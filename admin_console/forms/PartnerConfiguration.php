@@ -185,6 +185,12 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Password replacement frequency (seconds):',
 			'filters'		=> array('StringTrim'),
 		));				
+//--------------------------- Single Sign On ---------------------------			
+		
+		$this->addElement('text', 'logout_url', array(
+			'label'			=> 'Logout Url:',
+			'filters'		=> array('StringTrim'),
+		));
 //--------------------------- Group Association ---------------------------			
 		$partnerGroupTypes = new Kaltura_Form_Element_EnumSelect('partner_group_type', array('enum' => 'Kaltura_Client_Enum_PartnerGroupType'));
 		$partnerGroupTypes->setLabel('Account Type:');
@@ -624,13 +630,13 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array_merge(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert'), $permissionNames[self::GROUP_REMOTE_STORAGE] ,array('crossLine')), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));	
 		$this->addDisplayGroup(array('notifications_config', 'allow_multi_notification','crossLine'), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
 		$this->addDisplayGroup(array_merge(array('def_thumb_offset','def_thumb_density') , $permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS], array('enable_bulk_upload_notifications_emails', 'bulk_upload_notifications_email', 'crossLine')), 'publisherSpecificIngestionSettings', array('legend' => 'Content Ingestion Options'));
+		$this->addDisplayGroup(array('logout_url', 'crossLine'), 'signSignOn', array('legend' => 'Sign Sign On'));
 		$this->addDisplayGroup(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_max',
 									// Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_overagePrice',
 									 'login_block_period',
 									 'num_prev_pass_to_keep',
 									 'pass_replace_freq'),
 									 'passwordSecurity', array('legend' => 'Password Security'));
-
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
 		$this->addDisplayGroup(array('extended_free_trail', 'extended_free_trail_expiry_date', 'extended_free_trail_expiry_reason', 'monitor_usage_history'), 'accountOptionsMonitorUsage', array('legend' => 'New Account Options'));

@@ -101,6 +101,12 @@ class kmc4Action extends kalturaAction
 		}
 	/** END - set first_login flag **/
 		
+	/** get logout url **/
+		$this->logoutUrl = null; 
+		if ($partner->getLogoutUrl())
+			$this->logoutUrl = $partner->getLogoutUrl();
+	/** END - get logout url**/	
+		
 	/** partner-specific: change KDP version for partners working with auto-moderaion **/
 		// set content kdp version according to partner id
 		$moderated_partners = array( 31079, 28575, 32774 );

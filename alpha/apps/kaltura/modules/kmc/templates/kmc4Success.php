@@ -59,7 +59,8 @@ if( count($allowedPartners) > 1 ) {
 				kclip	: "<?php echo $content_uiconds_clipapp_kclip->getId(); ?>"
 			},
 			google_analytics_account : "<?php echo kConf::get("ga_account"); ?>",
-			language	 : "<?php echo (isset($language) ? $language : '') ?>"
+			language	 : "<?php echo (isset($language) ? $language : '') ?>",
+			logoutUrl	 : "<?php echo (isset($logoutUrl) ? $logoutUrl : '') ?>"
 		}
 	};
 </script>

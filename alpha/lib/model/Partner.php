@@ -553,6 +553,10 @@ class Partner extends BasePartner
 	public function getState() { return $this->getFromCustomData("state", null); }
 	public function setState( $v ) { $this->putInCustomData("state", $v); }
 
+	// logout url for partners integrating a single sign on solution
+	public function getLogoutUrl() { return $this->getFromCustomData('logoutUrl', null); }
+	public function setLogoutUrl($v) { $this->putInCustomData('logoutUrl', $v); }
+	
 	//kmc language
 	public function setKMCLanguage($v) { $this->putInCustomData('language', $v, 'KMC');}
 	public function getKMCLanguage() { return $this->getFromCustomData('language', 'KMC', null);}

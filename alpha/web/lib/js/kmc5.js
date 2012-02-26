@@ -1090,7 +1090,10 @@ kmc.user = {
 				},
 			dataType: "json",
 			complete: function() {
-				window.location = kmc.vars.service_url + "/index.php/kmc/kmc#" + state.moduleName + "|" + state.subtab;
+				if (kmc.vars.logoutUrl)
+					window.location = kmc.vars.logoutUrl;
+				else
+					window.location = kmc.vars.service_url + "/index.php/kmc/kmc#" + state.moduleName + "|" + state.subtab;
 			}
 		});
 	},
