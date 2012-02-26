@@ -221,7 +221,7 @@ class widget extends Basewidget
 	   		$player_name = 'player_' . (int)microtime(true);
 	   		$seo_hidden = "";
 	   	}
-	   	else
+	   	else if ($partner->getIgnoreSeoLinks())
 	   	{
 		   	$seo_hidden = '<a href="http://corp.kaltura.com">video platform</a>' .
 		   		'<a href="http://corp.kaltura.com/video_platform/video_management">video management</a>' .
