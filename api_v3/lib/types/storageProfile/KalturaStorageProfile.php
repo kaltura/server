@@ -161,6 +161,12 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 */
 	public $deliveryStatus;
 	
+	/**
+	 * 
+	 * @var string
+	 */
+	public $rtmpPrefix;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -189,6 +195,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		"trigger",
 		"deliveryPriority",
 		"deliveryStatus",
+		"rtmpPrefix"
 	);
 	
 	public function getMapBetweenObjects ( )
