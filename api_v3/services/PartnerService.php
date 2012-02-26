@@ -296,4 +296,40 @@ class PartnerService extends KalturaBaseService
 		return $response;
 	}
 
+	/**
+	 * List partners by filter with paging support
+	 * Current implementation will only list the sub partners of the partner initiating the api call (using the current KS)
+	 * 
+	 * @action list
+	 * @param KalturaPartnerFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaPartnerListResponse
+	 * 
+	 * @throws KalturaErrors::NON_GROUP_PARTNER
+	 */
+	function listAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		/**
+		 * this action is only partially implemented to support listing sub partners of a VAR partner
+		 * see action description for current implementation details
+		 */
+		
+		// to be on the safe side
+		if (is_null($this->getKs()) || is_null($this->getPartner()) || !$this->getPartnerId())
+			throw new KalturaAPIException(APIErrors::MISSING_KS);
+			
+		$c = new Criteria();
+		$subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $this->getPartnerId());
+		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $this->getPartnerId());
+		$subCriterion1->addOr($subCriterion2);
+		$c->add($subCriterion1);
+		$dbPartners = PartnerPeer::doSelect($c);
+		$partnersArray = KalturaPartnerArray::fromPartnerArray($dbPartners);
+		
+		$response = new KalturaPartnerListResponse();
+		$response->objects = $partnersArray;
+		$response->totalCount = count($partnersArray);
+		return $response;
+	}
+
 }
