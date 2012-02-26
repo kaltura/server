@@ -39,21 +39,23 @@ class KalturaConfigurableDistributionProfile extends KalturaDistributionProfile
 			
 		parent::toObject($dbObject, $skip);
 		
-		$dbFieldConfigArray = array();
 		if (!is_null($this->fieldConfigArray))
 		{
+			$dbFieldConfigArray = array();
 		    foreach ($this->fieldConfigArray as $fieldConfig)
-		    {
 		        $dbFieldConfigArray[] = $fieldConfig->toObject();
-		    }
+		        
+			$dbObject->setFieldConfigArray($dbFieldConfigArray);
 		}
-		$dbObject->setFieldConfigArray($dbFieldConfigArray);
 		
-		$itemXpathsToExtendArray = array();
-		foreach($this->itemXpathsToExtend as $stringObj)
-			$itemXpathsToExtendArray[] = $stringObj->value;
-			
-		$dbObject->setItemXpathsToExtend($itemXpathsToExtendArray);
+		if (!is_null($this->itemXpathsToExtend))
+		{
+			$itemXpathsToExtendArray = array();
+			foreach($this->itemXpathsToExtend as $stringObj)
+				$itemXpathsToExtendArray[] = $stringObj->value;
+				
+			$dbObject->setItemXpathsToExtend($itemXpathsToExtendArray);
+		}
 					
 		return $dbObject;
 	}

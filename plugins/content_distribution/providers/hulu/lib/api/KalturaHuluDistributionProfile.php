@@ -91,11 +91,14 @@ class KalturaHuluDistributionProfile extends KalturaConfigurableDistributionProf
 			
 		parent::toObject($dbObject, $skip);
 		
-		$seriesAdditionalCategoriesArray = array();
-		foreach($this->seriesAdditionalCategories as $stringObj)
-			$seriesAdditionalCategoriesArray[] = $stringObj->value;
-			
-		$dbObject->setSeriesAdditionalCategories($seriesAdditionalCategoriesArray);
+		if (!is_null($this->seriesAdditionalCategories))
+		{
+			$seriesAdditionalCategoriesArray = array();
+			foreach($this->seriesAdditionalCategories as $stringObj)
+				$seriesAdditionalCategoriesArray[] = $stringObj->value;
+				
+			$dbObject->setSeriesAdditionalCategories($seriesAdditionalCategoriesArray);
+		}
 					
 		return $dbObject;
 	}

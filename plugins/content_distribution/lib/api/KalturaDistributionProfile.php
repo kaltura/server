@@ -181,21 +181,23 @@ class KalturaDistributionProfile extends KalturaObject implements IFilterable
 			
 		parent::toObject($dbObject, $skip);
 		
-		$optionalThumbDimensionsArray = array();
 		if($this->optionalThumbDimensions)
 		{
+			$optionalThumbDimensionsArray = array();
 			foreach($this->optionalThumbDimensions as $optionalThumbDimensions)
 				$optionalThumbDimensionsArray[] = $optionalThumbDimensions->toObject();
-		}
-		$dbObject->setOptionalThumbDimensionsObjects($optionalThumbDimensionsArray);
 		
-		$requiredThumbDimensionsArray = array();	
+			$dbObject->setOptionalThumbDimensionsObjects($optionalThumbDimensionsArray);
+		}
+			
 		if($this->requiredThumbDimensions)
 		{
+			$requiredThumbDimensionsArray = array();
 			foreach($this->requiredThumbDimensions as $requiredThumbDimensions)
 				$requiredThumbDimensionsArray[] = $requiredThumbDimensions->toObject();
+				
+			$dbObject->setRequiredThumbDimensionsObjects($requiredThumbDimensionsArray);
 		}
-		$dbObject->setRequiredThumbDimensionsObjects($requiredThumbDimensionsArray);
 
 		return $dbObject;
 	}
