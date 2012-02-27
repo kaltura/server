@@ -109,7 +109,7 @@ abstract class KalturaAssetService extends KalturaBaseService
 	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, -1);
 	    }
 	    
-	    $dbAsset = entryPeer::retrieveByPK($assetId);
+	    $dbAsset = assetPeer::retrieveById($assetId);
 	    if (!$dbAsset)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $assetId);
