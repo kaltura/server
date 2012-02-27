@@ -93,22 +93,12 @@ abstract class KalturaAssetService extends KalturaBaseService
 	 * Action for manually exporting an asset
 	 * @param string $assetId
 	 * @param int $storageProfileId
-	 * @throws KalturaErrors::INVALID_ENTRY_ID
-	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::INVALID_FLAVOR_ASSET_ID
+	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
 	 */
 	protected function exportAction ( $assetId , $storageProfileId )
-	{
-	    if (!$assetId || $assetId == "")
-	    {
-	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, -1);
-	    }
-	    
-	    if (!$storageProfileId || $storageProfileId == "")
-	    {
-	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, -1);
-	    }
-	    
+	{	    
 	    $dbAsset = assetPeer::retrieveById($assetId);
 	    if (!$dbAsset)
 	    {
@@ -118,7 +108,7 @@ abstract class KalturaAssetService extends KalturaBaseService
 	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);	    
 	    if (!$dbStorageProfile)
 	    {
-	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $storageProfileId);
+	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $storageProfileId);
 	    }
 	    
 	    $storageExporter = new kStorageExporter();
@@ -131,6 +121,6 @@ abstract class KalturaAssetService extends KalturaBaseService
 	        throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 	    }
 	    
-	    return $this->getAction($$assetId);
+	    return $this->getAction($assetId);
 	}
 }
