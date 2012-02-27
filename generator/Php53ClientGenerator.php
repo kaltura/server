@@ -1,5 +1,5 @@
 <?php
-class PhpZend2ClientGenerator extends ClientGeneratorFromXml
+class Php53ClientGenerator extends ClientGeneratorFromXml
 {
 	private $cacheEnums = array();
 	private $cacheTypes = array();
@@ -9,10 +9,10 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected $_doc = null;
 	
-	function PhpZend2ClientGenerator($xmlPath, $sourcePath = null)
+	function Php53ClientGenerator($xmlPath, $sourcePath = null)
 	{
 		if(!$sourcePath)
-			$sourcePath = realpath("sources/zend2");
+			$sourcePath = realpath("sources/php53");
 			
 		parent::ClientGeneratorFromXml($xmlPath, $sourcePath);
 		$this->_doc = new DOMDocument();
