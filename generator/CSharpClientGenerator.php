@@ -370,7 +370,6 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("					int i = 0;");
 					$this->appendLine("					foreach ($arrayType item in this.$dotNetPropName)");
 					$this->appendLine("					{");
-					$this->appendLine("						kparams.Add(\"".$propName.":\" + i + \":objectType\", item.GetType().Name);");
 					$this->appendLine("						kparams.Add(\"".$propName.":\" + i, item.ToParams());");
 					$this->appendLine("						i++;");
 					$this->appendLine("					}");
