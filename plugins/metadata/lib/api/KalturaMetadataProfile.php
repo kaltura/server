@@ -21,7 +21,7 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var KalturaMetadataObjectType
-	 * @filter eq
+	 * @filter eq,in
 	 */
 	public $metadataObjectType;
 	

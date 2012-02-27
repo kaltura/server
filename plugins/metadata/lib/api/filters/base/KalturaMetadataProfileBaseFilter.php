@@ -11,6 +11,7 @@ class KalturaMetadataProfileBaseFilter extends KalturaFilter
 		"idEqual" => "_eq_id",
 		"partnerIdEqual" => "_eq_partner_id",
 		"metadataObjectTypeEqual" => "_eq_metadata_object_type",
+		"metadataObjectTypeIn" => "_in_metadata_object_type",
 		"versionEqual" => "_eq_version",
 		"nameEqual" => "_eq_name",
 		"systemNameEqual" => "_eq_system_name",
@@ -61,6 +62,14 @@ class KalturaMetadataProfileBaseFilter extends KalturaFilter
 	 * @var KalturaMetadataObjectType
 	 */
 	public $metadataObjectTypeEqual;
+
+	/**
+	 * 
+	 * 
+	 * @dynamicType KalturaMetadataObjectType
+	 * @var string
+	 */
+	public $metadataObjectTypeIn;
 
 	/**
 	 * 
