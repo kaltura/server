@@ -90,8 +90,6 @@ abstract class KalturaAssetService extends KalturaBaseService
 	}
 	
 	/**
-	 * @action export
-	 * 
 	 * Action for manually exporting an asset
 	 * @param string $assetId
 	 * @param int $storageProfileId
@@ -99,7 +97,7 @@ abstract class KalturaAssetService extends KalturaBaseService
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
 	 */
-	public function exportAction ( $assetId , $storageProfileId )
+	protected function exportAction ( $assetId , $storageProfileId )
 	{
 	    if (!$assetId || $assetId == "")
 	    {

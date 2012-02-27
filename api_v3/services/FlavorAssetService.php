@@ -817,4 +817,21 @@ class FlavorAssetService extends KalturaAssetService
 		
 		return $flavorAssetWithParamsArray;
 	}
+	
+	
+	/**
+	 * @action export
+	 * 
+	 * Action for manually exporting an asset
+	 * @param string $assetId
+	 * @param int $storageProfileId
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
+	 */
+	protected function exportAction ( $assetId , $storageProfileId )
+	{
+	    return parent::exportAction($assetId, $storageProfileId);
+	}
+	
 }
