@@ -126,7 +126,10 @@ class kPluginableEnumsManager
 
 	public static function apiToCore($type, $value)
 	{
-		$split = explode(IKalturaEnumerator::PLUGIN_VALUE_DELIMITER, $value, 2);
+		if(!preg_match('/\w+\.?\w+/', $value))
+			throw new kCoreException("Dynamic enum invalid format [$value]", kCoreException::INVALID_ENUM_FORMAT);
+			
+		$split = explode(IKalturaEnumerator::PLUGIN_VALUE_DELIMITER, $value);
 		if(count($split) == 1)
 			return $value;
 			
