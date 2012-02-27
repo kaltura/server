@@ -112,7 +112,7 @@ abstract class KalturaAssetService extends KalturaBaseService
 	    $dbAsset = assetPeer::retrieveById($assetId);
 	    if (!$dbAsset)
 	    {
-	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $assetId);
+	        throw new KalturaAPIException(KalturaErrors::INVALID_FLAVOR_ASSET_ID, $assetId);
 	    }
 	    
 	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);	    
