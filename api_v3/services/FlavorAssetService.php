@@ -829,7 +829,7 @@ class FlavorAssetService extends KalturaAssetService
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
 	 */
-	protected function exportAction ( $assetId , $storageProfileId )
+	public function exportAction ( $assetId , $storageProfileId )
 	{
 	    return parent::exportAction($assetId, $storageProfileId);
 	}
