@@ -121,7 +121,9 @@ abstract class KalturaAssetService extends KalturaBaseService
 	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $storageProfileId);
 	    }
 	    
-	    $exported = kStorageExporter::exportFlavorAsset($dbAsset, $dbStorageProfile);
+	    $storageExporter = new kStorageExporter();
+	    
+	    $exported = $storageExporter->exportFlavorAsset($dbAsset, $dbStorageProfile);
 	    
 	    if ($exported !== true)
 	    {

@@ -33,7 +33,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			foreach($externalStorages as $externalStorage)
 			{
 				if($externalStorage->getTrigger() == StorageProfile::STORAGE_TEMP_TRIGGER_MODERATION_APPROVED)
-					self::exportEntry($object, $externalStorage);
+					$this->exportEntry($object, $externalStorage);
 			}
 		}
 		
@@ -55,7 +55,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 						)
 					)
 				{
-					self::exportFlavorAsset($object, $externalStorage);
+					$this->exportFlavorAsset($object, $externalStorage);
 				}
 			}
 		}
@@ -66,7 +66,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param flavorAsset $flavor
 	 * @param StorageProfile $externalStorage
 	 */
-	public static function exportFlavorAsset(flavorAsset $flavor, StorageProfile $externalStorage)
+	public function exportFlavorAsset(flavorAsset $flavor, StorageProfile $externalStorage)
 	{
 		$flavorParamsIds = $externalStorage->getFlavorParamsIds();
 		KalturaLog::log(__METHOD__ . " flavorParamsIds [$flavorParamsIds]");
@@ -182,7 +182,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param entry $entry
 	 * @param StorageProfile $externalStorage
 	 */
-	public static function exportEntry(entry $entry, StorageProfile $externalStorage)
+	public function exportEntry(entry $entry, StorageProfile $externalStorage)
 	{
 		$checkFileSyncsKeys = $this->getEntrySyncKeys($entry, $externalStorage);
 		foreach($checkFileSyncsKeys as $key)
@@ -231,7 +231,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				{
 					$sourceFlavor = assetPeer::retrieveOriginalReadyByEntryId($dbBatchJob->getEntryId());
 					if($sourceFlavor)
-						self::exportFlavorAsset($sourceFlavor, $externalStorage);
+						$this->exportFlavorAsset($sourceFlavor, $externalStorage);
 				}
 			}
 		}
