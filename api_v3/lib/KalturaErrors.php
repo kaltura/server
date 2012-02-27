@@ -141,6 +141,8 @@ class KalturaErrors extends APIErrors
 	
 	const BULK_UPLOAD_NOT_FOUND = "BULK_UPLOAD_NOT_FOUND,Bulk upload id \"%s\" not found";
 	
+	const CANNOT_ABORT_BULKUPLOAD_UNFINISHED_JOB = "CANNOT_ABORT_UNFINISHED_BULKUPLOAD_JOB,Bulk Upload id \"%s\" is not finished";
+	
 	/**
 	 * Widget Service
 	 */
