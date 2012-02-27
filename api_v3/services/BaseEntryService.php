@@ -813,6 +813,8 @@ class BaseEntryService extends KalturaEntryService
 	 * Action for manually exporting an entry
 	 * @param string $entryId
 	 * @param int $storageProfileId
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */
 	public function exportAction ( $entryId , $storageProfileId )
 	{
@@ -827,20 +829,20 @@ class BaseEntryService extends KalturaEntryService
 	    }
 	    
 	    $dbEntry = entryPeer::retrieveByPK($entryId);
-	    
-	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
-	    
 	    if (!$dbEntry)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
 	    }
 	    
+	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);	    
 	    if (!$dbStorageProfile)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $storageProfileId);
 	    }
 	    
 	    kStorageExporter::exportEntry($dbEntry, $dbStorageProfile);
+	    
+	    //TODO: implement export errors
 	    
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry);
