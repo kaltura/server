@@ -22,6 +22,43 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		parent::__construct($filePath);
 	}
 	
+	/**
+	 * @return KalturaMediaInfo
+	 */
+	public function getMediaInfo()
+	{
+		$output = $this->getRawMediaInfo();
+		$kMi = $this->parseOutput($output);
+		$durLimit=3600000;
+		if(get_class($this)=='KMediaInfoMediaParser'
+		&& ((isset($kMi->containerDuration) && $kMi->containerDuration>$durLimit) 
+			|| (isset($kMi->videoDuration) && $kMi->videoDuration>$durLimit)
+			|| (isset($kMi->audioDuration) && $kMi->audioDuration>$durLimit))) {
+			$cmd = "{$this->cmdPath} \"--Inform=General;done %Duration%\" \"{$this->filePath}\"";
+			$output=0;
+			$output = shell_exec($cmd);
+			$aux = explode(" ", $output);
+			if(isset($aux) && count($aux)==2 && $aux[0]=='done'){
+				$kMi->containerDuration=(int)$aux[1];
+			}
+			$cmd = "{$this->cmdPath} \"--Inform=Video;done %Duration%\" \"{$this->filePath}\"";
+			$output=0;
+			$output = shell_exec($cmd);
+			$aux = explode(" ", $output);
+			if(isset($aux) && count($aux)==2 && $aux[0]=='done'){
+				$kMi->videoDuration=(int)$aux[1];
+			}
+			$cmd = "{$this->cmdPath} \"--Inform=Audio;done %Duration%\" \"{$this->filePath}\"";
+			$output=0;
+			$output = shell_exec($cmd);
+			$aux = explode(" ", $output);
+			if(isset($aux) && count($aux)==2 && $aux[0]=='done'){
+				$kMi->audioDuration=(int)$aux[1];
+			}
+		}
+		return $kMi;
+	}
+	
 	protected function getCommand() 
 	{
 		return "{$this->cmdPath} \"{$this->filePath}\"";
