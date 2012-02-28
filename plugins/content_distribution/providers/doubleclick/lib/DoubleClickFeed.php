@@ -203,7 +203,7 @@ class DoubleClickFeed
 			if ($cuePoint->getAdType() != AdType::VIDEO)
 				continue;
 				
-			$tags = explode(',', $cuePoint->getTags()); // KMC saved cue points provider as a tag
+			$tags = explode(',', $cuePoint->getTags()); // KMC saves cue points provider as a tag
 			foreach($tags as &$tempTag)
 				$tempTag = trim($tempTag);
 				
@@ -228,8 +228,29 @@ class DoubleClickFeed
 			$content = $this->content->cloneNode(true);
 			$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
 			$mediaGroup->appendChild($content);
+				
 			$url = $this->getAssetUrl($flavorAsset);
-			$type = $this->getContentTypeFromUrl($url);
+			$type = '';
+			switch ($flavorAsset->getFileExt())
+			{
+				// covers most cases
+				case 'mp4':
+					$type = 'video/mp4';
+					break;
+				case 'flv':
+					$type = 'video/x-flv';
+					break;
+				// try get using the deprecated  mime_content_type 
+				// which should be switched to Fileinfo once we have php5.3
+				default:
+					$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+					if(kFileSyncUtils::fileSync_exists($syncKey)) 
+					{
+					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
+					$type = mime_content_type($path);
+					}
+					break;
+			} 
 			
 			$this->setNodeValue('@url', $url, $content);
 			$this->setNodeValue('@type', $type, $content);
@@ -333,25 +354,5 @@ class DoubleClickFeed
 		if ($value)
 			$element->setAttribute($attribute, $value);
 	}
-	
-		
-	protected function getContentTypeFromUrl($url)
-	{
-		$this->ch = curl_init();
-		curl_setopt($this->ch, CURLOPT_URL, $url);
-		curl_setopt($this->ch, CURLOPT_HEADER, true);
-		curl_setopt($this->ch, CURLOPT_NOBODY, true);
-		curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-		$headers = curl_exec($this->ch);
-		if (preg_match('/Content-Type: (.*)/', $headers, $matched))
-		{
-			return trim($matched[1]);
-		}
-		else
-		{
-			KalturaLog::alert('"Content-Type" header was not found for the following URL: '. $url);
-			return null;
-		}
-	}
+
 }
