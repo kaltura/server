@@ -201,7 +201,7 @@ class AttUverseDistributionProfile extends ConfigurableDistributionProfile
 						</xsl:if>
 						<xsl:value-of select="." />
 					</xsl:for-each>');
-		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 	    	    
