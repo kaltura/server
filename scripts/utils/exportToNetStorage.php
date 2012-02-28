@@ -22,8 +22,7 @@ require_once(ROOT_DIR . '/infra/bootstrap_base.php');
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "metadata", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "sphinx_search", "*"));
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
 KAutoloader::setClassMapFilePath('../cache/classMap.cache');
 KAutoloader::register();
 
@@ -88,8 +87,10 @@ while ($moreEntries)
     	foreach($keys as $key)
     	{
     		$fileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $storageProfile);
-    		$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($key, true);
-    		kJobsManager::addStorageExportJob(null, $entry->getId(), $partnerId, $storageProfile, $fileSync, $srcFileSyncLocalPath);
+    		list($dcFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
+    		/* @var $dcFileSync FileSync */
+    		$srcFileSyncLocalPath = $dcFileSync->getFileRoot() . $dcFileSync->getFilePath();
+    		kJobsManager::addStorageExportJob(null, $entry->getId(), $partnerId, $storageProfile, $fileSync, $srcFileSyncLocalPath, false, $dcFileSync->getDc());
     	}
     		
     	echo $entry->getId() . " - " . count($keys) . " keys exported\n\n";
