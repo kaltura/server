@@ -39,24 +39,19 @@ function askToDelete($path)
 	$baseKalturaPath = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..');
 	if (strpos($path, $baseKalturaPath) === 0)
 	{
-		echo 'Are you sure you want to delete all contents of ['.$path.'] (y/n) ?  ';
+		echo 'Are you sure you want to delete all files under ['.$path.'] (y/n) ?  ';
 		$input = trim(fgets(STDIN));
-		if ($input === 'y') {
-			$cmd = 'rm -rf '.$path.DIRECTORY_SEPARATOR.'*'.DIRECTORY_SEPARATOR.'*';
-			echo "$cmd\n";
-			system($cmd);
-			
-			$cmd = 'rm -rf '.$path.DIRECTORY_SEPARATOR.'*.*';
-			echo "$cmd\n";
-			system($cmd);
-			
-			$cmd = 'del /F /S /Q '.$path.DIRECTORY_SEPARATOR.'*'.DIRECTORY_SEPARATOR.'*';
-			echo "$cmd\n";
-			system($cmd);
-			
-			$cmd = 'del /F /S /Q '.$path.DIRECTORY_SEPARATOR.'*.*';
-			echo "$cmd\n";
-			system($cmd);
+		if ($input === strtolower('y')) {
+                    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+			$cmd = 'del /F /S /Q '.$path.DIRECTORY_SEPARATOR.'*'.DIRECTORY_SEPARATOR.'* del /F /S /Q '.$path.DIRECTORY_SEPARATOR.'*.*';
+                    } else {
+		        $cmd = "find $path -type f -exec rm -rf {} \;";
+                    }
+                    echo "Executing: $cmd\n";
+                    system($cmd,$rc);
+                    if ($rc){
+                            echo "Failed to clean up $path.";
+                    }
 		}
 		else {
 			echo 'Skipping...'.PHP_EOL;
