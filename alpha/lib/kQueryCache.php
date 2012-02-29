@@ -7,6 +7,7 @@ class kQueryCache
 	const QUERY_MASTER_TIME_MARGIN_SEC = 300;		// The time frame after a change to a row during which we should query the master
 	const MAX_CACHED_OBJECT_COUNT = 100;			// Select queries that return more objects than this const will not be cached
 	const CACHED_QUERIES_EXPIRY_SEC = 86400;		// The expiry of the query keys in the memcache 	
+	const INVALIDATION_KEYS_EXPIRY_MARGIN = 3600;	// An extra expiry time given to invalidation keys over cached queries
 
 	const MAX_IN_CRITERION_INVALIDATION_KEYS = 5;	// Maximum number of allowed elements in 'IN' to use the query cache
 	
@@ -282,7 +283,8 @@ class kQueryCache
 		{
 			$invalidationKey = self::CACHE_PREFIX_INVALIDATION_KEY.$invalidationKey;
 			KalturaLog::debug("kQueryCache: updating invalidation key, invkey=$invalidationKey");
-			if (!self::$s_memcacheKeys->set($invalidationKey, $currentTime))
+			if (!self::$s_memcacheKeys->set($invalidationKey, $currentTime, 0, 
+				self::CACHED_QUERIES_EXPIRY_SEC + self::INVALIDATION_KEYS_EXPIRY_MARGIN))
 			{
 				KalturaLog::err("kQueryCache: failed to update invalidation key");
 			}
