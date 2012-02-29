@@ -25,8 +25,8 @@ class kgenericAction extends sfAction
 		if (!$ui_conf_swf_url)
 		{
 			die();
-		}
-			
+		}	
+		
 		if( kString::beginsWith( $ui_conf_swf_url , "http") )
 		{
 			$swf_url = 	$ui_conf_swf_url; // absolute URL 
@@ -43,7 +43,8 @@ class kgenericAction extends sfAction
 			$conf_vars = "&".$conf_vars;
 			
 		$params  = "host=" . $host.
-			"&uiConfId=" . $ui_conf_id.
+			"&uiConfId=" . $ui_conf_id .
+			"&cdnHost=". str_replace("http://", "", str_replace("https://", "", myPartnerUtils::getCdnHost($partner_id))).
 			$conf_vars;
 			
 		$this->redirect(  "$swf_url?$params");
