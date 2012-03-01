@@ -2,26 +2,29 @@
 
 // Invalidation keys table
 $INVALIDATION_KEYS = array(
-	array('table' => "flavor_asset", 			'keys' => array(array("'flavorAsset:id='", '@OBJ@.id'), array("'flavorAsset:entryId='", '@OBJ@.entry_id')), 							'class' => 'asset'),
-	array('table' => "kuser", 					'keys' => array(array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id'))),
-	array('table' => "entry", 					'keys' => array(array("'entry:id='", '@OBJ@.id'))),
-	array('table' => "access_control", 			'keys' => array(array("'accessControl:id='", '@OBJ@.id'))),
-	array('table' => "permission", 				'keys' => array(array("'permission:partnerId='", '@OBJ@.partner_id'))),
-	array('table' => "kuser_to_user_role",	 	'keys' => array(array("'kuserToUserRole:kuserId='", '@OBJ@.kuser_id'))),
-	array('table' => "category", 				'keys' => array(array("'category:partnerId='", '@OBJ@.partner_id'))),
-	array('table' => "file_sync", 				'keys' => array(array("'fileSync:objectId='", '@OBJ@.object_id'))),
-	array('table' => "media_info", 				'keys' => array(array("'mediaInfo:flavorAssetId='", '@OBJ@.flavor_asset_id'))),
-	array('table' => "storage_profile", 		'keys' => array(array("'storageProfile:id='", '@OBJ@.id'), array("'storageProfile:partnerId='", '@OBJ@.partner_id'))),
-	array('table' => "ui_conf", 				'keys' => array(array("'uiConf:id='", '@OBJ@.id'))),
-	array('table' => "widget", 					'keys' => array(array("'widget:id='", '@OBJ@.id'))),
-	array('table' => "metadata", 				'keys' => array(array("'metadata:objectId='", '@OBJ@.object_id')), 																		'plugin' => 'metadata'),
-	array('table' => "metadata_profile_field", 	'keys' => array(array("'metadataProfileField:metadataProfileId='", '@OBJ@.metadata_profile_id')),										'plugin' => 'metadata'),
-	array('table' => "partner", 				'keys' => array(array("'partner:id='", '@OBJ@.id'))),
-	array('table' => "cue_point", 				'keys' => array(array("'cuePoint:id='", '@OBJ@.id'), array("'cuePoint:entryId='", '@OBJ@.entry_id')),									'plugin' => 'cue_points/base'),
-	array('table' => "drop_folder_file", 		'keys' => array(array("'dropFolderFile:id='", '@OBJ@.id'), array("'dropFolderFile:dropFolderId='", '@OBJ@.drop_folder_id')),			'plugin' => 'drop_folder'),
-	array('table' => "flavor_params_output", 	'keys' => array(array("'flavorParamsOutput:id='", '@OBJ@.id'), array("'flavorParamsOutput:flavorAssetId='", '@OBJ@.flavor_asset_id')),	'class' => 'assetParamsOutput'),
-	array('table' => "entry_distribution", 		'keys' => array(array("'entryDistribution:entryId='", '@OBJ@.entry_id')),																'plugin' => 'content_distribution'),
-	array('table' => "flavor_params", 			'keys' => array(array("'flavorParams:id='", '@OBJ@.id')),																				'class' => 'assetParams'),
+	array('table' => "flavor_asset", 					'keys' => array(array("'flavorAsset:id='", '@OBJ@.id'), array("'flavorAsset:entryId='", '@OBJ@.entry_id')), 							'class' => 'asset'),
+	array('table' => "kuser", 							'keys' => array(array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id'))),
+	array('table' => "entry", 							'keys' => array(array("'entry:id='", '@OBJ@.id'))),
+	array('table' => "access_control", 					'keys' => array(array("'accessControl:id='", '@OBJ@.id'))),
+	array('table' => "permission", 						'keys' => array(array("'permission:partnerId='", '@OBJ@.partner_id'))),
+	array('table' => "kuser_to_user_role",	 			'keys' => array(array("'kuserToUserRole:kuserId='", '@OBJ@.kuser_id'))),
+	array('table' => "category", 						'keys' => array(array("'category:partnerId='", '@OBJ@.partner_id'))),
+	array('table' => "file_sync", 						'keys' => array(array("'fileSync:id='", '@OBJ@.id'), array("'fileSync:objectId='", '@OBJ@.object_id'))),
+	array('table' => "media_info", 						'keys' => array(array("'mediaInfo:flavorAssetId='", '@OBJ@.flavor_asset_id'))),
+	array('table' => "storage_profile", 				'keys' => array(array("'storageProfile:id='", '@OBJ@.id'), array("'storageProfile:partnerId='", '@OBJ@.partner_id'))),
+	array('table' => "ui_conf", 						'keys' => array(array("'uiConf:id='", '@OBJ@.id'))),
+	array('table' => "widget", 							'keys' => array(array("'widget:id='", '@OBJ@.id'))),
+	array('table' => "metadata", 						'keys' => array(array("'metadata:objectId='", '@OBJ@.object_id')), 																		'plugin' => 'metadata'),
+	array('table' => "metadata_profile_field", 			'keys' => array(array("'metadataProfileField:metadataProfileId='", '@OBJ@.metadata_profile_id')),										'plugin' => 'metadata'),
+	array('table' => "partner", 						'keys' => array(array("'partner:id='", '@OBJ@.id'))),
+	array('table' => "cue_point", 						'keys' => array(array("'cuePoint:id='", '@OBJ@.id'), array("'cuePoint:entryId='", '@OBJ@.entry_id')),									'plugin' => 'cue_points/base'),
+	array('table' => "drop_folder_file", 				'keys' => array(array("'dropFolderFile:id='", '@OBJ@.id'), array("'dropFolderFile:dropFolderId='", '@OBJ@.drop_folder_id')),			'plugin' => 'drop_folder'),
+	array('table' => "flavor_params_output", 			'keys' => array(array("'flavorParamsOutput:id='", '@OBJ@.id'), array("'flavorParamsOutput:flavorAssetId='", '@OBJ@.flavor_asset_id')),	'class' => 'assetParamsOutput'),
+	array('table' => "entry_distribution", 				'keys' => array(array("'entryDistribution:entryId='", '@OBJ@.entry_id')),																'plugin' => 'content_distribution'),
+	array('table' => "flavor_params", 					'keys' => array(array("'flavorParams:id='", '@OBJ@.id')),																				'class' => 'assetParams'),
+	array('table' => "flavor_params_conversion_profile",'keys' => array(array("'flavorParamsConversionProfile:flavorParamsId='", '@OBJ@.flavor_params_id', "',conversionProfileId='", '@OBJ@.conversion_profile_id'))),
+	array('table' => "user_role", 						'keys' => array(array("'userRole:id='", '@OBJ@.id'))),
+	array('table' => "invalid_session", 				'keys' => array(array("'invalidSession:ks='", '@OBJ@.ks'))),
 	);
 
 	
@@ -285,7 +288,11 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 			}
 			$curKey = 'concat(' . implode(', ', $curKey) . ')';
 			
-			$triggerBody[] = "DO memc_set($curKey, UNIX_TIMESTAMP(NOW()));";
+			// Note: we use SYSDATE instead of NOW because NOW has the time of the INSERT/UPDATE statement
+			// while SYSDATE has the local time of the slave. This is important if there's lag between the 
+			// datacenters, using NOW may cause any cached queries not to be invalidated when the slave
+			// finally catches up
+			$triggerBody[] = "DO memc_set($curKey, UNIX_TIMESTAMP(SYSDATE()), 90000);";
 		}
 		
 		if (count($triggerBody) > 1)
