@@ -6,4 +6,5 @@
 interface MetadataObjectType extends BaseEnum
 {
 	const ENTRY = 1;
+	const CATEGORY = 2;
 }
