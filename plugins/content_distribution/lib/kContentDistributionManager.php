@@ -118,7 +118,7 @@ class kContentDistributionManager
 			$dcs[$fileSyncDc][$assetId] = $fileSync->getId();					
 		}
 		
-		if(isset($dcs[$dc]) && count($dcs[$dc]) == count($assets)) // all files exist in the current dc
+		if(isset($dcs[$dc]) && count($dcs[$dc]) == count($assets)) // all files exist in the current/preferred dc
 			return true;
 		
 		// check if all files exist on any of the remote dcs
