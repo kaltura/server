@@ -243,12 +243,13 @@ class DoubleClickFeed
 				// try get using the deprecated  mime_content_type 
 				// which should be switched to Fileinfo once we have php5.3
 				default:
-					$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-					if(kFileSyncUtils::fileSync_exists($syncKey)) 
-					{
-					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
-					$type = mime_content_type($path);
-					}
+					// mime type function is not available on our enviroment, we will only cover mp4 & flv mime types
+					//$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+					//if(kFileSyncUtils::fileSync_exists($syncKey)) 
+					//{
+					//$path = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
+					//$type = mime_content_type($path);
+					//}
 					break;
 			} 
 			
