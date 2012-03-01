@@ -453,7 +453,17 @@ class requestUtils
 			$remote_addr = trim($headerIPs[count($headerIPs) - 1]);
 			KalturaLog::log("getRemoteAddress [".@$_SERVER['HTTP_X_FORWARDED_FOR']."] [".$_SERVER['HTTP_X_FORWARDED_SERVER']."] [$remote_addr]");
 		}
-			
+		
+		// support getting the original ip address of the client when using the cdn for API calls (cdnapi)
+		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
+		 	in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) )
+		{
+			// pick the last ip
+		 	$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
+			$remote_addr = trim($headerIPs[0]);
+			KalturaLog::log("getRemoteAddress [".@$_SERVER['HTTP_X_FORWARDED_FOR']."] [".$_SERVER['HTTP_HOST']."] [$remote_addr]");
+		}
+
 		if (!$remote_addr && isset ( $_SERVER['HTTP_X_KALTURA_REMOTE_ADDR'] ) )
 		{
 			list($remote_addr, $time, $uniqueId, $hash) = @explode(",", $_SERVER['HTTP_X_KALTURA_REMOTE_ADDR']);
