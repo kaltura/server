@@ -50,6 +50,6 @@ class FileSyncPeer extends BaseFileSyncPeer
 
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("fileSync:objectId=%s", self::OBJECT_ID));		
+		return array(array("fileSync:id=%s", self::ID), array("fileSync:objectId=%s", self::OBJECT_ID));		
 	}
 }

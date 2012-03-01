@@ -93,4 +93,8 @@ class UserRole extends BaseUserRole
 		return $this;
 	}
 	
+	public function getCacheInvalidationKeys()
+	{
+		return array("userRole:id=".$this->getId());
+	}
 } // UserRole

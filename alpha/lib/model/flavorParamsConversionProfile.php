@@ -14,4 +14,9 @@ class flavorParamsConversionProfile extends BaseflavorParamsConversionProfile
 	const READY_BEHAVIOR_INHERIT_FLAVOR_PARAMS = 0;
 	const READY_BEHAVIOR_REQUIRED = 1;
 	const READY_BEHAVIOR_OPTIONAL = 2;
+	
+	public function getCacheInvalidationKeys()
+	{
+		return array("flavorParamsConversionProfile:flavorParamsId=".$this->getFlavorParamsId().",conversionProfileId=".$this->getConversionProfileId());
+	}
 }

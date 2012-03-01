@@ -70,4 +70,9 @@ class flavorParamsConversionProfilePeer extends BaseflavorParamsConversionProfil
 		$stmt = flavorParamsConversionProfilePeer::doSelectStmt($criteria, $con);
 		return $stmt->fetchAll(PDO::FETCH_COLUMN);
 	}
+	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("flavorParamsConversionProfile:flavorParamsId=%s,conversionProfileId=%s", self::FLAVOR_PARAMS_ID, self::CONVERSION_PROFILE_ID));		
+	}
 }

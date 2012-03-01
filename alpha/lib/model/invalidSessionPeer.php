@@ -53,4 +53,8 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 		return $invalidSession;
 	}
 	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("invalidSession:ks=%s", self::KS));		
+	}
 } // invalidSessionPeer

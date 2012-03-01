@@ -15,4 +15,8 @@
  */
 class invalidSession extends BaseinvalidSession {
 
+	public function getCacheInvalidationKeys()
+	{
+		return array("invalidSession:ks=".$this->getKs());
+	}
 } // invalidSession
