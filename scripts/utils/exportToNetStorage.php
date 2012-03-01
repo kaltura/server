@@ -43,21 +43,29 @@ if(!$storageProfile)
 
 $moreEntries = true;
 $limitPerLoop = 500;
-$lastIntId = -1;
 $totalExported = 0;
+$lastCreatedAt = null;
+$processedIds = array();
 
 while ($moreEntries)
 {
     $currentExported = 0;
     $c = new Criteria();
     $c->add(entryPeer::PARTNER_ID, $partnerId);
-    $c->add(entryPeer::INT_ID, $lastIntId, Criteria::GREATER_THAN);
-    $c->addAscendingOrderByColumn(entryPeer::INT_ID);
+	if ($lastCreatedAt)
+		$c->add(entryPeer::CREATED_AT, $lastCreatedAt, Criteria::LESS_EQUAL);
+	$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
     $c->setLimit($limitPerLoop);
-    $entries = entryPeer::doSelect($c);
+    $entries = entryPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL3));
+	
     foreach($entries as $entry)
     {
-        $lastIntId = $entry->getIntId();
+		if (in_array($entry->getId(), $processedIds))
+			continue;
+		$processedIds[] = $entry->getId();
+		
+		$lastCreatedAt = $entry->getCreatedAt(null);
+		
     	$keys = array();
     	$keys[] = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
     	$keys[] = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
