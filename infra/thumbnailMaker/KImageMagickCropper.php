@@ -158,7 +158,12 @@ class KImageMagickCropper extends KBaseCropper
 				case self::RESIZE:
 					$w = $width ? $width : '';
 					$h = $height ? $height : '';
-					$attributes[] = "-resize {$w}x{$h}!";
+					
+					$resize = "-resize {$w}x{$h}";
+					if(strlen($w) && strlen($h))
+						$resize .= '!';
+						
+					$attributes[] = $resize;
 					break;
 					
 				case self::RESIZE_WITH_PADDING:
@@ -194,15 +199,25 @@ class KImageMagickCropper extends KBaseCropper
 						}
 						
 						$bgcolor = sprintf('%06x', $bgcolor);
+						
+						$resize = "-resize {$w}x{$h}";
+						if(strlen($w) && strlen($h))
+							$resize .= '!';
+							
 						$attributes[] = "-bordercolor \"#{$bgcolor}\"";
-						$attributes[] = "-resize {$w}x{$h}!";
+						$attributes[] = $resize;
 						$attributes[] = "-border {$borderWidth}x{$borderHeight} -gravity Center";
 					}
 					else 
 					{
 						$w = $width ? $width : '';
 						$h = $height ? $height : '';
-						$attributes[] = "-resize {$w}x{$h}!";
+						
+						$resize = "-resize {$w}x{$h}";
+						if(strlen($w) && strlen($h))
+							$resize .= '!';
+							
+						$attributes[] = $resize;
 					}
 					break;
 					
@@ -252,9 +267,13 @@ class KImageMagickCropper extends KBaseCropper
 					elseif($cropType == self::CROP_FROM_TOP && !$gravity)
 						$attributes[] = "-gravity North";
 						
+					$resize = "-resize {$w}x{$h}";
+					if(strlen($w) && strlen($h))
+						$resize .= '!';
+					
 					$attributes[] = $gravity;	
 					$attributes[] = "-crop {$resizeWidth}x{$resizeHeight}+0+0";
-					$attributes[] = "-resize {$w}x{$h}!";
+					$attributes[] = $resize;
 					break;
 			}
 		}
