@@ -18,8 +18,25 @@ class KalturaSwfFlavorParams extends KalturaFlavorParams
 	(
 	);
 	
+	// attributes that defined in flavorParams and not in SwfFlavorParams
+	private static $skip_attributes = array
+	(
+		"videoConstantBitrate",
+		"videoBitrateTolerance",
+	);
+	
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+		$map = array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+		foreach(self::$skip_attributes as $skip_attribute)
+		{
+			if(isset($map[$skip_attribute]))
+				unset($map[$skip_attribute]);
+				
+			$key = array_search($skip_attribute, $map);
+			if($key !== false)
+				unset($map[$key]);
+		}
+		return $map;
 	}
 }
