@@ -1,9 +1,9 @@
 <?php
 
-require_once 'PHPUnit\Framework\TestCase.php';
+require_once 'PHPUnit' . DIRECTORY_SEPARATOR . 'Framework' . DIRECTORY_SEPARATOR . 'TestCase.php';
 require_once 'bootstrap.php';
 
-define("TESTSFILE", dirname(__FILE__) . DIRECTORY_SEPARATOR . "convertImageConvertorTests.txt");
+define("TESTSFILE", dirname(__FILE__) . DIRECTORY_SEPARATOR . "convertImageConvertorTests.csv");
 
 /**
  * this class tests two servers thumbnail compatibility,
