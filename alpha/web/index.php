@@ -229,10 +229,6 @@ define('MODULES' , SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF
 
 require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
 
-DbManager::setConfig(kConf::getDB());
-DbManager::initialize();
-
-
 // Logger
 $loggerConfigPath = realpath(dirname(__FILE__) . "/../../configurations/logger.ini");
 try // we don't want to fail when logger is not configured right
@@ -245,6 +241,9 @@ catch(Zend_Config_Exception $ex)
 {
 	$config = null;
 }
+
+DbManager::setConfig(kConf::getDB());
+DbManager::initialize();
 
 ActKeyUtils::checkCurrent();
 sfContext::getInstance()->getController()->dispatch();
