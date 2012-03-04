@@ -30,8 +30,14 @@ class convertImageServersUTest extends PHPUnit_Framework_TestCase
 			die ('unable to read tests file [' . TESTSFILE . ']');
 			
 		fgetcsv($fileHundler);	// discard header line
+		$index = 0;
 		while (!feof($fileHundler))
-			$provedidData[] = fgetcsv($fileHundler);
+		{
+			$data = fgetcsv($fileHundler);
+			array_unshift($data, $index);
+			$provedidData[] = $data;
+			$index++;
+		}
 			
 		return $provedidData;
 	}
@@ -58,15 +64,15 @@ class convertImageServersUTest extends PHPUnit_Framework_TestCase
 	 * the test is done by executing a number of different tests on two different servers (on identical files)
 	 * @dataProvider providerTestList
 	 */
-	public function testConvertImage($partnerId, $entryId, $quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $bgcolor, $density)
+	public function testConvertImage($index, $partnerId, $entryId, $quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $bgcolor, $density)
 	{		
 		$sizeTol = 1000* 1000;	// bytes tolerance, under this limit files will be considered as having the same size
 		$graphicTol = 0.2;		//PSNR tolerance, under this limit fiesl will be considered as having the same graphical characteristic
 		$pixelTol = 5;			// pixel width / height tolerance
 		
-		$downloadedFileInput = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'input.jpg';
-		$downloadedFileOutput = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'output.jpg';	
-		$generatedFileOutput = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'generated.jpg';
+		$downloadedFileInput = dirname(__FILE__) . DIRECTORY_SEPARATOR . "input.$index.jpg";
+		$downloadedFileOutput = dirname(__FILE__) . DIRECTORY_SEPARATOR . "output.$index.jpg";	
+		$generatedFileOutput = dirname(__FILE__) . DIRECTORY_SEPARATOR . "generated.$index.jpg";
 		
 		$downloadedFileInputURL = $this->buildURL($partnerId, $entryId);
 		$downloadedFileOutputURL = $this->buildURL($partnerId, $entryId, $quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $bgcolor, $density);
@@ -111,28 +117,17 @@ class convertImageServersUTest extends PHPUnit_Framework_TestCase
 			
 		// check if images are identical, graphica-wise (upto a given tolerance) 
 		$compare = kConf::get('bin_path_imagemagick_compare');
-		$cmd = "$compare -metric RMSE $downloadedFileOutput $generatedFileOutput diff.png";		
+		$cmd = "$compare -metric RMSE $downloadedFileOutput $generatedFileOutput diff.$index.png > diff.$index.log 2>&1";		
 		$retValue = null;
 		$output = null;
 		KalturaLog::debug("Execute: $cmd");
-		$output = system($cmd, $retValue);
+		system($cmd, $retValue);
+		$output = file_get_contents("diff.$index.log");
 		KalturaLog::debug("returned value [$retValue] output: \n$output\n");
 		
-		$matches = array();
-		//preg_match('/[0-9]*\.?[0-9]*\)/', $output, $matches);
+		if ($retValue != 0)
+			$this->fail($output);
 		
-//		if ($retValue != 0)
-//		{
-//			$this->fail();
-//		}
-		
-//		$compareResult = floatval($matches[0]);
-	//	echo 'score is: ' . $compareResult;
-		
-//		$this->assertTrue($compareResult < $graphicTol,
-//			"graphical comparison returned with highly un-identical value [$compareResult]");
-				
-
 		if(file_exists($downloadedFileInput))
 			unlink($downloadedFileInput);
 		if(file_exists($downloadedFileOutput))
