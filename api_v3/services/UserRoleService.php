@@ -33,11 +33,11 @@ class UserRoleService extends KalturaBaseService
 
 	
 	/**
-	 * Allows you to add a new KalturaUserRole object
+	 * Adds a new user role object to the account.
 	 * 
 	 * @action add
-	 * @param KalturaUserRole $userRole
-	 * @return KalturaUserRole
+	 * @param KalturaUserRole $userRole A new role
+	 * @return KalturaUserRole The added user role object
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE
@@ -75,11 +75,11 @@ class UserRoleService extends KalturaBaseService
 	}
 	
 	/**
-	 * Retrieve a KalturaUserRole object by ID
+	 * Retrieves a user role object using its ID.
 	 * 
 	 * @action get
-	 * @param int $userRoleId 
-	 * @return KalturaUserRole
+	 * @param int $userRoleId The user role's unique identifier
+	 * @return KalturaUserRole The retrieved user role object
 	 * 
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */		
@@ -99,12 +99,12 @@ class UserRoleService extends KalturaBaseService
 	
 
 	/**
-	 * Update an existing KalturaUserRole object
+	 * Updates an existing user role object.
 	 * 
 	 * @action update
-	 * @param int $userRoleId
-	 * @param KalturaUserRole $userRole
-	 * @return KalturaUserRole
+	 * @param int $userRoleId The user role's unique identifier
+	 * @param KalturaUserRole $userRole The user role's unique identifier
+	 * @return KalturaUserRole The updated user role object
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 * @throws KalturaErrors::PERMISSION_NOT_FOUND
@@ -151,11 +151,11 @@ class UserRoleService extends KalturaBaseService
 	}
 
 	/**
-	 * Mark the KalturaUserRole object as deleted
+	 * Deletes an existing user role object.
 	 * 
 	 * @action delete
-	 * @param int $userRoleId 
-	 * @return KalturaUserRole
+	 * @param int $userRoleId The user role's unique identifier
+	 * @return KalturaUserRole The deleted user role object
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 * @throws KalturaErrors::ROLE_IS_BEING_USED
@@ -187,12 +187,14 @@ class UserRoleService extends KalturaBaseService
 	}
 	
 	/**
-	 * List user roles
+	 * Lists user role objects that are associated with an account.
+	 * Blocked user roles are listed unless you use a filter to exclude them.
+	 * Deleted user roles are not listed unless you use a filter to include them.
 	 * 
 	 * @action list
-	 * @param KalturaUserRoleFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @return KalturaUserRoleListResponse
+	 * @param KalturaUserRoleFilter $filter A filter used to exclude specific types of user roles
+	 * @param KalturaFilterPager $pager A limit for the number of records to display on a page
+	 * @return KalturaUserRoleListResponse The list of user role objects
 	 */
 	public function listAction(KalturaUserRoleFilter  $filter = null, KalturaFilterPager $pager = null)
 	{
@@ -218,11 +220,11 @@ class UserRoleService extends KalturaBaseService
 	}
 	
 	/**
-	 * Clone role
+	 * Creates a new user role object that is a duplicate of an existing role.
 	 * 
 	 * @action clone
-	 * @param int $userRoleId
-	 * @return KalturaUserRole
+	 * @param int $userRoleId The user role's unique identifier
+	 * @return KalturaUserRole The duplicate user role object
 	 * 
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */

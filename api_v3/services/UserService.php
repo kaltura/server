@@ -11,12 +11,12 @@ class UserService extends KalturaBaseUserService
 {
 	
 	/**
-	 * Adds a user to the Kaltura DB.
-	 * Input param $id is the unique identifier in the partner's system
+	 * Adds a new user to an existing account in the Kaltura database.
+	 * Input param $id is the unique identifier in the partner's system.
 	 *
 	 * @action add
-	 * @param KalturaUser $user 
-	 * @return KalturaUser
+	 * @param KalturaUser $user The new user
+	 * @return KalturaUser The new user
 	 *
 	 * @throws KalturaErrors::DUPLICATE_USER_BY_ID
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
@@ -91,12 +91,13 @@ class UserService extends KalturaBaseUserService
 	}
 	
 	/**
-	 * Update existing user, it is possible to update the user id too
+	 * Updates an existing user object.
+	 * You can also use this action to update the userId.
 	 * 
 	 * @action update
-	 * @param string $userId
-	 * @param KalturaUser $user
-	 * @return KalturaUser
+	 * @param string $userId The user's unique identifier in the partner's system
+	 * @param KalturaUser $user The user parameters to update
+	 * @return KalturaUser The updated user object
 	 *
 	 * @throws KalturaErrors::INVALID_USER_ID
 	 * @throws KalturaErrors::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER
@@ -166,11 +167,11 @@ class UserService extends KalturaBaseUserService
 
 	
 	/**
-	 * Get user by user ID
+	 * Retrieves a user object for a specified user ID.
 	 * 
 	 * @action get
-	 * @param string $userId
-	 * @return KalturaUser
+	 * @param string $userId The user's unique identifier in the partner's system
+	 * @return KalturaUser The specified user object
 	 *
 	 * @throws KalturaErrors::INVALID_USER_ID
 	 */		
@@ -188,11 +189,12 @@ class UserService extends KalturaBaseUserService
 	}
 	
 	/**
-	 * Get user by user's login ID and partner ID
+	 * Retrieves a user object for a user's login ID and partner ID.
+	 * A login ID is the email address used by a user to log into the system.
 	 * 
 	 * @action getByLoginId
-	 * @param string $loginId
-	 * @return KalturaUser
+	 * @param string $loginId The user's email address that identifies the user for login
+	 * @return KalturaUser The user object represented by the login and partner IDs
 	 * 
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
 	 * @throws KalturaErrors::USER_NOT_FOUND
@@ -215,11 +217,11 @@ class UserService extends KalturaBaseUserService
 	}
 
 	/**
-	 * Mark the user as deleted
+	 * Deletes a user from a partner account.
 	 * 
 	 * @action delete
-	 * @param string $userId 
-	 * @return KalturaUser
+	 * @param string $userId The user's unique identifier in the partner's system
+	 * @return KalturaUser The deleted user object
 	 *
 	 * @throws KalturaErrors::INVALID_USER_ID
 	 */		
@@ -250,12 +252,14 @@ class UserService extends KalturaBaseUserService
 	}
 	
 	/**
-	 * List users (When not set in the filter, blocked and deleted users will be returned too)
+	 * Lists user objects that are associated with an account.
+	 * Blocked users are listed unless you use a filter to exclude them.
+	 * Deleted users are not listed unless you use a filter to include them.
 	 * 
 	 * @action list
-	 * @param KalturaUserFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @return KalturaUserListResponse
+	 * @param KalturaUserFilter $filter A filter used to exclude specific types of users
+	 * @param KalturaFilterPager $pager A limit for the number of records to display on a page
+	 * @return KalturaUserListResponse The list of user objects
 	 */
 	public function listAction(KalturaUserFilter $filter = null, KalturaFilterPager $pager = null)
 	{
@@ -298,10 +302,10 @@ class UserService extends KalturaBaseUserService
 	}
 	
 	/**
-	 * Notify about user ban
+	 * Notifies that a user is banned from an account.
 	 * 
 	 * @action notifyBan
-	 * @param string $userId
+	 * @param string $userId The user's unique identifier in the partner's system
 	 *
 	 * @throws KalturaErrors::INVALID_USER_ID
 	 */		
@@ -315,15 +319,15 @@ class UserService extends KalturaBaseUserService
 	}
 
 	/**
-	 * Get a session using user id and password
+	 * Logs a user into a partner account with a partner ID, a partner user ID (puser), and a user password.
 	 * 
 	 * @action login
-	 * @param int $partnerId
-	 * @param string $userId
-	 * @param string $password
-	 * @param int $expiry
-	 * @param string $privileges
-	 * @return string
+	 * @param int $partnerId The identifier of the partner account
+	 * @param string $userId The user's unique identifier in the partner's system
+	 * @param string $password The user's password
+	 * @param int $expiry The requested time (in seconds) before the generated KS expires (By default, a KS expires after 24 hours).
+	 * @param string $privileges Special privileges
+	 * @return string A session KS for the user
 	 *
 	 * @throws KalturaErrors::USER_NOT_FOUND
 	 * @throws KalturaErrors::USER_WRONG_PASSWORD
@@ -340,15 +344,15 @@ class UserService extends KalturaBaseUserService
 	}
 	
 	/**
-	 * Get a session using user's kaltura id and password
+	 * Logs a user into a partner account with a user login ID and a user password.
 	 * 
 	 * @action loginByLoginId
-	 * @param int $partnerId
-	 * @param string $loginId login email
-	 * @param string $password
-	 * @param int $expiry
-	 * @param string $privileges
-	 * @return string
+	 * @param int $partnerId The identifier of the partner account
+	 * @param string $loginId The user's email address that identifies the user for login
+	 * @param string $password The user's password
+	 * @param int $expiry The requested time (in seconds) before the generated KS expires (By default, a KS expires after 24 hours).
+	 * @param string $privileges Special privileges
+	 * @return string A session KS for the user
 	 *
 	 * @throws KalturaErrors::USER_NOT_FOUND
 	 * @throws KalturaErrors::USER_WRONG_PASSWORD
@@ -366,16 +370,16 @@ class UserService extends KalturaBaseUserService
 	
 	
 	/**
-	 * Update user password and email
+	 * Updates a user’s login data: email, password, name.
 	 * 
 	 * @action updateLoginData
 	 * 
-	 * @param string $oldLoginId
-	 * @param string $password
-	 * @param string $newLoginId Optional, provide only when you want to update the login id
-	 * @param string $newPassword
-	 * @param string $newFirstName
-	 * @param string $newLastName
+	 * @param string $oldLoginId The user's current email address that identified the user for login
+	 * @param string $password The user's current email address that identified the user for login
+	 * @param string $newLoginId Optional, The user's email address that will identify the user for login
+	 * @param string $newPassword Optional, The user's new password
+	 * @param string $newFirstName Optional, The user's new first name
+	 * @param string $newLastName Optional, The user's new last name
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -390,11 +394,11 @@ class UserService extends KalturaBaseUserService
 	}
 	
 	/**
-	 * Reset admin user password and send it to the users email address
+	 * Reset user's password and send the user an email to generate a new one.
 	 * 
 	 * @action resetPassword
 	 * 
-	 * @param string $email
+	 * @param string $email The user's email address (login email)
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
@@ -412,8 +416,8 @@ class UserService extends KalturaBaseUserService
 	 * 
 	 * @action setInitialPassword
 	 * 
-	 * @param string $hashKey
-	 * @param string $newPassword new password to set
+	 * @param string $hashKey The hash key used to identify the user (retrieved by email)
+	 * @param string $newPassword The new password to set for the user
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
@@ -428,14 +432,14 @@ class UserService extends KalturaBaseUserService
 	}
 	
 	/**
-	 * Enable the user to login with a loginId (email) and password.
+	 * Enables a user to log into a partner account using an email address and a password
 	 * 
 	 * @action enableLogin
 	 * 
-	 * @param string $userId
-	 * @param string $loginId
-	 * @param string $password
-	 * @return KalturaUser
+	 * @param string $userId The user's unique identifier in the partner's system
+	 * @param string $loginId The user's email address that identifies the user for login
+	 * @param string $password The user's password
+	 * @return KalturaUser The user object represented by the user and login IDs
 	 * 
 	 * @throws KalturaErrors::USER_LOGIN_ALREADY_ENABLED
 	 * @throws KalturaErrors::USER_NOT_FOUND
@@ -499,15 +503,15 @@ class UserService extends KalturaBaseUserService
 	
 	
 	/**
-	 * Disallow user to login with an id/password.
-	 * Passing either a loginId or a userId is allowed.
+	 * Disables a user’s ability to log into a partner account using an email address and a password.
+	 * You may use either a userId or a loginId parameter for this action.
 	 * 
 	 * @action disableLogin
 	 * 
-	 * @param string $userId
-	 * @param string $loginId
+	 * @param string $userId The user's unique identifier in the partner's system
+	 * @param string $loginId The user's email address that identifies the user for login
 	 * 
-	 * @return KalturaUser
+	 * @return KalturaUser The user object represented by the user and login IDs
 	 * 
 	 * @throws KalturaErrors::USER_LOGIN_ALREADY_DISABLED
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL

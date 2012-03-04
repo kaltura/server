@@ -37,11 +37,11 @@ class PermissionService extends KalturaBaseService
 
 	
 	/**
-	 * Allows you to add a new KalturaPermission object
+	 * Adds a new permission object to the account.
 	 * 
 	 * @action add
-	 * @param KalturaPermission $permission
-	 * @return KalturaPermission
+	 * @param KalturaPermission $permission The new permission
+	 * @return KalturaPermission The added permission object
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE
@@ -86,11 +86,11 @@ class PermissionService extends KalturaBaseService
 	}
 	
 	/**
-	 * Retrieve a KalturaPermission object by ID
+	 * Retrieves a permission object using its ID.
 	 * 
 	 * @action get
-	 * @param string $permissionName 
-	 * @return KalturaPermission
+	 * @param string $permissionName The name assigned to the permission
+	 * @return KalturaPermission The retrieved permission object
 	 * 
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */		
@@ -110,12 +110,12 @@ class PermissionService extends KalturaBaseService
 
 
 	/**
-	 * Update an existing KalturaPermission object
+	 * Updates an existing permission object.
 	 * 
 	 * @action update
-	 * @param string $permissionName
-	 * @param KalturaPermission $permission
-	 * @return KalturaPermission
+	 * @param string $permissionName The name assigned to the permission
+	 * @param KalturaPermission $permission The updated permission parameters
+	 * @return KalturaPermission The updated permission object
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */	
@@ -166,11 +166,11 @@ class PermissionService extends KalturaBaseService
 	}
 
 	/**
-	 * Mark the KalturaPermission object as deleted
+	 * Deletes an existing permission object.
 	 * 
 	 * @action delete
-	 * @param string $permissionName 
-	 * @return KalturaPermission
+	 * @param string $permissionName The name assigned to the permission
+	 * @return KalturaPermission The deleted permission object
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */		
@@ -192,12 +192,14 @@ class PermissionService extends KalturaBaseService
 	}
 	
 	/**
-	 * List KalturaPermission objects
+	 * Lists permission objects that are associated with an account.
+	 * Blocked permissions are listed unless you use a filter to exclude them.
+	 * Blocked permissions are listed unless you use a filter to exclude them.
 	 * 
 	 * @action list
-	 * @param KalturaPermissionFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @return KalturaPermissionListResponse
+	 * @param KalturaPermissionFilter $filter A filter used to exclude specific types of permissions
+	 * @param KalturaFilterPager $pager A limit for the number of records to display on a page
+	 * @return KalturaPermissionListResponse The list of permission objects
 	 */
 	public function listAction(KalturaPermissionFilter  $filter = null, KalturaFilterPager $pager = null)
 	{
@@ -225,11 +227,11 @@ class PermissionService extends KalturaBaseService
 	}
 	
 	/**
-	 * Return a list of current sessions's allowed permission names
+	 * Retrieves a list of permissions that apply to the current KS.
 	 * 
 	 * @action getCurrentPermissions
 	 * 
-	 * @return string Comma seperated string of current permission names
+	 * @return string A comma-separated list of current permission names
 	 * 
 	 */	
 	public function getCurrentPermissions()

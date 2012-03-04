@@ -28,11 +28,12 @@ class PermissionItemService extends KalturaBaseService
 	}
 	
 	/**
-	 * Allows you to add a new KalturaPermissionItem object
+	 * Adds a new permission item object to the account.
+	 * This action is available only to Kaltura system administrators.
 	 * 
 	 * @action add
-	 * @param KalturaPermissionItem $permissionItem
-	 * @return KalturaPermissionItem
+	 * @param KalturaPermissionItem $permissionItem The new permission item
+	 * @return KalturaPermissionItem The added permission item object
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE
@@ -50,11 +51,11 @@ class PermissionItemService extends KalturaBaseService
 	}
 	
 	/**
-	 * Retrieve a KalturaPermissionItem object by ID
+	 * Retrieves a permission item object using its ID.
 	 * 
 	 * @action get
-	 * @param int $permissionItemId 
-	 * @return KalturaPermissionItem
+	 * @param int $permissionItemId The permission item's unique identifier
+	 * @return KalturaPermissionItem The retrieved permission item object
 	 * 
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */		
@@ -83,12 +84,13 @@ class PermissionItemService extends KalturaBaseService
 
 
 	/**
-	 * Update an existing KalturaPermissionItem object
+	 * Updates an existing permission item object.
+	 * This action is available only to Kaltura system administrators.
 	 * 
 	 * @action update
-	 * @param int $permissionItemId
-	 * @param KalturaPermissionItem $permissionItem
-	 * @return KalturaPermissionItem
+	 * @param int $permissionItemId The permission item's unique identifier
+	 * @param KalturaPermissionItem $permissionItem The updated permission item parameters
+	 * @return KalturaPermissionItem The updated permission item object
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */	
@@ -110,11 +112,12 @@ class PermissionItemService extends KalturaBaseService
 	}
 
 	/**
-	 * Mark the KalturaPermissionItem object as deleted
+	 * Deletes an existing permission item object.
+	 * This action is available only to Kaltura system administrators.
 	 * 
 	 * @action delete
-	 * @param int $permissionItemId 
-	 * @return KalturaPermissionItem
+	 * @param int $permissionItemId The permission item's unique identifier
+	 * @return KalturaPermissionItem The deleted permission item object
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */		
@@ -135,12 +138,12 @@ class PermissionItemService extends KalturaBaseService
 	}
 	
 	/**
-	 * List KalturaPermissionItem objects
+	 * Lists permission item objects that are associated with an account.
 	 * 
 	 * @action list
-	 * @param KalturaPermissionItemFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @return KalturaPermissionItemListResponse
+	 * @param KalturaPermissionItemFilter $filter A filter used to exclude specific types of permission items
+	 * @param KalturaFilterPager $pager A limit for the number of records to display on a page
+	 * @return KalturaPermissionItemListResponse The list of permission item objects
 	 */
 	public function listAction(KalturaPermissionItemFilter  $filter = null, KalturaFilterPager $pager = null)
 	{
