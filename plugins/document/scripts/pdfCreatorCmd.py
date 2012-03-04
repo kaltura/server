@@ -30,6 +30,12 @@ else:
 
 command = ' '.join(commandParams)
 
+# make sure the default printer is set appropriately
+PDF_CREATOR_PRINTER = 'PDFCreator'
+if win32print.GetDefaultPrinter() != PDF_CREATOR_PRINTER:
+    print 'setting default printer to %s' % PDF_CREATOR_PRINTER
+    win32print.SetDefaultPrinter(PDF_CREATOR_PRINTER)
+
 # execute the command
 print '\ncommand: %s' % command
 os.system(command)
