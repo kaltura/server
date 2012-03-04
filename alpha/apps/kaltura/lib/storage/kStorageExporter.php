@@ -33,7 +33,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			foreach($externalStorages as $externalStorage)
 			{
 				if($externalStorage->getTrigger() == StorageProfile::STORAGE_TEMP_TRIGGER_MODERATION_APPROVED)
-					$this->exportEntry($object, $externalStorage);
+					self::exportEntry($object, $externalStorage);
 			}
 		}
 		
@@ -55,7 +55,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 						)
 					)
 				{
-					$this->exportFlavorAsset($object, $externalStorage);
+					self::exportFlavorAsset($object, $externalStorage);
 				}
 			}
 		}
@@ -66,7 +66,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param flavorAsset $flavor
 	 * @param StorageProfile $externalStorage
 	 */
-	public function exportFlavorAsset(flavorAsset $flavor, StorageProfile $externalStorage)
+	static public function exportFlavorAsset(flavorAsset $flavor, StorageProfile $externalStorage)
 	{
 		$flavorParamsIds = $externalStorage->getFlavorParamsIds();
 		KalturaLog::log(__METHOD__ . " flavorParamsIds [$flavorParamsIds]");
@@ -79,7 +79,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 			
 		$key = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$this->export($flavor->getentry(), $externalStorage, $key, !$flavor->getIsOriginal());
+		self::export($flavor->getentry(), $externalStorage, $key, !$flavor->getIsOriginal());
 				
 		return true;
 	}
@@ -88,7 +88,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param entry $entry
 	 * @return array<FileSyncKey>
 	 */
-	protected function getEntrySyncKeys(entry $entry, StorageProfile $externalStorage)
+	static protected function getEntrySyncKeys(entry $entry, StorageProfile $externalStorage)
 	{
 		$exportFileSyncsKeys = array();
 		
@@ -120,9 +120,9 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param entry $entry
 	 * @param FileSyncKey $key
 	 */
-	protected function export(entry $entry, StorageProfile $externalStorage, FileSyncKey $key, $force = false)
+	static protected function export(entry $entry, StorageProfile $externalStorage, FileSyncKey $key, $force = false)
 	{
-		if(!$this->shouldExport($key, $externalStorage))
+		if(!self::shouldExport($key, $externalStorage))
 		{
 			KalturaLog::log("no need to export key [$key] to externalStorage id[" . $externalStorage->getId() . "]");
 			return;
@@ -144,7 +144,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param FileSyncKey $key
 	 * @return bool
 	 */
-	protected function shouldExport(FileSyncKey $key, StorageProfile $externalStorage)
+	static protected function shouldExport(FileSyncKey $key, StorageProfile $externalStorage)
 	{
 		KalturaLog::log(__METHOD__ . " - key [$key], externalStorage id[" . $externalStorage->getId() . "]");
 		
@@ -182,11 +182,11 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param entry $entry
 	 * @param StorageProfile $externalStorage
 	 */
-	public function exportEntry(entry $entry, StorageProfile $externalStorage)
+	static public function exportEntry(entry $entry, StorageProfile $externalStorage)
 	{
-		$checkFileSyncsKeys = $this->getEntrySyncKeys($entry, $externalStorage);
+		$checkFileSyncsKeys = self::getEntrySyncKeys($entry, $externalStorage);
 		foreach($checkFileSyncsKeys as $key)
-			$this->export($entry, $externalStorage, $key);
+			self::export($entry, $externalStorage, $key);
 	}
 	
 	/* (non-PHPdoc)
@@ -231,7 +231,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				{
 					$sourceFlavor = assetPeer::retrieveOriginalReadyByEntryId($dbBatchJob->getEntryId());
 					if($sourceFlavor)
-						$this->exportFlavorAsset($sourceFlavor, $externalStorage);
+						self::exportFlavorAsset($sourceFlavor, $externalStorage);
 				}
 			}
 		}
@@ -255,11 +255,11 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				{
 					$ismKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
 					if(kFileSyncUtils::fileSync_exists($ismKey))
-						$this->export($entry, $externalStorage, $ismKey);
+						self::export($entry, $externalStorage, $ismKey);
 					
 					$ismcKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
 					if(kFileSyncUtils::fileSync_exists($ismcKey))
-						$this->export($entry, $externalStorage, $ismcKey);
+						self::export($entry, $externalStorage, $ismcKey);
 				}
 			}
 		}
