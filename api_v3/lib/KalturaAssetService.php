@@ -111,9 +111,7 @@ abstract class KalturaAssetService extends KalturaBaseService
 	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $storageProfileId);
 	    }
 	    
-	    $storageExporter = new kStorageExporter();
-	    
-	    $exported = $storageExporter->exportFlavorAsset($dbAsset, $dbStorageProfile);
+	    $exported = kStorageExporter::exportFlavorAsset($dbAsset, $dbStorageProfile);
 	    
 	    if ($exported !== true)
 	    {
