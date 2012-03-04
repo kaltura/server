@@ -34,6 +34,10 @@ class category extends Basecategory
 			{
 				throw new kCoreException("Max number of categories was reached", kCoreException::MAX_NUMBER_OF_CATEGORIES_REACHED);
 			}
+			
+			$chunkedCategoryLoadThreshold = kConf::get('kmc_chunked_category_load_threshold');
+			if ($numOfCatsForPartner >= $chunkedCategoryLoadThreshold)
+				PermissionPeer::enableForPartner(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD, PermissionType::SPECIAL_FEATURE);
 		}
 		
 		// set the depth of the parent category + 1

@@ -35,6 +35,7 @@ interface PermissionName extends BaseEnum
 	const FEATURE_V1_FLAVORS = 'FEATURE_V1_FLAVORS';
 	const FEATURE_V2_FLAVORS = 'FEATURE_V2_FLAVORS';
 	
+	const DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD = 'DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD';
 	
 	// base system permissions
 	
