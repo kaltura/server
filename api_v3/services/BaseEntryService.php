@@ -830,8 +830,7 @@ class BaseEntryService extends KalturaEntryService
 	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $storageProfileId);
 	    }
 	    
-	    $storageExporter = new kStorageExporter();
-	    $storageExporter->exportEntry($dbEntry, $dbStorageProfile);
+	    kStorageExporter::exportEntry($dbEntry, $dbStorageProfile);
 	    
 	    //TODO: implement export errors
 	    
