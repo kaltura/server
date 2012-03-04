@@ -815,6 +815,7 @@ class BaseEntryService extends KalturaEntryService
 	 * @param int $storageProfileId
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 * @return KalturaBaseEntry The exported entry
 	 */
 	public function exportAction ( $entryId , $storageProfileId )
 	{	    
