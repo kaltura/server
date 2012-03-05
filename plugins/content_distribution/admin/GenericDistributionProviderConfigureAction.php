@@ -32,9 +32,10 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 	public function saveProviderAction($providerId, Form_GenericProviderConfiguration $form, $action, $actionType)
 	{
 		$actionObject = null;
+		$contentDistributionPlugin = Kaltura_Client_ContentDistribution_Plugin::get($this->client);
 		try
 		{
-			$actionObject = $this->client->genericDistributionProviderAction->getByProviderId($providerId, $actionType);
+			$actionObject = $contentDistributionPlugin->genericDistributionProviderAction->getByProviderId($providerId, $actionType);
 		}
 		catch(Exception $e){}
 		
@@ -55,7 +56,7 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 		if(!$actionObject)
 		{
 			if(!$isNew)
-				$this->client->genericDistributionProviderAction->deleteByProviderId($providerId, $actionType);
+				$contentDistributionPlugin->genericDistributionProviderAction->deleteByProviderId($providerId, $actionType);
 				
 			return;
 		}
@@ -63,7 +64,7 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 		$genericDistributionProviderAction = null;
 		if($isNew)
 		{
-			$genericDistributionProviderAction = $this->client->genericDistributionProviderAction->add($actionObject);
+			$genericDistributionProviderAction = $contentDistributionPlugin->genericDistributionProviderAction->add($actionObject);
 		}
 		else 
 		{
@@ -78,7 +79,7 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 			$actionObject->mrssValidator = null;
 			$actionObject->resultsTransformer = null;
 			
-			$genericDistributionProviderAction = $this->client->genericDistributionProviderAction->updateByProviderId($providerId, $actionType, $actionObject);
+			$genericDistributionProviderAction = $contentDistributionPlugin->genericDistributionProviderAction->updateByProviderId($providerId, $actionType, $actionObject);
 		}
 		
 		$genericDistributionProviderActionId = $genericDistributionProviderAction->id;
@@ -91,19 +92,19 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 			if(isset($files["mrssTransformer{$action}"]) && $files["mrssTransformer{$action}"]['size'])
 			{
 				$file = $files["mrssTransformer{$action}"];
-				$this->client->genericDistributionProviderAction->addMrssTransformFromFile($genericDistributionProviderActionId, $file['tmp_name']);
+				$contentDistributionPlugin->genericDistributionProviderAction->addMrssTransformFromFile($genericDistributionProviderActionId, $file['tmp_name']);
 			}
 		
 			if(isset($files["mrssValidator{$action}"]) && $files["mrssValidator{$action}"]['size'])
 			{
 				$file = $files["mrssValidator{$action}"];
-				$this->client->genericDistributionProviderAction->addMrssValidateFromFile($genericDistributionProviderActionId, $file['tmp_name']);
+				$contentDistributionPlugin->genericDistributionProviderAction->addMrssValidateFromFile($genericDistributionProviderActionId, $file['tmp_name']);
 			}
 		
 			if(isset($files["resultsTransformer{$action}"]) && $files["resultsTransformer{$action}"]['size'])
 			{
 				$file = $files["resultsTransformer{$action}"];
-				$this->client->genericDistributionProviderAction->addResultsTransformFromFile($genericDistributionProviderActionId, $file['tmp_name']);
+				$contentDistributionPlugin->genericDistributionProviderAction->addResultsTransformFromFile($genericDistributionProviderActionId, $file['tmp_name']);
 			}
 		}
 	}
