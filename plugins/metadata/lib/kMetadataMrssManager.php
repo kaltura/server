@@ -65,6 +65,10 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 	{
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$xml = kFileSyncUtils::file_get_contents($key, true, false);
+		if (is_null($xml)){
+			KalturaLog::alert("ready file sync was not found for key[$key]");
+			return;
+		}
 		$metadataXml = new SimpleXMLElement($xml);
 		
 		$customData = $mrss->addChild('customData');
