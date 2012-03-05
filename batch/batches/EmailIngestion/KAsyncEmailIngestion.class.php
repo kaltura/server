@@ -171,7 +171,7 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 				
 				
 				// validate partner and get email profile
-				$email_profiles = $this->validePartnerAndGetProfile($curMail->header->toadd, $user.'@'.$host);
+				$email_profiles = $this->validePartnerAndGetProfile(array($curMail->header->fromadd), $user.'@'.$host);
 				if (!$email_profiles) {
 					// error validating partner
 					KalturaLog::err('Partner validation failed for ['.$curMail->header->msgid."] on [$user@$host] from [".$curMail->header->fromadd.'] with subject ['.$curMail->header->subject.']');
@@ -372,13 +372,15 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 			// upload file to the kaltura server
 			// ---------------------------------
 			try {
-				$tokenId = $this->getClient()->upload->upload(realpath($filename)); 
+				$requestResults = $this->createUploadTokenAndUpload($profile, $filename);
+				
+				list ($token, $upload) = $requestResults;
 			}
 			catch (Exception $e) {
-				$tokenId = null;
+				$token = null;
 				KalturaLog::err($e->getMessage());
 			}
-			if ($tokenId == null || !$tokenId) {
+			if ($token->id == null || !$token->id) {
 				KalturaLog::err("Error uploading [$filename] to the kaltura server.");
 				$problems_happened = true;
 				$failures->upload_failed = true;
@@ -392,14 +394,14 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 			// create a new entry from the uploaded file
 			// -----------------------------------------
 			try {
-				$newEntry = $this->getClient()->EmailIngestionProfile->addMediaEntry($mediaEntry, $tokenId, $profile->id, $mailData->header->fromadd, $mailData->header->msgid);
+				$newEntry = $this->getClient()->EmailIngestionProfile->addMediaEntry($mediaEntry, $token->id, $profile->id, $mailData->header->fromadd, $mailData->header->msgid);
 			}
 			catch (Exception $e) {
 				$newEntry = null;
 				KalturaLog::err($e->getMessage());
 			}
 			if ($newEntry == null || !$newEntry) {
-				KalturaLog::err("Error adding entry from uploaded file [$filename], token [$tokenId].");
+				KalturaLog::err("Error adding entry from uploaded file [$filename], token  [".$token->id."].");
 				$problems_happened = true;
 				$failures->add_entry_failed = true;
 				// delete the temporary file from the disk
@@ -423,9 +425,30 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 		return !$problems_happened;
 	}
 
-
-
-
+    /**
+     * 
+     * Creates an upload token and uploads the file using the token.
+     * @param KalturaEmailIngestionProfile $profile
+     * @param string $filename
+     */
+    private function createUploadTokenAndUpload ($profile, $filename)
+    {
+        $this->impersonate($profile->partnerId);
+			    
+	    $this->getClient()->startMultiRequest();
+	    
+	    $uploadToken = new KalturaUploadToken(); 
+	    
+	    $uploadToken->fileName = $filename;
+	    
+	    $uploadToken->fileSize = filesize($filename);
+	    
+	    $uploadToken = $this->getClient()->uploadToken->add($uploadToken);
+	    
+		$this->getClient()->uploadToken->upload($uploadToken->id, realpath($filename));
+		
+		return $this->getClient()->doMultiRequest();
+    }
 
 
 	/**
