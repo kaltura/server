@@ -9,6 +9,12 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	private $_txtIni = "";
 	private $_txtXml = "";
 	private $_txtXmlSource = "";
+	
+	/**
+	 * Counts the actions that dependent on add action
+	 * @var int
+	 */
+	private $dependencyIndex = 0;
 
 	/**
 	 *
@@ -57,6 +63,8 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	 */
 	protected function writeBeforeService(KalturaServiceReflector $serviceReflector)
 	{
+		$this->dependencyIndex = 0;
+		
 		$serviceName = $serviceReflector->getServiceName();
 		$serviceClass = $serviceReflector->getServiceClass();
 
@@ -69,7 +77,6 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			//			$currentFolder = realpath(dirname($servicePath));
 			//			$rootPath = realpath(dirname(__FILE__) . '/../');
 			$upCounter = 3;
-			$bootstrapPath = str_repeat('/..', $upCounter) . '/bootstrap.php';
 		}
 
 		$this->_txtBase = '';
@@ -103,10 +110,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeTest("{");
 
 		//Writes the SetUp function for the test
-		$this->writeSetUpServiceFunction($serviceReflector);
+		//$this->writeSetUpServiceFunction($serviceReflector);
 
 		$this->writeIni("[config]");
-		$this->writeIni("source                                            = xml");
+		$this->writeIni("source                                            = ini");
 		$this->writeIni("serviceUrl                                        = @SERVICE_URL@");
 		$this->writeIni("partnerId                                         = @TEST_PARTNER_ID@");
 		$this->writeIni("clientTag                                         = unitTest");
@@ -118,8 +125,8 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeIni("expiry                                            = 86400");
 		$this->writeIni("privileges                                        = ");
 
-		$this->writeXml("<TestCaseData testCaseName='{$serviceClass}Test'>");
-		$this->writeXmlSource("	<TestCaseData testCaseName='{$serviceClass}Test'>");
+		$this->writeXml("<TestCaseData testCaseName=\"{$serviceClass}Test\">");
+		$this->writeXmlSource("	<TestCaseData testCaseName=\"{$serviceClass}Test\">");
 	}
 		
 	/**
@@ -221,18 +228,18 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	 */
 	protected function writeAfterService(KalturaServiceReflector $serviceReflector)
 	{
-		$this->writeBase("	/**");
-		$this->writeBase("	 * Called when all tests are done");
-		$this->writeBase("	 * @param int \$id");
-		$this->writeBase("	 * @return int");
-		$this->writeBase("	 * TODO: replace {$this->lastDependencyTest} with last test function that uses that id");
-		$this->writeBase("	 * @depends {$this->lastDependencyTest}");
-		$this->writeBase("	 */");
-		$this->writeBase("	public function testFinished(\$id)");
-		$this->writeBase("	{");
-		$this->writeBase("		return \$id;");
-		$this->writeBase("	}");
-		$this->writeBase("");
+//		$this->writeBase("	/**");
+//		$this->writeBase("	 * Called when all tests are done");
+//		$this->writeBase("	 * @param int \$id");
+//		$this->writeBase("	 * @return int");
+//		$this->writeBase("	 * TODO: replace {$this->lastDependencyTest} with last test function that uses that id");
+//		$this->writeBase("	 * @depends {$this->lastDependencyTest} with data set #0");
+//		$this->writeBase("	 */");
+//		$this->writeBase("	public function testFinished(\$id)");
+//		$this->writeBase("	{");
+//		$this->writeBase("		return \$id;");
+//		$this->writeBase("	}");
+//		$this->writeBase("");
 
 		//Close the test file
 		$this->writeTest("}");
@@ -249,15 +256,15 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$serviceClass = $serviceReflector->getServiceClass();
 		$serviceClass = ucfirst($serviceClass); //Capital first letter
 
-		$this->writeBase("	/**");
-		$this->writeBase("	 * ");
-		$this->writeBase("	 * Returns the suite for the test");
-		$this->writeBase("	 */");
-		$this->writeBase("	public static function suite()");
-		$this->writeBase("	{");
-		$this->writeBase("		return new KalturaTestSuite('{$serviceClass}Test');");
-		$this->writeBase("	}");
-		$this->writeBase("");
+//		$this->writeBase("	/**");
+//		$this->writeBase("	 * ");
+//		$this->writeBase("	 * Returns the suite for the test");
+//		$this->writeBase("	 */");
+//		$this->writeBase("	public static function suite()");
+//		$this->writeBase("	{");
+//		$this->writeBase("		return new KalturaTestSuite('{$serviceClass}Test');");
+//		$this->writeBase("	}");
+//		$this->writeBase("");
 
 		//Close the base file
 		$this->writeBase("}");
@@ -280,8 +287,8 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeToFile("$testPath/{$serviceClass}TestBase.php", $this->_txtBase);
 		$this->writeToFile("$testPath/{$serviceClass}Test.php", $this->_txtTest, false);
 		$this->writeToFile("$testPath/{$serviceClass}Test.php.ini", $this->_txtIni, false);
-		$this->writeToFile("$testPath/testsData/{$serviceClass}Test.data", $this->_txtXml, false);
-		$this->writeToFile("$testPath/testsData/{$serviceClass}Test.config", $this->_txtXmlSource, false); //TODO: change the file extension to source
+		//$this->writeToFile("$testPath/testsData/{$serviceClass}Test.data", $this->_txtXml, false);
+		//$this->writeToFile("$testPath/testsData/{$serviceClass}Test.config", $this->_txtXmlSource, false); //TODO: change the file extension to source
 	}
 
 	/**
@@ -296,18 +303,17 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeBase("	/**");
 		$this->writeBase("	 * Validates test{$actionName} results");
 		$this->writeBase("	 */");
-		$this->writeBase("	protected function validate{$actionName}($testParams)");
-		$this->writeBase("	{");
-		// TODO - add compare based on object type
-		$this->writeBase("	}");
-		$this->writeBase("");
+		$this->writeBase("	abstract protected function validate{$actionName}($testParams);");
+		//$this->writeBase("	{");
+		//$this->writeBase("	}");
+		//$this->writeBase("");
 
 		$this->writeTest("	/**");
 		$this->writeTest("	 * Validates test{$actionName} results");
 		$this->writeTest("	 */");
 		$this->writeTest("	protected function validate{$actionName}($testParams)");
 		$this->writeTest("	{");
-		$this->writeTest("		parent::validate{$actionName}($validateValues);");
+		//$this->writeTest("		parent::validate{$actionName}($validateValues);");
 		$this->writeTest("		// TODO - add your own validations here");
 		$this->writeTest("	}");
 		$this->writeTest("");
@@ -335,7 +341,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		}
 		elseif($outputTypeReflector->isFile())
 		{
-			$this->writeIni("test1.reference.type = file");
+			$this->writeIni("test1.reference.objectType = file");
 			$this->writeIni("test1.reference.path = ");
 				
 			//TODO: add support for files in XML
@@ -343,14 +349,15 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		}
 		else
 		{
-			$this->writeIni("test1.reference.type = $paramType");
+			$this->writeIni("test1.reference.objectType = $paramType");
 			$this->writeXml("		<OutputReference name = '$paramName' type = '$paramType' key = 'object key'>");
 				
 			$actionParamProperties = $outputTypeReflector->getTypeReflector()->getProperties();
 			foreach($actionParamProperties as $actionParamProperty)
 			{
+				/* @var $actionParamProperty KalturaPropertyInfo */
 				if($actionParamProperty->isReadOnly())
-				continue;
+					continue;
 					
 				$propertyType = $actionParamProperty->getType();
 				$propertyName = $actionParamProperty->getName();
@@ -365,13 +372,13 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 				}
 				elseif($actionParamProperty->isFile())
 				{
-					$this->writeIni("test1.reference.$propertyName.type = file");
+					$this->writeIni("test1.reference.$propertyName.objectType = file");
 					$this->writeIni("test1.reference.$propertyName.path = ");
 						
 					//TODO: add support for files in XML
 					$this->writeXml("			<OutputReference name = '$paramName' type='file' key= 'path/to/file'>");
 				}
-				else
+				elseif(!$actionParamProperty->isAbstract())
 				{
 					if($propertyName == 'type')
 					{
@@ -380,7 +387,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 					}
 					else
 					{
-						$this->writeIni("test1.reference.$propertyName.type = $propertyType");
+						$this->writeIni("test1.reference.$propertyName.objectType = $propertyType");
 					}
 						
 					$this->writeXml("			<$propertyName>$propertyType</$propertyName>");
@@ -390,20 +397,21 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$this->writeXml("		</OutputReference>");
 		}
 
-		$paramDesc = $outputTypeReflector->getDescription();
+		$paramDesc = strlen($outputTypeReflector->getDescription()) ? ' ' . $outputTypeReflector->getDescription() : '';
 
 		if($isBase)
-		$this->writeBase("	 * @param $paramType \$reference $paramDesc");
+			$this->writeBase("	 * @param $paramType \$reference{$paramDesc}");
 		else
-		$this->writeTest("	 * @param $paramType \$reference $paramDesc");
+			$this->writeTest("	 * @param $paramType \$reference{$paramDesc}");
 			
 		if(!$outputTypeReflector->isComplexType() || //it the param is not: complex
-		$outputTypeReflector->isEnum() || //or it is an enum then we dont print the type
-		$outputTypeReflector->isStringEnum() ||
-		$outputTypeReflector->isDynamicEnum())
-		$testParam = "\$reference";
+			$outputTypeReflector->isEnum() || //or it is an enum then we dont print the type
+			$outputTypeReflector->isStringEnum() ||
+			$outputTypeReflector->isDynamicEnum()
+		)
+			$testParam = "\$reference";
 		else
-		$testParam = "$paramType \$reference";
+			$testParam = "$paramType \$reference";
 			
 		if($outputTypeReflector->isOptional())
 		{
@@ -441,7 +449,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	{
 		$paramType = $actionParam->getType();
 		$paramName = $actionParam->getName();
-		$this->writeXmlSource("				<Input name = '$paramName' type = '$paramType' key = 'Fill object key'/>");
+		$this->writeXmlSource("				<Input name=\"$paramName\" type=\"$paramType\" key=\"Fill object key\"/>");
 
 		//KalturaLog::debug("paramName [$paramName] paramType [$paramType]");
 			
@@ -453,13 +461,13 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		{
 			$paramDefaultValue = $actionParam->getDefaultValue();
 			$this->writeIni("test1.$paramName = " . $paramDefaultValue );
-			$this->writeXml("		<Input name = '$paramName' type = '$paramType' key = '$paramDefaultValue'/>");
+			$this->writeXml("		<Input name=\"$paramName\" type=\"$paramType\" key=\"$paramDefaultValue\"/>");
 		}
 		elseif($actionParam->isFile())
 		{
-			$this->writeIni("test1.$paramName.type = file");
+			$this->writeIni("test1.$paramName.objectType = file");
 			$this->writeIni("test1.$paramName.path = ");
-			$this->writeXml("		<Input name = '$paramName' type = 'file' key = ''/>");
+			$this->writeXml("		<Input name=\"$paramName\" type=\"file\" key=\"\"/>");
 		}
 		else
 		{
@@ -469,10 +477,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			}
 			else
 			{
-				$this->writeIni("test1.$paramName.type = $paramType");
+				$this->writeIni("test1.$paramName.objectType = $paramType");
 			}
 				
-			$this->writeXml("		<Input name = '$paramName' type = '$paramType' key = ''>");
+			$this->writeXml("		<Input name=\"$paramName\" type=\"$paramType\" key=\"\">");
 				
 			$actionParamProperties = $actionParam->getTypeReflector()->getProperties();
 			foreach($actionParamProperties as $actionParamProperty)
@@ -493,11 +501,11 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 				}
 				elseif($actionParamProperty->isFile())
 				{
-					$this->writeIni("test1.$paramName.$propertyName.type = file");
+					$this->writeIni("test1.$paramName.$propertyName.objectType = file");
 					$this->writeIni("test1.$paramName.$propertyName.path = ");
 					$this->writeXml("			<$propertyName>file not supported yet...</$propertyName>");
 				}
-				else
+				elseif(!$actionParamProperty->isAbstract())
 				{
 					if($propertyName == 'type')
 					{
@@ -505,7 +513,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 					}
 					else
 					{
-						$this->writeIni("test1.$paramName.$propertyName.type = $propertyType");
+						$this->writeIni("test1.$paramName.$propertyName.objectType = $propertyType");
 					}
 						
 					$this->writeXml("			<$propertyName>$propertyType</$propertyName>");
@@ -514,9 +522,8 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$this->writeXml("		</Input>");
 		}
 			
-		$paramDesc = $actionParam->getDescription();
-
-		$this->write("	 * @param $paramType \$$paramName $paramDesc", $isBase);
+		$paramDesc = strlen($actionParam->getDescription()) ? ' ' . $actionParam->getDescription() : '';
+		$this->write("	 * @param $paramType \${$paramName}{$paramDesc}", $isBase);
 			
 		if(!$actionParam->isComplexType() || //it the param is not: complex
 		$actionParam->isEnum() || //or it is an enum then we dont print the type
@@ -567,12 +574,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	protected function writeServiceAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector)
 	{
 		if($outputTypeReflector && $outputTypeReflector->isFile())
-		{
 			return;
-		}
 			
 		if(in_array($action, array("list", "clone", "goto")))
-		$action = "{$action}Action";
+			$action = "{$action}Action";
 
 		//KalturaLog::info("Generates action [$serviceName.$action]");
 
@@ -582,15 +587,11 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 
 		//Set the tests to be the regression tests
 		if($action == 'add' || $action == 'update' || $action == 'get' || $action == 'listAction' || $action == 'delete' || ($action == 'addFromEntry' && $serviceName == 'documents'))
-		{
 			$isBase = true;
-		}
 
 		//Createds the dependency between the tests to the add tests
 		if($action == 'update' || $action == 'get' || $action == 'delete' ) // || $action == 'listAction' TODO: add list if needed
-		{
 			$addId = true;
-		}
 
 		//Special care for add method as it needs to return the id to the other tests
 		if($action == 'add' || ($action == 'addFromEntry' && $serviceName == 'documents'))
@@ -603,14 +604,12 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		//TODO:delete this
 		$resgressionTests = array('add', 'get', 'delete', 'update', 'listAction');
 		if ($serviceName == 'documents')
-		array_push($resgressionTests, 'addFromEntry');
+			array_push($resgressionTests, 'addFromEntry');
 		if(!in_array($action , $resgressionTests ))
-		{
 			return;
-		}
 
 		if($action)
-		$actionName = ucfirst($action);
+			$actionName = ucfirst($action);
 
 		$this->writeIni("");
 		$this->writeIni("[test{$actionName}]");
@@ -629,14 +628,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$validateValues = array();
 
 		foreach($actionParams as $actionParam)
-		{
 			$this->setTestParamsAndValues($actionParam, $testParams, $testValues, $validateValues, $addId, $isBase);
-		}
 
 		if($outputTypeReflector)
-		{
 			$this->setOutputData($outputTypeReflector, $testParams, $testValues, $isBase, $validateValues);
-		}
 
 		$this->writeXml("	</TestCaseData>");
 		$this->writeXml("</TestProcedureData>");
@@ -650,7 +645,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 
 		$outputType = null;
 		if($outputTypeReflector)
-		$outputType = $outputTypeReflector->getType();
+			$outputType = $outputTypeReflector->getType();
 
 		if($testReturnedType)
 		{
@@ -659,23 +654,20 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		}
 		if($addId)
 		{
-			if ($serviceName == 'documents')
-			$this->write("	 * @depends testAddFromEntry", $isBase);
-			else
-			$this->write("	 * @depends testAdd", $isBase);
+			$this->write("	 * @depends testAdd with data set #$this->dependencyIndex", $isBase);
+			$this->dependencyIndex++;
 		}
 		//TODO: Add the dependency if needed on the test finished
 		//		else
 		//				$this->write("	 * @depends testFinished", $isBase);
 
 		if(count($testValues))
-		$this->write("	 * @dataProvider provideData", $isBase);
+			$this->write("	 * @dataProvider provideData", $isBase);
 
-		print("Before writing test [$serviceName, $actionName]\n");
 		$this->writeActionTest($serviceName, $actionName, $action, $testParams, $testValues, $outputType, $isBase, $testReturnedType, $validateValues);
 
 		if($isBase) //TODO: maybe add validation to all the tests
-		$this->writeActionTestValidation($actionName, $testParams, $validateValues);
+			$this->writeActionTestValidation($actionName, $testParams, $validateValues);
 	}
 
 	/**
@@ -696,10 +688,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 
 		if($outputType) //If we have an output then we check it
 		{
-			if(is_object($outputType) || class_exists($outputType))
-			$this->write("		\$this->assertInstanceOf('$outputType', \$resultObject);", $isBase);
-			else
-			$this->write("		\$this->assertInternalType('$outputType', \$resultObject);", $isBase);
+			$this->write("		if(method_exists(\$this, 'assertNotInstanceOf'))", $isBase);
+			$this->write("			\$this->assertNotInstanceOf('$outputType', \$resultObject);", $isBase);
+			$this->write("		else", $isBase);
+			$this->write("			\$this->assertNotType('$outputType', get_class(\$resultObject));", $isBase);
 
 			//TODO: create an ignore field array to be populated dynamically (maybe from the service reflector)
 			$ignoreFields = array("createdAt", "updatedAt", "id", "thumbnailUrl",
@@ -709,7 +701,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 				
 			$ignoreFieldsLine = implode("', '", $ignoreFields);
 				
-			$this->write("		\$this->compareApiObjects(\$reference, \$resultObject, array('$ignoreFieldsLine'));", $isBase);
+			$this->write("		\$this->assertAPIObjects(\$reference, \$resultObject, array('$ignoreFieldsLine'));", $isBase);
 		}
 
 		if(!$isBase) //If regular test
@@ -718,17 +710,14 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		}
 
 		if($testReturnedType) //Adds assert to returned value (for dependency)
-		$this->write("		\$this->assertNotNull(\$resultObject->id);", $isBase);
+			$this->write("		\$this->assertNotNull(\$resultObject->id);", $isBase);
 			
 		if($validateValues && count($validateValues)) //Add validation
-		$this->write("		\$this->validate{$actionName}($validateValues);", $isBase);
+			$this->write("		\$this->validate{$actionName}($validateValues);", $isBase);
 
 		if($testReturnedType)
 		{
-			//Tests who needs the name and not the id currently only permission service
-			if($serviceName == 'permission')
-			$this->write("		return \$resultObject->name;", $isBase);
-			else //The rest use the id (currently...)
+			$this->write("		", $isBase);
 			$this->write("		return \$resultObject->id;", $isBase);
 		}
 			

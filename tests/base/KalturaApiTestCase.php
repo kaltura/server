@@ -1,7 +1,7 @@
 <?php
 
 
-class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
+class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogger
 {
 	/**
 	 * @var KalturaClient
@@ -65,7 +65,6 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 			if(!$testConfig->userId)
 			{
 				$testConfig->userId = '';
-				$needSave = true;
 			}
 			if(!$testConfig->sessionType)
 			{
@@ -80,7 +79,6 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 			if(!$testConfig->privileges)
 			{
 				$testConfig->privileges = '';
-				$needSave = true;
 			}
 		}
 		
@@ -97,9 +95,7 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 		
 		if($testConfig->startSession)
 		{
-			$ks = $this->client->session->start($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
-			$this->client->setKs($ks);
-			KalturaLog::info("Session started [$ks]");
+			$this->startSession($testConfig->sessionType, $testConfig->userId);
 		}
 	}
 	
@@ -118,10 +114,12 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 	 * @param KalturaObjectBase $object1
 	 * @param KalturaObjectBase $object2
 	 */
-	public function CompareAPIObjects(KalturaObjectBase $outputReference, KalturaObjectBase $actualResult, $validErrorFields = array())
+	public function assertAPIObjects(KalturaObjectBase $expectedObject, KalturaObjectBase $actualObject, $skip = array())
 	{
+		KalturaLog::debug("Comparing expected object [" . get_class($expectedObject) . "] to actual object [" . get_class($actualObject) . "]");
+		
 		//Use reflection to compare the objects
-		$outputReferenceReflector = new ReflectionClass($outputReference);
+		$outputReferenceReflector = new ReflectionClass($expectedObject);
 		$properties = $outputReferenceReflector->getProperties(ReflectionProperty::IS_PUBLIC);
 		
 		$newErrors = array();
@@ -130,23 +128,64 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 		{
 			$propertyName = $property->getName();
 			
-			//Start the php timer so we can gather performance data
-			PHP_Timer::start();
-			
 			//If the field is in the valid failure list then we skip him 
-			if(in_array($propertyName, $validErrorFields))
+			if(in_array($propertyName, $skip))
+				continue;
+			
+			$expectedValue = $property->getValue($expectedObject);
+			$expectedType = gettype($expectedValue) == 'object' ? get_class($expectedValue) : gettype($expectedValue);
+			if(is_null($expectedValue))
+				continue;
+				
+			$actualValue = $property->getValue($actualObject);
+			$actualType = gettype($actualValue) == 'object' ? get_class($actualValue) : gettype($actualValue);
+			
+			KalturaLog::debug("Comparing propery [$propertyName] expected type [$expectedType] actual type [$actualType]");
+			
+			if($expectedValue instanceof KalturaObjectBase)
 			{
+				if(method_exists($this, 'assertNotInstanceOf'))
+					$this->assertNotInstanceOf(get_class($expectedValue), $actualValue);
+				else
+					$this->assertNotType(get_class($expectedValue), get_class($actualValue));
+					
+				$this->assertAPIObjects($expectedValue, $actualValue);
 				continue;
 			}
-			else 
+			
+			if(is_array($expectedValue))
 			{
-				$expectedValue = $property->getValue($outputReference);
-				$actualValue = $property->getValue($actualResult);
-				$assertToPerform = "assertEquals";
-
-				$this->compareOnField($propertyName, $actualValue, $expectedValue, $assertToPerform);
-				//if this is an array we need to change it to a string
+				$this->assertType('array', $actualValue);
+				foreach($expectedValue as $key => $expectedKeyValue)
+				{
+					$message = "attribute [$propertyName] missing array key [$key]";
+					$this->assertArrayHasKey($key, $actualValue, $message);
+					
+					$actualKeyValue = $actualValue[$key];
+				
+					if($expectedKeyValue instanceof KalturaObjectBase)
+					{
+						if(method_exists($this, 'assertNotInstanceOf'))
+							$this->assertNotInstanceOf(get_class($expectedKeyValue), $actualKeyValue);
+						else
+							$this->assertNotType(get_class($expectedKeyValue), get_class($actualKeyValue));
+							
+						$this->assertAPIObjects($expectedKeyValue, $actualKeyValue);
+						continue;
+					}
+					
+					$message = "attribute [$propertyName] array key [$key] expected value [$expectedKeyValue] and actual value [$actualKeyValue]";
+					$this->assertEquals($expectedKeyValue, $actualKeyValue, $message);
+				}
+				
+				continue;
 			}
+			
+			$expectedValue = strval($expectedValue);
+			$actualValue = strval($actualValue);
+			
+			$message = "attribute [$propertyName] expected value [$expectedValue] and actual value [$actualValue]";
+			$this->assertEquals($expectedValue, $actualValue, $message);
 		}
 	
 		return $newErrors;
@@ -226,38 +265,21 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 	}
 
 	/**
-	 * 
-	 * Strip carriage return and new line from a string.
-	 * @param string $string to be stripped.
-	 */
-	protected function stripWhiteSpaces($string)
-	{
-		$string = str_replace("\n", '', $string);
-		$string = str_replace("\r", '', $string);
-		return $string;
-	} 
-
-	/**
 	 * Starts a new session
 	 * @param KalturaSessionType $type
 	 * @param string $userId
 	 */
 	protected function startSession($type, $userId = null)
 	{
-		print("start session\n");
+		$testConfig = $this->config->get('config');
 		
-		if($type == KalturaSessionType::ADMIN)
-			$secret = KalturaGlobalData::getData("@TEST_PARTNER_ADMIN_SECRET@");
-		else
-			$secret = KalturaGlobalData::getData("@TEST_PARTNER_SECRET@");
-				
-		$ks = $this->client->session->start($secret, $userId, $type, $secret);
-		$this->assertNotNull($ks);
-		if (!$ks) {
+		//$ks = $this->client->session->start($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
+		$ks = $this->client->generateSession($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
+		if (!$ks)
 			return false;
-		}
 		
 		$this->client->setKs($ks);
+		KalturaLog::info("Session started [$ks]");
 		return true;
 	}
 }

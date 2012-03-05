@@ -26,7 +26,7 @@
 //
 // @ignore
 // ===================================================================================================
-class KalturaTestConfig
+class KalturaTestConfiguration
 {
 	const PARTNER_ID = 0;
 	const SECRET = "1234";

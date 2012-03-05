@@ -27,15 +27,15 @@
 // @ignore
 // ===================================================================================================
 require_once('../KalturaClient.php');
-require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'KalturaTestConfig.php');
+require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'KalturaTestConfiguration.php');
 
 class TestMain 
 {
 	public static function run()
 	{
-		if(!KalturaTestConfig::SECRET)
+		if(!KalturaTestConfiguration::SECRET)
 		{
-			throw new Exception("Please fill the partner credentials in KalturaTestConfig class");
+			throw new Exception("Please fill the partner credentials in KalturaTestConfiguration class");
 		}
 		
 		$test = new TestMain();
@@ -48,7 +48,7 @@ class TestMain
 	private function getKalturaClient($partnerId, $adminSecret, $isAdmin)
 	{
 		$kConfig = new KalturaConfiguration($partnerId);
-		$kConfig->serviceUrl = KalturaTestConfig::SERVICE_URL;
+		$kConfig->serviceUrl = KalturaTestConfiguration::SERVICE_URL;
 		$client = new KalturaClient($kConfig);
 		
 		$userId = "SomeUser";
@@ -60,7 +60,7 @@ class TestMain
 		}
 		catch(Exception $ex)
 		{
-			die("could not start session - check configurations in KalturaTestConfig class");
+			die("could not start session - check configurations in KalturaTestConfiguration class");
 		}
 		
 		return $client;
@@ -70,7 +70,7 @@ class TestMain
 	{
 		try
 		{
-			$client = $this->getKalturaClient(KalturaTestConfig::PARTNER_ID, KalturaTestConfig::ADMIN_SECRET, true);
+			$client = $this->getKalturaClient(KalturaTestConfiguration::PARTNER_ID, KalturaTestConfiguration::ADMIN_SECRET, true);
 			$results = $client->media->listAction();
 			$entry = $results->objects[0];
 			echo "\nGot an entry: [{$entry->name}]";
@@ -85,7 +85,7 @@ class TestMain
 	{
 		try
 		{
-			$client = $this->getKalturaClient(KalturaTestConfig::PARTNER_ID, KalturaTestConfig::ADMIN_SECRET, true);
+			$client = $this->getKalturaClient(KalturaTestConfiguration::PARTNER_ID, KalturaTestConfiguration::ADMIN_SECRET, true);
 			$client->startMultiRequest();
 			$client->baseEntry->count();
 			$client->partner->getInfo();
@@ -109,8 +109,8 @@ class TestMain
 		try 
 		{
 			echo "\nUploading test video...";
-			$client = $this->getKalturaClient(KalturaTestConfig::PARTNER_ID, KalturaTestConfig::ADMIN_SECRET, false);
-			$filePath = KalturaTestConfig::UPLOAD_FILE;
+			$client = $this->getKalturaClient(KalturaTestConfiguration::PARTNER_ID, KalturaTestConfiguration::ADMIN_SECRET, false);
+			$filePath = KalturaTestConfiguration::UPLOAD_FILE;
 			
 			$token = $client->baseEntry->upload($filePath);
 			$entry = new KalturaMediaEntry();
