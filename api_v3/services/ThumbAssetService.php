@@ -383,7 +383,7 @@ class ThumbAssetService extends KalturaAssetService
 		$fileName = $entry->getId() . '.jpg';
 		
 		if(is_null($thumbParamId))
-			return $this->serveAsset($entry, $fileName);
+			return $this->serveFile($entry, entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB, $fileName);
 		
 		$thumbAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $thumbParamId);
 		if(!$thumbAsset)
