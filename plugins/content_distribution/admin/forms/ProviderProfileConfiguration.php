@@ -42,6 +42,7 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 		$this->addElement('text', 'name', array(
 			'label'			=> 'Name:',
 			'filters'		=> array('StringTrim'),
+			'required'		=> true,
 		));
 		
 		$this->addElement('text', 'partner_id', array(
