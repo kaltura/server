@@ -8,7 +8,6 @@ class kEdgeCastUrlManager extends kUrlManager
 	public function getFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
 		$url = parent::getFlavorAssetUrl($flavorAsset);
-		$url = ltrim($url,'/');
 		$url = preg_replace('/^mp4:(\/)*/', 'mp4:', $url);
 		// move version param to "behind" the flavor asset id
 		$flavorAssetId = $flavorAsset->getId();
@@ -16,12 +15,15 @@ class kEdgeCastUrlManager extends kUrlManager
 		$url = str_replace($flavorIdStr, '', $url);
 		$url = str_replace('serveFlavor', 'serveFlavor'.$flavorIdStr, $url);
 		
-		if ($this->extention) {
-			$url .= "/name/$flavorAssetId.$this->extention";
-		}
-			
-		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$url = $this->addEcSeek($url, $syncKey);			
+		if ($this->protocol == StorageProfile::PLAY_FORMAT_HTTP)
+		{
+    		if ($this->extention) {
+    			$url .= "/name/$flavorAssetId.$this->extention";
+    		}
+    			
+    		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+    		$url = $this->addEcSeek($url, $syncKey);
+		}			
 		return $url;
 	}
 	
@@ -32,10 +34,12 @@ class kEdgeCastUrlManager extends kUrlManager
 	public function getFileSyncUrl(FileSync $fileSync)
 	{
 		$url = parent::getFileSyncUrl($fileSync);
-		$url = ltrim($url,'/');
 		$url = preg_replace('/^mp4:(\/)*/', 'mp4:', $url);
-		$syncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
-		$url = $this->addEcSeek($url, $syncKey);
+		if ($this->protocol == StorageProfile::PLAY_FORMAT_HTTP)
+		{
+    		$syncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
+    		$url = $this->addEcSeek($url, $syncKey);
+		}
 		return $url;
 	}
 	
