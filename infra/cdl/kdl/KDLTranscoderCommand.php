@@ -298,6 +298,9 @@ $bt=0;
 			if($this->_vidWid!=null && $this->_vidHgt!=null){
 				$cmdStr = $cmdStr." -s ".$this->_vidWid."x".$this->_vidHgt;
 			}
+			if(isset($vidObj->_dar) && $vidObj->_dar>0) {
+				$cmdStr.= " -aspect ".round($vidObj->_dar,4);
+			}
 			if($this->_vidFr!==null && $this->_vidFr>0){
 				$cmdStr = $cmdStr." -r ".$this->_vidFr;
 			}
