@@ -497,12 +497,21 @@ $target->_video = null;
 		$this->evaluateTargetVideoFramesize($sourceVid, $targetVid);
 
 		/*
+		 * Following code is a hack to overcome x264 AR disorder that happens with several hdv source formats
+		 */
+		$srcVcodec = $source->GetIdOrFormat();
+		if(isset($srcVcodec) && in_array($srcVcodec, array("dvh3", "dvhp", "hdv1","hdv2" ,"hdv3", "hdv6"))
+		&& isset($targetVid->_id) && in_array($targetVid->_id, array("h264", "h264b", "h264m","h264h" ))
+		&& !($targetVid->_width==0 || $targetVid->_height==0)) {
+			$targetVid->_dar = round($targetVid->_width/$targetVid->_height,4);
+		}
+		/*
 		 * If flavor BR is higher than the source - keep the source BR
 		 */
 		$this->evaluateTargetVideoBitrate($sourceVid, $targetVid);
 
 		/*
-		 * If the flavor fps is zero, evaluate it from the source and
+		 * Frame Rate - If the flavor fps is zero, evaluate it from the source and
 		 * the constants theshold.
 		 */
 		if($flavorVid->_frameRate==0) {
@@ -518,8 +527,17 @@ $target->_video = null;
 			}
 		}
 
+		/*
+		 * GOP - if gop not set, set it to 2min according to the required frame rate, 
+		 * if not set=>60frames
+		 */
 		if($flavorVid->_gop===null || $flavorVid->_gop==0) {
-			$targetVid->_gop = KDLConstants::DefaultGOP;
+			if(isset($targetVid->_frameRate)){
+				$targetVid->_gop = round(2*$targetVid->_frameRate);
+			}
+			else {
+				$targetVid->_gop = KDLConstants::DefaultGOP;
+			}
 		}
 
 		$targetVid->_rotation = $sourceVid->_rotation;
