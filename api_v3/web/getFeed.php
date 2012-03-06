@@ -45,7 +45,7 @@ catch(PropelException $pex)
 catch(Exception $ex)
 {
 	KalturaLog::err($ex->getMessage());
-	header('KalturaSyndication: '.$ex->getMessage());
+	header('KalturaSyndication: ' . str_replace(array("\n", "\r"), array("\t", ''), $ex->getMessage()));
 	die;
 }
 
