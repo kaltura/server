@@ -6,33 +6,6 @@
 abstract class DocumentsServiceTestBase extends KalturaApiTestCase
 {
 	/**
-	 * Tests documents->addFromEntry action
-	 * @param string $sourceEntryId Document entry id to copy from
-	 * @param KalturaDocumentEntry $documentEntry Document entry metadata
-	 * @param int $sourceFlavorParamsId The flavor to be used as the new entry source, source flavor will be used if not specified
-	 * @param KalturaDocumentEntry $reference
-	 * @return KalturaDocumentEntry
-	 * @dataProvider provideData
-	 */
-	public function testAddFromEntry($sourceEntryId, KalturaDocumentEntry $documentEntry = null, $sourceFlavorParamsId = "", KalturaDocumentEntry $reference)
-	{
-		$resultObject = $this->client->documents->addFromEntry($sourceEntryId, $documentEntry, $sourceFlavorParamsId);
-		if(method_exists($this, 'assertNotInstanceOf'))
-			$this->assertNotInstanceOf('KalturaDocumentEntry', $resultObject);
-		else
-			$this->assertNotType('KalturaDocumentEntry', get_class($resultObject));
-		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->assertNotNull($resultObject->id);
-		$this->validateAddFromEntry($sourceEntryId, $documentEntry, $sourceFlavorParamsId, $reference);
-		
-		return $resultObject->id;
-	}
-
-	/**
-	 * Validates testAddFromEntry results
-	 */
-	abstract protected function validateAddFromEntry($sourceEntryId, KalturaDocumentEntry $documentEntry = null, $sourceFlavorParamsId = "", KalturaDocumentEntry $reference);
-	/**
 	 * Tests documents->get action
 	 * @param string $entryId Document entry id
 	 * @param int $version Desired version of the data
@@ -48,13 +21,17 @@ abstract class DocumentsServiceTestBase extends KalturaApiTestCase
 		else
 			$this->assertNotType('KalturaDocumentEntry', get_class($resultObject));
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->validateGet($entryId, $version, $reference);
+		$this->validateGet($resultObject);
 	}
 
 	/**
 	 * Validates testGet results
+	 * Hook to be overriden by the extending class
+	 * 
+	 * @param KalturaDocumentEntry $resultObject
 	 */
-	abstract protected function validateGet($entryId, $version = -1, KalturaDocumentEntry $reference);
+	protected function validateGet(KalturaDocumentEntry $resultObject){}
+
 	/**
 	 * Tests documents->update action
 	 * @param string $entryId Document entry id to update
@@ -71,13 +48,17 @@ abstract class DocumentsServiceTestBase extends KalturaApiTestCase
 		else
 			$this->assertNotType('KalturaDocumentEntry', get_class($resultObject));
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->validateUpdate($entryId, $documentEntry, $reference);
+		$this->validateUpdate($resultObject);
 	}
 
 	/**
 	 * Validates testUpdate results
+	 * Hook to be overriden by the extending class
+	 * 
+	 * @param KalturaDocumentEntry $resultObject
 	 */
-	abstract protected function validateUpdate($entryId, KalturaDocumentEntry $documentEntry, KalturaDocumentEntry $reference);
+	protected function validateUpdate(KalturaDocumentEntry $resultObject){}
+
 	/**
 	 * Tests documents->delete action
 	 * @param string $entryId Document entry id to delete
@@ -87,13 +68,8 @@ abstract class DocumentsServiceTestBase extends KalturaApiTestCase
 	public function testDelete($entryId)
 	{
 		$resultObject = $this->client->documents->delete($entryId);
-		$this->validateDelete($entryId);
 	}
 
-	/**
-	 * Validates testDelete results
-	 */
-	abstract protected function validateDelete($entryId);
 	/**
 	 * Tests documents->listAction action
 	 * @param KalturaDocumentEntryFilter $filter Document entry filter
@@ -109,11 +85,15 @@ abstract class DocumentsServiceTestBase extends KalturaApiTestCase
 		else
 			$this->assertNotType('KalturaDocumentListResponse', get_class($resultObject));
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->validateListAction($filter, $pager, $reference);
+		$this->validateListAction($resultObject);
 	}
 
 	/**
 	 * Validates testListAction results
+	 * Hook to be overriden by the extending class
+	 * 
+	 * @param KalturaDocumentListResponse $resultObject
 	 */
-	abstract protected function validateListAction(KalturaDocumentEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaDocumentListResponse $reference);
+	protected function validateListAction(KalturaDocumentListResponse $resultObject){}
+
 }
