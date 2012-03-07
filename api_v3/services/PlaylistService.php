@@ -53,7 +53,7 @@ class PlaylistService extends KalturaEntryService
 	 * 
 	 * @action add
 	 * @param KalturaPlaylist $playlist 
-	 * @param bool $updateStats 
+	 * @param bool $updateStats indicates that the playlist statistics attributes should be updated synchronously now
 	 * @return KalturaPlaylist
 	 */
 	function addAction( KalturaPlaylist $playlist , $updateStats = false)
