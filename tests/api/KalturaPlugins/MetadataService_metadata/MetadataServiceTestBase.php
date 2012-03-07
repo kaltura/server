@@ -24,15 +24,19 @@ abstract class MetadataServiceTestBase extends KalturaApiTestCase
 			$this->assertNotType('KalturaMetadata', get_class($resultObject));
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
 		$this->assertNotNull($resultObject->id);
-		$this->validateAdd($metadataProfileId, $objectType, $objectId, $xmlData, $reference);
+		$this->validateAdd($resultObject);
 		
 		return $resultObject->id;
 	}
 
 	/**
 	 * Validates testAdd results
+	 * Hook to be overriden by the extending class
+	 * 
+	 * @param KalturaMetadata $resultObject
 	 */
-	abstract protected function validateAdd($metadataProfileId, $objectType, $objectId, $xmlData, KalturaMetadata $reference);
+	protected function validateAdd(KalturaMetadata $resultObject){}
+
 	/**
 	 * Tests metadata->get action
 	 * @param int $id 
@@ -48,13 +52,17 @@ abstract class MetadataServiceTestBase extends KalturaApiTestCase
 		else
 			$this->assertNotType('KalturaMetadata', get_class($resultObject));
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->validateGet($id, $reference);
+		$this->validateGet($resultObject);
 	}
 
 	/**
 	 * Validates testGet results
+	 * Hook to be overriden by the extending class
+	 * 
+	 * @param KalturaMetadata $resultObject
 	 */
-	abstract protected function validateGet($id, KalturaMetadata $reference);
+	protected function validateGet(KalturaMetadata $resultObject){}
+
 	/**
 	 * Tests metadata->update action
 	 * @param int $id 
@@ -72,13 +80,17 @@ abstract class MetadataServiceTestBase extends KalturaApiTestCase
 		else
 			$this->assertNotType('KalturaMetadata', get_class($resultObject));
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->validateUpdate($id, $xmlData, $version, $reference);
+		$this->validateUpdate($resultObject);
 	}
 
 	/**
 	 * Validates testUpdate results
+	 * Hook to be overriden by the extending class
+	 * 
+	 * @param KalturaMetadata $resultObject
 	 */
-	abstract protected function validateUpdate($id, $xmlData = "", $version = "", KalturaMetadata $reference);
+	protected function validateUpdate(KalturaMetadata $resultObject){}
+
 	/**
 	 * Tests metadata->listAction action
 	 * @param KalturaMetadataFilter $filter 
@@ -94,13 +106,17 @@ abstract class MetadataServiceTestBase extends KalturaApiTestCase
 		else
 			$this->assertNotType('KalturaMetadataListResponse', get_class($resultObject));
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->validateListAction($filter, $pager, $reference);
+		$this->validateListAction($resultObject);
 	}
 
 	/**
 	 * Validates testListAction results
+	 * Hook to be overriden by the extending class
+	 * 
+	 * @param KalturaMetadataListResponse $resultObject
 	 */
-	abstract protected function validateListAction(KalturaMetadataFilter $filter = null, KalturaFilterPager $pager = null, KalturaMetadataListResponse $reference);
+	protected function validateListAction(KalturaMetadataListResponse $resultObject){}
+
 	/**
 	 * Tests metadata->delete action
 	 * @param int $id 
@@ -110,11 +126,6 @@ abstract class MetadataServiceTestBase extends KalturaApiTestCase
 	public function testDelete($id)
 	{
 		$resultObject = $this->client->metadata->delete($id);
-		$this->validateDelete($id);
 	}
 
-	/**
-	 * Validates testDelete results
-	 */
-	abstract protected function validateDelete($id);
 }

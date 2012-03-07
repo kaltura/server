@@ -20,11 +20,15 @@ abstract class MediaInfoServiceTestBase extends KalturaApiTestCase
 		else
 			$this->assertNotType('KalturaMediaInfoListResponse', get_class($resultObject));
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->validateListAction($filter, $pager, $reference);
+		$this->validateListAction($resultObject);
 	}
 
 	/**
 	 * Validates testListAction results
+	 * Hook to be overriden by the extending class
+	 * 
+	 * @param KalturaMediaInfoListResponse $resultObject
 	 */
-	abstract protected function validateListAction(KalturaMediaInfoFilter $filter = null, KalturaFilterPager $pager = null, KalturaMediaInfoListResponse $reference);
+	protected function validateListAction(KalturaMediaInfoListResponse $resultObject){}
+
 }
