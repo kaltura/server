@@ -248,8 +248,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 				$value = str_replace($search, $replace, $value);
 				$data[$key] = "'$value'";
 			}else{
-				$value = (int)$value;
-				$data[$key] = $value;
+//				$value = (int)$value;
+				$data[$key] = is_numeric($value) ? $value : 0;
 			}
 		}
 		
@@ -264,14 +264,14 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 		foreach($dataInts as $key => $value)
 		{
-			$value = (int)$value;
-			$data[$key] = $value;
+//			$value = (int)$value;
+			$data[$key] = is_numeric($value) ? $value : 0;
 		}
 		
 		foreach($dataTimes as $key => $value)
 		{
-			$value = (int)$value;
-			$data[$key] = $value;
+//			$value = (int)$value;
+			$data[$key] = is_numeric($value) ? $value : 0;
 		}
 		
 		$values = implode(',', $data);
