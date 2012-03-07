@@ -133,13 +133,13 @@ class kPluginableEnumsManager
 		if(count($split) == 1)
 		{
 			if(!preg_match('/[\w\d]+/', $value))
-				throw new kCoreException("Dynamic enum invalid format [$value]", kCoreException::INVALID_ENUM_FORMAT);
+				throw new kCoreException("Dynamic enum invalid format [$value] for type [$type]", kCoreException::INVALID_ENUM_FORMAT);
 				
 			return $value;
 		}
 	
 		if(!preg_match('/\w[\w\d]+\.[\w\d]+/', $value))
-			throw new kCoreException("Dynamic enum invalid format [$value]", kCoreException::INVALID_ENUM_FORMAT);
+			throw new kCoreException("Dynamic enum invalid format [$value] for type [$type]", kCoreException::INVALID_ENUM_FORMAT);
 			
 		$typeMap = self::getApiMap($type);
 		if($typeMap && isset($typeMap[$value]))
