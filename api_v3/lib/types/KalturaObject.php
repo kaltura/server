@@ -58,7 +58,14 @@ class KalturaObject
             if (is_callable($getter_callback))
             {
                 $value = call_user_func($getter_callback);
-                if($properties[$this_prop]->isDynamicEnum())
+                
+                if($properties[$this_prop]->isArray() && is_array($value))
+                {
+                	$class = $properties[$this_prop]->getType();
+                	if(method_exists($class, 'fromDbArray'))
+	                	$value = call_user_func(array($class, 'fromDbArray'), $value);
+                }
+                elseif($properties[$this_prop]->isDynamicEnum())
                 {
 					$propertyType = $properties[$this_prop]->getType();
 					$enumType = call_user_func(array($propertyType, 'getEnumClass'));
@@ -116,6 +123,10 @@ class KalturaObject
 			if ($value instanceof KalturaNullField)
 			{
 				$value = null;
+			}
+			elseif ($value instanceof KalturaTypedArray)
+			{
+				$value = $value->toObjectsArray();
 			}
 			elseif ($propertyInfo->isDynamicEnum())
 			{
