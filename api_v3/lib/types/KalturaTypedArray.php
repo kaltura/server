@@ -88,4 +88,12 @@ class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator, 
 	{
 		return $this->array;
 	}
+	
+	public function toObjectsArray()
+	{
+		$array = array();
+		foreach($this->array as $obj)
+			$array[] = $obj->toObject();
+		return $array;
+	}
 }
