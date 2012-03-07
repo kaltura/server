@@ -1314,7 +1314,7 @@ class myPartnerUtils
  	public static function copyAccessControls(Partner $fromPartner, Partner $toPartner)
  	{
 		$copiedList = array();
- 		KalturaLog::log("copyAccessControls - Copying access controls from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."]");
+ 		KalturaLog::log("Copying access control profiles from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."]");
  		
  		$c = new Criteria();
  		$c->add(accessControlPeer::PARTNER_ID, $fromPartner->getId());
@@ -1326,7 +1326,7 @@ class myPartnerUtils
  			$newAccessControl->setPartnerId($toPartner->getId());
  			$newAccessControl->save();
  			
- 			KalturaLog::log("copyAccessControls - Copied [".$accessControl->getId()."], new id is [".$newAccessControl->getId()."]");
+ 			KalturaLog::log("Copied [".$accessControl->getId()."], new id is [".$newAccessControl->getId()."]");
 			$copiedList[$accessControl->getId()] = $newAccessControl->getId();
  		}
 
