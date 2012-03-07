@@ -2157,10 +2157,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$this->is_categories_modified = false;
 	}
 	
-	public function isScheduledNow()
+	public function isScheduledNow($time = null)
 	{
-		$startDateCheck = (!$this->getStartDate() || $this->getStartDate(null) <= time());
-		$endDateCheck = (!$this->getEndDate() || $this->getEndDate(null) >= time());
+		if(is_null($time))
+			$time = time();
+			
+		$startDateCheck = (!$this->getStartDate() || $this->getStartDate(null) <= $time);
+		$endDateCheck = (!$this->getEndDate() || $this->getEndDate(null) >= $time);
 		return $startDateCheck && $endDateCheck;
 	}
 	
@@ -2422,7 +2425,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function getIndexedId()
 	{
-		return crc32($this->getId());
+		return sprintf('%u', crc32($this->getId()));
 	}
 	
 	/* (non-PHPdoc)

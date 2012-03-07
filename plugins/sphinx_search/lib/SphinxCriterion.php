@@ -204,7 +204,7 @@ class SphinxCriterion extends KalturaCriterion
 				
 			$ids = array();
 			foreach($value as $val)
-				$ids[$val] = crc32($val);
+				$ids[$val] = sprintf('%u', crc32($val));
 				
 			$value = $ids;
 			$this->criteria->setIds($comparison, $ids);

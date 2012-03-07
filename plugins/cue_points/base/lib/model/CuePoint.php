@@ -252,7 +252,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	 */
 	public function getIndexedId()
 	{
-		return crc32($this->getId());
+		return sprintf('%u', crc32($this->getId()));
 	}
 	
 	public static function getIndexFieldTypes()

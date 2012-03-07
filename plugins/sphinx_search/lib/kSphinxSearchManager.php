@@ -158,7 +158,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function getSphinxId($object)
 	{
-		return crc32($object->getId());
+		return sprintf('%u', crc32($object->getId()));
 	}
 
 	// TODO remove $force after replace bug solved
