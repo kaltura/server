@@ -21,13 +21,15 @@ class KalturaPlaylist extends KalturaBaseEntry
 	public $filters;
 	
 	/**
+	 * Maximum count of results to be returned in playlist execution
 	 * 
 	 * @var int
 	 */
 	public $totalResults;
 	
 	/**
-	 * Type of playlist  
+	 * Type of playlist
+	 * 
 	 * @var KalturaPlaylistType
 	 */	
 	public $playlistType;
