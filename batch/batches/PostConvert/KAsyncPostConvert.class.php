@@ -58,13 +58,14 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	 */
 	private function postConvert(KalturaBatchJob $job, KalturaPostConvertJobData $data)
 	{
-		$data->flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
+		if($data->flavorParamsOutputId)
+			$data->flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
 		
 		try
 		{
 			$mediaFile = trim($data->srcFileSyncLocalPath);
 			
-			if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
+			if(!$data->flavorParamsOutput || !$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 			{
 				if(!file_exists($mediaFile))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile does not exist", KalturaBatchJobStatus::RETRY);
