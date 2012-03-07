@@ -426,7 +426,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		
 		$description = $actionInfo->description;
 		$description = $this->fixDescription($description);
-	    $actionElement->setAttribute("description", $description);
+	    $actionElement->setAttribute("description", kString::stripUtf8InvalidChars($description));
 		
 		$actionElement->appendChild($resultElement);
 		
