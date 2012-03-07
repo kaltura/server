@@ -189,32 +189,18 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 
 		foreach($actions as $action => $actionName)
 		{
-			//KalturaLog::debug("$actionName\n");
-				
 			$actionInfo = $serviceReflector->getActionInfo($action);
 				
 			if($actionInfo->serverOnly)
-			{
 				continue;
-			}
 
 			if (strpos($actionInfo->clientgenerator, "ignore") !== false)
-			continue;
-
-			//TODO: add support for 'registerAction' The register is for partner service
-			$resgressionTests = array('addAction', 'getAction', 'deleteAction', 'updateAction', 'listAction');
-			if ($serviceName == 'documents')
-			{
-				print("Adding filters $serviceName, $actionName \n");
-				array_push($resgressionTests, 'addFromEntryAction');
-			}
-
-			if(!in_array($actionName , $resgressionTests))
-			{
 				continue;
-			}
 
-			print("After filtering $serviceName, $actionName \n");
+			$resgressionTests = array('addAction', 'getAction', 'deleteAction', 'updateAction', 'listAction');
+			if(!in_array($actionName , $resgressionTests))
+				continue;
+
 			$outputTypeReflector = $serviceReflector->getActionOutputType($action);
 			$actionParams = $serviceReflector->getActionParams($action);
 
@@ -289,34 +275,6 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeToFile("$testPath/{$serviceClass}Test.php.ini", $this->_txtIni, false);
 		//$this->writeToFile("$testPath/testsData/{$serviceClass}Test.data", $this->_txtXml, false);
 		//$this->writeToFile("$testPath/testsData/{$serviceClass}Test.config", $this->_txtXmlSource, false); //TODO: change the file extension to source
-	}
-
-	/**
-	 *
-	 * Writes the test validation for the given action
-	 * @param string $actionName
-	 * @param array $testParams
-	 * @param array $validateValues
-	 */
-	protected function writeActionTestValidation($actionName, $testParams, $validateValues)
-	{
-		$this->writeBase("	/**");
-		$this->writeBase("	 * Validates test{$actionName} results");
-		$this->writeBase("	 */");
-		$this->writeBase("	abstract protected function validate{$actionName}($testParams);");
-		//$this->writeBase("	{");
-		//$this->writeBase("	}");
-		//$this->writeBase("");
-
-		$this->writeTest("	/**");
-		$this->writeTest("	 * Validates test{$actionName} results");
-		$this->writeTest("	 */");
-		$this->writeTest("	protected function validate{$actionName}($testParams)");
-		$this->writeTest("	{");
-		//$this->writeTest("		parent::validate{$actionName}($validateValues);");
-		$this->writeTest("		// TODO - add your own validations here");
-		$this->writeTest("	}");
-		$this->writeTest("");
 	}
 
 	/**
@@ -603,8 +561,6 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 
 		//TODO:delete this
 		$resgressionTests = array('add', 'get', 'delete', 'update', 'listAction');
-		if ($serviceName == 'documents')
-			array_push($resgressionTests, 'addFromEntry');
 		if(!in_array($action , $resgressionTests ))
 			return;
 
@@ -657,17 +613,36 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$this->write("	 * @depends testAdd with data set #$this->dependencyIndex", $isBase);
 			$this->dependencyIndex++;
 		}
-		//TODO: Add the dependency if needed on the test finished
-		//		else
-		//				$this->write("	 * @depends testFinished", $isBase);
 
 		if(count($testValues))
 			$this->write("	 * @dataProvider provideData", $isBase);
 
 		$this->writeActionTest($serviceName, $actionName, $action, $testParams, $testValues, $outputType, $isBase, $testReturnedType, $validateValues);
 
-		if($isBase) //TODO: maybe add validation to all the tests
-			$this->writeActionTestValidation($actionName, $testParams, $validateValues);
+		if($isBase && $outputType)
+		{
+			$this->writeBase("	/**");
+			$this->writeBase("	 * Validates test{$actionName} results");
+			$this->writeBase("	 * Hook to be overriden by the extending class");
+			$this->writeBase("	 * ");
+			$this->writeBase("	 * @param $outputType \$resultObject");
+			$this->writeBase("	 */");
+			$this->writeBase("	protected function validate{$actionName}($outputType \$resultObject){}");
+			$this->writeBase("");
+
+			$serviceReflector = new KalturaServiceReflector($serviceId);
+			$serviceClass = $serviceReflector->getServiceClass();
+		
+			$this->writeTest("	/* (non-PHPdoc)");
+			$this->writeTest("	 * @see {$serviceClass}TestBase::validate{$actionName}()");
+			$this->writeTest("	 */");
+			$this->writeTest("	protected function validate{$actionName}($outputType \$resultObject)");
+			$this->writeTest("	{");
+			//$this->writeTest("		parent::validate{$actionName}($validateValues);");
+			$this->writeTest("		// TODO - add your own validations here");
+			$this->writeTest("	}");
+			$this->writeTest("");
+		}
 	}
 
 	/**
@@ -705,15 +680,13 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		}
 
 		if(!$isBase) //If regular test
-		{
 			$this->write("		// TODO - add here your own validations", $isBase);
-		}
 
 		if($testReturnedType) //Adds assert to returned value (for dependency)
 			$this->write("		\$this->assertNotNull(\$resultObject->id);", $isBase);
 			
-		if($validateValues && count($validateValues)) //Add validation
-			$this->write("		\$this->validate{$actionName}($validateValues);", $isBase);
+		if($outputType)
+			$this->write("		\$this->validate{$actionName}(\$resultObject);", $isBase);
 
 		if($testReturnedType)
 		{
