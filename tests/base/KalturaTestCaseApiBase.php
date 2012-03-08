@@ -107,7 +107,7 @@ class KalturaTestCaseApiBase extends PHPUnit_Framework_TestCase
 		if(!$argConfig)
 		{
 			if(!$arg->allowsNull())
-				throw new Exception("Argument [$argName] can't be null for test [" . $testConfig->getSectionName() . "]");
+				throw new Exception("Argument [$argName] can't be null for test [" . $this->getName() . "]");
 				
 			return null;
 		}
