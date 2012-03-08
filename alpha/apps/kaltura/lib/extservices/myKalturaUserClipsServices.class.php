@@ -111,6 +111,15 @@ class myKalturaUserClipsServices extends myBaseMediaSource implements IMediaSour
 					$object["thumb"] = $entry->getThumbnailUrl() ;				
 				}
 				
+				//Find the flavor sent over the dataUrl in order to send its extension
+				
+				$playedAsset = assetPeer::retrieveBestPlayByEntryId($entry->getId());
+				
+				if ($playedAsset)
+				{
+				    $object["fileExt"] = $playedAsset->getFileExt();
+				}
+				
 				$objects[] = $object;
 			}
 		}
