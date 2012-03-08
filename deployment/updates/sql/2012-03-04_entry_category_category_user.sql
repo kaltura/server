@@ -21,8 +21,8 @@ ADD `reference_id` VARCHAR(512),
 ADD `contribution_policy` TINYINT default 2,
 ADD `custom_data` TEXT,
 ADD `privacy_context` TINYINT default 0,
-ADD `privacy_contexts` VARCHAR(255);
-ADD  KEY `partner_id_full_name_index`(`partner_id`, `full_name`)
+ADD `privacy_contexts` VARCHAR(255),
+ADD  KEY `partner_id_full_name_index`(`partner_id`, `full_name`);
 	
 CREATE TABLE `category_kuser`
 (
