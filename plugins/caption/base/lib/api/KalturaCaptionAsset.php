@@ -104,9 +104,5 @@ class KalturaCaptionAsset extends KalturaAsset
 		
 		return parent::toInsertableObject ($object_to_fill, $props_to_skip);
 	}
-	
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		$this->validatePropertyNotNull('format');
-	}
+
 }
