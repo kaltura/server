@@ -370,7 +370,7 @@ class UserService extends KalturaBaseUserService
 	
 	
 	/**
-	 * Updates a user’s login data: email, password, name.
+	 * Updates a user's login data: email, password, name.
 	 * 
 	 * @action updateLoginData
 	 * 
@@ -503,7 +503,7 @@ class UserService extends KalturaBaseUserService
 	
 	
 	/**
-	 * Disables a user’s ability to log into a partner account using an email address and a password.
+	 * Disables a user's ability to log into a partner account using an email address and a password.
 	 * You may use either a userId or a loginId parameter for this action.
 	 * 
 	 * @action disableLogin
