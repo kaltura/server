@@ -343,6 +343,30 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	protected $available_from;
 
 	/**
+	 * The value for the creator_kuser_id field.
+	 * @var        int
+	 */
+	protected $creator_kuser_id;
+
+	/**
+	 * The value for the creator_puser_id field.
+	 * @var        string
+	 */
+	protected $creator_puser_id;
+
+	/**
+	 * The value for the entitled_users_edit field.
+	 * @var        string
+	 */
+	protected $entitled_users_edit;
+
+	/**
+	 * The value for the entitled_users_publish field.
+	 * @var        string
+	 */
+	protected $entitled_users_publish;
+
+	/**
 	 * @var        kshow
 	 */
 	protected $akshow;
@@ -1256,6 +1280,46 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [creator_kuser_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getCreatorKuserId()
+	{
+		return $this->creator_kuser_id;
+	}
+
+	/**
+	 * Get the [creator_puser_id] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCreatorPuserId()
+	{
+		return $this->creator_puser_id;
+	}
+
+	/**
+	 * Get the [entitled_users_edit] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getEntitledUsersEdit()
+	{
+		return $this->entitled_users_edit;
+	}
+
+	/**
+	 * Get the [entitled_users_publish] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getEntitledUsersPublish()
+	{
+		return $this->entitled_users_publish;
 	}
 
 	/**
@@ -2665,6 +2729,98 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	} // setAvailableFrom()
 
 	/**
+	 * Set the value of [creator_kuser_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     entry The current object (for fluent API support)
+	 */
+	public function setCreatorKuserId($v)
+	{
+		if(!isset($this->oldColumnsValues[entryPeer::CREATOR_KUSER_ID]))
+			$this->oldColumnsValues[entryPeer::CREATOR_KUSER_ID] = $this->creator_kuser_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->creator_kuser_id !== $v) {
+			$this->creator_kuser_id = $v;
+			$this->modifiedColumns[] = entryPeer::CREATOR_KUSER_ID;
+		}
+
+		return $this;
+	} // setCreatorKuserId()
+
+	/**
+	 * Set the value of [creator_puser_id] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     entry The current object (for fluent API support)
+	 */
+	public function setCreatorPuserId($v)
+	{
+		if(!isset($this->oldColumnsValues[entryPeer::CREATOR_PUSER_ID]))
+			$this->oldColumnsValues[entryPeer::CREATOR_PUSER_ID] = $this->creator_puser_id;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->creator_puser_id !== $v) {
+			$this->creator_puser_id = $v;
+			$this->modifiedColumns[] = entryPeer::CREATOR_PUSER_ID;
+		}
+
+		return $this;
+	} // setCreatorPuserId()
+
+	/**
+	 * Set the value of [entitled_users_edit] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     entry The current object (for fluent API support)
+	 */
+	public function setEntitledUsersEdit($v)
+	{
+		if(!isset($this->oldColumnsValues[entryPeer::ENTITLED_USERS_EDIT]))
+			$this->oldColumnsValues[entryPeer::ENTITLED_USERS_EDIT] = $this->entitled_users_edit;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->entitled_users_edit !== $v) {
+			$this->entitled_users_edit = $v;
+			$this->modifiedColumns[] = entryPeer::ENTITLED_USERS_EDIT;
+		}
+
+		return $this;
+	} // setEntitledUsersEdit()
+
+	/**
+	 * Set the value of [entitled_users_publish] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     entry The current object (for fluent API support)
+	 */
+	public function setEntitledUsersPublish($v)
+	{
+		if(!isset($this->oldColumnsValues[entryPeer::ENTITLED_USERS_PUBLISH]))
+			$this->oldColumnsValues[entryPeer::ENTITLED_USERS_PUBLISH] = $this->entitled_users_publish;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->entitled_users_publish !== $v) {
+			$this->entitled_users_publish = $v;
+			$this->modifiedColumns[] = entryPeer::ENTITLED_USERS_PUBLISH;
+		}
+
+		return $this;
+	} // setEntitledUsersPublish()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -2792,6 +2948,10 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$this->end_date = ($row[$startcol + 49] !== null) ? (string) $row[$startcol + 49] : null;
 			$this->flavor_params_ids = ($row[$startcol + 50] !== null) ? (string) $row[$startcol + 50] : null;
 			$this->available_from = ($row[$startcol + 51] !== null) ? (string) $row[$startcol + 51] : null;
+			$this->creator_kuser_id = ($row[$startcol + 52] !== null) ? (int) $row[$startcol + 52] : null;
+			$this->creator_puser_id = ($row[$startcol + 53] !== null) ? (string) $row[$startcol + 53] : null;
+			$this->entitled_users_edit = ($row[$startcol + 54] !== null) ? (string) $row[$startcol + 54] : null;
+			$this->entitled_users_publish = ($row[$startcol + 55] !== null) ? (string) $row[$startcol + 55] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -2801,7 +2961,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 52; // 52 = entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 56; // 56 = entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating entry object", $e);
@@ -3669,6 +3829,18 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			case 51:
 				return $this->getAvailableFrom();
 				break;
+			case 52:
+				return $this->getCreatorKuserId();
+				break;
+			case 53:
+				return $this->getCreatorPuserId();
+				break;
+			case 54:
+				return $this->getEntitledUsersEdit();
+				break;
+			case 55:
+				return $this->getEntitledUsersPublish();
+				break;
 			default:
 				return null;
 				break;
@@ -3742,6 +3914,10 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$keys[49] => $this->getEndDate(),
 			$keys[50] => $this->getFlavorParamsIds(),
 			$keys[51] => $this->getAvailableFrom(),
+			$keys[52] => $this->getCreatorKuserId(),
+			$keys[53] => $this->getCreatorPuserId(),
+			$keys[54] => $this->getEntitledUsersEdit(),
+			$keys[55] => $this->getEntitledUsersPublish(),
 		);
 		return $result;
 	}
@@ -3929,6 +4105,18 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			case 51:
 				$this->setAvailableFrom($value);
 				break;
+			case 52:
+				$this->setCreatorKuserId($value);
+				break;
+			case 53:
+				$this->setCreatorPuserId($value);
+				break;
+			case 54:
+				$this->setEntitledUsersEdit($value);
+				break;
+			case 55:
+				$this->setEntitledUsersPublish($value);
+				break;
 		} // switch()
 	}
 
@@ -4005,6 +4193,10 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[49], $arr)) $this->setEndDate($arr[$keys[49]]);
 		if (array_key_exists($keys[50], $arr)) $this->setFlavorParamsIds($arr[$keys[50]]);
 		if (array_key_exists($keys[51], $arr)) $this->setAvailableFrom($arr[$keys[51]]);
+		if (array_key_exists($keys[52], $arr)) $this->setCreatorKuserId($arr[$keys[52]]);
+		if (array_key_exists($keys[53], $arr)) $this->setCreatorPuserId($arr[$keys[53]]);
+		if (array_key_exists($keys[54], $arr)) $this->setEntitledUsersEdit($arr[$keys[54]]);
+		if (array_key_exists($keys[55], $arr)) $this->setEntitledUsersPublish($arr[$keys[55]]);
 	}
 
 	/**
@@ -4068,6 +4260,10 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(entryPeer::END_DATE)) $criteria->add(entryPeer::END_DATE, $this->end_date);
 		if ($this->isColumnModified(entryPeer::FLAVOR_PARAMS_IDS)) $criteria->add(entryPeer::FLAVOR_PARAMS_IDS, $this->flavor_params_ids);
 		if ($this->isColumnModified(entryPeer::AVAILABLE_FROM)) $criteria->add(entryPeer::AVAILABLE_FROM, $this->available_from);
+		if ($this->isColumnModified(entryPeer::CREATOR_KUSER_ID)) $criteria->add(entryPeer::CREATOR_KUSER_ID, $this->creator_kuser_id);
+		if ($this->isColumnModified(entryPeer::CREATOR_PUSER_ID)) $criteria->add(entryPeer::CREATOR_PUSER_ID, $this->creator_puser_id);
+		if ($this->isColumnModified(entryPeer::ENTITLED_USERS_EDIT)) $criteria->add(entryPeer::ENTITLED_USERS_EDIT, $this->entitled_users_edit);
+		if ($this->isColumnModified(entryPeer::ENTITLED_USERS_PUBLISH)) $criteria->add(entryPeer::ENTITLED_USERS_PUBLISH, $this->entitled_users_publish);
 
 		return $criteria;
 	}
@@ -4235,6 +4431,14 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$copyObj->setFlavorParamsIds($this->flavor_params_ids);
 
 		$copyObj->setAvailableFrom($this->available_from);
+
+		$copyObj->setCreatorKuserId($this->creator_kuser_id);
+
+		$copyObj->setCreatorPuserId($this->creator_puser_id);
+
+		$copyObj->setEntitledUsersEdit($this->entitled_users_edit);
+
+		$copyObj->setEntitledUsersPublish($this->entitled_users_publish);
 
 
 		if ($deepCopy) {

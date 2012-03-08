@@ -47,6 +47,23 @@ class categoryTableMap extends TableMap {
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('DELETED_AT', 'DeletedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
+		$this->addColumn('DIRECT_ENTRIES_COUNT', 'DirectEntriesCount', 'INTEGER', false, null, 0);
+		$this->addColumn('MEMBERS_COUNT', 'MembersCount', 'INTEGER', false, null, 0);
+		$this->addColumn('PENDING_MEMBERS_COUNT', 'PendingMembersCount', 'INTEGER', false, null, 0);
+		$this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('LISTING', 'Listing', 'TINYINT', false, null, 1);
+		$this->addColumn('PRIVACY', 'Privacy', 'TINYINT', false, null, 1);
+		$this->addColumn('MEMBERSHIP_SETTING', 'MembershipSetting', 'TINYINT', false, null, 2);
+		$this->addColumn('USER_JOIN_POLICY', 'UserJoinPolicy', 'TINYINT', false, null, 3);
+		$this->addColumn('DEFAULT_PERMISSION_LEVEL', 'DefaultPermissionLevel', 'TINYINT', false, null, 3);
+		$this->addColumn('KUSER_ID', 'KuserId', 'INTEGER', false, null, null);
+		$this->addColumn('REFERENCE_ID', 'ReferenceId', 'VARCHAR', false, 512, null);
+		$this->addColumn('CONTRIBUTION_POLICY', 'ContributionPolicy', 'TINYINT', false, null, 2);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('PRIVACY_CONTEXT', 'PrivacyContext', 'BOOLEAN', false, null, false);
+		$this->addColumn('PRIVACY_CONTEXTS', 'PrivacyContexts', 'VARCHAR', false, 255, null);
 		// validators
 	} // initialize()
 
@@ -55,6 +72,7 @@ class categoryTableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
+    $this->addRelation('categoryKuser', 'categoryKuser', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), null, null);
 	} // buildRelations()
 
 } // categoryTableMap

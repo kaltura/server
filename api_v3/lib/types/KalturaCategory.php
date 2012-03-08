@@ -69,6 +69,127 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public $createdAt;
 	
+	/**
+	 * Category description
+	 * 
+	 * @var string
+	 */
+	public $description;
+	
+	/**
+	 * Category tags
+	 * 
+	 * @var string
+	 * @filter like,mlikeor,mlikeand
+	 */
+	public $tags;
+	
+	/**
+	 * Category listing - if category will be returned for list action.
+	 * 
+	 * @var KalturaListingType
+	 * @filter eq
+	 */
+	public $listing;
+	
+	/**
+	 * @var KalturaPrivacyType
+	 * @filter eq,in
+	 */
+	public $privacy;
+	
+	/**
+	 * If Category members are inherited from parent category or set manualy. 
+	 * @var KalturaCategoryMembershipSettingType
+	 * @filter eq,in
+	 */
+	public $membershipSetting;
+	
+	
+	/**
+	 * Who can ask to join this category
+	 *  
+	 * @var KalturaUserJoinPolicyType
+	 */
+	public $userJoinPolicy;
+	
+	/**
+	 * Default permissionLevel for new users
+	 *  
+	 * @var KalturaCategoryUserPermissionLevel
+	 */
+	public $defaultPermissionLevel;
+	
+	/**
+	 * Category Owner (User id)
+	 *  
+	 * @var int
+	 */
+	public $owner;
+	
+	/**
+	 * Number of entries that belong to this category directly
+	 *  
+	 * @var int
+	 * @readonly
+	 */
+	public $directEntriesCount;
+	
+	
+	/**
+	 * reference Id - external reference id
+	 *  
+	 * @var string
+	 */
+	public $referenceId;
+	
+	/**
+	 * contribution Policy - who can assign entries to this category
+	 *  
+	 * @var KalturaContributionPolicyType
+	 */
+	public $contributionPolicy;
+	
+	/**
+	 * Number of active members for this category
+	 *  
+	 * @var int
+	 * @readonly
+	 */
+	public $membersCount;
+	
+	/**
+	 * Number of pending members for this category
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $pendingMembersCount;
+	
+	/**
+	 * Set privacy context for search
+	 *  
+	 * @var KalturaNullableBoolean
+	 */
+	public $privacyContext;
+	
+	/**
+	 * Number of entries that belong to this category directly
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $privacyContexts;
+	
+	/**
+	 * Status
+	 * 
+	 * @var KalturaCategoryStatus
+	 * @readonly
+	 * @filter eq,in
+	 */
+	public $status;
+	
 	private static $mapBetweenObjects = array
 	(
 		"id",
@@ -78,7 +199,23 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"fullName",
 		"partnerId",
 		"entriesCount",
-		"createdAt"
+		"createdAt",
+		"description",
+		"tags",
+		"listing",
+		"privacy",
+		"membershipSetting",
+		"userJoinPolicy",
+		"defaultPermissionLevel",
+		"owner",
+		"directEntriesCount",
+		"referenceId",
+		"contributionPolicy",
+		"membersCount",
+		"pendingMembersCount",
+		"privacyContext",	
+		"privacyContexts",
+		"status"
 	);
 	
 	public function getMapBetweenObjects()
@@ -105,7 +242,14 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		{
 			$parentCategoryDb = categoryPeer::retrieveByPK($category->parentId);
 			if (!$parentCategoryDb)
-				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_NOT_FOUND, $category->parentId);
+				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_NOT_FOUND, $category->parentId);	
 		}
+		elseif ($category->membershipSetting == KalturaCategoryMembershipSettingType::INHERT)
+		{
+			//cannot inherit member with no parant
+			throw new KalturaAPIException(KalturaErrors::CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET);
+		}
+		
+		
 	}
 }

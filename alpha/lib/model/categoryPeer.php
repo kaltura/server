@@ -27,7 +27,11 @@ class categoryPeer extends BasecategoryPeer
 		}
 
 		$c = new Criteria();
-		$c->add ( self::DELETED_AT, null, Criteria::EQUAL );
+		$c->add ( self::STATUS, CategoryStatus::DELETED, Criteria::NOT_EQUAL );
+		
+		if (kEntitlementUtils::$entitlementScope)
+			$c->add ( self::LISTING, ListingType::LISTED, Criteria::EQUAL );		
+		
 		self::$s_criteria_filter->setFilter ( $c );
 	}
 

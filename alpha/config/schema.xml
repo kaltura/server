@@ -220,6 +220,10 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="end_date" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="flavor_params_ids" type="varchar" size="512" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="available_from" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="creator_kuser_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="creator_puser_id" type="varchar" size="64" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entitled_users_edit" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entitled_users_publish" type="longvarchar" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="kshow">
 			<reference local="kshow_id" foreign="id" />
 		</foreign-key>
@@ -1407,9 +1411,54 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="deleted_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="direct_entries_count" type="integer" default="0" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="members_count" type="integer" default="0" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="pending_members_count" type="integer" default="0" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="description" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="listing" type="tinyint" default="1"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy" type="tinyint" default="1"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="membership_setting" type="tinyint" default="2"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="user_join_policy" type="tinyint" default="3"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="default_permission_level" type="tinyint" default="3"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kuser_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="reference_id" type="varchar" size="512" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="contribution_policy" type="tinyint" default="2"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy_context" type="boolean" default="0" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy_contexts" type="varchar" size="255" />
 		<index name="partner_id_full_name_index">
 			<index-column name="partner_id" />
 			<index-column name="full_name" />
+		</index>
+	</table>
+	<table skipSql="false" abstract="false" name="category_kuser" phpName="categoryKuser">
+		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="category_id" type="integer" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="kuser_id" type="integer" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="permission_level" type="tinyint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="tinyint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="inherit_from_category" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="update_method" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<foreign-key onDelete="none" onUpdate="none" foreignTable="category">
+			<reference local="category_id" foreign="id" />
+		</foreign-key>
+		<foreign-key onDelete="none" onUpdate="none" foreignTable="kuser">
+			<reference local="kuser_id" foreign="id" />
+		</foreign-key>
+		<index name="partner_id_category_index">
+			<index-column name="partner_id" />
+			<index-column name="category_id" />
+			<index-column name="status" />
+		</index>
+		<index name="partner_id_kuser_index">
+			<index-column name="partner_id" />
+			<index-column name="kuser_id" />
+			<index-column name="status" />
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="syndication_feed" phpName="syndicationFeed" reloadOnInsert="true">

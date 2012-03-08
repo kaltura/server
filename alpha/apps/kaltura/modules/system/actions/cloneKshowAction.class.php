@@ -93,6 +93,7 @@ class cloneKshowAction extends kalturaSystemAction
 						$override_fields->setPartnerId ( $target_kshow->getPartnerId() );
 						$override_fields->setSubpId( $target_kshow->getSubpId());
 						$override_fields->setKuserId( $kuser_id );
+						$override_fields->setCreatorKuserId( $kuser_id );
 						
 						$new_entry = myEntryUtils::deepClone( $entry , $target_kshow_id , $override_fields ,false );
 						$new_entry_list[] = $new_entry;

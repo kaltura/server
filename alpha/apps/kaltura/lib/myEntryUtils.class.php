@@ -1009,6 +1009,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  			$kuser = $entry->getKuser();
  			$newKuser = kuserPeer::createKuserForPartner($newEntry->getPartnerId(), $kuser->getPuserId());
  			$newEntry->setKuserId($newKuser->getId());
+ 			$newEntry->setCreatorKuserId($newKuser->getId());
  			kuserPeer::setUseCriteriaFilter(true);
  		} 		
  		

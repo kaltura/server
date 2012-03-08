@@ -357,6 +357,7 @@ class myPartnerRegistration
 		foreach ($allEntries as $entry)
 		{
 			$entry->setKuserId($kuserId);
+			$entry->setCreatorKuserId($kuserId);
 			$entry->save();
 		}
 	}

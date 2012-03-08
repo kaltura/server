@@ -102,6 +102,7 @@ abstract class addentrybaseAction extends defPartnerservices2Action
 			$entry->setPartnerId( $partner_id );
 			$entry->setSubpId( $subp_id );
 			$entry->setKuserId($puser_kuser->getKuserId() );
+			$entry->setCreatorKuserId($puser_kuser->getKuserId() );
 
 			// this is now called for the second time to force the type and media type
 			$this->setTypeAndMediaType ( $entry );

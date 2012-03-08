@@ -1132,34 +1132,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 		// remove duplicates
 		$newCats = array_unique($newCats);
- 		
- 		// leave only the most child categories
- 		$mostChildCats = array();
- 		foreach($newCats as $currentCat)  
- 		{
- 			$unsetI = false;
- 			$add = true;
- 			foreach($mostChildCats as $i => $mostChild)
- 			{
- 				if (strpos($currentCat, $mostChild.categoryPeer::CATEGORY_SEPARATOR) === 0)
- 				{
- 					$unsetI = $i;
- 					break;
- 				}
- 				if (strpos($mostChild, $currentCat.categoryPeer::CATEGORY_SEPARATOR) === 0)
- 				{
- 					$add = false;
- 				}
- 			}
- 			if ($unsetI !== false)
- 				unset($mostChildCats[$unsetI]);
- 				
- 			if ($add)
- 				$mostChildCats[] = $currentCat;
- 		}
-		
+	
 		$this->old_categories = $this->categories;
-		parent::setCategories(implode(",", $mostChildCats));
+		parent::setCategories(implode(",", $newCats));
 		$this->is_categories_modified = true;
 	}
 	
@@ -2077,6 +2052,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$kuser = $this->getKuser();
 		if ($kuser)
 			$this->setPuserId($kuser->getPuserId());
+	}
+	
+	public function setCreatorKuserId($v)
+	{
+		// if we set the kuserId when not needed - this causes the kuser object to be reset (even if the joinKuser was done properly)
+		if ( self::getCreatorKuserId() == $v )  // same value - don't set for nothing 
+			return;  		
+		
+		parent::setCreatorKuserId($v);
+		$kuser = kuserPeer::retrieveByPK($v);
+		if ($kuser)
+			$this->setCreatorPuserId($kuser->getPuserId());
 	}
 	
 	public function syncCategories()

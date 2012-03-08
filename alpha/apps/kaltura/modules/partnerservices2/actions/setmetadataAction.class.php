@@ -80,6 +80,7 @@ class setmetadataAction extends defPartnerservices2Action
 				// create a new roughcut entry by cloning the original entry
 				$entry = myEntryUtils::deepClone($entry, $kshow_id, false);
 				$entry->setKuserId($likuser_id);
+				$entry->setCreatorKuserId($puser_kuser->getKuserId() );
 				$entry->setCreatedAt(time());
 				$entry->setMediaType(entry::ENTRY_MEDIA_TYPE_SHOW);
 				$entry->save();

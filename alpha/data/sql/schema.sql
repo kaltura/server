@@ -208,6 +208,10 @@ CREATE TABLE `entry`
 	`end_date` DATETIME,
 	`flavor_params_ids` VARCHAR(512),
 	`available_from` DATETIME,
+	`creator_kuser_id` INTEGER,
+	`creator_puser_id` VARCHAR(64),
+	`entitled_users_edit` TEXT,
+	`entitled_users_publish` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `kshow_rank_index`(`kshow_id`, `rank`),
 	KEY `kshow_views_index`(`kshow_id`, `views`),
@@ -1620,8 +1624,57 @@ CREATE TABLE `category`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`deleted_at` DATETIME,
+	`status` INTEGER,
+	`direct_entries_count` INTEGER default 0,
+	`members_count` INTEGER default 0,
+	`pending_members_count` INTEGER default 0,
+	`description` TEXT,
+	`tags` TEXT,
+	`listing` TINYINT default 1,
+	`privacy` TINYINT default 1,
+	`membership_setting` TINYINT default 2,
+	`user_join_policy` TINYINT default 3,
+	`default_permission_level` TINYINT default 3,
+	`kuser_id` INTEGER,
+	`reference_id` VARCHAR(512),
+	`contribution_policy` TINYINT default 2,
+	`custom_data` TEXT,
+	`privacy_context` TINYINT default 0,
+	`privacy_contexts` VARCHAR(255),
 	PRIMARY KEY (`id`),
 	KEY `partner_id_full_name_index`(`partner_id`, `full_name`)
+)Type=MyISAM;
+
+#-----------------------------------------------------------------------------
+#-- category_kuser
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `category_kuser`;
+
+
+CREATE TABLE `category_kuser`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`category_id` INTEGER  NOT NULL,
+	`kuser_id` INTEGER  NOT NULL,
+	`partner_id` INTEGER  NOT NULL,
+	`permission_level` TINYINT,
+	`status` TINYINT,
+	`inherit_from_category` INTEGER,
+	`update_method` INTEGER,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	PRIMARY KEY (`id`),
+	KEY `partner_id_category_index`(`partner_id`, `category_id`, `status`),
+	KEY `partner_id_kuser_index`(`partner_id`, `kuser_id`, `status`),
+	INDEX `category_kuser_FI_1` (`category_id`),
+	CONSTRAINT `category_kuser_FK_1`
+		FOREIGN KEY (`category_id`)
+		REFERENCES `category` (`id`),
+	INDEX `category_kuser_FI_2` (`kuser_id`),
+	CONSTRAINT `category_kuser_FK_2`
+		FOREIGN KEY (`kuser_id`)
+		REFERENCES `kuser` (`id`)
 )Type=MyISAM;
 
 #-----------------------------------------------------------------------------

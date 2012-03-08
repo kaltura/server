@@ -85,6 +85,7 @@ class SyndicationDistributionProfile extends DistributionProfile
 		// creates playlist based on the filter XML
 		$playlist = new entry();
 		$playlist->setKuserId(kCurrentContext::$uid);
+		$playlist->setCreatorKuserId(kCurrentContext::$uid);
 		$playlist->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$playlist->setPartnerId($this->getPartnerId());
 		$playlist->setStatus(entryStatus::READY);

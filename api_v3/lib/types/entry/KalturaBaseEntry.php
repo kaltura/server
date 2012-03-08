@@ -49,6 +49,15 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	public $userId;
 	
 	/**
+	 * The ID of the user who created this entry 
+	 * 
+	 * @var string
+	 * @insertonly
+	 * @filter eq
+	 */
+	public $creatorId;
+	
+	/**
 	 * Entry tags
 	 * 
 	 * @var string
@@ -305,6 +314,24 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 */
 	public $operationAttributes;
 	
+	/**
+	 * list of user ids that are entitled to edit the entry (no server enforcement) The difference between entitledUsersEdit and entitledUsersPublish is applicative only
+	 * 
+	 * @var string
+	 * @filter matchand, matchor
+	 * @requiresPermission insert,update
+	 */
+	public $entitledUsersEdit;
+		
+	/**
+	 * list of user ids that are entitled to publish the entry (no server enforcement) The difference between entitledUsersEdit and entitledUsersPublish is applicative only
+	 * 
+	 * @var string
+	 * @filter matchand, matchor
+	 * @requiresPermission insert,update
+	 */
+	public $entitledUsersPublish;	
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
@@ -314,6 +341,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"name", 
 	 	"description",
 	 	"userId" => "puserId", // what should be extracted is only the puserId NOT kuserId
+	 	"creatorId" => "creatorPuserId",
 	 	"tags",
 	 	"adminTags",
 	 	"partnerId",
@@ -345,6 +373,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"categoriesIds",
 	 	"conversionProfileId" => "conversionQuality",
 	 	"rootEntryId",
+	 	"entitledUsersEdit",
+	 	"entitledUsersPublish"
 	 );
 		 
 	public function getMapBetweenObjects()

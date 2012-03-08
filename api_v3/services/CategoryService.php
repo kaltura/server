@@ -9,8 +9,7 @@ class CategoryService extends KalturaBaseService
 {
 	public function initService($serviceId, $serviceName, $actionName)
 	{
-		parent::initService($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClass(new categoryPeer()); 	
+		parent::initService($serviceId, $serviceName, $actionName); 	
 	}
 	
 	/**
@@ -35,6 +34,16 @@ class CategoryService extends KalturaBaseService
 			$categoryDb = new category();
 			$category->toInsertableObject($categoryDb);
 			$categoryDb->setPartnerId($this->getPartnerId());
+			
+			if ($categoryDb->getMembershipSetting() == CategoryMembershipSettingType::INHERT)
+			{
+				$parentCategory = $categoryDb->getParentCategory();
+				$categoryDb->setUserJoinPolicy($parentCategory->getUserJoinPolicy());
+				$categoryDb->setDefaultPermissionLevel($parentCategory->getDefaultPermissionLevel());
+				$categoryDb->setOwner($parentCategory->getOwner());
+				$categoryDb->setContributionPolicy($parentCategory->getContributionPolicy());
+			}
+						
 			$categoryDb->save();
 			$this->getPartner()->unlockCategories();
 		}
@@ -83,6 +92,13 @@ class CategoryService extends KalturaBaseService
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
 			
+		if (kEntitlementUtils::$entitlementScope)
+		{
+			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
+			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
+				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
+		}
+		
 		if ($category->name !== null)
 		{
 			$category->validatePropertyMinLength("name", 1);
@@ -95,10 +111,20 @@ class CategoryService extends KalturaBaseService
 		if ($this->getPartner()->isCategoriesLocked())
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED, Partner::CATEGORIES_LOCK_TIMEOUT);
 			
+		$this->getPartner()->lockCategories();
+		$category->toUpdatableObject($categoryDb);
+			
+		if ($category->membershipSetting == CategoryMembershipSettingType::INHERT)
+		{
+			$parentCategory = $categoryDb->getParentCategory();
+			$categoryDb->setUserJoinPolicy($parentCategory->getUserJoinPolicy());
+			$categoryDb->setDefaultPermissionLevel($parentCategory->getDefaultPermissionLevel());
+			$categoryDb->setOwner($parentCategory->getOwner());
+			$categoryDb->setContributionPolicy($parentCategory->getContributionPolicy());
+		}
+			
 		try
 		{
-			$this->getPartner()->lockCategories();
-			$category->toUpdatableObject($categoryDb);
 			$categoryDb->save();
 			$this->getPartner()->unlockCategories();
 		}
@@ -127,6 +153,13 @@ class CategoryService extends KalturaBaseService
 		$categoryDb = categoryPeer::retrieveByPK($id);
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
+		
+		if (kEntitlementUtils::$entitlementScope)
+		{
+			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
+			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
+				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
+		}
 			
 		$categoryDb->setDeletedAt(time());
 	} 

@@ -26,7 +26,7 @@ abstract class BasecategoryPeer {
 	const TM_CLASS = 'categoryTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 10;
+	const NUM_COLUMNS = 27;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -61,6 +61,57 @@ abstract class BasecategoryPeer {
 	/** the column name for the DELETED_AT field */
 	const DELETED_AT = 'category.DELETED_AT';
 
+	/** the column name for the STATUS field */
+	const STATUS = 'category.STATUS';
+
+	/** the column name for the DIRECT_ENTRIES_COUNT field */
+	const DIRECT_ENTRIES_COUNT = 'category.DIRECT_ENTRIES_COUNT';
+
+	/** the column name for the MEMBERS_COUNT field */
+	const MEMBERS_COUNT = 'category.MEMBERS_COUNT';
+
+	/** the column name for the PENDING_MEMBERS_COUNT field */
+	const PENDING_MEMBERS_COUNT = 'category.PENDING_MEMBERS_COUNT';
+
+	/** the column name for the DESCRIPTION field */
+	const DESCRIPTION = 'category.DESCRIPTION';
+
+	/** the column name for the TAGS field */
+	const TAGS = 'category.TAGS';
+
+	/** the column name for the LISTING field */
+	const LISTING = 'category.LISTING';
+
+	/** the column name for the PRIVACY field */
+	const PRIVACY = 'category.PRIVACY';
+
+	/** the column name for the MEMBERSHIP_SETTING field */
+	const MEMBERSHIP_SETTING = 'category.MEMBERSHIP_SETTING';
+
+	/** the column name for the USER_JOIN_POLICY field */
+	const USER_JOIN_POLICY = 'category.USER_JOIN_POLICY';
+
+	/** the column name for the DEFAULT_PERMISSION_LEVEL field */
+	const DEFAULT_PERMISSION_LEVEL = 'category.DEFAULT_PERMISSION_LEVEL';
+
+	/** the column name for the KUSER_ID field */
+	const KUSER_ID = 'category.KUSER_ID';
+
+	/** the column name for the REFERENCE_ID field */
+	const REFERENCE_ID = 'category.REFERENCE_ID';
+
+	/** the column name for the CONTRIBUTION_POLICY field */
+	const CONTRIBUTION_POLICY = 'category.CONTRIBUTION_POLICY';
+
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'category.CUSTOM_DATA';
+
+	/** the column name for the PRIVACY_CONTEXT field */
+	const PRIVACY_CONTEXT = 'category.PRIVACY_CONTEXT';
+
+	/** the column name for the PRIVACY_CONTEXTS field */
+	const PRIVACY_CONTEXTS = 'category.PRIVACY_CONTEXTS';
+
 	/**
 	 * An identiy map to hold any loaded instances of category objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -77,11 +128,11 @@ abstract class BasecategoryPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'ParentId', 'Depth', 'PartnerId', 'Name', 'FullName', 'EntriesCount', 'CreatedAt', 'UpdatedAt', 'DeletedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'parentId', 'depth', 'partnerId', 'name', 'fullName', 'entriesCount', 'createdAt', 'updatedAt', 'deletedAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARENT_ID, self::DEPTH, self::PARTNER_ID, self::NAME, self::FULL_NAME, self::ENTRIES_COUNT, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'parent_id', 'depth', 'partner_id', 'name', 'full_name', 'entries_count', 'created_at', 'updated_at', 'deleted_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'ParentId', 'Depth', 'PartnerId', 'Name', 'FullName', 'EntriesCount', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'Status', 'DirectEntriesCount', 'MembersCount', 'PendingMembersCount', 'Description', 'Tags', 'Listing', 'Privacy', 'MembershipSetting', 'UserJoinPolicy', 'DefaultPermissionLevel', 'KuserId', 'ReferenceId', 'ContributionPolicy', 'CustomData', 'PrivacyContext', 'PrivacyContexts', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'parentId', 'depth', 'partnerId', 'name', 'fullName', 'entriesCount', 'createdAt', 'updatedAt', 'deletedAt', 'status', 'directEntriesCount', 'membersCount', 'pendingMembersCount', 'description', 'tags', 'listing', 'privacy', 'membershipSetting', 'userJoinPolicy', 'defaultPermissionLevel', 'kuserId', 'referenceId', 'contributionPolicy', 'customData', 'privacyContext', 'privacyContexts', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARENT_ID, self::DEPTH, self::PARTNER_ID, self::NAME, self::FULL_NAME, self::ENTRIES_COUNT, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::STATUS, self::DIRECT_ENTRIES_COUNT, self::MEMBERS_COUNT, self::PENDING_MEMBERS_COUNT, self::DESCRIPTION, self::TAGS, self::LISTING, self::PRIVACY, self::MEMBERSHIP_SETTING, self::USER_JOIN_POLICY, self::DEFAULT_PERMISSION_LEVEL, self::KUSER_ID, self::REFERENCE_ID, self::CONTRIBUTION_POLICY, self::CUSTOM_DATA, self::PRIVACY_CONTEXT, self::PRIVACY_CONTEXTS, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'parent_id', 'depth', 'partner_id', 'name', 'full_name', 'entries_count', 'created_at', 'updated_at', 'deleted_at', 'status', 'direct_entries_count', 'members_count', 'pending_members_count', 'description', 'tags', 'listing', 'privacy', 'membership_setting', 'user_join_policy', 'default_permission_level', 'kuser_id', 'reference_id', 'contribution_policy', 'custom_data', 'privacy_context', 'privacy_contexts', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, )
 	);
 
 	/**
@@ -91,11 +142,11 @@ abstract class BasecategoryPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ParentId' => 1, 'Depth' => 2, 'PartnerId' => 3, 'Name' => 4, 'FullName' => 5, 'EntriesCount' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, 'DeletedAt' => 9, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'parentId' => 1, 'depth' => 2, 'partnerId' => 3, 'name' => 4, 'fullName' => 5, 'entriesCount' => 6, 'createdAt' => 7, 'updatedAt' => 8, 'deletedAt' => 9, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARENT_ID => 1, self::DEPTH => 2, self::PARTNER_ID => 3, self::NAME => 4, self::FULL_NAME => 5, self::ENTRIES_COUNT => 6, self::CREATED_AT => 7, self::UPDATED_AT => 8, self::DELETED_AT => 9, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'parent_id' => 1, 'depth' => 2, 'partner_id' => 3, 'name' => 4, 'full_name' => 5, 'entries_count' => 6, 'created_at' => 7, 'updated_at' => 8, 'deleted_at' => 9, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ParentId' => 1, 'Depth' => 2, 'PartnerId' => 3, 'Name' => 4, 'FullName' => 5, 'EntriesCount' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, 'DeletedAt' => 9, 'Status' => 10, 'DirectEntriesCount' => 11, 'MembersCount' => 12, 'PendingMembersCount' => 13, 'Description' => 14, 'Tags' => 15, 'Listing' => 16, 'Privacy' => 17, 'MembershipSetting' => 18, 'UserJoinPolicy' => 19, 'DefaultPermissionLevel' => 20, 'KuserId' => 21, 'ReferenceId' => 22, 'ContributionPolicy' => 23, 'CustomData' => 24, 'PrivacyContext' => 25, 'PrivacyContexts' => 26, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'parentId' => 1, 'depth' => 2, 'partnerId' => 3, 'name' => 4, 'fullName' => 5, 'entriesCount' => 6, 'createdAt' => 7, 'updatedAt' => 8, 'deletedAt' => 9, 'status' => 10, 'directEntriesCount' => 11, 'membersCount' => 12, 'pendingMembersCount' => 13, 'description' => 14, 'tags' => 15, 'listing' => 16, 'privacy' => 17, 'membershipSetting' => 18, 'userJoinPolicy' => 19, 'defaultPermissionLevel' => 20, 'kuserId' => 21, 'referenceId' => 22, 'contributionPolicy' => 23, 'customData' => 24, 'privacyContext' => 25, 'privacyContexts' => 26, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARENT_ID => 1, self::DEPTH => 2, self::PARTNER_ID => 3, self::NAME => 4, self::FULL_NAME => 5, self::ENTRIES_COUNT => 6, self::CREATED_AT => 7, self::UPDATED_AT => 8, self::DELETED_AT => 9, self::STATUS => 10, self::DIRECT_ENTRIES_COUNT => 11, self::MEMBERS_COUNT => 12, self::PENDING_MEMBERS_COUNT => 13, self::DESCRIPTION => 14, self::TAGS => 15, self::LISTING => 16, self::PRIVACY => 17, self::MEMBERSHIP_SETTING => 18, self::USER_JOIN_POLICY => 19, self::DEFAULT_PERMISSION_LEVEL => 20, self::KUSER_ID => 21, self::REFERENCE_ID => 22, self::CONTRIBUTION_POLICY => 23, self::CUSTOM_DATA => 24, self::PRIVACY_CONTEXT => 25, self::PRIVACY_CONTEXTS => 26, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'parent_id' => 1, 'depth' => 2, 'partner_id' => 3, 'name' => 4, 'full_name' => 5, 'entries_count' => 6, 'created_at' => 7, 'updated_at' => 8, 'deleted_at' => 9, 'status' => 10, 'direct_entries_count' => 11, 'members_count' => 12, 'pending_members_count' => 13, 'description' => 14, 'tags' => 15, 'listing' => 16, 'privacy' => 17, 'membership_setting' => 18, 'user_join_policy' => 19, 'default_permission_level' => 20, 'kuser_id' => 21, 'reference_id' => 22, 'contribution_policy' => 23, 'custom_data' => 24, 'privacy_context' => 25, 'privacy_contexts' => 26, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, )
 	);
 
 	/**
@@ -175,6 +226,23 @@ abstract class BasecategoryPeer {
 		$criteria->addSelectColumn(categoryPeer::CREATED_AT);
 		$criteria->addSelectColumn(categoryPeer::UPDATED_AT);
 		$criteria->addSelectColumn(categoryPeer::DELETED_AT);
+		$criteria->addSelectColumn(categoryPeer::STATUS);
+		$criteria->addSelectColumn(categoryPeer::DIRECT_ENTRIES_COUNT);
+		$criteria->addSelectColumn(categoryPeer::MEMBERS_COUNT);
+		$criteria->addSelectColumn(categoryPeer::PENDING_MEMBERS_COUNT);
+		$criteria->addSelectColumn(categoryPeer::DESCRIPTION);
+		$criteria->addSelectColumn(categoryPeer::TAGS);
+		$criteria->addSelectColumn(categoryPeer::LISTING);
+		$criteria->addSelectColumn(categoryPeer::PRIVACY);
+		$criteria->addSelectColumn(categoryPeer::MEMBERSHIP_SETTING);
+		$criteria->addSelectColumn(categoryPeer::USER_JOIN_POLICY);
+		$criteria->addSelectColumn(categoryPeer::DEFAULT_PERMISSION_LEVEL);
+		$criteria->addSelectColumn(categoryPeer::KUSER_ID);
+		$criteria->addSelectColumn(categoryPeer::REFERENCE_ID);
+		$criteria->addSelectColumn(categoryPeer::CONTRIBUTION_POLICY);
+		$criteria->addSelectColumn(categoryPeer::CUSTOM_DATA);
+		$criteria->addSelectColumn(categoryPeer::PRIVACY_CONTEXT);
+		$criteria->addSelectColumn(categoryPeer::PRIVACY_CONTEXTS);
 	}
 
 	/**

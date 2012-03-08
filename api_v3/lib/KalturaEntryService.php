@@ -605,7 +605,8 @@ class KalturaEntryService extends KalturaBaseService
 		$this->checkAndSetValidUserInsert($entry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($entry);
 		$this->validateAccessControlId($entry);
-		$this->validateEntryScheduleDates($entry, $dbEntry); 
+		$this->validateEntryScheduleDates($entry, $dbEntry);
+		$this->validateEntitledUsers($entry); 
 			
 		$dbEntry->setPartnerId($this->getPartnerId());
 		$dbEntry->setSubpId($this->getPartnerId() * 100);
@@ -949,6 +950,7 @@ class KalturaEntryService extends KalturaBaseService
 			KalturaLog::debug("Set kuser id [" . $this->getKuser()->getId() . "] line [" . __LINE__ . "]");
 			$dbEntry->setPuserId($this->getKuser()->getPuserId());
 			$dbEntry->setKuserId($this->getKuser()->getId());
+			$dbEntry->setCreatorKuserId($this->getKuser()->getId());
 			return;
 		}
 		
@@ -963,10 +965,12 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		// need to create kuser if this is an admin creating the entry on a different user
-		$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->userId); 
+		$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->userId);
+		$creator = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->creatorId);  
 
 		KalturaLog::debug("Set kuser id [" . $kuser->getId() . "] line [" . __LINE__ . "]");
 		$dbEntry->setKuserId($kuser->getId());
+		$dbEntry->setCreatorKuserId($creator->getId());
 	}
 	
    	/**
@@ -1116,6 +1120,19 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_SCHEDULE_DATES);
 		}
+	}
+	
+	/**
+	 * Throws an error if EntitledUsersEdit or EntitledUsersPublish is not valid
+	 * 
+	 * @param KalturaBaseEntry $entry
+	 */
+	protected function validateEntitledUsers($entry)
+	{
+		$entitledUsersEdit = $entry->entitledUsersEdit;
+		$entitledUsersPublish = $entry->entitledUsersPublish;
+		
+		//TODO - validate users exits.
 	}
 	
 	protected function createDummyKShow()

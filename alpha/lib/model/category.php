@@ -325,6 +325,7 @@ class category extends Basecategory
 			$child->setDeletedAt($v);
 		}
 		
+		$this->setStatus(CategoryStatus::DELETED);
 		parent::setDeletedAt($v);
 		$this->save();
 	}
@@ -543,5 +544,29 @@ class category extends Basecategory
 	public function getCacheInvalidationKeys()
 	{
 		return array("category:partnerId=".$this->getPartnerId());
+	}
+	
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or
+	 * equivalent initialization method).
+	 * @see        __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		$this->setName('');
+		$this->setFullName('');
+		$this->setEntriesCount(0);
+		$this->setDirectEntriesCount(0);
+		$this->setMembersCount(0);
+		$this->setPendingMembersCount(0);
+		$this->setListing(ListingType::LISTED);
+		$this->setPrivacy(PrivacyType::ALL);
+		$this->setMembershipSetting(CategoryMembershipSettingType::MANUAL);
+		$this->setUserJoinPolicy(UserJoinPolicyType::NOT_ALLOWED);
+		$this->setDefaultPermissionLevel(CategoryKuserPermissionLevel::MODERATOR);
+		$this->setContributionPolicy(ContributionPolicyType::MODERATOR);
+		$this->setStatus(CategoryStatus::ACTIVE);
+		$this->setPrivacyContext(false);
 	}
 }

@@ -375,6 +375,7 @@ class myInsertEntryHelper
 			
 		$entry->setkshowId($this->kshow_id);
 		$entry->setKuserId($kuser_id);
+		$entry->setCreatorKuserId($kuser_id);
 		
 		if ( $this->partner_id != null )
 		{

@@ -339,6 +339,7 @@ class addentryAction extends defPartnerservices2Action
                 $entry->setPartnerId( $partner_id );
                 $entry->setSubpId ( $subp_id );
                 $entry->setKuserId( $kuser_id );
+                $entry->setCreatorKuserId( $kuser_id );
                 $entry->setKshowId ( $kshow_id );
                 $entry->setSiteUrl ( $site_url );
                 $entry->setScreenName( $screen_name );

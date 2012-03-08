@@ -202,6 +202,7 @@ class LiveStreamService extends KalturaEntryService
 		$dbEntry->setPartnerId($this->getPartnerId());
 		$dbEntry->setSubpId($this->getPartnerId() * 100);
 		$dbEntry->setKuserId($this->getKuser()->getId());
+		$dbEntry->setCreatorKuserId($this->getKuser()->getId());
 		$dbEntry->setStatus(entryStatus::IMPORT);
 		
 		$te = new TrackEntry();

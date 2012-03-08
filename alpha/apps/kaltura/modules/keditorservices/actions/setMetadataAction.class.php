@@ -55,6 +55,7 @@ class setMetadataAction extends defKeditorservicesAction
 				// create a new roughcut entry by cloning the original entry
 				$entry = myEntryUtils::deepClone($entry, $kshow_id, false);
 				$entry->setKuserId($likuser_id);
+				$entry->setCreatorKuserId($likuser_id);
 				$entry->setCreatedAt(time());
 				$entry->setMediaType(entry::ENTRY_MEDIA_TYPE_SHOW);
 				$entry->save();

@@ -15,6 +15,16 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 		"depthEqual" => "_eq_depth",
 		"fullNameEqual" => "_eq_full_name",
 		"fullNameStartsWith" => "_likex_full_name",
+		"tagsLike" => "_like_tags",
+		"tagsMultiLikeOr" => "_mlikeor_tags",
+		"tagsMultiLikeAnd" => "_mlikeand_tags",
+		"listingEqual" => "_eq_listing",
+		"privacyEqual" => "_eq_privacy",
+		"privacyIn" => "_in_privacy",
+		"membershipSettingEqual" => "_eq_membership_setting",
+		"membershipSettingIn" => "_in_membership_setting",
+		"statusEqual" => "_eq_status",
+		"statusIn" => "_in_status",
 	);
 
 	private $order_by_map = array
@@ -85,4 +95,74 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $fullNameStartsWith;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagsLike;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagsMultiLikeOr;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd;
+
+	/**
+	 * 
+	 * 
+	 * @var KalturaListingType
+	 */
+	public $listingEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var KalturaPrivacyType
+	 */
+	public $privacyEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $privacyIn;
+
+	/**
+	 * 
+	 * 
+	 * @var KalturaCategoryMembershipSettingType
+	 */
+	public $membershipSettingEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $membershipSettingIn;
+
+	/**
+	 * 
+	 * 
+	 * @var KalturaCategoryStatus
+	 */
+	public $statusEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $statusIn;
 }

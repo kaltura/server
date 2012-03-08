@@ -160,6 +160,7 @@ class facebookUtils
 	 
 			$roughcut_entry->setKshowId($kshow->getId () );
 			$roughcut_entry->setKuserId($kshow->getProducerId());
+			$roughcut_entry->setCreatorKuserId($kshow->getProducerId());
 			$roughcut_entry->setPartnerId($kshow->getPartnerId() );
 			$roughcut_entry->setSubpId( $kshow->getSubpId() );
 			$roughcut_entry->setStatus(entryStatus::READY);

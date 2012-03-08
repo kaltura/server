@@ -83,6 +83,128 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	protected $deleted_at;
 
 	/**
+	 * The value for the status field.
+	 * @var        int
+	 */
+	protected $status;
+
+	/**
+	 * The value for the direct_entries_count field.
+	 * Note: this column has a database default value of: 0
+	 * @var        int
+	 */
+	protected $direct_entries_count;
+
+	/**
+	 * The value for the members_count field.
+	 * Note: this column has a database default value of: 0
+	 * @var        int
+	 */
+	protected $members_count;
+
+	/**
+	 * The value for the pending_members_count field.
+	 * Note: this column has a database default value of: 0
+	 * @var        int
+	 */
+	protected $pending_members_count;
+
+	/**
+	 * The value for the description field.
+	 * @var        string
+	 */
+	protected $description;
+
+	/**
+	 * The value for the tags field.
+	 * @var        string
+	 */
+	protected $tags;
+
+	/**
+	 * The value for the listing field.
+	 * Note: this column has a database default value of: 1
+	 * @var        int
+	 */
+	protected $listing;
+
+	/**
+	 * The value for the privacy field.
+	 * Note: this column has a database default value of: 1
+	 * @var        int
+	 */
+	protected $privacy;
+
+	/**
+	 * The value for the membership_setting field.
+	 * Note: this column has a database default value of: 2
+	 * @var        int
+	 */
+	protected $membership_setting;
+
+	/**
+	 * The value for the user_join_policy field.
+	 * Note: this column has a database default value of: 3
+	 * @var        int
+	 */
+	protected $user_join_policy;
+
+	/**
+	 * The value for the default_permission_level field.
+	 * Note: this column has a database default value of: 3
+	 * @var        int
+	 */
+	protected $default_permission_level;
+
+	/**
+	 * The value for the kuser_id field.
+	 * @var        int
+	 */
+	protected $kuser_id;
+
+	/**
+	 * The value for the reference_id field.
+	 * @var        string
+	 */
+	protected $reference_id;
+
+	/**
+	 * The value for the contribution_policy field.
+	 * Note: this column has a database default value of: 2
+	 * @var        int
+	 */
+	protected $contribution_policy;
+
+	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
+
+	/**
+	 * The value for the privacy_context field.
+	 * Note: this column has a database default value of: false
+	 * @var        boolean
+	 */
+	protected $privacy_context;
+
+	/**
+	 * The value for the privacy_contexts field.
+	 * @var        string
+	 */
+	protected $privacy_contexts;
+
+	/**
+	 * @var        array categoryKuser[] Collection to store aggregation of categoryKuser objects.
+	 */
+	protected $collcategoryKusers;
+
+	/**
+	 * @var        Criteria The criteria used to select the current contents of collcategoryKusers.
+	 */
+	private $lastcategoryKuserCriteria = null;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -138,6 +260,16 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		$this->name = '';
 		$this->full_name = '';
 		$this->entries_count = 0;
+		$this->direct_entries_count = 0;
+		$this->members_count = 0;
+		$this->pending_members_count = 0;
+		$this->listing = 1;
+		$this->privacy = 1;
+		$this->membership_setting = 2;
+		$this->user_join_policy = 3;
+		$this->default_permission_level = 3;
+		$this->contribution_policy = 2;
+		$this->privacy_context = false;
 	}
 
 	/**
@@ -338,6 +470,176 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [status] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getStatus()
+	{
+		return $this->status;
+	}
+
+	/**
+	 * Get the [direct_entries_count] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getDirectEntriesCount()
+	{
+		return $this->direct_entries_count;
+	}
+
+	/**
+	 * Get the [members_count] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getMembersCount()
+	{
+		return $this->members_count;
+	}
+
+	/**
+	 * Get the [pending_members_count] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getPendingMembersCount()
+	{
+		return $this->pending_members_count;
+	}
+
+	/**
+	 * Get the [description] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getDescription()
+	{
+		return $this->description;
+	}
+
+	/**
+	 * Get the [tags] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getTags()
+	{
+		return $this->tags;
+	}
+
+	/**
+	 * Get the [listing] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getListing()
+	{
+		return $this->listing;
+	}
+
+	/**
+	 * Get the [privacy] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getPrivacy()
+	{
+		return $this->privacy;
+	}
+
+	/**
+	 * Get the [membership_setting] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getMembershipSetting()
+	{
+		return $this->membership_setting;
+	}
+
+	/**
+	 * Get the [user_join_policy] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getUserJoinPolicy()
+	{
+		return $this->user_join_policy;
+	}
+
+	/**
+	 * Get the [default_permission_level] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getDefaultPermissionLevel()
+	{
+		return $this->default_permission_level;
+	}
+
+	/**
+	 * Get the [kuser_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getKuserId()
+	{
+		return $this->kuser_id;
+	}
+
+	/**
+	 * Get the [reference_id] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getReferenceId()
+	{
+		return $this->reference_id;
+	}
+
+	/**
+	 * Get the [contribution_policy] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getContributionPolicy()
+	{
+		return $this->contribution_policy;
+	}
+
+	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [privacy_context] column value.
+	 * 
+	 * @return     boolean
+	 */
+	public function getPrivacyContext()
+	{
+		return $this->privacy_context;
+	}
+
+	/**
+	 * Get the [privacy_contexts] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getPrivacyContexts()
+	{
+		return $this->privacy_contexts;
 	}
 
 	/**
@@ -652,6 +954,394 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	} // setDeletedAt()
 
 	/**
+	 * Set the value of [status] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setStatus($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::STATUS]))
+			$this->oldColumnsValues[categoryPeer::STATUS] = $this->status;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->status !== $v) {
+			$this->status = $v;
+			$this->modifiedColumns[] = categoryPeer::STATUS;
+		}
+
+		return $this;
+	} // setStatus()
+
+	/**
+	 * Set the value of [direct_entries_count] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setDirectEntriesCount($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::DIRECT_ENTRIES_COUNT]))
+			$this->oldColumnsValues[categoryPeer::DIRECT_ENTRIES_COUNT] = $this->direct_entries_count;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->direct_entries_count !== $v || $this->isNew()) {
+			$this->direct_entries_count = $v;
+			$this->modifiedColumns[] = categoryPeer::DIRECT_ENTRIES_COUNT;
+		}
+
+		return $this;
+	} // setDirectEntriesCount()
+
+	/**
+	 * Set the value of [members_count] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setMembersCount($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::MEMBERS_COUNT]))
+			$this->oldColumnsValues[categoryPeer::MEMBERS_COUNT] = $this->members_count;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->members_count !== $v || $this->isNew()) {
+			$this->members_count = $v;
+			$this->modifiedColumns[] = categoryPeer::MEMBERS_COUNT;
+		}
+
+		return $this;
+	} // setMembersCount()
+
+	/**
+	 * Set the value of [pending_members_count] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setPendingMembersCount($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::PENDING_MEMBERS_COUNT]))
+			$this->oldColumnsValues[categoryPeer::PENDING_MEMBERS_COUNT] = $this->pending_members_count;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->pending_members_count !== $v || $this->isNew()) {
+			$this->pending_members_count = $v;
+			$this->modifiedColumns[] = categoryPeer::PENDING_MEMBERS_COUNT;
+		}
+
+		return $this;
+	} // setPendingMembersCount()
+
+	/**
+	 * Set the value of [description] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setDescription($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::DESCRIPTION]))
+			$this->oldColumnsValues[categoryPeer::DESCRIPTION] = $this->description;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->description !== $v) {
+			$this->description = $v;
+			$this->modifiedColumns[] = categoryPeer::DESCRIPTION;
+		}
+
+		return $this;
+	} // setDescription()
+
+	/**
+	 * Set the value of [tags] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setTags($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::TAGS]))
+			$this->oldColumnsValues[categoryPeer::TAGS] = $this->tags;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->tags !== $v) {
+			$this->tags = $v;
+			$this->modifiedColumns[] = categoryPeer::TAGS;
+		}
+
+		return $this;
+	} // setTags()
+
+	/**
+	 * Set the value of [listing] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setListing($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::LISTING]))
+			$this->oldColumnsValues[categoryPeer::LISTING] = $this->listing;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->listing !== $v || $this->isNew()) {
+			$this->listing = $v;
+			$this->modifiedColumns[] = categoryPeer::LISTING;
+		}
+
+		return $this;
+	} // setListing()
+
+	/**
+	 * Set the value of [privacy] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setPrivacy($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::PRIVACY]))
+			$this->oldColumnsValues[categoryPeer::PRIVACY] = $this->privacy;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->privacy !== $v || $this->isNew()) {
+			$this->privacy = $v;
+			$this->modifiedColumns[] = categoryPeer::PRIVACY;
+		}
+
+		return $this;
+	} // setPrivacy()
+
+	/**
+	 * Set the value of [membership_setting] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setMembershipSetting($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::MEMBERSHIP_SETTING]))
+			$this->oldColumnsValues[categoryPeer::MEMBERSHIP_SETTING] = $this->membership_setting;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->membership_setting !== $v || $this->isNew()) {
+			$this->membership_setting = $v;
+			$this->modifiedColumns[] = categoryPeer::MEMBERSHIP_SETTING;
+		}
+
+		return $this;
+	} // setMembershipSetting()
+
+	/**
+	 * Set the value of [user_join_policy] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setUserJoinPolicy($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::USER_JOIN_POLICY]))
+			$this->oldColumnsValues[categoryPeer::USER_JOIN_POLICY] = $this->user_join_policy;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->user_join_policy !== $v || $this->isNew()) {
+			$this->user_join_policy = $v;
+			$this->modifiedColumns[] = categoryPeer::USER_JOIN_POLICY;
+		}
+
+		return $this;
+	} // setUserJoinPolicy()
+
+	/**
+	 * Set the value of [default_permission_level] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setDefaultPermissionLevel($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::DEFAULT_PERMISSION_LEVEL]))
+			$this->oldColumnsValues[categoryPeer::DEFAULT_PERMISSION_LEVEL] = $this->default_permission_level;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->default_permission_level !== $v || $this->isNew()) {
+			$this->default_permission_level = $v;
+			$this->modifiedColumns[] = categoryPeer::DEFAULT_PERMISSION_LEVEL;
+		}
+
+		return $this;
+	} // setDefaultPermissionLevel()
+
+	/**
+	 * Set the value of [kuser_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setKuserId($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::KUSER_ID]))
+			$this->oldColumnsValues[categoryPeer::KUSER_ID] = $this->kuser_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->kuser_id !== $v) {
+			$this->kuser_id = $v;
+			$this->modifiedColumns[] = categoryPeer::KUSER_ID;
+		}
+
+		return $this;
+	} // setKuserId()
+
+	/**
+	 * Set the value of [reference_id] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setReferenceId($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::REFERENCE_ID]))
+			$this->oldColumnsValues[categoryPeer::REFERENCE_ID] = $this->reference_id;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->reference_id !== $v) {
+			$this->reference_id = $v;
+			$this->modifiedColumns[] = categoryPeer::REFERENCE_ID;
+		}
+
+		return $this;
+	} // setReferenceId()
+
+	/**
+	 * Set the value of [contribution_policy] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setContributionPolicy($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::CONTRIBUTION_POLICY]))
+			$this->oldColumnsValues[categoryPeer::CONTRIBUTION_POLICY] = $this->contribution_policy;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->contribution_policy !== $v || $this->isNew()) {
+			$this->contribution_policy = $v;
+			$this->modifiedColumns[] = categoryPeer::CONTRIBUTION_POLICY;
+		}
+
+		return $this;
+	} // setContributionPolicy()
+
+	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = categoryPeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
+	 * Set the value of [privacy_context] column.
+	 * 
+	 * @param      boolean $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setPrivacyContext($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::PRIVACY_CONTEXT]))
+			$this->oldColumnsValues[categoryPeer::PRIVACY_CONTEXT] = $this->privacy_context;
+
+		if ($v !== null) {
+			$v = (boolean) $v;
+		}
+
+		if ($this->privacy_context !== $v || $this->isNew()) {
+			$this->privacy_context = $v;
+			$this->modifiedColumns[] = categoryPeer::PRIVACY_CONTEXT;
+		}
+
+		return $this;
+	} // setPrivacyContext()
+
+	/**
+	 * Set the value of [privacy_contexts] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setPrivacyContexts($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::PRIVACY_CONTEXTS]))
+			$this->oldColumnsValues[categoryPeer::PRIVACY_CONTEXTS] = $this->privacy_contexts;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->privacy_contexts !== $v) {
+			$this->privacy_contexts = $v;
+			$this->modifiedColumns[] = categoryPeer::PRIVACY_CONTEXTS;
+		}
+
+		return $this;
+	} // setPrivacyContexts()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -670,6 +1360,46 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			}
 
 			if ($this->entries_count !== 0) {
+				return false;
+			}
+
+			if ($this->direct_entries_count !== 0) {
+				return false;
+			}
+
+			if ($this->members_count !== 0) {
+				return false;
+			}
+
+			if ($this->pending_members_count !== 0) {
+				return false;
+			}
+
+			if ($this->listing !== 1) {
+				return false;
+			}
+
+			if ($this->privacy !== 1) {
+				return false;
+			}
+
+			if ($this->membership_setting !== 2) {
+				return false;
+			}
+
+			if ($this->user_join_policy !== 3) {
+				return false;
+			}
+
+			if ($this->default_permission_level !== 3) {
+				return false;
+			}
+
+			if ($this->contribution_policy !== 2) {
+				return false;
+			}
+
+			if ($this->privacy_context !== false) {
 				return false;
 			}
 
@@ -705,6 +1435,23 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->deleted_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->status = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->direct_entries_count = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->members_count = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+			$this->pending_members_count = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+			$this->description = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->tags = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->listing = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
+			$this->privacy = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
+			$this->membership_setting = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->user_join_policy = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
+			$this->default_permission_level = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
+			$this->kuser_id = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
+			$this->reference_id = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+			$this->contribution_policy = ($row[$startcol + 23] !== null) ? (int) $row[$startcol + 23] : null;
+			$this->custom_data = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
+			$this->privacy_context = ($row[$startcol + 25] !== null) ? (boolean) $row[$startcol + 25] : null;
+			$this->privacy_contexts = ($row[$startcol + 26] !== null) ? (string) $row[$startcol + 26] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -714,7 +1461,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = categoryPeer::NUM_COLUMNS - categoryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 27; // 27 = categoryPeer::NUM_COLUMNS - categoryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating category object", $e);
@@ -777,6 +1524,9 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		$this->hydrate($row, 0, true); // rehydrate
 
 		if ($deep) {  // also de-associate any related objects?
+
+			$this->collcategoryKusers = null;
+			$this->lastcategoryKuserCriteria = null;
 
 		} // if (deep)
 	}
@@ -919,6 +1669,14 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
 			}
 
+			if ($this->collcategoryKusers !== null) {
+				foreach ($this->collcategoryKusers as $referrerFK) {
+					if (!$referrerFK->isDeleted()) {
+						$affectedRows += $referrerFK->save($con);
+					}
+				}
+			}
+
 			$this->alreadyInSave = false;
 
 		}
@@ -946,6 +1704,8 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -956,7 +1716,9 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function postSave(PropelPDO $con = null) 
 	{
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 		parent::postSave($con);
 	}
 	
@@ -1129,6 +1891,14 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			}
 
 
+				if ($this->collcategoryKusers !== null) {
+					foreach ($this->collcategoryKusers as $referrerFK) {
+						if (!$referrerFK->validate($columns)) {
+							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+						}
+					}
+				}
+
 
 			$this->alreadyInValidation = false;
 		}
@@ -1192,6 +1962,57 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			case 9:
 				return $this->getDeletedAt();
 				break;
+			case 10:
+				return $this->getStatus();
+				break;
+			case 11:
+				return $this->getDirectEntriesCount();
+				break;
+			case 12:
+				return $this->getMembersCount();
+				break;
+			case 13:
+				return $this->getPendingMembersCount();
+				break;
+			case 14:
+				return $this->getDescription();
+				break;
+			case 15:
+				return $this->getTags();
+				break;
+			case 16:
+				return $this->getListing();
+				break;
+			case 17:
+				return $this->getPrivacy();
+				break;
+			case 18:
+				return $this->getMembershipSetting();
+				break;
+			case 19:
+				return $this->getUserJoinPolicy();
+				break;
+			case 20:
+				return $this->getDefaultPermissionLevel();
+				break;
+			case 21:
+				return $this->getKuserId();
+				break;
+			case 22:
+				return $this->getReferenceId();
+				break;
+			case 23:
+				return $this->getContributionPolicy();
+				break;
+			case 24:
+				return $this->getCustomData();
+				break;
+			case 25:
+				return $this->getPrivacyContext();
+				break;
+			case 26:
+				return $this->getPrivacyContexts();
+				break;
 			default:
 				return null;
 				break;
@@ -1223,6 +2044,23 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$keys[7] => $this->getCreatedAt(),
 			$keys[8] => $this->getUpdatedAt(),
 			$keys[9] => $this->getDeletedAt(),
+			$keys[10] => $this->getStatus(),
+			$keys[11] => $this->getDirectEntriesCount(),
+			$keys[12] => $this->getMembersCount(),
+			$keys[13] => $this->getPendingMembersCount(),
+			$keys[14] => $this->getDescription(),
+			$keys[15] => $this->getTags(),
+			$keys[16] => $this->getListing(),
+			$keys[17] => $this->getPrivacy(),
+			$keys[18] => $this->getMembershipSetting(),
+			$keys[19] => $this->getUserJoinPolicy(),
+			$keys[20] => $this->getDefaultPermissionLevel(),
+			$keys[21] => $this->getKuserId(),
+			$keys[22] => $this->getReferenceId(),
+			$keys[23] => $this->getContributionPolicy(),
+			$keys[24] => $this->getCustomData(),
+			$keys[25] => $this->getPrivacyContext(),
+			$keys[26] => $this->getPrivacyContexts(),
 		);
 		return $result;
 	}
@@ -1284,6 +2122,57 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			case 9:
 				$this->setDeletedAt($value);
 				break;
+			case 10:
+				$this->setStatus($value);
+				break;
+			case 11:
+				$this->setDirectEntriesCount($value);
+				break;
+			case 12:
+				$this->setMembersCount($value);
+				break;
+			case 13:
+				$this->setPendingMembersCount($value);
+				break;
+			case 14:
+				$this->setDescription($value);
+				break;
+			case 15:
+				$this->setTags($value);
+				break;
+			case 16:
+				$this->setListing($value);
+				break;
+			case 17:
+				$this->setPrivacy($value);
+				break;
+			case 18:
+				$this->setMembershipSetting($value);
+				break;
+			case 19:
+				$this->setUserJoinPolicy($value);
+				break;
+			case 20:
+				$this->setDefaultPermissionLevel($value);
+				break;
+			case 21:
+				$this->setKuserId($value);
+				break;
+			case 22:
+				$this->setReferenceId($value);
+				break;
+			case 23:
+				$this->setContributionPolicy($value);
+				break;
+			case 24:
+				$this->setCustomData($value);
+				break;
+			case 25:
+				$this->setPrivacyContext($value);
+				break;
+			case 26:
+				$this->setPrivacyContexts($value);
+				break;
 		} // switch()
 	}
 
@@ -1318,6 +2207,23 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setDeletedAt($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setStatus($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setDirectEntriesCount($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setMembersCount($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setPendingMembersCount($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setDescription($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setTags($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setListing($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setPrivacy($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setMembershipSetting($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setUserJoinPolicy($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setDefaultPermissionLevel($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setKuserId($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setReferenceId($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setContributionPolicy($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setCustomData($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setPrivacyContext($arr[$keys[25]]);
+		if (array_key_exists($keys[26], $arr)) $this->setPrivacyContexts($arr[$keys[26]]);
 	}
 
 	/**
@@ -1339,6 +2245,23 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryPeer::CREATED_AT)) $criteria->add(categoryPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(categoryPeer::UPDATED_AT)) $criteria->add(categoryPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(categoryPeer::DELETED_AT)) $criteria->add(categoryPeer::DELETED_AT, $this->deleted_at);
+		if ($this->isColumnModified(categoryPeer::STATUS)) $criteria->add(categoryPeer::STATUS, $this->status);
+		if ($this->isColumnModified(categoryPeer::DIRECT_ENTRIES_COUNT)) $criteria->add(categoryPeer::DIRECT_ENTRIES_COUNT, $this->direct_entries_count);
+		if ($this->isColumnModified(categoryPeer::MEMBERS_COUNT)) $criteria->add(categoryPeer::MEMBERS_COUNT, $this->members_count);
+		if ($this->isColumnModified(categoryPeer::PENDING_MEMBERS_COUNT)) $criteria->add(categoryPeer::PENDING_MEMBERS_COUNT, $this->pending_members_count);
+		if ($this->isColumnModified(categoryPeer::DESCRIPTION)) $criteria->add(categoryPeer::DESCRIPTION, $this->description);
+		if ($this->isColumnModified(categoryPeer::TAGS)) $criteria->add(categoryPeer::TAGS, $this->tags);
+		if ($this->isColumnModified(categoryPeer::LISTING)) $criteria->add(categoryPeer::LISTING, $this->listing);
+		if ($this->isColumnModified(categoryPeer::PRIVACY)) $criteria->add(categoryPeer::PRIVACY, $this->privacy);
+		if ($this->isColumnModified(categoryPeer::MEMBERSHIP_SETTING)) $criteria->add(categoryPeer::MEMBERSHIP_SETTING, $this->membership_setting);
+		if ($this->isColumnModified(categoryPeer::USER_JOIN_POLICY)) $criteria->add(categoryPeer::USER_JOIN_POLICY, $this->user_join_policy);
+		if ($this->isColumnModified(categoryPeer::DEFAULT_PERMISSION_LEVEL)) $criteria->add(categoryPeer::DEFAULT_PERMISSION_LEVEL, $this->default_permission_level);
+		if ($this->isColumnModified(categoryPeer::KUSER_ID)) $criteria->add(categoryPeer::KUSER_ID, $this->kuser_id);
+		if ($this->isColumnModified(categoryPeer::REFERENCE_ID)) $criteria->add(categoryPeer::REFERENCE_ID, $this->reference_id);
+		if ($this->isColumnModified(categoryPeer::CONTRIBUTION_POLICY)) $criteria->add(categoryPeer::CONTRIBUTION_POLICY, $this->contribution_policy);
+		if ($this->isColumnModified(categoryPeer::CUSTOM_DATA)) $criteria->add(categoryPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(categoryPeer::PRIVACY_CONTEXT)) $criteria->add(categoryPeer::PRIVACY_CONTEXT, $this->privacy_context);
+		if ($this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS)) $criteria->add(categoryPeer::PRIVACY_CONTEXTS, $this->privacy_contexts);
 
 		return $criteria;
 	}
@@ -1423,6 +2346,54 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 
 		$copyObj->setDeletedAt($this->deleted_at);
 
+		$copyObj->setStatus($this->status);
+
+		$copyObj->setDirectEntriesCount($this->direct_entries_count);
+
+		$copyObj->setMembersCount($this->members_count);
+
+		$copyObj->setPendingMembersCount($this->pending_members_count);
+
+		$copyObj->setDescription($this->description);
+
+		$copyObj->setTags($this->tags);
+
+		$copyObj->setListing($this->listing);
+
+		$copyObj->setPrivacy($this->privacy);
+
+		$copyObj->setMembershipSetting($this->membership_setting);
+
+		$copyObj->setUserJoinPolicy($this->user_join_policy);
+
+		$copyObj->setDefaultPermissionLevel($this->default_permission_level);
+
+		$copyObj->setKuserId($this->kuser_id);
+
+		$copyObj->setReferenceId($this->reference_id);
+
+		$copyObj->setContributionPolicy($this->contribution_policy);
+
+		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setPrivacyContext($this->privacy_context);
+
+		$copyObj->setPrivacyContexts($this->privacy_contexts);
+
+
+		if ($deepCopy) {
+			// important: temporarily setNew(false) because this affects the behavior of
+			// the getter/setter methods for fkey referrer objects.
+			$copyObj->setNew(false);
+
+			foreach ($this->getcategoryKusers() as $relObj) {
+				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+					$copyObj->addcategoryKuser($relObj->copy($deepCopy));
+				}
+			}
+
+		} // if ($deepCopy)
+
 
 		$copyObj->setNew(true);
 
@@ -1487,6 +2458,207 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Clears out the collcategoryKusers collection (array).
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addcategoryKusers()
+	 */
+	public function clearcategoryKusers()
+	{
+		$this->collcategoryKusers = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collcategoryKusers collection (array).
+	 *
+	 * By default this just sets the collcategoryKusers collection to an empty array (like clearcollcategoryKusers());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @return     void
+	 */
+	public function initcategoryKusers()
+	{
+		$this->collcategoryKusers = array();
+	}
+
+	/**
+	 * Gets an array of categoryKuser objects which contain a foreign key that references this object.
+	 *
+	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
+	 * Otherwise if this category has previously been saved, it will retrieve
+	 * related categoryKusers from storage. If this category is new, it will return
+	 * an empty collection or the current collection, the criteria is ignored on a new object.
+	 *
+	 * @param      PropelPDO $con
+	 * @param      Criteria $criteria
+	 * @return     array categoryKuser[]
+	 * @throws     PropelException
+	 */
+	public function getcategoryKusers($criteria = null, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(categoryPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collcategoryKusers === null) {
+			if ($this->isNew()) {
+			   $this->collcategoryKusers = array();
+			} else {
+
+				$criteria->add(categoryKuserPeer::CATEGORY_ID, $this->id);
+
+				categoryKuserPeer::addSelectColumns($criteria);
+				$this->collcategoryKusers = categoryKuserPeer::doSelect($criteria, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return the collection.
+
+
+				$criteria->add(categoryKuserPeer::CATEGORY_ID, $this->id);
+
+				categoryKuserPeer::addSelectColumns($criteria);
+				if (!isset($this->lastcategoryKuserCriteria) || !$this->lastcategoryKuserCriteria->equals($criteria)) {
+					$this->collcategoryKusers = categoryKuserPeer::doSelect($criteria, $con);
+				}
+			}
+		}
+		$this->lastcategoryKuserCriteria = $criteria;
+		return $this->collcategoryKusers;
+	}
+
+	/**
+	 * Returns the number of related categoryKuser objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related categoryKuser objects.
+	 * @throws     PropelException
+	 */
+	public function countcategoryKusers(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(categoryPeer::DATABASE_NAME);
+		} else {
+			$criteria = clone $criteria;
+		}
+
+		if ($distinct) {
+			$criteria->setDistinct();
+		}
+
+		$count = null;
+
+		if ($this->collcategoryKusers === null) {
+			if ($this->isNew()) {
+				$count = 0;
+			} else {
+
+				$criteria->add(categoryKuserPeer::CATEGORY_ID, $this->id);
+
+				$count = categoryKuserPeer::doCount($criteria, false, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return count of the collection.
+
+
+				$criteria->add(categoryKuserPeer::CATEGORY_ID, $this->id);
+
+				if (!isset($this->lastcategoryKuserCriteria) || !$this->lastcategoryKuserCriteria->equals($criteria)) {
+					$count = categoryKuserPeer::doCount($criteria, false, $con);
+				} else {
+					$count = count($this->collcategoryKusers);
+				}
+			} else {
+				$count = count($this->collcategoryKusers);
+			}
+		}
+		return $count;
+	}
+
+	/**
+	 * Method called to associate a categoryKuser object to this object
+	 * through the categoryKuser foreign key attribute.
+	 *
+	 * @param      categoryKuser $l categoryKuser
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addcategoryKuser(categoryKuser $l)
+	{
+		if ($this->collcategoryKusers === null) {
+			$this->initcategoryKusers();
+		}
+		if (!in_array($l, $this->collcategoryKusers, true)) { // only add it if the **same** object is not already associated
+			array_push($this->collcategoryKusers, $l);
+			$l->setcategory($this);
+		}
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this category is new, it will return
+	 * an empty collection; or if this category has previously
+	 * been saved, it will retrieve related categoryKusers from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in category.
+	 */
+	public function getcategoryKusersJoinkuser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(categoryPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collcategoryKusers === null) {
+			if ($this->isNew()) {
+				$this->collcategoryKusers = array();
+			} else {
+
+				$criteria->add(categoryKuserPeer::CATEGORY_ID, $this->id);
+
+				$this->collcategoryKusers = categoryKuserPeer::doSelectJoinkuser($criteria, $con, $join_behavior);
+			}
+		} else {
+			// the following code is to determine if a new query is
+			// called for.  If the criteria is the same as the last
+			// one, just return the collection.
+
+			$criteria->add(categoryKuserPeer::CATEGORY_ID, $this->id);
+
+			if (!isset($this->lastcategoryKuserCriteria) || !$this->lastcategoryKuserCriteria->equals($criteria)) {
+				$this->collcategoryKusers = categoryKuserPeer::doSelectJoinkuser($criteria, $con, $join_behavior);
+			}
+		}
+		$this->lastcategoryKuserCriteria = $criteria;
+
+		return $this->collcategoryKusers;
+	}
+
+	/**
 	 * Resets all collections of referencing foreign keys.
 	 *
 	 * This method is a user-space workaround for PHP's inability to garbage collect objects
@@ -1498,8 +2670,131 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function clearAllReferences($deep = false)
 	{
 		if ($deep) {
+			if ($this->collcategoryKusers) {
+				foreach ((array) $this->collcategoryKusers as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
 		} // if ($deep)
 
+		$this->collcategoryKusers = null;
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // Basecategory

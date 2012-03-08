@@ -239,6 +239,10 @@ class KalturaErrors extends APIErrors
 	
 	const CATEGORIES_LOCKED = "CATEGORIES_LOCKED,Categories are locked, lock will be automatically released in \"%s\" seconds";
 	
+	const CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET = "CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET,Cannot inherit members when parent category is not set";
+	
+	const NOT_ENTITLED_TO_UPDATE_CATEGORY = "NOT_ENTITLED_TO_UPDATE_CATEGORY, Current User is not entitled to update this category";
+	
 	/**
 	 * Batch Service
 	 */
@@ -355,4 +359,18 @@ class KalturaErrors extends APIErrors
 	const REPORT_NOT_PUBLIC = "REPORT_NOT_PUBLIC,Report id \"%s\" is not public";
 	
 	const REPORT_PARAMETER_MISSING = "REPORT_PARAMETER_MISSING,Parameter \"%s\" is missing";
+	
+	/**
+	 * categoryUser service
+	 */
+	const INVALID_CATEGORY_USER_ID = "INVALID_CATEGORY_USER_ID,Invalid CategoryUser ID [\"%s\"]";
+	
+	const CATEGORY_USER_ALREADY_EXISTS = "CATEGORY_USER_ALREADY_EXISTS,CategoryUser already exists [\"%s\"]";
+	
+	const CATEGORY_INHERIT_MEMBERS = "CATEGORY_INHERIT_MEMBERS,Cannot add members to this category since its inherit members from parent category [\"%s\"]";
+	
+	const CATEGORY_USER_NOT_ALLOWED = "CATEGORY_USER_NOT_ALLOWED,cannot register to this category [\"%s\"]";
+	
+	const CANNOT_UPDATE_CATEGORY_USER = "CANNOT_UPDATE_CATEGORY_USER,cannot update categoryUser";
+	
 }

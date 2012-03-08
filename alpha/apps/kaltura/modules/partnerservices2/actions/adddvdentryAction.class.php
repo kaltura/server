@@ -90,6 +90,7 @@ class adddvdentryAction extends defPartnerservices2Action
 			$dvd_entry->setPartnerId( $partner_id );
 			$dvd_entry->setSubpId( $subp_id );
 			$dvd_entry->setKuserId($puser_kuser->getKuserId() );
+			$dvd_entry->setCreatorKuserId($puser_kuser->getKuserId() );
 						
 			$dvd_entry->save();
 										

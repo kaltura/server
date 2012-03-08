@@ -456,6 +456,7 @@ class kshow extends Basekshow
 
 		$entry->setKshowId($kshow->getId () );
 		$entry->setKuserId($kuser_id);
+		$entry->setCreatorKuserId($kuser_id);
 		if ( $this->getPartnerId() !== null )
 			$entry->setPartnerId( $this->getPartnerId() ); // inherit partner_id from kshow
 		if ( $this->getSubpId() !== null )
