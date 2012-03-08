@@ -117,7 +117,7 @@ class myKalturaUserClipsServices extends myBaseMediaSource implements IMediaSour
 				
 				if ($playedAsset)
 				{
-				    $object["fileExt"] = $playedAsset->getFileExt();
+				    $object["file_ext"] = $playedAsset->getFileExt();
 				}
 				
 				$objects[] = $object;
