@@ -1,0 +1,340 @@
+<?php
+/**
+ * @package plugins.metroPcsDistribution
+ * @subpackage lib
+ */
+class MetroPcsDistributionEngine extends DistributionEngine implements 
+	IDistributionEngineSubmit,
+	IDistributionEngineCloseSubmit,
+	IDistributionEngineUpdate,
+	IDistributionEngineCloseUpdate,
+	IDistributionEngineDelete,
+	IDistributionEngineCloseDelete
+{
+	const FEED_TEMPLATE = 'feed_template.xml';
+	
+	const METRO_PCS_STATUS_PUBLISHED = 'PUBLISHED';
+	const METRO_PCS_STATUS_PENDING = 'PENDING';
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineSubmit::submit()
+	 */
+	public function submit(KalturaDistributionSubmitJobData $data)
+	{
+		$this->validateJobDataObjectTypes($data);
+		
+		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
+		
+		return false;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineCloseSubmit::closeSubmit()
+	 */
+	public function closeSubmit(KalturaDistributionSubmitJobData $data)
+	{
+		$this->validateJobDataObjectTypes($data);
+		
+		// metro pcs didn't approve that this logic does work, for now just mark every submited xml as successful
+		return true;
+		/*
+		$publishState = $this->fetchStatus($data);
+		switch($publishState)
+		{
+			case self::METRO_PCS_STATUS_PUBLISHED:
+				return true;
+			case self::METRO_PCS_STATUS_PENDING:
+				return false;
+			default:
+				throw new Exception("Error [$publishState]");
+		}
+		*/
+	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see IDistributionEngineUpdate::update()
+	 */
+	public function update(KalturaDistributionUpdateJobData $data)
+	{
+		$this->validateJobDataObjectTypes($data);
+		
+		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
+		
+		return false;
+	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see IDistributionEngineCloseUpdate::closeUpdate()
+	 */
+	public function closeUpdate(KalturaDistributionUpdateJobData $data)
+	{
+		$this->validateJobDataObjectTypes($data);
+		return true;
+	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see IDistributionEngineDelete::delete()
+	 */
+	public function delete(KalturaDistributionDeleteJobData $data)
+	{
+		$this->validateJobDataObjectTypes($data);
+		
+		$this->handleDelete($data, $data->distributionProfile, $data->providerData);
+		
+		return false;
+	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see IDistributionEngineCloseDelete::closeDelete()
+	 */
+	public function closeDelete(KalturaDistributionDeleteJobData $data)
+	{
+		$this->validateJobDataObjectTypes($data);
+		return true;
+	}
+	
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @throws Exception
+	 */
+	protected function validateJobDataObjectTypes(KalturaDistributionJobData $data)
+	{
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMetroPcsDistributionProfile))
+			throw new Exception("Distribution profile must be of type KalturaMetroPcsDistributionProfile");
+	
+		if(!$data->providerData || !($data->providerData instanceof KalturaMetroPcsDistributionJobProviderData))
+			throw new Exception("Provider data must be of type KalturaMetroPcsDistributionJobProviderData");
+	}
+	
+	/**
+	 * @param string $path
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaMetroPcsDistributionProfile $distributionProfile
+	 * @param KalturaMetroPcsDistributionJobProviderData $providerData
+	 */
+	public function handleSubmit(KalturaDistributionJobData $data, KalturaMetroPcsDistributionProfile $distributionProfile, KalturaMetroPcsDistributionJobProviderData $providerData)
+	{
+		KalturaLog::debug("Submiting data");	
+		$entryDistribution = $data->entryDistribution;
+			
+		//getting first flavor
+		$flavorAssetsLocalPaths = unserialize($providerData->assetLocalPaths);
+		//getting thumbnail urls
+		$thumbUrls = unserialize($providerData->thumbUrls);
+		reset($flavorAssetsLocalPaths);
+		$firstFlavorAssetId = key($flavorAssetsLocalPaths);
+		$firstFlavorAssetPath = $flavorAssetsLocalPaths[$firstFlavorAssetId];
+		$flavorAssetArray = $this->getFlavorAsset($entryDistribution, $firstFlavorAssetId);	
+		$flavorAsset = 	$flavorAssetArray[0];
+		//getting thumbnails
+		$thumbAssets = $this->getThumbAssets($entryDistribution);		
+		$entryDuration = $this->getEntryDuration($entryDistribution);
+		
+		//building feed
+		$currentTime = date('Y-m-d_H-i-s');
+		$feed = new MetroPcsDistributionFeedHelper(self::FEED_TEMPLATE, $entryDistribution, $distributionProfile, $providerData);	
+		$feed->setFlavor($flavorAsset, $entryDuration, $currentTime);
+		$feed->setThumbnails($thumbAssets, $thumbUrls);
+		
+		//xml file
+		$xmlFileName = $currentTime. '_' .$entryDistribution->id. '_' .$data->entryDistribution->entryId .'.xml';		
+		$path = $distributionProfile->ftpPath;
+		$destXmlFile = "{$path}/{$xmlFileName}";		
+		$xmlString = $feed->getXmlString();	
+
+		KalturaLog::debug('result xml - '.PHP_EOL.$xmlString);
+		file_put_contents($xmlFileName, $xmlString);
+		
+		//load the FTP
+		$ftpManager = $this->getFTPManager($distributionProfile);
+		if(!$ftpManager)
+			throw new Exception("FTP manager not loaded");		
+			
+		//upload flavor file to FTP	
+		$this->uploadFlavorAssetFile($path, $feed, $providerData, $ftpManager, $flavorAsset, $currentTime);
+			
+		//upload feed xml file to FTP
+		$ftpManager->putFile($destXmlFile, $xmlFileName, true);			
+		
+		KalturaLog::info('Files were uploaded successfully');
+	
+		$data->remoteId = $xmlFileName;
+		$data->sentData = $xmlString;
+	}	
+	
+	/**
+	 * @param string $path
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaMetroPcsDistributionProfile $distributionProfile
+	 * @param KalturaMetroPcsDistributionJobProviderData $providerData
+	 */
+	public function handleDelete(KalturaDistributionJobData $data, KalturaMetroPcsDistributionProfile $distributionProfile, KalturaMetroPcsDistributionJobProviderData $providerData)
+	{
+		KalturaLog::debug("Deleting data");
+	
+		$entryDistribution = $data->entryDistribution;
+		$entryDuration = $this->getEntryDuration($entryDistribution);
+		
+		//building feed
+		$currentTime = date('Y-m-d_H-i-s');
+		$feed = new MetroPcsDistributionFeedHelper(self::FEED_TEMPLATE, $entryDistribution, $distributionProfile, $providerData);	
+		//set end time and start time
+		$feed->setTimesForDelete();
+		//ignoring the image and item tags
+		$feed->setImageIgnore();
+		$feed->setItemIgnore();
+		
+		//xml file
+		$xmlFileName = $currentTime. '_' .$entryDistribution->id. '_' .$data->entryDistribution->entryId .'.xml';		
+		$path = $distributionProfile->ftpPath;
+		$destXmlFile = "{$path}/{$xmlFileName}";		
+		$xmlString = $feed->getXmlString();	
+		KalturaLog::debug('result xml - '.PHP_EOL.$xmlString);
+		file_put_contents($xmlFileName, $xmlString);
+	
+		//load the FTP
+		$ftpManager = $this->getFTPManager($distributionProfile);
+		if(!$ftpManager)
+			throw new Exception("FTP manager not loaded");		
+			
+		//upload feed xml file to FTP
+		$ftpManager->putFile($destXmlFile, $xmlFileName, true);			
+		
+		KalturaLog::info('XML file was deleted successfully');
+	
+		$data->remoteId = $xmlFileName;
+		$data->sentData = $xmlString;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see DistributionEngine::configure()
+	 */
+	public function configure(KSchedularTaskConfig $taskConfig)
+	{
+	}
+	
+	/**
+	 * 
+	 * @param KalturaMetroPcsDistributionProfile $distributionProfile
+	 * @return ftpMgr
+	 */
+	protected function getFTPManager(KalturaMetroPcsDistributionProfile $distributionProfile)
+	{
+		$host = $distributionProfile->ftpHost;
+		$login = $distributionProfile->ftpLogin;
+		$pass = $distributionProfile->ftpPass;
+		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		$ftpManager->login($host, $login, $pass);
+		return $ftpManager;
+	}
+	
+	/**
+	 * @param KalturaDistributionSubmitJobData $data
+	 * @return string status
+	 */
+	protected function fetchStatus(KalturaDistributionJobData $data)
+	{
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMetroPcsDistributionProfile))
+			return KalturaLog::err("Distribution profile must be of type KalturaMetroPcsDistributionProfile");
+	
+		$fileArray = $this->fetchFilesList($data->distributionProfile);
+		
+		for	($i=0; $i<count($fileArray); $i++)
+		{
+			if (preg_match ( "/{$data->remoteId}.rcvd/" , $fileArray[$i] , $matches))
+			{
+				return self::METRO_PCS_STATUS_PUBLISHED;
+			}
+			else if (preg_match ( "/{$data->remoteId}.*.err/" , $fileArray[$i] , $matches))
+			{
+				//$res = preg_split ("/\./", $matches[0]);
+				//return $res[1];
+				$res = explode('.',$matches[0]);
+				return $res[1];			
+			}
+		}
+
+		return self::METRO_PCS_STATUS_PENDING;
+	}
+
+	/**
+	 * @param KalturaMetroPcsDistributionProfile $distributionProfile
+	 */
+	protected function fetchFilesList(KalturaMetroPcsDistributionProfile $distributionProfile)
+	{
+		$host = $distributionProfile->ftpHost;
+		$login = $distributionProfile->ftpLogin;
+		$pass = $distributionProfile->ftpPass;
+		
+		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		if(!$fileTransferMgr)
+			throw new Exception("FTP manager not loaded");
+			
+		$fileTransferMgr->login($host, $host, $pass);
+		return $fileTransferMgr->listDir('/');
+	}
+	
+	protected function getThumbAssets(KalturaEntryDistribution $entryDistribution)
+	{
+		$thumbAssetFilter = new KalturaThumbAssetFilter();
+		$thumbAssetFilter->entryIdEqual = $entryDistribution->entryId;
+		$thumbAssetFilter->idIn = $entryDistribution->thumbAssetIds;
+		
+		try {
+			$this->impersonate($entryDistribution->partnerId);
+			$thumbAssets = $this->kalturaClient->thumbAsset->listAction($thumbAssetFilter);
+			$this->unimpersonate();
+		}
+		catch (Exception $e) {
+			$this->unimpersonate();
+			throw $e;
+		}		
+		return $thumbAssets->objects;		
+	}
+	
+	protected function getFlavorAsset(KalturaEntryDistribution $entryDistribution, $flavorAssetId)
+	{
+		$flavorAssetFilter = new KalturaFlavorAssetFilter();
+		$flavorAssetFilter->entryIdEqual = $entryDistribution->entryId;
+		$flavorAssetFilter->idIn = $flavorAssetId;
+		
+		try {
+			$this->impersonate($entryDistribution->partnerId);
+			$flavorAssets = $this->kalturaClient->flavorAsset->listAction($flavorAssetFilter);
+			$this->unimpersonate();
+		}
+		catch (Exception $e) {
+			$this->unimpersonate();
+			throw $e;
+		}		
+		return $flavorAssets->objects;		
+	}
+	
+	protected function getEntryDuration(KalturaEntryDistribution $entryDistribution)
+	{		
+		try {
+			$this->impersonate($entryDistribution->partnerId);
+			$entry = $this->kalturaClient->baseEntry->get($entryDistribution->entryId);
+			$this->unimpersonate();
+		}
+		catch (Exception $e) {
+			$this->unimpersonate();
+			throw $e;
+		}
+		
+		return $entry->duration;
+	}
+	
+	protected function uploadFlavorAssetFile($path, $feed, $providerData, $ftpManager, $flavorAsset, $currentTime)
+	{
+		$destName = $feed->flavorAssetUniqueName($flavorAsset, $currentTime);
+		$videoAssetFilePathArray = unserialize($providerData->assetLocalPaths);
+		$sourceName = $videoAssetFilePathArray[$flavorAsset->id];
+		$ftpManager->putFile($destName, $sourceName, true);
+	}
+	
+}
