@@ -612,12 +612,46 @@ class Propel
 			}
 		}
 
-		try {
-			$con = new $classname($dsn, $user, $password, $driver_options);
-			$con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		} catch (PDOException $e) {
-			throw new PropelException("Unable to open PDO connection dsn[$dsn] user[$user] password[$password]", $e);
+		// add profiling info and multiple retries for initiating a connection
+		// since we do not expect connection time to exceed 1 second and we do encounter tcp SYN packet drop
+		// which results in 3 second connection (the retry on the SYN is set to 3 seconds in the linux kernel)
+		// we try to connect up to 3 times setting a 1 second timeout on the first two attempts
+		// if there already was a timeout setting on the connection we wont activate the above logic and continue with
+		// the original flow of one connection attempt
+ 
+		$connStartTime = microtime(true);
+
+		if (!array_key_exists(PDO::ATTR_TIMEOUT, $driver_options))
+		{
+			$driver_options[PDO::ATTR_TIMEOUT] = 1;
+			$count = 3;
 		}
+		else
+			$count = 1;
+
+		for($i = 1; $i <= $count; $i++)
+		{
+			try {
+				if ($i > 1 && $i == $count) // remove the timeout on the last attempt of the a attempt loop
+					unset($driver_options[PDO::ATTR_TIMEOUT]);
+
+				$startTime = microtime(true);
+				$con = new $classname($dsn, $user, $password, $driver_options);
+				$con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				break;
+			} catch (PDOException $e) {
+				$timeTook = microtime(true) - $startTime;
+				if (class_exists("KalturaLog"))
+				{
+					KalturaLog::Log("failed to connect [$i] [$timeTook] $dsn");
+				}
+				if ($i == $count || $timeTook < 1)
+					throw new PropelException("Unable to open PDO connection dsn[$dsn] user[$user] password[$password]", $e);
+			}
+		}
+
+		if (class_exists("KalturaLog"))
+			KalturaLog::Log("total conn took ".(microtime(true) - $connStartTime)." $dsn");
 
 		// load any connection options from the config file
 		// connection attributes are those PDO flags that have to be set on the initialized connection
