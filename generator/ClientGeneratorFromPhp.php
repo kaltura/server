@@ -294,17 +294,17 @@ abstract class ClientGeneratorFromPhp
 			}
 		}
 		
-		// load the child types for all the types that we found except for types that inherit KalturaFilter
-
-		foreach($this->_types as $type => $typeReflector)
-		{
-			$reflector = new ReflectionClass($typeReflector->getType());
-			
-			if (!$typeReflector->isEnum() && !$typeReflector->isStringEnum() && !$reflector->isSubclassOf("KalturaFilter"))
-			{
-				$this->loadChildTypes($typeReflector);
-			}
-		}
+//		// load the child types for all the types that we found except for types that inherit KalturaFilter
+//
+//		foreach($this->_types as $type => $typeReflector)
+//		{
+//			$reflector = new ReflectionClass($typeReflector->getType());
+//			
+//			if (!$typeReflector->isEnum() && !$typeReflector->isStringEnum() && !$reflector->isSubclassOf("KalturaFilter"))
+//			{
+//				$this->loadChildTypes($typeReflector);
+//			}
+//		}
 	}
 	
 	private function loadTypesRecursive(KalturaTypeReflector $typeReflector)
@@ -338,11 +338,16 @@ abstract class ClientGeneratorFromPhp
 				$this->loadTypesRecursive($arrayTypeReflector);
 		}
 		
-		$this->addType($typeReflector);
+		$this->loadChildTypes($typeReflector);
 	}
 	
 	private function loadChildTypes(KalturaTypeReflector $typeReflector)
 	{
+		if (isset($this->_types[$typeReflector->getType()]))
+			return;
+			
+		$this->addType($typeReflector);
+		KalturaLog::debug("Loads [" . $typeReflector->getType() . "]");
 		$this->initClassMap();
 		foreach($this->_classMap as $class => $path)
 		{
