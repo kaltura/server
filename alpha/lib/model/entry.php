@@ -1636,6 +1636,29 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$this->putInCustomData("rootEntryId", $v);
 	}
 	
+	public function setCreatorPuserId( $v )		{	$this->putInCustomData ( "creatorPuserId" , $v );	}
+	public function getCreatorPuserId ( )  			{	return $this->getFromCustomData( "creatorPuserId", null, 0 );	}
+	
+	public function setCreatorKuserId($v)
+	{
+		// if we set the kuserId when not needed - this causes the kuser object to be reset (even if the joinKuser was done properly)
+		if ( self::getCreatorKuserId() == $v )  // same value - don't set for nothing 
+			return;  		
+		
+		$this->putInCustomData ( "creatorKuserId" , $v );
+		
+		$kuser = kuserPeer::retrieveByPK($v);
+		if ($kuser)
+			$this->setCreatorPuserId($kuser->getPuserId());
+	}
+	public function getCreatorKuserId (  )			{	return $this->getFromCustomData( "creatorKuserId", null, 0 );	}
+	
+	public function setEntitledUsersEdit( $v )		{	$this->putInCustomData ( "entitledUsersEdit" , $v );	}
+	public function getEntitledUsersEdit(  )			{	return $this->getFromCustomData( "entitledUsersEdit", null, 0 );	}
+	
+	public function setEntitledUsersPublish( $v )		{	$this->putInCustomData ( "entitledUsersPublish" , $v );	}
+	public function getEntitledUsersPublish(  )			{	return $this->getFromCustomData( "entitledUsersPublish", null, 0 );	}
+	
 	public function getRoots()
 	{
 		// the prefix required becaue combined sphinx match is rrequired, 
@@ -2054,17 +2077,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$this->setPuserId($kuser->getPuserId());
 	}
 	
-	public function setCreatorKuserId($v)
-	{
-		// if we set the kuserId when not needed - this causes the kuser object to be reset (even if the joinKuser was done properly)
-		if ( self::getCreatorKuserId() == $v )  // same value - don't set for nothing 
-			return;  		
-		
-		parent::setCreatorKuserId($v);
-		$kuser = kuserPeer::retrieveByPK($v);
-		if ($kuser)
-			$this->setCreatorPuserId($kuser->getPuserId());
-	}
 	
 	public function syncCategories()
 	{
