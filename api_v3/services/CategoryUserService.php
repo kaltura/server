@@ -60,14 +60,19 @@ class CategoryUserService extends KalturaBaseService
 	 * Get CategoryUser by id
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param int $categoryId
+	 * @param string $userId
 	 * @return KalturaCategoryUser
 	 */
-	function getAction($id)
+	function getAction($categoryId, $userId)
 	{
-		$dbCategoryKuser = categoryKuserPeer::retrieveByPK($id);
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
+		if (!$kuser)
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
+			
+		$dbCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryId, $kuser->getId());
 		if (!$dbCategoryKuser)
-			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $id);
+			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $userId);
 			
 		$categoryUser = new KalturaCategoryUser();
 		$categoryUser->fromObject($dbCategoryKuser);
@@ -79,17 +84,22 @@ class CategoryUserService extends KalturaBaseService
 	 * Update CategoryUser by id
 	 * 
 	 * @action update
-	 * @param int $id
+	 * @param int $categoryId
+	 * @param string $userId
 	 * @param KalturaCategoryUser $categoryUser
 	 * @param bool $override - to override manual changes
 	 * @return KalturaCategoryUser
 	 */
-	function updateAction($id, KalturaCategoryUser $categoryUser, $override)
+	function updateAction($categoryId, $userId, KalturaCategoryUser $categoryUser, $override)
 	{
-		//TODO - override
-		$dbCategoryKuser = categoryKuserPeer::retrieveByPK($id);
+		//TODO - override: implement syncMode
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
+		if (!$kuser)
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
+		
+		$dbCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryId, $kuser->getId());
 		if (!$dbCategoryKuser)
-			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $id);
+			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $userId);
 		
 		$dbCategoryKuser = $categoryUser->toUpdatableObject($dbCategoryKuser);
 		
@@ -115,13 +125,18 @@ class CategoryUserService extends KalturaBaseService
 	 * Delete a CategoryUser
 	 * 
 	 * @action delete
-	 * @param int $id
+	 * @param int $categoryId
+	 * @param string $userId
 	 */
-	function deleteAction($id)
+	function deleteAction($categoryId, $userId)
 	{
-		$dbCategoryKuser = categoryKuserPeer::retrieveByPK($id);
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
+		if (!$kuser)
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
+			
+		$dbCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryId, $kuser->getId());
 		if (!$dbCategoryKuser)
-			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $id);
+			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $kuser->getId());
 			
 		//TODO 
 		//cannot delete category owner
@@ -136,14 +151,19 @@ class CategoryUserService extends KalturaBaseService
 	 * activate CategoryUser
 	 * 
 	 * @action activate
-	 * @param int $id
+	 * @param int $categoryId
+	 * @param string $userId
 	 * @return KalturaCategoryUser
 	 */
-	function activateAction($id)
+	function activateAction($categoryId, $userId)
 	{
-		$dbCategoryKuser = categoryKuserPeer::retrieveByPK($id);
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
+		if (!$kuser)
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
+			
+		$dbCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryId, $kuser->getId());
 		if (!$dbCategoryKuser)
-			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $id);
+			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $userId);
 		
 		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($dbCategoryKuser->getCategoryId(), kCurrentContext::$uid);
 		if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
@@ -161,14 +181,19 @@ class CategoryUserService extends KalturaBaseService
 	 * reject CategoryUser
 	 * 
 	 * @action reject
-	 * @param int $id
+	 * @param int $categoryId
+	 * @param string $userId
 	 * @return KalturaCategoryUser
 	 */
-	function rejectAction($id)
+	function rejectAction($categoryId, $userId)
 	{
-		$dbCategoryKuser = categoryKuserPeer::retrieveByPK($id);
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
+		if (!$kuser)
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
+			
+		$dbCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryId, $kuser->getId());
 		if (!$dbCategoryKuser)
-			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $id);
+			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $userId);
 		
 		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($dbCategoryKuser->getCategoryId(), kCurrentContext::$uid);
 		if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
