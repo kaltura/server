@@ -5,6 +5,8 @@
  */ 
 class categoryFilter extends baseObjectFilter
 {
+	const FREE_TEXT_FIELDS = 'name,tags,description';
+	
 	public function init ()
 	{
 		// TODO - should separate the schema of the fields from the actual values
@@ -18,7 +20,9 @@ class categoryFilter extends baseObjectFilter
 			"_likex_full_name",
 			"_eq_depth",
 			"_gte_created_at",
-			"_lte_created_at"
+			"_lte_created_at",
+			"_search_text",
+			"_in_members",		
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name", "depth");

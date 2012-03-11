@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class category extends Basecategory
+class category extends Basecategory implements IIndexable
 {
 	protected $childs_for_save = array();
 	
@@ -23,6 +23,20 @@ class category extends Basecategory
 	const MAX_CATEGORY_DEPTH = 8;
 	
 	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 0;
+	
+	private static $indexFieldTypes = array(
+		'category_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'name' => IIndexable::FIELD_TYPE_STRING,
+		'full_name' => IIndexable::FIELD_TYPE_STRING,
+		'description' => IIndexable::FIELD_TYPE_STRING,
+		'tags' => IIndexable::FIELD_TYPE_STRING,
+		'category_status' => IIndexable::FIELD_TYPE_INTEGER,
+		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'listing' => IIndexable::FIELD_TYPE_INTEGER,
+		'search_text' => IIndexable::FIELD_TYPE_STRING,
+		'members' => IIndexable::FIELD_TYPE_STRING
+	);
 	
 	public function save(PropelPDO $con = null)
 	{
@@ -569,4 +583,86 @@ class category extends Basecategory
 		$this->setStatus(CategoryStatus::ACTIVE);
 		$this->setPrivacyContext(false);
 	}
+	
+	
+	/**
+	 * Get the [id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getIntId()
+	{
+		return $this->getId();
+	}
+	
+	//TODO - remove this function when changing sphinx_log model from entryId to objectId and objectType
+	public function getEntryId()
+	{
+		return null;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getObjectIndexName()
+	 */
+	public function getObjectIndexName()
+	{
+		return categoryPeer::getOMClass(false);
+	}
+	
+	public function getSearchText()
+	{
+		return 'category->getSearchText';
+	}
+	
+	public function getMembers()
+	{
+		return 'active members';
+	}
+	
+/* (non-PHPdoc)
+	 * @see IIndexable::getIndexFieldsMap()
+	 */
+	public function getIndexFieldsMap()
+	{
+		return array(
+		/*sphinx => propel */
+			'id' => 'id',
+			'partner_id' => 'partnerId',
+			'name' => 'name',
+			'full_name' => 'fullName',
+			'description' => 'description',
+			'tags' => 'tags',
+			'status' => 'status',
+			'kuser_id' => 'kuserId',
+			'listing' => 'listing',	
+			'search_text' => 'searchText',
+			'members' => 'members'
+		);
+	}
+	
+	/**
+	 * @return string field type, string, int or timestamp
+	 */
+	public function getIndexFieldType($field)
+	{
+		if(isset(self::$indexFieldTypes[$field]))
+			return self::$indexFieldTypes[$field];
+			
+		return null;
+	}
+	
+	
+
+	
+		/* (non-PHPdoc)
+	 * @see lib/model/om/Baseentry#postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+	
+		if (!$this->alreadyInSave)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
+	}
+	
 }

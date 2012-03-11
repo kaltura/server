@@ -25,7 +25,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable
 	/**
 	 * User id
 	 * 
-	 * @var int
+	 * @var string
 	 * @insertonly
 	 * @filter eq,in
 	 */
@@ -129,7 +129,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$kuser = kuserPeer::retrieveByPK($this->userId);
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
 			

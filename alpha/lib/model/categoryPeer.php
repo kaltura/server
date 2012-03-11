@@ -26,11 +26,15 @@ class categoryPeer extends BasecategoryPeer
 			self::$s_criteria_filter = new criteriaFilter ();
 		}
 
-		$c = new Criteria();
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 		$c->add ( self::STATUS, CategoryStatus::DELETED, Criteria::NOT_EQUAL );
 		
 		if (kEntitlementUtils::$entitlementScope)
-			$c->add ( self::LISTING, ListingType::LISTED, Criteria::EQUAL );		
+		{
+			//TODO - add 
+			// $c->addOr() user id is member of this category 
+			$c->add ( self::LISTING, ListingType::LISTED, Criteria::EQUAL );
+		}		
 		
 		self::$s_criteria_filter->setFilter ( $c );
 	}
@@ -106,5 +110,24 @@ class categoryPeer extends BasecategoryPeer
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("category:partnerId=%s", self::PARTNER_ID));		
+	}
+	
+	
+	
+	/**
+	 * @param Criteria $criteria
+	 * @param PropelPDO $con
+	 */
+	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
+	{
+		$c = clone $criteria;
+		
+		if($c instanceof KalturaCriteria)
+		{
+			$c->applyFilters();
+			$criteria->setRecordsCount($c->getRecordsCount());
+		}
+			
+		return parent::doSelect($c, $con);
 	}
 }

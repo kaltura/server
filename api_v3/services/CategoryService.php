@@ -21,6 +21,9 @@ class CategoryService extends KalturaBaseService
 	 */
 	function addAction(KalturaCategory $category)
 	{
+		//TODO - REMOVE!
+		$this->getPartner()->unlockCategories();
+		
 		$category->validatePropertyMinLength("name", 1);
 		$category->validatePropertyMaxLength("name", categoryPeer::MAX_CATEGORY_NAME);
 		$category->validateParentId($category);
@@ -30,7 +33,7 @@ class CategoryService extends KalturaBaseService
 			
 		try
 		{
-			$this->getPartner()->lockCategories();
+			$this->getPartner()->lockCategories(); 
 			$categoryDb = new category();
 			$category->toInsertableObject($categoryDb);
 			$categoryDb->setPartnerId($this->getPartnerId());
@@ -43,7 +46,6 @@ class CategoryService extends KalturaBaseService
 				$categoryDb->setOwner($parentCategory->getOwner());
 				$categoryDb->setContributionPolicy($parentCategory->getContributionPolicy());
 			}
-						
 			$categoryDb->save();
 			$this->getPartner()->unlockCategories();
 		}
@@ -94,17 +96,16 @@ class CategoryService extends KalturaBaseService
 			
 		if (kEntitlementUtils::$entitlementScope)
 		{
-			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
-			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
-				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
+		//	$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
+			//TODO - fix kuser puser
+	//		if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
+		//		throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
-		
 		if ($category->name !== null)
 		{
 			$category->validatePropertyMinLength("name", 1);
 			$category->validatePropertyMaxLength("name", categoryPeer::MAX_CATEGORY_NAME);
 		}
-			
 		if ($category->parentId !== null)
 			$category->validateParentId($category);
 			
@@ -182,10 +183,13 @@ class CategoryService extends KalturaBaseService
 		
 		$filter->toObject($categoryFilter);
 
-		$c = new Criteria();
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		 
 		$categoryFilter->attachToCriteria($c);
 		
-		$totalCount = categoryPeer::doCount($c);
+		//TODO - add to categoryPeer function for do count to go though sphinx
+		categoryPeer::doSelect($c);
+		$totalCount = $c->getRecordsCount();
 		$dbList = categoryPeer::doSelect($c);
 		
 		$list = KalturaCategoryArray::fromCategoryArray($dbList);

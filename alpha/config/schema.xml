@@ -220,10 +220,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="end_date" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="flavor_params_ids" type="varchar" size="512" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="available_from" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="creator_kuser_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="creator_puser_id" type="varchar" size="64" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entitled_users_edit" type="longvarchar" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entitled_users_publish" type="longvarchar" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="kshow">
 			<reference local="kshow_id" foreign="id" />
 		</foreign-key>

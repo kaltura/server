@@ -318,7 +318,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * list of user ids that are entitled to edit the entry (no server enforcement) The difference between entitledUsersEdit and entitledUsersPublish is applicative only
 	 * 
 	 * @var string
-	 * @filter matchand, matchor
 	 * @requiresPermission insert,update
 	 */
 	public $entitledUsersEdit;
@@ -327,7 +326,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * list of user ids that are entitled to publish the entry (no server enforcement) The difference between entitledUsersEdit and entitledUsersPublish is applicative only
 	 * 
 	 * @var string
-	 * @filter matchand, matchor
 	 * @requiresPermission insert,update
 	 */
 	public $entitledUsersPublish;	

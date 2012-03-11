@@ -15,4 +15,21 @@
  */
 class categoryKuser extends BasecategoryKuser {
 
+	public function getKuserId()
+	{
+		$puser = kuserPeer::retrieveByPK($this->id);
+		if (!$puser)
+			return null;
+			
+		return $puser->getId();
+	}
+	
+	public function setKuserId($puserId)
+	{
+		$kuser = kuserPeer::getKuserByPartnerAndUid(getKuserByPartnerAndUid);
+		if (!$kuser)
+			return;
+			
+		$this->setKuserId($kuser->getId());
+	}
 } // categoryKuser

@@ -422,6 +422,16 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	private $lastmoderationFlagRelatedByFlaggedKuserIdCriteria = null;
 
 	/**
+	 * @var        array categoryKuser[] Collection to store aggregation of categoryKuser objects.
+	 */
+	protected $collcategoryKusers;
+
+	/**
+	 * @var        Criteria The criteria used to select the current contents of collcategoryKusers.
+	 */
+	private $lastcategoryKuserCriteria = null;
+
+	/**
 	 * @var        array UploadToken[] Collection to store aggregation of UploadToken objects.
 	 */
 	protected $collUploadTokens;
@@ -2409,6 +2419,9 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			$this->collmoderationFlagsRelatedByFlaggedKuserId = null;
 			$this->lastmoderationFlagRelatedByFlaggedKuserIdCriteria = null;
 
+			$this->collcategoryKusers = null;
+			$this->lastcategoryKuserCriteria = null;
+
 			$this->collUploadTokens = null;
 			$this->lastUploadTokenCriteria = null;
 
@@ -2646,6 +2659,14 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 
 			if ($this->collmoderationFlagsRelatedByFlaggedKuserId !== null) {
 				foreach ($this->collmoderationFlagsRelatedByFlaggedKuserId as $referrerFK) {
+					if (!$referrerFK->isDeleted()) {
+						$affectedRows += $referrerFK->save($con);
+					}
+				}
+			}
+
+			if ($this->collcategoryKusers !== null) {
+				foreach ($this->collcategoryKusers as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
 						$affectedRows += $referrerFK->save($con);
 					}
@@ -2972,6 +2993,14 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 
 				if ($this->collmoderationFlagsRelatedByFlaggedKuserId !== null) {
 					foreach ($this->collmoderationFlagsRelatedByFlaggedKuserId as $referrerFK) {
+						if (!$referrerFK->validate($columns)) {
+							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+						}
+					}
+				}
+
+				if ($this->collcategoryKusers !== null) {
+					foreach ($this->collcategoryKusers as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
@@ -3759,6 +3788,12 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			foreach ($this->getmoderationFlagsRelatedByFlaggedKuserId() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
 					$copyObj->addmoderationFlagRelatedByFlaggedKuserId($relObj->copy($deepCopy));
+				}
+			}
+
+			foreach ($this->getcategoryKusers() as $relObj) {
+				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+					$copyObj->addcategoryKuser($relObj->copy($deepCopy));
 				}
 			}
 
@@ -5970,6 +6005,207 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Clears out the collcategoryKusers collection (array).
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addcategoryKusers()
+	 */
+	public function clearcategoryKusers()
+	{
+		$this->collcategoryKusers = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collcategoryKusers collection (array).
+	 *
+	 * By default this just sets the collcategoryKusers collection to an empty array (like clearcollcategoryKusers());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @return     void
+	 */
+	public function initcategoryKusers()
+	{
+		$this->collcategoryKusers = array();
+	}
+
+	/**
+	 * Gets an array of categoryKuser objects which contain a foreign key that references this object.
+	 *
+	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
+	 * Otherwise if this kuser has previously been saved, it will retrieve
+	 * related categoryKusers from storage. If this kuser is new, it will return
+	 * an empty collection or the current collection, the criteria is ignored on a new object.
+	 *
+	 * @param      PropelPDO $con
+	 * @param      Criteria $criteria
+	 * @return     array categoryKuser[]
+	 * @throws     PropelException
+	 */
+	public function getcategoryKusers($criteria = null, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(kuserPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collcategoryKusers === null) {
+			if ($this->isNew()) {
+			   $this->collcategoryKusers = array();
+			} else {
+
+				$criteria->add(categoryKuserPeer::KUSER_ID, $this->id);
+
+				categoryKuserPeer::addSelectColumns($criteria);
+				$this->collcategoryKusers = categoryKuserPeer::doSelect($criteria, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return the collection.
+
+
+				$criteria->add(categoryKuserPeer::KUSER_ID, $this->id);
+
+				categoryKuserPeer::addSelectColumns($criteria);
+				if (!isset($this->lastcategoryKuserCriteria) || !$this->lastcategoryKuserCriteria->equals($criteria)) {
+					$this->collcategoryKusers = categoryKuserPeer::doSelect($criteria, $con);
+				}
+			}
+		}
+		$this->lastcategoryKuserCriteria = $criteria;
+		return $this->collcategoryKusers;
+	}
+
+	/**
+	 * Returns the number of related categoryKuser objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related categoryKuser objects.
+	 * @throws     PropelException
+	 */
+	public function countcategoryKusers(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(kuserPeer::DATABASE_NAME);
+		} else {
+			$criteria = clone $criteria;
+		}
+
+		if ($distinct) {
+			$criteria->setDistinct();
+		}
+
+		$count = null;
+
+		if ($this->collcategoryKusers === null) {
+			if ($this->isNew()) {
+				$count = 0;
+			} else {
+
+				$criteria->add(categoryKuserPeer::KUSER_ID, $this->id);
+
+				$count = categoryKuserPeer::doCount($criteria, false, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return count of the collection.
+
+
+				$criteria->add(categoryKuserPeer::KUSER_ID, $this->id);
+
+				if (!isset($this->lastcategoryKuserCriteria) || !$this->lastcategoryKuserCriteria->equals($criteria)) {
+					$count = categoryKuserPeer::doCount($criteria, false, $con);
+				} else {
+					$count = count($this->collcategoryKusers);
+				}
+			} else {
+				$count = count($this->collcategoryKusers);
+			}
+		}
+		return $count;
+	}
+
+	/**
+	 * Method called to associate a categoryKuser object to this object
+	 * through the categoryKuser foreign key attribute.
+	 *
+	 * @param      categoryKuser $l categoryKuser
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addcategoryKuser(categoryKuser $l)
+	{
+		if ($this->collcategoryKusers === null) {
+			$this->initcategoryKusers();
+		}
+		if (!in_array($l, $this->collcategoryKusers, true)) { // only add it if the **same** object is not already associated
+			array_push($this->collcategoryKusers, $l);
+			$l->setkuser($this);
+		}
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this kuser is new, it will return
+	 * an empty collection; or if this kuser has previously
+	 * been saved, it will retrieve related categoryKusers from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in kuser.
+	 */
+	public function getcategoryKusersJoincategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(kuserPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collcategoryKusers === null) {
+			if ($this->isNew()) {
+				$this->collcategoryKusers = array();
+			} else {
+
+				$criteria->add(categoryKuserPeer::KUSER_ID, $this->id);
+
+				$this->collcategoryKusers = categoryKuserPeer::doSelectJoincategory($criteria, $con, $join_behavior);
+			}
+		} else {
+			// the following code is to determine if a new query is
+			// called for.  If the criteria is the same as the last
+			// one, just return the collection.
+
+			$criteria->add(categoryKuserPeer::KUSER_ID, $this->id);
+
+			if (!isset($this->lastcategoryKuserCriteria) || !$this->lastcategoryKuserCriteria->equals($criteria)) {
+				$this->collcategoryKusers = categoryKuserPeer::doSelectJoincategory($criteria, $con, $join_behavior);
+			}
+		}
+		$this->lastcategoryKuserCriteria = $criteria;
+
+		return $this->collcategoryKusers;
+	}
+
+	/**
 	 * Clears out the collUploadTokens collection (array).
 	 *
 	 * This does not modify the database; however, it will remove any associated objects, causing
@@ -6396,6 +6632,11 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 					$o->clearAllReferences($deep);
 				}
 			}
+			if ($this->collcategoryKusers) {
+				foreach ((array) $this->collcategoryKusers as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
 			if ($this->collUploadTokens) {
 				foreach ((array) $this->collUploadTokens as $o) {
 					$o->clearAllReferences($deep);
@@ -6420,6 +6661,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		$this->collmoderations = null;
 		$this->collmoderationFlagsRelatedByKuserId = null;
 		$this->collmoderationFlagsRelatedByFlaggedKuserId = null;
+		$this->collcategoryKusers = null;
 		$this->collUploadTokens = null;
 		$this->collKuserToUserRoles = null;
 	}

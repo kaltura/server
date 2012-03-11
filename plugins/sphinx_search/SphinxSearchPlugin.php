@@ -33,6 +33,9 @@ class SphinxSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers
 		if ($objectType == "entry")
 			return new SphinxEntryCriteria();
 			
+		if ($objectType == "category")
+			return new SphinxCategoryCriteria();
+			
 		return null;
 	}
 

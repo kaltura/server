@@ -1,9 +1,3 @@
-ALTER TABLE entry
-ADD `creator_kuser_id` INTEGER,
-ADD `creator_puser_id` VARCHAR(64),
-ADD	`entitled_users_edit` TEXT,
-ADD	`entitled_users_publish` TEXT;
-	
 ALTER TABLE category
 ADD `status` INTEGER,
 ADD `direct_entries_count` INTEGER default 0,
@@ -21,8 +15,7 @@ ADD `reference_id` VARCHAR(512),
 ADD `contribution_policy` TINYINT default 2,
 ADD `custom_data` TEXT,
 ADD `privacy_context` TINYINT default 0,
-ADD `privacy_contexts` VARCHAR(255),
-ADD  KEY `partner_id_full_name_index`(`partner_id`, `full_name`);
+ADD `privacy_contexts` VARCHAR(255);
 	
 CREATE TABLE `category_kuser`
 (
