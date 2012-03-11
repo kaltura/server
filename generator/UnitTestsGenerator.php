@@ -663,10 +663,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 
 		if($outputType) //If we have an output then we check it
 		{
-			$this->write("		if(method_exists(\$this, 'assertNotInstanceOf'))", $isBase);
-			$this->write("			\$this->assertNotInstanceOf('$outputType', \$resultObject);", $isBase);
+			$this->write("		if(method_exists(\$this, 'assertInstanceOf'))", $isBase);
+			$this->write("			\$this->assertInstanceOf('$outputType', \$resultObject);", $isBase);
 			$this->write("		else", $isBase);
-			$this->write("			\$this->assertNotType('$outputType', get_class(\$resultObject));", $isBase);
+			$this->write("			\$this->assertType('$outputType', \$resultObject);", $isBase);
 
 			//TODO: create an ignore field array to be populated dynamically (maybe from the service reflector)
 			$ignoreFields = array("createdAt", "updatedAt", "id", "thumbnailUrl",
