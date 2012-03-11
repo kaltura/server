@@ -114,9 +114,13 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 	 * @param KalturaObjectBase $object1
 	 * @param KalturaObjectBase $object2
 	 */
-	public function assertAPIObjects(KalturaObjectBase $expectedObject, KalturaObjectBase $actualObject, $skip = array())
+	public function assertAPIObjects(KalturaObjectBase $expectedObject, KalturaObjectBase $actualObject, $skip = array(), $objectName = '')
 	{
-		KalturaLog::debug("Comparing expected object [" . get_class($expectedObject) . "] to actual object [" . get_class($actualObject) . "]");
+		$objectName .= get_class($actualObject);
+		if(property_exists($actualObject, 'id'))
+			$objectName .= " id [{$actualObject->id}]";
+			
+		KalturaLog::debug("Comparing expected object [" . get_class($expectedObject) . "] to actual $objectName");
 		
 		//Use reflection to compare the objects
 		$outputReferenceReflector = new ReflectionClass($expectedObject);
@@ -140,41 +144,44 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 			$actualValue = $property->getValue($actualObject);
 			$actualType = gettype($actualValue) == 'object' ? get_class($actualValue) : gettype($actualValue);
 			
-			KalturaLog::debug("Comparing propery [$propertyName] expected type [$expectedType] actual type [$actualType]");
+			KalturaLog::debug("Comparing attribute [$propertyName] expected type [$expectedType] actual type [$actualType] on $objectName");
 			
 			if($expectedValue instanceof KalturaObjectBase)
 			{
-				if(method_exists($this, 'assertNotInstanceOf'))
-					$this->assertNotInstanceOf(get_class($expectedValue), $actualValue);
+				if(method_exists($this, 'assertInstanceOf'))
+					$this->assertInstanceOf(get_class($expectedValue), $actualValue, "$objectName attribute [$propertyName] is not expected type [" . get_class($expectedValue) . "]");
 				else
-					$this->assertNotType(get_class($expectedValue), get_class($actualValue));
+					$this->assertType(get_class($expectedValue), $actualValue, "$objectName attribute [$propertyName] is not expected type [" . get_class($expectedValue) . "]");
 					
-				$this->assertAPIObjects($expectedValue, $actualValue);
+				$this->assertAPIObjects($expectedValue, $actualValue, array(), "$objectName attribute [$propertyName] ");
 				continue;
 			}
 			
 			if(is_array($expectedValue))
 			{
-				$this->assertType('array', $actualValue);
+				$this->assertType('array', $actualValue, "$objectName attribute [$propertyName] is not array");
 				foreach($expectedValue as $key => $expectedKeyValue)
 				{
-					$message = "attribute [$propertyName] missing array key [$key]";
+					$message = "$objectName attribute [$propertyName] missing array key [$key]";
 					$this->assertArrayHasKey($key, $actualValue, $message);
 					
 					$actualKeyValue = $actualValue[$key];
 				
 					if($expectedKeyValue instanceof KalturaObjectBase)
 					{
-						if(method_exists($this, 'assertNotInstanceOf'))
-							$this->assertNotInstanceOf(get_class($expectedKeyValue), $actualKeyValue);
+						if(method_exists($this, 'assertInstanceOf'))
+							$this->assertInstanceOf(get_class($expectedKeyValue), $actualKeyValue, "$objectName attribute [$propertyName] key [$key] is not expected type [" . get_class($expectedKeyValue) . "]");
 						else
-							$this->assertNotType(get_class($expectedKeyValue), get_class($actualKeyValue));
+							$this->assertType(get_class($expectedKeyValue), $actualKeyValue, "$objectName attribute [$propertyName] key [$key] is not expected type [" . get_class($expectedKeyValue) . "]");
 							
-						$this->assertAPIObjects($expectedKeyValue, $actualKeyValue);
+						$this->assertAPIObjects($expectedKeyValue, $actualKeyValue, array(), "$objectName attribute [$propertyName] key [$key] ");
 						continue;
 					}
 					
-					$message = "attribute [$propertyName] array key [$key] expected value [$expectedKeyValue] and actual value [$actualKeyValue]";
+					if($actualKeyValue instanceof KalturaObjectBase)
+						$this->fail("$objectName attribute [$propertyName] array key [$key] expected type [" . gettype($expectedKeyValue) . "] and actual type [" . get_class($actualKeyValue) . "]");
+					
+					$message = "$objectName attribute [$propertyName] array key [$key] expected value [$expectedKeyValue] and actual value [$actualKeyValue]";
 					$this->assertEquals($expectedKeyValue, $actualKeyValue, $message);
 				}
 				
@@ -184,7 +191,7 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 			$expectedValue = strval($expectedValue);
 			$actualValue = strval($actualValue);
 			
-			$message = "attribute [$propertyName] expected value [$expectedValue] and actual value [$actualValue]";
+			$message = "$objectName attribute [$propertyName] expected value [$expectedValue] and actual value [$actualValue]";
 			$this->assertEquals($expectedValue, $actualValue, $message);
 		}
 	

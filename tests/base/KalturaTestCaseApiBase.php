@@ -278,7 +278,7 @@ class KalturaTestCaseApiBase extends PHPUnit_Framework_TestCase
 						}
 						catch (KalturaTestException $e)
 						{
-							KalturaLog::log($e->getMessage());
+							$this->fail($e->getMessage());
 						}
 					}
 				}
@@ -314,11 +314,11 @@ class KalturaTestCaseApiBase extends PHPUnit_Framework_TestCase
 			catch (Exception $e)
 			{
 				KalturaLog::err($e->getMessage());
-				throw $e;
+				$this->fail($e->getMessage());
 			}
 		}
-			
-		throw new Exception('Calling method not found');
+		
+		$this->fail('Calling method not found');
 	}
 
 	/* (non-PHPdoc)
