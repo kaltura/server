@@ -50,7 +50,25 @@ $baseConfigurationIndexs = 	array(
 		'available_from'			=> SphinxFieldType::RT_ATTR_TIMESTAMP,	
 		
 		'str_entry_id'				=> SphinxFieldType::RT_ATTR_STRING),
-	)
+	);
+	
+	'kaltura_category' => array(
+		'type'					=> 'rt',	
+		'path'					=> '/sphinx/kaltura_category_rt',
+	
+		'fields' => array( 
+			'category_id'		=> SphinxFieldType::RT_FIELD,
+			'name'       	    => SphinxFieldType::RT_FIELD,
+			'partner_id' 		=> IIndexable::FIELD_TYPE_INTEGER,
+			'full_name' 		=> IIndexable::FIELD_TYPE_STRING,
+			'description'	 	=> IIndexable::FIELD_TYPE_STRING,
+			'tags' 				=> IIndexable::FIELD_TYPE_STRING,
+			'category_status'	=> IIndexable::FIELD_TYPE_INTEGER,
+			'kuser_id' 			=> IIndexable::FIELD_TYPE_INTEGER,
+			'listing'			=> IIndexable::FIELD_TYPE_INTEGER,
+			'search_text' 		=> IIndexable::FIELD_TYPE_STRING,
+			'members' 			=> IIndexable::FIELD_TYPE_STRING
+			))
 );
 		
 $baseConfigurations = array (
