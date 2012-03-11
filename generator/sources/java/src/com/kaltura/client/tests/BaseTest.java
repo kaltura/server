@@ -28,20 +28,25 @@
 package com.kaltura.client.tests;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+
 import junit.framework.TestCase;
+
+import org.apache.log4j.Logger;
+
 import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.KalturaClient;
 import com.kaltura.client.KalturaConfiguration;
 import com.kaltura.client.enums.KalturaEntryStatus;
-import com.kaltura.client.enums.KalturaEntryType;
 import com.kaltura.client.enums.KalturaMediaType;
 import com.kaltura.client.enums.KalturaSessionType;
 import com.kaltura.client.services.KalturaMediaService;
 import com.kaltura.client.services.KalturaSessionService;
 import com.kaltura.client.types.KalturaMediaEntry;
+import com.kaltura.client.types.KalturaUploadToken;
+import com.kaltura.client.types.KalturaUploadedFileTokenResource;
 
 public class BaseTest extends TestCase {
 	public KalturaConfiguration kalturaConfig = new KalturaConfiguration();
@@ -53,114 +58,20 @@ public class BaseTest extends TestCase {
 
 	protected boolean doCleanup = true;
 
-	private Logger logger = Logger.getLogger(BaseTest.class);
+	private static Logger logger = Logger.getLogger(BaseTest.class);
 
 	@Override
 	protected void setUp() throws Exception {
-		if (KalturaTestConfig.SECRET == "") {
-			throw(new Error("Please fill the partner credentials to use"));
+		if (KalturaTestConfig.SECRET.isEmpty()) {
+			throw new Error("Please fill the partner credentials to use");
 		}
+		
+		// Create client
 		this.kalturaConfig.setPartnerId(KalturaTestConfig.PARTNER_ID);
 		this.kalturaConfig.setSecret(KalturaTestConfig.SECRET);
 		this.kalturaConfig.setAdminSecret(KalturaTestConfig.ADMIN_SECRET);
 		this.kalturaConfig.setEndpoint(KalturaTestConfig.ENDPOINT);
 		this.client = new KalturaClient(this.kalturaConfig);
-	}
-	
-	protected void startUserSession() {
-		try {
-	        KalturaSessionService sessionService = this.client.getSessionService();
-
-			String sessionId = sessionService.start(this.kalturaConfig.getSecret(),
-	        										"admin",
-	        										KalturaSessionType.USER,
-	        										this.kalturaConfig.getPartnerId(),
-	        										86400,
-	        								 		"");
-	        logger.debug("Session id:" + sessionId);
-	        this.client.setSessionId(sessionId);
-        
-		} catch (Exception kae) {
-			logger.error("Caught exception during setup", kae);
-		}
-	}
-	
-	protected void startAdminSession() {
-		try {
-	        KalturaSessionService sessionService = this.client.getSessionService();
-
-	        String sessionId = sessionService.start(this.kalturaConfig.getAdminSecret(),
-	        										"admin",
-	        										KalturaSessionType.ADMIN,
-	        										this.kalturaConfig.getPartnerId(),
-	        										86400,
-	        								 		"");
-	        logger.debug("Session id:" + sessionId);
-	        this.client.setSessionId(sessionId);
-	        
-		} catch (Exception kae) {
-			logger.error("Caught exception during setup", kae);
-		}
-	}
-	
-	protected KalturaMediaEntry addClip(String name) {
-
-		KalturaMediaEntry entry = new KalturaMediaEntry();
-		
-		entry.name = name;
-		entry.type = KalturaEntryType.MEDIA_CLIP;
-		entry.mediaType = KalturaMediaType.VIDEO;
-		
-		KalturaMediaEntry addedEntry = null;
-		try {
-			KalturaMediaService mediaService = this.client.getMediaService();
-			addedEntry = mediaService.addFromUrl(entry, KalturaTestConfig.testUrl);
-		} catch (KalturaApiException kae) {
-			logger.error("Caught exception during add from url", kae);
-		}
-		
-		if (addedEntry != null) {
-			this.testIds.add(addedEntry.id);
-		}
-		
-		return addedEntry;
-	}
-	
-	protected KalturaMediaEntry getProcessedClip(String id) throws Exception {
-		return getProcessedClip(id, false);
-	}
-	
-	protected KalturaMediaEntry getProcessedClip(String id, Boolean checkReady) throws Exception {
-		int maxTries = 30;
-		int sleepInterval = 300000;
-		int counter = 0;
-		KalturaMediaEntry retrievedEntry = null;		
-		try {
-			KalturaMediaService mediaService = this.client.getMediaService();
-			retrievedEntry = mediaService.get(id);
-			while (checkReady && retrievedEntry.status != KalturaEntryStatus.READY) {
-				
-				counter++;
-
-				if (counter >= maxTries) {
-					throw new Exception("Max retries (" + maxTries + ") when retrieving entry:" + id);
-				} else {
-					logger.info("On try: " + counter + ", clip not ready. waiting "+(sleepInterval/60000)+" minutes...");
-					try {
-						Thread.sleep(sleepInterval);
-					} catch (InterruptedException ie) {							
-					}
-				}
-				
-				retrievedEntry = mediaService.get(id);				
-				
-			} //wend
-		
-		} catch (KalturaApiException kae) {
-			logger.error("Problem retrieving entry: " + kae.getLocalizedMessage());
-		} 
-	
-		return retrievedEntry;
 	}
 	
 	@Override
@@ -174,11 +85,100 @@ public class BaseTest extends TestCase {
 		for (String id : this.testIds) {
 			logger.info("Deleting " + id);
 			try {
-				getProcessedClip(id);
+				getProcessedEntry(client, id);
 				mediaService.delete(id);			
 			} catch (Exception e) {
 				logger.error("Couldn't delete " + id, e);
+				fail();
 			}
 		} //next id
+	}
+	
+	
+	public static void startUserSession(KalturaClient client, KalturaConfiguration kalturaConfig) throws KalturaApiException{
+		startSession(client, kalturaConfig, kalturaConfig.getSecret(), KalturaSessionType.USER);
+	}
+	
+	public static void startAdminSession(KalturaClient client, KalturaConfiguration kalturaConfig) throws KalturaApiException{
+		startSession(client, kalturaConfig, kalturaConfig.getAdminSecret(), KalturaSessionType.ADMIN);
+	}
+	
+	protected static void startSession(KalturaClient client, KalturaConfiguration kalturaConfig, String secret,
+			KalturaSessionType type) throws KalturaApiException {
+		
+		KalturaSessionService sessionService = client.getSessionService();
+
+		String sessionId = sessionService.start(secret, "admin", type,
+				kalturaConfig.getPartnerId(), 86400, "");
+		logger.debug("Session id:" + sessionId);
+		client.setSessionId(sessionId);
+	}
+	
+	public static void closeSession(KalturaClient client) throws KalturaApiException {
+		client.getSessionService().end();
+	}
+	
+	// Entry utils
+	
+	public static KalturaMediaEntry addTestImage(BaseTest container, KalturaClient client, String name) throws KalturaApiException
+	{
+		KalturaMediaEntry entry = new KalturaMediaEntry();
+		entry.name = name;
+		entry.mediaType = KalturaMediaType.IMAGE;
+		File file = new File(KalturaTestConfig.UPLOAD_IMAGE);
+		entry = client.getMediaService().add(entry);
+		
+		// Upload token
+		KalturaUploadToken uploadToken = new KalturaUploadToken();
+		uploadToken.fileName = file.getName();
+		uploadToken.fileSize = file.length();
+		KalturaUploadToken token = client.getUploadTokenService().add(uploadToken);
+		assertNotNull(token);
+		
+		// Define content
+		KalturaUploadedFileTokenResource resource = new KalturaUploadedFileTokenResource();
+		resource.token = token.id;
+		entry = client.getMediaService().addContent(entry.id, resource);
+		assertNotNull(entry);
+		
+		// upload
+		uploadToken = client.getUploadTokenService().upload(token.id, file, false);
+		container.testIds.add(entry.id);
+		return client.getMediaService().get(entry.id);
+	}
+	
+	public static KalturaMediaEntry getProcessedEntry(KalturaClient client, String id) throws Exception {
+		return getProcessedEntry(client, id, false);
+	}
+	
+	public static KalturaMediaEntry getProcessedEntry(KalturaClient client, String id,
+			Boolean checkReady) throws KalturaApiException {
+		int maxTries = 50;
+		int sleepInterval = 30 * 1000;
+		int counter = 0;
+		KalturaMediaEntry retrievedEntry = null;
+		KalturaMediaService mediaService = client.getMediaService();
+		retrievedEntry = mediaService.get(id);
+		while (checkReady && retrievedEntry.status != KalturaEntryStatus.READY) {
+
+			counter++;
+
+			if (counter >= maxTries) {
+				throw new RuntimeException("Max retries (" + maxTries
+						+ ") when retrieving entry:" + id);
+			} else {
+				logger.info("On try: " + counter + ", clip not ready. waiting "
+						+ (sleepInterval / 1000) + " seconds...");
+				try {
+					Thread.sleep(sleepInterval);
+				} catch (InterruptedException ie) {
+					throw new RuntimeException("Failed while waiting for entry");
+				}
+			}
+
+			retrievedEntry = mediaService.get(id);
+		}
+
+		return retrievedEntry;
 	}
 }

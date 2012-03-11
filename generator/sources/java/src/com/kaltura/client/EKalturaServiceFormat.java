@@ -27,7 +27,9 @@
 // ===================================================================================================
 package com.kaltura.client;
 
-public enum EKalturaServiceFormat {
+import com.kaltura.client.enums.KalturaEnumAsInt;
+
+public enum EKalturaServiceFormat implements KalturaEnumAsInt{
 
 	RESPONSE_TYPE_JSON(1),
 	RESPONSE_TYPE_XML(2),

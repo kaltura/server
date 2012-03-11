@@ -27,109 +27,150 @@
 // ===================================================================================================
 package com.kaltura.client;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+
+import com.kaltura.client.enums.KalturaEnumAsInt;
+import com.kaltura.client.enums.KalturaEnumAsString;
 
 /**
- * Helper class that provides a collection of Kaltura parameters (key-value pairs).
+ * Helper class that provides a collection of Kaltura parameters (key-value
+ * pairs).
  * 
  * @author jpotts
- *
+ * 
  */
 public class KalturaParams extends HashMap<String, String> {
+	
+	private static final String PARAMS_SEPERATOR = ":";
 
 	private static final long serialVersionUID = 6630046786691120850L;
 
-	public String toQueryString() {
-		String str = "";
-		
-		Set<String> s = this.keySet();
-		Iterator<String> it = s.iterator( );
-		while (it.hasNext()) {
-			String name = (String)it.next();
-			String value = (String)this.get(name);
-			try {
-				str += (name + "=" + URLEncoder.encode (value, "UTF-8") + "&");
-			} catch (Exception e) {
-				//TODO handle this
-			}
-		}
-		
-        if (str.endsWith("&"))
-            str = str.substring(0, str.length() - 1);
+	private static final String ENCODING = "UTF-8";
+	
+	public String toQueryString() throws KalturaApiException {
 
-        return str;        
+		try {
+			StringBuffer str = new StringBuffer();
+
+			boolean isFirst = true;
+			for (java.util.Map.Entry<String, String> itr : this.entrySet()) {
+				if(isFirst) {
+					isFirst = false;
+				} else {
+					str.append("&");
+				}
+				str.append(itr.getKey());
+				str.append("=");
+				str.append(URLEncoder.encode(itr.getValue(), ENCODING));
+			}
+
+			return str.toString();
+		} catch (UnsupportedEncodingException e) {
+			throw new KalturaApiException("Failed to generate query string");
+		}
+	}
+
+	public void add(String key, int value) {
+		if (value == KalturaParamsValueDefaults.KALTURA_UNDEF_INT)
+			return;
+		if (value == KalturaParamsValueDefaults.KALTURA_NULL_INT)
+			putNull(key);
+		else
+			this.put(key, Integer.toString(value));
+	}
+
+	public void add(String key, float value) {
+		if (value == KalturaParamsValueDefaults.KALTURA_UNDEF_FLOAT)
+			return;
+		if (value == KalturaParamsValueDefaults.KALTURA_NULL_FLOAT)
+			putNull(key);
+		else
+			this.put(key, Float.toString(value));
+	}
+
+	public void add(String key, String value) {
+		if (value == null)
+			return;
+		if (value.equals(KalturaParamsValueDefaults.KALTURA_NULL_STRING))
+			putNull(key);
+		else
+			this.put(key, value);
 	}
 	
-	public void add(String objectName, KalturaParams objectProperties) {
-        for (String key : objectProperties.keySet()) {
-            this.put(objectName + ":" + key, objectProperties.get(key));            
-        }
-    }
-
-	public void add(KalturaParams objectProperties) {
-		this.putAll(objectProperties);
-    }
-
-	public void setString(String key, String value) {
-		if(this.get(key) != null)
-			this.remove(key);
-        this.put(key, value);
-    }
-	
-	public void addObjectIfNotNull(String key, KalturaObjectBase object) {
+	public void add(String key, KalturaObjectBase object) {
 		if (object == null)
 			return;
-		
-		KalturaParams params = object.toParams();
-		Set<String> s = params.keySet();
-		Iterator<String> it = s.iterator( );
-		while (it.hasNext()) {
-			String name = (String)it.next();
-			String value = (String)params.get(name);
-			this.put(key + ":" + name, value);
+
+		for (java.util.Map.Entry<String, String> itr : object.toParams().entrySet()) {
+			this.put(key + PARAMS_SEPERATOR + itr.getKey(), itr.getValue());
 		}
-    }
-	
-	public void addObjectIfNotNull(String key, ArrayList array) {
+	}
+
+	public <T extends KalturaObjectBase> void add(String key, ArrayList<T> array) {
 		if (array == null)
 			return;
-		
+
 		int index = 0;
-		for(KalturaObjectBase object : (ArrayList<KalturaObjectBase>)array)
-		{
-			KalturaParams params = object.toParams();
-			Set<String> s = params.keySet();
-			Iterator<String> it = s.iterator( );
-			while (it.hasNext()) {
-				String name = (String)it.next();
-				String value = (String)params.get(name);
-				this.put(key + ":" + index + ":" + name, value);
+		for (KalturaObjectBase baseObj : array) {
+			for (java.util.Map.Entry<String, String> itr : baseObj.toParams().entrySet()) {
+				this.put(key + PARAMS_SEPERATOR + index + PARAMS_SEPERATOR
+						+ itr.getKey(), itr.getValue());
 			}
 			index++;
 		}
-		if (array.isEmpty())
-		{
-			this.put(key + ":-", "");
+
+		if (array.isEmpty()) {
+			this.put(key + PARAMS_SEPERATOR + "-", "");
 		}
-    }
-
-	public void addStringIfNotNull(String key, String value) {
-        if (value != null) this.put(key, value);
-    }
-
-	public void addIntIfNotNull(String key, int value) {
-        if (value != Integer.MIN_VALUE) this.put(key, Integer.toString(value));
-    }
+	}
 	
-	public void addFloatIfNotNull(String key, float value) {
-        if (value != Float.MIN_VALUE) this.put(key, Float.toString(value));
-    }
+	public void add(KalturaParams objectProperties) {
+		this.putAll(objectProperties);
+	}
 	
-    public void addBoolIfNotNull(String key, boolean value) {
-        this.put(key, value ? "1" : "0");
-    }
+	public void addMulti(int idx, KalturaParams objectProperties) {
+		for (java.util.Map.Entry<String, String> itr : objectProperties.entrySet()) {
+			this.put(Integer.toString(idx) + PARAMS_SEPERATOR + itr.getKey(), itr.getValue());           
+		}
+	}
+	
+	public void addMulti(int idx, String key, String value) {
+		this.put(Integer.toString(idx) + PARAMS_SEPERATOR + key, value);
+	}
+
+	protected void putNull(String key) {
+		this.put(key + "__null", "");
+	}
+	
+	/**
+	 * Pay attention - this function does not check if the value is null.
+	 * neither it supports setting value to null.
+	 */
+	public void add(String key, boolean value) {
+		this.put(key, value ? "1" : "0");
+	}
+	
+	/**
+	 * Pay attention - this function does not support setting value to null.
+	 */
+	public void add(String key, KalturaEnumAsString value) {
+		if(value == null) 
+			return;
+		
+		add(key, value.getHashCode());
+	}
+	
+	/**
+	 * Pay attention - this function does not support setting value to null.
+	 */
+	public void add(String key, KalturaEnumAsInt value) {
+		if(value == null) 
+			return;
+		
+		add(key, value.getHashCode());
+	}
+	
 }

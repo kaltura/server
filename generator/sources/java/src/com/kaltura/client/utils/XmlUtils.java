@@ -27,7 +27,6 @@
 // ===================================================================================================
 package com.kaltura.client.utils;
 
-import java.io.ByteArrayInputStream;
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -47,7 +46,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.traversal.NodeIterator;
 import org.xml.sax.SAXException;
 
-import com.kaltura.client.KalturaApiException;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
 public class XmlUtils {

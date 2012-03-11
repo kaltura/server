@@ -32,16 +32,18 @@ import junit.framework.TestSuite;
 
 public class KalturaTestSuite {
 		
-	@SuppressWarnings("unchecked")
 	public static Test suite() {
 			
-		Class[] testClasses = { SystemServiceTest.class,
-								SessionServiceTest.class,
-								MediaServiceTest.class,
-								UiConfServiceTest.class };
-		
-		TestSuite suite = new TestSuite(testClasses);
-		
+		TestSuite suite = new TestSuite();
+		suite.addTestSuite(SystemServiceTest.class);
+		suite.addTestSuite(SessionServiceTest.class);
+		suite.addTestSuite(MediaServiceTest.class);
+		suite.addTestSuite(MediaServiceFieldsTest.class);
+		suite.addTestSuite(UiConfServiceTest.class);
+		suite.addTestSuite(MultiRequestTest.class);
+		suite.addTestSuite(PluginTest.class);
+		suite.addTestSuite(ErrorTest.class);
+
 		return suite;
 
 	}

@@ -38,6 +38,17 @@ public class KalturaServiceActionCall {
     private String action;
     private KalturaParams params;
     private KalturaFiles files;
+    
+    public KalturaServiceActionCall(String service, String action, KalturaParams kparams) {
+        this(service, action, kparams, new KalturaFiles());
+    }
+
+    public KalturaServiceActionCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles) {
+        this.service = service;
+        this.action = action;
+        this.params = kparams;
+        this.files = kfiles;
+    }
 
     public String getService() {
         return this.service;
@@ -57,33 +68,19 @@ public class KalturaServiceActionCall {
 
     public KalturaParams getParamsForMultiRequest(int multiRequestNumber) {
         KalturaParams multiRequestParams = new KalturaParams();
-        multiRequestParams.put(multiRequestNumber + ":service", this.service);
-        multiRequestParams.put(multiRequestNumber + ":action", this.action);
-        for (String param : this.params.keySet()) {
-            multiRequestParams.put(multiRequestNumber + ":" + param, this.params.get(param));
-        }
-
+        
+        multiRequestParams.addMulti(multiRequestNumber, "service", this.service);
+        multiRequestParams.addMulti(multiRequestNumber, "action", this.action);
+        multiRequestParams.addMulti(multiRequestNumber, this.params);
+        
         return multiRequestParams;
     }
 
     public KalturaFiles getFilesForMultiRequest(int multiRequestNumber) {
-        KalturaFiles multiRequestParams = new KalturaFiles();
-        for (String param : this.files.keySet()) {
-            multiRequestParams.put(multiRequestNumber + ":" + param, this.files.get(param));
-        }
-
-        return multiRequestParams;
-    }
-
-    public KalturaServiceActionCall(String service, String action, KalturaParams kparams) {
-        this(service, action, kparams, new KalturaFiles());
-    }
-
-    public KalturaServiceActionCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles) {
-        this.service = service;
-        this.action = action;
-        this.params = kparams;
-        this.files = kfiles;
+    	
+        KalturaFiles multiRequestFiles = new KalturaFiles();
+        multiRequestFiles.add(Integer.toString(multiRequestNumber), this.files);
+        return multiRequestFiles;
     }
 
 }

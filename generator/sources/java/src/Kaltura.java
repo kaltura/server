@@ -28,17 +28,15 @@
 
 import java.io.File;
 
-import sun.management.FileSystem;
-
-import com.kaltura.client.*;
+import com.kaltura.client.KalturaApiException;
+import com.kaltura.client.KalturaClient;
+import com.kaltura.client.KalturaConfiguration;
+import com.kaltura.client.KalturaMultiResponse;
 import com.kaltura.client.enums.KalturaEntryStatus;
-import com.kaltura.client.enums.KalturaEntryType;
 import com.kaltura.client.enums.KalturaMediaType;
 import com.kaltura.client.enums.KalturaSessionType;
 import com.kaltura.client.services.KalturaMediaService;
 import com.kaltura.client.tests.KalturaTestConfig;
-import com.kaltura.client.types.KalturaBaseEntry;
-import com.kaltura.client.types.KalturaBaseEntryListResponse;
 import com.kaltura.client.types.KalturaMediaEntry;
 import com.kaltura.client.types.KalturaMediaListResponse;
 import com.kaltura.client.types.KalturaPartner;
@@ -47,165 +45,170 @@ import com.kaltura.client.types.KalturaUploadedFileTokenResource;
 
 public class Kaltura {
 	
+	private static final int WAIT_BETWEEN_TESTS = 30000;
+	private static final String SERVICE_URL = "http://www.kaltura.com";
 	static public KalturaClient client;
 	
-	// shows a few sample Kaltura Api calls
-	public Kaltura() {	}
-
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		if (KalturaTestConfig.SECRET == "") {
-			throw(new Error("Please fill the partner credentials to use in the KalturaTestConfig class"));
+		
+		if (KalturaTestConfig.SECRET.isEmpty()) {
+			throw new Error("Please fill the partner credentials to use in the KalturaTestConfig class");
 		}
-		Kaltura samples = new Kaltura();
-		samples.list();
-		samples.multiRequest();
-		KalturaMediaEntry entry = samples.addEmptyEntry();
-		samples.uploadMediaFileAndAttachToEmptyEntry(entry);
-		samples.testIfEntryIsReadyForPublish(entry);
-		//cleanup the sample by deleting the entry:
-		samples.deleteEntry(entry);
-		System.out.print("\nSample code finished successfully.");
+		
+		try {
+
+			list();
+			multiRequest();
+			KalturaMediaEntry entry = addEmptyEntry();
+			uploadMediaFileAndAttachToEmptyEntry(entry);
+			testIfEntryIsReadyForPublish(entry);
+			// cleanup the sample by deleting the entry:
+			deleteEntry(entry);
+			System.out.println("Sample code finished successfully.");
+			
+		} catch (KalturaApiException e) {
+			System.out.println("Example failed.");
+			e.printStackTrace();
+		}
 	}
 	
-	
-	//helper function to create the Kaltura client object once and then reuse a static instance.
-	private KalturaClient getKalturaClient() throws KalturaApiException
+	/**
+	 * Helper function to create the Kaltura client object once and then reuse a static instance.
+	 * @return a singleton of <code>KalturaClient</code> used in this case 
+	 * @throws KalturaApiException if failed to generate session
+	 */
+	private static KalturaClient getKalturaClient() throws KalturaApiException
 	{
+		if (client != null) {
+			return client;
+		}
+		
+		// Set Constants
 		int partnerId = KalturaTestConfig.PARTNER_ID;
 		String adminSecret = KalturaTestConfig.ADMIN_SECRET;
-		Boolean isAdmin = true;
-		if (client != null) return client;
+		String userId = KalturaTestConfig.USER_NAME;
+		
+		// Generate configuration
 		KalturaConfiguration config = new KalturaConfiguration();
 		config.setPartnerId(partnerId);
-		config.setEndpoint("http://www.kaltura.com");
-		client = new KalturaClient(config);
-		String userId="SomeOneWeKnow"; 
-		KalturaSessionType type = (isAdmin ? KalturaSessionType.ADMIN: KalturaSessionType.USER);
+		config.setEndpoint(SERVICE_URL);
+		
 		try {
-			String ks = client.generateSession(adminSecret, userId, type, partnerId);
-			System.out.print("\nGenerated KS locally: ["+ks+"]");
+			// Create the client and open session
+			client = new KalturaClient(config);
+			String ks = client.generateSession(adminSecret, userId, KalturaSessionType.ADMIN, partnerId);
 			client.setSessionId(ks);
 		} catch(Exception ex) {
-			throw new KalturaApiException();
+			client = null;
+			throw new KalturaApiException("Failed to generate session");
 		}
+		
+		System.out.println("Generated KS locally: [" + client.getSessionId() + "]");
 		return client;
 	}
 	
-	//lists all media in the account and prints the first entry name
-	public void list()
-	{
-		try {
-			KalturaClient client = getKalturaClient();			
-			//Should not call Base directly - this is an Abstract!
-			//KalturaBaseEntryListResponse list = client.getBaseEntryService().list();
-			KalturaMediaListResponse list = client.getMediaService().list();
-			if (list.totalCount > 0) {
-				KalturaMediaEntry entry = list.objects.get(0);
-				System.out.print("\nGot an entry: \"" + entry.name + "\"");
-			} else {
-				System.out.print("\nThis account doesn't have any entries in it.");
+	/** 
+	 * lists all media in the account.
+	 */
+	private static void list() throws KalturaApiException {
+
+		KalturaMediaListResponse list = getKalturaClient().getMediaService().list();
+		if (list.totalCount > 0) {
+			System.out.println("The account contains " + list.totalCount + " entries.");
+			for (KalturaMediaEntry entry : list.objects) {
+				System.out.println("\t \"" + entry.name + "\"");
 			}
-		} catch (KalturaApiException e) {
-			e.printStackTrace();
-		}		
+		} else {
+			System.out.println("This account doesn't have any entries in it.");
+		}
+	}
+
+	/**
+	 * shows how to chain requests together to call a multi-request type where several requests are called in a single request.
+	 */
+	private static void multiRequest() throws KalturaApiException
+ {
+		KalturaClient client = getKalturaClient();
+		client.setMultiRequest(true);
+		client.getBaseEntryService().count();
+		client.getPartnerService().getInfo();
+		client.getPartnerService().getUsage(2010);
+		KalturaMultiResponse multi = client.doMultiRequest();
+		KalturaPartner partner = (KalturaPartner) multi.get(1);
+		System.out.println("Got Admin User email: " + partner.adminEmail);
+
 	}
 	
-	//shows how to chain requests together to call a multi-request type where several requests are called in a single request.
-	public void multiRequest()
-	{
-		try {
-			KalturaClient client = getKalturaClient();
-			client.setMultiRequest(true);
-			client.getBaseEntryService().count();
-			client.getPartnerService().getInfo();
-			client.getPartnerService().getUsage(2010);	
-			KalturaMultiResponse multi = client.doMultiRequest();
-			KalturaPartner partner = (KalturaPartner)multi.get(1);
-			System.out.print("\nGot Admin User email: " + partner.adminEmail);
-		} catch (KalturaApiException e) {
-			e.printStackTrace();
-		}		
+	/** 
+	 * creates an empty media entry and assigns basic metadata to it.
+	 * @return the generated <code>KalturaMediaEntry</code>
+	 * @throws KalturaApiException 
+	 */
+	private static KalturaMediaEntry addEmptyEntry() throws KalturaApiException {
+		System.out.println("Creating an empty Kaltura Entry (without actual media binary attached)...");
+		KalturaMediaEntry entry = new KalturaMediaEntry();
+		entry.name = "An Empty Kaltura Entry Test";
+		entry.mediaType = KalturaMediaType.VIDEO;
+		KalturaMediaEntry newEntry = getKalturaClient().getMediaService().add(entry);
+		System.out.println("The id of our new Video Entry is: " + newEntry.id);
+		return newEntry;
 	}
 	
-	//creates an empty media entry and assigns basic metadata to it.
-	private KalturaMediaEntry addEmptyEntry()
+	/**
+	 *  uploads a video file to Kaltura and assigns it to a given Media Entry object
+	 */
+	private static void uploadMediaFileAndAttachToEmptyEntry(KalturaMediaEntry entry) throws KalturaApiException
 	{
-		try {
 			KalturaClient client = getKalturaClient();			
-			System.out.print("\nCreating an empty Kaltura Entry (without actual media binary attached)...");
-			KalturaMediaEntry entry = new KalturaMediaEntry();
-			entry.name = "An Empty Kaltura Entry Test";
-			entry.mediaType = KalturaMediaType.VIDEO;
-			KalturaMediaEntry newEntry = client.getMediaService().add(entry);
-			System.out.print("\nThe id of our new Video Entry is: " + newEntry.id);
-			return newEntry;
-		} catch (KalturaApiException e) {
-			e.printStackTrace();
-			return null;
-		}	
-	}
-	
-	//uploads a video file to Kaltura and assigns it to a given Media Entry object 
-	private void uploadMediaFileAndAttachToEmptyEntry(KalturaMediaEntry entry)
-	{
-		try {
-			KalturaClient client = getKalturaClient();			
-			System.out.print("\nUploading a video file...");
+			System.out.println("Uploading a video file...");
+			
+			// upload upload token
 			File fileData = new File(KalturaTestConfig.UPLOAD_FILE);
 			KalturaUploadToken upToken = client.getUploadTokenService().add();
-			String uploadTokenId = upToken.id;
-			client.getUploadTokenService().upload(uploadTokenId, fileData);
 			KalturaUploadedFileTokenResource fileTokenResource = new KalturaUploadedFileTokenResource();
-			fileTokenResource.token = uploadTokenId;
-			KalturaMediaEntry newEntry = client.getMediaService().addContent(entry.id, fileTokenResource);
-			//update the entry name: 
-			KalturaMediaEntry updateEntry = new KalturaMediaEntry();
-			updateEntry.name = "A Media Entry with Video";
-			newEntry = client.getMediaService().update(newEntry.id, updateEntry);
-			System.out.print("\nUploaded a new Video file to entry: " + newEntry.id);
-		} catch (KalturaApiException e) {
-			e.printStackTrace();
-		}	
+			
+			// Connect to media entry and update name
+			fileTokenResource.token = upToken.id;
+			entry = client.getMediaService().addContent(entry.id, fileTokenResource);
+			
+			
+			// Upload actual data
+			client.getUploadTokenService().upload(upToken.id, fileData);
+			
+			System.out.println("Uploaded a new Video file to entry: " + entry.id);
 	}
 	
-	//periodically calls the Kaltura API to check that a given video entry has finished transcoding and is ready for playback. 
-	private void testIfEntryIsReadyForPublish (KalturaMediaEntry entry)
-	{
-		try {
-			KalturaClient client = getKalturaClient();			
-			System.out.print("\nTesting if Media Entry has finished processing and ready to be published...");
-			KalturaMediaEntry retrievedEntry = null;		
-			try {
-				KalturaMediaService mediaService = client.getMediaService();
-				retrievedEntry = mediaService.get(entry.id);
-				while (retrievedEntry.status != KalturaEntryStatus.READY) {
-					System.out.print("\nMedia not ready yet. Waiting 30 seconds.");
-					try {
-						Thread.sleep(30000);
-					} catch (InterruptedException ie) { }
-					retrievedEntry = mediaService.get(entry.id);				
-				}
-				System.out.print("\nEntry id: "+entry.id+" is now ready to be published and played.");
-			} catch (KalturaApiException kae) {
-				System.out.print("\nProblem retrieving entry: " + kae.getLocalizedMessage());
+	/** 
+	 * periodically calls the Kaltura API to check that a given video entry has finished transcoding and is ready for playback. 
+	 * @param entry The <code>KalturaMediaEntry</code> we want to test
+	 */
+	private static void testIfEntryIsReadyForPublish(KalturaMediaEntry entry)
+			throws KalturaApiException {
+
+		System.out.println("Testing if Media Entry has finished processing and ready to be published...");
+		KalturaMediaService mediaService = getKalturaClient().getMediaService();
+		while (true) {
+			KalturaMediaEntry retrievedEntry = mediaService.get(entry.id);
+			if (retrievedEntry.status == KalturaEntryStatus.READY) {
+				break;
 			}
-		} catch (KalturaApiException e) {
-			e.printStackTrace();
-		}	
+			System.out.println("Media not ready yet. Waiting 30 seconds.");
+			try {
+				Thread.sleep(WAIT_BETWEEN_TESTS);
+			} catch (InterruptedException ie) {
+			}
+		}
+		System.out.println("Entry id: " + entry.id + " is now ready to be published and played.");
 	}
-	
-	//deletes a given entry
-	private void deleteEntry (KalturaMediaEntry entry)
-	{
-		try {
-			KalturaClient client = getKalturaClient();			
-			System.out.print("\nDeleting entry id: "+entry.id);
-			client.getMediaService().delete(entry.id);
-		} catch (KalturaApiException e) {
-			e.printStackTrace();
-		}	
+
+	/** 
+	 * deletes a given entry
+	 * @param entry the <code>KalturaMediaEntry</code> we want to delete
+	 * @throws KalturaApiException
+	 */
+	private static void deleteEntry(KalturaMediaEntry entry)
+			throws KalturaApiException {
+		System.out.println("Deleting entry id: " + entry.id);
+		getKalturaClient().getMediaService().delete(entry.id);
 	}
 }

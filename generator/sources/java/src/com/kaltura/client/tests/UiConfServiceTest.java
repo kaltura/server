@@ -69,58 +69,44 @@ public class UiConfServiceTest extends BaseTest {
 	public void testAddUiConf() {
 		logger.info("Starting ui conf add test");
 		
-		startAdminSession();
-		
-		boolean exceptionThrown = false;
 		try {			
-	
+			BaseTest.startAdminSession(client,kalturaConfig);
 			String name = "Test UI Conf (" + new Date() + ")";
 			KalturaUiConf addedConf = addUiConf(name);
 			assertNotNull(addedConf);
 			
 		} catch (KalturaApiException kae) {
-			exceptionThrown = true;
 			logger.error(kae);
+			fail();
 		}
 		
-		assertFalse(exceptionThrown);
 	}
 	
 	public void testGetUiConf() {
 		logger.info("Starting ui get test");
 		
-		startAdminSession();
-		
-		boolean exceptionThrown = false;
 		try {			
-			
+			BaseTest.startAdminSession(client,kalturaConfig);
 			String name = "Test UI Conf (" + new Date() + ")";
 			KalturaUiConf addedConf = addUiConf(name);
 			
 			int addedConfId = addedConf.id;
-			
 			KalturaUiConfService confService = this.client.getUiConfService();
-			
 			KalturaUiConf retrievedConf = confService.get(addedConfId);
-			
 			assertEquals(retrievedConf.id, addedConfId);
 			
 		} catch (KalturaApiException kae) {
-			exceptionThrown = true;
 			logger.error(kae);
+			fail();
 		}
 		
-		assertFalse(exceptionThrown);
 	}
 	
 	public void testDeleteUiConf() {
 		logger.info("Starting ui conf delete test");
 		
-		startAdminSession();
-		
-		boolean exceptionThrown = false;
 		try {			
-			
+			BaseTest.startAdminSession(client,kalturaConfig);
 			String name = "Test UI Conf (" + new Date() + ")";
 			KalturaUiConf addedConf = addUiConf(name);
 			
@@ -130,33 +116,27 @@ public class UiConfServiceTest extends BaseTest {
 			
 			confService.delete(addedConfId);
 			
-			boolean notFound = false;
 			try {
 				confService.get(addedConfId);
+				fail();
 			} catch (KalturaApiException kae) {
-				notFound = true;
+				// Wanted behavior
 			} finally {
-				assertTrue(notFound);
-				
 				// we whacked this one, so let's not keep track of it		
 				this.testUiConfIds.remove(testUiConfIds.size() - 1);
 			}
 						
 		} catch (KalturaApiException kae) {
-			exceptionThrown = true;
 			logger.error(kae);
+			fail();
 		}
-		
-		assertFalse(exceptionThrown);
 	}
 
 	public void testListUiConf() {
 		logger.info("Starting ui conf list test");
 		
-		startAdminSession();
-		
-		boolean exceptionThrown = false;
 		try {
+			BaseTest.startAdminSession(client,kalturaConfig);
 			KalturaUiConfService uiConfService = client.getUiConfService();
 			assertNotNull(uiConfService);
 			
@@ -168,11 +148,9 @@ public class UiConfServiceTest extends BaseTest {
 			}
 			
 		} catch (KalturaApiException kae) {
-			exceptionThrown = true;
 			logger.error(kae);
+			fail();
 		}
-		
-		assertFalse(exceptionThrown);
 	}
 	
 	@Override

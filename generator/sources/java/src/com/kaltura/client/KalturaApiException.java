@@ -28,7 +28,7 @@
 package com.kaltura.client;
 
 public class KalturaApiException extends Exception {
-
+	
 	private static final long serialVersionUID = 6710104690443289367L;
 	
 	public String code = null;
@@ -44,5 +44,9 @@ public class KalturaApiException extends Exception {
 	public KalturaApiException(String message, String excCode) {
 		super(message);
 		code = excCode;
+	}
+	
+	public KalturaApiException(Throwable exp) {
+		super(exp);
 	}
 }

@@ -27,36 +27,71 @@
 // ===================================================================================================
 package com.kaltura.client.tests;
 
-import org.apache.log4j.Logger;
-
 import com.kaltura.client.KalturaApiException;
-import com.kaltura.client.KalturaClient;
-import com.kaltura.client.services.KalturaSessionService;
 import com.kaltura.client.enums.KalturaSessionType;
+import com.kaltura.client.types.KalturaMediaListResponse;
 
 public class SessionServiceTest extends BaseTest {
 
-	private Logger logger = Logger.getLogger(SessionServiceTest.class);
-	
+	/**
+	 * Test Open / close Session
+	 */
 	public void testSession() {
-		
-        KalturaClient client = new KalturaClient(this.kalturaConfig);
 
-        KalturaSessionService sessionService = client.getSessionService();
-        assertNotNull(sessionService);
-        
-        try {
-        	String sessionId = sessionService.start(this.kalturaConfig.getSecret(),
-        										"admin",
-        										KalturaSessionType.USER,
-        										this.kalturaConfig.getPartnerId(),
-        										86400,
-        								 		"");
-        	assertNotNull(sessionId);
-        	logger.debug("Session id:" + sessionId);
-        	client.setSessionId(sessionId);
-        } catch (KalturaApiException kae) {
-        	logger.error(kae);
-        }
+		try {
+			
+			// test open session
+			BaseTest.startUserSession(client, kalturaConfig);
+			assertNotNull(client.getSessionId());
+			
+			KalturaMediaListResponse response = client.getMediaService().list();
+			assertNotNull(response);
+			
+			// Close session
+			BaseTest.closeSession(client);
+			
+		} catch (KalturaApiException e) {
+			e.printStackTrace();
+			fail();
+		}
+		
+		// Test close connection
+		try {
+			client.getMediaService().list();
+			fail();
+		} catch (KalturaApiException e) {
+			// Should fail since the connection is closed.
+		}
+		
+	}
+	
+	public void testExpiredSession() {
+		try {
+			String KS = client.generateSession(KalturaTestConfig.ADMIN_SECRET,
+					"asdasd", KalturaSessionType.USER,
+					KalturaTestConfig.PARTNER_ID, 60 * 60 * 24);
+			client.setSessionId(KS);
+
+			KalturaMediaListResponse response = client.getMediaService().list();
+			assertNotNull(response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+
+		try {
+			String KS = client.generateSession(KalturaTestConfig.ADMIN_SECRET,
+					"asdasd", KalturaSessionType.USER,
+					KalturaTestConfig.PARTNER_ID, -60 * 60 * 24);
+			client.setSessionId(KS);
+
+			client.getMediaService().list();
+			fail();
+		} catch (Exception e) {
+			assertTrue(e instanceof KalturaApiException);
+			String msg = ((KalturaApiException)e).getMessage();
+			assertTrue(msg.contains("EXPIRED"));
+		}
+
 	}
 }

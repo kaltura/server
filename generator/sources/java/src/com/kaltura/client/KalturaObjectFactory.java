@@ -27,29 +27,46 @@
 // ===================================================================================================
 package com.kaltura.client;
 
-import java.io.File;
-import java.util.HashMap;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import com.kaltura.client.KalturaApiException;
+import java.lang.reflect.Constructor;
 
 /**
- * Helper class that provides a collection of Files.
+ * This class was generated using generate.php
+ * against an XML schema provided by Kaltura.
+ * @date Thu, 09 Feb 12 10:24:52 +0200
  * 
- * @author jpotts
- *
+ * MANUAL CHANGES TO THIS CLASS WILL BE OVERWRITTEN.
  */
-public class KalturaFiles extends HashMap<String, File> {
-	
-	private static final long serialVersionUID = -5838275045069221834L;
-	
-	private static final String PARAMS_SEPERATOR = ":";
 
-	public void add(KalturaFiles files) {
-		this.putAll(files);
-    }
-	
-	public void add(String objectName, KalturaFiles files) {
-		for (java.util.Map.Entry<String, File> itr : files.entrySet()) {
-			this.put(objectName + PARAMS_SEPERATOR + itr.getKey(), itr.getValue());           
+public class KalturaObjectFactory {
+    public static Object create(Element xmlElement) throws KalturaApiException {
+    	return create(xmlElement, null);
+   }
+    
+    public static <T> Object create(Element xmlElement, Class<T> fallbackClazz) throws KalturaApiException {
+    	NodeList objectTypeNodes = xmlElement.getElementsByTagName("objectType");
+        Node objectTypeNode = objectTypeNodes.item(0);
+        String objectType = objectTypeNode.getTextContent();
+        
+		Class<?> clazz = null;
+		try {
+			clazz = Class.forName("com.kaltura.client.types." + objectType);
+		} catch (ClassNotFoundException e1) {
+			if(fallbackClazz != null) {
+				clazz = fallbackClazz;
+			} else {
+				throw new KalturaApiException("Invalid object : " + objectType );
+			}
 		}
-    }
 
+        try {
+            Constructor<?> ctor = clazz.getConstructor(Element.class);
+            return ctor.newInstance(xmlElement);
+        } catch (Exception e) {
+        	 throw new KalturaApiException("Failed to construct object");
+        }
+    }
 }

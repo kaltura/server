@@ -35,21 +35,21 @@ public class SystemServiceTest extends BaseTest {
 	
 	private Logger logger = Logger.getLogger(SystemServiceTest.class);
 			
+	/**
+	 * Tests that ping to the session works
+	 */
 	public void testPing() {
 		logger.info("Starting ping test");
 
-		startUserSession();
-		
-		boolean exceptionThrown = false;
 		try {
+			BaseTest.startUserSession(client,kalturaConfig);
 			KalturaSystemService systemService = this.client.getSystemService();
 			boolean result = systemService.ping();
 			assertTrue(result);
+			BaseTest.closeSession(client);
 		} catch (Exception e) {
-			exceptionThrown = true;
+			fail();
 		}
-		
-		assertFalse(exceptionThrown);
 		
 	}
 		
