@@ -6,15 +6,6 @@
 class KalturaCategoryUser extends KalturaObject implements IFilterable 
 {
 	/**
-	 * The id of the Category
-	 * 
-	 * @var int
-	 * @readonly
-	 * @filter eq,in
-	 */
-	public $id;
-	
-	/**
 	 * 
 	 * @var int
 	 * @insertonly
@@ -85,7 +76,6 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable
 	
 	private static $mapBetweenObjects = array
 	(
-		"id",
 		"categoryId",
 		"userId" => "kuserId",
 		"partnerId",
