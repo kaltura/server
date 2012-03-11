@@ -159,6 +159,8 @@ class KalturaErrors extends APIErrors
 	/**
 	 * AccessControl Service
 	 */
+	const ACCESS_CONTROL_NEW_VERSION_UPDATE = "ACCESS_CONTROL_NEW_VERSION_UPDATE,Access control id \"%s\" should be updated using AccessControlProfile service";
+	
 	const ACCESS_CONTROL_ID_NOT_FOUND = "ACCESS_CONTROL_ID_NOT_FOUND,Access control id \"%s\" not found";
 	
 	const MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED = "MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED,Max number of \"%s\" access controls was reached";

@@ -4,6 +4,7 @@
  * Add & Manage Access Controls
  *
  * @service accessControl
+ * @deprecated use accessControlProfile service instead
  */
 class AccessControlService extends KalturaBaseService
 {

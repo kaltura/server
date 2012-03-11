@@ -125,6 +125,12 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
+	 * The value for the rules field.
+	 * @var        string
+	 */
+	protected $rules;
+
+	/**
 	 * @var        array entry[] Collection to store aggregation of entry objects.
 	 */
 	protected $collentrys;
@@ -166,6 +172,17 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	public function getColumnsOldValues()
 	{
 		return $this->oldColumnsValues;
+	}
+	
+	/**
+	 * @return mixed field value or null
+	 */
+	public function getColumnsOldValue($name)
+	{
+		if(isset($this->oldColumnsValues[$name]))
+			return $this->oldColumnsValues[$name];
+			
+		return null;
 	}
 
 	/**
@@ -449,6 +466,16 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [rules] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getRules()
+	{
+		return $this->rules;
 	}
 
 	/**
@@ -921,6 +948,29 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	} // setCustomData()
 
 	/**
+	 * Set the value of [rules] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     accessControl The current object (for fluent API support)
+	 */
+	public function setRules($v)
+	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::RULES]))
+			$this->oldColumnsValues[accessControlPeer::RULES] = $this->rules;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->rules !== $v) {
+			$this->rules = $v;
+			$this->modifiedColumns[] = accessControlPeer::RULES;
+		}
+
+		return $this;
+	} // setRules()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -981,6 +1031,7 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 			$this->prv_restrict_length = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
 			$this->kdir_restrict_type = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
 			$this->custom_data = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->rules = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -990,7 +1041,7 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 17; // 17 = accessControlPeer::NUM_COLUMNS - accessControlPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 18; // 18 = accessControlPeer::NUM_COLUMNS - accessControlPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating accessControl object", $e);
@@ -1512,6 +1563,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 			case 16:
 				return $this->getCustomData();
 				break;
+			case 17:
+				return $this->getRules();
+				break;
 			default:
 				return null;
 				break;
@@ -1550,6 +1604,7 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 			$keys[14] => $this->getPrvRestrictLength(),
 			$keys[15] => $this->getKdirRestrictType(),
 			$keys[16] => $this->getCustomData(),
+			$keys[17] => $this->getRules(),
 		);
 		return $result;
 	}
@@ -1632,6 +1687,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 			case 16:
 				$this->setCustomData($value);
 				break;
+			case 17:
+				$this->setRules($value);
+				break;
 		} // switch()
 	}
 
@@ -1673,6 +1731,7 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[14], $arr)) $this->setPrvRestrictLength($arr[$keys[14]]);
 		if (array_key_exists($keys[15], $arr)) $this->setKdirRestrictType($arr[$keys[15]]);
 		if (array_key_exists($keys[16], $arr)) $this->setCustomData($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setRules($arr[$keys[17]]);
 	}
 
 	/**
@@ -1701,6 +1760,7 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(accessControlPeer::PRV_RESTRICT_LENGTH)) $criteria->add(accessControlPeer::PRV_RESTRICT_LENGTH, $this->prv_restrict_length);
 		if ($this->isColumnModified(accessControlPeer::KDIR_RESTRICT_TYPE)) $criteria->add(accessControlPeer::KDIR_RESTRICT_TYPE, $this->kdir_restrict_type);
 		if ($this->isColumnModified(accessControlPeer::CUSTOM_DATA)) $criteria->add(accessControlPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(accessControlPeer::RULES)) $criteria->add(accessControlPeer::RULES, $this->rules);
 
 		return $criteria;
 	}
@@ -1798,6 +1858,8 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 		$copyObj->setKdirRestrictType($this->kdir_restrict_type);
 
 		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setRules($this->rules);
 
 
 		if ($deepCopy) {

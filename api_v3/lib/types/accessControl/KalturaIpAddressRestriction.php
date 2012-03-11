@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @deprecated use KalturaRule instead
  */
 class KalturaIpAddressRestriction extends KalturaBaseRestriction 
 {
@@ -21,12 +22,20 @@ class KalturaIpAddressRestriction extends KalturaBaseRestriction
 	
 	private static $mapBetweenObjects = array
 	(
-		"ipAddressRestrictionType" => "type",
+		"ipAddressRestrictionType",
 		"ipAddressList",
 	);
 	
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseRestriction::toRule()
+	 */
+	public function toRule()
+	{
+		return $this->toObject(new kAccessControlIpAddressRestriction());
 	}
 }

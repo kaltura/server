@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @deprecated
  */
 class KalturaDirectoryRestriction extends KalturaBaseRestriction 
 {
@@ -12,13 +13,11 @@ class KalturaDirectoryRestriction extends KalturaBaseRestriction
 	 */
 	public $directoryRestrictionType;
 	
-	private static $mapBetweenObjects = array
-	(
-		"directoryRestrictionType" => "type",
-	);
-	
-	public function getMapBetweenObjects()
+	/* (non-PHPdoc)
+	 * @see KalturaBaseRestriction::toRule()
+	 */
+	public function toRule()
 	{
-		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+		return null;
 	}
 }

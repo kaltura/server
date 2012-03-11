@@ -1,0 +1,112 @@
+<?php
+/**
+ * @package Core
+ * @subpackage model.data
+ * @abstract
+ */
+abstract class kCompareCondition extends kCondition
+{
+	/**
+	 * Value to evaluate against the field and operator
+	 * @var int
+	 */
+	protected $value;
+	
+	/**
+	 * Comparing operator, enum of searchConditionComparison
+	 * @var int
+	 */
+	protected $comparison;
+
+	/**
+	 * @return int
+	 */
+	public function getValue() 
+	{
+		return $this->value;
+	}
+
+	/**
+	 * Comparing operator, enum of searchConditionComparison
+	 * @return int
+	 */
+	public function getComparison() 
+	{
+		return $this->comparison;
+	}
+
+	/**
+	 * @param int $value
+	 */
+	public function setValue($value) 
+	{
+		$this->value = $value;
+	}
+
+	/**
+	 * Comparing operator, enum of searchConditionComparison
+	 * @param int $comparison
+	 */
+	public function setComparison($comparison) 
+	{
+		$this->comparison = $comparison;
+	}
+
+	/**
+	 * Return single integer or array of integers
+	 * @param accessControl $accessControl
+	 * @return int|array<int> the field content
+	 */
+	abstract public function getFieldValue(accessControl $accessControl);
+	
+	/**
+	 * @param int $field
+	 * @return bool
+	 */
+	protected function fieldFulfilled($field)
+	{
+		switch($this->comparison)
+		{
+			case searchConditionComparison::GREATER_THAN:
+				return $this->calcNot($this->value > $field);
+				
+			case searchConditionComparison::GREATER_THAN_OR_EQUEL:
+				return $this->calcNot($this->value >= $field);
+				
+			case searchConditionComparison::LESS_THAN:
+				return $this->calcNot($this->value < $field);
+				
+			case searchConditionComparison::LESS_THAN_OR_EQUEL:
+				return $this->calcNot($this->value <= $field);
+				
+			case searchConditionComparison::EQUEL:
+			default:
+				return $this->calcNot($this->value == $field);
+		}
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kCondition::fulfilled()
+	 */
+	public function fulfilled(accessControl $accessControl)
+	{
+		$field = $this->getFieldValue($accessControl);
+		
+		if (is_null($this->value))
+			return $this->calcNot(true);
+		
+		if (is_null($field))
+			return $this->calcNot(false);
+
+		if(is_array($field))
+		{
+			$fulfilled = true;
+			foreach($field as $fieldItem)
+				$fulfilled = $fulfilled && $this->fieldFulfilled($fieldItem);
+				
+			return $fulfilled;
+		}
+		
+		return $this->fieldFulfilled($field);
+	}
+}

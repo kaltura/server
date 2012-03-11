@@ -876,7 +876,7 @@ class playManifestAction extends kalturaAction
 		if (!is_string($referrer)) 
 			$referrer = ""; // base64_decode can return binary data
 			
-		$securyEntryHelper = new KSecureEntryHelper($this->entry, $ksStr, $referrer);
+		$securyEntryHelper = new KSecureEntryHelper($this->entry, $ksStr, $referrer, accessControlContextType::PLAY);
 		if ($securyEntryHelper->shouldPreview())
 		{
 			$this->clipTo = $securyEntryHelper->getPreviewLength() * 1000;

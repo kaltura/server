@@ -186,6 +186,7 @@ class KalturaRequestDeserializer
 		$properties = $typeReflector->getProperties();
 		foreach($properties as $property)
 		{
+			/* @var $property KalturaPropertyInfo */
 			$name = $property->getName();
 			$type = $property->getType();
 			

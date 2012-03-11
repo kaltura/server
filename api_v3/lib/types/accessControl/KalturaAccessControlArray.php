@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @deprecated use KalturaAccessControlProfileArray instead
  */
 class KalturaAccessControlArray extends KalturaTypedArray
 {

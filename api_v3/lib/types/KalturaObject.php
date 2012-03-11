@@ -107,11 +107,14 @@ class KalturaObject
 		
 		foreach ( $this->getMapBetweenObjects() as $this_prop => $object_prop )
 		{
-		 	if ( is_numeric( $this_prop) ) $this_prop = $object_prop;
-			if (in_array($this_prop, $props_to_skip)) continue;
+		 	if ( is_numeric( $this_prop) ) 
+		 		$this_prop = $object_prop;
+			if (in_array($this_prop, $props_to_skip)) 
+				continue;
 			
 			$value = $this->$this_prop;
-			if (is_null($value)) continue;
+			if (is_null($value)) 
+				continue;
 				
 			$propertyInfo = $typeReflector->getProperty($this_prop);
 			if (!$propertyInfo)
@@ -134,7 +137,7 @@ class KalturaObject
 				$enumType = call_user_func(array($propertyType, 'getEnumClass'));
 				$value = kPluginableEnumsManager::apiToCore($enumType, $value);
 			}
-			elseif (! kXml::isXMLValidContent($value) )
+			elseif (is_string($value) && ! kXml::isXMLValidContent($value) )
 			{
 				throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
 			}

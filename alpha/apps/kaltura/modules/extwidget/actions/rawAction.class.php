@@ -34,7 +34,7 @@ class rawAction extends sfAction
 
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 		
-		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer);
+		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, accessControlContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload();
 
 //		Rmoved by Tan-Tan - asked by Eran

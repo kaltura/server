@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @deprecated use KalturaRule instead
  */
 class KalturaPreviewRestriction extends KalturaSessionRestriction 
 {
@@ -20,5 +21,13 @@ class KalturaPreviewRestriction extends KalturaSessionRestriction
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseRestriction::toRule()
+	 */
+	public function toRule()
+	{
+		return $this->toObject(new kAccessControlPreviewRestriction());
 	}
 }

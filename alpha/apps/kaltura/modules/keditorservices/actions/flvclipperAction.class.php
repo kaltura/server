@@ -258,7 +258,7 @@ class flvclipperAction extends kalturaAction
 		if ($streamer != "rtmp" && strpos($request, $flv_extension) === false)
 		{
 			// check security using ks
-			$securyEntryHelper = new KSecureEntryHelper($entry, $ks_str, $referrer);
+			$securyEntryHelper = new KSecureEntryHelper($entry, $ks_str, $referrer, accessControlContextType::PLAY);
 			if ($securyEntryHelper->shouldPreview())
 			{
 				$this->checkForPreview($securyEntryHelper, $clip_to);

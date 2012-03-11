@@ -31,6 +31,22 @@ class accessControlScope
 	protected $userAgent;
 	
 	/**
+	 * Indicates what contexts should be tested 
+	 * No contexts means any context
+	 * 
+	 * @var array of accessControlContextType
+	 */
+	protected $contexts = array(accessControlContextType::PLAY);
+	
+	public function __construct()
+	{
+		$this->setIp(requestUtils::getRemoteAddress());
+		$this->setReferrer(isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : null);
+		$this->setUserAgent(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null);	
+		$this->setKs(kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null);
+	}
+	
+	/**
 	 * @param string $v
 	 */
 	public function setReferrer($v)
@@ -51,6 +67,9 @@ class accessControlScope
 	 */
 	public function setKs($v)
 	{
+		if(is_string($v))
+			$v = ks::fromSecureString($v);
+			
 		$this->ks = $v;
 	}
 	
@@ -65,8 +84,17 @@ class accessControlScope
 	/**
 	 * @param string $userAgent
 	 */
-	public function setUserAgent($userAgent) {
+	public function setUserAgent($userAgent) 
+	{
 		$this->userAgent = $userAgent;
+	}
+
+	/**
+	 * @param array $contexts array of accessControlContextType
+	 */
+	public function setContexts(array $contexts) 
+	{
+		$this->contexts = $contexts;
 	}
 	
 	/**
@@ -104,21 +132,28 @@ class accessControlScope
 	/**
 	 * @return string the $userAgent
 	 */
-	public function getUserAgent() {
+	public function getUserAgent() 
+	{
 		return $this->userAgent;
 	}
 
 	/**
-	 * @return accessControlScope
+	 * @return array of accessControlContextType
 	 */
-	public static function partialInit()
+	public function getContexts() 
 	{
-		$scope = new accessControlScope();
-		$scope->setIp(requestUtils::getRemoteAddress());
-		$scope->setReferrer(isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : null);
-		$scope->setUserAgent(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null);
-		return $scope;
+		return $this->contexts;
 	}
-	
-	
+
+	/**
+	 * @param int $context enum of accessControlContextType
+	 * @return bool
+	 */
+	public function isInContext($context)
+	{
+		if(!is_array($this->contexts) || !count($this->contexts))
+			return true;
+			
+		return in_array($context, $this->contexts);
+	}
 }

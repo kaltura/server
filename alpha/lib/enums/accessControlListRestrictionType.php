@@ -2,6 +2,7 @@
 /**
  * @package Core
  * @subpackage model.enum
+ * @deprecated use kRule instead
  */ 
 interface accessControlListRestrictionType extends BaseEnum
 {

@@ -5,50 +5,65 @@ class KSecureEntryHelper
 	 * 
 	 * @var entry
 	 */
-	private $_entry;
+	private $entry;
 	
 	/**
 	 * 
 	 * @var string
 	 */
-	private $_ksStr;
+	private $ksStr;
 	
 	/**
 	 * 
 	 * @var ks
 	 */
-	private $_ks;
+	private $ks;
 	
 	/**
 	 * 
 	 * @var string
 	 */
-	private $_referrer;
+	private $referrer;
+	
+	/**
+	 * Indicates what contexts should be tested 
+	 * No contexts means any context
+	 * 
+	 * @var array of accessControlContextType
+	 */
+	private $contexts;
+	
+	/**
+	 * Indicates that access control need to be checked every request and therefore can't be cached
+	 * 
+	 * @var bool
+	 */
+	private $disableCache;
 	
 	
 	/**
 	 * 
 	 * @param entry $entry
 	 */
-	public function __construct(entry $entry, $ksStr, $referrer)
+	public function __construct(entry $entry, $ksStr, $referrer, $contexts = array())
 	{
-		$this->_entry = $entry;
-		$this->_ksStr = $ksStr;
-		$this->_referrer = $referrer;
+		if(!is_array($contexts))
+			$contexts = array($contexts);
+			
+		$this->entry = $entry;
+		$this->ksStr = $ksStr;
+		$this->referrer = $referrer;
+		$this->contexts = $contexts;
 		
 		$this->validateKs();
 	}
 	
-	public function hasRestrictions()
+	public function hasRules()
 	{
-		$accessControl = $this->_entry->getAccessControl();
+		$accessControl = $this->entry->getAccessControl();
 		if ($accessControl)
-		{
-			$restrictions = $accessControl->getRestrictions();
-			if (count($restrictions))
-				return true;
-		}
-		
+			return $accessControl->hasRules();
+			
 		return false;
 	}
 	
@@ -61,39 +76,31 @@ class KSecureEntryHelper
 			return false;
 			
 		// should preview only when the access control is valid, but the preview and session restrictions exists
-		$accessControl = $this->_entry->getAccessControl();
+		$accessControl = $this->entry->getAccessControl();
 		if ($accessControl)
 		{
-			$accessControlScope = $this->getAccessControlScope();
-			$accessControl->setScope($accessControlScope);
-			if ($accessControl->isValid()) // the whole access control is valid, no need to preview
+			$context = new kEntryContextDataResult();
+			$accessControl->applyContext($context, $this->getAccessControlScope());
+			
+			$actions = $context->getAccessControlActions();
+			$previewActionFound = false;
+			foreach($actions as $action)
 			{
-				return false; 
+				/* @var $action kAccessControlAction */
+				if($action->getType() == accessControlActionType::BLOCK)
+					return false;
+					
+				if($action->getType() == accessControlActionType::PREVIEW)
+					$previewActionFound = true;
 			}
-			else
-			{
-				$restrictions = $accessControl->getRestrictions();
-				// all restrictions should be valid except for previewRestriction & sessionRestriction 
-				foreach($restrictions as $restriction)
-				{
-					if (!($restriction instanceof previewRestriction) && !($restriction instanceof sessionRestriction))
-						if ($restriction->isValid() === false)
-							return false;
-				}
-				if ($accessControl->hasPreviewRestriction())
-				{
-					$restriction = $accessControl->getPreviewRestriction();
-					if ($restriction->isValid() === false)
-						return true;
-				}
-			}
+			return $previewActionFound;
 		}
 		return false;
 	}
 	
 	public function getPreviewLength()
 	{
-		$accessControl = $this->_entry->getAccessControl();
+		$accessControl = $this->entry->getAccessControl();
 		if ($accessControl)
 		{
 			if ($accessControl->hasPreviewRestriction())
@@ -112,15 +119,15 @@ class KSecureEntryHelper
 	
 	public function validateForDownload()
 	{
-		if ($this->_ks)
+		if ($this->ks)
 		{
 			if ($this->isKsAdmin()) // no need to validate when ks is admin
 				return;
 			
-			if ($this->_ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, ks::PRIVILEGE_WILDCARD)) // no need to validate when we have wildcard download privilege
+			if ($this->ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, ks::PRIVILEGE_WILDCARD)) // no need to validate when we have wildcard download privilege
 				return;
 				
-			if ($this->_ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $this->_entry->getId())) // no need to validate when we have specific entry download privilege
+			if ($this->ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $this->entry->getId())) // no need to validate when we have specific entry download privilege
 				return;
 		}	
 			
@@ -138,22 +145,19 @@ class KSecureEntryHelper
 	
 	protected function validateAccessControl()
 	{
-		$accessControl = $this->_entry->getAccessControl();
-		if ($accessControl)
-		{
-			$accessControlScope = $this->getAccessControlScope();
-			$accessControl->setScope($accessControlScope);
+		$accessControl = $this->entry->getAccessControl();
+		if(!$accessControl)
+			return;
 			
-			if (!$accessControl->isValid())
-			{
-				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
-			}
-		}
+		$context = new kEntryContextDataResult();
+		$this->disableCache = $accessControl->applyContext($context, $this->getAccessControlScope());
+		if(count($context->getAccessControlActions()))
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 	}
 	
 	protected function validateScheduling()
 	{
-		if (!$this->_entry->isScheduledNow() && !$this->isKsAdmin())
+		if (!$this->entry->isScheduledNow() && !$this->isKsAdmin())
 		{
 			KExternalErrors::dieError(KExternalErrors::NOT_SCHEDULED_NOW);
 		}
@@ -161,17 +165,17 @@ class KSecureEntryHelper
 	
 	protected function validateKs()
 	{
-		if ($this->_ksStr)
+		if ($this->ksStr)
 		{
 			try
 			{
 				// todo need to check if partner is within a partner group
-				$ks = kSessionUtils::crackKs($this->_ksStr);
+				$ks = kSessionUtils::crackKs($this->ksStr);
 				// if entry is "display_in_search=2" validate partner ID from the KS
 				// => meaning it will alwasy pass on partner_id
-				if($this->_entry->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK)
+				if($this->entry->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK)
 				{
-					$valid = $ks->isValidForPartner($this->_entry->getPartnerId());
+					$valid = $ks->isValidForPartner($this->entry->getPartnerId());
 				}
 				else
 				{
@@ -181,7 +185,7 @@ class KSecureEntryHelper
 					die("This URL is expired");
 				else if ($valid === ks::INVALID_PARTNER)
 				{
-					if ($this->hasRestrictions()) // todo - for now if the entry doesnt have restrictions any way disregard a partner group check
+					if ($this->hasRules()) // TODO - for now if the entry doesnt have restrictions any way disregard a partner group check
 						die("Invalid session [".$valid."]");
 				}
 				else if ($valid !== ks::OK)
@@ -189,12 +193,12 @@ class KSecureEntryHelper
 					die("Invalid session [".$valid."]");
 				}
 				
-				if ($ks->partner_id != $this->_entry->getPartnerId())
+				if ($ks->partner_id != $this->entry->getPartnerId())
 				{
 					return;
 				}
 					
-				$this->_ks = $ks;	
+				$this->ks = $ks;	
 			}
 			catch(Exception $ex)
 			{
@@ -205,12 +209,12 @@ class KSecureEntryHelper
 	
 	public function isKsAdmin()
 	{
-		 return ($this->_ks && $this->_ks->isAdmin());
+		 return ($this->ks && $this->ks->isAdmin());
 	}
 	
 	protected function isEntryInModeration()
 	{
-		$entry = $this->_entry;
+		$entry = $this->entry;
 		$moderationStatus = $entry->getModerationStatus();
 		$invalidModerationStatuses = array(
 			entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION, 
@@ -220,14 +224,24 @@ class KSecureEntryHelper
 		return in_array($moderationStatus, $invalidModerationStatuses);
 	}
 	
+	/**
+	 * Access control need to be checked every request and therefore request can't be cached
+	 * @return boolean
+	 */
+	public function shouldDisableCache()
+	{
+		return $this->disableCache;
+	}
+	
 	private function getAccessControlScope()
 	{
-		$accessControlScope = accessControlScope::partialInit();
-		if ($this->_referrer)
-			$accessControlScope->setReferrer($this->_referrer);
-		$accessControlScope->setKs($this->_ks);
-		$accessControlScope->setEntryId($this->_entry->getId());
-		return $accessControlScope;
+		$scope = new accessControlScope();
+		if ($this->referrer)
+			$scope->setReferrer($this->referrer);
+		$scope->setKs($this->ks);
+		$scope->setEntryId($this->entry->getId());
+		$scope->setContexts($this->contexts);
+		return $scope;
 	}
 
 }

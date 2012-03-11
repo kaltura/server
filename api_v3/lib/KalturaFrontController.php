@@ -345,7 +345,7 @@ class KalturaFrontController
 					break;
 					
 				case kCoreException::MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED:
-					$object = new KalturaAPIException(KalturaErrors::MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED, Partner::MAX_ACCESS_CONTROLS);
+					$object = new KalturaAPIException(KalturaErrors::MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED, $ex->getData());
 					break;
 					
 				case kCoreException::MAX_CATEGORIES_PER_ENTRY:

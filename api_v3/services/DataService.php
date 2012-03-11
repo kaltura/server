@@ -147,7 +147,7 @@ class DataService extends KalturaEntryService
 
 		$ksObj = $this->getKs();
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
-		$securyEntryHelper = new KSecureEntryHelper($dbEntry, $ks, null);
+		$securyEntryHelper = new KSecureEntryHelper($dbEntry, $ks, null, accessControlContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload();	
 		
 		if ( ! $version || $version == -1 ) $version = null;

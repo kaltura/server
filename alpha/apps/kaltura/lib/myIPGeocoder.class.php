@@ -1,9 +1,16 @@
 <?php
 @include("IP2Location.inc.php");
 
-class myIPGeocoder
+class myIPGeocoder extends kGeoCoder
 {
-
+	/* (non-PHPdoc)
+	 * @see kGeoCoder::getCountry()
+	 */
+	public function getCountry($ip)
+	{
+		return $this->iptocountry($ip);
+	}
+	
 	function iptocountry($ip) 
 	{   
 		$ip2LocationBinFilePath = SF_ROOT_DIR.'/../../data'."/geoip/IP-COUNTRY-ISP.BIN";

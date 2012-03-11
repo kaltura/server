@@ -16,7 +16,7 @@ class KalturaSystemPartnerLimitArray extends KalturaTypedArray
 		$types = $reflector->getConstants();
 		foreach($types as $typeInfo) {
 		    $typeValue = $typeInfo->getDefaultValue();
-		    $arr[] = KalturaSystemPartnerLimit::fromPartner($typeValue, $partner);
+		    $arr[] = KalturaSystemPartnerOveragedLimit::fromPartner($typeValue, $partner);
 		}
 			
 			

@@ -406,7 +406,16 @@ class Partner extends BasePartner
 	public function getForceCdnHost()	{		return $this->getFromCustomData( "forceCdnHost" , null, false  );	}
 	public function setForceCdnHost( $v )	{		return $this->putInCustomData( "forceCdnHost", $v );	}	
 		
+	/**
+	 * @return bool
+	 * @deprecated
+	 */
 	public function getRestrictThumbnailByKs()	{		return $this->getFromCustomData( "restrictThumbnailByKs" , null, false  );	}
+	
+	/**
+	 * @return bool
+	 * @deprecated
+	 */
 	public function setRestrictThumbnailByKs( $v )	{		return $this->putInCustomData( "restrictThumbnailByKs", $v );	}	
 		
 	public function getRtmpUrl()	{		return $this->getFromCustomData( "rtmpUrl" , null, false  );	}
@@ -698,6 +707,7 @@ class Partner extends BasePartner
 	public function setMonthlyStorage($v)				{$this->putInCustomData('monthly_storage', $v);}
 	public function setMonthlyStorageAndBandwidth($v)	{$this->putInCustomData('monthly_storage_and_bandwidth', $v);}
 	public function setEndUsers($v)						{$this->putInCustomData('end_users', $v);}
+	public function setAccessControls($v)				{$this->putInCustomData('access_controls', $v);}
 	
 	public function setLoginUsersOveragePrice($v)		{$this->putInCustomData('login_users_overage_price', $v);}
 	public function setAdminLoginUsersOveragePrice($v)	{$this->putInCustomData('admin_login_users_overage_price', $v);}
@@ -735,6 +745,7 @@ class Partner extends BasePartner
 	public function getMonthlyStorage()					{return $this->getFromCustomData('monthly_storage');}
 	public function getMonthlyStorageAndBandwidth()		{return $this->getFromCustomData('monthly_storage_and_bandwidth');}
 	public function getEndUsers()						{return $this->getFromCustomData('end_users');}
+	public function getAccessControls()					{return $this->getFromCustomData('access_controls', null, self::MAX_ACCESS_CONTROLS);}
 	
 	public function getLoginUsersOveragePrice()			{return $this->getFromCustomData('login_users_overage_price');}
 	public function getAdminLoginUsersOveragePrice()	{return $this->getFromCustomData('admin_login_users_overage_price');}

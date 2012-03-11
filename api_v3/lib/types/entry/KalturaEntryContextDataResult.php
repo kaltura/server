@@ -7,33 +7,39 @@ class KalturaEntryContextDataResult extends KalturaObject
 {
 	/**
 	 * @var bool
+	 * @deprecated
 	 */
-	public $isSiteRestricted;
+	public $isSiteRestricted = false;
 	
 	/**
 	 * @var bool
+	 * @deprecated
 	 */
-	public $isCountryRestricted;
+	public $isCountryRestricted = false;
 	
 	/**
 	 * @var bool
+	 * @deprecated
 	 */
-	public $isSessionRestricted;
+	public $isSessionRestricted = false;
 	
 	/**
 	 * @var bool
+	 * @deprecated
 	 */
-	public $isIpAddressRestricted;
+	public $isIpAddressRestricted = false;
 	
 	/**
 	 * @var bool
+	 * @deprecated
 	 */
-	public $isUserAgentRestricted;
+	public $isUserAgentRestricted = false;
 	
 	/**
 	 * @var int
+	 * @deprecated
 	 */
-	public $previewLength;
+	public $previewLength = -1;
 	
 	/**
 	 * @var bool
@@ -58,8 +64,39 @@ class KalturaEntryContextDataResult extends KalturaObject
 	public $mediaProtocol;
 	
 	/**
-	 *
 	 * @var string
 	 */
 	public $storageProfilesXML;
+	
+	/**
+	 * Array of messages as received from the access control rules that invalidated
+	 * @var KalturaStringArray
+	 */
+	public $accessControlMessages;
+	
+	/**
+	 * Array of actions as received from the access control rules that invalidated
+	 * @var KalturaAccessControlActionArray
+	 */
+	public $accessControlActions;
+
+	private static $mapBetweenObjects = array
+	(
+		'isSiteRestricted',
+		'isCountryRestricted',
+		'isSessionRestricted',
+		'isIpAddressRestricted',
+		'isUserAgentRestricted',
+		'previewLength',
+		'accessControlMessages',
+		'accessControlActions',
+	);
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
 }

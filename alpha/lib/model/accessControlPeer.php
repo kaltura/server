@@ -33,7 +33,12 @@ class accessControlPeer extends BaseaccessControlPeer
 		self::$s_criteria_filter->setFilter ( $c );
 	}
 
-	public static function retrieveByPKNoFilter ($pk, $con = null)
+	/**
+	 * @param int $pk
+	 * @param PropelPDO $con
+	 * @return accessControl
+	 */
+	public static function retrieveByPKNoFilter($pk, PropelPDO $con = null)
 	{
 		self::setUseCriteriaFilter ( false );
 		$res = parent::retrieveByPK( $pk , $con );
@@ -41,39 +46,17 @@ class accessControlPeer extends BaseaccessControlPeer
 		return $res;
 	}
 
-	public static function retrieveByPKsNoFilter ($pks, $con = null)
+	/**
+	 * @param array $pk
+	 * @param PropelPDO $con
+	 * @return array<accessControl>
+	 */
+	public static function retrieveByPKsNoFilter($pks, PropelPDO $con = null)
 	{
 		self::setUseCriteriaFilter ( false );
 		$res = parent::retrieveByPKs( $pks , $con );
 		self::setUseCriteriaFilter ( true );
 		return $res;
-	}
-	
-	public static function getIdsValidForScope(accessControlScope $scope)
-	{
-		$profiles = self::getValidForScope($scope);
-		$ids = array();
-		foreach($profiles as $profile)
-		{
-			$ids[] = $profile->getId();
-		}
-		return $ids;
-	}
-	
-	public static function getValidForScope(accessControlScope $scope)
-	{
-		$c = new Criteria();
-		$c->setLimit(Partner::MAX_ACCESS_CONTROLS);
-		$profiles = self::doSelect($c);
-		$curretProfiles = array();
-		foreach($profiles as $profile)
-		{
-			$profile->setScope($scope);
-			if ($profile->isValid())
-				$curretProfiles[] = $profile;
-		}
-		
-		return $curretProfiles;
 	}
 	
 	public static function getCacheInvalidationKeys()

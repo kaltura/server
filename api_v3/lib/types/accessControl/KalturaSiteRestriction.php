@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @deprecated use KalturaRule instead
  */
 class KalturaSiteRestriction extends KalturaBaseRestriction 
 {
@@ -21,12 +22,20 @@ class KalturaSiteRestriction extends KalturaBaseRestriction
 	
 	private static $mapBetweenObjects = array
 	(
-		"siteRestrictionType" => "type",
+		"siteRestrictionType",
 		"siteList",
 	);
 	
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseRestriction::toRule()
+	 */
+	public function toRule()
+	{
+		return $this->toObject(new kAccessControlSiteRestriction());
 	}
 }

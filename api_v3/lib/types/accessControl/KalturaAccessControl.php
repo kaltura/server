@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @deprecated use KalturaAccessControlProfile instead
  */
 class KalturaAccessControl extends KalturaObject implements IFilterable 
 {
@@ -65,6 +66,14 @@ class KalturaAccessControl extends KalturaObject implements IFilterable
 	 */
 	public $restrictions;
 	
+	/**
+	 * Indicates that the access control profile is new and should be handled using KalturaAccessControlProfile object and accessControlProfile service
+	 * 
+	 * @var bool
+	 * @readonly
+	 */
+	public $containsUnsuportedRestrictions;
+	
 	private static $mapBetweenObjects = array
 	(
 		"id",
@@ -83,44 +92,58 @@ class KalturaAccessControl extends KalturaObject implements IFilterable
 	
 	public function toObject($dbObject = null, $skip = array())
 	{
+		if(!$dbObject)
+			$dbObject = new accessControl();
+			
+		/* @var $dbObject accessControl */
 		parent::toObject($dbObject);
 		
 		if ($this->restrictions instanceof KalturaRestrictionArray)
 		{
+			$rules = array();
 			foreach($this->restrictions as $restriction)
 			{
-				$dbRestriction = KalturaRestrictionFactory::getDbInstanceApiObject($restriction);
-				$restriction->toObject($dbRestriction); 
-				$dbObject->setRestriction($dbRestriction);
+				/* @var $restriction KalturaBaseRestriction */
+				$rule = $restriction->toRule();
+				if($rule)
+					$rules[] = $rule;
 			}
+				
+			$dbObject->setRulesArray($rules);
 		}
+		
+		return $dbObject;
 	}
 
 	public function toUpdatableObject($dbObject, $skip = array())
 	{
-		parent::toUpdatableObject($dbObject, $skip);
+		/* @var $dbObject accessControl */
+		$rules = $dbObject->getRules();
+		foreach($rules as $rule)
+			if(!($rule instanceof kAccessControlRestriction))
+				throw new KalturaAPIException(KalturaErrors::ACCESS_CONTROL_NEW_VERSION_UPDATE, $dbObject->getId());
 		
-		if ($this->restrictions !== null && $this->restrictions instanceof KalturaRestrictionArray)
-		{
-			$dbObject->clearRestrictions();
-			foreach($this->restrictions as $restriction)
-			{
-				$dbRestriction = KalturaRestrictionFactory::getDbInstanceApiObject($restriction);
-				$restriction->toObject($dbRestriction); 
-				$dbObject->setRestriction($dbRestriction);
-			}
-		}
+		parent::toUpdatableObject($dbObject, $skip);
 	}
 	
 	public function fromObject($dbObject)
 	{
 		parent::fromObject($dbObject);
 		
-		if ($dbObject instanceof accessControl)
+		if (!($dbObject instanceof accessControl))
+			return;
+			
+		$rules = $dbObject->getRulesArray();
+		foreach($rules as $rule)
 		{
-			$dbRestrictions = $dbObject->getRestrictions();
-			$this->restrictions = KalturaRestrictionArray::fromDbArray($dbRestrictions);
+			if(!($rule instanceof kAccessControlRestriction))
+			{
+				KalturaLog::info("Access control [" . $dbObject->getId() . "] rules are new and cannot be loaded using old object");
+				$this->containsUnsuportedRestrictions = true;
+				return;
+			}
 		}
+		$this->restrictions = KalturaRestrictionArray::fromDbArray($rules);
 	}
 	
 	public function getExtraFilters()

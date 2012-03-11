@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+Date: Sun, 11 Mar 2012 13:48:34 GMT
+Server: Apache/2.2.14 (Win32) DAV/2 mod_ssl/2.2.14 OpenSSL/0.9.8l mod_autoindex_color PHP/5.3.1 mod_apreq2-20090110/2.7.1 mod_perl/2.0.4 Perl/v5.10.1
+X-Powered-By: PHP/5.3.1
+Expires: Sun, 19 Nov 2000 08:52:00 GMT
+Cache-Control: 
+Pragma: 
+Content-Length: 2781
+Access-Control-Allow-Origin: *
+Accept-Ranges: bytes
+X-Me: kaltura.trunk
+X-UA-Compatible: IE=EmulateIE7
+Content-Type: image/jpeg
+

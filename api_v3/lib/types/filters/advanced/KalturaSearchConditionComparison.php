@@ -1,13 +1,12 @@
 <?php
 /**
  * @package api
- * @subpackage filters
+ * @subpackage filters.enum
  */
-class KalturaSearchConditionComparison extends KalturaEnum
+class KalturaSearchConditionComparison extends KalturaDynamicEnum implements searchConditionComparison
 {
-	const EQUEL = 1;
-	const GREATER_THAN = 2;
-	const GREATER_THAN_OR_EQUEL = 3;
-	const LESS_THAN = 4;
-	const LESS_THAN_OR_EQUEL = 5;
+	public static function getEnumClass()
+	{
+		return 'searchConditionComparison';
+	}
 }

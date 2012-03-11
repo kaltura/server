@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @deprecated use KalturaRule instead
  */
 class KalturaUserAgentRestriction extends KalturaBaseRestriction 
 {
@@ -21,12 +22,20 @@ class KalturaUserAgentRestriction extends KalturaBaseRestriction
 	
 	private static $mapBetweenObjects = array
 	(
-		"userAgentRestrictionType" => "type",
+		"userAgentRestrictionType",
 		"userAgentRegexList",
 	);
 	
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseRestriction::toRule()
+	 */
+	public function toRule()
+	{
+		return $this->toObject(new kAccessControlUserAgentRestriction());
 	}
 }

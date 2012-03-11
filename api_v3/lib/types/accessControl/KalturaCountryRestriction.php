@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @deprecated use KalturaRule instead
  */
 class KalturaCountryRestriction extends KalturaBaseRestriction 
 {
@@ -21,12 +22,20 @@ class KalturaCountryRestriction extends KalturaBaseRestriction
 	
 	private static $mapBetweenObjects = array
 	(
-		"countryRestrictionType" => "type",
+		"countryRestrictionType",
 		"countryList",
 	);
 	
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseRestriction::toRule()
+	 */
+	public function toRule()
+	{
+		return $this->toObject(new kAccessControlCountryRestriction());
 	}
 }

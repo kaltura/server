@@ -84,6 +84,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	
 	/**
 	 * @var int
+	 * @deprecated
 	 */
 	public $restrictThumbnailByKs;
 		

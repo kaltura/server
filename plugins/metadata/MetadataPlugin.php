@@ -3,7 +3,7 @@
  * Enable adding custom metadata objects that releate to core objects
  * @package plugins.metadata
  */
-class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaMemoryCleaner, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaSphinxConfiguration
+class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaMemoryCleaner, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaSphinxConfiguration, IKalturaEnumerator
 {
 
 	const SPHINX_DEFAULT_NUMBER_OF_DATE_FIELDS = 10;
@@ -80,6 +80,38 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	}
 	
 	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		if(is_null($baseEnumName))
+			return array('MetadataConditionType');
+	
+		if($baseEnumName == 'ConditionType')
+			return array('MetadataConditionType');
+			
+		return array();
+	}
+
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getConditionTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('ConditionType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see IKalturaServices::getServicesMap()
 	 */
 	public static function getServicesMap()
@@ -151,6 +183,15 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 				case KalturaBatchJobType::METADATA_TRANSFORM:
 					return new KalturaTransformMetadataJobData();
 			}
+		}
+	
+		if($baseClass == 'KalturaCondition')
+		{
+			if($enumValue == MetadataPlugin::getConditionTypeCoreValue(MetadataConditionType::METADATA_FIELD_COMPARE))
+				return new KalturaCompareMetadataCondition();
+				
+			if($enumValue == MetadataPlugin::getConditionTypeCoreValue(MetadataConditionType::METADATA_FIELD_MATCH))
+				return new KalturaMatchMetadataCondition();
 		}
 		
 		return null;

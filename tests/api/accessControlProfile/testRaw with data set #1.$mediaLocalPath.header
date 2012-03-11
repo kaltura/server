@@ -1,0 +1,30 @@
+HTTP/1.1 302 Found
+Date: Sun, 11 Mar 2012 13:53:16 GMT
+Server: Apache/2.2.14 (Win32) DAV/2 mod_ssl/2.2.14 OpenSSL/0.9.8l mod_autoindex_color PHP/5.3.1 mod_apreq2-20090110/2.7.1 mod_perl/2.0.4 Perl/v5.10.1
+X-Powered-By: PHP/5.3.1
+Expires: Thu, 19 Nov 1981 08:52:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Pragma: no-cache
+Content-Disposition: attachment; filename="testRaw with data set #1"
+Location: /p/101/sp/10100/raw/entry_id/0_f5jyf8iq/version/0/testRaw-with-data-set-1.flv?relocate=f.flv
+X-Me: kaltura.trunk
+X-UA-Compatible: IE=EmulateIE7
+Content-Length: 0
+Content-Type: text/html
+
+HTTP/1.1 200 OK
+Date: Sun, 11 Mar 2012 13:53:16 GMT
+Server: Apache/2.2.14 (Win32) DAV/2 mod_ssl/2.2.14 OpenSSL/0.9.8l mod_autoindex_color PHP/5.3.1 mod_apreq2-20090110/2.7.1 mod_perl/2.0.4 Perl/v5.10.1
+X-Powered-By: PHP/5.3.1
+Expires: Tue, 19 Jun 2012 13:53:17GMT
+Cache-Control: public, max-age=8640000 max-stale=0
+Pragma: 
+Content-Disposition: attachment; filename="testRaw with data set #1.flv"
+Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT
+Content-Length: 239978
+Access-Control-Allow-Origin: *
+Accept-Ranges: bytes
+X-Me: kaltura.trunk
+X-UA-Compatible: IE=EmulateIE7
+Content-Type: video/x-flv
+

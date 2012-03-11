@@ -7,11 +7,13 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 {
 	protected $limitType;
 	protected $label;
+	protected $withOverage;
 		
-	public function __construct($limitType, $label)
+	public function __construct($limitType, $label, $withOverage = true)
 	{
 		$this->limitType = $limitType;
 		$this->label = $label;
+		$this->withOverage = $withOverage;
 		parent::__construct();
 	}
 	
@@ -37,7 +39,37 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 		$element = $form->getElement($this->limitType.'_max');
 		$element->setBelongsTo($this->limitType);
 		
-		if ($element->getName()!=Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_max')
+		if($this->withOverage)
+		{
+			$form->addElement('text',  $this->limitType.'_overagePrice', array(
+				'label'			=> 'Overage Fee:',
+				'filters'		=> array('StringTrim'),
+				//'decorators'	=> array('Label', 'ViewHelper', array('HtmlTag',array('tag'=>'div','closeOnly'=>true, 'class' =>'includeUsage'))),
+			));
+			$element = $form->getElement($this->limitType.'_overagePrice');
+			$element->setBelongsTo($this->limitType);
+			
+			$element->addDecorators(array(
+	              'ViewHelper',
+	              array('Label'),
+	              array(array('row' => 'HtmlTag'), array('tag' => 'div','class'=>'includeUsageFloatRight',)),
+			));
+			
+			$form->addElement('text',  $this->limitType.'_overageUnit', array(
+				'label'			=> 'Overage Unit:',
+				'filters'		=> array('StringTrim'),
+				//'decorators'	=> array('Label', 'ViewHelper', array('HtmlTag',array('tag'=>'div','closeOnly'=>true, 'class' =>'includeUsage'))),
+			));
+			$element = $form->getElement($this->limitType.'_overageUnit');
+			$element->setBelongsTo($this->limitType);
+		
+			$element->addDecorators(array(
+	              'ViewHelper',
+	              array('Label'),
+	              array(array('row' => 'HtmlTag'), array('tag' => 'div','class'=>'includeUsageFloatRight',)),
+			));
+		}
+		else
 		{
 			$element->addDecorators(array(
 	              'ViewHelper',
@@ -45,34 +77,6 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 	              array(array('row' => 'HtmlTag'), array('tag' => 'div','class'=>'includeUsageFloatLeft')),
 			));
 		}
-		
-		$form->addElement('text',  $this->limitType.'_overagePrice', array(
-			'label'			=> 'Overage Fee:',
-			'filters'		=> array('StringTrim'),
-			//'decorators'	=> array('Label', 'ViewHelper', array('HtmlTag',array('tag'=>'div','closeOnly'=>true, 'class' =>'includeUsage'))),
-		));
-		$element = $form->getElement($this->limitType.'_overagePrice');
-		$element->setBelongsTo($this->limitType);
-		
-		$element->addDecorators(array(
-              'ViewHelper',
-              array('Label'),
-              array(array('row' => 'HtmlTag'), array('tag' => 'div','class'=>'includeUsageFloatRight',)),
-		));
-		
-		$form->addElement('text',  $this->limitType.'_overageUnit', array(
-			'label'			=> 'Overage Unit:',
-			'filters'		=> array('StringTrim'),
-			//'decorators'	=> array('Label', 'ViewHelper', array('HtmlTag',array('tag'=>'div','closeOnly'=>true, 'class' =>'includeUsage'))),
-		));
-		$element = $form->getElement($this->limitType.'_overageUnit');
-		$element->setBelongsTo($this->limitType);
-		
-		$element->addDecorators(array(
-              'ViewHelper',
-              array('Label'),
-              array(array('row' => 'HtmlTag'), array('tag' => 'div','class'=>'includeUsageFloatRight',)),
-		));
 	}
 	
 	public function populateFromObject($form, $object, $add_underscore = true)

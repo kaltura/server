@@ -26,41 +26,57 @@ class accessControl extends BaseaccessControl
 	const IP_ADDRESS_RESTRICTION_COLUMN_NAME = 'ip_address_restriction';
 	const USER_AGENT_RESTRICTION_COLUMN_NAME = 'user_agent_restriction';
 
-	public function save(PropelPDO $con = null)
+	/* (non-PHPdoc)
+	 * @see BaseaccessControl::preSave()
+	 */
+	public function preSave(PropelPDO $con = null)
 	{
 		if ($this->isColumnModified(accessControlPeer::DELETED_AT))
 		{
 			if ($this->isDefault === true)
-				throw new Exception("Default access control profile can't be deleted");
+				throw new kCoreException("Default access control profile [" . $this->getId(). "] can't be deleted", kCoreException::ACCESS_CONTROL_CANNOT_DELETE_PARTNER_DEFAULT);
 				
 			$c = new Criteria();
 			$c->add(entryPeer::ACCESS_CONTROL_ID, $this->getId());
 			$entryCount = entryPeer::doCount($c);
 			if ($entryCount > 0)
-				throw new Exception("Access control profile is linked with entries and can't be deleted");
+				throw new kCoreException("Default access control profile [" . $this->getId(). "] is linked with [$entryCount] entries and can't be deleted", kCoreException::ACCESS_CONTROL_CANNOT_DELETE_USED_PROFILE);
 		}
 		
-		if ($this->isNew())
-		{
-			$c = new Criteria();
-			$c->add(accessControlPeer::PARTNER_ID, $this->partner_id);
-			$count = accessControlPeer::doCount($c);
-			
-			if ($count >= Partner::MAX_ACCESS_CONTROLS)
-			{
-				throw new kCoreException("Max number of access control profiles was reached", kCoreException::MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED);
-			}
-		}
+		return parent::preSave($con);
+	}
+
+	/* (non-PHPdoc)
+	 * @see BaseaccessControl::preInsert()
+	 */
+	public function preInsert(PropelPDO $con = null)
+	{
+		$c = new Criteria();
+		$c->add(accessControlPeer::PARTNER_ID, $this->getPartnerId());
+		$count = accessControlPeer::doCount($c);
 		
-		parent::save($con);
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		$maxAccessControls = $partner->getAccessControls();
+		if ($count >= $maxAccessControls)
+			throw new kCoreException("Max number of access control profiles [$maxAccessControls] was reached", kCoreException::MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED, $maxAccessControls);
 		
-		// set this conversion profile as partners default
-		$partner = PartnerPeer::retrieveByPK($this->partner_id);
+		return parent::preInsert($con);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see lib/model/om/BaseaccessControl#postUpdate()
+	 */
+	public function postSave(PropelPDO $con = null)
+	{
+		// set this profile as partners default
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
 		if ($partner && $this->isDefault === true)
 		{
 			$partner->setDefaultAccessControlId($this->getId());
 			$partner->save();
 		}
+		
+		parent::postSave($con);
 	}
 
 	/* (non-PHPdoc)
@@ -83,27 +99,22 @@ class accessControl extends BaseaccessControl
 		return $ret;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see BaseaccessControl::copyInto()
+	 */
 	public function copyInto($copyObj, $deepCopy = false)
 	{
-		$copyObj->setPartnerId($this->partner_id);
-		$copyObj->setName($this->name);
-		$copyObj->setDescription($this->description);
-		$copyObj->setCreatedAt($this->created_at);
-		$copyObj->setUpdatedAt($this->updated_at);
-		$copyObj->setDeletedAt($this->deleted_at);
-		$copyObj->setNew(true);
-		$copyObj->setId(NULL);
-		 
-		$copyObj->clearRestrictions($this->getRestrictions());
+		/* @var $copyObj accessControl */
+		parent::copyInto($copyObj, $deepCopy);
 		$copyObj->setIsDefault($this->getIsDefault());
 	}
 	
 	/**
-	 * Set the accessControlScope
+	 * Set the accessControlScope, called internally only
 	 * 
 	 * @param $scope
 	 */
-	public function setScope(accessControlScope $scope)
+	protected function setScope(accessControlScope $scope)
 	{
 		$this->scope = $scope;
 	}
@@ -113,327 +124,136 @@ class accessControl extends BaseaccessControl
 	 * 
 	 * @return accessControlScope
 	 */
-	public function getScope()
+	public function &getScope()
 	{
-		if (!$this->scope instanceof accessControlScope)
+		if (!$this->scope)
 			$this->scope = new accessControlScope();
 			
 		return $this->scope;
 	}
 	
 	/**
-	 * check of there are any restrictions in this accessControl object
-	 * if there any restrictions return true, otherwise return false (if the acessControl is a default one) 
+	 * Check if there are any rules in this accessControl object
 	 * 
 	 * @return boolean
 	 */
-	public function hasRestrictions()
+	public function hasRules()
 	{
-		return
-		(
-			$this->hasSiteRestriction() ||
-			$this->hasCountryRestriction() ||
-			$this->hasSessionRestriction() ||
-			$this->hasPreviewRestriction() ||
-			$this->hasDirectoryRestriction() ||
-			$this->hasIpAddressRestriction() ||
-			$this->hasUserAgentRestriction()
-		);
+		return count($this->getRulesArray()) ? true : false;
 	}
 	
 	/**
-	 * Get all the restrictions
-	 * 
-	 * @return array
+	 * @param kEntryContextDataResult $context
+	 * @param accessControlScope $scope
+	 * @return boolean disable cache or not
 	 */
-	public function getRestrictions()
+	public function applyContext(kEntryContextDataResult &$context, accessControlScope $scope = null)
 	{
-		$restrictions = array();
+		if($scope)
+			$this->setScope($scope);
+		$scope = $this->getScope();
 		
-		if ($this->hasSiteRestriction())
-			$restrictions[] = $this->getSiteRestriction();
-			
-		if ($this->hasCountryRestriction())
-			$restrictions[] = $this->getCountryRestriction();
-			
-		if ($this->hasSessionRestriction())
-			$restrictions[] = $this->getSessionRestriction();
-			
-		if ($this->hasPreviewRestriction())
-			$restrictions[] = $this->getPreviewRestriction();
-			
-		if ($this->hasDirectoryRestriction())
-			$restrictions[] = $this->getDirectoryRestriction();
-			
-		if ($this->hasIpAddressRestriction())
-			$restrictions[] = $this->getIpAddressRestriction();
-			
-		if ($this->hasUserAgentRestriction())
-			$restrictions[] = $this->getUserAgentRestriction();
-			
-		return $restrictions;
-	}
-	
-	/**
-	 * Set new restrictions list
-	 *  
-	 * @param array $restrictions
-	 */
-	public function setRestrictions($restrictions)
-	{
-		$this->clearRestrictions();
-		if (is_array($restrictions))
+		if ($scope->getKs() && ($scope->getKs() instanceof ks) && $scope->getKs()->isAdmin())
+			return true;
+		
+		$disableCache = true;
+		
+		$rules = $this->getRulesArray();
+		foreach($rules as $rule)
 		{
-			foreach($restrictions as $restriction)
-			{
-				$this->setRestriction($restriction);
-			}
-		}
-	}
-	
-	/**
-	 * Clear all the restrictions
-	 */
-	public function clearRestrictions()
-	{
-		parent::setSiteRestrictType(null);
-		parent::setSiteRestrictList(null);
-		parent::setCountryRestrictType(null);
-		parent::setCountryRestrictList(null);
-		parent::setKsRestrictPrivilege(null);
-		parent::setPrvRestrictPrivilege(null);
-		parent::setPrvRestrictLength(null);
-		parent::setKdirRestrictType(null);
-		$this->setIpAddressRestriction(null);
-		$this->setUserAgentRestriction(null);
-	}
-	
-	/**
-	 * Set restriction
-	 * 
-	 * @param $restriction
-	 */
-	public function setRestriction(baseRestriction $restriction)
-	{
-		$restrictionClass = get_class($restriction);
-		switch($restrictionClass)
-		{
-			case "siteRestriction":
-				$this->setSiteRestriction($restriction);
-				break;
-			case "countryRestriction":
-				$this->setCountryRestriction($restriction);
-				break;
-			case "sessionRestriction":
-				$this->setSessionRestriction($restriction);
-				break;
-			case "previewRestriction":
-				$this->setPreviewRestriction($restriction);
-				break;
-			case "directoryRestriction":
-				$this->setDirectoryRestriction($restriction);
-				break;
-			case "ipAddressRestriction":
-				$this->setIpAddressRestriction($restriction);
-				break;
-			case "userAgentRestriction":
-				$this->setUserAgentRestriction($restriction);
+			/* @var $rule kRule */
+			$fulfilled = $rule->applyContext($context);
+				 
+			if(!$rule->shouldDisableCache())
+				$disableCache = false;
+				
+			if($fulfilled && $rule->getStopProcessing())
 				break;
 		}
+			
+		return $disableCache;
 	}
 	
 	/**
-	 * Validate all the restrictions using the accessControlScope
+	 * Validate all rules
 	 *
-	 * @return bool
+	 * @param accessControlScope $scope
+	 * @return bool	
 	 */
-	public function isValid()
+	public function isValid(accessControlScope $scope = null)
 	{
-		if (!$this->scope instanceof accessControlScope)
-			throw new Exception("Scope was not set");
-			
-		// if we have ks
-		if ($this->scope->getKs() && ($this->scope->getKs() instanceof ks))
+		$context = new kEntryContextDataResult();
+		$this->applyContext($context, $scope);
+		return (count($context->getAccessControlActions()) == 0);
+	}
+	
+	/**
+	 * @param array<kRule> $rules
+	 */
+	public function setRulesArray(array $rules)
+	{
+		$this->setRules(serialize($rules));
+	}
+	
+	/**
+	 * @return array<kRule>
+	 */
+	public function getRulesArray()
+	{
+		$rules = array();
+		$rulesString = $this->getRules();
+		if($rulesString)
 		{
-			// not need to validate if we have an admin ks
-			if ($this->scope->getKs()->isAdmin())
-				return true;
-		}
-			
-		$restrictions = $this->getRestrictions();
-		foreach($restrictions as $restriction)
+			try
+			{
+				$rules = unserialize($rulesString);
+			}
+			catch(Exception $e)
+			{
+				KalturaLog::err("Unable to unserialize [$rulesString], " . $e->getMessage());
+				$rules = array();
+			}
+		} 
+		
+		// TODO - remove after full migration
+		if(!count($rules))
 		{
-			if ($restriction->isValid() === false) // if one is not valid, all access control considered not valid
-				return false;
+			if (!is_null($this->getSiteRestrictType()))
+				$rules[] = new kAccessControlSiteRestriction($this);
+				
+			if (!is_null($this->getCountryRestrictType()))
+				$rules[] = new kAccessControlCountryRestriction($this);
+				
+			if (!is_null($this->getKsRestrictPrivilege()))
+				$rules[] = new kAccessControlSessionRestriction($this);
+				
+			if (!is_null($this->getPrvRestrictPrivilege()))
+				$rules[] = new kAccessControlPreviewRestriction($this);
+				
+			if (!is_null($this->getFromCustomData(self::IP_ADDRESS_RESTRICTION_COLUMN_NAME)))
+				$rules[] = new kAccessControlIpAddressRestriction($this);
+				
+			if (!is_null($this->getFromCustomData(self::USER_AGENT_RESTRICTION_COLUMN_NAME)))
+				$rules[] = new kAccessControlUserAgentRestriction($this);
 		}
 		
-		return true;
-	}
-	
-	public function getSiteRestriction()
-	{
-		if (!$this->hasSiteRestriction())
-			return null;
+		foreach ($rules as &$rule)
+			$rule->setAccessControl($this);
 			
-		$restriction = new siteRestriction($this); 
-		$restriction->setType(parent::getSiteRestrictType());
-		$restriction->setSiteList(parent::getSiteRestrictList());
-		
-		return $restriction;
+		return $rules;
 	}
 	
-	public function hasSiteRestriction()
-	{
-		return (parent::getSiteRestrictType() !== null);
-	}
-	
-	public function setSiteRestriction(siteRestriction $restriction)
-	{
-		parent::setSiteRestrictType($restriction->getType());
-		parent::setSiteRestrictList($restriction->getSiteList());
-	}
-	
-	public function getCountryRestriction()
-	{
-		if (!$this->hasCountryRestriction())
-			return null;
-			
-		$restriction = new countryRestriction($this);
-		$restriction->setType(parent::getCountryRestrictType());
-		$restriction->setCountryList(parent::getCountryRestrictList());
-		
-		return $restriction;
-	}
-	
-	public function hasCountryRestriction()
-	{
-		return (parent::getCountryRestrictType() !== null);
-	}
-	
-	public function setCountryRestriction(countryRestriction $restriction)
-	{
-		parent::setCountryRestrictType($restriction->getType());
-		parent::setCountryRestrictList($restriction->getCountryList());
-	}
-	
-	public function getSessionRestriction()
-	{
-		if (!$this->hasSessionRestriction())
-			return null;
-			
-		$restriction = new sessionRestriction($this);
-		$restriction->setPrivilegeName(parent::getKsRestrictPrivilege());
-		
-		return $restriction;
-	}
-	
-	public function hasSessionRestriction()
-	{
-		return (parent::getKsRestrictPrivilege() !== null);
-	}
-	
-	public function setSessionRestriction(sessionRestriction $restriction)
-	{
-		parent::setKsRestrictPrivilege($restriction->getPrivilegeName());
-	}
-	
-	public function getPreviewRestriction()
-	{
-		if (!$this->hasPreviewRestriction())
-			return null;
-			
-		$restriction = new previewRestriction($this);
-		$restriction->setPrivilegeName(parent::getPrvRestrictPrivilege());
-		$restriction->setPreviewLength(parent::getPrvRestrictLength());
-		
-		return $restriction;
-	}
-	
-	public function hasPreviewRestriction()
-	{
-		return (parent::getPrvRestrictPrivilege() !== null);
-	}
-	
-	public function setPreviewRestriction(previewRestriction $restriction)
-	{
-		parent::setPrvRestrictPrivilege($restriction->getPrivilegeName());
-		parent::setPrvRestrictLength($restriction->getPreviewLength());
-	}
-	
-	public function getDirectoryRestriction()
-	{
-		if (!$this->hasDirectoryRestriction())
-			return null;
-			
-		$restriction = new directoryRestriction($this);
-		$restriction->setType(parent::getKdirRestrictType());
-		
-		return $restriction;
-	}
-
-	public function hasDirectoryRestriction()
-	{
-		return (parent::getKdirRestrictType() !== null);
-	}
-	
-	public function setDirectoryRestriction(directoryRestriction $restrinction)
-	{
-		parent::setKdirRestrictType($restrinction->getType());
-	}
-	
-	/* IP restriction */
-	
-	public function getIpAddressRestriction()
-	{
-		if (!$this->hasIpAddressRestriction())
-			return null;
-					
-		$restriction = new ipAddressRestriction($this);
-		$restriction->populateFromString($this->getFromCustomData(self::IP_ADDRESS_RESTRICTION_COLUMN_NAME));
-		return $restriction;
-	}
-	
-	public function hasIpAddressRestriction()
-	{
-		return $this->getFromCustomData(self::IP_ADDRESS_RESTRICTION_COLUMN_NAME) !== null;
-	}
-	
-	public function setIpAddressRestriction(ipAddressRestriction $restriction = null)
-	{
-		$restrictionString = is_null($restriction) ? null : $restriction->toString();
-		$this->putInCustomData(self::IP_ADDRESS_RESTRICTION_COLUMN_NAME, $restrictionString);
-	}
-	
-	/* User agent restriction */
-	
-	public function getUserAgentRestriction()
-	{
-		if (!$this->hasUserAgentRestriction())
-			return null;
-					
-		$restriction = new userAgentRestriction($this);
-		$restriction->populateFromString($this->getFromCustomData(self::USER_AGENT_RESTRICTION_COLUMN_NAME));
-		return $restriction;
-	}
-	
-	public function hasUserAgentRestriction()
-	{
-		return $this->getFromCustomData(self::USER_AGENT_RESTRICTION_COLUMN_NAME) !== null;
-	}
-	
-	public function setUserAgentRestriction(userAgentRestriction $restriction = null)
-	{
-		$restrictionString = is_null($restriction) ? null : $restriction->toString();
-		$this->putInCustomData(self::USER_AGENT_RESTRICTION_COLUMN_NAME, $restrictionString);
-	}
-	
-	
-	
+	/**
+	 * @param bool $v
+	 */
 	public function setIsDefault($v)
 	{
 		$this->isDefault = (bool)$v;
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function getIsDefault()
 	{
 		if ($this->isDefault === null)
@@ -451,46 +271,6 @@ class accessControl extends BaseaccessControl
 		return $this->isDefault;
 	}
 	
-	function setSiteRestrictType($v)
-	{
-		throw new Exception("Internal use only");		
-	}
-	
-	function setSiteRestrictList($v)
-	{
-		throw new Exception("Internal use only");		
-	}
-	
-	function setCountryRestrictType($v)
-	{
-		throw new Exception("Internal use only");		
-	}
-	
-	function setCountryRestrictList($v)
-	{
-		throw new Exception("Internal use only");		
-	}
-	
-	function setKsRestrictPrivilege($v)
-	{
-		throw new Exception("Internal use only");		
-	}
-	
-	function setPrvRestrictPrivilege($v)
-	{
-		throw new Exception("Internal use only");		
-	}
-	
-	function setPrvRestrictLength($v)
-	{
-		throw new Exception("Internal use only");		
-	}
-	
-	function setKdirRestrictType($v)
-	{
-		throw new Exception("Internal use only");		
-	}
-
 	public function getCacheInvalidationKeys()
 	{
 		return array("accessControl:id=".$this->getId());

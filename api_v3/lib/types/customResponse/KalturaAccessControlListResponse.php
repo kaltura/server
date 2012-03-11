@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @deprecated use KalturaAccessControlProfileListResponse instead
  */
 class KalturaAccessControlListResponse extends KalturaObject
 {

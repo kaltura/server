@@ -54,6 +54,7 @@ class accessControlTableMap extends TableMap {
 		$this->addColumn('PRV_RESTRICT_LENGTH', 'PrvRestrictLength', 'INTEGER', false, null, null);
 		$this->addColumn('KDIR_RESTRICT_TYPE', 'KdirRestrictType', 'TINYINT', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('RULES', 'Rules', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

@@ -23,6 +23,17 @@ class serveFlavorAction extends kalturaAction
 		$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
 		if (is_null($entry))
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+	
+		$clipTo = null;
+		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, accessControlContextType::PLAY);
+		if ($securyEntryHelper->shouldPreview())
+		{
+			$clipTo = $securyEntryHelper->getPreviewLength() * 1000;
+		}
+		else
+		{
+			$securyEntryHelper->validateForPlay($entry, $ks);
+		}
 			
 		myPartnerUtils::blockInactivePartner($flavorAsset->getPartnerId());
 		myPartnerUtils::enforceDelivery($flavorAsset->getPartnerId());
@@ -57,8 +68,10 @@ class serveFlavorAction extends kalturaAction
 	
 	
 		$clipFrom = $this->getRequestParameter ( "clipFrom" , 0); // milliseconds
-		$clipTo = $this->getRequestParameter ( "clipTo" , 2147483647 ); // milliseconds
-		if ( $clipTo == 0 ) $clipTo = 2147483647;
+		if(is_null($clipTo))
+			$clipTo = $this->getRequestParameter ( "clipTo" , 2147483647 ); // milliseconds
+		if($clipTo == 0) 
+			$clipTo = 2147483647;
 
 
 		if($fileParam && is_dir($path)) {

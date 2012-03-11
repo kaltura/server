@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage enum
+ * @deprecated use KalturaRule instead
  */
 class KalturaSiteRestrictionType extends KalturaEnum
 {

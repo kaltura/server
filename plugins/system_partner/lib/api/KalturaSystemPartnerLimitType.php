@@ -16,4 +16,5 @@ class KalturaSystemPartnerLimitType extends KalturaStringEnum
 	const MONTHLY_STORAGE = 'MONTHLY_STORAGE';
 	const MONTHLY_STORAGE_AND_BANDWIDTH = 'MONTHLY_STORAGE_AND_BANDWIDTH';
 	const END_USERS = 'END_USERS';	
+	const ACCESS_CONTROLS = 'ACCESS_CONTROLS';	
 }

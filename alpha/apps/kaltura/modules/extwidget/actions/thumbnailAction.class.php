@@ -157,15 +157,13 @@ class thumbnailAction extends sfAction
 		}
 		
 		//checks whether the thumbnail display should be restricted by KS
-		if($partner->getRestrictThumbnailByKs()) {
-			$base64Referrer = $this->getRequestParameter("referrer");
-			$referrer = base64_decode($base64Referrer);
-			if (!is_string($referrer)) 
-				$referrer = ""; // base64_decode can return binary data
-			$ksStr = $this->getRequestParameter("ks");
-			$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer);
-			$securyEntryHelper->validateForPlay($entry, $ksStr);
-		}
+		$base64Referrer = $this->getRequestParameter("referrer");
+		$referrer = base64_decode($base64Referrer);
+		if (!is_string($referrer)) 
+			$referrer = ""; // base64_decode can return binary data
+		$ksStr = $this->getRequestParameter("ks");
+		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, accessControlContextType::THUMBNAIL);
+		$securyEntryHelper->validateForPlay($entry, $ksStr);
 		
 		// multiply the passed $src_* values so that they will relate to the original image size, according to $src_display_*
 		if ($rel_width != -1) {
@@ -346,7 +344,8 @@ class thumbnailAction extends sfAction
 		
 		$nocache = strpos($tempThumbPath, "_NOCACHE_") !== false;
 		
-		if($partner->getRestrictThumbnailByKs()) $nocache = TRUE;
+		if($securyEntryHelper->shouldDisableCache()) 
+			$nocache = true;
 
 		// notify external proxy, so it'll cache this url
 		if (!$nocache && requestUtils::getHost() == kConf::get ( "apphome_url" )  && file_exists($tempThumbPath))

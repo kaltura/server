@@ -669,27 +669,17 @@ class BaseEntryService extends KalturaEntryService
 			$isAdmin = $ks->isAdmin();
 			
 		$accessControl = $dbEntry->getAccessControl();
+		/* @var $accessControl accessControl */
 		$result = new KalturaEntryContextDataResult();
 		$result->isAdmin = $isAdmin;
-		$result->isScheduledNow = $dbEntry->isScheduledNow();
+		$result->isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
 
-		// defaults
-		$result->isSiteRestricted = false;
-		$result->isCountryRestricted = false;
-		$result->isSessionRestricted = false;
-		$result->isIpAddressRestricted = false;
-		$result->isUserAgentRestricted = false;
-		$result->previewLength = -1;
-		$result->storageProfiles = null;
-		
-		if ($accessControl && $accessControl->hasRestrictions())
+		if ($accessControl && $accessControl->hasRules())
 		{
-			// for now add caching headers only for specific partners listed in kConf
-			// later caching will be used for all partners, and access control will be done in the caching layer
 			$disableCache = true;
 			if (kConf::hasParam("optimized_playback"))
 			{
-				$partnerId = $dbEntry->getPartnerId();
+				$partnerId = $this->accessControl->getPartnerId();
 				$optimizedPlayback = kConf::get("optimized_playback");
 				if (array_key_exists($partnerId, $optimizedPlayback))
 				{
@@ -700,46 +690,16 @@ class BaseEntryService extends KalturaEntryService
 				}
 			}
 			
-			// no need to disable caching if the access control has only site restriction and the referrer was 
-			// included the api cache key
-			if (count($accessControl->getRestrictions()) == 1 &&
-				$accessControl->hasSiteRestriction())
-			{
-				if ($ks && in_array($ks->partner_id, kConf::get('v3cache_include_referrer_in_key'))) 
-					$disableCache = false;
-			}
-			
-			if ($disableCache)
-				KalturaResponseCacher::disableCache();
-			
-			$accessControlScope = accessControlScope::partialInit();
-			$accessControlScope->setReferrer($contextDataParams->referrer);
-			$accessControlScope->setKs($this->getKs());
+			$accessControlScope = $accessControl->getScope();
+            $contextDataParams->toObject($accessControlScope);
             $accessControlScope->setEntryId($entryId);
-			$accessControl->setScope($accessControlScope);
-
-			
-			if ($accessControl->hasSiteRestriction())
-				$result->isSiteRestricted = !$accessControl->getSiteRestriction()->isValid();
+			$result->isAdmin = $accessControlScope->getKs()->isAdmin();
+            
+			$dbResult = new kEntryContextDataResult();
+			if($accessControl->applyContext($dbResult))
+				KalturaResponseCacher::disableCache();
 				
-			if ($accessControl->hasCountryRestriction())
-				$result->isCountryRestricted = !$accessControl->getCountryRestriction()->isValid();
-				
-			if ($accessControl->hasSessionRestriction())
-				$result->isSessionRestricted = !$accessControl->getSessionRestriction()->isValid();
-				
-			if ($accessControl->hasPreviewRestriction())
-			{
-				$result->isSessionRestricted = !$accessControl->getPreviewRestriction()->isValid();
-				$result->previewLength = $accessControl->getPreviewRestriction()->getPreviewLength();
-			}
-			
-			if ($accessControl->hasIpAddressRestriction())
-				$result->isIpAddressRestricted = !$accessControl->getIpAddressRestriction()->isValid();
-			
-			if ($accessControl->hasUserAgentRestriction())
-				$result->isUserAgentRestricted = !$accessControl->getUserAgentRestriction()->isValid();
-			
+			$result->fromObject($dbResult);
 		}
 		
 		$partner = PartnerPeer::retrieveByPK($dbEntry->getPartnerId());
