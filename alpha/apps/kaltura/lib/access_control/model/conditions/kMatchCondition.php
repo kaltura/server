@@ -21,7 +21,7 @@ abstract class kMatchCondition extends kCondition
 			if(is_string($value))
 				$kStringValues[$index] = new kStringValue($value);
 				
-		$this->values = $values;
+		$this->values = $kStringValues;
 	}
 	
 	/**
