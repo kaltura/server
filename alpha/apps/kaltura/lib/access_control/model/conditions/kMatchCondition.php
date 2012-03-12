@@ -16,6 +16,11 @@ abstract class kMatchCondition extends kCondition
 	 */
 	function setValues(array $values)
 	{
+		$kStringValues = $values;
+		foreach($values as $index => $value)
+			if(is_string($value))
+				$kStringValues[$index] = new kStringValue($value);
+				
 		$this->values = $values;
 	}
 	

@@ -8,6 +8,14 @@
 class kStringValue extends kValue
 {
 	/**
+	 * @param string $value
+	 */
+	public function __construct($value) 
+	{
+		$this->value = $value;
+	}
+	
+	/**
 	 * @return string $value
 	 */
 	public function getValue() 
