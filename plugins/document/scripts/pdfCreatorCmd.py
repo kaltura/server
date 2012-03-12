@@ -3,6 +3,12 @@ import os.path
 import time
 import sys
 
+def getDefaultPrinter():
+    try:
+        return win32print.GetDefaultPrinter()
+    except RuntimeError:        # The default printer was not found.
+        return None
+
 if len(sys.argv) < 4:
     print 'wrong usage of this script. usage: %s {inputFile} {outFile} [--readOnly]' % os.path.dirname(__file__);
     sys.exit(1)
@@ -32,7 +38,7 @@ command = ' '.join(commandParams)
 
 # make sure the default printer is set appropriately
 PDF_CREATOR_PRINTER = 'PDFCreator'
-if win32print.GetDefaultPrinter() != PDF_CREATOR_PRINTER:
+if getDefaultPrinter() != PDF_CREATOR_PRINTER:
     print 'setting default printer to %s' % PDF_CREATOR_PRINTER
     win32print.SetDefaultPrinter(PDF_CREATOR_PRINTER)
 
