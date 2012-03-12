@@ -83,6 +83,16 @@ abstract class SphinxCriteria extends KalturaCriteria
 	}
 	
 	/**
+	 *	Overridable function which determines whether 
+	 *	The criteria enables star-searches. 
+	 *	@return bool
+	 */
+	public function starEnabled ()
+	{
+	    return false;
+	}
+	
+	/**
 	 * @return criteriaFilter
 	 */
 	abstract protected function getDefaultCriteriaFilter();
@@ -541,7 +551,14 @@ abstract class SphinxCriteria extends KalturaCriteria
 						$filter->unsetByName($field);
 					}
 					break;
-					
+				case baseObjectFilter::LIKEX:
+			        if(strlen($val) > 0 && $this->starEnabled())
+					{
+						$val = SphinxUtils::escapeString($val);
+						$this->matchClause[] = "@$sphinxField $val\\\*";
+						$filter->unsetByName($field);
+					}
+				    break;	
 				default:
 					KalturaLog::debug("Skip field[$field] has no opertaor[$operator]");
 			}
