@@ -36,7 +36,7 @@ abstract class kAccessControlRestriction extends kRule
 	{
 		$fulfilled = parent::applyContext($context);
 
-		if(!$fulfilled)
+		if($fulfilled)
 			foreach($this->actions as $action)
 				if($action instanceof kAccessControlPreviewAction)
 					$context->setPreviewLength($action->getLimit());

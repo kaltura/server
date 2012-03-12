@@ -33,7 +33,7 @@ class kAccessControlSessionRestriction extends kAccessControlRestriction
 	public function applyContext(kEntryContextDataResult $context)
 	{
 		$fulfilled = parent::applyContext($context);
-		if(!$fulfilled)
+		if($fulfilled)
 			$context->setIsSessionRestricted(true);
 			
 		return $fulfilled;

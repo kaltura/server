@@ -42,7 +42,7 @@ class kAccessControlPreviewRestriction extends kAccessControlRestriction
 	public function applyContext(kEntryContextDataResult $context)
 	{
 		$fulfilled = parent::applyContext($context);
-		if(!$fulfilled)
+		if($fulfilled)
 			$context->setPreviewLength($this->getAction()->getLimit());
 			
 		return $fulfilled;

@@ -37,7 +37,7 @@ class kAccessControlIpAddressRestriction extends kAccessControlRestriction
 	public function applyContext(kEntryContextDataResult $context)
 	{
 		$fulfilled = parent::applyContext($context);
-		if(!$fulfilled)
+		if($fulfilled)
 			$context->setIsIpAddressRestricted(true);
 			
 		return $fulfilled;
@@ -59,7 +59,7 @@ class kAccessControlIpAddressRestriction extends kAccessControlRestriction
 	 */
 	function setIpAddressRestrictionType($type)
 	{
-		$this->getCondition()->setNot($type == kAccessControlRestriction::RESTRICTION_TYPE_RESTRICT_LIST);
+		$this->getCondition()->setNot($type == kAccessControlRestriction::RESTRICTION_TYPE_ALLOW_LIST);
 	}
 	
 	/**
