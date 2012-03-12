@@ -58,7 +58,7 @@ class kAccessControlCountryRestriction extends kAccessControlRestriction
 	 */
 	function setCountryRestrictionType($type)
 	{
-		$this->getCondition()->setNot($type == kAccessControlRestriction::RESTRICTION_TYPE_ALLOW_LIST);
+		$this->getCondition()->setNot($type == kAccessControlRestriction::RESTRICTION_TYPE_RESTRICT_LIST);
 	}
 	
 	/**
