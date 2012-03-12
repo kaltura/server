@@ -83,16 +83,6 @@ abstract class SphinxCriteria extends KalturaCriteria
 	}
 	
 	/**
-	 *	Overridable function which determines whether 
-	 *	The criteria enables star-searches. 
-	 *	@return bool
-	 */
-	public function starEnabled ()
-	{
-	    return false;
-	}
-	
-	/**
 	 * @return criteriaFilter
 	 */
 	abstract protected function getDefaultCriteriaFilter();
@@ -552,7 +542,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 					}
 					break;
 				case baseObjectFilter::LIKEX:
-			        if(strlen($val) > 0 && $this->starEnabled())
+			        if(strlen($val) > 0)
 					{
 						$val = SphinxUtils::escapeString($val);
 						$this->matchClause[] = "@$sphinxField $val\\\*";
