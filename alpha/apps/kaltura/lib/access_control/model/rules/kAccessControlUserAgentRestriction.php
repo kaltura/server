@@ -84,7 +84,7 @@ class kAccessControlUserAgentRestriction extends kAccessControlRestriction
 	 */
 	function getUserAgentRegexList()
 	{
-		return implode(',', $this->getCondition()->getValues());
+		return implode(',', $this->getCondition()->getStringValues());
 	}
 }
 

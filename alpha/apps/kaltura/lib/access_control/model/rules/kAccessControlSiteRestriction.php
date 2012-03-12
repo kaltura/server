@@ -83,6 +83,6 @@ class kAccessControlSiteRestriction extends kAccessControlRestriction
 	 */
 	public function getSiteList()
 	{
-		return implode(',', $this->getCondition()->getValues());
+		return implode(',', $this->getCondition()->getStringValues());
 	}
 }

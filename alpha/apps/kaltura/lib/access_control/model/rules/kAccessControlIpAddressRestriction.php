@@ -84,7 +84,7 @@ class kAccessControlIpAddressRestriction extends kAccessControlRestriction
 	 */
 	function getIpAddressList()
 	{
-		return implode(',', $this->getCondition()->getValues());
+		return implode(',', $this->getCondition()->getStringValues());
 	}
 }
 

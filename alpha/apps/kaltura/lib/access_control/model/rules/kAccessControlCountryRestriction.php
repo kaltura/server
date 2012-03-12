@@ -83,7 +83,7 @@ class kAccessControlCountryRestriction extends kAccessControlRestriction
 	 */
 	function getCountryList()
 	{
-		return implode(',', $this->getCondition()->getValues());
+		return implode(',', $this->getCondition()->getStringValues());
 	}
 }
 
