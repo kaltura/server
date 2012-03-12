@@ -1195,6 +1195,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="prv_restrict_length" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kdir_restrict_type" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="rules" type="longvarchar" />
 	</table>
 	<table skipSql="false" abstract="false" name="media_info" phpName="mediaInfo">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
@@ -1346,7 +1347,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="container_format" type="varchar" size="127" />
 		<column primaryKey="false" lazyLoad="false" name="type" type="integer" required="true" inheritance="single" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
+		<foreign-key onDelete="none" onUpdate="none" onLoad="validate" foreignTable="entry">
 			<reference local="entry_id" foreign="id" />
 		</foreign-key>
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="flavor_params">
