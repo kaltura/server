@@ -1,12 +1,12 @@
 
 [config]
 source                                            = ini
-serviceUrl                                        = hudsontest1.kaltura.dev
-partnerId                                         = 115
+serviceUrl                                        = www.kaltura.com
+partnerId                                         = 528281
 clientTag                                         = unitTest
 curlTimeout                                       = 120
 startSession                                      = 1
-secret                                            = 81c8f9aa6bd5562a46ef15f188f9c605
+secret                                            = 767aed746ac10996c0c6cc57ab386661
 userId                                            = 
 sessionType                                       = 2
 expiry                                            = 86400
@@ -178,11 +178,10 @@ test1.accessControl.restrictions.item1.ipAddressRestrictionType= 0
 test1.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
 
 test1.contextDataParams.objectType                = KalturaEntryContextDataParams
-test1.contextDataParams.ip                        = 255.198.197.253
 
 test1.contextDataResultReference.objectType       = KalturaEntryContextDataResult
 test1.contextDataResultReference.isScheduledNow   = 1
-test1.contextDataResultReference.isAdmin          = 
+test1.contextDataResultReference.isAdmin          = 1
 test1.contextDataResultReference.streamerType     = http
 test1.contextDataResultReference.mediaProtocol    = http
 test1.contextDataResultReference.isIpAddressRestricted    = false
@@ -200,17 +199,13 @@ test2.accessControl.restrictions.item1.ipAddressRestrictionType= 1
 test2.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
 
 test2.contextDataParams.objectType                = KalturaEntryContextDataParams
-test2.contextDataParams.ip                        = 255.198.197.253
 
 test2.contextDataResultReference.objectType       = KalturaEntryContextDataResult
 test2.contextDataResultReference.isScheduledNow   = 1
-test2.contextDataResultReference.isAdmin          = 
+test2.contextDataResultReference.isAdmin          = 1
 test2.contextDataResultReference.streamerType     = http
 test2.contextDataResultReference.mediaProtocol    = http
 test2.contextDataResultReference.isIpAddressRestricted    = true
-test2.contextDataResultReference.actions.objectType= array
-test2.contextDataResultReference.actions.item0.objectType= KalturaAccessControlBlockAction
-test2.contextDataResultReference.actions.item0.type= 1
 
 
 
@@ -225,20 +220,16 @@ test3.accessControl.isDefault = false
 test3.accessControl.restrictions.objectType       = array
 test3.accessControl.restrictions.item1.objectType = KalturaUserAgentRestriction
 test3.accessControl.restrictions.item1.userAgentRestrictionType= 1
-test3.accessControl.restrictions.item1.userAgentRegexList= .*chrome.*
 
 test3.contextDataParams.objectType                = KalturaEntryContextDataParams
-test3.contextDataParams.userAgent = my firefox browser
+test3.contextDataParams.userAgent = my chrome browser
 
 test3.contextDataResultReference.objectType       = KalturaEntryContextDataResult
 test3.contextDataResultReference.isScheduledNow   = true
-test3.contextDataResultReference.isAdmin          = 
+test3.contextDataResultReference.isAdmin          = 1
 test3.contextDataResultReference.streamerType     = http
 test3.contextDataResultReference.mediaProtocol    = http
 test3.contextDataResultReference.isUserAgentRestricted    = true
-test3.contextDataResultReference.actions.objectType= array
-test3.contextDataResultReference.actions.item0.objectType= KalturaAccessControlBlockAction
-test3.contextDataResultReference.actions.item0.type= 1
 
 
 
@@ -251,46 +242,17 @@ test4.accessControl.description                   = Unit test access control pro
 test4.accessControl.isDefault = false
 test4.accessControl.restrictions.objectType       = array
 test4.accessControl.restrictions.item1.objectType = KalturaUserAgentRestriction
-test4.accessControl.restrictions.item1.userAgentRestrictionType= 1
-test4.accessControl.restrictions.item1.userAgentRegexList= .*chrome.*
+test4.accessControl.restrictions.item1.userAgentRestrictionType= 0
 
 test4.contextDataParams.objectType                = KalturaEntryContextDataParams
 test4.contextDataParams.userAgent = my chrome browser
 
 test4.contextDataResultReference.objectType       = KalturaEntryContextDataResult
 test4.contextDataResultReference.isScheduledNow   = true
-test4.contextDataResultReference.isAdmin          = 
+test4.contextDataResultReference.isAdmin          = 1
 test4.contextDataResultReference.streamerType     = http
 test4.contextDataResultReference.mediaProtocol    = http
 test4.contextDataResultReference.isUserAgentRestricted    = false
-
-
-
-
-
-
-
-
-
-test5.accessControl.objectType                    = KalturaAccessControl
-test5.accessControl.name                          = test4
-test5.accessControl.systemName                    = TEST4
-test5.accessControl.description                   = Unit test access control profile
-test5.accessControl.isDefault = false
-test5.accessControl.restrictions.objectType       = array
-test5.accessControl.restrictions.item1.objectType = KalturaUserAgentRestriction
-test5.accessControl.restrictions.item1.userAgentRestrictionType= 0
-test5.accessControl.restrictions.item1.userAgentRegexList= .*chrome.*
-
-test5.contextDataParams.objectType                = KalturaEntryContextDataParams
-test5.contextDataParams.userAgent = my firefox browser
-
-test5.contextDataResultReference.objectType       = KalturaEntryContextDataResult
-test5.contextDataResultReference.isScheduledNow   = true
-test5.contextDataResultReference.isAdmin          = 
-test5.contextDataResultReference.streamerType     = http
-test5.contextDataResultReference.mediaProtocol    = http
-test5.contextDataResultReference.isUserAgentRestricted    = false
 
 
 [testFeed]
