@@ -76,7 +76,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable
 	private static $mapBetweenObjects = array
 	(
 		"categoryId",
-		"userId" => "kuserId",
+		"userId" => "puserId",
 		"partnerId",
 		"permissionLevel",
 		"status",
@@ -118,7 +118,8 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		if (!kuserPeer::doCountKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId))
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
+		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
 			
 		$category = categoryPeer::retrieveByPK($this->categoryId);
@@ -128,9 +129,9 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable
 		if ($category->getMembershipSetting() == CategoryMembershipSettingType::INHERT)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS, $this->categoryId);		
 			
-		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->categoryId, $this->userId);
+		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->categoryId, $kuser->getId());
 		if ($categoryKuser)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_USER_ALREADY_EXISTS, $categoryKuser->getId());
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_USER_ALREADY_EXISTS);
 			
 		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->categoryId, kCurrentContext::$uid);
 		if ((!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER) &&

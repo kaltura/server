@@ -18,7 +18,7 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"partnerIdEqual" => "_eq_partner_id",
 		"partnerIdIn" => "_in_partner_id",
 		"userIdEqual" => "_eq_user_id",
-		"creatorEqual" => "_eq_creator",
+		"creatorIdEqual" => "_eq_creator_id",
 		"tagsLike" => "_like_tags",
 		"tagsMultiLikeOr" => "_mlikeor_tags",
 		"tagsMultiLikeAnd" => "_mlikeand_tags",
@@ -68,10 +68,6 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"partnerSortValueLessThanOrEqual" => "_lte_partner_sort_value",
 		"rootEntryIdEqual" => "_eq_root_entry_id",
 		"rootEntryIdIn" => "_in_root_entry_id",
-		"entitledUsersEditMatchAnd" => "_matchand_entitled_users_edit",
-		"entitledUsersEditMatchOr" => "_matchor_entitled_users_edit",
-		"entitledUsersPublishMatchAnd" => "_matchand_entitled_users_publish",
-		"entitledUsersPublishMatchOr" => "_matchor_entitled_users_publish",
 		"tagsNameMultiLikeOr" => "_mlikeor_tags-name",
 		"tagsAdminTagsMultiLikeOr" => "_mlikeor_tags-admin_tags",
 		"tagsAdminTagsNameMultiLikeOr" => "_mlikeor_tags-admin_tags-name",
@@ -186,7 +182,7 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * 
 	 * @var string
 	 */
-	public $creatorEqual;
+	public $creatorIdEqual;
 
 	/**
 	 * This filter should be in use for retrieving specific entries. It should include only one string to search for in entry tags (no wildcards, spaces are treated as part of the string).
@@ -534,34 +530,6 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $rootEntryIdIn;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $entitledUsersEditMatchAnd;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $entitledUsersEditMatchOr;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $entitledUsersPublishMatchAnd;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $entitledUsersPublishMatchOr;
 
 	/**
 	 * @var string

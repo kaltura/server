@@ -367,7 +367,7 @@ class KalturaErrors extends APIErrors
 	 */
 	const INVALID_CATEGORY_USER_ID = "INVALID_CATEGORY_USER_ID,Invalid CategoryUser for category [\"%s\"] and for user [\"%s\"]";
 	
-	const CATEGORY_USER_ALREADY_EXISTS = "CATEGORY_USER_ALREADY_EXISTS,CategoryUser already exists [\"%s\"]";
+	const CATEGORY_USER_ALREADY_EXISTS = "CATEGORY_USER_ALREADY_EXISTS,CategoryUser already exists";
 	
 	const CATEGORY_INHERIT_MEMBERS = "CATEGORY_INHERIT_MEMBERS,Cannot add members to this category since its inherit members from parent category [\"%s\"]";
 	
