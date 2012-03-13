@@ -81,4 +81,23 @@ class EntryAdminService extends KalturaBaseService
 		$response->totalCount = count($dbList);
 		return $response;
 	}
+
+    /**
+     * Get MRSS entry by entry id
+     * XML will return as an escaped string
+     *
+     * @action getMrssEntry
+     * @param string $entryId Entry id
+     * @return string
+     */
+    function getMrssEntry($entryId)
+    {
+        $dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
+        if (!count($dbEntry))
+            throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+        /* @var $mrss SimpleXMLElement */
+        $mrss = kMrssManager::getEntryMrssXml($dbEntry);
+        return $mrss->asXML();
+    }
 }
