@@ -362,65 +362,19 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 		}
 		
 		Infra_ClientHelper::unimpersonate();
-		
+
 		return $this->metadataProfileFields;
 	}
-	
+
 	protected function getEntryFields()
 	{
 		return array(
-			'entry.ID' => 'entry.ID',
-			'entry.KSHOW_ID' => 'entry.KSHOW_ID',
-			'entry.KUSER_ID' => 'entry.KUSER_ID',
-			'entry.NAME' => 'entry.NAME',
-			'entry.TYPE' => 'entry.TYPE',
-			'entry.MEDIA_TYPE' => 'entry.MEDIA_TYPE',
-			'entry.DATA' => 'entry.DATA',
-			'entry.THUMBNAIL' => 'entry.THUMBNAIL',
-			'entry.VIEWS' => 'entry.VIEWS',
-			'entry.VOTES' => 'entry.VOTES',
-			'entry.COMMENTS' => 'entry.COMMENTS',
-			'entry.FAVORITES' => 'entry.FAVORITES',
-			'entry.TOTAL_RANK' => 'entry.TOTAL_RANK',
-			'entry.RANK' => 'entry.RANK',
-			'entry.TAGS' => 'entry.TAGS',
-			'entry.ANONYMOUS' => 'entry.ANONYMOUS',
-			'entry.STATUS' => 'entry.STATUS',
-			'entry.SOURCE' => 'entry.SOURCE',
-			'entry.SOURCE_ID' => 'entry.SOURCE_ID',
-			'entry.SOURCE_LINK' => 'entry.SOURCE_LINK',
-			'entry.LICENSE_TYPE' => 'entry.LICENSE_TYPE',
-			'entry.CREDIT' => 'entry.CREDIT',
-			'entry.LENGTH_IN_MSECS' => 'entry.LENGTH_IN_MSECS',
-			'entry.CREATED_AT' => 'entry.CREATED_AT',
-			'entry.UPDATED_AT' => 'entry.UPDATED_AT',
-			'entry.PARTNER_ID' => 'entry.PARTNER_ID',
-			'entry.DISPLAY_IN_SEARCH' => 'entry.DISPLAY_IN_SEARCH',
-			'entry.SUBP_ID' => 'entry.SUBP_ID',
-			'entry.CUSTOM_DATA' => 'entry.CUSTOM_DATA',
-			'entry.SCREEN_NAME' => 'entry.SCREEN_NAME',
-			'entry.SITE_URL' => 'entry.SITE_URL',
-			'entry.PERMISSIONS' => 'entry.PERMISSIONS',
-			'entry.GROUP_ID' => 'entry.GROUP_ID',
-			'entry.PLAYS' => 'entry.PLAYS',
-			'entry.PARTNER_DATA' => 'entry.PARTNER_DATA',
-			'entry.INT_ID' => 'entry.INT_ID',
-			'entry.INDEXED_CUSTOM_DATA_1' => 'entry.INDEXED_CUSTOM_DATA_1',
-			'entry.DESCRIPTION' => 'entry.DESCRIPTION',
-			'entry.MEDIA_DATE' => 'entry.MEDIA_DATE',
-			'entry.ADMIN_TAGS' => 'entry.ADMIN_TAGS',
-			'entry.MODERATION_STATUS' => 'entry.MODERATION_STATUS',
-			'entry.MODERATION_COUNT' => 'entry.MODERATION_COUNT',
-			'entry.MODIFIED_AT' => 'entry.MODIFIED_AT',
-			'entry.PUSER_ID' => 'entry.PUSER_ID',
-			'entry.ACCESS_CONTROL_ID' => 'entry.ACCESS_CONTROL_ID',
-			'entry.CONVERSION_PROFILE_ID' => 'entry.CONVERSION_PROFILE_ID',
-			'entry.CATEGORIES' => 'entry.CATEGORIES',
-			'entry.CATEGORIES_IDS' => 'entry.CATEGORIES_IDS',
-			'entry.START_DATE' => 'entry.START_DATE',
-			'entry.END_DATE' => 'entry.END_DATE',
-			'entry.FLAVOR_PARAMS_IDS' => 'entry.FLAVOR_PARAMS_IDS',
-			'entry.AVAILABLE_FROM' => 'entry.AVAILABLE_FROM',
+            'entry.NAME' => 'entry.NAME',
+            'entry.TAGS' => 'entry.TAGS',
+            'entry.DESCRIPTION' => 'entry.DESCRIPTION',
+            'entry.CATEGORIES' => 'entry.CATEGORIES',
+            'entry.START_DATE' => 'entry.START_DATE',
+            'entry.END_DATE' => 'entry.END_DATE',
 		);
 	}
 }
