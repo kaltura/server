@@ -22,6 +22,7 @@ CREATE TABLE `category_kuser`
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`category_id` INTEGER  NOT NULL,
 	`kuser_id` INTEGER  NOT NULL,
+	`puser_id` VARCHAR(100)  NOT NULL,
 	`partner_id` INTEGER  NOT NULL,
 	`permission_level` TINYINT,
 	`status` TINYINT,
