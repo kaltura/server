@@ -40,6 +40,7 @@ class categoryKuserTableMap extends TableMap {
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addForeignKey('CATEGORY_ID', 'CategoryId', 'INTEGER', 'category', 'ID', true, null, null);
 		$this->addForeignKey('KUSER_ID', 'KuserId', 'INTEGER', 'kuser', 'ID', true, null, null);
+		$this->addColumn('PUSER_ID', 'PuserId', 'VARCHAR', true, 100, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('PERMISSION_LEVEL', 'PermissionLevel', 'TINYINT', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
