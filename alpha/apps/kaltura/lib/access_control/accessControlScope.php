@@ -31,6 +31,12 @@ class accessControlScope
 	protected $userAgent;
 	
 	/**
+	 * Unix timestamp (In seconds) to be used to test entry scheduling, keep null to use now.
+	 * @var int
+	 */
+	protected $time;
+	
+	/**
 	 * Indicates what contexts should be tested 
 	 * No contexts means any context
 	 * 
@@ -143,6 +149,25 @@ class accessControlScope
 	public function getContexts() 
 	{
 		return $this->contexts;
+	}
+
+	/**
+	 * @return int $time
+	 */
+	public function getTime() 
+	{
+		if(is_null($this->time))
+			return time();
+			
+		return $this->time;
+	}
+
+	/**
+	 * @param int $time
+	 */
+	public function setTime($time) 
+	{
+		$this->time = $time;
 	}
 
 	/**

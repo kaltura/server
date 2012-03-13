@@ -10,8 +10,11 @@ class kUserAgentContextField extends kStringField
 	/* (non-PHPdoc)
 	 * @see kStringField::getFieldValue()
 	 */
-	protected function getFieldValue() 
+	protected function getFieldValue(accessControlScope $scope = null) 
 	{
-		return isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
+		if(!$scope)
+			$scope = new accessControlScope();
+			
+		return $scope->getUserAgent();
 	}
 }

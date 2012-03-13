@@ -26,7 +26,7 @@ class kFieldCompareCondition extends kCompareCondition
 	 */
 	public function getFieldValue(accessControl $accessControl)
 	{
-		return $this->field->getValue();
+		return $this->field->getFieldValue($accessControl->getScope());
 	}
 	
 	/**

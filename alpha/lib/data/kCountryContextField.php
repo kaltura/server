@@ -17,9 +17,12 @@ class kCountryContextField extends kStringField
 	/* (non-PHPdoc)
 	 * @see kIntegerField::getFieldValue()
 	 */
-	protected function getFieldValue()
+	protected function getFieldValue(accessControlScope $scope = null)
 	{
-		$ip = requestUtils::getRemoteAddress();
+		if(!$scope)
+			$scope = new accessControlScope();
+			
+		$ip = $scope->getIp();
 		$ipGeo = kGeoCoderManager::getGeoCoder($this->getGeoCoderType());
 		$country = $ipGeo->getCountry($ip);
 		return trim(strtolower($country), " \n\r\t");

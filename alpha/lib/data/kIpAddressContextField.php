@@ -10,8 +10,11 @@ class kIpAddressContextField extends kStringField
 	/* (non-PHPdoc)
 	 * @see kIntegerField::getFieldValue()
 	 */
-	protected function getFieldValue()
+	protected function getFieldValue(accessControlScope $scope = null)
 	{
-		return requestUtils::getRemoteAddress();
-	}	
+		if(!$scope)
+			$scope = new accessControlScope();
+			
+		return $scope->getIp();
+	}
 }
