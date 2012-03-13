@@ -328,7 +328,6 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 	
 	protected function getMetadataFields()
 	{
-        return array();
 		if(is_array($this->metadataProfileFields))
 			return $this->metadataProfileFields;
 			
