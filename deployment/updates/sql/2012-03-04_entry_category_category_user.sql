@@ -5,7 +5,7 @@ ADD `members_count` INTEGER default 0,
 ADD `pending_members_count` INTEGER default 0,
 ADD `description` TEXT,
 ADD `tags` TEXT,
-ADD `listing` TINYINT default 1,
+ADD `display_in_search` TINYINT default 1,
 ADD `privacy` TINYINT default 1,
 ADD `membership_setting` TINYINT default 2,
 ADD `user_join_policy` TINYINT default 3,
@@ -38,7 +38,7 @@ CREATE TABLE `category_kuser`
 UPDATE category SET STATUS=2 WHERE deleted_at IS NULL;
 UPDATE category SET STATUS=3 WHERE deleted_at IS NOT NULL;
 UPDATE category SET 
-`listing`=1,
+`display_in_search`=1,
 `privacy`=1,
 `membership_setting`=2,
 `user_join_policy`=3,

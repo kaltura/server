@@ -27,7 +27,6 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable
 	 * 
 	 * @var int
 	 * @readonly
-	 * @filter eq,in
 	 */
 	public $partnerId;
 	
@@ -67,7 +66,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable
 	public $updatedAt;
 	
 	/**
-	 * Status
+	 * Update method can be either manual or automatic to distinguish between manual operations (for example in KMC) on automatic - using bulk upload 
 	 * 
 	 * @var KalturaUpdateMethodType
 	 * @filter eq
@@ -119,8 +118,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
-		if (!$kuser)
+		if (!kuserPeer::doCountKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId))
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
 			
 		$category = categoryPeer::retrieveByPK($this->categoryId);

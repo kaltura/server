@@ -1414,7 +1414,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="pending_members_count" type="integer" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="description" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="listing" type="tinyint" default="1"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="display_in_search" type="tinyint" default="1"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy" type="tinyint" default="1"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="membership_setting" type="tinyint" default="2"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="user_join_policy" type="tinyint" default="3"/>

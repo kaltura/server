@@ -12,6 +12,7 @@ class categoryPeer extends BasecategoryPeer
 	const CATEGORY_SEPARATOR = ">";
 	
 	const MAX_CATEGORY_NAME = 60;
+	const MEMBERS = 'category.MEMBERS';
 	
 	
 	private static $invalid_characters = array('>','<',',');
@@ -29,11 +30,14 @@ class categoryPeer extends BasecategoryPeer
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 		$c->add ( self::STATUS, CategoryStatus::DELETED, Criteria::NOT_EQUAL );
 		
-		if (kEntitlementUtils::$entitlementScope)
+		if (kEntitlementUtils::getEntitlementScope())
 		{
-			//TODO - add 
-			// $c->addOr() user id is member of this category 
-			$c->add ( self::LISTING, ListingType::LISTED, Criteria::EQUAL );
+			//TODO -
+			// $c->addOr() user id is member of this category  or display_in_search
+
+//			/$crit = $c->getNewCriterion ( self::DISPLAY_IN_SEARCH, displayInSearchType::LISTED, Criteria::EQUAL );
+		//	$crit->addOr ( $c->getNewCriterion ( self::MEMBERS , kCurrentContext::$uid, Criteria::EQUAL) );
+		//	$c->addAnd ( $crit );
 		}		
 		
 		self::$s_criteria_filter->setFilter ( $c );
@@ -130,4 +134,5 @@ class categoryPeer extends BasecategoryPeer
 			
 		return parent::doSelect($c, $con);
 	}
+	
 }

@@ -150,12 +150,12 @@ class CategoryUserService extends KalturaBaseService
 	/**
 	 * activate CategoryUser
 	 * 
-	 * @action activate
+	 * @action approve
 	 * @param int $categoryId
 	 * @param string $userId
 	 * @return KalturaCategoryUser
 	 */
-	function activateAction($categoryId, $userId)
+	function approveAction($categoryId, $userId)
 	{
 		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
 		if (!$kuser)

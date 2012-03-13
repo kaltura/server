@@ -606,7 +606,6 @@ class KalturaEntryService extends KalturaBaseService
 		$this->checkAdminOnlyInsertProperties($entry);
 		$this->validateAccessControlId($entry);
 		$this->validateEntryScheduleDates($entry, $dbEntry);
-		$this->validateEntitledUsers($entry); 
 			
 		$dbEntry->setPartnerId($this->getPartnerId());
 		$dbEntry->setSubpId($this->getPartnerId() * 100);
@@ -1122,19 +1121,7 @@ class KalturaEntryService extends KalturaBaseService
 		}
 	}
 	
-	/**
-	 * Throws an error if EntitledUsersEdit or EntitledUsersPublish is not valid
-	 * 
-	 * @param KalturaBaseEntry $entry
-	 */
-	protected function validateEntitledUsers($entry)
-	{
-		$entitledUsersEdit = $entry->entitledUsersEdit;
-		$entitledUsersPublish = $entry->entitledUsersPublish;
-		
-		//TODO - validate users exits.
-	}
-	
+
 	protected function createDummyKShow()
 	{
 		$kshow = new kshow();

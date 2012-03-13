@@ -89,10 +89,6 @@ class entryTableMap extends TableMap {
 		$this->addColumn('END_DATE', 'EndDate', 'TIMESTAMP', false, null, null);
 		$this->addColumn('FLAVOR_PARAMS_IDS', 'FlavorParamsIds', 'VARCHAR', false, 512, null);
 		$this->addColumn('AVAILABLE_FROM', 'AvailableFrom', 'TIMESTAMP', false, null, null);
-		$this->addColumn('CREATOR_KUSER_ID', 'CreatorKuserId', 'INTEGER', false, null, null);
-		$this->addColumn('CREATOR_PUSER_ID', 'CreatorPuserId', 'VARCHAR', false, 64, null);
-		$this->addColumn('ENTITLED_USERS_EDIT', 'EntitledUsersEdit', 'LONGVARCHAR', false, null, null);
-		$this->addColumn('ENTITLED_USERS_PUBLISH', 'EntitledUsersPublish', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

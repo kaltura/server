@@ -11,7 +11,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'category.TAGS' => 'tags',
 		'category.STATUS' => 'category_status',
 		'category.KUSER_ID' => 'kuser_id',
-		'category.LISTING' => 'listing',	
+		'category.DISPLAY_IN_SEARCH' => 'display_in_search',	
 		'category.SEARCH_TEXT' => '(name,tags,description)',
 		'category.MEMBERS' => 'members'
 	);
@@ -21,8 +21,17 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	);
 	
 	public static $sphinxTypes = array(
-		'ID' => IIndexable::FIELD_TYPE_INTEGER,
-			);
+		'category_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'name' => IIndexable::FIELD_TYPE_STRING,
+		'full_name' => IIndexable::FIELD_TYPE_STRING,
+		'description' => IIndexable::FIELD_TYPE_STRING,
+		'tags' => IIndexable::FIELD_TYPE_STRING,
+		'category_status' => IIndexable::FIELD_TYPE_INTEGER,
+		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'display_in_search' => IIndexable::FIELD_TYPE_STRING,
+		'search_text' => IIndexable::FIELD_TYPE_STRING,
+		'members' => IIndexable::FIELD_TYPE_STRING);
 
 	/**
 	 * @return criteriaFilter
@@ -75,7 +84,6 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		if ($matchAndCats !== null)
 		{
 			//TODO - implement pusers to kusers
-			$filter->set ( "in_members", 'pusersKusers' );
 			$filter->unsetByName('in_members');
 		}
 		
@@ -156,6 +164,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$fieldName = strtoupper($fieldName);
 			$fieldName = "category.$fieldName";
 		}
+		KalturaLog::debug('### $fieldName: ' . $fieldName);
 
 		return isset(self::$sphinxFields[$fieldName]);
 	}

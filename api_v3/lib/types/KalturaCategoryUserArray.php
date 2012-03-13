@@ -23,4 +23,3 @@ class KalturaCategoryUserArray extends KalturaTypedArray
 		return parent::__construct("KalturaCategoryUser");
 	}
 }
-?>

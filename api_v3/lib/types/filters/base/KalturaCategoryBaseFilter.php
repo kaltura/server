@@ -18,7 +18,7 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 		"tagsLike" => "_like_tags",
 		"tagsMultiLikeOr" => "_mlikeor_tags",
 		"tagsMultiLikeAnd" => "_mlikeand_tags",
-		"listingEqual" => "_eq_listing",
+		"displayInSearchEqual" => "_eq_display_in_search",
 		"privacyEqual" => "_eq_privacy",
 		"privacyIn" => "_in_privacy",
 		"membershipSettingEqual" => "_eq_membership_setting",
@@ -120,9 +120,9 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var KalturaListingType
+	 * @var KalturadisplayInSearchType
 	 */
-	public $listingEqual;
+	public $displayInSearchEqual;
 
 	/**
 	 * 

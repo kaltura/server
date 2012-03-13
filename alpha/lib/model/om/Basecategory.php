@@ -122,11 +122,11 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	protected $tags;
 
 	/**
-	 * The value for the listing field.
+	 * The value for the display_in_search field.
 	 * Note: this column has a database default value of: 1
 	 * @var        int
 	 */
-	protected $listing;
+	protected $display_in_search;
 
 	/**
 	 * The value for the privacy field.
@@ -263,7 +263,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		$this->direct_entries_count = 0;
 		$this->members_count = 0;
 		$this->pending_members_count = 0;
-		$this->listing = 1;
+		$this->display_in_search = 1;
 		$this->privacy = 1;
 		$this->membership_setting = 2;
 		$this->user_join_policy = 3;
@@ -533,13 +533,13 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [listing] column value.
+	 * Get the [display_in_search] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getListing()
+	public function getDisplayInSearch()
 	{
-		return $this->listing;
+		return $this->display_in_search;
 	}
 
 	/**
@@ -1092,27 +1092,27 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	} // setTags()
 
 	/**
-	 * Set the value of [listing] column.
+	 * Set the value of [display_in_search] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     category The current object (for fluent API support)
 	 */
-	public function setListing($v)
+	public function setDisplayInSearch($v)
 	{
-		if(!isset($this->oldColumnsValues[categoryPeer::LISTING]))
-			$this->oldColumnsValues[categoryPeer::LISTING] = $this->listing;
+		if(!isset($this->oldColumnsValues[categoryPeer::DISPLAY_IN_SEARCH]))
+			$this->oldColumnsValues[categoryPeer::DISPLAY_IN_SEARCH] = $this->display_in_search;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->listing !== $v || $this->isNew()) {
-			$this->listing = $v;
-			$this->modifiedColumns[] = categoryPeer::LISTING;
+		if ($this->display_in_search !== $v || $this->isNew()) {
+			$this->display_in_search = $v;
+			$this->modifiedColumns[] = categoryPeer::DISPLAY_IN_SEARCH;
 		}
 
 		return $this;
-	} // setListing()
+	} // setDisplayInSearch()
 
 	/**
 	 * Set the value of [privacy] column.
@@ -1375,7 +1375,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				return false;
 			}
 
-			if ($this->listing !== 1) {
+			if ($this->display_in_search !== 1) {
 				return false;
 			}
 
@@ -1441,7 +1441,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$this->pending_members_count = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
 			$this->description = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
 			$this->tags = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-			$this->listing = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
+			$this->display_in_search = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
 			$this->privacy = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
 			$this->membership_setting = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
 			$this->user_join_policy = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
@@ -1981,7 +1981,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				return $this->getTags();
 				break;
 			case 16:
-				return $this->getListing();
+				return $this->getDisplayInSearch();
 				break;
 			case 17:
 				return $this->getPrivacy();
@@ -2050,7 +2050,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$keys[13] => $this->getPendingMembersCount(),
 			$keys[14] => $this->getDescription(),
 			$keys[15] => $this->getTags(),
-			$keys[16] => $this->getListing(),
+			$keys[16] => $this->getDisplayInSearch(),
 			$keys[17] => $this->getPrivacy(),
 			$keys[18] => $this->getMembershipSetting(),
 			$keys[19] => $this->getUserJoinPolicy(),
@@ -2141,7 +2141,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				$this->setTags($value);
 				break;
 			case 16:
-				$this->setListing($value);
+				$this->setDisplayInSearch($value);
 				break;
 			case 17:
 				$this->setPrivacy($value);
@@ -2213,7 +2213,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[13], $arr)) $this->setPendingMembersCount($arr[$keys[13]]);
 		if (array_key_exists($keys[14], $arr)) $this->setDescription($arr[$keys[14]]);
 		if (array_key_exists($keys[15], $arr)) $this->setTags($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setListing($arr[$keys[16]]);
+		if (array_key_exists($keys[16], $arr)) $this->setDisplayInSearch($arr[$keys[16]]);
 		if (array_key_exists($keys[17], $arr)) $this->setPrivacy($arr[$keys[17]]);
 		if (array_key_exists($keys[18], $arr)) $this->setMembershipSetting($arr[$keys[18]]);
 		if (array_key_exists($keys[19], $arr)) $this->setUserJoinPolicy($arr[$keys[19]]);
@@ -2251,7 +2251,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryPeer::PENDING_MEMBERS_COUNT)) $criteria->add(categoryPeer::PENDING_MEMBERS_COUNT, $this->pending_members_count);
 		if ($this->isColumnModified(categoryPeer::DESCRIPTION)) $criteria->add(categoryPeer::DESCRIPTION, $this->description);
 		if ($this->isColumnModified(categoryPeer::TAGS)) $criteria->add(categoryPeer::TAGS, $this->tags);
-		if ($this->isColumnModified(categoryPeer::LISTING)) $criteria->add(categoryPeer::LISTING, $this->listing);
+		if ($this->isColumnModified(categoryPeer::DISPLAY_IN_SEARCH)) $criteria->add(categoryPeer::DISPLAY_IN_SEARCH, $this->display_in_search);
 		if ($this->isColumnModified(categoryPeer::PRIVACY)) $criteria->add(categoryPeer::PRIVACY, $this->privacy);
 		if ($this->isColumnModified(categoryPeer::MEMBERSHIP_SETTING)) $criteria->add(categoryPeer::MEMBERSHIP_SETTING, $this->membership_setting);
 		if ($this->isColumnModified(categoryPeer::USER_JOIN_POLICY)) $criteria->add(categoryPeer::USER_JOIN_POLICY, $this->user_join_policy);
@@ -2358,7 +2358,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 
 		$copyObj->setTags($this->tags);
 
-		$copyObj->setListing($this->listing);
+		$copyObj->setDisplayInSearch($this->display_in_search);
 
 		$copyObj->setPrivacy($this->privacy);
 

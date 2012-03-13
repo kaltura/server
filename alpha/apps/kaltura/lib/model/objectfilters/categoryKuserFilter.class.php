@@ -44,5 +44,3 @@ class categoryKuserFilter extends baseObjectFilter
 		return categoryKuserPeer::ID;
 	}
 }
-
-?>

@@ -61,6 +61,19 @@ class kuserPeer extends BasekuserPeer
 	
 	/**
 	 * @param int $partner_id
+	 * @param string $puser_id
+	 * @return kuser
+	 */
+	public static function doCountKuserByPartnerAndUid($partner_id , $puser_id )
+	{
+		$c = new Criteria();
+		$c->add(self::PARTNER_ID, $partner_id);
+		$c->add(self::PUSER_ID, $puser_id);
+		return self::doCount($c);			
+	}
+	
+	/**
+	 * @param int $partner_id
 	 * @param array $puser_ids
 	 * @return array<kuser>
 	 */
@@ -74,6 +87,9 @@ class kuserPeer extends BasekuserPeer
 	
 	public static function getActiveKuserByPartnerAndUid($partner_id , $puser_id)
 	{
+		if ($puser_id == '')
+			return null;
+			
 		$c = new Criteria();
 		$c->add(self::STATUS, KuserStatus::ACTIVE);
 		$c->add(self::PARTNER_ID, $partner_id);

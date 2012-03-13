@@ -8,14 +8,10 @@ class KalturaCategoryUserBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
-		"idEqual" => "_eq_id",
-		"idIn" => "_in_id",
 		"categoryIdEqual" => "_eq_category_id",
 		"categoryIdIn" => "_in_category_id",
 		"userIdEqual" => "_eq_user_id",
 		"userIdIn" => "_in_user_id",
-		"partnerIdEqual" => "_eq_partner_id",
-		"partnerIdIn" => "_in_partner_id",
 		"permissionLevelEqual" => "_eq_permission_level",
 		"permissionLevelIn" => "_in_permission_level",
 		"statusEqual" => "_eq_status",
@@ -50,20 +46,6 @@ class KalturaCategoryUserBaseFilter extends KalturaFilter
 	 * 
 	 * @var int
 	 */
-	public $idEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $idIn;
-
-	/**
-	 * 
-	 * 
-	 * @var int
-	 */
 	public $categoryIdEqual;
 
 	/**
@@ -76,7 +58,7 @@ class KalturaCategoryUserBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var int
+	 * @var string
 	 */
 	public $userIdEqual;
 
@@ -86,20 +68,6 @@ class KalturaCategoryUserBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $userIdIn;
-
-	/**
-	 * 
-	 * 
-	 * @var int
-	 */
-	public $partnerIdEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $partnerIdIn;
 
 	/**
 	 * 

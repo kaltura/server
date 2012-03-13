@@ -342,7 +342,7 @@ $this->benchmarkStart( "beforeImpl" );
 				$puser_kuser = $this->getPuserKuser ( $partner_id , $subp_id, $puser_id );
 	$this->benchmarkEnd( "puserKuser" );		
 	$this->benchmarkEnd( "beforeImpl" );
-			kEntitlementUtils::setEntitlementScope();
+			kEntitlementUtils::initEntitlementScope();
 			
 				// ----------------------------- impl --------------------------
 				

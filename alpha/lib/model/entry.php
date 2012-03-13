@@ -1653,11 +1653,77 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	}
 	public function getCreatorKuserId (  )			{	return $this->getFromCustomData( "creatorKuserId", null, 0 );	}
 	
-	public function setEntitledUsersEdit( $v )		{	$this->putInCustomData ( "entitledUsersEdit" , $v );	}
-	public function getEntitledUsersEdit(  )			{	return $this->getFromCustomData( "entitledUsersEdit", null, 0 );	}
+	public function setEntitledUsersEdit($v)		
+	{	
+		$entitledUserPuserEdit = array();
+		
+		$entitledPusersEdit = explode(',', $v);
+		
+		foreach ($entitledPusersEdit as $puserId)
+		{
+			$puserId = trim($puserId);
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
+			if (!$kuser)
+				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $puserId);
+			
+			$entitledUserPuserEdit[$kuser->getId()] = $kuser->getPuserId();
+		}
+				
+		$this->putInCustomData ( "entitledUserPuserEdit" , serialize($entitledUserPuserEdit) );		
+	}
 	
-	public function setEntitledUsersPublish( $v )		{	$this->putInCustomData ( "entitledUsersPublish" , $v );	}
-	public function getEntitledUsersPublish(  )			{	return $this->getFromCustomData( "entitledUsersPublish", null, 0 );	}
+	public function getEntitledKusersEdit()			
+	{	
+		$entitledUserPuserEdit = unserialize($this->getFromCustomData( "entitledUserPuserEdit", null, 0 ));
+
+		return implode(',', array_keys($entitledUserPuserEdit));
+	}
+	
+	public function getEntitledUsersEdit()			
+	{	
+		$entitledUserPuserEdit = $this->getFromCustomData( "entitledUserPuserEdit", null, 0 );
+		if (!$entitledUserPuserEdit)
+			return 'nothing';
+			
+		return implode(',', unserialize($entitledUserPuserEdit));
+	}
+	
+	public function setEntitledUsersPublish($v)		
+	{	
+		$entitledUserPuserPublish = array();
+		
+		$entitledPusersPublish = explode(',', $v);
+		foreach ($entitledPusersPublish as $puserId)
+		{
+			$puserId = trim($puserId);
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
+			if (!$kuser)
+				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $puserId);
+			
+			$entitledUserPuserPublish[$kuser->getId()] = $kuser->getPuserId();
+		}
+		$this->putInCustomData ( "entitledUserPuserPublish" , serialize($entitledUserPuserPublish) );	
+	}
+	
+	public function getEntitledKusersPublish()			
+	{	
+		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
+		if(!$entitledUserPuserPublish)
+			return '';
+
+		return implode(',', array_keys(unserialize($entitledUserPuserPublish)));
+	}
+	
+	public function getEntitledUsersPublish()			
+	{	
+		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
+		if (!$entitledUserPuserPublish)
+			return 'nothing';
+
+		return implode(',', unserialize($entitledUserPuserPublish));
+	}
 	
 	public function getRoots()
 	{

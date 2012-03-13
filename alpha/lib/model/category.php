@@ -33,7 +33,7 @@ class category extends Basecategory implements IIndexable
 		'tags' => IIndexable::FIELD_TYPE_STRING,
 		'category_status' => IIndexable::FIELD_TYPE_INTEGER,
 		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'listing' => IIndexable::FIELD_TYPE_INTEGER,
+		'display_in_search' => IIndexable::FIELD_TYPE_INTEGER,
 		'search_text' => IIndexable::FIELD_TYPE_STRING,
 		'members' => IIndexable::FIELD_TYPE_STRING
 	);
@@ -53,6 +53,8 @@ class category extends Basecategory implements IIndexable
 			if ($numOfCatsForPartner >= $chunkedCategoryLoadThreshold)
 				PermissionPeer::enableForPartner(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD, PermissionType::SPECIAL_FEATURE);
 		}
+		
+		$this->applyInheritance();
 		
 		// set the depth of the parent category + 1
 		if ($this->isNew() || $this->isColumnModified(categoryPeer::PARENT_ID))
@@ -574,7 +576,7 @@ class category extends Basecategory implements IIndexable
 		$this->setDirectEntriesCount(0);
 		$this->setMembersCount(0);
 		$this->setPendingMembersCount(0);
-		$this->setListing(ListingType::LISTED);
+		$this->setDisplayInSearch(displayInSearchType::LISTED);
 		$this->setPrivacy(PrivacyType::ALL);
 		$this->setMembershipSetting(CategoryMembershipSettingType::MANUAL);
 		$this->setUserJoinPolicy(UserJoinPolicyType::NOT_ALLOWED);
@@ -634,7 +636,7 @@ class category extends Basecategory implements IIndexable
 			'tags' => 'tags',
 			'status' => 'status',
 			'kuser_id' => 'kuserId',
-			'listing' => 'listing',	
+			'display_in_search' => 'displayInSearch',	
 			'search_text' => 'searchText',
 			'members' => 'members'
 		);
@@ -665,4 +667,16 @@ class category extends Basecategory implements IIndexable
 			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 	}
 	
+	
+	public function applyInheritance()
+	{
+		if ($this->getMembershipSetting() == CategoryMembershipSettingType::INHERT)
+		{
+			$parentCategory = $this->getParentCategory();
+			$this->setUserJoinPolicy($parentCategory->getUserJoinPolicy());
+			$this->setDefaultPermissionLevel($parentCategory->getDefaultPermissionLevel());
+			$this->setKuserId($parentCategory->getKuserId());
+			$this->setContributionPolicy($parentCategory->getContributionPolicy());
+		}
+	}
 }

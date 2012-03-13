@@ -37,15 +37,6 @@ class CategoryService extends KalturaBaseService
 			$categoryDb = new category();
 			$category->toInsertableObject($categoryDb);
 			$categoryDb->setPartnerId($this->getPartnerId());
-			
-			if ($categoryDb->getMembershipSetting() == CategoryMembershipSettingType::INHERT)
-			{
-				$parentCategory = $categoryDb->getParentCategory();
-				$categoryDb->setUserJoinPolicy($parentCategory->getUserJoinPolicy());
-				$categoryDb->setDefaultPermissionLevel($parentCategory->getDefaultPermissionLevel());
-				$categoryDb->setOwner($parentCategory->getOwner());
-				$categoryDb->setContributionPolicy($parentCategory->getContributionPolicy());
-			}
 			$categoryDb->save();
 			$this->getPartner()->unlockCategories();
 		}
@@ -94,7 +85,7 @@ class CategoryService extends KalturaBaseService
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
 			
-		if (kEntitlementUtils::$entitlementScope)
+		if (kEntitlementUtils::getEntitlementScope())
 		{
 		//	$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
 			//TODO - fix kuser puser
@@ -155,7 +146,7 @@ class CategoryService extends KalturaBaseService
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
 		
-		if (kEntitlementUtils::$entitlementScope)
+		if (kEntitlementUtils::getEntitlementScope())
 		{
 			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)

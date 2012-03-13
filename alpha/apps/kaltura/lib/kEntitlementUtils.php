@@ -1,9 +1,20 @@
 <?php
-
+/**
+ * kEntitlementUtils is all utils needed for entitlement use cases.
+ * @package Core
+ * @subpackage utils
+ *
+ */
 class kEntitlementUtils 
 {
 
-	public static $entitlementScope = false;  
+	protected static $entitlementScope = false;  
+	
+	
+	public static function getEntitlementScope()
+	{
+		return self::$entitlementScope;
+	}
 	
 	/**
 	 * Returns true if kuser or current kuser is entitled to entryId
@@ -33,12 +44,12 @@ class kEntitlementUtils
 	 * @param int $kuser
 	 * @return bool
 	 */
-	public static function setEntitlementScope()
+	public static function initEntitlementScope()
 	{
-		//TODO
-		
 		//TODO - RMOVE THIS CODE - FOR TESTS ONLY!
 		self::$entitlementScope = true;
+		
+		return true;
 	}
 	
 	

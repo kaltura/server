@@ -85,14 +85,16 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	public $tags;
 	
 	/**
-	 * Category listing - if category will be returned for list action.
+	 * Category displayInSearch - if category will be returned for list action.
 	 * 
-	 * @var KalturaListingType
+	 * @var KalturaDisplayInSearchType
 	 * @filter eq
 	 */
-	public $listing;
+	public $displayInSearch;
 	
 	/**
+	 * defines the privacy of the entries that assigned to this category
+	 * 
 	 * @var KalturaPrivacyType
 	 * @filter eq,in
 	 */
@@ -137,14 +139,14 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	
 	
 	/**
-	 * reference Id - external reference id
+	 * reference Id - external reference id 
 	 *  
 	 * @var string
 	 */
 	public $referenceId;
 	
 	/**
-	 * contribution Policy - who can assign entries to this category
+	 * who can assign entries to this category
 	 *  
 	 * @var KalturaContributionPolicyType
 	 */
@@ -167,14 +169,14 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	public $pendingMembersCount;
 	
 	/**
-	 * Set privacy context for search
+	 * Set privacy context for search entries that assiged to private and public categories. the entries will be private if the search context is set with those categories.
 	 *  
 	 * @var KalturaNullableBoolean
 	 */
 	public $privacyContext;
 	
 	/**
-	 * Number of entries that belong to this category directly
+	 * comma separated parents that defines a privacyContext for search
 	 *
 	 * @var string
 	 * @readonly
@@ -202,12 +204,12 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"createdAt",
 		"description",
 		"tags",
-		"listing",
+		"displayInSearch",
 		"privacy",
 		"membershipSetting",
 		"userJoinPolicy",
 		"defaultPermissionLevel",
-		"owner",
+		"owner" => 'kuserId',
 		"directEntriesCount",
 		"referenceId",
 		"contributionPolicy",
