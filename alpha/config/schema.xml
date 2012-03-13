@@ -1434,6 +1434,7 @@
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="category_id" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="kuser_id" type="integer" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="puser_id" type="varchar" size="100" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="permission_level" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="tinyint" />
