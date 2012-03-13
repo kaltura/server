@@ -63,6 +63,7 @@ class KalturaEntryContextDataParams extends KalturaObject
 		'ip',
 		'ks',
 		'userAgent',
+		'time',
 		'contexts',
 	);
 	
