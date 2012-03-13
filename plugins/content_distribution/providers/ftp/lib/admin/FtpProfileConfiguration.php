@@ -22,7 +22,30 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 	{
 		/* @var $object Kaltura_Client_FtpDistribution_Type_FtpDistributionProfile */
 		$object = parent::getObject($objectType, $properties, $add_underscore, true);
-		
+
+        $upload = new Zend_File_Transfer_Adapter_Http();
+        $files = $upload->getFileInfo();
+
+        if(isset($files['sftp_public_key']))
+        {
+            $file = $files['sftp_public_key'];
+            if ($file['error'] === UPLOAD_ERR_OK)
+            {
+                $content = file_get_contents($file['tmp_name']);
+                $object->sftpPublicKey = $content;
+            }
+        }
+
+        if(isset($files['sftp_private_key']))
+        {
+            $file = $files['sftp_private_key'];
+            if ($file['error'] === UPLOAD_ERR_OK)
+            {
+                $content = file_get_contents($file['tmp_name']);
+                $object->sftpPrivateKey = $content;
+            }
+        }
+
 		$updateRequiredEntryFields = array();
 		$updateRequiredMetadataXpaths = array();
 		
@@ -68,6 +91,7 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 	
 	public function populateFromObject($object, $add_underscore = true)
 	{
+        /* @var Kaltura_Client_FtpDistribution_Type_FtpDistributionProfile $object */
 		Infra_Form::populateFromObject($object, $add_underscore);
 		$this->addItemXpathsToExtend($object->itemXpathsToExtend);
 		
@@ -75,8 +99,10 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 		$metadataXpaths = array_keys($this->getMetadataFields());
 		
 		$fieldConfigArray = $object->fieldConfigArray;
-	
-		
+
+        $this->setDefault('sftp_public_key_readonly', $object->sftpPublicKey);
+		$this->setDefault('sftp_private_key_readonly', $object->sftpPrivateKey);
+
 		foreach($fieldConfigArray as $fieldConfig)
 		{
 			if (!isset($fieldConfig->updateParams[0]) && isset($fieldConfig->updateParams[0]->value))
@@ -141,19 +167,32 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 			'label'			=> 'Password:',
 			'filters'		=> array('StringTrim'),
 		));
-		
-		$this->addElement('textarea', 'sftp_public_key', array(
+
+        $this->addElement('text', 'passphrase', array(
+            'label'			=> 'Sftp Passphrase:',
+            'filters'		=> array('StringTrim'),
+        ));
+
+		$this->addElement('file', 'sftp_public_key', array(
 			'label'			=> 'Sftp Public Key:',
-			'filters'		=> array('StringTrim'),
 		));
+
+        $this->addElement('textarea', 'sftp_public_key_readonly', array(
+            'label'			=> 'Sftp Public Key:',
+            'readonly'      => true,
+        ));
 		
-		$this->addElement('textarea', 'sftp_private_key', array(
+		$this->addElement('file', 'sftp_private_key', array(
 			'label'			=> 'Sftp Private Key:',
-			'filters'		=> array('StringTrim'),
 		));
+
+        $this->addElement('textarea', 'sftp_private_key_readonly', array(
+            'label'			=> 'Sftp Private Key:',
+            'readonly'      => true,
+        ));
 		
 		$this->addDisplayGroup(
-			array('host', 'port', 'base_path', 'username', 'password', 'protocol', 'sftp_public_key', 'sftp_private_key'), 
+			array('protocol', 'host', 'port', 'base_path', 'username', 'password', 'passphrase', 'sftp_public_key', 'sftp_public_key_readonly', 'sftp_private_key', 'sftp_private_key_readonly'),
 			'server', 
 			array('legend' => 'Server', 'decorators' => array('FormElements', 'Fieldset'))
 		);
@@ -251,12 +290,15 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 			$elementNames[] = $elementName;
 			$index++;
 		}
-		
-		$this->addDisplayGroup(
-			$elementNames,
-			'entry_fields_trigger_update', 
-			array('legend' => 'Entry Fields that Trigger Update', 'decorators' => array('FormElements', 'Fieldset'))
-		);
+
+        if (count($elementNames))
+        {
+            $this->addDisplayGroup(
+                $elementNames,
+                'entry_fields_trigger_update',
+                array('legend' => 'Entry Fields that Trigger Update', 'decorators' => array('FormElements', 'Fieldset'))
+            );
+        }
 	}
 
 	protected function addMetadataFields()
@@ -273,16 +315,20 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 			$elementNames[] = $elementName;
 			$index++;
 		}
-		
-		$this->addDisplayGroup(
-			$elementNames,
-			'metadata_fields_trigger_update', 
-			array('legend' => 'Metadata Fields that Trigger Update', 'decorators' => array('FormElements', 'Fieldset'))
-		);
+
+        if (count($elementNames))
+        {
+            $this->addDisplayGroup(
+                $elementNames,
+                'metadata_fields_trigger_update',
+                array('legend' => 'Metadata Fields that Trigger Update', 'decorators' => array('FormElements', 'Fieldset'))
+            );
+        }
 	}
 	
 	protected function getMetadataFields()
 	{
+        return array();
 		if(is_array($this->metadataProfileFields))
 			return $this->metadataProfileFields;
 			

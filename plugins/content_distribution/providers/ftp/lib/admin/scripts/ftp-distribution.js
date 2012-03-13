@@ -11,6 +11,36 @@
 			jQuery(selector).parent().nextAll('dd').find('textarea').first().val('');
 		}
 	}
+
+    function sftpMode() {
+        showFormDtDd('#passphrase');
+        showFormDtDd('#sftp_public_key_readonly');
+        showFormDtDd('#sftp_private_key_readonly');
+        showFormDtDd('#sftp_public_key');
+        showFormDtDd('#sftp_private_key');
+        hideFormDtDd('#password');
+    }
+
+    function ftpMode() {
+        hideFormDtDd('#passphrase');
+        hideFormDtDd('#sftp_public_key_readonly');
+        hideFormDtDd('#sftp_private_key_readonly');
+        hideFormDtDd('#sftp_public_key');
+        hideFormDtDd('#sftp_private_key');
+        showFormDtDd('#password');
+    }
+
+    function hideFormDtDd(elementId) {
+        jQuery('#frmDistributionProfileConfig').find('#'+elementId).hide();
+        jQuery('#frmDistributionProfileConfig').find('#'+elementId+'-element').hide();
+        jQuery('#frmDistributionProfileConfig').find('#'+elementId+'-label').hide();
+    }
+
+    function showFormDtDd(elementId) {
+        jQuery('#frmDistributionProfileConfig').find('#'+elementId).show();
+        jQuery('#frmDistributionProfileConfig').find('#'+elementId+'-element').show();
+        jQuery('#frmDistributionProfileConfig').find('#'+elementId+'-label').show();
+    }
 	
 	jQuery('#enable_metadata_xslt').change(toggleXsltTextarea);
 	jQuery('#enable_metadata_filename').change(toggleXsltTextarea);
@@ -36,6 +66,18 @@
 			clearIfNotEnabled('#enable_flavor_asset_filename');
 			clearIfNotEnabled('#enable_thumbnail_asset_filename');
 		});
+
+        jQuery('#protocol').change(function() {
+           switch(Number(jQuery(this).val())) {
+               case 1: // ftp
+                   ftpMode();
+                   break;
+               case 3: // sftp
+                   sftpMode();
+                   break;
+           }
+        });
+        jQuery('#protocol').change();
 	});
 	
 	jQuery('#disable_metadata').change(function() {

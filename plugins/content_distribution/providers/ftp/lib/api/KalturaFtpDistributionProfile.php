@@ -35,6 +35,11 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 	 */
 	 public $password;
 
+    /**
+     * @var string
+     */
+    public $passphrase;
+
 	/**
 	 * @var string
 	 */
@@ -82,6 +87,7 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 		'basePath',
 		'username',
 		'password',
+        'passphrase',
 		'sftpPublicKey',
 		'sftpPrivateKey',
 		'disableMetadata',

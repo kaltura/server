@@ -13,6 +13,7 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_PASSWORD = 'password';
 	const CUSTOM_DATA_SFTP_PUBLIC_KEY = 'sftpPublicKey';
 	const CUSTOM_DATA_SFTP_PRIVATE_KEY = 'sftpPrivateKey';
+    const CUSTOM_DATA_PASSPHRASE = 'passphrase';
 	const CUSTOM_DATA_DISABLE_METADATA = 'disableMetadata';
 	const CUSTOM_DATA_METADATA_XSLT = 'metadataXslt';
 	const CUSTOM_DATA_METADATA_FILENAME_XSLT = 'metadataFilenameXslt';
@@ -124,7 +125,7 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 		entryPeer::getCriteriaFilter()->setFilter($oldEntryCriteria);
 		
 		$mrssObj = new DOMDocument();
-		if(!$mrssObj->loadXML($mrssStr))
+        if(!$mrssObj->loadXML($mrssStr))
 		    throw new Exception('Entry mrss xml is not valid');
 		    
 		return $mrssObj;
@@ -135,7 +136,10 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	 */
 	public function getProvider()
 	{
-		return FtpDistributionPlugin::getProvider();
+		if ($this->getProviderType() == FtpDistributionPlugin::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP_SCHEDULED))
+			return FtpScheduledDistributionPlugin::getProvider();
+		else
+			return FtpDistributionPlugin::getProvider();
 	}
 	
 	public function getProtocol()						{return $this->getFromCustomData(self::CUSTOM_DATA_PROTOCOL);}
@@ -144,6 +148,7 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	public function getBasePath()						{return $this->getFromCustomData(self::CUSTOM_DATA_BASE_PATH);}
 	public function getUsername()						{return $this->getFromCustomData(self::CUSTOM_DATA_USERNAME);}
 	public function getPassword()						{return $this->getFromCustomData(self::CUSTOM_DATA_PASSWORD);}
+    public function getPassphrase()					    {return $this->getFromCustomData(self::CUSTOM_DATA_PASSPHRASE);}
 	public function getSftpPublicKey()					{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_PUBLIC_KEY);}
 	public function getSftpPrivateKey()					{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_PRIVATE_KEY);}
 	public function getDisableMetadata()				{return $this->getFromCustomData(self::CUSTOM_DATA_DISABLE_METADATA);}
@@ -157,9 +162,10 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	public function setPort($v)							{$this->putInCustomData(self::CUSTOM_DATA_PORT, $v);}
 	public function setBasePath($v)						{$this->putInCustomData(self::CUSTOM_DATA_BASE_PATH, $v);}
 	public function setUsername($v)						{$this->putInCustomData(self::CUSTOM_DATA_USERNAME, $v);}
-	public function setPassword($v)						{$this->putInCustomData(self::CUSTOM_DATA_PASSWORD, $v);}
-	public function setSftpPublicKey($v)				{$this->putInCustomData(self::CUSTOM_DATA_SFTP_PUBLIC_KEY, $v);}
-	public function setSftpPrivateKey($v)				{$this->putInCustomData(self::CUSTOM_DATA_SFTP_PRIVATE_KEY, $v);}
+    public function setPassword($v)						{$this->putInCustomData(self::CUSTOM_DATA_PASSWORD, $v);}
+    public function setPassphrase($v)				    {$this->putInCustomData(self::CUSTOM_DATA_PASSPHRASE, $v);}
+    public function setSftpPublicKey($v)				{$this->putInCustomData(self::CUSTOM_DATA_SFTP_PUBLIC_KEY, $v);}
+    public function setSftpPrivateKey($v)				{$this->putInCustomData(self::CUSTOM_DATA_SFTP_PRIVATE_KEY, $v);}
 	public function setDisableMetadata($v)				{$this->putInCustomData(self::CUSTOM_DATA_DISABLE_METADATA, $v);}
 	public function setMetadataXslt($v)					{$this->putInCustomData(self::CUSTOM_DATA_METADATA_XSLT, $v);}
 	public function setMetadataFilenameXslt($v)			{$this->putInCustomData(self::CUSTOM_DATA_METADATA_FILENAME_XSLT, $v);}

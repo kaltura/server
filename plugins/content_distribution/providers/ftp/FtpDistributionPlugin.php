@@ -57,7 +57,7 @@ class FtpDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 		// client side apps like batch and admin console
-		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::FTP)
+		if (class_exists('KalturaClient') && ($enumValue == KalturaDistributionProviderType::FTP || $enumValue == KalturaDistributionProviderType::FTP_SCHEDULED))
 		{
 			if($baseClass == 'IDistributionEngineCloseDelete')
 				return new FtpDistributionEngine();
@@ -93,7 +93,7 @@ class FtpDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 				return new KalturaFtpDistributionJobProviderData();
 		}
 		
-		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::FTP)
+		if (class_exists('Kaltura_Client_Client') && ($enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::FTP || $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::FTP_SCHEDULED))
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 			{
@@ -106,22 +106,22 @@ class FtpDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
 
-		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP))
+		if($baseClass == 'KalturaDistributionJobProviderData' && ($enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP) || $enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP_SCHEDULED)))
 		{
 			$reflect = new ReflectionClass('KalturaFtpDistributionJobProviderData');
 			return $reflect->newInstanceArgs($constructorArgs);
 		}
 	
-		if($baseClass == 'kDistributionJobProviderData' && $enumValue == self::getApiValue(FtpDistributionProviderType::FTP))
+		if($baseClass == 'kDistributionJobProviderData' && ($enumValue == self::getApiValue(FtpDistributionProviderType::FTP) || $enumValue == self::getApiValue(FtpDistributionProviderType::FTP_SCHEDULED)))
 		{
 			$reflect = new ReflectionClass('kFtpDistributionJobProviderData');
 			return $reflect->newInstanceArgs($constructorArgs);
 		}
 	
-		if($baseClass == 'KalturaDistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP))
+		if($baseClass == 'KalturaDistributionProfile' && ($enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP) || $enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP_SCHEDULED)))
 			return new KalturaFtpDistributionProfile();
 			
-		if($baseClass == 'DistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP))
+		if($baseClass == 'DistributionProfile' && ($enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP) || $enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP_SCHEDULED)))
 			return new FtpDistributionProfile();
 			
 		return null;
@@ -135,7 +135,7 @@ class FtpDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		// client side apps like batch and admin console
-		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::FTP)
+		if (class_exists('KalturaClient') && ($enumValue == KalturaDistributionProviderType::FTP || $enumValue == KalturaDistributionProviderType::FTP_SCHEDULED))
 		{
 			if($baseClass == 'IDistributionEngineCloseDelete')
 				return 'FtpDistributionEngine';
@@ -171,7 +171,7 @@ class FtpDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 				return 'KalturaFtpDistributionJobProviderData';
 		}
 		
-		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::FTP)
+		if (class_exists('Kaltura_Client_Client') && ($enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::FTP || $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::FTP_SCHEDULED))
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 				return 'Form_FtpProfileConfiguration';
@@ -184,16 +184,16 @@ class FtpDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
 
-		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP))
+		if($baseClass == 'KalturaDistributionJobProviderData' && ($enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP) || $enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP_SCHEDULED)))
 			return 'KalturaFtpDistributionJobProviderData';
 	
-		if($baseClass == 'kDistributionJobProviderData' && $enumValue == self::getApiValue(FtpDistributionProviderType::FTP))
+		if($baseClass == 'kDistributionJobProviderData' && ($enumValue == self::getApiValue(FtpDistributionProviderType::FTP) || $enumValue == self::getApiValue(FtpDistributionProviderType::FTP_SCHEDULED)))
 			return 'kFtpDistributionJobProviderData';
 	
-		if($baseClass == 'KalturaDistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP))
+		if($baseClass == 'KalturaDistributionProfile' && ($enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP) || $enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP_SCHEDULED)))
 			return 'KalturaFtpDistributionProfile';
 			
-		if($baseClass == 'DistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP))
+		if($baseClass == 'DistributionProfile' && ($enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP) || $enumValue == self::getDistributionProviderTypeCoreValue(FtpDistributionProviderType::FTP_SCHEDULED)))
 			return 'FtpDistributionProfile';
 			
 		return null;

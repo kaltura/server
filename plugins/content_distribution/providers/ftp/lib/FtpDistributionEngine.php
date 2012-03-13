@@ -93,7 +93,8 @@ class FtpDistributionEngine extends DistributionEngine implements
 			$data->mediaFiles = array();
 			
 		$this->syncFiles($fileManager, $data->mediaFiles, $providerData->filesForDistribution, $distributionProfile);
-		
+
+        $this->storeMetadataFileAsSentData($data, $providerData->filesForDistribution);
 		return true;
 	}
 	
@@ -187,7 +188,8 @@ class FtpDistributionEngine extends DistributionEngine implements
 		$remoteFile->remoteId = $remoteFilePath; // remote id is the file path, later it will be used to delete the distributed files
 		return $remoteFile;
 	}
-	
+
+
 	protected function cleanPath($path)
 	{
 		$path = trim($path);
@@ -253,8 +255,50 @@ class FtpDistributionEngine extends DistributionEngine implements
 		$protocol = $distributionProfile->protocol;
 		$username = $distributionProfile->username;
 		$password = $distributionProfile->password;
+        $publicKey = $distributionProfile->sftpPublicKey;
+        $privateKey = $distributionProfile->sftpPrivateKey;
+        $passphrase = $distributionProfile->passphrase ? $distributionProfile->passphrase : null;
 		$fileTransferManager = kFileTransferMgr::getInstance($protocol);
-		$fileTransferManager->login($host, $username, $password, ($port) ? $port : null);
+        if ($distributionProfile->protocol === KalturaDistributionProtocol::SFTP)
+        {
+            $publicKeyTempPath = $this->tempFilePath . '/' . uniqid(null, true);
+            $privateKeyTempPath = $this->tempFilePath . '/' . uniqid(null, true);
+            try
+            {
+                file_put_contents($publicKeyTempPath, $publicKey);
+                file_put_contents($privateKeyTempPath, $privateKey);
+                $fileTransferManager->loginPubKey($host, $username, $publicKeyTempPath, $privateKeyTempPath, $passphrase, ($port) ? $port : null);
+                unlink($publicKeyTempPath);
+                unlink($privateKeyTempPath);
+            }
+            catch(Exception $ex)
+            {
+                if (file_exists($publicKeyTempPath))
+                    unlink($publicKeyTempPath);
+                if (file_exists($privateKeyTempPath))
+                    unlink($privateKeyTempPath);
+                throw $ex;
+            }
+        }
+        else
+        {
+            $fileTransferManager->login($host, $username, $password, ($port) ? $port : null);
+        }
 		return $fileTransferManager;
 	}
+
+    private function storeMetadataFileAsSentData(KalturaDistributionJobData $data, $filesForDistribution)
+    {
+        if (is_array($filesForDistribution))
+        {
+            foreach($filesForDistribution as $file)
+            {
+                /* @var $file KalturaFtpDistributionFile */
+                if ($file->assetId == 'metadata')
+                {
+                    $data->sentData = $file->contents;
+                }
+            }
+        }
+    }
 }
