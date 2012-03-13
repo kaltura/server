@@ -16,9 +16,24 @@ class categoryKuserFilter extends baseObjectFilter
 				"_in_category_id",
 				"_eq_user_id",
 				"_in_user_id",
+				"_eq_parent_id",
+				"_in_parent_id",
+				"_eq_depth",
+				"_eq_full_name",
+				"_likex_full_name",
+				"_like_tags",
+				"_mlikeor_tags",
+				"_mlikeand_tags",
+				"_eq_display_in_search",
+				"_eq_privacy",
+				"_in_privacy",
+				"_eq_membership_setting",
+				"_in_membership_setting",
+				"_eq_status",
+				"_in_status",
 			) , NULL );
 
-		$this->allowed_order_fields = array ( "created_at" , "updated_at");
+		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name");
 			
 	}
 
