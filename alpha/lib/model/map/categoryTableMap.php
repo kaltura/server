@@ -53,7 +53,7 @@ class categoryTableMap extends TableMap {
 		$this->addColumn('PENDING_MEMBERS_COUNT', 'PendingMembersCount', 'INTEGER', false, null, 0);
 		$this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
-		$this->addColumn('LISTING', 'Listing', 'TINYINT', false, null, 1);
+		$this->addColumn('DISPLAY_IN_SEARCH', 'DisplayInSearch', 'TINYINT', false, null, 1);
 		$this->addColumn('PRIVACY', 'Privacy', 'TINYINT', false, null, 1);
 		$this->addColumn('MEMBERSHIP_SETTING', 'MembershipSetting', 'TINYINT', false, null, 2);
 		$this->addColumn('USER_JOIN_POLICY', 'UserJoinPolicy', 'TINYINT', false, null, 3);

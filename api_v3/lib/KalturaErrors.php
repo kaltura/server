@@ -365,7 +365,7 @@ class KalturaErrors extends APIErrors
 	/**
 	 * categoryUser service
 	 */
-	const INVALID_CATEGORY_USER_ID = "INVALID_CATEGORY_USER_ID,Invalid CategoryUser ID [\"%s\"]";
+	const INVALID_CATEGORY_USER_ID = "INVALID_CATEGORY_USER_ID,Invalid CategoryUser for category [\"%s\"] and for user [\"%s\"]";
 	
 	const CATEGORY_USER_ALREADY_EXISTS = "CATEGORY_USER_ALREADY_EXISTS,CategoryUser already exists [\"%s\"]";
 	

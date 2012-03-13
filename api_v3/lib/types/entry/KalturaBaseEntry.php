@@ -318,16 +318,16 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * list of user ids that are entitled to edit the entry (no server enforcement) The difference between entitledUsersEdit and entitledUsersPublish is applicative only
 	 * 
 	 * @var string
-	 * @requiresPermission insert,update
 	 */
+	//TODO add php doc after permission deployment - @requiresPermission insert,update
 	public $entitledUsersEdit;
 		
 	/**
 	 * list of user ids that are entitled to publish the entry (no server enforcement) The difference between entitledUsersEdit and entitledUsersPublish is applicative only
 	 * 
 	 * @var string
-	 * @requiresPermission insert,update
 	 */
+	//TODO add php doc after permission deployment - @requiresPermission insert,update
 	public $entitledUsersPublish;	
 	
 	/*
@@ -372,7 +372,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"conversionProfileId" => "conversionQuality",
 	 	"rootEntryId",
 	 	"entitledUsersEdit",
-	 	"entitledUsersPublish"
+	 	"entitledUsersPublish",
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -458,6 +458,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	{
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		$this->validateObjectsExist();
+		parent::validateForInsert($propertiesToSkip);
+		
 		return parent::validateForInsert($propertiesToSkip);
 	}
 	
