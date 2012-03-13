@@ -178,6 +178,7 @@ class category extends Basecategory implements IIndexable
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 		
+		$objectUpdated = $this->isModified();
 		$objectDeleted = false;
 		if($this->isColumnModified(categoryPeer::DELETED_AT) && !is_null($this->getDeletedAt()))
 			$objectDeleted = true;
@@ -186,6 +187,9 @@ class category extends Basecategory implements IIndexable
 		
 		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+			
+		if($objectUpdated)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
 			
 		return $ret;
 	}
@@ -616,9 +620,24 @@ class category extends Basecategory implements IIndexable
 		return 'category->getSearchText';
 	}
 	
+	
+	/**
+	 * 
+	 * return comma seperated string of kusers ids that are active members on this category. 
+	 */	
 	public function getMembers()
 	{
-		return 'active members';
+		$members = categoryKuserPeer::doSelectByActiveKusersByCategoryId($this->getId());
+		if (!$members)
+			return '';
+		
+		$membersIds = array();
+		foreach ($members as $member)
+		{
+			$membersIds[] = $member->getKuserId();
+		}
+		
+		return implode(',', $membersIds);
 	}
 	
 /* (non-PHPdoc)

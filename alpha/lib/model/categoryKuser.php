@@ -14,21 +14,17 @@
  * @subpackage model
  */
 class categoryKuser extends BasecategoryKuser {
-
-	public function getKuserId()
-	{
-		$puser = kuserPeer::retrieveByPK($this->id);
-		if (!$puser)
-			return null;
-			
-		return $puser->getId();
-	}
 	
-	public function setKuserId($puserId)
+	public function setPuserId($puserId)
 	{
-		$kuser = kuserPeer::getKuserByPartnerAndUid(getKuserByPartnerAndUid);
-		if (!$kuser)
+		if ( self::getPuserId() == $puserId )  // same value - don't set for nothing 
 			return;
+
+		parent::setPuserId($puserId);
+			
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $puserId);
+		if (!$kuser)
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
 			
 		$this->setKuserId($kuser->getId());
 	}
