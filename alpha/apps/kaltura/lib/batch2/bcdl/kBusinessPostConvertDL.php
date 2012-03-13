@@ -431,12 +431,21 @@ class kBusinessPostConvertDL
 		$siblingJobs = $rootBatchJob->getChildJobs();
 		foreach($siblingJobs as $siblingJob)
 		{
+			/* @var $siblingJob BatchJob */
+			
 			// not conversion job and should be ignored
 			if($siblingJob->getJobType() != BatchJobType::CONVERT && $siblingJob->getJobType() != BatchJobType::POSTCONVERT)
 				continue;
-					
+		
+			$jobData = $siblingJob->getData();
+			if(!$jobData || (!($jobData instanceof kConvertJobData) && !($jobData instanceof kPostConvertJobData)))
+			{
+				KalturaLog::err("Job id [" . $siblingJob->getId() . "] has no valid job data");
+				continue;
+			}
+			
 			// found child flavor asset that hasn't failed, no need to fail the root job
-			$siblingFlavorAssetId = $siblingJob->getData()->getFlavorAssetId();
+			$siblingFlavorAssetId = $jobData->getFlavorAssetId();
 			$siblingFlavorAsset = assetPeer::retrieveById($siblingFlavorAssetId);
 			if ($siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_ERROR &&
 				$siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE &&
