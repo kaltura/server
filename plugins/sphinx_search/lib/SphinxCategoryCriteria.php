@@ -164,7 +164,6 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$fieldName = strtoupper($fieldName);
 			$fieldName = "category.$fieldName";
 		}
-		KalturaLog::debug('### $fieldName: ' . $fieldName);
 
 		return isset(self::$sphinxFields[$fieldName]);
 	}
