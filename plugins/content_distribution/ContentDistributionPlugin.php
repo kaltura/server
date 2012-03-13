@@ -101,7 +101,7 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			
 		return array();
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see IKalturaVersion::getVersion()
 	 */
@@ -122,7 +122,7 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		if(class_exists('ContentDistributionSphinxPlugin'))
 			if($object instanceof entry)
 				return array (ContentDistributionSphinxPlugin::getSphinxFieldName(self::SPHINX_EXPANDER_FIELD_DATA) => kContentDistributionManager::getEntrySearchValues($object));
-			
+
 		return null;
 	}
 	
@@ -275,11 +275,14 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		$pages[] = new DistributionProfileListAction();
 		$pages[] = new DistributionProfileConfigureAction();
 		$pages[] = new DistributionProfileUpdateStatusAction();
-		
+
 		$pages[] = new GenericDistributionProvidersListAction();
 		$pages[] = new GenericDistributionProviderConfigureAction();
 		$pages[] = new GenericDistributionProviderDeleteAction();
-		
+
+        $pages[] = new XsltTesterAction();
+        $pages[] = new XsltTesterApiAction();
+
 		return $pages;
 	}
 	
