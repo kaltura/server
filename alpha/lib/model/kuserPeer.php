@@ -61,19 +61,6 @@ class kuserPeer extends BasekuserPeer
 	
 	/**
 	 * @param int $partner_id
-	 * @param string $puser_id
-	 * @return kuser
-	 */
-	public static function doCountKuserByPartnerAndUid($partner_id , $puser_id )
-	{
-		$c = new Criteria();
-		$c->add(self::PARTNER_ID, $partner_id);
-		$c->add(self::PUSER_ID, $puser_id);
-		return self::doCount($c);			
-	}
-	
-	/**
-	 * @param int $partner_id
 	 * @param array $puser_ids
 	 * @return array<kuser>
 	 */
