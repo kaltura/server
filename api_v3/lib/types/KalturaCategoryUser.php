@@ -126,7 +126,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable
 		if (!$category)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $this->categoryId);						
 		
-		if ($category->getMembershipSetting() == CategoryMembershipSettingType::INHERT)
+		if ($category->getInheritance() == InheritanceType::INHERT)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS, $this->categoryId);		
 			
 		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->categoryId, $kuser->getId());

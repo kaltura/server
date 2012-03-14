@@ -102,10 +102,10 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	
 	/**
 	 * If Category members are inherited from parent category or set manualy. 
-	 * @var KalturaCategoryMembershipSettingType
+	 * @var KalturaInheritanceType
 	 * @filter eq,in
 	 */
-	public $membershipSetting;
+	public $inheritance;
 	
 	
 	/**
@@ -206,7 +206,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"tags",
 		"displayInSearch",
 		"privacy",
-		"membershipSetting",
+		"inheritance",
 		"userJoinPolicy",
 		"defaultPermissionLevel",
 		"owner" => "puserId",
@@ -246,7 +246,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			if (!$parentCategoryDb)
 				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_NOT_FOUND, $category->parentId);	
 		}
-		elseif ($category->membershipSetting == KalturaCategoryMembershipSettingType::INHERT)
+		elseif ($category->inheritance == KalturaInheritanceType::INHERT)
 		{
 			//cannot inherit member with no parant
 			throw new KalturaAPIException(KalturaErrors::CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET);

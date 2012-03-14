@@ -371,8 +371,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"categoriesIds",
 	 	"conversionProfileId" => "conversionQuality",
 	 	"rootEntryId",
-	 	"entitledUsersEdit",
-	 	"entitledUsersPublish",
+	 	"entitledUsersEdit" => "entitledPusersEdit",
+	 	"entitledUsersPublish" => "entitledPusersPublish"
 	 );
 		 
 	public function getMapBetweenObjects()
