@@ -13,7 +13,8 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'category.KUSER_ID' => 'kuser_id',
 		'category.DISPLAY_IN_SEARCH' => 'display_in_search',	
 		'category.SEARCH_TEXT' => '(name,tags,description)',
-		'category.MEMBERS' => 'members'
+		'category.MEMBERS' => 'members',
+		'plugins_data'
 	);
 	
 	public static $sphinxOrderFields = array(
@@ -30,7 +31,6 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'category_status' => IIndexable::FIELD_TYPE_INTEGER,
 		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'display_in_search' => IIndexable::FIELD_TYPE_STRING,
-		'search_text' => IIndexable::FIELD_TYPE_STRING,
 		'members' => IIndexable::FIELD_TYPE_STRING);
 
 	/**
@@ -202,7 +202,6 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			"full_name",
 			"description", 
 			"tags", 
-			"search_text",
 			"members"
 		));
 	}
