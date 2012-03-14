@@ -32,12 +32,12 @@ class categoryPeer extends BasecategoryPeer
 		
 		if (kEntitlementUtils::getEntitlementScope())
 		{
-			//TODO -
-			// $c->addOr() user id is member of this category  or display_in_search
-
-//			/$crit = $c->getNewCriterion ( self::DISPLAY_IN_SEARCH, displayInSearchType::LISTED, Criteria::EQUAL );
-		//	$crit->addOr ( $c->getNewCriterion ( self::MEMBERS , kCurrentContext::$uid, Criteria::EQUAL) );
-		//	$c->addAnd ( $crit );
+			$crit = $c->getNewCriterion ( self::DISPLAY_IN_SEARCH, displayInSearchType::LISTED, Criteria::EQUAL );
+			
+			if ( kCurrentContext::$uid <> '')
+				$crit->addOr ( $c->getNewCriterion ( self::MEMBERS , kCurrentContext::$uid, Criteria::EQUAL) );
+				
+			$c->addAnd ( $crit );
 		}		
 		
 		self::$s_criteria_filter->setFilter ( $c );

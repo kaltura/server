@@ -33,8 +33,7 @@ class category extends Basecategory implements IIndexable
 		'tags' => IIndexable::FIELD_TYPE_STRING,
 		'category_status' => IIndexable::FIELD_TYPE_INTEGER,
 		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'display_in_search' => IIndexable::FIELD_TYPE_INTEGER,
-		'search_text' => IIndexable::FIELD_TYPE_STRING,
+		'display_in_search' => IIndexable::FIELD_TYPE_STRING,
 		'members' => IIndexable::FIELD_TYPE_STRING
 	);
 	
@@ -615,12 +614,6 @@ class category extends Basecategory implements IIndexable
 		return categoryPeer::getOMClass(false);
 	}
 	
-	public function getSearchText()
-	{
-		return 'category->getSearchText';
-	}
-	
-	
 	/**
 	 * 
 	 * return comma seperated string of kusers ids that are active members on this category. 
@@ -689,13 +682,33 @@ class category extends Basecategory implements IIndexable
 	
 	public function applyInheritance()
 	{
-		if ($this->getMembershipSetting() == CategoryMembershipSettingType::INHERT)
-		{
-			$parentCategory = $this->getParentCategory();
-			$this->setUserJoinPolicy($parentCategory->getUserJoinPolicy());
-			$this->setDefaultPermissionLevel($parentCategory->getDefaultPermissionLevel());
-			$this->setKuserId($parentCategory->getKuserId());
-			$this->setContributionPolicy($parentCategory->getContributionPolicy());
-		}
+		if ($this->getMembershipSetting() != CategoryMembershipSettingType::INHERT)
+			return;
+			
+		$parentCategory = $this->getParentCategory();
+		$this->setUserJoinPolicy($parentCategory->getUserJoinPolicy());
+		$this->setDefaultPermissionLevel($parentCategory->getDefaultPermissionLevel());
+		$this->setKuserId($parentCategory->getKuserId());
+		$this->setContributionPolicy($parentCategory->getContributionPolicy());
+		
+		$parentInheritFromCategory = $parentCategory->getInheritFromCategory();
+			return $this->getId();
+		
+		$this->setInheritFromCategory();
+			
+	}
+	
+	public function setPuserId($puserId)
+	{
+		if ( self::getPuserId() == $puserId )  // same value - don't set for nothing 
+			return;
+
+		parent::setPuserId($puserId);
+			
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $puserId);
+		if (!$kuser)
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
+			
+		$this->setKuserId($kuser->getId());
 	}
 }
