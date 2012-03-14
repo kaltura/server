@@ -13,6 +13,19 @@ abstract class KalturaEvent
 	 * @return bool true if should continue to the next consumer
 	 */
 	protected abstract function doConsume(KalturaEventConsumer $consumer);
+
+	/**
+	 * @param kGenericEventConsumer $consumer
+	 * @return bool true if should continue to the next consumer
+	 */
+	protected function consumeGeneric(kGenericEventConsumer $consumer)
+	{
+		if(!$consumer->shouldConsumeEvent($this))
+			return true;
+	
+		KalturaLog::debug(get_class($this) . ' event consumed by ' . get_class($consumer));
+		return $consumer->consumeEvent($this);
+	}
 	
 	/**
 	 * Validate the consumer type and executes it
@@ -23,7 +36,9 @@ abstract class KalturaEvent
 	{
 		$consumerType = $this->getConsumerInterface();	
 		if($consumer instanceof $consumerType)
-			return $this->doConsume($consumer);
+			return $this->doConsume($consumer);	
+		elseif($consumer instanceof kGenericEventConsumer)
+			return $this->consumeGeneric($consumer);
 			
 		return true;
 	}

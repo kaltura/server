@@ -3,6 +3,7 @@
 class kEventsManager
 {
 	const BASE_CONSUMER_INTERFACE = 'KalturaEventConsumer';
+	const GENERIC_CONSUMER_INTERFACE = 'kGenericEventConsumer';
 	
 	protected static $consumers = array();
 	
@@ -81,8 +82,13 @@ class kEventsManager
 		if(!count(self::$consumers))
 			self::loadConsumers();
 			
+		$consumers = array();
 		if(isset(self::$consumers[$interfaceType]))
-			return self::$consumers[$interfaceType];
+			$consumers = self::$consumers[$interfaceType];
+			
+		if(isset(self::$consumers[self::GENERIC_CONSUMER_INTERFACE]))
+			foreach(self::$consumers[self::GENERIC_CONSUMER_INTERFACE] as $consumer)
+				$consumers[] = $consumer;
 			
 		return array();
 	}
