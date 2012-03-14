@@ -1633,11 +1633,13 @@ CREATE TABLE `category`
 	`user_join_policy` TINYINT default 3,
 	`default_permission_level` TINYINT default 3,
 	`kuser_id` INTEGER,
+	`puser_id` VARCHAR(100),
 	`reference_id` VARCHAR(512),
 	`contribution_policy` TINYINT default 2,
 	`custom_data` TEXT,
 	`privacy_context` TINYINT default 0,
 	`privacy_contexts` VARCHAR(255),
+	`inherit_from_category` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_full_name_index`(`partner_id`, `full_name`)
 )Type=MyISAM;
@@ -1663,13 +1665,12 @@ CREATE TABLE `category_kuser`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	PRIMARY KEY (`id`),
-	KEY `partner_id_category_index`(`partner_id`, `category_id`, `status`),
-	KEY `partner_id_kuser_index`(`partner_id`, `kuser_id`, `status`),
-	INDEX `category_kuser_FI_1` (`category_id`),
+	KEY `partner_id_category_index`(`category_id`, `status`),
+	KEY `partner_id_kuser_index`(`kuser_id`, `status`, `category_id`),
+	KEY `partner_id_index`(`partner_id`, `status`),
 	CONSTRAINT `category_kuser_FK_1`
 		FOREIGN KEY (`category_id`)
 		REFERENCES `category` (`id`),
-	INDEX `category_kuser_FI_2` (`kuser_id`),
 	CONSTRAINT `category_kuser_FK_2`
 		FOREIGN KEY (`kuser_id`)
 		REFERENCES `kuser` (`id`)

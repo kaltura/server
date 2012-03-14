@@ -192,7 +192,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		{
 			$fieldType = $object->getIndexFieldType($field);
 			$getter = "get{$getterName}";
-			
 			switch($fieldType)
 			{
 				case IIndexable::FIELD_TYPE_STRING:

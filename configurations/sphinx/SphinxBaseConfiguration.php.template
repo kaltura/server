@@ -65,9 +65,9 @@ $baseConfigurationIndexs = 	array(
 			'tags' 				=> IIndexable::FIELD_TYPE_STRING,
 			'category_status'	=> IIndexable::FIELD_TYPE_INTEGER,
 			'kuser_id' 			=> IIndexable::FIELD_TYPE_INTEGER,
-			'listing'			=> IIndexable::FIELD_TYPE_INTEGER,
-			'search_text' 		=> IIndexable::FIELD_TYPE_STRING,
-			'members' 			=> IIndexable::FIELD_TYPE_STRING
+			'display_in_search'	=> IIndexable::FIELD_TYPE_STRING,
+			'members' 			=> IIndexable::FIELD_TYPE_STRING,
+			'plugins_data'		=> SphinxFieldType::RT_FIELD,
 			))
 );
 		

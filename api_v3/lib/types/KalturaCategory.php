@@ -125,7 +125,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	/**
 	 * Category Owner (User id)
 	 *  
-	 * @var int
+	 * @var string
 	 */
 	public $owner;
 	
@@ -209,7 +209,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"membershipSetting",
 		"userJoinPolicy",
 		"defaultPermissionLevel",
-		"owner" => 'kuserId',
+		"owner" => "puserId",
 		"directEntriesCount",
 		"referenceId",
 		"contributionPolicy",
@@ -251,7 +251,20 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			//cannot inherit member with no parant
 			throw new KalturaAPIException(KalturaErrors::CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET);
 		}
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		if ($this->owner && $this->owner != '')
+		{
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->owner);
+			if (!$kuser)
+				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->owner);
+		}
 		
-		
+		return parent::validateForInsert($propertiesToSkip);
 	}
 }

@@ -120,7 +120,7 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var KalturadisplayInSearchType
+	 * @var KalturaDisplayInSearchType
 	 */
 	public $displayInSearchEqual;
 

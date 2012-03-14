@@ -137,11 +137,14 @@ class CategoryUserService extends KalturaBaseService
 		$dbCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryId, $kuser->getId());
 		if (!$dbCategoryKuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $kuser->getId());
-			
+
+		//TODO - Cannot delete if inherite memeers;
+		// TODO - if uer try to delete himsefl from the category
+		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($dbCategoryKuser->getCategoryId(), kCurrentContext::$uid);
+		if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
+			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER);
 		//TODO 
 		//cannot delete category owner
-		//Manager or the user itself can delete the user from the category.
-		//cannot delete if inherit members.
 		//Delete at one db query: update CategoryKuser set status=deleted where inheritedCategoryId=categoryId and 
 		
 		$dbCategoryKuser->delete();		
@@ -150,12 +153,12 @@ class CategoryUserService extends KalturaBaseService
 	/**
 	 * activate CategoryUser
 	 * 
-	 * @action approve
+	 * @action activate
 	 * @param int $categoryId
 	 * @param string $userId
 	 * @return KalturaCategoryUser
 	 */
-	function approveAction($categoryId, $userId)
+	function activateAction($categoryId, $userId)
 	{
 		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
 		if (!$kuser)
@@ -180,12 +183,12 @@ class CategoryUserService extends KalturaBaseService
 	/**
 	 * reject CategoryUser
 	 * 
-	 * @action reject
+	 * @action deactivate
 	 * @param int $categoryId
 	 * @param string $userId
 	 * @return KalturaCategoryUser
 	 */
-	function rejectAction($categoryId, $userId)
+	function deactivateAction($categoryId, $userId)
 	{
 		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
 		if (!$kuser)
@@ -199,7 +202,7 @@ class CategoryUserService extends KalturaBaseService
 		if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER);
 		
-		$dbCategoryKuser->setStatus(CategoryKuserStatus::REJECTED);
+		$dbCategoryKuser->setStatus(CategoryKuserStatus::NOT_ACTIVE);
 		$dbCategoryKuser->save();
 		
 		$categoryUser = new KalturaCategoryUser();

@@ -570,6 +570,10 @@ class Partner extends BasePartner
 	public function setKMCLanguage($v) { $this->putInCustomData('language', $v, 'KMC');}
 	public function getKMCLanguage() { return $this->getFromCustomData('language', 'KMC', null);}
 	
+	//default entitlement scope for ks
+	public function setDefaultEntitlementScope($v) { $this->putInCustomData('defaultEntitlementScope', $v, 'entitlement');}
+	public function getDefaultEntitlementScope() { return $this->getFromCustomData('defaultEntitlementScope', 'entitlement', null);}
+	
 	// additionalParams - key/value array
 	public function getAdditionalParams() 
 	{ 

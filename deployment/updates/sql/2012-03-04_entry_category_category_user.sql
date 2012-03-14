@@ -11,11 +11,13 @@ ADD `membership_setting` TINYINT default 2,
 ADD `user_join_policy` TINYINT default 3,
 ADD `default_permission_level` TINYINT default 3,
 ADD `kuser_id` INTEGER,
+ADD `puser_id` VARCHAR(100)  NOT NULL,
 ADD `reference_id` VARCHAR(512),
 ADD `contribution_policy` TINYINT default 2,
 ADD `custom_data` TEXT,
 ADD `privacy_context` TINYINT default 0,
-ADD `privacy_contexts` VARCHAR(255);
+ADD `privacy_contexts` VARCHAR(255),
+ADD `inherit_from_category` INTEGER;
 	
 CREATE TABLE `category_kuser`
 (

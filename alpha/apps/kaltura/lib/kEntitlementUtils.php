@@ -46,10 +46,40 @@ class kEntitlementUtils
 	 */
 	public static function initEntitlementScope()
 	{
-		//TODO - RMOVE THIS CODE - FOR TESTS ONLY!
-		self::$entitlementScope = true;
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id; 
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if (!$partner)
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID);
+			
+		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId))
+			return;		
 		
-		return true;
+		$partnerDefaultEntitlementScope = $partner->getDefaultEntitlementScope();
+		
+		// default entitlement scope is false - disable.
+		if(is_null($partnerDefaultEntitlementScope))
+			$partnerDefaultEntitlementScope = false;
+		
+		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : null;
+		if ($ksString == '') // for actions with no KS or when creating ks.
+			return;
+		
+		$ks = ks::fromSecureString($ksString);
+		
+		if (!$partnerDefaultEntitlementScope)
+		{
+			self::$entitlementScope = false;
+			$enableEntitlement = $ks->getEnableEntitlement();
+			if ($enableEntitlement)
+				self::$entitlementScope = true;
+		}
+		else
+		{
+			self::$entitlementScope = true;
+			$enableEntitlement = $ks->getDisableEntitlement();
+			if ($enableEntitlement)
+				self::$entitlementScope = false;
+		}
 	}
 	
 	

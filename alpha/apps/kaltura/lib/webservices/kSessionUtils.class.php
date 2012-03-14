@@ -255,6 +255,8 @@ class ks
 	const PRIVILEGE_ACTIONS_LIMIT = "actionslimit";
 	const PRIVILEGE_SET_ROLE = "setrole";
 	const PRIVILEGE_IP_RESTRICTION = "iprestrict";
+	const PRIVILEGE_ENABLE_ENTITLEMENT = "enableentitlement";
+	const PRIVILEGE_DISABLE_ENTITLEMENT = "disableentitlement";
 
 	public $partner_id = null;
 	public $master_partner_id = null;
@@ -539,10 +541,40 @@ class ks
 		return false;
 	}
 	
+	public function getEnableEntitlement()
+	{
+		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
+		// edit privilege (edit:XX,edit:YYY,...)
+		$allPrivileges = explode(',', $this->privileges);
+		// foreach pair - check privileges on playlist
+		foreach($allPrivileges as $priv)
+		{
+			if ($priv == self::PRIVILEGE_ENABLE_ENTITLEMENT) 
+				return true;
+		}
+		
+		return false;
+	}
+
+	public function getDisableEntitlement()
+	{
+		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
+		// edit privilege (edit:XX,edit:YYY,...)
+		$allPrivileges = explode(',', $this->privileges);
+		// foreach pair - check privileges on playlist
+		foreach($allPrivileges as $priv)
+		{
+			if ($priv == self::PRIVILEGE_DISABLE_ENTITLEMENT) 
+				return true;
+		}
+		
+		return false;
+	}
+	
 	public function getSetRole()
 	{
 		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
-		// edit privilege (edit:XXX,edit:YYY,...)
+		// edit privilege (edit:XX,edit:YYY,...)
 		$allPrivileges = explode(',', $this->privileges);
 		// foreach pair - check privileges on playlist
 		foreach($allPrivileges as $priv)
@@ -563,7 +595,6 @@ class ks
 	
 	public static function validatePrivileges ( $privileges, $partnerId )
 	{
-		
 		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
 		// edit privilege (edit:XXX,edit:YYY,...)
 		$allPrivileges = explode(',', $privileges);
