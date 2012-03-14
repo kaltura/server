@@ -10,19 +10,20 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 		"metadataObjectTypeEqual" => "_eq_object_type",
 	);
 
+	/* (non-PHPdoc)
+	 * @see KalturaMetadataBaseFilter::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
 	}
 	
-	protected function validate()
+	/**
+	 * Instantiate default value
+	 */
+	public function __construct()
 	{
-		$this->validatePropertyNotNull('metadataObjectTypeEqual');
-	}
-	
-	public function toObject ( $object_to_fill = null, $props_to_skip = array() )
-	{
-		$this->validate();
-		return parent::toObject($object_to_fill, $props_to_skip);
+		// default value for backward compatibility
+		$this->metadataObjectTypeEqual = MetadataObjectType::ENTRY;
 	}
 }
