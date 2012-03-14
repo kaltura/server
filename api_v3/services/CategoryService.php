@@ -103,10 +103,10 @@ class CategoryService extends KalturaBaseService
 		if ($this->getPartner()->isCategoriesLocked())
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED, Partner::CATEGORIES_LOCK_TIMEOUT);
 			
-		$this->getPartner()->lockCategories();
+		
 		$category->toUpdatableObject($categoryDb);
 			
-		if ($category->membershipSetting == CategoryMembershipSettingType::INHERT)
+		if ($category->inheritance == InheritanceType::INHERT)
 		{
 			$parentCategory = $categoryDb->getParentCategory();
 			$categoryDb->setUserJoinPolicy($parentCategory->getUserJoinPolicy());
@@ -114,7 +114,8 @@ class CategoryService extends KalturaBaseService
 			$categoryDb->setOwner($parentCategory->getOwner());
 			$categoryDb->setContributionPolicy($parentCategory->getContributionPolicy());
 		}
-			
+		
+		$this->getPartner()->lockCategories();	
 		try
 		{
 			$categoryDb->save();
