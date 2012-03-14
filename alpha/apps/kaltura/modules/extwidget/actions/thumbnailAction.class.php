@@ -260,24 +260,26 @@ class thumbnailAction extends sfAction
 					$tempThumbPath = myEntryUtils::resizeEntryImage ( $entry, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices );
 				} catch ( Exception $ex ) 
 				{
-					if ($ex->getCode () == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC) 
+					if($ex->getCode() == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC)
 					{
 						// get original flavor asset
-						$origFlavorAsset = assetPeer::retrieveOriginalByEntryId ( $entry_id );
-						if ($origFlavorAsset) 
-						{
+						$origFlavorAsset = assetPeer::retrieveOriginalByEntryId($entry_id);
+						if ($origFlavorAsset) {
 							$syncKey = $origFlavorAsset->getSyncKey ( flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
-							$remoteFileSync = kFileSyncUtils::getOriginFileSyncForKey ( $syncKey, false );
-							
-							if ($remoteFileSync && $remoteFileSync->getDc () == kDataCenterMgr::getCurrentDcId ()) 
-							{
-								KalturaLog::log ( "ERROR - Trying to redirect to myself - stop here." );
-								KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
+								
+							list($readyFileSync,$isLocal) = kFileSyncUtils::getReadyFileSyncForKey( $syncKey, TRUE, FALSE );
+							if ($readyFileSync) {
+								if ($isLocal) {
+									KalturaLog::log ( "ERROR - Trying to redirect to myself - stop here." );
+									KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
+								}
+								//Ready fileSync is on the other DC - dumping
+								kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 							}
+							throw new kFileSyncException('No ready fileSync found on any DC',kFileSyncException::FILE_NOT_FOUND);
 						}
+						// problem could be due to replication lag
 					}
-					// problem could be due to replication lag
-					kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 				}
 			}
 		}
