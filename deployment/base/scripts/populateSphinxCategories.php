@@ -27,7 +27,7 @@ DbManager::initialize();
 $c = new Criteria();
 
 if($argc > 1 && is_numeric($argv[1]))
-	$c->add(categoryPeer::INT_ID, $argv[1], Criteria::GREATER_EQUAL);
+	$c->add(categoryPeer::ID, $argv[1], Criteria::GREATER_EQUAL);
 
 $c->addAscendingOrderByColumn(categoryPeer::ID);
 $c->setLimit(10000);
