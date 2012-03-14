@@ -67,5 +67,21 @@ class kObjectCopiedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 		
 		return null;
 	}
+	
+	/**
+	 * @return BaseObject $fromObject
+	 */
+	public function getFromObject() 
+	{
+		return $this->fromObject;
+	}
+	
+	/**
+	 * @return BaseObject $toObject
+	 */
+	public function getToObject() 
+	{
+		return $this->toObject;
+	}
 
 }

@@ -39,4 +39,20 @@ abstract class kApplicativeEvent extends KalturaEvent implements IKalturaContinu
 		
 		return null;
 	}
+	
+	/**
+	 * @return BaseObject $object
+	 */
+	public function getObject() 
+	{
+		return $this->object;
+	}
+
+	/**
+	 * @return BatchJob $raisedJob
+	 */
+	public function getRaisedJob() 
+	{
+		return $this->raisedJob;
+	}
 }

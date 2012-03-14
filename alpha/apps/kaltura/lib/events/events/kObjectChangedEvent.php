@@ -61,5 +61,21 @@ class kObjectChangedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 		return null;
 	}
 	
+	/**
+	 * @return BaseObject $object
+	 */
+	public function getObject() 
+	{
+		return $this->object;
+	}
+	
+	/**
+	 * @return array $object
+	 */
+	public function getModifiedColumns() 
+	{
+		return $this->modifiedColumns;
+	}
+	
 
 }

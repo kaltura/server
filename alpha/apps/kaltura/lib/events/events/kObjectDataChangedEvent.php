@@ -43,5 +43,13 @@ class kObjectDataChangedEvent extends kApplicativeEvent
 		KalturaLog::debug(get_class($this) . ' event consumed by ' . get_class($consumer) . ' object type [' . get_class($this->object) . '] ' . $additionalLog);
 		return $consumer->objectDataChanged($this->object, $this->previousVersion, $this->raisedJob);
 	}
+	
+	/**
+	 * @return string $previousVersion
+	 */
+	public function getPreviousVersion() 
+	{
+		return $this->previousVersion;
+	}
 
 }

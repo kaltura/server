@@ -46,4 +46,20 @@ class kBatchJobStatusEvent extends KalturaEvent implements IKalturaContinualEven
 		return $consumer->updatedJob($this->dbBatchJob, $this->twinJob);
 	}
 
+	/**
+	 * @return BatchJob $dbBatchJob
+	 */
+	public function getBatchJob() 
+	{
+		return $this->dbBatchJob;
+	}
+
+	/**
+	 * @return BatchJob $twinJob
+	 */
+	public function getTwinJob() 
+	{
+		return $this->twinJob;
+	}
+
 }

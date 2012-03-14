@@ -54,5 +54,13 @@ class kObjectCreatedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 		
 		return null;
 	}
+	
+	/**
+	 * @return BaseObject $object
+	 */
+	public function getObject() 
+	{
+		return $this->object;
+	}
 
 }

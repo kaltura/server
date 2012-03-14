@@ -49,5 +49,12 @@ class kObjectSavedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 		KalturaLog::debug(get_class($this) . ' event consumed by ' . get_class($consumer) . ' object type [' . get_class($this->object) . '] ' . $additionalLog);
 		return $consumer->objectSaved($this->object);
 	}
-
+	
+	/**
+	 * @return BaseObject $object
+	 */
+	public function getObject() 
+	{
+		return $this->object;
+	}
 }
