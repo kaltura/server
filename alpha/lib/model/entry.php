@@ -1653,7 +1653,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	}
 	public function getCreatorKuserId (  )			{	return $this->getFromCustomData( "creatorKuserId", null, 0 );	}
 	
-	public function setEntitledUsersEdit($v)		
+	public function setEntitledPusersEdit($v)		
 	{	
 		$entitledUserPuserEdit = array();
 		
@@ -1675,16 +1675,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function getEntitledKusersEdit()			
 	{	
-		$entitledUserPuserEdit = unserialize($this->getFromCustomData( "entitledUserPuserEdit", null, 0 ));
+		$entitledUserPuserEdit = $this->getFromCustomData( "entitledUserPuserEdit", null, 0 );
+		if (!$entitledUserPuserEdit)
+			return '';
 
-		return implode(',', array_keys($entitledUserPuserEdit));
+		return implode(',', array_keys(unserialize($entitledUserPuserEdit)));
 	}
 	
-	public function getEntitledUsersEdit()			
+	public function getEntitledPusersEdit()			
 	{	
 		$entitledUserPuserEdit = $this->getFromCustomData( "entitledUserPuserEdit", null, 0 );
 		if (!$entitledUserPuserEdit)
-			return 'nothing';
+			return '';
 			
 		return implode(',', unserialize($entitledUserPuserEdit));
 	}

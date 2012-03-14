@@ -1416,7 +1416,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="display_in_search" type="tinyint" default="1"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy" type="tinyint" default="1"/>
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="membership_setting" type="tinyint" default="2"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="inheritance" type="tinyint" default="2"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="user_join_policy" type="tinyint" default="3"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="default_permission_level" type="tinyint" default="3"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kuser_id" type="integer" />

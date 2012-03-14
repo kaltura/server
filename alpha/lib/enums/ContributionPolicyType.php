@@ -1,5 +1,6 @@
 <?php
 /**
+ * Who can assign entry to a specific category
  * @package Core
  * @subpackage model.enum
  */ 

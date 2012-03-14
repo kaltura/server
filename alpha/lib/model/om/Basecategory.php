@@ -136,11 +136,11 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	protected $privacy;
 
 	/**
-	 * The value for the membership_setting field.
+	 * The value for the inheritance field.
 	 * Note: this column has a database default value of: 2
 	 * @var        int
 	 */
-	protected $membership_setting;
+	protected $inheritance;
 
 	/**
 	 * The value for the user_join_policy field.
@@ -277,7 +277,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		$this->pending_members_count = 0;
 		$this->display_in_search = 1;
 		$this->privacy = 1;
-		$this->membership_setting = 2;
+		$this->inheritance = 2;
 		$this->user_join_policy = 3;
 		$this->default_permission_level = 3;
 		$this->contribution_policy = 2;
@@ -565,13 +565,13 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [membership_setting] column value.
+	 * Get the [inheritance] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getMembershipSetting()
+	public function getInheritance()
 	{
-		return $this->membership_setting;
+		return $this->inheritance;
 	}
 
 	/**
@@ -1170,27 +1170,27 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	} // setPrivacy()
 
 	/**
-	 * Set the value of [membership_setting] column.
+	 * Set the value of [inheritance] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     category The current object (for fluent API support)
 	 */
-	public function setMembershipSetting($v)
+	public function setInheritance($v)
 	{
-		if(!isset($this->oldColumnsValues[categoryPeer::MEMBERSHIP_SETTING]))
-			$this->oldColumnsValues[categoryPeer::MEMBERSHIP_SETTING] = $this->membership_setting;
+		if(!isset($this->oldColumnsValues[categoryPeer::INHERITANCE]))
+			$this->oldColumnsValues[categoryPeer::INHERITANCE] = $this->inheritance;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->membership_setting !== $v || $this->isNew()) {
-			$this->membership_setting = $v;
-			$this->modifiedColumns[] = categoryPeer::MEMBERSHIP_SETTING;
+		if ($this->inheritance !== $v || $this->isNew()) {
+			$this->inheritance = $v;
+			$this->modifiedColumns[] = categoryPeer::INHERITANCE;
 		}
 
 		return $this;
-	} // setMembershipSetting()
+	} // setInheritance()
 
 	/**
 	 * Set the value of [user_join_policy] column.
@@ -1461,7 +1461,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				return false;
 			}
 
-			if ($this->membership_setting !== 2) {
+			if ($this->inheritance !== 2) {
 				return false;
 			}
 
@@ -1521,7 +1521,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$this->tags = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
 			$this->display_in_search = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
 			$this->privacy = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
-			$this->membership_setting = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->inheritance = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
 			$this->user_join_policy = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
 			$this->default_permission_level = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
 			$this->kuser_id = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
@@ -2067,7 +2067,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				return $this->getPrivacy();
 				break;
 			case 18:
-				return $this->getMembershipSetting();
+				return $this->getInheritance();
 				break;
 			case 19:
 				return $this->getUserJoinPolicy();
@@ -2138,7 +2138,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$keys[15] => $this->getTags(),
 			$keys[16] => $this->getDisplayInSearch(),
 			$keys[17] => $this->getPrivacy(),
-			$keys[18] => $this->getMembershipSetting(),
+			$keys[18] => $this->getInheritance(),
 			$keys[19] => $this->getUserJoinPolicy(),
 			$keys[20] => $this->getDefaultPermissionLevel(),
 			$keys[21] => $this->getKuserId(),
@@ -2235,7 +2235,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				$this->setPrivacy($value);
 				break;
 			case 18:
-				$this->setMembershipSetting($value);
+				$this->setInheritance($value);
 				break;
 			case 19:
 				$this->setUserJoinPolicy($value);
@@ -2309,7 +2309,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[15], $arr)) $this->setTags($arr[$keys[15]]);
 		if (array_key_exists($keys[16], $arr)) $this->setDisplayInSearch($arr[$keys[16]]);
 		if (array_key_exists($keys[17], $arr)) $this->setPrivacy($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setMembershipSetting($arr[$keys[18]]);
+		if (array_key_exists($keys[18], $arr)) $this->setInheritance($arr[$keys[18]]);
 		if (array_key_exists($keys[19], $arr)) $this->setUserJoinPolicy($arr[$keys[19]]);
 		if (array_key_exists($keys[20], $arr)) $this->setDefaultPermissionLevel($arr[$keys[20]]);
 		if (array_key_exists($keys[21], $arr)) $this->setKuserId($arr[$keys[21]]);
@@ -2349,7 +2349,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryPeer::TAGS)) $criteria->add(categoryPeer::TAGS, $this->tags);
 		if ($this->isColumnModified(categoryPeer::DISPLAY_IN_SEARCH)) $criteria->add(categoryPeer::DISPLAY_IN_SEARCH, $this->display_in_search);
 		if ($this->isColumnModified(categoryPeer::PRIVACY)) $criteria->add(categoryPeer::PRIVACY, $this->privacy);
-		if ($this->isColumnModified(categoryPeer::MEMBERSHIP_SETTING)) $criteria->add(categoryPeer::MEMBERSHIP_SETTING, $this->membership_setting);
+		if ($this->isColumnModified(categoryPeer::INHERITANCE)) $criteria->add(categoryPeer::INHERITANCE, $this->inheritance);
 		if ($this->isColumnModified(categoryPeer::USER_JOIN_POLICY)) $criteria->add(categoryPeer::USER_JOIN_POLICY, $this->user_join_policy);
 		if ($this->isColumnModified(categoryPeer::DEFAULT_PERMISSION_LEVEL)) $criteria->add(categoryPeer::DEFAULT_PERMISSION_LEVEL, $this->default_permission_level);
 		if ($this->isColumnModified(categoryPeer::KUSER_ID)) $criteria->add(categoryPeer::KUSER_ID, $this->kuser_id);
@@ -2460,7 +2460,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 
 		$copyObj->setPrivacy($this->privacy);
 
-		$copyObj->setMembershipSetting($this->membership_setting);
+		$copyObj->setInheritance($this->inheritance);
 
 		$copyObj->setUserJoinPolicy($this->user_join_policy);
 

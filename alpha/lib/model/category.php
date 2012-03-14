@@ -581,7 +581,7 @@ class category extends Basecategory implements IIndexable
 		$this->setPendingMembersCount(0);
 		$this->setDisplayInSearch(displayInSearchType::LISTED);
 		$this->setPrivacy(PrivacyType::ALL);
-		$this->setMembershipSetting(CategoryMembershipSettingType::MANUAL);
+		$this->setInheritance(InheritanceType::MANUAL);
 		$this->setUserJoinPolicy(UserJoinPolicyType::NOT_ALLOWED);
 		$this->setDefaultPermissionLevel(CategoryKuserPermissionLevel::MODERATOR);
 		$this->setContributionPolicy(ContributionPolicyType::MODERATOR);
@@ -620,7 +620,7 @@ class category extends Basecategory implements IIndexable
 	 */	
 	public function getMembers()
 	{
-		$members = categoryKuserPeer::doSelectByActiveKusersByCategoryId($this->getId());
+		$members = categoryKuserPeer::retrieveActiveKusersByCategoryId($this->getId());
 		if (!$members)
 			return '';
 		
@@ -682,7 +682,7 @@ class category extends Basecategory implements IIndexable
 	
 	public function applyInheritance()
 	{
-		if ($this->getMembershipSetting() != CategoryMembershipSettingType::INHERT)
+		if ($this->getInheritance() != InheritanceType::INHERT)
 			return;
 			
 		$parentCategory = $this->getParentCategory();
@@ -691,10 +691,12 @@ class category extends Basecategory implements IIndexable
 		$this->setKuserId($parentCategory->getKuserId());
 		$this->setContributionPolicy($parentCategory->getContributionPolicy());
 		
-		$parentInheritFromCategory = $parentCategory->getInheritFromCategory();
+		//TODO - fix this
+		/*$parentInheritFromCategory = $parentCategory->getInheritFromCategory();
 			return $this->getId();
 		
 		$this->setInheritFromCategory();
+		*/
 			
 	}
 	

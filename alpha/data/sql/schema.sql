@@ -1629,7 +1629,7 @@ CREATE TABLE `category`
 	`tags` TEXT,
 	`display_in_search` TINYINT default 1,
 	`privacy` TINYINT default 1,
-	`membership_setting` TINYINT default 2,
+	`inheritance` TINYINT default 2,
 	`user_join_policy` TINYINT default 3,
 	`default_permission_level` TINYINT default 3,
 	`kuser_id` INTEGER,

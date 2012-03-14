@@ -55,7 +55,7 @@ class categoryTableMap extends TableMap {
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('DISPLAY_IN_SEARCH', 'DisplayInSearch', 'TINYINT', false, null, 1);
 		$this->addColumn('PRIVACY', 'Privacy', 'TINYINT', false, null, 1);
-		$this->addColumn('MEMBERSHIP_SETTING', 'MembershipSetting', 'TINYINT', false, null, 2);
+		$this->addColumn('INHERITANCE', 'Inheritance', 'TINYINT', false, null, 2);
 		$this->addColumn('USER_JOIN_POLICY', 'UserJoinPolicy', 'TINYINT', false, null, 3);
 		$this->addColumn('DEFAULT_PERMISSION_LEVEL', 'DefaultPermissionLevel', 'TINYINT', false, null, 3);
 		$this->addColumn('KUSER_ID', 'KuserId', 'INTEGER', false, null, null);

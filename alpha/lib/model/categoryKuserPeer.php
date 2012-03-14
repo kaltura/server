@@ -41,7 +41,7 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 	 * 
 	 * @return array
 	 */
-	public static function doSelectByActiveKusersByCategoryId($categoryId, $con = null)
+	public static function retrieveActiveKusersByCategoryId($categoryId, $con = null)
 	{
 		$criteria = new Criteria();
 
