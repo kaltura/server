@@ -65,9 +65,18 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 *  
 	 * @var int
 	 * @readonly
-	 * @filter order
+	 * @filter gte,lte,order
 	 */
 	public $createdAt;
+	
+	/**
+	 * Update date as Unix timestamp (In seconds)
+	 *  
+	 * @var int
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $updatedAt;
 	
 	/**
 	 * Category description
@@ -85,12 +94,12 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	public $tags;
 	
 	/**
-	 * Category displayInSearch - if category will be returned for list action.
+	 * If category will be returned for list action.
 	 * 
-	 * @var KalturaDisplayInSearchType
+	 * @var KalturaAppearInListType
 	 * @filter eq
 	 */
-	public $displayInSearch;
+	public $appearInList;
 	
 	/**
 	 * defines the privacy of the entries that assigned to this category
@@ -139,7 +148,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	
 	
 	/**
-	 * reference Id - external reference id 
+	 * Category external id, controlled and managed by the partner.
 	 *  
 	 * @var string
 	 */
@@ -202,9 +211,10 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"partnerId",
 		"entriesCount",
 		"createdAt",
+		"updatedAt",
 		"description",
 		"tags",
-		"displayInSearch",
+		"appearInList" => "displayInSearch",
 		"privacy",
 		"inheritance",
 		"userJoinPolicy",

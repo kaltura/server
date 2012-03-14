@@ -53,8 +53,6 @@ class category extends Basecategory implements IIndexable
 				PermissionPeer::enableForPartner(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD, PermissionType::SPECIAL_FEATURE);
 		}
 		
-		$this->applyInheritance();
-		
 		// set the depth of the parent category + 1
 		if ($this->isNew() || $this->isColumnModified(categoryPeer::PARENT_ID))
 		{
@@ -579,7 +577,7 @@ class category extends Basecategory implements IIndexable
 		$this->setDirectEntriesCount(0);
 		$this->setMembersCount(0);
 		$this->setPendingMembersCount(0);
-		$this->setDisplayInSearch(displayInSearchType::LISTED);
+		$this->setDisplayInSearch(DisplayInSearchType::PARTNER_ONLY);
 		$this->setPrivacy(PrivacyType::ALL);
 		$this->setInheritance(InheritanceType::MANUAL);
 		$this->setUserJoinPolicy(UserJoinPolicyType::NOT_ALLOWED);
@@ -649,7 +647,7 @@ class category extends Basecategory implements IIndexable
 			'status' => 'status',
 			'kuser_id' => 'kuserId',
 			'display_in_search' => 'displayInSearch',	
-			'search_text' => 'searchText',
+			'free_text' => 'freeText',
 			'members' => 'members'
 		);
 	}
@@ -665,11 +663,18 @@ class category extends Basecategory implements IIndexable
 		return null;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see lib/model/om/Basecategory#preSave()
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		$this->applyInheritance();
+		
+		return parent::preSave($con);
+	}
 	
-
-	
-		/* (non-PHPdoc)
-	 * @see lib/model/om/Baseentry#postInsert()
+	/* (non-PHPdoc)
+	 * @see lib/model/om/Basecategory#postInsert()
 	 */
 	public function postInsert(PropelPDO $con = null)
 	{

@@ -7,7 +7,7 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 {
 	private $map_between_objects = array
 	(
-		"searchText" => "_search_text",
+		"freeText" => "_free_text",
 		"membersIn" => "_in_members",
 	);
 
@@ -19,7 +19,7 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 	/**
 	 * @var string
 	 */
-	public $searchText;
+	public $freeText;
 
 	/**
 	 * @var string

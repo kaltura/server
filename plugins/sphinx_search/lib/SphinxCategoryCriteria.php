@@ -12,7 +12,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'category.STATUS' => 'category_status',
 		'category.KUSER_ID' => 'kuser_id',
 		'category.DISPLAY_IN_SEARCH' => 'display_in_search',	
-		'category.SEARCH_TEXT' => '(name,tags,description)',
+		'category.FREE_TEXT' => '(name,tags,description)',
 		'category.MEMBERS' => 'members',
 		'plugins_data'
 	);
@@ -87,9 +87,9 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$filter->unsetByName('in_members');
 		}
 		
-		if($filter->get('_search_text'))
+		if($filter->get('_free_text'))
 		{
-			$freeTexts = $filter->get('_search_text');
+			$freeTexts = $filter->get('_free_text');
 			KalturaLog::debug("Attach free text [$freeTexts]");
 			
 			$additionalConditions = array();
@@ -152,7 +152,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 				$this->matchClause[] = $matches;
 			}
 		}
-		$filter->unsetByName('_search_text');
+		$filter->unsetByName('_free_text');
 				
 		return parent::applyFilterFields($filter);
 	}

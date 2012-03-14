@@ -21,7 +21,7 @@ class categoryFilter extends baseObjectFilter
 			"_eq_depth",
 			"_gte_created_at",
 			"_lte_created_at",
-			"_search_text",
+			"_free_text",
 			"_in_members",		
 			) , NULL );
 

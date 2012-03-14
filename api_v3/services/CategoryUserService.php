@@ -237,7 +237,7 @@ class CategoryUserService extends KalturaBaseService
 		$pager->attachToCriteria($c);
 		$list = categoryKuserPeer::doSelect($c);
 		
-		$newList = KalturaCategoryUserArray::fromCategoryUserArray($list);
+		$newList = KalturaCategoryUserArray::fromDbArray($list);
 		
 		$response = new KalturaCategoryUserListResponse();
 		$response->objects = $newList;

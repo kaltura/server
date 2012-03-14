@@ -10,8 +10,6 @@ class categoryKuserFilter extends baseObjectFilter
 		// TODO - should separate the schema of the fields from the actual values
 		// or can use this to set default valuse
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
-				"_eq_id",
-				"_in_id",
 				"_eq_category_id",
 				"_in_category_id",
 				"_eq_user_id",
@@ -24,7 +22,7 @@ class categoryKuserFilter extends baseObjectFilter
 				"_like_tags",
 				"_mlikeor_tags",
 				"_mlikeand_tags",
-				"_eq_display_in_search",
+				"_eq_appear_in_list",
 				"_eq_privacy",
 				"_in_privacy",
 				"_eq_membership_setting",

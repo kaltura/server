@@ -32,7 +32,7 @@ class categoryPeer extends BasecategoryPeer
 		
 		if (kEntitlementUtils::getEntitlementScope())
 		{
-			$crit = $c->getNewCriterion ( self::DISPLAY_IN_SEARCH, displayInSearchType::LISTED, Criteria::EQUAL );
+			$crit = $c->getNewCriterion ( self::DISPLAY_IN_SEARCH, DisplayInSearchType::PARTNER_ONLY, Criteria::EQUAL );
 			
 			if ( kCurrentContext::$uid <> '')
 				$crit->addOr ( $c->getNewCriterion ( self::MEMBERS , kCurrentContext::$uid, Criteria::EQUAL) );
