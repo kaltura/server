@@ -912,7 +912,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			
 		$script .= "
 		
-		if(\$this->alreadyInSave && count(\$this->modifiedColumns) == 2 and \$this->isColumnModified(".$this->getPeerClassname()."::UPDATED_AT))
+		if(\$this->alreadyInSave && count(\$this->modifiedColumns) == 2 && \$this->isColumnModified(".$this->getPeerClassname()."::UPDATED_AT))
 		{
 			\$theModifiedColumn = null;
 			foreach(\$this->modifiedColumns as \$modifiedColumn)
