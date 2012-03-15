@@ -80,17 +80,22 @@ class kEventsManager
 	protected static function getConsumers($interfaceType)
 	{
 		if(!count(self::$consumers))
+		{
 			self::loadConsumers();
-			
+		}
 		$consumers = array();
 		if(isset(self::$consumers[$interfaceType]))
+		{
 			$consumers = self::$consumers[$interfaceType];
+		}
 			
 		if(isset(self::$consumers[self::GENERIC_CONSUMER_INTERFACE]))
+		{
 			foreach(self::$consumers[self::GENERIC_CONSUMER_INTERFACE] as $consumer)
 				$consumers[] = $consumer;
+		}
 			
-		return array();
+		return $consumers;
 	}
 	
 	public static function flushEvents()
