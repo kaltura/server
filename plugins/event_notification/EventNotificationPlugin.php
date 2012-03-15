@@ -2,7 +2,7 @@
 /**
  * @package plugins.eventNotification
  */
-class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaEventConsumers, IKalturaServices, IKalturaMemoryCleaner, IKalturaAdminConsolePages, IKalturaConfigurator
+class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaEventConsumers, IKalturaServices, IKalturaMemoryCleaner, IKalturaAdminConsolePages, IKalturaConfigurator, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'eventNotification';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -38,6 +38,20 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 	{
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);		
+	}
+			
+	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		if(is_null($baseEnumName))
+			return array('EventNotificationBatchType');
+	
+		if($baseEnumName == 'BatchJobType')
+			return array('EventNotificationBatchType');
+			
+		return array();
 	}
 			
 	/* (non-PHPdoc)
@@ -91,5 +105,22 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 		return array(
 			'eventNotificationTemplate' => 'EventNotificationTemplateService',
 		);
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBatchJobTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BatchJobType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }
