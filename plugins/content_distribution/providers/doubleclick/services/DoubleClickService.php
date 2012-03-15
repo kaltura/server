@@ -86,10 +86,16 @@ class DoubleClickService extends KalturaBaseService
 			$entryFilter->set('_notin_id', $stateLastEntryIds);
 
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$baseCriteria->setLimit($profile->getItemsPerPage());
+		$baseCriteria->setLimit($profile->getItemsPerPage() + 1); // get +1 to check if we have next page
 		$entryFilter->attachToCriteria($baseCriteria);
 		$entries = entryPeer::doSelect($baseCriteria);
-		
+
+		$hasNextPage = false;
+		if (count($entries) === ($profile->getItemsPerPage() + 1)) { // we tried to get (itemsPerPage + 1) entries, meaning we have another page
+			$hasNextPage = true;
+			unset($entries[$profile->getItemsPerPage()]);
+		}
+
 		// Find the state
 		$entryIds = array();
 		$nextPageStateLastEntryCreatedAt = $stateLastEntryCreatedAt;
@@ -110,7 +116,7 @@ class DoubleClickService extends KalturaBaseService
 		$feed->setTotalResult($totalCount);
 		$feed->setStartIndex(($page - 1) * $profile->getItemsPerPage() + 1);
 		$feed->setSelfLink($this->getUrl($distributionProfileId, $hash, $page, $period, $stateLastEntryCreatedAt, $stateLastEntryIds));
-		if ($totalCount > $page * $profile->getItemsPerPage())
+		if ($hasNextPage)
 			$feed->setNextLink($this->getUrl($distributionProfileId, $hash, $page + 1, $period, $nextPageStateLastEntryCreatedAt, $nextPageStateLastEntryIds));
 	
 		$cacheDir = kConf::get("global_cache_dir")."double_click/";	
