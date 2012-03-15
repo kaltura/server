@@ -641,6 +641,25 @@ class MediaService extends KalturaEntryService
 		return $this->getEntry($entryId, $version, KalturaEntryType::MEDIA_CLIP);
 	}
 
+    /**
+     * Get MRSS by entry id
+     * XML will return as an escaped string
+     *
+     * @action getMrss
+     * @param string $entryId Entry id
+     * @return string
+     */
+    function getMrssAction($entryId)
+    {
+        $dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+        /* @var $mrss SimpleXMLElement */
+        $mrss = kMrssManager::getEntryMrssXml($dbEntry);
+        return $mrss->asXML();
+    }
+
 	/**
 	 * Update media entry. Only the properties that were set will be updated.
 	 * 

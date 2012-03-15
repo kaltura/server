@@ -29,8 +29,7 @@ class XsltTesterApiAction extends KalturaAdminConsolePlugin
         $xslt = $action->getRequest()->getParam('xslt');
 
         $this->client = Infra_ClientHelper::getClient();
-        $adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($this->client);
-        $xml = $adminConsolePlugin->entryAdmin->getMrssEntry($entryId);
+        $xml = $this->client->media->getMrss($entryId);
         $xslParams = array();
         $xslParams['entryDistributionId'] = '';
         $xslParams['distributionProfileId'] = '';
