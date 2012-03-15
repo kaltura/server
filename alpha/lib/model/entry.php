@@ -2250,6 +2250,21 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return $this;
 	}
 	
+	/**
+	 * @see Baseentry::setLengthInMsecs()
+	 * Make sure that the set value is positive
+	 */
+	public function setLengthInMsecs($v)
+	{
+		if(!$v || $v < 0) // null ot negative
+			return;
+			
+		if(is_string($v) && !is_numeric($v)) // not numeric
+			return;
+			
+		return parent::setLengthInMsecs($v);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see Baseentry::setAccessControlId()
 	 */
