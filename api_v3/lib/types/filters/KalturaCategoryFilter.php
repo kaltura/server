@@ -9,6 +9,7 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 	(
 		"freeText" => "_free_text",
 		"membersIn" => "_in_members",
+		"appearInListEqual" => "_eq_display_in_search",
 	);
 
 	public function getMapBetweenObjects()
