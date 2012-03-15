@@ -127,7 +127,8 @@ class DoubleClickService extends KalturaBaseService
 			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
 			
 			$cuePoints = $this->getCuePoints($entry->getPartnerId(), $entry->getId());
-			$feed->addItem($fields, $flavorAssets, $thumbAssets, $cuePoints);
+			$xml = $feed->getItemXml($fields, $flavorAssets, $thumbAssets, $cuePoints);
+            $feed->addItemXml($xml);
 		}
 		
 		header('Content-Type: text/xml');

@@ -51,7 +51,7 @@ class DoubleClickFeed
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/' . $templateName;
 		$this->distributionProfile = $profile;
 		
-		$this->doc = new DOMDocument();
+		$this->doc = new DOMDocument('1.0', 'UTF-8');
 		$this->doc->formatOutput = true;
 		$this->doc->preserveWhiteSpace = false;
 		$this->doc->load($xmlTemplate);
@@ -98,10 +98,31 @@ class DoubleClickFeed
 	 */
 	public function addItem(array $values, array $flavorAssets = null, array $thumbAssets = null, array $cuePoints)
 	{
-		$item = $this->item->cloneNode(true);
+		$item = $this->getItem($values, $flavorAssets, $thumbAssets, $cuePoints);
 		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
 		$channelNode->appendChild($item);
-		
+	}
+
+	public function addItemXml($xml)
+	{
+		$tempDoc = new DOMDocument('1.0', 'UTF-8');
+		$tempDoc->loadXML($xml);
+
+		$importedItem = $this->doc->importNode($tempDoc->firstChild, true);
+		$channelNode = $this->xpath->query('/rss/channel')->item(0);
+		$channelNode->appendChild($importedItem);
+	}
+
+	public function getItemXml(array $values, array $flavorAssets = null, array $thumbAssets = null, array $cuePoints)
+	{
+		$item = $this->getItem($values, $flavorAssets, $thumbAssets, $cuePoints);
+		return $this->doc->saveXML($item);
+	}
+
+	public function getItem(array $values, array $flavorAssets = null, array $thumbAssets = null, array $cuePoints)
+	{
+		$item = $this->item->cloneNode(true);
+
 		$this->setNodeValue('guid', $values[DoubleClickDistributionField::GUID], $item);
 		$this->setNodeValue('pubDate', date('r', $values[DoubleClickDistributionField::PUB_DATE]), $item);
 		$this->setNodeValue('title', $values[DoubleClickDistributionField::TITLE], $item);
@@ -111,7 +132,7 @@ class DoubleClickFeed
 		$this->setNodeValue('media:title', $values[DoubleClickDistributionField::TITLE], $item);
 		$this->setNodeValue('media:description', $values[DoubleClickDistributionField::DESCRIPTION], $item);
 		$this->setNodeValue('media:keywords', $values[DoubleClickDistributionField::KEYWORDS], $item);
-		
+
 		$categories = explode(',', $values[DoubleClickDistributionField::CATEGORIES]);
 		foreach($categories as $category)
 		{
@@ -127,7 +148,7 @@ class DoubleClickFeed
 
 		$this->setNodeValue('dfpvideo:contentID', $values[DoubleClickDistributionField::GUID], $item);
 		$this->setNodeValue('dfpvideo:monetizable', $values[DoubleClickDistributionField::MONETIZABLE], $item);
-		
+
 		$statsNode = $this->xpath->query('dfpvideo:stats', $item)->item(0);
 		$this->setOptionalAttribute($statsNode, 'totalViewCount', $values[DoubleClickDistributionField::TOTAL_VIEW_COUNT]);
 		$this->setOptionalAttribute($statsNode, 'previousDayViewCount', $values[DoubleClickDistributionField::PREVIOUS_DAY_VIEW_COUNT]);
@@ -135,15 +156,17 @@ class DoubleClickFeed
 		$this->setOptionalAttribute($statsNode, 'favoriteCount', $values[DoubleClickDistributionField::FAVORITE_COUNT]);
 		$this->setOptionalAttribute($statsNode, 'likeCount', $values[DoubleClickDistributionField::LIKE_COUNT]);
 		$this->setOptionalAttribute($statsNode, 'dislikeCount', $values[DoubleClickDistributionField::DISLIKE_COUNT]);
-		
+
 		$this->setCuePoints($item, $cuePoints);
 		$this->setDynamicMetadata($item, $values);
-		
+
 		if (is_array($flavorAssets))
 			$this->setFlavorAssets($item, $flavorAssets);
-			
+
 		if (is_array($thumbAssets))
 			$this->setThumbAssets($item, $thumbAssets);
+
+		return $item;
 	}
 	
 	public function getAssetUrl(asset $asset)
@@ -331,9 +354,13 @@ class DoubleClickFeed
 		{
 			// if CDATA inside, set the value of CDATA
 			if ($node->childNodes->length > 0 && $node->childNodes->item(0)->nodeType == XML_CDATA_SECTION_NODE)
-				$node->childNodes->item(0)->nodeValue = htmlentities($value);
+				$node->childNodes->item(0)->nodeValue = $value;
 			else
-				$node->nodeValue = htmlentities($value);
+			{
+				$textNode = $this->doc->createTextNode($value);
+				$node->appendChild($textNode);
+			}
+
 		}
 	}
 	
