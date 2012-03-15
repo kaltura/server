@@ -108,5 +108,7 @@ class KalturaCaptionAsset extends KalturaAsset
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull('format');
+		
+		parent::validateForInsert($propertiesToSkip);
 	}
 }
