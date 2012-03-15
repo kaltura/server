@@ -39,7 +39,12 @@ class KalturaTypeReflectorCacher
 			{
 				$typeReflector = new KalturaTypeReflector($type);
 				$cachedData = serialize($typeReflector);
-				file_put_contents($cachedFilePath, $cachedData);
+				$bytesWritten = file_put_contents($cachedFilePath, $cachedData);
+				if(!$bytesWritten)
+				{
+					$folderPermission = substr(decoct(fileperms(dirname($cachedFilePath))), 2);
+					error_log("Kaltura type reflector could not be saved to path [$cachedFilePath] type [$type] folder permisisons [$folderPermission]");
+				}
 			}
 			
 			self::$_loadedTypeReflectors[$type] = $typeReflector;
