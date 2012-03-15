@@ -352,6 +352,12 @@ class KalturaObject
 	{
 		$useableProperties = array();
 		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
+		if(!$reflector)
+		{
+			KalturaLog::err("Unable to validate usage for attribute object type [" . get_class($this) . "], type reflector not found");
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_USAGE_PERMISSION, get_class($this));
+		}
+			
 		$properties = $reflector->getProperties();
 		
 		if ($reflector->requiresUsagePermission() && !kPermissionManager::getUsagePermitted(get_class($this), kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
