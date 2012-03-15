@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Event notification template service lets you create and manage event notification templates
  * @service eventNotificationTemplate
@@ -181,4 +180,32 @@ class EventNotificationTemplateService extends KalturaBaseService
 //		
 //		return $response;
 //	}
+	
+	/**
+	 * Dispatch event notification object by id
+	 * 
+	 * @action get
+	 * @param int $id 
+	 * @param KalturaEventNotificationDispatchJobData $jobData 
+	 * @return int
+	 * 
+	 * @throws KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND
+	 */		
+	public function dispatchAction($id, KalturaEventNotificationDispatchJobData $data)
+	{
+		// get the object
+		$dbEventNotificationTemplate = EventNotificationTemplatePeer::retrieveByPK($id);
+		if (!$dbEventNotificationTemplate)
+			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND, $id);
+			
+		if(!$dbEventNotificationTemplate->getManualDispatchEnabled())
+			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_DISPATH_DISABLED, $id);
+		
+		$jobData = $data->toObject($dbEventNotificationTemplate->getJobData());
+		$job = kEventNotificationFlowManager::addEventNotificationDispatchJob($dbEventNotificationTemplate->getType(), $jobData, $dbEventNotificationTemplate->getPartnerId());
+		if(!$job)
+			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_DISPATH_FAILED, $id);
+			
+		return $job->getId();
+	}
 }

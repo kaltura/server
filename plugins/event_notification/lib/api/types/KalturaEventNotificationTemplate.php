@@ -61,6 +61,22 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	public $updatedAt;
 
 	/**
+	 * Define that the template could be dispatched manually from the API
+	 * 
+	 * @var bool
+	 * @requiresPermission insert,update
+	 */
+	public $manualDispatchEnabled;
+
+	/**
+	 * Define that the template could be dispatched automatically by the system
+	 * 
+	 * @var bool
+	 * @requiresPermission insert,update
+	 */
+	public $automaticDispatchEnabled;
+
+	/**
 	 * Define the event that should trigger this notification
 	 * 
 	 * @var int
@@ -93,6 +109,8 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 		'status',
 		'createdAt',
 		'updatedAt',
+		'manualDispatchEnabled',
+		'automaticDispatchEnabled',
 		'eventType',
 		'eventObjectType' => 'objectType',
 		'eventConditions',

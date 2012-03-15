@@ -16,9 +16,21 @@
 abstract class EventNotificationTemplate extends BaseEventNotificationTemplate 
 {
 	const CUSTOM_DATA_EVENT_CONDITIONS = 'eventConditions';
+	const CUSTOM_DATA_MANUAL_DISPATCH_ENABLED = 'manualDispatchEnabled';
+	const CUSTOM_DATA_AUTOMATIC_DISPATCH_ENABLED = 'automaticDispatchEnabled';
+
+	/**
+	 * Returns job data for dispatching the event notification
+	 * @return kEventNotificationDispatchJobData
+	 */
+	abstract public function getJobData(); 
 
 	public function getEventConditions()									{return $this->getFromCustomData(self::CUSTOM_DATA_EVENT_CONDITIONS);}
-	
+	public function getManualDispatchEnabled()								{return $this->getFromCustomData(self::CUSTOM_DATA_MANUAL_DISPATCH_ENABLED);}
+	public function getAutomaticDispatchEnabled()							{return $this->getFromCustomData(self::CUSTOM_DATA_AUTOMATIC_DISPATCH_ENABLED);}
+
 	public function setEventConditions(array $v)							{return $this->putInCustomData(self::CUSTOM_DATA_EVENT_CONDITIONS, $v);}
+	public function setManualDispatchEnabled(array $v)						{return $this->putInCustomData(self::CUSTOM_DATA_MANUAL_DISPATCH_ENABLED, $v);}
+	public function setAutomaticDispatchEnabled(array $v)					{return $this->putInCustomData(self::CUSTOM_DATA_AUTOMATIC_DISPATCH_ENABLED, $v);}
 	
 } // EventNotificationTemplate

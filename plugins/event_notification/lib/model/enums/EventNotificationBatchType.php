@@ -1,12 +1,11 @@
 <?php
-
 /**
- * @package plugins.emailNotification
+ * @package plugins.eventNotification
  * @subpackage model.enum
  */ 
-class EmailNotificationBatchType implements IKalturaPluginEnum, BatchJobType
+class EventNotificationBatchType implements IKalturaPluginEnum, BatchJobType
 {
-	const EMAIL_NOTIFICATION_HANDLER = 'EmailNotificationHandler';
+	const EVENT_NOTIFICATION_HANDLER = 'EventNotificationHandler';
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPluginEnum::getAdditionalValues()
@@ -14,7 +13,7 @@ class EmailNotificationBatchType implements IKalturaPluginEnum, BatchJobType
 	public static function getAdditionalValues()
 	{
 		return array(
-			'EMAIL_NOTIFICATION_HANDLER' => self::EMAIL_NOTIFICATION_HANDLER,
+			'EVENT_NOTIFICATION_HANDLER' => self::EVENT_NOTIFICATION_HANDLER,
 		);
 	}
 

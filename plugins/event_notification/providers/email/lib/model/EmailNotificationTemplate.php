@@ -24,6 +24,15 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 		parent::__construct();
 	}
 
+	/* (non-PHPdoc)
+	 * @see EventNotificationTemplate::getJobData()
+	 */
+	public function getJobData()
+	{
+		$jobData = new kEmailNotificationDispatchJobData();
+		
+	}
+	
 	/**
 	 * @param int $sub_type
 	 * @throws string
