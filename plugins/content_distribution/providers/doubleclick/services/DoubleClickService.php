@@ -112,9 +112,18 @@ class DoubleClickService extends KalturaBaseService
 		$feed->setSelfLink($this->getUrl($distributionProfileId, $hash, $page, $period, $stateLastEntryCreatedAt, $stateLastEntryIds));
 		if ($totalCount > $page * $profile->getItemsPerPage())
 			$feed->setNextLink($this->getUrl($distributionProfileId, $hash, $page + 1, $period, $nextPageStateLastEntryCreatedAt, $nextPageStateLastEntryIds));
-		
+	
+		$cacheDir = kConf::get("global_cache_dir")."double_click/";	
 		foreach($entries as $entry)
 		{
+			// check cache
+			$cacheFileName = $cacheDir.myContentStorage::dirForId($entry->getIntId(), $entry->getId().".xml");
+			if (file_exists($cacheFileName) && $entry->getUpdatedAt() < filemtime($cacheFileName))
+			{
+				$xml = file_get_contents($cacheFileName);
+			}
+			else
+			{
 			/* @var $entry entry */
 			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $profile->getId());
 			if (!$entryDistribution)
@@ -128,6 +137,9 @@ class DoubleClickService extends KalturaBaseService
 			
 			$cuePoints = $this->getCuePoints($entry->getPartnerId(), $entry->getId());
 			$xml = $feed->getItemXml($fields, $flavorAssets, $thumbAssets, $cuePoints);
+			mkdir(dirname($cacheFileName), 0777, true);
+			file_put_contents($cacheFileName, $xml);
+			}
             $feed->addItemXml($xml);
 		}
 		
