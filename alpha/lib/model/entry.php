@@ -2389,6 +2389,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if(!$this->wasObjectSaved())
+			return;
+			
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 		
@@ -2413,6 +2416,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function postInsert(PropelPDO $con = null)
 	{
+		if(!$this->wasObjectSaved())
+			return;
+			
 		parent::postInsert($con);
 	
 		if (!$this->alreadyInSave)
