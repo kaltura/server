@@ -82,10 +82,9 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 	public static function getAdminConsolePages() 
 	{
 		return array(
-			// TODO
-//			new EventNotificationListAction(),
-//			new EventNotificationConfigureAction(),
-//			new EventNotificationSetStatusAction(),
+			new EventNotificationTemplatesListAction(),
+			new EventNotificationTemplatesConfigureAction(),
+			new EventNotificationTemplatesUpdateStatusAction(),
 		);
 	}
 

@@ -15,6 +15,6 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 
 	public function sendEmail(KalturaEmailNotificationTemplate $emailNotificationTemplate, KalturaEmailNotificationDispatchJobData $data)
 	{
-		// TODO
+		// TODO - send it	
 	}
 }

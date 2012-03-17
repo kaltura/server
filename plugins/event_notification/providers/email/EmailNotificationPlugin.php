@@ -1,6 +1,11 @@
 <?php
 /**
  * @package plugins.emailNotification
+ * 
+ * 
+ * TODO
+ * Add event consumer to consume new email jobs and dispath event notification instead
+ * Untill all mails are sent throgh events
  */
 class EmailNotificationPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator
 {

@@ -2,12 +2,13 @@
 /**
  * @package plugins.emailNotification
  * @subpackage model
+ * 
+ * 
+ * TODO
+ * Find a nice way to use dynamic data in the subject and body
  */
 class EmailNotificationTemplate extends EventNotificationTemplate implements ISyncableFile
 {
-	const CUSTOM_DATA_FORMAT_TEXT = 1;
-	const CUSTOM_DATA_FORMAT_HTML = 2;
-	
 	const CUSTOM_DATA_FORMAT = 'format';
 	const CUSTOM_DATA_SUBJECT = 'subject';
 	const CUSTOM_DATA_FROM_EMAIL = 'fromEmail';
@@ -30,7 +31,13 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	public function getJobData()
 	{
 		$jobData = new kEmailNotificationDispatchJobData();
+		$jobData->setTemplateId($this->getId());
+		$jobData->setFromEmail($this->getFromEmail());
+		$jobData->setFromName($this->getFromName());
+		$jobData->setToEmail($this->getToEmail());
+		$jobData->setToName($this->getToName());
 		
+		return $jobData;
 	}
 	
 	/**
@@ -110,11 +117,11 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 		$extension = 'txt';
 		switch ($this->getFormat())
 		{
-			case self::CUSTOM_DATA_FORMAT_TEXT:
+			case EmailNotificationFormat::TEXT:
 				$extension = 'txt';
 				break;
 				
-			case self::CUSTOM_DATA_FORMAT_HTML:
+			case EmailNotificationFormat::HTML:
 				$extension = 'htm';
 				break;
 		}

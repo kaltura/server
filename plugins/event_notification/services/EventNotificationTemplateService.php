@@ -124,6 +124,33 @@ class EventNotificationTemplateService extends KalturaBaseService
 	}
 
 	/**
+	 * Update event notification template status by id
+	 * 
+	 * @action updateStatus
+	 * @param int $id
+	 * @param KalturaEventNotificationTemplateStatus $status
+	 * @return KalturaEventNotificationTemplate
+	 * 
+	 * @throws KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND
+	 */
+	function updateStatusAction($id, $status)
+	{
+		// get the object
+		$dbEventNotificationTemplate = EventNotificationTemplatePeer::retrieveByPK($id);
+		if (!$dbEventNotificationTemplate)
+			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND, $id);
+		
+		// save the object
+		$dbEventNotificationTemplate->setStatus($status);
+		$dbEventNotificationTemplate->save();
+	
+		// return the saved object
+		$eventNotificationTemplate = KalturaEventNotificationTemplate::getInstanceByType($dbEventNotificationTemplate->getType());
+		$eventNotificationTemplate->fromObject($dbEventNotificationTemplate);
+		return $eventNotificationTemplate;
+	}
+
+	/**
 	 * Delete an event notification template object
 	 * 
 	 * @action delete
@@ -149,37 +176,85 @@ class EventNotificationTemplateService extends KalturaBaseService
 		return $eventNotificationTemplate;
 	}
 	
-//	/**
-//	 * list event notification template objects
-//	 * 
-//	 * @action list
-//	 * @param KalturaEventNotificationTemplateFilter $filter
-//	 * @param KalturaFilterPager $pager
-//	 * @return KalturaEventNotificationTemplateListResponse
-//	 */
-//	public function listAction(KalturaEventNotificationTemplateFilter  $filter = null, KalturaFilterPager $pager = null)
-//	{
-//		if (!$filter)
-//			$filter = new KalturaEventNotificationTemplateFilter();
-//			
-//		if (! $pager)
-//			$pager = new KalturaFilterPager ();
-//			
-//		$eventNotificationTemplateFilter = $filter->toObject();
-//
-//		$c = new Criteria();
-//		$eventNotificationTemplateFilter->attachToCriteria($c);
-//		$count = EventNotificationTemplatePeer::doCount($c);
-//		
-//		$pager->attachToCriteria ( $c );
-//		$list = EventNotificationTemplatePeer::doSelect($c);
-//		
-//		$response = new KalturaEventNotificationTemplateListResponse();
-//		$response->objects = KalturaEventNotificationTemplateArray::fromDbArray($list);
-//		$response->totalCount = $count;
-//		
-//		return $response;
-//	}
+	/**
+	 * list event notification template objects
+	 * 
+	 * @action list
+	 * @param KalturaEventNotificationTemplateFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaEventNotificationTemplateListResponse
+	 */
+	public function listAction(KalturaEventNotificationTemplateFilter  $filter = null, KalturaFilterPager $pager = null)
+	{
+		if (!$filter)
+			$filter = new KalturaEventNotificationTemplateFilter();
+			
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+			
+		$eventNotificationTemplateFilter = $filter->toObject();
+
+		$c = new Criteria();
+		$eventNotificationTemplateFilter->attachToCriteria($c);
+		$count = EventNotificationTemplatePeer::doCount($c);
+		
+		$pager->attachToCriteria ( $c );
+		$list = EventNotificationTemplatePeer::doSelect($c);
+		
+		$response = new KalturaEventNotificationTemplateListResponse();
+		$response->objects = KalturaEventNotificationTemplateArray::fromDbArray($list);
+		$response->totalCount = $count;
+		
+		return $response;
+	}
+
+	/**
+	 * @action listByPartner
+	 * @param KalturaPartnerFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaEventNotificationTemplateListResponse
+	 */
+	public function listByPartnerAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		// TODO
+		$c = new Criteria();
+		
+		if (!is_null($filter))
+		{
+			
+			$partnerFilter = new partnerFilter();
+			$filter->toObject($partnerFilter);
+			$partnerFilter->set('_gt_id', 0);
+			
+			$partnerCriteria = new Criteria();
+			$partnerFilter->attachToCriteria($partnerCriteria);
+			$partnerCriteria->setLimit(1000);
+			$partnerCriteria->clearSelectColumns();
+			$partnerCriteria->addSelectColumn(PartnerPeer::ID);
+			$stmt = PartnerPeer::doSelectStmt($partnerCriteria);
+			
+			if($stmt->rowCount() < 1000) // otherwise, it's probably all partners
+			{
+				$partnerIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+				$c->add(DistributionProfilePeer::PARTNER_ID, $partnerIds, Criteria::IN);
+			}
+		}
+			
+		if (is_null($pager))
+			$pager = new KalturaFilterPager();
+			
+		$c->addDescendingOrderByColumn(DistributionProfilePeer::CREATED_AT);
+		
+		$totalCount = DistributionProfilePeer::doCount($c);
+		$pager->attachToCriteria($c);
+		$list = DistributionProfilePeer::doSelect($c);
+		$newList = KalturaDistributionProfileArray::fromDbArray($list);
+		
+		$response = new KalturaDistributionProfileListResponse();
+		$response->totalCount = $totalCount;
+		$response->objects = $newList;
+		return $response;
+	}
 	
 	/**
 	 * Dispatch event notification object by id
@@ -202,7 +277,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_DISPATH_DISABLED, $id);
 		
 		$jobData = $data->toObject($dbEventNotificationTemplate->getJobData());
-		$job = kEventNotificationFlowManager::addEventNotificationDispatchJob($dbEventNotificationTemplate->getType(), $jobData, $dbEventNotificationTemplate->getPartnerId());
+		$job = kEventNotificationFlowManager::addEventNotificationDispatchJob($dbEventNotificationTemplate->getType(), $jobData);
 		if(!$job)
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_DISPATH_FAILED, $id);
 			

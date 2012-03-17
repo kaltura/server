@@ -14,7 +14,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	
 	/**
 	 * @var int
-	 * @insertonly
+	 * @readonly
 	 * @filter eq,in
 	 */
 	public $partnerId;
@@ -36,12 +36,14 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	
 	/**
 	 * @var KalturaEventNotificationTemplateType
+	 * @insertonly
 	 * @filter eq,in
 	 */
 	public $type;
 	
 	/**
 	 * @var KalturaEventNotificationTemplateStatus
+	 * @readonly
 	 * @filter eq,in
 	 */
 	public $status;
@@ -79,21 +81,21 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	/**
 	 * Define the event that should trigger this notification
 	 * 
-	 * @var int
+	 * @var KalturaEventNotificationEventType
 	 */
 	public $eventType;
 
 	/**
 	 * Define the object that raied the event that should trigger this notification
 	 * 
-	 * @var KalturaObjectType
+	 * @var KalturaEventNotificationEventObjectType
 	 */
 	public $eventObjectType;
 
 	/**
 	 * Define the conditions that cause this notification to be triggered
-	 * 
-	 * @var KalturaEventConditionArray
+	 * TODO should be KalturaEventConditionArray or something
+	 * @var string
 	 */
 	public $eventConditions;
 	
