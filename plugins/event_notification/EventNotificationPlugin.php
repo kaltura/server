@@ -46,10 +46,13 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('EventNotificationBatchType');
+			return array('EventNotificationBatchType', 'EventNotificationPermissionName');
 	
 		if($baseEnumName == 'BatchJobType')
 			return array('EventNotificationBatchType');
+			
+		if($baseEnumName == 'PermissionName')
+			return array('EventNotificationPermissionName');
 			
 		return array();
 	}
