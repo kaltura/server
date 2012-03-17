@@ -64,4 +64,25 @@ class DynamicEnumPeer extends BaseDynamicEnumPeer {
 		return DynamicEnumPeer::doSelectOne($criteria, $con);
 	}
 	
+	/**
+	 * Retrieve a single id by its value name.
+	 *
+	 * @param      string $enumName the name of the enum class
+	 * @param      string $valueName the name of the constant value
+	 * @param      PropelPDO $con the connection to use
+	 * @return     int DynamicEnum id
+	 */
+	public static function retrieveValueByEnumValueName($enumName, $valueName, $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(DynamicEnumPeer::ENUM_NAME, $enumName);
+		$criteria->add(DynamicEnumPeer::VALUE_NAME, $valueName);
+
+		$dynamicEnum = DynamicEnumPeer::doSelectOne($criteria, $con);
+		if($dynamicEnum)
+			return $dynamicEnum->getId();
+			
+		return null;
+	}
+	
 } // DynamicEnumPeer
