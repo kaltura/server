@@ -9,6 +9,7 @@ class Form_PartnerConfiguration extends Infra_Form
     const GROUP_CONTENT_INGESTION_OPTIONS = 'GROUP_CONTENT_INGESTION_OPTIONS';
     const GROUP_PUBLISHER_DELIVERY_SETTINGS = 'GROUP_PUBLISHER_DELIVERY_SETTINGS';
     const GROUP_REMOTE_STORAGE = 'GROUP_REMOTE_STORAGE';
+    const GROUP_NOTIFICATION_CONFIG = 'GROUP_NOTIFICATION_CONFIG';
    	
     protected $limitSubForms = array();
     
@@ -19,6 +20,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS] = array();
 		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS] = array();
 		$permissionNames[self::GROUP_REMOTE_STORAGE] = array();
+		$permissionNames[self::GROUP_NOTIFICATION_CONFIG] = array();
 		// Set the method for the display form to POST
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmPartnerConfigure');
@@ -320,22 +322,26 @@ class Form_PartnerConfiguration extends Infra_Form
 			{
 				//check permission to access the link's page
 				$indexLinkArray = explode('/', $modul->indexLink);
-				$linkAllowed= false;
-				if (($indexLinkArray[0])=='plugin'){
-				 	$linkAllowed = Infra_AclHelper::isAllowed($indexLinkArray[1], null);
-				}
-				else{
-					$linkAllowed = Infra_AclHelper::isAllowed($indexLinkArray[0], $indexLinkArray[1]);
-				}
-				if ($linkAllowed)
-				{
+				
+//				Commented by Tan-Tan
+//				The system admin user is never allowed to use these features, the features are allowed to the partner
+//						
+//				$linkAllowed= false;
+//				if (($indexLinkArray[0])=='plugin'){
+//				 	$linkAllowed = Infra_AclHelper::isAllowed($indexLinkArray[1], null);
+//				}
+//				else{
+//					$linkAllowed = Infra_AclHelper::isAllowed($indexLinkArray[0], $indexLinkArray[1]);
+//				}
+//				if ($linkAllowed)
+//				{
 					$element = $this->getElement($modul->permissionName);
 					$element->setDescription('<a class=linkToPage href="../'.$modul->indexLink.'">(config)</a>');
 					$element->addDecorators(array('ViewHelper',		      
 				        array('Label', array('placement' => 'append')),
 				        array('Description', array('escape' => false, 'tag' => false)),
 				      ));
-				}		      
+//				}		      
 			}
 			$permissionNames[$modul->group][$modul->label] = $modul->permissionName;
 		}
@@ -349,6 +355,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
 		ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);
 		ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);		
+		ksort($permissionNames[self::GROUP_NOTIFICATION_CONFIG]);		
 		$this->addAllDisplayGroups($permissionNames);
 	}
 	
@@ -627,8 +634,10 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','crossLine'), 'groupAssociation', array('legend' => 'Multi-Account Group Related information'));
 		$this->addDisplayGroup(array_merge(array('checkbox_host', 'host', 'checkbox_cdn_host', 'cdn_host', 'checkbox_rtmp_url', 'rtmp_url', 'checkbox_thumbnail_host', 'thumbnail_host', 'checkbox_delivery_restrictions', 'delivery_restrictions'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));				
 		
-		$this->addDisplayGroup(array_merge(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert'), $permissionNames[self::GROUP_REMOTE_STORAGE] ,array('crossLine')), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));	
-		$this->addDisplayGroup(array('notifications_config', 'allow_multi_notification','crossLine'), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
+		$this->addDisplayGroup(array_merge(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert'), $permissionNames[self::GROUP_REMOTE_STORAGE] ,array('crossLine')), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));
+
+		// TODO
+		$this->addDisplayGroup(array_merge(array('notifications_config', 'allow_multi_notification'), $permissionNames[self::GROUP_NOTIFICATION_CONFIG] ,array('crossLine')), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
 		$this->addDisplayGroup(array_merge(array('def_thumb_offset','def_thumb_density') , $permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS], array('enable_bulk_upload_notifications_emails', 'bulk_upload_notifications_email', 'crossLine')), 'publisherSpecificIngestionSettings', array('legend' => 'Content Ingestion Options'));
 		$this->addDisplayGroup(array('logout_url', 'crossLine'), 'signSignOn', array('legend' => 'Sign Sign On'));
 		$this->addDisplayGroup(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_max',
