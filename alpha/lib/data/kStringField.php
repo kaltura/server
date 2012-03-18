@@ -9,10 +9,10 @@ abstract class kStringField extends kStringValue
 {
 	/**
 	 * Calculates the value at realtime
-	 * @param accessControlScope $scope
+	 * @param kScope $scope
 	 * @return string $value
 	 */
-	abstract protected function getFieldValue(accessControlScope $scope = null);
+	abstract protected function getFieldValue(kScope $scope = null);
 	
 	/* (non-PHPdoc)
 	 * @see kStringValue::getValue()

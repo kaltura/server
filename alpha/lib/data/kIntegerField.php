@@ -9,10 +9,10 @@ abstract class kIntegerField extends kIntegerValue
 {
 	/**
 	 * Calculates the value at realtime
-	 * @param accessControlScope $scope
+	 * @param kScope $scope
 	 * @return int $value
 	 */
-	abstract protected function getFieldValue(accessControlScope $scope = null);
+	abstract protected function getFieldValue(kScope $scope = null);
 	
 	/* (non-PHPdoc)
 	 * @see kIntegerValue::getValue()
