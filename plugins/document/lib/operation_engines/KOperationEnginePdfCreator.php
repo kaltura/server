@@ -57,6 +57,19 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			$realInFilePath = realpath($inFilePath);
 		}
 		
+	    //get the first two chars from the file. 
+    	$data = file_get_contents($realInFilePath,null,null,0,2);
+		$path_info = pathinfo ( $realInFilePath );
+		$pattern = '(pptx|docx|xlsx)';
+		$ext = $path_info ['extension'];
+		//checks if $realInFilePath is an old office document with a new extension ('pptx|docx|xlsx')
+		//if $realInFilePath is not the fileSync itself ($uniqueName = true) , rename the file by removing the 'x' in the extension.		
+		if ($uniqueName && preg_match ($pattern, $ext) && ($data != 'PK')) {
+			$RealInFilePathWithoutX = substr_replace ( $realInFilePath, "", - 1 );
+			if (rename ( $realInFilePath, $RealInFilePathWithoutX ))
+				$realInFilePath = $RealInFilePathWithoutX;
+		}
+		
 		parent::operate($operator, $realInFilePath, $configFilePath);
 		
 		if ($uniqueName) {
