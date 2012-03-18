@@ -44,7 +44,7 @@ class KDLTranscoderPdf2Swf extends KDLOperatorBase
 				$cmdStr .= '--flatten ';
 			}
 		}
-		$cmdStr .= KDLCmdlinePlaceholders::InFileName.
+		$cmdStr .= $extra .' '. KDLCmdlinePlaceholders::InFileName.
 		           ' -o '.KDLCmdlinePlaceholders::OutFileName;
 		
 		return trim($cmdStr);
