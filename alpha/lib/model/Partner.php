@@ -10,7 +10,6 @@
  */ 
 class Partner extends BasePartner
 {	
-	const SHARED_CONTENT_PARTNER_ID = 0;
 	const BATCH_PARTNER_ID = -1;
 	const ADMIN_CONSOLE_PARTNER_ID = -2;
 	

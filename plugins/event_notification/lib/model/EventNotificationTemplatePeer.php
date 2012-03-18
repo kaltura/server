@@ -45,7 +45,7 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 			if (isset ( self::$class_types_cache [$type] ))
 				return self::$class_types_cache [$type];
 			
-			$extendedCls = KalturaPluginManager::getObjectClass('EventNotificationTemplate', $type );
+			$extendedCls = KalturaPluginManager::getObjectClass ( 'EventNotificationTemplate', $type );
 			if ($extendedCls)
 			{
 				self::$class_types_cache [$type] = $extendedCls;
@@ -67,7 +67,7 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 			$dbMap->addTableObject ( new EventNotificationTemplateTableMap () );
 		}
 	}
-
+	
 	/**
 	 * Retrieve a single object by pkey and type
 	 *
@@ -78,19 +78,19 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 	 */
 	public static function retrieveTypeByPK($type, $pk, PropelPDO $con = null)
 	{
-		if (null !== ($obj = EventNotificationTemplatePeer::getInstanceFromPool((string) $pk))) 
+		if (null !== ($obj = EventNotificationTemplatePeer::getInstanceFromPool ( ( string ) $pk )))
 		{
-			if($obj->getType() != $type)
+			if ($obj->getType () != $type)
 				return null;
-				
+			
 			return $obj;
 		}
-
-		$criteria = new Criteria(EventNotificationTemplatePeer::DATABASE_NAME);
-		$criteria->add(EventNotificationTemplatePeer::ID, $pk);
-		$criteria->add(EventNotificationTemplatePeer::TYPE, $type);
-
-		return EventNotificationTemplatePeer::doSelectOne($criteria, $con);
+		
+		$criteria = new Criteria ( EventNotificationTemplatePeer::DATABASE_NAME );
+		$criteria->add ( EventNotificationTemplatePeer::ID, $pk );
+		$criteria->add ( EventNotificationTemplatePeer::TYPE, $type );
+		
+		return EventNotificationTemplatePeer::doSelectOne ( $criteria, $con );
 	}
 	
 	/**
@@ -109,13 +109,14 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 		$criteria->add ( EventNotificationTemplatePeer::OBJECT_TYPE, $objectType );
 		
 		if ($partnerId)
-			$criteria->add ( EventNotificationTemplatePeer::PARTNER_ID, array (Partner::SHARED_CONTENT_PARTNER_ID, $partnerId ), Criteria::IN );
+			$criteria->add ( EventNotificationTemplatePeer::PARTNER_ID, array (PartnerPeer::GLOBAL_PARTNER, $partnerId ), Criteria::IN );
 		else
-			$criteria->add ( EventNotificationTemplatePeer::PARTNER_ID, Partner::SHARED_CONTENT_PARTNER_ID );
+			$criteria->add ( EventNotificationTemplatePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER );
 		
 		return EventNotificationTemplatePeer::doSelect ( $criteria, $con );
 	}
 
 } // EventNotificationTemplatePeer
 
-EventNotificationTemplatePeer::buildTableMap();
+
+EventNotificationTemplatePeer::buildTableMap ();
