@@ -1041,9 +1041,19 @@ return array(
 	//user roles status
 	'Kaltura_Client_Enum_UserRoleStatus::ACTIVE' => 'active',
 	'Kaltura_Client_Enum_UserRoleStatus::BLOCKED' => 'blocked',
-	'Kaltura_Client_Enum_UserRoleStatus::DELETED' => 'deleted'
+	'Kaltura_Client_Enum_UserRoleStatus::DELETED' => 'deleted',
 	
 	
+	// event notifications config
+	'event notification templates intro text' => 'Here you can manage the event notification templates on your Kaltura video platform deployment',
+	'event notification templates configure intro text' => 'Here you can manage the event notification template',
+	'event notification templates' => 'event notification templates',
+
+	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateStatus::DISABLED' => 'Disabled',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateStatus::ACTIVE' => 'Active',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateStatus::DELETED' => 'Deleted',
+
+	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::EMAIL' => 'Email',
 );
 
 

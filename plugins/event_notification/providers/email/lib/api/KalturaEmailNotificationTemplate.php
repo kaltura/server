@@ -60,6 +60,11 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 		'toName',
 	);
 		 
+	public function __construct()
+	{
+		$this->type = EmailNotificationPlugin::getApiValue(EmailNotificationTemplateType::EMAIL);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()
 	 */
@@ -82,6 +87,7 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
+		$propertiesToSkip[] = 'type';
 		$this->validatePropertyNotNull('format');
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}

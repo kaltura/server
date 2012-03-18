@@ -1,0 +1,25 @@
+
+<?php if($this->errMessage): ?>
+<div class="error"><?php echo $this->errMessage ?></div>
+<?php endif; ?>
+
+<?php echo $this->form ?>
+<script type="text/javascript">
+
+// in case the form has file upload fields (YouTube for example), ajaxForm will use iframe to submit 
+// this form and the result data will be injected to an empty iframe without jquery, causing a js error.
+if (typeof(jQuery) != 'undefined') {
+	jQuery(function() {
+	});
+}
+
+jQuery(document).ready(function() {
+	<?php if ($this->formValid): ?>
+		jQuery('#partner-configure-dialog').dialog('close');
+		jQuery('#frmPaginator1').submit();
+	<?php else: ?>
+		jQuery('#frmPartnerConfigure').ajaxForm(configurePartnerSuccess);
+	<?php endif; ?>
+});
+
+</script>

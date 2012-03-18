@@ -1,5 +1,5 @@
 <?php
-class EventNotificationTemplatesConfigureAction extends KalturaAdminConsolePlugin
+class EventNotificationTemplateConfigureAction extends KalturaAdminConsolePlugin
 {
 	protected $client;
 	
@@ -51,7 +51,8 @@ class EventNotificationTemplatesConfigureAction extends KalturaAdminConsolePlugi
 			}
 			
 			$form = KalturaPluginManager::loadObject('Form_EventNotificationTemplateConfiguration', $type, array($partnerId, $type));
-			$templateClass = KalturaPluginManager::getObjectClass($templateClass, $type);
+			/* @var $form Form_EventNotificationTemplateConfiguration */
+			$templateClass = KalturaPluginManager::getObjectClass('Kaltura_Client_EventNotification_Type_EventNotificationTemplate', $type);
 			KalturaLog::debug("template class [$templateClass]");
 			
 			if(!$form)
@@ -65,10 +66,6 @@ class EventNotificationTemplatesConfigureAction extends KalturaAdminConsolePlugi
 			$pager = new Kaltura_Client_Type_FilterPager();
 			$pager->pageSize = 100;
 			
-			Infra_ClientHelper::impersonate($partnerId);
-			$flavorParamsResponse = $this->client->flavorParams->listAction(null, $pager);
-			Infra_ClientHelper::unimpersonate();
-			
 			if($templateId) // update
 			{
 				if ($request->isPost())
@@ -79,7 +76,6 @@ class EventNotificationTemplatesConfigureAction extends KalturaAdminConsolePlugi
 						$eventNotificationTemplate = $form->getObject($templateClass, $request->getPost());
 						$form->resetUnUpdatebleAttributes($eventNotificationTemplate);
 						$eventNotificationTemplate = $eventNotificationPlugin->eventNotificationTemplate->update($templateId, $eventNotificationTemplate);
-						$form->saveProviderAdditionalObjects($eventNotificationTemplate);
 						$form->setAttrib('class', 'valid');
 						$action->view->formValid = true;
 					}
@@ -87,13 +83,11 @@ class EventNotificationTemplatesConfigureAction extends KalturaAdminConsolePlugi
 					{
 						$form->populate($request->getPost());
 						$eventNotificationTemplate = $form->getObject($templateClass, $request->getPost());
-						$this->populateForm($form, $eventNotificationTemplate, $flavorParamsResponse);
 					}
 				}
 				else
 				{
 					$form->populateFromObject($eventNotificationTemplate);
-					$this->populateForm($form, $eventNotificationTemplate, $flavorParamsResponse);
 				}
 			}
 			else // new
@@ -109,7 +103,6 @@ class EventNotificationTemplatesConfigureAction extends KalturaAdminConsolePlugi
 					$eventNotificationTemplate->partnerId = null;
 					$eventNotificationTemplate = $eventNotificationPlugin->eventNotificationTemplate->add($eventNotificationTemplate);
 					Infra_ClientHelper::unimpersonate();
-					$form->saveProviderAdditionalObjects($eventNotificationTemplate);
 					$form->setAttrib('class', 'valid');
 					$action->view->formValid = true;
 				}
@@ -117,7 +110,6 @@ class EventNotificationTemplatesConfigureAction extends KalturaAdminConsolePlugi
 				{
 					$form->populate($request->getPost());
 					$eventNotificationTemplate = $form->getObject($templateClass, $request->getPost());
-					$this->populateForm($form, $eventNotificationTemplate, $flavorParamsResponse);
 				}
 			}
 		}
@@ -127,35 +119,9 @@ class EventNotificationTemplatesConfigureAction extends KalturaAdminConsolePlugi
 			$action->view->errMessage = $e->getMessage();
 			
 			$form->populate($request->getPost());
-			if (isset($flavorParamsResponse)) 
-			{
-				$eventNotificationTemplate = $form->getObject($templateClass, $request->getPost());
-				$this->populateForm($form, $eventNotificationTemplate, $flavorParamsResponse);
-			}
+			$eventNotificationTemplate = $form->getObject($templateClass, $request->getPost());
 		}
 		$action->view->form = $form;
-	}
-	
-	protected function populateForm(Form_DistributionConfiguration $form, Kaltura_Client_EventNotification_Type_EventNotificationTemplate $eventNotificationTemplate, Kaltura_Client_Type_FlavorParamsListResponse $flavorParamsResponse)
-	{
-		$optionalFlavorParamsIds = array();
-		$requiredFlavorParamsIds = array();
-		if(!is_null($eventNotificationTemplate->optionalFlavorParamsIds) && strlen($eventNotificationTemplate->optionalFlavorParamsIds))
-			$optionalFlavorParamsIds = explode(',', $eventNotificationTemplate->optionalFlavorParamsIds);
-		if(!is_null($eventNotificationTemplate->requiredFlavorParamsIds) && strlen($eventNotificationTemplate->requiredFlavorParamsIds))
-			$requiredFlavorParamsIds = explode(',', $eventNotificationTemplate->requiredFlavorParamsIds);
-			
-		$form->addFlavorParamsFields($flavorParamsResponse, $optionalFlavorParamsIds, $requiredFlavorParamsIds);
-		
-		if(is_array($eventNotificationTemplate->requiredThumbDimensions))
-			foreach($eventNotificationTemplate->requiredThumbDimensions as $dimensions)
-				$form->addThumbDimensions($dimensions, true);
-				
-		if(is_array($eventNotificationTemplate->optionalThumbDimensions))
-			foreach($eventNotificationTemplate->optionalThumbDimensions as $dimensions)
-				$form->addThumbDimensions($dimensions, false);
-				
-		$form->addThumbDimensionsForm();
 	}
 }
 

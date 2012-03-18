@@ -1,5 +1,5 @@
 <?php
-class EventNotificationTemplatesUpdateStatusAction extends KalturaAdminConsolePlugin
+class EventNotificationTemplateUpdateStatusAction extends KalturaAdminConsolePlugin
 {
 	public function __construct()
 	{
@@ -28,14 +28,14 @@ class EventNotificationTemplatesUpdateStatusAction extends KalturaAdminConsolePl
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$action->getHelper('viewRenderer')->setNoRender();
-		$profileId = $this->_getParam('profile_id');
+		$templateId = $this->_getParam('template_id');
 		$status = $this->_getParam('status');
 		$client = Infra_ClientHelper::getClient();
 		$eventNotificationPlugin = Kaltura_Client_EventNotification_Plugin::get($client);
 		
 		try
 		{
-			$eventNotificationPlugin->eventNotificationTemplates->updateStatus($profileId, $status);
+			$eventNotificationPlugin->eventNotificationTemplate->updateStatus($templateId, $status);
 			echo $action->getHelper('json')->sendJson('ok', false);
 		}
 		catch(Exception $e)

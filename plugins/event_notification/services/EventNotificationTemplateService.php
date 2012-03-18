@@ -27,6 +27,8 @@ class EventNotificationTemplateService extends KalturaBaseService
 	public function addAction(KalturaEventNotificationTemplate $eventNotificationTemplate)
 	{
 		$dbEventNotificationTemplate = $eventNotificationTemplate->toInsertableObject();
+		/* @var $dbEventNotificationTemplate EventNotificationTemplate */
+		$dbEventNotificationTemplate->setStatus(EventNotificationTemplateStatus::ACTIVE);
 		$dbEventNotificationTemplate->setPartnerId($this->getPartnerId());
 		$dbEventNotificationTemplate->save();
 		
@@ -216,7 +218,6 @@ class EventNotificationTemplateService extends KalturaBaseService
 	 */
 	public function listByPartnerAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		// TODO
 		$c = new Criteria();
 		
 		if (!is_null($filter))
@@ -236,21 +237,21 @@ class EventNotificationTemplateService extends KalturaBaseService
 			if($stmt->rowCount() < 1000) // otherwise, it's probably all partners
 			{
 				$partnerIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
-				$c->add(DistributionProfilePeer::PARTNER_ID, $partnerIds, Criteria::IN);
+				$c->add(EventNotificationTemplatePeer::PARTNER_ID, $partnerIds, Criteria::IN);
 			}
 		}
 			
 		if (is_null($pager))
 			$pager = new KalturaFilterPager();
 			
-		$c->addDescendingOrderByColumn(DistributionProfilePeer::CREATED_AT);
+		$c->addDescendingOrderByColumn(EventNotificationTemplatePeer::CREATED_AT);
 		
-		$totalCount = DistributionProfilePeer::doCount($c);
+		$totalCount = EventNotificationTemplatePeer::doCount($c);
 		$pager->attachToCriteria($c);
-		$list = DistributionProfilePeer::doSelect($c);
-		$newList = KalturaDistributionProfileArray::fromDbArray($list);
+		$list = EventNotificationTemplatePeer::doSelect($c);
+		$newList = KalturaEventNotificationTemplateArray::fromDbArray($list);
 		
-		$response = new KalturaDistributionProfileListResponse();
+		$response = new KalturaEventNotificationTemplateListResponse();
 		$response->totalCount = $totalCount;
 		$response->objects = $newList;
 		return $response;
@@ -259,7 +260,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 	/**
 	 * Dispatch event notification object by id
 	 * 
-	 * @action get
+	 * @action dispatch
 	 * @param int $id 
 	 * @param KalturaEventNotificationDispatchJobData $jobData 
 	 * @return int

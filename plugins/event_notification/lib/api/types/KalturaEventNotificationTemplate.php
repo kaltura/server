@@ -94,8 +94,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 
 	/**
 	 * Define the conditions that cause this notification to be triggered
-	 * TODO should be KalturaEventConditionArray or something
-	 * @var string
+	 * @var KalturaEventConditionArray
 	 */
 	public $eventConditions;
 	

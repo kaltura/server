@@ -36,6 +36,9 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 	 */
 	public static function isAllowedPartner($partnerId)
 	{
+		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId == Partner::BATCH_PARTNER_ID)
+			return true;
+			
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);		
 	}
@@ -86,8 +89,8 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 	{
 		return array(
 			new EventNotificationTemplatesListAction(),
-			new EventNotificationTemplatesConfigureAction(),
-			new EventNotificationTemplatesUpdateStatusAction(),
+			new EventNotificationTemplateConfigureAction(),
+			new EventNotificationTemplateUpdateStatusAction(),
 		);
 	}
 

@@ -55,9 +55,20 @@ class EmailNotificationPlugin extends KalturaPlugin implements IKalturaPermissio
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
+		if($baseClass == 'ISyncableFile' && $enumValue == self::getEmailNotificationFileSyncObjectTypeCoreValue(EmailNotificationFileSyncObjectType::EMAIL_NOTIFICATION_TEMPLATE) && isset($constructorArgs['objectId']))
+			return EventNotificationTemplatePeer::retrieveTypeByPK(self::getEmailNotificationTemplateTypeCoreValue(EmailNotificationTemplateType::EMAIL), $constructorArgs['objectId']);
+	
 		$class = self::getObjectClass($baseClass, $enumValue);
 		if($class)
+		{
+			if(is_array($constructorArgs))
+			{
+				$reflect = new ReflectionClass($class);
+				return $reflect->newInstanceArgs($constructorArgs);
+			}
+			
 			return new $class();
+		}
 			
 		return null;
 	}
@@ -70,6 +81,15 @@ class EmailNotificationPlugin extends KalturaPlugin implements IKalturaPermissio
 		if($baseClass == 'EventNotificationTemplate' && $enumValue == self::getEmailNotificationTemplateTypeCoreValue(EmailNotificationTemplateType::EMAIL))
 			return 'EmailNotificationTemplate';
 	
+		if($baseClass == 'KalturaEventNotificationTemplate' && $enumValue == self::getEmailNotificationTemplateTypeCoreValue(EmailNotificationTemplateType::EMAIL))
+			return 'KalturaEmailNotificationTemplate';
+	
+		if($baseClass == 'Form_EventNotificationTemplateConfiguration' && $enumValue == Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::EMAIL)
+			return 'Form_EmailNotificationTemplateConfiguration';
+	
+		if($baseClass == 'Kaltura_Client_EventNotification_Type_EventNotificationTemplate' && $enumValue == Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::EMAIL)
+			return 'Kaltura_Client_EmailNotification_Type_EmailNotificationTemplate';
+			
 		return null;
 	}
 

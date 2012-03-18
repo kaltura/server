@@ -156,44 +156,59 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	private $setBody = null;
 	
 	/**
+	 * @var string
+	 */
+	private $theBody = null;
+	
+	/**
 	 * @var int
 	 */
 	private $bodyPreviousVersion = null;
 
 	public function getBody()
 	{
+		if($this->theBody)
+			return $this->theBody;
+			
 		$key = $this->getSyncKey(self::FILE_SYNC_BODY);
-		return kFileSyncUtils::file_get_contents($key, true, false); 
+		$this->theBody = kFileSyncUtils::file_get_contents($key, true, false);
+		return $this->theBody;
 	}
 
 	public function setBody($body)
 	{
-		 $this->setBody = $body;
+		$this->getBody();
+		if($body != $this->theBody)
+			$this->setBody = $body;
 	}
 
 	/* (non-PHPdoc)
-	 * @see BaseEventNotificationTemplate::preUpdate()
+	 * @see BaseEventNotificationTemplate::preSave()
 	 */
-	public function preUpdate(PropelPDO $con = null)
+	public function preSave(PropelPDO $con = null)
 	{
 		if($this->setBody)
 		{
 			$this->bodyPreviousVersion = $this->getBodyFileVersion();
-			$this->incrementBodyFileVersion();
+			if($this->bodyPreviousVersion)
+				$this->incrementBodyFileVersion();
+			else 
+				$this->resetBodyFileVersion();
 		}
 			
-		return parent::preUpdate($con);
+		return parent::preSave($con);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see BaseEventNotificationTemplate::postSave()
 	 */
 	public function postSave(PropelPDO $con = null)
 	{
-		if($this->setBody)
+		if($this->wasObjectSaved() && $this->setBody)
 		{
 			$key = $this->getSyncKey(self::FILE_SYNC_BODY);
 			kFileSyncUtils::file_put_contents($key, $this->setBody);
+			$this->theBody = $this->setBody;
 			$this->setBody = null;
 			
 			kEventsManager::raiseEvent(new kObjectDataChangedEvent($this, $this->bodyPreviousVersion));	
@@ -209,8 +224,9 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	public function getFromName()								{return $this->getFromCustomData(self::CUSTOM_DATA_FROM_NAME);}
 	public function getToEmail()								{return $this->getFromCustomData(self::CUSTOM_DATA_TO_EMAIL);}
 	public function getToName()									{return $this->getFromCustomData(self::CUSTOM_DATA_TO_NAME);}
-	
+
 	public function incrementBodyFileVersion()					{return $this->incInCustomData(self::CUSTOM_DATA_BODY_FILE_VERSION);}
+	public function resetBodyFileVersion()						{return $this->putInCustomData(self::CUSTOM_DATA_BODY_FILE_VERSION, 1);}
 	public function setFormat($v)								{return $this->putInCustomData(self::CUSTOM_DATA_FORMAT, $v);}
 	public function setSubject($v)								{return $this->putInCustomData(self::CUSTOM_DATA_SUBJECT, $v);}
 	public function setFromEmail($v)							{return $this->putInCustomData(self::CUSTOM_DATA_FROM_EMAIL, $v);}

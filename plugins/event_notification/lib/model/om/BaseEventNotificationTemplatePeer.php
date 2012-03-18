@@ -762,7 +762,7 @@ abstract class BaseEventNotificationTemplatePeer {
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
-	abstract public static function getOMClass();
+	abstract public static function getOMClass($row, $colnum);
 
 	/**
 	 * Method perform an INSERT on the database, given a EventNotificationTemplate or Criteria object.

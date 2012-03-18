@@ -3,20 +3,20 @@
  * @package plugins.eventNotification
  * @subpackage api.objects
  */
-class KalturaEventNotificationTemplateArray extends KalturaTypedArray
+class KalturaEventConditionArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)
 	{
-		$newArr = new KalturaEventNotificationTemplateArray();
+		$newArr = new KalturaEventConditionArray();
 		if ($arr == null)
 			return $newArr;
 
 		foreach ($arr as $obj)
 		{
-    		$nObj = KalturaEventNotificationTemplate::getInstanceByType($obj->getType());
+    		$nObj = KalturaEventCondition::getInstanceByType($obj->getType());
     		if(!$nObj)
     		{
-    			KalturaLog::err("Event notification template could not find matching type for [" . $obj->getType() . "]");
+    			KalturaLog::err("Event condition could not find matching type for [" . $obj->getType() . "]");
     			continue;
     		}
 			$nObj->fromObject($obj);
@@ -28,6 +28,6 @@ class KalturaEventNotificationTemplateArray extends KalturaTypedArray
 		
 	public function __construct()
 	{
-		parent::__construct("KalturaEventNotificationTemplate");	
+		parent::__construct("KalturaEventCondition");	
 	}
 }
