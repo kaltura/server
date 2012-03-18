@@ -10,9 +10,9 @@ class kCoreException extends Exception
 	 */
 	private $data;
 	
-	public function __construct($message, $code, $data = null)
+	public function __construct($message, $code = null, $data = null)
 	{
-		KalturaLog::err('Message: '. $message .' \nCode: '.$code);
+		KalturaLog::err("Code: [$code] Message: [$message]");
 		$this->message = $message;
 		$this->code = $code;
 		$this->data = $data;
