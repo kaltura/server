@@ -363,7 +363,13 @@ class playManifestAction extends kalturaAction
 		}
 		
 		if (strpos($url, "/") === 0)
-			$url = $this->cdnHost . $url;
+		{
+			$flavorSizeKB = $flavorAsset->getSize();
+			if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
+				$url = requestUtils::getRequestHost() . $url;
+			else 
+				$url = $this->cdnHost . $url;
+		}
 			
 		$url = preg_replace('/^https?:\/\//', '', $url);
 		$url = str_replace('//', '/', $url);
