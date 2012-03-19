@@ -5,7 +5,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaEvalStringField extends KalturaStringField
+class KalturaEvalBooleanField extends KalturaBooleanField
 {
 	/**
 	 * PHP code
@@ -30,7 +30,7 @@ class KalturaEvalStringField extends KalturaStringField
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kEvalStringField();
+			$dbObject = new kEvalBooleanField();
 			
 		return parent::toObject($dbObject, $skip);
 	}
