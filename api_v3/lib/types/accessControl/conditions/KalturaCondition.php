@@ -9,6 +9,7 @@ class KalturaCondition extends KalturaObject
 	/**
 	 * The type of the access control condition
 	 * 
+	 * @readonly
 	 * @var KalturaConditionType
 	 */
 	public $type;
