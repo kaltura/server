@@ -131,6 +131,10 @@ class KalturaObject
 			{
 				$value = $value->toObjectsArray();
 			}
+			elseif ($propertyInfo->isComplexType() && $value instanceof KalturaObject)
+			{
+				$value = $value->toObject();
+			}
 			elseif ($propertyInfo->isDynamicEnum())
 			{
 				$propertyType = $propertyInfo->getType();
@@ -396,6 +400,7 @@ class KalturaObject
 						//TODO: not throwing exception to not break clients that sends -1 as null for integer values (etc...)
 						$e = new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_USAGE_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
 						$this->$propertyName = null;
+						KalturaLog::err($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
 						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
 					}
 				}
