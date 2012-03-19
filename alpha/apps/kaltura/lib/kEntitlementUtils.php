@@ -8,12 +8,12 @@
 class kEntitlementUtils 
 {
 
-	protected static $entitlementScope = false;  
+	protected static $entitlementEnforcement = false;  
 	
 	
-	public static function getEntitlementScope()
+	public static function getEntitlementEnforcement()
 	{
-		return self::$entitlementScope;
+		return self::$entitlementEnforcement;
 	}
 	
 	/**
@@ -39,12 +39,12 @@ class kEntitlementUtils
 	}
 	
 	/**
-	 * Set Entitlement scope - if entitelement is enabled \ disabled in this session
+	 * Set Entitlement Enforcement - if entitelement is enabled \ disabled in this session
 	 * @param int $categoryId
 	 * @param int $kuser
 	 * @return bool
 	 */
-	public static function initEntitlementScope()
+	public static function initEntitlementEnforcement()
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id; 
 		$partner = PartnerPeer::retrieveByPK($partnerId);
@@ -54,11 +54,11 @@ class kEntitlementUtils
 		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId))
 			return;		
 		
-		$partnerDefaultEntitlementScope = $partner->getDefaultEntitlementScope();
+		$partnerDefaultEntitlementEnforcement = $partner->getDefaultEntitlementEnforcement();
 		
 		// default entitlement scope is false - disable.
-		if(is_null($partnerDefaultEntitlementScope))
-			$partnerDefaultEntitlementScope = false;
+		if(is_null($partnerDefaultEntitlementEnforcement))
+			$partnerDefaultEntitlementEnforcement = false;
 		
 		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : null;
 		if ($ksString == '') // for actions with no KS or when creating ks.
@@ -66,19 +66,19 @@ class kEntitlementUtils
 		
 		$ks = ks::fromSecureString($ksString);
 		
-		if (!$partnerDefaultEntitlementScope)
+		if (!$partnerDefaultEntitlementEnforcement)
 		{
-			self::$entitlementScope = false;
+			self::$entitlementEnforcement = false;
 			$enableEntitlement = $ks->getEnableEntitlement();
 			if ($enableEntitlement)
-				self::$entitlementScope = true;
+				self::$entitlementEnforcement = true;
 		}
 		else
 		{
-			self::$entitlementScope = true;
+			self::$entitlementEnforcement = true;
 			$enableEntitlement = $ks->getDisableEntitlement();
 			if ($enableEntitlement)
-				self::$entitlementScope = false;
+				self::$entitlementEnforcement = false;
 		}
 	}
 	
