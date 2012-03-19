@@ -79,5 +79,15 @@ class kObjectChangedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 		return $this->modifiedColumns;
 	}
 	
-
+	/* (non-PHPdoc)
+	 * @see KalturaEvent::getScope()
+	 */
+	public function getScope()
+	{
+		$scope = parent::getScope();
+		if(method_exists($this->object, 'getPartnerId'))
+			$scope->setPartnerId($this->object->getPartnerId());
+			
+		return $scope;
+	}
 }

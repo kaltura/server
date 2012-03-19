@@ -63,5 +63,15 @@ class kBatchJobStatusEvent extends KalturaEvent implements IKalturaContinualEven
 	{
 		return $this->twinJob;
 	}
-
+	
+	/* (non-PHPdoc)
+	 * @see KalturaEvent::getScope()
+	 */
+	public function getScope()
+	{
+		$scope = parent::getScope();
+		$scope->setPartnerId($this->dbBatchJob->getPartnerId());
+		$scope->setParentRaisedJob($this->dbBatchJob);
+		return $scope;
+	}
 }

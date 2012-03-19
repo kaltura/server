@@ -85,5 +85,16 @@ class kObjectCopiedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 	{
 		return $this->toObject;
 	}
-
+	
+	/* (non-PHPdoc)
+	 * @see KalturaEvent::getScope()
+	 */
+	public function getScope()
+	{
+		$scope = parent::getScope();
+		if(method_exists($this->toObject, 'getPartnerId'))
+			$scope->setPartnerId($this->toObject->getPartnerId());
+			
+		return $scope;
+	}
 }

@@ -6,6 +6,12 @@
 class kObjectErasedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 {
     const EVENT_CONSUMER = 'kObjectErasedEventConsumer';
+	
+	/**
+	 * @var BaseObject
+	 */
+	private $object;
+    
 	/* (non-PHPdoc)
      * @see KalturaEvent::doConsume()
      */
@@ -42,6 +48,32 @@ class kObjectErasedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 			
 		KalturaLog::debug("Event [" . get_class($this) . "] object type [" . get_class($object) . "]" . $additionalLog);
 	}
-
-
+	
+	public function getKey()
+	{
+		if(method_exists($this->object, 'getId'))
+			return get_class($this->object).$this->object->getId();
+		
+		return null;
+	}
+	
+	/**
+	 * @return BaseObject $object
+	 */
+	public function getObject() 
+	{
+		return $this->object;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaEvent::getScope()
+	 */
+	public function getScope()
+	{
+		$scope = parent::getScope();
+		if(method_exists($this->object, 'getPartnerId'))
+			$scope->setPartnerId($this->object->getPartnerId());
+			
+		return $scope;
+	}
 }

@@ -11,9 +11,19 @@ class kEventScope extends kScope
 	protected $event;
 	
 	/**
+	 * @var int
+	 */
+	protected $partnerId;
+	
+	/**
+	 * @var BatchJob
+	 */
+	protected $parentRaisedJob;
+	
+	/**
 	 * @param KalturaEvent $v
 	 */
-	public function setEvent(KalturaEvent $v)
+	public function __construct(KalturaEvent $v)
 	{
 		$this->event = $v;
 	}
@@ -25,4 +35,38 @@ class kEventScope extends kScope
 	{
 		return $this->event;
 	}
+	
+	/**
+	 * @return int $partnerId
+	 */
+	public function getPartnerId()
+	{
+		return $this->partnerId;
+	}
+
+	/**
+	 * @return BatchJob $parentRaisedJob
+	 */
+	public function getParentRaisedJob()
+	{
+		return $this->parentRaisedJob;
+	}
+
+	/**
+	 * @param int $partnerId
+	 */
+	public function setPartnerId($partnerId)
+	{
+		$this->partnerId = $partnerId;
+	}
+
+	/**
+	 * @param BatchJob $parentRaisedJob
+	 */
+	public function setParentRaisedJob(BatchJob $parentRaisedJob)
+	{
+		$this->parentRaisedJob = $parentRaisedJob;
+	}
+
+	
 }

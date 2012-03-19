@@ -46,11 +46,25 @@ abstract class KalturaEvent
 		return true;
 	}
 	
+	/**
+	 * @return string
+	 */
 	public function getKey()
 	{
 		return null;
 	}
 	
+	/**
+	 * @return kEventScope
+	 */
+	public function getScope()
+	{
+		return new kEventScope($this);
+	}
+	
+	/**
+	 * @return int of enum EventPriority
+	 */
 	public function getPriority()
 	{
 		return EventPriority::NORMAL;

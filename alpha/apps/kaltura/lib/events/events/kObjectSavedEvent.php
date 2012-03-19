@@ -57,4 +57,16 @@ class kObjectSavedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 	{
 		return $this->object;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaEvent::getScope()
+	 */
+	public function getScope()
+	{
+		$scope = parent::getScope();
+		if(method_exists($this->object, 'getPartnerId'))
+			$scope->setPartnerId($this->object->getPartnerId());
+			
+		return $scope;
+	}
 }
