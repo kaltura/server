@@ -99,7 +99,10 @@ class KalturaFreewheelGenericDistributionJobProviderData extends KalturaConfigur
 		{
 			$videoAssetFilePaths = array();
 			foreach($this->videoAssetFilePaths as $videoAssetFilePath)
-				$videoAssetFilePaths[] = $videoAssetFilePath->path;
+			{
+				/* @var $videoAssetFilePath KalturaString */
+				$videoAssetFilePaths[] = $videoAssetFilePath->value;
+			}
 				
 			$object->setVideoAssetFilePaths($videoAssetFilePaths);
 		}
