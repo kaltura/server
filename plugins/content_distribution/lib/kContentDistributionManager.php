@@ -565,10 +565,11 @@ class kContentDistributionManager
 			return null;
 		} 
 		
-		$returnValue = true;
+		$returnValue = false;
 		$validationErrors = $entryDistribution->getValidationErrors();
 		if(!count($validationErrors))
 		{
+		    $returnValue = true;
 			$sunrise = $entryDistribution->getSunrise(null);
 			if($sunrise)
 			{
