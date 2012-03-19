@@ -68,8 +68,10 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		//if $realInFilePath is not the fileSync itself ($uniqueName = true) , rename the file by removing the 'x' from the extension.		
 		if ($uniqueName && in_array ( $ext, $newOfficeExtensions ) && $filePrefix == self::OLD_OFFICE_SIGNATURE) {
 			$RealInFilePathWithoutX = substr ( $realInFilePath, 0, - 1 );
-			if (rename ( $realInFilePath, $RealInFilePathWithoutX ))
+			if (rename ( $realInFilePath, $RealInFilePathWithoutX )){
+				KalturaLog::notice("renamed file [$realInFilePath] to [$RealInFilePathWithoutX]");
 				$realInFilePath = $RealInFilePathWithoutX;
+			}
 		}
 		
 		parent::operate($operator, $realInFilePath, $configFilePath);
