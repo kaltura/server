@@ -1665,7 +1665,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
 			if (!$kuser)
-				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $puserId);
+				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
 			
 			$entitledUserPuserEdit[$kuser->getId()] = $kuser->getPuserId();
 		}
@@ -1691,7 +1691,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', unserialize($entitledUserPuserEdit));
 	}
 	
-	public function setEntitledUsersPublish($v)		
+	public function setEntitledPusersPublish($v)		
 	{	
 		$entitledUserPuserPublish = array();
 		
@@ -1702,7 +1702,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
 			if (!$kuser)
-				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $puserId);
+				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
 			
 			$entitledUserPuserPublish[$kuser->getId()] = $kuser->getPuserId();
 		}
@@ -1722,7 +1722,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{	
 		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
 		if (!$entitledUserPuserPublish)
-			return 'nothing';
+			return '';
 
 		return implode(',', unserialize($entitledUserPuserPublish));
 	}

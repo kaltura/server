@@ -55,7 +55,7 @@ class categoryTableMap extends TableMap {
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('DISPLAY_IN_SEARCH', 'DisplayInSearch', 'TINYINT', false, null, 1);
 		$this->addColumn('PRIVACY', 'Privacy', 'TINYINT', false, null, 1);
-		$this->addColumn('INHERITANCE', 'Inheritance', 'TINYINT', false, null, 2);
+		$this->addColumn('INHERITANCE_TYPE', 'InheritanceType', 'TINYINT', false, null, 2);
 		$this->addColumn('USER_JOIN_POLICY', 'UserJoinPolicy', 'TINYINT', false, null, 3);
 		$this->addColumn('DEFAULT_PERMISSION_LEVEL', 'DefaultPermissionLevel', 'TINYINT', false, null, 3);
 		$this->addColumn('KUSER_ID', 'KuserId', 'INTEGER', false, null, null);
@@ -63,9 +63,9 @@ class categoryTableMap extends TableMap {
 		$this->addColumn('REFERENCE_ID', 'ReferenceId', 'VARCHAR', false, 512, null);
 		$this->addColumn('CONTRIBUTION_POLICY', 'ContributionPolicy', 'TINYINT', false, null, 2);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
-		$this->addColumn('PRIVACY_CONTEXT', 'PrivacyContext', 'BOOLEAN', false, null, false);
+		$this->addColumn('PRIVACY_CONTEXT', 'PrivacyContext', 'VARCHAR', false, 255, null);
 		$this->addColumn('PRIVACY_CONTEXTS', 'PrivacyContexts', 'VARCHAR', false, 255, null);
-		$this->addColumn('INHERIT_FROM_CATEGORY', 'InheritFromCategory', 'INTEGER', false, null, null);
+		$this->addColumn('INHERITED_PARENT_ID', 'InheritedParentId', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 
