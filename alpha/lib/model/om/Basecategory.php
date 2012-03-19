@@ -136,11 +136,11 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	protected $privacy;
 
 	/**
-	 * The value for the inheritance field.
+	 * The value for the inheritance_type field.
 	 * Note: this column has a database default value of: 2
 	 * @var        int
 	 */
-	protected $inheritance;
+	protected $inheritance_type;
 
 	/**
 	 * The value for the user_join_policy field.
@@ -189,8 +189,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the privacy_context field.
-	 * Note: this column has a database default value of: false
-	 * @var        boolean
+	 * @var        string
 	 */
 	protected $privacy_context;
 
@@ -201,10 +200,10 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	protected $privacy_contexts;
 
 	/**
-	 * The value for the inherit_from_category field.
+	 * The value for the inherited_parent_id field.
 	 * @var        int
 	 */
-	protected $inherit_from_category;
+	protected $inherited_parent_id;
 
 	/**
 	 * @var        array categoryKuser[] Collection to store aggregation of categoryKuser objects.
@@ -277,11 +276,10 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		$this->pending_members_count = 0;
 		$this->display_in_search = 1;
 		$this->privacy = 1;
-		$this->inheritance = 2;
+		$this->inheritance_type = 2;
 		$this->user_join_policy = 3;
 		$this->default_permission_level = 3;
 		$this->contribution_policy = 2;
-		$this->privacy_context = false;
 	}
 
 	/**
@@ -565,13 +563,13 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [inheritance] column value.
+	 * Get the [inheritance_type] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getInheritance()
+	public function getInheritanceType()
 	{
-		return $this->inheritance;
+		return $this->inheritance_type;
 	}
 
 	/**
@@ -647,7 +645,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	/**
 	 * Get the [privacy_context] column value.
 	 * 
-	 * @return     boolean
+	 * @return     string
 	 */
 	public function getPrivacyContext()
 	{
@@ -665,13 +663,13 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [inherit_from_category] column value.
+	 * Get the [inherited_parent_id] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getInheritFromCategory()
+	public function getInheritedParentId()
 	{
-		return $this->inherit_from_category;
+		return $this->inherited_parent_id;
 	}
 
 	/**
@@ -1170,27 +1168,27 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	} // setPrivacy()
 
 	/**
-	 * Set the value of [inheritance] column.
+	 * Set the value of [inheritance_type] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     category The current object (for fluent API support)
 	 */
-	public function setInheritance($v)
+	public function setInheritanceType($v)
 	{
-		if(!isset($this->oldColumnsValues[categoryPeer::INHERITANCE]))
-			$this->oldColumnsValues[categoryPeer::INHERITANCE] = $this->inheritance;
+		if(!isset($this->oldColumnsValues[categoryPeer::INHERITANCE_TYPE]))
+			$this->oldColumnsValues[categoryPeer::INHERITANCE_TYPE] = $this->inheritance_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->inheritance !== $v || $this->isNew()) {
-			$this->inheritance = $v;
-			$this->modifiedColumns[] = categoryPeer::INHERITANCE;
+		if ($this->inheritance_type !== $v || $this->isNew()) {
+			$this->inheritance_type = $v;
+			$this->modifiedColumns[] = categoryPeer::INHERITANCE_TYPE;
 		}
 
 		return $this;
-	} // setInheritance()
+	} // setInheritanceType()
 
 	/**
 	 * Set the value of [user_join_policy] column.
@@ -1353,7 +1351,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	/**
 	 * Set the value of [privacy_context] column.
 	 * 
-	 * @param      boolean $v new value
+	 * @param      string $v new value
 	 * @return     category The current object (for fluent API support)
 	 */
 	public function setPrivacyContext($v)
@@ -1362,10 +1360,10 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$this->oldColumnsValues[categoryPeer::PRIVACY_CONTEXT] = $this->privacy_context;
 
 		if ($v !== null) {
-			$v = (boolean) $v;
+			$v = (string) $v;
 		}
 
-		if ($this->privacy_context !== $v || $this->isNew()) {
+		if ($this->privacy_context !== $v) {
 			$this->privacy_context = $v;
 			$this->modifiedColumns[] = categoryPeer::PRIVACY_CONTEXT;
 		}
@@ -1397,27 +1395,27 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	} // setPrivacyContexts()
 
 	/**
-	 * Set the value of [inherit_from_category] column.
+	 * Set the value of [inherited_parent_id] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     category The current object (for fluent API support)
 	 */
-	public function setInheritFromCategory($v)
+	public function setInheritedParentId($v)
 	{
-		if(!isset($this->oldColumnsValues[categoryPeer::INHERIT_FROM_CATEGORY]))
-			$this->oldColumnsValues[categoryPeer::INHERIT_FROM_CATEGORY] = $this->inherit_from_category;
+		if(!isset($this->oldColumnsValues[categoryPeer::INHERITED_PARENT_ID]))
+			$this->oldColumnsValues[categoryPeer::INHERITED_PARENT_ID] = $this->inherited_parent_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->inherit_from_category !== $v) {
-			$this->inherit_from_category = $v;
-			$this->modifiedColumns[] = categoryPeer::INHERIT_FROM_CATEGORY;
+		if ($this->inherited_parent_id !== $v) {
+			$this->inherited_parent_id = $v;
+			$this->modifiedColumns[] = categoryPeer::INHERITED_PARENT_ID;
 		}
 
 		return $this;
-	} // setInheritFromCategory()
+	} // setInheritedParentId()
 
 	/**
 	 * Indicates whether the columns in this object are only set to default values.
@@ -1461,7 +1459,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				return false;
 			}
 
-			if ($this->inheritance !== 2) {
+			if ($this->inheritance_type !== 2) {
 				return false;
 			}
 
@@ -1474,10 +1472,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			}
 
 			if ($this->contribution_policy !== 2) {
-				return false;
-			}
-
-			if ($this->privacy_context !== false) {
 				return false;
 			}
 
@@ -1521,7 +1515,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$this->tags = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
 			$this->display_in_search = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
 			$this->privacy = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
-			$this->inheritance = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->inheritance_type = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
 			$this->user_join_policy = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
 			$this->default_permission_level = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
 			$this->kuser_id = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
@@ -1529,9 +1523,9 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$this->reference_id = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
 			$this->contribution_policy = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
 			$this->custom_data = ($row[$startcol + 25] !== null) ? (string) $row[$startcol + 25] : null;
-			$this->privacy_context = ($row[$startcol + 26] !== null) ? (boolean) $row[$startcol + 26] : null;
+			$this->privacy_context = ($row[$startcol + 26] !== null) ? (string) $row[$startcol + 26] : null;
 			$this->privacy_contexts = ($row[$startcol + 27] !== null) ? (string) $row[$startcol + 27] : null;
-			$this->inherit_from_category = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
+			$this->inherited_parent_id = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1852,6 +1846,16 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		
 		parent::postUpdate($con);
 	}
+	/**
+	 * Code to be run after deleting the object from database
+	 * @param PropelPDO $con
+	 */
+	public function postDelete(PropelPDO $con = null)
+	{
+		kEventsManager::raiseEvent(new kObjectErasedEvent($this));
+		
+		parent::postDelete($con);
+	}
 	
 	/**
 	 * Saves the modified columns temporarily while saving
@@ -2067,7 +2071,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				return $this->getPrivacy();
 				break;
 			case 18:
-				return $this->getInheritance();
+				return $this->getInheritanceType();
 				break;
 			case 19:
 				return $this->getUserJoinPolicy();
@@ -2097,7 +2101,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				return $this->getPrivacyContexts();
 				break;
 			case 28:
-				return $this->getInheritFromCategory();
+				return $this->getInheritedParentId();
 				break;
 			default:
 				return null;
@@ -2138,7 +2142,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$keys[15] => $this->getTags(),
 			$keys[16] => $this->getDisplayInSearch(),
 			$keys[17] => $this->getPrivacy(),
-			$keys[18] => $this->getInheritance(),
+			$keys[18] => $this->getInheritanceType(),
 			$keys[19] => $this->getUserJoinPolicy(),
 			$keys[20] => $this->getDefaultPermissionLevel(),
 			$keys[21] => $this->getKuserId(),
@@ -2148,7 +2152,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$keys[25] => $this->getCustomData(),
 			$keys[26] => $this->getPrivacyContext(),
 			$keys[27] => $this->getPrivacyContexts(),
-			$keys[28] => $this->getInheritFromCategory(),
+			$keys[28] => $this->getInheritedParentId(),
 		);
 		return $result;
 	}
@@ -2235,7 +2239,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				$this->setPrivacy($value);
 				break;
 			case 18:
-				$this->setInheritance($value);
+				$this->setInheritanceType($value);
 				break;
 			case 19:
 				$this->setUserJoinPolicy($value);
@@ -2265,7 +2269,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				$this->setPrivacyContexts($value);
 				break;
 			case 28:
-				$this->setInheritFromCategory($value);
+				$this->setInheritedParentId($value);
 				break;
 		} // switch()
 	}
@@ -2309,7 +2313,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[15], $arr)) $this->setTags($arr[$keys[15]]);
 		if (array_key_exists($keys[16], $arr)) $this->setDisplayInSearch($arr[$keys[16]]);
 		if (array_key_exists($keys[17], $arr)) $this->setPrivacy($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setInheritance($arr[$keys[18]]);
+		if (array_key_exists($keys[18], $arr)) $this->setInheritanceType($arr[$keys[18]]);
 		if (array_key_exists($keys[19], $arr)) $this->setUserJoinPolicy($arr[$keys[19]]);
 		if (array_key_exists($keys[20], $arr)) $this->setDefaultPermissionLevel($arr[$keys[20]]);
 		if (array_key_exists($keys[21], $arr)) $this->setKuserId($arr[$keys[21]]);
@@ -2319,7 +2323,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[25], $arr)) $this->setCustomData($arr[$keys[25]]);
 		if (array_key_exists($keys[26], $arr)) $this->setPrivacyContext($arr[$keys[26]]);
 		if (array_key_exists($keys[27], $arr)) $this->setPrivacyContexts($arr[$keys[27]]);
-		if (array_key_exists($keys[28], $arr)) $this->setInheritFromCategory($arr[$keys[28]]);
+		if (array_key_exists($keys[28], $arr)) $this->setInheritedParentId($arr[$keys[28]]);
 	}
 
 	/**
@@ -2349,7 +2353,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryPeer::TAGS)) $criteria->add(categoryPeer::TAGS, $this->tags);
 		if ($this->isColumnModified(categoryPeer::DISPLAY_IN_SEARCH)) $criteria->add(categoryPeer::DISPLAY_IN_SEARCH, $this->display_in_search);
 		if ($this->isColumnModified(categoryPeer::PRIVACY)) $criteria->add(categoryPeer::PRIVACY, $this->privacy);
-		if ($this->isColumnModified(categoryPeer::INHERITANCE)) $criteria->add(categoryPeer::INHERITANCE, $this->inheritance);
+		if ($this->isColumnModified(categoryPeer::INHERITANCE_TYPE)) $criteria->add(categoryPeer::INHERITANCE_TYPE, $this->inheritance_type);
 		if ($this->isColumnModified(categoryPeer::USER_JOIN_POLICY)) $criteria->add(categoryPeer::USER_JOIN_POLICY, $this->user_join_policy);
 		if ($this->isColumnModified(categoryPeer::DEFAULT_PERMISSION_LEVEL)) $criteria->add(categoryPeer::DEFAULT_PERMISSION_LEVEL, $this->default_permission_level);
 		if ($this->isColumnModified(categoryPeer::KUSER_ID)) $criteria->add(categoryPeer::KUSER_ID, $this->kuser_id);
@@ -2359,7 +2363,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryPeer::CUSTOM_DATA)) $criteria->add(categoryPeer::CUSTOM_DATA, $this->custom_data);
 		if ($this->isColumnModified(categoryPeer::PRIVACY_CONTEXT)) $criteria->add(categoryPeer::PRIVACY_CONTEXT, $this->privacy_context);
 		if ($this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS)) $criteria->add(categoryPeer::PRIVACY_CONTEXTS, $this->privacy_contexts);
-		if ($this->isColumnModified(categoryPeer::INHERIT_FROM_CATEGORY)) $criteria->add(categoryPeer::INHERIT_FROM_CATEGORY, $this->inherit_from_category);
+		if ($this->isColumnModified(categoryPeer::INHERITED_PARENT_ID)) $criteria->add(categoryPeer::INHERITED_PARENT_ID, $this->inherited_parent_id);
 
 		return $criteria;
 	}
@@ -2378,7 +2382,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 
 		$criteria->add(categoryPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(categoryPeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(categoryPeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)
@@ -2460,7 +2464,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 
 		$copyObj->setPrivacy($this->privacy);
 
-		$copyObj->setInheritance($this->inheritance);
+		$copyObj->setInheritanceType($this->inheritance_type);
 
 		$copyObj->setUserJoinPolicy($this->user_join_policy);
 
@@ -2480,7 +2484,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 
 		$copyObj->setPrivacyContexts($this->privacy_contexts);
 
-		$copyObj->setInheritFromCategory($this->inherit_from_category);
+		$copyObj->setInheritedParentId($this->inherited_parent_id);
 
 
 		if ($deepCopy) {
