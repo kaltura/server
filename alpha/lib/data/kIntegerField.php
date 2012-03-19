@@ -8,6 +8,11 @@
 abstract class kIntegerField extends kIntegerValue
 {
 	/**
+	 * @var kScope
+	 */
+	protected $scope = null;
+	
+	/**
 	 * Calculates the value at realtime
 	 * @param kScope $scope
 	 * @return int $value
@@ -19,6 +24,14 @@ abstract class kIntegerField extends kIntegerValue
 	 */
 	public function getValue() 
 	{
-		return $this->getFieldValue();
+		return $this->getFieldValue($this->scope);
+	}
+	
+	/**
+	 * @param kScope $scope
+	 */
+	public function setScope(kScope $scope) 
+	{
+		$this->scope = $scope;
 	}
 }
