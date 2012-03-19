@@ -20,6 +20,8 @@ class category extends Basecategory implements IIndexable
 	
 	protected $old_parent_id = null;
 	
+	protected $old_inheritance_type = null;
+	
 	const MAX_CATEGORY_DEPTH = 8;
 	
 	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 0;
@@ -108,21 +110,29 @@ class category extends Basecategory implements IIndexable
 			$oldParentId = $this->old_parent_id;
 			$newParentId = $this->parent_id;
 			$this->old_parent_id = null;
+			
+			if($oldParentId)
+				$oldParentCat = categoryPeer::retrieveByPK($oldParentId);
+			if ($oldParentCat && $this->inheritance_type == InheritanceType::MANUAL && $this->old_inheritance_type == InheritanceType::INHERIT)
+				$this->copyInheritedFields($oldParentCat);
 		}
-				
-		parent::save($con);
 		
+		parent::save($con);
+
 		if ($updateEntriesCount)
 		{
 			$parentsCategories = array();
 			// decrease for the old parent category
 			if($oldParentId)
-				$oldParentCat = categoryPeer::retrieveByPK($oldParentId);
-			if ($oldParentCat)
 			{
-				$parentsCategories[] = $oldParentCat->getId();
-				$parentsCategories = array_merge($parentsCategories, $oldParentCat->getAllParentsIds());
-			}						
+				$oldParentCat = categoryPeer::retrieveByPK($oldParentId);
+				if ($oldParentCat)
+				{
+					$parentsCategories[] = $oldParentCat->getId();
+					$parentsCategories = array_merge($parentsCategories, $oldParentCat->getAllParentsIds());
+				}
+			}
+						
 			// increase for the new parent category
 			$newParentCat = categoryPeer::retrieveByPK($newParentId);
 			if ($newParentCat)
@@ -130,7 +140,7 @@ class category extends Basecategory implements IIndexable
 				$parentsCategories[] = $newParentCat->getId();
 				$parentsCategories = array_merge($parentsCategories, $newParentCat->getAllParentsIds());
 			}
-
+			
 			$parentsCategories = array_unique($parentsCategories);
 				
 			foreach($parentsCategories as $parentsCategoryId)
@@ -579,7 +589,7 @@ class category extends Basecategory implements IIndexable
 		$this->setPendingMembersCount(0);
 		$this->setDisplayInSearch(DisplayInSearchType::PARTNER_ONLY);
 		$this->setPrivacy(PrivacyType::ALL);
-		$this->setInheritance(InheritanceType::MANUAL);
+		$this->setInheritanceType(InheritanceType::MANUAL);
 		$this->setUserJoinPolicy(UserJoinPolicyType::NOT_ALLOWED);
 		$this->setDefaultPermissionLevel(CategoryKuserPermissionLevel::MODERATOR);
 		$this->setContributionPolicy(ContributionPolicyType::MODERATOR);
@@ -664,16 +674,6 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/* (non-PHPdoc)
-	 * @see lib/model/om/Basecategory#preSave()
-	 */
-	public function preSave(PropelPDO $con = null)
-	{
-		$this->applyInheritance();
-		
-		return parent::preSave($con);
-	}
-	
-	/* (non-PHPdoc)
 	 * @see lib/model/om/Basecategory#postInsert()
 	 */
 	public function postInsert(PropelPDO $con = null)
@@ -684,26 +684,128 @@ class category extends Basecategory implements IIndexable
 			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 	}
 	
-	
-	public function applyInheritance()
+	public function getInheritFromParentCategory()
 	{
-		if ($this->getInheritance() != InheritanceType::INHERT)
-			return;
-			
 		$parentCategory = $this->getParentCategory();
-		$this->setUserJoinPolicy($parentCategory->getUserJoinPolicy());
-		$this->setDefaultPermissionLevel($parentCategory->getDefaultPermissionLevel());
-		$this->setKuserId($parentCategory->getKuserId());
-		$this->setContributionPolicy($parentCategory->getContributionPolicy());
-		
-		//TODO - fix this
-		/*$parentInheritFromCategory = $parentCategory->getInheritFromCategory();
-			return $this->getId();
-		
-		$this->setInheritFromCategory();
-		*/
+		if ($this->getInheritanceType() == InheritanceType::INHERIT)
+			return $parentCategory->getInheritedParentId();
 			
+		return $parentCategory->getId();
 	}
+	
+	
+	public function getInheritParent()
+	{
+		$inheritCategory = categoryPeer::retrieveByPK($this->getInheritedParentId());
+		//if(!$inheritCategory)
+			//TODO - THROW EXP
+			
+		return $inheritCategory;
+	}
+	
+	public function copyInheritedFields($oldParentCategory)
+	{			
+		$this->setUserJoinPolicy($oldParentCategory->getUserJoinPolicy());
+		$this->setDefaultPermissionLevel($oldParentCategory->getDefaultPermissionLevel());
+		$this->setKuserId($oldParentCategory->getKuserId());
+		$this->setContributionPolicy($oldParentCategory->getContributionPolicy());
+	}
+	
+	/**
+	 * inherited values are not synced in the DB to child category that inherit from them - but should be returned on the object.
+	 * (values are copied upon update inhertance from inherited to manual)
+	 */
+	public function getUserJoinPolicy()
+	{
+		if ($this->getInheritanceType() == InheritanceType::INHERIT)
+		{
+			$inheritCategory = $this->getInheritParent();
+			return $inheritCategory->getUserJoinPolicy();
+		}
+		else
+			return parent::getUserJoinPolicy();
+	}
+	
+	/**
+	 * inherited values are not synced in the DB to child category that inherit from them - but should be returned on the object.
+	 * (values are copied upon update inhertance from inherited to manual)
+	 */
+	public function getDefaultPermissionLevel()
+	{
+		if ($this->getInheritanceType() == InheritanceType::INHERIT)
+			return $this->getInheritParent()->getDefaultPermissionLevel();
+		else
+			return parent::getDefaultPermissionLevel();
+	}
+	
+	/**
+	 * inherited values are not synced in the DB to child category that inherit from them - but should be returned on the object.
+	 * (values are copied upon update inhertance from inherited to manual)
+	 */
+	public function getKuserId()
+	{
+		if ($this->getInheritanceType() == InheritanceType::INHERIT)
+			return $this->getInheritParent()->getKuserId();
+		else
+			return parent::getKuserId();
+	}
+	
+	/**
+	 * inherited values are not synced in the DB to child category that inherit from them - but should be returned on the object.
+	 * (values are copied upon update inhertance from inherited to manual)
+	 */
+	public function getContributionPolicy()
+	{
+		if ($this->getInheritanceType() == InheritanceType::INHERIT)
+			return $this->getInheritParent()->getContributionPolicy();
+		else
+			return parent::getContributionPolicy();
+	}
+	
+	/**
+	 * If Category inherit settings, and inherited parent category is currently being updated, this category should be in status updating.
+	 */
+	public function getStatus()
+	{
+		if ($this->getInheritanceType() == InheritanceType::INHERIT && $this->getInheritParent()->getStatus() == CategoryStatus::UPDATING)
+			return CategoryStatus::UPDATING;
+		else
+			return parent::getContributionPolicy();
+	}
+	
+	/**
+	 * If Category inherit settings, there is nothing to sync to child categories, and therefore, should be change status to updating.
+	 * @see lib/model/om/Basecategory#setStatus()
+	 */
+	public function setStatus($v)
+	{
+		if ($this->getInheritanceType() == InheritanceType::INHERIT && $v == CategoryStatus::UPDATING)
+			return;
+		
+		return parent::setStatus($v);
+	}
+	
+	/**
+	 * Set the value of [inheritance] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setInheritanceType($v)
+	{
+		$this->old_inheritance_type = $this->getInheritanceType();
+		if ($v == InheritanceType::INHERIT)
+		{
+			$this->getInheritedParentId($this->getInheritFromParentCategory());
+		}else{
+			$this->getInheritedParentId(null);
+		}
+		
+		parent::setInheritanceType($v);
+	}
+	
+
+	
 	
 	public function setPuserId($puserId)
 	{
@@ -714,7 +816,7 @@ class category extends Basecategory implements IIndexable
 			
 		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $puserId);
 		if (!$kuser)
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
+			throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
 			
 		$this->setKuserId($kuser->getId());
 	}

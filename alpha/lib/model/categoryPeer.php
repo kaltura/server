@@ -30,7 +30,7 @@ class categoryPeer extends BasecategoryPeer
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 		$c->add ( self::STATUS, CategoryStatus::DELETED, Criteria::NOT_EQUAL );
 		
-		if (kEntitlementUtils::getEntitlementScope())
+		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$crit = $c->getNewCriterion ( self::DISPLAY_IN_SEARCH, DisplayInSearchType::PARTNER_ONLY, Criteria::EQUAL );
 			

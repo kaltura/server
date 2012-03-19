@@ -26,6 +26,20 @@ class categoryKuser extends BasecategoryKuser {
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
 			
-		$this->setKuserId($kuser->getId());
+		parent::setKuserId($kuser->getId());
+	}
+	
+	public function setKuserId($kuserId)
+	{
+		if ( self::getKuserId() == $kuserId )  // same value - don't set for nothing 
+			return;
+
+		parent::setKuserId($kuserId);
+			
+		$kuser = kuserPeer::retrieveByPK($kuserId);
+		if (!$kuser)
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
+			
+		parent::setKuserId($kuser->getPuserId());
 	}
 } // categoryKuser
