@@ -7,7 +7,7 @@ ADD `description` TEXT,
 ADD `tags` TEXT,
 ADD `display_in_search` TINYINT default 1,
 ADD `privacy` TINYINT default 1,
-ADD `inheritance` TINYINT default 2,
+ADD `inheritance_type` TINYINT default 2,
 ADD `user_join_policy` TINYINT default 3,
 ADD `default_permission_level` TINYINT default 3,
 ADD `kuser_id` INTEGER,
@@ -15,9 +15,9 @@ ADD `puser_id` VARCHAR(100)  NOT NULL,
 ADD `reference_id` VARCHAR(512),
 ADD `contribution_policy` TINYINT default 2,
 ADD `custom_data` TEXT,
-ADD `privacy_context` TINYINT default 0,
+ADD	`privacy_context` VARCHAR(255),
 ADD `privacy_contexts` VARCHAR(255),
-ADD `inherit_from_category` INTEGER;
+ADD	`inherited_parent_id` INTEGER;
 	
 CREATE TABLE `category_kuser`
 (
