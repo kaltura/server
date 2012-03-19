@@ -1,6 +1,8 @@
 <?php
 /**
  * Applicative event that raised implicitly by the developer
+ * @package Core
+ * @subpackage events
  */
 class kObjectUpdatedEvent extends kApplicativeEvent
 {

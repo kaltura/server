@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage events
+ */
 class kObjectErasedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 {
     const EVENT_CONSUMER = 'kObjectErasedEventConsumer';

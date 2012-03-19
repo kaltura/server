@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage events
+ */
 interface kObjectErasedEventConsumer extends KalturaEventConsumer
 {
     /**

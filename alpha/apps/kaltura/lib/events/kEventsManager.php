@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage events
+ */
 class kEventsManager
 {
 	const BASE_CONSUMER_INTERFACE = 'KalturaEventConsumer';

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage events
+ */
 abstract class KalturaEvent
 {
 	/**

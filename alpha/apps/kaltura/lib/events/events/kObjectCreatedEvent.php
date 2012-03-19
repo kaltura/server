@@ -1,6 +1,8 @@
 <?php
 /**
  * Auto-raised event that raised by the propel generated objects
+ * @package Core
+ * @subpackage events
  */
 class kObjectCreatedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 {

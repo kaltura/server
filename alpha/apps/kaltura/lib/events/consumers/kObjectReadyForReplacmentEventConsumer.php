@@ -1,6 +1,8 @@
 <?php
 /**
  * Applicative event that raised explicitly by the developer
+ * @package Core
+ * @subpackage events
  */
 interface kObjectReadyForReplacmentEventConsumer extends KalturaEventConsumer
 {

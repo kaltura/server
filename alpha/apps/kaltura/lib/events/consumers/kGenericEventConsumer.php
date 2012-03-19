@@ -1,6 +1,8 @@
 <?php
 /**
  * Consume any type of event
+ * @package Core
+ * @subpackage events
  */
 interface kGenericEventConsumer extends KalturaEventConsumer
 {
