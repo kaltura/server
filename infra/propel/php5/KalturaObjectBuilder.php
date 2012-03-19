@@ -91,6 +91,11 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		return ($this->getTable()->getAttribute('raiseEvents', 'true') == 'true');
 	}
 	
+	public function isDeletable()
+	{
+		return ($this->getTable()->getAttribute('deletable', 'false') == 'true');
+	}
+	
 	public function getSubpackage()
 	{
 		$pkg = $this->getBuildProperty('subpackage');
@@ -533,9 +538,28 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		}
 		$script .= "
 		parent::postUpdate(\$con);
+	}";
+	
+	if ($this->isDeletable())
+	{
+	    $script .= "
+	/**
+	 * Code to be run after deleting the object from database
+	 * @param PropelPDO \$con
+	 */
+	public function postDelete(PropelPDO \$con = null)
+	{";
+		if ($this->shouldRaiseEvents())
+		{
+			$script .= "
+		kEventsManager::raiseEvent(new kObjectErasedEvent(\$this));
+		";
+		}
+		$script .= "
+		parent::postDelete(\$con);
 	}
 	";
-		
+	}	
 		if(!$this->shouldRaiseEvents())
 			return;
 	
