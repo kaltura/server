@@ -796,12 +796,12 @@ class category extends Basecategory implements IIndexable
 		$this->old_inheritance_type = $this->getInheritanceType();
 		if ($v == InheritanceType::INHERIT)
 		{
-			$this->getInheritedParentId($this->getInheritFromParentCategory());
-		}else{
-			$this->getInheritedParentId(null);
+			parent::setInheritedParentId($this->getInheritFromParentCategory());
 		}
-		
-		parent::setInheritanceType($v);
+		else
+		{
+			parent::setInheritedParentId(null);
+		}
 	}
 	
 
