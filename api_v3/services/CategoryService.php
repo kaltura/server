@@ -37,6 +37,7 @@ class CategoryService extends KalturaBaseService
 			$categoryDb = new category();
 			$category->toInsertableObject($categoryDb);
 			$categoryDb->setPartnerId($this->getPartnerId());
+			KalturaLog::debug(print_r($categoryDb,true));
 			$categoryDb->save();
 			$this->getPartner()->unlockCategories();
 		}
@@ -85,7 +86,7 @@ class CategoryService extends KalturaBaseService
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
 			
-		if (kEntitlementUtils::getEntitlementScope())
+		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
 		//	$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
 			//TODO - fix kuser puser
@@ -105,15 +106,6 @@ class CategoryService extends KalturaBaseService
 			
 		
 		$category->toUpdatableObject($categoryDb);
-			
-		if ($category->inheritance == InheritanceType::INHERT)
-		{
-			$parentCategory = $categoryDb->getParentCategory();
-			$categoryDb->setUserJoinPolicy($parentCategory->getUserJoinPolicy());
-			$categoryDb->setDefaultPermissionLevel($parentCategory->getDefaultPermissionLevel());
-			$categoryDb->setOwner($parentCategory->getOwner());
-			$categoryDb->setContributionPolicy($parentCategory->getContributionPolicy());
-		}
 		
 		$this->getPartner()->lockCategories();	
 		try
@@ -129,9 +121,11 @@ class CategoryService extends KalturaBaseService
 			else
 				throw $ex;
 		}
-		
+		KalturaLog::debug('### category');
 		$category = new KalturaCategory();
+		KalturaLog::debug('### category 2');
 		$category->fromObject($categoryDb);
+		KalturaLog::debug('### category 3' . print_r($category,true));
 		return $category;
 	}
 	
@@ -147,7 +141,7 @@ class CategoryService extends KalturaBaseService
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
 		
-		if (kEntitlementUtils::getEntitlementScope())
+		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)

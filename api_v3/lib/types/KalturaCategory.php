@@ -114,7 +114,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * @var KalturaInheritanceType
 	 * @filter eq,in
 	 */
-	public $inheritance;
+	public $inheritanceType;
 	
 	
 	/**
@@ -180,7 +180,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	/**
 	 * Set privacy context for search entries that assiged to private and public categories. the entries will be private if the search context is set with those categories.
 	 *  
-	 * @var KalturaNullableBoolean
+	 * @var string
 	 */
 	public $privacyContext;
 	
@@ -216,7 +216,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"tags",
 		"appearInList" => "displayInSearch",
 		"privacy",
-		"inheritance",
+		"inheritanceType",
 		"userJoinPolicy",
 		"defaultPermissionLevel",
 		"owner" => "puserId",
@@ -256,7 +256,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			if (!$parentCategoryDb)
 				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_NOT_FOUND, $category->parentId);	
 		}
-		elseif ($category->inheritance == KalturaInheritanceType::INHERT)
+		elseif ($category->inheritanceType == KalturaInheritanceType::INHERIT)
 		{
 			//cannot inherit member with no parant
 			throw new KalturaAPIException(KalturaErrors::CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET);
