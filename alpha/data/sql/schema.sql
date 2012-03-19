@@ -1629,7 +1629,7 @@ CREATE TABLE `category`
 	`tags` TEXT,
 	`display_in_search` TINYINT default 1,
 	`privacy` TINYINT default 1,
-	`inheritance` TINYINT default 2,
+	`inheritance_type` TINYINT default 2,
 	`user_join_policy` TINYINT default 3,
 	`default_permission_level` TINYINT default 3,
 	`kuser_id` INTEGER,
@@ -1637,9 +1637,9 @@ CREATE TABLE `category`
 	`reference_id` VARCHAR(512),
 	`contribution_policy` TINYINT default 2,
 	`custom_data` TEXT,
-	`privacy_context` TINYINT default 0,
+	`privacy_context` VARCHAR(255),
 	`privacy_contexts` VARCHAR(255),
-	`inherit_from_category` INTEGER,
+	`inherited_parent_id` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_full_name_index`(`partner_id`, `full_name`)
 )Type=MyISAM;
