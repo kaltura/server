@@ -497,11 +497,12 @@ $target->_video = null;
 		$this->evaluateTargetVideoFramesize($sourceVid, $targetVid);
 
 		/*
-		 * Following code is a hack to overcome x264 AR disorder that happens with several hdv source formats
+		 * Following code is a hack to overcome ffmpeg/x264 AR disorder 
+		 * that happens with several hdv source formats
 		 */
 		$srcVcodec = $source->GetIdOrFormat();
 		if(isset($srcVcodec) && in_array($srcVcodec, array("dvh3", "dvhp", "hdv1","hdv2" ,"hdv3", "hdv6"))
-		&& isset($targetVid->_id) && in_array($targetVid->_id, array("h264", "h264b", "h264m","h264h" ))
+//		&& isset($targetVid->_id) && in_array($targetVid->_id, array("h264", "h264b", "h264m","h264h" ))
 		&& !($targetVid->_width==0 || $targetVid->_height==0)) {
 			$targetVid->_dar = round($targetVid->_width/$targetVid->_height,4);
 		}
