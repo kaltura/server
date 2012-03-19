@@ -608,15 +608,24 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	 */
 	public static function getAdditionalSearchableFieldsLimit($partnerId, $obejctType)
 	{
-		if ($obejctType != MetadataObjectType::ENTRY)
-			return 0;
-		
 		$partner = PartnerPeer::retrieveByPK ( $partnerId );
 		if (!$partner)
 			throw new APIException(APIErrors::INVALID_PARTNER_ID, $partnerId);
 		
+		If ($obejctType == MetadataObjectType::ENTRY)
+		{
+			$partnerSearchIndex = $partner->getSearchIndex(entryPeer::TABLE_NAME);
+		}
+		elseif ($obejctType == MetadataObjectType::CATEGORY)
+		{
+			$partnerSearchIndex = $partner->getSearchIndex(categoryPeer::TABLE_NAME);
+		}
+		else 
+		{
+			return 0;
+		}
+		
 		$searchIndexes = kConf::get('search_indexes');
-		$partnerSearchIndex = $partner->getSearchIndex(entryPeer::TABLE_NAME);
 		
 		if(!isset($searchIndexes[$partnerSearchIndex]))
 			throw new Exception('could not find partner\'s search index ' . $partnerSearchIndex);
