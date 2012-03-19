@@ -938,7 +938,6 @@ abstract class BaseroughcutEntry extends BaseObject  implements Persistent {
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
@@ -1300,7 +1299,7 @@ abstract class BaseroughcutEntry extends BaseObject  implements Persistent {
 
 		$criteria->add(roughcutEntryPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(roughcutEntryPeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(roughcutEntryPeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)

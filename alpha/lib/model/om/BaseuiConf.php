@@ -1415,7 +1415,6 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
@@ -1878,7 +1877,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 
 		$criteria->add(uiConfPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(uiConfPeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(uiConfPeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)

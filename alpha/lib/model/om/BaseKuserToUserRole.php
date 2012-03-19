@@ -758,7 +758,6 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
@@ -1078,7 +1077,7 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 
 		$criteria->add(KuserToUserRolePeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(KuserToUserRolePeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(KuserToUserRolePeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)

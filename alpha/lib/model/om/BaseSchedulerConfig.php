@@ -1142,7 +1142,6 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Array of ValidationFailed objects.
 	 * @var        array ValidationFailed[]
@@ -1490,7 +1489,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 
 		$criteria->add(SchedulerConfigPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(SchedulerConfigPeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(SchedulerConfigPeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)

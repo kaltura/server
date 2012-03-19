@@ -862,7 +862,6 @@ abstract class BasePriorityGroup extends BaseObject  implements Persistent {
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Array of ValidationFailed objects.
 	 * @var        array ValidationFailed[]
@@ -1147,7 +1146,7 @@ abstract class BasePriorityGroup extends BaseObject  implements Persistent {
 
 		$criteria->add(PriorityGroupPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(PriorityGroupPeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(PriorityGroupPeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)

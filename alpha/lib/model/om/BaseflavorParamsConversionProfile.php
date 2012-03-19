@@ -907,7 +907,6 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Array of ValidationFailed objects.
 	 * @var        array ValidationFailed[]
@@ -1210,7 +1209,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 
 		$criteria->add(flavorParamsConversionProfilePeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(flavorParamsConversionProfilePeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(flavorParamsConversionProfilePeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)

@@ -623,7 +623,6 @@ abstract class Basefavorite extends BaseObject  implements Persistent {
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array

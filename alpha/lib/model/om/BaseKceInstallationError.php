@@ -798,7 +798,6 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array

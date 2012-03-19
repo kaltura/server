@@ -1013,7 +1013,6 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
@@ -1369,7 +1368,7 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 
 		$criteria->add(UserLoginDataPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(UserLoginDataPeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(UserLoginDataPeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)

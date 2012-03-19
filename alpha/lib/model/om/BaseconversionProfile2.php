@@ -1495,7 +1495,6 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
@@ -1948,7 +1947,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 
 		$criteria->add(conversionProfile2Peer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(conversionProfile2Peer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(conversionProfile2Peer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)

@@ -758,7 +758,6 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
@@ -1078,7 +1077,7 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 
 		$criteria->add(PermissionToPermissionItemPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(PermissionToPermissionItemPeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(PermissionToPermissionItemPeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)

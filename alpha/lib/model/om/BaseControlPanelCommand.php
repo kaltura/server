@@ -1222,7 +1222,6 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Array of ValidationFailed objects.
 	 * @var        array ValidationFailed[]
@@ -1588,7 +1587,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 
 		$criteria->add(ControlPanelCommandPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(ControlPanelCommandPeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(ControlPanelCommandPeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)

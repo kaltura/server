@@ -854,7 +854,6 @@ abstract class BaseflickrToken extends BaseObject  implements Persistent {
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
@@ -1183,7 +1182,7 @@ abstract class BaseflickrToken extends BaseObject  implements Persistent {
 
 		$criteria->add(flickrTokenPeer::KALT_TOKEN, $this->kalt_token);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(flickrTokenPeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(flickrTokenPeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)
