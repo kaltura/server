@@ -18,7 +18,12 @@ class kEvalStringField extends kStringField
 	 */
 	protected function getFieldValue(kScope $scope = null) 
 	{
-		return eval($this->code);
+		if(strpos($this->code, ';') !== false)
+			throw new kCoreException("Evaluated code may be simple value only");
+			
+		$val = null;
+		eval("$val = strval({$this->code});");
+		return $val;
 	}
 	
 	/**
