@@ -1397,7 +1397,7 @@
 			<reference local="flavor_params_id" foreign="id" />
 		</foreign-key>
 	</table>
-	<table skipSql="false" abstract="false" name="category" phpName="category">
+	<table skipSql="false" abstract="false" name="category" phpName="category" deletable="true">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" lazyLoad="false" name="parent_id" type="integer" required="true" />
 		<column primaryKey="false" lazyLoad="false" name="depth" type="tinyint" required="true" />
