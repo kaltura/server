@@ -1,7 +1,7 @@
 <?php if($this->errMessage) echo "<div class=\"error\">{$this->errMessage}</div>"; ?>
 <?php $this->form->setAction($this->url(array('controller' => 'partner', 'action' => 'exteneded-free-trail-history'))); ?>
 
-<?php if (!isset($this->auditList->objects) || !count($this->auditList->objects)):?>
+<?php if (!isset($this->auditList) || !count($this->auditList)):?>
 	<div>No Trial Extension history</div>
 <?php else:?>
 
@@ -17,7 +17,7 @@
 		<tbody>
 			
 		
-			<?php foreach($this->auditList->objects as $audit): ?>
+			<?php foreach($this->auditList as $audit): ?>
 			<tr class="1">
 				<td><?php echo $audit->userId; ?></td>
 				<td><?php echo date('m/d/y H:m:s',$audit->createdAt);?></td>
