@@ -347,7 +347,7 @@ abstract class ClientGeneratorFromPhp
 			return;
 			
 		$this->addType($typeReflector);
-		KalturaLog::debug("Loads [" . $typeReflector->getType() . "]");
+		
 		$this->initClassMap();
 		foreach($this->_classMap as $class => $path)
 		{
