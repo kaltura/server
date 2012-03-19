@@ -1416,7 +1416,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="display_in_search" type="tinyint" default="1"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy" type="tinyint" default="1"/>
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="inheritance" type="tinyint" default="2"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="inheritance_type" type="tinyint" default="2"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="user_join_policy" type="tinyint" default="3"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="default_permission_level" type="tinyint" default="3"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kuser_id" type="integer" />
@@ -1424,9 +1424,9 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="reference_id" type="varchar" size="512" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="contribution_policy" type="tinyint" default="2"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy_context" type="boolean" default="0" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy_context" type="varchar" size="255" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy_contexts" type="varchar" size="255" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="inherit_from_category" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="inherited_parent_id" type="integer" />
 		<index name="partner_id_full_name_index">
 			<index-column name="partner_id" />
 			<index-column name="full_name" />
