@@ -7,6 +7,6 @@
  */ 
 interface InheritanceType extends BaseEnum
 {
-	const INHERIT = 0;
-	const MANUAL = 1;
+	const INHERIT = 1;
+	const MANUAL = 2;
 }

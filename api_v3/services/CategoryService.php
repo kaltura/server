@@ -121,11 +121,8 @@ class CategoryService extends KalturaBaseService
 			else
 				throw $ex;
 		}
-		KalturaLog::debug('### category');
 		$category = new KalturaCategory();
-		KalturaLog::debug('### category 2');
 		$category->fromObject($categoryDb);
-		KalturaLog::debug('### category 3' . print_r($category,true));
 		return $category;
 	}
 	
@@ -173,10 +170,8 @@ class CategoryService extends KalturaBaseService
 		 
 		$categoryFilter->attachToCriteria($c);
 		
-		//TODO - add to categoryPeer function for do count to go though sphinx
-		categoryPeer::doSelect($c);
-		$totalCount = $c->getRecordsCount();
 		$dbList = categoryPeer::doSelect($c);
+		$totalCount = $c->getRecordsCount();
 		
 		$list = KalturaCategoryArray::fromCategoryArray($dbList);
 		$response = new KalturaCategoryListResponse();

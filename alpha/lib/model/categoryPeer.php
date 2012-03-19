@@ -131,7 +131,7 @@ class categoryPeer extends BasecategoryPeer
 			$c->applyFilters();
 			$criteria->setRecordsCount($c->getRecordsCount());
 		}
-			
+
 		return parent::doSelect($c, $con);
 	}
 	

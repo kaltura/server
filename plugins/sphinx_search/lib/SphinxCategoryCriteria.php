@@ -14,11 +14,39 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'category.DISPLAY_IN_SEARCH' => 'display_in_search',	
 		'category.FREE_TEXT' => '(name,tags,description)',
 		'category.MEMBERS' => 'members',
-		'plugins_data'
+		'plugins_data',
+		'category.DEPTH' => 'depth',
+		'category.REFERENCE_ID' => 'reference_id',
+		'category.PRIVACY_CONTEXT' => 'privacy_context',
+		'category.PRIVACY_CONTEXTS' => 'privacy_contexts',
+		'category.MEMBERS_COUNT' => 'members_count',
+		'category.PENDING_MEMBERS_COUNT' => 'pending_members_count',
+		'category.ENTRIES_COUNT' => 'entries_count',
+		'category.DIRECT_ENTRIES_COUNT' => 'direct_entries_count',
+		'category.PRIVACY' => 'privacy',
+		'category.INHERITANCE_TYPE' => 'inheritance_type',
+		'category.USER_JOIN_POLICY' => 'user_join_policy',
+		'category.DEFAULT_PERMISSION_LEVEL' => 'default_permission_level' ,
+		'category.CONTRIBUTION_POLICY' => 'contribution_policy',
+		'category.INHERITED_PARENT_ID' => 'inherited_parent_id',
+		'category.CREATED_AT' => 'created_at',
+		'category.UPDATED_AT' => 'updated_at',
+		'category.DELETED_AT' => 'deleted_at',	
 	);
 	
 	public static $sphinxOrderFields = array(
-
+		'category.ID' => 'category_id',
+		'category.PARTNER_ID' => 'partner_id',
+		'category.STATUS' => 'category_status',
+		'category.KUSER_ID' => 'kuser_id',
+		'category.DISPLAY_IN_SEARCH' => 'display_in_search',	
+		'category.DEPTH' => 'depth',
+		'category.MEMBERS_COUNT' => 'members_count',
+		'category.PENDING_MEMBERS_COUNT' => 'pending_members_count',
+		'category.ENTRIES_COUNT' => 'entries_count',
+		'category.DIRECT_ENTRIES_COUNT' => 'direct_entries_count',
+		'category.CREATED_AT' => 'created_at',
+		'category.UPDATED_AT' => 'updated_at',
 	);
 	
 	public static $sphinxTypes = array(
@@ -31,7 +59,26 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'category_status' => IIndexable::FIELD_TYPE_INTEGER,
 		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'display_in_search' => IIndexable::FIELD_TYPE_STRING,
-		'members' => IIndexable::FIELD_TYPE_STRING);
+		'members' => IIndexable::FIELD_TYPE_STRING,
+		'plugins_data' => IIndexable::FIELD_TYPE_STRING,
+		'depth' => IIndexable::FIELD_TYPE_INTEGER,
+		'reference_id' => IIndexable::FIELD_TYPE_STRING,
+		'privacy_context' => IIndexable::FIELD_TYPE_STRING,
+		'privacy_contexts' => IIndexable::FIELD_TYPE_STRING,
+		'members_count' => IIndexable::FIELD_TYPE_INTEGER,
+		'pending_members_count' => IIndexable::FIELD_TYPE_INTEGER,
+		'entries_count' => IIndexable::FIELD_TYPE_INTEGER,
+		'direct_entries_count' => IIndexable::FIELD_TYPE_INTEGER,
+		'privacy' => IIndexable::FIELD_TYPE_INTEGER,
+		'inheritance_type' => IIndexable::FIELD_TYPE_INTEGER,
+		'user_join_policy' => IIndexable::FIELD_TYPE_INTEGER,
+		'default_permission_level' => IIndexable::FIELD_TYPE_INTEGER,
+		'contribution_policy' => IIndexable::FIELD_TYPE_INTEGER,
+		'inherited_parent_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'created_at' => IIndexable::FIELD_TYPE_DATETIME,
+		'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
+		'deleted_at' => IIndexable::FIELD_TYPE_DATETIME
+	);
 
 	/**
 	 * @return criteriaFilter

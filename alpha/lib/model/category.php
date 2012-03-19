@@ -36,7 +36,24 @@ class category extends Basecategory implements IIndexable
 		'category_status' => IIndexable::FIELD_TYPE_INTEGER,
 		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'display_in_search' => IIndexable::FIELD_TYPE_STRING,
-		'members' => IIndexable::FIELD_TYPE_STRING
+		'members' => IIndexable::FIELD_TYPE_STRING,
+		'depth' => IIndexable::FIELD_TYPE_INTEGER,
+		'reference_id' => IIndexable::FIELD_TYPE_STRING,
+		'privacy_context' => IIndexable::FIELD_TYPE_STRING,
+		'privacy_contexts' => IIndexable::FIELD_TYPE_STRING,
+		'members_count' => IIndexable::FIELD_TYPE_INTEGER,
+		'pending_members_count' => IIndexable::FIELD_TYPE_INTEGER,
+		'entries_count' => IIndexable::FIELD_TYPE_INTEGER,
+		'direct_entries_count' => IIndexable::FIELD_TYPE_INTEGER,
+		'privacy' => IIndexable::FIELD_TYPE_INTEGER,
+		'inheritance_type' => IIndexable::FIELD_TYPE_INTEGER,
+		'user_join_policy' => IIndexable::FIELD_TYPE_INTEGER,
+		'default_permission_level' => IIndexable::FIELD_TYPE_INTEGER,
+		'contribution_policy' => IIndexable::FIELD_TYPE_INTEGER,
+		'inherited_parent_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'created_at' => IIndexable::FIELD_TYPE_DATETIME,
+		'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
+		'deleted_at' => IIndexable::FIELD_TYPE_DATETIME
 	);
 	
 	public function save(PropelPDO $con = null)
@@ -648,18 +665,32 @@ class category extends Basecategory implements IIndexable
 	{
 		return array(
 		/*sphinx => propel */
-			'id' => 'id',
+			'category_id' => 'id',
 			'partner_id' => 'partnerId',
 			'name' => 'name',
 			'full_name' => 'fullName',
 			'description' => 'description',
 			'tags' => 'tags',
-			'status' => 'status',
+			'category_status' => 'status',
 			'kuser_id' => 'kuserId',
 			'display_in_search' => 'displayInSearch',	
-			'free_text' => 'freeText',
-			'members' => 'members'
-		);
+			'depth' => 'depth',
+			'reference_id' => 'referenceId',
+			'privacy_context' => 'privacyContext',
+			'privacy_contexts' => 'privacyContexts',
+			'members_count' => 'membersCount',
+			'pending_members_count' => 'pendingMembersCount',
+			'entries_count' => 'entriesCount',
+			'direct_entries_count' => 'directEntriesCount',
+			'privacy' => 'privacy',
+			'inheritance_type' => 'inheritanceType',
+			'user_join_policy' => 'userJoinPolicy',
+			'default_permission_level' => 'defaultPermissionLevel',
+			'contribution_policy' => 'contributionPolicy',
+			'inherited_parent_id' => 'inheritedParentId',
+			'created_at' => 'createdAt',
+			'updated_at' => 'updatedAt',
+			'deleted_at' => 'deletedAt');		
 	}
 	
 	/**
@@ -697,8 +728,8 @@ class category extends Basecategory implements IIndexable
 	public function getInheritParent()
 	{
 		$inheritCategory = categoryPeer::retrieveByPK($this->getInheritedParentId());
-		//if(!$inheritCategory)
-			//TODO - THROW EXP
+		if(!$inheritCategory)
+			throw new kCoreException('Invalid inherited parent categroy id for category id [' . $this->getId() . ']');
 			
 		return $inheritCategory;
 	}
