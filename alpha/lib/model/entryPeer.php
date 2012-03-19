@@ -9,10 +9,7 @@
  */ 
 class entryPeer extends BaseentryPeer 
 {
-	// if the count is less that this number - don't cache it so the nubmers will not look strange in small lists
-	const MIN_COUNT_RESULT_TO_CACHE = 100;  
 	
-	private static $entry_count_cache = null;
 	private static $s_default_count_limit = 301;
 	
 	// cache classes by their type
@@ -318,45 +315,6 @@ class entryPeer extends BaseentryPeer
 		return $count;
 	}
 
-	/*
-	 *	will use the cache to select the count result that fits the criteria 
-	 */
-	public static function doCountWithCache (Criteria $criteria, $cache_expiry_in_seconds = 600 )
-	{
-		$cache_key = myCriteria::getCriteriaCacheKey ( $criteria );
-		
-		if ( !self::$entry_count_cache ) 
-		{
-			self::$entry_count_cache = new myCache( "entry_count_cache" , $cache_expiry_in_seconds );
-		}
-		
-		if ( $count_result = self::$entry_count_cache->get ( $cache_key ) )
-		{
-			KalturaLog::log( __METHOD__ . ": count from cache [$count_result] for cacheKey [$cache_key]" );
-			return $count_result;
-		}
-		else
-		{
-			KalturaLog::log( __METHOD__ . ": NO count from cache [$count_result] for cacheKey [$cache_key]" );
-			$count_result = self::doCount( $criteria ) ;
-			// if we have a count result worth caching - cache it.
-			// one the one hand, for few results, it's nice to display rapid differences, therefore cache only if above the MIN_COUNT_RESULT_TO_CACHE threshold
-			// one the other hand - it can be that there are very little few resuls (sometimes 0) and still importatn to cache even more than when many results
-			// for now - go for the first version - cache above threshold.
-			if ( $count_result && $count_result > self::MIN_COUNT_RESULT_TO_CACHE )
-			{
-				self::$entry_count_cache->put ( $cache_key , $count_result );
-				KalturaLog::log( __METHOD__ . ": Setting count in cache [$count_result] for cacheKey [$cache_key]" );
-			}
-			else
-			{
-				KalturaLog::log( __METHOD__ . ": Did NOT Set count in cache [$count_result] for cacheKey [$cache_key]" );
-			}
-		}
-		
-		return $count_result;
-	}
-		
 	public static function doStubCount (Criteria $criteria, $distinct = false, $con = null)
 	{
 		return 0;
