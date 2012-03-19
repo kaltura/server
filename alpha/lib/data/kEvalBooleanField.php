@@ -18,6 +18,9 @@ class kEvalBooleanField extends kBooleanField
 	 */
 	protected function getFieldValue(kScope $scope = null) 
 	{
+		if(!$scope)
+			return null;
+			
 		/* @var $scope kEventScope */
 		if(strpos($this->code, ';') !== false)
 			throw new kCoreException("Evaluated code may be simple value only");
