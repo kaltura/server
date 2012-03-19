@@ -34,8 +34,12 @@ class categoryPeer extends BasecategoryPeer
 		{
 			$crit = $c->getNewCriterion ( self::DISPLAY_IN_SEARCH, DisplayInSearchType::PARTNER_ONLY, Criteria::EQUAL );
 			
-			if ( kCurrentContext::$uid <> '')
-				$crit->addOr ( $c->getNewCriterion ( self::MEMBERS , kCurrentContext::$uid, Criteria::EQUAL) );
+			if ( kCurrentContext::$ks_uid <> '')
+			{
+				$kuser = kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid);
+				if($kuser)
+					$crit->addOr ( $c->getNewCriterion ( self::MEMBERS , $kuser->getId(), Criteria::EQUAL) );
+			}
 				
 			$c->addAnd ( $crit );
 		}		

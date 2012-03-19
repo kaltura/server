@@ -49,8 +49,15 @@ $baseConfigurationIndexs = 	array(
 		'end_date'					=> SphinxFieldType::RT_ATTR_TIMESTAMP,
 		'available_from'			=> SphinxFieldType::RT_ATTR_TIMESTAMP,	
 		
-		'str_entry_id'				=> SphinxFieldType::RT_ATTR_STRING),
-	);
+		'str_entry_id'				=> SphinxFieldType::RT_ATTR_STRING,
+		
+		'entitled_kusers_publish' 	=> IIndexable::FIELD_TYPE_STRING,
+		'entitled_kusers_edit' 		=> IIndexable::FIELD_TYPE_STRING,
+		'entitled_kusers' 			=> IIndexable::FIELD_TYPE_STRING,
+		'privacy_by_contexts' 		=> IIndexable::FIELD_TYPE_STRING,
+		'privacy' 					=> IIndexable::FIELD_TYPE_INTEGER,
+		'creator_kuser_id' 			=> IIndexable::FIELD_TYPE_INTEGER),
+	),
 	
 	'kaltura_category' => array(
 		'type'					=> 'rt',	

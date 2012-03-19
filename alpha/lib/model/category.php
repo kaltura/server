@@ -26,6 +26,8 @@ class category extends Basecategory implements IIndexable
 	
 	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 0;
 	
+	const CATEGORY_WORK_GROUP_SIZE = 10;
+	
 	private static $indexFieldTypes = array(
 		'category_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
@@ -826,13 +828,11 @@ class category extends Basecategory implements IIndexable
 	{
 		$this->old_inheritance_type = $this->getInheritanceType();
 		if ($v == InheritanceType::INHERIT)
-		{
 			parent::setInheritedParentId($this->getInheritFromParentCategory());
-		}
 		else
-		{
 			parent::setInheritedParentId(null);
-		}
+		
+		parent::setInheritanceType($v);
 	}
 	
 

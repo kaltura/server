@@ -2584,6 +2584,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			'start_date' => 'startDate',
 			'end_date' => 'endDate',
 			'available_from' => 'availableFrom',
+		
+			'entitled_kusers_publish' => 'entitledKusersPublish',
+			'entitled_kusers_edit' => 'entitledKusersEdit',
+			'entitled_kusers' => 'entitledKusers',
+			'privacy_by_contexts' => 'privacyByContexts',
+			'privacy' => 'privacy',
+			'creator_kuser_id' => 'creatorKuserId',	
 		);
 	}
 	
@@ -2630,6 +2637,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			'start_date' => IIndexable::FIELD_TYPE_DATETIME,
 			'end_date' => IIndexable::FIELD_TYPE_DATETIME,
 			'available_from' => IIndexable::FIELD_TYPE_DATETIME,
+	
+			'entitled_kusers_publish' => IIndexable::FIELD_TYPE_STRING,
+			'entitled_kusers_edit' => IIndexable::FIELD_TYPE_STRING,
+			'entitled_kusers' => IIndexable::FIELD_TYPE_STRING,
+			'privacy_by_contexts' => IIndexable::FIELD_TYPE_STRING,
+			'privacy' => IIndexable::FIELD_TYPE_INTEGER,
+			'creator_kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
 	);
 	
 	/**
@@ -2716,4 +2730,39 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 		return $dynamicFlavorAttributes;
 	}
+	
+	public function getPrivacyByContexts()
+	{
+		//TODO
+		return '';
+	}
+	
+	public function getPrivacy()
+	{
+		//TODO
+		return '';
+	}
+	
+	public function getEntitledKusers()
+	{
+		//TODO
+		$entitledKusersPublish = explode(',', $this->getEntitledKusersPublish());
+		$entitledKusersEdit = explode(',', $this->getEntitledKusersEdit());
+		$entitledKusers = array_merge($entitledKusersPublish, $entitledKusersEdit);
+		
+		if ($this->getCategoriesIds() == '')
+			return implode(',', $entitledKusers);
+		
+		//get categories for this entry that have small amount of members.
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$c->add(categoryPeer::ID, explode(',', $this->getCategoriesIds()) , Criteria::IN);
+		$c->add(categoryPeer::MEMBERS_COUNT, category::CATEGORY_WORK_GROUP_SIZE , Criteria::LESS_THAN);		
+		$categories	= categoryPeer::doSelect($c);
+		
+		//get all memebrs
+		foreach ($categories as $category)
+			$entitledKusers = array_merge($entitledKusers, explode(',', $category->getMembers()));
+		
+		return implode(',', $entitledKusers);
+	} 
 }
