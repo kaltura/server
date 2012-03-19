@@ -44,6 +44,14 @@ class SphinxEntryCriteria extends SphinxCriteria
 		entryPeer::START_DATE => 'start_date',
 		entryPeer::END_DATE => 'end_date',
 		entryPeer::AVAILABLE_FROM => 'available_from',
+		
+		'entryPeer.ENTITLED_KUSERS_PUBLISH' => 'entitledKusersPublish',
+		'entryPeer.ENTITLED_KUSERS_EDIT' => 'entitledKusersEdit',
+		'entryPeer.ENTITLED_KUSERS' => 'entitledKusers',
+		'entryPeer.PRIVACY_BY_CONTEXTS' => 'privacyByContexts',
+		'entryPeer.PRIVACY' => 'privacy',
+		'entryPeer.CREATOR_KUSER_ID' => 'creatorKuserId',
+		
 	);
 	
 	public static $sphinxOrderFields = array(
@@ -116,6 +124,13 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'start_date' => IIndexable::FIELD_TYPE_DATETIME,
 		'end_date' => IIndexable::FIELD_TYPE_DATETIME,
 		'available_from' => IIndexable::FIELD_TYPE_DATETIME,
+	
+		'entitled_kusers_publish' => IIndexable::FIELD_TYPE_STRING,
+		'entitled_kusers_edit' => IIndexable::FIELD_TYPE_STRING,
+		'entitled_kusers' => IIndexable::FIELD_TYPE_STRING,
+		'privacy_by_contexts' => IIndexable::FIELD_TYPE_STRING,
+		'privacy' => IIndexable::FIELD_TYPE_INTEGER,
+		'creator_kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
 	);
 
 	/**
