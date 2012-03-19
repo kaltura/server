@@ -64,7 +64,12 @@ abstract class kApplicativeEvent extends KalturaEvent implements IKalturaContinu
 	public function getScope()
 	{
 		$scope = parent::getScope();
-		$scope->setPartnerId($this->raisedJob->getPartnerId());
+		
+		if(method_exists($this->object, 'getPartnerId'))
+			$scope->setPartnerId($this->object->getPartnerId());
+		elseif($this->raisedJob)
+			$scope->setPartnerId($this->raisedJob->getPartnerId());
+			
 		$scope->setParentRaisedJob($this->raisedJob);
 		return $scope;
 	}
