@@ -75,7 +75,7 @@ class KalturaDispatcher
 		
 		kCurrentContext::initKsPartnerUser($ksStr, $p, $userId);
 		kPermissionManager::init(kConf::get('enable_cache'));
-		kEntitlementUtils::initEntitlementScope();
+		kEntitlementUtils::initEntitlementEnforcement();
 		
 		$actionInfo = $reflector->getActionInfo($action);
 		if($actionInfo->validateUserObjectClass && $actionInfo->validateUserIdParamName && isset($actionParams[$actionInfo->validateUserIdParamName]))
