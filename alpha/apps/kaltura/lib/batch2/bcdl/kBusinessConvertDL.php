@@ -135,7 +135,7 @@ class kBusinessConvertDL
 		$entry->setStatus($tempEntry->getStatus());	
 		$entry->save();
 		
-		myEntryUtils::deleteEntry($tempEntry);
+		myEntryUtils::deleteEntry($tempEntry,null,true);
 		
 		$te = new TrackEntry();
 		$te->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_REPLACED_ENTRY);
