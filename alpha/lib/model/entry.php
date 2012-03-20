@@ -151,8 +151,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		self::ENTRY_MEDIA_TYPE_LIVE_STREAM_REAL_MEDIA => 'LIVE_STREAM_REAL_MEDIA',
 		self::ENTRY_MEDIA_TYPE_LIVE_STREAM_QUICKTIME => 'LIVE_STREAM_QUICKTIME',
 	);
-
-
+	
+	
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
@@ -1633,6 +1633,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setThumbHeight ( $v )		{	$this->putInCustomData ( "thumbHeight" , $v );	}
 	public function getThumbHeight (  )			{	return $this->getFromCustomData( "thumbHeight", null, 0 );	}
 	
+	public function setMarkedForDeletion ( $v )	{	$this->putInCustomData ( "markedForDeletion" , (bool) $v );	}
+	public function getMarkedForDeletion (  )	{	return (bool) $this->getFromCustomData( "markedForDeletion" ,null, false );	}
+		
 	public function setRootEntryId($v)
 	{
 		$this->putInCustomData("rootEntryId", $v);
