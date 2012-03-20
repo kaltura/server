@@ -113,6 +113,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const ENTRY_CATEGORY_ESCAPE = "_";
 	const ENTRY_CATEGORY_SEPARATOR = ",";
 	
+	const ENTRY_ID_THAT_DOES_NOT_EXIST = 0;
+	
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
