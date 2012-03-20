@@ -9,7 +9,7 @@
 class KalturaBooleanValue extends KalturaValue
 {
 	/**
-	 * @var int
+	 * @var bool
 	 */
     public $value;
 
