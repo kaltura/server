@@ -253,6 +253,13 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				kJobsManager::abortChildJobs($dbBatchJob);
 			}
 
+			if(in_array($dbBatchJob->getStatus(),BatchJobPeer::getClosedStatusList()))
+			{
+				$jobEntry = $dbBatchJob->getEntry();
+				if($jobEntry->getMarkedForDeletion())
+					myEntryUtils::deleteEntry($jobEntry,null,true);
+			}
+		
 			switch($jobType)
 			{
 				case BatchJobType::IMPORT:
