@@ -22,10 +22,10 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 	 */
 	public function __construct(KSchedularTaskConfig $taskConfig, KalturaClient $client)
 	{
-		if($taskConfig->params->defaultFromMail)
+		if(isset($taskConfig->params->defaultFromMail) && $taskConfig->params->defaultFromMail)
 			$this->defaultFromMail = $taskConfig->params->defaultFromMail;
 			
-		if($taskConfig->params->defaultFromName)
+		if(isset($taskConfig->params->defaultFromName) && $taskConfig->params->defaultFromName)
 			$this->defaultFromName = $taskConfig->params->defaultFromName;
 			
 		parent::__construct($taskConfig, $client);
@@ -46,6 +46,9 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 	 */
 	public function sendEmail(KalturaEmailNotificationTemplate $emailNotificationTemplate, KalturaEmailNotificationDispatchJobData $data)
 	{
+		if(is_null($data->toEmail))
+			throw new Exception("Recipient e-mail address cannot be null");
+			
 		$mailer = new PHPMailer();
 		$mailer->CharSet = 'utf-8';
 		$mailer->IsHTML($emailNotificationTemplate->format == KalturaEmailNotificationFormat::HTML);

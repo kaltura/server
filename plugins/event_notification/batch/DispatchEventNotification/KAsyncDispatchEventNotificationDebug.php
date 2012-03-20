@@ -5,11 +5,11 @@
  */
 
 // /opt/kaltura/app/batch
-chdir(dirname( __FILE__ ) . "/../../../../../batch");
+chdir(dirname(__FILE__) . "/../../../../batch");
 
-require_once("bootstrap.php");
+require_once ("bootstrap.php");
 
-$iniFile = "batch_config.ini";		// should be the full file path
+$iniFile = realpath(dirname(__FILE__) . "/../../../../configurations/batch.ini");
 
 $kdebuger = new KGenericDebuger($iniFile);
 $kdebuger->run('KAsyncDispatchEventNotification');

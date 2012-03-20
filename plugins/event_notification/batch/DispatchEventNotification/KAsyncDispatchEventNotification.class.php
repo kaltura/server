@@ -31,7 +31,7 @@ class KAsyncDispatchEventNotification extends KJobHandlerWorker
 	
 	protected function dispatch(KalturaBatchJob $job, KalturaEventNotificationDispatchJobData $data)
 	{
-		KalturaLog::dispatch("parse($job->id)");
+		KalturaLog::debug("parse($job->id)");
 		
 		$this->updateJob($job, "Dispatch template [$data->templateId]", KalturaBatchJobStatus::QUEUED, 1);
 		

@@ -78,6 +78,9 @@ class EmailNotificationPlugin extends KalturaPlugin implements IKalturaPermissio
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
+		if($baseClass == 'KalturaEventNotificationDispatchJobData' && $enumValue == self::getEmailNotificationTemplateTypeCoreValue(EmailNotificationTemplateType::EMAIL))
+			return 'KalturaEmailNotificationDispatchJobData';
+	
 		if($baseClass == 'EventNotificationTemplate' && $enumValue == self::getEmailNotificationTemplateTypeCoreValue(EmailNotificationTemplateType::EMAIL))
 			return 'EmailNotificationTemplate';
 	
@@ -89,6 +92,9 @@ class EmailNotificationPlugin extends KalturaPlugin implements IKalturaPermissio
 	
 		if($baseClass == 'Kaltura_Client_EventNotification_Type_EventNotificationTemplate' && $enumValue == Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::EMAIL)
 			return 'Kaltura_Client_EmailNotification_Type_EmailNotificationTemplate';
+	
+		if($baseClass == 'KDispatchEventNotificationEngine' && $enumValue == KalturaEventNotificationTemplateType::EMAIL)
+			return 'KDispatchEmailNotificationEngine';
 			
 		return null;
 	}

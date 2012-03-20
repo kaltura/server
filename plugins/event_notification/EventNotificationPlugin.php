@@ -2,7 +2,7 @@
 /**
  * @package plugins.eventNotification
  */
-class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaEventConsumers, IKalturaServices, IKalturaMemoryCleaner, IKalturaAdminConsolePages, IKalturaConfigurator, IKalturaEnumerator
+class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaEventConsumers, IKalturaServices, IKalturaMemoryCleaner, IKalturaAdminConsolePages, IKalturaConfigurator, IKalturaEnumerator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'eventNotification';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -110,6 +110,28 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 		return array(
 			'eventNotificationTemplate' => 'EventNotificationTemplateService',
 		);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::loadObject()
+	 */
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{
+		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(EventNotificationBatchType::EVENT_NOTIFICATION_HANDLER) && isset($constructorArgs['coreJobSubType']))
+			return KalturaPluginManager::loadObject('KalturaEventNotificationDispatchJobData', $constructorArgs['coreJobSubType']);
+			
+		return null;
+	}
+		
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::getObjectClass()
+	 */
+	public static function getObjectClass($baseClass, $enumValue)
+	{
+		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(EventNotificationBatchType::EVENT_NOTIFICATION_HANDLER))
+			return 'KalturaEventNotificationDispatchJobData';
+			
+		return null;
 	}
 	
 	/**
