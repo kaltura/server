@@ -16,10 +16,10 @@ abstract class DocumentsServiceTestBase extends KalturaApiTestCase
 	public function testGet($entryId, $version = -1, KalturaDocumentEntry $reference)
 	{
 		$resultObject = $this->client->documents->get($entryId, $version);
-		if(method_exists($this, 'assertNotInstanceOf'))
-			$this->assertNotInstanceOf('KalturaDocumentEntry', $resultObject);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaDocumentEntry', $resultObject);
 		else
-			$this->assertNotType('KalturaDocumentEntry', get_class($resultObject));
+			$this->assertType('KalturaDocumentEntry', $resultObject);
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
 		$this->validateGet($resultObject);
 	}
@@ -43,10 +43,10 @@ abstract class DocumentsServiceTestBase extends KalturaApiTestCase
 	public function testUpdate($entryId, KalturaDocumentEntry $documentEntry, KalturaDocumentEntry $reference)
 	{
 		$resultObject = $this->client->documents->update($entryId, $documentEntry);
-		if(method_exists($this, 'assertNotInstanceOf'))
-			$this->assertNotInstanceOf('KalturaDocumentEntry', $resultObject);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaDocumentEntry', $resultObject);
 		else
-			$this->assertNotType('KalturaDocumentEntry', get_class($resultObject));
+			$this->assertType('KalturaDocumentEntry', $resultObject);
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
 		$this->validateUpdate($resultObject);
 	}
@@ -80,10 +80,10 @@ abstract class DocumentsServiceTestBase extends KalturaApiTestCase
 	public function testListAction(KalturaDocumentEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaDocumentListResponse $reference)
 	{
 		$resultObject = $this->client->documents->listAction($filter, $pager);
-		if(method_exists($this, 'assertNotInstanceOf'))
-			$this->assertNotInstanceOf('KalturaDocumentListResponse', $resultObject);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaDocumentListResponse', $resultObject);
 		else
-			$this->assertNotType('KalturaDocumentListResponse', get_class($resultObject));
+			$this->assertType('KalturaDocumentListResponse', $resultObject);
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
 		$this->validateListAction($resultObject);
 	}

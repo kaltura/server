@@ -18,10 +18,10 @@ abstract class MetadataServiceTestBase extends KalturaApiTestCase
 	public function testAdd($metadataProfileId, $objectType, $objectId, $xmlData, KalturaMetadata $reference)
 	{
 		$resultObject = $this->client->metadata->add($metadataProfileId, $objectType, $objectId, $xmlData);
-		if(method_exists($this, 'assertNotInstanceOf'))
-			$this->assertNotInstanceOf('KalturaMetadata', $resultObject);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaMetadata', $resultObject);
 		else
-			$this->assertNotType('KalturaMetadata', get_class($resultObject));
+			$this->assertType('KalturaMetadata', $resultObject);
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
 		$this->assertNotNull($resultObject->id);
 		$this->validateAdd($resultObject);
@@ -47,10 +47,10 @@ abstract class MetadataServiceTestBase extends KalturaApiTestCase
 	public function testGet($id, KalturaMetadata $reference)
 	{
 		$resultObject = $this->client->metadata->get($id);
-		if(method_exists($this, 'assertNotInstanceOf'))
-			$this->assertNotInstanceOf('KalturaMetadata', $resultObject);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaMetadata', $resultObject);
 		else
-			$this->assertNotType('KalturaMetadata', get_class($resultObject));
+			$this->assertType('KalturaMetadata', $resultObject);
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
 		$this->validateGet($resultObject);
 	}
@@ -75,10 +75,10 @@ abstract class MetadataServiceTestBase extends KalturaApiTestCase
 	public function testUpdate($id, $xmlData = "", $version = "", KalturaMetadata $reference)
 	{
 		$resultObject = $this->client->metadata->update($id, $xmlData, $version);
-		if(method_exists($this, 'assertNotInstanceOf'))
-			$this->assertNotInstanceOf('KalturaMetadata', $resultObject);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaMetadata', $resultObject);
 		else
-			$this->assertNotType('KalturaMetadata', get_class($resultObject));
+			$this->assertType('KalturaMetadata', $resultObject);
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
 		$this->validateUpdate($resultObject);
 	}
@@ -101,10 +101,10 @@ abstract class MetadataServiceTestBase extends KalturaApiTestCase
 	public function testListAction(KalturaMetadataFilter $filter = null, KalturaFilterPager $pager = null, KalturaMetadataListResponse $reference)
 	{
 		$resultObject = $this->client->metadata->listAction($filter, $pager);
-		if(method_exists($this, 'assertNotInstanceOf'))
-			$this->assertNotInstanceOf('KalturaMetadataListResponse', $resultObject);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaMetadataListResponse', $resultObject);
 		else
-			$this->assertNotType('KalturaMetadataListResponse', get_class($resultObject));
+			$this->assertType('KalturaMetadataListResponse', $resultObject);
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
 		$this->validateListAction($resultObject);
 	}
