@@ -10,7 +10,7 @@ class kStringValue extends kValue
 	/**
 	 * @param string $value
 	 */
-	public function __construct($value) 
+	public function __construct($value = null) 
 	{
 		$this->value = $value;
 	}

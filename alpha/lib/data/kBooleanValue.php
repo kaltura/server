@@ -8,6 +8,14 @@
 class kBooleanValue extends kValue
 {
 	/**
+	 * @param bool $value
+	 */
+	public function __construct($value = null) 
+	{
+		$this->value = $value;
+	}
+	
+	/**
 	 * @return bool $value
 	 */
 	public function getValue() 

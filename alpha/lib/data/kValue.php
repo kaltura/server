@@ -8,7 +8,7 @@
 abstract class kValue
 {
 	/**
-	 * @var int|string
+	 * @var int|string|bool
 	 */
 	protected $value;
 	

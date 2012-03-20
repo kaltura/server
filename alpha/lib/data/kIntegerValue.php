@@ -8,6 +8,14 @@
 class kIntegerValue extends kValue
 {
 	/**
+	 * @param int $value
+	 */
+	public function __construct($value = null) 
+	{
+		$this->value = $value;
+	}
+	
+	/**
 	 * @return int $value
 	 */
 	public function getValue() 
