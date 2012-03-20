@@ -3,6 +3,7 @@
  * @package api
  * @subpackage objects
  * @deprecated use KalturaRule instead
+ * @abstract
  */
 class KalturaBaseRestriction extends KalturaObject
 {
