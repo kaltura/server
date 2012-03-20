@@ -850,6 +850,13 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 //		return $this->generateH264paramsOriginal($transcoder);
 
 $h264Codec = new KDLCodecH264($this->_target->_video);
+		/*
+		 * Apple HLS assets should not have the 'global_header' set 
+		 * - it fails to get segmented
+		 */
+		if($this->_target->_container->_id==KDLContainerTarget::APPLEHTTP){
+			$h264Codec->_global_header=null;
+		}
 		switch($transcoder){
 		case KDLTranscoders::ON2:
 			return $this->generateH264paramsOriginal($transcoder);
