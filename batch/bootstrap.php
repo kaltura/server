@@ -13,6 +13,7 @@ define("KALTURA_BATCH_PATH", KALTURA_ROOT_PATH . "/batch");
 require_once(KALTURA_INFRA_PATH . "/KAutoloader.php");
 KAutoloader::setClassPath(array(
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "infra", "*"),
+	KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "PHPMailer", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"),
 	KAutoloader::buildPath(KALTURA_BATCH_PATH, "*"),
 ));
