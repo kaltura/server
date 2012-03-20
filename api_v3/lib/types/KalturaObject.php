@@ -98,12 +98,16 @@ class KalturaObject
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		$this->validateForUsage($object_to_fill, $props_to_skip); // will check that not useable properties are not set 
+		$class = get_class($this);
 		
 		// enables extension with default empty object
 		if(is_null($object_to_fill))
+		{
+			KalturaLog::err("No object supplied for type [$class]");
 			return null;
+		}
 			
-		$typeReflector = KalturaTypeReflectorCacher::get(get_class($this));
+		$typeReflector = KalturaTypeReflectorCacher::get($class);
 		
 		foreach ( $this->getMapBetweenObjects() as $this_prop => $object_prop )
 		{
@@ -119,7 +123,7 @@ class KalturaObject
 			$propertyInfo = $typeReflector->getProperty($this_prop);
 			if (!$propertyInfo)
 			{
-	            KalturaLog::alert("property [$this_prop] was not found on object class [" . get_class($this) . "]");
+	            KalturaLog::alert("property [$this_prop] was not found on object class [$class]");
 	            continue;
 			}
 			
@@ -150,7 +154,7 @@ class KalturaObject
 			if (is_callable($setter_callback))
 		 	    call_user_func_array( $setter_callback , array ($value ) );
 	 	    else 
-            	KalturaLog::alert("setter for property [$object_prop] was not found on object class [" . get_class($object_to_fill) . "] defined as property [$this_prop] on api class [" . get_class($this) . "]");
+            	KalturaLog::alert("setter for property [$object_prop] was not found on object class [" . get_class($object_to_fill) . "] defined as property [$this_prop] on api class [$class]");
 		}
 		return $object_to_fill;		
 	}
