@@ -1,6 +1,6 @@
 <?php
 
-class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectReadyForIndexEventConsumer
+class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectReadyForIndexEventConsumer, kObjectErasedEventConsumer
 {
 	const SPHINX_INDEX_NAME = 'kaltura';
 	const SPHINX_MAX_RECORDS = 1000;
@@ -105,7 +105,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	/* (non-PHPdoc)
 	 * @see kObjectReadyForIndexEventConsumer::shouldConsumeReadyForIndexEvent()
 	 */
-	public function shouldConsumeReadyForIndexEvent(BaseObject $object)
+    public function shouldConsumeReadyForIndexEvent(BaseObject $object)
 	{
 		if($object instanceof IIndexable)
 			return true;
@@ -341,4 +341,27 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 		return $this->execSphinx($sql, $object);
 	}
+    /* (non-PHPdoc)
+     * @see kObjectErasedEventConsumer::objectErased()
+     */
+    public function objectErased (BaseObject $object)
+    {
+        $this->deleteFromSphinx($object);
+        
+    }
+
+    /* (non-PHPdoc)
+     * @see kObjectErasedEventConsumer::shouldConsumeErasedEvent()
+     */
+    public function shouldConsumeErasedEvent (BaseObject $object)
+    {
+		if($object instanceof IIndexable)
+		{
+			return true;
+		}
+			
+		return false;
+        
+    }
+
 }
