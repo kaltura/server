@@ -27,10 +27,9 @@ class XsltTesterAction extends KalturaAdminConsolePlugin
 	{
         $entryId = $action->getRequest()->getParam('entry-id');
         $this->client = Infra_ClientHelper::getClient();
-        $adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($this->client);
         $action->getHelper('layout')->setLayout('layout_empty');
         $action->view->entryId = $entryId;
-        $action->view->xml = $adminConsolePlugin->entryAdmin->getMrssEntry($entryId);
+        $action->view->xml = $this->client->media->getMrss($entryId);
 	}
 }
 
