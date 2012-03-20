@@ -6,10 +6,57 @@
 <?php echo $this->form ?>
 <script type="text/javascript">
 
-// in case the form has file upload fields (YouTube for example), ajaxForm will use iframe to submit 
-// this form and the result data will be injected to an empty iframe without jquery, causing a js error.
+var newConditionIndex = 0;
+
+function newCondition() {
+	var currentIndex = newConditionIndex;
+	var newConditionTemplate = jQuery("#frmCondition");
+	var newConditionForm = newConditionTemplate.clone();
+	newConditionForm.attr("id", "frmCondition_" + currentIndex);
+	newConditionForm.find('[name="condition"]').attr('name', 'condition[' + currentIndex + ']');
+	newConditionForm.find('[name="removeConditionButton"]').click(function(){removeCondition(currentIndex);});
+	newConditionTemplate.after(newConditionForm);
+	newConditionForm.show();
+
+	newConditionIndex++;
+}
+
+function removeCondition(index){
+	jQuery("#frmCondition_" + index).remove();
+}
+
+var newContentParameterIndex = 0;
+
+function newContentParameter() {
+	var currentIndex = newContentParameterIndex;
+	var newContentParameterTemplate = jQuery("#frmContentParameter");
+	var newContentParameterForm = newContentParameterTemplate.clone();
+	newContentParameterForm.attr("id", "frmContentParameter_" + currentIndex);
+	newContentParameterForm.find('[name="contentParameterKey"]').attr('name', 'contentParameterKey[' + currentIndex + ']');
+	newContentParameterForm.find('[name="contentParameterValue"]').attr('name', 'contentParameterValue[' + currentIndex + ']');
+	newContentParameterForm.find('[name="removeContentParameterButton"]').click(function(){removeContentParameter(currentIndex);});
+	newContentParameterTemplate.after(newContentParameterForm);
+	newContentParameterForm.show();
+
+	newContentParameterIndex++;
+}
+
+function removeContentParameter(index){
+	jQuery("#frmContentParameter_" + index).remove();
+}
+
+function automaticEnabled(enabled) {
+	if(enabled)	{
+		jQuery('#frmAutomaticConfig').show();
+	}
+	else {
+		jQuery('#frmAutomaticConfig').hide();
+	}
+}
+
 if (typeof(jQuery) != 'undefined') {
 	jQuery(function() {
+		automaticEnabled(jQuery('#automatic_dispatch_enabled').attr('checked'));
 	});
 }
 

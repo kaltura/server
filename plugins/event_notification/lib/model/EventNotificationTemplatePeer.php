@@ -105,6 +105,7 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 	public static function retrieveByEventType($eventType, $objectType, $partnerId = null, PropelPDO $con = null)
 	{
 		$criteria = new Criteria ( EventNotificationTemplatePeer::DATABASE_NAME );
+		$criteria->add ( EventNotificationTemplatePeer::STATUS, EventNotificationTemplateStatus::ACTIVE );
 		$criteria->add ( EventNotificationTemplatePeer::EVENT_TYPE, $eventType );
 		$criteria->add ( EventNotificationTemplatePeer::OBJECT_TYPE, $objectType );
 		

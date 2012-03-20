@@ -36,7 +36,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 			}
 			
 			$type = $notificationTemplate->getType();
-			$jobData = $notificationTemplate->getJobData();
+			$jobData = $notificationTemplate->getJobData($event->getScope());
 			self::addEventNotificationDispatchJob($type, $jobData, null, $entryId, $parentJob);
 		}
 	}
@@ -61,7 +61,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		{
 			$batchJob = new BatchJob();
 			$batchJob->setEntryId($entryId);
-			$batchJob->setPartnerId($partnerId ? $partnerId : kCurrentContext::$ks_partner_id);
+			$batchJob->setPartnerId($partnerId ? $partnerId : kCurrentContext::$partner_id);
 		}
 		
 		KalturaLog::log("Creating event notification dispatch job on template id [" . $jobData->getTemplateId() . "] engine[$eventNotificationType]");
@@ -75,7 +75,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 * @param KalturaEvent $event
 	 * @return int
 	 */
-	public function getEventType(KalturaEvent $event) 
+	protected function getEventType(KalturaEvent $event) 
 	{
 		$matches = null;
 		if(!preg_match('/k(\w+)Event/', get_class($event), $matches))
@@ -83,9 +83,12 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 			
 		$typeName = $matches[1];
 		$constName = strtoupper(preg_replace('/(?!^)[[:upper:]]/','_\0', $typeName));
-		$type = constant("EventNotificationEventType::{$constName}");
-		if($type)
-			return $type;
+		if(defined("EventNotificationEventType::{$constName}"))
+		{
+			$type = constant("EventNotificationEventType::{$constName}");
+			if($type)
+				return $type;
+		}
 			
 		return DynamicEnumPeer::retrieveValueByEnumValueName('EventNotificationEventType', $constName);
 	}
@@ -95,7 +98,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 * @param KalturaEvent $event
 	 * @return int
 	 */
-	public function getEventObjectType(KalturaEvent $event) 
+	protected function getEventObjectType(KalturaEvent $event) 
 	{
 		if($event instanceof kBatchJobStatusEvent)
 			return EventNotificationEventObjectType::BATCHJOB;
@@ -104,12 +107,39 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 			return null;
 			
 		$object = $event->getObject();
-		$constName = get_class($object);
-		$type = constant("EventNotificationEventObjectType::{$constName}");
-		if($type)
-			return $type;
+		$constName = strtoupper(get_class($object));
+		if(defined("EventNotificationEventObjectType::{$constName}"))
+		{
+			$type = constant("EventNotificationEventObjectType::{$constName}");
+			if($type)
+				return $type;
+		}
 			
 		return DynamicEnumPeer::retrieveValueByEnumValueName('EventNotificationEventObjectType', $constName);
+	}
+
+	/**
+	 * @param EventNotificationTemplate $notificationTemplate
+	 * @param kEventScope $scope
+	 * @return boolean
+	 */
+	protected function notificationTemplatesConditionsFulfilled(EventNotificationTemplate $notificationTemplate, kEventScope $scope) 
+	{
+		$eventConditions = $notificationTemplate->getEventConditions();
+		if(!$eventConditions || !count($eventConditions))
+			return true;
+		
+		foreach($eventConditions as $eventCondition)
+		{
+			/* @var $eventCondition kEventCondition */
+			if(!$eventCondition->fulfilled($scope))
+			{
+				KalturaLog::debug("Template [" . $notificationTemplate->getId() . "] condition not fulfilled");
+				return false;
+			}
+		}
+		
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -119,44 +149,27 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	{
 		$this->notificationTemplates = array();
 		
+		$scope = $event->getScope();
+		if($scope->getPartnerId() <= 0)
+			return;
+			
 		$eventType = self::getEventType($event);
 		$eventObjectType = self::getEventObjectType($event);
 		
-		$partnerId = kCurrentContext::$ks_partner_id;
-		$notificationTemplates = EventNotificationTemplatePeer::retrieveByEventType($eventType, $eventObjectType, $partnerId);
+		$notificationTemplates = EventNotificationTemplatePeer::retrieveByEventType($eventType, $eventObjectType, $scope->getPartnerId());
 		KalturaLog::debug("Found [" . count($notificationTemplates) . "] templates for event type [$eventType] and object type [$eventObjectType]");
 		
 		foreach($notificationTemplates as $notificationTemplate)
 		{
-			/* @var $notificationTemplates EventNotificationTemplate */
+			/* @var $notificationTemplate EventNotificationTemplate */
 			
 			if(!$notificationTemplate->getAutomaticDispatchEnabled())
 			{
 				KalturaLog::notice("Template [" . $notificationTemplate->getId() . "] is not automatic, remove its event type to improve performance");
 				continue;
 			}
-				
-			$eventConditions = $notificationTemplates->getEventConditions();
-			if(!$eventConditions)
-			{
-				$this->notificationTemplates[] = $notificationTemplate;
-				continue;
-			}
-				
-			$fulfilled = true;
-			foreach($eventConditions as $eventCondition)
-			{
-				// TODO - how to implement kEventCondition?
-				
-				/* @var $eventCondition kEventCondition */
-				if(!$eventCondition->fulfilled($event))
-				{
-					KalturaLog::debug("Template [" . $notificationTemplate->getId() . "] condition not fulfilled");
-					$fulfilled = false;
-					break;
-				}
-			}
-			if($fulfilled)
+			
+			if($this->notificationTemplatesConditionsFulfilled($notificationTemplate, $scope))
 				$this->notificationTemplates[] = $notificationTemplate;
 		}
 		

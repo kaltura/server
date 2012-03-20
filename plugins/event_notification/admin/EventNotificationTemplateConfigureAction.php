@@ -35,6 +35,7 @@ class EventNotificationTemplateConfigureAction extends KalturaAdminConsolePlugin
 		
 		$action->view->errMessage = null;
 		$action->view->form = '';
+		$form = null;
 		
 		try
 		{
@@ -55,7 +56,7 @@ class EventNotificationTemplateConfigureAction extends KalturaAdminConsolePlugin
 			$templateClass = KalturaPluginManager::getObjectClass('Kaltura_Client_EventNotification_Type_EventNotificationTemplate', $type);
 			KalturaLog::debug("template class [$templateClass]");
 			
-			if(!$form)
+			if(!$form || !($form instanceof Form_EventNotificationTemplateConfiguration))
 			{
 				$action->view->errMessage = "Template form not found for type [$type]";
 				return;
@@ -84,6 +85,7 @@ class EventNotificationTemplateConfigureAction extends KalturaAdminConsolePlugin
 						$form->populate($request->getPost());
 						$eventNotificationTemplate = $form->getObject($templateClass, $request->getPost());
 					}
+					$form->finit();
 				}
 				else
 				{
@@ -111,6 +113,7 @@ class EventNotificationTemplateConfigureAction extends KalturaAdminConsolePlugin
 					$form->populate($request->getPost());
 					$eventNotificationTemplate = $form->getObject($templateClass, $request->getPost());
 				}
+				$form->finit();
 			}
 		}
 		catch(Exception $e)
@@ -118,8 +121,11 @@ class EventNotificationTemplateConfigureAction extends KalturaAdminConsolePlugin
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
 			$action->view->errMessage = $e->getMessage();
 			
-			$form->populate($request->getPost());
-			$eventNotificationTemplate = $form->getObject($templateClass, $request->getPost());
+			if($form)
+			{
+				$form->populate($request->getPost());
+				$eventNotificationTemplate = $form->getObject($templateClass, $request->getPost());
+			}
 		}
 		$action->view->form = $form;
 	}

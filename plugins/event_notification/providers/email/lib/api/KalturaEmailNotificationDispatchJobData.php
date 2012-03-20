@@ -30,12 +30,26 @@ class KalturaEmailNotificationDispatchJobData extends KalturaEventNotificationDi
 	 */
 	public $toName;
 	
+	/**
+	 * Define the email priority
+	 * @var KalturaEmailNotificationTemplatePriority
+	 */
+	public $priority;
+	
+	/**
+	 * Define the content dynamic parameters
+	 * @var KalturaKeyValueArray
+	 */
+	public $contentParameters;
+	
 	private static $map_between_objects = array
 	(
 		'fromEmail',
 		'fromName',
 		'toEmail',
 		'toName',
+		'priority',
+		'contentParameters',
 	);
 
 	public function getMapBetweenObjects ( )

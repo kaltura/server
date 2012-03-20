@@ -21,9 +21,10 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate
 
 	/**
 	 * Returns job data for dispatching the event notification
+	 * @param kScope $scope
 	 * @return kEventNotificationDispatchJobData
 	 */
-	abstract public function getJobData(); 
+	abstract public function getJobData(kScope $scope = null); 
 
 	public function getEventConditions()									{return $this->getFromCustomData(self::CUSTOM_DATA_EVENT_CONDITIONS);}
 	public function getManualDispatchEnabled()								{return $this->getFromCustomData(self::CUSTOM_DATA_MANUAL_DISPATCH_ENABLED);}

@@ -30,6 +30,18 @@ class kEmailNotificationDispatchJobData extends kEventNotificationDispatchJobDat
 	private $toName;
 	
 	/**
+	 * Define the email priority of enum EmailNotificationTemplatePriority
+	 * @var int
+	 */
+	private $priority;
+	
+	/**
+	 * Define the content dynamic parameters
+	 * @var array<key,value>
+	 */
+	private $contentParameters;
+	
+	/**
 	 * @return the $fromEmail
 	 */
 	public function getFromEmail() 
@@ -91,5 +103,37 @@ class kEmailNotificationDispatchJobData extends kEventNotificationDispatchJobDat
 	public function setToName($toName)  
 	{
 		$this->toName = $toName;
+	}
+	
+	/**
+	 * @return int $priority of enum EmailNotificationTemplatePriority
+	 */
+	public function getPriority()
+	{
+		return $this->priority;
+	}
+
+	/**
+	 * @return array<key,value> $contentParameters
+	 */
+	public function getContentParameters()
+	{
+		return $this->contentParameters;
+	}
+
+	/**
+	 * @param int $priority of enum EmailNotificationTemplatePriority
+	 */
+	public function setPriority($priority)
+	{
+		$this->priority = $priority;
+	}
+
+	/**
+	 * @param array<key,value> $contentParameters
+	 */
+	public function setContentParameters(array $contentParameters)
+	{
+		$this->contentParameters = $contentParameters;
 	}
 }

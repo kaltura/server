@@ -48,6 +48,18 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	public $toName;
 	
 	/**
+	 * Define the email priority
+	 * @var KalturaEmailNotificationTemplatePriority
+	 */
+	public $priority;
+	
+	/**
+	 * Define the content dynamic parameters
+	 * @var KalturaEventNotificationParameterArray
+	 */
+	public $contentParameters;
+	
+	/**
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
 	private static $map_between_objects = array(
@@ -58,6 +70,8 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 		'fromName',
 		'toEmail',
 		'toName',
+		'priority',
+		'contentParameters',
 	);
 		 
 	public function __construct()

@@ -15,6 +15,8 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	const CUSTOM_DATA_FROM_NAME = 'fromName';
 	const CUSTOM_DATA_TO_EMAIL = 'toEmail';
 	const CUSTOM_DATA_TO_NAME = 'toName';
+	const CUSTOM_DATA_PRIORITY = 'priority';
+	const CUSTOM_DATA_CONTENT_PARAMETERS = 'contentParameters';
 	const CUSTOM_DATA_BODY_FILE_VERSION = 'bodyFileVersion';
 	
 	const FILE_SYNC_BODY = 1;
@@ -28,7 +30,7 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	/* (non-PHPdoc)
 	 * @see EventNotificationTemplate::getJobData()
 	 */
-	public function getJobData()
+	public function getJobData(kScope $scope = null)
 	{
 		$jobData = new kEmailNotificationDispatchJobData();
 		$jobData->setTemplateId($this->getId());
@@ -36,6 +38,20 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 		$jobData->setFromName($this->getFromName());
 		$jobData->setToEmail($this->getToEmail());
 		$jobData->setToName($this->getToName());
+		$jobData->setPriority($this->getPriority());
+		
+		$contentParametersValues = array();
+		$contentParameters = $this->getContentParameters();
+		foreach($contentParameters as $contentParameter)
+		{
+			/* @var $contentParameter kEventNotificationParameter */
+			$value = $contentParameter->getValue();
+			if($scope && $value instanceof kStringField)
+				$value->setScope($scope);
+				
+			$contentParametersValues[$contentParameter->getKey()] = $value->getValue();
+		}
+		$jobData->setContentParameters($contentParametersValues);
 		
 		return $jobData;
 	}
@@ -224,6 +240,8 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	public function getFromName()								{return $this->getFromCustomData(self::CUSTOM_DATA_FROM_NAME);}
 	public function getToEmail()								{return $this->getFromCustomData(self::CUSTOM_DATA_TO_EMAIL);}
 	public function getToName()									{return $this->getFromCustomData(self::CUSTOM_DATA_TO_NAME);}
+	public function getPriority()								{return $this->getFromCustomData(self::CUSTOM_DATA_PRIORITY);}
+	public function getContentParameters()						{return $this->getFromCustomData(self::CUSTOM_DATA_CONTENT_PARAMETERS, null, array());}
 
 	public function incrementBodyFileVersion()					{return $this->incInCustomData(self::CUSTOM_DATA_BODY_FILE_VERSION);}
 	public function resetBodyFileVersion()						{return $this->putInCustomData(self::CUSTOM_DATA_BODY_FILE_VERSION, 1);}
@@ -233,4 +251,6 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	public function setFromName($v)								{return $this->putInCustomData(self::CUSTOM_DATA_FROM_NAME, $v);}
 	public function setToEmail($v)								{return $this->putInCustomData(self::CUSTOM_DATA_TO_EMAIL, $v);}
 	public function setToName($v)								{return $this->putInCustomData(self::CUSTOM_DATA_TO_NAME, $v);}
+	public function setPriority($v)								{return $this->putInCustomData(self::CUSTOM_DATA_PRIORITY, $v);}
+	public function setContentParameters(array $v)				{return $this->putInCustomData(self::CUSTOM_DATA_CONTENT_PARAMETERS, $v);}
 }
