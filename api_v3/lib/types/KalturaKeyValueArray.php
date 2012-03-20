@@ -7,6 +7,11 @@
  */
 class KalturaKeyValueArray extends KalturaTypedArray
 {
+	public static function fromDbArray(array $pairs = null)
+	{
+		return self::fromKeyValueArray($pairs);
+	}
+	
 	public static function fromKeyValueArray(array $pairs = null)
 	{
 		$pairsArray = new KalturaKeyValueArray();
