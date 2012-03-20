@@ -459,7 +459,7 @@ class myReportsMgr
 			if ($input_filter->keywords)
 			{
 				if($input_filter->search_in_tags)
-					$entryFilter->set("_matchor_search_text", $input_filter->keywords);
+					$entryFilter->set("_free_text", $input_filter->keywords);
 				else
 					$entryFilter->set("_like_admin_tags", $input_filter->keywords);
 				
@@ -476,6 +476,9 @@ class myReportsMgr
 				$c->applyFilters();
 				
 				$entryIdsFromDB = $c->getFetchedIds();
+				
+				if (!count($entryIdsFromDB))
+					$entryIdsFromDB[] = entry::ENTRY_ID_THAT_DOES_NOT_EXIST;
 			}
 						
 			$obj_ids_clause = null;
