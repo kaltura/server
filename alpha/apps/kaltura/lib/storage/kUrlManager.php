@@ -45,6 +45,11 @@ class kUrlManager
 	 */
 	protected $storageProfileId = null;
 	
+	/**
+	 * @var string
+	 */
+	protected $playbackContext = null;
+	
 	
 	/**
 	 * @param string $cdnHost
@@ -319,5 +324,25 @@ class kUrlManager
 
 		return false;
 	}
+	
+	
+	/**
+     * @return the $playbackContext
+     */
+    public function getPlaybackContext ()
+    {
+        return $this->playbackContext;
+    }
+
+	/**
+     * @param string $playbackContext
+     */
+    public function setPlaybackContext ($playbackContext)
+    {
+        $this->playbackContext = $playbackContext;
+    }
+
+	
+	
 
 }

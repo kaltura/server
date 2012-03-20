@@ -61,6 +61,12 @@ class playManifestAction extends kalturaAction
 	 */
 	private $deliveryCode = null;
 	
+	/**
+	 * @var string
+	 */
+	private $playbackContext = null;
+		
+	
 	const PLAY_STREAM_TYPE_LIVE = 'live';
 	const PLAY_STREAM_TYPE_RECORDED = 'recorded';
 	const PLAY_STREAM_TYPE_ANY = 'any';
@@ -275,6 +281,7 @@ class playManifestAction extends kalturaAction
 			$urlManager->setClipTo($this->clipTo);
 			$urlManager->setSeekFromTime($this->seekFrom);
 			$urlManager->setFileExtension($flavorAsset->getFileExt());
+			$urlManager->setPlaybackContext($this->playbackContext);
 			
 			$url = rtrim($storage->getDeliveryHttpBaseUrl(), "/");
 			$url .= "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
@@ -293,6 +300,7 @@ class playManifestAction extends kalturaAction
 		$kalturaUrlManager = kUrlManager::getUrlManagerByCdn($iisHost);
 		$kalturaUrlManager->setClipTo($this->clipTo);
 		$kalturaUrlManager->setProtocol(StorageProfile::PLAY_FORMAT_SILVER_LIGHT);
+		$kalturaUrlManager->setPlaybackContext($this->playbackContext);
 		
 		$partner = $this->entry->getPartner();
 		if(!$partner->getStorageServePriority() || $partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
@@ -313,6 +321,7 @@ class playManifestAction extends kalturaAction
 		$externalUrlManager = kUrlManager::getUrlManagerByStorageProfile($externalFileSync->getDc());
 		$externalUrlManager->setClipTo($this->clipTo);
 		$externalUrlManager->setProtocol(StorageProfile::PLAY_FORMAT_SILVER_LIGHT);
+		$externalUrlManager->setPlaybackContext($this->playbackContext);
 		
 		if($partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST)
 		{
@@ -353,6 +362,7 @@ class playManifestAction extends kalturaAction
 		$urlManager->setSeekFromTime($this->seekFrom);
 		$urlManager->setDomain($this->cdnHost);
 		$urlManager->setProtocol($this->format);
+		$urlManager->setPlaybackContext($this->playbackContext);
 
 	    $url = $urlManager->getFlavorAssetUrl($flavorAsset);
 	    		
@@ -574,6 +584,8 @@ class playManifestAction extends kalturaAction
 						$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc());
 						$urlManager->setClipTo($this->clipTo);
 						$urlManager->setContainerFormat($flavorAsset->getContainerFormat());
+						$urlManager->setPlaybackContext($this->playbackContext);
+						
 						if($flavorAsset->getFileExt() === null) // if the extension is missig use the one from the actual path
         					$urlManager->setFileExtension(pathinfo($fileSync->getFilePath(), PATHINFO_EXTENSION));
         				else
@@ -610,7 +622,8 @@ class playManifestAction extends kalturaAction
 				
 					$rtmpHost = parse_url($baseUrl, PHP_URL_HOST);
 
-					$urlManager = kUrlManager::getUrlManagerByCdn($rtmpHost);						
+					$urlManager = kUrlManager::getUrlManagerByCdn($rtmpHost);
+					$urlManager->setPlaybackContext($this->playbackContext);						
 		
 					// get all flavors with kaltura urls
 					foreach($flavorAssets as $flavorAsset)
@@ -824,6 +837,7 @@ class playManifestAction extends kalturaAction
 		$this->storageId = $this->getRequestParameter ( "storageId", null );
 		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
 		$this->deliveryCode = $this->getRequestParameter( "deliveryCode", null );
+		$this->playbackContext = $this->getRequestParameter( "playbackContext", null );
 		
 		$flavorIdsStr = $this->getRequestParameter ( "flavorIds", null );
 		if ($flavorIdsStr)
