@@ -1,12 +1,12 @@
 
 [config]
 source                                            = ini
-serviceUrl                                        = kaltura.trunk
-partnerId                                         = 101
+serviceUrl                                        = prod.kaltura.co.cc
+partnerId                                         = 1141
 clientTag                                         = unitTest
 curlTimeout                                       = 120
 startSession                                      = 1
-secret                                            = 815d617b032593a8519c4dcc5f61b25f
+secret                                            = fdde8519bef9be31bc9e33945f361963
 userId                                            = 
 sessionType                                       = 2
 expiry                                            = 86400
@@ -784,6 +784,45 @@ test2.contextDataResultReference.actions.item0.objectType = KalturaAccessControl
 test2.contextDataResultReference.actions.item0.type = 1
 
 
+
+
+
+
+
+
+test3.accessControlProfile.objectType                    = KalturaAccessControlProfile
+test3.accessControlProfile.name                          = test1
+test3.accessControlProfile.systemName                    = TEST1
+test3.accessControlProfile.description                   = Unit test access control profile
+test3.accessControlProfile.isDefault                     = 1
+test3.accessControlProfile.rules.objectType              = array
+test3.accessControlProfile.rules.item0.objectType        = KalturaRule
+test3.accessControlProfile.rules.item0.message           = message test 3
+test3.accessControlProfile.rules.item0.actions.objectType= array
+test3.accessControlProfile.rules.item0.actions.item0.objectType= KalturaAccessControlBlockAction
+test3.accessControlProfile.rules.item0.conditions.objectType= array
+test3.accessControlProfile.rules.item0.conditions.item0.objectType= KalturaUserAgentCondition
+test3.accessControlProfile.rules.item0.conditions.item0.values.objectType= array
+test3.accessControlProfile.rules.item0.conditions.item0.values.item0.objectType= KalturaStringValue
+test3.accessControlProfile.rules.item0.conditions.item0.values.item0.value= .*chrome.*
+test3.accessControlProfile.rules.item0.contexts.objectType = array
+test3.accessControlProfile.rules.item0.contexts.item0.objectType = KalturaAccessControlContextTypeHolder
+test3.accessControlProfile.rules.item0.contexts.item0.type = 1
+
+test3.contextDataParams.objectType                = KalturaEntryContextDataParams
+test3.contextDataParams.userAgent                 = aaa chrome sdfsdf
+
+test3.contextDataResultReference.objectType       = KalturaEntryContextDataResult
+test3.contextDataResultReference.isScheduledNow   = 1
+test3.contextDataResultReference.isAdmin          = 
+test3.contextDataResultReference.streamerType     = http
+test3.contextDataResultReference.mediaProtocol    = http
+test3.contextDataResultReference.accessControlMessages.objectType = array
+test3.contextDataResultReference.accessControlMessages.item0.objectType = KalturaString
+test3.contextDataResultReference.accessControlMessages.item0.value = message test 3
+test3.contextDataResultReference.actions.objectType = array
+test3.contextDataResultReference.actions.item0.objectType = KalturaAccessControlBlockAction
+test3.contextDataResultReference.actions.item0.type = 1
 
 
 
