@@ -346,10 +346,25 @@ class myEntryUtils
 	// 2. set data to be the "deleted_entry" depending on the media_type of the entry - point to the partner's template if exists
 	// 3. add the entry to the delete_entry table to be handled in a batch way
 	// 4. move the file so none of it's versions can be accessed via the web (there is usually only one version for a media_clip)
-	public static function deleteEntry ( entry $entry , $partner_id = null )
+	public static function deleteEntry ( entry $entry , $partner_id = null , $onlyIfAllJobsDone = false)
 	{
 		if ( $entry->getStatus() == entryStatus::DELETED || $entry->getStatus() == entryStatus::BLOCKED  )
 			return ; // don't do this twice !
+			
+		 if ($onlyIfAllJobsDone) {
+			KalturaLog::DEBUG("onlyIfAllJobsDone = ". (int)$onlyIfAllJobsDone);
+			$dbEntryBatchJobs = BatchJobPeer::retrieveByEntryId($entry->getId());
+			foreach($dbEntryBatchJobs as $job) {
+				/* @var $job BatchJob */
+				if (in_array($job->getStatus(), BatchJobPeer::getUnClosedStatusList()))	{
+					KalturaLog::DEBUG("Entry [". $entry->getId() ."] still has an unhandled batchjob [". $job->getId()."] with status [". $job->getStatus()."] - aborting deletion process.");
+					//mark entry for later deletion
+					$entry->setMarkedForDeletion(true);
+					$entry->save();
+					return;
+				}
+			}
+		}
 
 		KalturaLog::log("myEntryUtils::delete Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
 		
