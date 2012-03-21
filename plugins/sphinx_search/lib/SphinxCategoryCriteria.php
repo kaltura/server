@@ -271,7 +271,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		return in_array($fieldName, $categoryFields);
 	}
 	
-	protected function getTranslateIndexId($id)
+	public function getTranslateIndexId($id)
 	{
 		return $id;
 	}

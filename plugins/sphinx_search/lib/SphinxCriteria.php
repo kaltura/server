@@ -685,8 +685,8 @@ abstract class SphinxCriteria extends KalturaCriteria
 		
 	}
 	
-	protected function getTranslateIndexId($id)
+	public function getTranslateIndexId($id)
 	{
-		return sprintf('%u', crc32($id));;
+		return sprintf('%u', crc32($id));
 	}
 }

@@ -203,12 +203,10 @@ class SphinxCriterion extends KalturaCriterion
 				$value = explode(',', $value);
 				
 			$ids = array();
-			if(IIndexable::FIELD_TYPE_STRING == $this->criteria->getTranslateIndexId())
-			{
-				foreach($value as $val)
-					$ids[$val] = $this->criteria->getTranslateIndexId($val);
-			}
-				
+			
+			foreach($value as $val)
+				$ids[$val] = $this->criteria->getTranslateIndexId($val);
+
 			$value = $ids;
 			$this->criteria->setIds($comparison, $ids);
 		}
