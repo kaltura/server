@@ -20,7 +20,7 @@ class kConf
 		$configDir = realpath(dirname(__file__) . '/../configurations');
 		
 		self::$map = array();
-		if(function_exists('apc_fetch'))
+		if(function_exists('apc_exists') && apc_exists(self::APC_CACHE_MAP))
 		{
 			// existence of base.reload file means that the kConf should be reloaded from the file
 			if(file_exists("$configDir/base.reload"))
