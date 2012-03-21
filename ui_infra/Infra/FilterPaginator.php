@@ -85,6 +85,7 @@ class Infra_FilterPaginator implements Zend_Paginator_Adapter_Interface
 		}
 		catch(Kaltura_Client_Exception $e){
 			KalturaLog::err($e->getMessage());
+			return array();
 		}
 		$this->totalCount = $response->totalCount;
 		
