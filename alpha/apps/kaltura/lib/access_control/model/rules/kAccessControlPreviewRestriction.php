@@ -43,7 +43,10 @@ class kAccessControlPreviewRestriction extends kAccessControlRestriction
 	{
 		$fulfilled = parent::applyContext($context);
 		if($fulfilled)
-			$context->setPreviewLength($this->getAction()->getLimit());
+			$context->setIsSessionRestricted(true);
+			
+		// this is not a mistake, although it may looked like one, it should be set even in the condition is not fulfilled.
+		$context->setPreviewLength($this->getAction()->getLimit());
 			
 		return $fulfilled;
 	}

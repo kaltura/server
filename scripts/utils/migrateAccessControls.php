@@ -6,7 +6,9 @@ if($argc > 1)
 	$limit = $argv[1];
 	
 $criteria = new Criteria();
-$criteria->add(accessControlPeer::RULES, null, Criteria::ISNULL);
+if($argc < 3 || intval($argv[2]))
+	$criteria->add(accessControlPeer::RULES, null, Criteria::ISNULL);
+	
 $criteria->addAscendingOrderByColumn(accessControlPeer::ID);
 $criteria->setLimit($limit);
 
@@ -18,7 +20,7 @@ while(count($accessControls))
 	foreach($accessControls as $accessControl)
 	{
 		/* @var $accessControl accessControl */
-		$accessControl->setRulesArray($accessControl->getRulesArray());
+		$accessControl->setRulesArray($accessControl->getRulesArray(true));
 		$accessControl->save();
 		
 		$lastId = $accessControl->getId();
