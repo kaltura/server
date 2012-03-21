@@ -203,8 +203,16 @@ class SphinxCriterion extends KalturaCriterion
 				$value = explode(',', $value);
 				
 			$ids = array();
-			foreach($value as $val)
-				$ids[$val] = sprintf('%u', crc32($val));
+			if(IIndexable::FIELD_TYPE_STRING == $this->criteria->getIdFieldType())
+			{
+				foreach($value as $val)
+					$ids[$val] = sprintf('%u', crc32($val));
+			}
+			else
+			{
+				foreach($value as $val)
+					$ids[$val] = $val;
+			}
 				
 			$value = $ids;
 			$this->criteria->setIds($comparison, $ids);

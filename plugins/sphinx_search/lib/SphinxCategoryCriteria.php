@@ -270,4 +270,9 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		
 		return in_array($fieldName, $categoryFields);
 	}
+	
+	protected function getIdFieldType()
+	{
+		return IIndexable::FIELD_TYPE_INTEGER;
+	}
 }

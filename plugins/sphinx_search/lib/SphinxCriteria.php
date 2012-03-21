@@ -684,4 +684,9 @@ abstract class SphinxCriteria extends KalturaCriteria
 		return $this->recordsCount;
 		
 	}
+	
+	protected function getIdFieldType()
+	{
+		return IIndexable::FIELD_TYPE_STRING;
+	}
 }
