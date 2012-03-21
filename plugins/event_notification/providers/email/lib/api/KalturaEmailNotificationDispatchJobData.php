@@ -105,4 +105,20 @@ class KalturaEmailNotificationDispatchJobData extends KalturaEventNotificationDi
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
+	public function fromObject($dbObject)
+	{
+		/* @var $dbObject kEmailNotificationDispatchJobData */
+		parent::fromObject($dbObject);
+		
+		$this->to = KalturaKeyValueArray::fromKeyValueArray($dbObject->getTo());
+		$this->cc = KalturaKeyValueArray::fromKeyValueArray($dbObject->getCc());
+		$this->bcc = KalturaKeyValueArray::fromKeyValueArray($dbObject->getBcc());
+		$this->replyTo = KalturaKeyValueArray::fromKeyValueArray($dbObject->getReplyTo());
+		$this->customHeaders = KalturaKeyValueArray::fromKeyValueArray($dbObject->getCustomHeaders());
+		$this->contentParameters = KalturaKeyValueArray::fromKeyValueArray($dbObject->getContentParameters());
+	}
 }
