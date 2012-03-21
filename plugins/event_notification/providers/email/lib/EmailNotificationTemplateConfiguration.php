@@ -17,6 +17,25 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		if($object instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationTemplate)
 		{
 			KalturaLog::debug("Search properties [" . print_r($properties, true) . "]");
+
+			if(isset($properties['to_email']) && strlen(trim($properties['to_email'])))
+			{
+				$email = new Kaltura_Client_Type_StringValue();
+				$email->value = $properties['to_email'];
+				
+				$name = null;
+				if(isset($properties['to_name']) && strlen(trim($properties['to_name'])))
+				{
+					$name = new Kaltura_Client_Type_StringValue();
+					$name->value = $properties['to_name'];
+				}
+				
+				$recipient = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
+				$recipient->email = $email; 
+				$recipient->name = $name; 
+				
+				$object->to = array($recipient);
+			}
 			
 			$contentParameters = $object->contentParameters;
 			if(!$contentParameters || !is_array($contentParameters))
@@ -31,7 +50,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 					$field = new Kaltura_Client_Type_EvalStringField();
 					$field->code = $properties["contentParameterValue_{$index}"];
 					
-					$contentParameter = new Kaltura_Client_EmailNotification_Type_EventNotificationParameter();
+					$contentParameter = new Kaltura_Client_EmailNotification_Type_EmailNotificationParameter();
 					$contentParameter->key = $value;
 					$contentParameter->value = $field;
 					
@@ -46,7 +65,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 					$field = new Kaltura_Client_Type_EvalStringField();
 					$field->code = $properties['contentParameterValue'][$index];
 					
-					$contentParameter = new Kaltura_Client_EmailNotification_Type_EventNotificationParameter();
+					$contentParameter = new Kaltura_Client_EmailNotification_Type_EmailNotificationParameter();
 					$contentParameter->key = $value;
 					$contentParameter->value = $field;
 					
@@ -74,6 +93,18 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		
 		foreach($object->contentParameters as $parameter)
 			$this->addContentParameter($parameter);
+			
+		if(count($object->to) > 1)
+			$this->addError("Multiple recipients is not supported in admin console, saving the configuration will remove the existing recipients list.");
+			
+		if(count($object->to))
+		{
+			$to = reset($object->to);
+			/* @var $to KalturaEmailNotificationRecipient */
+			
+			$this->setDefault('to_email', $to->email->value);
+			$this->setDefault('to_name', $to->name->value);
+		}
 	}
 	
 	/* (non-PHPdoc)
@@ -109,13 +140,13 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		));
 		
 		$this->addElement('text', 'to_email', array(
-			'label'			=> 'Receipient e-mail:',
+			'label'			=> 'Recipient e-mail:',
 			'filters'		=> array('StringTrim'),
 			'validators'	=> array('EmailAddress'),
 		));
 		
 		$this->addElement('text', 'to_name', array(
-			'label'			=> 'Receipient name:',
+			'label'			=> 'Recipient name:',
 			'filters'		=> array('StringTrim'),
 		));
 		
@@ -158,9 +189,9 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 	}
 	
 	/**
-	 * @param Kaltura_Client_EmailNotification_Type_EventNotificationParameter $parameter
+	 * @param Kaltura_Client_EmailNotification_Type_EmailNotificationParameter $parameter
 	 */
-	protected function addContentParameter(Kaltura_Client_EmailNotification_Type_EventNotificationParameter $parameter)
+	protected function addContentParameter(Kaltura_Client_EmailNotification_Type_EmailNotificationParameter $parameter)
 	{
 		if($parameter->value instanceof Kaltura_Client_Type_EvalStringField)
 		{

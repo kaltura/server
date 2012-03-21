@@ -3,7 +3,7 @@
  * @package plugins.emailNotification
  * @subpackage model.data
  */
-class kEventNotificationParameter
+class kEmailNotificationParameter
 {
 	/**
 	 * The key to be replaced in the content

@@ -19,22 +19,65 @@ class KalturaEmailNotificationDispatchJobData extends KalturaEventNotificationDi
 	public $fromName;
 	
 	/**
-	 * Define the email receipient email
-	 * @var string
+	 * Email recipient emails and names, key is mail address and value is the name
+	 * @var KalturaKeyValueArray
 	 */
-	public $toEmail;
+	public $to;
 	
 	/**
-	 * Define the email receipient name
-	 * @var string
+	 * Email cc emails and names, key is mail address and value is the name
+	 * @var KalturaKeyValueArray
 	 */
-	public $toName;
+	public $cc;
+	
+	/**
+	 * Email bcc emails and names, key is mail address and value is the name
+	 * @var KalturaKeyValueArray
+	 */
+	public $bcc;
+	
+	/**
+	 * Email addresses that a reading confirmation will be sent to
+	 * 
+	 * @var KalturaKeyValueArray
+	 */
+	public $replyTo;
 	
 	/**
 	 * Define the email priority
 	 * @var KalturaEmailNotificationTemplatePriority
 	 */
 	public $priority;
+	
+	/**
+	 * Email address that a reading confirmation will be sent
+	 * 
+	 * @var string
+	 */
+	public $confirmReadingTo;
+	
+	/**
+	 * Hostname to use in Message-Id and Received headers and as default HELO string. 
+	 * If empty, the value returned by SERVER_NAME is used or 'localhost.localdomain'.
+	 * 
+	 * @var string
+	 */
+	public $hostname;
+	
+	/**
+	 * Sets the message ID to be used in the Message-Id header.
+	 * If empty, a unique id will be generated.
+	 * 
+	 * @var string
+	 */
+	public $messageID;
+	
+	/**
+	 * Adds a e-mail custom header
+	 * 
+	 * @var KalturaKeyValueArray
+	 */
+	public $customHeaders;
 	
 	/**
 	 * Define the content dynamic parameters
@@ -46,9 +89,15 @@ class KalturaEmailNotificationDispatchJobData extends KalturaEventNotificationDi
 	(
 		'fromEmail',
 		'fromName',
-		'toEmail',
-		'toName',
+		'to',
+		'cc',
+		'bcc',
+		'replyTo',
 		'priority',
+		'confirmReadingTo',
+		'hostname',
+		'messageID',
+		'customHeaders',
 		'contentParameters',
 	);
 

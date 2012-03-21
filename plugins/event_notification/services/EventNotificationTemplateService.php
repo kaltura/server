@@ -275,12 +275,12 @@ class EventNotificationTemplateService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND, $id);
 			
 		if(!$dbEventNotificationTemplate->getManualDispatchEnabled())
-			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_DISPATH_DISABLED, $id);
+			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_DISPATCH_DISABLED, $id);
 		
 		$jobData = $data->toObject($dbEventNotificationTemplate->getJobData());
 		$job = kEventNotificationFlowManager::addEventNotificationDispatchJob($dbEventNotificationTemplate->getType(), $jobData);
 		if(!$job)
-			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_DISPATH_FAILED, $id);
+			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_DISPATCH_FAILED, $id);
 			
 		return $job->getId();
 	}

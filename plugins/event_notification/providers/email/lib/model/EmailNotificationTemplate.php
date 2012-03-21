@@ -13,9 +13,15 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	const CUSTOM_DATA_SUBJECT = 'subject';
 	const CUSTOM_DATA_FROM_EMAIL = 'fromEmail';
 	const CUSTOM_DATA_FROM_NAME = 'fromName';
-	const CUSTOM_DATA_TO_EMAIL = 'toEmail';
-	const CUSTOM_DATA_TO_NAME = 'toName';
+	const CUSTOM_DATA_TO = 'to';
+	const CUSTOM_DATA_CC = 'cc';
+	const CUSTOM_DATA_BCC = 'bcc';
+	const CUSTOM_DATA_REPLY_TO = 'replyTo';
 	const CUSTOM_DATA_PRIORITY = 'priority';
+	const CUSTOM_DATA_CONFIRM_READING_TO = 'confirmReadingTo';
+	const CUSTOM_DATA_HOSTNAME = 'hostname';
+	const CUSTOM_DATA_MESSAGE_ID = 'messageID';
+	const CUSTOM_DATA_CUSTOM_HEADERS = 'customHeaders';
 	const CUSTOM_DATA_CONTENT_PARAMETERS = 'contentParameters';
 	const CUSTOM_DATA_BODY_FILE_VERSION = 'bodyFileVersion';
 	
@@ -27,6 +33,34 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 		parent::__construct();
 	}
 
+	/**
+	 * @param array $recipients
+	 * @param kScope $scope
+	 * @return array 
+	 */
+	protected function getRecipientsArray(array $recipients = null, kScope $scope = null)
+	{
+		if(!$recipients)
+			return array();
+			
+		$recipientsArray = array();
+		foreach($recipients as $recipient)
+		{
+			/* @var $recipient kEmailNotificationRecipient */
+			$email = $recipient->getEmail();
+			if($scope && $email instanceof kStringField)
+				$email->setScope($scope);
+				
+			$name = $recipient->getName();
+			if($scope && $name instanceof kStringField)
+				$name->setScope($scope);
+
+			$theName = $name->getValue();
+			$recipientsArray[$email->getValue()] = is_null($theName) ? '' : $theName;
+		}
+		return $recipientsArray;
+	}
+
 	/* (non-PHPdoc)
 	 * @see EventNotificationTemplate::getJobData()
 	 */
@@ -36,15 +70,22 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 		$jobData->setTemplateId($this->getId());
 		$jobData->setFromEmail($this->getFromEmail());
 		$jobData->setFromName($this->getFromName());
-		$jobData->setToEmail($this->getToEmail());
-		$jobData->setToName($this->getToName());
 		$jobData->setPriority($this->getPriority());
+		$jobData->setConfirmReadingTo($this->getConfirmReadingTo());
+		$jobData->setHostname($this->getHostname());
+		$jobData->setMessageID($this->getMessageID());
+		$jobData->setCustomHeaders($this->getCustomHeaders());
+		
+		$jobData->setTo($this->getRecipientsArray($this->getTo(), $scope));
+		$jobData->setCc($this->getRecipientsArray($this->getCc(), $scope));
+		$jobData->setBcc($this->getRecipientsArray($this->getBcc(), $scope));
+		$jobData->setReplyTo($this->getRecipientsArray($this->getReplyTo(), $scope));
 		
 		$contentParametersValues = array();
 		$contentParameters = $this->getContentParameters();
 		foreach($contentParameters as $contentParameter)
 		{
-			/* @var $contentParameter kEventNotificationParameter */
+			/* @var $contentParameter kEmailNotificationParameter */
 			$value = $contentParameter->getValue();
 			if($scope && $value instanceof kStringField)
 				$value->setScope($scope);
@@ -174,7 +215,7 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	/**
 	 * @var string
 	 */
-	private $theBody = null;
+	private $cachedBody = null;
 	
 	/**
 	 * @var int
@@ -183,18 +224,18 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 
 	public function getBody()
 	{
-		if($this->theBody)
-			return $this->theBody;
+		if($this->cachedBody)
+			return $this->cachedBody;
 			
 		$key = $this->getSyncKey(self::FILE_SYNC_BODY);
-		$this->theBody = kFileSyncUtils::file_get_contents($key, true, false);
-		return $this->theBody;
+		$this->cachedBody = kFileSyncUtils::file_get_contents($key, true, false);
+		return $this->cachedBody;
 	}
 
 	public function setBody($body)
 	{
 		$this->getBody();
-		if($body != $this->theBody)
+		if($body != $this->cachedBody)
 			$this->setBody = $body;
 	}
 
@@ -224,7 +265,7 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 		{
 			$key = $this->getSyncKey(self::FILE_SYNC_BODY);
 			kFileSyncUtils::file_put_contents($key, $this->setBody);
-			$this->theBody = $this->setBody;
+			$this->cachedBody = $this->setBody;
 			$this->setBody = null;
 			
 			kEventsManager::raiseEvent(new kObjectDataChangedEvent($this, $this->bodyPreviousVersion));	
@@ -238,9 +279,15 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	public function getSubject()								{return $this->getFromCustomData(self::CUSTOM_DATA_SUBJECT);}
 	public function getFromEmail()								{return $this->getFromCustomData(self::CUSTOM_DATA_FROM_EMAIL);}
 	public function getFromName()								{return $this->getFromCustomData(self::CUSTOM_DATA_FROM_NAME);}
-	public function getToEmail()								{return $this->getFromCustomData(self::CUSTOM_DATA_TO_EMAIL);}
-	public function getToName()									{return $this->getFromCustomData(self::CUSTOM_DATA_TO_NAME);}
 	public function getPriority()								{return $this->getFromCustomData(self::CUSTOM_DATA_PRIORITY);}
+	public function getConfirmReadingTo()						{return $this->getFromCustomData(self::CUSTOM_DATA_CONFIRM_READING_TO);}
+	public function getHostname()								{return $this->getFromCustomData(self::CUSTOM_DATA_HOSTNAME);}
+	public function getMessageID()								{return $this->getFromCustomData(self::CUSTOM_DATA_MESSAGE_ID);}
+	public function getCustomHeaders()							{return $this->getFromCustomData(self::CUSTOM_DATA_CUSTOM_HEADERS, null, array());}
+	public function getTo()										{return $this->getFromCustomData(self::CUSTOM_DATA_TO);}
+	public function getCc()										{return $this->getFromCustomData(self::CUSTOM_DATA_CC);}
+	public function getBcc()									{return $this->getFromCustomData(self::CUSTOM_DATA_BCC);}
+	public function getReplyTo()								{return $this->getFromCustomData(self::CUSTOM_DATA_REPLY_TO);}
 	public function getContentParameters()						{return $this->getFromCustomData(self::CUSTOM_DATA_CONTENT_PARAMETERS, null, array());}
 
 	public function incrementBodyFileVersion()					{return $this->incInCustomData(self::CUSTOM_DATA_BODY_FILE_VERSION);}
@@ -249,8 +296,14 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	public function setSubject($v)								{return $this->putInCustomData(self::CUSTOM_DATA_SUBJECT, $v);}
 	public function setFromEmail($v)							{return $this->putInCustomData(self::CUSTOM_DATA_FROM_EMAIL, $v);}
 	public function setFromName($v)								{return $this->putInCustomData(self::CUSTOM_DATA_FROM_NAME, $v);}
-	public function setToEmail($v)								{return $this->putInCustomData(self::CUSTOM_DATA_TO_EMAIL, $v);}
-	public function setToName($v)								{return $this->putInCustomData(self::CUSTOM_DATA_TO_NAME, $v);}
 	public function setPriority($v)								{return $this->putInCustomData(self::CUSTOM_DATA_PRIORITY, $v);}
+	public function setConfirmReadingTo($v)						{return $this->putInCustomData(self::CUSTOM_DATA_CONFIRM_READING_TO, $v);}
+	public function setHostname($v)								{return $this->putInCustomData(self::CUSTOM_DATA_HOSTNAME, $v);}
+	public function setMessageID($v)							{return $this->putInCustomData(self::CUSTOM_DATA_MESSAGE_ID, $v);}
+	public function setCustomHeaders($v)						{return $this->putInCustomData(self::CUSTOM_DATA_CUSTOM_HEADERS, $v);}
+	public function setTo(array $v)								{return $this->putInCustomData(self::CUSTOM_DATA_TO, $v);}
+	public function setCc(array $v)								{return $this->putInCustomData(self::CUSTOM_DATA_CC, $v);}
+	public function setBcc(array $v)							{return $this->putInCustomData(self::CUSTOM_DATA_BCC, $v);}
+	public function setReplyTo(array $v)						{return $this->putInCustomData(self::CUSTOM_DATA_REPLY_TO, $v);}
 	public function setContentParameters(array $v)				{return $this->putInCustomData(self::CUSTOM_DATA_CONTENT_PARAMETERS, $v);}
 }

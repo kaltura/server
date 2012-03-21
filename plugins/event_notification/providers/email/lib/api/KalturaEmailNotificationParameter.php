@@ -3,7 +3,7 @@
  * @package plugins.emailNotification
  * @subpackage api.objects
  */
-class KalturaEventNotificationParameter extends KalturaObject
+class KalturaEmailNotificationParameter extends KalturaObject
 {
 	/**
 	 * The key in the subject and body to be replaced with the dynamic value
@@ -34,7 +34,7 @@ class KalturaEventNotificationParameter extends KalturaObject
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kEventNotificationParameter();
+			$dbObject = new kEmailNotificationParameter();
 			
 		return parent::toObject($dbObject, $skip);
 	}
@@ -51,6 +51,10 @@ class KalturaEventNotificationParameter extends KalturaObject
 		KalturaLog::debug("Loading KalturaStringValue from type [$valueType]");
 		switch ($valueType)
 		{
+			case 'kStringValue':
+				$this->value = new KalturaStringValue();
+				break;
+				
 			case 'kEvalStringField':
 				$this->value = new KalturaEvalStringField();
 				break;

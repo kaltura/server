@@ -3,17 +3,17 @@
  * @package plugins.emailNotification
  * @subpackage api.objects
  */
-class KalturaEventNotificationParameterArray extends KalturaTypedArray
+class KalturaEmailNotificationRecipientArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)
 	{
-		$newArr = new KalturaEventNotificationParameterArray();
+		$newArr = new KalturaEmailNotificationRecipientArray();
 		if ($arr == null)
 			return $newArr;
 
 		foreach ($arr as $obj)
 		{
-    		$nObj = new KalturaEventNotificationParameter();
+    		$nObj = new KalturaEmailNotificationRecipient();
 			$nObj->fromObject($obj);
 			$newArr[] = $nObj;
 		}
@@ -23,6 +23,6 @@ class KalturaEventNotificationParameterArray extends KalturaTypedArray
 		
 	public function __construct()
 	{
-		parent::__construct("KalturaEventNotificationParameter");	
+		parent::__construct("KalturaEmailNotificationRecipient");	
 	}
 }
