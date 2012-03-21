@@ -11,10 +11,12 @@ class EventNotificationTemplateService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		if (!EventNotificationPlugin::isAllowedPartner($this->getPartnerId()))
+		$partnerId = $this->getPartnerId();
+		if (!EventNotificationPlugin::isAllowedPartner($partnerId))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, "{$this->serviceName}->{$this->actionName}");
 			
-		myPartnerUtils::addPartnerToCriteria(new EventNotificationTemplatePeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		if($partnerId != Partner::ADMIN_CONSOLE_PARTNER_ID && $partnerId != Partner::BATCH_PARTNER_ID)
+			myPartnerUtils::addPartnerToCriteria(new EventNotificationTemplatePeer(), $partnerId, $this->private_partner_data, $this->partnerGroup());
 	}
 		
 	/**
