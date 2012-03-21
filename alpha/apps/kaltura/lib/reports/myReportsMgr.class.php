@@ -421,7 +421,7 @@ class myReportsMgr
 	//		return StubReports::STUBexecuteQueryByType ( $partner_id , $report_type , $report_flavor , $input_filter  ,		$page_size , $page_index , $order_by );
 			
 			// if the keywords or the categories are not empty - use the text version of the query
-			$add_search_text = ( $input_filter->keywords != "" || $input_filter->categories != "");
+			$add_search_text = false;
 			
 			if ( is_numeric( $report_type ))
 			{
@@ -452,7 +452,6 @@ class myReportsMgr
 			if ($input_filter->categories)
 			{
 				$entryFilter->set("_matchand_categories", $input_filter->categories);
-				$input_filter->categories = '';
 				$shouldSelectFromSearchEngine = true;
 			}
 			
@@ -463,7 +462,6 @@ class myReportsMgr
 				else
 					$entryFilter->set("_like_admin_tags", $input_filter->keywords);
 				
-				$input_filter->keywords = '';
 				$shouldSelectFromSearchEngine = true;
 			}
 			
@@ -476,6 +474,9 @@ class myReportsMgr
 				$c->applyFilters();
 				
 				$entryIdsFromDB = $c->getFetchedIds();
+				
+				if ($c->getRecordsCount() > count($entryIdsFromDB))
+					throw new kCoreException('Search is to general', kCoreException::SEARCH_TOO_GENERAL );
 				
 				if (!count($entryIdsFromDB))
 					$entryIdsFromDB[] = entry::ENTRY_ID_THAT_DOES_NOT_EXIST;
@@ -539,6 +540,9 @@ class myReportsMgr
 		{
 			KalturaLog::log( $ex->getMessage() );
 			// TODO - write proeper error
+			if ($ex->getCode() == kCoreException::SEARCH_TOO_GENERAL);
+				throw $ex;
+			
 			throw new Exception ( "Error while processing report for [$partner_id , $report_type , $report_flavor]" );
 		}
 	}
@@ -689,7 +693,7 @@ class myReportsMgr
 		$page_size , $page_index  , $order_by , $obj_ids_clause = null )
 	{
 		// TODO - format the search_text according to the the $input_filter
-		$search_text_match_clause = self::setSearchFieldsAndText ( $input_filter );
+		$search_text_match_clause = "1=1"; //self::setSearchFieldsAndText ( $input_filter );
 		
 		$categories_match_clause = self::setCategoriesMatchClause( $input_filter );
 		

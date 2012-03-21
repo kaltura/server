@@ -1,0 +1,84 @@
+[config]
+source                                            = ini
+serviceUrl                                        = www.kaltura.com
+serviceUrlStaging                                 = lbd.kaltura.com
+partnerId                                         = 682882
+clientTag                                         = unitTest
+curlTimeout                                       = 120
+startSession                                      = 1
+secret                                            = b867e80eee6e7b097c038ad1031790cf
+userId                                            = 
+sessionType                                       = 2
+expiry                                            = 86400
+privileges                                        = 
+
+[testGetTotal]
+test1.reportType                      			  = 1
+test1.reportInputFilter.objectType                = KalturaReportInputFilter
+test1.reportInputFilter.categories                = fairuse
+test1.reportInputFilter.searchInTags			  = true
+test1.reportInputFilter.searchInAdminTags		  = false
+test1.reportInputFilter.fromDate			  	  = 1329530400
+test1.reportInputFilter.toDate			  	      = 1332122400
+test1.reportInputFilter.timeZoneOffset  	      = -120
+test1.reportInputFilter.keywords				  = oprah
+
+test2.reportType                      			  = 1
+test2.reportInputFilter.objectType                = KalturaReportInputFilter
+test2.reportInputFilter.categories                = fairuse
+test2.reportInputFilter.searchInTags			  = true
+test2.reportInputFilter.searchInAdminTags		  = false
+test2.reportInputFilter.fromDate			  	  = 1329530400
+test2.reportInputFilter.toDate			  	      = 1332122400
+test2.reportInputFilter.timeZoneOffset  	      = -120
+
+
+[testGetTable]
+test1.reportType                      			  = 1
+test1.reportInputFilter.objectType                = KalturaReportInputFilter
+test1.reportInputFilter.categories                = fairuse
+test1.reportInputFilter.searchInTags			  = true
+test1.reportInputFilter.searchInAdminTags		  = false
+test1.reportInputFilter.fromDate			  	  = 1329530400
+test1.reportInputFilter.toDate			  	      = 1332122400
+test1.reportInputFilter.timeZoneOffset  	      = -120
+test1.reportInputFilter.keywords				  = oprah
+test1.pager.objectType							  = KalturaFilterPager
+test1.pager.pageSize							  = 50
+test1.pager.pageIndex							  = 1
+
+test2.reportType                      			  = 1
+test2.reportInputFilter.objectType                = KalturaReportInputFilter
+test2.reportInputFilter.categories                = fairuse
+test2.reportInputFilter.searchInTags			  = true
+test2.reportInputFilter.searchInAdminTags		  = false
+test2.reportInputFilter.fromDate			  	  = 1329530400
+test2.reportInputFilter.toDate			  	      = 1332122400
+test2.reportInputFilter.timeZoneOffset  	      = -120
+test2.pager.objectType							  = KalturaFilterPager
+test2.pager.pageSize							  = 50
+test2.pager.pageIndex							  = 1
+
+
+[testGetGraphs]
+test1.reportType                      			  = 1
+test1.reportInputFilter.objectType                = KalturaReportInputFilter
+test1.reportInputFilter.categories                = fairuse
+test1.reportInputFilter.searchInTags			  = true
+test1.reportInputFilter.searchInAdminTags		  = false
+test1.reportInputFilter.fromDate			  	  = 1329530400
+test1.reportInputFilter.toDate			  	      = 1332122400
+test1.reportInputFilter.timeZoneOffset  	      = -120
+test1.reportInputFilter.keywords				  = oprah
+
+test2.reportType                      			  = 1
+test2.reportInputFilter.objectType                = KalturaReportInputFilter
+test2.reportInputFilter.categories                = fairuse
+test2.reportInputFilter.searchInTags			  = true
+test2.reportInputFilter.searchInAdminTags		  = false
+test2.reportInputFilter.fromDate			  	  = 1329530400
+test2.reportInputFilter.toDate			  	      = 1332122400
+test2.reportInputFilter.timeZoneOffset  	      = -120
+test2.reportInputFilter.keywords				  = oprah
+
+

@@ -362,6 +362,8 @@ class KalturaErrors extends APIErrors
 	
 	const REPORT_PARAMETER_MISSING = "REPORT_PARAMETER_MISSING,Parameter \"%s\" is missing";
 	
+	const SEARCH_TOO_GENERAL = "SEARCH_TOO_GENERAL";
+	
 	/**
 	 * categoryUser service
 	 */

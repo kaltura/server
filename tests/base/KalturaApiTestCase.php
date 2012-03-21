@@ -9,6 +9,11 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 	protected $client;
 	
 	/**
+	 * @var KalturaClient
+	 */
+	protected $clientStaging;
+	
+	/**
 	 * 
 	 * Creates a new Kaltura API Test Case
 	 * @param unknown_type $name
@@ -28,6 +33,12 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 		if(!$testConfig->serviceUrl)
 		{
 			$testConfig->serviceUrl = '@SERVICE_URL@';
+			$needSave = true;
+		}
+		
+		if(!$testConfig->serviceUrlStaging)
+		{
+			$testConfig->serviceUrlStaging = '@SERVICE_URL_STAGING@';
 			$needSave = true;
 		}
 		
@@ -95,7 +106,17 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 		
 		if($testConfig->startSession)
 		{
-			$this->startSession($testConfig->sessionType, $testConfig->userId);
+			$this->startSession($this->client, $testConfig->sessionType, $testConfig->userId);
+		}
+		
+		$kalturaConfigurationStaging = $kalturaConfiguration;
+		$kalturaConfigurationStaging->serviceUrl = $testConfig->serviceUrlStaging;
+		
+		$this->clientStaging = new KalturaClient($kalturaConfigurationStaging);
+		
+		if($testConfig->startSession)
+		{
+			$this->startSession($this->clientStaging, $testConfig->sessionType, $testConfig->userId);
 		}
 	}
 	
@@ -273,10 +294,30 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 
 	/**
 	 * Starts a new session
+	 * @param KalturaClient $client
 	 * @param KalturaSessionType $type
 	 * @param string $userId
 	 */
-	protected function startSession($type, $userId = null)
+	protected function startSession($client, $type, $userId = null)
+	{
+		$testConfig = $this->config->get('config');
+		
+		//$ks = $this->client->session->start($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
+		$ks = $client->generateSession($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
+		if (!$ks)
+			return false;
+		
+		$client->setKs($ks);
+		KalturaLog::info("Session started [$ks]");
+		return true;
+	}
+	
+	/**
+	 * Starts a new session
+	 * @param KalturaSessionType $type
+	 * @param string $userId
+	 */
+	protected function startSessionWithDiffe($type, $userId = null)
 	{
 		$testConfig = $this->config->get('config');
 		
