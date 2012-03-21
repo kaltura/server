@@ -407,6 +407,7 @@ class playManifestAction extends kalturaAction
 						if($this->flavorId && ($flavorAsset = assetPeer::retrieveById($this->flavorId)) != null)
 						{
 							$url = $this->getFlavorHttpUrl($flavorAsset);
+							$url = str_replace(" ", "%20", $url); // todo encode url
 							header("location:$url");
 							die;
 						}
@@ -740,7 +741,10 @@ class playManifestAction extends kalturaAction
 		foreach($flavors as $flavor)
 		{
 			$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1000;
-			$content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$bitrate."\n";
+			$codecs = "";
+			if ($bitrate && $bitrate <= 64000) // todo: detect whether it is really an audio flavor
+        			$codecs = ',CODECS="mp4a.40.2"';
+			$content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$bitrate."$codecs\n";
 			$content .= $flavor['url']."\n";
 		}
 
@@ -852,16 +856,28 @@ class playManifestAction extends kalturaAction
 		
 		if (!$this->flavorId) // in case a flavorId wasnt specified checking for a flavorParamId 
 		{ 
-			$flavorParamId = $this->getRequestParameter ( "flavorParamId", null );
-			if ($flavorParamId || $flavorParamId === "0")
+			$flavorParamIds = $this->getRequestParameter ( "flavorParamIds", null );
+			if ($flavorParamIds !== null)
 			{
-				$flavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entry->getId(), $flavorParamId);
-				if(!$flavorAsset)
+			        $this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entry->getId(), explode(",", $flavorParamIds));
+			        if (!$this->flavorIds || count($this->flavorIds) == 0)
+			        {
+			                KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+			        }
+			}
+			else
+			{
+				$flavorParamId = $this->getRequestParameter ( "flavorParamId", null );
+				if ($flavorParamId || $flavorParamId === "0")
 				{
-					KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-				}
+					$flavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entry->getId(), $flavorParamId);
+					if(!$flavorAsset)
+					{
+						KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+					}
 				
-				$this->flavorId = $flavorAsset->getId();
+					$this->flavorId = $flavorAsset->getId();
+				}
 			}
 		}	
 		
@@ -961,7 +977,7 @@ class playManifestAction extends kalturaAction
 		
 		if($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
 		{
-			header("Content-Type: text/plain; charset=UTF-8");
+			header("Content-Type: application/x-mpegurl");
 		}
 		else
 		{
