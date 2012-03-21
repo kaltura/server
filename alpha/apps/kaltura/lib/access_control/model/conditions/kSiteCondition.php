@@ -5,6 +5,12 @@
  */
 class kSiteCondition extends kMatchCondition
 {
+	/**
+	 * Indicates that global whitelist domains already appended 
+	 * @var bool
+	 */
+	private $globalWhitelistDomainsAppended = false;
+	
 	/* (non-PHPdoc)
 	 * @see kCondition::__construct()
 	 */
@@ -61,15 +67,17 @@ class kSiteCondition extends kMatchCondition
 	}
 	
 	/* (non-PHPdoc)
-	 * @see kCondition::fulfilled()
+	 * @see kCondition::internalFulfilled()
 	 */
-	public function fulfilled(accessControl $accessControl)
+	public function internalFulfilled(accessControl $accessControl)
 	{
 		$scope = $accessControl->getScope();
 		$referrer = $scope->getReferrer();
 
-		if (strpos($referrer, "kwidget") === false && kConf::hasParam("global_whitelisted_domains"))
+		if (!$this->globalWhitelistDomainsAppended && strpos($referrer, "kwidget") === false && kConf::hasParam("global_whitelisted_domains"))
 		{
+			$this->globalWhitelistDomainsAppended = true;
+			
 			$globalWhitelistedDomains = kConf::get("global_whitelisted_domains");
 			if(!is_array($globalWhitelistedDomains))
 				$globalWhitelistedDomains = explode(',', $globalWhitelistedDomains);
@@ -78,7 +86,7 @@ class kSiteCondition extends kMatchCondition
 				$this->values[] = $globalWhitelistedDomain;
 		}
 		
-		return parent::fulfilled($accessControl);
+		return parent::internalFulfilled($accessControl);
 	}
 	
 	/* (non-PHPdoc)

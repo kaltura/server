@@ -25,7 +25,16 @@ abstract class kCondition
 	 * @param accessControl $accessControl
 	 * @return bool
 	 */
-	abstract public function fulfilled(accessControl $accessControl);
+	abstract protected function internalFulfilled(accessControl $accessControl);
+	
+	/**
+	 * @param accessControl $accessControl
+	 * @return bool
+	 */
+	final public function fulfilled(accessControl $accessControl)
+	{
+		return $this->calcNot($this->internalFulfilled($accessControl));
+	}
 	
 	/**
 	 * @return int ConditionType
@@ -64,7 +73,7 @@ abstract class kCondition
 	 * @param bool
 	 * @return bool
 	 */
-	protected function calcNot($value) 
+	private function calcNot($value) 
 	{
 		return $this->not ? !$value : $value;
 	}

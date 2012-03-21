@@ -68,35 +68,35 @@ abstract class kCompareCondition extends kCondition
 		switch($this->comparison)
 		{
 			case searchConditionComparison::GREATER_THAN:
-				return $this->calcNot($this->value > $field);
+				return ($field > $this->value);
 				
 			case searchConditionComparison::GREATER_THAN_OR_EQUEL:
-				return $this->calcNot($this->value >= $field);
+				return ($field >= $this->value);
 				
 			case searchConditionComparison::LESS_THAN:
-				return $this->calcNot($this->value < $field);
+				return ($field < $this->value);
 				
 			case searchConditionComparison::LESS_THAN_OR_EQUEL:
-				return $this->calcNot($this->value <= $field);
+				return ($field <= $this->value);
 				
 			case searchConditionComparison::EQUEL:
 			default:
-				return $this->calcNot($this->value == $field);
+				return ($field == $this->value);
 		}
 	}
 	
 	/* (non-PHPdoc)
-	 * @see kCondition::fulfilled()
+	 * @see kCondition::internalFulfilled()
 	 */
-	public function fulfilled(accessControl $accessControl)
+	public function internalFulfilled(accessControl $accessControl)
 	{
 		$field = $this->getFieldValue($accessControl);
 		
 		if (is_null($this->value))
-			return $this->calcNot(true);
+			return true;
 		
 		if (is_null($field))
-			return $this->calcNot(false);
+			return false;
 
 		if(is_array($field))
 		{

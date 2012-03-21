@@ -156,7 +156,7 @@ class accessControl extends BaseaccessControl
 		if ($scope->getKs() && ($scope->getKs() instanceof ks) && $scope->getKs()->isAdmin())
 			return true;
 		
-		$disableCache = true;
+		$disableCache = false;
 		
 		$rules = $this->getRulesArray();
 		foreach($rules as $rule)
@@ -164,27 +164,14 @@ class accessControl extends BaseaccessControl
 			/* @var $rule kRule */
 			$fulfilled = $rule->applyContext($context);
 				 
-			if(!$rule->shouldDisableCache())
-				$disableCache = false;
+			if($rule->shouldDisableCache())
+				$disableCache = true;
 				
 			if($fulfilled && $rule->getStopProcessing())
 				break;
 		}
 			
 		return $disableCache;
-	}
-	
-	/**
-	 * Validate all rules
-	 *
-	 * @param accessControlScope $scope
-	 * @return bool	
-	 */
-	public function isValid(accessControlScope $scope = null)
-	{
-		$context = new kEntryContextDataResult();
-		$this->applyContext($context, $scope);
-		return (count($context->getAccessControlActions()) == 0);
 	}
 	
 	/**

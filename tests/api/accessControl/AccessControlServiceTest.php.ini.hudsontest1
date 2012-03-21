@@ -1,12 +1,12 @@
 
 [config]
 source                                            = ini
-serviceUrl                                        = kaltura.trunk
-partnerId                                         = 101
+serviceUrl                                        = hudsontest1.kaltura.dev
+partnerId                                         = 115
 clientTag                                         = unitTest
 curlTimeout                                       = 120
 startSession                                      = 1
-secret                                            = 815d617b032593a8519c4dcc5f61b25f
+secret                                            = 81c8f9aa6bd5562a46ef15f188f9c605
 userId                                            = 
 sessionType                                       = 2
 expiry                                            = 86400

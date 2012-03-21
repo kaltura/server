@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.data
  * 
- * Old IP address restriction for backward compatibility
+ * Old user agent address restriction for backward compatibility
  */
 class kAccessControlUserAgentRestriction extends kAccessControlRestriction
 {
@@ -23,7 +23,7 @@ class kAccessControlUserAgentRestriction extends kAccessControlRestriction
 		$this->condition = new kUserAgentCondition(true);
 		if($accessControl)
 		{
-			$strArray = unserialize($accessControl->getFromCustomData(accessControl::IP_ADDRESS_RESTRICTION_COLUMN_NAME));
+			$strArray = unserialize($accessControl->getFromCustomData(accessControl::USER_AGENT_RESTRICTION_COLUMN_NAME));
 			$this->setUserAgentRestrictionType($strArray['type']);
 			$this->setUserAgentRegexList($strArray['userAgentRegexList']);
 		}

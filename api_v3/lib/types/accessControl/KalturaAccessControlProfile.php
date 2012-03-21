@@ -96,7 +96,7 @@ class KalturaAccessControlProfile extends KalturaObject implements IFilterable
 	{
 		$this->validatePropertyMinMaxLength('name', 1, 128);
 		$this->validatePropertyMaxLength('systemName', 128, true);
-		$this->validatePropertyMaxLength('systemName', 1024, true);
+		$this->validatePropertyMaxLength('description', 1024, true);
 	}
 	
 	public function validateForInsert($skip = array())

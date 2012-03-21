@@ -38,20 +38,20 @@ class kAuthenticatedCondition extends kCondition
 	}
 	
 	/* (non-PHPdoc)
-	 * @see kCondition::fulfilled()
+	 * @see kCondition::internalFulfilled()
 	 */
-	public function fulfilled(accessControl $accessControl)
+	public function internalFulfilled(accessControl $accessControl)
 	{
 		$scope = $accessControl->getScope();
 		if (!$scope->getKs() || (!$scope->getKs() instanceof ks))
-			return $this->calcNot(false);
+			return false;
 		
 		if ($scope->getKs()->isAdmin())
-			return $this->calcNot(true);
+			return true;
 		
 		$privilegeVerified = true;
 		foreach($this->privileges as $privilege)
-			$privilegeVerified = $privilegeVerified && $this->calcNot($scope->getKs()->verifyPrivileges($privilege, $scope->getEntryId()));
+			$privilegeVerified = $privilegeVerified && $scope->getKs()->verifyPrivileges($privilege, $scope->getEntryId());
 
 		return $privilegeVerified;
 	}

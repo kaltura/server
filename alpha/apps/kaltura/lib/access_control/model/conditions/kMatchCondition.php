@@ -63,26 +63,26 @@ abstract class kMatchCondition extends kCondition
 	}
 	
 	/* (non-PHPdoc)
-	 * @see kCondition::fulfilled()
+	 * @see kCondition::internalFulfilled()
 	 */
-	public function fulfilled(accessControl $accessControl)
+	public function internalFulfilled(accessControl $accessControl)
 	{
 		$field = $this->getFieldValue($accessControl);
 		
 		$values = $this->getStringValues();
 		
 		if (!count($values))
-			return $this->calcNot(true);
+			return true;
 		
 		if (!strlen($field))
-			return $this->calcNot(false);
+			return false;
 			
 		if(in_array($field, $values))
-			return $this->calcNot(true);
+			return true;
 		
 		$matches = true;
 		foreach($values as $value)
-			$matches = $matches && $this->calcNot($this->matches($field, $value));
+			$matches = $matches && $this->matches($field, $value);
 			
 		return $matches;
 	}

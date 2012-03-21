@@ -101,13 +101,21 @@ class KSecureEntryHelper
 	public function getPreviewLength()
 	{
 		$accessControl = $this->entry->getAccessControl();
+		$preview = null;
 		if ($accessControl)
 		{
-			if ($accessControl->hasPreviewRestriction())
-				return $accessControl->getPreviewRestriction()->getPreviewLength();
-			else
-				return null;
+			$context = new kEntryContextDataResult();
+			$accessControl->applyContext($context, $this->getAccessControlScope());
+			
+			$actions = $context->getAccessControlActions();
+			$previewActionFound = false;
+			foreach($actions as $action)
+			{
+				if($action instanceof kAccessControlPreviewAction)
+					$preview = $preview ? min($preview, $action->getLimit()) : $action->getLimit();
+			}
 		}
+		return $preview;
 	}
 	
 	public function validateForPlay()
@@ -151,8 +159,26 @@ class KSecureEntryHelper
 			
 		$context = new kEntryContextDataResult();
 		$this->disableCache = $accessControl->applyContext($context, $this->getAccessControlScope());
+		
+		if(count($context->getAccessControlMessages()))
+		{
+			foreach($context->getAccessControlMessages() as $msg)
+				header("X-Kaltura: access-control: $msg");
+		}
+		
 		if(count($context->getAccessControlActions()))
-			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+		{
+			$actions = $context->getAccessControlActions();
+			$previewActionFound = false;
+			foreach($actions as $action)
+			{
+				/* @var $action kAccessControlAction */
+				if($action->getType() == accessControlActionType::BLOCK)
+				{
+					KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+				}
+			}
+		}
 	}
 	
 	protected function validateScheduling()

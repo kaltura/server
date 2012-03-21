@@ -8,9 +8,14 @@
  */
 class KalturaStringField extends KalturaStringValue
 {
-	/**
-	 * @var string
-	 * @readonly
+	/* (non-PHPdoc)
+	 * @see KalturaIntegerValue::toObject()
 	 */
-    public $value;
+	public function toObject($dbObject = null, $skip = array())
+	{
+		if(!is_null($this->value) && !($this->value instanceof KalturaNullField))
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE, $this->getFormattedPropertyNameWithClassName('value'));
+
+		return parent::toObject($dbObject, $skip);
+	}
 }

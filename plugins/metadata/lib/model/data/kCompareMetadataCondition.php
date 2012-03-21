@@ -39,40 +39,8 @@ class kCompareMetadataCondition extends kCompareCondition
 		if(!$metadata)
 			return null;
 			
-			
-		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		$source = kFileSyncUtils::file_get_contents($key, true, false);
-		if(!$source)
-			return null;
-		
-		$xml = new DOMDocument();
-		$xml->loadXML($source);
-		
-		$xPathPattern = $this->xPath;
-		if(preg_match('/^\w[\w\d]*$/', $xPathPattern))
-			$xPathPattern = "//$xPathPattern";
-		
-		$matches = null;
-		if(preg_match_all('/\/(\w[\w\d]*)/', $xPathPattern, $matches))
-		{
-			if(count($matches) == 2 && implode('', $matches[0]) == $xPathPattern)
-			{
-				$xPathPattern = '';
-				foreach($matches[1] as $match)
-					$xPathPattern .= "/*[local-name()='$match']";
-			}
-		}
-		
-		$xPath = new DOMXPath($xml);
-		$elementsList = $xPath->query($xPathPattern);
-		$values = array();
-		foreach($elementsList as $element)
-		{
-			/* @var $element DOMNode */
-			$values[] = intval($element->textContent);
-		}
-
-		return $values;
+		$values = kMetadataManager::parseMetadataValues($metadata, $this->xPath);
+		return array_map('intval', $values);
 	}
 	
 	/**
