@@ -10,6 +10,8 @@ class PluginController extends Zend_Controller_Action
 
 	public function __call($method, $args)
 	{
+		KalturaLog::debug("Called method [$method] with args [" . print_r($args, true) . "]");
+		
 		$arr = null;
 		if(!preg_match('/^(.+)Action$/', $method, $arr))
 			return parent::__call($method, $args);
