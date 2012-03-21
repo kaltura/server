@@ -20,12 +20,51 @@ class KalturaCompareCondition extends KalturaCondition
 	
 	private static $mapBetweenObjects = array
 	(
-		'value',
 		'comparison',
 	);
 	
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
+	public function toObject($dbObject = null, $skip = array())
+	{
+		/* @var $dbObject kCompareCondition */
+		$dbObject->setValue($this->value->toObject());
+			
+		return parent::toObject($dbObject, $skip);
+	}
+	 
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
+	public function fromObject($dbObject)
+	{
+		/* @var $dbObject kFieldMatchCondition */
+		parent::fromObject($dbObject);
+		
+		$valueType = get_class($dbObject->getValue());
+		KalturaLog::debug("Loading KalturaIntegerValue from type [$valueType]");
+		switch ($valueType)
+		{
+			case 'kIntegerValue':
+				$this->value = new KalturaIntegerValue();
+				break;
+				
+			case 'kTimeContextField':
+				$this->value = new KalturaTimeContextField();
+				break;
+				
+			default:
+				$this->value = KalturaPluginManager::loadObject('KalturaIntegerValue', $valueType);
+				break;
+		}
+		
+		if($this->value)
+			$this->value->fromObject($dbObject->getValue());
 	}
 }
