@@ -182,6 +182,12 @@ class kQueryCache
 		$cacheResult = self::$s_memcacheKeys->get($keysToGet);
 		KalturaLog::debug("kQueryCache: keys query took " . (microtime(true) - $queryStart) . " seconds");
 		
+		if ($cacheResult === false)
+		{
+			KalturaLog::debug("kQueryCache: failed to query keys memcache, not using query cache");
+			return null;
+		}
+		
 		// don't cache the result if the 'dont cache' flag is enabled
 		$cacheQuery = true;
 		if (array_key_exists(self::DONT_CACHE_KEY, $cacheResult) &&
