@@ -23,7 +23,7 @@ class kConf
 		if(function_exists('apc_fetch'))
 		{
 			// existence of base.reload file means that the kConf should be reloaded from the file
-			if(!file_exists("$configDir/base.reload"))
+			if(file_exists("$configDir/base.reload"))
 			{
 				if(apc_delete(self::APC_CACHE_MAP))
 				{
