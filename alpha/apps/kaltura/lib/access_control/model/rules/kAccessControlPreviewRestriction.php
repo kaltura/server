@@ -56,8 +56,9 @@ class kAccessControlPreviewRestriction extends kAccessControlRestriction
 	 */
 	private function getCondition()
 	{
-		if(!$this->condition && count($this->getConditions()))
-			$this->condition = reset($this->getConditions());
+		$conditions = $this->getConditions();
+		if(!$this->condition && count($conditions))
+			$this->condition = reset($conditions);
 			
 		return $this->condition;
 	}
@@ -67,8 +68,9 @@ class kAccessControlPreviewRestriction extends kAccessControlRestriction
 	 */
 	private function getAction()
 	{
-		if(!$this->action && count($this->getActions()))
-			$this->action = reset($this->getActions());
+		$actions = $this->getActions();
+		if(!$this->action && count($actions))
+			$this->action = reset($actions);
 			
 		return $this->action;
 	}

@@ -44,8 +44,9 @@ class kAccessControlSessionRestriction extends kAccessControlRestriction
 	 */
 	private function getCondition()
 	{
-		if(!$this->condition && count($this->getConditions()))
-			$this->condition = reset($this->getConditions());
+		$conditions = $this->getConditions();
+		if(!$this->condition && count($conditions))
+			$this->condition = reset($conditions);
 			
 		return $this->condition;
 	}
