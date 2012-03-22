@@ -34,7 +34,7 @@ class KalturaSiteRestriction extends KalturaBaseRestriction
 	/* (non-PHPdoc)
 	 * @see KalturaBaseRestriction::toRule()
 	 */
-	public function toRule()
+	public function toRule(KalturaRestrictionArray $restrictions)
 	{
 		return $this->toObject(new kAccessControlSiteRestriction());
 	}

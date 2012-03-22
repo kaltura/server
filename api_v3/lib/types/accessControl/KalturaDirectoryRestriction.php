@@ -16,7 +16,7 @@ class KalturaDirectoryRestriction extends KalturaBaseRestriction
 	/* (non-PHPdoc)
 	 * @see KalturaBaseRestriction::toRule()
 	 */
-	public function toRule()
+	public function toRule(KalturaRestrictionArray $restrictions)
 	{
 		return null;
 	}

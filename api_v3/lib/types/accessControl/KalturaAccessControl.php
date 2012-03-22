@@ -104,7 +104,7 @@ class KalturaAccessControl extends KalturaObject implements IFilterable
 			foreach($this->restrictions as $restriction)
 			{
 				/* @var $restriction KalturaBaseRestriction */
-				$rule = $restriction->toRule();
+				$rule = $restriction->toRule($this->restrictions);
 				if($rule)
 					$rules[] = $rule;
 			}

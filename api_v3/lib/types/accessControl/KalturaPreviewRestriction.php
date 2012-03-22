@@ -26,8 +26,9 @@ class KalturaPreviewRestriction extends KalturaSessionRestriction
 	/* (non-PHPdoc)
 	 * @see KalturaBaseRestriction::toRule()
 	 */
-	public function toRule()
+	public function toRule(KalturaRestrictionArray $restrictions)
 	{
-		return $this->toObject(new kAccessControlPreviewRestriction());
+		// Preview restriction became a rule action, it's not a rule.
+		return null;
 	}
 }
