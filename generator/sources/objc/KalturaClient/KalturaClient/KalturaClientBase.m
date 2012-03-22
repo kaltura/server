@@ -121,12 +121,16 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
  */
 @implementation KalturaObjectFactory
 
-+ (KalturaObjectBase*)createByName:(NSString*)aName
++ (KalturaObjectBase*)createByName:(NSString*)aName withDefaultType:(NSString*)aDefaultType
 {
     Class objClass = NSClassFromString(aName);
     if (objClass == nil)
     {
-        return nil;
+		objClass = NSClassFromString(aDefaultType);
+		if (objClass == nil)
+		{
+			return nil;
+		}
     }
     if (![objClass isSubclassOfClass:[KalturaObjectBase class]])
     {
@@ -489,10 +493,10 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
         KalturaParam* curParam = [self->_params lastObject];
         NSString *encodedKey = [KalturaParams allocUrlEncodedString:curParam.key];
         NSString *encodedVal = [KalturaParams allocUrlEncodedString:curParam.value];
-       [output appendFormat:@"%@=%@&", encodedKey, encodedVal];
+        [output appendFormat:@"%@=%@&", encodedKey, encodedVal];
         [encodedVal release];
         [encodedKey release];
-       [self->_params removeLastObject];
+        [self->_params removeLastObject];
     }
 }
 
@@ -588,6 +592,8 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
 @synthesize config = _config;
 @synthesize error = _error;
 @synthesize delegate = _delegate;
+@synthesize uploadProgressDelegate = _uploadProgressDelegate;
+@synthesize downloadProgressDelegate = _downloadProgressDelegate;
 @synthesize ks = _ks;
 @synthesize apiVersion = _apiVersion;
 @synthesize params = _params;
@@ -622,6 +628,7 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     self->_request = nil;
     [self->_apiStartTime release];
     self->_apiStartTime = nil;
+	self->_skipParser.delegate = nil;
     [self->_skipParser release];
     self->_skipParser = nil;
     [self->_reqParser release];
@@ -705,6 +712,8 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     self->_request.delegate = self;
     self->_request.timeOutSeconds = self.config.requestTimeout;
     self->_request.shouldWaitToInflateCompressedResponses = NO;
+	self->_request.uploadProgressDelegate = self.uploadProgressDelegate;
+	self->_request.downloadProgressDelegate = self.downloadProgressDelegate;
 
     [self addGlobalParamsAndSign];
     [self->_params addToRequest:self->_request];
@@ -853,17 +862,17 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     return result;
 }
 
-- (id)queueObjectService:(NSString*)aService withAction:(NSString*)aAction
+- (id)queueObjectService:(NSString*)aService withAction:(NSString*)aAction withExpectedType:(NSString*)aExpectedType
 {
-    KalturaXmlParserObject* parser = [[KalturaXmlParserObject alloc] init];
+    KalturaXmlParserObject* parser = [[KalturaXmlParserObject alloc] initWithExpectedType:aExpectedType];
     id result = [self queueService:aService withAction:aAction withParser:parser];
     [parser release];
     return result;
 }
 
-- (NSMutableArray*)queueArrayService:(NSString*)aService withAction:(NSString*)aAction
+- (NSMutableArray*)queueArrayService:(NSString*)aService withAction:(NSString*)aAction withExpectedType:(NSString*)aExpectedType
 {
-    KalturaXmlParserArray* parser = [[KalturaXmlParserArray alloc] init];
+    KalturaXmlParserArray* parser = [[KalturaXmlParserArray alloc] initWithExpectedType:aExpectedType];
     id result = [self queueService:aService withAction:aAction withParser:parser];
     [parser release];
     return result;

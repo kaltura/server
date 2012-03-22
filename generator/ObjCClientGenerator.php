@@ -443,6 +443,26 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			$this->appendMLine("{");
 			$this->appendMLine("    return KFT_$propType;");
 			$this->appendMLine("}\n");
+			
+			$objectType = '';
+			switch ($propType)
+			{
+			case "Object":
+				$objectType = $propertyNode->getAttribute ( "type" );
+				break;
+			case "Array":
+				$objectType = $propertyNode->getAttribute ( "arrayType" );
+				break;
+			}
+			
+			if ($objectType)
+			{
+				$this->appendHLine("- (NSString*)getObjectTypeOf$propName;");
+				$this->appendMLine("- (NSString*)getObjectTypeOf$propName");
+				$this->appendMLine("{");
+				$this->appendMLine("    return @\"$objectType\";");
+				$this->appendMLine("}\n");
+			}
 		}
 	}
 	
@@ -577,7 +597,19 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			break;
 		}
 
-		$this->appendMLine("    {$returnStmt}[self.client queue{$serviceType}Service:@\"$serviceId\" withAction:@\"$actionName\"];");
+		$withExpectedType = '';
+		switch ($serviceType)
+		{
+		case "Object":
+			$withExpectedType = " withExpectedType:@\"$resultType\"";
+			break;
+		case "Array":
+			$resultArrayType = $resultNode->getAttribute("arrayType");
+			$withExpectedType = " withExpectedType:@\"$resultArrayType\"";
+			break;
+		}
+		
+		$this->appendMLine("    {$returnStmt}[self.client queue{$serviceType}Service:@\"$serviceId\" withAction:@\"$actionName\"$withExpectedType];");
 		$this->appendMLine("}\n");
 		
 		$this->writeActionDefaultOverloads($actionNode, $optionalParams);
@@ -724,14 +756,27 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			$baseClassName = "KalturaClientPlugin";
 			
 		$this->appendHLine("@interface $pluginClassName : $baseClassName");	
+		$this->appendHLine("{");	
+		foreach ($services as $serviceName)
+		{
+			$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
+			$this->appendHLine("	$serviceClassName* _$serviceName;");
+		}
+		$this->appendHLine("}");	
+		$this->appendHLine("");	
 		$this->appendMLine("@implementation $pluginClassName");
 		
 		// properties
+		if ($pluginClassName != "KalturaClient")
+		{
+			$this->appendHLine("@property (nonatomic, assign) KalturaClientBase* client;");
+			$this->appendMLine("@synthesize client = _client;");
+		}
+		
 		foreach ($services as $serviceName)
 		{
 			$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 			$this->appendHLine("@property (nonatomic, readonly) $serviceClassName* $serviceName;");
-			$this->appendMLine("@synthesize $serviceName = _$serviceName;");
 		}
 		$this->appendMLine();
 		
@@ -746,7 +791,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		{
 			$initParams = "WithClient:(KalturaClient*)aClient";
 			$initSuperParams = "";
-			$clientVar = "aClient";
+			$clientVar = "self.client";
 		}
 		
 		$this->appendMLine("- (id)init{$initParams}");
@@ -758,14 +803,25 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		{
 			$this->appendMLine("    self.apiVersion = API_VERSION;");
 		}
-		foreach ($services as $serviceName)
+		else
 		{
-			$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
-			$this->appendMLine("    self->_$serviceName = [[$serviceClassName alloc] initWithClient:$clientVar];");
+			$this->appendMLine("    self.client = aClient;");
 		}
 		$this->appendMLine("    return self;");
 		$this->appendMLine("}");
 		$this->appendMLine();
+
+		foreach ($services as $serviceName)
+		{
+			$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
+			$this->appendMLine("- ($serviceClassName*)$serviceName");
+			$this->appendMLine("{");
+			$this->appendMLine("    if (self->_$serviceName == nil)");
+			$this->appendMLine("    	self->_$serviceName = [[$serviceClassName alloc] initWithClient:$clientVar];");
+			$this->appendMLine("    return self->_$serviceName;");
+			$this->appendMLine("}");
+			$this->appendMLine();
+		}
 		
 		// dealloc
 		$this->appendMLine("- (void)dealloc");

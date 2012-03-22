@@ -363,8 +363,10 @@ static void XMLCDECL saxCallbackError (void *ctx,
 
 - (void)dealloc
 {
+	self->_excObjParser.delegate = nil;
     [self->_excObjParser release];
     [self->_targetException release];
+	self->_subParser.delegate = nil;
     [self->_subParser release];
     [super dealloc];
 }
@@ -439,11 +441,24 @@ static void XMLCDECL saxCallbackError (void *ctx,
     return self;
 }
 
+- (id)initWithExpectedType:(NSString*)aExpectedType
+{
+    self = [super init];
+    if (self == nil)
+        return nil;
+
+    self->_expectedType = [aExpectedType copy];
+
+    return self;
+}
+
 - (void)dealloc
 {
+	self->_subParser.delegate = nil;
     [self->_subParser release];
     [self->_lastTagCapitalized release];
     [self->_targetObj release];
+	[self->_expectedType release];
     [super dealloc];
 }
 
@@ -500,6 +515,16 @@ static void XMLCDECL saxCallbackError (void *ctx,
         self->_lastPropType = (KalturaFieldType)[self->_targetObj performSelector:getPropTypeSel];
     }
     
+	NSString* expectedObjectType = nil;
+	if (self->_lastPropType == KFT_Object || self->_lastPropType == KFT_Array)
+	{
+		NSString* getObjectType = [[NSMutableString alloc] initWithFormat:@"getObjectTypeOf%@", self->_lastTagCapitalized];
+		SEL getObjectTypeSel = NSSelectorFromString(getObjectType);
+		[getObjectType release];
+	
+		expectedObjectType = [self->_targetObj performSelector:getObjectTypeSel];
+	}
+	
     switch (self->_lastPropType)
     {
         case KFT_Invalid:
@@ -507,11 +532,11 @@ static void XMLCDECL saxCallbackError (void *ctx,
             break;
             
         case KFT_Object:
-            self->_subParser = [[KalturaXmlParserObject alloc] init];
+            self->_subParser = [[KalturaXmlParserObject alloc] initWithExpectedType:expectedObjectType];
             break;
             
         case KFT_Array:
-            self->_subParser = [[KalturaXmlParserArray alloc] init];
+            self->_subParser = [[KalturaXmlParserArray alloc] initWithExpectedType:expectedObjectType];
             break;
             
         default:        // simple types are handled by foundChars
@@ -546,7 +571,7 @@ static void XMLCDECL saxCallbackError (void *ctx,
 {
     if (self->_lastIsObjectType)
     {
-        self->_targetObj = [KalturaObjectFactory createByName:aString];
+        self->_targetObj = [KalturaObjectFactory createByName:aString withDefaultType:self->_expectedType];
         if (self->_targetObj == nil)
         {
             self.error = [NSError errorWithDomain:KalturaClientErrorDomain code:KalturaClientErrorUnknownObjectType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Unknown object type", NSLocalizedDescriptionKey, aString, @"ObjectType", nil]];
@@ -602,21 +627,24 @@ static void XMLCDECL saxCallbackError (void *ctx,
  */
 @implementation KalturaXmlParserArray
 
-- (id)init
+- (id)initWithExpectedType:(NSString*)aExpectedType
 {
     self = [super init];
     if (self == nil)
         return nil;
-    
+
     self->_targetArr = [[NSMutableArray alloc] init];
-    
+    self->_expectedType = [aExpectedType copy];
+
     return self;
 }
 
 - (void)dealloc
 {
+	self->_subParser.delegate = nil;
     [self->_subParser release];
     [self->_targetArr release];
+	[self->_expectedType release];
     [super dealloc];
 }
 
@@ -634,7 +662,7 @@ static void XMLCDECL saxCallbackError (void *ctx,
         return;
     }
     
-    self->_subParser = [[KalturaXmlParserObject alloc] init];
+    self->_subParser = [[KalturaXmlParserObject alloc] initWithExpectedType:self->_expectedType];
     [self->_subParser attachToParser:self.parser withDelegate:self];
 }
 
@@ -754,6 +782,7 @@ static void XMLCDECL saxCallbackError (void *ctx,
 - (void)dealloc
 {
     [self->_path release];
+	self->_subParser.delegate = nil;
     [self->_subParser release];
     [super dealloc];
 }

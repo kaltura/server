@@ -27,6 +27,7 @@
 // ===================================================================================================
 #import <Foundation/Foundation.h>
 #import "ASIHTTPRequestDelegate.h"
+#import "ASIProgressDelegate.h"
 #import "KalturaXmlParsers.h"
 
 /*
@@ -126,7 +127,7 @@ typedef enum
  */
 @interface KalturaObjectFactory : NSObject
 
-+ (KalturaObjectBase*)createByName:(NSString*)aName;
++ (KalturaObjectBase*)createByName:(NSString*)aName withDefaultType:(NSString*)aDefaultType;
 
 @end
 
@@ -229,6 +230,8 @@ typedef enum
 @property (nonatomic, retain) KalturaClientConfiguration* config;
 @property (nonatomic, retain) NSError* error;
 @property (nonatomic, assign) id<KalturaClientDelegate> delegate;
+@property (nonatomic, assign) id<ASIProgressDelegate> uploadProgressDelegate;
+@property (nonatomic, assign) id<ASIProgressDelegate> downloadProgressDelegate;
 @property (nonatomic, copy) NSString* ks;
 @property (nonatomic, copy) NSString* apiVersion;
 @property (nonatomic, readonly) KalturaParams* params;
@@ -247,7 +250,7 @@ typedef enum
 - (int)queueIntService:(NSString*)aService withAction:(NSString*)aAction;
 - (double)queueFloatService:(NSString*)aService withAction:(NSString*)aAction;
 - (NSString*)queueStringService:(NSString*)aService withAction:(NSString*)aAction;
-- (id)queueObjectService:(NSString*)aService withAction:(NSString*)aAction;
-- (NSMutableArray*)queueArrayService:(NSString*)aService withAction:(NSString*)aAction;
+- (id)queueObjectService:(NSString*)aService withAction:(NSString*)aAction withExpectedType:(NSString*)aExpectedType;
+- (NSMutableArray*)queueArrayService:(NSString*)aService withAction:(NSString*)aAction withExpectedType:(NSString*)aExpectedType;
 
 @end

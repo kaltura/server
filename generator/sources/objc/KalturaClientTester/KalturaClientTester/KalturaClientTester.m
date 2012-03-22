@@ -90,6 +90,34 @@
 @end
 
 /*
+ KalturaDownloadDelegate
+ */
+@interface KalturaProgressDelegate : NSObject <ASIProgressDelegate> 
+
+@property (nonatomic, assign) BOOL receiveBytesCalled;
+@property (nonatomic, assign) BOOL sendBytesCalled;
+
+@end
+
+@implementation KalturaProgressDelegate
+
+@synthesize receiveBytesCalled = _receiveBytesCalled;
+@synthesize sendBytesCalled = _sendBytesCalled;
+
+- (void)request:(ASIHTTPRequest *)request didReceiveBytes:(long long)bytes
+{
+    self.receiveBytesCalled = TRUE;
+}
+
+- (void)request:(ASIHTTPRequest *)request didSendBytes:(long long)bytes
+{
+    self.sendBytesCalled = TRUE;
+}
+
+@end
+
+
+/*
  KalturaClientTester
  */
 @interface KalturaClientTester()
@@ -273,6 +301,10 @@
     [self->_client.uploadToken uploadWithUploadTokenId:token.id withFileData:uploadFilePath];
     assert(self->_client.error == nil);
     
+    // approve the entry, required when the account has content moderation enabled
+    [self->_client.media approveWithEntryId:entry.id];
+    assert(self->_client.error == nil);
+    
     return entry;
 }
 
@@ -361,6 +393,10 @@
     entry = [self->_client.media addContentWithEntryId:entry.id withResource:resource];
     assert(self->_client.error == nil);
     assert([[KalturaEntryStatus IMPORT] compare:entry.status] == NSOrderedSame);
+    
+    // approve the entry, required when the account has content moderation enabled
+    [self->_client.media approveWithEntryId:entry.id];
+    assert(self->_client.error == nil);
     
     // return: object, params: string, file
     NSString* uploadFilePath = [[NSBundle mainBundle] pathForResource:@"DemoVideo" ofType:@"flv"];
@@ -745,7 +781,7 @@
 {
     self->_client.config.serviceUrl = KALTURA_CLIENT_TEST_URL;
     [self->_client.params addIfDefinedKey:@"responseBuffer" withString:@"<xml><result><objectType>UnknownObjectType</objectType></result></xml>"];
-    [self->_client.playlist getWithId:@"1234"];
+    [self->_client queueObjectService:@"playlist" withAction:@"get" withExpectedType:@"AnotherUnknownObject"];
     
     [self assertKalturaError:self->_client.error withCode:KalturaClientErrorUnknownObjectType];
 }
@@ -1150,6 +1186,71 @@
 - (void)testAsyncVoidType
 {
     [self->_client.session end];
+}
+
+- (void)testUnknownObjectReturned
+{
+    self->_client.config.serviceUrl = KALTURA_CLIENT_TEST_URL;
+    [self->_client.params addIfDefinedKey:@"responseBuffer" withString:@"<xml><result><objectType>UnknownObjectType</objectType><id>abcdef</id></result></xml>"];
+    KalturaBaseEntry* result = [self->_client.baseEntry getWithEntryId:self->_imageEntry.id];
+    assert(self->_client.error == nil);
+    assert([result isKindOfClass:[KalturaBaseEntry class]]);
+    assert([result.id compare:@"abcdef"] == NSOrderedSame);
+}
+
+- (void)testUnknownArrayObjectReturned
+{
+    self->_client.config.serviceUrl = KALTURA_CLIENT_TEST_URL;
+    [self->_client.params addIfDefinedKey:@"responseBuffer" withString:@"<xml><result><item><objectType>UnknownObjectType</objectType><id>abcdef</id></item></result></xml>"];
+    NSArray* result = [self->_client.flavorAsset getByEntryIdWithEntryId:self->_videoEntry.id];
+    assert(self->_client.error == nil);
+    assert(result.count == 1);
+    KalturaFlavorAsset* asset = [result objectAtIndex:0];
+    assert([asset isKindOfClass:[KalturaFlavorAsset class]]);
+    assert([asset.id compare:@"abcdef"] == NSOrderedSame);
+}
+
+- (void)testUnknownNestedObjectObjectReturned
+{
+    self->_client.config.serviceUrl = KALTURA_CLIENT_TEST_URL;
+    [self->_client.params addIfDefinedKey:@"responseBuffer" withString:@"<xml><result><objectType>KalturaConversionProfile</objectType><cropDimensions><objectType>UnknownObjectType</objectType><left>1234</left></cropDimensions></result></xml>"];
+    KalturaConversionProfile* result = [self->_client.conversionProfile getWithId:1];
+    assert(self->_client.error == nil);
+    KalturaCropDimensions* dimensions = result.cropDimensions;
+    assert([dimensions isKindOfClass:[KalturaCropDimensions class]]);
+    assert(dimensions.left == 1234);
+}
+
+- (void)testUnknownNestedArrayObjectReturned
+{
+    self->_client.config.serviceUrl = KALTURA_CLIENT_TEST_URL;
+    [self->_client.params addIfDefinedKey:@"responseBuffer" withString:@"<xml><result><objectType>KalturaBaseEntryListResponse</objectType><objects><item><objectType>UnknownObjectType</objectType><id>abcdef</id></item></objects></result></xml>"];
+    KalturaBaseEntryListResponse* result = [self->_client.baseEntry list];
+    assert(self->_client.error == nil);
+    assert(result.objects.count == 1);
+    KalturaBaseEntry* entry = [result.objects objectAtIndex:0];
+    assert([entry isKindOfClass:[KalturaBaseEntry class]]);
+    assert([entry.id compare:@"abcdef"] == NSOrderedSame);
+}
+
+- (void)testDownloadDelegateSanity
+{
+    KalturaProgressDelegate* delegate = [[[KalturaProgressDelegate alloc] init] autorelease];
+    self->_client.downloadProgressDelegate = delegate;
+    [self->_client.baseEntry getWithEntryId:self->_imageEntry.id];
+    self->_client.downloadProgressDelegate = nil;
+    
+    assert(delegate.receiveBytesCalled);
+}
+
+- (void)testUploadDelegateSanity
+{
+    KalturaProgressDelegate* delegate = [[[KalturaProgressDelegate alloc] init] autorelease];
+    self->_client.uploadProgressDelegate = delegate;
+    [self->_client.baseEntry getWithEntryId:self->_imageEntry.id];
+    self->_client.uploadProgressDelegate = nil;
+    
+    assert(delegate.sendBytesCalled);
 }
 
 @end

@@ -133,12 +133,14 @@
 {
     KalturaXmlParserBase* _subParser;
     KalturaObjectBase* _targetObj;
+    NSString* _expectedType;
     NSString* _lastTagCapitalized;
     BOOL _lastIsObjectType;
     int _lastPropType;     // KalturaFieldType
 }
 
 - (id)initWithObject:(KalturaObjectBase*)aObject;
+- (id)initWithExpectedType:(NSString*)aExpectedType;
 
 @end
 
@@ -148,8 +150,12 @@
 @interface KalturaXmlParserArray : KalturaXmlParserBase <KalturaXmlParserDelegate>
 {
     KalturaXmlParserBase* _subParser;
+    NSString* _expectedType;
     NSMutableArray* _targetArr;
 }
+
+- (id)initWithExpectedType:(NSString*)aExpectedType;
+
 @end
 
 /*
