@@ -45,7 +45,14 @@ class kCountryCondition extends kMatchCondition
 		$scope = $accessControl->getScope();
 		$ip = $scope->getIp();
 		$ipGeo = kGeoCoderManager::getGeoCoder($this->getGeoCoderType());
-		$country = $ipGeo->getCountry($ip);
-		return trim(strtolower($country), " \n\r\t");
+		return $ipGeo->getCountry($ip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kMatchCondition::matches()
+	 */
+	protected function matches($field, $value)
+	{
+		return parent::matches(trim(strtolower($field), " \n\r\t"), trim(strtolower($value), " \n\r\t"));
 	}
 }
