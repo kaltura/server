@@ -68,22 +68,37 @@ abstract class kMatchCondition extends kCondition
 	public function internalFulfilled(accessControl $accessControl)
 	{
 		$field = $this->getFieldValue($accessControl);
-		
 		$values = $this->getStringValues();
 		
+		KalturaLog::debug("Matches field [$field] to values [" . print_r($values, true) . "]");
 		if (!count($values))
+		{
+			KalturaLog::debug("No values found, condition is true");
 			return true;
+		}
 		
 		if (!strlen($field))
+		{
+			KalturaLog::debug("Field is empty, condition is false");
 			return false;
+		}
 			
 		if(in_array($field, $values))
+		{
+			KalturaLog::debug("Field found in the values list, condition is true");
 			return true;
+		}
 		
-		$matches = true;
 		foreach($values as $value)
-			$matches = $matches && $this->matches($field, $value);
+		{
+			if($this->matches($field, $value))
+			{
+				KalturaLog::debug("Field [$field] matches value [$value], condition is true");
+				return true;
+			}
+		}
 			
-		return $matches;
+		KalturaLog::debug("No match found, condition is false");
+		return false;
 	}
 }
