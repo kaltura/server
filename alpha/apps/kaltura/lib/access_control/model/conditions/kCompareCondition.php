@@ -8,7 +8,7 @@ abstract class kCompareCondition extends kCondition
 {
 	/**
 	 * Value to evaluate against the field and operator
-	 * @var int
+	 * @var kIntegerValue
 	 */
 	protected $value;
 	
@@ -19,7 +19,7 @@ abstract class kCompareCondition extends kCondition
 	protected $comparison;
 
 	/**
-	 * @return int
+	 * @return kIntegerValue
 	 */
 	public function getValue() 
 	{
@@ -36,9 +36,9 @@ abstract class kCompareCondition extends kCondition
 	}
 
 	/**
-	 * @param int $value
+	 * @param kIntegerValue $value
 	 */
-	public function setValue($value) 
+	public function setValue(kIntegerValue $value) 
 	{
 		$this->value = $value;
 	}
@@ -65,23 +65,24 @@ abstract class kCompareCondition extends kCondition
 	 */
 	protected function fieldFulfilled($field)
 	{
+		$value = $this->value->getValue();
 		switch($this->comparison)
 		{
 			case searchConditionComparison::GREATER_THAN:
-				return ($field > $this->value);
+				return ($field > $value);
 				
 			case searchConditionComparison::GREATER_THAN_OR_EQUEL:
-				return ($field >= $this->value);
+				return ($field >= $value);
 				
 			case searchConditionComparison::LESS_THAN:
-				return ($field < $this->value);
+				return ($field < $value);
 				
 			case searchConditionComparison::LESS_THAN_OR_EQUEL:
-				return ($field <= $this->value);
+				return ($field <= $value);
 				
 			case searchConditionComparison::EQUEL:
 			default:
-				return ($field == $this->value);
+				return ($field == $value);
 		}
 	}
 	
@@ -91,20 +92,33 @@ abstract class kCompareCondition extends kCondition
 	public function internalFulfilled(accessControl $accessControl)
 	{
 		$field = $this->getFieldValue($accessControl);
+		$value = $this->value->getValue();
 		
-		if (is_null($this->value))
+		KalturaLog::debug("Copares field [$field] to value [$value]");
+		if (is_null($value))
+		{
+			KalturaLog::debug("Value is null, condition is true");
 			return true;
+		}
 		
 		if (is_null($field))
+		{
+			KalturaLog::debug("Field is null, condition is false");
 			return false;
+		}
 
 		if(is_array($field))
 		{
-			$fulfilled = true;
 			foreach($field as $fieldItem)
-				$fulfilled = $fulfilled && $this->fieldFulfilled($fieldItem);
-				
-			return $fulfilled;
+			{
+				if(!$this->fieldFulfilled($fieldItem))
+				{
+					KalturaLog::debug("Field item [$fieldItem] does not fulfilled, condition is false");
+					return false;
+				}
+			}
+			KalturaLog::debug("All field items fulfilled, condition is true");
+			return true;
 		}
 		
 		return $this->fieldFulfilled($field);
