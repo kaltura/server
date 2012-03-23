@@ -255,7 +255,7 @@ class KalturaTestCaseApiBase extends PHPUnit_Framework_TestCase
 				}
 				$default->$argName = $argConfig;
 			}
-			$methodConfig = new Zend_Config(array('test1' => $default), true);
+			$methodConfig = new Zend_Config(array('test0' => $default), true);
 			
 			$this->config->$methodName = $methodConfig;
 			$this->config->saveToIniFile();
@@ -333,12 +333,18 @@ class KalturaTestCaseApiBase extends PHPUnit_Framework_TestCase
 		{
 			foreach ($this->theDependencyInput as $index => $value)
 			{
-				KalturaLog::debug("Adding key [$index], value [$value] to the test data\n");
+				if(is_object($value))
+					KalturaLog::debug("Adding key [$index], value [" . get_class($value) . "] to the test data\n");
+				else
+					KalturaLog::debug("Adding key [$index], value [$value] to the test data\n");
+					
 				$this->data[$index] = $value;
 			}
 		}
 
-		return parent::runTest();
+		$ret = parent::runTest();
+
+		return $ret;
 	}
 	
     /* (non-PHPdoc)
@@ -360,6 +366,60 @@ class KalturaTestCaseApiBase extends PHPUnit_Framework_TestCase
             }
         }
 
-        return parent::run($result);
+        $ret =  parent::run($result);
+	
+		$testConfig = $this->config->get('config');
+		if($testConfig->reportPath)
+		{
+			$xml = new SimpleXMLElement('<test/>');
+			$xml->addAttribute('name', $this->getName());
+			$xml->addAttribute('status', $this->getStatus());
+			$xml->addAttribute('numAssertions', $this->getNumAssertions());
+			$xml->addAttribute('statusMessage', $this->getStatusMessage());
+			
+			$resultElement = $xml->addChild('result');
+			$resultElement->addAttribute('returnedType', get_class($this->getResult()));
+			
+			if($result instanceof PHPUnit_Framework_TestResult)
+			{
+				if($result->errorCount())
+				{
+					$errorsElemnt = $resultElement->addChild('errors');
+					$errors = $result->errors();
+					foreach($errors as $error)
+					{
+						/* @var $error PHPUnit_Framework_TestFailure */
+						$errorElemnt = $errorsElemnt->addChild('error', $error->exceptionMessage());
+					}
+				}
+			
+				if($result->skippedCount())
+				{
+					$skippedsElemnt = $resultElement->addChild('skippeds');
+					$skippeds = $result->skipped();
+					foreach($skippeds as $skipped)
+					{
+						/* @var $skipped PHPUnit_Framework_TestFailure */
+						$skippedElemnt = $skippedsElemnt->addChild('skipped', $skipped->exceptionMessage());
+					}
+				}
+			
+				if($result->failureCount())
+				{
+					$failuresElemnt = $resultElement->addChild('failures');
+					$failures = $result->failures();
+					foreach($failures as $failure)
+					{
+						/* @var $failure PHPUnit_Framework_TestFailure */
+						$failureElemnt = $failuresElemnt->addChild('failure', $failure->exceptionMessage());
+					}
+				}
+			}
+			
+			$fileName = $testConfig->reportPath . DIRECTORY_SEPARATOR . get_class($this) . '.' . $this->getName() . '.xml';
+			$xml->asXML($fileName);
+		}
+		
+		return $ret;
     }
 }

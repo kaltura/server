@@ -36,12 +36,6 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 			$needSave = true;
 		}
 		
-		if(!$testConfig->serviceUrlStaging)
-		{
-			$testConfig->serviceUrlStaging = '@SERVICE_URL_STAGING@';
-			$needSave = true;
-		}
-		
 		if(!$testConfig->partnerId)
 		{
 			$testConfig->partnerId = "@TEST_PARTNER_ID@";
@@ -109,14 +103,17 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 			$this->startSession($this->client, $testConfig->sessionType, $testConfig->userId);
 		}
 		
-		$kalturaConfigurationStaging = $kalturaConfiguration;
-		$kalturaConfigurationStaging->serviceUrl = $testConfig->serviceUrlStaging;
-		
-		$this->clientStaging = new KalturaClient($kalturaConfigurationStaging);
-		
-		if($testConfig->startSession)
+		if($testConfig->serviceUrlStaging)
 		{
-			$this->startSession($this->clientStaging, $testConfig->sessionType, $testConfig->userId);
+			$kalturaConfigurationStaging = $kalturaConfiguration;
+			$kalturaConfigurationStaging->serviceUrl = $testConfig->serviceUrlStaging;
+			
+			$this->clientStaging = new KalturaClient($kalturaConfigurationStaging);
+		
+			if($testConfig->startSession)
+			{
+				$this->startSession($this->clientStaging, $testConfig->sessionType, $testConfig->userId);
+			}
 		}
 	}
 	
