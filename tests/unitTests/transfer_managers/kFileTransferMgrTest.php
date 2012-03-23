@@ -71,18 +71,30 @@ class kFileTransferMgrTest extends KalturaTestCaseApiBase
 	/**
 	 * Tests kFileTransferMgr->listDir()
 	 * 
-	 * @param kFileTransferMgr $kFileTransferMgr
+	 * @param string $server Server's hostname or IP address
+	 * @param string $user User's name
+	 * @param string $pass Password
+	 * @param int $port Server's listening port
+	 * @param bool $ftp_passive_mode Used for FTP only
+	 * @param string $publicKeyFile
+	 * @param string $privateKeyFile
+	 * @param string $passPhrase
 	 * @param string $remote_path
 	 * @param array $list
 	 * @param int $exceptionCode the expected exception code
 	 * @dataProvider provideData
-	 * @depends testLogin with data set #0
 	 */
-	public function testListDir(kFileTransferMgr $kFileTransferMgr, $remote_path, $list, $exceptionCode = null)
+	public function testListDir($server, $user, $pass, $port, $ftp_passive_mode, $publicKeyFile, $privateKeyFile, $passPhrase, $remote_path, $list, $exceptionCode = null)
 	{
 		try 
 		{
-			$actualList = $kFileTransferMgr->listDir($remote_path);
+			if(strlen(trim($publicKeyFile)))
+				$this->kFileTransferMgr->loginPubKey($server, $user, $publicKeyFile, $privateKeyFile, $passPhrase, $port);
+			else
+				$this->kFileTransferMgr->login($server, $user, $pass, $port, $ftp_passive_mode);
+				
+			$actualList = $this->kFileTransferMgr->listDir($remote_path);
+			KalturaLog::debug("Actual List [" . print_r($actualList, true) . "]");
 			$this->assertEquals(count($list), count($actualList), 'Wrong list size');
 			
 			foreach($list as $value)
@@ -107,19 +119,30 @@ class kFileTransferMgrTest extends KalturaTestCaseApiBase
 	/**
 	 * Tests kFileTransferMgr->fileSize()
 	 * 
-	 * @param kFileTransferMgr $kFileTransferMgr
+	 * @param string $server Server's hostname or IP address
+	 * @param string $user User's name
+	 * @param string $pass Password
+	 * @param int $port Server's listening port
+	 * @param bool $ftp_passive_mode Used for FTP only
+	 * @param string $publicKeyFile
+	 * @param string $privateKeyFile
+	 * @param string $passPhrase
 	 * @param string $remote_path
 	 * @param string $file
 	 * @param int $expectedSize
 	 * @param int $exceptionCode the expected exception code
 	 * @dataProvider provideData
-	 * @depends testLogin with data set #0
 	 */
-	public function testFileSize(kFileTransferMgr $kFileTransferMgr, $remote_path, $file, $expectedSize, $exceptionCode = null)
+	public function testFileSize($server, $user, $pass, $port, $ftp_passive_mode, $publicKeyFile, $privateKeyFile, $passPhrase, $remote_path, $file, $expectedSize, $exceptionCode = null)
 	{
 		try 
 		{
-			$actualSize = $kFileTransferMgr->fileSize("$remote_path/$file");
+			if(strlen(trim($publicKeyFile)))
+				$this->kFileTransferMgr->loginPubKey($server, $user, $publicKeyFile, $privateKeyFile, $passPhrase, $port);
+			else
+				$this->kFileTransferMgr->login($server, $user, $pass, $port, $ftp_passive_mode);
+		
+			$actualSize = $this->kFileTransferMgr->fileSize("$remote_path/$file");
 			$this->assertEquals($expectedSize, $actualSize, "Wrong file size [$remote_path/$file]");
 		}
 		catch (kFileTransferMgrException $te)
