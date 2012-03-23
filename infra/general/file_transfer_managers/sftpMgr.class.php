@@ -211,7 +211,8 @@ class sftpMgr extends kFileTransferMgr
 	    $remote_path = ltrim($remote_path,'/');
         $lsdir_cmd = 'ls ' . $remote_path;
         $exec_output = $this->execCommand($lsdir_cmd);
-        return array_map('trim', explode("\n", $exec_output));
+		KalturaLog::info("sftp rawlist [$exec_output]");
+        return array_filter(array_map('trim', explode("\n", $exec_output)), 'strlen');
 	}	
 	
 	// download a file from the server
@@ -261,6 +262,34 @@ class sftpMgr extends kFileTransferMgr
 	    $remote_file = ltrim($remote_file,'/');
 	    $statinfo = ssh2_sftp_stat($this->getSftpConnection(), $remote_file);
 	    $filesize = isset($statinfo['size']) ? $statinfo['size'] : null;
+	    
+	    if(is_null($filesize) || $filesize <= 0)
+	    {
+	    	$remote_folder = dirname($remote_file);
+	        $lsdir_cmd = "ls -l $remote_folder/*";
+	        $exec_output = $this->execCommand($lsdir_cmd);
+	        
+			KalturaLog::info("sftp rawlist [$exec_output]");
+			
+        	$filesInfo = array_filter(array_map('trim', explode("\n", $exec_output)), 'strlen');
+        			    
+		    // drwxrwxrwx 10 root root 4096 2010-11-24 23:45 file.ext
+		    $regexUnix = "^(?P<permissions>[-drw]{10})\s+(?P<number>\d{1,2})\s+(?P<owner>[\d\w]+)\s+(?P<group>[\d\w]+)\s+(?P<fileSize>\d*)\s+(?P<year>\w{4})-(?P<month>\d{2})-(?P<day>\d{2})\s+(?P<hour>\d{2}):(?P<minute>\d{2})\s+$remote_folder\/(?P<file>.+)\s*$";
+		    
+		    foreach($filesInfo as $fileInfo)
+		    {
+		    	$matches = null;
+		    	if(!preg_match("/$regexUnix/", $fileInfo, $matches))
+		    	{
+		    		KalturaLog::err("Unix regex does not match ftp rawlist output [$fileInfo]");
+					continue;
+		    	}
+		    	
+		    	if($matches['file'] == basename($remote_file))
+		    		return $matches['fileSize'];
+		    }
+	    }
+	    
 	    return $filesize;
 	}
 	
