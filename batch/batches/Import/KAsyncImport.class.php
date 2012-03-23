@@ -77,10 +77,19 @@ class KAsyncImport extends KJobHandlerWorker
     			$curlWrapper = new KCurlWrapper($sourceUrl);
     			$useNoBody = ($job->executionAttempts > 1); // if the process crashed first time, tries with no body instead of range 0-0
     			$curlHeaderResponse = $curlWrapper->getHeader($useNoBody);
-    			if(!$curlHeaderResponse || $curlWrapper->getError())
+    			if(!$curlHeaderResponse || !count($curlHeaderResponse->headers))
     			{
     				$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlWrapper->getErrorNumber(), "Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::FAILED);
     				return $job;
+    			}
+    			
+    			if($curlWrapper->getError())
+    			{
+    				KalturaLog::err("Headers error: " . $curlWrapper->getError());
+    				KalturaLog::err("Headers error number: " . $curlWrapper->getErrorNumber());
+    				$curlWrapper->close();
+    				
+    				$curlWrapper = new KCurlWrapper($sourceUrl);
     			}
     			
     			if(!$curlHeaderResponse->isGoodCode())
