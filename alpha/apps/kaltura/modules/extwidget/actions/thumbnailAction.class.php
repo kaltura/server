@@ -68,6 +68,40 @@ class thumbnailAction extends sfAction
 		$bgcolor = $this->getRequestParameter( "bgcolor", "ffffff" );
 		$partner = null;
 		
+		
+		
+		// validating the inputs
+		if($quality < 20 || $quality > 100)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'quality must be btween 20 and 100');
+		
+		if($src_x < 0 || $src_x > 10000)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_x must be btween 0 and 10000');
+		
+		if($src_y < 0 || $src_y > 10000)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_y must be btween 0 and 10000');
+			
+		if($src_w < 0 || $src_w > 10000)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_w must be btween 0 and 10000');
+			
+		if($src_h < 0 || $src_h > 10000)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_h must be btween 0 and 10000');
+			
+		if($width < 0 || $width > 10000)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'width must be btween 0 and 10000');
+			
+		if($height < 0 || $height > 10000)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'height must be btween 0 and 10000');
+			
+		if($density < 0)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'density must be positive');
+			
+		if($vid_sec < -1)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'vid_sec must be positive');
+			
+		if(!preg_match('/^[0-9a-fA-F]{1,6}$/', $bgcolor))
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bgcolor must be six hexadecimal characters');
+		
+		
 		if ($upload_token_id)
 		{
 			$upload_token = UploadTokenPeer::retrieveByPK($upload_token_id);

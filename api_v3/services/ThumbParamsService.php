@@ -46,11 +46,9 @@ class ThumbParamsService extends KalturaBaseService
 	 * @return KalturaThumbParams
 	 */
 	public function addAction(KalturaThumbParams $thumbParams)
-	{
-		$thumbParams->validatePropertyMinLength("name", 1);
-		
+	{	
 		$thumbParamsDb = new thumbParams();
-		$thumbParams->toObject($thumbParamsDb);
+		$thumbParams->toInsertableObject($thumbParamsDb);
 		
 		$thumbParamsDb->setPartnerId($this->getPartnerId());
 		$thumbParamsDb->save();
@@ -89,9 +87,6 @@ class ThumbParamsService extends KalturaBaseService
 	 */
 	public function updateAction($id, KalturaThumbParams $thumbParams)
 	{
-		if ($thumbParams->name !== null)
-			$thumbParams->validatePropertyMinLength("name", 1);
-			
 		$thumbParamsDb = assetParamsPeer::retrieveByPK($id);
 		if (!$thumbParamsDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);

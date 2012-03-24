@@ -52,10 +52,11 @@ class KExternalErrors
 			self::UI_CONF_NOT_FOUND => "requested ui_conf not found",
 			self::PROXY_LOOPBACK => "proxied request is being looped back",
 			self::MULTIREQUEST_PROXY_FAILED => "tried to dump not the first request",
+			self::BAD_QUERY => "wrong query attributes",
 			
 		);
 	
-	public static function dieError($errorCode)
+	public static function dieError($errorCode, $message = null)
 	{
 		$description = self::$errorDescriptionMap[$errorCode];
 		$args = func_get_args();
@@ -65,6 +66,9 @@ class KExternalErrors
 			$description = @call_user_func_array('sprintf', array_merge(array($description), $args));
 		}
 		
+		if($message)
+			$description .= ", $message";
+			
 		KalturaLog::err("exiting on error $errorCode - $description");
 		
 		header("X-Kaltura:error-$errorCode");

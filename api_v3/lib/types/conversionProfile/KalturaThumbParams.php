@@ -124,16 +124,71 @@ class KalturaThumbParams extends KalturaAssetParams
 //		"cropProviderData",
 	);
 	
+	/* (non-PHPdoc)
+	 * @see KalturaAssetParams::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
+	/**
+	 * @param array $propertiesToSkip
+	 */
+	public function validate($propertiesToSkip = array())
+	{
+		$this->validatePropertyMinLength("name", 1);
+		
+		$this->validatePropertyMinMaxValue('quality', 20, 100, true);
+		$this->validatePropertyMinMaxValue('cropX', 0, 10000, true);
+		$this->validatePropertyMinMaxValue('cropY', 0, 10000, true);
+		$this->validatePropertyMinMaxValue('cropWidth', 0, 10000, true);
+		$this->validatePropertyMinMaxValue('cropHeight', 0, 10000, true);
+		$this->validatePropertyMinMaxValue('width', 0, 10000, true);
+		$this->validatePropertyMinMaxValue('height', 0, 10000, true);
+		$this->validatePropertyMinMaxValue('scaleWidth', 0, 10, true);
+		$this->validatePropertyMinMaxValue('scaleHeight', 0, 10, true);
+		$this->validatePropertyMinValue('density', 0, true);
+		$this->validatePropertyMinValue('videoOffset', 0, true);
+		
+		$this->validatePropertyMinMaxLength('backgroundColor', 1, 6, true);
+		if(!preg_match('/^[0-9a-fA-F]{1,6}$/', $this->backgroundColor))
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_WRONG_FORMAT, $this->getFormattedPropertyNameWithClassName('backgroundColor'), 'six hexadecimal characters');
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validatePropertyMinLength("name", 1);
+		$this->validate($propertiesToSkip);
+		
+		parent::validateForInsert($propertiesToSkip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate()
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validatePropertyMinLength("name", 1, true);
+		$this->validate($propertiesToSkip);
+			
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaAssetParams::getExtraFilters()
+	 */
 	public function getExtraFilters()
 	{
 		return array();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaAssetParams::getFilterDocs()
+	 */
 	public function getFilterDocs()
 	{
 		return array();

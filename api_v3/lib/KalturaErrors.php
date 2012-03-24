@@ -62,6 +62,8 @@ class KalturaErrors extends APIErrors
 	
 	const PROPERTY_VALIDATION_NUMERIC_VALUE = "PROPERTY_VALIDATION_NUMERIC_VALUE,The property \"%s\" must be numeric";
 	
+	const PROPERTY_VALIDATION_WRONG_FORMAT = "PROPERTY_VALIDATION_WRONG_FORMAT,The property \"%s\" must match format %s";
+	
 	const PROPERTY_VALIDATION_MIN_VALUE = "PROPERTY_VALIDATION_MIN_VALUE,The property \"%s\" must have a min value of %s";
 	
 	const PROPERTY_VALIDATION_MAX_VALUE = "PROPERTY_VALIDATION_MAX_VALUE,The property \"%s\" must have a max value of %s";
