@@ -254,10 +254,10 @@ class KalturaObject
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $maxLength);
 	}
 	
-	public function validatePropertyMinMaxLength($propertyName, $minLength, $maxLength)
+	public function validatePropertyMinMaxLength($propertyName, $minLength, $maxLength, $allowNull = false)
 	{
-		$this->validatePropertyMinLength($propertyName, $minLength);
-		$this->validatePropertyMaxLength($propertyName, $maxLength);
+		$this->validatePropertyMinLength($propertyName, $minLength, $allowNull);
+		$this->validatePropertyMaxLength($propertyName, $maxLength, $allowNull);
 	}
 	
 	public function getFormattedPropertyNameWithClassName($propertyName)
