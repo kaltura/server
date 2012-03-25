@@ -253,13 +253,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				kJobsManager::abortChildJobs($dbBatchJob);
 			}
 
-			if(in_array($dbBatchJob->getStatus(),BatchJobPeer::getClosedStatusList()))
-			{
-				$jobEntry = $dbBatchJob->getEntry();
-				if($jobEntry->getMarkedForDeletion())
-					myEntryUtils::deleteEntry($jobEntry,null,true);
-			}
-		
 			switch($jobType)
 			{
 				case BatchJobType::IMPORT:
@@ -339,6 +332,13 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_RETRY && $dbBatchJob->getExecutionAttempts() >= BatchJobPeer::getMaxExecutionAttempts($jobType))
 			{
 				$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FAILED);
+			}
+			
+			if(in_array($dbBatchJob->getStatus(),BatchJobPeer::getClosedStatusList()))
+			{
+				$jobEntry = $dbBatchJob->getEntry();
+				if($jobEntry->getMarkedForDeletion())
+					myEntryUtils::deleteEntry($jobEntry,null,true);
 			}
 		}
 		catch ( Exception $ex )
