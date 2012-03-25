@@ -21,6 +21,9 @@ class MetadataConditionType implements IKalturaPluginEnum, ConditionType
 	 */
 	public static function getAdditionalDescriptions()
 	{
-		return array();
+		return array(
+			self::METADATA_FIELD_COMPARE => 'Validate that all metadata elements number compared correctly to all listed numeric values.',
+			self::METADATA_FIELD_MATCH => 'Validate that any of metadata elements text matches any of listed textual values.',
+		);
 	}
 }
