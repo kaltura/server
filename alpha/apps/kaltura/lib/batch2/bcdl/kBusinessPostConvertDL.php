@@ -65,7 +65,7 @@ class kBusinessPostConvertDL
 			$postConvertAssetType = $postConvertData->getPostConvertAssetType();
 		
 		// don't validate in case of bypass, in case target flavor or media info are null 
-		if($postConvertAssetType && $targetFlavor && $productMediaInfo)
+		if($postConvertAssetType != BatchJob::POSTCONVERT_ASSET_TYPE_BYPASS && $targetFlavor && $productMediaInfo)
 		{
 			try{
 				$productFlavor = KDLWrap::CDLValidateProduct($sourceMediaInfo, $targetFlavor, $productMediaInfo);
