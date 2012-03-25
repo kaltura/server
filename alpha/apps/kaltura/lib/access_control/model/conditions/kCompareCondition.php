@@ -69,19 +69,24 @@ abstract class kCompareCondition extends kCondition
 		switch($this->comparison)
 		{
 			case searchConditionComparison::GREATER_THAN:
+				KalturaLog::debug("Compares field[$field] > value[$value]");
 				return ($field > $value);
 				
 			case searchConditionComparison::GREATER_THAN_OR_EQUEL:
+				KalturaLog::debug("Compares field[$field] >= value[$value]");
 				return ($field >= $value);
 				
 			case searchConditionComparison::LESS_THAN:
+				KalturaLog::debug("Compares field[$field] < value[$value]");
 				return ($field < $value);
 				
 			case searchConditionComparison::LESS_THAN_OR_EQUEL:
+				KalturaLog::debug("Compares field[$field] <= value[$value]");
 				return ($field <= $value);
 				
 			case searchConditionComparison::EQUEL:
 			default:
+				KalturaLog::debug("Compares field[$field] == value[$value]");
 				return ($field == $value);
 		}
 	}

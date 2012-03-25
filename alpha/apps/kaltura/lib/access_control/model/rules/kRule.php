@@ -94,15 +94,27 @@ class kRule
 	protected function fulfilled()
 	{
 		if(!$this->isInContext())
+		{
+			KalturaLog::debug("Rule is not in context");
 			return false;
+		}
 			
 		if(!is_array($this->conditions) || !count($this->conditions))
+		{
+			KalturaLog::debug("No conditions found");
 			return true;
+		}
 			
 		foreach($this->conditions as $condition)
+		{
 			if(!$condition->fulfilled($this->accessControl))
+			{
+				KalturaLog::debug("Condition [" . get_class($condition) . "] not  fulfilled");
 				return false;
+			}
+		}
 				
+		KalturaLog::debug("All conditions fulfilled");
 		return true;
 	}	
 	
@@ -133,8 +145,12 @@ class kRule
 	public function applyContext(kEntryContextDataResult $context)
 	{
 		if(!$this->fulfilled())
+		{
+			KalturaLog::debug("Rule conditions NOT fulfilled");
 			return false;
+		}
 			
+		KalturaLog::debug("Rule conditions fulfilled");
 		$context->addAccessControlMessage($this->message);
 		foreach($this->actions as $action)
 			$context->addAccessControlAction($action);
