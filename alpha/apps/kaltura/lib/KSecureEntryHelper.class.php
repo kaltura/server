@@ -169,7 +169,6 @@ class KSecureEntryHelper
 		if(count($context->getAccessControlActions()))
 		{
 			$actions = $context->getAccessControlActions();
-			$previewActionFound = false;
 			foreach($actions as $action)
 			{
 				/* @var $action kAccessControlAction */
