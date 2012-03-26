@@ -174,6 +174,10 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 	    parent::populateFromObject($object, $add_underscore);
 	    $this->setDefault('urlManagerParamsJson', json_encode($object->urlManagerParams));
 	    $this->setDefault('pathManagerParamsJson', json_encode($object->pathManagerParams));
+	    
+	    // add actual urlManager & pathManager so the form will not overwrite values which are missing from the combo box and were set through the API
+	    $this->addMultiOptionIfMissing('urlManagerClass', $object->urlManagerClass);
+	    $this->addMultiOptionIfMissing('pathManagerClass', $object->pathManagerClass);
 	}
 	
     public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
@@ -182,5 +186,15 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 		$object->urlManagerParams = json_decode($properties['urlManagerParamsJson'], true);
 		$object->pathManagerParams = json_decode($properties['pathManagerParamsJson'], true);
 		return $object;
+	}
+	
+	public function addMultiOptionIfMissing($elementName, $newOption)
+	{
+		$currentOptions = $this->getElement($elementName)->getMultiOptions();
+		if (!isset($currentOptions[$newOption]))
+		{
+		    $currentOptions[$newOption] = $newOption;
+		    $this->getElement($elementName)->setMultiOptions($currentOptions);
+		}
 	}
 }
