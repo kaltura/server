@@ -41,6 +41,13 @@ if(!$storageProfile)
 	exit;
 }
 
+$flavorParamsIds = $storageProfile->getFlavorParamsIds();
+KalturaLog::log("flavorParamsIds [$flavorParamsIds]");
+
+$flavorParamsArr = null;
+if(!is_null($flavorParamsIds) && strlen(trim($flavorParamsIds)))
+	$flavorParamsArr = explode(',', $flavorParamsIds);
+
 $moreEntries = true;
 $limitPerLoop = 500;
 $totalExported = 0;
@@ -72,7 +79,10 @@ while ($moreEntries)
     	
     	$flavors = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
     	foreach($flavors as $flavor)
-    		$keys[] = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+    	{
+			if(!$flavorParamsArr || in_array($flavor->getFlavorParamsId(), $flavorParamsArr))
+				$keys[] = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+    	}
     	
     	foreach($keys as $index => $key)
     	{
