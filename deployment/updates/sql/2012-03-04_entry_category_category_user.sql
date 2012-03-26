@@ -17,7 +17,8 @@ ADD `contribution_policy` TINYINT default 2,
 ADD `custom_data` TEXT,
 ADD	`privacy_context` VARCHAR(255),
 ADD `privacy_contexts` VARCHAR(255),
-ADD	`inherited_parent_id` INTEGER;
+ADD	`inherited_parent_id` INTEGER,
+MODIFY full_name TEXT;
 	
 CREATE TABLE `category_kuser`
 (
