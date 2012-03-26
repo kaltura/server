@@ -343,10 +343,18 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine();
 	}
 	
-	function writeService(DOMElement $serviceNode)
+	function writeService(DOMElement $serviceNode, $serviceName = null, $serviceId = null, $actionPrefix = "", $extends = "KalturaServiceBase")
 	{
-		$serviceName = $serviceNode->getAttribute("name");
-		$serviceId = $serviceNode->getAttribute("id");
+		$serviceName = $serviceName ? $serviceName : $serviceNode->getAttribute("name");
+		$serviceId = $serviceId ? $serviceId : $serviceNode->getAttribute("id");
+		
+		
+		$servicePlugins = $serviceNode->getElementsByTagName("servicePlugin");
+			
+		foreach ($servicePlugins as $servicePlugin)
+		{
+		    $this->writeServicePluginClasses($servicePlugin, $serviceName, $serviceId);
+		}
 		
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 		$this->appendLine();
@@ -359,25 +367,38 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-		$this->appendLine("class $serviceClassName extends KalturaServiceBase");
+		$this->appendLine("class $serviceClassName extends $extends");
 		$this->appendLine("{");
+		
+		if ($servicePlugins && count($servicePlugins))
+		{
+		    foreach ($servicePlugins as $servicePlugin)
+		    {
+		        $this->appendLine("");
+		        $this->appendLine('	/**');
+			    $this->appendLine("	* @param Kaltura".$this->upperCaseFirstLetter($servicePlugin->getAttribute("name"))."ServicePlugin");
+			    $this->appendLine('	*/');
+			    $this->appendLine("	public $".$servicePlugin->getAttribute("name").";");
+		    }
+		}
+		
 		$this->appendLine("	function __construct(KalturaClient \$client = null)");
 		$this->appendLine("	{");
 		$this->appendLine("		parent::__construct(\$client);");
+		
+		
 		$this->appendLine("	}");
 		
-		$actionNodes = $serviceNode->childNodes;
+		$actionNodes = $serviceNode->getElementsByTagName("action");
 		foreach($actionNodes as $actionNode)
 		{
-		    if ($actionNode->nodeType != XML_ELEMENT_NODE)
-				continue;
-				
-		    $this->writeAction($serviceId, $serviceName, $actionNode);
+            $this->writeAction($serviceId, $actionNode, $actionPrefix);
 		}
+		
 		$this->appendLine("}");
 	}
 	
-	function writeAction($serviceId, $serviceName, DOMElement $actionNode)
+	function writeAction($serviceId, DOMElement $actionNode, $actionPrefix = "")
 	{
 		$action = $actionNode->getAttribute("name");
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
@@ -454,15 +475,15 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		
 	    if($resultType == 'file')
 	    {
-			$this->appendLine("		\$this->client->queueServiceActionCall('" . strtolower($serviceId) . "', '$action', \$kparams);");
+			$this->appendLine("		\$this->client->queueServiceActionCall('" . strtolower($serviceId) . "', '$actionPrefix$action', \$kparams);");
 			$this->appendLine('		$resultObject = $this->client->getServeUrl();');
 	    }
 	    else
 	    {
 			if ($haveFiles)
-				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams, \$kfiles);");
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$actionPrefix$action\", \$kparams, \$kfiles);");
 			else
-				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams);");
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$actionPrefix$action\", \$kparams);");
 			$this->appendLine("		if (\$this->client->isMultiRequest())");
 			$this->appendLine("			return \$this->client->getMultiRequestResult();");
 			$this->appendLine("		\$resultObject = \$this->client->doQueue();");
@@ -484,6 +505,58 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	}");
 	}
 	
+	function writeServicePluginClasses (DOMElement $extendingPluginNode, $extendedServiceName, $extendedServiceId)
+	{
+	    $extendingPluginName = $extendingPluginNode->getAttribute("name");
+	    
+	    $servicePluginClassName = "Kaltura". $this->upperCaseFirstLetter($extendingPluginName) ."ServicePlugin";
+	    
+	    $this->appendLine("");
+	    $this->appendLine("class ". $servicePluginClassName . " extends BaseKalturaServicePlugin");
+	    $this->appendLine("{");
+	    
+	    $serviceNodes = $extendingPluginNode->getElementsByTagName("service");
+	    foreach ($serviceNodes as $serviceNode)
+	    {
+	        if ($serviceNode->nodeName == "service")
+	        {
+	            $this->appendLine("	/**");
+	            $this->appendLine("	* @param Kaltura". $this->upperCaseFirstLetter($serviceNode->getAttribute("name")) ."ExtendedService");
+	            $this->appendLine("	*/");
+	            $this->appendLine("	public $".$serviceNode->getAttribute("name"));
+	            $this->appendLine("");
+	        }
+	    }
+	    
+	    $this->appendLine("	public function __construct(KalturaClient \$client = null)");
+	    $this->appendLine("	{");
+	    $this->appendLine("		parent::__construct(\$client);");
+	    
+	    foreach ($serviceNodes as $serviceNode)
+	    {
+	        $extendingServiceName = $serviceNode->getAttribute("name");
+	        $this->appendLine("		$".$extendingServiceName." = new Kaltura".$this->upperCaseFirstLetter($extendingServiceName)."ExtendedService();");
+	    }
+	    
+	    $this->appendLine("	}");
+	    $this->appendLine("}");
+	    $this->appendLine("");
+	    
+	    foreach ($serviceNodes as $serviceNode)
+	    {
+	        $extendingServiceName = $serviceNode->getAttribute("name");
+	        
+	        $extendingServiceClassName = "Kaltura".$this->upperCaseFirstLetter($extendingServiceName)."Extended";
+	        
+	        $this->writeService($serviceNode, $extendingServiceClassName , $extendedServiceId, $extendingPluginName."_".$extendingServiceName."_"   ,"KalturaExtendedService");
+	    }
+	}
+	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @param unknown_type $paramNodes
+	 */
 	function getSignature($paramNodes)
 	{
 		$signature = "";
