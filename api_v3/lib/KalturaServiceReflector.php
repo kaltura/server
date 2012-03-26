@@ -41,9 +41,19 @@ class KalturaServiceReflector
 	private $_reservedKeys = array("service", "action", "format", "ks", "callback");
 	
 	/**
+	 * @var string
+	 */
+	private $_subService;
+	
+	/**
+	 * @var string
+	 */
+	private $_pluginName;
+	
+	/**
 	 * @param string $service
 	 */
-	public function KalturaServiceReflector($service)
+	public function __construct($service, &$action=null)
 	{
 		$this->_serviceId = strtolower($service);
 		$this->_servicesMap = KalturaServicesMap::getMap();
@@ -55,9 +65,64 @@ class KalturaServiceReflector
 		
 		if (!class_exists($this->_serviceClass))
 			throw new Exception("Service class [$this->_serviceClass] for service [$service] does not exists");
-			
+		
+		//If $action was passed, try to find it in $this->_serviceClass
+		
+		if ($action)
+		{
+		    $tempReflector = new KalturaServiceReflector($this->_serviceClass);
+		    
+		    if (!$tempReflector->isActionExists($action))
+		    {
+        		//If the action $action could not be found on $this->_serviceClass, search for it among the plugin services
+		        list ($extendingServiceId, $action) = $this->getExtendingPlugin($service, $action);
+		        
+		        $this->_serviceClass = $this->_servicesMap[$extendingServiceId];
+		    }
+		}
+		
+		
+		//If the action could not be found on the plugins either, throw an exception
 		$reflectionClass = new ReflectionClass($this->_serviceClass);
+			
 		$this->_docCommentParser = new KalturaDocCommentParser($reflectionClass->getDocComment()); 
+	}
+	
+	protected function getExtendingPlugin ($service, $action)
+	{
+	    //if found more than 1 extending service class - throw exception!
+	    
+	    $extendingPlugins = KalturaPluginManager::getPluginInstances("IKalturaServiceExtender");
+	    
+	    if (!isset($extendingPlugins))
+	    {
+	        //throw exception - no extending plugin found among the plugins at all
+	    }
+	    
+	    $foundExtendingService = false;
+	    $extendingServiceAndAction = array();
+	    foreach ($extendingPlugins as $extendingPlugin)
+	    {
+	        /* @var $extendingPlugin IKalturaActionsPlugin*/
+	       $serviceAndAction = $extendingPlugin->getExtendedActionAndService($service, $action);
+	       
+	       if ($serviceAndAction && count($serviceAndAction) && !$foundExtendingService)
+	       {
+	           $foundExtendingService = true;
+	           $extendingServiceAndAction = $serviceAndAction;
+	       }
+	       else if ($serviceAndAction && count($serviceAndAction) && $foundExtendingService)
+	       {
+	           //throw exception - more than 1 extending service
+	       }
+	    }
+	    
+	    if  ($foundExtendingService)
+	    {
+	        return $extendingServiceAndAction;
+	    }
+	    
+	    return null;
 	}
 	
 	public function getServiceInfo()
@@ -165,7 +230,7 @@ class KalturaServiceReflector
 	 * @param bool $ignoreDeprecated
 	 * @return array
 	 */
-	public function getActions($ignoreDeprecated = false)
+	public function getActions($ignoreDeprecated = false, $ignoreParentClassActions = false)
 	{
 		$actionsArrayType = intval($ignoreDeprecated);
 		if (isset($this->_actions[$actionsArrayType]) && is_array($this->_actions[$actionsArrayType]))
@@ -178,22 +243,52 @@ class KalturaServiceReflector
 		$actions = array();
 		foreach($reflectionMethods as $reflectionMethod)
 		{
+		    /* @var $reflectionMethod ReflectionMethod */
 			$docComment = $reflectionMethod->getDocComment();
 			$parsedDocComment = new KalturaDocCommentParser( $docComment );
 			if ($parsedDocComment->action)
 			{
 				if($ignoreDeprecated && $parsedDocComment->deprecated)
 					continue;
-					
+				if ($ignoreParentClassActions)
+				{
+				    KalturaLog::debug("Ignoring parent class actions for class [".$this->getServiceClass()."], parent class [". $reflectionMethod->class."].");
+				    if ($reflectionMethod->class != $this->getServiceClass())
+				    {
+				        continue;
+				    }
+				}	
 				$actionName = $parsedDocComment->action;
 				$actionId = strtolower($actionName);
 				$actions[$actionId] = $reflectionMethod->getName(); // key is the action id (action name lower cased), value is the method name
 			}
 		}
+		//TODO: get all extending services' actions.
 		
 		$this->_actions[$actionsArrayType] = $actions;
 		
 		return $this->_actions[$actionsArrayType];
+	}
+	
+	/**
+	 * Function returns all extending actions for the reflected service
+	 * @return array
+	 */
+	public function getExtendingPluginList ()
+	{
+	    $extendingPlugins = KalturaPluginManager::getPluginInstances("IKalturaServiceExtender");
+	    
+	    $serviceExtendingPlugins = array();
+	    foreach ($extendingPlugins as $extendingPlugin)
+	    {
+	        $extendingServices = $extendingPlugin->getExtendingServices($this->getServiceName());
+	        if (isset($extendingServices) && count($extendingServices) )
+	        {
+	            $serviceExtendingPlugins[] = $extendingPlugin;
+	        }
+	    }
+	     
+	    return $serviceExtendingPlugins;
 	}
 	
 	/**
