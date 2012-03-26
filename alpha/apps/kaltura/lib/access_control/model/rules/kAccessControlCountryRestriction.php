@@ -68,7 +68,11 @@ class kAccessControlCountryRestriction extends kAccessControlRestriction
 	function setCountryList($values)
 	{
 		$values = explode(',', $values);
-		$this->getCondition()->setValues($values);
+		$stringValues = array();
+		foreach($values as $value)
+			$stringValues[] = new kStringValue($value);
+			
+		$this->getCondition()->setValues($stringValues);
 	}
 	
 	/**

@@ -69,7 +69,11 @@ class kAccessControlIpAddressRestriction extends kAccessControlRestriction
 	function setIpAddressList($values)
 	{
 		$values = explode(',', $values);
-		$this->getCondition()->setValues($values);
+		$stringValues = array();
+		foreach($values as $value)
+			$stringValues[] = new kStringValue($value);
+			
+		$this->getCondition()->setValues($stringValues);
 	}
 	
 	/**

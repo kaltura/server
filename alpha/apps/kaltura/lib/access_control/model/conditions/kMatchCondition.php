@@ -41,7 +41,10 @@ abstract class kMatchCondition extends kCondition
 		foreach($this->values as $value)
 		{
 			/* @var $value kStringValue */
-			$values[] = $value->getValue();
+			if(is_object($value))
+				$values[] = $value->getValue();
+			else
+				$values[] = strval($value);
 		}
 		
 		return $values;

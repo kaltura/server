@@ -69,7 +69,11 @@ class kAccessControlUserAgentRestriction extends kAccessControlRestriction
 	function setUserAgentRegexList($values)
 	{
 		$values = explode(',', $values);
-		$this->getCondition()->setValues($values);
+		$stringValues = array();
+		foreach($values as $value)
+			$stringValues[] = new kStringValue($value);
+			
+		$this->getCondition()->setValues($stringValues);
 	}
 	
 	/**

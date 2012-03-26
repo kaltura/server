@@ -60,12 +60,23 @@ abstract class kCompareCondition extends kCondition
 	abstract public function getFieldValue(accessControl $accessControl);
 	
 	/**
+	 * @return int
+	 */
+	function getIntegerValue()
+	{
+		if(is_object($this->value))
+			return $this->value->getValue();
+		else
+			return intval($this);
+	}
+	
+	/**
 	 * @param int $field
 	 * @return bool
 	 */
 	protected function fieldFulfilled($field)
 	{
-		$value = $this->value->getValue();
+		$value = $this->getIntegerValue();
 		switch($this->comparison)
 		{
 			case searchConditionComparison::GREATER_THAN:
@@ -97,7 +108,7 @@ abstract class kCompareCondition extends kCondition
 	public function internalFulfilled(accessControl $accessControl)
 	{
 		$field = $this->getFieldValue($accessControl);
-		$value = $this->value->getValue();
+		$value = $this->getIntegerValue();
 		
 		KalturaLog::debug("Copares field [$field] to value [$value]");
 		if (is_null($value))
