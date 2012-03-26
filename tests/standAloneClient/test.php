@@ -69,13 +69,13 @@ function parseInputObject(SimpleXMLElement $input)
 	switch($type)
 	{
 		case 'string':
-			return $input->__toString();
+			return strval($input);
 			
 		case 'int':
-			return intval($input->__toString());
+			return intval(strval($input));
 			
 		case 'bool':
-			return (bool)($input->__toString());
+			return (bool)(strval($input));
 			
 		case 'array':
 			return parseInputArray($input->item);
