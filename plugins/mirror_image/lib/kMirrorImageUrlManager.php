@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.mirrorImage
+ * @subpackage storage
+ */
 class kMirrorImageUrlManager extends kUrlManager
 {
     
