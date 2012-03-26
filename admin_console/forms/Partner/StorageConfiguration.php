@@ -171,13 +171,13 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 	
 	public function populateFromObject($object, $add_underscore = true)
 	{
-	    parent::populateFromObject($object, $add_underscore);
-	    $this->setDefault('urlManagerParamsJson', json_encode($object->urlManagerParams));
-	    $this->setDefault('pathManagerParamsJson', json_encode($object->pathManagerParams));
-	    
 	    // add actual urlManager & pathManager so the form will not overwrite values which are missing from the combo box and were set through the API
 	    $this->addMultiOptionIfMissing('urlManagerClass', $object->urlManagerClass);
 	    $this->addMultiOptionIfMissing('pathManagerClass', $object->pathManagerClass);
+	    
+	    parent::populateFromObject($object, $add_underscore);
+	    $this->setDefault('urlManagerParamsJson', json_encode($object->urlManagerParams));
+	    $this->setDefault('pathManagerParamsJson', json_encode($object->pathManagerParams));
 	}
 	
     public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
