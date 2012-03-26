@@ -82,7 +82,6 @@ class KalturaFrontController
 		set_error_handler(array(&$this, "errorHandler"));
 		set_exception_handler(array(&$this, "exceptionHandler"));
 		
-		
 		KalturaLog::debug("Params [" . print_r($this->params, true) . "]");
 		if ($this->service == "multirequest")
 		{
@@ -335,21 +334,17 @@ class KalturaFrontController
 		else if ($ex instanceof kCoreException)
 		{
 			switch($ex->getCode())
-			{
-				case kCoreException::MAX_CATEGORY_DEPTH_REACHED:
-					$object = new KalturaAPIException(KalturaErrors::MAX_CATEGORY_DEPTH_REACHED, category::MAX_CATEGORY_DEPTH);
-					break;
-					
-				case kCoreException::MAX_NUMBER_OF_CATEGORIES_REACHED:
-					$object = new KalturaAPIException(KalturaErrors::MAX_NUMBER_OF_CATEGORIES_REACHED, Partner::MAX_NUMBER_OF_CATEGORIES);
-					break;
-					
+			{	
 				case kCoreException::MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED:
 					$object = new KalturaAPIException(KalturaErrors::MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED, $ex->getData());
 					break;
 					
 				case kCoreException::MAX_CATEGORIES_PER_ENTRY:
 					$object = new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, entry::MAX_CATEGORIES_PER_ENTRY);
+					break;
+				
+				case kCoreException::SEARCH_TOO_GENERAL:
+					throw new KalturaAPIException(KalturaErrors::SEARCH_TOO_GENERAL);
 					break;
 					
 				case kCoreException::SOURCE_FILE_NOT_FOUND:
