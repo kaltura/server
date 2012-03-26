@@ -155,7 +155,7 @@ class kFlowHelper
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 
-		if($isNewContent || $dbEntry->setStatus() == entryStatus::IMPORT)
+		if($isNewContent || $dbEntry->getStatus() == entryStatus::IMPORT)
 			// check if status == import for importing file of type url (filesync exists, and we want to raise event for conversion profile to start) 
 			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
 		
