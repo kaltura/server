@@ -36,7 +36,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	    $this->_xmlElement->setAttribute('apiVersion', KALTURA_API_VERSION);
 	    $this->_xmlElement->setAttribute('generatedDate', time());
 	    
-	    $this->detectExtendingPlugins();
+	    $this->listExtendingPlugins();
 	    
 	    $apiV3Path = realpath(dirname(__FILE__) . '/../api_v3');
 		$svnVersion = shell_exec('svnversion ' . $apiV3Path);
@@ -506,15 +506,15 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	    return $description;
 	}
 	
-	protected function detectExtendingPlugins ()
+	protected function listExtendingPlugins ()
 	{
 	    $servicePlugins = KalturaPluginManager::getPluginInstances("IKalturaServiceExtender");
 	    
 	    foreach ( $servicePlugins as $servicePlugin)
 	    {
-	        $extendingServices = $servicePlugin->getExtenstionMap ();
+	        $extensionMap = $servicePlugin->getExtenstionMap ();
 	        
-	        foreach ($extendingServices as $extendedService=>$extendingServices)
+	        foreach ($extensionMap as $extendedService=>$extendingServices)
 	        {
 	            foreach ($extendingServices as $extendingService)
 	            {
