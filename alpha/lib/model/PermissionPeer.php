@@ -193,7 +193,12 @@ class PermissionPeer extends BasePermissionPeer
 	public static function getByNameAndPartner($permissionName, $partnerIdsArray)
 	{
 		$c = new Criteria();
-		if (!in_array('*', $partnerIdsArray, true)) {
+		if (
+				(is_array($partnerIdsArray) && !in_array('*', $partnerIdsArray, true))
+				||
+				(!is_array($partnerIdsArray) && $partnerIdsArray != '*')
+			) 
+		{
 			$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
 		}
 		$c->addAnd(PermissionPeer::NAME, $permissionName, Criteria::EQUAL);
