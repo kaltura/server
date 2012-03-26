@@ -31,7 +31,6 @@ class ReportService extends KalturaBaseService
 	 */
 	function getGraphsAction( $reportType , KalturaReportInputFilter $reportInputFilter , $dimension = null , $objectIds = null  )
 	{
-		try {
 		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray ( myReportsMgr::getGraph( $this->getPartnerId() , 
 			$reportType , 
 			$reportInputFilter->toReportsInputFilter() ,
@@ -39,14 +38,7 @@ class ReportService extends KalturaBaseService
 			$objectIds ) );
 //print_r ( $reportGraphs );
 //		die();
-		}
-		catch(kCoreException $ex)
-	    {
-	    	if ($ex->getCode() == kCoreException::SEARCH_TOO_GENERAL);
-	    		throw new KalturaAPIException(KalturaErrors::SEARCH_TOO_GENERAL);
-	    		
-    		throw $ex;
-	    }
+
 		return $reportGraphs;
 	}
 
@@ -63,19 +55,10 @@ class ReportService extends KalturaBaseService
 	{
 		$reportTotal = new KalturaReportTotal();
 		
-		try {
-			list ( $header , $data ) = myReportsMgr::getTotal( $this->getPartnerId() , 
-				$reportType , 
-				$reportInputFilter->toReportsInputFilter() , $objectIds );
-			$reportTotal->fromReportTotal ( $header , $data );
-		}
-		catch(kCoreException $ex)
-	    {
-	    	if ($ex->getCode() == kCoreException::SEARCH_TOO_GENERAL);
-	    		throw new KalturaAPIException(KalturaErrors::SEARCH_TOO_GENERAL);
-	    		
-    		throw $ex;
-	    }
+		list ( $header , $data ) = myReportsMgr::getTotal( $this->getPartnerId() , 
+			$reportType , 
+			$reportInputFilter->toReportsInputFilter() , $objectIds );
+		$reportTotal->fromReportTotal ( $header , $data );
 			
 		return $reportTotal;
 	}	
@@ -99,20 +82,12 @@ class ReportService extends KalturaBaseService
 	{
 		$reportTable = new KalturaReportTable();
 		
-		try {
-			list ( $header , $data , $totalCount ) = myReportsMgr::getTable( $this->getPartnerId() , 
-				$reportType , 
-				$reportInputFilter->toReportsInputFilter() ,
-				$pager->pageSize , $pager->pageIndex ,
-				$order ,  $objectIds);
-		}
-		catch(kCoreException $ex)
-	    {
-	    	if ($ex->getCode() == kCoreException::SEARCH_TOO_GENERAL);
-	    		throw new KalturaAPIException(KalturaErrors::SEARCH_TOO_GENERAL);
-	    		
-    		throw $ex;
-	    }
+		list ( $header , $data , $totalCount ) = myReportsMgr::getTable( $this->getPartnerId() , 
+			$reportType , 
+			$reportInputFilter->toReportsInputFilter() ,
+			$pager->pageSize , $pager->pageIndex ,
+			$order ,  $objectIds);
+
 		$reportTable->fromReportTable ( $header , $data , $totalCount );
 			
 		return $reportTable;
@@ -140,21 +115,11 @@ class ReportService extends KalturaBaseService
 		KalturaFilterPager $pager = null , 
 		$order = null , $objectIds = null )
 	{
-		try {
-		
-			$report = myReportsMgr::getUrlForReportAsCsv( $this->getPartnerId() ,  $reportTitle , $reportText , $headers , $reportType , 
-				$reportInputFilter->toReportsInputFilter() ,
-				$dimension , 
-				$objectIds ,
-				$pager->pageSize , $pager->pageIndex , $order );
-		}
-		catch(kCoreException $ex)
-	    {
-	    	if ($ex->getCode() == kCoreException::SEARCH_TOO_GENERAL);
-	    		throw new KalturaAPIException(KalturaErrors::SEARCH_TOO_GENERAL);
-	    		
-    		throw $ex;
-	    } 
+		$report = myReportsMgr::getUrlForReportAsCsv( $this->getPartnerId() ,  $reportTitle , $reportText , $headers , $reportType , 
+			$reportInputFilter->toReportsInputFilter() ,
+			$dimension , 
+			$objectIds ,
+			$pager->pageSize , $pager->pageIndex , $order ); 
 	    
 	    return $report;
 	}
