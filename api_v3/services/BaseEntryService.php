@@ -679,7 +679,7 @@ class BaseEntryService extends KalturaEntryService
 			$disableCache = true;
 			if (kConf::hasParam("optimized_playback"))
 			{
-				$partnerId = $this->accessControl->getPartnerId();
+				$partnerId = $accessControl->getPartnerId();
 				$optimizedPlayback = kConf::get("optimized_playback");
 				if (array_key_exists($partnerId, $optimizedPlayback))
 				{
