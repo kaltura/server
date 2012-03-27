@@ -60,15 +60,24 @@ class AccessControlService extends KalturaBaseService
 	 * @param int $id
 	 * @param KalturaAccessControl $accessControl
 	 * @return KalturaAccessControl
+	 * 
+	 * @throws KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND
+	 * @throws KalturaErrors::ACCESS_CONTROL_NEW_VERSION_UPDATE
 	 */
 	function updateAction($id, KalturaAccessControl $accessControl)
 	{
 		$dbAccessControl = accessControlPeer::retrieveByPK($id);
 		if (!$dbAccessControl)
 			throw new KalturaAPIException(KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND, $id);
+	
+		$rules = $dbAccessControl->getRulesArray();
+		foreach($rules as $rule)
+		{
+			if(!($rule instanceof kAccessControlRestriction))
+				throw new KalturaAPIException(KalturaErrors::ACCESS_CONTROL_NEW_VERSION_UPDATE, $id);
+		}
 		
-		if ($accessControl->name !== null)
-			$accessControl->validatePropertyMinLength("name", 1);
+		$accessControl->validatePropertyMinLength("name", 1, true);
 			
 		$accessControl->toUpdatableObject($dbAccessControl);
 		$dbAccessControl->save();
