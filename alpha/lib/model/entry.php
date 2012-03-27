@@ -917,6 +917,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	// will work only for types that the data can be served as an a response to the service	
 	public function setDataContent ( $v , $increment_version = true , $allow_type_roughcut = false )
 	{
+		if($v == $this->getDataContent())
+		{
+			KalturaLog::info("Data content didn't change, ignoring the setter");
+			return;
+		}
+		
 //		if ( $v === null ) return ;
 		// DON'T do this for ENTRY_TYPE_SHOW unless $allow_type_roughcut is true
 		// - the metadata is handling is complex and is done in other places in the code 
