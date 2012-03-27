@@ -470,6 +470,12 @@ class ks
 			return true;
 		}
 		
+	    if ( $required_priv_name == ks::PRIVILEGE_VIEW && 
+			$this->verifyPlaylistPrivileges(ks::PRIVILEGE_VIEW_ENTRY_OF_PLAYLIST, $required_priv_value, $partnerId))
+		{
+			return true;
+		}
+		
 		return false;
 	}
 	
