@@ -106,7 +106,9 @@ class MetroPcsDistributionFeedHelper
 			$endDate->setTimezone(new DateTimeZone('EST'));
 		    $date = $endDate->format('c');			
 		    $this->setNodeValue('/msdp:rss/msdp:channel/msdp:endDate',$date); 
-		}		
+		}	
+
+		$this->setNodeValue('/msdp:rss/msdp:channel/msdp:rating', $this->getValueForField(KalturaMetroPcsDistributionField::RATING));
 	}
 				
 	/**
