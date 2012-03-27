@@ -86,7 +86,7 @@ class KalturaPlaylist extends KalturaBaseEntry
 		$object_to_fill->setType ( entryType::PLAYLIST );
 		parent::toUpdatableObject( $object_to_fill )	;
 		$object_to_fill->setType ( entryType::PLAYLIST );
-		$object_to_fill->setDataContent( $this->playlistContent );
+//		$object_to_fill->setDataContent( $this->playlistContent );
 		return $object_to_fill;
 	}
 	
@@ -110,7 +110,7 @@ class KalturaPlaylist extends KalturaBaseEntry
 		$dbObject->setType ( entryType::PLAYLIST );
 		parent::toObject( $dbObject )	;
 		$dbObject->setType ( entryType::PLAYLIST );
-		$dbObject->setDataContent( $this->playlistContent );
+//		$dbObject->setDataContent( $this->playlistContent );
 		
 		return $dbObject;
 	}
