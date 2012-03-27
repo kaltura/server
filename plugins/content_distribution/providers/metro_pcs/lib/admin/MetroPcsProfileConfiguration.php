@@ -44,12 +44,13 @@ class Form_MetroPcsProfileConfiguration extends Form_ConfigurableProfileConfigur
 			'label'			=> 'FTP Path:',
 			'filters'		=> array('StringTrim'),
 		));
-		
+
+		/*
 		$this->addElement('text', 'provider_name', array(
 			'label'			=> 'Provider:',
 			'filters'		=> array('StringTrim')
 		));
-		
+		*/
 		$this->addElement('text', 'provider_id', array(
 			'label'			=> 'Provider id:',
 			'filters'		=> array('StringTrim')

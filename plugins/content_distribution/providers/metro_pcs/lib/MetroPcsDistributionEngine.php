@@ -147,7 +147,8 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$xmlString = $feed->getXmlString();	
 
 		KalturaLog::debug('result xml - '.PHP_EOL.$xmlString);
-		file_put_contents($xmlFileName, $xmlString);
+		$tempFile = tmpfile();
+		file_put_contents($tempFile, $xmlString);
 		
 		//load the FTP
 		$ftpManager = $this->getFTPManager($distributionProfile);
@@ -158,7 +159,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$this->uploadFlavorAssetFile($path, $feed, $providerData, $ftpManager, $flavorAsset, $currentTime);
 			
 		//upload feed xml file to FTP
-		$ftpManager->putFile($destXmlFile, $xmlFileName, true);			
+		$ftpManager->putFile($destXmlFile, $tempFile, true);			
 		
 		KalturaLog::info('Files were uploaded successfully');
 	
@@ -194,7 +195,8 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$destXmlFile = "{$path}/{$xmlFileName}";		
 		$xmlString = $feed->getXmlString();	
 		KalturaLog::debug('result xml - '.PHP_EOL.$xmlString);
-		file_put_contents($xmlFileName, $xmlString);
+		$tempFile = tmpfile();
+		file_put_contents($tempFile, $xmlString);
 	
 		//load the FTP
 		$ftpManager = $this->getFTPManager($distributionProfile);
@@ -202,7 +204,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 			throw new Exception("FTP manager not loaded");		
 			
 		//upload feed xml file to FTP
-		$ftpManager->putFile($destXmlFile, $xmlFileName, true);			
+		$ftpManager->putFile($destXmlFile, $tempFile, true);			
 		
 		KalturaLog::info('XML file was deleted successfully');
 	

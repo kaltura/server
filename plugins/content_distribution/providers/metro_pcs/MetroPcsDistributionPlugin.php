@@ -213,7 +213,7 @@ class MetroPcsDistributionPlugin extends KalturaPlugin implements IKalturaPermis
 	{
 		$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
 		/* @var $distributionProfile MetroPcsDistributionProfile */
-		$mrss->addChild('provider_name', $distributionProfile->getProviderName());
+		//$mrss->addChild('provider_name', $distributionProfile->getProviderName());
 		$mrss->addChild('provider_id', $distributionProfile->getProviderId());		
 		$mrss->addChild('copyright', $distributionProfile->getCopyright());
 		$mrss->addChild('entitlements', $distributionProfile->getEntitlements());

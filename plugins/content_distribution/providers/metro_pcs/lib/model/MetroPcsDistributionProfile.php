@@ -9,7 +9,7 @@ class MetroPcsDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_FTP_LOGIN 			= 'ftpLogin';
 	const CUSTOM_DATA_FTP_PASS 				= 'ftpPass';
 	const CUSTOM_DATA_FTP_PATH				= 'ftpPath';
-	const CUSTOM_DATA_PROVIDER_NAME			= 'providerName';
+	//const CUSTOM_DATA_PROVIDER_NAME			= 'providerName';
 	const CUSTOM_DATA_PROVIDER_ID 			= 'providerId';
 	const CUSTOM_DATA_COPYRIGHT 			= 'copyright';
 	const CUSTOM_DATA_ENTITLEMENTS 			= 'entitlements';
@@ -354,7 +354,7 @@ class MetroPcsDistributionProfile extends ConfigurableDistributionProfile
 	public function getFtpLogin()					{return $this->getFromCustomData(self::CUSTOM_DATA_FTP_LOGIN);}
 	public function getFtpPass()					{return $this->getFromCustomData(self::CUSTOM_DATA_FTP_PASS);}
 	public function getFtpPath()					{return $this->getFromCustomData(self::CUSTOM_DATA_FTP_PATH);}
-	public function getProviderName()				{return $this->getFromCustomData(self::CUSTOM_DATA_PROVIDER_NAME);}
+	//public function getProviderName()				{return $this->getFromCustomData(self::CUSTOM_DATA_PROVIDER_NAME);}
 	public function getProviderId()					{return $this->getFromCustomData(self::CUSTOM_DATA_PROVIDER_ID);}
 	public function getCopyright()					{return $this->getFromCustomData(self::CUSTOM_DATA_COPYRIGHT);}
 	public function getEntitlements()				{return $this->getFromCustomData(self::CUSTOM_DATA_ENTITLEMENTS);}
@@ -365,7 +365,7 @@ class MetroPcsDistributionProfile extends ConfigurableDistributionProfile
 	public function setFtpLogin($v)					{$this->putInCustomData(self::CUSTOM_DATA_FTP_LOGIN, $v);}
 	public function setFtpPass($v)					{$this->putInCustomData(self::CUSTOM_DATA_FTP_PASS, $v);}
 	public function setFtpPath($v)					{$this->putInCustomData(self::CUSTOM_DATA_FTP_PATH, $v);}
-	public function setProviderName($v)				{$this->putInCustomData(self::CUSTOM_DATA_PROVIDER_NAME, $v);}
+	//public function setProviderName($v)				{$this->putInCustomData(self::CUSTOM_DATA_PROVIDER_NAME, $v);}
 	public function setProviderId($v)				{$this->putInCustomData(self::CUSTOM_DATA_PROVIDER_ID, $v);}
 	public function setCopyright($v)				{$this->putInCustomData(self::CUSTOM_DATA_COPYRIGHT, $v);}
 	public function setEntitlements($v)				{$this->putInCustomData(self::CUSTOM_DATA_ENTITLEMENTS, $v);}
