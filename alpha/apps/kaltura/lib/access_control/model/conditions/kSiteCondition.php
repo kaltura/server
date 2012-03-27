@@ -83,7 +83,7 @@ class kSiteCondition extends kMatchCondition
 				$globalWhitelistedDomains = explode(',', $globalWhitelistedDomains);
 				
 			foreach($globalWhitelistedDomains as $globalWhitelistedDomain)
-				$this->values[] = $globalWhitelistedDomain;
+				$this->values[] = new kStringValue($globalWhitelistedDomain);
 		}
 		
 		return parent::internalFulfilled($accessControl);
