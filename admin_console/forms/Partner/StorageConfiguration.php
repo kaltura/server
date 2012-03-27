@@ -127,12 +127,14 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			
 		));
+		$this->getElement('pathManagerClass')->setRequired(true)->setRegisterInArrayValidator(false);
 		 
 		$this->addElement('select', 'urlManagerClass', array(
 			'label'			=> 'Delivery URL format :',
 			'filters'		=> array('StringTrim'),
 			
 		));
+		$this->getElement('urlManagerClass')->setRequired(true)->setRegisterInArrayValidator(false);
 		 
 		$this->addElement('select', 'trigger', array(
 			'label'			=> 'Trigger:',
@@ -193,8 +195,7 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 		$currentOptions = $this->getElement($elementName)->getMultiOptions();
 		if (!isset($currentOptions[$newOption]))
 		{
-		    $currentOptions[$newOption] = $newOption;
-		    $this->getElement($elementName)->setMultiOptions($currentOptions);
+		    $this->getElement($elementName)->addMultiOption($newOption, $newOption)->setRegisterInArrayValidator(false);
 		}
 	}
 }
