@@ -9,7 +9,7 @@ $exampleMessage .= 	"\tphp " . basename(__FILE__) . " in.xml out.xml\n";
 
 if($argc < 3)
 {
-	echo "Missung attributes, see usage:\n";
+	echo "Missing attributes, see usage:\n";
 	echo $exampleMessage;
 	exit;
 }
