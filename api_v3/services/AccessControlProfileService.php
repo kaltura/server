@@ -37,6 +37,8 @@ class AccessControlProfileService extends KalturaBaseService
 	 * @action get
 	 * @param int $id
 	 * @return KalturaAccessControlProfile
+	 * 
+	 * @throws KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND
 	 */
 	function getAction($id)
 	{
@@ -56,6 +58,8 @@ class AccessControlProfileService extends KalturaBaseService
 	 * @param int $id
 	 * @param KalturaAccessControlProfile $accessControlProfile
 	 * @return KalturaAccessControlProfile
+	 * 
+	 * @throws KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND
 	 */
 	function updateAction($id, KalturaAccessControlProfile $accessControlProfile)
 	{
@@ -76,6 +80,9 @@ class AccessControlProfileService extends KalturaBaseService
 	 * 
 	 * @action delete
 	 * @param int $id
+	 * 
+	 * @throws KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND
+	 * @throws KalturaErrors::CANNOT_DELETE_DEFAULT_ACCESS_CONTROL
 	 */
 	function deleteAction($id)
 	{
