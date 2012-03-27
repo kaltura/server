@@ -66,7 +66,7 @@ class Form_MetroPcsProfileConfiguration extends Form_ConfigurableProfileConfigur
 			'label'			=> 'Entitlement:',
 			'filters'		=> array('StringTrim'),
 			'multiOptions'	=> array(
-				'BASIC' => 'BASIC',
+				'BASIC' => 'METROPCS_VIDEO_BASIC',
 				'PREMIUM' => 'PREMIUM',
 				'SUBSCRIPTION' => 'SUBSCRIPTION'
 			)
