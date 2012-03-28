@@ -3,10 +3,15 @@
  * @package Core
  * @subpackage model.filters.advanced
  */ 
-class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
+class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements IKalturaIndexQuery
 {
 	const SEARCH_AND = 1;
 	const SEARCH_OR = 2;
+	
+	/**
+	 * @var IKalturaIndexQuery
+	 */
+	protected $parentQuery;
 	
 	/**
 	 * @var int AND or OR
@@ -19,18 +24,27 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 	protected $items;
 	
 	/**
-	 * 
 	 * local whereClause
 	 * @var array
 	 */
 	protected $whereClause = array();
 	
 	/**
-	 * 
+	 * local $matchClause
+	 * @var array
+	 */
+	protected $matchClause = array();
+	
+	/**
 	 * local conditionClause
 	 * @var array
 	 */
 	protected $conditionClause = array();
+
+	/**
+	 * @var string
+	 */
+	protected $condition = null;
 	
 	/**
 	 * @return int $type
@@ -59,41 +73,37 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 	public function setItems(array $items) {
 		$this->items = $items;
 	}
-
-	/**
-	 * @var string
-	 */
-	protected $condition = null;
 	
-	public function applyCondition(array &$whereClause, array &$conditionClause)
+	/* (non-PHPdoc)
+	 * @see AdvancedSearchFilterItem::applyCondition()
+	 */
+	public function applyCondition(IKalturaIndexQuery $query)
 	{
-		if($this->condition)
-			return $this->condition;
-			
-		$conditions = array();
+		$this->parentQuery = $query;
 		
-		if(count($this->items))
+		if(!$this->condition)
 		{
-			foreach($this->items as $item)
+			if(count($this->items))
 			{
-				KalturaLog::debug("item type: " . get_class($item));
-				if($item instanceof AdvancedSearchFilterItem)
+				foreach($this->items as $item)
 				{
-					$condition = $item->applyCondition($whereClause, $conditionClause);
-					KalturaLog::debug("Append item [" . get_class($item) . "] condition [".print_r($condition,true)."]");
-					if($condition)
-						$conditions[] = $condition;
+					KalturaLog::debug("item type: " . get_class($item));
+					if($item instanceof AdvancedSearchFilterItem)
+					{
+						$item->applyCondition($query);
+					}
 				}
+				
+				$matchClause = array_unique($this->matchClause);
+				$glue = $this->type == self::SEARCH_AND ? ' ' : ' | ';
+				$this->condition = implode($glue, $matchClause);
+				
+				if($this->type == self::SEARCH_OR)
+					$this->condition = "( {$this->condition} )";
 			}
 		}
-
-		if(!count($conditions))
-			return null;
-		
-		foreach ($conditions as $condition)
-			$this->condition = $this->appendToDataCondition($this->condition, $condition, $this->type);
-		
-		return $this->condition;
+	
+		$query->addMatch($this->condition);
 	}
 	
 	public function getFreeTextConditions($freeTexts)
@@ -115,17 +125,6 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 			}
 		}
 		return $additionalConditions;
-	}
-	
-	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$conditionClause, array &$orderByClause)
-	{
-		KalturaLog::debug("apply from [" . get_class($filter) . "]");
-		
-		$conditions = $this->applyCondition($whereClause, $conditionClause);
-		if($conditions){
-			foreach ($conditions as $key => $value)
-				$matchClause[] = $key . ' ' . $value;
-		}
 	}
 	
 	public function addToXml(SimpleXMLElement &$xmlElement)
@@ -168,24 +167,37 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 		}
 	}
 	
-	protected function appendToDataCondition($dataCondition, $dataConditionsToAdd, $type)
-	{	
-		if (!count($dataCondition))
-			$dataCondition = array();
-		
-		if (!count($dataConditionsToAdd))
-			return $dataCondition;
-				
-		foreach ($dataConditionsToAdd as $key => $value)
-		{
-			if (!isset($dataCondition[$key])){
-				$dataCondition[$key] = $value;
-			}else{
-				$glue = ($type == MetadataSearchFilter::SEARCH_AND ? ' ' : ' | ');
-				$dataCondition[$key] = $dataCondition[$key] . $glue . $value ; 
-			}
-		}
-				
-		return $dataCondition;
+	/* (non-PHPdoc)
+	 * @see IKalturaIndexQuery::addWhere()
+	 */
+	public function addWhere($statement)
+	{
+		$this->whereClause[] = $statement;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaIndexQuery::addMatch()
+	 */
+	public function addMatch($match)
+	{
+		$this->matchClause[] = $match;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaIndexQuery::addCondition()
+	 */
+	public function addCondition($condition)
+	{
+		if($this->parentQuery)
+			$this->parentQuery->addCondition($condition);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaIndexQuery::addOrderBy()
+	 */
+	public function addOrderBy($column, $orderByType = Criteria::ASC)
+	{
+		if($this->parentQuery)
+			$this->parentQuery->addOrderBy($column, $orderByType);
 	}
 }

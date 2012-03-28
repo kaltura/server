@@ -1,23 +1,64 @@
 <?php
-
-class SphinxCriterion extends KalturaCriterion
+/**
+ * @package plugins.sphinxSearch
+ * @subpackage model.filters
+ */
+class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 {
 	const MAX_IN_VALUES = 150;
+	const SPHINX_OR = '| ';
+	const SPHINX_AND = '';
+	
 	protected static $NOT_NULL_FIELDS = array("created_at","updated_at");
 	
-	protected function hasOr()
+	/**
+	 * Sphinx textual match clauses
+	 * @var array
+	 */
+	protected $matchClause = array();
+	
+	/**
+	 * Sphinx condition clauses
+	 * @var array
+	 */
+	protected $conditionClause = array();
+	
+	/**
+	 * space or 
+	 * @var string
+	 */
+	protected $selfMatchOperator = '';
+	
+	/**
+	 * @var IKalturaIndexQuery
+	 */
+	protected $currentQuery;
+	
+	protected function needsBrackets()
 	{
+		$parentCriterion = $this->getParentCriterion();
+		if(!$parentCriterion)
+			return false;
+			
+		if($parentCriterion instanceof KalturaCriterion)
+			return ($parentCriterion->getSelfConjunction() == Criterion::ODER);
+			
+		return false;
+	}
+	
+	protected function hasOr($checkParent = true)
+	{
+		$parentCriterion = $this->getParentCriterion();
+		if($checkParent && $parentCriterion && $parentCriterion instanceof SphinxCriterion)
+			return $parentCriterion->hasOr();
+			
 		if (in_array(Criterion::ODER, $this->getConjunctions()))
-		{
 			return true;
-		}
 
 		foreach($this->getClauses() as $clause)
 		{
-			if (($clause instanceof SphinxCriterion) && $clause->hasOr())
-			{
+			if (($clause instanceof SphinxCriterion) && $clause->hasOr(false))
 				return true;
-			}
 		}
 		
 		return false;
@@ -77,11 +118,11 @@ class SphinxCriterion extends KalturaCriterion
 		return null;
 	}
 	
-	protected function generateAggregatedCondition($sphinxField, $value,$queryHasOr, $aggregatedStr, $singleStr)
+	protected function generateAggregatedCondition($sphinxField, $value, $aggregatedStr, $singleStr)
 	{
 		$values = implode(',', $value);
 		
-		if ($queryHasOr)
+		if ($this->hasOr())
 		{
 			return "$aggregatedStr ($sphinxField , $values)";
 		}
@@ -98,7 +139,7 @@ class SphinxCriterion extends KalturaCriterion
 		}
 	}
 	
-	protected function getNonStringClause($sphinxField, $type, $comparison, $value, $queryHasOr)
+	protected function getNonStringClause($sphinxField, $type, $comparison, $value)
 	{
 		$thisClause = array();
 		
@@ -117,7 +158,7 @@ class SphinxCriterion extends KalturaCriterion
 				if (!count($value))
 					break;
 				
-				$thisClause [] = $this->generateAggregatedCondition($sphinxField, $value,$queryHasOr, "in", "=");
+				$thisClause [] = $this->generateAggregatedCondition($sphinxField, $value, "in", "=");
 				break;
 				
 			case Criteria::NOT_IN:
@@ -132,7 +173,7 @@ class SphinxCriterion extends KalturaCriterion
 				if (!count($value))
 					break;
 				
-				$thisClause [] = $this->generateAggregatedCondition($sphinxField, $value,$queryHasOr, "not in", "<>");
+				$thisClause [] = $this->generateAggregatedCondition($sphinxField, $value, "not in", "<>");
 				
 				break;
 				
@@ -154,24 +195,24 @@ class SphinxCriterion extends KalturaCriterion
 		}
 		
 		$thisClause = implode(' AND ', $thisClause);
-		if ($queryHasOr && $thisClause)
+		if ($this->hasOr() && $thisClause)
 		{
 			$thisClause = "($thisClause)";
 		}
 		return $thisClause;
 	}
 
-	public function apply(array &$whereClause, array &$matchClause, &$conditionClause, $depth = 0, $queryHasOr = true)
+	/* (non-PHPdoc)
+	 * @see KalturaCriterion::apply()
+	 */
+	public function apply(IKalturaIndexQuery $query)
 	{
-		if (!$depth && !$this->hasOr())
-		{
-			$queryHasOr = false;
-		}
-			
+		$this->currentQuery = $query;
+		
 		$field = $this->getTable() . '.' . $this->getColumn();
 		
 		// Can apply criterion
-		KalturaLog::debug("Applies criterion [$field] queryHasOr=[$queryHasOr]");
+		KalturaLog::debug("Applies criterion [$field]");
 	
 		$comparison = $this->getComparison();
 		if($comparison == Criteria::CUSTOM || $comparison == Criteria::CUSTOM_EQUAL || $comparison == Criteria::ISNOTNULL)
@@ -240,81 +281,184 @@ class SphinxCriterion extends KalturaCriterion
 		
 		if($type == IIndexable::FIELD_TYPE_STRING)
 		{
-			$curMatchClause = $this->getStringMatchClause($sphinxField, $comparison, $value);
-			if ($curMatchClause)
-				$matchClause[] = $curMatchClause;
-			
-			$thisClause = '';
+			$match = $this->getStringMatchClause($sphinxField, $comparison, $value);
+			KalturaLog::debug("Add match criterion[$field] as sphinx field[$sphinxField] of type [$type] match [$match] line [" . __LINE__ . "]");
+			$this->addMatch($match);
 		}
 		else
 		{
-			$thisClause = $this->getNonStringClause($sphinxField, $type, $comparison, $value, $queryHasOr);
+			$condition = $this->getNonStringClause($sphinxField, $type, $comparison, $value);
+			KalturaLog::debug("Add condition criterion[$field] as sphinx field[$sphinxField] of type [$type] condition [$condition] line [" . __LINE__ . "]");
+			$this->addCondition($condition);
 		}
 		
 		$clauses = $this->getClauses();
-		$conjuctions = $this->getConjunctions();
-		
 		foreach($clauses as $index => $clause)
 		{
 			if(!($clause instanceof SphinxCriterion))
 			{
-				KalturaLog::debug("Clause [" . $clause->getColumn() . "] is not Kaltura criterion");
+				KalturaLog::debug("Clause [" . $clause->getColumn() . "] is not Sphinx criterion");
 				return false;
 			}
 			
-			$curConditionClause = '';
-			if(!$clause->apply($whereClause, $matchClause, $curConditionClause, $depth + 1, $queryHasOr))
+			if(!$clause->apply($this))
 			{
 				KalturaLog::debug("Failed to apply clause [" . $clause->getColumn() . "]");
 				return false;
 			}
+		}
+	
+		if (count($this->matchClause))
+		{
+			$matchesClause = implode(' ', $this->matchClause);
+			if ($this->hasOr())
+				$matchesClause = "($matchesClause)";
 			
-			if (!$curConditionClause)
-			{
-				continue;
-			}
-			
-			if ($thisClause)
-			{
-				$thisClause .= $conjuctions[$index];
-			}
-			$thisClause .= $curConditionClause;
-			if ($queryHasOr)
-			{
-				$thisClause = "($thisClause)";
-			}
+			$match = $this->getSelfMatchOperator() . $matchesClause;
+			KalturaLog::debug("Add match criterion[$field] as sphinx field[$sphinxField] of type [$type] match [$match] line [" . __LINE__ . "]");
+			$query->addMatch($match);
 		}
 		
-		if ($thisClause && !$queryHasOr)
+		if (count($this->conditionClause))
 		{
-			$whereClause[] = $thisClause;
-			$thisClause = null;
-		}
+			$attributesClause = implode('', $this->conditionClause);
+			if(!strlen(trim($attributesClause)))
+				return true;
+				
+			if (!$this->hasOr())
+			{
+				$where = $attributesClause;
+				KalturaLog::debug("Add where criterion[$field] as sphinx field[$sphinxField] of type [$type] where [$where] line [" . __LINE__ . "]");
+				$query->addWhere($where);
+				return true;
+			}
 			
-		if ($thisClause && !$depth)
-		{
 			// Reduce null
 			$expSimplifications = array(
-				"(($sphinxField <> 0 AND $sphinxField <= $value) OR ($sphinxField = 0))"	=> "$sphinxField <= $value",
-				"(($sphinxField <> 0 AND $sphinxField < $value) OR ($sphinxField = 0))"		=> "$sphinxField < $value",
+				"($sphinxField <> 0 AND $sphinxField <= $value) OR ($sphinxField = 0)"	=> "$sphinxField <= $value",
+				"($sphinxField <> 0 AND $sphinxField < $value) OR ($sphinxField = 0)"		=> "$sphinxField < $value",
 			);
 
-			if (array_key_exists($thisClause, $expSimplifications))
+			if (isset($expSimplifications[$attributesClause]))
 			{
-				KalturaLog::debug("Simplifying expression [$thisClause] => [{$expSimplifications[$thisClause]}]");
+				KalturaLog::debug("Simplifying expression [$attributesClause] => [{$expSimplifications[$attributesClause]}]");
 				
 				// We move it to the 'where' since where is allegedly faster than in the condition.
-				$whereClause[] = $expSimplifications[$thisClause];
-				$thisClause = null;
+				$where = $this->getSelfConjunction() . $expSimplifications[$attributesClause];
+				KalturaLog::debug("Add where criterion[$field] as sphinx field[$sphinxField] of type [$type] where [$where] line [" . __LINE__ . "]");
+				$query->addWhere($where);
 			}
-		}
-		
-		if ($thisClause)
-		{
-			// We will get here of query has or and it wasn't a simplified date condition
-			$conditionClause = $thisClause;
+			else
+			{
+				if($this->needsBrackets())
+					$attributesClause = "($attributesClause)";
+					
+				$condition = $this->getSelfConjunction() . $attributesClause;
+				KalturaLog::debug("Add condition criterion[$field] as sphinx field[$sphinxField] of type [$type] condition [$condition] line [" . __LINE__ . "]");
+				$query->addCondition($condition);
+			}
 		}
 		
 		return true;
+	}
+
+	/**
+	 * @return string $selfMatchOperator
+	 */
+	protected function getSelfMatchOperator()
+	{
+		return $this->selfMatchOperator;
+	}
+
+	/**
+	 * @param string $selfMatchOperator
+	 */
+	protected function setSelfMatchOperator($selfMatchOperator)
+	{
+		$this->selfMatchOperator = $selfMatchOperator;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see Criterion::addAnd()
+	 */
+	public function addAnd(Criterion $criterion)
+	{
+		if($criterion instanceof SphinxCriterion)
+			$criterion->setSelfMatchOperator(self::SPHINX_AND);
+			
+		return parent::addAnd($criterion);
+	}
+
+	/* (non-PHPdoc)
+	 * @see Criterion::addOr()
+	 */
+	public function addOr(Criterion $criterion)
+	{
+		$currentField = $this->getTable() . '.' . $this->getColumn();
+		$addedField = $this->getTable() . '.' . $this->getColumn();
+		KalturaLog::debug("Add OR criterion field [$addedField] to current field [$currentField]");
+	
+		// Validate that the added criterion and the current criterios are both attributes or both matches
+		if($this->criteria->hasSphinxFieldName($addedField))
+		{		
+			$currentSphinxField	= $this->criteria->getSphinxFieldName($currentField);
+			$addedSphinxField	= $this->criteria->getSphinxFieldName($addedField);
+			
+			if($currentSphinxField != $addedSphinxField)
+			{
+				KalturaLog::debug("Current sphinx field [$currentSphinxField] and added sphinx field [$addedField]");
+				
+				$currentType	= $this->criteria->getSphinxFieldType($currentSphinxField);
+				$addedType		= $this->criteria->getSphinxFieldType($addedField);
+				
+				if($currentType != $addedType)
+				{
+					KalturaLog::debug("Current type [$currentType] and added type [$addedType]");
+					if($currentType == IIndexable::FIELD_TYPE_STRING || $addedType == IIndexable::FIELD_TYPE_STRING)
+						throw new kCoreException("Cannot mix OR operator on attributes and matches", kCoreException::INVALID_QUERY);
+				}
+			}
+		}
+		
+		if($criterion instanceof SphinxCriterion)
+			$criterion->setSelfMatchOperator(self::SPHINX_OR);
+			
+		return parent::addOr($criterion);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaIndexQuery::addWhere()
+	 */
+	public function addWhere($statement)
+	{
+		if($this->currentQuery)
+			$this->currentQuery->addWhere($statement);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaIndexQuery::addMatch()
+	 */
+	public function addMatch($match)
+	{
+		if(strlen(trim($match)))
+			$this->matchClause[] = $match;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaIndexQuery::addCondition()
+	 */
+	public function addCondition($condition)
+	{
+		if(strlen(trim($condition)))
+			$this->conditionClause[] = $condition;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaIndexQuery::addOrderBy()
+	 */
+	public function addOrderBy($column, $orderByType = Criteria::ASC)
+	{
+		if($this->currentQuery)
+			$this->currentQuery->addOrderBy($column, $orderByType);
 	}
 }

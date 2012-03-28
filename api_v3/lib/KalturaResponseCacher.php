@@ -196,6 +196,7 @@ class KalturaResponseCacher
 		
 		if ($response)
 		{
+			// TODO add kaltura warnings
 			$contentTypeHdr = @file_get_contents($this->_cacheHeadersFilePath);
 			if ($contentTypeHdr) {
 				header($contentTypeHdr, true);

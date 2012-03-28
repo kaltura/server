@@ -10,9 +10,9 @@ class AdvancedSearchFilterItem
 	 */
 	protected $kalturaClass;
 	
-	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$conditionClause, array &$orderByClause)
+	public function apply(baseObjectFilter $filter, IKalturaIndexQuery $query)
 	{
-		$matchClause[] = $this->applyCondition($whereClause, $conditionClause);
+		$this->applyCondition($query);
 	}
 	
 	public function getFreeTextConditions($freeTexts)
@@ -22,14 +22,11 @@ class AdvancedSearchFilterItem
 	
 	/**
 	 * 
-	 * apply condition on whereClause and return array of strings for match clause
-	 * @param Criteria $criteria
-	 * @param array $whereClause
-	 * return array
+	 * Adds conditions, matches and where clauses to the query
+	 * @param IKalturaIndexQuery $query
 	 */
-	public function applyCondition(array &$whereClause, array &$conditionClause)
+	public function applyCondition(IKalturaIndexQuery $query)
 	{
-		return null;
 	}
 	
 	public function addToXml(SimpleXMLElement &$xmlElement)

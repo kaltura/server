@@ -1,6 +1,9 @@
 <?php
-
-abstract class SphinxCriteria extends KalturaCriteria
+/**
+ * @package plugins.sphinxSearch
+ * @subpackage model.filters
+ */
+abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQuery
 {
 	/**
 	 * Field keys to be removed from the criteria after all filters applied 
@@ -279,10 +282,10 @@ abstract class SphinxCriteria extends KalturaCriteria
 			return;
 		}
 		
-		$conditionMap = $this->getMap();
-		uksort($conditionMap, array('SphinxCriteria','sortFieldsByPriority'));
+		$criterionsMap = $this->getMap();
+		uksort($criterionsMap, array('SphinxCriteria','sortFieldsByPriority'));
 		// go over all criterions and try to move them to the sphinx
-		foreach($conditionMap as $field => $criterion)
+		foreach($criterionsMap as $field => $criterion)
 		{
 			if(!($criterion instanceof SphinxCriterion))
 			{
@@ -291,15 +294,10 @@ abstract class SphinxCriteria extends KalturaCriteria
 				continue;
 			}
 			
-			$curConditionClause = '';
-			if($criterion->apply($this->whereClause, $this->matchClause, $curConditionClause))
+			if($criterion->apply($this))
 			{
 				KalturaLog::debug("Criterion [" . $criterion->getColumn() . "] attached");
 				$this->keyToRemove[] = $field;
-				if ($curConditionClause)
-				{
-					$this->conditionClause[] = $curConditionClause;
-				}
 			}
 			else
 			{
@@ -317,7 +315,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 			if(count($this->matchClause) > 1)
 				$matches = '( ' . implode(' ) ( ', $this->matchClause) . ' )';
 				
-			$this->whereClause[] = "MATCH('$matches')";
+			$this->addWhere("MATCH('$matches')");
 		}
 		
 		$conditions = '';
@@ -328,12 +326,13 @@ abstract class SphinxCriteria extends KalturaCriteria
 				continue;
 			
 			$conditions .=	', (' . $this->conditionClause[$i] . ') as cnd' . $i . ' ';
-			$this->whereClause[] = 'cnd' . $i . ' > 0';
+			$this->addWhere('cnd' . $i . ' > 0');
 			
 			$i++; 
 		}
 		
 		$wheres = '';
+		KalturaLog::debug("Where clause: " . print_r($this->whereClause, true));
 		$this->whereClause = array_unique($this->whereClause);
 		if(count($this->whereClause))
 			$wheres = 'WHERE ' . implode(' AND ', $this->whereClause);
@@ -466,7 +465,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 					if(count($vals))
 					{
 						$val = implode(' | ', $vals);
-						$this->matchClause[] = "@$sphinxField $val";
+						$this->addMatch("@$sphinxField $val");
 						$filter->unsetByName($field);
 					}
 					break;
@@ -488,7 +487,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 					{
 						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
 						$val = $this->getPositiveMatch($sphinxField) . ' !' . implode(' !', $vals);
-						$this->matchClause[] = "@$sphinxField $val";
+						$this->addMatch("@$sphinxField $val");
 						$filter->unsetByName($field);
 					}
 					break;
@@ -510,7 +509,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 					{
 						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
 						$val = '(^' . implode('$ | ^', $vals) . '$)';
-						$this->matchClause[] = "@$sphinxField $val";
+						$this->addMatch("@$sphinxField $val");
 						$filter->unsetByName($field);
 					}
 					break;
@@ -520,7 +519,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 					if(is_numeric($val) || strlen($val) > 0)
 					{
 						$val = SphinxUtils::escapeString($val);
-						$this->matchClause[] = "@$sphinxField ^$val$";
+						$this->addMatch("@$sphinxField ^$val$");
 						$filter->unsetByName($field);
 					}
 					break;
@@ -542,15 +541,15 @@ abstract class SphinxCriteria extends KalturaCriteria
 					if(count($vals))
 					{
 						$val = implode(' ', $vals);
-						$this->matchClause[] = "@$sphinxField $val";
+						$this->addMatch("@$sphinxField $val");
 						$filter->unsetByName($field);
 					}
 					break;
 				case baseObjectFilter::LIKEX:
-			        if(strlen($val) > 0 && $this->getEnableStar())
+			        if(strlen($val) > 0)
 					{
 						$val = SphinxUtils::escapeString($val);
-						$this->matchClause[] = "@$sphinxField $val\\\*";
+						$this->addMatch("@$sphinxField $val\\\*");
 						$filter->unsetByName($field);
 					}
 				    break;	
@@ -572,7 +571,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 		{
 			KalturaLog::debug('Apply advanced filter [' . get_class($advancedSearch) . ']');
 			if($advancedSearch instanceof AdvancedSearchFilterItem)
-				$advancedSearch->apply($filter, $this, $this->matchClause, $this->whereClause, $this->conditionClause, $this->orderByClause);
+				$advancedSearch->apply($filter, $this);
 				
 			$this->hasAdvancedSearchFilter = true;
 		}
@@ -693,5 +692,53 @@ abstract class SphinxCriteria extends KalturaCriteria
 	public function getTranslateIndexId($id)
 	{
 		return sprintf('%u', crc32($id));
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaIndexQuery::addWhere()
+	 */
+	public function addWhere($statement)
+	{
+		if(strlen(trim($statement)))
+		{
+			$this->whereClause[] = $statement;
+			KalturaLog::debug("Added [$statement] count [" . count($this->whereClause) . "]");
+		}
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaIndexQuery::addMatch()
+	 */
+	public function addMatch($match)
+	{
+		if(strlen(trim($match)))
+		{
+			$this->matchClause[] = $match;
+			KalturaLog::debug("Added [$match] count [" . count($this->matchClause) . "]");
+		}
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaIndexQuery::addCondition()
+	 */
+	public function addCondition($condition)
+	{
+		if(strlen(trim($condition)))
+		{
+			KalturaLog::debug("Added [$condition]");
+			$this->conditionClause[] = $condition;
+		}
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaIndexQuery::addOrderBy()
+	 */
+	public function addOrderBy($column, $orderByType = Criteria::ASC)
+	{
+		if(strlen(trim($column)))
+		{
+			KalturaLog::debug("Added [$column]");
+			$this->orderByClause[] = "$column $orderByType";
+		}
 	}
 }

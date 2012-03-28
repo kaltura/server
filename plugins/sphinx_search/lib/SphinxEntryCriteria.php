@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.sphinxSearch
+ * @subpackage model.filters
+ */
 class SphinxEntryCriteria extends SphinxCriteria
 {
 	public static $sphinxFields = array(
@@ -184,10 +187,8 @@ class SphinxEntryCriteria extends SphinxCriteria
 		return entryPeer::doCount($c);
 	}
 	
-	/**
-	 * Applies all filter fields and unset the handled fields
-	 * 
-	 * @param baseObjectFilter $filter
+	/* (non-PHPdoc)
+	 * @see SphinxCriteria::applyFilterFields()
 	 */
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{
