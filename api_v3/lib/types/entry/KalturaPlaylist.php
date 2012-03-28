@@ -95,7 +95,8 @@ class KalturaPlaylist extends KalturaBaseEntry
 		parent::validateForInsert($propertiesToSkip);
 		
 		$this->validatePropertyNotNull("playlistType");
-		$this->validatePropertyNotNull("totalResults");
+		if ($this->playlistType == KalturaPlaylistType::DYNAMIC)
+			$this->validatePropertyNotNull("totalResults");
 	}
 	
 	public function toObject($dbObject = null, $skip = array())
