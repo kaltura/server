@@ -115,7 +115,7 @@ class MetroPcsDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setFieldName(MetroPcsDistributionField::CATEGORY);
 		$fieldConfig->setUserFriendlyFieldName('Category');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/MetroPcsCategory" />');
-		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
