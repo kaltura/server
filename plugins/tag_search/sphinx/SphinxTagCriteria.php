@@ -80,5 +80,10 @@ class SphinxTagCriteria extends SphinxCriteria
 	    return TagPeer::ID;
 	}
 	
+	protected function getEnableStar ()
+	{
+	    return true;
+	}
+	
 	
 }

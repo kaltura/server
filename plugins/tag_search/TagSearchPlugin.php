@@ -31,7 +31,7 @@ class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory,
 				'path'		=> '/sphinx/kaltura_tag_rt',
 				'fields'	=> self::getSphinxSchemaFields(),
 			    'dict'      => 'keywords',
-                'min_prefix_len' => '3',
+                'min_prefix_len' => self::MIN_TAG_SEARCH_LENGTH,
                 'enable_star' => '1',
 			
 			)

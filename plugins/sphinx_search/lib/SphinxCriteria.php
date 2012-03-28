@@ -82,6 +82,11 @@ abstract class SphinxCriteria extends KalturaCriteria
 		return '';
 	}
 	
+    protected function getEnableStar ()
+	{
+	    return false;
+	}
+	
 	/**
 	 * @return criteriaFilter
 	 */
@@ -542,7 +547,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 					}
 					break;
 				case baseObjectFilter::LIKEX:
-			        if(strlen($val) > 0)
+			        if(strlen($val) > 0 && $this->getEnableStar())
 					{
 						$val = SphinxUtils::escapeString($val);
 						$this->matchClause[] = "@$sphinxField $val\\\*";
