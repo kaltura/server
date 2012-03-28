@@ -156,11 +156,14 @@ class KalturaFilter extends KalturaObject
                 {
 					$propertyType = $property->getDynamicType();
 					$enumType = call_user_func(array($propertyType, 'getEnumClass'));
-                	$values = explode(',', $value);
-                	$finalValues = array();
-                	foreach($values as $val)
-                		$finalValues[] = kPluginableEnumsManager::coreToApi($enumType, $val);
-                	$value = implode(',', $finalValues);
+					if(!is_null($value))
+					{
+	                	$values = explode(',', $value);
+	                	$finalValues = array();
+	                	foreach($values as $val)
+	                		$finalValues[] = kPluginableEnumsManager::coreToApi($enumType, $val);
+	                	$value = implode(',', $finalValues);
+					}
                 }
                 	
 		    	$this->$this_prop = $value;
