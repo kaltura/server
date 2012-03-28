@@ -56,8 +56,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		BatchJobType::OOCONVERT => 'OO Convert',
 		BatchJobType::CONVERT_PROFILE => 'Convert Profile',
 		BatchJobType::POSTCONVERT => 'Post Convert',
-		BatchJobType::PULL => 'Pull',
-		BatchJobType::REMOTE_CONVERT => 'Remote Convert',
 		BatchJobType::EXTRACT_MEDIA => 'Extract Media',
 		BatchJobType::MAIL => 'Mail',
 		BatchJobType::NOTIFICATION => 'Notification',
@@ -78,6 +76,8 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		
 		BatchJobType::FILESYNC_IMPORT => 'File Sync Import',
 		BatchJobType::CAPTURE_THUMB => 'Capture Thumbnail',
+		
+		BatchJobType::INDEX => 'Index',
 	);
 	
 	private static $BATCHJOB_STATUS_NAMES = array(

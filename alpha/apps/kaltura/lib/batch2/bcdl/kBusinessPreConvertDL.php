@@ -11,7 +11,6 @@ class kBusinessPreConvertDL
 	 * @param int $flavorParamsOutputId
 	 * @param int $mediaInfoId
 	 * @param BatchJob $parentJob
-	 * @param BatchJob $remoteConvertJob
 	 * @param int $lastEngineType
 	 * @return BatchJob 
 	 */
@@ -342,7 +341,6 @@ class kBusinessPreConvertDL
 	 * @param string $errDescription
 	 * @param int $mediaInfoId
 	 * @param BatchJob $parentJob
-	 * @param BatchJob $remoteConvertJob
 	 * @param int $lastEngineType
 	 * @return BatchJob 
 	 */

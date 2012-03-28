@@ -15,8 +15,6 @@ interface BatchJobType extends BaseEnum
 	const OOCONVERT = 7;
 	const CONVERT_PROFILE = 10;
 	const POSTCONVERT = 11;
-	const PULL = 12;
-	const REMOTE_CONVERT = 13;
 	const EXTRACT_MEDIA = 14;
 	const MAIL = 15;
 	const NOTIFICATION = 16;
@@ -35,4 +33,5 @@ interface BatchJobType extends BaseEnum
 	const FILESYNC_IMPORT = 29;
 	const CAPTURE_THUMB = 30;
 	const DELETE_FILE = 31;
+	const INDEX = 32;
 }

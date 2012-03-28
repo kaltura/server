@@ -866,6 +866,23 @@ class kJobsManager
 		return self::addJob($batchJob, $jobData, BatchJobType::IMPORT, $subType);
 	}
 	
+	/**
+	 * @param int $partnerId
+	 * @param int $objectType of enum IndexObjectType
+	 * @param baseObjectFilter $filter
+	 * @return BatchJob
+	 */
+	public static function addIndexJob($partnerId, $objectType, baseObjectFilter $filter)
+	{
+	    $jobData = new kIndexJobData();
+ 		$jobData->setFilter($filter);
+ 		
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId($partnerId);
+		
+		return self::addJob($batchJob, $jobData, BatchJobType::INDEX, $objectType);
+	}
+	
 	public static function addBulkDownloadJob($partnerId, $puserId, $entryIds, $flavorParamsId)
 	{
 		$entryIds = explode(",", $entryIds);

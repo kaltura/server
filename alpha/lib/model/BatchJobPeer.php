@@ -84,11 +84,6 @@ class BatchJobPeer extends BaseBatchJobPeer
 					return sha1($data->getSrcFileUrl());
 				return null;
 				
-			case BatchJobType::PULL:
-				if($data instanceof kPullJobData)
-					return sha1($data->getSrcFileUrl());
-				return null;
-				
 			case BatchJobType::EXTRACT_MEDIA:
 				if($data instanceof kExtractMediaJobData)
 					return sha1($data->getSrcFileSyncLocalPath());
@@ -101,7 +96,6 @@ class BatchJobPeer extends BaseBatchJobPeer
 			case BatchJobType::DOWNLOAD:
 			case BatchJobType::CONVERT_PROFILE:
 			case BatchJobType::POSTCONVERT:
-			case BatchJobType::REMOTE_CONVERT:
 			default:
 				return null;
 		}
@@ -134,15 +128,6 @@ class BatchJobPeer extends BaseBatchJobPeer
 				}
 				return $duplicatedJobs;
 				
-			case BatchJobType::PULL:
-				foreach($duplicatedJobs as $index => $duplicatedJob)
-				{
-					$duplicatedData = $duplicatedJob->getData();
-					if(!($duplicatedData instanceof kPullJobData) || $duplicatedData->getSrcFileUrl() != $data->getSrcFileUrl())
-						unset($duplicatedJobs[$index]);
-				}
-				return $duplicatedJobs;
-				
 			case BatchJobType::EXTRACT_MEDIA:
 				foreach($duplicatedJobs as $index => $duplicatedJob)
 				{
@@ -159,7 +144,6 @@ class BatchJobPeer extends BaseBatchJobPeer
 			case BatchJobType::DOWNLOAD:
 			case BatchJobType::CONVERT_PROFILE:
 			case BatchJobType::POSTCONVERT:
-			case BatchJobType::REMOTE_CONVERT:
 			default:
 				return null;
 		}

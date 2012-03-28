@@ -29,6 +29,21 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 
+	protected function updatedIndex(BatchJob $dbBatchJob, kIndexJobData $data, BatchJob $twinJob = null)
+	{
+		switch($dbBatchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+				return kFlowHelper::handleIndexFinished($dbBatchJob, $data, $twinJob);
+			case BatchJob::BATCHJOB_STATUS_FAILED:
+			case BatchJob::BATCHJOB_STATUS_FATAL:
+				return kFlowHelper::handleIndexFailed($dbBatchJob, $data, $twinJob);
+				return $dbBatchJob;
+			default:
+				return $dbBatchJob;
+		}
+	}
+
 	protected function updatedExtractMedia(BatchJob $dbBatchJob, kExtractMediaJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
@@ -309,6 +324,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 					
 				case BatchJobType::DELETE_FILE:
 					$dbBatchJob=$this->updatedDeleteFile($dbBatchJob, $dbBatchJob->getData());
+					break;
+					
+				case BatchJobType::INDEX:
+					$dbBatchJob=$this->updatedIndex($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				default:

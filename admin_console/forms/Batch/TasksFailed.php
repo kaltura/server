@@ -35,8 +35,6 @@ class Form_Batch_TasksFailed extends Form_Base
 		unset($jobTypes[Kaltura_Client_Enum_BatchJobType::OOCONVERT]);
 		unset($jobTypes[Kaltura_Client_Enum_BatchJobType::CLEANUP]);
 		unset($jobTypes[Kaltura_Client_Enum_BatchJobType::SCHEDULER_HELPER]);
-		unset($jobTypes[Kaltura_Client_Enum_BatchJobType::PULL]);
-		unset($jobTypes[Kaltura_Client_Enum_BatchJobType::REMOTE_CONVERT]);
 		unset($jobTypes[Kaltura_Client_Enum_BatchJobType::DELETE]);
     	
 		$this->addViewParam('jobTypes', $jobTypes);

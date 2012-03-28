@@ -277,14 +277,6 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				$this->data = new KalturaPostConvertJobData();
 				break;
 				
-			case 'kPullJobData':
-				$this->data = new KalturaPullJobData();
-				break;
-				
-			case 'kRemoteConvertJobData':
-				$this->data = new KalturaRemoteConvertJobData();
-				break;
-				
 			case 'kMailJobData':
 				$this->data = new KalturaMailJobData();
 				break;
@@ -323,6 +315,10 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				
 			case 'kCaptureThumbJobData':
 				$this->data = new KalturaCaptureThumbJobData();
+				break;
+				
+			case 'kIndexJobData':
+				$this->data = new KalturaIndexJobData();
 				break;
 				
 			default:			
@@ -400,18 +396,6 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 					$this->data = new KalturaPostConvertJobData();
 				break;
 				
-			case KalturaBatchJobType::PULL:
-				$dbData = new kPullJobData();
-				if(is_null($this->data))
-					$this->data = new KalturaPullJobData();
-				break;
-				
-			case KalturaBatchJobType::REMOTE_CONVERT:
-				$dbData = new kRemoteConvertJobData();
-				if(is_null($this->data))
-					$this->data = new KalturaRemoteConvertJobData();
-				break;
-				
 			case KalturaBatchJobType::MAIL:
 				$dbData = new kMailJobData();
 				if(is_null($this->data))
@@ -475,6 +459,12 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				$dbData = new kCaptureThumbJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaCaptureThumbJobData();
+				break;
+				
+			case KalturaBatchJobType::INDEX:
+				$dbData = new kIndexJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaIndexJobData();
 				break;
 				
 			default:

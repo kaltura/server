@@ -34,14 +34,6 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 				$data = new KalturaPostConvertJobData();
 				break;
 				
-			case KalturaBatchJobType::PULL:
-				$data = new KalturaPullJobData();
-				break;
-				
-			case KalturaBatchJobType::REMOTE_CONVERT:
-				$data = new KalturaRemoteConvertJobData();
-				break;
-				
 			case KalturaBatchJobType::MAIL:
 				$data = new KalturaMailJobData();
 				break;
@@ -73,6 +65,10 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 				
 			case KalturaBatchJobType::STORAGE_DELETE:
 				$data = new KalturaStorageDeleteJobData();
+				break;
+				
+			case KalturaBatchJobType::INDEX:
+				$data = new KalturaIndexJobData();
 				break;
 				
 			default:

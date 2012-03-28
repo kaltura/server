@@ -345,19 +345,6 @@ class JobsService extends KalturaBaseService
 	
 	
 	/**
-	 * batch getRemoteConvertStatusAction returns the status of convert task
-	 * 
-	 * @action getRemoteConvertStatus
-	 * @param int $jobId the id of the remote convert job  
-	 * @return KalturaBatchJobResponse 
-	 */
-	function getRemoteConvertStatusAction($jobId)
-	{
-		return $this->getStatusAction($jobId, KalturaBatchJobType::REMOTE_CONVERT);
-	}
-
-	
-	/**
 	 * batch deleteConvertAction deletes and returns the status of convert task
 	 * 
 	 * @action deleteConvert
@@ -393,45 +380,6 @@ class JobsService extends KalturaBaseService
 	function retryConvertAction($jobId)
 	{
 		return $this->retryJobAction($jobId, KalturaBatchJobType::CONVERT);
-	}
-
-	
-	/**
-	 * batch deleteRemoteConvertAction deletes and returns the status of remote convert task
-	 * 
-	 * @action deleteRemoteConvert
-	 * @param int $jobId the id of the bulk upload job  
-	 * @return KalturaBatchJobResponse 
-	 */
-	function deleteRemoteConvertAction($jobId)
-	{
-		return $this->deleteJobAction($jobId, KalturaBatchJobType::REMOTE_CONVERT);
-	}
-
-	
-	/**
-	 * batch abortRemoteConvertAction aborts and returns the status of remote convert task
-	 * 
-	 * @action abortRemoteConvert
-	 * @param int $jobId the id of the bulk upload job  
-	 * @return KalturaBatchJobResponse 
-	 */
-	function abortRemoteConvertAction($jobId)
-	{
-		return $this->abortJobAction($jobId, KalturaBatchJobType::REMOTE_CONVERT);
-	}
-
-	
-	/**
-	 * batch retryRemoteConvertAction retrys and returns the status of remote convert task
-	 * 
-	 * @action retryRemoteConvert
-	 * @param int $jobId the id of the bulk upload job  
-	 * @return KalturaBatchJobResponse 
-	 */
-	function retryRemoteConvertAction($jobId)
-	{
-		return $this->retryJobAction($jobId, KalturaBatchJobType::REMOTE_CONVERT);
 	}
 
 	
@@ -629,65 +577,6 @@ class JobsService extends KalturaBaseService
 	
 
 // --------------------------------- CaptureThumbJob functions 	--------------------------------- //
-	
-	
-// --------------------------------- PullJob functions 	--------------------------------- //
-
-	
-	
-	/**
-	 * batch getPullStatusAction returns the status of pull task
-	 * 
-	 * @action getPullStatus
-	 * @param int $jobId the id of the pull job  
-	 * @return KalturaBatchJobResponse 
-	 */
-	function getPullStatusAction($jobId)
-	{
-		return $this->getStatusAction($jobId, KalturaBatchJobType::PULL);
-	}
-	
-	
-	/**
-	 * batch deletePullAction deletes and returns the status of pull task
-	 * 
-	 * @action deletePull
-	 * @param int $jobId the id of the bulk upload job  
-	 * @return KalturaBatchJobResponse 
-	 */
-	function deletePullAction($jobId)
-	{
-		return $this->deleteJobAction($jobId, KalturaBatchJobType::PULL);
-	}
-	
-	
-	/**
-	 * batch abortPullAction aborts and returns the status of pull task
-	 * 
-	 * @action abortPull
-	 * @param int $jobId the id of the bulk upload job  
-	 * @return KalturaBatchJobResponse 
-	 */
-	function abortPullAction($jobId)
-	{
-		return $this->abortJobAction($jobId, KalturaBatchJobType::PULL);
-	}
-	
-	
-	/**
-	 * batch retryPullAction retrys and returns the status of pull task
-	 * 
-	 * @action retryPull
-	 * @param int $jobId the id of the bulk upload job  
-	 * @return KalturaBatchJobResponse 
-	 */
-	function retryPullAction($jobId)
-	{
-		return $this->retryJobAction($jobId, KalturaBatchJobType::PULL);
-	}
-	
-
-// --------------------------------- PullJob functions 	--------------------------------- //
 	
 	
 // --------------------------------- ExtractMediaJob functions 	--------------------------------- //

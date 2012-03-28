@@ -395,13 +395,6 @@ class kBusinessPostConvertDL
 		if($rootBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED || $rootBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FATAL)
 			return false;
 
-		// failing a remote root job 
-		if($rootBatchJob->getJobType() == BatchJobType::REMOTE_CONVERT)
-		{
-			kJobsManager::failBatchJob($rootBatchJob, "Convert job " . $dbBatchJob->getId() . " failed");
-			return false;
-		}
-			
 		// bulk download root job no need to handle 
 		if($rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
