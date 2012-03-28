@@ -123,6 +123,9 @@ class kRule
 	 */
 	public function shouldDisableCache()
 	{	
+		if(!$this->isInContext())
+			return false;
+			
 		if(!is_array($this->conditions) || count($this->conditions) != 1)
 			return true;
 			
