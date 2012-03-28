@@ -120,8 +120,11 @@ class KSecureEntryHelper
 	
 	public function validateForPlay()
 	{
-		$this->validateModeration();
-		$this->validateScheduling();
+	    if ($this->contexts != array(accessControlContextType::THUMBNAIL))
+	    {
+		    $this->validateModeration();
+			$this->validateScheduling();
+	    }
 		$this->validateAccessControl();
 	}
 	
