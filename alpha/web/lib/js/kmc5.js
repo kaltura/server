@@ -491,7 +491,7 @@ kmc.preview_embed = {
 		is_video = (is_video) ? is_video : false;
 
 		if(id != "multitab_playlist") {
-			name = (name) ? kmc.utils.escapeQuotes(name) : '';
+			//name = (name) ? $('<div />').text( name ).html() : '';
 			description = kmc.utils.escapeQuotes(description); 
 
 			if(kmc.vars.current_uiconf) { // set by kmc.mediator.selectContent called from appstudio's "select content" action
