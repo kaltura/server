@@ -91,7 +91,7 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 			if ($propertyNode->nodeType != XML_ELEMENT_NODE)
 				continue;
 			
-			$propName = $propertyNode->getAttribute("name");
+			$propName = $this->replaceReservedWords($propertyNode->getAttribute("name"));
 			
 			$this->appendLine("		attr_accessor :".$this->camelCaseToUnderscoreAndLower($propName));
 		}
@@ -103,7 +103,7 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 			if ($propertyNode->nodeType != XML_ELEMENT_NODE)
 				continue;
 			
-			$propName = $propertyNode->getAttribute("name");
+			$propName = $this->replaceReservedWords($propertyNode->getAttribute("name"));
 			$propType = $propertyNode->getAttribute("type");
 			if (!in_array($propType, array("int", "float", "bool")))
 				continue;
@@ -219,6 +219,17 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 		$signature .= ")";
 		
 		return $signature;
+	}
+
+	protected function replaceReservedWords($propertyName)
+	{
+		switch ($propertyName)
+		{
+			case "not":
+				return "{$propertyName}_";
+			default:
+				return $propertyName;
+		}
 	}
 	
 	function writeMainClient(DOMNodeList  $serviceNodes)
