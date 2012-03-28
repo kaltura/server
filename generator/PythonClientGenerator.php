@@ -318,7 +318,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			if ($propertyNode->nodeType != XML_ELEMENT_NODE)
 				continue;
 			
-			$propName = $propertyNode->getAttribute("name");
+			$propName = $this->replaceReservedWords($propertyNode->getAttribute("name"));
 			
 			$result .= $delimiter.$propName.$argumentPostfix;
 		}
@@ -344,7 +344,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			if ($propertyNode->nodeType != XML_ELEMENT_NODE)
 				continue;
 			
-			$propName = $propertyNode->getAttribute("name");
+			$propName = $this->replaceReservedWords($propertyNode->getAttribute("name"));
 			$isReadOnly = $propertyNode->getAttribute("readOnly") == 1;
 			$isInsertOnly = $propertyNode->getAttribute("insertOnly") == 1;
 			$isEnum = $propertyNode->hasAttribute("enumType");
@@ -380,7 +380,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			if ($propertyNode->nodeType != XML_ELEMENT_NODE)
 				continue;
 			
-			$propName = $propertyNode->getAttribute("name");
+			$propName = $this->replaceReservedWords($propertyNode->getAttribute("name"));
 			$ucPropName = ucfirst($propName);
 			$isReadOnly = $propertyNode->getAttribute("readOnly") == 1;
 			
@@ -415,7 +415,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 				continue;
 							
 			$propType = $propertyNode->getAttribute ( "type" );
-			$propName = $propertyNode->getAttribute ( "name" );
+			$propName = $this->replaceReservedWords($propertyNode->getAttribute ( "name" ));
 			$isEnum = $propertyNode->hasAttribute ( "enumType" );
 			
 			$curLine = "        '$propName': ";
@@ -493,7 +493,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 				continue;
 			
 			$propType = $propertyNode->getAttribute ( "type" );
-			$propName = $propertyNode->getAttribute ( "name" );
+			$propName = $this->replaceReservedWords($propertyNode->getAttribute ( "name" ));
 			$isEnum = $propertyNode->hasAttribute ( "enumType" );
 			switch ($propType) 
 			{
@@ -692,7 +692,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 						$signature .= " = NotImplemented";
 					else if ($paramType == "string")
 						$signature .= " = \"$defaultValue\"";
-					else if ($paramType == "int")
+					else
 					{
 						if ($defaultValue == "")
 							$signature .= " = \"\""; // hack for partner.getUsage
@@ -711,6 +711,17 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		
 		return $signature;
 	}	
+	
+	protected function replaceReservedWords($propertyName)
+	{
+		switch ($propertyName)
+		{
+			case "not":
+				return "{$propertyName}_";
+			default:
+				return $propertyName;
+		}
+	}
 	
 	protected function addFile($fileName, $fileContents, $addLicense = true)
 	{
