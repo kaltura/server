@@ -144,8 +144,8 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$xmlFileName = $currentTime. '_' .$entryDistribution->id. '_' .$data->entryDistribution->entryId .'.xml';		
 		$path = $distributionProfile->ftpPath;
 		$destXmlFile = "{$path}/{$xmlFileName}";		
-		$xmlString = $feed->getXmlString();	
-
+		$xmlString = $feed->getXmlString();
+		
 		KalturaLog::debug('result xml - '.PHP_EOL.$xmlString);
 		$tempFile = $this->getTempFileWithContent($xmlString);
 		
@@ -332,6 +332,9 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 	protected function uploadFlavorAssetFile($path, $feed, $providerData, $ftpManager, $flavorAsset, $currentTime)
 	{
 		$destName = $feed->flavorAssetUniqueName($flavorAsset, $currentTime);
+		//adding the ftp path to the dest name 
+		$destName = $path.'/'.$destName;
+		
 		$videoAssetFilePathArray = unserialize($providerData->assetLocalPaths);
 		$sourceName = $videoAssetFilePathArray[$flavorAsset->id];
 		$ftpManager->putFile($destName, $sourceName, true);

@@ -255,7 +255,8 @@ class MetroPcsDistributionFeedHelper
 	{
 		$path = $this->distributionProfile->ftpPath;
 		$fileExt = $flavorAsset->fileExt;	
-		$uniqueName = $path.'/'.$currentTime.'_'.$this->entryDistribution->id.'_'.$flavorAsset->entryId.'_'.$flavorAsset->id.'.'.$fileExt;
+		//$uniqueName = $path.'/'.$currentTime.'_'.$this->entryDistribution->id.'_'.$flavorAsset->entryId.'_'.$flavorAsset->id.'.'.$fileExt;
+		$uniqueName = $currentTime.'_'.$this->entryDistribution->id.'_'.$flavorAsset->entryId.'_'.$flavorAsset->id.'.'.$fileExt;
 		return $uniqueName;		
 	}
 	
