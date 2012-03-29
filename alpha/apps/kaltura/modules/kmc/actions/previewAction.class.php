@@ -2,6 +2,10 @@
 
 require_once ( "kalturaAction.class.php" );
 
+/**
+ * @package Core
+ * @subpackage KMC
+ */
 class previewAction extends kalturaAction
 {
 	public function execute ( ) 
@@ -20,6 +24,17 @@ class previewAction extends kalturaAction
 
 		// Single Player parameters
 		$this->entry_id = $this->getRequestParameter('entry_id');
+		$entry = entryPeer::retrieveByPK($this->entry_id);
+		$this->entry_name = $entry->getName();
+		$this->entry_description = $entry->getDescription();
+		$this->entry_thumbnail_url = $entry->getThumbnailUrl();
+
+		$flavor_tag = $this->getRequestParameter('flavor_tag', 'iphone');
+		$flavor_assets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entry_id, $flavor_tag);
+		$flavor_asset = reset($flavor_assets);
+		/* @var $flavor_asset flavorAsset */		
+		$this->flavor_asset_id = $flavor_asset->getId();
+		
 		$this->delivery_type = $this->getRequestParameter('delivery');
 
 		// Playlist Parameters
@@ -30,4 +45,3 @@ class previewAction extends kalturaAction
 		$this->partner_cdnHost = myPartnerUtils::getCdnHost($this->partner_id);
 	}
 }
-?>
