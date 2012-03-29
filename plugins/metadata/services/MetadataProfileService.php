@@ -44,8 +44,10 @@ class MetadataProfileService extends KalturaBaseService
 		libxml_clear_errors();
 		libxml_use_internal_errors(false);
 		
-		
+		// must be validatebefore checking available searchable fields count
+		$metadataProfile->validatePropertyNotNull('metadataObjectType');
 		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdData, false, $metadataProfile->metadataObjectType);
+		
 		$dbMetadataProfile = $metadataProfile->toInsertableObject();
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::ACTIVE);
 		$dbMetadataProfile->setPartnerId($this->getPartnerId());
@@ -97,7 +99,10 @@ class MetadataProfileService extends KalturaBaseService
 		libxml_clear_errors();
 		libxml_use_internal_errors(false);
 		
+		// must be validatebefore checking available searchable fields count
+		$metadataProfile->validatePropertyNotNull('metadataObjectType');
 		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdFile, false, $metadataProfile->metadataObjectType);
+		
 		$dbMetadataProfile = $metadataProfile->toInsertableObject();
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::ACTIVE);
 		$dbMetadataProfile->setPartnerId($this->getPartnerId());
