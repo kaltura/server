@@ -93,17 +93,6 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	 */
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if($object instanceof CaptionAsset)
-			return true;
-			
-		return false;
-	}
-
-	/* (non-PHPdoc)
-	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
-	 */
-	public function shouldConsumeDeletedEvent(BaseObject $object)
-	{
 		/* @var $object CaptionAsset */
 		
 		// delete them one by one to raise the erased event
@@ -118,5 +107,16 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 		$entry = $object->getentry();
 		$entry->setUpdatedAt(time());
 		$entry->save();
+	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
+	 */
+	public function shouldConsumeDeletedEvent(BaseObject $object)
+	{
+		if($object instanceof CaptionAsset)
+			return true;
+			
+		return false;
 	}
 }
