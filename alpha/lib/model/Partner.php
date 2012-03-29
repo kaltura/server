@@ -1200,4 +1200,14 @@ class Partner extends BasePartner
 	{
 		return array("partner:id=".$this->getId());
 	}	
+	
+	public function getWidgetSessionRoleId() {
+		$id = $this->getFromCustomData ( 'widget_session_role_id' );
+		if (! $id) {
+			$id = UserRolePeer::getIdByStrId ( UserRoleId::WIDGET_SESSION_ROLE );
+		}
+		return $id;
+	}
+	
+	
 }
