@@ -100,6 +100,17 @@ abstract class BaseCaptionAssetItem extends BaseObject  implements Persistent {
 	{
 		return $this->oldColumnsValues;
 	}
+	
+	/**
+	 * @return mixed field value or null
+	 */
+	public function getColumnsOldValue($name)
+	{
+		if(isset($this->oldColumnsValues[$name]))
+			return $this->oldColumnsValues[$name];
+			
+		return null;
+	}
 
 	/**
 	 * Get the [id] column value.
@@ -764,6 +775,16 @@ abstract class BaseCaptionAssetItem extends BaseObject  implements Persistent {
 		$this->tempModifiedColumns = array();
 		
 		parent::postUpdate($con);
+	}
+	/**
+	 * Code to be run after deleting the object from database
+	 * @param PropelPDO $con
+	 */
+	public function postDelete(PropelPDO $con = null)
+	{
+		kEventsManager::raiseEvent(new kObjectErasedEvent($this));
+		
+		parent::postDelete($con);
 	}
 	
 	/**

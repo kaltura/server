@@ -3,7 +3,7 @@
  * @package plugins.captionSearch
  * @subpackage lib
  */
-class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer
+class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObjectDeletedEventConsumer
 {
 	/* (non-PHPdoc)
 	 * @see kObjectDataChangedEventConsumer::shouldConsumeDataChangedEvent()
@@ -43,6 +43,12 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer
 		return true;
 	}
 	
+	/**
+	 * @param CaptionAsset $captionAsset
+	 * @param BatchJob $parentJob
+	 * @throws kCoreException FILE_NOT_FOUND
+	 * @return BatchJob
+	 */
 	public function addParseCaptionAssetJob(CaptionAsset $captionAsset, BatchJob $parentJob = null)
 	{
 		$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
@@ -80,5 +86,30 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer
 		}
 			
 		return kJobsManager::addJob($batchJob, $jobData, CaptionSearchPlugin::getBatchJobTypeCoreValue(CaptionSearchBatchJobType::PARSE_CAPTION_ASSET));
+	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::objectDeleted()
+	 */
+	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		if($object instanceof CaptionAsset)
+			return true;
+			
+		return false;
+	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
+	 */
+	public function shouldConsumeDeletedEvent(BaseObject $object)
+	{
+		// delete them one by one to raise the erased event
+		$captionAssetItems = CaptionAssetItemPeer::retrieveByAssetId($object->getId());
+		foreach($captionAssetItems as $captionAssetItem)
+		{
+			/* @var $captionAssetItem CaptionAssetItem */
+			$captionAssetItem->delete();
+		}
 	}
 }
