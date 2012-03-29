@@ -141,7 +141,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$feed->setThumbnails($thumbAssets, $thumbUrls);
 		
 		//xml file
-		$xmlFileName = $currentTime. '_' .$entryDistribution->id. '_' .$data->entryDistribution->entryId .'.xml';		
+		$xmlFileName = $currentTime. '_' .$entryDistribution->id. '_' .$data->entryDistribution->entryId .'.xml';
 		$path = $distributionProfile->ftpPath;
 		$destXmlFile = "{$path}/{$xmlFileName}";		
 		$xmlString = $feed->getXmlString();
