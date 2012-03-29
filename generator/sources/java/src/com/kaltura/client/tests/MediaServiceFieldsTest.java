@@ -4,12 +4,11 @@ import java.util.ArrayList;
 
 import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.enums.KalturaContainerFormat;
-import com.kaltura.client.enums.KalturaDirectoryRestrictionType;
 import com.kaltura.client.enums.KalturaNullableBoolean;
 import com.kaltura.client.enums.KalturaSiteRestrictionType;
 import com.kaltura.client.types.KalturaAccessControl;
 import com.kaltura.client.types.KalturaBaseRestriction;
-import com.kaltura.client.types.KalturaDirectoryRestriction;
+import com.kaltura.client.types.KalturaCountryRestriction;
 import com.kaltura.client.types.KalturaSiteRestriction;
 import com.kaltura.client.types.KalturaThumbParams;
 
@@ -105,8 +104,8 @@ public class MediaServiceFieldsTest extends BaseTest {
 		KalturaSiteRestriction resA = new KalturaSiteRestriction();
 		resA.siteRestrictionType = KalturaSiteRestrictionType.RESTRICT_SITE_LIST;
 		resA.siteList = "ResA";
-		KalturaDirectoryRestriction resB = new KalturaDirectoryRestriction();
-		resB.directoryRestrictionType =KalturaDirectoryRestrictionType.DISPLAY_WITH_LINK;
+		KalturaCountryRestriction resB = new KalturaCountryRestriction();
+		resB.countryList = "IllegalCountry";
 		
 		ArrayList<KalturaBaseRestriction> restrictions = new ArrayList<KalturaBaseRestriction>();
 		restrictions.add(resA);
