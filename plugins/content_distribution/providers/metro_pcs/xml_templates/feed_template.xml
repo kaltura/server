@@ -1,7 +1,8 @@
-<rss xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' 
-	 xsi:schemaLocation='http://www.real.com/msdp VSPRSS20.xsd'
-	 xmlns:msdp='http://www.real.com/msdp' 
-	 xmlns='http://www.real.com/msdp'>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<rss xmlns="http://www.real.com/msdp" 
+	 xmlns:msdp="http://www.real.com/msdp"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	 xsi:schemaLocation="http://www.real.com/msdp VSPRSS20.xsd">
   <channel>
     <title></title>
     <link></link>
