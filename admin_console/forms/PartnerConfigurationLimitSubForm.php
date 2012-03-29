@@ -41,6 +41,12 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 		
 		if($this->withOverage)
 		{
+			$element->addDecorators(array(
+	              'ViewHelper',
+	              array('Label'),
+	              array(array('row' => 'HtmlTag'), array('tag' => 'div','class'=>'includeUsageFloatLeft')),
+			));
+			
 			$form->addElement('text',  $this->limitType.'_overagePrice', array(
 				'label'			=> 'Overage Fee:',
 				'filters'		=> array('StringTrim'),
@@ -69,14 +75,6 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 	              array(array('row' => 'HtmlTag'), array('tag' => 'div','class'=>'includeUsageFloatRight',)),
 			));
 		}
-		else
-		{
-			$element->addDecorators(array(
-	              'ViewHelper',
-	              array('Label'),
-	              array(array('row' => 'HtmlTag'), array('tag' => 'div','class'=>'includeUsageFloatLeft')),
-			));
-		}
 	}
 	
 	public function populateFromObject($form, $object, $add_underscore = true)
@@ -99,7 +97,12 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
-		$object = new $objectType;
+		$object = null;
+		if($this->withOverage)
+			$object = new Kaltura_Client_SystemPartner_Type_SystemPartnerOveragedLimit();
+		else
+			$object = new Kaltura_Client_SystemPartner_Type_SystemPartnerLimit();
+		
 		foreach($properties as $prop => $value)
 		{
 			if($add_underscore)
