@@ -181,7 +181,6 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		libxml_clear_errors();
 		if(!$xml->load($xmlPath))
 		{
-			$errors = libxml_get_errors();
 			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($xmlPath));
 			throw new kCuePointException("XML [$xmlPath] is invalid:\n{$errorMessage}", kCuePointException::XML_INVALID);
 		}
@@ -262,7 +261,6 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		libxml_clear_errors();
 		if(!$xml->loadXML($xmlContent))
 		{
-			$errors = libxml_get_errors();
 			$errorMessage = kXml::getLibXmlErrorDescription($xmlContent);
 			throw new kCuePointException("XML is invalid:\n{$errorMessage}", kCuePointException::XML_INVALID);
 		}
