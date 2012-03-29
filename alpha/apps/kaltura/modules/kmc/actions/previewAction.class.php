@@ -43,5 +43,6 @@ class previewAction extends kalturaAction
 
 		$this->partner_host = myPartnerUtils::getHost($this->partner_id);
 		$this->partner_cdnHost = myPartnerUtils::getCdnHost($this->partner_id);
+		$this->secure_host = kConf::get('cdn_host_https');
 	}
 }
