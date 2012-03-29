@@ -32,6 +32,19 @@ class MetadataProfileService extends KalturaBaseService
 	 */
 	function addAction(KalturaMetadataProfile $metadataProfile, $xsdData, $viewsData = null)
 	{
+		// validates the xsd
+		libxml_use_internal_errors(true);
+		libxml_clear_errors();
+		$xml = new DOMDocument();
+		if(!$xml->loadXML($xsdData) || !$xml->validate())
+		{
+			$errorMessage = kXml::getLibXmlErrorDescription($xsdData);
+			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE_SCHEMA, $errorMessage);
+		}
+		libxml_clear_errors();
+		libxml_use_internal_errors(false);
+		
+		
 		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdData, false, $metadataProfile->metadataObjectType);
 		$dbMetadataProfile = $metadataProfile->toInsertableObject();
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::ACTIVE);
@@ -71,6 +84,18 @@ class MetadataProfileService extends KalturaBaseService
 		$filePath = $xsdFile['tmp_name'];
 		if(!file_exists($filePath))
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xsdFile['name']);
+		
+		// validates the xsd
+		libxml_use_internal_errors(true);
+		libxml_clear_errors();
+		$xml = new DOMDocument();
+		if(!$xml->load($xsdFile) || !$xml->validate())
+		{
+			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($xsdFile));
+			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE_SCHEMA, $errorMessage);
+		}
+		libxml_clear_errors();
+		libxml_use_internal_errors(false);
 		
 		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdFile, false, $metadataProfile->metadataObjectType);
 		$dbMetadataProfile = $metadataProfile->toInsertableObject();
