@@ -104,6 +104,8 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	 */
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
+		/* @var $object CaptionAsset */
+		
 		// delete them one by one to raise the erased event
 		$captionAssetItems = CaptionAssetItemPeer::retrieveByAssetId($object->getId());
 		foreach($captionAssetItems as $captionAssetItem)
@@ -111,5 +113,10 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 			/* @var $captionAssetItem CaptionAssetItem */
 			$captionAssetItem->delete();
 		}
+		
+		// updates entry on order to trigger reindexing
+		$entry = $object->getentry();
+		$entry->setUpdatedAt(time());
+		$entry->save();
 	}
 }
