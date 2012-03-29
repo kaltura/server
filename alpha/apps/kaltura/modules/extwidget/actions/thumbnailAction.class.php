@@ -39,7 +39,7 @@ class thumbnailAction extends sfAction
 		$height = $this->getRequestParameter( "height", -1 );
 		$type = $this->getRequestParameter( "type" , 1);
 		$crop_provider = $this->getRequestParameter( "crop_provider", null);
-		$quality = $this->getRequestParameter( "quality" , 0);
+		$quality = $this->getRequestParameter( "quality" , 20);
 		$src_x = $this->getRequestParameter( "src_x" , 0);
 		$src_y = $this->getRequestParameter( "src_y" , 0);
 		$src_w = $this->getRequestParameter( "src_w" , 0);
@@ -197,7 +197,7 @@ class thumbnailAction extends sfAction
 			$referrer = ""; // base64_decode can return binary data
 		$ksStr = $this->getRequestParameter("ks");
 		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, accessControlContextType::THUMBNAIL);
-		$securyEntryHelper->validateForPlay($entry, $ksStr);
+		$securyEntryHelper->validateForPlay();
 		
 		// multiply the passed $src_* values so that they will relate to the original image size, according to $src_display_*
 		if ($rel_width != -1) {
