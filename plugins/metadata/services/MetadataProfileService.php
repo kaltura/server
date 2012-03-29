@@ -36,7 +36,7 @@ class MetadataProfileService extends KalturaBaseService
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
 		$xml = new DOMDocument();
-		if(!$xml->loadXML($xsdData) || !$xml->validate())
+		if(!$xml->loadXML($xsdData))
 		{
 			$errorMessage = kXml::getLibXmlErrorDescription($xsdData);
 			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE_SCHEMA, $errorMessage);
@@ -89,7 +89,7 @@ class MetadataProfileService extends KalturaBaseService
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
 		$xml = new DOMDocument();
-		if(!$xml->load($xsdFile) || !$xml->validate())
+		if(!$xml->load($xsdFile))
 		{
 			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($xsdFile));
 			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE_SCHEMA, $errorMessage);
