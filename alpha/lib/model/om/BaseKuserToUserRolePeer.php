@@ -260,8 +260,9 @@ abstract class BaseKuserToUserRolePeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -311,36 +312,37 @@ abstract class BaseKuserToUserRolePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = KuserToUserRolePeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = KuserToUserRolePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'KuserToUserRolePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			KuserToUserRolePeer::filterSelectResults($cachedResult);
+			KuserToUserRolePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			KuserToUserRolePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = KuserToUserRolePeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = KuserToUserRolePeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = KuserToUserRolePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		KuserToUserRolePeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		KuserToUserRolePeer::filterSelectResults($queryResult);
 		KuserToUserRolePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -395,7 +397,6 @@ abstract class BaseKuserToUserRolePeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

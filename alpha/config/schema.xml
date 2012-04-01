@@ -1403,7 +1403,7 @@
 		<column primaryKey="false" lazyLoad="false" name="depth" type="tinyint" required="true" />
 		<column primaryKey="false" lazyLoad="false" name="partner_id" type="integer" required="true" />
 		<column primaryKey="false" lazyLoad="false" name="name" type="varchar" required="true" default="" size="128" />
-		<column primaryKey="false" lazyLoad="false" name="full_name" type="varchar" required="true" default="" size="512" />
+		<column primaryKey="false" lazyLoad="false" name="full_name" type="longvarchar" required="true" />
 		<column primaryKey="false" lazyLoad="false" name="entries_count" type="integer" required="true" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />

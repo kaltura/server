@@ -33,6 +33,7 @@ class Partner extends BasePartner
 	
 	const MAX_ACCESS_CONTROLS = 24;
 	
+	//this is not enforced anymore, but for default pager size when listing ctagoeries (since we didn't have pager before flacon)
 	const MAX_NUMBER_OF_CATEGORIES = 1000;
 	
 	const CATEGORIES_LOCK_TIMEOUT = 300; // in seconds
@@ -573,6 +574,10 @@ class Partner extends BasePartner
 	//default entitlement scope for ks
 	public function setDefaultEntitlementEnforcement($v) { $this->putInCustomData('defaultEntitlementEnforcement', $v, 'entitlement');}
 	public function getDefaultEntitlementEnforcement() { return $this->getFromCustomData('defaultEntitlementEnforcement', 'entitlement', null);}
+	
+	//category work group size - to index all category members on each entry if category size is a group.
+	public function setCategoryGroupSize($v) { $this->putInCustomData('categoryGroupSize', $v, 'entitlement');}
+	public function getCategoryGroupSize() { return $this->getFromCustomData('categoryGroupSize', 'entitlement', null);}
 	
 	// additionalParams - key/value array
 	public function getAdditionalParams() 

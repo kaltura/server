@@ -276,8 +276,9 @@ abstract class BaseroughcutEntryPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -327,36 +328,37 @@ abstract class BaseroughcutEntryPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = roughcutEntryPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = roughcutEntryPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'roughcutEntryPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			roughcutEntryPeer::filterSelectResults($cachedResult);
+			roughcutEntryPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			roughcutEntryPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = roughcutEntryPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = roughcutEntryPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = roughcutEntryPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		roughcutEntryPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		roughcutEntryPeer::filterSelectResults($queryResult);
 		roughcutEntryPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -411,7 +413,6 @@ abstract class BaseroughcutEntryPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

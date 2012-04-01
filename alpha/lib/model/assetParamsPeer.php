@@ -167,7 +167,7 @@ class assetParamsPeer extends BaseassetParamsPeer
 		return true;
 	}
 	
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 		$criteria_filter = assetParamsPeer::getCriteriaFilter();
 		if(!$criteria_filter->isEnabled() || !self::$filterPartner)

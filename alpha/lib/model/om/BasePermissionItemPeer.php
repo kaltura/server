@@ -288,8 +288,9 @@ abstract class BasePermissionItemPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -339,36 +340,37 @@ abstract class BasePermissionItemPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = PermissionItemPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = PermissionItemPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'PermissionItemPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			PermissionItemPeer::filterSelectResults($cachedResult);
+			PermissionItemPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			PermissionItemPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = PermissionItemPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = PermissionItemPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = PermissionItemPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		PermissionItemPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		PermissionItemPeer::filterSelectResults($queryResult);
 		PermissionItemPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -423,7 +425,6 @@ abstract class BasePermissionItemPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

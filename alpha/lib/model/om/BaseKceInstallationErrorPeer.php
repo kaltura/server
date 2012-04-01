@@ -280,8 +280,9 @@ abstract class BaseKceInstallationErrorPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -331,36 +332,37 @@ abstract class BaseKceInstallationErrorPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = KceInstallationErrorPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = KceInstallationErrorPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'KceInstallationErrorPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			KceInstallationErrorPeer::filterSelectResults($cachedResult);
+			KceInstallationErrorPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			KceInstallationErrorPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = KceInstallationErrorPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = KceInstallationErrorPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = KceInstallationErrorPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		KceInstallationErrorPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		KceInstallationErrorPeer::filterSelectResults($queryResult);
 		KceInstallationErrorPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -415,7 +417,6 @@ abstract class BaseKceInstallationErrorPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

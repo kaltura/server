@@ -340,8 +340,9 @@ abstract class BaseMailJobPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -391,36 +392,37 @@ abstract class BaseMailJobPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = MailJobPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = MailJobPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'MailJobPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			MailJobPeer::filterSelectResults($cachedResult);
+			MailJobPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			MailJobPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = MailJobPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = MailJobPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = MailJobPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		MailJobPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		MailJobPeer::filterSelectResults($queryResult);
 		MailJobPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -475,7 +477,6 @@ abstract class BaseMailJobPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

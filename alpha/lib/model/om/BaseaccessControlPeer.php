@@ -312,8 +312,9 @@ abstract class BaseaccessControlPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -363,36 +364,37 @@ abstract class BaseaccessControlPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = accessControlPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = accessControlPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'accessControlPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			accessControlPeer::filterSelectResults($cachedResult);
+			accessControlPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			accessControlPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = accessControlPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = accessControlPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = accessControlPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		accessControlPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		accessControlPeer::filterSelectResults($queryResult);
 		accessControlPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -447,7 +449,6 @@ abstract class BaseaccessControlPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

@@ -28,21 +28,26 @@ class categoryPeer extends BasecategoryPeer
 		}
 
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
-		$c->add ( self::STATUS, CategoryStatus::DELETED, Criteria::NOT_EQUAL );
+		$c->add ( self::STATUS, CategoryStatus::DELETED, Criteria::NOT_EQUAL );	
 		
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$crit = $c->getNewCriterion ( self::DISPLAY_IN_SEARCH, DisplayInSearchType::PARTNER_ONLY, Criteria::EQUAL );
-			
-			if ( kCurrentContext::$ks_uid <> '')
-			{
+			$crit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+
+			$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
+			if($ksString <> '')
 				$kuser = kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid);
-				if($kuser)
-					$crit->addOr ( $c->getNewCriterion ( self::MEMBERS , $kuser->getId(), Criteria::EQUAL) );
+
+			if($kuser)
+			{
+				$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kuser->getId(), Criteria::EQUAL);
+				$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+				$crit->addOr($membersCrit);
 			}
 				
 			$c->addAnd ( $crit );
-		}		
+		}
 		
 		self::$s_criteria_filter->setFilter ( $c );
 	}
@@ -93,7 +98,7 @@ class categoryPeer extends BasecategoryPeer
 	{
 		$fullName = self::getParsedFullName($fullName);
 		
-		$c = new Criteria();
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 		$c->add(categoryPeer::FULL_NAME, $fullName);
 		return categoryPeer::doSelectOne($c, $con);
 	}
@@ -109,7 +114,7 @@ class categoryPeer extends BasecategoryPeer
 	public static function getByFullNameWildcardMatch($fullName, $con = null)
 	{
 		$fullName = str_replace(array('\\', '%', '_'), array('\\\\', '\%', '\_'), $fullName);
-		$c = new Criteria();
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 		$c->add(categoryPeer::FULL_NAME, $fullName."%", Criteria::LIKE);
 		
 		return categoryPeer::doSelect($c, $con);
@@ -119,8 +124,6 @@ class categoryPeer extends BasecategoryPeer
 	{
 		return array(array("category:partnerId=%s", self::PARTNER_ID));		
 	}
-	
-	
 	
 	/**
 	 * @param Criteria $criteria
@@ -137,6 +140,57 @@ class categoryPeer extends BasecategoryPeer
 		}
 
 		return parent::doSelect($c, $con);
+	}
+	
+	/**
+	 * @param Criteria $criteria
+	 * @param PropelPDO $con
+	 */
+	public static function doSelectEntitledAndNonIndexedCategories($kuserId, $limit)
+	{
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$c->addAnd(categoryPeer::MEMBERS, $kuserId, Criteria::EQUAL);
+		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
+		
+		$partner = PartnerPeer::retrieveByPK(kCurrentContext::$ks_partner_id);
+		if($partner && $partner->getCategoryGroupSize())
+			$categoryGroupSize = $partner->getCategoryGroupSize();
+
+		$membersCountCrit = $c->getNewCriterion (categoryPeer::MEMBERS_COUNT, $categoryGroupSize, Criteria::GREATER_THAN);
+		$membersCountCrit->addOr($c->getNewCriterion (categoryPeer::ENTRIES_COUNT, 
+										entry::CATEGORY_ENTRIES_COUNT_LIMIT_TO_BE_INDEXED, Criteria::GREATER_THAN));		
+		$c->addAnd($membersCountCrit);
+		
+		
+		$c->setLimit($limit);
+		$c->addDescendingOrderByColumn(categoryPeer::UPDATED_AT);
+
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		$categories = self::doSelect($c);
+		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
+		return $categories;
+	}
+	
+	/**
+	 * Retrieve a single object by pkey.
+	 *
+	 * @param      int $pk the primary key.
+	 * @param      PropelPDO $con the connection to use
+	 * @return     category
+	 */
+	public static function retrieveByPK($pk, PropelPDO $con = null)
+	{
+		if (null !== ($obj = categoryPeer::getInstanceFromPool((string) $pk))) {
+			return $obj;
+		}
+
+		$criteria = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$criteria->add(categoryPeer::ID, $pk);
+
+		$v = categoryPeer::doSelect($criteria, $con);
+
+		return !empty($v) > 0 ? $v[0] : null;
 	}
 	
 }

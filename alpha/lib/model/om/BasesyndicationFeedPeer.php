@@ -340,8 +340,9 @@ abstract class BasesyndicationFeedPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -391,36 +392,37 @@ abstract class BasesyndicationFeedPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = syndicationFeedPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = syndicationFeedPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'syndicationFeedPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			syndicationFeedPeer::filterSelectResults($cachedResult);
+			syndicationFeedPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			syndicationFeedPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = syndicationFeedPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = syndicationFeedPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = syndicationFeedPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		syndicationFeedPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		syndicationFeedPeer::filterSelectResults($queryResult);
 		syndicationFeedPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -475,7 +477,6 @@ abstract class BasesyndicationFeedPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

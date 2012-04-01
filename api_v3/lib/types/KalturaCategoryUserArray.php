@@ -5,7 +5,7 @@
  */
 class KalturaCategoryUserArray extends KalturaTypedArray
 {
-	public static function fromCategoryUserArray($arr)
+	public static function fromDbArray($arr)
 	{
 		$newArr = new KalturaCategoryUserArray();
 		foreach($arr as $obj)

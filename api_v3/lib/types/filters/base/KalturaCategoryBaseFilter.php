@@ -25,8 +25,8 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 		"appearInListEqual" => "_eq_appear_in_list",
 		"privacyEqual" => "_eq_privacy",
 		"privacyIn" => "_in_privacy",
-		"inheritanceEqual" => "_eq_inheritance",
-		"inheritanceIn" => "_in_inheritance",
+		"inheritanceTypeEqual" => "_eq_inheritance_type",
+		"inheritanceTypeIn" => "_in_inheritance_type",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 	);
@@ -177,14 +177,14 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 	 * 
 	 * @var KalturaInheritanceType
 	 */
-	public $inheritanceEqual;
+	public $inheritanceTypeEqual;
 
 	/**
 	 * 
 	 * 
 	 * @var string
 	 */
-	public $inheritanceIn;
+	public $inheritanceTypeIn;
 
 	/**
 	 * 

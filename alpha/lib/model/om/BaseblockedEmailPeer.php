@@ -244,8 +244,9 @@ abstract class BaseblockedEmailPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -295,36 +296,37 @@ abstract class BaseblockedEmailPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = blockedEmailPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = blockedEmailPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'blockedEmailPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			blockedEmailPeer::filterSelectResults($cachedResult);
+			blockedEmailPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			blockedEmailPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = blockedEmailPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = blockedEmailPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = blockedEmailPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		blockedEmailPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		blockedEmailPeer::filterSelectResults($queryResult);
 		blockedEmailPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -379,7 +381,6 @@ abstract class BaseblockedEmailPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

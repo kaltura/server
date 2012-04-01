@@ -260,8 +260,9 @@ abstract class BasePermissionToPermissionItemPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -311,36 +312,37 @@ abstract class BasePermissionToPermissionItemPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = PermissionToPermissionItemPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = PermissionToPermissionItemPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'PermissionToPermissionItemPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			PermissionToPermissionItemPeer::filterSelectResults($cachedResult);
+			PermissionToPermissionItemPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			PermissionToPermissionItemPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = PermissionToPermissionItemPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = PermissionToPermissionItemPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = PermissionToPermissionItemPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		PermissionToPermissionItemPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		PermissionToPermissionItemPeer::filterSelectResults($queryResult);
 		PermissionToPermissionItemPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -395,7 +397,6 @@ abstract class BasePermissionToPermissionItemPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

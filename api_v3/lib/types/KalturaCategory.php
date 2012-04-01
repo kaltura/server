@@ -201,6 +201,15 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public $status;
 	
+	/**
+	 * Status
+	 * 
+	 * @var int
+	 * @readonly
+	 * @filter eq,in
+	 */
+	public $inheritedParentId;
+	
 	private static $mapBetweenObjects = array
 	(
 		"id",
@@ -227,7 +236,8 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"pendingMembersCount",
 		"privacyContext",	
 		"privacyContexts",
-		"status"
+		"status",
+		"inheritedParentId",
 	);
 	
 	public function getMapBetweenObjects()
@@ -268,6 +278,17 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
+		if ($this->inheritanceType == KalturaInheritanceType::INHERIT)
+		{
+			if ($this->userJoinPolicy != null ||
+				$this->defaultPermissionLevel != null ||
+				$this->owner != null ||
+				$this->contributionPolicy != null)
+			{
+				throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES);
+			}
+		}
+		
 		if ($this->owner && $this->owner != '')
 		{
 			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->owner);
@@ -276,5 +297,22 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		}
 		
 		return parent::validateForInsert($propertiesToSkip);
+	}
+	
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if (($sourceObject->getInheritanceType() == KalturaInheritanceType::INHERIT && $this->inheritanceType == null) || 
+			($this->inheritanceType == KalturaInheritanceType::INHERIT))
+		{
+			if ($this->userJoinPolicy != null ||
+				$this->defaultPermissionLevel != null ||
+				$this->owner != null ||
+				$this->contributionPolicy != null)
+			{
+				throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES);
+			}
+		}
+		
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }

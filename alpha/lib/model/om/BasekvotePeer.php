@@ -264,8 +264,9 @@ abstract class BasekvotePeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -315,36 +316,37 @@ abstract class BasekvotePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = kvotePeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = kvotePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'kvotePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			kvotePeer::filterSelectResults($cachedResult);
+			kvotePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			kvotePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = kvotePeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = kvotePeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = kvotePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		kvotePeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		kvotePeer::filterSelectResults($queryResult);
 		kvotePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -399,7 +401,6 @@ abstract class BasekvotePeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

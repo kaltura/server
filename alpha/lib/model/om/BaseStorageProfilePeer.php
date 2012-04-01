@@ -344,8 +344,9 @@ abstract class BaseStorageProfilePeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -395,36 +396,37 @@ abstract class BaseStorageProfilePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = StorageProfilePeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = StorageProfilePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'StorageProfilePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			StorageProfilePeer::filterSelectResults($cachedResult);
+			StorageProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			StorageProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = StorageProfilePeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = StorageProfilePeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = StorageProfilePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		StorageProfilePeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		StorageProfilePeer::filterSelectResults($queryResult);
 		StorageProfilePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -479,7 +481,6 @@ abstract class BaseStorageProfilePeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

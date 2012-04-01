@@ -48,38 +48,62 @@ class criteriaFilter
 		if ( ! isset ( $criteria_to_filter->creteria_filter_attached ) )
 		{
 			$criteria_to_filter->creteria_filter_attached = true;
-
-			// copy all constraints from the criteria to $criteria_to_filter			
-			$columns = $this->criteria->keys();
-			
-			foreach ( $columns as $column )
+			$this->copyCriteriaConstraints($this->criteria, $criteria_to_filter);
+		}
+	}
+	
+	/**
+	 * copy all constraints from the criteria to $criteria_to_filter
+	 * 
+	 */
+	private function copyCriteriaConstraints($fromCriteria, $toCriteria)
+	{
+		$columns = $fromCriteria->keys();
+		
+		foreach ( $columns as $column )
+		{
+			$filter_criterion = $fromCriteria->getCriterion ( $column );
+			if ($filter_criterion instanceof KalturaCriterion && count($filter_criterion->getTags()))
 			{
-				$filter_criterion = $this->criteria->getCriterion ( $column );
-				$new_crit = $criteria_to_filter->getNewCriterion ( $filter_criterion->getTable() . "." . $filter_criterion->getColumn() ,  $filter_criterion->getValue() , $filter_criterion->getComparison() );
-				$existing_criterion = $criteria_to_filter->getCriterion ( $column );
-
-				// don't add duplicates !!
-				if ( $existing_criterion && ( $existing_criterion->getValue() == $filter_criterion->getValue() &&  $existing_criterion->getComparison() == $filter_criterion->getComparison() ) ) 
-					continue;
+				$enableByTags = false;
+		
+				foreach ($filter_criterion->getTags() as $tag)
+				{
+					if(KalturaCriterion::isTagEnable($tag))
+						$enableByTags = true;
+				}
 				
-					// go one step deeper to copy the inner clauses
-				$this->addClauses( $this->criteria , $filter_criterion , $new_crit );
-				$criteria_to_filter->addAnd ( $new_crit );
+				if (!$enableByTags)
+				{
+					KalturaLog::debug("Skip criterion[" . $filter_criterion->getColumn() . "] comparison [ " . $filter_criterion->getComparison() . " ] with disabled tag [ " . print_r($filter_criterion->getTags(), true) . " ]");
+					continue;
+				}
 			}
 			
+			$new_crit = $toCriteria->getNewCriterion ( $filter_criterion->getTable() . "." . $filter_criterion->getColumn() ,  $filter_criterion->getValue() , $filter_criterion->getComparison() );
+			$existing_criterion = $toCriteria->getCriterion ( $column );
 
-			// TODO - adda more robust way to copy the orderBy from this->criteria
-			$orderBy = $this->criteria->getOrderByColumns();
-			if ( $orderBy ) 
+			// don't add duplicates !!
+			if ( $existing_criterion && ( $existing_criterion->getValue() == $filter_criterion->getValue() &&  $existing_criterion->getComparison() == $filter_criterion->getComparison() ) ) 
+				continue;
+			
+				// go one step deeper to copy the inner clauses
+			$this->addClauses( $fromCriteria , $filter_criterion , $new_crit );
+			$toCriteria->addAnd ( $new_crit );
+		}
+		
+
+		// TODO - adda more robust way to copy the orderBy from this->criteria
+		$orderBy = $fromCriteria->getOrderByColumns();
+		if ( $orderBy ) 
+		{
+			foreach ( $orderBy as $orderByColumn ) 
 			{
-				foreach ( $orderBy as $orderByColumn ) 
-				{
-					@list ( $name , $order ) = explode ( " " , $orderByColumn );
-					if ( $order == Criteria::ASC )
-						$criteria_to_filter->addAscendingOrderByColumn ( $name );
-					else
-						$criteria_to_filter->addDescendingOrderByColumn ( $name );
-				}
+				@list ( $name , $order ) = explode ( " " , $orderByColumn );
+				if ( $order == Criteria::ASC )
+					$toCriteria->addAscendingOrderByColumn ( $name );
+				else
+					$toCriteria->addDescendingOrderByColumn ( $name );
 			}
 		}
 	}

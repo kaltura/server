@@ -10,6 +10,9 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		if($object instanceof entry)
 			return true;
 			
+		if($object instanceof category)
+			return true;
+			
 		if($object instanceof uiConf)
 			return true;
 			
@@ -35,6 +38,9 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	{
 		if($object instanceof entry)
 			$this->entryDeleted($object);
+			
+		if($object instanceof category)
+			$this->categoryDeleted($object);
 			
 		if($object instanceof uiConf)
 			$this->uiConfDeleted($object);
@@ -104,7 +110,15 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			$flavorParamsOutput->save();
 		}
 	}
-
+	
+	/**
+	 * @param category $category
+	 */
+	protected function categoryDeleted(category $category)
+	{
+		//TODO - ADD JOB TO DELETE ALL CategoryKusers.
+	}
+	
 	/**
 	 * @param uiConf $uiConf
 	 */

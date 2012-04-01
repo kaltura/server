@@ -276,8 +276,9 @@ abstract class BaseflavorParamsConversionProfilePeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -327,36 +328,37 @@ abstract class BaseflavorParamsConversionProfilePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = flavorParamsConversionProfilePeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = flavorParamsConversionProfilePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'flavorParamsConversionProfilePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			flavorParamsConversionProfilePeer::filterSelectResults($cachedResult);
+			flavorParamsConversionProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			flavorParamsConversionProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = flavorParamsConversionProfilePeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = flavorParamsConversionProfilePeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = flavorParamsConversionProfilePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		flavorParamsConversionProfilePeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		flavorParamsConversionProfilePeer::filterSelectResults($queryResult);
 		flavorParamsConversionProfilePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -411,7 +413,6 @@ abstract class BaseflavorParamsConversionProfilePeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

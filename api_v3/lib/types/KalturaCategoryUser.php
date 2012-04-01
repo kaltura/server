@@ -133,11 +133,11 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable
 		if ($categoryKuser)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_USER_ALREADY_EXISTS);
 			
-		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->categoryId, kCurrentContext::$uid);
+		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($this->categoryId, kCurrentContext::$uid);
 		if ((!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER) &&
 			$category->getUserJoinPolicy() == UserJoinPolicyType::NOT_ALLOWED)
 		{
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_USER_NOT_ALLOWED, $this->categoryId);
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_USER_JOIN_NOT_ALLOWED, $this->categoryId);
 		}
 		
 		return parent::validateForInsert($propertiesToSkip);

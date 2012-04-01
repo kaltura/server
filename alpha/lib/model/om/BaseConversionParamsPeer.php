@@ -304,8 +304,9 @@ abstract class BaseConversionParamsPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -355,36 +356,37 @@ abstract class BaseConversionParamsPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = ConversionParamsPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = ConversionParamsPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'ConversionParamsPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			ConversionParamsPeer::filterSelectResults($cachedResult);
+			ConversionParamsPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			ConversionParamsPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = ConversionParamsPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = ConversionParamsPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = ConversionParamsPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		ConversionParamsPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		ConversionParamsPeer::filterSelectResults($queryResult);
 		ConversionParamsPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -439,7 +441,6 @@ abstract class BaseConversionParamsPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

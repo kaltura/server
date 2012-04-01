@@ -392,8 +392,9 @@ abstract class BaseassetParamsOutputPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -443,36 +444,37 @@ abstract class BaseassetParamsOutputPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = assetParamsOutputPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = assetParamsOutputPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'assetParamsOutputPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			assetParamsOutputPeer::filterSelectResults($cachedResult);
+			assetParamsOutputPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			assetParamsOutputPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = assetParamsOutputPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = assetParamsOutputPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = assetParamsOutputPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		assetParamsOutputPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		assetParamsOutputPeer::filterSelectResults($queryResult);
 		assetParamsOutputPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -527,7 +529,6 @@ abstract class BaseassetParamsOutputPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

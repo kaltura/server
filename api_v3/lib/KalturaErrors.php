@@ -237,10 +237,6 @@ class KalturaErrors extends APIErrors
 	
 	const PARENT_CATEGORY_IS_CHILD = "PARENT_CATEGORY_IS_CHILD,The parent category \"%s\" is one of the childs for category \"%s\"";
 	
-	const MAX_CATEGORY_DEPTH_REACHED = "MAX_CATEGORY_DEPTH_REACHED,Category can have a max depth of \"%s\" levels";
-	
-	const MAX_NUMBER_OF_CATEGORIES_REACHED = "MAX_NUMBER_OF_CATEGORIES_REACHED,Max number of \"%s\" categories was reached";
-	
 	const CATEGORIES_LOCKED = "CATEGORIES_LOCKED,Categories are locked, lock will be automatically released in \"%s\" seconds";
 	
 	const CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET = "CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET,Cannot inherit members when parent category is not set";
@@ -375,8 +371,22 @@ class KalturaErrors extends APIErrors
 	
 	const CATEGORY_INHERIT_MEMBERS = "CATEGORY_INHERIT_MEMBERS,Cannot add members to this category since its inherit members from parent category [\"%s\"]";
 	
-	const CATEGORY_USER_NOT_ALLOWED = "CATEGORY_USER_NOT_ALLOWED,cannot register to this category [\"%s\"]";
+	const CATEGORY_USER_JOIN_NOT_ALLOWED = "CATEGORY_USER_JOIN_NOT_ALLOWED,cannot register to this category [\"%s\"]";
 	
 	const CANNOT_UPDATE_CATEGORY_USER = "CANNOT_UPDATE_CATEGORY_USER,cannot update categoryUser";
 	
+	const CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES = "CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES, Cannot update Category that inherit members attributes that that are inherited from parent category";
+	
+	const MUST_FILTER_USERS_OR_CATEGORY = "MUST_FILTER_USERS_OR_CATEGORY, Must filter users or categories";
+	
+	const CANNOT_OVERRIDE_MANUAL_CHANGES = "CANNOT_OVERRIDE_MANUAL_CHANGES,Cannot override manual changes";
+	
+	const CANNOT_UPDATE_CATEGORY_USER_OWNER = "CANNOT_UPDATE_CATEGORY_USER_OWNER, Cannot change CategoryUser object for category Owner";
+	
+	/**
+	 * categoryEntry
+	 */
+	const CANNOT_ASSIGN_ENTRY_TO_CATEGORY = "CANNOT_ASSIGN_ENTRY_TO_CATEGORY,Cannot assign entry to category";
+
+	const CANNOT_REMOVE_ENTRY_FROM_CATEGORY = "CANNOT_REMOVE_ENTRY_FROM_CATEGORY,Cannot remove entry from category";
 }

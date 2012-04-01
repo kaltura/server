@@ -24,7 +24,7 @@ $baseConfigurationIndexs = 	array(
 		
 		'sort_name'					=> SphinxFieldType::RT_ATTR_BIGINT,
         'int_entry_id'				=> SphinxFieldType::RT_ATTR_BIGINT,
-        'kuser_id'					=> SphinxFieldType::RT_ATTR_BIGINT,
+        'kuser_id'					=> IIndexable::FIELD_TYPE_STRING,
         'entry_status'				=> SphinxFieldType::RT_ATTR_BIGINT,
 		'type'						=> SphinxFieldType::RT_ATTR_BIGINT,
 		'media_type'	 			=> SphinxFieldType::RT_ATTR_BIGINT,
@@ -56,13 +56,16 @@ $baseConfigurationIndexs = 	array(
 		'entitled_kusers' 			=> IIndexable::FIELD_TYPE_STRING,
 		'privacy_by_contexts' 		=> IIndexable::FIELD_TYPE_STRING,
 		'privacy' 					=> IIndexable::FIELD_TYPE_INTEGER,
-		'creator_kuser_id' 			=> IIndexable::FIELD_TYPE_INTEGER),
+		'creator_kuser_id' 			=> IIndexable::FIELD_TYPE_STRING),
 	),
 	
 	'kaltura_category' => array(
 		'type'					=> 'rt',	
 		'path'					=> '/sphinx/kaltura_category_rt',
-	
+		'dict'      => 'keywords',
+        'min_prefix_len' => 3,
+        'enable_star' => '1',
+                
 		'fields' => array( 
 			'category_id'		=> SphinxFieldType::RT_FIELD,
 			'name'       	    => SphinxFieldType::RT_FIELD,
@@ -79,11 +82,11 @@ $baseConfigurationIndexs = 	array(
 			'reference_id' 		=> SphinxFieldType::RT_FIELD,
 			'privacy_context' 	=> SphinxFieldType::RT_FIELD,
 			'privacy_contexts'  => SphinxFieldType::RT_FIELD,
+			'privacy'		    => SphinxFieldType::RT_FIELD,
 			'members_count' 	=> SphinxFieldType::RT_ATTR_BIGINT,
 			'pending_members_count' => SphinxFieldType::RT_ATTR_BIGINT,
 			'entries_count' 	=> SphinxFieldType::RT_ATTR_BIGINT,
 			'direct_entries_count' => SphinxFieldType::RT_ATTR_BIGINT,
-			'privacy'		    => SphinxFieldType::RT_ATTR_BIGINT,
 			'inheritance_type'  => SphinxFieldType::RT_ATTR_BIGINT,
 			'user_join_policy'  => SphinxFieldType::RT_ATTR_BIGINT,
 			'default_permission_level' => SphinxFieldType::RT_ATTR_BIGINT,

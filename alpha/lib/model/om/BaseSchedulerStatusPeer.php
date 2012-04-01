@@ -288,8 +288,9 @@ abstract class BaseSchedulerStatusPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -339,36 +340,37 @@ abstract class BaseSchedulerStatusPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = SchedulerStatusPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = SchedulerStatusPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'SchedulerStatusPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			SchedulerStatusPeer::filterSelectResults($cachedResult);
+			SchedulerStatusPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			SchedulerStatusPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = SchedulerStatusPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = SchedulerStatusPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = SchedulerStatusPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		SchedulerStatusPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		SchedulerStatusPeer::filterSelectResults($queryResult);
 		SchedulerStatusPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -423,7 +425,6 @@ abstract class BaseSchedulerStatusPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

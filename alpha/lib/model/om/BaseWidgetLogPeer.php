@@ -304,8 +304,9 @@ abstract class BaseWidgetLogPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -355,36 +356,37 @@ abstract class BaseWidgetLogPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = WidgetLogPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = WidgetLogPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'WidgetLogPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			WidgetLogPeer::filterSelectResults($cachedResult);
+			WidgetLogPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			WidgetLogPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = WidgetLogPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = WidgetLogPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = WidgetLogPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		WidgetLogPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		WidgetLogPeer::filterSelectResults($queryResult);
 		WidgetLogPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -439,7 +441,6 @@ abstract class BaseWidgetLogPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

@@ -276,8 +276,9 @@ abstract class BaseReportPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -327,36 +328,37 @@ abstract class BaseReportPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = ReportPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = ReportPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'ReportPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			ReportPeer::filterSelectResults($cachedResult);
+			ReportPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			ReportPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = ReportPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = ReportPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = ReportPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		ReportPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		ReportPeer::filterSelectResults($queryResult);
 		ReportPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -411,7 +413,6 @@ abstract class BaseReportPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

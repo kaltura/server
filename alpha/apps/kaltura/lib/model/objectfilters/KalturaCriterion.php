@@ -5,6 +5,8 @@
  */
 abstract class KalturaCriterion extends Criterion
 {
+	const TAG_ENTITLEMENT_ENTRY = 'TAG_ENTITLEMENT_ENTRY';
+	const TAG_ENTITLEMENT_CATEGORY = 'TAG_ENTITLEMENT_CATEGORY';
 	/**
 	 * @var KalturaCriterion
 	 */
@@ -14,6 +16,41 @@ abstract class KalturaCriterion extends Criterion
 	 * @var KalturaCriteria
 	 */
 	protected $criteria = false;
+	
+	public static $enabledTags = array();
+	
+	protected $tags = array();
+	
+	public function setTags($tags)
+	{
+		$this->tags = $tags;
+	}
+	
+	public function addTag($tag)
+	{
+		$this->tags[] = $tag;
+	}
+	
+	public function getTags()
+	{
+		return $this->tags;
+	}
+	
+	public static function enableTag($tag)
+	{
+		self::$enabledTags[$tag] = $tag;
+	}
+	
+	public static function disableTag($tag)
+	{
+		if(isset(self::$enabledTags[$tag]))
+			unset(self::$enabledTags[$tag]);
+	}
+	
+	public static function isTagEnable($tag)
+	{
+		return isset(self::$enabledTags[$tag]);
+	}
 	
 	/**
 	 * AND or OR
@@ -27,6 +64,7 @@ abstract class KalturaCriterion extends Criterion
 	 * @param string $value
 	 * @param string $comparison
 	 */
+
 	public function __construct(Criteria $criteria, $column, $value, $comparison = null)
 	{
 		$this->criteria = $criteria;

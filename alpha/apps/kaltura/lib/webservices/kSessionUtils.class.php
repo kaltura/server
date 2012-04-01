@@ -257,6 +257,7 @@ class ks
 	const PRIVILEGE_IP_RESTRICTION = "iprestrict";
 	const PRIVILEGE_ENABLE_ENTITLEMENT = "enableentitlement";
 	const PRIVILEGE_DISABLE_ENTITLEMENT = "disableentitlement";
+	const PRIVILEGE_PRIVACY_CONTEXT = "privacycontext";
 
 	public $partner_id = null;
 	public $master_partner_id = null;
@@ -575,6 +576,24 @@ class ks
 		}
 		
 		return false;
+	}
+	
+	public function getPrivacyContext()
+	{
+		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
+		// edit privilege (edit:XX,edit:YYY,...)
+		$allPrivileges = explode(',', $this->privileges);
+		// foreach pair - check privileges on playlist
+		
+		foreach($allPrivileges as $priv)
+		{
+			$exPrivileges = explode(':', $priv);
+			//validate setRole
+			if ($exPrivileges[0] == self::PRIVILEGE_PRIVACY_CONTEXT) 
+				return $exPrivileges[1];
+		}
+		
+		return null;
 	}
 	
 	public function getSetRole()

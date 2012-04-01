@@ -284,8 +284,9 @@ abstract class BaseUserLoginDataPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -335,36 +336,37 @@ abstract class BaseUserLoginDataPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = UserLoginDataPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = UserLoginDataPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'UserLoginDataPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			UserLoginDataPeer::filterSelectResults($cachedResult);
+			UserLoginDataPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			UserLoginDataPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = UserLoginDataPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = UserLoginDataPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = UserLoginDataPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		UserLoginDataPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		UserLoginDataPeer::filterSelectResults($queryResult);
 		UserLoginDataPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -419,7 +421,6 @@ abstract class BaseUserLoginDataPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

@@ -272,8 +272,9 @@ abstract class BaseflickrTokenPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -323,36 +324,37 @@ abstract class BaseflickrTokenPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = flickrTokenPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = flickrTokenPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'flickrTokenPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			flickrTokenPeer::filterSelectResults($cachedResult);
+			flickrTokenPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			flickrTokenPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = flickrTokenPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = flickrTokenPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = flickrTokenPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		flickrTokenPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		flickrTokenPeer::filterSelectResults($queryResult);
 		flickrTokenPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -407,7 +409,6 @@ abstract class BaseflickrTokenPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

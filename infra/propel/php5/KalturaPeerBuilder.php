@@ -211,8 +211,9 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array \$selectResults The array of objects to filter.
+	 * @param	   Criteria \$criteria
 	 */
-	public static function filterSelectResults(&\$selectResults)
+	public static function filterSelectResults(&\$selectResults, Criteria \$criteria)
 	{
 	}
 	
@@ -262,36 +263,37 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 	 */
 	public static function doSelect(Criteria \$criteria, PropelPDO \$con = null)
 	{		
-		\$criteria = ".$this->getPeerClassname()."::prepareCriteriaForSelect(\$criteria);
+		\$criteriaForSelect = ".$this->getPeerClassname()."::prepareCriteriaForSelect(\$criteria);
 		
 		\$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		\$cacheKey = null;
 		\$cachedResult = kQueryCache::getCachedQueryResults(
-			\$criteria, 
+			\$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'".$this->getPeerClassname()."', 
 			\$cacheKey, 
 			\$queryDB);
 		if (\$cachedResult !== null)
 		{
-			".$this->getPeerClassname()."::filterSelectResults(\$cachedResult);
+			".$this->getPeerClassname()."::filterSelectResults(\$cachedResult, \$criteriaForSelect);
 			".$this->getPeerClassname()."::updateInstancePool(\$cachedResult);
 			return \$cachedResult;
 		}
 		
 		\$con = ".$this->getPeerClassname()."::alternativeCon(\$con, \$queryDB);
 		
-		\$queryResult = ".$this->getPeerClassname()."::populateObjects(".$this->basePeerClassname."::doSelect(\$criteria, \$con));
+		\$queryResult = ".$this->getPeerClassname()."::populateObjects(".$this->basePeerClassname."::doSelect(\$criteriaForSelect, \$con));
 		
-		if(\$criteria instanceof KalturaCriteria)
-			\$criteria->applyResultsSort(\$queryResult);
+		if(\$criteriaForSelect instanceof KalturaCriteria)
+			\$criteriaForSelect->applyResultsSort(\$queryResult);
+		
+		".$this->getPeerClassname()."::filterSelectResults(\$queryResult, \$criteria);
 		
 		if (\$cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults(\$cacheKey, \$queryResult);
 		}
 		
-		".$this->getPeerClassname()."::filterSelectResults(\$queryResult);
 		".$this->getPeerClassname()."::addInstancesToPool(\$queryResult);
 		return \$queryResult;
 	}";
@@ -414,7 +416,6 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 		
 		return self::\$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

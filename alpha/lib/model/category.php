@@ -22,11 +22,9 @@ class category extends Basecategory implements IIndexable
 	
 	protected $old_inheritance_type = null;
 	
-	const MAX_CATEGORY_DEPTH = 8;
-	
 	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 0;
 	
-	const CATEGORY_WORK_GROUP_SIZE = 10;
+	const MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY = 10;
 	
 	private static $indexFieldTypes = array(
 		'category_id' => IIndexable::FIELD_TYPE_INTEGER,
@@ -43,11 +41,11 @@ class category extends Basecategory implements IIndexable
 		'reference_id' => IIndexable::FIELD_TYPE_STRING,
 		'privacy_context' => IIndexable::FIELD_TYPE_STRING,
 		'privacy_contexts' => IIndexable::FIELD_TYPE_STRING,
+		'privacy' => IIndexable::FIELD_TYPE_STRING,
 		'members_count' => IIndexable::FIELD_TYPE_INTEGER,
 		'pending_members_count' => IIndexable::FIELD_TYPE_INTEGER,
 		'entries_count' => IIndexable::FIELD_TYPE_INTEGER,
 		'direct_entries_count' => IIndexable::FIELD_TYPE_INTEGER,
-		'privacy' => IIndexable::FIELD_TYPE_INTEGER,
 		'inheritance_type' => IIndexable::FIELD_TYPE_INTEGER,
 		'user_join_policy' => IIndexable::FIELD_TYPE_INTEGER,
 		'default_permission_level' => IIndexable::FIELD_TYPE_INTEGER,
@@ -62,16 +60,23 @@ class category extends Basecategory implements IIndexable
 	{
 		if ($this->isNew())
 		{
-			$numOfCatsForPartner = categoryPeer::doCount(new Criteria());
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
+			$c->add (categoryPeer::STATUS, CategoryStatus::DELETED, Criteria::NOT_EQUAL);
+			$c->add (categoryPeer::PARTNER_ID, kCurrentContext::$ks_partner_id, Criteria::EQUAL);
 			
-			if ($numOfCatsForPartner >= Partner::MAX_NUMBER_OF_CATEGORIES)
-			{
-				throw new kCoreException("Max number of categories was reached", kCoreException::MAX_NUMBER_OF_CATEGORIES_REACHED);
-			}
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+			$numOfCatsForPartner = categoryPeer::doCount($c);
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			
 			$chunkedCategoryLoadThreshold = kConf::get('kmc_chunked_category_load_threshold');
 			if ($numOfCatsForPartner >= $chunkedCategoryLoadThreshold)
 				PermissionPeer::enableForPartner(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD, PermissionType::SPECIAL_FEATURE);
+
+			if ($this->getPrivacyContexts() == '' && $this->getParentId())
+			{
+				$parentCategory = $this->getParentCategory();
+				$this->setPrivacyContexts($parentCategory->getPrivacyContexts());
+			}
 		}
 		
 		// set the depth of the parent category + 1
@@ -85,11 +90,6 @@ class category extends Basecategory implements IIndexable
 			}
 				$this->setChildsDepth();
 		}
-		
-		if ($this->getDepth() >= self::MAX_CATEGORY_DEPTH)
-		{
-			throw new kCoreException("Max depth was reached", kCoreException::MAX_CATEGORY_DEPTH_REACHED);
-		} 
 		
 		if ($this->isColumnModified(categoryPeer::NAME) || $this->isColumnModified(categoryPeer::PARENT_ID))
 		{
@@ -128,16 +128,41 @@ class category extends Basecategory implements IIndexable
 			$updateEntriesCount = true;
 			$oldParentId = $this->old_parent_id;
 			$newParentId = $this->parent_id;
-			$this->old_parent_id = null;
-			
-			if($oldParentId)
-				$oldParentCat = categoryPeer::retrieveByPK($oldParentId);
-			if ($oldParentCat && $this->inheritance_type == InheritanceType::MANUAL && $this->old_inheritance_type == InheritanceType::INHERIT)
-				$this->copyInheritedFields($oldParentCat);
+			$this->old_parent_id = null;	
 		}
 		
+		if (!$this->isNew() &&
+			$this->isColumnModified(categoryPeer::INHERITANCE_TYPE) &&  
+			$this->inheritance_type == InheritanceType::MANUAL && 
+			$this->old_inheritance_type == InheritanceType::INHERIT)
+		{
+				if($this->old_parent_id)
+					$categoryTocopyInheritedFields = categoryPeer::retrieveByPK($this->old_parent_id);
+				if($categoryTocopyInheritedFields)
+					$this->copyInheritedFields($categoryTocopyInheritedFields);
+		}
+		
+		$kuserChanged = false;
+		if ($this->isColumnModified(categoryPeer::KUSER_ID))
+			$kuserChanged = true; 
+			
 		parent::save($con);
-
+		
+		if ($kuserChanged && $this->inheritance_type == InheritanceType::MANUAL)
+		{	
+			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->getId(), $this->kuser_id);
+			if (!$categoryKuser)
+			{
+				$categoryKuser = new categoryKuser();
+				$categoryKuser->setCategoryId($this->getId());
+				$categoryKuser->setKuserId($this->kuser_id);
+			}
+			
+			$categoryKuser->setPermissionLevel(CategoryKuserPermissionLevel::MANAGER);
+			$categoryKuser->setStatus(CategoryKuserStatus::ACTIVE);
+			$categoryKuser->save();
+		}
+		
 		if ($updateEntriesCount)
 		{
 			$parentsCategories = array();
@@ -209,6 +234,32 @@ class category extends Basecategory implements IIndexable
 		if($this->isColumnModified(categoryPeer::DELETED_AT) && !is_null($this->getDeletedAt()))
 			$objectDeleted = true;
 			
+		if ($this->isColumnModified(categoryPeer::INHERITANCE_TYPE))
+		{
+			//TODO ADD_BATCH_JOB TO UPDATE CATEGORY INHERITACE + KUSERS INHERITANCE FOR THIS CATEGORY 
+			// + IF CATEGORY DOESN'T INHERIT MEMEBER - ADD OWNER
+		}
+		
+		if ($this->isColumnModified(categoryPeer::PRIVACY_CONTEXT))
+		{
+			//TODO ADD_BATCH_JOB TO UPDATE ALL SUB CATEGORIES WITH PROVACY CONTEXT FROM THE PARENT.
+		}
+		
+		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
+		$partner = $this->getPartner();
+		if($partner && $partner->getCategoryGroupSize())
+			$categoryGroupSize = $partner->getCategoryGroupSize();	
+		
+		//re-index entries
+		if ($this->isColumnModified(categoryPeer::PRIVACY) || 
+			$this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS) || 
+			($this->isColumnModified(categoryPeer::MEMBERS_COUNT) && 
+			$this->members_count <= $categoryGroupSize && 
+			$this->entries_count <= entry::CATEGORY_ENTRIES_COUNT_LIMIT_TO_BE_INDEXED))
+		{
+			 // TODO ADD JOB TO INDEX ENTRIES.
+		}
+			
 		$ret = parent::postUpdate($con);
 		
 		if($objectDeleted)
@@ -233,6 +284,11 @@ class category extends Basecategory implements IIndexable
 		$this->old_full_name = $this->getFullName();				
 		parent::setFullName($v);
 	}
+	
+	/**
+	 * @return partner
+	 */
+	public function getPartner()	{		return PartnerPeer::retrieveByPK( $this->getPartnerId() );	}
 	
 	public function setParentId($v)
 	{
@@ -325,12 +381,19 @@ class category extends Basecategory implements IIndexable
       }
       
       /**
+       * Increment direct entries count (will increment recursively the parent categories too)
+       */
+      public function incrementDirectEntriesCount()
+      {
+            $this->setDirectEntriesCount($this->getDirectEntriesCount() + 1);           
+            $this->save();
+      }
+      
+      /**
        * Decrement entries count (will decrement recursively the parent categories too)
        */
       public function decrementEntriesCount($decrease = 1, $entryCategoriesRemovedIds = null)
       {
-            
-            
             if($this->entryAlreadyBlongToCategory($entryCategoriesRemovedIds))
                   return;
             
@@ -355,12 +418,31 @@ class category extends Basecategory implements IIndexable
             $this->save();
       }
       
+      /**
+       * Decrement direct entries count (will decrement recursively the parent categories too)
+       */
+      public function decrementDirectEntriesCount()
+      {
+			$this->setDirectEntriesCount($this->getDirectEntriesCount() - 1);            
+            $this->save();
+      }
+      
 	public function validateFullNameIsUnique()
 	{
-		$name = $this->getFullName();
-		$category = categoryPeer::getByFullNameExactMatch($name);
+		$fullName = $this->getFullName();
+		$fullName = categoryPeer::getParsedFullName($fullName);
+		
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
+		$c->add(categoryPeer::FULL_NAME, $fullName);
+		$c->add (categoryPeer::STATUS, CategoryStatus::DELETED, Criteria::NOT_EQUAL);
+		$c->add (categoryPeer::PARTNER_ID, kCurrentContext::$ks_partner_id, Criteria::EQUAL);
+			
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		$category = categoryPeer::doSelectOne($c);
+		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
 		if ($category)
-			throw new kCoreException("Duplicate category: $name", kCoreException::DUPLICATE_CATEGORY);
+			throw new kCoreException("Duplicate category: $fullName", kCoreException::DUPLICATE_CATEGORY);
 	}
 	
 	public function setDeletedAt($v)
@@ -613,7 +695,6 @@ class category extends Basecategory implements IIndexable
 		$this->setDefaultPermissionLevel(CategoryKuserPermissionLevel::MODERATOR);
 		$this->setContributionPolicy(ContributionPolicyType::MODERATOR);
 		$this->setStatus(CategoryStatus::ACTIVE);
-		$this->setPrivacyContext(false);
 	}
 	
 	
@@ -647,6 +728,7 @@ class category extends Basecategory implements IIndexable
 	 */	
 	public function getMembers()
 	{
+		//TODO - retrieve with pagers
 		$members = categoryKuserPeer::retrieveActiveKusersByCategoryId($this->getId());
 		if (!$members)
 			return '';
@@ -711,6 +793,18 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function postInsert(PropelPDO $con = null)
 	{
+		if ($this->isColumnModified(categoryPeer::INHERITANCE_TYPE))
+		{
+			//TODO ADD_BATCH_JOB TO UPDATE CATEGORY INHERITACE + KUSERS INHERITANCE FOR THIS CATEGORY 
+			// + IF CATEGORY DOESN'T INHERIT MEMEBER - ADD OWNER
+		}
+		
+		if ($this->isColumnModified(categoryPeer::PRIVACY_CONTEXT))
+		{
+			//TODO ADD_BATCH_JOB TO UPDATE ALL SUB CATEGORIES WITH PROVACY CONTEXT FROM THE PARENT.
+		}
+		
+		
 		parent::postInsert($con);
 	
 		if (!$this->alreadyInSave)
@@ -736,12 +830,17 @@ class category extends Basecategory implements IIndexable
 		return $inheritCategory;
 	}
 	
-	public function copyInheritedFields($oldParentCategory)
+	/*
+	 * to be used when removing inheritance
+	 */
+	public function copyInheritedFields(category $oldParentCategory)
 	{			
 		$this->setUserJoinPolicy($oldParentCategory->getUserJoinPolicy());
 		$this->setDefaultPermissionLevel($oldParentCategory->getDefaultPermissionLevel());
 		$this->setKuserId($oldParentCategory->getKuserId());
 		$this->setContributionPolicy($oldParentCategory->getContributionPolicy());
+		$this->setMembersCount(0); //removing all members from this category
+		$this->setPendingMembersCount(0);
 	}
 	
 	/**
@@ -796,6 +895,30 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/**
+	 * inherited values are not synced in the DB to child category that inherit from them - but should be returned on the object.
+	 * (values are copied upon update inhertance from inherited to manual)
+	 */
+	public function getMembersCount()
+	{
+		if ($this->getInheritanceType() == InheritanceType::INHERIT)
+			return $this->getInheritParent()->getMembersCount();
+		else
+			return parent::getMembersCount();
+	}
+	
+	/**
+	 * inherited values are not synced in the DB to child category that inherit from them - but should be returned on the object.
+	 * (values are copied upon update inhertance from inherited to manual)
+	 */
+	public function getPendingMembersCount()
+	{
+		if ($this->getInheritanceType() == InheritanceType::INHERIT)
+			return $this->getInheritParent()->getPendingMembersCount();
+		else
+			return parent::getPendingMembersCount();
+	}
+	
+	/**
 	 * If Category inherit settings, and inherited parent category is currently being updated, this category should be in status updating.
 	 */
 	public function getStatus()
@@ -835,9 +958,6 @@ class category extends Basecategory implements IIndexable
 		parent::setInheritanceType($v);
 	}
 	
-
-	
-	
 	public function setPuserId($puserId)
 	{
 		if ( self::getPuserId() == $puserId )  // same value - don't set for nothing 
@@ -850,5 +970,22 @@ class category extends Basecategory implements IIndexable
 			throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
 			
 		$this->setKuserId($kuser->getId());
+	}
+	
+	public function setPrivacyContext($v)
+	{
+		if (!$this->getParentId())
+		{
+			$this->setPrivacyContexts($v);
+			parent::setPrivacyContext($v);
+			return;
+		}
+
+		$parentCategory = $this->getParentCategory();
+		$privacyContext = explode(',', $parentCategory->getPrivacyContexts());
+		$privacyContext[] = $v;
+		
+		$this->setPrivacyContexts(implode(',', $privacyContext));
+		parent::setPrivacyContext($v);
 	}
 }

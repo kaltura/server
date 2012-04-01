@@ -448,8 +448,9 @@ abstract class BaseentryPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -499,36 +500,37 @@ abstract class BaseentryPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = entryPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = entryPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'entryPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			entryPeer::filterSelectResults($cachedResult);
+			entryPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			entryPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = entryPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = entryPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = entryPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		entryPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		entryPeer::filterSelectResults($queryResult);
 		entryPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -565,10 +567,14 @@ abstract class BaseentryPeer {
 	
 	public static function  setUseCriteriaFilter ( $use )
 	{
+		KalturaLog::debug('### save done! # ' . __LINE__);
 		$criteria_filter = entryPeer::getCriteriaFilter();
+		KalturaLog::debug('### save done! # ' . __LINE__);
 		
 		if ( $use )  $criteria_filter->enable(); 
 		else $criteria_filter->disable();
+		
+		KalturaLog::debug('### save done! # ' . __LINE__);
 	}
 	
 	/**
@@ -583,7 +589,6 @@ abstract class BaseentryPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

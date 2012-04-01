@@ -300,8 +300,9 @@ abstract class BaseConversionProfilePeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -351,36 +352,37 @@ abstract class BaseConversionProfilePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = ConversionProfilePeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = ConversionProfilePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'ConversionProfilePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			ConversionProfilePeer::filterSelectResults($cachedResult);
+			ConversionProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			ConversionProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = ConversionProfilePeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = ConversionProfilePeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = ConversionProfilePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		ConversionProfilePeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		ConversionProfilePeer::filterSelectResults($queryResult);
 		ConversionProfilePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -435,7 +437,6 @@ abstract class BaseConversionProfilePeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

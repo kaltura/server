@@ -312,8 +312,9 @@ abstract class BaseControlPanelCommandPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -363,36 +364,37 @@ abstract class BaseControlPanelCommandPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = ControlPanelCommandPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = ControlPanelCommandPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'ControlPanelCommandPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			ControlPanelCommandPeer::filterSelectResults($cachedResult);
+			ControlPanelCommandPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			ControlPanelCommandPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = ControlPanelCommandPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = ControlPanelCommandPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = ControlPanelCommandPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		ControlPanelCommandPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		ControlPanelCommandPeer::filterSelectResults($queryResult);
 		ControlPanelCommandPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -447,7 +449,6 @@ abstract class BaseControlPanelCommandPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

@@ -7,24 +7,86 @@
  */
 class kEntitlementUtils 
 {
-
+	const NO_PRIVACY_CONTEXT = 'no_p_context';
+	const PRIVACY_CONTEXT_PREFIX = 'pc_pre_';
+	
 	protected static $entitlementEnforcement = false;  
 	
 	
 	public static function getEntitlementEnforcement()
-	{
+	{		
 		return self::$entitlementEnforcement;
 	}
 	
 	/**
 	 * Returns true if kuser or current kuser is entitled to entryId
-	 * @param string $entryId
+	 * @param entry $entry
 	 * @param int $kuser
 	 * @return bool
 	 */
-	public static function isEntryEntitled($entryId, $kuserId = null)
+	public static function isEntryEntitled(entry $entry, $kuserId = null)
 	{
-		//TODO
+		// entry is entitled when entitlement is disable
+		//TODO - WHAT ABOUT WIDGET SESSION? partner is on the ks
+		if(!self::getEntitlementEnforcement())
+			return true;
+
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
+		$c->add(categoryPeer::ID, explode(',', $entry->getCategoriesIds()), Criteria::IN);
+		
+		$ksPrivacyContexts = null;
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		
+		$privacy = array(PrivacyType::ALL);
+		if($ks && !$ks->isWidgetSession())
+			$privacy[] = PrivacyType::AUTHENTICATED_USERS;
+			
+		$crit = $c->getNewCriterion (categoryPeer::PRIVACY, $privacy, Criteria::IN);
+		
+		if($ks)
+		{	
+			$ksPrivacyContexts = $ks->getPrivacyContext();
+			if ($ksPrivacyContexts)
+				$crit->addAnd($c->getNewCriterion (categoryPeer::PRIVACY_CONTEXTS, $ksPrivacyContexts));
+			
+			if(!$kuserId)
+			{
+				$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid);
+				$kuserId = $kuser->getId();
+			}
+			
+			// kuser is set on the entry as creator or uploader
+			if ($entry->getKuserId() == $kuserId || $entry->getCreatorKuserId() == $kuserId)
+				return true;
+			
+			// kuser is set on the entry entitled users edit or publish
+			$entitledKusers = array_merge(explode(',', $entry->getEntitledKusersEdit()), explode(',', $entry->getEntitledKusersPublish()));
+			if(in_array($kuserId, $entitledKusers))
+				return true; 
+	
+			// entry that doesn't belong to any category is public
+			if(trim($entry->getCategories()) == '')
+				return true;
+					
+			// kuser is set on the category as member
+			// this ugly code is temporery - since we have a bug in sphinxCriteria::getAllCriterionFields
+			$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $kuserId, Criteria::EQUAL);
+			$membersCrit->addOr($crit);
+			$crit = $membersCrit;
+		}
+			
+		$c->addAnd(categoryPeer::ID, explode(',', $entry->getCategoriesIds()), Criteria::IN);
+		$c->addAnd($crit);
+		
+		//remove default FORCED criteria since categories that has display in search = public - doesn't mean that all of their entries are public
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		$category = categoryPeer::doSelectOne($c);
+		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+
+		if($category)
+			return true;
+		
+		return false;
 	} 	
 
 	/**
@@ -35,7 +97,29 @@ class kEntitlementUtils
 	 */
 	public static function validateEntryAssignToCategory($categoryId, $kuserId = null)
 	{ 
-		//TODO
+		if(!self::getEntitlementEnforcement())
+			return true;
+			
+		$category = categoryPeer::retrieveByPK($categoryUser->categoryId);
+		if (!$category)
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);
+
+		if ($category->getContributionPolicy() == ContributionPolicyType::ALL)
+			return true;
+		
+		if($kuserId)
+		{
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid);
+			$kuserId = $kuser->getId();
+		}
+			
+		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryUser->categoryId, $kuserId);
+		if($currentKuserCategoryKuser && ($currentKuserCategoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MANAGER ||
+										  $currentKuserCategoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MODERATOR ||
+										  $currentKuserCategoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::CONTRIBUTOR))
+			return true;
+			
+		return false;
 	}
 	
 	/**
@@ -46,41 +130,118 @@ class kEntitlementUtils
 	 */
 	public static function initEntitlementEnforcement()
 	{
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id; 
+		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id; 
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$partner)
-			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID);
+			return;
 			
 		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId))
 			return;		
 		
 		$partnerDefaultEntitlementEnforcement = $partner->getDefaultEntitlementEnforcement();
 		
-		// default entitlement scope is false - disable.
+		// default entitlement scope is true - enable.
 		if(is_null($partnerDefaultEntitlementEnforcement))
-			$partnerDefaultEntitlementEnforcement = false;
+			$partnerDefaultEntitlementEnforcement = true;
 		
-		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : null;
-		if ($ksString == '') // for actions with no KS or when creating ks.
-			return;
+		self::$entitlementEnforcement = $partnerDefaultEntitlementEnforcement;
 		
-		$ks = ks::fromSecureString($ksString);
-		
-		if (!$partnerDefaultEntitlementEnforcement)
+		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
+		if ($ksString != '') // for actions with no KS or when creating ks.
 		{
-			self::$entitlementEnforcement = false;
+			$ks = ks::fromSecureString($ksString);
+			$enableEntitlement = $ks->getDisableEntitlement();
+			if ($enableEntitlement)
+				self::$entitlementEnforcement = false;
+				
 			$enableEntitlement = $ks->getEnableEntitlement();
 			if ($enableEntitlement)
 				self::$entitlementEnforcement = true;
 		}
-		else
+			
+		if (self::$entitlementEnforcement)
 		{
-			self::$entitlementEnforcement = true;
-			$enableEntitlement = $ks->getDisableEntitlement();
-			if ($enableEntitlement)
-				self::$entitlementEnforcement = false;
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		}
 	}
 	
+	public static function getPrivacyContextSearch()
+	{
+		$privacyContextSearch = array();
+			
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		if(!$ks)
+			return array(self::NO_PRIVACY_CONTEXT . ' ' . PrivacyType::ALL . ' ' . self::NO_PRIVACY_CONTEXT) ;
+			
+		$ksPrivacyContexts = $ks->getPrivacyContext();
+		
+		if ($ksPrivacyContexts == null)
+		{
+			$privacyContextSearch[] = self::NO_PRIVACY_CONTEXT . ' ' . PrivacyType::ALL . ' ' . self::NO_PRIVACY_CONTEXT;
+			
+			if (!$ks->isWidgetSession())
+				$privacyContextSearch[] = self::NO_PRIVACY_CONTEXT . ' ' . PrivacyType::AUTHENTICATED_USERS . ' ' . self::NO_PRIVACY_CONTEXT;
+		}
+		else
+		{
+			$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
+			
+			foreach ($ksPrivacyContexts as $ksPrivacyContext)
+			{
+				$privacyContextSearch[] = self::PRIVACY_CONTEXT_PREFIX . $ksPrivacyContext . ' ' . PrivacyType::ALL . ' ' . self::PRIVACY_CONTEXT_PREFIX . $ksPrivacyContext;
+				
+				if (!$ks->isWidgetSession())
+					$privacyContextSearch[] = self::PRIVACY_CONTEXT_PREFIX . $ksPrivacyContext . ' ' . PrivacyType::AUTHENTICATED_USERS . ' ' . self::PRIVACY_CONTEXT_PREFIX . $ksPrivacyContext;
+			}
+		}
+		
+		return $privacyContextSearch;
+	}
 	
+	public static function getPrivacyContextForEntry(entry $entry)
+	{
+		$categoriesIds = $entry->getCategoriesIds();
+		$categoriesIds = explode(',', $categoriesIds);
+		
+		$privacyContexts = array();
+		$entryPrivacy = null;		
+		
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
+		$c->add(categoryPeer::ID, explode(',', $entry->getCategories()), Criteria::IN);
+		
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		$categories = categoryPeer::doSelect($c);
+		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
+		foreach ($categories as $category)
+		{				
+			$categoryPrivacy = $category->getPrivacy();
+			$categoryPrivacyContexts = $category->getPrivacyContexts();
+			if(!$categoryPrivacyContexts)
+				$categoryPrivacyContexts = '';
+			
+			$categoryPrivacyContexts = explode(',', $categoryPrivacyContexts);
+			
+			foreach ($categoryPrivacyContexts as $categoryPrivacyContext)
+			{
+				if(!isset($privacyContexts[$categoryPrivacyContext]) || $privacyContexts[$categoryPrivacyContext] > $categoryPrivacy)
+					$privacyContexts[$categoryPrivacyContext] = $categoryPrivacy;
+			}
+
+			if (!$entryPrivacy || $entryPrivacy > $categoryPrivacy)
+				$entryPrivacy = $categoryPrivacy;
+		}
+		
+		foreach ($privacyContexts as $categoryPrivacyContext => $Privacy)
+			$privacyContexts[] = self::PRIVACY_CONTEXT_PREFIX . $categoryPrivacyContext . ' ' . $Privacy . ' ' . self::PRIVACY_CONTEXT_PREFIX . $categoryPrivacyContext;
+		
+		//Entry That doesn't assinged to any category is public.
+		if (!$entryPrivacy)
+			$entryPrivacy = PrivacyType::ALL;
+			
+		$privacyContexts[] = self::NO_PRIVACY_CONTEXT . ' ' . $entryPrivacy . ' ' . self::NO_PRIVACY_CONTEXT;
+				
+		return $privacyContexts;
+	}
 }

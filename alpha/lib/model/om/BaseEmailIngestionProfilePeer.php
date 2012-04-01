@@ -288,8 +288,9 @@ abstract class BaseEmailIngestionProfilePeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -339,36 +340,37 @@ abstract class BaseEmailIngestionProfilePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = EmailIngestionProfilePeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = EmailIngestionProfilePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'EmailIngestionProfilePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			EmailIngestionProfilePeer::filterSelectResults($cachedResult);
+			EmailIngestionProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			EmailIngestionProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = EmailIngestionProfilePeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = EmailIngestionProfilePeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = EmailIngestionProfilePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		EmailIngestionProfilePeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		EmailIngestionProfilePeer::filterSelectResults($queryResult);
 		EmailIngestionProfilePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -423,7 +425,6 @@ abstract class BaseEmailIngestionProfilePeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

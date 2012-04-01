@@ -424,8 +424,9 @@ abstract class BasekuserPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -475,36 +476,37 @@ abstract class BasekuserPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = kuserPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = kuserPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'kuserPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			kuserPeer::filterSelectResults($cachedResult);
+			kuserPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			kuserPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = kuserPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = kuserPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = kuserPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		kuserPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		kuserPeer::filterSelectResults($queryResult);
 		kuserPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -559,7 +561,6 @@ abstract class BasekuserPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

@@ -312,8 +312,9 @@ abstract class BaseTrackEntryPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -363,36 +364,37 @@ abstract class BaseTrackEntryPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = TrackEntryPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = TrackEntryPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'TrackEntryPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			TrackEntryPeer::filterSelectResults($cachedResult);
+			TrackEntryPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			TrackEntryPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = TrackEntryPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = TrackEntryPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = TrackEntryPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		TrackEntryPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		TrackEntryPeer::filterSelectResults($queryResult);
 		TrackEntryPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -447,7 +449,6 @@ abstract class BaseTrackEntryPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

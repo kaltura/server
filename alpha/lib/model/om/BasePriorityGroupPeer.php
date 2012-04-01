@@ -276,8 +276,9 @@ abstract class BasePriorityGroupPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -327,36 +328,37 @@ abstract class BasePriorityGroupPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = PriorityGroupPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = PriorityGroupPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'PriorityGroupPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			PriorityGroupPeer::filterSelectResults($cachedResult);
+			PriorityGroupPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			PriorityGroupPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = PriorityGroupPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = PriorityGroupPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = PriorityGroupPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		PriorityGroupPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		PriorityGroupPeer::filterSelectResults($queryResult);
 		PriorityGroupPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -411,7 +413,6 @@ abstract class BasePriorityGroupPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

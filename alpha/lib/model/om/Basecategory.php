@@ -52,7 +52,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the full_name field.
-	 * Note: this column has a database default value of: ''
 	 * @var        string
 	 */
 	protected $full_name;
@@ -269,7 +268,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function applyDefaultValues()
 	{
 		$this->name = '';
-		$this->full_name = '';
 		$this->entries_count = 0;
 		$this->direct_entries_count = 0;
 		$this->members_count = 0;
@@ -802,7 +800,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$v = (string) $v;
 		}
 
-		if ($this->full_name !== $v || $this->isNew()) {
+		if ($this->full_name !== $v) {
 			$this->full_name = $v;
 			$this->modifiedColumns[] = categoryPeer::FULL_NAME;
 		}
@@ -1428,10 +1426,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function hasOnlyDefaultValues()
 	{
 			if ($this->name !== '') {
-				return false;
-			}
-
-			if ($this->full_name !== '') {
 				return false;
 			}
 

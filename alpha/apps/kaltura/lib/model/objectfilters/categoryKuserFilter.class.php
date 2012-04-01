@@ -32,7 +32,10 @@ class categoryKuserFilter extends baseObjectFilter
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name");
-			
+		
+		$this->aliases = array ( 
+			"user_id" => "kuser_id"
+		);
 	}
 
 	public function describe() 

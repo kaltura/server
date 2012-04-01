@@ -380,8 +380,9 @@ abstract class BaseassetParamsPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -431,36 +432,37 @@ abstract class BaseassetParamsPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = assetParamsPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = assetParamsPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'assetParamsPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			assetParamsPeer::filterSelectResults($cachedResult);
+			assetParamsPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			assetParamsPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = assetParamsPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = assetParamsPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = assetParamsPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		assetParamsPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		assetParamsPeer::filterSelectResults($queryResult);
 		assetParamsPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -515,7 +517,6 @@ abstract class BaseassetParamsPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

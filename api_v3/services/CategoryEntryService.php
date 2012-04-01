@@ -36,6 +36,14 @@ class CategoryEntryService extends KalturaBaseService
 		$category = categoryPeer::retrieveByPK($categoryEntry->categoryId);
 		if (!$category)
 			throw new APIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryEntry->categoryId);
+			
+		//validate user is entiteld to assign entry to this category 
+		if ($category->getContributionPolicy() != ContributionPolicyType::ALL)
+		{
+			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::$ks_uid);
+			if(!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
+				throw new ApiException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+		}
 		
 		$entry->setCategories($entry->getCategories() . ',' . $category->getFullName());
 		$entry->save();
@@ -47,11 +55,16 @@ class CategoryEntryService extends KalturaBaseService
 	 * Add new CategoryUser
 	 * 
 	 * @action delete
-	 * @param KalturaCategoryEntry $categoryEntry
+	 * @param string $entryId
+	 * @param int $categoryId
 	 * @return KalturaCategoryEntry
 	 */
-	function deleteAction($categoryEntry)
+	function deleteAction($entryId, $categoryId)
 	{
+		$categoryEntry = new KalturaCategoryEntry();
+		$categoryEntry->entryId = $entryId;
+		$categoryEntry->categoryId = $categoryId;		
+		
 		$categoryEntry->validateForUpdate();
 		
 		$entry = entryPeer::retrieveByPK($categoryEntry->entryId);
@@ -62,6 +75,11 @@ class CategoryEntryService extends KalturaBaseService
 		if (!$category)
 			throw new APIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryEntry->categoryId);
 		
+		//validate user is entiteld to assign entry to this category 
+		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::$ks_uid);
+		if(!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
+			throw new ApiException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
+			
 		$categories = $entry->getCategories();
 		
 		$categoriesArr = explode(entry::ENTRY_CATEGORY_SEPARATOR, $categories);

@@ -284,8 +284,9 @@ abstract class BasecategoryKuserPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -335,36 +336,37 @@ abstract class BasecategoryKuserPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = categoryKuserPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = categoryKuserPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'categoryKuserPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			categoryKuserPeer::filterSelectResults($cachedResult);
+			categoryKuserPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			categoryKuserPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = categoryKuserPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = categoryKuserPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = categoryKuserPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		categoryKuserPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		categoryKuserPeer::filterSelectResults($queryResult);
 		categoryKuserPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -419,7 +421,6 @@ abstract class BasecategoryKuserPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

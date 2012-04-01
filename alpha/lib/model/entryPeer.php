@@ -9,8 +9,14 @@
  */ 
 class entryPeer extends BaseentryPeer 
 {
+	const PRIVACY_BY_CONTEXTS = 'entry.PRIVACY_BY_CONTEXTS';
+	const ENTITLED_KUSERS = 'entry.ENTITLED_KUSERS';
+	const CREATOR_KUSER_ID = 'entry.CREATOR_KUSER_ID';
 	
 	private static $s_default_count_limit = 301;
+	private static $filerResults = false;
+	
+	private static $kuserBlongToMoreThanMaxCategoriesForSearch = false;
 	
 	// cache classes by their type
 	private static $class_types_cache = array(
@@ -248,6 +254,18 @@ class entryPeer extends BaseentryPeer
 	}	
 	
 /* -------------------- Critera filter functions -------------------- */	
+	
+	public static function retrieveByPK($pk, PropelPDO $con = null)
+	{
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+		self::$filerResults = true;
+		$res = parent::retrieveByPK($pk, $con);
+		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+		self::$filerResults = false;
+		
+		return $res;
+	}
+	
 	public static function retrieveByPKNoFilter ($pk, $con = null)
 	{
 		self::setUseCriteriaFilter ( false );
@@ -287,7 +305,77 @@ class entryPeer extends BaseentryPeer
 		
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS); 
 		$c->addAnd ( entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
-		self::$s_criteria_filter->setFilter ( $c );
+		
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
+		if($ksString <> '')
+			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid);
+		
+		$kuserId = null;
+		if($kuser)
+			$kuserId = $kuser->getId();
+
+		$crit = null;
+		if (kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$privacyContexts = kEntitlementUtils::getPrivacyContextSearch();
+			$crit = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, Criteria::IN);
+			$crit->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+			
+			if($kuserId)
+			{
+				//ENTITLED_KUSERS field includes $this->entitledUserEdit, $this->entitledUserEdit, and users on work groups categories.
+				$critKusers = ($c->getNewCriterion(self::ENTITLED_KUSERS, $kuserId, Criteria::EQUAL));
+				$critKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+				$crit->addOr($critKusers);
+				
+				$categoriesIds = array();
+				$categories = categoryPeer::doSelectEntitledAndNonIndexedCategories($kuserId, entry::CATEGORY_SEARCH_LIMIT);
+				if(count($categories) == entry::CATEGORY_SEARCH_LIMIT)
+					self::$kuserBlongToMoreThanMaxCategoriesForSearch = true;
+			 
+			
+				foreach($categories as $category)
+					$categoriesIds[] = $category->getId();
+	
+				if (count($categoriesIds))
+				{
+					$critCategories = $c->getNewCriterion(self::CATEGORIES_IDS, $categoriesIds, Criteria::IN);
+					$critCategories->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+					$crit->addOr($critCategories);
+				}
+			}
+		}
+		
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		// when session is not admin and without list:* privilege, allow access to user entries only
+		if ($ks && $kuserId && !$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
+		{
+			$kuserCrit = $c->getNewCriterion(entryPeer::KUSER_ID , $kuserId, Criteria::EQUAL);
+			$kuserCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+			
+			if(!$crit)
+				$crit = $kuserCrit;
+			else 
+				$crit->addOr ($kuserCrit);
+				
+			$creatorKuserCrit = $c->getNewCriterion(entryPeer::CREATOR_KUSER_ID, $kuserId, Criteria::EQUAL);
+			$creatorKuserCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+			$crit->addOr($creatorKuserCrit);
+		}
+		
+		if($crit)
+			$c->addAnd ( $crit );
+			
+		self::$s_criteria_filter->setFilter($c);
+	}
+	
+	public static function doCount(Criteria $criteria, $distinct = false, PropelPDO $con = null)
+	{
+		if (kEntitlementUtils::getEntitlementEnforcement())
+			throw new kCoreException('doCount is not supported for entitlement scope enable');
+		
+		parent::doCount($criteria, $distinct, $con);
 	}
 	
 	public static function doCountWithLimit (Criteria $criteria, $distinct = false, $con = null)
@@ -387,11 +475,19 @@ class entryPeer extends BaseentryPeer
 		
 		if($c instanceof KalturaCriteria)
 		{
-			$c->applyFilters();
-			$criteria->setRecordsCount($c->getRecordsCount());
+			$skipApplyFilters = entryPeer::applyEntitlmentCriteria($c);
+			
+			if(!$skipApplyFilters)
+			{
+				$c->applyFilters();
+				$criteria->setRecordsCount($c->getRecordsCount());
+			}
 		}
 			
-		return parent::doSelectJoinkuser($c, $con, $join_behavior);
+		$results = parent::doSelectJoinkuser($c, $con, $join_behavior);
+		self::$filerResults = false;
+		
+		return $results;
 	}
 
 	/**
@@ -404,12 +500,58 @@ class entryPeer extends BaseentryPeer
 		
 		if($c instanceof KalturaCriteria)
 		{
-			$c->applyFilters();
-			$criteria->setRecordsCount($c->getRecordsCount());
+			$skipApplyFilters = entryPeer::applyEntitlmentCriteria($c);
+			
+			if(!$skipApplyFilters)
+			{
+				$c->applyFilters();
+				$criteria->setRecordsCount($c->getRecordsCount());
+			}
 		}
 			
-		return parent::doSelect($c, $con);
+		$queryResult =  parent::doSelect($c, $con);
+		
+		if($c instanceof KalturaCriteria)
+			$criteria->setRecordsCount($c->getRecordsCount());
+			
+		self::$filerResults = false;
+		
+		return $queryResult;
 	}
+	
+	private static function applyEntitlmentCriteria(Criteria &$c)
+	{
+		$skipApplyFilters = false;
+		
+		if(	kEntitlementUtils::getEntitlementEnforcement() && 
+			KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_ENTRY) && 
+			self::$kuserBlongToMoreThanMaxCategoriesForSearch &&
+			!$c->getOffset())
+		{
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+			
+			$entitlementCrit = clone $c;
+			$entitlementCrit->applyFilters();
+			
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+			
+			if ($entitlementCrit->getRecordsCount() < $entitlementCrit->getLimit())
+			{
+				$c = $entitlementCrit;
+				$c->setRecordsCount($entitlementCrit->getRecordsCount());
+		 		$skipApplyFilters = true;
+		 		self::$filerResults = true;
+		 		//TODO add header the not full search
+			}
+			else
+			{
+				self::$s_criteria_filter->enableAdditional();
+				self::$filerResults = false;
+			}
+		}
+		
+		return $skipApplyFilters;
+	} 
 	
 	public static function getDurationType($duration)
 	{
@@ -436,6 +578,40 @@ class entryPeer extends BaseentryPeer
 	public static function getAtomicColumns()
 	{
 		return array(entryPeer::STATUS);
+	}
+	
+	/**
+	 * Override in order to filter objects returned from doSelect.
+	 *  
+	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
+	 */
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
+	{
+		if (!kEntitlementUtils::getEntitlementEnforcement() || KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_ENTRY || !self::$filerResults))
+			return parent::filterSelectResults(&$selectResults, $criteria);
+		
+		KalturaLog::debug('Entitlement: Filter Results');
+		
+		$removedRecordsCount = 0;
+		foreach ($selectResults as $key => $selectResult)
+		{
+			if (!kEntitlementUtils::isEntryEntitled($selectResult))
+			{
+				unset($selectResults[$key]);
+				$removedRecordsCount++;
+			}	
+		}
+		
+		if($criteria instanceof KalturaCriteria)
+		{
+			$recordsCount = $criteria->getRecordsCount();
+			$criteria->setRecordsCount($recordsCount - $removedRecordsCount);
+		}
+		
+		self::$filerResults = false;
+		
+		parent::filterSelectResults(&$selectResults, $criteria);
 	}
 }
 

@@ -37,7 +37,6 @@ class CategoryService extends KalturaBaseService
 			$categoryDb = new category();
 			$category->toInsertableObject($categoryDb);
 			$categoryDb->setPartnerId($this->getPartnerId());
-			KalturaLog::debug(print_r($categoryDb,true));
 			$categoryDb->save();
 			$this->getPartner()->unlockCategories();
 		}
@@ -86,12 +85,14 @@ class CategoryService extends KalturaBaseService
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
 			
+		$category->id = $id; // for KalturaCategory->ValidateForUpdate
+		
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
-		//	$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
-			//TODO - fix kuser puser
-	//		if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
-		//		throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
+			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
+		
+			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
+				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
 		if ($category->name !== null)
 		{
@@ -140,7 +141,7 @@ class CategoryService extends KalturaBaseService
 		
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
+			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
@@ -154,10 +155,21 @@ class CategoryService extends KalturaBaseService
 	 * @action list
 	 * @return KalturaCategoryListResponse
 	 */
-	function listAction(KalturaCategoryFilter $filter = null)
+	function listAction(KalturaCategoryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if ($filter === null)
 			$filter = new KalturaCategoryFilter();
+			
+		if ($pager == null)
+		{
+			$pager = new KalturaFilterPager();
+			
+			//before falcon we didn’t have a pager for action category->list, 
+			//and since we added a pager – and remove the limit for partners categories, 
+			//for backward compatibility this will be the page size. 
+			$pager->pageIndex = 1;
+			$pager->pageSize = partner::MAX_NUMBER_OF_CATEGORIES;
+		}
 			
 		if ($filter->orderBy === null)
 			$filter->orderBy = KalturaCategoryOrderBy::DEPTH_ASC;

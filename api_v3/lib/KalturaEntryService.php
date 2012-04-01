@@ -860,13 +860,7 @@ class KalturaEntryService extends KalturaBaseService
 
 		// because by default we will display only READY entries, and when deleted status is requested, we don't want this to disturb
 		entryPeer::allowDeletedInCriteriaFilter(); 
-		
-		// when session is not admin and without list:* privilege, allow access to user entries only
-		if (!$this->getKs() || (!$this->getKs()->isAdmin() && !$this->getKs()->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)))
-		{
-			$filter->userIdEqual = $this->getKuser()->getPuserId();
-		}
-		
+	
 		$this->setDefaultStatus($filter);
 		$this->setDefaultModerationStatus($filter);
 		$this->fixFilterUserId($filter);
@@ -885,6 +879,17 @@ class KalturaEntryService extends KalturaBaseService
 		$entryFilter->attachToCriteria($c);
 		
 		$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+		
+		// when session is not admin and without list:* privilege, allow access to user entries only
+		//moved to Additional criteria on entryPeer
+		/*if (!$this->getKs() || (!$this->getKs()->isAdmin() && !$this->getKs()->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)))
+		{
+			$filter->userIdEqual = $this->getKuser()->getPuserId();
+		
+			$crit = $c->getNewCriterion(entryPeer::KUSER_ID , $this->getKuser()->getId(), Criteria::EQUAL);
+			$crit->addOr($c->getNewCriterion(entryPeer::CREATOR_KUSER_ID, $this->getKuser()->getId(), Criteria::EQUAL) );
+			$c->addAnd($crit);
+		}*/
 			
 		return $c;
 	}

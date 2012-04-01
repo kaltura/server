@@ -348,8 +348,9 @@ abstract class BaseBulkUploadResultPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -399,36 +400,37 @@ abstract class BaseBulkUploadResultPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = BulkUploadResultPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = BulkUploadResultPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'BulkUploadResultPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			BulkUploadResultPeer::filterSelectResults($cachedResult);
+			BulkUploadResultPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			BulkUploadResultPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = BulkUploadResultPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = BulkUploadResultPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = BulkUploadResultPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		BulkUploadResultPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		BulkUploadResultPeer::filterSelectResults($queryResult);
 		BulkUploadResultPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -483,7 +485,6 @@ abstract class BaseBulkUploadResultPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

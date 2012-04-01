@@ -284,8 +284,9 @@ abstract class BasemoderationFlagPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -335,36 +336,37 @@ abstract class BasemoderationFlagPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = moderationFlagPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = moderationFlagPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'moderationFlagPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			moderationFlagPeer::filterSelectResults($cachedResult);
+			moderationFlagPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			moderationFlagPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = moderationFlagPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = moderationFlagPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = moderationFlagPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		moderationFlagPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		moderationFlagPeer::filterSelectResults($queryResult);
 		moderationFlagPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -419,7 +421,6 @@ abstract class BasemoderationFlagPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

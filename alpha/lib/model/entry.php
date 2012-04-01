@@ -113,6 +113,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const ENTRY_CATEGORY_ESCAPE = "_";
 	const ENTRY_CATEGORY_SEPARATOR = ",";
 	
+	const CATEGORY_SEARCH_LIMIT = 100;
+	const CATEGORY_ENTRIES_COUNT_LIMIT_TO_BE_INDEXED = 100;
+	
 	const ENTRY_ID_THAT_DOES_NOT_EXIST = 0;
 	
 	private $appears_in = null;
@@ -278,7 +281,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			// when retrieving the entry - ignore thr filter - when in partner has moderate_content =1 - the entry will have status=3 and will fail the retrieveByPk 
 			entryPeer::setUseCriteriaFilter(false);
 			$obj = entryPeer::retrieveByPk($this->getId());
-			$this->setIntId($obj->getIntId());
+			$this->setIntId($obj->getIntId());				
 			entryPeer::setUseCriteriaFilter(true);
 		}
 		
@@ -1729,7 +1732,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', array_keys(unserialize($entitledUserPuserPublish)));
 	}
 	
-	public function getEntitledUsersPublish()			
+	public function getEntitledPusersPublish()			
 	{	
 		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
 		if (!$entitledUserPuserPublish)
@@ -2213,17 +2216,20 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				$category = category::createByPartnerAndFullName ( $this->getPartnerId (), $cat );
 				
 			$category->incrementEntriesCount ( 1, $alreadyAddedCatIds );
+			$category->incrementDirectEntriesCount();
+			
 			$allIds [] = $category->getId ();
 			$alreadyAddedCatIds [] = $category->getId ();
 			$alreadyAddedCatIds = array_merge ( $alreadyAddedCatIds, $category->getAllParentsIds () );
 		}
-
+		
 		$alreadyRemovedCatIds = $allIdsWithParents;
 		
 		foreach ( $removedCats as $cat ) {
 			$category = categoryPeer::getByFullNameExactMatch ( $cat );
 			if ($category){
 				$category->decrementEntriesCount ( 1, $alreadyRemovedCatIds );
+				$category->decrementDirectEntriesCount();
 				
 				$alreadyRemovedCatIds [] = $category->getId ();
 				$alreadyRemovedCatIds = array_merge ( $alreadyRemovedCatIds, $category->getAllParentsIds () );
@@ -2600,7 +2606,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			'entitled_kusers_edit' => 'entitledKusersEdit',
 			'entitled_kusers' => 'entitledKusers',
 			'privacy_by_contexts' => 'privacyByContexts',
-			'privacy' => 'privacy',
 			'creator_kuser_id' => 'creatorKuserId',	
 		);
 	}
@@ -2625,7 +2630,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			
 			'sort_name' => IIndexable::FIELD_TYPE_INTEGER,
 			'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
-			'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
+			'kuser_id' => IIndexable::FIELD_TYPE_STRING,
 			'entry_status' => IIndexable::FIELD_TYPE_INTEGER,
 			'type' => IIndexable::FIELD_TYPE_INTEGER,
 			'media_type' => IIndexable::FIELD_TYPE_INTEGER,
@@ -2653,8 +2658,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			'entitled_kusers_edit' => IIndexable::FIELD_TYPE_STRING,
 			'entitled_kusers' => IIndexable::FIELD_TYPE_STRING,
 			'privacy_by_contexts' => IIndexable::FIELD_TYPE_STRING,
-			'privacy' => IIndexable::FIELD_TYPE_INTEGER,
-			'creator_kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
+			'creator_kuser_id' => IIndexable::FIELD_TYPE_STRING,
 	);
 	
 	/**
@@ -2744,19 +2748,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function getPrivacyByContexts()
 	{
-		//TODO
-		return '';
+		return kEntitlementUtils::getPrivacyContextForEntry($this);
 	}
 	
-	public function getPrivacy()
-	{
-		//TODO
-		return '';
-	}
 	
 	public function getEntitledKusers()
 	{
-		//TODO
 		$entitledKusersPublish = explode(',', $this->getEntitledKusersPublish());
 		$entitledKusersEdit = explode(',', $this->getEntitledKusersEdit());
 		$entitledKusers = array_merge($entitledKusersPublish, $entitledKusersEdit);
@@ -2764,11 +2761,20 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if ($this->getCategoriesIds() == '')
 			return implode(',', $entitledKusers);
 		
+		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
+		$partner = $this->getPartner();
+		if($partner && $partner->getCategoryGroupSize())
+			$categoryGroupSize = $partner->getCategoryGroupSize();
+			
 		//get categories for this entry that have small amount of members.
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$c->add(categoryPeer::ID, explode(',', $this->getCategoriesIds()) , Criteria::IN);
-		$c->add(categoryPeer::MEMBERS_COUNT, category::CATEGORY_WORK_GROUP_SIZE , Criteria::LESS_THAN);		
+		$c->add(categoryPeer::ID, explode(',', $this->getCategoriesIds()), Criteria::IN);
+		$c->add(categoryPeer::MEMBERS_COUNT, $categoryGroupSize, Criteria::LESS_EQUAL);
+		$c->add(categoryPeer::ENTRIES_COUNT, entry::CATEGORY_ENTRIES_COUNT_LIMIT_TO_BE_INDEXED, Criteria::LESS_EQUAL);
+		
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$categories	= categoryPeer::doSelect($c);
+		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		//get all memebrs
 		foreach ($categories as $category)
