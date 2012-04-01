@@ -263,11 +263,7 @@ class CategoryUserService extends KalturaBaseService
 				
 			$filter->userIdEqual = $kuser->getId();
 		}	
-		
-		//TODO 
-		//get category 
-		//if category inheris members - chnage filter to -> inherited from parent id = category->getIheritedParent
-		
+
 		$categories = array();
 		if ($filter->categoryIdEqual)
 		{
@@ -275,7 +271,7 @@ class CategoryUserService extends KalturaBaseService
 		}
 		elseif($filter->categoryIdIn)
 		{
-			$categories = categoryPeer::retrieveByPKs($filter->categoryIdIn);
+			$categories = categoryPeer::retrieveByPKs(explode(',', $filter->categoryIdIn));
 		}
 		
 		$categoriesInheritanceRoot = array();
@@ -283,6 +279,7 @@ class CategoryUserService extends KalturaBaseService
 		{
 			if($category->getInheritanceType() == InheritanceType::INHERIT)
 			{
+				//if category inheris members - chnage filter to -> inherited from parent id = category->getIheritedParent
 				$categoriesInheritanceRoot[$category->getInheritedParentId()] = $category->getInheritedParentId();
 			}
 			else
@@ -290,6 +287,9 @@ class CategoryUserService extends KalturaBaseService
 				$categoriesInheritanceRoot[$category->getId()] = $category->getId();
 			}
 		}
+		
+		$filter->categoryIdEqual = null;
+		$filter->categoryIdIn = implode(',', $categoriesInheritanceRoot);
 			
 		$categoryKuserFilter = new categoryKuserFilter();
 		$filter->toObject($categoryKuserFilter);

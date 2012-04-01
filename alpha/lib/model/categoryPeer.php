@@ -43,7 +43,7 @@ class categoryPeer extends BasecategoryPeer
 			{
 				$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kuser->getId(), Criteria::EQUAL);
 				$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-				$crit->addOr($membersCrit);
+     			$crit->addOr($membersCrit);
 			}
 				
 			$c->addAnd ( $crit );
@@ -191,6 +191,27 @@ class categoryPeer extends BasecategoryPeer
 		$v = categoryPeer::doSelect($criteria, $con);
 
 		return !empty($v) > 0 ? $v[0] : null;
+	}
+	
+	/**
+	 * Retrieve multiple objects by pkey.
+	 *
+	 * @param      array $pks List of primary keys
+	 * @param      PropelPDO $con the connection to use
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
+	 */
+	public static function retrieveByPKs($pks, PropelPDO $con = null)
+	{
+		$objs = null;
+		if (empty($pks)) {
+			$objs = array();
+		} else {
+			$criteria = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			$criteria->add(categoryPeer::ID, $pks, Criteria::IN);
+			$objs = categoryPeer::doSelect($criteria, $con);
+		}
+		return $objs;
 	}
 	
 }

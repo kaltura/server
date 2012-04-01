@@ -740,7 +740,12 @@ class category extends Basecategory implements IIndexable
 	public function getMembers()
 	{
 		//TODO - retrieve with pagers
-		$members = categoryKuserPeer::retrieveActiveKusersByCategoryId($this->getId());
+		$categoryIdToGetAllMembers = $this->getId();
+		$inheritedParentId = $this->getInheritedParentId();
+		if($inheritedParentId)
+			$categoryIdToGetAllMembers = $inheritedParentId;
+		
+		$members = categoryKuserPeer::retrieveActiveKusersByCategoryId($categoryIdToGetAllMembers);
 		if (!$members)
 			return '';
 		
