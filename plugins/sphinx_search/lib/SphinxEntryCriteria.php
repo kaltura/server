@@ -48,12 +48,11 @@ class SphinxEntryCriteria extends SphinxCriteria
 		entryPeer::END_DATE => 'end_date',
 		entryPeer::AVAILABLE_FROM => 'available_from',
 		
-		'entryPeer.ENTITLED_KUSERS_PUBLISH' => 'entitledKusersPublish',
-		'entryPeer.ENTITLED_KUSERS_EDIT' => 'entitledKusersEdit',
-		'entryPeer.ENTITLED_KUSERS' => 'entitledKusers',
-		'entryPeer.PRIVACY_BY_CONTEXTS' => 'privacyByContexts',
-		'entryPeer.PRIVACY' => 'privacy',
-		'entryPeer.CREATOR_KUSER_ID' => 'creatorKuserId',
+		'entry.ENTITLED_KUSERS_PUBLISH' => 'entitled_kusers_publish',
+		'entry.ENTITLED_KUSERS_EDIT' => 'entitled_kusers_edit',
+		'entry.ENTITLED_KUSERS' => 'entitled_kusers',
+		'entry.PRIVACY_BY_CONTEXTS' => 'privacy_by_contexts',
+		'entry.CREATOR_KUSER_ID' => 'creator_kuser_id',
 		
 	);
 	
@@ -104,7 +103,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'admin_tags' => IIndexable::FIELD_TYPE_STRING,
 		
 		'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'kuser_id' => IIndexable::FIELD_TYPE_STRING,
 		'entry_status' => IIndexable::FIELD_TYPE_INTEGER,
 		'type' => IIndexable::FIELD_TYPE_INTEGER,
 		'media_type' => IIndexable::FIELD_TYPE_INTEGER,
@@ -132,8 +131,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'entitled_kusers_edit' => IIndexable::FIELD_TYPE_STRING,
 		'entitled_kusers' => IIndexable::FIELD_TYPE_STRING,
 		'privacy_by_contexts' => IIndexable::FIELD_TYPE_STRING,
-		'privacy' => IIndexable::FIELD_TYPE_INTEGER,
-		'creator_kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'creator_kuser_id' => IIndexable::FIELD_TYPE_STRING,
 	);
 
 	/**

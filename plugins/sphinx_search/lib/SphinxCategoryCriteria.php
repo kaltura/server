@@ -68,11 +68,11 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'reference_id' => IIndexable::FIELD_TYPE_STRING,
 		'privacy_context' => IIndexable::FIELD_TYPE_STRING,
 		'privacy_contexts' => IIndexable::FIELD_TYPE_STRING,
+		'privacy' => IIndexable::FIELD_TYPE_STRING,	
 		'members_count' => IIndexable::FIELD_TYPE_INTEGER,
 		'pending_members_count' => IIndexable::FIELD_TYPE_INTEGER,
 		'entries_count' => IIndexable::FIELD_TYPE_INTEGER,
 		'direct_entries_count' => IIndexable::FIELD_TYPE_INTEGER,
-		'privacy' => IIndexable::FIELD_TYPE_INTEGER,
 		'inheritance_type' => IIndexable::FIELD_TYPE_INTEGER,
 		'user_join_policy' => IIndexable::FIELD_TYPE_INTEGER,
 		'default_permission_level' => IIndexable::FIELD_TYPE_INTEGER,
@@ -89,6 +89,11 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	protected function getDefaultCriteriaFilter()
 	{
 		return categoryPeer::getCriteriaFilter();
+	}
+	
+	protected function getEnableStar()
+	{
+		return true;
 	}
 	
 	/**
@@ -266,7 +271,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$fieldName = strtoupper($fieldName);
 			$fieldName = "category.$fieldName";
 		}
-		
+
 		$categoryFields = categoryPeer::getFieldNames(BasePeer::TYPE_COLNAME);
 		
 		return in_array($fieldName, $categoryFields);
