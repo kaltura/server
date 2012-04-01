@@ -117,9 +117,9 @@ abstract class kCompareCondition extends kCondition
 			return true;
 		}
 		
-		if (is_null($field))
+		if (!$field)
 		{
-			KalturaLog::debug("Field is null, condition is false");
+			KalturaLog::debug("Field is empty, condition is false");
 			return false;
 		}
 
