@@ -56,7 +56,7 @@ class categoryKuser extends BasecategoryKuser {
 	public function save(PropelPDO $con = null)
 	{
 		$category = categoryPeer::retrieveByPK($this->category_id);
-		if($category)
+		if(!$category)
 			throw new kCoreException('category not found');
 			
 		if ($this->isNew())
@@ -66,8 +66,6 @@ class categoryKuser extends BasecategoryKuser {
 			
 			if($this->status == CategoryKuserStatus::ACTIVE)
 				$category->setMembersCount($category->getMembersCount() + 1);
-			
-			$category->save();
 		}
 		
 		if (($this->isColumnModified(categoryKuserPeer::STATUS) && !$this->isNew()))
@@ -83,9 +81,9 @@ class categoryKuser extends BasecategoryKuser {
 			
 			if($this->old_status == CategoryKuserStatus::ACTIVE)
 				$category->setMembersCount($category->getMembersCount() - 1);
-			
-			$category->save();
 		}
+		
+		$category->save();
 		
 		parent::save($con);
 		
@@ -97,7 +95,7 @@ class categoryKuser extends BasecategoryKuser {
 	public function delete(PropelPDO $con = null)
 	{
 		$category = categoryPeer::retrieveByPK($this->category_id);
-		if($category)
+		if(!$category)
 			throw new kCoreException('category not found');
 			
 		if($this->status == CategoryKuserStatus::PENDING)

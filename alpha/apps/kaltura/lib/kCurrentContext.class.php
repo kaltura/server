@@ -38,7 +38,17 @@ class kCurrentContext
 	/**
 	 * @var string
 	 */
+	public static $kuser_id;
+	
+	/**
+	 * @var string
+	 */
 	public static $ks_uid;
+	
+	/**
+	 * @var string
+	 */
+	public static $ks_kuser_id;
 
 	/**
 	 * @var string
@@ -133,6 +143,11 @@ class kCurrentContext
 			kCurrentContext::$partner_id = $requestedPartnerId;
 			kCurrentContext::$uid = $requestedPuserId;
 			kCurrentContext::$is_admin_session = false;
+			kCurrentContext::$kuser_id = null;
+			
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$partner_id, kCurrentContext::$uid, true);
+			if($kuser)
+				kCurrentContext::$kuser_id = $kuser->getId();
 		}
 		else
 		{
@@ -154,6 +169,16 @@ class kCurrentContext
 			kCurrentContext::$is_admin_session = $ksObj->isAdmin();
 			kCurrentContext::$partner_id = $requestedPartnerId;
 			kCurrentContext::$uid = $requestedPuserId;
+			kCurrentContext::$kuser_id = null;
+			kCurrentContext::$ks_kuser_id = null;
+			
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$partner_id, kCurrentContext::$uid, true);
+			if($kuser)
+				kCurrentContext::$kuser_id = $kuser->getId();
+				
+			$ksKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid, true);
+			if($ksKuser)
+				kCurrentContext::$ks_kuser_id = $ksKuser->getId();
 		}
 
 		// set partner ID for logger

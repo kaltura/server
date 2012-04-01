@@ -160,6 +160,7 @@ class category extends Basecategory implements IIndexable
 			
 			$categoryKuser->setPermissionLevel(CategoryKuserPermissionLevel::MANAGER);
 			$categoryKuser->setStatus(CategoryKuserStatus::ACTIVE);
+			$categoryKuser->setPartnerId($this->getPartnerId());
 			$categoryKuser->save();
 		}
 		
@@ -558,7 +559,9 @@ class category extends Basecategory implements IIndexable
 		$entryFilter = new entryFilter();
 		$entryFilter->set("_matchor_categories_ids", $this->getId());
 		$entryFilter->attachToCriteria($c);
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 		$entries = entryPeer::doSelect($c);
+		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 		foreach($entries as $entry)
 		{
 			$entry->removeCategory($this->full_name);
@@ -622,7 +625,11 @@ class category extends Basecategory implements IIndexable
 			
 		$c = new Criteria();
 		$c->add(categoryPeer::PARENT_ID, $this->getId());
-		return categoryPeer::doSelect($c);
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		$categories = categoryPeer::doSelect($c);
+		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
+		return $categories;
 	}
 	
 	/**
@@ -633,7 +640,11 @@ class category extends Basecategory implements IIndexable
 		$c = new Criteria();
 		$c->add(categoryPeer::FULL_NAME, $this->getFullName() . '%', Criteria::LIKE);
 		$c->addAnd(categoryPeer::PARTNER_ID,$this->getPartnerId(),Criteria::EQUAL);
-		return categoryPeer::doSelect($c);
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		$categories = categoryPeer::doSelect($c);
+		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
+		return $categories;
 	}
 	
 	/**
@@ -764,6 +775,7 @@ class category extends Basecategory implements IIndexable
 			'privacy_contexts' => 'privacyContexts',
 			'members_count' => 'membersCount',
 			'pending_members_count' => 'pendingMembersCount',
+			'members' => 'members',
 			'entries_count' => 'entriesCount',
 			'direct_entries_count' => 'directEntriesCount',
 			'privacy' => 'privacy',

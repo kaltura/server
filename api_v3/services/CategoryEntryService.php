@@ -40,7 +40,7 @@ class CategoryEntryService extends KalturaBaseService
 		//validate user is entiteld to assign entry to this category 
 		if ($category->getContributionPolicy() != ContributionPolicyType::ALL)
 		{
-			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::$ks_uid);
+			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::$ks_kuser_id);
 			if(!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
 				throw new ApiException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
 		}
@@ -76,7 +76,7 @@ class CategoryEntryService extends KalturaBaseService
 			throw new APIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryEntry->categoryId);
 		
 		//validate user is entiteld to assign entry to this category 
-		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::$ks_uid);
+		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::$ks_kuser_id);
 		if(!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
 			throw new ApiException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
 			
