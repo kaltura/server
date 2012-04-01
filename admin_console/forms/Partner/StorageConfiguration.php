@@ -127,14 +127,14 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			
 		));
-		$this->getElement('pathManagerClass')->setRequired(true)->setRegisterInArrayValidator(false);
+		$this->getElement('pathManagerClass')->setRegisterInArrayValidator(false);
 		 
 		$this->addElement('select', 'urlManagerClass', array(
 			'label'			=> 'Delivery URL format :',
 			'filters'		=> array('StringTrim'),
 			
 		));
-		$this->getElement('urlManagerClass')->setRequired(true)->setRegisterInArrayValidator(false);
+		$this->getElement('urlManagerClass')->setRegisterInArrayValidator(false);
 		 
 		$this->addElement('select', 'trigger', array(
 			'label'			=> 'Trigger:',
