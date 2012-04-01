@@ -20,10 +20,7 @@ class CategoryService extends KalturaBaseService
 	 * @return KalturaCategory
 	 */
 	function addAction(KalturaCategory $category)
-	{
-		//TODO - REMOVE!
-		$this->getPartner()->unlockCategories();
-		
+	{		
 		$category->validatePropertyMinLength("name", 1);
 		$category->validatePropertyMaxLength("name", categoryPeer::MAX_CATEGORY_NAME);
 		$category->validateParentId($category);
@@ -89,7 +86,7 @@ class CategoryService extends KalturaBaseService
 		
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
+			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getId(), kCurrentContext::$ks_kuser_id);
 		
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
@@ -141,7 +138,7 @@ class CategoryService extends KalturaBaseService
 		
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getCategoryId(), kCurrentContext::$uid);
+			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getCategoryId(), kCurrentContext::$ks_kuser_id);
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
