@@ -76,7 +76,7 @@ for (;;)
 		$lastCreatedAt = $item->getCreatedAt(null);
 	}
 	
-    call_user_func(array($peerName, 'clearInstancePool'));
+    kMemoryManager::clearMemory();
 
 	if (count($items) < 500)
 		break;
