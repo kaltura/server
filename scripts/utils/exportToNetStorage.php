@@ -49,20 +49,42 @@ if(!is_null($flavorParamsIds) && strlen(trim($flavorParamsIds)))
 	$flavorParamsArr = explode(',', $flavorParamsIds);
 
 $moreEntries = true;
-$limitPerLoop = 500;
+$maxConcurrentJobs = 20;
 $totalExported = 0;
 $lastCreatedAt = null;
 $processedIds = array();
 
+$nonFinalBatchStatuses = array(
+    BatchJob::BATCHJOB_STATUS_PENDING,
+	BatchJob::BATCHJOB_STATUS_QUEUED,
+	BatchJob::BATCHJOB_STATUS_PROCESSING,
+	BatchJob::BATCHJOB_STATUS_PROCESSED,
+	BatchJob::BATCHJOB_STATUS_MOVEFILE,
+    );
+
 while ($moreEntries)
 {
+    $c = new Criteria();
+    $c->add(BatchJobPeer::PARTNER_ID, $partnerId);
+    $c->add(BatchJobPeer::JOB_TYPE, BatchJobType::STORAGE_EXPORT);
+    $c->add(BatchJobPeer::STATUS, $nonFinalBatchStatuses, Criteria::IN);
+    $batchCount = BatchJobPeer::doCount($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL3));
+    
+    if ($batchCount >= $maxConcurrentJobs)
+    {
+    	sleep(30);
+    	continue;
+    }
+    
+    $curLimit = $maxConcurrentJobs - $batchCount;
+    
     $currentExported = 0;
     $c = new Criteria();
     $c->add(entryPeer::PARTNER_ID, $partnerId);
 	if ($lastCreatedAt)
 		$c->add(entryPeer::CREATED_AT, $lastCreatedAt, Criteria::LESS_EQUAL);
 	$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
-    $c->setLimit($limitPerLoop);
+    $c->setLimit($curLimit);
     $entries = entryPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL3));
 	
     foreach($entries as $entry)
@@ -123,7 +145,7 @@ while ($moreEntries)
     	usleep(100);
     }
     
-    if (count($entries) < $limitPerLoop) {
+    if (count($entries) < $curLimit) {
         $moreEntries = false;
     }
     $entries = null;
