@@ -25,7 +25,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		
 		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
 		
-		return false;
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -61,7 +61,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		
 		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
 		
-		return false;
+		return true;
 	}
 	
 	/**
@@ -84,7 +84,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		
 		$this->handleDelete($data, $data->distributionProfile, $data->providerData);
 		
-		return false;
+		return true;
 	}
 	
 	/**

@@ -237,8 +237,9 @@ class MetroPcsDistributionFeedHelper
 	
 	
 	public function setItemIgnore()
-	{
+	{		
 		$itemNode = $this->xpath->query('/msdp:rss/msdp:channel/msdp:item')->item(0);
+		$this->setNodeValue('msdp:type', $this->getValueForField(KalturaMetroPcsDistributionField::ITEM_TYPE), $itemNode);
 		$this->setNodeValue('@ignore', "Y", $itemNode);		
 	}
 	
