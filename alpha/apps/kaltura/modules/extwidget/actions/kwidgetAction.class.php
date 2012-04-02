@@ -265,7 +265,7 @@ class kwidgetAction extends sfAction
 				{
 					// create an anonymous session
 					$ks = "";
-					$result = kSessionUtils::createKSessionNoValidations ( $partner_id , 0 , $ks , 86400 , false , "" , "view:*" );
+					$result = kSessionUtils::createKSessionNoValidations ( $partner_id , 0 , $ks , 86400 , false , "" , "view:*,widget:1" );
 					$ks_flashvars = "&$partnerIdStr&uid=0&ts=".microtime(true);
 					if($widget->getSecurityType () != widget::WIDGET_SECURITY_TYPE_FORCE_KS)
 					{

@@ -66,7 +66,7 @@ class startwidgetsessionAction extends startsessionAction
 
 		// according to the partner's policy and the widget's policy - define the privileges of the ks
 		// TODO - decide !! - for now only view - any kshow
-		$privileges = "view:*";
+		$privileges = "view:*,widget:1";
 
 		if ( $widget->getSecurityType() == widget::WIDGET_SECURITY_TYPE_FORCE_KS )
 		{
