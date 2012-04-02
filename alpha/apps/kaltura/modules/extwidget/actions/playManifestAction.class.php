@@ -91,8 +91,7 @@ class playManifestAction extends kalturaAction
 			$height		= isset($flavor['height'])	? $flavor['height']		: 0;
 			
 						
-			$url = htmlspecialchars($url);
-			$url .= $deliveryCodeStr;
+			$url = htmlspecialchars($url . $deliveryCodeStr);
 			$flvaorsXml .= "<media url=\"$url\" bitrate=\"$bitrate\" width=\"$width\" height=\"$height\"/>";
 		}		
 		
@@ -364,8 +363,8 @@ class playManifestAction extends kalturaAction
 		$urlManager->setProtocol($this->format);
 		$urlManager->setPlaybackContext($this->playbackContext);
 
-	    $url = $urlManager->getFlavorAssetUrl($flavorAsset);
-	    		
+	    $url = htmlspecialchars($urlManager->getFlavorAssetUrl($flavorAsset));
+	    
 		if ($this->format == StorageProfile::PLAY_FORMAT_RTSP)
 		{
 			echo '<html><head><meta http-equiv="refresh" content="0;url='.$url.'"></head></html>';
@@ -969,9 +968,11 @@ class playManifestAction extends kalturaAction
 				
 			case "hdnetwork":
 				$duration = $this->entry->getDurationInt();
-				$mediaUrl = "<media url=\"".requestUtils::getHost().str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"]))."\"/>"; 
+				$url = requestUtils::getHost() . str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"]));
+				$url = htmlspecialchars($url);
+				$mediaUrl = "<media url=\"$url\"/>"; 
 						
-				$xml =$this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, array(), $duration, null, $mediaUrl);
+				$xml = $this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, array(), $duration, null, $mediaUrl);
 				break;
 		}
 		
