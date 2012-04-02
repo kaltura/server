@@ -6,6 +6,7 @@ Package contents
  - The 'ASIHttpRequest' open source library (http://allseeing-i.com/ASIHTTPRequest/)
  - Project files
  - Library test code and data files (KalturaClientTester/*)
+ - Reference iPhone / iPad applications
 
 Adding the KalturaClient to an Xcode 4 project
 =============================================
