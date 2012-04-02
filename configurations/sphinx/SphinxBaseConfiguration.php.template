@@ -36,6 +36,7 @@ $baseConfigurationIndexs = 	array(
 		'access_control_id'			=> SphinxFieldType::RT_ATTR_BIGINT,
 		'moderation_count' 			=> SphinxFieldType::RT_ATTR_BIGINT,
 		'rank'			 			=> SphinxFieldType::RT_ATTR_BIGINT,
+		'total_rank'				=> SphinxFieldType::RT_ATTR_BIGINT,
 		'plays'			 			=> SphinxFieldType::RT_ATTR_BIGINT,
 		'partner_sort_value'		=> SphinxFieldType::RT_ATTR_BIGINT,
 		'replacement_status'		=> SphinxFieldType::RT_ATTR_BIGINT,
