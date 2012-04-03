@@ -38,7 +38,8 @@ switch($delivery_type) {
 }
 
 if( $playlist_id ) {
-
+	$entry_name = 'Kaltura Player';
+	$entry_description = '';
 	// build playlist url
 	$playlist_url = $partner_host ."/index.php/partnerservices2/executeplaylist?";
 	$playlist_url .= "partner_id=" . $partner_id . "&subp_id=" . $partner_id . "00&format=8&playlist_id=" . $playlist_id;
@@ -53,7 +54,7 @@ $flashVars = http_build_query($flashVars, '', '&amp;');
 
 // URL to this page
 $protocol = 'http';
-if ($_SERVER["HTTPS"] == "on") {$protocol .= "s";}
+if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {$protocol .= "s";}
 $pageURL = $protocol . "://";
 if ($_SERVER["SERVER_PORT"] != "80") {
 	$pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];

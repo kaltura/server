@@ -24,17 +24,19 @@ class previewAction extends kalturaAction
 
 		// Single Player parameters
 		$this->entry_id = $this->getRequestParameter('entry_id');
-		$entry = entryPeer::retrieveByPK($this->entry_id);
-		$this->entry_name = $entry->getName();
-		$this->entry_description = $entry->getDescription();
-		$this->entry_thumbnail_url = $entry->getThumbnailUrl();
+		if( $this->entry_id ) {
+			$entry = entryPeer::retrieveByPK($this->entry_id);
+			$this->entry_name = $entry->getName();
+			$this->entry_description = $entry->getDescription();
+			$this->entry_thumbnail_url = $entry->getThumbnailUrl();
 
-		$flavor_tag = $this->getRequestParameter('flavor_tag', 'iphone');
-		$flavor_assets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entry_id, $flavor_tag);
-		$flavor_asset = reset($flavor_assets);
-		/* @var $flavor_asset flavorAsset */
-		if( $flavor_asset ) {
-			$this->flavor_asset_id = $flavor_asset->getId();
+			$flavor_tag = $this->getRequestParameter('flavor_tag', 'iphone');
+			$flavor_assets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entry_id, $flavor_tag);
+			$flavor_asset = reset($flavor_assets);
+			/* @var $flavor_asset flavorAsset */
+			if( $flavor_asset ) {
+				$this->flavor_asset_id = $flavor_asset->getId();
+			}
 		}
 		
 		$this->delivery_type = $this->getRequestParameter('delivery');
