@@ -17,6 +17,8 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	 */
 	private $fileTransferMgr = null;
 	
+	protected static $dropFolderFileErrorStatuses = array(KalturaDropFolderFileStatus::DELETED, KalturaDropFolderFileStatus::ERROR_DELETING, KalturaDropFolderFileStatus::ERROR_DOWNLOADING, KalturaDropFolderFileStatus::ERROR_HANDLING);
+	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -154,7 +156,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 				{
 					if ($autoDeleteOriginalFile)
         				$this->setFileAsPurged($dropFolderFile);
-					else
+					else if (!in_array($dropFolderFile->status, self::$dropFolderFileErrorStatuses))
 						$this->errorWithFile($dropFolderFile, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 'Cannot find file with name ['.$dropFolderFile->fileName.']');
 						
 					continue;
