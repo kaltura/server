@@ -16,6 +16,8 @@ class category extends Basecategory implements IIndexable
 	
 	protected $parent_category;
 	
+	protected $inherited_parent_category;
+	
 	protected $old_full_name = "";
 	
 	protected $old_parent_id = null;
@@ -238,7 +240,7 @@ class category extends Basecategory implements IIndexable
 		if ($this->isColumnModified(categoryPeer::INHERITANCE_TYPE))
 		{
 			//TODO ADD_BATCH_JOB TO UPDATE CATEGORY INHERITACE + KUSERS INHERITANCE FOR THIS CATEGORY 
-			// + IF CATEGORY DOESN'T INHERIT MEMEBER - ADD OWNER
+			// + IF CATEGORY DOESN'T INHERIT MEMEBER
 		}
 		
 		if ($this->isColumnModified(categoryPeer::PRIVACY_CONTEXT))
@@ -252,7 +254,8 @@ class category extends Basecategory implements IIndexable
 			$categoryGroupSize = $partner->getCategoryGroupSize();	
 		
 		//re-index entries
-		if ($this->isColumnModified(categoryPeer::PRIVACY) || 
+		if ($this->isColumnModified(categoryPeer::INHERITANCE_TYPE) || 
+			$this->isColumnModified(categoryPeer::PRIVACY) || 
 			$this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS) || 
 			($this->isColumnModified(categoryPeer::MEMBERS_COUNT) && 
 			$this->members_count <= $categoryGroupSize && 
@@ -809,19 +812,7 @@ class category extends Basecategory implements IIndexable
 	 * @see lib/model/om/Basecategory#postInsert()
 	 */
 	public function postInsert(PropelPDO $con = null)
-	{
-		if ($this->isColumnModified(categoryPeer::INHERITANCE_TYPE))
-		{
-			//TODO ADD_BATCH_JOB TO UPDATE CATEGORY INHERITACE + KUSERS INHERITANCE FOR THIS CATEGORY 
-			// + IF CATEGORY DOESN'T INHERIT MEMEBER - ADD OWNER
-		}
-		
-		if ($this->isColumnModified(categoryPeer::PRIVACY_CONTEXT))
-		{
-			//TODO ADD_BATCH_JOB TO UPDATE ALL SUB CATEGORIES WITH PROVACY CONTEXT FROM THE PARENT.
-		}
-		
-		
+	{	
 		parent::postInsert($con);
 	
 		if (!$this->alreadyInSave)
@@ -968,11 +959,31 @@ class category extends Basecategory implements IIndexable
 	{
 		$this->old_inheritance_type = $this->getInheritanceType();
 		if ($v == InheritanceType::INHERIT)
-			parent::setInheritedParentId($this->getInheritFromParentCategory());
+			$this->setInheritedParentId($this->getInheritFromParentCategory());
 		else
-			parent::setInheritedParentId(null);
+			$this->setInheritedParentId(null);
 		
 		parent::setInheritanceType($v);
+	}
+	
+	public function setInheritedParentId($v)
+	{
+		$this->inherited_parent_category = null;
+		if (!is_null($v))
+			$this->inherited_parent_category = categoryPeer::retrieveByPK($v);
+		
+		parent::setInheritedParentId($v);
+	}
+	
+	public function getInheritedParentId()
+	{
+		$inheritedParentId = parent::getInheritedParentId();
+		$inheritedParentCategory = categoryPeer::retrieveByPK($inheritedParentId);
+
+		if($inheritedParentCategory && ($inheritedParentCategory->getInheritanceType() == InheritanceType::INHERIT))
+			return $inheritedParentCategory->getInheritedParentId();
+
+		return $inheritedParentId;
 	}
 	
 	public function setPuserId($puserId)
