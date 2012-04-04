@@ -88,6 +88,8 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"-updatedAt" => "-updated_at",
 		"+rank" => "+rank",
 		"-rank" => "-rank",
+		"+totalRank" => "+total_rank",
+		"-totalRank" => "-total_rank",
 		"+startDate" => "+start_date",
 		"-startDate" => "-start_date",
 		"+endDate" => "+end_date",
