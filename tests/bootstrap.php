@@ -11,7 +11,7 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "infra", "*"
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "base", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "lib", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "api_v3", "*"));
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "api", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "common", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "unitTests", "*"));
 
