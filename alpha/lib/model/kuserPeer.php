@@ -299,11 +299,30 @@ class kuserPeer extends BasekuserPeer
 		return $count;
 	}
 	
+	/**
+	 * @param Criteria $criteria
+	 * @param PropelPDO $con
+	 */
+	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
+	{
+		$c = clone $criteria;
+		
+		if($c instanceof KalturaCriteria)
+		{ 
+			$c->applyFilters();
+			$criteria->setRecordsCount($c->getRecordsCount());
+		}
+
+		return parent::doSelect($c, $con);
+	}
+	
 	
 	public static function doStubCount (Criteria $criteria, $distinct = false, $con = null)
 	{
 		return 0;
 	}	
+	
+	
 	
 	/**
 	 * @param string $email
