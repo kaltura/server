@@ -29,7 +29,7 @@ $c = new Criteria();
 if($argc > 1 && is_numeric($argv[1]))
 	$c->add(kuserPeer::ID, $argv[1], Criteria::GREATER_EQUAL);
 if($argc > 2 && is_numeric($argv[2]))
-	$c->add(entryPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
+	$c->add(kuserPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
 
 $c->addAscendingOrderByColumn(kuserPeer::ID);
 $c->setLimit(10000);
