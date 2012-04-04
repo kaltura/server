@@ -23,7 +23,7 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 	public function __construct($name = NULL, array $data = array(), $dataName = '')
 	{
 		KalturaLog::debug("KalturaApiTestCase::__construct name [$name], data [" . print_r($data, true). "], dataName [$dataName]\n");
-		
+
 		parent::__construct($name, $data, $dataName);
 				
 		$testConfig = $this->config->get('config');
@@ -65,6 +65,11 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 			if(!$testConfig->secret)
 			{
 				$testConfig->secret = 'PARTNER_SECRET';
+				$needSave = true;
+			}
+			if(!$testConfig->userSecret)
+			{
+				$testConfig->secret = 'PARTNER_USER_SECRET';
 				$needSave = true;
 			}
 			if(!$testConfig->userId)
@@ -295,7 +300,7 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 	 * @param KalturaSessionType $type
 	 * @param string $userId
 	 */
-	protected function startSession($client, $type, $userId = null)
+	protected function startSession($client, $type = null, $userId = null)
 	{
 		$testConfig = $this->config->get('config');
 		
@@ -314,12 +319,15 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 	 * @param KalturaSessionType $type
 	 * @param string $userId
 	 */
-	protected function startSessionWithDiffe($type, $userId = null)
+	protected function startSessionWithDiffe($type, $userId, $privileges = '')
 	{
 		$testConfig = $this->config->get('config');
 		
 		//$ks = $this->client->session->start($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
-		$ks = $this->client->generateSession($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
+		if ($type == SessionType::ADMIN)
+			$ks = $this->client->generateSession($testConfig->secret, $userId, $type, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
+		else 
+			$ks = $this->client->generateSession($testConfig->userSecret, $userId, $type, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
 		if (!$ks)
 			return false;
 		
