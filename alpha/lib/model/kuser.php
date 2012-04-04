@@ -13,7 +13,7 @@ require_once ( "myStatisticsMgr.class.php");
  * @package Core
  * @subpackage model
  */ 
-class kuser extends Basekuser
+class kuser extends Basekuser implements IIndexable
 {
 	public function __construct()
 	{
@@ -161,10 +161,14 @@ class kuser extends Basekuser
 			// if user is deleted - check if shoult also delete login data
 			UserLoginDataPeer::notifyOneLessUser($this->getLoginDataId());
 		}
-		else if (!is_null($oldLoginDataId) && is_null($this->getLoginDataId()))
+		else 
 		{
-			// if login was disabled - check if should also delete login data
-			UserLoginDataPeer::notifyOneLessUser($oldLoginDataId);
+		    kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
+		    if (!is_null($oldLoginDataId) && is_null($this->getLoginDataId()))
+		    {
+			    // if login was disabled - check if should also delete login data
+			    UserLoginDataPeer::notifyOneLessUser($oldLoginDataId);
+		    }
 		}
 			
 		return $ret;
@@ -1055,6 +1059,163 @@ class kuser extends Basekuser
 	{
 		return array("kuser:partnerId=".$this->getPartnerId().",puserid=".$this->getPuserId());
 	}
+	
+	/* (non-PHPdoc)
+     * @see IIndexable::getIntId()
+     */
+    public function getIntId ()
+    {
+        return $this->id;
+        
+    }
+
+	/* (non-PHPdoc)
+     * @see IIndexable::getEntryId()
+     */
+    public function getEntryId ()
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+	/* (non-PHPdoc)
+     * @see IIndexable::getObjectIndexName()
+     */
+    public function getObjectIndexName ()
+    {
+       $partner = $this->getPartner();
+		$partnerSearchIndex = $partner->getSearchIndex(kuserPeer::TABLE_NAME);
+		
+		return $partnerSearchIndex;
+        
+    }
+
+	/* (non-PHPdoc)
+     * @see IIndexable::getIndexFieldsMap()
+     */
+    public function getIndexFieldsMap ()
+    {
+        return array ( 
+        		"login_data_id" => "loginDataId",
+                "is_admin" => "isAdmin",
+                "screen_name" => "screenName",
+                "full_name" => "fullName",
+                "first_name" => "firstName",
+                "last_name" => "lastName",
+                "email" => "email",
+                "sha1_password" => "sha1Password",
+                "salt" => "salt",
+                "date_of_birth" => "dateOfBirth",
+                "country" => "country",
+                "state" => "state",
+                "city" => "city",
+                "zip" => "zip",
+                "url_list" => "urlList",
+                "picture" => "picture",
+                "icon" => "icon",
+                "about_me" => "aboutMe",
+                "tags" => "tags",
+                "tagline" => "tagline",
+                "network_highschool" => "networkHighschool",
+                "network_college" => "networkCollege",
+                "network_other" => "networkOther",
+                "mobile_num" => "mobileNum",
+                "mature_content" => "matureContent",
+                "gender" => "gender",
+                "registration_ip" => "registrationIp",
+                "registration_cookie" => "registrationCookie",
+                "im_list" => "imList",
+                "views" => "views",
+                "fans" => "fans",
+                "entries" => "entries",
+                "storage_size" => "storageSize",
+                "produced_kshows" => "producedKshows",
+                "kuser_status" => "status",
+                "created_at" => "createdAt",
+                "updated_at" => "updatedAt",
+                "partner_id" => "partnerId",
+                "display_in_search" => "displayInSearch",
+                "partner_data" => "partnerData",
+                "puser_id" => "puserId",
+                "admin_tags" => "adminTags",
+                "indexed_partner_data_int" => "indexedPartnerDataInt",
+                "indexed_partner_data_string" => "indexedPartnerDataString",
+                "custom_data" => "customData",
+        );
+        
+    }
+
+         private static $indexFieldTypes = array (
+        		"login_data_id" => IIndexable::FIELD_TYPE_INTEGER,
+                "is_admin" => IIndexable::FIELD_TYPE_INTEGER,
+                "screen_name" => IIndexable::FIELD_TYPE_STRING,
+                "full_name" => IIndexable::FIELD_TYPE_STRING,
+                "first_name" => IIndexable::FIELD_TYPE_STRING,
+                "last_name" => IIndexable::FIELD_TYPE_STRING,
+                "email" => IIndexable::FIELD_TYPE_STRING,
+                "sha1_password" => IIndexable::FIELD_TYPE_STRING,
+                "salt" => IIndexable::FIELD_TYPE_STRING,
+                "date_of_birth" => IIndexable::FIELD_TYPE_DATETIME,
+                "country" => IIndexable::FIELD_TYPE_STRING,
+                "state" => IIndexable::FIELD_TYPE_STRING,
+                "city" => IIndexable::FIELD_TYPE_STRING,
+                "zip" => IIndexable::FIELD_TYPE_STRING,
+                "url_list" => IIndexable::FIELD_TYPE_STRING,
+                "picture" => IIndexable::FIELD_TYPE_STRING,
+                "icon" => IIndexable::FIELD_TYPE_STRING,
+                "about_me" => IIndexable::FIELD_TYPE_STRING,
+                "tags" => IIndexable::FIELD_TYPE_STRING,
+                "tagline" => IIndexable::FIELD_TYPE_STRING,
+                "network_highschool" => IIndexable::FIELD_TYPE_STRING,
+                "network_college" => IIndexable::FIELD_TYPE_STRING,
+                "network_other" => IIndexable::FIELD_TYPE_STRING,
+                "mobile_num" => IIndexable::FIELD_TYPE_STRING,
+                "mature_content" => IIndexable::FIELD_TYPE_INTEGER,
+                "gender" => IIndexable::FIELD_TYPE_INTEGER,
+                "registration_ip" => IIndexable::FIELD_TYPE_STRING,
+                "registration_cookie" => IIndexable::FIELD_TYPE_STRING,
+                "im_list" => IIndexable::FIELD_TYPE_STRING,
+                "views" => IIndexable::FIELD_TYPE_INTEGER,
+                "fans" => IIndexable::FIELD_TYPE_INTEGER,
+                "entries" => IIndexable::FIELD_TYPE_INTEGER,
+                "storage_size" => IIndexable::FIELD_TYPE_INTEGER,
+                "produced_kshows" => IIndexable::FIELD_TYPE_INTEGER,
+                "kuser_status" => IIndexable::FIELD_TYPE_INTEGER,
+                "created_at" => IIndexable::FIELD_TYPE_DATETIME,
+                "updated_at" => IIndexable::FIELD_TYPE_DATETIME,
+                "partner_id" => IIndexable::FIELD_TYPE_INTEGER,
+                "display_in_search" => IIndexable::FIELD_TYPE_INTEGER,
+                "partner_data" => IIndexable::FIELD_TYPE_STRING,
+                "puser_id" => IIndexable::FIELD_TYPE_STRING,
+                "admin_tags" => IIndexable::FIELD_TYPE_STRING,
+                "indexed_partner_data_int" => IIndexable::FIELD_TYPE_INTEGER,
+                "indexed_partner_data_string" => IIndexable::FIELD_TYPE_STRING,
+        );
+        
+        
+	/* (non-PHPdoc)
+     * @see IIndexable::getIndexFieldType()
+     */
+    public function getIndexFieldType ($field)
+    {
+        if(isset(self::$indexFieldTypes[$field]))
+			return self::$indexFieldTypes[$field];
+			
+		return null;
+    }
+    
+	/* (non-PHPdoc)
+	 * @see lib/model/om/Baseentry#postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+	
+		if (!$this->alreadyInSave)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
+	}
+	
+        
 	
 	// --------------------------------------
 	// -- end of user role handling functions
