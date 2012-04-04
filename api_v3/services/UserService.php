@@ -9,7 +9,12 @@
  */
 class UserService extends KalturaBaseUserService 
 {
-	
+	function initService($serviceId, $serviceName, $actionName)
+	{
+	    KalturaLog::debug("In UserService Init");
+	    parent::initService($serviceId, $serviceName, $actionName);
+	}
+    
 	/**
 	 * Adds a new user to an existing account in the Kaltura database.
 	 * Input param $id is the unique identifier in the partner's system.
@@ -272,7 +277,7 @@ class UserService extends KalturaBaseUserService
 		$userFilter = new kuserFilter();
 		$filter->toObject($userFilter);
 		
-		$c = new Criteria();
+		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
 		$userFilter->attachToCriteria($c);
 		
 		if (!is_null($filter->roleIdEqual))
