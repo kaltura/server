@@ -173,12 +173,41 @@ class KalturaObject
 		return $this->toObject($object_to_fill, $props_to_skip);
 	}
 	
-	public function validatePropertyNotNull($propertyName)
+	public function validatePropertyNotNull($propertiesNames, $xor = false)
 	{
-		if (!property_exists($this, $propertyName) || $this->$propertyName === null)
-		{
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName($propertyName));
-		}
+        if (!is_array($propertiesNames))
+        {
+            $propertyName = $propertiesNames;
+    		if (!property_exists($this, $propertyName) || $this->$propertyName === null)
+    		{
+    			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName($propertyName));
+    		}
+        }
+        else 
+        {
+            $isValidated = false;
+            foreach ($propertiesNames as $propertyName)
+            {
+                if (property_exists($this, $propertyName) && $this->$propertyName !== null)
+                {
+                    if (!$isValidated)
+                    {
+                        $isValidated = true;
+                        if (!$xor)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if ($xor)
+                            throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE, implode("/", $propertiesNames)); 
+                    }
+                }
+            }
+            if (!$isValidated)
+                throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, implode("/", $propertiesNames));
+        }
 	}
 	
 	public function validatePropertyMinLength($propertyName, $minLength, $allowNull = false)
@@ -194,6 +223,7 @@ class KalturaObject
 		if (strlen($this->$propertyName) < $minLength)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $minLength);
 	}
+	
 	
 	public function validatePropertyNumeric($propertyName, $allowNull = false)
 	{
