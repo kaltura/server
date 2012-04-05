@@ -1671,7 +1671,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{	
 		$entitledUserPuserEdit = array();
 		
-		$entitledPusersEdit = explode(',', $v);
+		$entitledPusersEdit = explode(',', trim($v));
+		if (!count($entitledPusersEdit))
+			return;
 		
 		foreach ($entitledPusersEdit as $puserId)
 		{
@@ -1709,7 +1711,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{	
 		$entitledUserPuserPublish = array();
 		
-		$entitledPusersPublish = explode(',', $v);
+		$entitledPusersPublish = explode(',', trim($v));
+		if(!count($entitledPusersPublish))
+			return;
+			
 		foreach ($entitledPusersPublish as $puserId)
 		{
 			$puserId = trim($puserId);
