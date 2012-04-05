@@ -11,6 +11,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public static function getSphinxIndexName($baseName)
 	{
+	    KalturaLog::debug("Expected sphinx index name: ".self::SPHINX_INDEX_NAME . '_' . $baseName);
 		return self::SPHINX_INDEX_NAME . '_' . $baseName;
 	}
 	
@@ -147,6 +148,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
+	    KalturaLog::debug("Raising deferred event for object of type: ". get_class($object));
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($object));
 		return true;
 	}
@@ -263,7 +265,10 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 		foreach($dataInts as $key => $value)
 		{
-//			$value = (int)$value;
+			if (is_bool($value))
+			{
+			    $value = intval($value);
+			}
 			$data[$key] = is_numeric($value) ? $value : 0;
 		}
 		
@@ -276,6 +281,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$values = implode(',', $data);
 		$fields = implode(',', array_keys($data));
 		
+		KalturaLog::debug("Object index name: " . $object->getObjectIndexName());
 		$index = kSphinxSearchManager::getSphinxIndexName($object->getObjectIndexName());
 		
 		return "replace into $index ($fields) values($values)";
