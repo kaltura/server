@@ -11,9 +11,7 @@ class TagService extends KalturaBaseService
     public function initService($serviceId, $serviceName, $actionName)
     {
         parent::initService($serviceId, $serviceName, $actionName);
-		
 		parent::applyPartnerFilterForClass(new TagPeer());
-
     }
     
     /**
@@ -26,7 +24,6 @@ class TagService extends KalturaBaseService
      */
     public function searchAction (KalturaTagFilter $tagFilter, KalturaFilterPager $pager = null)
     {
-        
         if (!$tagFilter)
         {
             $tagFilter = new KalturaTagFilter();
@@ -51,7 +48,5 @@ class TagService extends KalturaBaseService
         $searchResponse->totalCount = $c->getRecordsCount();
         
         return $searchResponse;
-        
-        
     }
 }
