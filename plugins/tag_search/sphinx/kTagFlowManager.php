@@ -11,9 +11,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     public function objectDeleted (BaseObject $object, BatchJob $raisedJob = null)
     {
         $tagsIdsToRemove = $this->checkExistForDelete($object);
-        
         $tagsToRemove = TagPeer::retrieveByPKs($tagsIdsToRemove);
-        
         foreach ($tagsToRemove as $tagToRemove)
         {
             $tagToRemove->delete();
@@ -40,7 +38,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     public function objectCreated (BaseObject $object)
     {
         $tagsToAdd = $this->checkExistsForAdd($object);
-        
         if (count($tagsToAdd))
             $this->addTags($tagsToAdd, $this->getObjectIdByClassName(get_class($object)), $object->getPartnerId());
         
@@ -64,7 +61,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     public function objectChanged (BaseObject $object, array $modifiedColumns)
     {
         $tagsIdsToRemove = $this->checkExistForDelete($object, $object->getColumnsOldValue(self::TAGS_FIELD_NAME));
-        
         $tagsToRemove = TagPeer::retrieveByPKs($tagsIdsToRemove);
         
         foreach ($tagsToRemove as $tagToRemove)
@@ -73,7 +69,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         } 
 
         $tagsToAdd = $this->checkExistsForAdd($object);
-        
         $this->addTags($tagsToAdd, $this->getObjectIdByClassName(get_class($object)), $object->getPartnerId());
     }
 
@@ -100,12 +95,11 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	protected function checkExistsForAdd (BaseObject $object)
 	{
 	    KalturaLog::info("In Object Added handler");
-	    
 	    $objectTags = $this->trimObjectTags($object->getTags());
 	    
 	    $c = $this->getTagObjectsByTagStringsCriteria($objectTags, $this->getObjectIdByClassName(get_class($object)), $object->getPartnerId());
-	    
 	    $c->applyFilters();
+	    
 	    $numTagsFound = $c->getRecordsCount(); 
 	   
 	    if (!$numTagsFound)
@@ -140,21 +134,15 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    KalturaLog::info("In Delete handler");
 	    
 	    $objectTags = $tagsToCheck ? $this->trimObjectTags($tagsToCheck) : $this->trimObjectTags($object->getTags());
-	    
 	    $tagsToKeep = array();
-	    
 	    foreach($objectTags as $objectTag)
 	    {
 	        $peer = $object->getPeer();
 	        
     	    $c = KalturaCriteria::create(get_class($object));
-    	    
     	    $c->addAnd(self::PARTNER_ID_FIELD, $object->getPartnerId(), KalturaCriteria::EQUAL);
-    	    
     	    $c->addAnd($peer::TAGS, $objectTag, KalturaCriteria::LIKE);
-    	    
     	    $c->addAnd($peer::ID, array($object->getId()), KalturaCriteria::NOT_IN);
-    	    
     	    $selectResults = $peer->doSelect($c);
     	    
     	    foreach ($selectResults as $selectResult)
@@ -181,9 +169,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    {
     	    //Decrement instance count for the tags that we keep
     	    $c = $this->getTagObjectsByTagStringsCriteria($tagsToKeep, $this->getObjectIdByClassName(get_class($object)), $object->getPartnerId());
-    	    
     	    $tagsToKeepObjects = TagPeer::doSelect($c);
-    	    
     	    foreach ($tagsToKeepObjects as $tagToKeepObject)
     	    {
     	        /* @var $tagToKeepObject Tag */
@@ -193,18 +179,14 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    
 	    //Return the IDs of the rest of the tags for removal.
 	    $tagsToRemove = array_diff($objectTags, $tagsToKeep);
-	    
 	    KalturaLog::debug("tags to delete: ".print_r($tagsToRemove, true));
 	    
 	    if ($tagsToRemove)
 	    {
 	    
     	    $c = $this->getTagObjectsByTagStringsCriteria($tagsToRemove, $this->getObjectIdByClassName(get_class($object)) , $object->getPartnerId());
-    	    
     	    $c->applyFilters();
-    	    
     	    $recordsToRemove = $c->getRecordsCount();
-    	    
     	    return $c->getFetchedIds();
 	    }
 	    
@@ -263,20 +245,15 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	protected function getTagObjectsByTagStringsCriteria ($tagStrings, $objectType, $partnerId)
 	{
 	    $c = KalturaCriteria::create(TagPeer::OM_CLASS);
-	    
 	    $c->addAnd(TagPeer::TAG, $tagStrings, KalturaCriteria::IN);
-	    
 	    $c->addAnd(TagPeer::PARTNER_ID, $partnerId, KalturaCriteria::EQUAL);
-	    
 	    $c->addAnd(TagPeer::OBJECT_TYPE, $objectType, KalturaCriteria::EQUAL);
-	    
 	    return $c;
 	}
 	
 	protected function trimObjectTags ($tagsString)
 	{
 	    $arr = explode(",", $tagsString);
-	    
 	    for ($i=0; $i < count($arr); $i++)
 	    {
 	        $arr[$i] = trim($arr[$i]);
