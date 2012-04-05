@@ -50,6 +50,28 @@ class kFlowHelper
 
 	/**
 	 * @param BatchJob $dbBatchJob
+	 * @param kIndexJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function handleIndexFinished(BatchJob $dbBatchJob, kIndexJobData $data, BatchJob $twinJob = null)
+	{
+		// TODO change some flag on the calling object? top category for example?
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kIndexJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function handleIndexFailed(BatchJob $dbBatchJob, kIndexJobData $data, BatchJob $twinJob = null)
+	{
+		// TODO change some flag on the calling object? top category for example?
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
 	 * @param kImportJobData $data
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
@@ -1420,19 +1442,6 @@ class kFlowHelper
 		}
 
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob);
-			
-		return $dbBatchJob;
-	}
-
-	public static function handleRemoteConvertPending(BatchJob $dbBatchJob, kRemoteConvertJobData $data, BatchJob $twinJob = null)
-	{
-		// creates pull job
-		$pullData = new kPullJobData();
-		$pullData->setSrcFileUrl($data->getSrcFileUrl());
-		kJobsManager::addJob($dbBatchJob->createChild(false), $pullData, BatchJobType::PULL);
-
-		// mark the job as almost done
-		$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
 			
 		return $dbBatchJob;
 	}
