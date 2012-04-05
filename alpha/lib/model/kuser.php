@@ -1083,11 +1083,7 @@ class kuser extends Basekuser implements IIndexable
      */
     public function getObjectIndexName ()
     {
-       $partner = $this->getPartner();
-		$partnerSearchIndex = $partner->getSearchIndex(kuserPeer::TABLE_NAME);
-		
-		return $partnerSearchIndex;
-        
+       return categoryPeer::getOMClass(false);
     }
 
 	/* (non-PHPdoc)
