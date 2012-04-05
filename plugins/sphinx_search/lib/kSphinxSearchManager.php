@@ -11,7 +11,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public static function getSphinxIndexName($baseName)
 	{
-	    KalturaLog::debug("Expected sphinx index name: ".self::SPHINX_INDEX_NAME . '_' . $baseName);
 		return self::SPHINX_INDEX_NAME . '_' . $baseName;
 	}
 	
@@ -281,7 +280,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$values = implode(',', $data);
 		$fields = implode(',', array_keys($data));
 		
-		KalturaLog::debug("Object index name: " . $object->getObjectIndexName());
 		$index = kSphinxSearchManager::getSphinxIndexName($object->getObjectIndexName());
 		
 		return "replace into $index ($fields) values($values)";
