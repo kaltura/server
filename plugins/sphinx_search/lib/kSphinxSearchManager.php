@@ -268,6 +268,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			{
 			    $value = intval($value);
 			}
+			
 			$data[$key] = is_numeric($value) ? $value : 0;
 		}
 		
