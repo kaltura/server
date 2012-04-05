@@ -40,21 +40,14 @@ class TagService extends KalturaBaseService
         $tagFilter->validate();
         
         $c = KalturaCriteria::create(TagPeer::OM_CLASS);
-        
         $tagCoreFilter = new TagFilter();
-        
         $tagFilter->toObject($tagCoreFilter);
-        
         $tagCoreFilter->attachToCriteria($c);
-        
         $pager->attachToCriteria($c);
-        
         $tags = TagPeer::doSelect($c);
         
         $searchResponse = new KalturaTagListResponse();
-        
         $searchResponse->objects = KalturaTagArray::fromDbArray($tags);
-        
         $searchResponse->totalCount = $c->getRecordsCount();
         
         return $searchResponse;
