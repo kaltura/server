@@ -25,8 +25,8 @@ class kuserPeer extends BasekuserPeer
 			self::$s_criteria_filter = new criteriaFilter ();
 		}
 		
-		$c = new myCriteria(); 
-		$c->addAnd ( kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
+		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
+		$c->addAnd ( kuserPeer::STATUS, KuserStatus::DELETED, KalturaCriteria::NOT_EQUAL);
 		self::$s_criteria_filter->setFilter ( $c );
 	}
 	
