@@ -1849,7 +1849,7 @@ class kFlowHelper
 		if(!$entry)
 		{
 			KalturaLog::err("Real entry id [" . $tempEntry->getReplacedEntryId() . "] not found");
-			myEntryUtils::deleteEntry($tempEntry,null,true);
+			myEntryUtils::deleteEntry($tempEntry);
 			return;
 		}
 
@@ -1871,7 +1871,7 @@ class kFlowHelper
 			case entryReplacementStatus::NONE:
 			default:
 				KalturaLog::err("Real entry id [" . $tempEntry->getReplacedEntryId() . "] replacement canceled");
-				myEntryUtils::deleteEntry($tempEntry,null,true);
+				myEntryUtils::deleteEntry($tempEntry);
 				break;
 		}
 	}
