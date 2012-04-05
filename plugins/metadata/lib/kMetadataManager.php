@@ -22,8 +22,17 @@ class kMetadataManager
 	 */
 	public static function getObjectPeer($objectType)
 	{
-		if($objectType == Metadata::TYPE_ENTRY)
-			return new MetadataEntryPeer();
+		switch ($objectType)
+		{
+		    case MetadataObjectType::ENTRY:
+		        return new MetadataEntryPeer();
+		    case MetadataObjectType::CATEGORY:
+		        return new MetadataCategoryPeer();
+		    case MetadataObjectType::PARTNER:
+		        return new MetadataPartnerPeer();
+		    case MetadataObjectType::USER:
+		        return new MetadataKuserPeer();
+		}
 		
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaMetadataObjects');
 		foreach($pluginInstances as $pluginInstance)
