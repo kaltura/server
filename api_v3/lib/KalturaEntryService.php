@@ -1054,7 +1054,7 @@ class KalturaEntryService extends KalturaBaseService
 		if ($entry->adminTags !== null)
 			$this->validateAdminSession("adminTags");
 			
-		if ($entry->categories !== null)
+		if ($entry->categories !== null && trim($entry->categories) !== '')
 		{
 			$cats = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->categories);
 			foreach($cats as $cat)
