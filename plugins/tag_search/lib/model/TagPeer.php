@@ -25,7 +25,6 @@ class TagPeer extends BaseTagPeer
 			self::$s_criteria_filter = new criteriaFilter();
 		
 		$c = KalturaCriteria::create(self::OM_CLASS);
-		
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
@@ -45,27 +44,4 @@ class TagPeer extends BaseTagPeer
 			
 		return parent::doSelect($c, $con);
 	}
-	
-	/**
-	 * 
-	 * Function creates a criteria by given parama and performs select.
-	 * @param array $tagStrings
-	 * @param int $partnerId
-	 * @param int $objectType
-	 */
-	public static function retrieveByTagStrings ($tagStrings, $partnerId, $objectType)
-	{
-	    $c = KalturaCriteria::create(TagPeer::OM_CLASS);
-	    
-	    $c->addAnd(TagPeer::TAG, $tagStrings, KalturaCriteria::IN);
-	    
-	    $c->addAnd(TagPeer::PARTNER_ID, $partnerId, KalturaCriteria::EQUAL);
-	    
-	    $c->addAnd(TagPeer::OBJECT_TYPE, $objectType, KalturaCriteria::EQUAL);
-	    
-	    $this->doSelect($c);
-	}
-	
-	
-
 } // TagPeer
