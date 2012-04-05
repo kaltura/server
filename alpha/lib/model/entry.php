@@ -1671,10 +1671,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{	
 		$entitledUserPuserEdit = array();
 		
-		$entitledPusersEdit = explode(',', trim($v));
-		if (!count($entitledPusersEdit))
+		$v = trim($v);
+		if($v == '')
+		{
+			$this->putInCustomData ( "entitledUserPuserEdit" , serialize($entitledUserPuserEdit) );	
 			return;
+		}
 		
+		$entitledPusersEdit = explode(',',$v);
+				
 		foreach ($entitledPusersEdit as $puserId)
 		{
 			$puserId = trim($puserId);
@@ -1710,8 +1715,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setEntitledPusersPublish($v)		
 	{	
 		$entitledUserPuserPublish = array();
+	
+		$v = trim($v);
+		if($v == '')
+		{
+			$this->putInCustomData ( "entitledUserPuserPublish" , serialize($entitledUserPuserPublish) );	
+			return;
+		}
 		
-		$entitledPusersPublish = explode(',', trim($v));
+		$entitledPusersPublish = explode(',', $v);
 		if(!count($entitledPusersPublish))
 			return;
 			
