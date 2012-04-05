@@ -201,18 +201,7 @@ class SphinxKuserCriteria extends SphinxCriteria
      */
     protected function getSphinxIndexName ()
     {
-        if (!is_null(kCurrentContext::$partner_id) && kCurrentContext::$partner_id !== '') 
-			$partnerId = kCurrentContext::$partner_id;
-		else
-			$partnerId = kCurrentContext::$ks_partner_id;
-		
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if (!$partner)
-			return kSphinxSearchManager::getSphinxIndexName(kuserPeer::TABLE_NAME);
-		
-		$partnerSearchIndex = $partner->getSearchIndex(kuserPeer::TABLE_NAME);
-		
-		return kSphinxSearchManager::getSphinxIndexName($partnerSearchIndex);
+        return kSphinxSearchManager::getSphinxIndexName(kuserPeer::getOMClass(false));
         
     }
 
