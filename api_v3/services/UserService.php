@@ -288,10 +288,10 @@ class UserService extends KalturaBaseUserService
 			$rs = KuserToUserRolePeer::doSelectStmt($roleCriteria);
 			$kuserIds = $rs->fetchAll(PDO::FETCH_COLUMN);
 						
-			$c->add(kuserPeer::ID, $kuserIds, Criteria::IN);
+			$c->add(kuserPeer::ID, $kuserIds, KalturaCriteria::IN);
 		}
 		
-		$c->addAnd(kuserPeer::PUSER_ID, NULL, Criteria::ISNOTNULL);
+		$c->addAnd(kuserPeer::PUSER_ID, NULL, KalturaCriteria::ISNOTNULL);
 		
 		$totalCount = kuserPeer::doCount($c);
 		
