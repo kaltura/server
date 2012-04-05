@@ -39,7 +39,7 @@ class Tag extends BaseTag implements IIndexable
      */
     public function getObjectIndexName ()
     {
-        return TagSearchPlugin::INDEX_NAME;
+        return TagPeer::getOMClass(false);
         
     }
 
@@ -68,14 +68,6 @@ class Tag extends BaseTag implements IIndexable
 
 	
 	/* (non-PHPdoc)
-     * @see IIndexable::setUpdatedAt()
-     */
-    public function setUpdatedAt ($time)
-    {
-        
-    }
-
-	/* (non-PHPdoc)
      * @see IIndexable::getIndexFieldType()
      */
     public function getIndexFieldType ($field)
@@ -103,7 +95,6 @@ class Tag extends BaseTag implements IIndexable
 	public function incrementInstanceCount ()
 	{
 	    $this->setInstanceCount($this->getInstanceCount() + 1);
-	    
 	    $this->save();
 	}
     
@@ -113,9 +104,16 @@ class Tag extends BaseTag implements IIndexable
 	public function decrementInstanceCount ()
 	{
 	    $this->setInstanceCount($this->getInstanceCount() - 1);
-	    
 	    $this->save();
 	}
-
+	
+	/* (non-PHPdoc)
+     * @see IIndexable::setUpdatedAt()
+     */
+    public function setUpdatedAt ($time)
+    {
+        // TODO Auto-generated method stub
+        
+    }
 
 } // Tag
