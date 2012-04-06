@@ -10,6 +10,21 @@
  */ 
 class FileSyncPeer extends BaseFileSyncPeer
 {
+	/* (non-PHPdoc)
+	 * @see BaseFileSyncPeer::setDefaultCriteriaFilter()
+	 */
+	public static function setDefaultCriteriaFilter()
+	{
+		if(self::$s_criteria_filter == null)
+		{
+			self::$s_criteria_filter = new criteriaFilter();
+		}
+		
+		$c = new Criteria();
+		$c->add(self::STATUS, array(FileSync::FILE_SYNC_STATUS_DELETED, FileSync::FILE_SYNC_STATUS_PURGED), Criteria::IN);
+		self::$s_criteria_filter->setFilter($c);
+	}
+	
 	/**
 	 * 
 	 * @param FileSyncKey $key
