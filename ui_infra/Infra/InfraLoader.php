@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package UI-infra
+ * @subpackage bootstrap
+ */
 class Infra_InfraLoader implements Zend_Loader_Autoloader_Interface
 {
 	public function Infra_InfraLoader()

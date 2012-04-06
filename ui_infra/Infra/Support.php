@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package UI-infra
+ * @subpackage Support
+ */
 class Infra_Support 
 {
 	public static function isEnabled()

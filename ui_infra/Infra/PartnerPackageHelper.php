@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package UI-infra
+ * @subpackage Partners
+ */
 class Infra_PartnerPackageHelper
 {
 	private static $packages = null;

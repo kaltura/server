@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package UI-infra
+ * @subpackage Client
+ */
 class Infra_ClientHelper 
 {
 	private static $client = null;

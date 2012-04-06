@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package UI-infra
+ * @subpackage Authentication
+ */
 class Infra_AclHelper
 {
 	const ROLE_GUEST = 'guest';

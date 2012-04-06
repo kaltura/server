@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package UI-infra
+ * @subpackage paginator
+ */
 class Infra_FilterPaginator implements Zend_Paginator_Adapter_Interface
 {
 	/**

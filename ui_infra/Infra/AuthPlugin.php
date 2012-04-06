@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package UI-infra
+ * @subpackage Authentication
+ */
 class Infra_AuthPlugin extends Zend_Controller_Plugin_Abstract 
 {
 	private $_whitelist;

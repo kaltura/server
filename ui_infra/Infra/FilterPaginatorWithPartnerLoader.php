@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package UI-infra
+ * @subpackage paginator
+ */
 class Infra_FilterPaginatorWithPartnerLoader extends Infra_FilterPaginator
 {
 	/**

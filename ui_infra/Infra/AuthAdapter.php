@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package UI-infra
+ * @subpackage Authentication
+ */
 class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 {
 	/**

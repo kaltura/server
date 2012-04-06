@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package UI-infra
+ * @subpackage paginator
+ */
 class Infra_Paginator extends Zend_Paginator
 {
 	private static $index = 1;

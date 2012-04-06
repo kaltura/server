@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package UI-infra
+ * @subpackage batch
+ */
 class Infra_BatchJobFilter extends Kaltura_Client_Type_BatchJobFilterExt
 {
 	const JOB_TYPE_AND_SUB_TYPE_MAIN_DELIMITER = ';';
