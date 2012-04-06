@@ -1,6 +1,7 @@
 <?php
 /**
  * @package Admin
+ * @subpackage forms
  */
 class Form_Base extends Infra_Form
 {

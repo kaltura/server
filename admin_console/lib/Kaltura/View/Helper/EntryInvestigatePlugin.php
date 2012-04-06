@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Admin
+ * @subpackage views
+ */
 abstract class Kaltura_View_Helper_EntryInvestigatePlugin
 {
 	/**

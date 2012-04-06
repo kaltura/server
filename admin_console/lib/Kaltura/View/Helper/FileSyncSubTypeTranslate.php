@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Admin
+ * @subpackage views
+ */
 class Kaltura_View_Helper_FileSyncSubTypeTranslate extends Zend_View_Helper_Abstract
 {
 	private function entrySubTypeTranslate($objectSubType)

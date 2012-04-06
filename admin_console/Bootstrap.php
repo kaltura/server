@@ -1,6 +1,7 @@
 <?php
 /**
  * @package Admin
+ * @subpackage bootstrap
  */
 require_once(dirname(__FILE__) . '/../infra/kConf.php');
 
