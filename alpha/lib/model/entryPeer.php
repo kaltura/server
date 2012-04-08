@@ -305,17 +305,6 @@ class entryPeer extends BaseentryPeer
 		
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS); 
 		$c->addAnd ( entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
-		
-		$kuser = null;
-		
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
-		if($ksString <> '')
-			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid);
-		
-		$kuserId = null;
-		if($kuser)
-			$kuserId = $kuser->getId();
 
 		$crit = null;
 		if (kEntitlementUtils::getEntitlementEnforcement())
@@ -324,19 +313,18 @@ class entryPeer extends BaseentryPeer
 			$crit = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, Criteria::IN);
 			$crit->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 			
-			if($kuserId)
+			if(kCurrentContext::$ks_uid)
 			{
 				//ENTITLED_KUSERS field includes $this->entitledUserEdit, $this->entitledUserEdit, and users on work groups categories.
-				$critKusers = ($c->getNewCriterion(self::ENTITLED_KUSERS, $kuserId, Criteria::EQUAL));
+				$critKusers = ($c->getNewCriterion(self::ENTITLED_KUSERS, kCurrentContext::$ks_uid, Criteria::EQUAL));
 				$critKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 				$crit->addOr($critKusers);
 				
 				$categoriesIds = array();
-				$categories = categoryPeer::doSelectEntitledAndNonIndexedCategories($kuserId, entry::CATEGORY_SEARCH_LIMIT);
+				$categories = categoryPeer::doSelectEntitledAndNonIndexedCategories(kCurrentContext::$ks_uid, entry::CATEGORY_SEARCH_LIMIT);
 				if(count($categories) == entry::CATEGORY_SEARCH_LIMIT)
 					self::$kuserBlongToMoreThanMaxCategoriesForSearch = true;
 			 
-			
 				foreach($categories as $category)
 					$categoriesIds[] = $category->getId();
 	
@@ -350,10 +338,11 @@ class entryPeer extends BaseentryPeer
 		}
 		
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
+			
 		// when session is not admin and without list:* privilege, allow access to user entries only
-		if ($ks && $kuserId && !$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
-		{
-			$kuserCrit = $c->getNewCriterion(entryPeer::KUSER_ID , $kuserId, Criteria::EQUAL);
+		if (!$ks || (!$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)))
+		{		
+			$kuserCrit = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_uid, Criteria::EQUAL);
 			$kuserCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 			
 			if(!$crit)
@@ -361,7 +350,7 @@ class entryPeer extends BaseentryPeer
 			else 
 				$crit->addOr ($kuserCrit);
 				
-			$creatorKuserCrit = $c->getNewCriterion(entryPeer::CREATOR_KUSER_ID, $kuserId, Criteria::EQUAL);
+			$creatorKuserCrit = $c->getNewCriterion(entryPeer::CREATOR_KUSER_ID, kCurrentContext::$ks_uid, Criteria::EQUAL);
 			$creatorKuserCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 			$crit->addOr($creatorKuserCrit);
 		}
@@ -615,6 +604,8 @@ class entryPeer extends BaseentryPeer
 		self::$filerResults = false;
 		
 		parent::filterSelectResults(&$selectResults, $criteria);
+		
+		KalturaLog::debug('Entitlement: Filter Results - done');
 	}
 }
 
