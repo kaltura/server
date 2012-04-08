@@ -29,6 +29,8 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 		"inheritanceTypeIn" => "_in_inheritance_type",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
+		"inheritedParentIdEqual" => "_eq_inherited_parent_id",
+		"inheritedParentIdIn" => "_in_inherited_parent_id",
 	);
 
 	private $order_by_map = array
@@ -199,4 +201,18 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $statusIn;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $inheritedParentIdEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $inheritedParentIdIn;
 }

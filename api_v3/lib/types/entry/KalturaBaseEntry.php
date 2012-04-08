@@ -156,6 +156,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var int
 	 * @readonly
+	 * @filter order
 	 */
 	public $totalRank;
 	

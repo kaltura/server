@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaCategoryEntry extends KalturaObject 
+class KalturaCategoryEntry extends KalturaObject implements IFilterable 
 {
 	/**
 	 * 
@@ -19,6 +19,27 @@ class KalturaCategoryEntry extends KalturaObject
 	 * @filter eq,in
 	 */
 	public $entryId;
+	
+	private static $mapBetweenObjects = array
+	(
+		"entryId",
+		"categoryId"
+	);
+	
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
+	
+	public function getExtraFilters()
+	{
+		return array();
+	}
+	
+	public function getFilterDocs()
+	{
+		return array();
+	}
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{

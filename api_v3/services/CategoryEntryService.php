@@ -101,4 +101,38 @@ class CategoryEntryService extends KalturaBaseService
 
 		return $categoryEntry;
 	}
+	
+	/**
+	 * List all categoryEntry
+	 * 
+	 * @action list
+	 * @return KalturaCategoryEntryListResponse
+	 */
+	function listAction(KalturaCategoryEntryFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		if ($filter === null)
+			$filter = new KalturaCategoryEntryFilter();
+			
+		if ($pager == null)
+		{
+			$pager = new KalturaFilterPager();
+		}
+			
+		$categoryEntryFilter = new categoryEntryFilter();
+		
+		$filter->toObject($categoryEntryFilter);
+
+		$c = new Criteria();
+		$categoryEntryFilter->attachToCriteria($c);
+		
+		$dbList = categoryEntryPeer::doSelect($c);
+		
+		$totalCount = categoryEntryPeer::doCount($c);
+		
+		$list = KalturaCategoryEntryArray::fromCategoryEntryArray($dbList);
+		$response = new KalturaCategoryEntryListResponse();
+		$response->objects = $list;
+		$response->totalCount = $totalCount;
+		return $response;
+	}
 }

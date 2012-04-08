@@ -1432,6 +1432,22 @@
 			<index-column name="full_name" />
 		</index>
 	</table>
+		<table skipSql="false" abstract="false" name="category_entry" phpName="categoryEntry" deletable="true">
+		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column primaryKey="false" lazyLoad="false" name="partner_id" type="integer" required="true" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" size="20" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="category_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />		
+		<index name="partner_id_category_id_index">
+			<index-column name="partner_id" />
+			<index-column name="category_id" />
+		</index>
+		<index name="partner_id_entry_id_index">
+			<index-column name="partner_id" />
+			<index-column name="entry_id" />
+		</index>
+	</table>	
 	<table skipSql="false" abstract="false" name="category_kuser" phpName="categoryKuser">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="category_id" type="integer" />
