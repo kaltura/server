@@ -154,7 +154,10 @@ class kRule
 		}
 			
 		KalturaLog::debug("Rule conditions fulfilled");
-		$context->addAccessControlMessage($this->message);
+		if ($this->message)
+		{
+			$context->addAccessControlMessage($this->message);
+		}
 		foreach($this->actions as $action)
 			$context->addAccessControlAction($action);
 				
