@@ -257,10 +257,10 @@ class entryPeer extends BaseentryPeer
 	
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
 		self::$filerResults = true;
 		$res = parent::retrieveByPK($pk, $con);
-		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+		KalturaCriterion::enableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
 		self::$filerResults = false;
 		
 		return $res;
@@ -305,6 +305,8 @@ class entryPeer extends BaseentryPeer
 		
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS); 
 		$c->addAnd ( entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
+		
+		$kuser = null;
 		
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
@@ -352,7 +354,7 @@ class entryPeer extends BaseentryPeer
 		if ($ks && $kuserId && !$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
 		{
 			$kuserCrit = $c->getNewCriterion(entryPeer::KUSER_ID , $kuserId, Criteria::EQUAL);
-			$kuserCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+			$kuserCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 			
 			if(!$crit)
 				$crit = $kuserCrit;
@@ -360,7 +362,7 @@ class entryPeer extends BaseentryPeer
 				$crit->addOr ($kuserCrit);
 				
 			$creatorKuserCrit = $c->getNewCriterion(entryPeer::CREATOR_KUSER_ID, $kuserId, Criteria::EQUAL);
-			$creatorKuserCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+			$creatorKuserCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 			$crit->addOr($creatorKuserCrit);
 		}
 		
@@ -372,9 +374,10 @@ class entryPeer extends BaseentryPeer
 	
 	public static function doCount(Criteria $criteria, $distinct = false, PropelPDO $con = null)
 	{
-		if (kEntitlementUtils::getEntitlementEnforcement())
+		//TODO - this is problematic! should fix this!
+		/*if (kEntitlementUtils::getEntitlementEnforcement())
 			throw new kCoreException('doCount is not supported for entitlement scope enable');
-		
+		*/
 		parent::doCount($criteria, $distinct, $con);
 	}
 	
