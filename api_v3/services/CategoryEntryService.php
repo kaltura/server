@@ -11,11 +11,7 @@ class CategoryEntryService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		parent::applyPartnerFilterForClass(new categoryPeer());
-		parent::applyPartnerFilterForClass(new entryPeer());
-		
-		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, kCurrentContext::$ks_partner_id))
-			throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceId.'->'.$this->actionName);	
-			
+		parent::applyPartnerFilterForClass(new entryPeer());	
 	}
 	
 	/**
@@ -93,6 +89,7 @@ class CategoryEntryService extends KalturaBaseService
 				break;
 			}
 		}
+		
 		if($keyToRemove)
 			unset($categoriesArr[$key]);
 		
@@ -119,14 +116,11 @@ class CategoryEntryService extends KalturaBaseService
 		}
 			
 		$categoryEntryFilter = new categoryEntryFilter();
-		
 		$filter->toObject($categoryEntryFilter);
 
 		$c = new Criteria();
 		$categoryEntryFilter->attachToCriteria($c);
-		
 		$dbList = categoryEntryPeer::doSelect($c);
-		
 		$totalCount = categoryEntryPeer::doCount($c);
 		
 		$list = KalturaCategoryEntryArray::fromCategoryEntryArray($dbList);
