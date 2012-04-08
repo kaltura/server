@@ -7,10 +7,34 @@
  */
 class KProcessWrapper
 {
+	/**
+	 * @var resource
+	 */
 	public $handle;
+	
+	/**
+	 * @var KSchedularTaskConfig
+	 */
 	public $taskConfig;
+	
+	/**
+	 * @var array
+	 */
 	private $pipes;
+	
+	/**
+	 * The time that the process should die
+	 * 
+	 * @var int unix time
+	 */
 	private $dieTime;
+	
+	/**
+	 * The process system pid
+	 * 
+	 * @var int
+	 */
+	private $processId;
 	
 	/**
 	 * @param int $taskIndex
@@ -70,11 +94,17 @@ class KProcessWrapper
 		$this->_cleanup();
 	}
 	
+	/**
+	 * @return string the batch worker name
+	 */
 	public function getName()
 	{
 		return $this->taskConfig->name;
 	}
 	
+	/**
+	 * @return int the batch instance index
+	 */
 	public function getIndex()
 	{
 		return $this->taskConfig->getTaskIndex();
@@ -100,7 +130,10 @@ class KProcessWrapper
 		if($this->pipes)
 		{
 			foreach($this->pipes as $index => $ref)
-				$this->closeResource($ref);
+			{
+				if(is_resource($ref))
+					fclose($ref);
+			}
 				
 			unset($this->pipes);
 			$this->pipes = null;
@@ -108,35 +141,22 @@ class KProcessWrapper
 		
 		if($this->handle && is_resource($this->handle))
 		{
-//			$status = proc_get_status($this->handle);
-//			if($status['running'] == true)
-//			{
-//				//process ran too long, kill it
-//				//get the parent pid of the process we want to kill
-//				$ppid = $status['pid'];
-//				
-//				//use ps to get all the children of this process, and kill them
-//				$pids = preg_split('/\s+/', `ps -o pid --no-heading --ppid $ppid`);
-//				foreach($pids as $pid)
-//				{
-//					if(is_numeric($pid))
-//					{
-//						posix_kill($pid, 9); //9 is the SIGKILL signal
-//					}
-//				}
-//			}
-			
+			if($this->processId && function_exists('posix_kill'))
+				posix_kill($this->processId, 9);
+				
 			proc_terminate($this->handle, 9); //9 is the SIGKILL signal
 			proc_close($this->handle);
 			$this->handle = null;
 		}
 	}
 	
-	private function closeResource($resource)
+	/**
+	 * @param int $processId
+	 */
+	public function setProcessId($processId)
 	{
-		if(is_resource($resource))
-			fclose($resource);
+		$this->processId = $processId;
 	}
 
+
 }
-?>

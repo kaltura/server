@@ -264,10 +264,15 @@ class KGenericScheduler
 				
 				foreach($tasks as $index => &$proc)
 				{
+					/* @var $proc KProcessWrapper */
 					if($proc->isRunning())
 					{
 						if(isset($runningBatches[$proc->getName()][$proc->getIndex()]))
+						{
+							$processId = $runningBatches[$proc->getName()][$proc->getIndex()];
+							$proc->setProcessId($processId);
 							unset($runningBatches[$proc->getName()][$proc->getIndex()]);
+						}
 							
 						continue;
 					}

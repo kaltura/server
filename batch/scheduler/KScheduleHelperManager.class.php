@@ -132,7 +132,7 @@ class KScheduleHelperManager
         		
         	list($workerName, $batchIndex, $run) = explode('.', $file);
         	
-			$runningBatches[$workerName][$batchIndex] = true;
+			$runningBatches[$workerName][$batchIndex] = file_get_contents($statusDirPath . DIRECTORY_SEPARATOR . $file);
         }
         closedir($dh);
 		
@@ -157,7 +157,7 @@ class KScheduleHelperManager
 	 */
 	public static function saveRunningBatch($statusDirPath, $workerName, $batchIndex)
 	{
-		file_put_contents("$statusDirPath/$workerName.$batchIndex.run", '', FILE_APPEND);
+		file_put_contents("$statusDirPath/$workerName.$batchIndex.run", getmypid(), FILE_APPEND);
 	}
 
 	/**
