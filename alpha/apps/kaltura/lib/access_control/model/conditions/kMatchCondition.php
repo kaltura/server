@@ -33,18 +33,26 @@ abstract class kMatchCondition extends kCondition
 	}
 	
 	/**
+	 * @param accessControlScope $scope
 	 * @return array<string>
 	 */
-	function getStringValues()
+	function getStringValues($scope)
 	{
 		$values = array();
 		foreach($this->values as $value)
 		{
 			/* @var $value kStringValue */
 			if(is_object($value))
+			{
+				if($value instanceof kStringField)
+					$value->setScope($scope);
+					
 				$values[] = $value->getValue();
+			}
 			else
+			{
 				$values[] = strval($value);
+			}
 		}
 		
 		return $values;
@@ -65,27 +73,13 @@ abstract class kMatchCondition extends kCondition
 		return ($field === $value);
 	}
 	
-	/* (non-PHPdoc)
-	 * @see kCondition::internalFulfilled()
+	/**
+	 * @param string $field
+	 * @param array $values
+	 * @return boolean
 	 */
-	public function internalFulfilled(accessControl $accessControl)
+	public function fieldFulfilled($field, $values)
 	{
-		$field = $this->getFieldValue($accessControl);
-		$values = $this->getStringValues();
-		
-		KalturaLog::debug("Matches field [$field] to values [" . print_r($values, true) . "]");
-		if (!count($values))
-		{
-			KalturaLog::debug("No values found, condition is true");
-			return true;
-		}
-		
-		if (!strlen($field))
-		{
-			KalturaLog::debug("Field is empty, condition is false");
-			return false;
-		}
-			
 		if(in_array($field, $values))
 		{
 			KalturaLog::debug("Field found in the values list, condition is true");
@@ -103,5 +97,43 @@ abstract class kMatchCondition extends kCondition
 			
 		KalturaLog::debug("No match found, condition is false");
 		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kCondition::internalFulfilled()
+	 */
+	public function internalFulfilled(accessControl $accessControl)
+	{
+		$field = $this->getFieldValue($accessControl);
+		$values = $this->getStringValues($accessControl->getScope());
+		
+		KalturaLog::debug("Matches field [$field] to values [" . print_r($values, true) . "]");
+		if (!count($values))
+		{
+			KalturaLog::debug("No values found, condition is true");
+			return true;
+		}
+		
+		if (!$field)
+		{
+			KalturaLog::debug("Field is empty, condition is false");
+			return false;
+		}
+
+		if(is_array($field))
+		{
+			foreach($field as $fieldItem)
+			{
+				if(!$this->fieldFulfilled($fieldItem, $values))
+				{
+					KalturaLog::debug("Field item [$fieldItem] does not fulfill, condition is false");
+					return false;
+				}
+			}
+			KalturaLog::debug("All field items fulfilled, condition is true");
+			return true;
+		}
+		
+		return $this->fieldFulfilled($field, $values);
 	}
 }

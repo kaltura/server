@@ -62,28 +62,33 @@ abstract class kCompareCondition extends kCondition
 	/**
 	 * @return int
 	 */
-	function getIntegerValue()
+	function getIntegerValue($scope)
 	{
 		if(is_object($this->value))
+		{
+			if($this->value instanceof kIntegerField)
+				$this->value->setScope($scope);
+				
 			return $this->value->getValue();
-		else
-			return intval($this);
+		}
+		
+		return intval($this);
 	}
 	
 	/**
 	 * @param int $field
+	 * @param int $value
 	 * @return bool
 	 */
-	protected function fieldFulfilled($field)
+	protected function fieldFulfilled($field, $value)
 	{
-		$value = $this->getIntegerValue();
 		switch($this->comparison)
 		{
 			case searchConditionComparison::GREATER_THAN:
 				KalturaLog::debug("Compares field[$field] > value[$value]");
 				return ($field > $value);
 				
-			case searchConditionComparison::GREATER_THAN_OR_EQUEL:
+			case searchConditionComparison::GREATER_THAN_OR_EQUAL:
 				KalturaLog::debug("Compares field[$field] >= value[$value]");
 				return ($field >= $value);
 				
@@ -91,11 +96,11 @@ abstract class kCompareCondition extends kCondition
 				KalturaLog::debug("Compares field[$field] < value[$value]");
 				return ($field < $value);
 				
-			case searchConditionComparison::LESS_THAN_OR_EQUEL:
+			case searchConditionComparison::LESS_THAN_OR_EQUAL:
 				KalturaLog::debug("Compares field[$field] <= value[$value]");
 				return ($field <= $value);
 				
-			case searchConditionComparison::EQUEL:
+			case searchConditionComparison::EQUAL:
 			default:
 				KalturaLog::debug("Compares field[$field] == value[$value]");
 				return ($field == $value);
@@ -108,7 +113,7 @@ abstract class kCompareCondition extends kCondition
 	public function internalFulfilled(accessControl $accessControl)
 	{
 		$field = $this->getFieldValue($accessControl);
-		$value = $this->getIntegerValue();
+		$value = $this->getIntegerValue($accessControl->getScope());
 		
 		KalturaLog::debug("Copares field [$field] to value [$value]");
 		if (is_null($value))
@@ -127,9 +132,9 @@ abstract class kCompareCondition extends kCondition
 		{
 			foreach($field as $fieldItem)
 			{
-				if(!$this->fieldFulfilled($fieldItem))
+				if(!$this->fieldFulfilled($fieldItem, $value))
 				{
-					KalturaLog::debug("Field item [$fieldItem] does not fulfilled, condition is false");
+					KalturaLog::debug("Field item [$fieldItem] does not fulfill, condition is false");
 					return false;
 				}
 			}
@@ -137,6 +142,6 @@ abstract class kCompareCondition extends kCondition
 			return true;
 		}
 		
-		return $this->fieldFulfilled($field);
+		return $this->fieldFulfilled($field, $value);
 	}
 }
