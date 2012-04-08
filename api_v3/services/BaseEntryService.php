@@ -499,7 +499,10 @@ class BaseEntryService extends KalturaEntryService
 		$entryFilter->attachToCriteria($c);		
 		$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 				
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		$list = entryPeer::doSelect($c);
+		KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		
 		$totalCount = $c->getRecordsCount();
 				
 	    $newList = KalturaBaseEntryArray::fromEntryArray($list, false);
