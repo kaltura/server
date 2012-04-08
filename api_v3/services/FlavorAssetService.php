@@ -552,6 +552,10 @@ class FlavorAssetService extends KalturaAssetService
 		if (!in_array($dbEntry->getStatus(), $validStatuses))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS);
 			
+		$conversionProfile = $dbEntry->getconversionProfile2();
+		if(!$conversionProfile)
+			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $dbEntry->getConversionProfileId());
+		
 		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if (is_null($originalFlavorAsset) || $originalFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
