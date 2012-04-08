@@ -1,0 +1,112 @@
+<?php
+/**
+ * Allows user to 'like' or 'unlike' and entry
+ *
+ * @service like
+ * @package plugins.like
+ * @subpackage api.services
+ */
+class LikeService extends KalturaBaseService
+{
+    const KVOTE_LIKE_RANK_VALUE = 1;
+    
+    const KVOTE_UNLIKE_RANK_VALUE = 0;
+    
+    public function initService($serviceId, $serviceName, $actionName)
+    {
+        parent::initService($serviceId, $serviceName, $actionName);
+		
+		if(!LikePlugin::isAllowedPartner($this->getPartnerId()))
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+    }
+    
+    /**
+     * @action like
+     * Action for current kuser to mark the entry as "liked".
+     * @param string $entryId
+     * @throws KalturaLikeErrors::USER_LIKE_FOR_ENTRY_ALREADY_EXISTS
+     * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+     * @return bool
+     */
+    public function likeAction ( $entryId )
+    {
+        if (!$entryId)
+	    {
+	        throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
+	    }
+	    
+	    //Check if a kvote for current entryId and kuser already exists. If it does - throw exception
+	    $existingKVote = kvotePeer::doSelectByEntryIdAndPuserId($entryId, $this->getPartnerId(), kCurrentContext::$uid);
+	    if ($existingKVote)
+	    {
+	        throw new KalturaAPIException(KalturaLikeErrors::USER_LIKE_FOR_ENTRY_ALREADY_EXISTS);
+	    }
+	    
+	    $dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			
+		if (kvotePeer::enableExistingKVote($entryId, $this->getPartnerId(), kCurrentContext::$uid))
+		{
+		    return true;
+		}
+		
+		kvotePeer::createKvote($entryId, kCurrentContext::$uid, $this->getPartnerId(), self::KVOTE_LIKE_RANK_VALUE);
+	    
+	    return true;
+    }
+    
+    /**
+     * @action unlike
+     * Action for current kuser to revoke a previously added "like" from an entry
+     * @param string $entryId
+     * @return bool
+     */
+    public function unlikeAction ( $entryId )
+    {
+        if (!$entryId)
+	    {
+	        throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
+	    }
+	    
+	    $existingKVote = kvotePeer::doSelectByEntryIdAndPuserId($entryId, $this->getPartnerId(), kCurrentContext::$uid);
+	    if (!$existingKVote)
+	    {
+	        throw new KalturaAPIException(KalturaLikeErrors::USER_LIKE_FOR_ENTRY_NOT_FOUND);
+	    }
+	    
+	    $dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+    }
+    
+    /**
+     * @action checkLikeExists
+     * Action to check whether a user likes a specific entry
+     * @param string $entryId
+     * @param string $userId
+     * @return bool
+     */
+    public function checkLikeExistsAction ( $entryId , $userId )
+    {
+        if (!$entryId)
+	    {
+	        throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
+	    }
+        
+	    if (!$userId)
+	    {
+	        throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "userId");
+	    }
+	    
+	    $existingKVote = kvotePeer::doSelectByEntryIdAndPuserId($entryId, $this->getPartnerId(), $userId);
+	    if (!$existingKVote || !count($existingKVote))
+	    {
+	        return false;
+	    }
+	    
+	    return true;
+        	    
+    }
+
+}
