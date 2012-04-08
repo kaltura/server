@@ -7,6 +7,7 @@ abstract class KalturaCriterion extends Criterion
 {
 	const TAG_ENTITLEMENT_ENTRY = 'TAG_ENTITLEMENT_ENTRY';
 	const TAG_ENTITLEMENT_CATEGORY = 'TAG_ENTITLEMENT_CATEGORY';
+	const TAG_WIDGET_SESSION = 'TAG_WIDGET_SESSION';
 	/**
 	 * @var KalturaCriterion
 	 */
@@ -41,10 +42,27 @@ abstract class KalturaCriterion extends Criterion
 		self::$enabledTags[$tag] = $tag;
 	}
 	
+	public static function enableTags($tags)
+	{
+		foreach($tags as $tag)
+			self::$enabledTags[$tag] = $tag;
+	}
+	
 	public static function disableTag($tag)
 	{
 		if(isset(self::$enabledTags[$tag]))
+		{
 			unset(self::$enabledTags[$tag]);
+		}
+	}
+	
+	public static function disableTags($tags)
+	{
+		foreach($tags as $tag)
+		{
+			if(isset(self::$enabledTags[$tag]))
+				unset(self::$enabledTags[$tag]);
+		}
 	}
 	
 	public static function isTagEnable($tag)

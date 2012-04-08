@@ -70,6 +70,7 @@ class criteriaFilter
 				foreach ($filter_criterion->getTags() as $tag)
 				{
 					if(KalturaCriterion::isTagEnable($tag))
+
 						$enableByTags = true;
 				}
 				
@@ -124,6 +125,15 @@ class criteriaFilter
 		$i=0;
 		foreach ( $clauses as $clause )
 		{
+			$enableByTags = false;
+			foreach ($clause->getTags() as $tag)
+			{
+				if(KalturaCriterion::isTagEnable($tag))
+				{
+					$enableByTags = true;
+				}
+			}
+			
 			$new_crit = $criteria_to_filter->getNewCriterion ( $clause->getTable() . "." . $clause->getColumn() ,  $clause->getValue() , $clause->getComparison() );
 			$conj = @$conjunctions[$i];
 				

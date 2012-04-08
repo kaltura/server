@@ -74,11 +74,19 @@ class category extends Basecategory implements IIndexable
 			if ($numOfCatsForPartner >= $chunkedCategoryLoadThreshold)
 				PermissionPeer::enableForPartner(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD, PermissionType::SPECIAL_FEATURE);
 
-			if ($this->getPrivacyContexts() == '' && $this->getParentId())
+			if ($this->getParentId())
 			{
 				$parentCategory = $this->getParentCategory();
 				$this->setPrivacyContexts($parentCategory->getPrivacyContexts());
 			}
+		}
+		
+		if($this->getPrivacyContexts() == '' && $this->getPrivacyContext() == '')
+		{
+			//set default enetitlement default settings = no entitlement
+			$this->setPrivacy(PrivacyType::ALL);
+			$this->setContributionPolicy(ContributionPolicyType::ALL);
+			$this->setDisplayInSearch(DisplayInSearchType::PARTNER_ONLY);
 		}
 		
 		// set the depth of the parent category + 1
@@ -562,9 +570,9 @@ class category extends Basecategory implements IIndexable
 		$entryFilter = new entryFilter();
 		$entryFilter->set("_matchor_categories_ids", $this->getId());
 		$entryFilter->attachToCriteria($c);
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
 		$entries = entryPeer::doSelect($c);
-		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+		KalturaCriterion::enableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
 		foreach($entries as $entry)
 		{
 			$entry->removeCategory($this->full_name);

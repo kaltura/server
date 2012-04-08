@@ -52,8 +52,12 @@ class categoryKuser extends BasecategoryKuser {
 		parent::setStatus($v);
 	}
 	
-	
-	public function save(PropelPDO $con = null)
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
 	{
 		$category = categoryPeer::retrieveByPK($this->category_id);
 		if(!$category)
@@ -83,14 +87,10 @@ class categoryKuser extends BasecategoryKuser {
 				$category->setMembersCount($category->getMembersCount() - 1);
 		}
 		
-		$category->save();
-		
-		parent::save($con);
-		
-		//TODO add job to 
-		//update inheritance categories with membersCount from parent (propel objects) and this will also 
-		// reindex those categoryies with the new members.
+		return parent::preSave($con);
 	}
+	
+
 	
 	public function delete(PropelPDO $con = null)
 	{

@@ -32,9 +32,13 @@ class categoryPeer extends BasecategoryPeer
 		
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
+			//add context as filter
+			$c->addAnd(self::PRIVACY_CONTEXTS, kEntitlementUtils::getKsPrivacyContext(), Criteria::IN);
+			
 			$crit = $c->getNewCriterion ( self::DISPLAY_IN_SEARCH, DisplayInSearchType::PARTNER_ONLY, Criteria::EQUAL );
 			$crit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 
+			$kuser = null;
 			$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
 			if($ksString <> '')
 				$kuser = kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid);
