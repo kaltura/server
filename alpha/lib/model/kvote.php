@@ -13,11 +13,20 @@ class kvote extends Basekvote
 {
 	private $statistics_results = null;
 	
+	public function __construct()
+	{
+	    $this->status = KVoteStatus::KVOTE_STATUS_VOTED;
+	}
+	
 	public function save(PropelPDO $con = null)
 	{
 		if ( $this->isNew() )
 		{
 			$this->statistics_results = myStatisticsMgr::addKvote( $this , $this->getRank() );
+		}
+		if (in_array(kvotePeer::STATUS, $this->modifiedColumns))
+		{
+		   $this->statistics_results = myStatisticsMgr::modifyEntryVotesBykVote($this, $this->getRank()); 
 		}
 		
 		return parent::save( $con );
@@ -38,5 +47,5 @@ class kvote extends Basekvote
 	{
 		return $this->statistics_results;
 	}
-
+	
 }
