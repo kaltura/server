@@ -11,12 +11,12 @@ class BaseEntryService extends KalturaEntryService
 {
     public function initService($serviceId, $serviceName, $actionName)
     {
-        if ($actionName == "anonymousRank" && $this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_LIKE))
-        {
-            throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
-        }
-        
         parent::initService($serviceId, $serviceName, $actionName);
+        $partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+        if ($actionName == "anonymousRank" && $partner->getEnabledService(KalturaPermissionName::FEATURE_LIKE))
+        {
+            throw new KalturaAPIException(KalturaErrors::ACTION_FORBIDDEN, "anonymousRank");
+        }
     }
     
 	/* (non-PHPdoc)
