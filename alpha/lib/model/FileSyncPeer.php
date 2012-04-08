@@ -21,7 +21,7 @@ class FileSyncPeer extends BaseFileSyncPeer
 		}
 		
 		$c = new Criteria();
-		$c->add(self::STATUS, array(FileSync::FILE_SYNC_STATUS_DELETED, FileSync::FILE_SYNC_STATUS_PURGED), Criteria::IN);
+		$c->add(self::STATUS, array(FileSync::FILE_SYNC_STATUS_DELETED, FileSync::FILE_SYNC_STATUS_PURGED), Criteria::NOT_IN);
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
