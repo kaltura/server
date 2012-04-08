@@ -37,6 +37,9 @@ class KalturaErrors extends APIErrors
 	// %s - action name, %s - service name
 	const ACTION_DOES_NOT_EXISTS = "ACTION_DOES_NOT_EXISTS,Action \"%s\" does not exists for service \"%s\"";
 	
+	// %s - action name
+	const ACTION_FORBIDDEN = "ACTION_FORBIDDEN,Action \"%s\" is forbidden for use";
+	
 	// %s - parameter name
 	const MISSING_MANDATORY_PARAMETER = "MISSING_MANDATORY_PARAMETER,Missing parameter \"%s\"";
 	
@@ -55,6 +58,8 @@ class KalturaErrors extends APIErrors
 	const OBJECT_TYPE_ABSTRACT = "OBJECT_TYPE_ABSTRACT,The object type \"%s\" is abstract, use on of the object implementations";
 	
 	const PROPERTY_VALIDATION_CANNOT_BE_NULL =  "PROPERTY_VALIDATION_CANNOT_BE_NULL,The property \"%s\" cannot be NULL";
+	
+	const PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE = "PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE,Only one of the passed properties: %s should not be null";
 	
 	const PROPERTY_VALIDATION_MIN_LENGTH = "PROPERTY_VALIDATION_MIN_LENGTH,The property \"%s\" must have a min length of %s characters";
 	
