@@ -898,14 +898,28 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
+		$disableWidgetSessionFilters = false;
+		if ($filter &&
+			($filter->idEqual != null ||
+			$filter->idIn != null ||
+			$filter->referenceIdEqual != null ||
+			$filter->referenceIdIn != null))
+			$disableWidgetSessionFilters = true;
+			
 		if (!$pager)
 			$pager = new KalturaFilterPager();
 		
 		$c = $this->prepareEntriesCriteriaFilter($filter, $pager);
 		
+		if ($disableWidgetSessionFilters)
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			
 		$list = entryPeer::doSelect($c);
 		$totalCount = $c->getRecordsCount();
 		
+		if ($disableWidgetSessionFilters)
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+
 		return array($list, $totalCount);		
 	}
 	
@@ -1054,7 +1068,7 @@ class KalturaEntryService extends KalturaBaseService
 		if ($entry->adminTags !== null)
 			$this->validateAdminSession("adminTags");
 			
-		if ($entry->categories !== null && trim($entry->categories) !== '')
+		if ($entry->categories !== null)
 		{
 			$cats = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->categories);
 			foreach($cats as $cat)
