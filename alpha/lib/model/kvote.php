@@ -29,6 +29,7 @@ class kvote extends Basekvote
 		   $this->statistics_results = myStatisticsMgr::modifyEntryVotesBykVote($this, $this->getRank()); 
 		}
 		
+		KalturaLog::debug("kvote status before save: ". $this->getStatus());
 		return parent::save( $con );
 	}
 	

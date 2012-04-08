@@ -37,14 +37,12 @@ class kvotePeer extends BasekvotePeer
     
     public static function getKuserFromPuserAndPartner($puserId, $partnerId)
 	{
-		$kuser = kuserPeer::createKuserForPartner($partnerId, $puserId);
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId, true);
 		
 		if ($kuser->getStatus() !== KuserStatus::ACTIVE)
 			throw new APIException(APIErrors::INVALID_USER_ID);
 		
-		$this->kuser = $kuser;
-		
-		return $this->kuser;
+		return $kuser;
 	}
 	
 	public static function enableExistingKVote ($entryId, $partnerId, $puserId)
@@ -52,10 +50,13 @@ class kvotePeer extends BasekvotePeer
 	    self::setUseCriteriaFilter(false);
 	    
 	    $kvote = self::doSelectByEntryIdAndPuserId($entryId, $partnerId, $puserId);
-	    if ($kvote->getStatus() == KVoteStatus::KVOTE_STATUS_REVOKED)
+	    if ($kvote && $kvote->getStatus() == KVoteStatus::KVOTE_STATUS_REVOKED)
 	    {
 	        self::changeKVoteStatus($kvote, KVoteStatus::KVOTE_STATUS_VOTED);
+	        return true;
 	    }
+	    
+	    return false;
 	}
 	
     public static function disableExistingKVote ($entryId, $partnerId, $puserId)
@@ -77,6 +78,7 @@ class kvotePeer extends BasekvotePeer
 	{
 	    $kvote = new kvote();
 		$kvote->setEntryId($entryId);
+		$kvote->setStatus(KVoteStatus::KVOTE_STATUS_VOTED);
 		$kuser = self::getKuserFromPuserAndPartner($puserId, $partnerId);
 		$kvote->setKuserId($kuser->getId());
 		$kvote->setRank($rank);
