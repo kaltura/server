@@ -567,14 +567,10 @@ abstract class BaseentryPeer {
 	
 	public static function  setUseCriteriaFilter ( $use )
 	{
-		KalturaLog::debug('### save done! # ' . __LINE__);
 		$criteria_filter = entryPeer::getCriteriaFilter();
-		KalturaLog::debug('### save done! # ' . __LINE__);
 		
 		if ( $use )  $criteria_filter->enable(); 
 		else $criteria_filter->disable();
-		
-		KalturaLog::debug('### save done! # ' . __LINE__);
 	}
 	
 	/**
