@@ -313,15 +313,15 @@ class entryPeer extends BaseentryPeer
 			$crit = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, Criteria::IN);
 			$crit->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 			
-			if(kCurrentContext::$ks_uid)
+			if(kCurrentContext::$ks_kuser_id)
 			{
 				//ENTITLED_KUSERS field includes $this->entitledUserEdit, $this->entitledUserEdit, and users on work groups categories.
-				$critKusers = ($c->getNewCriterion(self::ENTITLED_KUSERS, kCurrentContext::$ks_uid, Criteria::EQUAL));
+				$critKusers = ($c->getNewCriterion(self::ENTITLED_KUSERS, kCurrentContext::$ks_kuser_id, Criteria::EQUAL));
 				$critKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 				$crit->addOr($critKusers);
 				
 				$categoriesIds = array();
-				$categories = categoryPeer::doSelectEntitledAndNonIndexedCategories(kCurrentContext::$ks_uid, entry::CATEGORY_SEARCH_LIMIT);
+				$categories = categoryPeer::doSelectEntitledAndNonIndexedCategories(kCurrentContext::$ks_kuser_id, entry::CATEGORY_SEARCH_LIMIT);
 				if(count($categories) == entry::CATEGORY_SEARCH_LIMIT)
 					self::$kuserBlongToMoreThanMaxCategoriesForSearch = true;
 			 

@@ -2179,6 +2179,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function syncCategories()
 	{
+		//if entitlement is context is set - skip this field sync.
+		if(implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::DEFAULT_CONTEXT)
+			return;
+			
 		if (!$this->is_categories_modified)
 			return;
 		
@@ -2232,8 +2236,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			if (! $category)
 				$category = category::createByPartnerAndFullName ( $this->getPartnerId (), $cat );
 				
-			$category->incrementEntriesCount ( 1, $alreadyAddedCatIds );
-			$category->incrementDirectEntriesCount();
+			$categoryEntry = new categoryEntry();
+			$categoryEntry->setEntryId($this->getId());
+			$categoryEntry->setCategoryId($category->getId());
+			$categoryEntry->setEntryCategoriesAddedIds($alreadyAddedCatIds);
+			$categoryEntry->setPartnerId($this->getPartnerId());
+			$categoryEntry->save();
 			
 			$allIds [] = $category->getId ();
 			$alreadyAddedCatIds [] = $category->getId ();
@@ -2242,11 +2250,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		$alreadyRemovedCatIds = $allIdsWithParents;
 		
-		foreach ( $removedCats as $cat ) {
+		foreach ( $removedCats as $cat ) 
+		{
 			$category = categoryPeer::getByFullNameExactMatch ( $cat );
+
 			if ($category){
-				$category->decrementEntriesCount ( 1, $alreadyRemovedCatIds );
-				$category->decrementDirectEntriesCount();
+				$categoryEntryToDelete = categoryEntryPeer::retrieveByCategoryIdAndEntryId($category->getId(), $this->getId());
+				if($categoryEntryToDelete)
+				{
+					$categoryEntryToDelete->setEntryCategoriesRemovedIds($alreadyRemovedCatIds);
+					$categoryEntryToDelete->delete();
+				}
 				
 				$alreadyRemovedCatIds [] = $category->getId ();
 				$alreadyRemovedCatIds = array_merge ( $alreadyRemovedCatIds, $category->getAllParentsIds () );
@@ -2767,7 +2781,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function getPrivacyByContexts()
 	{
-		return kEntitlementUtils::getPrivacyContextForEntry($this);
+		return implode(' ',kEntitlementUtils::getPrivacyContextForEntry($this));
 	}
 	
 	
