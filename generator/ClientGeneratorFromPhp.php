@@ -238,60 +238,71 @@ abstract class ClientGeneratorFromPhp
 		$this->initClassMap();
 		
 		$serviceMap = KalturaServicesMap::getMap();
-		foreach($serviceMap as $service => $serviceClass)
+		foreach($serviceMap as $serviceId => $serviceActionItem)
 		{
-			$servicePath = $this->_classMap[$serviceClass];			
-			if ($this->isPathExcluded($servicePath))
-			{
-				continue;
-			}
-			
-			$serviceReflector = new KalturaServiceReflector($service);
-			if (count($this->_includeList) > 0 && array_key_exists($service, $this->_includeList)) 
-			{
-				$actionToInclude = $this->_includeList[$service];
-				$this->addService($serviceReflector);
-				
-				$actions = array_keys($serviceReflector->getActions());
-				foreach($actions as $action)
-				{
-					if (count($actionToInclude) && !array_key_exists($action, $actionToInclude))
+		    /* @var $serviceActionItem KalturaServiceActionItem */
+		    $actionsToInclude = array();
+		    if ( count($this->_includeList) && !array_key_exists($serviceId, $this->_includeList) )
+  			{
+  			    continue;
+  			}
+  			$actionsToInclude = $this->_includeList[$serviceId];
+  			$serviceActionItemToAdd = KalturaServiceActionItem::cloneItem($serviceActionItem);
+		    foreach ($serviceActionItem->actionMap as $actionId => $actionCallback)
+		    {
+		        list ( $serviceClassName, $actionMethodName) = array_values($actionCallback);
+		        
+		        //Check if the service path for the current action is excluded
+		        $servicePath = $this->_classMap[$serviceClassName];	
+    		    if ($this->isPathExcluded($servicePath))
+      			{
+      			    unset($serviceActionItemToAdd->actionMap[$actionId]);
+      			    continue;
+      			}
+      			
+      			// check if the current action is included
+      			if (count($actionsToInclude) && !array_key_exists(strtolower($actionId), $actionsToInclude))
+      			{
+      			    unset($serviceActionItemToAdd->actionMap[$actionId]); 
+      			    continue;
+      			}
+      			
+      			$actionReflector = new KalturaActionReflector($serviceId, $actionId, $actionCallback);
+      			if (!$this->shouldUseServiceAction($actionReflector))
+      			{
+      			    continue;
+      			}
+      			
+      			$serviceActionItemToAdd->actionMap[$actionId] = $actionReflector;
+      			
+      			$actionParams = $actionReflector->getActionParams();
+      			foreach ($actionParams as $actionParam)
+      			{
+      			    if ($actionParam->isComplexType())
 					{
-						$serviceReflector->removeAction($action);
-						continue;
-					}
-					
-					// params
-					$actionParams = $serviceReflector->getActionParams($action);
-					$actionInfo = $serviceReflector->getActionInfo($action);
-					
-					if (strpos($actionInfo->clientgenerator, "ignore") !== false)
-						continue;
-						
-					foreach ($actionParams as $actionParam)
-					{
-						if ($actionParam->isComplexType())
-						{
-							$typeReflector = KalturaTypeReflectorCacher::get($actionParam->getType());
-							if(!$typeReflector)
-								throw new Exception("Couldn't load type reflector for service[$service] action[$action] param type[" . $actionParam->getType() . "]");
-							
-							$this->loadTypesRecursive($typeReflector);
-						}
-					}
-	
-					// output type
-					$outputInfo = $serviceReflector->getActionOutputType($action);
-					if ($outputInfo && $outputInfo->isComplexType())
-					{
-						$typeReflector = $outputInfo->getTypeReflector();
+						$typeReflector = KalturaTypeReflectorCacher::get($actionParam->getType());
 						if(!$typeReflector)
-							throw new Exception("Couldn't load type reflector for service[$service] action[$action] output type[" . $outputInfo->getType() . "]");
-							
+							throw new Exception("Couldn't load type reflector for service [$serviceId] action [$actionId] param type[" . $actionParam->getType() . "]");
+						
 						$this->loadTypesRecursive($typeReflector);
 					}
+      			}
+      			
+		        $outputInfo = $actionReflector->getActionOutputType();
+				if ($outputInfo && $outputInfo->isComplexType())
+				{
+					$typeReflector = $outputInfo->getTypeReflector();
+					if(!$typeReflector)
+						throw new Exception("Couldn't load type reflector for service [$serviceId] action [$actionId] output type[" . $outputInfo->getType() . "]");
+						
+					$this->loadTypesRecursive($typeReflector);
 				}
-			}
+		    }
+		    
+		    if ( count($serviceActionItem->actionMap) )
+		    {
+		        $this->_services[$serviceId] = $serviceActionItemToAdd;
+		    }
 		}
 		
 //		// load the child types for all the types that we found except for types that inherit KalturaFilter
@@ -364,24 +375,32 @@ abstract class ClientGeneratorFromPhp
 		}
 	}
 	
-	protected function addService(KalturaServiceReflector $serviceReflector)
+	protected function shouldUseServiceAction (KalturaActionReflector $actionReflector)
 	{
-		$serviceName = $serviceReflector->getServiceName();
-		if($serviceReflector->isServerOnly())
-		{
-			KalturaLog::info("Service is server only [$serviceName]");
-			return;
-		}
-			
-		if (array_key_exists($serviceName, $this->_services))
-		{
-			KalturaLog::err("Service already exists [$serviceName]");
-//			throw new Exception("Service already exists [$serviceName]");
-			return;
-		}
-			
-		$this->_services[$serviceName] = $serviceReflector;
+	    $serviceId = $actionReflector->getServiceId();
+	    
+	    if ($actionReflector->getActionClassInfo()->serverOnly)
+	    {
+	        KalturaLog::info("Service [".$serviceId."] is server only");
+	        return false;
+	    }
+	    
+	    $actionId = $actionReflector->getActionId();
+	    if (strpos($actionReflector->getActionInfo()->clientgenerator, "ignore") !== false)
+	    {
+	        KalturaLog::info("Action [$actionId] in service [$serviceId] ignored by generator");
+	        return false;
+	    }
+	    
+	    if (isset($this->_serviceActions[$serviceId]) && isset($this->_serviceActions[$serviceId][$actionId]))
+	    {
+	        KalturaLog::err("Service [$serviceId] action [$actionId] already exists!");
+	        return false;
+	    }
+        
+	    return true;
 	}
+	
 	
 	protected function addType(KalturaTypeReflector $objectReflector)
 	{
@@ -426,20 +445,23 @@ abstract class ClientGeneratorFromPhp
 		
 		// load full list of actions and services
 		$fullList = array();
+		$serviceMap = null;
 		$serviceMap = KalturaServicesMap::getMap();
-		foreach($serviceMap as $service => $serviceClass)
+		foreach($serviceMap as $serviceId => $serviceActionItem)
 		{
-			$servicePath = $this->_classMap[$serviceClass];			
-			if ($this->isPathExcluded($servicePath))
-			{
-				continue;
-			}
-
-			$serviceReflector = new KalturaServiceReflector($service);
-			$actions = $serviceReflector->getActions();
-			foreach($actions as &$action) // we need only the keys
-				$action = true;
-			$fullList[$service] = $actions;
+		    /* @var $serviceActionItem KalturaServiceActionItem */
+		    foreach ($serviceActionItem->actionMap as $actionId => $actionCallback)
+		    {
+		        list ($serviceClass, $actionMethodName) = array_values($actionCallback);
+		        
+		        
+    			$servicePath = $this->_classMap[$serviceClass];			
+    			if ($this->isPathExcluded($servicePath))
+    			{
+    				continue;
+    			}
+    			$fullList[strtolower($serviceId)][strtolower($actionId)] = true;
+		    }
 		}
 					
 		$includeList = array();
