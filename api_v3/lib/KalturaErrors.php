@@ -389,9 +389,19 @@ class KalturaErrors extends APIErrors
 	const CANNOT_UPDATE_CATEGORY_USER_OWNER = "CANNOT_UPDATE_CATEGORY_USER_OWNER, Cannot change CategoryUser object for category Owner";
 	
 	/**
+	 * entry
+	 */
+	
+	const ENTRY_CATEGORY_FIELD_IS_DEPRECATED = "ENTRY_CATEGORY_FIELD_IS_DEPRECATED, entry->categories and entry->categoriesIds fields are deprecated - user categoryEntry service";
+	
+	/**
 	 * categoryEntry
 	 */
 	const CANNOT_ASSIGN_ENTRY_TO_CATEGORY = "CANNOT_ASSIGN_ENTRY_TO_CATEGORY,Cannot assign entry to category";
 
 	const CANNOT_REMOVE_ENTRY_FROM_CATEGORY = "CANNOT_REMOVE_ENTRY_FROM_CATEGORY,Cannot remove entry from category";
+	
+	const ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY = "ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY,Entry doesn't assigned to category"; 
+	
+	const MUST_FILTER_ENTRY_OR_CATEGORY = "MUST_FILTER_ENTRY_OR_CATEGORY,Must filter on entry id or on category id";
 }
