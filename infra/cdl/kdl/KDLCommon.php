@@ -195,6 +195,7 @@
 		const OutFileName	= "__outFileName__";
 		const OutDir		= "__outDir__";
 		const ConfigFileName= "__configFileName__";
+		const BinaryName	= "__binaryName__";
 	};
 	
 	class KDLContainerTarget {
