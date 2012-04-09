@@ -14,6 +14,7 @@ class KalturaPDO extends PropelPDO
 	protected static $comment = null;
 	
 	protected $connectionName = null;
+	protected $hostName = null;
 	
 	protected $enableComments = true;
 	
@@ -23,7 +24,21 @@ class KalturaPDO extends PropelPDO
 	public function __construct($dsn, $username = null, $password = null, $driver_options = array())
 	{	
 		if(isset($driver_options[self::KALTURA_ATTR_NAME]))
+		{
 			$this->connectionName = $driver_options[self::KALTURA_ATTR_NAME];
+		}
+		
+		list($mysql, $connection) = explode(':', $dsn);
+		$arguments = explode(';', $connection);
+		foreach($arguments as $argument)
+		{
+			list($argumentName, $argumentValue) = explode('=', $argument);
+			if(strtolower($argumentName) == 'host')
+			{
+				$this->hostName = $argumentValue;
+				break;
+			}
+		}
 			
 		$connStart = microtime(true);
 
@@ -37,6 +52,16 @@ class KalturaPDO extends PropelPDO
 	public function setCommentsEnabled($enabled) 
 	{
 		$this->enableComments = $enabled;
+	}
+
+	public function getConnectionName() 
+	{
+		return $this->connectionName;
+	}
+
+	public function getHostName() 
+	{
+		return $this->hostName;
 	}
 
 	public function getComment() 
