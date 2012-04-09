@@ -30,6 +30,9 @@ class kDataCenterMgr
 		self::$s_current_dc = $current_dc;
 	}
 	
+	/**
+	 * @return int the configured id of current data center
+	 */
 	public static function getCurrentDcId () 
 	{
 		$dc = self::getCurrentDc();
