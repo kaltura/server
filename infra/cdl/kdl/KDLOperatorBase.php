@@ -21,9 +21,15 @@ abstract class KDLOperatorBase {
 		KalturaLog::log("KDLOperatorBase::__construct: id($id), name($name), sourceBlacklist(".print_r($sourceBlacklist,true)."), targetBlacklist(".print_r($targetBlacklist,true).")");
     	$this->_id=$id;
 		$this->_name=$name;
-		$this->_sourceBlacklist = $sourceBlacklist;
-		$this->_targetBlacklist = $targetBlacklist; 	
-    }
+		$this->_sourceBlacklist=$sourceBlacklist;
+		$this->_targetBlacklist=$targetBlacklist;
+ 		if(!isset($sourceBlacklist) && array_key_exists ($id, KDLConstants::$TranscodersSourceBlackList)) {
+			$this->_sourceBlacklist=KDLConstants::$TranscodersSourceBlackList[$id];
+		}
+		if(!isset($targetBlacklist) && array_key_exists ($id, KDLConstants::$TranscodersTargetBlackList)) {
+			$this->_targetBlacklist=KDLConstants::$TranscodersTargetBlackList[$id];
+		}
+   }
 
     /**
      * @param KDLFlavor $target
@@ -94,6 +100,20 @@ abstract class KDLOperatorBase {
 		return null;
 	}
 
+	/* ---------------------------
+	 * fixVP6BitRate
+	 */
+	protected function fixVP6BitRate($maxVidRate, $videoBr)
+	{
+		if($videoBr){
+			$videoBr = round($videoBr*KDLConstants::BitrateVP6Factor);
+			if($videoBr>$maxVidRate){
+				$videoBr=$maxVidRate;
+			}
+		}
+		return $videoBr;
+	}
+	
 	/**
 	 * @return the $_id
 	 */
