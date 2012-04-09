@@ -260,8 +260,9 @@ abstract class BaseAuditTrailConfigPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -311,36 +312,37 @@ abstract class BaseAuditTrailConfigPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = AuditTrailConfigPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = AuditTrailConfigPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'AuditTrailConfigPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			AuditTrailConfigPeer::filterSelectResults($cachedResult);
+			AuditTrailConfigPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			AuditTrailConfigPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = AuditTrailConfigPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = AuditTrailConfigPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = AuditTrailConfigPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		AuditTrailConfigPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		AuditTrailConfigPeer::filterSelectResults($queryResult);
 		AuditTrailConfigPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -395,7 +397,6 @@ abstract class BaseAuditTrailConfigPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

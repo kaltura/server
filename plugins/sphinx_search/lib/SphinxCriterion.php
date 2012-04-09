@@ -321,7 +321,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 		
 		if (count($this->conditionClause))
 		{
-			$attributesClause = implode('', $this->conditionClause);
+			$attributesClause = implode($this->getSelfConjunction(), array_unique($this->conditionClause));
 			if(!strlen(trim($attributesClause)))
 				return true;
 				

@@ -296,8 +296,9 @@ abstract class BaseGenericDistributionProviderPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -347,36 +348,37 @@ abstract class BaseGenericDistributionProviderPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = GenericDistributionProviderPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = GenericDistributionProviderPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'GenericDistributionProviderPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			GenericDistributionProviderPeer::filterSelectResults($cachedResult);
+			GenericDistributionProviderPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			GenericDistributionProviderPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = GenericDistributionProviderPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = GenericDistributionProviderPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = GenericDistributionProviderPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		GenericDistributionProviderPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		GenericDistributionProviderPeer::filterSelectResults($queryResult);
 		GenericDistributionProviderPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -431,7 +433,6 @@ abstract class BaseGenericDistributionProviderPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

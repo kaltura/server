@@ -994,7 +994,6 @@ abstract class BaseEventNotificationTemplate extends BaseObject  implements Pers
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array

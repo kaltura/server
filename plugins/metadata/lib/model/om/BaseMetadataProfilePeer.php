@@ -292,8 +292,9 @@ abstract class BaseMetadataProfilePeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -343,36 +344,37 @@ abstract class BaseMetadataProfilePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = MetadataProfilePeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = MetadataProfilePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'MetadataProfilePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			MetadataProfilePeer::filterSelectResults($cachedResult);
+			MetadataProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			MetadataProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = MetadataProfilePeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = MetadataProfilePeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = MetadataProfilePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		MetadataProfilePeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		MetadataProfilePeer::filterSelectResults($queryResult);
 		MetadataProfilePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -427,7 +429,6 @@ abstract class BaseMetadataProfilePeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

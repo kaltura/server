@@ -38,6 +38,9 @@ class SphinxLogTableMap extends TableMap {
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+		$this->addColumn('EXECUTED_SERVER_ID', 'ExecutedServerId', 'INTEGER', false, null, null);
+		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'INTEGER', false, null, null);
+		$this->addColumn('OBJECT_ID', 'ObjectId', 'INTEGER', false, null, null);
 		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', false, 20, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, 0);
 		$this->addColumn('DC', 'Dc', 'INTEGER', false, null, null);

@@ -288,8 +288,9 @@ abstract class BaseMetadataProfileFieldPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -339,36 +340,37 @@ abstract class BaseMetadataProfileFieldPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = MetadataProfileFieldPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = MetadataProfileFieldPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'MetadataProfileFieldPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			MetadataProfileFieldPeer::filterSelectResults($cachedResult);
+			MetadataProfileFieldPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			MetadataProfileFieldPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = MetadataProfileFieldPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = MetadataProfileFieldPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = MetadataProfileFieldPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		MetadataProfileFieldPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		MetadataProfileFieldPeer::filterSelectResults($queryResult);
 		MetadataProfileFieldPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -423,7 +425,6 @@ abstract class BaseMetadataProfileFieldPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

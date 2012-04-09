@@ -264,8 +264,9 @@ abstract class BaseTagPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -315,36 +316,37 @@ abstract class BaseTagPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = TagPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = TagPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'TagPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			TagPeer::filterSelectResults($cachedResult);
+			TagPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			TagPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = TagPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = TagPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = TagPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		TagPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		TagPeer::filterSelectResults($queryResult);
 		TagPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -399,7 +401,6 @@ abstract class BaseTagPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

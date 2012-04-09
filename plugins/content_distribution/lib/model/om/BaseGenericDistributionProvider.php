@@ -136,6 +136,17 @@ abstract class BaseGenericDistributionProvider extends BaseObject  implements Pe
 	{
 		return $this->oldColumnsValues;
 	}
+	
+	/**
+	 * @return mixed field value or null
+	 */
+	public function getColumnsOldValue($name)
+	{
+		if(isset($this->oldColumnsValues[$name]))
+			return $this->oldColumnsValues[$name];
+			
+		return null;
+	}
 
 	/**
 	 * Get the [id] column value.
@@ -1063,7 +1074,6 @@ abstract class BaseGenericDistributionProvider extends BaseObject  implements Pe
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
@@ -1446,7 +1456,7 @@ abstract class BaseGenericDistributionProvider extends BaseObject  implements Pe
 
 		$criteria->add(GenericDistributionProviderPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(GenericDistributionProviderPeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(GenericDistributionProviderPeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)

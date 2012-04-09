@@ -288,8 +288,9 @@ abstract class BaseEventNotificationTemplatePeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -339,36 +340,37 @@ abstract class BaseEventNotificationTemplatePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = EventNotificationTemplatePeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = EventNotificationTemplatePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'EventNotificationTemplatePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			EventNotificationTemplatePeer::filterSelectResults($cachedResult);
+			EventNotificationTemplatePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			EventNotificationTemplatePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = EventNotificationTemplatePeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = EventNotificationTemplatePeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = EventNotificationTemplatePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		EventNotificationTemplatePeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		EventNotificationTemplatePeer::filterSelectResults($queryResult);
 		EventNotificationTemplatePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -423,7 +425,6 @@ abstract class BaseEventNotificationTemplatePeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

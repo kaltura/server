@@ -13,6 +13,9 @@ DROP TABLE IF EXISTS `sphinx_log`;
 CREATE TABLE `sphinx_log`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`executed_server_id` INTEGER,
+	`object_type` INTEGER,
+	`object_id` INTEGER,
 	`entry_id` VARCHAR(20),
 	`partner_id` INTEGER default 0,
 	`dc` INTEGER,

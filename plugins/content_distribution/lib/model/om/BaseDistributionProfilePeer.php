@@ -320,8 +320,9 @@ abstract class BaseDistributionProfilePeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -371,36 +372,37 @@ abstract class BaseDistributionProfilePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = DistributionProfilePeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = DistributionProfilePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'DistributionProfilePeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			DistributionProfilePeer::filterSelectResults($cachedResult);
+			DistributionProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			DistributionProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = DistributionProfilePeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = DistributionProfilePeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = DistributionProfilePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		DistributionProfilePeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		DistributionProfilePeer::filterSelectResults($queryResult);
 		DistributionProfilePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -455,7 +457,6 @@ abstract class BaseDistributionProfilePeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

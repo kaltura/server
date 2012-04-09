@@ -148,6 +148,17 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 	{
 		return $this->oldColumnsValues;
 	}
+	
+	/**
+	 * @return mixed field value or null
+	 */
+	public function getColumnsOldValue($name)
+	{
+		if(isset($this->oldColumnsValues[$name]))
+			return $this->oldColumnsValues[$name];
+			
+		return null;
+	}
 
 	/**
 	 * Get the [id] column value.
@@ -1143,7 +1154,6 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
@@ -1544,7 +1554,7 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 
 		$criteria->add(GenericDistributionProviderActionPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(GenericDistributionProviderActionPeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(GenericDistributionProviderActionPeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)

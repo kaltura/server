@@ -26,13 +26,22 @@ abstract class BaseSphinxLogPeer {
 	const TM_CLASS = 'SphinxLogTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 6;
+	const NUM_COLUMNS = 9;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
 	const ID = 'sphinx_log.ID';
+
+	/** the column name for the EXECUTED_SERVER_ID field */
+	const EXECUTED_SERVER_ID = 'sphinx_log.EXECUTED_SERVER_ID';
+
+	/** the column name for the OBJECT_TYPE field */
+	const OBJECT_TYPE = 'sphinx_log.OBJECT_TYPE';
+
+	/** the column name for the OBJECT_ID field */
+	const OBJECT_ID = 'sphinx_log.OBJECT_ID';
 
 	/** the column name for the ENTRY_ID field */
 	const ENTRY_ID = 'sphinx_log.ENTRY_ID';
@@ -65,11 +74,11 @@ abstract class BaseSphinxLogPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'EntryId', 'PartnerId', 'Dc', 'Sql', 'CreatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'entryId', 'partnerId', 'dc', 'sql', 'createdAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::ENTRY_ID, self::PARTNER_ID, self::DC, self::SQL, self::CREATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'entry_id', 'partner_id', 'dc', 'sql', 'created_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'ExecutedServerId', 'ObjectType', 'ObjectId', 'EntryId', 'PartnerId', 'Dc', 'Sql', 'CreatedAt', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'executedServerId', 'objectType', 'objectId', 'entryId', 'partnerId', 'dc', 'sql', 'createdAt', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::EXECUTED_SERVER_ID, self::OBJECT_TYPE, self::OBJECT_ID, self::ENTRY_ID, self::PARTNER_ID, self::DC, self::SQL, self::CREATED_AT, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'executed_server_id', 'object_type', 'object_id', 'entry_id', 'partner_id', 'dc', 'sql', 'created_at', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -79,11 +88,11 @@ abstract class BaseSphinxLogPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'EntryId' => 1, 'PartnerId' => 2, 'Dc' => 3, 'Sql' => 4, 'CreatedAt' => 5, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'entryId' => 1, 'partnerId' => 2, 'dc' => 3, 'sql' => 4, 'createdAt' => 5, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::ENTRY_ID => 1, self::PARTNER_ID => 2, self::DC => 3, self::SQL => 4, self::CREATED_AT => 5, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'entry_id' => 1, 'partner_id' => 2, 'dc' => 3, 'sql' => 4, 'created_at' => 5, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ExecutedServerId' => 1, 'ObjectType' => 2, 'ObjectId' => 3, 'EntryId' => 4, 'PartnerId' => 5, 'Dc' => 6, 'Sql' => 7, 'CreatedAt' => 8, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'executedServerId' => 1, 'objectType' => 2, 'objectId' => 3, 'entryId' => 4, 'partnerId' => 5, 'dc' => 6, 'sql' => 7, 'createdAt' => 8, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::EXECUTED_SERVER_ID => 1, self::OBJECT_TYPE => 2, self::OBJECT_ID => 3, self::ENTRY_ID => 4, self::PARTNER_ID => 5, self::DC => 6, self::SQL => 7, self::CREATED_AT => 8, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'executed_server_id' => 1, 'object_type' => 2, 'object_id' => 3, 'entry_id' => 4, 'partner_id' => 5, 'dc' => 6, 'sql' => 7, 'created_at' => 8, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -154,6 +163,9 @@ abstract class BaseSphinxLogPeer {
 	public static function addSelectColumns(Criteria $criteria)
 	{
 		$criteria->addSelectColumn(SphinxLogPeer::ID);
+		$criteria->addSelectColumn(SphinxLogPeer::EXECUTED_SERVER_ID);
+		$criteria->addSelectColumn(SphinxLogPeer::OBJECT_TYPE);
+		$criteria->addSelectColumn(SphinxLogPeer::OBJECT_ID);
 		$criteria->addSelectColumn(SphinxLogPeer::ENTRY_ID);
 		$criteria->addSelectColumn(SphinxLogPeer::PARTNER_ID);
 		$criteria->addSelectColumn(SphinxLogPeer::DC);
@@ -264,8 +276,9 @@ abstract class BaseSphinxLogPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -315,36 +328,37 @@ abstract class BaseSphinxLogPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = SphinxLogPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = SphinxLogPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'SphinxLogPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			SphinxLogPeer::filterSelectResults($cachedResult);
+			SphinxLogPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			SphinxLogPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = SphinxLogPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = SphinxLogPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = SphinxLogPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		SphinxLogPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		SphinxLogPeer::filterSelectResults($queryResult);
 		SphinxLogPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -399,7 +413,6 @@ abstract class BaseSphinxLogPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

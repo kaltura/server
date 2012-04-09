@@ -280,8 +280,9 @@ abstract class BaseAuditTrailDataPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -331,36 +332,37 @@ abstract class BaseAuditTrailDataPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = AuditTrailDataPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = AuditTrailDataPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'AuditTrailDataPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			AuditTrailDataPeer::filterSelectResults($cachedResult);
+			AuditTrailDataPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			AuditTrailDataPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = AuditTrailDataPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = AuditTrailDataPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = AuditTrailDataPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		AuditTrailDataPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		AuditTrailDataPeer::filterSelectResults($queryResult);
 		AuditTrailDataPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -415,7 +417,6 @@ abstract class BaseAuditTrailDataPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

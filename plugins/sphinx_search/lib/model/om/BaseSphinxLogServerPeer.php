@@ -264,8 +264,9 @@ abstract class BaseSphinxLogServerPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -315,36 +316,37 @@ abstract class BaseSphinxLogServerPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = SphinxLogServerPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = SphinxLogServerPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'SphinxLogServerPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			SphinxLogServerPeer::filterSelectResults($cachedResult);
+			SphinxLogServerPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			SphinxLogServerPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = SphinxLogServerPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = SphinxLogServerPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = SphinxLogServerPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		SphinxLogServerPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		SphinxLogServerPeer::filterSelectResults($queryResult);
 		SphinxLogServerPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -399,7 +401,6 @@ abstract class BaseSphinxLogServerPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

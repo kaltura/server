@@ -328,8 +328,9 @@ abstract class BaseEntryDistributionPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -379,36 +380,37 @@ abstract class BaseEntryDistributionPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = EntryDistributionPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = EntryDistributionPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'EntryDistributionPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			EntryDistributionPeer::filterSelectResults($cachedResult);
+			EntryDistributionPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			EntryDistributionPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = EntryDistributionPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = EntryDistributionPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = EntryDistributionPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		EntryDistributionPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		EntryDistributionPeer::filterSelectResults($queryResult);
 		EntryDistributionPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -463,7 +465,6 @@ abstract class BaseEntryDistributionPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

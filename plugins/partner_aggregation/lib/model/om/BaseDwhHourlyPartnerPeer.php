@@ -484,8 +484,9 @@ abstract class BaseDwhHourlyPartnerPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -535,36 +536,37 @@ abstract class BaseDwhHourlyPartnerPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = DwhHourlyPartnerPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = DwhHourlyPartnerPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'DwhHourlyPartnerPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			DwhHourlyPartnerPeer::filterSelectResults($cachedResult);
+			DwhHourlyPartnerPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			DwhHourlyPartnerPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = DwhHourlyPartnerPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = DwhHourlyPartnerPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = DwhHourlyPartnerPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		DwhHourlyPartnerPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		DwhHourlyPartnerPeer::filterSelectResults($queryResult);
 		DwhHourlyPartnerPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -619,7 +621,6 @@ abstract class BaseDwhHourlyPartnerPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter
