@@ -21,7 +21,7 @@ class CategoryEntryService extends KalturaBaseService
 	 * @param KalturaCategoryEntry $categoryEntry
 	 * @return KalturaCategoryEntry
 	 */
-	function addAction($categoryEntry)
+	function addAction(KalturaCategoryEntry $categoryEntry)
 	{
 		$categoryEntry->validateForInsert();
 		
@@ -34,15 +34,25 @@ class CategoryEntryService extends KalturaBaseService
 			throw new APIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryEntry->categoryId);
 			
 		//validate user is entiteld to assign entry to this category 
-		if ($category->getContributionPolicy() != ContributionPolicyType::ALL)
+		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)
 		{
 			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::$ks_kuser_id);
 			if(!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
-				throw new ApiException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+				throw new APIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
 		}
 		
-		$entry->setCategories($entry->getCategories() . ',' . $category->getFullName());
-		$entry->save();
+		if ($category->getPrivacyContext() == kEntitlementUtils::DEFAULT_CONTEXT)
+		{
+			$entry->setCategories($entry->getCategories() . ',' . $category->getFullName());
+			$entry->save();	
+		}
+		else
+		{
+			$dbCategoryEntry = new categoryEntry();
+			$categoryEntry->toInsertableObject($dbCategoryEntry);
+			$dbCategoryEntry->setPartnerId(kCurrentContext::$ks_partner_id);
+			$dbCategoryEntry->save();
+		}
 
 		return $categoryEntry;
 	}
@@ -73,29 +83,42 @@ class CategoryEntryService extends KalturaBaseService
 		
 		//validate user is entiteld to assign entry to this category 
 		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::$ks_kuser_id);
-		if(!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
+		if(kEntitlementUtils::getEntitlementEnforcement() && (!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
 			throw new ApiException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
 			
-		$categories = $entry->getCategories();
-		
-		$categoriesArr = explode(entry::ENTRY_CATEGORY_SEPARATOR, $categories);
-
-		$keyToRemove = false;
-		foreach ($categoriesArr as $key => $categoryOnEntey)
+			
+		if ($category->getPrivacyContext() == kEntitlementUtils::DEFAULT_CONTEXT)
 		{
-			if($categoryOnEntey == $category->getFullName())
+			$categories = $entry->getCategories();
+		
+			$categoriesArr = explode(entry::ENTRY_CATEGORY_SEPARATOR, $categories);
+	
+			$keyToRemove = false;
+			foreach ($categoriesArr as $key => $categoryOnEntey)
 			{
-				$keyToRemove = true;
-				break;
+				if($categoryOnEntey == $category->getFullName())
+				{
+					$keyToRemove = true;
+					break;
+				}
 			}
+			
+			if($keyToRemove)
+				unset($categoriesArr[$key]);
+			
+			$entry->setCategories(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categoriesArr));
+			$entry->save();
+				
+		}
+		else
+		{
+			$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryEntry->categoryId, $categoryEntry->entryId);
+			if(!$dbCategoryEntry)
+				throw new APIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
+			
+			$dbCategoryEntry->delete();
 		}
 		
-		if($keyToRemove)
-			unset($categoriesArr[$key]);
-		
-		$entry->setCategories(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categoriesArr));
-		$entry->save();
-
 		return $categoryEntry;
 	}
 	
@@ -111,9 +134,13 @@ class CategoryEntryService extends KalturaBaseService
 			$filter = new KalturaCategoryEntryFilter();
 			
 		if ($pager == null)
-		{
 			$pager = new KalturaFilterPager();
-		}
+		
+		if ($filter->entryIdEqual == null && 
+			$filter->entryIdIn == null &&
+			$filter->categoryIdEqual == null &&
+			$filter->categoryIdIn == null)
+			throw new APIException(KalturaErrors::MUST_FILTER_ENTRY_OR_CATEGORY);
 			
 		$categoryEntryFilter = new categoryEntryFilter();
 		$filter->toObject($categoryEntryFilter);
