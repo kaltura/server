@@ -34,6 +34,9 @@ require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.D
 
 define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
 require_once(ROOT_DIR . '/infra/bootstrap_base.php');
+
+define("KALTURA_API_V3", true); // used for different logic in alpha libs
+
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "api_v3", "*"));
