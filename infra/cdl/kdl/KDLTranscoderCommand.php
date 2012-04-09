@@ -18,7 +18,7 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 
 	public function GenerateCommandLine(KDLFlavor $predesign, KDLFlavor $target, $extra=null)
 	{
-		$cmdLineGenerator = $target->SetTranscoderCmdLineGenerator();
+		$cmdLineGenerator = $target->SetTranscoderCmdLineGenerator($predesign);
 
 // The setting below seems to be redundant, since in the prev line the same vidBr is being set
 //		if($target->_video)
@@ -34,15 +34,35 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 	 */
 	public function CheckConstraints(KDLMediaDataSet $source, KDLFlavor $target, array &$errors=null, array &$warnings=null)
 	{
-//		if(array_key_exists($this->_id, KDLConstants::$TranscodersSourceBlackList)) {
-//			$this->_sourceBlacklist = KDLConstants::$TranscodersSourceBlackList[$this->_id];
-//		}
-//		if(array_key_exists($this->_id, KDLConstants::$TranscodersTargetBlackList)) {
-//			$this->_targetBlacklist = KDLConstants::$TranscodersTargetBlackList[$this->_id];
-//		}
 		if(parent::CheckConstraints($source, $target, $errors, $warnings)==true)
 			return true;
+
+		if($this->_id==KDLTranscoders::FFMPEG_AUX) {
+			$transcoder = new KDLOperatorFfmpeg0_10($this->_id);
+			if($transcoder->CheckConstraints($source, $target, $errors, $warnings)==true)
+				return true;
+		}
 			
+		if($this->_id==KDLTranscoders::FFMPEG) {
+			$transcoder = new KDLOperatorFfmpeg($this->_id);
+			if($transcoder->CheckConstraints($source, $target, $errors, $warnings)==true)
+				return true;
+		}
+	
+		
+		if($this->_id==KDLTranscoders::MENCODER) {
+			$transcoder = new KDLOperatorMencoder($this->_id);
+			if($transcoder->CheckConstraints($source, $target, $errors, $warnings)==true)
+				return true;
+		}
+	
+		
+		if($this->_id==KDLTranscoders::ON2) {
+			$transcoder = new KDLOperatorOn2($this->_id);
+			if($transcoder->CheckConstraints($source, $target, $errors, $warnings)==true)
+				return true;
+		}
+	
 		/*
 		 * Remove encoding.com for DAR<>PAR
 		 */
@@ -57,43 +77,43 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 		/*
 		 * Remove mencoder, encoding.com and cli_encode
 		 * for audio only flavors
-		 */
+		 
 		if(($this->_id==KDLTranscoders::MENCODER || $this->_id==KDLTranscoders::ENCODING_COM || $this->_id==KDLTranscoders::ON2)
 		&& $target->_video==null) {
 			$warnings[KDLConstants::AudioIndex][] = //"The transcoder (".$key.") does not handle properly DAR<>PAR.";
 				KDLWarnings::ToString(KDLWarnings::TranscoderLimitation, $this->_id);
 			return true;
-		}
+		}*/
 
 		/*
 		 * Remove encoding.com and ffmpegs
 		 * for rotated videos
-		 */
-		if(($this->_id==KDLTranscoders::ENCODING_COM || $this->_id==KDLTranscoders::FFMPEG || $this->_id==KDLTranscoders::FFMPEG_AUX)
+		 
+		if(($this->_id==KDLTranscoders::ENCODING_COM || $this->_id==KDLTranscoders::FFMPEG)
 		&& $target->_video && $target->_video->_rotation) {
 			$warnings[KDLConstants::VideoIndex][] = //"The transcoder (".$key.") does not handle properly DAR<>PAR.";
 				KDLWarnings::ToString(KDLWarnings::TranscoderLimitation, $this->_id);
 			return true;
-		}
+		}*/
 		
 		/*
 		 * Remove On2
 		 * for 270 rotated videos
-		 */
+		 
 		if($this->_id==KDLTranscoders::ON2
 		&& $target->_video && $target->_video->_rotation==270) {
 			$warnings[KDLConstants::VideoIndex][] = //"The transcoder (".$key.") does not handle properly DAR<>PAR.";
 				KDLWarnings::ToString(KDLWarnings::TranscoderLimitation, $this->_id);
 			return true;
-		}
+		}*/
 		
 		/*
 		 * Non Mac transcoders should not mess up with QT/WMV/WMA
 		 * 
-		 */
+		 
 		$qt_wmv_list = array("wmv1","wmv2","wmv3","wvc1","wmva","wma1","wma2","wmapro");
 		if((# $this->_id==KDLTranscoders::ENCODING_COM || $this->_id==KDLTranscoders::MENCODER || $this->_id==KDLTranscoders::ON2 || 
-			$this->_id==KDLTranscoders::FFMPEG || $this->_id==KDLTranscoders::FFMPEG_AUX)
+			$this->_id==KDLTranscoders::FFMPEG)
 		&& $source->_container && ($source->_container->_id=="qt" || $source->_container->_format=="qt")
 		&& (
 			($source->_video && (in_array($source->_video->_format,$qt_wmv_list)||in_array($source->_video->_id,$qt_wmv_list)))
@@ -103,7 +123,7 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 			$warnings[KDLConstants::VideoIndex][] = //"The transcoder (".$key.") can not process the (".$sourcePart->_id."/".$sourcePart->_format. ").";
 				KDLWarnings::ToString(KDLWarnings::TranscoderFormat, $this->_id, "qt/wmv/wma");
 			return true;
-		}
+		}*/
 		
 		return false;	
 	}
@@ -115,6 +135,7 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 	 */
 class KDLTranscoderCommand {
 	
+			private $_design;
 			private $_target;
 			
 			private $_vidId;
@@ -134,15 +155,12 @@ class KDLTranscoderCommand {
 			
 			private $_conId;
 			
-			private $_inFileName=KDLCmdlinePlaceholders::InFileName;
-			private $_outFileName=KDLCmdlinePlaceholders::OutFileName;
 			private $_clipStart=null;
 			private $_clipDur=null;
 			
-	public function KDLTranscoderCommand($inFileName=KDLCmdlinePlaceholders::InFileName, $outFileName=KDLCmdlinePlaceholders::OutFileName, KDLFlavor $target)
+	public function KDLTranscoderCommand(KDLFlavor $design, KDLFlavor $target)
 	{
-		$this->_inFileName=$inFileName;
-		$this->_outFileName=$outFileName;
+		$this->_design = $design;
 		$this->_target = $target;
 		$this->setParameters($target);
 	}
@@ -199,11 +217,9 @@ class KDLTranscoderCommand {
 				$cmd=$this->CLI_Encode($transParams->_extra);;
 				break;
 			case KDLTranscoders::FFMPEG:
-				$this->fixVP6BitRate($maxVidRate);
 				$cmd=$this->FFMpeg($transParams->_extra);
 				break;
 			case KDLTranscoders::MENCODER:
-				$this->fixVP6BitRate($maxVidRate);
 				$cmd=$this->Mencoder($transParams->_extra);
 				break;
 			case KDLTranscoders::ENCODING_COM:
@@ -211,7 +227,6 @@ class KDLTranscoderCommand {
 				break;
 			case KDLTranscoders::FFMPEG_AUX:
 			case KDLTranscoders::FFMPEG_VP8:
-				$this->fixVP6BitRate($maxVidRate);
 				$cmd=$this->FFMpeg_aux($transParams->_extra);
 				break;
 			case KDLTranscoders::EE3:
@@ -226,183 +241,8 @@ class KDLTranscoderCommand {
 	 */
 	public function FFMpeg($extra=null)
 	{
-	$cmdStr = null;
-// rem ffmpeg -i <infilename> -vcodec flv   -r 25 -b 500k  -ar 22050 -ac 2 -acodec libmp3lame -f flv -t 60 -y <outfilename>
-$vcodecParams = "fl";
-$format = "fl";
-$acodec = "libmp3lam";
-
-		if($this->_clipStart!==null && $this->_clipStart>0){
-			$cmdStr = $cmdStr." -ss ".$this->_clipStart/1000;
-		}
-		
-		if($this->_clipDur!==null && $this->_clipDur>0){
-			$cmdStr = $cmdStr." -t ".$this->_clipDur/1000;
-		}
-		
-		if($this->_inFileName){
-			$cmdStr .= " -i ".$this->_inFileName;
-		}
-		if($this->_vidId!="none"){
-			switch($this->_vidId){
-				case KDLVideoTarget::FLV:
-				case KDLVideoTarget::H263:
-				case KDLVideoTarget::VP6:
-					$vcodecParams = "flv";
-					break; 
-				case KDLVideoTarget::H264:
-				case KDLVideoTarget::H264B:
-				case KDLVideoTarget::H264M:
-				case KDLVideoTarget::H264H:
-					$vcodecParams = $this->generateH264params(KDLTranscoders::FFMPEG);
-					break; 				
-				case KDLVideoTarget::MPEG4:
-					$vcodecParams = "mpeg4";
-					break;
-				case KDLVideoTarget::THEORA:
-					$vcodecParams = "libtheora";
-					break;
-				case KDLVideoTarget::WMV2:
-				case KDLVideoTarget::WMV3:
-				case KDLVideoTarget::WVC1A:
-					$vcodecParams = "wmv2";
-					break;
-				case KDLVideoTarget::VP8:
-					$vcodecParams = "libvpx";
-					break; 
-				case KDLVideoTarget::MPEG2:
-					$vcodecParams = "mpeg2video";
-					break;
-				case KDLVideoTarget::COPY:
-					$vcodecParams = "copy";
-					break; 
-			}
-$vidObj = $this->_target->_video;
-			$cmdStr = $cmdStr." -vcodec ".$vcodecParams;
-			if($this->_vidBr){
-				$cmdStr = $cmdStr." -b ".$this->_vidBr."k";
-			}
-$bt=0;
-			if(isset($vidObj->_cbr) && $vidObj->_cbr>0) {
-				$bt = round($this->_vidBr/10);
-				$cmdStr.= " -minrate ".$this->_vidBr."k";
-				$cmdStr.= " -maxrate ".$this->_vidBr."k";
-				$cmdStr.= " -bufsize ".round($this->_vidBr/5)."k";
-			}
-			if(isset($vidObj->_bt) && $vidObj->_bt>0) {
-				$cmdStr.= " -bt ".$vidObj->_bt."k";
-			}
-			else if($bt>0){
-				$cmdStr.= " -bt $bt"."k";
-			}
-			if($this->_vidWid!=null && $this->_vidHgt!=null){
-				$cmdStr = $cmdStr." -s ".$this->_vidWid."x".$this->_vidHgt;
-			}
-			if(isset($vidObj->_dar) && $vidObj->_dar>0) {
-				$cmdStr.= " -aspect ".round($vidObj->_dar,4);
-			}
-			if($this->_vidFr!==null && $this->_vidFr>0){
-				$cmdStr = $cmdStr." -r ".$this->_vidFr;
-			}
-			if($this->_vidGop!==null && $this->_vidGop>0){
-				$cmdStr = $cmdStr." -g ".$this->_vidGop;
-			}
-			if($this->_vidScanType!==null && $this->_vidScanType>0){ // ScanType 0:progressive, 1:interlaced
-				$cmdStr = $cmdStr." -deinterlace";
-			}
-		}
-		else {
-			$cmdStr = $cmdStr." -vn";
-		}
-		
-		if($this->_audId!="none") {
-			switch($this->_audId){
-				case KDLAudioTarget::MP3:
-					$acodec = "libmp3lame";
-					break;
-				case KDLAudioTarget::AAC:
-					$acodec = "libfaac";
-					break;
-				case KDLAudioTarget::VORBIS:
-					$acodec = "libvorbis";
-					break;
-				case KDLAudioTarget::WMA:
-					$acodec = "wmav2";
-					break;
-				case KDLAudioTarget::AMRNB:
-					// common settings - -ab 12.2k -ar 8000 -ac 1
-					$acodec = "libopencore_amrnb";
-					break;
-				case KDLAudioTarget::MPEG2:
-					$acodec = "mp2";
-					break;
-				case KDLAudioTarget::COPY:
-					$acodec = "copy";
-					break;
-			}
-			$cmdStr = $cmdStr." -acodec ".$acodec;
-			if($this->_audBr!==null && $this->_audBr>0){
-				$cmdStr = $cmdStr." -ab ".$this->_audBr."k";
-			}
-			if($this->_audSr!==null && $this->_audSr>0){
-				$cmdStr = $cmdStr." -ar ".$this->_audSr;
-			}
-			if($this->_audCh!==null && $this->_audCh>0){
-				$cmdStr = $cmdStr." -ac ".$this->_audCh;
-			}
-		}
-		else {
-			$cmdStr = $cmdStr." -an";
-		}
-		
-		if($this->_conId!="none") {
-			switch($this->_conId){
-				case KDLContainerTarget::FLV:
-					$format = "flv";
-					break;
-				case KDLContainerTarget::AVI:
-				case KDLContainerTarget::MP4:
-				case KDLContainerTarget::_3GP:
-				case KDLContainerTarget::MOV:
-				case KDLContainerTarget::MP3:
-				case KDLContainerTarget::OGG:
-					$format = $this->_conId;
-					break;
-				case KDLContainerTarget::WMV:
-					$format = "asf";
-					break;
-				case KDLContainerTarget::MKV:
-					$format = "matroska";
-					break;
-				case KDLContainerTarget::WEBM:
-					$format = "webm";
-					break;
-				case KDLContainerTarget::MPEGTS:
-				case KDLContainerTarget::APPLEHTTP:
-					$format = "mpegts";
-					break;
-				case KDLContainerTarget::MPEG:
-					$format = "mpeg";
-					break;
-			}
-			$cmdStr = $cmdStr." -f ".$format;
-		}
-		
-		/*
-		 * Following 'dummy' seek-to setting is done to ensure preciseness
-		 * of the main seek command that is done at the beginning o fthe command line
-		 */
-		if($this->_clipStart!==null && $this->_clipStart>0){
-			$cmdStr = $cmdStr." -ss 0.01";
-		}
-		
-		if($extra)
-			$cmdStr = $cmdStr." ".$extra;
-		
-		if($this->_outFileName)
-			$cmdStr = $cmdStr." -y ".$this->_outFileName;
-
-		return $cmdStr;
+		$transcoder = new KDLOperatorFfmpeg0_10(KDLTranscoders::FFMPEG); 
+		return $transcoder->GenerateCommandLine($this->_design,  $this->_target,$extra);
 	}
 
 	/* ---------------------------
@@ -410,141 +250,8 @@ $bt=0;
 	 */
 	public function Mencoder($extra=null)
 	{
-	$cmdStr = null;
-// mencoder <_INPUT_FILE_> -of lavf -ofps <_TRG_FR_> -oac mp3lame -srate <_TRG_ASAMPLE_RATE_> -ovc lavc -lavcopts vcodec=flv:vbitrate=<_TRG_BR_>:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=100 –vf harddup -o <_TARGET_FILE_>
-// mencoder 5.flv          -of lavf -lavfopts format=avi -ovc lavc -ofps 30 -lavcopts vcodec=x264:vbitrate=806:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=640:352 -oac faac -faacopts mpeg=4:object=2:br=96 -srate 44100 -endpos 2 -o aaa1.flv
-// mencoder $1             -of lavf -lavfopts format=avi -ovc x264 -ofps 25 -x264encopts bitrate=500:subq=5:8x8dct:frameref=2:bframes=3:b_pyramid:weight_b:threads=auto -vf scale=1280:720,harddup -nosound -endpos 4 -o $outputFile
-//BASELINE mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -o ~/Media/aaa.mp4 -of lavf -lavfopts format=mp4 -ofps 25 -ovc x264 -sws 9 -x264encopts bitrate=300:subq=5:frameref=6:bframes=0:threads=auto:keyint=60:nocabac:level_idc=30:global_header:partitions=all:trellis=1:chroma_me:me=umh -vf scale=304:176 -oac faac -faacopts mpeg=4:object=2:br=96 ; mediainfo ~/Media/aaa.mp4
-//MAINLINE mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -o ~/Media/aaa.mp4 -of lavf -lavfopts format=mp4 -ofps 25 -ovc x264 -sws 9 -x264encopts bitrate=300:subq=5:frameref=6:bframes=3:threads=auto:keyint=60:level_idc=30:partitions=all:trellis=1:chroma_me:me=umh -vf scale=304:176 -oac faac -faacopts mpeg=4:object=2:br=96 ; mediainfo ~/Media/aaa.mp4
-//HIGH     mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -o ~/Media/aaa.mp4 -of lavf -lavfopts format=mp4 -ofps 25 -ovc x264 -sws 9 -x264encopts bitrate=300:subq=7:frameref=6:bframes=3:b_pyramid=1:weight_b=1:threads=auto:keyint=60:level_idc=30:8x8dct:trellis=1:chroma_me:me=umh -vf scale=304:176 -oac faac -faacopts mpeg=4:object=2:br=96 ; mediainfo ~/Media/aaa.mp4
-	
-$vcodec = "fl";
-$format = "fl";
-
-		if($this->_inFileName)
-			$cmdStr = $cmdStr." ".$this->_inFileName;
-		
-		if($this->_conId!="none") {
-			switch($this->_conId){
-				case KDLContainerTarget::WMV:
-					$format = "asf";
-					break;
-				default:
-					$format = $this->_conId;
-					break;
-			}
-			
-			// This will not work for mp4 - TO FIX
-			$cmdStr = $cmdStr." -of lavf -lavfopts format=".$format;
-		}
-		
-		if($this->_vidId!="none"){
-			if($this->_vidFr)
-				$cmdStr = $cmdStr." -ofps ".$this->_vidFr;
-			
-			switch($this->_vidId){
-				case KDLVideoTarget::FLV:
-				case KDLVideoTarget::H263:
-				case KDLVideoTarget::VP6:
-					$cmdStr = $cmdStr." -ovc lavc";
-					$cmdStr = $cmdStr." -lavcopts vcodec=flv";
-					if($this->_vidBr) {
-						$cmdStr = $cmdStr.":vbitrate=".$this->_vidBr;
-					}
-					$cmdStr = $cmdStr.":mbd=2:mv0:trell:v4mv:cbp:last_pred=3";
-//					$cmdStr = $cmdStr.":mbd=2:mv0:trell:v4mv:cbp";
-					break;
-				case KDLVideoTarget::H264:
-				case KDLVideoTarget::H264B:
-				case KDLVideoTarget::H264M:
-				case KDLVideoTarget::H264H:
-					$cmdStr .= $this->generateH264params(KDLTranscoders::MENCODER);
-					break; 				
-				case KDLVideoTarget::MPEG4:
-					$cmdStr = $cmdStr." -ovc lavc";
-					$cmdStr = $cmdStr." -lavcopts vcodec=mpeg4";
-					if($this->_vidBr) {
-						$cmdStr = $cmdStr.":vbitrate=".$this->_vidBr;
-					}
-					break;
-				case KDLVideoTarget::WMV2:
-				case KDLVideoTarget::WMV3:
-				case KDLVideoTarget::WVC1A:
-					$cmdStr = $cmdStr." -ovc lavc";
-					$cmdStr = $cmdStr." -lavcopts vcodec=wmv2";
-					if($this->_vidBr) {
-						$cmdStr = $cmdStr.":vbitrate=".$this->_vidBr;
-					}
-					break;
-			}
-
-			if($this->_vidGop!==null && $this->_vidGop>0)
-				$cmdStr = $cmdStr.":keyint=".$this->_vidGop;
-			$cmdStr = $cmdStr." -vf harddup";
-			if($this->_vidWid && $this->_vidHgt)
-				$cmdStr = $cmdStr.",scale=".$this->_vidWid.":".$this->_vidHgt;
-			if($this->_vidScanType!==null && $this->_vidScanType>0) // ScanType 0:progressive, 1:interlaced
-				$cmdStr = $cmdStr.",yadif=3,mcdeint,framestep=2";
-			if(isset($this->_vidRotation)) {
-				if($this->_vidRotation==180)
-					$cmdStr = $cmdStr.",flip";
-				else if($this->_vidRotation==90 || $this->_vidRotation==-90)
-					$cmdStr = $cmdStr.",rotate=1";
-				else if($this->_vidRotation==270)
-					$cmdStr = $cmdStr.",rotate=3";
-			}
-		}
-		else {
-			$cmdStr = $cmdStr." -novideo";
-		}
-
-// mencoder <_INPUT_FILE_> -of lavf -ofps <_TRG_FR_> -ovc lavc -lavcopts vcodec=flv:vbitrate=<_TRG_BR_>:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=100 –vf harddup 
-//-oac mp3lame -srate <_TRG_ASAMPLE_RATE_> -o <_TARGET_FILE_>
-
-		if($this->_audId!="none") {
-			if($this->_audId==KDLAudioTarget::MP3){
-				$cmdStr = $cmdStr." -oac mp3lame -lameopts abr";
-				if($this->_audBr)
-					$cmdStr = $cmdStr.":br=".$this->_audBr;
-//				if($aud->_channels)
-//					$cmdStr = $cmdStr." -ac ".$aud->_channels;
-			}
-///web/kaltura/bin/x64/mencoder -endpos 2 $1 -of lavf -lavfopts format=avi -ovc x264 -ofps 25 -x264encopts bitrate=500 -vf scale=1280:720,harddup -oac faac -srate 48000 -channels 5 -faacopts mpeg=4:object=2:br=32 -o $outputFile
-			else if($this->_audId==KDLAudioTarget::AAC){
-				$cmdStr = $cmdStr." -oac faac -faacopts mpeg=4:object=2:tns:raw";
-				if($this->_audBr)
-					$cmdStr = $cmdStr.":br=".$this->_audBr;
-			}
-			else if($this->_audId==KDLAudioTarget::WMA){
-				$cmdStr = $cmdStr." -oac lavc -lavcopts acodec=wmav2";
-				if($this->_audBr)
-					$cmdStr = $cmdStr.":abitrate=".$this->_audBr;
-			}
-
-			if($this->_audSr)
-				$cmdStr = $cmdStr." -srate ".$this->_audSr;
-		}
-		else {
-			$cmdStr = $cmdStr." -nosound";
-		}
-		
-		$clipStart=0;
-		if($this->_clipStart!==null && $this->_clipStart>0){
-			$clipStart = $this->_clipStart;
-			$cmdStr = $cmdStr." -ss ".$clipStart/1000;
-		}
-		
-		if($this->_clipDur!==null && $this->_clipDur>0){
-			$cmdStr = $cmdStr." -endpos ".($clipStart+$this->_clipDur)/1000;
-		}
-		
-		if($extra)
-			$cmdStr = $cmdStr." ".$extra;
-		
-		if($this->_outFileName)
-			$cmdStr = $cmdStr." -o ".$this->_outFileName;
-
-		return $cmdStr;
+		$transcoder = new KDLOperatorMencoder(KDLTranscoders::MENCODER); 
+		return $transcoder->GenerateCommandLine($this->_design,  $this->_target,$extra);
 	}
 
 	/* ---------------------------
@@ -552,90 +259,8 @@ $format = "fl";
 	 */
 	public function CLI_Encode($extra=null)
 	{
-	$cmdStr = null;
-//cli_encode -i $1 -r 25 -b 1200 -k 100 --FE2_VP6_CXMODE=1 --FE2_VP6_RC_MODE=3 --FE2_CUT_STOP_SEC=5 -o $outputFile 
-
-		if($this->_inFileName)
-			$cmdStr = $cmdStr."-i ".$this->_inFileName;
-		
-		if($this->_conId!="none") {
-			//$format = $con->_id;
-			// This will not work for mp4 - TO FIX
-			//$cmdStr = $cmdStr." -of lavf -lavfopts format=".$format;
-		}
-
-		if($this->_vidId!="none"){
-			switch($this->_vidId){
-				case KDLVideoTarget::H264:
-				case KDLVideoTarget::H264B:
-				case KDLVideoTarget::H264M:
-				case KDLVideoTarget::H264H:
-					$cmdStr .= $this->generateH264params(KDLTranscoders::ON2);
-					break; 				
-/*
-				case KDLVideoTarget::H264:
-					$cmdStr = $cmdStr." -c H264";;
-					break;
-				case KDLVideoTarget::H264B:
-					$cmdStr = $cmdStr." -c H264 --FE2_H264_PROFILE=0";;
-					break;
-				case KDLVideoTarget::H264M:
-					$cmdStr = $cmdStr." -c H264 --FE2_H264_PROFILE=1";;
-					break;
-				case KDLVideoTarget::H264H:				
-					$cmdStr = $cmdStr." -c H264 --FE2_H264_PROFILE=2";;
-					break;
-*/
-				case KDLVideoTarget::VP6:
-				case KDLVideoTarget::H263:
-					default:
-					$cmdStr = $cmdStr." -c VP6";
-					break;
-			}
-
-			if($this->_vidFr)
-				$cmdStr = $cmdStr." -r ".round($this->_vidFr);
-			
-			if($this->_vidBr)
-				$cmdStr = $cmdStr." -b ".$this->_vidBr;
-			if($this->_vidGop!==null && $this->_vidGop>0) 
-				$cmdStr = $cmdStr." -k ".$this->_vidGop;
-			if($this->_vidWid && $this->_vidHgt){
-				if(is_null($this->_vidRotation) || $this->_vidRotation==0  || $this->_vidRotation==180)
-					$cmdStr = $cmdStr." -w ".$this->_vidWid." -h ".$this->_vidHgt;
-				else
-					$cmdStr = $cmdStr." -h ".$this->_vidWid." -w ".$this->_vidHgt;
-			}
-			if($this->_vidScanType!==null && $this->_vidScanType>0){ // ScanType 0:progressive, 1:interlaced
-				$cmdStr .= " --deinterlace=1";
-			}
-		}
-		
-		if($this->_audId!="none") {
-			if($this->_audBr!==null)
-				$cmdStr = $cmdStr." -a ".$this->_audBr;
-			if($this->_audSr)
-				$cmdStr = $cmdStr." -s ".$this->_audSr;
-		}
-		
-		if($this->_vid2pass==true)
-			$cmdStr = $cmdStr." --FE2_VP6_CXMODE=1 --FE2_VP6_RC_MODE=3";
-		
-			if($this->_clipStart!==null && $this->_clipStart>0){
-			$cmdStr = $cmdStr." --FE2_CUT_START_SEC=".$this->_clipStart/1000;
-		}
-		
-		if($this->_clipDur!==null && $this->_clipDur>0){
-			$cmdStr = $cmdStr." --FE2_CUT_STOP_SEC=".$this->_clipDur/1000;
-		}
-		
-		if($extra)
-			$cmdStr = $cmdStr." ".$extra;
-		
-		if($this->_outFileName)
-			$cmdStr = $cmdStr." -o ".$this->_outFileName;
-
-		return $cmdStr;
+		$transcoder = new KDLOperatorOn2(KDLTranscoders::ON2); 
+		return $transcoder->GenerateCommandLine($this->_design,  $this->_target,$extra);
 	}
 	
 	/* ---------------------------
@@ -650,23 +275,9 @@ $format = "fl";
 	 * FFMpeg_aux
 	 */
 	public function FFMpeg_aux($extra=null)
-	{
-		return $this->FFMpeg($extra);
-	}
-
-	/* ---------------------------
-	 * fixVP6BitRate
-	 */
-	private function fixVP6BitRate($maxVidRate)
-	{
-		if($this->_vidBr){
-			if($this->_vidId==KDLVideoTarget::VP6){
-				$this->_vidBr = round($this->_vidBr*KDLConstants::BitrateVP6Factor);
-			}
-			if($this->_vidBr>$maxVidRate){
-				$this->_vidBr=$maxVidRate;
-			}
-		}
+	{/**/
+		$transcoder = new KDLOperatorFfmpeg(KDLTranscoders::FFMPEG_AUX); 
+		return $transcoder->GenerateCommandLine($this->_design,  $this->_target,$extra);
 	}
 
 	/* ---------------------------
@@ -678,199 +289,6 @@ $format = "fl";
 		return $ee3->GeneratePresetFile($this->_target);
 	}
 
-	/* ---------------------------
-	 * generateH264params
-	 */
-	private function generateH264params($transcoder)
-	{
-		/*
-		 * From Eagle and on, the H264 should be generated to match Akami HD constarints 
-		 * for Apple HLS/adaptive playbck:
-		 * - aligned key frames across all bitrates
-		 * - same frame rate across all bitrates
-		 * 
-		 * '_h264ForMobile' flag rules the generation mode 
-		 */
-		if(is_null($this->_target->_engineVersion) || $this->_target->_engineVersion==0){
-			return $this->generateH264paramsOriginal($transcoder);
-		}
-		return $this->generateH264paramsManaged($transcoder);
-	}
-	
-	/* ---------------------------
-	 * generateH264paramsOriginal
-	 */
-	private function generateH264paramsOriginal($transcoder)
-	{
-/*
--sws - scale quality option, 0-lowest, 9- good
--subq - sub-pixel and partion search algorithms. 1 - fast/low quality, 9-slow/best quality, 5-average
-global_header - makes it baseline
-b_pyramid - to be used with bframes>2 (main and high profile)
-
-good mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -o ~/Media/aaa.mp4 -of lavf -lavfopts format=mp4 -ofps 25 -ovc x264 -sws 9 -x264encopts bitrate=300:subq=5:frameref=6:bframes=3:b_pyramid=1:weight_b=1:threads=auto:keyint=60:level_idc=30:global_header:partitions=all:trellis=1:chroma_me:me=umh:8x8dct -vf scale=304:176 -oac faac -faacopts mpeg=4:object=2:br=96 ; mediainfo ~/Media/aaa.mp4
-bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=mp4 -ofps 25 -ovc x264        -x264encopts bitrate=300:subq=7:frameref=6:bframes=3:b_pyramid=1:weight_b=1:threads=auto:level_idc=30:global_header:8x8dct:trellis=1:chroma_me:me=umh:keyint=60 -vf harddup,scale=304:176 -oac faac -faacopts mpeg=4:object=2:br=96 -endpos 10 -o ~/Media/aaa.mp4; mediainfo ~/Media/aaa.mp4
-     mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=mp4 -ofps 25 -ovc x264 -sws 9 -x264encopts bitrate=300:subq=5:frameref=6:bframes=3:b_pyramid=1:weight_b=1:threads=auto:level_idc=30:global_header:partitions=all:trellis=1:chroma_me:me=umh:8x8dct:keyint=60 -vf scale=304:176 -oac faac -faacopts mpeg=4:object=2:br=96 -o ~/Media/aaa.mp4; mediainfo ~/Media/aaa.mp4
- 
- */
-		$h264params=null;
-		$ffQsettings = " -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4";
-		switch($this->_vidId) {
-				case KDLVideoTarget::H264:
-					switch($transcoder){
-					case KDLTranscoders::ON2:
-						$h264params=" -c H264";;
-						break;
-					case KDLTranscoders::FFMPEG:
-					case KDLTranscoders::FFMPEG_AUX:
-					case KDLTranscoders::FFMPEG_VP8:
-						$h264params=" libx264 -subq 2".$ffQsettings;
-						if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
-							$h264params .= " -crf 30";
-						}
-						break;
-					case KDLTranscoders::MENCODER:
-						$h264params = $h264params." -ovc x264 -x264encopts ";
-						if($this->_vidBr) {
-							$h264params .= "bitrate=".$this->_vidBr;
-							$h264params .= ":";
-							if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
-								$h264params .= "crf=30:";
-							}
-						}
-						$h264params .= "subq=2:8x8dct:frameref=2:bframes=3:b_pyramid=1:weight_b:threads=auto";
-						break;
-					}
-					break;
-				case KDLVideoTarget::H264B:
-					switch($transcoder){
-					case KDLTranscoders::ON2:
-						$h264params=" -c H264 --FE2_H264_PROFILE=0";
-						break;
-					case KDLTranscoders::FFMPEG:
-					case KDLTranscoders::FFMPEG_AUX:
-					case KDLTranscoders::FFMPEG_VP8:
-						$h264params=" libx264 -subq 2".$ffQsettings." -coder 0";;
-						if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
-							$h264params .= " -crf 30";
-						}
-						break;
-					case KDLTranscoders::MENCODER:
-						$h264params = $h264params." -ovc x264 -sws 9 -x264encopts ";
-						if($this->_vidBr) {
-							$h264params .= " bitrate=".$this->_vidBr;
-							$h264params .= ":";
-							if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
-								$h264params .= "crf=30:";
-							}
-						}
-						$h264params .= "subq=2:frameref=6:bframes=0:threads=auto:nocabac:level_idc=30:global_header:partitions=all:trellis=1:chroma_me:me=umh";
-						break;
-					}
-					break;
-				case KDLVideoTarget::H264M:
-					switch($transcoder){
-					case KDLTranscoders::ON2:
-						$h264params=" -c H264 --FE2_H264_PROFILE=1";;
-						break;
-					case KDLTranscoders::FFMPEG:
-					case KDLTranscoders::FFMPEG_AUX:
-					case KDLTranscoders::FFMPEG_VP8:
-						$h264params="libx264 -subq 5".$ffQsettings." -coder 1 -refs 2";
-						if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
-							$h264params .= " -crf 30";
-						}
-						break;
-					case KDLTranscoders::MENCODER:
-						$h264params = $h264params." -ovc x264 -sws 9 -x264encopts ";
-						if($this->_vidBr) {
-							$h264params .= " bitrate=".$this->_vidBr;
-							$h264params .= ":";
-							if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
-								$h264params .= "crf=30:";
-							}
-						}
-						$h264params .= "subq=5:frameref=6:bframes=3:threads=auto:level_idc=30:global_header:partitions=all:trellis=1:chroma_me:me=umh";
-						break;
-					}
-					break;
-				case KDLVideoTarget::H264H:				
-					switch($transcoder){
-					case KDLTranscoders::ON2:
-						$h264params=" -c H264 --FE2_H264_PROFILE=2";
-						break;
-					case KDLTranscoders::FFMPEG:
-					case KDLTranscoders::FFMPEG_AUX:
-					case KDLTranscoders::FFMPEG_VP8:
-						$h264params=" libx264 -subq 7".$ffQsettings." -bf 16 -coder 1 -refs 6 -flags2 +bpyramid+wpred+mixed_refs+dct8x8+fastpskip";
-						if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
-							$h264params .= " -crf 30";
-						}
-						break;
-					case KDLTranscoders::MENCODER:
-						$h264params = $h264params." -ovc x264 -sws 9 -x264encopts ";
-						if($this->_vidBr) {
-							$h264params .= " bitrate=".$this->_vidBr;
-							$h264params .= ":";
-							if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
-								$h264params .= "crf=30:";
-							}
-						}
-						$h264params .= "subq=7:frameref=6:bframes=3:b_pyramid=1:weight_b=1:threads=auto:level_idc=30:global_header:8x8dct:trellis=1:chroma_me:me=umh";
-						break;
-					}
-					break;
-		}
-		return $h264params;
-	}
-
-	/* ---------------------------
-	 * generateH264paramsManaged
-	 */
-	private function generateH264paramsManaged($transcoder)
-	{
-			/*
-			 * From Eagle and on, the H264 should be generated to match Akami HD constarints 
-			 * for Apple HLS/adaptive playbck:
-			 * - aligned key frames across all bitrates
-			 * - same frame rate across all bitrates
-			 * 
-			 * '_h264ForMobile' flag rules the generation mode 
-			 */
-		if(property_exists($this->_target->_video,"_h264ForMobile")) {
-			$h264ForMobile = $this->_target->_video->_h264ForMobile;
-		}
-		else if(isset($this->_target->_engineVersion) && $this->_target->_engineVersion==1){
-			$h264ForMobile = 1;
-		}
-		else {
-			$h264ForMobile = 0;
-		}
-		
-//		return $this->generateH264paramsOriginal($transcoder);
-
-$h264Codec = new KDLCodecH264($this->_target->_video);
-		/*
-		 * Apple HLS assets should not have the 'global_header' set 
-		 * - it fails to get segmented
-		 */
-		if($this->_target->_container->_id==KDLContainerTarget::APPLEHTTP){
-			$h264Codec->_global_header=null;
-		}
-		switch($transcoder){
-		case KDLTranscoders::ON2:
-			return $this->generateH264paramsOriginal($transcoder);
-			break;
-		case KDLTranscoders::FFMPEG:
-		case KDLTranscoders::FFMPEG_AUX:
-		case KDLTranscoders::FFMPEG_VP8:
-			return $h264Codec->FFmpeg();
-			break;
-		case KDLTranscoders::MENCODER:
-			return $h264Codec->Mencoder();
-			break;
-		}
-	}
 }
 
 class KDLExpressionEncoder3 {
