@@ -388,7 +388,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			KalturaLog::debug("Creating new entry");
 			$dbObject = new entry();
 		}
-			
+		
 		parent::toObject($dbObject, $skip);
 		
 		if ($this->startDate === -1) // save -1 as null
@@ -431,8 +431,13 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		
 		$this->startDate = $sourceObject->getStartDate(null);
 		$this->endDate = $sourceObject->getEndDate(null);
-		
 		$this->operationAttributes = KalturaOperationAttributesArray::fromOperationAttributesArray($sourceObject->getOperationAttributes());
+		
+		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::DEFAULT_CONTEXT)
+		{
+			$this->categories = null;
+			$this->categoriesIds = null;
+		}
 	}
 	
 	public function validateObjectsExist()
@@ -457,6 +462,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
+		$this->validateCategories();
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		$this->validateObjectsExist();
 		parent::validateForInsert($propertiesToSkip);
@@ -464,11 +470,61 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		return parent::validateForInsert($propertiesToSkip);
 	}
 	
+	public function validateCategories()
+	{
+		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::DEFAULT_CONTEXT && 
+			($this->categoriesIds != null || $this->categories != null))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_CATEGORY_FIELD_IS_DEPRECATED);
+			
+		if ($this->categoriesIds != null)
+		{
+			$catsNames = array ();
+			
+			$cats = explode(",", $this->categoriesIds);
+			
+			foreach ($cats as $cat)
+			{ 
+				$catName = categoryPeer::retrieveByPK($cat);
+				if (is_null($catName))
+					throw new KalturaAPIException(KalturaErrors::CANT_UPDATE_PARAMETER, $cat);
+			}
+		}
+		
+		if ($this->categories != null)
+		{
+			$catsNames = array ();
+			
+			$cats = explode(",", $this->categoriesIds);
+			
+			foreach ($cats as $cat)
+			{ 
+				$catName = categoryPeer::retrieveByPK($cat);
+				if (is_null($catName))
+				{
+					$enableEntit = false;
+					if (KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY))
+					{
+						KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+						$enableEntit = true;
+					}
+
+					$catName = categoryPeer::retrieveByPK($cat);
+					if ($catName)
+						throw new KalturaAPIException(KalturaErrors::CANT_UPDATE_PARAMETER, $cat);
+							
+					if($enableEntit)
+						KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+				}
+			}
+		}
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForUpdate($source_object)
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
+		$this->validateCategories();
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		
 		if(!is_null($this->conversionProfileId) && $sourceObject->getStatus() != entryStatus::NO_CONTENT)
