@@ -175,10 +175,11 @@ abstract class KConversionEngine
 	protected function getCmdLine ($cmd_line , $add_log )
 	{
 		// I have commented out the audio parameters so we don't decrease the quality - it stays as-is
-		$exec_cmd = $this->getCmd() . " " . 
+		$binName=$this->getCmd();
+		$exec_cmd = $binName . " " . 
 			str_replace ( 
-				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName), 
-				array($this->inFilePath, $this->outFilePath, $this->configFilePath),
+				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName), 
+				array($this->inFilePath, $this->outFilePath, $this->configFilePath, $binName),
 				$cmd_line);
 				
 		if ( $add_log )
