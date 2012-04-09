@@ -35,7 +35,7 @@ class kvotePeer extends BasekvotePeer
         return self::doSelectOne($c);
     }
     
-    public static function getKuserFromPuserAndPartner($puserId, $partnerId)
+    protected static function getKuserFromPuserAndPartner($puserId, $partnerId)
 	{
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId, true);
 		
@@ -68,7 +68,7 @@ class kvotePeer extends BasekvotePeer
 	    } 
 	}
 	
-	public static function changeKVoteStatus (kvote $kvote, $requiredStatus)
+	protected static function changeKVoteStatus (kvote $kvote, $requiredStatus)
 	{
 	    $kvote->setStatus($requiredStatus);
 	    $kvote->save();

@@ -13,11 +13,6 @@ class kvote extends Basekvote
 {
 	private $statistics_results = null;
 	
-	public function __construct()
-	{
-	    $this->status = KVoteStatus::KVOTE_STATUS_VOTED;
-	}
-	
 	public function save(PropelPDO $con = null)
 	{
 		if ( $this->isNew() )
