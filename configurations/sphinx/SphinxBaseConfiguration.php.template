@@ -24,7 +24,7 @@ $baseConfigurationIndexs = 	array(
 		
 		'sort_name'					=> SphinxFieldType::RT_ATTR_BIGINT,
         'int_entry_id'				=> SphinxFieldType::RT_ATTR_BIGINT,
-        'kuser_id'					=> IIndexable::FIELD_TYPE_STRING,
+        'kuser_id'					=> SphinxFieldType::RT_FIELD,
         'entry_status'				=> SphinxFieldType::RT_ATTR_BIGINT,
 		'type'						=> SphinxFieldType::RT_ATTR_BIGINT,
 		'media_type'	 			=> SphinxFieldType::RT_ATTR_BIGINT,
@@ -52,12 +52,12 @@ $baseConfigurationIndexs = 	array(
 		
 		'str_entry_id'				=> SphinxFieldType::RT_ATTR_STRING,
 		
-		'entitled_kusers_publish' 	=> IIndexable::FIELD_TYPE_STRING,
-		'entitled_kusers_edit' 		=> IIndexable::FIELD_TYPE_STRING,
-		'entitled_kusers' 			=> IIndexable::FIELD_TYPE_STRING,
-		'privacy_by_contexts' 		=> IIndexable::FIELD_TYPE_STRING,
-		'privacy' 					=> IIndexable::FIELD_TYPE_INTEGER,
-		'creator_kuser_id' 			=> IIndexable::FIELD_TYPE_STRING),
+		'entitled_kusers_publish' 	=> SphinxFieldType::RT_FIELD,
+		'entitled_kusers_edit' 		=> SphinxFieldType::RT_FIELD,
+		'entitled_kusers' 			=> SphinxFieldType::RT_FIELD,
+		'privacy_by_contexts' 		=> SphinxFieldType::RT_FIELD,
+		'privacy' 					=> SphinxFieldType::RT_ATTR_BIGINT,
+		'creator_kuser_id' 			=> SphinxFieldType::RT_FIELD),
 	),
 	
 	'kaltura_category' => array(
