@@ -1,7 +1,7 @@
 <?php
 class XmlClientGenerator extends ClientGeneratorFromPhp  
 {
-    /** 
+    /**
      * @var DOMDocument
      */
     private $_doc = null;
@@ -15,11 +15,6 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
      * @var array
      */
     private $_requiredPlugins = array();
-    
-    /**
-     * @var array
-     */
-    private $_extendingServices = array();
     
     public function XmlClientGenerator()
     {
@@ -35,8 +30,6 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	    $this->_xmlElement = $this->_doc->createElement("xml");
 	    $this->_xmlElement->setAttribute('apiVersion', KALTURA_API_VERSION);
 	    $this->_xmlElement->setAttribute('generatedDate', time());
-	    
-	    $this->listExtendingPlugins();
 	    
 	    $apiV3Path = realpath(dirname(__FILE__) . '/../api_v3');
 		$svnVersion = shell_exec('svnversion ' . $apiV3Path);
@@ -71,46 +64,38 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		}		
 		
 		$servicesElement = $this->_doc->createElement("services");
-		foreach($this->_services as $serviceReflector)
+		foreach($this->_services as $serviceId => $serviceActionItem)
 		{
-			if(!isset($this->_includeList[strtolower($serviceReflector->getServiceId())]))
+		    /* @var $serviceActionItem KalturaServiceActionItem */
+			if(!isset($this->_includeList[strtolower($serviceId)]))
 			{
-				KalturaLog::debug("Service [" . $serviceReflector->getServiceName() . "] excluded");
+				KalturaLog::debug("Service [$serviceId] excluded");
 				continue;
 			}
-
-			if (in_array($serviceReflector->getServiceName(), $this->_extendingServices))
-			{
-			    KalturaLog::debug("Service [" . $serviceReflector->getServiceName() . "] excluded");
-				continue;
-			}
-			
-		    $serviceIncludeList = $this->_includeList[strtolower($serviceReflector->getServiceId())];
+				
+		    $serviceIncludeList = $this->_includeList[strtolower($serviceId)];
 		    $serviceElement = $this->_doc->createElement("service");
-			$serviceElement->setAttribute("id", $serviceReflector->getServiceId());
-			$serviceElement->setAttribute("name", $serviceReflector->getServiceName());
-			$description = $serviceReflector->getServiceDescription();
+			$serviceElement->setAttribute("id", $serviceId);
+			$serviceElement->setAttribute("name", $serviceActionItem->serviceInfo->serviceName);
+			$description = $serviceActionItem->serviceInfo->description;
 		    $description = $this->fixDescription($description);
-		    
 			$serviceElement->setAttribute("description", $description);
 		
-			$plugin = $this->extractPluginNameFromPackage($serviceReflector->getPackage());
+			$plugin = $this->extractPluginNameFromPackage($serviceActionItem->serviceInfo->package);
 			if($plugin)
 			{
 				$serviceElement->setAttribute("plugin", $plugin);
 			}
-		
-			$actions = $serviceReflector->getActions();
-			$actions = array_keys($actions);
-			foreach($actions as $action)
+			foreach($serviceActionItem->actionMap as $actionId => $actionReflector)
 			{
-				if(!isset($serviceIncludeList[strtolower($action)]))
+			    /* @var $actionReflector KalturaActionReflector */
+				if(!isset($serviceIncludeList[strtolower($actionId)]))
 				{
-					KalturaLog::debug("Action [" . $serviceReflector->getServiceName() . ".$action] excluded");
+					KalturaLog::debug("Action [" . $serviceId . ".$actionId] excluded");
 					continue;
 				}
 					
-				$actionInfo = $serviceReflector->getActionInfo($action);
+				$actionInfo = $actionReflector->getActionInfo();
 				
 				if($actionInfo->serverOnly)
 					continue;
@@ -118,59 +103,8 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 				if (strpos($actionInfo->clientgenerator, "ignore") !== false)
 					continue;
 					
-				$serviceActionElement = $this->getServiceActionElement($serviceReflector, $action);
-				$serviceElement->appendChild($serviceActionElement);			
-			}
-			
-			$extendingPlugins = $serviceReflector->getExtendingPluginList();
-			
-			foreach ($extendingPlugins as $extendingPlugin)
-			{
-			    $extendingPluginElement = $this->_doc->createElement("servicePlugin");
-			    $extendingPluginElement->setAttribute("name", $extendingPlugin->getPluginName());
-			    
-			    $extendingServices = $extendingPlugin->getExtendingServices($serviceReflector->getServiceName());
-			    
-			    foreach ($extendingServices as $extendingService)
-			    {
-			        $extendingServiceReflector = new KalturaServiceReflector($extendingService);
-			        
-			        $extendingServiceElement = $this->_doc->createElement("service");
-
-			        $extendingServiceElement->setAttribute("name", $extendingServiceReflector->getServiceName() );
-			        
-			        //Extract all of extending service actions
-			        
-			        $extendingServiceActions = $extendingServiceReflector->getActions(false, true);
-			        
-			        $extendingServiceActions = array_keys($extendingServiceActions);
-			        
-			        foreach ($extendingServiceActions as $extendingServiceAction)
-			        {
-			            if(!isset($serviceIncludeList[strtolower($extendingServiceAction)]))
-				        {
-    					    KalturaLog::debug("Action [" . $extendingServiceReflector->getServiceName() . ".$extendingServiceAction] excluded");
-    					    continue;
-    				    }
-    					
-    				    $extendingActionInfo = $extendingServiceReflector->getActionInfo($extendingServiceAction);
-    				
-    				    if($extendingActionInfo->serverOnly)
-    					    continue;
-    					
-    				    if (strpos($extendingActionInfo->clientgenerator, "ignore") !== false)
-    					    continue;
-    					
-    				    $extendingServiceActionElement = $this->getServiceActionElement($extendingServiceReflector, $extendingServiceAction);
-    				    $extendingServiceElement->appendChild($extendingServiceActionElement);			
-    			            
-    			            
-    			    }
-			        
-			        $extendingPluginElement->appendChild($extendingServiceElement);
-			    }
-			    
-			    $serviceElement->appendChild($extendingPluginElement);
+				$serviceActionElement = $this->getServiceActionElement($actionReflector);
+				$serviceElement->appendChild($serviceActionElement);
 			}
 			
 			$servicesElement->appendChild($serviceElement);
@@ -183,10 +117,9 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$this->_xmlElement->appendChild($classesElement);
 		$this->_xmlElement->appendChild($servicesElement);
 		$this->_xmlElement->appendChild($pluginsElement);
-        
+	    
 		$this->addFile("KalturaClient.xml", $this->_doc->saveXML());
 	}
-	
 	
 	private function pluginHasServices($pluginInstance)
 	{
@@ -400,18 +333,18 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		return $classElement;
 	}
 	
-	private function getServiceActionElement(KalturaServiceReflector $serviceReflector, $actionId)
+	private function getServiceActionElement(KalturaActionReflector $actionReflector)
 	{
-	    $outputTypeReflector = $serviceReflector->getActionOutputType($actionId);
-	    $actionInfo = $serviceReflector->getActionInfo($actionId);
-		$actionParams = $serviceReflector->getActionParams($actionId);
+	    $outputTypeReflector = $actionReflector->getActionOutputType();
+	    $actionInfo = $actionReflector->getActionInfo();
+		$actionParams = $actionReflector->getActionParams();
 		
 		$outputType = null;
 		if ($outputTypeReflector)
 			$outputType = $outputTypeReflector->getType();
 		
 		$actionElement = $this->_doc->createElement("action");
-		$actionElement->setAttribute("name", $actionInfo->action);
+		$actionElement->setAttribute("name", $actionReflector->getActionName());
 		
 		foreach($actionParams as $actionParam)
 		{
@@ -506,24 +439,6 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	    return $description;
 	}
 	
-	protected function listExtendingPlugins ()
-	{
-	    $servicePlugins = KalturaPluginManager::getPluginInstances("IKalturaServiceExtender");
-	    
-	    foreach ( $servicePlugins as $servicePlugin)
-	    {
-	        $extensionMap = $servicePlugin->getExtenstionMap ();
-	        
-	        foreach ($extensionMap as $extendedService=>$extendingServices)
-	        {
-	            foreach ($extendingServices as $extendingService)
-	            {
-	                $this->_extendingServices[] = $extendingService;
-	            }
-	        }
-	    }
-	}
-	
 	protected function writeHeader() { }
 
 	protected function writeFooter() { }
@@ -543,9 +458,4 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	protected function writeType(KalturaTypeReflector $type) { }
 	
 	protected function writeAfterTypes() { }
-	
-	protected function writeExtendingPlugin ()
-	{
-	    
-	}
 }
