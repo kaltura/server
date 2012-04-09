@@ -102,6 +102,9 @@ class categoryPeer extends BasecategoryPeer
 	{
 		$fullName = self::getParsedFullName($fullName);
 		
+		if (trim($fullName) == '')
+			return null;
+		
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 		$c->add(categoryPeer::FULL_NAME, $fullName);
 		return categoryPeer::doSelectOne($c, $con);

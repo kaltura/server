@@ -246,7 +246,7 @@ class kEntitlementUtils
 			
 		$ksPrivacyContexts = $ks->getPrivacyContext();
 		
-		if(is_null($ksPrivacyContexts))
+		if(is_null($ksPrivacyContexts) || $ksPrivacyContexts = '')
 			return array(self::DEFAULT_CONTEXT);
 			
 		return explode(',', $ksPrivacyContexts);
