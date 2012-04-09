@@ -13,7 +13,7 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_VAR_TYPE = "/\\@var (\\w*)/";
     const DOCCOMMENT_LINK = "/\\@link (.*)/";
-    const DOCCOMMENT_DESCRIPTION = "/\\* [a-zA-Z\\-\\s].*\\./";
+    const DOCCOMMENT_DESCRIPTION = " /\\*\\s*?[^@]+/";
     const DOCCOMMENT_RETURN_TYPE = "/\\@return (\\w*)/";
     
     const DOCCOMMENT_SERVICE_NAME =  "/\\@service\\s?(\\w*)/";
@@ -41,6 +41,8 @@ class KalturaDocCommentParser
     const DOCCOMMENT_PERMISSIONS = "/\\@requiresPermission ([\\w\\,\\s]*)/";
     
     const DOCCOMMENT_VALIDATE_USER = "/\\@validateUser\\s+(\\w+)\\s+(\\w+)\\s*(\\w*)/";
+    
+    const DOCCOMMENT_ALIAS_ACTION = "/\\@actionAlias\\s(\\w+\\.\\w+)/";
     
     /**
      * @var bool
@@ -168,13 +170,18 @@ class KalturaDocCommentParser
     public $validateUserPrivilege = null;
     
     /**
+     * @var string
+     */
+    public $actionAlias = null;
+    
+    /**
      * Parse a docComment
      *
      * @param string $comment
      * @param array $replacements Optional associative array for replacing values in search patterns
      * @return array
      */
-    function KalturaDocCommentParser($comment , $replacements = null)
+    function __construct($comment , $replacements = null)
     {
     	$this->readOnly = preg_match( self::DOCCOMMENT_READONLY, $comment);
         $this->insertOnly = preg_match( self::DOCCOMMENT_INSERTONLY, $comment);
@@ -199,8 +206,10 @@ class KalturaDocCommentParser
             $this->varType = $result[1];
             
         $result = null;
-        if (preg_match_all( self::DOCCOMMENT_DESCRIPTION, $comment, $result ))
-            $this->description = preg_replace("/(\\*\\s*)/", "", implode("\n", $result[0]));
+        if (preg_match( self::DOCCOMMENT_DESCRIPTION, $comment, $result ))
+        {
+            $this->description = preg_replace("/(\\*\\s*)/", "", $result[0]);
+        }
             
         if ($this->deprecated)
         {
@@ -248,6 +257,10 @@ class KalturaDocCommentParser
         $result = null;
         if (preg_match(self::DOCCOMMENT_PERMISSIONS, $comment, $result))
         	$this->permissions = $result[1]; 
+        
+        $result = null;
+        if (preg_match(self::DOCCOMMENT_ALIAS_ACTION, $comment, $result))
+        	$this->actionAlias = $result[1]; 	
             
         $result = null;
         if (preg_match(self::DOCCOMMENT_VALIDATE_USER, $comment, $result))
