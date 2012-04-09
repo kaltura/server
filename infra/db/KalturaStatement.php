@@ -27,6 +27,9 @@ class KalturaStatement extends PDOStatement
 
 	public function execute ($input_parameters = null) 
 	{
+		if (defined("KALTURA_API_V3"))
+			KalturaResponseCacher::disableConditionalCache();
+	
 		$search = array();
 		$replace = array();
 		
