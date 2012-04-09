@@ -50,7 +50,7 @@ class KalturaResponseCacher
 	
 	protected $_instanceId = 0;
 	
-	protected $_cacheStatus = self::CACHE_STATUS_ACTIVE;	// by default ACTIVE, unless explicitly disabled
+	protected $_cacheStatus = self::CACHE_STATUS_DISABLED;	// enabled after the KalturaResponseCacher initializes
 	protected $_invalidationKeys = array();				// the list of query cache invalidation keys for the current request
 	protected $_invalidationTime = 0;					// the last invalidation time of the invalidation keys
 	
@@ -123,6 +123,7 @@ class KalturaResponseCacher
 		$this->setKS($ks);
 
 		self::$_activeInstances[$this->_instanceId] = $this;
+		$this->_cacheStatus = self::CACHE_STATUS_ACTIVE;
 	}
 	
 	public function setKS($ks)
