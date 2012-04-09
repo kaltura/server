@@ -96,7 +96,7 @@ $baseConfigurationIndexs = 	array(
 			'created_at' 		=> SphinxFieldType::RT_ATTR_TIMESTAMP,
 			'updated_at'		=> SphinxFieldType::RT_ATTR_TIMESTAMP,
 			'deleted_at' 		=> SphinxFieldType::RT_ATTR_TIMESTAMP
-				))
+				)),
 				
 		'kaltura_kuser' => array(
 		'type'					=> 'rt',	
