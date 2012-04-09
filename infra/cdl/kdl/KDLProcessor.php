@@ -123,14 +123,6 @@ KalturaLog::log("An invalid source RealMedia file thatfails to provide valid med
 
 		
 		/* ------------------------------
-		 * ProceessFlavor
-		 */
-		public static function ProceessFlavor($flavorList)
-		{
-			
-		}
-		
-		/* ------------------------------
 		 * ProceessFlavorsForCollection
 		 */
 		public static function ProceessFlavorsForCollection($flavorList)
