@@ -40,23 +40,50 @@ class KalturaDispatcher
 		
         try 
         {
+            //strtolower on service - map is indexed according to lower-case service IDs
+            $service = strtolower($service);
             // load the service reflector
-		    $reflector = new KalturaServiceReflector($service);
+            $serviceMap = KalturaServicesMap::getMap();
+            
+            if (!isset($serviceMap[$service]))
+            {
+                KalturaLog::crit("Service does not exist!");
+                throw new KalturaAPIException(KalturaErrors::SERVICE_DOES_NOT_EXISTS, $service);
+            }
+            
+            // check if action exists
+		    if (!$action)
+		    {
+		        KalturaLog::crit("Action not specified!");
+			    throw new KalturaAPIException(KalturaErrors::ACTION_NOT_SPECIFIED, $service);
+		    }
+            $reflector = $serviceMap[$service];
+		    /* @var $reflector KalturaServiceActionItem */
+            $action = strtolower($action);
+            if (!isset($reflector->actionMap[$action]))
+            {
+                KalturaLog::crit("Action does not exist!");
+			    throw new KalturaAPIException(KalturaErrors::ACTION_DOES_NOT_EXISTS, $action, $service);
+            }
+            
+		    $actionReflector = new KalturaActionReflector($service, $action, $reflector->actionMap[$action]);
         }
-        catch(Exception $ex)
+        catch (Exception $e)
         {
-			throw new KalturaAPIException(KalturaErrors::SERVICE_DOES_NOT_EXISTS, $service);
+             throw new Exception("Could not create action reflector for service [$service], action [$action]!");
         }
-		
-		// check if action exists
-		if (!$action)
-			throw new KalturaAPIException(KalturaErrors::ACTION_NOT_SPECIFIED, $service);
-		
-		if (!$reflector->isActionExists($action))
-			throw new KalturaAPIException(KalturaErrors::ACTION_DOES_NOT_EXISTS, $action, $service);
-		
-		$actionParams = $reflector->getActionParams($action);
-
+        
+        $success = null;
+		//$actionFromCache = apc_fetch("$service"._."$action", $success);
+        
+//		if (!$success)
+//		{
+		    $actionParams = $actionReflector->getActionParams();
+//		}
+//		else
+//		{
+//		    $actionParams = $actionFromCache["actionParams"];
+//		}
 		// services.ct - check if partner is allowed to access service ...
 
 		// validate it's ok to access this service
@@ -64,12 +91,12 @@ class KalturaDispatcher
 		$arguments = $deserializer->buildActionArguments($actionParams);
 		KalturaLog::debug("Dispatching service [".$service."], action [".$action."] with params " . print_r($arguments, true));
 
-		$serviceInstance = $reflector->getServiceInstance();
+		$serviceInstance = $actionReflector->getServiceInstance();
 		
 		kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : null);
 		kCurrentContext::$user_ip = requestUtils::getRemoteAddress();
 		kCurrentContext::$ps_vesion = "ps3";
-		kCurrentContext::$service = $reflector->getServiceName();
+		kCurrentContext::$service = $reflector->serviceInfo->serviceName;
 		kCurrentContext::$action =  $action;
 		kCurrentContext::$client_lang =  isset($params['clientTag']) ? $params['clientTag'] : null;
 		
@@ -78,7 +105,14 @@ class KalturaDispatcher
 		kEntitlementUtils::initEntitlementEnforcement();
 		KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		
-		$actionInfo = $reflector->getActionInfo($action);
+//		if (!$success)
+//		{
+		    $actionInfo = $actionReflector->getActionInfo();
+//		}
+//		else
+//		{
+//		    $actionInfo = $actionFromCache["actionInfo"];
+//		}
 		if($actionInfo->validateUserObjectClass && $actionInfo->validateUserIdParamName && isset($actionParams[$actionInfo->validateUserIdParamName]))
 		{
 //			// TODO maybe if missing should throw something, maybe a bone?
@@ -90,18 +124,23 @@ class KalturaDispatcher
 		}
 		
 		// initialize the service before invoking the action on it
-		$serviceInstance->initService($reflector->getServiceId(), $reflector->getServiceName(), $action);
+		// action reflector will init the service to maintain the pluginable action transparency
+		$actionReflector->initService();
 		
 		$invokeStart = microtime(true);
 		KalturaLog::debug("Invoke start");
-		
-		$res =  $reflector->invoke($action, $arguments);
+		$res =  $actionReflector->invoke( $arguments );
 		
 		kEventsManager::flushEvents();
 		
 		KalturaLog::debug("Invoke took - " . (microtime(true) - $invokeStart) . " seconds");
 		KalturaLog::debug("Disptach took - " . (microtime(true) - $start) . " seconds");		
 				
+//		if (!$success)
+//		{
+//		    $success = apc_store("$service"._."$action",array ("actionInfo" => $actionInfo, "actionParams" => $actionParams,));
+//		}
+		
 		kMemoryManager::clearMemory();
 		
 		return $res;
