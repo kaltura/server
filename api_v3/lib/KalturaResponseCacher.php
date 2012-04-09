@@ -342,38 +342,53 @@ class KalturaResponseCacher
 			
 		file_put_contents($this->_cacheLogFilePath, "cachekey: $this->_cacheKey\n".print_r($this->_params, true)."\n".$response);
 		
+		$cachedResponse = null;						// XXXXXXX TODO: remove this
 		if ($this->_wouldHaveUsedCondCache)			// XXXXXXX TODO: remove this
 		{
 			$cachedResponse = @file_get_contents($this->_cacheDataFilePath);
-			// compare the calculated $response to the previously stored $cachedResponse
-			if ($cachedResponse)
-			{
-				$format = isset($_REQUEST["format"]) ? $_REQUEST["format"] : KalturaResponseType::RESPONSE_TYPE_XML;				
-				switch($format)
-				{
-					case KalturaResponseType::RESPONSE_TYPE_XML:
-						$pattern = '/<executionTime>[0-9\.]+<\/executionTime>/';
-						$testResult = (preg_replace($pattern, '', $cachedResponse) == preg_replace($pattern, '', $response));
-						break;
-						
-					case KalturaResponseType::RESPONSE_TYPE_JSONP:
-						$pattern = '/^[^\(]+/';
-						$testResult = (preg_replace($pattern, '', $cachedResponse) == preg_replace($pattern, '', $response));
-						break;
-					
-					default:
-						$testResult = ($cachedResponse == $response);
-						break;
-				}
-				
-				if ($testResult)
-					KalturaLog::log('conditional cache check: OK');			// we would have used the cache, and the response buffer do match
-				else
-					KalturaLog::log('conditional cache check: FAILED');		// we would have used the cache, but the response buffers do not match
-			}
 		}
 		
 		file_put_contents($this->_cacheDataFilePath, $response);
+		
+		// compare the calculated $response to the previously stored $cachedResponse
+		if ($cachedResponse)			// XXXXXXX TODO: remove this
+		{
+			$pattern = '/\/ks\/[a-zA-Z0-9=]+/';
+			$response = preg_replace($pattern, 'KS', $response);
+			$cachedResponse = preg_replace($pattern, 'KS', $cachedResponse);
+
+			$pattern = '/s:\d+:/';
+			$response = preg_replace($pattern, 's::', $response);
+			$cachedResponse = preg_replace($pattern, 's::', $cachedResponse);
+
+			$pattern = '/kaltura_player_\d+/';
+			$response = preg_replace($pattern, 'KP', $response);
+			$cachedResponse = preg_replace($pattern, 'KP', $cachedResponse);
+			
+			$format = isset($_REQUEST["format"]) ? $_REQUEST["format"] : KalturaResponseType::RESPONSE_TYPE_XML;				
+			switch($format)
+			{
+				case KalturaResponseType::RESPONSE_TYPE_XML:
+					$pattern = '/<executionTime>[0-9\.]+<\/executionTime>/';
+					$testResult = (preg_replace($pattern, 'ET', $cachedResponse) == preg_replace($pattern, 'ET', $response));
+					break;
+					
+				case KalturaResponseType::RESPONSE_TYPE_JSONP:
+					$pattern = '/^[^\(]+/';
+					$testResult = (preg_replace($pattern, 'CB', $cachedResponse) == preg_replace($pattern, 'CB', $response));
+					break;
+				
+				default:
+					$testResult = ($cachedResponse == $response);
+					break;
+			}
+			
+			if ($testResult)
+				KalturaLog::log('conditional cache check: OK');			// we would have used the cache, and the response buffer do match
+			else
+				KalturaLog::log('conditional cache check: FAILED key: '.$this->_cacheKey);		// we would have used the cache, but the response buffers do not match
+		}
+		
 		if(!is_null($contentType)) {
 			$this->createDirForPath($this->_cacheHeadersFilePath);
 			file_put_contents($this->_cacheHeadersFilePath, $contentType);
@@ -441,8 +456,8 @@ class KalturaResponseCacher
 		}
 		
 		// get caching conditions
-		$cacheExpiry = @file_get_contents($this->_cacheExpiryFilePath);
-		$conditions = @file_get_contents($this->_cacheConditionsFilePath);
+		$cacheExpiry = self::safeFileGetContents($this->_cacheExpiryFilePath);
+		$conditions = self::safeFileGetContents($this->_cacheConditionsFilePath);
 
 		// check the expiry
 		if (!$cacheExpiry)
@@ -458,10 +473,10 @@ class KalturaResponseCacher
 		{
 			// cached response is expired
 			@unlink($this->_cacheDataFilePath);
-			@unlink($this->_cacheHeadersFilePath);
 			@unlink($this->_cacheLogFilePath);
-			@unlink($this->_cacheExpiryFilePath);
-			@unlink($this->_cacheConditionsFilePath);
+			self::safeUnlink($this->_cacheHeadersFilePath);
+			self::safeUnlink($this->_cacheExpiryFilePath);
+			self::safeUnlink($this->_cacheConditionsFilePath);
 			return false;
 		}
 			
@@ -711,4 +726,20 @@ class KalturaResponseCacher
 		fclose($fp);
 	}
 
+	// This function avoids the 'file does not exist' warning
+	private static function safeFileGetContents($fileName)
+	{
+		if (!file_exists($fileName))
+			return null;
+		return @file_get_contents($fileName);
+	}
+
+	// This function avoids the 'file does not exist' warning
+	private static function safeUnlink($fileName)
+	{
+		if (!file_exists($fileName))
+			return;
+		@unlink($fileName);
+	}
+	
 }
