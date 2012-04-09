@@ -33,13 +33,13 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the object_type field.
-	 * @var        int
+	 * @var        string
 	 */
 	protected $object_type;
 
 	/**
 	 * The value for the object_id field.
-	 * @var        int
+	 * @var        string
 	 */
 	protected $object_id;
 
@@ -173,7 +173,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	/**
 	 * Get the [object_type] column value.
 	 * 
-	 * @return     int
+	 * @return     string
 	 */
 	public function getObjectType()
 	{
@@ -183,7 +183,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	/**
 	 * Get the [object_id] column value.
 	 * 
-	 * @return     int
+	 * @return     string
 	 */
 	public function getObjectId()
 	{
@@ -319,7 +319,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	/**
 	 * Set the value of [object_type] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      string $v new value
 	 * @return     SphinxLog The current object (for fluent API support)
 	 */
 	public function setObjectType($v)
@@ -328,7 +328,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 			$this->oldColumnsValues[SphinxLogPeer::OBJECT_TYPE] = $this->object_type;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (string) $v;
 		}
 
 		if ($this->object_type !== $v) {
@@ -342,7 +342,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	/**
 	 * Set the value of [object_id] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      string $v new value
 	 * @return     SphinxLog The current object (for fluent API support)
 	 */
 	public function setObjectId($v)
@@ -351,7 +351,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 			$this->oldColumnsValues[SphinxLogPeer::OBJECT_ID] = $this->object_id;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (string) $v;
 		}
 
 		if ($this->object_id !== $v) {
@@ -541,8 +541,8 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->executed_server_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-			$this->object_type = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-			$this->object_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+			$this->object_type = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+			$this->object_id = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
 			$this->entry_id = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->partner_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
 			$this->dc = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;

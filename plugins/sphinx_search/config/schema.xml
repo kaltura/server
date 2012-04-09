@@ -3,8 +3,8 @@
 	<table skipSql="false" abstract="false" name="sphinx_log" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" autoIncrement="true" required="true" primaryKey="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="executed_server_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_type" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_type" type="varchar" size="255" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_id" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />			

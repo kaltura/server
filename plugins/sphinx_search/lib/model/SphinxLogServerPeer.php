@@ -35,5 +35,21 @@ class SphinxLogServerPeer extends BaseSphinxLogServerPeer {
 
 		return SphinxLogServerPeer::doSelect($criteria, $con);
 	}
+
+	/**
+	 * Retrieve the server object of the current data center
+	 *
+	 * @param      string $server server name
+	 * @param      PropelPDO $con the connection to use
+	 * @return     SphinxLogServer
+	 */
+	public static function retrieveByLocalServer($server, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(SphinxLogServerPeer::SERVER, $server);
+		$criteria->add(SphinxLogServerPeer::DC, kDataCenterMgr::getCurrentDcId());
+
+		return SphinxLogServerPeer::doSelectOne($criteria, $con);
+	}
 	
 } // SphinxLogServerPeer

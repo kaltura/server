@@ -10,6 +10,12 @@ interface IIndexable extends IBaseObject
 	const FIELD_TYPE_DATETIME = 'datetime';
 	
 	/**
+	 * Used for convenience in the sphinx log table
+	 * @return string|int
+	 */
+	public function getId();
+	
+	/**
 	 * Is the id as used and know by the indexing server
 	 * @return int
 	 */

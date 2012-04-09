@@ -295,21 +295,34 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	{
 		KalturaLog::debug($sql);
 		
+		$sphinxConnection = null;
+		$sphinxConnectionId = null;
+		if(kConf::hasParam('exec_sphinx') && kConf::get('exec_sphinx'))
+		{
+			$sphinxConnection = DbManager::getSphinxConnection(false);
+			$sphinxServer = SphinxLogServerPeer::retrieveByLocalServer($sphinxConnection->getHostName());
+			if($sphinxServer)
+				$sphinxConnectionId = $sphinxServer->getId();
+		}
+		
 		$sphinxLog = new SphinxLog();
+		$sphinxLog->setExecutedServerId($sphinxConnectionId);
+		$sphinxLog->setObjectId($object->getId());
+		$sphinxLog->setObjectType(get_class($object));
 		$sphinxLog->setEntryId($object->getEntryId());
 		$sphinxLog->setPartnerId($object->getPartnerId());
 		$sphinxLog->setSql($sql);
 		$sphinxLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 
-		if(!kConf::hasParam('exec_sphinx') || !kConf::get('exec_sphinx'))
+		if(!$sphinxConnection)
 			return true;
 			
-		$con = DbManager::getSphinxConnection(false);
-		$ret = $con->exec($sql);
+		$sphinxConnection = DbManager::getSphinxConnection(false);
+		$ret = $sphinxConnection->exec($sql);
 		if($ret)
 			return true;
 			
-		$arr = $con->errorInfo();
+		$arr = $sphinxConnection->errorInfo();
 		KalturaLog::err($arr[2]);
 		return false;
 	}
