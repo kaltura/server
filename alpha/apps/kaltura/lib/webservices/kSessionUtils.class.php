@@ -258,6 +258,8 @@ class ks
 	const PRIVILEGE_ENABLE_ENTITLEMENT = "enableentitlement";
 	const PRIVILEGE_DISABLE_ENTITLEMENT = "disableentitlement";
 	const PRIVILEGE_PRIVACY_CONTEXT = "privacycontext";
+	
+	const ADMIN_SECRET_CACHE_PREFIX = 'partner_admin_secret_';
 
 	public $partner_id = null;
 	public $master_partner_id = null;
@@ -671,8 +673,19 @@ class ks
 
 	private function getSalt ( )
 	{
+		$cacheKey = null;
+		if (function_exists('apc_fetch'))
+		{
+			$cacheKey = self::ADMIN_SECRET_CACHE_PREFIX . $this->partner_id;
+			$adminSecret = apc_fetch($cacheKey);
+			if ($adminSecret)
+				return $adminSecret;
+		}
+		
 		$p = PartnerPeer::retrieveByPK( $this->partner_id )	;
 		if ( ! $p )  return ""; // VERY big problem
+		if ($cacheKey)
+			apc_store($cacheKey, $p->getAdminSecret());
 		return $p->getAdminSecret();
 	}
 	

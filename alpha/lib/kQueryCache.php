@@ -190,11 +190,15 @@ class kQueryCache
 		
 		// don't cache the result if the 'dont cache' flag is enabled
 		$cacheQuery = true;
-		if (array_key_exists(self::DONT_CACHE_KEY, $cacheResult) &&
-			$cacheResult[self::DONT_CACHE_KEY])
+		if (array_key_exists(self::DONT_CACHE_KEY, $cacheResult))
 		{
-			KalturaLog::debug("kQueryCache: dontCache key is set -> not caching the result");
-			$cacheQuery = false;
+			if ($cacheResult[self::DONT_CACHE_KEY])
+			{
+				KalturaLog::debug("kQueryCache: dontCache key is set -> not caching the result");
+				if (defined("KALTURA_API_V3"))
+					KalturaResponseCacher::disableConditionalCache();
+				$cacheQuery = false;
+			}
 			unset($cacheResult[self::DONT_CACHE_KEY]);
 		}
 		
@@ -212,6 +216,14 @@ class kQueryCache
 					return null;			// The query won't be cached since cacheKey is null, it's ok cause it won't be used anyway
 				}
 			}
+		}
+		
+		if (defined("KALTURA_API_V3"))
+		{
+			$invalidationTime = 0;
+			if ($cacheResult)
+				$invalidationTime = max($cacheResult);
+			KalturaResponseCacher::addInvalidationKeys($invalidationKeys, $invalidationTime);
 		}
 		
 		// check whether we have a valid cached query

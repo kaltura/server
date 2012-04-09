@@ -784,6 +784,9 @@ class myReportsMgr
 	
 	private static function executeQuery ( $query )
 	{
+		if (defined("KALTURA_API_V3"))
+			KalturaResponseCacher::disableConditionalCache();
+	
 		$mysql_function = (strpos($query, 'CALL') === false)? 'mysql': 'mysqli';
 		
 		$db_config = kConf::get( "reports_db_config" );
