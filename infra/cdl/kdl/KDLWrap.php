@@ -478,37 +478,35 @@ KalturaLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 	{
 KalturaLog::log(__METHOD__."==>");
 KalturaLog::log("\nCDL mediaInfo==>\n".print_r($cdlMediaInfo,true));
-/*
-$flavorAsset->setWidth($mediaInfoDb->getVideoWidth());
-$flavorAsset->setHeight($mediaInfoDb->getVideoHeight());
-$flavorAsset->setFrameRate($mediaInfoDb->getVideoFrameRate());
-$flavorAsset->setBitrate($mediaInfoDb->getContainerBitRate());
-$flavorAsset->setSize($mediaInfoDb->getFileSize());
-$flavorAsset->setContainerFormat($mediaInfoDb->getContainerFormat());
-$flavorAsset->setVideoCodecId($mediaInfoDb->getVideoCodecId());
-*/
-  	$medSet = new KDLMediaDataSet();
-	self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $medSet);
+	  	$medSet = new KDLMediaDataSet();
+		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $medSet);
 KalturaLog::log("\nKDL mediaDataSet==>\n".print_r($medSet,true));
-	
-//	$fla = new flavorAsset();
-		if(!is_null($medSet->_container)){
+
+$contBr = 0;
+		if(isset($medSet->_container)){
 			$fla->setContainerFormat($medSet->_container->GetIdOrFormat());
+			$contBr = $medSet->_container->_bitRate;
 		}
   		$fla->setSize($cdlMediaInfo->getFileSize());
 
-  	$vidBr = 0;
-		if($medSet->_video){
+$vidBr = 0;
+		if(isset($medSet->_video)){
 			$fla->setWidth($medSet->_video->_width);
   			$fla->setHeight($medSet->_video->_height);
   			$fla->setFrameRate($medSet->_video->_frameRate);
 			$vidBr = $medSet->_video->_bitRate;
 			$fla->setVideoCodecId($medSet->_video->GetIdOrFormat());
 		}
-		if($vidBr==0)
-			$fla->setBitrate($medSet->_container->_bitRate);
-		else
-			$fla->setBitrate($vidBr);
+$audBr = 0;
+		if(isset($medSet->_audio)){
+			$audBr = $medSet->_audio->_bitRate;
+		}
+		/*
+		 * Evaluate the asset br.
+		 * Prevously it was taken from video, if t was available.
+		 */
+		$assetBr = max($contBr,$vidBr+$audBr);
+		$fla->setBitrate($assetBr);
 
 KalturaLog::log("\nCDL fl.Asset==>\n".print_r($fla,true));
 		return $fla;
