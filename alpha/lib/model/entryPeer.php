@@ -581,7 +581,7 @@ class entryPeer extends BaseentryPeer
 	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 		if (!kEntitlementUtils::getEntitlementEnforcement() || KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_ENTRY || !self::$filerResults))
-			return parent::filterSelectResults(&$selectResults, $criteria);
+			return parent::filterSelectResults($selectResults, $criteria);
 		
 		KalturaLog::debug('Entitlement: Filter Results');
 		
@@ -603,7 +603,7 @@ class entryPeer extends BaseentryPeer
 		
 		self::$filerResults = false;
 		
-		parent::filterSelectResults(&$selectResults, $criteria);
+		parent::filterSelectResults($selectResults, $criteria);
 		
 		KalturaLog::debug('Entitlement: Filter Results - done');
 	}
