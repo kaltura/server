@@ -1,6 +1,9 @@
 <?php 
 class KalturaServicesMap
 {
+	/**
+	 * @var array <KalturaServiceActionItem>
+	 */
 	private static $services = array();
 	
 	private static $extraServices = array();
@@ -27,7 +30,7 @@ class KalturaServicesMap
 					throw new Exception('Failed to save services cached map to ['.$cacheFilePath.']');
 			}
 			
-			require_once($cacheFilePath);
+			self::$services = unserialize(file_get_contents($cacheFilePath));
 		}
 		return self::$services + self::$extraServices;
 	}
@@ -55,6 +58,7 @@ class KalturaServicesMap
 		return $serviceIds;
 	}
 	
+	//TODO create a function for the subsequent loops
 	static function cacheMap($servicePath, $cacheFilePath)
 	{
 		if (!is_dir($servicePath))
@@ -64,43 +68,81 @@ class KalturaServicesMap
 		$serviceMap = array();
 		$classMap = KAutoloader::getClassMap();
 		$checkedClasses = array();
-		foreach($classMap as $class => $classFilePath)
+		
+		//Retrieve all service classes from the classMap.
+		$serviceClasses = array();
+		foreach ($classMap as $class => $classFilePath)
 		{
-			$classFilePath = realpath($classFilePath);
+		    $classFilePath = realpath($classFilePath);
 			if (strpos($classFilePath, $servicePath) === 0) // make sure the class is in the request service path
 			{
 				$reflectionClass = new ReflectionClass($class);
+				
+				
 				if ($reflectionClass->isSubclassOf('KalturaBaseService'))
 				{
-					$docComment = $reflectionClass->getDocComment();
-					$parser = new KalturaDocCommentParser($docComment);
-					$serviceId = strtolower($parser->serviceName);
-					$serviceMap[$serviceId] = $class;
+				    $serviceDoccomment = new KalturaDocCommentParser($reflectionClass->getDocComment());
+				    $serviceClasses[$serviceDoccomment->serviceName] = $class;
 				}
 			}
-			$checkedClasses[] = $class;
 		}
 		
-		$pluginServices = array();
+		//Retrieve all plugin service classes.
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServices');
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
 			$pluginServices = $pluginInstance->getServicesMap();
 			foreach($pluginServices as $serviceName => $serviceClass)
 			{
-				$serviceName = strtolower($serviceName);
+			    $serviceName = strtolower($serviceName);
 				$serviceId = "{$pluginName}_{$serviceName}";
-				$pluginServices[$serviceId] = $serviceClass;
-				$serviceMap[$serviceId] = $serviceClass;
+			    $serviceClasses[$serviceId] = $serviceClass;
 			}
 		}
 		
-		$cachedFile = '';
-		$cachedFile .= ('<?php' . PHP_EOL);
-		$cachedFile .= ('self::$services = ' . var_export($serviceMap, true) . ';' . PHP_EOL);
+		//Add core & plugin services to the services map
+		foreach($serviceClasses as $serviceId => $serviceClass)
+		{
+			$serviceReflectionClass = KalturaServiceReflector::constructFromClassName($serviceClass);
+			$serviceMapEntry = new KalturaServiceActionItem();
+			$serviceMapEntry->serviceId = $serviceId;
+			$serviceMapEntry->serviceInfo = $serviceReflectionClass->getServiceInfo();
+            $actionMap = array();
+            $nativeActions = $serviceReflectionClass->getActions();
+            foreach ($nativeActions as $actionId => $actionName)	
+            {
+                $actionMap[strtolower($actionId)] = array ("serviceClass" => $serviceClass, "actionMethodName" => $actionName, "serviceId" => $serviceId, "actionName" => $actionId);
+            }	
+            
+            //Loop over all service classes and find the alias actions for the $serviceClass
+            foreach ($serviceClasses as $extServiceId => $extServiceClass)
+            {
+                $aliasServiceClass = KalturaServiceReflector::constructFromClassName($extServiceClass);
+                $aliasActions = $aliasServiceClass->getAliasActions($serviceId);
+                foreach ($aliasActions as $aliasAction => $actionName)
+                {
+                    if (isset($actionMap[$aliasAction]))
+                    {
+                        throw new Exception("Cannot use the same action alias from 2 service classes! Action alias [$aliasAction], classes [".$actionMap[$aliasAction]."], [$extServiceClass]");
+                    }
+                    $actionMap[strtolower($aliasAction)] = array ("serviceClass" => $extServiceClass, "actionMethodName" => $actionName, "serviceId" => $extServiceId, "actionName" => $aliasAction);
+                }
+                
+            }
+            
+            if (count($actionMap))
+            {
+                $serviceMapEntry->actionMap = $actionMap;
+                $serviceMap[strtolower($serviceId)] = $serviceMapEntry;
+            }
+		}
+		
+//		$cachedFile = '';
+//		$cachedFile .= ('<?php' . PHP_EOL);
+//		$cachedFile .= ('self::$services = ' . var_export($serviceMap, true) . ';' . PHP_EOL);
 		if (!is_dir(dirname($cacheFilePath))) {
 			mkdir(dirname($cacheFilePath), 0777);
 		}
-		file_put_contents($cacheFilePath, $cachedFile);
+		file_put_contents($cacheFilePath, serialize($serviceMap));
 	}
 }
