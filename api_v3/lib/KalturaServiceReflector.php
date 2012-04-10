@@ -225,7 +225,7 @@ class KalturaServiceReflector extends KalturaReflector
 	
 	protected function getActionsFromServiceMap ()
 	{			
-		$serviceActionItem = $newInstance->_servicesMap[$this->_serviceId];
+		$serviceActionItem = $this->_servicesMap[$this->_serviceId];
 		/* @var $serviceActionItem KalturaServiceActionItem */
 		
 	    return $serviceActionItem->actionMap;
