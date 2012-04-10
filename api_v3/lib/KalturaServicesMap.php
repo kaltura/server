@@ -106,6 +106,7 @@ class KalturaServicesMap
 			$serviceReflectionClass = KalturaServiceReflector::constructFromClassName($serviceClass);
 			$serviceMapEntry = new KalturaServiceActionItem();
 			$serviceMapEntry->serviceId = $serviceId;
+			$serviceMapEntry->serviceClass = $serviceClass;
 			$serviceMapEntry->serviceInfo = $serviceReflectionClass->getServiceInfo();
             $actionMap = array();
             $nativeActions = $serviceReflectionClass->getActions();
