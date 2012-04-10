@@ -18,7 +18,7 @@ class kvotePeer extends BasekvotePeer
 		}
 
 		$c = new myCriteria();
-		$c->add ( self::STATUS, KVoteStatus::REVOKED, Criteria::NOT_EQUAL );
+		$c->add ( kvotePeer::STATUS, KVoteStatus::REVOKED, Criteria::NOT_EQUAL );
 		
 		self::$s_criteria_filter->setFilter ( $c );
     }
