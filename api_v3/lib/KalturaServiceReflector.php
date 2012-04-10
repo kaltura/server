@@ -203,7 +203,7 @@ class KalturaServiceReflector extends KalturaReflector
 	{
 		$actions = $this->getActions(false);
 		if(isset($actions[$actionId]))
-			return $actions[$actionId]['actionMethodName'];
+			return $actions[$actionId];
 			
 		return null;
 	}
