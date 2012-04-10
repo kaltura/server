@@ -60,7 +60,7 @@ class KalturaServiceReflector extends KalturaReflector
 		$newInstance->_servicesMap = KalturaServicesMap::getMap();
 		
 		if (!$newInstance->isServiceExists($newInstance->_serviceId))
-			throw new Exception("Service [$service] does not exists");
+			throw new Exception("Service [$service] does not exists in service list [" . print_r(array_keys($newInstance->_servicesMap), true) . "]");
 			
 		$newInstance->_serviceClass = $newInstance->_servicesMap[$newInstance->_serviceId];
 		
