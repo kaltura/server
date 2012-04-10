@@ -317,7 +317,7 @@ KalturaLog::log ( __METHOD__ . ": " . $kshow->getId() . " plays: $v");
 	public static function addKvote ( kvote $kvote , $delta_rank )
 	{
 		$entry = $kvote->getEntry();
-		$res = self::modifyEntryVotes($entry, $delta_rank, KVoteStatus::KVOTE_STATUS_VOTED);
+		$res = self::modifyEntryVotes($entry, $delta_rank, KVoteStatus::VOTED);
 		return $res; 
 	}
 	
@@ -337,14 +337,14 @@ KalturaLog::log ( __METHOD__ . ": " . $kshow->getId() . " plays: $v");
 		$votes = $entry->getVotes();
 		if ( self::shouldModify ( $entry , entryPeer::VOTES ) );
 		{
-		    if ($kvoteStatus == KVoteStatus::KVOTE_STATUS_VOTED)
+		    if ($kvoteStatus == KVoteStatus::VOTED)
 			    self::inc ($votes);
 			else 
 			    self::dec($votes);
 			$entry->setVotes( $votes );
 				
 			$total_rank = $entry->getTotalRank();
-			if ($kvoteStatus == KVoteStatus::KVOTE_STATUS_VOTED)
+			if ($kvoteStatus == KVoteStatus::VOTED)
 			    self::inc ($total_rank, $delta_rank);
 			else 
 			    self::dec($total_rank, $delta_rank);
