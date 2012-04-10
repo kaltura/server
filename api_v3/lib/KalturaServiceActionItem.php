@@ -30,12 +30,5 @@ class KalturaServiceActionItem
         $serviceActionItem->actionMap = $item->actionMap;
         return $serviceActionItem;
     }
-    
-    public function getServiceReflector()
-    {
-    	if(!$this->serviceClass)
-    		throw new Exception("Service class [$this->serviceClass] does not exists in service action item [" . print_r($this, true) . "]");
-    		
-    	return KalturaServiceReflector::constructFromClassName($this->serviceClass);
-    }
+
 }
