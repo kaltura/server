@@ -54,9 +54,10 @@
 		}
 		
 		$list = array();
-		foreach($services as $serviceName => $serviceReflector)
+		foreach($services as $serviceName => $serviceActionItem)
 		{
-			if($serviceReflector->isServerOnly())
+		    /* @var $serviceActionItem KalturaServiceActionItem */
+			if($serviceActionItem->serviceInfo->serverOnly)
 				unset($services[$serviceName]);
 		}
 		ksort($services, SORT_STRING);
@@ -115,18 +116,18 @@
 			<div class="param"><label for="service">Select service:</label> <select
 	name="service">
 					<?php 
-						foreach($services as $serviceReflector)
+						foreach($services as $serviceId => $serviceActionItem)
 						{
-							/* @var $serviceReflector KalturaServiceReflector */
-							$serviceId = $serviceReflector->getServiceId();
-							$serviceName = $serviceReflector->getServiceName();
-							$serviceLabel = $serviceReflector->getServiceName();
-							$pluginName = $serviceReflector->getPluginName();
+							/* @var $serviceActionItem KalturaServiceActionItem */
+							$serviceId = $serviceActionItem->serviceId;
+							$serviceName = $serviceActionItem->serviceInfo->serviceName;
+							$serviceLabel = $serviceActionItem->serviceInfo->serviceName;
+							$pluginName = $serviceActionItem->serviceInfo->package;
 							
 							if ($pluginName)
 								$serviceName = "$pluginName.$serviceName";
 							
-							if ($serviceReflector->isDeprecated())
+							if ($serviceActionItem->serviceInfo->deprecated)
 								$serviceLabel . ' (deprecated)';
 							
 							echo "<option value=\"$serviceId\" title=\"$serviceName\">$serviceLabel</option>";

@@ -1,14 +1,14 @@
 <?php
-try
+$serviceMap = KalturaServicesMap::getMap();
+$serviceReflector = $serviceMap[strtolower($service)];
+
+if (!$serviceReflector)
 {
-	$serviceReflector = KalturaServiceReflector::constructFromServiceId($service);
+    die('Service "'.$service.'" not found');
 }
-catch(Exception $ex)
-{
-	die('Service "'.$service.'" not found');
-}
-$actions = array_keys($serviceReflector->getActions());
-$serviceInfo = $serviceReflector->getServiceInfo();
+/* @var $serviceReflector KalturaServiceActionItem */
+$actions = $serviceReflector->actionMap;
+$serviceInfo = $serviceReflector->serviceInfo;
 ?>
 <h2>Kaltura API</h2>
 <table id="serviceInfo">
@@ -38,10 +38,11 @@ $serviceInfo = $serviceReflector->getServiceInfo();
           <th>Description</th>
         </tr>
       <?php
-      foreach($actions as $action)
+      foreach($actions as $actionId=>$actionCallback)
       {
-        $actionInfo = $serviceReflector->getActionInfo($action);
-        echo '<tr><td><a href="?service='.$service.'&action='.$action.'">'.$actionInfo->action.'</td><td>'.nl2br($actionInfo->description).'</td></tr>';
+        $actionReflector = new KalturaActionReflector($service, $actionId, $actionCallback);
+        $actionInfo = $actionReflector->getActionInfo();
+        echo '<tr><td><a href="?service='.$service.'&action='.$actionId.'">'.$actionInfo->action.'</td><td>'.nl2br($actionInfo->description).'</td></tr>';
       }
       ?>
       </table>

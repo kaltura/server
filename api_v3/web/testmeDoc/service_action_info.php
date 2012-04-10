@@ -1,22 +1,24 @@
 <?php
+
+$serviceMap = KalturaServicesMap::getMap();
+$serviceReflector = $serviceMap[strtolower($service)];
+
+if (!$serviceReflector)
+{
+    die('Service "'.$service.'" not found');
+}
+/* @var $serviceReflector KalturaServiceActionItem */
+$actions = $serviceReflector->actionMap;
 try
 {
-	$serviceReflector = KalturaServiceReflector::constructFromServiceId($service);
-}
-catch(Exception $ex)
-{
-	die('Service "'.$service.'" not found');
-}
-$actions = $serviceReflector->getActions();
-try
-{
-	$actionParams = $serviceReflector->getActionParams($action);
+    $actionReflector = new KalturaActionReflector($service, $action, $actions[$action]);
+	$actionParams = $actionReflector->getActionParams($action);
 }
 catch(Exception $ex)
 {
 	die('Action "'.$action.'" does not exist for service "'.$service.'"');
 }
-$actionInfo = $serviceReflector->getActionInfo($action);
+$actionInfo = $actionReflector->getActionInfo();
 
 ?>
 <h2>Kaltura API</h2>
@@ -61,7 +63,7 @@ foreach($actionParams as $actionParam):
 		<td><?php echo  $actionParam->getDescription(); ?></td>
 	</tr>
 <?php endforeach;
-$returnValue = $serviceReflector->getActionOutputType($action);
+$returnValue = $actionReflector->getActionOutputType();
 if ($returnValue):
 ?>
 	<tr>

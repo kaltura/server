@@ -11,13 +11,17 @@ function toArrayRecursive(KalturaPropertyInfo $propInfo)
 	return $propInfo->toArray();
 }
 
+$serviceMap = KalturaServicesMap::getMap();
 $actionInfo = null;
 try
 {
-	$serviceReflector = KalturaServiceReflector::constructFromServiceId($service);
+	$serviceReflector = $serviceMap[strtolower($service)];
+	/* @var $serviceReflector KalturaServiceActionItem */
+	$actionReflector = new KalturaActionReflector($service, $action, $serviceReflector->actionMap[$action]);
+	$actionParams = $actionReflector->getActionParams();
+	$actionInfo = $actionReflector->getActionInfo();
 	
-	$actionParams = $serviceReflector->getActionParams($action);
-	$actionInfo = $serviceReflector->getActionInfo($action);
+	KalturaLog::debug($message);
 	
 	$actionInfo = array(
 		"actionParams" => array(),
