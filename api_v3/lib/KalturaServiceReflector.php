@@ -102,6 +102,7 @@ class KalturaServiceReflector extends KalturaReflector
         
         $reflectionClass = new ReflectionClass($serviceClass);
         $newInstance->_serviceInfo = new KalturaDocCommentParser($reflectionClass->getDocComment());
+        $newInstance->_serviceId = $newInstance->_serviceInfo->serviceName;
         return $newInstance;
 	}
 	
