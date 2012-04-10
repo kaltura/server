@@ -137,8 +137,6 @@ class KalturaThumbParams extends KalturaAssetParams
 	 */
 	public function validate($propertiesToSkip = array())
 	{
-		$this->validatePropertyMinLength("name", 1);
-		
 		$this->validatePropertyMinMaxValue('quality', 20, 100, true);
 		$this->validatePropertyMinMaxValue('cropX', 0, 10000, true);
 		$this->validatePropertyMinMaxValue('cropY', 0, 10000, true);
