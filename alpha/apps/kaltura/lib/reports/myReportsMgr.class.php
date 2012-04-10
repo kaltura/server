@@ -724,6 +724,7 @@ class myReportsMgr
 		
 		$time_shift *= -1; // Don't ask me why but it works that way
 		
+		$origTimeZone = date_default_timezone_get ();
 		date_default_timezone_set('UTC');
 				
 		// removing hours, minutes and seconds from the date  
@@ -778,7 +779,9 @@ class myReportsMgr
 			}
 		}
 		$replaced_sql = str_replace ( $names , $values , $sql_content );	
-			
+
+		date_default_timezone_set($origTimeZone);
+		
 		return $replaced_sql;
 	}
 	
