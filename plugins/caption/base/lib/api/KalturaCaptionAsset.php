@@ -102,13 +102,12 @@ class KalturaCaptionAsset extends KalturaAsset
 			}
 		}
 		
-		return parent::toInsertableObject ($object_to_fill, $props_to_skip);
-	}
-	
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		$this->validatePropertyNotNull('format');
+		if ($this->format === null &&
+			$object_to_fill->getContainerFormat() === null)		// not already set by setFromAssetParams
+		{
+			$this->format = KalturaCaptionType::SRT;
+		}
 		
-		parent::validateForInsert($propertiesToSkip);
+		return parent::toInsertableObject ($object_to_fill, $props_to_skip);
 	}
 }
