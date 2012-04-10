@@ -16,7 +16,7 @@ class KalturaServiceReflector extends KalturaReflector
 	private $_serviceClass = null;
 	
 	/**
-	 * @var array
+	 * @var array<KalturaServiceActionItem>
 	 */
 	private $_servicesMap = null;
 	
@@ -62,7 +62,9 @@ class KalturaServiceReflector extends KalturaReflector
 		if (!$newInstance->isServiceExists($newInstance->_serviceId))
 			throw new Exception("Service [$service] does not exists in service list [" . print_r(array_keys($newInstance->_servicesMap), true) . "]");
 			
-		$newInstance->_serviceClass = $newInstance->_servicesMap[$newInstance->_serviceId];
+		$serviceActionItem = $newInstance->_servicesMap[$newInstance->_serviceId];
+		/* @var $serviceActionItem KalturaServiceActionItem */
+		$newInstance->_serviceClass = $serviceActionItem->serviceClass;
 		
 		if (!class_exists($newInstance->_serviceClass))
 			throw new Exception("Service class [$newInstance->_serviceClass] for service [$service] does not exists");
