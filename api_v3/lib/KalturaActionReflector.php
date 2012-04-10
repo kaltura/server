@@ -58,8 +58,6 @@ class KalturaActionReflector extends KalturaReflector
      */
 	public function __construct( $serviceId, $actionId, $serviceCallback )
     {
-        KalturaLog::info ("Constructing service reflector with parameters: serviceId [$serviceId] , actionId [$actionId]");
-        KalturaLog::debug("Action callback: ". print_r($serviceCallback, true));
         list ($this->_actionClass, $this->_actionMethodName, $this->_actionServiceId, $this->_actionName) = array_values($serviceCallback);
         
         $this->_serviceId = $serviceId;
