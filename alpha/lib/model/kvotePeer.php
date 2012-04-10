@@ -18,7 +18,7 @@ class kvotePeer extends BasekvotePeer
 		}
 
 		$c = new myCriteria();
-		$c->add ( self::STATUS, KVoteStatus::KVOTE_STATUS_REVOKED, Criteria::NOT_EQUAL );
+		$c->add ( self::STATUS, KVoteStatus::REVOKED, Criteria::NOT_EQUAL );
 		
 		self::$s_criteria_filter->setFilter ( $c );
     }
@@ -28,19 +28,19 @@ class kvotePeer extends BasekvotePeer
     {
         $kuser = self::getKuserFromPuserAndPartner($puserId, $partnerId);
         
-        $c = new Criteria();
+        $c = new Criteria(); 
         $c->addAnd(kvotePeer::KUSER_ID, $kuser->getId(), Criteria::EQUAL);
         $c->addAnd(kvotePeer::ENTRY_ID, $entryId, Criteria::EQUAL);
         
         return self::doSelectOne($c);
     }
     
-    protected static function getKuserFromPuserAndPartner($puserId, $partnerId)
+    protected static function getKuserFromPuserAndPartner($puserId, $partnerId, $shouldCreate = false)
 	{
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId, true);
-		
-		if ($kuser->getStatus() !== KuserStatus::ACTIVE)
-			throw new APIException(APIErrors::INVALID_USER_ID);
+    		
+		if ($kuser && $kuser->getStatus() !== KuserStatus::ACTIVE)
+			throw new kCoreException(APIErrors::INVALID_USER_ID);
 		
 		return $kuser;
 	}
@@ -50,36 +50,35 @@ class kvotePeer extends BasekvotePeer
 	    self::setUseCriteriaFilter(false);
 	    
 	    $kvote = self::doSelectByEntryIdAndPuserId($entryId, $partnerId, $puserId);
-	    if ($kvote && $kvote->getStatus() == KVoteStatus::KVOTE_STATUS_REVOKED)
-	    {
-	        self::changeKVoteStatus($kvote, KVoteStatus::KVOTE_STATUS_VOTED);
-	        return true;
-	    }
+	    $kvote->setStatus(KVoteStatus::VOTED);
+	    $affectedLines = $kvote->save();
 	    
-	    return false;
+	    return $affectedLines;
 	}
 	
     public static function disableExistingKVote ($entryId, $partnerId, $puserId)
 	{
 	    $kvote = self::doSelectByEntryIdAndPuserId($entryId, $partnerId, $puserId);
-	    if ($kvote->getStatus() == KVoteStatus::KVOTE_STATUS_VOTED)
-	    {
-	        self::changeKVoteStatus($kvote, KVoteStatus::KVOTE_STATUS_REVOKED);
-	    } 
-	}
-	
-	protected static function changeKVoteStatus (kvote $kvote, $requiredStatus)
-	{
-	    $kvote->setStatus($requiredStatus);
-	    $kvote->save();
+        $kvote->setStatus(KVoteStatus::REVOKED);
+	    $affectedLines = $kvote->save();
+	    
+	    return $affectedLines;
+	    
 	}
 	
 	public static function createKvote ($entryId, $partnerId, $puserId, $rank)
 	{
 	    $kvote = new kvote();
 		$kvote->setEntryId($entryId);
-		$kvote->setStatus(KVoteStatus::KVOTE_STATUS_VOTED);
+		$kvote->setStatus(KVoteStatus::VOTED);
 		$kuser = self::getKuserFromPuserAndPartner($puserId, $partnerId);
+		if (!$kuser)
+		{
+		    $kuser = new kuser();
+		    $kuser->setPuserId($puserId);
+		    $kuser->setStatus(KuserStatus::ACTIVE);
+		    $kuser->save();
+		}
 		$kvote->setKuserId($kuser->getId());
 		$kvote->setRank($rank);
 		$kvote->save();
