@@ -50,8 +50,11 @@ class kvotePeer extends BasekvotePeer
 	    self::setUseCriteriaFilter(false);
 	    
 	    $kvote = self::doSelectByEntryIdAndPuserId($entryId, $partnerId, $puserId);
-	    $kvote->setStatus(KVoteStatus::VOTED);
-	    $affectedLines = $kvote->save();
+	    if ($kvote)
+	    {
+	        $kvote->setStatus(KVoteStatus::VOTED);
+	        $affectedLines = $kvote->save();
+	    }
 	    
 	    return $affectedLines;
 	}
@@ -59,8 +62,11 @@ class kvotePeer extends BasekvotePeer
     public static function disableExistingKVote ($entryId, $partnerId, $puserId)
 	{
 	    $kvote = self::doSelectByEntryIdAndPuserId($entryId, $partnerId, $puserId);
-        $kvote->setStatus(KVoteStatus::REVOKED);
-	    $affectedLines = $kvote->save();
+	    if ($kvote)
+	    {
+            $kvote->setStatus(KVoteStatus::REVOKED);
+    	    $affectedLines = $kvote->save();
+	    }
 	    
 	    return $affectedLines;
 	    
