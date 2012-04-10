@@ -44,7 +44,12 @@
 			$clientGenerator->setIncludeOrExcludeList($include, $exclude, $excludePaths);
 			$clientGenerator->load();
 			
-			$services = $clientGenerator->getServices();
+			$serviceItems = $clientGenerator->getServices();
+				
+			$services = array();
+			foreach($serviceItems as $serviceId => $serviceActionItem)
+				$services[$serviceId] = $serviceActionItem->getServiceReflector();
+			
 			kFile::setFileContent($cacheFileName, serialize($services));
 		}
 		

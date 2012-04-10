@@ -30,4 +30,9 @@ class KalturaServiceActionItem
         $serviceActionItem->actionMap = $item->actionMap;
         return $serviceActionItem;
     }
+    
+    public function getServiceReflector()
+    {
+    	return KalturaServiceReflector::constructFromClassName($this->serviceClass);
+    }
 }

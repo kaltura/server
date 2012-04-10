@@ -113,8 +113,10 @@ abstract class ClientGeneratorFromPhp
 		
 		$this->writeBeforeServices();
 		// services
-		foreach($this->_services as $serviceReflector)
+		foreach($this->_services as $serviceId => $serviceActionItem)
 		{
+			$serviceReflector = $serviceActionItem->getServiceReflector();
+			
 			$this->writeBeforeService($serviceReflector);
 			$serviceName = $serviceReflector->getServiceName();
 			$serviceId = $serviceReflector->getServiceId();
