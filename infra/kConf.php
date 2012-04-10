@@ -27,8 +27,10 @@ class kConf
 			{
 				if(apc_delete(self::APC_CACHE_MAP))
 				{
-					@unlink("$configDir/base.reload");
+					$deleted = unlink("$configDir/base.reload");
 					error_log("Base configuration reloaded");
+					if(!$deleted)
+						error_log("Failed to delete base.reload file");
 				}
 				else 
 				{
