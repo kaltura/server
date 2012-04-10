@@ -1,7 +1,7 @@
 <?php
 try
 {
-	$serviceReflector = new KalturaServiceReflector($service);
+	$serviceReflector = KalturaServiceReflector::constructFromServiceId($service);
 }
 catch(Exception $ex)
 {

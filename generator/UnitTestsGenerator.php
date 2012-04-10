@@ -630,7 +630,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$this->writeBase("	protected function validate{$actionName}($outputType \$resultObject){}");
 			$this->writeBase("");
 
-			$serviceReflector = new KalturaServiceReflector($serviceId);
+			$serviceReflector = KalturaServiceReflector::constructFromServiceId($serviceId);
 			$serviceClass = $serviceReflector->getServiceClass();
 		
 			$this->writeTest("	/* (non-PHPdoc)");

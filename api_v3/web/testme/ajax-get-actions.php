@@ -3,7 +3,7 @@ require_once("../../bootstrap.php");
 KalturaLog::setContext("TESTME");
 
 $service = $_GET["service"];
-$serviceReflector = new KalturaServiceReflector($service);
+$serviceReflector = KalturaServiceReflector::constructFromServiceId($service);
 
 $actionsArray = $serviceReflector->getActions();
 $actionNames = array_keys($actionsArray);

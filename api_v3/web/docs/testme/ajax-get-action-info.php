@@ -14,7 +14,7 @@ function toArrayRecursive(KalturaPropertyInfo $propInfo)
 $actionInfo = null;
 try
 {
-	$serviceReflector = new KalturaServiceReflector($service);
+	$serviceReflector = KalturaServiceReflector::constructFromServiceId($service);
 	
 	$actionParams = $serviceReflector->getActionParams($action);
 	$actionInfo = $serviceReflector->getActionInfo($action);
