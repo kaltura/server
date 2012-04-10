@@ -48,7 +48,7 @@
 				
 			$services = array();
 			foreach($serviceItems as $serviceId => $serviceActionItem)
-				$services[$serviceId] = $serviceActionItem->getServiceReflector();
+				$services[$serviceId] = $serviceActionItem;
 			
 			kFile::setFileContent($cacheFileName, serialize($services));
 		}
