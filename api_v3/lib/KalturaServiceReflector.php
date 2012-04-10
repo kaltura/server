@@ -224,8 +224,11 @@ class KalturaServiceReflector extends KalturaReflector
 	}
 	
 	protected function getActionsFromServiceMap ()
-	{
-	    return $this->_servicesMap[$this->_serviceId];
+	{			
+		$serviceActionItem = $newInstance->_servicesMap[$this->_serviceId];
+		/* @var $serviceActionItem KalturaServiceActionItem */
+		
+	    return $serviceActionItem->actionMap;
 	}
 	
 	protected function getActionMethodsFromReflector($ignoreDeprecated = false, $ignoreAliasActions = true)
