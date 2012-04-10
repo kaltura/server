@@ -150,7 +150,7 @@ class KalturaThumbParams extends KalturaAssetParams
 		$this->validatePropertyMinValue('videoOffset', 0, true);
 		
 		$this->validatePropertyMinMaxLength('backgroundColor', 1, 6, true);
-		if(!preg_match('/^[0-9a-fA-F]{1,6}$/', $this->backgroundColor))
+		if(!is_null($this->backgroundColor) && !preg_match('/^[0-9a-fA-F]{1,6}$/', $this->backgroundColor))
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_WRONG_FORMAT, $this->getFormattedPropertyNameWithClassName('backgroundColor'), 'six hexadecimal characters');
 	}
 	
