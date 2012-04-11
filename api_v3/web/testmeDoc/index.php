@@ -1,5 +1,5 @@
 <?php 
-
+ini_set("memory_limit","256M");
 require_once("../../bootstrap.php"); 
 require_once("helpers.php");
 

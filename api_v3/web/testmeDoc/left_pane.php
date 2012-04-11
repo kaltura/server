@@ -7,7 +7,7 @@
 	
 	function compareServiceNames($obj1, $obj2)
 	{
-		return strcmp($obj1->getServiceName(), $obj2->getServiceName());
+		return strcmp($obj1->serviceId, $obj2->serviceId);
 	}
 
 	$config = new Zend_Config_Ini("../../config/testme.ini", null, array('allowModifications' => true));
@@ -21,17 +21,19 @@
 		
 	$clientGenerator = new DummyForDocsClientGenerator();
 	$clientGenerator->setIncludeOrExcludeList($include, $exclude, $excludePaths);
+	echo $include;
 	$clientGenerator->setAdditionalList($additional);
 	$clientGenerator->load();
 	
 	$list = array();
 	$services = $clientGenerator->getServices();
-	foreach($services as $serviceName => $serviceReflector)
+	foreach($services as $serviceId => $serviceReflector)
 	{
-		$actions = $serviceReflector->getActions();
-		foreach($actions as &$action) // we need only the keys
-			$action = null;
-		$list[$serviceName] = $actions;
+	    /* @var $serviceReflector KalturaServiceActionItem */
+		$actions = $serviceReflector->actionMap;
+		foreach($actions as $actionId=>&$actionCallback) // we need only the keys
+			$actionCallback = null;
+		$list[$serviceId] = $actions;
 	}
 	$clientGenerator->setIncludeList($list);
 	$enums = $clientGenerator->getEnums();
@@ -67,15 +69,17 @@
 				<ul class="services">
 				<?php foreach($services as $serviceReflector): ?>
 					<?php 
-						$serviceId = $serviceReflector->getServiceId();
-						$actions = $serviceReflector->getActions();
-						$deprecated = $serviceReflector->isDeprecated() ? " (deprecated)" : "";
+					    /* @var $serviceReflector KalturaServiceActionItem */
+					    $serviceId = $serviceReflector->serviceId;
+						$serviceName = $serviceReflector->serviceInfo->serviceName;
+						$actions = $serviceReflector->actionMap;
+						$deprecated = $serviceReflector->serviceInfo->deprecated ? " (deprecated)" : "";
 					?>
 					<li class="service" id="service_<?php echo $serviceId; ?>">
-						<a href="?service=<?php echo $serviceId; ?>"><?php echo $serviceReflector->getServiceName().$deprecated; ?></a>
+						<a href="?service=<?php echo $serviceId; ?>"><?php echo $serviceName.$deprecated; ?></a>
 						<ul class="actions">
-						<?php foreach($actions as $actionId => $actionName): ?>
-							<li class="action"><a href="?service=<?php echo $serviceId; ?>&action=<?php echo $actionId; ?>"><?php echo $actionName;?></a></li>
+						<?php foreach($actions as $actionId => $actionReflector): ?>
+							<li class="action"><a href="?service=<?php echo $serviceId; ?>&action=<?php echo $actionId; ?>"><?php echo $actionReflector->getActionName()."Action";?></a></li>
 						<?php endforeach; ?>
 						</ul>
 					</li>
