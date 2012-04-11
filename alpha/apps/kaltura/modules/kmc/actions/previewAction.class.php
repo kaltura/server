@@ -34,6 +34,7 @@ class previewAction extends kalturaAction
 			$flavor_assets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entry_id, $flavor_tag);
 			$flavor_asset = reset($flavor_assets);
 			/* @var $flavor_asset flavorAsset */
+			$this->flavor_asset_id = null;
 			if( $flavor_asset ) {
 				$this->flavor_asset_id = $flavor_asset->getId();
 			}
