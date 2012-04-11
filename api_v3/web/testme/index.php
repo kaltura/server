@@ -53,7 +53,6 @@
 			kFile::setFileContent($cacheFileName, serialize($services));
 		}
 		
-		$list = array();
 		foreach($services as $serviceName => $serviceActionItem)
 		{
 		    /* @var $serviceActionItem KalturaServiceActionItem */
