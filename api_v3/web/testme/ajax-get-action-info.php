@@ -21,8 +21,6 @@ try
 	$actionParams = $actionReflector->getActionParams();
 	$actionInfo = $actionReflector->getActionInfo();
 	
-	KalturaLog::debug($message);
-	
 	$actionInfo = array(
 		"actionParams" => array(),
 	    "description" => $actionInfo->description
