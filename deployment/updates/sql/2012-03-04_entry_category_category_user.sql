@@ -44,7 +44,7 @@ UPDATE category SET STATUS=3 WHERE deleted_at IS NOT NULL;
 UPDATE category SET 
 `display_in_search`=1,
 `privacy`=1,
-`membership_setting`=2,
+`inheritance_type`=2,
 `user_join_policy`=3,
 `default_permission_level`=3,
 `contribution_policy`=2,
