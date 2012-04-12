@@ -1,7 +1,7 @@
 #!/bin/bash
 source ../configurations/system.ini
 
-output_path=`php -r 'require_once("bootstrap.php"); echo myContentStorage::getFSContentRootPath() . "/content/clientlibs";' 2>&1`
+output_path=$WEB_DIR/content/clientlibs
 
 rm -fr $output_path/$@
 rm -fr ../cache/api_v3/*
