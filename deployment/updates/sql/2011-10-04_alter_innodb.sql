@@ -35,7 +35,6 @@ alter table scheduler_status engine innodb;
 alter table scheduler_worker engine innodb;
 alter table storage_profile engine innodb;
 alter table syndication_feed engine innodb;
-alter table system_user engine innodb;
 alter table tagword_count engine innodb;
 alter table temp_entry_update engine innodb;
 alter table temp_updated_kusers_storage_usage engine innodb;
@@ -49,3 +48,8 @@ alter table virus_scan_profile engine innodb;
 alter table widget engine innodb;
 alter table widget_log engine innodb;
 alter table work_group engine innodb;
+
+drop table if exists system_user engine;
+
+
+
