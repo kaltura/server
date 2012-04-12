@@ -37,7 +37,7 @@ class KalturaEmailNotificationDispatchJobData extends KalturaEventNotificationDi
 	public $bcc;
 	
 	/**
-	 * Email addresses that a reading confirmation will be sent to
+	 * Email addresses that a replies should be sent to, key is mail address and value is the name
 	 * 
 	 * @var KalturaKeyValueArray
 	 */
@@ -50,7 +50,7 @@ class KalturaEmailNotificationDispatchJobData extends KalturaEventNotificationDi
 	public $priority;
 	
 	/**
-	 * Email address that a reading confirmation will be sent
+	 * Email address that a reading confirmation will be sent to
 	 * 
 	 * @var string
 	 */
