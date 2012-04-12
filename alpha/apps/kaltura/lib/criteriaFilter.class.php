@@ -39,8 +39,6 @@ class criteriaFilter
 		return $this->criteria;
 	}
 	
-	// TODO - FOR now assume the all columns of the criteria are glued using AND 
-	// added a 1-level deep copy of criterions (addClauses)
 	public function applyFilter ( Criteria $criteria_to_filter )
 	{
 		if ( ! $this->enable ) return;
@@ -125,13 +123,20 @@ class criteriaFilter
 		$i=0;
 		foreach ( $clauses as $clause )
 		{
-			$enableByTags = false;
-			foreach ($clause->getTags() as $tag)
+			/* @var $clause Criterion */
+			
+			if($clause instanceof KalturaCriterion)
 			{
-				if(KalturaCriterion::isTagEnable($tag))
+				$enableByTags = false;
+				foreach ($clause->getTags() as $tag)
 				{
-					$enableByTags = true;
+					if(KalturaCriterion::isTagEnable($tag))
+					{
+						$enableByTags = true;
+					}
 				}
+				if(!$enableByTags)
+					continue;
 			}
 			
 			$new_crit = $criteria_to_filter->getNewCriterion ( $clause->getTable() . "." . $clause->getColumn() ,  $clause->getValue() , $clause->getComparison() );
@@ -144,4 +149,3 @@ class criteriaFilter
 	}
 	
 }
-?>
