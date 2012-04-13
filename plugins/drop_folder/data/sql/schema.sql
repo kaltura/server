@@ -33,7 +33,7 @@ CREATE TABLE `drop_folder`
 	KEY `partner_id_index`(`partner_id`),
 	KEY `status_index`(`status`),
 	KEY `dc_index`(`dc`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- drop_folder_file
@@ -61,7 +61,7 @@ CREATE TABLE `drop_folder_file`
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`),
 	KEY `status_index`(`status`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

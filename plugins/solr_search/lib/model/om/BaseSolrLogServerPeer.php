@@ -264,8 +264,9 @@ abstract class BaseSolrLogServerPeer {
 	 * Override in order to filter objects returned from doSelect.
 	 *  
 	 * @param      array $selectResults The array of objects to filter.
+	 * @param	   Criteria $criteria
 	 */
-	public static function filterSelectResults(&$selectResults)
+	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
 	
@@ -315,36 +316,37 @@ abstract class BaseSolrLogServerPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteria = SolrLogServerPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = SolrLogServerPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'SolrLogServerPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			SolrLogServerPeer::filterSelectResults($cachedResult);
+			SolrLogServerPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			SolrLogServerPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
 		$con = SolrLogServerPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = SolrLogServerPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		$queryResult = SolrLogServerPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyResultsSort($queryResult);
+		if($criteriaForSelect instanceof KalturaCriteria)
+			$criteriaForSelect->applyResultsSort($queryResult);
+		
+		SolrLogServerPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		SolrLogServerPeer::filterSelectResults($queryResult);
 		SolrLogServerPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -399,7 +401,6 @@ abstract class BaseSolrLogServerPeer {
 		
 		return self::$s_criteria_filter;
 	}
-	
 	 
 	/**
 	 * Creates default criteria filter

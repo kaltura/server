@@ -41,7 +41,7 @@ CREATE TABLE `audit_trail`
 	KEY `partner_entry_index`(`partner_id`, `entry_id`),
 	KEY `kuser_index`(`kuser_id`),
 	KEY `status_index`(`status`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- audit_trail_data
@@ -66,7 +66,7 @@ CREATE TABLE `audit_trail_data`
 	KEY `object_index`(`object_type`, `object_id`),
 	KEY `partner_index`(`partner_id`),
 	KEY `audit_trail_index`(`audit_trail_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- audit_trail_config
@@ -84,7 +84,7 @@ CREATE TABLE `audit_trail_config`
 	`actions` VARCHAR(1023),
 	PRIMARY KEY (`id`),
 	KEY `partner_object_index`(`partner_id`, `object_type`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

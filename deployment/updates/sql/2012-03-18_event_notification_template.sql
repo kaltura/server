@@ -15,4 +15,4 @@ CREATE TABLE `event_notification_template`
 	`object_type` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status_index`(`partner_id`, `status`)
-)Type=MyISAM;
+)Type=InnoDB;

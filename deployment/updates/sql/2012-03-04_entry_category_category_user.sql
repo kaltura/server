@@ -36,7 +36,7 @@ CREATE TABLE `category_kuser`
 	PRIMARY KEY (`id`),
 	KEY `partner_id_category_index`(`partner_id`, `category_id`, `status`),
 	KEY `partner_id_kuser_index`(`partner_id`, `kuser_id`, `status`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 
 UPDATE category SET STATUS=2 WHERE deleted_at IS NULL;

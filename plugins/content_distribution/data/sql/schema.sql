@@ -36,7 +36,7 @@ CREATE TABLE `distribution_profile`
 	KEY `partner_id`(`partner_id`),
 	KEY `partner_status`(`partner_id`, `status`),
 	KEY `partner_status_provider`(`partner_id`, `status`, `provider_type`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- entry_distribution
@@ -72,7 +72,7 @@ CREATE TABLE `entry_distribution`
 	PRIMARY KEY (`id`),
 	KEY `partner_entry_profile`(`partner_id`, `entry_id`, `distribution_profile_id`),
 	KEY `partner_profile_status`(`partner_id`, `distribution_profile_id`, `status`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- generic_distribution_provider
@@ -99,7 +99,7 @@ CREATE TABLE `generic_distribution_provider`
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_and_defaults`(`partner_id`, `is_default`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- generic_distribution_provider_action
@@ -129,7 +129,7 @@ CREATE TABLE `generic_distribution_provider_action`
 	PRIMARY KEY (`id`),
 	KEY `generic_distribution_provider_id`(`generic_distribution_provider_id`),
 	KEY `generic_distribution_provider_status`(`generic_distribution_provider_id`, `status`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

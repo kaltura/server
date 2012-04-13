@@ -69,7 +69,7 @@ CREATE TABLE `kuser`
 	KEY `partner_indexed_partner_data_int`(`partner_id`, `indexed_partner_data_int`),
 	KEY `partner_indexed_partner_data_string`(`partner_id`, `indexed_partner_data_string`),
 	KEY `login_data_id_index`(`login_data_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- kshow
@@ -145,7 +145,7 @@ CREATE TABLE `kshow`
 	CONSTRAINT `kshow_FK_1`
 		FOREIGN KEY (`producer_id`)
 		REFERENCES `kuser` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- entry
@@ -236,7 +236,7 @@ CREATE TABLE `entry`
 	CONSTRAINT `entry_FK_4`
 		FOREIGN KEY (`conversion_profile_id`)
 		REFERENCES `conversion_profile_2` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- kvote
@@ -266,7 +266,7 @@ CREATE TABLE `kvote`
 	CONSTRAINT `kvote_FK_3`
 		FOREIGN KEY (`kuser_id`)
 		REFERENCES `kshow` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- comment
@@ -291,7 +291,7 @@ CREATE TABLE `comment`
 	CONSTRAINT `comment_FK_1`
 		FOREIGN KEY (`kuser_id`)
 		REFERENCES `kuser` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- flag
@@ -316,7 +316,7 @@ CREATE TABLE `flag`
 	CONSTRAINT `flag_FK_1`
 		FOREIGN KEY (`kuser_id`)
 		REFERENCES `kuser` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- favorite
@@ -338,7 +338,7 @@ CREATE TABLE `favorite`
 	CONSTRAINT `favorite_FK_1`
 		FOREIGN KEY (`kuser_id`)
 		REFERENCES `kuser` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- kshow_kuser
@@ -364,7 +364,7 @@ CREATE TABLE `kshow_kuser`
 	CONSTRAINT `kshow_kuser_FK_2`
 		FOREIGN KEY (`kuser_id`)
 		REFERENCES `kuser` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- mail_job
@@ -408,7 +408,7 @@ CREATE TABLE `mail_job`
 	CONSTRAINT `mail_job_FK_1`
 		FOREIGN KEY (`recipient_id`)
 		REFERENCES `kuser` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- scheduler
@@ -431,7 +431,7 @@ CREATE TABLE `scheduler`
 	`last_status` DATETIME,
 	`host` VARCHAR(255) default '',
 	PRIMARY KEY (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- scheduler_worker
@@ -456,7 +456,7 @@ CREATE TABLE `scheduler_worker`
 	`statuses` VARCHAR(1023) default '',
 	`last_status` DATETIME,
 	PRIMARY KEY (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- scheduler_status
@@ -484,7 +484,7 @@ CREATE TABLE `scheduler_status`
 	KEY `status_created_at_index`(`created_at`),
 	KEY `scheduler_id_index`(`scheduler_id`),
 	KEY `worker_id_index_type`(`worker_id`, `worker_type`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- scheduler_config
@@ -516,7 +516,7 @@ CREATE TABLE `scheduler_config`
 	KEY `status_created_at_index`(`created_at`),
 	KEY `scheduler_id_index`(`scheduler_id`),
 	KEY `worker_id_index_type`(`worker_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- control_panel_command
@@ -546,7 +546,7 @@ CREATE TABLE `control_panel_command`
 	`description` VARCHAR(255),
 	`error_description` VARCHAR(255),
 	PRIMARY KEY (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- batch_job
@@ -611,7 +611,7 @@ CREATE TABLE `batch_job`
 	KEY `execution_attempts_index`(`job_type`, `execution_attempts`),
 	KEY `processor_expiration_index`(`job_type`, `processor_expiration`),
 	KEY `lock_index`(`batch_index`, `scheduler_id`, `worker_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- priority_group
@@ -632,7 +632,7 @@ CREATE TABLE `priority_group`
 	`priority` TINYINT,
 	`bulk_priority` TINYINT,
 	PRIMARY KEY (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- bulk_upload_result
@@ -672,7 +672,7 @@ CREATE TABLE `bulk_upload_result`
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `entry_id_index_id`(`entry_id`, `id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- blocked_email
@@ -685,7 +685,7 @@ CREATE TABLE `blocked_email`
 (
 	`email` VARCHAR(40)  NOT NULL,
 	PRIMARY KEY (`email`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- conversion
@@ -717,7 +717,7 @@ CREATE TABLE `conversion`
 	CONSTRAINT `conversion_FK_1`
 		FOREIGN KEY (`entry_id`)
 		REFERENCES `entry` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- flickr_token
@@ -738,7 +738,7 @@ CREATE TABLE `flickr_token`
 	`updated_at` DATETIME,
 	PRIMARY KEY (`kalt_token`),
 	KEY `is_valid_index`(`is_valid`, `kalt_token`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- puser_kuser
@@ -766,7 +766,7 @@ CREATE TABLE `puser_kuser`
 	CONSTRAINT `puser_kuser_FK_1`
 		FOREIGN KEY (`kuser_id`)
 		REFERENCES `kuser` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- puser_role
@@ -798,7 +798,7 @@ CREATE TABLE `puser_role`
 	CONSTRAINT `puser_role_FK_3`
 		FOREIGN KEY (`puser_id`)
 		REFERENCES `puser_kuser` (`puser_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- partner
@@ -857,7 +857,7 @@ CREATE TABLE `partner`
 	CONSTRAINT `partner_FK_1`
 		FOREIGN KEY (`anonymous_kuser_id`)
 		REFERENCES `kuser` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- widget_log
@@ -891,7 +891,7 @@ CREATE TABLE `widget_log`
 	CONSTRAINT `widget_log_FK_1`
 		FOREIGN KEY (`entry_id`)
 		REFERENCES `entry` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- admin_kuser
@@ -921,7 +921,7 @@ CREATE TABLE `admin_kuser`
 	CONSTRAINT `admin_kuser_FK_1`
 		FOREIGN KEY (`partner_id`)
 		REFERENCES `partner` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- notification
@@ -953,7 +953,7 @@ CREATE TABLE `notification`
 	`dc` VARCHAR(2),
 	PRIMARY KEY (`id`),
 	KEY `status_partner_id_index`(`status`, `partner_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- moderation
@@ -985,7 +985,7 @@ CREATE TABLE `moderation`
 	CONSTRAINT `moderation_FK_1`
 		FOREIGN KEY (`kuser_id`)
 		REFERENCES `kuser` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- moderation_flag
@@ -1022,7 +1022,7 @@ CREATE TABLE `moderation_flag`
 	CONSTRAINT `moderation_flag_FK_3`
 		FOREIGN KEY (`flagged_kuser_id`)
 		REFERENCES `kuser` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- roughcut_entry
@@ -1056,7 +1056,7 @@ CREATE TABLE `roughcut_entry`
 	CONSTRAINT `roughcut_entry_FK_3`
 		FOREIGN KEY (`entry_id`)
 		REFERENCES `entry` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- widget
@@ -1096,7 +1096,7 @@ CREATE TABLE `widget`
 	CONSTRAINT `widget_FK_3`
 		FOREIGN KEY (`ui_conf_id`)
 		REFERENCES `ui_conf` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- ui_conf
@@ -1132,7 +1132,7 @@ CREATE TABLE `ui_conf`
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`),
 	KEY `partner_id_creation_mode_index`(`partner_id`, `creation_mode`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- partner_stats
@@ -1162,7 +1162,7 @@ CREATE TABLE `partner_stats`
 	`widgets` INTEGER,
 	PRIMARY KEY (`partner_id`),
 	KEY `partner_id_index`(`partner_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- partner_activity
@@ -1189,7 +1189,7 @@ CREATE TABLE `partner_activity`
 	`amount9` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- conversion_profile
@@ -1217,7 +1217,7 @@ CREATE TABLE `conversion_profile`
 	`conversion_profile_2_id` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- conversion_params
@@ -1246,7 +1246,7 @@ CREATE TABLE `conversion_params`
 	`updated_at` DATETIME,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- kce_installation_error
@@ -1272,7 +1272,7 @@ CREATE TABLE `kce_installation_error`
 	KEY `server_os_index`(`server_os`),
 	KEY `php_version_index`(`php_version`),
 	KEY `type_index`(`type`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- file_sync
@@ -1307,7 +1307,7 @@ CREATE TABLE `file_sync`
 	KEY `partner_id_object_id_object_type_index`(`partner_id`, `object_id`, `object_type`),
 	KEY `dc_status_index`(`dc`, `status`),
 	KEY `linked_index`(`linked_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- access_control
@@ -1337,7 +1337,7 @@ CREATE TABLE `access_control`
 	`custom_data` TEXT,
 	`rules` TEXT,
 	PRIMARY KEY (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- media_info
@@ -1388,7 +1388,7 @@ CREATE TABLE `media_info`
 	CONSTRAINT `media_info_FK_1`
 		FOREIGN KEY (`flavor_asset_id`)
 		REFERENCES `flavor_asset` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- flavor_params
@@ -1435,7 +1435,7 @@ CREATE TABLE `flavor_params`
 	`engine_version` SMALLINT,
 	`type` INTEGER default 0 NOT NULL,
 	PRIMARY KEY (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- flavor_params_output
@@ -1497,7 +1497,7 @@ CREATE TABLE `flavor_params_output`
 	CONSTRAINT `flavor_params_output_FK_3`
 		FOREIGN KEY (`flavor_asset_id`)
 		REFERENCES `flavor_asset` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- flavor_asset
@@ -1538,7 +1538,7 @@ CREATE TABLE `flavor_asset`
 	CONSTRAINT `flavor_asset_FK_2`
 		FOREIGN KEY (`flavor_params_id`)
 		REFERENCES `flavor_params` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- conversion_profile_2
@@ -1571,7 +1571,7 @@ CREATE TABLE `conversion_profile_2`
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status`(`partner_id`, `status`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- flavor_params_conversion_profile
@@ -1600,7 +1600,7 @@ CREATE TABLE `flavor_params_conversion_profile`
 	CONSTRAINT `flavor_params_conversion_profile_FK_2`
 		FOREIGN KEY (`flavor_params_id`)
 		REFERENCES `flavor_params` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- category
@@ -1642,7 +1642,7 @@ CREATE TABLE `category`
 	`inherited_parent_id` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_full_name_index`(`partner_id`, `full_name`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- category_entry
@@ -1662,7 +1662,7 @@ CREATE TABLE `category_entry`
 	PRIMARY KEY (`id`),
 	KEY `partner_id_category_id_index`(`partner_id`, `category_id`),
 	KEY `partner_id_entry_id_index`(`partner_id`, `entry_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- category_kuser
@@ -1694,7 +1694,7 @@ CREATE TABLE `category_kuser`
 	CONSTRAINT `category_kuser_FK_2`
 		FOREIGN KEY (`kuser_id`)
 		REFERENCES `kuser` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- syndication_feed
@@ -1732,7 +1732,7 @@ CREATE TABLE `syndication_feed`
 	`display_in_search` TINYINT default 1,
 	PRIMARY KEY (`id`),
 	KEY `int_id_index`(`int_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- track_entry
@@ -1766,7 +1766,7 @@ CREATE TABLE `track_entry`
 	KEY `entry_id_indx`(`entry_id`),
 	KEY `track_event_type_id_indx`(`track_event_type_id`),
 	KEY `param_1_indx`(`param_1_str`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- system_user
@@ -1793,7 +1793,7 @@ CREATE TABLE `system_user`
 	`role` VARCHAR(40),
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `system_user_email_unique` (`email`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- storage_profile
@@ -1831,7 +1831,7 @@ CREATE TABLE `storage_profile`
 	`delivery_priority` INTEGER,
 	`delivery_status` TINYINT,
 	PRIMARY KEY (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- email_ingestion_profile
@@ -1856,7 +1856,7 @@ CREATE TABLE `email_ingestion_profile`
 	`updated_at` DATETIME,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `email_ingestion_profile_email_address_unique` (`email_address`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- upload_token
@@ -1892,7 +1892,7 @@ CREATE TABLE `upload_token`
 	CONSTRAINT `upload_token_FK_1`
 		FOREIGN KEY (`kuser_id`)
 		REFERENCES `kuser` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- invalid_session
@@ -1910,7 +1910,7 @@ CREATE TABLE `invalid_session`
 	`actions_limit` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `ks_index`(`ks`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- dynamic_enum
@@ -1926,7 +1926,7 @@ CREATE TABLE `dynamic_enum`
 	`value_name` VARCHAR(255)  NOT NULL,
 	`plugin_name` VARCHAR(255),
 	PRIMARY KEY (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- user_login_data
@@ -1950,7 +1950,7 @@ CREATE TABLE `user_login_data`
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `login_email_index`(`login_email`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- permission
@@ -1977,7 +1977,7 @@ CREATE TABLE `permission`
 	KEY `partner_id_index`(`partner_id`),
 	KEY `name_index`(`name`),
 	KEY `name_partner_id_index`(`name`, `partner_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- user_role
@@ -2002,7 +2002,7 @@ CREATE TABLE `user_role`
 	`system_name` VARCHAR(128) default '' NOT NULL,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- permission_item
@@ -2026,7 +2026,7 @@ CREATE TABLE `permission_item`
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- permission_to_permission_item
@@ -2051,7 +2051,7 @@ CREATE TABLE `permission_to_permission_item`
 	CONSTRAINT `permission_to_permission_item_FK_2`
 		FOREIGN KEY (`permission_item_id`)
 		REFERENCES `permission_item` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- kuser_to_user_role
@@ -2076,7 +2076,7 @@ CREATE TABLE `kuser_to_user_role`
 	CONSTRAINT `kuser_to_user_role_FK_2`
 		FOREIGN KEY (`user_role_id`)
 		REFERENCES `user_role` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- report
@@ -2097,7 +2097,7 @@ CREATE TABLE `report`
 	`updated_at` DATETIME,
 	`deleted_at` DATETIME,
 	PRIMARY KEY (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

@@ -20,7 +20,7 @@ CREATE TABLE `solr_log`
 	PRIMARY KEY (`id`),
 	KEY `entry_id`(`entry_id`),
 	KEY `creatd_at`(`created_at`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- solr_log_server
@@ -42,7 +42,7 @@ CREATE TABLE `solr_log_server`
 	CONSTRAINT `solr_log_server_FK_1`
 		FOREIGN KEY (`last_log_id`)
 		REFERENCES `solr_log` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

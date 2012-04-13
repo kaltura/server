@@ -36,7 +36,7 @@ CREATE TABLE `cue_point`
 	PRIMARY KEY (`id`),
 	KEY `partner_entry_index`(`partner_id`, `entry_id`),
 	KEY `int_id_index`(`int_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

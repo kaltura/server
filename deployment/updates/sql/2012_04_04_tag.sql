@@ -19,7 +19,7 @@ CREATE TABLE `tag`
 	PRIMARY KEY (`id`),
 	KEY `partner_tag`(`partner_id`),
 	KEY `partner_object_tag`(`partner_id`, `object_type`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

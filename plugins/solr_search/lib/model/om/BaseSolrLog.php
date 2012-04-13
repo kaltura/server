@@ -93,6 +93,17 @@ abstract class BaseSolrLog extends BaseObject  implements Persistent {
 	{
 		return $this->oldColumnsValues;
 	}
+	
+	/**
+	 * @return mixed field value or null
+	 */
+	public function getColumnsOldValue($name)
+	{
+		if(isset($this->oldColumnsValues[$name]))
+			return $this->oldColumnsValues[$name];
+			
+		return null;
+	}
 
 	/**
 	 * Applies default values to this object.
@@ -681,7 +692,6 @@ abstract class BaseSolrLog extends BaseObject  implements Persistent {
 		
 		parent::postUpdate($con);
 	}
-	
 	/**
 	 * Array of ValidationFailed objects.
 	 * @var        array ValidationFailed[]

@@ -9,4 +9,4 @@ CREATE TABLE `category_entry`
 	PRIMARY KEY (`id`),
 	KEY `partner_id_category_id_index`(`partner_id`, `category_id`),
 	KEY `partner_id_entry_id_index`(`partner_id`, `entry_id`)
-)Type=MyISAM;
+)Type=InnoDB;

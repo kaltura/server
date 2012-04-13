@@ -27,7 +27,7 @@ CREATE TABLE `short_link`
 	KEY `int_id`(`int_id`),
 	KEY `partner_id`(`partner_id`),
 	KEY `kuser_partner_name`(`partner_id`, `kuser_id`, `system_name`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

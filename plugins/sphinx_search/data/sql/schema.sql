@@ -24,7 +24,7 @@ CREATE TABLE `sphinx_log`
 	PRIMARY KEY (`id`),
 	KEY `entry_id`(`entry_id`),
 	KEY `creatd_at`(`created_at`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- sphinx_log_server
@@ -46,7 +46,7 @@ CREATE TABLE `sphinx_log_server`
 	CONSTRAINT `sphinx_log_server_FK_1`
 		FOREIGN KEY (`last_log_id`)
 		REFERENCES `sphinx_log` (`id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

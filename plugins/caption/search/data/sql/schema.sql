@@ -23,7 +23,7 @@ CREATE TABLE `caption_asset_item`
 	PRIMARY KEY (`id`),
 	KEY `caption_asset`(`caption_asset_id`),
 	KEY `partner_caption_asset`(`partner_id`, `caption_asset_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

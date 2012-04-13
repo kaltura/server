@@ -24,7 +24,7 @@ CREATE TABLE `virus_scan_profile`
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id`(`partner_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

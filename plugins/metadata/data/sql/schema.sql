@@ -27,7 +27,7 @@ CREATE TABLE `metadata_profile`
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id`(`partner_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- metadata_profile_field
@@ -53,7 +53,7 @@ CREATE TABLE `metadata_profile_field`
 	PRIMARY KEY (`id`),
 	KEY `partner_id`(`partner_id`),
 	KEY `profile_id_and_version`(`metadata_profile_id`, `metadata_profile_version`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 #-----------------------------------------------------------------------------
 #-- metadata
@@ -78,7 +78,7 @@ CREATE TABLE `metadata`
 	KEY `partner_id`(`partner_id`),
 	KEY `profile_id_and_version`(`metadata_profile_id`, `metadata_profile_version`),
 	KEY `object_id_and_type`(`object_type`, `object_id`)
-)Type=MyISAM;
+)Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;
