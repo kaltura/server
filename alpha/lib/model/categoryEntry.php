@@ -36,8 +36,11 @@ class categoryEntry extends BasecategoryEntry {
 		parent::postInsert($con);
 	
 		$category = categoryPeer::retrieveByPK($this->category_id);
-		$category->incrementEntriesCount(1, $this->entryCategoriesAddedIds);
-		$category->incrementDirectEntriesCount();
+		if($category)
+		{
+			$category->incrementEntriesCount(1, $this->entryCategoriesAddedIds);
+			$category->incrementDirectEntriesCount();
+		}
 	}
 	
 	/**
@@ -49,8 +52,11 @@ class categoryEntry extends BasecategoryEntry {
 		parent::postDelete($con);
 		
 		$category = categoryPeer::retrieveByPK($this->category_id);
-		$category->decrementEntriesCount(1, $this->entryCategoriesRemovedIds);
-		$category->decrementDirectEntriesCount();
+		if($category)
+		{
+			$category->decrementEntriesCount(1, $this->entryCategoriesRemovedIds);
+			$category->decrementDirectEntriesCount();
+		}
 	}
 	
 } // categoryEntry
