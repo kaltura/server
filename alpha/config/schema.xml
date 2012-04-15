@@ -1439,7 +1439,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="category_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />		
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<index name="partner_id_category_id_index">
 			<index-column name="partner_id" />
 			<index-column name="category_id" />

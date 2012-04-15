@@ -1659,7 +1659,7 @@ CREATE TABLE `category_entry`
 	`entry_id` VARCHAR(20),
 	`category_id` INTEGER,
 	`created_at` DATETIME,
-	`status` INTEGER,
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_category_id_index`(`partner_id`, `category_id`),
 	KEY `partner_id_entry_id_index`(`partner_id`, `entry_id`)
