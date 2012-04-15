@@ -470,6 +470,9 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		return parent::validateForInsert($propertiesToSkip);
 	}
 	
+	/*
+	 * To validate if user is entitled to the category – all needed is to select from the db.
+	 */
 	public function validateCategories()
 	{
 		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::DEFAULT_CONTEXT && 
