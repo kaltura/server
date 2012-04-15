@@ -46,8 +46,8 @@ abstract class BasecategoryEntryPeer {
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'category_entry.CREATED_AT';
 
-	/** the column name for the STATUS field */
-	const STATUS = 'category_entry.STATUS';
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'category_entry.CUSTOM_DATA';
 
 	/**
 	 * An identiy map to hold any loaded instances of categoryEntry objects.
@@ -65,10 +65,10 @@ abstract class BasecategoryEntryPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'EntryId', 'CategoryId', 'CreatedAt', 'Status', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'entryId', 'categoryId', 'createdAt', 'status', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::ENTRY_ID, self::CATEGORY_ID, self::CREATED_AT, self::STATUS, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'entry_id', 'category_id', 'created_at', 'status', ),
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'EntryId', 'CategoryId', 'CreatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'entryId', 'categoryId', 'createdAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::ENTRY_ID, self::CATEGORY_ID, self::CREATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'entry_id', 'category_id', 'created_at', 'custom_data', ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
 	);
 
@@ -79,10 +79,10 @@ abstract class BasecategoryEntryPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'EntryId' => 2, 'CategoryId' => 3, 'CreatedAt' => 4, 'Status' => 5, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'entryId' => 2, 'categoryId' => 3, 'createdAt' => 4, 'status' => 5, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::ENTRY_ID => 2, self::CATEGORY_ID => 3, self::CREATED_AT => 4, self::STATUS => 5, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'entry_id' => 2, 'category_id' => 3, 'created_at' => 4, 'status' => 5, ),
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'EntryId' => 2, 'CategoryId' => 3, 'CreatedAt' => 4, 'CustomData' => 5, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'entryId' => 2, 'categoryId' => 3, 'createdAt' => 4, 'customData' => 5, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::ENTRY_ID => 2, self::CATEGORY_ID => 3, self::CREATED_AT => 4, self::CUSTOM_DATA => 5, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'entry_id' => 2, 'category_id' => 3, 'created_at' => 4, 'custom_data' => 5, ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
 	);
 
@@ -158,7 +158,7 @@ abstract class BasecategoryEntryPeer {
 		$criteria->addSelectColumn(categoryEntryPeer::ENTRY_ID);
 		$criteria->addSelectColumn(categoryEntryPeer::CATEGORY_ID);
 		$criteria->addSelectColumn(categoryEntryPeer::CREATED_AT);
-		$criteria->addSelectColumn(categoryEntryPeer::STATUS);
+		$criteria->addSelectColumn(categoryEntryPeer::CUSTOM_DATA);
 	}
 
 	/**
