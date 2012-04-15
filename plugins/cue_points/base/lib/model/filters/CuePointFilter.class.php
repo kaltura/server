@@ -51,6 +51,8 @@ class CuePointFilter extends baseObjectFilter
 				"_lte_duration",
 				"_eq_parent_id",
 				"_in_parent_id",
+				"_eq_cue_point_type", 
+				"_in_cue_point_type"
 			) , NULL );
 
 		$this->allowed_order_fields = array (
