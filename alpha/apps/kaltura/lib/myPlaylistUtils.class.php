@@ -16,25 +16,15 @@ class myPlaylistUtils
 		self::$isAdminKs = $v;
 	}
 	
-	private static $attachCriteriaHandler = null;
-	
 	/**
-	 * input - $obj is object that implements IKalturaPlaylistUtils
-	 * @return void
-	 */
-	public static function setAttachCriteriaHandler($obj)
-	{
-		self::$attachCriteriaHandler = $obj;
-	}
-/**
- * Playlist is an entry of type ENTRY_TYPE_PLAYLIST = 5.
- * Within this type there are 3 media_types to tell the difference between dynamic,static and external playslits:
- * dynamic 	media_type = ENTRY_MEDIA_TYPE_XML = 10
- * static 	media_type = ENTRY_MEDIA_TYPE_TEXT = 3
- * external media_type = ENTRY_MEDIA_TYPE_GENERIC_1= 101;	// these types can be used for derived classes - assume this is some kind of TXT file
- *
- * 
- */	
+	 * Playlist is an entry of type ENTRY_TYPE_PLAYLIST = 5.
+	 * Within this type there are 3 media_types to tell the difference between dynamic,static and external playslits:
+	 * dynamic 	media_type = ENTRY_MEDIA_TYPE_XML = 10
+	 * static 	media_type = ENTRY_MEDIA_TYPE_TEXT = 3
+	 * external media_type = ENTRY_MEDIA_TYPE_GENERIC_1= 101;	// these types can be used for derived classes - assume this is some kind of TXT file
+	 *
+	 * 
+	 */	
 	public static function validatePlaylist ( $playlist )
 	{
 		if ( ! $playlist )	 throw new Exception ( "No playlist to validate" );
@@ -254,11 +244,6 @@ class myPlaylistUtils
 			
 			$entry_filter->attachToCriteria( $c );
 			
-			if(self::$attachCriteriaHandler != null)
-			{
-				self::$attachCriteriaHandler->attachCriteriaHandler($c);
-			}
-			
 			// add some hard-coded criteria
 			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX ) , Criteria::IN ); // search only for clips or roughcuts
 			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
@@ -437,11 +422,6 @@ class myPlaylistUtils
 			
 			$entry_filter->attachToCriteria( $c );
 
-			if(self::$attachCriteriaHandler != null)
-			{
-				self::$attachCriteriaHandler->attachCriteriaHandler($c);
-			}
-			
 			// add some hard-coded criteria
 			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX , entryType::LIVE_STREAM ) , Criteria::IN ); // search only for clips or roughcuts
 			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
@@ -752,9 +732,3 @@ HTML;
 		return false;
 	}
 }
-
-interface IKalturaPlaylistUtils
-{
-	public function attachCriteriaHandler(Criteria &$c);
-}
-?>
