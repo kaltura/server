@@ -80,7 +80,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 	
 	/**
 	 * Admin tags can be updated only by using an admin session
-	 *
+	 * @deprecated Use "tags" field instead.
 	 * @var string
 	 */
 	public $adminTags;
