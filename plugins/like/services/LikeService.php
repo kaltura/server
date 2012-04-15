@@ -100,7 +100,7 @@ class LikeService extends KalturaBaseService
      * @param string $userId
      * @return bool
      */
-    public function checkLikeExistsAction ( $entryId , $userId )
+    public function checkLikeExistsAction ( $entryId , $userId = null )
     {
         if (!$entryId)
 	    {
