@@ -45,6 +45,10 @@ class AuditTrailFilter extends baseObjectFilter
 				"_in_server_name",
 				"_eq_ip_address",
 				"_in_ip_address",
+				"_eq_ks", 
+				"_eq_audit_object_type", 
+				"_eq_client_tag", 
+				"_in_audit_object_type"
 			) , NULL );
 
 		$this->allowed_order_fields = array ("created_at" , "parsed_at");
