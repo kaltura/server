@@ -10,4 +10,5 @@ class KalturaAssetStatus extends KalturaEnum
 	const READY = 2;
 	const DELETED = 3;
 	const IMPORTING = 7;
+	const EXPORTING = 9;
 }

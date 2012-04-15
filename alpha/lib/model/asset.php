@@ -70,6 +70,7 @@ class asset extends Baseasset implements ISyncableFile
 	const ASSET_STATUS_WAIT_FOR_CONVERT = 6; // can't convert since the source is not ready yet, will be converted when the source is ready
 	const ASSET_STATUS_IMPORTING = 7;
 	const ASSET_STATUS_VALIDATING = 8;
+	const ASSET_STATUS_EXPORTING = 9;
 	
 	/**
 	 * @deprecated use FILE_SYNC_ASSET_SUB_TYPE_ASSET instead
@@ -488,5 +489,22 @@ class asset extends Baseasset implements ISyncableFile
 		$this->setHeight($dbAssetParams->getHeight());
 		$this->setWidth($dbAssetParams->getWidth());
 		$this->addTags($dbAssetParams->getTagsArray());
+	}
+	
+	/**
+	 * @return array of asset status values that mean the asset is at post conversion status (ready locally)
+	 * Can be overwritten for specific asset types
+	 */
+	public function getLocalReadyStatuses()
+	{
+	    return array(
+	        asset::ASSET_STATUS_EXPORTING,
+	        asset::ASSET_STATUS_READY,
+	    );
+	}
+	
+    public function setStatusLocalReady()
+	{
+	    parent::setStatus(asset::ASSET_STATUS_READY);
 	}
 }
