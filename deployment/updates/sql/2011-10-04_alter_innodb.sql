@@ -49,7 +49,7 @@ alter table widget engine innodb;
 alter table widget_log engine innodb;
 alter table work_group engine innodb;
 
-drop table if exists system_user engine;
+drop table if exists system_user;
 
 
 
