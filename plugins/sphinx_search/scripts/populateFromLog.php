@@ -71,9 +71,13 @@ while(true)
 	
 	foreach($sphinxLogs as $sphinxLog)
 	{
-		$dc = $sphinxLog->getDc();
-		KalturaLog::log('Sphinx log id ' . $sphinxLog->getId() . " dc [$dc] Memory: [" . memory_get_usage() . "]");
+		/* @var $sphinxLog SphinxLog */
 		
+		$dc = $sphinxLog->getDc();
+		$executedServerId = $sphinxLog->getExecutedServerId();
+		KalturaLog::log('Sphinx log id ' . $sphinxLog->getId() . " dc [$dc] executed server id [$executedServerId] Memory: [" . memory_get_usage() . "]");
+		
+		$serverLastLog = null;
 		if(isset($lastLogs[$dc]))
 		{
 			$serverLastLog = $lastLogs[$dc];
@@ -93,9 +97,17 @@ while(true)
 			$lastLogs[$dc] = $serverLastLog;
 		}
 		
-		try{
-			$sql = $sphinxLog->getSql();
-			$affected = $sphinxCon->exec($sql);
+		try
+		{
+			if($serverLastLog->getId() == $executedServerId)
+			{
+				KalturaLog::debug("SQL already executed on server [$executedServerId] synchronously.");
+			}
+			else
+			{
+				$sql = $sphinxLog->getSql();
+				$affected = $sphinxCon->exec($sql);
+			}
 			
 			if(!$affected)
 			{
@@ -107,7 +119,8 @@ while(true)
 			$serverLastLog->setLastLogId($sphinxLog->getId());
 			$serverLastLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 		}
-		catch(Exception $e){
+		catch(Exception $e)
+		{
 			KalturaLog::err($e->getMessage());
 		}
 	}
