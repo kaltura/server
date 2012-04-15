@@ -107,9 +107,9 @@ class LikeService extends KalturaBaseService
 	        throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
 	    }
         
-	    if (!$userId)
+	    if (!$userId || $userId = "")
 	    {
-	        throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "userId");
+	        $userId = kCurrentContext::$ks_uid;
 	    }
 	    
 	    $existingKVote = kvotePeer::doSelectByEntryIdAndPuserId($entryId, $this->getPartnerId(), $userId);
