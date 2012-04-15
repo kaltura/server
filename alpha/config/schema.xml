@@ -171,6 +171,7 @@
 		<column lazyLoad="false" name="id" type="varchar" required="true" primaryKey="true" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kshow_id" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kuser_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="creator_kuser_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="name" type="varchar" size="60" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="type" type="smallint" inheritance="single" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="media_type" type="smallint" />

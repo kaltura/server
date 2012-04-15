@@ -1653,20 +1653,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setCreatorPuserId( $v )		{	$this->putInCustomData ( "creatorPuserId" , $v );	}
 	public function getCreatorPuserId ( )  			{	return $this->getFromCustomData( "creatorPuserId", null, 0 );	}
 	
-	public function setCreatorKuserId($v)
-	{
-		// if we set the kuserId when not needed - this causes the kuser object to be reset (even if the joinKuser was done properly)
-		if ( self::getCreatorKuserId() == $v )  // same value - don't set for nothing 
-			return;  		
-		
-		$this->putInCustomData ( "creatorKuserId" , $v );
-		
-		$kuser = kuserPeer::retrieveByPK($v);
-		if ($kuser)
-			$this->setCreatorPuserId($kuser->getPuserId());
-	}
-	public function getCreatorKuserId (  )			{	return $this->getFromCustomData( "creatorKuserId", null, 0 );	}
-	
 	public function setEntitledPusersEdit($v)		
 	{	
 		$entitledUserPuserEdit = array();
@@ -2174,6 +2160,21 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$kuser = $this->getKuser();
 		if ($kuser)
 			$this->setPuserId($kuser->getPuserId());
+	}
+	
+	public function setCreatorKuserId($v)
+	{
+		KalturaLog::debug("Set kuser id [" .$v . "] line [" . __LINE__ . "]");
+		// if we set the kuserId when not needed - this causes the kuser object to be reset (even if the joinKuser was done properly)
+		if ( self::getCreatorKuserId() == $v )  // same value - don't set for nothing 
+			return;  		
+
+		parent::setCreatorKuserId($v);
+		$kuser = kuserPeer::retrieveByPk($v);
+		if ($kuser)
+		{
+			$this->setCreatorPuserId($kuser->getPuserId());
+		}
 	}
 	
 	

@@ -342,7 +342,7 @@ class entryPeer extends BaseentryPeer
 		// when session is not admin and without list:* privilege, allow access to user entries only
 		if (!$ks || (!$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)))
 		{		
-			$kuserCrit = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_uid, Criteria::EQUAL);
+			$kuserCrit = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
 			$kuserCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 			
 			if(!$crit)
@@ -350,7 +350,7 @@ class entryPeer extends BaseentryPeer
 			else 
 				$crit->addOr ($kuserCrit);
 				
-			$creatorKuserCrit = $c->getNewCriterion(entryPeer::CREATOR_KUSER_ID, kCurrentContext::$ks_uid, Criteria::EQUAL);
+			$creatorKuserCrit = $c->getNewCriterion(entryPeer::CREATOR_KUSER_ID, kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
 			$creatorKuserCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 			$crit->addOr($creatorKuserCrit);
 		}

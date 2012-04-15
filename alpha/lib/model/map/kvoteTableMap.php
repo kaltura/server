@@ -42,7 +42,6 @@ class kvoteTableMap extends TableMap {
 		$this->addForeignKey('ENTRY_ID', 'EntryId', 'VARCHAR', 'entry', 'ID', false, 20, null);
 		$this->addForeignKey('KUSER_ID', 'KuserId', 'INTEGER', 'kshow', 'ID', false, null, null);
 		$this->addColumn('RANK', 'Rank', 'INTEGER', false, null, null);
-		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		// validators
 	} // initialize()

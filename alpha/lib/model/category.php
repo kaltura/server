@@ -854,7 +854,6 @@ class category extends Basecategory implements IIndexable
 		$this->setUserJoinPolicy($oldParentCategory->getUserJoinPolicy());
 		$this->setDefaultPermissionLevel($oldParentCategory->getDefaultPermissionLevel());
 		$this->setKuserId($oldParentCategory->getKuserId());
-		$this->setContributionPolicy($oldParentCategory->getContributionPolicy());
 		$this->setMembersCount(0); //removing all members from this category
 		$this->setPendingMembersCount(0);
 	}
@@ -902,18 +901,6 @@ class category extends Basecategory implements IIndexable
 	 * inherited values are not synced in the DB to child category that inherit from them - but should be returned on the object.
 	 * (values are copied upon update inhertance from inherited to manual)
 	 */
-	public function getContributionPolicy()
-	{
-		if ($this->getInheritanceType() == InheritanceType::INHERIT)
-			return $this->getInheritParent()->getContributionPolicy();
-		else
-			return parent::getContributionPolicy();
-	}
-	
-	/**
-	 * inherited values are not synced in the DB to child category that inherit from them - but should be returned on the object.
-	 * (values are copied upon update inhertance from inherited to manual)
-	 */
 	public function getMembersCount()
 	{
 		if ($this->getInheritanceType() == InheritanceType::INHERIT)
@@ -942,7 +929,7 @@ class category extends Basecategory implements IIndexable
 		if ($this->getInheritanceType() == InheritanceType::INHERIT && $this->getInheritParent()->getStatus() == CategoryStatus::UPDATING)
 			return CategoryStatus::UPDATING;
 		else
-			return parent::getContributionPolicy();
+			return parent::getStatus();
 	}
 	
 	/**

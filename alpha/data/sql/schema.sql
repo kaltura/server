@@ -159,6 +159,7 @@ CREATE TABLE `entry`
 	`id` VARCHAR(20)  NOT NULL,
 	`kshow_id` VARCHAR(20),
 	`kuser_id` INTEGER,
+	`creator_kuser_id` INTEGER,
 	`name` VARCHAR(60),
 	`type` SMALLINT,
 	`media_type` SMALLINT,

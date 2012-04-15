@@ -165,7 +165,9 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * Number of active members for this category
 	 *  
 	 * @var int
+	 * @filter gte,lte
 	 * @readonly
+	 * 
 	 */
 	public $membersCount;
 	
@@ -173,6 +175,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * Number of pending members for this category
 	 *
 	 * @var int
+	 * @filter gte,lte
 	 * @readonly
 	 */
 	public $pendingMembersCount;

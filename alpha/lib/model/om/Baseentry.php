@@ -38,6 +38,12 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	protected $kuser_id;
 
 	/**
+	 * The value for the creator_kuser_id field.
+	 * @var        int
+	 */
+	protected $creator_kuser_id;
+
+	/**
 	 * The value for the name field.
 	 * @var        string
 	 */
@@ -556,6 +562,16 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function getKuserId()
 	{
 		return $this->kuser_id;
+	}
+
+	/**
+	 * Get the [creator_kuser_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getCreatorKuserId()
+	{
+		return $this->creator_kuser_id;
 	}
 
 	/**
@@ -1334,6 +1350,29 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setKuserId()
+
+	/**
+	 * Set the value of [creator_kuser_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     entry The current object (for fluent API support)
+	 */
+	public function setCreatorKuserId($v)
+	{
+		if(!isset($this->oldColumnsValues[entryPeer::CREATOR_KUSER_ID]))
+			$this->oldColumnsValues[entryPeer::CREATOR_KUSER_ID] = $this->creator_kuser_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->creator_kuser_id !== $v) {
+			$this->creator_kuser_id = $v;
+			$this->modifiedColumns[] = entryPeer::CREATOR_KUSER_ID;
+		}
+
+		return $this;
+	} // setCreatorKuserId()
 
 	/**
 	 * Set the value of [name] column.
@@ -2743,55 +2782,56 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$this->id = ($row[$startcol + 0] !== null) ? (string) $row[$startcol + 0] : null;
 			$this->kshow_id = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
 			$this->kuser_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-			$this->name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->type = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->media_type = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->data = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->thumbnail = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->views = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->votes = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-			$this->comments = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->favorites = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
-			$this->total_rank = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-			$this->rank = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
-			$this->tags = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->anonymous = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
-			$this->status = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
-			$this->source = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
-			$this->source_id = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
-			$this->source_link = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
-			$this->license_type = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
-			$this->credit = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
-			$this->length_in_msecs = ($row[$startcol + 22] !== null) ? (int) $row[$startcol + 22] : null;
-			$this->created_at = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
-			$this->updated_at = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
-			$this->partner_id = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
-			$this->display_in_search = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
-			$this->subp_id = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
-			$this->custom_data = ($row[$startcol + 28] !== null) ? (string) $row[$startcol + 28] : null;
-			$this->screen_name = ($row[$startcol + 29] !== null) ? (string) $row[$startcol + 29] : null;
-			$this->site_url = ($row[$startcol + 30] !== null) ? (string) $row[$startcol + 30] : null;
-			$this->permissions = ($row[$startcol + 31] !== null) ? (int) $row[$startcol + 31] : null;
-			$this->group_id = ($row[$startcol + 32] !== null) ? (string) $row[$startcol + 32] : null;
-			$this->plays = ($row[$startcol + 33] !== null) ? (int) $row[$startcol + 33] : null;
-			$this->partner_data = ($row[$startcol + 34] !== null) ? (string) $row[$startcol + 34] : null;
-			$this->int_id = ($row[$startcol + 35] !== null) ? (int) $row[$startcol + 35] : null;
-			$this->indexed_custom_data_1 = ($row[$startcol + 36] !== null) ? (int) $row[$startcol + 36] : null;
-			$this->description = ($row[$startcol + 37] !== null) ? (string) $row[$startcol + 37] : null;
-			$this->media_date = ($row[$startcol + 38] !== null) ? (string) $row[$startcol + 38] : null;
-			$this->admin_tags = ($row[$startcol + 39] !== null) ? (string) $row[$startcol + 39] : null;
-			$this->moderation_status = ($row[$startcol + 40] !== null) ? (int) $row[$startcol + 40] : null;
-			$this->moderation_count = ($row[$startcol + 41] !== null) ? (int) $row[$startcol + 41] : null;
-			$this->modified_at = ($row[$startcol + 42] !== null) ? (string) $row[$startcol + 42] : null;
-			$this->puser_id = ($row[$startcol + 43] !== null) ? (string) $row[$startcol + 43] : null;
-			$this->access_control_id = ($row[$startcol + 44] !== null) ? (int) $row[$startcol + 44] : null;
-			$this->conversion_profile_id = ($row[$startcol + 45] !== null) ? (int) $row[$startcol + 45] : null;
-			$this->categories = ($row[$startcol + 46] !== null) ? (string) $row[$startcol + 46] : null;
-			$this->categories_ids = ($row[$startcol + 47] !== null) ? (string) $row[$startcol + 47] : null;
-			$this->start_date = ($row[$startcol + 48] !== null) ? (string) $row[$startcol + 48] : null;
-			$this->end_date = ($row[$startcol + 49] !== null) ? (string) $row[$startcol + 49] : null;
-			$this->flavor_params_ids = ($row[$startcol + 50] !== null) ? (string) $row[$startcol + 50] : null;
-			$this->available_from = ($row[$startcol + 51] !== null) ? (string) $row[$startcol + 51] : null;
+			$this->creator_kuser_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+			$this->name = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->type = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->media_type = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+			$this->data = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->thumbnail = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->views = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->votes = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->comments = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->favorites = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+			$this->total_rank = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+			$this->rank = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->tags = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->anonymous = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
+			$this->status = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
+			$this->source = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->source_id = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
+			$this->source_link = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
+			$this->license_type = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
+			$this->credit = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+			$this->length_in_msecs = ($row[$startcol + 23] !== null) ? (int) $row[$startcol + 23] : null;
+			$this->created_at = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
+			$this->updated_at = ($row[$startcol + 25] !== null) ? (string) $row[$startcol + 25] : null;
+			$this->partner_id = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
+			$this->display_in_search = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
+			$this->subp_id = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
+			$this->custom_data = ($row[$startcol + 29] !== null) ? (string) $row[$startcol + 29] : null;
+			$this->screen_name = ($row[$startcol + 30] !== null) ? (string) $row[$startcol + 30] : null;
+			$this->site_url = ($row[$startcol + 31] !== null) ? (string) $row[$startcol + 31] : null;
+			$this->permissions = ($row[$startcol + 32] !== null) ? (int) $row[$startcol + 32] : null;
+			$this->group_id = ($row[$startcol + 33] !== null) ? (string) $row[$startcol + 33] : null;
+			$this->plays = ($row[$startcol + 34] !== null) ? (int) $row[$startcol + 34] : null;
+			$this->partner_data = ($row[$startcol + 35] !== null) ? (string) $row[$startcol + 35] : null;
+			$this->int_id = ($row[$startcol + 36] !== null) ? (int) $row[$startcol + 36] : null;
+			$this->indexed_custom_data_1 = ($row[$startcol + 37] !== null) ? (int) $row[$startcol + 37] : null;
+			$this->description = ($row[$startcol + 38] !== null) ? (string) $row[$startcol + 38] : null;
+			$this->media_date = ($row[$startcol + 39] !== null) ? (string) $row[$startcol + 39] : null;
+			$this->admin_tags = ($row[$startcol + 40] !== null) ? (string) $row[$startcol + 40] : null;
+			$this->moderation_status = ($row[$startcol + 41] !== null) ? (int) $row[$startcol + 41] : null;
+			$this->moderation_count = ($row[$startcol + 42] !== null) ? (int) $row[$startcol + 42] : null;
+			$this->modified_at = ($row[$startcol + 43] !== null) ? (string) $row[$startcol + 43] : null;
+			$this->puser_id = ($row[$startcol + 44] !== null) ? (string) $row[$startcol + 44] : null;
+			$this->access_control_id = ($row[$startcol + 45] !== null) ? (int) $row[$startcol + 45] : null;
+			$this->conversion_profile_id = ($row[$startcol + 46] !== null) ? (int) $row[$startcol + 46] : null;
+			$this->categories = ($row[$startcol + 47] !== null) ? (string) $row[$startcol + 47] : null;
+			$this->categories_ids = ($row[$startcol + 48] !== null) ? (string) $row[$startcol + 48] : null;
+			$this->start_date = ($row[$startcol + 49] !== null) ? (string) $row[$startcol + 49] : null;
+			$this->end_date = ($row[$startcol + 50] !== null) ? (string) $row[$startcol + 50] : null;
+			$this->flavor_params_ids = ($row[$startcol + 51] !== null) ? (string) $row[$startcol + 51] : null;
+			$this->available_from = ($row[$startcol + 52] !== null) ? (string) $row[$startcol + 52] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -2801,7 +2841,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 52; // 52 = entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 53; // 53 = entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating entry object", $e);
@@ -3522,150 +3562,153 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				return $this->getKuserId();
 				break;
 			case 3:
-				return $this->getName();
+				return $this->getCreatorKuserId();
 				break;
 			case 4:
-				return $this->getType();
+				return $this->getName();
 				break;
 			case 5:
-				return $this->getMediaType();
+				return $this->getType();
 				break;
 			case 6:
-				return $this->getData();
+				return $this->getMediaType();
 				break;
 			case 7:
-				return $this->getThumbnail();
+				return $this->getData();
 				break;
 			case 8:
-				return $this->getViews();
+				return $this->getThumbnail();
 				break;
 			case 9:
-				return $this->getVotes();
+				return $this->getViews();
 				break;
 			case 10:
-				return $this->getComments();
+				return $this->getVotes();
 				break;
 			case 11:
-				return $this->getFavorites();
+				return $this->getComments();
 				break;
 			case 12:
-				return $this->getTotalRank();
+				return $this->getFavorites();
 				break;
 			case 13:
-				return $this->getRank();
+				return $this->getTotalRank();
 				break;
 			case 14:
-				return $this->getTags();
+				return $this->getRank();
 				break;
 			case 15:
-				return $this->getAnonymous();
+				return $this->getTags();
 				break;
 			case 16:
-				return $this->getStatus();
+				return $this->getAnonymous();
 				break;
 			case 17:
-				return $this->getSource();
+				return $this->getStatus();
 				break;
 			case 18:
-				return $this->getSourceId();
+				return $this->getSource();
 				break;
 			case 19:
-				return $this->getSourceLink();
+				return $this->getSourceId();
 				break;
 			case 20:
-				return $this->getLicenseType();
+				return $this->getSourceLink();
 				break;
 			case 21:
-				return $this->getCredit();
+				return $this->getLicenseType();
 				break;
 			case 22:
-				return $this->getLengthInMsecs();
+				return $this->getCredit();
 				break;
 			case 23:
-				return $this->getCreatedAt();
+				return $this->getLengthInMsecs();
 				break;
 			case 24:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 25:
-				return $this->getPartnerId();
+				return $this->getUpdatedAt();
 				break;
 			case 26:
-				return $this->getDisplayInSearch();
+				return $this->getPartnerId();
 				break;
 			case 27:
-				return $this->getSubpId();
+				return $this->getDisplayInSearch();
 				break;
 			case 28:
-				return $this->getCustomData();
+				return $this->getSubpId();
 				break;
 			case 29:
-				return $this->getScreenName();
+				return $this->getCustomData();
 				break;
 			case 30:
-				return $this->getSiteUrl();
+				return $this->getScreenName();
 				break;
 			case 31:
-				return $this->getPermissions();
+				return $this->getSiteUrl();
 				break;
 			case 32:
-				return $this->getGroupId();
+				return $this->getPermissions();
 				break;
 			case 33:
-				return $this->getPlays();
+				return $this->getGroupId();
 				break;
 			case 34:
-				return $this->getPartnerData();
+				return $this->getPlays();
 				break;
 			case 35:
-				return $this->getIntId();
+				return $this->getPartnerData();
 				break;
 			case 36:
-				return $this->getIndexedCustomData1();
+				return $this->getIntId();
 				break;
 			case 37:
-				return $this->getDescription();
+				return $this->getIndexedCustomData1();
 				break;
 			case 38:
-				return $this->getMediaDate();
+				return $this->getDescription();
 				break;
 			case 39:
-				return $this->getAdminTags();
+				return $this->getMediaDate();
 				break;
 			case 40:
-				return $this->getModerationStatus();
+				return $this->getAdminTags();
 				break;
 			case 41:
-				return $this->getModerationCount();
+				return $this->getModerationStatus();
 				break;
 			case 42:
-				return $this->getModifiedAt();
+				return $this->getModerationCount();
 				break;
 			case 43:
-				return $this->getPuserId();
+				return $this->getModifiedAt();
 				break;
 			case 44:
-				return $this->getAccessControlId();
+				return $this->getPuserId();
 				break;
 			case 45:
-				return $this->getConversionProfileId();
+				return $this->getAccessControlId();
 				break;
 			case 46:
-				return $this->getCategories();
+				return $this->getConversionProfileId();
 				break;
 			case 47:
-				return $this->getCategoriesIds();
+				return $this->getCategories();
 				break;
 			case 48:
-				return $this->getStartDate();
+				return $this->getCategoriesIds();
 				break;
 			case 49:
-				return $this->getEndDate();
+				return $this->getStartDate();
 				break;
 			case 50:
-				return $this->getFlavorParamsIds();
+				return $this->getEndDate();
 				break;
 			case 51:
+				return $this->getFlavorParamsIds();
+				break;
+			case 52:
 				return $this->getAvailableFrom();
 				break;
 			default:
@@ -3692,55 +3735,56 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$keys[0] => $this->getId(),
 			$keys[1] => $this->getKshowId(),
 			$keys[2] => $this->getKuserId(),
-			$keys[3] => $this->getName(),
-			$keys[4] => $this->getType(),
-			$keys[5] => $this->getMediaType(),
-			$keys[6] => $this->getData(),
-			$keys[7] => $this->getThumbnail(),
-			$keys[8] => $this->getViews(),
-			$keys[9] => $this->getVotes(),
-			$keys[10] => $this->getComments(),
-			$keys[11] => $this->getFavorites(),
-			$keys[12] => $this->getTotalRank(),
-			$keys[13] => $this->getRank(),
-			$keys[14] => $this->getTags(),
-			$keys[15] => $this->getAnonymous(),
-			$keys[16] => $this->getStatus(),
-			$keys[17] => $this->getSource(),
-			$keys[18] => $this->getSourceId(),
-			$keys[19] => $this->getSourceLink(),
-			$keys[20] => $this->getLicenseType(),
-			$keys[21] => $this->getCredit(),
-			$keys[22] => $this->getLengthInMsecs(),
-			$keys[23] => $this->getCreatedAt(),
-			$keys[24] => $this->getUpdatedAt(),
-			$keys[25] => $this->getPartnerId(),
-			$keys[26] => $this->getDisplayInSearch(),
-			$keys[27] => $this->getSubpId(),
-			$keys[28] => $this->getCustomData(),
-			$keys[29] => $this->getScreenName(),
-			$keys[30] => $this->getSiteUrl(),
-			$keys[31] => $this->getPermissions(),
-			$keys[32] => $this->getGroupId(),
-			$keys[33] => $this->getPlays(),
-			$keys[34] => $this->getPartnerData(),
-			$keys[35] => $this->getIntId(),
-			$keys[36] => $this->getIndexedCustomData1(),
-			$keys[37] => $this->getDescription(),
-			$keys[38] => $this->getMediaDate(),
-			$keys[39] => $this->getAdminTags(),
-			$keys[40] => $this->getModerationStatus(),
-			$keys[41] => $this->getModerationCount(),
-			$keys[42] => $this->getModifiedAt(),
-			$keys[43] => $this->getPuserId(),
-			$keys[44] => $this->getAccessControlId(),
-			$keys[45] => $this->getConversionProfileId(),
-			$keys[46] => $this->getCategories(),
-			$keys[47] => $this->getCategoriesIds(),
-			$keys[48] => $this->getStartDate(),
-			$keys[49] => $this->getEndDate(),
-			$keys[50] => $this->getFlavorParamsIds(),
-			$keys[51] => $this->getAvailableFrom(),
+			$keys[3] => $this->getCreatorKuserId(),
+			$keys[4] => $this->getName(),
+			$keys[5] => $this->getType(),
+			$keys[6] => $this->getMediaType(),
+			$keys[7] => $this->getData(),
+			$keys[8] => $this->getThumbnail(),
+			$keys[9] => $this->getViews(),
+			$keys[10] => $this->getVotes(),
+			$keys[11] => $this->getComments(),
+			$keys[12] => $this->getFavorites(),
+			$keys[13] => $this->getTotalRank(),
+			$keys[14] => $this->getRank(),
+			$keys[15] => $this->getTags(),
+			$keys[16] => $this->getAnonymous(),
+			$keys[17] => $this->getStatus(),
+			$keys[18] => $this->getSource(),
+			$keys[19] => $this->getSourceId(),
+			$keys[20] => $this->getSourceLink(),
+			$keys[21] => $this->getLicenseType(),
+			$keys[22] => $this->getCredit(),
+			$keys[23] => $this->getLengthInMsecs(),
+			$keys[24] => $this->getCreatedAt(),
+			$keys[25] => $this->getUpdatedAt(),
+			$keys[26] => $this->getPartnerId(),
+			$keys[27] => $this->getDisplayInSearch(),
+			$keys[28] => $this->getSubpId(),
+			$keys[29] => $this->getCustomData(),
+			$keys[30] => $this->getScreenName(),
+			$keys[31] => $this->getSiteUrl(),
+			$keys[32] => $this->getPermissions(),
+			$keys[33] => $this->getGroupId(),
+			$keys[34] => $this->getPlays(),
+			$keys[35] => $this->getPartnerData(),
+			$keys[36] => $this->getIntId(),
+			$keys[37] => $this->getIndexedCustomData1(),
+			$keys[38] => $this->getDescription(),
+			$keys[39] => $this->getMediaDate(),
+			$keys[40] => $this->getAdminTags(),
+			$keys[41] => $this->getModerationStatus(),
+			$keys[42] => $this->getModerationCount(),
+			$keys[43] => $this->getModifiedAt(),
+			$keys[44] => $this->getPuserId(),
+			$keys[45] => $this->getAccessControlId(),
+			$keys[46] => $this->getConversionProfileId(),
+			$keys[47] => $this->getCategories(),
+			$keys[48] => $this->getCategoriesIds(),
+			$keys[49] => $this->getStartDate(),
+			$keys[50] => $this->getEndDate(),
+			$keys[51] => $this->getFlavorParamsIds(),
+			$keys[52] => $this->getAvailableFrom(),
 		);
 		return $result;
 	}
@@ -3782,150 +3826,153 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				$this->setKuserId($value);
 				break;
 			case 3:
-				$this->setName($value);
+				$this->setCreatorKuserId($value);
 				break;
 			case 4:
-				$this->setType($value);
+				$this->setName($value);
 				break;
 			case 5:
-				$this->setMediaType($value);
+				$this->setType($value);
 				break;
 			case 6:
-				$this->setData($value);
+				$this->setMediaType($value);
 				break;
 			case 7:
-				$this->setThumbnail($value);
+				$this->setData($value);
 				break;
 			case 8:
-				$this->setViews($value);
+				$this->setThumbnail($value);
 				break;
 			case 9:
-				$this->setVotes($value);
+				$this->setViews($value);
 				break;
 			case 10:
-				$this->setComments($value);
+				$this->setVotes($value);
 				break;
 			case 11:
-				$this->setFavorites($value);
+				$this->setComments($value);
 				break;
 			case 12:
-				$this->setTotalRank($value);
+				$this->setFavorites($value);
 				break;
 			case 13:
-				$this->setRank($value);
+				$this->setTotalRank($value);
 				break;
 			case 14:
-				$this->setTags($value);
+				$this->setRank($value);
 				break;
 			case 15:
-				$this->setAnonymous($value);
+				$this->setTags($value);
 				break;
 			case 16:
-				$this->setStatus($value);
+				$this->setAnonymous($value);
 				break;
 			case 17:
-				$this->setSource($value);
+				$this->setStatus($value);
 				break;
 			case 18:
-				$this->setSourceId($value);
+				$this->setSource($value);
 				break;
 			case 19:
-				$this->setSourceLink($value);
+				$this->setSourceId($value);
 				break;
 			case 20:
-				$this->setLicenseType($value);
+				$this->setSourceLink($value);
 				break;
 			case 21:
-				$this->setCredit($value);
+				$this->setLicenseType($value);
 				break;
 			case 22:
-				$this->setLengthInMsecs($value);
+				$this->setCredit($value);
 				break;
 			case 23:
-				$this->setCreatedAt($value);
+				$this->setLengthInMsecs($value);
 				break;
 			case 24:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 25:
-				$this->setPartnerId($value);
+				$this->setUpdatedAt($value);
 				break;
 			case 26:
-				$this->setDisplayInSearch($value);
+				$this->setPartnerId($value);
 				break;
 			case 27:
-				$this->setSubpId($value);
+				$this->setDisplayInSearch($value);
 				break;
 			case 28:
-				$this->setCustomData($value);
+				$this->setSubpId($value);
 				break;
 			case 29:
-				$this->setScreenName($value);
+				$this->setCustomData($value);
 				break;
 			case 30:
-				$this->setSiteUrl($value);
+				$this->setScreenName($value);
 				break;
 			case 31:
-				$this->setPermissions($value);
+				$this->setSiteUrl($value);
 				break;
 			case 32:
-				$this->setGroupId($value);
+				$this->setPermissions($value);
 				break;
 			case 33:
-				$this->setPlays($value);
+				$this->setGroupId($value);
 				break;
 			case 34:
-				$this->setPartnerData($value);
+				$this->setPlays($value);
 				break;
 			case 35:
-				$this->setIntId($value);
+				$this->setPartnerData($value);
 				break;
 			case 36:
-				$this->setIndexedCustomData1($value);
+				$this->setIntId($value);
 				break;
 			case 37:
-				$this->setDescription($value);
+				$this->setIndexedCustomData1($value);
 				break;
 			case 38:
-				$this->setMediaDate($value);
+				$this->setDescription($value);
 				break;
 			case 39:
-				$this->setAdminTags($value);
+				$this->setMediaDate($value);
 				break;
 			case 40:
-				$this->setModerationStatus($value);
+				$this->setAdminTags($value);
 				break;
 			case 41:
-				$this->setModerationCount($value);
+				$this->setModerationStatus($value);
 				break;
 			case 42:
-				$this->setModifiedAt($value);
+				$this->setModerationCount($value);
 				break;
 			case 43:
-				$this->setPuserId($value);
+				$this->setModifiedAt($value);
 				break;
 			case 44:
-				$this->setAccessControlId($value);
+				$this->setPuserId($value);
 				break;
 			case 45:
-				$this->setConversionProfileId($value);
+				$this->setAccessControlId($value);
 				break;
 			case 46:
-				$this->setCategories($value);
+				$this->setConversionProfileId($value);
 				break;
 			case 47:
-				$this->setCategoriesIds($value);
+				$this->setCategories($value);
 				break;
 			case 48:
-				$this->setStartDate($value);
+				$this->setCategoriesIds($value);
 				break;
 			case 49:
-				$this->setEndDate($value);
+				$this->setStartDate($value);
 				break;
 			case 50:
-				$this->setFlavorParamsIds($value);
+				$this->setEndDate($value);
 				break;
 			case 51:
+				$this->setFlavorParamsIds($value);
+				break;
+			case 52:
 				$this->setAvailableFrom($value);
 				break;
 		} // switch()
@@ -3955,55 +4002,56 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
 		if (array_key_exists($keys[1], $arr)) $this->setKshowId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setKuserId($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setName($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setType($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setMediaType($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setData($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setThumbnail($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setViews($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setVotes($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setComments($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setFavorites($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setTotalRank($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setRank($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setTags($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setAnonymous($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setStatus($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setSource($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setSourceId($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setSourceLink($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setLicenseType($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setCredit($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setLengthInMsecs($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setCreatedAt($arr[$keys[23]]);
-		if (array_key_exists($keys[24], $arr)) $this->setUpdatedAt($arr[$keys[24]]);
-		if (array_key_exists($keys[25], $arr)) $this->setPartnerId($arr[$keys[25]]);
-		if (array_key_exists($keys[26], $arr)) $this->setDisplayInSearch($arr[$keys[26]]);
-		if (array_key_exists($keys[27], $arr)) $this->setSubpId($arr[$keys[27]]);
-		if (array_key_exists($keys[28], $arr)) $this->setCustomData($arr[$keys[28]]);
-		if (array_key_exists($keys[29], $arr)) $this->setScreenName($arr[$keys[29]]);
-		if (array_key_exists($keys[30], $arr)) $this->setSiteUrl($arr[$keys[30]]);
-		if (array_key_exists($keys[31], $arr)) $this->setPermissions($arr[$keys[31]]);
-		if (array_key_exists($keys[32], $arr)) $this->setGroupId($arr[$keys[32]]);
-		if (array_key_exists($keys[33], $arr)) $this->setPlays($arr[$keys[33]]);
-		if (array_key_exists($keys[34], $arr)) $this->setPartnerData($arr[$keys[34]]);
-		if (array_key_exists($keys[35], $arr)) $this->setIntId($arr[$keys[35]]);
-		if (array_key_exists($keys[36], $arr)) $this->setIndexedCustomData1($arr[$keys[36]]);
-		if (array_key_exists($keys[37], $arr)) $this->setDescription($arr[$keys[37]]);
-		if (array_key_exists($keys[38], $arr)) $this->setMediaDate($arr[$keys[38]]);
-		if (array_key_exists($keys[39], $arr)) $this->setAdminTags($arr[$keys[39]]);
-		if (array_key_exists($keys[40], $arr)) $this->setModerationStatus($arr[$keys[40]]);
-		if (array_key_exists($keys[41], $arr)) $this->setModerationCount($arr[$keys[41]]);
-		if (array_key_exists($keys[42], $arr)) $this->setModifiedAt($arr[$keys[42]]);
-		if (array_key_exists($keys[43], $arr)) $this->setPuserId($arr[$keys[43]]);
-		if (array_key_exists($keys[44], $arr)) $this->setAccessControlId($arr[$keys[44]]);
-		if (array_key_exists($keys[45], $arr)) $this->setConversionProfileId($arr[$keys[45]]);
-		if (array_key_exists($keys[46], $arr)) $this->setCategories($arr[$keys[46]]);
-		if (array_key_exists($keys[47], $arr)) $this->setCategoriesIds($arr[$keys[47]]);
-		if (array_key_exists($keys[48], $arr)) $this->setStartDate($arr[$keys[48]]);
-		if (array_key_exists($keys[49], $arr)) $this->setEndDate($arr[$keys[49]]);
-		if (array_key_exists($keys[50], $arr)) $this->setFlavorParamsIds($arr[$keys[50]]);
-		if (array_key_exists($keys[51], $arr)) $this->setAvailableFrom($arr[$keys[51]]);
+		if (array_key_exists($keys[3], $arr)) $this->setCreatorKuserId($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setName($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setType($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setMediaType($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setData($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setThumbnail($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setViews($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setVotes($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setComments($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setFavorites($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setTotalRank($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setRank($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setTags($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setAnonymous($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setStatus($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setSource($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setSourceId($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setSourceLink($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setLicenseType($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setCredit($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setLengthInMsecs($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setCreatedAt($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setUpdatedAt($arr[$keys[25]]);
+		if (array_key_exists($keys[26], $arr)) $this->setPartnerId($arr[$keys[26]]);
+		if (array_key_exists($keys[27], $arr)) $this->setDisplayInSearch($arr[$keys[27]]);
+		if (array_key_exists($keys[28], $arr)) $this->setSubpId($arr[$keys[28]]);
+		if (array_key_exists($keys[29], $arr)) $this->setCustomData($arr[$keys[29]]);
+		if (array_key_exists($keys[30], $arr)) $this->setScreenName($arr[$keys[30]]);
+		if (array_key_exists($keys[31], $arr)) $this->setSiteUrl($arr[$keys[31]]);
+		if (array_key_exists($keys[32], $arr)) $this->setPermissions($arr[$keys[32]]);
+		if (array_key_exists($keys[33], $arr)) $this->setGroupId($arr[$keys[33]]);
+		if (array_key_exists($keys[34], $arr)) $this->setPlays($arr[$keys[34]]);
+		if (array_key_exists($keys[35], $arr)) $this->setPartnerData($arr[$keys[35]]);
+		if (array_key_exists($keys[36], $arr)) $this->setIntId($arr[$keys[36]]);
+		if (array_key_exists($keys[37], $arr)) $this->setIndexedCustomData1($arr[$keys[37]]);
+		if (array_key_exists($keys[38], $arr)) $this->setDescription($arr[$keys[38]]);
+		if (array_key_exists($keys[39], $arr)) $this->setMediaDate($arr[$keys[39]]);
+		if (array_key_exists($keys[40], $arr)) $this->setAdminTags($arr[$keys[40]]);
+		if (array_key_exists($keys[41], $arr)) $this->setModerationStatus($arr[$keys[41]]);
+		if (array_key_exists($keys[42], $arr)) $this->setModerationCount($arr[$keys[42]]);
+		if (array_key_exists($keys[43], $arr)) $this->setModifiedAt($arr[$keys[43]]);
+		if (array_key_exists($keys[44], $arr)) $this->setPuserId($arr[$keys[44]]);
+		if (array_key_exists($keys[45], $arr)) $this->setAccessControlId($arr[$keys[45]]);
+		if (array_key_exists($keys[46], $arr)) $this->setConversionProfileId($arr[$keys[46]]);
+		if (array_key_exists($keys[47], $arr)) $this->setCategories($arr[$keys[47]]);
+		if (array_key_exists($keys[48], $arr)) $this->setCategoriesIds($arr[$keys[48]]);
+		if (array_key_exists($keys[49], $arr)) $this->setStartDate($arr[$keys[49]]);
+		if (array_key_exists($keys[50], $arr)) $this->setEndDate($arr[$keys[50]]);
+		if (array_key_exists($keys[51], $arr)) $this->setFlavorParamsIds($arr[$keys[51]]);
+		if (array_key_exists($keys[52], $arr)) $this->setAvailableFrom($arr[$keys[52]]);
 	}
 
 	/**
@@ -4018,6 +4066,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(entryPeer::ID)) $criteria->add(entryPeer::ID, $this->id);
 		if ($this->isColumnModified(entryPeer::KSHOW_ID)) $criteria->add(entryPeer::KSHOW_ID, $this->kshow_id);
 		if ($this->isColumnModified(entryPeer::KUSER_ID)) $criteria->add(entryPeer::KUSER_ID, $this->kuser_id);
+		if ($this->isColumnModified(entryPeer::CREATOR_KUSER_ID)) $criteria->add(entryPeer::CREATOR_KUSER_ID, $this->creator_kuser_id);
 		if ($this->isColumnModified(entryPeer::NAME)) $criteria->add(entryPeer::NAME, $this->name);
 		if ($this->isColumnModified(entryPeer::TYPE)) $criteria->add(entryPeer::TYPE, $this->type);
 		if ($this->isColumnModified(entryPeer::MEDIA_TYPE)) $criteria->add(entryPeer::MEDIA_TYPE, $this->media_type);
@@ -4138,6 +4187,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$copyObj->setKshowId($this->kshow_id);
 
 		$copyObj->setKuserId($this->kuser_id);
+
+		$copyObj->setCreatorKuserId($this->creator_kuser_id);
 
 		$copyObj->setName($this->name);
 
