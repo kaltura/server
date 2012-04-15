@@ -480,7 +480,7 @@ class kJobsManager
 				$nextOperator = $operatorSet->getOperator();
 				if(!$nextOperator)
 				{
-					KalturaLog::log("First operator is invalid");
+					KalturaLog::err("First operator is invalid");
 					return null;
 				}
 				
@@ -506,7 +506,7 @@ class kJobsManager
 				$parentData = $parentJob->getData();
 				if(!$parentData || !($parentData instanceof kConvartableJobData))
 				{
-					KalturaLog::log("Parent job data is invalid");
+					KalturaLog::err("Parent job data is invalid");
 					return null;
 				}
 				
@@ -517,7 +517,7 @@ class kJobsManager
 				$nextOperator = $operatorSet->getOperator($nextOperatorSet, $nextOperatorIndex);
 				if(!$nextOperator)
 				{
-					KalturaLog::log("Next operator is invalid");
+					KalturaLog::err("Next operator is invalid");
 					return null;
 				}
 				
@@ -540,7 +540,7 @@ class kJobsManager
 				$currentConversionEngine = next($conversionEngines);
 				if(! $currentConversionEngine)
 				{
-					KalturaLog::log("There is no other conversion engine to use");
+					KalturaLog::err("There is no other conversion engine to use");
 					return null;
 				}
 			}
