@@ -17,11 +17,11 @@ class kvote extends Basekvote
 	{
 		if ( $this->isNew() )
 		{
-			$this->statistics_results = myStatisticsMgr::addKvote( $this , $this->getRank() );
+			$this->statistics_results = myStatisticsMgr::addKvote($this);
 		}
 		if (in_array(kvotePeer::STATUS, $this->modifiedColumns))
 		{
-		   $this->statistics_results = myStatisticsMgr::modifyEntryVotesBykVote($this, $this->getRank()); 
+		   $this->statistics_results = myStatisticsMgr::modifyEntryVotesBykVote($this); 
 		}
 		
 		KalturaLog::debug("kvote status before save: ". $this->getStatus());

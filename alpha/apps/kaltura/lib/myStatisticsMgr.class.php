@@ -314,17 +314,17 @@ KalturaLog::log ( __METHOD__ . ": " . $kshow->getId() . " plays: $v");
 	}
 	
 	
-	public static function addKvote ( kvote $kvote , $delta_rank )
+	public static function addKvote ( kvote $kvote )
 	{
 		$entry = $kvote->getEntry();
-		$res = self::modifyEntryVotes($entry, $delta_rank, KVoteStatus::VOTED);
+		$res = self::modifyEntryVotes($entry, $kvote->getRank(), KVoteStatus::VOTED);
 		return $res; 
 	}
 	
-    public static function modifyEntryVotesBykVote (kvote $kvote, $delta_rank)
+    public static function modifyEntryVotesBykVote (kvote $kvote)
 	{
 		$entry = $kvote->getEntry();
-		$res = self::modifyEntryVotes($entry, $delta_rank, $kvote->getStatus());
+		$res = self::modifyEntryVotes($entry, $kvote->getRank(), $kvote->getStatus());
 		return $res; 
 	}
 
