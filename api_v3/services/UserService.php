@@ -180,8 +180,13 @@ class UserService extends KalturaBaseUserService
 	 *
 	 * @throws KalturaErrors::INVALID_USER_ID
 	 */		
-	public function getAction($userId)
+	public function getAction($userId = null)
 	{
+	    if (!$userId || $userId = "")
+	    {
+            $userId = kCurrentContext::$ks_uid;	        
+	    }
+	    
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 	
 		if (!$dbUser)
