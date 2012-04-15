@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 class XsltTesterAction extends KalturaAdminConsolePlugin
 {
     protected $client;

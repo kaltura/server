@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 interface IMediaSource
 {
 	/**
@@ -27,4 +31,3 @@ interface IMediaSource
 	
 	public function getConfigCustomData();
 }
-?>

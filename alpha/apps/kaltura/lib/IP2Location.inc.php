@@ -1,5 +1,5 @@
 <?php
-/* IP2Location.inc
+/** IP2Location.inc
  *
  * Copyright (C) 2005-2008 IP2Location.com
  *
@@ -18,6 +18,8 @@
  * You should have received a copy of the GNU Lesser General var
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * 
+ * @package IP2Location
  */
 
 define("VERSION", "3.00");

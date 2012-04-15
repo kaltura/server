@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package plugins.mySqlSearch
+ */
 class kMySqlSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEventConsumer
 {
 	const MYSQL_INDEX_NAME = 'Search';

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myMediaCommonsServices extends myBaseMediaSource implements IMediaSource
 {
 	protected $supported_media_types =  self::SUPPORT_MEDIA_TYPE_IMAGE; // for now - supports only images  
@@ -240,4 +244,3 @@ class myMediaCommonsServices extends myBaseMediaSource implements IMediaSource
 	
 
 }
-?>

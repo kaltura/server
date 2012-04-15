@@ -4,6 +4,10 @@
 //require_once(MODULES.'search/actions/AJAX_getEntriesAction.class.php');
 
 
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myKalturaServices extends myBaseMediaSource implements IMediaSource
 {
 	const AUTH_SALT = "myKalturaServices:gogog123";
@@ -198,4 +202,3 @@ class myKalturaServices extends myBaseMediaSource implements IMediaSource
 	
 	
 }
-?>

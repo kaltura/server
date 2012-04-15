@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.eventNotification
+ * @subpackage admin
+ */
 class Form_NewEventNotificationTemplate extends Zend_Form
 {
 	public function init()

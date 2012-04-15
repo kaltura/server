@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.KalturaInternalTools
+ * @subpackage admin
+ */
 class Form_SystemHelper extends Zend_Form
 {
 	public function init()

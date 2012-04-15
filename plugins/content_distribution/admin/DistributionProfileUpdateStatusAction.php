@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 class DistributionProfileUpdateStatusAction extends KalturaAdminConsolePlugin
 {
 	public function __construct()

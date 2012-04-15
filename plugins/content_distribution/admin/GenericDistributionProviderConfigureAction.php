@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlugin
 {
 	protected $client;

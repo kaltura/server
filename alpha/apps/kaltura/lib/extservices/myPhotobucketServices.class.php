@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myPhotobucketServices extends myBaseMediaSource implements IMediaSource
 {
 	protected $supported_media_types =  5;  
@@ -228,4 +232,3 @@ class myPhotobucketServices extends myBaseMediaSource implements IMediaSource
         return self::urlencodeRFC3986(utf8_encode($string));
     }
 }
-?>

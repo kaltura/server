@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myWebcamRecordService extends myBaseMediaSource implements IMediaSource
 {
 	private static $NEED_MEDIA_INFO = "0";
@@ -23,5 +27,3 @@ class myWebcamRecordService extends myBaseMediaSource implements IMediaSource
 		return array("serverUrl" => requestUtils::getStreamingServerUrl());
 	}
 }
-
-?>

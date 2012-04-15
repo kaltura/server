@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myUrlImportServices extends myBaseMediaSource implements IMediaSource
 {
 	// TODO - once the fetch video is fixed - return $supported_media_types to be 5
@@ -279,4 +283,3 @@ class myUrlImportServices extends myBaseMediaSource implements IMediaSource
 
 		
 }
-?>

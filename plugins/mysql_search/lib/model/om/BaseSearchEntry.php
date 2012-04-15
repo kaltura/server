@@ -5,7 +5,7 @@
  *
  * 
  *
- * @package plugins.contentDistribution
+ * @package plugins.mySqlSearch
  * @subpackage model.om
  */
 abstract class BaseSearchEntry extends BaseObject  implements Persistent {

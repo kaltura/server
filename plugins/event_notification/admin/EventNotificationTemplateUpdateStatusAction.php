@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.eventNotification
+ * @subpackage admin
+ */
 class EventNotificationTemplateUpdateStatusAction extends KalturaAdminConsolePlugin
 {
 	public function __construct()

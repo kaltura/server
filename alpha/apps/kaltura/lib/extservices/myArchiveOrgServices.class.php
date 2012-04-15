@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myArchiveOrgServices extends myBaseMediaSource implements IMediaSource
 {
 	protected $supported_media_types =  self::SUPPORT_MEDIA_TYPE_VIDEO ;  
@@ -241,4 +245,3 @@ class myArchiveOrgServices extends myBaseMediaSource implements IMediaSource
 	
 
 }
-;?>

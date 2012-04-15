@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myFlickrServices extends myBaseMediaSource implements IMediaSource
 {
 	protected $supported_media_types = self::SUPPORT_MEDIA_TYPE_IMAGE;  
@@ -257,4 +261,3 @@ class myFlickrServices extends myBaseMediaSource implements IMediaSource
 		return array('status' => $status, 'message' => $message, 'objectInfo' => $objectInfo);
 	}
 }
-?>

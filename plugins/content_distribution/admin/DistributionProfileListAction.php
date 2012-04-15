@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 class DistributionProfileListAction extends KalturaAdminConsolePlugin implements IKalturaAdminConsolePublisherAction
 {
 	public function __construct()

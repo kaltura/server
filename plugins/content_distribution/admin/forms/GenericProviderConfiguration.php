@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 class Form_GenericProviderConfiguration extends Form_DistributionConfiguration
 {
 	private $properties = null;

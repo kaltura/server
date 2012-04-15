@@ -4,6 +4,10 @@
 //require_once(MODULES.'search/actions/AJAX_getEntriesAction.class.php');
 
 
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myKalturaKshowServices extends myBaseMediaSource implements IMediaSource
 {
 	const KALTURA_SERVICE_CRITERIA_FROM_KSHOW = 1;
@@ -209,4 +213,3 @@ class myKalturaKshowServices extends myBaseMediaSource implements IMediaSource
 	
 	
 }
-?>

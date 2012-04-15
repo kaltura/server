@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package plugins.mySqlSearch
+ */
 abstract class MySqlCriteria extends KalturaCriteria
 {
 	protected $removedKeys = array();

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myMySpaceServices extends myBaseMediaSource implements IMediaSource
 {
 	protected $supported_media_types =  self::SUPPORT_MEDIA_TYPE_VIDEO ;  
@@ -408,4 +412,3 @@ class myMySpaceServices extends myBaseMediaSource implements IMediaSource
 		return $body;
 	}
 }
-?>

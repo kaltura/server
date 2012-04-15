@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myFileUploadService extends myBaseMediaSource implements IMediaSource
 {
 	const MAX_FILES = 100;
@@ -64,5 +68,3 @@ class myFileUploadService extends myBaseMediaSource implements IMediaSource
 		}
 	}
 }
-
-?>

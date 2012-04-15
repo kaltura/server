@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myCurrentServices extends myBaseMediaSource implements IMediaSource
 {
 	protected $supported_media_types = 5; //self::SUPPORT_MEDIA_TYPE_VIDEO + (int)self::SUPPORT_MEDIA_TYPE_IMAGE;  
@@ -180,4 +184,3 @@ class myCurrentServices extends myBaseMediaSource implements IMediaSource
 
 		
 }
-?>

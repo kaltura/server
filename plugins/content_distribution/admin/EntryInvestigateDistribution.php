@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 class Kaltura_View_Helper_EntryInvestigateDistribution extends Kaltura_View_Helper_EntryInvestigatePlugin
 {
 	/* (non-PHPdoc)

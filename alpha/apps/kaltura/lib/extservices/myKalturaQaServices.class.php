@@ -2,6 +2,10 @@
 //define('MODULES' , SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR."modules".DIRECTORY_SEPARATOR);
 //require_once(MODULES.'search/actions/entryFilter.class.php');
 
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myKalturaQaServices  extends myBaseMediaSource  implements IMediaSource
 {
 	public function getMediaInfo( $media_type ,$objectId) 
@@ -64,4 +68,3 @@ class myKalturaQaServices  extends myBaseMediaSource  implements IMediaSource
 	}
 	
 }
-?>

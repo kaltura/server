@@ -11,7 +11,7 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package plugins.contentDistribution
+ * @package plugins.mySqlSearch
  * @subpackage model.map
  */
 class SearchEntryTableMap extends TableMap {

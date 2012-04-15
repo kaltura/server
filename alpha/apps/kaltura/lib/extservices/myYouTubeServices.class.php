@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myYouTubeServices extends myBaseMediaSource implements IMediaSource
 {
 	protected $supported_media_types =  3;// self::SUPPORT_MEDIA_TYPE_VIDEO +self::SUPPORT_MEDIA_TYPE_AUDIO;  
@@ -216,4 +219,3 @@ class myYouTubeServices extends myBaseMediaSource implements IMediaSource
 
 	
 }
-?>

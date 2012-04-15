@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myCCMixterServices extends myBaseMediaSource implements IMediaSource
 {
 	private static $NEED_MEDIA_INFO = "0";
@@ -115,4 +119,3 @@ class myCCMixterServices extends myBaseMediaSource implements IMediaSource
 
 
 }
-?>

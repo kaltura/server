@@ -1,6 +1,9 @@
 <?php
 /**
  * Will return all clips for kuser (in specific partner_id - a kuser is always in a partner context)
+ * 
+ * @package Core
+ * @subpackage ExternalServices
  */
 class myKalturaUserClipsServices extends myBaseMediaSource implements IMediaSource
 {
@@ -137,4 +140,3 @@ class myKalturaUserClipsServices extends myBaseMediaSource implements IMediaSour
 	
 
 }
-?>

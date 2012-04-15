@@ -5,7 +5,7 @@
  *
  * 
  *
- * @package plugins.contentDistribution
+ * @package plugins.mySqlSearch
  * @subpackage model.om
  */
 abstract class BaseSearchEntryPeer {

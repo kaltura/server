@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myJamendoServices extends myBaseMediaSource implements IMediaSource
 {
 	protected $supported_media_types = self::SUPPORT_MEDIA_TYPE_AUDIO;  
@@ -97,4 +101,3 @@ class myJamendoServices extends myBaseMediaSource implements IMediaSource
 	
 	
 }
-?>

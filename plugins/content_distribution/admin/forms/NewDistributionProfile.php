@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 class Form_NewDistributionProfile extends Zend_Form
 {
 	public function init()

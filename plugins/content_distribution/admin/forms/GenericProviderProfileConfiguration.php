@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfiguration
 {
 	private static $metadataProfileFields;

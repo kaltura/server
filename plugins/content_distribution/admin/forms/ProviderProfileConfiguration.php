@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfiguration
 {
 	protected $partnerId;

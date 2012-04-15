@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 class GenericDistributionProvidersListAction extends KalturaAdminConsolePlugin implements IKalturaAdminConsolePublisherAction
 {
 	public function __construct()

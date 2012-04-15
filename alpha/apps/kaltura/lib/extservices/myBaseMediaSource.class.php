@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 abstract class myBaseMediaSource implements IMediaSource 
 {
 	const AUTH_METHOD_PUBLIC = 1;
@@ -150,4 +154,3 @@ abstract class myBaseMediaSource implements IMediaSource
 		curl_close($ch);	
 	}
 }
-?>

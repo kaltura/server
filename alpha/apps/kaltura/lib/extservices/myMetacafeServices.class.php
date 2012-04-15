@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage ExternalServices
+ */
 class myMetacafeServices extends myBaseMediaSource implements IMediaSource
 {
 	protected $supported_media_types =  self::SUPPORT_MEDIA_TYPE_VIDEO ;  
@@ -127,4 +130,3 @@ class myMetacafeServices extends myBaseMediaSource implements IMediaSource
 		return "";
 	}
 }
-;?>

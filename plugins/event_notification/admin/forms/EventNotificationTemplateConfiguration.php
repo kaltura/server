@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.eventNotification
+ * @subpackage admin
+ */
 abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 {
 	/**

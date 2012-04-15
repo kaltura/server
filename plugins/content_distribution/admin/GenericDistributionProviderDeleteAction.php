@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 class GenericDistributionProviderDeleteAction extends KalturaAdminConsolePlugin
 {
 	public function __construct()

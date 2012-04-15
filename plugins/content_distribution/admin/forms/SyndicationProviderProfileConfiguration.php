@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 class Form_SyndicationProviderProfileConfiguration extends Form_ProviderProfileConfiguration
 {
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)

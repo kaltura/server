@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage Scheduler.Distribute
+ */
 abstract class DistributionEngine implements IDistributionEngine
 {
 	/**

@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package plugins.mySqlSearch
+ */
 interface IMySqlSearchPeer
 {
 	/**

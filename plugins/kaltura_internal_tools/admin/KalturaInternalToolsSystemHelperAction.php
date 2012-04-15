@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.KalturaInternalTools
+ * @subpackage admin
+ */
 class KalturaInternalToolsPluginSystemHelperAction extends KalturaAdminConsolePlugin
 {
 	

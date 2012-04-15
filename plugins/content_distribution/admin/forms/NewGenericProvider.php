@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 class Form_NewGenericProvider extends Zend_Form
 {
 	public function init()

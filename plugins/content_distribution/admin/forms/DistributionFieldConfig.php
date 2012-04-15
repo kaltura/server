@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage admin
+ */
 class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 {
 	public function init()
