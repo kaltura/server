@@ -143,7 +143,8 @@ class CategoryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
 			
-		$categoryDb->setDeletedAt(time());
+		$categoryDb->setStatus(CategoryStatus::DELETED);
+		$categoryDb->setDeletedAt(time());		
 	} 
 	
 	/**
