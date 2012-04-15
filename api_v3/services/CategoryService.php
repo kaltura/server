@@ -178,6 +178,7 @@ class CategoryService extends KalturaBaseService
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		 
 		$categoryFilter->attachToCriteria($c);
+		$pager->attachToCriteria($c);
 		
 		$dbList = categoryPeer::doSelect($c);
 		$totalCount = $c->getRecordsCount();
