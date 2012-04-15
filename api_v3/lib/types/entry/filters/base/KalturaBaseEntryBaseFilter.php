@@ -97,8 +97,6 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"+partnerSortValue" => "+partner_sort_value",
 		"-partnerSortValue" => "-partner_sort_value",
 		"recent" => "recent",
-	    "+totalRank" => "+total_rank",
-		"-totalRank" => "-total_rank",
 	);
 
 	public function getMapBetweenObjects()

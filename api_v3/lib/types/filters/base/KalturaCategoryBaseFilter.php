@@ -27,6 +27,10 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 		"privacyIn" => "_in_privacy",
 		"inheritanceTypeEqual" => "_eq_inheritance_type",
 		"inheritanceTypeIn" => "_in_inheritance_type",
+		"membersCountGreaterThanOrEqual" => "_gte_members_count",
+		"membersCountLessThanOrEqual" => "_lte_members_count",
+		"pendingMembersCountGreaterThanOrEqual" => "_gte_pending_members_count",
+		"pendingMembersCountLessThanOrEqual" => "_lte_pending_members_count",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"inheritedParentIdEqual" => "_eq_inherited_parent_id",
@@ -187,6 +191,34 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $inheritanceTypeIn;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $membersCountGreaterThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $membersCountLessThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $pendingMembersCountGreaterThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $pendingMembersCountLessThanOrEqual;
 
 	/**
 	 * 
