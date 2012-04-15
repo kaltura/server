@@ -1,9 +1,14 @@
 <?php
-
+/**
+ * @package plugins.dailymotionDistribution
+ * @subpackage tests
+ */
 require_once(dirname(__FILE__) . '/../../../../../../tests/base/bootstrap.php');
 
 /**
  * DailymotionDistributionProvider test case.
+ * @package plugins.dailymotionDistribution
+ * @subpackage tests
  */
 class DailymotionDistributionProviderTest extends KalturaUnitTestCase
 {
