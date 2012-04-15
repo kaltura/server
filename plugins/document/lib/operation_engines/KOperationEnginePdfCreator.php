@@ -105,7 +105,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		
 		
 		//TODO: RENAME - will not be needed once PDFCreator can work with a configurations file	
-		$sleepTimes = 50;
+		$sleepTimes = 100;
 		$sleepSeconds = 3;
 		$tmpFile = realpath($tmpFile);
 		while (!rename($tmpFile, $this->outFilePath) && $sleepTimes > 0) {
