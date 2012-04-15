@@ -13,6 +13,12 @@
 class KDwhClient
 {
 	private static $s_file_name;
+	
+	/**
+	 * Enable logging
+	 * @var bool
+	 */
+	private static $enabled = true;
 
 	/* Holds the PHP stream to log to.
 	 * @var null|stream
@@ -34,10 +40,22 @@ class KDwhClient
 	}
 
 	/**
+	 * Enables or disables logging
+	 * @param bool $enabled
+	 */
+	public static function setEnabled($enabled)
+	{
+		self::$enabled = $enabled;
+	}
+
+	/**
 	 * @param KDwhEventBase $event
 	 */
 	public static function send ( KDwhEventBase $event )
 	{
+		if(!self::$enabled)
+			return;
+			
 		$dwh_client = self::getInstance();
 
 		$event_line = $event->toEventLine();

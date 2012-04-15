@@ -224,6 +224,7 @@ abstract class KBatchBase implements IKalturaLogger
 		KalturaLog::debug("set_time_limit({$this->taskConfig->maximumExecutionTime})");
 		set_time_limit($this->taskConfig->maximumExecutionTime);
 		
+		
 		KalturaLog::debug('This batch index: ' . $this->getIndex());
 		KalturaLog::debug('This session key: ' . $this->sessionKey);
 		
@@ -238,6 +239,7 @@ abstract class KBatchBase implements IKalturaLogger
 		$ks = $this->createKS();
 		$this->kClient->setKs($ks);
 		
+		KDwhClient::setEnabled($this->taskConfig->getDwhEnabled());
 		KDwhClient::setFileName($this->taskConfig->getDwhPath());
 		$this->onBatchUp();
 		
@@ -484,6 +486,7 @@ abstract class KBatchBase implements IKalturaLogger
 		$killConfig->schedulerId = $this->getSchedulerId();
 		$killConfig->schedulerName = $this->getSchedulerName();
 		$killConfig->dwhPath = $this->taskConfig->getDwhPath();
+		$killConfig->dwhEnabled = $this->taskConfig->getDwhEnabled();
 		
 		$phpPath = 'php'; // TODO - get it from somewhere
 		$killerPath = $this->getMonitorPath();

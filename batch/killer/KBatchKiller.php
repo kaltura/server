@@ -14,6 +14,7 @@ class KBatchKiller
 	{
 		$this->config = $config;
 		
+		KDwhClient::setEnabled($config->dwhEnabled);		
 		KDwhClient::setFileName($config->dwhPath);
 	}
 	

@@ -159,6 +159,7 @@ class KGenericScheduler
 		$this->logDir = $this->schedulerConfig->getLogDir();
 		$this->maxExecutionTime = $this->schedulerConfig->getMaxExecutionTime();
 		$this->statusInterval = $this->schedulerConfig->getStatusInterval();
+		KDwhClient::setEnabled($this->schedulerConfig->getDwhEnabled());
 		KDwhClient::setFileName($this->schedulerConfig->getDwhPath());
 		
 		$taskConfigsValidations = array();

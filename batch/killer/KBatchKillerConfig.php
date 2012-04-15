@@ -64,4 +64,9 @@ class KBatchKillerConfig
 	 * @var string path to DWH log
 	 */
 	public $dwhPath;
+	
+	/**
+	 * @var bool DWH logging enabled
+	 */
+	public $dwhEnabled;
 }

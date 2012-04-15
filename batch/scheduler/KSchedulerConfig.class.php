@@ -180,11 +180,16 @@ class KSchedulerConfig
 		return $this->config->KScheduler->hostName;
 	}
 
+	public function getDwhEnabled()
+	{
+		return $this->config->KScheduler->dwhEnabled;
+	}
+	
 	public function getDwhPath()
 	{
 		return $this->config->KScheduler->dwhPath;
 	}
-
+	
 	public function getTimezone()
 	{
 		return $this->config->KScheduler->timezone;
@@ -243,7 +248,7 @@ class KSchedulerConfig
 			$task->baseSharedPath = $taskData->baseSharedPath;	  
 			$task->baseTempLocalPath = $taskData->baseTempLocalPath;	  
 			$task->baseTempSharedPath = $taskData->baseTempSharedPath;	  
-			$task->minCreatedAtMinutes = $taskData->minCreatedAtMinutes;
+			$task->minCreatedAtMinutes = $taskData->minCreatedAtMinutes;	  
 			
 			$task->params = $taskData->params;
 			if($taskData->filter)
@@ -260,6 +265,7 @@ class KSchedulerConfig
 			$task->setSchedulerName($this->getName());
 			$task->setServiceUrl($this->getServiceUrl());
 			$task->setDwhPath($this->getDwhPath());
+			$task->setDwhEnabled($this->getDwhEnabled());
 			$task->setHostName($this->getHostName());
 			$task->setTimezone($this->getTimezone());
 			$task->setQueueFiltersDir($this->getQueueFiltersDir());
@@ -375,6 +381,7 @@ class KSchedularTaskConfig
 	private $secret;
 	private $curlTimeout;
 	private $dwhPath;
+	private $dwhEnabled;
 	private $hostName;
 	private $timezone;
 	private $commandsDir;
@@ -438,7 +445,15 @@ class KSchedularTaskConfig
 		return $this->hostName;
 	}
 
-	
+	/**
+	 * @param $dwhEnabled the $dwhEnabled to set
+	 */
+	public function setDwhEnabled($dwhEnabled)
+	{
+		if(is_null($this->dwhEnabled))
+			$this->dwhEnabled = $dwhEnabled;
+	}
+
 	/**
 	 * @param $dwhPath the $dwhPath to set
 	 */
@@ -446,6 +461,14 @@ class KSchedularTaskConfig
 	{
 		if(is_null($this->dwhPath))
 			$this->dwhPath = $dwhPath;
+	}
+
+	/**
+	 * @return the $dwhEnabled
+	 */
+	public function getDwhEnabled()
+	{
+		return $this->dwhEnabled;
 	}
 
 	/**
