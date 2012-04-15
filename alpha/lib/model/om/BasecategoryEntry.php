@@ -50,10 +50,10 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	protected $created_at;
 
 	/**
-	 * The value for the status field.
-	 * @var        int
+	 * The value for the custom_data field.
+	 * @var        string
 	 */
-	protected $status;
+	protected $custom_data;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -181,13 +181,13 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [status] column value.
+	 * Get the [custom_data] column value.
 	 * 
-	 * @return     int
+	 * @return     string
 	 */
-	public function getStatus()
+	public function getCustomData()
 	{
-		return $this->status;
+		return $this->custom_data;
 	}
 
 	/**
@@ -332,27 +332,24 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	} // setCreatedAt()
 
 	/**
-	 * Set the value of [status] column.
+	 * Set the value of [custom_data] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      string $v new value
 	 * @return     categoryEntry The current object (for fluent API support)
 	 */
-	public function setStatus($v)
+	public function setCustomData($v)
 	{
-		if(!isset($this->oldColumnsValues[categoryEntryPeer::STATUS]))
-			$this->oldColumnsValues[categoryEntryPeer::STATUS] = $this->status;
-
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (string) $v;
 		}
 
-		if ($this->status !== $v) {
-			$this->status = $v;
-			$this->modifiedColumns[] = categoryEntryPeer::STATUS;
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = categoryEntryPeer::CUSTOM_DATA;
 		}
 
 		return $this;
-	} // setStatus()
+	} // setCustomData()
 
 	/**
 	 * Indicates whether the columns in this object are only set to default values.
@@ -391,7 +388,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$this->entry_id = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->category_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
 			$this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->status = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->custom_data = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -633,6 +630,8 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -643,7 +642,9 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	public function postSave(PropelPDO $con = null) 
 	{
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 		parent::postSave($con);
 	}
 	
@@ -871,7 +872,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 				return $this->getCreatedAt();
 				break;
 			case 5:
-				return $this->getStatus();
+				return $this->getCustomData();
 				break;
 			default:
 				return null;
@@ -899,7 +900,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$keys[2] => $this->getEntryId(),
 			$keys[3] => $this->getCategoryId(),
 			$keys[4] => $this->getCreatedAt(),
-			$keys[5] => $this->getStatus(),
+			$keys[5] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -947,7 +948,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 				$this->setCreatedAt($value);
 				break;
 			case 5:
-				$this->setStatus($value);
+				$this->setCustomData($value);
 				break;
 		} // switch()
 	}
@@ -978,7 +979,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[2], $arr)) $this->setEntryId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setCategoryId($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setStatus($arr[$keys[5]]);
+		if (array_key_exists($keys[5], $arr)) $this->setCustomData($arr[$keys[5]]);
 	}
 
 	/**
@@ -995,7 +996,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryEntryPeer::ENTRY_ID)) $criteria->add(categoryEntryPeer::ENTRY_ID, $this->entry_id);
 		if ($this->isColumnModified(categoryEntryPeer::CATEGORY_ID)) $criteria->add(categoryEntryPeer::CATEGORY_ID, $this->category_id);
 		if ($this->isColumnModified(categoryEntryPeer::CREATED_AT)) $criteria->add(categoryEntryPeer::CREATED_AT, $this->created_at);
-		if ($this->isColumnModified(categoryEntryPeer::STATUS)) $criteria->add(categoryEntryPeer::STATUS, $this->status);
+		if ($this->isColumnModified(categoryEntryPeer::CUSTOM_DATA)) $criteria->add(categoryEntryPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1058,7 +1059,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 
 		$copyObj->setCreatedAt($this->created_at);
 
-		$copyObj->setStatus($this->status);
+		$copyObj->setCustomData($this->custom_data);
 
 
 		$copyObj->setNew(true);
@@ -1139,4 +1140,121 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BasecategoryEntry
