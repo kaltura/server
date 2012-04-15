@@ -1,9 +1,9 @@
 <?php
 /**
  * @package deployment
- * @subpackage dragonfly.roles_and_permissions
+ * @subpackage falcon.roles_and_permissions
  * 
- * Adds tvcom permissions
+ * Adds permissions for category entry service
  * 
  * No need to re-run after server code deploy
  */
