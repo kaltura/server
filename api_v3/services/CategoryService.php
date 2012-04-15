@@ -142,8 +142,7 @@ class CategoryService extends KalturaBaseService
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
-			
-		$categoryDb->setStatus(CategoryStatus::DELETED);
+		
 		$categoryDb->setDeletedAt(time());		
 	} 
 	
