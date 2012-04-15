@@ -15,6 +15,11 @@
  */
 class categoryEntry extends BasecategoryEntry {
 	
+	/*
+	 * when calculating category->entries count, 
+	 * entry might belong to a few sub categories and should not be calculated more than once in the parent category.
+	 * those fields means what categories where already set the calculation of the entry.
+	 */
 	private $entryCategoriesRemovedIds = null;
 	private $entryCategoriesAddedIds = null;
 	
