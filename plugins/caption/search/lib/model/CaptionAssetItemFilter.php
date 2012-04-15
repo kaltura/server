@@ -42,6 +42,10 @@ class CaptionAssetItemFilter extends baseObjectFilter
 			"_lte_start_time",
 			"_gte_end_time",
 			"_lte_end_time",
+			"_in_id", 
+			"_gte_deleted_at", 
+			"_eq_id", 
+			"_lte_deleted_at"
 		), null);
 
 		$this->allowed_order_fields = array(
