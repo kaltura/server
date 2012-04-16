@@ -40,6 +40,11 @@ if ($editFlavorParam)
 			<input type="text" id="height" name="height" value="<?php echo $editFlavorParam->getHeight(); ?>" size="5"  <?php echo $disabled; ?>/> pixels
 			<br />
 			<label for="two-pass">Two Pass:</label><input type="checkbox" id="two-pass" name="two-pass" value="1" <?php echo ($editFlavorParam->getTwoPass()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
+			<label for="rotate">Rotate:</label><input type="checkbox" id="rotate" name="rotate" value="1" <?php echo ($editFlavorParam->getRotate()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
+			<label for="aspectRatioProcessingMode">ARmode: </label>
+			<input type="text" id="aspectRatioProcessingMode" name="aspectRatioProcessingMode" value="<?php echo $editFlavorParam->getAspectRatioProcessingMode(); ?>" size="1" <?php echo $disabled; ?>/>
+			<label for="forceFrameToMultiplication16">ForceMod16:</label><input type="checkbox" id="forceFrameToMultiplication16" name="forceFrameToMultiplication16" value="1" <?php echo ($editFlavorParam->getForceFrameToMultiplication16()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
+			<label for="isGopInSec">IsGopInSec:</label><input type="checkbox" id="isGopInSec" name="isGopInSec" value="1" <?php echo ($editFlavorParam->getIsGopInSec()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
 			<br />
 			<label for="video-codec">Video codec: </label>
 			<select id="video-codec" name="video-codec" <?php echo $disabled; ?>>
