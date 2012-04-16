@@ -158,7 +158,7 @@ class KalturaResponseCacher
 
 		// split cache over 16 folders using the cachekey first character
 		// this will reduce the amount of files per cache folder
-		$pathWithFilePrefix = $this->_cacheDirectory . DIRECTORY_SEPARATOR . substr($this->_cacheKey, 0, 1) . DIRECTORY_SEPARATOR . $this->_cacheFilePrefix;
+		$pathWithFilePrefix = $this->_cacheDirectory . DIRECTORY_SEPARATOR . substr($this->_cacheKey, 0, 2) . DIRECTORY_SEPARATOR . $this->_cacheFilePrefix;
 		$this->_cacheDataFilePath 		= $pathWithFilePrefix . $this->_cacheKey;
 		$this->_cacheHeadersFilePath 	= $pathWithFilePrefix . $this->_cacheKey . ".headers";
 		$this->_cacheLogFilePath 		= $pathWithFilePrefix . $this->_cacheKey . ".log";
@@ -227,6 +227,10 @@ class KalturaResponseCacher
 			{
 				$processingTime = microtime(true) - $startTime;
 				header("$cacheHeaderName:$cacheHeader,$this->_cacheKey,$processingTime", false);
+
+				// in case of multirequest, we must not condtionally cache the multirequest when a sub request comes from cache
+				// for single requests, the next line has no effect
+				self::disableConditionalCache();
 				return $response;
 			}
 		}
@@ -386,7 +390,16 @@ class KalturaResponseCacher
 			if ($testResult)
 				KalturaLog::log('conditional cache check: OK');			// we would have used the cache, and the response buffer do match
 			else
+			{
 				KalturaLog::log('conditional cache check: FAILED key: '.$this->_cacheKey);		// we would have used the cache, but the response buffers do not match
+				
+				$outputFileBase = '/tmp/condCache/' . $this->_cacheKey;
+				@$this->createDirForPath($outputFileBase);
+				$cachedFileName = $outputFileBase . '-cached';
+				$nonCachedFileName = $outputFileBase . '-new';
+				@file_put_contents($cachedFileName, $cachedResponse);
+				@file_put_contents($nonCachedFileName, $response);
+			}
 		}
 		
 		if(!is_null($contentType)) {
@@ -529,7 +542,7 @@ class KalturaResponseCacher
 	
 	private static function getMaxInvalidationTime($invalidationKeys)
 	{
-		if (!class_exists('Memcache'))
+		if (!kConf::get("query_cache_enabled") || !class_exists('Memcache'))
 			return null;
 		
 		$memcache = new Memcache;	
