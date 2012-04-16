@@ -45,7 +45,7 @@ class kuserPeer extends BasekuserPeer
 	 */
 	public static function getKuserByPartnerAndUid($partner_id , $puser_id, $ignore_puser_kuser = false)
 	{
-		if (defined("KALTURA_API_V3") || $ignore_puser_kuser)
+		if ($ignore_puser_kuser || kCurrentContext::isApiV3Context())
 		{
 			$c = new Criteria();
 			$c->add(self::PARTNER_ID, $partner_id);

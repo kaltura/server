@@ -279,7 +279,7 @@ class kuser extends Basekuser implements IIndexable
 
 	public function setPicture($filename )
 	{
-		if (defined("KALTURA_API_V3"))
+		if (kCurrentContext::isApiV3Context())
 		{
 			parent::setPicture($filename);
 			return;
@@ -548,7 +548,7 @@ class kuser extends Basekuser implements IIndexable
 	public function getPuserId()
 	{
 		$puserId = parent::getPuserId();
-		if (is_null($puserId) && !defined("KALTURA_API_V3"))
+		if (is_null($puserId) && !kCurrentContext::isApiV3Context())
 			$puserId = PuserKuserPeer::getPuserIdFromKuserId ( $this->getPartnerId(), $this->getId() );
 		
 		return $puserId;
