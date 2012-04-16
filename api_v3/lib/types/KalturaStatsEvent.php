@@ -140,5 +140,11 @@ referrer
 	 */
 	public $isFirstInSession;
 	
+	/**
+	 * kaltura application name 
+	 * @var string 
+	 */
+	public $applicationId;
+	
 		
 }
