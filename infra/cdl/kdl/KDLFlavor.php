@@ -537,7 +537,15 @@ $target->_video = null;
 				$targetVid->_gop = round(2*$targetVid->_frameRate);
 			}
 			else {
-			$targetVid->_gop = KDLConstants::DefaultGOP;
+				$targetVid->_gop = KDLConstants::DefaultGOP;
+			}
+		}
+		else if(isset($flavorVid->_isGopInSec) && $flavorVid->_isGopInSec>0) {
+			if(isset($targetVid->_frameRate)){
+				$targetVid->_gop = round($targetVid->_frameRate*$targetVid->_frameRate);
+			}
+			else {
+				$targetVid->_gop = KDLConstants::DefaultGOP;
 			}
 		}
 
