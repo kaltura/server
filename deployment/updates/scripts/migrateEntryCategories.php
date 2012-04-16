@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/../bootstrap.php');
+require_once(dirname(__FILE__).'/../../bootstrap.php');
 
 // command: php migrateEntryCategories.php [realRun|dryRun] [partner id] [start entry int id] [max entries]
 
