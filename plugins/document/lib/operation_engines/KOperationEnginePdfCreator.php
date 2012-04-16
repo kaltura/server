@@ -90,7 +90,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		
 		// sleeping while file not ready, since PDFCreator exists a bit before the file is actually ready
 		$sleepTimes = 10;
-		$sleepSeconds = 1;
+		$sleepSeconds = 2;
 		while (!file_exists(realpath($tmpFile)) && $sleepTimes > 0) {
 			sleep($sleepSeconds);
 			$sleepTimes--;
