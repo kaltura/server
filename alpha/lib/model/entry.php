@@ -2235,8 +2235,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		{
 			$category = categoryPeer::getByFullNameExactMatch ( $cat );
 			if (! $category)
-				$category = category::createByPartnerAndFullName ( $this->getPartnerId (), $cat );
+			{
+				KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+				$unentitedCategory = categoryPeer::getByFullNameExactMatch ( $cat );
+				KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 				
+				if(!$unentitedCategory)
+					$category = category::createByPartnerAndFullName ( $this->getPartnerId (), $cat );
+			}
+				
+			if (!category)
+				continue;
+			
 			$categoryEntry = new categoryEntry();
 			$categoryEntry->setEntryId($this->getId());
 			$categoryEntry->setCategoryId($category->getId());
