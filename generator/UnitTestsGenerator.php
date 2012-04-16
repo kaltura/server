@@ -39,38 +39,32 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	{
 		parent::generate();
 
-		$this->load();
-
-		$this->writeBeforeServices();
-
-		foreach($this->_services as $serviceReflector)
+		foreach($this->_services as $serviceId => $serviceActionItem)
 		{
-			//TODO: maybe we should test deprecated services?
-			if($serviceReflector->isDeprecated())
-			continue;
+		    /* @var $serviceActionItem KalturaServiceActionItem */
+			if($serviceActionItem->serviceInfo->deprecated)
+			    continue;
 
-			$this->writeBeforeService($serviceReflector);
-			$this->writeService($serviceReflector);
-			$this->writeAfterService($serviceReflector);
+			$this->writeBeforeService($serviceActionItem);
+			$this->writeService($serviceActionItem);
+			$this->writeAfterService($serviceActionItem);
 		}
-			
-		$this->writeAfterServices();
 	}
 
 	/**
 	 * (non-PHPdoc)
 	 * @see ClientGeneratorFromPhp::writeBeforeService()
 	 */
-	protected function writeBeforeService(KalturaServiceReflector $serviceReflector)
+	protected function writeBeforeService(KalturaServiceActionItem $serviceActionItem)
 	{
 		$this->dependencyIndex = 0;
 		
-		$serviceName = $serviceReflector->getServiceName();
-		$serviceClass = $serviceReflector->getServiceClass();
+		$serviceName = $serviceActionItem->serviceInfo->serviceName;
+		$serviceClass = $serviceActionItem->serviceClass;
 
 		$bootstrapPath = '/../../bootstrap.php';
 
-		if($serviceReflector->isFromPlugin())
+		if(strpos($serviceActionItem->serviceId, "_"))
 		{
 			//			$serviceClass = $serviceReflector->getServiceClass();
 			//			$servicePath = KAutoloader::getClassFilePath($serviceClass);
@@ -134,7 +128,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	 * Add the set up function for the service
 	 * @param KalturaServiceReflector $serviceReflector
 	 */
-	protected function writeSetUpServiceFunction(KalturaServiceReflector $serviceReflector)
+	protected function writeSetUpServiceFunction(KalturaServiceActionItem $serviceReflector)
 	{
 		$this->writeTest("	/**");
 		$this->writeTest("	 * Set up the test initial data");
@@ -150,11 +144,11 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeBase("	 */");
 		$this->writeBase("	protected function setUp()");
 		$this->writeBase("	{");
-		$actions = $serviceReflector->getActions();
+		$actions = $serviceReflector->actionMap;
 
-		foreach ($actions as $action)
+		foreach ($actions as $actionId=>$actionReflector)
 		{
-			$actionName = ucfirst($action);
+			$actionName = ucfirst($actionId);
 			$this->writeBase("		\$this->set{$actionName}TestData();");
 		}
 
@@ -163,7 +157,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeBase("	}");
 		$this->writeBase("");
 
-		foreach ($actions as $action) //creates the methods for the data set up
+		foreach ($actions as $actionId=>$actionReflector) //creates the methods for the data set up
 		{
 			$actionName = ucfirst($action);
 				
@@ -180,16 +174,17 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	 * Writes the service to the test and data files
 	 * @param KalturaServiceReflector $serviceReflector
 	 */
-	protected function writeService(KalturaServiceReflector $serviceReflector)
+	protected function writeService(KalturaServiceActionItem $serviceReflector)
 	{
-		$serviceName = $serviceReflector->getServiceName();
-		$serviceId = $serviceReflector->getServiceId();
-		$serviceClass = $serviceReflector->getServiceClass();
-		$actions = $serviceReflector->getActions();
+		$serviceName = $serviceReflector->serviceInfo->serviceName;
+		$serviceId = $serviceReflector->serviceId;
+		$serviceClass = $serviceReflector->serviceClass;
+		$actions = $serviceReflector->actionMap;
 
-		foreach($actions as $action => $actionName)
+		foreach($actions as $action => $actionReflector)
 		{
-			$actionInfo = $serviceReflector->getActionInfo($action);
+		    /* @var $actionReflector KalturaActionReflector */
+			$actionInfo = $actionReflector->getActionInfo();
 				
 			if($actionInfo->serverOnly)
 				continue;
@@ -198,11 +193,11 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 				continue;
 
 			$resgressionTests = array('addAction', 'getAction', 'deleteAction', 'updateAction', 'listAction');
-			if(!in_array($actionName , $resgressionTests))
+			if(!in_array($actionReflector->getActionName() , $resgressionTests))
 				continue;
 
-			$outputTypeReflector = $serviceReflector->getActionOutputType($action);
-			$actionParams = $serviceReflector->getActionParams($action);
+			$outputTypeReflector = $actionReflector->getActionOutputType();
+			$actionParams = $actionReflector->getActionParams();
 
 			$this->writeServiceAction($serviceId, $serviceName, $actionInfo->action, $actionParams, $outputTypeReflector);
 		}
@@ -212,7 +207,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	 * (non-PHPdoc)
 	 * @see ClientGeneratorFromPhp::writeAfterService()
 	 */
-	protected function writeAfterService(KalturaServiceReflector $serviceReflector)
+	protected function writeAfterService(KalturaServiceActionItem $serviceReflector)
 	{
 //		$this->writeBase("	/**");
 //		$this->writeBase("	 * Called when all tests are done");
@@ -239,7 +234,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		//		$this->writeBase("	abstract public function testFinished(\$id);");
 		//		$this->writeBase("");
 
-		$serviceClass = $serviceReflector->getServiceClass();
+		$serviceClass = $serviceReflector->serviceClass;
 		$serviceClass = ucfirst($serviceClass); //Capital first letter
 
 //		$this->writeBase("	/**");
@@ -255,11 +250,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		//Close the base file
 		$this->writeBase("}");
 
-		$serviceName = $serviceReflector->getServiceName();
-		$serviceClass = $serviceReflector->getServiceClass();
+		$serviceName = $serviceReflector->serviceInfo->serviceName;
 		$testPath = realpath(dirname(__FILE__) . '/../') . "/tests/api/$serviceName";
 
-		if($serviceReflector->isFromPlugin())
+		if(strpos($serviceReflector->serviceId, "_"))
 		{
 			//			$servicePath = KAutoloader::getClassFilePath($serviceClass);
 			//			$testPath = realpath(dirname($servicePath) . '/../') . "/tests/services/$serviceName";
