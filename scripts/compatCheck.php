@@ -191,6 +191,10 @@ function compareValues($newValue, $oldValue)
 	$newValue = normalizeKS($newValue);
 	$oldValue = normalizeKS($oldValue);
 
+	$pattern = '/kaltura_player_\d+/';
+	$newValue = preg_replace($pattern, 'KP', $newValue);
+	$oldValue = preg_replace($pattern, 'KP', $oldValue);
+	
 	return $newValue == $oldValue;
 }	
 	
