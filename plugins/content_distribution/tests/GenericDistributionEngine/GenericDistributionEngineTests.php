@@ -4,6 +4,9 @@ require_once(dirname(__FILE__) . '/../../../../tests/base/bootstrap.php');
 
 /**
  * GenericDistributionEngine test case.
+ * 
+ * @package plugins.contentDistribution 
+ * @subpackage Scheduler.Distribute
  */
 class GenericDistributionEngineTests extends KalturaUnitTestCase
 {
