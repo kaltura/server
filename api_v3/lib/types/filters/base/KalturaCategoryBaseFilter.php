@@ -43,10 +43,14 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 		"-depth" => "-depth",
 		"+fullName" => "+full_name",
 		"-fullName" => "-full_name",
+		"+entriesCount" => "+entries_count",
+		"-entriesCount" => "-entries_count",
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",
 		"-updatedAt" => "-updated_at",
+		"+directEntriesCount" => "+direct_entries_count",
+		"-directEntriesCount" => "-direct_entries_count",
 	);
 
 	public function getMapBetweenObjects()

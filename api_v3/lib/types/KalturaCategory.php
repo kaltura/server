@@ -56,6 +56,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * Number of entries in this Category (including child categories)
 	 * 
 	 * @var int
+	 * @filter order
 	 * @readonly
 	 */
 	public $entriesCount;
@@ -142,6 +143,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * Number of entries that belong to this category directly
 	 *  
 	 * @var int
+	 * @filter order
 	 * @readonly
 	 */
 	public $directEntriesCount;

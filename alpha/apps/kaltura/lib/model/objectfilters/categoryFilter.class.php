@@ -37,7 +37,7 @@ class categoryFilter extends baseObjectFilter
 			"_in_status",
 			) , NULL );
 
-		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name", "depth");
+		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name", "depth", "entries_count", "direct_entries_count");
 
 		$this->aliases = array ( 
 			"owner" => "kuser_id"
