@@ -115,16 +115,15 @@ abstract class ClientGeneratorFromPhp
 		// services
 		foreach($this->_services as $serviceId => $serviceActionItem)
 		{
-			$serviceReflector = $serviceActionItem->getServiceReflector();
-			
-			$this->writeBeforeService($serviceReflector);
-			$serviceName = $serviceReflector->getServiceName();
-			$serviceId = $serviceReflector->getServiceId();
-			$actions = $serviceReflector->getActions();
-			$actions = array_keys($actions);
-			foreach($actions as $action)
+			/* @var $serviceActionItem KalturaServiceActionItem */
+			$this->writeBeforeService($serviceActionItem);
+			$serviceName = $serviceActionItem->serviceInfo->serviceName;
+			$serviceId = $serviceActionItem->serviceId;
+			$actions = $serviceActionItem->actionMap;
+			foreach($actions as $action => $actionCallback)
 			{
-				$actionInfo = $serviceReflector->getActionInfo($action);
+			    $actionReflector = new KalturaActionReflector($serviceId, $action, $actionCallback);
+				$actionInfo = $actionReflector->getActionInfo();
 				
 				if($actionInfo->serverOnly)
 					continue;
@@ -132,11 +131,11 @@ abstract class ClientGeneratorFromPhp
 				if (strpos($actionInfo->clientgenerator, "ignore") !== false)
 					continue;
 					
-				$outputTypeReflector = $serviceReflector->getActionOutputType($action);
-				$actionParams = $serviceReflector->getActionParams($action);
+				$outputTypeReflector = $action->getActionOutputType();
+				$actionParams = $action->getActionParams();
 				$this->writeServiceAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);				
 			}
-			$this->writeAfterService($serviceReflector);
+			$this->writeAfterService($serviceActionItem);
 		}
 		$this->writeAfterServices();
 		
@@ -203,7 +202,7 @@ abstract class ClientGeneratorFromPhp
 	
 	protected abstract function writeBeforeServices();
 	
-	protected abstract function writeBeforeService(KalturaServiceReflector $serviceReflector);
+	protected abstract function writeBeforeService(KalturaServiceActionItem $serviceReflector);
 	
 	/**
 	 * Called while looping the actions inside a service to write the service action description
@@ -215,7 +214,7 @@ abstract class ClientGeneratorFromPhp
 	 */
 	protected abstract function writeServiceAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);
 	
-	protected abstract function writeAfterService(KalturaServiceReflector $serviceReflector);
+	protected abstract function writeAfterService(KalturaServiceActionItem $serviceReflector);
 	
 	protected abstract function writeAfterServices();
 	
