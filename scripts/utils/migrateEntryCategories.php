@@ -3,6 +3,17 @@ require_once(dirname(__FILE__).'/../bootstrap.php');
 
 // command: php migrateEntryCategories.php [realRun|dryRun] [partner id] [start entry int id] [max entries]
 
+class migrationCategoryEntry extends categoryEntry
+{
+	/* (non-PHPdoc)
+	 * @see categoryEntry::postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{	
+		// DO nothing - don't increase category entries count
+	}
+}
+
 $partnerId = null;
 $startEntryIntId = null;
 $limit = null;
@@ -53,7 +64,7 @@ while(count($entries) && (!$limit || $migrated < $limit))
 		$categoriesCriteria->addSelectColumn(categoryPeer::ID);
 		$categoriesCriteria->add(categoryPeer::ID, $entry->getCategoriesIds(), Criteria::IN);
 
-		$stmt = flavorParamsConversionProfilePeer::doSelectStmt($categoriesCriteria);
+		$stmt = categoryPeer::doSelectStmt($categoriesCriteria);
 		$categoryIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		
 		
@@ -62,7 +73,7 @@ while(count($entries) && (!$limit || $migrated < $limit))
 		$categoryEntriesCriteria->add(categoryEntryPeer::ENTRY_ID, $entry->getId());
 		$categoryEntriesCriteria->add(categoryEntryPeer::CATEGORY_ID, $categoryIds, Criteria::IN);
 
-		$stmt = flavorParamsConversionProfilePeer::doSelectStmt($categoryEntriesCriteria);
+		$stmt = categoryEntryPeer::doSelectStmt($categoryEntriesCriteria);
 		$categoryEntriesIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		
 		$categoryIds = array_diff($categoryIds, $categoryEntriesIds);
@@ -70,7 +81,7 @@ while(count($entries) && (!$limit || $migrated < $limit))
 		KalturaStatement::setDryRun($dryRun);		
 		foreach($categoryIds as $categoryId)
 		{
-			$categoryEntry = new categoryEntry();
+			$categoryEntry = new migrationCategoryEntry();
 			$categoryEntry->setEntryId($entry->getId());
 			$categoryEntry->setCategoryId($categoryId);
 			$categoryEntry->setPartnerId($entry->getPartnerId());
