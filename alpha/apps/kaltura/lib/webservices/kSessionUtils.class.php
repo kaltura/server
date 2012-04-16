@@ -439,6 +439,19 @@ class ks
 			}
 		}
 		
+		// creates the kuser
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_END_USER_REPORTS, $partner_id))
+		{
+			$kuser = kuserPeer::getKuserByPartnerAndUid($partner_id, $puser_id);
+			if(!$kuser)
+			{
+				$kuser = new kuser();
+				$kuser->setPuserId($puser_id);
+				$kuser->setStatus(KuserStatus::ACTIVE);
+				$kuser->save();
+			}
+		}
+		
 		return self::OK;
 	}
 	
