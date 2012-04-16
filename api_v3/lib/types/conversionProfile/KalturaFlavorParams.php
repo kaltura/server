@@ -135,6 +135,11 @@ class KalturaFlavorParams extends KalturaAssetParams
 	/**
 	 * @var int
 	 */
+	public $isGopInSec;
+
+	/**
+	 * @var int
+	 */
 	public $videoConstantBitrate;
 
 	/**
@@ -174,6 +179,7 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"format",
 		"aspectRatioProcessingMode",
 		"forceFrameToMultiplication16",
+		"isGopInSec",
 		"videoConstantBitrate",
 		"videoBitrateTolerance",
 		"clipOffset",
