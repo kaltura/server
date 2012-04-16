@@ -1980,7 +1980,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	}
 	public function getPuserId( $real_puser_id = false )
 	{
-		if (defined("KALTURA_API_V3"))
+		if (kCurrentContext::isApiV3Context())
 			return parent::getPuserId();
 			
 		// HACK for FootBo
