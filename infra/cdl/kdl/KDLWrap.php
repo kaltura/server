@@ -336,6 +336,7 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 			if($cdlFlavor instanceof flavorParams) {
 				$kdlFlavor->_video->_cbr = $cdlFlavor->getVideoConstantBitrate();
 				$kdlFlavor->_video->_bt = $cdlFlavor->getVideoBitrateTolerance();
+				$kdlFlavor->_video->_isGopInSec = $cdlFlavor->getIsGopInSec();
 			}
 			//		$flavor->_video->_dar = $api->getVideoDar();
 			if($kdlFlavor->_video->IsDataSet()==false)
