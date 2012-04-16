@@ -18,7 +18,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		
 	}
 	
-	protected function writeBeforeService(KalturaServiceReflector $serviceReflector)
+	protected function writeBeforeService(KalturaServiceActionItem $serviceReflector)
 	{
 		
 	}
@@ -28,7 +28,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		
 	}
 	
-	protected function writeAfterService(KalturaServiceReflector $serviceReflector)
+	protected function writeAfterService(KalturaServiceActionItem $serviceReflector)
 	{
 		
 	}
