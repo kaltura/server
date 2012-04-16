@@ -29,7 +29,7 @@ class kvotePeer extends BasekvotePeer
         $kuser = self::getKuserFromPuserAndPartner($puserId, $partnerId);
         if (!$kuser)
         {
-            return;
+            return null;
         }
         
         $c = new Criteria(); 
