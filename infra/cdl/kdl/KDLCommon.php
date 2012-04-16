@@ -17,12 +17,43 @@
 		const MaxDurationFactor = 1.5;
 	}
 
-	class KDLConstants {
+	class KDLVideoBitrateNormalize {
 		const BitrateH263Factor = 1.0;
 		const BitrateVP6Factor = 1.5;
 		const BitrateH264Factor = 2.0;
 		const BitrateOthersRatio = 1.3;
-						
+		
+		static $BitrateFactorCategory1 = array(KDLVideoTarget::H263,KDLVideoTarget::FLV, "h263", "h.263", "s263", "flv1", "theora");
+		static $BitrateFactorCategory2 = array(KDLVideoTarget::VP6, "vp6", "vp6e", "vp6s", "flv4");
+		static $BitrateFactorCategory3 = array(KDLVideoTarget::H264, KDLVideoTarget::H264B, 
+											   KDLVideoTarget::H264M,KDLVideoTarget::H264H,
+											   KDLVideoTarget::WMV3, KDLVideoTarget::WVC1A,
+											   KDLVideoTarget::VP8,
+											   "h264", "h.264", "x264", "avc1", "wvc1",
+											   "avc", "wmv3", "wmva", "rv40", "realvideo4", "rv30", "realvideo3");
+	public static function NormalizeSourceToTarget($sourceCodec, $sourceBitrate, $targetCodec)
+	{		
+		$ratioTrg = self::BitrateVP6Factor;
+		if(in_array($targetCodec, self::$BitrateFactorCategory1))
+			$ratioTrg = self::BitrateH263Factor;
+		else if(in_array($targetCodec, self::$BitrateFactorCategory2))
+			$ratioTrg = self::BitrateVP6Factor;
+		else if(in_array($targetCodec, self::$BitrateFactorCategory3))
+			$ratioTrg = self::BitrateH264Factor;
+
+		$ratioSrc = self::BitrateOthersRatio;
+		if(in_array($sourceCodec, self::$BitrateFactorCategory1))
+			$ratioSrc = self::BitrateH263Factor;
+		else if(in_array($sourceCodec, self::$BitrateFactorCategory2))
+			$ratioSrc = self::BitrateVP6Factor;
+		else if(in_array($sourceCodec, self::$BitrateFactorCategory3))
+			$ratioSrc = self::BitrateH264Factor;
+
+		$brSrcNorm = $sourceBitrate*($ratioSrc/$ratioTrg);
+		return round($brSrcNorm, 0);								   		}
+	}
+	
+	class KDLConstants {
 				/* FlavorBitrateRedundencyFactor - 
 				 * The ratio between the current and prev flavors 
 				 * should be at most of that value (curr/prev=ratio).
@@ -77,15 +108,6 @@
 				KDLConstants::ContainerIndex=>array(KDLContainerTarget::ISMV)),
 		);
 		
-		static $BitrateFactorCategory1 = array(KDLVideoTarget::H263,KDLVideoTarget::FLV, "h263", "h.263", "s263", "flv1");
-		static $BitrateFactorCategory2 = array(KDLVideoTarget::VP6, "vp6", "vp6e", "vp6s", "flv4");
-		static $BitrateFactorCategory3 = array(KDLVideoTarget::H264, KDLVideoTarget::H264B, 
-											   KDLVideoTarget::H264M,KDLVideoTarget::H264H,
-											   KDLVideoTarget::WMV3, KDLVideoTarget::WVC1A,
-											   KDLVideoTarget::VP8,
-											   "h264", "h.264", "x264", "avc1", "wvc1",
-											   "avc", "wmv3", "wmva", "rv40", "realvideo4", "rv30", "realvideo3");
-											   		
 		const MaxFramerate = 30.0;
 		const DefaultGOP = 60;
 		const DefaultAudioSampleRate = 44100;

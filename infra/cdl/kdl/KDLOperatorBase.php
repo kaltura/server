@@ -106,7 +106,7 @@ abstract class KDLOperatorBase {
 	protected function fixVP6BitRate($maxVidRate, $videoBr)
 	{
 		if($videoBr){
-			$videoBr = round($videoBr*KDLConstants::BitrateVP6Factor);
+			$videoBr = round($videoBr*KDLVideoBitrateNormalize::BitrateVP6Factor);
 			if($videoBr>$maxVidRate){
 				$videoBr=$maxVidRate;
 			}

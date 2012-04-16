@@ -669,23 +669,8 @@ $target->_video = null;
 	//therefore the Evaluate frame sze should be called before this func
 	private static function evaluateTargetVideoBitrate(KDLVideoData $source, KDLVideoData $target) 
 	{
-		$ratioFlvr = KDLConstants::BitrateVP6Factor;
-		if(in_array($target->_id, KDLConstants::$BitrateFactorCategory1))
-			$ratioFlvr = KDLConstants::BitrateH263Factor;
-		else if(in_array($target->_id, KDLConstants::$BitrateFactorCategory2))
-			$ratioFlvr = KDLConstants::BitrateVP6Factor;
-		else if(in_array($target->_id, KDLConstants::$BitrateFactorCategory3))
-			$ratioFlvr = KDLConstants::BitrateH264Factor;
-
-		$ratioSrc = KDLConstants::BitrateOthersRatio;
-		if(in_array($source->_id, KDLConstants::$BitrateFactorCategory1))
-			$ratioSrc = KDLConstants::BitrateH263Factor;
-		else if(in_array($source->_id, KDLConstants::$BitrateFactorCategory2))
-			$ratioSrc = KDLConstants::BitrateVP6Factor;
-		else if(in_array($source->_id, KDLConstants::$BitrateFactorCategory3))
-			$ratioSrc = KDLConstants::BitrateH264Factor;
-			
-		$brSrcNorm = $source->_bitRate*($ratioSrc/$ratioFlvr);
+		$brSrcNorm = KDLVideoBitrateNormalize::NormalizeSourceToTarget($source->_id, $source->_bitRate, $target->_id);
+		
 		if($target->_bitRate>$brSrcNorm){
 			$target->_bitRate = $brSrcNorm;
 		}
