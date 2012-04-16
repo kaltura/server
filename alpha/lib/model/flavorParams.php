@@ -106,4 +106,7 @@ class flavorParams extends assetParams
 	
 	public function setVideoBitrateTolerance($v)	{$this->putInCustomData('VideoBitrateTolerance', $v);}
 	public function getVideoBitrateTolerance()	{return $this->getFromCustomData('VideoBitrateTolerance', null, 0);}
+	
+	public function setIsGopInSec($v)	{$this->putInCustomData('IsGopInSec', $v);}
+	public function getIsGopInSec()	{return $this->getFromCustomData('IsGopInSec', null, 0);}
 }
