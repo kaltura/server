@@ -8,7 +8,7 @@
  * @package plugins.tagSearch
  * @subpackage model.om
  */
-abstract class BaseTagPeer {
+abstract class BasetagPeer {
 
 	/** the default database name for this class */
 	const DATABASE_NAME = 'propel';
@@ -17,13 +17,13 @@ abstract class BaseTagPeer {
 	const TABLE_NAME = 'tag';
 
 	/** the related Propel class for this table */
-	const OM_CLASS = 'Tag';
+	const OM_CLASS = 'tag';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'plugins.tagSearch.Tag';
+	const CLASS_DEFAULT = 'plugins.tagSearch.tag';
 
 	/** the related TableMap class for this table */
-	const TM_CLASS = 'TagTableMap';
+	const TM_CLASS = 'tagTableMap';
 	
 	/** The total number of columns. */
 	const NUM_COLUMNS = 6;
@@ -50,10 +50,10 @@ abstract class BaseTagPeer {
 	const CREATED_AT = 'tag.CREATED_AT';
 
 	/**
-	 * An identiy map to hold any loaded instances of Tag objects.
+	 * An identiy map to hold any loaded instances of tag objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
 	 * queries.
-	 * @var        array Tag[]
+	 * @var        array tag[]
 	 */
 	public static $instances = array();
 
@@ -132,12 +132,12 @@ abstract class BaseTagPeer {
 	 *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
 	 * </code>
 	 * @param      string $alias The alias for the current table.
-	 * @param      string $column The column name for current table. (i.e. TagPeer::COLUMN_NAME).
+	 * @param      string $column The column name for current table. (i.e. tagPeer::COLUMN_NAME).
 	 * @return     string
 	 */
 	public static function alias($alias, $column)
 	{
-		return str_replace(TagPeer::TABLE_NAME.'.', $alias.'.', $column);
+		return str_replace(tagPeer::TABLE_NAME.'.', $alias.'.', $column);
 	}
 
 	/**
@@ -153,12 +153,12 @@ abstract class BaseTagPeer {
 	 */
 	public static function addSelectColumns(Criteria $criteria)
 	{
-		$criteria->addSelectColumn(TagPeer::ID);
-		$criteria->addSelectColumn(TagPeer::TAG);
-		$criteria->addSelectColumn(TagPeer::PARTNER_ID);
-		$criteria->addSelectColumn(TagPeer::OBJECT_TYPE);
-		$criteria->addSelectColumn(TagPeer::INSTANCE_COUNT);
-		$criteria->addSelectColumn(TagPeer::CREATED_AT);
+		$criteria->addSelectColumn(tagPeer::ID);
+		$criteria->addSelectColumn(tagPeer::TAG);
+		$criteria->addSelectColumn(tagPeer::PARTNER_ID);
+		$criteria->addSelectColumn(tagPeer::OBJECT_TYPE);
+		$criteria->addSelectColumn(tagPeer::INSTANCE_COUNT);
+		$criteria->addSelectColumn(tagPeer::CREATED_AT);
 	}
 
 	/**
@@ -177,27 +177,27 @@ abstract class BaseTagPeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(TagPeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(tagPeer::TABLE_NAME);
 
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			TagPeer::addSelectColumns($criteria);
+			tagPeer::addSelectColumns($criteria);
 		}
 
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
 		
-		TagPeer::attachCriteriaFilter($criteria);
+		tagPeer::attachCriteriaFilter($criteria);
 
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteria, 
 			kQueryCache::QUERY_TYPE_COUNT,
-			'TagPeer', 
+			'tagPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
@@ -206,7 +206,7 @@ abstract class BaseTagPeer {
 		}
 		
 		// select the connection for the query
-		$con = TagPeer::alternativeCon ($con, $queryDB);
+		$con = tagPeer::alternativeCon ($con, $queryDB);
 		
 		// BasePeer returns a PDOStatement
 		$stmt = BasePeer::doCount($criteria, $con);
@@ -230,7 +230,7 @@ abstract class BaseTagPeer {
 	 *
 	 * @param      Criteria $criteria object used to create the SELECT statement.
 	 * @param      PropelPDO $con
-	 * @return     Tag
+	 * @return     tag
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
@@ -238,7 +238,7 @@ abstract class BaseTagPeer {
 	{
 		$critcopy = clone $criteria;
 		$critcopy->setLimit(1);
-		$objects = TagPeer::doSelect($critcopy, $con);
+		$objects = tagPeer::doSelect($critcopy, $con);
 		if ($objects) {
 			return $objects[0];
 		}
@@ -280,10 +280,10 @@ abstract class BaseTagPeer {
 	{
 		foreach ($queryResult as $curIndex => $curObject)
 		{
-			$objFromPool = TagPeer::getInstanceFromPool($curObject->getPrimaryKey());
+			$objFromPool = tagPeer::getInstanceFromPool($curObject->getPrimaryKey());
 			if ($objFromPool === null)
 			{
-				TagPeer::addInstanceToPool($curObject);
+				tagPeer::addInstanceToPool($curObject);
 			}
 			else
 			{
@@ -301,7 +301,7 @@ abstract class BaseTagPeer {
 	{
 		foreach ($queryResult as $curResult)
 		{
-			TagPeer::addInstanceToPool($curResult);
+			tagPeer::addInstanceToPool($curResult);
 		}
 	}
 	
@@ -316,38 +316,38 @@ abstract class BaseTagPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteriaForSelect = TagPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = tagPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
-			'TagPeer', 
+			'tagPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			TagPeer::filterSelectResults($cachedResult, $criteriaForSelect);
-			TagPeer::updateInstancePool($cachedResult);
+			tagPeer::filterSelectResults($cachedResult, $criteriaForSelect);
+			tagPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
-		$con = TagPeer::alternativeCon($con, $queryDB);
+		$con = tagPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = TagPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
+		$queryResult = tagPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		TagPeer::filterSelectResults($queryResult, $criteria);
+		tagPeer::filterSelectResults($queryResult, $criteria);
 		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		TagPeer::addInstancesToPool($queryResult);
+		tagPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
 
@@ -371,7 +371,7 @@ abstract class BaseTagPeer {
 			$con = myDbHelper::alternativeCon($con);
 			
 		if($con === null)
-			$con = Propel::getConnection(TagPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(tagPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		
 		return $con;
 	}
@@ -383,7 +383,7 @@ abstract class BaseTagPeer {
 	
 	public static function  setUseCriteriaFilter ( $use )
 	{
-		$criteria_filter = TagPeer::getCriteriaFilter();
+		$criteria_filter = tagPeer::getCriteriaFilter();
 		
 		if ( $use )  $criteria_filter->enable(); 
 		else $criteria_filter->disable();
@@ -397,7 +397,7 @@ abstract class BaseTagPeer {
 	public static function &getCriteriaFilter()
 	{
 		if(self::$s_criteria_filter == null)
-			TagPeer::setDefaultCriteriaFilter();
+			tagPeer::setDefaultCriteriaFilter();
 		
 		return self::$s_criteria_filter;
 	}
@@ -423,7 +423,7 @@ abstract class BaseTagPeer {
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
 	{
-		TagPeer::getCriteriaFilter()->applyFilter($criteria);
+		tagPeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
@@ -505,10 +505,10 @@ abstract class BaseTagPeer {
 	public static function doCountStmt(Criteria $criteria, PropelPDO $con = null)
 	{
 		// attach default criteria
-		TagPeer::attachCriteriaFilter($criteria);
+		tagPeer::attachCriteriaFilter($criteria);
 		
 		// select the connection for the query
-		$con = TagPeer::alternativeCon ( $con );
+		$con = tagPeer::alternativeCon ( $con );
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doCount($criteria, $con);
@@ -522,20 +522,20 @@ abstract class BaseTagPeer {
 			if(count($asColumns) == 1 && isset($asColumns['_score']))
 			{
 				$criteria = clone $criteria;
-				TagPeer::addSelectColumns($criteria);
+				tagPeer::addSelectColumns($criteria);
 			}
 		}
 		else
 		{
 			$criteria = clone $criteria;
-			TagPeer::addSelectColumns($criteria);
+			tagPeer::addSelectColumns($criteria);
 		}
 		
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
 
 		// attach default criteria
-		TagPeer::attachCriteriaFilter($criteria);
+		tagPeer::attachCriteriaFilter($criteria);
 
 		return $criteria;
 	}
@@ -555,9 +555,9 @@ abstract class BaseTagPeer {
 	 */
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
-		$con = TagPeer::alternativeCon($con);
+		$con = tagPeer::alternativeCon($con);
 		
-		$criteria = TagPeer::prepareCriteriaForSelect($criteria);
+		$criteria = tagPeer::prepareCriteriaForSelect($criteria);
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
@@ -571,10 +571,10 @@ abstract class BaseTagPeer {
 	 * to the cache in order to ensure that the same objects are always returned by doSelect*()
 	 * and retrieveByPK*() calls.
 	 *
-	 * @param      Tag $value A Tag object.
+	 * @param      tag $value A tag object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(Tag $obj, $key = null)
+	public static function addInstanceToPool(tag $obj, $key = null)
 	{
 		if (Propel::isInstancePoolingEnabled()) {
 			if ($key === null) {
@@ -592,18 +592,18 @@ abstract class BaseTagPeer {
 	 * methods in your stub classes -- you may need to explicitly remove objects
 	 * from the cache in order to prevent returning objects that no longer exist.
 	 *
-	 * @param      mixed $value A Tag object or a primary key value.
+	 * @param      mixed $value A tag object or a primary key value.
 	 */
 	public static function removeInstanceFromPool($value)
 	{
 		if (Propel::isInstancePoolingEnabled() && $value !== null) {
-			if (is_object($value) && $value instanceof Tag) {
+			if (is_object($value) && $value instanceof tag) {
 				$key = (string) $value->getId();
 			} elseif (is_scalar($value)) {
 				// assume we've been passed a primary key
 				$key = (string) $value;
 			} else {
-				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or Tag object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or tag object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
 				throw $e;
 			}
 
@@ -618,7 +618,7 @@ abstract class BaseTagPeer {
 	 * a multi-column primary key, a serialize()d version of the primary key will be returned.
 	 *
 	 * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-	 * @return     Tag Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+	 * @return     tag Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
 	 * @see        getPrimaryKeyHash()
 	 */
 	public static function getInstanceFromPool($key)
@@ -684,11 +684,11 @@ abstract class BaseTagPeer {
 		$results = array();
 	
 		// set the class once to avoid overhead in the loop
-		$cls = TagPeer::getOMClass(false);
+		$cls = tagPeer::getOMClass(false);
 		// populate the object(s)
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key = TagPeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj = TagPeer::getInstanceFromPool($key))) {
+			$key = tagPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj = tagPeer::getInstanceFromPool($key))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj->hydrate($row, 0, true); // rehydrate
@@ -719,10 +719,10 @@ abstract class BaseTagPeer {
 	 */
 	public static function buildTableMap()
 	{
-	  $dbMap = Propel::getDatabaseMap(BaseTagPeer::DATABASE_NAME);
-	  if (!$dbMap->hasTable(BaseTagPeer::TABLE_NAME))
+	  $dbMap = Propel::getDatabaseMap(BasetagPeer::DATABASE_NAME);
+	  if (!$dbMap->hasTable(BasetagPeer::TABLE_NAME))
 	  {
-	    $dbMap->addTableObject(new TagTableMap());
+	    $dbMap->addTableObject(new tagTableMap());
 	  }
 	}
 
@@ -739,13 +739,13 @@ abstract class BaseTagPeer {
 	 */
 	public static function getOMClass($withPrefix = true)
 	{
-		return $withPrefix ? TagPeer::CLASS_DEFAULT : TagPeer::OM_CLASS;
+		return $withPrefix ? tagPeer::CLASS_DEFAULT : tagPeer::OM_CLASS;
 	}
 
 	/**
-	 * Method perform an INSERT on the database, given a Tag or Criteria object.
+	 * Method perform an INSERT on the database, given a tag or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or Tag object containing data that is used to create the INSERT statement.
+	 * @param      mixed $values Criteria or tag object containing data that is used to create the INSERT statement.
 	 * @param      PropelPDO $con the PropelPDO connection to use
 	 * @return     mixed The new primary key.
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -754,17 +754,17 @@ abstract class BaseTagPeer {
 	public static function doInsert($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(TagPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(tagPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 		} else {
-			$criteria = $values->buildCriteria(); // build Criteria from Tag object
+			$criteria = $values->buildCriteria(); // build Criteria from tag object
 		}
 
-		if ($criteria->containsKey(TagPeer::ID) && $criteria->keyContainsValue(TagPeer::ID) ) {
-			throw new PropelException('Cannot insert a value for auto-increment primary key ('.TagPeer::ID.')');
+		if ($criteria->containsKey(tagPeer::ID) && $criteria->keyContainsValue(tagPeer::ID) ) {
+			throw new PropelException('Cannot insert a value for auto-increment primary key ('.tagPeer::ID.')');
 		}
 
 
@@ -786,9 +786,9 @@ abstract class BaseTagPeer {
 	}
 
 	/**
-	 * Method perform an UPDATE on the database, given a Tag or Criteria object.
+	 * Method perform an UPDATE on the database, given a tag or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or Tag object containing data that is used to create the UPDATE statement.
+	 * @param      mixed $values Criteria or tag object containing data that is used to create the UPDATE statement.
 	 * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -797,7 +797,7 @@ abstract class BaseTagPeer {
 	public static function doUpdate($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(TagPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(tagPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		$selectCriteria = new Criteria(self::DATABASE_NAME);
@@ -805,10 +805,10 @@ abstract class BaseTagPeer {
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 
-			$comparison = $criteria->getComparison(TagPeer::ID);
-			$selectCriteria->add(TagPeer::ID, $criteria->remove(TagPeer::ID), $comparison);
+			$comparison = $criteria->getComparison(tagPeer::ID);
+			$selectCriteria->add(tagPeer::ID, $criteria->remove(tagPeer::ID), $comparison);
 
-		} else { // $values is Tag object
+		} else { // $values is tag object
 			$criteria = $values->buildCriteria(); // gets full criteria
 			$selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
 		}
@@ -836,19 +836,19 @@ abstract class BaseTagPeer {
 	public static function doDeleteAll($con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(TagPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(tagPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		try {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-			$affectedRows += BasePeer::doDeleteAll(TagPeer::TABLE_NAME, $con);
+			$affectedRows += BasePeer::doDeleteAll(tagPeer::TABLE_NAME, $con);
 			// Because this db requires some delete cascade/set null emulation, we have to
 			// clear the cached instance *after* the emulation has happened (since
 			// instances get re-added by the select statement contained therein).
-			TagPeer::clearInstancePool();
-			TagPeer::clearRelatedInstancePool();
+			tagPeer::clearInstancePool();
+			tagPeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -858,9 +858,9 @@ abstract class BaseTagPeer {
 	}
 
 	/**
-	 * Method perform a DELETE on the database, given a Tag or Criteria object OR a primary key value.
+	 * Method perform a DELETE on the database, given a tag or Criteria object OR a primary key value.
 	 *
-	 * @param      mixed $values Criteria or Tag object or primary key or array of primary keys
+	 * @param      mixed $values Criteria or tag object or primary key or array of primary keys
 	 *              which is used to create the DELETE statement
 	 * @param      PropelPDO $con the connection to use
 	 * @return     int 	The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -871,27 +871,27 @@ abstract class BaseTagPeer {
 	 public static function doDelete($values, PropelPDO $con = null)
 	 {
 		if ($con === null) {
-			$con = Propel::getConnection(TagPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(tagPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			// invalidate the cache for all objects of this type, since we have no
 			// way of knowing (without running a query) what objects should be invalidated
 			// from the cache based on this Criteria.
-			TagPeer::clearInstancePool();
+			tagPeer::clearInstancePool();
 			// rename for clarity
 			$criteria = clone $values;
-		} elseif ($values instanceof Tag) { // it's a model object
+		} elseif ($values instanceof tag) { // it's a model object
 			// invalidate the cache for this single object
-			TagPeer::removeInstanceFromPool($values);
+			tagPeer::removeInstanceFromPool($values);
 			// create criteria based on pk values
 			$criteria = $values->buildPkeyCriteria();
 		} else { // it's a primary key, or an array of pks
 			$criteria = new Criteria(self::DATABASE_NAME);
-			$criteria->add(TagPeer::ID, (array) $values, Criteria::IN);
+			$criteria->add(tagPeer::ID, (array) $values, Criteria::IN);
 			// invalidate the cache for this object(s)
 			foreach ((array) $values as $singleval) {
-				TagPeer::removeInstanceFromPool($singleval);
+				tagPeer::removeInstanceFromPool($singleval);
 			}
 		}
 
@@ -906,7 +906,7 @@ abstract class BaseTagPeer {
 			$con->beginTransaction();
 			
 			$affectedRows += BasePeer::doDelete($criteria, $con);
-			TagPeer::clearRelatedInstancePool();
+			tagPeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -916,24 +916,24 @@ abstract class BaseTagPeer {
 	}
 
 	/**
-	 * Validates all modified columns of given Tag object.
+	 * Validates all modified columns of given tag object.
 	 * If parameter $columns is either a single column name or an array of column names
 	 * than only those columns are validated.
 	 *
 	 * NOTICE: This does not apply to primary or foreign keys for now.
 	 *
-	 * @param      Tag $obj The object to validate.
+	 * @param      tag $obj The object to validate.
 	 * @param      mixed $cols Column name or array of column names.
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(Tag $obj, $cols = null)
+	public static function doValidate(tag $obj, $cols = null)
 	{
 		$columns = array();
 
 		if ($cols) {
-			$dbMap = Propel::getDatabaseMap(TagPeer::DATABASE_NAME);
-			$tableMap = $dbMap->getTable(TagPeer::TABLE_NAME);
+			$dbMap = Propel::getDatabaseMap(tagPeer::DATABASE_NAME);
+			$tableMap = $dbMap->getTable(tagPeer::TABLE_NAME);
 
 			if (! is_array($cols)) {
 				$cols = array($cols);
@@ -949,7 +949,7 @@ abstract class BaseTagPeer {
 
 		}
 
-		return BasePeer::doValidate(TagPeer::DATABASE_NAME, TagPeer::TABLE_NAME, $columns);
+		return BasePeer::doValidate(tagPeer::DATABASE_NAME, tagPeer::TABLE_NAME, $columns);
 	}
 
 	/**
@@ -957,19 +957,19 @@ abstract class BaseTagPeer {
 	 *
 	 * @param      int $pk the primary key.
 	 * @param      PropelPDO $con the connection to use
-	 * @return     Tag
+	 * @return     tag
 	 */
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
 
-		if (null !== ($obj = TagPeer::getInstanceFromPool((string) $pk))) {
+		if (null !== ($obj = tagPeer::getInstanceFromPool((string) $pk))) {
 			return $obj;
 		}
 
-		$criteria = new Criteria(TagPeer::DATABASE_NAME);
-		$criteria->add(TagPeer::ID, $pk);
+		$criteria = new Criteria(tagPeer::DATABASE_NAME);
+		$criteria->add(tagPeer::ID, $pk);
 
-		$v = TagPeer::doSelect($criteria, $con);
+		$v = tagPeer::doSelect($criteria, $con);
 
 		return !empty($v) > 0 ? $v[0] : null;
 	}
@@ -988,16 +988,16 @@ abstract class BaseTagPeer {
 		if (empty($pks)) {
 			$objs = array();
 		} else {
-			$criteria = new Criteria(TagPeer::DATABASE_NAME);
-			$criteria->add(TagPeer::ID, $pks, Criteria::IN);
-			$objs = TagPeer::doSelect($criteria, $con);
+			$criteria = new Criteria(tagPeer::DATABASE_NAME);
+			$criteria->add(tagPeer::ID, $pks, Criteria::IN);
+			$objs = tagPeer::doSelect($criteria, $con);
 		}
 		return $objs;
 	}
 
-} // BaseTagPeer
+} // BasetagPeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BaseTagPeer::buildTableMap();
+BasetagPeer::buildTableMap();
 

@@ -8,14 +8,14 @@
  * @package plugins.tagSearch
  * @subpackage model.om
  */
-abstract class BaseTag extends BaseObject  implements Persistent {
+abstract class Basetag extends BaseObject  implements Persistent {
 
 
 	/**
 	 * The Peer class.
 	 * Instance provides a convenient way of calling static methods on a class
 	 * that calling code may not be able to identify.
-	 * @var        TagPeer
+	 * @var        tagPeer
 	 */
 	protected static $peer;
 
@@ -113,7 +113,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Initializes internal state of BaseTag object.
+	 * Initializes internal state of Basetag object.
 	 * @see        applyDefaults()
 	 */
 	public function __construct()
@@ -216,12 +216,12 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 * Set the value of [id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     Tag The current object (for fluent API support)
+	 * @return     tag The current object (for fluent API support)
 	 */
 	public function setId($v)
 	{
-		if(!isset($this->oldColumnsValues[TagPeer::ID]))
-			$this->oldColumnsValues[TagPeer::ID] = $this->id;
+		if(!isset($this->oldColumnsValues[tagPeer::ID]))
+			$this->oldColumnsValues[tagPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -229,7 +229,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 
 		if ($this->id !== $v) {
 			$this->id = $v;
-			$this->modifiedColumns[] = TagPeer::ID;
+			$this->modifiedColumns[] = tagPeer::ID;
 		}
 
 		return $this;
@@ -239,12 +239,12 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 * Set the value of [tag] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     Tag The current object (for fluent API support)
+	 * @return     tag The current object (for fluent API support)
 	 */
 	public function setTag($v)
 	{
-		if(!isset($this->oldColumnsValues[TagPeer::TAG]))
-			$this->oldColumnsValues[TagPeer::TAG] = $this->tag;
+		if(!isset($this->oldColumnsValues[tagPeer::TAG]))
+			$this->oldColumnsValues[tagPeer::TAG] = $this->tag;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -252,7 +252,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 
 		if ($this->tag !== $v) {
 			$this->tag = $v;
-			$this->modifiedColumns[] = TagPeer::TAG;
+			$this->modifiedColumns[] = tagPeer::TAG;
 		}
 
 		return $this;
@@ -262,12 +262,12 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 * Set the value of [partner_id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     Tag The current object (for fluent API support)
+	 * @return     tag The current object (for fluent API support)
 	 */
 	public function setPartnerId($v)
 	{
-		if(!isset($this->oldColumnsValues[TagPeer::PARTNER_ID]))
-			$this->oldColumnsValues[TagPeer::PARTNER_ID] = $this->partner_id;
+		if(!isset($this->oldColumnsValues[tagPeer::PARTNER_ID]))
+			$this->oldColumnsValues[tagPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -275,7 +275,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 
 		if ($this->partner_id !== $v) {
 			$this->partner_id = $v;
-			$this->modifiedColumns[] = TagPeer::PARTNER_ID;
+			$this->modifiedColumns[] = tagPeer::PARTNER_ID;
 		}
 
 		return $this;
@@ -285,12 +285,12 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 * Set the value of [object_type] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     Tag The current object (for fluent API support)
+	 * @return     tag The current object (for fluent API support)
 	 */
 	public function setObjectType($v)
 	{
-		if(!isset($this->oldColumnsValues[TagPeer::OBJECT_TYPE]))
-			$this->oldColumnsValues[TagPeer::OBJECT_TYPE] = $this->object_type;
+		if(!isset($this->oldColumnsValues[tagPeer::OBJECT_TYPE]))
+			$this->oldColumnsValues[tagPeer::OBJECT_TYPE] = $this->object_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -298,7 +298,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 
 		if ($this->object_type !== $v) {
 			$this->object_type = $v;
-			$this->modifiedColumns[] = TagPeer::OBJECT_TYPE;
+			$this->modifiedColumns[] = tagPeer::OBJECT_TYPE;
 		}
 
 		return $this;
@@ -308,12 +308,12 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 * Set the value of [instance_count] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     Tag The current object (for fluent API support)
+	 * @return     tag The current object (for fluent API support)
 	 */
 	public function setInstanceCount($v)
 	{
-		if(!isset($this->oldColumnsValues[TagPeer::INSTANCE_COUNT]))
-			$this->oldColumnsValues[TagPeer::INSTANCE_COUNT] = $this->instance_count;
+		if(!isset($this->oldColumnsValues[tagPeer::INSTANCE_COUNT]))
+			$this->oldColumnsValues[tagPeer::INSTANCE_COUNT] = $this->instance_count;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -321,7 +321,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 
 		if ($this->instance_count !== $v || $this->isNew()) {
 			$this->instance_count = $v;
-			$this->modifiedColumns[] = TagPeer::INSTANCE_COUNT;
+			$this->modifiedColumns[] = tagPeer::INSTANCE_COUNT;
 		}
 
 		return $this;
@@ -332,7 +332,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     Tag The current object (for fluent API support)
+	 * @return     tag The current object (for fluent API support)
 	 */
 	public function setCreatedAt($v)
 	{
@@ -369,7 +369,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 					)
 			{
 				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = TagPeer::CREATED_AT;
+				$this->modifiedColumns[] = tagPeer::CREATED_AT;
 			}
 		} // if either are not null
 
@@ -427,10 +427,10 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 6; // 6 = TagPeer::NUM_COLUMNS - TagPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 6; // 6 = tagPeer::NUM_COLUMNS - tagPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
-			throw new PropelException("Error populating Tag object", $e);
+			throw new PropelException("Error populating tag object", $e);
 		}
 	}
 
@@ -473,15 +473,15 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(TagPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(tagPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
 
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
-		TagPeer::setUseCriteriaFilter(false);
-		$stmt = TagPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
-		TagPeer::setUseCriteriaFilter(true);
+		tagPeer::setUseCriteriaFilter(false);
+		$stmt = tagPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		tagPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -510,14 +510,14 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(TagPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(tagPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
 			if ($ret) {
-				TagPeer::doDelete($this, $con);
+				tagPeer::doDelete($this, $con);
 				$this->postDelete($con);
 				$this->setDeleted(true);
 				$con->commit();
@@ -550,7 +550,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(TagPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(tagPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
@@ -570,7 +570,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 					$this->postUpdate($con);
 				}
 				$this->postSave($con);
-				TagPeer::addInstanceToPool($this);
+				tagPeer::addInstanceToPool($this);
 			} else {
 				$affectedRows = 0;
 			}
@@ -605,14 +605,14 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 			$this->alreadyInSave = true;
 
 			if ($this->isNew() ) {
-				$this->modifiedColumns[] = TagPeer::ID;
+				$this->modifiedColumns[] = tagPeer::ID;
 			}
 
 			// If this object has been modified, then save it to the database.
 			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
-					$pk = TagPeer::doInsert($this, $con);
+					$pk = tagPeer::doInsert($this, $con);
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
 										 // should always be true here (even though technically
 										 // BasePeer::doInsert() can insert multiple rows).
@@ -622,7 +622,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 					$this->setNew(false);
 					$this->objectSaved = true;
 				} else {
-					$affectedObjects = TagPeer::doUpdate($this, $con);
+					$affectedObjects = tagPeer::doUpdate($this, $con);
 					if($affectedObjects)
 						$this->objectSaved = true;
 						
@@ -843,7 +843,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 			$failureMap = array();
 
 
-			if (($retval = TagPeer::doValidate($this, $columns)) !== true) {
+			if (($retval = tagPeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
 			}
 
@@ -866,7 +866,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 */
 	public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = TagPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = tagPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		$field = $this->getByPosition($pos);
 		return $field;
 	}
@@ -918,7 +918,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 */
 	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true)
 	{
-		$keys = TagPeer::getFieldNames($keyType);
+		$keys = tagPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
 			$keys[1] => $this->getTag(),
@@ -942,7 +942,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 */
 	public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = TagPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = tagPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		return $this->setByPosition($pos, $value);
 	}
 
@@ -997,7 +997,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 */
 	public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
 	{
-		$keys = TagPeer::getFieldNames($keyType);
+		$keys = tagPeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
 		if (array_key_exists($keys[1], $arr)) $this->setTag($arr[$keys[1]]);
@@ -1014,14 +1014,14 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 */
 	public function buildCriteria()
 	{
-		$criteria = new Criteria(TagPeer::DATABASE_NAME);
+		$criteria = new Criteria(tagPeer::DATABASE_NAME);
 
-		if ($this->isColumnModified(TagPeer::ID)) $criteria->add(TagPeer::ID, $this->id);
-		if ($this->isColumnModified(TagPeer::TAG)) $criteria->add(TagPeer::TAG, $this->tag);
-		if ($this->isColumnModified(TagPeer::PARTNER_ID)) $criteria->add(TagPeer::PARTNER_ID, $this->partner_id);
-		if ($this->isColumnModified(TagPeer::OBJECT_TYPE)) $criteria->add(TagPeer::OBJECT_TYPE, $this->object_type);
-		if ($this->isColumnModified(TagPeer::INSTANCE_COUNT)) $criteria->add(TagPeer::INSTANCE_COUNT, $this->instance_count);
-		if ($this->isColumnModified(TagPeer::CREATED_AT)) $criteria->add(TagPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(tagPeer::ID)) $criteria->add(tagPeer::ID, $this->id);
+		if ($this->isColumnModified(tagPeer::TAG)) $criteria->add(tagPeer::TAG, $this->tag);
+		if ($this->isColumnModified(tagPeer::PARTNER_ID)) $criteria->add(tagPeer::PARTNER_ID, $this->partner_id);
+		if ($this->isColumnModified(tagPeer::OBJECT_TYPE)) $criteria->add(tagPeer::OBJECT_TYPE, $this->object_type);
+		if ($this->isColumnModified(tagPeer::INSTANCE_COUNT)) $criteria->add(tagPeer::INSTANCE_COUNT, $this->instance_count);
+		if ($this->isColumnModified(tagPeer::CREATED_AT)) $criteria->add(tagPeer::CREATED_AT, $this->created_at);
 
 		return $criteria;
 	}
@@ -1036,9 +1036,9 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 */
 	public function buildPkeyCriteria()
 	{
-		$criteria = new Criteria(TagPeer::DATABASE_NAME);
+		$criteria = new Criteria(tagPeer::DATABASE_NAME);
 
-		$criteria->add(TagPeer::ID, $this->id);
+		$criteria->add(tagPeer::ID, $this->id);
 
 		return $criteria;
 	}
@@ -1069,7 +1069,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 * If desired, this method can also make copies of all associated (fkey referrers)
 	 * objects.
 	 *
-	 * @param      object $copyObj An object of Tag (or compatible) type.
+	 * @param      object $copyObj An object of tag (or compatible) type.
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
 	 * @throws     PropelException
 	 */
@@ -1102,7 +1102,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 * objects.
 	 *
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-	 * @return     Tag Clone of current object.
+	 * @return     tag Clone of current object.
 	 * @throws     PropelException
 	 */
 	public function copy($deepCopy = false)
@@ -1118,16 +1118,16 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @var     Tag Clone of current object.
+	 * @var     tag Clone of current object.
 	 */
 	protected $copiedFrom = null;
 	
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @param      Tag $copiedFrom Clone of current object.
+	 * @param      tag $copiedFrom Clone of current object.
 	 */
-	public function setCopiedFrom(Tag $copiedFrom)
+	public function setCopiedFrom(tag $copiedFrom)
 	{
 		$this->copiedFrom = $copiedFrom;
 	}
@@ -1139,12 +1139,12 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 * same instance for all member of this class. The method could therefore
 	 * be static, but this would prevent one from overriding the behavior.
 	 *
-	 * @return     TagPeer
+	 * @return     tagPeer
 	 */
 	public function getPeer()
 	{
 		if (self::$peer === null) {
-			self::$peer = new TagPeer();
+			self::$peer = new tagPeer();
 		}
 		return self::$peer;
 	}
@@ -1165,4 +1165,4 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 
 	}
 
-} // BaseTag
+} // Basetag
