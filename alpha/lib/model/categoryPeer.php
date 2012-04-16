@@ -120,9 +120,9 @@ class categoryPeer extends BasecategoryPeer
 	 */
 	public static function getByFullNameWildcardMatch($fullName, $con = null)
 	{
-		$fullName = str_replace(array('\\', '%', '_'), array('\\\\', '\%', '\_'), $fullName);
+//		$fullName = str_replace(array('\\', '%', '_'), array('\\\\', '\%', '\_'), $fullName);
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
-		$c->add(categoryPeer::FULL_NAME, $fullName."%", Criteria::LIKE);
+		$c->add(categoryPeer::FULL_NAME, "$fullName\\*", Criteria::LIKE);
 		
 		return categoryPeer::doSelect($c, $con);
 	}
