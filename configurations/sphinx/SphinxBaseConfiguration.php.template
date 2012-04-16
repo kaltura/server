@@ -64,6 +64,7 @@ $baseConfigurationIndexs = 	array(
 	
 	'kaltura_category' => array(	
 		'path'					=> '/sphinx/kaltura_category_rt',
+		'dict'      => 'keywords',
 		'min_prefix_len'	 => 3,
 		'enable_star'	 => 1,
 		'fields' => array( 
@@ -99,6 +100,7 @@ $baseConfigurationIndexs = 	array(
 				
 	'kaltura_kuser' => array(	
 		'path'	 => '/sphinx/kaltura_kuser_rt',
+		'dict'      => 'keywords',
 		'min_prefix_len'	 => 3,
 		'enable_star'	 => 1,
 		'fields' => array( 
@@ -155,6 +157,7 @@ $baseConfigurations = array (
 	'searchd' => array(
 		'log'				=> '@LOG_DIR@/sphinx/kaltura_sphinx_searchd.log',
 		'query_log'			=> '@LOG_DIR@/sphinx/kaltura_sphinx_query.log',
+		'query_log_format'	=> 'sphinxql',
 		'read_timeout'		=> '5',
 		'max_children'		=> '30',
 		'pid_file'			=> '@BASE_DIR@/sphinx/searchd.pid',
@@ -164,6 +167,7 @@ $baseConfigurations = array (
 		'workers'			=> 'threads',
 		'binlog_path'		=> '@LOG_DIR@/sphinx/data',
 		'binlog_flush'		=> '1',
+		'rt_flush_period'	=> '3600',
 		'listen'			=> '0.0.0.0:9312:mysql41'
 	)
 );
