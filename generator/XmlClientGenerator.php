@@ -445,11 +445,11 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	
 	protected function writeBeforeServices() { }
 	
-	protected function writeBeforeService(KalturaServiceReflector $serviceReflector) { }
+	protected function writeBeforeService(KalturaServiceActionItem $serviceReflector) { }
 	
 	protected function writeServiceAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector) { }
 	
-	protected function writeAfterService(KalturaServiceReflector $serviceReflector) { }
+	protected function writeAfterService(KalturaServiceActionItem $serviceReflector) { }
 	
 	protected function writeAfterServices() { }
 	
