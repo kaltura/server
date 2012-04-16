@@ -40,7 +40,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	{
 		$defaultConfig = array(
 			'type'				=> 'rt',
-			'blend_chars'		=> '`, ~, !, @, U+23, $, %, ^, &, *, (, ), -, _, =, +, [, ], {, }, ;, :, \', \, |, /, ?, U+0C, ., <, >',
+			'blend_chars'		=> '`, ~, !, @, U+23, $, %, ^, &, *, (, ), -, _, =, +, [, ], {, }, ;, :, \', \, |, /, ?, U+0C, ., <',
 			'charset_type'		=> 'utf-8',
 			'rt_mem_limit'		=> '1024M',
 			'charset_table'		=> '>, 0..9, A..Z->a..z, a..z, U+410..U+42F->U+430..U+44F, U+430..U+44F, \
