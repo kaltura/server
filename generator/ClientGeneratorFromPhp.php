@@ -130,8 +130,8 @@ abstract class ClientGeneratorFromPhp
 				if (strpos($actionInfo->clientgenerator, "ignore") !== false)
 					continue;
 					
-				$outputTypeReflector = $action->getActionOutputType();
-				$actionParams = $action->getActionParams();
+				$outputTypeReflector = $actionReflector->getActionOutputType();
+				$actionParams = $actionReflector->getActionParams();
 				$this->writeServiceAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);				
 			}
 			$this->writeAfterService($serviceActionItem);
