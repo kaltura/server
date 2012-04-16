@@ -324,6 +324,7 @@ class thumbnailAction extends sfAction
 			{
 				$remoteUrl =  $file_sync->getExternalUrl();
    				header("Location: $remoteUrl");
+   				die;
 			}
 			
 			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl ( $file_sync , $_SERVER['REQUEST_URI'] );
