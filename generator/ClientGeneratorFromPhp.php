@@ -120,9 +120,8 @@ abstract class ClientGeneratorFromPhp
 			$serviceName = $serviceActionItem->serviceInfo->serviceName;
 			$serviceId = $serviceActionItem->serviceId;
 			$actions = $serviceActionItem->actionMap;
-			foreach($actions as $action => $actionCallback)
+			foreach($actions as $action => $actionReflector)
 			{
-			    $actionReflector = new KalturaActionReflector($serviceId, $action, $actionCallback);
 				$actionInfo = $actionReflector->getActionInfo();
 				
 				if($actionInfo->serverOnly)
