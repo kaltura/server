@@ -124,7 +124,7 @@ class kCurrentContext
 	
 	public static function isApiV3Context()
 	{		
-		if (defined("KALTURA_API_V3") && kCurrentContext::$ps_vesion == 'ps3') {
+		if (kCurrentContext::$ps_vesion == 'ps3') {
 			return true;
 		}
 		
