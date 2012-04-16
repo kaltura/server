@@ -87,7 +87,8 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 	
 		if($baseClass == 'KalturaJobData')
 		{
-			if($enumValue == self::getApiValue(VirusScanBatchJobType::VIRUS_SCAN))
+			if($enumValue == self::getApiValue(VirusScanBatchJobType::VIRUS_SCAN) || 
+			   $enumValue == self::getBatchJobTypeCoreValue(VirusScanBatchJobType::VIRUS_SCAN))
 			{
 				return new KalturaVirusScanJobData();
 			}
