@@ -1,28 +1,6 @@
 <?php
 
-define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
-define('SPHINX_CONFIG_DIR', ROOT_DIR . '/configurations/sphinx/');
-
-require_once(ROOT_DIR . '/infra/kConf.php');
-require_once(ROOT_DIR . '/infra/bootstrap_base.php');
-
-define("KALTURA_API_V3", true); // used for different logic in alpha libs
-
-require_once(ROOT_DIR . '/infra/KAutoloader.php');
-
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "api_v3", "lib", "*"));
-KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/deploy/classMap.cache');
-KAutoloader::register();
-
-error_reporting(E_ALL);
-KalturaLog::setLogger(new KalturaStdoutLogger());
-
-$dbConf = kConf::getDB();
-DbManager::setConfig($dbConf);
-DbManager::initialize();
-
+require_once(dirname(__FILE__) . '/../../bootstrap.php');
 
 $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
 foreach($pluginInstances as $pluginInstance)

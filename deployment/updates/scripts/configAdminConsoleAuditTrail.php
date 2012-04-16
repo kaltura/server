@@ -9,9 +9,6 @@ error_reporting(E_ALL);
 chdir(dirname(__FILE__));
 define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
 require_once(ROOT_DIR . '/infra/bootstrap_base.php');
-
-define("KALTURA_API_V3", true); // used for different logic in alpha libs
-
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
@@ -39,6 +36,8 @@ KalturaLog::setLogger(new KalturaStdoutLogger());
 $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
 DbManager::initialize();
+
+kCurrentContext::$ps_vesion = 'ps3'; // used for different logic in alpha libs
 
 $partner = PartnerPeer::retrieveByPK($partnerId);
 $partner->setPluginEnabled(AuditPlugin::PLUGIN_NAME, true);
