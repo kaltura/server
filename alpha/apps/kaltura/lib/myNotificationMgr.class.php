@@ -210,7 +210,7 @@ $debug .= "property: $not_property = [$value]\n";
 				
 			if ( $object_data instanceof entry )
 			{
-				if (defined("KALTURA_API_V3"))
+				if (kCurrentContext::isApiV3Context())
 				{
 					$kuser = $object_data->getKuser();
 					
