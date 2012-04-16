@@ -44,7 +44,7 @@ class myKalturaUserClipsServices extends myBaseMediaSource implements IMediaSour
 		$objects = array();
 		
 		$should_serach = true;
-		if (defined("KALTURA_API_V3"))
+		if (kCurrentContext::isApiV3Context())
 		{
 			$kuser = kuserPeer::getKuserByPartnerAndUid(self::$partner_id, self::$puser_id);
 			$should_serach = true;
