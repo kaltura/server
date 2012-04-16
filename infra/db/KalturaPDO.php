@@ -122,7 +122,7 @@ class KalturaPDO extends PropelPDO
 	 */
 	public function query()
 	{
-		if (defined("KALTURA_API_V3"))
+		if (class_exists('KalturaResponseCacher'))
 			KalturaResponseCacher::disableConditionalCache();
 	
 		$args = func_get_args();

@@ -120,7 +120,7 @@ class myCache
 		if ( ! self::$s_ready ) return NULL ;
 //		$this->m_stats->m_gets++;
 
-		if (defined("KALTURA_API_V3"))
+		if (class_exists('KalturaResponseCacher'))
 			KalturaResponseCacher::disableConditionalCache();
 		
 		$value = self::$s_memcache->get ( $this->m_namespace . $obj_name );
