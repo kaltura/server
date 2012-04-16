@@ -19,37 +19,9 @@ $paperHeight = null;
  * DON'T TOUCH THE FOLLOWING CODE
  ***************************************************/
 
-error_reporting(E_ALL);
 chdir(dirname(__FILE__));
 
-require_once(realpath(dirname(__FILE__)).'/../../../alpha/config/sfrootdir.php');
-define('SF_APP',         'kaltura');
-define('SF_ENVIRONMENT', 'prod');
-define('SF_DEBUG',       false);
-
-define('MODULES' , SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR."modules".DIRECTORY_SEPARATOR);
-
-require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
-
-
-define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
-require_once(ROOT_DIR . '/infra/bootstrap_base.php');
-
-define("KALTURA_API_V3", true); // used for different logic in alpha libs
-
-require_once(ROOT_DIR . '/infra/KAutoloader.php');
-
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "api_v3", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
-KAutoloader::setClassMapFilePath('../../cache/classMap.cache');
-KAutoloader::register();
-
-date_default_timezone_set(kConf::get("date_default_timezone")); // America/New_York
-
-KalturaLog::setLogger(new KalturaStdoutLogger());
-
-DbManager::setConfig(kConf::getDB());
-DbManager::initialize();
+require_once(realpath(dirname(__FILE__)).'/../../bootstrap.php');
 
 $flavorParams = null;
 
@@ -72,7 +44,7 @@ else
 }
 
 $pdfOperator = new kOperator();
-$pdfOperator->id = KalturaConversionEngineType::PDF_CREATOR;
+$pdfOperator->id = conversionEngineType::PDF_CREATOR;
 $operators = new kOperatorSets();
 $operators->addSet(array($pdfOperator));
 

@@ -2,24 +2,8 @@
 
 $partnerId = 1;
 
-
-set_time_limit(0);
-ini_set("memory_limit","700M");
-error_reporting(E_ALL);
 chdir(dirname(__FILE__));
-define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../'));
-require_once(ROOT_DIR . '/infra/bootstrap_base.php');
-
-define("KALTURA_API_V3", true); // used for different logic in alpha libs
-
-require_once(ROOT_DIR . '/infra/KAutoloader.php');
-
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "api_v3", "lib", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
-KAutoloader::setClassMapFilePath('../cache/classMap.cache');
-KAutoloader::register();
-
+require_once(dirname(__FILE__) . '/../bootstrap.php');
 
 $objectsToTrack = array(
 	KalturaAuditTrailObjectType::ACCESS_CONTROL => array(
