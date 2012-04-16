@@ -100,7 +100,7 @@ class DummyForDocsClientGenerator extends ClientGeneratorFromPhp
 	{
 	}
 	
-	protected function writeAfterService(KalturaServiceReflector $serviceReflector)
+	protected function writeAfterService(KalturaServiceActionItem $serviceReflector)
 	{
 	}
 	
@@ -112,7 +112,7 @@ class DummyForDocsClientGenerator extends ClientGeneratorFromPhp
 	{
 	}
 	
-	private function writeMainClassServiceDeclaration(KalturaServiceReflector $serviceReflector)
+	private function writeMainClassServiceDeclaration(KalturaServiceActionItem $serviceReflector)
 	{
 	}
 	
