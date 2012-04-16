@@ -195,7 +195,7 @@ class kQueryCache
 			if ($cacheResult[self::DONT_CACHE_KEY])
 			{
 				KalturaLog::debug("kQueryCache: dontCache key is set -> not caching the result");
-				if (defined("KALTURA_API_V3"))
+				if (class_exists('KalturaResponseCacher'))
 					KalturaResponseCacher::disableConditionalCache();
 				$cacheQuery = false;
 			}
@@ -218,7 +218,7 @@ class kQueryCache
 			}
 		}
 		
-		if (defined("KALTURA_API_V3"))
+		if (class_exists('KalturaResponseCacher'))
 		{
 			$invalidationTime = 0;
 			if ($cacheResult)
