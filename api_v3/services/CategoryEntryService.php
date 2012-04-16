@@ -67,22 +67,16 @@ class CategoryEntryService extends KalturaBaseService
 	 */
 	function deleteAction($entryId, $categoryId)
 	{
-		$categoryEntry = new KalturaCategoryEntry();
-		$categoryEntry->entryId = $entryId;
-		$categoryEntry->categoryId = $categoryId;		
-		
-		$categoryEntry->validateForUpdate();
-		
-		$entry = entryPeer::retrieveByPK($categoryEntry->entryId);
+		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry)
-			throw new APIException(KalturaErrors::INVALID_ENTRY_ID, $categoryEntry->entryId);
+			throw new APIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
 			
-		$category = categoryPeer::retrieveByPK($categoryEntry->categoryId);
+		$category = categoryPeer::retrieveByPK($categoryId);
 		if (!$category)
-			throw new APIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryEntry->categoryId);
+			throw new APIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
 		
 		//validate user is entiteld to assign entry to this category 
-		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::$ks_kuser_id);
+		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, kCurrentContext::$ks_kuser_id);
 		if(kEntitlementUtils::getEntitlementEnforcement() && (!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
 			throw new ApiException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
 			
@@ -93,19 +87,15 @@ class CategoryEntryService extends KalturaBaseService
 		
 			$categoriesArr = explode(entry::ENTRY_CATEGORY_SEPARATOR, $categories);
 	
-			$keyToRemove = false;
 			foreach ($categoriesArr as $key => $categoryOnEntey)
 			{
 				if($categoryOnEntey == $category->getFullName())
 				{
-					$keyToRemove = true;
+					unset($categoriesArr[$key]);
 					break;
 				}
 			}
-			
-			if($keyToRemove)
-				unset($categoriesArr[$key]);
-			
+
 			$entry->setCategories(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categoriesArr));
 			$entry->save();
 				
@@ -118,8 +108,6 @@ class CategoryEntryService extends KalturaBaseService
 			
 			$dbCategoryEntry->delete();
 		}
-		
-		return $categoryEntry;
 	}
 	
 	/**
@@ -153,6 +141,7 @@ class CategoryEntryService extends KalturaBaseService
 		$c->addAnd(categoryPeer::ID, $categoriesIds, Criteria::IN);
 		$stmt = categoryPeer::doSelectStmt($c);
 		$categoryIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		
 		foreach ($dbCategoriesEntry as $key => $dbCategoryEntry)
 		{
 			if(!in_array($dbCategoryEntry->getCategoryId(), $categoryIds))

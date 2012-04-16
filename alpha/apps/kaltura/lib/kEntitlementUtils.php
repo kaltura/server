@@ -82,9 +82,7 @@ class kEntitlementUtils
 		$c->addAnd($crit);
 		
 		//remove default FORCED criteria since categories that has display in search = public - doesn't mean that all of their entries are public
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$category = categoryPeer::doSelectOne($c);
-		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 
 		if($category)
 			return true;

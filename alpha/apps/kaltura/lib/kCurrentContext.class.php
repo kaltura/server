@@ -144,6 +144,7 @@ class kCurrentContext
 			kCurrentContext::$uid = $requestedPuserId;
 			kCurrentContext::$is_admin_session = false;
 			kCurrentContext::$kuser_id = null;
+			kCurrentContext::$ks_kuser_id = 0;
 			
 			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$partner_id, kCurrentContext::$uid, true);
 			if($kuser)
@@ -170,7 +171,7 @@ class kCurrentContext
 			kCurrentContext::$partner_id = $requestedPartnerId;
 			kCurrentContext::$uid = $requestedPuserId;
 			kCurrentContext::$kuser_id = null;
-			kCurrentContext::$ks_kuser_id = null;
+			kCurrentContext::$ks_kuser_id = 0;
 			
 			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$partner_id, kCurrentContext::$uid, true);
 			if($kuser)

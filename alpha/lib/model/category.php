@@ -677,6 +677,7 @@ class category extends Basecategory implements IIndexable
 			else
 				$fullNameTemp .= (categoryPeer::CATEGORY_SEPARATOR . $name);
 				
+			
 			$category = categoryPeer::getByFullNameExactMatch($fullNameTemp);
 			if (!$category)
 			{
