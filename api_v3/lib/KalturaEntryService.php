@@ -186,7 +186,8 @@ class KalturaEntryService extends KalturaBaseService
 			
 			list($width, $height, $type, $attr) = getimagesize($entryFullPath);
 			$dbEntry->setDimensions($width, $height);
-			
+			$dbEntry->setData(".jpg"); // this will increase the data version
+			$dbEntry->save();
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			try
 			{
