@@ -1141,27 +1141,58 @@ class kFlowHelper
 		$entry = $dbBatchJob->getEntry();
 		if($entry)
 		{
+			/*
+			 * Retrieve data describing the new thumb
+			 */
 			$thisFlavorHeight = $data->getThumbHeight();
 			$thisFlavorBitrate = $data->getThumbBitrate();
+			$thisFlavorId = $data->getFlavorAssetId();
+			
+			/*
+			 * If there is already a thumb assigned to that entry, get the asset id that was used to grab the thumb.
+			 * For older entries (w/out grabbedFromAssetId), the original logic would be used.
+			 * For newer entries - retrieve mediaInfo's for th new and grabbed assest.
+			 * Use KDL logic to normalize the 'grabbed' and 'new' video bitrates.
+			 * Set ignoreThumbnail if the new br is lower than the normalized.
+			 */
+			if($entry->getCreateThumb()) {
+				$grabbedFromAssetId=$entry->getThumbGrabbedFromAssetId();
+				if(isset($grabbedFromAssetId)){
+					$thisMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($thisFlavorId);
+					$grabMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($grabbedFromAssetId);
+					if(isset($thisMediaInfo) && isset($grabMediaInfo)){
+						$normalizedBr=KDLVideoBitrateNormalize::NormalizeSourceToTarget($grabMediaInfo->getVideoFormat(), $grabMediaInfo->getVideoBitrate(), $thisMediaInfo->getVideoFormat());
+						$ignoreThumbnail = ($normalizedBr>=$thisMediaInfo->getVideoBitrate()? true: false);
+					}
+					else
+						$grabbedFromAssetId=null;
+				}
 
-			if(!$entry->getCreateThumb() || $entry->getThumbBitrate() > $thisFlavorBitrate)
-			{
+				/*
+				 * Nulled 'grabbedFromAssetId' notifies - there is no grabbed asset data available,
+				 * ==> use the older logic - w/out br normalizing 
+				 */
+				if(!isset($grabbedFromAssetId)){
+					if($entry->getThumbBitrate() > $thisFlavorBitrate) {
 				$ignoreThumbnail = true;
 			}
-			elseif($entry->getThumbBitrate() == $thisFlavorBitrate && $entry->getThumbHeight() > $thisFlavorHeight)
-			{
+			elseif($entry->getThumbBitrate() == $thisFlavorBitrate && $entry->getThumbHeight() > $thisFlavorHeight)	{
 				$ignoreThumbnail = true;
+					}
+				}
 			}
-			else
-			{
-				$entry->setThumbHeight($thisFlavorHeight);
-				$entry->setThumbBitrate($thisFlavorBitrate);
-				$entry->save();
+			else {
+				$ignoreThumbnail = true;
 			}
 		}
 
 		if(!$ignoreThumbnail)
 		{
+			$entry->setThumbHeight($thisFlavorHeight);
+			$entry->setThumbBitrate($thisFlavorBitrate);
+			$entry->setThumbGrabbedFromAssetId($thisFlavorId);
+			$entry->save();
+
 			KalturaLog::debug("Saving thumbnail from: " . $data->getThumbPath());
 			// creats thumbnail the file sync
 			$entry = $dbBatchJob->getEntry(false, false);
