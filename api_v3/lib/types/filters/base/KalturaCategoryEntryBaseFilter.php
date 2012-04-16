@@ -11,7 +11,6 @@ class KalturaCategoryEntryBaseFilter extends KalturaFilter
 		"categoryIdEqual" => "_eq_category_id",
 		"categoryIdIn" => "_in_category_id",
 		"entryIdEqual" => "_eq_entry_id",
-		"entryIdIn" => "_in_entry_id",
 	);
 
 	private $order_by_map = array
@@ -48,11 +47,4 @@ class KalturaCategoryEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $entryIdEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $entryIdIn;
 }

@@ -13,8 +13,6 @@ class categoryEntryFilter extends baseObjectFilter
 			"_eq_category_id",
 			"_in_category_id",
 			"_eq_entry_id",
-			"_in_entry_id",
-
 			) , NULL );
 
 		$this->allowed_order_fields = array ( );

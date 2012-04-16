@@ -128,32 +128,44 @@ class CategoryEntryService extends KalturaBaseService
 	 * @action list
 	 * @return KalturaCategoryEntryListResponse
 	 */
-	function listAction(KalturaCategoryEntryFilter $filter = null, KalturaFilterPager $pager = null)
+	function listAction(KalturaCategoryEntryFilter $filter = null)
 	{
 		if ($filter === null)
 			$filter = new KalturaCategoryEntryFilter();
-			
-		if ($pager == null)
-			$pager = new KalturaFilterPager();
 		
-		if ($filter->entryIdEqual == null && 
-			$filter->entryIdIn == null &&
-			$filter->categoryIdEqual == null &&
-			$filter->categoryIdIn == null)
-			throw new APIException(KalturaErrors::MUST_FILTER_ENTRY_OR_CATEGORY);
+		if ($filter->entryIdEqual == null)
+			throw new APIException(KalturaErrors::MUST_FILTER_ENTRY_ID_EQUAL);
 			
 		$categoryEntryFilter = new categoryEntryFilter();
 		$filter->toObject($categoryEntryFilter);
 
 		$c = new Criteria();
 		$categoryEntryFilter->attachToCriteria($c);
-		$dbList = categoryEntryPeer::doSelect($c);
-		$totalCount = categoryEntryPeer::doCount($c);
+		$dbCategoriesEntry = categoryEntryPeer::doSelect($c);
+
+		//remove unlisted categories: display in search is set to members only
+		$categoriesIds = array();
+		foreach ($dbCategoriesEntry as $dbCategoryEntry)
+			$categoriesIds[] = $dbCategoryEntry->getCategoryId();
 		
-		$list = KalturaCategoryEntryArray::fromCategoryEntryArray($dbList);
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$c->addSelectColumn(categoryPeer::ID);
+		$c->addAnd(categoryPeer::ID, $categoriesIds, Criteria::IN);
+		$stmt = categoryPeer::doSelectStmt($c);
+		$categoryIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		foreach ($dbCategoriesEntry as $key => $dbCategoryEntry)
+		{
+			if(!in_array($dbCategoryEntry->getCategoryId(), $categoryIds))
+			{
+				KalturaLog::debug('Category [' . print_r($dbCategoryEntry->getCategoryId(),true) . '] is not listed to user');
+				unset($dbCategoriesEntry[$key]);
+			}
+		}
+		
+		$categoryEntrylist = KalturaCategoryEntryArray::fromCategoryEntryArray($dbCategoriesEntry);
 		$response = new KalturaCategoryEntryListResponse();
-		$response->objects = $list;
-		$response->totalCount = $totalCount;
+		$response->objects = $categoryEntrylist;
+		$response->totalCount = count($categoryEntrylist); // no pager since category entry is limited to ENTRY::MAX_CATEGORIES_PER_ENTRY
 		return $response;
 	}
 }

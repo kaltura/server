@@ -403,5 +403,5 @@ class KalturaErrors extends APIErrors
 	
 	const ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY = "ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY,Entry doesn't assigned to category"; 
 	
-	const MUST_FILTER_ENTRY_OR_CATEGORY = "MUST_FILTER_ENTRY_OR_CATEGORY,Must filter on entry id or on category id";
+	const MUST_FILTER_ENTRY_ID_EQUAL = "MUST_FILTER_ENTRY_ID_EQUAL,Must filter on entry id";
 }
