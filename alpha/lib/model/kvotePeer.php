@@ -27,6 +27,10 @@ class kvotePeer extends BasekvotePeer
     public static function doSelectByEntryIdAndPuserId ($entryId, $partnerId, $puserId)
     {
         $kuser = self::getKuserFromPuserAndPartner($puserId, $partnerId);
+        if (!$kuser)
+        {
+            return;
+        }
         
         $c = new Criteria(); 
         $c->addAnd(kvotePeer::KUSER_ID, $kuser->getId(), Criteria::EQUAL);
@@ -39,9 +43,6 @@ class kvotePeer extends BasekvotePeer
 	{
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId, true);
     		
-		if ($kuser && $kuser->getStatus() !== KuserStatus::ACTIVE)
-			throw new kCoreException(APIErrors::INVALID_USER_ID);
-		
 		return $kuser;
 	}
 	
