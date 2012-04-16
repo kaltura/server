@@ -207,6 +207,7 @@ include_once("KDLCommon.php");
 		public $_forceMult16 = 1;
 		public $_cbr=0;		// Constant bit rate, when set - -b 50M -minrate 50M -maxrate 50M -bt 5M -bufsize 10M 
 		public $_bt=0;		// bitrate tolerance
+		public $_isGopInSec=0;// if set the value of gop is in seconds, vs. frames
 			   
 		public function GetSectionEnum() { return KDLConstants::VideoIndex; }
 		
