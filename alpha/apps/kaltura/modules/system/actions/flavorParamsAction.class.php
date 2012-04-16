@@ -76,6 +76,10 @@ class flavorParamsAction extends kalturaSystemAction
 						$this->editFlavorParam->setTags($this->getRequestParameter("tags"));
 						$this->editFlavorParam->setFormat($this->getRequestParameter("format"));
 						$this->editFlavorParam->setTwoPass($this->getRequestParameter("two-pass", false));
+						$this->editFlavorParam->setRotate($this->getRequestParameter("rotate", false));
+						$this->editFlavorParam->setAspectRatioProcessingMode($this->getRequestParameter("aspectRatioProcessingMode",0));
+						$this->editFlavorParam->setIsGopInSec($this->getRequestParameter("isGopInSec",0));
+						$this->editFlavorParam->setForceFrameToMultiplication16($this->getRequestParameter("forceFrameToMultiplication16"));
 						$this->editFlavorParam->setWidth($this->getRequestParameter("width")); 
 						$this->editFlavorParam->setHeight($this->getRequestParameter("height"));
 						$this->editFlavorParam->setVideoCodec($this->getRequestParameter("video-codec"));
