@@ -326,5 +326,9 @@ class APIErrors
 	const INVALID_FEED_ID = "INVALID_FEED_ID,Unknown feed [%s]" ;
 	
 	const INVALID_FEED_TYPE = "INVALID_FEED_TYPE,Wrong feed type [%s]" ;
+
+	const ERROR_OCCURED_WHILE_GZCOMPRESS_JOB_DATA = "ERROR_OCCURED_WHILE_GZCOMPRESS_JOB_DATA, error accored while gzcompress job data";
 	
+	const ERROR_OCCURED_WHILE_GZUNCOMPRESS_JOB_DATA = "ERROR_OCCURED_WHILE_GZUNCOMPRESS_JOB_DATA, error accored while gzuncompress job data";
+		
 }

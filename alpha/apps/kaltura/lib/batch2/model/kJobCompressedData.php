@@ -19,7 +19,7 @@ class kJobCompressedData extends kJobData {
 	public function kJobCompressedData($serializedJobData) {
 		$this->compressedJobData = gzcompress ( $serializedJobData );
 		if (! $this->compressedJobData) {
-			throw new Exception ( KalturaErrors::ERROR_OCCURED_WHILE_GZCOMPRESS );
+			throw new Exception ( APIErrors::ERROR_OCCURED_WHILE_GZCOMPRESS );
 		}
 	}
 	
@@ -31,7 +31,7 @@ class kJobCompressedData extends kJobData {
 		if ($serializedJobData )
 			return $serializedJobData;
 		else
-			throw new Exception ( KalturaErrors::ERROR_OCCURED_WHILE_GZUNCOMPRESS);
+			throw new Exception ( APIErrors::ERROR_OCCURED_WHILE_GZUNCOMPRESS);
 	}
 
 }
