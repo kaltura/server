@@ -8,16 +8,17 @@ class KIndexingEntryEngine extends KIndexingEngine
 	/* (non-PHPdoc)
 	 * @see KIndexingEngine::index()
 	 */
-	public function index(KalturaFilter $filter)
+	public function index(KalturaFilter $filter, $shouldUpdate)
 	{
-		return $this->indexEntries($filter);
+		return $this->indexEntries($filter, $shouldUpdate);
 	}
 	
 	/**
-	 * @param KalturaBaseEntryFilter $filter
+	 * @param KalturaBaseEntryFilter $filter The filter should return the list of entries that need to be reindexed
+	 * @param bool $shouldUpdate Indicates that the entry columns and attributes values should be recalculated before reindexed
 	 * @return int the number of indexed objects
 	 */
-	protected function indexEntries(KalturaBaseEntryFilter $filter)
+	protected function indexEntries(KalturaBaseEntryFilter $filter, $shouldUpdate)
 	{
 		$filter->orderBy = KalturaBaseEntryOrderBy::CREATED_AT_ASC;
 		
@@ -28,7 +29,7 @@ class KIndexingEntryEngine extends KIndexingEngine
 		$this->client->startMultiRequest();
 		foreach($entriesList->objects as $entry)
 		{
-			$this->client->index->indexEntry($entry);
+			$this->client->baseEntry->index($entry, $shouldUpdate);
 		}
 		$results = $this->client->doMultiRequest();
 		foreach($results as $result)

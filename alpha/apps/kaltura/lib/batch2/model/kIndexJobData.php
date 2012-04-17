@@ -6,14 +6,22 @@
 class kIndexJobData extends kJobData
 {
 	/**
+	 * The filter should return the list of objects that need to be reindexed.
 	 * @var baseObjectFilter
 	 */
 	private $filter;
 	
 	/**
+	 * Indicates the last id that reindexed, used when the batch crached, to re-run from the last crash point.
 	 * @var int
 	 */
 	private $lastIndexId;
+	
+	/**
+	 * Indicates that the object columns and attributes values should be recalculated before reindexed.
+	 * @var bool
+	 */
+	private $shouldUpdate;
 	
 	/**
 	 * @return baseObjectFilter $filter
@@ -45,5 +53,21 @@ class kIndexJobData extends kJobData
 	public function setLastIndexId($lastIndexId)
 	{
 		$this->lastIndexId = $lastIndexId;
+	}
+	
+	/**
+	 * @return bool $shouldUpdate
+	 */
+	public function getShouldUpdate()
+	{
+		return $this->shouldUpdate;
+	}
+
+	/**
+	 * @param bool $shouldUpdate
+	 */
+	public function setShouldUpdate($shouldUpdate)
+	{
+		$this->shouldUpdate = $shouldUpdate;
 	}
 }

@@ -54,10 +54,11 @@ abstract class KIndexingEngine
 	}
 	
 	/**
-	 * @param KalturaFilter $filter
+	 * @param KalturaFilter $filter The filter should return the list of objects that need to be reindexed
+	 * @param bool $shouldUpdate Indicates that the object columns and attributes values should be recalculated before reindexed
 	 * @return int the number of indexed objects
 	 */
-	abstract public function index(KalturaFilter $filter);
+	abstract public function index(KalturaFilter $filter, $shouldUpdate);
 	
 	/**
 	 * @return int $lastIndexId
