@@ -301,7 +301,7 @@ class KalturaSyndicationFeedRenderer
 		{
 			if($this->lastEntryCreatedAt)
 			{
-				$this->currentCriteria->add(entryPeer::CREATED_AT, $this->lastEntryCreatedAt, Criteria::LESS_EQUAL);
+				$this->currentCriteria->add($this->getOrderByColumn(), $this->lastEntryCreatedAt, Criteria::LESS_EQUAL);
 			}
 			
 			if (count($this->lastEntryIds))
@@ -362,14 +362,14 @@ class KalturaSyndicationFeedRenderer
 		
 		$c = clone $this->baseCriteria;
 		$c->setLimit(self::ENTRY_PEER_LIMIT_QUERY);
-		
+
 		if(!count($this->entryFilters))
 		{
 			if($this->currentCriteria) // already executed the base criteria
 				return null;
 				
 			$c->clearOrderByColumns();
-			$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
+			$c->addDescendingOrderByColumn($this->getOrderByColumn());
 			$c->dontCount();
 			
 			return $c; // return the base criteria
@@ -386,7 +386,7 @@ class KalturaSyndicationFeedRenderer
 		$filter->attachToCriteria($c);
 		
 		$c->clearOrderByColumns();
-		$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
+		$c->addDescendingOrderByColumn($this->getOrderByColumn());
 		$c->dontCount();
 		
 		return $c;
@@ -853,5 +853,13 @@ class KalturaSyndicationFeedRenderer
 			$this->writeClosingXmlNode('url', 1);
 		}
 		$this->writeClosingXmlNode('urlset');
+	}
+
+	private function getOrderByColumn()
+	{
+		if ($this->syndicationFeed->entriesOrderBy === 'recent')
+			return entryPeer::AVAILABLE_FROM;
+
+		return entryPeer::CREATED_AT; // the default
 	}
 }

@@ -12,7 +12,8 @@ class syndicationFeed extends BasesyndicationFeed
 {
 	const CUSTOM_DATA_MRSS_PARAMETERS = 'mrss_parameters';
 	const CUSTOM_DATA_STORAGE_ID = 'storage_id';
-	
+	const CUSTOM_DATA_ENTRIES_ORDER_BY = 'entries_order_by';
+
 	// copied from KalturaSyndicationFeedStatus
 	const SYNDICATION_DELETED = -1;
 	const SYNDICATION_ACTIVE = 1;
@@ -104,5 +105,21 @@ class syndicationFeed extends BasesyndicationFeed
 	public function setStorageId($storageId)
 	{	
 		$this->putInCustomData(self::CUSTOM_DATA_STORAGE_ID, $storageId);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getEntriesOrderBy()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_ENTRIES_ORDER_BY);
+	}
+
+	/**
+	 * @param string $entriesOrderBy
+	 */
+	public function setEntriesOrderBy($entriesOrderBy)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_ENTRIES_ORDER_BY, $entriesOrderBy);
 	}
 }

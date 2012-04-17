@@ -123,8 +123,13 @@ class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 	 * @var int
 	 */
 	public $storageId;
+
+	/**
+	 * @var KalturaSyndicationFeedEntriesOrderBy
+	 */
+	public $entriesOrderBy;
 	
-	private static $mapBetweenObjects = array("id", "partnerId", "playlistId", "name", "status", "type", "landingPage", "createdAt", "playerUiconfId", "allowEmbed", "flavorParamId", "transcodeExistingContent", "addToDefaultConversionProfile", "categories", "storageId");
+	private static $mapBetweenObjects = array("id", "partnerId", "playlistId", "name", "status", "type", "landingPage", "createdAt", "playerUiconfId", "allowEmbed", "flavorParamId", "transcodeExistingContent", "addToDefaultConversionProfile", "categories", "storageId", "entriesOrderBy");
 	
 	public function getMapBetweenObjects()
 	{
