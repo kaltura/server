@@ -71,6 +71,10 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 				$data = new KalturaIndexJobData();
 				break;
 				
+			case KalturaBatchJobType::DELETE:
+				$data = new KalturaDeleteJobData();
+				break;
+				
 			default:
 				$data = KalturaPluginManager::loadObject('KalturaJobData', $jobType);
 				KalturaLog::debug("Loaded data type [" . get_class($data) . "] for job type [$jobType]");
