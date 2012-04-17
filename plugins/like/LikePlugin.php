@@ -1,4 +1,8 @@
 <?php
+/**
+ * Enable 'liking' or 'unliking' an entry as the current user, rather than anonymously ranking it.
+ * @package plugins.like
+ */
 class LikePlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions
 {
     const PLUGIN_NAME = "like";
