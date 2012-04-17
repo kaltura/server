@@ -321,6 +321,10 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				$this->data = new KalturaIndexJobData();
 				break;
 				
+			case 'kDeleteJobData':
+				$this->data = new KalturaDeleteJobData();
+				break;
+				
 			default:			
 				if($dbData instanceof kBulkUploadJobData)
 					$this->data = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $dbBatchJob->getJobSubType());
@@ -465,6 +469,12 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				$dbData = new kIndexJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaIndexJobData();
+				break;
+				
+			case KalturaBatchJobType::DELETE:
+				$dbData = new kDeleteJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaDeleteJobData();
 				break;
 				
 			default:

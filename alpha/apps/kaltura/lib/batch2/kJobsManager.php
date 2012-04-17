@@ -869,18 +869,37 @@ class kJobsManager
 	/**
 	 * @param int $partnerId
 	 * @param int $objectType of enum IndexObjectType
-	 * @param baseObjectFilter $filter
+	 * @param baseObjectFilter $filter The filter should return the list of objects that need to be reindexed
+	 * @param bool $shouldUpdate Indicates that the object columns and attributes values should be recalculated before reindexed
 	 * @return BatchJob
 	 */
-	public static function addIndexJob($partnerId, $objectType, baseObjectFilter $filter)
+	public static function addIndexJob($partnerId, $objectType, baseObjectFilter $filter, $shouldUpdate)
 	{
 	    $jobData = new kIndexJobData();
  		$jobData->setFilter($filter);
+ 		$jobData->setShouldUpdate($shouldUpdate);
  		
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
 		
 		return self::addJob($batchJob, $jobData, BatchJobType::INDEX, $objectType);
+	}
+	
+	/**
+	 * @param int $partnerId
+	 * @param int $objectType of enum DeleteObjectType
+	 * @param baseObjectFilter $filter The filter should return the list of objects that need to be deleted
+	 * @return BatchJob
+	 */
+	public static function addDeleteJob($partnerId, $objectType, baseObjectFilter $filter)
+	{
+	    $jobData = new kDeleteJobData();
+ 		$jobData->setFilter($filter);
+ 		
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId($partnerId);
+		
+		return self::addJob($batchJob, $jobData, BatchJobType::DELETE, $objectType);
 	}
 	
 	public static function addBulkDownloadJob($partnerId, $puserId, $entryIds, $flavorParamsId)

@@ -72,6 +72,28 @@ class kFlowHelper
 
 	/**
 	 * @param BatchJob $dbBatchJob
+	 * @param kDeleteJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function handleDeleteFinished(BatchJob $dbBatchJob, kDeleteJobData $data, BatchJob $twinJob = null)
+	{
+		// TODO change some flag on the calling object? top category for example?
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kDeleteJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function handleDeleteFailed(BatchJob $dbBatchJob, kDeleteJobData $data, BatchJob $twinJob = null)
+	{
+		// TODO change some flag on the calling object? top category for example?
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
 	 * @param kImportJobData $data
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
