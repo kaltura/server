@@ -49,6 +49,9 @@ abstract class BasekvotePeer {
 	/** the column name for the RANK field */
 	const RANK = 'kvote.RANK';
 
+	/** the column name for the STATUS field */
+	const STATUS = 'kvote.STATUS';
+
 	/** the column name for the KVOTE_TYPE field */
 	const KVOTE_TYPE = 'kvote.KVOTE_TYPE';
 
@@ -79,7 +82,6 @@ abstract class BasekvotePeer {
 		BasePeer::TYPE_COLNAME => array (self::ID, self::KSHOW_ID, self::ENTRY_ID, self::KUSER_ID, self::PARTNER_ID, self::RANK, self::STATUS, self::KVOTE_TYPE, self::CREATED_AT, self::CUSTOM_DATA, ),
 		BasePeer::TYPE_FIELDNAME => array ('id', 'kshow_id', 'entry_id', 'kuser_id', 'partner_id', 'rank', 'status', 'kvote_type', 'created_at', 'custom_data', ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
-
 	);
 
 	/**
@@ -169,6 +171,7 @@ abstract class BasekvotePeer {
 		$criteria->addSelectColumn(kvotePeer::KUSER_ID);
 		$criteria->addSelectColumn(kvotePeer::PARTNER_ID);
 		$criteria->addSelectColumn(kvotePeer::RANK);
+		$criteria->addSelectColumn(kvotePeer::STATUS);
 		$criteria->addSelectColumn(kvotePeer::KVOTE_TYPE);
 		$criteria->addSelectColumn(kvotePeer::CREATED_AT);
 		$criteria->addSelectColumn(kvotePeer::CUSTOM_DATA);

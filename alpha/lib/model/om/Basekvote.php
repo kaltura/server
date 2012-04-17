@@ -56,6 +56,12 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	protected $rank;
 
 	/**
+	 * The value for the status field.
+	 * @var        int
+	 */
+	protected $status;
+
+	/**
 	 * The value for the kvote_type field.
 	 * Note: this column has a database default value of: 1
 	 * @var        int
@@ -213,6 +219,16 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	public function getRank()
 	{
 		return $this->rank;
+	}
+
+	/**
+	 * Get the [status] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getStatus()
+	{
+		return $this->status;
 	}
 
 	/**
@@ -426,6 +442,29 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	} // setRank()
 
 	/**
+	 * Set the value of [status] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     kvote The current object (for fluent API support)
+	 */
+	public function setStatus($v)
+	{
+		if(!isset($this->oldColumnsValues[kvotePeer::STATUS]))
+			$this->oldColumnsValues[kvotePeer::STATUS] = $this->status;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->status !== $v) {
+			$this->status = $v;
+			$this->modifiedColumns[] = kvotePeer::STATUS;
+		}
+
+		return $this;
+	} // setStatus()
+
+	/**
 	 * Set the value of [kvote_type] column.
 	 * 
 	 * @param      int $v new value
@@ -563,7 +602,6 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			$this->kvote_type = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
 			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->custom_data = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -574,7 +612,6 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 
 			// FIXME - using NUM_COLUMNS may be clearer.
 			return $startcol + 10; // 10 = kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS).
-
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating kvote object", $e);
@@ -1256,6 +1293,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(kvotePeer::KUSER_ID)) $criteria->add(kvotePeer::KUSER_ID, $this->kuser_id);
 		if ($this->isColumnModified(kvotePeer::PARTNER_ID)) $criteria->add(kvotePeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(kvotePeer::RANK)) $criteria->add(kvotePeer::RANK, $this->rank);
+		if ($this->isColumnModified(kvotePeer::STATUS)) $criteria->add(kvotePeer::STATUS, $this->status);
 		if ($this->isColumnModified(kvotePeer::KVOTE_TYPE)) $criteria->add(kvotePeer::KVOTE_TYPE, $this->kvote_type);
 		if ($this->isColumnModified(kvotePeer::CREATED_AT)) $criteria->add(kvotePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(kvotePeer::CUSTOM_DATA)) $criteria->add(kvotePeer::CUSTOM_DATA, $this->custom_data);
@@ -1322,6 +1360,8 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		$copyObj->setPartnerId($this->partner_id);
 
 		$copyObj->setRank($this->rank);
+
+		$copyObj->setStatus($this->status);
 
 		$copyObj->setKvoteType($this->kvote_type);
 
