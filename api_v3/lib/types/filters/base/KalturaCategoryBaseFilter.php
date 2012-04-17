@@ -35,6 +35,8 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 		"statusIn" => "_in_status",
 		"inheritedParentIdEqual" => "_eq_inherited_parent_id",
 		"inheritedParentIdIn" => "_in_inherited_parent_id",
+		"partnerSortValueGreaterThanOrEqual" => "_gte_partner_sort_value",
+		"partnerSortValueLessThanOrEqual" => "_lte_partner_sort_value",
 	);
 
 	private $order_by_map = array
@@ -51,6 +53,8 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 		"-updatedAt" => "-updated_at",
 		"+directEntriesCount" => "+direct_entries_count",
 		"-directEntriesCount" => "-direct_entries_count",
+		"+partnerSortValue" => "+partner_sort_value",
+		"-partnerSortValue" => "-partner_sort_value",
 	);
 
 	public function getMapBetweenObjects()
@@ -251,4 +255,18 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $inheritedParentIdIn;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $partnerSortValueGreaterThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $partnerSortValueLessThanOrEqual;
 }

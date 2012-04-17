@@ -215,6 +215,28 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public $inheritedParentId;
 	
+	/**
+	 * Can be used to store various partner related data as a numeric value
+	 * 
+	 * @var int
+	 * @filter gte,lte,order
+	 */
+	public $partnerSortValue;
+	
+	/**
+	 * Can be used to store various partner related data as a string 
+	 * 
+	 * @var string
+	 */
+	public $partnerData;
+	
+	/**
+	 * Enable client side applications to define how to sort the category child categories 
+	 * 
+	 * @var KalturaCategoryOrderBy
+	 */
+	public $defaultOrderBy;
+	
 	private static $mapBetweenObjects = array
 	(
 		"id",
@@ -243,6 +265,9 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"privacyContexts",
 		"status",
 		"inheritedParentId",
+		"partnerSortValue",
+		"partnerData",
+		"defaultOrderBy",
 	);
 	
 	public function getMapBetweenObjects()

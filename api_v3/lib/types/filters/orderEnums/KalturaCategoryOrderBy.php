@@ -17,4 +17,6 @@ class KalturaCategoryOrderBy extends KalturaStringEnum
 	const UPDATED_AT_DESC = "-updatedAt";
 	const DIRECT_ENTRIES_COUNT_ASC = "+directEntriesCount";
 	const DIRECT_ENTRIES_COUNT_DESC = "-directEntriesCount";
+	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";
+	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
 }

@@ -35,9 +35,11 @@ class categoryFilter extends baseObjectFilter
 			"_in_inheritance_type",
 			"_eq_status",
 			"_in_status",
+			"_gte_partner_sort_value",
+			"_lte_partner_sort_value",
 			) , NULL );
 
-		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name", "depth", "entries_count", "direct_entries_count");
+		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name", "depth", "partner_sort_value", "entries_count", "direct_entries_count");
 
 		$this->aliases = array ( 
 			"owner" => "kuser_id"
@@ -67,4 +69,3 @@ class categoryFilter extends baseObjectFilter
 	}
 }
 
-?>

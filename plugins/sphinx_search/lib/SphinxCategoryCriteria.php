@@ -35,6 +35,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'category.CREATED_AT' => 'created_at',
 		'category.UPDATED_AT' => 'updated_at',
 		'category.DELETED_AT' => 'deleted_at',	
+		'category.PARTNER_SORT_VALUE' => 'partner_sort_value',
 	);
 	
 	public static $sphinxOrderFields = array(
@@ -50,6 +51,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'category.DIRECT_ENTRIES_COUNT' => 'direct_entries_count',
 		'category.CREATED_AT' => 'created_at',
 		'category.UPDATED_AT' => 'updated_at',
+		'category.PARTNER_SORT_VALUE' => 'partner_sort_value',
 	);
 	
 	public static $sphinxTypes = array(
@@ -80,7 +82,8 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'inherited_parent_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'created_at' => IIndexable::FIELD_TYPE_DATETIME,
 		'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
-		'deleted_at' => IIndexable::FIELD_TYPE_DATETIME
+		'deleted_at' => IIndexable::FIELD_TYPE_DATETIME,
+		'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
 	);
 
 	/**

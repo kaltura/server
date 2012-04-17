@@ -55,7 +55,8 @@ class category extends Basecategory implements IIndexable
 		'inherited_parent_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'created_at' => IIndexable::FIELD_TYPE_DATETIME,
 		'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
-		'deleted_at' => IIndexable::FIELD_TYPE_DATETIME
+		'deleted_at' => IIndexable::FIELD_TYPE_DATETIME,
+		'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
 	);
 	
 	public function save(PropelPDO $con = null)
@@ -803,7 +804,9 @@ class category extends Basecategory implements IIndexable
 			'inherited_parent_id' => 'inheritedParentId',
 			'created_at' => 'createdAt',
 			'updated_at' => 'updatedAt',
-			'deleted_at' => 'deletedAt');		
+			'deleted_at' => 'deletedAt',
+			'partner_sort_value' => 'partnerSortValue',
+		);		
 	}
 	
 	/**
@@ -1011,5 +1014,53 @@ class category extends Basecategory implements IIndexable
 		
 		$this->setPrivacyContexts(implode(',', $privacyContext));
 		parent::setPrivacyContext($v);
+	}
+	
+	/**
+	 * @param int $v
+	 */
+	public function setPartnerSortValue($v)
+	{
+		$this->putInCustomData("partnerSortValue", $v);
+	}
+	
+	/**
+	 * @return int
+	 */
+	public function getPartnerSortValue()
+	{
+		return (int)$this->getFromCustomData("partnerSortValue");
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setPartnerData($v)
+	{
+		$this->putInCustomData("partnerData", $v);
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getPartnerData()
+	{
+		return $this->getFromCustomData("partnerData");
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setDefaultOrderBy($v)
+	{
+		$this->putInCustomData("defaultOrderBy", $v);
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getDefaultOrderBy()
+	{
+		return $this->getFromCustomData("defaultOrderBy");
 	}
 }
