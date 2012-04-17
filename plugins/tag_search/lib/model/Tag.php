@@ -13,7 +13,7 @@
  * @package plugins.tagSearch
  * @subpackage model
  */
-class Tag extends BaseTag implements IIndexable
+class Tag extends Basetag implements IIndexable
 {
 	/* (non-PHPdoc)
      * @see IIndexable::getIntId()
