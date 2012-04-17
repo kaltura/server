@@ -36,6 +36,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	protected $orderByClause = array();
 	
 	/**
+	 * Indicates that order by clauses added and the results should be sorted
+	 * @var bool
+	 */
+	protected $applySortRequired;
+	
+	/**
 	 * Counts how many criterions couldn't be handled
 	 * @var int
 	 */
@@ -349,6 +355,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$search = array_keys($replace);
 			
 			
+			$this->clearOrderByColumns();
 			foreach($orderByColumns as $orderByColumn)
 			{
 				$arr = explode(' ', $orderByColumn);
@@ -363,19 +370,34 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				{
 					KalturaLog::debug("Skip sort field[$orderField] from [$orderByColumn] limit won't be used in sphinx query");
 					$setLimit = false;
+					$matches = null;
+					if(preg_match('/^\s*([^\s]+)\s+(ASC|DESC)\s*$/i', $orderByColumn, $matches))
+					{
+						list($match, $column, $direction) = $matches;
+						
+						if(strtoupper($direction) == Criteria::DESC)
+							$this->addDescendingOrderByColumn($column);
+						else
+							$this->addAscendingOrderByColumn($column);
+					}
 				}
 			}
 		}
 		
-		foreach ($this->orderByClause as $orderByClause){
+		foreach ($this->orderByClause as $orderByClause)
+		{
 			$orders[] = $orderByClause;
-			$setLimit = false;
 		}
 		
 		if(count($orders))
 		{
+			$this->applySortRequired = true;
 			$orders = array_unique($orders);
 			$orderBy = 'ORDER BY ' . implode(',', $orders);
+		}
+		else
+		{
+			$this->applySortRequired = false;
 		}
 			
 		$index = $this->getSphinxIndexName();
@@ -590,8 +612,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 * (non-PHPdoc)
 	 * @see KalturaCriteria::applyResultsSort()
 	 */
-	public function applyResultsSort(array &$objects){
-		if (!count($this->orderByClause))
+	public function applyResultsSort(array &$objects)
+	{
+		if (!$this->applySortRequired)
 			return;
 		
 		$sortedResult = array();
@@ -601,8 +624,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		$objects = array();
 		foreach ($this->fetchedIds as $fetchedId)
-			$objects[] = $sortedResult[$fetchedId];
-		
+			if(isset($sortedResult[$fetchedId]))
+				$objects[] = $sortedResult[$fetchedId];
 	}
 	
 	/* (non-PHPdoc)
