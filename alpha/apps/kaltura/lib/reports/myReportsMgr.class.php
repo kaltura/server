@@ -69,7 +69,14 @@ class myReportsMgr
 		return array ( $query , $res , $header );
 	}
 	
-	
+	/**
+	 * @param int $partner_id
+	 * @param int $report_type myReportsMgr::REPORT_TYPE_*
+	 * @param reportsInputFilter $input_filter
+	 * @param string $dimension returns single column from the graphs array
+	 * @param string $object_ids comma seperated ids
+	 * @return array <date|type, array <columnName, value>>
+	 */
 	public static function getGraph ( $partner_id , $report_type , reportsInputFilter $input_filter , $dimension = null , $object_ids = null )
 	{
 		$start = microtime(true);
@@ -787,7 +794,7 @@ class myReportsMgr
 	
 	private static function executeQuery ( $query )
 	{
-		if (defined("KALTURA_API_V3"))
+		if (class_exists('KalturaResponseCacher'))
 			KalturaResponseCacher::disableConditionalCache();
 	
 		$mysql_function = (strpos($query, 'CALL') === false)? 'mysql': 'mysqli';
