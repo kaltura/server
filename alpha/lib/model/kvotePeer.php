@@ -79,7 +79,7 @@ class kvotePeer extends BasekvotePeer
 		$kvote->setEntryId($entryId);
 		$kvote->setStatus(KVoteStatus::VOTED);
 		$kvote->setPartnerId($partnerId);
-		$kvote->setType($type);
+		$kvote->setKvoteType($type);
 		$kuser = self::getKuserFromPuserAndPartner($puserId, $partnerId);
 		if (!$kuser)
 		{
