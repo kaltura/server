@@ -260,9 +260,34 @@ function beginsWith($str, $end)
 
 function getRequestHash($fullActionName, $paramsForHash)
 {
-	unset($paramsForHash['ks']);
-	unset($paramsForHash['kalsig']);
-	unset($paramsForHash['clientTag']);
+	foreach ($paramsForHash as $paramName => $paramValue)
+	{
+		preg_match('/^\d+\:ks$/', $paramName, $matches);
+		if ($matches)
+		{
+			unset($paramsForHash[$paramName]);
+			continue;
+		}
+	}
+	
+	$paramsToUnset = array(
+		"ks",
+		"kalsig",
+		"clientTag",
+		"callback",
+		"sig",
+		"ts",
+		"3:contextDataParams:uid",
+		"contextDataParams:uid",
+		"4:filter:uid",
+		"filter:uid",
+		"4:pager:uid",
+		"pager:uid",
+		);
+	foreach ($paramsToUnset as $paramToUnset)
+	{
+		unset($paramsForHash[$paramToUnset]);
+	}
 	return md5($fullActionName . serialize($paramsForHash));
 }
 
@@ -350,12 +375,20 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array())
 
 function isRequestExpired($parsedParams)
 {
-	if (!array_key_exists('ks', $parsedParams))
+	$ks = null;
+	if (array_key_exists('ks', $parsedParams))
+	{
+		$ks = $parsedParams['ks'];
+	}
+	else if (array_key_exists('1:ks', $parsedParams))
+	{
+		$ks = $parsedParams['1:ks'];
+	}
+	else
 	{
 		return false;
 	}
 	
-	$ks = $parsedParams['ks'];
 	$ks = base64_decode($ks, true);
 	@list($hash, $ks) = @explode ("|", $ks, 2);
 	$ksParts = explode(";", $ks);
@@ -375,6 +408,82 @@ function isRequestExpired($parsedParams)
 	return (time() >= $validUntil);
 }
 
+function isActionApproved($fullActionName, $action)
+{
+	return 
+		beginsWith($fullActionName, 'playlist.execute') ||
+		beginsWith($action, 'get') ||
+		beginsWith($action, 'list') ||
+		beginsWith($action, 'count');
+}
+
+function processMultiRequest($parsedParams)
+{
+	$paramsByRequest = array();
+	foreach ($parsedParams as $paramName => $paramValue)
+	{
+		$explodedName = explode(':', $paramName);
+		if (count($explodedName) <= 1 || !is_numeric($explodedName[0]))
+		{
+			continue;
+		}
+		
+		$requestIndex = (int)$explodedName[0];
+		$paramName = implode(':', array_slice($explodedName, 1));
+		if (!array_key_exists($requestIndex, $paramsByRequest))
+		{
+			$paramsByRequest[$requestIndex] = array();
+		}
+		$paramsByRequest[$requestIndex][$paramName] = $paramValue;
+	}
+	
+	if (!$paramsByRequest)
+	{
+		return;
+	}
+	
+	$fullActionName = 'multirequest';
+	$maxIndex = max(array_keys($paramsByRequest));
+	for ($reqIndex = 1; $reqIndex <= $maxIndex; $reqIndex++)
+	{
+		if (!array_key_exists('service', $paramsByRequest[$reqIndex]) ||
+			!array_key_exists('action', $paramsByRequest[$reqIndex]))
+		{
+			return;
+		}
+		
+		$service = $paramsByRequest[$reqIndex]['service'];
+		$action = $paramsByRequest[$reqIndex]['action'];
+		$curFullActionName = strtolower("$service.$action");		
+		if (!isActionApproved($curFullActionName, $action))
+		{
+			return;
+		}
+		
+		$fullActionName .= '/'.$curFullActionName;
+	}
+
+	if (isRequestExpired($parsedParams))
+	{
+		return;
+	}
+	
+	switch (shouldProcessRequest($fullActionName, $parsedParams))
+	{
+	case 'quit':
+		return true;
+		
+	case 'no':
+		return;
+	}
+	
+	$parsedParams['format'] = '2';		# XML
+
+	$uri = "/api_v3/index.php?service=multirequest";
+	
+	testAction($fullActionName, $parsedParams, $uri, $parsedParams);
+}
+
 function processRequest($parsedParams)
 {
 	if (!array_key_exists('service', $parsedParams))
@@ -384,32 +493,31 @@ function processRequest($parsedParams)
 	}
 
 	$service = $parsedParams['service'];
+	unset($parsedParams['service']);
+	
 	if (beginsWith(strtolower($service), "multirequest"))
 	{
+		if (strtolower($service) == "multirequest")
+		{
+			processMultiRequest($parsedParams);
+		}
 		return;
 	}
 	
 	if (!array_key_exists('action', $parsedParams))
 	{
-		print "Error: action not specified " . print_r($parsedParams, true) . "\n";
+		//print "Error: action not specified " . print_r($parsedParams, true) . "\n";
 		return;
 	}
 		
 	$action = $parsedParams['action'];
-	$fullActionName = strtolower("$service.$action");
-	unset($parsedParams['service']);
 	unset($parsedParams['action']);
+	
+	$fullActionName = strtolower("$service.$action");
 	$parsedParams['format'] = '2';		# XML
 	
-	if (!beginsWith($fullActionName, 'playlist.execute') &&
-		!beginsWith($action, 'get') &&
-		!beginsWith($action, 'list') &&
-		!beginsWith($action, 'count'))
-	{
-		return;
-	}
-	
-	if (isRequestExpired($parsedParams))
+	if (!isActionApproved($fullActionName, $action) ||
+		isRequestExpired($parsedParams))
 	{
 		return;
 	}
