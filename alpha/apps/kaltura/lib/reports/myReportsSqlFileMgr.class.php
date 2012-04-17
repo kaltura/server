@@ -3,28 +3,31 @@ class myReportsSqlFileMgr
 {
 	const NO_TEXT_SUFFIX = "no_text";
 	const FOR_OBJECTS_SUFFIX = "for_objects";
+	const NO_FILTER_SUFFIX = "without_filter";
 	
-	public static function getSqlFilePath ( $type_str , $flavor_str , $add_search_text , $object_ids )
+	public static function getSqlFilePath ( $type_str , $flavor_str , $add_search_text , $object_ids, $input_filter )
 	{
-		$res = self::getSqlFilePathImpl( $type_str , $flavor_str , $add_search_text , $object_ids );
+		$res = self::getSqlFilePathImpl( $type_str , $flavor_str , $add_search_text , $object_ids,  $input_filter );
 KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$object_ids] -> [$res]" );		
 		return $res;
 	}
 	
-	private static function getSqlFilePathImpl ( $type_str , $flavor_str , $add_search_text , $object_ids , $recursion_count = 0)
-	{
-//KalturaLog::log ( __LINE__ . ": [$type_str] [$flavor_str] [$add_search_text] [$object_ids] [$recursion_count]" );		
+	private static function getSqlFilePathImpl ( $type_str , $flavor_str , $add_search_text , $object_ids , $input_filter, $recursion_count = 0)
+	{		
 		$recursion_count++;
 		if ( $recursion_count > 5) 
 		{
 			throw new Exception ("Cannot find config for [$type_str] , [$flavor_str]" ); 
 		}
-		 	
+		
+		$has_filter = ( $input_filter->keywords != "" || $input_filter->categories != "" || $object_ids);
+		
 		$config = self::getFileNameMappingConfig( 
 			$type_str , 
 			$flavor_str , 
 			$add_search_text ? "" : "_" . self::NO_TEXT_SUFFIX , 
-			$object_ids ? "_" . self::FOR_OBJECTS_SUFFIX : "" );
+			$object_ids ? "_" . self::FOR_OBJECTS_SUFFIX : "",
+			$has_filter );
 		
 		if ( $config === null )
 		{
@@ -35,7 +38,8 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 					$type_str , 
 					$flavor_str , 
 					$add_search_text ? "" : "_" . self::NO_TEXT_SUFFIX , 
-					"" );
+					"",
+					$has_filter);
 		
 				if ( $config === null )
 				{
@@ -47,8 +51,7 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				throw new Exception ( "cannot find mapping for [$type_str][$flavor_str]" );
 			}
 		}
-		
-//echo "[[$config]]</br>";		
+				
 		if ( $config === "" )
 		{
 			$path_prefix =  dirname (__FILE__ ) . "/{$type_str}/{$type_str}_$flavor_str";
@@ -65,15 +68,14 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				// an alias to some other path
 				$parts = explode ( "/" , substr ( $config , 1 ) ); // find the '/' character in the rest of the string
 				if ( count($parts) == 1 )
-				{
-//echo $parts[0]; die();					
+				{					
 					// use the configuration of same report type but other flavor - use false as $no_text_indicator
-					return self::getSqlFilePathImpl ( $type_str , $parts[0] , true , $object_ids , $recursion_count );
+					return self::getSqlFilePathImpl ( $type_str , $parts[0] , true , $object_ids , $input_filter, $recursion_count );
 				}
 				elseif ( count($parts) == 2 )
 				{
 					// use the configuraiton of some other report_type and other flavor - use false as $no_text_indicator
-					return self::getSqlFilePathImpl ( $parts[0] , $parts[1] , true , $object_ids , $recursion_count );
+					return self::getSqlFilePathImpl ( $parts[0] , $parts[1] , true , $object_ids , $input_filter, $recursion_count );
 				}
 			}
 			else
@@ -97,7 +99,7 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 	}
 
 	
-	private static function getFileNameMappingConfig ( $type_str , $flavor_str , $no_text , $for_objects )
+	private static function getFileNameMappingConfig ( $type_str , $flavor_str , $no_text , $for_objects, $has_filter )
 	{
 		$map = array (
 			"content_contributions" => array (
@@ -117,8 +119,10 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"count_no_text" => "",	
 				"graph" => "graph_and_total",
 				"graph_no_text" => "graph_and_total_no_text",
+				"graph_without_filter" => "graph_and_total_no_filter",
 				"total" => "graph_and_total",
 				"total_no_text" => "graph_and_total_no_text",
+				"total_without_filter" => "graph_and_total_no_filter",
 			) ,	
 			"content_interactions" => array (	
 				"detail" => "",
@@ -127,8 +131,10 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"count_no_text" => "",						
 				"graph" => "",
 				"graph_no_text" => "",
+				"graph_without_filter" => "graph_no_filter",
 				"total" => "",
 				"total_no_text" => "",			
+				"total_without_filter" => "total_no_filter",
 			),	
 			"map_overlay" => array (	
 				"detail" => "",
@@ -151,8 +157,10 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"count_no_text" => "",
 				"graph" => "",
 				"graph_no_text" => "",
+				"graph_without_filter" => "graph_no_filter",
 				"total" => "",
-				"total_no_text" => "",			
+				"total_no_text" => "",		
+				"total_without_filter" => "total_no_filter",
 			),
 			"top_contributors" => array (
 				"detail" => "",
@@ -220,6 +228,10 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 		else
 			throw new Exception ( "Cannot find mapping for [$type_str]" );
 			
+		if (!($has_filter) && isset($report_type_mapping[$flavor_str . "_" . self::NO_FILTER_SUFFIX])) {
+			return $report_type_mapping[$flavor_str . "_" . self::NO_FILTER_SUFFIX];					
+		}
+
 		if ( $no_text )
 			$flavor_str = $flavor_str . $no_text;
 		if ( $for_objects )	

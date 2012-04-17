@@ -424,10 +424,7 @@ class myReportsMgr
 		$start = microtime(true);
 		try
 		{
-	//		require_once ( dirname(__FILE__)  . "/StubReports.php" );
-	//		return StubReports::STUBexecuteQueryByType ( $partner_id , $report_type , $report_flavor , $input_filter  ,		$page_size , $page_index , $order_by );
 			
-			// if the keywords or the categories are not empty - use the text version of the query
 			$add_search_text = false;
 			
 			if ( is_numeric( $report_type ))
@@ -436,7 +433,8 @@ class myReportsMgr
 					self::$type_map[$report_type] ,  
 					self::$flavor_map[$report_flavor] , 
 					$add_search_text , 
-					$object_ids ? true : false );
+					$object_ids ? true : false ,
+					$input_filter);
 			}
 			else
 			{
