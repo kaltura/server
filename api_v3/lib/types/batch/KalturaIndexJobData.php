@@ -15,9 +15,15 @@ class KalturaIndexJobData extends KalturaJobData
 	 */
 	public $filter;
 	
+	/**
+	 * @var int
+	 */
+	public $lastIndexId;
+	
 	private static $map_between_objects = array
 	(
 		"filter" ,
+		"lastIndexId" ,
 	);
 
 	public function getMapBetweenObjects ( )

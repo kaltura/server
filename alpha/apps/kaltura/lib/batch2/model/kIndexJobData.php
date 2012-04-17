@@ -11,6 +11,11 @@ class kIndexJobData extends kJobData
 	private $filter;
 	
 	/**
+	 * @var int
+	 */
+	private $lastIndexId;
+	
+	/**
 	 * @return baseObjectFilter $filter
 	 */
 	public function getFilter()
@@ -24,5 +29,21 @@ class kIndexJobData extends kJobData
 	public function setFilter(baseObjectFilter $filter)
 	{
 		$this->filter = $filter;
+	}
+	
+	/**
+	 * @return int $lastIndexId
+	 */
+	public function getLastIndexId()
+	{
+		return $this->lastIndexId;
+	}
+
+	/**
+	 * @param int $lastIndexId
+	 */
+	public function setLastIndexId($lastIndexId)
+	{
+		$this->lastIndexId = $lastIndexId;
 	}
 }
