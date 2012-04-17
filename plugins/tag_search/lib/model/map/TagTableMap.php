@@ -14,12 +14,12 @@
  * @package plugins.tagSearch
  * @subpackage model.map
  */
-class TagTableMap extends TableMap {
+class tagTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'plugins.tagSearch.TagTableMap';
+	const CLASS_NAME = 'plugins.tagSearch.tagTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -32,8 +32,8 @@ class TagTableMap extends TableMap {
 	{
 	  // attributes
 		$this->setName('tag');
-		$this->setPhpName('Tag');
-		$this->setClassname('Tag');
+		$this->setPhpName('tag');
+		$this->setClassname('tag');
 		$this->setPackage('plugins.tagSearch');
 		$this->setUseIdGenerator(true);
 		// columns
@@ -53,4 +53,4 @@ class TagTableMap extends TableMap {
 	{
 	} // buildRelations()
 
-} // TagTableMap
+} // tagTableMap
