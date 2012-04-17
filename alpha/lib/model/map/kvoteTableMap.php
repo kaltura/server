@@ -43,6 +43,7 @@ class kvoteTableMap extends TableMap {
 		$this->addForeignKey('KUSER_ID', 'KuserId', 'INTEGER', 'kshow', 'ID', false, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
 		$this->addColumn('RANK', 'Rank', 'INTEGER', false, null, null);
+		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
 		$this->addColumn('KVOTE_TYPE', 'KvoteType', 'INTEGER', false, null, 1);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
