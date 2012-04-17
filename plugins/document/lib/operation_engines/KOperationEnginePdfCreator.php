@@ -13,10 +13,10 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	private $flavorParamsOutput;
 	
 	/**
-	 * the max time for the actual conversion to finish. during this time we try to rename the output file.
-	 * @var int
+	 * The task's configuration.
+	 * @var KSchedularTaskConfig
 	 */
-	private $outputFileMoveTimeoutSec;
+	private $taskConfiguration;
 
 	//old office files prefix
 	const OLD_OFFICE_SIGNATURE = "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1";
@@ -24,7 +24,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
 	{
 		parent::configure($taskConfig, $data, $client);
-		$outputFileMoveTimeoutSec = $taskConfig->params->outputFileMoveTimeoutSec;
+		$this->taskConfiguration = $taskConfig;
 		$this->flavorParamsOutput = $data->flavorParamsOutput;
 		KalturaLog::debug("document : this [". print_r($this, true)."]"); 
 	}
@@ -95,7 +95,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		}
 		
 		// sleeping while file not ready, since PDFCreator exists a bit before the file is actually ready
-		$sleepTimes = 10;
+		$sleepTimes = $this->taskConfiguration->fileExistReties;
 		$sleepSeconds = 2;
 		while (!file_exists(realpath($tmpFile)) && $sleepTimes > 0) {
 			sleep($sleepSeconds);
@@ -114,7 +114,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		$totalSleepTime = 0;
 		$sleepSeconds = 3;
 		$tmpFile = realpath($tmpFile);
-		while (!rename($tmpFile, $this->outFilePath) && $totalSleepTime > $this->outputFileMoveTimeoutSec) {
+		while (!rename($tmpFile, $this->outFilePath) && $totalSleepTime > $this->taskConfiguration->params->outputFileMoveTimeoutSec) {
 			sleep($sleepSeconds);
 			$totalSleepTime += $sleepSeconds;
 			clearstatcache();
