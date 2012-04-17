@@ -73,11 +73,13 @@ class kvotePeer extends BasekvotePeer
 	    
 	}
 	
-	public static function createKvote ($entryId, $partnerId, $puserId, $rank)
+	public static function createKvote ($entryId, $partnerId, $puserId, $rank, $type=KVoteType::RANK)
 	{
 	    $kvote = new kvote();
 		$kvote->setEntryId($entryId);
 		$kvote->setStatus(KVoteStatus::VOTED);
+		$kvote->setPartnerId($partnerId);
+		$kvote->setType($type);
 		$kuser = self::getKuserFromPuserAndPartner($puserId, $partnerId);
 		if (!$kuser)
 		{
