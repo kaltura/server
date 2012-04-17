@@ -465,7 +465,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		$this->validateCategories();
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		$this->validateObjectsExist();
-		parent::validateForInsert($propertiesToSkip);
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
