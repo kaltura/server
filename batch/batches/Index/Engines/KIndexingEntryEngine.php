@@ -8,7 +8,7 @@ class KIndexingEntryEngine extends KIndexingEngine
 	/* (non-PHPdoc)
 	 * @see KIndexingEngine::index()
 	 */
-	public function index(KalturaFilter $filter, $shouldUpdate)
+	protected function index(KalturaFilter $filter, $shouldUpdate)
 	{
 		return $this->indexEntries($filter, $shouldUpdate);
 	}
@@ -16,7 +16,7 @@ class KIndexingEntryEngine extends KIndexingEngine
 	/**
 	 * @param KalturaBaseEntryFilter $filter The filter should return the list of entries that need to be reindexed
 	 * @param bool $shouldUpdate Indicates that the entry columns and attributes values should be recalculated before reindexed
-	 * @return int the number of indexed objects
+	 * @return int the number of indexed entries
 	 */
 	protected function indexEntries(KalturaBaseEntryFilter $filter, $shouldUpdate)
 	{

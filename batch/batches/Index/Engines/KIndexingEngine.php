@@ -21,6 +21,18 @@ abstract class KIndexingEngine
 	private $lastIndexId;
 	
 	/**
+	 * The partner that owns the objects
+	 * @var int
+	 */
+	private $partnerId;
+	
+	/**
+	 * The batch system partner id
+	 * @var int
+	 */
+	private $batchPartnerId;
+	
+	/**
 	 * @param int $objectType of enum KalturaIndexObjectType
 	 * @return KIndexingEngine
 	 */
@@ -40,12 +52,16 @@ abstract class KIndexingEngine
 	}
 	
 	/**
+	 * @param int $partnerId
 	 * @param KalturaClient $client
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	public function configure(KalturaClient $client, KSchedularTaskConfig $taskConfig)
+	public function configure($partnerId, KalturaClient $client, KSchedularTaskConfig $taskConfig)
 	{
+		$this->partnerId = $partnerId;
+		$this->batchPartnerId = $taskConfig->getPartnerId();
 		$this->client = $client;
+
 		$this->pager = new KalturaFilterPager();
 		$this->pager->pageSize = 100;
 		
@@ -53,12 +69,40 @@ abstract class KIndexingEngine
 			$this->pager->pageSize = $taskConfig->params->pageSize;
 	}
 	
+	protected function impersonate()
+	{
+		$clientConfig = $this->client->getConfig();
+		$clientConfig->partnerId = $this->partnerId;
+		$this->client->setConfig($clientConfig);
+	}
+	
+	protected function unimpersonate()
+	{
+		$clientConfig = $this->client->getConfig();
+		$clientConfig->partnerId = $this->batchPartnerId;
+		$this->client->setConfig($clientConfig);
+	}
+	
 	/**
 	 * @param KalturaFilter $filter The filter should return the list of objects that need to be reindexed
 	 * @param bool $shouldUpdate Indicates that the object columns and attributes values should be recalculated before reindexed
 	 * @return int the number of indexed objects
 	 */
-	abstract public function index(KalturaFilter $filter, $shouldUpdate);
+	public function run(KalturaFilter $filter, $shouldUpdate)
+	{
+		$this->impersonate();
+		$ret = $this->index($filter, $shouldUpdate);
+		$this->unimpersonate();
+		
+		return $ret;
+	}
+	
+	/**
+	 * @param KalturaFilter $filter The filter should return the list of objects that need to be reindexed
+	 * @param bool $shouldUpdate Indicates that the object columns and attributes values should be recalculated before reindexed
+	 * @return int the number of indexed objects
+	 */
+	protected function index(KalturaFilter $filter, $shouldUpdate);
 	
 	/**
 	 * @return int $lastIndexId

@@ -60,7 +60,7 @@ class KAsyncIndex extends KJobHandlerWorker
 		$continue = true;
 		while($continue)
 		{
-			$indexedObjectsCount = $engine->index($filter, $data->shouldUpdate);
+			$indexedObjectsCount = $engine->run($filter, $data->shouldUpdate);
 			$continue = (bool) $indexedObjectsCount;
 			$lastIndexId = $engine->getLastIndexId();
 			

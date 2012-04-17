@@ -8,7 +8,7 @@ class KIndexingCategoryEngine extends KIndexingEngine
 	/* (non-PHPdoc)
 	 * @see KIndexingEngine::index()
 	 */
-	public function index(KalturaFilter $filter, $shouldUpdate)
+	protected function index(KalturaFilter $filter, $shouldUpdate)
 	{
 		return $this->indexCategories($filter, $shouldUpdate);
 	}
@@ -16,7 +16,7 @@ class KIndexingCategoryEngine extends KIndexingEngine
 	/**
 	 * @param KalturaCategoryFilter $filter The filter should return the list of categories that need to be reindexed
 	 * @param bool $shouldUpdate Indicates that the category columns and attributes values should be recalculated before reindexed
-	 * @return int the number of indexed objects
+	 * @return int the number of indexed categories
 	 */
 	protected function indexCategories(KalturaCategoryFilter $filter, $shouldUpdate)
 	{
