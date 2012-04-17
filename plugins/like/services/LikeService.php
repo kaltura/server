@@ -107,7 +107,7 @@ class LikeService extends KalturaBaseService
 	        throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
 	    }
         
-	    if (!$userId || $userId = "")
+	    if (!$userId)
 	    {
 	        $userId = kCurrentContext::$ks_uid;
 	    }
