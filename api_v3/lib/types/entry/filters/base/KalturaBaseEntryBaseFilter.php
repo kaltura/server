@@ -43,6 +43,8 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
+		"totalRankLessThanOrEqual" => "_lte_total_rank",
+		"totalRankGreaterThanOrEqual" => "_gte_total_rank",
 		"groupIdEqual" => "_eq_group_id",
 		"searchTextMatchAnd" => "_matchand_search_text",
 		"searchTextMatchOr" => "_matchor_search_text",
@@ -356,6 +358,20 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $totalRankLessThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $totalRankGreaterThanOrEqual;
 
 	/**
 	 * 
