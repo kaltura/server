@@ -73,7 +73,6 @@ class BatchController extends Zend_Controller_Action
 		}
 		
 		$filter = new Infra_BatchJobFilter();
-		$filter->jobTypeNotIn = Kaltura_Client_Enum_BatchJobType::DELETE;
 		$filter->entryIdEqual = $entryId;
 		$paginatorAdapter = new Infra_FilterPaginator($client->jobs, "listBatchJobs", null, $filter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request, null, 20);
@@ -158,7 +157,6 @@ class BatchController extends Zend_Controller_Action
 		
 		$filter = new Infra_BatchJobFilter();
 		$filter->orderBy = Kaltura_Client_Enum_BaseJobOrderBy::CREATED_AT_DESC;
-		$filter->jobTypeNotIn = Kaltura_Client_Enum_BatchJobType::DELETE;
 	
 		if($request->getParam('createdAtFrom', false))
 		{
@@ -318,7 +316,6 @@ class BatchController extends Zend_Controller_Action
 		
 		$filter = new Infra_BatchJobFilter();
 		$filter->orderBy = Kaltura_Client_Enum_BaseJobOrderBy::CREATED_AT_DESC;
-//		$filter->jobTypeNotIn = Kaltura_Client_Enum_BatchJobType::DELETE;
 	
 		if($request->getParam('createdAtFrom', false))
 		{
@@ -640,7 +637,6 @@ class BatchController extends Zend_Controller_Action
 		}
 		
 		$filter = new Infra_BatchJobFilter();
-		$filter->jobTypeNotIn = Kaltura_Client_Enum_BatchJobType::DELETE;
 		$filter->entryIdEqual = $entryId;
 		try{
 			$jobsList = $client->jobs->listBatchJobs($filter);
