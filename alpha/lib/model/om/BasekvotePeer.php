@@ -26,7 +26,7 @@ abstract class BasekvotePeer {
 	const TM_CLASS = 'kvoteTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 6;
+	const NUM_COLUMNS = 10;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -43,11 +43,20 @@ abstract class BasekvotePeer {
 	/** the column name for the KUSER_ID field */
 	const KUSER_ID = 'kvote.KUSER_ID';
 
+	/** the column name for the PARTNER_ID field */
+	const PARTNER_ID = 'kvote.PARTNER_ID';
+
 	/** the column name for the RANK field */
 	const RANK = 'kvote.RANK';
 
+	/** the column name for the KVOTE_TYPE field */
+	const KVOTE_TYPE = 'kvote.KVOTE_TYPE';
+
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'kvote.CREATED_AT';
+
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'kvote.CUSTOM_DATA';
 
 	/**
 	 * An identiy map to hold any loaded instances of kvote objects.
@@ -65,11 +74,12 @@ abstract class BasekvotePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'KshowId', 'EntryId', 'KuserId', 'Rank', 'CreatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'kshowId', 'entryId', 'kuserId', 'rank', 'createdAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::KSHOW_ID, self::ENTRY_ID, self::KUSER_ID, self::RANK, self::CREATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'kshow_id', 'entry_id', 'kuser_id', 'rank', 'created_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'KshowId', 'EntryId', 'KuserId', 'PartnerId', 'Rank', 'Status', 'KvoteType', 'CreatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'kshowId', 'entryId', 'kuserId', 'partnerId', 'rank', 'status', 'kvoteType', 'createdAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::KSHOW_ID, self::ENTRY_ID, self::KUSER_ID, self::PARTNER_ID, self::RANK, self::STATUS, self::KVOTE_TYPE, self::CREATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'kshow_id', 'entry_id', 'kuser_id', 'partner_id', 'rank', 'status', 'kvote_type', 'created_at', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+
 	);
 
 	/**
@@ -79,11 +89,11 @@ abstract class BasekvotePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'KshowId' => 1, 'EntryId' => 2, 'KuserId' => 3, 'Rank' => 4, 'CreatedAt' => 5, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'kshowId' => 1, 'entryId' => 2, 'kuserId' => 3, 'rank' => 4, 'createdAt' => 5, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KSHOW_ID => 1, self::ENTRY_ID => 2, self::KUSER_ID => 3, self::RANK => 4, self::CREATED_AT => 5, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'kshow_id' => 1, 'entry_id' => 2, 'kuser_id' => 3, 'rank' => 4, 'created_at' => 5, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'KshowId' => 1, 'EntryId' => 2, 'KuserId' => 3, 'PartnerId' => 4, 'Rank' => 5, 'Status' => 6, 'KvoteType' => 7, 'CreatedAt' => 8, 'CustomData' => 9, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'kshowId' => 1, 'entryId' => 2, 'kuserId' => 3, 'partnerId' => 4, 'rank' => 5, 'status' => 6, 'kvoteType' => 7, 'createdAt' => 8, 'customData' => 9, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KSHOW_ID => 1, self::ENTRY_ID => 2, self::KUSER_ID => 3, self::PARTNER_ID => 4, self::RANK => 5, self::STATUS => 6, self::KVOTE_TYPE => 7, self::CREATED_AT => 8, self::CUSTOM_DATA => 9, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'kshow_id' => 1, 'entry_id' => 2, 'kuser_id' => 3, 'partner_id' => 4, 'rank' => 5, 'status' => 6, 'kvote_type' => 7, 'created_at' => 8, 'custom_data' => 9, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
 	);
 
 	/**
@@ -157,8 +167,11 @@ abstract class BasekvotePeer {
 		$criteria->addSelectColumn(kvotePeer::KSHOW_ID);
 		$criteria->addSelectColumn(kvotePeer::ENTRY_ID);
 		$criteria->addSelectColumn(kvotePeer::KUSER_ID);
+		$criteria->addSelectColumn(kvotePeer::PARTNER_ID);
 		$criteria->addSelectColumn(kvotePeer::RANK);
+		$criteria->addSelectColumn(kvotePeer::KVOTE_TYPE);
 		$criteria->addSelectColumn(kvotePeer::CREATED_AT);
+		$criteria->addSelectColumn(kvotePeer::CUSTOM_DATA);
 	}
 
 	/**
@@ -428,6 +441,65 @@ abstract class BasekvotePeer {
 	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
+		$criteriaFilter = self::getCriteriaFilter();
+		$criteria = $criteriaFilter->getFilter();
+		
+		if(!$privatePartnerData)
+		{
+			// the private partner data is not allowed - 
+			if($kalturaNetwork)
+			{
+				// allow only the kaltura netword stuff
+				if($partnerId)
+				{
+					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the pattner_id and then the rest
+					myCriteria::addComment($criteria , "Only Kaltura Network");
+					$criteria->addAscendingOrderByColumn($orderBy);//, Criteria::CUSTOM );
+				}
+			}
+			else
+			{
+				// no private data and no kaltura_network - 
+				// add a criteria that will return nothing
+				$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
+			}
+		}
+		else
+		{
+			// private data is allowed
+			if(!strlen(strval($partnerGroup)))
+			{
+				// the default case
+				$criteria->addAnd(self::PARTNER_ID, $partnerId);
+			}
+			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			{
+				// all is allowed - don't add anything to the criteria
+			}
+			else 
+			{
+				// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
+				$partners = explode(',', trim($partnerGroup));
+				foreach($partners as &$p)
+					trim($p); // make sure there are not leading or trailing spaces
+
+				// add the partner_id to the partner_group
+				if (!in_array(strval($partnerId), $partners))
+					$partners[] = strval($partnerId);
+				
+				if(count($partners) == 1 && reset($partners) == $partnerId)
+				{
+					$criteria->addAnd(self::PARTNER_ID, $partnerId);
+				}
+				else 
+				{
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
+					$criteria->addAnd($criterion);
+				}
+			}
+		}
+			
+		$criteriaFilter->enable();
 	}
 	
 	/**
