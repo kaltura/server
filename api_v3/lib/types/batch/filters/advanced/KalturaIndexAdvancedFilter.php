@@ -8,11 +8,11 @@ class KalturaIndexAdvancedFilter extends KalturaSearchOperator
 	/**
 	 * @var int
 	 */
-	public $indexIdGreaterThan;
+	public $indexIdGreaterThanOrEqual;
 	
 	private static $map_between_objects = array
 	(
-		"indexIdGreaterThan",
+		"indexIdGreaterThanOrEqual",
 	);
 
 	public function getMapBetweenObjects ( )
