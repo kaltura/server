@@ -305,7 +305,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('	 */');
 		$this->appendLine('	public static function get(\Kaltura\Client\Client $client)');
 		$this->appendLine('	{');
-		$this->appendLine('		return new $pluginClassName(\$client);');
+		$this->appendLine("		return new $pluginClassName(\$client);");
 		$this->appendLine('	}');
 		$this->appendLine('');
 		$this->appendLine('	/**');

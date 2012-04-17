@@ -282,7 +282,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('	 */');
 		$this->appendLine('	public static function get(Kaltura_Client_Client $client)');
 		$this->appendLine('	{');
-		$this->appendLine('		return new $pluginClassName(\$client);');
+		$this->appendLine("		return new $pluginClassName(\$client);");
 		$this->appendLine('	}');
 		$this->appendLine('');
 		$this->appendLine('	/**');
