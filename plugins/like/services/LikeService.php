@@ -58,7 +58,7 @@ class LikeService extends KalturaBaseService
 		    return true;
 		}
 		
-		kvotePeer::createKvote($entryId, $this->getPartnerId(), kCurrentContext::$ks_uid, self::KVOTE_LIKE_RANK_VALUE);
+		kvotePeer::createKvote($entryId, $this->getPartnerId(), kCurrentContext::$ks_uid, self::KVOTE_LIKE_RANK_VALUE, KVoteType::LIKE);
 	    
 	    return true;
     }
