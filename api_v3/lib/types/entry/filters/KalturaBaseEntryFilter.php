@@ -31,4 +31,15 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 * @var string
 	 */
 	public $categoriesFullNameIn;
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
+	public function toObject($coreFilter = null, $props_to_skip = array()) 
+	{
+		if(is_null($coreFilter))
+			$coreFilter = new entryFilter();
+			
+		return parent::toObject($coreFilter, $props_to_skip);
+	}
 }

@@ -20,10 +20,20 @@ class KalturaCategoryEntry extends KalturaObject implements IFilterable
 	 */
 	public $entryId;
 	
+	/**
+	 * Creation date as Unix timestamp (In seconds)
+	 *  
+	 * @var int
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $createdAt;
+	
 	private static $mapBetweenObjects = array
 	(
 		"entryId",
-		"categoryId"
+		"categoryId",
+		"createdAt",
 	);
 	
 	public function getMapBetweenObjects()

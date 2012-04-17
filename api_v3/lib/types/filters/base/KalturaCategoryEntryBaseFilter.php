@@ -11,10 +11,14 @@ class KalturaCategoryEntryBaseFilter extends KalturaFilter
 		"categoryIdEqual" => "_eq_category_id",
 		"categoryIdIn" => "_in_category_id",
 		"entryIdEqual" => "_eq_entry_id",
+		"createdAtGreaterThanOrEqual" => "_gte_created_at",
+		"createdAtLessThanOrEqual" => "_lte_created_at",
 	);
 
 	private $order_by_map = array
 	(
+		"+createdAt" => "+created_at",
+		"-createdAt" => "-created_at",
 	);
 
 	public function getMapBetweenObjects()
@@ -47,4 +51,18 @@ class KalturaCategoryEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $entryIdEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual;
 }

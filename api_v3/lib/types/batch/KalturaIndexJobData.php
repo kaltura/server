@@ -2,11 +2,6 @@
 /**
  * @package api
  * @subpackage objects
- * 
- * TODO:
- * 1.	Filters should instantiate the correct core filter in their toObject method.
- * 2.	Need to think how to instantiate the correct KalturaFilter in the fromObject,
- * 		should it be a factory with a huge switch?
  */
 class KalturaIndexJobData extends KalturaJobData
 {
