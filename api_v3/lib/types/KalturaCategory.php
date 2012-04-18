@@ -40,6 +40,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * The following characters are not allowed: '<', '>', ','
 	 * 
 	 * @var string
+	 * @filter order
 	 */
 	public $name;
 	

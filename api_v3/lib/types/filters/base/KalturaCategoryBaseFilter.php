@@ -43,6 +43,8 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 	(
 		"+depth" => "+depth",
 		"-depth" => "-depth",
+		"+name" => "+name",
+		"-name" => "-name",
 		"+fullName" => "+full_name",
 		"-fullName" => "-full_name",
 		"+entriesCount" => "+entries_count",

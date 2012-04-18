@@ -7,6 +7,8 @@ class KalturaCategoryOrderBy extends KalturaStringEnum
 {
 	const DEPTH_ASC = "+depth";
 	const DEPTH_DESC = "-depth";
+	const NAME_ASC = "+name";
+	const NAME_DESC = "-name";
 	const FULL_NAME_ASC = "+fullName";
 	const FULL_NAME_DESC = "-fullName";
 	const ENTRIES_COUNT_ASC = "+entriesCount";
