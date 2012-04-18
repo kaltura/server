@@ -272,7 +272,18 @@ class category extends Basecategory implements IIndexable
 		{
 			 // TODO ADD JOB TO INDEX ENTRIES.
 		}
-			
+	
+		// check if parnet is deleted and could be purged
+		if ($this->isColumnModified(categoryPeer::STATUS) && $this->getStatus() == CategoryStatus::PURGED)
+		{
+			$parentCategory = $this->getParentCategory();
+			if($parentCategory->isReadyForPurge())
+			{
+				$parentCategory->setStatus(CategoryStatus::PURGED);
+				$parentCategory->save();
+			}
+		}
+		
 		$ret = parent::postUpdate($con);
 		
 		if($objectDeleted)
@@ -829,6 +840,34 @@ class category extends Basecategory implements IIndexable
 	
 		if (!$this->alreadyInSave)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
+	}
+	
+	/**
+	 * Indicates that the category is deleted and could be purged
+	 * @return boolean
+	 */
+	public function isReadyForPurge()
+	{
+		return(
+			$this->getStatus() == CategoryStatus::DELETED && 
+			$this->getMembersCount() <= 0 && 
+			$this->getEntriesCount() <= 0
+		);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see Basecategory::preUpdate()
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if (!$this->alreadyInSave)
+		{
+			// when the category is deleted and has no entries and no members, it could be purged
+			if($this->isReadyForPurge())
+				$this->setStatus(CategoryStatus::PURGED);
+		}
+		
+		return parent::preUpdate($con);
 	}
 	
 	public function getInheritFromParentCategory()
