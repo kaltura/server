@@ -92,7 +92,7 @@ class DummyForDocsClientGenerator extends ClientGeneratorFromPhp
 	{
 	}
 
-	protected function writeBeforeService(KalturaServiceReflector $serviceReflector)
+	protected function writeBeforeService(KalturaServiceActionItem $serviceReflector)
 	{
 	}
 	
