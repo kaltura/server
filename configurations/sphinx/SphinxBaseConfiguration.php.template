@@ -96,8 +96,10 @@ $baseConfigurationIndexs = 	array(
 			'inherited_parent_id' => SphinxFieldType::RT_ATTR_BIGINT,
 			'created_at' 		=> SphinxFieldType::RT_ATTR_TIMESTAMP,
 			'updated_at'		=> SphinxFieldType::RT_ATTR_TIMESTAMP,
-			'deleted_at' 		=> SphinxFieldType::RT_ATTR_TIMESTAMP
-				)),
+			'deleted_at' 		=> SphinxFieldType::RT_ATTR_TIMESTAMP,
+			'partner_sort_value'=> SphinxFieldType::RT_ATTR_BIGINT,
+		)
+	),
 				
 	'kaltura_kuser' => array(	
 		'path'	 => '/sphinx/kaltura_kuser_rt',
