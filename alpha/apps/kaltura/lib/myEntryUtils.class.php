@@ -1134,4 +1134,48 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$sourceAsset->copyToEntry($newEntry->getId(), $newEntry->getPartnerId());
 		
  	}
+ 	
+ 	public static function index(entry $entry)
+ 	{
+ 		//TODO - fix this to be taken from categoryEntry
+ 		$categoriesEntry = categoryEntryPeer::selectByEntryId($entry->getId);
+		
+		//update full name and remove deleted categories.
+		$categoriesFullName = array();
+		
+		foreach ($categoriesEntry as $categoryEntry)
+		{
+			categoryPeer::setUseCriteriaFilter(false);
+			$categoryDb = categoryPeer::retrieveByPK($categoryEntry->getCategoryId());
+			categoryPeer::setUseCriteriaFilter(true);
+			
+			if (!$categoryDb || $categoryDb->getStatus() == CategoryStatus::DELETED || $categoryDb->getStatus() == CategoryStatus::PURGED)
+			{
+				while($categoryDb->getParentId != null)
+				{
+					categoryPeer::setUseCriteriaFilter(false);
+					$parentCategoryDb = categoryPeer::retrieveByPK($categoryDb->getParentId);
+					categoryPeer::setUseCriteriaFilter(true);
+					
+					if ($parentCategoryDb && 
+						($parentCategoryDb->getStatus() == CategoryStatus::ACTIVE || $parentCategoryDb->getStatus() == CategoryStatus::UPDATING)) 
+					{
+						$categoriesFullName[] = $parentCategoryDb->getFullName();
+						break;
+					}
+					
+					$categoryDb = $parentCategoryDb;
+				}
+			}
+			else
+			{
+				$categoriesFullName[] = $categoryDb->getFullName();
+			}
+		}
+		
+		$entry->setCategoriesWithNoSync($categoriesFullName);
+		$entry->save();
+		
+		return $entry->getIntId();
+ 	}
 }

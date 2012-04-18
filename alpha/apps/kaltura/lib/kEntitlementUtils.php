@@ -203,7 +203,7 @@ class kEntitlementUtils
 		$entryPrivacy = null;		
 		
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
-		$c->add(categoryPeer::ID, explode(',', $entry->getCategories()), Criteria::IN);
+		$c->add(categoryPeer::ID, explode(',', $entry->getCategoriesIds()), Criteria::IN);
 		
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$categories = categoryPeer::doSelect($c);

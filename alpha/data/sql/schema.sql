@@ -1618,6 +1618,7 @@ CREATE TABLE `category`
 	`partner_id` INTEGER  NOT NULL,
 	`name` VARCHAR(128) default '' NOT NULL,
 	`full_name` TEXT  NOT NULL,
+	`full_ids` TEXT  NOT NULL,
 	`entries_count` INTEGER default 0 NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,

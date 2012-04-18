@@ -10,9 +10,12 @@
 class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 {
 	private $previous_status ;
+	protected $new_categories = '';
+	protected $new_categories_ids = '';
 	protected $old_categories;
 	protected $is_categories_modified = false;
-
+	
+	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 	
 	const ROOTS_FIELD_PREFIX = 'K_Pref';
@@ -1143,13 +1146,30 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 		// remove duplicates
 		$newCats = array_unique($newCats);
-	
-		$this->old_categories = $this->categories;
-		parent::setCategories(implode(",", $newCats));
+
+		$this->new_categories = implode(self::ENTRY_CATEGORY_SEPARATOR, $newCats);
+		$this->modifiedColumns[] = entryPeer::CATEGORIES;
 		$this->is_categories_modified = true;
 	}
 	
-	public function renameCategory($oldFullName, $newFullName)
+	public function setCategoriesIds($v)
+	{
+		$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $newCats);
+		
+		$this->trimCategories($newCats);
+		
+		if (count($newCats) > self::MAX_CATEGORIES_PER_ENTRY)
+			throw new kCoreException("Max number of allowed entries per category was reached", kCoreException::MAX_CATEGORIES_PER_ENTRY);
+
+		// remove duplicates
+		$newCats = array_unique($newCats);
+		
+		$this->new_categories_ids = implode(self::ENTRY_CATEGORY_SEPARATOR, $newCats);
+		$this->modifiedColumns[] = entryPeer::CATEGORIES;
+		$this->is_categories_modified = true;
+	}
+		
+	/*public function renameCategory($oldFullName, $newFullName)
 	{
 		$categories = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->categories);
 		foreach($categories as &$category) 
@@ -1157,11 +1177,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$oldFullName = str_replace(array ('(', ')'), array ('\(', '\)'), $oldFullName);
 			$category = preg_replace("/^".$oldFullName."/", $newFullName, $category);
 		}
-		$this->categories = implode(self::ENTRY_CATEGORY_SEPARATOR, $categories);
+		$this->setCategories(implode(self::ENTRY_CATEGORY_SEPARATOR, $categories));
 		$this->old_categories = $this->categories; // so the sync won't increment the count on categories
 		$this->modifiedColumns[] = entryPeer::CATEGORIES;
 		$this->is_categories_modified = true;
-	}
+	}*/
 	
 	public function removeCategory($fullName)
 	{
@@ -1173,9 +1193,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			if (!preg_match("/^".$fullName."/", $category))
 				$newCategories[] = $category;
 		}
-		$this->categories = implode(self::ENTRY_CATEGORY_SEPARATOR, $newCategories);
+		$this->setCategories(implode(self::ENTRY_CATEGORY_SEPARATOR, $newCategories));
 		$this->modifiedColumns[] = entryPeer::CATEGORIES;
 		$this->is_categories_modified = true;
+	}
+	
+	public function setFinalCategoriesIds()
+	{
+		parent::setCategoriesIds($v);
+		parent::setCategories($v);		
 	}
 	
 	private function trimCategories(&$categories)
@@ -1647,7 +1673,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setMarkedForDeletion ( $v )	{	$this->putInCustomData ( "markedForDeletion" , (bool) $v );	}
 	public function getMarkedForDeletion (  )	{	return (bool) $this->getFromCustomData( "markedForDeletion" ,null, false );	}
-		
+	
 	public function setRootEntryId($v)
 	{
 		$this->putInCustomData("rootEntryId", $v);
@@ -2180,108 +2206,30 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 	}
 	
+	public function getNewCategories()
+	{
+		return $this->new_categories;
+	}
+	
+	public function getNewCategoriesIds()
+	{
+		return $this->new_categories_ids;
+	}
+	
+	public function getOldCategories()
+	{
+		return $this->old_categories;
+	}
 	
 	public function syncCategories()
 	{
-		//if entitlement is context is set - skip this field sync.
-		if(implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::DEFAULT_CONTEXT)
-			return;
-			
 		if (!$this->is_categories_modified)
 			return;
 		
-		if ($this->categories != null && $this->categories !== "")
-			$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->categories);
-		else
-			$newCats = array();
-		
-		if ($this->old_categories !== null && $this->old_categories !== "")
-			$oldCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->old_categories);
-		else
-			$oldCats = array();
-
-		$allIds = array();
-		$allIdsWithParents = array ();
-		
-		$addedCats = array();
-		$removedCats = array();
-		$remainingCats = array();
-		
-		foreach ( $oldCats as $cat )
-		{
-			if (array_search ( $cat, $newCats ) === false)
-				$removedCats [] = $cat;
-		}
-		
-		foreach ( $newCats as $cat )
-		{
-			if (array_search ( $cat, $oldCats ) === false)
-				$addedCats [] = $cat;
-			else
-				$remainingCats [] = $cat;
-		}
-		
-		foreach ( $remainingCats as $cat ) 
-		{
-			$category = categoryPeer::getByFullNameExactMatch ( $cat );
-			if ($category) 
-			{
-				$allIds [] = $category->getId ();
-				$allIdsWithParents [] = $category->getId ();
-				$allIdsWithParents = array_merge ( $allIdsWithParents, $category->getAllParentsIds () );
-			}
-		}
+		list($categories, $categoriesIds) = categoryEntryPeer::syncEntriesCategories($this);
 	
-		$alreadyAddedCatIds = $allIdsWithParents;
-		
-		foreach ( $addedCats as $cat )
-		{
-			$category = categoryPeer::getByFullNameExactMatch ( $cat );
-			if (! $category)
-			{
-				KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-				$unentitedCategory = categoryPeer::getByFullNameExactMatch ( $cat );
-				KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-				
-				if(!$unentitedCategory)
-					$category = category::createByPartnerAndFullName ( $this->getPartnerId (), $cat );
-			}
-				
-			if (!category)
-				continue;
-			
-			$categoryEntry = new categoryEntry();
-			$categoryEntry->setEntryId($this->getId());
-			$categoryEntry->setCategoryId($category->getId());
-			$categoryEntry->setEntryCategoriesAddedIds($alreadyAddedCatIds);
-			$categoryEntry->setPartnerId($this->getPartnerId());
-			$categoryEntry->save();
-			
-			$allIds [] = $category->getId ();
-			$alreadyAddedCatIds [] = $category->getId ();
-			$alreadyAddedCatIds = array_merge ( $alreadyAddedCatIds, $category->getAllParentsIds () );
-		}
-		
-		$alreadyRemovedCatIds = $allIdsWithParents;
-		
-		foreach ( $removedCats as $cat ) 
-		{
-			$category = categoryPeer::getByFullNameExactMatch ( $cat );
-
-			if ($category){
-				$categoryEntryToDelete = categoryEntryPeer::retrieveByCategoryIdAndEntryId($category->getId(), $this->getId());
-				if($categoryEntryToDelete)
-				{
-					$categoryEntryToDelete->setEntryCategoriesRemovedIds($alreadyRemovedCatIds);
-					$categoryEntryToDelete->delete();
-				}
-				
-				$alreadyRemovedCatIds [] = $category->getId ();
-				$alreadyRemovedCatIds = array_merge ( $alreadyRemovedCatIds, $category->getAllParentsIds () );
-			}
-		}
-		
-		$this->setCategoriesIds ( implode ( ",", $allIds ) );
+		parent::setCategories ( $categories );
+		parent::setCategoriesIds ( $categoriesIds );
 		parent::save ();
 		$this->is_categories_modified = false;
 	}
@@ -2578,6 +2526,22 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return sprintf('%u', crc32($this->getId()));
 	}
 	
+	public function getCategoriesEntryIds()
+	{
+		//TODO implement select with pagers
+		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+		$c->addAnd(categoryEntryPeer::ENTRY_ID, $this->getId());
+		$allCategoriesEntry = categoryEntryPeer::doSelect($c);
+		
+		$categoriesEntryIds = array();
+		foreach($allCategoriesEntry as $categoryEntry)
+		{
+			$categoriesEntryIds[] = $categoryEntry->getCategoryId();
+		}
+		
+		return implode(',', $categoriesEntryIds);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see IIndexable::getEntryId()
 	 */
@@ -2610,7 +2574,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			'sort_name' => 'sortName',
 		
 			'tags' => 'tags',
-			'categories' => 'categoriesIds',
+			'categories' => 'categoriesEntryIds',
 			'flavor_params' => 'flavorParamsIds',
 			'source_link' => 'sourceLink',
 			'kshow_id' => 'kshowId',
@@ -2805,7 +2769,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$entitledKusersEdit = explode(',', $this->getEntitledKusersEdit());
 		$entitledKusers = array_merge($entitledKusersPublish, $entitledKusersEdit);
 		
-		if ($this->getCategoriesIds() == '')
+		if ($this->getAllCategoriesIds() == '')
 			return implode(',', $entitledKusers);
 		
 		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
@@ -2815,7 +2779,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			
 		//get categories for this entry that have small amount of members.
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$c->add(categoryPeer::ID, explode(',', $this->getCategoriesIds()), Criteria::IN);
+		$c->add(categoryPeer::ID, $this->getAllCategoriesIds(), Criteria::IN);
 		$c->add(categoryPeer::MEMBERS_COUNT, $categoryGroupSize, Criteria::LESS_EQUAL);
 		$c->add(categoryPeer::ENTRIES_COUNT, entry::CATEGORY_ENTRIES_COUNT_LIMIT_TO_BE_INDEXED, Criteria::LESS_EQUAL);
 		
@@ -2828,5 +2792,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$entitledKusers = array_merge($entitledKusers, explode(',', $category->getMembers()));
 		
 		return implode(',', $entitledKusers);
-	} 
+	}
+	
+	public function getAllCategoriesIds()
+	{
+		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+		$c->addAnd(categoryEntryPeer::ENTRY_ID, $this->getId());
+		$categoriesEntry = categoryEntryPeer::doSelect($c);
+		
+		$categoriesIds = array();
+		foreach($categoriesEntry as $categoryEntry)
+			$categoriesIds[] = $categoryEntry->getCategoryId();
+			
+		return implode(',', $categoriesIds);
+	}
 }
