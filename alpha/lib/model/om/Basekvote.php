@@ -44,41 +44,16 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	protected $kuser_id;
 
 	/**
-	 * The value for the partner_id field.
-	 * @var        int
-	 */
-	protected $partner_id;
-
-	/**
 	 * The value for the rank field.
 	 * @var        int
 	 */
 	protected $rank;
 
 	/**
-	 * The value for the status field.
-	 * @var        int
-	 */
-	protected $status;
-
-	/**
-	 * The value for the kvote_type field.
-	 * Note: this column has a database default value of: 1
-	 * @var        int
-	 */
-	protected $kvote_type;
-
-	/**
 	 * The value for the created_at field.
 	 * @var        string
 	 */
 	protected $created_at;
-
-	/**
-	 * The value for the custom_data field.
-	 * @var        string
-	 */
-	protected $custom_data;
 
 	/**
 	 * @var        kshow
@@ -141,27 +116,6 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Applies default values to this object.
-	 * This method should be called from the object's constructor (or
-	 * equivalent initialization method).
-	 * @see        __construct()
-	 */
-	public function applyDefaultValues()
-	{
-		$this->kvote_type = 1;
-	}
-
-	/**
-	 * Initializes internal state of Basekvote object.
-	 * @see        applyDefaults()
-	 */
-	public function __construct()
-	{
-		parent::__construct();
-		$this->applyDefaultValues();
-	}
-
-	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -202,16 +156,6 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [partner_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getPartnerId()
-	{
-		return $this->partner_id;
-	}
-
-	/**
 	 * Get the [rank] column value.
 	 * 
 	 * @return     int
@@ -219,26 +163,6 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	public function getRank()
 	{
 		return $this->rank;
-	}
-
-	/**
-	 * Get the [status] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getStatus()
-	{
-		return $this->status;
-	}
-
-	/**
-	 * Get the [kvote_type] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getKvoteType()
-	{
-		return $this->kvote_type;
 	}
 
 	/**
@@ -279,16 +203,6 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
-	}
-
-	/**
-	 * Get the [custom_data] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getCustomData()
-	{
-		return $this->custom_data;
 	}
 
 	/**
@@ -396,29 +310,6 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	} // setKuserId()
 
 	/**
-	 * Set the value of [partner_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     kvote The current object (for fluent API support)
-	 */
-	public function setPartnerId($v)
-	{
-		if(!isset($this->oldColumnsValues[kvotePeer::PARTNER_ID]))
-			$this->oldColumnsValues[kvotePeer::PARTNER_ID] = $this->partner_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->partner_id !== $v) {
-			$this->partner_id = $v;
-			$this->modifiedColumns[] = kvotePeer::PARTNER_ID;
-		}
-
-		return $this;
-	} // setPartnerId()
-
-	/**
 	 * Set the value of [rank] column.
 	 * 
 	 * @param      int $v new value
@@ -440,52 +331,6 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setRank()
-
-	/**
-	 * Set the value of [status] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     kvote The current object (for fluent API support)
-	 */
-	public function setStatus($v)
-	{
-		if(!isset($this->oldColumnsValues[kvotePeer::STATUS]))
-			$this->oldColumnsValues[kvotePeer::STATUS] = $this->status;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->status !== $v) {
-			$this->status = $v;
-			$this->modifiedColumns[] = kvotePeer::STATUS;
-		}
-
-		return $this;
-	} // setStatus()
-
-	/**
-	 * Set the value of [kvote_type] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     kvote The current object (for fluent API support)
-	 */
-	public function setKvoteType($v)
-	{
-		if(!isset($this->oldColumnsValues[kvotePeer::KVOTE_TYPE]))
-			$this->oldColumnsValues[kvotePeer::KVOTE_TYPE] = $this->kvote_type;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->kvote_type !== $v || $this->isNew()) {
-			$this->kvote_type = $v;
-			$this->modifiedColumns[] = kvotePeer::KVOTE_TYPE;
-		}
-
-		return $this;
-	} // setKvoteType()
 
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -537,26 +382,6 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	} // setCreatedAt()
 
 	/**
-	 * Set the value of [custom_data] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     kvote The current object (for fluent API support)
-	 */
-	public function setCustomData($v)
-	{
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->custom_data !== $v) {
-			$this->custom_data = $v;
-			$this->modifiedColumns[] = kvotePeer::CUSTOM_DATA;
-		}
-
-		return $this;
-	} // setCustomData()
-
-	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -566,10 +391,6 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
-			if ($this->kvote_type !== 1) {
-				return false;
-			}
-
 		// otherwise, everything was equal, so return TRUE
 		return true;
 	} // hasOnlyDefaultValues()
@@ -596,12 +417,8 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			$this->kshow_id = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
 			$this->entry_id = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->kuser_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-			$this->partner_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->rank = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->kvote_type = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->custom_data = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->rank = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -611,7 +428,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 6; // 6 = kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating kvote object", $e);
@@ -881,8 +698,6 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
-		$this->setCustomDataObj();
-    	
 		return parent::preSave($con);
 	}
 
@@ -893,9 +708,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	public function postSave(PropelPDO $con = null) 
 	{
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
-		$this->oldColumnsValues = array();
-		$this->oldCustomDataValues = array();
-    	 
+		$this->oldColumnsValues = array(); 
 		parent::postSave($con);
 	}
 	
@@ -1133,22 +946,10 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 				return $this->getKuserId();
 				break;
 			case 4:
-				return $this->getPartnerId();
-				break;
-			case 5:
 				return $this->getRank();
 				break;
-			case 6:
-				return $this->getStatus();
-				break;
-			case 7:
-				return $this->getKvoteType();
-				break;
-			case 8:
+			case 5:
 				return $this->getCreatedAt();
-				break;
-			case 9:
-				return $this->getCustomData();
 				break;
 			default:
 				return null;
@@ -1175,12 +976,8 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			$keys[1] => $this->getKshowId(),
 			$keys[2] => $this->getEntryId(),
 			$keys[3] => $this->getKuserId(),
-			$keys[4] => $this->getPartnerId(),
-			$keys[5] => $this->getRank(),
-			$keys[6] => $this->getStatus(),
-			$keys[7] => $this->getKvoteType(),
-			$keys[8] => $this->getCreatedAt(),
-			$keys[9] => $this->getCustomData(),
+			$keys[4] => $this->getRank(),
+			$keys[5] => $this->getCreatedAt(),
 		);
 		return $result;
 	}
@@ -1225,22 +1022,10 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 				$this->setKuserId($value);
 				break;
 			case 4:
-				$this->setPartnerId($value);
-				break;
-			case 5:
 				$this->setRank($value);
 				break;
-			case 6:
-				$this->setStatus($value);
-				break;
-			case 7:
-				$this->setKvoteType($value);
-				break;
-			case 8:
+			case 5:
 				$this->setCreatedAt($value);
-				break;
-			case 9:
-				$this->setCustomData($value);
 				break;
 		} // switch()
 	}
@@ -1270,12 +1055,8 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setKshowId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setEntryId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setKuserId($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setPartnerId($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setRank($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setKvoteType($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setCustomData($arr[$keys[9]]);
+		if (array_key_exists($keys[4], $arr)) $this->setRank($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
 	}
 
 	/**
@@ -1291,12 +1072,8 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(kvotePeer::KSHOW_ID)) $criteria->add(kvotePeer::KSHOW_ID, $this->kshow_id);
 		if ($this->isColumnModified(kvotePeer::ENTRY_ID)) $criteria->add(kvotePeer::ENTRY_ID, $this->entry_id);
 		if ($this->isColumnModified(kvotePeer::KUSER_ID)) $criteria->add(kvotePeer::KUSER_ID, $this->kuser_id);
-		if ($this->isColumnModified(kvotePeer::PARTNER_ID)) $criteria->add(kvotePeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(kvotePeer::RANK)) $criteria->add(kvotePeer::RANK, $this->rank);
-		if ($this->isColumnModified(kvotePeer::STATUS)) $criteria->add(kvotePeer::STATUS, $this->status);
-		if ($this->isColumnModified(kvotePeer::KVOTE_TYPE)) $criteria->add(kvotePeer::KVOTE_TYPE, $this->kvote_type);
 		if ($this->isColumnModified(kvotePeer::CREATED_AT)) $criteria->add(kvotePeer::CREATED_AT, $this->created_at);
-		if ($this->isColumnModified(kvotePeer::CUSTOM_DATA)) $criteria->add(kvotePeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1357,17 +1134,9 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 
 		$copyObj->setKuserId($this->kuser_id);
 
-		$copyObj->setPartnerId($this->partner_id);
-
 		$copyObj->setRank($this->rank);
 
-		$copyObj->setStatus($this->status);
-
-		$copyObj->setKvoteType($this->kvote_type);
-
 		$copyObj->setCreatedAt($this->created_at);
-
-		$copyObj->setCustomData($this->custom_data);
 
 
 		$copyObj->setNew(true);
@@ -1598,121 +1367,4 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 			$this->akshowRelatedByKuserId = null;
 	}
 
-	/* ---------------------- CustomData functions ------------------------- */
-
-	/**
-	 * @var myCustomData
-	 */
-	protected $m_custom_data = null;
-
-	/**
-	 * Store custom data old values before the changes
-	 * @var        array
-	 */
-	protected $oldCustomDataValues = array();
-	
-	/**
-	 * @return array
-	 */
-	public function getCustomDataOldValues()
-	{
-		return $this->oldCustomDataValues;
-	}
-	
-	/**
-	 * @param string $name
-	 * @param string $value
-	 * @param string $namespace
-	 * @return string
-	 */
-	public function putInCustomData ( $name , $value , $namespace = null )
-	{
-		$customData = $this->getCustomDataObj( );
-		
-		$currentNamespace = '';
-		if($namespace)
-			$currentNamespace = $namespace;
-			
-		if(!isset($this->oldCustomDataValues[$currentNamespace]))
-			$this->oldCustomDataValues[$currentNamespace] = array();
-		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
-			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
-		
-		$customData->put ( $name , $value , $namespace );
-	}
-
-	/**
-	 * @param string $name
-	 * @param string $namespace
-	 * @param string $defaultValue
-	 * @return string
-	 */
-	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
-	{
-		$customData = $this->getCustomDataObj( );
-		$res = $customData->get ( $name , $namespace );
-		if ( $res === null ) return $defaultValue;
-		return $res;
-	}
-
-	/**
-	 * @param string $name
-	 * @param string $namespace
-	 */
-	public function removeFromCustomData ( $name , $namespace = null)
-	{
-
-		$customData = $this->getCustomDataObj( );
-		return $customData->remove ( $name , $namespace );
-	}
-
-	/**
-	 * @param string $name
-	 * @param int $delta
-	 * @param string $namespace
-	 * @return string
-	 */
-	public function incInCustomData ( $name , $delta = 1, $namespace = null)
-	{
-		$customData = $this->getCustomDataObj( );
-		return $customData->inc ( $name , $delta , $namespace  );
-	}
-
-	/**
-	 * @param string $name
-	 * @param int $delta
-	 * @param string $namespace
-	 * @return string
-	 */
-	public function decInCustomData ( $name , $delta = 1, $namespace = null)
-	{
-		$customData = $this->getCustomDataObj(  );
-		return $customData->dec ( $name , $delta , $namespace );
-	}
-
-	/**
-	 * @return myCustomData
-	 */
-	public function getCustomDataObj( )
-	{
-		if ( ! $this->m_custom_data )
-		{
-			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
-		}
-		return $this->m_custom_data;
-	}
-	
-	/**
-	 * Must be called before saving the object
-	 */
-	public function setCustomDataObj()
-	{
-		if ( $this->m_custom_data != null )
-		{
-			$this->setCustomData( $this->m_custom_data->toString() );
-		}
-	}
-	
-	/* ---------------------- CustomData functions ------------------------- */
-	
 } // Basekvote
