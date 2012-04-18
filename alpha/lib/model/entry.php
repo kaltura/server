@@ -1197,13 +1197,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$this->modifiedColumns[] = entryPeer::CATEGORIES;
 		$this->is_categories_modified = true;
 	}
-	
-	public function setFinalCategoriesIds()
-	{
-		parent::setCategoriesIds($v);
-		parent::setCategories($v);		
-	}
-	
+		
 	private function trimCategories(&$categories)
 	{
 		$trimedCategories = array();
