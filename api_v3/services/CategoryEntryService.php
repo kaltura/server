@@ -41,18 +41,14 @@ class CategoryEntryService extends KalturaBaseService
 				throw new APIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
 		}
 		
-		if ($category->getPrivacyContext() == kEntitlementUtils::DEFAULT_CONTEXT)
-		{
-			$entry->setCategories($entry->getCategories() . ',' . $category->getFullName());
-			$entry->save();	
-		}
-		else
-		{
-			$dbCategoryEntry = new categoryEntry();
-			$categoryEntry->toInsertableObject($dbCategoryEntry);
-			$dbCategoryEntry->setPartnerId(kCurrentContext::$ks_partner_id);
-			$dbCategoryEntry->save();
-		}
+		$categoryEntryExists = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryEntry->categoryId, $categoryEntry->entryId);
+		if($categoryEntryExists)
+			throw new APIException(KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS);
+		
+		$dbCategoryEntry = new categoryEntry();
+		$categoryEntry->toInsertableObject($dbCategoryEntry);
+		$dbCategoryEntry->setPartnerId(kCurrentContext::$ks_partner_id);
+		$dbCategoryEntry->save();
 
 		return $categoryEntry;
 	}
@@ -102,7 +98,7 @@ class CategoryEntryService extends KalturaBaseService
 		}
 		else
 		{
-			$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryEntry->categoryId, $categoryEntry->entryId);
+			$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
 			if(!$dbCategoryEntry)
 				throw new APIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
 			
@@ -127,7 +123,7 @@ class CategoryEntryService extends KalturaBaseService
 		$categoryEntryFilter = new categoryEntryFilter();
 		$filter->toObject($categoryEntryFilter);
 
-		$c = new Criteria();
+		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
 		$categoryEntryFilter->attachToCriteria($c);
 		$dbCategoriesEntry = categoryEntryPeer::doSelect($c);
 

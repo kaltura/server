@@ -15,6 +15,8 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 		"depthEqual" => "_eq_depth",
 		"fullNameEqual" => "_eq_full_name",
 		"fullNameStartsWith" => "_likex_full_name",
+		"fullIdsEqual" => "_eq_full_ids",
+		"fullIdsStartsWith" => "_likex_full_ids",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -47,6 +49,8 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 		"-name" => "-name",
 		"+fullName" => "+full_name",
 		"-fullName" => "-full_name",
+		"+fullIds" => "+full_ids",
+		"-fullIds" => "-full_ids",
 		"+entriesCount" => "+entries_count",
 		"-entriesCount" => "-entries_count",
 		"+createdAt" => "+created_at",
@@ -117,6 +121,20 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $fullNameStartsWith;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $fullIdsEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $fullIdsStartsWith;
 
 	/**
 	 * 

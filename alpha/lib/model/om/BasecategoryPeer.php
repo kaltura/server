@@ -26,7 +26,7 @@ abstract class BasecategoryPeer {
 	const TM_CLASS = 'categoryTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 29;
+	const NUM_COLUMNS = 30;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -48,6 +48,9 @@ abstract class BasecategoryPeer {
 
 	/** the column name for the FULL_NAME field */
 	const FULL_NAME = 'category.FULL_NAME';
+
+	/** the column name for the FULL_IDS field */
+	const FULL_IDS = 'category.FULL_IDS';
 
 	/** the column name for the ENTRIES_COUNT field */
 	const ENTRIES_COUNT = 'category.ENTRIES_COUNT';
@@ -134,11 +137,11 @@ abstract class BasecategoryPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'ParentId', 'Depth', 'PartnerId', 'Name', 'FullName', 'EntriesCount', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'Status', 'DirectEntriesCount', 'MembersCount', 'PendingMembersCount', 'Description', 'Tags', 'DisplayInSearch', 'Privacy', 'InheritanceType', 'UserJoinPolicy', 'DefaultPermissionLevel', 'KuserId', 'PuserId', 'ReferenceId', 'ContributionPolicy', 'CustomData', 'PrivacyContext', 'PrivacyContexts', 'InheritedParentId', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'parentId', 'depth', 'partnerId', 'name', 'fullName', 'entriesCount', 'createdAt', 'updatedAt', 'deletedAt', 'status', 'directEntriesCount', 'membersCount', 'pendingMembersCount', 'description', 'tags', 'displayInSearch', 'privacy', 'inheritanceType', 'userJoinPolicy', 'defaultPermissionLevel', 'kuserId', 'puserId', 'referenceId', 'contributionPolicy', 'customData', 'privacyContext', 'privacyContexts', 'inheritedParentId', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARENT_ID, self::DEPTH, self::PARTNER_ID, self::NAME, self::FULL_NAME, self::ENTRIES_COUNT, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::STATUS, self::DIRECT_ENTRIES_COUNT, self::MEMBERS_COUNT, self::PENDING_MEMBERS_COUNT, self::DESCRIPTION, self::TAGS, self::DISPLAY_IN_SEARCH, self::PRIVACY, self::INHERITANCE_TYPE, self::USER_JOIN_POLICY, self::DEFAULT_PERMISSION_LEVEL, self::KUSER_ID, self::PUSER_ID, self::REFERENCE_ID, self::CONTRIBUTION_POLICY, self::CUSTOM_DATA, self::PRIVACY_CONTEXT, self::PRIVACY_CONTEXTS, self::INHERITED_PARENT_ID, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'parent_id', 'depth', 'partner_id', 'name', 'full_name', 'entries_count', 'created_at', 'updated_at', 'deleted_at', 'status', 'direct_entries_count', 'members_count', 'pending_members_count', 'description', 'tags', 'display_in_search', 'privacy', 'inheritance_type', 'user_join_policy', 'default_permission_level', 'kuser_id', 'puser_id', 'reference_id', 'contribution_policy', 'custom_data', 'privacy_context', 'privacy_contexts', 'inherited_parent_id', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'ParentId', 'Depth', 'PartnerId', 'Name', 'FullName', 'FullIds', 'EntriesCount', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'Status', 'DirectEntriesCount', 'MembersCount', 'PendingMembersCount', 'Description', 'Tags', 'DisplayInSearch', 'Privacy', 'InheritanceType', 'UserJoinPolicy', 'DefaultPermissionLevel', 'KuserId', 'PuserId', 'ReferenceId', 'ContributionPolicy', 'CustomData', 'PrivacyContext', 'PrivacyContexts', 'InheritedParentId', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'parentId', 'depth', 'partnerId', 'name', 'fullName', 'fullIds', 'entriesCount', 'createdAt', 'updatedAt', 'deletedAt', 'status', 'directEntriesCount', 'membersCount', 'pendingMembersCount', 'description', 'tags', 'displayInSearch', 'privacy', 'inheritanceType', 'userJoinPolicy', 'defaultPermissionLevel', 'kuserId', 'puserId', 'referenceId', 'contributionPolicy', 'customData', 'privacyContext', 'privacyContexts', 'inheritedParentId', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARENT_ID, self::DEPTH, self::PARTNER_ID, self::NAME, self::FULL_NAME, self::FULL_IDS, self::ENTRIES_COUNT, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::STATUS, self::DIRECT_ENTRIES_COUNT, self::MEMBERS_COUNT, self::PENDING_MEMBERS_COUNT, self::DESCRIPTION, self::TAGS, self::DISPLAY_IN_SEARCH, self::PRIVACY, self::INHERITANCE_TYPE, self::USER_JOIN_POLICY, self::DEFAULT_PERMISSION_LEVEL, self::KUSER_ID, self::PUSER_ID, self::REFERENCE_ID, self::CONTRIBUTION_POLICY, self::CUSTOM_DATA, self::PRIVACY_CONTEXT, self::PRIVACY_CONTEXTS, self::INHERITED_PARENT_ID, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'parent_id', 'depth', 'partner_id', 'name', 'full_name', 'full_ids', 'entries_count', 'created_at', 'updated_at', 'deleted_at', 'status', 'direct_entries_count', 'members_count', 'pending_members_count', 'description', 'tags', 'display_in_search', 'privacy', 'inheritance_type', 'user_join_policy', 'default_permission_level', 'kuser_id', 'puser_id', 'reference_id', 'contribution_policy', 'custom_data', 'privacy_context', 'privacy_contexts', 'inherited_parent_id', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, )
 	);
 
 	/**
@@ -148,11 +151,11 @@ abstract class BasecategoryPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ParentId' => 1, 'Depth' => 2, 'PartnerId' => 3, 'Name' => 4, 'FullName' => 5, 'EntriesCount' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, 'DeletedAt' => 9, 'Status' => 10, 'DirectEntriesCount' => 11, 'MembersCount' => 12, 'PendingMembersCount' => 13, 'Description' => 14, 'Tags' => 15, 'DisplayInSearch' => 16, 'Privacy' => 17, 'InheritanceType' => 18, 'UserJoinPolicy' => 19, 'DefaultPermissionLevel' => 20, 'KuserId' => 21, 'PuserId' => 22, 'ReferenceId' => 23, 'ContributionPolicy' => 24, 'CustomData' => 25, 'PrivacyContext' => 26, 'PrivacyContexts' => 27, 'InheritedParentId' => 28, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'parentId' => 1, 'depth' => 2, 'partnerId' => 3, 'name' => 4, 'fullName' => 5, 'entriesCount' => 6, 'createdAt' => 7, 'updatedAt' => 8, 'deletedAt' => 9, 'status' => 10, 'directEntriesCount' => 11, 'membersCount' => 12, 'pendingMembersCount' => 13, 'description' => 14, 'tags' => 15, 'displayInSearch' => 16, 'privacy' => 17, 'inheritanceType' => 18, 'userJoinPolicy' => 19, 'defaultPermissionLevel' => 20, 'kuserId' => 21, 'puserId' => 22, 'referenceId' => 23, 'contributionPolicy' => 24, 'customData' => 25, 'privacyContext' => 26, 'privacyContexts' => 27, 'inheritedParentId' => 28, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARENT_ID => 1, self::DEPTH => 2, self::PARTNER_ID => 3, self::NAME => 4, self::FULL_NAME => 5, self::ENTRIES_COUNT => 6, self::CREATED_AT => 7, self::UPDATED_AT => 8, self::DELETED_AT => 9, self::STATUS => 10, self::DIRECT_ENTRIES_COUNT => 11, self::MEMBERS_COUNT => 12, self::PENDING_MEMBERS_COUNT => 13, self::DESCRIPTION => 14, self::TAGS => 15, self::DISPLAY_IN_SEARCH => 16, self::PRIVACY => 17, self::INHERITANCE_TYPE => 18, self::USER_JOIN_POLICY => 19, self::DEFAULT_PERMISSION_LEVEL => 20, self::KUSER_ID => 21, self::PUSER_ID => 22, self::REFERENCE_ID => 23, self::CONTRIBUTION_POLICY => 24, self::CUSTOM_DATA => 25, self::PRIVACY_CONTEXT => 26, self::PRIVACY_CONTEXTS => 27, self::INHERITED_PARENT_ID => 28, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'parent_id' => 1, 'depth' => 2, 'partner_id' => 3, 'name' => 4, 'full_name' => 5, 'entries_count' => 6, 'created_at' => 7, 'updated_at' => 8, 'deleted_at' => 9, 'status' => 10, 'direct_entries_count' => 11, 'members_count' => 12, 'pending_members_count' => 13, 'description' => 14, 'tags' => 15, 'display_in_search' => 16, 'privacy' => 17, 'inheritance_type' => 18, 'user_join_policy' => 19, 'default_permission_level' => 20, 'kuser_id' => 21, 'puser_id' => 22, 'reference_id' => 23, 'contribution_policy' => 24, 'custom_data' => 25, 'privacy_context' => 26, 'privacy_contexts' => 27, 'inherited_parent_id' => 28, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ParentId' => 1, 'Depth' => 2, 'PartnerId' => 3, 'Name' => 4, 'FullName' => 5, 'FullIds' => 6, 'EntriesCount' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, 'DeletedAt' => 10, 'Status' => 11, 'DirectEntriesCount' => 12, 'MembersCount' => 13, 'PendingMembersCount' => 14, 'Description' => 15, 'Tags' => 16, 'DisplayInSearch' => 17, 'Privacy' => 18, 'InheritanceType' => 19, 'UserJoinPolicy' => 20, 'DefaultPermissionLevel' => 21, 'KuserId' => 22, 'PuserId' => 23, 'ReferenceId' => 24, 'ContributionPolicy' => 25, 'CustomData' => 26, 'PrivacyContext' => 27, 'PrivacyContexts' => 28, 'InheritedParentId' => 29, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'parentId' => 1, 'depth' => 2, 'partnerId' => 3, 'name' => 4, 'fullName' => 5, 'fullIds' => 6, 'entriesCount' => 7, 'createdAt' => 8, 'updatedAt' => 9, 'deletedAt' => 10, 'status' => 11, 'directEntriesCount' => 12, 'membersCount' => 13, 'pendingMembersCount' => 14, 'description' => 15, 'tags' => 16, 'displayInSearch' => 17, 'privacy' => 18, 'inheritanceType' => 19, 'userJoinPolicy' => 20, 'defaultPermissionLevel' => 21, 'kuserId' => 22, 'puserId' => 23, 'referenceId' => 24, 'contributionPolicy' => 25, 'customData' => 26, 'privacyContext' => 27, 'privacyContexts' => 28, 'inheritedParentId' => 29, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARENT_ID => 1, self::DEPTH => 2, self::PARTNER_ID => 3, self::NAME => 4, self::FULL_NAME => 5, self::FULL_IDS => 6, self::ENTRIES_COUNT => 7, self::CREATED_AT => 8, self::UPDATED_AT => 9, self::DELETED_AT => 10, self::STATUS => 11, self::DIRECT_ENTRIES_COUNT => 12, self::MEMBERS_COUNT => 13, self::PENDING_MEMBERS_COUNT => 14, self::DESCRIPTION => 15, self::TAGS => 16, self::DISPLAY_IN_SEARCH => 17, self::PRIVACY => 18, self::INHERITANCE_TYPE => 19, self::USER_JOIN_POLICY => 20, self::DEFAULT_PERMISSION_LEVEL => 21, self::KUSER_ID => 22, self::PUSER_ID => 23, self::REFERENCE_ID => 24, self::CONTRIBUTION_POLICY => 25, self::CUSTOM_DATA => 26, self::PRIVACY_CONTEXT => 27, self::PRIVACY_CONTEXTS => 28, self::INHERITED_PARENT_ID => 29, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'parent_id' => 1, 'depth' => 2, 'partner_id' => 3, 'name' => 4, 'full_name' => 5, 'full_ids' => 6, 'entries_count' => 7, 'created_at' => 8, 'updated_at' => 9, 'deleted_at' => 10, 'status' => 11, 'direct_entries_count' => 12, 'members_count' => 13, 'pending_members_count' => 14, 'description' => 15, 'tags' => 16, 'display_in_search' => 17, 'privacy' => 18, 'inheritance_type' => 19, 'user_join_policy' => 20, 'default_permission_level' => 21, 'kuser_id' => 22, 'puser_id' => 23, 'reference_id' => 24, 'contribution_policy' => 25, 'custom_data' => 26, 'privacy_context' => 27, 'privacy_contexts' => 28, 'inherited_parent_id' => 29, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, )
 	);
 
 	/**
@@ -228,6 +231,7 @@ abstract class BasecategoryPeer {
 		$criteria->addSelectColumn(categoryPeer::PARTNER_ID);
 		$criteria->addSelectColumn(categoryPeer::NAME);
 		$criteria->addSelectColumn(categoryPeer::FULL_NAME);
+		$criteria->addSelectColumn(categoryPeer::FULL_IDS);
 		$criteria->addSelectColumn(categoryPeer::ENTRIES_COUNT);
 		$criteria->addSelectColumn(categoryPeer::CREATED_AT);
 		$criteria->addSelectColumn(categoryPeer::UPDATED_AT);

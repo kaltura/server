@@ -57,6 +57,12 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	protected $full_name;
 
 	/**
+	 * The value for the full_ids field.
+	 * @var        string
+	 */
+	protected $full_ids;
+
+	/**
 	 * The value for the entries_count field.
 	 * Note: this column has a database default value of: 0
 	 * @var        int
@@ -348,6 +354,16 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function getFullName()
 	{
 		return $this->full_name;
+	}
+
+	/**
+	 * Get the [full_ids] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getFullIds()
+	{
+		return $this->full_ids;
 	}
 
 	/**
@@ -807,6 +823,29 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setFullName()
+
+	/**
+	 * Set the value of [full_ids] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setFullIds($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::FULL_IDS]))
+			$this->oldColumnsValues[categoryPeer::FULL_IDS] = $this->full_ids;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->full_ids !== $v) {
+			$this->full_ids = $v;
+			$this->modifiedColumns[] = categoryPeer::FULL_IDS;
+		}
+
+		return $this;
+	} // setFullIds()
 
 	/**
 	 * Set the value of [entries_count] column.
@@ -1497,29 +1536,30 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$this->partner_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
 			$this->name = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->full_name = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->entries_count = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->deleted_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->status = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->direct_entries_count = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
-			$this->members_count = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-			$this->pending_members_count = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
-			$this->description = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->tags = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-			$this->display_in_search = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
-			$this->privacy = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
-			$this->inheritance_type = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
-			$this->user_join_policy = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
-			$this->default_permission_level = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
-			$this->kuser_id = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
-			$this->puser_id = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
-			$this->reference_id = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
-			$this->contribution_policy = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
-			$this->custom_data = ($row[$startcol + 25] !== null) ? (string) $row[$startcol + 25] : null;
-			$this->privacy_context = ($row[$startcol + 26] !== null) ? (string) $row[$startcol + 26] : null;
-			$this->privacy_contexts = ($row[$startcol + 27] !== null) ? (string) $row[$startcol + 27] : null;
-			$this->inherited_parent_id = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
+			$this->full_ids = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->entries_count = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->updated_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->deleted_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->status = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->direct_entries_count = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+			$this->members_count = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+			$this->pending_members_count = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->description = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->tags = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->display_in_search = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
+			$this->privacy = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->inheritance_type = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
+			$this->user_join_policy = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
+			$this->default_permission_level = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
+			$this->kuser_id = ($row[$startcol + 22] !== null) ? (int) $row[$startcol + 22] : null;
+			$this->puser_id = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
+			$this->reference_id = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
+			$this->contribution_policy = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
+			$this->custom_data = ($row[$startcol + 26] !== null) ? (string) $row[$startcol + 26] : null;
+			$this->privacy_context = ($row[$startcol + 27] !== null) ? (string) $row[$startcol + 27] : null;
+			$this->privacy_contexts = ($row[$startcol + 28] !== null) ? (string) $row[$startcol + 28] : null;
+			$this->inherited_parent_id = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1529,7 +1569,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 29; // 29 = categoryPeer::NUM_COLUMNS - categoryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 30; // 30 = categoryPeer::NUM_COLUMNS - categoryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating category object", $e);
@@ -2029,72 +2069,75 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				return $this->getFullName();
 				break;
 			case 6:
-				return $this->getEntriesCount();
+				return $this->getFullIds();
 				break;
 			case 7:
-				return $this->getCreatedAt();
+				return $this->getEntriesCount();
 				break;
 			case 8:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 9:
-				return $this->getDeletedAt();
+				return $this->getUpdatedAt();
 				break;
 			case 10:
-				return $this->getStatus();
+				return $this->getDeletedAt();
 				break;
 			case 11:
-				return $this->getDirectEntriesCount();
+				return $this->getStatus();
 				break;
 			case 12:
-				return $this->getMembersCount();
+				return $this->getDirectEntriesCount();
 				break;
 			case 13:
-				return $this->getPendingMembersCount();
+				return $this->getMembersCount();
 				break;
 			case 14:
-				return $this->getDescription();
+				return $this->getPendingMembersCount();
 				break;
 			case 15:
-				return $this->getTags();
+				return $this->getDescription();
 				break;
 			case 16:
-				return $this->getDisplayInSearch();
+				return $this->getTags();
 				break;
 			case 17:
-				return $this->getPrivacy();
+				return $this->getDisplayInSearch();
 				break;
 			case 18:
-				return $this->getInheritanceType();
+				return $this->getPrivacy();
 				break;
 			case 19:
-				return $this->getUserJoinPolicy();
+				return $this->getInheritanceType();
 				break;
 			case 20:
-				return $this->getDefaultPermissionLevel();
+				return $this->getUserJoinPolicy();
 				break;
 			case 21:
-				return $this->getKuserId();
+				return $this->getDefaultPermissionLevel();
 				break;
 			case 22:
-				return $this->getPuserId();
+				return $this->getKuserId();
 				break;
 			case 23:
-				return $this->getReferenceId();
+				return $this->getPuserId();
 				break;
 			case 24:
-				return $this->getContributionPolicy();
+				return $this->getReferenceId();
 				break;
 			case 25:
-				return $this->getCustomData();
+				return $this->getContributionPolicy();
 				break;
 			case 26:
-				return $this->getPrivacyContext();
+				return $this->getCustomData();
 				break;
 			case 27:
-				return $this->getPrivacyContexts();
+				return $this->getPrivacyContext();
 				break;
 			case 28:
+				return $this->getPrivacyContexts();
+				break;
+			case 29:
 				return $this->getInheritedParentId();
 				break;
 			default:
@@ -2124,29 +2167,30 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$keys[3] => $this->getPartnerId(),
 			$keys[4] => $this->getName(),
 			$keys[5] => $this->getFullName(),
-			$keys[6] => $this->getEntriesCount(),
-			$keys[7] => $this->getCreatedAt(),
-			$keys[8] => $this->getUpdatedAt(),
-			$keys[9] => $this->getDeletedAt(),
-			$keys[10] => $this->getStatus(),
-			$keys[11] => $this->getDirectEntriesCount(),
-			$keys[12] => $this->getMembersCount(),
-			$keys[13] => $this->getPendingMembersCount(),
-			$keys[14] => $this->getDescription(),
-			$keys[15] => $this->getTags(),
-			$keys[16] => $this->getDisplayInSearch(),
-			$keys[17] => $this->getPrivacy(),
-			$keys[18] => $this->getInheritanceType(),
-			$keys[19] => $this->getUserJoinPolicy(),
-			$keys[20] => $this->getDefaultPermissionLevel(),
-			$keys[21] => $this->getKuserId(),
-			$keys[22] => $this->getPuserId(),
-			$keys[23] => $this->getReferenceId(),
-			$keys[24] => $this->getContributionPolicy(),
-			$keys[25] => $this->getCustomData(),
-			$keys[26] => $this->getPrivacyContext(),
-			$keys[27] => $this->getPrivacyContexts(),
-			$keys[28] => $this->getInheritedParentId(),
+			$keys[6] => $this->getFullIds(),
+			$keys[7] => $this->getEntriesCount(),
+			$keys[8] => $this->getCreatedAt(),
+			$keys[9] => $this->getUpdatedAt(),
+			$keys[10] => $this->getDeletedAt(),
+			$keys[11] => $this->getStatus(),
+			$keys[12] => $this->getDirectEntriesCount(),
+			$keys[13] => $this->getMembersCount(),
+			$keys[14] => $this->getPendingMembersCount(),
+			$keys[15] => $this->getDescription(),
+			$keys[16] => $this->getTags(),
+			$keys[17] => $this->getDisplayInSearch(),
+			$keys[18] => $this->getPrivacy(),
+			$keys[19] => $this->getInheritanceType(),
+			$keys[20] => $this->getUserJoinPolicy(),
+			$keys[21] => $this->getDefaultPermissionLevel(),
+			$keys[22] => $this->getKuserId(),
+			$keys[23] => $this->getPuserId(),
+			$keys[24] => $this->getReferenceId(),
+			$keys[25] => $this->getContributionPolicy(),
+			$keys[26] => $this->getCustomData(),
+			$keys[27] => $this->getPrivacyContext(),
+			$keys[28] => $this->getPrivacyContexts(),
+			$keys[29] => $this->getInheritedParentId(),
 		);
 		return $result;
 	}
@@ -2197,72 +2241,75 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				$this->setFullName($value);
 				break;
 			case 6:
-				$this->setEntriesCount($value);
+				$this->setFullIds($value);
 				break;
 			case 7:
-				$this->setCreatedAt($value);
+				$this->setEntriesCount($value);
 				break;
 			case 8:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 9:
-				$this->setDeletedAt($value);
+				$this->setUpdatedAt($value);
 				break;
 			case 10:
-				$this->setStatus($value);
+				$this->setDeletedAt($value);
 				break;
 			case 11:
-				$this->setDirectEntriesCount($value);
+				$this->setStatus($value);
 				break;
 			case 12:
-				$this->setMembersCount($value);
+				$this->setDirectEntriesCount($value);
 				break;
 			case 13:
-				$this->setPendingMembersCount($value);
+				$this->setMembersCount($value);
 				break;
 			case 14:
-				$this->setDescription($value);
+				$this->setPendingMembersCount($value);
 				break;
 			case 15:
-				$this->setTags($value);
+				$this->setDescription($value);
 				break;
 			case 16:
-				$this->setDisplayInSearch($value);
+				$this->setTags($value);
 				break;
 			case 17:
-				$this->setPrivacy($value);
+				$this->setDisplayInSearch($value);
 				break;
 			case 18:
-				$this->setInheritanceType($value);
+				$this->setPrivacy($value);
 				break;
 			case 19:
-				$this->setUserJoinPolicy($value);
+				$this->setInheritanceType($value);
 				break;
 			case 20:
-				$this->setDefaultPermissionLevel($value);
+				$this->setUserJoinPolicy($value);
 				break;
 			case 21:
-				$this->setKuserId($value);
+				$this->setDefaultPermissionLevel($value);
 				break;
 			case 22:
-				$this->setPuserId($value);
+				$this->setKuserId($value);
 				break;
 			case 23:
-				$this->setReferenceId($value);
+				$this->setPuserId($value);
 				break;
 			case 24:
-				$this->setContributionPolicy($value);
+				$this->setReferenceId($value);
 				break;
 			case 25:
-				$this->setCustomData($value);
+				$this->setContributionPolicy($value);
 				break;
 			case 26:
-				$this->setPrivacyContext($value);
+				$this->setCustomData($value);
 				break;
 			case 27:
-				$this->setPrivacyContexts($value);
+				$this->setPrivacyContext($value);
 				break;
 			case 28:
+				$this->setPrivacyContexts($value);
+				break;
+			case 29:
 				$this->setInheritedParentId($value);
 				break;
 		} // switch()
@@ -2295,29 +2342,30 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[3], $arr)) $this->setPartnerId($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setName($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setFullName($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setEntriesCount($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setDeletedAt($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setStatus($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setDirectEntriesCount($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setMembersCount($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setPendingMembersCount($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setDescription($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setTags($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setDisplayInSearch($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setPrivacy($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setInheritanceType($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setUserJoinPolicy($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setDefaultPermissionLevel($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setKuserId($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setPuserId($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setReferenceId($arr[$keys[23]]);
-		if (array_key_exists($keys[24], $arr)) $this->setContributionPolicy($arr[$keys[24]]);
-		if (array_key_exists($keys[25], $arr)) $this->setCustomData($arr[$keys[25]]);
-		if (array_key_exists($keys[26], $arr)) $this->setPrivacyContext($arr[$keys[26]]);
-		if (array_key_exists($keys[27], $arr)) $this->setPrivacyContexts($arr[$keys[27]]);
-		if (array_key_exists($keys[28], $arr)) $this->setInheritedParentId($arr[$keys[28]]);
+		if (array_key_exists($keys[6], $arr)) $this->setFullIds($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setEntriesCount($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setDeletedAt($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setStatus($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setDirectEntriesCount($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setMembersCount($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setPendingMembersCount($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setDescription($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setTags($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setDisplayInSearch($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setPrivacy($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setInheritanceType($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setUserJoinPolicy($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setDefaultPermissionLevel($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setKuserId($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setPuserId($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setReferenceId($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setContributionPolicy($arr[$keys[25]]);
+		if (array_key_exists($keys[26], $arr)) $this->setCustomData($arr[$keys[26]]);
+		if (array_key_exists($keys[27], $arr)) $this->setPrivacyContext($arr[$keys[27]]);
+		if (array_key_exists($keys[28], $arr)) $this->setPrivacyContexts($arr[$keys[28]]);
+		if (array_key_exists($keys[29], $arr)) $this->setInheritedParentId($arr[$keys[29]]);
 	}
 
 	/**
@@ -2335,6 +2383,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryPeer::PARTNER_ID)) $criteria->add(categoryPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(categoryPeer::NAME)) $criteria->add(categoryPeer::NAME, $this->name);
 		if ($this->isColumnModified(categoryPeer::FULL_NAME)) $criteria->add(categoryPeer::FULL_NAME, $this->full_name);
+		if ($this->isColumnModified(categoryPeer::FULL_IDS)) $criteria->add(categoryPeer::FULL_IDS, $this->full_ids);
 		if ($this->isColumnModified(categoryPeer::ENTRIES_COUNT)) $criteria->add(categoryPeer::ENTRIES_COUNT, $this->entries_count);
 		if ($this->isColumnModified(categoryPeer::CREATED_AT)) $criteria->add(categoryPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(categoryPeer::UPDATED_AT)) $criteria->add(categoryPeer::UPDATED_AT, $this->updated_at);
@@ -2433,6 +2482,8 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		$copyObj->setName($this->name);
 
 		$copyObj->setFullName($this->full_name);
+
+		$copyObj->setFullIds($this->full_ids);
 
 		$copyObj->setEntriesCount($this->entries_count);
 

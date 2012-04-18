@@ -190,6 +190,37 @@ class CategoryService extends KalturaBaseService
 		return $response;
 	}
 	
+	/**
+	 * Index Category by id
+	 * 
+	 * @action index
+	 * @param int $id
+	 * @param int $shouldUpdate
+	 * @return int category int id
+	 */
+	function indexAction($id, $shouldUpdate)
+	{
+		$categoryDb = categoryPeer::retrieveByPK($id);
+		if (!$categoryDb)
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
+			
+		if (!$shouldUpdate)
+		{
+			$categoryDb->setUpdatedAt(time());
+			$categoryDb->save();
+			
+			return $categoryDb->getIntId();
+		}
+		
+		//TODO 
+		//calculate depth
+		//calculate full name
+		//calculate inherited parent
+		//calculate EntriesCount
+		//??? calculate directEntriesCount
+		
+	}
+	
 	private function handleCoreException(kCoreException $ex, category $categoryDb, KalturaCategory $category)
 	{
 		switch($ex->getCode())

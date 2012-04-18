@@ -54,6 +54,15 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	public $fullName;
 	
 	/**
+	 * The full ids of the Category
+	 * 
+	 * @var string
+	 * @readonly
+	 * @filter order,eq,likex
+	 */
+	public $fullIds;
+	
+	/**
 	 * Number of entries in this Category (including child categories)
 	 * 
 	 * @var int
@@ -245,6 +254,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"depth",
 		"name",
 		"fullName",
+		"fullIds",
 		"partnerId",
 		"entriesCount",
 		"createdAt",

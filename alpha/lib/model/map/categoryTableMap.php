@@ -43,6 +43,7 @@ class categoryTableMap extends TableMap {
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', true, 128, '');
 		$this->addColumn('FULL_NAME', 'FullName', 'LONGVARCHAR', true, null, null);
+		$this->addColumn('FULL_IDS', 'FullIds', 'LONGVARCHAR', true, null, null);
 		$this->addColumn('ENTRIES_COUNT', 'EntriesCount', 'INTEGER', true, null, 0);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);

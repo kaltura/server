@@ -813,4 +813,29 @@ class BaseEntryService extends KalturaEntryService
 	    return $entry;
 	    
 	}
+	
+	/**
+	 * index Entry by id
+	 * 
+	 * @action index
+	 * @param string $id
+	 * @param int $shouldUpdate
+	 * @return int entry int id
+	 */
+	function indexAction($id, $shouldUpdate)
+	{
+		$entryDb = entryPeer::retrieveByPK($id);
+		if (!$entryDb)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $id);
+
+		if (!$shouldUpdate)
+		{
+			$entryDb->setUpdatedAt(time());
+			$entryDb->save();
+			
+			return $entryDb->getIntId();
+		}
+		
+		return myEntryUtils::index($entryDb);
+	}
 }

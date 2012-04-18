@@ -11,6 +11,8 @@ class KalturaCategoryOrderBy extends KalturaStringEnum
 	const NAME_DESC = "-name";
 	const FULL_NAME_ASC = "+fullName";
 	const FULL_NAME_DESC = "-fullName";
+	const FULL_IDS_ASC = "+fullIds";
+	const FULL_IDS_DESC = "-fullIds";
 	const ENTRIES_COUNT_ASC = "+entriesCount";
 	const ENTRIES_COUNT_DESC = "-entriesCount";
 	const CREATED_AT_ASC = "+createdAt";
