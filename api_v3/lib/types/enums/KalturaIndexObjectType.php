@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class KalturaAudioCodec extends KalturaEnum
+class KalturaIndexObjectType extends KalturaEnum
 {
 	const ENTRY = 1;
 	const CATEGORY = 2;
