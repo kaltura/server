@@ -105,9 +105,24 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 				$uniqid = uniqid('thumb_');
 				$capturePath = realpath($rootPath) . "/$uniqid";
 					
+				$mediaInfoWidth = null;
+				$mediaInfoHeight = null;
+				$mediaInfoDar = null;
+				$mediaInfoFilter = new KalturaMediaInfoFilter();
+				$mediaInfoFilter->flavorAssetIdEqual = $data->srcAssetId;
+				$mediaInfoList = $this->kClient->mediaInfo->listAction();
+				if(count($mediaInfoList->objects))
+				{
+					$mediaInfo = reset($mediaInfoList->objects);
+					/* @var $mediaInfo KalturaMediaInfo */
+					$mediaInfoWidth = $mediaInfo->videoWidth;
+					$mediaInfoHeight = $mediaInfo->videoHeight;
+					$mediaInfoDar = $mediaInfo->videoDar;
+				}
+				
 				// generates the thumbnail
 				$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $capturePath, $this->taskConfig->params->FFMpegCmd);
-				$created = $thumbMaker->createThumnail($thumbParamsOutput->videoOffset);
+				$created = $thumbMaker->createThumnail($thumbParamsOutput->videoOffset, $mediaInfoWidth, $mediaInfoHeight, null ,null, $mediaInfoDar);
 				if(!$created || !file_exists($capturePath))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not created", KalturaBatchJobStatus::FAILED);
 				

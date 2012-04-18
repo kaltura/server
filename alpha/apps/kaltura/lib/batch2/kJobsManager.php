@@ -597,18 +597,17 @@ class kJobsManager
 	
 	
 	/**
-	 * addFlavorConvertJob adds a single flavor conversion 
-	 * 
-	 * @param FileSyncKey $srcSyncKey
-	 * @param flavorParamsOutput $flavor
-	 * @param int $flavorAssetId
-	 * @param int $mediaInfoId
 	 * @param BatchJob $parentJob
-	 * @param int $lastEngineType  
-	 * @param BatchJob $dbConvertFlavorJob
-	 * @return BatchJob 
+	 * @param int $partnerId
+	 * @param string $entryId
+	 * @param string $thumbAssetId
+	 * @param FileSyncKey $srcSyncKey
+	 * @param string $srcAssetId
+	 * @param int $srcAssetType enum of assetType
+	 * @param thumbParamsOutput $thumbParams
+	 * @return BatchJob
 	 */
-	public static function addCapturaThumbJob(BatchJob $parentJob = null, $partnerId, $entryId, $thumbAssetId, FileSyncKey $srcSyncKey, $srcAssetType, thumbParamsOutput $thumbParams = null)
+	public static function addCapturaThumbJob(BatchJob $parentJob = null, $partnerId, $entryId, $thumbAssetId, FileSyncKey $srcSyncKey, $srcAssetId, $srcAssetType, thumbParamsOutput $thumbParams = null)
 	{
 		$thumbAsset = assetPeer::retrieveById($thumbAssetId);
 		if(!$thumbAsset)
@@ -674,6 +673,7 @@ class kJobsManager
 		// creates convert data
 		$data = new kCaptureThumbJobData();
 		$data->setThumbAssetId($thumbAssetId);
+		$data->setSrcAssetId($srcAssetId);
 		$data->setSrcAssetType($srcAssetType);
 		$data->setSrcFileSyncLocalPath($localPath);
 		$data->setSrcFileSyncRemoteUrl($remoteUrl);

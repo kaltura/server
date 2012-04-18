@@ -24,9 +24,9 @@ abstract class KBaseThumbnailMaker
 		$this->targetPath = $targetPath;
 	}
 	
-	public function createThumnail($position = null, $width = null, $height = null, $frameCount = 1, $targetType = "image2")
+	public function createThumnail($position = null, $width = null, $height = null, $frameCount = 1, $targetType = "image2", $dar = null)
 	{
-		KalturaLog::debug(__METHOD__."position = $position, width = $width, height = $height, frameCount = $frameCount, frameCount = $frameCount");
+		KalturaLog::debug("position[$position], width[$width], height[$height], frameCount[$frameCount], frameCount[$frameCount], dar[$dar]");
 		$cmd = $this->getCommand($position, $width, $height, $frameCount, $targetType);
 		KalturaLog::info("Executing: $cmd");
 		

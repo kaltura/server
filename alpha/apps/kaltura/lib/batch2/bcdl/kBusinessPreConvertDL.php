@@ -152,7 +152,7 @@ class kBusinessPreConvertDL
 		
 		if(!$runSync)
 		{
-			$job = kJobsManager::addCapturaThumbJob($parentJob, $entry->getPartnerId(), $entry->getId(), $thumbAsset->getId(), $srcSyncKey, $srcAssetType, $destThumbParamsOutput);
+			$job = kJobsManager::addCapturaThumbJob($parentJob, $entry->getPartnerId(), $entry->getId(), $thumbAsset->getId(), $srcSyncKey, $srcAsset->getId(), $srcAssetType, $destThumbParamsOutput);
 			return $thumbAsset;
 		}
 
@@ -291,9 +291,15 @@ class kBusinessPreConvertDL
 		{
 			if($srcAsset->getType() == assetType::FLAVOR)
 			{
+				/* @var $srcAsset flavorAsset */
+				$dar = null;
+				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($srcAsset->getId());
+				if($mediaInfo)
+					$dar = $mediaInfo->getVideoDar();
+				
 				// generates the thumbnail
 				$thumbMaker = new KFFMpegThumbnailMaker($srcPath, $destPath, kConf::get('bin_path_ffmpeg'));
-				$created = $thumbMaker->createThumnail($destThumbParamsOutput->getVideoOffset());
+				$created = $thumbMaker->createThumnail($destThumbParamsOutput->getVideoOffset(), $srcAsset->getWidth(), $srcAsset->getHeight(), null, null, $dar);
 				if(!$created || !file_exists($destPath))
 				{
 					$errDescription = "Thumbnail not captured";

@@ -227,7 +227,7 @@ class kFlowHelper
 
 				$srcSyncKey = $flavorAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 				$srcAssetType = $flavorAsset->getType();
-				kJobsManager::addCapturaThumbJob($entryThumbnail->getPartnerId(), $entryThumbnail->getEntryId(), $entryThumbnail->getId(), $srcSyncKey, $srcAssetType, $thumbParamsOutput);
+				kJobsManager::addCapturaThumbJob($entryThumbnail->getPartnerId(), $entryThumbnail->getEntryId(), $entryThumbnail->getId(), $srcSyncKey, $flavorAsset->getId(), $srcAssetType, $thumbParamsOutput);
 			}
 		}
 

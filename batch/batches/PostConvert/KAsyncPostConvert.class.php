@@ -104,6 +104,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			$mediaInfo = null;
 		}
 		
+		/* @var $mediaInfo KalturaMediaInfo */
 		if(is_null($mediaInfo))
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::EXTRACT_MEDIA_FAILED, "Failed to extract media info: $mediaFile", KalturaBatchJobStatus::FAILED);
 		
@@ -138,7 +139,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 					
 			// generates the thumbnail
 			$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $thumbPath, $this->taskConfig->params->FFMpegCmd);
-			$created = $thumbMaker->createThumnail($data->thumbOffset);
+			$created = $thumbMaker->createThumnail($data->thumbOffset, $mediaInfo->videoWidth, $mediaInfo->videoHeight, null, null, $mediaInfo->videoDar);
 			
 			if(!$created || !file_exists($thumbPath))
 			{
