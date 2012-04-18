@@ -27,6 +27,12 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	//this will be the default value if the parameter is not set in the task's configuration
 	const DEFAULT_FILE_UNLOCK_INTERVAL = 3;
 	
+	//this will be the default value if it not set in the task's configuration
+	const DEFAULT_SLEEP_TIMES = 10;
+	
+	//this will be the default value if it not set in the task's configuration
+	const DEFAULT_SLEEP_SECONDS = 2;
+	
 	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
 	{
 		parent::configure($taskConfig, $data, $client);
@@ -100,9 +106,17 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			$tmpFile = dirname($this->outFilePath).'/'.$tmpFile;
 		}
 		
-		// sleeping while file not ready, since PDFCreator exists a bit before the file is actually ready
 		$sleepTimes = $this->taskConfiguration->fileExistReties;
+		if (!$sleepTimes){
+			$sleepTimes = self::DEFAULT_SLEEP_TIMES;
+		}
+		
 		$sleepSeconds = $this->taskConfiguration->fileExistInterval;
+		if (!$sleepSeconds){
+			$sleepSeconds = self::DEFAULT_SLEEP_SECONDS;
+		}
+		
+		// sleeping while file not ready, since PDFCreator exists a bit before the file is actually ready
 		while (!file_exists(realpath($tmpFile)) && $sleepTimes > 0) {
 			sleep($sleepSeconds);
 			$sleepTimes--;
