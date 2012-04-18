@@ -39,12 +39,21 @@ class categoryEntry extends BasecategoryEntry {
 	public function postInsert(PropelPDO $con = null)
 	{	
 		parent::postInsert($con);
-	
-		$category = categoryPeer::retrieveByPK($this->category_id);
+		
+		$category = categoryPeer::retrieveByPK($this->getCategoryId());
 		if($category)
 		{
 			$category->incrementEntriesCount(1, $this->entryCategoriesAddedIds);
 			$category->incrementDirectEntriesCount();
+			
+			$entry = entryPeer::retrieveByPK($this->getEntryId());
+			if($entry && !categoryEntryPeer::getSkipSave())
+			{
+				if($category->getPrivacyContext() == '')
+					$entry->setCategories($entry->getCategories() . ',' . $category->getFullName());
+				
+				$entry->save();					
+			}
 		}
 	}
 	
@@ -62,6 +71,23 @@ class categoryEntry extends BasecategoryEntry {
 			$category->decrementEntriesCount(1, $this->entryCategoriesRemovedIds);
 			$category->decrementDirectEntriesCount();
 		}
+		
+		$entry = entryPeer::retrieveByPK($this->getEntryId());
+		if($entry)
+		{
+
+			if (!$category)
+			{
+				categoryPeer::setUseCriteriaFilter(false);
+				$category = categoryPeer::retrieveByPK($this->category_id);
+				categoryPeer::setUseCriteriaFilter(true);
+			}
+
+			$entry->removeCategory($category->getFullName());
+			$entry->save();
+		}
 	}
+	
+
 	
 } // categoryEntry
