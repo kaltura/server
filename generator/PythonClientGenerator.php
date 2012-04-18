@@ -415,7 +415,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 				continue;
 							
 			$propType = $propertyNode->getAttribute ( "type" );
-			$propName = $this->replaceReservedWords($propertyNode->getAttribute ( "name" ));
+			$propName = $propertyNode->getAttribute ( "name" );
 			$isEnum = $propertyNode->hasAttribute ( "enumType" );
 			
 			$curLine = "        '$propName': ";
@@ -493,37 +493,38 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 				continue;
 			
 			$propType = $propertyNode->getAttribute ( "type" );
-			$propName = $this->replaceReservedWords($propertyNode->getAttribute ( "name" ));
+			$propName = $propertyNode->getAttribute ( "name" );
+			$memberName = $this->replaceReservedWords($propName);
 			$isEnum = $propertyNode->hasAttribute ( "enumType" );
 			switch ($propType) 
 			{
 				case "int" :
 					if ($isEnum)
 					{
-						$this->appendLine ( "        kparams.addIntEnumIfDefined(\"$propName\", self.$propName)" );
+						$this->appendLine ( "        kparams.addIntEnumIfDefined(\"$propName\", self.$memberName)" );
 					}
 					else
-						$this->appendLine ( "        kparams.addIntIfDefined(\"$propName\", self.$propName)" );
+						$this->appendLine ( "        kparams.addIntIfDefined(\"$propName\", self.$memberName)" );
 					break;
 				case "string" :
 					if ($isEnum)
 					{
-						$this->appendLine ( "        kparams.addStringEnumIfDefined(\"$propName\", self.$propName)" );
+						$this->appendLine ( "        kparams.addStringEnumIfDefined(\"$propName\", self.$memberName)" );
 					}
 					else
-						$this->appendLine ( "        kparams.addStringIfDefined(\"$propName\", self.$propName)" );
+						$this->appendLine ( "        kparams.addStringIfDefined(\"$propName\", self.$memberName)" );
 					break;
 				case "bool" :
-					$this->appendLine ( "        kparams.addBoolIfDefined(\"$propName\", self.$propName)" );
+					$this->appendLine ( "        kparams.addBoolIfDefined(\"$propName\", self.$memberName)" );
 					break;
 				case "float" :
-					$this->appendLine ( "        kparams.addFloatIfDefined(\"$propName\", self.$propName)" );
+					$this->appendLine ( "        kparams.addFloatIfDefined(\"$propName\", self.$memberName)" );
 					break;
 				case "array":
-					$this->appendLine("        kparams.addArrayIfDefined(\"$propName\", self.$propName)");
+					$this->appendLine("        kparams.addArrayIfDefined(\"$propName\", self.$memberName)");
 					break;
 				default :
-					$this->appendLine ( "        kparams.addObjectIfDefined(\"$propName\", self.$propName)" );
+					$this->appendLine ( "        kparams.addObjectIfDefined(\"$propName\", self.$memberName)" );
 					break;
 			}
 		}
