@@ -72,6 +72,7 @@ $baseConfigurationIndexs = 	array(
 			'name'       	    => SphinxFieldType::RT_FIELD,
 			'partner_id' 		=> SphinxFieldType::RT_ATTR_BIGINT,
 			'full_name' 		=> SphinxFieldType::RT_FIELD,
+			'sort_name'			=> SphinxFieldType::RT_ATTR_BIGINT,
 			'description'	 	=> SphinxFieldType::RT_FIELD,
 			'tags' 				=> SphinxFieldType::RT_FIELD,
 			'category_status'	=> SphinxFieldType::RT_ATTR_BIGINT,

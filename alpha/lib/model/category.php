@@ -33,6 +33,7 @@ class category extends Basecategory implements IIndexable
 		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'name' => IIndexable::FIELD_TYPE_STRING,
 		'full_name' => IIndexable::FIELD_TYPE_STRING,
+		'sort_name' => IIndexable::FIELD_TYPE_INTEGER,
 		'description' => IIndexable::FIELD_TYPE_STRING,
 		'tags' => IIndexable::FIELD_TYPE_STRING,
 		'category_status' => IIndexable::FIELD_TYPE_INTEGER,
@@ -731,19 +732,28 @@ class category extends Basecategory implements IIndexable
 		$this->setContributionPolicy(ContributionPolicyType::MODERATOR);
 		$this->setStatus(CategoryStatus::ACTIVE);
 	}
-	
-	
+
 	/**
-	 * Get the [id] column value.
-	 * 
-	 * @return     int
+	 * @return int sorting value
+	 */
+	public function getSortName()
+	{
+		return kUTF8::str2int64($this->getName());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIntId()
 	 */
 	public function getIntId()
 	{
 		return $this->getId();
 	}
 	
-	//TODO - remove this function when changing sphinx_log model from entryId to objectId and objectType
+	/* (non-PHPdoc)
+	 * @see IIndexable::getEntryId()
+	 * 
+	 * TODO - remove this function when changing sphinx_log model from entryId to objectId and objectType
+	 */
 	public function getEntryId()
 	{
 		return null;
@@ -793,6 +803,7 @@ class category extends Basecategory implements IIndexable
 			'partner_id' => 'partnerId',
 			'name' => 'name',
 			'full_name' => 'fullName',
+			'sort_name' => 'sortName',
 			'description' => 'description',
 			'tags' => 'tags',
 			'category_status' => 'status',
