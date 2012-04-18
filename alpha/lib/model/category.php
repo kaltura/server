@@ -559,6 +559,8 @@ class category extends Basecategory implements IIndexable
 		
 	private function addIndexEntryJob($categoryId, $shouldUpdate = false)
 	{
+		return;
+		
 		$filter = new KalturaBaseEntryFilter();
 		
 		if(!is_null($categoryId))
@@ -579,6 +581,8 @@ class category extends Basecategory implements IIndexable
 	
 	private function addIndexCategoryJob($rootCategoryId, $shouldUpdate = false)
 	{
+		return;
+		
 		$filter = new KalturaCategoryFilter();
 		
 		if(!is_null($rootCategoryId))
@@ -825,6 +829,7 @@ class category extends Basecategory implements IIndexable
 			'partner_id' => 'partnerId',
 			'name' => 'name',
 			'full_name' => 'fullName',
+			'full_ids' => 'fullIds',
 			'sort_name' => 'sortName',
 			'description' => 'description',
 			'tags' => 'tags',
