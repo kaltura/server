@@ -253,12 +253,13 @@ class KalturaSyndicationFeedRenderer
 		$entry = current($this->entriesCurrentPage);
 		if($entry)
 		{
+			$orderByFieldValue = $this->getOrderByFieldValue($entry);
 			next($this->entriesCurrentPage);
-			if ($this->lastEntryCreatedAt > $entry->getCreatedAt(null))
+			if ($this->lastEntryCreatedAt > $orderByFieldValue)
 				$this->lastEntryIds = array();
 			
 			$this->lastEntryIds[] = $entry->getId();
-			$this->lastEntryCreatedAt = $entry->getCreatedAt(null);
+			$this->lastEntryCreatedAt = $orderByFieldValue;
 			return $entry;
 		}
 			
@@ -273,12 +274,13 @@ class KalturaSyndicationFeedRenderer
 		$entry = current($this->entriesCurrentPage);
 		if($entry)
 		{
+			$orderByFieldValue = $this->getOrderByFieldValue($entry);
 			next($this->entriesCurrentPage);
-			if ($this->lastEntryCreatedAt > $entry->getCreatedAt(null))
+			if ($this->lastEntryCreatedAt > $orderByFieldValue)
 				$this->lastEntryIds = array();
 			
 			$this->lastEntryIds[] = $entry->getId();
-			$this->lastEntryCreatedAt = $entry->getCreatedAt(null);
+			$this->lastEntryCreatedAt = $orderByFieldValue;
 		}
 		else
 		{
@@ -861,5 +863,13 @@ class KalturaSyndicationFeedRenderer
 			return entryPeer::AVAILABLE_FROM;
 
 		return entryPeer::CREATED_AT; // the default
+	}
+
+	private function getOrderByFieldValue(entry $entry)
+	{
+		if ($this->syndicationFeed->entriesOrderBy === 'recent')
+			return $entry->getAvailableFrom(null);
+
+		return $entry->getCreatedAt(null); // the default
 	}
 }
