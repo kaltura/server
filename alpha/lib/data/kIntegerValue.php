@@ -32,7 +32,7 @@ class kIntegerValue extends kValue
 	}
 	
 	/**
-	 * @param accessControlScope $scope
+	 * @param kScope $scope
 	 * @return bool
 	 */
 	public function shouldDisableCache($scope)
