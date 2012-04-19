@@ -74,4 +74,12 @@ class kCompareMetadataCondition extends kCompareCondition
 	{
 		$this->profileId = $profileId;
 	}
+
+	/* (non-PHPdoc)
+	 * @see kCompareCondition::shouldFieldDisableCache()
+	 */
+	public function shouldFieldDisableCache($scope)
+	{
+		return false;
+	}	
 }

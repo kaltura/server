@@ -73,4 +73,12 @@ class kMatchMetadataCondition extends kMatchCondition
 	{
 		$this->profileId = $profileId;
 	}
+
+	/* (non-PHPdoc)
+	 * @see kMatchCondition::shouldFieldDisableCache()
+	 */
+	public function shouldFieldDisableCache($scope)
+	{
+		return false;
+	}	
 }
