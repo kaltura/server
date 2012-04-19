@@ -285,8 +285,12 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kshow_id" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kuser_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="rank" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kvote_type" type="integer" default="1"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="kshow">
 			<reference local="kshow_id" foreign="id" />
 		</foreign-key>
@@ -299,8 +303,10 @@
 		<index name="kshow_index">
 			<index-column name="kshow_id" />
 		</index>
-		<index name="entry_user_index">
+		<index name="entry_user_status_index">
 			<index-column name="entry_id" />
+			<index-column name="kuser_id" />
+			<index-column name="status" />
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="comment" phpName="comment">
@@ -634,26 +640,14 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_id" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_type" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="action" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entry_status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_status" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="row_data" type="varchar" size="1023" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="title" type="varchar" size="127" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="description" type="varchar" size="255" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="varchar" size="255" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="url" type="varchar" size="255" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="content_type" type="varchar" size="31" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="conversion_profile_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="access_control_profile_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="category" type="varchar" size="128" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="schedule_start_date" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="schedule_end_date" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="thumbnail_url" type="varchar" size="255" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="thumbnail_saved" type="boolean" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_data" type="varchar" size="4096" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="error_description" type="varchar" size="255" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="plugins_data" type="varchar" size="9182" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
-		<index name="entry_id_index_id">
-			<index-column name="entry_id" />
+		<index name="object_id_index_id">
+			<index-column name="object_id" />
 			<index-column name="id" />
 		</index>
 	</table>
