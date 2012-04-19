@@ -135,15 +135,6 @@ function xmlToArray($xmlstring)
 	return $array;
 }
 
-$IGNORED_FIELDS = array(
-	'/executionTime', 
-	'/result/serverTime',
-	'/debug/execute_impl_time', 
-	'/debug/execute_time', 
-	'/debug/total_time', 
-	'/entry/@attributes/server_time', 
-	);
-	
 function normalizeKS($value)
 {
 	$ksPos1 = strpos($value, '/ks/');
@@ -190,18 +181,12 @@ function compareValues($newValue, $oldValue)
 	
 	$newValue = normalizeKS($newValue);
 	$oldValue = normalizeKS($oldValue);
-
-	$pattern = '/kaltura_player_\d+/';
-	$newValue = preg_replace($pattern, 'KP', $newValue);
-	$oldValue = preg_replace($pattern, 'KP', $oldValue);
 	
 	return $newValue == $oldValue;
 }	
 	
 function compareArrays($resultNew, $resultOld, $path)
 {
-	global $IGNORED_FIELDS;
-	
 	$errors = array();
 	foreach ($resultOld as $key => $oldValue)
 	{
@@ -218,11 +203,6 @@ function compareArrays($resultNew, $resultOld, $path)
 		}
 		else if (is_string($oldValue) && is_string($newValue))
 		{
-			if (in_array("$path/$key", $IGNORED_FIELDS))
-			{
-				continue;
-			}
-			
 			if (!compareValues($newValue, $oldValue))
 			{
 				$errors[] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
@@ -237,8 +217,22 @@ function compareArrays($resultNew, $resultOld, $path)
 	return $errors;
 }
 
+function normalizeResultBuffer($result)
+{
+	$result = preg_replace('/<executionTime>[0-9\.]+<\/executionTime>/', '', $result);
+	$result = preg_replace('/<serverTime>[0-9\.]+<\/serverTime>/', '', $result);
+	$result = preg_replace('/<execute_impl_time>[0-9\.]+<\/execute_impl_time>/', '', $result);
+	$result = preg_replace('/<execute_time>[0-9\.]+<\/execute_time>/', '', $result);
+	$result = preg_replace('/<total_time>[0-9\.]+<\/total_time>/', '', $result);
+	$result = preg_replace('/<server_time>[0-9\.]+<\/server_time>/', '', $result);
+	$result = preg_replace('/kaltura_player_\d+/', 'KP', $result);
+	return $result;
+}
+
 function compareResults($resultNew, $resultOld)
 {
+	$resultNew = normalizeResultBuffer($resultNew);
+	$resultOld = normalizeResultBuffer($resultOld);
 	if ($resultNew == $resultOld)
 		return array();
 		
