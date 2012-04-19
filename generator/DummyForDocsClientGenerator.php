@@ -120,7 +120,7 @@ class DummyForDocsClientGenerator extends ClientGeneratorFromPhp
 	{
 	}
 	
-	private function writeMainClassServiceInitialization(KalturaServiceReflector $serviceReflector)
+	private function writeMainClassServiceInitialization(KalturaServiceActionItem $serviceReflector)
 	{
 	}
 	
