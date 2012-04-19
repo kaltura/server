@@ -336,12 +336,26 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			if (!$kuser)
 				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->owner);
 		}
+	
+		if($this->referenceId)
+		{
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			$c->add('category.REFERENCE_ID', $this->referenceId);
+			$c->applyFilters();
+			if(count($c->getFetchedIds()))
+				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
+		}
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
-	
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate()
+	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
+		/* @var $sourceObject category */
+		
 		if (($sourceObject->getInheritanceType() == KalturaInheritanceType::INHERIT && $this->inheritanceType == null) || 
 			($this->inheritanceType == KalturaInheritanceType::INHERIT))
 		{
@@ -352,6 +366,16 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			{
 				throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES);
 			}
+		}
+	
+		if($this->referenceId)
+		{
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			$c->add('category.ID', $sourceObject->getId(), Criteria::NOT_EQUAL);
+			$c->add('category.REFERENCE_ID', $this->referenceId);
+			$c->applyFilters();
+			if(count($c->getFetchedIds()))
+				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
 		}
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);

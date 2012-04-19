@@ -198,16 +198,16 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		"rtmpPrefix"
 	);
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}	
 	
-	
-	/**
-	 * @param StorageProfile $object_to_fill
-	 * @param array $props_to_skip
-	 * @return StorageProfile
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toInsertableObject()
 	 */
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
@@ -216,8 +216,47 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 			
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate()
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validatePropertyMinLength("name", 1, true);
 	
+		if($this->systemName)
+		{
+			$c = KalturaCriteria::create(StorageProfilePeer::OM_CLASS);
+			$c->add(StorageProfilePeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
+			$c->add(StorageProfilePeer::SYSTEM_NAME, $this->systemName);
+			if(StorageProfilePeer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+		}
+		
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validatePropertyMinLength("name", 1);
+		
+		if($this->systemName)
+		{
+			$c = KalturaCriteria::create(StorageProfilePeer::OM_CLASS);
+			$c->add(StorageProfilePeer::SYSTEM_NAME, $this->systemName);
+			if(StorageProfilePeer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+		}
+		
+		return parent::validateForInsert($propertiesToSkip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		if(is_null($object_to_fill))
@@ -251,6 +290,9 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		return $object_to_fill;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
 	public function fromObject ( $source_object  )
 	{
 	    parent::fromObject($source_object);
@@ -259,11 +301,17 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	    $this->pathManagerParams = KalturaKeyValueArray::fromKeyValueArray($source_object->getPathManagerParams());
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getExtraFilters()
+	 */
 	public function getExtraFilters()
 	{
 		return array();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getFilterDocs()
+	 */
 	public function getFilterDocs()
 	{
 		return array();

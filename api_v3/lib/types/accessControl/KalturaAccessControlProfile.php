@@ -87,31 +87,67 @@ class KalturaAccessControlProfile extends KalturaObject implements IFilterable
 		"rules" => "rulesArray",
 	);
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
 	}
 	
+	/**
+	 * Common validation to insert and update
+	 */
 	public function validate()
 	{
 		$this->validatePropertyMaxLength('systemName', 128, true);
 		$this->validatePropertyMaxLength('description', 1024, true);
 	}
 	
-	public function validateForInsert($skip = array())
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyMinMaxLength('name', 1, 128);
 		$this->validate();
-		return parent::validateForInsert($skip);
+		
+		if($this->systemName)
+		{
+			$c = KalturaCriteria::create(accessControlPeer::OM_CLASS);
+			$c->add(accessControlPeer::SYSTEM_NAME, $this->systemName);
+			if(accessControlPeer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+		}
+		
+		return parent::validateForInsert($propertiesToSkip);
 	}
-	
-	public function validateForUpdate($skip = array())
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate()
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
+		/* @var $sourceObject accessControl */
+		
 		$this->validatePropertyMinMaxLength('name', 1, 128, true);
 		$this->validate();
-		return parent::validateForUpdate($skip);
+		
+		if($this->systemName)
+		{
+			$c = KalturaCriteria::create(accessControlPeer::OM_CLASS);
+			$c->add(accessControlPeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
+			$c->add(accessControlPeer::SYSTEM_NAME, $this->systemName);
+			if(accessControlPeer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+		}
+		
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
 	public function toObject($dbAccessControlProfile = null, $skip = array())
 	{
 		if(!$dbAccessControlProfile)
@@ -120,11 +156,17 @@ class KalturaAccessControlProfile extends KalturaObject implements IFilterable
 		return parent::toObject($dbAccessControlProfile, $skip);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getExtraFilters()
+	 */
 	public function getExtraFilters()
 	{
 		return array();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getFilterDocs()
+	 */
 	public function getFilterDocs()
 	{
 		return array();

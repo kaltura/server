@@ -211,8 +211,16 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if (!is_null($this->name) && !($this->name instanceof KalturaNullField))
-			$this->validatePropertyMinLength("name", 1);
+		$this->validatePropertyMinLength("name", 1, true);
+	
+		if($this->systemName)
+		{
+			$c = KalturaCriteria::create(conversionProfile2Peer::OM_CLASS);
+			$c->add(conversionProfile2Peer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
+			$c->add(conversionProfile2Peer::SYSTEM_NAME, $this->systemName);
+			if(conversionProfile2Peer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+		}
 		
 		if (!is_null($this->flavorParamsIds) && !($this->flavorParamsIds instanceof KalturaNullField)) 
 			$this->validateFlavorParamsIds();
@@ -230,6 +238,14 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		$this->validatePropertyMinLength("name", 1);
 		$this->validateFlavorParamsIds();
 		$this->validateDefaultEntry();
+		
+		if($this->systemName)
+		{
+			$c = KalturaCriteria::create(conversionProfile2Peer::OM_CLASS);
+			$c->add(conversionProfile2Peer::SYSTEM_NAME, $this->systemName);
+			if(conversionProfile2Peer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+		}
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -276,11 +292,19 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		}
 	}
 	
+	/**
+	 * @return array
+	 */
 	public function getFlavorParamsAsArray()
 	{
 		return explode(",", $this->flavorParamsIds);
 	}
 	
+	/**
+	 * @param conversionProfile2 $conversionProfile
+	 * @param PropelPDO $con
+	 * Sets flavorParamsIds attribute based on flavorParamsConversionProfiles table
+	 */
 	public function loadFlavorParamsIds(conversionProfile2 $conversionProfile, $con = null)
 	{
 		$flavorParams = $conversionProfile->getflavorParamsConversionProfilesJoinflavorParams(null, $con);
@@ -292,11 +316,17 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		$this->flavorParamsIds = implode(",", $flavorParamIds);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getExtraFilters()
+	 */
 	public function getExtraFilters()
 	{
 		return array();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getFilterDocs()
+	 */
 	public function getFilterDocs()
 	{
 		return array();

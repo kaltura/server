@@ -85,11 +85,17 @@ class KalturaAccessControl extends KalturaObject implements IFilterable
 		"isDefault",
 	);
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
@@ -115,6 +121,44 @@ class KalturaAccessControl extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		if($this->systemName)
+		{
+			$c = KalturaCriteria::create(accessControlPeer::OM_CLASS);
+			$c->add(accessControlPeer::SYSTEM_NAME, $this->systemName);
+			if(accessControlPeer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+		}
+		
+		return parent::validateForInsert($propertiesToSkip);
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate()
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		/* @var $sourceObject accessControl */
+		
+		if($this->systemName)
+		{
+			$c = KalturaCriteria::create(accessControlPeer::OM_CLASS);
+			$c->add(accessControlPeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
+			$c->add(accessControlPeer::SYSTEM_NAME, $this->systemName);
+			if(accessControlPeer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+		}
+		
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toUpdatableObject()
+	 */
 	public function toUpdatableObject($dbObject, $skip = array())
 	{
 		/* @var $dbObject accessControl */
@@ -126,6 +170,9 @@ class KalturaAccessControl extends KalturaObject implements IFilterable
 		parent::toUpdatableObject($dbObject, $skip);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
 	public function fromObject($dbObject)
 	{
 		parent::fromObject($dbObject);
@@ -146,11 +193,17 @@ class KalturaAccessControl extends KalturaObject implements IFilterable
 		$this->restrictions = KalturaRestrictionArray::fromDbArray($rules);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getExtraFilters()
+	 */
 	public function getExtraFilters()
 	{
 		return array();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getFilterDocs()
+	 */
 	public function getFilterDocs()
 	{
 		return array();

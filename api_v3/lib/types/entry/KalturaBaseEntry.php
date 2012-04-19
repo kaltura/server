@@ -465,12 +465,23 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		$this->validateCategories();
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		$this->validateObjectsExist();
+	
+		if($this->referenceId)
+		{
+			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+			$c->add('entry.REFERENCE_ID', $this->referenceId);
+			$c->applyFilters();
+			if(count($c->getFetchedIds()))
+				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
+		}
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
-	
-	/*
+		
+	/**
 	 * To validate if user is entitled to the category – all needed is to select from the db.
+	 * 
+	 * @throws KalturaAPIException
 	 */
 	public function validateCategories()
 	{
@@ -526,8 +537,19 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
+		/* @var $sourceObject entry */
 		$this->validateCategories();
 		$this->validatePropertyMinLength('referenceId', 2, true);
+		
+		if($this->referenceId)
+		{
+			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+			$c->add('entry.ID', $sourceObject->getId(), Criteria::NOT_EQUAL);
+			$c->add('entry.REFERENCE_ID', $this->referenceId);
+			$c->applyFilters();
+			if(count($c->getFetchedIds()))
+				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
+		}
 		
 		if(!is_null($this->conversionProfileId) && $sourceObject->getStatus() != entryStatus::NO_CONTENT)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $sourceObject->getStatus());
@@ -537,6 +559,9 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getExtraFilters()
+	 */
 	public function getExtraFilters()
 	{
 		return array(
@@ -550,6 +575,9 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getFilterDocs()
+	 */
 	public function getFilterDocs()
 	{
 		return array(
