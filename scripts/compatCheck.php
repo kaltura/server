@@ -124,8 +124,8 @@ function xmlToArray($xmlstring)
 	$xmlstring = str_replace(array('&amp;#', '&amp;lt;', '&amp;gt;', '&amp;quot;', '&amp;amp;', '&amp;apos;'), array('&#', '&lt;', '&gt;', '&quot;', '&amp;', '&apos;'), $xmlstring);
 	if ($xmlstring != $origstring)
 	{
-		printStringDiff($xmlstring, $origstring);
-		return null;
+		//printStringDiff($xmlstring, $origstring);
+		//return null;
 	}
 
 	// parse the xml
@@ -371,6 +371,10 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array())
 	{
 		print "\tError: $error\n";
 	}
+	print "Result - new\n";
+	print $resultNew . "\n";
+	print "Result - old\n";
+	print $resultOld . "\n";
 }
 
 function isRequestExpired($parsedParams)
@@ -489,7 +493,7 @@ function processRequest($parsedParams)
 {
 	if (!array_key_exists('service', $parsedParams))
 	{
-		print "Error: service not specified " . print_r($parsedParams, true) . "\n";
+		//print "Error: service not specified " . print_r($parsedParams, true) . "\n";
 		return;
 	}
 
