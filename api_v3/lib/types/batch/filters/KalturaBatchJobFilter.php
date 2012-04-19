@@ -75,6 +75,10 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 				$data = new KalturaDeleteJobData();
 				break;
 				
+			case KalturaBatchJobType::MOVE_CATEGORY_ENTRIES:
+				$data = new KalturaMoveCategoryEntriesJobData();
+				break;
+				
 			default:
 				$data = KalturaPluginManager::loadObject('KalturaJobData', $jobType);
 				KalturaLog::debug("Loaded data type [" . get_class($data) . "] for job type [$jobType]");

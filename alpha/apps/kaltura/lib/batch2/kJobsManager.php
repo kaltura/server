@@ -1094,7 +1094,7 @@ class kJobsManager
 	 */
 	public static function addStorageExportJob(BatchJob $parentJob = null, $entryId, $partnerId, StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false, $dc = null)
 	{
-		KalturaLog::log(__METHOD__ . " entryId[$entryId], partnerId[$partnerId], externalStorage id[" . $externalStorage->getId() . "], fileSync id[" . $fileSync->getId() . "], srcFileSyncLocalPath[$srcFileSyncLocalPath]");
+		KalturaLog::debug("entryId[$entryId], partnerId[$partnerId], externalStorage id[" . $externalStorage->getId() . "], fileSync id[" . $fileSync->getId() . "], srcFileSyncLocalPath[$srcFileSyncLocalPath]");
 		
 		$netStorageExportData = new kStorageExportJobData();
 	    $netStorageExportData->setServerUrl($externalStorage->getStorageUrl()); 
@@ -1121,6 +1121,37 @@ class kJobsManager
 		$batchJob->setDc($dc);
 		KalturaLog::log("Creating Storage export job, with source file: " . $netStorageExportData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $netStorageExportData, BatchJobType::STORAGE_EXPORT, $externalStorage->getProtocol());
+	}
+	
+	/**
+	 * @param BatchJob $parentJob
+	 * @param int $partnerId
+	 * @param int $srcCategoryId the source category id
+	 * @param int $destCategoryId the destination category id
+	 * @param bool $moveFromChildren indicates that all entries from all child categories should be moved as well
+	 * @param bool $copyOnly indicates that the entries shouldn't be deleted from the source entry
+	 * @return BatchJob
+	 */
+	public static function addMoveCategoryEntriesJob(BatchJob $parentJob = null, $partnerId, $srcCategoryId, $destCategoryId, $moveFromChildren = false, $copyOnly = false)
+	{
+		$moveCategoryEntriesData = new kMoveCategoryEntriesJobData();
+	    $moveCategoryEntriesData->setSrcCategoryId($srcCategoryId);
+	    $moveCategoryEntriesData->setDestCategoryId($destCategoryId);
+	    $moveCategoryEntriesData->setMoveFromChildren($moveFromChildren);
+	    $moveCategoryEntriesData->setCopyOnly($copyOnly);
+		
+		$batchJob = null;
+		if($parentJob)
+		{
+			$batchJob = $parentJob->createChild(false);
+		}
+		else
+		{
+			$batchJob = new BatchJob();
+			$batchJob->setPartnerId($partnerId);
+		}
+		
+		return self::addJob($batchJob, $moveCategoryEntriesData, BatchJobType::MOVE_CATEGORY_ENTRIES);
 	}
 	
 	public static function addStorageDeleteJob(BatchJob $parentJob = null, $entryId = null, StorageProfile $storage, FileSyncKey $syncKey)

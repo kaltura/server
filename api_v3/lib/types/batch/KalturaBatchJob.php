@@ -309,6 +309,10 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				$this->data = new KalturaStorageExportJobData();
 				break;
 				
+			case 'kMoveCategoryEntriesJobData':
+				$this->data = new KalturaMoveCategoryEntriesJobData();
+				break;
+				
 			case 'kStorageDeleteJobData':
 				$this->data = new KalturaStorageDeleteJobData();
 				break;
@@ -451,6 +455,12 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				$dbData = new kStorageExportJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaStorageExportJobData();
+				break;
+				
+			case KalturaBatchJobType::MOVE_CATEGORY_ENTRIES:
+				$dbData = new kMoveCategoryEntriesJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaMoveCategoryEntriesJobData();
 				break;
 				
 			case KalturaBatchJobType::STORAGE_DELETE:

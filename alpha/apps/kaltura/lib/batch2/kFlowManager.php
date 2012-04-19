@@ -34,10 +34,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return kFlowHelper::handleIndexFinished($dbBatchJob, $data, $twinJob);
+//				return kFlowHelper::handleIndexFinished($dbBatchJob, $data, $twinJob);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return kFlowHelper::handleIndexFailed($dbBatchJob, $data, $twinJob);
+//				return kFlowHelper::handleIndexFailed($dbBatchJob, $data, $twinJob);
 				return $dbBatchJob;
 			default:
 				return $dbBatchJob;
@@ -49,10 +49,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return kFlowHelper::handleDeleteFinished($dbBatchJob, $data, $twinJob);
+//				return kFlowHelper::handleDeleteFinished($dbBatchJob, $data, $twinJob);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return kFlowHelper::handleDeleteFailed($dbBatchJob, $data, $twinJob);
+//				return kFlowHelper::handleDeleteFailed($dbBatchJob, $data, $twinJob);
 				return $dbBatchJob;
 			default:
 				return $dbBatchJob;
@@ -72,6 +72,20 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 
+	protected function updatedMoveCategoryEntries(BatchJob $dbBatchJob, kMoveCategoryEntriesJobData $data, BatchJob $twinJob = null)
+	{
+		switch($dbBatchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+//				return kFlowHelper::handleMoveCategoryEntriesFinished($dbBatchJob, $data);
+			case BatchJob::BATCHJOB_STATUS_FAILED:
+			case BatchJob::BATCHJOB_STATUS_FATAL:
+//				return kFlowHelper::handleMoveCategoryEntriesFailed($dbBatchJob, $data);
+			default:
+				return $dbBatchJob;
+		}
+	}
+
 	protected function updatedStorageExport(BatchJob $dbBatchJob, kStorageExportJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
@@ -85,7 +99,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return $dbBatchJob;
 		}
 	}
-
+	
 	protected function updatedStorageDelete(BatchJob $dbBatchJob, kStorageDeleteJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
@@ -328,7 +342,11 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				case BatchJobType::STORAGE_EXPORT:
 					$dbBatchJob = $this->updatedStorageExport($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 					break;
-
+					
+				case BatchJobType::MOVE_CATEGORY_ENTRIES:
+					$dbBatchJob = $this->updatedMoveCategoryEntries($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					break;
+					
 				case BatchJobType::STORAGE_DELETE:
 					$dbBatchJob = $this->updatedStorageDelete($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 					break;
