@@ -163,6 +163,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * Category external id, controlled and managed by the partner.
 	 *  
 	 * @var string
+	 * @filter eq
 	 */
 	public $referenceId;
 	
