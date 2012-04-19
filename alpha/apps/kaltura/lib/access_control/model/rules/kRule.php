@@ -126,19 +126,17 @@ class kRule
 		if(!$this->isInContext())
 			return false;
 			
-		if(!is_array($this->conditions) || count($this->conditions) != 1)
+		if(!is_array($this->conditions))
 			return true;
-			
-		$condition = reset($this->conditions);
-		if(!($condition instanceof kSiteCondition))
-			return true;
-			
-		$scope = $this->accessControl->getScope();
-		$ks = $scope->getKs();
-		if ($ks && in_array($ks->partner_id, kConf::get('v3cache_include_referrer_in_key')))
-			return false;
 		
-		return true;
+		foreach ($this->conditions as $condition)
+		{
+			if ($condition->shouldDisableCache($this->accessControl->getScope()))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**

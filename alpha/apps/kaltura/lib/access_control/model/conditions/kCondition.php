@@ -77,4 +77,13 @@ abstract class kCondition
 	{
 		return $this->not ? !$value : $value;
 	}
+
+	/**
+	 * @param kScope $scope
+	 * @return bool
+	 */
+	public function shouldDisableCache($scope)
+	{
+		return true;
+	}
 }

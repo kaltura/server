@@ -41,5 +41,12 @@ class kTimeContextField extends kIntegerField
 	}
 
 	
-	
+	/* (non-PHPdoc)
+	 * @see kIntegerValue::shouldDisableCache()
+	 */
+	public function shouldDisableCache($scope)
+	{
+		// the caching is for a limited time, so we can cache the result even when time fields are used
+		return false;
+	}	
 }

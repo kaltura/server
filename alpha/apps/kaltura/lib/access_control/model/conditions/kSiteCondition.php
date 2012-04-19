@@ -96,4 +96,16 @@ class kSiteCondition extends kMatchCondition
 	{
 		return ($field === $value) || (strpos($field, ".".$value) !== false);
 	}
+
+	/* (non-PHPdoc)
+	 * @see kCondition::shouldDisableCache()
+	 */
+	public function shouldDisableCache($scope)
+	{
+		// no need to disable cache if the referrer is part of the cache key
+		$ks = $scope->getKs();
+		if ($ks && in_array($ks->partner_id, kConf::get('v3cache_include_referrer_in_key')))
+			return false;
+		return true;
+	}
 }

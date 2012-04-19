@@ -34,4 +34,12 @@ abstract class kBooleanField extends kBooleanValue
 	{
 		$this->scope = $scope;
 	}
+
+	/* (non-PHPdoc)
+	 * @see kBooleanField::shouldDisableCache()
+	 */
+	public function shouldDisableCache($scope)
+	{
+		return true;
+	}
 }

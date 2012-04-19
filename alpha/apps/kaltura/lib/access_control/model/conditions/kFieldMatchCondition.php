@@ -43,4 +43,12 @@ class kFieldMatchCondition extends kMatchCondition
 	{
 		$this->field = $field;
 	}
+
+	/* (non-PHPdoc)
+	 * @see kMatchCondition::shouldFieldDisableCache()
+	 */
+	public function shouldFieldDisableCache($scope)
+	{
+		return $this->field->shouldDisableCache($scope);
+	}	
 }

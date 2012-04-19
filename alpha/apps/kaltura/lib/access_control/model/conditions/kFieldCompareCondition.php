@@ -44,4 +44,12 @@ class kFieldCompareCondition extends kCompareCondition
 	{
 		$this->field = $field;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see kCompareCondition::shouldFieldDisableCache()
+	 */
+	public function shouldFieldDisableCache($scope)
+	{
+		return $this->field->shouldDisableCache($scope);
+	}	
 }

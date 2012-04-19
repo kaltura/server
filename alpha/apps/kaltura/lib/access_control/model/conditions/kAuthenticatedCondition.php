@@ -66,4 +66,13 @@ class kAuthenticatedCondition extends kCondition
 		KalturaLog::debug("No privilege verified");
 		return false;
 	}
+
+	/* (non-PHPdoc)
+	 * @see kCondition::shouldDisableCache()
+	 */
+	public function shouldDisableCache($scope)
+	{
+		// the KS type and privileges are part of the cache key
+		return false;
+	}
 }

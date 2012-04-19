@@ -33,7 +33,7 @@ abstract class kMatchCondition extends kCondition
 	}
 	
 	/**
-	 * @param accessControlScope $scope
+	 * @param kScope $scope
 	 * @return array<string>
 	 */
 	function getStringValues($scope)
@@ -135,5 +135,29 @@ abstract class kMatchCondition extends kCondition
 		}
 		
 		return $this->fieldFulfilled($field, $values);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kCondition::shouldDisableCache()
+	 */
+	public function shouldDisableCache($scope)
+	{
+		foreach($values as $value)
+		{
+			if (is_object($value) && $value->shouldDisableCache($scope))
+			{
+				return true;
+			}
+		}
+		return $this->shouldFieldDisableCache($scope);
+	}
+
+	/**
+	 * @param kScope $scope
+	 * @return bool
+	 */
+	public function shouldFieldDisableCache($scope)
+	{
+		return true;
 	}
 }

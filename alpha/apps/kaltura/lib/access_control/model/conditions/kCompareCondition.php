@@ -144,4 +144,22 @@ abstract class kCompareCondition extends kCondition
 		
 		return $this->fieldFulfilled($field, $value);
 	}
+
+	/* (non-PHPdoc)
+	 * @see kCondition::shouldDisableCache()
+	 */
+	public function shouldDisableCache($scope)
+	{
+		return (is_object($this->value) && $this->value->shouldDisableCache($scope)) ||
+			$this->shouldFieldDisableCache($scope);
+	}
+
+	/**
+	 * @param kScope $scope
+	 * @return bool
+	 */
+	public function shouldFieldDisableCache($scope)
+	{
+		return true;
+	}
 }
