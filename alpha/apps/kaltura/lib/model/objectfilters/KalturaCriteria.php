@@ -37,8 +37,7 @@ class KalturaCriteria extends Criteria
 	}
 	
 	/**
-	 * 
-	 * return fetchedIds
+	 * return array fetchedIds
 	 */
 	public function getFetchedIds()
 	{
@@ -50,7 +49,7 @@ class KalturaCriteria extends Criteria
 	 * set fetchedIds
 	 * @param array $fetchedIds
 	 */
-	public function setFetchedIds($fetchedIds)
+	public function setFetchedIds(array $fetchedIds)
 	{
 		$this->fetchedIds = $fetchedIds;
 	}
