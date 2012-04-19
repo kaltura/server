@@ -178,7 +178,7 @@ class KalturaObject
         if (!is_array($propertiesNames))
         {
             $propertyName = $propertiesNames;
-    		if (!property_exists($this, $propertyName) || $this->$propertyName === null)
+    		if (!property_exists($this, $propertyName) || $this->$propertyName === null || $this->$propertyName instanceof KalturaNullField)
     		{
     			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName($propertyName));
     		}
