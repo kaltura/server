@@ -34,9 +34,8 @@ FROM
 			  count_plays_75 > 0 OR
 			  count_plays_100 > 0 )
 	GROUP BY location_id
-#	ORDER BY {SORT_FIELD}
+	LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */;
 
 ) AS ev_stats LEFT OUTER JOIN dwh_dim_locations loc
 	ON ev_stats.location_id = loc.location_id AND loc.location_type_name  in ( 'country' , 'state' )
 ORDER BY {SORT_FIELD}
-LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */;

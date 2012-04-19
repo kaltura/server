@@ -30,6 +30,6 @@ FROM
 		  count_loads > 0 )
 	GROUP BY domain_id
 	ORDER BY {SORT_FIELD}
+	LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
 ) AS ev_stats, dwh_dim_domain dom
 WHERE ev_stats.domain_id = dom.domain_id
-LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
