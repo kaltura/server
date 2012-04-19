@@ -446,7 +446,8 @@ function processMultiRequest($parsedParams)
 	$maxIndex = max(array_keys($paramsByRequest));
 	for ($reqIndex = 1; $reqIndex <= $maxIndex; $reqIndex++)
 	{
-		if (!array_key_exists('service', $paramsByRequest[$reqIndex]) ||
+		if (!array_key_exists($reqIndex, $paramsByRequest) ||
+			!array_key_exists('service', $paramsByRequest[$reqIndex]) ||
 			!array_key_exists('action', $paramsByRequest[$reqIndex]))
 		{
 			return;
