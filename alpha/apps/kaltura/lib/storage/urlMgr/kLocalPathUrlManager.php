@@ -11,7 +11,7 @@ class kLocalPathUrlManager extends kUrlManager
 	 * @param FileSync $fileSync
 	 * @return string
 	 */
-	public function getFileSyncUrl(FileSync $fileSync)
+	protected function doGetFileSyncUrl(FileSync $fileSync)
 	{
 		$fileSync = kFileSyncUtils::resolve($fileSync);
 		
@@ -33,14 +33,14 @@ class kLocalPathUrlManager extends kUrlManager
 	 * @param flavorAsset $flavorAsset
 	 * @return string
 	 */
-	public function getFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
 		if($this->protocol != StorageProfile::PLAY_FORMAT_RTMP)
-			return parent::getFlavorAssetUrl($flavorAsset);
+			return parent::doGetFlavorAssetUrl($flavorAsset);
                 	
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-		$url = $this->getFileSyncUrl($fileSync);
+		$url = $this->doGetFileSyncUrl($fileSync);
 		if ($this->extention && strtolower($this->extention) != 'flv' ||
 			$this->containerFormat && strtolower($this->containerFormat) != 'flash video')
 		{

@@ -63,13 +63,13 @@ class FileSync extends BaseFileSync
 		return (isset($this->statusMap[$this->getStatus()])) ? $this->statusMap[$this->getStatus()] : "Unknown";
 	}
 	
-	public function getExternalUrl($format = StorageProfile::PLAY_FORMAT_HTTP)
+	public function getExternalUrl($entryId, $format = StorageProfile::PLAY_FORMAT_HTTP)
 	{
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
 		if(!$storage || $storage->getProtocol() == StorageProfile::STORAGE_KALTURA_DC)
 			return kDataCenterMgr::getInternalRemoteUrl($this);
 			
-		$urlManager = kUrlManager::getUrlManagerByStorageProfile($this->getDc());
+		$urlManager = kUrlManager::getUrlManagerByStorageProfile($this->getDc(), $entryId);
 		$url = $urlManager->getFileSyncUrl($this);
 		
 		if ($format == StorageProfile::PLAY_FORMAT_RTMP)

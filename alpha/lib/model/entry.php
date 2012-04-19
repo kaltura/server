@@ -1060,7 +1060,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 			
 			if($serveRemote && $fileSync)
-				return $fileSync->getExternalUrl();
+				return $fileSync->getExternalUrl($this->getId());
 		}
 		
 		//$path = $this->getThumbnailPath ( $version );

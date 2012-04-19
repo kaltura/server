@@ -6,10 +6,23 @@
 class kLimeLightUrlManager extends kUrlManager
 {
 	/**
+	 * @return kUrlTokenizer
+	 */
+	public function getTokenizer()
+	{
+		if($this->protocol != StorageProfile::PLAY_FORMAT_RTMP)
+			return new kLimeLightUrlTokenizer(
+				$this->protocol . '://' . $this->domain,
+				$this->params['http_auth_key']);
+				
+		return null;
+	}
+
+	/**
 	 * @param flavorAsset $flavorAsset
 	 * @return string
 	 */
-	public function getFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
 		$entry = $flavorAsset->getentry();
 		$partnerId = $entry->getPartnerId();
@@ -33,11 +46,6 @@ class kLimeLightUrlManager extends kUrlManager
 		if($this->protocol != StorageProfile::PLAY_FORMAT_RTMP)
 		{
 			$url .= '?novar=0';
-			$url .= '&e=' . (time() + 120);
-			
-			$key = $this->params['http_auth_key'];
-			$fullUrl = $this->protocol . '://' . $this->domain . $url;
-			$url .= '&h=' . md5($key . $fullUrl);
 			
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$seekFromBytes = $this->getSeekFromBytes(kFileSyncUtils::getLocalFilePathForKey($syncKey));

@@ -144,7 +144,7 @@ class kMrssManager
 		if(!$storage)
 			return null;
 			
-		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc());
+		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $asset->getEntryId());
 		$urlManager->setFileExtension($asset->getFileExt());
 		$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
 		
@@ -171,7 +171,7 @@ class kMrssManager
 		
 		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
 		
-		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost);
+		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $asset->getEntryId());
 		$urlManager->setDomain($cdnHost);
 		$url = $urlManager->getAssetUrl($asset);
 		$url = $cdnHost . $url;
