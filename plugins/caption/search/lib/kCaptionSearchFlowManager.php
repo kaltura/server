@@ -63,7 +63,7 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 				throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
 			
 	    	$fullPath = myContentStorage::getFSUploadsPath() . '/' . $captionAsset->getId() . '.tmp';
-			if(!kFile::downloadUrlToFile($fileSync->getExternalUrl(), $fullPath))
+			if(!kFile::downloadUrlToFile($fileSync->getExternalUrl($captionAsset->getEntryId()), $fullPath))
 				throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
 			
 			kFileSyncUtils::moveFromFile($fullPath, $syncKey, true, false, true);

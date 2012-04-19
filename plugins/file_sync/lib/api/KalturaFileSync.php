@@ -262,6 +262,28 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 		return array();
 	}
 	
+	public function getEntryId(FileSync $fileSync)
+	{
+		if($fileSync->getObjectType() == FileSyncObjectType::ENTRY)
+			return $fileSync->getObjectId();
+			
+		if($fileSync->getObjectType() == FileSyncObjectType::BATCHJOB)
+		{
+			$job = BatchJobPeer::retrieveByPK($fileSync->getObjectId());
+			if($job)
+				return $job->getEntryId();
+		}
+			
+		if($fileSync->getObjectType() == FileSyncObjectType::FLAVOR_ASSET)
+		{
+			$flavor = assetPeer::retrieveById($fileSync->getObjectId());
+			if($flavor)
+				return $flavor->getEntryId();
+		}
+			
+		return null;
+	}
+	
 	public function toObject($dbFileSync = null, $propsToSkip = array())
 	{
 		if(is_null($dbFileSync))
@@ -274,7 +296,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	{
 		parent::fromObject($source_object);
 		
-		$this->fileUrl = $source_object->getExternalUrl();
+		$this->fileUrl = $source_object->getExternalUrl($this->getEntryId($source_object));
 		$this->readyAt = $source_object->getReadyAt(null);
 		$this->isCurrentDc = ($source_object->getDc() == kDataCenterMgr::getCurrentDcId());
 		

@@ -5,9 +5,9 @@ class kEdgeCastUrlManager extends kUrlManager
 	 * @param flavorAsset $flavorAsset
 	 * @return string
 	 */
-	public function getFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
-		$url = parent::getFlavorAssetUrl($flavorAsset);
+		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url = preg_replace('/^mp4:(\/)*/', 'mp4:', $url);
 		// move version param to "behind" the flavor asset id
 		$flavorAssetId = $flavorAsset->getId();
@@ -31,9 +31,9 @@ class kEdgeCastUrlManager extends kUrlManager
 	 * @param FileSync $fileSync
 	 * @return string
 	 */
-	public function getFileSyncUrl(FileSync $fileSync)
+	protected function doGetFileSyncUrl(FileSync $fileSync)
 	{
-		$url = parent::getFileSyncUrl($fileSync);
+		$url = parent::doGetFileSyncUrl($fileSync);
 		$url = preg_replace('/^mp4:(\/)*/', 'mp4:', $url);
 		if ($this->protocol == StorageProfile::PLAY_FORMAT_HTTP)
 		{

@@ -151,6 +151,6 @@ class ContentDistributionBatchService extends BatchService
 		if(!$fileSync)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $asset->getId());
 			
-		return $fileSync->getExternalUrl();
+		return $fileSync->getExternalUrl($asset->getEntryId());
 	}
 }

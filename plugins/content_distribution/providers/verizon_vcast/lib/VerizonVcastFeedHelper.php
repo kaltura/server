@@ -128,7 +128,7 @@ class VerizonVcastFeedHelper
 	{
 		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
 		
-		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost);
+		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $asset->getEntryId());
 		$urlManager->setDomain($cdnHost);
 		$url = $urlManager->getAssetUrl($asset);
 		$url = $cdnHost . $url;

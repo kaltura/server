@@ -58,13 +58,16 @@ class kMultiCentersSynchronizer implements kObjectAddedEventConsumer
 			KalturaLog::err('Original filesync not found for object_id['.$object->getObjectId().'] version['.$object->getVersion().'] type['.$object->getObjectType().'] subtype['.$object->getObjectSubType().']');
 			return true;
 		}
-		$sourceFileUrl = $original_filesync->getExternalUrl();
+		
+		$entryId = $this->getEntryId($object);
+		
+		$sourceFileUrl = $original_filesync->getExternalUrl($entryId);
 		if (!$sourceFileUrl) {
 			KalturaLog::err('External URL not found for filesync id [' . $object->getId() . ']');
 			return true;
 		}				
 		
-		$job = kMultiCentersManager::addFileSyncImportJob($this->getEntryId($object), $object, $sourceFileUrl, $raisedJob, $original_filesync->getFileSize());
+		$job = kMultiCentersManager::addFileSyncImportJob($entryId, $object, $sourceFileUrl, $raisedJob, $original_filesync->getFileSize());
 		
 		$job->save();
 		
