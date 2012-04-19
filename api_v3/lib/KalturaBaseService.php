@@ -273,7 +273,7 @@ abstract class KalturaBaseService
 	 * @param bool $forceProxy
 	 * @throws KalturaAPIException
 	 */
-	protected function serveFile(ISyncableFile $syncable, $fileSubType, $fileName, $forceProxy = false)
+	protected function serveFile(ISyncableFile $syncable, $fileSubType, $fileName, $entryId = null, $forceProxy = false)
 	{
 		/* @var $fileSync FileSync */
 		$syncKey = $syncable->getSyncKey($fileSubType);
@@ -308,7 +308,7 @@ abstract class KalturaBaseService
 		}
 		else
 		{
-			$remoteUrl =  $fileSync->getExternalUrl();
+			$remoteUrl =  $fileSync->getExternalUrl($entryId);
 			header("Location: $remoteUrl");
 			die;
 		}	

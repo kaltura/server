@@ -82,11 +82,11 @@ abstract class KalturaAssetService extends KalturaBaseService
 		
 		if($serveRemote && $fileSync)
 		{
-			header("Location: " . $fileSync->getExternalUrl());
+			header("Location: " . $fileSync->getExternalUrl($asset->getEntryId()));
 			die;
 		}
 		
-		return $this->serveFile($asset, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileName, $forceProxy);
+		return $this->serveFile($asset, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileName, $asset->getEntryId(), $forceProxy);
 	}
 	
 	/**
