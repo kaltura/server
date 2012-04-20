@@ -22,7 +22,7 @@ class KIndexingEntryEngine extends KIndexingEngine
 	{
 		$filter->orderBy = KalturaBaseEntryOrderBy::CREATED_AT_ASC;
 		
-		$entriesList = $this->client->baseEntry->list($filter, $this->pager);
+		$entriesList = $this->client->baseEntry->listAction($filter, $this->pager);
 		if(!count($entriesList->objects))
 			return 0;
 			

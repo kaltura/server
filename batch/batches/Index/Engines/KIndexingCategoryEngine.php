@@ -22,7 +22,7 @@ class KIndexingCategoryEngine extends KIndexingEngine
 	{
 		$filter->orderBy = KalturaCategoryOrderBy::DEPTH_ASC . ',' . KalturaCategoryOrderBy::CREATED_AT_ASC;
 		
-		$categoriesList = $this->client->category->list($filter, $this->pager);
+		$categoriesList = $this->client->category->listAction($filter, $this->pager);
 		if(!count($categoriesList->objects))
 			return 0;
 			
