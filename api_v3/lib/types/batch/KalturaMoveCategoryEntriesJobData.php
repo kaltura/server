@@ -18,6 +18,27 @@ class KalturaMoveCategoryEntriesJobData extends KalturaJobData
     public $destCategoryId;
     
     /**
+     * Saves the last category id that its entries moved completely
+     * In case of crash the batch will restart from that point
+     * @var int
+     */
+    public $lastMovedCategoryId;
+    
+    /**
+     * Saves the last page index of the child categories filter pager
+     * In case of crash the batch will restart from that point
+     * @var int
+     */
+    public $lastMovedCategoryPageIndex;
+    
+    /**
+     * Saves the last page index of the category entries filter pager
+     * In case of crash the batch will restart from that point
+     * @var int
+     */
+    public $lastMovedCategoryEntryPageIndex;
+    
+    /**
      * All entries from all child categories will be moved as well
      * @var bool
      */
@@ -35,6 +56,9 @@ class KalturaMoveCategoryEntriesJobData extends KalturaJobData
 	(
 	    'srcCategoryId',
 	    'destCategoryId',
+	    'lastMovedCategoryId',
+	    'lastMovedCategoryPageIndex',
+	    'lastMovedCategoryEntryPageIndex',
 	    'moveFromChildren',
 	    'copyOnly',
 	);
