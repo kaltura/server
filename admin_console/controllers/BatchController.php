@@ -81,11 +81,6 @@ class BatchController extends Zend_Controller_Action
 		$this->view->paginator = $paginator;
 	}
 
-	public function entryHistoryAjaxAction()
-	{
-	}
-
-	
 	private function getDefaultFromDate()
 	{
 		return time() - (60 * 60 * 12);
