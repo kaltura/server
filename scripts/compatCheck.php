@@ -574,6 +574,8 @@ class LogProcessorApiV3
 		{
 			if ($buffer[0] == ']')
 			{
+				$this->inParams = false;
+			
 				$parsedParams = print_r_reverse($this->params);
 				if (print_r($parsedParams, true) != $this->params)
 				{
@@ -594,8 +596,6 @@ class LogProcessorApiV3
 				{
 					return true;
 				}
-						
-				$this->inParams = false;
 			}
 			else
 			{
