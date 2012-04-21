@@ -135,31 +135,8 @@ function xmlToArray($xmlstring)
 	return $array;
 }
 
-function normalizeKS($value)
+function normalizeKS($value, $ks)
 {
-	$ksPos1 = strpos($value, '/ks/');
-	$ksPos2 = strpos($value, '&ks=');
-	if ($ksPos1 !== false)
-	{
-		$ksStartPos = $ksPos1;
-		$endDelim = '/';
-	}
-	else if ($ksPos2 !== false)
-	{
-		$ksStartPos = $ksPos2;
-		$endDelim = '&';
-	}
-	else
-		return $value;
-		
-	$ksStartPos += 4;
-	$ksEndPos = strpos($value, $endDelim, $ksStartPos);
-	if ($ksEndPos == false)
-	{
-		$ksEndPos = strlen($value);
-	}
-	
-	$ks = substr($value, $ksStartPos, $ksEndPos - $ksStartPos);
 	$decodedKs = base64_decode($ks);
 	$explodedKs = explode('|', $decodedKs);
 	if (count($explodedKs) < 2)
@@ -175,13 +152,6 @@ function normalizeKS($value)
 
 function compareValues($newValue, $oldValue)
 {
-	global $serviceUrlNew, $serviceUrlOld;
-	
-	$newValue = str_replace($serviceUrlNew, $serviceUrlOld, $newValue);
-	
-	$newValue = normalizeKS($newValue);
-	$oldValue = normalizeKS($oldValue);
-	
 	return $newValue == $oldValue;
 }	
 	
@@ -219,6 +189,8 @@ function compareArrays($resultNew, $resultOld, $path)
 
 function normalizeResultBuffer($result)
 {
+	global $serviceUrlNew, $serviceUrlOld;
+	
 	$result = preg_replace('/<executionTime>[0-9\.]+<\/executionTime>/', '', $result);
 	$result = preg_replace('/<serverTime>[0-9\.]+<\/serverTime>/', '', $result);
 	$result = preg_replace('/<execute_impl_time>[0-9\.]+<\/execute_impl_time>/', '', $result);
@@ -226,6 +198,17 @@ function normalizeResultBuffer($result)
 	$result = preg_replace('/<total_time>[0-9\.]+<\/total_time>/', '', $result);
 	$result = preg_replace('/<server_time>[0-9\.]+<\/server_time>/', '', $result);
 	$result = preg_replace('/kaltura_player_\d+/', 'KP', $result);
+	$result = str_replace($serviceUrlNew, $serviceUrlOld, $result);
+	
+	$patterns = array('/\/ks\/([a-zA-Z0-9+]+=*)/', '/&ks=([a-zA-Z0-9+\/]+=*)/', '/\?ks=([a-zA-Z0-9+\/]+=*)/');
+	foreach ($patterns as $pattern)
+	{
+		preg_match_all($pattern, $result, $matches);
+		foreach ($matches[1] as $match)
+		{
+			$result = normalizeKS($result, $match);
+		}
+	}
 	return $result;
 }
 
