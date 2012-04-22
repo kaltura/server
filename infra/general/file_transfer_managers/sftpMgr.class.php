@@ -306,7 +306,12 @@ class sftpMgr extends kFileTransferMgr
 	// execute the given command on the server
 	private function execCommand($command_str)
 	{
+		KalturaLog::debug($command_str);
+		
 		$stream = ssh2_exec($this->getSsh2Connection(), $command_str);
+		if(!$stream || !is_resource($stream))
+			return null;
+		
   		stream_set_blocking($stream, true);
    		$output = stream_get_contents($stream);
    		fclose($stream);
