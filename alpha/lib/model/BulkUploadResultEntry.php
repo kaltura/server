@@ -20,6 +20,73 @@ class BulkUploadResultEntry extends BulkUploadResult
     const THUMBNAIL_SAVED = "thumbnail_saved";
     const ENTRY_STATUS = "entry_status";
     
+	
+	public function updateStatusFromObject()
+	{
+		$entry = entryPeer::retrieveByPKNoFilter($this->getObjectId());
+		if(!$entry)
+			return;
+			
+		$this->setEntryStatus($entry->getStatus());
+		$this->save();
+		
+    	$closedStatuses = array (
+    	    entryStatus::ERROR_IMPORTING,
+			entryStatus::ERROR_CONVERTING,
+			entryStatus::READY,
+			entryStatus::DELETED,
+			entryStatus::PENDING,
+			entryStatus::NO_CONTENT,
+    	);
+
+		if(in_array($this->getObjectStatus(), $closedStatuses))
+		{
+		    $this->setStatus(BulkUploadResultStatus::OK);
+			$this->updateEntryThumbnail();
+			continue;
+		}
+			
+		return $this->getStatus();
+	}
+	
+    protected function updateEntryThumbnail(BulkUploadResult $bulkUploadResult)
+	{
+		if(		$this->getEntryStatus() != entryStatus::READY 
+			||	!strlen($this->getThumbnailUrl()) 
+			||	$this->getThumbnailSaved()
+		)
+			return;
+			
+		try 
+		{
+		    $entry = entryPeer::retrieveByPKNoFilter($this->getObjectId());
+			myEntryUtils::updateThumbnailFromFile($entry, $this->getThumbnailUrl());
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			return;
+		}
+		
+		$bulkUploadResult->setThumbnailSaved(true);
+		$bulkUploadResult->save();
+	}
+	
+	public function getEntryId()
+	{
+		if($this->getObjectType() == BulkUploadResultObjectType::ENTRY)
+			return $this->getObjectId();
+			
+		return null;
+	}
+
+	
+	public function setEntryId($v)
+	{
+		$this->setObjectType(BulkUploadResultObjectType::ENTRY);
+		return $this->setObjectId($v);
+	}
+    
     public function getSshPrivateKey()		{return $this->getFromCustomData(self::CUSTOM_DATA_SSH_PRIVATE_KEY);}
 	public function setSshPrivateKey($v)	{$this->putInCustomData(self::CUSTOM_DATA_SSH_PRIVATE_KEY, $v);}
 	
@@ -65,4 +132,16 @@ class BulkUploadResultEntry extends BulkUploadResult
 	
 	public function getThumbnailSaved()	{return $this->getFromCustomData(self::THUMBNAIL_SAVED);}
 	public function setThumbnailSaved($v)	{$this->putInCustomData(self::THUMBNAIL_SAVED, $v);}
+	
+    public function getEntryStatus()	
+    {
+        return $this->getObjectStatus();
+    }
+    
+	public function setEntryStatus($v)	
+	{
+	    $this->setObjectStatus($v);
+	}
+	
+	
 }

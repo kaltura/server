@@ -4,6 +4,8 @@ class BulkUploadResultCategory extends BulkUploadResult
     //Category property names
     const RELATIVE_PATH = "relative_path";
     const NAME = "name";
+    const TAGS = "tags";
+    const DESCRIPTION = "description";
     const REFERENCE_ID = "reference_id";
     const APPEAR_IN_LIST = "appear_in_list";
     const PRIVACY = "privacy";
@@ -12,6 +14,16 @@ class BulkUploadResultCategory extends BulkUploadResult
     const DEFAULT_PERMISSION_LEVEL = "default_permission_level";
     const OWNER = "owner";
     const CONTRIBUTION_POLICY = "contribution_policy";
+    
+    public function updateStatusFromObject()
+    {
+        if ($this->getObjectStatus() == CategoryStatus::ACTIVE)
+        {
+            $this->setStatus(BulkUploadResultStatus::OK);
+        }
+        
+        return $this->getStatus();
+    }
     
     //Set properties for categories
 	
