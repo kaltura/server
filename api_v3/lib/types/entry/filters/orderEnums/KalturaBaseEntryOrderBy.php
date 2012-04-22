@@ -23,4 +23,8 @@ class KalturaBaseEntryOrderBy extends KalturaStringEnum
 	const END_DATE_DESC = "-endDate";
 	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";
 	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
+	const RECENT_ASC = "+recent";
+	const RECENT_DESC = "-recent";
+	const WEIGHT_ASC = "+weight";
+	const WEIGHT_DESC = "-weight";
 }

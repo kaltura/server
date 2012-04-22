@@ -174,6 +174,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		$this->appendLine("	(");
 		foreach($type->getCurrentProperties() as $prop)
 		{
+			/* @var $prop KalturaPropertyInfo */
 			$filters = $prop->getFilters();
 			foreach($filters as $filter)
 			{
@@ -194,7 +195,8 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 				{
 					$propertyName = $filterFields["order"];
 					$orderFieldName = $this->formatOrderPropertyValue($propertyName);
-					$this->appendLine("		\"".$propertyName."\" => \"$orderFieldName\",");
+					$this->appendLine("		\"".$propertyName."\" => \"+$orderFieldName\",");
+					$this->appendLine("		\"".$propertyName."\" => \"-$orderFieldName\",");
 				}
 			}
 		}
@@ -311,6 +313,26 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 				}
 			}
 		}
+		
+		$reflectionClass = new ReflectionClass($type->getType());
+		if ($reflectionClass->getMethod("getExtraFilters")->getDeclaringClass()->getName() === $reflectionClass->getName()) 
+		{
+			$extraFilters = $type->getInstance()->getExtraFilters();
+			if ($extraFilters)
+			{
+				foreach($extraFilters as $filterFields)
+				{
+					if (!isset($filterFields["order"]))
+						continue;
+						
+					$fieldName = $filterFields["order"];
+					$fieldConst = $this->getOrderByConst($fieldName);
+					$this->appendLine("	const {$fieldConst}_ASC = \"+$fieldName\";");
+					$this->appendLine("	const {$fieldConst}_DESC = \"-$fieldName\";");
+				}
+			}
+		}
+		
 		$this->appendLine("}");
 		
 		$this->writeToFile($enumPath, $this->_txt);

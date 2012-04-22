@@ -75,6 +75,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		entryPeer::TOTAL_RANK => 'total_rank',
 		entryPeer::PLAYS => 'plays',
 		'entry.PARTNER_SORT_VALUE' => 'partner_sort_value',
+		'entry.WEIGHT' => '@weight',
 		
 		entryPeer::CREATED_AT => 'created_at',
 		entryPeer::UPDATED_AT => 'updated_at',
@@ -257,11 +258,16 @@ class SphinxEntryCriteria extends SphinxCriteria
 //		if ($filter->get("_matchor_duration_type") !== null)
 //			$filter->set("_matchor_duration_type", $filter->durationTypesToIndexedStrings($filter->get("_matchor_duration_type")));
 			
-		if($filter->get(baseObjectFilter::ORDER) === "recent")
+		if($filter->get(baseObjectFilter::ORDER) === "recent" || $filter->get(baseObjectFilter::ORDER) === "-recent")
 		{
 			$filter->set("_lte_available_from", time());
 			//$filter->set("_gteornull_end_date", time()); // schedule not finished
 			$filter->set(baseObjectFilter::ORDER, "-available_from");
+		}
+			
+		if($filter->get(baseObjectFilter::ORDER) === "+recent")
+		{
+			$filter->set(baseObjectFilter::ORDER, "+available_from");
 		}
 		
 		if($filter->get('_free_text'))

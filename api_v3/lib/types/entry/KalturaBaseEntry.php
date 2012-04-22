@@ -572,6 +572,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			array("filter" => "mlikeand", "fields" => array("tags", "adminTags")),
 			array("filter" => "mlikeand", "fields" => array("tags", "adminTags", "name")),
 			array("order" => "recent"),
+			array("order" => "weight"),
 		);
 	}
 	
