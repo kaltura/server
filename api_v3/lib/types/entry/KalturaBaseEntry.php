@@ -466,14 +466,14 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		$this->validateObjectsExist();
 	
-		if($this->referenceId)
-		{
-			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-			$c->add('entry.REFERENCE_ID', $this->referenceId);
-			$c->applyFilters();
-			if(count($c->getFetchedIds()))
-				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
-		}
+//		if($this->referenceId)
+//		{
+//			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+//			$c->add('entry.REFERENCE_ID', $this->referenceId);
+//			$c->applyFilters();
+//			if(count($c->getFetchedIds()))
+//				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
+//		}
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -541,15 +541,15 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		$this->validateCategories();
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		
-		if($this->referenceId)
-		{
-			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-			$c->add('entry.ID', $sourceObject->getId(), Criteria::NOT_EQUAL);
-			$c->add('entry.REFERENCE_ID', $this->referenceId);
-			$c->applyFilters();
-			if(count($c->getFetchedIds()))
-				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
-		}
+//		if($this->referenceId)
+//		{
+//			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+//			$c->add('entry.ID', $sourceObject->getId(), Criteria::NOT_EQUAL);
+//			$c->add('entry.REFERENCE_ID', $this->referenceId);
+//			$c->applyFilters();
+//			if(count($c->getFetchedIds()))
+//				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
+//		}
 		
 		if(!is_null($this->conversionProfileId) && $sourceObject->getStatus() != entryStatus::NO_CONTENT)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $sourceObject->getStatus());

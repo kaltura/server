@@ -338,14 +338,14 @@ class KalturaCategory extends KalturaObject implements IFilterable
 				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->owner);
 		}
 	
-		if($this->referenceId)
-		{
-			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-			$c->add('category.REFERENCE_ID', $this->referenceId);
-			$c->applyFilters();
-			if(count($c->getFetchedIds()))
-				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
-		}
+//		if($this->referenceId)
+//		{
+//			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+//			$c->add('category.REFERENCE_ID', $this->referenceId);
+//			$c->applyFilters();
+//			if(count($c->getFetchedIds()))
+//				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
+//		}
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -369,15 +369,15 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			}
 		}
 	
-		if($this->referenceId)
-		{
-			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-			$c->add('category.ID', $sourceObject->getId(), Criteria::NOT_EQUAL);
-			$c->add('category.REFERENCE_ID', $this->referenceId);
-			$c->applyFilters();
-			if(count($c->getFetchedIds()))
-				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
-		}
+//		if($this->referenceId)
+//		{
+//			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+//			$c->add('category.ID', $sourceObject->getId(), Criteria::NOT_EQUAL);
+//			$c->add('category.REFERENCE_ID', $this->referenceId);
+//			$c->applyFilters();
+//			if(count($c->getFetchedIds()))
+//				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
+//		}
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
