@@ -53,7 +53,8 @@ class ScriptsRunner {
 		
 		foreach ($dsnArray as $param) {
 			$items = explode("=",$param);
-			$this->dbParams[$items[0]] = $items[1];
+			if(count($items) == 2)
+				$this->dbParams[$items[0]] = $items[1];
 		} 
 		foreach ($this->dbParams as $key=>$value) {			
 			echo $key."=>".$value."\n";
