@@ -56,6 +56,12 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	protected $partner_id;
 
 	/**
+	 * The value for the status field.
+	 * @var        int
+	 */
+	protected $status;
+
+	/**
 	 * The value for the object_id field.
 	 * @var        string
 	 */
@@ -63,6 +69,7 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the object_type field.
+	 * Note: this column has a database default value of: 1
 	 * @var        int
 	 */
 	protected $object_type;
@@ -74,10 +81,10 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	protected $action;
 
 	/**
-	 * The value for the entry_status field.
+	 * The value for the object_status field.
 	 * @var        int
 	 */
-	protected $entry_status;
+	protected $object_status;
 
 	/**
 	 * The value for the row_data field.
@@ -86,82 +93,28 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	protected $row_data;
 
 	/**
-	 * The value for the title field.
-	 * @var        string
-	 */
-	protected $title;
-
-	/**
-	 * The value for the description field.
-	 * @var        string
-	 */
-	protected $description;
-
-	/**
-	 * The value for the tags field.
-	 * @var        string
-	 */
-	protected $tags;
-
-	/**
-	 * The value for the url field.
-	 * @var        string
-	 */
-	protected $url;
-
-	/**
-	 * The value for the content_type field.
-	 * @var        string
-	 */
-	protected $content_type;
-
-	/**
-	 * The value for the conversion_profile_id field.
-	 * @var        int
-	 */
-	protected $conversion_profile_id;
-
-	/**
-	 * The value for the access_control_profile_id field.
-	 * @var        int
-	 */
-	protected $access_control_profile_id;
-
-	/**
-	 * The value for the category field.
-	 * @var        string
-	 */
-	protected $category;
-
-	/**
-	 * The value for the schedule_start_date field.
-	 * @var        string
-	 */
-	protected $schedule_start_date;
-
-	/**
-	 * The value for the schedule_end_date field.
-	 * @var        string
-	 */
-	protected $schedule_end_date;
-
-	/**
-	 * The value for the thumbnail_url field.
-	 * @var        string
-	 */
-	protected $thumbnail_url;
-
-	/**
-	 * The value for the thumbnail_saved field.
-	 * @var        boolean
-	 */
-	protected $thumbnail_saved;
-
-	/**
 	 * The value for the partner_data field.
 	 * @var        string
 	 */
 	protected $partner_data;
+
+	/**
+	 * The value for the object_error_description field.
+	 * @var        string
+	 */
+	protected $object_error_description;
+
+	/**
+	 * The value for the error_code field.
+	 * @var        int
+	 */
+	protected $error_code;
+
+	/**
+	 * The value for the error_type field.
+	 * @var        int
+	 */
+	protected $error_type;
 
 	/**
 	 * The value for the error_description field.
@@ -224,6 +177,27 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 			return $this->oldColumnsValues[$name];
 			
 		return null;
+	}
+
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or
+	 * equivalent initialization method).
+	 * @see        __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		$this->object_type = 1;
+	}
+
+	/**
+	 * Initializes internal state of BaseBulkUploadResult object.
+	 * @see        applyDefaults()
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->applyDefaultValues();
 	}
 
 	/**
@@ -347,6 +321,16 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Get the [status] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getStatus()
+	{
+		return $this->status;
+	}
+
+	/**
 	 * Get the [object_id] column value.
 	 * 
 	 * @return     string
@@ -377,13 +361,13 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [entry_status] column value.
+	 * Get the [object_status] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getEntryStatus()
+	public function getObjectStatus()
 	{
-		return $this->entry_status;
+		return $this->object_status;
 	}
 
 	/**
@@ -397,186 +381,6 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [title] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getTitle()
-	{
-		return $this->title;
-	}
-
-	/**
-	 * Get the [description] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getDescription()
-	{
-		return $this->description;
-	}
-
-	/**
-	 * Get the [tags] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getTags()
-	{
-		return $this->tags;
-	}
-
-	/**
-	 * Get the [url] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getUrl()
-	{
-		return $this->url;
-	}
-
-	/**
-	 * Get the [content_type] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getContentType()
-	{
-		return $this->content_type;
-	}
-
-	/**
-	 * Get the [conversion_profile_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getConversionProfileId()
-	{
-		return $this->conversion_profile_id;
-	}
-
-	/**
-	 * Get the [access_control_profile_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getAccessControlProfileId()
-	{
-		return $this->access_control_profile_id;
-	}
-
-	/**
-	 * Get the [category] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getCategory()
-	{
-		return $this->category;
-	}
-
-	/**
-	 * Get the [optionally formatted] temporal [schedule_start_date] column value.
-	 * 
-	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
-	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
-	 *
-	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
-	 *							If format is NULL, then the raw unix timestamp integer will be returned.
-	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-	 * @throws     PropelException - if unable to parse/validate the date/time value.
-	 */
-	public function getScheduleStartDate($format = 'Y-m-d H:i:s')
-	{
-		if ($this->schedule_start_date === null) {
-			return null;
-		}
-
-
-		if ($this->schedule_start_date === '0000-00-00 00:00:00') {
-			// while technically this is not a default value of NULL,
-			// this seems to be closest in meaning.
-			return null;
-		} else {
-			try {
-				$dt = new DateTime($this->schedule_start_date);
-			} catch (Exception $x) {
-				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->schedule_start_date, true), $x);
-			}
-		}
-
-		if ($format === null) {
-			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
-			return (int) $dt->format('U');
-		} elseif (strpos($format, '%') !== false) {
-			return strftime($format, $dt->format('U'));
-		} else {
-			return $dt->format($format);
-		}
-	}
-
-	/**
-	 * Get the [optionally formatted] temporal [schedule_end_date] column value.
-	 * 
-	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
-	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
-	 *
-	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
-	 *							If format is NULL, then the raw unix timestamp integer will be returned.
-	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-	 * @throws     PropelException - if unable to parse/validate the date/time value.
-	 */
-	public function getScheduleEndDate($format = 'Y-m-d H:i:s')
-	{
-		if ($this->schedule_end_date === null) {
-			return null;
-		}
-
-
-		if ($this->schedule_end_date === '0000-00-00 00:00:00') {
-			// while technically this is not a default value of NULL,
-			// this seems to be closest in meaning.
-			return null;
-		} else {
-			try {
-				$dt = new DateTime($this->schedule_end_date);
-			} catch (Exception $x) {
-				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->schedule_end_date, true), $x);
-			}
-		}
-
-		if ($format === null) {
-			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
-			return (int) $dt->format('U');
-		} elseif (strpos($format, '%') !== false) {
-			return strftime($format, $dt->format('U'));
-		} else {
-			return $dt->format($format);
-		}
-	}
-
-	/**
-	 * Get the [thumbnail_url] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getThumbnailUrl()
-	{
-		return $this->thumbnail_url;
-	}
-
-	/**
-	 * Get the [thumbnail_saved] column value.
-	 * 
-	 * @return     boolean
-	 */
-	public function getThumbnailSaved()
-	{
-		return $this->thumbnail_saved;
-	}
-
-	/**
 	 * Get the [partner_data] column value.
 	 * 
 	 * @return     string
@@ -584,6 +388,36 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	public function getPartnerData()
 	{
 		return $this->partner_data;
+	}
+
+	/**
+	 * Get the [object_error_description] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getObjectErrorDescription()
+	{
+		return $this->object_error_description;
+	}
+
+	/**
+	 * Get the [error_code] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getErrorCode()
+	{
+		return $this->error_code;
+	}
+
+	/**
+	 * Get the [error_type] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getErrorType()
+	{
+		return $this->error_type;
 	}
 
 	/**
@@ -807,6 +641,29 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	} // setPartnerId()
 
 	/**
+	 * Set the value of [status] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     BulkUploadResult The current object (for fluent API support)
+	 */
+	public function setStatus($v)
+	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::STATUS]))
+			$this->oldColumnsValues[BulkUploadResultPeer::STATUS] = $this->status;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->status !== $v) {
+			$this->status = $v;
+			$this->modifiedColumns[] = BulkUploadResultPeer::STATUS;
+		}
+
+		return $this;
+	} // setStatus()
+
+	/**
 	 * Set the value of [object_id] column.
 	 * 
 	 * @param      string $v new value
@@ -844,7 +701,7 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 			$v = (int) $v;
 		}
 
-		if ($this->object_type !== $v) {
+		if ($this->object_type !== $v || $this->isNew()) {
 			$this->object_type = $v;
 			$this->modifiedColumns[] = BulkUploadResultPeer::OBJECT_TYPE;
 		}
@@ -876,27 +733,27 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	} // setAction()
 
 	/**
-	 * Set the value of [entry_status] column.
+	 * Set the value of [object_status] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     BulkUploadResult The current object (for fluent API support)
 	 */
-	public function setEntryStatus($v)
+	public function setObjectStatus($v)
 	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::ENTRY_STATUS]))
-			$this->oldColumnsValues[BulkUploadResultPeer::ENTRY_STATUS] = $this->entry_status;
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::OBJECT_STATUS]))
+			$this->oldColumnsValues[BulkUploadResultPeer::OBJECT_STATUS] = $this->object_status;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->entry_status !== $v) {
-			$this->entry_status = $v;
-			$this->modifiedColumns[] = BulkUploadResultPeer::ENTRY_STATUS;
+		if ($this->object_status !== $v) {
+			$this->object_status = $v;
+			$this->modifiedColumns[] = BulkUploadResultPeer::OBJECT_STATUS;
 		}
 
 		return $this;
-	} // setEntryStatus()
+	} // setObjectStatus()
 
 	/**
 	 * Set the value of [row_data] column.
@@ -922,340 +779,6 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	} // setRowData()
 
 	/**
-	 * Set the value of [title] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     BulkUploadResult The current object (for fluent API support)
-	 */
-	public function setTitle($v)
-	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::TITLE]))
-			$this->oldColumnsValues[BulkUploadResultPeer::TITLE] = $this->title;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->title !== $v) {
-			$this->title = $v;
-			$this->modifiedColumns[] = BulkUploadResultPeer::TITLE;
-		}
-
-		return $this;
-	} // setTitle()
-
-	/**
-	 * Set the value of [description] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     BulkUploadResult The current object (for fluent API support)
-	 */
-	public function setDescription($v)
-	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::DESCRIPTION]))
-			$this->oldColumnsValues[BulkUploadResultPeer::DESCRIPTION] = $this->description;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->description !== $v) {
-			$this->description = $v;
-			$this->modifiedColumns[] = BulkUploadResultPeer::DESCRIPTION;
-		}
-
-		return $this;
-	} // setDescription()
-
-	/**
-	 * Set the value of [tags] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     BulkUploadResult The current object (for fluent API support)
-	 */
-	public function setTags($v)
-	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::TAGS]))
-			$this->oldColumnsValues[BulkUploadResultPeer::TAGS] = $this->tags;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->tags !== $v) {
-			$this->tags = $v;
-			$this->modifiedColumns[] = BulkUploadResultPeer::TAGS;
-		}
-
-		return $this;
-	} // setTags()
-
-	/**
-	 * Set the value of [url] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     BulkUploadResult The current object (for fluent API support)
-	 */
-	public function setUrl($v)
-	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::URL]))
-			$this->oldColumnsValues[BulkUploadResultPeer::URL] = $this->url;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->url !== $v) {
-			$this->url = $v;
-			$this->modifiedColumns[] = BulkUploadResultPeer::URL;
-		}
-
-		return $this;
-	} // setUrl()
-
-	/**
-	 * Set the value of [content_type] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     BulkUploadResult The current object (for fluent API support)
-	 */
-	public function setContentType($v)
-	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::CONTENT_TYPE]))
-			$this->oldColumnsValues[BulkUploadResultPeer::CONTENT_TYPE] = $this->content_type;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->content_type !== $v) {
-			$this->content_type = $v;
-			$this->modifiedColumns[] = BulkUploadResultPeer::CONTENT_TYPE;
-		}
-
-		return $this;
-	} // setContentType()
-
-	/**
-	 * Set the value of [conversion_profile_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BulkUploadResult The current object (for fluent API support)
-	 */
-	public function setConversionProfileId($v)
-	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::CONVERSION_PROFILE_ID]))
-			$this->oldColumnsValues[BulkUploadResultPeer::CONVERSION_PROFILE_ID] = $this->conversion_profile_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->conversion_profile_id !== $v) {
-			$this->conversion_profile_id = $v;
-			$this->modifiedColumns[] = BulkUploadResultPeer::CONVERSION_PROFILE_ID;
-		}
-
-		return $this;
-	} // setConversionProfileId()
-
-	/**
-	 * Set the value of [access_control_profile_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BulkUploadResult The current object (for fluent API support)
-	 */
-	public function setAccessControlProfileId($v)
-	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::ACCESS_CONTROL_PROFILE_ID]))
-			$this->oldColumnsValues[BulkUploadResultPeer::ACCESS_CONTROL_PROFILE_ID] = $this->access_control_profile_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->access_control_profile_id !== $v) {
-			$this->access_control_profile_id = $v;
-			$this->modifiedColumns[] = BulkUploadResultPeer::ACCESS_CONTROL_PROFILE_ID;
-		}
-
-		return $this;
-	} // setAccessControlProfileId()
-
-	/**
-	 * Set the value of [category] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     BulkUploadResult The current object (for fluent API support)
-	 */
-	public function setCategory($v)
-	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::CATEGORY]))
-			$this->oldColumnsValues[BulkUploadResultPeer::CATEGORY] = $this->category;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->category !== $v) {
-			$this->category = $v;
-			$this->modifiedColumns[] = BulkUploadResultPeer::CATEGORY;
-		}
-
-		return $this;
-	} // setCategory()
-
-	/**
-	 * Sets the value of [schedule_start_date] column to a normalized version of the date/time value specified.
-	 * 
-	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
-	 * @return     BulkUploadResult The current object (for fluent API support)
-	 */
-	public function setScheduleStartDate($v)
-	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::SCHEDULE_START_DATE]))
-			$this->oldColumnsValues[BulkUploadResultPeer::SCHEDULE_START_DATE] = $this->schedule_start_date;
-
-		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
-		// -- which is unexpected, to say the least.
-		if ($v === null || $v === '') {
-			$dt = null;
-		} elseif ($v instanceof DateTime) {
-			$dt = $v;
-		} else {
-			// some string/numeric value passed; we normalize that so that we can
-			// validate it.
-			try {
-				if (is_numeric($v)) { // if it's a unix timestamp
-					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
-					// We have to explicitly specify and then change the time zone because of a
-					// DateTime bug: http://bugs.php.net/bug.php?id=43003
-					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
-				} else {
-					$dt = new DateTime($v);
-				}
-			} catch (Exception $x) {
-				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
-			}
-		}
-
-		if ( $this->schedule_start_date !== null || $dt !== null ) {
-			// (nested ifs are a little easier to read in this case)
-
-			$currNorm = ($this->schedule_start_date !== null && $tmpDt = new DateTime($this->schedule_start_date)) ? $tmpDt->format('Y-m-d H:i:s') : null;
-			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
-
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
-			{
-				$this->schedule_start_date = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = BulkUploadResultPeer::SCHEDULE_START_DATE;
-			}
-		} // if either are not null
-
-		return $this;
-	} // setScheduleStartDate()
-
-	/**
-	 * Sets the value of [schedule_end_date] column to a normalized version of the date/time value specified.
-	 * 
-	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
-	 * @return     BulkUploadResult The current object (for fluent API support)
-	 */
-	public function setScheduleEndDate($v)
-	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::SCHEDULE_END_DATE]))
-			$this->oldColumnsValues[BulkUploadResultPeer::SCHEDULE_END_DATE] = $this->schedule_end_date;
-
-		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
-		// -- which is unexpected, to say the least.
-		if ($v === null || $v === '') {
-			$dt = null;
-		} elseif ($v instanceof DateTime) {
-			$dt = $v;
-		} else {
-			// some string/numeric value passed; we normalize that so that we can
-			// validate it.
-			try {
-				if (is_numeric($v)) { // if it's a unix timestamp
-					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
-					// We have to explicitly specify and then change the time zone because of a
-					// DateTime bug: http://bugs.php.net/bug.php?id=43003
-					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
-				} else {
-					$dt = new DateTime($v);
-				}
-			} catch (Exception $x) {
-				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
-			}
-		}
-
-		if ( $this->schedule_end_date !== null || $dt !== null ) {
-			// (nested ifs are a little easier to read in this case)
-
-			$currNorm = ($this->schedule_end_date !== null && $tmpDt = new DateTime($this->schedule_end_date)) ? $tmpDt->format('Y-m-d H:i:s') : null;
-			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
-
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
-			{
-				$this->schedule_end_date = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = BulkUploadResultPeer::SCHEDULE_END_DATE;
-			}
-		} // if either are not null
-
-		return $this;
-	} // setScheduleEndDate()
-
-	/**
-	 * Set the value of [thumbnail_url] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     BulkUploadResult The current object (for fluent API support)
-	 */
-	public function setThumbnailUrl($v)
-	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::THUMBNAIL_URL]))
-			$this->oldColumnsValues[BulkUploadResultPeer::THUMBNAIL_URL] = $this->thumbnail_url;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->thumbnail_url !== $v) {
-			$this->thumbnail_url = $v;
-			$this->modifiedColumns[] = BulkUploadResultPeer::THUMBNAIL_URL;
-		}
-
-		return $this;
-	} // setThumbnailUrl()
-
-	/**
-	 * Set the value of [thumbnail_saved] column.
-	 * 
-	 * @param      boolean $v new value
-	 * @return     BulkUploadResult The current object (for fluent API support)
-	 */
-	public function setThumbnailSaved($v)
-	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::THUMBNAIL_SAVED]))
-			$this->oldColumnsValues[BulkUploadResultPeer::THUMBNAIL_SAVED] = $this->thumbnail_saved;
-
-		if ($v !== null) {
-			$v = (boolean) $v;
-		}
-
-		if ($this->thumbnail_saved !== $v) {
-			$this->thumbnail_saved = $v;
-			$this->modifiedColumns[] = BulkUploadResultPeer::THUMBNAIL_SAVED;
-		}
-
-		return $this;
-	} // setThumbnailSaved()
-
-	/**
 	 * Set the value of [partner_data] column.
 	 * 
 	 * @param      string $v new value
@@ -1277,6 +800,75 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setPartnerData()
+
+	/**
+	 * Set the value of [object_error_description] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     BulkUploadResult The current object (for fluent API support)
+	 */
+	public function setObjectErrorDescription($v)
+	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::OBJECT_ERROR_DESCRIPTION]))
+			$this->oldColumnsValues[BulkUploadResultPeer::OBJECT_ERROR_DESCRIPTION] = $this->object_error_description;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->object_error_description !== $v) {
+			$this->object_error_description = $v;
+			$this->modifiedColumns[] = BulkUploadResultPeer::OBJECT_ERROR_DESCRIPTION;
+		}
+
+		return $this;
+	} // setObjectErrorDescription()
+
+	/**
+	 * Set the value of [error_code] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     BulkUploadResult The current object (for fluent API support)
+	 */
+	public function setErrorCode($v)
+	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::ERROR_CODE]))
+			$this->oldColumnsValues[BulkUploadResultPeer::ERROR_CODE] = $this->error_code;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->error_code !== $v) {
+			$this->error_code = $v;
+			$this->modifiedColumns[] = BulkUploadResultPeer::ERROR_CODE;
+		}
+
+		return $this;
+	} // setErrorCode()
+
+	/**
+	 * Set the value of [error_type] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     BulkUploadResult The current object (for fluent API support)
+	 */
+	public function setErrorType($v)
+	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::ERROR_TYPE]))
+			$this->oldColumnsValues[BulkUploadResultPeer::ERROR_TYPE] = $this->error_type;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->error_type !== $v) {
+			$this->error_type = $v;
+			$this->modifiedColumns[] = BulkUploadResultPeer::ERROR_TYPE;
+		}
+
+		return $this;
+	} // setErrorType()
 
 	/**
 	 * Set the value of [error_description] column.
@@ -1354,6 +946,10 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
+			if ($this->object_type !== 1) {
+				return false;
+			}
+
 		// otherwise, everything was equal, so return TRUE
 		return true;
 	} // hasOnlyDefaultValues()
@@ -1382,27 +978,19 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 			$this->bulk_upload_job_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
 			$this->line_index = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->partner_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->object_id = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->object_type = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->action = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->entry_status = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-			$this->row_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->title = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->description = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->tags = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->url = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->content_type = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-			$this->conversion_profile_id = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
-			$this->access_control_profile_id = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
-			$this->category = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
-			$this->schedule_start_date = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
-			$this->schedule_end_date = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
-			$this->thumbnail_url = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
-			$this->thumbnail_saved = ($row[$startcol + 22] !== null) ? (boolean) $row[$startcol + 22] : null;
-			$this->partner_data = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
-			$this->error_description = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
-			$this->plugins_data = ($row[$startcol + 25] !== null) ? (string) $row[$startcol + 25] : null;
-			$this->custom_data = ($row[$startcol + 26] !== null) ? (string) $row[$startcol + 26] : null;
+			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+			$this->object_id = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->object_type = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->action = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->object_status = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->row_data = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->partner_data = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->object_error_description = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->error_code = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->error_type = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
+			$this->error_description = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->plugins_data = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->custom_data = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1412,7 +1000,7 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 27; // 27 = BulkUploadResultPeer::NUM_COLUMNS - BulkUploadResultPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 19; // 19 = BulkUploadResultPeer::NUM_COLUMNS - BulkUploadResultPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating BulkUploadResult object", $e);
@@ -1882,66 +1470,42 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 				return $this->getPartnerId();
 				break;
 			case 6:
-				return $this->getObjectId();
+				return $this->getStatus();
 				break;
 			case 7:
-				return $this->getObjectType();
+				return $this->getObjectId();
 				break;
 			case 8:
-				return $this->getAction();
+				return $this->getObjectType();
 				break;
 			case 9:
-				return $this->getEntryStatus();
+				return $this->getAction();
 				break;
 			case 10:
-				return $this->getRowData();
+				return $this->getObjectStatus();
 				break;
 			case 11:
-				return $this->getTitle();
+				return $this->getRowData();
 				break;
 			case 12:
-				return $this->getDescription();
-				break;
-			case 13:
-				return $this->getTags();
-				break;
-			case 14:
-				return $this->getUrl();
-				break;
-			case 15:
-				return $this->getContentType();
-				break;
-			case 16:
-				return $this->getConversionProfileId();
-				break;
-			case 17:
-				return $this->getAccessControlProfileId();
-				break;
-			case 18:
-				return $this->getCategory();
-				break;
-			case 19:
-				return $this->getScheduleStartDate();
-				break;
-			case 20:
-				return $this->getScheduleEndDate();
-				break;
-			case 21:
-				return $this->getThumbnailUrl();
-				break;
-			case 22:
-				return $this->getThumbnailSaved();
-				break;
-			case 23:
 				return $this->getPartnerData();
 				break;
-			case 24:
+			case 13:
+				return $this->getObjectErrorDescription();
+				break;
+			case 14:
+				return $this->getErrorCode();
+				break;
+			case 15:
+				return $this->getErrorType();
+				break;
+			case 16:
 				return $this->getErrorDescription();
 				break;
-			case 25:
+			case 17:
 				return $this->getPluginsData();
 				break;
-			case 26:
+			case 18:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1971,27 +1535,19 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 			$keys[3] => $this->getBulkUploadJobId(),
 			$keys[4] => $this->getLineIndex(),
 			$keys[5] => $this->getPartnerId(),
-			$keys[6] => $this->getObjectId(),
-			$keys[7] => $this->getObjectType(),
-			$keys[8] => $this->getAction(),
-			$keys[9] => $this->getEntryStatus(),
-			$keys[10] => $this->getRowData(),
-			$keys[11] => $this->getTitle(),
-			$keys[12] => $this->getDescription(),
-			$keys[13] => $this->getTags(),
-			$keys[14] => $this->getUrl(),
-			$keys[15] => $this->getContentType(),
-			$keys[16] => $this->getConversionProfileId(),
-			$keys[17] => $this->getAccessControlProfileId(),
-			$keys[18] => $this->getCategory(),
-			$keys[19] => $this->getScheduleStartDate(),
-			$keys[20] => $this->getScheduleEndDate(),
-			$keys[21] => $this->getThumbnailUrl(),
-			$keys[22] => $this->getThumbnailSaved(),
-			$keys[23] => $this->getPartnerData(),
-			$keys[24] => $this->getErrorDescription(),
-			$keys[25] => $this->getPluginsData(),
-			$keys[26] => $this->getCustomData(),
+			$keys[6] => $this->getStatus(),
+			$keys[7] => $this->getObjectId(),
+			$keys[8] => $this->getObjectType(),
+			$keys[9] => $this->getAction(),
+			$keys[10] => $this->getObjectStatus(),
+			$keys[11] => $this->getRowData(),
+			$keys[12] => $this->getPartnerData(),
+			$keys[13] => $this->getObjectErrorDescription(),
+			$keys[14] => $this->getErrorCode(),
+			$keys[15] => $this->getErrorType(),
+			$keys[16] => $this->getErrorDescription(),
+			$keys[17] => $this->getPluginsData(),
+			$keys[18] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -2042,66 +1598,42 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 				$this->setPartnerId($value);
 				break;
 			case 6:
-				$this->setObjectId($value);
+				$this->setStatus($value);
 				break;
 			case 7:
-				$this->setObjectType($value);
+				$this->setObjectId($value);
 				break;
 			case 8:
-				$this->setAction($value);
+				$this->setObjectType($value);
 				break;
 			case 9:
-				$this->setEntryStatus($value);
+				$this->setAction($value);
 				break;
 			case 10:
-				$this->setRowData($value);
+				$this->setObjectStatus($value);
 				break;
 			case 11:
-				$this->setTitle($value);
+				$this->setRowData($value);
 				break;
 			case 12:
-				$this->setDescription($value);
-				break;
-			case 13:
-				$this->setTags($value);
-				break;
-			case 14:
-				$this->setUrl($value);
-				break;
-			case 15:
-				$this->setContentType($value);
-				break;
-			case 16:
-				$this->setConversionProfileId($value);
-				break;
-			case 17:
-				$this->setAccessControlProfileId($value);
-				break;
-			case 18:
-				$this->setCategory($value);
-				break;
-			case 19:
-				$this->setScheduleStartDate($value);
-				break;
-			case 20:
-				$this->setScheduleEndDate($value);
-				break;
-			case 21:
-				$this->setThumbnailUrl($value);
-				break;
-			case 22:
-				$this->setThumbnailSaved($value);
-				break;
-			case 23:
 				$this->setPartnerData($value);
 				break;
-			case 24:
+			case 13:
+				$this->setObjectErrorDescription($value);
+				break;
+			case 14:
+				$this->setErrorCode($value);
+				break;
+			case 15:
+				$this->setErrorType($value);
+				break;
+			case 16:
 				$this->setErrorDescription($value);
 				break;
-			case 25:
+			case 17:
 				$this->setPluginsData($value);
 				break;
-			case 26:
+			case 18:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -2134,27 +1666,19 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[3], $arr)) $this->setBulkUploadJobId($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setLineIndex($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setPartnerId($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setObjectId($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setObjectType($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setAction($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setEntryStatus($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setRowData($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setTitle($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setDescription($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setTags($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setUrl($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setContentType($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setConversionProfileId($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setAccessControlProfileId($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setCategory($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setScheduleStartDate($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setScheduleEndDate($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setThumbnailUrl($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setThumbnailSaved($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setPartnerData($arr[$keys[23]]);
-		if (array_key_exists($keys[24], $arr)) $this->setErrorDescription($arr[$keys[24]]);
-		if (array_key_exists($keys[25], $arr)) $this->setPluginsData($arr[$keys[25]]);
-		if (array_key_exists($keys[26], $arr)) $this->setCustomData($arr[$keys[26]]);
+		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setObjectId($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setObjectType($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setAction($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setObjectStatus($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setRowData($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setPartnerData($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setObjectErrorDescription($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setErrorCode($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setErrorType($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setErrorDescription($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setPluginsData($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setCustomData($arr[$keys[18]]);
 	}
 
 	/**
@@ -2172,24 +1696,16 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID)) $criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $this->bulk_upload_job_id);
 		if ($this->isColumnModified(BulkUploadResultPeer::LINE_INDEX)) $criteria->add(BulkUploadResultPeer::LINE_INDEX, $this->line_index);
 		if ($this->isColumnModified(BulkUploadResultPeer::PARTNER_ID)) $criteria->add(BulkUploadResultPeer::PARTNER_ID, $this->partner_id);
+		if ($this->isColumnModified(BulkUploadResultPeer::STATUS)) $criteria->add(BulkUploadResultPeer::STATUS, $this->status);
 		if ($this->isColumnModified(BulkUploadResultPeer::OBJECT_ID)) $criteria->add(BulkUploadResultPeer::OBJECT_ID, $this->object_id);
 		if ($this->isColumnModified(BulkUploadResultPeer::OBJECT_TYPE)) $criteria->add(BulkUploadResultPeer::OBJECT_TYPE, $this->object_type);
 		if ($this->isColumnModified(BulkUploadResultPeer::ACTION)) $criteria->add(BulkUploadResultPeer::ACTION, $this->action);
-		if ($this->isColumnModified(BulkUploadResultPeer::ENTRY_STATUS)) $criteria->add(BulkUploadResultPeer::ENTRY_STATUS, $this->entry_status);
+		if ($this->isColumnModified(BulkUploadResultPeer::OBJECT_STATUS)) $criteria->add(BulkUploadResultPeer::OBJECT_STATUS, $this->object_status);
 		if ($this->isColumnModified(BulkUploadResultPeer::ROW_DATA)) $criteria->add(BulkUploadResultPeer::ROW_DATA, $this->row_data);
-		if ($this->isColumnModified(BulkUploadResultPeer::TITLE)) $criteria->add(BulkUploadResultPeer::TITLE, $this->title);
-		if ($this->isColumnModified(BulkUploadResultPeer::DESCRIPTION)) $criteria->add(BulkUploadResultPeer::DESCRIPTION, $this->description);
-		if ($this->isColumnModified(BulkUploadResultPeer::TAGS)) $criteria->add(BulkUploadResultPeer::TAGS, $this->tags);
-		if ($this->isColumnModified(BulkUploadResultPeer::URL)) $criteria->add(BulkUploadResultPeer::URL, $this->url);
-		if ($this->isColumnModified(BulkUploadResultPeer::CONTENT_TYPE)) $criteria->add(BulkUploadResultPeer::CONTENT_TYPE, $this->content_type);
-		if ($this->isColumnModified(BulkUploadResultPeer::CONVERSION_PROFILE_ID)) $criteria->add(BulkUploadResultPeer::CONVERSION_PROFILE_ID, $this->conversion_profile_id);
-		if ($this->isColumnModified(BulkUploadResultPeer::ACCESS_CONTROL_PROFILE_ID)) $criteria->add(BulkUploadResultPeer::ACCESS_CONTROL_PROFILE_ID, $this->access_control_profile_id);
-		if ($this->isColumnModified(BulkUploadResultPeer::CATEGORY)) $criteria->add(BulkUploadResultPeer::CATEGORY, $this->category);
-		if ($this->isColumnModified(BulkUploadResultPeer::SCHEDULE_START_DATE)) $criteria->add(BulkUploadResultPeer::SCHEDULE_START_DATE, $this->schedule_start_date);
-		if ($this->isColumnModified(BulkUploadResultPeer::SCHEDULE_END_DATE)) $criteria->add(BulkUploadResultPeer::SCHEDULE_END_DATE, $this->schedule_end_date);
-		if ($this->isColumnModified(BulkUploadResultPeer::THUMBNAIL_URL)) $criteria->add(BulkUploadResultPeer::THUMBNAIL_URL, $this->thumbnail_url);
-		if ($this->isColumnModified(BulkUploadResultPeer::THUMBNAIL_SAVED)) $criteria->add(BulkUploadResultPeer::THUMBNAIL_SAVED, $this->thumbnail_saved);
 		if ($this->isColumnModified(BulkUploadResultPeer::PARTNER_DATA)) $criteria->add(BulkUploadResultPeer::PARTNER_DATA, $this->partner_data);
+		if ($this->isColumnModified(BulkUploadResultPeer::OBJECT_ERROR_DESCRIPTION)) $criteria->add(BulkUploadResultPeer::OBJECT_ERROR_DESCRIPTION, $this->object_error_description);
+		if ($this->isColumnModified(BulkUploadResultPeer::ERROR_CODE)) $criteria->add(BulkUploadResultPeer::ERROR_CODE, $this->error_code);
+		if ($this->isColumnModified(BulkUploadResultPeer::ERROR_TYPE)) $criteria->add(BulkUploadResultPeer::ERROR_TYPE, $this->error_type);
 		if ($this->isColumnModified(BulkUploadResultPeer::ERROR_DESCRIPTION)) $criteria->add(BulkUploadResultPeer::ERROR_DESCRIPTION, $this->error_description);
 		if ($this->isColumnModified(BulkUploadResultPeer::PLUGINS_DATA)) $criteria->add(BulkUploadResultPeer::PLUGINS_DATA, $this->plugins_data);
 		if ($this->isColumnModified(BulkUploadResultPeer::CUSTOM_DATA)) $criteria->add(BulkUploadResultPeer::CUSTOM_DATA, $this->custom_data);
@@ -2269,41 +1785,25 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 
 		$copyObj->setPartnerId($this->partner_id);
 
+		$copyObj->setStatus($this->status);
+
 		$copyObj->setObjectId($this->object_id);
 
 		$copyObj->setObjectType($this->object_type);
 
 		$copyObj->setAction($this->action);
 
-		$copyObj->setEntryStatus($this->entry_status);
+		$copyObj->setObjectStatus($this->object_status);
 
 		$copyObj->setRowData($this->row_data);
 
-		$copyObj->setTitle($this->title);
-
-		$copyObj->setDescription($this->description);
-
-		$copyObj->setTags($this->tags);
-
-		$copyObj->setUrl($this->url);
-
-		$copyObj->setContentType($this->content_type);
-
-		$copyObj->setConversionProfileId($this->conversion_profile_id);
-
-		$copyObj->setAccessControlProfileId($this->access_control_profile_id);
-
-		$copyObj->setCategory($this->category);
-
-		$copyObj->setScheduleStartDate($this->schedule_start_date);
-
-		$copyObj->setScheduleEndDate($this->schedule_end_date);
-
-		$copyObj->setThumbnailUrl($this->thumbnail_url);
-
-		$copyObj->setThumbnailSaved($this->thumbnail_saved);
-
 		$copyObj->setPartnerData($this->partner_data);
+
+		$copyObj->setObjectErrorDescription($this->object_error_description);
+
+		$copyObj->setErrorCode($this->error_code);
+
+		$copyObj->setErrorType($this->error_type);
 
 		$copyObj->setErrorDescription($this->error_description);
 
