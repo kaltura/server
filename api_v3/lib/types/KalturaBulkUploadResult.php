@@ -13,7 +13,6 @@ class KalturaBulkUploadResult extends KalturaObject
      */
     public $id;
 
-	
 	/**
 	 * The id of the parent job
 	 * 
@@ -21,8 +20,6 @@ class KalturaBulkUploadResult extends KalturaObject
      */
     public $bulkUploadJobId;
 
-
-	
 	/**
 	 * The index of the line in the CSV
 	 * 
@@ -30,14 +27,15 @@ class KalturaBulkUploadResult extends KalturaObject
      */
     public $lineIndex;
 
-
-	
 	/**
      * @var int
      */
     public $partnerId;
 
-
+    /**
+     * @var int
+     */
+    public $status;
 	
 	/**
      * @var KalturaBulkUploadAction
@@ -45,34 +43,22 @@ class KalturaBulkUploadResult extends KalturaObject
     public $action;
 
 
-	
-	/**
-     * @var string
-     */
-    public $entryId;
-
-
-	
 	/**
      * @var string
      */
     public $objectId;
+    
+    /**
+     * @var int
+     */
+    public $objectStatus;
 
 
-	
 	/**
      * @var KalturaBulkUploadResultObjectType
      */
     public $bulkUploadResultObjectType;
 
-	
-	/**
-     * @var int
-     */
-    public $entryStatus;
-
-
-	
 	/**
 	 * The data as recieved in the csv
 	 * 
@@ -80,158 +66,54 @@ class KalturaBulkUploadResult extends KalturaObject
      */
     public $rowData;
 
-
-	
-	/**
-     * @var string
-     */
-    public $title;
-
-
-	
-	/**
-     * @var string
-     */
-    public $description;
-
-
-	
-	/**
-     * @var string
-     */
-    public $tags;
-
-
-	
-	/**
-     * @var string
-     */
-    public $url;
-
-
-	
-	/**
-     * @var string
-     */
-    public $contentType;
-
-
-	
-	/**
-     * @var int
-     */
-    public $conversionProfileId;
-
-
-	
-	/**
-     * @var int
-     */
-    public $accessControlProfileId;
-
-
-	
-	/**
-     * @var string
-     */
-    public $category;
-
-
-	
-	/**
-     * @var int
-     */
-    public $scheduleStartDate;
-
-
-	
-	/**
-     * @var int
-     */
-    public $scheduleEndDate;
-
-
-	
-	/**
-     * @var string
-     */
-    public $thumbnailUrl;
-
-
-	
-	/**
-     * @var bool
-     */
-    public $thumbnailSaved;
-
-
-	
 	/**
      * @var string
      */
     public $partnerData;
 
-
-	
 	/**
      * @var string
      */
-    public $errorDescription;
+    public $objectErrorDescription;
 
-
-	
 	/**
      * @var KalturaBulkUploadPluginDataArray
      */
     public $pluginsData;
     
+    /**
+     * @var string
+     */
+    public $errorDescription;
     
     /**
      * @var string
      */
-    public $sshPrivateKey;
+    public $errorCode;
     
     /**
-     * @var string
+     * @var int
      */
-    public $sshPublicKey;
-    
-    /**
-     * @var string
-     */
-    public $sshKeyPassphrase;
+    public $errorType;
     
     
-       
 	private static $mapBetweenObjects = array
 	(
 		"id",
 	    "bulkUploadJobId",
 	    "lineIndex",
 	    "partnerId",
-	    "entryId",
+		"status",
 		"action",
 		"objectId",
 		"bulkUploadResultObjectType" => "objectType",
-		"entryStatus",
+	    "objectStatus",
 	    "rowData",
-	    "title",
-	    "description",
-	    "tags",
-	    "url",
-	    "contentType",
-	    "conversionProfileId",
-	    "accessControlProfileId",
-	    "category",
-	    "scheduleStartDate",
-	    "scheduleEndDate",
-	    "thumbnailUrl",
-		"thumbnailSaved",
 	    "partnerData",
+	    "objectErrorDescription",
 	    "errorDescription",
-	    "sshPrivateKey",
-	    "sshPublicKey",
-	    "sshKeyPassphrase",
+	    "errorCode",
+	    "errorType",
 	);
 	
 	public function getMapBetweenObjects()
@@ -242,8 +124,20 @@ class KalturaBulkUploadResult extends KalturaObject
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$dbObject = parent::toInsertableObject(new BulkUploadResult(), $props_to_skip);
-		$pluginsData = array();
-		if($this->pluginsData && $this->pluginsData instanceof KalturaBulkUploadPluginDataArray)
+		
+		$pluginsData = $this->addPluginData();
+		$dbObject->setPluginsData($pluginsData);
+		
+		return $dbObject;
+	}
+	
+	/**
+	 * @return array
+	 */
+	protected function addPluginData ()
+	{
+	    $pluginsData = array();
+	    if($this->pluginsData && $this->pluginsData instanceof KalturaBulkUploadPluginDataArray)
 		{
 			foreach($this->pluginsData as $data)
 			{
@@ -253,8 +147,6 @@ class KalturaBulkUploadResult extends KalturaObject
 			}
 		}
 		KalturaLog::debug("Plugins data array:\n" . print_r($pluginsData, true));
-		$dbObject->setPluginsData($pluginsData);
-		
-		return $dbObject;
+		return $pluginsData;
 	}
 }
