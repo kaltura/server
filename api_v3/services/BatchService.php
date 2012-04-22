@@ -1,7 +1,7 @@
 <?php
 /**
  * batch service lets you handle different batch process from remote machines.
- * As oppesed to other ojects in the system, locking mechanism is critical in this case.
+ * As opposed to other objects in the system, locking mechanism is critical in this case.
  * For this reason the GetExclusiveXX, UpdateExclusiveXX and FreeExclusiveXX actions are important for the system's intergity.
  * In general - updating batch object should be done only using the UpdateExclusiveXX which in turn can be called only after 
  * acuiring a batch objet properly (using  GetExclusiveXX).
@@ -110,38 +110,17 @@ class BatchService extends KalturaBaseService
 	}	
 
 	
-	protected function updateEntryThumbnail(BulkUploadResult $bulkUploadResult)
-	{
-		if(		$bulkUploadResult->getEntryStatus() != entryStatus::READY 
-			||	!strlen($bulkUploadResult->getThumbnailUrl()) 
-			||	$bulkUploadResult->getThumbnailSaved()
-		)
-			return;
-			
-		try 
-		{
-			myEntryUtils::updateThumbnailFromFile($bulkUploadResult->getEntry(), $bulkUploadResult->getThumbnailUrl());
-		}
-		catch (Exception $e)
-		{
-			KalturaLog::err($e->getMessage());
-			return;
-		}
-		
-		$bulkUploadResult->setThumbnailSaved(true);
-		$bulkUploadResult->save();
-	}
-	
 	/**
 	 * Returns total created entries count
 	 * 
 	 * @action countBulkUploadEntries
 	 * @param int $bulkUploadJobId The id of the bulk upload job
+	 * @param KalturaBulkUploadObjectType $bulkUploadObjectType
 	 * @return int the number of created entries 
 	 */
-	function countBulkUploadEntriesAction($bulkUploadJobId)
+	function countBulkUploadEntriesAction($bulkUploadJobId, $bulkUploadObjectType = KalturaBulkUploadObjectType::ENTRY)
 	{
-		return BulkUploadResultPeer::countWithEntryByBulkUploadId($bulkUploadJobId);
+		return BulkUploadResultPeer::countWithObjectTypeByBulkUploadId($bulkUploadJobId, $bulkUploadObjectType);
 	}
 	
 	/**
@@ -153,14 +132,6 @@ class BatchService extends KalturaBaseService
 	 */
 	function updateBulkUploadResultsAction($bulkUploadJobId)
 	{
-		$closedStatuses = array(
-			KalturaEntryStatus::ERROR_IMPORTING,
-			KalturaEntryStatus::ERROR_CONVERTING,
-			KalturaEntryStatus::READY,
-			KalturaEntryStatus::DELETED,
-			KalturaEntryStatus::PENDING,
-			KalturaEntryStatus::NO_CONTENT,
-		);
 		
 		$unclosedEntries = array();
 		$bulkUploadResults = BulkUploadResultPeer::retrieveByBulkUploadId($bulkUploadJobId);
@@ -173,29 +144,26 @@ class BatchService extends KalturaBaseService
 			{
 				//TODO: find some better alternative, find out why the bulk upload result which reports error is 
 				// returning objectId "null" for failed entry assets, rather than the entryId to which they pertain.
-				$data->setNumOfEntries(BulkUploadResultPeer::countWithEntryByBulkUploadId($bulkUploadJobId));
+				//$data->setNumOfEntries(BulkUploadResultPeer::countWithEntryByBulkUploadId($bulkUploadJobId));
+				$data->setNumOfObjects(BulkUploadResultPeer::countWithObjectTypeByBulkUploadId($bulkUploadJobId, $data->getBulkUploadObjectType()));
 				$bulkUpload->setData($data);
 				$bulkUpload->save();
 			}
 		}
 		
+		$unclosedEntriesCount = 0;
 		foreach($bulkUploadResults as $bulkUploadResult)
 		{
-			$status = $bulkUploadResult->updateStatusFromEntry();
+		    /* @var $bulkUploadResult BulkUploadResult */
+			$status = $bulkUploadResult->updateStatusFromObject();
 			
-			if(in_array($bulkUploadResult->getEntryStatus(), $closedStatuses))
-			{
-				$this->updateEntryThumbnail($bulkUploadResult);
-				continue;
+			if ($status != BulkUploadResultStatus::OK)
+			{	
+    			$unclosedEntriesCount++;
 			}
-			
-			if(in_array($status, $closedStatuses))
-				continue;
-				
-			$unclosedEntries[$bulkUploadResult->getEntryId()] = $status;
 		}
 		
-		return count($unclosedEntries);
+		return $unclosedEntriesCount;
 	}	
 	
 // --------------------------------- BulkUploadJob functions 	--------------------------------- //
