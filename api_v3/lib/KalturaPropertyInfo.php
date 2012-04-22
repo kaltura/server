@@ -14,6 +14,10 @@ class KalturaPropertyInfo
 	private $_insertOnly = false;
 	private $_writeOnly = false;
 	private $_description;
+	
+	/**
+	 * @var array of strings
+	 */
 	private $_filters = array();
 	private $_dynamicType = null;
 	private $_permissions = array();
@@ -238,6 +242,9 @@ class KalturaPropertyInfo
 		return $this->_description;
 	}	
 	
+	/**
+	 * @param array|string $filters array or comma separated values
+	 */
 	public function setFilters($filters)
 	{
 		if (is_array($filters))
@@ -251,6 +258,9 @@ class KalturaPropertyInfo
 		}
 	}	
 	
+	/**
+	 * @return array of strings
+	 */
 	public function getFilters()
 	{
 		return $this->_filters;

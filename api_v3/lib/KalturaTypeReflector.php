@@ -280,7 +280,7 @@ class KalturaTypeReflector
 	/**
 	 * Return only the properties defined in the current class
 	 *
-	 * @return array
+	 * @return array<KalturaPropertyInfo>
 	 */
 	public function getCurrentProperties()
 	{
