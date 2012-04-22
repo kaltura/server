@@ -5,6 +5,14 @@
  */
 abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQuery
 {
+	const RANKER_NONE = 'none';
+	const RANKER_SPH04 = 'sph04';
+	
+	/**
+	 * @var string none or sph04
+	 */
+	protected $ranker;
+	
 	/**
 	 * Field keys to be removed from the criteria after all filters applied 
 	 * @var array
@@ -166,7 +174,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		$comment = $pdo->getComment();
 		$sphinxIdField = $this->getSphinxIdField();
-		$sql = "SELECT $sphinxIdField $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION ranker=none, max_matches=$maxMatches, comment='$comment'";
+		$sql = "SELECT $sphinxIdField $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='$comment'";
 
 		$badSphinxQueries = kConf::hasParam("sphinx_bad_queries") ? kConf::get("sphinx_bad_queries") : array();
 
@@ -314,8 +322,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		KalturaLog::debug("Applied " . count($this->matchClause) . " matches, " . count($this->whereClause) . " clauses, " . count($this->keyToRemove) . " keys removed, $this->criteriasLeft keys left");
 		
+		$this->ranker = self::RANKER_NONE;
 		if(count($this->matchClause))
 		{
+			$this->ranker = self::RANKER_SPH04;
 			$this->matchClause = array_unique($this->matchClause);
 			$matches = reset($this->matchClause);
 			if(count($this->matchClause) > 1)

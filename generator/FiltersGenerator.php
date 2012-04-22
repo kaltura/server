@@ -195,8 +195,8 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 				{
 					$propertyName = $filterFields["order"];
 					$orderFieldName = $this->formatOrderPropertyValue($propertyName);
-					$this->appendLine("		\"".$propertyName."\" => \"+$orderFieldName\",");
-					$this->appendLine("		\"".$propertyName."\" => \"-$orderFieldName\",");
+					$this->appendLine("		\"+$propertyName\" => \"+$orderFieldName\",");
+					$this->appendLine("		\"-$propertyName\" => \"-$orderFieldName\",");
 				}
 			}
 		}

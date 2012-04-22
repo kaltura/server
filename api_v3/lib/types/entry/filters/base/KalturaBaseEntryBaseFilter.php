@@ -98,10 +98,10 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"-endDate" => "-end_date",
 		"+partnerSortValue" => "+partner_sort_value",
 		"-partnerSortValue" => "-partner_sort_value",
-		"recent" => "+recent",
-		"recent" => "-recent",
-		"weight" => "+weight",
-		"weight" => "-weight",
+		"+recent" => "+recent",
+		"-recent" => "-recent",
+		"+weight" => "+weight",
+		"-weight" => "-weight",
 	);
 
 	public function getMapBetweenObjects()

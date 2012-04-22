@@ -29,6 +29,7 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 		"privacyIn" => "_in_privacy",
 		"inheritanceTypeEqual" => "_eq_inheritance_type",
 		"inheritanceTypeIn" => "_in_inheritance_type",
+		"referenceIdEqual" => "_eq_reference_id",
 		"membersCountGreaterThanOrEqual" => "_gte_members_count",
 		"membersCountLessThanOrEqual" => "_lte_members_count",
 		"pendingMembersCountGreaterThanOrEqual" => "_gte_pending_members_count",
@@ -219,6 +220,13 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $inheritanceTypeIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $referenceIdEqual;
 
 	/**
 	 * 
