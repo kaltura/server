@@ -1,0 +1,20 @@
+This source contains:
+ - The Kaltura client library (kaltura_client_base.rb)
+ - Auto generated core APIs (kaltura_client.rb)
+ - Auto generated plugin APIs (kaltura_plugins/*.rb)
+ - Ruby library test code and data files (test/*)
+ 
+== DEPENDENCIES ==
+
+RAKE			(http://rake.rubyforge.org/)
+Shoulda			(gem install shoulda)
+Rest_client		(gem install rest-client)
+
+== RUNNING THE CLIENT LIBRARY TESTS ==
+
+IMPORTANT: never run the tests of the client library against a production account - 
+	these tests perform modifications to account profiles.
+	
+Update kaltura.yml with your account information
+Change directory to kaltura/ruby
+Execute the command: rake test
