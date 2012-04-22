@@ -62,11 +62,6 @@ class MediaService extends KalturaEntryService
 		$dbEntry->setStatus(entryStatus::NO_CONTENT);
 		$dbEntry->save();
 
-		if ( $entry->partnerId == "1201")
-		{
-		    KalturaLog::debug("ABC script is running -> creating new media entry");
-		}
-		
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
 	
 		$entry->fromObject($dbEntry);
