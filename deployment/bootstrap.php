@@ -17,6 +17,8 @@ KAutoloader::register();
 
 date_default_timezone_set(kConf::get("date_default_timezone")); // America/New_York
 
+$loggerConfigPath = realpath(KALTURA_ROOT_PATH . DIRECTORY_SEPARATOR . "configurations" . DIRECTORY_SEPARATOR . "logger.ini");
+
 try // we don't want to fail when logger is not configured right
 {
 	$config = new Zend_Config_Ini($loggerConfigPath);
