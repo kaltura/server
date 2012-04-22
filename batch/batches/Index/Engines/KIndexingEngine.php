@@ -46,6 +46,12 @@ abstract class KIndexingEngine
 			case KalturaIndexObjectType::CATEGORY:
 				return new KIndexingCategoryEngine();
 				
+			case KalturaIndexObjectType::CATEGORY_ENTRY:
+				return new KIndexingCategoryEntryEngine();
+				
+			case KalturaIndexObjectType::CATEGORY_USER:
+				return new KIndexingCategoryUserEngine();
+				
 			default:
 				return KalturaPluginManager::loadObject('KIndexingEngine', $objectType);
 		}
