@@ -27,6 +27,7 @@ class KalturaBulkUpload extends KalturaObject
 	
 	/**
 	 * @var int
+	 * @deprecated User $numOfObjects instead
 	 */
 	public $numOfEntries;
 	
@@ -88,6 +89,16 @@ class KalturaBulkUpload extends KalturaObject
 	 */
 	public $description;
 	
+	/**
+	 * @var int
+	 */
+	public $numOfObjects;
+	
+	/**
+	 * @var string
+	 */
+	public $bulkUploadObjectType;
+	
 	public function fromObject($batchJob)
 	{
 		/* @var $batchJob BatchJob */
@@ -114,6 +125,7 @@ class KalturaBulkUpload extends KalturaObject
 			$this->uploadedBy = $jobData->getUploadedBy();
 			$this->uploadedByUserId = $jobData->getUserId();
 			$this->numOfEntries = $jobData->getNumOfEntries();
+			$this->numOfObjects = $jobData->getNumOfObjects();
 			$this->fileName = $jobData->getFileName();
 		}
 		
