@@ -5,7 +5,7 @@
  * @package plugins.bulkUploadCsv
  * @subpackage batch
  */
-class BulkUploadEngineCsv extends KBulkUploadEngine
+class BulkUploadEngineCsv extends BulkUploadGeneralEngineCsv
 {
 	/**
 	 * The column count (values) for the V1 CSV format
@@ -19,99 +19,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 */
 	const VALUES_COUNT_V2 = 12;
 	
-	/**
-	 * The bulk upload results
-	 * @var array
-	 */
-	private $bulkUploadResults = array();
-		
-	/**
-	 * @var int
-	 */
-	protected $lineNumber = 0;
-	
-	/**
-	 * @var KalturaBulkUploadCsvVersion
-	 */
-	protected $csvVersion = KalturaBulkUploadCsvVersion::V1;
 
-	/* (non-PHPdoc)
-	 * @see KBulkUploadEngine::handleBulkUpload()
-	 */
-	public function handleBulkUpload()
-	{
-		$startLineNumber = $this->getStartIndex($this->job->id);
-	
-		$filePath = $this->data->filePath;
-		$fileHandle = fopen($filePath, "r");
-		if(!$fileHandle)
-			throw new KalturaBatchException("Unable to open file: {$filePath}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
-					
-		KalturaLog::info("Opened file: $filePath");
-		
-		$columns = $this->getV1Columns();
-		$values = fgetcsv($fileHandle);
-		while($values)
-		{
-			//removing UTF-8 BOM if exists
-			if(substr($values[0], 0,3) == pack('CCC',0xef,0xbb,0xbf)) { 
-       			 $values[0]=substr($values[0], 3); 
-    		} 
-			// use version 3 (dynamic columns cassiopeia) identified by * in first char
-			if(substr(trim($values[0]), 0, 1) == '*') // is a remark
-			{
-				$columns = $this->parseColumns($values);
-				KalturaLog::info("Columns V3:\n" . print_r($columns, true));
-				$this->csvVersion = KalturaBulkUploadCsvVersion::V3;
-			}
-			
-			// ignore and continue - identified by # or *
-			if(	(substr(trim($values[0]), 0, 1) == '#') || // is a remark OR
-				(substr(trim($values[0]), 0, 1) == '*'))  //is version identifier
-			{
-				$values = fgetcsv($fileHandle);
-				continue;
-			}
-			
-			$this->lineNumber ++;
-			if($this->lineNumber <= $startLineNumber)
-			{
-				$values = fgetcsv($fileHandle);
-				continue;
-			}
-			
-			// creates a result object
-			$this->createUploadResult($values, $columns);
-			if($this->exceededMaxRecordsEachRun)
-				break;
-				    		    
-			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
-			{
-				$this->kClient->doMultiRequest();
-				$this->checkAborted();
-				$this->kClient->startMultiRequest();
-			}
-			
-			$values = fgetcsv($fileHandle);
-		}
-		
-		fclose($fileHandle);
-		
-		// send all invalid results
-		$this->kClient->doMultiRequest();
-		
-		KalturaLog::info("CSV file parsed, $this->lineNumber lines with " . ($this->lineNumber - count($this->bulkUploadResults)) . ' invalid records');
-		
-		// update csv verision on the job
-		$this->data->csvVersion = $this->csvVersion;
-				
-		//Check if job aborted
-		$this->checkAborted();
-
-		//Create the entries from the bulk upload results
-		$this->createEntries();
-	}
-		
 	/* (non-PHPdoc)
 	 * @see KBulkUploadEngine::addBulkUploadResult()
 	 */
@@ -119,7 +27,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	{
 		parent::addBulkUploadResult($bulkUploadResult);
 			
-		if($bulkUploadResult->entryId && $bulkUploadResult->entryStatus == KalturaEntryStatus::IMPORT)
+		if(($bulkUploadResult->entryId || $bulkUploadResult->objectId) && $bulkUploadResult->entryStatus == KalturaEntryStatus::IMPORT)
 		{
 		    $url = $bulkUploadResult->url;
 		    $isSsh = (stripos($url, 'sftp:') === 0) || (stripos($url, 'scp:') === 0);
@@ -144,7 +52,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * 
 	 * Create the entries from the given bulk upload results
 	 */
-	protected function createEntries()
+	protected function createObjects()
 	{
 		// start a multi request for add entries
 		$this->kClient->startMultiRequest();
@@ -154,31 +62,49 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 				
 		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
-			$mediaEntry = $this->createMediaEntryFromResultAndJobData($bulkUploadResult);
-					
-			$bulkUploadResultChunk[] = $bulkUploadResult;
-			
-			$this->impersonate();
-			$this->kClient->media->add($mediaEntry);
-			$this->unimpersonate();
-			
-			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
-			{
-				// make all the media->add as the partner
-				$requestResults = $this->kClient->doMultiRequest();
-				
-				$this->updateEntriesResults($requestResults, $bulkUploadResultChunk);
-				$this->checkAborted();
-				$this->kClient->startMultiRequest();
-				$bulkUploadResultChunk = array();
-			}
+		    /* @var $bulkUploadResult KalturaBulkUploadResult */
+		    switch ($bulkUploadResult->action)
+		    {
+		        case KalturaBulkUploadAction::ADD:
+    		        $mediaEntry = $this->createMediaEntryFromResultAndJobData($bulkUploadResult);
+        					
+        			$bulkUploadResultChunk[] = $bulkUploadResult;
+        			
+        			$this->impersonate();
+        			$this->kClient->media->add($mediaEntry);
+        			$this->unimpersonate();
+        			
+        			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
+        			{
+        				// make all the media->add as the partner
+        				$requestResults = $this->kClient->doMultiRequest();
+        				
+        				$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
+        				$this->checkAborted();
+        				$this->kClient->startMultiRequest();
+        				$bulkUploadResultChunk = array();
+        			}
+		            break;
+		        
+		        case KalturaBulkUploadAction::UPDATE:
+		            break;
+		        
+		        case KalturaBulkUploadAction::DELETE:
+		            break;
+		        
+		        default:
+		            $bulkUploadResult->objectStatus = KalturaEntryStatus::ERROR_IMPORTING;
+		            $bulkUploadResult->errorDescription = "unknown action passed: [".$bulkUploadResult->action ."]";
+		            break;
+		    }
+    			
 		}
 		
 		// make all the media->add as the partner
 		$requestResults = $this->kClient->doMultiRequest();
 		
 		if(count($requestResults))
-			$this->updateEntriesResults($requestResults, $bulkUploadResultChunk);
+			$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
 
 		KalturaLog::info("job[{$this->job->id}] finish creating entries");
 	}
@@ -186,7 +112,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	/**
 	 * 
 	 * Creates and returns a new media entry for the given job data and bulk upload result object
-	 * @param unknown_type $bulkUploadResult
+	 * @param KalturaBulkUploadResultEntry $bulkUploadResult
 	 */
 	protected function createMediaEntryFromResultAndJobData($bulkUploadResult)
 	{
@@ -257,7 +183,8 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		}
 		$this->handledRecordsThisRun++;
 		
-		$bulkUploadResult = new KalturaBulkUploadResult();
+		$bulkUploadResult = new KalturaBulkUploadResultEntry();
+		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadResultObjectType::ENTRY;
 		$bulkUploadResult->bulkUploadJobId = $this->job->id;
 		$bulkUploadResult->lineIndex = $this->lineNumber;
 		$bulkUploadResult->partnerId = $this->job->partnerId;
@@ -280,6 +207,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			{
 				// fail and continue with next line
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 				$bulkUploadResult->errorDescription = "Wrong number of values on line $this->lineNumber";
 				$this->addBulkUploadResult($bulkUploadResult);
 				return;
@@ -303,6 +231,10 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			{
 				$$column = strlen($values[$index]) ? $values[$index] : null;
 				KalturaLog::info("Set value \${$column} [{$$column}]");
+			}
+			else if ($column == 'entryId')
+			{
+			    $bulkUploadResult->objectId = $values[$index];
 			}
 			else
 			{
@@ -336,6 +268,12 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		}
 		
 		$bulkUploadResult->entryStatus = KalturaEntryStatus::IMPORT;
+		$bulkUploadResult->status = KalturaBulkUploadResultStatus::IN_PROGRESS;
+		
+		if (!$bulkUploadResult->action)
+		{
+		    $bulkUploadResult->action = KalturaBulkUploadAction::ADD;
+		}
 		
 		if(!is_numeric($bulkUploadResult->conversionProfileId))
 			$bulkUploadResult->conversionProfileId = null;
@@ -429,6 +367,15 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	    return $ret;
 	}
 	
+	protected function getColumns()
+	{
+	    $ret = $this->getV2Columns();
+	    $ret[] = 'entryId';
+	    $ret[] = 'action';
+	    return $ret;
+	}
+	
+	
 	/**
 	 * 
 	 * Gets the columns for V3 csv file (parses the header)
@@ -458,11 +405,48 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		return $ret;
 	}
 
-	/**
-	 * @param string $item
-	 */
-	protected function trimArray(&$item)
+	
+	
+	protected function updateObjectsResults($requestResults, $bulkUploadResults)
 	{
-		$item = trim($item);
+	    $this->kClient->startMultiRequest();
+		KalturaLog::info("Updating " . count($requestResults) . " results");
+		
+		// checking the created entries
+		foreach($requestResults as $index => $requestResult)
+		{
+			$bulkUploadResult = $bulkUploadResults[$index];
+			
+			if(is_array($requestResult) && isset($requestResult['code']))
+			{
+				$bulkUploadResult->entryStatus = $requestResult['code'];
+				$bulkUploadResult->errorDescription = $requestResult['message'];
+				$this->addBulkUploadResult($bulkUploadResult);
+				continue;
+			}
+			
+			if($requestResult instanceof Exception)
+			{
+				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+				$bulkUploadResult->errorDescription = $requestResult->getMessage();
+				$this->addBulkUploadResult($bulkUploadResult);
+				continue;
+			}
+			
+			if(! ($requestResult instanceof KalturaBaseEntry))
+			{
+				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+				$bulkUploadResult->errorDescription = "Returned type is " . get_class($requestResult) . ', KalturaMediaEntry was expected';
+				$this->addBulkUploadResult($bulkUploadResult);
+				continue;
+			}
+			
+			// update the results with the new entry id
+			$bulkUploadResult->entryId = $requestResult->id;
+			$bulkUploadResult->objectId = $requestResult->id;
+			$this->addBulkUploadResult($bulkUploadResult);
+		}
+		
+		$this->kClient->doMultiRequest();
 	}
 }
