@@ -61,7 +61,12 @@ class MediaService extends KalturaEntryService
     	$dbEntry = parent::add($entry, $entry->conversionProfileId);
 		$dbEntry->setStatus(entryStatus::NO_CONTENT);
 		$dbEntry->save();
-    		
+
+		if ( $entry->partnerId == "1201")
+		{
+		    KalturaLog::debug("ABC script is running -> creating new media entry");
+		}
+		
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
 	
 		$entry->fromObject($dbEntry);
@@ -69,7 +74,8 @@ class MediaService extends KalturaEntryService
     }
 
     /**
-     * Add content to entry
+     * Add content to media entry which is not yet associated with content (therefore is in status NO_CONTENT).
+     * If the requirement is to replace the entry's associated content, use action updateContent.
      *
      * @action addContent
      * @param string $entryId
@@ -691,7 +697,7 @@ class MediaService extends KalturaEntryService
 	}
 
 	/**
-	 * Replace media content of the entry
+	 * Replace content associated with the media entry.
 	 * 
 	 * @action updateContent
 	 * @param string $entryId Media entry id to update
