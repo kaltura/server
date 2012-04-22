@@ -230,9 +230,14 @@ function compareResults($resultNew, $resultOld)
 	return compareArrays($resultNew, $resultOld, "");
 }
 
-function beginsWith($str, $end) 
+function beginsWith($str, $prefix) 
 {
-	return (substr($str, 0, strlen($end)) === $end);
+	return (substr($str, 0, strlen($prefix)) === $prefix);
+}
+
+function endsWith($str, $postfix) 
+{
+	return (substr($str, -strlen($postfix)) === $postfix);
 }
 
 function getRequestHash($fullActionName, $paramsForHash)
@@ -676,8 +681,10 @@ class LogProcessorPS2
 		$markerPos = strpos($buffer, PS2_START_MARKER);
 		if ($markerPos === false)
 			return false;
-		$params = substr($buffer, $markerPos + strlen(PS2_START_MARKER));
-		$parsedParams = eval('return ' . trim($params) . ';');
+		$params = trim(substr($buffer, $markerPos + strlen(PS2_START_MARKER)));
+		if (!beginsWith($params, 'array (') || !endsWith($params, ')'))
+			return false;
+		$parsedParams = eval('return ' . $params . ';');
 
 		if (processPS2Request($parsedParams))
 		{
@@ -714,7 +721,7 @@ function processGZipFile($apiLogPath, $logProcessor)
 
 	while (!gzeof($handle)) 
 	{
-		$buffer = gzgets($handle, 4096);
+		$buffer = gzgets($handle, 16384);
 		if ($logProcessor->processLine($buffer))
 			break;
 	}
