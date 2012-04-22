@@ -393,7 +393,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			if(in_array($dbBatchJob->getStatus(),BatchJobPeer::getClosedStatusList()))
 			{
 				$jobEntry = $dbBatchJob->getEntry();
-				if($jobEntry->getMarkedForDeletion())
+				if($jobEntry && $jobEntry->getMarkedForDeletion())
 					myEntryUtils::deleteEntry($jobEntry,null,true);
 			}
 		}
