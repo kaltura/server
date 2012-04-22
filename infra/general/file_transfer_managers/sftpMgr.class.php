@@ -277,7 +277,8 @@ class sftpMgr extends kFileTransferMgr
 		$filesInfo = array_filter(array_map('trim', explode("\n", $exec_output)), 'strlen');
 			    
 		// drwxrwxrwx 10 root root 4096 2010-11-24 23:45 file.ext
-	    $regexUnix = "^(?P<permissions>[-drw]{10})\s+(?P<number>\d{1,2})\s+(?P<owner>[\d\w]+)\s+(?P<group>[\d\w]+)\s+(?P<fileSize>\d*)\s+(?P<year>\w{4})-(?P<month>\d{2})-(?P<day>\d{2})\s+(?P<hour>\d{2}):(?P<minute>\d{2})\s+$remote_folder\/(?P<file>.+)\s*$";
+		// -rw-r--r--+ 1 mikew Domain Users 7270248766 Feb  9 11:16 Kaltura/LegislativeBriefing2012.mov
+		$regexUnix = "^(?P<permissions>[-drw]{10})\+?\s+(?P<number>\d{1,2})\s+(?P<owner>[\d\w]+)\s+(?P<group>[\d\w\s]+)\s+(?P<fileSize>\d*)\s+((?P<year1>\w{4})-(?P<month1>\d{2})-(?P<day1>\d{2})\s+(?P<hour1>\d{2}):(?P<minute1>\d{2})|(?P<month2>\w{3})\s+(?P<day2>\d{1,2})\s+((?P<hour2>\d{2}):(?P<minute2>\d{2})|(?P<year2>\d{4})))\s+$remote_folder\/(?P<file>.+)\s*$";
 	    
 	    foreach($filesInfo as $fileInfo)
 	    {
@@ -306,7 +307,7 @@ class sftpMgr extends kFileTransferMgr
 	// execute the given command on the server
 	private function execCommand($command_str)
 	{
-		KalturaLog::debug($command_str);
+		KalturaLog::info($command_str);
 		
 		$stream = ssh2_exec($this->getSsh2Connection(), $command_str);
 		if(!$stream || !is_resource($stream))
@@ -319,4 +320,3 @@ class sftpMgr extends kFileTransferMgr
 	}
 	
 }
-?>
