@@ -37,6 +37,8 @@ class categoryFilter extends baseObjectFilter
 			"_in_status",
 			"_gte_partner_sort_value",
 			"_lte_partner_sort_value",
+			"_likex_full_name",
+			"_eq_full_ids",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name", "depth", "partner_sort_value", "entries_count", "direct_entries_count");
@@ -66,6 +68,16 @@ class categoryFilter extends baseObjectFilter
 	public function getIdFromPeer (  )
 	{
 		return categoryPeer::ID;
+	}
+	
+	public function setFullIdsStartsWith($v)
+	{
+		$this->set('_likex_full_name', $v);
+	}
+	
+	public function setIdIn($v)
+	{
+		$this->set('_in_id', $v);
 	}
 }
 

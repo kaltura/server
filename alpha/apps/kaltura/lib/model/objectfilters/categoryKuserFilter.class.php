@@ -59,4 +59,9 @@ class categoryKuserFilter extends baseObjectFilter
 	{
 		return categoryKuserPeer::ID;
 	}
+	
+	public function setCategoryIdEqual($v)
+	{
+		$this->set('_eq_category_id', $v);
+	}
 }
