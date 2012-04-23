@@ -13,6 +13,8 @@ class KalturaCategoryEntryBaseFilter extends KalturaFilter
 		"entryIdEqual" => "_eq_entry_id",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
+		"categoryFullIdsStartsWith" => "_likex_category_full_ids",
+		"categoryFullIdsEqual" => "_eq_category_full_ids",
 	);
 
 	private $order_by_map = array
@@ -65,4 +67,18 @@ class KalturaCategoryEntryBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $categoryFullIdsStartsWith;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $categoryFullIdsEqual;
 }
