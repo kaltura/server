@@ -49,17 +49,19 @@ class CategoryEntryService extends KalturaBaseService
 		$categoryEntry->toInsertableObject($dbCategoryEntry);
 		$dbCategoryEntry->setPartnerId(kCurrentContext::$ks_partner_id);
 		$dbCategoryEntry->save();
+		
+		$categoryEntry = new KalturaCategoryEntry();
+		$categoryEntry->fromObject($dbCategoryEntry);
 
 		return $categoryEntry;
 	}
 	
 	/**
-	 * Add new CategoryUser
+	 * Delete CategoryUser
 	 * 
 	 * @action delete
 	 * @param string $entryId
 	 * @param int $categoryId
-	 * @return KalturaCategoryEntry
 	 */
 	function deleteAction($entryId, $categoryId)
 	{
@@ -112,12 +114,17 @@ class CategoryEntryService extends KalturaBaseService
 	 * @action list
 	 * @return KalturaCategoryEntryListResponse
 	 */
-	function listAction(KalturaCategoryEntryFilter $filter = null)
+	function listAction(KalturaCategoryEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if ($filter === null)
 			$filter = new KalturaCategoryEntryFilter();
+			
+		if ($pager == null)
+			$pager = new KalturaFilterPager();
 		
-		if ($filter->entryIdEqual == null)
+		if ($filter->entryIdEqual == null && 
+			((kEntitlementUtils::getEntitlementEnforcement()) || 
+			  $filter->categoryFullIdsStartsWith == null ))
 			throw new APIException(KalturaErrors::MUST_FILTER_ENTRY_ID_EQUAL);
 			
 		$categoryEntryFilter = new categoryEntryFilter();
@@ -125,6 +132,7 @@ class CategoryEntryService extends KalturaBaseService
 
 		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
 		$categoryEntryFilter->attachToCriteria($c);
+		$pager->attachToCriteria($c);
 		$dbCategoriesEntry = categoryEntryPeer::doSelect($c);
 
 		//remove unlisted categories: display in search is set to members only
@@ -138,12 +146,15 @@ class CategoryEntryService extends KalturaBaseService
 		$stmt = categoryPeer::doSelectStmt($c);
 		$categoryIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		
-		foreach ($dbCategoriesEntry as $key => $dbCategoryEntry)
+		if(kEntitlementUtils::getEntitlementEnforcement())
 		{
-			if(!in_array($dbCategoryEntry->getCategoryId(), $categoryIds))
+			foreach ($dbCategoriesEntry as $key => $dbCategoryEntry)
 			{
-				KalturaLog::debug('Category [' . print_r($dbCategoryEntry->getCategoryId(),true) . '] is not listed to user');
-				unset($dbCategoriesEntry[$key]);
+				if(!in_array($dbCategoryEntry->getCategoryId(), $categoryIds))
+				{
+					KalturaLog::debug('Category [' . print_r($dbCategoryEntry->getCategoryId(),true) . '] is not listed to user');
+					unset($dbCategoriesEntry[$key]);
+				}
 			}
 		}
 		
@@ -152,5 +163,37 @@ class CategoryEntryService extends KalturaBaseService
 		$response->objects = $categoryEntrylist;
 		$response->totalCount = count($categoryEntrylist); // no pager since category entry is limited to ENTRY::MAX_CATEGORIES_PER_ENTRY
 		return $response;
+	}
+	
+	/**
+	 * Index Category by id
+	 * 
+	 * @action index
+	 * @param string $entryId
+	 * @param int $categoryId
+	 * @param bool $shouldUpdate
+	 * @return int category int id
+	 */
+	function indexAction($entryId, $categoryId, $shouldUpdate = true)
+	{
+		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
+		if(!$dbCategoryEntry)
+			throw new APIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
+			
+		if (!$shouldUpdate)
+		{
+			$dbCategoryEntry->setUpdatedAt(time());
+			$dbCategoryEntry->save();
+			
+			return $dbCategoryEntry->getIntId();
+		}
+				
+		$dbCategoryEntry->reSetCategoryFullIds();
+
+		//TODO should skip all categoryentry logic 
+		$dbCategoryEntry->save();
+		
+		return $dbCategoryEntry->getId();
+				
 	}
 }

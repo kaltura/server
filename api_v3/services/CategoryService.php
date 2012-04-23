@@ -20,11 +20,10 @@ class CategoryService extends KalturaBaseService
 	 * @return KalturaCategory
 	 */
 	function addAction(KalturaCategory $category)
-	{		
-		$category->validatePropertyMinLength("name", 1);
-		$category->validatePropertyMaxLength("name", categoryPeer::MAX_CATEGORY_NAME);
-		$category->validateParentId($category);
-
+	{	
+		//TODO - remove!	
+		$this->getPartner()->unlockCategories();
+		
 		if ($this->getPartner()->isCategoriesLocked())
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED, Partner::CATEGORIES_LOCK_TIMEOUT);
 			
@@ -46,7 +45,9 @@ class CategoryService extends KalturaBaseService
 				throw $ex;
 		}
 		
+		$category = new KalturaCategory();
 		$category->fromObject($categoryDb);
+		
 		return $category;
 	}
 	
@@ -77,7 +78,7 @@ class CategoryService extends KalturaBaseService
 	 * @return KalturaCategory
 	 */
 	function updateAction($id, KalturaCategory $category)
-	{
+	{		
 		$categoryDb = categoryPeer::retrieveByPK($id);
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
@@ -91,14 +92,7 @@ class CategoryService extends KalturaBaseService
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
-		if ($category->name !== null)
-		{
-			$category->validatePropertyMinLength("name", 1);
-			$category->validatePropertyMaxLength("name", categoryPeer::MAX_CATEGORY_NAME);
-		}
-		if ($category->parentId !== null)
-			$category->validateParentId($category);
-			
+					
 		if ($this->getPartner()->isCategoriesLocked())
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED, Partner::CATEGORIES_LOCK_TIMEOUT);
 			
@@ -108,8 +102,11 @@ class CategoryService extends KalturaBaseService
 		$this->getPartner()->lockCategories();	
 		try
 		{
+			
 			$categoryDb->save();
+			
 			$this->getPartner()->unlockCategories();
+			
 		}
 		catch(Exception $ex)
 		{
@@ -156,34 +153,32 @@ class CategoryService extends KalturaBaseService
 	{
 		if ($filter === null)
 			$filter = new KalturaCategoryFilter();
-			
+
 		if ($pager == null)
 		{
 			$pager = new KalturaFilterPager();
-			
 			//before falcon we didn’t have a pager for action category->list, 
 			//and since we added a pager – and remove the limit for partners categories, 
 			//for backward compatibility this will be the page size. 
 			$pager->pageIndex = 1;
 			$pager->pageSize = partner::MAX_NUMBER_OF_CATEGORIES;
 		}
-			
+
 		if ($filter->orderBy === null)
 			$filter->orderBy = KalturaCategoryOrderBy::DEPTH_ASC;
 			
 		$categoryFilter = new categoryFilter();
 		
 		$filter->toObject($categoryFilter);
-
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		 
+		
 		$categoryFilter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
-		
 		$dbList = categoryPeer::doSelect($c);
 		$totalCount = $c->getRecordsCount();
 		
 		$list = KalturaCategoryArray::fromCategoryArray($dbList);
+		
 		$response = new KalturaCategoryListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
@@ -195,10 +190,10 @@ class CategoryService extends KalturaBaseService
 	 * 
 	 * @action index
 	 * @param int $id
-	 * @param int $shouldUpdate
+	 * @param bool $shouldUpdate
 	 * @return int category int id
 	 */
-	function indexAction($id, $shouldUpdate)
+	function indexAction($id, $shouldUpdate = true)
 	{
 		$categoryDb = categoryPeer::retrieveByPK($id);
 		if (!$categoryDb)
@@ -212,13 +207,21 @@ class CategoryService extends KalturaBaseService
 			return $categoryDb->getIntId();
 		}
 		
-		//TODO 
-		//calculate depth
-		//calculate full name
-		//calculate inherited parent
-		//calculate EntriesCount
-		//??? calculate directEntriesCount
+		$categoryDb->setIsIndex(true);
 		
+		//update category full ids and inherited parent id should come first.
+		$categoryDb->reSetFullIds();
+		$categoryDb->reSetInheritedParentId();
+		$categoryDb->reSetDepth();
+		$categoryDb->reSetFullName();
+		$categoryDb->reSetEntriesCount();
+		$categoryDb->reSetPendingMembersCount();
+		$categoryDb->reSetPendingMembersCount();
+
+		//TODO should skip all category logic 
+		$categoryDb->save();
+		
+		return $categoryDb->getId();
 	}
 	
 	private function handleCoreException(kCoreException $ex, category $categoryDb, KalturaCategory $category)

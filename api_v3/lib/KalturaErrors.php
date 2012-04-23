@@ -85,8 +85,6 @@ class KalturaErrors extends APIErrors
 	
 	const PLUGIN_NOT_AVAILABLE_FOR_PARTNER = "PLUGIN_NOT_AVAILABLE_FOR_PARTNER,Plugin [%s] is not available for partner [%s]";
 	
-	const REFERENCE_ID_ALREADY_EXISTS = "REFERENCE_ID_ALREADY_EXISTS,Reference id [%s] already exists";
-	
 	const SYSTEM_NAME_ALREADY_EXISTS = "SYSTEM_NAME_ALREADY_EXISTS,System name [%s] already exists";
 	
 	/**

@@ -29,11 +29,21 @@ class KalturaCategoryEntry extends KalturaObject implements IFilterable
 	 */
 	public $createdAt;
 	
+	/**
+	 * The full ids of the Category
+	 * 
+	 * @var string
+	 * @readonly
+	 * @filter likex,eq
+	 */
+	public $categoryFullIds;
+	
 	private static $mapBetweenObjects = array
 	(
 		"entryId",
 		"categoryId",
 		"createdAt",
+		"categoryFullIds",
 	);
 	
 	public function getMapBetweenObjects()
