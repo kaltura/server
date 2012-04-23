@@ -40,6 +40,7 @@ class kmc4Action extends kalturaAction
 	/** END - check parameters and verify user is logged-in **/
 		
 	/** Get array of allowed partners for the current user **/
+		$this->allowedPartners = array();
 		$currentUser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $ksObj->user, true);
 		if($currentUser) {
 			$partners = myPartnerUtils::getPartnersArray($currentUser->getAllowedPartnerIds());
