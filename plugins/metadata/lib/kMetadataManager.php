@@ -13,6 +13,9 @@ class kMetadataManager
 	
 	protected static $objectTypeNames = array(
 		Metadata::TYPE_ENTRY => 'entry',
+		Metadata::TYPE_CATEGORY => 'category',
+		Metadata::TYPE_USER => 'kuser',
+		Metadata::TYPE_CATEGORY_USER => 'categoryKuser',
 	);
 	
 	/**
@@ -524,6 +527,35 @@ class kMetadataManager
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Function returns the required Metadata object type for the given object's class name
+	 * @param BaseObject $object
+	 * @return int
+	 */
+	public static function getTypeNameFromObject (BaseObject $object)
+	{
+	    $cls = get_class($object);
+	    foreach (self::$objectTypeNames as $objectType => $objectClassName)
+	    {
+	        if ($cls == self::$objectTypeNames)
+	        {
+	            return $objectType;
+	        }
+	    }
+	    
+	    $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaMetadataObjects');
+		foreach($pluginInstances as $pluginInstance)
+		{
+			/* @var $pluginInstance IKalturaMetadataObjects */
+			$objectType = $pluginInstance->getObjectType($cls);
+			if($objectType)
+			{
+				return $objectType;
+			}
+		}
+	    return Metadata::TYPE_ENTRY;
 	}
 	
 	/**
