@@ -76,6 +76,7 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the action field.
+	 * Note: this column has a database default value of: 1
 	 * @var        int
 	 */
 	protected $action;
@@ -188,6 +189,7 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	public function applyDefaultValues()
 	{
 		$this->object_type = 1;
+		$this->action = 1;
 	}
 
 	/**
@@ -724,7 +726,7 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 			$v = (int) $v;
 		}
 
-		if ($this->action !== $v) {
+		if ($this->action !== $v || $this->isNew()) {
 			$this->action = $v;
 			$this->modifiedColumns[] = BulkUploadResultPeer::ACTION;
 		}
@@ -947,6 +949,10 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	public function hasOnlyDefaultValues()
 	{
 			if ($this->object_type !== 1) {
+				return false;
+			}
+
+			if ($this->action !== 1) {
 				return false;
 			}
 

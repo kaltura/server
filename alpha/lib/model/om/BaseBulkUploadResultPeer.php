@@ -734,6 +734,7 @@ abstract class BaseBulkUploadResultPeer {
 	public static function populateObjects(PDOStatement $stmt)
 	{
 		$results = array();
+	
 		// populate the object(s)
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$key = BulkUploadResultPeer::getPrimaryKeyHashFromRow($row, 0);
