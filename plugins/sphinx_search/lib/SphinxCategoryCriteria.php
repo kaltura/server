@@ -7,9 +7,11 @@ class SphinxCategoryCriteria extends SphinxCriteria
 {
 	public static $sphinxFields = array(
 		'category.ID' => 'category_id',
+		'category.PARENT_ID' => 'parent_id',
 		'category.PARTNER_ID' => 'partner_id',
 		'category.NAME' => 'name',
 		'category.FULL_NAME' => 'full_name',
+		'category.FULL_IDS' => 'full_ids',
 		'category.DESCRIPTION' => 'description',
 		'category.TAGS' => 'tags',
 		'category.STATUS' => 'category_status',
@@ -57,9 +59,11 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	
 	public static $sphinxTypes = array(
 		'category_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'parent_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'name' => IIndexable::FIELD_TYPE_STRING,
 		'full_name' => IIndexable::FIELD_TYPE_STRING,
+		'full_ids' => IIndexable::FIELD_TYPE_STRING,
 		'description' => IIndexable::FIELD_TYPE_STRING,
 		'tags' => IIndexable::FIELD_TYPE_STRING,
 		'category_status' => IIndexable::FIELD_TYPE_INTEGER,
@@ -257,6 +261,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		return in_array($field_name, array(
 			"name", 
 			"full_name",
+			"full_ids",
 			"description", 
 			"tags", 
 			"members"
