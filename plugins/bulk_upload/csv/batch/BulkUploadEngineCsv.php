@@ -1,6 +1,6 @@
 <?php
 /**
- * Class for the handling Bulk upload using SCV in the system 
+ * Class which parses the bulk upload CSV and creates the objects listed in it. 
  * 
  * @package plugins.bulkUploadCsv
  * @subpackage batch

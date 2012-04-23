@@ -1,11 +1,12 @@
 <?php
 /**
- * Class for the handling Bulk upload using SCV in the system 
+ * Class which parses the bulk upload CSV and creates the objects listed in it. 
+ * This engine class parses CSVs which describe entries.
  * 
  * @package plugins.bulkUploadCsv
  * @subpackage batch
  */
-class BulkUploadEntryEngineCsv extends BulkUploadGeneralEngineCsv
+class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 {
 	/**
 	 * The column count (values) for the V1 CSV format
@@ -93,7 +94,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadGeneralEngineCsv
 		            break;
 		        
 		        default:
-		            $bulkUploadResult->objectStatus = KalturaEntryStatus::ERROR_IMPORTING;
+		            $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 		            $bulkUploadResult->errorDescription = "unknown action passed: [".$bulkUploadResult->action ."]";
 		            break;
 		    }
@@ -284,24 +285,28 @@ class BulkUploadEntryEngineCsv extends BulkUploadGeneralEngineCsv
 		if($this->lineNumber > $this->maxRecords) // check max records
 		{
 			$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorDescription = "Exeeded max records count per bulk";
 		}
 		
 		if(!$this->isUrl($bulkUploadResult->url)) // validates the url
 		{
 			$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorDescription = "Invalid url '$bulkUploadResult->url' on line $this->lineNumber";
 		}
 		
 		if($scheduleStartDate && !self::isFormatedDate($scheduleStartDate))
 		{
 			$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorDescription = "Invalid schedule start date '$scheduleStartDate' on line $this->lineNumber";
 		}
 		
 		if($scheduleEndDate && !self::isFormatedDate($scheduleEndDate))
 		{
 			$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorDescription = "Invalid schedule end date '$scheduleEndDate' on line $this->lineNumber";
 		}
 		
@@ -310,15 +315,17 @@ class BulkUploadEntryEngineCsv extends BulkUploadGeneralEngineCsv
 		
 		if (empty($privateKey) & !empty($publicKey)) {
 		    $bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorDescription = "Missing SSH private key on line  $this->lineNumber";
 		
 		}
 		else if (!empty($privateKey) & empty($publicKey)) {
 		    $bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorDescription = "Missing SSH public key on line $this->lineNumber";
 		}
 		
-		if($bulkUploadResult->entryStatus == KalturaEntryStatus::ERROR_IMPORTING)
+		if($bulkUploadResult->status == KalturaBulkUploadResultStatus::ERROR)
 		{
 			$this->addBulkUploadResult($bulkUploadResult);
 			return;
@@ -419,6 +426,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadGeneralEngineCsv
 			
 			if(is_array($requestResult) && isset($requestResult['code']))
 			{
+			    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 				$bulkUploadResult->entryStatus = $requestResult['code'];
 				$bulkUploadResult->errorDescription = $requestResult['message'];
 				$this->addBulkUploadResult($bulkUploadResult);
@@ -428,6 +436,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadGeneralEngineCsv
 			if($requestResult instanceof Exception)
 			{
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 				$bulkUploadResult->errorDescription = $requestResult->getMessage();
 				$this->addBulkUploadResult($bulkUploadResult);
 				continue;
@@ -436,6 +445,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadGeneralEngineCsv
 			if(! ($requestResult instanceof KalturaBaseEntry))
 			{
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 				$bulkUploadResult->errorDescription = "Returned type is " . get_class($requestResult) . ', KalturaMediaEntry was expected';
 				$this->addBulkUploadResult($bulkUploadResult);
 				continue;

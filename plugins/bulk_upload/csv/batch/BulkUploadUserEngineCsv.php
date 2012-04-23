@@ -1,11 +1,12 @@
 <?php
 /**
- * Class for the handling Bulk upload using SCV in the system 
+ * Class which parses the bulk upload CSV and creates the objects listed in it. 
+ * This engine class parses CSVs which describe users.
  * 
  * @package plugins.bulkUploadCsv
  * @subpackage batch
  */
-class BulkUploadUserEngineCsv extends BulkUploadGeneralEngineCsv
+class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 {
     
     protected $mapFullNameToId = array();

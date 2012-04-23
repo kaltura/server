@@ -1,11 +1,12 @@
 <?php
 /**
- * Class for the handling Bulk upload using SCV in the system 
+ * Class which parses the bulk upload CSV and creates the objects listed in it. 
+ * This engine class parses CSVs which describe categories.
  * 
  * @package plugins.bulkUploadCsv
  * @subpackage batch
  */
-class BulkUploadCategoryEngineCsv extends BulkUploadGeneralEngineCsv
+class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 {
     
     protected $mapFullNameToId = array();
@@ -256,7 +257,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadGeneralEngineCsv
 		if(count($requestResults))
 			$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
 
-		KalturaLog::info("job[{$this->job->id}] finish modifyig categories");
+		KalturaLog::info("job[{$this->job->id}] finish modifying categories");
 	}
 	
 	/**
