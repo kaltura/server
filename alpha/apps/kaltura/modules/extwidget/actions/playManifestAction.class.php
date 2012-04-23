@@ -774,6 +774,10 @@ class playManifestAction extends kalturaAction
 		if (strpos($this->protocol, "rtmp") === 0)
 			$baseUrl = $this->protocol . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
 		
+		$rtmpHost = parse_url($baseUrl, PHP_URL_HOST);
+		$urlManager = $this->getUrlManagerByCdn($rtmpHost);
+		$this->tokenizer = $urlManager->getTokenizer();
+
 		return $flavors;
 	}
 
@@ -891,6 +895,7 @@ class playManifestAction extends kalturaAction
 
 				$renderer = new kF4MManifestRenderer();
 				$renderer->entryId = $this->entryId;
+				$renderer->tokenizer = $this->tokenizer;
 				$renderer->flavors = $flavors;
 				$renderer->baseUrl = $baseUrl;
 				$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
