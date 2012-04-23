@@ -218,6 +218,7 @@
 		const OutDir		= "__outDir__";
 		const ConfigFileName= "__configFileName__";
 		const BinaryName	= "__binaryName__";
+		const ForceKeyframes= "__forceKeyframes__";
 	};
 	
 	class KDLContainerTarget {
