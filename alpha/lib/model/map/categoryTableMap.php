@@ -67,6 +67,7 @@ class categoryTableMap extends TableMap {
 		$this->addColumn('PRIVACY_CONTEXT', 'PrivacyContext', 'VARCHAR', false, 255, null);
 		$this->addColumn('PRIVACY_CONTEXTS', 'PrivacyContexts', 'VARCHAR', false, 255, null);
 		$this->addColumn('INHERITED_PARENT_ID', 'InheritedParentId', 'INTEGER', false, null, null);
+		$this->addColumn('LOCK', 'Lock', 'BOOLEAN', false, null, null);
 		// validators
 	} // initialize()
 

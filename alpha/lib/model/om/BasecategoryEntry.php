@@ -44,6 +44,12 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	protected $category_id;
 
 	/**
+	 * The value for the category_full_ids field.
+	 * @var        string
+	 */
+	protected $category_full_ids;
+
+	/**
 	 * The value for the created_at field.
 	 * @var        string
 	 */
@@ -144,6 +150,16 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	public function getCategoryId()
 	{
 		return $this->category_id;
+	}
+
+	/**
+	 * Get the [category_full_ids] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCategoryFullIds()
+	{
+		return $this->category_full_ids;
 	}
 
 	/**
@@ -329,6 +345,29 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	} // setCategoryId()
 
 	/**
+	 * Set the value of [category_full_ids] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     categoryEntry The current object (for fluent API support)
+	 */
+	public function setCategoryFullIds($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryEntryPeer::CATEGORY_FULL_IDS]))
+			$this->oldColumnsValues[categoryEntryPeer::CATEGORY_FULL_IDS] = $this->category_full_ids;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->category_full_ids !== $v) {
+			$this->category_full_ids = $v;
+			$this->modifiedColumns[] = categoryEntryPeer::CATEGORY_FULL_IDS;
+		}
+
+		return $this;
+	} // setCategoryFullIds()
+
+	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
@@ -482,9 +521,10 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$this->partner_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->entry_id = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->category_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-			$this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->custom_data = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->category_full_ids = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->custom_data = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -494,7 +534,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 7; // 7 = categoryEntryPeer::NUM_COLUMNS - categoryEntryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 8; // 8 = categoryEntryPeer::NUM_COLUMNS - categoryEntryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating categoryEntry object", $e);
@@ -630,7 +670,9 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 				$ret = $ret && $this->preUpdate($con);
 			}
 			if ($ret) {
+				
 				$affectedRows = $this->doSave($con);
+				
 				if ($isInsert) {
 					$this->postInsert($con);
 				} else {
@@ -667,6 +709,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 */
 	protected function doSave(PropelPDO $con)
 	{
+		
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		if (!$this->alreadyInSave) {
 			$this->alreadyInSave = true;
@@ -679,13 +722,13 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
+					
 					$pk = categoryEntryPeer::doInsert($this, $con);
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
 										 // should always be true here (even though technically
 										 // BasePeer::doInsert() can insert multiple rows).
-
+					
 					$this->setId($pk);  //[IMV] update autoincrement primary key
-
 					$this->setNew(false);
 					$this->objectSaved = true;
 				} else {
@@ -969,12 +1012,15 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 				return $this->getCategoryId();
 				break;
 			case 4:
-				return $this->getCreatedAt();
+				return $this->getCategoryFullIds();
 				break;
 			case 5:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 6:
+				return $this->getUpdatedAt();
+				break;
+			case 7:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1002,9 +1048,10 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$keys[1] => $this->getPartnerId(),
 			$keys[2] => $this->getEntryId(),
 			$keys[3] => $this->getCategoryId(),
-			$keys[4] => $this->getCreatedAt(),
-			$keys[5] => $this->getUpdatedAt(),
-			$keys[6] => $this->getCustomData(),
+			$keys[4] => $this->getCategoryFullIds(),
+			$keys[5] => $this->getCreatedAt(),
+			$keys[6] => $this->getUpdatedAt(),
+			$keys[7] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1049,12 +1096,15 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 				$this->setCategoryId($value);
 				break;
 			case 4:
-				$this->setCreatedAt($value);
+				$this->setCategoryFullIds($value);
 				break;
 			case 5:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 6:
+				$this->setUpdatedAt($value);
+				break;
+			case 7:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1085,9 +1135,10 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setPartnerId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setEntryId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setCategoryId($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setCustomData($arr[$keys[6]]);
+		if (array_key_exists($keys[4], $arr)) $this->setCategoryFullIds($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setCustomData($arr[$keys[7]]);
 	}
 
 	/**
@@ -1103,6 +1154,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryEntryPeer::PARTNER_ID)) $criteria->add(categoryEntryPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(categoryEntryPeer::ENTRY_ID)) $criteria->add(categoryEntryPeer::ENTRY_ID, $this->entry_id);
 		if ($this->isColumnModified(categoryEntryPeer::CATEGORY_ID)) $criteria->add(categoryEntryPeer::CATEGORY_ID, $this->category_id);
+		if ($this->isColumnModified(categoryEntryPeer::CATEGORY_FULL_IDS)) $criteria->add(categoryEntryPeer::CATEGORY_FULL_IDS, $this->category_full_ids);
 		if ($this->isColumnModified(categoryEntryPeer::CREATED_AT)) $criteria->add(categoryEntryPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(categoryEntryPeer::UPDATED_AT)) $criteria->add(categoryEntryPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(categoryEntryPeer::CUSTOM_DATA)) $criteria->add(categoryEntryPeer::CUSTOM_DATA, $this->custom_data);
@@ -1177,6 +1229,8 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		$copyObj->setEntryId($this->entry_id);
 
 		$copyObj->setCategoryId($this->category_id);
+
+		$copyObj->setCategoryFullIds($this->category_full_ids);
 
 		$copyObj->setCreatedAt($this->created_at);
 
