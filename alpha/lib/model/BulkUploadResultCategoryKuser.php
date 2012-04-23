@@ -7,6 +7,43 @@ class BulkUploadResultCategoryKuser extends BulkUploadResult
     const PERMISSION_LEVEL = "permission_level";
     const UPDATE_METHOD = "update_method";
     
+    public static function getClosedStatuses ()
+    {
+        return array(
+            CategoryKuserStatus::ACTIVE,
+            CategoryKuserStatus::PENDING,
+        );
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see BulkUploadResult::handleRelatedObjects()
+     */
+    public function handleRelatedObjects()
+    {
+        
+    }
+    
+    /* (non-PHPdoc)
+     * @see BulkUploadResult::updateStatusFromObject()
+     */
+    public function updateStatusFromObject()
+    {
+        if ($this->getObjectStatus() == CategoryKuserStatus::ACTIVE)
+        {
+            $this->setStatus(BulkUploadResultStatus::OK);
+            $this->save();
+        }
+    }
+    
+    /* (non-PHPdoc)
+     * @see BulkUploadResult::getObject()
+     */
+    public function getObject()
+    {
+        return categoryKuserPeer::retrieveByPK($this->getObjectId());
+    }
+    
     //Set properties for category users
 	
     public function getCategoryId()	{return $this->getFromCustomData(self::CATEGORY_ID);}

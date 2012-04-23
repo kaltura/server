@@ -13,6 +13,31 @@ class BulkUploadResultKuser extends BulkUploadResult
     const FIRST_NAME = "first_name";
     const LAST_NAME = "last_name";
     const IS_ADMIN = "is_admin";
+    const TAGS = "tags";
+    
+    /* (non-PHPdoc)
+     * @see BulkUploadResult::handleRelatedObjects()
+     */
+    public function handleRelatedObjects()
+    {
+        
+    }
+    
+    /* (non-PHPdoc)
+     * @see BulkUploadResult::updateStatusFromObject()
+     */
+    public function updateStatusFromObject()
+    {
+        
+    }
+    
+    /* (non-PHPdoc)
+     * @see BulkUploadResult::getObject()
+     */
+    public function getObject()
+    {
+        return kuserPeer::retrieveByPKNoFilter($this->getObjectId());
+    }
     
     //Set properties for users
 	
@@ -48,4 +73,7 @@ class BulkUploadResultKuser extends BulkUploadResult
 	
 	public function getIsAdmin()	{return $this->getFromCustomData(self::IS_ADMIN);}
 	public function setIsAdmin($v)	{$this->putInCustomData(self::IS_ADMIN, $v);}
+	
+    public function getTags()	{return $this->getFromCustomData(self::TAGS);}
+	public function setTags($v)	{$this->putInCustomData(self::TAGS, $v);}
 }

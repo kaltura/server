@@ -10,44 +10,10 @@
  */ 
 class BulkUploadResult extends BaseBulkUploadResult
 {   
-	private $aEntry = null;
-	
-	public function getEntry()
-	{
-		if($this->aEntry == null && $this->getEntryId())
-		{
-			$this->aEntry = entryPeer::retrieveByPKNoFilter($this->getEntryId());
-		}
-		return $this->aEntry;
-	}
-	
-	public function updateStatusFromEntry()
-	{
-		$entry = $this->getEntry();
-		if(!$entry)
-			return;
-			
-		$this->setEntryStatus($entry->getStatus());
-		$this->save();
-		
-		return $this->getEntryStatus();
-	}
-	
-	public function getEntryId()
-	{
-		if($this->getObjectType() == BulkUploadResultObjectType::ENTRY)
-			return $this->getObjectId();
-			
-		return null;
-	}
-	
-	public function setEntryId($v)
-	{
-		$this->setObjectType(BulkUploadResultObjectType::ENTRY);
-		return $this->setObjectId($v);
-	}
-	
-
+    public static function getClosedStatuses()
+    {
+        return array();
+    }
 	/**
 	 * Get the [plugins_data] column value.
 	 * 
@@ -76,5 +42,34 @@ class BulkUploadResult extends BaseBulkUploadResult
 		return parent::setPluginsData(json_encode($v));
 	} // setPluginsData()
 	
+	
+	/**
+	 * Function to update the status of the current bulk upload result
+	 * with dependence on its related object's status.
+	 */
+	public function updateStatusFromObject ()
+	{
+	    $this->setStatus(BulkUploadResultStatus::OK);
+	    $this->save();
+	}
+	
+	
+	/**
+	 * Function called after the bulk upload result is added
+	 * to the database, in case the object it concerns needs to be updated also.
+	 */
+	public function handleRelatedObjects ()
+	{
+	    
+	}
+	
+	
+	/**
+	 * Function to return the object related to the current bulk upload result.
+	 */
+	public function getObject ()
+	{
+	    
+	}
 	
 }

@@ -21,6 +21,9 @@ class BulkUploadResultEntry extends BulkUploadResult
     const ENTRY_STATUS = "entry_status";
     
 	
+	/* (non-PHPdoc)
+	 * @see BulkUploadResult::updateStatusFromObject()
+	 */
 	public function updateStatusFromObject()
 	{
 		$entry = entryPeer::retrieveByPKNoFilter($this->getObjectId());
@@ -73,9 +76,12 @@ class BulkUploadResultEntry extends BulkUploadResult
 		$bulkUploadResult->save();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see BulkUploadResult::handleRelatedObjects()
+	 */
 	public function handleRelatedObjects()
 	{
-	    $entry = entryPeer::retrieveByPKNoFilter($this->getObjectId()); //Gets also deleted entries
+	    $entry = $this->getObject(); 
 		if(!$entry)
 			throw new kCoreException("Entry not found");
 			
@@ -84,6 +90,16 @@ class BulkUploadResultEntry extends BulkUploadResult
 			
 		$entry->setBulkUploadId($this->getBulkUploadJobId());
 		$entry->save();
+	}
+	
+	
+	/* (non-PHPdoc)
+	 * @see BulkUploadResult::getObject()
+	 */
+	public function getObject()
+	{
+	    //Return deleted entries as well.
+	    return entryPeer::retrieveByPKNoFilter($this->getObjectId());   
 	}
 	
 	public function getEntryId()

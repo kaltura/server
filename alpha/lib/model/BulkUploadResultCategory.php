@@ -20,14 +20,27 @@ class BulkUploadResultCategory extends BulkUploadResult
         if ($this->getObjectStatus() == CategoryStatus::ACTIVE)
         {
             $this->setStatus(BulkUploadResultStatus::OK);
+            $this->save();
         }
         
         return $this->getStatus();
     }
     
+    /* (non-PHPdoc)
+     * @see BulkUploadResult::handleRelatedObjects()
+     */
     public function handleRelatedObjects()
     {
         
+    }
+    
+    /* (non-PHPdoc)
+     * @see BulkUploadResult::getObject()
+     */
+    public function getObject()
+    {
+        //Return deleted categories as well.
+        return categoryPeer::retrieveByPKsNoFilter($this->getObjectId());
     }
     
     //Set properties for categories
