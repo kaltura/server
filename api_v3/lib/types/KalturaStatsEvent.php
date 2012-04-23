@@ -146,5 +146,10 @@ referrer
 	 */
 	public $applicationId;
 	
+	
+	/**
+	 * @var KalturaStatsContextType
+	 */
+	public $eventContext;
 		
 }
