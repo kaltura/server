@@ -1148,29 +1148,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			categoryPeer::setUseCriteriaFilter(false);
 			$categoryDb = categoryPeer::retrieveByPK($categoryEntry->getCategoryId());
 			categoryPeer::setUseCriteriaFilter(true);
-			
-			if (!$categoryDb || $categoryDb->getStatus() == CategoryStatus::DELETED || $categoryDb->getStatus() == CategoryStatus::PURGED)
-			{
-				while($categoryDb->getParentId != null)
-				{
-					categoryPeer::setUseCriteriaFilter(false);
-					$parentCategoryDb = categoryPeer::retrieveByPK($categoryDb->getParentId);
-					categoryPeer::setUseCriteriaFilter(true);
-					
-					if ($parentCategoryDb && 
-						($parentCategoryDb->getStatus() == CategoryStatus::ACTIVE || $parentCategoryDb->getStatus() == CategoryStatus::UPDATING)) 
-					{
-						$categoriesFullName[] = $parentCategoryDb->getFullName();
-						break;
-					}
-					
-					$categoryDb = $parentCategoryDb;
-				}
-			}
-			else
-			{
-				$categoriesFullName[] = $categoryDb->getFullName();
-			}
+
+			$categoriesFullName[] = $categoryDb->getFullName();
 		}
 		
 		$entry->setCategoriesWithNoSync($categoriesFullName);
