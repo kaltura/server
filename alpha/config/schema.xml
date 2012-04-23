@@ -637,12 +637,16 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="bulk_upload_job_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="line_index" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_id" type="varchar" size="20" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_type" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="action" type="integer" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="object_type" type="integer" inheritance="single" default="1"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="action" type="integer" default="1"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_status" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="row_data" type="varchar" size="1023" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_data" type="varchar" size="4096" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_error_description" type="varchar" size="255" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="error_code" type="integer"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="error_type" type="integer"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="error_description" type="varchar" size="255" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="plugins_data" type="varchar" size="9182" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
@@ -1460,6 +1464,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="update_method" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="category">
 			<reference local="category_id" foreign="id" />
 		</foreign-key>
