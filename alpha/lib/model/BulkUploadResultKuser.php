@@ -25,13 +25,6 @@ class BulkUploadResultKuser extends BulkUploadResult
         $kuser->save();
     }
     
-    /* (non-PHPdoc)
-     * @see BulkUploadResult::updateStatusFromObject()
-     */
-    public function updateStatusFromObject()
-    {
-        
-    }
     
     /* (non-PHPdoc)
      * @see BulkUploadResult::getObject()

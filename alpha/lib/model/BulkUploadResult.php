@@ -10,10 +10,6 @@
  */ 
 class BulkUploadResult extends BaseBulkUploadResult
 {   
-    public static function getClosedStatuses()
-    {
-        return array();
-    }
 	/**
 	 * Get the [plugins_data] column value.
 	 * 
@@ -51,6 +47,8 @@ class BulkUploadResult extends BaseBulkUploadResult
 	{
 	    $this->setStatus(BulkUploadResultStatus::OK);
 	    $this->save();
+	    
+	    return $this->getStatus();
 	}
 	
 	

@@ -7,14 +7,7 @@ class BulkUploadResultCategoryKuser extends BulkUploadResult
     const PERMISSION_LEVEL = "permission_level";
     const UPDATE_METHOD = "update_method";
     
-    public static function getClosedStatuses ()
-    {
-        return array(
-            CategoryKuserStatus::ACTIVE,
-            CategoryKuserStatus::PENDING,
-        );
-    }
-    
+   
     /**
      * (non-PHPdoc)
      * @see BulkUploadResult::handleRelatedObjects()
