@@ -15,6 +15,11 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		return self::PLUGIN_NAME;
 	}
 	
+	public static function getAllPluginableActions ()
+	{
+	    return array('baseEntry_addBulkUpload' => 'bulkUpload_add');
+	}
+	
 	/**
 	 * @return array<string> list of enum classes names that extend the base enum name
 	 */
@@ -49,7 +54,20 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		if($baseClass == 'KBulkUploadEngine' && class_exists('KalturaClient') && (is_null($enumValue) || $enumValue == KalturaBulkUploadType::CSV))
 		{
 			list($taskConfig, $kClient, $job) = $constructorArgs;
-			return new BulkUploadEngineCsv($taskConfig, $kClient, $job);
+			/* @var $job KalturaBatchJob */
+			//KalturaLog::debug(get_class_vars('KalturaBulkUploadObjectType'));
+			KalturaLog::debug("Class file path: ".KAutoloader::getClassFilePath('KalturaBulkUploadObjectType'));
+			switch ($job->data->bulkUploadObjectType)
+			{
+			    case KalturaBulkUploadObjectType::ENTRY:
+			        return new BulkUploadEntryEngineCsv($taskConfig, $kClient, $job);
+			    case KalturaBulkUploadObjectType::CATEGORY:
+			        return new BulkUploadCategoryEngineCsv($taskConfig, $kClient, $job);
+			    default:
+			        throw new KalturaAPIException();
+			        break;
+			}
+			
 		}
 				
 		return null;
