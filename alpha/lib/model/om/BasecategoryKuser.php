@@ -86,6 +86,12 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 	protected $updated_at;
 
 	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
+
+	/**
 	 * @var        category
 	 */
 	protected $acategory;
@@ -308,6 +314,16 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
 	}
 
 	/**
@@ -624,6 +640,26 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 	} // setUpdatedAt()
 
 	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     categoryKuser The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = categoryKuserPeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -666,6 +702,7 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			$this->update_method = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->created_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->updated_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->custom_data = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -675,7 +712,7 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 11; // 11 = categoryKuserPeer::NUM_COLUMNS - categoryKuserPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 12; // 12 = categoryKuserPeer::NUM_COLUMNS - categoryKuserPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating categoryKuser object", $e);
@@ -934,6 +971,8 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -944,7 +983,9 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 	public function postSave(PropelPDO $con = null) 
 	{
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 		parent::postSave($con);
 	}
 	
@@ -1200,6 +1241,9 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			case 10:
 				return $this->getUpdatedAt();
 				break;
+			case 11:
+				return $this->getCustomData();
+				break;
 			default:
 				return null;
 				break;
@@ -1232,6 +1276,7 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			$keys[8] => $this->getUpdateMethod(),
 			$keys[9] => $this->getCreatedAt(),
 			$keys[10] => $this->getUpdatedAt(),
+			$keys[11] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1296,6 +1341,9 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			case 10:
 				$this->setUpdatedAt($value);
 				break;
+			case 11:
+				$this->setCustomData($value);
+				break;
 		} // switch()
 	}
 
@@ -1331,6 +1379,7 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[8], $arr)) $this->setUpdateMethod($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setCustomData($arr[$keys[11]]);
 	}
 
 	/**
@@ -1353,6 +1402,7 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryKuserPeer::UPDATE_METHOD)) $criteria->add(categoryKuserPeer::UPDATE_METHOD, $this->update_method);
 		if ($this->isColumnModified(categoryKuserPeer::CREATED_AT)) $criteria->add(categoryKuserPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(categoryKuserPeer::UPDATED_AT)) $criteria->add(categoryKuserPeer::UPDATED_AT, $this->updated_at);
+		if ($this->isColumnModified(categoryKuserPeer::CUSTOM_DATA)) $criteria->add(categoryKuserPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1438,6 +1488,8 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 		$copyObj->setCreatedAt($this->created_at);
 
 		$copyObj->setUpdatedAt($this->updated_at);
+
+		$copyObj->setCustomData($this->custom_data);
 
 
 		$copyObj->setNew(true);
@@ -1618,4 +1670,121 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			$this->akuser = null;
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BasecategoryKuser
