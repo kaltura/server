@@ -31,7 +31,9 @@ class BulkUploadResultCategory extends BulkUploadResult
      */
     public function handleRelatedObjects()
     {
-        
+        $category = $this->getObject();
+        $category->setBulkUploadId($this->getBulkUploadJobId());
+        $category->save();
     }
     
     /* (non-PHPdoc)
