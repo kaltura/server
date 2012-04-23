@@ -110,7 +110,9 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 				$mediaInfoDar = null;
 				$mediaInfoFilter = new KalturaMediaInfoFilter();
 				$mediaInfoFilter->flavorAssetIdEqual = $data->srcAssetId;
-				$mediaInfoList = $this->kClient->mediaInfo->listAction();
+				$this->impersonate($job->partnerId);
+				$mediaInfoList = $this->kClient->mediaInfo->listAction($mediaInfoFilter);
+				$this->unimpersonate();
 				if(count($mediaInfoList->objects))
 				{
 					$mediaInfo = reset($mediaInfoList->objects);
