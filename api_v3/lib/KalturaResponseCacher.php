@@ -452,7 +452,7 @@ class KalturaResponseCacher
 
 	private function hasCache()
 	{
-		if (!$this->isKSValid())
+		if ($this->_ks && !$this->isKSValid())
 			return false;					// ks not valid, do not return from cache
 	
 		// if the request is for warming the cache, disregard the cache and run the request
