@@ -48,21 +48,14 @@ class BatchService extends KalturaBaseService
 			
 		$bulkUploadResult->pluginsData = $pluginDataArray;
 		$dbBulkUploadResult = $bulkUploadResult->toInsertableObject();
+		/* @var $dbBulkUploadResult BulkUploadResult */
 		$dbBulkUploadResult->save();
 	
-		if($bulkUploadResult->entryId)
+		if($bulkUploadResult->objectId)
 		{
-			$entry = entryPeer::retrieveByPKNoFilter($bulkUploadResult->entryId); //Gets also deleted entries
-			if(!$entry)
-				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $bulkUploadResult->entryId);
-				
-			if($bulkUploadResult->thumbnailUrl)
-				$entry->setCreateThumb(false);
-				
-			$entry->setBulkUploadId($bulkUploadResult->bulkUploadJobId);
-			$entry->save();
+			$dbBulkUploadResult->handleRelatedObjects();
 			
-			$jobs = BatchJobPeer::retrieveByEntryId($bulkUploadResult->entryId);
+			$jobs = BatchJobPeer::retrieveByEntryId($bulkUploadResult->objectId);
 			foreach($jobs as $job)
 			{
 				if(!$job->getParentJobId())
@@ -73,7 +66,7 @@ class BatchService extends KalturaBaseService
 				}
 			}
 			
-			if($entry && $pluginDataArray && $pluginDataArray->count)
+			if($dbBulkUploadResult->getObject() && $pluginDataArray && $pluginDataArray->count)
 			{
 				$pluginValues = $pluginDataArray->toValuesArray();
 				if(count($pluginValues))
