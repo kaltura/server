@@ -39,8 +39,9 @@ class categoryEntryTableMap extends TableMap {
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
-		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', false, 20, null);
-		$this->addColumn('CATEGORY_ID', 'CategoryId', 'INTEGER', false, null, null);
+		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', true, 20, null);
+		$this->addColumn('CATEGORY_ID', 'CategoryId', 'INTEGER', true, null, null);
+		$this->addColumn('CATEGORY_FULL_IDS', 'CategoryFullIds', 'LONGVARCHAR', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);

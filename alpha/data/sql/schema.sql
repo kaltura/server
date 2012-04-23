@@ -1642,6 +1642,7 @@ CREATE TABLE `category`
 	`privacy_context` VARCHAR(255),
 	`privacy_contexts` VARCHAR(255),
 	`inherited_parent_id` INTEGER,
+	`lock` TINYINT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_full_name_index`(`partner_id`, `full_name`)
 )Type=InnoDB;
@@ -1657,8 +1658,9 @@ CREATE TABLE `category_entry`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`partner_id` INTEGER  NOT NULL,
-	`entry_id` VARCHAR(20),
-	`category_id` INTEGER,
+	`entry_id` VARCHAR(20)  NOT NULL,
+	`category_id` INTEGER  NOT NULL,
+	`category_full_ids` TEXT  NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT,

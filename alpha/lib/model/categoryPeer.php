@@ -28,7 +28,7 @@ class categoryPeer extends BasecategoryPeer
 		}
 
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
-		$c->add ( self::STATUS, CategoryStatus::DELETED, Criteria::NOT_EQUAL );	
+		$c->add ( self::STATUS, array(CategoryStatus::DELETED, CategoryStatus::PURGED), Criteria::NOT_IN );
 		
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{

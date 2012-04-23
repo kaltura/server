@@ -1427,6 +1427,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy_context" type="varchar" size="255" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy_contexts" type="varchar" size="255" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="inherited_parent_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="lock" type="boolean" />
 		<index name="partner_id_full_name_index">
 			<index-column name="partner_id" />
 			<index-column name="full_name" />
@@ -1435,8 +1436,9 @@
 		<table skipSql="false" abstract="false" name="category_entry" phpName="categoryEntry" deletable="true">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" lazyLoad="false" name="partner_id" type="integer" required="true" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" size="20" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="category_id" type="integer" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" size="20" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="category_id" type="integer" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="category_full_ids" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
@@ -1452,7 +1454,7 @@
 			<index-column name="updated_at" />
 		</index>
 	</table>	
-	<table skipSql="false" abstract="false" name="category_kuser" phpName="categoryKuser">
+	<table skipSql="false" abstract="false" name="category_kuser" phpName="categoryKuser" deletable="true">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="category_id" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="kuser_id" type="integer" />

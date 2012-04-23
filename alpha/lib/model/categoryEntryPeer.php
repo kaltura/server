@@ -17,6 +17,19 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 
 	private static $skipEntrySave = false;
 	
+	public static function setDefaultCriteriaFilter ()
+	{
+		if ( self::$s_criteria_filter == null )
+		{
+			self::$s_criteria_filter = new criteriaFilter ();
+		}
+
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
+		$c->add ( self::PARTNER_ID, kCurrentContext::$ks_partner_id, Criteria::EQUAL);
+				
+		self::$s_criteria_filter->setFilter ( $c );
+	}
+	
 	public static function getSkipSave()
 	{
 		return self::$skipEntrySave;

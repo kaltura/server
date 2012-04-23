@@ -34,6 +34,16 @@ class categoryEntry extends BasecategoryEntry {
 	}
 	
 	/* (non-PHPdoc)
+	 * @see lib/model/om/Basecategory#preSave()
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		$category = categoryPeer::retrieveByPK($this->getCategoryId());
+		$this->setCategoryFullIds($category->getFullIds());
+		return parent::preSave();
+	}
+	
+	/* (non-PHPdoc)
 	 * @see lib/model/om/Basecategory#postInsert()
 	 */
 	public function postInsert(PropelPDO $con = null)
@@ -86,6 +96,15 @@ class categoryEntry extends BasecategoryEntry {
 			$entry->removeCategory($category->getFullName());
 			$entry->save();
 		}
+	}
+	
+	public function reSetCategoryFullIds()
+	{
+		$category = categoryPeer::retrieveByPK($this->getCategoryId());
+		if(!$category)
+			throw new kCoreException('category id [' . $this->getCategoryId() . 'was not found', kCoreException::ID_NOT_FOUND);
+			
+		$this->setCategoryFullIds($category->getFullIds());
 	}
 	
 
