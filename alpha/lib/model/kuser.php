@@ -21,13 +21,14 @@ class kuser extends Basekuser implements IIndexable
 		$this->roleIdsChanged = false;
 	}
 	
+	const BULK_UPLOAD_ID = "bulk_upload_id";
 	
 	const ANONYMOUS_PUSER_ID = "KALANONYM";
 	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 		
 	const KUSER_KALTURA = 0;
-	  
+	
 	// different sort orders for browsing kswhos
 	const KUSER_SORT_MOST_VIEWED = 1;  
 	const KUSER_SORT_MOST_RECENT = 2;  
@@ -707,7 +708,7 @@ class kuser extends Basekuser implements IIndexable
 			return $dt->format($format);
 		}
 	}
-	
+	 
 	
 	private function setDeletedAt($v)
 	{		
@@ -1211,10 +1212,13 @@ class kuser extends Basekuser implements IIndexable
 			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 	}
 	
-        
-	
 	// --------------------------------------
 	// -- end of user role handling functions
 	// --------------------------------------
+	
+	//Custom data functions
+	
+    public function setBulkUploadId ($bulkUploadId){$this->putInCustomData (self::BULK_UPLOAD_ID, $bulkUploadId);}
+	public function getBulkUploadId (){return $this->getFromCustomData(self::BULK_UPLOAD_ID);}
 			
 }
