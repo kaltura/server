@@ -17,6 +17,8 @@ class categoryKuser extends BasecategoryKuser {
 	
 	private $old_status = null;
 	
+	const BULK_UPLOAD_ID = "bulk_upload_id";
+	
 	public function setPuserId($puserId)
 	{
 		if ( self::getPuserId() == $puserId )  // same value - don't set for nothing 
@@ -108,4 +110,9 @@ class categoryKuser extends BasecategoryKuser {
 		
 		parent::delete($con);
 	}
+	
+	//set properties in custom data
+	
+    public function setBulkUploadId ($bulkUploadId){$this->putInCustomData (self::BULK_UPLOAD_ID, $bulkUploadId);}
+	public function getBulkUploadId (){return $this->getFromCustomData(self::BULK_UPLOAD_ID);}
 } // categoryKuser
