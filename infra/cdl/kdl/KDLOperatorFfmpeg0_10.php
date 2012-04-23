@@ -4,11 +4,7 @@
  * @subpackage lib
  */
 class KDLOperatorFfmpeg0_10 extends KDLOperatorFfmpeg {
-/*
-    public function __construct($id, $name=null, $sourceBlacklist=null, $targetBlacklist=null) {
-    	parent::__construct($id,$name,$sourceBlacklist,$targetBlacklist);
-    }
-*/
+
 	/* ---------------------------
 	 * GenerateCommandLine
 	 */
@@ -63,18 +59,11 @@ $forcedKF=0;
 							// this var will be used as a flag for further stages,
 			break;
 		}
-//print_r($target); die;
+//$forcedKF=null;	// Disable FORCED KF - due to large record size
 		if(isset($forcedKF) and isset($vid->_gop) && isset($vid->_frameRate) && $vid->_frameRate>0){
-			$forcedKF=null;
 			$gopInSecs=($vid->_gop/$vid->_frameRate);
-			for($t=0,$tr=0;$t<=$target->_container->_duration/1000; $t+=$gopInSecs, $tr+=round($gopInSecs)){
-				if(round($t)>$tr) {
-					echo "$t,$tr\n"; $t=$tr;
-				}
-				$forcedKF.=",".round($t,4);
-			}
-			$forcedKF[0] = ' ';
-			$cmdStr.= " -force_key_frames$forcedKF";
+			$forcedKF=KDLCmdlinePlaceholders::ForceKeyframes.($target->_container->_duration/1000)."_$gopInSecs";
+			$cmdStr.= " -force_key_frames $forcedKF";
 		}
 		
 		if(isset($vid->_rotation)) {
@@ -97,16 +86,6 @@ $forcedKF=0;
 	{
 	    if(KDLOperatorBase::CheckConstraints($source, $target, $errors, $warnings)==true)
 			return true;
-
-		/*
-		 * Remove ffmpegs
-		 * for rotated videos
-		 
-		if($target->_video && $target->_video->_rotation) {
-			$warnings[KDLConstants::VideoIndex][] = //"The transcoder (".$key.") does not handle properly DAR<>PAR.";
-				KDLWarnings::ToString(KDLWarnings::TranscoderLimitation, $this->_id);
-			return true;
-		}*/
 
 		/*
 		 * Non Mac transcoders should not mess up with QT/WMV/WMA
