@@ -3,6 +3,6 @@
  * @package api
  * @subpackage enum
  */
-class KalturaBulkUploadAction extends KalturaEnum implements BulkUploadAction
+class KalturaBulkUploadAction extends DynamicEnum implements BulkUploadAction
 {
 }
