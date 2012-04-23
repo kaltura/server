@@ -8,56 +8,68 @@ class kBulkUploadJobData extends kJobData
 /**
 	 * @var int
 	 */
-	private $userId;
+	protected $userId;
 	
 	/**
 	 * The screen name of the user
 	 * 
 	 * @var string
 	 */
-	private $uploadedBy;
+	protected $uploadedBy;
 	
 	/**
 	 * Selected profile id for all bulk entries
 	 * 
 	 * @var int
 	 */
-	private $conversionProfileId;
+	protected $conversionProfileId;
 		
 	/**
 	 * Number of created entries
-	 * 
+	 * @deprecated Use numOfObjects instead
 	 * @var int
 	 */
-	private $numOfEntries;
+	protected $numOfEntries;
 	
 	/**
 	 * Created by the API
 	 * 
 	 * @var string
 	 */
-	private $resultsFileLocalPath;
+	protected $resultsFileLocalPath;
 	
 	/**
 	 * Created by the API
 	 * 
 	 * @var string
 	 */
-	private $resultsFileUrl;
+	protected $resultsFileUrl;
 
 	/**
 	 * 
 	 * The bulk upload job file path
 	 * @var string
 	 */
-	private $filePath;
+	protected $filePath;
 	
 	/**
 	 * 
 	 * The bulk upload job file name
 	 * @var string
 	 */
-	private $fileName;
+	protected $fileName;
+	
+	/**
+	 * Type of object for bulk upload
+	 * @var int
+	 */
+	protected $bulkUploadObjectType;
+
+	/**
+	 * Number of created objects
+	 * @var int
+	 */
+	protected $numOfObjects;
 		
 	/**
 	 * @return the $userId
@@ -170,4 +182,36 @@ class kBulkUploadJobData extends kJobData
 	public function setResultsFileUrl($resultsFileUrl) {
 		$this->resultsFileUrl = $resultsFileUrl;
 	}
+	/**
+     * @return the $numOfObjects
+     */
+    public function getNumOfObjects ()
+    {
+        return $this->numOfObjects;
+    }
+
+	/**
+     * @param int $numOfObjects
+     */
+    public function setNumOfObjects ($numOfObjects)
+    {
+        $this->numOfObjects = $numOfObjects;
+    }
+	/**
+     * @return the $bulkUploadObjectType
+     */
+    public function getBulkUploadObjectType ()
+    {
+        return $this->bulkUploadObjectType;
+    }
+
+	/**
+     * @param int $bulkUploadObjectType
+     */
+    public function setBulkUploadObjectType ($bulkUploadObjectType)
+    {
+        $this->bulkUploadObjectType = $bulkUploadObjectType;
+    }
+
+
 }
