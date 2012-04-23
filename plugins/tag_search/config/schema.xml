@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="plugins.tagSearch">
-	<table skipSql="false" abstract="false" name="tag" deletable="true">
+	<table skipSql="false" abstract="false" name="tag" phpName="tag" deletable="true">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
 		<column primaryKey="false" required="true" lazyLoad="false" name="tag" type="varchar" size="32" />
 		<column primaryKey="false" required="true" lazyLoad="false" name="partner_id" type="integer" />
