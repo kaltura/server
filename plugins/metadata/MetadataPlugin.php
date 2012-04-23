@@ -485,7 +485,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		$dbMetadata->setPartnerId($object->getPartnerId());
 		$dbMetadata->setMetadataProfileId($metadataProfileId);
 		$dbMetadata->setMetadataProfileVersion($metadataProfile->getVersion());
-		$dbMetadata->setObjectType(Metadata::TYPE_ENTRY);
+		$dbMetadata->setObjectType(kMetadataManager::getTypeNameFromObject($object));
 		$dbMetadata->setObjectId($object->getId());
 		$dbMetadata->setStatus(Metadata::STATUS_VALID);
 		$dbMetadata->save();
