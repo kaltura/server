@@ -41,8 +41,9 @@ class BulkUploadResultEntry extends BulkUploadResult
 
 		if(in_array($this->getObjectStatus(), $closedStatuses))
 		{
-		    $this->setStatus(BulkUploadResultStatus::OK);
 			$this->updateEntryThumbnail();
+		    $this->setStatus(BulkUploadResultStatus::OK);
+		    $this->save();
 			continue;
 		}
 			
@@ -70,6 +71,19 @@ class BulkUploadResultEntry extends BulkUploadResult
 		
 		$bulkUploadResult->setThumbnailSaved(true);
 		$bulkUploadResult->save();
+	}
+	
+	public function handleRelatedObjects()
+	{
+	    $entry = entryPeer::retrieveByPKNoFilter($this->getObjectId()); //Gets also deleted entries
+		if(!$entry)
+			throw new kCoreException("Entry not found");
+			
+		if($this->getThumbnailUrl())
+			$entry->setCreateThumb(false);
+			
+		$entry->setBulkUploadId($this->getBulkUploadJobId());
+		$entry->save();
 	}
 	
 	public function getEntryId()
