@@ -108,7 +108,7 @@ abstract class KIndexingEngine
 	 * @param bool $shouldUpdate Indicates that the object columns and attributes values should be recalculated before reindexed
 	 * @return int the number of indexed objects
 	 */
-	protected function index(KalturaFilter $filter, $shouldUpdate);
+	abstract protected function index(KalturaFilter $filter, $shouldUpdate);
 	
 	/**
 	 * @return int $lastIndexId
