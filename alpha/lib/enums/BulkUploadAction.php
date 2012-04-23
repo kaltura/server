@@ -10,4 +10,5 @@ interface BulkUploadAction extends BaseEnum
 	const DELETE = 3;
 	const REPLACE = 4;
 	const TRANSFORM_XSLT = 5;
+	const ADD_OR_UPDATE = 6;
 }
