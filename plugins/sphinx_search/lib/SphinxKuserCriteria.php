@@ -3,7 +3,6 @@ class SphinxKuserCriteria extends SphinxCriteria
 {
     public function __construct()
     {
-        KalturaLog::debug("In SphinxKuserCriteria constructor");
         parent::__construct();
     }
     
