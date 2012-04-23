@@ -25,16 +25,27 @@ class BulkUploadResultCategory extends BulkUploadResult
         return $this->getStatus();
     }
     
+    public function handleRelatedObjects()
+    {
+        
+    }
+    
     //Set properties for categories
 	
-	public function getParentId()	{return $this->getFromCustomData(self::RELATIVE_PATH);}
-	public function setParentId($v)	{$this->putInCustomData(self::RELATIVE_PATH, $v);}
+	public function getRelativePath()	{return $this->getFromCustomData(self::RELATIVE_PATH);}
+	public function setRelativePath($v)	{$this->putInCustomData(self::RELATIVE_PATH, $v);}
 	
 	public function getName()	{return $this->getFromCustomData(self::NAME);}
 	public function setName($v)	{$this->putInCustomData(self::NAME, $v);}
 	
 	public function getReferenceId()	{return $this->getFromCustomData(self::REFERENCE_ID);}
 	public function setReferenceId($v)	{$this->putInCustomData(self::REFERENCE_ID, $v);}
+	
+    public function getDescription()	{return $this->getFromCustomData(self::DESCRIPTION);}
+	public function setDescription($v)	{$this->putInCustomData(self::DESCRIPTION, $v);}
+	
+    public function getTags()	{return $this->getFromCustomData(self::TAGS);}
+	public function setTags($v)	{$this->putInCustomData(self::TAGS, $v);}
 	
 	public function getAppearInList()	{return $this->getFromCustomData(self::APPEAR_IN_LIST);}
 	public function setAppearInList($v)	{$this->putInCustomData(self::APPEAR_IN_LIST, $v);}
