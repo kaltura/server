@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.inletArmada
+ * @subpackage lib
  */
 class InletArmadaConversionEngineType implements IKalturaPluginEnum, conversionEngineType
 {

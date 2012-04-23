@@ -1,6 +1,14 @@
 <?php
+/**
+ * @package plugins.inletArmada
+ * @subpackage lib
+ */
 #include_once "XmlRpcWrap.php";
 
+/**
+ * @package plugins.inletArmada
+ * @subpackage lib
+ */
 class InletArmadaJobStatus{
 
 	const Created 		= 0;
@@ -13,6 +21,10 @@ class InletArmadaJobStatus{
 	const CompletedFailure = 0x42;
 };
 
+/**
+ * @package plugins.inletArmada
+ * @subpackage lib
+ */
 class InletAPIWrap {
 
 protected 
