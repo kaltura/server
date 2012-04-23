@@ -46,7 +46,7 @@ class BulkUploadResultTableMap extends TableMap {
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
 		$this->addColumn('OBJECT_ID', 'ObjectId', 'VARCHAR', false, 20, null);
 		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'INTEGER', true, null, 1);
-		$this->addColumn('ACTION', 'Action', 'INTEGER', false, null, null);
+		$this->addColumn('ACTION', 'Action', 'INTEGER', false, null, 1);
 		$this->addColumn('OBJECT_STATUS', 'ObjectStatus', 'INTEGER', false, null, null);
 		$this->addColumn('ROW_DATA', 'RowData', 'VARCHAR', false, 1023, null);
 		$this->addColumn('PARTNER_DATA', 'PartnerData', 'VARCHAR', false, 4096, null);
