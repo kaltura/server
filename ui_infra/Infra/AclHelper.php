@@ -38,8 +38,12 @@ class Infra_AclHelper
      */
 	public static function isAllowed($resource, $privilege)
 	{
+		if(!$resource)
+			return false;
+			
 		$acl = Zend_Registry::get('acl');
-		if (!$acl->has($resource)) {
+		if (!$acl->has($resource)) 
+		{
 			KalturaLog::err("Resource [$resource] privilege [$privilege] not found!");
 			return false;
 		}
