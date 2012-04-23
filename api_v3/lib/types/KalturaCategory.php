@@ -248,6 +248,14 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public $defaultOrderBy;
 	
+	/**
+	 * Some category fields cannot be updated while the category is locked
+	 * 
+	 * @var bool
+	 * @readonly
+	 */
+	public $lock;
+	
 	private static $mapBetweenObjects = array
 	(
 		"id",
@@ -280,6 +288,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"partnerSortValue",
 		"partnerData",
 		"defaultOrderBy",
+		"lock",
 	);
 	
 	public function getMapBetweenObjects()
@@ -297,18 +306,18 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		return array();
 	}
 	
-	public function validateParentId(KalturaCategory $category)
+	public function validateParentId()
 	{
-		if ($category->parentId === null)
-			$category->parentId = 0;
+		if ($this->parentId === null)
+			$this->parentId = 0;
 			
-		if ($category->parentId !== 0)
+		if ($this->parentId !== 0)
 		{
-			$parentCategoryDb = categoryPeer::retrieveByPK($category->parentId);
+			$parentCategoryDb = categoryPeer::retrieveByPK($this->parentId);
 			if (!$parentCategoryDb)
-				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_NOT_FOUND, $category->parentId);	
+				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_NOT_FOUND, $this->parentId);	
 		}
-		elseif ($category->inheritanceType == KalturaInheritanceType::INHERIT)
+		elseif ($this->inheritanceType == KalturaInheritanceType::INHERIT)
 		{
 			//cannot inherit member with no parant
 			throw new KalturaAPIException(KalturaErrors::CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET);
@@ -320,12 +329,51 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		if ($this->inheritanceType == KalturaInheritanceType::INHERIT)
+		$this->validatePropertyMinLength("name", 1);
+		$this->validatePropertyMaxLength("name", categoryPeer::MAX_CATEGORY_NAME);
+		
+		$this->validateCategory();
+	
+		if($this->referenceId)
+		{
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			$c->add('category.REFERENCE_ID', $this->referenceId);
+			$c->applyFilters();
+			if(count($c->getFetchedIds()))
+				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
+		}
+		
+		return parent::validateForInsert($propertiesToSkip);
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate()
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if ($this->name !== null)
+		{
+			$this->validatePropertyMinLength("name", 1);
+			$this->validatePropertyMaxLength("name", categoryPeer::MAX_CATEGORY_NAME);
+		}
+		
+		if ($this->parentId !== null)
+			$this->validateParentId();
+			
+		$this->validateCategory($sourceObject);
+
+		
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
+	private function validateCategory($sourceObject = null)
+	{
+		if ((!is_null($sourceObject) && $sourceObject->getInheritanceType() == KalturaInheritanceType::INHERIT && $this->inheritanceType == null) || 
+			($this->inheritanceType == KalturaInheritanceType::INHERIT))
 		{
 			if ($this->userJoinPolicy != null ||
 				$this->defaultPermissionLevel != null ||
-				$this->owner != null ||
-				$this->contributionPolicy != null)
+				$this->owner != null)
 			{
 				throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES);
 			}
@@ -337,48 +385,5 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			if (!$kuser)
 				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->owner);
 		}
-	
-//		if($this->referenceId)
-//		{
-//			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-//			$c->add('category.REFERENCE_ID', $this->referenceId);
-//			$c->applyFilters();
-//			if(count($c->getFetchedIds()))
-//				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
-//		}
-		
-		return parent::validateForInsert($propertiesToSkip);
-	}
-
-	/* (non-PHPdoc)
-	 * @see KalturaObject::validateForUpdate()
-	 */
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-	{
-		/* @var $sourceObject category */
-		
-		if (($sourceObject->getInheritanceType() == KalturaInheritanceType::INHERIT && $this->inheritanceType == null) || 
-			($this->inheritanceType == KalturaInheritanceType::INHERIT))
-		{
-			if ($this->userJoinPolicy != null ||
-				$this->defaultPermissionLevel != null ||
-				$this->owner != null ||
-				$this->contributionPolicy != null)
-			{
-				throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES);
-			}
-		}
-	
-//		if($this->referenceId)
-//		{
-//			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-//			$c->add('category.ID', $sourceObject->getId(), Criteria::NOT_EQUAL);
-//			$c->add('category.REFERENCE_ID', $this->referenceId);
-//			$c->applyFilters();
-//			if(count($c->getFetchedIds()))
-//				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
-//		}
-		
-		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }
