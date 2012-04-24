@@ -1,15 +1,14 @@
 <?php
 /**
  * Class which parses the bulk upload CSV and creates the objects listed in it. 
- * This engine class parses CSVs which describe users.
+ * This engine class parses CSVs which describe category users.
  * 
  * @package plugins.bulkUploadCsv
  * @subpackage batch
  */
-class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
+class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 {
-    
-    /**
+/**
      * (non-PHPdoc)
      * @see BulkUploadGeneralEngineCsv::createUploadResult()
      */
@@ -22,8 +21,8 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		}
 		$this->handledRecordsThisRun++;
 		
-		$bulkUploadResult = new KalturaBulkUploadResultUser();
-		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadResultObjectType::USER;
+		$bulkUploadResult = new KalturaBulkUploadResultCategoryUser();
+		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadResultObjectType::CATEGORY_USER;
 		$bulkUploadResult->bulkUploadJobId = $this->job->id;
 		$bulkUploadResult->lineIndex = $this->lineNumber;
 		$bulkUploadResult->partnerId = $this->job->partnerId;
@@ -39,7 +38,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			if(!is_numeric($index))
 				continue;
             
-			if ($column == 'userId')
+			if ($column == 'categoryUserId')
 			{
 			    $bulkUploadResult->objectId = $values[$index];
 			}
@@ -72,7 +71,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$bulkUploadResult->pluginsData = $bulkUploadPlugins;
 		}
 		
-		$bulkUploadResult->objectStatus = KalturaUserStatus::ACTIVE;
+		$bulkUploadResult->objectStatus = KalturaCategoryUserStatus::ACTIVE;
 		$bulkUploadResult->status = KalturaBulkUploadResultStatus::IN_PROGRESS;
 		
 		if (!$bulkUploadResult->action)
@@ -87,17 +86,9 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
     
 	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult)
 	{
-		if (!$bulkUploadResult->objectId)
-		{
-		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
-			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
-			$bulkUploadResult->errorDescription = "Mandatory Column [userId] missing from CSV.";
-		}
-		
 	    if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
 		{
-		    $user = $this->kClient->user->get($bulkUploadResult->objectId);
-		    if ( $user )
+		    if ( $bulkUploadResult->objectId )
 		    {
 		        $bulkUploadResult->action = KalturaBulkUploadAction::UPDATE;
 		    }
@@ -121,6 +112,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			return;
 		}	
 
+		
 		return $bulkUploadResult;
 	}
 	
@@ -151,23 +143,23 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		    {
 		        case KalturaBulkUploadAction::ADD:
 		            KalturaLog::debug("In handle case for action [ADD]");
-    		        $user = $this->createUserFromResultAndJobData($bulkUploadResult);
+    		        $user = $this->createCategoryUserFromResultAndJobData($bulkUploadResult);
         					
         			$bulkUploadResultChunk[] = $bulkUploadResult;
         			
         			$this->impersonate();
-        			$this->kClient->user->add($user);
+        			$this->kClient->categoryUser->add($user);
         			$this->unimpersonate();
         			
 		            break;
 		        
 		        case KalturaBulkUploadAction::UPDATE:
-		            $category = $this->createUserFromResultAndJobData($bulkUploadResult);
+		            $category = $this->createCategoryUserFromResultAndJobData($bulkUploadResult);
         					
         			$bulkUploadResultChunk[] = $bulkUploadResult;
         			
         			$this->impersonate();
-        			$this->kClient->user->update($bulkUploadResult->objectId, $category);
+        			$this->kClient->categoryUser->update($bulkUploadResult->objectId, $category);
         			$this->unimpersonate();
         			
         			
@@ -177,7 +169,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		            $bulkUploadResultChunk[] = $bulkUploadResult;
         			
         			$this->impersonate();
-        			$this->kClient->user->delete($bulkUploadResult->objectId);
+        			$this->kClient->categoryUser->delete($bulkUploadResult->objectId);
         			$this->unimpersonate();
         			
 		            break;
@@ -210,73 +202,43 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	}
 	
 	/**
-	 * Function to create a new user from bulk upload result.
-	 * @param KalturaBulkUploadResultUser $bulkUploadUserResult
+	 * Function to create a new category user from bulk upload result.
+	 * @param KalturaBulkUploadResultCategoryUser $bulkUploadCategoryUserResult
 	 */
-	protected function createUserFromResultAndJobData (KalturaBulkUploadResultUser $bulkUploadUserResult)
+	protected function createCategoryUserFromResultAndJobData (KalturaBulkUploadResultCategoryUser $bulkUploadCategoryUserResult)
 	{
-	    $user = new KalturaUser();
+	    $categoryUser = new KalturaCategoryUser();
 	    //calculate parentId of the category
 	    
-	    if ($bulkUploadUserResult->objectId)
-	        $user->id = $bulkUploadUserResult->objectId;
+	    if ($bulkUploadCategoryUserResult->categoryId)
+	        $categoryUser->categoryId = $bulkUploadCategoryUserResult->categoryId;
 	    
-	    if ($bulkUploadUserResult->tags)
-	        $user->tags = $bulkUploadUserResult->tags;
+	    if ($bulkUploadCategoryUserResult->userId)
+	        $categoryUser->tags = $bulkUploadUserResult->tags;
 	        
-	    if ($bulkUploadUserResult->firstName)
-	        $user->firstName = $bulkUploadUserResult->firstName;
+	    if ($bulkUploadCategoryUserResult->permissionLevel)
+	        $categoryUser->permissionLevel = $bulkUploadCategoryUserResult->permissionLevel;
 	        
-	    if ($bulkUploadUserResult->lastName)
-	        $user->lastName = $bulkUploadUserResult->lastName; 
-	           
-	    if ($bulkUploadUserResult->email)
-	        $user->email = $bulkUploadUserResult->email;
-
-	    if ($bulkUploadUserResult->city)
-	        $user->city = $bulkUploadUserResult->city;
+	    if ($bulkUploadCategoryUserResult->updateMethod)
+	        $categoryUser->updateMethod = $bulkUploadCategoryUserResult->updateMethod; 
 	        
-	    if ($bulkUploadUserResult->inheritance)
-	        $user->country = $bulkUploadUserResult->country;
-	        
-	    if ($bulkUploadUserResult->state)
-	        $user->state = $bulkUploadUserResult->state;
-	    
-	    if ($bulkUploadUserResult->zip)
-	        $user->zip = $bulkUploadUserResult->zip; 
-	        
-	    if ($bulkUploadUserResult->gender)
-	        $user->gender = $bulkUploadUserResult->gender; 
-	    
-	    if ($bulkUploadUserResult->dateOfBirth)
-	        $user->dateOfBirth = $bulkUploadUserResult->dateOfBirth; 
-	        
-	    if ($bulkUploadUserResult->isAdmin)
-	        $user->isAdmin = $bulkUploadUserResult->isAdmin;
-	        
-	    return $user;
+	    return $categoryUser;
 	}
 	
 	/**
 	 * 
-	 * Gets the columns for V1 csv file
+	 * Gets the columns for CSV file
 	 */
 	protected function getColumns()
 	{
 		return array(
 		    "action",
+		    "categoryUserId",
+		    "categoryId",
 		    "userId",
-		    "firstName",
-		    "lastName",
-		    "email",
-		    "isAdmin",
-		    "tags",
-		    "gender",
-		    "zip",
-		    "country",
-		    "state",
-			"city",
-		    "dateOfBirth",
+		    "permissionLevel",
+		    "updateMethod",
+		    
 		);
 	}
 	

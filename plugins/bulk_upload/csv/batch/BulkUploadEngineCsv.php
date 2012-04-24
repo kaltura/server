@@ -5,7 +5,7 @@
  * @package plugins.bulkUploadCsv
  * @subpackage batch
  */
-class BulkUploadEngineCsv extends KBulkUploadEngine
+abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 {
 	/**
 	 * The bulk upload results
@@ -113,10 +113,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * 
 	 * Create the entries from the given bulk upload results
 	 */
-	protected function createObjects()
-	{
-		
-	}
+	abstract protected function createObjects();
 	
 	/**
 	 * 
@@ -124,10 +121,8 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * @param array $values
 	 * @param array $columns
 	 */
-	protected function createUploadResult($values, $columns)
-	{
-		
-	}
+	abstract protected function createUploadResult($values, $columns);
+
 
 	/**
 	 * 
@@ -147,10 +142,8 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		
 	}
 	
-	protected function getColumns ()
-	{
-	    
-	}
+	abstract protected function getColumns ();
+
 	
 	/**
 	 * 

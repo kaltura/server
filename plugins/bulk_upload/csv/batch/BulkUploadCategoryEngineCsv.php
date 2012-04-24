@@ -115,13 +115,6 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
         			$bulkUploadResult->errorDescription = "Mandatory Column [name] missing from CSV.";
         		}
         			
-        	    if( !$bulkUploadResult->relativePath )
-        		{
-        			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
-        			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
-        			$bulkUploadResult->errorDescription = "Mandatory Column [relativePath] missing from CSV.";
-        		}
-        		
 		        break;
 		       
 		    case KalturaBulkUploadAction::UPDATE:
