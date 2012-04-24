@@ -297,6 +297,9 @@ class kwidgetAction extends sfAction
 						{
 							die;
 						}
+						
+						if (!$ui_conf_result->confFile)
+							die;
 							
 						$serializer = new KalturaXmlSerializer(false);
 						$serializer->serialize($widget_result);
