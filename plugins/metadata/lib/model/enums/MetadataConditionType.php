@@ -23,7 +23,7 @@ class MetadataConditionType implements IKalturaPluginEnum, ConditionType
 	{
 		return array(
 			MetadataPlugin::getApiValue(self::METADATA_FIELD_COMPARE) => 'Validate that all metadata elements number compared correctly to all listed numeric values.',
-			MetadataPlugin::getApiValue(self::METADATA_FIELD_MATCH) => 'Validate that any of metadata elements text matches any of listed textual values.',
+			MetadataPlugin::getApiValue(self::METADATA_FIELD_MATCH) => 'Validate that any of the metadata elements text matches any of listed textual values.',
 		);
 	}
 }
