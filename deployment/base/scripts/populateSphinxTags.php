@@ -27,29 +27,28 @@ DbManager::initialize();
 $c = new Criteria();
 
 if($argc > 1 && is_numeric($argv[1]))
-	$c->add(entryPeer::INT_ID, $argv[1], Criteria::GREATER_EQUAL);
+	$c->add(TagPeer::ID, $argv[1], Criteria::GREATER_EQUAL);
 
 if($argc > 2 && is_numeric($argv[2]))
-	$c->add(entryPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
+	$c->add(TagPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
 	
-$c->addAscendingOrderByColumn(entryPeer::INT_ID);
+$c->addAscendingOrderByColumn(TagPeer::ID);
 $c->setLimit(10000);
 
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 //$sphinxCon = DbManager::getSphinxConnection();
 
-$entries = entryPeer::doSelect($c, $con);
+$tags = TagPeer::doSelect($c, $con);
 $sphinx = new kSphinxSearchManager();
-while(count($entries))
+while(count($tags))
 {
-	foreach($entries as $entry)
+	foreach($tags as $tag)
 	{
-		KalturaLog::log('entry id ' . $entry->getId() . ' int id[' . $entry->getIntId() . '] crc id[' . $sphinx->getSphinxId($entry) . ']');
+	    /* @var $tag Tag */
+		KalturaLog::log('tag id ' . $tag->getId() . ' tag string [' . $tag->getTag() . '] crc id[' . $sphinx->getSphinxId($tag) . ']');
 		
 		try {
-			$kTagFlowManager = new kTagFlowManager();
-			
-			$kTagFlowManager->objectCreated($entry);
+			$ret = $sphinx->saveToSphinx($tag, true);
 		}
 		catch(Exception $e){
 			KalturaLog::err($e->getMessage());
@@ -57,12 +56,12 @@ while(count($entries))
 		}
 	}
 	
-	$c->setOffset($c->getOffset() + count($entries));
-	entryPeer::clearInstancePool();
+	$c->setOffset($c->getOffset() + count($tags));
+	TagPeer::clearInstancePool();
 	MetadataPeer::clearInstancePool();
 	MetadataProfilePeer::clearInstancePool();
 	MetadataProfileFieldPeer::clearInstancePool();
-	$entries = entryPeer::doSelect($c, $con);
+	$tags = TagPeer::doSelect($c, $con);
 }
 
 KalturaLog::log('Done');
