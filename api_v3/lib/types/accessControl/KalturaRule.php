@@ -6,14 +6,14 @@
 class KalturaRule extends KalturaObject
 {
 	/**
-	 * Message to be thrown to the player in case the rule fulfilled
+	 * Message to be thrown to the player in case the rule is fulfilled
 	 * 
 	 * @var string
 	 */
 	public $message;
 	
 	/**
-	 * Actions to be performed by the player in case the rule fulfilled
+	 * Actions to be performed by the player in case the rule is fulfilled
 	 * 
 	 * @var KalturaAccessControlActionArray
 	 */
