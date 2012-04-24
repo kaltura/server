@@ -39,7 +39,7 @@ class Tag extends BaseTag implements IIndexable
      */
     public function getObjectIndexName ()
     {
-        return TagPeer::getOMClass(false);
+        return TagSearchPlugin::INDEX_NAME;
         
     }
 
