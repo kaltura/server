@@ -38,35 +38,35 @@ class KalturaDispatcher
 		if (!$service)
 			throw new KalturaAPIException(KalturaErrors::SERVICE_NOT_SPECIFIED);
 		
-        try 
+        //strtolower on service - map is indexed according to lower-case service IDs
+        $service = strtolower($service);
+        // load the service reflector
+        $serviceMap = KalturaServicesMap::getMap();
+        
+        if (!isset($serviceMap[$service]))
         {
-            //strtolower on service - map is indexed according to lower-case service IDs
-            $service = strtolower($service);
-            // load the service reflector
-            $serviceMap = KalturaServicesMap::getMap();
-            
-            if (!isset($serviceMap[$service]))
-            {
-                KalturaLog::crit("Service does not exist!");
-                throw new KalturaAPIException(KalturaErrors::SERVICE_DOES_NOT_EXISTS, $service);
-            }
-            
-            // check if action exists
-		    if (!$action)
-		    {
-		        KalturaLog::crit("Action not specified!");
-			    throw new KalturaAPIException(KalturaErrors::ACTION_NOT_SPECIFIED, $service);
-		    }
-            $reflector = $serviceMap[$service];
-		    /* @var $reflector KalturaServiceActionItem */
-            $action = strtolower($action);
-            if (!isset($reflector->actionMap[$action]))
-            {
-                KalturaLog::crit("Action does not exist!");
-			    throw new KalturaAPIException(KalturaErrors::ACTION_DOES_NOT_EXISTS, $action, $service);
-            }
-            
-		    $actionReflector = new KalturaActionReflector($service, $action, $reflector->actionMap[$action]);
+            KalturaLog::crit("Service does not exist!");
+            throw new KalturaAPIException(KalturaErrors::SERVICE_DOES_NOT_EXISTS, $service);
+        }
+        
+        // check if action exists
+	    if (!$action)
+	    {
+	        KalturaLog::crit("Action not specified!");
+		    throw new KalturaAPIException(KalturaErrors::ACTION_NOT_SPECIFIED, $service);
+	    }
+        $reflector = $serviceMap[$service];
+	    /* @var $reflector KalturaServiceActionItem */
+        $action = strtolower($action);
+        if (!isset($reflector->actionMap[$action]))
+        {
+            KalturaLog::crit("Action does not exist!");
+		    throw new KalturaAPIException(KalturaErrors::ACTION_DOES_NOT_EXISTS, $action, $service);
+        }
+        
+        try
+        {
+	        $actionReflector = new KalturaActionReflector($service, $action, $reflector->actionMap[$action]);
         }
         catch (Exception $e)
         {
@@ -102,8 +102,8 @@ class KalturaDispatcher
 		
 		kCurrentContext::initKsPartnerUser($ksStr, $p, $userId);
 		kPermissionManager::init(kConf::get('enable_cache'));
-		kEntitlementUtils::initEntitlementEnforcement();
-		KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		//kEntitlementUtils::initEntitlementEnforcement();
+		//KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		
 //		if (!$success)
 //		{
