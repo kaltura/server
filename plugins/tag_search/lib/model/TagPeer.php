@@ -13,7 +13,7 @@
  * @package plugins.tagSearch
  * @subpackage model
  */
-class TagPeer extends BasetagPeer
+class TagPeer extends BaseTagPeer
 {
     
 	/**
