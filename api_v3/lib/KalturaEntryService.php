@@ -919,7 +919,7 @@ class KalturaEntryService extends KalturaBaseService
 		$totalCount = $c->getRecordsCount();
 		
 		if ($disableWidgetSessionFilters)
-			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
 
 		return array($list, $totalCount);		
 	}

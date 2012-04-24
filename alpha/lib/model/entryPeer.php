@@ -260,7 +260,7 @@ class entryPeer extends BaseentryPeer
 		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
 		self::$filerResults = true;
 		$res = parent::retrieveByPK($pk, $con);
-		KalturaCriterion::enableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
+		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
 		self::$filerResults = false;
 		
 		return $res;
@@ -525,7 +525,7 @@ class entryPeer extends BaseentryPeer
 			$entitlementCrit = clone $c;
 			$entitlementCrit->applyFilters();
 			
-			KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 			
 			if ($entitlementCrit->getRecordsCount() < $entitlementCrit->getLimit())
 			{

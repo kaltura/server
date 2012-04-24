@@ -2779,7 +2779,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$categories	= categoryPeer::doSelect($c);
-		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		//get all memebrs
 		foreach ($categories as $category)

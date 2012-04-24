@@ -76,7 +76,7 @@ class category extends Basecategory implements IIndexable
 			
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			$numOfCatsForPartner = categoryPeer::doCount($c);
-			KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 
 			$chunkedCategoryLoadThreshold = kConf::get('kmc_chunked_category_load_threshold');
 			if ($numOfCatsForPartner >= $chunkedCategoryLoadThreshold)
@@ -395,7 +395,7 @@ class category extends Basecategory implements IIndexable
 				
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$category = categoryPeer::getByFullNameExactMatch($fullName);
-		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		if ($category)
 			throw new kCoreException("Duplicate category: $fullName", kCoreException::DUPLICATE_CATEGORY);
@@ -591,7 +591,7 @@ class category extends Basecategory implements IIndexable
 		$c->add(categoryPeer::PARENT_ID, $this->getId());
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$categories = categoryPeer::doSelect($c);
-		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		return $categories;
 	}
@@ -606,7 +606,7 @@ class category extends Basecategory implements IIndexable
 		$c->addAnd(categoryPeer::PARTNER_ID,$this->getPartnerId(),Criteria::EQUAL);
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$categories = categoryPeer::doSelect($c);
-		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		return $categories;
 	}

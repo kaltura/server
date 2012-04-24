@@ -207,7 +207,7 @@ class kEntitlementUtils
 		
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$categories = categoryPeer::doSelect($c);
-		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		foreach ($categories as $category)
 		{				

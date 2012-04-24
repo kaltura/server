@@ -60,35 +60,23 @@ class criteriaFilter
 		
 		foreach ( $columns as $column )
 		{
-			$filter_criterion = $fromCriteria->getCriterion ( $column );
-			if ($filter_criterion instanceof KalturaCriterion && count($filter_criterion->getTags()))
+			$filterCriterion = $fromCriteria->getCriterion ( $column );
+			if ($filterCriterion instanceof KalturaCriterion && !$filterCriterion->isEnabled())
 			{
-				$enableByTags = false;
-		
-				foreach ($filter_criterion->getTags() as $tag)
-				{
-					if(KalturaCriterion::isTagEnable($tag))
-
-						$enableByTags = true;
-				}
-				
-				if (!$enableByTags)
-				{
-					KalturaLog::debug("Skip criterion[" . $filter_criterion->getColumn() . "] comparison [ " . $filter_criterion->getComparison() . " ] with disabled tag [ " . print_r($filter_criterion->getTags(), true) . " ]");
-					continue;
-				}
+				KalturaLog::debug("Skip criterion[" . $filterCriterion->getColumn() . "] comparison [ " . $filterCriterion->getComparison() . " ] with disabled tag [ " . print_r($filterCriterion->getTags(), true) . " ]");
+				continue;
 			}
 			
-			$new_crit = $toCriteria->getNewCriterion ( $filter_criterion->getTable() . "." . $filter_criterion->getColumn() ,  $filter_criterion->getValue() , $filter_criterion->getComparison() );
-			$existing_criterion = $toCriteria->getCriterion ( $column );
+			$newCriterion = $toCriteria->getNewCriterion ( $filterCriterion->getTable() . "." . $filterCriterion->getColumn() ,  $filterCriterion->getValue() , $filterCriterion->getComparison() );
+			$existingCriterion = $toCriteria->getCriterion ( $column );
 
 			// don't add duplicates !!
-			if ( $existing_criterion && ( $existing_criterion->getValue() == $filter_criterion->getValue() &&  $existing_criterion->getComparison() == $filter_criterion->getComparison() ) ) 
+			if ( $existingCriterion && ( $existingCriterion->getValue() == $filterCriterion->getValue() &&  $existingCriterion->getComparison() == $filterCriterion->getComparison() ) ) 
 				continue;
 			
 				// go one step deeper to copy the inner clauses
-			$this->addClauses( $fromCriteria , $filter_criterion , $new_crit );
-			$toCriteria->addAnd ( $new_crit );
+			$this->addClauses( $fromCriteria , $filterCriterion , $newCriterion );
+			$toCriteria->addAnd ( $newCriterion );
 		}
 		
 
@@ -114,36 +102,25 @@ class criteriaFilter
 	 * It's in the Criteria.php file under
 	 * 	/symfony/vendor/propel/util/Criteria.php 
 	 */
-	private function addClauses ( Criteria $criteria_to_filter , Criterion $filter_criterion , Criterion $crit  )
+	private function addClauses ( Criteria $criteriaToFilter , Criterion $filterCriterion , Criterion $criterion  )
 	{
-		$conjunctions = $filter_criterion->getConjunctions();
+		$conjunctions = $filterCriterion->getConjunctions();
 		if ( count ( $conjunctions ) < 1 ) return;
 		
-		$clauses = $filter_criterion->getClauses();
+		$clauses = $filterCriterion->getClauses();
 		$i=0;
 		foreach ( $clauses as $clause )
-		{
+		{	
+			if($clause instanceof KalturaCriterion && !$clause->isEnabled())
+				continue;
+				
 			/* @var $clause Criterion */
 			
-			if($clause instanceof KalturaCriterion)
-			{
-				$enableByTags = false;
-				foreach ($clause->getTags() as $tag)
-				{
-					if(KalturaCriterion::isTagEnable($tag))
-					{
-						$enableByTags = true;
-					}
-				}
-				if(!$enableByTags)
-					continue;
-			}
-			
-			$new_crit = $criteria_to_filter->getNewCriterion ( $clause->getTable() . "." . $clause->getColumn() ,  $clause->getValue() , $clause->getComparison() );
+			$newCriterion = $criteriaToFilter->getNewCriterion ( $clause->getTable() . "." . $clause->getColumn() ,  $clause->getValue() , $clause->getComparison() );
 			$conj = @$conjunctions[$i];
 				
-			if ( $conj == Criterion::UND ) $crit->addAnd( $new_crit );
-			elseif ( $conj == Criterion::ODER ) $crit->addOr ( $new_crit );
+			if ( $conj == Criterion::UND ) $criterion->addAnd( $newCriterion );
+			elseif ( $conj == Criterion::ODER ) $criterion->addOr ( $newCriterion );
 			$i++;
 		}
 	}

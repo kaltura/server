@@ -514,19 +514,11 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 				$catName = categoryPeer::retrieveByPK($cat);
 				if (is_null($catName))
 				{
-					$enableEntit = false;
-					if (KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY))
-					{
-						KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-						$enableEntit = true;
-					}
-
+					KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 					$catName = categoryPeer::retrieveByPK($cat);
 					if ($catName)
 						throw new KalturaAPIException(KalturaErrors::CANT_UPDATE_PARAMETER, $cat);
-							
-					if($enableEntit)
-						KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+					KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 				}
 			}
 		}

@@ -501,7 +501,7 @@ class BaseEntryService extends KalturaEntryService
 				
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		$list = entryPeer::doSelect($c);
-		KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		
 		$totalCount = $c->getRecordsCount();
 				

@@ -71,7 +71,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$dbCategories = categoryPeer::retrieveByPKs($newCatsIds);
-		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 
 		foreach ($dbCategories as $dbCategory)
 		{
@@ -135,7 +135,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 			{
 				KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 				$unentitedCategory = categoryPeer::getByFullNameExactMatch ( $cat );
-				KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+				KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 
 				if(!$unentitedCategory)
 					$category = category::createByPartnerAndFullName ( $entry->getPartnerId (), $cat );

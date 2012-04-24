@@ -18,7 +18,7 @@ abstract class KalturaCriterion extends Criterion
 	 */
 	protected $criteria = false;
 	
-	public static $enabledTags = array();
+	protected static $enabledTags = array();
 	
 	protected $tags = array();
 	
@@ -39,35 +39,55 @@ abstract class KalturaCriterion extends Criterion
 	
 	public static function enableTag($tag)
 	{
-		self::$enabledTags[$tag] = $tag;
+		self::$enabledTags[$tag] = 0;
 	}
 	
-	public static function enableTags($tags)
+	public static function restoreTag($tag)
+	{
+		if(!isset(self::$enabledTags[$tag]))
+			return;
+			
+		self::$enabledTags[$tag]++;
+			
+		if(self::$enabledTags[$tag] > 0)
+			throw new Exception("Enable called more times than disable");
+	}
+	
+	public static function restoreTags(array $tags)
 	{
 		foreach($tags as $tag)
-			self::$enabledTags[$tag] = $tag;
+			self::restoreTag($tag);
 	}
 	
 	public static function disableTag($tag)
 	{
 		if(isset(self::$enabledTags[$tag]))
-		{
-			unset(self::$enabledTags[$tag]);
-		}
+			self::$enabledTags[$tag]--;
 	}
 	
 	public static function disableTags($tags)
 	{
 		foreach($tags as $tag)
-		{
-			if(isset(self::$enabledTags[$tag]))
-				unset(self::$enabledTags[$tag]);
-		}
+			self::disableTag($tag);
 	}
 	
 	public static function isTagEnable($tag)
 	{
-		return isset(self::$enabledTags[$tag]);
+		return (isset(self::$enabledTags[$tag]) && self::$enabledTags[$tag] === 0);
+	}
+	
+	public function isEnabled()
+	{
+		if(!count($this->getTags()))
+			return true;
+			
+		foreach ($this->getTags() as $tag)
+		{
+			if(self::isTagEnable($tag))
+				return true;
+		}
+		
+		return false;
 	}
 	
 	/**

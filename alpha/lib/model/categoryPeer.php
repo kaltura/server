@@ -177,7 +177,7 @@ class categoryPeer extends BasecategoryPeer
 
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$categories = self::doSelect($c);
-		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		return $categories;
 	}
