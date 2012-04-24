@@ -355,7 +355,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	/* (non-PHPdoc)
 	 * @see IKalturaBulkUploadHandler::handleBulkUploadData()
 	 */
-	public static function handleBulkUploadData($object, array $data)
+	public static function handleBulkUploadData(BaseObject $object, array $data)
 	{
 		KalturaLog::debug("Handle metadata bulk upload data:\n" . print_r($data, true));
 		
