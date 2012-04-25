@@ -61,12 +61,15 @@ while(count($entries) && (!$limit || $migrated < $limit))
 		/* @var $entry entry */
 		
 		$categoriesCriteria = new Criteria();
-		$categoriesCriteria->addSelectColumn(categoryPeer::ID);
 		$categoriesCriteria->add(categoryPeer::ID, $entry->getCategoriesIds(), Criteria::IN);
-
-		$stmt = categoryPeer::doSelectStmt($categoriesCriteria);
-		$categoryIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		$categories = categoryPeer::doSelect($categoriesCriteria);
 		
+		$categoryIds = array();
+		foreach($categories as $category)
+		{
+			/* @var $category category */
+			$categoryIds[] = $category->getId();
+		} 
 		
 		$categoryEntriesCriteria = new Criteria();
 		$categoryEntriesCriteria->addSelectColumn(categoryEntryPeer::CATEGORY_ID);
@@ -76,15 +79,24 @@ while(count($entries) && (!$limit || $migrated < $limit))
 		$stmt = categoryEntryPeer::doSelectStmt($categoryEntriesCriteria);
 		$categoryEntriesIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		
-		$categoryIds = array_diff($categoryIds, $categoryEntriesIds);
-		
 		KalturaStatement::setDryRun($dryRun);		
-		foreach($categoryIds as $categoryId)
+		foreach($categories as $category)
 		{
+			/* @var $category category */
+			$entryId = $entry->getId();
+			$categoryId = $category->getId();
+			
+			if(in_array($categoryId, $categoryEntriesIds))
+			{
+				KalturaLog::debug("CategoryEntry already exists for entry [$entryId] and category [$categoryId]");
+				continue;
+			}
+			
 			$categoryEntry = new migrationCategoryEntry();
-			$categoryEntry->setEntryId($entry->getId());
+			$categoryEntry->setEntryId($entryId);
 			$categoryEntry->setCategoryId($categoryId);
 			$categoryEntry->setPartnerId($entry->getPartnerId());
+			$categoryEntry->setCategoryFullIds($category->getFullIds());
 			$categoryEntry->save();
 		}
 		KalturaStatement::setDryRun(false);
