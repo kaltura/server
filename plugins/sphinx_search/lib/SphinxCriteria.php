@@ -437,11 +437,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	{
 		foreach($filter->fields as $field => $val)
 		{
-			if(is_null($val) || !strlen($val)) 
-			{
-//				KalturaLog::debug("Skip field[$field] value is null");
+			if(is_null($val) || !strlen($val) || $field == '_order_by') 
 				continue;
-			}
 			
 			$fieldParts = explode(baseObjectFilter::FILTER_PREFIX, $field, 3);
 			if(count($fieldParts) != 3)
