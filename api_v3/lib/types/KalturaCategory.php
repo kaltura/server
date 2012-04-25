@@ -291,22 +291,31 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"lock",
 	);
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getExtraFilters()
+	 */
 	public function getExtraFilters()
 	{
 		return array();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getFilterDocs()
+	 */
 	public function getFilterDocs()
 	{
 		return array();
 	}
 	
-	/*
+	/**
 	 * validate parent id exists and if not - cannot set category to inherit from parent.
 	 */
 	public function validateParentId()
@@ -365,11 +374,12 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
-	/*
+	/**
 	 * validate category fields
 	 * 1. category that inherit memebers canno set values to inherited fields.
 	 * 2. validate the owner id exists as kuser
 	 * 
+	 * @param category $sourceObject
 	 */
 	private function validateCategory(category $sourceObject = null)
 	{
