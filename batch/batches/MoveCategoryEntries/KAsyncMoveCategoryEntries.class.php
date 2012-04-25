@@ -44,7 +44,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		return $this->moveCategoryEntries($job, $job->data);
+		return $this->move($job, $job->data);
 	}
 	
 	/**
