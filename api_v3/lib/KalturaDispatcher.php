@@ -70,7 +70,7 @@ class KalturaDispatcher
         }
         catch (Exception $e)
         {
-             throw new Exception("Could not create action reflector for service [$service], action [$action]!");
+             throw new Exception("Could not create action reflector for service [$service], action [$action]. Received error: ". $e->getMessage());
         }
         
         $success = null;
