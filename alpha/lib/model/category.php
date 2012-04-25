@@ -822,12 +822,20 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function isReadyForPurge()
 	{
-		//TODO - fix, categroy might have no memeber and no entries but can have children categories.
-		return(
-			$this->getStatus() == CategoryStatus::DELETED && 
-			$this->getMembersCount() <= 0 && 
-			$this->getEntriesCount() <= 0
-		);
+		
+		if(
+			$this->getStatus() != CategoryStatus::DELETED || 
+			$this->getMembersCount() > 0 || 
+			$this->getEntriesCount() > 0
+		)
+			return false;
+		
+		$criteria = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$criteria->add(categoryPeer::PARENT_ID, $this->getId());
+		$criteria->applyFilters();
+		$childCategories = $criteria->getRecordsCount();
+		
+		return ($childCategories == 0);
 	}
 	
 	/* (non-PHPdoc)
