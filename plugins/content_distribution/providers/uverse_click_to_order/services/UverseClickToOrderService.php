@@ -51,6 +51,7 @@ class UverseClickToOrderService extends KalturaBaseService
 		
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$entryFilter->attachToCriteria($baseCriteria);
+		$baseCriteria->addDescendingOrderByColumn(entryPeer::UPDATED_AT);
 		$entries = entryPeer::doSelect($baseCriteria);
 
 		$feed = new UverseClickToOrderFeed('feed_template.xml');
@@ -76,11 +77,18 @@ class UverseClickToOrderService extends KalturaBaseService
 			}					
 			$fields = $profile->getAllFieldValues($entryDistribution);
 			$relatedEntryId = $fields[UverseClickToOrderDistributionField::CATEGORY_ENTRY_ID];
-			$relatedEntriesArray[$relatedEntryId] .= $entry->getId().'---'.$entry->getThumbnailUrl().'---'.$entry->getDownloadUrl().',';		
-				
+			
+			if (!isset($relatedEntriesArray[$relatedEntryId])) {
+				$relatedEntriesArray[$relatedEntryId] = array();
+			}
+			$relatedEntriesArray[$relatedEntryId][] = array(
+				'id' => $entry->getId(),
+				'thumbnailUrl' => $entry->getThumbnailUrl(),
+				'downloadUrl' => $entry->getDownloadUrl()
+			);
 		}
 		//retreive each category and add it to the xml
-		foreach ($relatedEntriesArray as $relatedEntryId => $entriesList)
+		foreach ($relatedEntriesArray as $relatedEntryId => $entriesUnderCategory)
 		{
 			//getting the related entry id object
 			$c = new Criteria();
@@ -94,15 +102,13 @@ class UverseClickToOrderService extends KalturaBaseService
 			$categoryName = $relatedEntryObject[0]->getName();
 			$categoryFile = $relatedEntryObject[0]->getThumbnailUrl();
 			$categoryNode = $feed->addCategory($categoryName, $categoryFile);
-			$entriesUnderCategory = explode(',', trim($entriesList, ','));
+
 			//getting all entries under a category
-			foreach ($entriesUnderCategory as $entryUnderCategory)
+			foreach ($entriesUnderCategory as $entryInfo)
 			{	
-				//getting entry info				
-				$entryInfo = explode('---', $entryUnderCategory);
-				$entryId = $entryInfo[0];
-				$thumbnailFile = $entryInfo[1];
-				$flavorFile =  $entryInfo[2];
+				$entryId = $entryInfo['id'];
+				$thumbnailFile = $entryInfo['thumbnailUrl'];
+				$flavorFile =  $entryInfo['downloadUrl'];
 				//getting entry's fileds array
 				$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entryId, $profile->getId());									
 				$fields = $profile->getAllFieldValues($entryDistribution);
@@ -116,19 +122,17 @@ class UverseClickToOrderService extends KalturaBaseService
 	
 	private function getImageUrl($entryId, $width = null, $height = null)
 	{
-		$c = new Criteria();
-		$c->addAnd(entryPeer::ID, $entryId, Criteria::EQUAL);
-		$backgroundImage = entryPeer::doSelect($c);		
+		$backgroundImage = entryPeer::retrieveByPK($entryId);		
 		if (!$backgroundImage)
 		{
-			KalturaLog::err('Related Entry ['.$entryId.'] was not found ');
+			KalturaLog::err('Image entry ['.$entryId.'] was not found');
 			return '';
 		}
-		if ($backgroundImage[0]->getMediaType() == KalturaMediaType::IMAGE ){
-			$backgroundImageUrl = $backgroundImage[0]->getDownloadUrl();		
+		if ($backgroundImage->getMediaType() == KalturaMediaType::IMAGE){
+			$backgroundImageUrl = $backgroundImage->getDownloadUrl();		
 		}
 		else{
-			$backgroundImageUrl = $backgroundImage[0]->getThumbnailUrl().'/width/'.$width.'/height/'.$height;
+			$backgroundImageUrl = $backgroundImage->getThumbnailUrl().'/width/'.$width.'/height/'.$height;
 		}
 		return $backgroundImageUrl;
 	}
