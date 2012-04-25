@@ -8,9 +8,9 @@ class KDeletingCategoryEntryEngine extends KDeletingEngine
 	/* (non-PHPdoc)
 	 * @see KDeletingEngine::delete()
 	 */
-	protected function delete(KalturaFilter $filter, $shouldUpdate)
+	protected function delete(KalturaFilter $filter)
 	{
-		return $this->deleteCategoryEntries($filter, $shouldUpdate);
+		return $this->deleteCategoryEntries($filter);
 	}
 	
 	/**
@@ -21,7 +21,7 @@ class KDeletingCategoryEntryEngine extends KDeletingEngine
 	{
 		$filter->orderBy = KalturaCategoryEntryOrderBy::CREATED_AT_ASC;
 		
-		$categoryEntriesList = $this->client->categoryEntry->list($filter, $this->pager);
+		$categoryEntriesList = $this->client->categoryEntry->listAction($filter, $this->pager);
 		if(!count($categoryEntriesList->objects))
 			return 0;
 			

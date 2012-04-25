@@ -83,10 +83,10 @@ abstract class KDeletingEngine
 	 * @param bool $shouldUpdate Indicates that the object columns and attributes values should be recalculated before reindexed
 	 * @return int the number of indexed objects
 	 */
-	public function run(KalturaFilter $filter, $shouldUpdate)
+	public function run(KalturaFilter $filter)
 	{
 		$this->impersonate();
-		$ret = $this->delete($filter, $shouldUpdate);
+		$ret = $this->delete($filter);
 		$this->unimpersonate();
 		
 		return $ret;

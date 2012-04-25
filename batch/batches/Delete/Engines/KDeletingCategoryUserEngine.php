@@ -8,9 +8,9 @@ class KDeletingCategoryUserEngine extends KDeletingEngine
 	/* (non-PHPdoc)
 	 * @see KDeletingEngine::delete()
 	 */
-	protected function delete(KalturaFilter $filter, $shouldUpdate)
+	protected function delete(KalturaFilter $filter)
 	{
-		return $this->deleteCategoryUsers($filter, $shouldUpdate);
+		return $this->deleteCategoryUsers($filter);
 	}
 	
 	/**
@@ -21,7 +21,7 @@ class KDeletingCategoryUserEngine extends KDeletingEngine
 	{
 		$filter->orderBy = KalturaCategoryUserOrderBy::CREATED_AT_ASC;
 		
-		$categoryUsersList = $this->client->categoryUser->list($filter, $this->pager);
+		$categoryUsersList = $this->client->categoryUser->listAction($filter, $this->pager);
 		if(!count($categoryUsersList->objects))
 			return 0;
 			
@@ -29,7 +29,7 @@ class KDeletingCategoryUserEngine extends KDeletingEngine
 		foreach($categoryUsersList->objects as $categoryUser)
 		{
 			/* @var $categoryUser KalturaCategoryUser */
-			$this->client->categoryUser->delete($categoryUser->userId, $categoryUser->categoryId);
+			$this->client->categoryUser->delete($categoryUser->categoryId, $categoryUser->userId);
 		}
 		$results = $this->client->doMultiRequest();
 		foreach($results as $result)
