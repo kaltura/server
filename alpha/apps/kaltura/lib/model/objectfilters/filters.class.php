@@ -214,6 +214,9 @@ abstract class baseObjectFilter extends myBaseObject
 	 */
 	public function addOrderToCriteria ( Criteria $criteria , $field_name  )
 	{
+		if(!$field_name)
+			return;
+			
 		list ( $field_name , $ascending ) = self::getFieldAndDirection ( $field_name );
 /*
 		if ( $field_name[0] == "-" )
@@ -745,6 +748,9 @@ abstract class baseObjectFilter extends myBaseObject
 		$order_arr = explode ( "," , $order_string );
 		foreach ( $order_arr as $order )
 		{
+			if(!$order)
+				continue;
+				
 			list ( $field_name , $ascending ) = self::getFieldAndDirection ( $order );
 			if ( in_array ( $field_name , $this->allowed_order_fields ) )
 			{
