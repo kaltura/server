@@ -154,6 +154,8 @@ class myPartnerUtils
 		self::addPartnerToCriteria ( new moderationPeer() , $partner_id , $private_partner_data , $partner_group);
 		self::addPartnerToCriteria ( new notificationPeer() , $partner_id , $private_partner_data , $partner_group);
 		self::addPartnerToCriteria ( new categoryPeer() , $partner_id , $private_partner_data , $partner_group);
+		self::addPartnerToCriteria ( new categoryEntryPeer() , $partner_id , $private_partner_data , $partner_group);
+		self::addPartnerToCriteria ( new categoryKuserPeer() , $partner_id , $private_partner_data , $partner_group);
 		
 		// TODO - due to very bad performance every time there is such a call, make sure this code is called from the uiConf services
 //		self::addPartnerToCriteria ( new uiConfPeer() , $partner_id );

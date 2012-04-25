@@ -14,10 +14,7 @@ class kEntitlementUtils
 	
 	
 	public static function getEntitlementEnforcement()
-	{
-		//TODO - remove this.
-		return false;
-		
+	{		
 		return self::$entitlementEnforcement;
 	}
 	
