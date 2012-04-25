@@ -133,26 +133,28 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	function deleteAction($categoryId, $userId)
 	{
-		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $userId);
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 			
 		$dbCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryId, $kuser->getId());
 		if (!$dbCategoryKuser)
-			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $kuser->getId());
+			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $userId);
 			
-		$category = categoryPeer::retrieveByPK($categoryUser->categoryId);
+		$category = categoryPeer::retrieveByPK($categoryId);
 		if (!$category)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);						
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);						
 
 		if ($category->getInheritanceType() == InheritanceType::INHERIT)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS, $categoryId);		
 		
 		// only manager can remove memnger or users remove himself
 		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($dbCategoryKuser->getCategoryId(), kCurrentContext::$ks_kuser_id);
-		if(!$currentKuserCategoryKuser || 
+		if((!$currentKuserCategoryKuser || 
 			($currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&
-			 kCurrentContext::$ks_uid != $userId))
+			 kCurrentContext::$ks_uid != $userId)) &&
+			 !PermissionPeer::isValidForPartner(PermissionName::BATCH_BASE, $partnerId))
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER);
 		
 		if($dbCategoryKuser->getKuserId() == $category->getKuserId())
@@ -279,6 +281,10 @@ class CategoryUserService extends KalturaBaseService
 		$categoriesInheritanceRoot = array();
 		foreach ($categories as $category)
 		{
+			
+			if(is_null($category))
+				continue;
+				
 			if($category->getInheritanceType() == InheritanceType::INHERIT)
 			{
 				//if category inheris members - chnage filter to -> inherited from parent id = category->getIheritedParent
@@ -292,7 +298,16 @@ class CategoryUserService extends KalturaBaseService
 		
 		$filter->categoryIdEqual = null;
 		$filter->categoryIdIn = implode(',', $categoriesInheritanceRoot);
+
+		//if filter had categories that doesn't exists or not entitled - should return 0 objects. 
+		if(count($categories) && !count($categoriesInheritanceRoot))
+		{
+			$response = new KalturaCategoryUserListResponse();
+			$response->totalCount = 0;
 			
+			return $response;
+		}
+		
 		$categoryKuserFilter = new categoryKuserFilter();
 		$filter->toObject($categoryKuserFilter);
 		

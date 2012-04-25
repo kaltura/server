@@ -20,20 +20,19 @@ class CategoryService extends KalturaBaseService
 	 * @return KalturaCategory
 	 */
 	function addAction(KalturaCategory $category)
-	{	
-		//TODO - remove!	
-		$this->getPartner()->unlockCategories();
-		
+	{		
 		if ($this->getPartner()->isCategoriesLocked())
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED, Partner::CATEGORIES_LOCK_TIMEOUT);
 			
 		try
 		{
-			$this->getPartner()->lockCategories(); 
+			$this->getPartner()->lockCategories();
+
 			$categoryDb = new category();
 			$category->toInsertableObject($categoryDb);
 			$categoryDb->setPartnerId($this->getPartnerId());
 			$categoryDb->save();
+			
 			$this->getPartner()->unlockCategories();
 		}
 		catch(Exception $ex)

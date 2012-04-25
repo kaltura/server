@@ -28,7 +28,13 @@ class categoryPeer extends BasecategoryPeer
 		}
 
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
-		$c->add ( self::STATUS, array(CategoryStatus::DELETED, CategoryStatus::PURGED), Criteria::NOT_IN );
+		
+		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id; 			
+		
+		if(!PermissionPeer::isValidForPartner(PermissionName::BATCH_BASE, $partnerId))
+			$c->add ( self::STATUS, array(CategoryStatus::DELETED, CategoryStatus::PURGED), Criteria::NOT_IN );
+		else
+			$c->add ( self::STATUS, CategoryStatus::PURGED, Criteria::NOT_EQUAL );
 		
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{

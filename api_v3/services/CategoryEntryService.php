@@ -118,36 +118,43 @@ class CategoryEntryService extends KalturaBaseService
 	{
 		if ($filter === null)
 			$filter = new KalturaCategoryEntryFilter();
-			
+		
 		if ($pager == null)
 			$pager = new KalturaFilterPager();
 		
 		if ($filter->entryIdEqual == null && 
-			((kEntitlementUtils::getEntitlementEnforcement()) || 
-			  $filter->categoryFullIdsStartsWith == null ))
+			kEntitlementUtils::getEntitlementEnforcement())
 			throw new APIException(KalturaErrors::MUST_FILTER_ENTRY_ID_EQUAL);
+			
+		if ($filter->entryIdEqual == null &&
+			$filter->categoryFullIdsEqual == null &&
+			$filter->categoryFullIdsStartsWith == null &&
+			$filter->categoryIdIn == null &&
+			$filter->categoryIdEqual == null)
+			throw new APIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_CATEGORY);		
 			
 		$categoryEntryFilter = new categoryEntryFilter();
 		$filter->toObject($categoryEntryFilter);
-
-		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+		
+		$c = new Criteria();
 		$categoryEntryFilter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
 		$dbCategoriesEntry = categoryEntryPeer::doSelect($c);
-
-		//remove unlisted categories: display in search is set to members only
-		$categoriesIds = array();
-		foreach ($dbCategoriesEntry as $dbCategoryEntry)
-			$categoriesIds[] = $dbCategoryEntry->getCategoryId();
 		
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$c->addSelectColumn(categoryPeer::ID);
-		$c->addAnd(categoryPeer::ID, $categoriesIds, Criteria::IN);
-		$stmt = categoryPeer::doSelectStmt($c);
-		$categoryIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
-		
-		if(kEntitlementUtils::getEntitlementEnforcement())
+		if(kEntitlementUtils::getEntitlementEnforcement() && count($dbCategoriesEntry))
 		{
+			
+			//remove unlisted categories: display in search is set to members only
+			$categoriesIds = array();
+			foreach ($dbCategoriesEntry as $dbCategoryEntry)
+				$categoriesIds[] = $dbCategoryEntry->getCategoryId();
+				
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			$c->addSelectColumn(categoryPeer::ID);
+			$c->addAnd(categoryPeer::ID, $categoriesIds, Criteria::IN);
+			$stmt = categoryPeer::doSelectStmt($c);
+			$categoryIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+			
 			foreach ($dbCategoriesEntry as $key => $dbCategoryEntry)
 			{
 				if(!in_array($dbCategoryEntry->getCategoryId(), $categoryIds))

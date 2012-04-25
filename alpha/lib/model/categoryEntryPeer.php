@@ -17,19 +17,6 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 
 	private static $skipEntrySave = false;
 	
-	public static function setDefaultCriteriaFilter ()
-	{
-		if ( self::$s_criteria_filter == null )
-		{
-			self::$s_criteria_filter = new criteriaFilter ();
-		}
-
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
-		$c->add ( self::PARTNER_ID, kCurrentContext::$ks_partner_id, Criteria::EQUAL);
-				
-		self::$s_criteria_filter->setFilter ( $c );
-	}
-	
 	public static function getSkipSave()
 	{
 		return self::$skipEntrySave;
@@ -56,6 +43,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 	
 	public static function syncEntriesCategories(entry $entry)
 	{		
+		
 		//TODO save on entry only with no privacy context 
 		self::$skipEntrySave = true;
 		
@@ -68,6 +56,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 			$newCatsIds = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getNewCategoriesIds());
 		else
 			$newCatsIds = array();	
+			
 		
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$dbCategories = categoryPeer::retrieveByPKs($newCatsIds);
@@ -88,13 +77,17 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		$removedCats = array();
 		$remainingCats = array();
 		$oldCats = array();
+		$oldCatsIds = array();
 		
 		$dbOldCategoriesEntry = categoryEntryPeer::selectByEntryId($entry->getId());
 		foreach ($dbOldCategoriesEntry as $dbOldCategoryEntry)
-		{
-			$category = categoryPeer::retrieveByPKNoFilter($dbOldCategoryEntry->getCategoryId());
+			$oldCatsIds[] = $dbOldCategoryEntry->getCategoryId();
+
+		
+		$oldCategoris = categoryPeer::retrieveByPKsNoFilter($oldCatsIds);
+		foreach($oldCategoris as $category)
 			$oldCats[] = $category->getFullName();
-		}		
+				
 		
 		foreach ( $oldCats as $cat )
 		{
@@ -112,6 +105,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		
 		foreach ( $remainingCats as $cat ) 
 		{
+			
 			$category = categoryPeer::getByFullNameExactMatch ( $cat );
 			if ($category) 
 			{
@@ -130,9 +124,11 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		
 		foreach ( $addedCats as $cat )
 		{
+			
 			$category = categoryPeer::getByFullNameExactMatch ( $cat );
 			if (!$category)
 			{
+				
 				KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 				$unentitedCategory = categoryPeer::getByFullNameExactMatch ( $cat );
 				KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
@@ -143,13 +139,20 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 				
 			if (!$category)
 				continue;
-				
-			$categoryEntry = new categoryEntry();
-			$categoryEntry->setEntryId($entry->getId());
-			$categoryEntry->setCategoryId($category->getId());
-			$categoryEntry->setEntryCategoriesAddedIds($alreadyAddedCatIds);
-			$categoryEntry->setPartnerId($entry->getPartnerId());
-			$categoryEntry->save();
+
+			//when use caetgoryEntry->add categoryEntry object was alreay created - and no need to create it.
+			//when using baseEntry->categories = 'my category' will need to add the new category.
+			$categoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($category->getId(), $entry->getId())	;
+			
+			if(!$categoryEntry)
+			{
+				$categoryEntry = new categoryEntry();
+				$categoryEntry->setEntryId($entry->getId());
+				$categoryEntry->setCategoryId($category->getId());
+				$categoryEntry->setEntryCategoriesAddedIds($alreadyAddedCatIds);
+				$categoryEntry->setPartnerId($entry->getPartnerId());
+				$categoryEntry->save();
+			}
 			
 			if($category->getPrivacyContext() == '' || $category->getPrivacyContext() == null)
 			{

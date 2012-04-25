@@ -152,7 +152,14 @@ class category extends Basecategory implements IIndexable
 		{
 			// delete all categoryKuser objects for this category
 			$this->addDeleteCategoryKuserJob($this->getId());
-			$this->addMoveEntriesToCategoryJob($this->move_entries_to_parent_category);
+			
+			if($this->getParentId())
+			{
+				$this->addMoveEntriesToCategoryJob($this->move_entries_to_parent_category);
+			}else{
+				$this->addDeleteCategoryEntryJob($this->getId());
+			}
+					
 		}
 		
 		if (!$this->isNew() &&
@@ -483,26 +490,24 @@ class category extends Basecategory implements IIndexable
 		$filter = new categoryKuserFilter();
 		$filter->setCategoryIdEqual($categoryId);
 
-		kJobsManager::addDeleteJob($this->getPartnerId(), KalturaIndexObjectType::CATEGORY_USER, $filter);
+		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 	}
 	
 	private function addDeleteCategoryEntryJob($categoryId)
 	{
-		
-		$filter = new entryFilter();
-		$filter->setCategoriesIdsMatchAnd($categoryId);
+		$filter = new categoryEntryFilter();
+		$filter->setCategoryIdEqaul($categoryId);
 
-		kJobsManager::addDeleteJob($this->getPartnerId(), KalturaIndexObjectType::CATEGORY_ENTRY, $filter);
+		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
 	}
 		
 	private function addIndexEntryJob($categoryId, $shouldUpdate = false)
 	{
-		
 		$filter = new entryFilter();
 		$filter->setCategoriesIdsMatchAnd($categoryId);
 			
 		//TODO - add batch job size after sharon commits her code.		
-		kJobsManager::addIndexJob($this->getPartnerId(), KalturaIndexObjectType::ENTRY, $filter, $shouldUpdate);
+		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::ENTRY, $filter, $shouldUpdate);
 	}
 	
 	private function addMoveEntriesToCategoryJob($destCategoryId)
@@ -519,7 +524,7 @@ class category extends Basecategory implements IIndexable
 		$filter->setIdIn($categoriesIdsIn);
 		
 
-		kJobsManager::addIndexJob($this->getPartnerId(), KalturaIndexObjectType::CATEGORY, $filter, $shouldUpdate);
+		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY, $filter, $shouldUpdate);
 		
 	}
 
@@ -529,8 +534,9 @@ class category extends Basecategory implements IIndexable
 		$filter = new categoryEntryFilter();
 		$filter->setCategoryIdEqaul($categoryId);
 
-		kJobsManager::addIndexJob($this->getPartnerId(), KalturaIndexObjectType::CATEGORY_ENTRY, $filter, $shouldUpdate);
+		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_ENTRY, $filter, $shouldUpdate);
 	}
+	
 	/**
 	 * Validate recursivly that the new parent id is not one of the child categories
 	 * 
@@ -538,7 +544,7 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function validateParentIdIsNotChild($parentId)
 	{
-		if ($this->getId() == $parentId)
+		if ($this->getId() == $parentId && $parentId != 0)
 			throw new kCoreException("Parent id [$parentId] is one of the childs", kCoreException::PARENT_ID_IS_CHILD);
 		
 		$childs = $this->getChilds();
@@ -1131,12 +1137,20 @@ class category extends Basecategory implements IIndexable
 	public function setBulkUploadId ( $bulkUploadId )	{		$this->putInCustomData ( "bulk_upload_id" , $bulkUploadId );	}
 	public function getBulkUploadId (  )	{		return $this->getFromCustomData( "bulk_upload_id" );	}
 	
+	/*
+	 * to be set when category is indexing - recalculating inheritance fields.
+	 */
 	public function setIsIndex($v)
 	{
 		$this->is_index = $v;
 	}
 	
-	public function getIsIndex()
+	/*
+	 * if category is reindexing - recalculating inheritance fields.
+	 * no need to add all batch job, 
+	 * because some of the batch jobs are already done by the parent category.
+	 */
+	protected function getIsIndex()
 	{
 		return $this->is_index;
 	}

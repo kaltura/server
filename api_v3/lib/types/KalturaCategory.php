@@ -306,6 +306,9 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		return array();
 	}
 	
+	/*
+	 * validate parent id exists and if not - cannot set category to inherit from parent.
+	 */
 	public function validateParentId()
 	{
 		if ($this->parentId === null)
@@ -315,7 +318,10 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		{
 			$parentCategoryDb = categoryPeer::retrieveByPK($this->parentId);
 			if (!$parentCategoryDb)
-				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_NOT_FOUND, $this->parentId);	
+				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_NOT_FOUND, $this->parentId);
+
+			if($parentCategoryDb->getLock())
+				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_IS_LOCK);
 		}
 		elseif ($this->inheritanceType == KalturaInheritanceType::INHERIT)
 		{
@@ -329,19 +335,12 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
+		
 		$this->validatePropertyMinLength("name", 1);
 		$this->validatePropertyMaxLength("name", categoryPeer::MAX_CATEGORY_NAME);
 		
 		$this->validateCategory();
-	
-		if($this->referenceId)
-		{
-			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-			$c->add('category.REFERENCE_ID', $this->referenceId);
-			$c->applyFilters();
-			if(count($c->getFetchedIds()))
-				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
-		}
+		
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -366,8 +365,15 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
-	private function validateCategory($sourceObject = null)
+	/*
+	 * validate category fields
+	 * 1. category that inherit memebers canno set values to inherited fields.
+	 * 2. validate the owner id exists as kuser
+	 * 
+	 */
+	private function validateCategory(category $sourceObject = null)
 	{
+		
 		if ((!is_null($sourceObject) && $sourceObject->getInheritanceType() == KalturaInheritanceType::INHERIT && $this->inheritanceType == null) || 
 			($this->inheritanceType == KalturaInheritanceType::INHERIT))
 		{
@@ -379,11 +385,18 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			}
 		}
 		
+		if (!is_null($sourceObject) && $sourceObject->getLock())
+		{
+			
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_IS_LOCKED);
+		}
+
 		if ($this->owner && $this->owner != '')
 		{
 			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->owner);
 			if (!$kuser)
 				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->owner);
 		}
+		
 	}
 }

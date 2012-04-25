@@ -57,11 +57,9 @@ class categoryEntry extends BasecategoryEntry {
 			$category->incrementDirectEntriesCount();
 			
 			$entry = entryPeer::retrieveByPK($this->getEntryId());
-			if($entry && !categoryEntryPeer::getSkipSave())
+			if($entry && !categoryEntryPeer::getSkipSave() && $category->getPrivacyContext() == '')
 			{
-				if($category->getPrivacyContext() == '')
-					$entry->setCategories($entry->getCategories() . ',' . $category->getFullName());
-				
+				$entry->setCategories($entry->getCategories() . entry::ENTRY_CATEGORY_SEPARATOR . $category->getFullName());
 				$entry->save();					
 			}
 		}

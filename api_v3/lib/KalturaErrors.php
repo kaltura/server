@@ -240,6 +240,8 @@ class KalturaErrors extends APIErrors
 	
 	const PARENT_CATEGORY_NOT_FOUND = "PARENT_CATEGORY_NOT_FOUND,Parent category id \"%s\" not found";
 	
+	const PARENT_CATEGORY_IS_LOCK = "PARENT_CATEGORY_IS_LOCK,Parent category is locked";
+	
 	const DUPLICATE_CATEGORY = "DUPLICATE_CATEGORY,The category \"%s\" already exists";
 	
 	const PARENT_CATEGORY_IS_CHILD = "PARENT_CATEGORY_IS_CHILD,The parent category \"%s\" is one of the childs for category \"%s\"";
@@ -403,5 +405,9 @@ class KalturaErrors extends APIErrors
 	
 	const MUST_FILTER_ENTRY_ID_EQUAL = "MUST_FILTER_ENTRY_ID_EQUAL,Must filter on entry id";
 	
+	const MUST_FILTER_ON_ENTRY_OR_CATEGORY = "MUST_FILTER_ON_ENTRY_OR_CATEGORY,Must filter on entry id or category";
+	
 	const CATEGORY_ENTRY_ALREADY_EXISTS = "CATEGORY_ENTRY_ALREADY_EXISTS,Entry already assigned to this category";
+	
+	const CATEGORY_IS_LOCKED = 'CATEGORY_IS_LOCKED,Category is locked - cannot delete or change parent id';
 }

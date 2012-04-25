@@ -670,9 +670,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 				$ret = $ret && $this->preUpdate($con);
 			}
 			if ($ret) {
-				
 				$affectedRows = $this->doSave($con);
-				
 				if ($isInsert) {
 					$this->postInsert($con);
 				} else {
@@ -709,7 +707,6 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 */
 	protected function doSave(PropelPDO $con)
 	{
-		
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		if (!$this->alreadyInSave) {
 			$this->alreadyInSave = true;
@@ -722,13 +719,13 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
-					
 					$pk = categoryEntryPeer::doInsert($this, $con);
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
 										 // should always be true here (even though technically
 										 // BasePeer::doInsert() can insert multiple rows).
-					
+
 					$this->setId($pk);  //[IMV] update autoincrement primary key
+
 					$this->setNew(false);
 					$this->objectSaved = true;
 				} else {

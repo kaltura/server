@@ -3,8 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class KalturaDeleteObjectType extends KalturaEnum
+class KalturaDeleteObjectType extends KalturaEnum implements DeleteObjectType
 {
-	const CATEGORY_ENTRY = 1;
-	const CATEGORY_USER = 2;
+
 }
