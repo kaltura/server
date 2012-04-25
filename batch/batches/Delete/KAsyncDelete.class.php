@@ -56,8 +56,6 @@ class KAsyncDelete extends KJobHandlerWorker
 			$continue = (bool) $deletedObjectsCount;
 		}
 		
-		$this->closeJob($job, null, null, "delete object done", KalturaBatchJobStatus::FINISHED);
-		
-		return $job;
+		return $this->closeJob($job, null, null, "Delete objects finished", KalturaBatchJobStatus::FINISHED);
 	}
 }

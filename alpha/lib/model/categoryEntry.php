@@ -57,6 +57,7 @@ class categoryEntry extends BasecategoryEntry {
 			$category->incrementDirectEntriesCount();
 			
 			$entry = entryPeer::retrieveByPK($this->getEntryId());
+			//only categories with no context are saved on entry - this is only for Backward compatible 
 			if($entry && !categoryEntryPeer::getSkipSave() && $category->getPrivacyContext() == '')
 			{
 				$entry->setCategories($entry->getCategories() . entry::ENTRY_CATEGORY_SEPARATOR . $category->getFullName());

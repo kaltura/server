@@ -79,33 +79,11 @@ class CategoryEntryService extends KalturaBaseService
 			throw new ApiException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
 			
 			
-		if ($category->getPrivacyContext() == kEntitlementUtils::DEFAULT_CONTEXT)
-		{
-			$categories = $entry->getCategories();
+		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
+		if(!$dbCategoryEntry)
+			throw new APIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
 		
-			$categoriesArr = explode(entry::ENTRY_CATEGORY_SEPARATOR, $categories);
-	
-			foreach ($categoriesArr as $key => $categoryOnEntey)
-			{
-				if($categoryOnEntey == $category->getFullName())
-				{
-					unset($categoriesArr[$key]);
-					break;
-				}
-			}
-
-			$entry->setCategories(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categoriesArr));
-			$entry->save();
-				
-		}
-		else
-		{
-			$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
-			if(!$dbCategoryEntry)
-				throw new APIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
-			
-			$dbCategoryEntry->delete();
-		}
+		$dbCategoryEntry->delete();
 	}
 	
 	/**

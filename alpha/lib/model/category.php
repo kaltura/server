@@ -111,17 +111,28 @@ class category extends Basecategory implements IIndexable
 			}
 		}
 		
+		//TODO - i don't think we need lock machnizem
+/*		if (!$this->isNew() || $this->isColumnModified(categoryPeer::PARENT_ID))
+		{
+			//lock category when parent id is changed.
+			//TODO - GET OLD ROOT CATEGORY
+			$oldRootParentCategory = 888;
+			$oldRootParentCategory->setLock(true);
+			$oldRootParentCategory->save();
+			
+			//lock new root catgegory
+			$rootParentCategory = $this->getRootCategoryFromFullIds();
+			$rootParentCategory->setLock(true);
+			$rootParentCategory->save();
+		}*/
+		
 		if (!$this->getIsIndex() && 
 			($this->isColumnModified(categoryPeer::NAME) || 
 			$this->isColumnModified(categoryPeer::PARENT_ID)))
 		{
-			//TODO - SHOULD LOCK
-			/*$oldRootParentCategory = $this->getRootCategoryFromFullIds();
-			$oldRootParentCategory->setLock(true);
-			$oldRootParentCategory->save();*/
 			$this->updateFullName();
 		}
-		
+
 		//index + update categoryEntry
 		if (!$this->isNew() &&
 			($this->isColumnModified(categoryPeer::FULL_IDS) ||
@@ -159,7 +170,6 @@ class category extends Basecategory implements IIndexable
 			}else{
 				$this->addDeleteCategoryEntryJob($this->getId());
 			}
-					
 		}
 		
 		if (!$this->isNew() &&
@@ -419,13 +429,11 @@ class category extends Basecategory implements IIndexable
 			$this->move_entries_to_parent_category = $moveEntriesToParentCategory;
 		}
 		
-		
 		$this->loadChildsForSave();
 		foreach($this->childs_for_save as $child)
 		{
 			$child->setDeletedAt($v, $moveEntriesToParentCategory);
 		}
-		
 		$this->setStatus(CategoryStatus::DELETED);
 		parent::setDeletedAt($v);
 		$this->save();
@@ -438,6 +446,7 @@ class category extends Basecategory implements IIndexable
 			
 		$fullIds = explode(categoryPeer::CATEGORY_SEPARATOR, $this->getFullIds());
 		
+		//TODO - disable tag for unlisted categories
 		return categoryPeer::retrieveByPK($fullIds[0]); 
 	}
 		

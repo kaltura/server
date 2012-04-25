@@ -25,7 +25,6 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 	public static function retrieveByCategoryIdAndEntryId($categoryId, $entryId)
 	{
 		$c = new Criteria();
-		$c->add(self::PARTNER_ID, kCurrentContext::$ks_partner_id);
 		$c->add(self::CATEGORY_ID, $categoryId);
 		$c->add(self::ENTRY_ID, $entryId);
 		
@@ -35,7 +34,6 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 	public static function selectByEntryId($entryId)
 	{
 		$c = new Criteria();
-		$c->add(self::PARTNER_ID, kCurrentContext::$ks_partner_id);
 		$c->add(self::ENTRY_ID, $entryId);
 		
 		return self::doSelect($c);

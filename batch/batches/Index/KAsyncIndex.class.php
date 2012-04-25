@@ -71,6 +71,6 @@ class KAsyncIndex extends KJobHandlerWorker
 			$filter->advancedSearch = $advancedFilter;
 		}
 		
-		return $job;
+		return $this->closeJob($job, null, null, "Index objects finished", KalturaBatchJobStatus::FINISHED);
 	}
 }
