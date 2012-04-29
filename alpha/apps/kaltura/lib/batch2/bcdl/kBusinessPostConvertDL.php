@@ -26,7 +26,7 @@ class kBusinessPostConvertDL
 				return $flavorParamsConversionProfile->getReadyBehavior();
 		}
 			
-		return flavorParamsConversionProfile::READY_BEHAVIOR_INHERIT_FLAVOR_PARAMS;
+		return flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT;
 	}
 	
 	public static function handleFlavorReady(BatchJob $dbBatchJob, $flavorAssetId)
@@ -171,7 +171,7 @@ class kBusinessPostConvertDL
 		{
 			if($flavorParamsConversionProfile->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 				$requiredFlavorParamsIds[$flavorParamsConversionProfile->getFlavorParamsId()] = true;
-			if($flavorParamsConversionProfile->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_INHERIT_FLAVOR_PARAMS)
+			if($flavorParamsConversionProfile->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT)
 				$inheritedFlavorParamsIds[] = $flavorParamsConversionProfile->getFlavorParamsId();
 		}
 		$flavorParamsItems = assetParamsPeer::retrieveByPKs($inheritedFlavorParamsIds);

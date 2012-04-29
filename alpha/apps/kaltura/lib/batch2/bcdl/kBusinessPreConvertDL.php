@@ -590,7 +590,7 @@ class kBusinessPreConvertDL
 			$flavorParamsConversionProfile = $conversionProfileFlavorParams[$flavor->getFlavorParamsId()];
 			$flavor->_force = $flavorParamsConversionProfile->getForceNoneComplied();
 			
-			if($flavorParamsConversionProfile->getReadyBehavior() != flavorParamsConversionProfile::READY_BEHAVIOR_INHERIT_FLAVOR_PARAMS)
+			if($flavorParamsConversionProfile->getReadyBehavior() != flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT)
 				$flavor->setReadyBehavior($flavorParamsConversionProfile->getReadyBehavior());	
 
 			if(!$flavor->IsValid())
