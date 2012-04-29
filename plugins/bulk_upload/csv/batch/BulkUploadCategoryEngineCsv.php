@@ -194,7 +194,6 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		    switch ($bulkUploadResult->action)
 		    {
 		        case KalturaBulkUploadAction::ADD:
-		            KalturaLog::debug("In handle case for action [ADD]");
     		        $category = $this->createCategoryFromResultAndJobData($bulkUploadResult);
         					
         			$bulkUploadResultChunk[] = $bulkUploadResult;
@@ -302,7 +301,6 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 	    {
 	        //Error because the relative path of the new category does not exist
 	    }
-	    
 	    if (count($parentCategoryIds->objects) > 1)
 	    {
 	        //Error because the relative path of the new category is not unique under the root category.
@@ -364,6 +362,8 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 			
 			if(is_array($requestResult) && isset($requestResult['code']))
 			{
+			    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			    $bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
 				$bulkUploadResult->objectStatus = $requestResult['code'];
 				$bulkUploadResult->errorDescription = $requestResult['message'];
 				$this->addBulkUploadResult($bulkUploadResult);
@@ -373,6 +373,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 			if($requestResult instanceof Exception)
 			{
 				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+				$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
 				$bulkUploadResult->errorDescription = $requestResult->getMessage();
 				$this->addBulkUploadResult($bulkUploadResult);
 				continue;

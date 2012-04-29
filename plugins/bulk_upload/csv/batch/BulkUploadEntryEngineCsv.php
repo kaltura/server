@@ -427,6 +427,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 			if(is_array($requestResult) && isset($requestResult['code']))
 			{
 			    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			    $bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
 				$bulkUploadResult->entryStatus = $requestResult['code'];
 				$bulkUploadResult->errorDescription = $requestResult['message'];
 				$this->addBulkUploadResult($bulkUploadResult);
@@ -437,6 +438,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 			{
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+				$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
 				$bulkUploadResult->errorDescription = $requestResult->getMessage();
 				$this->addBulkUploadResult($bulkUploadResult);
 				continue;
@@ -446,6 +448,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 			{
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+				$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
 				$bulkUploadResult->errorDescription = "Returned type is " . get_class($requestResult) . ', KalturaMediaEntry was expected';
 				$this->addBulkUploadResult($bulkUploadResult);
 				continue;
