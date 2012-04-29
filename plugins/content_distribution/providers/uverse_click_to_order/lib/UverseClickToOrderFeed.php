@@ -45,7 +45,7 @@ class UverseClickToOrderFeed
 		$this->xpath = new DOMXPath($this->doc);
 			
 		// item node template
-		$node = $this->xpath->query('/root/category/item',$this->category)->item(0);		
+		$node = $this->xpath->query('/root/category/item')->item(0);		
 		$this->item = $node->cloneNode(true);
 		$node->parentNode->removeChild($node);
 
@@ -122,10 +122,16 @@ class UverseClickToOrderFeed
 		$this->setNodeValue('directions', $values[UverseClickToOrderDistributionField::ITEM_DIRECTIONS], $item);
 	}
 	
-	public function setBackgroudImage($widedBackgroundImageUrl, $standardBackgroundImageUrl)
+	public function setBackgroudImage($widedBackgroundImageUrl = null, $standardBackgroundImageUrl = null)
 	{				
-		$this->setNodeValue('background_image/@wide', $widedBackgroundImageUrl);	
-		$this->setNodeValue('background_image/@standard', $standardBackgroundImageUrl);
+		if ($widedBackgroundImageUrl)
+		{
+			$this->setNodeValue('background_image/@wide', $widedBackgroundImageUrl);
+		}
+		if ($standardBackgroundImageUrl)
+		{	
+			$this->setNodeValue('background_image/@standard', $standardBackgroundImageUrl);
+		}
 	}
 	
 	public function getXml()

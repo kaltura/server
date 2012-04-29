@@ -137,7 +137,7 @@ class UverseClickToOrderDistributionPlugin extends KalturaPlugin implements IKal
 	 */
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
-		 // append AttUverse specific report statistics
+		 // append UverseClickToOrder specific report statistics
 	    $distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
 		$mrss->addChild('background_image_wide', $distributionProfile->getBackgroundImageWide());
 		$mrss->addChild('background_image_standard', $distributionProfile->getBackgroundImageStandard());
