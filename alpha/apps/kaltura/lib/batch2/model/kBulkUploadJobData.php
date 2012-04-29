@@ -78,12 +78,6 @@ class kBulkUploadJobData extends kJobData
 	protected $objectData;
 	
 	/**
-	 * Type of bulk upload
-	 * @var string
-	 */
-	protected $type;
-		
-	/**
 	 * @return the $userId
 	 */
 	public function getUserId() {
@@ -239,23 +233,5 @@ class kBulkUploadJobData extends kJobData
     {
         $this->objectData = $objectData;
     }
-	/**
-     * @return the $type
-     */
-    public function getType ()
-    {
-        return $this->type;
-    }
-
-	/**
-     * @param string $type
-     */
-    public function setType ($type)
-    {
-        $this->type = $type;
-    }
-
-
-
 
 }
