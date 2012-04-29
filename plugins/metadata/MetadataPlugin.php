@@ -578,6 +578,24 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			if(self::isAllowedPartner($object->getPartnerId()))
 				return kMetadataManager::getSearchValuesByObject(Metadata::TYPE_ENTRY, $object->getId());
 		}
+	
+		if($object instanceof category)
+		{
+			if(self::isAllowedPartner($object->getPartnerId()))
+				return kMetadataManager::getSearchValuesByObject(Metadata::TYPE_CATEGORY, $object->getId());
+		}
+	
+		if($object instanceof categoryKuser)
+		{
+			if(self::isAllowedPartner($object->getPartnerId()))
+				return kMetadataManager::getSearchValuesByObject(Metadata::TYPE_CATEGORY_USER, $object->getId());
+		}
+	
+		if($object instanceof kuser)
+		{
+			if(self::isAllowedPartner($object->getPartnerId()))
+				return kMetadataManager::getSearchValuesByObject(Metadata::TYPE_USER, $object->getId());
+		}
 			
 		return null;
 	}
