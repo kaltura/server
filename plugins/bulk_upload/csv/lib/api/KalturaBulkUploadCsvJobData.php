@@ -25,6 +25,11 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 		"csvVersion"
 	);
 
+	public function __construct()
+	{
+	    $this->type = KalturaBulkUploadType::CSV;
+	}
+	
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );

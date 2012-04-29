@@ -17,6 +17,12 @@ class KalturaBulkUploadXmlJobData extends KalturaBulkUploadJobData
 	private static $map_between_objects = array
 	();
 
+	
+	public function __construct()
+	{
+	    $this->type = KalturaBulkUploadType::XML;
+	}
+	
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
