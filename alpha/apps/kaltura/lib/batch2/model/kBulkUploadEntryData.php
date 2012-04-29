@@ -13,4 +13,21 @@ class kBulkUploadEntryData extends kBulkUploadObjectData
      * @var int
      */
     protected $conversionProfileId;
+    
+	/**
+     * @return the $conversionProfileId
+     */
+    public function getConversionProfileId ()
+    {
+        return $this->conversionProfileId;
+    }
+
+	/**
+     * @param int $conversionProfileId
+     */
+    public function setConversionProfileId ($conversionProfileId)
+    {
+        $this->conversionProfileId = $conversionProfileId;
+    }
+
 }
