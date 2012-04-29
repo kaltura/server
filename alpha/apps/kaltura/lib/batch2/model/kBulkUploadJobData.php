@@ -19,7 +19,7 @@ class kBulkUploadJobData extends kJobData
 	
 	/**
 	 * Selected profile id for all bulk entries
-	 * 
+	 * @deprecated
 	 * @var int
 	 */
 	protected $conversionProfileId;
@@ -70,6 +70,18 @@ class kBulkUploadJobData extends kJobData
 	 * @var int
 	 */
 	protected $numOfObjects;
+	
+	/**
+	 * Data pertaining to the objects being uploaded
+	 * @var kBulkUploadObjectData
+	 */
+	protected $objectData;
+	
+	/**
+	 * Type of bulk upload
+	 * @var string
+	 */
+	protected $type;
 		
 	/**
 	 * @return the $userId
@@ -212,6 +224,38 @@ class kBulkUploadJobData extends kJobData
     {
         $this->bulkUploadObjectType = $bulkUploadObjectType;
     }
+	/**
+     * @return the $objectData
+     */
+    public function getObjectData ()
+    {
+        return $this->objectData;
+    }
+
+	/**
+     * @param kBulkUploadObjectData $objectData
+     */
+    public function setObjectData ($objectData)
+    {
+        $this->objectData = $objectData;
+    }
+	/**
+     * @return the $type
+     */
+    public function getType ()
+    {
+        return $this->type;
+    }
+
+	/**
+     * @param string $type
+     */
+    public function setType ($type)
+    {
+        $this->type = $type;
+    }
+
+
 
 
 }
