@@ -1283,9 +1283,19 @@ class kJobsManager
 		
 		if(!$batchJob->getParentJobId() && $batchJob->getEntryId())
 		{
-			$entry = entryPeer::retrieveByPKNoFilter($batchJob->getEntryId()); // some jobs could be on deleted entry
-			$batchJob->setRootJobId($entry->getBulkUploadId());
-			$batchJob->setBulkJobId($entry->getBulkUploadId());
+			$currentJob = kBatchManager::getCurrentUpdatingJob();
+			if($currentJob && $currentJob->getEntryId() == $batchJob->getEntryId())
+			{
+				$batchJob->setParentJobId($currentJob->getId());
+				$batchJob->setBulkJobId($currentJob->getBulkJobId());
+				$batchJob->setRootJobId($currentJob->getRootJobId());
+			}
+			else
+			{
+				$entry = entryPeer::retrieveByPKNoFilter($batchJob->getEntryId()); // some jobs could be on deleted entry
+				$batchJob->setRootJobId($entry->getBulkUploadId());
+				$batchJob->setBulkJobId($entry->getBulkUploadId());
+			}
 		}
 			
 		// validate partner id
