@@ -10,10 +10,11 @@ class UverseClickToOrderDistributionProfile extends ConfigurableDistributionProf
 	const CUSTOM_DATA_BACKGROUND_IMAGE_STANDARD = 'backgroundImageStandard';
 	
 	protected $maxLengthValidation= array (
-		UverseClickToOrderDistributionField::ITEM_CONTENT => 320,
-		UverseClickToOrderDistributionField::CATEGORY_ENTRY_ID => 15,
+		UverseClickToOrderDistributionField::ITEM_CONTENT => 320,		
 		UverseClickToOrderDistributionField::ITEM_TITLE => 25,
 	);
+	
+	const CATEGORY_ENTRY_NAME_MAXIMUM_LENGTH = 15;
 
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -108,8 +109,34 @@ class UverseClickToOrderDistributionProfile extends ConfigurableDistributionProf
 			return $validationErrors;
 		}		
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($this->maxLengthValidation, $allFieldValues, $action));
+		$validationErrors = array_merge($validationErrors, $this->validateMaxLengthCategoryName($allFieldValues[UverseClickToOrderDistributionField::CATEGORY_ENTRY_ID], $action));
+		
 		return $validationErrors;
 	}
+	
+	protected function validateMaxLengthCategoryName($categoryEntryId, $action)
+	{
+	    $validationErrors = array();
+	    $c = new Criteria();
+		$c->addAnd(entryPeer::ID, $categoryEntryId, Criteria::EQUAL);
+		$categoryEntryIdObject = entryPeer::doSelect($c);
+		if ($categoryEntryIdObject)
+		{
+			$relatedEntryName = $categoryEntryIdObject[0]->getName();	
+			if (strlen($relatedEntryName) > self::CATEGORY_ENTRY_NAME_MAXIMUM_LENGTH)
+			{
+				KalturaLog::debug('related category name exceeds the maximum length of '.self::CATEGORY_ENTRY_NAME_MAXIMUM_LENGTH. ' characters');
+				$errorMsg = 'related category name exceeds the maximum length of '.self::CATEGORY_ENTRY_NAME_MAXIMUM_LENGTH. ' characters';			
+	    		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA);    		
+	    		$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+	    		$validationError->setValidationErrorParam($errorMsg);
+	    		$validationError->setDescription($errorMsg);
+	    		$validationErrors[] = $validationError;
+			}
+		}	    
+	    return $validationErrors;
+	}
+	
 	
 	public function getFeedUrl()
 	{

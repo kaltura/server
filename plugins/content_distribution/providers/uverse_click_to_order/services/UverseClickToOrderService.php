@@ -96,7 +96,7 @@ class UverseClickToOrderService extends KalturaBaseService
 			$relatedEntryObject = entryPeer::doSelect($c);	
 			if (!$relatedEntryObject)
 			{
-				KalturaLog::err('Related Entry ['.$relatedEntryId.'] was not found for entry ['.$entry->getId().'] and profile [' . $profile->getId() . ']');
+				KalturaLog::err('Related Entry ['.$relatedEntryId.'] was not found');
 				continue;
 			}
 			$categoryName = $relatedEntryObject[0]->getName();
