@@ -1349,12 +1349,12 @@ class kJobsManager
 	 * @param Partner $partner
 	 * @param string $puserId
 	 * @param string $uploadedBy
-	 * @param int $conversionProfileId
+	 * @param int $bulkUploadObjectType
 	 * @param BulkUploadType $bulkUploadType
 	 * @throws APIException
 	 * @return BatchJob
 	 */
-	public static function addBulkUploadJob($filePath, $fileName, Partner $partner, $puserId, $uploadedBy, $conversionProfileId = null, $bulkUploadType = null)
+	public static function addBulkUploadJob(Partner $partner, kBulkUploadJobData $jobData, $bulkUploadType = null)
 	{
 		$job = new BatchJob();
 		$job->setPartnerId($partner->getId());
@@ -1364,7 +1364,7 @@ class kJobsManager
 		$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 //		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
 		try{
-			kFileSyncUtils::moveFromFile($filePath, $syncKey, true);
+			kFileSyncUtils::moveFromFile($jobData->getFilePath(), $syncKey, true);
 		}
 		catch(Exception $e)
 		{
@@ -1373,35 +1373,32 @@ class kJobsManager
 		
 		$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		
-		$data = KalturaPluginManager::loadObject('kBulkUploadJobData', $bulkUploadType);
-
 		if(is_null($data))
 		{
 			throw new APIException(APIErrors::BULK_UPLOAD_BULK_UPLOAD_TYPE_NOT_VALID, $bulkUploadType);
 		}
-		
-		$data->setFilePath($filePath);
-		$data->setUserId($puserId);
-		$data->setUploadedBy($uploadedBy);
-		$data->setFileName($fileName);
-		if (!$conversionProfileId)
-			$conversionProfileId = $partner->getDefaultConversionProfileId();
-			
-		$kmcVersion = $partner->getKmcVersion();
-		$check = null;
-		if($kmcVersion < 2)
+		if (!$jobData->getBulkUploadObjectType())
 		{
-			$check = ConversionProfilePeer::retrieveByPK($conversionProfileId);
+		    $jobData->setBulkUploadObjectType(BulkUploadObjectType::ENTRY);
 		}
-		else
-		{
-			$check = conversionProfile2Peer::retrieveByPK($conversionProfileId);
-		}
-		if(!$check)
-			throw new APIException(APIErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
 		
-		$data->setConversionProfileId($conversionProfileId);
-			
-		return kJobsManager::addJob($job, $data, BatchJobType::BULKUPLOAD, kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadType));
+		if ($jobData->getBulkUploadObjectType() == BulkUploadObjectType::ENTRY && !$jobData->getConversionProfileId())
+		{
+			$jobData->setConversionProfileId($partner->getDefaultConversionProfileId());
+			$kmcVersion = $partner->getKmcVersion();
+		    $check = null;
+			if($kmcVersion < 2)
+    		{
+    			$check = ConversionProfilePeer::retrieveByPK($jobData->getConversionProfileId());
+    		}
+    		else
+    		{
+    			$check = conversionProfile2Peer::retrieveByPK($jobData->getConversionProfileId());
+    		}
+    		if(!$check)
+    			throw new APIException(APIErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $jobData->getConversionProfileId());
+    	}
+
+		return kJobsManager::addJob($job, $jobData, BatchJobType::BULKUPLOAD, kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadType));
 	}
 }
