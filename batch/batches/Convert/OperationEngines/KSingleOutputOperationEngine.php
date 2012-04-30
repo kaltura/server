@@ -24,8 +24,8 @@ class KSingleOutputOperationEngine extends KOperationEngine
 		}
 		$exec_cmd = $this->cmd . " " . 
 			str_replace ( 
-				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName), 
-				array($this->inFilePath, $this->outFilePath, $this->configFilePath),
+				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName), 
+				array($this->inFilePath, $this->outFilePath, $this->configFilePath, $this->cmd),
 				$this->operator->command);
 				
 		$exec_cmd .= " >> \"{$this->logFilePath}\" 2>&1";
