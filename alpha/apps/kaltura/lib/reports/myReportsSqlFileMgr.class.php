@@ -27,7 +27,8 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 			$flavor_str , 
 			$add_search_text ? "" : "_" . self::NO_TEXT_SUFFIX , 
 			$object_ids ? "_" . self::FOR_OBJECTS_SUFFIX : "",
-			$has_filter );
+			$has_filter,
+			$input_filter->getFilterBy());
 		
 		if ( $config === null )
 		{
@@ -38,8 +39,9 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 					$type_str , 
 					$flavor_str , 
 					$add_search_text ? "" : "_" . self::NO_TEXT_SUFFIX , 
-					"",
-					$has_filter);
+					"", 
+					$has_filter,
+					$input_filter->getFilterBy() );
 		
 				if ( $config === null )
 				{
@@ -99,7 +101,7 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 	}
 
 	
-	private static function getFileNameMappingConfig ( $type_str , $flavor_str , $no_text , $for_objects, $has_filter )
+	private static function getFileNameMappingConfig ( $type_str , $flavor_str , $no_text , $for_objects, $has_filter, $filter_by )
 	{
 		$map = array (
 			"content_contributions" => array (
@@ -220,6 +222,70 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"total_no_text" => "!graph",
 				"graph" => ""				,
 				"graph_no_text" => "!graph",
+			),
+			"user_engagement" => array (
+				"graph_no_text" => "top_content/graph_no_text",
+				"graph_without_filter" => "top_content/graph_no_filter",
+				"graph_by_user" => "graph_by_user",
+				"graph_by_app" => "graph_by_app",
+				"graph_by_user_by_app" => "graph_by_user_by_app",
+				"total_no_text" => "total_no_text",
+				"total_by_user" => "total_by_user",
+				"total_by_app" => "total_by_app",
+				"total_by_user_by_app" => "total_by_user_by_app",
+				"detail_no_text" => "detail_no_text",
+				"detail_by_user" => "detail_by_user",
+				"detail_by_app" => "detail_by_app",
+				"detail_by_user_by_app" => "detail_by_user_by_app",	
+			),
+			"specific_user_engagement" => array (
+				"detail_by_user" => "detail_by_user",
+				"detail_by_user_by_app" => "detail_by_user_by_app",	
+			),
+			"user_top_content" => array (
+				"graph_no_text" => "top_content/graph_no_text",
+				"graph_without_filter" => "top_content/graph_no_filter",
+				"graph_by_user" => "user_engagement/graph_by_user",
+				"graph_by_app" => "user_engagement/graph_by_app",
+				"graph_by_user_by_app" => "user_engagement/graph_by_user_by_app",
+				"total_no_text" => "user_engagement/total_no_text",
+				"total_by_user" => "user_engagement/total_by_user",
+				"total_by_app" => "user_engagement/total_by_app",
+				"total_by_user_by_app" => "user_engagement/total_by_user_by_app",
+				"detail_no_text" => "user_engagement/detail_no_text",
+				"detail_by_user" => "user_engagement/detail_by_user",
+				"detail_by_app" => "user_engagement/detail_by_app",
+				"detail_by_user_by_app" => "user_engagement/detail_by_user_by_app",	
+			),
+			"user_content_dropoff" => array (
+				"graph_no_text" => "content_dropoff/graph_no_text",
+				"graph_without_filter" => "content_dropoff/graph_no_filter",
+				"graph_by_user" => "graph_by_user",
+				"graph_by_app" => "graph_by_app",
+				"graph_by_user_by_app" => "graph_by_user_by_app",
+				"total_no_text" => "total_no_text",
+				"total_by_user" => "total_by_user",
+				"total_by_app" => "total_by_app",
+				"total_by_user_by_app" => "total_by_user_by_app",
+				"detail_no_text" => "detail_no_text",
+				"detail_by_user" => "detail_by_user",
+				"detail_by_app" => "detail_by_app",
+				"detail_by_user_by_app" => "detail_by_user_by_app",	
+			),
+			"user_content_interactions" => array (
+				"graph_no_text" => "content_interactions/graph_no_text",
+				"graph_without_filter" => "content_interactions/graph_no_filter",
+				"graph_by_user" => "graph_by_user",
+				"graph_by_app" => "graph_by_app",
+				"graph_by_user_by_app" => "graph_by_user_by_app",
+				"total_no_text" => "total_no_text",
+				"total_by_user" => "total_by_user",
+				"total_by_app" => "total_by_app",
+				"total_by_user_by_app" => "total_by_user_by_app",
+				"detail_no_text" => "detail_no_text",
+				"detail_by_user" => "detail_by_user",
+				"detail_by_app" => "detail_by_app",
+				"detail_by_user_by_app" => "detail_by_user_by_app",	
 			)
 		);
 
@@ -231,11 +297,17 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 		if (!($has_filter) && isset($report_type_mapping[$flavor_str . "_" . self::NO_FILTER_SUFFIX])) {
 			return $report_type_mapping[$flavor_str . "_" . self::NO_FILTER_SUFFIX];					
 		}
-
-		if ( $no_text )
-			$flavor_str = $flavor_str . $no_text;
-		if ( $for_objects )	
-			$flavor_str = $flavor_str . $for_objects;
+		
+		if ($filter_by) {
+			$flavor_str = $flavor_str . $filter_by;
+		} else {
+			if ( $no_text )
+				$flavor_str = $flavor_str . $no_text;
+			if ( $for_objects )	
+				$flavor_str = $flavor_str . $for_objects;
+		}
+			
+		
 			
 		if ( isset ( $report_type_mapping[$flavor_str ]))
 			return $report_type_mapping[$flavor_str];

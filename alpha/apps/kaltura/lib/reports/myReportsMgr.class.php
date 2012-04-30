@@ -15,6 +15,11 @@ class myReportsMgr
 	const REPORT_TYPE_CONTENT_CONTRIBUTIONS = 7;
 	const REPORT_TYPE_WIDGETS_STATS = 8;
 	const REPORT_TYPE_ADMIN_CONSOLE = 10;
+	const REPORT_TYPE_USER_ENGAGEMENT = 11;
+	const SPEFICIC_USER_ENGAGEMENT = 12;
+	const REPORT_TYPE_USER_TOP_CONTENT = 13;
+	const REPORT_TYPE_USER_CONTENT_DROPOFF = 14;
+	const REPORT_TYPE_USER_CONTENT_INTERACTIONS = 15;
 	const REPORT_TYPE_SYSTEM_GENERIC_PARTNER = 100;
 	const REPORT_TYPE_SYSTEM_GENERIC_PARTNER_TYPE = 101;
 	const REPORT_TYPE_PARTNER_BANDWIDTH_USAGE = 200;
@@ -569,6 +574,11 @@ class myReportsMgr
 		self::REPORT_TYPE_CONTENT_CONTRIBUTIONS => "content_contributions" ,
 		self::REPORT_TYPE_WIDGETS_STATS => "widgets_stats" ,
 		self::REPORT_TYPE_ADMIN_CONSOLE => "admin_console" ,
+		self::REPORT_TYPE_USER_ENGAGEMENT => "user_engagement",
+		self::SPEFICIC_USER_ENGAGEMENT => "specific_user_engagement",
+		self::REPORT_TYPE_USER_TOP_CONTENT => "user_top_content",
+		self::REPORT_TYPE_USER_CONTENT_DROPOFF => "user_content_dropoff", 
+	    self::REPORT_TYPE_USER_CONTENT_INTERACTIONS => "user_content_interactions",
 		self::REPORT_TYPE_SYSTEM_GENERIC_PARTNER => "system_generic_partner" ,
 		self::REPORT_TYPE_SYSTEM_GENERIC_PARTNER_TYPE => "system_generic_partner_type" ,
 		self::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE => "partner_bandwidth_usage" ,
@@ -649,7 +659,38 @@ class myReportsMgr
 			"widgets_stats" => array (
 				"widget_id",
 				"count_plays"
-			)
+			),
+			"user_engagement" => array (
+				"unique_videos".
+				"count_plays" ,	
+				"sum_time_viewed" ,
+				"avg_time_viewed" ,
+				"count_loads" ,
+				"load_play_ratio" ,		
+			),
+			"user_top_content" => array (				
+				"count_plays" ,	
+				"sum_time_viewed" ,
+				"avg_time_viewed" ,
+				"count_loads" ,
+				"load_play_ratio" ,	
+			),
+			"user_content_dropoff" => array (
+				"count_plays" ,	
+				"count_plays_25" ,
+				"count_plays_50" ,
+				"count_plays_75" ,
+				"count_plays_100" ,
+				"play_through_ratio" ,
+			) ,	
+			"user_content_interactions" => array (	
+				"count_plays" ,	
+				"count_edit" ,
+				"count_viral" ,
+				"count_download" ,
+				"count_report" ,
+			),
+			
 		);
 			
 		if ( $order_by[0] == '-' )
@@ -949,6 +990,33 @@ class reportsInputFilter
 	{
 		return $this->from_date ."_".$this->to_date."_".$this->keywords."_".$this->search_in_tags."_".$this->search_in_admin_tags.
 		"_".$this->categories;
+	}
+	
+	public function getFilterBy() {
+		return "";
+			
+	}
+}
+
+class endUserReportsInputFilter extends reportsInputFilter
+{
+	public $application;
+	public $userIds;
+	
+	public function toShortString()
+	{
+		return parent::toShortString() . "_" . $this->userIds . "_" . $this->application ;
+	}
+	
+	public function getFilterBy() {
+		$filterBy = ""; 
+		if ($this->userIds) 
+			$filterBy = "_by_user";
+		if ($this->application)
+			$filterBy = $filterBy . "_by_app";
+
+		return $filterBy;
+			
 	}
 }
 ?>
