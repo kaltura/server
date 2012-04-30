@@ -887,6 +887,25 @@ class kJobsManager
 	
 	/**
 	 * @param int $partnerId
+	 * @param int $objectType of enum CopyObjectType
+	 * @param baseObjectFilter $filter The filter should return the list of objects that need to be copied.
+	 * @param BaseObject $templateObject Template object to overwrite attributes on the copied object
+	 * @return BatchJob
+	 */
+	public static function addCopyJob($partnerId, $objectType, baseObjectFilter $filter, BaseObject $templateObject)
+	{
+	    $jobData = new kCopyJobData();
+ 		$jobData->setFilter($filter);
+ 		$jobData->setTemplateObject($templateObject);
+ 		
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId($partnerId);
+		
+		return self::addJob($batchJob, $jobData, BatchJobType::COPY, $objectType);
+	}
+	
+	/**
+	 * @param int $partnerId
 	 * @param int $objectType of enum DeleteObjectType
 	 * @param baseObjectFilter $filter The filter should return the list of objects that need to be deleted
 	 * @return BatchJob
