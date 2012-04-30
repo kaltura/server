@@ -1,7 +1,14 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 require_once ( "kalturaAction.class.php" );
 
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 class getuiconfsAction extends kalturaAction
 {
 	public function execute ( ) 
@@ -82,4 +89,3 @@ class getuiconfsAction extends kalturaAction
 		return $this->renderText(json_encode($merged_list));
 	}
 }
-?>

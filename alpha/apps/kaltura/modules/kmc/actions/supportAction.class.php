@@ -1,7 +1,14 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 require_once ( "kalturaAction.class.php" );
 
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 class supportAction extends kalturaAction
 {
     const SUPPORT_EMAIL_TYPE_ID = 210;

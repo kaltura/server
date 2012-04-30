@@ -1,7 +1,14 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 require_once ( dirname(__FILE__)."/../../partnerservices2/actions/adminloginAction.class.php");
 
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 class widgetReportAction extends kalturaAction
 {
 
@@ -137,4 +144,3 @@ class widgetReportAction extends kalturaAction
 		return $partner_id;
 	}
 }
-?>

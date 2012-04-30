@@ -1,8 +1,8 @@
 <?php
-
-//require_once ( "kalturaAction.class.php" );
-//require_once("KalturaClient.php");
-
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 class createmixAction extends kalturaAction
 {
 	public function execute ( )

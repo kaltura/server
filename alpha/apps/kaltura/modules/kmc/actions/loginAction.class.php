@@ -1,7 +1,14 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 require_once ( "kalturaAction.class.php" );
 
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 class loginAction extends kalturaAction
 {
 	public function execute ( ) 
@@ -51,4 +58,3 @@ class loginAction extends kalturaAction
 		sfView::SUCCESS;
 	}
 }
-?>

@@ -1,7 +1,14 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 require_once ( "kalturaAction.class.php" );
 
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 class kmcEmbedAction extends kalturaAction
 {
 	public function execute ( ) 
@@ -60,4 +67,3 @@ k_pl_0_name=test123&k_pl_0_url=http%3A%2F%2Flocalhost%2Findex.php%2Fpartnerservi
 		sfView::SUCCESS;
 	}
 }
-?>

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 class varloginAction extends kalturaAction
 {
 	public function execute ( ) 
@@ -9,4 +13,3 @@ class varloginAction extends kalturaAction
 		sfView::SUCCESS;
 	}
 }
-?>

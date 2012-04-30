@@ -1,7 +1,14 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 require_once ( "kalturaAction.class.php" );
 
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 class logoutAction extends kalturaAction
 {
 	public function execute ( ) 
@@ -25,4 +32,3 @@ class logoutAction extends kalturaAction
 		return sfView::NONE; //redirection to kmc/kmc is done from java script
 	}
 }
-?>

@@ -1,6 +1,10 @@
 <?php
-// TEST PAGE FOR ADDING JW TO KMC
-
+/**
+ * Test page for adding JW player to KMC
+ * 
+ * @package    Core
+ * @subpackage KMC
+ */
 class varpartnerlistAction extends kalturaAction
 {
 	public function execute ( ) 
@@ -68,4 +72,3 @@ class varpartnerlistAction extends kalturaAction
 		}
 	}
 }
-?>

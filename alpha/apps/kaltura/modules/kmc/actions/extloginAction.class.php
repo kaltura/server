@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 class extloginAction extends kalturaAction
 {
 	

@@ -1,7 +1,14 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 require_once ( "kalturaAction.class.php" );
 
+/**
+ * @package    Core
+ * @subpackage KMC
+ */
 class kmc3Action extends kalturaAction
 {
 	const CURRENT_KMC_VERSION = 3;
@@ -355,4 +362,3 @@ class kmc3Action extends kalturaAction
 		return $confs;
 	}	
 }
-?>
