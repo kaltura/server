@@ -83,12 +83,14 @@ class UverseClickToOrderService extends KalturaBaseService
 			}
 			
 			$flavorAssets = array_map('trim', explode(',', $entryDistribution->getFlavorAssetIds()));
-			$flavorAsset = isset($flavorAssets[0]) ? $flavorAssets[0] : null;
-			$flavorUrl = $flavorAsset ? $flavorAsset->getDownloadUrl : $entry->getDownloadUrl();
+			$flavorAssetId = isset($flavorAssets[0]) ? $flavorAssets[0] : null;
+			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+			$flavorUrl = $flavorAsset ? $flavorAsset->getDownloadUrl() : $entry->getDownloadUrl();
 			
 			$thumbAssets = array_map('trim', explode(',', $entryDistribution->getThumbAssetIds()));
-			$thumbAsset = isset($thumbAssets[0]) ? $thumbAssets[0] : null;
-			$thumbUrl = $thumbAsset ? $thumbAsset->getDownloadUrl : $entry->getThumbnailUrl();
+			$thumbAssetId = isset($thumbAssets[0]) ? $thumbAssets[0] : null;
+			$thumbAsset = assetPeer::retrieveById($thumbAssetId);
+			$thumbUrl = $thumbAsset ? $thumbAsset->getDownloadUrl() : $entry->getThumbnailUrl();
 			
 			$relatedEntriesArray[$relatedEntryId][] = array(
 				'id' => $entry->getId(),
@@ -101,16 +103,14 @@ class UverseClickToOrderService extends KalturaBaseService
 		foreach ($relatedEntriesArray as $relatedEntryId => $entriesUnderCategory)
 		{
 			//getting the related entry id object
-			$c = new Criteria();
-			$c->addAnd(entryPeer::ID, $relatedEntryId, Criteria::EQUAL);
-			$relatedEntryObject = entryPeer::doSelect($c);	
+			$relatedEntryObject = entryPeer::retrieveByPK($relatedEntryId);	
 			if (!$relatedEntryObject)
 			{
 				KalturaLog::err('Related Entry ['.$relatedEntryId.'] was not found');
 				continue;
 			}
-			$categoryName = $relatedEntryObject[0]->getName();
-			$categoryFile = $relatedEntryObject[0]->getThumbnailUrl().'/width/'.$fields[UverseClickToOrderDistributionField::CATEGORY_IMAGE_WIDTH].'/height/'.$fields[UverseClickToOrderDistributionField::CATEGORY_IMAGE_HEIGHT];
+			$categoryName = $relatedEntryObject->getName();
+			$categoryFile = $relatedEntryObject->getThumbnailUrl().'/width/'.$fields[UverseClickToOrderDistributionField::CATEGORY_IMAGE_WIDTH].'/height/'.$fields[UverseClickToOrderDistributionField::CATEGORY_IMAGE_HEIGHT];
 			$categoryNode = $feed->addCategory($categoryName, $categoryFile);
 
 			//getting all entries under a category
