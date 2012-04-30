@@ -32,8 +32,11 @@ class BulkUploadResultCategory extends BulkUploadResult
     public function handleRelatedObjects()
     {
         $category = $this->getObject();
-        $category->setBulkUploadId($this->getBulkUploadJobId());
-        $category->save();
+        if ($category)
+        {
+            $category->setBulkUploadId($this->getBulkUploadJobId());
+            $category->save();
+        }
     }
     
     /* (non-PHPdoc)
@@ -42,7 +45,7 @@ class BulkUploadResultCategory extends BulkUploadResult
     public function getObject()
     {
         //Return deleted categories as well.
-        return categoryPeer::retrieveByPKsNoFilter($this->getObjectId());
+        return categoryPeer::retrieveByPKNoFilter($this->getObjectId());
     }
     
     //Set properties for categories

@@ -15,8 +15,11 @@ class BulkUploadResultCategoryKuser extends BulkUploadResult
     public function handleRelatedObjects()
     {
         $categoryKuser = $this->getObject();
-        $categoryKuser->setBulkUploadId($this->getBulkUploadJobId());
-        $categoryKuser->save();
+        if ($categoryKuser)
+        {
+            $categoryKuser->setBulkUploadId($this->getBulkUploadJobId());
+            $categoryKuser->save();
+        }
     }
     
     /* (non-PHPdoc)
