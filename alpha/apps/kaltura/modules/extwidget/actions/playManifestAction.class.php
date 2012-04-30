@@ -1158,10 +1158,16 @@ class playManifestAction extends kalturaAction
 				$params = null;
 				parse_str($optimizedPlayback[$partner_id], $params);
 				if (isset($params['cache_playmanifest']) && $params['cache_playmanifest'])
-					requestUtils::sendCachingHeaders(60);
+					$renderer->cachingHeadersAge = 60;
 			}
 		}
 		
+		if (!$securyEntryHelper->shouldDisableCache())
+		{
+			$cache = kPlayManifestCacher::getInstance();
+			$cache->storeCache($renderer);
+		}
+
 		$renderer->output($playbackContext);
 	}
 }

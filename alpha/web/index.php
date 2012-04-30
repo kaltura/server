@@ -27,6 +27,13 @@ function checkCache()
 		}
 	}
 
+	if (strpos($uri, "/playManifest") !== false)
+	{
+		require_once(dirname(__FILE__)."/../apps/kaltura/lib/cache/kPlayManifestCacher.php");
+		$cache = kPlayManifestCacher::getInstance();
+		$cache->checkOrStart();
+	}
+	
 	if (strpos($uri, "/partnerservices2") !== false)
 	{
 		$params = $_GET + $_POST;

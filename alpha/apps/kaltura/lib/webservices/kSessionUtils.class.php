@@ -220,7 +220,7 @@ class kSessionUtils
 	}
 }
 
-class ks
+class ks extends kSessionBase
 {
 	const USER_WILDCARD = "*";
 	const PRIVILEGE_WILDCARD = "*";
@@ -239,41 +239,9 @@ class ks
 
 	const INVALID_LKS = -7;
 	
-	const TYPE_KS = 0; // change to be 1
-	const TYPE_KAS =1; // change to be 2
-
 	const PATTERN_WILDCARD = "*";
-
-	const SEPARATOR = ";";
 	
-	const PRIVILEGE_EDIT = "edit";
-	const PRIVILEGE_VIEW = "sview";
-	const PRIVILEGE_LIST = "list"; // used to bypass the user filter in entry list
-	const PRIVILEGE_DOWNLOAD = "download";
-	const PRIVILEGE_EDIT_ENTRY_OF_PLAYLIST = "editplaylist";
-	const PRIVILEGE_VIEW_ENTRY_OF_PLAYLIST = "sviewplaylist";
-	const PRIVILEGE_ACTIONS_LIMIT = "actionslimit";
-	const PRIVILEGE_SET_ROLE = "setrole";
-	const PRIVILEGE_IP_RESTRICTION = "iprestrict";
-	const PRIVILEGE_ENABLE_ENTITLEMENT = "enableentitlement";
-	const PRIVILEGE_DISABLE_ENTITLEMENT = "disableentitlement";
-	const PRIVILEGE_PRIVACY_CONTEXT = "privacycontext";
-	
-	const ADMIN_SECRET_CACHE_PREFIX = 'partner_admin_secret_';
-
-	public $partner_id = null;
-	public $master_partner_id = null;
-	public $valid_until = null;
-	public $partner_pattern = null;
-	public $type;
 	public $error;
-	public $rand;
-	public $user;
-	public $privileges;
-	public $additional_data = null;
-
-	private $original_str = "";
-	private $hash = null;
 
 	private $valid_string=false;
 
@@ -303,62 +271,22 @@ class ks
 	{
 		if ( empty ( $encoded_str ) ) return null;
 
-		$str = base64_decode( $encoded_str , true ) ; // encode this string
-
-		$ks = new ks();
-
-		$real_str = $str;
-		@list ( $hash , $real_str) = @explode ( "|" , $str , 2 );
-
-//		echo "[$str]<br>[$hash]<br>[$real_str]<br>[" . self::hash ( $real_str ) . "]<br>";
-		$ks->hash = $hash;
-		$ks->original_str = $encoded_str;
-
-		$parts = explode(self::SEPARATOR, $real_str);
-		if (count($parts) < 5)
+		$ks = new ks();		
+		if (!$ks->parseKS($encoded_str))
 		{
 			throw new Exception ( self::getErrorStr ( self::INVALID_STR ) );
 		}
-		
-		list(
-			$ks->partner_id, 
-			$ks->partner_pattern, 
-			$ks->valid_until, 
-			$ks->type, 
-			$ks->rand, 
-		) = $parts;
-		
-		if(isset($parts[5]))
-			$ks->user = $parts[5];
-			
-		if(isset($parts[6]))
-			$ks->privileges = $parts[6];
-			
-		if(isset($parts[7]))
-			$ks->master_partner_id = $parts[7];
-		
-		if(isset($parts[8]))
-			$ks->additional_data = $parts[8];
-			
+
 		$salt = $ks->getSalt();
-		 
-		if (self::hash ( $salt , $real_str ) != $hash )
+		if (self::hash ( $salt , $ks->real_str ) != $ks->hash )
 		{
 			throw new Exception ( self::getErrorStr ( self::INVALID_STR ) );
-			//$ks->valid_string = false;
-			//return $ks;
-		}
-			
+		}			
 
 		$ks->valid_string = true;
 		return $ks;
 	}
 
-	public function isAdmin()
-	{
-		return $this->type >= self::TYPE_KAS;
-	}
-	
 	public function getUniqueString()
 	{
 		return $this->partner_id . $this->rand;
@@ -405,7 +333,7 @@ class ks
 			if ( ! $this->type == $type  ) return self::INVALID_TYPE;
 		}
 		if ( $this->expired ( ) ) return self::EXPIRED ;
-	
+
 		$allowedIPRestriction = $this->isSetIPRestriction();			
 		if ($allowedIPRestriction && $allowedIPRestriction != kCurrentContext::$user_ip)
 		{
@@ -415,7 +343,8 @@ class ks
 		
 		if($this->original_str && 
 			$partner_id != Partner::BATCH_PARTNER_ID &&		// Avoid querying the database on batch KS, since they are never invalidated
-			!$this->isWidgetSession())								// Since anyone can create a widget session, no need to check for invalidation
+			!$this->isWidgetSession() &&					// Since anyone can create a widget session, no need to check for invalidation
+			$this->isKSInvalidated() !== false)				// Could not check for invalidation using the memcache
 		{
 			$criteria = new Criteria();
 			$criteria->add(invalidSessionPeer::KS, $this->getHash());
