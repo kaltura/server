@@ -33,7 +33,7 @@ class KalturaBulkUploadResult extends KalturaObject
     public $partnerId;
 
     /**
-     * @var int
+     * @var KalturaBulkUploadResultStatus
      */
     public $status;
 	
