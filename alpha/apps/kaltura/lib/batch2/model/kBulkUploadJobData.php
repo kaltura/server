@@ -219,7 +219,7 @@ class kBulkUploadJobData extends kJobData
         $this->bulkUploadObjectType = $bulkUploadObjectType;
     }
 	/**
-     * @return the $objectData
+     * @return kBulkUploadObjectData
      */
     public function getObjectData ()
     {
