@@ -500,6 +500,10 @@ abstract class kFileTransferMgr
 				$temp_path = $temp_path . $split_path[$i];
 				if (!$this->fileExists($temp_path)) { // direcotry doesn't exist
 					$res = @($this->doMkDir($temp_path));
+					//in case the directory was already been created by a parallel worker (race condition)
+					if (!$res) {
+						$res = $this->fileExists ( $temp_path );
+					}
 				}
 				$temp_path = $temp_path . '/';
 			}
