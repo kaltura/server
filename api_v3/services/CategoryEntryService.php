@@ -113,8 +113,8 @@ class CategoryEntryService extends KalturaBaseService
 			
 		$categoryEntryFilter = new categoryEntryFilter();
 		$filter->toObject($categoryEntryFilter);
-		
-		$c = new Criteria();
+		 
+		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
 		$categoryEntryFilter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
 		$dbCategoriesEntry = categoryEntryPeer::doSelect($c);

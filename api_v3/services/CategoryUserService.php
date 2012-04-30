@@ -154,11 +154,11 @@ class CategoryUserService extends KalturaBaseService
 		if((!$currentKuserCategoryKuser || 
 			($currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&
 			 kCurrentContext::$ks_uid != $userId)) &&
-			 !PermissionPeer::isValidForPartner(PermissionName::BATCH_BASE, kCurrentContext::$ks_partner_id))
+			 kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER);
 		
 		if($dbCategoryKuser->getKuserId() == $category->getKuserId() &&
-			!PermissionPeer::isValidForPartner(PermissionName::BATCH_BASE, kCurrentContext::$ks_partner_id))
+			kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER_OWNER);
 			
 		$dbCategoryKuser->delete();		
@@ -328,4 +328,9 @@ class CategoryUserService extends KalturaBaseService
 		
 		return $response;
 	}
+	
+	/*public function index()
+	{
+		//TODO - WHY DO WE NEED IT?
+	}*/
 }
