@@ -51,7 +51,6 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			list($taskConfig, $kClient, $job) = $constructorArgs;
 			/* @var $job KalturaBatchJob */
 			//KalturaLog::debug(get_class_vars('KalturaBulkUploadObjectType'));
-			KalturaLog::debug("Class file path: ".KAutoloader::getClassFilePath('KalturaBulkUploadObjectType'));
 			switch ($job->data->bulkUploadObjectType)
 			{
 			    case KalturaBulkUploadObjectType::ENTRY:
