@@ -9,7 +9,7 @@ spec = Gem::Specification.new do |s|
   s.homepage = "http://www.kaltura.com/"
   s.summary = "A gem implementation of Kaltura's Ruby Client"
   s.description = "A gem implementation of Kaltura's Ruby Client."
-  s.files = FileList["**/*.rb", "license.txt","Rakefile","README", "agpl.txt", "kaltura.yml"].to_a
-  s.test_files = FileList["{test}/**/*test.rb"].to_a
+  s.files = FileList["lib/**/*.rb", "license.txt","Rakefile","README", "agpl.txt", "kaltura.yml"].to_a
+  s.test_files = FileList["{test}/test_helper.rb", "{test}/**/*test.rb", "{test}/media/*"].to_a
   s.add_dependency('rest-client')
 end

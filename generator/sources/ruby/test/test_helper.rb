@@ -31,9 +31,7 @@ require 'shoulda'
 require 'yaml'
 require 'logger'
 
-require 'kaltura_client'
-require 'kaltura_client_base'
-Dir[File.expand_path("../../kaltura_plugins/*.rb", __FILE__)].each {|file| require file }
+require 'kaltura'
 
 class Test::Unit::TestCase
 
@@ -42,12 +40,12 @@ class Test::Unit::TestCase
   # initiate kaltura client object
   # get the sesion object and assigns it to the client
   def setup
-    config_yml = YAML.load_file("kaltura.yml")
+    config_file = YAML.load_file("kaltura.yml")
         
-    partner_id = config_yml["test"]["partner_id"]
-    service_url = config_yml["test"]["service_url"]
-    administrator_secret = config_yml["test"]["administrator_secret"]
-    timeout = config_yml["test"]["timeout"]
+    partner_id = config_file["test"]["partner_id"]
+    service_url = config_file["test"]["service_url"]
+    administrator_secret = config_file["test"]["administrator_secret"]
+    timeout = config_file["test"]["timeout"]
     
     config = Kaltura::KalturaConfiguration.new(partner_id, service_url)
     config.logger = Logger.new(STDOUT)

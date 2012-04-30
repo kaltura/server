@@ -52,7 +52,7 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	    $this->appendLine();
       	$this->appendLine("end");
 	    
-    	$this->addFile("kaltura_client.rb", $this->getTextBlock());
+    	$this->addFile("lib/kaltura_client.rb", $this->getTextBlock());
 
 		// writing plugins
 		$pluginNodes = $xpath->query("/xml/plugins/plugin");
@@ -98,7 +98,7 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 			
 			$this->appendLine();
 	      	$this->appendLine("end");
-			$this->addFile($this->camelCaseToUnderscoreAndLower("kaltura_plugins/Kaltura".$this->upperCaseFirstLetter($pluginName)."ClientPlugin.rb"), $this->getTextBlock());	
+			$this->addFile($this->camelCaseToUnderscoreAndLower("lib/kaltura_plugins/Kaltura".$this->upperCaseFirstLetter($pluginName)."ClientPlugin.rb"), $this->getTextBlock());	
 		}
 	}
 	

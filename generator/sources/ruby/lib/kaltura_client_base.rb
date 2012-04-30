@@ -36,7 +36,7 @@ require 'openssl'
 require 'digest/sha1'
 require 'base64'
 require 'date'
-require 'tmpdir'
+require 'yaml'
 
 module Kaltura
 	class KalturaClientBase
@@ -216,7 +216,9 @@ module Kaltura
 					end
 				end
       elsif value.is_a? Array
-        unless value.empty?
+        if value.empty?
+          add_param(params, "#{name}:-", "");
+        else
           value.each_with_index do |ele, i|
             if ele.is_a? KalturaObjectBase
               add_param(params, "#{name}:#{i}", ele.to_params)

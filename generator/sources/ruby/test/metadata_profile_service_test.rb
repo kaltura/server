@@ -31,6 +31,14 @@ class MetadataProfileServiceTest < Test::Unit::TestCase
   
   # this test adds a metadata_profile and retrieves the list of metadata_profiles to demonstrate the use of kaltura plugins.
   should "creates a metadata_profile and get the metadata_profile list" do
+    
+    # cleaning up the list
+    metadata_profile_filter = Kaltura::KalturaMetadataProfileFilter.new
+    filter_pager = Kaltura::KalturaFilterPager.new
+    metadata_profile_list = @client.metadata_profile_service.list(metadata_profile_filter, filter_pager)
+    metadata_profile_list.objects.each do |obj|
+      @client.metadata_profile_service.delete(obj.id) rescue nil
+    end  if metadata_profile_list.objects
       
      # creates a metadata_profile  
      metadata_profile = Kaltura::KalturaMetadataProfile.new
