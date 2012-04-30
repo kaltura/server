@@ -2,6 +2,9 @@
 /**
  * wraps a real kshow object and copies only very little data to be stored in some cache.
  * all the baseobject classes handle DB issues and are very heavy when persisting.
+ * 
+ * @package Core
+ * @subpackage model.data
  */
 class kshowStub extends myBaseObject
 {
@@ -65,5 +68,3 @@ class kshowStub extends myBaseObject
 
 	
 }
-
-?>

@@ -1,7 +1,14 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage model.data
+ */
 require_once("myContentStorage.class.php");
 
+/**
+ * @package Core
+ * @subpackage model.data
+ */
 class ktagword {
 	const TAG_SEPARATOR = ",";
 	const MAXIMUM_TAG_LENGTH = 100;
@@ -120,4 +127,3 @@ class ktagword {
 	}
 }
 
-?>

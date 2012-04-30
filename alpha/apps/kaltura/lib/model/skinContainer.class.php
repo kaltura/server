@@ -1,8 +1,15 @@
 <?php
+/**
+ * @package Core
+ * @subpackage model.data
+ */
 include_once ( "myBaseObject.class.php" );
 include_once ( "allUtils.class.php" );
 
-// TODO -move to lib !!
+/**
+ * @package Core
+ * @subpackage model.data
+ */
 class skinContainer extends myBaseObject
 {
 	// TODO - explain why the .cls prefix in the UI turns to _cls ?!!??!?!
@@ -147,4 +154,3 @@ class skinContainer extends myBaseObject
 		return true;
 	}
 }
-?>

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage model.wrappers
+ */
 class genericObjectWrapper  implements Iterator
 {
 	private $m_obj;
@@ -121,4 +125,3 @@ class genericNullWrapper extends genericObjectWrapper
 		return "";
 	}
 }
-?>

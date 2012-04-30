@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage model.wrappers
+ */
 abstract class objectWrapperBase implements Iterator
 {
 	const DETAIL_LEVEL_BASIC = 1;
