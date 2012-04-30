@@ -819,7 +819,7 @@ class BaseEntryService extends KalturaEntryService
 	 * 
 	 * @action index
 	 * @param string $id
-	 * @param int $shouldUpdate
+	 * @param bool $shouldUpdate
 	 * @return int entry int id
 	 */
 	function indexAction($id, $shouldUpdate)
