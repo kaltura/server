@@ -131,7 +131,7 @@ class CategoryService extends KalturaBaseService
 		$categoryDb = categoryPeer::retrieveByPK($id);
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
-		
+			
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getCategoryId(), kCurrentContext::$ks_kuser_id);
@@ -203,7 +203,7 @@ class CategoryService extends KalturaBaseService
 			$categoryDb->setUpdatedAt(time());
 			$categoryDb->save();
 			
-			return $categoryDb->getIntId();
+			return $categoryDb->getId();
 		}
 		
 		$categoryDb->setIsIndex(true);
