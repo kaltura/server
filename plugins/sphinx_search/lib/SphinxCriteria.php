@@ -588,10 +588,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 	}
 	
-	/**
-	 * Applies a single filter
-	 * 
-	 * @param baseObjectFilter $filter
+	/* (non-PHPdoc)
+	 * @see KalturaCriteria::applyFilter()
 	 */
 	protected function applyFilter(baseObjectFilter $filter)
 	{

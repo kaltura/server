@@ -88,12 +88,37 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 	}
 	
 	/**
+	 * Applies a single filter
+	 * 
+	 * @param baseObjectFilter $filter
+	 */
+	protected function applyFilter(baseObjectFilter $filter)
+	{
+		$advancedSearch = $filter->getAdvancedSearch();
+		if(is_object($advancedSearch))
+		{
+			KalturaLog::debug('Apply advanced filter [' . get_class($advancedSearch) . ']');
+			if($advancedSearch instanceof AdvancedSearchFilterItem)
+				$advancedSearch->apply($filter, $this);
+				
+			$this->hasAdvancedSearchFilter = true;
+		}
+		else
+		{
+			KalturaLog::debug('No advanced filter found');
+		}
+		
+		// attach all unhandled fields
+		$filter->attachToFinalCriteria($this);
+	}
+	
+	/**
 	 * Applies all filter on this criteria
 	 */
 	public function applyFilters()
 	{
 		foreach($this->filters as $filter)
-			$filter->attachToFinalCriteria($this);
+			$this->applyFilter($filter);
 	}
 	
 	/**
