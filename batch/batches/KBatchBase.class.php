@@ -264,7 +264,7 @@ abstract class KBatchBase implements IKalturaLogger
 		$partnerId = $this->taskConfig->getPartnerId();
 		$sessionType = KalturaSessionType::ADMIN;
 		$puserId = 'batchUser';
-		$privileges = '';
+		$privileges = 'disableentitlement';
 		$adminSecret = $this->taskConfig->getSecret();
 		$expiry = 60 * 60 * 24 * 30; // 30 days
 		
