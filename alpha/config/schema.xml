@@ -1427,7 +1427,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy_context" type="varchar" size="255" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy_contexts" type="varchar" size="255" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="inherited_parent_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="lock" type="boolean" />
 		<index name="partner_id_full_name_index">
 			<index-column name="partner_id" />
 			<index-column name="full_name" />

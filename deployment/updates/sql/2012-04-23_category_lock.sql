@@ -1,2 +1,0 @@
-ALTER TABLE `category`
-ADD COLUMN `lock` TINYINT NOT NULL;

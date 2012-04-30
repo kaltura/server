@@ -178,7 +178,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * Number of active members for this category
 	 *  
 	 * @var int
-	 * @filter gte,lte
+	 * @filter gte,lte,order
 	 * @readonly
 	 * 
 	 */
@@ -248,14 +248,6 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public $defaultOrderBy;
 	
-	/**
-	 * Some category fields cannot be updated while the category is locked
-	 * 
-	 * @var bool
-	 * @readonly
-	 */
-	public $lock;
-	
 	private static $mapBetweenObjects = array
 	(
 		"id",
@@ -288,7 +280,6 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"partnerSortValue",
 		"partnerData",
 		"defaultOrderBy",
-		"lock",
 	);
 	
 	/* (non-PHPdoc)
@@ -329,8 +320,9 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			if (!$parentCategoryDb)
 				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_NOT_FOUND, $this->parentId);
 
-			if($parentCategoryDb->getLock())
-				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_IS_LOCK);
+				
+			if(false)//TODO - GET PARTNER AND CHECK IF LOCK.
+				throw new KalturaAPIException(KalturaErrors::PARTNER_CATEGORIES_LOCKED);
 		}
 		elseif ($this->inheritanceType == KalturaInheritanceType::INHERIT)
 		{

@@ -240,7 +240,7 @@ class KalturaErrors extends APIErrors
 	
 	const PARENT_CATEGORY_NOT_FOUND = "PARENT_CATEGORY_NOT_FOUND,Parent category id \"%s\" not found";
 	
-	const PARENT_CATEGORY_IS_LOCK = "PARENT_CATEGORY_IS_LOCK,Parent category is locked";
+	const PARTNER_CATEGORIES_LOCKED = "PARTNER_CATEGORIES_LOCKED,Partner categories are locked";
 	
 	const DUPLICATE_CATEGORY = "DUPLICATE_CATEGORY,The category \"%s\" already exists";
 	

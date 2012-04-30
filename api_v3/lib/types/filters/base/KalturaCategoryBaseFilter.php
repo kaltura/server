@@ -60,6 +60,8 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 		"-updatedAt" => "-updated_at",
 		"+directEntriesCount" => "+direct_entries_count",
 		"-directEntriesCount" => "-direct_entries_count",
+		"+membersCount" => "+members_count",
+		"-membersCount" => "-members_count",
 		"+partnerSortValue" => "+partner_sort_value",
 		"-partnerSortValue" => "-partner_sort_value",
 	);

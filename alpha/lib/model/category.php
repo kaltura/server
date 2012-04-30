@@ -1176,10 +1176,4 @@ class category extends Basecategory implements IIndexable
 	{
 		return $this->is_index;
 	}
-	
-	public function getLock()
-	{
-		//TODO - FIX THIS.
-		$rootCategory = $this->getRootCategoryFromFullIds($this);
-	}
 }
