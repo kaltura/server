@@ -35,4 +35,5 @@ interface BatchJobType extends BaseEnum
 	const DELETE_FILE = 31;
 	const INDEX = 32;
 	const MOVE_CATEGORY_ENTRIES = 33;
+	const COPY = 34;
 }

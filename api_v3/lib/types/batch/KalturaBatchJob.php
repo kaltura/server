@@ -325,6 +325,10 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				$this->data = new KalturaIndexJobData();
 				break;
 				
+			case 'kCopyJobData':
+				$this->data = new KalturaCopyJobData();
+				break;
+				
 			case 'kDeleteJobData':
 				$this->data = new KalturaDeleteJobData();
 				break;
@@ -479,6 +483,12 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				$dbData = new kIndexJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaIndexJobData();
+				break;
+				
+			case KalturaBatchJobType::COPY:
+				$dbData = new kCopyJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaCopyJobData();
 				break;
 				
 			case KalturaBatchJobType::DELETE:

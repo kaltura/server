@@ -44,6 +44,21 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 
+	protected function updatedCopy(BatchJob $dbBatchJob, kCopyJobData $data, BatchJob $twinJob = null)
+	{
+		switch($dbBatchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+//				return kFlowHelper::handleCopyFinished($dbBatchJob, $data, $twinJob);
+			case BatchJob::BATCHJOB_STATUS_FAILED:
+			case BatchJob::BATCHJOB_STATUS_FATAL:
+//				return kFlowHelper::handleCopyFailed($dbBatchJob, $data, $twinJob);
+				return $dbBatchJob;
+			default:
+				return $dbBatchJob;
+		}
+	}
+
 	protected function updatedDelete(BatchJob $dbBatchJob, kDeleteJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
@@ -361,6 +376,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 					
 				case BatchJobType::INDEX:
 					$dbBatchJob=$this->updatedIndex($dbBatchJob, $dbBatchJob->getData());
+					break;
+					
+				case BatchJobType::COPY:
+					$dbBatchJob=$this->updatedCopy($dbBatchJob, $dbBatchJob->getData());
 					break;
 					
 				case BatchJobType::DELETE:

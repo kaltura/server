@@ -71,6 +71,10 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 				$data = new KalturaIndexJobData();
 				break;
 				
+			case KalturaBatchJobType::COPY:
+				$data = new KalturaCopyJobData();
+				break;
+				
 			case KalturaBatchJobType::DELETE:
 				$data = new KalturaDeleteJobData();
 				break;

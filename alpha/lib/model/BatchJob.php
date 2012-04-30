@@ -78,6 +78,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		BatchJobType::CAPTURE_THUMB => 'Capture Thumbnail',
 		
 		BatchJobType::INDEX => 'Index',
+		BatchJobType::COPY => 'Copy',
 		BatchJobType::MOVE_CATEGORY_ENTRIES => 'Move Category Entries',
 	);
 	
