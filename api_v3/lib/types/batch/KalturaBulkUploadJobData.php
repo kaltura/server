@@ -8,19 +8,21 @@ class KalturaBulkUploadJobData extends KalturaJobData
 {
 	/**
 	 * @var string
+	 * @readonly
 	 */
 	public $userId;
 	
 	/**
 	 * The screen name of the user
-	 * 
+	 * @readonly
 	 * @var string
 	 */
 	public $uploadedBy;
 	
 	/**
 	 * Selected profile id for all bulk entries
-	 * 
+	 * @deprecated set this parameter on the KalturaBulkUploadEntryData instead
+	 * @readonly
 	 * @var int
 	 */
 	public $conversionProfileId;
@@ -78,6 +80,7 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	
 	/**
 	 * Data pertaining to the objects being uploaded
+	 * @readonly
 	 * @var KalturaBulkUploadObjectData
 	 */
 	public $objectData;
@@ -102,7 +105,6 @@ class KalturaBulkUploadJobData extends KalturaJobData
 		"fileName",
 		"bulkUploadObjectType",
 	    "objectData",
-	    "type",
 	);
 
 	

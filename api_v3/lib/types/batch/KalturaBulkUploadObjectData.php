@@ -7,7 +7,7 @@
  * @subpackage objects
  *
  */
-class KalturaBulkUploadObjectData extends KalturaObject
+abstract class KalturaBulkUploadObjectData extends KalturaObject
 {
     
 }
