@@ -18,5 +18,10 @@ class KalturaReportType extends KalturaEnum
 	const CONTENT_CONTRIBUTIONS = 7;
 	const WIDGETS_STATS = 8;
 //	const ADMIN_CONSOLE = 10;		// shouldn't be accessable to users through the API
+	const USER_ENGAGEMENT = 11;
+	const SPEFICIC_USER_ENGAGEMENT = 12;
+	const USER_TOP_CONTENT = 13;
+	const USER_CONTENT_DROPOFF = 14;
+	const USER_CONTENT_INTERACTIONS = 15;
 }
 ?>

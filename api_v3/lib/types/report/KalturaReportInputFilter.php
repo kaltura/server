@@ -43,9 +43,11 @@ class KalturaReportInputFilter extends KalturaObject
 	 */
 	public $timeZoneOffset = 0;
 	
-	public function toReportsInputFilter ()
+	public function toReportsInputFilter ($reportInputFilter = null)
 	{
-		$reportInputFilter = new reportsInputFilter();
+		if (is_null($reportInputFilter)) 
+			$reportInputFilter = new reportsInputFilter();
+		
 		$reportInputFilter->from_date = $this->fromDate;
 		$reportInputFilter->to_date = $this->toDate;
 		$reportInputFilter->keywords = $this->keywords;
