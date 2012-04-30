@@ -22,6 +22,23 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		return self::$skipEntrySave;
 	}
 	
+	/**
+	 * @param Criteria $criteria
+	 * @param PropelPDO $con
+	 */
+	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
+	{
+		$c = clone $criteria;
+			
+		if($c instanceof KalturaCriteria)
+		{
+			$c->applyFilters();
+			$criteria->setRecordsCount($c->getRecordsCount());
+		}
+
+		return parent::doSelect($c, $con);
+	}
+	
 	public static function retrieveByCategoryIdAndEntryId($categoryId, $entryId)
 	{
 		$c = new Criteria();

@@ -14,7 +14,6 @@ class categoryPeer extends BasecategoryPeer
 	const MAX_CATEGORY_NAME = 60;
 	const MEMBERS = 'category.MEMBERS';
 	
-	
 	private static $invalid_characters = array('>','<',',');
 	
 	private static $replace_character = "_";
@@ -31,7 +30,7 @@ class categoryPeer extends BasecategoryPeer
 		
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id; 			
 		
-		if(!PermissionPeer::isValidForPartner(PermissionName::BATCH_BASE, $partnerId))
+		if($partnerId != Partner::BATCH_PARTNER_ID)
 			$c->add ( self::STATUS, array(CategoryStatus::DELETED, CategoryStatus::PURGED), Criteria::NOT_IN );
 		else
 			$c->add ( self::STATUS, CategoryStatus::PURGED, Criteria::NOT_EQUAL );
@@ -148,7 +147,7 @@ class categoryPeer extends BasecategoryPeer
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{
 		$c = clone $criteria;
-		
+			
 		if($c instanceof KalturaCriteria)
 		{
 			$c->applyFilters();
