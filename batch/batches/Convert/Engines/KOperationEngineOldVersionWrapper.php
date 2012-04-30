@@ -38,12 +38,20 @@ class KOperationEngineOldVersionWrapper extends KOperationEngine
 		$this->convertor->setMediaInfoEnabled($enabled);
 	}
 	
-	/**
-	 * @return string
+	/* (non-PHPdoc)
+	 * @see KOperationEngine::getLogFilePath()
 	 */
 	public function getLogFilePath()
 	{
 		return $this->convertor->getLogFilePath();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KOperationEngine::getLogData()
+	 */
+	public function getLogData()
+	{
+		return $this->convertor->getLogData();
 	}
 	
 	protected function getCmdLine(){}
