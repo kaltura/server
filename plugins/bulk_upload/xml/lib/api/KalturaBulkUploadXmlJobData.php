@@ -20,7 +20,7 @@ class KalturaBulkUploadXmlJobData extends KalturaBulkUploadJobData
 	
 	public function __construct()
 	{
-	    $this->type = KalturaBulkUploadType::XML;
+	    $this->type = kPluginableEnumsManager::coreToApi("KalturaBulkUploadType", BulkUploadXmlType::XML);
 	}
 	
 	public function getMapBetweenObjects ( )

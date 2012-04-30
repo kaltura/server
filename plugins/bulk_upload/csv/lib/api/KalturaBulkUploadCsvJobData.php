@@ -9,9 +9,8 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 {	
 	/**
 	 * The version of the csv file
-	 * 
-	 *
 	 * @var KalturaBulkUploadCsvVersion
+	 * @readonly
 	 */
 	public $csvVersion = null;
 	
@@ -27,7 +26,7 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 
 	public function __construct()
 	{
-	    $this->type = KalturaBulkUploadType::CSV;
+	    $this->type = kPluginableEnumsManager::coreToApi("KalturaBulkUploadType", BulkUploadCsvType::CSV);
 	}
 	
 	public function getMapBetweenObjects ( )
