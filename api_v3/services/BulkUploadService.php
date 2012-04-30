@@ -1,11 +1,13 @@
 <?php
 
 /**
- * Bulk upload service is used to upload & manage bulk uploads using CSV files
+ * Bulk upload service is used to upload & manage bulk uploads using CSV files.
+ * This service manages only entry bulk uploads.
  *
  * @service bulkUpload
  * @package api
  * @subpackage services
+ * @deprecated Use BulkUploadPlugin instead.
  */
 class BulkUploadService extends KalturaBaseService
 {
@@ -24,7 +26,7 @@ class BulkUploadService extends KalturaBaseService
 	 * @param string $fileName
 	 * @return KalturaBulkUpload
 	 */
-	function addAction($conversionProfileId, $csvFileData, $bulkUploadType = null, $uploadedBy = null, $fileName = null)
+	public function addAction($conversionProfileId, $csvFileData, $bulkUploadType = null, $uploadedBy = null, $fileName = null)
 	{
 		if($conversionProfileId == self::PARTNER_DEFAULT_CONVERSION_PROFILE_ID)
 			$conversionProfileId = $this->getPartner()->getDefaultConversionProfileId();
@@ -41,11 +43,58 @@ class BulkUploadService extends KalturaBaseService
 		if(!$fileName)
 			$fileName = $csvFileData["name"];
 		
-		$dbJob = kJobsManager::addBulkUploadJob($csvFileData["tmp_name"], $fileName, $this->getPartner(), $this->getKuser()->getPuserId(), $uploadedBy, $conversionProfileId, $coreBulkUploadType);
+		$data = $this->constructJobData($csvFileData["tmp_name"], $fileName, $this->getPartner(), $this->getKuser()->getPuserId(), $uploadedBy, $conversionProfileId, $coreBulkUploadType);
+		
+		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $data, $coreBulkUploadType);
 		
 		$bulkUpload = new KalturaBulkUpload();
 		$bulkUpload->fromObject($dbJob);
 		return $bulkUpload;
+	}
+	
+	/**
+	 * Function constructs a core object of type kBulkUploadJobData
+	 * @param int $conversionProfileId
+	 * @param string $filePath
+	 * @param string $userId
+	 * @param BulkUploadType $bulkUploadType
+	 * @param string $uploadedBy
+	 * @param string $fileName
+	 */
+	protected function constructJobData ($filePath, $fileName, Partner $partner, $puserId, $uploadedBy, $conversionProfileId = null, BulkUploadType $coreBulkUploadType = null)
+	{
+	   $data = KalturaPluginManager::loadObject('kBulkUploadJobData', $coreBulkUploadType);
+
+		if(is_null($data))
+		{
+			throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_BULK_UPLOAD_TYPE_NOT_VALID, $coreBulkUploadType);
+		}
+		
+		$data->setFilePath($filePath);
+		$data->setUserId($puserId);
+		$data->setUploadedBy($uploadedBy);
+		$data->setFileName($fileName);
+		if (!$conversionProfileId)
+			$conversionProfileId = $partner->getDefaultConversionProfileId();
+			
+		$kmcVersion = $partner->getKmcVersion();
+		$check = null;
+		if($kmcVersion < 2)
+		{
+			$check = ConversionProfilePeer::retrieveByPK($conversionProfileId);
+		}
+		else
+		{
+			$check = conversionProfile2Peer::retrieveByPK($conversionProfileId);
+		}
+		if(!$check)
+			throw new APIException(APIErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
+		
+		$objectData = new kBulkUploadEntryData();
+		$objectData->setConversionProfileId($conversionProfileId);
+		$data->setObjectData($objectData);
+		
+		return $data;
 	}
 	
 	/**
@@ -55,7 +104,7 @@ class BulkUploadService extends KalturaBaseService
 	 * @param int $id
 	 * @return KalturaBulkUpload
 	 */
-	function getAction($id)
+	public function getAction($id)
 	{
 	    $c = new Criteria();
 	    $c->addAnd(BatchJobPeer::ID, $id);
@@ -78,7 +127,7 @@ class BulkUploadService extends KalturaBaseService
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaBulkUploadListResponse
 	 */
-	function listAction(KalturaFilterPager $pager = null)
+	public function listAction(KalturaFilterPager $pager = null)
 	{
 	    if (!$pager)
 			$pager = new KalturaFilterPager();
@@ -116,7 +165,7 @@ class BulkUploadService extends KalturaBaseService
 	 * @return file
 	 * 
 	 */
-	function serveAction($id)
+	public function serveAction($id)
 	{
 		$c = new Criteria();
 		$c->addAnd(BatchJobPeer::ID, $id);
@@ -157,7 +206,7 @@ class BulkUploadService extends KalturaBaseService
 	 * @return file
 	 * 
 	 */
-	function serveLogAction($id)
+	public function serveLogAction($id)
 	{
 		$c = new Criteria();
 		$c->addAnd(BatchJobPeer::ID, $id);
@@ -185,7 +234,7 @@ class BulkUploadService extends KalturaBaseService
 	 * @param int $id job id
 	 * @return KalturaBulkUpload
 	 */
-	function abortAction($id)
+	public function abortAction($id)
 	{
 	    $c = new Criteria();
 	    $c->addAnd(BatchJobPeer::ID, $id);
