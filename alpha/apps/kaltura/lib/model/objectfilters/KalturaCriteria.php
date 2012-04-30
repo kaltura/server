@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.filters
  */
-class KalturaCriteria extends Criteria
+class KalturaCriteria extends Criteria implements IKalturaDbQuery
 {
 	/**
 	 * The count of total returned items
@@ -188,5 +188,28 @@ class KalturaCriteria extends Criteria
 		}
 		
 		return parent::add($nc);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaDbQuery::addColumnWhere()
+	 */
+	public function addColumnWhere($column, $value, $comparison)
+	{
+		$this->add($column, $value, $comparison);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaDbQuery::addOrderBy()
+	 */
+	public function addOrderBy($column, $orderByType = Criteria::ASC)
+	{
+		if($orderByType == Criteria::ASC)
+		{
+			$this->addAscendingOrderByColumn($column);
+		}
+		else
+		{
+			$this->addDescendingOrderByColumn($column);
+		}
 	}
 }

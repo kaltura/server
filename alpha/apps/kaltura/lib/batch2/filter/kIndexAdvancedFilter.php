@@ -9,13 +9,13 @@ class kIndexAdvancedFilter extends AdvancedSearchFilterItem
 	 * @var string
 	 */
 	protected $indexIdGreaterThanOrEqual = null;
-	
+
 	/* (non-PHPdoc)
-	 * @see AdvancedSearchFilterOperator::applyCondition()
+	 * @see AdvancedSearchFilterItem::apply()
 	 */
-	public function applyCondition(IKalturaIndexQuery $query)
+	public function apply(baseObjectFilter $filter, IKalturaDbQuery $query)
 	{
-		$query->addWhere("id > {$this->indexIdGreaterThanOrEqual}");
+		$query->addColumnWhere('id', $this->indexIdGreaterThanOrEqual, Criteria::GREATER_THAN);
 	}
 	
 	/**

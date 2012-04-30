@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage model.filters
  */
-interface IKalturaIndexQuery
+interface IKalturaIndexQuery extends IKalturaDbQuery
 {
 	/**
 	 * Add a new where clause condition to the query
@@ -23,11 +23,4 @@ interface IKalturaIndexQuery
 	 * @param string $condition
 	 */
 	public function addCondition($condition);
-	
-	/**
-	 * Add a new column to order by
-	 * @param string $orderBy
-	 * @param string $orderByType Criteria::ASC | Criteria::DESC
-	 */
-	public function addOrderBy($column, $orderByType = Criteria::ASC);
 }

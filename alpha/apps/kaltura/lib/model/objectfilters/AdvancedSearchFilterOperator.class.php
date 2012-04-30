@@ -168,6 +168,15 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 	}
 	
 	/* (non-PHPdoc)
+	 * @see IKalturaDbQuery::addColumnWhere()
+	 */
+	public function addColumnWhere($column, $value, $comparison)
+	{
+		if($this->parentQuery)
+			$this->parentQuery->addColumnWhere($column, $value, $comparison);
+	}
+	
+	/* (non-PHPdoc)
 	 * @see IKalturaIndexQuery::addWhere()
 	 */
 	public function addWhere($statement)

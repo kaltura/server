@@ -9,10 +9,11 @@ class AdvancedSearchFilterItem
 	 * @var string
 	 */
 	protected $kalturaClass;
-	
-	public function apply(baseObjectFilter $filter, IKalturaIndexQuery $query)
+
+	public function apply(baseObjectFilter $filter, IKalturaDbQuery $query)
 	{
-		$this->applyCondition($query);
+		if($query instanceof IKalturaIndexQuery)
+			$this->applyCondition($query);
 	}
 	
 	public function getFreeTextConditions($freeTexts)
@@ -21,7 +22,6 @@ class AdvancedSearchFilterItem
 	}
 	
 	/**
-	 * 
 	 * Adds conditions, matches and where clauses to the query
 	 * @param IKalturaIndexQuery $query
 	 */

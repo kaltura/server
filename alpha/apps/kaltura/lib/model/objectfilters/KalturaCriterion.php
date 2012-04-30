@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.filters
  */
-abstract class KalturaCriterion extends Criterion
+abstract class KalturaCriterion extends Criterion implements IKalturaDbQuery
 {
 	const TAG_ENTITLEMENT_ENTRY = 'TAG_ENTITLEMENT_ENTRY';
 	const TAG_ENTITLEMENT_CATEGORY = 'TAG_ENTITLEMENT_CATEGORY';
@@ -175,5 +175,18 @@ abstract class KalturaCriterion extends Criterion
 	protected function setSelfConjunction($selfConjunction)
 	{
 		$this->selfConjunction = $selfConjunction;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaDbQuery::addColumnWhere()
+	 */
+	public function addColumnWhere($column, $value, $comparison)
+	{
+		$criterion = $this->criteria->getNewCriterion($column, $value, $comparison);
+		
+		if($this->getSelfConjunction() == self::ODER)
+			$this->addOr($criterion);
+		else
+			$this->addAnd($criterion);
 	}
 }
