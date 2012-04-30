@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage errors
+ */
 class kUserException extends kCoreException
 {
 	const LOGIN_DATA_NOT_FOUND = 'LOGIN_DATA_NOT_FOUND';

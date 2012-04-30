@@ -1,6 +1,9 @@
 <?php
 /**
  * @FIXME - refactor the current error codes to another exception class which will inherit from kCoreException
+ * 
+ * @package Core
+ * @subpackage errors
  */
 class kCoreException extends Exception
 {

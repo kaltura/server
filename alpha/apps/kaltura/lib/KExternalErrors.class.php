@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage errors
+ */
 class KExternalErrors
 {
 	const ENTRY_NOT_FOUND = 1;

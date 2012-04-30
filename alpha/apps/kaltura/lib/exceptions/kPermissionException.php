@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage errors
+ */
 class kPermissionException extends kCoreException
 {
 	const PERMISSION_ITEM_NOT_FOUND = 'PERMISSION_ITEM_NOT_FOUND';

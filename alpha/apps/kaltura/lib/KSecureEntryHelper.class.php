@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package Core
+ * @subpackage utils
+ *
+ */
 class KSecureEntryHelper
 {
 	/**

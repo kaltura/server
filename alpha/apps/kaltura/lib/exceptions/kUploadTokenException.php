@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage errors
+ */
 class kUploadTokenException extends kCoreException
 {
 	const UPLOAD_TOKEN_FILE_NAME_IS_MISSING_FOR_UPLOADED_FILE = "UPLOAD_TOKEN_FILE_NAME_IS_MISSING_FOR_UPLOADED_FILE";

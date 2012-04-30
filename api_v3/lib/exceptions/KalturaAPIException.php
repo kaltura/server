@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage errors
+ */
 class KalturaAPIException extends Exception 
 {
 	protected $code;
