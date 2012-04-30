@@ -33,6 +33,11 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
 	    "updateMethod",
 	);
 	
+    public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
+	
     public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$dbObject = parent::toInsertableObject(new BulkUploadResultCategoryKuser(), $props_to_skip);

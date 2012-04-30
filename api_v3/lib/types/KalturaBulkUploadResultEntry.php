@@ -133,6 +133,11 @@ class KalturaBulkUploadResultEntry extends KalturaBulkUploadResult
 	    "sshKeyPassphrase",
 	);
 	
+    public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
+	
     public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		if ($this->entryId)

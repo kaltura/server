@@ -80,6 +80,11 @@ class KalturaBulkUploadResultCategory extends KalturaBulkUploadResult
 	    "contributionPolicy",
 	);
 	
+    public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
+	
     public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$dbObject = parent::toInsertableObject(new BulkUploadResultCategory(), $props_to_skip);
