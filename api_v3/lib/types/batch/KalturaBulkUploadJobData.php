@@ -108,17 +108,59 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	);
 
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
 	public function toObject($dbData = null, $props_to_skip = array()) 
 	{
 		if(is_null($dbData))
 			$dbData = new kBulkUploadJobData();
 			
 		return parent::toObject($dbData);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
+	public function fromObject($source_object)
+	{
+	    parent::fromObject($source_object);
+	    
+	    /* @var $source_object kBulkUploadJobData */
+	    $this->objectData = null;
+	    switch (get_class($source_object->getObjectData()))
+	    {
+	        case 'kBulkUploadEntryData':
+	            $this->objectData = new KalturaBulkUploadEntryData();
+	            break;
+	        case 'kBulkUploadCategoryData':
+	            $this->objectData = new KalturaBulkUploadCategoryData();
+	            break;
+	        case 'kBulkUploadCategoryUserData':
+	            $this->objectData = new KalturaBulkUploadCategoryUserData();
+	            break;
+	        case 'kBulkUploadUserData':
+	            $this->objectData = new KalturaBulkUploadUserData();
+	            break;
+	        default:
+	            break;
+	    }
+	    
+	    if ($this->objectData)
+	    {
+	        KalturaLog::debug("Object data class was found: ". get_class($this->objectData));
+	        $this->objectData->fromObject($source_object->getObjectData());
+	    }
+	        
+	        
 	}
 
 	/**
