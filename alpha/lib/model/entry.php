@@ -1154,7 +1154,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setCategoriesIds($v)
 	{
-		$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $newCats);
+		$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $v);
 		
 		$this->trimCategories($newCats);
 		
@@ -2799,5 +2799,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$categoriesIds[] = $categoryEntry->getCategoryId();
 			
 		return implode(',', $categoriesIds);
+	}
+	
+	public function reSetCategories()
+	{
+		$this->is_categories_modified = true;
+	}
+	
+	public function setCategoriesWithNoSync()
+	{
+		
 	}
 }
