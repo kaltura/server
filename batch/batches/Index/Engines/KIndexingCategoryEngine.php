@@ -29,8 +29,9 @@ class KIndexingCategoryEngine extends KIndexingEngine
 		$this->client->startMultiRequest();
 		foreach($categoriesList->objects as $category)
 		{
-			$this->client->category->index($category, $shouldUpdate);
+			$this->client->category->index($category->id, $shouldUpdate);
 		}
+		
 		$results = $this->client->doMultiRequest();
 		foreach($results as $result)
 			if($result instanceof Exception)

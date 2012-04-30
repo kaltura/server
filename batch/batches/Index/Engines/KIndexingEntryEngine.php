@@ -29,7 +29,7 @@ class KIndexingEntryEngine extends KIndexingEngine
 		$this->client->startMultiRequest();
 		foreach($entriesList->objects as $entry)
 		{
-			$this->client->baseEntry->index($entry, $shouldUpdate);
+			$this->client->baseEntry->index($entry->id, $shouldUpdate);
 		}
 		$results = $this->client->doMultiRequest();
 		foreach($results as $result)

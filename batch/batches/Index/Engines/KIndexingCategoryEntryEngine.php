@@ -29,7 +29,7 @@ class KIndexingCategoryEntryEngine extends KIndexingEngine
 		$this->client->startMultiRequest();
 		foreach($categoryEntriesList->objects as $categoryEntry)
 		{
-			$this->client->categoryEntry->index($categoryEntry, $shouldUpdate);
+			$this->client->categoryEntry->index($categoryEntry->entryId, $categoryEntry->categoryId , $shouldUpdate);
 		}
 		$results = $this->client->doMultiRequest();
 		foreach($results as $result)
