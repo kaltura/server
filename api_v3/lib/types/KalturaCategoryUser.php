@@ -3,8 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaCategoryUser extends KalturaObject implements IFilterable 
-{
+class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	/**
 	 * 
 	 * @var int
@@ -37,7 +36,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable
 	 * @filter eq,in
 	 */
 	public $permissionLevel;
-
+	
 	/**
 	 * Status
 	 * 
@@ -73,73 +72,60 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable
 	 */
 	public $updateMethod;
 	
-	private static $mapBetweenObjects = array
-	(
-		"categoryId",
-		"userId" => "puserId",
-		"partnerId",
-		"permissionLevel",
-		"status",
-		"createdAt",
-		"updatedAt",
-		"updateMethod",	
-	);
+	private static $mapBetweenObjects = array ("categoryId", "userId" => "puserId", "partnerId", "permissionLevel", "status", "createdAt", "updatedAt", "updateMethod" );
 	
-	public function toObject($dbObject = null, $skip = array())
-	{
-		if (is_null($dbObject))
-			$dbObject = new categoryKuser();
-			
-		parent::toObject($dbObject, $skip);
-				
+	public function toObject($dbObject = null, $skip = array()) {
+		if (is_null ( $dbObject ))
+			$dbObject = new categoryKuser ();
+		
+		parent::toObject ( $dbObject, $skip );
+		
 		return $dbObject;
-	}	
+	}
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the CategoryKuser object (on the right)  
 	 */
-	public function getMapBetweenObjects()
-	{
-		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	public function getMapBetweenObjects() {
+		return array_merge ( parent::getMapBetweenObjects (), self::$mapBetweenObjects );
 	}
 	
-	public function getExtraFilters()
-	{
-		return array();
+	public function getExtraFilters() {
+		return array ();
 	}
 	
-	public function getFilterDocs()
-	{
-		return array();
+	public function getFilterDocs() {
+		return array ();
 	}
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert()
 	 */
-	public function validateForInsert($propertiesToSkip = array())
+	public function validateForInsert($propertiesToSkip = array()) 
 	{
-		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userId);
-		if (!$kuser)
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
-			
-		$category = categoryPeer::retrieveByPK($this->categoryId);
-		if (!$category)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $this->categoryId);						
+		$kuser = kuserPeer::getKuserByPartnerAndUid ( kCurrentContext::$ks_partner_id, $this->userId );
+		if (! $kuser)
+			throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID, $this->userId );
 		
-		if ($category->getInheritanceType() == InheritanceType::INHERIT)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS, $this->categoryId);		
-			
-		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->categoryId, $kuser->getId());
+		$category = categoryPeer::retrieveByPK ( $this->categoryId );
+		if (! $category)
+			throw new KalturaAPIException ( KalturaErrors::CATEGORY_NOT_FOUND, $this->categoryId );
+		
+		if ($category->getInheritanceType () == InheritanceType::INHERIT)
+			throw new KalturaAPIException ( KalturaErrors::CATEGORY_INHERIT_MEMBERS, $this->categoryId );
+		
+		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId ( $this->categoryId, $kuser->getId () );
 		if ($categoryKuser)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_USER_ALREADY_EXISTS);
+			throw new KalturaAPIException ( KalturaErrors::CATEGORY_USER_ALREADY_EXISTS );
 		
-		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($this->categoryId, kCurrentContext::$ks_kuser_id);
-		if ((!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER) &&
-			$category->getUserJoinPolicy() == UserJoinPolicyType::NOT_ALLOWED)
-		{
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_USER_JOIN_NOT_ALLOWED, $this->categoryId);
+		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId ( $this->categoryId, kCurrentContext::$ks_kuser_id );
+		if ((! $currentKuserCategoryKuser || 
+				$currentKuserCategoryKuser->getPermissionLevel () != CategoryKuserPermissionLevel::MANAGER) && 
+				$category->getUserJoinPolicy () == UserJoinPolicyType::NOT_ALLOWED && 
+				kEntitlementUtils::getEntitlementEnforcement ()) {
+			throw new KalturaAPIException ( KalturaErrors::CATEGORY_USER_JOIN_NOT_ALLOWED, $this->categoryId );
 		}
 		
-		return parent::validateForInsert($propertiesToSkip);
+		return parent::validateForInsert ( $propertiesToSkip );
 	}
 }

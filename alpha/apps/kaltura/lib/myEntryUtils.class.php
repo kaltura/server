@@ -1137,22 +1137,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  	
  	public static function index(entry $entry)
  	{
- 		//TODO - fix this to be taken from categoryEntry
- 		$categoriesEntry = categoryEntryPeer::selectByEntryId($entry->getId);
-		
-		//update full name and remove deleted categories.
-		$categoriesFullName = array();
-		
-		foreach ($categoriesEntry as $categoryEntry)
-		{
-			categoryPeer::setUseCriteriaFilter(false);
-			$categoryDb = categoryPeer::retrieveByPK($categoryEntry->getCategoryId());
-			categoryPeer::setUseCriteriaFilter(true);
-
-			$categoriesFullName[] = $categoryDb->getFullName();
-		}
-		
-		$entry->setCategoriesWithNoSync($categoriesFullName);
+		$entry->setCategoriesIds($entry->getCategoriesIds());
 		$entry->save();
 		
 		return $entry->getIntId();

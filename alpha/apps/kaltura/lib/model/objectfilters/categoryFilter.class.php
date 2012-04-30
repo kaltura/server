@@ -39,6 +39,7 @@ class categoryFilter extends baseObjectFilter
 			"_lte_partner_sort_value",
 			"_likex_full_name",
 			"_eq_full_ids",
+			"_likex_full_ids",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name", "depth", "partner_sort_value", "entries_count", "direct_entries_count");
@@ -72,7 +73,7 @@ class categoryFilter extends baseObjectFilter
 	
 	public function setFullIdsStartsWith($v)
 	{
-		$this->set('_likex_full_name', $v);
+		$this->set('_likex_full_ids', $v);
 	}
 	
 	public function setIdIn($v)

@@ -38,6 +38,7 @@ class category extends Basecategory implements IIndexable
 		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'name' => IIndexable::FIELD_TYPE_STRING,
 		'full_name' => IIndexable::FIELD_TYPE_STRING,
+		'full_ids' => IIndexable::FIELD_TYPE_STRING,
 		'sort_name' => IIndexable::FIELD_TYPE_INTEGER,
 		'description' => IIndexable::FIELD_TYPE_STRING,
 		'tags' => IIndexable::FIELD_TYPE_STRING,
@@ -111,20 +112,12 @@ class category extends Basecategory implements IIndexable
 			}
 		}
 		
-		//TODO - i don't think we need lock machnizem
-/*		if (!$this->isNew() || $this->isColumnModified(categoryPeer::PARENT_ID))
+		//TODO - lock machnizem
+		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PARENT_ID))
 		{
 			//lock category when parent id is changed.
-			//TODO - GET OLD ROOT CATEGORY
-			$oldRootParentCategory = 888;
-			$oldRootParentCategory->setLock(true);
-			$oldRootParentCategory->save();
-			
-			//lock new root catgegory
-			$rootParentCategory = $this->getRootCategoryFromFullIds();
-			$rootParentCategory->setLock(true);
-			$rootParentCategory->save();
-		}*/
+			$this->setCategoryFullIds();
+		}
 		
 		if (!$this->getIsIndex() && 
 			($this->isColumnModified(categoryPeer::NAME) || 
@@ -147,7 +140,7 @@ class category extends Basecategory implements IIndexable
 			 $this->isColumnModified(categoryPeer::INHERITANCE_TYPE) ||
 			 $this->isColumnModified(categoryPeer::FULL_NAME)))
 		{
-			$this->addIndexCategoryJob($this->getId(), null, true);			
+			$this->addIndexCategoryJob($this->getFullIds(), null, true);			
 		}
 		
 		// save the childs 
@@ -162,7 +155,8 @@ class category extends Basecategory implements IIndexable
 		if ($this->isColumnModified(categoryPeer::DELETED_AT) && $this->getDeletedAt() !== null)
 		{
 			// delete all categoryKuser objects for this category
-			$this->addDeleteCategoryKuserJob($this->getId());
+			if($this->getInheritanceType() == InheritanceType::MANUAL)
+				$this->addDeleteCategoryKuserJob($this->getId());
 			
 			if($this->getParentId())
 			{
@@ -184,7 +178,9 @@ class category extends Basecategory implements IIndexable
 					$this->copyInheritedFields($categoryToCopyInheritedFields);
 					
 				$this->reSetMembersCount();
-			}else{
+			}
+			elseif ($this->inheritance_type == InheritanceType::INHERIT && 
+					$this->old_inheritance_type == InheritanceType::MANUAL){
 				$this->addDeleteCategoryKuserJob($this->getId());
 			}
 		}
@@ -216,8 +212,11 @@ class category extends Basecategory implements IIndexable
 	private function addRecalcCategoriesCount($categoryId)
 	{
 		$oldParentCat = categoryPeer::retrieveByPK($categoryId);
+		
+		if(!$oldParentCat)
+			return;
+		
 		$parentsCategories = explode(categoryPeer::CATEGORY_SEPARATOR, $oldParentCat->getFullIds());
-
 		$this->addIndexCategoryJob(null, $parentsCategories, true);
 	}
 	
@@ -439,12 +438,12 @@ class category extends Basecategory implements IIndexable
 		$this->save();
 	}
 	
-	public function getRootCategoryFromFullIds()
-	{
-		if($this->getParentId() == null)
-			return null;
+	public function getRootCategoryFromFullIds($category)
+	{		
+		if ($category->getParentId() == null)
+			return null; 	
 			
-		$fullIds = explode(categoryPeer::CATEGORY_SEPARATOR, $this->getFullIds());
+		$fullIds = explode(categoryPeer::CATEGORY_SEPARATOR, $category->getFullIds());
 		
 		//TODO - disable tag for unlisted categories
 		return categoryPeer::retrieveByPK($fullIds[0]); 
@@ -495,7 +494,6 @@ class category extends Basecategory implements IIndexable
 	
 	private function addDeleteCategoryKuserJob($categoryId)
 	{
-		
 		$filter = new categoryKuserFilter();
 		$filter->setCategoryIdEqual($categoryId);
 
@@ -514,6 +512,18 @@ class category extends Basecategory implements IIndexable
 	{
 		$filter = new entryFilter();
 		$filter->setCategoriesIdsMatchAnd($categoryId);
+		
+		$statusArr = array(entryStatus::BLOCKED, 
+						   entryStatus::ERROR_CONVERTING, 
+						   entryStatus::ERROR_IMPORTING, 
+						   entryStatus::IMPORT, 
+						   entryStatus::MODERATE, 
+						   entryStatus::NO_CONTENT, 
+						   entryStatus::PENDING, 
+						   entryStatus::PRECONVERT, 
+						   entryStatus::READY);
+		
+		$filter->setStatusIn($statusArr);
 			
 		//TODO - add batch job size after sharon commits her code.		
 		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::ENTRY, $filter, $shouldUpdate);
@@ -521,25 +531,20 @@ class category extends Basecategory implements IIndexable
 	
 	private function addMoveEntriesToCategoryJob($destCategoryId)
 	{
-		
 		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId);
 	}
 	
 	private function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $shouldUpdate = false)
 	{
-		
 		$filter = new categoryFilter();
 		$filter->setFullIdsStartsWith($fullIdsStartsWithCategoryId);
 		$filter->setIdIn($categoriesIdsIn);
-		
 
 		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY, $filter, $shouldUpdate);
-		
 	}
 
 	private function addIndexCategoryEntryByFullIdJob($categoryId = null, $shouldUpdate = false)
 	{
-		
 		$filter = new categoryEntryFilter();
 		$filter->setCategoryIdEqaul($categoryId);
 
@@ -1170,5 +1175,11 @@ class category extends Basecategory implements IIndexable
 	protected function getIsIndex()
 	{
 		return $this->is_index;
+	}
+	
+	public function getLock()
+	{
+		//TODO - FIX THIS.
+		$rootCategory = $this->getRootCategoryFromFullIds($this);
 	}
 }

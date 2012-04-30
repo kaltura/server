@@ -4,7 +4,7 @@
  * @subpackage filters
  */
 class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
-{
+{	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
