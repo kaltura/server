@@ -1,3 +1,5 @@
+# coding: utf-8
+
 # ===================================================================================================
 #                           _  __     _ _
 #                          | |/ /__ _| | |_ _  _ _ _ __ _
@@ -25,8 +27,6 @@
 #
 # @ignore
 # ===================================================================================================
-
-# coding: utf-8
 require 'test_helper'
 require 'uri'
 
@@ -238,7 +238,7 @@ class MediaServiceTest < Test::Unit::TestCase
   should "support UTF content in entry metadata" do
     
     media_entry = Kaltura::KalturaMediaEntry.new
-    media_entry.name = "����"
+    media_entry.name = "שלום"
     media_entry.description = @description
     
     media_entry.media_type = Kaltura::KalturaMediaType::VIDEO
@@ -251,7 +251,7 @@ class MediaServiceTest < Test::Unit::TestCase
     
     media_entry = @client.base_entry_service.get(created_entry.id)
     
-    assert_equal media_entry.name, "����"
+    assert_equal media_entry.name, "שלום"
     assert_equal media_entry.description, @description
     assert_nil @client.media_service.delete(media_entry.id)
   end
@@ -290,7 +290,7 @@ class MediaServiceTest < Test::Unit::TestCase
     super
     @description=
     <<-DESC
-          test description
+          שלום עולם
     DESC
   end
   
