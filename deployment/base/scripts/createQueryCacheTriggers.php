@@ -1,5 +1,7 @@
 <?php
 
+$dryRun = true;
+
 // Invalidation keys table
 $INVALIDATION_KEYS = array(
 	array('table' => "flavor_asset", 					'keys' => array(array("'flavorAsset:id='", '@OBJ@.id'), array("'flavorAsset:entryId='", '@OBJ@.entry_id')), 							'class' => 'asset'),
@@ -27,7 +29,9 @@ $INVALIDATION_KEYS = array(
 	array('table' => "invalid_session", 				'keys' => array(array("'invalidSession:ks='", '@OBJ@.ks'))),
 	);
 
-	
+$TRIGGER_TYPES = array('INSERT', 'UPDATE', 'DELETE');
+
+$SPECIAL_TRIGGERS = array("invalid_session/INSERT" => "DO memc_set(concat('invalid_session_', IF(NEW.ks IS NULL, '', NEW.ks)), 1, IF(NEW.ks_valid_until IS NULL, 0, UNIX_TIMESTAMP(NEW.ks_valid_until) + 600));");
 	
 function generateInvalidationKeyCode($invalidationKey)
 {
@@ -178,6 +182,53 @@ function compareTriggerBodies($body1, $body2)
 {
 	return stripTrailingSemicolon($body1) == stripTrailingSemicolon($body2);
 }
+
+function buildTriggerBody($invalidationKey, $triggerType)
+{
+	global $SPECIAL_TRIGGERS;
+
+	$tableName = $invalidationKey['table'];
+	$triggerBody = array();
+	foreach ($invalidationKey['keys'] as $curKeyStrings)
+	{
+		$curKey = array("'QCI-'");
+		foreach ($curKeyStrings as $curStr)
+		{
+			if (strpos($curStr, '@OBJ@') === false)
+				$curKey[] = $curStr;
+			else 
+				$curKey[] = "IF($curStr IS NULL,'',$curStr)";
+		}
+		$curKey = 'concat(' . implode(', ', $curKey) . ')';
+		
+		$triggerBody[] = "DO memc_set($curKey, UNIX_TIMESTAMP(SYSDATE()), 90000);";		// 90000 = slightly more than the cache expiry (1 day)
+	}
+	
+	$specialTriggerKey = "{$tableName}/{$triggerType}";
+	if (array_key_exists($specialTriggerKey, $SPECIAL_TRIGGERS))
+	{
+		$triggerBody[] = $SPECIAL_TRIGGERS[$specialTriggerKey];
+	}
+	
+	if (count($triggerBody) > 1)
+	{
+		$triggerBody = 'BEGIN ' . implode(' ', $triggerBody) . ' END';
+	}
+	else
+	{
+		$triggerBody = implode(' ', $triggerBody);
+	}
+
+	if ($triggerType == 'DELETE')
+	{
+		$triggerBody = str_replace('@OBJ@', 'OLD', $triggerBody);
+	}
+	else
+	{
+		$triggerBody = str_replace('@OBJ@', 'NEW', $triggerBody);
+	}
+	return $triggerBody;
+}
 	
 // Default parameters
 $ACTION = 'help';
@@ -265,63 +316,35 @@ mysql_free_result($result);
 foreach ($INVALIDATION_KEYS as $invalidationKey)
 {
 	$tableName = $invalidationKey['table'];
-	
-	$sqlCommands = array(
-		"DROP TRIGGER IF EXISTS {$tableName}_insert_memcache",
-		"DROP TRIGGER IF EXISTS {$tableName}_update_memcache",
-		"DROP TRIGGER IF EXISTS {$tableName}_delete_memcache",
-		);
+		
+	$sqlCommands = array();
+	foreach ($TRIGGER_TYPES as $triggerType)
+	{
+		$sqlCommands[] = "DROP TRIGGER IF EXISTS {$tableName}_".strtolower($triggerType)."_memcache";
+	}
 	
 	if ($ACTION == 'create')
-	{
-		// build the invalidation keys
-		$triggerBody = array();
-		foreach ($invalidationKey['keys'] as $curKeyStrings)
+	{		
+		$foundDiff = false;
+		foreach ($TRIGGER_TYPES as $triggerType)
 		{
-			$curKey = array("'QCI-'");
-			foreach ($curKeyStrings as $curStr)
+			$triggerBody = buildTriggerBody($invalidationKey, $triggerType);
+			$triggerName = "{$tableName}_".strtolower($triggerType)."_memcache";
+				
+			if (!array_key_exists($triggerName, $triggers) || 
+				!compareTriggerBodies($triggerBody, $triggers[$triggerName]))
 			{
-				if (strpos($curStr, '@OBJ@') === false)
-					$curKey[] = $curStr;
-				else 
-					$curKey[] = "IF($curStr IS NULL,'',$curStr)";
+				$foundDiff = true;
 			}
-			$curKey = 'concat(' . implode(', ', $curKey) . ')';
-			
-			// Note: we use SYSDATE instead of NOW because NOW has the time of the INSERT/UPDATE statement
-			// while SYSDATE has the local time of the slave. This is important if there's lag between the 
-			// datacenters, using NOW may cause any cached queries not to be invalidated when the slave
-			// finally catches up
-			$triggerBody[] = "DO memc_set($curKey, UNIX_TIMESTAMP(SYSDATE()), 90000);";
+
+			$sqlCommands[] = "CREATE TRIGGER {$triggerName} AFTER {$triggerType} ON {$tableName} FOR EACH ROW {$triggerBody}";
 		}
 		
-		if (count($triggerBody) > 1)
-		{
-			$triggerBody = 'BEGIN ' . implode(' ', $triggerBody) . ' END';
-		}
-		else
-		{
-			$triggerBody = implode(' ', $triggerBody);
-		}
-		
-		$insertUpdateBody = str_replace('@OBJ@', 'NEW', $triggerBody);
-		$deleteBody = str_replace('@OBJ@', 'OLD', $triggerBody);
-		
-		$insertTriggerName = "{$tableName}_insert_memcache";
-		$updateTriggerName = "{$tableName}_update_memcache";
-		$deleteTriggerName = "{$tableName}_delete_memcache";
-		
-		if (array_key_exists($insertTriggerName, $triggers) && compareTriggerBodies($insertUpdateBody, $triggers[$insertTriggerName]) &&
-			array_key_exists($updateTriggerName, $triggers) && compareTriggerBodies($insertUpdateBody, $triggers[$updateTriggerName]) &&
-			array_key_exists($deleteTriggerName, $triggers) && compareTriggerBodies($deleteBody, $triggers[$deleteTriggerName]))
+		if (!$foundDiff)
 		{
 			print "Skipping {$tableName} - no changes detected...\n";
 			continue;
 		}
-		
-		$sqlCommands[] = "CREATE TRIGGER {$insertTriggerName} AFTER INSERT ON {$tableName} FOR EACH ROW $insertUpdateBody";
-		$sqlCommands[] = "CREATE TRIGGER {$updateTriggerName} AFTER UPDATE ON {$tableName} FOR EACH ROW $insertUpdateBody";
-		$sqlCommands[] = "CREATE TRIGGER {$deleteTriggerName} AFTER DELETE ON {$tableName} FOR EACH ROW $deleteBody";
 				
 		print "Creating triggers on {$tableName}...\n";
 	}
@@ -332,10 +355,17 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 	
 	foreach ($sqlCommands as $sqlCommand)
 	{
-		$result = mysql_query($sqlCommand) or die('Error: Trigger query failed: ' . mysql_error() . "\n");
-		if ($result !== true)
+		if ($dryRun)
 		{
-			die("Error: Unexpected result returned from mysql_query\n");
+			print $sqlCommand . PHP_EOL;
+		}
+		else
+		{
+			$result = mysql_query($sqlCommand) or die('Error: Trigger query failed: ' . mysql_error() . "\n");
+			if ($result !== true)
+			{
+				die("Error: Unexpected result returned from mysql_query\n");
+			}
 		}
 	}
 }
