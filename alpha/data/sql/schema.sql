@@ -1638,7 +1638,6 @@ CREATE TABLE `category`
 	`privacy_context` VARCHAR(255),
 	`privacy_contexts` VARCHAR(255),
 	`inherited_parent_id` INTEGER,
-	`lock` TINYINT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_full_name_index`(`partner_id`, `full_name`)
 )Type=InnoDB;

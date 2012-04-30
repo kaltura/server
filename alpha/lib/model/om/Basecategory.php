@@ -211,12 +211,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	protected $inherited_parent_id;
 
 	/**
-	 * The value for the lock field.
-	 * @var        boolean
-	 */
-	protected $lock;
-
-	/**
 	 * @var        array categoryKuser[] Collection to store aggregation of categoryKuser objects.
 	 */
 	protected $collcategoryKusers;
@@ -690,16 +684,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function getInheritedParentId()
 	{
 		return $this->inherited_parent_id;
-	}
-
-	/**
-	 * Get the [lock] column value.
-	 * 
-	 * @return     boolean
-	 */
-	public function getLock()
-	{
-		return $this->lock;
 	}
 
 	/**
@@ -1471,29 +1455,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	} // setInheritedParentId()
 
 	/**
-	 * Set the value of [lock] column.
-	 * 
-	 * @param      boolean $v new value
-	 * @return     category The current object (for fluent API support)
-	 */
-	public function setLock($v)
-	{
-		if(!isset($this->oldColumnsValues[categoryPeer::LOCK]))
-			$this->oldColumnsValues[categoryPeer::LOCK] = $this->lock;
-
-		if ($v !== null) {
-			$v = (boolean) $v;
-		}
-
-		if ($this->lock !== $v) {
-			$this->lock = $v;
-			$this->modifiedColumns[] = categoryPeer::LOCK;
-		}
-
-		return $this;
-	} // setLock()
-
-	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1599,7 +1560,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$this->privacy_context = ($row[$startcol + 27] !== null) ? (string) $row[$startcol + 27] : null;
 			$this->privacy_contexts = ($row[$startcol + 28] !== null) ? (string) $row[$startcol + 28] : null;
 			$this->inherited_parent_id = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
-			$this->lock = ($row[$startcol + 30] !== null) ? (boolean) $row[$startcol + 30] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1609,7 +1569,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 31; // 31 = categoryPeer::NUM_COLUMNS - categoryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 30; // 30 = categoryPeer::NUM_COLUMNS - categoryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating category object", $e);
@@ -2180,9 +2140,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			case 29:
 				return $this->getInheritedParentId();
 				break;
-			case 30:
-				return $this->getLock();
-				break;
 			default:
 				return null;
 				break;
@@ -2234,7 +2191,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$keys[27] => $this->getPrivacyContext(),
 			$keys[28] => $this->getPrivacyContexts(),
 			$keys[29] => $this->getInheritedParentId(),
-			$keys[30] => $this->getLock(),
 		);
 		return $result;
 	}
@@ -2356,9 +2312,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			case 29:
 				$this->setInheritedParentId($value);
 				break;
-			case 30:
-				$this->setLock($value);
-				break;
 		} // switch()
 	}
 
@@ -2413,7 +2366,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[27], $arr)) $this->setPrivacyContext($arr[$keys[27]]);
 		if (array_key_exists($keys[28], $arr)) $this->setPrivacyContexts($arr[$keys[28]]);
 		if (array_key_exists($keys[29], $arr)) $this->setInheritedParentId($arr[$keys[29]]);
-		if (array_key_exists($keys[30], $arr)) $this->setLock($arr[$keys[30]]);
 	}
 
 	/**
@@ -2455,7 +2407,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryPeer::PRIVACY_CONTEXT)) $criteria->add(categoryPeer::PRIVACY_CONTEXT, $this->privacy_context);
 		if ($this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS)) $criteria->add(categoryPeer::PRIVACY_CONTEXTS, $this->privacy_contexts);
 		if ($this->isColumnModified(categoryPeer::INHERITED_PARENT_ID)) $criteria->add(categoryPeer::INHERITED_PARENT_ID, $this->inherited_parent_id);
-		if ($this->isColumnModified(categoryPeer::LOCK)) $criteria->add(categoryPeer::LOCK, $this->lock);
 
 		return $criteria;
 	}
@@ -2579,8 +2530,6 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		$copyObj->setPrivacyContexts($this->privacy_contexts);
 
 		$copyObj->setInheritedParentId($this->inherited_parent_id);
-
-		$copyObj->setLock($this->lock);
 
 
 		if ($deepCopy) {
