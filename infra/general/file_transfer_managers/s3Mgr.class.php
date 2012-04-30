@@ -46,8 +46,6 @@ class s3Mgr extends kFileTransferMgr
 		//KalturaLog::debug("after new S3");
 		$buckets = $this->s3->listBuckets(); //just to check whether the connection is good
 		//KalturaLog::debug("buckets: ".print_r($buckets, TRUE));
-		echo "buckets:\n\r";
-		var_dump($buckets);
 		if($buckets !== false) {
 			//KalturaLog::debug("Connected to Amazon");
 			return true;
