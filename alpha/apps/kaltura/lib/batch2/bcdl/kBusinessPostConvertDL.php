@@ -95,7 +95,7 @@ class kBusinessPostConvertDL
 		}
 		
 		// mark the asset as ready 
-		$currentFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$currentFlavorAsset->setStatusLocalReady();
 		$currentFlavorAsset->save();
 		
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob, $currentFlavorAsset->getFlavorParamsId());
@@ -185,20 +185,12 @@ class kBusinessPostConvertDL
 		
 		// go over all the flavor assets of the entry
 		$inCompleteFlavorIds = array();
+		$exportOriginalAsset = false;
 		$siblingFlavorAssets = assetPeer::retrieveFlavorsByEntryId($currentFlavorAsset->getEntryId());
 		foreach($siblingFlavorAssets as $siblingFlavorAsset)
 		{
 			KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] flavor params id [" . $siblingFlavorAsset->getFlavorParamsId() . "]");
-				
-			if($siblingFlavorAsset->getId() == $currentFlavorAsset->getId())
-			{
-				KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is current");
-				if(isset($requiredFlavorParamsIds[$siblingFlavorAsset->getFlavorParamsId()]))
-					unset($requiredFlavorParamsIds[$siblingFlavorAsset->getFlavorParamsId()]);
-					
-				continue;
-			}
-			
+							
 			// don't mark any incomplete flag
 			if($siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			{
@@ -227,6 +219,20 @@ class kBusinessPostConvertDL
 				$inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
 			}
 			
+			if ($siblingFlavorAsset->getStatus() == flavorAsset::ASSET_STATUS_EXPORTING)
+			{
+			    if ($siblingFlavorAsset->getIsOriginal())
+			    {
+			        $exportOriginalAsset = true;
+			    }
+			    else
+			    {
+			        KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is incomplete");
+				    $inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
+			    }
+			    
+			}
+						
 			if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 			{
 				KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is required");
@@ -263,13 +269,20 @@ class kBusinessPostConvertDL
 		{
 			KalturaLog::debug('Convert Finished');
 			
-			// mark the context root job as finished only if all conversion jobs are completed
-			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
-			
-			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
-				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
-		
-			return $dbBatchJob;
+			if($exportOriginalAsset && $rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
+			{
+        		$storageExporter = new kStorageExporter();
+        		$storageExporter->exportSourceAssetFromJob($rootBatchJob);
+			}
+			else
+			{
+			    // mark the context root job as finished only if all conversion jobs are completed
+    			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
+    			
+    			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
+    				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+			}
+			return $dbBatchJob;	
 		}
 		
 		KalturaLog::debug('Convert Finished - has In-Complete flavors [' . print_r($inCompleteFlavorIds, true) . ']');

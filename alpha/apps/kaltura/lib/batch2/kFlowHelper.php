@@ -377,8 +377,6 @@ class kFlowHelper
 		if(!$entry)
 			throw new APIException(APIErrors::INVALID_ENTRY, $dbBatchJob, $dbBatchJob->getEntryId());
 			
-		$entry->addFlavorParamsId($data->getFlavorParamsOutput()->getFlavorParamsId());
-		$entry->save();
 
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
 
@@ -901,10 +899,6 @@ class kFlowHelper
 			$addedFlavorParamsOutputsIds[] = $flavor->getFlavorParamsOutputId();
 		}
 
-		// adding flavor params ids to the entry
-		$addedFlavorParamsOutputs = assetParamsOutputPeer::retrieveByPKs($addedFlavorParamsOutputsIds);
-		foreach($addedFlavorParamsOutputs as $addedFlavorParamsOutput)
-			$entry->addFlavorParamsId($addedFlavorParamsOutput->getFlavorParamsId());
 
 		$ismVersion = $entry->getIsmVersion();
 
@@ -1356,7 +1350,20 @@ class kFlowHelper
 				kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
 			}
 		}
-
+		
+		// if an asset was exported - check if should set its status to READY
+		$asset = asset::getFromFileSync($fileSync);
+		if ($asset && in_array($asset->getStatus(), array(asset::ASSET_STATUS_EXPORTING, asset::ASSET_STATUS_ERROR)))
+		{
+            $asset->setStatusLocalReady();
+            $asset->save();
+            
+            if ( ($asset instanceof flavorAsset) && ($asset->getStatus() == asset::ASSET_STATUS_READY) )
+            {
+                kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $asset);
+            }
+		}
+		
 		return $dbBatchJob;
 	}
 
@@ -1372,6 +1379,24 @@ class kFlowHelper
 		$fileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
 		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
 		$fileSync->save();
+		
+		// if an asset was exported - check if should set its status to ERROR
+		$asset = asset::getFromFileSync($fileSync);
+		if ($asset && $asset->getStatus() == asset::ASSET_STATUS_EXPORTING) // meaning that export is required for asset readiness
+		{
+            $asset->setStatus(asset::ASSET_STATUS_ERROR);
+            $asset->save();
+            
+		    if ($asset instanceof flavorAsset)
+            {
+                $flavorParamsOutput = $asset->getFlavorParamsOutput();
+                $flavorParamsOutputId = $flavorParamsOutput ? $flavorParamsOutput->getId() : null;
+                $mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($asset->getId());
+                $mediaInfoId = $mediaInfo ? $mediaInfo->getId() : null;
+                kBusinessPostConvertDL::handleConvertFailed($dbBatchJob, null, $asset->getId(), $flavorParamsOutputId, $mediaInfoId);
+            }
+		}
+		
 
 		return $dbBatchJob;
 	}

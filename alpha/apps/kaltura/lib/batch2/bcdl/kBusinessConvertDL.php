@@ -64,9 +64,6 @@ class kBusinessConvertDL
 			if(isset($newAssets[$oldAsset->getType()]) && isset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]))
 			{
 				$newAsset = $newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()];
-				//in situations were the flavor was created but failed to be converted it param id wont be added to the entry's flavor_params_ids field. so now when replacing the
-				//old entry's flavors with the temporery entry's flavors we should add their params ids to the entry's flavor_params_ids field.
-				$entry->addFlavorParamsId($oldAsset->getFlavorParamsId());
 				
 				/* @var $newAsset asset */
 				KalturaLog::debug("Create link from new asset [" . $newAsset->getId() . "] to old asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
@@ -85,7 +82,7 @@ class kBusinessConvertDL
 				$oldAsset->setTags($newAsset->getTags());
 				$oldAsset->setDescription($newAsset->getDescription());
 				$oldAsset->incrementVersion();
-				$oldAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+				$oldAsset->setStatusLocalReady();
 				$oldAsset->save();
 				
 				$oldFileSync = $oldAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -122,7 +119,6 @@ class kBusinessConvertDL
 			foreach ($newAssetsByTypes as $newAsset)
 			{
 				$createdAsset = $newAsset->copyToEntry($entry->getId(), $entry->getPartnerId());
-				$entry->addFlavorParamsId($newAsset->getFlavorParamsId());
 				KalturaLog::debug("Copied from new asset [" . $newAsset->getId() . "] to copied asset [" . $createdAsset->getId() . "] for flavor [" . $newAsset->getFlavorParamsId() . "]");
 			}
 		}

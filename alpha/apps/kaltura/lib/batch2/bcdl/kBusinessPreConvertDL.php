@@ -47,7 +47,7 @@ class kBusinessPreConvertDL
 		if($sourceAssetId)
 		{
 			$srcAsset = assetPeer::retrieveById($sourceAssetId);
-			if($srcAsset && $srcAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			if($srcAsset && in_array($srcAsset->getStatus(), $srcAsset->getLocalReadyStatuses()))
 				return $srcAsset;
 		}
 		
@@ -55,19 +55,19 @@ class kBusinessPreConvertDL
 		{
 			KalturaLog::debug("Look for flavor params [$sourceParamsId]");
 			$srcAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $sourceParamsId);
-			if($srcAsset && $srcAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			if($srcAsset && in_array($srcAsset->getStatus(), $srcAsset->getLocalReadyStatuses()))
 				return $srcAsset;
 		}
 					
 		KalturaLog::debug("Look for original flavor of entry [$entryId]");
 		$srcAsset = assetPeer::retrieveOriginalByEntryId($entryId);
-		if($srcAsset && $srcAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+		if($srcAsset && in_array($srcAsset->getStatus(), $srcAsset->getLocalReadyStatuses()))
 			return $srcAsset;
 					
 			
 		KalturaLog::debug("Look for highest bitrate flavor of entry [$entryId]");
 		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
-		if($srcAsset && $srcAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+		if($srcAsset && in_array($srcAsset->getStatus(), $srcAsset->getLocalReadyStatuses()))
 			return $srcAsset;
 			
 		return null;
@@ -389,7 +389,7 @@ class kBusinessPreConvertDL
 			return null;
 		}
 	
-		if ($originalFlavorAsset->getId() != $flavorAssetId && $originalFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+		if ($originalFlavorAsset->getId() != $flavorAssetId && !in_array($originalFlavorAsset->getStatus(), $originalFlavorAsset->getLocalReadyStatuses()))
 		{
 			$errDescription = 'Original flavor asset not ready';
 			KalturaLog::log(__METHOD__." - ".$errDescription);
@@ -773,7 +773,7 @@ class kBusinessPreConvertDL
 		if(!$entry->getCreateThumb())
 		{
 			// mark the asset as ready 
-			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+			$originalFlavorAsset->setStatusLocalReady();
 			$originalFlavorAsset->save();
 			
 			kFlowHelper::generateThumbnailsFromFlavor($entry->getId(), null, $originalFlavorAsset->getFlavorParamsId());
@@ -1008,10 +1008,9 @@ class kBusinessPreConvertDL
 				return false;
 			}
 			
-			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+			$originalFlavorAsset->setStatusLocalReady();
 			$originalFlavorAsset->save();
 			
-			$entry->addFlavorParamsId($sourceFlavor->getId());
 			$entry->save();
 			
 			kFlowHelper::generateThumbnailsFromFlavor($parentJob->getEntryId(), $parentJob);

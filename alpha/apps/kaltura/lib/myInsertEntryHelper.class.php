@@ -594,7 +594,8 @@ class myInsertEntryHelper
 					}
 					
 					kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset));
-					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+
+					$flavorAsset->setStatusLocalReady();
 					$flavorAsset->save();
 				}
 				else

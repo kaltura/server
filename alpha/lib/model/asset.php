@@ -503,8 +503,24 @@ class asset extends Baseasset implements ISyncableFile
 	    );
 	}
 	
+    /**
+     * Set the asset status to a locally ready status (READY, EXPORTING) according to the required jobs to perform on the asset
+     */
     public function setStatusLocalReady()
 	{
 	    parent::setStatus(asset::ASSET_STATUS_READY);
+	}
+	
+	
+	public static function getFromFileSync(FileSync $fileSync)
+	{
+	    if ($fileSync->getObjectType() != FileSyncObjectType::ASSET) {
+	        return null;
+	    }
+	    if ($fileSync->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET) {
+	        return null;
+	    }
+	    $asset = assetPeer::retrieveById($fileSync->getObjectId());
+	    return $asset;
 	}
 }

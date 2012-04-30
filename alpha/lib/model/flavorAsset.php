@@ -122,4 +122,75 @@ class flavorAsset extends asset
 		$this->setFrameRate($dbAssetParams->getFrameRate());
 		$this->setVideoCodecId($dbAssetParams->getVideoCodec());
 	}
+	
+		
+    /**
+     * (non-PHPdoc)
+     * @see asset::setStatusLocalReady()
+     */
+    public function setStatusLocalReady()
+	{	    
+	    KalturaLog::debug('Setting local ready status for asset id ['.$this->getId().']');
+	    $newStatus = asset::ASSET_STATUS_READY;
+	    
+	    $externalStorages = StorageProfilePeer::retrieveExternalByPartnerId($this->getPartnerId());
+		foreach($externalStorages as $externalStorage)
+		{
+		    // check if storage profile should affect the asset ready status
+		    if ($externalStorage->getReadyBehavior() != StorageProfileReadyBehavior::REQUIRED)
+		    {
+		        // current storage profile is not required for asset readiness - skipping
+		        continue;
+		    }
+		    
+		    // check if export should happen now or wait for another trigger
+		    if (!$externalStorage->triggerFitsReadyAsset($this->getEntryId())) {
+		        KalturaLog::debug('Asset id ['.$this->getId().'] is not ready to export to profile ['.$externalStorage->getId().']');
+		        continue;
+		    }
+		    
+		    // check if asset fits to the export rules defined on the profile
+		    if (!$externalStorage->shouldExportFlavorAsset($this))
+		    {
+		        KalturaLog::debug('Should not export asset id ['.$this->getId().'] to profile ['.$externalStorage->getId().']');
+		        continue;
+		    }
+		    
+		    KalturaLog::debug('Asset id ['.$this->getId().'] is required to export to profile ['.$externalStorage->getId().'] - setting status to [EXPORTING]');
+		    $newStatus = asset::ASSET_STATUS_EXPORTING;
+		    break;
+		}   
+        KalturaLog::debug('Setting status to ['.$newStatus.']');
+	    $this->setStatus($newStatus);
+	}
+	
+	
+
+    public function save(PropelPDO $con = null)
+	{
+	    // check if flavor asset is new before saving
+	    $isNew = $this->isNew();
+	    $statusModified = $this->isColumnModified(assetPeer::STATUS);
+	    
+	    // save the asset
+		$saveResult = parent::save();
+		
+		// update associated entry's flavorParamsId list
+		if ( $this->getStatus() == self::ASSET_STATUS_READY && ($isNew || $statusModified) )
+		{
+		    $entry = $this->getentry();
+		    if (!$entry) {
+		        KalturaLog::err('Cannot get entry object for flavor asset id ['.$this->getId().']');
+		    }
+		    else {
+		        KalturaLog::debug('Adding flavor params id ['.$this->getFlavorParamsId().'] to entry id ['.$entry->getId().']');
+		        $entry->addFlavorParamsId($this->getFlavorParamsId());
+		        $entry->save();
+		    }
+		}
+
+		// return the parent::save result
+		return $saveResult;
+	}
+	
 }

@@ -254,7 +254,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		if($dbAsset && !($dbAsset instanceof flavorAsset))
 		{
-			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+		    $dbAsset->setStatusLocalReady();
 				
 			if($dbAsset->getFlavorParamsId())
 			{
@@ -528,7 +528,6 @@ class KalturaEntryService extends KalturaBaseService
 				continue;
 				
 			KalturaLog::debug("Resource asset id [" . $dbAsset->getId() . "]");
-			$dbEntry->addFlavorParamsId($dbAsset->getFlavorParamsId());
 			
 			if($dbAsset->getIsOriginal())
 				$ret = $dbAsset;

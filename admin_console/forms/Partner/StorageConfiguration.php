@@ -139,8 +139,11 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 		$this->addElement('select', 'trigger', array(
 			'label'			=> 'Trigger:',
 			'filters'		=> array('StringTrim'),
-			
 		));
+		
+		$readyBehavior = new Kaltura_Form_Element_EnumSelect('readyBehavior', array('enum' => 'Kaltura_Client_Enum_StorageProfileReadyBehavior'));
+		$readyBehavior->setLabel('Ready Behavior:');
+		$this->addElements(array($readyBehavior));
 		
 		$this->addElement('textarea', 'urlManagerParamsJson', array(
 			'label'			=> 'URL Manager Params (JSON):',

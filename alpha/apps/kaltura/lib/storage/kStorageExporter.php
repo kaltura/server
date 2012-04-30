@@ -15,7 +15,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			return true;
 		
 		// if changed object is flavor asset
-		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && in_array($object->getStatus(), $object->getLocalReadyStatuses()))
 			return true;
 			
 		return false;		
@@ -38,22 +38,14 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 		
 		// if changed object is flavor asset
-		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && in_array($object->getStatus(), $object->getLocalReadyStatuses()))
 		{
 			$entry = $object->getentry();
 			
 			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
 			foreach($externalStorages as $externalStorage)
 			{
-				if(
-					$externalStorage->getTrigger() == StorageProfile::STORAGE_TEMP_TRIGGER_FLAVOR_READY
-					||
-						(
-							$externalStorage->getTrigger() == StorageProfile::STORAGE_TEMP_TRIGGER_MODERATION_APPROVED
-							&&
-							$entry->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED
-						)
-					)
+				if ($externalStorage->triggerFitsReadyAsset($entry->getId()))
 				{
 					self::exportFlavorAsset($object, $externalStorage);
 				}
@@ -68,20 +60,14 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	static public function exportFlavorAsset(flavorAsset $flavor, StorageProfile $externalStorage)
 	{
-		$flavorParamsIds = $externalStorage->getFlavorParamsIds();
-		KalturaLog::log(__METHOD__ . " flavorParamsIds [$flavorParamsIds]");
-		
-		if(!is_null($flavorParamsIds) && strlen(trim($flavorParamsIds)))
-		{
-			$flavorParamsArr = explode(',', $flavorParamsIds);
-			if(!in_array($flavor->getFlavorParamsId(), $flavorParamsArr))
-				return;
+	    if (!$externalStorage->shouldExportFlavorAsset($flavor)) {
+		    return;
 		}
 			
 		$key = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		self::export($flavor->getentry(), $externalStorage, $key, !$flavor->getIsOriginal());
+		$exporting = self::export($flavor->getentry(), $externalStorage, $key, !$flavor->getIsOriginal());
 				
-		return true;
+		return $exporting;
 	}
 	
 	/**
@@ -121,13 +107,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param FileSyncKey $key
 	 */
 	static protected function export(entry $entry, StorageProfile $externalStorage, FileSyncKey $key, $force = false)
-	{
-		if(!self::shouldExport($key, $externalStorage))
-		{
-			KalturaLog::log("no need to export key [$key] to externalStorage id[" . $externalStorage->getId() . "]");
-			return;
-		}
-			
+	{			
 		$externalFileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $externalStorage);
 		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key,true,false);
@@ -138,13 +118,14 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		$parent_file_sync = kFileSyncUtils::resolve($fileSync);
 		$srcFileSyncPath = $parent_file_sync->getFileRoot() . $parent_file_sync->getFilePath();
 		kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(), $externalStorage, $externalFileSync, $srcFileSyncPath, $force, $fileSync->getDc());
+		return true;
 	}
 	
 	/**
 	 * @param FileSyncKey $key
 	 * @return bool
 	 */
-	static protected function shouldExport(FileSyncKey $key, StorageProfile $externalStorage)
+	static public function shouldExport(FileSyncKey $key, StorageProfile $externalStorage)
 	{
 		KalturaLog::log(__METHOD__ . " - key [$key], externalStorage id[" . $externalStorage->getId() . "]");
 		
@@ -169,6 +150,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 		
 		$storageFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key, $externalStorage->getId());
+		//TODO: what if currently being exported ?
+
 		if($storageFileSync) // already exported
 		{
 			KalturaLog::log(__METHOD__ . " key [$key] already exported");
@@ -196,11 +179,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	{
 		if($dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
 			return false;
-			
-		// convert profile finished - export source flavor
-		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
-			return true;
-			
+						
 		// convert collection finished - export ism and ismc files
 		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_COLLECTION && $dbBatchJob->getJobSubType() == conversionEngineType::EXPRESSION_ENCODER3)
 			return true;
@@ -208,34 +187,31 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		return false;
 	}
 	
-	/* (non-PHPdoc)
-	 * @see kBatchJobStatusEventConsumer::updatedJob()
-	 */
-	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
+	public function exportSourceAssetFromJob(BatchJob $dbBatchJob)
 	{
 		// convert profile finished - export source flavor
 		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 		{
 			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($dbBatchJob->getPartnerId());
-			foreach($externalStorages as $externalStorage)
+			$sourceFlavor = assetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
+			if (!$sourceFlavor) {
+			    KalturaLog::debug('Cannot find source flavor for entry id ['.$dbBatchJob->getEntryId().']');
+			}
+			else if (!in_array($sourceFlavor->getStatus(), $sourceFlavor->getLocalReadyStatuses())) {
+			    KalturaLog::debug('Source flavor id ['.$sourceFlavor->getId().'] has status ['.$sourceFlavor->getStatus().'] - not ready for export');
+			}
+			else
 			{
-				if(
-					$externalStorage->getTrigger() == StorageProfile::STORAGE_TEMP_TRIGGER_FLAVOR_READY
-					||
-						(
-							$externalStorage->getTrigger() == StorageProfile::STORAGE_TEMP_TRIGGER_MODERATION_APPROVED
-							&&
-							$dbBatchJob->getEntry()->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED
-						)
-					)
-				{
-					$sourceFlavor = assetPeer::retrieveOriginalReadyByEntryId($dbBatchJob->getEntryId());
-					if($sourceFlavor)
-						self::exportFlavorAsset($sourceFlavor, $externalStorage);
-				}
+    			foreach($externalStorages as $externalStorage)
+    			{
+    				if ($externalStorage->triggerFitsReadyAsset($dbBatchJob->getEntryId()))
+    				{
+    				    self::exportFlavorAsset($sourceFlavor, $externalStorage);
+    				}
+    			}
 			}
 		}
-			
+    			
 		// convert collection finished - export ism and ismc files
 		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_COLLECTION && $dbBatchJob->getJobSubType() == conversionEngineType::EXPRESSION_ENCODER3)
 		{
@@ -243,15 +219,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($dbBatchJob->getPartnerId());
 			foreach($externalStorages as $externalStorage)
 			{
-				if(
-					$externalStorage->getTrigger() == StorageProfile::STORAGE_TEMP_TRIGGER_FLAVOR_READY
-					||
-						(
-							$externalStorage->getTrigger() == StorageProfile::STORAGE_TEMP_TRIGGER_MODERATION_APPROVED
-							&&
-							$entry->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED
-						)
-					)
+				if($externalStorage->triggerFitsReadyAsset($entry->getId()))
 				{
 					$ismKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
 					if(kFileSyncUtils::fileSync_exists($ismKey))
@@ -265,6 +233,20 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 		return true;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see kBatchJobStatusEventConsumer::updatedJob()
+	 */
+	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
+	{
+		// convert profile finished - export source flavor
+		if ($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
+		{
+    		return $this->exportSourceAssetFromJob($dbBatchJob);
+		}
+		return true;
+	}
+	
 	
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
 	{

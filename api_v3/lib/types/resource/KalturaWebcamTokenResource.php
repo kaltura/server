@@ -61,7 +61,7 @@ class KalturaWebcamTokenResource extends KalturaDataCenterContentResource
 			$flavorTags = KDLWrap::CDLMediaInfo2Tags($dbMediaInfo, array(flavorParams::TAG_WEB, flavorParams::TAG_MBR));
 			$originalFlavorAsset->setTags(implode(',', array_unique($flavorTags)));
 		}
-   		$originalFlavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+   		$originalFlavorAsset->setStatusLocalReady();
    		$originalFlavorAsset->save();
 		
    		$dbEntry->setStatus(entryStatus::READY);

@@ -3,7 +3,6 @@
 
 <?php 
 	$triggersNames = array(
-		1 => 'Convert Finished',
 		2 => 'Moderation Approved',
 		3 => 'Flavor Ready',
 	);
@@ -41,6 +40,7 @@
 				<th><?php echo $this->translate('Path Manager'); ?></th>
 				<th><?php echo $this->translate('URL Manager'); ?></th>
 				<th><?php echo $this->translate('Trigger'); ?></th>
+				<th><?php echo $this->translate('Ready Behavior'); ?></th>
 				<th><?php echo $this->translate('Creation Date'); ?></th>
 				<th><?php echo $this->translate('Action'); ?></th>
 			</tr>
@@ -62,6 +62,7 @@
 				<td><?php echo (isset($pathManagersNames[$storage->pathManagerClass]) ? $pathManagersNames[$storage->pathManagerClass] : $pathManagersNames['default']); ?></td>
 				<td><?php echo (isset($urlManagersNames[$storage->urlManagerClass]) ? $urlManagersNames[$storage->urlManagerClass] : $urlManagersNames['default']); ?></td>
 				<td><?php echo $triggersNames[$storage->trigger]; ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_StorageProfileReadyBehavior', $storage->readyBehavior); ?></td>
 				<td><?php echo $this->dateFormat($storage->createdAt, Zend_Date::DATE_LONG); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $storage->id; ?>)">

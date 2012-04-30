@@ -824,7 +824,7 @@ class kJobsManager
  		{
  			if($keepCurrentVersion)
  			{
- 				if($asset->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
+ 				if(!in_array($asset->getStatus(), $asset->getLocalReadyStatuses()))
 	 				$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
  			}
  			else 
@@ -1032,7 +1032,7 @@ class kJobsManager
 				if($flavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED)
 				{
 					if($sourceIncludedInProfile)
-						$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+						$flavorAsset->setStatusLocalReady();
 					else
 					{
 						$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_DELETED);

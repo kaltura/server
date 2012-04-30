@@ -37,6 +37,7 @@ class StorageProfile extends BaseStorageProfile
 	
 	const CUSTOM_DATA_URL_MANAGER_PARAMS = 'url_manager_params';
 	const CUSTOM_DATA_PATH_MANAGER_PARAMS = 'path_manager_params';
+	const CUSTOM_DATA_READY_BEHAVIOR = 'ready_behavior';
 	
 	/**
 	 * @return kPathManager
@@ -63,11 +64,10 @@ class StorageProfile extends BaseStorageProfile
 	/* ---------------------------------- TODO - temp solution -----------------------------------------*/
 	// remove after event manager implemented
 	
-	const STORAGE_TEMP_TRIGGER_CONVERT_FINISHED = 1;
 	const STORAGE_TEMP_TRIGGER_MODERATION_APPROVED = 2;
 	const STORAGE_TEMP_TRIGGER_FLAVOR_READY = 3;
 		
-	public function getTrigger() { return $this->getFromCustomData("trigger", null, self::STORAGE_TEMP_TRIGGER_CONVERT_FINISHED); }
+	public function getTrigger() { return $this->getFromCustomData("trigger", null, self::STORAGE_TEMP_TRIGGER_FLAVOR_READY); }
 	public function setTrigger( $v ) { $this->putInCustomData("trigger", (int)$v); }
 	
 	//external path format
@@ -135,10 +135,87 @@ class StorageProfile extends BaseStorageProfile
 	    return $params;
 	}
 	
+	
+    public function setReadyBehavior($readyBehavior)
+	{
+	    $this->putInCustomData(self::CUSTOM_DATA_READY_BEHAVIOR, $readyBehavior);
+	}
+	
+	public function getReadyBehavior()
+	{
+	    // return NO_EFFECT as default when no other value is set
+	    return $this->getFromCustomData(self::CUSTOM_DATA_READY_BEHAVIOR, null, StorageProfileReadyBehavior::NO_EFFECT);
+	}
+	
 	/* Cache Invalidation */
 	
 	public function getCacheInvalidationKeys()
 	{
 		return array("storageProfile:id=".$this->getId(), "storageProfile:partnerId=".$this->getPartnerId());
+	}
+	
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @return boolean true if the given flavor asset is configured to be exported or false otherwise
+	 */
+	public function shouldExportFlavorAsset(flavorAsset $flavorAsset)
+	{
+	    $shouldExport = null;
+	    
+	    // check if flavor params id is in the list to export
+	    $flavorParamsIdsToExport = $this->getFlavorParamsIds();
+	    KalturaLog::log(__METHOD__ . " flavorParamsIds [$flavorParamsIdsToExport]");
+	    
+	    if (is_null($flavorParamsIdsToExport) || strlen(trim($flavorParamsIdsToExport)) == 0)
+	    {
+	        // all flavor assets should be exported
+	        $shouldExport = true;
+	    }
+	    else
+	    {
+	        $flavorParamsIdsToExport = array_map('trim', explode(',', $flavorParamsIdsToExport));
+	        if (in_array($flavorAsset->getFlavorParamsId(), $flavorParamsIdsToExport))
+	        {
+	            // flavor set to export
+	            $shouldExport = true;
+	        }
+	        else
+	        {
+	            // flavor not set to export
+	            $shouldExport = false;
+	        }
+	    }
+	    
+	    // check if flavor fits the export rules defined on the profile
+	    if ($shouldExport)
+	    {
+	        $key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+	        $shouldExport = kStorageExporter::shouldExport($key, $this);
+	    }
+	    else
+	    {
+	        KalturaLog::log("no need to export key [$key] to externalStorage id[" . $this->getId() . "]");
+	    }
+	    
+	    return $shouldExport;
+	}
+	
+	/**
+	 * @return true if the profile's trigger fits a ready flavor asset for the given entry id
+	 * @param string $entryId
+	 */
+	public function triggerFitsReadyAsset($entryId)
+	{
+	    if ($this->getTrigger() == StorageProfile::STORAGE_TEMP_TRIGGER_FLAVOR_READY) {
+	        return true;
+	    }
+	    
+	    if ($this->getTrigger() == StorageProfile::STORAGE_TEMP_TRIGGER_MODERATION_APPROVED) {
+	        $entry = entryPeer::retrieveByPK($entryId);
+	        if ($entry && $entry->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED) {
+                return true;	            
+	        }
+	    }
+	    return false;
 	}
 }

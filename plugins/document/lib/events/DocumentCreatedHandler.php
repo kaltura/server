@@ -131,7 +131,7 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 			{
 				// only for documents entry, make the source ready since no conversion profile will be executed by default
 				$object->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
-				$object->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+				$object->setStatusLocalReady();
 				$object->save();
 				
 				$entry->setStatusReady();
