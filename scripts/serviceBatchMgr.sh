@@ -24,7 +24,7 @@ if [ $# != 1 ]; then
    exit 0 	
 fi
 
-CONFIG_FILE=$BATCHDIR/config/`hostname`_config.ini
+CONFIG_FILE=$APP_DIR/configurations/hosts/batch/`hostname`.ini
 
 default_config=0
 if [ ! -f $CONFIG_FILE ]; then
