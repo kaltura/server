@@ -36,26 +36,35 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 			 *		stands for duration of 462 seconds, gop size 2 seconds
 			 */
 		foreach($cmdLines as $k=>$cmdLine){
-			$kfPlcHldr = strstr($cmdLine->exec_cmd, KDLCmdlinePlaceholders::ForceKeyframes);
-			if($kfPlcHldr!=false){ 
-				$kfPlcHldr = explode(" ",$kfPlcHldr);	// 
-				$kfPlcHldr = $kfPlcHldr[0];
-				$kfPrms = substr($kfPlcHldr,strlen(KDLCmdlinePlaceholders::ForceKeyframes));
-				$kfPrms = explode("_",$kfPrms);
-				$forcedKF=null;
-				for($t=0,$tr=0;$t<=$kfPrms[0]; $t+=$kfPrms[1], $tr+=round($kfPrms[1])){
-					if(round($t)>$tr) {
-						$t=$tr;
-					}
-					$forcedKF.=",".round($t,4);
-				}
-				$forcedKF[0] = ' ';
-				$cmdLines[$k]->exec_cmd = str_replace ( 
-						array($kfPlcHldr), 
-						array($forcedKF),
-						$cmdLine->exec_cmd);
-			}
+			$cmdLines[$k]->exec_cmd = self::expandForcedKeyframesParams($cmdLine->exec_cmd);
 		}
 		return $cmdLines;
 	}
+	
+	public static function expandForcedKeyframesParams($execCmd)
+	{
+		$cmdLineWithKeyframes = strstr($execCmd, KDLCmdlinePlaceholders::ForceKeyframes);
+		if($cmdLineWithKeyframes==false){
+			return $execCmd;
+		}
+		
+		$cmdLineWithKeyframes = explode(" ",$cmdLineWithKeyframes);	// 
+		$cmdLineWithKeyframes = $cmdLineWithKeyframes[0];
+		$kfPrms = substr($cmdLineWithKeyframes,strlen(KDLCmdlinePlaceholders::ForceKeyframes));
+		$kfPrms = explode("_",$kfPrms);
+		$forcedKF=null;
+		for($t=0,$tr=0;$t<=$kfPrms[0]; $t+=$kfPrms[1], $tr+=round($kfPrms[1])){
+			if(round($t)>$tr) {
+				$t=$tr;
+			}
+			$forcedKF.=",".round($t,4);
+		}
+		$forcedKF[0] = ' ';
+		$execCmd = str_replace ( 
+				array($cmdLineWithKeyframes), 
+				array($forcedKF),
+				$execCmd);
+		return $execCmd;
+	}
 }
+
