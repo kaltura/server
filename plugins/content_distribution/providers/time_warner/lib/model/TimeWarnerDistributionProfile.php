@@ -23,6 +23,7 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 			'TV-14',
 			'TV-MA',
 		),
+	/*	
 		TimeWarnerDistributionField::MEDIA_CATEGORY_CT => array(
 			'Clip',
 			'Movie',
@@ -56,6 +57,7 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 				'Sports',
 				'Strange'
 			),
+	*/
 		);
 	
 	/* (non-PHPdoc)
@@ -260,8 +262,8 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($this->maxLengthValidation, $allFieldValues, $action));
 		$validationErrors = array_merge($validationErrors, $this->validateInListOrNull($this->inListOrNullValidation, $allFieldValues, $action));
-
-		$validationErrors = array_merge($validationErrors, $this->validateMultipleValuesInListOrNull($this->multipleInListOrNull, $allFieldValues, $action));
+		//$validationErrors = array_merge($validationErrors, $this->validateMultipleValuesInListOrNull($this->multipleInListOrNull, $allFieldValues, $action));
+		
 		return $validationErrors;
 	}
 	
@@ -284,6 +286,7 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 	 * @param unknown_type $allFieldValues
 	 * @param unknown_type $action
 	 */
+	/*
 	protected function validateMultipleValuesInListOrNull($fieldArray, $allFieldValues, $action)
 	{
 	    $validationErrors = array();
@@ -314,6 +317,7 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		}
 	    return $validationErrors;
 	}
+	*/
 	
 	public function getUniqueHashForFeedUrl()		{return $this->getFromCustomData(self::CUSTOM_DATA_UNIQUE_HASH_FOR_FEED_URL);}
 	public function setUniqueHashForFeedUrl($v)		{$this->putInCustomData(self::CUSTOM_DATA_UNIQUE_HASH_FOR_FEED_URL, $v);}
