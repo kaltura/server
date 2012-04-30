@@ -81,11 +81,21 @@ class UverseClickToOrderService extends KalturaBaseService
 			if (!isset($relatedEntriesArray[$relatedEntryId])) {
 				$relatedEntriesArray[$relatedEntryId] = array();
 			}
+			
+			$flavorAssets = array_map('trim', explode(',', $entryDistribution->getFlavorAssetIds()));
+			$flavorAsset = isset($flavorAssets[0]) ? $flavorAssets[0] : null;
+			$flavorUrl = $flavorAsset ? $flavorAsset->getDownloadUrl : $entry->getDownloadUrl();
+			
+			$thumbAssets = array_map('trim', explode(',', $entryDistribution->getThumbAssetIds()));
+			$thumbAsset = isset($thumbAssets[0]) ? $thumbAssets[0] : null;
+			$thumbUrl = $thumbAsset ? $thumbAsset->getDownloadUrl : $entry->getThumbnailUrl();
+			
 			$relatedEntriesArray[$relatedEntryId][] = array(
 				'id' => $entry->getId(),
-				'thumbnailUrl' => $entry->getThumbnailUrl(),
-				'downloadUrl' => $entry->getDownloadUrl()
+				'thumbnailUrl' => $thumbUrl,
+				'downloadUrl' => $flavorUrl,
 			);
+			
 		}
 		//retreive each category and add it to the xml
 		foreach ($relatedEntriesArray as $relatedEntryId => $entriesUnderCategory)
@@ -100,7 +110,7 @@ class UverseClickToOrderService extends KalturaBaseService
 				continue;
 			}
 			$categoryName = $relatedEntryObject[0]->getName();
-			$categoryFile = $relatedEntryObject[0]->getThumbnailUrl();
+			$categoryFile = $relatedEntryObject[0]->getThumbnailUrl().'/width/'.$fields[UverseClickToOrderDistributionField::CATEGORY_IMAGE_WIDTH].'/height/'.$fields[UverseClickToOrderDistributionField::CATEGORY_IMAGE_HEIGHT];
 			$categoryNode = $feed->addCategory($categoryName, $categoryFile);
 
 			//getting all entries under a category
