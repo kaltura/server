@@ -35,23 +35,25 @@ class s3Mgr extends kFileTransferMgr
 
 
 	// login to an existing connection with given user/pass (ftp_passive_mode is irrelevant)
-	protected function doLogin($sftp_user, $sftp_pass, $ftp_passive_mode = TRUE)
+	protected function doLogin($sftp_user, $sftp_pass, $ftp_passive_mode = true)
 	{
 		//KalturaLog::debug("doLogin is active");
 		if(!class_exists("S3")) {
 			KalturaLog::debug("Class S3 was not found!!");
-			return FALSE;
+			return false;
 		}
-		$this->s3 = new S3($sftp_user, $sftp_pass,FALSE);
+		$this->s3 = new S3($sftp_user, $sftp_pass, false);
 		//KalturaLog::debug("after new S3");
 		$buckets = $this->s3->listBuckets(); //just to check whether the connection is good
 		//KalturaLog::debug("buckets: ".print_r($buckets, TRUE));
-		if($buckets !== FALSE) {
+		echo "buckets:\n\r";
+		var_dump($buckets);
+		if($buckets !== false) {
 			//KalturaLog::debug("Connected to Amazon");
-			return TRUE;
+			return true;
 		}
 		//KalturaLog::debug("Connection to Amazon failed");
-		return FALSE;
+		return false;
 	}
 
 
@@ -67,20 +69,20 @@ class s3Mgr extends kFileTransferMgr
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		KalturaLog::debug("remote_file: ".$remote_file);
-		$res = $this->s3->putObjectFile($local_file, $bucket, $remote_file, S3::ACL_PUBLIC_READ);
+		$res = $this->s3->putObjectFile($local_file, $bucket, $remote_file);
 
 		if ($res)
 		{
 			$info = $this->s3->getObjectInfo($bucket, $remote_file);
 			if ($info && $info['size'] == filesize($local_file))
 			{
-				KalturaLog::debug("File uploaded to Amazon, info: ".print_r($info, TRUE));
-				return TRUE;
+				KalturaLog::debug("File uploaded to Amazon, info: ".print_r($info, true));
+				return true;
 			}
 			else
 			{
 				KalturaLog::debug("error uploading file ".$local_file." s3 info ".print_r($info, true));
-				return FALSE;
+				return false;
 			}
 		}
 	}
@@ -91,7 +93,7 @@ class s3Mgr extends kFileTransferMgr
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		KalturaLog::debug("remote_file: ".$remote_file);
 		$saveTo = fopen($local_file,"w");
-		if(!$saveTo) return FALSE;
+		if(!$saveTo) return false;
 		return $this->s3->getObject($bucket, $remote_file, $saveTo);
 	}
 
@@ -120,8 +122,8 @@ class s3Mgr extends kFileTransferMgr
 	}
 
 	private function isdirectory($file_name) {
-		if(strpos($file_name,'.') === FALSE) return TRUE;
-		return FALSE;
+		if(strpos($file_name,'.') === false) return TRUE;
+		return false;
 	}
 	
 	// return the current working directory
