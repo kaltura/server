@@ -436,6 +436,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new KalturaBatchException("Missing entry id element", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		}
 		
+		// Overwriting conversionProfileId if one is supplied in the XML
+		if(isset($item->conversionProfileId) || isset($item->conversionProfile))
+			$conversionProfileId = $this->getConversionProfileId($item);
+		KalturaLog::DEBUG("Conversion profile found within XML - setting to [ $conversionProfileId ]");
+		
 		//Throw exception in case of max proccessed items and handle all exceptions there
 		$updatedEntryBulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::UPDATE);
 		
@@ -679,7 +684,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$updatedEntryId = $updatedEntry->replacingEntryId;
 					
 		if($resource)
-			$this->kClient->baseEntry->updateContent($updatedEntryId ,$resource); //to create a temporery entry.
+			$this->kClient->baseEntry->updateContent($updatedEntryId ,$resource, $entry->conversionProfileId); //to create a temporery entry.
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
