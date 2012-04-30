@@ -1,5 +1,8 @@
 <?php
- 
+/**
+ * @package plugins.document
+ * @subpackage lib
+ */
 class KDLTranscoderPdfCreator extends KDLOperatorBase
 {
 	
