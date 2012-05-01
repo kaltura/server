@@ -1352,7 +1352,7 @@ class kFlowHelper
 		}
 		
 		// if an asset was exported - check if should set its status to READY
-		$asset = asset::getFromFileSync($fileSync);
+		$asset = assetPeer::retrieveByFileSync($fileSync);
 		if ($asset && in_array($asset->getStatus(), array(asset::ASSET_STATUS_EXPORTING, asset::ASSET_STATUS_ERROR)))
 		{
             $asset->setStatusLocalReady();
@@ -1381,7 +1381,7 @@ class kFlowHelper
 		$fileSync->save();
 		
 		// if an asset was exported - check if should set its status to ERROR
-		$asset = asset::getFromFileSync($fileSync);
+		$asset = assetPeer::retrieveByFileSync($fileSync);
 		if ($asset && $asset->getStatus() == asset::ASSET_STATUS_EXPORTING) // meaning that export is required for asset readiness
 		{
             $asset->setStatus(asset::ASSET_STATUS_ERROR);

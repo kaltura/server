@@ -511,16 +511,4 @@ class asset extends Baseasset implements ISyncableFile
 	    parent::setStatus(asset::ASSET_STATUS_READY);
 	}
 	
-	
-	public static function getFromFileSync(FileSync $fileSync)
-	{
-	    if ($fileSync->getObjectType() != FileSyncObjectType::ASSET) {
-	        return null;
-	    }
-	    if ($fileSync->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET) {
-	        return null;
-	    }
-	    $asset = assetPeer::retrieveById($fileSync->getObjectId());
-	    return $asset;
-	}
 }

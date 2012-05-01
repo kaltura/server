@@ -533,4 +533,16 @@ class assetPeer extends BaseassetPeer
 	{
 		return array(array("flavorAsset:id=%s", self::ID), array("flavorAsset:entryId=%s", self::ENTRY_ID));		
 	}
+	
+	public static function retrieveByFileSync(FileSync $fileSync)
+	{
+		if ($fileSync->getObjectType() != FileSyncObjectType::ASSET) {
+	        return null;
+	    }
+	    if ($fileSync->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET) {
+	        return null;
+	    }
+	    $asset = assetPeer::retrieveById($fileSync->getObjectId());
+	    return $asset;
+	}
 }

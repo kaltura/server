@@ -143,8 +143,8 @@ class StorageProfile extends BaseStorageProfile
 	
 	public function getReadyBehavior()
 	{
-	    // return NO_EFFECT as default when no other value is set
-	    return $this->getFromCustomData(self::CUSTOM_DATA_READY_BEHAVIOR, null, StorageProfileReadyBehavior::NO_EFFECT);
+	    // return NO_IMPACT as default when no other value is set
+	    return $this->getFromCustomData(self::CUSTOM_DATA_READY_BEHAVIOR, null, StorageProfileReadyBehavior::NO_IMPACT);
 	}
 	
 	/* Cache Invalidation */
