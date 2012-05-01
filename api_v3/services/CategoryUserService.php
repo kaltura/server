@@ -29,7 +29,17 @@ class CategoryUserService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);						
 		
 		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryUser->categoryId, kCurrentContext::$ks_kuser_id);
-		if($currentKuserCategoryKuser && $currentKuserCategoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MANAGER)
+		if (!kEntitlementUtils::getEntitlementEnforcement())
+		{
+			//set default status: batch partner - set to pending, other - set to active
+			if ($this->getPartnerId() == partner::BATCH_PARTNER_ID)
+				$dbCategoryKuser->setStatus(CategoryKuserStatus::PENDING);
+			else
+				$dbCategoryKuser->setStatus(CategoryKuserStatus::ACTIVE);
+				
+			$dbCategoryKuser->setPermissionLevel($categoryUser->permissionLevel);
+		}
+		elseif ($currentKuserCategoryKuser && $currentKuserCategoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MANAGER)
 		{
 			//Current Kuser is manager
 			$dbCategoryKuser->setStatus(CategoryKuserStatus::ACTIVE);
@@ -327,6 +337,21 @@ class CategoryUserService extends KalturaBaseService
 		$response->totalCount = $totalCount;
 		
 		return $response;
+	}
+	
+	/**
+	 * Copy all memeber from parent category
+	 * 
+	 * @action copyCategoryUsersFromParent
+	 * @param int $categoryId
+	 */
+	public function copyCategoryUsersFromParentAction($categoryId)
+	{
+		$categoryDb = categoryPeer::retrieveByPK($categoryId);
+		if (!$categoryDb)
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
+			
+		//TODO
 	}
 	
 	/*public function index()
