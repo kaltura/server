@@ -315,6 +315,10 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			    $propertyElement->setAttribute("type", "string");
 			    $propertyElement->setAttribute("enumType", $property->getType());
 			}
+			else if ($propType == 'KalturaObject')
+			{
+			    $propertyElement->setAttribute("type", 'KalturaObjectBase');
+			}
 			else
 			{
 			    $propertyElement->setAttribute("type", $propType);

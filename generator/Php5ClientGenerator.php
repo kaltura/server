@@ -303,9 +303,6 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			else
 				$propType = $propertyNode->getAttribute("type");
 				
-			if($propType == 'KalturaObject')
-				$propType = 'KalturaObjectBase';
-				
 			$propDescription = $propertyNode->getAttribute("description");
 			
 			$this->appendLine("	/**");
