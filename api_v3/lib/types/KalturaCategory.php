@@ -49,7 +49,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @readonly
-	 * @filter order,eq,likex,in
+	 * @filter eq,likex,in
 	 */
 	public $fullName;
 	
@@ -58,7 +58,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @readonly
-	 * @filter order,eq,likex
+	 * @filter eq,likex
 	 */
 	public $fullIds;
 	
