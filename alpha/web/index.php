@@ -185,25 +185,6 @@ function checkCache()
 				header("Pragma:");
 				header("Content-Type: $content_type");
 				
-				$name_of_file = pathinfo($file_name, PATHINFO_FILENAME);
-				//$local_file_name = str_replace("/web//content/entry/tempthumb/", "/opt/kaltura/cache/content/entry/tempthumb/", $file_name);
-				$local_file_name = kConf::get('general_cache_dir').DIRECTORY_SEPARATOR.'content/entry/tempthumb/'.$name_of_file;
-
-				if (!file_exists($local_file_name))
-				{
-					$dirname = pathinfo($local_file_name, PATHINFO_DIRNAME);
-					if (!file_exists($dirname) || !is_dir($dirname))
-						mkdir($dirname, 0755, true);
-						
-					copy($file_name, $local_file_name);
-					
-					// if copy succeeded use local file
-					if (file_exists($local_file_name))
-						$file_name = $local_file_name;
-				}
-				else
-					$file_name = $local_file_name;
-				
 				$chunk_size = 100000;
 				$fh = fopen($file_name, "rb");
 				if ($fh)
