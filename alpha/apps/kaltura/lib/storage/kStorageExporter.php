@@ -169,7 +169,14 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	{
 		$checkFileSyncsKeys = self::getEntrySyncKeys($entry, $externalStorage);
 		foreach($checkFileSyncsKeys as $key)
-			self::export($entry, $externalStorage, $key);
+		{
+			if(self::shouldExport($key, $externalStorage)) {
+				self::export($entry, $externalStorage, $key);
+			}
+			else {
+				KalturaLog::log("no need to export key [$key] to externalStorage id[" . $externalStorage->getId() . "]");
+			}			
+		}
 	}
 	
 	/* (non-PHPdoc)
