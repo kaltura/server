@@ -47,7 +47,7 @@ class KImageMagickCropper extends KBaseCropper
 //			$ext = self::$imageExtByType[$type];
 //			
 //		$targetPath = kFile::replaceExt($targetPath, $ext);
-			
+		
 		parent::__construct($srcPath, $targetPath);
 	}
 	
@@ -57,8 +57,8 @@ class KImageMagickCropper extends KBaseCropper
 
 		$exifData = @exif_read_data($this->srcPath);
 		$orientation = isset($exifData["Orientation"]) ? $exifData["Orientation"] : 1;
-
-		if(!is_null($forceRotation)) {
+		
+		if(isset($forceRotation)) {
 			switch($forceRotation){
 			case 0:  // do noting
 				break;
@@ -78,7 +78,7 @@ class KImageMagickCropper extends KBaseCropper
 			$attributes[] = "-density ".$density;
 			$attributes[] = "-units PixelsPerInch ";
 		}
-		
+				
 		switch($orientation)
 		{
 			case 1: // nothing
@@ -151,7 +151,7 @@ class KImageMagickCropper extends KBaseCropper
 		}
 				
 		// crop or resize
-	if($width || $height)
+		if($width || $height)
 		{
 			switch($cropType)
 			{
@@ -277,10 +277,10 @@ class KImageMagickCropper extends KBaseCropper
 					break;
 			}
 		}
-
+		
 		if(!count($attributes))
 			return null;
-			
+
 		$options = implode(' ', $attributes);
 		return "\"$this->cmdPath\" \"$this->srcPath\" $options \"$this->targetPath\"";
 	}
