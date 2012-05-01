@@ -127,7 +127,8 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
                 else 
                 {
                     $bulkUploadResult->objectId = $this->calculateIdToUpdate($bulkUploadResult);
-                }    		    
+                } 
+
 		        break;
 		    
 		    case KalturaBulkUploadAction::DELETE:
@@ -157,13 +158,6 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 			$this->addBulkUploadResult($bulkUploadResult);
 			return;
 		}	
-
-		if ($bulkUploadResult->relativePath)
-		{
-		    $fullNameId = $this->calculateParentId($bulkUploadResult->relativePath);
-		    
-		    $this->mapFullNameToId[$bulkUploadResult->relativePath] = $fullNameId;
-		}
 		
 		return $bulkUploadResult;
 	}
@@ -180,9 +174,8 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 	 */
 	protected function createObjects()
 	{
-		// start a multi request for add entries
-		$this->kClient->startMultiRequest();
-		
+		// Because the bulk upload feature may be used to construct a category tree, we are unable to work with an ordinary multi-request.
+		$requestResults = array();
 		KalturaLog::info("job[{$this->job->id}] start creating categories");
 		$bulkUploadResultChunk = array(); // store the results of the created entries
 				
@@ -198,9 +191,16 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
         					
         			$bulkUploadResultChunk[] = $bulkUploadResult;
         			
-        			$this->impersonate();
-        			$this->kClient->category->add($category);
-        			$this->unimpersonate();
+        			try 
+        			{
+            			$this->impersonate();
+            			$requestResults[] = $this->kClient->category->add($category);
+            			$this->unimpersonate();
+        			}
+        			catch (Exception $e)
+        			{
+        			    $requestResults[] = $e;
+        			}
         			
 		            break;
 		        
@@ -209,19 +209,32 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
         					
         			$bulkUploadResultChunk[] = $bulkUploadResult;
         			
-        			$this->impersonate();
-        			$this->kClient->category->update($bulkUploadResult->objectId, $category);
-        			$this->unimpersonate();
-        			
+        			try 
+        			{
+            			$this->impersonate();
+            			$requestResults[] = $this->kClient->category->update($bulkUploadResult->objectId, $category);
+            			$this->unimpersonate();
+        			}
+		            catch (Exception $e)
+        			{
+        			    $requestResults[] = $e;
+        			}
         			
 		            break;
 		            
 		        case KalturaBulkUploadAction::DELETE:
 		            $bulkUploadResultChunk[] = $bulkUploadResult;
         			
-        			$this->impersonate();
-        			$this->kClient->category->delete($bulkUploadResult->objectId);
-        			$this->unimpersonate();
+		            try 
+		            {
+            			$this->impersonate();
+            			$requestResults[] = $this->kClient->category->delete($bulkUploadResult->objectId);
+            			$this->unimpersonate();
+		            }
+		            catch (Exception $e)
+        			{
+        			    $requestResults[] = $e;
+        			}
         			
 		            break;
 		        
@@ -231,20 +244,9 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		            break;
 		    }
 		    
-		    if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
-			{
-				// make all the media->add as the partner
-				$requestResults = $this->kClient->doMultiRequest();
-				
-				$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
-				$this->checkAborted();
-				$this->kClient->startMultiRequest();
-				$bulkUploadResultChunk = array();
-			}
 		}
 		
 		// make all the category actions as the partner
-		$requestResults = $this->kClient->doMultiRequest();
 		
 		if(count($requestResults))
 			$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
@@ -261,7 +263,9 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 	    $category = new KalturaCategory();
 	    $category->name = $bulkUploadCategoryResult->name;
 	    //calculate parentId of the category
-	    $category->parentId = $this->mapFullNameToId[$bulkUploadCategoryResult->relativePath];
+	    if ($bulkUploadCategoryResult->relativePath)
+	        $category->parentId = $this->calculateParentId($bulkUploadCategoryResult->relativePath);
+	        
 	    if ($bulkUploadCategoryResult->tags)
 	        $category->tags = $bulkUploadCategoryResult->tags;
 	        
