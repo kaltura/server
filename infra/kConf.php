@@ -98,8 +98,8 @@ class kConf
 		if($mapName == 'local')
 			return self::$map;
 		
-		if(isset(self::$map[$mapName]))
-			return self::$map[$mapName];
+//		if(isset(self::$map[$mapName]))
+//			return self::$map[$mapName];
 		
 		$configDir = realpath(dirname(__file__) . '/../configurations');
 		if(!file_exists("$configDir/$mapName.ini"))
@@ -123,7 +123,7 @@ class kConf
 						continue;
 						
 					$config = new Zend_Config_Ini("$configPath/$iniFile");
-					self::$map[$mapName] = array_merge_recursive(self::$map[$mapName], $config->toArray());
+					self::$map[$mapName] = self::mergeConfigItem(self::$map[$mapName], $config->toArray(), false);
 				}
 				$configDir->close();
 			}
@@ -153,6 +153,44 @@ class kConf
 	public static function getDB()
 	{
 		return self::getMap('db');
+	}
+
+	/**
+	 * @param array $srcConfig
+	 * @param array $newConfig
+	 * @param bool $valuesOnly
+	 * @return array
+	 */
+	protected static function mergeConfigItem(array $srcConfig, array $newConfig, $valuesOnly)
+	{
+		$returnedConfig = $srcConfig;
+		
+		if($valuesOnly)
+		{
+			foreach($srcConfig as $key => $value)
+			{
+				if(!$newConfig[$key]) // nothing to append
+					continue;
+				elseif(is_array($value))
+					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly);
+				else
+					$returnedConfig[$key] = $srcConfig[$key] . ',' . $newConfig[$key];
+			}
+		}
+		else
+		{
+			foreach($newConfig as $key => $value)
+			{
+				if(!$srcConfig[$key])
+					$returnedConfig[$key] = $newConfig[$key];
+				elseif(is_array($value))
+					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly);
+				else
+					$returnedConfig[$key] = $srcConfig[$key] . ',' . $newConfig[$key];
+			}
+		}
+		
+		return $returnedConfig;
 	}
 }
 
