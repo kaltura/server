@@ -98,8 +98,8 @@ class kConf
 		if($mapName == 'local')
 			return self::$map;
 		
-//		if(isset(self::$map[$mapName]))
-//			return self::$map[$mapName];
+		if(isset(self::$map[$mapName]))
+			return self::$map[$mapName];
 		
 		$configDir = realpath(dirname(__file__) . '/../configurations');
 		if(!file_exists("$configDir/$mapName.ini"))
