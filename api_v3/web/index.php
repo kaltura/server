@@ -13,7 +13,7 @@ ActKeyUtils::checkCurrent();
 KalturaLog::setContext("API");
 
 KalturaLog::debug(">------------------------------------- api_v3 -------------------------------------");
-KalturaLog::info("API-start ");
+KalturaLog::info("API-start pid:".getmypid());
 
 $controller = KalturaFrontController::getInstance();
 $controller->run();
