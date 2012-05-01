@@ -757,6 +757,10 @@ class playManifestAction extends kalturaAction
 		
 		$baseUrl = $this->entry->getStreamUrl();
 		$baseUrl = rtrim($baseUrl, '/');
+
+		$rtmpHost = parse_url($baseUrl, PHP_URL_HOST);
+		$urlManager = $this->getUrlManagerByCdn($rtmpHost);
+		
 		$flavors = $this->entry->getStreamBitrates();
 		if(count($flavors))
 		{
@@ -774,8 +778,8 @@ class playManifestAction extends kalturaAction
 		if (strpos($this->protocol, "rtmp") === 0)
 			$baseUrl = $this->protocol . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
 		
-		$rtmpHost = parse_url($baseUrl, PHP_URL_HOST);
-		$urlManager = $this->getUrlManagerByCdn($rtmpHost);
+		$urlManager->finalizeUrls($baseUrl, $flavors);
+
 		$this->tokenizer = $urlManager->getTokenizer();
 
 		return $flavors;

@@ -219,6 +219,8 @@ class kUrlManager
 			if ($tokenizer)
 			{
 				$url = $tokenizer->tokenizeSingleUrl($url);
+				if (class_exists('KalturaResponseCacher'))
+					KalturaResponseCacher::disableCache();
 			}
 		}
 		return $url;
@@ -284,7 +286,12 @@ class kUrlManager
 	 */
 	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
 	{
-	}	
+		if (isset($this->params['enforce_rtmpe']) && $this->params['enforce_rtmpe'])
+		{
+			$baseUrl = preg_replace('/^rtmp:\/\//', 'rtmpe://', $baseUrl);
+			$baseUrl = preg_replace('/^rtmpt:\/\//', 'rtmpte://', $baseUrl);
+		}
+	}
 
 	/**
 	 * @param asset $asset
@@ -307,6 +314,8 @@ class kUrlManager
 				if ($tokenizer)
 				{
 					$url = $tokenizer->tokenizeSingleUrl($url);
+					if (class_exists('KalturaResponseCacher'))
+						KalturaResponseCacher::disableCache();
 				}
 			}
 		}
