@@ -72,9 +72,10 @@ class categoryKuser extends BasecategoryKuser {
 			
 			if($this->status == CategoryKuserStatus::ACTIVE)
 				$category->setMembersCount($category->getMembersCount() + 1);
+			
+			$category->save();
 		}
-		
-		if (($this->isColumnModified(categoryKuserPeer::STATUS) && !$this->isNew()))
+		elseif($this->isColumnModified(categoryKuserPeer::STATUS))
 		{
 			if($this->status == CategoryKuserStatus::PENDING)
 				$category->setPendingMembersCount($category->getPendingMembersCount() + 1);
@@ -87,6 +88,8 @@ class categoryKuser extends BasecategoryKuser {
 			
 			if($this->old_status == CategoryKuserStatus::ACTIVE)
 				$category->setMembersCount($category->getMembersCount() - 1);
+				
+			$category->save();
 		}
 		
 		return parent::preSave($con);

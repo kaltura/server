@@ -8,30 +8,31 @@ class kIndexAdvancedFilter extends AdvancedSearchFilterItem
 	/**
 	 * @var string
 	 */
-	protected $indexIdGreaterThanOrEqual = null;
+	protected $indexIdGreaterThan = null;
 
 	/* (non-PHPdoc)
 	 * @see AdvancedSearchFilterItem::apply()
 	 */
 	public function apply(baseObjectFilter $filter, IKalturaDbQuery $query)
 	{
-		$query->addColumnWhere('id', $this->indexIdGreaterThanOrEqual, Criteria::GREATER_THAN);
+		if (!is_null($this->indexIdGreaterThan))
+			$query->addColumnWhere('id', $this->indexIdGreaterThan, Criteria::GREATER_THAN);
 	}
 	
 	/**
-	 * @return string $indexIdGreaterThanOrEqual
+	 * @return string $indexIdGreaterThan
 	 */
-	public function getIndexIdGreaterThanOrEqual()
+	public function getIndexIdGreaterThan()
 	{
-		return $this->indexIdGreaterThanOrEqual;
+		return $this->indexIdGreaterThan;
 	}
 
 	/**
-	 * @param string $indexIdGreaterThanOrEqual
+	 * @param string $indexIdGreaterThan
 	 */
-	public function setIndexIdGreaterThanOrEqual($indexIdGreaterThanOrEqual)
+	public function setIndexIdGreaterThan($indexIdGreaterThan)
 	{
-		$this->indexIdGreaterThanOrEqual = $indexIdGreaterThanOrEqual;
+		$this->indexIdGreaterThan = $indexIdGreaterThan;
 	}
 
 	

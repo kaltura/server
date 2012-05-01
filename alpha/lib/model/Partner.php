@@ -36,8 +36,6 @@ class Partner extends BasePartner
 	//this is not enforced anymore, but for default pager size when listing ctagoeries (since we didn't have pager before flacon)
 	const MAX_NUMBER_OF_CATEGORIES = 1000;
 	
-	const CATEGORIES_LOCK_TIMEOUT = 300; // in seconds
-	
 	// added by Tan-Tan, 06/10/09
 	const PARTNER_TYPE_KMC = 1;
 	const PARTNER_TYPE_OTHER = 2;
@@ -406,6 +404,88 @@ class Partner extends BasePartner
 		
 	public function getForceCdnHost()	{		return $this->getFromCustomData( "forceCdnHost" , null, false  );	}
 	public function setForceCdnHost( $v )	{		return $this->putInCustomData( "forceCdnHost", $v );	}	
+	
+	public function getFeaturesStatus()	{		return $this->getFromCustomData( "featuresStatus" , null, array() );	}
+	public function setFeaturesStatus( $v )	{		return $this->putInCustomData( "featuresStatus", $v );	}	
+	
+	public function addFeaturesStatus($type, $value)
+	{
+		$newFeatureStatus = new featureStatus();
+		$newFeatureStatus->setStatusType($type);
+		$newFeatureStatus->setStatusValue($value);
+		
+		$featuresStatus = $this->getFeaturesStatus();
+		$featuresStatus[$newFeatureStatus->getStatusType()] = $newFeatureStatus;
+		
+		$this->setFeaturesStatus($featuresStatus);
+		$this->save();
+	}
+	
+	public function removeFeaturesStatus($type)
+	{
+		$featuresStatus = $this->getFeaturesStatus();
+		if(isset($featuresStatus[$type]))
+			unset($featuresStatus[$type]);
+		
+		$this->setFeaturesStatus($featuresStatus);
+		$this->save();
+	}
+	
+	public function getFeaturesStatusByType($type)
+	{
+		$featuresStatus = $this->getFeaturesStatus();
+		
+		if(isset($featuresStatus[$type]))
+			return $featuresStatus[$type];
+			
+		return null;
+	}
+	
+	
+	public function incrementFeaturesStatusByType($type)
+	{
+		$featuresStatus = $this->getFeaturesStatus();
+		if(isset($featuresStatus[$type]))
+		{
+			$featureStatus  = $featuresStatus[$type];
+			$featuresStatus->setStatusValue($featuresStatus->getStatusValue() + 1);
+			$featuresStatus[$type] = $featureStatus;
+		}else {
+			$featureStatus = new featureStatus();
+			$featureStatus->setStatusType($type);
+			$featureStatus->setStatusValue(1);
+			$featuresStatus[$type] = $featureStatus;
+		}
+		
+		$this->setFeaturesStatus($featuresStatus);
+		$this->save();
+	}
+	
+	public function decrementFeaturesStatusByType($type)
+	{
+		$featuresStatus = $this->getFeaturesStatus();
+
+		if(isset($featuresStatus[$type]))
+		{
+			$featureStatus = $featuresStatus[$type];
+
+			if ($featureStatus->getStatusValue() > 1 )
+			{
+				$featureStatus  = $featuresStatus[$type];
+				$featureStatus->setStatusValue($featureStatus->getStatusValue() - 1);
+				
+				$featuresStatus[$type] = $featureStatus;
+			}
+			else
+			{
+				unset($featuresStatus[$type]);
+			}
+		}
+
+		$this->setFeaturesStatus($featuresStatus);
+		$this->save();
+	}
+	
 		
 	/**
 	 * @return bool
@@ -448,10 +528,13 @@ class Partner extends BasePartner
 
 	public function getAddEntryMaxFiles() { return $this->getFromCustomData("addEntryMaxFiles", null, myFileUploadService::MAX_FILES); }
 	public function setAddEntryMaxFiles( $v ) { $this->putInCustomData("addEntryMaxFiles", (int)$v); }
-
+	
 	private function getCategoriesLockTime() { return $this->getFromCustomData("categoriesLockTime", null, 0); }
 	private function setCategoriesLockTime( $v ) { $this->putInCustomData("categoriesLockTime", (int)$v); }
-
+		
+	private function getCategoriesLock() { return $this->getFromCustomData("categoriesLock", 'category', false); }
+	private function setCategoriesLock( $v ) { $this->putInCustomData("categoriesLock", (bool)$v, 'category'); }
+	
 	public function getAdSupported() { return $this->getFromCustomData("adSupported", null, 0); }
 	public function setAdSupported( $v ) { $this->putInCustomData("adSupported", (int)$v); } 
 
@@ -595,27 +678,19 @@ class Partner extends BasePartner
 	
 	public function lockCategories()
 	{
-		$this->setCategoriesLockTime(time());
+		$this->setCategoriesLock(true);
 		$this->save();
 	}
 	
 	public function unlockCategories()
 	{
-		$this->setCategoriesLockTime(0);
+		$this->setCategoriesLock(false);
 		$this->save();
-	}
+	}	
 	
 	public function isCategoriesLocked()
 	{
-		if ($this->getCategoriesLockTime() + self::CATEGORIES_LOCK_TIMEOUT > time())
-		{
-			return true;
-		}
-		else
-		{
-			$this->unlockCategories();
-			return false;
-		}
+		return $this->getCategoriesLock();
 	}
 
 	public function getOpenId ()
