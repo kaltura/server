@@ -6,7 +6,7 @@
  * @package plugins.bulkUpload
  * @subpackage services
  */
-class BulkService extends KalturaBaseService implements IAliasService
+class BulkService extends KalturaBaseService
 {
 	const PARTNER_DEFAULT_CONVERSION_PROFILE_ID = -1;
 	
@@ -345,13 +345,6 @@ class BulkService extends KalturaBaseService implements IAliasService
 		return $ret;
 	}
 	
-	/* (non-PHPdoc)
-     * @see IExtensionService::getPluginName()
-     */
-    public static function getServiceId ()
-    {
-        return "bulkUpload_bulkUpload";
-    }
 
 
 }
