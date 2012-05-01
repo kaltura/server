@@ -240,13 +240,11 @@ class KalturaErrors extends APIErrors
 	
 	const PARENT_CATEGORY_NOT_FOUND = "PARENT_CATEGORY_NOT_FOUND,Parent category id \"%s\" not found";
 	
-	const PARTNER_CATEGORIES_LOCKED = "PARTNER_CATEGORIES_LOCKED,Partner categories are locked";
-	
 	const DUPLICATE_CATEGORY = "DUPLICATE_CATEGORY,The category \"%s\" already exists";
 	
 	const PARENT_CATEGORY_IS_CHILD = "PARENT_CATEGORY_IS_CHILD,The parent category \"%s\" is one of the childs for category \"%s\"";
 	
-	const CATEGORIES_LOCKED = "CATEGORIES_LOCKED,Categories are locked, lock will be automatically released in \"%s\" seconds";
+	const CATEGORIES_LOCKED = "CATEGORIES_LOCKED,Categories are locked";
 	
 	const CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET = "CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET,Cannot inherit members when parent category is not set";
 	

@@ -21,23 +21,19 @@ class CategoryService extends KalturaBaseService
 	 */
 	function addAction(KalturaCategory $category)
 	{		
-		if ($this->getPartner()->isCategoriesLocked())
-			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED, Partner::CATEGORIES_LOCK_TIMEOUT);
+		if ($category->parentId != null && //batch to index categories or to move categories might miss this category to be moved or index
+			$this->getPartner()->getFeaturesStatusByType(FeatureStatusType::CATEGORY_LOCK))
+			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
 			
 		try
 		{
-			$this->getPartner()->lockCategories();
-
 			$categoryDb = new category();
 			$category->toInsertableObject($categoryDb);
 			$categoryDb->setPartnerId($this->getPartnerId());
 			$categoryDb->save();
-			
-			$this->getPartner()->unlockCategories();
 		}
 		catch(Exception $ex)
 		{
-			$this->getPartner()->unlockCategories();
 			if ($ex instanceof kCoreException)
 				$this->handleCoreException($ex, $categoryDb, $category);
 			else
@@ -78,10 +74,16 @@ class CategoryService extends KalturaBaseService
 	 */
 	function updateAction($id, KalturaCategory $category)
 	{		
+		//it is possible to not all of the sub tree is updated, 
+		//and updateing fileds that will add batch job to reindex categories - might not update all sub categories.
+		if ($category->parentId != null && //batch to index categories or to move categories might miss this category to be moved or index
+			$this->getPartner()->getFeaturesStatusByType(FeatureStatusType::CATEGORY_LOCK))
+			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
+			
 		$categoryDb = categoryPeer::retrieveByPK($id);
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
-			
+
 		$category->id = $id; // for KalturaCategory->ValidateForUpdate
 		
 		if (kEntitlementUtils::getEntitlementEnforcement())
@@ -91,30 +93,21 @@ class CategoryService extends KalturaBaseService
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
-					
-		if ($this->getPartner()->isCategoriesLocked())
-			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED, Partner::CATEGORIES_LOCK_TIMEOUT);
-			
-		
+
 		$category->toUpdatableObject($categoryDb);
 		
-		$this->getPartner()->lockCategories();	
 		try
 		{
-			
 			$categoryDb->save();
-			
-			$this->getPartner()->unlockCategories();
-			
 		}
 		catch(Exception $ex)
 		{
-			$this->getPartner()->unlockCategories();
 			if ($ex instanceof kCoreException)
 				$this->handleCoreException($ex, $categoryDb, $category);
 			else
 				throw $ex;
 		}
+		
 		$category = new KalturaCategory();
 		$category->fromObject($categoryDb);
 		return $category;
@@ -128,6 +121,9 @@ class CategoryService extends KalturaBaseService
 	 */
 	function deleteAction($id)
 	{
+		if ($this->getPartner()->getFeaturesStatusByType(FeatureStatusType::CATEGORY_LOCK))
+			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
+			
 		$categoryDb = categoryPeer::retrieveByPK($id);
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
@@ -139,7 +135,18 @@ class CategoryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
 		
-		$categoryDb->setDeletedAt(time());		
+		$this->getPartner()->addFeaturesStatus(FeatureStatusType::CATEGORY_LOCK, 1);
+		
+		try
+		{
+			$categoryDb->setDeletedAt(time());	
+			$this->getPartner()->removeFeaturesStatus(FeatureStatusType::CATEGORY_LOCK);
+		}
+		catch(Exception $ex)
+		{
+			$this->getPartner()->removeFeaturesStatus(FeatureStatusType::CATEGORY_LOCK);
+			throw $ex;
+		}
 	} 
 	
 	/**
@@ -236,5 +243,16 @@ class CategoryService extends KalturaBaseService
 			default:
 				throw $ex;
 		}
+	}
+	
+	/**
+	 * Unlock categories - this is only for debuging - and should not be uploaded in flacon version
+	 * 
+	 * @action unlockCategories
+	 */
+	function unlockCategoriesAction()
+	{
+		//TODO - remove this action! should not be uploaded in Falcon version, this is only for QA and front team to make work easy
+		$this->getPartner()->removeFeaturesStatus(FeatureStatusType::CATEGORY_LOCK);
 	}
 }

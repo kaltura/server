@@ -164,7 +164,8 @@ class CategoryUserService extends KalturaBaseService
 		if((!$currentKuserCategoryKuser || 
 			($currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&
 			 kCurrentContext::$ks_uid != $userId)) &&
-			 kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
+			 kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID &&
+			 kEntitlementUtils::getEntitlementEnforcement())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER);
 		
 		if($dbCategoryKuser->getKuserId() == $category->getKuserId() &&

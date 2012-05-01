@@ -329,5 +329,31 @@ class PartnerService extends KalturaBaseService
 		$response->totalCount = count($partnersArray);
 		return $response;
 	}
+	
+	/**
+	 * List partners statuses
+	 * 
+	 * @action listFeatureStatus
+	 * @return KalturaFeatureStatusListResponse
+	 */
+	function listFeatureStatusAction()
+	{
+		if (is_null($this->getKs()) || is_null($this->getPartner()) || !$this->getPartnerId())
+			throw new KalturaAPIException(APIErrors::MISSING_KS);
+			
+		$dbPartner = $this->getPartner();
+		if ( ! $dbPartner )
+			throw new KalturaAPIException ( APIErrors::UNKNOWN_PARTNER_ID , $this->getPartnerId() );
+			
+		$dbFeaturesStatus = $dbPartner->getFeaturesStatus();
+		
+		$featuresStatus = KalturaFeatureStatusArray::fromFeatureStatusArray($dbFeaturesStatus);
+		
+		$response = new KalturaFeatureStatusListResponse();
+		$response->objects = $featuresStatus;
+		$response->totalCount = count($featuresStatus);
+		
+		return $response;
+	}
 
 }

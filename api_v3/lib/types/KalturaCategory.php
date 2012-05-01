@@ -49,7 +49,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @readonly
-	 * @filter eq,likex,in
+	 * @filter order,eq,likex,in
 	 */
 	public $fullName;
 	
@@ -58,7 +58,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @readonly
-	 * @filter eq,likex
+	 * @filter order,eq,likex
 	 */
 	public $fullIds;
 	
@@ -384,8 +384,9 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		
 		if (!is_null($sourceObject))
 		{
-			//TODO - CHECK LOCK!
-			//throw new KalturaAPIException(KalturaErrors::CATEGORY_IS_LOCKED);
+			$partner = PartnerPeer::retrieveByPK(kCurrentContext::$ks_partner_id);
+			if (!$partner || $partner->getFeaturesStatusByType(FeatureStatusType::CATEGORY_LOCK))
+				throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);		
 		}
 
 		if ($this->owner && $this->owner != '')

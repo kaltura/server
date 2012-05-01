@@ -30,7 +30,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	public $partnerId;
 	
 	/**
-	 * Partner id
+	 * Permission level
 	 * 
 	 * @var KalturaCategoryUserPermissionLevel
 	 * @filter eq,in
