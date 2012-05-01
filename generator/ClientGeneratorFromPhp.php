@@ -276,6 +276,7 @@ abstract class ClientGeneratorFromPhp
       			$serviceActionItemToAdd->actionMap[$actionId] = $actionReflector;
       			
       			$actionParams = $actionReflector->getActionParams();
+      			
       			foreach ($actionParams as $actionParam)
       			{
       			    if ($actionParam->isComplexType())
@@ -583,7 +584,7 @@ abstract class ClientGeneratorFromPhp
 		// now fill recursively the childs
 		foreach($typesTree as $baseType => $null)
 		{
-			$this->loadChildsForInheritance($types, $baseType, $typesTree);
+			$this->loadChildrenForInheritance($types, $baseType, $typesTree);
 		}
 		
 		// use the tree to sort the types
@@ -615,17 +616,17 @@ abstract class ClientGeneratorFromPhp
 	    }
 	}
 	
-	private function loadChildsForInheritance(array $types, $parentType, array &$typesTree)
+	private function loadChildrenForInheritance(array $types, $parentType, array &$typesTree)
 	{
-		$typesTree[$parentType] = $this->getChildsForParentType($types, $parentType);
+		$typesTree[$parentType] = $this->getChildrenForParentType($types, $parentType);
 		
 		foreach($typesTree[$parentType] as $childClass => $null)
 		{
-			$this->loadChildsForInheritance($types, $childClass, $typesTree[$parentType]);
+			$this->loadChildrenForInheritance($types, $childClass, $typesTree[$parentType]);
 		}
 	}
 	
-	private function getChildsForParentType(array $types, $parentType)
+	private function getChildrenForParentType(array $types, $parentType)
 	{
 		$childs = array();
 		foreach($types as $type)
