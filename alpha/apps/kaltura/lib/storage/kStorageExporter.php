@@ -187,7 +187,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		return false;
 	}
 	
-	public function exportSourceAssetFromJob(BatchJob $dbBatchJob)
+	public static function exportSourceAssetFromJob(BatchJob $dbBatchJob)
 	{
 		// convert profile finished - export source flavor
 		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)

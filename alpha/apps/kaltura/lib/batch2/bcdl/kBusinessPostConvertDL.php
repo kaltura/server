@@ -271,8 +271,7 @@ class kBusinessPostConvertDL
 			
 			if($exportOriginalAsset && $rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 			{
-        		$storageExporter = new kStorageExporter();
-        		$storageExporter->exportSourceAssetFromJob($rootBatchJob);
+        		kStorageExporter::exportSourceAssetFromJob($rootBatchJob);
 			}
 			else
 			{

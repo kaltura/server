@@ -222,7 +222,7 @@ return array(
 	'Kaltura_Client_Enum_StorageServePriority::EXTERNAL_ONLY' => 'External Storage Only',
 	'Kaltura_Client_Enum_StorageServePriority::EXTERNAL_FIRST' => 'External Storage First',
 
-    'Kaltura_Client_Enum_StorageProfileReadyBehavior::NO_EFFECT' => 'No Effect',
+    'Kaltura_Client_Enum_StorageProfileReadyBehavior::NO_IMPACT' => 'No Effect',
     'Kaltura_Client_Enum_StorageProfileReadyBehavior::REQUIRED' => 'Required',
 
 	'Kaltura_Client_Enum_DistributionProfileStatus::ENABLED' => 'Enabled',
