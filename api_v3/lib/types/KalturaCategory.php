@@ -49,7 +49,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @readonly
-	 * @filter order,eq,likex
+	 * @filter order,eq,likex,in
 	 */
 	public $fullName;
 	
@@ -218,7 +218,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	public $status;
 	
 	/**
-	 * Status
+	 * the category id that this category inherit its members and members permission (for contribution and join)
 	 * 
 	 * @var int
 	 * @readonly
@@ -319,10 +319,6 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			$parentCategoryDb = categoryPeer::retrieveByPK($this->parentId);
 			if (!$parentCategoryDb)
 				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_NOT_FOUND, $this->parentId);
-
-				
-			if(false)//TODO - GET PARTNER AND CHECK IF LOCK.
-				throw new KalturaAPIException(KalturaErrors::PARTNER_CATEGORIES_LOCKED);
 		}
 		elseif ($this->inheritanceType == KalturaInheritanceType::INHERIT)
 		{

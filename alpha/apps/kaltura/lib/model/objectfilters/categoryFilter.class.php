@@ -18,6 +18,7 @@ class categoryFilter extends baseObjectFilter
 			"_in_parent_id",
 			"_eq_full_name",
 			"_likex_full_name",
+			"_in_full_name",
 			"_eq_depth",
 			"_gte_created_at",
 			"_lte_created_at",
