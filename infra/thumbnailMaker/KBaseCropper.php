@@ -55,7 +55,7 @@ abstract class KBaseCropper
 		if(is_null($bgcolor))
 			$bgcolor = 0;
 		
-		$cmd = $this->getCommand($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density, $forceRotation = null);
+		$cmd = $this->getCommand($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density, $forceRotation);
 		if($cmd)
 		{
 			KalturaLog::info("Executing: $cmd");
