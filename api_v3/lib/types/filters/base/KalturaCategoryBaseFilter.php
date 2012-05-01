@@ -14,6 +14,7 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 		"parentIdIn" => "_in_parent_id",
 		"depthEqual" => "_eq_depth",
 		"fullNameEqual" => "_eq_full_name",
+		"fullNameIn" => "_in_full_name",
 		"fullNameStartsWith" => "_likex_full_name",
 		"fullIdsEqual" => "_eq_full_ids",
 		"fullIdsStartsWith" => "_likex_full_ids",
@@ -117,6 +118,13 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $fullNameEqual;
+	
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $fullNameIn;
 
 	/**
 	 * 
