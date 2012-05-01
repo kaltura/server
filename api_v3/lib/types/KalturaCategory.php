@@ -357,7 +357,6 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			$this->validateParentId();
 			
 		$this->validateCategory($sourceObject);
-
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
@@ -383,10 +382,10 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			}
 		}
 		
-		if (!is_null($sourceObject) && $sourceObject->getLock())
+		if (!is_null($sourceObject))
 		{
-			
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_IS_LOCKED);
+			//TODO - CHECK LOCK!
+			//throw new KalturaAPIException(KalturaErrors::CATEGORY_IS_LOCKED);
 		}
 
 		if ($this->owner && $this->owner != '')
