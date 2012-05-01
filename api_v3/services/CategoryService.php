@@ -74,15 +74,16 @@ class CategoryService extends KalturaBaseService
 	 */
 	function updateAction($id, KalturaCategory $category)
 	{		
-		//it is possible to not all of the sub tree is updated, 
-		//and updateing fileds that will add batch job to reindex categories - might not update all sub categories.
-		if ($category->parentId != null && //batch to index categories or to move categories might miss this category to be moved or index
-			$this->getPartner()->getFeaturesStatusByType(FeatureStatusType::CATEGORY_LOCK))
-			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
-			
 		$categoryDb = categoryPeer::retrieveByPK($id);
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
+			
+		//it is possible to not all of the sub tree is updated, 
+		//and updateing fileds that will add batch job to reindex categories - might not update all sub categories.
+		//batch to index categories or to move categories might miss this category to be moved or index
+		if (($category->parentId != null && $category->parentId !=  $categoryDb->getParentId()) && 
+			$this->getPartner()->getFeaturesStatusByType(FeatureStatusType::CATEGORY_LOCK))
+			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
 
 		$category->id = $id; // for KalturaCategory->ValidateForUpdate
 		
