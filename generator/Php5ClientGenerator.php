@@ -302,6 +302,10 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 				$propType = $propertyNode->getAttribute("enumType");
 			else
 				$propType = $propertyNode->getAttribute("type");
+				
+			if($propType == 'KalturaObject')
+				$propType = 'KalturaObjectBase';
+				
 			$propDescription = $propertyNode->getAttribute("description");
 			
 			$this->appendLine("	/**");

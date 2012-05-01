@@ -255,6 +255,9 @@ class KalturaTypeReflector
 	 */
 	public function getParentTypeReflector()
 	{
+		if($this->_type == 'KalturaObject')
+			return null;
+			
 	    $reflectClass = new ReflectionClass($this->_type);
 	    $parentClass = $reflectClass->getParentClass();
 	    if (!$parentClass)
