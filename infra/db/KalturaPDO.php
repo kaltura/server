@@ -69,7 +69,7 @@ class KalturaPDO extends PropelPDO
 		if(!self::$comment)
 		{
 			$uniqueId = new UniqueId();
-			self::$comment = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : '');
+			self::$comment = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
 			self::$comment .= "[$uniqueId]";
 		}
 		

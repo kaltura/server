@@ -682,7 +682,7 @@ $this->benchmarkStart( "beforeImpl" );
 			$this->service_config = myPartnerUtils::getServiceConfig( $partner );			
 		}
 		
-		kCurrentContext::$host = @$_SERVER["HOSTNAME"];
+		kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
 		kCurrentContext::$user_ip = requestUtils::getRemoteAddress();
 		kCurrentContext::$ps_vesion = "ps2";
 		kCurrentContext::$service = "partnerservices2";

@@ -93,7 +93,7 @@ class KalturaDispatcher
 
 		$serviceInstance = $actionReflector->getServiceInstance();
 		
-		kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : null);
+		kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
 		kCurrentContext::$user_ip = requestUtils::getRemoteAddress();
 		kCurrentContext::$ps_vesion = "ps3";
 		kCurrentContext::$service = $reflector->serviceInfo->serviceName;

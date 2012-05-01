@@ -60,10 +60,10 @@ class kConf
 		$localConfig = parse_ini_file("$configDir/local.ini", true);
 		$config = array_merge_recursive($config, $localConfig);
 		
-		if(isset($_SERVER["HOSTNAME"]))
+		$hostname = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
+		if($hostname)
 		{
-			$hostName = $_SERVER["HOSTNAME"];
-			$localConfigFile = "$hostName.ini";
+			$localConfigFile = "$hostname.ini";
 			
 			$configPath = "$configDir/hosts";
 			$configDir = dir($configPath);
@@ -108,10 +108,10 @@ class kConf
 		$config = new Zend_Config_Ini("$configDir/$mapName.ini");
 		self::$map[$mapName] = $config->toArray();
 	
-		if(isset($_SERVER["HOSTNAME"]))
+		$hostname = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
+		if($hostname)
 		{
-			$hostName = $_SERVER["HOSTNAME"];
-			$localConfigFile = "$hostName.ini";
+			$localConfigFile = "$hostname.ini";
 			
 			$configPath = "$configDir/hosts/$mapName";
 			if(file_exists($configPath) && is_dir($configPath)){			
