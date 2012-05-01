@@ -321,6 +321,10 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				$this->data = new KalturaCaptureThumbJobData();
 				break;
 				
+			case 'kMoveCategoryEntriesJobData':
+			    $this->data = new KalturaMoveCategoryEntriesJobData();
+			    break;
+
 			case 'kIndexJobData':
 				$this->data = new KalturaIndexJobData();
 				break;
