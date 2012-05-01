@@ -682,13 +682,6 @@ class myEntryUtils
 		$basePath = myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $tempThumbName, $entryThumbFilename , $version );
 		$tempThumbPath = $contentPath.$basePath;
 		
-		$cachedTempThumbPath = myContentStorage::getFSCacheRootPath().$basePath;
-		if (file_exists($cachedTempThumbPath))
-		{
-			header("X-Kaltura:cached-local-thumb-exists,".md5($cachedTempThumbPath));
-			return $cachedTempThumbPath;
-		}
-
 		if (file_exists($tempThumbPath))
 		{
 			header("X-Kaltura:cached-thumb-exists,".md5($tempThumbPath));
