@@ -6,7 +6,6 @@
 class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 {
 	protected $cmdPath;
-	
 	/**
 	 * @param string $filePath
 	 * @param string $cmdPath
@@ -19,8 +18,14 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 	
 	public function createThumnail($position = null, $width = null, $height = null, $frameCount = 1, $targetType = "image2", $dar = null)
 	{
+		if(!isset($frameCount))
+			$frameCount = 1;
+		if(!isset($targetType))
+			$targetType = "image2";		
 		KalturaLog::debug("position[$position], width[$width], height[$height], frameCount[$frameCount], frameCount[$frameCount], dar[$dar]");
-		
+		if(isset($dar) && $dar>0 && isset($height)){
+			$width = round($height*$dar);
+		}
 		// TODO - calculate the width and height according to dar
 		$cmdArr = $this->getCommand($position, $width, $height, $frameCount, $targetType);
 
