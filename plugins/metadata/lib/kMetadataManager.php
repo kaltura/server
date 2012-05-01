@@ -139,6 +139,19 @@ class kMetadataManager
 			}
 			
 			$xPathData = $xPaths[$xPath];
+			
+			if($profileField->getStatus() != MetadataProfileField::STATUS_ACTIVE && 
+				isset($xPathData['type']) &&
+				($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_DATE || 
+				 $xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_INT))
+			{
+				$availableSearchIndex = self::getAvailableSearchIndex($partnerId, $metadataProfile->getObjectType());
+				if (!isset($availableSearchIndex))
+					throw new Exception('could not find available search index');
+										
+				$profileField->setSearchIndex($availableSearchIndex);
+			}
+			
 			$profileField->setStatus(MetadataProfileField::STATUS_ACTIVE);
 			$profileField->setMetadataProfileVersion($metadataProfile->getVersion());
 			if(isset($xPathData['name']))
@@ -147,6 +160,9 @@ class kMetadataManager
 				$profileField->setLabel($xPathData['label']);
 			if(isset($xPathData['type']))
 				$profileField->setType($xPathData['type']);
+			
+			
+				
 			$profileField->save();
 			
 			unset($xPaths[$xPath]);
