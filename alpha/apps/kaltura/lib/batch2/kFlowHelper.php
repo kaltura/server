@@ -1909,4 +1909,26 @@ class kFlowHelper
 				break;
 		}
 	}
+	
+	public static function handleIndexFinished(BatchJob $dbBatchJob, kIndexJobData $data, $twinJob)
+	{
+		$featureStatusToRemove = $data->getFeatureStatusToRemove();
+		if($featureStatusToRemove)
+		{
+			$dbBatchJob->getPartner()->decrementFeaturesStatusByType($featureStatusToRemove->getStatusType());
+		}
+		
+		return $dbBatchJob;
+	}
+		
+	public static function handleIndexFailed(BatchJob $dbBatchJob, kIndexJobData $data, $twinJob)
+	{
+		$featureStatusToRemove = $data->getFeatureStatusToRemove();
+		if($featureStatusToRemove)
+		{
+			$dbBatchJob->getPartner()->decrementFeaturesStatusByType($featureStatusToRemove->getStatusType());
+		}
+		
+		return $dbBatchJob;
+	}
 }

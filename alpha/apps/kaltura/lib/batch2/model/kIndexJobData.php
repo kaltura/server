@@ -24,6 +24,12 @@ class kIndexJobData extends kJobData
 	private $shouldUpdate;
 	
 	/**
+	 * Indicates that the job locked .
+	 * @var featureStatus
+	 */
+	private $featureStatusToRemove = null;
+	
+	/**
 	 * @return baseObjectFilter $filter
 	 */
 	public function getFilter()
@@ -69,5 +75,21 @@ class kIndexJobData extends kJobData
 	public function setShouldUpdate($shouldUpdate)
 	{
 		$this->shouldUpdate = $shouldUpdate;
+	}
+	
+	/**
+	 * @return int featureStatus
+	 */
+	public function getFeatureStatusToRemove()
+	{
+		return $this->featureStatusToRemove;
+	}
+
+	/**
+	 * @param featureStatus $featureStatusToRemove
+	 */
+	public function setFeatureStatusToRemove($featureStatusToRemove)
+	{
+		$this->featureStatusToRemove = $featureStatusToRemove;
 	}
 }

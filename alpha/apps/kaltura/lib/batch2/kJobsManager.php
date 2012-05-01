@@ -30,6 +30,7 @@ class kJobsManager
 	{
 		$batchJob->setStatus($status);
 		$changed = $batchJob->save();
+		
 		if(!$changed)
 			return $batchJob;
 		
@@ -873,11 +874,12 @@ class kJobsManager
 	 * @param bool $shouldUpdate Indicates that the object columns and attributes values should be recalculated before reindexed
 	 * @return BatchJob
 	 */
-	public static function addIndexJob($partnerId, $objectType, baseObjectFilter $filter, $shouldUpdate)
+	public static function addIndexJob($partnerId, $objectType, baseObjectFilter $filter, $shouldUpdate, $featureStatusToRemove = null)
 	{
 	    $jobData = new kIndexJobData();
  		$jobData->setFilter($filter);
  		$jobData->setShouldUpdate($shouldUpdate);
+ 		$jobData->setFeatureStatusToRemove($featureStatusToRemove);
  		
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
