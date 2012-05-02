@@ -92,8 +92,11 @@ class categoryEntry extends BasecategoryEntry {
 				categoryPeer::setUseCriteriaFilter(true);
 			}
 
-			$entry->removeCategory($category->getFullName());
-			$entry->save();
+			if(!categoryEntryPeer::getSkipSave())
+			{
+				$entry->removeCategory($category->getFullName());
+				$entry->save();
+			}
 		}
 	}
 	

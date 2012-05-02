@@ -55,10 +55,9 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		
 		return self::doSelect($c);
 	}
-	
-	public static function syncEntriesCategories(entry $entry)
-	{		
 		
+	public static function syncEntriesCategories(entry $entry)
+	{					 
 		//TODO save on entry only with no privacy context 
 		self::$skipEntrySave = true;
 		
@@ -82,7 +81,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 			$newCats[] = $dbCategory->getFullName();
 		}
 		
-		array_unique($newCats);
+		$newCats = array_unique($newCats);
 		
 		$allIds = array();
 		$allCats = array();
@@ -120,8 +119,9 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		
 		foreach ( $remainingCats as $cat ) 
 		{
-			
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			$category = categoryPeer::getByFullNameExactMatch ( $cat );
+			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			if ($category) 
 			{
 				if($category->getPrivacyContext() == '' || $category->getPrivacyContext() == null)
@@ -139,17 +139,26 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		
 		foreach ( $addedCats as $cat )
 		{
-			
 			$category = categoryPeer::getByFullNameExactMatch ( $cat );
 			if (!$category)
 			{
-				
 				KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 				$unentitedCategory = categoryPeer::getByFullNameExactMatch ( $cat );
 				KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 
 				if(!$unentitedCategory)
+				{
 					$category = category::createByPartnerAndFullName ( $entry->getPartnerId (), $cat );
+				}
+			}
+			else
+			{
+				$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($category->getId(), kCurrentContext::$ks_kuser_id);
+				if(kEntitlementUtils::getEntitlementEnforcement() && (!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
+				{
+					//user is not entitled to add entry to this category
+					$category = null;
+				}
 			}
 				
 			if (!$category)
@@ -185,16 +194,34 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		{
 			$category = categoryPeer::getByFullNameExactMatch ( $cat );
 
-			if ($category){
+			if ($category)
+			{
 				$categoryEntryToDelete = categoryEntryPeer::retrieveByCategoryIdAndEntryId($category->getId(), $entry->getId());
 				if($categoryEntryToDelete)
 				{
-					$categoryEntryToDelete->setEntryCategoriesRemovedIds($alreadyRemovedCatIds);
-					$categoryEntryToDelete->delete();
+					$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntryToDelete->getCategoryId(), kCurrentContext::$ks_kuser_id);
+					if(kEntitlementUtils::getEntitlementEnforcement() && (!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
+					{
+						//not entiteld to delete - should be set back on the entry.
+						$allCats[] = $category->getFullName();
+						$allIds[] = $category->getId ();
+					}
+					else
+					{
+						$categoryEntryToDelete->setEntryCategoriesRemovedIds($alreadyRemovedCatIds);
+						$categoryEntryToDelete->delete();
+					}
 				}
 				
-				$alreadyRemovedCatIds [] = $category->getId ();
+				$alreadyRemovedCatIds[] = $category->getId ();
 				$alreadyRemovedCatIds = array_merge ( $alreadyRemovedCatIds, $category->getAllParentsIds () );
+			}
+			else
+			{
+				//
+				//category was not found - it could be 
+				$allCats[] = $category->getFullName();
+				$allIds[] = $category->getId ();
 			}
 		}
 		self::$skipEntrySave = false;

@@ -21,6 +21,7 @@ class KalturaCategoryUserBaseFilter extends KalturaFilter
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"updateMethodEqual" => "_eq_update_method",
+		"updateMethodIn" => "_in_update_method",
 	);
 
 	private $order_by_map = array
@@ -131,4 +132,11 @@ class KalturaCategoryUserBaseFilter extends KalturaFilter
 	 * @var KalturaUpdateMethodType
 	 */
 	public $updateMethodEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $updateMethodIn;
 }

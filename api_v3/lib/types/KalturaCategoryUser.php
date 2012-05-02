@@ -68,7 +68,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	 * Update method can be either manual or automatic to distinguish between manual operations (for example in KMC) on automatic - using bulk upload 
 	 * 
 	 * @var KalturaUpdateMethodType
-	 * @filter eq
+	 * @filter eq, in
 	 */
 	public $updateMethod;
 	
