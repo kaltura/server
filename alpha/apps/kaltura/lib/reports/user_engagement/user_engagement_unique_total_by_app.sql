@@ -2,7 +2,7 @@
 SELECT COUNT(DISTINCT user_id) unique_known_users,
 COUNT(DISTINCT entry_id) unique_videos
 FROM 
-	dwh_hourly_events_context_entry_user_app, dwh_dim_applications ap
+	dwh_hourly_events_context_entry_user_app ev, dwh_dim_applications ap
 WHERE 	{OBJ_ID_CLAUSE}
 	AND {OBJ_CAT_NAME}
 	AND ap.name = {APPLICATION_NAME}
