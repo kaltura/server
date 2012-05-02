@@ -29,6 +29,8 @@ class categoryKuserFilter extends baseObjectFilter
 				"_in_membership_setting",
 				"_eq_status",
 				"_in_status",
+				"_eq_permission_level",
+				"_in_permission_level",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name");
