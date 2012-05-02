@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Consumer to disable caching after an object is saved.
+ *
+ */
 class KalturaCacheDisabler implements kObjectSavedEventConsumer
 {
 	public function objectSaved(BaseObject $object)
