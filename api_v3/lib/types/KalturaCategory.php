@@ -389,7 +389,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 				throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);		
 		}
 
-		if ($this->owner && $this->owner != '')
+		if ($this->owner && $this->owner != '' && !($this->owner instanceof KalturaNullField) )
 		{
 			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->owner);
 			if (!$kuser)
