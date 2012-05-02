@@ -41,6 +41,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
+		$useCloser = $this->taskConfig->params->useCloser;
 		if ($useCloser)
 		{
 			// if closer is used, the file will be download to a temporary directory, and then moved to its final destination by the KAsyncFileSyncImportCloser batch
