@@ -73,11 +73,10 @@ class CategoryEntryService extends KalturaBaseService
 		if (!$category)
 			throw new APIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
 		
-		//validate user is entiteld to assign entry to this category 
+		//validate user is entiteld to remove entry from category 
 		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, kCurrentContext::$ks_kuser_id);
 		if(kEntitlementUtils::getEntitlementEnforcement() && (!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
 			throw new ApiException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
-			
 			
 		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
 		if(!$dbCategoryEntry)
