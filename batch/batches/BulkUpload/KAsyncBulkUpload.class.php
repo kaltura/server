@@ -110,16 +110,16 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 		$job = $engine->getJob();
 		$data = $engine->getData();
 
-		$countHandledEntries = $this->countCreatedEntries($job->id);
+		$countHandledObjects = $this->countCreatedObjects($job->id, $job->data->bulkUploadObjectType);
 		
-		if(!$countHandledEntries)
+		if(!$countHandledObjects)
 			throw new KalturaBatchException("No entries were handled successfully", KalturaBatchJobAppErrors::BULK_NO_ENTRIES_HANDLED);
 			
 		if($engine->shouldRetry())
 		{
 			KalturaLog::debug("Set the job to retry");
 			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
-			return $this->closeJob($job, null, null, "Handled [$countHandledEntries] entries", KalturaBatchJobStatus::RETRY);
+			return $this->closeJob($job, null, null, "Handled [$countHandledObjects] objects of type [". $job->data->$bulkUploadObjectType ."]", KalturaBatchJobStatus::RETRY);
 		}
 			
 		return $this->closeJob($job, null, null, 'Waiting for imports and conversion', KalturaBatchJobStatus::ALMOST_DONE, $data);
@@ -130,8 +130,8 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 	 * @param int $jobId
 	 * @return int
 	 */
-	protected function countCreatedEntries($jobId) 
+	protected function countCreatedObjects($jobId, $bulkuploadObjectType) 
 	{
-		return $this->kClient->batch->countBulkUploadEntries($jobId);
+		return $this->kClient->batch->countBulkUploadEntries($jobId, $bulkuploadObjectType);
 	}
 }
