@@ -347,7 +347,7 @@ class PartnerService extends KalturaBaseService
 			
 		$dbFeaturesStatus = $dbPartner->getFeaturesStatus();
 		
-		$featuresStatus = KalturaFeatureStatusArray::fromFeatureStatusArray($dbFeaturesStatus);
+		$featuresStatus = KalturaFeatureStatusArray::fromDbArray($dbFeaturesStatus);
 		
 		$response = new KalturaFeatureStatusListResponse();
 		$response->objects = $featuresStatus;
