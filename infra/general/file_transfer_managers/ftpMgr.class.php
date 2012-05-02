@@ -158,10 +158,10 @@ class ftpMgr extends kFileTransferMgr
 	protected function doFileSize($remote_file)
 	{
 	    $remote_file = ltrim($remote_file,'/');
-	    $size = ftp_size($this->getConnection(), $remote_file);
-		KalturaLog::debug("size [" . print_r($size, true) . "]");
-	    if($size > 0)
-	    	return $size;
+//	    $size = ftp_size($this->getConnection(), $remote_file);
+//		KalturaLog::debug("size [" . print_r($size, true) . "]");
+//	    if($size > 0)
+//	    	return $size;
 	    	
 	    $filesInfo = ftp_rawlist($this->getConnection(), dirname($remote_file));
 		KalturaLog::debug("ftp rawlist [" . print_r($filesInfo, true) . "]");
