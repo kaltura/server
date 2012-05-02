@@ -146,10 +146,14 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		KalturaLog::debug('Executing CURL to get directory contents for ['.$sourceUrl.']');
 		$curlWrapper = new KCurlWrapper($sourceUrl);	
 		$contents = $curlWrapper->exec();
-		if ($contents === false) {
-			$msg = 'Error: ' . $curlWrapper->getError();
+		$curlError = $curlWrapper->getError();
+		$curlErrorNumber = $curlWrapper->getErrorNumber();
+		$curlWrapper->close();
+		
+		if ($contents === false || $curlError) {
+			$msg = "Error: $curlError";
 			KalturaLog::err($msg);
-			$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlWrapper->getErrorNumber(), $msg, KalturaBatchJobStatus::RETRY);
+			$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlErrorNumber, $msg, KalturaBatchJobStatus::RETRY);
 			return false;
 		}
 		$contents = unserialize($contents); // if an exception is thrown, it will be catched in fetchUrl
@@ -282,19 +286,21 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 			
 		KalturaLog::debug("Executing curl for downloading file at [$sourceUrl]");
 		$res = $curlWrapper->exec($fileDestination); // download file
+		$curlError = $curlWrapper->getError();
+		$curlErrorNumber = $curlWrapper->getErrorNumber();
+		$curlWrapper->close();
+		
 		KalturaLog::debug("Curl results: $res");
 
 		// handle errors
-		if (!$res || $curlWrapper->getError())
+		if (!$res || $curlError)
 		{
-			$errNumber = $curlWrapper->getErrorNumber();
-			if($errNumber != CURLE_OPERATION_TIMEOUTED)
+			if($curlErrorNumber != CURLE_OPERATION_TIMEOUTED)
 			{
 				// an error other than timeout occured  - cannot continue (timeout is handled with resuming)
-				$msg = 'Error: ' . $curlWrapper->getError();
+				$msg = "Error: $curlError";
 				KalturaLog::err($msg);
-				$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, $msg, KalturaBatchJobStatus::RETRY);
-				$curlWrapper->close();
+				$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlErrorNumber, $msg, KalturaBatchJobStatus::RETRY);
 				return false;
 			}
 			else
@@ -306,17 +312,14 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 				if($actualFileSize == $resumeOffset)
 				{
 					// no downloading was done at all - error
-					$msg = 'Error: ' . $curlWrapper->getError();
+					$msg = "Error: $curlError";
 					KalturaLog::err($msg);
-					$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, $msg, KalturaBatchJobStatus::RETRY);
-					$curlWrapper->close();
+					$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlErrorNumber, $msg, KalturaBatchJobStatus::RETRY);
 					return false;
 				}
 			}
 		}
 		
-		$curlWrapper->close();
-			
 		if(!file_exists($fileDestination))
 		{
 			// destination file does not exist for an unknown reason
@@ -433,17 +436,24 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		$curlWrapper = new KCurlWrapper($url);
 		$curlHeaderResponse = $curlWrapper->getHeader();
 		$curlError = $curlWrapper->getError();
+		$curlErrorNumber = $curlWrapper->getErrorNumber();
 		$curlWrapper->close();
 		
-		if(!$curlHeaderResponse || $curlError)
+		if(!$curlHeaderResponse || !count($curlHeaderResponse->headers))
 		{
 			// error fetching headers
-			$msg = 'Error: ' . $curlWrapper->getError();
+			$msg = "Error: $curlError";
 			KalturaLog::err($msg);
-			$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlWrapper->getErrorNumber(), $msg, KalturaBatchJobStatus::RETRY);
+			$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlErrorNumber, $msg, KalturaBatchJobStatus::RETRY);
 			return false;
 		}
-			
+	
+    	if($curlError)
+    	{
+    		KalturaLog::err("Headers error: $curlError");
+    		KalturaLog::err("Headers error number: $curlErrorNumber");
+    	}
+    			
 		if(!$curlHeaderResponse->isGoodCode())
 		{
 			// some error exists in the response
