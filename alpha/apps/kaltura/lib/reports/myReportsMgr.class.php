@@ -16,6 +16,7 @@ class myReportsMgr
 	const REPORT_TYPE_WIDGETS_STATS = 8;
 	const REPORT_TYPE_ADMIN_CONSOLE = 10;
 	const REPORT_TYPE_USER_ENGAGEMENT = 11;
+	const REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE = 110;
 	const SPEFICIC_USER_ENGAGEMENT = 12;
 	const REPORT_TYPE_USER_TOP_CONTENT = 13;
 	const REPORT_TYPE_USER_CONTENT_DROPOFF = 14;
@@ -26,6 +27,10 @@ class myReportsMgr
 	
 	const REPORTS_COUNT_CACHE = 60;
 	
+	const COUNT_PLAYS_HEADER = "count_plays";
+	const UNIQUE_USERS = "unique_known_users";
+	const UNIQUE_VIDEOS = "unique_videos";
+	const PLAYS_LIMIT = 10000; 
 
 	public static function runQuery ( $query_file , $map , $debug = false )
 	{
@@ -195,7 +200,6 @@ class myReportsMgr
 	public static function getTotal ( $partner_id , $report_type , reportsInputFilter $input_filter , $object_ids = null  )
 	{
 		$start = microtime ( true );
-//		$partner_id = "23456";
 		
 		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_TOTAL , $input_filter , null , null , null , $object_ids );
 		if ( count($result) > 0 )
@@ -209,12 +213,33 @@ class myReportsMgr
 				$data[] = $value;
 			}
 			$res = array ( $header , $data );
+			if ($input_filter instanceof endUserReportsInputFilter) 
+			{
+				$count_plays =	$res[self::COUNT_PLAYS_HEADER];
+				if ($count_plays > self::PLAYS_LIMIT) {
+					$header[]= self::UNIQUE_USERS;
+					$data[] = -1;
+					$header[]= self::UNIQUE_VIDEOS;
+					$data[] = -1;	
+				} else {
+					$result  = self::executeQueryByType( $partner_id , $report_type * 10 , self::REPORT_FLAVOR_TOTAL , $input_filter , null , null , null , $object_ids );
+					$row = $result[0];
+			
+					foreach ( $row as $name => $value )
+					{
+						$header[]= $name;
+						$data[] = $value;
+					}			
+				}
+			}
+			$res = array ( $header , $data );
 		}
 		else
 		{
 //			return $result[0]; // for total - there is only a single record
 			$res = array ( null , null );
-		}	
+		}
+			
 		$end = microtime(true);
 		KalturaLog::log( "getTotal took [" . ( $end - $start ) . "]" );
 		
@@ -264,6 +289,7 @@ class myReportsMgr
 //print_r ( $header );
 //die();			
 			$res = array ( $header , $data , $total_count );
+			
 		}
 		else
 		{
@@ -459,10 +485,33 @@ class myReportsMgr
 			$entryFilter = new entryFilter();
 			$shouldSelectFromSearchEngine = false;
 			
+			$category_ids_clause = "1=1"; 
 			if ($input_filter->categories)
 			{
-				$entryFilter->set("_matchand_categories", $input_filter->categories);
-				$shouldSelectFromSearchEngine = true;
+				if ($input_filter instanceof endUserReportsInputFilter)
+				{
+					$categoryFilter = new categoryFilter();
+					$categoryFilter->set("_in_full_name", $input_filter->categories);
+					$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+					$categoryFilter->attachToCriteria($c);
+					$c->applyFilters();
+				
+					$categoryIdsFromDB = $c->getFetchedIds();
+				
+				
+					if (count($categoryIdsFromDB))
+					{
+						$categoryIds = implode(",", $categoryIdsFromDB);
+					    $category_ids_clause = "ev.context_id in ( $categoryIds )";
+					}
+						
+				}
+				else 
+				{ 
+					$entryFilter->set("_matchand_categories", $input_filter->categories);
+					$shouldSelectFromSearchEngine = true;
+				}
+				
 			}
 			
 			if ($input_filter->keywords)
@@ -533,7 +582,7 @@ class myReportsMgr
 			if ( is_numeric( $report_type ))
 				$order_by = self::getOrderBy( self::$type_map[$report_type] , $order_by );
 			
-			$query = self::getReplacedSql( $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause );
+			$query = self::getReplacedSql( $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause, $category_ids_clause );
 			if ( is_numeric( $report_type ))
 				$query_header = "/* -- " . self::$type_map[$report_type] . " " . self::$flavor_map[$report_flavor] . " -- */\n";
 			else 
@@ -575,6 +624,7 @@ class myReportsMgr
 		self::REPORT_TYPE_WIDGETS_STATS => "widgets_stats" ,
 		self::REPORT_TYPE_ADMIN_CONSOLE => "admin_console" ,
 		self::REPORT_TYPE_USER_ENGAGEMENT => "user_engagement",
+		self::REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
 		self::SPEFICIC_USER_ENGAGEMENT => "specific_user_engagement",
 		self::REPORT_TYPE_USER_TOP_CONTENT => "user_top_content",
 		self::REPORT_TYPE_USER_CONTENT_DROPOFF => "user_content_dropoff", 
@@ -736,7 +786,7 @@ class myReportsMgr
 	}
 	
 	private static function getReplacedSql ( $sql_content , $partner_id , reportsInputFilter $input_filter , 
-		$page_size , $page_index  , $order_by , $obj_ids_clause = null )
+		$page_size , $page_index  , $order_by , $obj_ids_clause = null, $cat_ids_clause = null)
 	{
 		// TODO - format the search_text according to the the $input_filter
 		$search_text_match_clause = "1=1"; //self::setSearchFieldsAndText ( $input_filter );
@@ -756,7 +806,7 @@ class myReportsMgr
 		}
 
 		$obj_ids_str = $obj_ids_clause ? $obj_ids_clause : "1=1";
-		
+		$cat_ids_str = $cat_ids_clause ? $cat_ids_clause : "1=1";
 		// the diff between user and server timezones 
 		$time_shift = round($input_filter->timeZoneOffset / 60);
 		
@@ -795,6 +845,7 @@ class myReportsMgr
 				"{OBJ_ID_CLAUSE}" , 
 				"{CATEGORIES_MATCH}" , 
 				"{TIME_SHIFT}" , 
+				"{CAT_ID_CLAUSE}" ,
 			);
 			
 		$values = 
@@ -814,6 +865,7 @@ class myReportsMgr
 				$obj_ids_str , 
 				$categories_match_clause,
 				$time_shift,
+				$cat_ids_str,
 			);
 				
 		if ( $input_filter->extra_map )
@@ -1010,6 +1062,8 @@ class endUserReportsInputFilter extends reportsInputFilter
 	
 	public function getFilterBy() {
 		$filterBy = ""; 
+		if ($this->categories) 
+			$filterBy = "_by_context";
 		if ($this->userIds) 
 			$filterBy = "_by_user";
 		if ($this->application)

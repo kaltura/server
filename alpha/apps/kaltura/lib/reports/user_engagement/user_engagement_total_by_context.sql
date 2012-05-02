@@ -4,12 +4,9 @@ SUM(sum_time_viewed) sum_time_viewed,
 SUM(sum_time_viewed)/SUM(count_plays) avg_time_viewed,
 SUM(count_loads) count_loads,
 (SUM(count_plays) / SUM(count_loads)) load_play_ratio
-
 FROM 
-	dwh_hourly_events_context_app, dwh_dim_application ap
+	dwh_hourly_events_context_app
 WHERE 	{CAT_ID_CLAUSE}
-	AND ap.name = {APPLICATION_NAME}
-	AND ap.application_id = ev.application_id
 	AND partner_id =  {PARTNER_ID} # PARTNER_ID
 	AND date_id BETWEEN IF({TIME_SHIFT}>0,(DATE({FROM_DATE_ID}) - INTERVAL 1 DAY)*1, {FROM_DATE_ID})  
     			AND     IF({TIME_SHIFT}<=0,(DATE({TO_DATE_ID}) + INTERVAL 1 DAY)*1, {TO_DATE_ID})

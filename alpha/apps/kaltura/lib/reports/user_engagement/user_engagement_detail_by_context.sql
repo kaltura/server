@@ -19,7 +19,9 @@ FROM
 		( SUM(count_plays) / SUM(count_loads) ) load_play_ratio
 	FROM 
 		dwh_hourly_events_context_entry_user_app ev
-	WHERE 	{OBJ_ID_CLAUSE} # ev.entry_id in 
+	WHERE 	
+	    {OBJ_ID_CLAUSE} # ev.entry_id in 
+		AND {CAT_ID_CLAUSE}
 		AND partner_id =  {PARTNER_ID} # PARTNER_ID
         AND date_id BETWEEN IF({TIME_SHIFT}>0,(DATE({FROM_DATE_ID}) - INTERVAL 1 DAY)*1, {FROM_DATE_ID})  
     			AND     IF({TIME_SHIFT}<=0,(DATE({TO_DATE_ID}) + INTERVAL 1 DAY)*1, {TO_DATE_ID})
@@ -30,6 +32,7 @@ FROM
 		  count_loads > 0 )
 	GROUP BY user_id
 	ORDER BY {SORT_FIELD}
+	LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
 ) AS ev_stats, dwh_dim_pusers us
 WHERE ev_stats.user_id = us.puser_id
-LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
+AND us.partner_id = {PARTNER_ID}

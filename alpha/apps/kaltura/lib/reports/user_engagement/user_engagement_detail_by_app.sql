@@ -18,9 +18,10 @@ FROM
 		SUM(count_loads) count_loads,
 		( SUM(count_plays) / SUM(count_loads) ) load_play_ratio
 	FROM 
-		dwh_hourly_events_entry_user_app ev, dwh_dim_applications ap
+		dwh_hourly_events_context_entry_user_app ev, dwh_dim_applications ap
 	WHERE 	
 	    {OBJ_ID_CLAUSE} # ev.entry_id in 
+		AND {CAT_ID_CLAUSE}
 		AND ap.name = {APPLICATION_NAME}
 		AND ap.application_id = ev.application_id
 		AND partner_id =  {PARTNER_ID} # PARTNER_ID
@@ -33,7 +34,7 @@ FROM
 		  count_loads > 0 )
 	GROUP BY user_id
 	ORDER BY {SORT_FIELD}
+	LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
 ) AS ev_stats, dwh_dim_pusers us
 WHERE ev_stats.user_id = us.puser_id
 AND us.partner_id = {PARTNER_ID}
-LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */

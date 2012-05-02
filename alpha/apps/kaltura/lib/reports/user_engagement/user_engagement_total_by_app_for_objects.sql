@@ -1,4 +1,6 @@
 /* Unique Known Users |  Unique Videos |  Plays | Minutes Viewed | Avg. View time | player impressions  | Impression to play ratio */
+SELECT COUNT(DISTINCT user_id) unique_known_users,
+COUNT(DISTINCT entry_id) unique_videos,
 SUM(count_plays) count_plays,
 SUM(sum_time_viewed) sum_time_viewed,
 SUM(sum_time_viewed)/SUM(count_plays) avg_time_viewed,
@@ -6,8 +8,8 @@ SUM(count_loads) count_loads,
 (SUM(count_plays) / SUM(count_loads)) load_play_ratio
 
 FROM 
-	dwh_hourly_events_context_app, dwh_dim_application ap
-WHERE 	{CAT_ID_CLAUSE}
+	dwh_hourly_events_entry_user_app, dwh_dim_application ap
+WHERE 	{OBJ_ID_CLAUSE}
 	AND ap.name = {APPLICATION_NAME}
 	AND ap.application_id = ev.application_id
 	AND partner_id =  {PARTNER_ID} # PARTNER_ID

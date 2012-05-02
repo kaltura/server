@@ -223,20 +223,48 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"graph" => ""				,
 				"graph_no_text" => "!graph",
 			),
+			"user_engagement_unique" => array (
+				"total_without_filter" => "user_engagement/unique_total_by_context",
+				"total_by_context" => "user_engagement/unique_total_by_context",
+				"total_by_app" => "user_engagement/unique_total_by_app",
+				"total_by_context_by_app" => "user_engagement/unique_total_by_app",
+				"total_by_user" => "user_engagement/unique_total_by_user",
+				"total_by_context_by_user" => "user_engagement/unique_total_by_user",
+				"total_by_user_by_app" => "user_engagement/unique_total_by_user_by_app",
+				"total_by_context_by_user_by_app" => "user_engagement/unique_total_by_context_by_user_by_app",
+				"total_without_filter" => "user_engagement/unique_total_by_context",
+				"total_no_text" => "user_engagement/unique_total_by_context"
+			),
 			"user_engagement" => array (
-				"graph_no_text" => "top_content/graph_no_text",
-				"graph_without_filter" => "top_content/graph_no_filter",
+				"graph_no_text" => "graph_no_text",
+				"graph_without_filter" => "graph_by_context",
+			    "graph_by_context" => "graph_by_context",
+			    "graph_by_context_for_objects" => "graph_by_context_for_objects",
 				"graph_by_user" => "graph_by_user",
+				"graph_by_context_by_user" => "graph_by_user",
 				"graph_by_app" => "graph_by_app",
+				"graph_by_app_for_objects" => "graph_by_app_for_objects",
+				"graph_by_context_by_app" => "graph_by_app",
+			    "graph_by_context_by_app_for_objects" => "graph_by_app_for_objects",
 				"graph_by_user_by_app" => "graph_by_user_by_app",
+			    "graph_by_context_by_user_by_app" => "graph_by_user_by_app",
 				"total_no_text" => "total_no_text",
+				"total_without_filter" => "total_by_context",
+			    "total_by_context" => "total_by_context",
 				"total_by_user" => "total_by_user",
+			    "total_by_context_by_user" => "total_by_user", 
 				"total_by_app" => "total_by_app",
+				"total_by_context_by_app" => "total_by_app",
 				"total_by_user_by_app" => "total_by_user_by_app",
+				"total_by_context_by_user_by_app" => "total_by_user_by_app",
 				"detail_no_text" => "detail_no_text",
 				"detail_by_user" => "detail_by_user",
+			    "detail_by_context_by_user" => "detail_by_user", 
 				"detail_by_app" => "detail_by_app",
+			    "detail_by_context_by_app" => "detail_by_app",
+				"detail_by_context" => "detail_by_context",
 				"detail_by_user_by_app" => "detail_by_user_by_app",	
+				"detail_by_context_by_user_by_app" => "detail_by_user_by_app",
 			),
 			"specific_user_engagement" => array (
 				"detail_by_user" => "detail_by_user",
@@ -303,9 +331,10 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 		} else {
 			if ( $no_text )
 				$flavor_str = $flavor_str . $no_text;
-			if ( $for_objects )	
-				$flavor_str = $flavor_str . $for_objects;
 		}
+		if ( $for_objects )	
+				$flavor_str = $flavor_str . $for_objects;
+		
 			
 		
 			
