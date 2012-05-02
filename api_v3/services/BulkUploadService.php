@@ -60,6 +60,7 @@ class BulkUploadService extends KalturaBaseService
 	 * @param BulkUploadType $bulkUploadType
 	 * @param string $uploadedBy
 	 * @param string $fileName
+	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 */
 	protected function constructJobData ($filePath, $fileName, Partner $partner, $puserId, $uploadedBy, $conversionProfileId = null, BulkUploadType $coreBulkUploadType = null)
 	{
@@ -88,7 +89,7 @@ class BulkUploadService extends KalturaBaseService
 			$check = conversionProfile2Peer::retrieveByPK($conversionProfileId);
 		}
 		if(!$check)
-			throw new APIException(APIErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
+			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
 		
 		$objectData = new kBulkUploadEntryData();
 		$objectData->setConversionProfileId($conversionProfileId);
