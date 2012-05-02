@@ -17,10 +17,10 @@ FROM (SELECT
 		SUM(count_loads) count_loads,
 		( SUM(count_plays) / SUM(count_loads) ) load_play_ratio
 		FROM 
-			dwh_hourly_events_context_entry_user_app ev, dwh_dim_pusers us, , dwh_dim_applications ap
+			dwh_hourly_events_context_entry_user_app ev, dwh_dim_pusers us, dwh_dim_applications ap
 		WHERE 	
 			{OBJ_ID_CLAUSE} # ev.entry_id in 
-			AND ev.partner_id =  {PARTNER_ID} # PARTNER_ID
+			AND ev.partner_id = {PARTNER_ID} # PARTNER_ID
 			AND ev.partner_id = us.partner_id
 			AND us.name = {PUSER_ID}
 			AND us.puser_id = ev.user_id
