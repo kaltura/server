@@ -55,7 +55,7 @@ class KalturaErrors extends APIErrors
 	// %s - service , %s - action
 	const INVALID_SERVICE_CONFIGURATION = "INVALID_SERVICE_CONFIGURATION,Invalid service configuration. Unknown service [%s:%s].";
 	
-	const OBJECT_TYPE_ABSTRACT = "OBJECT_TYPE_ABSTRACT,The object type \"%s\" is abstract, use on of the object implementations";
+	const OBJECT_TYPE_ABSTRACT = "OBJECT_TYPE_ABSTRACT,The object type \"%s\" is abstract, use one of the object implementations";
 	
 	const PROPERTY_VALIDATION_CANNOT_BE_NULL =  "PROPERTY_VALIDATION_CANNOT_BE_NULL,The property \"%s\" cannot be NULL";
 	
