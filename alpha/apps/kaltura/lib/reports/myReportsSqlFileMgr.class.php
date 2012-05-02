@@ -20,7 +20,7 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 			throw new Exception ("Cannot find config for [$type_str] , [$flavor_str]" ); 
 		}
 		
-		$has_filter = ( $input_filter->keywords != "" || $input_filter->categories != "" || $object_ids);
+		$has_filter = ( $input_filter->keywords != "" || $input_filter->categories != "" || $object_ids || $input_filter->getFilterBy() != "");
 		
 		$config = self::getFileNameMappingConfig( 
 			$type_str , 
