@@ -351,46 +351,9 @@ abstract class KBulkUploadEngine
 	 * @param array $requestResults
 	 * @param array $bulkUploadResults
 	 */
-	protected function updateEntriesResults(array $requestResults, array $bulkUploadResults)
+	protected function updateObjectsResults(array $requestResults, array $bulkUploadResults)
 	{
-		$this->kClient->startMultiRequest();
-		KalturaLog::info("Updating " . count($requestResults) . " results");
 		
-		// checking the created entries
-		foreach($requestResults as $index => $requestResult)
-		{
-			$bulkUploadResult = $bulkUploadResults[$index];
-			
-			if(is_array($requestResult) && isset($requestResult['code']))
-			{
-				$bulkUploadResult->entryStatus = $requestResult['code'];
-				$bulkUploadResult->errorDescription = $requestResult['message'];
-				$this->addBulkUploadResult($bulkUploadResult);
-				continue;
-			}
-			
-			if($requestResult instanceof Exception)
-			{
-				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
-				$bulkUploadResult->errorDescription = $requestResult->getMessage();
-				$this->addBulkUploadResult($bulkUploadResult);
-				continue;
-			}
-			
-			if(! ($requestResult instanceof KalturaBaseEntry))
-			{
-				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
-				$bulkUploadResult->errorDescription = "Returned type is " . get_class($requestResult) . ', KalturaMediaEntry was expected';
-				$this->addBulkUploadResult($bulkUploadResult);
-				continue;
-			}
-			
-			// update the results with the new entry id
-			$bulkUploadResult->entryId = $requestResult->id;
-			$this->addBulkUploadResult($bulkUploadResult);
-		}
-		
-		$this->kClient->doMultiRequest();
 	}
 	
 	/**
