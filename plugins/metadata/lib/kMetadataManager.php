@@ -56,8 +56,8 @@ class kMetadataManager
 		if(!$peer)
 			return null;
 			
-		$objectId = $metadata->getObjectId();
-		return $peer->retrieveByPK($objectId);
+		$peer->setPartnerId($metadata->getPartnerId());
+		return $peer->retrieveByPK($metadata->getObjectId());
 	}
 	
 	/**

@@ -5,4 +5,7 @@
  */
 class MetadataPartnerPeer extends PartnerPeer implements IMetadataPeer
 {
+	public function setPartnerId($partnerId)
+	{
+	}
 }
