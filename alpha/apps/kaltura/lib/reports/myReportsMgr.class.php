@@ -216,6 +216,10 @@ class myReportsMgr
 			if ($input_filter instanceof endUserReportsInputFilter) 
 			{
 				$count_plays =	$res[self::COUNT_PLAYS_HEADER];
+				if (count($res) == 1) {
+					$header = array();
+					$data = array();
+				}
 				if ($count_plays > self::PLAYS_LIMIT) {
 					$header[]= self::UNIQUE_USERS;
 					$data[] = -1;
@@ -498,12 +502,13 @@ class myReportsMgr
 				
 					$categoryIdsFromDB = $c->getFetchedIds();
 				
-				
+									
 					if (count($categoryIdsFromDB))
-					{
 						$categoryIds = implode(",", $categoryIdsFromDB);
-					    $category_ids_clause = "ev.context_id in ( $categoryIds )";
-					}
+					else
+						$categoryIds = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
+							
+					$category_ids_clause = "ev.context_id in ( $categoryIds )";
 						
 				}
 				else 
