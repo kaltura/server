@@ -16,6 +16,20 @@ class KalturaObject
 		
 	}
 	
+	/**
+	 * Function tests whether a property on the object is null.
+	 * This can occur in case the property is actually null or if it is instance of type KalturaNullField
+	 * @param string $property
+	 */
+	protected function isNull ($propertyName)
+	{
+	    if (!property_exists(get_class($this), $propertyName) || $this->$propertyName===null || $this->$propertyName instanceof KalturaNullField)
+	    {
+	        return true;
+	    }
+	    return false;
+	}
+	
 	protected function getMapBetweenObjects ( )
 	{
 		return array();
@@ -178,7 +192,7 @@ class KalturaObject
         if (!is_array($propertiesNames))
         {
             $propertyName = $propertiesNames;
-    		if (!property_exists($this, $propertyName) || $this->$propertyName === null || $this->$propertyName instanceof KalturaNullField)
+    		if ($this->isNull($propertyName))
     		{
     			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName($propertyName));
     		}
@@ -188,7 +202,7 @@ class KalturaObject
             $isValidated = false;
             foreach ($propertiesNames as $propertyName)
             {
-                if (property_exists($this, $propertyName) && $this->$propertyName !== null)
+                if (!$this->isNull($propertyName))
                 {
                     if (!$isValidated)
                     {
