@@ -481,7 +481,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/**
 	 * To validate if user is entitled to the category – all needed is to select from the db.
 	 * 
-	 * @throws KalturaAPIException
+	 * @throws KalturaErrors::ENTRY_CATEGORY_FIELD_IS_DEPRECATED
 	 */
 	public function validateCategories()
 	{
