@@ -4,7 +4,7 @@ COUNT(DISTINCT entry_id) unique_videos
 FROM 
 	dwh_hourly_events_context_entry_user_app ev, dwh_dim_applications ap
 WHERE 	{OBJ_ID_CLAUSE}
-	AND {OBJ_CAT_NAME}
+	AND {CAT_ID_CLAUSE}
 	AND ap.name = {APPLICATION_NAME}
 	AND ap.application_id = ev.application_id
 	AND partner_id =  {PARTNER_ID} # PARTNER_ID

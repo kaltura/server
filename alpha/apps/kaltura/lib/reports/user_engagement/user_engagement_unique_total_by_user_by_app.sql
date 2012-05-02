@@ -9,7 +9,7 @@ SUM(count_loads) count_loads,
 FROM 
 	dwh_hourly_events_context_entry_user_app ev, dwh_dim_applications ap, dwh_dim_users us
 WHERE 	{OBJ_ID_CLAUSE}
-	AND {OBJ_CAT_NAME}
+	AND {CAT_ID_CLAUSE}
 	AND ev.partner_id = us.partner_id
 	AND us.name IN {PUSER_ID}
 	AND us.puser_id = ev.user_id
