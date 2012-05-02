@@ -5,7 +5,7 @@
  */
 class KalturaBulkUploadObjectType extends KalturaDynamicEnum implements BulkUploadObjectType
 {
-/**
+	/**
 	 * @return string
 	 */
 	public static function getEnumClass()
