@@ -250,6 +250,10 @@ class KalturaErrors extends APIErrors
 	
 	const NOT_ENTITLED_TO_UPDATE_CATEGORY = "NOT_ENTITLED_TO_UPDATE_CATEGORY, Current User is not entitled to update this category";
 	
+	const CATEGORY_DOES_NOT_HAVE_PARENT_CATEGORY = "CATEGORY_DOES_NOT_HAVE_PARENT_CATEGORY,Category doesn't have parent category";
+	
+	const CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT, Cannot update privacy context";
+	
 	/**
 	 * Batch Service
 	 */
