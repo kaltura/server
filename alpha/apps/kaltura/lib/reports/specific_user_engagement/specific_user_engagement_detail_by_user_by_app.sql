@@ -4,7 +4,6 @@ SELECT en.entry_name entry_name,
 	count_plays,
 	sum_time_viewed,
 	avg_time_viewed,
-	count_plays,
 	count_loads,
 	load_play_ratio
 FROM (SELECT 
@@ -13,7 +12,6 @@ FROM (SELECT
 		SUM(count_plays) count_plays,
 		SUM(sum_time_viewed) sum_time_viewed,
 		SUM(sum_time_viewed)/SUM(count_plays) avg_time_viewed,
-		SUM(count_plays) count_plays,
 		SUM(count_loads) count_loads,
 		( SUM(count_plays) / SUM(count_loads) ) load_play_ratio
 		FROM 
