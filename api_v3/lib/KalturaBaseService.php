@@ -109,7 +109,7 @@ abstract class KalturaBaseService
 		// check if current aciton is allowed and if private partner data access is allowed
 		$allowPrivatePartnerData = false;
 		$actionPermitted = $this->isPermitted($allowPrivatePartnerData);
-		
+
 		// action not permitted at all, not even kaltura network
 		if (!$actionPermitted)
 		{			
@@ -136,14 +136,14 @@ abstract class KalturaBaseService
 	/**
 	 * Check if current action is permitted for current context (ks/partner/user)
 	 * @param bool $allowPrivatePartnerData true if access to private partner data is allowed, false otherwise (kaltura network)
-	 * @throws APIErrors::MISSING_KS
+	 * @throws KalturaErrors::MISSING_KS
 	 */
 	protected function isPermitted(&$allowPrivatePartnerData)
 	{		
 		// if no partner defined but required -> error MISSING_KS
 		if (!$this->partner && $this->partnerRequired($this->actionName))
 		{
-			throw new KalturaAPIException(APIErrors::MISSING_KS);
+			throw new KalturaAPIException(KalturaErrors::MISSING_KS);
 		}
 		
 		// check if actions is permitted for current context
@@ -271,7 +271,7 @@ abstract class KalturaBaseService
 	 * @param int $fileSubType
 	 * @param string $fileName
 	 * @param bool $forceProxy
-	 * @throws KalturaAPIException
+	 * @throws KalturaErrors::FILE_DOESNT_EXIST
 	 */
 	protected function serveFile(ISyncableFile $syncable, $fileSubType, $fileName, $entryId = null, $forceProxy = false)
 	{
