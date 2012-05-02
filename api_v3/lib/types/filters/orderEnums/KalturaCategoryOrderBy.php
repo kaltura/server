@@ -15,6 +15,8 @@ class KalturaCategoryOrderBy extends KalturaStringEnum
 	const CREATED_AT_DESC = "-createdAt";
 	const UPDATED_AT_ASC = "+updatedAt";
 	const UPDATED_AT_DESC = "-updatedAt";
+	const DIRECT_ENTRIES_COUNT_ASC = "+directEntriesCount";
+	const DIRECT_ENTRIES_COUNT_DESC = "-directEntriesCount";
 	const MEMBERS_COUNT_ASC = "+membersCount";
 	const MEMBERS_COUNT_DESC = "-membersCount";
 	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";

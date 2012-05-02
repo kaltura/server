@@ -25,9 +25,9 @@ class kIndexJobData extends kJobData
 	
 	/**
 	 * Indicates that the job locked .
-	 * @var featureStatus
+	 * @var kFeatureStatus
 	 */
-	private $featureStatusToRemove = null;
+	private $featureStatusesToRemove = array();
 	
 	/**
 	 * @return baseObjectFilter $filter
@@ -78,18 +78,18 @@ class kIndexJobData extends kJobData
 	}
 	
 	/**
-	 * @return int featureStatus
+	 * @return int
 	 */
-	public function getFeatureStatusToRemove()
+	public function getFeatureStatusesToRemove()
 	{
-		return $this->featureStatusToRemove;
+		return $this->featureStatusesToRemove;
 	}
 
 	/**
-	 * @param featureStatus $featureStatusToRemove
+	 * @param array $featureStatusesToRemove
 	 */
-	public function setFeatureStatusToRemove($featureStatusToRemove)
+	public function setFeatureStatusesToRemove($featureStatusesToRemove)
 	{
-		$this->featureStatusToRemove = $featureStatusToRemove;
+		$this->featureStatusesToRemove = $featureStatusesToRemove;
 	}
 }

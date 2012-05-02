@@ -872,14 +872,17 @@ class kJobsManager
 	 * @param int $objectType of enum IndexObjectType
 	 * @param baseObjectFilter $filter The filter should return the list of objects that need to be reindexed
 	 * @param bool $shouldUpdate Indicates that the object columns and attributes values should be recalculated before reindexed
+	 * @param array $featureStatusesToRemove - kFeatureStatus to remove when job is finished.
 	 * @return BatchJob
 	 */
-	public static function addIndexJob($partnerId, $objectType, baseObjectFilter $filter, $shouldUpdate, $featureStatusToRemove = null)
+	public static function addIndexJob($partnerId, $objectType, baseObjectFilter $filter, $shouldUpdate, $featureStatusesToRemove = array())
 	{
+		KalturaLog::debug('### ' . __LINE__);
+		
 	    $jobData = new kIndexJobData();
  		$jobData->setFilter($filter);
  		$jobData->setShouldUpdate($shouldUpdate);
- 		$jobData->setFeatureStatusToRemove($featureStatusToRemove);
+ 		$jobData->setFeatureStatusesToRemove($featureStatusesToRemove);
  		
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);

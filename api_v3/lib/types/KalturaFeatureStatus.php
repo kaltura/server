@@ -8,17 +8,17 @@ class KalturaFeatureStatus extends KalturaObject
 	/**
 	 * @var KalturaFeatureStatusType
 	 */
-	public $statusType;
+	public $type;
 	
 	/**
 	 * @var int
 	 */
-	public $statusValue;
+	public $value;
 	
 	private static $map_between_objects = array
 	(
-		"statusType",
-		"statusValue",
+		"type",
+		"value",
 	);
 	
 	public function getMapBetweenObjects ( )

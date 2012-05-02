@@ -405,17 +405,25 @@ class Partner extends BasePartner
 	public function getForceCdnHost()	{		return $this->getFromCustomData( "forceCdnHost" , null, false  );	}
 	public function setForceCdnHost( $v )	{		return $this->putInCustomData( "forceCdnHost", $v );	}	
 	
-	public function getFeaturesStatus()	{		return $this->getFromCustomData( "featuresStatus" , null, array() );	}
-	public function setFeaturesStatus( $v )	{		return $this->putInCustomData( "featuresStatus", $v );	}	
+	public function getFeaturesStatus()	
+	{		
+		$featuresStatus = unserialize($this->getFromCustomData("featuresStatus"));
+		if(!$featuresStatus)
+			return null;
+
+		return $featuresStatus;
+	}
+	
+	public function setFeaturesStatus(array $v ) {		return $this->putInCustomData("featuresStatus", serialize($v) );	}	
 	
 	public function addFeaturesStatus($type, $value)
 	{
-		$newFeatureStatus = new featureStatus();
-		$newFeatureStatus->setStatusType($type);
-		$newFeatureStatus->setStatusValue($value);
+		$newFeatureStatus = new kFeatureStatus();
+		$newFeatureStatus->setType($type);
+		$newFeatureStatus->setValue($value);
 		
 		$featuresStatus = $this->getFeaturesStatus();
-		$featuresStatus[$newFeatureStatus->getStatusType()] = $newFeatureStatus;
+		$featuresStatus[$newFeatureStatus->getType()] = $newFeatureStatus;
 		
 		$this->setFeaturesStatus($featuresStatus);
 		$this->save();
@@ -445,18 +453,19 @@ class Partner extends BasePartner
 	public function incrementFeaturesStatusByType($type)
 	{
 		$featuresStatus = $this->getFeaturesStatus();
+		
 		if(isset($featuresStatus[$type]))
 		{
 			$featureStatus  = $featuresStatus[$type];
-			$featuresStatus->setStatusValue($featuresStatus->getStatusValue() + 1);
+			$featureStatus->setValue($featureStatus->getValue() + 1);
 			$featuresStatus[$type] = $featureStatus;
 		}else {
-			$featureStatus = new featureStatus();
-			$featureStatus->setStatusType($type);
-			$featureStatus->setStatusValue(1);
+			$featureStatus = new kFeatureStatus();
+			$featureStatus->setType($type);
+			$featureStatus->setValue(1);
 			$featuresStatus[$type] = $featureStatus;
 		}
-		
+
 		$this->setFeaturesStatus($featuresStatus);
 		$this->save();
 	}
@@ -469,10 +478,10 @@ class Partner extends BasePartner
 		{
 			$featureStatus = $featuresStatus[$type];
 
-			if ($featureStatus->getStatusValue() > 1 )
+			if ($featureStatus->getValue() > 1 )
 			{
 				$featureStatus  = $featuresStatus[$type];
-				$featureStatus->setStatusValue($featureStatus->getStatusValue() - 1);
+				$featureStatus->setValue($featureStatus->getValue() - 1);
 				
 				$featuresStatus[$type] = $featureStatus;
 			}

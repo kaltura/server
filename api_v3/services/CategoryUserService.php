@@ -347,16 +347,19 @@ class CategoryUserService extends KalturaBaseService
 	/**
 	 * Copy all memeber from parent category
 	 * 
-	 * @action copyCategoryUsersFromParent
+	 * @action copyFromCaregory
 	 * @param int $categoryId
 	 */
-	public function copyCategoryUsersFromParentAction($categoryId)
+	public function copyFromCaregoryAction($categoryId)
 	{
 		$categoryDb = categoryPeer::retrieveByPK($categoryId);
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
-			
-		//TODO
+
+		if($categoryDb->getParentId() == null)
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_DOES_NOT_HAVE_PARENT_CATEGORY);
+		
+		$categoryDb->copyCategoryUsersFromParent($categoryDb->getParentId());
 	}
 	
 	/*public function index()

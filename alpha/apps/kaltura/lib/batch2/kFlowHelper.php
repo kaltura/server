@@ -1912,10 +1912,10 @@ class kFlowHelper
 	
 	public static function handleIndexFinished(BatchJob $dbBatchJob, kIndexJobData $data, $twinJob)
 	{
-		$featureStatusToRemove = $data->getFeatureStatusToRemove();
-		if($featureStatusToRemove)
+		$featureStatusesToRemove = $data->getFeatureStatusesToRemove();
+		foreach($featureStatusesToRemove as $featureStatusToRemove)
 		{
-			$dbBatchJob->getPartner()->decrementFeaturesStatusByType($featureStatusToRemove->getStatusType());
+			$dbBatchJob->getPartner()->decrementFeaturesStatusByType($featureStatusToRemove->getType());
 		}
 		
 		return $dbBatchJob;
@@ -1923,10 +1923,10 @@ class kFlowHelper
 		
 	public static function handleIndexFailed(BatchJob $dbBatchJob, kIndexJobData $data, $twinJob)
 	{
-		$featureStatusToRemove = $data->getFeatureStatusToRemove();
-		if($featureStatusToRemove)
+		$featureStatusesToRemove = $data->getFeatureStatusesToRemove();
+		foreach($featureStatusesToRemove as $featureStatusToRemove)
 		{
-			$dbBatchJob->getPartner()->decrementFeaturesStatusByType($featureStatusToRemove->getStatusType());
+			$dbBatchJob->getPartner()->decrementFeaturesStatusByType($featureStatusToRemove->getType());
 		}
 		
 		return $dbBatchJob;

@@ -19,6 +19,17 @@ class categoryKuser extends BasecategoryKuser {
 	
 	const BULK_UPLOAD_ID = "bulk_upload_id";
 	
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or
+	 * equivalent initialization method).
+	 * @see        __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		$this->setUpdateMethod(UpdateMethodType::MANUAL);
+	}
+	
 	public function setPuserId($puserId)
 	{
 		if ( self::getPuserId() == $puserId )  // same value - don't set for nothing 

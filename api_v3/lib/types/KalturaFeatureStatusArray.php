@@ -5,7 +5,7 @@
  */
 class KalturaFeatureStatusArray extends KalturaTypedArray
 {
-	public static function fromFeatureStatusArray(array $arr)
+	public static function fromDbArray(array $arr)
 	{
 		$newArr = new KalturaFeatureStatusArray();
 		foreach($arr as $obj)

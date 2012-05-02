@@ -2520,6 +2520,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return sprintf('%u', crc32($this->getId()));
 	}
 	
+	/*
+	 * get all categoryEntry objects from categoryEntryPeer
+	 */
 	public function getCategoriesEntryIds()
 	{
 		//TODO implement select with pagers

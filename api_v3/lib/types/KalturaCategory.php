@@ -387,7 +387,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		if (!is_null($sourceObject))
 		{
 			$partner = PartnerPeer::retrieveByPK(kCurrentContext::$ks_partner_id);
-			if (!$partner || $partner->getFeaturesStatusByType(FeatureStatusType::CATEGORY_LOCK))
+			if (!$partner || $partner->getFeaturesStatusByType(FeatureStatusType::LOCK_CATEGORY))
 				throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);		
 		}
 

@@ -1128,6 +1128,9 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		
  	}
  	
+ 	/*
+ 	 * re-index to search index, and recalculate fields.
+ 	 */
  	public static function index(entry $entry)
  	{
 		$entry->setCategoriesIds($entry->getCategoriesIds());

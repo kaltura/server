@@ -180,6 +180,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 			
 			if($category->getPrivacyContext() == '' || $category->getPrivacyContext() == null)
 			{
+				// only categories with no context should be set on entry->categories and entry->categoriesIds
 				$allCats[] = $category->getFullName();
 				$allIds [] = $category->getId ();
 			}
@@ -218,8 +219,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 			}
 			else
 			{
-				//
-				//category was not found - it could be 
+				//category was not found - it could be that user is not entitled to remove it 
 				$allCats[] = $category->getFullName();
 				$allIds[] = $category->getId ();
 			}
