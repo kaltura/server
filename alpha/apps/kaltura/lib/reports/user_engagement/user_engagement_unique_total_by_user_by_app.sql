@@ -7,7 +7,7 @@ SUM(sum_time_viewed)/SUM(count_plays) avg_time_viewed,
 SUM(count_loads) count_loads,
 (SUM(count_plays) / SUM(count_loads)) load_play_ratio
 FROM 
-	dwh_hourly_events_context_entry_user_app ev, dwh_dim_application ap, dwh_dim_users us
+	dwh_hourly_events_context_entry_user_app ev, dwh_dim_applications ap, dwh_dim_users us
 WHERE 	{OBJ_ID_CLAUSE}
 	AND {OBJ_CAT_NAME}
 	AND ev.partner_id = us.partner_id
