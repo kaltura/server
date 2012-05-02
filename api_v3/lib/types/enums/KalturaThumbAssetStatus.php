@@ -5,4 +5,5 @@
  */
 class KalturaThumbAssetStatus extends KalturaAssetStatus
 {
+	const CAPTURING = 1;
 }

@@ -123,9 +123,11 @@ class kBusinessPreConvertDL
 		}
 	
 		$thumbAsset->incrementVersion();
-		$thumbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
 		$thumbAsset->setTags($destThumbParamsOutput->getTags());
 		$thumbAsset->setFileExt($destThumbParamsOutput->getFileExt());
+		
+		if($thumbAsset->getStatus() != asset::ASSET_STATUS_READY)
+			$thumbAsset->setStatus(asset::ASSET_STATUS_CONVERTING);
 		
 		//Sets the default thumb if this the only default thumb
 		kBusinessPreConvertDL::setIsDefaultThumb($thumbAsset);

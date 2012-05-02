@@ -728,7 +728,7 @@
 									<td><?php echo date($this->translate('time format'), $thumbAsset->createdAt); ?></td>
 									<td><?php echo date($this->translate('time format'), $thumbAsset->updatedAt); ?></td>
 									<td><?php echo date($this->translate('time format'), $thumbAsset->deletedAt); ?></td>
-									<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_FlavorAssetStatus', $thumbAsset->status); ?></td>
+									<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_ThumbAssetStatus', $thumbAsset->status); ?></td>
 									<td><?php echo $thumbAsset->description; ?></td>
 									<td><?php echo $thumbAsset->width; ?></td>
 									<td><?php echo $thumbAsset->height; ?></td>

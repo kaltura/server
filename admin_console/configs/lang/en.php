@@ -129,6 +129,14 @@ return array(
 	'Kaltura_Client_Enum_FlavorAssetStatus::VALIDATING' => 'Validating',
 	'Kaltura_Client_Enum_FlavorAssetStatus::EXPORTING' => 'Exporting',
 
+	'Kaltura_Client_Enum_ThumbAssetStatus::ERROR' => 'Error',
+	'Kaltura_Client_Enum_ThumbAssetStatus::QUEUED' => 'Queued',
+	'Kaltura_Client_Enum_ThumbAssetStatus::CAPTURING' => 'Capturing',
+	'Kaltura_Client_Enum_ThumbAssetStatus::READY' => 'Ready',
+	'Kaltura_Client_Enum_ThumbAssetStatus::DELETED' => 'Deleted',
+	'Kaltura_Client_Enum_ThumbAssetStatus::IMPORTING' => 'Importing',
+	'Kaltura_Client_Enum_ThumbAssetStatus::EXPORTING' => 'Exporting',
+
 	'Kaltura_Client_FileSync_Enum_FileSyncStatus::ERROR' => 'Error',
 	'Kaltura_Client_FileSync_Enum_FileSyncStatus::PENDING' => 'Pending',
 	'Kaltura_Client_FileSync_Enum_FileSyncStatus::READY' => 'Ready',
