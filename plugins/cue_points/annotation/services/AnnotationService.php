@@ -33,7 +33,7 @@ class AnnotationService extends CuePointService
 	 * @param KalturaAnnotation $annotation
 	 * @return KalturaAnnotation
 	 */
-	function addAction(KalturaAnnotation $annotation)
+	function addAction(KalturaCuePoint $annotation)
 	{
 		return parent::addAction($annotation);
 	}
@@ -47,7 +47,7 @@ class AnnotationService extends CuePointService
 	 * @return KalturaAnnotation
 	 * @throws KalturaCuePointErrors::INVALID_CUE_POINT_ID
 	 */
-	function updateAction($id, KalturaAnnotation $annotation)
+	function updateAction($id, KalturaCuePoint $annotation)
 	{
 		return parent::updateAction($id, $annotation);
 	}
@@ -60,7 +60,7 @@ class AnnotationService extends CuePointService
 	* @param KalturaFilterPager $pager
 	* @return KalturaAnnotationListResponse
 	*/
-	function listAction(KalturaAnnotationFilter $filter = null, KalturaFilterPager $pager = null)
+	function listAction(KalturaCuePointFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if(!$filter)
 			$filter = new KalturaAnnotationFilter();
