@@ -150,7 +150,7 @@ class KalturaDispatcher
 	 * @param string $objectClass
 	 * @param string $objectId
 	 * @param string $privilege optional
-	 * @throws KalturaAPIException
+	 * @throws KalturaErrors::INVALID_KS
 	 */
 	private function validateUser($objectClass, $objectId, $privilege = null)
 	{
