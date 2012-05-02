@@ -55,8 +55,9 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 	 * 
 	 * @return KalturaBatchJob
 	 */
-	private function move(KalturaBatchJob $job, KalturaMoveCategoryEntriesJobData $data)
+	protected function move(KalturaBatchJob $job, KalturaMoveCategoryEntriesJobData $data)
 	{
+	    $this->impersonate($job->partnerId);
 		KalturaLog::debug("Move category entries job id [$job->id]");
 		
 		if($data->lastMovedCategoryId)
@@ -64,6 +65,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			
 		$job = $this->moveCategory($job, $data);
 		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
+		$this->unimpersonate();
 	}
 	
 	/**
@@ -77,6 +79,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 	 */
 	private function moveCategory(KalturaBatchJob $job, KalturaMoveCategoryEntriesJobData $data, $srcCategoryId = null)
 	{
+	    
 		if(is_null($srcCategoryId))
 			$srcCategoryId = $data->srcCategoryId;
 		
@@ -105,8 +108,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 				foreach($categoriesList->objects as $category)
 				{
 					/* @var $category KalturaCategory */
-					
-					$movedEntries += $this->moveEntries($job, $data, $category->id);
+					$movedEntries += $this->moveCategory($job, $data, $category->id);
 				}
 				
 				$categoryPager->pageIndex++;
