@@ -1,4 +1,5 @@
 /* Unique Known Users |  Unique Videos |  Plays | Minutes Viewed | Avg. View time | player impressions  | Impression to play ratio */
+SELECT
 SUM(count_plays) count_plays,
 SUM(sum_time_viewed) sum_time_viewed,
 SUM(sum_time_viewed)/SUM(count_plays) avg_time_viewed,
