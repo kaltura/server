@@ -141,13 +141,13 @@ class category extends Basecategory implements IIndexable
 			$featureStatus = null;
 			if ($this->isColumnModified(categoryPeer::PARENT_ID))
 			{
-				$featureStatus = new featureStatus();
-				$featureStatus->setStatusType(FeatureStatusType::CATEGORY_LOCK);
+				$featureStatus = new kFeatureStatus();
+				$featureStatus->setType(FeatureStatusType::LOCK_CATEGORY);
 				
-				$this->getPartner()->addFeaturesStatus(FeatureStatusType::CATEGORY_LOCK, 1);
+				$this->getPartner()->addFeaturesStatus(FeatureStatusType::LOCK_CATEGORY, 1);
 			}
 			
-			$this->addIndexCategoryJob($this->getFullIds(), null, true, $featureStatus);			
+			$this->addIndexCategoryJob($this->getFullIds(), null, true, $featureStatus);		
 		}
 		
 		// save the childs 
@@ -516,6 +516,17 @@ class category extends Basecategory implements IIndexable
 		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 	}
 	
+	private function addCopyCategoryKuserJob($categoryId)
+	{
+		$templateCategory = new categoryKuser();
+		$templateCategory->setCategoryId($this->getId());
+		
+		$filter = new categoryKuserFilter();
+		$filter->setCategoryIdEqual($categoryId);
+
+		kJobsManager::addCopyJob($this->getPartnerId(), CopyObjectType::CATEGORY_USER, $filter, $templateCategory);
+	}
+	
 	private function addDeleteCategoryEntryJob($categoryId)
 	{
 		$filter = new categoryEntryFilter();
@@ -526,6 +537,14 @@ class category extends Basecategory implements IIndexable
 		
 	private function addIndexEntryJob($categoryId, $shouldUpdate = false)
 	{
+		$this->getPartner()->incrementFeaturesStatusByType(FeatureStatusType::INDEX_ENTRY);
+		
+		$featureStatusToRemoveIndex = new kFeatureStatus();
+		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_ENTRY);
+		
+		$featureStatusesToRemove = array();
+		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
+		
 		$filter = new entryFilter();
 		$filter->setCategoriesIdsMatchAnd($categoryId);
 		
@@ -542,7 +561,7 @@ class category extends Basecategory implements IIndexable
 		$filter->setStatusIn($statusArr);
 			
 		//TODO - add batch job size after sharon commits her code.		
-		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::ENTRY, $filter, $shouldUpdate);
+		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::ENTRY, $filter, $shouldUpdate, $featureStatusesToRemove);
 	}
 	
 	private function addMoveEntriesToCategoryJob($destCategoryId)
@@ -552,19 +571,36 @@ class category extends Basecategory implements IIndexable
 	
 	private function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $shouldUpdate = false, $featureStatusToRemove = null)
 	{
+		$this->getPartner()->incrementFeaturesStatusByType(FeatureStatusType::INDEX_CATEGORY);
+		
+		$featureStatusToRemoveIndex = new kFeatureStatus();
+		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY);
+		
+		$featureStatusesToRemove = array();
+		$featureStatusesToRemove[] = $featureStatusToRemove;
+		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
+		
 		$filter = new categoryFilter();
 		$filter->setFullIdsStartsWith($fullIdsStartsWithCategoryId);
 		$filter->setIdIn($categoriesIdsIn);
-
-		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY, $filter, $shouldUpdate, $featureStatusToRemove);
+		
+		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY, $filter, $shouldUpdate, $featureStatusesToRemove);
 	}
 
 	private function addIndexCategoryEntryJob($categoryId = null, $shouldUpdate = false)
 	{
+		$this->getPartner()->incrementFeaturesStatusByType(FeatureStatusType::INDEX_CATEGORY_ENTRY);
+		
+		$featureStatusToRemoveIndex = new kFeatureStatus();
+		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY_ENTRY);
+		
+		$featureStatusesToRemove = array();
+		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
+		
 		$filter = new categoryEntryFilter();
 		$filter->setCategoryIdEqaul($categoryId);
 
-		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_ENTRY, $filter, $shouldUpdate);
+		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_ENTRY, $filter, $shouldUpdate, $featureStatusToRemoveIndex);
 		
 	}
 	
@@ -745,12 +781,10 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/**
-	 * 
 	 * return comma seperated string of kusers ids that are active members on this category. 
 	 */	
 	public function getMembers()
 	{
-		//TODO - retrieve with pagers
 		$categoryIdToGetAllMembers = $this->getId();
 		$inheritedParentId = $this->getInheritedParentId();
 		if($inheritedParentId)
@@ -1195,5 +1229,10 @@ class category extends Basecategory implements IIndexable
 	protected function getIsIndex()
 	{
 		return $this->is_index;
+	}
+	
+	public function copyCategoryUsersFromParent($categoryId)
+	{
+		$this->addCopyCategoryKuserJob($categoryId);
 	}
 }
