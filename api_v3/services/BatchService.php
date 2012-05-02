@@ -321,6 +321,8 @@ class BatchService extends KalturaBaseService
 	 * @param int $id The id of the job
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism
 	 * @param KalturaBatchJobType $jobType The type of the job  
+	 * @throws KalturaErrors::UPDATE_EXCLUSIVE_JOB_FAILED
+	 * @throws KalturaErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE
 	 */
 	function resetJobExecutionAttemptsAction($id ,KalturaExclusiveLockKey $lockKey, $jobType)
 	{
@@ -335,11 +337,11 @@ class BatchService extends KalturaBaseService
 		
 		$job = BatchJobPeer::doSelectOne ( $c );
 		if(!$job)
-			throw new APIException(APIErrors::UPDATE_EXCLUSIVE_JOB_FAILED, $id, $lockKey->schedulerId, $lockKey->workerId, $lockKey->batchIndex);
+			throw new KalturaAPIException(KalturaErrors::UPDATE_EXCLUSIVE_JOB_FAILED, $id, $lockKey->schedulerId, $lockKey->workerId, $lockKey->batchIndex);
 		
 		// verifies that the job is of the right type
 		if($job->getJobType() != $jobType)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, $lockKey, null);
+			throw new KalturaAPIException(KalturaErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, $lockKey, null);
 			
 		$job->setExecutionAttempts(0);
 		$job->save();
@@ -498,13 +500,14 @@ class BatchService extends KalturaBaseService
 	 * @action logConversion
 	 * @param string $flavorAssetId
 	 * @param string $data
+	 * @throws KalturaErrors::INVALID_FLAVOR_ASSET_ID
 	 */
 	function logConversionAction($flavorAssetId, $data)
 	{
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
-			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $flavorAssetId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_FLAVOR_ASSET_ID, $flavorAssetId);
 	
 		$flavorAsset->incLogFileVersion();
 		$flavorAsset->save();
