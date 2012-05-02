@@ -195,7 +195,7 @@ class KalturaRequestDeserializer
 			{
 				if (array_key_exists($name . '__null', $params))
 				{
-					$obj->$name = new KalturaNullField;
+					$obj->$name = new KalturaNullField();
 					continue;
 				}
 				
