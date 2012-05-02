@@ -5,7 +5,7 @@ SELECT
 	SUM(sum_time_viewed)/SUM(count_plays) avg_time_viewed,
 	SUM(count_loads) count_loads
 FROM 
-	dwh_hourly_events_entry_user_app ev, kalturadw.dwh_dim_pusers us, kalturadw.dwh_dim_application ap
+	dwh_hourly_events_context_entry_user_app ev, kalturadw.dwh_dim_pusers us, kalturadw.dwh_dim_application ap
 WHERE 	
 	{OBJ_ID_CLAUSE} # ev.entry_id in 
 	AND us.partner_id = {PARTNER_ID}
