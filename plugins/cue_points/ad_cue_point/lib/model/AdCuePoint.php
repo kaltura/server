@@ -5,7 +5,7 @@
  * @package plugins.adCuePoint
  * @subpackage model
  */
-class AdCuePoint extends CuePoint
+class AdCuePoint extends CuePoint implements IMetadataObject
 {
 	const CUSTOM_DATA_FIELD_SOURCE_URL = 'sourceUrl';
 	const CUSTOM_DATA_FIELD_AD_TYPE = 'adType';
@@ -31,4 +31,12 @@ class AdCuePoint extends CuePoint
 
 	public function setSourceUrl($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SOURCE_URL, (string)$v);}
 	public function setAdType($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_AD_TYPE, (int)$v);}
+	
+	/* (non-PHPdoc)
+	 * @see IMetadataObject::getMetadataObjectType()
+	 */
+	public function getMetadataObjectType()
+	{
+		return AdCuePointMetadataPlugin::getMetadataObjectTypeCoreValue(AdCuePointMetadataObjectType::AD_CUE_POINT);
+	}
 }

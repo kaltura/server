@@ -637,6 +637,10 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		{
 			$partnerSearchIndex = $partner->getSearchIndex(categoryPeer::TABLE_NAME);
 		}
+		elseif ($obejctType == MetadataObjectType::USER)
+		{
+			$partnerSearchIndex = $partner->getSearchIndex(kuserPeer::TABLE_NAME);
+		}
 		else 
 		{
 			return 0;

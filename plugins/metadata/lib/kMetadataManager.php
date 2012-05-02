@@ -21,31 +21,27 @@ class kMetadataManager
 	/**
 	 * @param KalturaMetadataObjectType $objectType
 	 * 
-	 * @return iMetadataPeer
+	 * @return IMetadataPeer
 	 */
-	public static function getObjectPeer($objectType)
+	protected static function getObjectPeer($objectType)
 	{
 		switch ($objectType)
 		{
 		    case MetadataObjectType::ENTRY:
 		        return new MetadataEntryPeer();
+		        
 		    case MetadataObjectType::CATEGORY:
 		        return new MetadataCategoryPeer();
+		        
 		    case MetadataObjectType::PARTNER:
 		        return new MetadataPartnerPeer();
+		        
 		    case MetadataObjectType::USER:
 		        return new MetadataKuserPeer();
+		        
+			default:
+				return KalturaPluginManager::loadObject('IMetadataPeer', $objectType);
 		}
-		
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaMetadataObjects');
-		foreach($pluginInstances as $pluginInstance)
-		{
-			/* @var $pluginInstance IKalturaMetadataObjects */
-			$peer = $pluginInstance->getObjectPeer($objectType);
-			if($peer)
-				return $peer;
-		}
-		return null;
 	}
 	
 	/**
@@ -530,19 +526,7 @@ class kMetadataManager
 		if(isset(self::$objectTypeNames[$objectType]))
 			return self::$objectTypeNames[$objectType];
 			
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaMetadataObjects');
-		foreach($pluginInstances as $pluginInstance)
-		{
-			/* @var $pluginInstance IKalturaMetadataObjects */
-			$className = $pluginInstance->getObjectClassName($objectType);
-			if($className)
-			{
-				self::$objectTypeNames[$objectType] = $className;
-				return $className;
-			}
-		}
-		
-		return null;
+		return KalturaPluginManager::getObjectClass('IMetadataObject', $objectType);
 	}
 	
 	/**
@@ -555,22 +539,13 @@ class kMetadataManager
 	    $cls = get_class($object);
 	    foreach (self::$objectTypeNames as $objectType => $objectClassName)
 	    {
-	        if ($cls == self::$objectTypeNames)
-	        {
+	        if(is_subclass_of($cls, self::$objectTypeNames))
 	            return $objectType;
-	        }
 	    }
 	    
-	    $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaMetadataObjects');
-		foreach($pluginInstances as $pluginInstance)
-		{
-			/* @var $pluginInstance IKalturaMetadataObjects */
-			$objectType = $pluginInstance->getObjectType($cls);
-			if($objectType)
-			{
-				return $objectType;
-			}
-		}
+	    if($object instanceof IMetadataObject)
+	    	return $object->getMetadataObjectType();
+	    	
 	    return Metadata::TYPE_ENTRY;
 	}
 	

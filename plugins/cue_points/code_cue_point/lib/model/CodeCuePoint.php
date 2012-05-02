@@ -5,7 +5,7 @@
  * @package plugins.codeCuePoint
  * @subpackage model
  */
-class CodeCuePoint extends CuePoint
+class CodeCuePoint extends CuePoint implements IMetadataObject
 {
 	public function __construct() 
 	{
@@ -21,5 +21,13 @@ class CodeCuePoint extends CuePoint
 	public function applyDefaultValues()
 	{
 		$this->setType(CodeCuePointPlugin::getCuePointTypeCoreValue(CodeCuePointType::CODE));
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IMetadataObject::getMetadataObjectType()
+	 */
+	public function getMetadataObjectType()
+	{
+		return CodeCuePointMetadataPlugin::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT);
 	}
 }

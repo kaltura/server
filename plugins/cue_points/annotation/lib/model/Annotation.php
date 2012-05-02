@@ -3,7 +3,7 @@
  * @package plugins.annotation
  * @subpackage model
  */
-class Annotation extends CuePoint
+class Annotation extends CuePoint implements IMetadataObject
 {
 	public function __construct() 
 	{
@@ -19,5 +19,13 @@ class Annotation extends CuePoint
 	public function applyDefaultValues()
 	{
 		$this->setType(AnnotationPlugin::getCuePointTypeCoreValue(AnnotationCuePointType::ANNOTATION));
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IMetadataObject::getMetadataObjectType()
+	 */
+	public function getMetadataObjectType()
+	{
+		return AnnotationMetadataPlugin::getMetadataObjectTypeCoreValue(AnnotationMetadataObjectType::ANNOTATION);
 	}
 }

@@ -3,7 +3,7 @@
  * Enable custom metadata on code cue point objects
  * @package plugins.codeCuePoint
  */
-class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaMetadataObjects, IKalturaCuePointXmlParser
+class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaObjectLoader, IKalturaCuePointXmlParser
 {
 	const PLUGIN_NAME = 'codeCuePointMetadata';
 	const METADATA_BULK_UPLOAD_XML_PLUGIN_NAME = 'metadataBulkUploadXml';
@@ -56,40 +56,37 @@ class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPendin
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaMetadataObjects::getObjectType()
+	 * @see IKalturaObjectLoader::loadObject()
 	 */
-	public static function getObjectType($className)
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if(is_subclass_of($className, 'CodeCuePoint'))
-			return self::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT);
-			
-		return null;
+		$class = self::getObjectClass($baseClass, $enumValue);
+		return new $class();
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaMetadataObjects::getObjectClassName()
+	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
-	public static function getObjectClassName($type)
+	public static function getObjectClass($baseClass, $enumValue)
 	{
-		$type = kPluginableEnumsManager::apiToCore('MetadataObjectType', $type);
-		if($type == self::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT))
+		if($baseClass == 'IMetadataPeer' && $enumValue == self::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT))
+			return 'CuePointPeer';
+			
+		if($baseClass == 'IMetadataObject' && $enumValue == self::getMetadataObjectTypeCoreValue(AdCuePointMetadataObjectType::AD_CUE_POINT))
 			return 'CodeCuePoint';
-			
-		return null;
 	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaMetadataObjects::getObjectPeer()
+
+	/**
+	 * @return string external API value of dynamic enum.
 	 */
-	public static function getObjectPeer($type)
+	public static function getApiValue($valueName)
 	{
-		$type = kPluginableEnumsManager::apiToCore('MetadataObjectType', $type);
-		if($type == self::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT))
-			return new CuePointPeer();
-			
-		return null;
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
 	public static function getMetadataObjectTypeCoreValue($valueName)
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;

@@ -3,6 +3,6 @@
  * @package plugins.metadata
  * @subpackage model
  */
-class MetadataPartnerPeer extends PartnerPeer implements iMetadataPeer
+class MetadataPartnerPeer extends PartnerPeer implements IMetadataPeer
 {
 }
