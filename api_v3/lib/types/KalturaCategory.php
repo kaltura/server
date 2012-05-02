@@ -357,7 +357,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			$this->validateParentId();
 			
 		$this->validateCategory($sourceObject);
-		
+			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
@@ -370,7 +370,9 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	private function validateCategory(category $sourceObject = null)
 	{
-		
+		if($this->privacyContext != null && kEntitlementUtils::getEntitlementEnforcement())
+			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT);
+			
 		if ((!is_null($sourceObject) && $sourceObject->getInheritanceType() == KalturaInheritanceType::INHERIT && $this->inheritanceType == null) || 
 			($this->inheritanceType == KalturaInheritanceType::INHERIT))
 		{
