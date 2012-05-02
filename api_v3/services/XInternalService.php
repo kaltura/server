@@ -14,7 +14,7 @@ class XInternalService extends KalturaBaseService
 	 * 	   - Video will be converted using the flavor params id
 	 *     - Audio will be downloaded as MP3
 	 *     - Image will be downloaded as Jpeg
-	 * - MixEntry will be flattend using the flavor params id
+	 * - MixEntry will be flattened using the flavor params id
 	 * - Other entry types are not supported
 	 * 
 	 * Returns the admin email that the email message will be sent to 
