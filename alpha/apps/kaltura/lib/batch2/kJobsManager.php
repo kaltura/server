@@ -1363,15 +1363,11 @@ class kJobsManager
 		return $batchJob;		
 	}
 
-	
-		/**
-	 * @param string $filePath the full path to the file
-	 * @param string $fileName name of the file  
+	/**
+	 * Function adds bulk upload job to the queue
 	 * @param Partner $partner
-	 * @param string $puserId
-	 * @param string $uploadedBy
-	 * @param int $bulkUploadObjectType
-	 * @param BulkUploadType $bulkUploadType
+	 * @param kBulkUploadJobData $jobData
+	 * @param string $bulkUploadType
 	 * @throws APIException
 	 * @return BatchJob
 	 */
@@ -1394,7 +1390,7 @@ class kJobsManager
 		
 		$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		
-		if(is_null($data))
+		if(is_null($jobData))
 		{
 			throw new APIException(APIErrors::BULK_UPLOAD_BULK_UPLOAD_TYPE_NOT_VALID, $bulkUploadType);
 		}
@@ -1403,7 +1399,9 @@ class kJobsManager
 		    $jobData->setBulkUploadObjectType(BulkUploadObjectType::ENTRY);
 		}
 		
-		if ($jobData->getBulkUploadObjectType() == BulkUploadObjectType::ENTRY && !$jobData->getConversionProfileId())
+		$jobData->setFilePath($filePath);
+		
+		if ($jobData->getBulkUploadObjectType() == BulkUploadObjectType::ENTRY && !$jobData->getObjectData()->getConversionProfileId())
 		{
 			$jobData->setConversionProfileId($partner->getDefaultConversionProfileId());
 			$kmcVersion = $partner->getKmcVersion();
