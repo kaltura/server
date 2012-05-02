@@ -243,12 +243,15 @@ class CategoryUserService extends KalturaBaseService
 	 * List all categories
 	 * 
 	 * @action list
+	 * @param KalturaCategoryUserFilter $filter
+	 * @param KalturaFilterPager $pager
 	 * @return KalturaCategoryUserListResponse
+	 * @throws KalturaErrors::MUST_FILTER_USERS_OR_CATEGORY
 	 */
 	function listAction(KalturaCategoryUserFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if(!($filter->categoryIdEqual || $filter->categoryIdIn || $filter->userIdIn || $filter->userIdEqual))
-			throw new APIException(KalturaErrors::MUST_FILTER_USERS_OR_CATEGORY);			
+			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_USERS_OR_CATEGORY);			
 		
 		if (!$filter)
 			$filter = new KalturaCategoryUserFilter();
