@@ -1,4 +1,4 @@
-<?php
+ <?php
 /**
  * EmailIngestionProfile service lets you manage email ingestion profile records
  *
@@ -8,9 +8,7 @@
  */
 class EmailIngestionProfileService extends KalturaEntryService
 {
-	/**
-	 * @ignore
-	 */
+	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -24,14 +22,14 @@ class EmailIngestionProfileService extends KalturaEntryService
 	 * @param KalturaEmailIngestionProfile $EmailIP Mandatory input parameter of type KalturaEmailIngestionProfile
 	 * @return KalturaEmailIngestionProfile
 	 *
-	 * @throws APIErrors::EMAIL_INGESTION_PROFILE_EMAIL_EXISTS
+	 * @throws KalturaErrors::EMAIL_INGESTION_PROFILE_EMAIL_EXISTS
 	 */
 	function addAction( KalturaEmailIngestionProfile $EmailIP )
 	{
 		$existingEIP = EmailIngestionProfilePeer::retrieveByEmailAddressNoFilter($EmailIP->emailAddress);
 		if($existingEIP)
 		{
-			throw new APIException(APIErrors::EMAIL_INGESTION_PROFILE_EMAIL_EXISTS, $EmailIP->emailAddress);
+			throw new KalturaAPIException(KalturaErrors::EMAIL_INGESTION_PROFILE_EMAIL_EXISTS, $EmailIP->emailAddress);
 		}
 
 		$dbEIP = $EmailIP->toInsertableObject();
@@ -51,13 +49,13 @@ class EmailIngestionProfileService extends KalturaEntryService
 	 * @param string $emailAddress
 	 * @return KalturaEmailIngestionProfile
 	 *
-	 * @throws APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND
+	 * @throws KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND
 	 */
 	function getByEmailAddressAction($emailAddress)
 	{
 		$existingEIP = EmailIngestionProfilePeer::retrieveByEmailAddressNoFilter($emailAddress);
 		if(!$existingEIP)
-		throw new APIException(APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND, $emailAddress);
+		throw new KalturaAPIException(KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND, $emailAddress);
 
 		$emailIP = new KalturaEmailIngestionProfile();
 		$emailIP->fromObject($existingEIP);
@@ -72,13 +70,13 @@ class EmailIngestionProfileService extends KalturaEntryService
 	 * @param int $id
 	 * @return KalturaEmailIngestionProfile
 	 *
-	 * @throws APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND
+	 * @throws KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND
 	 */
 	function getAction($id)
 	{
 		$existingEIP = EmailIngestionProfilePeer::retrieveByPK($id);
 		if(!$existingEIP)
-		throw new APIException(APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND, $id);
+		throw new KalturaAPIException(KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND, $id);
 			
 		$emailIP = new KalturaEmailIngestionProfile();
 		$emailIP->fromObject($existingEIP);
@@ -94,14 +92,14 @@ class EmailIngestionProfileService extends KalturaEntryService
 	 * @param KalturaEmailIngestionProfile $EmailIP
 	 * @return KalturaEmailIngestionProfile
 	 *
-	 * @throws APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND
+	 * @throws KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND
 	 */
 	function updateAction( $id , KalturaEmailIngestionProfile $EmailIP )
 	{
 		$dbEIP = EmailIngestionProfilePeer::retrieveByPK( $id );
 
 		if ( ! $dbEIP )
-			throw new KalturaAPIException ( APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND , $id );
+			throw new KalturaAPIException ( KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND , $id );
 
 		$EmailIP->emailAddress = $dbEIP->getEmailAddress();
 		$updateEIP = $EmailIP->toUpdatableObject($dbEIP);
@@ -118,14 +116,14 @@ class EmailIngestionProfileService extends KalturaEntryService
 	 * @action delete
 	 * @param int $id
 	 *
-	 * @throws APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND
+	 * @throws KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND
 	 */
 	function deleteAction( $id )
 	{
 		$dbEIP = EmailIngestionProfilePeer::retrieveByPK( $id );
 
 		if ( ! $dbEIP )
-		throw new KalturaAPIException ( APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND , $id );
+		throw new KalturaAPIException ( KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND , $id );
 
 		$dbEIP->setStatus ( EmailIngestionProfile::EMAIL_INGESTION_PROFILE_STATUS_INACTIVE );
 
@@ -145,6 +143,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 	 * @return KalturaMediaEntry
 	 *
 	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
+	 * @throws KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND
 	 *
 	 */
 	function addMediaEntryAction(KalturaMediaEntry $mediaEntry, $uploadTokenId, $emailProfId, $fromAddress, $emailMsgId)
@@ -160,7 +159,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 			// get the email profile by the given id
 			$existingEIP = EmailIngestionProfilePeer::retrieveByPK($emailProfId);
 			if(!$existingEIP)
-			throw new APIException(APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND, $id);
+			    throw new KalturaAPIException(KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND, $emailProfId);
 	
 			$emailIP = new KalturaEmailIngestionProfile();
 			$emailIP->fromObject($existingEIP);
