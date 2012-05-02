@@ -1,7 +1,7 @@
 <?php
 /**
  * batch service lets you handle different batch process from remote machines.
- * As oppesed to other ojects in the system, locking mechanism is critical in this case.
+ * As opposed to other objects in the system, locking mechanism is critical in this case.
  * For this reason the GetExclusiveXX, UpdateExclusiveXX and FreeExclusiveXX actions are important for the system's intergity.
  * In general - updating batch object should be done only using the UpdateExclusiveXX which in turn can be called only after 
  * acuiring a batch objet properly (using  GetExclusiveXX).
