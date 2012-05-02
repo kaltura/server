@@ -42,7 +42,11 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 			{
 			    $bulkUploadResult->objectId = $values[$index];
 			}
-				
+		    if ($column == 'status')
+			{
+			    $bulkUploadResult->requiredObjectStatus = $values[$index];
+			}
+			
 			if(iconv_strlen($values[$index], 'UTF-8'))
 			{
 				$bulkUploadResult->$column = $values[$index];
@@ -137,7 +141,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		
 		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
-			/* @var $bulkUploadResult KalturaBulkUploadResultCategory */
+			/* @var $bulkUploadResult KalturaBulkUploadResultCategoryUser */
 		    KalturaLog::debug("Handling bulk upload result: [". $bulkUploadResult->name ."]");
 		    switch ($bulkUploadResult->action)
 		    {
@@ -147,7 +151,19 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
         			$bulkUploadResultChunk[] = $bulkUploadResult;
         			
         			$this->impersonate();
-        			$this->kClient->categoryUser->add($user);
+        			$categoryUser = $this->kClient->categoryUser->add($user);
+        			if ($bulkUploadResult->requiredObjectStatus)
+        			{
+        			    switch ($bulkUploadResult->requiredObjectStatus)
+        			    {
+        			        case KalturaCategoryUserStatus::ACTIVE:
+        			            $this->kClient->categoryUser->activate($categoryUser->categoryId, $categoryUser->userId);
+        			            break;
+        			        case KalturaCategoryUserStatus::NOT_ACTIVE:
+        			            $this->kClient->categoryUser->deactivate($categoryUser->categoryId, $categoryUser->userId);
+        			            break;
+        			    }
+        			}
         			$this->unimpersonate();
         			
 		            break;
@@ -168,7 +184,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		            $bulkUploadResultChunk[] = $bulkUploadResult;
         			
         			$this->impersonate();
-        			$this->kClient->categoryUser->delete($bulkUploadResult->objectId);
+        			$this->kClient->categoryUser->delete($bulkUploadResult->categoryId, $bulkUploadResult->userId);
         			$this->unimpersonate();
         			
 		            break;
@@ -218,6 +234,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 	    if ($bulkUploadCategoryUserResult->permissionLevel)
 	        $categoryUser->permissionLevel = $bulkUploadCategoryUserResult->permissionLevel;
 	        
+	    $categoryUser->updateMethod = KalturaUpdateMethodType::AUTOMATIC;
 	    if ($bulkUploadCategoryUserResult->updateMethod)
 	        $categoryUser->updateMethod = $bulkUploadCategoryUserResult->updateMethod; 
 	        
@@ -235,9 +252,9 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		    "categoryUserId",
 		    "categoryId",
 		    "userId",
+			"status",
 		    "permissionLevel",
 		    "updateMethod",
-		    
 		);
 	}
 	
