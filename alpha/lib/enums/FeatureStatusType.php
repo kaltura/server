@@ -5,5 +5,8 @@
  */ 
 interface FeatureStatusType extends BaseEnum
 {
-	const CATEGORY_LOCK = 1;
+	const LOCK_CATEGORY = 1;
+	const INDEX_CATEGORY = 2;
+	const INDEX_CATEGORY_ENTRY = 3;
+	const INDEX_ENTRY = 4;
 }
