@@ -216,7 +216,7 @@ class myReportsMgr
 			if ($input_filter instanceof endUserReportsInputFilter) 
 			{
 				$count_plays =	$res[self::COUNT_PLAYS_HEADER];
-				if (count($res) == 1) {
+				if (count($res[0]) == 1) {
 					$header = array();
 					$data = array();
 				}
@@ -402,6 +402,8 @@ class myReportsMgr
 	private static function getTotalTableCount( $partner_id , $report_type , reportsInputFilter $input_filter  ,
 		$page_size , $page_index , $order_by , $object_ids = null )
 	{
+		if ($input_filter instanceof endUserReportsInputFilter)
+			return 0;
 		$cache_key = self::createCacheKey ( $partner_id , $report_type , $input_filter , $object_ids );
 		if ( ! self::$count_cache )
 		{
