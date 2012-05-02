@@ -19,6 +19,10 @@ class CategoryEntryService extends KalturaBaseService
 	 * 
 	 * @action add
 	 * @param KalturaCategoryEntry $categoryEntry
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 * @throws KalturaErrors::CATEGORY_NOT_FOUND
+	 * @throws KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY
+	 * @throws KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS
 	 * @return KalturaCategoryEntry
 	 */
 	function addAction(KalturaCategoryEntry $categoryEntry)
@@ -27,23 +31,23 @@ class CategoryEntryService extends KalturaBaseService
 		
 		$entry = entryPeer::retrieveByPK($categoryEntry->entryId);
 		if (!$entry)
-			throw new APIException(KalturaErrors::INVALID_ENTRY_ID, $categoryEntry->entryId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $categoryEntry->entryId);
 			
 		$category = categoryPeer::retrieveByPK($categoryEntry->categoryId);
 		if (!$category)
-			throw new APIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryEntry->categoryId);
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryEntry->categoryId);
 			
 		//validate user is entiteld to assign entry to this category 
 		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)
 		{
 			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::$ks_kuser_id);
 			if(!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
-				throw new APIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
 		}
 		
 		$categoryEntryExists = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryEntry->categoryId, $categoryEntry->entryId);
 		if($categoryEntryExists)
-			throw new APIException(KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS);
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS);
 		
 		$dbCategoryEntry = new categoryEntry();
 		$categoryEntry->toInsertableObject($dbCategoryEntry);
@@ -62,25 +66,30 @@ class CategoryEntryService extends KalturaBaseService
 	 * @action delete
 	 * @param string $entryId
 	 * @param int $categoryId
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 * @throws KalturaErrors::CATEGORY_NOT_FOUND
+	 * @throws KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY
+	 * @throws KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY
+	 * 
 	 */
 	function deleteAction($entryId, $categoryId)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry)
-			throw new APIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
 			
 		$category = categoryPeer::retrieveByPK($categoryId);
 		if (!$category)
-			throw new APIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
 		
 		//validate user is entiteld to remove entry from category 
 		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, kCurrentContext::$ks_kuser_id);
 		if(kEntitlementUtils::getEntitlementEnforcement() && (!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
-			throw new ApiException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
+			throw new KalturaAPIException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
 			
 		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
 		if(!$dbCategoryEntry)
-			throw new APIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
+			throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
 		
 		$dbCategoryEntry->delete();
 	}
@@ -89,6 +98,10 @@ class CategoryEntryService extends KalturaBaseService
 	 * List all categoryEntry
 	 * 
 	 * @action list
+	 * @param KalturaCategoryEntryFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @throws KalturaErrors::MUST_FILTER_ENTRY_ID_EQUAL
+	 * @throws KalturaErrors::MUST_FILTER_ON_ENTRY_OR_CATEGORY
 	 * @return KalturaCategoryEntryListResponse
 	 */
 	function listAction(KalturaCategoryEntryFilter $filter = null, KalturaFilterPager $pager = null)
@@ -101,14 +114,14 @@ class CategoryEntryService extends KalturaBaseService
 		
 		if ($filter->entryIdEqual == null && 
 			kEntitlementUtils::getEntitlementEnforcement())
-			throw new APIException(KalturaErrors::MUST_FILTER_ENTRY_ID_EQUAL);
+			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ENTRY_ID_EQUAL);
 			
 		if ($filter->entryIdEqual == null &&
 			$filter->categoryFullIdsEqual == null &&
 			$filter->categoryFullIdsStartsWith == null &&
 			$filter->categoryIdIn == null &&
 			$filter->categoryIdEqual == null)
-			throw new APIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_CATEGORY);		
+			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_CATEGORY);		
 			
 		$categoryEntryFilter = new categoryEntryFilter();
 		$filter->toObject($categoryEntryFilter);
@@ -150,19 +163,20 @@ class CategoryEntryService extends KalturaBaseService
 	}
 	
 	/**
-	 * Index Category by id
+	 * Index CategoryEntry by Id
 	 * 
 	 * @action index
 	 * @param string $entryId
 	 * @param int $categoryId
 	 * @param bool $shouldUpdate
-	 * @return int category int id
+	 * @throws KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY
+	 * @return int
 	 */
 	function indexAction($entryId, $categoryId, $shouldUpdate = true)
 	{
 		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
 		if(!$dbCategoryEntry)
-			throw new APIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
+			throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
 			
 		if (!$shouldUpdate)
 		{
