@@ -641,7 +641,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new Exception(implode(', ', $pluginsErrorResults));
 	
 		//Updates the bulk upload result for the given entry (with the status and other data)
-		$this->updateEntriesResults(array($entry), array($updatedEntryBulkUploadResult));
+		$this->updateObjectsResults(array($entry), array($updatedEntryBulkUploadResult));
 	}
 
 	/**
@@ -853,7 +853,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
 			
 		//Updates the bulk upload result for the given entry (with the status and other data)
-		$this->updateEntriesResults(array($createdEntry), array($createdEntryBulkUploadResult));
+		$this->updateObjectsResults(array($createdEntry), array($createdEntryBulkUploadResult));
 		
 		//Adds the additional data for the flavors and thumbs
 		$this->handleFlavorAndThumbsAdditionalData($createdEntry->id, $flavorAssets, $thumbAssets);
@@ -1999,5 +1999,54 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$bulkUploadResult->scheduleEndDate = self::parseFormatedDate((string)$item->endDate);
 		
 		return $bulkUploadResult;
+	}
+	
+	protected function updateObjectsResults($requestResults, $bulkUploadResults)
+	{
+	    $this->kClient->startMultiRequest();
+		KalturaLog::info("Updating " . count($requestResults) . " results");
+		
+		// checking the created entries
+		foreach($requestResults as $index => $requestResult)
+		{
+			$bulkUploadResult = $bulkUploadResults[$index];
+			
+			if(is_array($requestResult) && isset($requestResult['code']))
+			{
+			    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			    $bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
+				$bulkUploadResult->entryStatus = $requestResult['code'];
+				$bulkUploadResult->errorDescription = $requestResult['message'];
+				$this->addBulkUploadResult($bulkUploadResult);
+				continue;
+			}
+			
+			if($requestResult instanceof Exception)
+			{
+				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+				$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
+				$bulkUploadResult->errorDescription = $requestResult->getMessage();
+				$this->addBulkUploadResult($bulkUploadResult);
+				continue;
+			}
+			
+			if(! ($requestResult instanceof KalturaBaseEntry))
+			{
+				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+				$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
+				$bulkUploadResult->errorDescription = "Returned type is " . get_class($requestResult) . ', KalturaMediaEntry was expected';
+				$this->addBulkUploadResult($bulkUploadResult);
+				continue;
+			}
+			
+			// update the results with the new entry id
+			$bulkUploadResult->entryId = $requestResult->id;
+			$bulkUploadResult->objectId = $requestResult->id;
+			$this->addBulkUploadResult($bulkUploadResult);
+		}
+		
+		$this->kClient->doMultiRequest();
 	}
 }
