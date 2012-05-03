@@ -30,11 +30,31 @@ class myCache
 		
 		if ( self::$s_memcache == NULL )
 		{
-			self::$s_memcache = kCacheManager::getCache(kCacheManager::MC_LOCAL);
-			if (self::$s_memcache)
+			if (!function_exists('memcache_connect')) return;
+						
+			self::$s_memcache = new Memcache;
+			$connStart = microtime(true);
+			//self::$s_memcache->pconnect(self::SERVER, self::PORT) // this will use a persistent connection 
+			try {
+				$res = @self::$s_memcache->connect( kConf::get ( "memcache_host") , kConf::get ( "memcache_port" ) );
+			}
+			catch (Exception $e) {
+				$res = false;
+			}
+			KalturaLog::debug("myCache ($namespace): connect took - ". (microtime(true) - $connStart). " seconds to ".kConf::get("memcache_host"));
+			
+			if ( !$res )
+			{
+				KalturaLog::info( "ERROR: Error while trying to connect to memcache. Make sure it is properly running on " . 
+					kConf::get ( "memcache_host") . ":" . kConf::get ( "memcache_port" ) );
+				//throw new Exception ("Error while trying to connect to memcache. Make sure it is properly running on " . self::SERVER . ":" . self::PORT );
+			}
+			else
 			{
 				self::$s_ready = true;
 			}
+			
+//				or die ("Error while trying to connect to memcache. Make sure it is properly running on " . self::SERVER . ":" . self::PORT );
 		}
 
 		
@@ -88,7 +108,7 @@ class myCache
 			}
 		}
 		
-		self::$s_memcache->set ( $this->m_namespace . $obj_name , $obj , $expiry );
+		self::$s_memcache->set ( $this->m_namespace . $obj_name , $obj , false , $expiry );
 		
 		// TODO - maintain the linked_list
 //		//$this->m_obj_container[$obj_name] = $obj;
@@ -102,7 +122,7 @@ class myCache
 
 		if (class_exists('KalturaResponseCacher'))
 			KalturaResponseCacher::disableConditionalCache();
-			
+		
 		$value = self::$s_memcache->get ( $this->m_namespace . $obj_name );
 
 		if ( !isset ( $value ) )
