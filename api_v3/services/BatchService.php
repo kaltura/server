@@ -73,7 +73,7 @@ class BatchService extends KalturaBaseService
 				{
 					$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadHandler');
 					foreach($pluginInstances as $pluginInstance)
-						$pluginInstance->handleBulkUploadData($bulkUploadResult->entryId, $pluginValues);
+						$pluginInstance->handleBulkUploadData($dbBulkUploadResult->getObject(), $pluginValues);
 				}
 			}
 		}
@@ -484,7 +484,7 @@ class BatchService extends KalturaBaseService
 	
 	/**
 	 * batch cleanExclusiveJobs action mark as fatal error all expired jobs
-	 * 
+	 
 	 * @action cleanExclusiveJobs
 	 * @return int the count of jobs that cleaned 
 	 */
