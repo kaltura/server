@@ -49,6 +49,6 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 	
 	public function setType ()
 	{
-	    $this->type = kPluginableEnumsManager::coreToApi("KalturaBulkUploadType", BulkUploadCsvType::CSV);
+	    $this->type = kPluginableEnumsManager::coreToApi("KalturaBulkUploadType", BulkUploadCsvPlugin::getApiValue(BulkUploadCsvType::CSV));
 	}
 }
