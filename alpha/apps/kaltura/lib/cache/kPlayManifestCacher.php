@@ -2,16 +2,16 @@
 
 require_once(dirname(__FILE__) . '/../requestUtils.class.php');
 require_once(dirname(__FILE__) . '/../webservices/kSessionBase.class.php');
+require_once(dirname(__FILE__) . '/../../../../../infra/cache/kCacheManager.php');
 
 class kPlayManifestCacher
 {
 	const CACHE_EXPIRY = 600;		// 10 min
-	const CACHE_FILE_PREFIX = "playManifest-";
 	
 	protected $_cacheEnabled = false;
 
 	protected $_cacheKey = "";
-	protected $_cacheDataFilePath = "";
+	protected $_cacheWrapper = null;
 	
 	protected $_ksPartnerId = null;
 	protected $_ksValidated = false;
@@ -81,12 +81,7 @@ class kPlayManifestCacher
 
 		$this->_cacheKey = md5( http_build_query($params) );
 
-		// split cache over 256 folders using the cachekey first 2 characters
-		// this will reduce the amount of files per cache folder
-		$_cacheDirectory = rtrim(kConf::get('response_cache_dir'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-		$_cacheDirectory .= "cache_manifest" . DIRECTORY_SEPARATOR;
-		$pathWithFilePrefix = $_cacheDirectory . substr($this->_cacheKey, 0, 2) . DIRECTORY_SEPARATOR . self::CACHE_FILE_PREFIX;
-		$this->_cacheDataFilePath = $pathWithFilePrefix . $this->_cacheKey;
+		$this->_cacheWrapper = kCacheManager::getCache(kCacheManager::FS_PLAY_MANIFEST);
 	}
 	
 	static public function getInstance()
@@ -98,39 +93,15 @@ class kPlayManifestCacher
 	
 	///////////////////////////////////////////////////////////////////
 	//	Cache reading functions
-	
-	private function canUseCache()
-	{
-		if (!$this->_ksValidated)
-			return false;					// ks not valid, do not return from cache
-	
-		if (!file_exists($this->_cacheDataFilePath))
-		{
-			// don't have any cached response for this key
-			return false;
-		}
-		
-		// check the expiry
-		$cacheExpiry = filemtime($this->_cacheDataFilePath) + self::CACHE_EXPIRY;
-		if ($cacheExpiry <= time())
-		{
-			// cached response is expired
-			@unlink($this->_cacheDataFilePath);
-			return false;
-		}
-		
-		return true;
-	}
-	
 	private function getCachedResponse()
 	{
 		if (!$this->_cacheEnabled)
 			return false;
 		
 		$startTime = microtime(true);
-		if ($this->canUseCache())
+		if ($this->_ksValidated)
 		{
-			$response = @file_get_contents($this->_cacheDataFilePath);
+			$response = $this->_cacheWrapper->get($this->_cacheKey, self::CACHE_EXPIRY);
 			if ($response)
 			{
 				$processingTime = microtime(true) - $startTime;
@@ -151,7 +122,7 @@ class kPlayManifestCacher
 		if (!$response)
 			return;
 
-		list($requiredFiles, $serializedRenderer) = unserialize($response);
+		list($requiredFiles, $serializedRenderer) = $response;
 		foreach ($requiredFiles as $requiredFile)
 		{
 			require_once($requiredFile);
@@ -163,15 +134,6 @@ class kPlayManifestCacher
 	
 	///////////////////////////////////////////////////////////////////
 	//	Cache storing functions
-
-	private function createDirForPath($filePath)
-	{
-		$dirname = dirname($filePath);
-		if (!is_dir($dirname))
-		{
-			mkdir($dirname, 0777, true);
-		}
-	}
 
 	public function storeCache($renderer)
 	{
@@ -199,14 +161,7 @@ class kPlayManifestCacher
 		// serialize the response
 		$requiredFiles = $renderer->getRequiredFiles();
 		$serializedRenderer = serialize($renderer);
-		$response = serialize(array($requiredFiles, $serializedRenderer));
 	
-		$this->createDirForPath($this->_cacheDataFilePath);
-		
-		// write the cached response to a temporary file and then rename, to prevent any
-		// other running instance of apache from picking up a partially written response
-		$tempDataFilePath = tempnam(dirname($this->_cacheDataFilePath), basename($this->_cacheDataFilePath));
-		file_put_contents($tempDataFilePath, $response);
-		rename($tempDataFilePath, $this->_cacheDataFilePath);		
+		$this->_cacheWrapper->set($this->_cacheKey, array($requiredFiles, $serializedRenderer), self::CACHE_EXPIRY, self::CACHE_EXPIRY);
 	}
 }
