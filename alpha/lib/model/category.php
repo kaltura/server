@@ -618,7 +618,7 @@ class category extends Basecategory implements IIndexable
 		$filter = new categoryKuserFilter();
 		$filter->setCategoryIdEqual($categoryId);
 
-		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_KUSER, $filter, $shouldUpdate, $featureStatusToRemoveIndex);
+		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_USER, $filter, $shouldUpdate, $featureStatusToRemoveIndex);
 		
 	}
 	

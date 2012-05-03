@@ -29,7 +29,7 @@ class KIndexingCategoryUserEngine extends KIndexingEngine
 		$this->client->startMultiRequest();
 		foreach($categoryUsersList->objects as $categoryUser)
 		{
-			$this->client->categoryUser->index($categoryUser->id, $shouldUpdate);
+			$this->client->categoryUser->index($categoryUser->userId, $categoryUser->categoryId, $shouldUpdate);
 		}
 		$results = $this->client->doMultiRequest();
 		foreach($results as $result)
