@@ -376,9 +376,9 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		if ((!is_null($sourceObject) && $sourceObject->getInheritanceType() == KalturaInheritanceType::INHERIT && $this->inheritanceType == null) || 
 			($this->inheritanceType == KalturaInheritanceType::INHERIT))
 		{
-			if ($this->userJoinPolicy != null ||
-				$this->defaultPermissionLevel != null ||
-				$this->owner != null)
+			if (($this->userJoinPolicy != null && $this->userJoinPolicy != $sourceObject->getUserJoinPolicy()) ||
+				($this->defaultPermissionLevel != null && $this->defaultPermissionLevel != $sourceObject->getDefaultPermissionLevel()) ||
+				($this->owner != null && $this->owner != $this->getOwner()))
 			{
 				throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES);
 			}
