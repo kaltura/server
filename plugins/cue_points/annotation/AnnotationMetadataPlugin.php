@@ -61,7 +61,10 @@ class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 		$class = self::getObjectClass($baseClass, $enumValue);
-		return new $class();
+		if($class && class_exists($class))
+			return new $class();
+			
+		return null;
 	}
 	
 	/* (non-PHPdoc)
