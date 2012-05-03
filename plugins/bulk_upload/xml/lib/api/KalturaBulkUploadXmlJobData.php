@@ -46,6 +46,6 @@ class KalturaBulkUploadXmlJobData extends KalturaBulkUploadJobData
 	
 	public function setType ()
 	{
-	    $this->type = kPluginableEnumsManager::coreToApi("KalturaBulkUploadType", BulkUploadXmlType::XML);
+	    $this->type = kPluginableEnumsManager::coreToApi("KalturaBulkUploadType", BulkUploadXmlPlugin::getApiValue(BulkUploadXmlType::XML));
 	}
 }
