@@ -4,7 +4,7 @@
  * @subpackage objects
  * @abstract
  */
-abstract class KalturaBulkUploadJobData extends KalturaJobData
+class KalturaBulkUploadJobData extends KalturaJobData
 {
 	/**
 	 * @var string
@@ -116,16 +116,7 @@ abstract class KalturaBulkUploadJobData extends KalturaJobData
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::toObject()
-	 */
-	public function toObject($dbData = null, $props_to_skip = array()) 
-	{
-		if(is_null($dbData))
-			$dbData = new kBulkUploadJobData();
-			
-		return parent::toObject($dbData);
-	}
+
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
@@ -185,5 +176,10 @@ abstract class KalturaBulkUploadJobData extends KalturaJobData
 			return null;
 			
 		return kPluginableEnumsManager::coreToApi('BulkUploadType', $subType);
+	}
+	
+	public function setType()
+	{
+	    
 	}
 }
