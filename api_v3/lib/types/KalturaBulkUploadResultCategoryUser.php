@@ -13,6 +13,11 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
    /**
     * @var string
     */
+   public $categoryReferenceId;
+   
+   /**
+    * @var string
+    */
    public $userId;
    
    /**
@@ -26,13 +31,14 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
    public $updateMethod;
    
    /**
-    * @var KalturaCategoryUserStatus
+    * @var int
     */
    public $requiredObjectStatus;
     
     private static $mapBetweenObjects = array
 	(
 	    "categoryId",
+	    "categoryReferenceId",
 		"userId",
 	    "permissionLevel",
 	    "updateMethod",
