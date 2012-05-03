@@ -1,8 +1,7 @@
 /* Unique Known Users |  Unique Videos |  Plays | Minutes Viewed | Avg. View time | player impressions  | Impression to play ratio */
 SELECT 
 COUNT(DISTINCT user_id) unique_known_users,
-COUNT(DISTINCT entry_id) unique_videos,
-
+COUNT(DISTINCT entry_id) unique_videos
 FROM 
 	dwh_hourly_events_context_entry_user_app ev
 WHERE 	{OBJ_ID_CLAUSE} # ev.entry_id in 
