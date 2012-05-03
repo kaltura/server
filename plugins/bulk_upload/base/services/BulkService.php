@@ -26,8 +26,6 @@ class BulkService extends KalturaBaseService
 	 */
 	function addEntriesAction($fileData, KalturaBulkUploadJobData $bulkUploadData = null, KalturaBulkUploadEntryData $bulkUploadEntryData = null)
 	{
-	    $bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
-		
 	    if (!$bulkUploadData)
 	    {
 	       $bulkUploadData = new KalturaBulkUploadJobData();
@@ -41,6 +39,7 @@ class BulkService extends KalturaBaseService
 			$bulkUploadEntryData->fileName = $fileData["name"];
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
+		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
 		/* @var $dbBulkUploadJobData kBulkUploadJobData */
 		$dbBulkUploadJobData->setBulkUploadObjectType(BulkUploadObjectType::ENTRY);
 		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
@@ -68,8 +67,6 @@ class BulkService extends KalturaBaseService
 	 */
 	public function addCategoriesAction ($fileData, KalturaBulkUploadJobData $bulkUploadData = null, KalturaBulkUploadCategoryData $bulkUploadCategoryData = null)
 	{
-	    $bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
-	    
 	    if (!$bulkUploadData)
 	    {
 	       $bulkUploadData = new KalturaBulkUploadJobData();
@@ -84,12 +81,12 @@ class BulkService extends KalturaBaseService
 			$fileName = $fileData["name"];
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
+		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
 		$dbBulkUploadJobData->setBulkUploadObjectType(BulkUploadObjectType::CATEGORY);
 		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
 		$dbObjectData = $bulkUploadCategoryData->toInsertableObject();
 		$dbBulkUploadJobData->setObjectData($dbObjectData);
 		$dbBulkUploadJobData->setFilePath($fileData["tmp_name"]);
-		KalturaLog::debug("CSV file path: ". $dbBulkUploadJobData->getFilePath());
 		
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
 		
@@ -110,8 +107,6 @@ class BulkService extends KalturaBaseService
 	 */
 	public function addCategoryUsersAction ($fileData, KalturaBulkUploadJobData $bulkUploadData = null, KalturaBulkUploadCategoryUserData $bulkUploadCategoryUserData = null)
 	{
-	    $bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
-	    
 	    if (!$bulkUploadData)
 	    {
 	       $bulkUploadData = new KalturaBulkUploadJobData();
@@ -126,12 +121,12 @@ class BulkService extends KalturaBaseService
 			$fileName = $fileData["name"];
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
+		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
 		$dbBulkUploadJobData->setBulkUploadObjectType(BulkUploadObjectType::CATEGORY_USER);
 		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
 		$dbObjectData = $bulkUploadCategoryUserData->toInsertableObject();
 		$dbBulkUploadJobData->setObjectData($dbObjectData);
 		$dbBulkUploadJobData->setFilePath($fileData["tmp_name"]);
-		KalturaLog::debug("CSV file path: ". $dbBulkUploadJobData->getFilePath());
 		
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
 		
@@ -152,8 +147,6 @@ class BulkService extends KalturaBaseService
 	 */
 	public function addUsersAction($fileData, KalturaBulkUploadJobData $bulkUploadData = null, KalturaBulkUploadUserData $bulkUploadUserData = null)
 	{
-	   $bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
-	    
 	   if (!$bulkUploadData)
 	   {
 	       $bulkUploadData = new KalturaBulkUploadJobData();
@@ -168,6 +161,7 @@ class BulkService extends KalturaBaseService
 			$fileName = $fileData["name"];
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
+		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
 		$dbBulkUploadJobData->setBulkUploadObjectType(BulkUploadObjectType::USER);
 		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
 		$dbObjectData = $bulkUploadUserData->toInsertableObject();
