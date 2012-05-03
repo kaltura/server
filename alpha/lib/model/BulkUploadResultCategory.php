@@ -1,4 +1,12 @@
 <?php
+/**
+ * Subclass for representing a row from the 'bulk_upload_result' table.
+ *
+ * 
+ *
+ * @package Core
+ * @subpackage model
+ */ 
 class BulkUploadResultCategory extends BulkUploadResult
 {
     //Category property names

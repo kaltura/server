@@ -1,4 +1,10 @@
 <?php
+/**
+ * Subclass for representing a row from the 'bulk_upload_result' table.
+ *
+ * @package Core
+ * @subpackage model
+ */ 
 class BulkUploadResultKuser extends BulkUploadResult
 {
     //kUser property names

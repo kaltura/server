@@ -1,8 +1,17 @@
 <?php
+/**
+ * Subclass for representing a row from the 'bulk_upload_result' table.
+ *
+ * 
+ *
+ * @package Core
+ * @subpackage model
+ */ 
 class BulkUploadResultCategoryKuser extends BulkUploadResult
 {
     //categoryUser property names
     const CATEGORY_ID = "category_id";
+    const CATEGORY_REFERENCE_ID = "category_reference_id";
     const USER_ID = "user_id";
     const PERMISSION_LEVEL = "permission_level";
     const UPDATE_METHOD = "update_method";
@@ -47,6 +56,9 @@ class BulkUploadResultCategoryKuser extends BulkUploadResult
 	
     public function getCategoryId()	{return $this->getFromCustomData(self::CATEGORY_ID);}
 	public function setCategoryId($v)	{$this->putInCustomData(self::CATEGORY_ID, $v);}
+	
+    public function getCategoryReferenceId()	{return $this->getFromCustomData(self::CATEGORY_REFERENCE_ID);}
+	public function setCategoryReferenceIdId($v)	{$this->putInCustomData(self::CATEGORY_REFERENCE_ID, $v);}
 
     public function getUserId()	{return $this->getFromCustomData(self::USER_ID);}
 	public function setUserId($v)	{$this->putInCustomData(self::USER_ID, $v);}
