@@ -37,7 +37,7 @@ class categoryKuser extends BasecategoryKuser {
 
 		parent::setPuserId($puserId);
 			
-		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $puserId);
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$partner_id, $puserId);
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
 			
