@@ -218,7 +218,14 @@ class myReportsMgr
 			$res = array ( $header , $data );
 			if ($input_filter instanceof endUserReportsInputFilter) 
 			{
-				$count_plays =	$res[self::COUNT_PLAYS_HEADER];
+				foreach ( $row as $name => $value )
+				{
+					if ($name == self::COUNT_PLAYS_HEADER)
+					{
+						$count_plays = $value;
+						break;
+					}
+				}
 				if (count($res[0]) == 1) {
 					$header = array();
 					$data = array();
