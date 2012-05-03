@@ -20,7 +20,6 @@ class KalturaBulkUploadXmlJobData extends KalturaBulkUploadJobData
 	
 	public function __construct()
 	{
-	    $this->type = kPluginableEnumsManager::coreToApi("KalturaBulkUploadType", BulkUploadXmlType::XML);
 	}
 	
 	public function getMapBetweenObjects ( )
@@ -31,8 +30,22 @@ class KalturaBulkUploadXmlJobData extends KalturaBulkUploadJobData
 	public function toObject($dbData = null, $props_to_skip = array()) 
 	{
 		if(is_null($dbData))
-			$dbData = new kBulkUploadJobData();
+			$dbData = new kBulkUploadXmlJobData();
 			
 		return parent::toObject($dbData);
+	}
+	
+    public function toInsertableObject()
+	{
+	    $dbObj = parent::toInsertableObject();
+	    
+	    $this->setType();
+	    
+	    return $dbObj;
+	}
+	
+	public function setType ()
+	{
+	    $this->type = kPluginableEnumsManager::coreToApi("KalturaBulkUploadType", BulkUploadXmlType::XML);
 	}
 }

@@ -24,10 +24,6 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 		"csvVersion"
 	);
 
-	public function __construct()
-	{
-	    $this->type = kPluginableEnumsManager::coreToApi("KalturaBulkUploadType", BulkUploadCsvType::CSV);
-	}
 	
 	public function getMapBetweenObjects ( )
 	{
@@ -37,8 +33,22 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 	public function toObject($dbData = null, $props_to_skip = array()) 
 	{
 		if(is_null($dbData))
-			$dbData = new kBulkUploadJobData();
+			$dbData = new kBulkUploadCsvJobData();
 			
 		return parent::toObject($dbData);
+	}
+	
+	public function toInsertableObject()
+	{
+	    $dbObj = parent::toInsertableObject();
+	    
+	    $this->setType();
+	    
+	    return $dbObj;
+	}
+	
+	public function setType ()
+	{
+	    $this->type = kPluginableEnumsManager::coreToApi("KalturaBulkUploadType", BulkUploadCsvType::CSV);
 	}
 }
