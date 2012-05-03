@@ -122,7 +122,7 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 			return $this->closeJob($job, null, null, "Handled [$countHandledObjects] objects of type [". $job->data->$bulkUploadObjectType ."]", KalturaBatchJobStatus::RETRY);
 		}
 			
-		return $this->closeJob($job, null, null, 'Waiting for imports and conversion', KalturaBatchJobStatus::ALMOST_DONE, $data);
+		return $this->closeJob($job, null, null, 'Waiting for objects closure', KalturaBatchJobStatus::ALMOST_DONE, $data);
 	}
 	
 	/**
