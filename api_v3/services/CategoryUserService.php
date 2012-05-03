@@ -375,7 +375,12 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	public function indexAction($userId, $categoryId, $shouldUpdate = true)
 	{
-		$kuser = kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $userId);
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $userId);
+
+		if(!$kuser)
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+			
 		$dbCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, $kuser->getId());
 		if(!$dbCategoryKuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID);
