@@ -255,18 +255,21 @@ class myReportsMgr
 		$page_size , $page_index , $order_by , $object_ids = null )
 	{
 		$start = microtime ( true );
-		$total_count = self::getTotalTableCount( $partner_id , $report_type , $input_filter  ,
-			$page_size , $page_index , $order_by , $object_ids );
+		if (!$input_filter instanceof endUserReportsInputFilter)
+		{
+			$total_count = self::getTotalTableCount( $partner_id , $report_type , $input_filter  ,
+				$page_size , $page_index , $order_by , $object_ids );	
 			
+			if ( $total_count <= 0 )
+			{
+				$end = microtime(true);
+				KalturaLog::log( "getTable took [" . ( $end - $start ) . "]" );			
+				return array ( null , null , 0 );
+			}
+		}
 		if ( ! $page_size || $page_size < 0 ) $page_size = 10;
 		if ( ! $page_index || $page_index < 0 ) $page_index = 0;
 		
-		if ( $total_count <= 0 )
-		{
-			$end = microtime(true);
-			KalturaLog::log( "getTable took [" . ( $end - $start ) . "]" );			
-			return array ( null , null , 0 );
-		}
 		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_TABLE , $input_filter ,$page_size , $page_index , $order_by , $object_ids );
 
 		if ( count($result) > 0 )
@@ -402,8 +405,7 @@ class myReportsMgr
 	private static function getTotalTableCount( $partner_id , $report_type , reportsInputFilter $input_filter  ,
 		$page_size , $page_index , $order_by , $object_ids = null )
 	{
-		if ($input_filter instanceof endUserReportsInputFilter)
-			return 0;
+		
 		$cache_key = self::createCacheKey ( $partner_id , $report_type , $input_filter , $object_ids );
 		if ( ! self::$count_cache )
 		{
