@@ -233,7 +233,7 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"total_by_user_by_app" => "user_engagement/unique_total_by_user_by_app",
 				"total_by_context_by_user_by_app" => "user_engagement/unique_total_by_context_by_user_by_app",
 				"total_without_filter" => "user_engagement/unique_total_by_context",
-				"total_no_text" => "user_engagement/unique_total_by_context"
+				"total_no_text" => "user_engagement/unique_total_no_text"
 			),
 			"user_engagement" => array (
 				"graph_no_text" => "graph_no_text",
