@@ -8,7 +8,8 @@
  */
 class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 {
-/**
+    private $categoryReferenceIdMap = array();
+	/**
      * (non-PHPdoc)
      * @see BulkUploadGeneralEngineCsv::createUploadResult()
      */
@@ -102,14 +103,41 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		    }
 		}
 		
+		if (!$bulkUploadResult->userId)
+		{
+		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+			$bulkUploadResult->errorDescription = "Missing mandatory parameter userId";
+		}
+		
+		if (!$bulkUploadResult->categoryId && !$bulkUploadResult->categoryReferenceId)
+		{
+		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+			$bulkUploadResult->errorDescription = "Missing mandatory parameter categoryId";
+		}
 
 		if($this->lineNumber > $this->maxRecords) // check max records
 		{
 			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
-			$bulkUploadResult->errorDescription = "Exeeded max records count per bulk";
+			$bulkUploadResult->errorDescription = "Exceeded max records count per bulk";
 		}
 		
+		if (!$bulkUploadResult->categoryId && $bulkUploadResult->categoryReferenceId)
+		{
+		    $filter = new KalturaCategoryFilter();
+		    $filter->referenceIdEqual = $bulkUploadResult->categoryReferenceId;
+		    $this->impersonate();
+		    $categoryResults = $this->kClient->category->listAction($filter);
+		    $this->unimpersonate();
+		    
+		    if ($categoryResults->objects && count($categoryResults->objects))
+		    {
+		        $this->categoryReferenceIdMap[$bulkUploadResult->categoryReferenceId] = $categoryResults->objects[0]->id;
+		    }
+		}	
+			
 		if($bulkUploadResult->status == KalturaBulkUploadResultStatus::ERROR)
 		{
 			$this->addBulkUploadResult($bulkUploadResult);
@@ -142,7 +170,6 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
 			/* @var $bulkUploadResult KalturaBulkUploadResultCategoryUser */
-		    KalturaLog::debug("Handling bulk upload result: [". $bulkUploadResult->name ."]");
 		    switch ($bulkUploadResult->action)
 		    {
 		        case KalturaBulkUploadAction::ADD:
@@ -154,6 +181,9 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
         			$categoryUser = $this->kClient->categoryUser->add($user);
         			if ($bulkUploadResult->requiredObjectStatus)
         			{
+        				//We push the bulk upload result in the array a second time to maintain an equal number of 
+        				//multi request results and bulk upload results
+        				$bulkUploadResultChunk[] = $bulkUploadResult;
         			    switch ($bulkUploadResult->requiredObjectStatus)
         			    {
         			        case KalturaCategoryUserStatus::ACTIVE:
@@ -172,6 +202,19 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		            $category = $this->createCategoryUserFromResultAndJobData($bulkUploadResult);
         					
         			$bulkUploadResultChunk[] = $bulkUploadResult;
+		    		if ($bulkUploadResult->requiredObjectStatus)
+        			{
+        				$bulkUploadResultChunk[] = $bulkUploadResult;
+        			    switch ($bulkUploadResult->requiredObjectStatus)
+        			    {
+        			        case KalturaCategoryUserStatus::ACTIVE:
+        			            $this->kClient->categoryUser->activate($categoryUser->categoryId, $categoryUser->userId);
+        			            break;
+        			        case KalturaCategoryUserStatus::NOT_ACTIVE:
+        			            $this->kClient->categoryUser->deactivate($categoryUser->categoryId, $categoryUser->userId);
+        			            break;
+        			    }
+        			}
         			
         			$this->impersonate();
         			$this->kClient->categoryUser->update($bulkUploadResult->objectId, $category);
@@ -226,10 +269,16 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 	    //calculate parentId of the category
 	    
 	    if ($bulkUploadCategoryUserResult->categoryId)
+	    {
 	        $categoryUser->categoryId = $bulkUploadCategoryUserResult->categoryId;
+	    }
+	    else if ($this->categoryReferenceIdMap[$bulkUploadCategoryUserResult->categoryReferenceId])
+	    {
+	        $categoryUser->categoryId = $this->categoryReferenceIdMap[$bulkUploadCategoryUserResult->categoryReferenceId];
+	    }
 	    
 	    if ($bulkUploadCategoryUserResult->userId)
-	        $categoryUser->tags = $bulkUploadUserResult->tags;
+	        $categoryUser->userId = $bulkUploadCategoryUserResult->userId;
 	        
 	    if ($bulkUploadCategoryUserResult->permissionLevel)
 	        $categoryUser->permissionLevel = $bulkUploadCategoryUserResult->permissionLevel;
@@ -251,6 +300,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		    "action",
 		    "categoryUserId",
 		    "categoryId",
+		    "categoryReferenceId",
 		    "userId",
 			"status",
 		    "permissionLevel",
@@ -259,15 +309,17 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 	}
 	
 	
-    protected function updateObjectsResults($requestResults, $bulkUploadResults)
+	protected function updateObjectsResults($requestResults, $bulkUploadResults)
 	{
 	    $this->kClient->startMultiRequest();
 		KalturaLog::info("Updating " . count($requestResults) . " results");
 		
+		$doneWithPrev = true;
 		// checking the created entries
 		foreach($requestResults as $index => $requestResult)
 		{
-			$bulkUploadResult = $bulkUploadResults[$index];
+			if ($doneWithPrev)
+				$bulkUploadResult = $bulkUploadResults[$index];
 			
 			if(is_array($requestResult) && isset($requestResult['code']))
 			{
@@ -276,23 +328,30 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 				$bulkUploadResult->objectStatus = $requestResult['code'];
 				$bulkUploadResult->errorDescription = $requestResult['message'];
 				$this->addBulkUploadResult($bulkUploadResult);
+				$doneWithPrev = true;
 				continue;
 			}
 			
 			if($requestResult instanceof Exception)
 			{
 				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
-			    $bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
+				$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
 				$bulkUploadResult->errorDescription = $requestResult->getMessage();
 				$this->addBulkUploadResult($bulkUploadResult);
+				$doneWithPrev = true;
 				continue;
 			}
 			
 			// update the results with the new object Id
-			if ($requestResult->id)
+			if (property_exists(get_class($requestResult), "id") && $requestResult->id)
 			    $bulkUploadResult->objectId = $requestResult->id;
-			
-			$this->addBulkUploadResult($bulkUploadResult);
+			    
+			if ($bulkUploadResult->requiredObjectStatus && $doneWithPrev)
+			{
+				$doneWithPrev = false;
+			}
+			if ($doneWithPrev)
+				$this->addBulkUploadResult($bulkUploadResult);
 		}
 		
 		$this->kClient->doMultiRequest();
