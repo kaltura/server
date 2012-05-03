@@ -19,8 +19,11 @@ class myReportsMgr
 	const REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE = 110;
 	const SPEFICIC_USER_ENGAGEMENT = 12;
 	const REPORT_TYPE_USER_TOP_CONTENT = 13;
+	const REPORT_TYPE_USER_TOP_CONTENT_TOTAL_UNIQUE = 130;
 	const REPORT_TYPE_USER_CONTENT_DROPOFF = 14;
+	const REPORT_TYPE_USER_CONTENT_DROPOFF_TOTAL_UNIQUE = 140;
 	const REPORT_TYPE_USER_CONTENT_INTERACTIONS = 15;
+	const REPORT_TYPE_USER_CONTENT_INTERACTIONS_TOTAL_UNIQUE = 150;
 	const REPORT_TYPE_SYSTEM_GENERIC_PARTNER = 100;
 	const REPORT_TYPE_SYSTEM_GENERIC_PARTNER_TYPE = 101;
 	const REPORT_TYPE_PARTNER_BANDWIDTH_USAGE = 200;
@@ -506,7 +509,6 @@ class myReportsMgr
 				
 					$categoryIdsFromDB = $c->getFetchedIds();
 				
-									
 					if (count($categoryIdsFromDB))
 						$categoryIds = implode(",", $categoryIdsFromDB);
 					else
@@ -636,8 +638,11 @@ class myReportsMgr
 		self::REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
 		self::SPEFICIC_USER_ENGAGEMENT => "specific_user_engagement",
 		self::REPORT_TYPE_USER_TOP_CONTENT => "user_top_content",
+		self::REPORT_TYPE_USER_TOP_CONTENT_TOTAL_UNIQUE => "user_engagement_unique",
 		self::REPORT_TYPE_USER_CONTENT_DROPOFF => "user_content_dropoff", 
+		self::REPORT_TYPE_USER_CONTENT_DROPOFF_TOTAL_UNIQUE => "user_engagement_unique",
 	    self::REPORT_TYPE_USER_CONTENT_INTERACTIONS => "user_content_interactions",
+	    self::REPORT_TYPE_USER_CONTENT_INTERACTIONS_TOTAL_UNIQUE => "user_engagement_unique",
 		self::REPORT_TYPE_SYSTEM_GENERIC_PARTNER => "system_generic_partner" ,
 		self::REPORT_TYPE_SYSTEM_GENERIC_PARTNER_TYPE => "system_generic_partner_type" ,
 		self::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE => "partner_bandwidth_usage" ,
@@ -800,7 +805,6 @@ class myReportsMgr
 		// TODO - format the search_text according to the the $input_filter
 		$search_text_match_clause = "1=1"; //self::setSearchFieldsAndText ( $input_filter );
 		
-		$categories_match_clause = self::setCategoriesMatchClause( $input_filter );
 		
 		$pagination_first = ( $page_index - 1 ) * $page_size;
 		if ( $pagination_first < 0 ) $pagination_first = 0;
@@ -851,8 +855,7 @@ class myReportsMgr
 				"{SORT_FIELD}" , 
 				"{PAGINATION_FIRST}" ,
 				"{PAGINATION_SIZE}" ,
-				"{OBJ_ID_CLAUSE}" , 
-				"{CATEGORIES_MATCH}" , 
+				"{OBJ_ID_CLAUSE}" ,  
 				"{TIME_SHIFT}" , 
 				"{CAT_ID_CLAUSE}" ,
 			);
@@ -872,7 +875,6 @@ class myReportsMgr
 				$pagination_first ,
 				$page_size ,
 				$obj_ids_str , 
-				$categories_match_clause,
 				$time_shift,
 				$cat_ids_str,
 			);
