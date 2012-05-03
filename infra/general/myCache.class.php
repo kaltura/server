@@ -88,7 +88,7 @@ class myCache
 			}
 		}
 		
-		self::$s_memcache->set ( $this->m_namespace . $obj_name , $obj , false , $expiry );
+		self::$s_memcache->set ( $this->m_namespace . $obj_name , $obj , $expiry );
 		
 		// TODO - maintain the linked_list
 //		//$this->m_obj_container[$obj_name] = $obj;
