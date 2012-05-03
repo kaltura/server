@@ -1915,6 +1915,9 @@ class kFlowHelper
 		$featureStatusesToRemove = $data->getFeatureStatusesToRemove();
 		foreach($featureStatusesToRemove as $featureStatusToRemove)
 		{
+			if(!($featureStatusToRemove instanceof kFeatureStatus))
+				continue;
+			
 			$dbBatchJob->getPartner()->decrementFeaturesStatusByType($featureStatusToRemove->getType());
 		}
 		
@@ -1926,6 +1929,9 @@ class kFlowHelper
 		$featureStatusesToRemove = $data->getFeatureStatusesToRemove();
 		foreach($featureStatusesToRemove as $featureStatusToRemove)
 		{
+			if(!($featureStatusToRemove instanceof kFeatureStatus))
+				continue;
+				
 			$dbBatchJob->getPartner()->decrementFeaturesStatusByType($featureStatusToRemove->getType());
 		}
 		

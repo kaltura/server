@@ -72,7 +72,27 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	 */
 	public $updateMethod;
 	
-	private static $mapBetweenObjects = array ("categoryId", "userId" => "puserId", "partnerId", "permissionLevel", "status", "createdAt", "updatedAt", "updateMethod" );
+	/**
+	 * The full ids of the Category
+	 * 
+	 * @var string
+	 * @readonly
+	 * @filter likex,eq
+	 */
+	public $categoryFullIds;
+	
+	private static $mapBetweenObjects = array
+	(
+		"categoryId",
+		"userId" => "puserId",
+		"partnerId",
+		"permissionLevel",
+		"status",
+		"createdAt",
+		"updatedAt",
+		"updateMethod",
+		"categoryFullIds",	
+	);
 	
 	public function toObject($dbObject = null, $skip = array()) {
 		if (is_null ( $dbObject ))

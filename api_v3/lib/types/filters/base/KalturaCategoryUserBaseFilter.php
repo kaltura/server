@@ -22,6 +22,8 @@ class KalturaCategoryUserBaseFilter extends KalturaFilter
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"updateMethodEqual" => "_eq_update_method",
 		"updateMethodIn" => "_in_update_method",
+		"categoryFullIdsStartsWith" => "_likex_category_full_ids",
+		"categoryFullIdsEqual" => "_eq_category_full_ids",
 	);
 
 	private $order_by_map = array
@@ -139,4 +141,18 @@ class KalturaCategoryUserBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $updateMethodIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $categoryFullIdsStartsWith;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $categoryFullIdsEqual;
 }

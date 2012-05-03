@@ -1466,6 +1466,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="category_full_ids" type="longvarchar" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="category">
 			<reference local="category_id" foreign="id" />
 		</foreign-key>

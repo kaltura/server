@@ -92,6 +92,12 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
+	 * The value for the category_full_ids field.
+	 * @var        string
+	 */
+	protected $category_full_ids;
+
+	/**
 	 * @var        category
 	 */
 	protected $acategory;
@@ -324,6 +330,16 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [category_full_ids] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCategoryFullIds()
+	{
+		return $this->category_full_ids;
 	}
 
 	/**
@@ -660,6 +676,29 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 	} // setCustomData()
 
 	/**
+	 * Set the value of [category_full_ids] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     categoryKuser The current object (for fluent API support)
+	 */
+	public function setCategoryFullIds($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryKuserPeer::CATEGORY_FULL_IDS]))
+			$this->oldColumnsValues[categoryKuserPeer::CATEGORY_FULL_IDS] = $this->category_full_ids;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->category_full_ids !== $v) {
+			$this->category_full_ids = $v;
+			$this->modifiedColumns[] = categoryKuserPeer::CATEGORY_FULL_IDS;
+		}
+
+		return $this;
+	} // setCategoryFullIds()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -703,6 +742,7 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			$this->created_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->updated_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
 			$this->custom_data = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->category_full_ids = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -712,7 +752,7 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 12; // 12 = categoryKuserPeer::NUM_COLUMNS - categoryKuserPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 13; // 13 = categoryKuserPeer::NUM_COLUMNS - categoryKuserPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating categoryKuser object", $e);
@@ -1255,6 +1295,9 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			case 11:
 				return $this->getCustomData();
 				break;
+			case 12:
+				return $this->getCategoryFullIds();
+				break;
 			default:
 				return null;
 				break;
@@ -1288,6 +1331,7 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			$keys[9] => $this->getCreatedAt(),
 			$keys[10] => $this->getUpdatedAt(),
 			$keys[11] => $this->getCustomData(),
+			$keys[12] => $this->getCategoryFullIds(),
 		);
 		return $result;
 	}
@@ -1355,6 +1399,9 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			case 11:
 				$this->setCustomData($value);
 				break;
+			case 12:
+				$this->setCategoryFullIds($value);
+				break;
 		} // switch()
 	}
 
@@ -1391,6 +1438,7 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
 		if (array_key_exists($keys[11], $arr)) $this->setCustomData($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setCategoryFullIds($arr[$keys[12]]);
 	}
 
 	/**
@@ -1414,6 +1462,7 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryKuserPeer::CREATED_AT)) $criteria->add(categoryKuserPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(categoryKuserPeer::UPDATED_AT)) $criteria->add(categoryKuserPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(categoryKuserPeer::CUSTOM_DATA)) $criteria->add(categoryKuserPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(categoryKuserPeer::CATEGORY_FULL_IDS)) $criteria->add(categoryKuserPeer::CATEGORY_FULL_IDS, $this->category_full_ids);
 
 		return $criteria;
 	}
@@ -1501,6 +1550,8 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 		$copyObj->setUpdatedAt($this->updated_at);
 
 		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setCategoryFullIds($this->category_full_ids);
 
 
 		$copyObj->setNew(true);

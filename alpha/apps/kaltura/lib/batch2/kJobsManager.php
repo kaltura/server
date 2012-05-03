@@ -877,8 +877,6 @@ class kJobsManager
 	 */
 	public static function addIndexJob($partnerId, $objectType, baseObjectFilter $filter, $shouldUpdate, $featureStatusesToRemove = array())
 	{
-		KalturaLog::debug('### ' . __LINE__);
-		
 	    $jobData = new kIndexJobData();
  		$jobData->setFilter($filter);
  		$jobData->setShouldUpdate($shouldUpdate);

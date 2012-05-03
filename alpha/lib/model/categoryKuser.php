@@ -125,7 +125,16 @@ class categoryKuser extends BasecategoryKuser {
 		parent::delete($con);
 	}
 	
-	//set properties in custom data
+	public function reSetCategoryFullIds()
+	{
+		$category = categoryPeer::retrieveByPK($this->getCategoryId());
+		if(!$category)
+			throw new kCoreException('category id [' . $this->getCategoryId() . 'was not found', kCoreException::ID_NOT_FOUND);
+			
+		$this->setCategoryFullIds($category->getFullIds());
+	}
+	
+	//	set properties in custom data
 	
     public function setBulkUploadId ($bulkUploadId){$this->putInCustomData (self::BULK_UPLOAD_ID, $bulkUploadId);}
 	public function getBulkUploadId (){return $this->getFromCustomData(self::BULK_UPLOAD_ID);}

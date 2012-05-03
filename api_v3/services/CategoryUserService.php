@@ -59,6 +59,7 @@ class CategoryUserService extends KalturaBaseService
 			$dbCategoryKuser->setStatus(CategoryKuserStatus::PENDING);
 		}
 				
+		$dbCategoryKuser->setCategoryFullIds($category->getFullIds());
 		$dbCategoryKuser->setPartnerId($this->getPartnerId());
 		$dbCategoryKuser->save();
 		
@@ -350,7 +351,7 @@ class CategoryUserService extends KalturaBaseService
 	 * @action copyFromCaregory
 	 * @param int $categoryId
 	 */
-	public function copyFromCaregoryAction($categoryId)
+	public function copyFromCategoryAction($categoryId)
 	{
 		$categoryDb = categoryPeer::retrieveByPK($categoryId);
 		if (!$categoryDb)
@@ -362,8 +363,34 @@ class CategoryUserService extends KalturaBaseService
 		$categoryDb->copyCategoryUsersFromParent($categoryDb->getParentId());
 	}
 	
-	/*public function index()
+	/**
+	 * Index CategoryUser by userid and category id
+	 * 
+	 * @action index
+	 * @param string $userId
+	 * @param int $categoryId
+	 * @param bool $shouldUpdate
+	 * @throws KalturaErrors::INVALID_CATEGORY_USER_ID
+	 * @return int
+	 */
+	public function indexAction($userId, $categoryId, $shouldUpdate = true)
 	{
-		//TODO - WHY DO WE NEED IT?
-	}*/
+		$kuser = kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $userId);
+		$dbCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, $kuser->getId());
+		if(!$dbCategoryKuser)
+			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID);
+			
+		if (!$shouldUpdate)
+		{
+			$dbCategoryKuser->setUpdatedAt(time());
+			$dbCategoryKuser->save();
+			
+			return $dbCategoryKuser->getId();
+		}
+				
+		$dbCategoryKuser->reSetCategoryFullIds();
+		$dbCategoryKuser->save();
+		
+		return $dbCategoryKuser->getId();
+	}
 }

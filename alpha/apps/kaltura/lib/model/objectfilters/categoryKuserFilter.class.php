@@ -14,6 +14,10 @@ class categoryKuserFilter extends baseObjectFilter
 				"_in_category_id",
 				"_eq_user_id",
 				"_in_user_id",
+				"_gte_created_at",
+				"_lte_created_at",
+				"_gte_updated_at",
+				"_lte_updated_at",
 				"_eq_parent_id",
 				"_in_parent_id",
 				"_eq_depth",
@@ -33,6 +37,8 @@ class categoryKuserFilter extends baseObjectFilter
 				"_in_permission_level",
 				"_eq_update_method",
 				"_in_update_method",
+				"_likex_category_full_ids",
+				"_eq_category_full_ids",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name");

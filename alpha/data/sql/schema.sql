@@ -1686,6 +1686,7 @@ CREATE TABLE `category_kuser`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
+	`category_full_ids` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_category_index`(`category_id`, `status`),
 	KEY `partner_id_kuser_index`(`kuser_id`, `status`, `category_id`),

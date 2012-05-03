@@ -409,7 +409,7 @@ class Partner extends BasePartner
 	{		
 		$featuresStatus = unserialize($this->getFromCustomData("featuresStatus"));
 		if(!$featuresStatus)
-			return null;
+			return array();
 
 		return $featuresStatus;
 	}

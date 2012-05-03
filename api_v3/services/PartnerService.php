@@ -344,7 +344,7 @@ class PartnerService extends KalturaBaseService
 		$dbPartner = $this->getPartner();
 		if ( ! $dbPartner )
 			throw new KalturaAPIException ( APIErrors::UNKNOWN_PARTNER_ID , $this->getPartnerId() );
-			
+		
 		$dbFeaturesStatus = $dbPartner->getFeaturesStatus();
 		
 		$featuresStatus = KalturaFeatureStatusArray::fromDbArray($dbFeaturesStatus);
