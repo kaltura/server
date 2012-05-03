@@ -860,16 +860,13 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function postInsert(PropelPDO $con = null)
 	{	
-		
 		parent::postInsert($con);
 
 		if($this->getFullIds() == null)
 		{
-			
 			$this->reSetFullIds();
 			
 			parent::save();
-			
 		}
 			
 		if (!$this->alreadyInSave)

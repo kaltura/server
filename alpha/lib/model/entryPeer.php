@@ -306,19 +306,21 @@ class entryPeer extends BaseentryPeer
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS); 
 		$c->addAnd ( entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
 
-		$crit = null;
+		// logic should be ( kuserId || creatorKuserId) || (privacyByContext && entitledKusers)
+		
+		$critPrivacyByContextAndEntitledKusers = null;
+		
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$privacyContexts = kEntitlementUtils::getPrivacyContextSearch();
-			$critPrivacyByContext = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, Criteria::IN);
-			$critPrivacyByContext->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-			$c->addAnd($critPrivacyByContext);
-			
+			$critPrivacyByContextAndEntitledKusers = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, Criteria::IN);
+			$critPrivacyByContextAndEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+
 			if(kCurrentContext::$ks_kuser_id)
 			{
 				//ENTITLED_KUSERS field includes $this->entitledUserEdit, $this->entitledUserEdit, and users on work groups categories.
-				$crit = $c->getNewCriterion(self::ENTITLED_KUSERS, kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
-				$crit->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+				$critEntitledKusers = $c->getNewCriterion(self::ENTITLED_KUSERS, kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
+				$critEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 				
 				$categoriesIds = array();
 				$categories = categoryPeer::doSelectEntitledAndNonIndexedCategories(kCurrentContext::$ks_kuser_id, entry::CATEGORY_SEARCH_LIMIT);
@@ -332,32 +334,40 @@ class entryPeer extends BaseentryPeer
 				{
 					$critCategories = $c->getNewCriterion(self::CATEGORIES_IDS, $categoriesIds, Criteria::IN);
 					$critCategories->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-					$crit->addOr($critCategories);
+					$critEntitledKusers->addOr($critCategories);
 				}
+				
+				$critPrivacyByContextAndEntitledKusers->addAnd($critEntitledKusers);
 			}
 		}
-		
+
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
-			
+		
+		$critKuser = null;
+
 		// when session is not admin and without list:* privilege, allow access to user entries only
 		if (!$ks || (!$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)))
 		{		
-			$kuserCrit = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
-			$kuserCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
-			
-			if(!$crit)
-				$crit = $kuserCrit;
-			else 
-				$crit->addOr ($kuserCrit);
+			$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
+			$critKuser->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 				
 			$creatorKuserCrit = $c->getNewCriterion(entryPeer::CREATOR_KUSER_ID, kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
 			$creatorKuserCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
-			$crit->addOr($creatorKuserCrit);
+			$critKuser->addOr($creatorKuserCrit);
 		}
 		
-		if($crit)
-			$c->addAnd ( $crit );
+		if($critPrivacyByContextAndEntitledKusers && $critKuser)
+			$critKuser->addOr($critPrivacyByContextAndEntitledKusers);
 			
+		if($critKuser)
+		{
+			$c->addAnd ($critKuser);
+		}
+		elseif($critPrivacyByContextAndEntitledKusers)
+		{
+			$c->addAnd ($critPrivacyByContextAndEntitledKusers);
+		}
+		
 		self::$s_criteria_filter->setFilter($c);
 	}
 	

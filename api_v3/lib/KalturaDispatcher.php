@@ -102,8 +102,8 @@ class KalturaDispatcher
 		
 		kCurrentContext::initKsPartnerUser($ksStr, $p, $userId);
 		kPermissionManager::init(kConf::get('enable_cache'));
-		//kEntitlementUtils::initEntitlementEnforcement();
-		//KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		kEntitlementUtils::initEntitlementEnforcement();
+		KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		
 //		if (!$success)
 //		{

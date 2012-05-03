@@ -39,7 +39,8 @@ abstract class KalturaCriterion extends Criterion implements IKalturaDbQuery
 	
 	public static function enableTag($tag)
 	{
-		self::$enabledTags[$tag] = 0;
+		if (!isset(self::$enabledTags[$tag]))
+			self::$enabledTags[$tag] = 0;
 	}
 	
 	public static function restoreTag($tag)
