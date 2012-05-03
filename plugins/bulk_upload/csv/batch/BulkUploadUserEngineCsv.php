@@ -236,7 +236,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	    if ($bulkUploadUserResult->city)
 	        $user->city = $bulkUploadUserResult->city;
 	        
-	    if ($bulkUploadUserResult->inheritance)
+	    if ($bulkUploadUserResult->country)
 	        $user->country = $bulkUploadUserResult->country;
 	        
 	    if ($bulkUploadUserResult->state)
