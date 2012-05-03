@@ -272,10 +272,8 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 	{
 	    $parentCategoryFilter = new KalturaCategoryFilter();
 	    $parentCategoryFilter->fullNameEqual = $fullname;
-	    $this->impersonate();
 	    $parentCategoryIds = $this->kClient->category->listAction($parentCategoryFilter);
 	    /* @var $parentCategoryIds KalturaCategoryListResponse*/
-	    $this->unimpersonate();
 	    if (!count($parentCategoryIds->objects))
 	    {
 	        //Error because the relative path of the new category does not exist
