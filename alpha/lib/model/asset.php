@@ -334,7 +334,7 @@ class asset extends Baseasset implements ISyncableFile
 	{
 		$key = $this->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key, $storageId);
-		if(!$fileSync)
+		if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
 			return null;
 		
 		$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
@@ -361,14 +361,14 @@ class asset extends Baseasset implements ISyncableFile
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
 				$serveRemote = true;
 				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if(!$fileSync)
+				if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
 					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
 				
 				break;
 			
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
 				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if($fileSync)
+				if($fileSync && $fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY)
 					$serveRemote = true;
 				
 				break;
@@ -379,7 +379,7 @@ class asset extends Baseasset implements ISyncableFile
 					break;
 					
 				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if(!$fileSync)
+				if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
 					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
 				
 				$serveRemote = true;
