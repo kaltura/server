@@ -184,65 +184,40 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		{
 			/* @var $bulkUploadResult KalturaBulkUploadResultCategory */
 		    KalturaLog::debug("Handling bulk upload result: [". $bulkUploadResult->name ."]");
-		    switch ($bulkUploadResult->action)
+		    $this->impersonate();
+		    try 
 		    {
-		        case KalturaBulkUploadAction::ADD:
-    		        $category = $this->createCategoryFromResultAndJobData($bulkUploadResult);
-        					
-        			$bulkUploadResultChunk[] = $bulkUploadResult;
-        			
-        			try 
-        			{
-            			$this->impersonate();
-            			$requestResults[] = $this->kClient->category->add($category);
-            			$this->unimpersonate();
-        			}
-        			catch (Exception $e)
-        			{
-        			    $requestResults[] = $e;
-        			}
-        			
-		            break;
-		        
-		        case KalturaBulkUploadAction::UPDATE:
-		            $category = $this->createCategoryFromResultAndJobData($bulkUploadResult);
-        					
-        			$bulkUploadResultChunk[] = $bulkUploadResult;
-        			
-        			try 
-        			{
-            			$this->impersonate();
-            			$requestResults[] = $this->kClient->category->update($bulkUploadResult->objectId, $category);
-            			$this->unimpersonate();
-        			}
-		            catch (Exception $e)
-        			{
-        			    $requestResults[] = $e;
-        			}
-        			
-		            break;
-		            
-		        case KalturaBulkUploadAction::DELETE:
-		            $bulkUploadResultChunk[] = $bulkUploadResult;
-        			
-		            try 
-		            {
-            			$this->impersonate();
-            			$requestResults[] = $this->kClient->category->delete($bulkUploadResult->objectId);
-            			$this->unimpersonate();
-		            }
-		            catch (Exception $e)
-        			{
-        			    $requestResults[] = $e;
-        			}
-        			
-		            break;
-		        
-		        default:
-		            $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
-		            $bulkUploadResult->errorDescription = "Unknown action passed: [".$bulkUploadResult->action ."]";
-		            break;
+    		    switch ($bulkUploadResult->action)
+    		    {
+    		        case KalturaBulkUploadAction::ADD:
+        		        $category = $this->createCategoryFromResultAndJobData($bulkUploadResult);
+            			$bulkUploadResultChunk[] = $bulkUploadResult;
+                		$requestResults[] = $this->kClient->category->add($category);
+ 
+    		            break;
+    		        
+    		        case KalturaBulkUploadAction::UPDATE:
+    		            $category = $this->createCategoryFromResultAndJobData($bulkUploadResult);
+            			$bulkUploadResultChunk[] = $bulkUploadResult;
+                		$requestResults[] = $this->kClient->category->update($bulkUploadResult->objectId, $category);
+    		            break;
+    		            
+    		        case KalturaBulkUploadAction::DELETE:
+    		            $bulkUploadResultChunk[] = $bulkUploadResult;
+                		$requestResults[] = $this->kClient->category->delete($bulkUploadResult->objectId);
+    		            break;
+    		        
+    		        default:
+    		            $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+    		            $bulkUploadResult->errorDescription = "Unknown action passed: [".$bulkUploadResult->action ."]";
+    		            break;
+    		    }
 		    }
+		    catch (Exception $e)
+		    {
+		        $requestResults[] = $e;
+		    }
+		    $this->unimpersonate();
 		    
 		}
 		
