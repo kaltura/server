@@ -37,7 +37,7 @@ class localMgr extends kFileTransferMgr
 	// login using a public key - not supported in FTP
 	protected function doLoginPubKey($user, $pubKeyFile, $privKeyFile, $passphrase = null)
 	{
-		return false; // NOT SUPPORTED
+		return true;
 	}
 
 
@@ -104,8 +104,24 @@ class localMgr extends kFileTransferMgr
 	
 	protected function doFileSize($remote_file)
 	{
-	    clearstatcache();
-	    return @filesize($remote_file);
+		$url = "file://$remote_file";
+
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_NOBODY, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		$headers = curl_exec($ch);
+		if(!$headers)
+			KalturaLog::err('Curl error: ' . curl_error($ch));
+		curl_close($ch);
+		
+		if(!$headers)
+			return false;
+		       
+		if (preg_match('/Content-Length: (\d+)/', $headers, $matches))
+			return floatval($matches[1]);
+			
+		return false;
 	}
 	
     protected function doModificationTime($remote_file)
