@@ -82,6 +82,10 @@ class BulkService extends KalturaBaseService
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
+		
+		KalturaLog::debug("### bulk upload type: ".$bulkUploadData->type);
+		KalturaLog::debug("### bulk upload type: $bulkUploadCoreType");
+		
 		$dbBulkUploadJobData->setBulkUploadObjectType(BulkUploadObjectType::CATEGORY);
 		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
 		$dbObjectData = $bulkUploadCategoryData->toInsertableObject();
