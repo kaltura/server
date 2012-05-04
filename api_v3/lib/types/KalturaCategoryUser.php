@@ -123,7 +123,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	 */
 	public function validateForInsert($propertiesToSkip = array()) 
 	{
-		$kuser = kuserPeer::getKuserByPartnerAndUid ( kCurrentContext::$partner_id, $this->userId );
+		$kuser = kuserPeer::getKuserByPartnerAndUid ( kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id, $this->userId );
 		if (! $kuser)
 			throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID, $this->userId );
 		
