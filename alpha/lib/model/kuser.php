@@ -133,6 +133,7 @@ class kuser extends Basekuser implements IIndexable
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 		
+		$objectUpdated = $this->isModified();
 		$objectDeleted = false;
 		if($this->isColumnModified(kuserPeer::STATUS) && $this->getStatus() == KuserStatus::DELETED) {
 			$objectDeleted = true;
@@ -162,10 +163,11 @@ class kuser extends Basekuser implements IIndexable
 			// if user is deleted - check if shoult also delete login data
 			UserLoginDataPeer::notifyOneLessUser($this->getLoginDataId());
 		}
-		else 
+
+		if($objectUpdated)
 		{
 		    kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
-		    if (!is_null($oldLoginDataId) && is_null($this->getLoginDataId()))
+		    if (!$objectDeleted && !is_null($oldLoginDataId) && is_null($this->getLoginDataId()))
 		    {
 			    // if login was disabled - check if should also delete login data
 			    UserLoginDataPeer::notifyOneLessUser($oldLoginDataId);
