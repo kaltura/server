@@ -37,6 +37,7 @@ abstract class kBaseCacheWrapper
 	 * @param mixed $var
 	 * @param int $expiry
 	 * @param int $defaultExpiry
+	 * @return bool false on error
 	 */
 	abstract public function set($key, $var, $expiry = 0, $defaultExpiry = 0);
 

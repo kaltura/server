@@ -66,7 +66,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function set($key, $var, $expiry = 0, $defaultExpiry = 0)
 	{
-		$this->memcache->set($key, $var, $this->flags, $expiry);
+		return $this->memcache->set($key, $var, $this->flags, $expiry);
 	}
 
 	/* (non-PHPdoc)

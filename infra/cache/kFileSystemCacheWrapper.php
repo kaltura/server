@@ -100,22 +100,30 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 		// write the expiry if non default
 		if ($defaultExpiry != $expiry)
 		{
-			self::safeFilePutContents($filePath . self::EXPIRY_SUFFIX, $expiry ? time() + $expiry : 0);
+			if (self::safeFilePutContents($filePath . self::EXPIRY_SUFFIX, $expiry ? time() + $expiry : 0) === false)
+				return false;
 		}
 		
-		self::safeFilePutContents($filePath, $var);
+		return self::safeFilePutContents($filePath, $var);
 	}
 	
 	/**
 	 * @param string $filePath
 	 * @param string $var
+	 * @return bool
 	 */
 	protected static function safeFilePutContents($filePath, $var)
 	{
 		// write to a temp file and then rename, so that the write will be atomic
 		$tempFilePath = tempnam(dirname($filePath), basename($filePath));
-		file_put_contents($tempFilePath, $var);
-		rename($tempFilePath, $filePath);
+		if (file_put_contents($tempFilePath, $var) === false)
+			return false;
+		if (rename($tempFilePath, $filePath) === false)
+		{
+			self::safeUnlink($tempFilePath);
+			return false;
+		}
+		return true;
 	}
 		
 	/**

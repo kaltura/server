@@ -31,6 +31,6 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	 */
 	public function set($key, $var, $expiry = 0, $defaultExpiry = 0)
 	{
-		apc_store($key, $var, $expiry);
+		return apc_store($key, $var, $expiry);
 	}
 }
