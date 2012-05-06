@@ -1,5 +1,6 @@
 SELECT 
 	us.name name,
+	unique_videos,
 	count_plays,
 	count_plays_25,
 	count_plays_50,
@@ -17,12 +18,13 @@ FROM
 		SUM(count_plays_100) count_plays_100,
 		( SUM(count_plays_100) / SUM(count_plays) ) play_through_ratio
 	FROM 
-		dwh_hourly_events_entry_user_app ev, dwh_dim_applications ap
+		dwh_hourly_events_context_entry_user_app ev, dwh_dim_applications ap
 	WHERE 	
 	    {OBJ_ID_CLAUSE} # ev.entry_id in 
-		AND ap.application_id = ev.application_id
+		AND {CAT_ID_CLAUSE}
 		AND ap.name = {APPLICATION_NAME}
 		AND ap.application_id = ev.application_id
+		AND ap.partner_id = ev.partner_id
 		AND partner_id =  {PARTNER_ID} # PARTNER_ID
         AND date_id BETWEEN IF({TIME_SHIFT}>0,(DATE({FROM_DATE_ID}) - INTERVAL 1 DAY)*1, {FROM_DATE_ID})  
     			AND     IF({TIME_SHIFT}<=0,(DATE({TO_DATE_ID}) + INTERVAL 1 DAY)*1, {TO_DATE_ID})
@@ -35,7 +37,7 @@ FROM
 		  count_plays_100 > 0 )
 	GROUP BY user_id
 	ORDER BY {SORT_FIELD}
+	LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
 ) AS ev_stats, dwh_dim_pusers us
 WHERE ev_stats.user_id = us.puser_id
 AND us.partner_id = {PARTNER_ID}
-LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */

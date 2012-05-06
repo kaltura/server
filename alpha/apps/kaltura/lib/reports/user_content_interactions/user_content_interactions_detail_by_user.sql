@@ -6,9 +6,10 @@ SELECT
 	SUM(count_download) count_download,
 	SUM(count_report) count_report
 FROM 
-	dwh_hourly_events_entry_user_app ev, dwh_dim_users us
+	dwh_hourly_events_context_entry_user_app ev, dwh_dim_pusers us
 WHERE 	
 	{OBJ_ID_CLAUSE} # ev.entry_id in 
+	AND {CAT_ID_CLAUSE}
 	AND ev.partner_id =  {PARTNER_ID} # PARTNER_ID
 	AND ev.partner_id = us.partner_id
 	AND us.name IN {PUSER_ID}

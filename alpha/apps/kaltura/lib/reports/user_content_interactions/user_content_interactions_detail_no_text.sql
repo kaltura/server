@@ -1,22 +1,21 @@
 SELECT 
 	us.name name,
-	SUM(count_plays) count_plays,
-	SUM(count_edit) count_edit,
-	SUM(count_viral) count_viral,
-	SUM(count_download) count_download,
-	SUM(count_report) count_report
+	count_plays,
+	count_edit,
+	count_viral,
+	count_download,
+	count_report
 FROM
 (
 	SELECT 
 		user_id,
 		SUM(count_plays) count_plays,
-		SUM(count_plays_25) count_plays_25,
-		SUM(count_plays_50) count_plays_50,
-		SUM(count_plays_75) count_plays_75,
-		SUM(count_plays_100) count_plays_100,
-		( SUM(count_plays_100) / SUM(count_plays) ) play_through_ratio
+		SUM(count_edit) count_edit,
+		SUM(count_viral) count_viral,
+		SUM(count_download) count_download,
+		SUM(count_report) count_report
 	FROM 
-		dwh_hourly_events_entry_user_app ev
+		dwh_hourly_events_context_entry_user_app ev
 	WHERE 	{OBJ_ID_CLAUSE} # ev.entry_id in 
 		AND partner_id =  {PARTNER_ID} # PARTNER_ID
         AND date_id BETWEEN IF({TIME_SHIFT}>0,(DATE({FROM_DATE_ID}) - INTERVAL 1 DAY)*1, {FROM_DATE_ID})  
