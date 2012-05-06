@@ -48,14 +48,14 @@ abstract class KalturaAssetService extends KalturaBaseService
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
 				$serveRemote = true;
 				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if(!$fileSync)
+				if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
 					throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
 				
 				break;
 			
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
 				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if($fileSync)
+				if($fileSync && $fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY)
 					$serveRemote = true;
 				
 				break;
@@ -66,7 +66,7 @@ abstract class KalturaAssetService extends KalturaBaseService
 					break;
 					
 				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if(!$fileSync)
+				if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
 					throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
 				
 				$serveRemote = true;
