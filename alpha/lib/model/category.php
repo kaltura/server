@@ -151,11 +151,9 @@ class category extends Basecategory implements IIndexable
 			$this->addIndexCategoryJob($this->getFullIds(), null, $featureStatus);		
 		}
 		
-		// save the childs 
+		// save the childs for action category->delete - delete category is not done by async batch. 
 		foreach($this->childs_for_save as $child)
 		{
-			//TODO - REMOVE!
-			throw new Exception('shouldnt get here');
 			$child->save();
 		}
 		
@@ -843,7 +841,7 @@ class category extends Basecategory implements IIndexable
 			'depth' => 'depth',
 			'reference_id' => 'referenceId',
 			'privacy_context' => 'privacyContext',
-			'privacy_contexts' => 'privacyContexts',
+			'privacy_contexts' => 'searchIndexPrivacyContexts',
 			'members_count' => 'membersCount',
 			'pending_members_count' => 'pendingMembersCount',
 			'members' => 'members',
@@ -1251,5 +1249,13 @@ class category extends Basecategory implements IIndexable
 	public function reSetPrivacyContext()
 	{
 		$this->setPrivacyContext($this->getPrivacyContext());
+	}
+	
+	public function getSearchIndexPrivacyContexts()
+	{
+		if(is_null($this->getPrivacyContexts()) || $this->getPrivacyContexts() == '')
+			return kEntitlementUtils::DEFAULT_CONTEXT;
+			
+		return $this->getPrivacyContexts();
 	}
 }
