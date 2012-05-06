@@ -12,7 +12,7 @@ require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "audit", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "metadata", "*"));
-KAutoloader::setClassMapFilePath('../cache/classMap.cache');
+KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/scripts/' . basename(__FILE__) . '.cache');
 KAutoloader::register();
 
 $customData = myCustomData::fromString('a:3:{s:24:"defConversionProfileType";s:3:"med";s:22:"defaultAccessControlId";i:1;s:26:"defaultConversionProfileId";i:1;}');

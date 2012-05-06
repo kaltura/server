@@ -16,7 +16,7 @@ $metadataFieldNames = array(
 
 require_once(dirname(__FILE__).'/../bootstrap.php');
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
-KAutoloader::setClassMapFilePath(KALTURA_ROOT_PATH.'/cache/scripts/classMap'.uniqid().'.cache');
+KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/scripts/' . basename(__FILE__) . '.cache');
 KAutoloader::register();
 
 // don't add to database if one of the parameters is missing or is an empty string

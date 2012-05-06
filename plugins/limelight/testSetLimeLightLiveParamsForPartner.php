@@ -5,7 +5,7 @@ require_once(dirname(__FILE__).'/../../scripts/bootstrap.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "limelight", "*"));
 //KAutoloader::setClassMapFilePath(KALTURA_ROOT_PATH.'/cache/scripts/limelight/classMap.cache');
-KAutoloader::setClassMapFilePath(KALTURA_ROOT_PATH.'/cache/scripts/classMap'.uniqid().'.cache');
+KAutoloader::setClassMapFilePath(KALTURA_ROOT_PATH.'/cache/scripts/' . basename(__FILE__) . '.cache');
 KAutoloader::register();
 
 $partnerId = 101;

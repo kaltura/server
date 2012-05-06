@@ -33,7 +33,7 @@ require_once(ROOT_DIR . '/infra/kConf.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
-KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/sphinx/classMap.cache');
+KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/sphinx/' . basename(__FILE__) . '.cache');
 KAutoloader::register();
 
 error_reporting(E_ALL);

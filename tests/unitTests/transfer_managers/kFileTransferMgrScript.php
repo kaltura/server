@@ -10,7 +10,7 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "p
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "infra", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
 
-KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/tests/classMap.cache');
+KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/tests/' . basename(__FILE__) . '.cache');
 KAutoloader::register();
 
 // Timezone
