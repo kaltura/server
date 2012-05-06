@@ -180,11 +180,11 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		$bulkUploadResultChunk = array(); // store the results of the created entries
 				
 		
+		$this->impersonate();
 		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
 			/* @var $bulkUploadResult KalturaBulkUploadResultCategory */
 		    KalturaLog::debug("Handling bulk upload result: [". $bulkUploadResult->name ."]");
-		    $this->impersonate();
 		    try 
 		    {
     		    switch ($bulkUploadResult->action)
@@ -217,10 +217,10 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		    {
 		        $requestResults[] = $e;
 		    }
-		    $this->unimpersonate();
 		    
 		}
 		
+		$this->unimpersonate();
 		// make all the category actions as the partner
 		
 		if(count($requestResults))
