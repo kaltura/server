@@ -10,6 +10,7 @@ class KalturaThumbAsset extends KalturaAsset
 	 * 
 	 * @var int
 	 * @insertonly
+	 * @filter eq,in
 	 */
 	public $thumbParamsId;
 	

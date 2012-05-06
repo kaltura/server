@@ -14,6 +14,8 @@ class AssetFilter extends baseObjectFilter
 			"_in_id",
 			"_eq_entry_id",
 			"_in_entry_id",
+		    "_eq_flavor_params_id",
+		 	"_in_flavor_params_id",
 			"_eq_partner_id",
 			"_in_partner_id",
 			"_eq_format",

@@ -8,6 +8,8 @@ class KalturaFlavorAssetBaseFilter extends KalturaAssetFilter
 {
 	private $map_between_objects = array
 	(
+		"flavorParamsIdEqual" => "_eq_flavor_params_id",
+		"flavorParamsIdIn" => "_in_flavor_params_id",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"statusNotIn" => "_notin_status",
@@ -26,6 +28,20 @@ class KalturaFlavorAssetBaseFilter extends KalturaAssetFilter
 	{
 		return array_merge(parent::getOrderByMap(), $this->order_by_map);
 	}
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $flavorParamsIdEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $flavorParamsIdIn;
 
 	/**
 	 * 

@@ -10,6 +10,7 @@ class KalturaCaptionAsset extends KalturaAsset
 	 * 
 	 * @var int
 	 * @insertonly
+	 * @filter eq,in
 	 */
 	public $captionParamsId;
 	

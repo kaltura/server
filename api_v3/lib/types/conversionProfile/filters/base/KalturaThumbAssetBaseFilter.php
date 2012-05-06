@@ -8,6 +8,8 @@ class KalturaThumbAssetBaseFilter extends KalturaAssetFilter
 {
 	private $map_between_objects = array
 	(
+		"thumbParamsIdEqual" => "_eq_thumb_params_id",
+		"thumbParamsIdIn" => "_in_thumb_params_id",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"statusNotIn" => "_notin_status",
@@ -26,6 +28,20 @@ class KalturaThumbAssetBaseFilter extends KalturaAssetFilter
 	{
 		return array_merge(parent::getOrderByMap(), $this->order_by_map);
 	}
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $thumbParamsIdEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $thumbParamsIdIn;
 
 	/**
 	 * 

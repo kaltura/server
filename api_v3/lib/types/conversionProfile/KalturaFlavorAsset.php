@@ -10,6 +10,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * 
 	 * @var int
 	 * @insertonly
+	 * @filter eq,in
 	 */
 	public $flavorParamsId;
 	

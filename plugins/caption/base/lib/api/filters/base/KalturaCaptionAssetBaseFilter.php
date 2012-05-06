@@ -8,6 +8,8 @@ class KalturaCaptionAssetBaseFilter extends KalturaAssetFilter
 {
 	private $map_between_objects = array
 	(
+		"captionParamsIdEqual" => "_eq_caption_params_id",
+		"captionParamsIdIn" => "_in_caption_params_id",
 		"formatEqual" => "_eq_format",
 		"formatIn" => "_in_format",
 		"statusEqual" => "_eq_status",
@@ -28,6 +30,20 @@ class KalturaCaptionAssetBaseFilter extends KalturaAssetFilter
 	{
 		return array_merge(parent::getOrderByMap(), $this->order_by_map);
 	}
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $captionParamsIdEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $captionParamsIdIn;
 
 	/**
 	 * 
