@@ -51,8 +51,9 @@ class CategoryEntryService extends KalturaBaseService
 		
 		$dbCategoryEntry = new categoryEntry();
 		$categoryEntry->toInsertableObject($dbCategoryEntry);
+		
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-		$dbCategoryEntry->setPartnerId(kCurrentContext::$ks_partner_id);
+		$dbCategoryEntry->setPartnerId($partnerId);
 		$dbCategoryEntry->save();
 		
 		//need to select the entry again - after update
