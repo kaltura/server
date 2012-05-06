@@ -51,7 +51,8 @@ class kEntitlementUtils
 			
 			if(!$kuserId)
 			{
-				$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid);
+				$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+				$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid);
 				$kuserId = $kuser->getId();
 			}
 			
@@ -107,7 +108,8 @@ class kEntitlementUtils
 		
 		if($kuserId)
 		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid);
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid);
 			$kuserId = $kuser->getId();
 		}
 			
@@ -128,7 +130,7 @@ class kEntitlementUtils
 	 */
 	public static function initEntitlementEnforcement()
 	{
-		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id; 
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id; 
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$partner)
 			return;

@@ -70,9 +70,11 @@ class category extends Basecategory implements IIndexable
 	{
 		if ($this->isNew())
 		{
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			
 			$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 			$c->add (categoryPeer::STATUS, CategoryStatus::DELETED, Criteria::NOT_EQUAL);
-			$c->add (categoryPeer::PARTNER_ID, kCurrentContext::$ks_partner_id, Criteria::EQUAL);
+			$c->add (categoryPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 			
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			$numOfCatsForPartner = categoryPeer::doCount($c);
