@@ -76,6 +76,8 @@ for (;;)
 		$lastCreatedAt = $item->getCreatedAt(null);
 	}
 	
+	sleep(10);
+	
     kMemoryManager::clearMemory();
 
 	if (count($items) < 500)
