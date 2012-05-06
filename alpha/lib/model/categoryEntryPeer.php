@@ -220,6 +220,10 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 			else
 			{
 				//category was not found - it could be that user is not entitled to remove it 
+				KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+				$category = categoryPeer::getByFullNameExactMatch ( $cat );
+				KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+				
 				$allCats[] = $category->getFullName();
 				$allIds[] = $category->getId ();
 			}

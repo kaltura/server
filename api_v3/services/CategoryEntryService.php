@@ -51,8 +51,13 @@ class CategoryEntryService extends KalturaBaseService
 		
 		$dbCategoryEntry = new categoryEntry();
 		$categoryEntry->toInsertableObject($dbCategoryEntry);
+//		/$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$dbCategoryEntry->setPartnerId(kCurrentContext::$ks_partner_id);
 		$dbCategoryEntry->save();
+		
+		//need to select the entry again - after update
+		$entry = entryPeer::retrieveByPK($categoryEntry->entryId);		
+		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $entry);
 		
 		$categoryEntry = new KalturaCategoryEntry();
 		$categoryEntry->fromObject($dbCategoryEntry);
@@ -92,6 +97,10 @@ class CategoryEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
 		
 		$dbCategoryEntry->delete();
+		
+		//need to select the entry again - after update
+		$entry = entryPeer::retrieveByPK($entryId);		
+		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $entry);
 	}
 	
 	/**

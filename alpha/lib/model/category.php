@@ -16,8 +16,6 @@ class category extends Basecategory implements IIndexable
 	
 	protected $parent_category;
 	
-	protected $inherited_parent_category;
-	
 	protected $old_full_name = "";
 	
 	protected $old_parent_id = null;
@@ -1050,15 +1048,6 @@ class category extends Basecategory implements IIndexable
 		parent::setInheritanceType($v);
 	}
 	
-	public function setInheritedParentId($v)
-	{
-		$this->inherited_parent_category = null;
-		if (!is_null($v))
-			$this->inherited_parent_category = categoryPeer::retrieveByPK($v);
-		
-		parent::setInheritedParentId($v);
-	}
-	
 	public function setPuserId($puserId)
 	{
 		if ( self::getPuserId() == $puserId )  // same value - don't set for nothing 
@@ -1170,15 +1159,18 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function reSetInheritedParentId()
 	{
-		$this->setInheritedParentId($this->getActuallInheritedParentId());
+		if($this->getInheritanceType() != InheritanceType::INHERIT)
+			$this->setInheritedParentId(null);
+		else
+			$this->setInheritedParentId($this->getActuallInheritedParentId());
 	}
 	
 	private function getActuallInheritedParentId()
 	{
-		if (!$this->getParentId())
+		if (!$this->getParentId() || $this->getInheritanceType() != InheritanceType::INHERIT)
 			return $this->getId();
 		
-		return $this->getParentCategory()->getActuallInheritedParentId() . categoryPeer::CATEGORY_SEPARATOR . $this->getId();
+		return $this->getParentCategory()->getActuallInheritedParentId();
 	}
 	
 	/**

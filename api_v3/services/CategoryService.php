@@ -223,7 +223,7 @@ class CategoryService extends KalturaBaseService
 		$categoryDb->reSetFullName();
 		$categoryDb->reSetEntriesCount();
 		$categoryDb->reSetPendingMembersCount();
-		$categoryDb->reSetPendingMembersCount();
+		$categoryDb->reSetPrivacyContext();
 
 		//TODO should skip all category logic 
 		$categoryDb->save();
