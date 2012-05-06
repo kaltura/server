@@ -262,7 +262,7 @@ class S3 {
 			trigger_error('S3::inputFile(): Unable to open input file: '.$file, E_USER_WARNING);
 			return false;
 		}
-		return array('file' => $file, 'size' => filesize($file),
+		return array('file' => $file, 'size' => kFile::fileSize($file),
 		'md5sum' => $md5sum !== false ? (is_string($md5sum) ? $md5sum :
 		base64_encode(md5_file($file, true))) : '');
 	}
@@ -320,7 +320,7 @@ class S3 {
 			$rest->size = $input['size'];
 		else {
 			if (isset($input['file']))
-				$rest->size = filesize($input['file']);
+				$rest->size = kFile::fileSize($input['file']);
 			elseif (isset($input['data']))
 				$rest->size = strlen($input['data']);
 		}

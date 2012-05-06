@@ -523,7 +523,7 @@ class BatchService extends KalturaBaseService
 	 * 
 	 * @action checkFileExists
 	 * @param string $localPath
-	 * @param int $size
+	 * @param float $size
 	 * @return KalturaFileExistsResponse 
 	 */
 	function checkFileExistsAction($localPath, $size)
@@ -535,7 +535,7 @@ class BatchService extends KalturaBaseService
 		if($ret->exists)
 		{
 			clearstatcache();
-			$ret->sizeOk = (filesize($localPath) == $size);
+			$ret->sizeOk = (kFile::fileSize($localPath) == $size);
 		}
 		
 		return $ret;

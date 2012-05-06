@@ -167,10 +167,10 @@ $exeStr = "FFMpeg ".$cmdLineGenerator->FFMpeg(null);
 			kLog::log( ".CMD-->".$exeStr);
 			exec($exeStr, $output, $rv);
 			kLog::log( "..RV-->In".$inFile."==>");
-			if(!file_exists($outFile) || filesize($outFile)==0)
+			if(!file_exists($outFile) || kFile::fileSize($outFile)==0)
 				kLog::log( "Failed");
 			else {
-				kLog::log( "Succeeded, Filesize:".filesize($outFile));
+				kLog::log( "Succeeded, Filesize:".kFile::fileSize($outFile));
 				$mediaInfoStr = shell_exec(MediaInfoProgram." ". realpath($outFile));
 				$medLoader = new KDLMediaInfoLoader($mediaInfoStr);
 				$product = new KDLFlavor();

@@ -120,7 +120,7 @@ class KDistributedFileManager
 			if($fileSize)
 			{
 				clearstatcache();
-				if(filesize($localPath) != $fileSize)
+				if(kFile::fileSize($localPath) != $fileSize)
 				{
 					$errDescription = "Error: output file have a wrong size";
 					return false;

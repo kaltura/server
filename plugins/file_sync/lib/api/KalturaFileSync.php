@@ -183,7 +183,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	
 	/**
 	 * 
-	 * @var int
+	 * @var float
 	 * @filter gte,lte,order
 	 * @readonly
 	 */
@@ -211,7 +211,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	
 	/**
 	 * 
-	 * @var int
+	 * @var float
 	 * @readonly
 	 */
 	public $fileDiscSize;
@@ -310,7 +310,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 		if($this->isCurrentDc)
 		{
 			$path = $this->fileRoot . $this->filePath;
-			$this->fileDiscSize = filesize($path);
+			$this->fileDiscSize = kFile::fileSize($path);
 			$content = file_get_contents($path, false, null, 0, 1024);
 			if(ctype_print($content) || ctype_cntrl($content))
 				$this->fileContent = $content;

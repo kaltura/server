@@ -397,11 +397,11 @@ $xmlFileName = "k:\\pre.xml";
 		echo "1<br>\n";
 		echo($exec_cmd);
 //		exec("ffmpeg ".$exec_cmd);
-		if(!file_exists($outFile) || filesize($outFile)==0) {
+		if(!file_exists($outFile) || kFile::fileSize($outFile)==0) {
 			kLog::log( "\nFailed");
 		}
 		else {
-			kLog::log( "\nSucceeded, Filesize:".filesize($outFile));
+			kLog::log( "\nSucceeded, Filesize:".kFile::fileSize($outFile));
 		}
 //		$cdlAsset = new flavorAsset;
 //		KDLWrap::ConvertMediainfoCdl2FlavorAsset($cdlMedInf, $cdlAsset);

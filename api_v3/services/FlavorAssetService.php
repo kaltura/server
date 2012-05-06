@@ -167,7 +167,7 @@ class FlavorAssetService extends KalturaAssetService
 	{
 		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 		$flavorAsset->setFileExt($ext);
-		$flavorAsset->setSize(filesize($fullPath));
+		$flavorAsset->setSize(kFile::fileSize($fullPath));
 		$flavorAsset->incrementVersion();
 		$flavorAsset->save();
 		

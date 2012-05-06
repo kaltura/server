@@ -172,7 +172,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 				
 			$destPath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
 			$sharedPath = $this->translateLocalPath2Shared($destPath);
-			$fileSize = filesize($srcPath);
+			$fileSize = kFile::fileSize($srcPath);
 			
 			KalturaLog::debug("add to move list file[$srcPath] to[$destPath] size[$fileSize] shared path[$sharedPath]");
 			$files2move[] = array(
@@ -191,7 +191,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 				
 			$destPath = $this->sharedTempPath . DIRECTORY_SEPARATOR . basename($srcPath);
 			$sharedPath = $this->translateLocalPath2Shared($destPath);
-			$fileSize = filesize($srcPath);
+			$fileSize = kFile::fileSize($srcPath);
 			
 			$flavor->destFileSyncLocalPath = $sharedPath;
 			if($this->taskConfig->params->isRemote)
@@ -223,7 +223,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 			KalturaLog::debug("rename($srcPath, $destPath)");
 			rename($srcPath, $destPath);
 		
-			if(!file_exists($destPath) || filesize($destPath) != $fileSize)
+			if(!file_exists($destPath) || kFile::fileSize($destPath) != $fileSize)
 			{
 				KalturaLog::err("Error: moving file [$srcPath] failed");
 				die();

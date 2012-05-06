@@ -105,7 +105,7 @@ class KAsyncImport extends KJobHandlerWorker
     			if( $fileSize )
     			{
     				clearstatcache();
-    				$actualFileSize = filesize($data->destFileLocalPath);
+    				$actualFileSize = kFile::fileSize($data->destFileLocalPath);
     				if($actualFileSize >= $fileSize)
     				{
     					return $this->moveFile($job, $data->destFileLocalPath, $fileSize);
@@ -148,7 +148,7 @@ class KAsyncImport extends KJobHandlerWorker
 				else
 				{
 					clearstatcache();
-					$actualFileSize = filesize($data->destFileLocalPath);
+					$actualFileSize = kFile::fileSize($data->destFileLocalPath);
 					if($actualFileSize == $resumeOffset)
 					{
 						$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::RETRY);
@@ -170,7 +170,7 @@ class KAsyncImport extends KJobHandlerWorker
 			if($fileSize)
 			{
 				clearstatcache();
-				$actualFileSize = filesize($data->destFileLocalPath);
+				$actualFileSize = kFile::fileSize($data->destFileLocalPath);
 				if($actualFileSize < $fileSize)
 				{
 					$percent = floor($actualFileSize * 100 / $fileSize);
@@ -283,7 +283,7 @@ class KAsyncImport extends KJobHandlerWorker
 			if($fileSize)
 			{
 				clearstatcache();
-				$actualFileSize = filesize($data->destFileLocalPath);
+				$actualFileSize = kFile::fileSize($data->destFileLocalPath);
 				if($actualFileSize < $fileSize)
 				{
 					$percent = floor($actualFileSize * 100 / $fileSize);
@@ -343,7 +343,7 @@ class KAsyncImport extends KJobHandlerWorker
 			clearstatcache();
 			if($fileSize)
 			{
-				if(filesize($sharedFile) != $fileSize)
+				if(kFile::fileSize($sharedFile) != $fileSize)
 				{
 					KalturaLog::err("Error: renamed file have a wrong size");
 					die();
@@ -351,7 +351,7 @@ class KAsyncImport extends KJobHandlerWorker
 			}
 			else
 			{
-				$fileSize = filesize($sharedFile);
+				$fileSize = kFile::fileSize($sharedFile);
 			}
 			
 			@chmod($sharedFile, 0777);

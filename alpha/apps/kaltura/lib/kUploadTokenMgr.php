@@ -71,7 +71,7 @@ class kUploadTokenMgr
 		else
 			$this->handleMoveFile($fileData);
 		
-		$fileSize = filesize($this->_uploadToken->getUploadTempPath());
+		$fileSize = kFile::fileSize($this->_uploadToken->getUploadTempPath());
 		
 		if ($finalChunk)
 		{
@@ -185,7 +185,7 @@ class kUploadTokenMgr
 	/**
 	 * Resume the upload token with the uploaded file optionally at a given offset
 	 * @param file $fileData
-	 * @param int $resumeAt
+	 * @param float $resumeAt
 	 */
 	protected function handleResume($fileData, $resumeAt = -1)
 	{
@@ -194,7 +194,7 @@ class kUploadTokenMgr
 		if (!file_exists($uploadFilePath))
 			throw new kUploadTokenException("Temp file [$uploadFilePath] was not found when trying to resume", kUploadTokenException::UPLOAD_TOKEN_FILE_NOT_FOUND_FOR_RESUME);
 			
-		if ($resumeAt > filesize($uploadFilePath))
+		if ($resumeAt > kFile::fileSize($uploadFilePath))
 			throw new kUploadTokenException("Temp file [$uploadFilePath] attempted to resume at invalid position $resumeAt", kUploadTokenException::UPLOAD_TOKEN_RESUMING_INVALID_POSITION);
 			
 		$this->resumeFile($fileData['tmp_name'], $uploadFilePath, $resumeAt);

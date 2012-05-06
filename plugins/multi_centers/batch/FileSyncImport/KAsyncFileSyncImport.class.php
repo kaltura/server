@@ -308,7 +308,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 				// timeout error occured
 				KalturaLog::debug('Timeout occured');
 				clearstatcache();
-				$actualFileSize = filesize($fileDestination);
+				$actualFileSize = kFile::fileSize($fileDestination);
 				if($actualFileSize == $resumeOffset)
 				{
 					// no downloading was done at all - error
@@ -332,8 +332,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 
 		if($fileSize)
 		{
-			clearstatcache();
-			$actualFileSize = filesize($fileDestination);
+			$actualFileSize = kFile::fileSize($fileDestination);
 			if ($actualFileSize < $fileSize)
 			{
 				// part of file was downloaded - will resume in next run
@@ -373,20 +372,19 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 			return false;
 		}
 
-		clearstatcache();
 		if($fileSize)
 		{
-			if(filesize($destFile) != $fileSize)
+			if(kFile::fileSize($destFile) != $fileSize)
 			{
 				// destination file size is wrong
-				KalturaLog::err("Error: file [$destFile] has a wrong size.  file size: [".filesize($destFile)."] should be [$fileSize]");
+				KalturaLog::err("Error: file [$destFile] has a wrong size.  file size: [".kFile::fileSize($destFile)."] should be [$fileSize]");
 				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_WRONG_SIZE, "Error: file [$destFile] has a wrong size", KalturaBatchJobStatus::FAILED);
 				return false;
 			}
 		}
 		else
 		{
-			$fileSize = filesize($destFile);
+			$fileSize = kFile::fileSize($destFile);
 		}
 			
 		// set file owner

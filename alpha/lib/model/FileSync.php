@@ -45,7 +45,7 @@ class FileSync extends BaseFileSync
 
 	public function setFileSizeFromPath ($filePath)
 	{
-		$this->setFileSize(kFile::kFileSize($filePath));
+		$this->setFileSize(kFile::fileSize($filePath));
 	}
 	
 	public function getFullPath ()

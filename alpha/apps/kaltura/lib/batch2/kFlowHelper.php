@@ -1811,7 +1811,7 @@ class kFlowHelper
 			if($dbAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_IMPORTING)
 			{
 				$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-				$dbAsset->setSize(filesize($finalPath));
+				$dbAsset->setSize(kFile::fileSize($finalPath));
 					
 				if($dbAsset instanceof flavorAsset)
 				{

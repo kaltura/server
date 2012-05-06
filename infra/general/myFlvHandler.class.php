@@ -891,7 +891,7 @@ class myFlvStaticHandler
 	public static function isMultiFlavor ( $file_name )
 	{
 		$edit_file_name = myContentStorage::getFileNameEdit( $file_name );
-		return ( file_exists ( $edit_file_name ) && filesize ( $edit_file_name ) > 0 ) ;
+		return ( file_exists ( $edit_file_name ) && kFile::fileSize ( $edit_file_name ) > 0 ) ;
 	}
 
 
@@ -901,7 +901,7 @@ class myFlvStaticHandler
 	public static function getBestFileFlavor ( $file_name  )
 	{
 		$edit_file_name = myContentStorage::getFileNameEdit( $file_name );
-		if ( file_exists ( $edit_file_name ) && filesize ( $edit_file_name ) > 0 )
+		if ( file_exists ( $edit_file_name ) && kFile::fileSize ( $edit_file_name ) > 0 )
 		{
 			return $edit_file_name;
 		}
@@ -1057,7 +1057,7 @@ class FlvInfoVideo extends FlvInfo
 	public function open()
 	{
 		parent::open();
-		$this->last_index = filesize($this->info_file_name) / $this->TAG_INFO_SIZE - 1;
+		$this->last_index = kFile::fileSize($this->info_file_name) / $this->TAG_INFO_SIZE - 1;
 	}
 
 	public function hasTags()
@@ -1232,7 +1232,7 @@ class FlvMetadataVideo extends FlvInfo
 	
 	public function getSize()
 	{
-		return filesize($this->info_file_name);
+		return kFile::fileSize($this->info_file_name);
 	}
 	
 	public function dump()

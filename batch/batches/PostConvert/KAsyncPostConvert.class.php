@@ -192,9 +192,9 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		$sharedFile = realpath($rootPath) . "/$uniqid";
 		
 		clearstatcache();
-		$fileSize = filesize($data->thumbPath);
+		$fileSize = kFile::fileSize($data->thumbPath);
 		rename($data->thumbPath, $sharedFile);
-		if(!file_exists($sharedFile) || filesize($sharedFile) != $fileSize)
+		if(!file_exists($sharedFile) || kFile::fileSize($sharedFile) != $fileSize)
 		{
 			$err = 'moving file failed';
 			throw new Exception($err, -1);

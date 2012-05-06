@@ -126,7 +126,7 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 				
 			$destPath = "{$this->sharedTempPath}/$fileName";
 			$sharedPath = $this->translateLocalPath2Shared($destPath);
-			$fileSize = filesize($srcPath);
+			$fileSize = kFile::fileSize($srcPath);
 			
 			$files2move[] = array(
 				'from' => $srcPath,
@@ -141,7 +141,7 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 			$srcPath = $flavor->destFileSyncLocalPath;
 			$destPath = $this->sharedTempPath . DIRECTORY_SEPARATOR . basename($srcPath);
 			$sharedPath = $this->translateLocalPath2Shared($destPath);
-			$fileSize = filesize($srcPath);
+			$fileSize = kFile::fileSize($srcPath);
 			
 			$flavor->destFileSyncLocalPath = $sharedPath;
 			if($this->taskConfig->params->isRemote)
@@ -167,7 +167,7 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 			KalturaLog::info("rename($srcPath, $destPath)");
 			rename($srcPath, $destPath);
 		
-			if(!file_exists($destPath) || filesize($destPath) != $fileSize)
+			if(!file_exists($destPath) || kFile::fileSize($destPath) != $fileSize)
 			{
 				KalturaLog::err("Error: moving file [$srcPath] failed");
 				die();
@@ -223,7 +223,7 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 			if($fileSize && file_exists($srcFileSyncLocalPath))
 			{
 				clearstatcache();
-				$actualFileSize = filesize($srcFileSyncLocalPath);
+				$actualFileSize = kFile::fileSize($srcFileSyncLocalPath);
 				
 				if($actualFileSize == $fileSize)
 				{
@@ -256,7 +256,7 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 			}
 			
 			clearstatcache();
-			$actualFileSize = filesize($srcFileSyncLocalPath);
+			$actualFileSize = kFile::fileSize($srcFileSyncLocalPath);
 			KalturaLog::debug("Fetched file to [$srcFileSyncLocalPath] size[$actualFileSize]");
 				
 			if($fileSize)

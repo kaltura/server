@@ -67,14 +67,14 @@ abstract class KBaseCropper
 				return false;
 
 			// Support animated gifs - KImageMagick generates multiple images with a postfix of '-<frame num>'
-			if (!@filesize($this->targetPath))
+			if (!kFile::fileSize($this->targetPath))
 			{
 				$targetFiledir = pathinfo($this->targetPath, PATHINFO_DIRNAME);
 				$targetFilename = pathinfo($this->targetPath, PATHINFO_FILENAME);
 				$targetFileext = pathinfo($this->targetPath, PATHINFO_EXTENSION);
 				
 				$firstFrameTargetFile = "$targetFiledir/$targetFilename-0.$targetFileext";
-				if (@filesize($firstFrameTargetFile))
+				if (kFile::fileSize($firstFrameTargetFile))
 				{
 					kFile::moveFile($firstFrameTargetFile, $this->targetPath);
 				}

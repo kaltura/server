@@ -153,9 +153,9 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		}
 		
 		clearstatcache();
-		$fileSize = filesize($data->destFileSyncLocalPath);
+		$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
 		rename($data->destFileSyncLocalPath, $sharedFile);
-		if(!file_exists($sharedFile) || filesize($sharedFile) != $fileSize)
+		if(!file_exists($sharedFile) || kFile::fileSize($sharedFile) != $fileSize)
 		{
 			KalturaLog::err("Error: moving file failed");
 			die();
@@ -234,7 +234,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 			if($fileSize)
 			{
 				clearstatcache();
-				if(filesize($srcFileSyncLocalPath) != $fileSize)
+				if(kFile::fileSize($srcFileSyncLocalPath) != $fileSize)
 				{
 					$errDescription = "Error: output file have a wrong size";
 					return false;

@@ -356,7 +356,7 @@ class kJobsManager
 		$convertCollectionData->setInputXmlRemoteUrl($remoteUrl);
 		$convertCollectionData->setCommandLinesStr($commandLinesStr);
 		
-		$dbConvertCollectionJob->setFileSize(filesize($convertCollectionData->getSrcFileSyncLocalPath()));
+		$dbConvertCollectionJob->setFileSize(kFile::fileSize($convertCollectionData->getSrcFileSyncLocalPath()));
 		
 		return kJobsManager::addJob($dbConvertCollectionJob, $convertCollectionData, BatchJobType::CONVERT_COLLECTION, $currentConversionEngine);
 	}
@@ -565,7 +565,7 @@ class kJobsManager
 				KalturaLog::log("Created from flavor convert job with entry id [" . $dbConvertFlavorJob->getEntryId() . "]");
 			}
 		}
-		$dbConvertFlavorJob->setFileSize(filesize($convertData->getSrcFileSyncLocalPath()));
+		$dbConvertFlavorJob->setFileSize(kFile::fileSize($convertData->getSrcFileSyncLocalPath()));
 		
 		// TODO remove after all old version flavors migrated
 		if(in_array(conversionEngineType::ENCODING_COM, $conversionEngines))
@@ -965,7 +965,7 @@ class kJobsManager
 		}
 		
 		// if file size is 0, do not create conversion profile and set entry status as error converting
-		if (!file_exists($inputFileSyncLocalPath) || filesize($inputFileSyncLocalPath) == 0)
+		if (!file_exists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
 		{
 			KalturaLog::debug("Input file [$inputFileSyncLocalPath] does not exist");
 			

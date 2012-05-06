@@ -160,7 +160,7 @@ class AttachmentAssetService extends KalturaAssetService
 		
 		$attachmentAsset->incrementVersion();
 		$attachmentAsset->setFileExt($ext);
-		$attachmentAsset->setSize(filesize($fullPath));
+		$attachmentAsset->setSize(kFile::fileSize($fullPath));
 		$attachmentAsset->save();
 		
 		$syncKey = $attachmentAsset->getSyncKey(AttachmentAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
@@ -184,7 +184,7 @@ class AttachmentAssetService extends KalturaAssetService
 		
 		$attachmentAsset->setWidth($width);
 		$attachmentAsset->setHeight($height);
-		$attachmentAsset->setSize(filesize($finalPath));
+		$attachmentAsset->setSize(kFile::fileSize($finalPath));
 		
 		$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$attachmentAsset->save();
@@ -251,7 +251,7 @@ class AttachmentAssetService extends KalturaAssetService
 		
 		$attachmentAsset->setWidth($width);
 		$attachmentAsset->setHeight($height);
-		$attachmentAsset->setSize(filesize($finalPath));
+		$attachmentAsset->setSize(kFile::fileSize($finalPath));
 		
 		$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$attachmentAsset->save();

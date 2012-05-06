@@ -1146,7 +1146,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			{
 				KalturaLog::debug("Validating file size");
 				
-				$fileSize = filesize($filePath);
+				$fileSize = kFile::fileSize($filePath);
 				$xmlFileSize = (int)$elementToSearchIn->serverFileContentResource->fileSize;
 				if($xmlFileSize != $fileSize)
 				{

@@ -50,7 +50,7 @@ class UploadService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN);
 			
 		$res->uploadTokenId = $token;
-		$res->fileSize = filesize($entryFullPath);
+		$res->fileSize = kFile::fileSize($entryFullPath);
 		return $res; 
 	}
 }

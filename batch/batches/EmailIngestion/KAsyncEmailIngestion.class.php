@@ -359,7 +359,7 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 			}
 			
 			// check if attachment size is valid according to the email ingestion profile configuration
-			if ($profile->maxAttachmentSizeKbytes && (filesize($filename)/1024 > $profile->maxAttachmentSizeKbytes)) {
+			if ($profile->maxAttachmentSizeKbytes && (kFile::fileSize($filename)/1024 > $profile->maxAttachmentSizeKbytes)) {
 				KalturaLog::info("Attachment [$cur_attach->filename] is too big for profile [$profile->id] - ignoring.");
 				// delete the temporary file from the disk			
 				if (!unlink($filename)) {
@@ -442,7 +442,7 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 	    
 	    $uploadToken->fileName = $filename;
 	    
-	    $uploadToken->fileSize = filesize($filename);
+	    $uploadToken->fileSize = kFile::fileSize($filename);
 	    
 	    $uploadToken = $this->getClient()->uploadToken->add($uploadToken);
 	    
