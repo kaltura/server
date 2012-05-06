@@ -9,7 +9,7 @@ class KAutoloader
 	static private $_classPath = null;
 	static private $_includePath = null;
 	static private $_classMap = array();
-	static private $_classMapFileLocation = "";
+	static private $_classMapFileLocation = false;
 	static private $_noCache = false;
 	
 	static function register()
@@ -271,7 +271,7 @@ class KAutoloader
 	 */
 	private static function loadClassMap()
 	{
-		if (!file_exists(self::$_classMapFileLocation) || self::$_noCache == true)
+		if (!self::$_classMapFileLocation || !file_exists(self::$_classMapFileLocation) || self::$_noCache == true)
 		{
 			// cached map doesn't exists, rebuild the cache map
 			foreach(self::$_classPath as $dir)
@@ -289,7 +289,7 @@ class KAutoloader
 				self::scanDirectory($dir, $recursive);
 			}
 			
-			if (self::$_noCache === false)
+			if (self::$_noCache === false && self::$_classMapFileLocation)
 			{
 				// save the cached map
 				$bytesWritten = file_put_contents(self::$_classMapFileLocation, serialize(self::$_classMap));
