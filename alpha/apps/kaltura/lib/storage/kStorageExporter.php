@@ -96,8 +96,14 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			$flavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($entry->getId(), $flavorParamsArr);
 		}
 		
-		foreach($flavorAssets as $flavorAsset)
-			$exportFileSyncsKeys[] = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		foreach($flavorAssets as $flavorAsset) {
+			if ($externalStorage->shouldExportFlavorAsset($flavorAsset)) {
+				$exportFileSyncsKeys[] = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			}
+			else {
+				KalturaLog::log('Flavor asset id ['.$flavorAsset->getId().'] should not be exported');
+			}
+		}
 		
 		return $exportFileSyncsKeys;
 	}
