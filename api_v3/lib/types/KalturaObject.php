@@ -24,7 +24,7 @@ class KalturaObject
 	 */
 	protected function isNull ($propertyName)
 	{
-	    if (!property_exists(get_class($this), $propertyName) || $this->$propertyName===null || $this->$propertyName instanceof KalturaNullField)
+	    if (!property_exists(get_class($this), $propertyName) || is_null($this->$propertyName) || $this->$propertyName instanceof KalturaNullField)
 	    {
 	        return true;
 	    }
