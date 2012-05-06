@@ -19,7 +19,8 @@ class KalturaObject
 	/**
 	 * Function tests whether a property on the object is null.
 	 * This can occur in case the property is actually null or if it is instance of type KalturaNullField
-	 * @param string $property
+	 * @param string $propertyName
+	 * @return bool
 	 */
 	protected function isNull ($propertyName)
 	{
