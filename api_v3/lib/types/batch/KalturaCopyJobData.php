@@ -21,7 +21,7 @@ class KalturaCopyJobData extends KalturaJobData
 	 * Template object to overwrite attributes on the copied object
 	 * @var KalturaObject
 	 */
-/*	public $templateObject;*/
+	public $templateObject;
 	
 	private static $map_between_objects = array
 	(
