@@ -386,14 +386,16 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		
 		if (!is_null($sourceObject))
 		{
-			$partner = PartnerPeer::retrieveByPK(kCurrentContext::$ks_partner_id);
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			$partner = PartnerPeer::retrieveByPK($partnerId);
 			if (!$partner || $partner->getFeaturesStatusByType(FeatureStatusType::LOCK_CATEGORY))
 				throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);		
 		}
 
 		if ($this->owner && $this->owner != '' && !($this->owner instanceof KalturaNullField) )
 		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->owner);
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $this->owner);
 			if (!$kuser)
 				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->owner);
 		}

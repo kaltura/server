@@ -46,7 +46,10 @@ class categoryPeer extends BasecategoryPeer
 			$kuser = null;
 			$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
 			if($ksString <> '')
-				$kuser = kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid);
+			{
+				$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+				$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid);
+			}
 
 			if($kuser)
 			{
@@ -167,7 +170,8 @@ class categoryPeer extends BasecategoryPeer
 		$c->addAnd(categoryPeer::MEMBERS, $kuserId, Criteria::EQUAL);
 		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
 		
-		$partner = PartnerPeer::retrieveByPK(kCurrentContext::$ks_partner_id);
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if($partner && $partner->getCategoryGroupSize())
 			$categoryGroupSize = $partner->getCategoryGroupSize();
 

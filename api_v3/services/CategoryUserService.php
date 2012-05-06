@@ -77,7 +77,8 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	function getAction($categoryId, $userId)
 	{
-		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id, $userId);
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 			
@@ -103,7 +104,8 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	function updateAction($categoryId, $userId, KalturaCategoryUser $categoryUser, $override = false)
 	{
-		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id, $userId);
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 		
@@ -186,7 +188,8 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	function activateAction($categoryId, $userId)
 	{
-		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id, $userId);
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 			
@@ -216,7 +219,8 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	function deactivateAction($categoryId, $userId)
 	{
-		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id, $userId);
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 			
@@ -263,9 +267,10 @@ class CategoryUserService extends KalturaBaseService
 		if($filter->userIdIn)
 		{
 			$usersIds = explode(',', $filter->userIdIn);
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 
 			$c = new Criteria();
-			$c->add(kuserPeer::PARTNER_ID, kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id, Criteria::EQUAL);
+			$c->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 			$c->add(kuserPeer::PUSER_ID, $usersIds, Criteria::IN);
 			$kusers = kuserPeer::doSelect($c);
 			
@@ -278,7 +283,8 @@ class CategoryUserService extends KalturaBaseService
 		
 		if($filter->userIdEqual)
 		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id, $filter->userIdEqual);
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $filter->userIdEqual);
 			if (!$kuser)
 				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
 				
