@@ -273,7 +273,9 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 			),
 			"specific_user_engagement" => array (
 				"detail_by_user" => "detail_by_user",
+				"detail_by_context_by_user" => "detail_by_user",
 				"detail_by_user_by_app" => "detail_by_user_by_app",	
+				"detail_by_context_by_user_by_app" => "detail_by_user_by_app",
 			),
 			"user_top_content" => array (
 				"graph_no_text" => "user_engagement/graph_no_text",
