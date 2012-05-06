@@ -59,7 +59,7 @@ class KalturaReportInputFilter extends KalturaObject
 		return $reportInputFilter;
 	}
 	
-	public function fromReportsInputFilter ( reportsInputFilter $reportInputFilter )
+	public function fromReportsInputFilter (  $reportInputFilter )
 	{
 		$this->fromDate = $reportInputFilter->from_date ;
 		$this->toDate = $reportInputFilter->to_date ;

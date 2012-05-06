@@ -40,7 +40,7 @@ class KalturaEndUserReportInputFilter extends KalturaReportInputFilter
 		return $endUserReportsInputFilter;
 	}
 	
-	public function fromReportsInputFilter ( endUserReportsInputFilter $endUserReportsInputFilter )
+	public function fromReportsInputFilter (  $endUserReportsInputFilter )
 	{
 		parent::fromReportsInputFilter($endUserReportsInputFilter);
 		$this->application = $endUserReportsInputFilter->application ;
