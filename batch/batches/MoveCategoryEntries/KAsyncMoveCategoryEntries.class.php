@@ -123,7 +123,10 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 		}
 		
 		$data->lastMovedCategoryId = $srcCategoryId;
+		
+		$this->unimpersonate();
 		$this->updateJob($job, "Moved [$movedEntries] entries", KalturaBatchJobStatus::PROCESSING, null, $data);
+		$this->impersonate($job->partnerId);
 		
 		return $job;
 	}
