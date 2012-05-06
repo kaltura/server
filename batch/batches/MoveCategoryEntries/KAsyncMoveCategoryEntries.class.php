@@ -64,8 +64,8 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			$this->startMove = false;
 			
 		$job = $this->moveCategory($job, $data);
-		$job = $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
 		$this->unimpersonate();
+		$job = $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
 		
 		return $job;
 	}
