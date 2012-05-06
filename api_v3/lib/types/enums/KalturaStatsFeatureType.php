@@ -6,4 +6,3 @@ class KalturaStatsFeatureType extends KalturaEnum {
 
 }
 
-?>
