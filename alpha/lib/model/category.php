@@ -942,7 +942,7 @@ class category extends Basecategory implements IIndexable
 	
 	public function getInheritParent()
 	{
-		if (is_null($this->getInheritedParentId()))
+		if ($this->getInheritanceType() != InheritanceType::INHERIT || is_null($this->getInheritedParentId()))
 			return null;
 			
 		$inheritCategory = categoryPeer::retrieveByPK($this->getInheritedParentId());
