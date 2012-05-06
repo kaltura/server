@@ -9,6 +9,7 @@ class KImageMagickCropper extends KBaseCropper
 	const RESIZE_WITH_PADDING = 2;
 	const CROP = 3;
 	const CROP_FROM_TOP = 4;
+	const RESIZE_WITH_FORCE = 5;
 	
 	protected $cmdPath;
 	protected $srcWidth;
@@ -158,12 +159,7 @@ class KImageMagickCropper extends KBaseCropper
 				case self::RESIZE:
 					$w = $width ? $width : '';
 					$h = $height ? $height : '';
-					
-					$resize = "-resize {$w}x{$h}";
-					if(strlen($w) && strlen($h))
-						$resize .= '!';
-						
-					$attributes[] = $resize;
+					$attributes[] = "-resize {$w}x{$h}";
 					break;
 					
 				case self::RESIZE_WITH_PADDING:
@@ -199,11 +195,6 @@ class KImageMagickCropper extends KBaseCropper
 						}
 						
 						$bgcolor = sprintf('%06x', $bgcolor);
-						
-						$resize = "-resize {$w}x{$h}";
-						if(strlen($w) && strlen($h))
-							$resize .= '!';
-							
 						$attributes[] = "-bordercolor \"#{$bgcolor}\"";
 						$attributes[] = $resize;
 						$attributes[] = "-border {$borderWidth}x{$borderHeight} -gravity Center";
@@ -212,12 +203,7 @@ class KImageMagickCropper extends KBaseCropper
 					{
 						$w = $width ? $width : '';
 						$h = $height ? $height : '';
-						
-						$resize = "-resize {$w}x{$h}";
-						if(strlen($w) && strlen($h))
-							$resize .= '!';
-							
-						$attributes[] = $resize;
+						$attributes[] = "-resize {$w}x{$h}";
 					}
 					break;
 					
@@ -267,14 +253,20 @@ class KImageMagickCropper extends KBaseCropper
 					elseif($cropType == self::CROP_FROM_TOP && !$gravity)
 						$attributes[] = "-gravity North";
 						
-					$resize = "-resize {$w}x{$h}";
-					if(strlen($w) && strlen($h))
-						$resize .= '!';
-					
 					$attributes[] = $gravity;	
 					$attributes[] = "-crop {$resizeWidth}x{$resizeHeight}+0+0";
 					$attributes[] = $resize;
 					break;
+				case self::RESIZE_WITH_FORCE:
+				    $w = $width ? $width : '';
+					$h = $height ? $height : '';
+					
+					$resize = "-resize {$w}x{$h}";
+					if(strlen($w) && strlen($h))
+						$resize .= '!';
+						
+					$attributes[] = $resize;
+				    break;
 			}
 		}
 		
