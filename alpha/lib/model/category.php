@@ -942,6 +942,9 @@ class category extends Basecategory implements IIndexable
 	
 	public function getInheritParent()
 	{
+		if (is_null($this->getInheritedParentId()))
+			return null;
+			
 		$inheritCategory = categoryPeer::retrieveByPK($this->getInheritedParentId());
 		if(!$inheritCategory)
 			throw new kCoreException('Invalid inherited parent categroy id for category id [' . $this->getId() . ']');
@@ -1251,5 +1254,10 @@ class category extends Basecategory implements IIndexable
 	public function copyCategoryUsersFromParent($categoryId)
 	{
 		$this->addCopyCategoryKuserJob($categoryId);
+	}
+	
+	public function reSetPrivacyContext()
+	{
+		$this->setPrivacyContext($this->getPrivacyContext());
 	}
 }
