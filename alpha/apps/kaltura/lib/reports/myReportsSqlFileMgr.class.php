@@ -406,6 +406,9 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"total_by_user_by_app" => "user_content_interactions/unique_total_by_user_by_app",
 				"total_by_context_by_user_by_app" => "user_content_interactions/unique_total_by_user_by_app",
 				"total_no_text" => "user_content_interactions/unique_total_by_context"
+			),
+			"applications" => array (
+				"detail_without_filter" => "detail_no_filter"
 			)
 		);
 
