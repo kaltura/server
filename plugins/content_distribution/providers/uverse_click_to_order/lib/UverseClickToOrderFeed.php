@@ -5,6 +5,9 @@
  */
 class UverseClickToOrderFeed
 {
+    const VIDFILE_CONTENT_TYPE = 'video';
+    
+    
 	/**
 	 * @var DOMDocument
 	 */
@@ -116,7 +119,12 @@ class UverseClickToOrderFeed
 		$this->setNodeValue('@content_type', $values[UverseClickToOrderDistributionField::ITEM_CONTENT_TYPE], $item);
 		$this->setNodeValue('@file', $thumbnailFile, $item);
 		$this->setNodeValue('@destination', $values[UverseClickToOrderDistributionField::ITEM_DESTINATION], $item);
-		$this->setNodeValue('@vidfile', $flavorFile, $item);
+		if (strtolower($values[UverseClickToOrderDistributionField::ITEM_CONTENT_TYPE]) == self::VIDFILE_CONTENT_TYPE) {
+		    $this->setNodeValue('@vidfile', $flavorFile, $item);
+		}
+		else {
+		    $item->removeAttribute('vidfile');
+		}		
 		$this->setNodeValue('@ccvidfile', $values[UverseClickToOrderDistributionField::ITEM_CCVIDFILE], $item);
 		$this->setNodeValue('content', $values[UverseClickToOrderDistributionField::ITEM_CONTENT], $item);
 		$this->setNodeValue('directions', $values[UverseClickToOrderDistributionField::ITEM_DIRECTIONS], $item);
