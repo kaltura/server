@@ -140,15 +140,17 @@ class category extends Basecategory implements IIndexable
 			 $this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS)))
 		{
 			$featureStatus = null;
+			
 			if ($this->isColumnModified(categoryPeer::PARENT_ID))
 			{
 				$featureStatus = new kFeatureStatus();
 				$featureStatus->setType(FeatureStatusType::LOCK_CATEGORY);
 				
-				$this->getPartner()->addFeaturesStatus(FeatureStatusType::LOCK_CATEGORY, 1);
+				$featureStatusToRemoveIndex = new kFeatureStatus();
+				$featureStatusToRemoveIndex->setType(FeatureStatusType::LOCK_CATEGORY);
 			}
 			
-			$this->addIndexCategoryJob($this->getFullIds(), null, $featureStatus);		
+			$this->addIndexCategoryJob($this->getFullIds(), null, $featureStatusToRemoveIndex);		
 		}
 		
 		// save the childs for action category->delete - delete category is not done by async batch. 
@@ -417,7 +419,7 @@ class category extends Basecategory implements IIndexable
             $this->save();
       }
       
-	public function validateFullNameIsUnique()
+	protected  function validateFullNameIsUnique()
 	{
 		$fullName = $this->getFullName();
 		$fullName = categoryPeer::getParsedFullName($fullName);
@@ -568,22 +570,31 @@ class category extends Basecategory implements IIndexable
 		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId);
 	}
 	
-	private function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $featureStatusToRemove = null, $shouldUpdate = true)
+	private function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $featureStatusToRemove = null)
 	{
-		$this->getPartner()->incrementFeaturesStatusByType(FeatureStatusType::INDEX_CATEGORY);
-		
 		$featureStatusToRemoveIndex = new kFeatureStatus();
 		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY);
 		
 		$featureStatusesToRemove = array();
-		$featureStatusesToRemove[] = $featureStatusToRemove;
 		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
+		
+		if(!is_null($featureStatusToRemove))
+		{
+			$featureStatusesToRemove[] = $featureStatusToRemove;
+		}
 		
 		$filter = new categoryFilter();
 		$filter->setFullIdsStartsWith($fullIdsStartsWithCategoryId);
 		$filter->setIdIn($categoriesIdsIn);
 		
-		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY, $filter, $shouldUpdate, $featureStatusesToRemove);
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);		
+		$filter->attachToCriteria($c);		
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		categoryPeer::doSelect($c);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
+		if($c->getRecordsCount() > 0)
+			kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY, $filter, true, $featureStatusesToRemove);
 	}
 
 	private function addIndexCategoryEntryJob($categoryId = null, $shouldUpdate = true)
@@ -599,7 +610,7 @@ class category extends Basecategory implements IIndexable
 		$filter = new categoryEntryFilter();
 		$filter->setCategoryIdEqaul($categoryId);
 
-		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_ENTRY, $filter, $shouldUpdate, $featureStatusToRemoveIndex);
+		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_ENTRY, $filter, $shouldUpdate, $featureStatusesToRemove);
 		
 	}
 	
@@ -616,7 +627,7 @@ class category extends Basecategory implements IIndexable
 		$filter = new categoryKuserFilter();
 		$filter->setCategoryIdEqual($categoryId);
 
-		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_USER, $filter, $shouldUpdate, $featureStatusToRemoveIndex);
+		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_USER, $filter, $shouldUpdate, $featureStatusesToRemove);
 		
 	}
 	

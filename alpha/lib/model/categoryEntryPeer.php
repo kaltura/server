@@ -17,6 +17,11 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 
 	private static $skipEntrySave = false;
 	
+	/**
+	 * For backward compatibility we need to keep entry->categories and 
+	 * entry->categoriesIds updated with categoryEntry. 
+	 * If the entry was already saved – shouldn’t save it from this class
+	 */
 	public static function getSkipSave()
 	{
 		return self::$skipEntrySave;
