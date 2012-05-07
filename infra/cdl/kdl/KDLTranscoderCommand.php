@@ -38,13 +38,13 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 			return true;
 
 		if($this->_id==KDLTranscoders::FFMPEG_AUX) {
-			$transcoder = new KDLOperatorFfmpeg0_10($this->_id);
+			$transcoder = new KDLOperatorFfmpeg($this->_id);
 			if($transcoder->CheckConstraints($source, $target, $errors, $warnings)==true)
 				return true;
 		}
 			
 		if($this->_id==KDLTranscoders::FFMPEG) {
-			$transcoder = new KDLOperatorFfmpeg($this->_id);
+			$transcoder = new KDLOperatorFfmpeg0_10($this->_id);
 			if($transcoder->CheckConstraints($source, $target, $errors, $warnings)==true)
 				return true;
 		}
@@ -73,58 +73,7 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 				KDLWarnings::ToString(KDLWarnings::TranscoderFormat, $this->_id, "non square pixels");
 			return true;
 		}
-			
-		/*
-		 * Remove mencoder, encoding.com and cli_encode
-		 * for audio only flavors
-		 
-		if(($this->_id==KDLTranscoders::MENCODER || $this->_id==KDLTranscoders::ENCODING_COM || $this->_id==KDLTranscoders::ON2)
-		&& $target->_video==null) {
-			$warnings[KDLConstants::AudioIndex][] = //"The transcoder (".$key.") does not handle properly DAR<>PAR.";
-				KDLWarnings::ToString(KDLWarnings::TranscoderLimitation, $this->_id);
-			return true;
-		}*/
-
-		/*
-		 * Remove encoding.com and ffmpegs
-		 * for rotated videos
-		 
-		if(($this->_id==KDLTranscoders::ENCODING_COM || $this->_id==KDLTranscoders::FFMPEG)
-		&& $target->_video && $target->_video->_rotation) {
-			$warnings[KDLConstants::VideoIndex][] = //"The transcoder (".$key.") does not handle properly DAR<>PAR.";
-				KDLWarnings::ToString(KDLWarnings::TranscoderLimitation, $this->_id);
-			return true;
-		}*/
-		
-		/*
-		 * Remove On2
-		 * for 270 rotated videos
-		 
-		if($this->_id==KDLTranscoders::ON2
-		&& $target->_video && $target->_video->_rotation==270) {
-			$warnings[KDLConstants::VideoIndex][] = //"The transcoder (".$key.") does not handle properly DAR<>PAR.";
-				KDLWarnings::ToString(KDLWarnings::TranscoderLimitation, $this->_id);
-			return true;
-		}*/
-		
-		/*
-		 * Non Mac transcoders should not mess up with QT/WMV/WMA
-		 * 
-		 
-		$qt_wmv_list = array("wmv1","wmv2","wmv3","wvc1","wmva","wma1","wma2","wmapro");
-		if((# $this->_id==KDLTranscoders::ENCODING_COM || $this->_id==KDLTranscoders::MENCODER || $this->_id==KDLTranscoders::ON2 || 
-			$this->_id==KDLTranscoders::FFMPEG)
-		&& $source->_container && ($source->_container->_id=="qt" || $source->_container->_format=="qt")
-		&& (
-			($source->_video && (in_array($source->_video->_format,$qt_wmv_list)||in_array($source->_video->_id,$qt_wmv_list)))
-			||($source->_audio && (in_array($source->_audio->_format,$qt_wmv_list)||in_array($source->_audio->_id,$qt_wmv_list)))
-			)
-		){
-			$warnings[KDLConstants::VideoIndex][] = //"The transcoder (".$key.") can not process the (".$sourcePart->_id."/".$sourcePart->_format. ").";
-				KDLWarnings::ToString(KDLWarnings::TranscoderFormat, $this->_id, "qt/wmv/wma");
-			return true;
-		}*/
-		
+					
 		return false;	
 	}
 }
