@@ -433,10 +433,14 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$thumbAsset || !($thumbAsset instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		
+		kBusinessConvertDL::setAsDefaultThumbAsset($thumbAsset);
+		
+		/*	
 		$entry = $thumbAsset->getentry();
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $thumbAsset->getEntryId());
-					
+		
+				
 		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
 		foreach($entryThumbAssets as $entryThumbAsset)
 		{
@@ -463,6 +467,7 @@ class ThumbAssetService extends KalturaAssetService
 		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
 		kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $thumbSyncKey);
+		*/
 	}
 
 	/**
