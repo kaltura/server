@@ -231,6 +231,9 @@ class APIErrors
 	const SOURCE_FILE_NOT_FOUND = "SOURCE_FILE_NOT_FOUND,The flavor source file not found";
 	
 	
+	const SOURCE_FILE_REMOTE = "SOURCE_FILE_REMOTE,The source file is remote, no local file found";
+	
+	
 	const PARTNER_NOT_SET = "PARTNER_NOT_SET, Partner not set";
 
 	// %s - partner id
