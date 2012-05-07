@@ -387,14 +387,14 @@ class kBusinessPreConvertDL
 		if (is_null($originalFlavorAsset))
 		{
 			$errDescription = 'Original flavor asset not found';
-			KalturaLog::log(__METHOD__." - ".$errDescription);
+			KalturaLog::err($errDescription);
 			return null;
 		}
 	
 		if ($originalFlavorAsset->getId() != $flavorAssetId && !in_array($originalFlavorAsset->getStatus(), $originalFlavorAsset->getLocalReadyStatuses()))
 		{
 			$errDescription = 'Original flavor asset not ready';
-			KalturaLog::log(__METHOD__." - ".$errDescription);
+			KalturaLog::err($errDescription);
 			return null;
 		}
 		
@@ -406,13 +406,19 @@ class kBusinessPreConvertDL
 			$mediaInfoId = $mediaInfo->getId();
 		
 		$flavorParams = assetParamsPeer::retrieveByPK($flavorParamsId);
+		if (!$flavorParams)
+		{
+			KalturaLog::err("Flavor Params Id [$flavorParamsId] not found");
+			return null;
+		}
+		
 		$flavorParams->setDynamicAttributes($dynamicAttributes);
 			
 		$flavor = self::validateFlavorAndMediaInfo($flavorParams, $mediaInfo, $errDescription);
 		
 		if (is_null($flavor))
 		{
-			KalturaLog::log(__METHOD__." - Failed to validate media info [$errDescription]");
+			KalturaLog::err("Failed to validate media info [$errDescription]");
 			return null;
 		}
 			
@@ -443,7 +449,7 @@ class kBusinessPreConvertDL
 		$flavorAsset = kBatchManager::createFlavorAsset($flavor, $partnerId, $entryId, $flavorAssetId);
 		if (!$flavorAsset)
 		{
-			KalturaLog::err(__METHOD__." - Failed to create flavor asset");
+			KalturaLog::err("Failed to create flavor asset");
 			return null;
 		}
 		$flavorAssetId = $flavorAsset->getId();
@@ -481,7 +487,7 @@ class kBusinessPreConvertDL
 					
 					if (is_null($flavorParamsOutput))
 					{
-						KalturaLog::log(__METHOD__." - Failed to validate media info [$errDescription]");
+						KalturaLog::err("Failed to validate media info [$errDescription]");
 						continue;
 					}
 				}

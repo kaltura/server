@@ -19,6 +19,15 @@ class SyndicationFeedService extends KalturaBaseService
 		parent::applyPartnerFilterForClass(new syndicationFeedPeer());
 	}
 	
+	protected function partnerGroup()
+	{
+		// required in order to load flavor params of partner zero
+		if ($this->actionName == 'requestConversion')
+			return parent::partnerGroup() . ',0';
+
+		return parent::partnerGroup();
+	}
+	
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if ($actionName === 'get') {
