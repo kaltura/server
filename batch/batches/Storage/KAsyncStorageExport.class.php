@@ -99,6 +99,11 @@ class KAsyncStorageExport extends KJobHandlerWorker
 		try{
 			$engine->putFile($destFile, $srcFile, $data->force);
 		}
+		catch(kFileTransferMgrException $e){
+			if($e->getCode() == kFileTransferMgrException::remoteFileExists)
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::FILE_ALREADY_EXISTS,$e->getMessage(),KalturaBatchJobStatus::FAILED);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $e->getCode(), $e->getMessage(), KalturaBatchJobStatus::FAILED);
+		}
 		catch(Exception $e)
 		{
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $e->getCode(), $e->getMessage(), KalturaBatchJobStatus::FAILED);
