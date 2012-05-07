@@ -100,6 +100,13 @@ class kBusinessConvertDL
 					$oldFlavorNewMediaInfo->save();
 				}
 				unset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]);
+				
+				if ($oldAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+				{
+					$defaultThumbAssetNew = $oldAsset;
+					KalturaLog::debug("Nominating ThumbAsset [".$oldAsset->getId()."] as the default ThumbAsset after replacent");
+				}
+				
 			}	
 			//If the old asset is not set for replacement by its paramsId and type, delete it.
 			elseif($oldAsset instanceof flavorAsset || $oldAsset instanceof thumbAsset)
@@ -113,11 +120,6 @@ class kBusinessConvertDL
 				$entry->removeFlavorParamsId($oldAsset->getFlavorParamsId());
 				$saveEntry = true;
 			}
-			// If the new asset being copied is the Default ThumbAsset, note it to be re-assigned after the replacement
-			if ($newAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB)) {
-				$defaultThumbAssetNew = $newAsset;
-				KalturaLog::debug("Nominating ThumbAsset [".$newAsset->getId()."] as the default ThumbAsset after replacent");
-			}			
 		}
 		
 		foreach($newAssets as $newAssetsByTypes)
@@ -126,9 +128,14 @@ class kBusinessConvertDL
 			{
 				$createdAsset = $newAsset->copyToEntry($entry->getId(), $entry->getPartnerId());
 				KalturaLog::debug("Copied from new asset [" . $newAsset->getId() . "] to copied asset [" . $createdAsset->getId() . "] for flavor [" . $newAsset->getFlavorParamsId() . "]");
+				
+				if ($newAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB)) {
+					$defaultThumbAssetNew = $newAsset;
+					KalturaLog::debug("Nominating ThumbAsset [".$newAsset->getId()."] as the default ThumbAsset after replacent");
+				}
 			}
 		}
-		// Handling default ThumbAsset setting from
+		
 		if (!$defaultThumbAssetNew)
 			kalturalog::debug("No default ThumbAsset found for replacing entry [". $tempEntry->getId() ."]");
 		else {		
@@ -160,10 +167,8 @@ class kBusinessConvertDL
 		/* @var $thumbAsset thumbAsset */
 		$entry = $thumbAsset->getentry();
 		if (!$entry)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $thumbAsset->getEntryId());							
-		//$this->checkIfUserAllowedToUpdateEntry($entry);			
-		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
-		
+			throw new kCoreException("Could not retrieve entry ID [".$thumbAsset->getEntryId()."] from ThumbAsset ID [".$thumbAsset->getId()."]",KalturaErrors::ENTRY_ID_NOT_FOUND);
+		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());			
 		foreach($entryThumbAssets as $entryThumbAsset)
 		{
 			if($entryThumbAsset->getId() == $thumbAsset->getId())
@@ -186,11 +191,9 @@ class kBusinessConvertDL
 		$entry->setCreateThumb(false);
 		$entry->save();
 		
-		/* needed ?
 		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
 		kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $thumbSyncKey);
-		*/
 	}
 	
 	public static function parseFlavorDescription(flavorParamsOutputWrap $flavor)
