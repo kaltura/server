@@ -124,20 +124,20 @@ class CategoryService extends KalturaBaseService
 	{
 		if ($this->getPartner()->getFeaturesStatusByType(FeatureStatusType::LOCK_CATEGORY))
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
-			
+
 		$categoryDb = categoryPeer::retrieveByPK($id);
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
-			
+
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getCategoryId(), kCurrentContext::$ks_kuser_id);
+			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getId(), kCurrentContext::$ks_kuser_id);
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
-		
-		$this->getPartner()->addFeaturesStatus(FeatureStatusType::LOCK_CATEGORY, 1);
-		
+
+		$this->getPartner()->addFeaturesStatus(FeatureStatusType::LOCK_CATEGORY);
+
 		try
 		{
 			$categoryDb->setDeletedAt(time());	
@@ -246,6 +246,49 @@ class CategoryService extends KalturaBaseService
 		}
 	}
 	
+	/**
+	 * Move categories that belong to the same parent category to a traget categroy
+	 * 
+	 * @action move
+	 * @param string $categoryIds
+	 * @param int $targetCategoryParentId
+	 * @return KalturaCategoryListResponse
+	 */
+	function moveAction($categoryIds, $targetCategoryParentId)
+	{
+		if ($this->getPartner()->getFeaturesStatusByType(FeatureStatusType::LOCK_CATEGORY))
+			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
+		
+		$categories = explode(',', $categoryIds);
+		$dbCategories = array();
+		$parentId = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
+		
+		foreach($categories as $categoryId)
+		{
+			$dbCategory = categoryPeer::retrieveByPK($categoryId);
+			if (!$dbCategory)
+				throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
+			
+			if($parentId == category::CATEGORY_ID_THAT_DOES_NOT_EXIST)
+				$parentId = $dbCategory->getParentId();
+				
+			if($parentId != $dbCategory->getParentId())
+				throw new KalturaAPIException(KalturaErrors::CANNOT_MOVE_CATEGORIES_FROM_DIFFERENT_PARENT_CATEGORY);
+				
+			$dbCategories[] = $dbCategory;
+		}
+		
+		$dbTargetCategory = categoryPeer::retrieveByPK($targetCategoryParentId);
+		if (!$dbTargetCategory)
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $targetCategoryParentId);		
+		
+		foreach ($dbCategories as $dbCategory)
+		{
+			$dbCategory->setParentId($dbTargetCategory->getId());
+			$dbCategory->save();		
+		}
+		
+	}
 	/**
 	 * Unlock categories - this is only for debuging - and should not be uploaded in flacon version
 	 * 
