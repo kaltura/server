@@ -254,6 +254,8 @@ class KalturaErrors extends APIErrors
 	
 	const CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT, Cannot update privacy context";
 	
+	const CANNOT_MOVE_CATEGORIES_FROM_DIFFERENT_PARENT_CATEGORY = "CANNOT_MOVE_CATEGORIES_FROM_DIFFERENT_PARENT_CATEGORIES,Cannot move categories from different parent categories";
+	
 	/**
 	 * Batch Service
 	 */

@@ -416,7 +416,7 @@ class Partner extends BasePartner
 	
 	public function setFeaturesStatus(array $v ) {		return $this->putInCustomData("featuresStatus", serialize($v) );	}	
 	
-	public function addFeaturesStatus($type, $value)
+	public function addFeaturesStatus($type, $value = 1)
 	{
 		$newFeatureStatus = new kFeatureStatus();
 		$newFeatureStatus->setType($type);
