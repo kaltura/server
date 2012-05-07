@@ -91,18 +91,6 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
     
 	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult)
 	{
-	    if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
-		{
-		    if ( $bulkUploadResult->objectId )
-		    {
-		        $bulkUploadResult->action = KalturaBulkUploadAction::UPDATE;
-		    }
-	        else
-	        {
-	            $bulkUploadResult->action = KalturaBulkUploadAction::ADD;
-		    }
-		}
-		
 		if (!$bulkUploadResult->userId)
 		{
 		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
@@ -136,7 +124,20 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		    {
 		        $this->categoryReferenceIdMap[$bulkUploadResult->categoryReferenceId] = $categoryResults->objects[0]->id;
 		    }
-		}	
+		}
+        
+	    if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
+		{
+		    try 
+		    {
+		        $categoryUser = $this->kClient->categoryUser->get($bulkUploadResult->categoryId, $bulkUploadResult->userId);
+		        $bulkUploadResult->action = KalturaBulkUploadAction::UPDATE;
+		    }
+		    catch (Exception $e)
+		    {
+		        $bulkUploadResult->action = KalturaBulkUploadAction::ADD;
+		    }
+		}
 			
 		if($bulkUploadResult->status == KalturaBulkUploadResultStatus::ERROR)
 		{
