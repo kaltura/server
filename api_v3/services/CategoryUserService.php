@@ -334,8 +334,9 @@ class CategoryUserService extends KalturaBaseService
 		$categoryKuserFilter = new categoryKuserFilter();
 		$filter->toObject($categoryKuserFilter);
 		
-		$c = new Criteria();
+		$c = KalturaCriteria::create(categoryKuserPeer::OM_CLASS);
 		$categoryKuserFilter->attachToCriteria($c);
+		$c->applyFilters();
 		
 		$totalCount = categoryKuserPeer::doCount($c);
 		
