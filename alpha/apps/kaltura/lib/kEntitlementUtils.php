@@ -53,7 +53,8 @@ class kEntitlementUtils
 			{
 				$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 				$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid);
-				$kuserId = $kuser->getId();
+				if($kuser)
+					$kuserId = $kuser->getId();
 			}
 			
 			// kuser is set on the entry as creator or uploader
