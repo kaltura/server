@@ -33,6 +33,8 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	{
 		switch($dbBatchJob->getStatus())
 		{
+			case BatchJob::BATCHJOB_STATUS_PENDING:
+				return kFlowHelper::handleIndexPending($dbBatchJob, $data, $twinJob);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 				return kFlowHelper::handleIndexFinished($dbBatchJob, $data, $twinJob);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
