@@ -10,15 +10,15 @@ class MetadataKuserPeer extends kuserPeer implements IMetadataPeer
 	 * 
 	 * @var int
 	 */
-	private $partnerId;
+	private static $partnerId;
 	
 	public function setPartnerId($partnerId)
 	{
-		$this->partnerId = $partnerId;		
+		self::$partnerId = $partnerId;		
 	}
 	
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
-		return parent::getKuserByPartnerAndUid($this->partnerId, $pk, true);
+		return parent::getKuserByPartnerAndUid(self::$partnerId, $pk, true);
 	}
 }
