@@ -218,4 +218,17 @@ class StorageProfile extends BaseStorageProfile
 	    }
 	    return false;
 	}
+	
+	
+	public function isPendingExport(asset $asset)
+	{
+	    $key = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+	    $c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
+		$c->addAnd(FileSyncPeer::DC, $this->getId(), Criteria::EQUAL);
+		$fileSync = FileSyncPeer::doSelectOne($c);
+		if (!$fileSync) {
+		    return false;
+		}
+		return ($fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_PENDING);
+	}
 }

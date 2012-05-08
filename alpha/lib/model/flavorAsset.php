@@ -149,12 +149,20 @@ class flavorAsset extends asset
 		        continue;
 		    }
 		    
-		    // check if asset fits to the export rules defined on the profile
+		    // check if asset needs to be exported to the remote storage
 		    if (!$externalStorage->shouldExportFlavorAsset($this))
 		    {
-		        KalturaLog::debug('Should not export asset id ['.$this->getId().'] to profile ['.$externalStorage->getId().']');
+    		    // check if asset is currently being exported to the remote storage
+    		    if (!$externalStorage->isPendingExport($this))
+    		    {
+    		        KalturaLog::debug('Should not export asset id ['.$this->getId().'] to profile ['.$externalStorage->getId().']');
 		        continue;
-		    }
+    		    }
+    		    else
+    		    {
+    		        KalturaLog::debug('Asset id ['.$this->getId().'] is currently being exported to profile ['.$externalStorage->getId().']');
+    		    }		        
+		    }		    
 		    
 		    KalturaLog::debug('Asset id ['.$this->getId().'] is required to export to profile ['.$externalStorage->getId().'] - setting status to [EXPORTING]');
 		    $newStatus = asset::ASSET_STATUS_EXPORTING;

@@ -117,7 +117,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		$externalFileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $externalStorage);
 		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key,true,false);
-		if(!$fileSync){
+		if(!$fileSync || !kDataCenterMgr::dcExists($fileSync->getDc())){
 			KalturaLog::err("no ready fileSync was found for key [$key]");
 			return;
 		}
@@ -155,12 +155,11 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			return false;
 		}
 		
-		$storageFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key, $externalStorage->getId());
-		//TODO: what if currently being exported ?
+		$storageFileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($key, $externalStorage->getId());
 
-		if($storageFileSync) // already exported
+		if($storageFileSync) // already exported or currently being exported
 		{
-			KalturaLog::log(__METHOD__ . " key [$key] already exported");
+			KalturaLog::log(__METHOD__ . " key [$key] already exported or being exported");
 			return false;
 		}
 			
@@ -171,17 +170,25 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param entry $entry
 	 * @param StorageProfile $externalStorage
 	 */
-	static public function exportEntry(entry $entry, StorageProfile $externalStorage)
+	public function exportEntry(entry $entry, StorageProfile $externalStorage, &$exportedKeys = array(), &$nonExportedKeys = array())
 	{
-		$checkFileSyncsKeys = self::getEntrySyncKeys($entry, $externalStorage);
+		$checkFileSyncsKeys = $this->getEntrySyncKeys($entry, $externalStorage);
 		foreach($checkFileSyncsKeys as $key)
 		{
-			if(self::shouldExport($key, $externalStorage)) {
-				self::export($entry, $externalStorage, $key);
-			}
-			else {
-				KalturaLog::log("no need to export key [$key] to externalStorage id[" . $externalStorage->getId() . "]");
-			}			
+    		if (self::shouldExport($key, $externalStorage)) {
+    			$exported = self::export($entry, $externalStorage, $key);
+    			if ($exported) {
+    			    $exportedKeys[] = $key;
+    			}
+    			else {
+    			    $nonExportedKeys[] = $key;
+    			}
+    		}
+    		else {
+    		    $nonExportedKeys[] = $key;
+    		    KalturaLog::log("no need to export key [$key] to externalStorage id[" . $externalStorage->getId() . "]");
+    		}
+			
 		}
 	}
 	
