@@ -917,6 +917,12 @@ return array(
 	// external-storages
 	'external-storages intro text' => 'Here you can manage the Remote Storage profiles on your Kaltura video platform deployment',
 	'external-storages results count' => 'Results <span>(%s storages)</span>',
+	'are you sure manual storage?' => 'The remote storage status will be changed to "manual".\n Are you sure?',
+	'are you sure auto storage?' => 'The remote storage status will be changed to "auto".\n Are you sure?',
+	'are you sure disable storage?' => 'The remote storage will be disabled.\n Are you sure?',
+    'storage was manualed' => 'Remote storage status is now "manual".',
+    'storage was autoed' => 'Remote storage status is now "auto".',
+    'storage was disabled' => 'Remote storage has been disabled.',
 
 	// partner-configure
 	'partner-configure intro text' => 'NOTE:  changing these settings here will override the existing default settings for this storage.',
@@ -995,6 +1001,10 @@ return array(
 	// Distibution
 	'provider-list intro text'	=>	'Here you can define and manage generic distribution settings to be used in several Distribution Profiles. To have these settings available for all publisher accounts, define the setting to publisher ID: 0',
 	'distribution-profiles intro text' =>	'Here you can manage the Distribution profiles on your Kaltura video platform deployment',
+    'are you sure delete the profile?' => 'Are you sure you want to delete this profile?',   
+    'profile was removed' => 'Storage profile was removed.' ,
+    'profile was disabled' => 'Profile disabled.',
+    'profile was enabled' => 'Profile enabled.',
 
 	// Drop Folder
 	'drop folder list intro text' => 'Here you can manage the Drop Folder profiles on your Kaltura video platform deployment',
