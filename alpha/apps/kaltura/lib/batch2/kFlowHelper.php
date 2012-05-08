@@ -1341,16 +1341,6 @@ class kFlowHelper
 		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
 		$fileSync->save();
 
-		if($dbBatchJob->getJobSubType() != StorageProfile::STORAGE_KALTURA_DC)
-		{
-			$partner = $dbBatchJob->getPartner();
-			if($partner && $partner->getStorageDeleteFromKaltura())
-			{
-				$syncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
-				kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
-			}
-		}
-		
 		// if an asset was exported - check if should set its status to READY
 		$asset = assetPeer::retrieveByFileSync($fileSync);
 		if ($asset && in_array($asset->getStatus(), array(asset::ASSET_STATUS_EXPORTING, asset::ASSET_STATUS_ERROR)))
@@ -1362,6 +1352,17 @@ class kFlowHelper
             {
                 kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $asset);
             }
+		}
+		
+		// check if all exports finished and delete local file sync according to configuration
+		if($asset->getStatus() == asset::ASSET_STATUS_READY && $dbBatchJob->getJobSubType() != StorageProfile::STORAGE_KALTURA_DC)
+		{
+			$partner = $dbBatchJob->getPartner();
+			if($partner && $partner->getStorageDeleteFromKaltura())
+			{
+				$syncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
+				kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			}
 		}
 		
 		return $dbBatchJob;
