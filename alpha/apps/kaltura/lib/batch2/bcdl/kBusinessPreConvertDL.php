@@ -324,9 +324,10 @@ class kBusinessPreConvertDL
 			$scaleWidth = $destThumbParamsOutput->getScaleWidth();
 			$scaleHeight = $destThumbParamsOutput->getScaleHeight();
 			$density = $destThumbParamsOutput->getDensity();
+			$stripProfiles = $destThumbParamsOutput->getStripProfiles();
 			
 			$cropper = new KImageMagickCropper($srcPath, $destPath, kConf::get('bin_path_imagemagick'), true);
-			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density, $rotate);
+			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density, $rotate, $stripProfiles);
 			if(!$cropped || !file_exists($destPath))
 			{
 				$errDescription = "Crop failed";

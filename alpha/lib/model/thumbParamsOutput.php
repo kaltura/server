@@ -35,6 +35,7 @@ class thumbParamsOutput extends assetParamsOutput
 	public function getScaleHeight()			{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_SCALE_HEIGHT);}
 	public function getBackgroundColor()		{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_BACKGROUND_COLOR);}
 	public function getDensity()				{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_DENSITY);}
+	public function getStripProfiles()			{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_STRIP_PROFILES);}
 
 	public function setSourceParamsId($v)		{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_SOURCE_PARAMS_ID, $v);}
 	public function setCropType($v)				{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_CROP_TYPE, $v);}
@@ -50,4 +51,5 @@ class thumbParamsOutput extends assetParamsOutput
 	public function setScaleHeight($v)			{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_SCALE_HEIGHT, $v);}
 	public function setBackgroundColor($v)		{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_BACKGROUND_COLOR, $v);}
 	public function setDensity($v)				{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_DENSITY, $v);}
+	public function setStripProfiles($v)			{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_STRIP_PROFILES, $v);}
 }

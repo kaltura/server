@@ -52,7 +52,7 @@ class KImageMagickCropper extends KBaseCropper
 		parent::__construct($srcPath, $targetPath);
 	}
 	
-	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = 0xffffff, $density = 0, $forceRotation = null)
+	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = 0xffffff, $density = 0, $forceRotation = null, $strip = false)
 	{
 		$attributes = array();
 
@@ -74,6 +74,9 @@ class KImageMagickCropper extends KBaseCropper
 				break;
 			}
 		}
+		
+		if($strip)
+			$attributes[] = "-strip";
 		
 		if($density != 0) {
 			$attributes[] = "-density ".$density;

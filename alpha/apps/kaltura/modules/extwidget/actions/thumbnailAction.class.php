@@ -48,6 +48,7 @@ class thumbnailAction extends sfAction
 		$vid_slice = $this->getRequestParameter( "vid_slice" , -1);
 		$vid_slices = $this->getRequestParameter( "vid_slices" , -1);
 		$density = $this->getRequestParameter( "density" , 0);
+		$stripProfiles = $this->getRequestParameter( "strip" , null);
 		
 		// actual width and height of image from which the src_* values were taken.
 		// these will be used to multiply the src_* parameters to make them relate to the original image size.
@@ -101,17 +102,20 @@ class thumbnailAction extends sfAction
 		if(!preg_match('/^[0-9a-fA-F]{1,6}$/', $bgcolor))
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bgcolor must be six hexadecimal characters');
 		
-		
 		if ($upload_token_id)
 		{
 			$upload_token = UploadTokenPeer::retrieveByPK($upload_token_id);
 			if ($upload_token)
 			{
 				$partnerId = $upload_token->getPartnerId();
-				if($density == 0) {
-				    $partner = PartnerPeer::retrieveByPK($partnerId);
+				$partner = PartnerPeer::retrieveByPK($partnerId);
+				
+				if($density == 0)
 					$density = $partner->getDefThumbDensity();
-				}
+				
+				if(is_null($stripProfiles))
+					$stripProfiles = $partner->getStripThumbProfile();
+				
 				$thumb_full_path =  myContentStorage::getFSCacheRootPath() . myContentStorage::getGeneralEntityPath("uploadtokenthumb", $upload_token->getIntId(), $upload_token->getId(), $upload_token->getId() . ".jpg");
 				kFile::fullMkdir($thumb_full_path);
 				if (file_exists($upload_token->getUploadTempPath()))
@@ -137,7 +141,7 @@ class thumbnailAction extends sfAction
 					}
 						
 					// and resize it
-					myFileConverter::convertImage($src_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density);
+					myFileConverter::convertImage($src_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles);
 					kFile::dumpFile($thumb_full_path);
 				} else {
 					KalturaLog::debug ( "token_id [$upload_token_id] not found in DC [". kDataCenterMgr::getCurrentDcId ()."]. dump url to romote DC");
@@ -186,9 +190,11 @@ class thumbnailAction extends sfAction
 		}
 		
 		$partner = $entry->getPartner();
-		if($density == 0) {
+		if($density == 0)
 			$density = $partner->getDefThumbDensity();
-		}
+		
+		if(is_null($stripProfiles))
+			$stripProfiles = $partner->getStripThumbProfile();
 		
 		//checks whether the thumbnail display should be restricted by KS
 		$base64Referrer = $this->getRequestParameter("referrer");
@@ -260,7 +266,7 @@ class thumbnailAction extends sfAction
 				}
 				$contentPath = myContentStorage::getFSContentRootPath();
 				$msgPath = $contentPath."content/templates/entry/thumbnail/audio_thumb.jpg";
-				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density);
+				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles);
 				//kFile::dumpFile($tempThumbPath, null, 0);
 			}
 			elseif($entry->getType() == entryType::LIVE_STREAM)
@@ -272,13 +278,13 @@ class thumbnailAction extends sfAction
 				}
 				$contentPath = myContentStorage::getFSContentRootPath();
 				$msgPath = $contentPath."content/templates/entry/thumbnail/live_thumb.jpg";
-				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density);
+				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles);
 			}
 			elseif($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_SHOW) // roughcut without any thumbnail, probably just created
 			{
 				$contentPath = myContentStorage::getFSContentRootPath();
 				$msgPath = $contentPath."content/templates/entry/thumbnail/auto_edit.jpg";
-				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density);
+				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles);
 				//kFile::dumpFile($tempThumbPath, null, 0);
 			}
 			//elseif($entry->getType() == entryType::MEDIA_CLIP && ($entry->getStatus() == entryStatus::PRECONVERT || $entry->getStatus() == entryStatus::IMPORT))

@@ -87,6 +87,13 @@ class KalturaThumbParams extends KalturaAssetParams
 	 */
 	public $density;
 	
+	/**
+	 * Strip profiles and comments
+	 * 
+	 * @var bool
+	 */
+	public $stripProfiles;
+	
 	
 //	Maybe support will be added in the future
 //	
@@ -117,7 +124,8 @@ class KalturaThumbParams extends KalturaAssetParams
 		"backgroundColor",
 		"sourceParamsId",
 		"format",
-		"density"
+		"density",
+		"stripProfiles",
 	
 //		Maybe support will be added in the future
 //		"cropProvider",
