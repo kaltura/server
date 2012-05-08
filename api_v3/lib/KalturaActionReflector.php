@@ -61,11 +61,6 @@ class KalturaActionReflector extends KalturaReflector
         list ($this->_actionClass, $this->_actionMethodName, $this->_actionServiceId, $this->_actionName) = array_values($serviceCallback);
         
         $this->_serviceId = $serviceId;
-        
-        $reflectionClass = new ReflectionClass($this->_actionClass);
-        $reflectionMethod = $reflectionClass->getMethod($this->_actionMethodName);
-        $this->_actionClassInfo = new KalturaDocCommentParser($reflectionClass->getDocComment());
-        $this->_actionInfo = new KalturaDocCommentParser($reflectionMethod->getDocComment());
         $this->_actionId = $actionId;
         
         $actionAlias = $this->_actionInfo->actionAlias ? explode(".", $this->_actionInfo->actionAlias) : null;
@@ -81,7 +76,12 @@ class KalturaActionReflector extends KalturaReflector
      */
     public function getActionInfo ( )
     {
-        //TODO Check from cache - add later
+        if (!$this->_actionInfo)
+        {
+           $reflectionClass = new ReflectionClass($this->_actionClass);
+           $reflectionMethod = $reflectionClass->getMethod($this->_actionMethodName);
+           $this->_actionInfo = new KalturaDocCommentParser($reflectionMethod->getDocComment());
+        }
        return $this->_actionInfo;
     }
     
@@ -170,6 +170,11 @@ class KalturaActionReflector extends KalturaReflector
      */
     public function getActionClassInfo ()
     {
+        if (!$this->_actionClassInfo)
+        {
+            $reflectionClass = new ReflectionClass($this->_actionClass);
+            $this->_actionClassInfo = new KalturaDocCommentParser($reflectionClass->getDocComment());
+        }
         return $this->_actionClassInfo;
     }
     
