@@ -40,22 +40,47 @@ class KalturaDispatcher
 		
         //strtolower on service - map is indexed according to lower-case service IDs
         $service = strtolower($service);
-        // load the service reflector
-        $serviceMap = KalturaServicesMap::getMap();
         
-        if (!isset($serviceMap[$service]))
+        $success = null;
+        if (function_exists('apc_fetch'))
         {
-            KalturaLog::crit("Service does not exist!");
-            throw new KalturaAPIException(KalturaErrors::SERVICE_DOES_NOT_EXISTS, $service);
+            $serviceItemFromCache = apc_fetch($service, $success);
+            if ($serviceItemFromCache["serviceMapLastMod"] != KalturaServicesMap::getServiceMapCreationTime())
+            {
+                $success = false;
+            }
         }
         
-        // check if action exists
-	    if (!$action)
-	    {
-	        KalturaLog::crit("Action not specified!");
-		    throw new KalturaAPIException(KalturaErrors::ACTION_NOT_SPECIFIED, $service);
-	    }
-        $reflector = $serviceMap[$service];
+        if ($success)
+        {
+            $reflector = $serviceItemFromCache["serviceActionItem"];
+        }
+        else 
+        {
+            // load the service reflector
+            $serviceMap = KalturaServicesMap::getMap();
+            
+            if (!isset($serviceMap[$service]))
+            {
+                KalturaLog::crit("Service does not exist!");
+                throw new KalturaAPIException(KalturaErrors::SERVICE_DOES_NOT_EXISTS, $service);
+            }
+            
+            // check if action exists
+    	    if (!$action)
+    	    {
+    	        KalturaLog::crit("Action not specified!");
+    		    throw new KalturaAPIException(KalturaErrors::ACTION_NOT_SPECIFIED, $service);
+    	    }
+            $reflector = $serviceMap[$service];
+            
+            if (function_exists('apc_store'))
+            {
+                $servicesMapLastModeTime = KalturaServicesMap::getServiceMapCreationTime();
+		        $success = apc_store("$service" ,array ("serviceActionItem" => $serviceMap[$service], "actionParams" => $actionParams,));
+                
+            }
+        }
 	    /* @var $reflector KalturaServiceActionItem */
         $action = strtolower($action);
         if (!isset($reflector->actionMap[$action]))
@@ -75,7 +100,13 @@ class KalturaDispatcher
         
         $success = null;
         if (function_exists('apc_fetch'))
-		    $actionFromCache = apc_fetch("$service"._."$action", $success);
+        {
+		    $actionFromCache = apc_fetch("{$service}_{$action}", $success);
+		    if ($actionFromCache["serviceMapLastMod"] != KalturaServicesMap::getServiceMapCreationTime())
+		    {
+		        $success = false;
+		    }
+        }
         
 		if (!$success)
 		{
@@ -139,7 +170,8 @@ class KalturaDispatcher
 				
 		if (!$success && function_exists('apc_store'))
 		{
-		    $success = apc_store("$service"._."$action",array ("actionInfo" => $actionInfo, "actionParams" => $actionParams,));
+		    $servicesMapLastModeTime = KalturaServicesMap::getServiceMapCreationTime();
+		    $success = apc_store("{$service}_{$action}",array ("serviceMapLastMod" => $servicesMapLastModeTime, "actionInfo" => $actionInfo, "actionParams" => $actionParams,));
 		}
 		
 		kMemoryManager::clearMemory();
