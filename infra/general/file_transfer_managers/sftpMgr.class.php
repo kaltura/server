@@ -269,12 +269,16 @@ class sftpMgr extends kFileTransferMgr
 //	    $filesize = isset($statinfo['size']) ? $statinfo['size'] : null;
 	    
     	$remote_folder = dirname($remote_file);
-        $lsdir_cmd = "ls -l $remote_folder/*";
-        $exec_output = $this->execCommand($lsdir_cmd);
-        
-		KalturaLog::info("sftp rawlist [$exec_output]");
+//        $lsdir_cmd = "ls -l $remote_folder/*";
+//        $exec_output = $this->execCommand($lsdir_cmd);
+		$output = array();
+		$sftpLsCommand = "ls -l $remote_folder/*";
+        $cmd = "echo -e '$sftpLsCommand \n quit' | sftp -oPort=$this->sftp_port -o IdentityFile=$this->sftp_privKeyFile -o 'StrictHostKeyChecking=no' $this->sftp_user@$this->sftp_server";
+        exec($cmd, $output);
 		
-		$filesInfo = array_filter(array_map('trim', explode("\n", $exec_output)), 'strlen');
+        KalturaLog::info("sftp rawlist: " . print_r($output, true) . "\n"); 
+		
+		$filesInfo = array_filter(array_map('trim', $output), 'strlen');
 			    
 		// drwxrwxrwx 10 root root 4096 2010-11-24 23:45 file.ext
 		// -rw-r--r--+ 1 mikew Domain Users 7270248766 Feb  9 11:16 Kaltura/LegislativeBriefing2012.mov
@@ -283,14 +287,16 @@ class sftpMgr extends kFileTransferMgr
 	    foreach($filesInfo as $fileInfo)
 	    {
 	    	$matches = null;
-	    	if(!preg_match("/$regexUnix/", $fileInfo, $matches))
-	    	{
-	    		KalturaLog::err("Unix regex does not match ftp rawlist output [$fileInfo]");
-				continue;
+	    	if (!stristr ($fileInfo, 'sftp>') || stripos($fileInfo, 'sftp>') != 0){ // to ignore the bash commands e.g. sftp>quit etc 
+		    	if(!preg_match("/$regexUnix/", $fileInfo, $matches))
+		    	{
+		    		KalturaLog::err("Unix regex does not match sftp rawlist output [$fileInfo]");
+					continue;
+		    	}
+		    	
+		    	if($matches['file'] == basename($remote_file))
+		    		return $matches['fileSize'];
 	    	}
-	    	
-	    	if($matches['file'] == basename($remote_file))
-	    		return $matches['fileSize'];
 	    }
 	    return null;
 	}
