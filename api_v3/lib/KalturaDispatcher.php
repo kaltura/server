@@ -74,16 +74,17 @@ class KalturaDispatcher
         }
         
         $success = null;
-		//$actionFromCache = apc_fetch("$service"._."$action", $success);
+        if (function_exists('apc_fetch'))
+		    $actionFromCache = apc_fetch("$service"._."$action", $success);
         
-//		if (!$success)
-//		{
-		    $actionParams = $actionReflector->getActionParams();
-//		}
-//		else
-//		{
-//		    $actionParams = $actionFromCache["actionParams"];
-//		}
+		if (!$success)
+		{
+	    	    $actionParams = $actionReflector->getActionParams();
+		}
+		else
+		{
+		    $actionParams = $actionFromCache["actionParams"];
+		}
 		// services.ct - check if partner is allowed to access service ...
 
 		// validate it's ok to access this service
@@ -105,14 +106,14 @@ class KalturaDispatcher
 		kEntitlementUtils::initEntitlementEnforcement();
 		KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		
-//		if (!$success)
-//		{
+		if (!$success)
+		{
 		    $actionInfo = $actionReflector->getActionInfo();
-//		}
-//		else
-//		{
-//		    $actionInfo = $actionFromCache["actionInfo"];
-//		}
+		}
+		else
+		{
+		    $actionInfo = $actionFromCache["actionInfo"];
+		}
 		if($actionInfo->validateUserObjectClass && $actionInfo->validateUserIdParamName && isset($actionParams[$actionInfo->validateUserIdParamName]))
 		{
 //			// TODO maybe if missing should throw something, maybe a bone?
@@ -136,10 +137,10 @@ class KalturaDispatcher
 		KalturaLog::debug("Invoke took - " . (microtime(true) - $invokeStart) . " seconds");
 		KalturaLog::debug("Disptach took - " . (microtime(true) - $start) . " seconds");		
 				
-//		if (!$success)
-//		{
-//		    $success = apc_store("$service"._."$action",array ("actionInfo" => $actionInfo, "actionParams" => $actionParams,));
-//		}
+		if (!$success && function_exists('apc_store'))
+		{
+		    $success = apc_store("$service"._."$action",array ("actionInfo" => $actionInfo, "actionParams" => $actionParams,));
+		}
 		
 		kMemoryManager::clearMemory();
 		
