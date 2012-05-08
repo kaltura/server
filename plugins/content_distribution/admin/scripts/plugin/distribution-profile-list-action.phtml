@@ -227,7 +227,12 @@ function newDistributionProfileSuccess(html) {
 	if (jQuery(html).filter('#frmDistributionProfileConfig').hasClass('valid')) 
 	{
 		dialogDiv.dialog('close');
-		jQuery('#frmPaginator1').submit();
+		if (jQuery('#frmPaginator1').length){
+			jQuery('#frmPaginator1').submit();
+		}
+		else {
+			jQuery('#frmPartnerIdFilter').submit();
+		}
 	}
 	else
 	{
