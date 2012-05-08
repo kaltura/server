@@ -1375,7 +1375,7 @@ class kFlowHelper
 	public static function handleStorageExportFailed(BatchJob $dbBatchJob, kStorageExportJobData $data)
 	{
 		KalturaLog::debug("Export to storage failed for sync file[" . $data->getSrcFileSyncId() . "]");
-		if ($dbBatchJob->getErrType() == KalturaBatchJobErrorTypes::APP && $dbBatchJob->getErrNumber() == KalturaBatchJobAppErrors::FILE_ALREADY_EXISTS){
+		if ($dbBatchJob->getErrType() == BatchJobErrorTypes::APP && $dbBatchJob->getErrNumber() == BatchJobAppErrors::FILE_ALREADY_EXISTS){
 			KalturaLog::notice("remote file already exists");
 			return $dbBatchJob;
 		}
