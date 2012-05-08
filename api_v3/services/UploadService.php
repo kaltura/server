@@ -37,6 +37,8 @@ class UploadService extends KalturaEntryService
 	 */
 	function getUploadedFileTokenByFileNameAction($fileName)
 	{
+		KalturaResponseCacher::disableConditionalCache();
+		
 		$res = new KalturaUploadResponse();
 		$ksUnique = md5($this->getKs()->toSecureString());
 		
