@@ -28,11 +28,11 @@ class EntitlementTest extends EntitlementTestBase
 		$this->startSession($this->client);
 		
 		/* @var $category KalturaCategory */
-		$category->name = $category->name . time();
+		$category->name = $category->name . time() . rand();
 		$category = $this->client->category->add($category);
 		
 		/* @var $user KalturaUser */
-		$user->id = $user->id . time();
+		$user->id = $user->id . time() . rand();
 		$user = $this->client->user->add($user);
 			
 		$this->startSessionWithDiffe(SessionType::USER, $user->id);
@@ -97,6 +97,7 @@ class EntitlementTest extends EntitlementTestBase
 				default:
 					break;	
 			}
+			
 		}
 		
 		if ($categoryUserResponse && $categoryUserResponse->status == KalturaCategoryUserStatus::ACTIVE)
@@ -124,16 +125,42 @@ class EntitlementTest extends EntitlementTestBase
 	 */
 	public function testCategoryHierarchy($category1, $category2, $category3, $user1)
 	{
+		$this->startSession($this->client);
+		
+		$users = array();
+		$users[] = $category1->owner;
+		$users[] = $category2->owner;
+		$users[] = $category3->owner;
+		
+		foreach($users as $userId)
+		{
+			if($userId == '')
+				continue;
+				
+			try{
+				$user = new KalturaUser();
+				$user->id = $userId;
+				$this->client->user->add($user);
+			}
+			catch (Exception $ex)
+			{
+				if($ex->getCode() != 'DUPLICATE_USER_BY_ID')
+				{
+					$this->assertTrue(false, 'Fialed to add user: ' . $ex->getCode());
+				}
+			}
+		}
+		
 		KalturaLog::info('Add categories');
-		$category1->name = $category1->name . time();
+		$category1->name = $category1->name . time() . rand();
 		$category1 = $this->client->category->add($category1);
 		
 		$category2->parentId = $category1->id;
-		$category2->name = $category2->name . time();
+		$category2->name = $category2->name . time() . rand();
 		$category2 = $this->client->category->add($category2);
 		
 		$category3->parentId = $category2->id;
-		$category3->name = $category3->name . time();
+		$category3->name = $category3->name . time() . rand();
 		$category3 = $this->client->category->add($category3);
 		
 		/* @var $category1 KalturaCategory */
@@ -142,7 +169,7 @@ class EntitlementTest extends EntitlementTestBase
 		
 		KalturaLog::info('Add user');
 		/* @var $user KalturaUser */
-		$user1->id = $user1->id . time();
+		$user1->id = $user1->id . time() . rand();
 		$user1 = $this->client->user->add($user1);
 			
 		$this->startSessionWithDiffe(SessionType::USER, $user1->id);
@@ -232,10 +259,10 @@ class EntitlementTest extends EntitlementTestBase
 	{
 		$entry = $this->client->baseEntry->add($entry);
 		
-		$category->name = $category->name . time();
+		$category->name = $category->name . time() . rand();
 		$category = $this->client->category->add($category);
 		
-		$user->id = $user->id . time();
+		$user->id = $user->id . time() . rand();
 		$user = $this->client->user->add($user);
 		
 		$categoryEntry = new KalturaCategoryEntry();
