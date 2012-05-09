@@ -2,7 +2,7 @@
 
 /**
  * This plugin replaces the deprecated BulkUploadService. It includes a service for uploading entries, categories, users and categoryUsers in bulks.
- *@package plugins.bulkUploadCsv
+ *@package plugins.bulkUpload
  *
  */
 class BulkUploadPlugin extends KalturaPlugin implements IKalturaConfigurator, IKalturaServices
