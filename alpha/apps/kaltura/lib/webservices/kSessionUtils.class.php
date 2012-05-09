@@ -321,7 +321,7 @@ class ks extends kSessionBase
 	
 	public function isWidgetSession()
 	{
-		return ($this->type == ks::TYPE_KS) && ($this->user == 0) && ($this->privileges == "view:*");
+		return ($this->type == ks::TYPE_KS) && ($this->user == 0) && (strstr($this->privileges,'widget:1') !== false);
 	}
 	
 	public function isValid( $partner_id , $puser_id , $type = false)
@@ -517,6 +517,22 @@ class ks extends kSessionBase
 		{
 			if ($priv == self::PRIVILEGE_DISABLE_ENTITLEMENT) 
 				return true;
+		}
+		
+		return false;
+	}
+	
+	public function getDisableEntitlementForEntry()
+	{
+		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
+		// edit privilege (edit:XX,edit:YYY,...)
+		$allPrivileges = explode(',', $this->privileges);
+		// foreach pair - check privileges on playlist
+		foreach($allPrivileges as $priv)
+		{
+			$exPrivileges = explode(':', $priv);
+			if ($exPrivileges[0] == self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY) 
+				return $exPrivileges[1];
 		}
 		
 		return false;

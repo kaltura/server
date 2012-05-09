@@ -27,10 +27,13 @@ class kEntitlementUtils
 	public static function isEntryEntitled(entry $entry, $kuserId = null)
 	{
 		// entry is entitled when entitlement is disable
-		//TODO - WHAT ABOUT WIDGET SESSION? partner is on the ks
 		if(!self::getEntitlementEnforcement())
 			return true;
-
+		
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		if($ks && $ks->isWidgetSession() && $ks->getDisableEntitlementForEntry() == $entry->getId())
+			return true;
+			
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 		$c->add(categoryPeer::ID, explode(',', $entry->getCategoriesIds()), Criteria::IN);
 		
@@ -46,8 +49,10 @@ class kEntitlementUtils
 		if($ks)
 		{	
 			$ksPrivacyContexts = $ks->getPrivacyContext();
-			if ($ksPrivacyContexts)
-				$crit->addAnd($c->getNewCriterion (categoryPeer::PRIVACY_CONTEXTS, $ksPrivacyContexts));
+			if (!$ksPrivacyContexts)
+				$ksPrivacyContexts = self::DEFAULT_CONTEXT;
+			
+			$c->add(categoryPeer::PRIVACY_CONTEXTS, $ksPrivacyContexts, Criteria::EQUAL);
 			
 			if(!$kuserId)
 			{
@@ -75,13 +80,16 @@ class kEntitlementUtils
 			$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $kuserId, Criteria::EQUAL);
 			$membersCrit->addOr($crit);
 			$crit = $membersCrit;
+			
 		}
 			
 		$c->addAnd(categoryPeer::ID, explode(',', $entry->getCategoriesIds()), Criteria::IN);
 		$c->addAnd($crit);
 		
 		//remove default FORCED criteria since categories that has display in search = public - doesn't mean that all of their entries are public
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$category = categoryPeer::doSelectOne($c);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 
 		if($category)
 			return true;

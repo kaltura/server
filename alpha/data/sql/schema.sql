@@ -1079,6 +1079,8 @@ CREATE TABLE `widget`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`partner_data` VARCHAR(4096),
+	`enforce_entitlement` TINYINT default 1,
+	`privacy_context` VARCHAR(255),
 	PRIMARY KEY (`id`),
 	KEY `int_id_index`(`int_id`),
 	INDEX `widget_FI_1` (`kshow_id`),
@@ -1733,6 +1735,8 @@ CREATE TABLE `syndication_feed`
 	`created_at` DATETIME,
 	`custom_data` TEXT,
 	`display_in_search` TINYINT default 1,
+	`enforce_entitlement` TINYINT default 1,
+	`privacy_context` VARCHAR(255),
 	PRIMARY KEY (`id`),
 	KEY `int_id_index`(`int_id`)
 )Type=InnoDB;

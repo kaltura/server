@@ -43,7 +43,7 @@ class categoryFilter extends baseObjectFilter
 			"_likex_full_ids",
 			) , NULL );
 
-		$this->allowed_order_fields = array ( "created_at" , "updated_at", "depth", "partner_sort_value", "entries_count", "members_count", "direct_entries_count");
+		$this->allowed_order_fields = array ( "created_at" , "updated_at", "depth", "partner_sort_value", "entries_count", "members_count", "direct_entries_count", "full_name");
 
 		$this->aliases = array ( 
 			"owner" => "kuser_id"

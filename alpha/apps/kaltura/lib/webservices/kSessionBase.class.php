@@ -21,6 +21,7 @@ class kSessionBase
 	const PRIVILEGE_IP_RESTRICTION = "iprestrict";
 	const PRIVILEGE_ENABLE_ENTITLEMENT = "enableentitlement";
 	const PRIVILEGE_DISABLE_ENTITLEMENT = "disableentitlement";
+	const PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY = "disableentitlementforentry";
 	const PRIVILEGE_PRIVACY_CONTEXT = "privacycontext";
 
 	const ADMIN_SECRET_CACHE_PREFIX = 'partner_admin_secret_';
@@ -104,7 +105,7 @@ class kSessionBase
 	
 	public function isWidgetSession()
 	{
-		return ($this->type == self::TYPE_KS) && ($this->user == 0) && ($this->privileges == "view:*");
+		return ($this->type == self::TYPE_KS) && ($this->user == 0) && (strstr($this->privileges,'widget:1') !== false);
 	}
 	
 	static public function getAdminSecretFromCache($partnerId)
