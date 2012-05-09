@@ -26,7 +26,7 @@ abstract class BaseBulkUploadResultPeer {
 	const TM_CLASS = 'BulkUploadResultTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 19;
+	const NUM_COLUMNS = 32;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -67,6 +67,45 @@ abstract class BaseBulkUploadResultPeer {
 	/** the column name for the ROW_DATA field */
 	const ROW_DATA = 'bulk_upload_result.ROW_DATA';
 
+	/** the column name for the ENTRY_STATUS field */
+	const ENTRY_STATUS = 'bulk_upload_result.ENTRY_STATUS';
+
+	/** the column name for the TITLE field */
+	const TITLE = 'bulk_upload_result.TITLE';
+
+	/** the column name for the DESCRIPTION field */
+	const DESCRIPTION = 'bulk_upload_result.DESCRIPTION';
+
+	/** the column name for the TAGS field */
+	const TAGS = 'bulk_upload_result.TAGS';
+
+	/** the column name for the URL field */
+	const URL = 'bulk_upload_result.URL';
+
+	/** the column name for the CONTENT_TYPE field */
+	const CONTENT_TYPE = 'bulk_upload_result.CONTENT_TYPE';
+
+	/** the column name for the CONVERSION_PROFILE_ID field */
+	const CONVERSION_PROFILE_ID = 'bulk_upload_result.CONVERSION_PROFILE_ID';
+
+	/** the column name for the ACCESS_CONTROL_PROFILE_ID field */
+	const ACCESS_CONTROL_PROFILE_ID = 'bulk_upload_result.ACCESS_CONTROL_PROFILE_ID';
+
+	/** the column name for the CATEGORY field */
+	const CATEGORY = 'bulk_upload_result.CATEGORY';
+
+	/** the column name for the SCHEDULE_START_DATE field */
+	const SCHEDULE_START_DATE = 'bulk_upload_result.SCHEDULE_START_DATE';
+
+	/** the column name for the SCHEDULE_END_DATE field */
+	const SCHEDULE_END_DATE = 'bulk_upload_result.SCHEDULE_END_DATE';
+
+	/** the column name for the THUMBNAIL_URL field */
+	const THUMBNAIL_URL = 'bulk_upload_result.THUMBNAIL_URL';
+
+	/** the column name for the THUMBNAIL_SAVED field */
+	const THUMBNAIL_SAVED = 'bulk_upload_result.THUMBNAIL_SAVED';
+
 	/** the column name for the PARTNER_DATA field */
 	const PARTNER_DATA = 'bulk_upload_result.PARTNER_DATA';
 
@@ -104,11 +143,11 @@ abstract class BaseBulkUploadResultPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'BulkUploadJobId', 'LineIndex', 'PartnerId', 'Status', 'ObjectId', 'ObjectType', 'Action', 'ObjectStatus', 'RowData', 'PartnerData', 'ObjectErrorDescription', 'ErrorCode', 'ErrorType', 'ErrorDescription', 'PluginsData', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'bulkUploadJobId', 'lineIndex', 'partnerId', 'status', 'objectId', 'objectType', 'action', 'objectStatus', 'rowData', 'partnerData', 'objectErrorDescription', 'errorCode', 'errorType', 'errorDescription', 'pluginsData', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::BULK_UPLOAD_JOB_ID, self::LINE_INDEX, self::PARTNER_ID, self::STATUS, self::OBJECT_ID, self::OBJECT_TYPE, self::ACTION, self::OBJECT_STATUS, self::ROW_DATA, self::PARTNER_DATA, self::OBJECT_ERROR_DESCRIPTION, self::ERROR_CODE, self::ERROR_TYPE, self::ERROR_DESCRIPTION, self::PLUGINS_DATA, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'bulk_upload_job_id', 'line_index', 'partner_id', 'status', 'object_id', 'object_type', 'action', 'object_status', 'row_data', 'partner_data', 'object_error_description', 'error_code', 'error_type', 'error_description', 'plugins_data', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'BulkUploadJobId', 'LineIndex', 'PartnerId', 'Status', 'ObjectId', 'ObjectType', 'Action', 'ObjectStatus', 'RowData', 'EntryStatus', 'Title', 'Description', 'Tags', 'Url', 'ContentType', 'ConversionProfileId', 'AccessControlProfileId', 'Category', 'ScheduleStartDate', 'ScheduleEndDate', 'ThumbnailUrl', 'ThumbnailSaved', 'PartnerData', 'ObjectErrorDescription', 'ErrorCode', 'ErrorType', 'ErrorDescription', 'PluginsData', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'bulkUploadJobId', 'lineIndex', 'partnerId', 'status', 'objectId', 'objectType', 'action', 'objectStatus', 'rowData', 'entryStatus', 'title', 'description', 'tags', 'url', 'contentType', 'conversionProfileId', 'accessControlProfileId', 'category', 'scheduleStartDate', 'scheduleEndDate', 'thumbnailUrl', 'thumbnailSaved', 'partnerData', 'objectErrorDescription', 'errorCode', 'errorType', 'errorDescription', 'pluginsData', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::BULK_UPLOAD_JOB_ID, self::LINE_INDEX, self::PARTNER_ID, self::STATUS, self::OBJECT_ID, self::OBJECT_TYPE, self::ACTION, self::OBJECT_STATUS, self::ROW_DATA, self::ENTRY_STATUS, self::TITLE, self::DESCRIPTION, self::TAGS, self::URL, self::CONTENT_TYPE, self::CONVERSION_PROFILE_ID, self::ACCESS_CONTROL_PROFILE_ID, self::CATEGORY, self::SCHEDULE_START_DATE, self::SCHEDULE_END_DATE, self::THUMBNAIL_URL, self::THUMBNAIL_SAVED, self::PARTNER_DATA, self::OBJECT_ERROR_DESCRIPTION, self::ERROR_CODE, self::ERROR_TYPE, self::ERROR_DESCRIPTION, self::PLUGINS_DATA, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'bulk_upload_job_id', 'line_index', 'partner_id', 'status', 'object_id', 'object_type', 'action', 'object_status', 'row_data', 'entry_status', 'title', 'description', 'tags', 'url', 'content_type', 'conversion_profile_id', 'access_control_profile_id', 'category', 'schedule_start_date', 'schedule_end_date', 'thumbnail_url', 'thumbnail_saved', 'partner_data', 'object_error_description', 'error_code', 'error_type', 'error_description', 'plugins_data', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, )
 	);
 
 	/**
@@ -118,11 +157,11 @@ abstract class BaseBulkUploadResultPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'BulkUploadJobId' => 3, 'LineIndex' => 4, 'PartnerId' => 5, 'Status' => 6, 'ObjectId' => 7, 'ObjectType' => 8, 'Action' => 9, 'ObjectStatus' => 10, 'RowData' => 11, 'PartnerData' => 12, 'ObjectErrorDescription' => 13, 'ErrorCode' => 14, 'ErrorType' => 15, 'ErrorDescription' => 16, 'PluginsData' => 17, 'CustomData' => 18, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'bulkUploadJobId' => 3, 'lineIndex' => 4, 'partnerId' => 5, 'status' => 6, 'objectId' => 7, 'objectType' => 8, 'action' => 9, 'objectStatus' => 10, 'rowData' => 11, 'partnerData' => 12, 'objectErrorDescription' => 13, 'errorCode' => 14, 'errorType' => 15, 'errorDescription' => 16, 'pluginsData' => 17, 'customData' => 18, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::BULK_UPLOAD_JOB_ID => 3, self::LINE_INDEX => 4, self::PARTNER_ID => 5, self::STATUS => 6, self::OBJECT_ID => 7, self::OBJECT_TYPE => 8, self::ACTION => 9, self::OBJECT_STATUS => 10, self::ROW_DATA => 11, self::PARTNER_DATA => 12, self::OBJECT_ERROR_DESCRIPTION => 13, self::ERROR_CODE => 14, self::ERROR_TYPE => 15, self::ERROR_DESCRIPTION => 16, self::PLUGINS_DATA => 17, self::CUSTOM_DATA => 18, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'bulk_upload_job_id' => 3, 'line_index' => 4, 'partner_id' => 5, 'status' => 6, 'object_id' => 7, 'object_type' => 8, 'action' => 9, 'object_status' => 10, 'row_data' => 11, 'partner_data' => 12, 'object_error_description' => 13, 'error_code' => 14, 'error_type' => 15, 'error_description' => 16, 'plugins_data' => 17, 'custom_data' => 18, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'BulkUploadJobId' => 3, 'LineIndex' => 4, 'PartnerId' => 5, 'Status' => 6, 'ObjectId' => 7, 'ObjectType' => 8, 'Action' => 9, 'ObjectStatus' => 10, 'RowData' => 11, 'EntryStatus' => 12, 'Title' => 13, 'Description' => 14, 'Tags' => 15, 'Url' => 16, 'ContentType' => 17, 'ConversionProfileId' => 18, 'AccessControlProfileId' => 19, 'Category' => 20, 'ScheduleStartDate' => 21, 'ScheduleEndDate' => 22, 'ThumbnailUrl' => 23, 'ThumbnailSaved' => 24, 'PartnerData' => 25, 'ObjectErrorDescription' => 26, 'ErrorCode' => 27, 'ErrorType' => 28, 'ErrorDescription' => 29, 'PluginsData' => 30, 'CustomData' => 31, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'bulkUploadJobId' => 3, 'lineIndex' => 4, 'partnerId' => 5, 'status' => 6, 'objectId' => 7, 'objectType' => 8, 'action' => 9, 'objectStatus' => 10, 'rowData' => 11, 'entryStatus' => 12, 'title' => 13, 'description' => 14, 'tags' => 15, 'url' => 16, 'contentType' => 17, 'conversionProfileId' => 18, 'accessControlProfileId' => 19, 'category' => 20, 'scheduleStartDate' => 21, 'scheduleEndDate' => 22, 'thumbnailUrl' => 23, 'thumbnailSaved' => 24, 'partnerData' => 25, 'objectErrorDescription' => 26, 'errorCode' => 27, 'errorType' => 28, 'errorDescription' => 29, 'pluginsData' => 30, 'customData' => 31, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::BULK_UPLOAD_JOB_ID => 3, self::LINE_INDEX => 4, self::PARTNER_ID => 5, self::STATUS => 6, self::OBJECT_ID => 7, self::OBJECT_TYPE => 8, self::ACTION => 9, self::OBJECT_STATUS => 10, self::ROW_DATA => 11, self::ENTRY_STATUS => 12, self::TITLE => 13, self::DESCRIPTION => 14, self::TAGS => 15, self::URL => 16, self::CONTENT_TYPE => 17, self::CONVERSION_PROFILE_ID => 18, self::ACCESS_CONTROL_PROFILE_ID => 19, self::CATEGORY => 20, self::SCHEDULE_START_DATE => 21, self::SCHEDULE_END_DATE => 22, self::THUMBNAIL_URL => 23, self::THUMBNAIL_SAVED => 24, self::PARTNER_DATA => 25, self::OBJECT_ERROR_DESCRIPTION => 26, self::ERROR_CODE => 27, self::ERROR_TYPE => 28, self::ERROR_DESCRIPTION => 29, self::PLUGINS_DATA => 30, self::CUSTOM_DATA => 31, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'bulk_upload_job_id' => 3, 'line_index' => 4, 'partner_id' => 5, 'status' => 6, 'object_id' => 7, 'object_type' => 8, 'action' => 9, 'object_status' => 10, 'row_data' => 11, 'entry_status' => 12, 'title' => 13, 'description' => 14, 'tags' => 15, 'url' => 16, 'content_type' => 17, 'conversion_profile_id' => 18, 'access_control_profile_id' => 19, 'category' => 20, 'schedule_start_date' => 21, 'schedule_end_date' => 22, 'thumbnail_url' => 23, 'thumbnail_saved' => 24, 'partner_data' => 25, 'object_error_description' => 26, 'error_code' => 27, 'error_type' => 28, 'error_description' => 29, 'plugins_data' => 30, 'custom_data' => 31, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, )
 	);
 
 	/**
@@ -204,6 +243,19 @@ abstract class BaseBulkUploadResultPeer {
 		$criteria->addSelectColumn(BulkUploadResultPeer::ACTION);
 		$criteria->addSelectColumn(BulkUploadResultPeer::OBJECT_STATUS);
 		$criteria->addSelectColumn(BulkUploadResultPeer::ROW_DATA);
+		$criteria->addSelectColumn(BulkUploadResultPeer::ENTRY_STATUS);
+		$criteria->addSelectColumn(BulkUploadResultPeer::TITLE);
+		$criteria->addSelectColumn(BulkUploadResultPeer::DESCRIPTION);
+		$criteria->addSelectColumn(BulkUploadResultPeer::TAGS);
+		$criteria->addSelectColumn(BulkUploadResultPeer::URL);
+		$criteria->addSelectColumn(BulkUploadResultPeer::CONTENT_TYPE);
+		$criteria->addSelectColumn(BulkUploadResultPeer::CONVERSION_PROFILE_ID);
+		$criteria->addSelectColumn(BulkUploadResultPeer::ACCESS_CONTROL_PROFILE_ID);
+		$criteria->addSelectColumn(BulkUploadResultPeer::CATEGORY);
+		$criteria->addSelectColumn(BulkUploadResultPeer::SCHEDULE_START_DATE);
+		$criteria->addSelectColumn(BulkUploadResultPeer::SCHEDULE_END_DATE);
+		$criteria->addSelectColumn(BulkUploadResultPeer::THUMBNAIL_URL);
+		$criteria->addSelectColumn(BulkUploadResultPeer::THUMBNAIL_SAVED);
 		$criteria->addSelectColumn(BulkUploadResultPeer::PARTNER_DATA);
 		$criteria->addSelectColumn(BulkUploadResultPeer::OBJECT_ERROR_DESCRIPTION);
 		$criteria->addSelectColumn(BulkUploadResultPeer::ERROR_CODE);
