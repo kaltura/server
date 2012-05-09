@@ -83,9 +83,6 @@ class BulkService extends KalturaBaseService
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
 		
-		KalturaLog::debug("### bulk upload type: ".$bulkUploadData->type);
-		KalturaLog::debug("### bulk upload type: $bulkUploadCoreType");
-		
 		$dbBulkUploadJobData->setBulkUploadObjectType(BulkUploadObjectType::CATEGORY);
 		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
 		$dbObjectData = $bulkUploadCategoryData->toInsertableObject();
@@ -171,7 +168,6 @@ class BulkService extends KalturaBaseService
 		$dbObjectData = $bulkUploadUserData->toInsertableObject();
 		$dbBulkUploadJobData->setObjectData($dbObjectData);
 		$dbBulkUploadJobData->setFilePath($fileData["tmp_name"]);
-		KalturaLog::debug("CSV file path: ". $dbBulkUploadJobData->getFilePath());
 		
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
 		
