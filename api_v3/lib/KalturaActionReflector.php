@@ -62,12 +62,6 @@ class KalturaActionReflector extends KalturaReflector
         
         $this->_serviceId = $serviceId;
         $this->_actionId = $actionId;
-        
-        $actionAlias = $this->_actionInfo->actionAlias ? explode(".", $this->_actionInfo->actionAlias) : null;
-        if ($actionAlias)
-        {
-            $actionAlias = $actionAlias[1];
-        }
     }
     
     /**
