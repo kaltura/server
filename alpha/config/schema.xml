@@ -643,6 +643,19 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="action" type="integer" default="1"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_status" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="row_data" type="varchar" size="1023" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entry_status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="title" type="varchar" size="127" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="description" type="varchar" size="255" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="varchar" size="255" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="url" type="varchar" size="255" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="content_type" type="varchar" size="31" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="conversion_profile_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="access_control_profile_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="category" type="varchar" size="128" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="schedule_start_date" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="schedule_end_date" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="thumbnail_url" type="varchar" size="255" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="thumbnail_saved" type="boolean" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_data" type="varchar" size="4096" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_error_description" type="varchar" size="255" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="error_code" type="integer"/>
