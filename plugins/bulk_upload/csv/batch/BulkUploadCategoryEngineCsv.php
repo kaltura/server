@@ -296,6 +296,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 	    {
 	        $categoryFilter = new KalturaCategoryFilter();
 	        $categoryFilter->referenceIdEqual = $bulkUploadResult->referenceId;
+	        $categoryFilter->fullNameStartsWith = $bulkUploadResult->relativePath;
 	        $this->impersonate();
 	        $categoryList = $this->kClient->category->listAction($categoryFilter);
 	        $this->unimpersonate();
