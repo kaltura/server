@@ -59,15 +59,9 @@ class KalturaDispatcher
              throw new Exception("Could not create action reflector for service [$service], action [$action]. Received error: ". $e->getMessage());
         }
         
-        $actionFromCache = $actionReflector->fetchValuesFromAPC();
-        if ($actionFromCache)
-        {
-		    $actionParams = $actionFromCache["actionParams"];
-		}
-		else
-		{
-		    $actionParams = $actionReflector->getActionParams();
-		}
+        $fetchFromAPCSuccess = $actionReflector->fetchValuesFromAPC();
+
+		$actionParams = $actionReflector->getActionParams();
 		// services.ct - check if partner is allowed to access service ...
 
 		// validate it's ok to access this service
@@ -89,14 +83,8 @@ class KalturaDispatcher
 		kEntitlementUtils::initEntitlementEnforcement();
 		KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		
-		if (!$actionFromCache)
-		{
-		    $actionInfo = $actionReflector->getActionInfo();
-		}
-		else
-		{
-		    $actionInfo = $actionFromCache["actionInfo"];
-		}
+		$actionInfo = $actionReflector->getActionInfo();
+
 		if($actionInfo->validateUserObjectClass && $actionInfo->validateUserIdParamName && isset($actionParams[$actionInfo->validateUserIdParamName]))
 		{
 //			// TODO maybe if missing should throw something, maybe a bone?
@@ -120,7 +108,7 @@ class KalturaDispatcher
 		KalturaLog::debug("Invoke took - " . (microtime(true) - $invokeStart) . " seconds");
 		KalturaLog::debug("Disptach took - " . (microtime(true) - $start) . " seconds");		
 				
-		$actionReflector->storeValuesInAPC($actionFromCache);
+		$actionReflector->storeValuesInAPC($fetchFromAPCSuccess);
 		kMemoryManager::clearMemory();
 		
 		return $res;

@@ -51,6 +51,12 @@ class KalturaActionReflector extends KalturaReflector
      */
     protected $_actionClassInstance;
     
+    
+    /**
+     * @var array
+     */
+    protected $_actionParams;
+    
     /**
      * 
      * @param string $serviceId
@@ -85,54 +91,57 @@ class KalturaActionReflector extends KalturaReflector
      */
     public function getActionParams ( )
     {
-		// reflect the service 
-		$reflectionClass = new ReflectionClass($this->_actionClass);
-		$reflectionMethod = $reflectionClass->getMethod($this->_actionMethodName);
+        if (!$this->_actionParams)
+        {
+    		// reflect the service 
+    		$reflectionClass = new ReflectionClass($this->_actionClass);
+    		$reflectionMethod = $reflectionClass->getMethod($this->_actionMethodName);
+    		
+    		$docComment = $reflectionMethod->getDocComment();
+    		$reflectionParams = $reflectionMethod->getParameters();
+    		$actionParams = array();
+    		foreach($reflectionParams as $reflectionParam)
+    		{
+    			$name = $reflectionParam->getName();
+    			if (in_array($name, $this->_reservedKeys))
+    				throw new Exception("Param [$name] in action [$this->_actionMethodName] is a reserved key");
+    				
+    			$parsedDocComment = new KalturaDocCommentParser( $docComment, array(
+    				KalturaDocCommentParser::DOCCOMMENT_REPLACENET_PARAM_NAME => $name , ) );
+    			$paramClass = $reflectionParam->getClass(); // type hinting for objects  
+    			if ($paramClass)
+    			{
+    				$type = $paramClass->getName();
+    			}
+    			else //
+    			{
+    				$result = null;
+    				if ($parsedDocComment->param)
+    					$type = $parsedDocComment->param;
+    				else 
+    				{
+    					throw new Exception("Type not found in doc comment for param [".$name."] in action [".$this->_actionMethodName."] in service [".$this->_serviceId."]");
+    				}
+    			}
+    			
+    			$paramInfo = new KalturaParamInfo($type, $name);
+    			$paramInfo->setDescription($parsedDocComment->paramDescription);
+    			
+    			if ($reflectionParam->isOptional()) // for normal parameters
+    			{
+    				$paramInfo->setDefaultValue($reflectionParam->getDefaultValue());
+    				$paramInfo->setOptional(true);
+    			}
+    			else if ($reflectionParam->getClass() && $reflectionParam->allowsNull()) // for object parameter
+    			{
+    				$paramInfo->setOptional(true);
+    			}
+    			
+    			$this->_actionParams[$name] = $paramInfo;
+    		}
+        }
 		
-		$docComment = $reflectionMethod->getDocComment();
-		$reflectionParams = $reflectionMethod->getParameters();
-		$actionParams = array();
-		foreach($reflectionParams as $reflectionParam)
-		{
-			$name = $reflectionParam->getName();
-			if (in_array($name, $this->_reservedKeys))
-				throw new Exception("Param [$name] in action [$this->_actionMethodName] is a reserved key");
-				
-			$parsedDocComment = new KalturaDocCommentParser( $docComment, array(
-				KalturaDocCommentParser::DOCCOMMENT_REPLACENET_PARAM_NAME => $name , ) );
-			$paramClass = $reflectionParam->getClass(); // type hinting for objects  
-			if ($paramClass)
-			{
-				$type = $paramClass->getName();
-			}
-			else //
-			{
-				$result = null;
-				if ($parsedDocComment->param)
-					$type = $parsedDocComment->param;
-				else 
-				{
-					throw new Exception("Type not found in doc comment for param [".$name."] in action [".$this->_actionMethodName."] in service [".$this->_serviceId."]");
-				}
-			}
-			
-			$paramInfo = new KalturaParamInfo($type, $name);
-			$paramInfo->setDescription($parsedDocComment->paramDescription);
-			
-			if ($reflectionParam->isOptional()) // for normal parameters
-			{
-				$paramInfo->setDefaultValue($reflectionParam->getDefaultValue());
-				$paramInfo->setOptional(true);
-			}
-			else if ($reflectionParam->getClass() && $reflectionParam->allowsNull()) // for object parameter
-			{
-				$paramInfo->setOptional(true);
-			}
-			
-			$actionParams[$name] = $paramInfo;
-		}
-		
-		return $actionParams;
+		return $this->_actionParams;
     }
     
 	/**
@@ -215,7 +224,7 @@ class KalturaActionReflector extends KalturaReflector
         KalturaLog::debug("Create or retrieve instance of action class [". $this->_actionClass ."]");
         $instance = $this->getServiceInstance();
         
-        $instance->initService($this->_actionServiceId, $this->_actionClassInfo->serviceName, $this->_actionInfo->action);
+        $instance->initService($this->_actionServiceId, $this->getActionClassInfo()->serviceName, $this->getActionInfo()->action);
     }
 	/**
      * @return string
@@ -247,7 +256,10 @@ class KalturaActionReflector extends KalturaReflector
 	    	    return $fetchFromAPCSuccess;
 		}
 		
-		return $actionFromCache;
+		$this->_actionInfo = $actionFromCache["actionInfo"];
+		$this->_actionParams = $actionFromCache["actionParams"];
+		$this->_actionClassInfo = $actionFromCache["actionClassInfo"];
+		return true;
     }
     
     public function storeValuesInAPC ($fetchFromAPCSuccess)
@@ -255,7 +267,7 @@ class KalturaActionReflector extends KalturaReflector
         if (!$fetchFromAPCSuccess && function_exists('apc_store'))
 		{
 		    $servicesMapLastModTime = KalturaServicesMap::getServiceMapModificationTime();
-		    $success = apc_store("{$this->_serviceId}_{$this->_actionId}",array (KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime, "actionInfo" => $this->getActionInfo(), "actionParams" => $this->getActionParams(),));
+		    $success = apc_store("{$this->_serviceId}_{$this->_actionId}",array (KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime, "actionInfo" => $this->getActionInfo(), "actionParams" => $this->getActionParams(), "actionClassInfo" => $this->getActionClassInfo()));
 		}
     }
 
