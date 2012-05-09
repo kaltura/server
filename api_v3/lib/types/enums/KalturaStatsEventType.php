@@ -46,4 +46,3 @@ class KalturaStatsEventType extends KalturaEnum
 	const POSTROLL_50 = 39;
 	const POSTROLL_75 = 40;
 }
-?>
