@@ -323,11 +323,12 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 	{
 		$testConfig = $this->config->get('config');
 		
-		//$ks = $this->client->session->start($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
+		$secret = $testConfig->secret;
 		if ($type == SessionType::ADMIN)
-			$ks = $this->client->generateSession($testConfig->secret, $userId, $type, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
-		else 
-			$ks = $this->client->generateSession($testConfig->userSecret, $userId, $type, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
+			$secret = $testConfig->userSecret;
+ 			
+		$ks = $this->client->generateSession($secret, $userId, $type, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
+
 		if (!$ks)
 			return false;
 		
