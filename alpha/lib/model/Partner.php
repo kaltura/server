@@ -671,6 +671,10 @@ class Partner extends BasePartner
 	public function setCategoryGroupSize($v) { $this->putInCustomData('categoryGroupSize', $v, 'entitlement');}
 	public function getCategoryGroupSize() { return $this->getFromCustomData('categoryGroupSize', 'entitlement', null);}
 	
+	//strip image profiles and comments when generating the thumbnail
+	public function setStripThumbProfile($v) { $this->putInCustomData('stripThumbProfile', $v);}
+	public function getStripThumbProfile() { return $this->getFromCustomData('stripThumbProfile');}
+	
 	// additionalParams - key/value array
 	public function getAdditionalParams() 
 	{ 
