@@ -83,7 +83,7 @@ class EntitlementTest extends EntitlementTestBase
 					if ($categoryUserResponse && $categoryUserResponse->permissionLevel == $category->defaultPermissionLevel)
 						$this->assertTrue(true, 'user permission Level was set as default permission level');
 					else
-						$this->assertTrue(false, 'user permission Level was not set as default permission level');
+						$this->assertTrue(false, 'user permission Level [' . $categoryUserResponse->permissionLevel . '] was not set as category permission level [' . $category->defaultPermissionLevel . ']');
 						
 					break;
 				case KalturaUserJoinPolicyType::NOT_ALLOWED:
@@ -231,9 +231,9 @@ class EntitlementTest extends EntitlementTestBase
 				$this->assertEquals($category1->contributionPolicy, $category3->contributionPolicy);
 
 				if(count($category1Memebers->objects) == count($category3Memebers->objects))
-					$this->assertAPIObjects($category1Memebers->objects[0], $category2Memebers->objects[0]);
+					$this->assertAPIObjects($category1Memebers->objects[0], $category3Memebers->objects[0]);
 				else
-					$this->assertTrue(false);
+					$this->assertTrue(false, 'Category3 inherit from category1, but members count are not the same, category [' . $category1->id . '] members ['. count($category1Memebers->objects) .'] category [' . $category3->id . ']  members [' . count($category3Memebers->objects) . ']');
 			}
 		}
 		elseif($category3->inheritanceType == KalturaInheritanceType::INHERIT)
