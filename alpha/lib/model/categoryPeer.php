@@ -168,27 +168,23 @@ class categoryPeer extends BasecategoryPeer
 	 */
 	public static function doSelectEntitledAndNonIndexedCategories($kuserId, $limit)
 	{
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$c->addAnd(categoryPeer::MEMBERS, $kuserId, Criteria::EQUAL);
-		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
-		
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$partner = PartnerPeer::retrieveByPK($partnerId);
+		
+		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
 		if($partner && $partner->getCategoryGroupSize())
 			$categoryGroupSize = $partner->getCategoryGroupSize();
 
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		$membersCountCrit = $c->getNewCriterion (categoryPeer::MEMBERS_COUNT, $categoryGroupSize, Criteria::GREATER_THAN);
 		$membersCountCrit->addOr($c->getNewCriterion (categoryPeer::ENTRIES_COUNT, 
 										entry::CATEGORY_ENTRIES_COUNT_LIMIT_TO_BE_INDEXED, Criteria::GREATER_THAN));		
 		$c->addAnd($membersCountCrit);
-		
-		
+
 		$c->setLimit($limit);
 		$c->addDescendingOrderByColumn(categoryPeer::UPDATED_AT);
 
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$categories = self::doSelect($c);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		return $categories;
 	}

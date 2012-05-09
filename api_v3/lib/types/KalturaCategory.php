@@ -197,6 +197,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * Set privacy context for search entries that assiged to private and public categories. the entries will be private if the search context is set with those categories.
 	 *  
 	 * @var string
+	 * $filter eq
 	 */
 	public $privacyContext;
 	

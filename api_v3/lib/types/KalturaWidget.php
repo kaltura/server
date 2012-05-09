@@ -85,11 +85,26 @@ class KalturaWidget extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $widgetHTML;
+	
+	/**
+	 * 
+	 * Should enforce entitlement on feed entries
+	 * @var bool
+	 */
+	public $enforceEntitlement;
+	
+	/**
+	 * Set privacy context for search entries that assiged to private and public categories within a category privacy context.
+	 *  
+	 * @var string
+	 * $filter eq
+	 */
+	public $privacyContext;
 
 	private static $map_between_objects = array
 	(
 		"id" , "sourceWidgetId" , "rootWidgetId" , "partnerId" , "entryId" , "uiConfId" , "widgetHTML" , 
-		"securityType" , "securityPolicy" , "createdAt" , "updatedAt" , "partnerData"
+		"securityType" , "securityPolicy" , "createdAt" , "updatedAt" , "partnerData", "enforceEntitlement", "privacyContext",
 	);
 
 	public function getMapBetweenObjects ( )

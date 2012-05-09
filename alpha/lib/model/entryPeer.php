@@ -12,6 +12,7 @@ class entryPeer extends BaseentryPeer
 	const PRIVACY_BY_CONTEXTS = 'entry.PRIVACY_BY_CONTEXTS';
 	const ENTITLED_KUSERS = 'entry.ENTITLED_KUSERS';
 	const CREATOR_KUSER_ID = 'entry.CREATOR_KUSER_ID';
+	const ENTRY_ID = 'entry.ENTRY_ID';
 	
 	private static $s_default_count_limit = 301;
 	private static $filerResults = false;
@@ -346,7 +347,7 @@ class entryPeer extends BaseentryPeer
 		$critKuser = null;
 
 		// when session is not admin and without list:* privilege, allow access to user entries only
-		if (!$ks || (!$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)))
+		if ($ks && $ks->isWidgetSession())
 		{		
 			$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
 			$critKuser->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
@@ -354,6 +355,12 @@ class entryPeer extends BaseentryPeer
 			$creatorKuserCrit = $c->getNewCriterion(entryPeer::CREATOR_KUSER_ID, kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
 			$creatorKuserCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 			$critKuser->addOr($creatorKuserCrit);
+			
+			if($ks->getDisableEntitlementForEntry())
+			{
+				$entryCrit = $c->getNewCriterion(entryPeer::ENTRY_ID, $ks->getDisableEntitlementForEntry(), Criteria::EQUAL);
+				$critKuser->addOr($entryCrit);
+			}
 		}
 		
 		if($critPrivacyByContextAndEntitledKusers && $critKuser)

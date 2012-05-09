@@ -62,6 +62,8 @@ class syndicationFeedTableMap extends TableMap {
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('DISPLAY_IN_SEARCH', 'DisplayInSearch', 'TINYINT', false, null, 1);
+		$this->addColumn('ENFORCE_ENTITLEMENT', 'EnforceEntitlement', 'BOOLEAN', false, null, true);
+		$this->addColumn('PRIVACY_CONTEXT', 'PrivacyContext', 'VARCHAR', false, 255, null);
 		// validators
 	} // initialize()
 

@@ -159,7 +159,9 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 			else
 			{
 				$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($category->getId(), kCurrentContext::$ks_kuser_id);
-				if(kEntitlementUtils::getEntitlementEnforcement() && (!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
+				if(kEntitlementUtils::getEntitlementEnforcement() && 
+					$category->getContributionPolicy() != ContributionPolicyType::ALL &&
+					(!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
 				{
 					//user is not entitled to add entry to this category
 					$category = null;

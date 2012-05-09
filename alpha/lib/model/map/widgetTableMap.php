@@ -52,6 +52,8 @@ class widgetTableMap extends TableMap {
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('PARTNER_DATA', 'PartnerData', 'VARCHAR', false, 4096, null);
+		$this->addColumn('ENFORCE_ENTITLEMENT', 'EnforceEntitlement', 'BOOLEAN', false, null, true);
+		$this->addColumn('PRIVACY_CONTEXT', 'PrivacyContext', 'VARCHAR', false, 255, null);
 		// validators
 	} // initialize()
 

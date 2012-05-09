@@ -139,13 +139,10 @@ class category extends Basecategory implements IIndexable
 			 $this->isColumnModified(categoryPeer::NAME) ||
 			 $this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS)))
 		{
-			$featureStatus = null;
+			$featureStatusToRemoveIndex = null;
 			
 			if ($this->isColumnModified(categoryPeer::PARENT_ID))
 			{
-				$featureStatus = new kFeatureStatus();
-				$featureStatus->setType(FeatureStatusType::LOCK_CATEGORY);
-				
 				$featureStatusToRemoveIndex = new kFeatureStatus();
 				$featureStatusToRemoveIndex->setType(FeatureStatusType::LOCK_CATEGORY);
 			}
@@ -582,7 +579,7 @@ class category extends Basecategory implements IIndexable
 		{
 			$featureStatusesToRemove[] = $featureStatusToRemove;
 		}
-		
+
 		$filter = new categoryFilter();
 		$filter->setFullIdsStartsWith($fullIdsStartsWithCategoryId);
 		$filter->setIdIn($categoriesIdsIn);
@@ -770,7 +767,7 @@ class category extends Basecategory implements IIndexable
 		$this->setInheritanceType(InheritanceType::MANUAL);
 		$this->setUserJoinPolicy(UserJoinPolicyType::NOT_ALLOWED);
 		$this->setDefaultPermissionLevel(CategoryKuserPermissionLevel::MODERATOR);
-		$this->setContributionPolicy(ContributionPolicyType::MODERATOR);
+		$this->setContributionPolicy(ContributionPolicyType::MEMBERS_WITH_CONTRIBUTION_PERMISSION);
 		$this->setStatus(CategoryStatus::ACTIVE);
 	}
 

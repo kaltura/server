@@ -26,7 +26,7 @@ abstract class BasesyndicationFeedPeer {
 	const TM_CLASS = 'syndicationFeedTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 25;
+	const NUM_COLUMNS = 27;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -106,6 +106,12 @@ abstract class BasesyndicationFeedPeer {
 	/** the column name for the DISPLAY_IN_SEARCH field */
 	const DISPLAY_IN_SEARCH = 'syndication_feed.DISPLAY_IN_SEARCH';
 
+	/** the column name for the ENFORCE_ENTITLEMENT field */
+	const ENFORCE_ENTITLEMENT = 'syndication_feed.ENFORCE_ENTITLEMENT';
+
+	/** the column name for the PRIVACY_CONTEXT field */
+	const PRIVACY_CONTEXT = 'syndication_feed.PRIVACY_CONTEXT';
+
 	/**
 	 * An identiy map to hold any loaded instances of syndicationFeed objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -122,11 +128,11 @@ abstract class BasesyndicationFeedPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'IntId', 'PartnerId', 'PlaylistId', 'Name', 'Status', 'Type', 'LandingPage', 'FlavorParamId', 'PlayerUiconfId', 'AllowEmbed', 'AdultContent', 'TranscodeExistingContent', 'AddToDefaultConversionProfile', 'Categories', 'FeedDescription', 'Language', 'FeedLandingPage', 'OwnerName', 'OwnerEmail', 'FeedImageUrl', 'FeedAuthor', 'CreatedAt', 'CustomData', 'DisplayInSearch', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'intId', 'partnerId', 'playlistId', 'name', 'status', 'type', 'landingPage', 'flavorParamId', 'playerUiconfId', 'allowEmbed', 'adultContent', 'transcodeExistingContent', 'addToDefaultConversionProfile', 'categories', 'feedDescription', 'language', 'feedLandingPage', 'ownerName', 'ownerEmail', 'feedImageUrl', 'feedAuthor', 'createdAt', 'customData', 'displayInSearch', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::INT_ID, self::PARTNER_ID, self::PLAYLIST_ID, self::NAME, self::STATUS, self::TYPE, self::LANDING_PAGE, self::FLAVOR_PARAM_ID, self::PLAYER_UICONF_ID, self::ALLOW_EMBED, self::ADULT_CONTENT, self::TRANSCODE_EXISTING_CONTENT, self::ADD_TO_DEFAULT_CONVERSION_PROFILE, self::CATEGORIES, self::FEED_DESCRIPTION, self::LANGUAGE, self::FEED_LANDING_PAGE, self::OWNER_NAME, self::OWNER_EMAIL, self::FEED_IMAGE_URL, self::FEED_AUTHOR, self::CREATED_AT, self::CUSTOM_DATA, self::DISPLAY_IN_SEARCH, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'int_id', 'partner_id', 'playlist_id', 'name', 'status', 'type', 'landing_page', 'flavor_param_id', 'player_uiconf_id', 'allow_embed', 'adult_content', 'transcode_existing_content', 'add_to_default_conversion_profile', 'categories', 'feed_description', 'language', 'feed_landing_page', 'owner_name', 'owner_email', 'feed_image_url', 'feed_author', 'created_at', 'custom_data', 'display_in_search', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'IntId', 'PartnerId', 'PlaylistId', 'Name', 'Status', 'Type', 'LandingPage', 'FlavorParamId', 'PlayerUiconfId', 'AllowEmbed', 'AdultContent', 'TranscodeExistingContent', 'AddToDefaultConversionProfile', 'Categories', 'FeedDescription', 'Language', 'FeedLandingPage', 'OwnerName', 'OwnerEmail', 'FeedImageUrl', 'FeedAuthor', 'CreatedAt', 'CustomData', 'DisplayInSearch', 'EnforceEntitlement', 'PrivacyContext', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'intId', 'partnerId', 'playlistId', 'name', 'status', 'type', 'landingPage', 'flavorParamId', 'playerUiconfId', 'allowEmbed', 'adultContent', 'transcodeExistingContent', 'addToDefaultConversionProfile', 'categories', 'feedDescription', 'language', 'feedLandingPage', 'ownerName', 'ownerEmail', 'feedImageUrl', 'feedAuthor', 'createdAt', 'customData', 'displayInSearch', 'enforceEntitlement', 'privacyContext', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::INT_ID, self::PARTNER_ID, self::PLAYLIST_ID, self::NAME, self::STATUS, self::TYPE, self::LANDING_PAGE, self::FLAVOR_PARAM_ID, self::PLAYER_UICONF_ID, self::ALLOW_EMBED, self::ADULT_CONTENT, self::TRANSCODE_EXISTING_CONTENT, self::ADD_TO_DEFAULT_CONVERSION_PROFILE, self::CATEGORIES, self::FEED_DESCRIPTION, self::LANGUAGE, self::FEED_LANDING_PAGE, self::OWNER_NAME, self::OWNER_EMAIL, self::FEED_IMAGE_URL, self::FEED_AUTHOR, self::CREATED_AT, self::CUSTOM_DATA, self::DISPLAY_IN_SEARCH, self::ENFORCE_ENTITLEMENT, self::PRIVACY_CONTEXT, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'int_id', 'partner_id', 'playlist_id', 'name', 'status', 'type', 'landing_page', 'flavor_param_id', 'player_uiconf_id', 'allow_embed', 'adult_content', 'transcode_existing_content', 'add_to_default_conversion_profile', 'categories', 'feed_description', 'language', 'feed_landing_page', 'owner_name', 'owner_email', 'feed_image_url', 'feed_author', 'created_at', 'custom_data', 'display_in_search', 'enforce_entitlement', 'privacy_context', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, )
 	);
 
 	/**
@@ -136,11 +142,11 @@ abstract class BasesyndicationFeedPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'IntId' => 1, 'PartnerId' => 2, 'PlaylistId' => 3, 'Name' => 4, 'Status' => 5, 'Type' => 6, 'LandingPage' => 7, 'FlavorParamId' => 8, 'PlayerUiconfId' => 9, 'AllowEmbed' => 10, 'AdultContent' => 11, 'TranscodeExistingContent' => 12, 'AddToDefaultConversionProfile' => 13, 'Categories' => 14, 'FeedDescription' => 15, 'Language' => 16, 'FeedLandingPage' => 17, 'OwnerName' => 18, 'OwnerEmail' => 19, 'FeedImageUrl' => 20, 'FeedAuthor' => 21, 'CreatedAt' => 22, 'CustomData' => 23, 'DisplayInSearch' => 24, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'intId' => 1, 'partnerId' => 2, 'playlistId' => 3, 'name' => 4, 'status' => 5, 'type' => 6, 'landingPage' => 7, 'flavorParamId' => 8, 'playerUiconfId' => 9, 'allowEmbed' => 10, 'adultContent' => 11, 'transcodeExistingContent' => 12, 'addToDefaultConversionProfile' => 13, 'categories' => 14, 'feedDescription' => 15, 'language' => 16, 'feedLandingPage' => 17, 'ownerName' => 18, 'ownerEmail' => 19, 'feedImageUrl' => 20, 'feedAuthor' => 21, 'createdAt' => 22, 'customData' => 23, 'displayInSearch' => 24, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::INT_ID => 1, self::PARTNER_ID => 2, self::PLAYLIST_ID => 3, self::NAME => 4, self::STATUS => 5, self::TYPE => 6, self::LANDING_PAGE => 7, self::FLAVOR_PARAM_ID => 8, self::PLAYER_UICONF_ID => 9, self::ALLOW_EMBED => 10, self::ADULT_CONTENT => 11, self::TRANSCODE_EXISTING_CONTENT => 12, self::ADD_TO_DEFAULT_CONVERSION_PROFILE => 13, self::CATEGORIES => 14, self::FEED_DESCRIPTION => 15, self::LANGUAGE => 16, self::FEED_LANDING_PAGE => 17, self::OWNER_NAME => 18, self::OWNER_EMAIL => 19, self::FEED_IMAGE_URL => 20, self::FEED_AUTHOR => 21, self::CREATED_AT => 22, self::CUSTOM_DATA => 23, self::DISPLAY_IN_SEARCH => 24, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'int_id' => 1, 'partner_id' => 2, 'playlist_id' => 3, 'name' => 4, 'status' => 5, 'type' => 6, 'landing_page' => 7, 'flavor_param_id' => 8, 'player_uiconf_id' => 9, 'allow_embed' => 10, 'adult_content' => 11, 'transcode_existing_content' => 12, 'add_to_default_conversion_profile' => 13, 'categories' => 14, 'feed_description' => 15, 'language' => 16, 'feed_landing_page' => 17, 'owner_name' => 18, 'owner_email' => 19, 'feed_image_url' => 20, 'feed_author' => 21, 'created_at' => 22, 'custom_data' => 23, 'display_in_search' => 24, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'IntId' => 1, 'PartnerId' => 2, 'PlaylistId' => 3, 'Name' => 4, 'Status' => 5, 'Type' => 6, 'LandingPage' => 7, 'FlavorParamId' => 8, 'PlayerUiconfId' => 9, 'AllowEmbed' => 10, 'AdultContent' => 11, 'TranscodeExistingContent' => 12, 'AddToDefaultConversionProfile' => 13, 'Categories' => 14, 'FeedDescription' => 15, 'Language' => 16, 'FeedLandingPage' => 17, 'OwnerName' => 18, 'OwnerEmail' => 19, 'FeedImageUrl' => 20, 'FeedAuthor' => 21, 'CreatedAt' => 22, 'CustomData' => 23, 'DisplayInSearch' => 24, 'EnforceEntitlement' => 25, 'PrivacyContext' => 26, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'intId' => 1, 'partnerId' => 2, 'playlistId' => 3, 'name' => 4, 'status' => 5, 'type' => 6, 'landingPage' => 7, 'flavorParamId' => 8, 'playerUiconfId' => 9, 'allowEmbed' => 10, 'adultContent' => 11, 'transcodeExistingContent' => 12, 'addToDefaultConversionProfile' => 13, 'categories' => 14, 'feedDescription' => 15, 'language' => 16, 'feedLandingPage' => 17, 'ownerName' => 18, 'ownerEmail' => 19, 'feedImageUrl' => 20, 'feedAuthor' => 21, 'createdAt' => 22, 'customData' => 23, 'displayInSearch' => 24, 'enforceEntitlement' => 25, 'privacyContext' => 26, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::INT_ID => 1, self::PARTNER_ID => 2, self::PLAYLIST_ID => 3, self::NAME => 4, self::STATUS => 5, self::TYPE => 6, self::LANDING_PAGE => 7, self::FLAVOR_PARAM_ID => 8, self::PLAYER_UICONF_ID => 9, self::ALLOW_EMBED => 10, self::ADULT_CONTENT => 11, self::TRANSCODE_EXISTING_CONTENT => 12, self::ADD_TO_DEFAULT_CONVERSION_PROFILE => 13, self::CATEGORIES => 14, self::FEED_DESCRIPTION => 15, self::LANGUAGE => 16, self::FEED_LANDING_PAGE => 17, self::OWNER_NAME => 18, self::OWNER_EMAIL => 19, self::FEED_IMAGE_URL => 20, self::FEED_AUTHOR => 21, self::CREATED_AT => 22, self::CUSTOM_DATA => 23, self::DISPLAY_IN_SEARCH => 24, self::ENFORCE_ENTITLEMENT => 25, self::PRIVACY_CONTEXT => 26, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'int_id' => 1, 'partner_id' => 2, 'playlist_id' => 3, 'name' => 4, 'status' => 5, 'type' => 6, 'landing_page' => 7, 'flavor_param_id' => 8, 'player_uiconf_id' => 9, 'allow_embed' => 10, 'adult_content' => 11, 'transcode_existing_content' => 12, 'add_to_default_conversion_profile' => 13, 'categories' => 14, 'feed_description' => 15, 'language' => 16, 'feed_landing_page' => 17, 'owner_name' => 18, 'owner_email' => 19, 'feed_image_url' => 20, 'feed_author' => 21, 'created_at' => 22, 'custom_data' => 23, 'display_in_search' => 24, 'enforce_entitlement' => 25, 'privacy_context' => 26, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, )
 	);
 
 	/**
@@ -235,6 +241,8 @@ abstract class BasesyndicationFeedPeer {
 		$criteria->addSelectColumn(syndicationFeedPeer::CREATED_AT);
 		$criteria->addSelectColumn(syndicationFeedPeer::CUSTOM_DATA);
 		$criteria->addSelectColumn(syndicationFeedPeer::DISPLAY_IN_SEARCH);
+		$criteria->addSelectColumn(syndicationFeedPeer::ENFORCE_ENTITLEMENT);
+		$criteria->addSelectColumn(syndicationFeedPeer::PRIVACY_CONTEXT);
 	}
 
 	/**

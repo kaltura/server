@@ -176,6 +176,19 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	protected $display_in_search;
 
 	/**
+	 * The value for the enforce_entitlement field.
+	 * Note: this column has a database default value of: true
+	 * @var        boolean
+	 */
+	protected $enforce_entitlement;
+
+	/**
+	 * The value for the privacy_context field.
+	 * @var        string
+	 */
+	protected $privacy_context;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -234,6 +247,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		$this->transcode_existing_content = false;
 		$this->add_to_default_conversion_profile = false;
 		$this->display_in_search = 1;
+		$this->enforce_entitlement = true;
 	}
 
 	/**
@@ -524,6 +538,26 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function getDisplayInSearch()
 	{
 		return $this->display_in_search;
+	}
+
+	/**
+	 * Get the [enforce_entitlement] column value.
+	 * 
+	 * @return     boolean
+	 */
+	public function getEnforceEntitlement()
+	{
+		return $this->enforce_entitlement;
+	}
+
+	/**
+	 * Get the [privacy_context] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getPrivacyContext()
+	{
+		return $this->privacy_context;
 	}
 
 	/**
@@ -1125,6 +1159,52 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	} // setDisplayInSearch()
 
 	/**
+	 * Set the value of [enforce_entitlement] column.
+	 * 
+	 * @param      boolean $v new value
+	 * @return     syndicationFeed The current object (for fluent API support)
+	 */
+	public function setEnforceEntitlement($v)
+	{
+		if(!isset($this->oldColumnsValues[syndicationFeedPeer::ENFORCE_ENTITLEMENT]))
+			$this->oldColumnsValues[syndicationFeedPeer::ENFORCE_ENTITLEMENT] = $this->enforce_entitlement;
+
+		if ($v !== null) {
+			$v = (boolean) $v;
+		}
+
+		if ($this->enforce_entitlement !== $v || $this->isNew()) {
+			$this->enforce_entitlement = $v;
+			$this->modifiedColumns[] = syndicationFeedPeer::ENFORCE_ENTITLEMENT;
+		}
+
+		return $this;
+	} // setEnforceEntitlement()
+
+	/**
+	 * Set the value of [privacy_context] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     syndicationFeed The current object (for fluent API support)
+	 */
+	public function setPrivacyContext($v)
+	{
+		if(!isset($this->oldColumnsValues[syndicationFeedPeer::PRIVACY_CONTEXT]))
+			$this->oldColumnsValues[syndicationFeedPeer::PRIVACY_CONTEXT] = $this->privacy_context;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->privacy_context !== $v) {
+			$this->privacy_context = $v;
+			$this->modifiedColumns[] = syndicationFeedPeer::PRIVACY_CONTEXT;
+		}
+
+		return $this;
+	} // setPrivacyContext()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1155,6 +1235,10 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			}
 
 			if ($this->display_in_search !== 1) {
+				return false;
+			}
+
+			if ($this->enforce_entitlement !== true) {
 				return false;
 			}
 
@@ -1205,6 +1289,8 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			$this->created_at = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
 			$this->custom_data = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
 			$this->display_in_search = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
+			$this->enforce_entitlement = ($row[$startcol + 25] !== null) ? (boolean) $row[$startcol + 25] : null;
+			$this->privacy_context = ($row[$startcol + 26] !== null) ? (string) $row[$startcol + 26] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1214,7 +1300,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 25; // 25 = syndicationFeedPeer::NUM_COLUMNS - syndicationFeedPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 27; // 27 = syndicationFeedPeer::NUM_COLUMNS - syndicationFeedPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating syndicationFeed object", $e);
@@ -1746,6 +1832,12 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			case 24:
 				return $this->getDisplayInSearch();
 				break;
+			case 25:
+				return $this->getEnforceEntitlement();
+				break;
+			case 26:
+				return $this->getPrivacyContext();
+				break;
 			default:
 				return null;
 				break;
@@ -1792,6 +1884,8 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			$keys[22] => $this->getCreatedAt(),
 			$keys[23] => $this->getCustomData(),
 			$keys[24] => $this->getDisplayInSearch(),
+			$keys[25] => $this->getEnforceEntitlement(),
+			$keys[26] => $this->getPrivacyContext(),
 		);
 		return $result;
 	}
@@ -1898,6 +1992,12 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			case 24:
 				$this->setDisplayInSearch($value);
 				break;
+			case 25:
+				$this->setEnforceEntitlement($value);
+				break;
+			case 26:
+				$this->setPrivacyContext($value);
+				break;
 		} // switch()
 	}
 
@@ -1947,6 +2047,8 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[22], $arr)) $this->setCreatedAt($arr[$keys[22]]);
 		if (array_key_exists($keys[23], $arr)) $this->setCustomData($arr[$keys[23]]);
 		if (array_key_exists($keys[24], $arr)) $this->setDisplayInSearch($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setEnforceEntitlement($arr[$keys[25]]);
+		if (array_key_exists($keys[26], $arr)) $this->setPrivacyContext($arr[$keys[26]]);
 	}
 
 	/**
@@ -1983,6 +2085,8 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(syndicationFeedPeer::CREATED_AT)) $criteria->add(syndicationFeedPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(syndicationFeedPeer::CUSTOM_DATA)) $criteria->add(syndicationFeedPeer::CUSTOM_DATA, $this->custom_data);
 		if ($this->isColumnModified(syndicationFeedPeer::DISPLAY_IN_SEARCH)) $criteria->add(syndicationFeedPeer::DISPLAY_IN_SEARCH, $this->display_in_search);
+		if ($this->isColumnModified(syndicationFeedPeer::ENFORCE_ENTITLEMENT)) $criteria->add(syndicationFeedPeer::ENFORCE_ENTITLEMENT, $this->enforce_entitlement);
+		if ($this->isColumnModified(syndicationFeedPeer::PRIVACY_CONTEXT)) $criteria->add(syndicationFeedPeer::PRIVACY_CONTEXT, $this->privacy_context);
 
 		return $criteria;
 	}
@@ -2084,6 +2188,10 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		$copyObj->setCustomData($this->custom_data);
 
 		$copyObj->setDisplayInSearch($this->display_in_search);
+
+		$copyObj->setEnforceEntitlement($this->enforce_entitlement);
+
+		$copyObj->setPrivacyContext($this->privacy_context);
 
 
 		$copyObj->setNew(true);

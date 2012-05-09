@@ -7,5 +7,5 @@
 interface ContributionPolicyType extends BaseEnum
 {
 	const ALL = 1;
-	const MODERATOR = 2;
+	const MEMBERS_WITH_CONTRIBUTION_PERMISSION = 2;
 }
