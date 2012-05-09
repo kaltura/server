@@ -41,46 +41,7 @@ class KalturaDispatcher
         //strtolower on service - map is indexed according to lower-case service IDs
         $service = strtolower($service);
         
-        $success = null;
-        if (function_exists('apc_fetch'))
-        {
-            $serviceItemFromCache = apc_fetch($service, $success);
-            if ($serviceItemFromCache["serviceMapLastMod"] != KalturaServicesMap::getServiceMapCreationTime())
-            {
-                $success = false;
-            }
-        }
-        
-        if ($success)
-        {
-            $reflector = $serviceItemFromCache["serviceActionItem"];
-        }
-        else 
-        {
-            // load the service reflector
-            $serviceMap = KalturaServicesMap::getMap();
-            
-            if (!isset($serviceMap[$service]))
-            {
-                KalturaLog::crit("Service does not exist!");
-                throw new KalturaAPIException(KalturaErrors::SERVICE_DOES_NOT_EXISTS, $service);
-            }
-            
-            // check if action exists
-    	    if (!$action)
-    	    {
-    	        KalturaLog::crit("Action not specified!");
-    		    throw new KalturaAPIException(KalturaErrors::ACTION_NOT_SPECIFIED, $service);
-    	    }
-            $reflector = $serviceMap[$service];
-            
-            if (function_exists('apc_store'))
-            {
-                $servicesMapLastModeTime = KalturaServicesMap::getServiceMapCreationTime();
-		        $success = apc_store("$service" ,array ("serviceActionItem" => $serviceMap[$service], "actionParams" => $actionParams,));
-                
-            }
-        }
+        $reflector = KalturaServicesMap::getServiceItem($service, $action);
 	    /* @var $reflector KalturaServiceActionItem */
         $action = strtolower($action);
         if (!isset($reflector->actionMap[$action]))
@@ -98,23 +59,14 @@ class KalturaDispatcher
              throw new Exception("Could not create action reflector for service [$service], action [$action]. Received error: ". $e->getMessage());
         }
         
-        $success = null;
-        if (function_exists('apc_fetch'))
+        $actionFromCache = $actionReflector->fetchValuesFromAPC();
+        if ($actionFromCache)
         {
-		    $actionFromCache = apc_fetch("{$service}_{$action}", $success);
-		    if ($actionFromCache["serviceMapLastMod"] != KalturaServicesMap::getServiceMapCreationTime())
-		    {
-		        $success = false;
-		    }
-        }
-        
-		if (!$success)
-		{
-	    	    $actionParams = $actionReflector->getActionParams();
+		    $actionParams = $actionFromCache["actionParams"];
 		}
 		else
 		{
-		    $actionParams = $actionFromCache["actionParams"];
+		    $actionParams = $actionReflector->getActionParams();
 		}
 		// services.ct - check if partner is allowed to access service ...
 
@@ -137,7 +89,7 @@ class KalturaDispatcher
 		kEntitlementUtils::initEntitlementEnforcement();
 		KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		
-		if (!$success)
+		if (!$actionFromCache)
 		{
 		    $actionInfo = $actionReflector->getActionInfo();
 		}
@@ -168,15 +120,17 @@ class KalturaDispatcher
 		KalturaLog::debug("Invoke took - " . (microtime(true) - $invokeStart) . " seconds");
 		KalturaLog::debug("Disptach took - " . (microtime(true) - $start) . " seconds");		
 				
-		if (!$success && function_exists('apc_store'))
-		{
-		    $servicesMapLastModeTime = KalturaServicesMap::getServiceMapCreationTime();
-		    $success = apc_store("{$service}_{$action}",array ("serviceMapLastMod" => $servicesMapLastModeTime, "actionInfo" => $actionInfo, "actionParams" => $actionParams,));
-		}
-		
+		$actionReflector->storeValuesInAPC($actionFromCache);
 		kMemoryManager::clearMemory();
 		
 		return $res;
+	}
+	
+	
+	
+	protected function getActionInfoAndParams ()
+	{
+	    
 	}
 
 	/**
@@ -185,7 +139,7 @@ class KalturaDispatcher
 	 * @param string $privilege optional
 	 * @throws KalturaErrors::INVALID_KS
 	 */
-	private function validateUser($objectClass, $objectId, $privilege = null)
+	protected function validateUser($objectClass, $objectId, $privilege = null)
 	{
 		// don't allow operations without ks
 		if (!kCurrentContext::$ks_object)
