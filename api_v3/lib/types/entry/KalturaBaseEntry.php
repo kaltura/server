@@ -462,6 +462,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
+		$this->validateUsers();
 		$this->validateCategories();
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		$this->validateObjectsExist();
@@ -524,12 +525,45 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		}
 	}
 	
+	public function validateUsers()
+	{
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		
+		if(!$this->isNull('entitledUsersEdit'))
+		{
+			$entitledUsersEdit = explode(',', $this->entitledUsersEdit);
+
+			foreach ($entitledUsersEdit as $puserId)
+			{
+				$puserId = trim($puserId);
+				$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
+				if (!$kuser)
+					throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+			}
+		}
+			
+		if(!$this->isNull('entitledUsersPublish'))
+		{
+			$entitledPusersPublish = explode(',', $this->entitledUsersPublish);
+	
+			foreach ($entitledPusersPublish as $puserId)
+			{
+				$puserId = trim($puserId);
+				$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
+				if (!$kuser)
+					throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+			}
+		}
+		
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForUpdate($source_object)
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		/* @var $sourceObject entry */
+		$this->validateUsers();
 		$this->validateCategories();
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		
