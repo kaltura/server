@@ -91,6 +91,8 @@ class category extends Basecategory implements IIndexable
 		
 		if($this->getPrivacyContexts() == '' && $this->getPrivacyContext() == '')
 		{
+			//TODO - might need to throw exception here if the values are diffret.
+			
 			//set default enetitlement default settings = no entitlement
 			$this->setPrivacy(PrivacyType::ALL);
 			$this->setContributionPolicy(ContributionPolicyType::ALL);
@@ -937,8 +939,11 @@ class category extends Basecategory implements IIndexable
 	
 	public function getInheritFromParentCategory()
 	{
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$parentCategory = $this->getParentCategory();
-		if ($this->getInheritanceType() == InheritanceType::INHERIT)
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
+		if ($parentCategory->getInheritanceType() == InheritanceType::INHERIT)
 			return $parentCategory->getInheritedParentId();
 			
 		return $parentCategory->getId();
