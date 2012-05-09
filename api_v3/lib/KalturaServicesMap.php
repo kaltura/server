@@ -8,6 +8,8 @@ class KalturaServicesMap
 	
 	private static $extraServices = array();
 	
+	const SERVICES_MAP_MODIFICATION_TIME = "serviceMapModificationTime";
+	
 	public static function addService($serviceId, $class)
 	{
 		$serviceId = strtolower($serviceId);
@@ -146,4 +148,58 @@ class KalturaServicesMap
 		}
 		file_put_contents($cacheFilePath, serialize($serviceMap));
 	}
+	
+	public static function getServiceMapModificationTime ()
+	{
+	    $cacheFilePathArray = array(kConf::get("cache_root_path"), 'api_v3', 'KalturaServicesMap.cache');
+		$cacheFilePath = implode(DIRECTORY_SEPARATOR, $cacheFilePathArray);
+	    return filemtime($cacheFilePath);
+	}
+	
+    public static function getServiceItem ($serviceId, $actionId)
+	{
+	    $success = null;
+        if (function_exists('apc_fetch'))
+        {
+            $serviceItemFromCache = apc_fetch($serviceId, $success);
+            if ($serviceItemFromCache["serviceMapLastMod"] != self::getServiceMapModificationTime())
+            {
+                $success = false;
+            }
+        }
+        
+        if ($success)
+        {
+            $reflector = $serviceItemFromCache["serviceActionItem"];
+        }
+        else 
+        {
+            // load the service reflector
+            $serviceMap = self::getMap();
+            
+            if (!isset($serviceMap[$serviceId]))
+            {
+                KalturaLog::crit("Service does not exist!");
+                throw new KalturaAPIException(KalturaErrors::SERVICE_DOES_NOT_EXISTS, $serviceId);
+            }
+            
+            // check if action exists
+    	    if (!$actionId)
+    	    {
+    	        KalturaLog::crit("Action not specified!");
+    		    throw new KalturaAPIException(KalturaErrors::ACTION_NOT_SPECIFIED, $serviceId);
+    	    }
+            $reflector = $serviceMap[$serviceId];
+            
+            if (function_exists('apc_store'))
+            {
+                $servicesMapLastModTime = self::getServiceMapModificationTime();
+		        $success = apc_store("$serviceId" ,array ("serviceActionItem" => $serviceMap[$serviceId], KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime,));
+                
+            }
+        }
+        
+        return $reflector;
+	}
+	
 }
