@@ -218,14 +218,46 @@ class KalturaActionReflector extends KalturaReflector
         $instance->initService($this->_actionServiceId, $this->_actionClassInfo->serviceName, $this->_actionInfo->action);
     }
 	/**
-     * @return the $_actionServiceId
+     * @return string
      */
     public function getActionServiceId ()
     {
         return $this->_actionServiceId;
     }
 
-
+    
+    /**
+     * Attempt to retrieve the values for actionInfo and actionParams from the APC Cache
+     * @return Ambigous <unknown, multitype:, multitype:KalturaParamInfo >
+     */
+    public function fetchValuesFromAPC ()
+    {
+        $fetchFromAPCSuccess = null;
+        if (function_exists('apc_fetch'))
+        {
+		    $actionFromCache = apc_fetch("{$this->_serviceId}_{$this->_actionId}", $fetchFromAPCSuccess);
+		    if ($actionFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] != KalturaServicesMap::getServiceMapModificationTime())
+		    {
+		        $fetchFromAPCSuccess = false;
+		    }
+        }
+        
+		if (!$fetchFromAPCSuccess)
+		{
+	    	    return $fetchFromAPCSuccess;
+		}
+		
+		return $actionFromCache;
+    }
+    
+    public function storeValuesInAPC ($fetchFromAPCSuccess)
+    {
+        if (!$fetchFromAPCSuccess && function_exists('apc_store'))
+		{
+		    $servicesMapLastModTime = KalturaServicesMap::getServiceMapCreationTime();
+		    $success = apc_store("{$this->_serviceId}_{$this->_actionId}",array (KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime, "actionInfo" => $this->getActionInfo(), "actionParams" => $this->getActionParams(),));
+		}
+    }
 
 
 }
