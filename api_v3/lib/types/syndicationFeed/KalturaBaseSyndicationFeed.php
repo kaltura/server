@@ -129,7 +129,22 @@ class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 	 */
 	public $entriesOrderBy;
 	
-	private static $mapBetweenObjects = array("id", "partnerId", "playlistId", "name", "status", "type", "landingPage", "createdAt", "playerUiconfId", "allowEmbed", "flavorParamId", "transcodeExistingContent", "addToDefaultConversionProfile", "categories", "storageId", "entriesOrderBy");
+	/**
+	 * 
+	 * Should enforce entitlement on feed entries
+	 * @var bool
+	 */
+	public $enforceEntitlement;
+	
+	/**
+	 * Set privacy context for search entries that assiged to private and public categories within a category privacy context.
+	 *  
+	 * @var string
+	 * $filter eq
+	 */
+	public $privacyContext;
+	
+	private static $mapBetweenObjects = array("id", "partnerId", "playlistId", "name", "status", "type", "landingPage", "createdAt", "playerUiconfId", "allowEmbed", "flavorParamId", "transcodeExistingContent", "addToDefaultConversionProfile", "categories", "storageId", "entriesOrderBy", "enforceEntitlement", "privacyContext");
 	
 	public function getMapBetweenObjects()
 	{

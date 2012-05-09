@@ -7,6 +7,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 {
 	public static $sphinxFields = array(
 		entryPeer::ID => 'int_entry_id',
+		'entry.ENTRY_ID' => 'entry_id',
 		entryPeer::NAME => 'name',
 		entryPeer::TAGS => 'tags',
 		entryPeer::CATEGORIES_IDS => 'categories',

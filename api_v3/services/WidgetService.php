@@ -57,6 +57,10 @@ class WidgetService extends KalturaBaseService
 			if (!$entry)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $widget->entryId);
 		}
+		elseif ($widget->enforceEntitlement == false)
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_DISABLE_ENTITLEMENT_WITH_NO_ENTRY_ID);
+		}
 		
 		$dbWidget = $widget->toWidget();
 		$dbWidget->setPartnerId($this->getPartnerId());

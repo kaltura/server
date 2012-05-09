@@ -148,6 +148,8 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$filter->unsetByName('in_members');
 		}
 		
+		//TODO - CATEGORY_PRIVACY_CONTEXT IS SET - *
+		
 		if($filter->get('_free_text'))
 		{
 			$freeTexts = $filter->get('_free_text');

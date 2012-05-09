@@ -31,12 +31,7 @@ class CategoryUserService extends KalturaBaseService
 		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryUser->categoryId, kCurrentContext::$ks_kuser_id);
 		if (!kEntitlementUtils::getEntitlementEnforcement())
 		{
-			//set default status: batch partner - set to pending, other - set to active
-			if ($this->getPartnerId() == partner::BATCH_PARTNER_ID)
-				$dbCategoryKuser->setStatus(CategoryKuserStatus::PENDING);
-			else
-				$dbCategoryKuser->setStatus(CategoryKuserStatus::ACTIVE);
-				
+			$dbCategoryKuser->setStatus(CategoryKuserStatus::ACTIVE);	
 			$dbCategoryKuser->setPermissionLevel($categoryUser->permissionLevel);
 		}
 		elseif ($currentKuserCategoryKuser && $currentKuserCategoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MANAGER)
@@ -198,7 +193,8 @@ class CategoryUserService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $userId);
 		
 		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($dbCategoryKuser->getCategoryId(), kCurrentContext::$ks_kuser_id);
-		if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
+		if(kEntitlementUtils::getEntitlementEnforcement() &&
+			(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER))
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER);
 		
 		$dbCategoryKuser->setStatus(CategoryKuserStatus::ACTIVE);
@@ -229,7 +225,7 @@ class CategoryUserService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $userId);
 		
 		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($dbCategoryKuser->getCategoryId(), kCurrentContext::$ks_kuser_id);
-		if(!kEntitlementUtils::getEntitlementEnforcement() &&
+		if(kEntitlementUtils::getEntitlementEnforcement() &&
 			(!$currentKuserCategoryKuser || 
 			($currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&
 			 kCurrentContext::$ks_uid != $userId)))
@@ -360,6 +356,9 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	public function copyFromCategoryAction($categoryId)
 	{
+		if (kEntitlementUtils::getEntitlementEnforcement())
+			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER);
+		
 		$categoryDb = categoryPeer::retrieveByPK($categoryId);
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
@@ -379,6 +378,7 @@ class CategoryUserService extends KalturaBaseService
 	 * @param bool $shouldUpdate
 	 * @throws KalturaErrors::INVALID_CATEGORY_USER_ID
 	 * @return int
+	 * @serverOnly
 	 */
 	public function indexAction($userId, $categoryId, $shouldUpdate = true)
 	{

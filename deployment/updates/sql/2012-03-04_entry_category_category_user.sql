@@ -40,7 +40,7 @@ CREATE TABLE `category_kuser`
 
 
 UPDATE category SET STATUS=2 WHERE deleted_at IS NULL;
-UPDATE category SET STATUS=3 WHERE deleted_at IS NOT NULL;
+UPDATE category SET STATUS=4 WHERE deleted_at IS NOT NULL;
 UPDATE category SET 
 `display_in_search`=1,
 `privacy`=1,
