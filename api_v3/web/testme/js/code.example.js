@@ -30,6 +30,16 @@ KCodeExampleBase.prototype.importsArray = {};
 KCodeExampleBase.prototype.jqImports = null;
 KCodeExampleBase.prototype.jqActionImports = null;
 
+// (Hagay Onn) If using port 80, the location object's port member is ""
+KCodeExampleBase.getServiceUrl = function (){
+	var serviceFullUrl = "http://" + location.hostname;
+	if(location.port != ""){	// not port 80 (default)
+		serviceFullUrl += ":" + location.port;
+	}
+	serviceFullUrl += "/";
+	return serviceFullUrl;
+};
+
 KCodeExampleBase.prototype.getNull = function (){
 	return jQuery("<span class=\"code-" + this.lang + "-system\">null</span>");
 };
@@ -689,7 +699,9 @@ KCodeExamplePHP.prototype.codeHeader = function (){
 	var jqConfigObject = this.codeVar("config");
 
 	this.addCode(this.codeAssign(jqConfigObject.clone(true), this.codeNewInstance("KalturaConfiguration", [this.codeVar("partnerId")])));
-	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(true), "serviceUrl"), this.codeString("http://" + location.hostname + "/")));
+	
+	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(true), "serviceUrl"), this.codeString(KCodeExampleBase.getServiceUrl())));
+
 	this.addCode(this.codeAssign(this.jqClientObject.clone(true), this.codeNewInstance("KalturaClient", [jqConfigObject.clone(true)])));
 };
 
@@ -932,7 +944,7 @@ KCodeExampleJavascript.prototype.codeHeader = function (){
 	var jqClientDeclare = this.codeVarDefine(this.jqClientObject.clone(true), "KalturaClient");
 
 	this.addCode(this.codeAssign(jqConfigDeclare, this.codeNewInstance("KalturaConfiguration", [this.codeVar("partnerId")])), jqBody);
-	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(true), "serviceUrl"), this.codeString("http://" + location.hostname + "/")), jqBody);
+	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(true), "serviceUrl"), this.codeString(KCodeExampleBase.getServiceUrl())), jqBody);
 	this.addCode(this.codeAssign(jqClientDeclare, this.codeNewInstance("KalturaClient", [jqConfigObject.clone(true)])), jqBody);
 	
 	jqBody.append(this.jqAction);
@@ -1073,8 +1085,7 @@ KCodeExampleJava.prototype.codeHeader = function (){
 
 	var jqSetPartnerId = this.codeUserFunction("setPartnerId", [this.codeVar("partnerId")]);
 	this.addCode(this.codeObjectMethod(jqConfigObject.clone(true), jqSetPartnerId), jqBody);
-
-	var jqSetEndpoint = this.codeUserFunction("setEndpoint", [this.codeString("http://" + location.hostname + "/")]);
+	var jqSetEndpoint = this.codeUserFunction("setEndpoint", [this.codeString(KCodeExampleBase.getServiceUrl())]);
 	this.addCode(this.codeObjectMethod(jqConfigObject.clone(true), jqSetEndpoint), jqBody);
 
 	var jqClientDeclare = this.codeVarDefine(this.jqClientObject.clone(true), "KalturaClient");
@@ -1241,8 +1252,9 @@ KCodeExampleCsharp.prototype.codeHeader = function (){
 	var jqConfigObjectDeclare = this.codeVarDefine(jqConfigObject, "KalturaConfiguration");
 	var jqConfigObjectInit = this.codeAssign(jqConfigObjectDeclare.clone(true), this.codeNewInstance("KalturaConfiguration", [this.codeVar("partnerId")]));
 	this.addCode(jqConfigObjectInit, jqBody);
-	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(true), "ServiceUrl"), this.codeString("http://" + location.hostname + "/")), jqBody);
-
+	
+	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(true), "ServiceUrl"), this.codeString(KCodeExampleBase.getServiceUrl())), jqBody);
+			
 	var jqClientDeclare = this.codeVarDefine(this.jqClientObject.clone(true), "KalturaClient");
 	var jqClientInit = this.codeAssign(jqClientDeclare, this.codeNewInstance("KalturaClient", [jqConfigObject.clone(true)]));
 	this.addCode(jqClientInit, jqBody);
@@ -1353,14 +1365,11 @@ KCodeExamplePython.prototype.codeHeader = function (){
 	var jqConfigObjectDeclare = this.codeVarDefine(jqConfigObject, "KalturaConfiguration");
 
 	this.addCode(this.codeAssign(jqConfigObjectDeclare.clone(true), this.codeNewInstance("KalturaConfiguration", [this.codeVar("PARTNER_ID")])));
-	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(true), "serviceUrl"), this.codeString("http://" + location.hostname + "/")));
+	
+	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(true), "serviceUrl"), this.codeString(KCodeExampleBase.getServiceUrl())));
+		
 	this.addCode(this.codeAssign(this.jqClientObject.clone(true), this.codeNewInstance("KalturaClient", [jqConfigObject.clone(true)])));
 };
-
-
-
-
-
 
 
 function switchToCodeGenerator(type, generator){
@@ -1388,8 +1397,6 @@ function switchToCSharp(){
 function switchToPython(){
 	switchToCodeGenerator('python', new KCodeExamplePython(jQuery("#example")));
 }
-
-
 
 function toggleCode(){
 	$('#codeExample').toggle();
