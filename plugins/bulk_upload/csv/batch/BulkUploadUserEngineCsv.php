@@ -150,7 +150,6 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		    switch ($bulkUploadResult->action)
 		    {
 		        case KalturaBulkUploadAction::ADD:
-		            KalturaLog::debug("In handle case for action [ADD]");
     		        $user = $this->createUserFromResultAndJobData($bulkUploadResult);
         					
         			$bulkUploadResultChunk[] = $bulkUploadResult;
@@ -216,11 +215,13 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	protected function createUserFromResultAndJobData (KalturaBulkUploadResultUser $bulkUploadUserResult)
 	{
 	    $user = new KalturaUser();
-	    //calculate parentId of the category
-	    
+	    //Prepare object
 	    if ($bulkUploadUserResult->objectId)
 	        $user->id = $bulkUploadUserResult->objectId;
 	    
+	    if ($bulkUploadUserResult->screenName)
+	        $user->screenName = $bulkUploadUserResult->screenName;
+	        
 	    if ($bulkUploadUserResult->tags)
 	        $user->tags = $bulkUploadUserResult->tags;
 	        
@@ -253,7 +254,10 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	        
 	    if ($bulkUploadUserResult->isAdmin)
 	        $user->isAdmin = $bulkUploadUserResult->isAdmin;
-	        
+	    
+	    if ($bulkUploadUserResult->roleIds)
+	        $user->roleIds = $bulkUploadUserResult->roleIds;
+
 	    return $user;
 	}
 	
@@ -266,6 +270,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		return array(
 		    "action",
 		    "userId",
+		    "screenName",
 		    "firstName",
 		    "lastName",
 		    "email",
@@ -277,6 +282,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		    "state",
 			"city",
 		    "dateOfBirth",
+		    "roleIds",
 		);
 	}
 	
