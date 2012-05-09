@@ -158,17 +158,17 @@ class KalturaServicesMap
 	
     public static function getServiceItem ($serviceId, $actionId)
 	{
-	    $success = null;
+	    $apcFetchSuccess = null;
         if (function_exists('apc_fetch'))
         {
-            $serviceItemFromCache = apc_fetch($serviceId, $success);
+            $serviceItemFromCache = apc_fetch($serviceId, $apcFetchSuccess);
             if ($serviceItemFromCache["serviceMapLastMod"] != self::getServiceMapModificationTime())
             {
-                $success = false;
+                $apcFetchSuccess = false;
             }
         }
         
-        if ($success)
+        if ($apcFetchSuccess)
         {
             $reflector = $serviceItemFromCache["serviceActionItem"];
         }
