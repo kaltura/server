@@ -564,11 +564,13 @@ class FlavorAssetService extends KalturaAssetService
 		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		// if the file sync isn't local (wasn't synced yet) proxy request to other datacenter
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
+		/* @var $fileSync FileSync */
 		if(!$fileSync)
 		{
 			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
-		}	
-		else if(!$local)
+		}
+		
+		if(!$local && $fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
 		{
 			kFile::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
 		}
