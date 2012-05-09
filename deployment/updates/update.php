@@ -192,10 +192,13 @@ class ScriptsRunner {
 			echo "Could not run script: script not found $file";	
 			return false;
 		}
+		
+		echo "running ".$file.PHP_EOL;
+		
 		exec("php " .  $file . " realrun", $logFile, $return_var);
 		
 		if ($return_var === 0) {
-			echo "running ".$file.PHP_EOL;
+			echo "finish: ".$file.PHP_EOL;
 			return true;
 		} else {
 			echo "Failed to run: ".$file.PHP_EOL.implode("\n",$logFile).PHP_EOL;	
