@@ -35,6 +35,7 @@ class mediaInfoPeer extends BasemediaInfoPeer
 					
 		$criteria = new Criteria();
 		$criteria->add(mediaInfoPeer::FLAVOR_ASSET_ID, $sourceFlavorAsset->getId());
+		$criteria->addDescendingOrderByColumn(mediaInfoPeer::CREATED_AT);
 
 		return mediaInfoPeer::doSelectOne($criteria);
 	}
