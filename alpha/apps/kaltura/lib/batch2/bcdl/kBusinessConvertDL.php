@@ -129,18 +129,25 @@ class kBusinessConvertDL
 				$createdAsset = $newAsset->copyToEntry($entry->getId(), $entry->getPartnerId());
 				KalturaLog::debug("Copied from new asset [" . $newAsset->getId() . "] to copied asset [" . $createdAsset->getId() . "] for flavor [" . $newAsset->getFlavorParamsId() . "]");
 				
-				if ($newAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB)) {
+				if ($createdAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+				{
 					$defaultThumbAssetNew = $newAsset;
 					KalturaLog::debug("Nominating ThumbAsset [".$newAsset->getId()."] as the default ThumbAsset after replacent");
 				}
 			}
 		}
 		
-		if (!$defaultThumbAssetNew)
-			kalturalog::debug("No default ThumbAsset found for replacing entry [". $tempEntry->getId() ."]");
-		else {		
+		if ($defaultThumbAssetNew)
+		{
 			kBusinessConvertDL::setAsDefaultThumbAsset($defaultThumbAssetNew);
 			kalturalog::debug("Setting ThumbAsset [". $defaultThumbAssetNew->getId() ."] as the default ThumbAsset");
+		}
+		else 
+		{		
+			kalturalog::debug("No default ThumbAsset found for replacing entry [". $tempEntry->getId() ."]");
+			$tempEntrySyncKey = $tempEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$realEntrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			kFileSyncUtils::createSyncFileLinkForKey($realEntrySyncKey, $tempEntrySyncKey);
 		}
 		
 		
@@ -168,6 +175,7 @@ class kBusinessConvertDL
 		$entry = $thumbAsset->getentry();
 		if (!$entry)
 			throw new kCoreException("Could not retrieve entry ID [".$thumbAsset->getEntryId()."] from ThumbAsset ID [".$thumbAsset->getId()."]",KalturaErrors::ENTRY_ID_NOT_FOUND);
+		
 		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());			
 		foreach($entryThumbAssets as $entryThumbAsset)
 		{
