@@ -254,7 +254,7 @@ class KalturaActionReflector extends KalturaReflector
     {
         if (!$fetchFromAPCSuccess && function_exists('apc_store'))
 		{
-		    $servicesMapLastModTime = KalturaServicesMap::getServiceMapCreationTime();
+		    $servicesMapLastModTime = KalturaServicesMap::getServiceMapModificationTime();
 		    $success = apc_store("{$this->_serviceId}_{$this->_actionId}",array (KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime, "actionInfo" => $this->getActionInfo(), "actionParams" => $this->getActionParams(),));
 		}
     }
