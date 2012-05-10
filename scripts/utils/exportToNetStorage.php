@@ -68,7 +68,7 @@ while ($moreEntries)
     $c->addAnd(BatchJobPeer::PARTNER_ID, $partnerId);
     $c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::STORAGE_EXPORT);
     $c->addAnd(BatchJobPeer::STATUS, $nonFinalBatchStatuses, Criteria::IN);
-    $batchCount = BatchJobPeer::doCount($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL3));
+    $batchCount = BatchJobPeer::doCount($c, false, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL3));
     
     if ($batchCount >= $maxConcurrentJobs)
     {
