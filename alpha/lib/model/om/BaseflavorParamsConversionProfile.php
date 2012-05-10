@@ -889,6 +889,11 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	{
 		kQueryCache::invalidateQueryCache($this);
 		
+		kEventsManager::raiseEvent(new kObjectCreatedEvent($this));
+		
+		if($this->copiedFrom)
+			kEventsManager::raiseEvent(new kObjectCopiedEvent($this->copiedFrom, $this));
+		
 		parent::postInsert($con);
 	}
 
@@ -903,10 +908,80 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			return;
 		}
 	
-		kQueryCache::invalidateQueryCache($this);
+		if($this->isModified())
+		{
+			kQueryCache::invalidateQueryCache($this);
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+		}
+			
+		$this->tempModifiedColumns = array();
 		
 		parent::postUpdate($con);
 	}
+	/**
+	 * Code to be run after deleting the object from database
+	 * @param PropelPDO $con
+	 */
+	public function postDelete(PropelPDO $con = null)
+	{
+		kEventsManager::raiseEvent(new kObjectErasedEvent($this));
+		
+		parent::postDelete($con);
+	}
+	
+	/**
+	 * Saves the modified columns temporarily while saving
+	 * @var array
+	 */
+	private $tempModifiedColumns = array();
+	
+	/**
+	 * Returns whether the object has been modified.
+	 *
+	 * @return     boolean True if the object has been modified.
+	 */
+	public function isModified()
+	{
+		if(!empty($this->tempModifiedColumns))
+			return true;
+			
+		return !empty($this->modifiedColumns);
+	}
+
+	/**
+	 * Has specified column been modified?
+	 *
+	 * @param      string $col
+	 * @return     boolean True if $col has been modified.
+	 */
+	public function isColumnModified($col)
+	{
+		if(in_array($col, $this->tempModifiedColumns))
+			return true;
+			
+		return in_array($col, $this->modifiedColumns);
+	}
+
+	/**
+	 * Code to be run before updating the object in database
+	 * @param PropelPDO $con
+	 * @return boolean
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if ($this->alreadyInSave)
+		{
+			return true;
+		}	
+		
+		
+		if($this->isModified())
+			$this->setUpdatedAt(time());
+		
+		$this->tempModifiedColumns = $this->modifiedColumns;
+		return parent::preUpdate($con);
+	}
+	
 	/**
 	 * Array of ValidationFailed objects.
 	 * @var        array ValidationFailed[]

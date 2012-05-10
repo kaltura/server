@@ -1394,7 +1394,7 @@
 			<index-column name="status" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="flavor_params_conversion_profile" phpName="flavorParamsConversionProfile" raiseEvents="false">
+	<table skipSql="false" abstract="false" name="flavor_params_conversion_profile" phpName="flavorParamsConversionProfile" deletable="true">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" lazyLoad="false" name="conversion_profile_id" type="integer" required="true" />
 		<column primaryKey="false" lazyLoad="false" name="flavor_params_id" type="integer" required="true" />
