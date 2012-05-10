@@ -1151,19 +1151,9 @@ class playManifestAction extends kalturaAction
 				break;
 		}
 				
-		// for now add caching headers only for specific partners listed in kConf
-		// later caching will be used for all partners, and url tokenization will be done in the caching layer
-		if (kConf::hasParam("optimized_playback"))
+		if (!$renderer->tokenizer && !$securyEntryHelper->shouldDisableCache())
 		{
-			$partnerId = $this->entry->getPartnerId();
-			$optimizedPlayback = kConf::get("optimized_playback");
-			if (isset($optimizedPlayback[$partnerId]))
-			{
-				$params = null;
-				parse_str($optimizedPlayback[$partner_id], $params);
-				if (isset($params['cache_playmanifest']) && $params['cache_playmanifest'])
-					$renderer->cachingHeadersAge = 60;
-			}
+			$renderer->cachingHeadersAge = 60;
 		}
 		
 		if (!$securyEntryHelper->shouldDisableCache())
