@@ -27,6 +27,8 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	const BULK_UPLOAD_COLUMN_URL = 'metadataUrl';
 	const BULK_UPLOAD_COLUMN_FIELD_PREFIX = 'metadataField_';
 	const BULK_UPLOAD_MULTI_VALUES_DELIMITER = '|,|';
+	const BULK_UPLOAD_METADATA_FIELD_PREFIX = "metadata::";
+    const BULK_UPLOAD_METADATA_SYSTEMNAME_SEPARATOR = "::";	
 	
 	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
 
@@ -358,20 +360,34 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	public static function handleBulkUploadData(BaseObject $object, array $data)
 	{
 		KalturaLog::debug("Handle metadata bulk upload data:\n" . print_r($data, true));
-		
-		if(!isset($data[self::BULK_UPLOAD_COLUMN_PROFILE_ID]))
-			return;
+		KalturaLog::debug("Handle metadata for objectId ". $object->getId());
 			
 		$metadataProfileId = $data[self::BULK_UPLOAD_COLUMN_PROFILE_ID];
 		$xmlData = null;
 		
 		if(!$object)
 			return;
-			
-//		$criteriaFilter = FileSyncPeer::getCriteriaFilter();
-//		$criteria = $criteriaFilter->getFilter();
-//		$criteria->add(FileSyncPeer::PARTNER_ID, $entry->getPartnerId());
+    
+		if ($metadataProfileId)
+		{
+		    self::addMetadataWithProfileId($metadataProfileId, $object, $data);
 		
+		}
+		else
+		{
+		    self::addMetadataWithProfilesSystemNames($object, $data);
+		}
+		
+		
+	}
+	
+	/**
+	 * @param int $metadataProfileId
+	 * @param Object $object
+	 * @param array $data
+	 */
+	protected static function addMetadataWithProfileId ($metadataProfileId, Object $object, $data)
+	{
 		$metadataProfile = MetadataProfilePeer::retrieveById($metadataProfileId);
 		if(!$metadataProfile)
 		{
@@ -425,7 +441,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 				if(!isset($metadataProfileFields[$key]))
 				{
 					$errorMessage = "Field [$key] does not exist";
-					KalturaLog::debug($errorMessage);
+					KalturaLog::err($errorMessage);
 					self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
 					continue;
 				}
@@ -442,7 +458,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 						if(!$value || !strlen($value))
 						{
 							$errorMessage = "Could not parse date format [$fieldValue] for field [$key]";
-							KalturaLog::debug($errorMessage);
+							KalturaLog::err($errorMessage);
 							self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
 							continue;
 						}
@@ -453,7 +469,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT && !is_numeric($fieldValue))
 					{
 						$errorMessage = "Could not parse int format [$fieldValue] for field [$key]";
-						KalturaLog::debug($errorMessage);
+						KalturaLog::err($errorMessage);
 						self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
 						continue;
 					}
@@ -496,6 +512,133 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		kFileSyncUtils::file_put_contents($key, $xmlData);
 		
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
+	}
+	
+	/**
+	 * Read multiple metadata schemas
+	 * @param BaseObject $object
+	 * @param array $data
+	 */
+	protected function addMetadataWithProfilesSystemNames ($object, $data)
+	{
+	    $newFieldValuesMap = array();
+	    $xmlDataArray = array();
+	    //Construct mapping of all metadata profile system names, their fields and the field values.
+	    foreach ($data as $key => $value)
+	    {
+	        if ( strpos($key, self::BULK_UPLOAD_METADATA_FIELD_PREFIX) == 0 )
+	        {
+	            list ($prefix, $metadataProfileSystemName, $metadataProfileFieldName) = explode(self::BULK_UPLOAD_METADATA_SYSTEMNAME_SEPARATOR, $key);
+	            if (!isset($newFieldValuesMap[$metadataProfileSystemName]))
+	                $newFieldValuesMap[$metadataProfileSystemName] = array();
+	            $newFieldValuesMap[$metadataProfileSystemName][$metadataProfileFieldName] = $value;
+	        }
+	    }
+	    
+	    foreach ($metadataProfileFieldName as $metadataProfileSystemName => $fieldsArray)
+	    {
+	        /* @var array $fieldsArray */
+	        if (!$fieldsArray || !count($fieldsArray))
+	        {
+	            continue;
+	        }
+	        $metadataProfile = MetadataProfilePeer::retrieveBySystemName($metadataProfileSystemName);
+	        
+	        if (!$metadataProfile)
+	        {
+	            $errorMessage = "Metadata profile with system name [$metadataProfileSystemName] could not be found.";
+                KalturaLog::err($errorMessage);
+                self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+				continue;   
+	        }
+	        
+	        $metadataProfileId = $metadataProfile->getId();
+	        $xml = new DOMDocument();
+	        $metadataProfileFields = array();
+			MetadataProfileFieldPeer::setUseCriteriaFilter(false);
+			$tmpMetadataProfileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfileId);
+			MetadataProfileFieldPeer::setUseCriteriaFilter(true);
+            foreach ($tmpMetadataProfileFields as $metadataProfileField)
+                /* @var $metadataProfileField MetadataProfileField */
+                $metadataProfileFields[$metadataProfileField->getKey()] = $metadataProfileField;
+                
+            foreach ($fieldsArray as $fieldSysName => $fieldValue)
+            {
+                if (!isset ($metadataProfileFields[$fieldSysName]))
+                {
+                    $errorMessage = "Metadata profile field with system name [$fieldSysName] missing from metadata profile with id [$metadataProfileId]";
+                    KalturaLog::err($errorMessage);
+                    self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+					continue;                
+                }
+                
+                $metadataProfileField = $metadataProfileFields[$fieldSysName];
+				KalturaLog::debug("Found field [" . $metadataProfileField->getXpath() . "] for value [$value]");
+				
+				$fieldValues = explode(self::BULK_UPLOAD_MULTI_VALUES_DELIMITER, $value);
+				foreach($fieldValues as $fieldValue)
+				{
+					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE && !is_numeric($fieldValue))
+					{
+						$value = self::parseFormatedDate($fieldValue);
+						if(!$value || !strlen($value))
+						{
+							$errorMessage = "Could not parse date format [$fieldValue] for field [$key]";
+							KalturaLog::err($errorMessage);
+							self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+							continue;
+						}
+							
+						$fieldValue = $value;
+					}
+					
+					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT && !is_numeric($fieldValue))
+					{
+						$errorMessage = "Could not parse int format [$fieldValue] for field [$key]";
+						KalturaLog::err($errorMessage);
+						self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+						continue;
+					}
+						
+					self::addXpath($xml, $metadataProfileField->getXpath(), $fieldValue);
+				}
+					
+				$dataFound = true;
+				
+                if($dataFound)
+    			{
+    				$xmlDataArray[$metadataProfileId] = $xml->saveXML($xml->firstChild);
+    				$xmlDataArray[$metadataProfileId] = trim($xmlDataArray[$metadataProfileId], " \n\r\t");
+    			}
+            }
+	    }
+	    
+	    foreach ($xmlDataArray as $metadataProfileId => $xmlData)
+	    {
+	        $errorMessage = '';
+    		if(!kMetadataManager::validateMetadata($metadataProfileId, $xmlData, $errorMessage))
+    		{
+    			self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+    			return;
+    		}
+    		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
+    		
+    		$dbMetadata = new Metadata();
+    		$dbMetadata->setPartnerId($object->getPartnerId());
+    		$dbMetadata->setMetadataProfileId($metadataProfileId);
+    		$dbMetadata->setMetadataProfileVersion($metadataProfile->getVersion());
+    		$dbMetadata->setObjectType(kMetadataManager::getTypeNameFromObject($object));
+    		$dbMetadata->setObjectId($object->getId());
+    		$dbMetadata->setStatus(Metadata::STATUS_VALID);
+    		$dbMetadata->save();
+    		
+    		KalturaLog::debug("Metadata [" . $dbMetadata->getId() . "] saved [$xmlData]");
+    		
+    		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+    		kFileSyncUtils::file_put_contents($key, $xmlData);
+    		
+		    kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
+	    }
 	}
 	
 	protected static function addBulkUploadResultDescription($entryId, $bulkUploadId, $description)
