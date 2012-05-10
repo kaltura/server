@@ -145,6 +145,8 @@ class kBusinessConvertDL
 		else 
 		{		
 			kalturalog::debug("No default ThumbAsset found for replacing entry [". $tempEntry->getId() ."]");
+			$entry->setThumbnail(".jpg"); // thumbnailversion++
+			$entry->save();
 			$tempEntrySyncKey = $tempEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
 			$realEntrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
 			kFileSyncUtils::createSyncFileLinkForKey($realEntrySyncKey, $tempEntrySyncKey);
