@@ -371,13 +371,10 @@ class ks extends kSessionBase
 		// creates the kuser
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_END_USER_REPORTS, $partner_id))
 		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid($partner_id, $puser_id);
-			if(!$kuser)
+			$kuser = kuserPeer::createKuserForPartner($partner_id, $puser_id);
+			if(!$puser_id)
 			{
-				$kuser = new kuser();
-				$kuser->setPuserId($puser_id);
-				$kuser->setPartnerId($partner_id);
-				$kuser->setStatus(KuserStatus::ACTIVE);
+				$kuser->setScreenName('Unknown');
 				$kuser->save();
 			}
 		}
