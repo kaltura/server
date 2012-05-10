@@ -11,9 +11,12 @@ class kLimeLightUrlManager extends kUrlManager
 	public function getTokenizer()
 	{
 		if($this->protocol != StorageProfile::PLAY_FORMAT_RTMP)
-			return new kLimeLightUrlTokenizer(
-				$this->protocol . '://' . $this->domain,
-				$this->params['http_auth_key']);
+		{
+			if (isset($this->params['http_auth_key']) && $this->params['http_auth_key'])
+				return new kLimeLightUrlTokenizer(
+					$this->protocol . '://' . $this->domain,
+					$this->params['http_auth_key']);
+		}
 				
 		return null;
 	}
