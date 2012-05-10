@@ -108,7 +108,7 @@ class categoryPeer extends BasecategoryPeer
 	 * @param $con
 	 * @return category
 	 */
-	public static function getByFullNameExactMatch($fullName, $con = null)
+	public static function getByFullNameExactMatch($fullName, $ignoreCategoryId, $con = null)
 	{
 		$fullName = self::getParsedFullName($fullName);
 		
@@ -117,6 +117,8 @@ class categoryPeer extends BasecategoryPeer
 		
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 		$c->add(categoryPeer::FULL_NAME, $fullName);
+		$c->add(categoryPeer::ID, $ignoreCategoryId, Criteria::NOT_EQUAL);
+		
 		return categoryPeer::doSelectOne($c, $con);
 	}
 	

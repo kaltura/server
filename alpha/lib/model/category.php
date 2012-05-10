@@ -424,7 +424,7 @@ class category extends Basecategory implements IIndexable
 		$fullName = categoryPeer::getParsedFullName($fullName);
 				
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		$category = categoryPeer::getByFullNameExactMatch($fullName);
+		$category = categoryPeer::getByFullNameExactMatch($fullName, $this->getId());
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		if ($category)
