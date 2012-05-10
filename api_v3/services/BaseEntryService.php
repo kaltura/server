@@ -686,6 +686,12 @@ class BaseEntryService extends KalturaEntryService
 		$result = new KalturaEntryContextDataResult();
 		$result->isAdmin = $isAdmin;
 		$result->isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
+		
+		if (($dbEntry->getStartDate() && abs($dbEntry->getStartDate() - time()) <= 86400) ||
+			($dbEntry->getEndDate() &&   abs($dbEntry->getEndDate() - time())   <= 86400))
+		{
+			KalturaResponseCacher::setConditionalCacheExpiry(600);
+		}	
 
 		if ($accessControl && $accessControl->hasRules())
 		{

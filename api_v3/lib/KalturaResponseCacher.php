@@ -57,6 +57,7 @@ class KalturaResponseCacher
 	protected $_cacheStatus = self::CACHE_STATUS_DISABLED;	// enabled after the KalturaResponseCacher initializes
 	protected $_invalidationKeys = array();				// the list of query cache invalidation keys for the current request
 	protected $_invalidationTime = 0;					// the last invalidation time of the invalidation keys
+	protected $_conditionalCacheExpiry = 0;				// the expiry used for conditional caching, if 0 CONDITIONAL_CACHE_EXPIRY will be used 
 	
 	protected $_wouldHaveUsedCondCache = false;			// XXXXXXX TODO: remove this
 
@@ -187,6 +188,16 @@ class KalturaResponseCacher
 		{
 			// no need to check for CACHE_STATUS_DISABLED, since the instances are removed from the list when they get this status
 			$curInstance->_cacheStatus = self::CACHE_STATUS_ANONYMOUS_ONLY;
+		}
+	}
+	
+	public static function setConditionalCacheExpiry($expiry)
+	{
+		foreach (self::$_activeInstances as $curInstance)
+		{
+			if ($curInstance->_conditionalCacheExpiry && $curInstance->_conditionalCacheExpiry < $expiry)
+				continue;
+			$curInstance->_conditionalCacheExpiry = $expiry;
 		}
 	}
 	
@@ -368,6 +379,9 @@ class KalturaResponseCacher
 			// save the cache conditions
 			$conditions = array(array_unique($this->_invalidationKeys), $this->_invalidationTime);
 			file_put_contents($this->_cacheConditionsFilePath, serialize($conditions));
+
+			if ($this->_conditionalCacheExpiry)
+				file_put_contents($this->_cacheExpiryFilePath, time() + $this->_conditionalCacheExpiry);
 		}
 		else
 		{
@@ -730,8 +744,7 @@ class KalturaResponseCacher
 			return;			// not a stand-alone call to session start
 		}
 		
-		if (!isset($params['type']) || $params['type'] != '2' ||
-			!isset($params['secret']) ||
+		if (!isset($params['secret']) ||
 			!isset($params['partnerId']))
 		{
 			return;			// missing mandatory params or not admin session
@@ -742,20 +755,33 @@ class KalturaResponseCacher
 		{
 			return;			// the format is unsupported at this level
 		}
+
+		$type = isset($params['type']) ? $params['type'] : 0;
+		if (!in_array($type, array(0, 2)))
+		{
+			return;			// invalid session type
+		}
+		$type = (int)$type;
 		
 		$partnerId = $params['partnerId'];
-		$paramSecret = $params['secret'];
-		$adminSecret = kSessionBase::getAdminSecretFromCache($partnerId);
-		if (!$adminSecret || $adminSecret != $paramSecret)
+		$secrets = kSessionBase::getSecretsFromCache($partnerId);
+		if (!$secrets)
 		{
-			return;			// invalid admin secret
+			return;			// can't find the secrets of the partner in the cache
 		}
-
+		list($adminSecret, $userSecret) = $secrets;				
+		$secretToMatch = $type ? $adminSecret : $userSecret;
+		$paramSecret = $params['secret'];
+		if ($paramSecret != $secretToMatch)
+		{
+			return;			// invalid secret
+		}
+		
 		$userId = isset($params['userId']) ? $params['userId'] : '';
 		$expiry = isset($params['expiry']) ? $params['expiry'] : 86400;
 		$privileges = isset($params['privileges']) ? $params['privileges'] : null;
 		
-		$result = kSessionBase::generateSession($paramSecret, $userId, $params['type'], $partnerId, $expiry, $privileges);
+		$result = kSessionBase::generateSession($adminSecret, $userId, $type, $partnerId, $expiry, $privileges);
 		if ($format == self::RESPONSE_TYPE_XML)
 		{
 			header("Content-Type: text/xml");
