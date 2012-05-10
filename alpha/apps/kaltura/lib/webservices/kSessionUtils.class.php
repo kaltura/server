@@ -376,6 +376,7 @@ class ks extends kSessionBase
 			{
 				$kuser = new kuser();
 				$kuser->setPuserId($puser_id);
+				$kuser->setPartnerId($partner_id);
 				$kuser->setStatus(KuserStatus::ACTIVE);
 				$kuser->save();
 			}
