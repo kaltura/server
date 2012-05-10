@@ -24,7 +24,7 @@ class kSessionBase
 	const PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY = "disableentitlementforentry";
 	const PRIVILEGE_PRIVACY_CONTEXT = "privacycontext";
 
-	const ADMIN_SECRET_CACHE_PREFIX = 'partner_admin_secret_';
+	const SECRETS_CACHE_PREFIX = 'partner_secrets_';
 
 	const INVALID_SESSION_KEY_PREFIX = 'invalid_session_';
 	const INVALID_SESSIONS_SYNCED_KEY = 'invalid_sessions_synched';
@@ -108,16 +108,16 @@ class kSessionBase
 		return ($this->type == self::TYPE_KS) && ($this->user == 0) && (strstr($this->privileges,'widget:1') !== false);
 	}
 	
-	static public function getAdminSecretFromCache($partnerId)
+	static public function getSecretsFromCache($partnerId)
 	{
 		if (!function_exists('apc_fetch'))
 			return null;			// no APC - can't get the partner secret here (DB not initialized)
 		
-		$adminSecret = apc_fetch(self::ADMIN_SECRET_CACHE_PREFIX . $partnerId);
-		if (!$adminSecret)
+		$secrets = apc_fetch(self::SECRETS_CACHE_PREFIX . $partnerId);
+		if (!$secrets)
 			return null;			// admin secret not found in APC
 		
-		return $adminSecret;
+		return $secrets;
 	}
 	
 	protected function isKSInvalidated()
@@ -153,10 +153,11 @@ class kSessionBase
 		if ($this->valid_until <= time())
 			return false;						// KS is expired
 			
-		$adminSecret = self::getAdminSecretFromCache($this->partner_id);
-		if (!$adminSecret)
+		$secrets = self::getSecretsFromCache($this->partner_id);
+		if (!$secrets)
 			return false;						// admin secret not found in APC, can't validate the KS
-			
+		
+		list($adminSecret, $userSecret) = $secrets;
 		if (sha1($adminSecret . $this->real_str) != $this->hash)
 			return false;						// wrong KS signature
 

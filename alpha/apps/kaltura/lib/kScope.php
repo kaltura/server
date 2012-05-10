@@ -112,7 +112,11 @@ class kScope
 	public function getTime() 
 	{
 		if(is_null($this->time))
+		{
+			if (class_exists('KalturaResponseCacher'))
+				KalturaResponseCacher::setConditionalCacheExpiry(600);
 			return time();
+		}
 			
 		return $this->time;
 	}

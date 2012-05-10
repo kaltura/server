@@ -632,16 +632,19 @@ class ks extends kSessionBase
 		$cacheKey = null;
 		if (function_exists('apc_fetch'))
 		{
-			$cacheKey = self::ADMIN_SECRET_CACHE_PREFIX . $this->partner_id;
-			$adminSecret = apc_fetch($cacheKey);
-			if ($adminSecret)
+			$cacheKey = self::SECRETS_CACHE_PREFIX . $this->partner_id;
+			$secrets = apc_fetch($cacheKey);
+			if ($secrets)
+			{
+				list($adminSecret, $userSecret) = $secrets;
 				return $adminSecret;
+			}
 		}
 		
 		$p = PartnerPeer::retrieveByPK( $this->partner_id )	;
 		if ( ! $p )  return ""; // VERY big problem
 		if ($cacheKey)
-			apc_store($cacheKey, $p->getAdminSecret());
+			apc_store($cacheKey, array($p->getAdminSecret(), $p->getSecret()));
 		return $p->getAdminSecret();
 	}
 	
