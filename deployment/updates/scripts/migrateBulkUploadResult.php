@@ -7,7 +7,6 @@
  * @subpackage updates
  */ 
 
-$stopFile = dirname(__FILE__).'/stop_flavor_migration'; // creating this file will stop the script
 $countLimitEachLoop = 500;
 
 //------------------------------------------------------
@@ -20,11 +19,11 @@ $c = new Criteria();
 
 if (isset($argv[1]))
 {
-    $c->addAnd(BulkUploadResultPeer::PARTNER_ID, $argv[1], Criteria::EQUAL);
+    $c->addAnd(BulkUploadResultPeer::ID, $argv[1], Criteria::GREATER_EQUAL);
 }
 if (isset($argv[2]))
 {
-    $c->addAnd(BulkUploadResultPeer::ID, $argv[2], Criteria::GREATER_EQUAL);
+    $c->addAnd(BulkUploadResultPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
 }
 $c->setLimit($countLimitEachLoop);
 $bulkUploadResults = BulkUploadResultPeer::doSelect($c, $con);
