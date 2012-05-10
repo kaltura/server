@@ -99,7 +99,7 @@ class KalturaActionReflector extends KalturaReflector
     		
     		$docComment = $reflectionMethod->getDocComment();
     		$reflectionParams = $reflectionMethod->getParameters();
-    		$actionParams = array();
+    		$this->_actionParams = array();
     		foreach($reflectionParams as $reflectionParam)
     		{
     			$name = $reflectionParam->getName();
@@ -237,7 +237,7 @@ class KalturaActionReflector extends KalturaReflector
     
     /**
      * Attempt to retrieve the values for actionInfo and actionParams from the APC Cache
-     * @return Ambigous <unknown, multitype:, multitype:KalturaParamInfo >
+     * @return bool
      */
     public function fetchValuesFromAPC ()
     {
