@@ -198,6 +198,7 @@ $baseConfigurationIndexs = 	array(
 			'indexed_partner_data_int'			=> SphinxFieldType::RT_ATTR_BIGINT,
 			'indexed_partner_data_string' 	    => SphinxFieldType::RT_FIELD,
 			'custom_data' 	    				=> SphinxFieldType::RT_FIELD,
+			'plugins_data'						=> SphinxFieldType::RT_FIELD,
 		),
 	),
 );
