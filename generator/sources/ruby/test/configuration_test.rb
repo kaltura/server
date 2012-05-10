@@ -62,7 +62,7 @@ class ConfigurationTest < Test::Unit::TestCase
     config.timeout = timeout
     
     @client = Kaltura::KalturaClient.new( config )
-    assert_nil @client.ks
+    assert_equal @client.ks, Kaltura::KalturaNotImplemented
     
     session = @client.session_service.start( administrator_secret, '', Kaltura::KalturaSessionType::ADMIN )
     @client.ks = session
@@ -107,7 +107,7 @@ class ConfigurationTest < Test::Unit::TestCase
       @client.ks = session
     end
     
-    assert_nil @client.ks
+    assert_equal @client.ks, Kaltura::KalturaNotImplemented
   end
   
   # this test uses a session created in client side to comunicate with api.
@@ -126,7 +126,7 @@ class ConfigurationTest < Test::Unit::TestCase
   
       @client = Kaltura::KalturaClient.new( config )
     
-      assert_nil @client.ks
+      assert_equal @client.ks, Kaltura::KalturaNotImplemented
     
       @client.generate_session(administrator_secret, '', Kaltura::KalturaSessionType::ADMIN, partner_id)
       

@@ -39,12 +39,15 @@ require 'date'
 require 'yaml'
 
 module Kaltura
+  class KalturaNotImplemented; end
+  
 	class KalturaClientBase
 		attr_accessor 	:config
 		attr_accessor 	:ks
 		attr_reader 	:is_multirequest
 	
 		def initialize(config)
+		  @ks = KalturaNotImplemented
 			@should_log = false
 			@config = config
 			@calls_queue = []
@@ -205,7 +208,9 @@ module Kaltura
 		end
 		
 		def add_param(params, name, value)
-			if value == nil
+		  if value == KalturaNotImplemented
+		    return
+			elsif value == nil
 				params[name + '__null'] = ''
 			elsif value.is_a? Hash
 				if value.empty?

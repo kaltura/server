@@ -286,7 +286,7 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 		    {
 		    	$default = $paramNode->getAttribute("default");
 	    		if ($default === "null")
-	    			$default = "nil";
+	    			$default = "KalturaNotImplemented";
 	    		else if ($default === "")
 	    			$default = "''";
 	    		else if ($paramNode->getAttribute("type") == "string")
