@@ -247,14 +247,9 @@ class KalturaActionReflector extends KalturaReflector
 		    $actionFromCache = apc_fetch("{$this->_serviceId}_{$this->_actionId}", $fetchFromAPCSuccess);
 		    if ($actionFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] != KalturaServicesMap::getServiceMapModificationTime())
 		    {
-		        $fetchFromAPCSuccess = false;
+		        return false;
 		    }
         }
-        
-		if (!$fetchFromAPCSuccess)
-		{
-	    	    return $fetchFromAPCSuccess;
-		}
 		
 		$this->_actionInfo = $actionFromCache["actionInfo"];
 		$this->_actionParams = $actionFromCache["actionParams"];
