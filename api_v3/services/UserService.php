@@ -298,10 +298,10 @@ class UserService extends KalturaBaseUserService
 		
 		$c->addAnd(kuserPeer::PUSER_ID, NULL, KalturaCriteria::ISNOTNULL);
 		
-		$totalCount = kuserPeer::doCount($c);
-		
 		$pager->attachToCriteria($c);
 		$list = kuserPeer::doSelect($c);
+		
+		$totalCount = $c->getRecordsCount();
 
 		$newList = KalturaUserArray::fromUserArray($list);
 		$response = new KalturaUserListResponse();

@@ -1723,6 +1723,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setEntitledPusersPublish($v)		
 	{	
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$entitledUserPuserPublish = array();
 	
 		$v = trim($v);
@@ -1739,7 +1740,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		foreach ($entitledPusersPublish as $puserId)
 		{
 			$puserId = trim($puserId);
-			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			
 			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
 			if (!$kuser)
 				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
