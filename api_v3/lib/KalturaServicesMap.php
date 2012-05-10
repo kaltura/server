@@ -162,7 +162,7 @@ class KalturaServicesMap
         if (function_exists('apc_fetch'))
         {
             $serviceItemFromCache = apc_fetch($serviceId, $apcFetchSuccess);
-            if ($serviceItemFromCache["serviceMapLastMod"] != self::getServiceMapModificationTime())
+            if ($serviceItemFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] != self::getServiceMapModificationTime())
             {
                 $apcFetchSuccess = false;
             }
