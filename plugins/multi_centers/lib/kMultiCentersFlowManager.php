@@ -57,7 +57,6 @@ class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 			throw new KalturaAPIException(MultiCentersErrors::INVALID_FILESYNC_RECORD, $fileSyncId);
 		}
 		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
-		$fileSync->setReadyAt( time() );
 		$fileSync->setFileSizeFromPath(kFileSyncUtils::getLocalFilePathForKey(kFileSyncUtils::getKeyForFileSync($fileSync)));
 		$fileSync->save();
 		return $dbBatchJob;
@@ -77,7 +76,6 @@ class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 			throw new KalturaAPIException(MultiCentersErrors::INVALID_FILESYNC_RECORD, $fileSyncId);
 		}
 		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
-		$fileSync->setReadyAt( time() );
 		$fileSync->save();
 		return $dbBatchJob;
 	}

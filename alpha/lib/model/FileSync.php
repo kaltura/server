@@ -108,6 +108,17 @@ class FileSync extends BaseFileSync
 	{
 		return array("fileSync:id=".$this->getId(), "fileSync:objectId=".$this->getObjectId());
 	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseFileSync::setStatus()
+	 */
+	public function setStatus($v)
+	{
+		if($v == FileSync::FILE_SYNC_STATUS_READY || $v == FileSync::FILE_SYNC_STATUS_ERROR)
+			$this->setReadyAt(time());
+			
+		return parent::setStatus($v);
+	}
 }
 
 

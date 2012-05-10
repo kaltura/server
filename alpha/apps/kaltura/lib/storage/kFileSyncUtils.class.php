@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage storage
  */
-class kFileSyncUtils
+class kFileSyncUtils implements kObjectChangedEventConsumer
 {
 	/**
 	 * @var array<int order, int storageId> 
@@ -805,7 +805,6 @@ class kFileSyncUtils
 		{
 			$current_dc_file_sync->setFileSizeFromPath ( $full_path );
 			$current_dc_file_sync->setStatus( FileSync::FILE_SYNC_STATUS_READY );
-			$current_dc_file_sync->setReadyAt ( time() );
 		}
 		else 
 		{
@@ -929,7 +928,6 @@ class kFileSyncUtils
 		$fileSync->setFileSize	( -1 );
 		$fileSync->setStatus	( FileSync::FILE_SYNC_STATUS_READY );
 		$fileSync->setOriginal	( false );
-		$fileSync->setReadyAt	( time() );
 		$fileSync->setFileType	( FileSync::FILE_SYNC_FILE_TYPE_URL );
 		$fileSync->save();
 		
@@ -964,8 +962,7 @@ class kFileSyncUtils
 		$current_dc_file_sync = FileSync::createForFileSyncKey( $target_key );
 		$current_dc_file_sync->setPartnerId ( $target_key->partner_id);
 		$current_dc_file_sync->setFileSize ( -1 );
-		$current_dc_file_sync->setStatus( FileSync::FILE_SYNC_STATUS_READY );
-		$current_dc_file_sync->setReadyAt ( time() );
+		$current_dc_file_sync->setStatus( $sourceFile->getStatus() );
 		$current_dc_file_sync->setOriginal ( 1 );
 		
 		if($sourceFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
@@ -1005,7 +1002,7 @@ class kFileSyncUtils
 				
 			$remote_dc_file_sync = FileSync::createForFileSyncKey( $target_key );
 			$remote_dc_file_sync->setDc( $remote_dc_id );
-			$remote_dc_file_sync->setStatus( FileSync::FILE_SYNC_STATUS_READY );
+			$remote_dc_file_sync->setStatus( $source_file_sync->getStatus() );
 			$remote_dc_file_sync->setOriginal ( 0 );
 			
 			if($source_file_sync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
@@ -1019,7 +1016,6 @@ class kFileSyncUtils
 				$remote_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_LINK );
 				$remote_dc_file_sync->setLinkedId ( $source_file_sync->getId() );
 			}
-			$remote_dc_file_sync->setReadyAt ( time() );
 			$remote_dc_file_sync->setPartnerID ( $target_key->partner_id );
 			$remote_dc_file_sync->save();
 			
@@ -1064,12 +1060,15 @@ class kFileSyncUtils
 		// first check if fileSync is source or link
 		$file = FileSyncPeer::retrieveByFileSyncKey($key);
 		if(!$file)
-		{
 			return null;
-		}
+		
 		if($file->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK)
 		{
 			$newStatus = FileSync::FILE_SYNC_STATUS_PURGED;
+		}
+		elseif($file->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+		{
+			$newStatus = FileSync::FILE_SYNC_STATUS_DELETED;
 		}
 		else
 		{
@@ -1084,25 +1083,16 @@ class kFileSyncUtils
 			}
 		}
 		
-		// TODO - implement - remember to handle links to deleted node gracfully
-		// remember to mark deleted all DC's entries
-		
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
+		if($fromKalturaDcsOnly)
+			$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+			
 		$file_sync_list = FileSyncPeer::doSelect( $c );
 		foreach($file_sync_list as $file_sync)
 		{
-			if($file_sync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE)
-			{
-				$file_sync->setStatus ( $newStatus );
-				$file_sync->save();
-			}
-			
-			if($file_sync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && !$fromKalturaDcsOnly)
-			{
-				$file_sync->setStatus ( FileSync::FILE_SYNC_STATUS_DELETED ); // need also to delete from the external storage (by job)
-				$file_sync->save();
-			}
+			$file_sync->setStatus($newStatus);
+			$file_sync->save();
 		}
 	}
 	
@@ -1126,16 +1116,29 @@ class kFileSyncUtils
 			$c->add(FileSyncPeer::LINKED_ID, $fileSync->getId());
 			$c->addAnd(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_LINK);
 			$c->addAnd(FileSyncPeer::DC, $fileSync->getDc());
-			$c->addAnd(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
 			
 			$links = FileSyncPeer::doSelect($c);
 			
+			// choose the first link and convert it to file
+			$firstLink = array_shift($links);
+			/* @var $firstLink FileSync */
+			if($firstLink)
+			{
+				$firstLink->setStatus($fileSync->getStatus());
+				$firstLink->setFileRoot($fileSync->getFileRoot());
+				$firstLink->setFilePath($fileSync->getFilePath());
+				$firstLink->setFileType(FileSync::FILE_SYNC_FILE_TYPE_FILE);
+				$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
+				$firstLink->setLinkCount(count($links));
+				$firstLink->save();
+			}
+			
+			// change all the rest of the links to point on the new file sync
 			foreach($links as $link)
 			{
+				/* @var $link FileSync */
 				$link->setStatus($fileSync->getStatus());
-				$link->setFileRoot($fileSync->getFileRoot());
-				$link->setFilePath($fileSync->getFilePath());
-				$link->setFileType(FileSync::FILE_SYNC_FILE_TYPE_FILE);
+				$link->setLinkedId($firstLink->getId());
 				$link->save();
 			}
 		}
@@ -1171,23 +1174,39 @@ class kFileSyncUtils
 	{
 		return kFileSyncObjectManager::retrieveObject( $sync_key->object_type, $sync_key->object_id );
 	}
-	
-//	/**
-//	 * Marks the local FileSync object as ready so it could go for sync
-//	 * 
-//	 * @param FileSyncKey $key
-//	 * @return void
-//	 * @deprecated
-//	 */
-//	public static function markLocalFileSyncAsReady(FileSyncKey $key, $strict = true)
-//	{
-//		$fileSync = self::getLocalFileSyncForKey($key, $strict);
-//		// added the option to work as non-strict, since some entries may not have all files, for example - EDIT flavor
-//		if($fileSync)
-//		{
-//			$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
-//			$fileSync->setReadyAt( time() );
-//			$fileSync->save();
-//		}
-//	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::objectChanged()
+	 */
+	public function objectChanged(BaseObject $object, array $modifiedColumns)
+	{
+		/* @var $object FileSync */
+		
+		$c = new Criteria();
+		$c->add(FileSyncPeer::DC, $object->getDc());
+		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_LINK);
+		$c->add(FileSyncPeer::PARTNER_ID, $object->getPartnerId());
+		$c->add(FileSyncPeer::LINKED_ID, $object->getId());
+		
+		$links = FileSyncPeer::doSelect($c);
+		foreach($links as $link)
+		{
+			$link->setStatus($object->getStatus());
+			$link->save();
+		}
+	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
+	 */
+	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+	{
+		if(	$object instanceof FileSync 
+			&& $object->getLinkCount() 
+			&& in_array(FileSyncPeer::STATUS, $modifiedColumns)
+		)
+			return true;
+			
+		return false;
+	}
 }
