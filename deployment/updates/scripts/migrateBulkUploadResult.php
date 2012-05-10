@@ -7,11 +7,6 @@
  * @subpackage updates
  */ 
 
-
-$dryRun = true; //TODO: change for real run
-if(in_array('realrun', $argv))
-	$dryRun = false;
-	
 $stopFile = dirname(__FILE__).'/stop_flavor_migration'; // creating this file will stop the script
 $countLimitEachLoop = 500;
 
@@ -20,10 +15,18 @@ $countLimitEachLoop = 500;
 require_once(dirname(__FILE__).'/../../bootstrap.php');
 
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
-KalturaStatement::setDryRun($dryRun);
 	
 $c = new Criteria();
 
+if (isset($argv[1]))
+{
+    $c->addAnd(BulkUploadResultPeer::PARTNER_ID, $argv[1], Criteria::EQUAL);
+}
+if (isset($argv[2]))
+{
+    $c->addAnd(BulkUploadResultPeer::ID, $argv[2], Criteria::GREATER_EQUAL);
+}
+$c->setLimit($countLimitEachLoop);
 $bulkUploadResults = BulkUploadResultPeer::doSelect($c, $con);
 
 while($bulkUploadResults && count($bulkUploadResults))
@@ -31,24 +34,27 @@ while($bulkUploadResults && count($bulkUploadResults))
 	foreach($bulkUploadResults as $bulkUploadResult)
 	{
 		/* @var $bulkUploadResult BulkUploadResult */
-		$bulkUploadResult->putInCustomData(BulkUploadResultEntry::TITLE, $bulkUploadResult->getTitle());
-		$bulkUploadResult->putInCustomData(BulkUploadResultEntry::DESCRIPTION, $bulkUploadResult->getDescription());
-		$bulkUploadResult->putInCustomData(BulkUploadResultEntry::TAGS, $bulkUploadResult->getTags());
-		$bulkUploadResult->putInCustomData(BulkUploadResultEntry::CATEGORY, $bulkUploadResult->getCategory());
-		$bulkUploadResult->putInCustomData(BulkUploadResultEntry::CONTENT_TYPE, $bulkUploadResult->getContentType());
-		$bulkUploadResult->putInCustomData(BulkUploadResultEntry::CONVERSION_PROFILE_ID, $bulkUploadResult->getConversionProfileId());
-		$bulkUploadResult->putInCustomData(BulkUploadResultEntry::ACCESS_CONSTROL_PROFILE_ID, $bulkUploadResult->getAccessControlProfileId());
-		$bulkUploadResult->putInCustomData(BulkUploadResultEntry::URL, $bulkUploadResult->getUrl());
-		$bulkUploadResult->putInCustomData(BulkUploadResultEntry::ENTRY_STATUS, $bulkUploadResult->getEntryStatus());
-		$bulkUploadResult->putInCustomData(BulkUploadResultEntry::THUMBNAIL_URL, $bulkUploadResult->getThumbnailUrl());
-		$bulkUploadResult->putInCustomData(BulkUploadResultEntry::THUMBNAIL_SAVED, $bulkUploadResult->getThumbnailSaved());
-		$bulkUploadResult->putInCustomData(BulkUploadResultEntry::SCHEDULE_END_DATE, $bulkUploadResult->getScheduleEndDate());
-		$bulkUploadResult->putInCustomData(BulkUploadResultEntry::SCHEDULE_START_DATE, $bulkUploadResult->getScheduleStartDate());
+		$bulkUploadResult->putInCustomData("title", $bulkUploadResult->getTitle());
+		$bulkUploadResult->putInCustomData("description", $bulkUploadResult->getDescription());
+		$bulkUploadResult->putInCustomData("tags", $bulkUploadResult->getTags());
+		$bulkUploadResult->putInCustomData("category", $bulkUploadResult->getCategory());
+		$bulkUploadResult->putInCustomData("content_type", $bulkUploadResult->getContentType());
+		$bulkUploadResult->putInCustomData("conversion_profile_id", $bulkUploadResult->getConversionProfileId());
+		$bulkUploadResult->putInCustomData("access_control_profile_id", $bulkUploadResult->getAccessControlProfileId());
+		$bulkUploadResult->putInCustomData("url", $bulkUploadResult->getUrl());
+		$bulkUploadResult->putInCustomData("entry_status", $bulkUploadResult->getEntryStatus());
+		$bulkUploadResult->putInCustomData("thumbnail_url", $bulkUploadResult->getThumbnailUrl());
+		$bulkUploadResult->putInCustomData("thumbnail_saved", $bulkUploadResult->getThumbnailSaved());
+		$bulkUploadResult->putInCustomData("schedule_end_date", $bulkUploadResult->getScheduleEndDate());
+		$bulkUploadResult->putInCustomData("schedule_start_date", $bulkUploadResult->getScheduleStartDate());
 		
 		$bulkUploadResult->save();
 		
+		var_dump("Last handled id: ".$bulkUploadResult->getId());
 		
 	}
+	$countLimitEachLoop += $countLimitEachLoop;
+	$c->setOffset($countLimitEachLoop);
 	$bulkUploadResults = BulkUploadResultPeer::doSelect($c, $con);
-	sleep(1);
+	usleep(100);
 }
