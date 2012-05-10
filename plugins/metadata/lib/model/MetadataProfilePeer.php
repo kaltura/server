@@ -75,4 +75,8 @@ class MetadataProfilePeer extends BaseMetadataProfilePeer
 		
 		return $ret;
 	}
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("metadataProfile:id=%s", self::ID));		
+	}
 } // MetadataProfilePeer
