@@ -135,40 +135,40 @@ class BulkUploadResultEntry extends BulkUploadResult
 	public function setSshKeyPassphrase($v)	{$this->putInCustomData(self::CUSTOM_DATA_SSH_KEY_PASSPHRASE, $v);}
 	
 	//Set properties for entries
-    public function getTitle()	{return $this->getFromCustomData(self::TITLE, null, $this->title);}
+    public function getTitle()	{return $this->getFromCustomData(self::TITLE, null, parent::getTitle());}
 	public function setTitle($v)	{$this->putInCustomData(self::TITLE, $v);}
 	
-    public function getDescription()	{return $this->getFromCustomData(self::DESCRIPTION, null, $this->description);}
+    public function getDescription()	{return $this->getFromCustomData(self::DESCRIPTION, null, parent::getDescription());}
 	public function setDescription($v)	{$this->putInCustomData(self::DESCRIPTION, $v);}
 
-	public function getTags()	{return $this->getFromCustomData(self::TAGS, null, $this->tags);}
+	public function getTags()	{return $this->getFromCustomData(self::TAGS, null, parent::getTags());}
 	public function setTags($v)	{$this->putInCustomData(self::TAGS, $v);}
 	
-	public function getUrl()	{return $this->getFromCustomData(self::URL, null, $this->url);}
+	public function getUrl()	{return $this->getFromCustomData(self::URL, null, parent::getUrl());}
 	public function setUrl($v)	{$this->putInCustomData(self::URL, $v);}
 	
-	public function getContentType()	{return $this->getFromCustomData(self::CONTENT_TYPE, null, $this->content_type);}
+	public function getContentType()	{return $this->getFromCustomData(self::CONTENT_TYPE, null, parent::getContentType());}
 	public function setContentType($v)	{$this->putInCustomData(self::CONTENT_TYPE, $v);}
 	
-	public function getConversionProfileId()	{return $this->getFromCustomData(self::CONVERSION_PROFILE_ID, null, $this->conversion_profile_id);}
+	public function getConversionProfileId()	{return $this->getFromCustomData(self::CONVERSION_PROFILE_ID, null, parent::getConversionProfileId());}
 	public function setConversionProfileId($v)	{$this->putInCustomData(self::CONVERSION_PROFILE_ID, $v);}
 	
-	public function getAcessControlProfileId()	{return $this->getFromCustomData(self::ACCESS_CONSTROL_PROFILE_ID, null, $this->access_control_profile_id);}
+	public function getAcessControlProfileId()	{return $this->getFromCustomData(self::ACCESS_CONSTROL_PROFILE_ID, null, parent::getAccessControlProfileId());}
 	public function setAccessControlProfileId($v)	{$this->putInCustomData(self::ACCESS_CONSTROL_PROFILE_ID, $v);}
 	
-	public function getCategory()	{return $this->getFromCustomData(self::CATEGORY, null, $this->category);}
+	public function getCategory()	{return $this->getFromCustomData(self::CATEGORY, null, parent::getCategory());}
 	public function setCategory($v)	{$this->putInCustomData(self::CATEGORY, $v);}
 	
-	public function getScheduleStartDate()	{return $this->getFromCustomData(self::SCHEDULE_START_DATE, null, $this->schedule_start_date);}
+	public function getScheduleStartDate()	{return $this->getFromCustomData(self::SCHEDULE_START_DATE, null, parent::getScheduleStartDate());}
 	public function setScheduleStartDate($v)	{$this->putInCustomData(self::SCHEDULE_START_DATE, $v);}
 	
-	public function getScheduleEndDate()	{return $this->getFromCustomData(self::SCHEDULE_END_DATE, null, $this->schedule_end_date);}
+	public function getScheduleEndDate()	{return $this->getFromCustomData(self::SCHEDULE_END_DATE, null, parent::getScheduleEndDate());}
 	public function setScheduleEndDate($v)	{$this->putInCustomData(self::SCHEDULE_END_DATE, $v);}
 	
-	public function getThumbnailUrl()	{return $this->getFromCustomData(self::THUMBNAIL_URL, null, $this->thumbnail_url);}
+	public function getThumbnailUrl()	{return $this->getFromCustomData(self::THUMBNAIL_URL, null, parent::getThumbnailUrl());}
 	public function setThumbnailUrl($v)	{$this->putInCustomData(self::THUMBNAIL_URL, $v);}
 	
-	public function getThumbnailSaved()	{return $this->getFromCustomData(self::THUMBNAIL_SAVED, null, $this->thumbnail_saved);}
+	public function getThumbnailSaved()	{return $this->getFromCustomData(self::THUMBNAIL_SAVED, null, parent::getThumbnailSaved());}
 	public function setThumbnailSaved($v)	{$this->putInCustomData(self::THUMBNAIL_SAVED, $v);}
 	
     public function getEntryStatus()	
