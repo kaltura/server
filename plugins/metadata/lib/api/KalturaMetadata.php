@@ -149,6 +149,15 @@ class KalturaMetadata extends KalturaObject implements IFilterable
 	public function fromObject($source_object)
 	{
 		parent::fromObject($source_object);
+		
+		if($this->metadataObjectType == KalturaMetadataObjectType::USER)
+		{
+			$user = kuserPeer::retrieveByPK($this->objectId);
+			
+			$this->objectId = null;
+			if($user)
+				$this->objectId = $user->getPuserId();
+		}
 
 		$key = $source_object->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$this->xml = kFileSyncUtils::file_get_contents($key, true, false);
