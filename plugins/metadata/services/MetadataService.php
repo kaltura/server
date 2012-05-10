@@ -39,6 +39,13 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addAction($metadataProfileId, $objectType, $objectId, $xmlData)
 	{
+		if($objectType == KalturaMetadataObjectType::USER)
+		{
+			$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $objectId);
+			if($kuser)				
+				$objectId = $kuser->getId();
+		}
+		
 		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
 		$check = MetadataPeer::retrieveByObject($metadataProfileId, $objectType, $objectId);
 		if($check)
