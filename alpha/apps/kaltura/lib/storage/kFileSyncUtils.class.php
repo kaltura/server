@@ -1113,9 +1113,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		{
 			// for each source, find its links and fix them
 			$c = new Criteria();
+			
+			$c->add(FileSyncPeer::DC, $fileSync->getDc());
+			$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_LINK);
 			$c->add(FileSyncPeer::LINKED_ID, $fileSync->getId());
-			$c->addAnd(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_LINK);
-			$c->addAnd(FileSyncPeer::DC, $fileSync->getDc());
+			$c->addAscendingOrderByColumn(FileSyncPeer::PARTNER_ID);
 			
 			$links = FileSyncPeer::doSelect($c);
 			
@@ -1185,7 +1187,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		$c = new Criteria();
 		$c->add(FileSyncPeer::DC, $object->getDc());
 		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_LINK);
-		$c->add(FileSyncPeer::PARTNER_ID, $object->getPartnerId());
 		$c->add(FileSyncPeer::LINKED_ID, $object->getId());
 		
 		$links = FileSyncPeer::doSelect($c);
