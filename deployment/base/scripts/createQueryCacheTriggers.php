@@ -17,6 +17,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "ui_conf", 						'keys' => array(array("'uiConf:id='", '@OBJ@.id'))),
 	array('table' => "widget", 							'keys' => array(array("'widget:id='", '@OBJ@.id'))),
 	array('table' => "metadata", 						'keys' => array(array("'metadata:objectId='", '@OBJ@.object_id')), 																		'plugin' => 'metadata'),
+	array('table' => "metadata_profile", 				'keys' => array(array("'metadataProfile:id='", '@OBJ@.id')), 																			'plugin' => 'metadata'),
 	array('table' => "metadata_profile_field", 			'keys' => array(array("'metadataProfileField:metadataProfileId='", '@OBJ@.metadata_profile_id')),										'plugin' => 'metadata'),
 	array('table' => "partner", 						'keys' => array(array("'partner:id='", '@OBJ@.id'))),
 	array('table' => "cue_point", 						'keys' => array(array("'cuePoint:id='", '@OBJ@.id'), array("'cuePoint:entryId='", '@OBJ@.entry_id')),									'plugin' => 'cue_points/base'),
