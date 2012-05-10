@@ -1080,18 +1080,20 @@ class kFlowHelper
 		$thumbParamsObjects = assetParamsPeer::retrieveThumbnailsByPKs($assetParamsIds);
 		foreach($thumbParamsObjects as $thumbParams)
 		{
-			// check if this thumbnail already created
 			if(isset($thumbAssetsList[$thumbParams->getId()]))
+			{
+				KalturaLog::log("Thumbnail asset already created [" . $thumbAssetsList[$thumbParams->getId()]->getId() . "]");
 				continue;
+			}
 
-			if(is_null($srcParamsId) && is_null($thumbParams->getSourceParamsId()))
+			if(is_null($srcParamsId) && !$thumbParams->getSourceParamsId())
 			{
 				// alternative should be used
 				$thumbParams->setSourceParamsId($alternateFlavorParamsId);
 			}
 			elseif($thumbParams->getSourceParamsId() != $srcParamsId)
 			{
-				// only thumbnails that uses srcParamsId should be generated for now
+				KalturaLog::log("Only thumbnails that uses source params [$srcParamsId] should be generated for now");
 				continue;
 			}
 
