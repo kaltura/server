@@ -375,4 +375,3 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 mysql_close($link);
 
 print "Done !\n";
-?>
