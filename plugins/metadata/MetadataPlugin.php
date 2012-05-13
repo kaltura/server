@@ -386,7 +386,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	 * @param Object $object
 	 * @param array $data
 	 */
-	protected static function addMetadataWithProfileId ($metadataProfileId, Object $object, $data)
+	protected static function addMetadataWithProfileId ($metadataProfileId, Object $object, array $data)
 	{
 		$metadataProfile = MetadataProfilePeer::retrieveById($metadataProfileId);
 		if(!$metadataProfile)
@@ -519,7 +519,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	 * @param BaseObject $object
 	 * @param array $data
 	 */
-	protected function addMetadataWithProfilesSystemNames ($object, $data)
+	protected function addMetadataWithProfilesSystemNames (BaseObject $object, array $data)
 	{
 	    $newFieldValuesMap = array();
 	    $xmlDataArray = array();
