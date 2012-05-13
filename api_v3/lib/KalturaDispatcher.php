@@ -41,7 +41,7 @@ class KalturaDispatcher
         //strtolower on service - map is indexed according to lower-case service IDs
         $service = strtolower($service);
         
-        $reflector = KalturaServicesMap::getServiceItem($service, $action);
+        $reflector = KalturaServicesMap::retrieveServiceActionItemFromCache($service, $action);
 	    /* @var $reflector KalturaServiceActionItem */
         $action = strtolower($action);
         if (!isset($reflector->actionMap[$action]))
@@ -59,8 +59,6 @@ class KalturaDispatcher
              throw new Exception("Could not create action reflector for service [$service], action [$action]. Received error: ". $e->getMessage());
         }
         
-        $fetchFromAPCSuccess = $actionReflector->fetchValuesFromAPC();
-
 		$actionParams = $actionReflector->getActionParams();
 		// services.ct - check if partner is allowed to access service ...
 
@@ -108,17 +106,9 @@ class KalturaDispatcher
 		KalturaLog::debug("Invoke took - " . (microtime(true) - $invokeStart) . " seconds");
 		KalturaLog::debug("Disptach took - " . (microtime(true) - $start) . " seconds");		
 				
-		$actionReflector->storeValuesInAPC($fetchFromAPCSuccess);
 		kMemoryManager::clearMemory();
 		
 		return $res;
-	}
-	
-	
-	
-	protected function getActionInfoAndParams ()
-	{
-	    
 	}
 
 	/**
