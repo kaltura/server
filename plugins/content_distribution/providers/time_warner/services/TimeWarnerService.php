@@ -71,7 +71,7 @@ class TimeWarnerService extends KalturaBaseService
 		}
 		
 		header('Content-Type: text/xml');
-		echo str_replace('&','&amp;',html_entity_decode($feed->getXml()));
+		echo $feed->getXml();
 		die;
 	}
 }
