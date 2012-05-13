@@ -7,6 +7,7 @@ class DailymotionDistributionProfile extends ConfigurableDistributionProfile
 {
 	const CUSTOM_DATA_USER = 'user';
 	const CUSTOM_DATA_PASSWORD = 'password';
+	const CUSTOM_DATA_GEO_BLOCKING_MAPPING = 'geoBlockingMapping';
 
 	const METADATA_FIELD_CATEGORY = 'DailymotionCategory';
 	const METADATA_FIELD_DESCRIPTION = 'DailymotionDescription';
@@ -19,6 +20,7 @@ class DailymotionDistributionProfile extends ConfigurableDistributionProfile
 	const VIDEO_TAGS_MAXIMUM_LENGTH = 250;
 	const VIDEO_TAG_MINIMUM_LENGTH = 3;
 	const VIDEO_TYPE_ALLOWED_VALUES = 'ugc,creative,official';
+	const VIDEO_GEO_BLOCKING_OPERATION_ALLOWED_VALUES = 'allow,deny';
 	
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -30,10 +32,12 @@ class DailymotionDistributionProfile extends ConfigurableDistributionProfile
 	
 	public function getUser()			{return $this->getFromCustomData(self::CUSTOM_DATA_USER);}
 	public function getPassword()		{return $this->getFromCustomData(self::CUSTOM_DATA_PASSWORD);}
+	public function getGeoBlockingMapping(){return $this->getFromCustomData(self::CUSTOM_DATA_GEO_BLOCKING_MAPPING);}
 
 	public function setUser($v)			{$this->putInCustomData(self::CUSTOM_DATA_USER, $v);}
 	public function setPassword($v)		{$this->putInCustomData(self::CUSTOM_DATA_PASSWORD, $v);}
-	
+	public function setGeoBlockingMapping($v){$this->putInCustomData(self::CUSTOM_DATA_GEO_BLOCKING_MAPPING, $v);}
+
 	
 			
 	/* (non-PHPdoc)
@@ -50,6 +54,7 @@ class DailymotionDistributionProfile extends ConfigurableDistributionProfile
 		
 		$inListOrNullFields = array (
 		    DailymotionDistributionField::VIDEO_TYPE => explode(',', self::VIDEO_TYPE_ALLOWED_VALUES),
+			DailymotionDistributionField::VIDEO_GEO_BLOCKING_OPERATION => explode(',', self::VIDEO_GEO_BLOCKING_OPERATION_ALLOWED_VALUES),
 	    );
 		
 		$allFieldValues = $this->getAllFieldValues($entryDistribution);
@@ -190,6 +195,16 @@ class DailymotionDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='".self::METADATA_FIELD_TYPE."']"));
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(DailymotionDistributionField::VIDEO_GEO_BLOCKING_OPERATION);
+		$fieldConfig->setUserFriendlyFieldName('Geo blocking allow / deny');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(DailymotionDistributionField::VIDEO_GEO_BLOCKING_COUNTRY_LIST);
+		$fieldConfig->setUserFriendlyFieldName('Geo blocking country list');
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
 	    return $fieldConfigArray;
 	}

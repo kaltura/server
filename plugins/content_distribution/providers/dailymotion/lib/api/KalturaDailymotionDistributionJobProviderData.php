@@ -9,6 +9,16 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 	 * @var string
 	 */
 	public $videoAssetFilePath;
+
+	/**
+	 * @var string
+	 */
+	public $accessControlGeoBlockingOperation;
+
+	/**
+	 * @var string
+	 */
+	public $accessControlGeoBlockingCountryList;
 	
 	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
@@ -32,7 +42,11 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$this->videoAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 		}
-		
+
+		// look for krule with action block and condition of country
+		$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
+		if ($entry->getAccessControl())
+			$this->setGeoBlocking($entry->getAccessControl());
 	}
 
 
@@ -61,5 +75,42 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 	public function setVideoAssetFilePath($videoAssetFilePath)
 	{
 		$this->videoAssetFilePath = $videoAssetFilePath;
+	}
+
+	protected function setGeoBlocking(accessControl $accessControl)
+	{
+		$rules = $accessControl->getRulesArray();
+		foreach($rules as $rule)
+		{
+			$hasBlockAction = false;
+			/* @var $rule kRule */
+			foreach($rule->getActions() as $action)
+			{
+				/* @var $action kAccessControlAction */
+				if($action->getType() == accessControlActionType::BLOCK)
+				{
+					$hasBlockAction = true;
+					break;
+				}
+			}
+
+			if (!$hasBlockAction)
+				continue;
+
+			foreach($rule->getConditions() as $condition)
+			{
+				if ($condition instanceof kCountryCondition)
+				{
+					/* @var $condition kCountryCondition */
+					$this->accessControlGeoBlockingCountryList = implode(',', $condition->getStringValues());
+					if ($condition->getNot() === true)
+						$this->accessControlGeoBlockingOperation = 'allow';
+					else
+						$this->accessControlGeoBlockingOperation = 'deny';
+
+					break;
+				}
+			}
+		}
 	}
 }
