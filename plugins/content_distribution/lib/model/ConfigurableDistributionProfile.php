@@ -309,7 +309,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	        return null;
 	    }
 	    $fieldValue = $fieldElement->nodeValue;
-	    return str_replace('&','&amp;',html_entity_decode($fieldValue));
+	    return $fieldValue;
 	}
 	
 	
