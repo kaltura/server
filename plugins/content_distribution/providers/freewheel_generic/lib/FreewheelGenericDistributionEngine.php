@@ -6,7 +6,8 @@
 class FreewheelGenericDistributionEngine extends DistributionEngine implements 
 	IDistributionEngineSubmit,
 	IDistributionEngineCloseSubmit,
-	IDistributionEngineUpdate
+	IDistributionEngineUpdate,
+	IDistributionEngineCloseUpdate
 {
 	const FREEWHEEL_SFTP_SERVER = "sftp.fwmrm.net";
 	const FREEWHEEL_SFTP_PORT = 22;
@@ -36,6 +37,57 @@ class FreewheelGenericDistributionEngine extends DistributionEngine implements
 	 * @see IDistributionEngineCloseSubmit::closeSubmit()
 	 */
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
+	{
+		return $this->handleClose($data);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineUpdate::update()
+	 */
+	public function update(KalturaDistributionUpdateJobData $data)
+	{
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaFreewheelGenericDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaFreewheelGenericDistributionProfile");
+	
+		if(!$data->providerData || !($data->providerData instanceof KalturaFreewheelGenericDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaFreewheelGenericDistributionJobProviderData");
+		
+		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
+		
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineCloseUpdate::closeUpdate()
+	 */
+	public function closeUpdate(KalturaDistributionUpdateJobData $data)
+	{
+		return $this->handleClose($data);
+	}
+
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaFreewheelGenericDistributionProfile $distributionProfile
+	 * @param KalturaFreewheelGenericDistributionJobProviderData $providerData
+	 */
+	protected function handleSubmit(KalturaDistributionJobData $data, KalturaFreewheelGenericDistributionProfile $distributionProfile, KalturaFreewheelGenericDistributionJobProviderData $providerData)
+	{
+		KalturaLog::err(print_r($providerData, true));
+		$entryId = $data->entryDistribution->entryId;
+		$partnerId = $distributionProfile->partnerId;
+		
+		$feed = new FreewheelGenericFeedHelper('freewheel_template.xml', $distributionProfile, $providerData);
+		$xml = $feed->getXml();
+		$data->sentData = $xml;
+		$result = $this->upload($entryId.".xml", $xml, $distributionProfile->apikey);
+		$data->results = $result;
+	}
+	
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @throws Exception
+	 */
+	protected function handleClose(KalturaDistributionJobData $data)
 	{
 		$entryId = $data->entryDistribution->entryId;
 		$loginName = $data->distributionProfile->sftpLogin;
@@ -77,39 +129,8 @@ class FreewheelGenericDistributionEngine extends DistributionEngine implements
 		if (isset($errors))
 			throw new Exception('Distribution failed with error ['.$errors[0].']');
 			
+		$data->results = $contents;
 		return true;
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionEngineUpdate::update()
-	 */
-	public function update(KalturaDistributionUpdateJobData $data)
-	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaFreewheelGenericDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaFreewheelGenericDistributionProfile");
-	
-		if(!$data->providerData || !($data->providerData instanceof KalturaFreewheelGenericDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaFreewheelGenericDistributionJobProviderData");
-		
-		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
-		
-		return true;
-	}
-
-	/**
-	 * @param KalturaDistributionJobData $data
-	 * @param KalturaFreewheelGenericDistributionProfile $distributionProfile
-	 * @param KalturaFreewheelGenericDistributionJobProviderData $providerData
-	 */
-	protected function handleSubmit(KalturaDistributionJobData $data, KalturaFreewheelGenericDistributionProfile $distributionProfile, KalturaFreewheelGenericDistributionJobProviderData $providerData)
-	{
-		KalturaLog::err(print_r($providerData, true));
-		$entryId = $data->entryDistribution->entryId;
-		$partnerId = $distributionProfile->partnerId;
-		
-		$feed = new FreewheelGenericFeedHelper('freewheel_template.xml', $distributionProfile, $providerData);
-		$xml = $feed->getXml();
-		$result = $this->upload($entryId.".xml", $xml, $distributionProfile->apikey);
 	}
 	
 	/* (non-PHPdoc)
@@ -163,7 +184,7 @@ class FreewheelGenericDistributionEngine extends DistributionEngine implements
 			if ($code == 200) 
 				return $result;
 				
-			throw new Exception('HTTP error occured while sending metadata to Freewheel BVI [Code: '.$code.']');
+			throw new Exception('HTTP error occured while sending metadata to Freewheel BVI [Code: '.$code.'] [Result: '.$result.']');
 		}
 	}
 
