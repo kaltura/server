@@ -1,5 +1,4 @@
 SELECT
-	DATE(DATE(date_id) + INTERVAL hour_id HOUR + INTERVAL {TIME_SHIFT} HOUR)*1 date_id, # time shifted date
 	SUM(count_plays) count_plays,
 	SUM(count_plays_25) count_plays_25,
 	SUM(count_plays_50) count_plays_50,
