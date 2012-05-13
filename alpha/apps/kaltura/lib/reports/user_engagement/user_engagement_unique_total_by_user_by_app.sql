@@ -4,6 +4,7 @@ COUNT(DISTINCT entry_id) unique_videos,
 SUM(count_plays) count_plays,
 SUM(sum_time_viewed) sum_time_viewed,
 SUM(sum_time_viewed)/SUM(count_plays) avg_time_viewed,
+0 avg_view_drop_off,
 SUM(count_loads) count_loads,
 (SUM(count_plays) / SUM(count_loads)) load_play_ratio
 FROM 

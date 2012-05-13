@@ -1,6 +1,5 @@
 SELECT 
 	us.name name,
-	unique_videos,
 	count_plays,
 	count_plays_25,
 	count_plays_50,

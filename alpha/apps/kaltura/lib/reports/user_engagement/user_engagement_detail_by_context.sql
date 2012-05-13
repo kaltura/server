@@ -4,6 +4,7 @@ SELECT
 	count_plays,
 	sum_time_viewed,
 	avg_time_viewed,
+	0 avg_view_drop_off,
 	count_loads,
 	load_play_ratio
 FROM
