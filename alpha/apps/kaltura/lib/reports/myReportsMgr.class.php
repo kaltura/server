@@ -101,7 +101,7 @@ class myReportsMgr
 
 		// assume each row has the same number of columns
 
-		if ( $report_type == self::REPORT_TYPE_CONTENT_DROPOFF )
+		if ( $report_type == self::REPORT_TYPE_CONTENT_DROPOFF || $report_type == self::REPORT_TYPE_USER_CONTENT_DROPOFF)
 		{
 			$res = self::getGraphsByColumnName ( $result , $report_type);
 		}
@@ -232,19 +232,23 @@ class myReportsMgr
 					$data = array();
 				}
 				if ($count_plays > self::PLAYS_LIMIT) {
-					$header[]= self::UNIQUE_USERS;
-					$data[] = -1;
-					$header[]= self::UNIQUE_VIDEOS;
-					$data[] = -1;	
+					$unique_header[]= self::UNIQUE_USERS;
+					$unique_data[] = "-";
+					$unique_header[]= self::UNIQUE_VIDEOS;
+					$unique_data[] = "-";
+					$header = array_merge($unique_header, $header);
+					$data = array_merge($unique_data, $data);						
 				} else {
 					$result  = self::executeQueryByType( $partner_id , $report_type * 10 , self::REPORT_FLAVOR_TOTAL , $input_filter , null , null , null , $object_ids );
 					$row = $result[0];
 			
 					foreach ( $row as $name => $value )
 					{
-						$header[]= $name;
-						$data[] = $value;
+						$unique_header[]= $name;
+						$unique_data[] = $value;
 					}			
+					$header = array_merge($unique_header, $header);
+					$data = array_merge($unique_data, $data);
 				}
 			}
 			$res = array ( $header , $data );
