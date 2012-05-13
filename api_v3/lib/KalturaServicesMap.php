@@ -162,52 +162,43 @@ class KalturaServicesMap
      * @param string $serviceId
      * @param string $actionId
      * @throws KalturaAPIException
-     * @return Ambigous <KalturaServiceActionItem, number>
+     * @return KalturaServiceActionItem
      */
     public static function retrieveServiceActionItemFromCache ($serviceId, $actionId)
 	{
-	    $apcFetchSuccess = null;
         if (function_exists('apc_fetch'))
         {
             $serviceItemFromCache = apc_fetch($serviceId, $apcFetchSuccess);
-            if ($serviceItemFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] != self::getServiceMapModificationTime())
+            if ($apcFetchSuccess && $serviceItemFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == self::getServiceMapModificationTime())
             {
-                $apcFetchSuccess = false;
+                return $serviceItemFromCache["serviceActionItem"];
             }
         }
-        
-        if ($apcFetchSuccess)
-        {
-            $reflector = $serviceItemFromCache["serviceActionItem"];
-        }
-        else 
-        {
-            // load the service reflector
-            $serviceMap = self::getMap();
-            
-            if (!isset($serviceMap[$serviceId]))
-            {
-                KalturaLog::crit("Service does not exist!");
-                throw new KalturaAPIException(KalturaErrors::SERVICE_DOES_NOT_EXISTS, $serviceId);
-            }
-            
-            // check if action exists
-    	    if (!$actionId)
-    	    {
-    	        KalturaLog::crit("Action not specified!");
-    		    throw new KalturaAPIException(KalturaErrors::ACTION_NOT_SPECIFIED, $serviceId);
-    	    }
-            $reflector = $serviceMap[$serviceId];
-            
-            if (function_exists('apc_store'))
-            {
-                $servicesMapLastModTime = self::getServiceMapModificationTime();
-		        $success = apc_store("$serviceId" ,array ("serviceActionItem" => $serviceMap[$serviceId], KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime,));
-                
-            }
-        }
-        
-        return $reflector;
+		
+		// load the service reflector
+		$serviceMap = self::getMap();
+		
+		if(!isset($serviceMap[$serviceId]))
+		{
+			KalturaLog::crit("Service does not exist!");
+			throw new KalturaAPIException(KalturaErrors::SERVICE_DOES_NOT_EXISTS, $serviceId);
+		}
+		
+		// check if action exists
+		if(!$actionId)
+		{
+			KalturaLog::crit("Action not specified!");
+			throw new KalturaAPIException(KalturaErrors::ACTION_NOT_SPECIFIED, $serviceId);
+		}
+		$reflector = $serviceMap[$serviceId];
+		
+		if(function_exists('apc_store'))
+		{
+			$servicesMapLastModTime = self::getServiceMapModificationTime();
+			$success = apc_store("$serviceId", array("serviceActionItem" => $serviceMap[$serviceId], KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime));
+		}
+		
+		return $reflector;
 	}
 	
 }
