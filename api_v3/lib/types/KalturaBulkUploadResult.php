@@ -128,7 +128,7 @@ class KalturaBulkUploadResult extends KalturaObject
 	        
 		$dbObject = parent::toInsertableObject($object_to_fill, $props_to_skip);
 		
-		$pluginsData = $this->addPluginData();
+		$pluginsData = $this->createPluginDataMap();
 		$dbObject->setPluginsData($pluginsData);
 		
 		return $dbObject;
@@ -137,7 +137,7 @@ class KalturaBulkUploadResult extends KalturaObject
 	/**
 	 * @return array
 	 */
-	protected function addPluginData ()
+	protected function createPluginDataMap ()
 	{
 	    $pluginsData = array();
 	    if($this->pluginsData && $this->pluginsData instanceof KalturaBulkUploadPluginDataArray)

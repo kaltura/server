@@ -152,7 +152,7 @@ class KalturaBulkUploadResultEntry extends KalturaBulkUploadResult
 		
 		$dbObject = parent::toInsertableObject(new BulkUploadResultEntry(), $props_to_skip);
 		
-		$pluginsData = $this->addPluginData();
+		$pluginsData = $this->createPluginDataMap();
 		$dbObject->setPluginsData($pluginsData);
 		
 		return $dbObject;
