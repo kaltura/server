@@ -156,7 +156,15 @@ class KalturaServicesMap
 	    return filemtime($cacheFilePath);
 	}
 	
-    public static function getServiceItem ($serviceId, $actionId)
+    /**
+     * Function tpo retrieve a specific KalturaServiceActionItem from the cache by a service ID and action ID.
+     * If the item was not found, it is retrieved from the services map and cached.
+     * @param string $serviceId
+     * @param string $actionId
+     * @throws KalturaAPIException
+     * @return Ambigous <KalturaServiceActionItem, number>
+     */
+    public static function retrieveServiceActionItemFromCache ($serviceId, $actionId)
 	{
 	    $apcFetchSuccess = null;
         if (function_exists('apc_fetch'))
