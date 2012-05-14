@@ -307,7 +307,7 @@ class entryPeer extends BaseentryPeer
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS); 
 		$c->addAnd ( entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
 
-		// logic should be ( kuserId || creatorKuserId) || (privacyByContext && entitledKusers)
+		// logic should be ( kuserId || creatorKuserId) || (privacyByContext && (entitledKusers || categories))
 		
 		$critPrivacyByContextAndEntitledKusers = null;
 		

@@ -6,6 +6,7 @@
 class categoryFilter extends baseObjectFilter
 {
 	const FREE_TEXT_FIELDS = 'name,tags,description';
+	const NAME_REFERNCE_ID = 'name,reference_id';
 	
 	public function init ()
 	{
@@ -23,6 +24,7 @@ class categoryFilter extends baseObjectFilter
 			"_gte_created_at",
 			"_lte_created_at",
 			"_free_text",
+			"_likex_name_or_reference_id",
 			"_in_members",
 			"_gte_updated_at",
 			"_lte_updated_at",

@@ -18,6 +18,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'category.KUSER_ID' => 'kuser_id',
 		'category.DISPLAY_IN_SEARCH' => 'display_in_search',	
 		'category.FREE_TEXT' => '(name,tags,description)',
+		'category.NAME_REFERNCE_ID' => '(name,reference_id)',
 		'category.MEMBERS' => 'members',
 		'plugins_data',
 		'category.DEPTH' => 'depth',
@@ -216,6 +217,74 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			}
 		}
 		$filter->unsetByName('_free_text');
+		
+		
+		if($filter->get('_likex_name_or_reference_id'))
+		{
+			$freeTexts = $filter->get('_likex_name_or_reference_id');
+			KalturaLog::debug("Attach free text [$freeTexts]");
+			
+			$additionalConditions = array();
+			$advancedSearch = $filter->getAdvancedSearch();
+			if($advancedSearch)
+			{
+				$additionalConditions = $advancedSearch->getFreeTextConditions($freeTexts);
+			}
+			
+			if(preg_match('/^"[^"]+"$/', $freeTexts))
+			{
+				$freeText = str_replace('"', '', $freeTexts);
+				$freeText = SphinxUtils::escapeString($freeText);
+				$freeText = "^$freeText$";
+				$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $freeText\\\*";
+			}
+			else
+			{
+				if(strpos($freeTexts, baseObjectFilter::IN_SEPARATOR) > 0)
+				{
+					str_replace(baseObjectFilter::AND_SEPARATOR, baseObjectFilter::IN_SEPARATOR, $freeTexts);
+				
+					$freeTextsArr = explode(baseObjectFilter::IN_SEPARATOR, $freeTexts);
+					foreach($freeTextsArr as $valIndex => $valValue)
+					{
+						if(!is_numeric($valValue) && strlen($valValue) <= 0)
+							unset($freeTextsArr[$valIndex]);
+						else
+							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
+					}
+							
+					foreach($freeTextsArr as $freeText)
+					{
+						$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $freeText\\\*";
+					}
+				}
+				else
+				{
+					$freeTextsArr = explode(baseObjectFilter::AND_SEPARATOR, $freeTexts);
+					foreach($freeTextsArr as $valIndex => $valValue)
+					{
+						if(!is_numeric($valValue) && strlen($valValue) <= 0)
+							unset($freeTextsArr[$valIndex]);
+						else
+							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
+					}
+							
+					$freeTextsArr = array_unique($freeTextsArr);
+					$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
+					$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $freeTextExpr\\\*";
+				}
+			}
+			if(count($additionalConditions))
+			{	
+				$additionalConditions = array_unique($additionalConditions);
+				$matches = reset($additionalConditions);
+				if(count($additionalConditions) > 1)
+					$matches = '( ' . implode(' ) | ( ', $additionalConditions) . ' )';
+					
+				$this->matchClause[] = $matches;
+			}
+		}
+		$filter->unsetByName('_likex_name_or_reference_id');
 				
 		return parent::applyFilterFields($filter);
 	}
@@ -264,6 +333,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			"name", 
 			"full_name",
 			"full_ids",
+			"free_text",
 			"description", 
 			"tags", 
 			"members"
