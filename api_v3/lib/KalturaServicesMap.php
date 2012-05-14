@@ -168,11 +168,12 @@ class KalturaServicesMap
 	{
         if (function_exists('apc_fetch'))
         {
+            $apcFetchSuccess = null;
             $serviceItemFromCache = apc_fetch($serviceId, $apcFetchSuccess);
             if ($apcFetchSuccess && $serviceItemFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == self::getServiceMapModificationTime())
             {
                 return $serviceItemFromCache["serviceActionItem"];
-            }
+            } 
         }
 		
 		// load the service reflector
@@ -192,7 +193,7 @@ class KalturaServicesMap
 		}
 		$reflector = $serviceMap[$serviceId];
 		
-		if(function_exists('apc_store'))
+		if(function_exists('apc_store') && $apcFetchSuccess)
 		{
 			$servicesMapLastModTime = self::getServiceMapModificationTime();
 			$success = apc_store("$serviceId", array("serviceActionItem" => $serviceMap[$serviceId], KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime));
