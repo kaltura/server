@@ -32,7 +32,7 @@ class myCsvReport
 				
 		foreach ( $graph as $data => $value )
 		{
-			if ( $report_type == myReportsMgr::REPORT_TYPE_CONTENT_DROPOFF )
+			if ( $report_type == myReportsMgr::REPORT_TYPE_CONTENT_DROPOFF || $report_type == myReportsMgr::REPORT_TYPE_USER_CONTENT_DROPOFF)
 			{
 				$csv->addNewLine( $data , $value );
 			}	
