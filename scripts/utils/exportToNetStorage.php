@@ -149,7 +149,7 @@ while ($moreEntries)
         $moreEntries = false;
     }
     $entries = null;
-    entryPeer::clearInstancePool();
+     kMemoryManager::clearMemory();
 }
 
 echo "Done\n";
