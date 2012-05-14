@@ -41,10 +41,9 @@ class KalturaDispatcher
         //strtolower on service - map is indexed according to lower-case service IDs
         $service = strtolower($service);
         
-        $reflector = KalturaServicesMap::retrieveServiceActionItemFromCache($service, $action);
-	    /* @var $reflector KalturaServiceActionItem */
+        $serviceActionItem = KalturaServicesMap::retrieveServiceActionItem($service, $action);
         $action = strtolower($action);
-        if (!isset($reflector->actionMap[$action]))
+        if (!isset($serviceActionItem->actionMap[$action]))
         {
             KalturaLog::crit("Action does not exist!");
 		    throw new KalturaAPIException(KalturaErrors::ACTION_DOES_NOT_EXISTS, $action, $service);
@@ -52,7 +51,7 @@ class KalturaDispatcher
         
         try
         {
-	        $actionReflector = new KalturaActionReflector($service, $action, $reflector->actionMap[$action]);
+	        $actionReflector = new KalturaActionReflector($service, $action, $serviceActionItem->actionMap[$action]);
         }
         catch (Exception $e)
         {
@@ -72,7 +71,7 @@ class KalturaDispatcher
 		kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
 		kCurrentContext::$user_ip = requestUtils::getRemoteAddress();
 		kCurrentContext::$ps_vesion = "ps3";
-		kCurrentContext::$service = $reflector->serviceInfo->serviceName;
+		kCurrentContext::$service = $serviceActionItem->serviceInfo->serviceName;
 		kCurrentContext::$action =  $action;
 		kCurrentContext::$client_lang =  isset($params['clientTag']) ? $params['clientTag'] : null;
 		
