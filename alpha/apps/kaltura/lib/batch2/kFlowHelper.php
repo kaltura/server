@@ -1051,8 +1051,8 @@ class kFlowHelper
 		{
 			$flavorParamsObjects = assetParamsPeer::retrieveFlavorsByPKs($assetParamsIds);
 			foreach($flavorParamsObjects as $flavorParams)
-			if($flavorParams->hasTag(flavorParams::TAG_SOURCE))
-			$alternateFlavorParamsId = $flavorParams->getId();
+				if($flavorParams->hasTag(flavorParams::TAG_SOURCE))
+					$alternateFlavorParamsId = $flavorParams->getId();
 
 			if(is_null($alternateFlavorParamsId))
 			{
