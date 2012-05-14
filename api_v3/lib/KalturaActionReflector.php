@@ -73,7 +73,7 @@ class KalturaActionReflector extends KalturaReflector
 		if(function_exists('apc_fetch'))
 		{
 			$actionFromCache = apc_fetch("{$this->_serviceId}_{$this->_actionId}", $fetchFromAPCSuccess);
-			if($actionFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] != KalturaServicesMap::getServiceMapModificationTime())
+			if(!$fetchFromAPCSuccess || $actionFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] != KalturaServicesMap::getServiceMapModificationTime())
 			{
 				return;
 			}
@@ -265,7 +265,7 @@ class KalturaActionReflector extends KalturaReflector
         if (!function_exists('apc_store'))
         	return;
         	
-        $cacheValue = array(
+        $cacheValue = array( 
         	KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime, 
         	"actionInfo" => $this->_actionInfo, 
         	"actionParams" => $this->_actionParams,
