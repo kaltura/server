@@ -72,31 +72,31 @@ class thumbnailAction extends sfAction
 		
 		
 		// validating the inputs
-		if($quality < 20 || $quality > 100)
+		if(!is_numeric($quality) || $quality < 20 || $quality > 100)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'quality must be btween 20 and 100');
 		
-		if($src_x < 0 || $src_x > 10000)
+		if(!is_numeric($src_x) || $src_x < 0 || $src_x > 10000)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_x must be btween 0 and 10000');
 		
-		if($src_y < 0 || $src_y > 10000)
+		if(!is_numeric($src_y) || $src_y < 0 || $src_y > 10000)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_y must be btween 0 and 10000');
 			
-		if($src_w < 0 || $src_w > 10000)
+		if(!is_numeric($src_w) || $src_w < 0 || $src_w > 10000)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_w must be btween 0 and 10000');
 			
-		if($src_h < 0 || $src_h > 10000)
+		if(!is_numeric($src_h) || $src_h < 0 || $src_h > 10000)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_h must be btween 0 and 10000');
 			
-		if($width < 0 || $width > 10000)
+		if(!is_numeric($width) || $width < 0 || $width > 10000)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'width must be btween 0 and 10000');
 			
-		if($height < 0 || $height > 10000)
+		if(!is_numeric($height) || $height < 0 || $height > 10000)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'height must be btween 0 and 10000');
 			
-		if($density < 0)
+		if(!is_numeric($density) || $density < 0)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'density must be positive');
 			
-		if($vid_sec < -1)
+		if(!is_numeric($vid_sec) || $vid_sec < -1)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'vid_sec must be positive');
 			
 		if(!preg_match('/^[0-9a-fA-F]{1,6}$/', $bgcolor))
