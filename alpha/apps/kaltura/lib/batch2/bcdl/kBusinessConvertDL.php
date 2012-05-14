@@ -194,7 +194,7 @@ class kBusinessConvertDL
 			/* @var $thumbAsset KalturaThumbAsset */
 			$thumbAsset->addTags(array(thumbParams::TAG_DEFAULT_THUMB));
 			$thumbAsset->save();
-			KalturaLog::DEBUG("Setting entry [". $thumbAsset->entryId ."] default ThumbAsset to [". $thumbAsset->id ."]");
+			KalturaLog::debug("Setting entry [". $thumbAsset->getEntryId() ."] default ThumbAsset to [". $thumbAsset->getId() ."]");
 		}
 		
 		$entry->setThumbnail(".jpg");
