@@ -188,7 +188,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw $e;
 		}
 		
-        if(!in_array($flavorAsset->getStatus(), $flavorAsset->getLocalReadyStatuses()))
+        if(!$flavorAsset->isLocalReadyStatus())
 			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 			
 		$flavorAsset->save();
@@ -285,7 +285,7 @@ class FlavorAssetService extends KalturaAssetService
         $fileSync = kFileSyncUtils::getLocalFileSyncForKey($newSyncKey, false);
         $fileSync = kFileSyncUtils::resolve($fileSync);
         
-        if(!in_array($flavorAsset->getStatus(), $flavorAsset->getLocalReadyStatuses()))
+        if(!$flavorAsset->isLocalReadyStatus())
 			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		
 		$flavorAsset->setSize($fileSync->getFileSize());
@@ -558,7 +558,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $dbEntry->getConversionProfileId());
 		
 		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
-		if (is_null($originalFlavorAsset) || !in_array($originalFlavorAsset->getStatus(), $originalFlavorAsset->getLocalReadyStatuses()))
+		if (is_null($originalFlavorAsset) || !$originalFlavorAsset->isLocalReadyStatus())
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 
 		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -647,7 +647,7 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$assetDb || !($assetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 
-		if (!in_array($assetDb->getStatus(), $assetDb->getLocalReadyStatuses()))
+		if (!$assetDb->isLocalReadyStatus())
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
 
 		if($storageId)

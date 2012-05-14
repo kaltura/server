@@ -15,7 +15,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			return true;
 		
 		// if changed object is flavor asset
-		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && in_array($object->getStatus(), $object->getLocalReadyStatuses()))
+		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 			return true;
 			
 		return false;		
@@ -38,7 +38,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 		
 		// if changed object is flavor asset
-		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && in_array($object->getStatus(), $object->getLocalReadyStatuses()))
+		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 		{
 			$entry = $object->getentry();
 			
@@ -214,10 +214,12 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		{
 			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($dbBatchJob->getPartnerId());
 			$sourceFlavor = assetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
-			if (!$sourceFlavor) {
+			if (!$sourceFlavor) 
+			{
 			    KalturaLog::debug('Cannot find source flavor for entry id ['.$dbBatchJob->getEntryId().']');
 			}
-			else if (!in_array($sourceFlavor->getStatus(), $sourceFlavor->getLocalReadyStatuses())) {
+			else if (!$sourceFlavor->isLocalReadyStatus()) 
+			{
 			    KalturaLog::debug('Source flavor id ['.$sourceFlavor->getId().'] has status ['.$sourceFlavor->getStatus().'] - not ready for export');
 			}
 			else

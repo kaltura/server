@@ -592,7 +592,7 @@ class myEntryUtils
 			if($flavorParamsId)
 				$flavorAsset = assetPeer::retrieveByEntryIdAndParams($source_entry->getId(), $flavorParamsId);
 				
-			if(is_null($flavorAsset) || !in_array($flavorAsset->getStatus(), $flavorAsset->getLocalReadyStatuses()))
+			if(is_null($flavorAsset) || !$flavorAsset->isLocalReadyStatus())
 				$flavorAsset = assetPeer::retrieveOriginalByEntryId($source_entry->getId());
 				
 			if (is_null($flavorAsset))

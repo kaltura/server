@@ -47,7 +47,7 @@ class kBusinessPreConvertDL
 		if($sourceAssetId)
 		{
 			$srcAsset = assetPeer::retrieveById($sourceAssetId);
-			if($srcAsset && in_array($srcAsset->getStatus(), $srcAsset->getLocalReadyStatuses()))
+			if($srcAsset && $srcAsset->isLocalReadyStatus())
 				return $srcAsset;
 		}
 		
@@ -55,19 +55,19 @@ class kBusinessPreConvertDL
 		{
 			KalturaLog::debug("Look for flavor params [$sourceParamsId]");
 			$srcAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $sourceParamsId);
-			if($srcAsset && in_array($srcAsset->getStatus(), $srcAsset->getLocalReadyStatuses()))
+			if($srcAsset && $srcAsset->isLocalReadyStatus())
 				return $srcAsset;
 		}
 					
 		KalturaLog::debug("Look for original flavor of entry [$entryId]");
 		$srcAsset = assetPeer::retrieveOriginalByEntryId($entryId);
-		if($srcAsset && in_array($srcAsset->getStatus(), $srcAsset->getLocalReadyStatuses()))
+		if($srcAsset && $srcAsset->isLocalReadyStatus())
 			return $srcAsset;
 					
 			
 		KalturaLog::debug("Look for highest bitrate flavor of entry [$entryId]");
 		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
-		if($srcAsset && in_array($srcAsset->getStatus(), $srcAsset->getLocalReadyStatuses()))
+		if($srcAsset && $srcAsset->isLocalReadyStatus())
 			return $srcAsset;
 			
 		return null;
@@ -392,7 +392,7 @@ class kBusinessPreConvertDL
 			return null;
 		}
 	
-		if ($originalFlavorAsset->getId() != $flavorAssetId && !in_array($originalFlavorAsset->getStatus(), $originalFlavorAsset->getLocalReadyStatuses()))
+		if ($originalFlavorAsset->getId() != $flavorAssetId && !$originalFlavorAsset->isLocalReadyStatus())
 		{
 			$errDescription = 'Original flavor asset not ready';
 			KalturaLog::err($errDescription);

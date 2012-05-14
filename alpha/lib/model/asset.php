@@ -495,12 +495,13 @@ class asset extends Baseasset implements ISyncableFile
 	 * @return array of asset status values that mean the asset is at post conversion status (ready locally)
 	 * Can be overwritten for specific asset types
 	 */
-	public function getLocalReadyStatuses()
+	public function isLocalReadyStatus()
 	{
-	    return array(
-	        asset::ASSET_STATUS_EXPORTING,
-	        asset::ASSET_STATUS_READY,
-	    );
+		$status = $this->getStatus();
+	    if($status == asset::ASSET_STATUS_EXPORTING || $status == asset::ASSET_STATUS_READY)
+	    	return true;
+	    	
+	    return false;
 	}
 	
     /**

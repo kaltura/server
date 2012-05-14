@@ -825,7 +825,7 @@ class kJobsManager
  		{
  			if($keepCurrentVersion)
  			{
- 				if(!in_array($asset->getStatus(), $asset->getLocalReadyStatuses()))
+ 				if(!$asset->isLocalReadyStatus())
 	 				$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
  			}
  			else 

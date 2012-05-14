@@ -22,8 +22,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return kFlowHelper::handleImportFinished($dbBatchJob, $data, $twinJob);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_IMPORTING);
-				return $dbBatchJob;
+				return kFlowHelper::handleImportFailed($dbBatchJob, $data, $twinJob);
 			default:
 				return $dbBatchJob;
 		}
