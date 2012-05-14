@@ -1222,5 +1222,18 @@ class kuser extends Basekuser implements IIndexable
 	
     public function setBulkUploadId ($bulkUploadId){$this->putInCustomData (self::BULK_UPLOAD_ID, $bulkUploadId);}
 	public function getBulkUploadId (){return $this->getFromCustomData(self::BULK_UPLOAD_ID);}
+
+	/**
+	 * Force modifiedColumns to be affected even if the value not changed
+	 * 
+	 * @see Basekuser::setUpdatedAt()
+	 */
+	public function setUpdatedAt($v)
+	{
+		parent::setUpdatedAt($v);
+		if(!in_array(kuserPeer::UPDATED_AT, $this->modifiedColumns, false))
+			$this->modifiedColumns[] = kuserPeer::UPDATED_AT;
 			
+		return $this;
+	}
 }

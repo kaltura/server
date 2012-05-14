@@ -1271,4 +1271,18 @@ class category extends Basecategory implements IIndexable
 			
 		return $this->getPrivacyContexts();
 	}
+	
+	/**
+	 * Force modifiedColumns to be affected even if the value not changed
+	 * 
+	 * @see Basecategory::setUpdatedAt()
+	 */
+	public function setUpdatedAt($v)
+	{
+		parent::setUpdatedAt($v);
+		if(!in_array(categoryPeer::UPDATED_AT, $this->modifiedColumns, false))
+			$this->modifiedColumns[] = categoryPeer::UPDATED_AT;
+			
+		return $this;
+	}
 }
