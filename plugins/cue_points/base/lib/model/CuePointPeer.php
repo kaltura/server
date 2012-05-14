@@ -41,11 +41,6 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
-	public function setPartnerId($partnerId)
-	{
-		self::addPartnerToCriteria($partnerId);
-	}
-	
 	public static function setDefaultCriteriaFilterByKuser()
 	{
 		if(self::$s_criteria_filter == null)
