@@ -1202,9 +1202,15 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
+		$noneValidStatuses = array(
+			FileSync::FILE_SYNC_STATUS_DELETED,
+			FileSync::FILE_SYNC_STATUS_PURGED,
+		);
+		
 		if(	$object instanceof FileSync 
 			&& $object->getLinkCount() 
 			&& in_array(FileSyncPeer::STATUS, $modifiedColumns)
+			&& !in_array($object->getStatus(), $noneValidStatuses)
 		)
 			return true;
 			
