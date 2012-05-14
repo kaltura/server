@@ -7,9 +7,12 @@ class DummyForDocsClientGenerator extends ClientGeneratorFromPhp
 	
 	public function DummyForDocsClientGenerator()
 	{
+	    ini_set("memory_limit", "256M");
+	    set_time_limit(600);
+	    
 		parent::ClientGeneratorFromPhp();
-		
 	}
+	
 	public function load()
 	{
 		parent::load();

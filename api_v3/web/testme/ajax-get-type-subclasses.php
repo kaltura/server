@@ -1,5 +1,4 @@
 <?php
-ini_set("memory_limit","256M");
 require_once("../../bootstrap.php");
 KalturaLog::setContext("TESTME");
 $type = $_GET["type"];
@@ -54,4 +53,3 @@ echo json_encode($subClasses);
 $bench_end = microtime(true);
 KalturaLog::INFO ( "<------- api_v3 testme type [$type][" . ($bench_end - $bench_start) . "] -------");
 
-?>

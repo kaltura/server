@@ -9,6 +9,7 @@ abstract class ClientGeneratorFromPhp
 	protected $_sourcePath = "";
 	protected $_typesToIgnore = array();
 	protected $_classMap = null;
+	protected $_typesClassMap = null;
 	protected $_excludePathList = array();
 	
 	protected $package = 'Kaltura';
@@ -360,8 +361,12 @@ abstract class ClientGeneratorFromPhp
 			
 		$this->addType($typeReflector);
 		
-		$this->initClassMap();
-		foreach($this->_classMap as $class => $path)
+		if(!$this->_typesClassMap)
+		{
+			$this->initClassMap();
+			$this->_typesClassMap = $this->_classMap;
+		}
+		foreach($this->_typesClassMap as $class => $path)
 		{
 			if (strpos($class, 'Kaltura') === 0 && strpos($class, '_') === false && strpos($path, 'api') !== false) // make sure the class is api object
 			{
@@ -372,6 +377,10 @@ abstract class ClientGeneratorFromPhp
 					if($classTypeReflector)
 						$this->loadTypesRecursive($classTypeReflector);
 				}
+			}
+			else
+			{
+				unset($this->_typesClassMap[$class]);
 			}
 		}
 	}

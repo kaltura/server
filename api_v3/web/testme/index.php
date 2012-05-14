@@ -15,7 +15,6 @@
 <script type="text/javascript" src="js/main.js?r35598"></script>
 </head> 
 	<?php 
-	    ini_set("memory_limit","256M");
 		require_once("../../bootstrap.php");
 		ActKeyUtils::checkCurrent();
 		KalturaLog::setContext("TESTME");
