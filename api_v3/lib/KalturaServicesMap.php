@@ -164,7 +164,7 @@ class KalturaServicesMap
      * @throws KalturaAPIException
      * @return KalturaServiceActionItem
      */
-    public static function retrieveServiceActionItemFromCache ($serviceId, $actionId)
+    public static function retrieveServiceActionItem($serviceId, $actionId)
 	{
         if (function_exists('apc_fetch'))
         {
