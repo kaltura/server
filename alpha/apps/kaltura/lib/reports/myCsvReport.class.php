@@ -36,8 +36,8 @@ class myCsvReport
 			{
 				$csv->addNewLine( $data , $value );
 			}	
-			else
-			{
+			else if($dimension)
+			{	
 				$csv->addNewLine( $csv->formatDate( myReportsMgr::formatDateFromDateId( $data ) ), $value );		
 			}
 			
