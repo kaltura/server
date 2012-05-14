@@ -54,6 +54,29 @@ class kFlowHelper
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
+	public static function handleImportFailed(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
+	{
+		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_IMPORTING);
+		
+		if($data->getFlavorAssetId())
+		{
+			$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+			if($flavorAsset && !$flavorAsset->isLocalReadyStatus())
+			{
+				$flavorAsset->setDescription($dbBatchJob->getMessage());
+				$flavorAsset->setStatus(asset::ASSET_STATUS_ERROR);
+				$flavorAsset->save();
+			}
+		}
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kImportJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
 	public static function handleImportFinished(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
 	{
 		KalturaLog::debug("Import finished, with file: " . $data->getDestFileLocalPath());
