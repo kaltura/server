@@ -1202,6 +1202,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$urlContentResource = $elementToSearchIn->urlContentResource;
 			$resource->url = kXml::getXmlAttributeAsString($urlContentResource, "url");
 		}
+		elseif(isset($elementToSearchIn->sshUrlContentResource))
+		{
+			KalturaLog::debug("Resource is : sshUrlContentResource");
+			$resource = new KalturaSshUrlResource();
+			$sshUrlContentResource = $elementToSearchIn->sshUrlContentResource;
+			$resource->url = kXml::getXmlAttributeAsString($sshUrlContentResource, "url");
+			$resource->privateKey = kXml::getXmlAttributeAsString($sshUrlContentResource, "privateKey");
+			$resource->publicKey = kXml::getXmlAttributeAsString($sshUrlContentResource, "publicKey");
+			$resource->keyPassphrase = kXml::getXmlAttributeAsString($sshUrlContentResource, "keyPassphrase");
+		}
 		elseif(isset($elementToSearchIn->remoteStorageContentResource))
 		{
 			KalturaLog::debug("Resource is : remoteStorageContentResource");

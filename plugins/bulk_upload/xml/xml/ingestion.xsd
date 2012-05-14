@@ -1,17 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
 
 	<xs:complexType name="T_mrss">
 		<xs:sequence>
-			<xs:element ref="channel" maxOccurs="unbounded" minOccurs="1">
+			<xs:element maxOccurs="unbounded" minOccurs="1" ref="channel">
 				<xs:annotation>
 					<xs:documentation>A single entry wrapper element</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 
-			<xs:element ref="mrss-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="mrss-extension"/>
 
 		</xs:sequence>
-		<xs:attribute name="version" use="optional" type="xs:decimal">
+		<xs:attribute name="version" type="xs:decimal" use="optional">
 			<xs:annotation>
 				<xs:documentation>
 					The XSD version to be used
@@ -22,20 +23,20 @@
 
 	<xs:complexType name="T_channel">
 		<xs:sequence>
-			<xs:element ref="item" maxOccurs="unbounded" minOccurs="1">
+			<xs:element maxOccurs="unbounded" minOccurs="1" ref="item">
 				<xs:annotation>
 					<xs:documentation>holding entry element</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 
-			<xs:element ref="channel-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="channel-extension"/>
 
 		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="T_item">
 		<xs:sequence>
-			<xs:element name="action" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" name="action">
 				<xs:annotation>
 					<xs:documentation>
 						The action to apply from the item element:<br/>
@@ -46,16 +47,16 @@
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:enumeration value="add" />
-						<xs:enumeration value="update" />
-						<xs:enumeration value="delete" />
+						<xs:enumeration value="add"/>
+						<xs:enumeration value="update"/>
+						<xs:enumeration value="delete"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:choice minOccurs="1" maxOccurs="2">
-				<xs:choice minOccurs="1" maxOccurs="1">
+			<xs:choice maxOccurs="2" minOccurs="1">
+				<xs:choice maxOccurs="1" minOccurs="1">
 					<xs:sequence>
-						<xs:element name="type" minOccurs="1" maxOccurs="1" type="KalturaEntryType">
+						<xs:element maxOccurs="1" minOccurs="1" name="type" type="KalturaEntryType">
 							<xs:annotation>
 								<xs:documentation>
 									The type of the new entry.<br/>
@@ -64,7 +65,7 @@
 								</xs:documentation>
 							</xs:annotation>
 						</xs:element>
-						<xs:element name="licenseType" minOccurs="0" maxOccurs="1" type="KalturaLicenseType">
+						<xs:element maxOccurs="1" minOccurs="0" name="licenseType" type="KalturaLicenseType">
 							<xs:annotation>
 								<xs:documentation>
 									The license type of the new entry.<br/>
@@ -73,7 +74,7 @@
 							</xs:annotation>
 						</xs:element>
 					</xs:sequence>
-					<xs:element name="entryId" minOccurs="1" maxOccurs="1">
+					<xs:element maxOccurs="1" minOccurs="1" name="entryId">
 						<xs:annotation>
 							<xs:documentation>
 								The identifier of the entry that an update/delete action applies to.<br/>
@@ -87,7 +88,7 @@
 						</xs:simpleType>
 					</xs:element>
 				</xs:choice>
-				<xs:element name="referenceId" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" name="referenceId">
 					<xs:annotation>
 						<xs:documentation>Partner external identifier of the entry</xs:documentation>
 					</xs:annotation>
@@ -98,7 +99,7 @@
 					</xs:simpleType>
 				</xs:element>
 			</xs:choice>
-			<xs:element name="userId" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" name="userId">
 				<xs:annotation>
 					<xs:documentation>The user identifier of the content creator/owner</xs:documentation>
 				</xs:annotation>
@@ -108,7 +109,7 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element name="name" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" name="name">
 				<xs:annotation>
 					<xs:documentation>The title of the entry</xs:documentation>
 				</xs:annotation>
@@ -118,22 +119,22 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string">
+			<xs:element maxOccurs="1" minOccurs="0" name="description" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Text that describes the entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" ref="tags">
 				<xs:annotation>
 					<xs:documentation>Tags associated with the entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="categories" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" ref="categories">
 				<xs:annotation>
 					<xs:documentation>The categories assigned to the entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="partnerData" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" name="partnerData">
 				<xs:annotation>
 					<xs:documentation>
 						Publisher-specific information related to the entry.<br/>
@@ -146,7 +147,7 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element name="partnerSortData" minOccurs="0" maxOccurs="1" type="xs:int">
+			<xs:element maxOccurs="1" minOccurs="0" name="partnerSortData" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>
 						Partner-specific order used to enable custom ordering and filtering.<br/>
@@ -154,13 +155,13 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:element name="accessControlId" minOccurs="1" maxOccurs="1" type="xs:int">
+			<xs:choice maxOccurs="1" minOccurs="0">
+				<xs:element maxOccurs="1" minOccurs="1" name="accessControlId" type="xs:int">
 					<xs:annotation>
 						<xs:documentation>The access control profile identifier of the entry. If not specified, the account's default access control profile is used.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="accessControl" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" name="accessControl">
 					<xs:annotation>
 						<xs:documentation>The access control profile system name of the entry. If not specified, the account's default access control profile is used. You can use the Kaltura API to set a specific access control system name.</xs:documentation>
 					</xs:annotation>
@@ -171,8 +172,8 @@
 					</xs:simpleType>
 				</xs:element>
 			</xs:choice>
-			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:element name="conversionProfileId" minOccurs="1" maxOccurs="1" type="xs:int">
+			<xs:choice maxOccurs="1" minOccurs="0">
+				<xs:element maxOccurs="1" minOccurs="1" name="conversionProfileId" type="xs:int">
 					<xs:annotation>
 						<xs:documentation>
 							The transcoding profile identifier of the entry.<br/>
@@ -181,7 +182,7 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="conversionProfile" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" name="conversionProfile">
 					<xs:annotation>
 						<xs:documentation>
 							The transcoding profile system name of the entry.<br/>
@@ -197,7 +198,7 @@
 					</xs:simpleType>
 				</xs:element>
 			</xs:choice>
-			<xs:element name="startDate" minOccurs="0" maxOccurs="1" type="xs:dateTime">
+			<xs:element maxOccurs="1" minOccurs="0" name="startDate" type="xs:dateTime">
 				<xs:annotation>
 					<xs:documentation>
 						The scheduled start date for the entry.<br/>
@@ -205,7 +206,7 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="endDate" minOccurs="0" maxOccurs="1" type="xs:dateTime">
+			<xs:element maxOccurs="1" minOccurs="0" name="endDate" type="xs:dateTime">
 				<xs:annotation>
 					<xs:documentation>
 						The scheduled end date for the entry.<br/>
@@ -214,8 +215,8 @@
 				</xs:annotation>
 			</xs:element>
 
-			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:element ref="media" minOccurs="1" maxOccurs="1">
+			<xs:choice maxOccurs="1" minOccurs="0">
+				<xs:element maxOccurs="1" minOccurs="1" ref="media">
 					<xs:annotation>
 						<xs:documentation>
 							Specifies media-related information, such as media type
@@ -231,21 +232,21 @@
 				-->
 			</xs:choice>
 			
-			<xs:element name="msDuration" minOccurs="0" maxOccurs="1" type="xs:int">
+			<xs:element maxOccurs="1" minOccurs="0" name="msDuration" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>
 						The duration in miliseconds
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="contentAssets" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" ref="contentAssets">
 				<xs:annotation>
 					<xs:documentation>
 						Specifies media/flavor asset information, such as location of media files to upload, type of ingestion, and related transcoding flavor settings
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="thumbnails" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" ref="thumbnails">
 				<xs:annotation>
 					<xs:documentation>
 						Specifies thumbnail-related information, such as location of media files and related thumbnail flavor settings
@@ -253,14 +254,14 @@
 				</xs:annotation>
 			</xs:element>
 
-			<xs:element ref="item-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="item-extension"/>
 
 		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="T_media">
 		<xs:sequence>
-			<xs:element name="mediaType" minOccurs="1" maxOccurs="1" type="KalturaMediaType">
+			<xs:element maxOccurs="1" minOccurs="1" name="mediaType" type="KalturaMediaType">
 				<xs:annotation>
 					<xs:documentation>
 						Specifies the entry media type.<br/>
@@ -277,7 +278,7 @@
 			</xs:element>
 			-->
 
-			<xs:element ref="media-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="media-extension"/>
 
 		</xs:sequence>
 	</xs:complexType>
@@ -398,8 +399,8 @@
 	-->
 
 	<xs:complexType name="T_serverFileContentResource">
-		<xs:choice minOccurs="0" maxOccurs="1">
-			<xs:element name="fileSize" type="xs:int" minOccurs="1" maxOccurs="1">
+		<xs:choice maxOccurs="1" minOccurs="0">
+			<xs:element maxOccurs="1" minOccurs="1" name="fileSize" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>
 						The expected size of the file.<br/>
@@ -407,7 +408,7 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="fileChecksum" minOccurs="1" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="1" name="fileChecksum">
 				<xs:annotation>
 					<xs:documentation>
 						The expected checksum of the file.<br/>
@@ -417,7 +418,7 @@
 				<xs:complexType>
 					<xs:simpleContent>
 						<xs:extension base="xs:string">
-							<xs:attribute name="type" use="optional" default="md5">
+							<xs:attribute default="md5" name="type" use="optional">
 								<xs:simpleType>
 									<xs:restriction base="xs:string">
 										<xs:enumeration value="md5"/>
@@ -459,16 +460,41 @@
 		</xs:attribute>
 	</xs:complexType>
 
+	<xs:complexType name="T_sshUrlContentResource">
+		<xs:sequence>
+			<xs:element maxOccurs="1" minOccurs="1" name="privateKey" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>The SSH private key string</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element maxOccurs="1" minOccurs="1" name="publicKey" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>The SSH public key string</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute ref="url" use="required">
+			<xs:annotation>
+				<xs:documentation>The URL location of the file</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="keyPassphrase" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>The SSH key pass phrase</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
 	<xs:complexType name="T_remoteStorageContentResource">
-		<xs:choice minOccurs="1" maxOccurs="1">
-			<xs:element name="storageProfileId" type="xs:int" minOccurs="1" maxOccurs="1">
+		<xs:choice maxOccurs="1" minOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="1" name="storageProfileId" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>
 						The identifier of the remote storage profile used as the source of content ingestion. Only links to the files on this remote storage are set from the entry, without actually uploading content to Kaltura. (The remote storage must be defined in Kaltura.)
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="storageProfile" minOccurs="1" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="1" name="storageProfile">
 				<xs:annotation>
 					<xs:documentation>
 						The system name of the remote storage profile used as the source of content ingestion. Only links to the files on this remote storage are set from the entry, without actually uploading content to Kaltura. (The remote storage must be defined in Kaltura.)
@@ -490,7 +516,7 @@
 
 	<xs:complexType name="T_remoteStorageContentResources">
 		<xs:sequence>
-			<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="unbounded">
+			<xs:element maxOccurs="unbounded" minOccurs="1" ref="remoteStorageContentResource">
 				<xs:annotation>
 					<xs:documentation>
 						Specifies that the content location is a path within a single remote storage defined in Kaltura.<br/> 
@@ -502,13 +528,13 @@
 	</xs:complexType>
 
 	<xs:complexType name="T_entryContentResource">
-		<xs:choice minOccurs="0" maxOccurs="1">
-			<xs:element name="flavorParamsId" type="xs:int" minOccurs="1" maxOccurs="1">
+		<xs:choice maxOccurs="1" minOccurs="0">
+			<xs:element maxOccurs="1" minOccurs="1" name="flavorParamsId" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>The flavor params identifier of the content origin entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="flavorParams" minOccurs="1" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="1" name="flavorParams">
 				<xs:annotation>
 					<xs:documentation>The flavor params system name of the content origin entry</xs:documentation>
 				</xs:annotation>
@@ -536,7 +562,7 @@
 
 	<xs:complexType name="T_content">
 		<xs:sequence>
-			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" ref="tags">
 				<xs:annotation>
 					<xs:documentation>
 						Specifies specific tags for the ingested flavor asset.<br/> 
@@ -545,8 +571,8 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:choice minOccurs="1" maxOccurs="1">
-				<xs:element ref="serverFileContentResource" minOccurs="1" maxOccurs="1">
+			<xs:choice maxOccurs="1" minOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" ref="serverFileContentResource">
 					<xs:annotation>
 						<xs:documentation>
 							Specifies that the content location is on a Kaltura-hosted server.<br/>
@@ -554,14 +580,21 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="urlContentResource" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" ref="urlContentResource">
 					<xs:annotation>
 						<xs:documentation>
 							Specifies that the content location is a URL (http/ftp)
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" ref="sshUrlContentResource">
+					<xs:annotation>
+						<xs:documentation>
+							Specifies that the content location is a URL (scp/sftp)
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element maxOccurs="1" minOccurs="1" ref="remoteStorageContentResource">
 					<xs:annotation>
 						<xs:documentation>
 							Specifies that the content location is a path within a remote storage defined in Kaltura.<br/> 
@@ -569,7 +602,7 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="remoteStorageContentResources" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" ref="remoteStorageContentResources">
 					<xs:annotation>
 						<xs:documentation>
 							Specifies that content is located within several remote storages defined in Kaltura.<br/> 
@@ -577,24 +610,24 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" ref="entryContentResource">
 					<xs:annotation>
 						<xs:documentation>
 							Specifies that the source of content ingestion is the content of an existing Kaltura entry
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" ref="assetContentResource">
 					<xs:annotation>
 						<xs:documentation>
 							Specifies that the source of content ingestion is a specific asset of an existing Kaltura entry
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="contentResource-extension" minOccurs="1" maxOccurs="1" />
+				<xs:element maxOccurs="1" minOccurs="1" ref="contentResource-extension"/>
 			</xs:choice>
 
-			<xs:element ref="content-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="content-extension"/>
 
 		</xs:sequence>
 		<xs:attribute name="flavorParamsId" type="xs:int" use="optional">
@@ -628,7 +661,7 @@
 	</xs:complexType>
 	<xs:complexType name="T_contentAssets">
 		<xs:sequence>
-			<xs:element name="action" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" name="action">
 				<xs:annotation>
 					<xs:documentation>
 						The action to apply from the item element:<br/>
@@ -638,12 +671,12 @@
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:enumeration value="update" />
-						<xs:enumeration value="replace" />
+						<xs:enumeration value="update"/>
+						<xs:enumeration value="replace"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element ref="content" maxOccurs="unbounded" minOccurs="0">
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="content">
 				<xs:annotation>
 					<xs:documentation>All Content Assets</xs:documentation>
 				</xs:annotation>
@@ -652,15 +685,15 @@
 	</xs:complexType>
 	<xs:complexType name="T_thumbnail">
 		<xs:sequence>
-			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" ref="tags">
 				<xs:annotation>
 					<xs:documentation>
 						Specifies specific user tags to set for the thumbnail asset
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:choice minOccurs="1" maxOccurs="1">
-				<xs:element ref="serverFileContentResource" minOccurs="1" maxOccurs="1">
+			<xs:choice maxOccurs="1" minOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" ref="serverFileContentResource">
 					<xs:annotation>
 						<xs:documentation>
 							Specifies that the thumbnail location is on a Kaltura-hosted server.<br/>
@@ -668,14 +701,21 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="urlContentResource" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" ref="urlContentResource">
 					<xs:annotation>
 						<xs:documentation>
 							Specifies that the thumbnail location is a URL (http/ftp)
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" ref="sshUrlContentResource">
+					<xs:annotation>
+						<xs:documentation>
+							Specifies that the content location is a URL (scp/sftp)
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element maxOccurs="1" minOccurs="1" ref="remoteStorageContentResource">
 					<xs:annotation>
 						<xs:documentation>
 							Specifies that the thumbnail location is a path within a remote storage defined in Kaltura.<br/>
@@ -683,7 +723,7 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="remoteStorageContentResources" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" ref="remoteStorageContentResources">
 					<xs:annotation>
 						<xs:documentation>
 							Specifies that the thumbnail is located within several remote storages defined in Kaltura.<br/> 
@@ -691,24 +731,24 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" ref="entryContentResource">
 					<xs:annotation>
 						<xs:documentation>
 							Specifies that the source of thumbnail ingestion is an existing Kaltura entry
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" ref="assetContentResource">
 					<xs:annotation>
 						<xs:documentation>
 							Specifies that the source of thumbnail ingestion is a specific asset of an existing Kaltura entry
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="contentResource-extension" minOccurs="1" maxOccurs="1" />
+				<xs:element maxOccurs="1" minOccurs="1" ref="contentResource-extension"/>
 			</xs:choice>
 
-			<xs:element ref="thumbnail-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="thumbnail-extension"/>
 
 		</xs:sequence>
 		<xs:attribute name="assetId" type="xs:string" use="optional">
@@ -718,21 +758,21 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="isDefault" type="xs:boolean" use="optional" default="false">
+		<xs:attribute default="false" name="isDefault" type="xs:boolean" use="optional">
 			<xs:annotation>
 				<xs:documentation>
 					Specifies whether this thumbnail is set as the default thumbnail of the entry.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="thumbParamsId" type="xs:int" use="optional" >
+		<xs:attribute name="thumbParamsId" type="xs:int" use="optional">
 			<xs:annotation>
 				<xs:documentation>
 					The identifier of the thumb params to be associated with this thumbnail asset.  This is the thumbnail params identifier across partner entries. The identifier can be used to filter content.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="thumbParams" use="optional" >
+		<xs:attribute name="thumbParams" use="optional">
 			<xs:annotation>
 				<xs:documentation>
 					The thumb params system name to be associated with this thumbnail asset. This is the thumbnail params identifier across partner entries. The identifier can be used to filter content.
@@ -747,7 +787,7 @@
 	</xs:complexType>
 	<xs:complexType name="T_thumbnails">
 		<xs:sequence>
-			<xs:element name="action" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" name="action">
 				<xs:annotation>
 					<xs:documentation>
 						The action to apply from the item element:<br/>
@@ -757,12 +797,12 @@
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:enumeration value="update" />
-						<xs:enumeration value="replace" />
+						<xs:enumeration value="update"/>
+						<xs:enumeration value="replace"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element ref="thumbnail" maxOccurs="unbounded" minOccurs="0">
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="thumbnail">
 				<xs:annotation>
 					<xs:documentation>All Thumbnails Assets</xs:documentation>
 				</xs:annotation>
@@ -777,13 +817,13 @@
 
 	<xs:complexType name="T_tags">
 		<xs:sequence>
-			<xs:element name="tag" minOccurs="0" maxOccurs="unbounded">
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="tag">
 				<xs:annotation>
 					<xs:documentation>Specifies a single tag to set for a related object</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:maxLength value="30" />
+						<xs:maxLength value="30"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
@@ -792,7 +832,7 @@
 
 	<xs:complexType name="T_categories">
 		<xs:sequence>
-			<xs:element name="category" type="xs:string" minOccurs="0" maxOccurs="32">
+			<xs:element maxOccurs="32" minOccurs="0" name="category" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Specifies a single category assigned to an entry. Use the &gt; character (`&amp;gt;`) to indicate the position of the category in the category tree hierarchy</xs:documentation>
 				</xs:annotation>
@@ -1040,9 +1080,9 @@
 	<xs:element name="bitrates" type="T_bitrates" />
 	-->
 
-	<xs:attribute name="url" type="T_url" />
+	<xs:attribute name="url" type="T_url"/>
 
-	<xs:element name="contentResource-extension" />
+	<xs:element name="contentResource-extension"/>
 	<xs:element name="serverFileContentResource" type="T_serverFileContentResource">
 		<xs:annotation>
 			<xs:documentation>Specifies that the location of content ingestion is on a Kaltura-hosted server. By default, this option is not available to Kaltura partners.</xs:documentation>
@@ -1097,6 +1137,44 @@
 						<thumbnails>
 							<thumbnail>
 								<urlContentResource url="http://my.domain/path/thumb.jpg"/>
+							</thumbnail>
+						</thumbnails>
+					</item>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="sshUrlContentResource" type="T_sshUrlContentResource">
+		<xs:annotation>
+			<xs:documentation>Specifies that the location of content ingestion is a URL (scp/sftp)</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<contentAssets>
+							<content>
+								<sshUrlContentResource url="sftp://user@my.domain/path/video.mp4">
+									<privateKey>-----BEGIN RSA PRIVATE KEY-----
+MIIEoQIBAAKCAQEAxVOIocT3q+aQKUvs53LOnxokoJUtZXKHL+LArNl4a3dhZ8wY
+ZPGwodSydB/jo4aHKZztA0YCPd3LOnxoko3LOnxokoJUtCM/DdVGQfb/0+PpWzPe
+KIGdzIl3LOoJUtfOAMS6nC3LOnxJUt33LOnxnxokoJUtXN1ej06CYPR5ZfwKFFIO
+tK1yWx3LOnxokoJUtNRSdEi</privateKey>
+									<publicKey>ssh-rsa AAAAB3NzaC1yc2l4a3dhZ8wYEAAxVOIocT3q+aQKUvs5omvVdPl4a3dhZ8wY+LArTNl4a3dhZ8wl4a3dhZ8wY/jo4aHKZztA0YCPd3LOnxokoJUtACM/Dm0wq67dVGQfb/0+PpWzPeCKIGdEEPAzIlfOAMS6nC3Hy3ydBFbi5IJtbGmXN1ej06CYPR5ZfwKAD8FFIOa7dMYtK1yWxNRSdEih00Z8vEiiAkoEHDatRMKVbluqdPVTleQzgqnYL/45l4a3dhZ8wYnbItnQYQgyxGbYgmMMVGGZsZnpRhRtvhAUOsQoixRC14sKHsl4a3dhZ8wY/l4a3dhZ8wY+qbHEaDdl4a3dhZ8wY/QWnhlhKQwIzXl4a3dhZ8wY== user@my.domain</publicKey>
+								</sshUrlContentResource>
+							</content>
+						</contentAssets>
+						<thumbnails>
+							<thumbnail>
+								<sshUrlContentResource url="scp://user@my.domain/path/thumb.jpg">
+									<privateKey>-----BEGIN RSA PRIVATE KEY-----
+MIIEoQIBAAKCAQEAxVOIocT3q+aQKUvs53LOnxokoJUtZXKHL+LArNl4a3dhZ8wY
+ZPGwodSydB/jo4aHKZztA0YCPd3LOnxoko3LOnxokoJUtCM/DdVGQfb/0+PpWzPe
+KIGdzIl3LOoJUtfOAMS6nC3LOnxJUt33LOnxnxokoJUtXN1ej06CYPR5ZfwKFFIO
+tK1yWx3LOnxokoJUtNRSdEi</privateKey>
+									<publicKey>ssh-rsa AAAAB3NzaC1yc2l4a3dhZ8wYEAAxVOIocT3q+aQKUvs5omvVdPl4a3dhZ8wY+LArTNl4a3dhZ8wl4a3dhZ8wY/jo4aHKZztA0YCPd3LOnxokoJUtACM/Dm0wq67dVGQfb/0+PpWzPeCKIGdEEPAzIlfOAMS6nC3Hy3ydBFbi5IJtbGmXN1ej06CYPR5ZfwKAD8FFIOa7dMYtK1yWxNRSdEih00Z8vEiiAkoEHDatRMKVbluqdPVTleQzgqnYL/45l4a3dhZ8wYnbItnQYQgyxGbYgmMMVGGZsZnpRhRtvhAUOsQoixRC14sKHsl4a3dhZ8wY/l4a3dhZ8wY+qbHEaDdl4a3dhZ8wY/QWnhlhKQwIzXl4a3dhZ8wY== user@my.domain</publicKey>
+								</sshUrlContentResource>
 							</thumbnail>
 						</thumbnails>
 					</item>
@@ -1236,16 +1314,16 @@
 		</xs:annotation>
 	</xs:element>
 
-	<xs:element name="mrss-extension" />
-	<xs:element name="channel-extension" />
-	<xs:element name="item-extension" />
-	<xs:element name="media-extension" />
-	<xs:element name="mix-extension" />
-	<xs:element name="playlist-extension" />
-	<xs:element name="data-extension" />
-	<xs:element name="liveStream-extension" />
-	<xs:element name="document-extension" />
-	<xs:element name="content-extension" />
-	<xs:element name="thumbnail-extension" />
+	<xs:element name="mrss-extension"/>
+	<xs:element name="channel-extension"/>
+	<xs:element name="item-extension"/>
+	<xs:element name="media-extension"/>
+	<xs:element name="mix-extension"/>
+	<xs:element name="playlist-extension"/>
+	<xs:element name="data-extension"/>
+	<xs:element name="liveStream-extension"/>
+	<xs:element name="document-extension"/>
+	<xs:element name="content-extension"/>
+	<xs:element name="thumbnail-extension"/>
 
 </xs:schema>
