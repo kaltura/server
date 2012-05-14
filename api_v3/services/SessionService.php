@@ -165,8 +165,13 @@ class SessionService extends KalturaBaseService
 		// TODO - decide !! - for now only view - any kshow
 		$privileges = "view:*,widget:1";
 		
-		if(!$widget->getEnforceEntitlement() && $widget->getEntryId())
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId) &&
+			!$widget->getEnforceEntitlement() && $widget->getEntryId())
 			$privileges .= ','. kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY . ':' . $widget->getEntryId();
+			
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId) &&
+			!is_null($widget->getPrivacyContext()) && $widget->getPrivacyContext() != '' )
+			$privileges .= ','. kSessionBase::PRIVILEGE_PRIVACY_CONTEXT . ':' . $widget->getPrivacyContext();
 		
 		$userId = 0;
 		/*if ( $widget->getSecurityType() == widget::WIDGET_SECURITY_TYPE_FORCE_KS )

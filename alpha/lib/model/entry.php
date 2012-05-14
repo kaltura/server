@@ -2766,9 +2766,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$entitledKusersPublish = explode(',', $this->getEntitledKusersPublish());
 		$entitledKusersEdit = explode(',', $this->getEntitledKusersEdit());
 		$entitledKusers = array_merge($entitledKusersPublish, $entitledKusersEdit);
+		$entitledKusers[] = $this->getKuserId();
+		$entitledKusers[] = $this->getCreatorKuserId();
+		
+		$entitledKusers = array_unique($entitledKusers);
 		
 		if ($this->getAllCategoriesIds() == '')
-			return implode(',', $entitledKusers);
+			return implode(' ', $entitledKusers);
 		
 		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
 		$partner = $this->getPartner();
@@ -2788,6 +2792,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		//get all memebrs
 		foreach ($categories as $category)
 			$entitledKusers = array_merge($entitledKusers, explode(',', $category->getMembers()));
+		
+		$entitledKusers = array_unique($entitledKusers);
 		
 		return implode(',', $entitledKusers);
 	}

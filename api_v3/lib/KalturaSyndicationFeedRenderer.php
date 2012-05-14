@@ -92,6 +92,11 @@ class KalturaSyndicationFeedRenderer
 		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
 		if( !$syndicationFeedDB )
 			throw new Exception("Feed Id not found");
+		
+		kEntitlementUtils::initEntitlementEnforcement($syndicationFeedDB->getPartnerId(), $syndicationFeedDB->getEnforceEntitlement());
+		
+		if(!is_null($syndicationFeedDB->getPrivacyContext()) && $syndicationFeedDB->getPrivacyContext() != '')
+			kEntitlementUtils::setPrivacyContextSearch($syndicationFeedDB->getPrivacyContext());
 			
 		$tmpSyndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
 		$tmpSyndicationFeed->fromObject($syndicationFeedDB);

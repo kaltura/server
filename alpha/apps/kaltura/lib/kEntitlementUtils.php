@@ -11,7 +11,7 @@ class kEntitlementUtils
 	const PRIVACY_CONTEXT_PREFIX = 'pc_pre_';
 	
 	protected static $entitlementEnforcement = false;  
-	
+	protected static $privacyContextSearch = null;	
 	
 	public static function getEntitlementEnforcement()
 	{
@@ -137,9 +137,11 @@ class kEntitlementUtils
 	 * @param int $kuser
 	 * @return bool
 	 */
-	public static function initEntitlementEnforcement()
+	public static function initEntitlementEnforcement($partnerId = null, $enableEntit = null)
 	{
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id; 
+		if(is_null($partnerId))
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			 
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$partner)
 			return;
@@ -167,6 +169,14 @@ class kEntitlementUtils
 			if ($enableEntitlement)
 				self::$entitlementEnforcement = true;
 		}
+		
+		if(!is_null($enableEntit))
+		{
+			if($enableEntit)
+				self::$entitlementEnforcement = true;
+			else
+				self::$entitlementEnforcement = false;
+		}
 			
 		if (self::$entitlementEnforcement)
 		{
@@ -177,11 +187,14 @@ class kEntitlementUtils
 	
 	public static function getPrivacyContextSearch()
 	{
+		if (self::$privacyContextSearch)
+			return self::$privacyContextSearch;
+			 
 		$privacyContextSearch = array();
 			
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		if(!$ks)
-			return array(self::PRIVACY_CONTEXT_PREFIX . self::DEFAULT_CONTEXT.
+			return array(self::PRIVACY_CONTEXT_PREFIX . self::DEFAULT_CONTEXT .
 						 ' ' . PrivacyType::ALL . ' ' . self::PRIVACY_CONTEXT_PREFIX . self::DEFAULT_CONTEXT);
 			
 		$ksPrivacyContexts = $ks->getPrivacyContext();
@@ -199,7 +212,14 @@ class kEntitlementUtils
 				$privacyContextSearch[] = self::PRIVACY_CONTEXT_PREFIX . $ksPrivacyContext . ' ' . PrivacyType::AUTHENTICATED_USERS . ' ' . self::PRIVACY_CONTEXT_PREFIX . $ksPrivacyContext;
 		}
 		
+		self::$privacyContextSearch = $privacyContextSearch;
+			 
 		return $privacyContextSearch;
+	}
+	
+	public static function setPrivacyContextSearch($privacyContextSearch)
+	{
+		self::$privacyContextSearch = array(self::PRIVACY_CONTEXT_PREFIX . $privacyContextSearch . ' ' . PrivacyType::ALL . ' ' . self::PRIVACY_CONTEXT_PREFIX . $privacyContextSearch);
 	}
 	
 	public static function getPrivacyContextForEntry(entry $entry)

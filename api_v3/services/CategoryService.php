@@ -266,6 +266,9 @@ class CategoryService extends KalturaBaseService
 		
 		foreach($categories as $categoryId)
 		{
+			if($categoryId == '')
+				continue;
+				
 			$dbCategory = categoryPeer::retrieveByPK($categoryId);
 			if (!$dbCategory)
 				throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
