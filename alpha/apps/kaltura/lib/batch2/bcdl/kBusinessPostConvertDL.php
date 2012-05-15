@@ -185,7 +185,6 @@ class kBusinessPostConvertDL
 		
 		// go over all the flavor assets of the entry
 		$inCompleteFlavorIds = array();
-		$exportOriginalAsset = false;
 		$origianlAssetFlavorId = null;
 		$siblingFlavorAssets = assetPeer::retrieveFlavorsByEntryId($currentFlavorAsset->getEntryId());
 		foreach($siblingFlavorAssets as $siblingFlavorAsset)
@@ -208,7 +207,6 @@ class kBusinessPostConvertDL
 			{
 			    if ($siblingFlavorAsset->getIsOriginal())
 			    {
-			        $exportOriginalAsset = true;
 			        $origianlAssetFlavorId = $siblingFlavorAsset->getFlavorParamsId();
 			    }
 			    else if ($readyBehavior != flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)
@@ -266,7 +264,7 @@ class kBusinessPostConvertDL
 			}
 		}
 		
-		if ($exportOriginalAsset) {
+		if ($origianlAssetFlavorId) {
 		    $inCompleteFlavorIds = array_diff($inCompleteFlavorIds, array($origianlAssetFlavorId));
 		}
 		
@@ -274,7 +272,7 @@ class kBusinessPostConvertDL
 		{
 			KalturaLog::debug('Convert Finished');
 			
-			if($exportOriginalAsset && $rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
+			if($origianlAssetFlavorId && $rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 			{
         		kStorageExporter::exportSourceAssetFromJob($rootBatchJob);
 			}
