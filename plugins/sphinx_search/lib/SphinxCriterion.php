@@ -189,6 +189,9 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				// fallthrough
 				
 			default:
+				if(is_bool($value))
+					$value = intval($value);
+					
 				if (!(($type == IIndexable::FIELD_TYPE_INTEGER || $type == IIndexable::FIELD_TYPE_DATETIME) && !is_numeric($value)))
 					$thisClause[] = "$sphinxField $comparison $value";
 				break;
