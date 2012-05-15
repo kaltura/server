@@ -404,6 +404,9 @@ class requestUtils
     			case "ts":
     				$content_type ="video/MP2T";
     				break;
+			case "3gp":
+				$content_type ="video/3gpp";
+				break;
     			default:
     				$content_type ="image/$ext";
     				break;
