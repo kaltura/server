@@ -228,6 +228,14 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected function getTypeClassInfo($className)
 	{
+		if($className == 'KalturaObjectBase')
+		{
+			$classInfo = new PhpZend2ClientGeneratorClassInfo();
+			$classInfo->setClassName($className);
+			$classInfo->setNamespace("Kaltura\\Client\\Type");
+			return $classInfo;
+		}
+		
 		if(!isset($this->cacheTypes[$className]))
 			throw new Exception("Class info for {$className} not found");
 		
