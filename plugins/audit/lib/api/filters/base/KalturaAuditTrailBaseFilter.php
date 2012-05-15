@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaAuditTrailBaseFilter extends KalturaFilter
+abstract class KalturaAuditTrailBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -66,260 +66,186 @@ class KalturaAuditTrailBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $parsedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $parsedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaAuditTrailStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaAuditTrailObjectType
 	 */
 	public $auditObjectTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $auditObjectTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $objectIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $objectIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $relatedObjectIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $relatedObjectIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaAuditTrailObjectType
 	 */
 	public $relatedObjectTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $relatedObjectTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $entryIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $entryIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $masterPartnerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $masterPartnerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $partnerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $requestIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $requestIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $userIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $userIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaAuditTrailAction
 	 */
 	public $actionEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $actionIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $ksEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaAuditTrailContext
 	 */
 	public $contextEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $contextIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $entryPointEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $entryPointIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $serverNameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $serverNameIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $ipAddressEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $ipAddressIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $clientTagEqual;

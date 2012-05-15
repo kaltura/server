@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaVerizonVcastDistributionProviderBaseFilter extends KalturaDistributionProviderFilter
+abstract class KalturaVerizonVcastDistributionProviderBaseFilter extends KalturaDistributionProviderFilter
 {
 	private $map_between_objects = array
 	(

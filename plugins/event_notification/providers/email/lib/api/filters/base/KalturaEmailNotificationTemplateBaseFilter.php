@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaEmailNotificationTemplateBaseFilter extends KalturaEventNotificationTemplateFilter
+abstract class KalturaEmailNotificationTemplateBaseFilter extends KalturaEventNotificationTemplateFilter
 {
 	private $map_between_objects = array
 	(

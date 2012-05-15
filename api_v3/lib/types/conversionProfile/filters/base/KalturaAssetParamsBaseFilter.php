@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaAssetParamsBaseFilter extends KalturaFilter
+abstract class KalturaAssetParamsBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -29,29 +29,21 @@ class KalturaAssetParamsBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaNullableBoolean
 	 */
 	public $isSystemDefaultEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsEqual;

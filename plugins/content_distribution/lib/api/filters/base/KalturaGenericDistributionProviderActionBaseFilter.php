@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaGenericDistributionProviderActionBaseFilter extends KalturaFilter
+abstract class KalturaGenericDistributionProviderActionBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -39,71 +39,51 @@ class KalturaGenericDistributionProviderActionBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $genericDistributionProviderIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $genericDistributionProviderIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaDistributionAction
 	 */
 	public $actionEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $actionIn;

@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
+abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 {
 	private $map_between_objects = array
 	(
@@ -42,64 +42,46 @@ class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $durationLessThan;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $durationGreaterThan;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $durationLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $durationGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $msDurationLessThan;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $msDurationGreaterThan;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $msDurationLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $msDurationGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $durationTypeMatchOr;

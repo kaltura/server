@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaEventNotificationTemplateBaseFilter extends KalturaFilter
+abstract class KalturaEventNotificationTemplateBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -43,86 +43,62 @@ class KalturaEventNotificationTemplateBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $partnerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaEventNotificationTemplateType
 	 */
 	public $typeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @dynamicType KalturaEventNotificationTemplateType
 	 * @var string
 	 */
 	public $typeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaEventNotificationTemplateStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;

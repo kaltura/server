@@ -4,7 +4,7 @@
  * @subpackage api.objects
  * @abstract
  */
-class KalturaDistributionProvider extends KalturaObject implements IFilterable
+abstract class KalturaDistributionProvider extends KalturaObject implements IFilterable
 {
 	/**
 	 * @readonly

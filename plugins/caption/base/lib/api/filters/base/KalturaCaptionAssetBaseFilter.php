@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaCaptionAssetBaseFilter extends KalturaAssetFilter
+abstract class KalturaCaptionAssetBaseFilter extends KalturaAssetFilter
 {
 	private $map_between_objects = array
 	(
@@ -32,51 +32,37 @@ class KalturaCaptionAssetBaseFilter extends KalturaAssetFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $captionParamsIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $captionParamsIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaCaptionType
 	 */
 	public $formatEqual;
 
 	/**
-	 * 
-	 * 
 	 * @dynamicType KalturaCaptionType
 	 * @var string
 	 */
 	public $formatIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaCaptionAssetStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusNotIn;

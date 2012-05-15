@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaVirusScanProfileBaseFilter extends KalturaFilter
+abstract class KalturaVirusScanProfileBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -43,99 +43,71 @@ class KalturaVirusScanProfileBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $partnerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $nameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $nameLike;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaVirusScanProfileStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaVirusScanEngineType
 	 */
 	public $engineTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @dynamicType KalturaVirusScanEngineType
 	 * @var string
 	 */

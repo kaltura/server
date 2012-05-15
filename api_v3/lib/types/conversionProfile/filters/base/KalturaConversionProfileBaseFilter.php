@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaConversionProfileBaseFilter extends KalturaFilter
+abstract class KalturaConversionProfileBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -38,79 +38,57 @@ class KalturaConversionProfileBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaConversionProfileStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @dynamicType KalturaConversionProfileStatus
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $nameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $defaultEntryIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $defaultEntryIdIn;

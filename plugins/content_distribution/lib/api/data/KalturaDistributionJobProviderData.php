@@ -4,7 +4,7 @@
  * @subpackage api.objects
  * @abstract
  */
-class KalturaDistributionJobProviderData extends KalturaObject
+abstract class KalturaDistributionJobProviderData extends KalturaObject
 {
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{

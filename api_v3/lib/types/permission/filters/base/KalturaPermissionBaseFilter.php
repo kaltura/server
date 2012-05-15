@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaPermissionBaseFilter extends KalturaFilter
+abstract class KalturaPermissionBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -53,141 +53,101 @@ class KalturaPermissionBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaPermissionType
 	 */
 	public $typeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $typeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $nameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $nameIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $friendlyNameLike;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $descriptionLike;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaPermissionStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $partnerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $dependsOnPermissionNamesMultiLikeOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $dependsOnPermissionNamesMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;

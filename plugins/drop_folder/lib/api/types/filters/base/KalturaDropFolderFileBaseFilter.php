@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaDropFolderFileBaseFilter extends KalturaFilter
+abstract class KalturaDropFolderFileBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -64,163 +64,117 @@ class KalturaDropFolderFileBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $partnerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $dropFolderIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $dropFolderIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $fileNameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $fileNameIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $fileNameLike;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaDropFolderFileStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $parsedSlugEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $parsedSlugIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $parsedSlugLike;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $parsedFlavorEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $parsedFlavorIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $parsedFlavorLike;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaDropFolderFileErrorCode
 	 */
 	public $errorCodeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @dynamicType KalturaDropFolderFileErrorCode
 	 * @var string
 	 */
 	public $errorCodeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;

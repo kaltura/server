@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaShortLinkBaseFilter extends KalturaFilter
+abstract class KalturaShortLinkBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -47,113 +47,81 @@ class KalturaShortLinkBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $expiresAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $expiresAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $partnerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $userIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $userIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaShortLinkStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;

@@ -4,7 +4,7 @@
  * @subpackage api.objects
  * @abstract
  */
-class KalturaDistributionProfile extends KalturaObject implements IFilterable
+abstract class KalturaDistributionProfile extends KalturaObject implements IFilterable
 {
 	/**
 	 * Auto generated unique id

@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaPartnerBaseFilter extends KalturaFilter
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -51,78 +51,56 @@ class KalturaPartnerBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $nameLike;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $nameMultiLikeOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $nameMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $nameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaPartnerStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerPackageEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerPackageGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerPackageLessThanOrEqual;

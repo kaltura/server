@@ -4,7 +4,7 @@
  * @subpackage objects
  * @abstract
  */
-class KalturaMatchCondition extends KalturaCondition
+abstract class KalturaMatchCondition extends KalturaCondition
 {
 	/**
 	 * @var KalturaStringValueArray

@@ -142,7 +142,7 @@ else
 	{
 		$columns[] = 'Value';
 	}
-	elseif (!$typeReflector->getInstance() instanceof KalturaFilter)
+	elseif (!$typeReflector->isFilter())
 	{
 		$columns[] = 'Writable';
 	}
@@ -283,7 +283,7 @@ else
 		echo '</table></td></tr>';
 	}
 	
-	KalturaTypeReflector::setClassInheritMapPath($cachePath . "/classInheritMap.cache");
+	KalturaTypeReflector::setClassInheritMapPath(KAutoloader::buildPath(kConf::get("cache_root_path"), "api_v3", "KalturaClassInheritMap.cache"));
 	if(!KalturaTypeReflector::hasClassInheritMapCache())
 	{
 		$config = new Zend_Config_Ini("../../config/testme.ini", null, array('allowModifications' => true));

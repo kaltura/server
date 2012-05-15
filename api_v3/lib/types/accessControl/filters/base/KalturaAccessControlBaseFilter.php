@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaAccessControlBaseFilter extends KalturaFilter
+abstract class KalturaAccessControlBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -33,43 +33,31 @@ class KalturaAccessControlBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;

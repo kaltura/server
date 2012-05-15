@@ -55,6 +55,10 @@ abstract class ClientGeneratorFromPhp
 		
 		if (is_dir($sourcePath))
 			$this->addSourceFiles($this->_sourcePath);	
+
+		$typesClassMapPath = $this->getTypesClassMapPath();
+		if(file_exists($typesClassMapPath))
+			$this->_typesClassMap = unserialize(file_get_contents($typesClassMapPath));
 	}
 	
 	public function getOutputFiles()
@@ -354,6 +358,16 @@ abstract class ClientGeneratorFromPhp
 		$this->loadChildTypes($typeReflector);
 	}
 	
+	protected function getTypesClassMapPath()
+	{
+		$class = get_class($this);
+		$dir = kConf::get("cache_root_path") . "/generator";
+		if(!file_exists($dir))
+			mkdir($dir, 0655, true);
+			
+		return "$dir/$class.typeClassMap.cache";
+	}
+	
 	private function loadChildTypes(KalturaTypeReflector $typeReflector)
 	{
 		if (isset($this->_types[$typeReflector->getType()]))
@@ -361,10 +375,12 @@ abstract class ClientGeneratorFromPhp
 			
 		$this->addType($typeReflector);
 		
+		$cacheTypesClassMap = false;
 		if(!$this->_typesClassMap)
 		{
 			$this->initClassMap();
 			$this->_typesClassMap = $this->_classMap;
+			$cacheTypesClassMap = true;
 		}
 		foreach($this->_typesClassMap as $class => $path)
 		{
@@ -382,6 +398,11 @@ abstract class ClientGeneratorFromPhp
 			{
 				unset($this->_typesClassMap[$class]);
 			}
+		}
+		
+		if($cacheTypesClassMap)
+		{
+			file_put_contents($this->getTypesClassMapPath(), serialize($this->_typesClassMap));
 		}
 	}
 	

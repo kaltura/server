@@ -4,7 +4,7 @@
  * @subpackage filters
  * @abstract
  */
-class KalturaSearchItem extends KalturaObject
+abstract class KalturaSearchItem extends KalturaObject
 {
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{

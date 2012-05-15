@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaMixEntryBaseFilter extends KalturaPlayableEntryFilter
+abstract class KalturaMixEntryBaseFilter extends KalturaPlayableEntryFilter
 {
 	private $map_between_objects = array
 	(

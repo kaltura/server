@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaUserBaseFilter extends KalturaFilter
+abstract class KalturaUserBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -41,85 +41,61 @@ class KalturaUserBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $screenNameLike;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $screenNameStartsWith;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $emailLike;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $emailStartsWith;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaUserStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var bool
 	 */
 	public $isAdminEqual;

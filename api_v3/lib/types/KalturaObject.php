@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaObject 
+abstract class KalturaObject 
 {
 	protected function getReadOnly ()
 	{

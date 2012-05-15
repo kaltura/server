@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaFileSyncBaseFilter extends KalturaFilter
+abstract class KalturaFileSyncBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -64,206 +64,148 @@ class KalturaFileSyncBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaFileSyncObjectType
 	 */
 	public $fileObjectTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @dynamicType KalturaFileSyncObjectType
 	 * @var string
 	 */
 	public $fileObjectTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $objectIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $objectIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $versionEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $versionIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $objectSubTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $objectSubTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $dcEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $dcIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $originalEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $readyAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $readyAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $syncTimeGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $syncTimeLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaFileSyncStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaFileSyncType
 	 */
 	public $fileTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $fileTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $linkedIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $linkCountGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $linkCountLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
-	 * @var int
+	 * @var float
 	 */
 	public $fileSizeGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
-	 * @var int
+	 * @var float
 	 */
 	public $fileSizeLessThanOrEqual;
 }

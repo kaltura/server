@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaStorageProfileBaseFilter extends KalturaFilter
+abstract class KalturaStorageProfileBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -43,99 +43,71 @@ class KalturaStorageProfileBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $partnerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaStorageProfileStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaStorageProfileProtocol
 	 */
 	public $protocolEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $protocolIn;

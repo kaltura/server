@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaUiConfBaseFilter extends KalturaFilter
+abstract class KalturaUiConfBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -44,106 +44,76 @@ class KalturaUiConfBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $nameLike;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $partnerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaUiConfObjType
 	 */
 	public $objTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $objTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaUiConfCreationMode
 	 */
 	public $creationModeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $creationModeIn;

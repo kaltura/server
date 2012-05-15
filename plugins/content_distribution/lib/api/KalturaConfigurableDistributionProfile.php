@@ -4,7 +4,7 @@
  * @subpackage api.objects
  * @abstract
  */
-class KalturaConfigurableDistributionProfile extends KalturaDistributionProfile
+abstract class KalturaConfigurableDistributionProfile extends KalturaDistributionProfile
 {
 
 	/**

@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaDropFolderBaseFilter extends KalturaFilter
+abstract class KalturaDropFolderBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -59,185 +59,133 @@ class KalturaDropFolderBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $partnerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $nameLike;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaDropFolderType
 	 */
 	public $typeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @dynamicType KalturaDropFolderType
 	 * @var string
 	 */
 	public $typeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaDropFolderStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $conversionProfileIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $conversionProfileIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $dcEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $dcIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $pathLike;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaDropFolderFileHandlerType
 	 */
 	public $fileHandlerTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @dynamicType KalturaDropFolderFileHandlerType
 	 * @var string
 	 */
 	public $fileHandlerTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $fileNamePatternsLike;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $fileNamePatternsMultiLikeOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $fileNamePatternsMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsLike;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;

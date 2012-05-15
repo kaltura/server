@@ -6,7 +6,7 @@
  * @subpackage objects
  * @abstract
  */
-class KalturaOperationAttributes extends KalturaObject 
+abstract class KalturaOperationAttributes extends KalturaObject 
 {
 	public function toAttributesArray()
 	{

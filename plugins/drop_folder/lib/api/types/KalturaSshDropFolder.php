@@ -5,7 +5,7 @@
  * @subpackage api.objects
  * @abstract
  */
-class KalturaSshDropFolder extends KalturaRemoteDropFolder
+abstract class KalturaSshDropFolder extends KalturaRemoteDropFolder
 {
 
     /**

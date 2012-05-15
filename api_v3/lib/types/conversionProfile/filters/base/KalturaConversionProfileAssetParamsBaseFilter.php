@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaConversionProfileAssetParamsBaseFilter extends KalturaFilter
+abstract class KalturaConversionProfileAssetParamsBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -35,71 +35,51 @@ class KalturaConversionProfileAssetParamsBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $conversionProfileIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $conversionProfileIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $assetParamsIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $assetParamsIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaFlavorReadyBehaviorType
 	 */
 	public $readyBehaviorEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $readyBehaviorIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaAssetParamsOrigin
 	 */
 	public $originEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $originIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameIn;

@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaCategoryEntryBaseFilter extends KalturaFilter
+abstract class KalturaCategoryEntryBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -34,50 +34,36 @@ class KalturaCategoryEntryBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $categoryIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $categoryIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $entryIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $categoryFullIdsStartsWith;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $categoryFullIdsEqual;

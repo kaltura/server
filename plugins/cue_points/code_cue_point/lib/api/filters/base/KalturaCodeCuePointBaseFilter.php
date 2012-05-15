@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaCodeCuePointBaseFilter extends KalturaCuePointFilter
+abstract class KalturaCodeCuePointBaseFilter extends KalturaCuePointFilter
 {
 	private $map_between_objects = array
 	(
@@ -41,85 +41,61 @@ class KalturaCodeCuePointBaseFilter extends KalturaCuePointFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $codeLike;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $codeMultiLikeOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $codeMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $codeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $codeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $descriptionLike;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $descriptionMultiLikeOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $descriptionMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $endTimeGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $endTimeLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $durationGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $durationLessThanOrEqual;

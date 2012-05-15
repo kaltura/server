@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaSyndicationDistributionProfileBaseFilter extends KalturaDistributionProfileFilter
+abstract class KalturaSyndicationDistributionProfileBaseFilter extends KalturaDistributionProfileFilter
 {
 	private $map_between_objects = array
 	(

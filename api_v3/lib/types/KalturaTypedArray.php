@@ -7,7 +7,6 @@ class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator, 
 {
 	private $array = array();
 	private $class = "";
-	private $dummyClass = null;
 	
 	/**
 	 * @var int $count
@@ -17,7 +16,6 @@ class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator, 
 	public function __construct($class = 'KalturaObject')
 	{
 		$this->class = $class;
-		$this->dummyClass = new $class;		
 	}
 	
 	public function offsetExists($offset) 
@@ -32,10 +30,8 @@ class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator, 
 
 	public function offsetSet($offset, $value) 
 	{
-
-		if (!($value instanceof $this->dummyClass)) {
+		if (!is_object($value) && is_subclass_of($value, $this->class))
 			throw new Exception("'".get_class($value)."' is not an instance of '".$this->class."'");
-		}
 		
 		if ($offset === null)
 			$this->array[] = $value;

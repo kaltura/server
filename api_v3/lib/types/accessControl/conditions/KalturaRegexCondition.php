@@ -4,6 +4,6 @@
  * @subpackage objects
  * @abstract
  */
-class KalturaRegexCondition extends KalturaMatchCondition
+abstract class KalturaRegexCondition extends KalturaMatchCondition
 {
 }

@@ -4,7 +4,7 @@
  * @subpackage api.objects
  * @abstract
  */
-class KalturaDropFolderFileHandlerConfig extends KalturaObject
+abstract class KalturaDropFolderFileHandlerConfig extends KalturaObject
 {	
 	/**
 	 * @var KalturaDropFolderFileHandlerType

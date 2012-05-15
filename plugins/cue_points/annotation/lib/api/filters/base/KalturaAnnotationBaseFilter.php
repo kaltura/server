@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaAnnotationBaseFilter extends KalturaCuePointFilter
+abstract class KalturaAnnotationBaseFilter extends KalturaCuePointFilter
 {
 	private $map_between_objects = array
 	(
@@ -38,64 +38,46 @@ class KalturaAnnotationBaseFilter extends KalturaCuePointFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $parentIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $parentIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $textLike;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $textMultiLikeOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $textMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $endTimeGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $endTimeLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $durationGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $durationLessThanOrEqual;

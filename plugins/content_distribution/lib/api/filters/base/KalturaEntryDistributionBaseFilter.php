@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaEntryDistributionBaseFilter extends KalturaFilter
+abstract class KalturaEntryDistributionBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -55,141 +55,101 @@ class KalturaEntryDistributionBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $submittedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $submittedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $entryIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $entryIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $distributionProfileIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $distributionProfileIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaEntryDistributionStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaEntryDistributionFlag
 	 */
 	public $dirtyStatusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $dirtyStatusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $sunriseGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $sunriseLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $sunsetGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $sunsetLessThanOrEqual;

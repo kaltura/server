@@ -4,7 +4,7 @@
  * @subpackage objects
  * @abstract
  */
-class KalturaAccessControlAction extends KalturaObject
+abstract class KalturaAccessControlAction extends KalturaObject
 {
 	/**
 	 * The type of the access control action

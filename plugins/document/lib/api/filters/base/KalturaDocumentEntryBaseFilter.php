@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaDocumentEntryBaseFilter extends KalturaBaseEntryFilter
+abstract class KalturaDocumentEntryBaseFilter extends KalturaBaseEntryFilter
 {
 	private $map_between_objects = array
 	(
@@ -29,29 +29,21 @@ class KalturaDocumentEntryBaseFilter extends KalturaBaseEntryFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaDocumentType
 	 */
 	public $documentTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $documentTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $assetParamsIdsMatchOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $assetParamsIdsMatchAnd;

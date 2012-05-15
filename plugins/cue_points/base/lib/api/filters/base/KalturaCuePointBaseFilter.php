@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaCuePointBaseFilter extends KalturaFilter
+abstract class KalturaCuePointBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -59,184 +59,132 @@ class KalturaCuePointBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaCuePointType
 	 */
 	public $cuePointTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @dynamicType KalturaCuePointType
 	 * @var string
 	 */
 	public $cuePointTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaCuePointStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $entryIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $entryIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsLike;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $startTimeGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $startTimeLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $userIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $userIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerSortValueEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $partnerSortValueIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerSortValueGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerSortValueLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaNullableBoolean
 	 */
 	public $forceStopEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $systemNameIn;

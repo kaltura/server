@@ -6,7 +6,7 @@
  * @subpackage objects
  * @abstract
  */
-class KalturaContentResource extends KalturaResource 
+abstract class KalturaContentResource extends KalturaResource 
 {
 	public function validateAsset(asset $dbAsset)
 	{

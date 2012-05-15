@@ -4,7 +4,7 @@
  * @subpackage api.objects
  * @abstract
  */
-class KalturaEventCondition extends KalturaObject
+abstract class KalturaEventCondition extends KalturaObject
 {	
 	/**
 	 * @param string $class class name of the core object

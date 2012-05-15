@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaCategoryBaseFilter extends KalturaFilter
+abstract class KalturaCategoryBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -74,232 +74,166 @@ class KalturaCategoryBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $parentIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $parentIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $depthEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $fullNameEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $fullNameStartsWith;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $fullNameIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $fullIdsEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $fullIdsStartsWith;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsLike;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaAppearInListType
 	 */
 	public $appearInListEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaPrivacyType
 	 */
 	public $privacyEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $privacyIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaInheritanceType
 	 */
 	public $inheritanceTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $inheritanceTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $referenceIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $membersCountGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $membersCountLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $pendingMembersCountGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $pendingMembersCountLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaCategoryStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $inheritedParentIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $inheritedParentIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerSortValueGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerSortValueLessThanOrEqual;

@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaUserLoginDataBaseFilter extends KalturaFilter
+abstract class KalturaUserLoginDataBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -26,8 +26,6 @@ class KalturaUserLoginDataBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $loginEmailEqual;

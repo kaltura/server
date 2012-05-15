@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaThumbParamsBaseFilter extends KalturaAssetParamsFilter
+abstract class KalturaThumbParamsBaseFilter extends KalturaAssetParamsFilter
 {
 	private $map_between_objects = array
 	(
@@ -26,8 +26,6 @@ class KalturaThumbParamsBaseFilter extends KalturaAssetParamsFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaContainerFormat
 	 */
 	public $formatEqual;

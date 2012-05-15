@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaCategoryUserBaseFilter extends KalturaFilter
+abstract class KalturaCategoryUserBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -45,113 +45,81 @@ class KalturaCategoryUserBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $categoryIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $categoryIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $userIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $userIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaCategoryUserPermissionLevel
 	 */
 	public $permissionLevelEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $permissionLevelIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaCategoryUserStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaUpdateMethodType
 	 */
 	public $updateMethodEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $updateMethodIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $categoryFullIdsStartsWith;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $categoryFullIdsEqual;

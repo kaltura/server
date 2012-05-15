@@ -6,7 +6,7 @@
  * @subpackage objects
  * @abstract
  */
-class KalturaBooleanField extends KalturaBooleanValue
+abstract class KalturaBooleanField extends KalturaBooleanValue
 {
 	/* (non-PHPdoc)
 	 * @see KalturaIntegerValue::toObject()

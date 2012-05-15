@@ -6,7 +6,7 @@
  * @subpackage objects
  * @abstract
  */
-class KalturaValue extends KalturaObject
+abstract class KalturaValue extends KalturaObject
 {
 	private static $mapBetweenObjects = array
 	(

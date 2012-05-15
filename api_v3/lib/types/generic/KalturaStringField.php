@@ -6,7 +6,7 @@
  * @subpackage objects
  * @abstract
  */
-class KalturaStringField extends KalturaStringValue
+abstract class KalturaStringField extends KalturaStringValue
 {
 	/* (non-PHPdoc)
 	 * @see KalturaIntegerValue::toObject()

@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
+abstract class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
 {
 	private $map_between_objects = array
 	(
@@ -33,43 +33,31 @@ class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaMediaType
 	 */
 	public $mediaTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $mediaTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $mediaDateGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $mediaDateLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $flavorParamsIdsMatchOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $flavorParamsIdsMatchAnd;

@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaThumbParamsOutputBaseFilter extends KalturaThumbParamsFilter
+abstract class KalturaThumbParamsOutputBaseFilter extends KalturaThumbParamsFilter
 {
 	private $map_between_objects = array
 	(
@@ -29,29 +29,21 @@ class KalturaThumbParamsOutputBaseFilter extends KalturaThumbParamsFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $thumbParamsIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $thumbParamsVersionEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $thumbAssetIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $thumbAssetVersionEqual;

@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaBaseEntryBaseFilter extends KalturaFilter
+abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -129,8 +129,6 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idNotIn;
@@ -185,8 +183,6 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	public $userIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $creatorIdEqual;
@@ -234,29 +230,21 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	public $adminTagsMultiLikeAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $categoriesMatchAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $categoriesMatchOr;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $categoriesIdsMatchAnd;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $categoriesIdsMatchOr;
@@ -292,36 +280,26 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	public $statusNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaEntryModerationStatus
 	 */
 	public $moderationStatusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaEntryModerationStatus
 	 */
 	public $moderationStatusNotEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $moderationStatusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $moderationStatusNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaEntryType
 	 */
 	public $typeEqual;
@@ -349,36 +327,26 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $totalRankLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $totalRankGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $groupIdEqual;
@@ -398,156 +366,112 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	public $searchTextMatchOr;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $accessControlIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $accessControlIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $startDateGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $startDateLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $startDateGreaterThanOrEqualOrNull;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $startDateLessThanOrEqualOrNull;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $endDateGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $endDateLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $endDateGreaterThanOrEqualOrNull;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $endDateLessThanOrEqualOrNull;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $referenceIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $referenceIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $replacingEntryIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $replacingEntryIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $replacedEntryIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $replacedEntryIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaEntryReplacementStatus
 	 */
 	public $replacementStatusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @dynamicType KalturaEntryReplacementStatus
 	 * @var string
 	 */
 	public $replacementStatusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerSortValueGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerSortValueLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $rootEntryIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $rootEntryIdIn;

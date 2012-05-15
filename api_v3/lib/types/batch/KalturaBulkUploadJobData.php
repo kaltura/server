@@ -4,7 +4,7 @@
  * @subpackage objects
  * @abstract
  */
-class KalturaBulkUploadJobData extends KalturaJobData
+abstract class KalturaBulkUploadJobData extends KalturaJobData
 {
 	/**
 	 * @var string

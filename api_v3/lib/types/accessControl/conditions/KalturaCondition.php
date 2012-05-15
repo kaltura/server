@@ -4,7 +4,7 @@
  * @subpackage objects
  * @abstract
  */
-class KalturaCondition extends KalturaObject
+abstract class KalturaCondition extends KalturaObject
 {
 	/**
 	 * The type of the access control condition

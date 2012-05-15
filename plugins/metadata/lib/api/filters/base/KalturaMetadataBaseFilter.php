@@ -4,7 +4,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-class KalturaMetadataBaseFilter extends KalturaFilter
+abstract class KalturaMetadataBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -50,120 +50,86 @@ class KalturaMetadataBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $partnerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $metadataProfileIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $metadataProfileVersionEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $metadataProfileVersionGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $metadataProfileVersionLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaMetadataObjectType
 	 */
 	public $metadataObjectTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $objectIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $objectIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $versionEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $versionGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $versionLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaMetadataStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;

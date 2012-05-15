@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaUploadTokenBaseFilter extends KalturaFilter
+abstract class KalturaUploadTokenBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
@@ -32,36 +32,26 @@ class KalturaUploadTokenBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $idIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $userIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaUploadTokenStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;

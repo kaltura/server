@@ -4,7 +4,7 @@
  * @subpackage api.objects
  * @abstract
  */
-class KalturaDistributionValidationError extends KalturaObject
+abstract class KalturaDistributionValidationError extends KalturaObject
 {
 	/**
 	 * @var KalturaDistributionAction

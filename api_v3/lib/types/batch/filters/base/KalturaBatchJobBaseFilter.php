@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
+abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 {
 	private $map_between_objects = array
 	(
@@ -109,479 +109,343 @@ class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $entryIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaBatchJobType
 	 */
 	public $jobTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @dynamicType KalturaBatchJobType
 	 * @var string
 	 */
 	public $jobTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @dynamicType KalturaBatchJobType
 	 * @var string
 	 */
 	public $jobTypeNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $jobSubTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $jobSubTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $jobSubTypeNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $onStressDivertToEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $onStressDivertToIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $onStressDivertToNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaBatchJobStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $abortEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $checkAgainTimeoutGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $checkAgainTimeoutLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $progressGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $progressLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatesCountGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $updatesCountLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $priorityGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $priorityLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $priorityEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $priorityIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $priorityNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $twinJobIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $twinJobIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $twinJobIdNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $bulkJobIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $bulkJobIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $bulkJobIdNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $parentJobIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $parentJobIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $parentJobIdNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $rootJobIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $rootJobIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $rootJobIdNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $queueTimeGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $queueTimeLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $finishTimeGreaterThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $finishTimeLessThanOrEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaBatchJobErrorTypes
 	 */
 	public $errTypeEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $errTypeIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $errTypeNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $errNumberEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $errNumberIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $errNumberNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $fileSizeLessThan;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $fileSizeGreaterThan;
 
 	/**
-	 * 
-	 * 
 	 * @var bool
 	 */
 	public $lastWorkerRemoteEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $schedulerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $schedulerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $schedulerIdNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $workerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $workerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $workerIdNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $batchIndexEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $batchIndexIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $batchIndexNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $lastSchedulerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $lastSchedulerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $lastSchedulerIdNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $lastWorkerIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $lastWorkerIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $lastWorkerIdNotIn;
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $dcEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $dcIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $dcNotIn;

@@ -4,7 +4,7 @@
  * @subpackage objects
  * @abstract
  */
-class KalturaDataCenterContentResource extends KalturaContentResource 
+abstract class KalturaDataCenterContentResource extends KalturaContentResource 
 {
 	public function getDc()
 	{

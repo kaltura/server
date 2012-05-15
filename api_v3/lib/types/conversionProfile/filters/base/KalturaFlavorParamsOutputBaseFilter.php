@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaFlavorParamsOutputBaseFilter extends KalturaFlavorParamsFilter
+abstract class KalturaFlavorParamsOutputBaseFilter extends KalturaFlavorParamsFilter
 {
 	private $map_between_objects = array
 	(
@@ -29,29 +29,21 @@ class KalturaFlavorParamsOutputBaseFilter extends KalturaFlavorParamsFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $flavorParamsIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $flavorParamsVersionEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $flavorAssetIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $flavorAssetVersionEqual;

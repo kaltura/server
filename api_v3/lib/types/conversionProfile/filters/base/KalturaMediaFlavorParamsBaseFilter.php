@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaMediaFlavorParamsBaseFilter extends KalturaFlavorParamsFilter
+abstract class KalturaMediaFlavorParamsBaseFilter extends KalturaFlavorParamsFilter
 {
 	private $map_between_objects = array
 	(

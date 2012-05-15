@@ -4,7 +4,7 @@
  * @subpackage objects
  * @abstract
  */
-class KalturaCompareCondition extends KalturaCondition
+abstract class KalturaCompareCondition extends KalturaCondition
 {
 	/**
 	 * Value to evaluate against the field and operator

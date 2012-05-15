@@ -21,11 +21,6 @@ class KalturaTypeReflector
 	private $_type;
 	
 	/**
-	 * @var KalturaObject
-	 */
-	private $_instance;
-	
-	/**
 	 * @var array<KalturaPropertyInfo>
 	 */
 	private $_properties;
@@ -44,26 +39,6 @@ class KalturaTypeReflector
 	 * @var array<string>
 	 */
 	private $_constantsValues;
-	
-	/**
-	 * @var bool
-	 */
-	private $_isEnum;
-	
-	/**
-	 * @var bool
-	 */
-	private $_isStringEnum;
-	
-	/**
-	 * @var bool
-	 */
-	private $_isDynamicEnum;
-	
-	/**
-	 * @var bool
-	 */
-	private $_isArray;
 	
 	/**
 	 * @var string
@@ -116,6 +91,7 @@ class KalturaTypeReflector
 		$this->_type = $type;
 		
 	    $reflectClass = new ReflectionClass($this->_type);
+	    $this->_abstract = $reflectClass->isAbstract();
 	    $comments = $reflectClass->getDocComment();
 	    if($comments)
 	    {
@@ -126,19 +102,8 @@ class KalturaTypeReflector
 	    	$this->_serverOnly = $commentsParser->serverOnly;
 	    	$this->_package = $commentsParser->package;
 	    	$this->_subpackage = $commentsParser->subpackage;
-	    	$this->_abstract = $commentsParser->abstract;
 	    	if (!is_null($commentsParser->permissions)) {
 	    		$this->_permissions = explode(',',$commentsParser->permissions);
-	    	}
-	    }
-	    
-	    if(!$reflectClass->isAbstract())
-	    {
-	    	$constructor = $reflectClass->getConstructor();
-	    	if(!$constructor || $constructor->isPublic())
-	    	{
-//				KalturaLog::debug("Instanciating type [$type]");
-				$this->_instance = new $type;
 	    	}
 	    }
 	}
@@ -348,9 +313,7 @@ class KalturaTypeReflector
 		if($this->isDynamicEnum())
 		{
 			$type = $this->getType();
-			// TODO remove call_user_func after moving to php 5.3
-			$baseEnumName = call_user_func(array($type, 'getEnumClass'));
-//			$baseEnumName = $type::getEnumClass();
+			$baseEnumName = $type::getEnumClass();
 			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
 			foreach($pluginInstances as $pluginInstance)
 			{
@@ -358,9 +321,8 @@ class KalturaTypeReflector
 				$enums = $pluginInstance->getEnums($baseEnumName);
 				foreach($enums as $enum)
 				{
-					// TODO remove call_user_func after moving to php 5.3
 					$enumConstans = call_user_func(array($enum, 'getAdditionalValues'));
-//					$enumConstans = $enum::getAdditionalValues();
+					$enumConstans = $enum::getAdditionalValues();
 					foreach($enumConstans as $name => $value)
 						$this->_constantsValues[$name] = $pluginName . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value;
 				}
@@ -406,9 +368,7 @@ class KalturaTypeReflector
 		if($this->isDynamicEnum())
 		{
 			$type = $this->getType();
-			// TODO remove call_user_func after moving to php 5.3
-			$baseEnumName = call_user_func(array($type, 'getEnumClass'));
-//			$baseEnumName = $type::getEnumClass();
+			$baseEnumName = $type::getEnumClass();
 			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
 			foreach($pluginInstances as $pluginInstance)
 			{
@@ -416,9 +376,7 @@ class KalturaTypeReflector
 				$enums = $pluginInstance->getEnums($baseEnumName);
 				foreach($enums as $enum)
 				{
-					// TODO remove call_user_func after moving to php 5.3
-					$enumConstans = call_user_func(array($enum, 'getAdditionalValues'));
-//					$enumConstans = $enum::getAdditionalValues();
+					$enumConstans = $enum::getAdditionalValues();
 					foreach($enumConstans as $name => $value)
 					{
 						$value = $pluginName . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value;
@@ -444,15 +402,7 @@ class KalturaTypeReflector
 	 */
 	public function isEnum()
 	{
-		if ($this->_isEnum === null)
-		{
-			if ($this->_instance instanceof KalturaEnum)
-				$this->_isEnum = true;
-			else
-				$this->_isEnum = false;
-		}
-			
-		return $this->_isEnum; 
+		return is_subclass_of($this->_type, 'KalturaEnum'); 
 	}
 	
 	/**
@@ -486,21 +436,23 @@ class KalturaTypeReflector
 	}
 	
 	/**
+	 * Returns true when the type is a filter
+	 *
+	 * @return boolean
+	 */
+	public function isFilter()
+	{
+		return is_subclass_of($this->_type, 'KalturaFilter');
+	}
+	
+	/**
 	 * Returns true when the type is a string enum
 	 *
 	 * @return boolean
 	 */
 	public function isStringEnum()
 	{
-		if ($this->_isStringEnum === null)
-		{
-			if ($this->_instance instanceof KalturaStringEnum)
-				$this->_isStringEnum = true;
-			else
-				$this->_isStringEnum = false;
-		}
-			
-		return $this->_isStringEnum; 
+		return is_subclass_of($this->_type, 'KalturaStringEnum');
 	}
 	
 	/**
@@ -510,17 +462,8 @@ class KalturaTypeReflector
 	 */
 	public function isDynamicEnum()
 	{
-		if ($this->_isDynamicEnum === null)
-		{
-			if ($this->_instance instanceof KalturaDynamicEnum)
-				$this->_isDynamicEnum = true;
-			else
-				$this->_isDynamicEnum = false;
-		}
-			
-		return $this->_isDynamicEnum; 
+		return is_subclass_of($this->_type, 'KalturaDynamicEnum');
 	}
-	
 	
 	/**
 	 * Returns true when the type is (for what we know) an array
@@ -529,15 +472,7 @@ class KalturaTypeReflector
 	 */
 	public function isArray()
 	{
-		if ($this->_isArray === null)
-		{
-			if ($this->_instance instanceof KalturaTypedArray)
-				$this->_isArray = true;
-			else
-				$this->_isArray = false;
-		}
-			
-		return $this->_isArray;
+		return is_subclass_of($this->_type, 'KalturaTypedArray');
 	}
 	
 	/**
@@ -547,10 +482,12 @@ class KalturaTypeReflector
 	 */
 	public function getArrayType()
 	{
-		if ($this->isArray())
+		if ($this->isArray() && !$this->isAbstract())
 		{
-			return $this->_instance->getType(); 
+			$instance = new $this->_type();
+			return $instance->getType(); 
 		}
+		
 		return null;
 	}
 	
@@ -646,7 +583,10 @@ class KalturaTypeReflector
 
 	public function getInstance()
 	{
-		return $this->_instance;
+		if($this->isAbstract())
+			throw new Exception("Object type [$this->_type] is abstract and can't be instantiated");
+			
+		return new $this->_type;
 	}
 	
 	public function __sleep()
@@ -657,7 +597,7 @@ class KalturaTypeReflector
 		if ($this->_constants === null)
 			$this->getConstants();
 		
-		return array("_type", "_instance", "_properties", "_currentProperties", "_constants", "_constantsValues", "_isEnum", "_isStringEnum", "_isDynamicEnum", "_isArray", "_description", "_abstract", "_comments", "_permissions", "_subpackage", "_package", "_serverOnly", "_deprecated");
+		return array("_type", "_properties", "_currentProperties", "_constants", "_constantsValues", "_description", "_abstract", "_comments", "_permissions", "_subpackage", "_package", "_serverOnly", "_deprecated");
 	}
 
 

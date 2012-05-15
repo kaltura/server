@@ -123,7 +123,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		$this->appendLine(" * @subpackage $subpackage");
 		$this->appendLine(" * @abstract");
 		$this->appendLine(" */");
-		$this->appendLine("class $filterClassName extends $partnetClassName");
+		$this->appendLine("abstract class $filterClassName extends $partnetClassName");
 		$this->appendLine("{");
 		$this->appendLine("	private \$map_between_objects = array");
 		$this->appendLine("	(");
@@ -147,7 +147,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		$extraFilters = null;
 		$reflectionClass = new ReflectionClass($type->getType());
 		// invoke getExtraFilter only if it was defined in the current class
-		if ($reflectionClass->getMethod("getExtraFilters")->getDeclaringClass()->getName() === $reflectionClass->getName()) 
+		if (!$type->isAbstract() && $reflectionClass->getMethod("getExtraFilters")->getDeclaringClass()->getName() === $reflectionClass->getName()) 
 		{
 			$extraFilters = $type->getInstance()->getExtraFilters();
 			if (!$extraFilters)
@@ -235,9 +235,20 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 						
 					$this->appendLine();
 					$this->appendLine("	/**");
-					$this->appendLine("	 * " . $this->getDocForFilter($type->getInstance(), $filterProp));
-					$this->appendLine("	 * ");
 					
+					if(!$type->isAbstract())
+					{
+						$filterableObject = $type->getInstance();
+						$filterDocs = $filterableObject->getFilterDocs();
+						if (isset($filterDocs[$filterProp]))
+						{
+							$filterDoc = $filterDocs[$filterProp];
+							
+							$this->appendLine("	 * $filterDoc");
+							$this->appendLine("	 * ");
+						}
+					}
+						
 					if($filterDynamicType)
 						$this->appendLine("	 * @dynamicType $filterDynamicType");
 						
@@ -315,7 +326,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		}
 		
 		$reflectionClass = new ReflectionClass($type->getType());
-		if ($reflectionClass->getMethod("getExtraFilters")->getDeclaringClass()->getName() === $reflectionClass->getName()) 
+		if (!$type->isAbstract() && $reflectionClass->getMethod("getExtraFilters")->getDeclaringClass()->getName() === $reflectionClass->getName()) 
 		{
 			$extraFilters = $type->getInstance()->getExtraFilters();
 			if ($extraFilters)
@@ -413,15 +424,6 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		
 		
 		return "_".$filterType."_".implode("-", $fields);
-	}
-	
-	private function getDocForFilter(IFilterable $filterableObject, $filterPropName)
-	{
-		$filterDocs = $filterableObject->getFilterDocs();
-		if (isset($filterDocs[$filterPropName]))
-			return $filterDocs[$filterPropName];
-		else
-			return "";
 	}
 	
 	protected function writeAfterTypes()

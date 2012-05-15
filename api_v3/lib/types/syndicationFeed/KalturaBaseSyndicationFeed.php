@@ -4,7 +4,7 @@
  * @subpackage objects
  * @abstract
  */
-class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
+abstract class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 {
 	/**
 	 * 

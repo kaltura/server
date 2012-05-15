@@ -4,7 +4,7 @@
  * @subpackage api.objects
  * @abstract
  */
-class KalturaConfigurableDistributionJobProviderData extends KalturaDistributionJobProviderData
+abstract class KalturaConfigurableDistributionJobProviderData extends KalturaDistributionJobProviderData
 {
 
 	/**

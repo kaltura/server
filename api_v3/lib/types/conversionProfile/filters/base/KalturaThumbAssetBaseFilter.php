@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaThumbAssetBaseFilter extends KalturaAssetFilter
+abstract class KalturaThumbAssetBaseFilter extends KalturaAssetFilter
 {
 	private $map_between_objects = array
 	(
@@ -30,36 +30,26 @@ class KalturaThumbAssetBaseFilter extends KalturaAssetFilter
 	}
 
 	/**
-	 * 
-	 * 
 	 * @var int
 	 */
 	public $thumbParamsIdEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $thumbParamsIdIn;
 
 	/**
-	 * 
-	 * 
 	 * @var KalturaThumbAssetStatus
 	 */
 	public $statusEqual;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $statusNotIn;
