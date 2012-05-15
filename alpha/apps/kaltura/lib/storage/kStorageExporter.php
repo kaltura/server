@@ -117,7 +117,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		$externalFileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $externalStorage);
 		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key,true,false);
-		if(!$fileSync || !kDataCenterMgr::dcExists($fileSync->getDc())){
+		if (!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL) {
 			KalturaLog::err("no ready fileSync was found for key [$key]");
 			return;
 		}
