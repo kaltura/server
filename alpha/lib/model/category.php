@@ -102,15 +102,7 @@ class category extends Basecategory implements IIndexable
 		// set the depth of the parent category + 1
 		if (!$this->getIsIndex() && ($this->isNew() || $this->isColumnModified(categoryPeer::PARENT_ID)))
 		{
-			if ($this->getParentId() !== 0 && $this->getParentId() != null)
-			{
-				$parentCat = $this->getParentCategory();
-				$this->setDepth($parentCat->getDepth() + 1);
-			}
-			else
-			{
-				$this->setDepth(0);
-			}
+			$this->reSetDepth();
 		}
 		
 		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PARENT_ID))
@@ -1145,7 +1137,15 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function reSetDepth()
 	{		
-		$this->setDepth(substr_count($this->getFullIds(), categoryPeer::CATEGORY_SEPARATOR));
+		if ($this->getParentId() !== 0 && $this->getParentId() != null)
+		{
+			$parentCat = $this->getParentCategory();
+			$this->setDepth($parentCat->getDepth() + 1);
+		}
+		else
+		{
+			$this->setDepth(0);
+		}
 	}
 		
 	/**
