@@ -174,7 +174,7 @@ function checkCache()
 				else
 					$content_type ="image/$ext";
 		
-				$total_length = kFile::fileSize($file_name);
+				$total_length = filesize($file_name);
 				$max_age = 8640000;
 				
 				header("X-Kaltura:cached-dispatcher-thumb");
