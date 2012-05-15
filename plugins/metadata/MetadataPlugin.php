@@ -362,15 +362,12 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		KalturaLog::debug("Handle metadata bulk upload data:\n" . print_r($data, true));
 		KalturaLog::debug("Handle metadata for objectId ". $object->getId());
 			
-		$metadataProfileId = $data[self::BULK_UPLOAD_COLUMN_PROFILE_ID];
-		$xmlData = null;
-		
 		if(!$object)
 			return;
     
-		if ($metadataProfileId)
+		if (isset($data[self::BULK_UPLOAD_COLUMN_PROFILE_ID]))
 		{
-		    self::addMetadataWithProfileId($metadataProfileId, $object, $data);
+		    self::addMetadataWithProfileId($object, $data);
 		
 		}
 		else
@@ -386,8 +383,9 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	 * @param Object $object
 	 * @param array $data
 	 */
-	protected static function addMetadataWithProfileId ($metadataProfileId, Object $object, array $data)
+	protected static function addMetadataWithProfileId (Object $object, array $data)
 	{
+	    $metadataProfileId = $data[self::BULK_UPLOAD_COLUMN_PROFILE_ID];
 		$metadataProfile = MetadataProfilePeer::retrieveById($metadataProfileId);
 		if(!$metadataProfile)
 		{
@@ -535,7 +533,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	        }
 	    }
 	    
-	    foreach ($metadataProfileFieldName as $metadataProfileSystemName => $fieldsArray)
+	    foreach ($newFieldValuesMap as $metadataProfileSystemName => $fieldsArray)
 	    {
 	        /* @var array $fieldsArray */
 	        if (!$fieldsArray || !count($fieldsArray))
