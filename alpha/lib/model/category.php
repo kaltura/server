@@ -1194,7 +1194,18 @@ class category extends Basecategory implements IIndexable
 		$count = categoryEntryPeer::doCount($criteria);
 
 		$this->setEntriesCount($count);
-		$this->save();
+	}
+	
+	/**
+	 * reset category's directEntriesCount by calculate it.
+	 */
+	public function reSetDirectEntriesCount()
+	{
+		$criteria = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+		$criteria->addAnd(categoryEntryPeer::CATEGORY_ID, $this->getId());
+		$count = categoryEntryPeer::doCount($criteria);
+
+		$this->setDirectEntriesCount($count);
 	}
 	
 	/**
