@@ -18,6 +18,7 @@ class myReportsMgr
 	const REPORT_TYPE_USER_ENGAGEMENT = 11;
 	const REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE = 110;
 	const SPEFICIC_USER_ENGAGEMENT = 12;
+	const SPEFICIC_USER_ENGAGEMENT_TOTAL_UNIQUE = 120;
 	const REPORT_TYPE_USER_TOP_CONTENT = 13;
 	const REPORT_TYPE_USER_TOP_CONTENT_TOTAL_UNIQUE = 130;
 	const REPORT_TYPE_USER_CONTENT_DROPOFF = 14;
@@ -649,6 +650,7 @@ class myReportsMgr
 		self::REPORT_TYPE_USER_ENGAGEMENT => "user_engagement",
 		self::REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
 		self::SPEFICIC_USER_ENGAGEMENT => "specific_user_engagement",
+		self::SPEFICIC_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
 		self::REPORT_TYPE_USER_TOP_CONTENT => "user_top_content",
 		self::REPORT_TYPE_USER_TOP_CONTENT_TOTAL_UNIQUE => "user_engagement_unique",
 		self::REPORT_TYPE_USER_CONTENT_DROPOFF => "user_content_dropoff", 
