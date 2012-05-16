@@ -123,6 +123,9 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 		return array();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
 	public function toObject($dbMetadataProfile = null, $propsToSkip = array())
 	{
 		if(is_null($dbMetadataProfile))
@@ -131,6 +134,27 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 		return parent::toObject($dbMetadataProfile, $propsToSkip);
 	}
 	
+		/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validatePropertyMinLength("name", 1);
+		
+		if($this->systemName)
+		{
+			$c = KalturaCriteria::create(MetadataProfilePeer::OM_CLASS);
+			$c->add(MetadataProfilePeer::SYSTEM_NAME, $this->systemName);
+			if(StorageProfilePeer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+		}
+		
+		return parent::validateForInsert($propertiesToSkip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
 	public function fromObject($source_object)
 	{
 		parent::fromObject($source_object);
