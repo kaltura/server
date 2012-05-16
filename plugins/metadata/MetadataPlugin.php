@@ -524,7 +524,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	    //Construct mapping of all metadata profile system names, their fields and the field values.
 	    foreach ($data as $key => $value)
 	    {
-	        if ( strpos($key, self::BULK_UPLOAD_METADATA_FIELD_PREFIX) == 0 )
+	        if ( strpos($key, self::BULK_UPLOAD_METADATA_FIELD_PREFIX) === 0 )
 	        {
 	            list ($prefix, $metadataProfileSystemName, $metadataProfileFieldName) = explode(self::BULK_UPLOAD_METADATA_SYSTEMNAME_SEPARATOR, $key);
 	            if (!isset($newFieldValuesMap[$metadataProfileSystemName]))
