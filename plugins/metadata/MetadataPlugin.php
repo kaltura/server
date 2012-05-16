@@ -517,7 +517,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	 * @param BaseObject $object
 	 * @param array $data
 	 */
-	protected function addMetadataWithProfilesSystemNames (BaseObject $object, array $data)
+	protected static function addMetadataWithProfilesSystemNames (BaseObject $object, array $data)
 	{
 	    $newFieldValuesMap = array();
 	    $xmlDataArray = array();
