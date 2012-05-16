@@ -526,7 +526,17 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	    {
 	        if ( strpos($key, self::BULK_UPLOAD_METADATA_FIELD_PREFIX) === 0 )
 	        {
+	            $prefix = null;
+	            $metadataProfileSystemName = null;
+	            $metadataProfileFieldName = null;
 	            list ($prefix, $metadataProfileSystemName, $metadataProfileFieldName) = explode(self::BULK_UPLOAD_METADATA_SYSTEMNAME_SEPARATOR, $key);
+	            if (!$prefix || !$metadataProfileSystemName || !$metadataProfileFieldName)
+	            {
+	                $errorMessage = "Unexpected key sturcture. Expected metadata::ProfileSystemName::FieldSystemName.";
+                    KalturaLog::err($errorMessage);
+                    self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+				    continue; 
+	            }
 	            if (!isset($newFieldValuesMap[$metadataProfileSystemName]))
 	                $newFieldValuesMap[$metadataProfileSystemName] = array();
 	            $newFieldValuesMap[$metadataProfileSystemName][$metadataProfileFieldName] = $value;
@@ -639,12 +649,19 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	    }
 	}
 	
-	protected static function addBulkUploadResultDescription($entryId, $bulkUploadId, $description)
+	/**
+	 * Add description of an error to the BulkUploadResult of the object in question
+	 * @param BaseObject $object
+	 * @param string $bulkUploadId
+	 * @param string $description
+	 */
+	protected static function addBulkUploadResultDescription(BaseObject $object, $bulkUploadId, $description)
 	{
-		$bulkUploadResult = BulkUploadResultPeer::retrieveByEntryId($entryId, $bulkUploadId);
+	    $objectType = strtoupper($object->getPeer());
+		$bulkUploadResult = BulkUploadResultPeer::retrieveByObjectId($object->getId(), $bulkUploadId);
 		if(!$bulkUploadResult)
 		{
-			KalturaLog::err("Bulk upload results not found for entry [$entryId]");
+			KalturaLog::err("Bulk upload results not found for object [{$object->getId()}]");
 			return;
 		}
 		
