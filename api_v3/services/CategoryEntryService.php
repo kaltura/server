@@ -130,6 +130,7 @@ class CategoryEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ENTRY_ID_EQUAL);
 			
 		if ($filter->entryIdEqual == null &&
+			$filter->entryIdIn == null &&
 			$filter->categoryFullIdsEqual == null &&
 			$filter->categoryFullIdsStartsWith == null &&
 			$filter->categoryIdIn == null &&
