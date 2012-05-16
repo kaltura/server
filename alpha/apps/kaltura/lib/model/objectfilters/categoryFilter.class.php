@@ -31,7 +31,7 @@ class categoryFilter extends baseObjectFilter
 			"_like_tags",
 			"_mlikeor_tags",
 			"_mlikeand_tags",
-			"_eq_appear_in_list",
+			"_eq_display_in_search",
 			"_eq_privacy",
 			"_in_privacy",
 			"_eq_inheritance_type",
