@@ -155,7 +155,25 @@ insert into `file_sync`(`id`,`partner_id`,`object_type`,`object_id`,`version`,`o
 (131,0,2,'2158531',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/2158531.xml',10186),
 (132,0,2,'2162571',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/2162571.xml',8867),
 (133,0,2,'2162571',null,2,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/2162571.features.xml',15903),
-(134,0,2,'2733871',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/2733871.xml',4974);
+(134,0,2,'2733871',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/2733871.xml',4974),
+(135,0,2,'1522362',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/1522362.xml',14943),
+(136,0,2,'1522362',null,2,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/1522362.features.xml',13257),
+(137,0,2,'4860481',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/4860481.xml',14141),
+(138,0,2,'4674741',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/4674741.xml',12834),
+(139,0,2,'4674731',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/4674731.xml',12765),
+(140,0,2,'4395691',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/4395691.xml',2915),
+(141,0,2,'6386311',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/6386311.xml',431),
+(142,0,2,'6548401',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/6548401.xml',13926),
+(143,0,2,'6548401',null,2,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/6548401.features.xml',18867),
+(144,0,2,'6548391',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/6548391.xml',13421),
+(145,0,2,'6548391',null,2,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/6548391.features.xml',18863),
+(146,0,2,'6235211',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/6235211.xml',2945),
+(147,0,2,'6548421',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/6548421.xml',1079),
+(148,0,2,'6235221',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/6235221.xml',2560),
+(149,0,2,'5612211',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/5612211.xml',4967),
+(150,0,2,'6709401',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/6709401.xml',2702),
+(151,0,2,'6709411',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/6709411.xml',12834),
+(152,0,2,'6709421',null,1,0,1,now(),now(),null,null,2,1,null,null,'@WEB_DIR@/','content/uiconf/special/6709421.xml',12765);
 
 insert into `flavor_asset`(`id`,`int_id`,`partner_id`,`tags`,`created_at`,`updated_at`,`deleted_at`,`entry_id`,`flavor_params_id`,`status`,`version`,`description`,`width`,`height`,`bitrate`,`frame_rate`,`size`,`is_original`,`file_ext`,`container_format`,`video_codec_id`,`type`,`custom_data`,`partner_data`) values 
 ('_KMCLOGO',1,0,'web,mbr',now(),now(),null,'_KMCLOGO',0,2,'1','',0,0,0,0,0,0,null,null,null,1,'a:3:{s:13:"FlavorBitrate";i:0;s:15:"FlavorFrameRate";d:0;s:18:"FlavorVideoCodecId";N;}',null),
@@ -188,10 +206,10 @@ insert into `flavor_params`(`id`,`version`,`partner_id`,`name`,`system_name`,`ta
 (10,0,0,'Standard - Large (H264)','Standard-Large(H264)','web,mbr','',2,now(),now(),null,1,'mp4','h264',1350,'aac',96,0,0,0,0,720,0,0,0,'2','','a:12:{s:16:"FlavorVideoCodec";s:4:"h264";s:18:"FlavorVideoBitrate";i:1350;s:16:"FlavorAudioCodec";s:3:"aac";s:18:"FlavorAudioBitrate";i:96;s:19:"FlavorAudioChannels";i:0;s:21:"FlavorAudioSampleRate";i:0;s:21:"FlavorAudioResolution";i:0;s:15:"FlavorFrameRate";d:0;s:13:"FlavorGopSize";i:0;s:13:"FlavorTwoPass";b:0;s:17:"FlavorDeinterlice";i:0;s:12:"FlavorRotate";i:0;}',0,null,1,0,0,null,null,1),
 (11,0,0,'High - Large (H264)','High-Large(H264)','web,mbr','',2,now(),now(),null,1,'mp4','h264',2500,'aac',128,0,0,0,0,720,0,0,0,'2','','a:12:{s:16:"FlavorVideoCodec";s:4:"h264";s:18:"FlavorVideoBitrate";i:2500;s:16:"FlavorAudioCodec";s:3:"aac";s:18:"FlavorAudioBitrate";i:128;s:19:"FlavorAudioChannels";i:0;s:21:"FlavorAudioSampleRate";i:0;s:21:"FlavorAudioResolution";i:0;s:15:"FlavorFrameRate";d:0;s:13:"FlavorGopSize";i:0;s:13:"FlavorTwoPass";b:0;s:17:"FlavorDeinterlice";i:0;s:12:"FlavorRotate";i:0;}',0,null,1,0,0,null,null,1),
 (12,0,0,'HD (H264)','HD(H264)','web,mbr','',2,now(),now(),null,1,'mp4','h264',4000,'aac',192,0,0,0,0,1080,0,0,0,'2','','a:12:{s:16:"FlavorVideoCodec";s:4:"h264";s:18:"FlavorVideoBitrate";i:4000;s:16:"FlavorAudioCodec";s:3:"aac";s:18:"FlavorAudioBitrate";i:192;s:19:"FlavorAudioChannels";i:0;s:21:"FlavorAudioSampleRate";i:0;s:21:"FlavorAudioResolution";i:0;s:15:"FlavorFrameRate";d:0;s:13:"FlavorGopSize";i:0;s:13:"FlavorTwoPass";b:0;s:17:"FlavorDeinterlice";i:0;s:12:"FlavorRotate";i:0;}',0,null,1,0,0,null,null,1),
-(13,0,0,'iPad','iPad','web,ipad,ipadnew','iPad',2,now(),now(),null,1,'mp4','h264',1500,'aac',160,2,48000,0,1024,0,25,50,0,'2,99','-flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 800k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2  -vsync 2 | -flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 800k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2 -vsync 2','a:13:{s:16:"FlavorVideoCodec";s:5:"h264m";s:18:"FlavorVideoBitrate";s:4:"1500";s:16:"FlavorAudioCodec";s:3:"aac";s:18:"FlavorAudioBitrate";s:3:"160";s:19:"FlavorAudioChannels";s:1:"2";s:21:"FlavorAudioSampleRate";s:5:"48000";s:21:"FlavorAudioResolution";s:1:"0";s:15:"FlavorFrameRate";s:2:"25";s:13:"FlavorGopSize";s:2:"50";s:13:"FlavorTwoPass";b:0;s:17:"FlavorDeinterlice";i:0;s:12:"FlavorRotate";i:0;s:19:"requiredPermissions";a:1:{i:0;s:22:"FEATURE_MOBILE_FLAVORS";}}}',0,null,1,0,0,null,0,1),
+(13,0,0,'iPad','iPad','web,ipad','iPad',2,now(),now(),null,1,'mp4','h264',1500,'aac',160,2,48000,0,1024,0,25,50,0,'2,99','-flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 800k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2  -vsync 2 | -flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 800k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2 -vsync 2','a:13:{s:16:"FlavorVideoCodec";s:5:"h264m";s:18:"FlavorVideoBitrate";s:4:"1500";s:16:"FlavorAudioCodec";s:3:"aac";s:18:"FlavorAudioBitrate";s:3:"160";s:19:"FlavorAudioChannels";s:1:"2";s:21:"FlavorAudioSampleRate";s:5:"48000";s:21:"FlavorAudioResolution";s:1:"0";s:15:"FlavorFrameRate";s:2:"25";s:13:"FlavorGopSize";s:2:"50";s:13:"FlavorTwoPass";b:0;s:17:"FlavorDeinterlice";i:0;s:12:"FlavorRotate";i:0;s:19:"requiredPermissions";a:1:{i:0;s:22:"FEATURE_MOBILE_FLAVORS";}}}',0,null,1,0,0,null,0,1),
 (14,0,0,'Mobile (3GP)','Mobile(3GP)','mobile,mpeg4','Nokia/Blackberry',0,now(),now(),null,1,'3gp','mpeg4',800,'aac',64,0,0,0,480,0,0,300,0,'2,4','','a:13:{s:16:"FlavorVideoCodec";s:5:"mpeg4";s:18:"FlavorVideoBitrate";s:3:"800";s:16:"FlavorAudioCodec";s:3:"aac";s:18:"FlavorAudioBitrate";s:2:"64";s:19:"FlavorAudioChannels";s:1:"0";s:21:"FlavorAudioSampleRate";s:1:"0";s:21:"FlavorAudioResolution";s:1:"0";s:15:"FlavorFrameRate";s:1:"0";s:13:"FlavorGopSize";s:3:"300";s:13:"FlavorTwoPass";b:0;s:17:"FlavorDeinterlice";i:0;s:12:"FlavorRotate";i:0;s:19:"requiredPermissions";a:1:{i:0;s:22:"FEATURE_MOBILE_FLAVORS";}}}}',0,null,1,0,0,null,0,1),
-(15,0,0,'Mobile (H264) - Basic','Mobile(H264)-Basic','mobile,iphone,h264,web,iphonenew','iPhone,android',0,now(),now(),null,1,'mp4','h264b',400,'aac',64,2,22050,0,480,0,25,50,0,'2,99','-flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 400k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2  -vsync 2 | -flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 400k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2 -vsync 2','a:13:{s:16:"FlavorVideoCodec";s:5:"h264b";s:18:"FlavorVideoBitrate";s:3:"400";s:16:"FlavorAudioCodec";s:3:"aac";s:18:"FlavorAudioBitrate";s:2:"64";s:19:"FlavorAudioChannels";s:1:"2";s:21:"FlavorAudioSampleRate";s:5:"22050";s:21:"FlavorAudioResolution";s:1:"0";s:15:"FlavorFrameRate";s:2:"25";s:13:"FlavorGopSize";s:2:"50";s:13:"FlavorTwoPass";b:0;s:17:"FlavorDeinterlice";i:0;s:12:"FlavorRotate";i:0;s:19:"requiredPermissions";a:1:{i:0;s:22:"FEATURE_MOBILE_FLAVORS";}}}}',0,null,1,0,0,null,0,1),
-(16,0,0,'Mobile (H264) - Standard','Mobile(H264)-Standard','mobile,iphone,h264,web,iphonenew','Mobile (H264) - Standard',2,now(),now(),null,1,'mp4','h264b',800,'aac',64,2,22050,0,480,0,25,50,0,'2,99','-flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 800k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2  -vsync 2 | -flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 800k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2 -vsync 2','a:13:{s:16:"FlavorVideoCodec";s:5:"h264b";s:18:"FlavorVideoBitrate";s:3:"800";s:16:"FlavorAudioCodec";s:3:"aac";s:18:"FlavorAudioBitrate";s:2:"64";s:19:"FlavorAudioChannels";s:1:"2";s:21:"FlavorAudioSampleRate";s:5:"22050";s:21:"FlavorAudioResolution";s:1:"0";s:15:"FlavorFrameRate";s:2:"25";s:13:"FlavorGopSize";s:2:"50";s:13:"FlavorTwoPass";b:0;s:17:"FlavorDeinterlice";i:0;s:12:"FlavorRotate";i:0;s:19:"requiredPermissions";a:1:{i:0;s:22:"FEATURE_MOBILE_FLAVORS";}}}}',0,null,1,0,0,null,0,1),
+(15,0,0,'Mobile (H264) - Basic','Mobile(H264)-Basic','mobile,iphone,h264,web','iPhone,android',0,now(),now(),null,1,'mp4','h264b',400,'aac',64,2,22050,0,480,0,25,50,0,'2,99','-flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 400k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2  -vsync 2 | -flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 400k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2 -vsync 2','a:13:{s:16:"FlavorVideoCodec";s:5:"h264b";s:18:"FlavorVideoBitrate";s:3:"400";s:16:"FlavorAudioCodec";s:3:"aac";s:18:"FlavorAudioBitrate";s:2:"64";s:19:"FlavorAudioChannels";s:1:"2";s:21:"FlavorAudioSampleRate";s:5:"22050";s:21:"FlavorAudioResolution";s:1:"0";s:15:"FlavorFrameRate";s:2:"25";s:13:"FlavorGopSize";s:2:"50";s:13:"FlavorTwoPass";b:0;s:17:"FlavorDeinterlice";i:0;s:12:"FlavorRotate";i:0;s:19:"requiredPermissions";a:1:{i:0;s:22:"FEATURE_MOBILE_FLAVORS";}}}}',0,null,1,0,0,null,0,1),
+(16,0,0,'Mobile (H264) - Standard','Mobile(H264)-Standard','mobile,iphone,h264,web','Mobile (H264) - Standard',2,now(),now(),null,1,'mp4','h264b',800,'aac',64,2,22050,0,480,0,25,50,0,'2,99','-flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 800k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2  -vsync 2 | -flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 800k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2 -vsync 2','a:13:{s:16:"FlavorVideoCodec";s:5:"h264b";s:18:"FlavorVideoBitrate";s:3:"800";s:16:"FlavorAudioCodec";s:3:"aac";s:18:"FlavorAudioBitrate";s:2:"64";s:19:"FlavorAudioChannels";s:1:"2";s:21:"FlavorAudioSampleRate";s:5:"22050";s:21:"FlavorAudioResolution";s:1:"0";s:15:"FlavorFrameRate";s:2:"25";s:13:"FlavorGopSize";s:2:"50";s:13:"FlavorTwoPass";b:0;s:17:"FlavorDeinterlice";i:0;s:12:"FlavorRotate";i:0;s:19:"requiredPermissions";a:1:{i:0;s:22:"FEATURE_MOBILE_FLAVORS";}}}}',0,null,1,0,0,null,0,1),
 (17,0,0,'Apple streaming - Med','Apple streaming-Med','applembr','Apple streaming - Med',2,now(),now(),null,0,'applehttp','h264b',800,'aac',64,2,22050,0,480,0,25,50,0,'','','a:12:{s:16:"FlavorVideoCodec";s:5:"h264b";s:18:"FlavorVideoBitrate";s:3:"800";s:16:"FlavorAudioCodec";s:3:"aac";s:18:"FlavorAudioBitrate";s:2:"64";s:19:"FlavorAudioChannels";s:1:"2";s:21:"FlavorAudioSampleRate";s:5:"22050";s:21:"FlavorAudioResolution";s:1:"0";s:15:"FlavorFrameRate";s:2:"25";s:13:"FlavorGopSize";s:2:"50";s:13:"FlavorTwoPass";b:0;s:17:"FlavorDeinterlice";i:0;s:12:"FlavorRotate";i:0;}',0,null,1,0,0,'[[{"id":2,"extra":"-flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 400k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2 -vsync 2 ","command":null},{"id":"segmenter.Segmenter","extra":null,"command":null}],[{"id":99,"extra":"-flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 400k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2 -vsync 2 ","command":null},{"id":"segmenter.Segmenter","extra":null,"command":null}]]',1,1),
 (18,0,0,'Apple streaming - Basic','Apple streaming-Basic','applembr','Apple streaming',0,now(),now(),null,0,'applehttp','h264b',400,'aac',64,2,22050,0,480,0,25,50,0,'','','a:12:{s:16:"FlavorVideoCodec";s:5:"h264b";s:18:"FlavorVideoBitrate";s:3:"400";s:16:"FlavorAudioCodec";s:3:"aac";s:18:"FlavorAudioBitrate";s:2:"64";s:19:"FlavorAudioChannels";s:1:"2";s:21:"FlavorAudioSampleRate";s:5:"22050";s:21:"FlavorAudioResolution";s:1:"0";s:15:"FlavorFrameRate";s:2:"25";s:13:"FlavorGopSize";s:2:"50";s:13:"FlavorTwoPass";b:0;s:17:"FlavorDeinterlice";i:0;s:12:"FlavorRotate";i:0;}',0,null,1,0,0,'[[{"id":2,"extra":"-flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 400k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2 -vsync 2 ","command":null},{"id":"segmenter.Segmenter","extra":null,"command":null}],[{"id":99,"extra":"-flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 400k -maxrate 1200k -bufsize 1200k -rc_eq ''blurCplx^(1-qComp)'' -level 30 -async 2 -vsync 2 ","command":null},{"id":"segmenter.Segmenter","extra":null,"command":null}]]',1,1),
 (19,0,0,'Default Thumbnail','Default Thumbnail','default_thumb','Default Thumbnail',0,now(),now(),null,1,'jpg','',0,'',0,0,0,0,0,0,0,0,0,null,null,'a:11:{s:13:"ThumbCropType";i:1;s:12:"ThumbQuality";i:100;s:10:"ThumbCropX";i:0;s:10:"ThumbCropY";i:0;s:14:"ThumbCropWidth";i:0;s:15:"ThumbCropHeight";i:0;s:16:"ThumbVideoOffset";i:3;s:15:"ThumbScaleWidth";i:0;s:16:"ThumbScaleHeight";i:0;s:20:"ThumbBackgroundColor";i:0;s:19:"ThumbSourceParamsId";i:0;}',0,null,1,0,0,null,null,2),
@@ -404,7 +422,9 @@ insert into `permission`(`id`,`type`,`name`,`friendly_name`,`description`,`partn
 (176,1,'systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_ADMIN_KMC_USERS','System admin config publisher admin kmc user','System admin config publisher admin kmc user',-2,1,null,null,now(),now(),'a:1:{s:13:"partner_group";s:0:"";}'),
 (177,2,'FEATURE_CLIP_MEDIA','clipped media fature','Permission to use clipping feature',99,1,null,null,now(),now(),'a:1:{s:13:"partner_group";s:0:"";}'),
 (178,1,'ADMIN_USER_ASSIGN_PARNTERS','System admin assign partners to user','Permission to assign partners to user',-2,1,null,null,now(),now(),'a:1:{s:13:"partner_group";s:0:"";}'),
-(179,1,'dropFolder.CONTENT_INGEST_DROP_FOLDER_MATCH','Drop Folder Match','Permission to match drop folder file to entry',0,1,'CONTENT_INGEST_DROP_FOLDER_MATCH',null,now(),now(),'a:1:{s:13:"partner_group";s:0:"";}');
+(179,1,'SYSTEM_ADMIN_REPORTS_READ','System admin view reports','System admin view reports',-2,1,null,null,now(),now(),'a:1:{s:13:"partner_group";s:0:"";}'),
+(180,1,'SYSTEM_ADMIN_REPORTS_UPDATE','System admin update reports','System admin update reports',-2,1,null,null,now(),now(),'a:1:{s:13:"partner_group";s:0:"";}'),
+(181,1,'dropFolder.CONTENT_INGEST_DROP_FOLDER_MATCH','Drop Folder Match','Permission to match drop folder file to entry',0,1,'CONTENT_INGEST_DROP_FOLDER_MATCH',null,now(),now(),'a:1:{s:13:"partner_group";s:0:"";}');
 
 insert into `permission_item`(`id`,`type`,`partner_id`,`param_1`,`param_2`,`param_3`,`param_4`,`param_5`,`tags`,`created_at`,`updated_at`,`custom_data`) values 
 (1,'kApiActionPermissionItem',0,'metadata_metadataprofile','list','','','',null,now(),now(),null),
@@ -1114,7 +1134,7 @@ insert into `permission_item`(`id`,`type`,`partner_id`,`param_1`,`param_2`,`para
 (705,'kApiParameterPermissionItem',-2,'KalturaMediaInfo','multiStream','read','','',null,now(),now(),null),
 (706,'kApiParameterPermissionItem',-1,'KalturaMediaInfo','multiStream','read','','',null,now(),now(),null),
 (707,'kApiActionPermissionItem',0,'synacorhbodistribution_synacorhbo','getfeed','','','',null,now(),now(),null),
-(708,'kApiActionPermissionItem',0,'dropfolder_dropfolderfile','updateStatus','','','',null,now(),now(),null),
+(708,'kApiActionPermissionItem',0,'dropfolder_dropfolderfile','updatestatus','','','',null,now(),now(),null),
 (709,'kApiActionPermissionItem',0,'attachment_attachmentParams','add','','','',null,now(),now(),null),
 (710,'kApiActionPermissionItem',0,'attachment_attachmentParams','get','','','',null,now(),now(),null),
 (711,'kApiActionPermissionItem',0,'attachment_attachmentParams','update','','','',null,now(),now(),null),
@@ -1124,7 +1144,25 @@ insert into `permission_item`(`id`,`type`,`partner_id`,`param_1`,`param_2`,`para
 (715,'kApiActionPermissionItem',0,'caption_captionParams','get','','','',null,now(),now(),null),
 (716,'kApiActionPermissionItem',0,'caption_captionParams','update','','','',null,now(),now(),null),
 (717,'kApiActionPermissionItem',0,'caption_captionParams','delete','','','',null,now(),now(),null),
-(718,'kApiActionPermissionItem',0,'caption_captionParams','list','','','',null,now(),now(),null);
+(718,'kApiActionPermissionItem',0,'caption_captionParams','list','','','',null,now(),now(),null),
+(719,'kApiActionPermissionItem',0,'flavorParams','add','','','',null,now(),now(),null),
+(720,'kApiActionPermissionItem',0,'flavorParams','get','','','',null,now(),now(),null),
+(721,'kApiActionPermissionItem',0,'flavorParams','update','','','',null,now(),now(),null),
+(722,'kApiActionPermissionItem',0,'flavorParams','delete','','','',null,now(),now(),null),
+(723,'kApiActionPermissionItem',0,'flavorParams','list','','','',null,now(),now(),null),
+(724,'kApiActionPermissionItem',0,'flavorParams','getbyconversionprofileid','','','',null,now(),now(),null),
+(725,'kApiActionPermissionItem',0,'ndndistribution_ndn','getfeed','','','',null,now(),now(),null),
+(726,'kApiActionPermissionItem',0,'uversedistribution_uverse','getfeed','','','',null,now(),now(),null),
+(727,'kApiActionPermissionItem',-2,'adminconsole_reportadmin','add','','','',null,now(),now(),null),
+(728,'kApiActionPermissionItem',-2,'adminconsole_reportadmin','get','','','',null,now(),now(),null),
+(729,'kApiActionPermissionItem',-2,'adminconsole_reportadmin','list','','','',null,now(),now(),null),
+(730,'kApiActionPermissionItem',-2,'adminconsole_reportadmin','update','','','',null,now(),now(),null),
+(731,'kApiActionPermissionItem',-2,'adminconsole_reportadmin','executedebug','','','',null,now(),now(),null),
+(732,'kApiActionPermissionItem',-2,'adminconsole_reportadmin','getparameters','','','',null,now(),now(),null),
+(733,'kApiActionPermissionItem',-2,'adminconsole_reportadmin','getcsvurl','','','',null,now(),now(),null),
+(734,'kApiActionPermissionItem',-2,'adminconsole_reportadmin','delete','','','',null,now(),now(),null),
+(735,'kApiActionPermissionItem',0,'report','execute','','','',null,now(),now(),null),
+(736,'kApiActionPermissionItem',0,'report','getcsv','','','',null,now(),now(),null);
 
 insert into `permission_to_permission_item`(`id`,`permission_id`,`permission_item_id`,`created_at`,`updated_at`) values
 (45655,66,567,now(),now()),
@@ -2877,7 +2915,36 @@ insert into `permission_to_permission_item`(`id`,`permission_id`,`permission_ite
 (84080,26,180,now(),now()),
 (84081,107,180,now(),now()),
 (84082,111,180,now(),now()),
-(84083,143,590,now(),now());
+(84083,63,719,now(),now()),
+(84084,62,720,now(),now()),
+(84085,64,721,now(),now()),
+(84086,65,722,now(),now()),
+(84087,88,723,now(),now()),
+(84088,62,723,now(),now()),
+(84089,33,723,now(),now()),
+(84090,26,723,now(),now()),
+(84091,11,723,now(),now()),
+(84092,118,723,now(),now()),
+(84093,107,723,now(),now()),
+(84094,111,723,now(),now()),
+(84095,114,723,now(),now()),
+(84096,62,724,now(),now()),
+(84097,118,5,now(),now()),
+(84098,118,6,now(),now()),
+(84099,118,9,now(),now()),
+(84100,6,725,now(),now()),
+(84101,6,726,now(),now()),
+(84102,118,727,now(),now()),
+(84103,118,728,now(),now()),
+(84104,118,729,now(),now()),
+(84105,118,730,now(),now()),
+(84106,118,731,now(),now()),
+(84107,118,732,now(),now()),
+(84108,118,733,now(),now()),
+(84109,118,734,now(),now()),
+(84110,79,735,now(),now()),
+(84111,79,736,now(),now()),
+(84112,143,590,now(),now());
 
 insert into `storage_profile`(`id`,`created_at`,`updated_at`,`partner_id`,`name`,`system_name`,`desciption`,`status`,`protocol`,`storage_url`,`storage_base_dir`,`storage_username`,`storage_password`,`storage_ftp_passive_mode`,`delivery_http_base_url`,`delivery_rmp_base_url`,`delivery_iis_base_url`,`min_file_size`,`max_file_size`,`flavor_params_ids`,`max_concurrent_connections`,`custom_data`,`path_manager_class`,`url_manager_class`) values
 (0,now(),now(),0,'@DC_NAME@','','@DC_DESCRIPTION@',3,0,null,'@STORAGE_BASE_DIR@',null,null,null,'@DELIVERY_HTTP_BASE_URL@','@DELIVERY_RTMP_BASE_URL@','@DELIVERY_ISS_BASE_URL@',null,null,null,null,null,null,'');
@@ -2977,7 +3044,22 @@ insert into `ui_conf`(`id`,`obj_type`,`partner_id`,`subp_id`,`conf_file_path`,`n
 (2011401,2,0,0,'content/uiconf/special/2011401.xml','new KCW for UVA','','',null,'/flash/kcw/v2.1.6.3/ContributionWizard.swf',now(),now(),'',1,'',null,2,null,2,3,null,null),
 (2158531,8,0,0,'content/uiconf/special/2158531.xml','Sakai_Default_AudioPlayer','400','100',null,'/flash/kdp3/v3.5.6/kdp3.swf',now(),now(),'',1,'kdp3,player',null,2,null,2,2,null,null),
 (2162571,8,0,0,'content/uiconf/special/2162571.xml','Sakai_Default_ImagePlayer','400','300',null,'/flash/kdp3/v3.5.6/kdp3.swf',now(),now(),'',1,'kdp3,player',null,2,null,2,2,null,null),
-(2733871,4,0,0,'content/uiconf/special/2733871.xml','KAE for UVA','','',null,'/flash/kae/v1.2.3/KalturaAdvancedVideoEditor.swf',now(),now(),'',1,'','a:2:{s:8:"autoplay";b:0;s:9:"automuted";b:0;}',2,null,2,3,null,null);
+(2733871,4,0,0,'content/uiconf/special/2733871.xml','KAE for UVA','','',null,'/flash/kae/v1.2.3/KalturaAdvancedVideoEditor.swf',now(),now(),'',1,'','a:2:{s:8:"autoplay";b:0;s:9:"automuted";b:0;}',2,null,2,3,null,null),
+(4395691,2,0,0,'content/uiconf/special/4395691.xml','moodle_uploader_regular','640','480',NULL,'/flash/kcw/v2.1.6.7/ContributionWizard.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,NULL,NULL), 
+(4674731,8,0,0,'content/uiconf/special/4674731.xml','Default Light-- moodle extension KDP3','400','365',NULL,'/flash/kdp3/v3.5.7.6/kdp3.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,NULL,NULL), 
+(4674741,8,0,0,'content/uiconf/special/4674741.xml','Default Dark -- moodle extension KDP','400','365',NULL,'/flash/kdp3/v3.5.7.6/kdp3.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,NULL,NULL), 
+(4860481,8,0,0,'content/uiconf/special/4860481.xml','Moodle - PPT Widget - Video on the Left','900','483',NULL,'/flash/kdp3/v3.5.7.7/kdp3.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,NULL,NULL), 
+(6235211,2,0,0,'content/uiconf/special/6235211.xml','blackboard video only - course gallery default','0','0',NULL,'/flash/kcw/v2.1.6.7/ContributionWizard.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,NULL,NULL), 
+(6235221,2,0,0,'content/uiconf/special/6235221.xml','blackboard video only for ''my media'' page','0','0',NULL,'/flash/kcw/v2.1.6.7/ContributionWizard.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,NULL,NULL), 
+(6386311,2,0,0,'content/uiconf/special/6386311.xml','moodle2.0  kuploader','','',NULL,'/flash/kupload/v1.2.8/KUpload.swf',now(),now(),'',1,'','a:2:{s:8:"autoplay";b:0;s:9:"automuted";b:0;}',2,NULL,2,3,NULL,NULL), 
+(6548391,8,0,0,'content/uiconf/special/6548391.xml','BlackBoard 2.0 - course gallery player','400','330',NULL,'/flash/kdp3/v3.5.33/kdp3.swf',now(),now(),'',1,'kdp3,player',NULL,2,NULL,2,2,NULL,NULL), 
+(6548401,8,0,0,'content/uiconf/special/6548401.xml','BlackBoard 2.0 - My Media Player','400','330',NULL,'/flash/kdp3/v3.5.33/kdp3.swf',now(),now(),'',1,'kdp3,player',NULL,2,NULL,2,2,NULL,NULL), 
+(6548421,0,0,0,'content/uiconf/special/6548421.xml','kClip for clippApp in Blackboard 2.0','','',NULL,'/flash/kclip/v1.1.4/KClip.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,NULL,NULL),
+(5612211,2,0,0,'content/uiconf/special/5612211.xml','KCW for uva','0','0',NULL,'/flash/kcw/v2.1.4/ContributionWizard.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,NULL,NULL),
+(6709401,2,0,0,'content/uiconf/special/6709401.xml','moodle2 uploader regular','640','480',NULL,'/flash/kcw/v2.1.6.7/ContributionWizard.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,NULL,NULL),
+(6709411,8,0,0,'content/uiconf/special/6709411.xml','Default Dark -- moodle2 extension KDP','400','365',NULL,'/flash/kdp3/v3.5.7.6/kdp3.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,NULL,NULL),
+(6709421,8,0,0,'content/uiconf/special/6709421.xml','Default Light-- moodle2 extension KDP3','400','365',NULL,'/flash/kdp3/v3.5.7.6/kdp3.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,NULL,NULL);
+
 
 insert into `user_login_data`(`id`,`login_email`,`first_name`,`last_name`,`sha1_password`,`salt`,`config_partner_id`,`login_blocked_until`,`created_at`,`updated_at`,`custom_data`) values
 (1,'@TEMPLATE_PARTNER_MAIL@','Template',null,'@TEMPLATE_ADMIN_KUSER_SHA1@','@TEMPLATE_ADMIN_KUSER_SALT@',99,null,now(),now(),'a:4:{s:14:"login_attempts";N;s:17:"password_hash_key";N;s:18:"previous_passwords";N;s:21:"last_login_partner_id";i:99;}'),
@@ -2997,7 +3079,7 @@ insert into `user_role`(`id`,`str_id`,`name`,`system_name`,`description`,`partne
 (8,'','Support Manager','Support Manager','Support manager',-2,1,'SYSTEM_ADMIN_BASE,SYSTEM_ADMIN_PUBLISHER_BASE,SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS,SYSTEM_ADMIN_PUBLISHER_CONFIG,SYSTEM_ADMIN_PUBLISHER_BLOCK,SYSTEM_ADMIN_PUBLISHER_ADD,SYSTEM_ADMIN_PUBLISHER_USAGE,SYSTEM_ADMIN_DEVELOPERS_TAB,SYSTEM_ADMIN_BATCH_CONTROL,SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE,SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY,SYSTEM_ADMIN_PUBLISHER_RESET_USER_PASSWORD,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_ACCOUNT_INFO,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_GROUP_OPTIONS,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_TECH_DATA,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_GENERAL_INFORMATION,SYSTEM_ADMIN_PARTNER_CONFIGURATION_VIEW,SYSTEM_ADMIN_WIDGET,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_ADMIN_KMC_USERS,AUDIT_TRAIL_BASE','admin_console',now(),now(),null),
 (9,'','Publisher Administrator','Publisher Administrator','Publishers Administrator',-2,1,'SYSTEM_ADMIN_BASE,SYSTEM_ADMIN_PUBLISHER_BASE,SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS,SYSTEM_ADMIN_PUBLISHER_CONFIG,SYSTEM_ADMIN_PUBLISHER_BLOCK,SYSTEM_ADMIN_PUBLISHER_ADD,SYSTEM_ADMIN_PUBLISHER_USAGE,SYSTEM_ADMIN_DEVELOPERS_TAB,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_TECH_DATA,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_ACCOUNT_INFO,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_GENERAL_INFORMATION,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_GROUP_OPTIONS,SYSTEM_ADMIN_PARTNER_CONFIGURATION_VIEW,SYSTEM_ADMIN_WIDGET,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_ADMIN_KMC_USERS,SYSTEM_ADMIN_PUBLISHER_RESET_USER_PASSWORD,AUDIT_TRAIL_BASE','admin_console',now(),now(),null),
 (10,'','Guest','Guest','Guest',-2,1,'SYSTEM_ADMIN_BASE','admin_console',now(),now(),null),
-(11,'BULK_LOG_VIEWER_ROLE','Bulk Log Viewer Role','Bulk Log Viewer Role','Bulk Log Viewer Role',0,1,'BULK_LOG_DOWNLOAD',NULL,now(),now(),NULL);
+(11,'BULK_LOG_VIEWER','Bulk Log Viewer Role','BULK_LOG_VIEWER','Bulk Log Viewer Role',0,1,'BULK_LOG_DOWNLOAD_EMAIL',NULL,now(),now(),NULL);
 
 
 insert into `widget`(`id`,`int_id`,`source_widget_id`,`root_widget_id`,`partner_id`,`subp_id`,`kshow_id`,`entry_id`,`ui_conf_id`,`custom_data`,`security_type`,`security_policy`,`created_at`,`updated_at`,`partner_data`) values 
