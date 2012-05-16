@@ -28,13 +28,32 @@ class BulkUploadResultPeer extends BaseBulkUploadResultPeer
 	
 	
 	/**
-	 * @return BulkUploadResult 
+	 * @return BulkUploadResult
+	 * @deprecated 
 	 */
 	public static function retrieveByEntryId($entryId, $bulkUploadId = null)
 	{
 		$criteria = new Criteria();
 		$criteria->add(BulkUploadResultPeer::OBJECT_ID, $entryId);
 		$criteria->add(BulkUploadResultPeer::OBJECT_TYPE, BulkUploadResultObjectType::ENTRY);
+		if($bulkUploadId)
+			$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $bulkUploadId);
+		
+		return self::doSelectOne($criteria);
+	}
+	
+	/**
+	 * Retrieve BulkUploadResult object by objectId and bulkUpload job ID.
+	 * @param string $objectId
+	 * @param int $objectType default value 1 (ENTRY)
+	 * @param string $bulkUploadId
+	 * @return BulkUploadResult
+	 */
+	public static function retrieveByObjectId ($objectId, $objectType = 1, $bulkUploadId = null)
+	{
+	    $criteria = new Criteria();
+		$criteria->add(BulkUploadResultPeer::OBJECT_ID, $objectId);
+		$criteria->add(BulkUploadResultPeer::OBJECT_TYPE, $objectType);
 		if($bulkUploadId)
 			$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $bulkUploadId);
 		
