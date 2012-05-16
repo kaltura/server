@@ -1058,7 +1058,9 @@ class category extends Basecategory implements IIndexable
 
 		parent::setPuserId($puserId);
 			
-		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $puserId);
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 		if (!$kuser)
 			throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
 			
