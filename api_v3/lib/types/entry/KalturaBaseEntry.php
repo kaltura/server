@@ -538,7 +538,13 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 				$puserId = trim($puserId);
 				$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
 				if (!$kuser)
-					throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+				{
+					$newKuser = new kuser();
+					$newKuser->setPuserId($puserId);
+					$newKuser->setStatus(KuserStatus::ACTIVE);
+					$newKuser->setPartnerId($partnerId);
+					$newKuser->save();
+				}
 			}
 		}
 			
@@ -551,7 +557,13 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 				$puserId = trim($puserId);
 				$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
 				if (!$kuser)
-					throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+				{
+					$newKuser = new kuser();
+					$newKuser->setPuserId($puserId);
+					$newKuser->setStatus(KuserStatus::ACTIVE);
+					$newKuser->setPartnerId($partnerId);
+					$newKuser->save();
+				}
 			}
 		}
 		
