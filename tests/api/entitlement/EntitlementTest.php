@@ -62,14 +62,9 @@ class EntitlementTest extends EntitlementTestBase
 		$categoriesListResponse = $this->client->category->listAction($filterCategory);
 
 		
-		if(count($categoriesListResponse->objects))
-		{
-			if($category->appearInList == KalturaAppearInListType::PARTNER_ONLY)
-				$this->assertTrue(true, 'Category returned since it should appear in list');
-			else
-				$this->assertTrue(false, 'Category is not parent only and should not be appear in list');
-		}
-		
+		if(!count($categoriesListResponse->objects) && $category->appearInList == KalturaAppearInListType::PARTNER_ONLY)
+			$this->assertTrue(false, 'Category should returned in list since it appearInListType is set to PARTNER_ONLY');
+			
 		if ($category->appearInList != KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
 		{
 			switch ($category->userJoinPolicy)
@@ -90,10 +85,30 @@ class EntitlementTest extends EntitlementTestBase
 					if (!$categoryUserResponse)
 						$this->assertTrue(true, 'user cannot be added to this category since it is not allowed');
 					else
-					{
 						$this->assertTrue(false, 'user was added to this category although it is not allowed');
-					}				
+					
+					if(count($categoriesListResponse->objects) && $category->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
+						$this->assertTrue(false, 'Category should not returned in list since it appearInListType is set to CATEGORY_MEMBERS_ONLY and user is not member in this category');
+					
 					break;
+					
+				case KalturaUserJoinPolicyType::REQUEST_TO_JOIN:
+					if ($categoryUserResponse && $categoryUserResponse->status == KalturaCategoryUserStatus::PENDING)
+						$this->assertTrue(true, 'user was added to the category since it\'s policy is REQUEST_TO_JOIN with status pending');
+					else
+						$this->assertTrue(false, 'user was not added to the category or was not set to pending status although it\'s policy is REQUEST_TO_JOIN');
+						
+					if ($categoryUserResponse && $categoryUserResponse->permissionLevel == $category->defaultPermissionLevel)
+						$this->assertTrue(true, 'user permission Level was set as default permission level');
+					else
+						$this->assertTrue(false, 'user permission Level [' . $categoryUserResponse->permissionLevel . '] was not set as category permission level [' . $category->defaultPermissionLevel . ']');
+						
+					
+					if(count($categoriesListResponse->objects) && $category->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
+						$this->assertTrue(false, 'Category should not returned in list since it appearInListType is set to CATEGORY_MEMBERS_ONLY and user is not member in this category');
+					
+					break;
+					
 				default:
 					break;	
 			}
@@ -255,23 +270,74 @@ class EntitlementTest extends EntitlementTestBase
 	 * @param KalturaBaseEntry $entry
 	 * @dataProvider provideData
 	 */
-	public function testEntryEntit($category, $user, $entry)
+	public function testEntryEntit($category, $user, $entry, $categoryUserPermissionLevel)
 	{
-		$entry = $this->client->baseEntry->add($entry);
+		$this->startSession($this->client);
 		
+		/* @var $category KalturaCategory */
 		$category->name = $category->name . time() . rand();
 		$category = $this->client->category->add($category);
+					
+		$filterCategory = new KalturaCategoryFilter();
+		$filterCategory->idEqual = $category->id;		
+		$categoriesListResponse = $this->client->category->listAction($filterCategory);
 		
+		$entry = $this->client->baseEntry->add($entry);
+		
+		$categoryCategoryEntry = new KalturaCategoryEntry();
+		$categoryCategoryEntry->categoryId = $category->id;
+		$categoryCategoryEntry->entryId = $entry->id;
+		
+		try {
+			$categoryEntryResponse = $this->client->categoryEntry->add($categoryCategoryEntry);
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::err('Error: line:' . __LINE__ .' ' . $ex->getMessage());
+			
+			if ($ex->getCode() != 'CATEGORY_NOT_FOUND' && $category->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
+			{			
+				$this->assertTrue(true, 'Category is members only and cannot get this entry');
+			}
+			elseif($category->contributionPolicy != KalturaContributionPolicyType::ALL)
+			{
+				$this->assertTrue(true, 'not allowed to add entry to category');
+			}
+			else
+			{
+				$this->assertTrue(false, 'Fialed to add entry to category');
+				return;
+			}
+		}
+		
+		/* @var $user KalturaUser */
 		$user->id = $user->id . time() . rand();
 		$user = $this->client->user->add($user);
+			
+		$this->startSessionWithDiffe(SessionType::USER, $user->id);
 		
-		$categoryEntry = new KalturaCategoryEntry();
-		$categoryEntry->entryId = $entry->id;
-		$categoryEntry->categoryId = $category->id;
+		//user get the entry with no permission
+		try {
+			$entry = $this->client->baseEntry->get($entry->id);
+		}
+		catch (Exception $ex)
+		{
+			if($ex->getCode() != 'ENTRY_ID_NOT_FOUND')
+			{
+				if($category->privacy != KalturaPrivacyType::MEMBERS_ONLY)
+					$this->assertTrue(false, 'Category privacy if not members only and user should be able to get the entry');	
+			}
+		}
+		
+		if($category->privacy == KalturaPrivacyType::MEMBERS_ONLY)
+			$this->assertTrue(false, 'Category privacy if members only and user should not be able to get the entry');	
+		
+		$this->startSession($this->client);
 		
 		$categoryUser = new KalturaCategoryUser();
 		$categoryUser->categoryId = $category->id;
 		$categoryUser->userId = $user->id;
+		$categoryUser->permissionLevel = $categoryUserPermissionLevel;
 		
 		$categoryUserResponse = null;
 		try {
@@ -280,39 +346,34 @@ class EntitlementTest extends EntitlementTestBase
 		catch(Exception $ex)
 		{
 			KalturaLog::err('Error: line:' . __LINE__ .' ' . $ex->getMessage());
-			if ($category->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)				
+			
+			if ($category->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
+			{				
 				$this->assertTrue(true, 'Category is members only and therefor user is not able to get it and to be added to');
+			}
 			elseif($category->userJoinPolicy == KalturaUserJoinPolicyType::NOT_ALLOWED)
+			{
 				$this->assertTrue(true, 'User is not allowed to join this category');
+			}
 			else
+			{
 				$this->assertTrue(false, 'Fialed to add user to category');
-				
-			return;
+				return;
+			}
 		}
 		
-		try {
-			$userSessionEntry = $this->client->baseEntry->get($entry->id);
-			
-			if ($category->privacy == KalturaPrivacyType::AUTHENTICATED_USERS ||
-				$category->privacy == KalturaPrivacyType::ALL)
-				$this->assertTrue(true);
-			else
-				$this->assertTrue(false, 'Entry belong to members only category, and user is not a memebr, but was able to get the entry');
-			
-		}
-		catch (Exception $ex)
+		if($categoryUserResponse && $categoryUserResponse->status == KalturaCategoryUserStatus::ACTIVE)
 		{
-			$this->assertEquals($category->privacy, KalturaPrivacyType::MEMBERS_ONLY);
+				//user get the entry with no permission
+			try {
+				$entry = $this->client->baseEntry->get($entry->id);
+			}
+			catch (Exception $ex)
+			{
+				if($ex->getCode() != 'ENTRY_ID_NOT_FOUND')
+					$this->assertTrue(false, 'Category privacy if not members only and user should be able to get the entry');	
+			}
 		}
-		
-		
-			
-		$this->client->categoryEntry->add($categoryEntry);
-		
-		
-		
-		$this->startSessionWithDiffe(SessionType::USER, $user->id);
-				
 	}
 	
 }
