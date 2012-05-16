@@ -391,7 +391,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		{
 			$errorMessage = "Metadata profile [$metadataProfileId] not found";
 			KalturaLog::err($errorMessage);
-			self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+			self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 			return;
 		}
 		
@@ -405,7 +405,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			{
 				$errorMessage = "Download metadata[" . $data[self::BULK_UPLOAD_COLUMN_URL] . "] error: " . $e->getMessage();
 				KalturaLog::err($errorMessage);
-				self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+				self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 				$xmlData = null;
 			}
 		}
@@ -440,7 +440,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 				{
 					$errorMessage = "Field [$key] does not exist";
 					KalturaLog::err($errorMessage);
-					self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+					self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 					continue;
 				}
 				
@@ -457,7 +457,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 						{
 							$errorMessage = "Could not parse date format [$fieldValue] for field [$key]";
 							KalturaLog::err($errorMessage);
-							self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+							self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 							continue;
 						}
 							
@@ -468,7 +468,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 					{
 						$errorMessage = "Could not parse int format [$fieldValue] for field [$key]";
 						KalturaLog::err($errorMessage);
-						self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+						self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 						continue;
 					}
 						
@@ -491,7 +491,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		$errorMessage = '';
 		if(!kMetadataManager::validateMetadata($metadataProfileId, $xmlData, $errorMessage))
 		{
-			self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+			self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 			return;
 		}
 		
@@ -534,7 +534,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	            {
 	                $errorMessage = "Unexpected key sturcture. Expected metadata::ProfileSystemName::FieldSystemName.";
                     KalturaLog::err($errorMessage);
-                    self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+                    self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 				    continue; 
 	            }
 	            if (!isset($newFieldValuesMap[$metadataProfileSystemName]))
@@ -556,7 +556,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	        {
 	            $errorMessage = "Metadata profile with system name [$metadataProfileSystemName] could not be found.";
                 KalturaLog::err($errorMessage);
-                self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+                self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 				continue;   
 	        }
 	        
@@ -576,7 +576,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
                 {
                     $errorMessage = "Metadata profile field with system name [$fieldSysName] missing from metadata profile with id [$metadataProfileId]";
                     KalturaLog::err($errorMessage);
-                    self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+                    self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 					continue;                
                 }
                 
@@ -593,7 +593,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 						{
 							$errorMessage = "Could not parse date format [$fieldValue] for field [$key]";
 							KalturaLog::err($errorMessage);
-							self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+							self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 							continue;
 						}
 							
@@ -604,7 +604,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 					{
 						$errorMessage = "Could not parse int format [$fieldValue] for field [$key]";
 						KalturaLog::err($errorMessage);
-						self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+						self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 						continue;
 					}
 						
@@ -626,7 +626,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	        $errorMessage = '';
     		if(!kMetadataManager::validateMetadata($metadataProfileId, $xmlData, $errorMessage))
     		{
-    			self::addBulkUploadResultDescription($object->getId(), $object->getBulkUploadId(), $errorMessage);
+    			self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
     			return;
     		}
     		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
@@ -657,8 +657,10 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	 */
 	protected static function addBulkUploadResultDescription(BaseObject $object, $bulkUploadId, $description)
 	{
-	    $objectType = strtoupper($object->getPeer());
-		$bulkUploadResult = BulkUploadResultPeer::retrieveByObjectId($object->getId(), $bulkUploadId);
+	    $objectPeerClass = get_class($object->getPeer());
+	    $objectType = strtoupper(constant("$objectPeerClass::OM_CLASS"));
+	    
+		$bulkUploadResult = BulkUploadResultPeer::retrieveByObjectId($object->getId(), constant("BulkUploadObjectType::$objectType"), $bulkUploadId);
 		if(!$bulkUploadResult)
 		{
 			KalturaLog::err("Bulk upload results not found for object [{$object->getId()}]");
