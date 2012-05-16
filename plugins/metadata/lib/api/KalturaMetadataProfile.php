@@ -134,7 +134,25 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 		return parent::toObject($dbMetadataProfile, $propsToSkip);
 	}
 	
-		/* (non-PHPdoc)
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
+	public function fromObject($source_object)
+	{
+		parent::fromObject($source_object);
+
+		$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
+		$this->xsd = kFileSyncUtils::file_get_contents($key, true, false);
+		
+		$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
+		$this->views = kFileSyncUtils::file_get_contents($key, true, false);
+
+		$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT);
+		$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
+	}
+	
+	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert()
 	 */
 	public function validateForInsert($propertiesToSkip = array())
@@ -153,19 +171,20 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KalturaObject::fromObject()
+	 * @see KalturaObject::validateForUpdate()
 	 */
-	public function fromObject($source_object)
+	public function validateForUpdate($sourceObject)
 	{
-		parent::fromObject($source_object);
-
-		$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-		$this->xsd = kFileSyncUtils::file_get_contents($key, true, false);
-		
-		$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
-		$this->views = kFileSyncUtils::file_get_contents($key, true, false);
-
-		$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT);
-		$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
+	    $this->validatePropertyMinLength("name", 1); 
+	    
+	    if ($this->systemName)
+	    {
+	        $c = KalturaCriteria::create(MetadataProfilePeer::OM_CLASS);
+			$c->add(MetadataProfilePeer::SYSTEM_NAME, $this->systemName);
+			if(StorageProfilePeer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+	    }
+	    
+	    return parent::validateForUpdate($sourceObject);
 	}
 }
