@@ -261,6 +261,8 @@ class KalturaActionReflector extends KalturaReflector
         if (!function_exists('apc_store'))
         	return;
         	
+	    $servicesMapLastModTime = KalturaServicesMap::getServiceMapModificationTime();
+	    
         $cacheValue = array(
         	KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime, 
         	"actionInfo" => $this->_actionInfo, 
@@ -268,7 +270,6 @@ class KalturaActionReflector extends KalturaReflector
         	"actionClassInfo" => $this->_actionClassInfo,
         );
         
-	    $servicesMapLastModTime = KalturaServicesMap::getServiceMapModificationTime();
 	    $success = apc_store("{$this->_serviceId}_{$this->_actionId}", $cacheValue);
     }
 
