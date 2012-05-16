@@ -18,7 +18,7 @@ class PartnerService extends KalturaBaseService
 	}
 
 	/**
-	 * Register to Kaltura's partner program
+	 * Create a new Partner object
 	 * 
 	 * @action register
 	 * @param KalturaPartner $partner
@@ -27,17 +27,11 @@ class PartnerService extends KalturaBaseService
 	 *
 	 * @throws APIErrors::PARTNER_REGISTRATION_ERROR
 	 */
-	function registerAction( KalturaPartner $partner , $cmsPassword = "" )
+	public function registerAction( KalturaPartner $partner , $cmsPassword = "" )
 	{
 		KalturaResponseCacher::disableCache();
 		
 		$dbPartner = $partner->toPartner();
-		$partner->validatePropertyNotNull("name");
-		$partner->validatePropertyNotNull("adminName");
-		$partner->validatePropertyNotNull("adminEmail");
-		$partner->validatePropertyNotNull("description");
-		$partner->validatePropertyMaxLength("country", 2, true);
-		$partner->validatePropertyMaxLength("state", 2, true);
 		
 		$c = new Criteria();
 		$c->addAnd(UserLoginDataPeer::LOGIN_EMAIL, $partner->adminEmail, Criteria::EQUAL);
@@ -58,9 +52,9 @@ class PartnerService extends KalturaBaseService
 				if ($parentPartnerId == Partner::ADMIN_CONSOLE_PARTNER_ID) {
 		                    $parentPartnerId = null;
 				}
-                		else {
-				
-					// only if this partner is a var/grou, allow setting it as parent for the new created partner
+                else
+                {
+					// only if this partner is a var/group, allow setting it as parent for the new created partner
 					$parentPartner = PartnerPeer::retrieveByPK( $parentPartnerId );
 					if ( ! ($parentPartner->getPartnerGroupType() == PartnerGroupType::VAR_GROUP ||
 							$parentPartner->getPartnerGroupType() == PartnerGroupType::GROUP ) )
@@ -110,7 +104,7 @@ class PartnerService extends KalturaBaseService
 
 
 	/**
-	 * Update details and settings of you existing partner
+	 * Update details and settings of an existing partner
 	 * 
 	 * @action update
 	 * @param KalturaPartner $partner
@@ -119,7 +113,7 @@ class PartnerService extends KalturaBaseService
 	 *
 	 * @throws APIErrors::UNKNOWN_PARTNER_ID
 	 */	
-	function updateAction( KalturaPartner $partner, $allowEmpty = false)
+	public function updateAction( KalturaPartner $partner, $allowEmpty = false)
 	{
 		$dbPartner = PartnerPeer::retrieveByPK( $this->getPartnerId() );
 		
@@ -160,7 +154,7 @@ class PartnerService extends KalturaBaseService
 	 *
 	 * @throws APIErrors::ADMIN_KUSER_NOT_FOUND
 	 */
-	function getSecretsAction( $partnerId , $adminEmail , $cmsPassword )
+	public function getSecretsAction( $partnerId , $adminEmail , $cmsPassword )
 	{
 		KalturaResponseCacher::disableCache();
 
@@ -193,15 +187,15 @@ class PartnerService extends KalturaBaseService
 	}
 	
 	/**
-	 * Retrieve all info about partner
-	 * This service gets no parameters, and is using the KS to know which partnerId info should be returned
+	 * Retrieve all info attributed to the partner
+	 * This action expects no parameters. It returns information for the current KS partnerId.
 	 * 
 	 * @action getInfo
 	 * @return KalturaPartner
 	 *
 	 * @throws APIErrors::UNKNOWN_PARTNER_ID
 	 */		
-	function getInfoAction( )
+	public function getInfoAction( )
 	{
 		$partnerId = $this->getPartnerId();
 		$dbPartner = PartnerPeer::retrieveByPK( $partnerId );
@@ -231,7 +225,7 @@ class PartnerService extends KalturaBaseService
 	 * 
 	 * @throws APIErrors::UNKNOWN_PARTNER_ID
 	 */
-	function getUsageAction( $year = '' , $month = 1 , $resolution = "days" )
+	public function getUsageAction( $year = '' , $month = 1 , $resolution = "days" )
 	{
 
 		$dbPartner = PartnerPeer::retrieveByPK( $this->getPartnerId() );
@@ -270,13 +264,13 @@ class PartnerService extends KalturaBaseService
 	}
 	
 	/**
-	 * Retrieve partner secret and admin secret
+	 * Retrieve a list of partner IDs which the current user is allowed to access.
 	 * 
 	 * @action listPartnersForUser
-	 * @return KalturaPartner
+	 * @return KalturaPartnerListResponse
 	 * 
 	 */
-	function listPartnersForUserAction()
+	public function listPartnersForUserAction()
 	{	
 		$partnerId = kCurrentContext::$master_partner_id;
 		
@@ -298,24 +292,15 @@ class PartnerService extends KalturaBaseService
 
 	/**
 	 * List partners by filter with paging support
-	 * Current implementation will only list the sub partners of the partner initiating the api call (using the current KS)
-	 * 
+	 * Current implementation will only list the sub partners of the partner initiating the api call (using the current KS).
+	 * This action is only partially implemented to support listing sub partners of a VAR partner.
 	 * @action list
 	 * @param KalturaPartnerFilter $filter
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaPartnerListResponse
 	 */
-	function listAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
+	public function listAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		/**
-		 * this action is only partially implemented to support listing sub partners of a VAR partner
-		 * see action description for current implementation details
-		 */
-		
-		// to be on the safe side
-		if (is_null($this->getKs()) || is_null($this->getPartner()) || !$this->getPartnerId())
-			throw new KalturaAPIException(APIErrors::MISSING_KS);
-			
 		$c = new Criteria();
 		$subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $this->getPartnerId());
 		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $this->getPartnerId());
@@ -331,12 +316,13 @@ class PartnerService extends KalturaBaseService
 	}
 	
 	/**
-	 * List partners statuses
+	 * List partner's current processes' statuses
 	 * 
 	 * @action listFeatureStatus
+	 * @throws APIErrors::UNKNOWN_PARTNER_ID
 	 * @return KalturaFeatureStatusListResponse
 	 */
-	function listFeatureStatusAction()
+	public function listFeatureStatusAction()
 	{
 		if (is_null($this->getKs()) || is_null($this->getPartner()) || !$this->getPartnerId())
 			throw new KalturaAPIException(APIErrors::MISSING_KS);

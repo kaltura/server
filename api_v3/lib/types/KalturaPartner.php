@@ -251,8 +251,22 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		return self::fromPartner($source_object);
 	}
 	
+	
+	/**
+	 * Function runs required validations on the current KalturaPartner object and 
+	 * if all validations are successful, creates a new DB object for it and returns it.
+	 * @throws KalturaAPIException
+	 * @return Partner
+	 */
 	public function toPartner()
 	{
+	    $this->validatePropertyNotNull("name");
+		$this->validatePropertyNotNull("adminName");
+		$this->validatePropertyNotNull("adminEmail");
+		$this->validatePropertyNotNull("description");
+		$this->validatePropertyMaxLength("country", 2, true);
+		$this->validatePropertyMaxLength("state", 2, true);
+		
 		if($this->adminName && $this->firstName === null && $this->lastName === null)
 		{
 			$this->firstName = $this->adminName;
