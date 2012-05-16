@@ -91,6 +91,7 @@ class KalturaBulkUpload extends KalturaObject
 	
 	/**
 	 * @var int
+	 * 
 	 */
 	public $numOfObjects;
 	
@@ -127,6 +128,7 @@ class KalturaBulkUpload extends KalturaObject
 			$this->numOfEntries = $jobData->getNumOfEntries();
 			$this->numOfObjects = $jobData->getNumOfObjects();
 			$this->fileName = $jobData->getFileName();
+			$this->bulkUploadObjectType = $jobData->getBulkUploadObjectType();
 		}
 		
 //		$results = BulkUploadResultPeer::retrieveByBulkUploadId($this->id);
