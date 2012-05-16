@@ -47,5 +47,4 @@ UPDATE category SET
 `inheritance_type`=2,
 `user_join_policy`=3,
 `default_permission_level`=3,
-`contribution_policy`=2,
-`privacy_context`=0;
+`contribution_policy`=2;
