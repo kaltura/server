@@ -49,7 +49,7 @@ while(count($userRoles))
 	$nextCriteria = clone $criteria;
 	$nextCriteria->add(UserRolePeer::ID, $userRole->getId(), Criteria::GREATER_THAN);
 	$userRoles = UserRolePeer::doSelect($nextCriteria);
-	//usleep(100);
+	usleep(100);
 }
 
 
