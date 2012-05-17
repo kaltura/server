@@ -45,12 +45,15 @@ class kFile
 	}
 	
 	/**
-	 * @param string $filePath - path to file
+	 * @param string $filename - path to file
 	 * @return float
 	 */
-	static public function fileSize($filePath)
+	static public function fileSize($filename)
 	{
-		$url = "file://$filePath";
+		if(PHP_INT_SIZE >= 8)
+			return filesize($filename);
+			
+		$url = "file://$filename";
 
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_NOBODY, true);
