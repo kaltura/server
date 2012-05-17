@@ -43,6 +43,7 @@ class categoryFilter extends baseObjectFilter
 			"_likex_full_name",
 			"_eq_full_ids",
 			"_likex_full_ids",
+			"_eq_inherited_parent_id",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "depth", "partner_sort_value", "entries_count", "members_count", "direct_entries_count", "full_name");
@@ -82,6 +83,11 @@ class categoryFilter extends baseObjectFilter
 	public function setIdIn($v)
 	{
 		$this->set('_in_id', $v);
+	}
+	
+	public function setInheritedParentId($v)
+	{
+		$this->set('_eq_inherited_parent_id', $v);
 	}
 }
 

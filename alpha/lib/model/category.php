@@ -141,8 +141,14 @@ class category extends Basecategory implements IIndexable
 				$featureStatusToRemoveIndex->setType(FeatureStatusType::LOCK_CATEGORY);
 			}
 			
-			$this->addIndexCategoryJob($this->getFullIds(), null, $featureStatusToRemoveIndex);		
+			$this->addIndexCategoryJob($this->getFullIds(), null, null, $featureStatusToRemoveIndex);		
 		}
+		elseif (!$this->isNew() && 
+				($this->isColumnModified(categoryPeer::MEMBERS) ||
+			 	$this->isColumnModified(categoryPeer::MEMBERS_COUNT)))
+	 	{
+	 		$this->addIndexCategoryJob(null, null, $this->getId());
+	 	}
 		
 		// save the childs for action category->delete - delete category is not done by async batch. 
 		foreach($this->childs_for_save as $child)
@@ -561,7 +567,7 @@ class category extends Basecategory implements IIndexable
 		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId);
 	}
 	
-	private function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $featureStatusToRemove = null)
+	private function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $inheritedParentId = null, $featureStatusToRemove = null)
 	{
 		$featureStatusToRemoveIndex = new kFeatureStatus();
 		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY);
@@ -576,6 +582,7 @@ class category extends Basecategory implements IIndexable
 
 		$filter = new categoryFilter();
 		$filter->setFullIdsStartsWith($fullIdsStartsWithCategoryId);
+		$filter->setInheritedParentId($inheritedParentId);
 		$filter->setIdIn($categoriesIdsIn);
 		
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);		
@@ -1059,7 +1066,6 @@ class category extends Basecategory implements IIndexable
 		parent::setPuserId($puserId);
 			
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-		
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 		if (!$kuser)
 			throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);

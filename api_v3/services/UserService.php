@@ -11,7 +11,6 @@ class UserService extends KalturaBaseUserService
 {
 	function initService($serviceId, $serviceName, $actionName)
 	{
-	    KalturaLog::debug("In UserService Init");
 	    parent::initService($serviceId, $serviceName, $actionName);
 	}
     

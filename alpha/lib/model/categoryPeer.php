@@ -115,7 +115,9 @@ class categoryPeer extends BasecategoryPeer
 		if (trim($fullName) == '')
 			return null;
 		
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
+		//we should not user KalturaCriteria::create(categoryPeer::OM_CLASS);
+		//as there is a bug in sphinx 2.0.4 that 'my category' and 'my category category' return the same object.
+		$c = new Criteria();  
 		$c->add(categoryPeer::FULL_NAME, $fullName);
 		$c->add(categoryPeer::ID, $ignoreCategoryId, Criteria::NOT_EQUAL);
 		
