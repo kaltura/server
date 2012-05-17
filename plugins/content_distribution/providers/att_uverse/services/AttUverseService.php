@@ -85,7 +85,7 @@ class AttUverseService extends KalturaBaseService
 		}
 		$feed->setChannelTitle($channelTitle);
 		header('Content-Type: text/xml');
-		echo $feed->getXml();
+		echo str_replace('&','&amp;',html_entity_decode($feed->getXml()));
 		die;
 	}
 }
