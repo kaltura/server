@@ -10,7 +10,7 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 		"freeText" => "_free_text",
 		"membersIn" => "_in_members",
 		"appearInListEqual" => "_eq_display_in_search",
-		"nameOrReferenceIdStartsWith" => "_contains_name_or_reference_id",
+		"nameOrReferenceIdContains" => "_contains_name_or_reference_id",
 	);
 
 	private $order_by_map = array
@@ -42,7 +42,7 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 	/**
 	 * @var string
 	 */
-	public $nameOrReferenceIdStartsWith;
+	public $nameOrReferenceIdContains;
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
