@@ -177,8 +177,8 @@ class CategoryService extends KalturaBaseService
 		$categoryFilter = new categoryFilter();
 		
 		$filter->toObject($categoryFilter);
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		$categoryFilter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
 		$dbList = categoryPeer::doSelect($c);

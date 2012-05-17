@@ -109,6 +109,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * 
 	 * @var KalturaAppearInListType
 	 * @filter eq
+	 * @requiresPermission insert,update
 	 */
 	public $appearInList;
 	
@@ -117,6 +118,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * 
 	 * @var KalturaPrivacyType
 	 * @filter eq,in
+	 * @requiresPermission insert,update
 	 */
 	public $privacy;
 	
@@ -124,6 +126,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * If Category members are inherited from parent category or set manualy. 
 	 * @var KalturaInheritanceType
 	 * @filter eq,in
+	 * @requiresPermission insert,update
 	 */
 	public $inheritanceType;
 	
@@ -132,6 +135,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * Who can ask to join this category
 	 *  
 	 * @var KalturaUserJoinPolicyType
+	 * @requiresPermission insert,update
 	 */
 	public $userJoinPolicy;
 	
@@ -139,6 +143,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * Default permissionLevel for new users
 	 *  
 	 * @var KalturaCategoryUserPermissionLevel
+	 * @requiresPermission insert,update
 	 */
 	public $defaultPermissionLevel;
 	
@@ -146,6 +151,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * Category Owner (User id)
 	 *  
 	 * @var string
+	 * @requiresPermission insert,update
 	 */
 	public $owner;
 	
@@ -171,6 +177,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * who can assign entries to this category
 	 *  
 	 * @var KalturaContributionPolicyType
+	 * @requiresPermission insert,update
 	 */
 	public $contributionPolicy;
 	
@@ -198,6 +205,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 *  
 	 * @var string
 	 * $filter eq
+	 * @requiresPermission insert,update
 	 */
 	public $privacyContext;
 	
