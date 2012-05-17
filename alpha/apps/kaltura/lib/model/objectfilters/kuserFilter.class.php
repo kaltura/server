@@ -5,6 +5,8 @@
  */ 
 class kuserFilter extends baseObjectFilter
 {
+	const PUSER_ID_OR_SCREEN_NAME = 'puser_id,screen_name';
+	
 	public function init ()
 	{
 		// TODO - should separate the schema of the fields from the actual values
@@ -35,7 +37,8 @@ class kuserFilter extends baseObjectFilter
 				"_notin_id",
 				"_gte_login_data_id",
 				"_ltornull_login_data_id",
-				"_eq_is_admin",				
+				"_eq_is_admin",
+				"_contains_puser_id_or_screen_name",			
 			) ,
 			NULL
 		);
