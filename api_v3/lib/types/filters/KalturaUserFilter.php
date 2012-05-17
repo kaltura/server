@@ -8,7 +8,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	
 	private $map_between_objects = array
 	(
-		"idOrScreenName" => "_contains_puser_id_or_screen_name",
+		"idOrScreenNameContains" => "_contains_puser_id_or_screen_name",
 		"idEqual" => "_eq_puser_id",
 		"idIn" => "_in_puser_id",
 	);
@@ -62,7 +62,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	/**
 	 * @var string
 	 */
-	public $idOrScreenName;
+	public $idOrScreenNameContains;
 
 	/**
 	 * @var string
