@@ -367,6 +367,11 @@ class PartnerService extends KalturaBaseService
 	    $filter->toObject($partnerFilter);
 	    
 	    $c = new Criteria();
+	    $subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id);
+		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id);
+		$subCriterion1->addOr($subCriterion2);
+		$c->add($subCriterion1);
+		
 	    $partnerFilter->attachToCriteria($c);
 	    $pager->attachToCriteria($c);
 	    $dbPartners = PartnerPeer::doSelect($c);
