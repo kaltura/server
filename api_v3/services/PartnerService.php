@@ -142,11 +142,12 @@ class PartnerService extends KalturaBaseService
 		
 		return $partner;
 	}
-
+	
+	
 	/**
 	 * Retrieve partner secret and admin secret
 	 * 
-	 * @action getSecrets
+	 * @action get
 	 * @param int $partnerId
 	 * @param string $adminEmail
 	 * @param string $cmsPassword
@@ -154,9 +155,9 @@ class PartnerService extends KalturaBaseService
 	 *
 	 * @throws APIErrors::ADMIN_KUSER_NOT_FOUND
 	 */
-	public function getSecretsAction( $partnerId , $adminEmail , $cmsPassword )
+	public function getAction ($partnerId , $adminEmail , $cmsPassword)
 	{
-		KalturaResponseCacher::disableCache();
+	    KalturaResponseCacher::disableCache();
 
 		$adminKuser = null;
 		try {
@@ -184,6 +185,23 @@ class PartnerService extends KalturaBaseService
 		$partner->cmsPassword = $cmsPassword;
 		
 		return $partner;
+	}
+
+	/**
+	 * Retrieve partner secret and admin secret
+	 * 
+	 * @action getSecrets
+	 * @param int $partnerId
+	 * @param string $adminEmail
+	 * @param string $cmsPassword
+	 * @return KalturaPartner
+	 * @deprecatede
+	 *
+	 * @throws APIErrors::ADMIN_KUSER_NOT_FOUND
+	 */
+	public function getSecretsAction( $partnerId , $adminEmail , $cmsPassword )
+	{
+		return $this->getAction($partnerId, $adminEmail, $cmsPassword);
 	}
 	
 	/**
