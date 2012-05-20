@@ -1057,6 +1057,7 @@ class myPartnerUtils
 		
 		$reportFilter->from_date = $startDate;
 		$reportFilter->to_date = $endDate;
+		$reportFilter->interval = $resolution;
 		
 		// if TZ offset provided, add TZ offset to the UTC time created above to reflect the user's timezone
 		// in myReportsMgr the offset will be later cleaned again to reflect UTC time so that the DWH query will be correct (with the TIME_SHIFT)
@@ -1067,7 +1068,6 @@ class myPartnerUtils
 			$reportFilter->from_date = $reportFilter->from_date + $tzOffsetSec;
 			$reportFilter->to_date = $reportFilter->to_date + $tzOffsetSec;
 		}
-		$reportFilter->extra_map = array('{GROUP_COLUMN}' => (($resolution == reportInterval::MONTHS) ? "month_id" : "date_id"));
 		
 		$data = myReportsMgr::getGraph($partner->getId(), $reportType, $reportFilter, null, null);
 		

@@ -96,12 +96,7 @@ class myReportsMgr
 	public static function getGraph ( $partner_id , $report_type , reportsInputFilter $input_filter , $dimension = null , $object_ids = null )
 	{
 		$start = microtime(true);
-//		$partner_id = "1";
 		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_GRAPH , $input_filter , null , null , null , $object_ids );
-//print_r ( $result );		
-		//		plays.event_date_id,count_plays,distinct_plays,sum_time_viewed,avg_time_viewed,count_loads
-
-		// assume each row has the same number of columns
 
 		if ( $report_type == self::REPORT_TYPE_CONTENT_DROPOFF || $report_type == self::REPORT_TYPE_USER_CONTENT_DROPOFF)
 		{
@@ -880,6 +875,7 @@ class myReportsMgr
 				"{OBJ_ID_CLAUSE}" ,  
 				"{TIME_SHIFT}" , 
 				"{CAT_ID_CLAUSE}" ,
+				"{GROUP_COLUMN}" ,
 			);
 			
 		$values = 
@@ -899,6 +895,7 @@ class myReportsMgr
 				$obj_ids_str , 
 				$time_shift,
 				$cat_ids_str,
+				($input_filter == reportInterval::MONTHS ? "month_id" : "date_id"),
 			);
 				
 		if ( $input_filter->extra_map )
@@ -1070,6 +1067,7 @@ class reportsInputFilter
 	public $extra_map;
 	public $categories;
 	public $timeZoneOffset;
+	public $interval;
 	
 	public function getFilterBy() {
 		return "";
@@ -1096,4 +1094,3 @@ class endUserReportsInputFilter extends reportsInputFilter
 			
 	}
 }
-?>
