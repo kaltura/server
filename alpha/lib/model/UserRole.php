@@ -49,7 +49,7 @@ class UserRole extends BaseUserRole
 	 * @var bool $filterDependencies true if should filter permissions which are set for partner but not valid due to dependencies on other permissions which are missing for the partner
 	 * @return     string
 	 */
-	public function getPermissionNames($filterDependencies = false)
+	public function getPermissionNames($filterDependencies = false, $skipTranslateWildcard = false)
 	{
 		// get from DB
 		$permissionNames = parent::getPermissionNames();
@@ -61,7 +61,7 @@ class UserRole extends BaseUserRole
 		}
 		
 		// translate * to permission names of all permissions valid for partner
-		if (in_array(self::ALL_PARTNER_PERMISSIONS_WILDCARD, $permissionNames))
+		if (in_array(self::ALL_PARTNER_PERMISSIONS_WILDCARD, $permissionNames) && !$skipTranslateWildcard)
 		{
 			$permissionNames = array();
 			$permissions = PermissionPeer::getAllValidForPartner($currentPartnerId, $filterDependencies);
