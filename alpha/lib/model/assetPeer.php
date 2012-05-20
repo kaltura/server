@@ -323,6 +323,27 @@ class assetPeer extends BaseassetPeer
 		return self::doSelectAscendingBitrate($c);
 	}
 	
+	public static function retrieveFlavorsByEntryIdAndStatus($entryId, array $paramsIds = null, array $statuses = null)
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		
+		if(count($statuses)) {
+		    $c->add(assetPeer::STATUS, $statuses, Criteria::IN);
+		}
+		
+		if(count($paramsIds)) {
+			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
+		}
+		
+		$c->addAscendingOrderByColumn(assetPeer::BITRATE);
+		
+		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
+		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
+		
+		return self::doSelect($c);
+	}
+	
 	public static function retrieveReadyFlavorsIdsByEntryId($entryId, array $paramsIds = null)
 	{
 		$c = new Criteria();
