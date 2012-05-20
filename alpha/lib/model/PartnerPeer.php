@@ -36,4 +36,19 @@ class PartnerPeer extends BasePartnerPeer
 	{
 		return array(array("partner:id=%s", self::ID));		
 	}
+	
+	public function setDefaultCriteriaFilter()
+	{
+	    if(self::$s_criteria_filter == null)
+			self::$s_criteria_filter = new criteriaFilter();
+		
+		$c = new myCriteria(); 
+		$subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $this->getPartnerId());
+		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $this->getPartnerId());
+		$subCriterion1->addOr($subCriterion2);
+		$c->add($subCriterion1);
+		
+		self::$s_criteria_filter->setFilter($c);
+	}
+	
 }
