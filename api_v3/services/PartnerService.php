@@ -220,45 +220,97 @@ class PartnerService extends KalturaBaseService
 	 * @action getUsage
 	 * @param int $year
 	 * @param int $month
-	 * @param string $resolution accepted values are "days" or "months"
+	 * @param KalturaReportInterval $resolution
 	 * @return KalturaPartnerUsage
 	 * 
 	 * @throws APIErrors::UNKNOWN_PARTNER_ID
+	 * @deprecated use getStatistics instead
 	 */
-	public function getUsageAction( $year = '' , $month = 1 , $resolution = "days" )
+	public function getUsageAction($year = '', $month = 1, $resolution = "days")
 	{
-
-		$dbPartner = PartnerPeer::retrieveByPK( $this->getPartnerId() );
+		$dbPartner = PartnerPeer::retrieveByPK($this->getPartnerId());
 		
-		if ( ! $dbPartner )
-			throw new KalturaAPIException ( APIErrors::UNKNOWN_PARTNER_ID , $this->getPartnerId() );
-
-
+		if(!$dbPartner)
+			throw new KalturaAPIException(APIErrors::UNKNOWN_PARTNER_ID, $this->getPartnerId());
+		
 		$packages = new PartnerPackages();
-		$partnerUsage = new KalturaPartnerUsage;
+		$partnerUsage = new KalturaPartnerUsage();
 		$partnerPackage = $packages->getPackageDetails($dbPartner->getPartnerPackage());
 		
-		$report_date = date ( "Y-m-d" , time());
+		$report_date = date("Y-m-d", time());
 		
-		list ( $totalStorage , $totalUsage , $totalTraffic ) = myPartnerUtils::collectPartnerUsageFromDWH($dbPartner, $partnerPackage, $report_date);
+		list($totalStorage, $totalUsage, $totalTraffic) = myPartnerUtils::collectPartnerUsageFromDWH($dbPartner, $partnerPackage, $report_date);
 		
-		$partnerUsage->hostingGB = round($totalStorage/1024 , 2); // from MB to GB
-		$totalUsageGB = round($totalUsage/1024/1024 , 2); // from KB to GB
+		$partnerUsage->hostingGB = round($totalStorage / 1024, 2); // from MB to GB
+		$totalUsageGB = round($totalUsage / 1024 / 1024, 2); // from KB to GB
 		if($partnerPackage)
 		{
-			$partnerUsage->Percent = round( ($totalUsageGB / $partnerPackage['cycle_bw'])*100, 2);
+			$partnerUsage->Percent = round(($totalUsageGB / $partnerPackage['cycle_bw']) * 100, 2);
 			$partnerUsage->packageBW = $partnerPackage['cycle_bw'];
 		}
 		$partnerUsage->usageGB = $totalUsageGB;
 		$partnerUsage->reachedLimitDate = $dbPartner->getUsageLimitWarning();
 		
-		if($year != '' && is_int($year))
+		if($year != '')
 		{
-			$graph_lines = myPartnerUtils::getPartnerUsageGraph($year, $month, $dbPartner, $resolution);
+			$startDate = gmmktime(0, 0, 0, $month, 1, $year);
+			$endDate = gmmktime(0, 0, 0, $month, date('t', $startDate), $year);
+			
+			if($resolution == reportInterval::MONTHS)
+			{
+				$startDate = gmmktime(0, 0, 0, 1, 1, $year);
+				$endDate = gmmktime(0, 0, 0, 12, 31, $year);
+				
+				if(intval(date('Y')) == $year)
+					$endDate = time();
+			}
+			
+			$usageGraph = myPartnerUtils::getPartnerUsageGraph($startDate, $endDate, $dbPartner, $resolution);
 			// currently we provide only one line, output as a string.
 			// in the future this could be extended to something like KalturaGraphLines object
-			$partnerUsage->usageGraph = $graph_lines['line'];
+			$partnerUsage->usageGraph = $usageGraph;
 		}
+		
+		return $partnerUsage;
+	}
+	
+	/**
+	 * Get usage statistics for a partner
+	 * Calculation is done according to partner's package
+	 *
+	 * @action getStatistics
+	 * @return KalturaPartnerStatistics
+	 * 
+	 * @throws APIErrors::UNKNOWN_PARTNER_ID
+	 */
+	public function getStatisticsAction()
+	{
+		$dbPartner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		
+		if(!$dbPartner)
+			throw new KalturaAPIException(APIErrors::UNKNOWN_PARTNER_ID, $this->getPartnerId());
+		
+		$packages = new PartnerPackages();
+		$partnerUsage = new KalturaPartnerStatistics();
+		$partnerPackage = $packages->getPackageDetails($dbPartner->getPartnerPackage());
+		
+		$report_date = date("Y-m-d", time());
+		
+		list($totalStorage, $totalUsage, $totalTraffic) = myPartnerUtils::collectPartnerUsageFromDWH($dbPartner, $partnerPackage, $report_date);
+		
+		$partnerUsage->hosting = round($totalStorage / 1024, 2); // from MB to GB
+		$totalUsageGB = round($totalUsage / 1024 / 1024, 2); // from KB to GB
+		if($partnerPackage)
+		{
+			$partnerUsage->usagePercent = round(($totalUsageGB / $partnerPackage['cycle_bw']) * 100, 2);
+			$partnerUsage->packageBandwidthAndStorage = $partnerPackage['cycle_bw'];
+		}
+		if($totalTraffic)
+		{
+			$partnerUsage->bandwidth = round($totalTraffic / 1024 / 1024, 2); // from KB to GB
+		}
+		$partnerUsage->usage = $totalUsageGB;
+		$partnerUsage->reachedLimitDate = $dbPartner->getUsageLimitWarning();
 		
 		return $partnerUsage;
 	}

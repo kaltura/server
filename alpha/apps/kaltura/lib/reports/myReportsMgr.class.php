@@ -1052,7 +1052,6 @@ KalturaLog::log( "Reports query using database host: [$host] user [" . $db_confi
 
 }
 
-
 class reportsInputFilter
 {
 	public $from_date;
@@ -1064,15 +1063,9 @@ class reportsInputFilter
 	public $categories;
 	public $timeZoneOffset;
 	
-	public function toShortString()
+	public function getFilterBy() 
 	{
-		return $this->from_date ."_".$this->to_date."_".$this->keywords."_".$this->search_in_tags."_".$this->search_in_admin_tags.
-		"_".$this->categories;
-	}
-	
-	public function getFilterBy() {
 		return "";
-			
 	}
 }
 
@@ -1081,12 +1074,8 @@ class endUserReportsInputFilter extends reportsInputFilter
 	public $application;
 	public $userIds;
 	
-	public function toShortString()
+	public function getFilterBy() 
 	{
-		return parent::toShortString() . "_" . $this->userIds . "_" . $this->application ;
-	}
-	
-	public function getFilterBy() {
 		$filterBy = ""; 
 		if ($this->categories) 
 			$filterBy = "_by_context";
@@ -1096,7 +1085,5 @@ class endUserReportsInputFilter extends reportsInputFilter
 			$filterBy = $filterBy . "_by_app";
 
 		return $filterBy;
-			
 	}
 }
-?>

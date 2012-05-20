@@ -1043,109 +1043,85 @@ class myPartnerUtils
 		return $res;
 	}
 	
-	public static function getPartnerBandwidthUsageFromDWH($partnerId, $startDate, $endDate, $resolution, $tzOffset = null)
+	/**
+	 * @param int $startDate
+	 * @param int $endDate
+	 * @param Partner $partner
+	 * @param reportInterval $resolution
+	 * @param int $tzOffset
+	 * @return string
+	 */
+	public static function getPartnerUsageGraph($startDate, $endDate, Partner $partner, $resolution = reportInterval::DAYS, $tzOffset = null, $reportType = myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE)
 	{
 		$reportFilter = new reportsInputFilter();
 		
-		// use gmmktime to avoid server timezone offset - this is for backward compatibility while the KMC is not sending TZ info
-		list($year, $month, $day) = explode('-', $startDate);
-		$reportFilter->from_date = gmmktime(0, 0, 0, $month, $day, $year);
-		list($year, $month, $day) = explode('-', $endDate);
-		$reportFilter->to_date = gmmktime(0, 0, 0, $month, $day, $year);
+		$reportFilter->from_date = $startDate;
+		$reportFilter->to_date = $endDate;
 		
 		// if TZ offset provided, add TZ offset to the UTC time created above to reflect the user's timezone
 		// in myReportsMgr the offset will be later cleaned again to reflect UTC time so that the DWH query will be correct (with the TIME_SHIFT)
 		if(!is_null($tzOffset))
 		{
-			$tzOffsetSec = $tzOffset*60;
+			$tzOffsetSec = $tzOffset * 60;
 			$reportFilter->timeZoneOffset = $tzOffsetSec;
 			$reportFilter->from_date = $reportFilter->from_date + $tzOffsetSec;
 			$reportFilter->to_date = $reportFilter->to_date + $tzOffsetSec;
 		}
-		$reportFilter->extra_map = array(
-			'{GROUP_COLUMN}' => (($resolution == 'months')? "month_id": "date_id"),
-		);
+		$reportFilter->extra_map = array('{GROUP_COLUMN}' => (($resolution == reportInterval::MONTHS) ? "month_id" : "date_id"));
 		
-		$res = myReportsMgr::getGraph ( $partnerId , myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE , $reportFilter , null , null );
-		return $res;
-	}
-	public static function getPartnerUsageGraph( $year , $month , $partner , $resolution = 'days', $tzOffset = null)
-	{
-		if (!$resolution) $resolution = 'days';
+		$data = myReportsMgr::getGraph($partner->getId(), $reportType, $reportFilter, null, null);
 		
-		$start_date = $year .'-'. (($month)? $month: '01') .'-01';
-		
-		switch ( $resolution )
+		$graphPointsLine = array();
+		if($resolution == reportInterval::MONTHS)
 		{
-			case 'weeks':
-			case 'days':
-				$end_date = $year .'-'. ($month) .'-'.date('t', strtotime($year .'-'. ($month) .'-01'));
-				break;
-			
-			case 'months':
-				$start_date = $year.'-'.'01-01';
-				if ((int)date('Y') == $year)
-				{
-					$end_date = date('Y-m-d');
-				}
-				else 
-				{
-					$end_date = ((int)$year).'-12-31';
-				}
-				break;
-		}
-		$data = myPartnerUtils::getPartnerBandwidthUsageFromDWH($partner->getId(), $start_date, $end_date, $resolution, $tzOffset);
-
-		if ($resolution != 'months')
-		{
-			$graph_points['line'] = myPartnerUtils::daily_activity_to_graph($data, $resolution, $start_date);
+			$graphPointsLine = myPartnerUtils::annualActivityGraph($data);
 		}
 		else
 		{
-			//$activity = myPartnerUtils::collectPartnerUsageFromDWH($partner, 1, $end_date, true );
-			$graph_points['line'] = myPartnerUtils::year_activity_to_graph($data, $year);
+			$graphPointsLine = myPartnerUtils::dailyActivityGraph($data, $startDate);
 		}
-		$strGraphLine = '';
 
-		// sort array by keys
-		ksort($graph_points['line']);
-		foreach($graph_points['line'] as $point => $usage) {
-			$strGraphLine .= (int)$point.','.$usage.';';
+		ksort($graphPointsLine);		
+		$graphLine = '';
+		foreach($graphPointsLine as $point => $usage)
+		{
+			$graphLine .= intval($point) . ",$usage;";
 		}
-		$graph_points['line'] = $strGraphLine;
 		
-		return $graph_points;
+		return $graphLine;
 	}
 	
-	public static function year_activity_to_graph($act, $requested_year)
+	protected static function annualActivityGraph($data)
 	{
 		$points = array_fill(1, 12, 0);
 		
-		if(!isset($act['bandwidth'])) return $points;
-		foreach($act['bandwidth'] as $month_id => $activity)
+		if(!isset($data['bandwidth'])) 
+			return $points;
+			
+		foreach($data['bandwidth'] as $monthId => $bandwidth)
 		{
-			$year = floor($month_id/100);
-			$month = $month_id - ($year*100);
-			if($requested_year != $year)
-				continue;
-			$points[(int)$month] = round($activity/1024); // bandwidth info returned from DWH is in KB, converting to MB
+			$year = floor($monthId / 100);
+			$month = $monthId - ($year * 100);
+			$points[intval($month)] = round($bandwidth / 1024); // bandwidth info returned from DWH is in KB, converting to MB
 		}
 
 		return $points;
 	}		
-
 	
-	public static function daily_activity_to_graph($act, $res, $start_date)
+	protected static function dailyActivityGraph($data, $startDate)
 	{
-		$days_in_month = date('t', (int)strtotime($start_date));
-		$points = array_fill(1, $days_in_month, 0);
+		$daysInMonth = date('t', (int)strtotime($startDate));
+		$points = array_fill(1, $daysInMonth, 0);
 		
-		if(!isset($act['bandwidth'])) return $points;
-		foreach ($act['bandwidth'] as $date_id => $bw)
+		if(!isset($data['bandwidth'])) 
+			return $points;
+			
+		foreach ($data['bandwidth'] as $dateId => $bandwidth)
 		{
-			$day = $date_id%100;
-			$points[$day] += round($bw); // normalize to MB
+			$day = $dateId % 100;
+			$points[$day] += round($bandwidth); // normalize to MB
 		}
+		
 		return $points;
  	}
  	

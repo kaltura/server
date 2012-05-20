@@ -61,8 +61,7 @@ class ReportService extends KalturaBaseService
 		$reportTotal->fromReportTotal ( $header , $data );
 			
 		return $reportTotal;
-	}	
-	
+	}
 	
 	/**
 	 * report getTable action allows to get a graph data for a specific report. 

@@ -62,10 +62,23 @@ class getpartnerusageAction extends defPartnerservices2Action
 		/*  --- ended total usage status --- */
 		
 		/* usage graph */
-		$year = $this->getPM("year");
-		$month = $this->getP("month");
+		$year = intval($this->getPM("year"));
+		$month = intval($this->getP("month"));
 		$resolution = $this->getP("resolution");
-		$graph_points = myPartnerUtils::getPartnerUsageGraph($year, $month, $partner, $resolution);
+		
+		$start_date = gmmktime(0, 0, 0, $month ? $month : 1, 1, $year);
+		$end_date = gmmktime(0, 0, 0, $month, date('t', $start_date), $year);
+		
+		if($resolution == 'months')
+		{
+			$start_date = gmmktime(0, 0, 0, 1, 1, $year);
+			$end_date = gmmktime(0, 0, 0, 12, 31, $year);
+			
+			if(intval(date('Y')) == $year)
+				$end_date = time();
+		}
+		
+		$graph_points['line'] = myPartnerUtils::getPartnerUsageGraph($start_date, $end_date, $partner, $resolution);
 		/* --- ended usage graph --- */ 
 		
 
