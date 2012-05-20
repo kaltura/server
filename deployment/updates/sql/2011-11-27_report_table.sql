@@ -10,4 +10,4 @@ CREATE TABLE `report`
 	`updated_at` DATETIME,
 	`deleted_at` DATETIME,
 	PRIMARY KEY (`id`)
-)Type=InnoDB;
+)ENGINE=InnoDB;
