@@ -28,6 +28,7 @@ class myReportsMgr
 	const REPORT_TYPE_SYSTEM_GENERIC_PARTNER = 100;
 	const REPORT_TYPE_SYSTEM_GENERIC_PARTNER_TYPE = 101;
 	const REPORT_TYPE_PARTNER_BANDWIDTH_USAGE = 200;
+	const REPORT_TYPE_PARTNER_USAGE = 201;
 	const REPORT_TYPE_APPLICATIONS = 16;
 	
 	const REPORTS_COUNT_CACHE = 60;
@@ -665,6 +666,7 @@ class myReportsMgr
 		self::REPORT_TYPE_SYSTEM_GENERIC_PARTNER => "system_generic_partner" ,
 		self::REPORT_TYPE_SYSTEM_GENERIC_PARTNER_TYPE => "system_generic_partner_type" ,
 		self::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE => "partner_bandwidth_usage" ,
+		self::REPORT_TYPE_PARTNER_USAGE => "partner_usage" ,
 		self::REPORT_TYPE_APPLICATIONS => 'applications',
 		
 	);
