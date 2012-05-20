@@ -42,9 +42,9 @@ class kMultiCentersSynchronizer implements kObjectAddedEventConsumer
 		{
 			$this->excludedSyncFileObjectTypes = array();
 			$dcConfig = kConf::getMap("dc_config");
-			if($dcConfig->sync_exclude_types)
+			if(isset($dcConfig['sync_exclude_types']))
 			{
-				foreach($dcConfig->sync_exclude_types as $syncExcludeType)
+				foreach($dcConfig['sync_exclude_types'] as $syncExcludeType)
 				{
 					$configObjectType = $syncExcludeType;
 					$configObjectSubType = null;
@@ -72,7 +72,7 @@ class kMultiCentersSynchronizer implements kObjectAddedEventConsumer
 			}
 		}
 		
-		if(!in_array($objectType, $this->excludedSyncFileObjectTypes))
+		if(!isset($this->excludedSyncFileObjectTypes[$objectType]))
 			return true;
 			
 		if(count($this->excludedSyncFileObjectTypes[$objectType]) && !in_array($objectSubType, $this->excludedSyncFileObjectTypes[$objectType]))
