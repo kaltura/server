@@ -85,25 +85,29 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 		{
 			if(count($this->items))
 			{
+				$queryDestination = $this;
+				if($this->type == self::SEARCH_AND)
+					$queryDestination = $query;
+					
 				foreach($this->items as $item)
 				{
 					KalturaLog::debug("item type: " . get_class($item));
 					if($item instanceof AdvancedSearchFilterItem)
 					{
-						$item->applyCondition($query);
+						$item->applyCondition($queryDestination);
 					}
 				}
 				
-				$matchClause = array_unique($this->matchClause);
-				$glue = $this->type == self::SEARCH_AND ? ' ' : ' | ';
-				$this->condition = implode($glue, $matchClause);
-				
-				if($this->type == self::SEARCH_OR)
-					$this->condition = "( {$this->condition} )";
+				if($this->type == self::SEARCH_OR && count($this->matchClause))
+				{
+					$matchClause = array_unique($this->matchClause);
+					$this->condition = '( ' . implode(' | ', $matchClause) . ' )';
+				}
 			}
 		}
 	
-		$query->addMatch($this->condition);
+		if($this->condition)
+			$query->addMatch($this->condition);
 	}
 	
 	public function getFreeTextConditions($freeTexts)
