@@ -58,7 +58,11 @@ KalturaLog::info("Done");
 
 function addPermissionsToRole($role, $permissionList)
 {
-	$currentPermissions = $role->getPermissionNames();
+	$currentPermissions = $role->getPermissionNames(false, true);
+	
+	if(in_array(UserRole::ALL_PARTNER_PERMISSIONS_WILDCARD, $currentPermissions))
+		return;
+		
 	$currentPermissionsArray = explode(',', $currentPermissions);
 	$permissionsToAddArray = explode(',', $permissionList);
 	$tempArray = array();
