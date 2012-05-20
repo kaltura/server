@@ -8,7 +8,7 @@
  */
 class PartnerService extends KalturaBaseService 
 {
-	
+
 	protected function partnerRequired($actionName)
 	{
 		if ($actionName === 'register') {
@@ -353,12 +353,24 @@ class PartnerService extends KalturaBaseService
 	 */
 	public function listAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		$c = new Criteria();
-		$subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $this->getPartnerId());
-		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $this->getPartnerId());
-		$subCriterion1->addOr($subCriterion2);
-		$c->add($subCriterion1);
-		$dbPartners = PartnerPeer::doSelect($c);
+	    if (is_null($filter))
+	    {
+	        $filter = new KalturaPartnerFilter();
+	    }
+	    
+	    if (is_null($pager))
+	    {
+	        $pager = new KalturaFilterPager();   
+	    }
+	    
+	    $partnerFilter = new partnerFilter();
+	    $filter->toObject($partnerFilter);
+	    
+	    $c = new Criteria();
+	    $partnerFilter->attachToCriteria($c);
+	    $pager->attachToCriteria($c);
+	    $dbPartners = PartnerPeer::doSelect($c);
+	    
 		$partnersArray = KalturaPartnerArray::fromPartnerArray($dbPartners);
 		
 		$response = new KalturaPartnerListResponse();
