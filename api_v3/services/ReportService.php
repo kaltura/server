@@ -31,13 +31,33 @@ class ReportService extends KalturaBaseService
 	 */
 	function getGraphsAction( $reportType , KalturaReportInputFilter $reportInputFilter , $dimension = null , $objectIds = null  )
 	{
+		if($reportType == myReportsMgr::REPORT_TYPE_PARTNER_USAGE)
+		{
+			if($objectIds)
+			{
+				$c = new Criteria();
+				$c->addSelectColumn(PartnerPeer::ID);
+				$subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $this->getPartnerId());
+				$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $this->getPartnerId());
+				$subCriterion1->addOr($subCriterion2);
+				$c->add($subCriterion1);
+				$c->add(PartnerPeer::ID, explode(',', $objectIds), Criteria::IN);
+				
+				$stmt = PartnerPeer::doSelectStmt($c);
+				$partnerIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+				$objectIds = implode(',', $partnerIds); 
+			}
+			else
+			{
+				$objectIds = $this->getPartnerId();
+			}
+		}
+		
 		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray ( myReportsMgr::getGraph( $this->getPartnerId() , 
 			$reportType , 
 			$reportInputFilter->toReportsInputFilter() ,
 			$dimension , 
 			$objectIds ) );
-//print_r ( $reportGraphs );
-//		die();
 
 		return $reportGraphs;
 	}
@@ -236,4 +256,3 @@ class ReportService extends KalturaBaseService
 		$params[] = $partnerIdParam;
 	}
 }
-?>
