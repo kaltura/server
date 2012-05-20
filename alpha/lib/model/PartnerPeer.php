@@ -20,7 +20,7 @@ class PartnerPeer extends BasePartnerPeer
 	/*
 		Will retrieve the partner object in one of 2 ways:
 		1. if pk in a number - will use the original  retrieveByPK
-		2. if pk is not the umber - will try to retrieve
+		2. if pk is not the number - will try to retrieve
 	*/
 
 	// partner cache functions, left for backward compatibility
@@ -35,20 +35,6 @@ class PartnerPeer extends BasePartnerPeer
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("partner:id=%s", self::ID));		
-	}
-	
-	public static function setDefaultCriteriaFilter()
-	{
-	    if(self::$s_criteria_filter == null)
-			self::$s_criteria_filter = new criteriaFilter();
-		
-		$c = new myCriteria(); 
-		$subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id);
-		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id);
-		$subCriterion1->addOr($subCriterion2);
-		$c->add($subCriterion1);
-		
-		self::$s_criteria_filter->setFilter($c);
 	}
 	
 }
