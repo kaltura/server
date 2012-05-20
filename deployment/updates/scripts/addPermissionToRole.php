@@ -60,7 +60,7 @@ function addPermissionsToRole($role, $permissionList)
 {
 	$currentPermissions = $role->getPermissionNames(false, true);
 	
-	if(in_array(UserRole::ALL_PARTNER_PERMISSIONS_WILDCARD, $currentPermissions))
+	if(UserRole::ALL_PARTNER_PERMISSIONS_WILDCARD ==  $currentPermissions)
 		return;
 		
 	$currentPermissionsArray = explode(',', $currentPermissions);
@@ -75,10 +75,12 @@ function addPermissionsToRole($role, $permissionList)
 			$tempArray[] = $perm;
 		}
 	}
+	
 	$tempString = trim(implode(',', $tempArray), ',');
 	$currentPermissions .= ','.$tempString;
 	$role->setPermissionNames($currentPermissions);
 	$role->save();
+	
 	KalturaLog::log('Added permission ['.$tempString.'] to role name ['.$role->getName().']');
 }
 
