@@ -43,8 +43,8 @@ class PartnerPeer extends BasePartnerPeer
 			self::$s_criteria_filter = new criteriaFilter();
 		
 		$c = new myCriteria(); 
-		$subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $this->getPartnerId());
-		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $this->getPartnerId());
+		$subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id);
+		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id);
 		$subCriterion1->addOr($subCriterion2);
 		$c->add($subCriterion1);
 		
