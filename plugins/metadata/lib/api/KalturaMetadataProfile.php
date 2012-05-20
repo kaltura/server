@@ -177,9 +177,10 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	{
 	    $this->validatePropertyMinLength("name", 1); 
 	    
-	    if ($this->systemName && $this->systemName != $sourceObject->getSystemName())
+	    if ($this->systemName)
 	    {
 	        $c = KalturaCriteria::create(MetadataProfilePeer::OM_CLASS);
+	        $c->add(StorageProfilePeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
 			$c->add(MetadataProfilePeer::SYSTEM_NAME, $this->systemName);
 			if(StorageProfilePeer::doCount($c))
 				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
