@@ -177,7 +177,7 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	{
 	    $this->validatePropertyMinLength("name", 1); 
 	    
-	    if ($this->systemName)
+	    if ($this->systemName && $this->systemName != $sourceObject->getSystemName())
 	    {
 	        $c = KalturaCriteria::create(MetadataProfilePeer::OM_CLASS);
 			$c->add(MetadataProfilePeer::SYSTEM_NAME, $this->systemName);
