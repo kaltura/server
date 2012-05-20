@@ -482,13 +482,18 @@ class myReportsMgr
 			
 			$add_search_text = false;
 			
+			$has_object_ids = false;
+			if ($input_filter instanceof endUserReportsInputFilter) 
+				$has_object_ids = $input_filter->categories;
+			$has_object_id = $has_object_ids || $object_ids;
+				
 			if ( is_numeric( $report_type ))
 			{
 				$file_path = myReportsSqlFileMgr::getSqlFilePath( 
 					self::$type_map[$report_type] ,  
 					self::$flavor_map[$report_flavor] , 
 					$add_search_text , 
-					$object_ids ? true : false ,
+					$has_object_ids ? true : false ,
 					$input_filter);
 			}
 			else
@@ -510,12 +515,12 @@ class myReportsMgr
 			$shouldSelectFromSearchEngine = false;
 			
 			$category_ids_clause = "1=1"; 
-			if ($input_filter->categories)
+			if ($input_filter instanceof endUserReportsInputFilter)
 			{
-				if ($input_filter instanceof endUserReportsInputFilter)
+				if ($input_filter->playbackContext)
 				{
 					$categoryFilter = new categoryFilter();
-					$categoryFilter->set("_in_full_name", $input_filter->categories);
+					$categoryFilter->set("_in_full_name", $input_filter->playbackContext);
 					$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 					$categoryFilter->attachToCriteria($c);
 					$c->applyFilters();
@@ -530,12 +535,12 @@ class myReportsMgr
 					$category_ids_clause = "ev.context_id in ( $categoryIds )";
 						
 				}
-				else 
-				{ 
-					$entryFilter->set("_matchand_categories", $input_filter->categories);
-					$shouldSelectFromSearchEngine = true;
-				}
-				
+			}
+			
+			if ($input_filter->categories) 
+			{ 
+				$entryFilter->set("_matchand_categories", $input_filter->categories);
+				$shouldSelectFromSearchEngine = true;
 			}
 			
 			if ($input_filter->keywords)
@@ -1052,6 +1057,7 @@ KalturaLog::log( "Reports query using database host: [$host] user [" . $db_confi
 
 }
 
+
 class reportsInputFilter
 {
 	public $from_date;
@@ -1063,9 +1069,9 @@ class reportsInputFilter
 	public $categories;
 	public $timeZoneOffset;
 	
-	public function getFilterBy() 
-	{
+	public function getFilterBy() {
 		return "";
+			
 	}
 }
 
@@ -1073,11 +1079,11 @@ class endUserReportsInputFilter extends reportsInputFilter
 {
 	public $application;
 	public $userIds;
+	public $playbackContext;
 	
-	public function getFilterBy() 
-	{
+	public function getFilterBy() {
 		$filterBy = ""; 
-		if ($this->categories) 
+		if ($this->playbackContext) 
 			$filterBy = "_by_context";
 		if ($this->userIds) 
 			$filterBy = "_by_user";
@@ -1085,5 +1091,7 @@ class endUserReportsInputFilter extends reportsInputFilter
 			$filterBy = $filterBy . "_by_app";
 
 		return $filterBy;
+			
 	}
 }
+?>
