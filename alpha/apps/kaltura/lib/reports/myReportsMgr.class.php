@@ -453,7 +453,7 @@ class myReportsMgr
 		else
 			$partner_id_str = $partner_id;
 		return $partner_id_str . "|" . $report_type . "|" . 
-			$input_filter->from_date . $input_filter->to_date . $input_filter->keywords . $input_filter->search_in_admin_tags . $input_filter->search_in_tags .
+			$input_filter->from_date . $input_filter->to_date . $input_filter->keywords . $input_filter->search_in_admin_tags . $input_filter->search_in_tags . $input_filter->interval .
 			$object_ids;
 	}
 	
