@@ -40,6 +40,10 @@ while(count($fileSyncs))
 		if(in_array($fileSync->getId(), $handledIds))
 			continue;
 			
+		FileSyncPeer::setUseCriteriaFilter(false);
+		$srcFileSync = FileSyncPeer::retrieveByPK($fileSync->getLinkedId());
+		FileSyncPeer::setUseCriteriaFilter(true);
+		
 		// find all the links of the same source
 		$linksCriteria = new Criteria();
 		$linksCriteria->add(FileSyncPeer::DC, $fileSync->getDc());
@@ -57,6 +61,7 @@ while(count($fileSyncs))
 		if($firstLink)
 		{
 			$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
+			$firstLink->setFileSize($srcFileSync->getFileSize());
 			$firstLink->setLinkCount(count($links));
 			$firstLink->save();
 			

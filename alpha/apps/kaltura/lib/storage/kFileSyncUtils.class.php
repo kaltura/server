@@ -1111,6 +1111,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		$fileSyncList = FileSyncPeer::doSelect($c);
 		foreach($fileSyncList as $fileSync)
 		{
+			/* @var $fileSync FileSync */
+			
 			// for each source, find its links and fix them
 			$c = new Criteria();
 			
@@ -1127,6 +1129,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 			if($firstLink)
 			{
 				$firstLink->setStatus($fileSync->getStatus());
+				$firstLink->setFileSize($fileSync->getFileSize());
 				$firstLink->setFileRoot($fileSync->getFileRoot());
 				$firstLink->setFilePath($fileSync->getFilePath());
 				$firstLink->setFileType(FileSync::FILE_SYNC_FILE_TYPE_FILE);
