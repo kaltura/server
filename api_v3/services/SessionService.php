@@ -71,10 +71,10 @@ class SessionService extends KalturaBaseService
 	 * The result KS is the session key that you should pass to all services that requires a ticket.
 	 * 
 	 * @action impersonate
-	 * @param string $secret Remember to provide the correct secret according to the sessionType you want
+	 * @param string $secret - should be the secret (admin or user) of the original partnerId (not impersonatedPartnerId).
 	 * @param int $impersonatedPartnerId
-	 * @param string $userId
-	 * @param KalturaSessionType $type Regular session or Admin session
+	 * @param string $userId - impersonated userId
+	 * @param KalturaSessionType $type
 	 * @param int $partnerId
 	 * @param int $expiry KS expiry time in seconds
 	 * @param string $privileges 
@@ -82,7 +82,7 @@ class SessionService extends KalturaBaseService
 	 *
 	 * @throws APIErrors::START_SESSION_ERROR
 	 */
-	function impersonateAction($secret, $impersonatedPartnerId, $userId = "", $type = 0, $partnerId = null, $expiry = 86400 , $privileges = null )
+	function impersonateAction($secret, $impersonatedPartnerId, $userId = "", $type = KalturaSessionType::USER, $partnerId = null, $expiry = 86400 , $privileges = null )
 	{
 		KalturaResponseCacher::disableCache();
 		
