@@ -1,6 +1,7 @@
 SELECT total_bandwidth.bandwidth,
 	   total_storage.storage,
 	   total_bandwidth.bandwidth + total_storage.storage total_usage	
+FROM	   
 (SELECT 
 	SUM(count_bandwidth_kb) as bandwidth
 FROM 
@@ -8,7 +9,7 @@ FROM
 WHERE
 	{OBJ_ID_CLAUSE}
 	AND
-	date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID})) AS total_bandwidth,
+	date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID}) AS total_bandwidth,
 (SELECT 
 	MAX(aggr_storage_mb) storage
 FROM 
