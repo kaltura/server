@@ -11,8 +11,14 @@ class KalturaVarConsolePartnerFilter extends KalturaPartnerFilter
      */
     public $groupTypeEq;
     
-   private $map_between_objects = array
-   (
-		"groupTypeEq" => "_eq_group_type",
-   );
+    /**
+     * @var string
+     */
+    public $groupTypeIn;
+    
+    private $map_between_objects = array
+    (
+    	"groupTypeEq" => "_eq_group_type",
+        "groupTypeIn" => "_in_group_type",
+    );
 }
