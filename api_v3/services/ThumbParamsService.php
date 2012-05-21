@@ -170,7 +170,8 @@ class ThumbParamsService extends KalturaBaseService
 		$thumbParamsDb = array();
 		foreach($thumbParamsConversionProfilesDb as $item)
 		{
-			$thumbParamsDb[] = $item->getThumbParams();
+			/* @var $item flavorParamsConversionProfile */
+			$thumbParamsDb[] = $item->getassetParams();
 		}
 		
 		$thumbParams = KalturaThumbParamsArray::fromDbArray($thumbParamsDb);
