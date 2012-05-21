@@ -8,7 +8,7 @@
  */
 class PartnerService extends KalturaBaseService 
 {
-
+    
 	protected function partnerRequired($actionName)
 	{
 		if ($actionName === 'register') {
@@ -155,9 +155,47 @@ class PartnerService extends KalturaBaseService
 	 *
 	 * @throws APIErrors::ADMIN_KUSER_NOT_FOUND
 	 */
-	public function getAction ($partnerId , $adminEmail , $cmsPassword)
+	public function getAction ($partnerId = null)
 	{
-	    KalturaResponseCacher::disableCache();
+	    if (is_null($partnerId))
+	    {
+	        $partnerId = $this->getPartnerId();
+	    }
+	    
+	    $c = new Criteria();
+	    $subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $this->getPartnerId());
+		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $this->getPartnerId());
+		$subCriterion1->addOr($subCriterion2);
+		$c->add($subCriterion1);
+		$c->addAnd(PartnerPeer::ID ,$partnerId);
+		
+		$dbPartner = PartnerPeer::doSelectOne($c);
+		if (is_null($dbPartner))
+		{
+		    throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
+		}
+		
+		$partner = new KalturaPartner();
+		$partner->fromObject($dbPartner);
+		
+		return $partner;
+	}
+
+	/**
+	 * Retrieve partner secret and admin secret
+	 * 
+	 * @action getSecrets
+	 * @param int $partnerId
+	 * @param string $adminEmail
+	 * @param string $cmsPassword
+	 * @return KalturaPartner
+	 * 
+	 *
+	 * @throws APIErrors::ADMIN_KUSER_NOT_FOUND
+	 */
+	public function getSecretsAction( $partnerId , $adminEmail , $cmsPassword )
+	{
+		KalturaResponseCacher::disableCache();
 
 		$adminKuser = null;
 		try {
@@ -186,23 +224,6 @@ class PartnerService extends KalturaBaseService
 		
 		return $partner;
 	}
-
-	/**
-	 * Retrieve partner secret and admin secret
-	 * 
-	 * @action getSecrets
-	 * @param int $partnerId
-	 * @param string $adminEmail
-	 * @param string $cmsPassword
-	 * @return KalturaPartner
-	 * @deprecatede
-	 *
-	 * @throws APIErrors::ADMIN_KUSER_NOT_FOUND
-	 */
-	public function getSecretsAction( $partnerId , $adminEmail , $cmsPassword )
-	{
-		return $this->getAction($partnerId, $adminEmail, $cmsPassword);
-	}
 	
 	/**
 	 * Retrieve all info attributed to the partner
@@ -210,21 +231,12 @@ class PartnerService extends KalturaBaseService
 	 * 
 	 * @action getInfo
 	 * @return KalturaPartner
-	 *
+	 * @deprecated
 	 * @throws APIErrors::UNKNOWN_PARTNER_ID
 	 */		
 	public function getInfoAction( )
 	{
-		$partnerId = $this->getPartnerId();
-		$dbPartner = PartnerPeer::retrieveByPK( $partnerId );
-		
-		if ( ! $dbPartner )
-			throw new KalturaAPIException ( APIErrors::UNKNOWN_PARTNER_ID , $partnerId );
-			
-		$partner = new KalturaPartner();
-		$partner->fromPartner( $dbPartner );
-		
-		return $partner;
+		return $this->getAction();
 	}
 	
 	/**
@@ -385,8 +397,8 @@ class PartnerService extends KalturaBaseService
 	    $filter->toObject($partnerFilter);
 	    
 	    $c = new Criteria();
-	    $subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id);
-		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id);
+	    $subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $this->getPartnerId());
+		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $this->getPartnerId());
 		$subCriterion1->addOr($subCriterion2);
 		$c->add($subCriterion1);
 		
