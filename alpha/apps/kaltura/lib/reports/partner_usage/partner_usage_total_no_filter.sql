@@ -1,9 +1,9 @@
-SELECT total_bandwidth.bandwidth,
-	   total_storage.storage,
-	   total_bandwidth.bandwidth + total_storage.storage total_usage	
+SELECT total_bandwidth.bandwidth/1024 bandwidth_consumption,
+	   total_storage.storage storage_used,
+	   total_bandwidth.bandwidth/1024 + total_storage.storage combined_bandwidth_storage
 FROM	   
 (SELECT 
-	SUM(count_bandwidth_kb) as bandwidth
+	SUM(IFNULL(count_bandwidth_kb,0)) as bandwidth
 FROM 
 	kalturadw.dwh_hourly_partner_usage
 WHERE
@@ -11,7 +11,7 @@ WHERE
 	AND
 	date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID}) AS total_bandwidth,
 (SELECT 
-	MAX(aggr_storage_mb) storage
+	MAX(IFNULL(aggr_storage_mb,0)) storage
 FROM 
 	kalturadw.dwh_hourly_partner_usage
 WHERE

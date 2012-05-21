@@ -1,8 +1,8 @@
 SELECT
 	{GROUP_COLUMN}, /*partner_id, */ 
-	SUM(count_bandwidth) as bandwidth,
-	MAX(aggr_storage_mb) as storage,
-	SUM(count_bandwidth) + MAX(aggr_storage_mb) AS bandwidth_storage
+	SUM(count_bandwidth) as bandwidth_consumption,
+	MAX(aggr_storage_mb) as used_storage,
+	SUM(count_bandwidth) + MAX(aggr_storage_mb) AS combined_bandwidth_storage
 FROM (
 	SELECT
 		date_id, FLOOR(date_id/100) month_id, partner_id, ifnull(count_bandwidth_kb, 0)/1024 count_bandwidth, ifnull(aggr_storage_mb, 0) aggr_storage_mb
