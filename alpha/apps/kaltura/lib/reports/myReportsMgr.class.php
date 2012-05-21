@@ -590,6 +590,10 @@ class myReportsMgr
 				else if ( $report_type == self::REPORT_TYPE_ADMIN_CONSOLE )
 				{
 					$obj_ids_clause = "dim_partner.partner_id in ( $object_ids_str)";
+				}			
+				else if ( $report_type == self::REPORT_TYPE_PARTNER_USAGE )
+				{
+					$obj_ids_clause = "partner_id in ($object_ids_str)";
 				}		
 				else
 				{

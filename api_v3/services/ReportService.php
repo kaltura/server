@@ -20,6 +20,30 @@ class ReportService extends KalturaBaseService
 	}
 		
 	/**
+	 * Validates that all object ids are allowed partner ids
+	 * 
+	 * @param string $objectIds comma seperated ids
+	 * @return string comma seperated ids
+	 */
+	protected function validateObjectsAreAllowedPartners($objectIds = null)
+	{
+		if(!$objectIds)
+			return $this->getPartnerId();
+			
+		$c = new Criteria();
+		$c->addSelectColumn(PartnerPeer::ID);
+		$subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $this->getPartnerId());
+		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $this->getPartnerId());
+		$subCriterion1->addOr($subCriterion2);
+		$c->add($subCriterion1);
+		$c->add(PartnerPeer::ID, explode(',', $objectIds), Criteria::IN);
+		
+		$stmt = PartnerPeer::doSelectStmt($c);
+		$partnerIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		return implode(',', $partnerIds); 
+	}
+		
+	/**
 	 * report getGraphs action allows to get a graph data for a specific report. 
 	 * 
 	 * @action getGraphs
@@ -29,29 +53,10 @@ class ReportService extends KalturaBaseService
 	 * @param string $objectIds - one ID or more (separated by ',') of specific objects to query
 	 * @return KalturaReportGraphArray 
 	 */
-	function getGraphsAction( $reportType , KalturaReportInputFilter $reportInputFilter , $dimension = null , $objectIds = null  )
+	public function getGraphsAction( $reportType , KalturaReportInputFilter $reportInputFilter , $dimension = null , $objectIds = null  )
 	{
 		if($reportType == myReportsMgr::REPORT_TYPE_PARTNER_USAGE)
-		{
-			if($objectIds)
-			{
-				$c = new Criteria();
-				$c->addSelectColumn(PartnerPeer::ID);
-				$subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $this->getPartnerId());
-				$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $this->getPartnerId());
-				$subCriterion1->addOr($subCriterion2);
-				$c->add($subCriterion1);
-				$c->add(PartnerPeer::ID, explode(',', $objectIds), Criteria::IN);
-				
-				$stmt = PartnerPeer::doSelectStmt($c);
-				$partnerIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
-				$objectIds = implode(',', $partnerIds); 
-			}
-			else
-			{
-				$objectIds = $this->getPartnerId();
-			}
-		}
+			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
 		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray ( myReportsMgr::getGraph( $this->getPartnerId() , 
 			$reportType , 
@@ -71,8 +76,11 @@ class ReportService extends KalturaBaseService
 	 * @param string $objectIds - one ID or more (separated by ',') of specific objects to query
 	 * @return KalturaReportTotal 
 	 */
-	function getTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null )
+	public function getTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null )
 	{
+		if($reportType == myReportsMgr::REPORT_TYPE_PARTNER_USAGE)
+			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
+		
 		$reportTotal = new KalturaReportTotal();
 		
 		list ( $header , $data ) = myReportsMgr::getTotal( $this->getPartnerId() , 
@@ -95,10 +103,11 @@ class ReportService extends KalturaBaseService
 	 * @param string $objectIds - one ID or more (separated by ',') of specific objects to query
 	 * @return KalturaReportTable 
 	 */
-	function getTableAction( $reportType , KalturaReportInputFilter $reportInputFilter , 
-		KalturaFilterPager $pager , 
-		$order = null , $objectIds = null )
+	public function getTableAction($reportType, KalturaReportInputFilter $reportInputFilter, KalturaFilterPager $pager, $order = null, $objectIds = null)
 	{
+		if($reportType == myReportsMgr::REPORT_TYPE_PARTNER_USAGE)
+			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
+		
 		$reportTable = new KalturaReportTable();
 		
 		list ( $header , $data , $totalCount ) = myReportsMgr::getTable( $this->getPartnerId() , 
@@ -129,11 +138,14 @@ class ReportService extends KalturaBaseService
 	 * @param string $objectIds - one ID or more (separated by ',') of specific objects to query
 	 * @return string 
 	 */
-	function getUrlForReportAsCsvAction ( $reportTitle , $reportText , $headers , $reportType , KalturaReportInputFilter $reportInputFilter , 
+	public function getUrlForReportAsCsvAction ( $reportTitle , $reportText , $headers , $reportType , KalturaReportInputFilter $reportInputFilter , 
 		$dimension = null , 
 		KalturaFilterPager $pager = null , 
 		$order = null , $objectIds = null )
 	{
+		if($reportType == myReportsMgr::REPORT_TYPE_PARTNER_USAGE)
+			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
+		
 		$report = myReportsMgr::getUrlForReportAsCsv( $this->getPartnerId() ,  $reportTitle , $reportText , $headers , $reportType , 
 			$reportInputFilter->toReportsInputFilter() ,
 			$dimension , 
@@ -149,7 +161,7 @@ class ReportService extends KalturaBaseService
 	 * @param KalturaKeyValueArray $params
 	 * @return KalturaReportResponse
 	 */
-	function executeAction($id, KalturaKeyValueArray $params = null)
+	public function executeAction($id, KalturaKeyValueArray $params = null)
 	{
 		$dbReport = ReportPeer::retrieveByPK($id);
 		if (is_null($dbReport))
@@ -175,7 +187,7 @@ class ReportService extends KalturaBaseService
 	 * @param KalturaKeyValueArray $params
 	 * @return file
 	 */
-	function getCsvAction($id, KalturaKeyValueArray $params = null)
+	public function getCsvAction($id, KalturaKeyValueArray $params = null)
 	{
 		$dbReport = ReportPeer::retrieveByPK($id);
 		if (is_null($dbReport))
@@ -216,7 +228,7 @@ class ReportService extends KalturaBaseService
 	 * @param string $params
 	 * @return file
 	 */
-	function getCsvFromStringParamsAction($id, $params = null)
+	public function getCsvFromStringParamsAction($id, $params = null)
 	{
 		$paramsArray = $this->parseParamsStr($params);
 		return $this->getCsvAction($id, $paramsArray);
