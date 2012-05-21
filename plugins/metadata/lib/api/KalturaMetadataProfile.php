@@ -180,7 +180,7 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	    if ($this->systemName)
 	    {
 	        $c = KalturaCriteria::create(MetadataProfilePeer::OM_CLASS);
-	        $c->add(StorageProfilePeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
+	        $c->add(MetadataProfilePeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
 			$c->add(MetadataProfilePeer::SYSTEM_NAME, $this->systemName);
 			if(MetadataProfilePeer::doCount($c))
 				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
