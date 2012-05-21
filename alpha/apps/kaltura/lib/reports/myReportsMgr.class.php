@@ -895,7 +895,7 @@ class myReportsMgr
 				$obj_ids_str , 
 				$time_shift,
 				$cat_ids_str,
-				($input_filter == reportInterval::MONTHS ? "month_id" : "date_id"),
+				($input_filter->interval == reportInterval::MONTHS ? "month_id" : "date_id"),
 			);
 				
 		if ( $input_filter->extra_map )
