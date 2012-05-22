@@ -57,12 +57,12 @@ class BulkUploadService extends KalturaBaseService
 	 * @param int $conversionProfileId
 	 * @param string $filePath
 	 * @param string $userId
-	 * @param BulkUploadType $bulkUploadType
+	 * @param int $bulkUploadType
 	 * @param string $uploadedBy
 	 * @param string $fileName
 	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 */
-	protected function constructJobData ($filePath, $fileName, Partner $partner, $puserId, $uploadedBy, $conversionProfileId = null, BulkUploadType $coreBulkUploadType = null)
+	protected function constructJobData ($filePath, $fileName, Partner $partner, $puserId, $uploadedBy, $conversionProfileId = null, $coreBulkUploadType = null)
 	{
 	   $data = KalturaPluginManager::loadObject('kBulkUploadJobData', $coreBulkUploadType);
 
