@@ -2765,11 +2765,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		$entitledKusersPublish = explode(',', $this->getEntitledKusersPublish());
 		$entitledKusersEdit = explode(',', $this->getEntitledKusersEdit());
-		$entitledKusers = array_merge($entitledKusersPublish, $entitledKusersEdit);
-		$entitledKusers[] = $this->getKuserId();
-		$entitledKusers[] = $this->getCreatorKuserId();
+		$entitledKusersNoPrivacyContext = array_merge($entitledKusersPublish, $entitledKusersEdit);
+		$entitledKusersNoPrivacyContext[] = $this->getKuserId();
+		$entitledKusersNoPrivacyContext[] = $this->getCreatorKuserId();
 		
-		$entitledKusers = array_unique($entitledKusers);
+		$entitledKusers = array();
+		$entitledKusers[kEntitlementUtils::ENTRY_PRIVACY_CONTEXT] = array_unique($entitledKusers);
 		
 		if ($this->getAllCategoriesIds() == '')
 			return implode(' ', $entitledKusers);
@@ -2791,11 +2792,26 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		//get all memebrs
 		foreach ($categories as $category)
-			$entitledKusers = array_merge($entitledKusers, explode(',', $category->getMembers()));
+		{
+			$privacyContexts = explode(',', $category->getPrivacyContexts());
+			if(!count($privacyContexts))
+				$privacyContexts = array(kEntitlementUtils::DEFAULT_CONTEXT); 
+							
+			foreach ($privacyContexts as $privacyContext)
+			{
+				if(isset($entitledKusers[$privacyContext]))
+					$entitledKusers[$privacyContext] = array_merge($entitledKusers, explode(',', $category->getMembers()));
+				else
+					$entitledKusers[$privacyContext] = explode(',', $category->getMembers());
+			}
+		}
 		
-		$entitledKusers = array_unique($entitledKusers);
+		$entitledKusersByContexts = array();
 		
-		return implode(',', $entitledKusers);
+		foreach($entitledKusers as $privacyContext => $kusers)
+			$entitledKusersByContexts[] = $privacyContext . ' ' . implode(' ', $kusers) . ' ' . $privacyContext;
+		
+		return $entitledKusersByContexts;
 	}
 	
 	public function getAllCategoriesIds()

@@ -259,9 +259,9 @@ class SphinxKuserCriteria extends SphinxCriteria
 	 */
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{		
-		if($filter->get('_contains_puser_id_or_screen_name'))
+		if($filter->get('_likex_puser_id_or_screen_name'))
 		{
-			$freeTexts = $filter->get('_contains_puser_id_or_screen_name');
+			$freeTexts = $filter->get('_likex_puser_id_or_screen_name');
 			KalturaLog::debug("Attach free text [$freeTexts]");
 			
 			$additionalConditions = array();
@@ -326,7 +326,7 @@ class SphinxKuserCriteria extends SphinxCriteria
 			}
 		}
 		
-		$filter->unsetByName('_contains_puser_id_or_screen_name');
+		$filter->unsetByName('_likex_puser_id_or_screen_name');
 		
 		return parent::applyFilterFields($filter);
 	}

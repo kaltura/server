@@ -307,20 +307,28 @@ class entryPeer extends BaseentryPeer
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS); 
 		$c->addAnd ( entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
 
+		
 		// logic should be ( kuserId || creatorKuserId) || (privacyByContext && (entitledKusers || categories))
 		
-		$critPrivacyByContextAndEntitledKusers = null;
+		
+		// logic should be ( kuserId || creatorKuserId) || 
+		//  				(privacyByContext of type 1 or 2) || 
+		//					privacyByContext << entitledKusers << privacyByContext || 
+		//					categoriesWithinPrivacyContext))
+		
+		$critEntitled = null;
 		
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$privacyContexts = kEntitlementUtils::getPrivacyContextSearch();
-			$critPrivacyByContextAndEntitledKusers = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, Criteria::IN);
-			$critPrivacyByContextAndEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+			$critEntitled = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, Criteria::IN);
+			$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 
 			if(kCurrentContext::$ks_kuser_id)
 			{
 				//ENTITLED_KUSERS field includes $this->entitledUserEdit, $this->entitledUserEdit, and users on work groups categories.
-				$critEntitledKusers = $c->getNewCriterion(self::ENTITLED_KUSERS, kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
+				$entitledKuserByPrivacyContext = kEntitlementUtils::getEntitledKuserByPrivacyContext();
+				$critEntitledKusers = $c->getNewCriterion(self::ENTITLED_KUSERS, $entitledKuserByPrivacyContext, Criteria::IN);
 				$critEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 				
 				$categoriesIds = array();
@@ -335,10 +343,10 @@ class entryPeer extends BaseentryPeer
 				{
 					$critCategories = $c->getNewCriterion(self::CATEGORIES_IDS, $categoriesIds, Criteria::IN);
 					$critCategories->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-					$critEntitledKusers->addOr($critCategories);
+					$critEntitled->addOr($critCategories);
 				}
 				
-				$critPrivacyByContextAndEntitledKusers->addAnd($critEntitledKusers);
+				$critEntitled->addOr($critEntitledKusers);
 			}
 		}
 
@@ -363,16 +371,16 @@ class entryPeer extends BaseentryPeer
 			}
 		}
 		
-		if($critPrivacyByContextAndEntitledKusers && $critKuser)
-			$critKuser->addOr($critPrivacyByContextAndEntitledKusers);
+		if($critEntitled && $critKuser)
+			$critKuser->addOr($critEntitled);
 			
 		if($critKuser)
 		{
 			$c->addAnd ($critKuser);
 		}
-		elseif($critPrivacyByContextAndEntitledKusers)
+		elseif($critEntitled)
 		{
-			$c->addAnd ($critPrivacyByContextAndEntitledKusers);
+			$c->addAnd ($critEntitled);
 		}
 		
 		self::$s_criteria_filter->setFilter($c);
@@ -597,7 +605,9 @@ class entryPeer extends BaseentryPeer
 	 */
 	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
-		if (!kEntitlementUtils::getEntitlementEnforcement() || KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_ENTRY || !self::$filerResults))
+		if (!kEntitlementUtils::getEntitlementEnforcement() || 
+			KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_ENTRY) || 
+			!self::$filerResults)
 			return parent::filterSelectResults($selectResults, $criteria);
 		
 		KalturaLog::debug('Entitlement: Filter Results');

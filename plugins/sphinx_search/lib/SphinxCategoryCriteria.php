@@ -91,6 +91,10 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'deleted_at' => IIndexable::FIELD_TYPE_DATETIME,
 		'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
 	);
+	
+	public static $sphinxFieldsEscapeType = array(
+		'category.FULL_NAME' => SphinxFieldEscapeType::STRIP,
+	);
 
 	/**
 	 * @return criteriaFilter
@@ -219,9 +223,9 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		$filter->unsetByName('_free_text');
 		
 		
-		if($filter->get('_contains_name_or_reference_id'))
+		if($filter->get('_likex_name_or_reference_id'))
 		{
-			$freeTexts = $filter->get('_contains_name_or_reference_id');
+			$freeTexts = $filter->get('_likex_name_or_reference_id');
 			KalturaLog::debug("Attach free text [$freeTexts]");
 			
 			$additionalConditions = array();
@@ -236,7 +240,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 				$freeText = str_replace('"', '', $freeTexts);
 				$freeText = SphinxUtils::escapeString($freeText);
 				$freeText = "^$freeText$";
-				$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") \\\*$freeText\\\*";
+				$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $freeText\\\*";
 			}
 			else
 			{
@@ -255,7 +259,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 							
 					foreach($freeTextsArr as $freeText)
 					{
-						$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") \\\*$freeText\\\*";
+						$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $freeText\\\*";
 					}
 				}
 				else
@@ -271,7 +275,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 							
 					$freeTextsArr = array_unique($freeTextsArr);
 					$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
-					$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") \\\*$freeTextExpr\\\*";
+					$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $freeTextExpr\\\*";
 				}
 			}
 			if(count($additionalConditions))
@@ -284,7 +288,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 				$this->matchClause[] = $matches;
 			}
 		}
-		$filter->unsetByName('_contains_name_or_reference_id');
+		$filter->unsetByName('_likex_name_or_reference_id');
 				
 		return parent::applyFilterFields($filter);
 	}
@@ -325,6 +329,20 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			return null;
 			
 		return self::$sphinxTypes[$fieldName];
+	}
+	
+	public function getSphinxFieldsEscapeType($fieldName)
+	{
+		if(strpos($fieldName, '.') === false)
+		{
+			$fieldName = strtoupper($fieldName);
+			$fieldName = "category.$fieldName";
+		}
+		
+		if(!isset(self::$sphinxFieldsEscapeType[$fieldName]))
+			return SphinxFieldEscapeType::DEFAULT_ESCAPE;
+			
+		return self::$sphinxFieldsEscapeType[$fieldName];
 	}
 	
 	public function hasMatchableField ( $field_name )

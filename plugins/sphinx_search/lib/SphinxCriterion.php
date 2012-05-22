@@ -66,10 +66,12 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 	
 	protected function getStringMatchClause($sphinxField, $comparison, $value)
 	{
+		$fieldsEscapeType = $this->criteria->getSphinxFieldsEscapeType($sphinxField);
+		
 		switch($comparison)
 		{
 			case Criteria::EQUAL:
-				$value = SphinxUtils::escapeString($value);
+				$value = SphinxUtils::escapeString($value, $fieldsEscapeType);
 				return "@$sphinxField ^$value$";
 				
 			case Criteria::NOT_IN:
@@ -80,7 +82,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 					if(!is_numeric($valValue) && strlen($valValue) <= 1)
 						unset($vals[$valIndex]);
 					else
-						$vals[$valIndex] = SphinxUtils::escapeString($valValue);
+						$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
 				}
 				
 				if(count($vals))
@@ -99,7 +101,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 					if(!is_numeric($valValue) && strlen($valValue) <= 1)
 						unset($vals[$valIndex]);
 					else
-						$vals[$valIndex] = SphinxUtils::escapeString($valValue);
+						$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
 				}
 				
 				if(count($vals))
@@ -111,7 +113,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				break;
 				
 			default:
-				$value = SphinxUtils::escapeString($value);
+				$value = SphinxUtils::escapeString($value, $fieldsEscapeType);
 				return "@$sphinxField $value";
 		}
 		

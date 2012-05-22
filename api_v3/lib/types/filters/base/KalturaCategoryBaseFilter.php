@@ -35,6 +35,7 @@ abstract class KalturaCategoryBaseFilter extends KalturaFilter
 		"membersCountLessThanOrEqual" => "_lte_members_count",
 		"pendingMembersCountGreaterThanOrEqual" => "_gte_pending_members_count",
 		"pendingMembersCountLessThanOrEqual" => "_lte_pending_members_count",
+		"privacyContextEqual" => "_eq_privacy_context",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"inheritedParentIdEqual" => "_eq_inherited_parent_id",
@@ -207,6 +208,11 @@ abstract class KalturaCategoryBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $pendingMembersCountLessThanOrEqual;
+
+	/**
+	 * @var string
+	 */
+	public $privacyContextEqual;
 
 	/**
 	 * @var KalturaCategoryStatus

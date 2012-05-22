@@ -38,7 +38,7 @@ class kuserFilter extends baseObjectFilter
 				"_gte_login_data_id",
 				"_ltornull_login_data_id",
 				"_eq_is_admin",
-				"_contains_puser_id_or_screen_name",			
+				"_likex_puser_id_or_screen_name",			
 			) ,
 			NULL
 		);

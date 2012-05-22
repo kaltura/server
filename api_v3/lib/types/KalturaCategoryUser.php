@@ -123,10 +123,6 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	 */
 	public function validateForInsert($propertiesToSkip = array()) 
 	{
-		$kuser = kuserPeer::getKuserByPartnerAndUid ( kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id, $this->userId );
-		if (! $kuser)
-			throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID, $this->userId );
-		
 		$category = categoryPeer::retrieveByPK ( $this->categoryId );
 		if (! $category)
 			throw new KalturaAPIException ( KalturaErrors::CATEGORY_NOT_FOUND, $this->categoryId );
@@ -134,9 +130,15 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 		if ($category->getInheritanceType () == InheritanceType::INHERIT)
 			throw new KalturaAPIException ( KalturaErrors::CATEGORY_INHERIT_MEMBERS, $this->categoryId );
 		
-		$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId ( $this->categoryId, $kuser->getId () );
-		if ($categoryKuser)
-			throw new KalturaAPIException ( KalturaErrors::CATEGORY_USER_ALREADY_EXISTS );
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		
+		$kuser = kuserPeer::getKuserByPartnerAndUid ($partnerId , $this->userId );
+		if($kuser)
+		{
+			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId ( $this->categoryId, $kuser->getId () );
+			if ($categoryKuser)
+				throw new KalturaAPIException ( KalturaErrors::CATEGORY_USER_ALREADY_EXISTS );
+		}
 		
 		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId ( $this->categoryId, kCurrentContext::$ks_kuser_id );
 		if ((! $currentKuserCategoryKuser || 
@@ -144,6 +146,14 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 				$category->getUserJoinPolicy () == UserJoinPolicyType::NOT_ALLOWED && 
 				kEntitlementUtils::getEntitlementEnforcement ()) {
 			throw new KalturaAPIException ( KalturaErrors::CATEGORY_USER_JOIN_NOT_ALLOWED, $this->categoryId );
+		}
+		
+		//if user doesn't exists - create it
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$kuser = kuserPeer::getKuserByPartnerAndUid ($partnerId , $this->userId);
+		if(!$kuser)
+		{
+			kuserPeer::createKuserForPartner($partnerId, $this->userId);
 		}
 		
 		return parent::validateForInsert ( $propertiesToSkip );

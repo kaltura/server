@@ -159,6 +159,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 */
 	abstract protected function doCountOnPeer(Criteria $c);
 	
+	public function getSphinxFieldsEscapeType($fieldName)
+	{
+		return SphinxFieldEscapeType::DEFAULT_ESCAPE;
+	}
+	
 	/**
 	 * @param string $index index name
 	 * @param string $wheres
@@ -473,7 +478,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$sphinxField = $this->getSphinxFieldName($fieldName);
 				$type = $this->getSphinxFieldType($sphinxField);
 			}
+			
 			$valStr = print_r($val, true);
+			$fieldsEscapeType = $this->getSphinxFieldsEscapeType($fieldName);
 			
 			KalturaLog::debug("Attach field[$fieldName] as sphinx field[$sphinxField] of type [$type] and comparison[$operator] for value[$valStr]");
 			switch($operator)
@@ -486,9 +493,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue))
-							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
+							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
 						else
-							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
+							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
 					}
 					
 					if(count($vals))
@@ -507,9 +514,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue))
-							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
+							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
 						else
-							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
+							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
 					}
 					
 					if(count($vals))
@@ -529,9 +536,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue))
-							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
+							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
 						else
-							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
+							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
 					}
 					
 					if(count($vals))
@@ -547,7 +554,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				case baseObjectFilter::EQ:
 					if(is_numeric($val) || strlen($val) > 0)
 					{
-						$val = SphinxUtils::escapeString($val);
+						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
 						$this->addMatch("@$sphinxField ^$val$");
 						$filter->unsetByName($field);
 					}
@@ -562,9 +569,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue))
-							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
+							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
 						else
-							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
+							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
 					}
 							
 					if(count($vals))
@@ -577,7 +584,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				case baseObjectFilter::LIKEX:
 			        if(strlen($val) > 0)
 					{
-						$val = SphinxUtils::escapeString($val);
+						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
 						$this->addMatch("@$sphinxField $val\\\*");
 						$filter->unsetByName($field);
 					}

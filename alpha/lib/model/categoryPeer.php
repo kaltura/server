@@ -108,18 +108,18 @@ class categoryPeer extends BasecategoryPeer
 	 * @param $con
 	 * @return category
 	 */
-	public static function getByFullNameExactMatch($fullName, $ignoreCategoryId, $con = null)
+	public static function getByFullNameExactMatch($fullName, $ignoreCategoryId = null, $con = null)
 	{
 		$fullName = self::getParsedFullName($fullName);
 		
 		if (trim($fullName) == '')
 			return null;
 		
-		//we should not user KalturaCriteria::create(categoryPeer::OM_CLASS);
-		//as there is a bug in sphinx 2.0.4 that 'my category' and 'my category category' return the same object.
-		$c = new Criteria();  
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 		$c->add(categoryPeer::FULL_NAME, $fullName);
-		$c->add(categoryPeer::ID, $ignoreCategoryId, Criteria::NOT_EQUAL);
+		
+		if($ignoreCategoryId)
+			$c->add(categoryPeer::ID, $ignoreCategoryId, Criteria::NOT_EQUAL);
 		
 		return categoryPeer::doSelectOne($c, $con);
 	}

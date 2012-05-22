@@ -7,8 +7,8 @@
  */
 class kEntitlementUtils 
 {
-	const DEFAULT_CONTEXT = 'DEFAULT_CONTEXT';
-	const PRIVACY_CONTEXT_PREFIX = 'pc_pre_';
+	const DEFAULT_CONTEXT = 'DEFAULTPC';
+	const ENTRY_PRIVACY_CONTEXT = 'ENTRYPC'; 
 	
 	protected static $entitlementEnforcement = false;  
 	protected static $privacyContextSearch = null;	
@@ -194,8 +194,7 @@ class kEntitlementUtils
 			
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		if(!$ks)
-			return array(self::PRIVACY_CONTEXT_PREFIX . self::DEFAULT_CONTEXT .
-						 ' ' . PrivacyType::ALL . ' ' . self::PRIVACY_CONTEXT_PREFIX . self::DEFAULT_CONTEXT);
+			return array(self::DEFAULT_CONTEXT . ' ' . PrivacyType::ALL . ' ' . self::DEFAULT_CONTEXT);
 			
 		$ksPrivacyContexts = $ks->getPrivacyContext();
 		
@@ -206,10 +205,10 @@ class kEntitlementUtils
 		
 		foreach ($ksPrivacyContexts as $ksPrivacyContext)
 		{
-			$privacyContextSearch[] = self::PRIVACY_CONTEXT_PREFIX . $ksPrivacyContext . ' ' . PrivacyType::ALL . ' ' . self::PRIVACY_CONTEXT_PREFIX . $ksPrivacyContext;
+			$privacyContextSearch[] = $ksPrivacyContext . ' ' . PrivacyType::ALL . ' ' . $ksPrivacyContext;
 			
 			if (!$ks->isWidgetSession())
-				$privacyContextSearch[] = self::PRIVACY_CONTEXT_PREFIX . $ksPrivacyContext . ' ' . PrivacyType::AUTHENTICATED_USERS . ' ' . self::PRIVACY_CONTEXT_PREFIX . $ksPrivacyContext;
+				$privacyContextSearch[] = $ksPrivacyContext . ' ' . PrivacyType::AUTHENTICATED_USERS . ' ' . $ksPrivacyContext;
 		}
 		
 		self::$privacyContextSearch = $privacyContextSearch;
@@ -219,7 +218,7 @@ class kEntitlementUtils
 	
 	public static function setPrivacyContextSearch($privacyContextSearch)
 	{
-		self::$privacyContextSearch = array(self::PRIVACY_CONTEXT_PREFIX . $privacyContextSearch . ' ' . PrivacyType::ALL . ' ' . self::PRIVACY_CONTEXT_PREFIX . $privacyContextSearch);
+		self::$privacyContextSearch = array($privacyContextSearch . ' ' . PrivacyType::ALL . ' ' . $privacyContextSearch);
 	}
 	
 	public static function getPrivacyContextForEntry(entry $entry)
@@ -259,9 +258,32 @@ class kEntitlementUtils
 		
 		$entryPrivacyContexts = array();
 		foreach ($privacyContexts as $categoryPrivacyContext => $Privacy)
-			$entryPrivacyContexts[] = self::PRIVACY_CONTEXT_PREFIX . $categoryPrivacyContext . ' ' . $Privacy . ' ' . self::PRIVACY_CONTEXT_PREFIX . $categoryPrivacyContext;
+			$entryPrivacyContexts[] = $categoryPrivacyContext . ' ' . $Privacy . ' ' . $categoryPrivacyContext;
 		
 		return $entryPrivacyContexts;
+	}
+	
+	public static function getEntitledKuserByPrivacyContext()
+	{
+		if(kCurrentContext::$ks_kuser_id && kCurrentContext::$ks_kuser_id == '')
+			return null;
+			
+		$privacyContextSearch = array();
+			
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		$ksPrivacyContexts = $ks->getPrivacyContext();
+		
+		if(is_null($ksPrivacyContexts))
+			$ksPrivacyContexts = self::DEFAULT_CONTEXT;
+		
+		$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
+		
+		foreach ($ksPrivacyContexts as $ksPrivacyContext)
+			$privacyContextSearch[] = $ksPrivacyContext . ' << ' . kCurrentContext::$ks_kuser_id . ' << ' . $ksPrivacyContext;
+		
+		$privacyContextSearch[] = self:: ENTRY_PRIVACY_CONTEXT . ' << ' . kCurrentContext::$ks_kuser_id . ' << ' . self:: ENTRY_PRIVACY_CONTEXT;
+			
+		return $privacyContextSearch;
 	}
 	
 	public static function getKsPrivacyContext()

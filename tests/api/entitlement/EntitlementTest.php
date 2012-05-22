@@ -361,6 +361,8 @@ class EntitlementTest extends EntitlementTestBase
 			}
 		}
 		
+		$this->startSessionWithDiffe(SessionType::USER, $user->id);
+		
 		if($categoryUserResponse && $categoryUserResponse->status == KalturaCategoryUserStatus::ACTIVE)
 		{
 				//user get the entry with no permission

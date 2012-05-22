@@ -28,7 +28,7 @@ class CategoryUserService extends KalturaBaseService
 		if (!$category)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);						
 		
-		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryUser->categoryId, kCurrentContext::$ks_kuser_id);
+		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryUser->categoryId, kCurrentContext::$ks_kuser_id);		
 		if (!kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$dbCategoryKuser->setStatus(CategoryKuserStatus::ACTIVE);	
@@ -38,10 +38,6 @@ class CategoryUserService extends KalturaBaseService
 		{
 			//Current Kuser is manager
 			$dbCategoryKuser->setStatus(CategoryKuserStatus::ACTIVE);
-		}
-		elseif ($category->getUserJoinPolicy() == UserJoinPolicyType::NOT_ALLOWED)
-		{
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_USER_JOIN_NOT_ALLOWED, $categoryUser->categoryId);
 		}
 		elseif ($category->getUserJoinPolicy() == UserJoinPolicyType::AUTO_JOIN)
 		{

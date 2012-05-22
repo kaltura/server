@@ -536,15 +536,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			foreach ($entitledUsersEdit as $puserId)
 			{
 				$puserId = trim($puserId);
-				$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
-				if (!$kuser)
-				{
-					$newKuser = new kuser();
-					$newKuser->setPuserId($puserId);
-					$newKuser->setStatus(KuserStatus::ACTIVE);
-					$newKuser->setPartnerId($partnerId);
-					$newKuser->save();
-				}
+				kuserPeer::createKuserForPartner($partnerId, $puserId);
 			}
 		}
 			
@@ -555,15 +547,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			foreach ($entitledPusersPublish as $puserId)
 			{
 				$puserId = trim($puserId);
-				$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
-				if (!$kuser)
-				{
-					$newKuser = new kuser();
-					$newKuser->setPuserId($puserId);
-					$newKuser->setStatus(KuserStatus::ACTIVE);
-					$newKuser->setPartnerId($partnerId);
-					$newKuser->save();
-				}
+				kuserPeer::createKuserForPartner($partnerId, $puserId);
 			}
 		}
 		
