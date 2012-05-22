@@ -7,6 +7,7 @@ class categoryFilter extends baseObjectFilter
 {
 	const FREE_TEXT_FIELDS = 'name,tags,description';
 	const NAME_REFERNCE_ID = 'name,reference_id';
+	const MEMBERS = 'members';
 	
 	public function init ()
 	{
@@ -45,6 +46,8 @@ class categoryFilter extends baseObjectFilter
 			"_likex_full_ids",
 			"_eq_inherited_parent_id",
 			"_eq_privacy_context",
+			"_eq_manager",
+			"_eq_member",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "depth", "partner_sort_value", "entries_count", "members_count", "direct_entries_count", "full_name");

@@ -11,6 +11,8 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 		"membersIn" => "_in_members",
 		"appearInListEqual" => "_eq_display_in_search",
 		"nameOrReferenceIdStartsWith" => "_likex_name_or_reference_id",
+		"managerEqual" => "_eq_manager",
+		"memberEqual" => "_eq_member",
 	);
 
 	private $order_by_map = array
@@ -43,6 +45,16 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 	 * @var string
 	 */
 	public $nameOrReferenceIdStartsWith;
+	
+	/**
+	 * @var string
+	 */
+	public $managerEqual;
+	
+	/**
+	 * @var string
+	 */
+	public $memberEqual;
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()

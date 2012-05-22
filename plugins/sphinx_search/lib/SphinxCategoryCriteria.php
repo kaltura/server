@@ -227,6 +227,33 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$filter->set('_eq_privacy_context', kEntitlementUtils::NOT_DEFAULT_CONTEXT);
 		}
 		
+		if($filter->get('_eq_manager'))
+		{
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id; 
+			
+			$puserId = $filter->get('_eq_manager');
+			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+			if($kuser)
+			{
+				$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
+				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . $manager . ' << ' . $kuser->getid() .' << ' . $manager . ')';
+			}
+		}
+		$filter->unsetByName('_eq_any_member');
+		
+		if($filter->get('_eq_member'))
+		{
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id; 
+			
+			$puserId = $filter->get('_eq_member');
+			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+			if($kuser)
+			{
+				$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
+				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . $kuser->getid() . ')';
+			}
+		}
+		$filter->unsetByName('_eq_member');
 		
 		if($filter->get('_likex_name_or_reference_id'))
 		{

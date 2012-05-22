@@ -111,6 +111,22 @@ class KalturaBulkUploadResultEntry extends KalturaBulkUploadResult
      */
     public $sshKeyPassphrase;
     
+    /**
+	 * @var string
+	 */
+	public $creatorId;
+	
+	/**
+	 * @var string
+	 */
+	public $entitledUsersEdit;
+		
+	/**
+	 * @var string
+	 */
+	public $entitledUsersPublish;	
+	
+    
     private static $mapBetweenObjects = array
 	(
 	    "entryId",
@@ -131,6 +147,9 @@ class KalturaBulkUploadResultEntry extends KalturaBulkUploadResult
 	    "sshPrivateKey",
 	    "sshPublicKey",
 	    "sshKeyPassphrase",
+		"creatorId",
+		"entitledUsersEdit",
+		"entitledUsersPublish",
 	);
 	
     public function getMapBetweenObjects()

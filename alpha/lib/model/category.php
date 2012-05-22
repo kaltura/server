@@ -819,13 +819,46 @@ class category extends Basecategory implements IIndexable
 		if (!$members)
 			return '';
 		
-		$membersIds = array();
+		$membersIdsByPermission = array();
 		foreach ($members as $member)
 		{
-			$membersIds[] = $member->getKuserId();
+			if(isset($membersIdsByPermission[$member->getPermissionLevel()]))
+				$membersIdsByPermission[$member->getPermissionLevel()][] = $member->getKuserId();
+			else
+				$membersIdsByPermission[$member->getPermissionLevel()] = array ($member->getKuserId());
 		}
 		
+		$membersIds = array();
+		foreach ($membersIdsByPermission as $permissionLevel => $membersIdByPermission)
+			$membersIds[] = self::getPermissionLevelName($permissionLevel) . ' ' . 
+							implode(' ', $membersIdByPermission) . ' ' . 
+							self::getPermissionLevelName($permissionLevel); 
+		
 		return implode(',', $membersIds);
+	}
+	
+	public static function getPermissionLevelName($permissionLevel)
+	{
+		switch ($permissionLevel)
+		{
+			case CategoryKuserPermissionLevel::CONTRIBUTOR:
+				return 'CONTRIBUTOR';
+				break;
+				
+			case CategoryKuserPermissionLevel::MANAGER:
+				return 'MANAGER';
+				break;
+				
+			case CategoryKuserPermissionLevel::MEMBER:
+				return 'MEMBER';
+				break;
+				
+			case CategoryKuserPermissionLevel::MODERATOR:
+				return 'MODERATOR';
+				break;
+		}
+		
+		return '';
 	}
 	
 /* (non-PHPdoc)
