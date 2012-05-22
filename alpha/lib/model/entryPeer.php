@@ -468,7 +468,8 @@ class entryPeer extends BaseentryPeer
 	{
 		if($row)
 		{
-			$entryType = $row[$colnum + 4]; // type
+			 $typeField = self::translateFieldName(entryPeer::TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
+  			 $entryType = $row[$typeField];
 			if(isset(self::$class_types_cache[$entryType]))
 				return self::$class_types_cache[$entryType];
 				
