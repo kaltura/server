@@ -73,4 +73,52 @@ class DocumentEntry extends entry
 	}
 
 	public function getCreateThumb (  )			{	return false;} // Documents never have a thumb
+	
+	public function getLocalThumbFilePath(entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null) {
+		KalturaLog::log ( "flavor_id [$flavorId] file_name [$fileName]" );
+		if (is_null ( $flavorId ))
+			KExternalErrors::dieError ( KExternalErrors::MISSING_PARAMETER, 'flavor_id' );
+		$flavor = assetPeer::retrieveById ( $flavorId );
+		if (is_null ( $flavor ))
+			KExternalErrors::dieError ( KExternalErrors::FLAVOR_NOT_FOUND, $flavorId );
+		$flavorSyncKey = $flavor->getSyncKey ( asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET );
+		$file_path = kFileSyncUtils::getReadyLocalFilePathForKey ( $flavorSyncKey );
+		if (is_dir($file_path)){
+			if (is_null($fileName))
+				 KExternalErrors::dieError ( KExternalErrors::MISSING_PARAMETER, 'file name' );
+			$orig_image_path = $file_path . DIRECTORY_SEPARATOR . $fileName;
+		}
+		try 
+		{
+			return myEntryUtils::resizeEntryImage ( $entry, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density );
+		} 
+		catch ( Exception $ex ) 
+		{
+			if ($ex->getCode () == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC) 
+			{
+				$remoteFileSync = kFileSyncUtils::getOriginFileSyncForKey ( $flavorSyncKey, false );
+				if (! $remoteFileSync) 
+				{
+					// file does not exist on any DC - die
+					KalturaLog::err ( "No FileSync for flavor [$flavorId]" );
+					KExternalErrors::dieError ( KExternalErrors::FILE_NOT_FOUND );
+				}
+				
+				if ($remoteFileSync->getDc () == kDataCenterMgr::getCurrentDcId ()) 
+				{
+					KalturaLog::err ( "Trying to redirect to myself - stop here." );
+					KExternalErrors::dieError ( KExternalErrors::FILE_NOT_FOUND );
+				}
+				
+				if (! in_array ( $remoteFileSync->getDc (), kDataCenterMgr::getDcIds () )) 
+				{
+					KalturaLog::err ( "Origin file sync is on remote storage." );
+					KExternalErrors::dieError ( KExternalErrors::FILE_NOT_FOUND );
+				}
+				$remoteUrl = kDataCenterMgr::getRedirectExternalUrl ( $remoteFileSync );
+				kFile::dumpUrl ( $remoteUrl );
+			}
+		}			
+	}
 }

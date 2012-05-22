@@ -2841,4 +2841,59 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		return SphinxFieldEscapeType::DEFAULT_ESCAPE;
 	}
+	
+/**
+	 * will create thumbnail according to the entry type 
+	 * @return the thumbnail path.
+	 */
+	public function getLocalThumbFilePath(entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null) {
+		$contentPath = myContentStorage::getFSContentRootPath ();
+		// if entry type is audio - serve generic thumb:
+		if ($this->getMediaType () == entry::ENTRY_MEDIA_TYPE_AUDIO) {
+			if ($this->getStatus () == entryStatus::DELETED || $this->getModerationStatus () == moderation::MODERATION_STATUS_BLOCK) {
+				KalturaLog::log ( "rejected audio entry - not serving thumbnail" );
+				KExternalErrors::dieError ( KExternalErrors::ENTRY_DELETED_MODERATED );
+			}
+			$msgPath = $contentPath . "content/templates/entry/thumbnail/audio_thumb.jpg";
+			return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles );
+		
+		} elseif ($this->getType () == entryType::LIVE_STREAM) {
+			if ($this->getStatus () == entryStatus::DELETED || $this->getModerationStatus () == moderation::MODERATION_STATUS_BLOCK) {
+				KalturaLog::log ( "rejected live stream entry - not serving thumbnail" );
+				KExternalErrors::dieError ( KExternalErrors::ENTRY_DELETED_MODERATED );
+			}
+			$msgPath = $contentPath . "content/templates/entry/thumbnail/live_thumb.jpg";
+			return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles );
+		} elseif ($this->getMediaType () == entry::ENTRY_MEDIA_TYPE_SHOW) { // roughcut without any thumbnail, probably just created 
+			$msgPath = $contentPath . "content/templates/entry/thumbnail/auto_edit.jpg";
+			return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles );
+		
+		} 
+		elseif ($this->getType () == entryType::MEDIA_CLIP) {
+			try {
+				return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices );
+			} catch ( Exception $ex ) {
+				if ($ex->getCode () == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC) {
+					// get original flavor asset
+					$origFlavorAsset = assetPeer::retrieveOriginalByEntryId ( $this->getId() );
+					if ($origFlavorAsset) {
+						$syncKey = $origFlavorAsset->getSyncKey ( flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
+						
+						list ( $readyFileSync, $isLocal ) = kFileSyncUtils::getReadyFileSyncForKey ( $syncKey, TRUE, FALSE );
+						if ($readyFileSync) {
+							if ($isLocal) {
+								KalturaLog::err ( 'Trying to redirect to myself - stop here.' );
+								KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
+							}
+							//Ready fileSync is on the other DC - dumping
+							kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
+						}
+						KalturaLog::err ( 'No ready fileSync found on any DC.' );
+						KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
+					}
+				}
+			}
+		}
+	}
 }
