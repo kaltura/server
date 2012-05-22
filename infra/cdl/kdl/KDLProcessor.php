@@ -1,8 +1,4 @@
 <?php
-include_once("KDLCommon.php");
-include_once("KDLMediaDataSet.php");
-include_once("KDLFlavor.php");
-include_once("KDLTranscoderCommand.php");
 
 	/* ===========================
 	 * KDLProcessor
@@ -127,7 +123,7 @@ KalturaLog::log("An invalid source RealMedia file thatfails to provide valid med
 		 */
 		public static function ProceessFlavorsForCollection($flavorList)
 		{
-			$ee3obj = new KDLExpressionEncoder3();
+			$ee3obj = new KDLExpressionEncoder3(KDLTranscoders::EE3);
 			return $ee3obj->GenerateSmoothStreamingPresetFile($flavorList);
 		}
 		
