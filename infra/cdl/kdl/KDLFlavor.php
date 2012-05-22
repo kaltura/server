@@ -159,17 +159,6 @@ class KDLFlavor extends KDLMediaDataSet {
 	 * generateCommandLines
 	 */
 	private function generateCommandLines(KDLFlavor $target, $transcoders){
-
-		if(isset($target->_video)) {
-			if(!property_exists($target->_video,"_h264ForMobile")) {
-				if(isset($target->_engineVersion) && $target->_engineVersion==1){
-					$target->_video->_h264ForMobile = 1;
-				}
-				else {
-					$target->_video->_h264ForMobile = 0;
-				}
-			}
-		}
 		foreach($transcoders as $key=>$trPrmObj) {
 
 			if(is_array($trPrmObj)){
@@ -844,16 +833,6 @@ KalturaLog::log(__METHOD__."==>\n");
 		return false;
 	}
 	
-	/* ---------------------------
-	 * SetTranscoderCmdLineGenerator
-	 */
-	public function SetTranscoderCmdLineGenerator(KDLFlavor $design)
-	{
-		$cmdLine = new KDLTranscoderCommand($design, $this);
-
-		return $cmdLine;
-	}
-
 	/* ---------------------------
 	 * Blacklist processing
 	 */
