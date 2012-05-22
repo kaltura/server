@@ -26,7 +26,7 @@ class SphinxUtils
 		}
 		elseif($escapeType == SphinxFieldEscapeType::STRIP)
 		{
-			return preg_replace("/[^a-zA-Z0-9]/" , self::REPLACE_CHARS , trim($str));
+			return preg_replace('/[^\w\d]/' , self::REPLACE_CHARS , trim($str));
 		}
 	}
 }
