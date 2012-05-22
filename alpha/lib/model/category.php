@@ -1306,7 +1306,7 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	public static $sphinxFieldsEscapeType = array(
-		'category.FULL_NAME' => SphinxFieldEscapeType::STRIP,
+		'full_name' => SphinxFieldEscapeType::STRIP,
 	);
 	
 	public function getSphinxFieldsEscapeType($fieldName)
