@@ -44,6 +44,7 @@ class categoryFilter extends baseObjectFilter
 			"_eq_full_ids",
 			"_likex_full_ids",
 			"_eq_inherited_parent_id",
+			"_eq_privacy_context",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "depth", "partner_sort_value", "entries_count", "members_count", "direct_entries_count", "full_name");

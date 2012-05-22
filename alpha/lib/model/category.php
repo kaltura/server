@@ -849,7 +849,7 @@ class category extends Basecategory implements IIndexable
 			'display_in_search' => 'displayInSearch',	
 			'depth' => 'depth',
 			'reference_id' => 'referenceId',
-			'privacy_context' => 'privacyContext',
+			'privacy_context' => 'searchIndexprivacyContext',
 			'privacy_contexts' => 'searchIndexPrivacyContexts',
 			'members_count' => 'membersCount',
 			'pending_members_count' => 'pendingMembersCount',
@@ -1085,7 +1085,7 @@ class category extends Basecategory implements IIndexable
 		$parentCategory = $this->getParentCategory();
 		$privacyContext = explode(',', $parentCategory->getPrivacyContexts());
 		$privacyContext[] = $v;
-		
+
 		$this->setPrivacyContexts(implode(',', $privacyContext));
 		parent::setPrivacyContext($v);
 	}
@@ -1281,6 +1281,14 @@ class category extends Basecategory implements IIndexable
 	public function reSetPrivacyContext()
 	{
 		$this->setPrivacyContext($this->getPrivacyContext());
+	}
+	
+	public function getSearchIndexPrivacyContext()
+	{
+		if(is_null($this->getPrivacyContext()) || $this->getPrivacyContext() == '')
+			return kEntitlementUtils::DEFAULT_CONTEXT;
+			
+		return $this->getPrivacyContexts() . ',' . kEntitlementUtils::NOT_DEFAULT_CONTEXT;
 	}
 	
 	public function getSearchIndexPrivacyContexts()

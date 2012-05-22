@@ -381,6 +381,8 @@ class KalturaErrors extends APIErrors
 	
 	const CATEGORY_INHERIT_MEMBERS = "CATEGORY_INHERIT_MEMBERS,Cannot add members to this category since its inherit members from parent category [\"%s\"]";
 	
+	const CATEGORY_INHERIT_MEMBERS_MUST_SET_PARENT_CATEGORY = "CATEGORY_INHERIT_MEMBERS_MUST_SET_PARENT_CATEGORY,Category that inherit members must have parent category set";
+	
 	const CATEGORY_USER_JOIN_NOT_ALLOWED = "CATEGORY_USER_JOIN_NOT_ALLOWED,cannot register to this category [\"%s\"]";
 	
 	const CANNOT_UPDATE_CATEGORY_USER = "CANNOT_UPDATE_CATEGORY_USER,cannot update categoryUser";

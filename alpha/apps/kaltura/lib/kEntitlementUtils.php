@@ -8,6 +8,8 @@
 class kEntitlementUtils 
 {
 	const DEFAULT_CONTEXT = 'DEFAULTPC';
+	const NOT_DEFAULT_CONTEXT = 'NOTDEFAULTPC';
+	
 	const ENTRY_PRIVACY_CONTEXT = 'ENTRYPC'; 
 	
 	protected static $entitlementEnforcement = false;  
@@ -15,6 +17,7 @@ class kEntitlementUtils
 	
 	public static function getEntitlementEnforcement()
 	{
+		return false;
 		return self::$entitlementEnforcement;
 	}
 	

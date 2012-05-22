@@ -382,6 +382,13 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		if($this->privacyContext != null && kEntitlementUtils::getEntitlementEnforcement())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT);
 			
+		if (($this->inheritanceType == KalturaInheritanceType::INHERIT) && 
+			($this->parentId == null) && 
+			(!is_null($sourceObject)) && $sourceObject->getParentId())
+		{
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_MUST_SET_PARENT_CATEGORY);
+		}
+		
 		if ((!is_null($sourceObject) && $sourceObject->getInheritanceType() == KalturaInheritanceType::INHERIT && $this->inheritanceType == null) || 
 			($this->inheritanceType == KalturaInheritanceType::INHERIT))
 		{

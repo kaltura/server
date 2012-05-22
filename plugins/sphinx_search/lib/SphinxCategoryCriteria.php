@@ -224,7 +224,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		
 		if($filter->get('_eq_privacy_context') && ($filter->get('_eq_privacy_context') == '*'))
 		{
-			$filter->set('_eq_privacy_context', kEntitlementUtils::DEFAULT_CONTEXT);
+			$filter->set('_eq_privacy_context', kEntitlementUtils::NOT_DEFAULT_CONTEXT);
 		}
 		
 		
