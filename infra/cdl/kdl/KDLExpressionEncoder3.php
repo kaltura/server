@@ -11,7 +11,7 @@ const jobXml = '<?xml version="1.0"?>
   Version="3.0">
   <Job
     OutputDirectory="C:\Tmp\Prod"
-    DefaultMediaOutputFileName="{OriginalFilename}.{DefaultExtension}" />
+    DefaultMediaOutputFileName="{OriginalFilename}" />
   <MediaFile
     VideoResizeMode="Letterbox"
 	ThumbnailCodec="Jpeg" 
@@ -255,6 +255,7 @@ $audObj = $target->_audio;
 
 $jobElem = null;
 $outputFormat=null;
+$defaultMediaOutputFileName = KDLCmdlinePlaceholders::OutFileName; // suits MP4/WMV targets. ISMV requires '{DefaultExtension}' as well
 		if(isset($target->_container)) {
 $contObj = $target->_container;
 			switch($contObj->_id){
@@ -263,6 +264,7 @@ $contObj = $target->_container;
 						$formatName='MP4OutputFormat';
 					else
 						$formatName='WindowsMediaOutputFormat';
+					$defaultMediaOutputFileName = KDLCmdlinePlaceholders::OutFileName.".{DefaultExtension}";
 					break;
 				case KDLContainerTarget::MP4:
 					$formatName='MP4OutputFormat';
@@ -285,10 +287,10 @@ $contObj = $target->_container;
 		
 		$jobElem->Job['OutputDirectory']=KDLCmdlinePlaceholders::OutDir;
 		if(isset($outFileName)){
-			$jobElem->Job['DefaultMediaOutputFileName']=$outFileName.".{DefaultExtension}";
+			$jobElem->Job['DefaultMediaOutputFileName']=$outFileName;
 		}
 		else {
-			$jobElem->Job['DefaultMediaOutputFileName']=KDLCmdlinePlaceholders::OutFileName.".{DefaultExtension}";
+			$jobElem->Job['DefaultMediaOutputFileName']=$defaultMediaOutputFileName;
 		}
 /*
 	Since there are certain constraints on those values for the EE3 presets, 
