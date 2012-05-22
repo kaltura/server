@@ -1,5 +1,10 @@
 #!/bin/bash
-source ../configurations/system.ini
+if [ -L $0 ];then
+	REAL_SCRIPT=`readlink $0`
+else
+	REAL_SCRIPT=$0
+fi
+. `dirname $REAL_SCRIPT`/../configurations/system.ini
 
 COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.daemon.sh -u root"
 POP_COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.populate.sh"
