@@ -281,9 +281,6 @@ class KDLOperationParams {
 					case 'height':
 						$mdObj->_height = $param;
 						break;
-					case 'h264ForMobile':
-						$mdObj->_h264ForMobile = $param;
-						break;
 					default:
 						break;
 				}
