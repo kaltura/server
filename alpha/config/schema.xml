@@ -1836,11 +1836,11 @@
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="err_type" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="err_number" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="on_stress_divert_to" type="integer" />
-        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="bulk_upload_object_type" type="integer" />
-        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="uploaded_by" type="varchar" />
-        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="uploaded_by_user_id" type="varchar" />
-        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="num_of_objects" type="int" />
-        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_name" type="varchar" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="param_1" type="integer" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="param_2" type="varchar" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="param_3" type="varchar" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="param_4" type="integer" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="param_5" type="varchar" />
         <index name="status_job_type_index">
             <index-column name="status" />
             <index-column name="job_type" />
