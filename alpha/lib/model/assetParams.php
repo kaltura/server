@@ -29,6 +29,10 @@ class assetParams extends BaseassetParams
 	const CONTAINER_FORMAT_PDF = 'pdf';
 	const CONTAINER_FORMAT_SWF = 'swf';
 	
+	const CONTAINER_FORMAT_JPG = 'jpg';
+	const CONTAINER_FORMAT_BMP = 'bmp';
+	const CONTAINER_FORMAT_PNG = 'png';
+	
 	const TAG_SOURCE = "source";
 	const TAG_WEB = "web";
 	const TAG_MBR = "mbr";

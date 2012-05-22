@@ -549,7 +549,83 @@ include_once("KDLCommon.php");
 		}
 	}
 	
-	
+	/* ---------------------------
+	 * ImageData
+	 */
+	class KDLImageData extends KDLBaseMediaData {
+
+		/* ---------------------
+		 * Data
+		 */
+		public $_densityWidth,
+			   $_densityHeight,
+			   $_sizeWidth,
+			   $_sizeHeight,
+			   $_depth;
+			   
+
+		public function GetSectionEnum() { return KDLConstants::ImageIndex; }
+		
+		/* ------------------------------
+		 * Validate
+		 */
+		public function Validate(array &$errors, array &$warnings, $section=null) {
+			parent::Validate($errors, $warnings, KDLConstants::ImageIndex);
+			self::sanityCheck($errors, $warnings);
+			
+			if(count($errors)>0)
+				return false;
+			else
+				return true;
+		}
+		
+		/* ---------------------------
+		 * ToString
+		 */
+		public function ToString(){
+			$rvStr=parent::ToString();
+
+			if($this->_densityWidth)
+				$rvStr=$rvStr.","."densityWidth:".$this->_densityWidth;
+			if($this->_densityHeight)
+				$rvStr=$rvStr.","."densityHeight:".$this->_densityHeight;
+			if($this->_sizeWidth)
+				$rvStr=$rvStr.","."sizeWidth:".$this->_sizeWidth;
+			if($this->_sizeHeight)
+				$rvStr=$rvStr.","."sizeHeight:".$this->_sizeHeight;
+			if($this->_depth)
+				$rvStr=$rvStr.","."depth:".$this->_depth;
+			if($rvStr)
+				$rvStr = "IMAGE(".$rvStr.")";
+			return $rvStr;
+		}
+		
+		/* ------------------------------
+		 * IsDataSet
+		 */
+		public function IsDataSet(){
+			if(parent::IsDataSet())
+				return true;
+			if($this->_densityWidth)
+				return true;
+			if($this->_densityHeight)
+				return true;
+			if($this->_sizeWidth)
+				return true;
+			if($this->_sizeHeight)
+				return true;
+			if($this->_depth)
+				return true;
+			return false;
+		}
+		
+		/* ------------------------------
+		 * sanityCheck
+		 */
+		public function sanityCheck(array &$errors, array &$warnings, $section=null) {
+			;
+		}
+	}
 
 
 

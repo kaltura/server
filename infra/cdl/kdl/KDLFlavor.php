@@ -131,7 +131,7 @@ class KDLFlavor extends KDLMediaDataSet {
 		if($source==null || !$source->IsDataSet() || $this->_flags&self::ForceCommandLineFlagBit) {
 			KalturaLog::log("FORCE ". $this->_flags);
 			$target = clone $this;
-			if($target->_video->_gop===null || $target->_video->_gop==0)
+			if($target->_video && ($target->_video->_gop===null || $target->_video->_gop==0))
 			$target->_video->_gop = KDLConstants::DefaultGOP;
 				
 			$target->_warnings[KDLConstants::ContainerIndex][] =
@@ -370,7 +370,7 @@ $plannedDur = 0;
 			$target->_container = clone $this->_container;
 		}
 
-$sourceDur=0;
+		$sourceDur=0;
 			/*
 			 * Evaluate source duration
 			 */
@@ -392,7 +392,7 @@ $sourceDur=0;
 			$target->_clipDur=0;
 		}
 		$target->_container->_duration = $sourceDur;
-$target->_video = null;
+		$target->_video = null;
 		if($this->_video!="") {
 			if($source->_video!="" && ($target->_container && !($target->_container->_id==KDLContainerTarget::MP3 || $target->_container->_id==KDLContainerTarget::WMA))){
 				/*

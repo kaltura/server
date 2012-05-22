@@ -30,6 +30,7 @@ class KExternalErrors
 	const PROXY_LOOPBACK = 23;
 	const MULTIREQUEST_PROXY_FAILED = 24;
 	const BAD_QUERY = 25;
+	const INVALID_FLAVOR_ASSET_TYPE = 26;
 	
 	private static $errorDescriptionMap = array(
 			self::ENTRY_NOT_FOUND => "requested entry not found",
@@ -57,6 +58,7 @@ class KExternalErrors
 			self::PROXY_LOOPBACK => "proxied request is being looped back",
 			self::MULTIREQUEST_PROXY_FAILED => "tried to dump not the first request",
 			self::BAD_QUERY => "wrong query attributes",
+			self::INVALID_FLAVOR_ASSET_TYPE => "requested flavor asset type is invalid",
 			
 		);
 	

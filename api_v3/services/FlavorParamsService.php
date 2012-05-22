@@ -9,6 +9,9 @@
  */
 class FlavorParamsService extends KalturaBaseService
 {
+	
+	const PROPERTY_MIN_LENGTH = 1; 
+	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -47,14 +50,14 @@ class FlavorParamsService extends KalturaBaseService
 	 */
 	public function addAction(KalturaFlavorParams $flavorParams)
 	{
-		$flavorParams->validatePropertyMinLength("name", 1);
+		$flavorParams->validatePropertyMinLength("name", self::PROPERTY_MIN_LENGTH);
 		
-		$flavorParamsDb = new flavorParams();
-		$flavorParams->toObject($flavorParamsDb);
+		$flavorParamsDb = $flavorParams->toObject();
 		
 		$flavorParamsDb->setPartnerId($this->getPartnerId());
 		$flavorParamsDb->save();
 		
+		$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
 		$flavorParams->fromObject($flavorParamsDb);
 		return $flavorParams;
 	}
@@ -90,7 +93,7 @@ class FlavorParamsService extends KalturaBaseService
 	public function updateAction($id, KalturaFlavorParams $flavorParams)
 	{
 		if ($flavorParams->name !== null)
-			$flavorParams->validatePropertyMinLength("name", 1);
+			$flavorParams->validatePropertyMinLength("name", self::PROPERTY_MIN_LENGTH);
 			
 		$flavorParamsDb = assetParamsPeer::retrieveByPK($id);
 		if (!$flavorParamsDb)
@@ -99,6 +102,7 @@ class FlavorParamsService extends KalturaBaseService
 		$flavorParams->toUpdatableObject($flavorParamsDb);
 		$flavorParamsDb->save();
 			
+		$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
 		$flavorParams->fromObject($flavorParamsDb);
 		return $flavorParams;
 	}

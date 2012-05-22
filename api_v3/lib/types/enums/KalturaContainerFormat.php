@@ -25,6 +25,7 @@ class KalturaContainerFormat extends KalturaStringEnum
 	const SWF = 'swf';
 	const PDF = 'pdf';
 	
-	
+	const BMP = 'bmp';
+	const PNG = 'png';
 	const JPG = 'jpg';
 }

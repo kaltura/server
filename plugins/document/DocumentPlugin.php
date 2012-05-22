@@ -37,6 +37,7 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 				DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::PDF),
 				DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::SWF),
 				DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::DOCUMENT),
+				DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::IMAGE),
 			);
 		}
 		
@@ -69,6 +70,9 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 					
 				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::DOCUMENT):
 					return new KalturaDocumentFlavorParams();
+					
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::IMAGE);
+					return new KalturaImageFlavorParams();
 				
 				default:
 					return null;	
@@ -87,6 +91,9 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 					
 				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::DOCUMENT):
 					return new KalturaDocumentFlavorParamsOutput();
+					
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::IMAGE);
+					return new KalturaImageFlavorParamsOutput();
 				
 				default:
 					return null;	
@@ -113,6 +120,14 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 			return new KOperationEnginePdf2Swf($constructorArgs['params']->pdf2SwfCmd, $constructorArgs['outFilePath']);
 		}
 		
+		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::IMAGEMAGICK)
+		{
+			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
+				return null;
+			
+			return new KOperationEngineImageMagick($constructorArgs['params']->imageMagickCmd, $constructorArgs['outFilePath']);
+		}
+		
 		
 		// KDL ENGINES
 		
@@ -126,6 +141,10 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 			return new KDLTranscoderPdf2Swf($enumValue);
 		}
 		
+		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(DocumentConversionEngineType::IMAGEMAGICK_ENGINE))
+		{
+			return new KDLTranscoderImageMagick($enumValue);
+		}
 		
 		return null;
 	}
@@ -154,6 +173,9 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 					
 				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::DOCUMENT):
 					return 'flavorParams';
+					
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::IMAGE);
+					return 'ImageFlavorParams';
 				
 				default:
 					return null;	
@@ -172,6 +194,9 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 					
 				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::DOCUMENT):
 					return 'flavorParamsOutput';
+					
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::IMAGE);
+					return 'ImageFlavorParamsOutput';
 				
 				default:
 					return null;	
@@ -233,10 +258,13 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('DocumentAssetType');
+			return array('DocumentAssetType','DocumentConversionEngineType');
 	
 		if($baseEnumName == 'assetType')
 			return array('DocumentAssetType');
+			
+		if($baseEnumName == 'conversionEngineType')
+			return array('DocumentConversionEngineType');
 			
 		return array();
 	}

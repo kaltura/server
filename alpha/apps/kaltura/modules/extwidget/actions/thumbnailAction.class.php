@@ -49,6 +49,8 @@ class thumbnailAction extends sfAction
 		$vid_slices = $this->getRequestParameter( "vid_slices" , -1);
 		$density = $this->getRequestParameter( "density" , 0);
 		$stripProfiles = $this->getRequestParameter( "strip" , null);
+		$flavor_id =  $this->getRequestParameter( "flavor_id" , null);
+		$file_name =  $this->getRequestParameter( "file_name" , null);
 		
 		// actual width and height of image from which the src_* values were taken.
 		// these will be used to multiply the src_* parameters to make them relate to the original image size.
@@ -222,7 +224,7 @@ class thumbnailAction extends sfAction
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 			$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA;
 			
-		KalturaLog::debug("In thumbnail action - get thumbnail filesyncs");
+		KalturaLog::debug("get thumbnail filesyncs");
 		$dataKey = $entry->getSyncKey($subType);
 		list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey( $dataKey ,true , false );
 		
@@ -328,6 +330,9 @@ class thumbnailAction extends sfAction
 					}
 				}
 			}
+			elseif ($entry->getType() == entryType::DOCUMENT){
+				$tempThumbPath = self::getThumbnailFromDocumentEntry($entry, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density ,$stripProfiles , $file_name,$flavor_id);
+			}
 		}
 		
 		if ( !$local && !$tempThumbPath)
@@ -414,6 +419,54 @@ class thumbnailAction extends sfAction
 		
 		// TODO - can delete from disk assuming we caneasily recreate it and it will anyway be cached in the CDN
 		// however dumpfile dies at the end so we cant just write it here (maybe register a shutdown callback)
+	}
+	
+	private function getThumbnailFromDocumentEntry(entry $entry, $version, $width, $height, $type, $bgcolor = "ffffff", $crop_provider = null, $quality = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $file_name = null, $flavor_id = null) 
+	{
+		KalturaLog::log ( "flavor_id [$flavor_id] file_name [$file_name]" );
+		if (is_null ( $flavor_id ))
+			KExternalErrors::dieError ( KExternalErrors::MISSING_PARAMETER, 'flavor_id' );
+		$flavor = assetPeer::retrieveById ( $flavor_id );
+		if (is_null ( $flavor ))
+			KExternalErrors::dieError ( KExternalErrors::FLAVOR_NOT_FOUND, $flavor_id );
+		$flavorSyncKey = $flavor->getSyncKey ( asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET );
+		$file_path = kFileSyncUtils::getReadyLocalFilePathForKey ( $flavorSyncKey );
+		if (is_dir($file_path)){
+			if (is_null($file_name))
+				 KExternalErrors::dieError ( KExternalErrors::MISSING_PARAMETER, 'file name' );
+			$orig_image_path = $file_path . DIRECTORY_SEPARATOR . $file_name;
+		}
+		try 
+		{
+			return myEntryUtils::resizeEntryImage ( $entry, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density );
+		} 
+		catch ( Exception $ex ) 
+		{
+			if ($ex->getCode () == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC) 
+			{
+				$remoteFileSync = kFileSyncUtils::getOriginFileSyncForKey ( $flavorSyncKey, false );
+				if (! $remoteFileSync) 
+				{
+					// file does not exist on any DC - die
+					KalturaLog::err ( "No FileSync for flavor [$flavor_id]" );
+					KExternalErrors::dieError ( KExternalErrors::FILE_NOT_FOUND );
+				}
+				
+				if ($remoteFileSync->getDc () == kDataCenterMgr::getCurrentDcId ()) 
+				{
+					KalturaLog::err ( "Trying to redirect to myself - stop here." );
+					KExternalErrors::dieError ( KExternalErrors::FILE_NOT_FOUND );
+				}
+				
+				if (! in_array ( $remoteFileSync->getDc (), kDataCenterMgr::getDcIds () )) 
+				{
+					KalturaLog::err ( "Origin file sync is on remote storage." );
+					KExternalErrors::dieError ( KExternalErrors::FILE_NOT_FOUND );
+				}
+				$remoteUrl = kDataCenterMgr::getRedirectExternalUrl ( $remoteFileSync );
+				kFile::dumpUrl ( $remoteUrl );
+			}
+		}
 	}
 }
 ?>

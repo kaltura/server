@@ -3,26 +3,51 @@
  * @package plugins.document
  * @subpackage api.objects
  */
-class KalturaPdfFlavorParams extends KalturaFlavorParams 
+class KalturaImageFlavorParams extends KalturaFlavorParams 
 {
 	public function toObject($object = null, $skip = array())
 	{
 		if(is_null($object))
-			$object = new PdfFlavorParams();
+			$object = new ImageFlavorParams();
 		
 		parent::toObject($object, $skip);
-		$object->setType(DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::PDF));
+		$object->setType(DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::IMAGE));
 		return $object;
 	}
 	
 	/**
-	 * @var bool
+	 * @var int
 	 */
-	public $readonly;
+	public $densityWidth;
+	
+	/**
+	 * @var int
+	 */
+	public $densityHeight;
+	
+	/**
+	 * @var int
+	 */
+	public $sizeWidth;
+	
+	/**
+	 * @var int
+	 */
+	public $sizeHeight;
+	
+	/**
+	 * @var int
+	 */
+	public $depth;
+	
 	
 	private static $map_between_objects = array
 	(
-		'readonly',
+		'densityWidth',
+		'densityHeight',
+		'sizeWidth',
+		'sizeHeight',
+		'depth',
 	);
 	
 	// attributes that defined in flavorParams and not in PdfFlavorParams
@@ -30,6 +55,18 @@ class KalturaPdfFlavorParams extends KalturaFlavorParams
 	(
 		"videoConstantBitrate",
 		"videoBitrateTolerance",
+		"videoCodec",
+		"videoBitrate",
+		"audioCodec",
+		"audioBitrate",
+		"audioChannels",
+		"audioSampleRate",
+		"frameRate",
+		"aspectRatioProcessingMode",
+		"clipOffset",
+		"clipDuration",
+		"isGopInSec",
+		"gopSize"
 	);
 	
 	public function getMapBetweenObjects()

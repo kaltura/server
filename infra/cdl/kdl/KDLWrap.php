@@ -133,7 +133,7 @@ class KDLWrap
 	 */
 	public static function CDLMediaInfo2Tags(mediaInfo $cdlMediaInfo, $tagList) 
 	{
-KalturaLog::log(__METHOD__."==>\n");
+		KalturaLog::log("==>\n");
 		$mediaSet = new KDLMediaDataSet();
 		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
 		KalturaLog::log( "...S-->".$mediaSet->ToString());
@@ -147,7 +147,7 @@ KalturaLog::log(__METHOD__."==>\n");
 	 */
 	public static function CDLIsFLV(mediaInfo $cdlMediaInfo) 
 	{
-KalturaLog::log(__METHOD__."==>\n");
+		KalturaLog::log("==>\n");
 		$tagList[] = "flv";
 		$mediaSet = new KDLMediaDataSet();
 		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
@@ -208,7 +208,7 @@ KalturaLog::log(__METHOD__."==>\n");
 			$flavor->setFormat($target->_container->GetIdOrFormat());
 		
 		if($target->_video) {
-//echo "\n target->_video - "; print_r($target->_video); echo "\n";
+			//echo "\n target->_video - "; print_r($target->_video); echo "\n";
 			$flavor->setVideoCodec($target->_video->GetIdOrFormat());
 			$flavor->setVideoBitrate($target->_video->_bitRate);
 			$flavor->setWidth($target->_video->_width);
@@ -233,7 +233,7 @@ KalturaLog::log(__METHOD__."==>\n");
 		
 		$cdlOprSets = KDLWrap::convertOperatorsKdl2Cdl($target->_transcoders);
 		if($target->_engineVersion==1) {
-KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
+			KalturaLog::log("\noperators==>\n".print_r($cdlOprSets,true));
 			$flavor->setOperators($cdlOprSets->getSerialized());
 			$flavor->setEngineVersion(1);
 		}
@@ -274,15 +274,15 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 		}
 		$flavor->setFileExt($target->EvaluateFileExt());
 		$flavor->_errors = $flavor->_errors + $target->_errors;
-//echo "target errs "; print_r($target->_errors);
-//echo "flavor errs "; print_r($flavor->_errors);
+		//echo "target errs "; print_r($target->_errors);
+		//echo "flavor errs "; print_r($flavor->_errors);
 		$flavor->_warnings = $flavor->_warnings + $target->_warnings;
-//echo "target wrns "; print_r($target->_warnings);
-//echo "flavor wrns "; print_r($flavor->_warnings);
+		//echo "target wrns "; print_r($target->_warnings);
+		//echo "flavor wrns "; print_r($flavor->_warnings);
 		
-//echo "flavor "; print_r($flavor);
+		//echo "flavor "; print_r($flavor);
 		
-//KalturaLog::log(__METHOD__."\nflavorOutputParams==>\n".print_r($flavor,true));
+		//KalturaLog::log(__METHOD__."\nflavorOutputParams==>\n".print_r($flavor,true));
 		return $flavor;
 	}
 	
@@ -316,7 +316,6 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 			if($kdlFlavor->_container->IsDataSet()==false)
 				$kdlFlavor->_container = null;
 		}
-		
 			/* 
 			 * Video stream initialization
 			 */	
@@ -358,26 +357,25 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 			if($kdlFlavor->_audio->IsDataSet()==false)
 				$kdlFlavor->_audio = null;
 		}
-		
-$operators = $cdlFlavor->getOperators();
-$transObjArr = array();
-//KalturaLog::log(__METHOD__."\nCDL Flavor==>\n".print_r($cdlFlavor,true));
+		$operators = $cdlFlavor->getOperators();
+		$transObjArr = array();
+		//KalturaLog::log(__METHOD__."\nCDL Flavor==>\n".print_r($cdlFlavor,true));
 		if(!empty($operators) || $cdlFlavor->getEngineVersion()==1) {
 			$transObjArr = KDLWrap::convertOperatorsCdl2Kdl($operators);
 			$kdlFlavor->_engineVersion = 1;
 		}
 		else {
 			$kdlFlavor->_engineVersion = 0;
-$trnsStr = $cdlFlavor->getConversionEngines();
-$extraStr = $cdlFlavor->getConversionEnginesExtraParams();
+			$trnsStr = $cdlFlavor->getConversionEngines();
+			$extraStr = $cdlFlavor->getConversionEnginesExtraParams();
 			$transObjArr=KDLUtils::parseTranscoderList($trnsStr, $extraStr);
 			if($cdlFlavor instanceof flavorParamsOutputWrap || $cdlFlavor instanceof flavorParamsOutput) {
-$cmdLines = $cdlFlavor->getCommandLines();
+				$cmdLines = $cdlFlavor->getCommandLines();
 				foreach($transObjArr as $transObj){
 					$transObj->_cmd = $cmdLines[$transObj->_id];
 				}
 			}
-KalturaLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
+			KalturaLog::log("\ntranscoders==>\n".print_r($transObjArr,true));
 		}
 
 		KDLUtils::RecursiveScan($transObjArr, "transcoderSetFuncWrap", self::$TranscodersCdl2Kdl, "");
@@ -414,8 +412,18 @@ KalturaLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 			$kdlFlavor->_pdf->_paperWidth  = $cdlFlavor->getPaperWidth();
 			$kdlFlavor->_pdf->_readonly  = $cdlFlavor->getReadonly();
 		}
+		if($cdlFlavor instanceof ImageFlavorParams || $cdlFlavor instanceof ImageFlavorParamsOutput) {
+			$kdlFlavor->_image = new KDLImageData();
+			$kdlFlavor->_image->_densityWidth = $cdlFlavor->getDensityWidth();
+			$kdlFlavor->_image->_densityHeight = $cdlFlavor->getDensityHeight();
+			$kdlFlavor->_image->_sizeWidth = $cdlFlavor->getSizeWidth();
+			$kdlFlavor->_image->_sizeHeight = $cdlFlavor->getSizeHeight();
+			$kdlFlavor->_image->_depth = $cdlFlavor->getDepth();
+			$kdlFlavor->_image->_format = $cdlFlavor->getFormat();
+		}
 		
-//KalturaLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));
+		
+		//KalturaLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));
 		return $kdlFlavor;
 	}
 	
@@ -477,20 +485,20 @@ KalturaLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 	 */
 	public static function ConvertMediainfoCdl2FlavorAsset(mediaInfo $cdlMediaInfo, flavorAsset &$fla)
 	{
-KalturaLog::log(__METHOD__."==>");
-KalturaLog::log("\nCDL mediaInfo==>\n".print_r($cdlMediaInfo,true));
+		KalturaLog::log("==>");
+		KalturaLog::log("\nCDL mediaInfo==>\n".print_r($cdlMediaInfo,true));
 	  	$medSet = new KDLMediaDataSet();
 		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $medSet);
-KalturaLog::log("\nKDL mediaDataSet==>\n".print_r($medSet,true));
+		KalturaLog::log("\nKDL mediaDataSet==>\n".print_r($medSet,true));
 
-$contBr = 0;
+		$contBr = 0;
 		if(isset($medSet->_container)){
 			$fla->setContainerFormat($medSet->_container->GetIdOrFormat());
 			$contBr = $medSet->_container->_bitRate;
 		}
   		$fla->setSize($cdlMediaInfo->getFileSize());
 
-$vidBr = 0;
+		$vidBr = 0;
 		if(isset($medSet->_video)){
 			$fla->setWidth($medSet->_video->_width);
   			$fla->setHeight($medSet->_video->_height);
@@ -498,7 +506,7 @@ $vidBr = 0;
 			$vidBr = $medSet->_video->_bitRate;
 			$fla->setVideoCodecId($medSet->_video->GetIdOrFormat());
 		}
-$audBr = 0;
+		$audBr = 0;
 		if(isset($medSet->_audio)){
 			$audBr = $medSet->_audio->_bitRate;
 		}
@@ -509,7 +517,7 @@ $audBr = 0;
 		$assetBr = max($contBr,$vidBr+$audBr);
 		$fla->setBitrate($assetBr);
 
-KalturaLog::log("\nCDL fl.Asset==>\n".print_r($fla,true));
+		KalturaLog::log("\nCDL fl.Asset==>\n".print_r($fla,true));
 		return $fla;
 	}
 
@@ -518,24 +526,24 @@ KalturaLog::log("\nCDL fl.Asset==>\n".print_r($fla,true));
 	 */
 	public static function convertOperatorsCdl2Kdl($operators)
 	{
-KalturaLog::log(__METHOD__."\ncdlOperators==>\n".print_r($operators,true));
+		KalturaLog::log("\ncdlOperators==>\n".print_r($operators,true));
 		$transObjArr = array();
-$oprSets = new kOperatorSets();
-//		$operators = stripslashes($operators);
-//KalturaLog::log(__METHOD__."\ncdlOperators(stripslsh)==>\n".print_r($operators,true));
+		$oprSets = new kOperatorSets();
+		//		$operators = stripslashes($operators);
+		//KalturaLog::log(__METHOD__."\ncdlOperators(stripslsh)==>\n".print_r($operators,true));
 		$oprSets->setSerialized($operators);
-KalturaLog::log(__METHOD__."\noperatorSets==>\n".print_r($oprSets,true));
+		KalturaLog::log("\noperatorSets==>\n".print_r($oprSets,true));
 		foreach ($oprSets->getSets() as $oprSet) {
 			if(count($oprSet)==1) {
 				$opr = $oprSet[0];
-KalturaLog::log(__METHOD__."\n1==>\n".print_r($oprSet,true));
+				KalturaLog::log("\n1==>\n".print_r($oprSet,true));
 				$kdlOpr = new KDLOperationParams($opr);
 				$transObjArr[] = $kdlOpr;
 			}
 			else {
 				$auxArr = array();
 				foreach ($oprSet as $opr) {
-KalturaLog::log(__METHOD__."\n2==>\n".print_r($oprSet,true));
+					KalturaLog::log("\n2==>\n".print_r($oprSet,true));
 					$kdlOpr = new KDLOperationParams($opr);
 					$auxArr[] = $kdlOpr;
 				}
@@ -642,7 +650,7 @@ function transcoderSetFuncWrap($oprObj, $transDictionary, $param2)
 
 //	$oprObj->_engine = KDLWrap::GetEngineObject($oprObj->_id);
 	$id = $oprObj->_id;
-KalturaLog::log(__METHOD__.":operators id=$id :");
+	KalturaLog::log(":operators id=$id :");
 	$engine=null;
 	if(isset($oprObj->_className) && class_exists($oprObj->_className)){
 		try {
