@@ -8,7 +8,7 @@
  * @subpackage model
  */
 class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
-{
+{ 
 	private $previous_status ;
 	protected $new_categories = '';
 	protected $new_categories_ids = '';
@@ -2835,5 +2835,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setCategoriesWithNoSync()
 	{
 		
+	}
+	
+	public function getSphinxFieldsEscapeType($fieldName)
+	{
+		return SphinxFieldEscapeType::DEFAULT_ESCAPE;
 	}
 }
