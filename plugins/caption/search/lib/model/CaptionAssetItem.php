@@ -281,4 +281,9 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 		kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 	}
 	
+	public function getSphinxFieldsEscapeType($fieldName)
+	{
+		return SphinxFieldEscapeType::DEFAULT_ESCAPE;
+	}
+	
 } // CaptionAssetItem

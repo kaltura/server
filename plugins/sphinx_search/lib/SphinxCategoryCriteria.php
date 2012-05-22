@@ -222,6 +222,11 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		}
 		$filter->unsetByName('_free_text');
 		
+		if($filter->get('_eq_privacy_context') && ($filter->get('_eq_privacy_context') == '*'))
+		{
+			$filter->set('_eq_privacy_context', kEntitlementUtils::DEFAULT_CONTEXT);
+		}
+		
 		
 		if($filter->get('_likex_name_or_reference_id'))
 		{

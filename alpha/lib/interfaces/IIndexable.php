@@ -37,6 +37,11 @@ interface IIndexable extends IBaseObject
 	public function getIndexFieldType($field);
 	
 	/**
+	 * @return string field escape type for strings
+	 */
+	public function getSphinxFieldsEscapeType($field);
+	
+	/**
 	 * @param int $time
 	 * @return IIndexable
 	 */

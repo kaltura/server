@@ -20,7 +20,7 @@ class CategoryService extends KalturaBaseService
 	 * @return KalturaCategory
 	 */
 	function addAction(KalturaCategory $category)
-	{		
+	{
 		if ($category->parentId != null && //batch to index categories or to move categories might miss this category to be moved or index
 			$this->getPartner()->getFeaturesStatusByType(FeatureStatusType::LOCK_CATEGORY))
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);

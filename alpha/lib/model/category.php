@@ -416,7 +416,7 @@ class category extends Basecategory implements IIndexable
             $this->save();
       }
       
-	protected  function validateFullNameIsUnique()
+	protected function validateFullNameIsUnique()
 	{
 		$fullName = $this->getFullName();
 		$fullName = categoryPeer::getParsedFullName($fullName);
@@ -1304,4 +1304,17 @@ class category extends Basecategory implements IIndexable
 			
 		return $this;
 	}
+	
+	public static $sphinxFieldsEscapeType = array(
+		'category.FULL_NAME' => SphinxFieldEscapeType::STRIP,
+	);
+	
+	public function getSphinxFieldsEscapeType($fieldName)
+	{
+		if(!isset(self::$sphinxFieldsEscapeType[$fieldName]))
+			return SphinxFieldEscapeType::DEFAULT_ESCAPE;
+			
+		return self::$sphinxFieldsEscapeType[$fieldName];
+	}
+	
 }

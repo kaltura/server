@@ -115,5 +115,10 @@ class Tag extends BaseTag implements IIndexable
         // TODO Auto-generated method stub
         
     }
+    
+	public function getSphinxFieldsEscapeType($fieldName)
+	{
+		return SphinxFieldEscapeType::DEFAULT_ESCAPE;
+	}
 
 } // Tag
