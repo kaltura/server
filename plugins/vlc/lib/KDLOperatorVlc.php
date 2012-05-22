@@ -204,49 +204,6 @@ $con = $target->_container;
 	}
 	
 	/* ---------------------------
-	 * generateH264params
-	 */
-	private function generateH264paramsOld($videoObject)
-	{
-/*
--sws - scale quality option, 0-lowest, 9- good
--subq - sub-pixel and partion search algorithms. 1 - fast/low quality, 9-slow/best quality, 5-average
-global_header - makes it baseline
-b_pyramid - to be used with bframes>2 (main and high profile)
-
-good mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -o ~/Media/aaa.mp4 -of lavf -lavfopts format=mp4 -ofps 25 -ovc x264 -sws 9 -x264encopts bitrate=300:subq=5:frameref=6:bframes=3:b_pyramid=1:weight_b=1:threads=auto:keyint=60:level_idc=30:global_header:partitions=all:trellis=1:chroma_me:me=umh:8x8dct -vf scale=304:176 -oac faac -faacopts mpeg=4:object=2:br=96 ; mediainfo ~/Media/aaa.mp4
-bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=mp4 -ofps 25 -ovc x264        -x264encopts bitrate=300:subq=7:frameref=6:bframes=3:b_pyramid=1:weight_b=1:threads=auto:level_idc=30:global_header:8x8dct:trellis=1:chroma_me:me=umh:keyint=60 -vf harddup,scale=304:176 -oac faac -faacopts mpeg=4:object=2:br=96 -endpos 10 -o ~/Media/aaa.mp4; mediainfo ~/Media/aaa.mp4
-     mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=mp4 -ofps 25 -ovc x264 -sws 9 -x264encopts bitrate=300:subq=5:frameref=6:bframes=3:b_pyramid=1:weight_b=1:threads=auto:level_idc=30:global_header:partitions=all:trellis=1:chroma_me:me=umh:8x8dct:keyint=60 -vf scale=304:176 -oac faac -faacopts mpeg=4:object=2:br=96 -o ~/Media/aaa.mp4; mediainfo ~/Media/aaa.mp4
- 
- */
-		$h264params=null;
-		$ffQsettings = "qcomp=0.6,qpmin=10,qpmax=50,qpstep=4";
-		//					$transcodeStr .= "venc=x264{profile=baseline,subme=2,qcomp=0.6,qpmin=10,qpmax=50,qpstep=4},vcodec=h264";
-		
-		switch($videoObject->_id) {
-		case KDLVideoTarget::H264:
-		case KDLVideoTarget::H264B:
-			$h264params="profile=baseline,subme=2,".$ffQsettings.",no-cabac";;
-			break;
-		case KDLVideoTarget::H264M:
-			$h264params="profile=main,subme=5,".$ffQsettings.",ref=2";
-			break;
-		case KDLVideoTarget::H264H:				
-			$h264params="profile=high,subme=7,".$ffQsettings.",bframes=16,ref=6";
-			break;
-		default:
-			return null;
-		}
-		if($videoObject->_bitRate<KDLConstants::LowBitrateThresHold) {
-			$h264params .= ",crf=30";
-		}
-		if(1) {//$videoObject->_gop!==null && $videoObject->_gop>0){
-			$h264params .= ",keyint=".$videoObject->_gop.",min-keyint=".$videoObject->_gop;
-		}
-		return $h264params;
-	}
-	
-	/* ---------------------------
 	 * CheckConstraints
 	 */
 	public function CheckConstraints(KDLMediaDataSet $source, KDLFlavor $target, array &$errors=null, array &$warnings=null)
@@ -272,7 +229,6 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 			$params="profile=high";
 			break;
 		}
-	
 
 		$encopts = "qcomp=$h264->_qcomp,qpmin=$h264->_qmin,qpmax=$h264->_qmax,qpstep=$h264->_qdiff";
 		{
