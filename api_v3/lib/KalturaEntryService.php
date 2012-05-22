@@ -698,7 +698,6 @@ class KalturaEntryService extends KalturaBaseService
 		
 		// even if it null
 		$entry->setConversionQuality($conversionProfileId);
-		$entry->setConversionProfileId($conversionProfileId);
 		$entry->save();
 		
 		if($dynamicConversionAttributes)
