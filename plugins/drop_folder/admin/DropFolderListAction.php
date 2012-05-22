@@ -55,8 +55,11 @@ class DropFolderListAction extends KalturaAdminConsolePlugin implements IKaltura
 
 		$createFolderForm = new Form_CreateDropFolder();
 		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'DropFolderConfigure'), null, true);
-		$createFolderForm->getElement("newPartnerId")->setValue($dropFolderFilter->partnerIdEqual);
 		$createFolderForm->setAction($actionUrl);
+		
+		if($dropFolderFilter)
+			$createFolderForm->getElement("newPartnerId")->setValue($dropFolderFilter->partnerIdEqual);
+			
 		$action->view->newFolderForm = $createFolderForm;
 	}
 	
