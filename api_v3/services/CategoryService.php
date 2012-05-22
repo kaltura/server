@@ -301,6 +301,6 @@ class CategoryService extends KalturaBaseService
 	function unlockCategoriesAction()
 	{
 		//TODO - remove this action! should not be uploaded in Falcon version, this is only for QA and front team to make work easy
-		$this->getPartner()->removeFeaturesStatus(FeatureStatusType::LOCK_CATEGORY);
+		$this->getPartner()->setFeaturesStatus(array());
 	}
 }
