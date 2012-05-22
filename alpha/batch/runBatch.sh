@@ -1,5 +1,10 @@
 #!/bin/bash
-source ../../configurations/system.ini
+if [ -L $0 ];then
+	REAL_SCRIPT=`readlink $0`
+else
+	REAL_SCRIPT=$0
+fi
+. `dirname $REAL_SCRIPT`/../../configurations/system.ini
 
 # $1 is the action (start|stop|restart)
 # $2 is the batch name (optional) 

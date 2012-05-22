@@ -1,5 +1,10 @@
 #!/bin/bash
-source @APP_DIR@/configurations/system.ini
+if [ -L $0 ];then
+	REAL_SCRIPT=`readlink $0`
+else
+	REAL_SCRIPT=$0
+fi
+. `dirname $REAL_SCRIPT`/../../../configurations/system.ini
 
 MAILTO="$ADMIN_CONSOLE_ADMIN_MAIL"
 MAINT=$BASE_DIR/maintenance
