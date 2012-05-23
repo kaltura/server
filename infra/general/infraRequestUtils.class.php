@@ -131,9 +131,9 @@ class infraRequestUtils
     			case "ts":
     				$content_type ="video/MP2T";
     				break;
-			case "3gp":
-				$content_type ="video/3gpp";
-				break;
+    			case "3gp":
+    				$content_type ="video/3gpp";
+    				break;
     			default:
     				$content_type ="image/$ext";
     				break;
@@ -158,7 +158,8 @@ class infraRequestUtils
 			header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
 		}
 		
-		header("Content-Length: $content_length ");
+		if ($content_length !== null)	
+			header("Content-Length: $content_length ");
 		header("Pragma:");
 		header("Content-Type: $content_type");
 	}
