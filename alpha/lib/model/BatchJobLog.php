@@ -67,5 +67,26 @@ class BatchJobLog extends BaseBatchJobLog {
 		} else
 			parent::setData ( null );
 	} 
+	
+    /* (non-PHPdoc)
+     * @see BaseBatchJobLog::preUpdate()
+     */
+    public function preUpdate(PropelPDO $con = null)
+	{
+		if ($this->alreadyInSave)
+		{
+			return true;
+		}	
+		$this->tempModifiedColumns = $this->modifiedColumns;
+		return true;
+  	}
+  	
+    /* (non-PHPdoc)
+     * @see BaseBatchJobLog::preInsert()
+     */
+    public function preInsert(PropelPDO $con = null)
+	{
+		return true;
+	}
 
 } // BatchJobLog
