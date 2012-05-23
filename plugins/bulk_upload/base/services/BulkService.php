@@ -206,28 +206,37 @@ class BulkService extends KalturaBaseService
 	 * List bulk upload batch jobs
 	 *
 	 * @action list
+	 * @param KalturaBulkUploadFilter $bulkUploadFilter
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaBulkUploadListResponse
 	 */
-	function listAction(KalturaFilterPager $pager = null)
+	function listAction(KalturaBulkUploadFilter $bulkUploadFilter = null, KalturaFilterPager $pager = null)
 	{
+	    if (!$bulkUploadFilter)
+    	    $bulkUploadFilter = new KalturaBulkUploadFilter();
+	    
 	    if (!$pager)
 			$pager = new KalturaFilterPager();
 			
-	    $c = new Criteria();
-		$c->addAnd(BatchJobPeer::PARTNER_ID, $this->getPartnerId());
-		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
 		
-		$crit = $c->getNewCriterion(BatchJobPeer::ABORT, null);
-		$critOr = $c->getNewCriterion(BatchJobPeer::ABORT, 0);
+		$coreBulkUploadFilter = new BatchJobLogFilter();
+        $bulkUploadFilter->toObject($coreBulkUploadFilter);
+			
+	    $c = new Criteria();
+		$c->addAnd(BatchJobLogPeer::PARTNER_ID, $this->getPartnerId());
+		$c->addAnd(BatchJobLogPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
+		
+		$crit = $c->getNewCriterion(BatchJobLogPeer::ABORT, null);
+		$critOr = $c->getNewCriterion(BatchJobLogPeer::ABORT, 0);
 		$crit->addOr($critOr);
 		$c->add($crit);
 		
-		$c->addDescendingOrderByColumn(BatchJobPeer::ID);
+		$c->addDescendingOrderByColumn(BatchJobLogPeer::ID);
 		
-		$count = BatchJobPeer::doCount($c);
+		$coreBulkUploadFilter->attachToCriteria($c);
+		$count = BatchJobLogPeer::doCount($c);
 		$pager->attachToCriteria($c);
-		$jobs = BatchJobPeer::doSelect($c);
+		$jobs = BatchJobLogPeer::doSelect($c);
 		
 		$response = new KalturaBulkUploadListResponse();
 		$response->objects = KalturaBulkUploads::fromBatchJobArray($jobs);
@@ -250,10 +259,10 @@ class BulkService extends KalturaBaseService
 	function serveAction($id)
 	{
 		$c = new Criteria();
-		$c->addAnd(BatchJobPeer::ID, $id);
-		$c->addAnd(BatchJobPeer::PARTNER_ID, $this->getPartnerId());
-		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
-		$batchJob = BatchJobPeer::doSelectOne($c);
+		$c->addAnd(BatchJobLogPeer::ID, $id);
+		$c->addAnd(BatchJobLogPeer::PARTNER_ID, $this->getPartnerId());
+		$c->addAnd(BatchJobLogPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
+		$batchJob = BatchJobLogPeer::doSelectOne($c);
 		
 		if (!$batchJob)
 			throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
