@@ -64,9 +64,9 @@ class kBatchJobLogManager implements kObjectCreatedEventConsumer, kObjectChanged
 	protected function copyBatchJobToLog(BatchJob $batchJob, BatchJobLog $batchJobLog)
 	{
 	    $batchJob->copyInto($batchJobLog, true);
+	    $batchJobLog->setJobId($batchJob->getId());
 	    //set param_1 for the $batchJobLog
 	    $batchJobData = $batchJob->getData();
-	    $batchJobLog->setJobId($batchJob->getId());
 	    /* @var $batchJobData kBulkUploadJobData */
 	    $batchJobLog->setParam1($batchJobData->getBulkUploadObjectType());
 
