@@ -738,8 +738,32 @@ class kFile
 		$ext = pathinfo($file_name, PATHINFO_EXTENSION);
 		$total_length = $limit_file_size ? $limit_file_size : kFile::fileSize($file_name);
 		
-		// get range parameters from HTTP range requst headers
-		list($range_from, $range_to, $range_length) = infraRequestUtils::handleRangeRequest($total_length);
+		$useXSendFile = false;
+		if (in_array('mod_xsendfile', apache_get_modules()))
+		{
+			$xsendfile_uri = kConf::hasParam('xsendfile_uri') ? kConf::get('xsendfile_uri') : null;
+			if ($xsendfile_uri !== null && strpos($_SERVER["REQUEST_URI"], $xsendfile_uri) !== false)
+			{
+				$xsendfile_paths = kConf::hasParam('xsendfile_paths') ? kConf::get('xsendfile_paths') : array();
+				foreach($xsendfile_paths as $path)
+				{
+					if (strpos($file_name, $path) === 0)
+					{
+						header('X-Kaltura-Sendfile:');
+						$useXSendFile = true;
+						break;
+					}
+				}
+			}
+		}
+
+		if ($useXSendFile)
+			$range_length = null;
+		else
+		{
+			// get range parameters from HTTP range requst headers
+			list($range_from, $range_to, $range_length) = infraRequestUtils::handleRangeRequest($total_length);
+		}
 		
 		if($mime_type)
 		{
@@ -748,12 +772,17 @@ class kFile
 		else
 			infraRequestUtils::sendCdnHeaders($ext, $range_length, $max_age);
 
-		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
-					
 		// return "Accept-Ranges: bytes" header. Firefox looks for it when playing ogg video files
 		// upon detecting this header it cancels its original request and starts sending byte range requests
 		header("Accept-Ranges: bytes");
-			
+		header("Access-Control-Allow-Origin:*");		
+
+		if ($useXSendFile)
+		{
+			header("X-Sendfile: $file_name");
+			die;
+		}
+
 		$chunk_size = 100000;
 		$fh = fopen($file_name, "rb");
 		if($fh)
