@@ -4,12 +4,18 @@ error_reporting(E_ALL);
 
 require_once(dirname(__FILE__).'/../infra/kConf.php');
 
+$interactive = true;
+if ($argc == 2 && $argv[1] == '-y')
+{
+	$interactive = false;
+}
+
 // clear kConf defined cache directories
 $path = realpath(kConf::get('cache_root_path'));
 
-askToDelete(fixPath(kConf::get('general_cache_dir')));
-askToDelete(fixPath(kConf::get('response_cache_dir')));
-askToDelete(fixPath(kConf::get('cache_root_path')));
+askToDelete(fixPath(kConf::get('general_cache_dir')), $interactive);
+askToDelete(fixPath(kConf::get('response_cache_dir')), $interactive);
+askToDelete(fixPath(kConf::get('cache_root_path')), $interactive);
 
 // clear APC cache
 if (function_exists('apc_clear_cache'))
@@ -34,26 +40,41 @@ function fixPath($path)
 }
 
 
-function askToDelete($path)
+function askToDelete($path, $interactive)
 {	
 	$baseKalturaPath = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..');
 	if (strpos($path, $baseKalturaPath) === 0)
 	{
-		echo 'Are you sure you want to delete all files under ['.$path.'] (y/n) ?  ';
-		$input = trim(fgets(STDIN));
-		if ($input === strtolower('y')) {
-                    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			$cmd = 'del /F /S /Q '.$path.DIRECTORY_SEPARATOR.'*'.DIRECTORY_SEPARATOR.'* del /F /S /Q '.$path.DIRECTORY_SEPARATOR.'*.*';
-                    } else {
-		        $cmd = "find $path -type f -exec rm -rf {} \;";
-                    }
-                    echo "Executing: $cmd\n";
-                    system($cmd,$rc);
-                    if ($rc){
-                            echo "Failed to clean up $path.";
-                    }
+		if ($interactive)
+		{
+			echo 'Are you sure you want to delete all contents of ['.$path.'] (y/n) ?  ';
+			$input = trim(fgets(STDIN));
 		}
-		else {
+		else
+		{
+			$input = 'y';
+		}
+		
+		if ($input === strtolower('y')) 
+		{
+			if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') 
+			{
+				$cmd = 'del /F /S /Q '.$path.DIRECTORY_SEPARATOR.'*'.DIRECTORY_SEPARATOR.'* del /F /S /Q '.$path.DIRECTORY_SEPARATOR.'*.*';
+			}
+			else 
+			{
+				$cmd = "find $path -type f -exec rm -rf {} \;";
+			}
+			
+			echo "Executing: $cmd\n";
+			system($cmd,$rc);
+			if ($rc)
+			{
+				echo "Failed to clean up $path.".PHP_EOL;
+			}
+		}
+		else 
+		{
 			echo 'Skipping...'.PHP_EOL;
 		}
 	}
