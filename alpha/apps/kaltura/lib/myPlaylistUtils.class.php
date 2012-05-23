@@ -261,11 +261,15 @@ class myPlaylistUtils
 			}
 		}
 
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		
 		if ( $detailed )
 			$unsorted_entry_list = entryPeer::doSelectJoinkuser( $c ); // maybe join with kuser to add some data about the contributor
 		else
 			$unsorted_entry_list = entryPeer::doSelect( $c ); // maybe join with kuser to add some data about the contributor
 	
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			
 		// now sort the list according to $entry_id_list
 		
 		$entry_list = array();
@@ -446,10 +450,14 @@ class myPlaylistUtils
 			
 			self::addModerationToCriteria($c);
 			
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			
 			if ( $detailed )
 				$entry_list_for_filter = entryPeer::doSelectJoinkuser( $c ); // maybe join with kuser to add some data about the contributor
 			else
 				$entry_list_for_filter = entryPeer::doSelect( $c ); // maybe join with kuser to add some data about the contributor
+			
+			KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
 			
 			// update total count and merge current result with the global list
 			$number_of_entries += count ( $entry_list_for_filter );
