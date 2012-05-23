@@ -55,7 +55,6 @@ class BulkUploadResultEntry extends BulkUploadResult
 			$this->updateEntryThumbnail();
 		    $this->setStatus(BulkUploadResultStatus::OK);
 		    $this->save();
-			continue;
 		}
 			
 		return $this->getStatus();
