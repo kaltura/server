@@ -43,7 +43,7 @@ while($batchJobResults && count($batchJobResults))
 	    //set param_1 for the $batchJobLog
 	    $batchJobData = $batchJob->getData();
 	    /* @var $batchJobData kBulkUploadJobData */
-	    $batchJobLog->setParam1($batchJobData->getBulkUploadObjectType());
+	    $batchJobLog->setParam1($batchJobData->getBulkUploadObjectType() ? $batchJobData->getBulkUploadObjectType() : 1);
 	    
 		$batchJobLog->save();
 		
