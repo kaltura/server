@@ -1,12 +1,14 @@
 CREATE TABLE `batch_job_log`
 (
     `id` INTEGER  NOT NULL AUTO_INCREMENT,
+    `job_id` INTEGER;
     `job_type` SMALLINT,
     `job_sub_type` SMALLINT,
     `data` TEXT,
     `file_size` INTEGER,
     `duplication_key` VARCHAR(2047),
     `status` INTEGER,
+    `log_status` INTEGER,
     `abort` TINYINT,
     `check_again_timeout` INTEGER,
     `progress` TINYINT,
