@@ -41,7 +41,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	/**
 	 * The frame rate (in FPS) of the Flavor Asset
 	 * 
-	 * @var int
+	 * @var float
 	 * @readonly
 	 */
 	public $frameRate;
