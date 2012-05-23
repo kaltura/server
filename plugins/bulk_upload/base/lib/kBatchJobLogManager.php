@@ -16,7 +16,7 @@ class kBatchJobLogManager implements kObjectCreatedEventConsumer, kObjectChanged
         
         KalturaLog::info("Handling batch job log object with Id [" . $batchJobLog->getId() ."]");
                 
-        $batchJobLog = $this->copyBatchJobToLog($object, $batchJobLog);
+        $batchJobLog = $this->copyModifiedColumns($batchJobLog, $object, $modifiedColumns);
         
         $batchJobLog->save();
     }
@@ -61,58 +61,27 @@ class kBatchJobLogManager implements kObjectCreatedEventConsumer, kObjectChanged
         return false;
     }
 
-	protected function copyBatchJobToLog($batchJob, $batchJobLog)
+	protected function copyBatchJobToLog(BatchJob $batchJob, BatchJobLog $batchJobLog)
 	{
-	    $batchJobLog->setAbort($batchJob->getAbort());
-	    $batchJobLog->setBatchIndex($batchJob->getBatchIndex());
-	    $batchJobLog->setBulkJobId($batchJob->getBulkJobId());
-	    $batchJobLog->setCheckAgainTimeout($batchJob->getCheckAgainTimeout());
-	    $batchJobLog->setCreatedAt($batchJob->getCreatedAt());
-	    $batchJobLog->setCreatedBy($batchJob->getCreatedBy());
-	    $batchJobLog->setData($batchJob->getData());
-	    $batchJobLog->setDc($batchJob->getDc());
-	    $batchJobLog->setDeletedAt($batchJob->getDeletedAt());
-	    $batchJobLog->setDescription($batchJob->getDescription());
-	    $batchJobLog->setDuplicationKey($batchJob->getDuplicationKey());
-	    $batchJobLog->setEntryId($batchJob->getEntryId());
-	    $batchJobLog->setErrNumber($batchJob->getErrNumber());
-	    $batchJobLog->setErrType($batchJob->getErrType());
-	    $batchJobLog->setExecutionAttempts($batchJob->getExecutionAttempts());
-	    $batchJobLog->setFileSize($batchJob->getFileSize());
-	    $batchJobLog->setFinishTime($batchJob->getFinishTime());
-	    $batchJobLog->setJobId($batchJob->getId());
-	    $batchJobLog->setJobSubType($batchJob->getJobSubType());
-	    $batchJobLog->setJobType($batchJob->getJobType());
-	    $batchJobLog->setLastSchedulerId($batchJob->getLastSchedulerId());
-	    $batchJobLog->setLastWorkerId($batchJob->getLastWorkerId());
-	    $batchJobLog->setLastWorkerRemote($batchJob->getLastWorkerRemote());
-	    $batchJobLog->setLockVersion($batchJob->getLockVersion());
-	    $batchJobLog->setMessage($batchJob->getMessage());
-	    $batchJobLog->setOnStressDivertTo($batchJob->getOnStressDivertTo());
-	    $batchJobLog->setParentJobId($batchJob->getParentJobId());
-	    $batchJobLog->setPartnerId($batchJob->getPartnerId());
-	    $batchJobLog->setPrimaryKey($batchJob->getPrimaryKey());
-	    $batchJobLog->setPriority($batchJob->getPriority());
-	    $batchJobLog->setProcessorExpiration($batchJob->getProcessorExpiration());
-	    $batchJobLog->setProgress($batchJob->getProgress());
-	    $batchJobLog->setQueueTime($batchJob->getQueueTime());
-	    $batchJobLog->setRootJobId($batchJob->getRootJobId());
-	    $batchJobLog->setSchedulerId($batchJob->getSchedulerId());
-	    $batchJobLog->setJobStatus($batchJob->getStatus());
-	    $batchJobLog->setSubpId($batchJob->getSubpId());
-	    $batchJobLog->setTwinJobId($batchJob->getTwinJobId());
-	    $batchJobLog->setUpdatedAt($batchJob->getUpdatedAt());
-	    $batchJobLog->setUpdatedBy($batchJob->getUpdatedBy());
-	    $batchJobLog->setUpdatesCount($batchJob->getUpdatesCount());
-	    $batchJobLog->setWorkerId($batchJob->getWorkerId());
-	    $batchJobLog->setWorkGroupId($batchJob->getWorkGroupId());
+	    $batchJob->copyInto($batchJobLog, true);
 	    //set param_1 for the $batchJobLog
 	    $batchJobData = $batchJob->getData();
+	    $batchJobLog->setJobId($batchJob->getId());
 	    /* @var $batchJobData kBulkUploadJobData */
 	    $batchJobLog->setParam1($batchJobData->getBulkUploadObjectType());
 
 		return $batchJobLog;
 	}
+	
+	protected function copyModifiedColumns (BatchJobLog $batchJobLog, BatchJob $batchJob, array $modifiedColumns)
+	{
+	    foreach ($modifiedColumns as $modifiedColumn)
+	    {
+	        list ($tableName, $columnName) = explode(".", $modifiedColumn);
+	        $batchJobLog->setByName("batch_job_log.".$columnName, $batchJob->getByName($modifiedColumn));
+	    }	 
 
+	    return $batchJobLog;
+	}
     
 }
