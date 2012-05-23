@@ -44,7 +44,7 @@ class BatchJobLogTableMap extends TableMap {
 		$this->addColumn('DATA', 'Data', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('FILE_SIZE', 'FileSize', 'INTEGER', false, null, null);
 		$this->addColumn('DUPLICATION_KEY', 'DuplicationKey', 'VARCHAR', false, 2047, null);
-		$this->addColumn('JOB_STATUS', 'JobStatus', 'INTEGER', false, null, null);
+		$this->addColumn('LOG_STATUS', 'LogStatus', 'INTEGER', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
 		$this->addColumn('ABORT', 'Abort', 'TINYINT', false, null, null);
 		$this->addColumn('CHECK_AGAIN_TIMEOUT', 'CheckAgainTimeout', 'INTEGER', false, null, null);
