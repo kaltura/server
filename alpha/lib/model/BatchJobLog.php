@@ -70,6 +70,7 @@ class BatchJobLog extends BaseBatchJobLog {
 	
     /* (non-PHPdoc)
      * @see BaseBatchJobLog::preUpdate()
+     * The implementation is unusual because the created_at and updated_at dates do not belong to this object but to the BatchJob object it represents.
      */
     public function preUpdate(PropelPDO $con = null)
 	{
@@ -83,6 +84,7 @@ class BatchJobLog extends BaseBatchJobLog {
   	
     /* (non-PHPdoc)
      * @see BaseBatchJobLog::preInsert()
+     * The implementation is unusual because the created_at and updated_at dates do not belong to this object but to the BatchJob object it represents.
      */
     public function preInsert(PropelPDO $con = null)
 	{
