@@ -87,11 +87,11 @@ while($batchJobResults && count($batchJobResults))
 	    
 		$batchJob->save();
 		
-		var_dump("Last handled id: ".$bulkUploadResult->getId());
+		var_dump("Last handled id: ".$batchJob->getId());
 		
 	}
 	$countLimitEachLoop += $countLimitEachLoop;
 	$c->setOffset($countLimitEachLoop);
-	$bulkUploadResults = BulkUploadResultPeer::doSelect($c, $con);
+	$batchJobResults = BatchJobPeer::doSelect($c, $con);
 	usleep(100);
 }
