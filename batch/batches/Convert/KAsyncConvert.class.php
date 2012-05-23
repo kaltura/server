@@ -107,7 +107,12 @@ class KAsyncConvert extends KJobHandlerWorker
 	
 	protected function convert(KalturaBatchJob $job, KalturaConvartableJobData $data)
 	{
-		$data->flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
+			/*
+			 * When called for 'collections', the 'flavorParamsOutputId' is not set.
+			 * It is set in the 'flavors' array, but for collections the 'flavorParamsOutput' it is unrequired.
+			 */
+		if(isset($data->flavorParamsOutputId))
+			$data->flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
 		
 		if($this->taskConfig->params->isRemoteOutput)
 			$job->lastWorkerRemote = true;
@@ -219,9 +224,14 @@ class KAsyncConvert extends KJobHandlerWorker
 
 	protected function getOperator(KalturaConvartableJobData $data)
 	{
-		$operatorsSet = new kOperatorSets();
-		$operatorsSet->setSerialized(/*stripslashes*/($data->flavorParamsOutput->operators));
-		return $operatorsSet->getOperator($data->currentOperationSet, $data->currentOperationIndex);
+		if(isset($data->flavorParamsOutput)) 
+		{
+			$operatorsSet = new kOperatorSets();
+			$operatorsSet->setSerialized(/*stripslashes*/($data->flavorParamsOutput->operators));
+			return $operatorsSet->getOperator($data->currentOperationSet, $data->currentOperationIndex);
+		}
+		else
+			return null;
 	}
 	
 	private function moveFile(KalturaBatchJob $job, KalturaConvertJobData $data)
