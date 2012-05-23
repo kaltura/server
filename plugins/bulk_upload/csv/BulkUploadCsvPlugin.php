@@ -113,26 +113,28 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			
 		foreach($bulkUploadResults as $bulkUploadResult)
 		{
-			$values = array(
-				$bulkUploadResult->getTitle(),
-				$bulkUploadResult->getDescription(),
-				$bulkUploadResult->getTags(),
-				$bulkUploadResult->getUrl(),
-				$bulkUploadResult->getContentType(),
-			);
-				
-			if($data->getCsvVersion() > 1)
-			{
-				$values[] = $bulkUploadResult->getConversionProfileId();
-				$values[] = $bulkUploadResult->getAccessControlProfileId();
-				$values[] = $bulkUploadResult->getCategory();
-				$values[] = $bulkUploadResult->getScheduleStartDate('Y-m-d\TH:i:s');
-				$values[] = $bulkUploadResult->getScheduleEndDate('Y-m-d\TH:i:s');
-				$values[] = $bulkUploadResult->getThumbnailUrl();
-				$values[] = $bulkUploadResult->getPartnerData();
-			}
-			$values[] = $bulkUploadResult->getEntryId();
-			$values[] = $bulkUploadResult->getEntryStatus();
+		    /* @var $bulkUploadResult BulkUploadResult */
+		    switch ($bulkUploadResult->getObjectType())
+		    {
+		        case BulkUploadObjectType::ENTRY:
+		            $values = self::writeEntryBulkUploadResults($bulkUploadResult, $data);
+		            break;
+		        case BulkUploadObjectType::CATEGORY:
+		            $values = self::writeCategoryBulkUploadResults($bulkUploadResult, $data);
+		            break;
+		        case BulkUploadObjectType::CATEGORY_USER:
+		            $valeus = self::writeCategoryUserBulkUploadResults($bulkUploadResult, $data);
+		            break;
+		        case BulkUploadObjectType::USER: 
+		            $values = self::writeUserBulkUploadResults($bulkUploadResult, $data);
+		            break;
+		        default:
+		            
+		            break;
+		    }
+			
+			$values[] = $bulkUploadResult->getObjectId();
+			$values[] = $bulkUploadResult->getObjectStatus();
 			$values[] = $bulkUploadResult->getErrorDescription();
 				
 			fputcsv($STDOUT, $values);
@@ -141,6 +143,109 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		
 		kFile::closeDbConnections();
 		exit;
+	}
+	
+	/**
+	 * Function constructs an array of the return values of the bulk upload result and returns it
+	 * @param BulkUploadResultCategory $bulkUploadResult
+	 * @param kJobData $data
+	 * @return array
+	 */
+	protected static function writeCategoryBulkUploadResults(BulkUploadResultCategory $bulkUploadResult, kJobData $data)
+	{
+	    /* @var $bulkUploadResult BulkUploadResultCategory */
+	    $values = array();
+	    $values[] = $bulkUploadResult->getName();
+	    $values[] = $bulkUploadResult->getRelativePath();
+	    $values[] = $bulkUploadResult->getTags();
+	    $values[] = $bulkUploadResult->getDescription();
+	    $values[] = $bulkUploadResult->getReferenceId();
+	    $values[] = $bulkUploadResult->getAppearInList();
+	    $values[] = $bulkUploadResult->getPrivacy();
+	    $values[] = $bulkUploadResult->getContributionPolicy();
+	    $values[] = $bulkUploadResult->getInhritance();
+	    $values[] = $bulkUploadResult->getUserJoinPolicy();
+	    $values[] = $bulkUploadResult->getDefaultPermissionLevel();
+	    $values[] = $bulkUploadResult->getOwner();
+	    
+	    return $values;
+	}
+	
+    /**
+     * Function constructs an array of the return values of the bulk upload result and returns it
+     * @param BulkUploadResult $bulkUploadResult
+     * @param kJobData $data
+     * @return array
+     */
+    protected static function writeEntryBulkUploadResults(BulkUploadResult $bulkUploadResult, kJobData $data)
+	{
+        $values = array(
+			$bulkUploadResult->getTitle(),
+			$bulkUploadResult->getDescription(),
+			$bulkUploadResult->getTags(),
+			$bulkUploadResult->getUrl(),
+			$bulkUploadResult->getContentType(),
+		);
+			
+		if($data->getCsvVersion() > 1)
+		{
+			$values[] = $bulkUploadResult->getConversionProfileId();
+			$values[] = $bulkUploadResult->getAccessControlProfileId();
+			$values[] = $bulkUploadResult->getCategory();
+			$values[] = $bulkUploadResult->getScheduleStartDate('Y-m-d\TH:i:s');
+			$values[] = $bulkUploadResult->getScheduleEndDate('Y-m-d\TH:i:s');
+			$values[] = $bulkUploadResult->getThumbnailUrl();
+			$values[] = $bulkUploadResult->getPartnerData();
+		}
+		
+		return $values;
+	}
+	
+    /**
+     * Function constructs an array of the return values of the bulk upload result and returns it
+     * @param BulkUploadResult $bulkUploadResult
+     * @param kJobData $data
+     * @return array
+     */
+    protected static function writeCategoryUserBulkUploadResults(BulkUploadResult $bulkUploadResult, kJobData $data)
+	{
+	    /* @var $bulkUploadResult BulkUploadResultCategoryKuser */
+	    $values = array();
+	    $values[] = $bulkUploadResult->getCategoryId();
+	    $values[] = $bulkUploadResult->getKuserId();
+	    $values[] = $bulkUploadResult->getCategoryReferenceId();
+	    $values[] = $bulkUploadResult->getPermissionLevel();
+	    $values[] = $bulkUploadResult->getUpdateMethod();
+	    $values[] = $bulkUploadResult->getRequiredStatus();
+	    
+	    return $values;
+	}
+	
+    /**
+     * Function constructs an array of the return values of the bulk upload result and returns it
+     * @param BulkUploadResult $bulkUploadResult
+     * @param kJobData $data
+     * @return array
+     */
+    protected static function writeUserBulkUploadResults(BulkUploadResult $bulkUploadResult, kJobData $data)
+	{
+	    /* @var $bulkUploadResult BulkUploadResultKuser */
+	    $values = array();
+	    $values[] = $bulkUploadResult->getScreenName();
+	    $values[] = $bulkUploadResult->getEmail();
+	    $values[] = $bulkUploadResult->getDateOfBirth();
+	    $values[] = $bulkUploadResult->getCountry();
+	    $values[] = $bulkUploadResult->getState();
+	    $values[] = $bulkUploadResult->getCity();
+	    $values[] = $bulkUploadResult->getZip();
+	    $values[] = $bulkUploadResult->getGender();
+	    $values[] = $bulkUploadResult->getFirstName();
+	    $values[] = $bulkUploadResult->getLastName();
+	    $values[] = $bulkUploadResult->getIsAdmin();
+	    $values[] = $bulkUploadResult->getTags();
+	    $values[] = $bulkUploadResult->getRoleIds();
+	    
+	    return $values;
 	}
 	
 	/**
