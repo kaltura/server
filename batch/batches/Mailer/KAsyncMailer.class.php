@@ -210,7 +210,8 @@ class KAsyncMailer extends KJobHandlerWorker
 		
 		if ( $type > 0 )
 		{
-			$subject = $this->texts_array[$culture]['subjects'][$type];
+			$cultureTexts = isset($this->texts_array[$culture]) ? $this->texts_array[$culture] : reset($this->texts_array);
+			$subject = $cultureTexts['subjects'][$type];
 			$subject = vsprintf( $subject, $subjectParamsArray );
 			//$this->mail->setSubject( $subject );
 			return $subject;
@@ -227,9 +228,10 @@ class KAsyncMailer extends KJobHandlerWorker
 
 		// if this does not need the common_header, under common_text should have $type_header =
 		// same with footer
-		$common_taxt_arr = $this->texts_array[$culture]['common_text'];
+		$cultureTexts = isset($this->texts_array[$culture]) ? $this->texts_array[$culture] : reset($this->texts_array);
+		$common_taxt_arr = $cultureTexts['common_text'];
 		$footer = ( isset($common_taxt_arr[$type . '_footer']) ) ? $common_taxt_arr[$type . '_footer'] : $common_taxt_arr['footer'];
-		$body = $this->texts_array[$culture]['bodies'][$type];
+		$body = $cultureTexts['bodies'][$type];
 
 		$forumsLink = kConf::get('forum_url');
 		$unsubscribeLink = kConf::get('unsubscribe_mail_url').$recipientemail;
@@ -295,4 +297,3 @@ class KAsyncMailer extends KJobHandlerWorker
 		return  $email . self::SEPARATOR . kString::expiryHash( $email , self::$key , self::EXPIRY_INTERVAL );
 	}
 }
-?>
