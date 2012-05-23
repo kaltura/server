@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaBulkUpload extends KalturaObject
+class KalturaBulkUpload extends KalturaObject implements IFilterable
 {
 	/**
 	 * @var int
@@ -97,31 +97,44 @@ class KalturaBulkUpload extends KalturaObject
 	
 	/**
 	 * @var string
+	 * @filter eq,in
 	 */
 	public $bulkUploadObjectType;
 	
-	public function fromObject($batchJob)
+	/**
+	 * Mapping between the API object properties and te core object properties.
+	 * @var unknown_type
+	 */
+	private $map_between_objects = array(
+	    "id",
+	    "uploadedOn" => "createdAt",
+	    "status",
+	    "error" => "message",
+	    "description",
+	    "bulkUploadType" => "jobSubType",
+	    
+	);
+	
+	public function fromObject($batchJobObject)
 	{
-		/* @var $batchJob BatchJob */
+		/* @var $batchJobObject BatchJobLog */
 		
-		if($batchJob->getJobType() != BatchJobType::BULKUPLOAD)
+		if($batchJobObject->getJobType() != BatchJobType::BULKUPLOAD)
 			throw new Exception("Bulk upload object can be initialized from bulk upload job only");
 		
-		$this->id = $batchJob->getId();
-		$this->uploadedOn = $batchJob->getCreatedAt(null);
-		$this->status = $batchJob->getStatus();
-		$this->error = $batchJob->getMessage();
-		$this->description = $batchJob->getDescription();
-		$this->bulkUploadType = kPluginableEnumsManager::coreToApi('BulkUploadType', $batchJob->getJobSubType());
+		parent::fromObject($batchJobObject);
 		
-		$this->logFileUrl = requestUtils::getHost() . "/api_v3/service/bulkUpload/action/serveLog/id/{$batchJob->getId()}/ks/" . kCurrentContext::$ks;
+		$this->logFileUrl = requestUtils::getHost() . "/api_v3/service/bulkUpload/action/serveLog/id/{$batchJobObject->getId()}/ks/" . kCurrentContext::$ks;
 //		$this->logFileUrl = requestUtils::getHost() . "/index.php/extwidget/bulkuploadfile/id/{$batchJob->getId()}/pid/{$batchJob->getPartnerId()}/type/log";
-		$this->bulkFileUrl = requestUtils::getHost() . "/api_v3/service/bulkUpload/action/serve/id/{$batchJob->getId()}/ks/" . kCurrentContext::$ks;
+		$this->bulkFileUrl = requestUtils::getHost() . "/api_v3/service/bulkUpload/action/serve/id/{$batchJobObject->getId()}/ks/" . kCurrentContext::$ks;
 //		$this->bulkFileUrl = requestUtils::getCdnHost() . "/index.php/extwidget/bulkuploadfile/id/{$batchJob->getId()}/pid/{$batchJob->getPartnerId()}/type/$type";
 		$this->csvFileUrl = $this->bulkFileUrl;
-					
-		$jobData = $batchJob->getData();
-		if($jobData instanceof kBulkUploadJobData)
+		if (method_exists(get_class($batchJobObject), "getParam1"))
+			    $this->bulkUploadObjectType = $batchJobObject->getParam1();
+		
+	    //if (isset ())
+		    $jobData = $batchJobObject->getData();
+		if($jobData && $jobData instanceof kBulkUploadJobData)
 		{
 			$this->uploadedBy = $jobData->getUploadedBy();
 			$this->uploadedByUserId = $jobData->getUserId();
@@ -135,5 +148,23 @@ class KalturaBulkUpload extends KalturaObject
 		
 //		$results = BulkUploadResultPeer::retrieveByBulkUploadId($this->id);
 //		$this->results = KalturaBulkUploadResultArray::fromBulkUploadResultArray($results);
+	}
+
+	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getExtraFilters()
+	 */
+	public function getExtraFilters()
+	{
+	    return array();
+	}
+	
+	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getFilterDocs()
+	 */
+	public function getFilterDocs()
+	{
+	    return array();
 	}
 }
