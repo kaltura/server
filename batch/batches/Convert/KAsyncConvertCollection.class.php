@@ -58,7 +58,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 		KalturaLog::debug ( "Converting collection job");
 	
 		
-		if($this->taskConfig->params->isRemote || !strlen(trim($data->actualSrcFileSyncLocalPath))) // for distributed conversion
+		if($this->taskConfig->params->isRemoteInput || !strlen(trim($data->actualSrcFileSyncLocalPath))) // for distributed conversion
 		{
 			if(!strlen(trim($data->actualSrcFileSyncLocalPath)))
 				$data->actualSrcFileSyncLocalPath = $this->taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($data->srcFileSyncRemoteUrl);
@@ -89,7 +89,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 		
 		$data->inputXmlLocalPath = $this->translateSharedPath2Local($data->inputXmlLocalPath);
 	
-		if($this->taskConfig->params->isRemote || !strlen(trim($data->inputXmlLocalPath))) // for distributed conversion
+		if($this->taskConfig->params->isRemoteInput || !strlen(trim($data->inputXmlLocalPath))) // for distributed conversion
 		{
 			if(!strlen(trim($data->inputXmlLocalPath)))
 				$data->inputXmlLocalPath = $this->taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($data->inputXmlLocalPath);
@@ -100,6 +100,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::REMOTE_FILE_NOT_FOUND, $err, KalturaBatchJobStatus::RETRY);
 			}
 		}
+
 		
 		if(file_exists($data->inputXmlLocalPath))
 		{
@@ -194,7 +195,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 			$fileSize = kFile::fileSize($srcPath);
 			
 			$flavor->destFileSyncLocalPath = $sharedPath;
-			if($this->taskConfig->params->isRemote)
+			if($this->taskConfig->params->isRemoteOutput)
 				$flavor->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($sharedPath);
 						
 			KalturaLog::debug("add to move list file[$srcPath] to[$destPath] size[$fileSize] shared path[$sharedPath]");
@@ -232,7 +233,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 		}
 		
 		$data->destDirLocalPath = $this->translateLocalPath2Shared($this->sharedTempPath);
-		if($this->taskConfig->params->isRemote) // for remote conversion
+		if($this->taskConfig->params->isRemoteOutput) // for remote conversion
 		{			
 			$data->destDirRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destDirLocalPath);
 			$job->status = KalturaBatchJobStatus::ALMOST_DONE;
@@ -254,7 +255,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{
 		$flavors = null;
-		if($job->data->flavors)
+		if((isset($job->data->flavors)))
 		{
 			$flavors = $job->data->flavors;
 			$job->data->flavors = null;
