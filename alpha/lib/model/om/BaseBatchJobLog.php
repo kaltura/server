@@ -26,6 +26,12 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 	protected $id;
 
 	/**
+	 * The value for the job_id field.
+	 * @var        int
+	 */
+	protected $job_id;
+
+	/**
 	 * The value for the job_type field.
 	 * @var        int
 	 */
@@ -54,6 +60,12 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 	 * @var        string
 	 */
 	protected $duplication_key;
+
+	/**
+	 * The value for the job_status field.
+	 * @var        int
+	 */
+	protected $job_status;
 
 	/**
 	 * The value for the status field.
@@ -383,6 +395,16 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Get the [job_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getJobId()
+	{
+		return $this->job_id;
+	}
+
+	/**
 	 * Get the [job_type] column value.
 	 * 
 	 * @return     int
@@ -430,6 +452,16 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 	public function getDuplicationKey()
 	{
 		return $this->duplication_key;
+	}
+
+	/**
+	 * Get the [job_status] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getJobStatus()
+	{
+		return $this->job_status;
 	}
 
 	/**
@@ -1046,6 +1078,29 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 	} // setId()
 
 	/**
+	 * Set the value of [job_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     BatchJobLog The current object (for fluent API support)
+	 */
+	public function setJobId($v)
+	{
+		if(!isset($this->oldColumnsValues[BatchJobLogPeer::JOB_ID]))
+			$this->oldColumnsValues[BatchJobLogPeer::JOB_ID] = $this->job_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->job_id !== $v) {
+			$this->job_id = $v;
+			$this->modifiedColumns[] = BatchJobLogPeer::JOB_ID;
+		}
+
+		return $this;
+	} // setJobId()
+
+	/**
 	 * Set the value of [job_type] column.
 	 * 
 	 * @param      int $v new value
@@ -1159,6 +1214,29 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setDuplicationKey()
+
+	/**
+	 * Set the value of [job_status] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     BatchJobLog The current object (for fluent API support)
+	 */
+	public function setJobStatus($v)
+	{
+		if(!isset($this->oldColumnsValues[BatchJobLogPeer::JOB_STATUS]))
+			$this->oldColumnsValues[BatchJobLogPeer::JOB_STATUS] = $this->job_status;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->job_status !== $v) {
+			$this->job_status = $v;
+			$this->modifiedColumns[] = BatchJobLogPeer::JOB_STATUS;
+		}
+
+		return $this;
+	} // setJobStatus()
 
 	/**
 	 * Set the value of [status] column.
@@ -2316,52 +2394,54 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-			$this->job_type = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-			$this->job_sub_type = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-			$this->data = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->file_size = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->duplication_key = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->abort = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->check_again_timeout = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->progress = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-			$this->message = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->description = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->updates_count = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-			$this->created_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->created_by = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->updated_at = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-			$this->updated_by = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-			$this->deleted_at = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-			$this->priority = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
-			$this->work_group_id = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
-			$this->queue_time = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
-			$this->finish_time = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
-			$this->entry_id = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
-			$this->partner_id = ($row[$startcol + 23] !== null) ? (int) $row[$startcol + 23] : null;
-			$this->subp_id = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
-			$this->scheduler_id = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
-			$this->worker_id = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
-			$this->batch_index = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
-			$this->last_scheduler_id = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
-			$this->last_worker_id = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
-			$this->last_worker_remote = ($row[$startcol + 30] !== null) ? (boolean) $row[$startcol + 30] : null;
-			$this->processor_expiration = ($row[$startcol + 31] !== null) ? (string) $row[$startcol + 31] : null;
-			$this->execution_attempts = ($row[$startcol + 32] !== null) ? (int) $row[$startcol + 32] : null;
-			$this->lock_version = ($row[$startcol + 33] !== null) ? (int) $row[$startcol + 33] : null;
-			$this->twin_job_id = ($row[$startcol + 34] !== null) ? (int) $row[$startcol + 34] : null;
-			$this->bulk_job_id = ($row[$startcol + 35] !== null) ? (int) $row[$startcol + 35] : null;
-			$this->root_job_id = ($row[$startcol + 36] !== null) ? (int) $row[$startcol + 36] : null;
-			$this->parent_job_id = ($row[$startcol + 37] !== null) ? (int) $row[$startcol + 37] : null;
-			$this->dc = ($row[$startcol + 38] !== null) ? (int) $row[$startcol + 38] : null;
-			$this->err_type = ($row[$startcol + 39] !== null) ? (int) $row[$startcol + 39] : null;
-			$this->err_number = ($row[$startcol + 40] !== null) ? (int) $row[$startcol + 40] : null;
-			$this->on_stress_divert_to = ($row[$startcol + 41] !== null) ? (int) $row[$startcol + 41] : null;
-			$this->param_1 = ($row[$startcol + 42] !== null) ? (int) $row[$startcol + 42] : null;
-			$this->param_2 = ($row[$startcol + 43] !== null) ? (string) $row[$startcol + 43] : null;
-			$this->param_3 = ($row[$startcol + 44] !== null) ? (string) $row[$startcol + 44] : null;
-			$this->param_4 = ($row[$startcol + 45] !== null) ? (int) $row[$startcol + 45] : null;
-			$this->param_5 = ($row[$startcol + 46] !== null) ? (string) $row[$startcol + 46] : null;
+			$this->job_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+			$this->job_type = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+			$this->job_sub_type = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+			$this->data = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->file_size = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->duplication_key = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->job_status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->abort = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->check_again_timeout = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->progress = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->message = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->description = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->updates_count = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->created_at = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->created_by = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->updated_at = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->updated_by = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
+			$this->deleted_at = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
+			$this->priority = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
+			$this->work_group_id = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
+			$this->queue_time = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+			$this->finish_time = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
+			$this->entry_id = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
+			$this->partner_id = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
+			$this->subp_id = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
+			$this->scheduler_id = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
+			$this->worker_id = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
+			$this->batch_index = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
+			$this->last_scheduler_id = ($row[$startcol + 30] !== null) ? (int) $row[$startcol + 30] : null;
+			$this->last_worker_id = ($row[$startcol + 31] !== null) ? (int) $row[$startcol + 31] : null;
+			$this->last_worker_remote = ($row[$startcol + 32] !== null) ? (boolean) $row[$startcol + 32] : null;
+			$this->processor_expiration = ($row[$startcol + 33] !== null) ? (string) $row[$startcol + 33] : null;
+			$this->execution_attempts = ($row[$startcol + 34] !== null) ? (int) $row[$startcol + 34] : null;
+			$this->lock_version = ($row[$startcol + 35] !== null) ? (int) $row[$startcol + 35] : null;
+			$this->twin_job_id = ($row[$startcol + 36] !== null) ? (int) $row[$startcol + 36] : null;
+			$this->bulk_job_id = ($row[$startcol + 37] !== null) ? (int) $row[$startcol + 37] : null;
+			$this->root_job_id = ($row[$startcol + 38] !== null) ? (int) $row[$startcol + 38] : null;
+			$this->parent_job_id = ($row[$startcol + 39] !== null) ? (int) $row[$startcol + 39] : null;
+			$this->dc = ($row[$startcol + 40] !== null) ? (int) $row[$startcol + 40] : null;
+			$this->err_type = ($row[$startcol + 41] !== null) ? (int) $row[$startcol + 41] : null;
+			$this->err_number = ($row[$startcol + 42] !== null) ? (int) $row[$startcol + 42] : null;
+			$this->on_stress_divert_to = ($row[$startcol + 43] !== null) ? (int) $row[$startcol + 43] : null;
+			$this->param_1 = ($row[$startcol + 44] !== null) ? (int) $row[$startcol + 44] : null;
+			$this->param_2 = ($row[$startcol + 45] !== null) ? (string) $row[$startcol + 45] : null;
+			$this->param_3 = ($row[$startcol + 46] !== null) ? (string) $row[$startcol + 46] : null;
+			$this->param_4 = ($row[$startcol + 47] !== null) ? (int) $row[$startcol + 47] : null;
+			$this->param_5 = ($row[$startcol + 48] !== null) ? (string) $row[$startcol + 48] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -2371,7 +2451,7 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 47; // 47 = BatchJobLogPeer::NUM_COLUMNS - BatchJobLogPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 49; // 49 = BatchJobLogPeer::NUM_COLUMNS - BatchJobLogPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating BatchJobLog object", $e);
@@ -2822,141 +2902,147 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 				return $this->getId();
 				break;
 			case 1:
-				return $this->getJobType();
+				return $this->getJobId();
 				break;
 			case 2:
-				return $this->getJobSubType();
+				return $this->getJobType();
 				break;
 			case 3:
-				return $this->getData();
+				return $this->getJobSubType();
 				break;
 			case 4:
-				return $this->getFileSize();
+				return $this->getData();
 				break;
 			case 5:
-				return $this->getDuplicationKey();
+				return $this->getFileSize();
 				break;
 			case 6:
-				return $this->getStatus();
+				return $this->getDuplicationKey();
 				break;
 			case 7:
-				return $this->getAbort();
+				return $this->getJobStatus();
 				break;
 			case 8:
-				return $this->getCheckAgainTimeout();
+				return $this->getStatus();
 				break;
 			case 9:
-				return $this->getProgress();
+				return $this->getAbort();
 				break;
 			case 10:
-				return $this->getMessage();
+				return $this->getCheckAgainTimeout();
 				break;
 			case 11:
-				return $this->getDescription();
+				return $this->getProgress();
 				break;
 			case 12:
-				return $this->getUpdatesCount();
+				return $this->getMessage();
 				break;
 			case 13:
-				return $this->getCreatedAt();
+				return $this->getDescription();
 				break;
 			case 14:
-				return $this->getCreatedBy();
+				return $this->getUpdatesCount();
 				break;
 			case 15:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 16:
-				return $this->getUpdatedBy();
+				return $this->getCreatedBy();
 				break;
 			case 17:
-				return $this->getDeletedAt();
+				return $this->getUpdatedAt();
 				break;
 			case 18:
-				return $this->getPriority();
+				return $this->getUpdatedBy();
 				break;
 			case 19:
-				return $this->getWorkGroupId();
+				return $this->getDeletedAt();
 				break;
 			case 20:
-				return $this->getQueueTime();
+				return $this->getPriority();
 				break;
 			case 21:
-				return $this->getFinishTime();
+				return $this->getWorkGroupId();
 				break;
 			case 22:
-				return $this->getEntryId();
+				return $this->getQueueTime();
 				break;
 			case 23:
-				return $this->getPartnerId();
+				return $this->getFinishTime();
 				break;
 			case 24:
-				return $this->getSubpId();
+				return $this->getEntryId();
 				break;
 			case 25:
-				return $this->getSchedulerId();
+				return $this->getPartnerId();
 				break;
 			case 26:
-				return $this->getWorkerId();
+				return $this->getSubpId();
 				break;
 			case 27:
-				return $this->getBatchIndex();
+				return $this->getSchedulerId();
 				break;
 			case 28:
-				return $this->getLastSchedulerId();
+				return $this->getWorkerId();
 				break;
 			case 29:
-				return $this->getLastWorkerId();
+				return $this->getBatchIndex();
 				break;
 			case 30:
-				return $this->getLastWorkerRemote();
+				return $this->getLastSchedulerId();
 				break;
 			case 31:
-				return $this->getProcessorExpiration();
+				return $this->getLastWorkerId();
 				break;
 			case 32:
-				return $this->getExecutionAttempts();
+				return $this->getLastWorkerRemote();
 				break;
 			case 33:
-				return $this->getLockVersion();
+				return $this->getProcessorExpiration();
 				break;
 			case 34:
-				return $this->getTwinJobId();
+				return $this->getExecutionAttempts();
 				break;
 			case 35:
-				return $this->getBulkJobId();
+				return $this->getLockVersion();
 				break;
 			case 36:
-				return $this->getRootJobId();
+				return $this->getTwinJobId();
 				break;
 			case 37:
-				return $this->getParentJobId();
+				return $this->getBulkJobId();
 				break;
 			case 38:
-				return $this->getDc();
+				return $this->getRootJobId();
 				break;
 			case 39:
-				return $this->getErrType();
+				return $this->getParentJobId();
 				break;
 			case 40:
-				return $this->getErrNumber();
+				return $this->getDc();
 				break;
 			case 41:
-				return $this->getOnStressDivertTo();
+				return $this->getErrType();
 				break;
 			case 42:
-				return $this->getParam1();
+				return $this->getErrNumber();
 				break;
 			case 43:
-				return $this->getParam2();
+				return $this->getOnStressDivertTo();
 				break;
 			case 44:
-				return $this->getParam3();
+				return $this->getParam1();
 				break;
 			case 45:
-				return $this->getParam4();
+				return $this->getParam2();
 				break;
 			case 46:
+				return $this->getParam3();
+				break;
+			case 47:
+				return $this->getParam4();
+				break;
+			case 48:
 				return $this->getParam5();
 				break;
 			default:
@@ -2981,52 +3067,54 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 		$keys = BatchJobLogPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
-			$keys[1] => $this->getJobType(),
-			$keys[2] => $this->getJobSubType(),
-			$keys[3] => $this->getData(),
-			$keys[4] => $this->getFileSize(),
-			$keys[5] => $this->getDuplicationKey(),
-			$keys[6] => $this->getStatus(),
-			$keys[7] => $this->getAbort(),
-			$keys[8] => $this->getCheckAgainTimeout(),
-			$keys[9] => $this->getProgress(),
-			$keys[10] => $this->getMessage(),
-			$keys[11] => $this->getDescription(),
-			$keys[12] => $this->getUpdatesCount(),
-			$keys[13] => $this->getCreatedAt(),
-			$keys[14] => $this->getCreatedBy(),
-			$keys[15] => $this->getUpdatedAt(),
-			$keys[16] => $this->getUpdatedBy(),
-			$keys[17] => $this->getDeletedAt(),
-			$keys[18] => $this->getPriority(),
-			$keys[19] => $this->getWorkGroupId(),
-			$keys[20] => $this->getQueueTime(),
-			$keys[21] => $this->getFinishTime(),
-			$keys[22] => $this->getEntryId(),
-			$keys[23] => $this->getPartnerId(),
-			$keys[24] => $this->getSubpId(),
-			$keys[25] => $this->getSchedulerId(),
-			$keys[26] => $this->getWorkerId(),
-			$keys[27] => $this->getBatchIndex(),
-			$keys[28] => $this->getLastSchedulerId(),
-			$keys[29] => $this->getLastWorkerId(),
-			$keys[30] => $this->getLastWorkerRemote(),
-			$keys[31] => $this->getProcessorExpiration(),
-			$keys[32] => $this->getExecutionAttempts(),
-			$keys[33] => $this->getLockVersion(),
-			$keys[34] => $this->getTwinJobId(),
-			$keys[35] => $this->getBulkJobId(),
-			$keys[36] => $this->getRootJobId(),
-			$keys[37] => $this->getParentJobId(),
-			$keys[38] => $this->getDc(),
-			$keys[39] => $this->getErrType(),
-			$keys[40] => $this->getErrNumber(),
-			$keys[41] => $this->getOnStressDivertTo(),
-			$keys[42] => $this->getParam1(),
-			$keys[43] => $this->getParam2(),
-			$keys[44] => $this->getParam3(),
-			$keys[45] => $this->getParam4(),
-			$keys[46] => $this->getParam5(),
+			$keys[1] => $this->getJobId(),
+			$keys[2] => $this->getJobType(),
+			$keys[3] => $this->getJobSubType(),
+			$keys[4] => $this->getData(),
+			$keys[5] => $this->getFileSize(),
+			$keys[6] => $this->getDuplicationKey(),
+			$keys[7] => $this->getJobStatus(),
+			$keys[8] => $this->getStatus(),
+			$keys[9] => $this->getAbort(),
+			$keys[10] => $this->getCheckAgainTimeout(),
+			$keys[11] => $this->getProgress(),
+			$keys[12] => $this->getMessage(),
+			$keys[13] => $this->getDescription(),
+			$keys[14] => $this->getUpdatesCount(),
+			$keys[15] => $this->getCreatedAt(),
+			$keys[16] => $this->getCreatedBy(),
+			$keys[17] => $this->getUpdatedAt(),
+			$keys[18] => $this->getUpdatedBy(),
+			$keys[19] => $this->getDeletedAt(),
+			$keys[20] => $this->getPriority(),
+			$keys[21] => $this->getWorkGroupId(),
+			$keys[22] => $this->getQueueTime(),
+			$keys[23] => $this->getFinishTime(),
+			$keys[24] => $this->getEntryId(),
+			$keys[25] => $this->getPartnerId(),
+			$keys[26] => $this->getSubpId(),
+			$keys[27] => $this->getSchedulerId(),
+			$keys[28] => $this->getWorkerId(),
+			$keys[29] => $this->getBatchIndex(),
+			$keys[30] => $this->getLastSchedulerId(),
+			$keys[31] => $this->getLastWorkerId(),
+			$keys[32] => $this->getLastWorkerRemote(),
+			$keys[33] => $this->getProcessorExpiration(),
+			$keys[34] => $this->getExecutionAttempts(),
+			$keys[35] => $this->getLockVersion(),
+			$keys[36] => $this->getTwinJobId(),
+			$keys[37] => $this->getBulkJobId(),
+			$keys[38] => $this->getRootJobId(),
+			$keys[39] => $this->getParentJobId(),
+			$keys[40] => $this->getDc(),
+			$keys[41] => $this->getErrType(),
+			$keys[42] => $this->getErrNumber(),
+			$keys[43] => $this->getOnStressDivertTo(),
+			$keys[44] => $this->getParam1(),
+			$keys[45] => $this->getParam2(),
+			$keys[46] => $this->getParam3(),
+			$keys[47] => $this->getParam4(),
+			$keys[48] => $this->getParam5(),
 		);
 		return $result;
 	}
@@ -3062,141 +3150,147 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 				$this->setId($value);
 				break;
 			case 1:
-				$this->setJobType($value);
+				$this->setJobId($value);
 				break;
 			case 2:
-				$this->setJobSubType($value);
+				$this->setJobType($value);
 				break;
 			case 3:
-				$this->setData($value);
+				$this->setJobSubType($value);
 				break;
 			case 4:
-				$this->setFileSize($value);
+				$this->setData($value);
 				break;
 			case 5:
-				$this->setDuplicationKey($value);
+				$this->setFileSize($value);
 				break;
 			case 6:
-				$this->setStatus($value);
+				$this->setDuplicationKey($value);
 				break;
 			case 7:
-				$this->setAbort($value);
+				$this->setJobStatus($value);
 				break;
 			case 8:
-				$this->setCheckAgainTimeout($value);
+				$this->setStatus($value);
 				break;
 			case 9:
-				$this->setProgress($value);
+				$this->setAbort($value);
 				break;
 			case 10:
-				$this->setMessage($value);
+				$this->setCheckAgainTimeout($value);
 				break;
 			case 11:
-				$this->setDescription($value);
+				$this->setProgress($value);
 				break;
 			case 12:
-				$this->setUpdatesCount($value);
+				$this->setMessage($value);
 				break;
 			case 13:
-				$this->setCreatedAt($value);
+				$this->setDescription($value);
 				break;
 			case 14:
-				$this->setCreatedBy($value);
+				$this->setUpdatesCount($value);
 				break;
 			case 15:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 16:
-				$this->setUpdatedBy($value);
+				$this->setCreatedBy($value);
 				break;
 			case 17:
-				$this->setDeletedAt($value);
+				$this->setUpdatedAt($value);
 				break;
 			case 18:
-				$this->setPriority($value);
+				$this->setUpdatedBy($value);
 				break;
 			case 19:
-				$this->setWorkGroupId($value);
+				$this->setDeletedAt($value);
 				break;
 			case 20:
-				$this->setQueueTime($value);
+				$this->setPriority($value);
 				break;
 			case 21:
-				$this->setFinishTime($value);
+				$this->setWorkGroupId($value);
 				break;
 			case 22:
-				$this->setEntryId($value);
+				$this->setQueueTime($value);
 				break;
 			case 23:
-				$this->setPartnerId($value);
+				$this->setFinishTime($value);
 				break;
 			case 24:
-				$this->setSubpId($value);
+				$this->setEntryId($value);
 				break;
 			case 25:
-				$this->setSchedulerId($value);
+				$this->setPartnerId($value);
 				break;
 			case 26:
-				$this->setWorkerId($value);
+				$this->setSubpId($value);
 				break;
 			case 27:
-				$this->setBatchIndex($value);
+				$this->setSchedulerId($value);
 				break;
 			case 28:
-				$this->setLastSchedulerId($value);
+				$this->setWorkerId($value);
 				break;
 			case 29:
-				$this->setLastWorkerId($value);
+				$this->setBatchIndex($value);
 				break;
 			case 30:
-				$this->setLastWorkerRemote($value);
+				$this->setLastSchedulerId($value);
 				break;
 			case 31:
-				$this->setProcessorExpiration($value);
+				$this->setLastWorkerId($value);
 				break;
 			case 32:
-				$this->setExecutionAttempts($value);
+				$this->setLastWorkerRemote($value);
 				break;
 			case 33:
-				$this->setLockVersion($value);
+				$this->setProcessorExpiration($value);
 				break;
 			case 34:
-				$this->setTwinJobId($value);
+				$this->setExecutionAttempts($value);
 				break;
 			case 35:
-				$this->setBulkJobId($value);
+				$this->setLockVersion($value);
 				break;
 			case 36:
-				$this->setRootJobId($value);
+				$this->setTwinJobId($value);
 				break;
 			case 37:
-				$this->setParentJobId($value);
+				$this->setBulkJobId($value);
 				break;
 			case 38:
-				$this->setDc($value);
+				$this->setRootJobId($value);
 				break;
 			case 39:
-				$this->setErrType($value);
+				$this->setParentJobId($value);
 				break;
 			case 40:
-				$this->setErrNumber($value);
+				$this->setDc($value);
 				break;
 			case 41:
-				$this->setOnStressDivertTo($value);
+				$this->setErrType($value);
 				break;
 			case 42:
-				$this->setParam1($value);
+				$this->setErrNumber($value);
 				break;
 			case 43:
-				$this->setParam2($value);
+				$this->setOnStressDivertTo($value);
 				break;
 			case 44:
-				$this->setParam3($value);
+				$this->setParam1($value);
 				break;
 			case 45:
-				$this->setParam4($value);
+				$this->setParam2($value);
 				break;
 			case 46:
+				$this->setParam3($value);
+				break;
+			case 47:
+				$this->setParam4($value);
+				break;
+			case 48:
 				$this->setParam5($value);
 				break;
 		} // switch()
@@ -3224,52 +3318,54 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 		$keys = BatchJobLogPeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-		if (array_key_exists($keys[1], $arr)) $this->setJobType($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setJobSubType($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setData($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setFileSize($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setDuplicationKey($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setAbort($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setCheckAgainTimeout($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setProgress($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setMessage($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setDescription($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setUpdatesCount($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setCreatedAt($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setCreatedBy($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setUpdatedAt($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setUpdatedBy($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setDeletedAt($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setPriority($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setWorkGroupId($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setQueueTime($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setFinishTime($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setEntryId($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setPartnerId($arr[$keys[23]]);
-		if (array_key_exists($keys[24], $arr)) $this->setSubpId($arr[$keys[24]]);
-		if (array_key_exists($keys[25], $arr)) $this->setSchedulerId($arr[$keys[25]]);
-		if (array_key_exists($keys[26], $arr)) $this->setWorkerId($arr[$keys[26]]);
-		if (array_key_exists($keys[27], $arr)) $this->setBatchIndex($arr[$keys[27]]);
-		if (array_key_exists($keys[28], $arr)) $this->setLastSchedulerId($arr[$keys[28]]);
-		if (array_key_exists($keys[29], $arr)) $this->setLastWorkerId($arr[$keys[29]]);
-		if (array_key_exists($keys[30], $arr)) $this->setLastWorkerRemote($arr[$keys[30]]);
-		if (array_key_exists($keys[31], $arr)) $this->setProcessorExpiration($arr[$keys[31]]);
-		if (array_key_exists($keys[32], $arr)) $this->setExecutionAttempts($arr[$keys[32]]);
-		if (array_key_exists($keys[33], $arr)) $this->setLockVersion($arr[$keys[33]]);
-		if (array_key_exists($keys[34], $arr)) $this->setTwinJobId($arr[$keys[34]]);
-		if (array_key_exists($keys[35], $arr)) $this->setBulkJobId($arr[$keys[35]]);
-		if (array_key_exists($keys[36], $arr)) $this->setRootJobId($arr[$keys[36]]);
-		if (array_key_exists($keys[37], $arr)) $this->setParentJobId($arr[$keys[37]]);
-		if (array_key_exists($keys[38], $arr)) $this->setDc($arr[$keys[38]]);
-		if (array_key_exists($keys[39], $arr)) $this->setErrType($arr[$keys[39]]);
-		if (array_key_exists($keys[40], $arr)) $this->setErrNumber($arr[$keys[40]]);
-		if (array_key_exists($keys[41], $arr)) $this->setOnStressDivertTo($arr[$keys[41]]);
-		if (array_key_exists($keys[42], $arr)) $this->setParam1($arr[$keys[42]]);
-		if (array_key_exists($keys[43], $arr)) $this->setParam2($arr[$keys[43]]);
-		if (array_key_exists($keys[44], $arr)) $this->setParam3($arr[$keys[44]]);
-		if (array_key_exists($keys[45], $arr)) $this->setParam4($arr[$keys[45]]);
-		if (array_key_exists($keys[46], $arr)) $this->setParam5($arr[$keys[46]]);
+		if (array_key_exists($keys[1], $arr)) $this->setJobId($arr[$keys[1]]);
+		if (array_key_exists($keys[2], $arr)) $this->setJobType($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setJobSubType($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setData($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setFileSize($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setDuplicationKey($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setJobStatus($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setStatus($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setAbort($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCheckAgainTimeout($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setProgress($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setMessage($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setDescription($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setUpdatesCount($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setCreatedAt($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setCreatedBy($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setUpdatedAt($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setUpdatedBy($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setDeletedAt($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setPriority($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setWorkGroupId($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setQueueTime($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setFinishTime($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setEntryId($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setPartnerId($arr[$keys[25]]);
+		if (array_key_exists($keys[26], $arr)) $this->setSubpId($arr[$keys[26]]);
+		if (array_key_exists($keys[27], $arr)) $this->setSchedulerId($arr[$keys[27]]);
+		if (array_key_exists($keys[28], $arr)) $this->setWorkerId($arr[$keys[28]]);
+		if (array_key_exists($keys[29], $arr)) $this->setBatchIndex($arr[$keys[29]]);
+		if (array_key_exists($keys[30], $arr)) $this->setLastSchedulerId($arr[$keys[30]]);
+		if (array_key_exists($keys[31], $arr)) $this->setLastWorkerId($arr[$keys[31]]);
+		if (array_key_exists($keys[32], $arr)) $this->setLastWorkerRemote($arr[$keys[32]]);
+		if (array_key_exists($keys[33], $arr)) $this->setProcessorExpiration($arr[$keys[33]]);
+		if (array_key_exists($keys[34], $arr)) $this->setExecutionAttempts($arr[$keys[34]]);
+		if (array_key_exists($keys[35], $arr)) $this->setLockVersion($arr[$keys[35]]);
+		if (array_key_exists($keys[36], $arr)) $this->setTwinJobId($arr[$keys[36]]);
+		if (array_key_exists($keys[37], $arr)) $this->setBulkJobId($arr[$keys[37]]);
+		if (array_key_exists($keys[38], $arr)) $this->setRootJobId($arr[$keys[38]]);
+		if (array_key_exists($keys[39], $arr)) $this->setParentJobId($arr[$keys[39]]);
+		if (array_key_exists($keys[40], $arr)) $this->setDc($arr[$keys[40]]);
+		if (array_key_exists($keys[41], $arr)) $this->setErrType($arr[$keys[41]]);
+		if (array_key_exists($keys[42], $arr)) $this->setErrNumber($arr[$keys[42]]);
+		if (array_key_exists($keys[43], $arr)) $this->setOnStressDivertTo($arr[$keys[43]]);
+		if (array_key_exists($keys[44], $arr)) $this->setParam1($arr[$keys[44]]);
+		if (array_key_exists($keys[45], $arr)) $this->setParam2($arr[$keys[45]]);
+		if (array_key_exists($keys[46], $arr)) $this->setParam3($arr[$keys[46]]);
+		if (array_key_exists($keys[47], $arr)) $this->setParam4($arr[$keys[47]]);
+		if (array_key_exists($keys[48], $arr)) $this->setParam5($arr[$keys[48]]);
 	}
 
 	/**
@@ -3282,11 +3378,13 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 		$criteria = new Criteria(BatchJobLogPeer::DATABASE_NAME);
 
 		if ($this->isColumnModified(BatchJobLogPeer::ID)) $criteria->add(BatchJobLogPeer::ID, $this->id);
+		if ($this->isColumnModified(BatchJobLogPeer::JOB_ID)) $criteria->add(BatchJobLogPeer::JOB_ID, $this->job_id);
 		if ($this->isColumnModified(BatchJobLogPeer::JOB_TYPE)) $criteria->add(BatchJobLogPeer::JOB_TYPE, $this->job_type);
 		if ($this->isColumnModified(BatchJobLogPeer::JOB_SUB_TYPE)) $criteria->add(BatchJobLogPeer::JOB_SUB_TYPE, $this->job_sub_type);
 		if ($this->isColumnModified(BatchJobLogPeer::DATA)) $criteria->add(BatchJobLogPeer::DATA, $this->data);
 		if ($this->isColumnModified(BatchJobLogPeer::FILE_SIZE)) $criteria->add(BatchJobLogPeer::FILE_SIZE, $this->file_size);
 		if ($this->isColumnModified(BatchJobLogPeer::DUPLICATION_KEY)) $criteria->add(BatchJobLogPeer::DUPLICATION_KEY, $this->duplication_key);
+		if ($this->isColumnModified(BatchJobLogPeer::JOB_STATUS)) $criteria->add(BatchJobLogPeer::JOB_STATUS, $this->job_status);
 		if ($this->isColumnModified(BatchJobLogPeer::STATUS)) $criteria->add(BatchJobLogPeer::STATUS, $this->status);
 		if ($this->isColumnModified(BatchJobLogPeer::ABORT)) $criteria->add(BatchJobLogPeer::ABORT, $this->abort);
 		if ($this->isColumnModified(BatchJobLogPeer::CHECK_AGAIN_TIMEOUT)) $criteria->add(BatchJobLogPeer::CHECK_AGAIN_TIMEOUT, $this->check_again_timeout);
@@ -3394,6 +3492,8 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 	public function copyInto($copyObj, $deepCopy = false)
 	{
 
+		$copyObj->setJobId($this->job_id);
+
 		$copyObj->setJobType($this->job_type);
 
 		$copyObj->setJobSubType($this->job_sub_type);
@@ -3403,6 +3503,8 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 		$copyObj->setFileSize($this->file_size);
 
 		$copyObj->setDuplicationKey($this->duplication_key);
+
+		$copyObj->setJobStatus($this->job_status);
 
 		$copyObj->setStatus($this->status);
 
