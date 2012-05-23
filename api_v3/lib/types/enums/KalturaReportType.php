@@ -24,6 +24,5 @@ class KalturaReportType extends KalturaEnum
 	const USER_CONTENT_DROPOFF = 14;
 	const USER_CONTENT_INTERACTIONS = 15;
 	const APPLICATIONS = 16;
-	const REPORT_TYPE_PARTNER_USAGE = 201; 
+	const PARTNER_USAGE = 201; 
 }
-?>
