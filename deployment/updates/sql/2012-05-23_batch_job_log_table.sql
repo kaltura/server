@@ -59,7 +59,6 @@ CREATE TABLE `batch_job_log`
     KEY `execution_attempts_index`(`job_type`, `execution_attempts`),
     KEY `processor_expiration_index`(`job_type`, `processor_expiration`),
     KEY `lock_index`(`batch_index`, `scheduler_id`, `worker_id`),
-    KEY `partner_job_type_bulk_upload_type_index`(`partner_id`, `bulk_upload_type`, `job_type`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
