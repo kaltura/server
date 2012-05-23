@@ -199,7 +199,7 @@ class KImageMagickCropper extends KBaseCropper
 						
 						$bgcolor = sprintf('%06x', $bgcolor);
 						$attributes[] = "-bordercolor \"#{$bgcolor}\"";
-						$attributes[] = $resize;
+						$attributes[] = "-resize {$w}x{$h}";
 						$attributes[] = "-border {$borderWidth}x{$borderHeight} -gravity Center";
 					}
 					else 
