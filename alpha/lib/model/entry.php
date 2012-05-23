@@ -9,7 +9,6 @@
  */
 class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 { 
-	private $previous_status ;
 	protected $new_categories = '';
 	protected $new_categories_ids = '';
 	protected $old_categories;
@@ -221,24 +220,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$is_new = true;
 		}
 
-		if ( $this->isColumnModified ( entryPeer::STATUS ) && ( $this->previous_status != $this->getStatus() ) )
-		{
-			// add a track for when the status changed
-			$track_entry = new TrackEntry();
-			$track_entry->setEntryId( $this->getId() );
-			$track_entry->setTrackEventTypeId( TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_ENTRY );
-			$track_entry->setChangedProperties( "status [{$this->previous_status}]->[{$this->getStatus()}]" );
-			
-			if ( $this->previous_status != entryStatus::DELETED &&
-				 $this->getStatus() == entryStatus::DELETED )
-			{
-				myStatisticsMgr::deleteEntry( $this );
-				$track_entry->setTrackEventTypeId( TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETED_ENTRY );
-			}
-		
-			TrackEntry::addTrackEntry( $track_entry );
-		}
-
 		if ( $this->type == entryType::MIX )
 		{
 			// some of the properties should be copied to the kshow
@@ -326,23 +307,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function incViews ( $should_save = true )
 	{
 		myStatisticsMgr::incEntryViews( $this );
-	}
-
-
-
-	private function statusChangedTo ( $new_status )
-	{
-		return ( $this->previous_status != $new_status &&
-				$this->getStatus() == $new_status );
-	}
-
-
-	public function setStatus ( $v)
-	{
-		// if we haven't yet set the previous status - remember it now
-		if ( is_null ( $this->previous_status ) )
-			$this->previous_status = $this->getStatus();
-		parent::setStatus( $v );
 	}
 
 	/**
@@ -2406,13 +2370,55 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$objectDeleted = true;
 			
 		$ret = parent::postUpdate($con);
+	
+		$trackColumns = array(
+			entryPeer::STATUS,
+			entryPeer::MODERATION_STATUS,
+			entryPeer::KUSER_ID,
+			entryPeer::CREATOR_KUSER_ID,
+			entryPeer::ACCESS_CONTROL_ID,
+		);
+		
+		$changedProperties = array();
+		foreach($trackColumns as $trackColumn)
+		{
+			if($this->isColumnModified($trackColumn))
+			{
+				$column = entryPeer::translateFieldName($trackColumn, BasePeer::TYPE_COLNAME, BasePeer::TYPE_STUDLYPHPNAME);
+				$previousValue = $this->getColumnsOldValue($trackColumn);
+				$newValue = $this->getByName($trackColumn, BasePeer::TYPE_COLNAME);
+				$changedProperties[] = "$column [{$previousValue}]->[{$newValue}]";
+			}
+		}
 		
 		if($objectDeleted)
+		{
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+			myStatisticsMgr::deleteEntry($this);
+			
+			$trackEntry = new TrackEntry();
+			$trackEntry->setEntryId($this->getId());
+			$trackEntry->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETED_ENTRY);
+			$trackEntry->setChangedProperties(implode("\n", $changedProperties));
+			$trackEntry->setDescription(__METHOD__ . "[" . __LINE__ . "]");
+			TrackEntry::addTrackEntry($trackEntry);
+		}
 			
 		if($objectUpdated)
+		{
 			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
-			
+
+			if(!$objectDeleted && count($changedProperties))
+			{
+				$trackEntry = new TrackEntry();
+				$trackEntry->setEntryId($this->getId());
+				$trackEntry->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_ENTRY);
+				$trackEntry->setChangedProperties(implode("\n", $changedProperties));
+				$trackEntry->setDescription(__METHOD__ . "[" . __LINE__ . "]");
+				TrackEntry::addTrackEntry($trackEntry);
+			}
+		}
+		
 		return $ret;
 	}
 	

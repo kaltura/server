@@ -66,6 +66,12 @@ class MixingService extends KalturaEntryService
 			$dbEntry->save();
 		}
 		
+		$trackEntry = new TrackEntry();
+		$trackEntry->setEntryId($dbEntry->getId());
+		$trackEntry->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_ENTRY);
+		$trackEntry->setDescription(__METHOD__ . ":" . __LINE__ . "::ENTRY_MIX");
+		TrackEntry::addTrackEntry($trackEntry);
+		
 		$kshow->setShowEntry($dbEntry);
 		$kshow->save();
 		$mixEntry->fromObject($dbEntry);

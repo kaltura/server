@@ -41,6 +41,12 @@ class DataService extends KalturaEntryService
 		$dbEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_AUTOMATIC); 
 		$dbEntry->save();
 		
+		$trackEntry = new TrackEntry();
+		$trackEntry->setEntryId($dbEntry->getId());
+		$trackEntry->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_ENTRY);
+		$trackEntry->setDescription(__METHOD__ . ":" . __LINE__ . "::ENTRY_DATA");
+		TrackEntry::addTrackEntry($trackEntry);
+		
 		$dataEntry->fromObject($dbEntry);
 		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);

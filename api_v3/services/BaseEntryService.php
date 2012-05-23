@@ -70,6 +70,12 @@ class BaseEntryService extends KalturaEntryService
    		$dbEntry->setStatus(entryStatus::NO_CONTENT);
     	$dbEntry->save();
     	
+		$trackEntry = new TrackEntry();
+		$trackEntry->setEntryId($dbEntry->getId());
+		$trackEntry->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_ENTRY);
+		$trackEntry->setDescription(__METHOD__ . ":" . __LINE__ . "::ENTRY_BASE");
+		TrackEntry::addTrackEntry($trackEntry);
+		
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
     	
 	    $entry->fromObject($dbEntry);

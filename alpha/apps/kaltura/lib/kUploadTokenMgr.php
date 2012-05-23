@@ -109,7 +109,7 @@ class kUploadTokenMgr
 		$te->setParam1Str($this->_uploadToken->getId());
 		$te->setParam2Str($this->_uploadToken->getFileName());
 		$te->setParam3Str($this->_uploadToken->getUploadTempPath());
-		$te->setDescription(__METHOD__.":".__LINE__);
+		$te->setDescription(__METHOD__ . ":" . __LINE__);
 		TrackEntry::addTrackEntry($te);
 	}
 	

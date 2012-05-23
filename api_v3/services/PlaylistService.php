@@ -78,6 +78,12 @@ class PlaylistService extends KalturaEntryService
 			myPlaylistUtils::updatePlaylistStatistics( $dbPlaylist->getPartnerId() , $dbPlaylist );
 		$dbPlaylist->setDisplayInSearch ( 2 ); // make all the playlist entries PUBLIC !
 		
+		$trackEntry = new TrackEntry();
+		$trackEntry->setEntryId($dbPlaylist->getId());
+		$trackEntry->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_ENTRY);
+		$trackEntry->setDescription(__METHOD__ . ":" . __LINE__ . "::ENTRY_PLAYLIST");
+		TrackEntry::addTrackEntry($trackEntry);
+		
 		$playlist = new KalturaPlaylist(); // start from blank
 		$playlist->fromObject( $dbPlaylist );
 		
