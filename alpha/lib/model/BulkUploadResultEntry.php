@@ -61,7 +61,7 @@ class BulkUploadResultEntry extends BulkUploadResult
 		return $this->getStatus();
 	}
 	
-    protected function updateEntryThumbnail(BulkUploadResult $bulkUploadResult)
+    protected function updateEntryThumbnail()
 	{
 		if(		$this->getEntryStatus() != entryStatus::READY 
 			||	!strlen($this->getThumbnailUrl()) 
@@ -80,8 +80,8 @@ class BulkUploadResultEntry extends BulkUploadResult
 			return;
 		}
 		
-		$bulkUploadResult->setThumbnailSaved(true);
-		$bulkUploadResult->save();
+		$this->setThumbnailSaved(true);
+		$this->save();
 	}
 	
 	/* (non-PHPdoc)
