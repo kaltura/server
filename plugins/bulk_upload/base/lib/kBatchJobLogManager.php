@@ -77,8 +77,16 @@ class kBatchJobLogManager implements kObjectCreatedEventConsumer, kObjectChanged
 	{
 	    foreach ($modifiedColumns as $modifiedColumn)
 	    {
-	        list ($tableName, $columnName) = explode(".", $modifiedColumn);
-	        $batchJobLog->setByName("batch_job_log.".$columnName, $batchJob->getByName($modifiedColumn));
+	        $fieldName = BatchJobPeer::translateFieldName($modifiedColumn, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME);
+	        $fieldPosJob = BatchJobPeer::translateFieldName($modifiedColumn, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
+	        $fieldPosLog = BatchJobPeer::translateFieldName($fieldName, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM);
+	        try {
+	            $batchJobLog->setByPosition($fieldPosLog, $batchJob->getByPosition($fieldPosJob));
+	        }
+	        catch (Exception $e)
+	        {
+	            KalturaLog::err("Could not set value for BatchJobLog field $fieldName, exception thrown: ".$e->getMessage());
+	        }
 	    }	 
 
 	    return $batchJobLog;
