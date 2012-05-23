@@ -85,7 +85,7 @@ while($batchJobResults && count($batchJobResults))
 	    /* @var $batchJobData kBulkUploadJobData */
 	    $batchJobLog->setParam1($batchJobData->getBulkUploadObjectType());
 	    
-		$batchJob->save();
+		$batchJobLog->save();
 		
 		var_dump("Last handled id: ".$batchJob->getId());
 		
