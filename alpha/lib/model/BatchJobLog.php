@@ -25,5 +25,47 @@ class BatchJobLog extends BaseBatchJobLog {
 		// is where any default values for this object are set.
 		parent::__construct();
 	}
+	
+		/**
+	 * @param boolean  $bypassSerialization enables PS2 support
+	 */
+	public function getData($bypassSerialization = false)
+	{
+		if($bypassSerialization)
+			return parent::getData();
+		$data = parent::getData();
+		if(!is_null($data))
+		{
+			try {
+				$unserializedData = unserialize ( $data );
+				if ($unserializedData instanceof kJobCompressedData) {
+					$serializedJobData = $unserializedData->getSerializedJobData ();
+					$unserializedData = unserialize ( $serializedJobData );
+				}
+				return $unserializedData;
+			} catch(Exception $e){
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * @param boolean  $bypassSerialization enables PS2 support
+	 */
+	public function setData($v, $bypassSerialization = false) {
+		if ($bypassSerialization)
+			return parent::setData ( $v );
+		$this->setDuplicationKey ( BatchJobPeer::createDuplicationKey ( $this->getJobType (), $v ) );
+		if (! is_null ( $v )) {
+			$sereializedValue = serialize ( $v );
+			if (strlen ( ( string ) $sereializedValue ) > self::MAX_SERIALIZED_JOB_DATA_SIZE ) { 
+				$v = new kJobCompressedData ( $sereializedValue );
+				$sereializedValue = serialize ( $v );
+			}
+			parent::setData ( $sereializedValue );	
+		} else
+			parent::setData ( null );
+	} 
 
 } // BatchJobLog
