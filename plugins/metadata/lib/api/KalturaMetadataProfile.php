@@ -173,7 +173,7 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForUpdate()
 	 */
-	public function validateForUpdate($sourceObject)
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 	    $this->validatePropertyMinLength("name", 1); 
 	    
