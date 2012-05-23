@@ -62,10 +62,10 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 	protected $duplication_key;
 
 	/**
-	 * The value for the job_status field.
+	 * The value for the log_status field.
 	 * @var        int
 	 */
-	protected $job_status;
+	protected $log_status;
 
 	/**
 	 * The value for the status field.
@@ -455,13 +455,13 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [job_status] column value.
+	 * Get the [log_status] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getJobStatus()
+	public function getLogStatus()
 	{
-		return $this->job_status;
+		return $this->log_status;
 	}
 
 	/**
@@ -1216,27 +1216,27 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 	} // setDuplicationKey()
 
 	/**
-	 * Set the value of [job_status] column.
+	 * Set the value of [log_status] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     BatchJobLog The current object (for fluent API support)
 	 */
-	public function setJobStatus($v)
+	public function setLogStatus($v)
 	{
-		if(!isset($this->oldColumnsValues[BatchJobLogPeer::JOB_STATUS]))
-			$this->oldColumnsValues[BatchJobLogPeer::JOB_STATUS] = $this->job_status;
+		if(!isset($this->oldColumnsValues[BatchJobLogPeer::LOG_STATUS]))
+			$this->oldColumnsValues[BatchJobLogPeer::LOG_STATUS] = $this->log_status;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->job_status !== $v) {
-			$this->job_status = $v;
-			$this->modifiedColumns[] = BatchJobLogPeer::JOB_STATUS;
+		if ($this->log_status !== $v) {
+			$this->log_status = $v;
+			$this->modifiedColumns[] = BatchJobLogPeer::LOG_STATUS;
 		}
 
 		return $this;
-	} // setJobStatus()
+	} // setLogStatus()
 
 	/**
 	 * Set the value of [status] column.
@@ -2400,7 +2400,7 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 			$this->data = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->file_size = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
 			$this->duplication_key = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->job_status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->log_status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
 			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->abort = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
 			$this->check_again_timeout = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
@@ -2920,7 +2920,7 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 				return $this->getDuplicationKey();
 				break;
 			case 7:
-				return $this->getJobStatus();
+				return $this->getLogStatus();
 				break;
 			case 8:
 				return $this->getStatus();
@@ -3073,7 +3073,7 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 			$keys[4] => $this->getData(),
 			$keys[5] => $this->getFileSize(),
 			$keys[6] => $this->getDuplicationKey(),
-			$keys[7] => $this->getJobStatus(),
+			$keys[7] => $this->getLogStatus(),
 			$keys[8] => $this->getStatus(),
 			$keys[9] => $this->getAbort(),
 			$keys[10] => $this->getCheckAgainTimeout(),
@@ -3168,7 +3168,7 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 				$this->setDuplicationKey($value);
 				break;
 			case 7:
-				$this->setJobStatus($value);
+				$this->setLogStatus($value);
 				break;
 			case 8:
 				$this->setStatus($value);
@@ -3324,7 +3324,7 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[4], $arr)) $this->setData($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setFileSize($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setDuplicationKey($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setJobStatus($arr[$keys[7]]);
+		if (array_key_exists($keys[7], $arr)) $this->setLogStatus($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setStatus($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setAbort($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setCheckAgainTimeout($arr[$keys[10]]);
@@ -3384,7 +3384,7 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(BatchJobLogPeer::DATA)) $criteria->add(BatchJobLogPeer::DATA, $this->data);
 		if ($this->isColumnModified(BatchJobLogPeer::FILE_SIZE)) $criteria->add(BatchJobLogPeer::FILE_SIZE, $this->file_size);
 		if ($this->isColumnModified(BatchJobLogPeer::DUPLICATION_KEY)) $criteria->add(BatchJobLogPeer::DUPLICATION_KEY, $this->duplication_key);
-		if ($this->isColumnModified(BatchJobLogPeer::JOB_STATUS)) $criteria->add(BatchJobLogPeer::JOB_STATUS, $this->job_status);
+		if ($this->isColumnModified(BatchJobLogPeer::LOG_STATUS)) $criteria->add(BatchJobLogPeer::LOG_STATUS, $this->log_status);
 		if ($this->isColumnModified(BatchJobLogPeer::STATUS)) $criteria->add(BatchJobLogPeer::STATUS, $this->status);
 		if ($this->isColumnModified(BatchJobLogPeer::ABORT)) $criteria->add(BatchJobLogPeer::ABORT, $this->abort);
 		if ($this->isColumnModified(BatchJobLogPeer::CHECK_AGAIN_TIMEOUT)) $criteria->add(BatchJobLogPeer::CHECK_AGAIN_TIMEOUT, $this->check_again_timeout);
@@ -3504,7 +3504,7 @@ abstract class BaseBatchJobLog extends BaseObject  implements Persistent {
 
 		$copyObj->setDuplicationKey($this->duplication_key);
 
-		$copyObj->setJobStatus($this->job_status);
+		$copyObj->setLogStatus($this->log_status);
 
 		$copyObj->setStatus($this->status);
 
