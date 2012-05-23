@@ -18,10 +18,6 @@ class KalturaBulkUploadXmlJobData extends KalturaBulkUploadJobData
 	();
 
 	
-	public function __construct()
-	{
-	}
-	
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
@@ -35,9 +31,9 @@ class KalturaBulkUploadXmlJobData extends KalturaBulkUploadJobData
 		return parent::toObject($dbData);
 	}
 	
-    public function toInsertableObject()
+    public function toInsertableObject($object_to_fill = null , $props_to_skip = array())
 	{
-	    $dbObj = parent::toInsertableObject();
+	    $dbObj = parent::toInsertableObject($object_to_fill, $props_to_skip);
 	    
 	    $this->setType();
 	    
