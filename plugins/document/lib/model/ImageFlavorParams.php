@@ -3,7 +3,7 @@
  * @package plugins.document
  * @subpackage model
  */
-class ImageFlavorParams extends flavorParams implements ImageFlavorParamsInterface
+class ImageFlavorParams extends flavorParams
 {
 	const CUSTOM_DATA_FIELD_DENSITY_WIDTH = 'densityWidth';
 	const CUSTOM_DATA_FIELD_DENSITY_HEIGHT = 'densityHeight';

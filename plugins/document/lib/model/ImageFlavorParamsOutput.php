@@ -3,7 +3,7 @@
  * @package plugins.document
  * @subpackage model
  */
-class ImageFlavorParamsOutput extends  flavorParamsOutput implements ImageFlavorParamsInterface
+class ImageFlavorParamsOutput extends  flavorParamsOutput
 {
 	/**
 	 * Applies default values to this object.

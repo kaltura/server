@@ -3,7 +3,7 @@
  * @package plugins.document
  * @subpackage model
  */
-class PdfFlavorParams extends flavorParams implements PdfFlavorParamsInterface
+class PdfFlavorParams extends flavorParams
 {
 	const CUSTOM_DATA_FIELD_READONLY = 'readonly';
 	

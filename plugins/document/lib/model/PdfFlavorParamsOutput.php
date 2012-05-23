@@ -3,7 +3,7 @@
  * @package plugins.document
  * @subpackage model
  */
-class PdfFlavorParamsOutput extends flavorParamsOutput implements PdfFlavorParamsInterface
+class PdfFlavorParamsOutput extends flavorParamsOutput
 {
 	/**
 	 * Applies default values to this object.

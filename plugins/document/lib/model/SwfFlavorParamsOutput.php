@@ -3,7 +3,7 @@
  * @package plugins.document
  * @subpackage model
  */
-class SwfFlavorParamsOutput extends flavorParamsOutput implements SwfFlavorParamsInterface
+class SwfFlavorParamsOutput extends flavorParamsOutput
 {
 	/**
 	 * Applies default values to this object.
