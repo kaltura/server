@@ -31,7 +31,10 @@ class KOperationManager
 	protected static function createNewEngine($type, KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data)
 	{
 		// TODO - remove after old version deprecated
-		if(!$data->flavorParamsOutput->engineVersion)
+		/*
+		 * The 'flavorParamsOutput' is not set only for SL/ISM collections - that is definently old engine' flow
+		 */
+		if(!isset($data->flavorParamsOutput) || !$data->flavorParamsOutput->engineVersion)
 		{
 			return new KOperationEngineOldVersionWrapper($type, $taskConfig, $data);
 		}
