@@ -24,6 +24,9 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public function shouldConsumeDeletedEvent (BaseObject $object)
     {
+        if (!defined("taggedObjectType::". strtoupper(get_class($object))))
+            return;
+        
         if (property_exists($object, self::TAGS_FIELD_NAME) && $object->getTags() != "")
         {
             return true;
@@ -48,6 +51,9 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public function shouldConsumeCreatedEvent (BaseObject $object)
     {
+        if (!defined("taggedObjectType::". strtoupper(get_class($object))))
+            return;
+        
         if (property_exists($object, self::TAGS_FIELD_NAME) && $object->getTags() != "")
         {
             return true;
@@ -77,6 +83,8 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public function shouldConsumeChangedEvent (BaseObject $object, array $modifiedColumns)
     {
+        if (!defined("taggedObjectType::". strtoupper(get_class($object))))
+            return;
         
         if (property_exists($object, self::TAGS_FIELD_NAME) && in_array(self::getClassConstValue(get_class($object->getPeer()), self::TAGS_FIELD_NAME), $modifiedColumns) )
         {
