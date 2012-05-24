@@ -325,6 +325,9 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		    "privacy",
 		    "inheritance",
 		    "owner",
+			"userJoinPolicy",
+		    "appearInList",
+		    "defaultPermissionLevel",
 		);
 	}
 	
