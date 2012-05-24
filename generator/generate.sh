@@ -19,6 +19,7 @@ rm -fr ../batch/client/*
 rm -fr ../tests/lib/*
 
 rsync -avC $output_path/php5ZendClientAdminConsole/ ../admin_console/lib
+rsync -avC $output_path/php5ZendClientVarConsole/ ../var_console/lib
 rsync -avC $output_path/batchClient/ ../batch/client
 rsync -avC  $output_path/testsClient/* ../tests/lib
 

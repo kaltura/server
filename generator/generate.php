@@ -273,7 +273,7 @@ foreach($config as $name => $item)
 	
 	//delete the api services xml schema file
 	if ($fromXml)
-		unlink("temp.xml");
+		//unlink("temp.xml");
 		
 
 	if (count($files) == 0)
