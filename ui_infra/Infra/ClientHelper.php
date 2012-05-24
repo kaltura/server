@@ -14,16 +14,16 @@ class Infra_ClientHelper
 	
 	public static function unimpersonate()
 	{
-		$config = self::$client->getConfig();
+		$config = self::getClient()->getConfig();
 		$config->partnerId = self::getPartnerId();
-		self::$client->setConfig($config);
+		self::getClient()->setConfig($config);
 	}
 	
 	public static function impersonate($partnerId)
 	{
-		$config = self::$client->getConfig();
+		$config = self::getClient()->getConfig();
 		$config->partnerId = $partnerId;
-		self::$client->setConfig($config);
+		self::getClient()->setConfig($config);
 	}
 	
 	public static function getPartnerId()
@@ -65,7 +65,9 @@ class Infra_ClientHelper
 	public static function getClient()
 	{
 		if(self::$client)
+		{
 			return self::$client;
+		}
 
 		if (!class_exists('Kaltura_Client_Client'))
 			throw new Exception('Kaltura client not found, maybe it wasn\'t generated');
@@ -88,7 +90,6 @@ class Infra_ClientHelper
 		
 		$client = new Kaltura_Client_Client($config);
 		$client->setKs($ks);
-			
 		self::$client = $client;
 		
 		return $client;
