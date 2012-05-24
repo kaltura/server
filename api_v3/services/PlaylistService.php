@@ -35,7 +35,6 @@ class PlaylistService extends KalturaEntryService
 	
 	protected function partnerGroup()
 	{
-		// required in order to load flavor params of partner zero
 		if ($this->actionName == 'execute')
 			return parent::partnerGroup() . ',0';
 
