@@ -27,6 +27,11 @@ class BulkUploadResultEntry extends BulkUploadResult
     const THUMBNAIL_URL = "thumbnail_url";
     const THUMBNAIL_SAVED = "thumbnail_saved";
     const ENTRY_STATUS = "entry_status";
+    const CREATOR_ID = "creator_id";
+    const ENTITLED_USERS_PUBLISH = "entitled_users_publish";
+    const ENTITLED_USERS_EDIT = "entitled_users_edit";
+    
+    
     
 	
 	/* (non-PHPdoc)
@@ -169,6 +174,15 @@ class BulkUploadResultEntry extends BulkUploadResult
 	
 	public function getThumbnailSaved()	{return $this->getFromCustomData(self::THUMBNAIL_SAVED, null, parent::getThumbnailSaved());}
 	public function setThumbnailSaved($v)	{$this->putInCustomData(self::THUMBNAIL_SAVED, $v);}
+	
+	public function getCreatorId()	{return $this->getFromCustomData(self::CREATOR_ID, null);}
+	public function setCreatorId($v)	{$this->putInCustomData(self::CREATOR_ID, $v);}
+	
+	public function getEntitledUsersEdit()	{return $this->getFromCustomData(self::ENTITLED_USERS_EDIT, null);}
+	public function setEntitledUsersEdit($v)	{$this->putInCustomData(self::ENTITLED_USERS_EDIT, $v);}
+	
+	public function getEntitledUsersPublish()	{return $this->getFromCustomData(self::ENTITLED_USERS_PUBLISH, null);}
+	public function setEntitledUsersPublish($v)	{$this->putInCustomData(self::ENTITLED_USERS_PUBLISH, $v);}
 	
     public function getEntryStatus()	
     {

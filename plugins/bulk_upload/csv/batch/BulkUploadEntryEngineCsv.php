@@ -379,6 +379,10 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	    $ret = $this->getV2Columns();
 	    $ret[] = 'entryId';
 	    $ret[] = 'action';
+	    $ret[] = 'creatorId';
+	    $ret[] = 'entitledUsersEdit';
+	    $ret[] = 'entitledUsersPublish';
+	    
 	    return $ret;
 	}
 	
