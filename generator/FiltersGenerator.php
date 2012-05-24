@@ -224,6 +224,9 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 				{
 					$filterProp = $this->formatFilterPropertyName($filter, $prop->getName());
 					$filterPropType = $prop->getType();
+					if($filterPropType == 'bool')
+						$filterPropType = 'KalturaNullableBoolean';
+					
 					$filterDynamicType = null;
 					if (in_array($filter, array(baseObjectFilter::IN, baseObjectFilter::NOT_IN, baseObjectFilter::MATCH_OR, baseObjectFilter::MATCH_AND)))
 					{

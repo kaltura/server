@@ -9,7 +9,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		parent::ClientGeneratorFromXml($xmlFilePath, "sources/as3");
 	}
 	
-	function getSingleLineCommentMarker()
+	protected function getSingleLineCommentMarker()
 	{
 		return '//';
 	}
@@ -82,11 +82,11 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$str .= "	import com.kaltura.vo." . $xml->attributes()->base . ";\n\n";
 		else if( $this->base_client_dir == "flex_client" )
 		{
-			$str .= "	import com.kaltura.vo.BaseFlexVo;\n";
+			$str .= "	import com.kaltura.vo.BaseFlexVo;\n\n";
 		}
 		else //Must be flash client
 		{
-			$str .= "	import com.kaltura.vo.BaseFlashVo;\n";
+			$str .= "	import com.kaltura.vo.BaseFlashVo;\n\n";
 		}
 			
 		if( $this->base_client_dir == "flex_client" )
@@ -112,19 +112,56 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$type = "*";
 			switch($child->attributes()->type)
 			{
-				case "string" : $type = "String = null"; break;
-				case "float" : $type = "Number = Number.NEGATIVE_INFINITY"; break;
-				case "int" : $type = "int = int.MIN_VALUE"; break;
-				case "bool" : $type = "Boolean"; break;
-				case "array" : $type = "Array = null"; break;
+				case "string" : 
+					$type = "String = null"; 
+					break;
+					
+				case "float" : 
+					$type = "Number = Number.NEGATIVE_INFINITY"; 
+					break;
+					
+				case "int" : 
+					$type = "int = int.MIN_VALUE"; 
+					break;
+					
+				case "bool" : 
+					$type = "Boolean"; 
+					break;
+					
+				case "array" : 
+					$type = "Array = null"; 
+					break;
+					
 				default :
 					$type = $child->attributes()->type; 
 					$str = $this->addImport2String( "	import com.kaltura.vo." .  $type , $str );
 				break;
 			}
-			$str .= "		/** \n";
-			$str .= "		* " . $child->attributes()->description ;
-			$str .= "		* */ \n";
+			
+			if($this->generateDocs)
+			{
+				$str .= "		/**\n";
+			
+				if(strlen(trim($child->attributes()->description, " \n\r\t")))
+				{
+					$descriptionLines = explode("\n", $child->attributes()->description);
+					foreach($descriptionLines as $descriptionLine)
+					{
+						$descriptionLine = trim($descriptionLine, " \t\r");
+						$str .= "		 * $descriptionLine\n";
+					}
+				}
+				
+				if($child->attributes()->enumType)
+				{
+					$str .= "		 * @see com.kaltura.types." . $child->attributes()->enumType . "\n";
+				}
+				elseif($child->attributes()->type == 'bool')
+				{
+					$str .= "		 * @see com.kaltura.types.kalturaBoolean\n";
+				}
+				$str .= "		 **/\n";
+			}
 			$str .= "		public var " . $child->attributes()->name . " : " . $type . ";\n\n"; 
 		}
 
@@ -133,9 +170,12 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		if($xml->attributes()->base)
 			$str .= "		override public function getUpdateableParamKeys():Array\n";
 		else {
-			$str .= "		/** \n";
-			$str .= "		* a list of attributes which may be updated on this object \n";
-			$str .= "		* */ \n";
+			if($this->generateDocs)
+			{
+				$str .= "		/** \n";
+				$str .= "		 * a list of attributes which may be updated on this object \n";
+				$str .= "		 **/ \n";
+			}
 			$str .= "		public function getUpdateableParamKeys():Array\n";
 		}
 
@@ -160,9 +200,12 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		if($xml->attributes()->base)
 			$str .= "		override public function getInsertableParamKeys():Array\n";
 		else {
-			$str .= "		/** \n";
-			$str .= "		* a list of attributes which may only be inserted when initializing this object \n";
-			$str .= "		* */ \n";
+			if($this->generateDocs)
+			{
+				$str .= "		/** \n";
+				$str .= "		 * a list of attributes which may only be inserted when initializing this object \n";
+				$str .= "		 **/ \n";
+			}
 			$str .= "		public function getInsertableParamKeys():Array\n";
 		}
 
@@ -181,7 +224,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		}
 			
 		$str .= "			return arr;\n";	
-		$str .= "		}\n\n";
+		$str .= "		}\n";
 		
 		
 		////////////////////////////////////////////////
@@ -387,6 +430,24 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				$str .= "	import com.kaltura.net.KalturaCall;\n";
 				
 			$str .= "\n";
+			
+			if($this->generateDocs)
+			{
+				$str .= "	/**\n";
+				
+				if(strlen(trim($child->attributes()->description, " \n\r\t")))
+				{
+					$descriptionLines = explode("\n", $child->attributes()->description);
+					foreach($descriptionLines as $descriptionLine)
+					{
+						$descriptionLine = trim($descriptionLine, " \t\r");
+						$str .= "	 * $descriptionLine\n";
+					}
+				}
+				
+				$str .= "	 **/\n";
+			}
+			
 			$str .= "	public class " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . " " ;
 			
 			if(count($fileAttributesNames))
@@ -405,11 +466,15 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			{
 				$str .= "		public var filterFields : String;\n";
 			}
+			$str .= "		\n";
 			
-			$str .= "		/**\n";
-			foreach($const_doc_params as $const_doc_param)
-			$str .= "		 * @param $const_doc_param\n";
-			$str .= "		 **/\n";
+			if($this->generateDocs)
+			{
+				$str .= "		/**\n";
+				foreach($const_doc_params as $const_doc_param)
+					$str .= "		 * @param $const_doc_param\n";
+				$str .= "		 **/\n";
+			}
 			
 			$str .= "		public function " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "( " . $const_props . " )\n";
 			$str .= "		{\n";
@@ -613,33 +678,6 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		return $str;
 	}
 	
-	private function getObjectProps($type)
-	{
-		$val_arr = array();
-		foreach ( $this->xml->classes->children() as $k_class) //TODO: SEE IF XML CAN DO IT WITHOUT LOOPING
-		{
-			if($k_class->attributes()->name == rtrim($type) )
-			{
-				if($k_class->attributes()->base)
-					$val_arr = array_merge( $val_arr, $this->getObjectProps( $k_class->attributes()->base )	);
-				
-				foreach($k_class->children() as $prop)
-					array_push( $val_arr , $prop->attributes()->name);
-			}
-		}
-		
-		//TODO: ADD THE BASE ATTRIBUTES
-		return $val_arr;
-	}
-	
-	private function getDelegateParseFunction()
-	{
-		foreach($xml->children() as $child)
-		{
-			$res = "override public function parse( result : XML ) : * {";
-		}
-	}
-	
 	private function write2File( $filename , $contents )
 	{
 		$this->addFile($filename, $contents);
@@ -652,4 +690,3 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		return $str;
 	}
 }
-?>
