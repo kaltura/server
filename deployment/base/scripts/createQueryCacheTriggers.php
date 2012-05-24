@@ -5,7 +5,7 @@ $dryRun = true;
 // Invalidation keys table
 $INVALIDATION_KEYS = array(
 	array('table' => "flavor_asset", 					'keys' => array(array("'flavorAsset:id='", '@OBJ@.id'), array("'flavorAsset:entryId='", '@OBJ@.entry_id')), 							'class' => 'asset'),
-	array('table' => "kuser", 							'keys' => array(array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id'))),
+	array('table' => "kuser", 							'keys' => array(array("'kuser:id='", '@OBJ@.id'), array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id'))),
 	array('table' => "entry", 							'keys' => array(array("'entry:id='", '@OBJ@.id'))),
 	array('table' => "access_control", 					'keys' => array(array("'accessControl:id='", '@OBJ@.id'))),
 	array('table' => "permission", 						'keys' => array(array("'permission:partnerId='", '@OBJ@.partner_id'))),
@@ -14,10 +14,10 @@ $INVALIDATION_KEYS = array(
 	array('table' => "file_sync", 						'keys' => array(array("'fileSync:id='", '@OBJ@.id'), array("'fileSync:objectId='", '@OBJ@.object_id'))),
 	array('table' => "media_info", 						'keys' => array(array("'mediaInfo:flavorAssetId='", '@OBJ@.flavor_asset_id'))),
 	array('table' => "storage_profile", 				'keys' => array(array("'storageProfile:id='", '@OBJ@.id'), array("'storageProfile:partnerId='", '@OBJ@.partner_id'))),
-	array('table' => "ui_conf", 						'keys' => array(array("'uiConf:id='", '@OBJ@.id'))),
+	array('table' => "ui_conf", 						'keys' => array(array("'uiConf:id='", '@OBJ@.id'), array("'uiConf:partnerId='", '@OBJ@.partner_id'))),
 	array('table' => "widget", 							'keys' => array(array("'widget:id='", '@OBJ@.id'))),
 	array('table' => "metadata", 						'keys' => array(array("'metadata:objectId='", '@OBJ@.object_id')), 																		'plugin' => 'metadata'),
-	array('table' => "metadata_profile", 				'keys' => array(array("'metadataProfile:id='", '@OBJ@.id')), 																			'plugin' => 'metadata'),
+	array('table' => "metadata_profile", 				'keys' => array(array("'metadataProfile:id='", '@OBJ@.id'), array("'metadataProfile:partnerId='", '@OBJ@.partner_id')), 				'plugin' => 'metadata'),
 	array('table' => "metadata_profile_field", 			'keys' => array(array("'metadataProfileField:metadataProfileId='", '@OBJ@.metadata_profile_id')),										'plugin' => 'metadata'),
 	array('table' => "partner", 						'keys' => array(array("'partner:id='", '@OBJ@.id'))),
 	array('table' => "cue_point", 						'keys' => array(array("'cuePoint:id='", '@OBJ@.id'), array("'cuePoint:entryId='", '@OBJ@.entry_id')),									'plugin' => 'cue_points/base'),
@@ -25,9 +25,12 @@ $INVALIDATION_KEYS = array(
 	array('table' => "flavor_params_output", 			'keys' => array(array("'flavorParamsOutput:id='", '@OBJ@.id'), array("'flavorParamsOutput:flavorAssetId='", '@OBJ@.flavor_asset_id')),	'class' => 'assetParamsOutput'),
 	array('table' => "entry_distribution", 				'keys' => array(array("'entryDistribution:entryId='", '@OBJ@.entry_id')),																'plugin' => 'content_distribution'),
 	array('table' => "flavor_params", 					'keys' => array(array("'flavorParams:id='", '@OBJ@.id')),																				'class' => 'assetParams'),
-	array('table' => "flavor_params_conversion_profile",'keys' => array(array("'flavorParamsConversionProfile:flavorParamsId='", '@OBJ@.flavor_params_id', "',conversionProfileId='", '@OBJ@.conversion_profile_id'))),
+	array('table' => "flavor_params_conversion_profile",'keys' => array(array("'flavorParamsConversionProfile:flavorParamsId='", '@OBJ@.flavor_params_id', "',conversionProfileId='", '@OBJ@.conversion_profile_id'), array("'flavorParamsConversionProfile:conversionProfileId='", '@OBJ@.conversion_profile_id'))),
 	array('table' => "user_role", 						'keys' => array(array("'userRole:id='", '@OBJ@.id'))),
 	array('table' => "invalid_session", 				'keys' => array(array("'invalidSession:ks='", '@OBJ@.ks'))),
+	array('table' => "upload_token", 					'keys' => array(array("'uploadToken:id='", '@OBJ@.id'))),
+	array('table' => "conversion_profile_2", 			'keys' => array(array("'conversionProfile2:partnerId='", '@OBJ@.partner_id'))),
+	array('table' => "distribution_profile", 			'keys' => array(array("'distributionProfile:id='", '@OBJ@.id')),																		'plugin' => 'content_distribution'),
 	);
 
 $TRIGGER_TYPES = array('INSERT', 'UPDATE', 'DELETE');
