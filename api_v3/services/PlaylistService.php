@@ -13,7 +13,7 @@ class PlaylistService extends KalturaEntryService
 //	public function initService($serviceId, $serviceName, $actionName)
 //	{
 //		parent::initService($serviceId, $serviceName, $actionName);
-//		parent::applyPartnerFilterForClassNoKalturaNetwork ( new accessControlPeer() );
+//		parent::applyPartnerFilterForClass(new EntryPeer());
 //	}
 
 	/* (non-PHPdoc)
@@ -33,13 +33,11 @@ class PlaylistService extends KalturaEntryService
 		return parent::kalturaNetworkAllowed($actionName);
 	}
 	
-	protected function partnerGroup()
+	protected function globalPartnerAllowed($actionName)
 	{
 		if ($this->actionName == 'execute')
-			return parent::partnerGroup() . ',0';
-
-		return parent::partnerGroup();
-	}
+			return true;
+	} 
 	
 	protected function partnerRequired($actionName)
 	{
