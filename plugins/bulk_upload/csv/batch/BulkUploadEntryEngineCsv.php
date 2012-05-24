@@ -148,6 +148,15 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 		    	
 		    if($bulkUploadResult->partnerData)
 		    	$mediaEntry->partnerData = $bulkUploadResult->partnerData;
+		    	
+		    if($bulkUploadResult->creatorId)
+		    	$mediaEntry->creatorId = $bulkUploadResult->creatorId;
+		    	
+		    if($bulkUploadResult->entitledUsersEdit)
+		    	$mediaEntry->entitledUsersEdit = $bulkUploadResult->entitledUsersEdit;
+		    	
+		    if($bulkUploadResult->entitledUsersPublish)
+		    	$mediaEntry->entitledUsersPublish = $bulkUploadResult->entitledUsersPublish;
 		}
 			
 		//Set the content type
@@ -393,27 +402,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	 */
 	protected function parseColumns($headers)
 	{
-		$validColumns = $this->getV2Columns();
-		$ret = array();
-		$plugins = array();
-		
-		foreach($headers as $index => $header)
-		{
-			$header = trim($header, '* ');
-			if(in_array($header, $validColumns))
-			{
-				$ret[$index] = $header;
-			}
-			else
-			{
-				$plugins[$index] = $header;
-			}
-		}
-		
-		if(count($plugins))
-			$ret['plugins'] = $plugins;
-			
-		return $ret;
+		return parent::parseColumns($headers);
 	}
 
 	
