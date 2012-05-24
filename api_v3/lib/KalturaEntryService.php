@@ -1143,7 +1143,7 @@ class KalturaEntryService extends KalturaBaseService
 	protected function createDummyKShow()
 	{
 		$kshow = new kshow();
-		$kshow->setName("DUMMY KSHOW FOR API V3");
+		$kshow->setName(kshow::DUMMY_KSHOW_NAME);
 		$kshow->setProducerId($this->getKuser()->getId());
 		$kshow->setPartnerId($this->getPartnerId());
 		$kshow->setSubpId($this->getPartnerId() * 100);
