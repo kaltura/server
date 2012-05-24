@@ -356,7 +356,7 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	public $fileSizeGreaterThan;
 
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 */
 	public $lastWorkerRemoteEqual;
 

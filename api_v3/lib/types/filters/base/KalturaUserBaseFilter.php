@@ -96,7 +96,7 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 */
 	public $isAdminEqual;
 }

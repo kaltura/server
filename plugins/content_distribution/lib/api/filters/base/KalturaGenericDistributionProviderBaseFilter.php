@@ -81,7 +81,7 @@ abstract class KalturaGenericDistributionProviderBaseFilter extends KalturaDistr
 	public $partnerIdIn;
 
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 */
 	public $isDefaultEqual;
 
