@@ -1,3 +1,4 @@
+import pywintypes
 import win32print
 import win32con
 import win32api
@@ -100,7 +101,7 @@ commandParams.append('/NoStart')
 inputFileExt = os.path.splitext(inputFile)[1].lower()
 if readOnly and inputFileExt == '.pdf':
     commandParams.append('/IF"%s"' % inputFile)
-    commandParams.append('/OF"%s.pdf"' % outputFile)
+    commandParams.append('/OF"%s"' % outputFile)
 else:
     commandParams.append('/PF"%s"' % inputFile)
 

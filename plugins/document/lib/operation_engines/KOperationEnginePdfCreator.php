@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package plugins.document
  * @subpackage lib
@@ -20,7 +21,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	 * @var KSchedularTaskConfig
 	 */
 	private $taskConfiguration;
-
+	
 	//old office files prefix
 	const OLD_OFFICE_SIGNATURE = "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1";
 	
@@ -81,11 +82,11 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			$realInFilePath = realpath($inFilePath);
 		}
 		
-    	$filePrefix = file_get_contents ( $realInFilePath, false, null, 0, strlen ( self::OLD_OFFICE_SIGNATURE ) );
+		$filePrefix = file_get_contents ( $realInFilePath, false, null, 0, strlen ( self::OLD_OFFICE_SIGNATURE ) );
 		$path_info = pathinfo ( $realInFilePath );
 		$ext = $path_info ['extension'];
-		$ext =  strtolower($ext);
 		$newOfficeExtensions = Array ('pptx', 'docx', 'xlsx' );
+		$ext =  strtolower($ext);
 		//checks if $realInFilePath is an old office document with a new extension ('pptx|docx|xlsx')
 		//if $realInFilePath is not the fileSync itself ($uniqueName = true) , rename the file by removing the 'x' from the extension.		
 		if ($uniqueName && in_array ( $ext, $newOfficeExtensions ) && $filePrefix == self::OLD_OFFICE_SIGNATURE) {
@@ -96,17 +97,22 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			}
 		}
 		
-		parent::operate($operator, $realInFilePath, $configFilePath);
+		$finalOutputPath = $this->outFilePath;
 		
-		if ($uniqueName) {
-			@unlink($tmpUniqInFilePath);
-		}
-		//TODO: RENAME - will not be needed once PDFCreator can work with a configurations file
 		if (($inputExtension == 'pdf') && ($this->flavorParamsOutput->readonly == true)){
 			$tmpFile = $this->outFilePath.'.pdf';
 		}else{
 			$tmpFile = kFile::replaceExt(basename($realInFilePath), 'pdf');
 			$tmpFile = dirname($this->outFilePath).'/'.$tmpFile;
+		}
+		$this->outFilePath = $tmpFile;
+		
+		parent::operate($operator, $realInFilePath, $configFilePath);
+
+		$this->outFilePath = $finalOutputPath;
+		
+		if ($uniqueName) {
+			@unlink($tmpUniqInFilePath);
 		}
 		
 		$sleepTimes = $this->taskConfiguration->fileExistReties;
