@@ -22,6 +22,8 @@ class kQueryCache
 	const QUERY_DB_MASTER = 1;
 	const QUERY_DB_SLAVE = 2;
 	
+	const CACHE_VERSION = '1';
+	
 	protected static $s_memcacheKeys = null;
 	protected static $s_memcacheQueries = null;
 	protected static $s_memcacheInited = false;
@@ -66,6 +68,12 @@ class kQueryCache
 				$columnName = $invalidationKeyRule[$colIndex];
 				$criterion = $criteria->getCriterion($columnName);
 				if (!$criterion)
+				{
+					$invalidationKeys = null;
+					break;
+				}
+				
+				if (in_array(Criterion::ODER, $criterion->getConjunctions()))
 				{
 					$invalidationKeys = null;
 					break;
@@ -116,6 +124,11 @@ class kQueryCache
 		// if the criteria has an empty IN, no need to go to the DB or memcache - return an empty array
 		foreach ($criteria->getMap() as $criterion)
 		{
+			if (in_array(Criterion::ODER, $criterion->getConjunctions()))
+			{
+				continue;
+			}
+			
 			if ($criterion->getComparison() == Criteria::IN && !$criterion->getValue())
 			{
 				KalturaLog::debug("kQueryCache: criteria has empty IN, returning empty result set, peer=$peerClassName");
@@ -195,7 +208,7 @@ class kQueryCache
 		}
 		
 		// check whether we have a valid cached query
-		$origCacheKey = self::CACHE_PREFIX_QUERY.$queryType.md5(serialize($criteria));
+		$origCacheKey = self::CACHE_PREFIX_QUERY.$queryType.md5(serialize($criteria) . self::CACHE_VERSION);
 		if ($cacheQuery)
 		{
 			$cacheKey = $origCacheKey; 
@@ -211,7 +224,7 @@ class kQueryCache
 			return null;
 		}
 		
-		list($queryResult, $queryTime) = $queryResult;
+		list($queryResult, $queryTime, $debugInfo) = $queryResult;
 		
 		$existingInvKeys = array();
 		foreach ($cacheResult as $invalidationKey => $invalidationTime)
@@ -220,7 +233,7 @@ class kQueryCache
 			
 			if ($queryTime < $invalidationTime + self::INVALIDATION_TIME_MARGIN_SEC)
 			{
-				KalturaLog::debug("kQueryCache: cached query invalid, peer=$peerClassName, key=$origCacheKey, invkey=$invalidationKey querytime=$queryTime invtime=$invalidationTime");
+				KalturaLog::debug("kQueryCache: cached query invalid, peer=$peerClassName, key=$origCacheKey, invkey=$invalidationKey querytime=$queryTime debugInfo=$debugInfo invtime=$invalidationTime");
 				return null;
 			}
 		}
@@ -228,7 +241,7 @@ class kQueryCache
 		// return from memcache
 		$existingInvKeys = implode(',', $existingInvKeys);
 		
-		KalturaLog::debug("kQueryCache: returning from memcache, peer=$peerClassName, key=$origCacheKey queryTime=$queryTime invkeys=[$existingInvKeys]");
+		KalturaLog::debug("kQueryCache: returning from memcache, peer=$peerClassName, key=$origCacheKey queryTime=$queryTime debugInfo=$debugInfo invkeys=[$existingInvKeys]");
 		return $queryResult;
 	}
 	
@@ -239,10 +252,14 @@ class kQueryCache
 		{
 			return;
 		}
+
+		$uniqueId = new UniqueId();
+		$debugInfo = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : '');
+		$debugInfo .= "[$uniqueId]";
 		
 		$queryTime = time();
 		KalturaLog::debug("kQueryCache: Updating memcache, key=$cacheKey queryTime=$queryTime");
-		self::$s_memcacheQueries->set($cacheKey, array($queryResult, $queryTime), self::CACHED_QUERIES_EXPIRY_SEC);
+		self::$s_memcacheQueries->set($cacheKey, array($queryResult, $queryTime, $debugInfo), self::CACHED_QUERIES_EXPIRY_SEC);
 	}
 	
 	public static function invalidateQueryCache($object)
