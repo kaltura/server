@@ -3,6 +3,9 @@
 // Define path to application directory
 defined('APPLICATION_PATH')
     || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../'));
+    
+defined('UI_INFRA_PATH')
+    || define('UI_INFRA_PATH', realpath(dirname(__FILE__) . '/../../ui_infra'));
 
 // Define application environment
 defined('APPLICATION_ENV')
