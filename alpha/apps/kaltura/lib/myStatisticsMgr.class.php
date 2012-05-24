@@ -65,7 +65,7 @@ class myStatisticsMgr
 	public static function addEntry ( entry $entry )
 	{
 		return;
-		$kshow = $entry->getkshow();
+		/*$kshow = $entry->getkshow();
 		if ( $kshow )
 		{
 			$v = $kshow->getEntries();
@@ -96,13 +96,14 @@ class myStatisticsMgr
 		}
 
 		self::add ( $kshow );
-		self::add ( $kuser );
+		self::add ( $kuser );*/
 	}
 
 	//- will increment kuser.entries, kshow.entries & kshow.contributors
 	public static function deleteEntry ( entry $entry )
 	{
-		$kshow = $entry->getkshow();
+		return;
+		/*$kshow = $entry->getkshow();
 		if ($kshow)
 		{
 			$v = $kshow->getEntries();
@@ -135,7 +136,7 @@ class myStatisticsMgr
 	
 			self::add ( $kshow );
 			self::add ( $kuser );
-		}
+		}*/
 	}
 	
 	//- will increment kuser.produced_kshows
