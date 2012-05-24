@@ -91,6 +91,11 @@ class KalturaRequestDeserializer
 				if (array_key_exists($name, $this->paramsGrouped))
 				{
 					$enumValue = $this->paramsGrouped[$name];
+					if(strtolower($enumValue) == 'true')
+						$enumValue = 1;
+					if(strtolower($enumValue) == 'false')
+						$enumValue = 0;
+						
 					if (!$actionParam->getTypeReflector()->checkEnumValue($enumValue))
 						throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $enumValue, $name, $actionParam->getType());
 					
