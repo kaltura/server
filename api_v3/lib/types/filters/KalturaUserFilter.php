@@ -75,7 +75,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	public $idIn;
 	
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 */
 	public $loginEnabledEqual;
 	
