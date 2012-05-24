@@ -20,6 +20,8 @@ class kshow extends Basekshow
 	const KSHOW_ID_USE_DEFAULT = -1;
 	const KSHOW_ID_CREATE_NEW = -2;
 	
+	const DUMMY_KSHOW_NAME = "DUMMY KSHOW FOR API V3";
+	
 	private $skin_container = null;
 	private $m_show_entry = null;
 	private $m_intro = null;
@@ -234,7 +236,9 @@ class kshow extends Basekshow
 		{
 			$is_new = true;
 			$this->setId(self::calculateId());
-			myStatisticsMgr::addKshow( $this );
+			
+			if ($this->getName() != self::DUMMY_KSHOW_NAME)
+				myStatisticsMgr::addKshow( $this );
 		}
 
 		myPartnerUtils::setPartnerIdForObj( $this );
@@ -254,7 +258,8 @@ class kshow extends Basekshow
 
 	public function delete(PropelPDO $con = null)
 	{
-		myStatisticsMgr::deleteKshow( $this );
+		if ($this->getName() != self::DUMMY_KSHOW_NAME)
+			myStatisticsMgr::deleteKshow( $this );
 
 		parent::delete( $con );
 	}
