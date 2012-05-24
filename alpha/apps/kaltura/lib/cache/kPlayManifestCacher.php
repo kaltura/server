@@ -67,6 +67,7 @@ class kPlayManifestCacher
 		unset($params['playbackContext']);
 		
 		$params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+		$params['___cache___host'] = @$_SERVER['HTTP_HOST'];
 
 		// take only the hostname part of the referrer parameter of baseEntry.getContextData
 		if (isset($params['referrer']))
@@ -79,7 +80,7 @@ class kPlayManifestCacher
 		
 		ksort($params);
 
-		$this->_cacheKey = md5( http_build_query($params) );
+		$this->_cacheKey = 'playManifest-' . md5( http_build_query($params) );
 
 		$this->_cacheWrapper = kCacheManager::getCache(kCacheManager::FS_PLAY_MANIFEST);
 	}
@@ -101,7 +102,7 @@ class kPlayManifestCacher
 		$startTime = microtime(true);
 		if ($this->_ksValidated)
 		{
-			$response = $this->_cacheWrapper->get($this->_cacheKey, self::CACHE_EXPIRY);
+			$response = $this->_cacheWrapper->get($this->_cacheKey);
 			if ($response)
 			{
 				$processingTime = microtime(true) - $startTime;
@@ -162,6 +163,6 @@ class kPlayManifestCacher
 		$requiredFiles = $renderer->getRequiredFiles();
 		$serializedRenderer = serialize($renderer);
 	
-		$this->_cacheWrapper->set($this->_cacheKey, array($requiredFiles, $serializedRenderer), self::CACHE_EXPIRY, self::CACHE_EXPIRY);
+		$this->_cacheWrapper->set($this->_cacheKey, array($requiredFiles, $serializedRenderer), self::CACHE_EXPIRY);
 	}
 }
