@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__FILE__) . '/../requestUtils.class.php');
 require_once(dirname(__FILE__) . '/../../../../../infra/cache/kCacheManager.php');
 
 // NOTE: this code runs before the API dispatcher - should not use Propel / autoloader
@@ -165,10 +166,22 @@ class kSessionBase
 			$this->isWidgetSession())			// Since anyone can create a widget session, no need to check for invalidation
 			return true;
 
+		$allPrivileges = explode(',', $this->privileges);
+		foreach($allPrivileges as $priv)
+		{
+			$exPrivileges = explode(':', $priv);
+			if (count($exPrivileges) == 2 && 
+				$exPrivileges[0] == self::PRIVILEGE_IP_RESTRICTION &&
+				$exPrivileges[1] != requestUtils::getRemoteAddress())
+			{
+				return false;
+			}
+		}
+
 		$isInvalidated = $this->isKSInvalidated();
 		if ($isInvalidated === null || $isInvalidated)
 			return false;						// KS is invalidated, or failed to check
-	
+
 		return true;
 	}
 	

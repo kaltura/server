@@ -22,7 +22,7 @@ class kSessionUtils
 				$desired_expiry_in_seconds = 	$ks_max_expiry_in_seconds;
 
 			$ks = new ks();
-			$ks->valid_until = time() + $desired_expiry_in_seconds ; // store in milliseconds to make comparison easier at validation time
+			$ks->valid_until = kApiCache::getTime() + $desired_expiry_in_seconds ; // store in milliseconds to make comparison easier at validation time
 			$ks->type = ks::TYPE_KS;
 			$ks->partner_id = $partner_id;
 			$ks->partner_pattern = $partner_id;
@@ -62,7 +62,7 @@ class kSessionUtils
 			//	echo "startKSession: from DB: $ks_max_expiry_in_seconds | desired: $desired_expiry_in_seconds " ;
 
 			$ks = new ks();
-			$ks->valid_until = time() + $desired_expiry_in_seconds ; // store in milliseconds to make comparison easier at validation time
+			$ks->valid_until = kApiCache::getTime() + $desired_expiry_in_seconds ; // store in milliseconds to make comparison easier at validation time
 //			$ks->type = $admin ? ks::TYPE_KAS : ks::TYPE_KS;
 			if ( $admin == false )
 				$ks->type = ks::TYPE_KS;
@@ -99,7 +99,7 @@ class kSessionUtils
 			$desired_expiry_in_seconds = 	$ks_max_expiry_in_seconds;
 */
 		$ks = new ks();
-		$ks->valid_until = time() + $desired_expiry_in_seconds ; // store in milliseconds to make comparison easier at validation time
+		$ks->valid_until = kApiCache::getTime() + $desired_expiry_in_seconds ; // store in milliseconds to make comparison easier at validation time
 //			$ks->type = $admin ? ks::TYPE_KAS : ks::TYPE_KS;
 		if ( $admin == false )
 			$ks->type = ks::TYPE_KS;
