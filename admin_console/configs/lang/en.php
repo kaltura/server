@@ -261,7 +261,7 @@ return array(
 	'Kaltura_Client_Enum_PartnerGroupType::PUBLISHER' => 'Publisher Account',
 	'Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP' => 'VAR Parent Account (Non-Aggreagated Billing)',
 	'Kaltura_Client_Enum_PartnerGroupType::GROUP' => 'Group Parent Account (Aggregated Billing)',
-
+    'Kaltura_Client_Enum_PartnerGroupType::TEMPLATE' => 'Template Account',
 
 	// login
 	'login error' => 'Invalid credentials provided',
