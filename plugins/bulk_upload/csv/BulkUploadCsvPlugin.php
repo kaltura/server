@@ -196,6 +196,9 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			$values[] = $bulkUploadResult->getScheduleEndDate('Y-m-d\TH:i:s');
 			$values[] = $bulkUploadResult->getThumbnailUrl();
 			$values[] = $bulkUploadResult->getPartnerData();
+			$values[] = $bulkUploadResult->getCreatorId();
+			$values[] = $bulkUploadResult->getEntitledUsersEdit();
+			$values[] = $bulkUploadResult->getEntitledUsersPublish();
 		}
 		
 		return $values;
