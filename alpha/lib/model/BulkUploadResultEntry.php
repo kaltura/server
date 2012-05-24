@@ -85,7 +85,6 @@ class BulkUploadResultEntry extends BulkUploadResult
 		}
 		
 		$this->setThumbnailSaved(true);
-		$this->save();
 	}
 	
 	/* (non-PHPdoc)
