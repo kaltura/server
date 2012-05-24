@@ -425,22 +425,8 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 					
-		// if the entry does not belong to the partner but "display_in_search = 2"
-		// we want to turn off the criteria over the assetPeer
-		if($dbEntry->getPartnerId() != $this->getPartnerId() &&
-		   $dbEntry->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK)
-		{
-			assetPeer::setUseCriteriaFilter(false);
-		}
-			
 		$flavorAssetsDb = assetPeer::retrieveFlavorsByEntryId($entryId);
-
-		// re-set default criteria to avoid fetching "private" flavors in laetr queries.
-		// this should be also set in baseService, but we better do it anyway.
-		assetPeer::setUseCriteriaFilter(true);
-		
 		$flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb);
-		
 		return $flavorAssets;
 	}
 	
@@ -462,6 +448,42 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$pager)
 			$pager = new KalturaFilterPager();
 			
+		// verify access to the relevant entries - either same partner as the KS or kaltura network
+		if ($filter->entryIdEqual)
+		{
+			$entryIds = array($filter->entryIdEqual);
+		}
+		else if ($filter->entryIdIn)
+		{
+			$entryIds = explode(',', $filter->entryIdIn);
+		}
+		else
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'KalturaAssetFilter::entryIdEqual/KalturaAssetFilter::entryIdIn');
+		}
+
+		$c = new Criteria();
+		$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
+		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $this->getPartnerId());
+		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
+		$c->addAnd($criterionPartnerOrKn);
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		$dbEntries = entryPeer::doSelect($c);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		
+		if (!$dbEntries)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, implode(',', $entryIds));
+		
+		$entryIds = array();
+		foreach ($dbEntries as $dbEntry)
+		{
+			$entryIds[] = $dbEntry->getId();
+		}
+
+		$filter->entryIdEqual = null;
+		$filter->entryIdIn = implode(',', $entryIds);
+
+		// get the flavors
 		$flavorAssetFilter = new AssetFilter();
 		
 		$filter->toObject($flavorAssetFilter);
@@ -501,24 +523,15 @@ class FlavorAssetService extends KalturaAssetService
 		$c->addAnd($criterionPartnerOrKn);
 		// there could only be one entry because the query is by primary key.
 		// so using doSelectOne is safe.
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		$dbEntry = entryPeer::doSelectOne($c);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		// if the entry does not belong to the partner but "display_in_search = 2"
-		// we want to turn off the criteria over the assetPeer
-		if($dbEntry->getPartnerId() != $this->getPartnerId() &&
-		   $dbEntry->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK)
-		{
-			assetPeer::setUseCriteriaFilter(false);
-		}
 		$flavorAssetsDb = assetPeer::retrieveReadyWebByEntryId($entryId);
 		if (count($flavorAssetsDb) == 0)
 			throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND);
-		
-		// re-set default criteria to avoid fetching "private" flavors in laetr queries.
-		// this should be also set in baseService, but we better do it anyway.
-		assetPeer::setUseCriteriaFilter(true);
 			
 		$flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb);
 		
