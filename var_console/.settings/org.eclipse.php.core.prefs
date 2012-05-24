@@ -1,0 +1,5 @@
+#Mon May 14 13:20:47 IDT 2012
+eclipse.preferences.version=1
+include_path=0;/var_console\u00055;org.zend.php.framework.CONTAINER\u00052;/ui_infra\u00052;/infra\u00052;/vendor
+phpVersion=php5.3
+use_asp_tags_as_php=false

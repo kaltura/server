@@ -1,0 +1,163 @@
+<p><?php echo $this->translate('partner-list-by-user intro text'); ?></p>
+<?php echo $this->form; ?>
+<div id="results" class="clear">
+	<?php $count = $this->paginator->getItemsCount(); ?>
+	<h2><?php echo $this->translate('Results'); ?><span> (<?php echo $count; ?> <?php echo $this->translate(array('publisher', 'publishers', $count)); ?>)</span></h2>
+	<span class="hint"><?php if ($this->commercialFiltered) { echo $this->translate('partner-list commercial filtered'); } ?></span>
+	<table class="clear">
+		<thead>
+			<tr>
+				<th><?php echo $this->translate('ID'); ?></th>
+				<th><?php echo $this->translate('Publisher Name'); ?></th>
+				<th><?php echo $this->translate('Options'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<td colspan="16"><?php echo $this->paginator; ?></td>
+			</tr>
+		</tfoot>
+		<tbody>
+			<?php foreach($this->paginator as /* Kaltura_Client_Type_Partner */ $partner): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $partner->id; ?></td>
+				<td><?php echo $partner->name; ?></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, <?php echo $partner->id; ?>)">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<?php if (Infra_AclHelper::isAllowedPartner($partner->id, $partner->partnerPackage)): ?>
+							<?php if ($partner->status != Kaltura_Client_Enum_PartnerStatus::FULL_BLOCK): ?>
+								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')): ?>
+									<option value="manage" ><?php echo $this->translate('Multi-Publisher Console login'); ?></option>
+								<?php endif; ?>	
+							<?php endif; ?>
+						<?php endif; ?>							
+					</select>
+				</td>
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+jQuery('#filter_type').change(function() {
+	if(this.value == "none") {
+		$("#filter_text").css("display","none");
+		$("div.help").hide();
+	}
+	else {
+		$("#filter_text").css("display","inline");
+		$("#filter_text input").focus();
+		if(this.value == "free")
+			$("div.help").show();
+		else
+			$("div.help").hide();
+	}
+});
+// <div class="help" title="<?php //echo this_tooltip_text ?>"></div>
+
+jQuery('#filter_type').change();
+
+
+function doAction(action, partnerId) {
+	if (action && eval('typeof ' + action) == 'function')
+	{
+		f = eval(action);
+		Array.prototype.shift.apply(arguments);
+		f.apply(this, arguments);
+	}
+	jQuery('select.options').val('');
+}
+
+function manage(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'var-console-redirect', 'partner_id' => ''), null, true); ?>' + partnerId;
+	window.open(url);
+}
+
+</script>
+
+<script type="text/javascript">
+jQuery('#filter_type').change(function() {
+	if(this.value == "none") {
+		$("#filter_text").css("display","none");
+		$("div.help").hide();
+	}
+	else {
+		$("#filter_text").css("display","inline");
+		$("#filter_text input").focus();
+		if(this.value == "free")
+			$("div.help").show();
+		else
+			$("div.help").hide();
+	}
+});
+// <div class="help" title="<?php //echo this_tooltip_text ?>"></div>
+
+jQuery('#filter_type').change();
+
+function doAction(action, partnerId) {
+	if (action && eval('typeof ' + action) == 'function')
+	{
+		f = eval(action);
+		Array.prototype.shift.apply(arguments);
+		f.apply(this, arguments);
+	}
+	jQuery('select.options').val('');
+}
+
+jQuery(function() {
+	$("#configure-dialog").dialog({
+		bgiframe: true,
+		autoOpen: false,
+		height: 300,
+		modal: true,
+		buttons: {
+			'Create an account': function() {
+				var bValid = true;
+				allFields.removeClass('ui-state-error');
+	
+				bValid = bValid && checkLength(name,"username",3,16);
+				bValid = bValid && checkLength(email,"email",6,80);
+				bValid = bValid && checkLength(password,"password",5,16);
+	
+				bValid = bValid && checkRegexp(name,/^[a-z]([0-9a-z_])+$/i,"Username may consist of a-z, 0-9, underscores, begin with a letter.");
+				// From jquery.validate.js (by joern), contributed by Scott Gonzalez: http://projects.scottsplayground.com/email_address_validation/
+				bValid = bValid && checkRegexp(email,/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i,"eg. ui@jquery.com");
+				bValid = bValid && checkRegexp(password,/^([0-9a-zA-Z])+$/,"Password field only allow : a-z 0-9");
+				
+				if (bValid) {
+					$('#users tbody').append('<tr>' +
+						'<td>' + name.val() + '</td>' + 
+						'<td>' + email.val() + '</td>' + 
+						'<td>' + password.val() + '</td>' +
+						'</tr>'); 
+					$(this).dialog('close');
+				}
+			},
+			Cancel: function() {
+				$(this).dialog('close');
+			}
+		},
+		close: function() {
+			allFields.val('').removeClass('ui-state-error');
+		}	
+	});
+});
+
+<?php
+
+// add javascript "pluginControllerUrl variable to be used by plugins javascript code
+echo 'var pluginControllerUrl = \''.$this->url(array('controller' => 'plugin'), null, true).'\';'.PHP_EOL.PHP_EOL;
+
+// add javascript from plugin pages 
+$pluginActionJavascriptStr = '';
+foreach ($this->partnerActionPluginPages as $partnerActionPluginPage)
+{
+	$pluginActionJavascriptStr .= $partnerActionPluginPage->getPublisherAdminActionJavascript().PHP_EOL.PHP_EOL;						
+}
+
+echo $pluginActionJavascriptStr;
+
+?>
+</script>
