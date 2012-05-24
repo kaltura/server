@@ -2533,9 +2533,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function getCategoriesEntryIds()
 	{
 		//TODO implement select with pagers
-		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
-		$c->addAnd(categoryEntryPeer::ENTRY_ID, $this->getId());
-		$allCategoriesEntry = categoryEntryPeer::doSelect($c);
+		$allCategoriesEntry = categoryEntryPeer::retrieveByEntryId($this->getId());
 		
 		$categoriesEntryIds = array();
 		foreach($allCategoriesEntry as $categoryEntry)
@@ -2845,7 +2843,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function getSphinxFieldsEscapeType($fieldName)
 	{
-		return SphinxFieldEscapeType::DEFAULT_ESCAPE;
+		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 	}
 	
 /**
