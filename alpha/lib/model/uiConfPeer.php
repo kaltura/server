@@ -34,6 +34,6 @@ class uiConfPeer extends BaseuiConfPeer
 		
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("uiConf:id=%s", self::ID));		
+		return array(array("uiConf:id=%s", self::ID), array("uiConf:partnerId=%s", self::PARTNER_ID));		
 	}
 }

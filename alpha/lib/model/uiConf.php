@@ -742,6 +742,6 @@ class uiConf extends BaseuiConf implements ISyncableFile
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("uiConf:id=".$this->getId());
+		return array("uiConf:id=".$this->getId(), "uiConf:partnerId=".$this->getPartnerId());
 	}
 }

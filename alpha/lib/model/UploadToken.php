@@ -90,4 +90,8 @@ class UploadToken extends BaseUploadToken
 	{
 		return $this->getkuser()->getPuserId();
 	}
+	public function getCacheInvalidationKeys()
+	{
+		return array("uploadToken:id=".$this->getId());
+	}
 }

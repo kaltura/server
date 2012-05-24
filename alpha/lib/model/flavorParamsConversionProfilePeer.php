@@ -73,6 +73,6 @@ class flavorParamsConversionProfilePeer extends BaseflavorParamsConversionProfil
 	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("flavorParamsConversionProfile:flavorParamsId=%s,conversionProfileId=%s", self::FLAVOR_PARAMS_ID, self::CONVERSION_PROFILE_ID));		
+		return array(array("flavorParamsConversionProfile:flavorParamsId=%s,conversionProfileId=%s", self::FLAVOR_PARAMS_ID, self::CONVERSION_PROFILE_ID), array("flavorParamsConversionProfile:conversionProfileId=%s", self::CONVERSION_PROFILE_ID));		
 	}
 }

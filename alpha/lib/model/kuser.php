@@ -1060,7 +1060,7 @@ class kuser extends Basekuser implements IIndexable
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("kuser:partnerId=".$this->getPartnerId().",puserid=".$this->getPuserId());
+		return array("kuser:id=".$this->getId(), "kuser:partnerId=".$this->getPartnerId().",puserid=".$this->getPuserId());
 	}
 	
 	/* (non-PHPdoc)

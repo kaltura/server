@@ -57,4 +57,8 @@ class conversionProfile2Peer extends BaseconversionProfile2Peer
 		$stmt = conversionProfile2Peer::doSelectStmt($criteria, $con);
 		return $stmt->fetchAll(PDO::FETCH_COLUMN);
 	}
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("conversionProfile2:partnerId=%s", self::PARTNER_ID));		
+	}
 }
