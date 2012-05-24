@@ -392,7 +392,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			
 			if(!is_null($sourceObject) && 
 				(($this->appearInList != null && $this->appearInList != KalturaAppearInListType::PARTNER_ONLY) ||
-				($this->appearInList != null && $sourceObject->getAppearInList() != DisplayInSearchType::PARTNER_ONLY) || 
+				($this->appearInList != null && $sourceObject->getDisplayInSearch() != DisplayInSearchType::PARTNER_ONLY) || 
 				($this->privacy != null && $this->privacy != KalturaPrivacyType::ALL) ||
 				($this->privacy != null && $sourceObject->getPrivacy() != KalturaPrivacyType::ALL)))
 			{
