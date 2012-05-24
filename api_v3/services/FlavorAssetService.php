@@ -419,7 +419,9 @@ class FlavorAssetService extends KalturaAssetService
 		$c->addAnd($criterionPartnerOrKn);
 		// there could only be one entry because the query is by primary key.
 		// so using doSelectOne is safe.
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		$dbEntry = entryPeer::doSelectOne($c);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 					

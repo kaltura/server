@@ -118,7 +118,7 @@ class Tag extends BaseTag implements IIndexable
     
 	public function getSphinxFieldsEscapeType($fieldName)
 	{
-		return SphinxFieldEscapeType::DEFAULT_ESCAPE;
+		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 	}
 
 } // Tag

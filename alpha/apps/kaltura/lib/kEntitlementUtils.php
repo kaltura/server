@@ -17,7 +17,6 @@ class kEntitlementUtils
 	
 	public static function getEntitlementEnforcement()
 	{
-		return false;
 		return self::$entitlementEnforcement;
 	}
 	
@@ -75,7 +74,8 @@ class kEntitlementUtils
 				return true; 
 	
 			// entry that doesn't belong to any category is public
-			if(trim($entry->getCategories()) == '')
+			$categoryEntries = categoryEntryPeer::retrieveByEntryId($entry->getId());
+			if(!count($categoryEntries))
 				return true;
 					
 			// kuser is set on the category as member

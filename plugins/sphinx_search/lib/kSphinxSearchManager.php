@@ -242,7 +242,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 
 		foreach ($sphinxPluginsData as $key => $value){			
 			if (!is_numeric($value)){
-				$value = SphinxUtils::escapeString($value, SphinxFieldEscapeType::DEFAULT_ESCAPE, 1);
+				$value = SphinxUtils::escapeString($value, SearchIndexFieldEscapeType::DEFAULT_ESCAPE, 1);
 				$search = array("\0", 	"\n",	"\r",	"\x1a");
 				$replace = array("\\0", "\\n",	"\\r",	"\\Z");
 				$value = str_replace($search, $replace, $value);

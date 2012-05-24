@@ -496,5 +496,132 @@ class EntitlementTest extends EntitlementTestBase
 		
 	}
 	
+	/**
+	 * Tests testBackwardCopmatEntryCategoryAdd
+	 * @param KalturaCategory $category
+	 * @param KalturaBaseEntry $entry
+	 * @dataProvider provideData
+	 */
+	public function testEntryCategoryAdd($category, $entry)
+	{
+		$this->startSession($this->client);
+					
+		$entry = $this->client->baseEntry->add($entry);
+
+		/* @var $category KalturaCategory */
+		$category->name = $category->name . time() . rand();
+		$category = $this->client->category->add($category);
+		
+		$categoryCategoryEntry = new KalturaCategoryEntry();
+		$categoryCategoryEntry->categoryId = $category->id;
+		$categoryCategoryEntry->entryId = $entry->id;
+		
+		try {
+			$categoryEntryResponse = $this->client->categoryEntry->add($categoryCategoryEntry);
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::err('Error: line:' . __LINE__ .' ' . $ex->getMessage());
+			
+			if ($ex->getCode() != 'CATEGORY_NOT_FOUND' && $category->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
+			{			
+				$this->assertTrue(true, 'Category is members only and cannot get this entry');
+			}
+			elseif($category->contributionPolicy != KalturaContributionPolicyType::ALL)
+			{
+				$this->assertTrue(true, 'not allowed to add entry to category');
+			}
+			else
+			{
+				$this->assertTrue(false, 'Fialed to add entry to category');
+			}
+			return;
+		}
+		
+		try{
+			$entry = $this->client->baseEntry->get($entry->id);
+		}
+		catch (Exception $ex)
+		{
+			$this->assertTrue(false, 'Fialed to get entry to category: ' . $ex->getMessage());
+			return;
+		}
+		
+		if($entry->categories != $category->fullName)
+			$this->assertTrue(false, 'CategoryEntry new service didnt update entry->categories');
+			
+		$updatedCategory = new KalturaCategory();
+		$updatedCategory->name = $category->name .' new name';
+			
+		try{
+			$category = $this->client->category->update($category->id, $updatedCategory);
+			$this->client->baseEntry->index($entry->id);
+		}
+		catch (Exception $ex)
+		{
+			$this->assertTrue(false, 'Fialed to update entry: '  . $ex->getMessage());
+			return;
+		}
+
+		try{
+			$entry = $this->client->baseEntry->get($entry->id);
+		}
+		catch (Exception $ex)
+		{
+			$this->assertTrue(false, 'Fialed to get entry to category: ' . $ex->getMessage());
+			return;
+		}
+		
+		if($entry->categories != $category->fullName)
+			$this->assertTrue(false, 'CategoryEntry new service didnt update entry->categories: ' . $ex->getMessage());
+		
+	}
+	
+	/**
+	 * Tests testBackwardCopmatEntryCategoriesAdd
+	 * @param string $categoryName
+	 * @param KalturaBaseEntry $entry
+	 * @dataProvider provideData
+	 */
+	public function testBackwardCopmatEntryCategoriesAdd($categoryName, $entry)
+	{
+		$this->startSession($this->client);
+					
+		$categoryName = $categoryName . time() . rand();
+		$entry->categories = $categoryName;
+		$entry = $this->client->baseEntry->add($entry);
+
+		if($entry->categories != $categoryName)
+			$this->assertTrue(false, 'Category was not set on entry');
+			
+		$categoryId = $entry->categoriesIds;
+		
+		try {
+			$category = $this->client->category->get($categoryId);
+		}
+		catch(Exception $ex)
+		{
+			$this->assertTrue(false, 'Category was not found');
+		}
+		
+		if($category->fullName != $categoryName)
+			$this->assertTrue(false, 'Category full name is not as created');
+		
+		$filter = new KalturaCategoryEntryFilter();
+		$filter->categoryIdEqual = $category->id;
+		$filter->entryIdEqual = $entry->id;
+		 
+		try{
+			$categoryEntryResponse = $this->client->categoryEntry->listAction($filter);
+		}
+		catch (Exception $ex)
+		{
+			$this->assertTrue(false, 'Fialed to get category entry ');
+			return;
+		}
+		
+		if($categoryEntryResponse->objects && count($categoryEntryResponse->objects) != 1)
+			$this->assertTrue(false, 'CategoryEntry was not created');
+	}
 }
 

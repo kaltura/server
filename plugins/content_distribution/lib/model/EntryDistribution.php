@@ -445,6 +445,6 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	
 	public function getSphinxFieldsEscapeType($fieldName)
 	{
-		return SphinxFieldEscapeType::DEFAULT_ESCAPE;
+		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 	}
 } // EntryDistribution

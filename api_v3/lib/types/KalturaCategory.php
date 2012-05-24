@@ -382,6 +382,24 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		if($this->privacyContext != null && kEntitlementUtils::getEntitlementEnforcement())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT);
 			
+		if($this->privacyContext != null || $this->privacyContext != '') 
+		{
+			if(is_null($sourceObject) && ($this->appearInList != null && $this->appearInList != KalturaAppearInListType::PARTNER_ONLY) ||
+				($this->privacy != null && $this->privacy != KalturaPrivacyType::ALL))
+			{
+				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT);
+			}
+			
+			if(!is_null($sourceObject) && 
+				(($this->appearInList != null && $this->appearInList != KalturaAppearInListType::PARTNER_ONLY) ||
+				($this->appearInList != null && $sourceObject->getAppearInList() != DisplayInSearchType::PARTNER_ONLY) || 
+				($this->privacy != null && $this->privacy != KalturaPrivacyType::ALL) ||
+				($this->privacy != null && $sourceObject->getPrivacy() != KalturaPrivacyType::ALL)))
+			{
+				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT);
+			}
+		}
+			
 		if (($this->inheritanceType == KalturaInheritanceType::INHERIT) && 
 			($this->parentId == null) && 
 			(!is_null($sourceObject)) && $sourceObject->getParentId())

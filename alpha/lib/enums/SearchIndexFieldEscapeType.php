@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.sphinxSearch
+ * @package Core
  * @subpackage model.enum
- */
-interface SphinxFieldEscapeType extends BaseEnum 
+ */ 
+interface SearchIndexFieldEscapeType extends BaseEnum 
 {
 	const DEFAULT_ESCAPE  = '1';
 	const STRIP  = '2';

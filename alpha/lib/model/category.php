@@ -1314,6 +1314,12 @@ class category extends Basecategory implements IIndexable
 	public function reSetPrivacyContext()
 	{
 		$this->setPrivacyContext($this->getPrivacyContext());
+		
+		if($this->getPrivacyContexts() == '')
+		{
+			$this->setPrivacy(PrivacyType::ALL);
+			$this->setDisplayInSearch(DisplayInSearchType::PARTNER_ONLY);
+		}
 	}
 	
 	public function getSearchIndexPrivacyContext()
@@ -1347,13 +1353,13 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	public static $sphinxFieldsEscapeType = array(
-		'full_name' => SphinxFieldEscapeType::STRIP,
+		'full_name' => SearchIndexFieldEscapeType::STRIP,
 	);
 	
 	public function getSphinxFieldsEscapeType($fieldName)
 	{
 		if(!isset(self::$sphinxFieldsEscapeType[$fieldName]))
-			return SphinxFieldEscapeType::DEFAULT_ESCAPE;
+			return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 			
 		return self::$sphinxFieldsEscapeType[$fieldName];
 	}

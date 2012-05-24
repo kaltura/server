@@ -53,6 +53,14 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		return self::doSelectOne($c);
 	}
 	
+	public static function retrieveByEntryId($entryId)
+	{
+		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entryId);
+		
+		return categoryEntryPeer::doSelect($c);
+	}
+	
 	public static function selectByEntryId($entryId)
 	{
 		$c = new Criteria();

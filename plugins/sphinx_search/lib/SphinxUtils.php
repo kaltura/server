@@ -4,9 +4,9 @@ class SphinxUtils
 {
 	const REPLACE_CHARS  = 'zzz'; 
 
-	public static function escapeString($str, $escapeType = SphinxFieldEscapeType::DEFAULT_ESCAPE, $iterations = 2)
+	public static function escapeString($str, $escapeType = SearchIndexFieldEscapeType::DEFAULT_ESCAPE, $iterations = 2)
 	{
-		if($escapeType == SphinxFieldEscapeType::DEFAULT_ESCAPE)
+		if($escapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE)
 		{
 			// NOTE: it appears that sphinx performs double decoding on SELECT values, so we encode twice.
 			//		" and ! are escaped once to enable clients to use them, " = exact match, ! = AND NOT
@@ -24,9 +24,14 @@ class SphinxUtils
 				return str_replace($from, $toSingle, $str);
 			}
 		}
-		elseif($escapeType == SphinxFieldEscapeType::STRIP)
+		elseif($escapeType == SearchIndexFieldEscapeType::STRIP)
 		{
-			return preg_replace('/[^\w\d]/' , self::REPLACE_CHARS , trim($str));
+			$str = trim($str);
+			
+			if(substr($str, strlen($str) - 2, 2) == '\*')
+				return preg_replace('/[^\w\d]/' , self::REPLACE_CHARS , substr($str, 0, strlen($str) - 2)) . '\\\*';
+				
+			return preg_replace('/([^\w\d]|_)/' , self::REPLACE_CHARS , $str);
 		}
 	}
 }
