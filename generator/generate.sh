@@ -15,6 +15,7 @@ rm -fr ../cache/generator/*
 php generate.php "$@"
 
 rm -fr ../admin_console/lib/Kaltura/Client
+rm -fr ../var_console/lib/Kaltura/Client
 rm -fr ../batch/client/*
 rm -fr ../tests/lib/*
 
