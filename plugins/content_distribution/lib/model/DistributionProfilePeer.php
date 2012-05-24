@@ -103,4 +103,8 @@ class DistributionProfilePeer extends BaseDistributionProfilePeer
 		return null;
 	}
 	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("distributionProfile:id=%s", self::ID));		
+	}
 } // DistributionProfilePeer

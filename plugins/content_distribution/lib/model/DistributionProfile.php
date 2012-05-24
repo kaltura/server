@@ -413,4 +413,8 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	public function setRecommendedDcForDownload($v)				{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_DC_DOWNLOAD, $v);}
 	public function setRecommendedDcForExecute($v)				{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_DC_EXECUTE, $v);}
 	
+	public function getCacheInvalidationKeys()
+	{
+		return array("distributionProfile:id=".$this->getId());
+	}
 } // DistributionProfile
