@@ -243,6 +243,11 @@ class KalturaFrontController
 				}
 				else
 				{		
+					if ($i != 1)
+					{
+						kMemoryManager::clearMemory();
+					}
+				
 	        		$currentResult = $this->dispatcher->dispatch($currentService, $currentAction, $currentParams);
 	        		// store serialized resposne in cache
 	        		$cache->storeCache(serialize($currentResult));
