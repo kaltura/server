@@ -67,6 +67,9 @@ class Infra_AclHelper
 		return false;
 	}
 	
+	/**
+	 * Refresh the list of partners the user is allowed to access.
+	 */
 	public static function refreshCurrentUserAllowrdPartners() {
 		if (Zend_Auth::getInstance()->hasIdentity()) 
 		{
