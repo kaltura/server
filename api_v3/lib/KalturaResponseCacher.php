@@ -30,41 +30,45 @@ class KalturaResponseCacher
 	const CACHE_STATUS_DISABLED = 2;			// cache was explicitly disabled by calling DisableCache (e.g. getContentData for an entry with access control)
 	
 	// cache modes
-	const CACHE_MODE_NONE = 0;					// no caching should be performed
 	const CACHE_MODE_ANONYMOUS = 1;				// anonymous caching should be performed - the cached response will not be associated with any conditions
 	const CACHE_MODE_CONDITIONAL = 2;			// cache the response along with its matching conditions
 	
 	const CONDITIONAL_CACHE_EXPIRY = 86400;		// 1 day, must not be greater than the expiry of the query cache keys
+	
+	const EXPIRY_MARGIN = 300;
 
+	const CACHE_DELIMITER = "\r\n\r\n";
+	
+	const SUFFIX_DATA =  '.cache';
+	const SUFFIX_RULES = '.rules';
+	
+	protected $_cacheStore = null;
 	protected $_params = array();
-	protected $_cacheFilePrefix = "cache_v3-";
-	protected $_cacheDirectory = "/tmp/";
 	protected $_cacheKey = "";
-	protected $_cacheDataFilePath = "";
-	protected $_cacheHeadersFilePath = "";
-	protected $_cacheLogFilePath = "";
-	protected $_cacheExpiryFilePath = "";
-	protected $_cacheConditionsFilePath = "";
 	protected $_ks = "";
 	protected $_ksObj = null;
 	protected $_ksPartnerId = null;
 	protected $_defaultExpiry = 600;
 	protected $_expiry = 600;
 	protected $_cacheHeadersExpiry = 60; // cache headers for CDN & browser - used  for GET request with kalsig param
+	protected $_contentType = null;
 	
 	protected $_instanceId = 0;
 	
 	protected $_cacheStatus = self::CACHE_STATUS_DISABLED;	// enabled after the KalturaResponseCacher initializes
+	protected $_cacheId = null;							// the cache id ensures that the conditions are in sync with the response buffer
 	protected $_invalidationKeys = array();				// the list of query cache invalidation keys for the current request
 	protected $_invalidationTime = 0;					// the last invalidation time of the invalidation keys
 	protected $_conditionalCacheExpiry = 0;				// the expiry used for conditional caching, if 0 CONDITIONAL_CACHE_EXPIRY will be used 
 	
 	protected $_wouldHaveUsedCondCache = false;			// XXXXXXX TODO: remove this
-
+	
 	protected static $_activeInstances = array();		// active class instances: instanceId => instanceObject
 	protected static $_nextInstanceId = 0;
-		
-	public function __construct($params = null, $cacheDirectory = null, $expiry = 0)
+	
+	protected static $_cacheWarmupInitiated = false;
+	
+	public function __construct($params = null, $cacheType = kCacheManager::FS_API_V3, $expiry = 0)
 	{
 		$this->_instanceId = self::$_nextInstanceId;  
 		self::$_nextInstanceId++;
@@ -72,11 +76,6 @@ class KalturaResponseCacher
 		if ($expiry)
 			$this->_defaultExpiry = $this->_expiry = $expiry;
 			
-		$this->_cacheDirectory = $cacheDirectory ? $cacheDirectory : 
-			rtrim(kConf::get('response_cache_dir'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-		
-		$this->_cacheDirectory .= "cache_v3-".$this->_expiry . DIRECTORY_SEPARATOR;
-		
 		if (!kConf::get('enable_cache'))
 			return;
 			
@@ -110,15 +109,30 @@ class KalturaResponseCacher
 			return;
 		}
 		
+		$this->_cacheStore = kCacheManager::getCache($cacheType);
+		if (!$this->_cacheStore)
+		{
+			self::disableCache();
+			return;
+		}
+		
 		$ks = isset($params['ks']) ? $params['ks'] : '';
 		foreach($params as $key => $value)
 		{
-			if(preg_match('/[\d]+:ks/', $key))
+			if(!preg_match('/[\d]+:ks/', $key))
+				continue;				// not a ks
+
+			if (strpos($value, ':result') !== false)
+				continue;				// the ks is the result of some sub request
+
+			if ($ks && $ks != $value)
 			{
-				if (!$ks && strpos($value, ':result') === false)
-					$ks = $value;
-				unset($params[$key]);
+				self::disableCache();	// several different ks's in a multirequest - don't use cache
+				return;
 			}
+
+			$ks = $value;
+			unset($params[$key]);
 		}
 			
 		unset($params['ks']);
@@ -144,6 +158,7 @@ class KalturaResponseCacher
 		$this->_params["___cache___privileges"] = ($this->_ksObj ? $this->_ksObj->privileges : null);
 		$this->_params['___cache___uri'] = $_SERVER['PHP_SELF'];
 		$this->_params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+		$this->_params['___cache___host'] = @$_SERVER['HTTP_HOST'];
 
 		// take only the hostname part of the referrer parameter of baseEntry.getContextData
 		foreach ($this->_params as $key => $value)
@@ -161,16 +176,7 @@ class KalturaResponseCacher
 		
 		ksort($this->_params);
 
-		$this->_cacheKey = md5( http_build_query($this->_params) );
-
-		// split cache over 16 folders using the cachekey first character
-		// this will reduce the amount of files per cache folder
-		$pathWithFilePrefix = $this->_cacheDirectory . DIRECTORY_SEPARATOR . substr($this->_cacheKey, 0, 2) . DIRECTORY_SEPARATOR . $this->_cacheFilePrefix;
-		$this->_cacheDataFilePath 		= $pathWithFilePrefix . $this->_cacheKey;
-		$this->_cacheHeadersFilePath 	= $pathWithFilePrefix . $this->_cacheKey . ".headers";
-		$this->_cacheLogFilePath 		= $pathWithFilePrefix . $this->_cacheKey . ".log";
-		$this->_cacheExpiryFilePath 	= $pathWithFilePrefix . $this->_cacheKey . ".expiry";
-		$this->_cacheConditionsFilePath = $pathWithFilePrefix . $this->_cacheKey . ".conditions";
+		$this->_cacheKey = 'cache_v3-' . md5( http_build_query($this->_params) );
 	}
 	
 	public static function disableCache()
@@ -237,22 +243,33 @@ class KalturaResponseCacher
 			return false;
 		
 		$startTime = microtime(true);
-		if ($this->hasCache())
+		if (!$this->hasCache())
 		{
-			$response = @file_get_contents($this->_cacheDataFilePath);
-			if ($response)
-			{
-				$processingTime = microtime(true) - $startTime;
-				header("$cacheHeaderName:$cacheHeader,$this->_cacheKey,$processingTime", false);
-
-				// in case of multirequest, we must not condtionally cache the multirequest when a sub request comes from cache
-				// for single requests, the next line has no effect
-				self::disableConditionalCache();
-				return $response;
-			}
+			return false;
 		}
 		
-		return false;				
+		$cacheResult = $this->_cacheStore->get($this->_cacheKey . self::SUFFIX_DATA);
+		if (!$cacheResult)
+		{
+			return false;
+		}
+
+		list($cacheId, $contentType, $response) = explode(self::CACHE_DELIMITER, $cacheResult, 3);
+		if ($this->_cacheId && $this->_cacheId != $cacheId)
+		{
+			return false;
+		}
+
+		$this->_contentType = $contentType;
+		
+		// in case of multirequest, we must not condtionally cache the multirequest when a sub request comes from cache
+		// for single requests, the next line has no effect
+		self::disableConditionalCache();
+
+		$processingTime = microtime(true) - $startTime;
+		header("$cacheHeaderName:$cacheHeader,$this->_cacheKey,$processingTime", false);
+
+		return $response;
 	}
 	
 		
@@ -261,55 +278,52 @@ class KalturaResponseCacher
 		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
 			return;
 					
-		$response = $this->checkCache();
-		
-		if ($response)
+		$response = $this->checkCache();		
+		if (!$response)
 		{
-			// TODO add kaltura warnings
-			$contentTypeHdr = @file_get_contents($this->_cacheHeadersFilePath);
-			if ($contentTypeHdr) {
-				header($contentTypeHdr, true);
-			}	
+			ob_start();
+			return;
+		}
+		
+		if ($this->_contentType) 
+		{
+			header($this->_contentType, true);
+		}	
 
-			// for GET requests with kalsig (signature of call params) return cdn/browser caching headers
-			if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]))
-			{
-				$max_age = $this->_cacheHeadersExpiry;
-				header("Cache-Control: private, max-age=$max_age max-stale=0");
-				header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
-				header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
-			}
-			else
-			{
-				header("Expires: Sun, 19 Nov 2000 08:52:00 GMT", true);
-				header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
-				header("Pragma: no-cache", true);
-			}
-	
-			// for jsonp ignore the callback argument and replace it in result (e.g. callback_4([{...}]);
-			if (@$_REQUEST["format"] == 9)
-			{
-				$callback = @$_REQUEST["callback"];
-				$pos = strpos($response, "(");
-				if ($pos)
-				{
-					$response = $callback.substr($response, $pos);
-				}
-			}
-
-			echo $response;
-			die;
+		// for GET requests with kalsig (signature of call params) return cdn/browser caching headers
+		if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]))
+		{
+			$max_age = $this->_cacheHeadersExpiry;
+			header("Cache-Control: private, max-age=$max_age max-stale=0");
+			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
+			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
 		}
 		else
 		{
-			ob_start();
+			header("Expires: Sun, 19 Nov 2000 08:52:00 GMT", true);
+			header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
+			header("Pragma: no-cache", true);
 		}
+
+		// for jsonp ignore the callback argument and replace it in result (e.g. callback_4([{...}]);
+		if (@$_REQUEST["format"] == 9)
+		{
+			$callback = @$_REQUEST["callback"];
+			$pos = strpos($response, "(");
+			if ($pos)
+			{
+				$response = $callback.substr($response, $pos);
+			}
+		}
+
+		echo $response;
+		die;
 	}
 	
 		
 	public function end()
 	{
-		if ($this->getCacheMode() == self::CACHE_MODE_NONE)
+		if (!$this->getCacheModes())
 			return;
 	
 		$response = ob_get_contents();
@@ -331,24 +345,23 @@ class KalturaResponseCacher
 	}
 	
 	
-	public function storeCache($response, $contentType = null)
+	public function storeCache($response, $contentType = "")
 	{
 		// remove $this from the list of active instances - the request is complete
 		unset(self::$_activeInstances[$this->_instanceId]);
 	
-		$cacheMode = $this->getCacheMode();
-		if ($cacheMode == self::CACHE_MODE_NONE)
+		$cacheModes = $this->getCacheModes();
+		if (!$cacheModes)
 			return;
 
-		// provide cache key in header unless the X-Kaltura header was already set with a value
-		// such as an error code. the header is used for debugging but it also appears in the access_log
-		// and there we rather show the error than the cach key
-
+		// set the X-Kaltura header only if it does not exist or contains 'cache-key'
+		// the header is overwritten for cache-key so that for a multirequest we'll get the key of
+		// the entire request and not just the last request
 		$headers = headers_list();
 		$foundHeader = false;
 		foreach($headers as $header)
 		{
-			if (strpos($header, 'X-Kaltura') === 0)
+			if (strpos($header, 'X-Kaltura') === 0 && strpos($header, 'cache-key') === false)
 			{
 				$foundHeader = true;
 				break;
@@ -356,59 +369,60 @@ class KalturaResponseCacher
 		}
 
 		if (!$foundHeader)
-			header("X-Kaltura:cache-key,".$this->_cacheKey);
-	
-		$this->createDirForPath($this->_cacheLogFilePath);
-		$this->createDirForPath($this->_cacheDataFilePath);
-			
-		file_put_contents($this->_cacheLogFilePath, "cachekey: $this->_cacheKey\n".print_r($this->_params, true)."\n".$response);
+			header("X-Kaltura: cache-key,".$this->_cacheKey);
 		
+		$cacheId = microtime(true) . '_' . getmypid();
+		
+		$cacheRules = array();
+		$maxExpiry = 0;
+		foreach ($cacheModes as $cacheMode)
+		{
+			$expiry = $this->_expiry;
+			$conditions = null;
+			
+			switch ($cacheMode)
+			{
+			case self::CACHE_MODE_CONDITIONAL:
+				$conditions = array($cacheId, array_unique($this->_invalidationKeys), $this->_invalidationTime);
+				if ($this->_conditionalCacheExpiry)
+					$expiry = $this->_conditionalCacheExpiry;
+				else
+					$expiry = self::CONDITIONAL_CACHE_EXPIRY;
+				break;
+
+			case self::CACHE_MODE_ANONYMOUS:
+				if ($expiry == $this->_defaultExpiry)
+				{
+					if (kConf::hasParam("v3cache_expiry"))
+					{
+						$expiryArr = kConf::get("v3cache_expiry");
+						if (array_key_exists($this->_ksPartnerId, $expiryArr))
+							$expiry = $expiryArr[$this->_ksPartnerId];
+					}
+				}
+				break;
+			}
+			
+			$maxExpiry = max($maxExpiry, $expiry);
+			$cacheRules[$cacheMode] = array(time() + $expiry, $expiry, $conditions);
+		}
+	
 		$cachedResponse = null;						// XXXXXXX TODO: remove this
 		if ($this->_wouldHaveUsedCondCache)			// XXXXXXX TODO: remove this
 		{
-			$cachedResponse = @file_get_contents($this->_cacheDataFilePath);
+			$cachedResponse = $this->_cacheStore->get($this->_cacheKey . self::SUFFIX_DATA);
 		}
+
+		// write to the cache
+		$this->_cacheStore->set($this->_cacheKey . self::SUFFIX_RULES, serialize($cacheRules), $maxExpiry + self::EXPIRY_MARGIN);
 		
-		if(!is_null($contentType)) {
-			$this->createDirForPath($this->_cacheHeadersFilePath);
-			file_put_contents($this->_cacheHeadersFilePath, $contentType);
-		}
-
-		if ($cacheMode == self::CACHE_MODE_CONDITIONAL)
-		{
-			// save the cache conditions
-			$conditions = array(array_unique($this->_invalidationKeys), $this->_invalidationTime);
-			file_put_contents($this->_cacheConditionsFilePath, serialize($conditions));
-
-			if ($this->_conditionalCacheExpiry)
-				file_put_contents($this->_cacheExpiryFilePath, time() + $this->_conditionalCacheExpiry);
-		}
-		else
-		{
-			// store specific expiry shorter than the default one
-			if ($this->_expiry == $this->_defaultExpiry)
-			{
-				if (kConf::hasParam("v3cache_expiry"))
-				{
-					$expiryArr = kConf::get("v3cache_expiry");
-					if (array_key_exists($this->_ksPartnerId, $expiryArr))
-						$this->_expiry = $expiryArr[$this->_ksPartnerId];
-				}
-			}
-
-			if ($this->_expiry != $this->_defaultExpiry)
-				file_put_contents($this->_cacheExpiryFilePath, time() + $this->_expiry);
-		}
-		
-		// write the cached response to a temporary file and then rename, to prevent any
-		// other running instance of apache from picking up a partially written response
-		$tempDataFilePath = tempnam(dirname($this->_cacheDataFilePath), basename($this->_cacheDataFilePath));
-		file_put_contents($tempDataFilePath, $response);
-		rename($tempDataFilePath, $this->_cacheDataFilePath);
+		$this->_cacheStore->set($this->_cacheKey . self::SUFFIX_DATA, implode(self::CACHE_DELIMITER, array($cacheId, $contentType, $response)), $maxExpiry);
 		
 		// compare the calculated $response to the previously stored $cachedResponse
 		if ($cachedResponse)			// XXXXXXX TODO: remove this
 		{
+			list($dummy, $cachedContentType, $cachedResponse) = explode(self::CACHE_DELIMITER, $cachedResponse, 3);
+		
 			$pattern = '/\/ks\/[a-zA-Z0-9=]+/';
 			$response = preg_replace($pattern, 'KS', $response);
 			$cachedResponse = preg_replace($pattern, 'KS', $cachedResponse);
@@ -439,6 +453,11 @@ class KalturaResponseCacher
 					break;
 			}
 			
+			if ($cachedContentType != $contentType)
+			{
+				$testResult = false;
+			}
+			
 			if ($testResult)
 				KalturaLog::log('conditional cache check: OK');			// we would have used the cache, and the response buffer do match
 			else
@@ -446,7 +465,10 @@ class KalturaResponseCacher
 				KalturaLog::log('conditional cache check: FAILED key: '.$this->_cacheKey);		// we would have used the cache, but the response buffers do not match
 				
 				$outputFileBase = '/tmp/condCache/' . $this->_cacheKey;
-				@$this->createDirForPath($outputFileBase);
+				if (!is_dir('/tmp/condCache/'))
+				{
+					mkdir('/tmp/condCache/', 0777, true);
+				}				
 				$cachedFileName = $outputFileBase . '-cached';
 				$nonCachedFileName = $outputFileBase . '-new';
 				@file_put_contents($cachedFileName, $cachedResponse);
@@ -460,16 +482,6 @@ class KalturaResponseCacher
 		$this->_expiry = $expiry;
 	}
 	
-	private function createDirForPath($filePath)
-	{
-		$dirname = dirname($filePath);
-		if (!is_dir($dirname))
-		{
-			mkdir($dirname, 0777, true);
-		}
-	}
-	
-
 	private function hasCache()
 	{
 		if ($this->_ks && (!$this->_ksObj || !$this->_ksObj->tryToValidateKS()))
@@ -477,7 +489,6 @@ class KalturaResponseCacher
 	
 		// if the request is for warming the cache, disregard the cache and run the request
 		$warmCacheHeader = self::getRequestHeaderValue(self::WARM_CACHE_HEADER);
-
 		if ($warmCacheHeader !== false)
 		{
 			// if the request triggering the cache warmup was an https request, fool the code to treat the current request as https as well 
@@ -485,62 +496,64 @@ class KalturaResponseCacher
 				$_SERVER["HTTPS"] = "on";
 						
 			// make a trace in the access log of this being a warmup call
-			header("X-Kaltura:cached-warmup-$warmCacheHeader,".$this->_cacheKey);
-			return false;
+			header("X-Kaltura:cached-warmup-$warmCacheHeader,".$this->_cacheKey, false);
 		}
-
-		if (!file_exists($this->_cacheDataFilePath))
+		
+		$cacheRules = $this->_cacheStore->get($this->_cacheKey . self::SUFFIX_RULES);
+		if (!$cacheRules)
 		{
 			// don't have any cached response for this key
 			return false;
 		}
 		
-		// get caching conditions
-		$cacheExpiry = self::safeFileGetContents($this->_cacheExpiryFilePath);
-		$conditions = self::safeFileGetContents($this->_cacheConditionsFilePath);
-
-		// check the expiry
-		if (!$cacheExpiry)
+		$cacheRules = unserialize($cacheRules);	
+		foreach ($cacheRules as $rule)
 		{
-			if ($conditions)
-				$cacheExpiry = filemtime($this->_cacheDataFilePath) + self::CONDITIONAL_CACHE_EXPIRY;
-			else
-				$cacheExpiry = filemtime($this->_cacheDataFilePath) + $this->_expiry;
-		}
-		$cacheTTL = $cacheExpiry - time(); 
-
-		if($cacheTTL <= 0)
-		{
-			// cached response is expired
-			@unlink($this->_cacheDataFilePath);
-			@unlink($this->_cacheLogFilePath);
-			self::safeUnlink($this->_cacheHeadersFilePath);
-			self::safeUnlink($this->_cacheExpiryFilePath);
-			self::safeUnlink($this->_cacheConditionsFilePath);
-			return false;
-		}
-			
-		if ($cacheTTL < self::WARM_CACHE_INTERVAL) // 1 minute left for cache, lets warm it
-		{
-			self::warmCache($this->_cacheDataFilePath);	
-		}
+			list($cacheExpiry, $expiryInterval, $conditions) = $rule;
 		
-		// check the invalidation conditions
-		if ($conditions)
-		{
-			list($invalidationKeys, $cachedInvalidationTime) = unserialize($conditions);
-			$invalidationTime = self::getMaxInvalidationTime($invalidationKeys);
-			if ($invalidationTime === null)		
-				return false;					// failed to get the invalidation time, can't use cache
+			$cacheTTL = $cacheExpiry - time(); 
+			if($cacheTTL <= 0)
+			{
+				// the cache is expired
+				continue;
+			}
 				
-			if ($cachedInvalidationTime < $invalidationTime)
-				return false;					// something changed since the response was cached
+			if ($conditions)
+			{
+				list($this->_cacheId, $invalidationKeys, $cachedInvalidationTime) = $conditions;
+				$invalidationTime = self::getMaxInvalidationTime($invalidationKeys);
+				if ($invalidationTime === null)		
+					continue;					// failed to get the invalidation time from memcache, can't use cache
+					
+				if ($cachedInvalidationTime < $invalidationTime)
+					continue;					// something changed since the response was cached
 
-			$this->_wouldHaveUsedCondCache = true;			// XXXXXXX TODO: remove this
-			return false;									// XXXXXXX TODO: remove this
+				$this->_wouldHaveUsedCondCache = true;			// XXXXXXX TODO: remove this
+				continue;										// XXXXXXX TODO: remove this
+				
+				if (isset($cacheRules[self::CACHE_MODE_ANONYMOUS]))
+				{
+					// since the conditions matched, we can extend the expiry of the anonymous cache
+					list($cacheExpiry, $expiryInterval, $conditions) = $cacheRules[self::CACHE_MODE_ANONYMOUS];
+					$cacheExpiry = time() + $expiryInterval;
+					$cacheRules[self::CACHE_MODE_ANONYMOUS] = array($cacheExpiry, $expiryInterval, $conditions);
+					$this->_cacheStore->set($this->_cacheKey . self::SUFFIX_RULES, serialize($cacheRules), $cacheTTL + self::EXPIRY_MARGIN);
+				}
+			}
+			else if ($warmCacheHeader !== false)
+			{
+				// if there are no conditions and this is a cache warmup request, don't use the cache
+				continue;
+			}
+			else if ($cacheTTL < self::WARM_CACHE_INTERVAL) // 1 minute left for cache, lets warm it
+			{
+				self::warmCache($this->_cacheKey);	
+			}
+			
+			return true;
 		}
 		
-		return true;
+		return false;
 	}
 	
 	private static function getMaxInvalidationTime($invalidationKeys)
@@ -559,25 +572,33 @@ class KalturaResponseCacher
 		return max($cacheResult);
 	}
 
-	private function getCacheMode()
+	private function getCacheModes()
 	{
 		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
-			return self::CACHE_MODE_NONE;
+			return null;
 			
 		$ks = null;
 		try
 		{
 			$ks = kSessionUtils::crackKs($this->_ks);
 		}
-		catch(Exception $e){
+		catch(Exception $e)
+		{
 			KalturaLog::err($e->getMessage());
 			self::disableCache();
-			return self::CACHE_MODE_NONE;
+			return null;
 		}
 		
-		if(!$ks)
-			return self::CACHE_MODE_ANONYMOUS;
+		if ($ks && 
+			(($ks->valid_until && $ks->valid_until < time()) ||	// don't cache when the KS is expired
+			$ks->isSetLimitAction())) 							// don't cache when the KS has a limit on the number of actions
+		{
+			self::disableCache();
+			return null;
+		}
 		
+		$isAnonymous = !$ks || (!$ks->isAdmin() && ($ks->user === "0" || $ks->user === null));
+        
 		// force caching of actions listed in kConf even if admin ks is used
 		if(kConf::hasParam('v3cache_ignore_admin_ks'))
 		{
@@ -595,30 +616,27 @@ class KalturaResponseCacher
 						$matches++;
 				
 				if ($matches == count($ignoreParams))
-					return self::CACHE_MODE_ANONYMOUS;
+				{
+					$isAnonymous = true;
+					break;
+				}
 			}
 		}
-        
-		if (($ks->valid_until && $ks->valid_until < time()) ||	// don't cache when the KS is expired
-			$ks->isSetLimitAction() || 							// don't cache when the KS has a limit on the number of actions
-			$ks->isSetIPRestriction())							// don't cache when the KS is restricted to an IP address
+		
+		if (!$isAnonymous && $this->_cacheStatus == self::CACHE_STATUS_ANONYMOUS_ONLY)
 		{
 			self::disableCache();
-			return self::CACHE_MODE_NONE;
-		}
-        
-		if (!$ks->isAdmin() && ($ks->user === "0" || $ks->user === null)) 	// can use anonymous caching if it's a widget session
-		{
-			return self::CACHE_MODE_ANONYMOUS;
+			return null;
 		}
 		
-		if ($this->_cacheStatus != self::CACHE_STATUS_ANONYMOUS_ONLY)		// use conditional caching if possible
-		{
-			return self::CACHE_MODE_CONDITIONAL;
-		}
+		$result = array();
+		if ($isAnonymous)
+			$result[] = self::CACHE_MODE_ANONYMOUS;
 		
-		self::disableCache();
-		return self::CACHE_MODE_NONE;
+		if ($this->_cacheStatus != self::CACHE_STATUS_ANONYMOUS_ONLY)
+			$result[] = self::CACHE_MODE_CONDITIONAL;
+		
+		return $result;
 	}
 	
 	private static function getRequestHeaderValue($headerName)
@@ -655,9 +673,14 @@ class KalturaResponseCacher
 	// can the warm cache header get received via a warm request passed from the other DC?
 	private function warmCache($key)
 	{
+		if (self::$_cacheWarmupInitiated)
+			return;
+			
+		self::$_cacheWarmupInitiated = true;
+	
 		// require apc for checking whether warmup is already in progress
 		if (!function_exists('apc_fetch'))
-		return;
+			return;
 
 		$key = "cache-warmup-$key";
 
@@ -719,22 +742,6 @@ class KalturaResponseCacher
 		fclose($fp);
 	}
 
-	// This function avoids the 'file does not exist' warning
-	private static function safeFileGetContents($fileName)
-	{
-		if (!file_exists($fileName))
-			return null;
-		return @file_get_contents($fileName);
-	}
-
-	// This function avoids the 'file does not exist' warning
-	private static function safeUnlink($fileName)
-	{
-		if (!file_exists($fileName))
-			return;
-		@unlink($fileName);
-	}
-	
 	private static function handleSessionStart(&$params)
 	{
 		if (!isset($params['service']) || $params['service'] != 'session' ||
