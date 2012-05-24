@@ -8,22 +8,34 @@ abstract class kBaseCacheWrapper
 {	
 	/**
 	 * @param string $key
-	 * @param int $defaultExpiry
 	 * @return mixed or false on error
 	 */
-	abstract public function get($key, $defaultExpiry = 0);
+	abstract public function get($key);
+	
+	/**
+	 * @param string $key
+	 * @param mixed $var
+	 * @param int $expiry
+	 * @return bool false on error
+	 */
+	abstract public function set($key, $var, $expiry = 0);
+
+	/**
+	 * @param string $key
+	 * @return bool false on error
+	 */
+	abstract public function delete($key);
 	
 	/**
 	 * @param array $keys
-	 * @param int $defaultExpiry
 	 * @return array or false on error
 	 */
-	public function multiGet($keys, $defaultExpiry = 0)
+	public function multiGet($keys)
 	{
 		$result = array();
 		foreach ($keys as $key)
 		{
-			$curResult = $this->get($key, $defaultExpiry);
+			$curResult = $this->get($key);
 			if ($curResult !== false)
 			{
 				$result[$key] = $curResult;
@@ -34,12 +46,29 @@ abstract class kBaseCacheWrapper
 
 	/**
 	 * @param string $key
-	 * @param mixed $var
-	 * @param int $expiry
-	 * @param int $defaultExpiry
-	 * @return bool false on error
+	 * @param int $delta
+	 * @return mixed false on error
 	 */
-	abstract public function set($key, $var, $expiry = 0, $defaultExpiry = 0);
+	public function increment($key, $delta = 1)
+	{
+		$curVal = $this->get($key);
+		if ($curVal === false)
+			return false;
+		$curVal += $delta;
+		if ($this->set($key, $curVal) === false)
+			return false;
+		return $curVal;
+	}
+	
+	/**
+	 * @param string $key
+	 * @param int $delta
+	 * @return mixed false on error
+	 */
+	public function decrement($key, $delta = 1)
+	{
+		return $this->increment($key, -$delta);
+	}
 
 	/**
 	 * This function is required since this code can run before the autoloader

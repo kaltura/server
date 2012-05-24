@@ -28,9 +28,9 @@ class kCacheManager
 		self::MC_GLOBAL_KEYS => 	array('Memcache',	'kConf:global_keys_memcache_host', 		'kConf:global_keys_memcache_port',		0),
 		self::MC_GLOBAL_QUERIES => 	array('Memcache',	'kConf:global_queries_memcache_host', 	'kConf:global_queries_memcache_port',	MEMCACHE_COMPRESSED),
 
-		self::FS_API_V3 => 			array('FileSystem',	'kConf:response_cache_dir', 'cache_v3-600', 		'cache_v3-', 	 2, false),
-		self::FS_API_V3_FEED => 	array('FileSystem',	'kConf:global_cache_dir', 	'feed/cache_v3-86400', 	'cache_v3-', 	 2, false),
-		self::FS_PLAY_MANIFEST => 	array('FileSystem',	'kConf:response_cache_dir', 'cache_manifest', 		'playManifest-', 2, true),
+		self::FS_API_V3 => 			array('FileSystem',	'kConf:response_cache_dir', 'cache_v3-600', 		2, false, 600,	 	false),
+		self::FS_API_V3_FEED => 	array('FileSystem',	'kConf:global_cache_dir', 	'feed/cache_v3-86400', 	2, false, 86400,	false),
+		self::FS_PLAY_MANIFEST => 	array('FileSystem',	'kConf:response_cache_dir', 'cache_manifest', 		2, true,  600,		true ),
 	);
 	
 	/**

@@ -8,27 +8,30 @@ require_once(dirname(__FILE__) . '/kBaseCacheWrapper.php');
  */
 class kFileSystemCacheWrapper extends kBaseCacheWrapper
 {
-	const EXPIRY_SUFFIX = '.expiry';
+	const EXPIRY_SUFFIX = '__expiry';
 
 	protected $baseFolder;
-	protected $baseFilename;
 	protected $keyFolderChars;
 	protected $serializeData;
+	protected $defaultExpiry;
+	protected $supportExpiry;
 
 	/**
 	 * @param string $rootFolder
 	 * @param string $baseFolder
-	 * @param string $baseFilename
 	 * @param int $keyFolderChars
 	 * @param bool $serializeData
+	 * @param int $defaultExpiry
+	 * @param bool $supportExpiry
 	 * @return bool false on error
 	 */
-	public function init($rootFolder, $baseFolder, $baseFilename, $keyFolderChars, $serializeData)
+	public function init($rootFolder, $baseFolder, $keyFolderChars, $serializeData, $defaultExpiry, $supportExpiry)
 	{
 		$this->baseFolder = rtrim($rootFolder, '/') . '/' . rtrim($baseFolder, '/') . '/';
-		$this->baseFilename = $baseFilename;
 		$this->keyFolderChars = $keyFolderChars;
 		$this->serializeData = $serializeData;
+		$this->defaultExpiry = $defaultExpiry;
+		$this->supportExpiry = $supportExpiry;
 		return true;
 	}
 	
@@ -40,8 +43,16 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	{
 		$filePath = $this->baseFolder;
 		if ($this->keyFolderChars)
-			$filePath .= substr($key, 0, $this->keyFolderChars) . '/';
-		return $filePath . $this->baseFilename . $key;
+		{
+			$dashPos = strrpos($key, '-');
+			$startPos = 0;
+			if ($dashPos !== false)
+			{
+				$startPos = $dashPos + 1;
+			}
+			$filePath .= substr($key, $startPos, $this->keyFolderChars) . '/';
+		}
+		return $filePath . $key;
 	}
 
 	/**
@@ -59,23 +70,26 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::get()
 	 */
-	public function get($key, $defaultExpiry = 0)
+	public function get($key)
 	{
 		$filePath = $this->getFilePath($key);
 		if (!file_exists($filePath))
 			return false;
-			
-		$cacheExpiry = self::safeFileGetContents($filePath . self::EXPIRY_SUFFIX);
-		if ($cacheExpiry === false)
-		{
-			$cacheExpiry = filemtime($filePath) + $defaultExpiry;		
-		}
 		
-		if ($cacheExpiry && $cacheExpiry <= time())
+		if ($this->supportExpiry)
 		{
-			self::safeUnlink($filePath);
-			self::safeUnlink($filePath . self::EXPIRY_SUFFIX);
-			return false;
+			$cacheExpiry = self::safeFileGetContents($filePath . self::EXPIRY_SUFFIX);
+			if ($cacheExpiry === false && $this->defaultExpiry)
+			{
+				$cacheExpiry = filemtime($filePath) + $this->defaultExpiry;		
+			}
+			
+			if ($cacheExpiry && $cacheExpiry <= time())
+			{
+				self::safeUnlink($filePath);
+				self::safeUnlink($filePath . self::EXPIRY_SUFFIX);
+				return false;
+			}
 		}
 		
 		$result = self::safeFileGetContents($filePath);
@@ -89,7 +103,7 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::set()
 	 */
-	public function set($key, $var, $expiry = 0, $defaultExpiry = 0)
+	public function set($key, $var, $expiry = 0)
 	{
 		$filePath = $this->getFilePath($key);
 		if ($this->serializeData)
@@ -98,7 +112,7 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 		self::createDirForPath($filePath);
 		
 		// write the expiry if non default
-		if ($defaultExpiry != $expiry)
+		if ($this->supportExpiry && $this->defaultExpiry != $expiry)
 		{
 			if (self::safeFilePutContents($filePath . self::EXPIRY_SUFFIX, $expiry ? time() + $expiry : 0) === false)
 				return false;
@@ -107,6 +121,19 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 		return self::safeFilePutContents($filePath, $var);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see kBaseCacheWrapper::delete()
+	 */
+	public function delete($key)
+	{
+		$filePath = $this->getFilePath($key);
+		if ($this->supportExpiry)
+		{
+			self::safeUnlink($filePath . self::EXPIRY_SUFFIX);
+		}
+		return self::safeUnlink($filePath);
+	}
+
 	/**
 	 * @param string $filePath
 	 * @param string $var
@@ -142,13 +169,14 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 
 	/**
 	 * @param string $filePath
+	 * @return bool false on error
 	 */
 	protected static function safeUnlink($filePath)
 	{
 		if (!file_exists($filePath))
 		{
-			return;
+			return false;
 		}
-		@unlink($filePath);
+		return @unlink($filePath);
 	}
 }
