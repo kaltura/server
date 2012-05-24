@@ -276,7 +276,7 @@ class SphinxKuserCriteria extends SphinxCriteria
 				$freeText = str_replace('"', '', $freeTexts);
 				$freeText = SphinxUtils::escapeString($freeText);
 				$freeText = "^$freeText$";
-				$additionalConditions[] = "@(" . kuserFilter::PUSER_ID_OR_SCREEN_NAME . ") \\\*$freeText\\\*";
+				$additionalConditions[] = "@(" . kuserFilter::PUSER_ID_OR_SCREEN_NAME . ") $freeText\\\*";
 			}
 			else
 			{
@@ -295,7 +295,7 @@ class SphinxKuserCriteria extends SphinxCriteria
 							
 					foreach($freeTextsArr as $freeText)
 					{
-						$additionalConditions[] = "@(" . kuserFilter::PUSER_ID_OR_SCREEN_NAME . ") \\\*$freeText\\\*";
+						$additionalConditions[] = "@(" . kuserFilter::PUSER_ID_OR_SCREEN_NAME . ") $freeText\\\*";
 					}
 				}
 				else
@@ -312,7 +312,7 @@ class SphinxKuserCriteria extends SphinxCriteria
 					$freeTextsArr = array_unique($freeTextsArr);
 					$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
 					
-					$additionalConditions[] = "@(" . kuserFilter::PUSER_ID_OR_SCREEN_NAME . ") \\\*$freeTextExpr\\\*";
+					$additionalConditions[] = "@(" . kuserFilter::PUSER_ID_OR_SCREEN_NAME . ") $freeTextExpr\\\*";
 				}
 			}
 			if(count($additionalConditions))
