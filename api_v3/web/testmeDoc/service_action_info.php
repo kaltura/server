@@ -44,7 +44,7 @@ if($actionParams): ?>
 	</tr>
 	<tr>
 		<th class="subtitle">Name</th>
-		<th class="subtitle">Tpe</th>
+		<th class="subtitle">Type</th>
 		<th class="subtitle">Description</th>
 		<th class="subtitle">Required</th>
 		<th class="subtitle">Default Value</th>
