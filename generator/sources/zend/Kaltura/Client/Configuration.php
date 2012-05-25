@@ -47,7 +47,7 @@ class Kaltura_Client_Configuration
 	 */
 	public function __construct($partnerId = -1)
 	{
-	    if (!is_numeric($partnerId))
+	    if ($partnerId && !is_numeric($partnerId))
 	        throw new Kaltura_Client_ClientException("Invalid partner id", Kaltura_Client_ClientException::ERROR_INVALID_PARTNER_ID);
 	        
 	    $this->partnerId = $partnerId;
