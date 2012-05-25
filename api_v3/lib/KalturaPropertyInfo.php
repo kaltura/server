@@ -1,28 +1,76 @@
 <?php
 class KalturaPropertyInfo
 {
+	/**
+	 * @var string class name
+	 */
 	private $_type;
+	
+	/**
+	 * @var string property name
+	 */
 	private $_name;
+	
+	/**
+	 * @var mix
+	 */
 	private $_defaultValue;
 	
 	/**
 	 * @var KalturaTypeReflector
 	 */
 	private $_typeReflector;
+	
+	/**
+	 * @var KalturaTypeReflector
+	 */
 	private $_arrayTypeReflector;
+	
+	/**
+	 * @var bool
+	 */
 	private $_readOnly = false;
+	
+	/**
+	 * @var bool
+	 */
 	private $_insertOnly = false;
+	
+	/**
+	 * @var bool
+	 */
 	private $_writeOnly = false;
+	
+	/**
+	 * @var string
+	 */
 	private $_description;
 	
 	/**
 	 * @var array of strings
 	 */
 	private $_filters = array();
+	
 	private $_dynamicType = null;
+	
+	/**
+	 * @var array
+	 */
 	private $_permissions = array();
+	
+	/**
+	 * @var bool
+	 */
 	private $_deprecated = false;
+	
+	/**
+	 * @var string
+	 */
 	private $_deprecationMessage = null;
+	
+	/**
+	 * @var bool
+	 */
 	private $_serverOnly = false;
 	
 	const READ_PERMISSION_NAME = 'read';
@@ -30,37 +78,59 @@ class KalturaPropertyInfo
 	const INSERT_PERMISSION_NAME = 'insert';
 	const ALL_PERMISSION_NAME = 'all';	
 	
+	/**
+	 * @param string $type class name
+	 * @param string $name property name
+	 */
 	public function KalturaPropertyInfo($type, $name = '')
 	{
 		$this->_type = $type;
 		$this->_name = $name;
 	}
 	
+	/**
+	 * @param string $type class name
+	 */
 	public function setType($type)
 	{
 		$this->_type = $type;
 	}
 	
+	/**
+	 * @return string class name
+	 */
 	public function getType()
 	{
 		return $this->_type;
 	}
 	
+	/**
+	 * @param string $name
+	 */
 	public function setName($name)
 	{
 		$this->_name = $name;
 	}
 	
+	/**
+	 * @return string
+	 */
 	public function getName()
 	{
 		return $this->_name;
 	}
 
+	/**
+	 * @param string $value
+	 */
 	public function setDefaultValue($value)
 	{
 		$this->_defaultValue = $value;
 	}
 	
+	/**
+	 * @return mix
+	 */
 	public function getDefaultValue()
 	{
 		return $this->_defaultValue;
@@ -80,6 +150,9 @@ class KalturaPropertyInfo
 		return $this->_typeReflector;
 	}
 	
+	/**
+	 * @return KalturaTypeReflector
+	 */
 	public function getArrayTypeReflector()
 	{
 		if ($this->_arrayTypeReflector === null)
@@ -91,22 +164,49 @@ class KalturaPropertyInfo
 		return $this->_arrayTypeReflector;
 	}
 	
+	/**
+	 * Returns the name of the constant according to its value 
+	 *
+	 * @param mixed $value
+	 * @return string
+	 */
+	public function getConstantName($value)
+	{
+		$this->getTypeReflector();
+		if ($this->_typeReflector)
+			return $this->_typeReflector->getConstantName($value);
+		else
+			return null;
+	}
+	
+	/**
+	 * @return boolean
+	 */
 	public function isFile()
 	{
 		return $this->_type == 'file';
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function isSimpleType()
 	{
 		$simpleTypes = array("int", "string", "bool", "float");
 		return in_array($this->_type, $simpleTypes);
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function isComplexType()
 	{
 		return !$this->isSimpleType() && !$this->isFile();
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function isEnum()
 	{
 		$this->getTypeReflector();
@@ -116,6 +216,9 @@ class KalturaPropertyInfo
 			return false;
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function isStringEnum()
 	{
 		$this->getTypeReflector();
@@ -125,6 +228,9 @@ class KalturaPropertyInfo
 			return false;
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function isDynamicEnum()
 	{
 		$this->getTypeReflector();
@@ -134,6 +240,9 @@ class KalturaPropertyInfo
 			return false;
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function isArray()
 	{
 		$this->getTypeReflector();
@@ -143,6 +252,9 @@ class KalturaPropertyInfo
 			return false;
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function isAbstract()
 	{
 		$this->getTypeReflector();
@@ -153,6 +265,9 @@ class KalturaPropertyInfo
 			return false;
 	}
 	
+	/**
+	 * @return string
+	 */
 	public function getArrayType()
 	{
 		$this->getTypeReflector();
@@ -172,71 +287,113 @@ class KalturaPropertyInfo
 		return $this->_dynamicType;
 	}
 	
+	/**
+	 * @param bool $value
+	 */
 	public function setReadOnly($value)
 	{
 		$this->_readOnly = $value;
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function isReadOnly()
 	{
 		return $this->_readOnly;
 	}
 	
+	/**
+	 * @param bool $value
+	 */
 	public function setInsertOnly($value)
 	{
 		$this->_insertOnly = $value;
 	}
 	
+	/**
+	 * @param bool $value
+	 */
 	public function setWriteOnly($value)
 	{
 		$this->_writeOnly = $value;
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function isInsertOnly()
 	{
 		return $this->_insertOnly;
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function isWriteOnly()
 	{
 		return $this->_writeOnly;
 	}
 	
+	/**
+	 * @param bool $value
+	 */
 	public function setDeprecated($value)
 	{
 		$this->_deprecated = $value;
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function isDeprecated()
 	{
 		return $this->_deprecated;
 	}
 	
+	/**
+	 * @param string $value
+	 */
 	public function setDeprecationMessage($value)
 	{
 		$this->_deprecationMessage = $value;
 	}
 	
+	/**
+	 * @return string
+	 */
 	public function getDeprecationMessage()
 	{
 		return $this->_deprecationMessage;
 	}
 	
+	/**
+	 * @param bool $value
+	 */
 	public function setServerOnly($value)
 	{
 		$this->_serverOnly = $value;
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function isServerOnly()
 	{
 		return $this->_serverOnly;
 	}
 	
+	/**
+	 * @param string $desc
+	 */
 	public function setDescription($desc)
 	{
 		$this->_description = $desc;
 	}
 	
+	/**
+	 * @return string
+	 */
 	public function getDescription()
 	{
 		return $this->_description;
@@ -267,6 +424,9 @@ class KalturaPropertyInfo
 	}
 	
 	
+	/**
+	 * @param array $permissions
+	 */
 	public function setPermissions($permissions)
 	{
 		if (is_array($permissions))
@@ -281,31 +441,50 @@ class KalturaPropertyInfo
 	}
 	
 	
+	/**
+	 * @return array
+	 */
 	public function getPermissions()
 	{
 		return $this->_permissions;
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function requiresReadPermission()
 	{
 		return in_array(self::READ_PERMISSION_NAME, $this->_permissions);
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function requiresUpdatePermission()
 	{
 		return in_array(self::UPDATE_PERMISSION_NAME, $this->_permissions);
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function requiresInsertPermission()
 	{
 		return in_array(self::INSERT_PERMISSION_NAME, $this->_permissions);
 	}
 	
+	/**
+	 * @return boolean
+	 */
 	public function requiresUsagePermission()
 	{
 		return in_array(self::ALL_PERMISSION_NAME, $this->_permissions);
 	}
 
+	/**
+	 * @param bool $withSubTypes
+	 * @return array 
+	 */
 	public function toArray($withSubTypes = false)
 	{
 		$array = array();
