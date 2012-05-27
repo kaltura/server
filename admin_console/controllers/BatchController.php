@@ -563,6 +563,11 @@ class BatchController extends Zend_Controller_Action
 	}
 
 	
+	public function importInvestigationAction() 
+	{
+	}
+
+	
 	public function exportInvestigationAction() 
 	{
 		$this->_helper->layout->disableLayout();
