@@ -258,7 +258,7 @@ class KImageMagickCropper extends KBaseCropper
 						
 					$attributes[] = $gravity;	
 					$attributes[] = "-crop {$resizeWidth}x{$resizeHeight}+0+0";
-					$attributes[] = $resize;
+					$attributes[] = "-resize {$w}x{$h}";
 					break;
 				case self::RESIZE_WITH_FORCE:
 				    $w = $width ? $width : '';
