@@ -424,7 +424,24 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 			"applications" => array (
 				"detail_without_filter" => "detail_no_filter",
 				"count_without_filter" => "count_no_filter"
+			),
+			"user_usage" => array (
+				"graph_without_filter" => "graph_no_filter",
+				"graph_by_user" => "graph_by_user",
+				"total_without_filter" => "total_no_filter",
+			    "total_by_user" => "total_by_user",
+				"detail_without_filter" => "detail_no_filter",
+				"detail_by_user" => "detail_by_user",
+				"base_total_without_filter" => "user_usage/base_total_no_filter",
+				"base_total_by_user" => "user_usage/base_total_by_user"
+			),
+			"specific_user_usage" => array (
+				"graph_by_user" => "user_usage/graph_by_user",
+			    "total_by_user" => "user_usage/total_by_user",
+				"detail_by_user" => "detail_by_user",
+				"base_total_by_user" => "user_usage/base_total_by_user"
 			)
+			
 		);
 
 		if ( isset ( $map[$type_str] ) )

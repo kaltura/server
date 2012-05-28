@@ -5,6 +5,7 @@ class myReportsMgr
 	const REPORT_FLAVOR_TOTAL= 2;
 	const REPORT_FLAVOR_TABLE= 3;
 	const REPORT_FLAVOR_COUNT = 4;
+	const REPORT_FLAVOR_SUB_TOTAL = 5;
 	
 	const REPORT_TYPE_TOP_CONTENT = 1;
 	const REPORT_TYPE_CONTENT_DROPOFF = 2;
@@ -17,8 +18,8 @@ class myReportsMgr
 	const REPORT_TYPE_ADMIN_CONSOLE = 10;
 	const REPORT_TYPE_USER_ENGAGEMENT = 11;
 	const REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE = 110;
-	const SPEFICIC_USER_ENGAGEMENT = 12;
-	const SPEFICIC_USER_ENGAGEMENT_TOTAL_UNIQUE = 120;
+	const REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT = 12;
+	const REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT_TOTAL_UNIQUE = 120;
 	const REPORT_TYPE_USER_TOP_CONTENT = 13;
 	const REPORT_TYPE_USER_TOP_CONTENT_TOTAL_UNIQUE = 130;
 	const REPORT_TYPE_USER_CONTENT_DROPOFF = 14;
@@ -30,6 +31,8 @@ class myReportsMgr
 	const REPORT_TYPE_PARTNER_BANDWIDTH_USAGE = 200;
 	const REPORT_TYPE_PARTNER_USAGE = 201;
 	const REPORT_TYPE_APPLICATIONS = 16;
+	const REPORT_TYPE_USER_USAGE = 17;
+	const REPORT_TYPE_SPECIFIC_USER_USAGE = 18;
 	
 	const REPORTS_COUNT_CACHE = 60;
 	
@@ -321,6 +324,40 @@ class myReportsMgr
 		return $res;
 	}
 
+	/**
+	 * @param int $partner_id
+	 * @param int $report_type myReportsMgr::REPORT_TYPE_*
+	 * @param reportsInputFilter $input_filter
+	 * @param string $object_ids comma seperated ids
+	 * @return array <columnName, value>
+	 */
+	public static function getSubTotal ( $partner_id , $report_type , reportsInputFilter $input_filter , $object_ids = null )
+	{
+		$start = microtime(true);
+		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_SUB_TOTAL , $input_filter , null , null , null , $object_ids );
+
+		if ( count($result) > 0 )
+		{
+			$row = $result[0];
+			$header = array();
+			$data = array();
+			foreach ( $row as $name => $value )
+			{
+				$header[]= $name;
+				$data[] = $value;
+			}
+			$res = array ( $header , $data );
+		}
+		else
+		{
+			$res =  array ( null , null );
+		}
+		
+		$end = microtime(true);
+		KalturaLog::log( "getSubTotal took [" . ( $end - $start ) . "]" );
+		
+		return $res;
+	}
 	
 	
 	/**
@@ -608,6 +645,23 @@ class myReportsMgr
 				$obj_ids_clause = "ev.entry_id in ( $entryIds )";
 			}
 			
+			if ($input_filter instanceof endUserReportsInputFilter && $input_filter->userIds && ($report_type == self::REPORT_TYPE_USER_USAGE || $report_type == self::REPORT_TYPE_SPECIFIC_USER_USAGE) ) {
+					$userFilter = new kuserFilter();
+					$userFilter->set("_in_puser_id", $input_filter->userIds);
+					$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
+					$userFilter->attachToCriteria($c);
+					$c->applyFilters();
+				
+					$userIdsFromDB = $c->getFetchedIds();
+				
+					if (count($userIdsFromDB))
+						$kuserIds = implode(",", $userIdsFromDB);
+					else
+						$kuserId = kuser::KUSER_ID_THAT_DOES_NOT_EXIST;
+							
+					$obj_ids_clause = "u.kuser_id in ( $kuserIds )";
+			} 
+			
 			if ( is_numeric( $report_type ))
 				$order_by = self::getOrderBy( self::$type_map[$report_type] , $order_by );
 			
@@ -640,6 +694,7 @@ class myReportsMgr
 		self::REPORT_FLAVOR_TOTAL => "total" ,
 		self::REPORT_FLAVOR_TABLE => "detail" ,
 		self::REPORT_FLAVOR_COUNT => "count" , 
+		self::REPORT_FLAVOR_SUB_TOTAL =>"sub_total"  ,
 	);
 	
 	private static $type_map = array ( 
@@ -654,8 +709,8 @@ class myReportsMgr
 		self::REPORT_TYPE_ADMIN_CONSOLE => "admin_console" ,
 		self::REPORT_TYPE_USER_ENGAGEMENT => "user_engagement",
 		self::REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
-		self::SPEFICIC_USER_ENGAGEMENT => "specific_user_engagement",
-		self::SPEFICIC_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
+		self::REPROT_TYPE_SPEFICIC_USER_ENGAGEMENT => "specific_user_engagement",
+		self::REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
 		self::REPORT_TYPE_USER_TOP_CONTENT => "user_top_content",
 		self::REPORT_TYPE_USER_TOP_CONTENT_TOTAL_UNIQUE => "user_engagement_unique",
 		self::REPORT_TYPE_USER_CONTENT_DROPOFF => "user_content_dropoff", 
@@ -667,6 +722,8 @@ class myReportsMgr
 		self::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE => "partner_bandwidth_usage" ,
 		self::REPORT_TYPE_PARTNER_USAGE => "partner_usage" ,
 		self::REPORT_TYPE_APPLICATIONS => 'applications',
+		self::REPORT_TYPE_USER_USAGE => 'user_usage',
+		self::REPORT_TYPE_SPECIFIC_USER_USAGE => 'specific_user_usage',
 		
 	);
 	
