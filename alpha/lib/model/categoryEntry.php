@@ -50,6 +50,21 @@ class categoryEntry extends BasecategoryEntry {
 	{	
 		parent::postInsert($con);
 		
+		$this->updateEntry();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see lib/model/om/Basecategory#postInsert()
+	 */
+	public function postUpdate(PropelPDO $con = null)
+	{	
+		parent::postUpdate($con);
+		
+		$this->updateEntry();
+	}
+	
+	private function updateEntry()
+	{
 		$category = categoryPeer::retrieveByPK($this->getCategoryId());
 		if($category)
 		{
@@ -61,8 +76,10 @@ class categoryEntry extends BasecategoryEntry {
 			if($entry && !categoryEntryPeer::getSkipSave() && $category->getPrivacyContext() == '')
 			{
 				$entry->setCategories($entry->getCategories() . entry::ENTRY_CATEGORY_SEPARATOR . $category->getFullName());
-				$entry->save();					
 			}
+			
+			$entry->setUpdatedAt(time());
+			$entry->save();	
 		}
 	}
 	
