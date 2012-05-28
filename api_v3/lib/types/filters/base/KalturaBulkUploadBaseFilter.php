@@ -8,6 +8,10 @@ abstract class KalturaBulkUploadBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
+		"uploadedOnGreaterThanOrEqual" => "_gte_uploaded_on",
+		"uploadedOnLessThanOrEqual" => "_lte_uploaded_on",
+		"uploadedOnEqual" => "_eq_uploaded_on",
+		"statusIn" => "_in_status",
 		"bulkUploadObjectTypeEqual" => "_eq_bulk_upload_object_type",
 		"bulkUploadObjectTypeIn" => "_in_bulk_upload_object_type",
 	);
@@ -27,7 +31,27 @@ abstract class KalturaBulkUploadBaseFilter extends KalturaFilter
 	}
 
 	/**
+	 * @var int
+	 */
+	public $uploadedOnGreaterThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $uploadedOnLessThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $uploadedOnEqual;
+
+	/**
 	 * @var string
+	 */
+	public $statusIn;
+
+	/**
+	 * @var int
 	 */
 	public $bulkUploadObjectTypeEqual;
 

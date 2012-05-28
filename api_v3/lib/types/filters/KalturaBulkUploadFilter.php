@@ -9,6 +9,9 @@ class KalturaBulkUploadFilter extends KalturaBulkUploadBaseFilter
 	(
 		"bulkUploadObjectTypeEqual" => "_eq_param_1",
 		"bulkUploadObjectTypeIn" => "_in_param_1",
+	    "uploadedOnGreaterThanOrEqual" => "_gte_created_at",
+		"uploadedOnLessThanOrEqual" => "_lte_created_at",
+		"uploadedOnEqual" => "_eq_created_at",
 	);
 	
     public function getMapBetweenObjects()
