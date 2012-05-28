@@ -92,6 +92,25 @@ class ReportService extends KalturaBaseService
 	}
 	
 	/**
+	 * report getBaseTotal action allows to get a the total base for storage reports  
+	 * 
+	 * @action getBaseTotal
+	 * @param KalturaReportType $reportType  
+	 * @param KalturaReportInputFilter $reportInputFilter
+	 * @param string $objectIds - one ID or more (separated by ',') of specific objects to query
+	 * @return KalturaReportSubTotalArray 
+	 */
+	public function getBaseTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null )
+	{
+		$reportSubTotals =  KalturaReportSubTotalArray::fromReportDataArray( myReportsMgr::getGraph( $this->getPartnerId() , 
+			$reportType , 
+			$reportInputFilter->toReportsInputFilter() ,
+			$objectIds));
+
+		return $reportSubTotals;
+	}
+	
+	/**
 	 * report getTable action allows to get a graph data for a specific report. 
 	 * 
 	 * @action getTable
