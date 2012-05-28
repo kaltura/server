@@ -27,11 +27,11 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		$this->bootstrap('timezone');
 		
 		$loggerConfigPath = realpath(APPLICATION_PATH . '/../configurations/logger.ini');
-		$config = new Zend_Config_Ini($loggerConfigPath);
+		$loggerConfig = new Zend_Config_Ini($loggerConfigPath);
 		$configSettings = Zend_Registry::get('config')->settings;
 		$loggerName = $configSettings->loggerName;
-		$adminConsoleLogger = $config->$loggerName;
-		KalturaLog::initLog($adminConsoleLogger);
+		$appLogger = $loggerConfig->get($loggerName);
+		KalturaLog::initLog($appLogger);
 		KalturaLog::debug('starting request');
 		
 	}	
