@@ -15,15 +15,8 @@ class PartnerUsageController extends Zend_Controller_Action
 		$to = new Zend_Date($this->_getParam('to_date', $this->getDefaultToDate()));
 		
 		$client = Infra_ClientHelper::getClient();
-		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		
 		$form = new Form_PartnerUsageFilter();
-		$partnerPackages = $systemPartnerPlugin->systemPartner->getPackages();
-		Form_PackageHelper::addPackagesToForm($form, $partnerPackages, 'partner_package');
-		
-		$this->view->partnerPackages = array();
-		foreach($partnerPackages as $package)
-			$this->view->partnerPackages[$package->id] = $package->name;
 		
 		$form->populate($request->getParams());
 		
@@ -36,17 +29,20 @@ class PartnerUsageController extends Zend_Controller_Action
 		}
 		
 		// init filters
-		$partnerFilter = $this->getPartnerFilterFromForm($form);
-		$usageFilter = new Kaltura_Client_SystemPartner_Type_SystemPartnerUsageFilter();
+		$usageFilter = new Kaltura_Client_Type_ReportInputFilter();
 		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
+		$partners = $client->partner->listAction();
+		$partnerIds = array();
+		
+		foreach ($partners->objects as $partner)
+		    $partnerIds[] = $partner->id;
 		
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($systemPartnerPlugin->systemPartner, "getUsage", null, $partnerFilter, $usageFilter);
+		$paginatorAdapter = new Infra_FilterPaginator($client->report, "getGraphs", null, Kaltura_Client_Enum_ReportType::PARTNER_USAGE, $usageFilter, null, $partnerIds);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package', true, 'All Service Editions');
 		// set view
 		$this->view->from = $from;
 		$this->view->to = $to;
@@ -70,9 +66,15 @@ class PartnerUsageController extends Zend_Controller_Action
 		
 		// init filters
 		$partnerFilter = $this->getPartnerFilterFromForm($form);
-		$usageFilter = new Kaltura_Client_SystemPartner_Type_SystemPartnerUsageFilter();
+		$usageFilter = new Kaltura_Client_Type_ReportInputFilter();
 		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
+		$partners = $client->partner->listAction();
+		$partnerIds = array();
+		
+		foreach ($partners->objects as $partner)
+		    $partnerIds[] = $partner->id;
+		
 		
 		$pager = new Kaltura_Client_Type_FilterPager();
 		$pager->pageIndex = 1;
@@ -80,8 +82,7 @@ class PartnerUsageController extends Zend_Controller_Action
 		$items = array();
 		while(true)
 		{
-			$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
-			$response = $systemPartnerPlugin->systemPartner->getUsage($partnerFilter, $usageFilter, $pager);
+			$response = $client->report->getGraphs(Kaltura_Client_Enum_ReportType::PARTNER_USAGE, $usageFilter, null, $partnerIds);
 			if (count($response->objects) <= 0)
 				break;
 				
