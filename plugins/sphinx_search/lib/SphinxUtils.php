@@ -28,8 +28,8 @@ class SphinxUtils
 		{
 			$str = trim($str);
 			
-			if(substr($str, strlen($str) - 2, 2) == '\*')
-				return preg_replace('/[^\w\d]/' , self::REPLACE_CHARS , substr($str, 0, strlen($str) - 2)) . '\\\*';
+			if(substr($str, -2) == '\*')
+				return preg_replace('/[^\w\d]/' , self::REPLACE_CHARS , substr($str, -2)) . '\\\*';
 				
 			return preg_replace('/([^\w\d]|_)/' , self::REPLACE_CHARS , $str);
 		}
