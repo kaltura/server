@@ -10,9 +10,8 @@ FROM kalturadw.dwh_dim_time t LEFT JOIN(
 		kalturadw.dwh_hourly_user_usage u
         WHERE
 		{OBJ_ID_CLAUSE}
-		partner_id = {PARTNER_ID}
-		AND
-		date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID}
+		AND partner_id = {PARTNER_ID}
+		AND date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID}
         ) raw_data ON date_id = day_id
 WHERE day_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID}
 GROUP BY IF('{GROUP_COLUMN}' = 'date_id',day_id,t.month_id) 
