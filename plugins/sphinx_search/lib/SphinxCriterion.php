@@ -72,7 +72,10 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 		{
 			case Criteria::EQUAL:
 				$value = SphinxUtils::escapeString($value, $fieldsEscapeType);
-				return "@$sphinxField ^$value$";
+				if (strstr($value, ' '))
+					$value = "^$value$";
+				
+				return "@$sphinxField $value";
 				
 			case Criteria::NOT_IN:
 				$vals = is_array($value) ? $value : explode(',', $value);
