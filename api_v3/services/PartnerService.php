@@ -23,11 +23,12 @@ class PartnerService extends KalturaBaseService
 	 * @action register
 	 * @param KalturaPartner $partner
 	 * @param string $cmsPassword
+	 * @param int $templatePartnerId
 	 * @return KalturaPartner
 	 *
 	 * @throws APIErrors::PARTNER_REGISTRATION_ERROR
 	 */
-	public function registerAction( KalturaPartner $partner , $cmsPassword = "" )
+	public function registerAction( KalturaPartner $partner , $cmsPassword = "" , $templatePartnerId = null)
 	{
 		KalturaResponseCacher::disableCache();
 		
@@ -73,7 +74,7 @@ class PartnerService extends KalturaBaseService
 			}
 			
 			list($pid, $subpid, $pass, $hashKey) = $partner_registration->initNewPartner( $dbPartner->getName() , $dbPartner->getAdminName() , $dbPartner->getAdminEmail() ,
-				$dbPartner->getCommercialUse() , "yes" , $dbPartner->getDescription() , $dbPartner->getUrl1() , $cmsPassword , $dbPartner, $ignorePassword );
+				$dbPartner->getCommercialUse() , "yes" , $dbPartner->getDescription() , $dbPartner->getUrl1() , $cmsPassword , $dbPartner, $ignorePassword, $templatePartnerId );
 
 			$dbPartner = PartnerPeer::retrieveByPK( $pid );
 
@@ -440,5 +441,5 @@ class PartnerService extends KalturaBaseService
 		
 		return $response;
 	}
-
+	
 }
