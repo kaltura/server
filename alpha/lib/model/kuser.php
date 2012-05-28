@@ -29,6 +29,8 @@ class kuser extends Basekuser implements IIndexable
 		
 	const KUSER_KALTURA = 0;
 	
+	const KUSER_ID_THAT_DOES_NOT_EXIST = 0;
+	
 	// different sort orders for browsing kswhos
 	const KUSER_SORT_MOST_VIEWED = 1;  
 	const KUSER_SORT_MOST_RECENT = 2;  
