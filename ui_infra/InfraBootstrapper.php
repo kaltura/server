@@ -248,9 +248,11 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
       			}
       			
       			if ($allow) {
+      			    KalturaLog::debug("### allow $currentRole $resource");
       				$acl->allow($currentRole, $resource);
       			}
       			else {
+      			    KalturaLog::debug("### deny $currentRole $resource");
       				$acl->deny($currentRole, $resource);
       			}
       		}
