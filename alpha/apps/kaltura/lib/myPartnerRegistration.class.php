@@ -138,14 +138,28 @@ class myPartnerRegistration
 			$bodyParams);
 	}
 
-	private function createNewPartner( $parnter_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null )
+	/**
+	 * Function creates new partner, saves all the required data to it, and copies objects & filesyncs of template content to its ID.
+	 * @param string $partner_name
+	 * @param string $contact
+	 * @param string $email
+	 * @param CommercialUseType $ID_is_for
+	 * @param string $SDK_terms_agreement
+	 * @param string $description
+	 * @param string $website_url
+	 * @param string $password
+	 * @param Partner $partner
+	 * @param int $templatePartnerId
+	 * @return Partner
+	 */
+	private function createNewPartner( $partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null, $templatePartnerId = null )
 	{
 		$secret = md5($this->str_makerand(5,10,true, false, true));
 		$admin_secret = md5($this->str_makerand(5,10,true, false, true));
 
 		$newPartner = new Partner();
-		if ($parnter_name)
-			$newPartner->setPartnerName($parnter_name);
+		if ($partner_name)
+			$newPartner->setPartnerName($partner_name);
 		$newPartner->setAdminSecret($admin_secret);
 		$newPartner->setSecret($secret);
 		$newPartner->setAdminName($contact);
@@ -196,8 +210,8 @@ class myPartnerRegistration
 		$newPartner->save();
 
 		// if name was left empty - which should not happen - use id as name
-		if ( ! $parnter_name ) $parnter_name = $newPartner->getId();
-		$newPartner->setPartnerName( $parnter_name );
+		if ( ! $partner_name ) $partner_name = $newPartner->getId();
+		$newPartner->setPartnerName( $partner_name );
 		$newPartner->setPrefix($newPartner->getId());
 		$newPartner->setPartnerAlias(md5($newPartner->getId().'kaltura partner'));
 
@@ -212,7 +226,7 @@ class myPartnerRegistration
 		$partner_id = $newPartner->getId();
 		widget::createDefaultWidgetForPartner( $partner_id , $this->createNewSubPartner ( $newPartner ) );
 		
-		$fromPartner = PartnerPeer::retrieveByPK(kConf::get("template_partner_id"));
+		$fromPartner = PartnerPeer::retrieveByPK($templatePartnerId ? $templatePartnerId : kConf::get("template_partner_id"));
 	 	if (!$fromPartner)
 	 		KalturaLog::log("Template content partner was not found!");
  		else
@@ -272,7 +286,7 @@ class myPartnerRegistration
 		return array($password, $loginData->getPasswordHashKey(), $kuser->getId());
 	}
 
-	public function initNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null, $ignorePassword = false  )
+	public function initNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null, $ignorePassword = false, $templatePartnerId = null  )
 	{
 		// Validate input fields
 		if( $partner_name == "" )
