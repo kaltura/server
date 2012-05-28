@@ -12,6 +12,7 @@ abstract class KalturaBulkUploadBaseFilter extends KalturaFilter
 		"uploadedOnLessThanOrEqual" => "_lte_uploaded_on",
 		"uploadedOnEqual" => "_eq_uploaded_on",
 		"statusIn" => "_in_status",
+		"statusEqual" => "_eq_status",
 		"bulkUploadObjectTypeEqual" => "_eq_bulk_upload_object_type",
 		"bulkUploadObjectTypeIn" => "_in_bulk_upload_object_type",
 	);
@@ -51,11 +52,17 @@ abstract class KalturaBulkUploadBaseFilter extends KalturaFilter
 	public $statusIn;
 
 	/**
-	 * @var int
+	 * @var KalturaBatchJobStatus
+	 */
+	public $statusEqual;
+
+	/**
+	 * @var KalturaBulkUploadObjectType
 	 */
 	public $bulkUploadObjectTypeEqual;
 
 	/**
+	 * @dynamicType KalturaBulkUploadObjectType
 	 * @var string
 	 */
 	public $bulkUploadObjectTypeIn;
