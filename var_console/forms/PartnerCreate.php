@@ -50,7 +50,7 @@ class Form_PartnerCreate extends Infra_Form
 		    'RegisterInArrayValidator' => false
 		));
 		
-		$this->addDisplayGroup(array('name', 'company', 'admin_email', 'phone', 'describe_yourself', 'website', copyPartner), 'partner_info', array(
+		$this->addDisplayGroup(array('name', 'company', 'admin_email', 'phone', 'describe_yourself', 'website', 'copyPartner'), 'partner_info', array(
 			'legend' => 'Publisher Info',
 			'decorators' => array(
 				'Description', 
