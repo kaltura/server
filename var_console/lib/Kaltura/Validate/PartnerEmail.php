@@ -11,14 +11,15 @@ class Kaltura_Validate_PartnerEmail extends Zend_Validate_Abstract
 		
 		$client = Infra_ClientHelper::getClient();
 		// get results and paginate
-		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		$filter = new Kaltura_Client_Type_UserLoginDataFilter();
 		$filter->loginEmailEqual = $value;
 		
-		$otherUsersWithTheSameEmail = $systemPartnerPlugin->systemPartner->listUserLoginData($filter);
+		$otherUsersWithTheSameEmail = $client->partner->checkUserLoginDataExists($filter);
 		
-		if (count ( $otherUsersWithTheSameEmail->objects )) {
-			try {
+		if (count ( $otherUsersWithTheSameEmail->objects )) 
+		{
+			try 
+			{
 				// allow to use email of admin console users
 				$client->user->getByLoginId($value);
 			} catch (Exception $ex) {
