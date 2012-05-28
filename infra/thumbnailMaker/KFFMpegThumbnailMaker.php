@@ -30,16 +30,16 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		$cmdArr = $this->getCommand($position, $width, $height, $frameCount, $targetType);
 
 		$cmd= $cmdArr[0];
-		{
-			$rv = null;
-			KalturaLog::info("Executing: $cmd");
-			file_put_contents("$this->targetPath.log", $cmd, FILE_APPEND);
-			$output = system( $cmd , $rv );
-			KalturaLog::debug("Returned value: '$rv'");
+		$rv = null;
+		KalturaLog::info("Executing: $cmd");
+		$logFilePath = "$this->targetPath.log";
+		mkdir(dirname($logFilePath), 0665, true);
+		file_put_contents($logFilePath, $cmd, FILE_APPEND);
+		$output = system( $cmd , $rv );
+		KalturaLog::debug("Returned value: '$rv'");
 
-			if($rv==0 && $this->parseOutput($output)==true)
-				return true;
-		}
+		if($rv==0 && $this->parseOutput($output)==true)
+			return true;
 
 		KalturaLog::debug("THUMB Capture Failure - First attempt failed due to ffmpeg crash or 'missing-keyframe' issue.\nSecond attempt with 'slow-thumb-capture' mode");
 		$cmd= $cmdArr[1];
@@ -50,7 +50,7 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 			else {
 				$rv = null;
 				KalturaLog::info("Executing: $cmd");
-				file_put_contents("$this->targetPath.log", $cmd, FILE_APPEND);
+				file_put_contents($logFilePath, $cmd, FILE_APPEND);
 				$output = system( $cmd , $rv );
 				KalturaLog::debug("Returned value: '$rv'");
 				
