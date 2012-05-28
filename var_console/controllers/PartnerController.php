@@ -90,31 +90,9 @@ class PartnerController extends Zend_Controller_Action
 		
 		$form = new Form_PartnerFilter();
 		$form->setAction($action);
-//		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
-//		$partnerPackages = $systemPartnerPlugin->systemPartner->getPackages();
-//		Form_PackageHelper::addPackagesToForm($form, $partnerPackages, 'partner_package', true, 'All Service Editions');
-		
-//		$this->view->partnerPackages = array();
-//		foreach($partnerPackages as $package)
-//		{
-//			$this->view->partnerPackages[$package->id] = $package->name;
-//		}
 		
 		// init filter
 		$partnerFilter = $this->getPartnerFilterFromRequest($request);
-		// if non-commercial partners are not allowed, add to filter
-		
-		if (Infra_AclHelper::isAllowed('partner','commercial')) {
-			$this->view->commercialFiltered = false;
-		}
-		else {
-			$this->view->commercialFiltered = true;
-			$partnerFilter->partnerPackageLessThanOrEqual = self::PARTNER_PACKAGE_FREE;
-		}
-							
-		
-		// get results and paginate
-		//$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		
 		$paginatorAdapter = new Infra_FilterPaginator($client->partner, "listAction", null, $partnerFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
