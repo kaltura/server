@@ -429,9 +429,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		if ($this->owner && $this->owner != '' && !($this->owner instanceof KalturaNullField) )
 		{
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $this->owner);
-			if (!$kuser)
-				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->owner);
+			kuserPeer::createKuserForPartner($partnerId, $this->owner);
 		}
 		
 	}
