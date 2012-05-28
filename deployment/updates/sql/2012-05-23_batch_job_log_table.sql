@@ -1,7 +1,7 @@
 CREATE TABLE `batch_job_log`
 (
     `id` INTEGER  NOT NULL AUTO_INCREMENT,
-    `job_id` INTEGER;
+    `job_id` INTEGER,
     `job_type` SMALLINT,
     `job_sub_type` SMALLINT,
     `data` TEXT,
