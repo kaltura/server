@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.varConsole
+ */
 class VarConsolePlugin extends KalturaPlugin implements IKalturaConfigurator
 {
     const PLUGIN_NAME = "VarConsolePlugin";

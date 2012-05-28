@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.var_console
+ * @package plugins.varConsole
  * @subpackage model.filters
  *
  */
