@@ -396,17 +396,6 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	}
 	
 	
-	/**
-	 * 
-	 * Gets the columns for V3 csv file (parses the header)
-	 */
-	protected function parseColumns($headers)
-	{
-		return parent::parseColumns($headers);
-	}
-
-	
-	
 	protected function updateObjectsResults($requestResults, $bulkUploadResults)
 	{
 	    $this->kClient->startMultiRequest();
