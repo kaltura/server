@@ -58,15 +58,6 @@ class Form_PartnerCreate extends Infra_Form
 				array('Fieldset'),
 			)
 		));
-//		
-//		$this->addDisplayGroup(array('website', 'content_categories', 'adult_content'), 'website_info', array(
-//			'legend' => 'Website Info',
-//			'decorators' => array(
-//				'Description', 
-//				'FormElements', 
-//				array('Fieldset'),
-//			)
-//		));
 		
 		$this->addElement('button', 'submit', array(
 			'label' => 'partner-create form create',
