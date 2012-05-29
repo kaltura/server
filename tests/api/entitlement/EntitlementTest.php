@@ -613,7 +613,7 @@ class EntitlementTest extends EntitlementTestBase
 		$category1->name = $category1->name . rand();
 		
 		try {
-			$category1 = $this->client->category->add($category1);
+			$category1Response = $this->client->category->add($category1);
 		}
 		catch(Exception $ex)
 		{
@@ -626,7 +626,54 @@ class EntitlementTest extends EntitlementTestBase
 				$this->assertTrue(true, 'should not be able to create category with privacyContext: ' . $ex->getCode());
 		}
 		
+		$this->startSessionWithDiffe(SessionType::ADMIN, null, 'disableentitlement');
 		
+		
+		if(!$category1Response)
+		{
+			try {
+				$category1Response = $this->client->category->add($category1);
+			}
+			catch(Exception $ex)
+			{
+				KalturaLog::err('Error: line:' . __LINE__ .' ' . $ex->getMessage());
+				$this->assertTrue(true, 'Session with no entitlement cannot add category: ' . $ex->getMessage());
+			}
+		}
+		
+		try {
+			$category2Response = $this->client->category->add($category2);
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::err('Error: line:' . __LINE__ .' ' . $ex->getMessage());
+			$this->assertTrue(true, 'Session with no entitlement cannot add category: ' . $ex->getMessage());
+		}
+		
+		$this->startSessionWithDiffe(SessionType::USER, 'anyuser', 'privacycontext:' . $category1->privacyContext);
+		
+		$category2ResponseWithDiffContext = null;
+		try {
+			$category2ResponseWithDiffContext = $this->client->category->get($category2Response->id);
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::err('Error: line:' . __LINE__ .' ' . $ex->getMessage());
+			$this->assertTrue(true, 'Should not be able to get category with different context from the session ks: ' . $ex->getMessage());
+		}
+		
+		if($category2ResponseWithDiffContext)
+			$this->assertTrue(true, 'Should not be able to get category with different context from the session ks');
+			
+		$category1ResponseWithDiffContext = null;
+		try {
+			$category1ResponseWithDiffContext = $this->client->category->get($category1Response->id);
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::err('Error: line:' . __LINE__ .' ' . $ex->getMessage());
+			$this->assertTrue(false, 'Should be able to get category with different context from the session ks: ' . $ex->getMessage());
+		}
 	}
 }
 
