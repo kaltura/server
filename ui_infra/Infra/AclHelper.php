@@ -12,9 +12,10 @@ class Infra_AclHelper
 	 */
 	public static function getCurrentRole()
 	{
-		if (Zend_Auth::getInstance()->hasIdentity())
+		if (Infra_AuthHelper::getAuthInstance()->hasIdentity())
 		{
-			$roleIds = Zend_Auth::getInstance()->getIdentity()->getUser()->roleIds;
+			$roleIds = Infra_AuthHelper::getAuthInstance()->getIdentity()->getUser()->roleIds;
+			
 			return $roleIds;
 		}
 		return self::ROLE_GUEST;
@@ -22,9 +23,9 @@ class Infra_AclHelper
 	
 	public static function getCurrentPermissions()
 	{
-		if (Zend_Auth::getInstance()->hasIdentity())
+		if (Infra_AuthHelper::getAuthInstance()->hasIdentity())
 		{
-			$permissions = Zend_Auth::getInstance()->getIdentity()->getPermissions();
+			$permissions = Infra_AuthHelper::getAuthInstance()->getIdentity()->getPermissions();
 			return $permissions;
 		}
 		return array();
@@ -52,13 +53,13 @@ class Infra_AclHelper
 	}
 	
 	public static function isAllowedPartner($partnerId, $partnerPackage) {
-		if (Zend_Auth::getInstance()->hasIdentity()) 
+		if (Infra_AuthHelper::getAuthInstance()->hasIdentity()) 
 		{
-			$partners = Zend_Auth::getInstance()->getIdentity()->getAllowedPartners();
+			$partners = Infra_AuthHelper::getAuthInstance()->getIdentity()->getAllowedPartners();
 			if (in_array('*', $partners)) {
 				return true;
 			}
-			$packages = Zend_Auth::getInstance()->getIdentity()->getAllowedPartnerPackages();
+			$packages = Infra_AuthHelper::getAuthInstance()->getIdentity()->getAllowedPartnerPackages();
 			if (in_array($partnerPackage, $packages)) {
 				return true;
 			}			
@@ -71,9 +72,9 @@ class Infra_AclHelper
 	 * Refresh the list of partners the user is allowed to access.
 	 */
 	public static function refreshCurrentUserAllowrdPartners() {
-		if (Zend_Auth::getInstance()->hasIdentity()) 
+		if (Infra_AuthHelper::getAuthInstance()->hasIdentity()) 
 		{
-			Zend_Auth::getInstance()->getIdentity()->refreshAllowedPartners();
+			Infra_AuthHelper::getAuthInstance()->getIdentity()->refreshAllowedPartners();
 		}
 	}
 	
