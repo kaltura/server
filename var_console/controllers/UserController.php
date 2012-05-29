@@ -20,11 +20,7 @@ class UserController extends Zend_Controller_Action
 		$form = new Form_UserFilter();
 		$form->setAction($action);
 		
-		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		$userRoles = $client->userRole->listAction();
-		Form_PackageHelper::addPackagesToForm($form, $userRoles->objects, 'user_roles', true, 'All Service Editions');
-		
-		$this->view->partnerPackages = array();
 		
 		$config = Zend_Registry::get('config');
 		
@@ -51,7 +47,6 @@ class UserController extends Zend_Controller_Action
 
     public function loginAction ()
     {
-        KalturaLog::debug("### login action");
         $loginForm = new Form_Login();
 		$resetForm = new Form_ResetPassword();
 		$request = $this->getRequest();
@@ -60,6 +55,8 @@ class UserController extends Zend_Controller_Action
 		{
 			$adapter = new Infra_AuthAdapter($request->getPost('email'), $request->getPost('password'));
 			$auth = Zend_Auth::getInstance();
+			$storage = new Zend_Auth_Storage_Session("Zend_Auth_VarConsole");
+			$auth->setStorage($storage);
 			$result = $auth->authenticate($adapter);
 
 			if ($result->isValid())
