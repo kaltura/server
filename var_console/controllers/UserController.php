@@ -54,7 +54,7 @@ class UserController extends Zend_Controller_Action
 		if ($request->isPost())
 		{
 			$adapter = new Infra_AuthAdapter($request->getPost('email'), $request->getPost('password'));
-			$auth = AuthHelper::getAuthInstance();
+			$auth = Infra_AuthHelper::getAuthInstance();
 			$result = $auth->authenticate($adapter);
 
 			if ($result->isValid())
