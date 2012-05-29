@@ -103,6 +103,10 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		            $bulkUploadResult->action = KalturaBulkUploadAction::ADD;
 		        }
 		    }
+		    else 
+		    {
+		        $bulkUploadResult->action = KalturaBulkUploadAction::ADD;
+		    }
 		}
 		
 		switch ($bulkUploadResult->action)
