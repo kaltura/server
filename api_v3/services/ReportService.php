@@ -98,7 +98,7 @@ class ReportService extends KalturaBaseService
 	 * @param KalturaReportType $reportType  
 	 * @param KalturaReportInputFilter $reportInputFilter
 	 * @param string $objectIds - one ID or more (separated by ',') of specific objects to query
-	 * @return KalturaReportSubTotalArray 
+	 * @return KalturaReportBaseTotalArray 
 	 */
 	public function getBaseTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null )
 	{
