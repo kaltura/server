@@ -305,6 +305,8 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 	            return $categoryList->objects[0]->id;
 	        }
 	    }
+	    
+	    return null;
 	}
 	
 	/**
