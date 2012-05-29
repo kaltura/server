@@ -2,9 +2,9 @@
 /**
  * @package plugins.varConsole
  */
-class VarConsolePlugin extends KalturaPlugin implements IKalturaConfigurator
+class VarConsolePlugin extends KalturaPlugin implements IKalturaConfigurator, IKalturaServices
 {
-    const PLUGIN_NAME = "VarConsolePlugin";
+    const PLUGIN_NAME = "varConsole";
     
 	/* (non-PHPdoc)
      * @see IKalturaConfigurator::getConfig()
@@ -28,6 +28,21 @@ class VarConsolePlugin extends KalturaPlugin implements IKalturaConfigurator
     {    
         return self::PLUGIN_NAME;
     }
+
+
+	/* (non-PHPdoc)
+     * @see IKalturaServices::getServicesMap()
+     */
+    public static function getServicesMap ()
+    {
+        $map = array(
+			'varConsole' => 'VarConsoleService',
+		);
+		
+		return $map;
+    }
+
+
 
     
 }
