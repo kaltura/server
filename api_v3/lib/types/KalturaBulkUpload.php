@@ -22,6 +22,7 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var int
+	 * @filter gte,lte,eq
 	 */
 	public $uploadedOn;
 	
@@ -33,6 +34,7 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var KalturaBatchJobStatus
+	 * @filter in,eq
 	 */
 	public $status;
 	
@@ -96,7 +98,7 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 	public $numOfObjects;
 	
 	/**
-	 * @var string
+	 * @var KalturaBulkUploadObjectType
 	 * @filter eq,in
 	 */
 	public $bulkUploadObjectType;
@@ -114,6 +116,11 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 	    "bulkUploadType" => "jobSubType",
 	    
 	);
+	
+    public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+	}
 	
 	public function fromObject($batchJobObject)
 	{
