@@ -58,7 +58,7 @@ class kConf
 			die("Local configuration not found [$configDir/local.ini]");
 		}		
 		$localConfig = parse_ini_file("$configDir/local.ini", true);
-		$config = array_merge_recursive($config, $localConfig);
+		$config = self::mergeConfigItem($config, $localConfig);
 		
 		$hostname = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
 		if($hostname)
@@ -74,7 +74,7 @@ class kConf
 					continue;
 					
 				$localConfig = parse_ini_file("$configPath/$iniFile", true);
-				$config = array_merge_recursive($config, $localConfig);
+				$config = self::mergeConfigItem($config, $localConfig);
 			}
 			$configDir->close();
 		}
@@ -123,7 +123,7 @@ class kConf
 						continue;
 						
 					$config = new Zend_Config_Ini("$configPath/$iniFile");
-					self::$map[$mapName] = self::mergeConfigItem(self::$map[$mapName], $config->toArray(), false);
+					self::$map[$mapName] = self::mergeConfigItem(self::$map[$mapName], $config->toArray());
 				}
 				$configDir->close();
 			}
@@ -159,9 +159,10 @@ class kConf
 	 * @param array $srcConfig
 	 * @param array $newConfig
 	 * @param bool $valuesOnly
+	 * @param bool $overwrite
 	 * @return array
 	 */
-	protected static function mergeConfigItem(array $srcConfig, array $newConfig, $valuesOnly)
+	protected static function mergeConfigItem(array $srcConfig, array $newConfig, $valuesOnly = false, $overwrite = true)
 	{
 		$returnedConfig = $srcConfig;
 		
@@ -172,7 +173,9 @@ class kConf
 				if(!$newConfig[$key]) // nothing to append
 					continue;
 				elseif(is_array($value))
-					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly);
+					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly, $overwrite);
+				elseif($overwrite)
+					$returnedConfig[$key] = $newConfig[$key];
 				else
 					$returnedConfig[$key] = $srcConfig[$key] . ',' . $newConfig[$key];
 			}
@@ -181,10 +184,14 @@ class kConf
 		{
 			foreach($newConfig as $key => $value)
 			{
-				if(!$srcConfig[$key])
+				if(is_numeric($key))
+					$returnedConfig[] = $newConfig[$key];
+				elseif(!$srcConfig[$key])
 					$returnedConfig[$key] = $newConfig[$key];
 				elseif(is_array($value))
-					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly);
+					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly, $overwrite);
+				elseif($overwrite)
+					$returnedConfig[$key] = $newConfig[$key];
 				else
 					$returnedConfig[$key] = $srcConfig[$key] . ',' . $newConfig[$key];
 			}
