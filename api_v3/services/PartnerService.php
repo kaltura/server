@@ -442,33 +442,6 @@ class PartnerService extends KalturaBaseService
 		return $response;
 	}
 	
-	/**
-	 * Action checks whether partners with the given login data specifications exists and returns true/false.
-	 * 
-	 * @action checkUserLoginDataExists
-	 * @param KalturaUserLoginDataFilter $userLoginDataFilter
-	 * @return bool
-	 */
-	public function checkUserLoginDataExistsAction (KalturaUserLoginDataFilter $filter)
-	{
-	    if (!$filter)
-	    {
-	        $filter = new KalturaUserLoginDataFilter();
-	        $filter->loginEmailEqual = $this->getPartner()->getAdminEmail();
-	    }
-	    
-	    $userLoginDataFilter = new UserLoginDataFilter();
-		$filter->toObject($userLoginDataFilter);
-		
-		$c = new Criteria();
-		$userLoginDataFilter->attachToCriteria($c);
-		
-		$totalCount = UserLoginDataPeer::doCount($c);
-		
-		if ($totalCount)
-		    return true;
-		 
-		return false;
-	}
+
 	
 }
