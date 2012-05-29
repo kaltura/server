@@ -538,7 +538,7 @@ class kMetadataManager
 	    $cls = get_class($object);
 	    foreach (self::$objectTypeNames as $objectType => $objectClassName)
 	    {
-	        if(is_subclass_of($cls, $objectClassName))
+	        if(is_subclass_of($object, $objectClassName))
 
 	            return $objectType;
 	    }
