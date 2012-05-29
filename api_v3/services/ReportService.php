@@ -102,7 +102,7 @@ class ReportService extends KalturaBaseService
 	 */
 	public function getBaseTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null )
 	{
-		$reportSubTotals =  KalturaReportSubTotalArray::fromReportDataArray( myReportsMgr::getGraph( $this->getPartnerId() , 
+		$reportSubTotals =  KalturaReportBaseTotalArray::fromReportDataArray( myReportsMgr::getBaseTotal( $this->getPartnerId() , 
 			$reportType , 
 			$reportInputFilter->toReportsInputFilter() ,
 			$objectIds));
