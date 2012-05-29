@@ -1,8 +1,6 @@
 <?php
 require_once(dirname(__FILE__).'/../../bootstrap.php');
 
-KalturaLog::setLogger(new KalturaStdoutLogger());
-
 class migrationEntry extends entry
 {
 	public function setId($v)
