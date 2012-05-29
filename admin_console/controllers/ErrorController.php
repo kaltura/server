@@ -17,7 +17,7 @@ class ErrorController extends Zend_Controller_Action
 		{
 			if (strpos($errors->exception->getMessage(), 'EXPIRED'))
 			{
-				Zend_Auth::getInstance()->clearIdentity();
+				Infra_AuthHelper::getAuthInstance()->clearIdentity();
 				$this->_helper->redirector('login', 'user');
 			}
 		}
