@@ -335,22 +335,11 @@ class myReportsMgr
 	{
 		$start = microtime(true);
 		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_BASE_TOTAL , $input_filter , null , null , null , $object_ids );
-
+		$res = null;
 		if ( count($result) > 0 )
 		{
-			$row = $result[0];
-			$header = array();
-			$data = array();
-			foreach ( $row as $name => $value )
-			{
-				$header[]= $name;
-				$data[] = $value;
-			}
-			$res = array ( $header , $data );
-		}
-		else
-		{
-			$res =  array ( null , null );
+			$res = $result[0];
+			
 		}
 		
 		$end = microtime(true);
