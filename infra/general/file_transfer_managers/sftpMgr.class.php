@@ -128,13 +128,14 @@ class sftpMgr extends kFileTransferMgr
 			KalturaLog::debug('Put file using command: ' . $cmd);
 			system($cmd, $return_value);		
 			// Check if the PUT command ended succesfully
-			$fileSize_Local = $this->doFileSize($local_file);
+			$fileSize_Local = kFile::kFileSize($local_file);
 			$fileSize_Remote = $this->doFileSize($absolute_path);
 			if (($fileSize_Remote != $fileSize_Local) || !$fileSize_Local || !$fileSize_Remote)
 			{
 				KalturaLog::debug("Files sizes do not match, or file does not exist: remote file size [$fileSize_Remote] local file size [$fileSize_Local]");
 				return false;
 			}			
+				
 			return true;
 		}
 	}
