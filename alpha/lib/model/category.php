@@ -768,7 +768,7 @@ class category extends Basecategory implements IIndexable
 		$this->setInheritanceType(InheritanceType::MANUAL);
 		$this->setUserJoinPolicy(UserJoinPolicyType::NOT_ALLOWED);
 		$this->setDefaultPermissionLevel(CategoryKuserPermissionLevel::MODERATOR);
-		$this->setContributionPolicy(ContributionPolicyType::MEMBERS_WITH_CONTRIBUTION_PERMISSION);
+		$this->setContributionPolicy(ContributionPolicyType::ALL);
 		$this->setStatus(CategoryStatus::ACTIVE);
 	}
 
@@ -834,7 +834,7 @@ class category extends Basecategory implements IIndexable
 							implode(' ', $membersIdByPermission) . ' ' . 
 							self::getPermissionLevelName($permissionLevel); 
 		
-		return implode(',', $membersIds);
+		return implode(' ', $membersIds);
 	}
 	
 	public static function getPermissionLevelName($permissionLevel)
@@ -1327,7 +1327,7 @@ class category extends Basecategory implements IIndexable
 		if(is_null($this->getPrivacyContext()) || $this->getPrivacyContext() == '')
 			return kEntitlementUtils::DEFAULT_CONTEXT;
 			
-		return $this->getPrivacyContexts() . ',' . kEntitlementUtils::NOT_DEFAULT_CONTEXT;
+		return $this->getPrivacyContexts() . ' ' . kEntitlementUtils::NOT_DEFAULT_CONTEXT;
 	}
 	
 	public function getSearchIndexPrivacyContexts()
@@ -1353,7 +1353,7 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	public static $sphinxFieldsEscapeType = array(
-		'full_name' => SearchIndexFieldEscapeType::STRIP,
+	//	'full_name' => SearchIndexFieldEscapeType::STRIP,
 	);
 	
 	public function getSphinxFieldsEscapeType($fieldName)
