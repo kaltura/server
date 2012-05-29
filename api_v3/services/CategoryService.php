@@ -21,6 +21,9 @@ class CategoryService extends KalturaBaseService
 	 */
 	function addAction(KalturaCategory $category)
 	{
+		if($category->owner == '')
+			$category->owner = null;
+			
 		if ($category->parentId != null && //batch to index categories or to move categories might miss this category to be moved or index
 			$this->getPartner()->getFeaturesStatusByType(FeatureStatusType::LOCK_CATEGORY))
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
@@ -74,6 +77,9 @@ class CategoryService extends KalturaBaseService
 	 */
 	function updateAction($id, KalturaCategory $category)
 	{		
+		if($category->owner == '')
+			$category->owner = null;
+			
 		$categoryDb = categoryPeer::retrieveByPK($id);
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
@@ -94,9 +100,9 @@ class CategoryService extends KalturaBaseService
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
-
-		$category->toUpdatableObject($categoryDb);
 		
+		$category->toUpdatableObject($categoryDb);
+
 		try
 		{
 			$categoryDb->save();
