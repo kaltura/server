@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaReportSubTotal extends KalturaObject 
+class KalturaReportBaseTotal extends KalturaObject 
 {
 	/**
 	 * @var string

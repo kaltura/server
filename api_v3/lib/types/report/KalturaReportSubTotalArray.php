@@ -3,14 +3,14 @@
  * @package api
  * @subpackage objects
  */
-class KalturaReportSubTotalArray extends KalturaTypedArray
+class KalturaReportBaseTotalArray extends KalturaTypedArray
 {
 	public static function fromReportDataArray ( $arr )
 	{
-		$newArr = new KalturaReportSubTotalArray();
+		$newArr = new KalturaReportBaseTotalArray();
 		foreach ( $arr as $id => $data )
 		{
-			$nObj = new KalturaReportSubTotal();
+			$nObj = new KalturaReportBaseTotal();
 			$nObj->fromReportData ( $id, $data );
 			$newArr[] = $nObj;
 		}
@@ -20,7 +20,7 @@ class KalturaReportSubTotalArray extends KalturaTypedArray
 	
 	public function __construct( )
 	{
-		return parent::__construct ( "KalturaReportSubTotal" );
+		return parent::__construct ( "KalturaReportBaseTotal" );
 	}
 }
 ?>
