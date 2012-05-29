@@ -36,7 +36,7 @@ class BulkService extends KalturaBaseService
 	        $bulkUploadEntryData = new KalturaBulkUploadEntryData();
 	    }
 		if(!$bulkUploadData->fileName)
-			$bulkUploadEntryData->fileName = $fileData["name"];
+			$bulkUploadData->fileName = $fileData["name"];
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
@@ -78,7 +78,7 @@ class BulkService extends KalturaBaseService
 	    }
 	    
 		if(!$bulkUploadData->fileName)
-			$fileName = $fileData["name"];
+			$bulkUploadData->fileName = $fileData["name"];
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
@@ -119,7 +119,7 @@ class BulkService extends KalturaBaseService
         }
 		
 		if(!$bulkUploadData->fileName)
-			$fileName = $fileData["name"];
+			$bulkUploadData->fileName = $fileData["name"];
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
@@ -159,7 +159,7 @@ class BulkService extends KalturaBaseService
 	   }
 		
 		if(!$bulkUploadData->fileName)
-			$fileName = $fileData["name"];
+			$bulkUploadData->fileName = $fileData["name"];
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
