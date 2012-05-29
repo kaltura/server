@@ -97,16 +97,19 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	    if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
 		{
 		    $this->impersonate();
-		    $user = $this->kClient->user->get($bulkUploadResult->objectId);
-		    $this->unimpersonate();
-		    if ( $user )
+		    try 
 		    {
-		        $bulkUploadResult->action = KalturaBulkUploadAction::UPDATE;
+		        $user = $this->kClient->user->get($bulkUploadResult->objectId);
+    		    if ( $user )
+    		    {
+    		        $bulkUploadResult->action = KalturaBulkUploadAction::UPDATE;
+    		    }
 		    }
-	        else
+	        catch (Exception $e)
 	        {
 	            $bulkUploadResult->action = KalturaBulkUploadAction::ADD;
 		    }
+		    $this->unimpersonate();
 		}
 		
 
