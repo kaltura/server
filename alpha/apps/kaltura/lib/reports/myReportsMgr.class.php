@@ -5,7 +5,7 @@ class myReportsMgr
 	const REPORT_FLAVOR_TOTAL= 2;
 	const REPORT_FLAVOR_TABLE= 3;
 	const REPORT_FLAVOR_COUNT = 4;
-	const REPORT_FLAVOR_SUB_TOTAL = 5;
+	const REPORT_FLAVOR_BASE_TOTAL = 5;
 	
 	const REPORT_TYPE_TOP_CONTENT = 1;
 	const REPORT_TYPE_CONTENT_DROPOFF = 2;
@@ -331,10 +331,10 @@ class myReportsMgr
 	 * @param string $object_ids comma seperated ids
 	 * @return array <columnName, value>
 	 */
-	public static function getSubTotal ( $partner_id , $report_type , reportsInputFilter $input_filter , $object_ids = null )
+	public static function getBaseTotal ( $partner_id , $report_type , reportsInputFilter $input_filter , $object_ids = null )
 	{
 		$start = microtime(true);
-		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_SUB_TOTAL , $input_filter , null , null , null , $object_ids );
+		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_BASE_TOTAL , $input_filter , null , null , null , $object_ids );
 
 		if ( count($result) > 0 )
 		{
@@ -694,7 +694,7 @@ class myReportsMgr
 		self::REPORT_FLAVOR_TOTAL => "total" ,
 		self::REPORT_FLAVOR_TABLE => "detail" ,
 		self::REPORT_FLAVOR_COUNT => "count" , 
-		self::REPORT_FLAVOR_SUB_TOTAL =>"sub_total"  ,
+		self::REPORT_FLAVOR_BASE_TOTAL =>"base_total",
 	);
 	
 	private static $type_map = array ( 

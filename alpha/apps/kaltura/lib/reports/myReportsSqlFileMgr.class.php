@@ -432,8 +432,8 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 			    "total_by_user" => "total_by_user",
 				"detail_without_filter" => "detail_no_filter",
 				"detail_by_user" => "detail_by_user",
-				"base_total_without_filter" => "user_usage/base_total_no_filter",
-				"base_total_by_user" => "user_usage/base_total_by_user"
+				"base_total_without_filter" => "base_total_no_filter",
+				"base_total_by_user" => "base_total_by_user"
 			),
 			"specific_user_usage" => array (
 				"graph_by_user" => "user_usage/graph_by_user",
