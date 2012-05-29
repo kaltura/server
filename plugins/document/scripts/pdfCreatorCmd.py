@@ -1,3 +1,5 @@
+import ntsecuritycon
+import win32security
 import pywintypes
 import win32print
 import win32con
@@ -47,7 +49,19 @@ def getProcessList():
              break
      CloseHandle(hProcessSnap)
 
+def adjustPrivilege(priv, enable = True):
+    flags = ntsecuritycon.TOKEN_ADJUST_PRIVILEGES | ntsecuritycon.TOKEN_QUERY
+    htoken = win32security.OpenProcessToken(win32api.GetCurrentProcess(), flags)
+    id = win32security.LookupPrivilegeValue(None, priv)
+    if enable:
+        newPrivileges = [(id, ntsecuritycon.SE_PRIVILEGE_ENABLED)]
+    else:
+        newPrivileges = [(id, 0)]
+    win32security.AdjustTokenPrivileges(htoken, 0, newPrivileges)
+    win32api.CloseHandle(htoken)
+
 def killProcess(processId):
+    adjustPrivilege(ntsecuritycon.SE_DEBUG_NAME)
     try:
         handle = win32api.OpenProcess(win32con.PROCESS_TERMINATE, 0, processId)
         if handle:
