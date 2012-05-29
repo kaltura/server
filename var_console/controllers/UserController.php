@@ -34,7 +34,7 @@ class UserController extends Zend_Controller_Action
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		
-		$this->view->myEmail = Zend_Auth::getInstance()->getIdentity()->getUser()->email;
+		$this->view->myEmail = Infra_AuthHelper::getAuthInstance()->getIdentity()->getUser()->email;
 		$this->view->paginator = $paginator;
 
 							
@@ -54,9 +54,7 @@ class UserController extends Zend_Controller_Action
 		if ($request->isPost())
 		{
 			$adapter = new Infra_AuthAdapter($request->getPost('email'), $request->getPost('password'));
-			$auth = Zend_Auth::getInstance();
-			$storage = new Zend_Auth_Storage_Session("Zend_Auth_VarConsole");
-			$auth->setStorage($storage);
+			$auth = AuthHelper::getAuthInstance();
 			$result = $auth->authenticate($adapter);
 
 			if ($result->isValid())
@@ -89,7 +87,7 @@ class UserController extends Zend_Controller_Action
 		Zend_Session::forgetMe();
 		$client = Infra_ClientHelper::getClient();
 		$client->session->end();
-		Zend_Auth::getInstance()->clearIdentity();
+		Infra_AuthHelper::getAuthInstance()->clearIdentity();
 		$this->_helper->redirector('index', 'index');
 	}
 	
