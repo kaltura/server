@@ -16,7 +16,7 @@ class Kaltura_Validate_PartnerEmail extends Zend_Validate_Abstract
 		
 		$otherUsersWithTheSameEmail = $client->partner->checkUserLoginDataExists($filter);
 		
-		if (count ( $otherUsersWithTheSameEmail->objects )) 
+		if ( $otherUsersWithTheSameEmail ) 
 		{
 			try 
 			{
