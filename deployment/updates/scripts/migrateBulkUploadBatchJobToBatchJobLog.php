@@ -40,6 +40,9 @@ while($batchJobResults && count($batchJobResults))
 		
 	    $batchJob->copyInto($batchJobLog, true);
 	    $batchJobLog->setJobId($batchJob->getId());
+	    //migrate jobData without unnecessary serialization
+	    $batchJobLog->setData($batchJob->getData(true), true);
+	    $batchJobData = $batchJob->getData();
 	    //set param_1 for the $batchJobLog
 	    $batchJobData = $batchJob->getData();
 	    /* @var $batchJobData kBulkUploadJobData */
