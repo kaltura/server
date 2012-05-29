@@ -93,7 +93,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	);
 	
 	public static $sphinxFieldsEscapeType = array(
-		'category.FULL_NAME' => SearchIndexFieldEscapeType::STRIP,
+		//'category.FULL_NAME' => SearchIndexFieldEscapeType::STRIP,
 	);
 
 	/**
