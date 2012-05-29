@@ -28,11 +28,11 @@ class EntitlementTest extends EntitlementTestBase
 		$this->startSession($this->client);
 		
 		/* @var $category KalturaCategory */
-		$category->name = $category->name . time() . rand();
+		$category->name = $category->name . rand();
 		$category = $this->client->category->add($category);
 		
 		/* @var $user KalturaUser */
-		$user->id = $user->id . time() . rand();
+		$user->id = $user->id . rand();
 		$user = $this->client->user->add($user);
 			
 		$this->startSessionWithDiffe(SessionType::USER, $user->id);
@@ -124,9 +124,6 @@ class EntitlementTest extends EntitlementTestBase
 				$this->assertTrue(false, 'User must be able to remove himself from the category');
 			}
 		}
-				
-		//$this->client->category->delete($category->id);
-		//$this->client->user->delete($user->id);
 	}
 
 	/**
@@ -166,15 +163,15 @@ class EntitlementTest extends EntitlementTestBase
 		}
 		
 		KalturaLog::info('Add categories');
-		$category1->name = $category1->name . time() . rand();
+		$category1->name = $category1->name . rand();
 		$category1 = $this->client->category->add($category1);
 		
 		$category2->parentId = $category1->id;
-		$category2->name = $category2->name . time() . rand();
+		$category2->name = $category2->name . rand();
 		$category2 = $this->client->category->add($category2);
 		
 		$category3->parentId = $category2->id;
-		$category3->name = $category3->name . time() . rand();
+		$category3->name = $category3->name . rand();
 		$category3 = $this->client->category->add($category3);
 		
 		/* @var $category1 KalturaCategory */
@@ -183,7 +180,7 @@ class EntitlementTest extends EntitlementTestBase
 		
 		KalturaLog::info('Add user');
 		/* @var $user KalturaUser */
-		$user1->id = $user1->id . time() . rand();
+		$user1->id = $user1->id . rand();
 		$user1 = $this->client->user->add($user1);
 			
 		$this->startSessionWithDiffe(SessionType::USER, $user1->id);
@@ -274,7 +271,7 @@ class EntitlementTest extends EntitlementTestBase
 		$this->startSession($this->client);
 		
 		/* @var $category KalturaCategory */
-		$category->name = $category->name . time() . rand();
+		$category->name = $category->name . rand();
 		$category = $this->client->category->add($category);
 					
 		$filterCategory = new KalturaCategoryFilter();
@@ -310,7 +307,7 @@ class EntitlementTest extends EntitlementTestBase
 		}
 		
 		/* @var $user KalturaUser */
-		$user->id = $user->id . time() . rand();
+		$user->id = $user->id . rand();
 		$user = $this->client->user->add($user);
 			
 		$this->startSessionWithDiffe(SessionType::USER, $user->id);
@@ -390,7 +387,7 @@ class EntitlementTest extends EntitlementTestBase
 		$this->startSession($this->client);
 		
 		/* @var $category KalturaCategory */
-		$category->name = $category->name . time() . rand();
+		$category->name = $category->name . rand();
 		$category = $this->client->category->add($category);
 					
 		$filterCategory = new KalturaCategoryFilter();
@@ -398,7 +395,7 @@ class EntitlementTest extends EntitlementTestBase
 		$categoriesListResponse = $this->client->category->listAction($filterCategory);
 		
 		/* @var $user KalturaUser */
-		$user->id = $user->id . time() . rand();
+		$user->id = $user->id . rand();
 		$user = $this->client->user->add($user);
 			
 		$this->startSessionWithDiffe(SessionType::USER, $user->id);
@@ -509,7 +506,7 @@ class EntitlementTest extends EntitlementTestBase
 		$entry = $this->client->baseEntry->add($entry);
 
 		/* @var $category KalturaCategory */
-		$category->name = $category->name . time() . rand();
+		$category->name = $category->name . rand();
 		$category = $this->client->category->add($category);
 		
 		$categoryCategoryEntry = new KalturaCategoryEntry();
@@ -552,29 +549,6 @@ class EntitlementTest extends EntitlementTestBase
 			
 		$updatedCategory = new KalturaCategory();
 		$updatedCategory->name = $category->name .' new name';
-			
-		try{
-			$category = $this->client->category->update($category->id, $updatedCategory);
-			$this->client->baseEntry->index($entry->id);
-		}
-		catch (Exception $ex)
-		{
-			$this->assertTrue(false, 'Fialed to update entry: '  . $ex->getMessage());
-			return;
-		}
-
-		try{
-			$entry = $this->client->baseEntry->get($entry->id);
-		}
-		catch (Exception $ex)
-		{
-			$this->assertTrue(false, 'Fialed to get entry to category: ' . $ex->getMessage());
-			return;
-		}
-		
-		if($entry->categories != $category->fullName)
-			$this->assertTrue(false, 'CategoryEntry new service didnt update entry->categories: ' . $ex->getMessage());
-		
 	}
 	
 	/**
@@ -587,7 +561,7 @@ class EntitlementTest extends EntitlementTestBase
 	{
 		$this->startSession($this->client);
 					
-		$categoryName = $categoryName . time() . rand();
+		$categoryName = $categoryName . rand();
 		$entry->categories = $categoryName;
 		$entry = $this->client->baseEntry->add($entry);
 
@@ -616,12 +590,43 @@ class EntitlementTest extends EntitlementTestBase
 		}
 		catch (Exception $ex)
 		{
-			$this->assertTrue(false, 'Fialed to get category entry ');
+			$this->assertTrue(false, 'Fialed to get category entry');
 			return;
 		}
 		
 		if($categoryEntryResponse->objects && count($categoryEntryResponse->objects) != 1)
 			$this->assertTrue(false, 'CategoryEntry was not created');
+	}
+	
+	/**
+	 * Tests testPrivacyContext
+	 * @param KalturaCategory $category1
+	 * @param KalturaCategory $category2
+	 * @param KalturaBaseEntry $entry
+	 * @dataProvider provideData
+	 */
+	public function testPrivacyContext($category1, $category2, $entry)
+	{
+		$this->startSession($this->client);
+		
+		/* @var $category KalturaCategory */
+		$category1->name = $category1->name . rand();
+		
+		try {
+			$category1 = $this->client->category->add($category1);
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::err('Error: line:' . __LINE__ .' ' . $ex->getMessage());
+			
+			if ($ex->getCode() != 'CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT' && $category1->privacyContext != '')
+			 	$this->assertTrue(false, 'should not be able to create category with privacyContext: ' . $ex->getCode());	
+
+			if($ex->getCode() == 'CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT' && $category1->privacyContext != '')
+				$this->assertTrue(true, 'should not be able to create category with privacyContext: ' . $ex->getCode());
+		}
+		
+		
 	}
 }
 
