@@ -160,21 +160,16 @@ abstract class ClientGeneratorFromPhp
 		$this->loadServicesInfo();
 		
 		// load the filter order by string enums
-		$filterOrderByStringEnums = array();
 		foreach($this->_types as $typeReflector)
 		{
 			if (strpos($typeReflector->getType(), "Filter", strlen($typeReflector->getType()) - 6))
 			{
 				$filterOrderByStringEnumTypeName = str_replace("Filter", "OrderBy", $typeReflector->getType());
 				if (class_exists($filterOrderByStringEnumTypeName))
-					$filterOrderByStringEnums[] = KalturaTypeReflectorCacher::get($filterOrderByStringEnumTypeName);
+					$this->addType(KalturaTypeReflectorCacher::get($filterOrderByStringEnumTypeName));
 			}
 		}
-		$this->_types = array_merge($this->_types, $filterOrderByStringEnums);
 		
-		// organize types so enums will be first
-		$enumTypes = array();
-		$classTypes = array();
 	    foreach($this->_types as $typeReflector)
 		{
 			if ($typeReflector->isEnum() || $typeReflector->isStringEnum())
@@ -183,13 +178,26 @@ abstract class ClientGeneratorFromPhp
 		        $classTypes[$typeReflector->getType()] = $typeReflector; 
 		};
 		
-		// sort by type name
-		ksort($enumTypes);
-
-		$this->sortClassTypes($classTypes);
+		uasort($this->_types, array($this, 'compareTypes'));
+	}
+	
+	/**
+	 * @param KalturaTypeReflector $a
+	 * @param KalturaTypeReflector $b
+	 */
+	protected function compareTypes(KalturaTypeReflector $a, KalturaTypeReflector $b)
+	{
+		// enums at the begining
+		if($a->isEnum() && !$b->isEnum())
+			return -1;
+			
+		if($b->isEnum() && !$a->isEnum())
+			return 1;
 		
-		// merge back
-		$this->_types = array_merge($enumTypes, $classTypes);
+		if($a->getInheritanceLevel() != $b->getInheritanceLevel())
+			return ($a->getInheritanceLevel() < $b->getInheritanceLevel() ? -1 : 1);
+			
+		return strcmp($a->getType(), $b->getType());
 	}
 	
 	/**
@@ -310,18 +318,6 @@ abstract class ClientGeneratorFromPhp
 		        $this->_services[$serviceId] = $serviceActionItemToAdd;
 		    }
 		}
-		
-//		// load the child types for all the types that we found except for types that inherit KalturaFilter
-//
-//		foreach($this->_types as $type => $typeReflector)
-//		{
-//			$reflector = new ReflectionClass($typeReflector->getType());
-//			
-//			if (!$typeReflector->isEnum() && !$typeReflector->isStringEnum() && !$reflector->isSubclassOf("KalturaFilter"))
-//			{
-//				$this->loadChildTypes($typeReflector);
-//			}
-//		}
 	}
 	
 	private function loadTypesRecursive(KalturaTypeReflector $typeReflector)
@@ -372,7 +368,10 @@ abstract class ClientGeneratorFromPhp
 	{
 		if (isset($this->_types[$typeReflector->getType()]))
 			return;
-			
+	
+		if(in_array($typeReflector->getType(), $this->_typesToIgnore))
+			return;
+		
 		$this->addType($typeReflector);
 		
 		$cacheTypesClassMap = false;
@@ -436,15 +435,23 @@ abstract class ClientGeneratorFromPhp
 	protected function addType(KalturaTypeReflector $objectReflector)
 	{
 		$type = $objectReflector->getType();
+	
+		if (isset($this->_types[$type]))
+			return;
 		
+		if(in_array($type, $this->_typesToIgnore))
+		{
+			KalturaLog::info("Type should be ignored [$type]");
+			return;
+		}
+			
 		if($objectReflector->isServerOnly())
 		{
 			KalturaLog::info("Type is server only [$type]");
 			return;
 		}
 			
-		if (!array_key_exists($type, $this->_types))
-			$this->_types[$type] = $objectReflector;
+		$this->_types[$type] = $objectReflector;
 	}
 	
 	public function isPathExcluded($path)
@@ -564,7 +571,7 @@ abstract class ClientGeneratorFromPhp
 			$list = array();
 			
 		if(is_string($list))
-			$list = explode(',', $list);
+			$list = explode(',', str_replace(' ', '', $list));
 			
 		$this->_typesToIgnore = $list;
 	}
@@ -593,82 +600,6 @@ abstract class ClientGeneratorFromPhp
 			if($classTypeReflector)
 				$this->loadTypesRecursive($classTypeReflector);
 		}
-	}
-	
-	/**
-	 * sorts the class so the parent classes will appear before the childs
-	 */
-	public function sortClassTypes(array &$types)
-	{
-		$typesTree = array();
-		
-		// first fill the base classes
-		foreach($types as $type)
-		{
-			if (is_null($type->getParentTypeReflector()))
-			{
-				$typesTree[$type->getType()] = array();
-			}
-		}
-		
-		// now fill recursively the childs
-		foreach($typesTree as $baseType => $null)
-		{
-			$this->loadChildrenForInheritance($types, $baseType, $typesTree);
-		}
-		
-		// use the tree to sort the types
-		$typesNamesInOrder = array();
-		$orderedTypes = array();
-		$this->flattenArray($typesTree, $typesNamesInOrder);
-		foreach($typesNamesInOrder as $typeName)
-		{
-			foreach($types as $type)
-			{
-				if ($type->getType() == $typeName)
-				{
-					$orderedTypes[$typeName] = $type;
-					break;
-				}
-			}
-		}
-
-		$types = &$orderedTypes;
-	}
-	
-	private function flattenArray($array, &$out) 
-	{
-	    foreach($array as $key => $childs)
-	    {
-	    	$out[$key] = null;
-	        if (is_array($childs) && count($childs) > 0)
-	            $this->flattenArray($childs, $out);
-	    }
-	}
-	
-	private function loadChildrenForInheritance(array $types, $parentType, array &$typesTree)
-	{
-		$typesTree[$parentType] = $this->getChildrenForParentType($types, $parentType);
-		
-		foreach($typesTree[$parentType] as $childClass => $null)
-		{
-			$this->loadChildrenForInheritance($types, $childClass, $typesTree[$parentType]);
-		}
-	}
-	
-	private function getChildrenForParentType(array $types, $parentType)
-	{
-		$childs = array();
-		foreach($types as $type)
-		{
-			$currentParentType = ($type->getParentTypeReflector()) ? $type->getParentTypeReflector()->getType() : null;
-			$class = $type->getType();
-			if ($currentParentType === $parentType) 
-			{
-				$childs[$class] = array();
-			}
-		}
-		return $childs;
 	}
 	
 	/**

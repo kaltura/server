@@ -214,6 +214,27 @@ class KalturaTypeReflector
 	}
 	
 	/**
+	 * Return the number of inheritance generations since KalturaObject
+	 *
+	 * @return int
+	 */
+	public function getInheritanceLevel()
+	{
+		if($this->_type == 'KalturaObject')
+			return 0;
+			
+		if(is_subclass_of($this->_type, 'IKalturaEnum'))
+			return 1;
+			
+		$parentTypeReflector = $this->getParentTypeReflector();
+		if(!$parentTypeReflector)
+			return 1;
+			
+		return $parentTypeReflector->getInheritanceLevel() + 1;
+	}
+	
+	/**
+	
 	 * Return a type reflector for the parent class (null if none) 
 	 *
 	 * @return KalturaTypeReflector
