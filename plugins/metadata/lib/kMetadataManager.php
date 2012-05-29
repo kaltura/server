@@ -535,10 +535,9 @@ class kMetadataManager
 	 */
 	public static function getTypeNameFromObject (BaseObject $object)
 	{
-	    $cls = get_class($object);
 	    foreach (self::$objectTypeNames as $objectType => $objectClassName)
 	    {
-	        if(is_subclass_of($object, $objectClassName))
+	        if($object instanceof  $objectClassName)
 
 	            return $objectType;
 	    }
