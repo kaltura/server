@@ -110,7 +110,7 @@ class CategoryUserService extends KalturaBaseService
 		$dbCategoryKuser = $categoryUser->toUpdatableObject($dbCategoryKuser);
 		$dbCategoryKuser->setUpdateMethod($override);
 		
-		$category = categoryPeer::retrieveByPK($categoryUser->categoryId);
+		$category = categoryPeer::retrieveByPK($categoryId);
 		if (!$category)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);
 
