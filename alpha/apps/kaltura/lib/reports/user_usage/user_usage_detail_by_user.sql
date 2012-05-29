@@ -28,7 +28,7 @@ FROM
 		total_entries,
 		total_msecs
 	FROM
-		kalturadw.dwh_hourly_user_usage u JOIN (SELECT kuser_id, MAX(date_id) date_id FROM dwh_hourly_user_usage u WHERE {OBJ_ID_CLAUSE} AND partner_id = {PARTNER_ID} AND date_id <= TO_DATE_ID GROUP BY kuser_id) MAX
+		kalturadw.dwh_hourly_user_usage u JOIN (SELECT kuser_id, MAX(date_id) date_id FROM dwh_hourly_user_usage u WHERE {OBJ_ID_CLAUSE} AND partner_id = {PARTNER_ID} AND date_id <= {TO_DATE_ID} GROUP BY kuser_id) MAX
 	    ON u.kuser_id = max.kuser_id AND u.date_id = max.date_id WHERE {OBJ_ID_CLAUSE}) total,
 	dwh_dim_kusers users
 WHERE raw_data.kuser_id = total.kuser_id
