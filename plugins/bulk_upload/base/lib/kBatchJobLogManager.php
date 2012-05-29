@@ -66,6 +66,7 @@ class kBatchJobLogManager implements kObjectCreatedEventConsumer, kObjectChanged
 	    $batchJob->copyInto($batchJobLog, true);
 	    $batchJobLog->setJobId($batchJob->getId());
 	    //set param_1 for the $batchJobLog
+	    $batchJobLog->setData($batchJob->getData(true), true);
 	    $batchJobData = $batchJob->getData();
 	    /* @var $batchJobData kBulkUploadJobData */
 	    $batchJobLog->setParam1($batchJobData->getBulkUploadObjectType());
