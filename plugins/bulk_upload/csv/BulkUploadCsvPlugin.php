@@ -163,7 +163,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	    $values[] = $bulkUploadResult->getAppearInList();
 	    $values[] = $bulkUploadResult->getPrivacy();
 	    $values[] = $bulkUploadResult->getContributionPolicy();
-	    $values[] = $bulkUploadResult->getInhritance();
+	    $values[] = $bulkUploadResult->getInheritance();
 	    $values[] = $bulkUploadResult->getUserJoinPolicy();
 	    $values[] = $bulkUploadResult->getDefaultPermissionLevel();
 	    $values[] = $bulkUploadResult->getOwner();
