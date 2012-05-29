@@ -46,9 +46,9 @@ class Infra_ClientHelper
 	
 	public static function getKs()
 	{
-		if (Zend_Auth::getInstance()->hasIdentity())
+		if (Infra_AuthHelper::getAuthInstance()->hasIdentity())
 		{
-			$ks = Zend_Auth::getInstance()->getIdentity()->getKs();
+			$ks = Infra_AuthHelper::getAuthInstance()->getIdentity()->getKs();
 		}
 		else
 		{

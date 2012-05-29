@@ -29,7 +29,7 @@ class Infra_AuthPlugin extends Zend_Controller_Plugin_Abstract
 			return;
 		}
 		
-		$auth = Zend_Auth::getInstance();
+		$auth = Infra_AuthHelper::getAuthInstance();
 		if ($auth->hasIdentity()) {
 			return;
 		}
