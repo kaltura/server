@@ -145,8 +145,10 @@ class UserController extends Zend_Controller_Action
 		{
 			$adapter = new Infra_AuthAdapter($request->getPost('email'), $request->getPost('password'));
 			$auth = Zend_Auth::getInstance();
+			$storage = new Zend_Auth_Storage_Session("Zend_Auth_AdminConsole");
+			$auth->setStorage($storage);
 			$result = $auth->authenticate($adapter);
-
+            
 			if ($result->isValid())
 			{
 				if ($request->getPost('remember_me'))
