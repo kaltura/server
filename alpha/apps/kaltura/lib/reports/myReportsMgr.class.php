@@ -217,7 +217,7 @@ class myReportsMgr
 				$data[] = $value;
 			}
 			$res = array ( $header , $data );
-			if ($input_filter instanceof endUserReportsInputFilter) 
+			if ($input_filter instanceof endUserReportsInputFilter && $report_type != self::REPORT_TYPE_USER_USAGE && $report_type != self::REPORT_TYPE_SPECIFIC_USER_USAGE) 
 			{
 				foreach ( $row as $name => $value )
 				{
@@ -657,7 +657,7 @@ class myReportsMgr
 					if (count($userIdsFromDB))
 						$kuserIds = implode(",", $userIdsFromDB);
 					else
-						$kuserId = kuser::KUSER_ID_THAT_DOES_NOT_EXIST;
+						$kuserIds = kuser::KUSER_ID_THAT_DOES_NOT_EXIST;
 							
 					$obj_ids_clause = "u.kuser_id in ( $kuserIds )";
 			} 
@@ -709,7 +709,7 @@ class myReportsMgr
 		self::REPORT_TYPE_ADMIN_CONSOLE => "admin_console" ,
 		self::REPORT_TYPE_USER_ENGAGEMENT => "user_engagement",
 		self::REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
-		self::REPROT_TYPE_SPEFICIC_USER_ENGAGEMENT => "specific_user_engagement",
+		self::REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT => "specific_user_engagement",
 		self::REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
 		self::REPORT_TYPE_USER_TOP_CONTENT => "user_top_content",
 		self::REPORT_TYPE_USER_TOP_CONTENT_TOTAL_UNIQUE => "user_engagement_unique",
