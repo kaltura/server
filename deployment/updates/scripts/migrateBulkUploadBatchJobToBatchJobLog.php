@@ -26,9 +26,14 @@ if (isset($argv[2]))
     $c->addAnd(BatchJobPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
 }
 
+if (isset($argv[3]))
+{
+    $c->addAnd(BatchJobPeer::UPDATED_AT, $argv[3], Criteria::GREATER_EQUAL);
+}
+
 $c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD, Criteria::EQUAL);
 $c->setLimit($countLimitEachLoop);
-$c->addAscendingOrderByColumn(BatchJobPeer::ID);
+$c->addAscendingOrderByColumn(BatchJobPeer::UPDATED_AT);
 $batchJobResults = BatchJobPeer::doSelect($c, $con);
 
 while($batchJobResults && count($batchJobResults))

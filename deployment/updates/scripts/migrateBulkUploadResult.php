@@ -25,6 +25,11 @@ if (isset($argv[2]))
 {
     $c->addAnd(BulkUploadResultPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
 }
+if (isset($argv[3]))
+{
+    $c->addAnd(BulkUploadResultPeer::UPDATED_AT, $argv[3], Criteria::GREATER_EQUAL);
+}
+$c->addAscendingOrderByColumn(BulkUploadResultPeer::UPDATED_AT);
 $c->setLimit($countLimitEachLoop);
 $bulkUploadResults = BulkUploadResultPeer::doSelect($c, $con);
 
