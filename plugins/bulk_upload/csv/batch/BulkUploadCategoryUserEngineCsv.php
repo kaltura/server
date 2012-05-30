@@ -200,7 +200,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		            break;
 		        
 		        case KalturaBulkUploadAction::UPDATE:
-		            $category = $this->createCategoryUserFromResultAndJobData($bulkUploadResult);
+		            $categoryUser = $this->createCategoryUserFromResultAndJobData($bulkUploadResult);
         					
         			$bulkUploadResultChunk[] = $bulkUploadResult;
 		    		if ($bulkUploadResult->requiredObjectStatus)
@@ -218,7 +218,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
         			}
         			
         			$this->impersonate();
-        			$this->kClient->categoryUser->update($bulkUploadResult->objectId, $category);
+        			$this->kClient->categoryUser->update($bulkUploadResult->categoryId, $bulkUploadResult->userId, $categoryUser);
         			$this->unimpersonate();
         			
         			
