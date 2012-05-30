@@ -47,7 +47,10 @@ class KalturaStatement extends PDOStatement
 			foreach ($input_parameters as $value) 
 			{
 				$search[] = ':p' . $i++;
-				$replace[] = "'$value'";
+				if(is_null($value))
+					$replace[] = "NULL";
+				else
+					$replace[] = "'$value'";
 			}
 			$search = array_reverse($search);
 			$replace = array_reverse($replace);
