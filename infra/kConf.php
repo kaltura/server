@@ -170,13 +170,13 @@ class kConf
 		{
 			foreach($srcConfig as $key => $value)
 			{
-				if(!$newConfig[$key]) // nothing to append
+				if(!isset($newConfig[$key])) // nothing to append
 					continue;
-				elseif(is_array($value) && isset($srcConfig[$key]))
+				elseif(is_array($value))
 					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly, $overwrite);
 				elseif($overwrite)
 					$returnedConfig[$key] = $newConfig[$key];
-				elseif(!is_array($value))
+				else
 					$returnedConfig[$key] = $srcConfig[$key] . ',' . $newConfig[$key];
 			}
 		}
@@ -188,7 +188,7 @@ class kConf
 				{
 					$returnedConfig[] = $newConfig[$key];
 				}
-				elseif(!$srcConfig[$key])
+				elseif(!isset($srcConfig[$key]))
 				{
 					$returnedConfig[$key] = $newConfig[$key];
 				}
