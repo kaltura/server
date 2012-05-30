@@ -380,6 +380,10 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 			{
 				$doneWithPrev = false;
 			}
+			else
+			{
+			    $doneWithPrev = true;
+			}
 			if ($doneWithPrev)
 				$this->addBulkUploadResult($bulkUploadResult);
 		}
