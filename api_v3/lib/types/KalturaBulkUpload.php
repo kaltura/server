@@ -108,7 +108,7 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 	 * @var unknown_type
 	 */
 	private $map_between_objects = array(
-	    "id",
+	    "id" => "jobId",
 	    "uploadedOn" => "createdAt",
 	    "status",
 	    "error" => "message",
@@ -143,7 +143,6 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 		
 	    //if (isset ())
 		$jobData = $batchJobObject->getData();
-		KalturaLog::debug();
 		if($jobData && $jobData instanceof kBulkUploadJobData)
 		{
 			$this->uploadedBy = $jobData->getUploadedBy();
