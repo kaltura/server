@@ -21,6 +21,13 @@ class KDLFlavor extends KDLMediaDataSet {
 	public	$_isTwoPass=false;
 	public  $_clipStart=null;
 	public 	$_clipDur=null;
+	public	$_explicitClipDur=null; // Contrary to to the 'clipDur' data member, the 'explicitClipDur' can not be 0 or null, 
+									// for flavors that have a clip action.
+									// clipDur==0/null means that the clip should end when the source is finised.
+									// Some transcoders require 'explicit' duration (EE3), even in those cases.
+									// For those cases I have set this data member.
+									// Although the 'clipDur' can be changed to act in this way, I prefered to not to touch 
+									// the origina logic (that works for ffmpeg,mec, on2, vlc), but rather set this new data member 
 	public	$_transcoders = array();
 
 		/* --------------------------
@@ -390,7 +397,14 @@ $plannedDur = 0;
 			 */
 		if($sourceDur>0 && $sourceDur<$target->_clipStart+$target->_clipDur) {
 			$target->_clipDur=0;
+			$target->_explicitClipDur=$sourceDur-$target->_clipStart;
 		}
+		else if(isset($target->_clipStart) && (!isset($target->_clipDur) || $target->_clipDur==0)){
+			$target->_explicitClipDur=$sourceDur-$target->_clipStart;
+		}
+		else
+			$target->_explicitClipDur = $target->_clipDur;
+			
 		$target->_container->_duration = $sourceDur;
 		$target->_video = null;
 		if($this->_video!="") {
