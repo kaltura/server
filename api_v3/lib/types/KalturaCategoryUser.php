@@ -95,6 +95,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	);
 	
 	public function toObject($dbObject = null, $skip = array()) {
+	    
 		if (is_null ( $dbObject ))
 			$dbObject = new categoryKuser ();
 		
@@ -157,5 +158,19 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 		}
 		
 		return parent::validateForInsert ( $propertiesToSkip );
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toInsertableObject()
+	 */
+	public function toInsertableObject($dbObject = null, $skip = array())
+	{
+	    if (!$this->permissionLevel)
+	    {
+    	    $category = categoryPeer::retrieveByPK($this->categoryId);
+	        $this->permissionLevel = $category->getDefaultPermissionLevel();
+	    }
+	    
+	    return parent::toInsertableObject($dbObject, $skip);
 	}
 }
