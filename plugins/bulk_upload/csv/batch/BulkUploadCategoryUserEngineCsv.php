@@ -9,6 +9,12 @@
 class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 {
     private $categoryReferenceIdMap = array();
+    
+    private static $validCategoryUserStatuses = array(KalturaCategoryUserStatus::ACTIVE, KalturaCategoryUserStatus::NOT_ACTIVE, KalturaCategoryUserStatus::PENDING,);
+    
+    private static $validCategoryUserPermissionLevels = array (KalturaCategoryUserPermissionLevel::CONTRIBUTOR, KalturaCategoryUserPermissionLevel::MANAGER, KalturaCategoryUserPermissionLevel::MEMBER, KalturaCategoryUserPermissionLevel::MODERATOR,);
+    
+    private static $validCategoryUserUpdateMethods = array (KalturaUpdateMethodType::AUTOMATIC, KalturaUpdateMethodType::MANUAL,);
 	/**
      * (non-PHPdoc)
      * @see BulkUploadGeneralEngineCsv::createUploadResult()
@@ -91,6 +97,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
     
 	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult)
 	{
+	    /* @var $bulkUploadResult KalturaBulkUploadResultCategoryUser */
 		if (!$bulkUploadResult->userId)
 		{
 		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
@@ -104,7 +111,29 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
 			$bulkUploadResult->errorDescription = "Missing mandatory parameter categoryId";
 		}
-
+		
+		if ($bulkUploadResult->requiredObjectStatus && !in_array($bulkUploadResult->requiredObjectStatus, self::$validCategoryUserStatuses))
+	    {
+	        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+			$bulkUploadResult->errorDescription = "Wrong value passed for property status.";
+	    }
+	    
+	    if ($bulkUploadResult->permissionLevel && !in_array($bulkUploadResult->permissionLevel, self::$validCategoryUserPermissionLevels))
+	    {
+	        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+			$bulkUploadResult->errorDescription = "Wrong value passed for property permissionLevel.";
+	    }
+	    
+	    if ($bulkUploadResult->updateMethod && !in_array($bulkUploadResult->updateMethod, self::$validCategoryUserUpdateMethods))
+	    {
+	        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+			$bulkUploadResult->errorDescription = "Wrong value passed for property updateMethod.";
+	    }
+	    
+	    
 		if($this->lineNumber > $this->maxRecords) // check max records
 		{
 			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
