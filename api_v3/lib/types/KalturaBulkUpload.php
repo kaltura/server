@@ -124,7 +124,11 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 	
 	public function fromObject($batchJobObject)
 	{
-		/* @var $batchJobObject BatchJobLog */
+	    /* @var $batchJobObject BatchJobLog */
+	    if (is_null($batchJobObject))
+	    {
+	        return null;
+	    }
 		
 		if($batchJobObject->getJobType() != BatchJobType::BULKUPLOAD)
 			throw new Exception("Bulk upload object can be initialized from bulk upload job only");
