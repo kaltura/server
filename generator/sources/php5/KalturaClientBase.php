@@ -261,6 +261,7 @@ class KalturaClientBase
 		$this->addParam($params, "apiVersion", $this->apiVersion);
 		$this->addParam($params, "format", $this->config->format);
 		$this->addParam($params, "clientTag", $this->config->clientTag);
+		$this->addParam($params, "ignoreNull", true);
 		
 		$url = $this->config->serviceUrl."/api_v3/index.php?service=";
 		if ($this->isMultiRequest)
@@ -593,8 +594,8 @@ class KalturaClientBase
 	/**
 	 * Validate that the passed object type is of the expected type
 	 *
-	 * @param unknown_type $resultObject
-	 * @param unknown_type $objectType
+	 * @param any $resultObject
+	 * @param string $objectType
 	 */
 	public function validateObjectType($resultObject, $objectType)
 	{
