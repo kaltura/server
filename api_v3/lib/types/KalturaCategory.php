@@ -382,19 +382,23 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		if($this->privacyContext != null && kEntitlementUtils::getEntitlementEnforcement())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT);
 			
-		if($this->privacyContext != null || $this->privacyContext != '') 
+		if(($this->privacyContext == null || $this->privacyContext == '') &&
+			((is_null($sourceObject) &&
+			(($this->appearInList != null && $this->appearInList != KalturaAppearInListType::PARTNER_ONLY) ||
+			($this->privacy != null && $this->privacy != KalturaPrivacyType::ALL))) ||
+			($sourceObject &&
+			((($this->appearInList != null && $this->appearInList != KalturaAppearInListType::PARTNER_ONLY) ||
+			($this->appearInList == null && $sourceObject->getDisplayInSearch() != DisplayInSearchType::PARTNER_ONLY)) || 
+			(($this->privacy != null && $this->privacy != KalturaPrivacyType::ALL) ||
+			 $this->privacy == null && $sourceObject->getPrivacy() != KalturaPrivacyType::ALL))))) 
 		{
-			if(is_null($sourceObject) && ($this->appearInList != null && $this->appearInList != KalturaAppearInListType::PARTNER_ONLY) ||
-				($this->privacy != null && $this->privacy != KalturaPrivacyType::ALL))
+			if ($this->parentId != null)
 			{
-				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT);
+				$parentCategory = categoryPeer::retrieveByPK($this->parentId);
+				if($parentCategory && $parentCategory->getPrivacyContexts() == '')
+					throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT);
 			}
-			
-			if(!is_null($sourceObject) && 
-				(($this->appearInList != null && $this->appearInList != KalturaAppearInListType::PARTNER_ONLY) ||
-				($this->appearInList != null && $sourceObject->getDisplayInSearch() != DisplayInSearchType::PARTNER_ONLY) || 
-				($this->privacy != null && $this->privacy != KalturaPrivacyType::ALL) ||
-				($this->privacy != null && $sourceObject->getPrivacy() != KalturaPrivacyType::ALL)))
+			else
 			{
 				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT);
 			}
