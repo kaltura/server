@@ -133,9 +133,9 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 		
 		$this->uploadedOn = $batchJobObject->getCreatedAt(null);
 		
-		$this->logFileUrl = requestUtils::getHost() . "/api_v3/service/bulkUpload/action/serveLog/id/{$batchJobObject->getId()}/ks/" . kCurrentContext::$ks;
+		$this->logFileUrl = requestUtils::getHost() . "/api_v3/service/bulkUpload/action/serveLog/id/{$batchJobObject->getJobId()}/ks/" . kCurrentContext::$ks;
 //		$this->logFileUrl = requestUtils::getHost() . "/index.php/extwidget/bulkuploadfile/id/{$batchJob->getId()}/pid/{$batchJob->getPartnerId()}/type/log";
-		$this->bulkFileUrl = requestUtils::getHost() . "/api_v3/service/bulkUpload/action/serve/id/{$batchJobObject->getId()}/ks/" . kCurrentContext::$ks;
+		$this->bulkFileUrl = requestUtils::getHost() . "/api_v3/service/bulkUpload/action/serve/id/{$batchJobObject->getJobId()}/ks/" . kCurrentContext::$ks;
 //		$this->bulkFileUrl = requestUtils::getCdnHost() . "/index.php/extwidget/bulkuploadfile/id/{$batchJob->getId()}/pid/{$batchJob->getPartnerId()}/type/$type";
 		$this->csvFileUrl = $this->bulkFileUrl;
 		if (method_exists(get_class($batchJobObject), "getParam1"))
