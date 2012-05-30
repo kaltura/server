@@ -87,11 +87,19 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
     
 	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult)
 	{
+	    /* @var $bulkUploadResult KalturaBulkUploadResultUser */
 		if (!$bulkUploadResult->objectId)
 		{
 		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
 			$bulkUploadResult->errorDescription = "Mandatory Column [userId] missing from CSV.";
+		}
+		
+		if ($bulkUploadResult->dateOfBirth && !self::isFormatedDate($bulkUploadResult->dateOfBirth))
+		{
+		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+			$bulkUploadResult->errorDescription = "Format of property dateOfBirth is incorrect.";
 		}
 		
 	    if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
