@@ -17,6 +17,7 @@ class kEntitlementUtils
 	
 	public static function getEntitlementEnforcement()
 	{
+		//return false;
 		return self::$entitlementEnforcement;
 	}
 	
@@ -64,20 +65,24 @@ class kEntitlementUtils
 					$kuserId = $kuser->getId();
 			}
 			
-			// kuser is set on the entry as creator or uploader
-			if ($entry->getKuserId() == $kuserId || $entry->getCreatorKuserId() == $kuserId)
-				return true;
+			if($kuserId != '')
+			{
+				// kuser is set on the entry as creator or uploader
+				if ($entry->getKuserId() == $kuserId || $entry->getCreatorKuserId() == $kuserId)
+					return true;
+				
+				// kuser is set on the entry entitled users edit or publish
+				$entitledKusers = array_merge(explode(',', $entry->getEntitledKusersEdit()), explode(',', $entry->getEntitledKusersPublish()));
+				if(in_array($kuserId, $entitledKusers))
+					return true; 
+			}
 			
-			// kuser is set on the entry entitled users edit or publish
-			$entitledKusers = array_merge(explode(',', $entry->getEntitledKusersEdit()), explode(',', $entry->getEntitledKusersPublish()));
-			if(in_array($kuserId, $entitledKusers))
-				return true; 
-	
 			// entry that doesn't belong to any category is public
 			$categoryEntries = categoryEntryPeer::retrieveByEntryId($entry->getId());
 			if(!count($categoryEntries))
 				return true;
-					
+		
+						
 			// kuser is set on the category as member
 			// this ugly code is temporery - since we have a bug in sphinxCriteria::getAllCriterionFields
 			$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $kuserId, Criteria::EQUAL);
@@ -142,7 +147,7 @@ class kEntitlementUtils
 	 */
 	public static function initEntitlementEnforcement($partnerId = null, $enableEntit = null)
 	{
-		if(is_null($partnerId))
+		if(is_null($partnerId)) 
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			 
 		$partner = PartnerPeer::retrieveByPK($partnerId);
