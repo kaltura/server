@@ -14,5 +14,18 @@
  * @subpackage model
  */
 class BatchJobLogPeer extends BaseBatchJobLogPeer {
+    
+    /**
+     * Function retreives BatchJobLog object by a specific job ID.
+     * @param string $jobId
+     * @return BatchJobLog
+     */
+    public static function retrieveByBatchJobId ($jobId)
+    {
+        $c = new Criteria();
+        $c->addAnd(BatchJobLogPeer::JOB_ID, $jobId, Criteria::EQUAL);
+        
+        return self::doSelectOne($c);
+    }
 
 } // BatchJobLogPeer
