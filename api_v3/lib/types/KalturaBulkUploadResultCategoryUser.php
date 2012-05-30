@@ -59,4 +59,17 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
 		
 		return $dbObject;
 	}
+	
+	public function toObject($object_to_fill = null , $props_to_skip = array() )
+	{
+	    if (is_null($object_to_fill))
+	    {
+	        return null;
+	    }
+	    $categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->categoryId, $this->userId);
+	    if ($categoryKuser)
+	        $this->objectId = $categoryKuser->getId();
+	    
+	    return parent::toObject($object_to_fill, $props_to_skip);
+	}
 }
