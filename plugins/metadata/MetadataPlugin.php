@@ -380,7 +380,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	
 	/**
 	 * @param int $metadataProfileId
-	 * @param Object $object
+	 * @param BaseObject $object
 	 * @param array $data
 	 */
 	protected static function addMetadataWithProfileId (BaseObject $object, array $data)
