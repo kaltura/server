@@ -239,7 +239,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . $manager . ' << ' . $kuser->getid() .' << ' . $manager . ')';
 			}
 		}
-		$filter->unsetByName('_eq_any_member');
+		$filter->unsetByName('_eq_manager');
 		
 		if($filter->get('_eq_member'))
 		{
