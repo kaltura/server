@@ -42,7 +42,6 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		parent::configure($taskConfig, $data, $client);
 		$this->taskConfiguration = $taskConfig;
 		$this->flavorParamsOutput = $data->flavorParamsOutput;
-		KalturaLog::debug("document : this [". print_r($this, true)."]"); 
 	}
 	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
