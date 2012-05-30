@@ -48,9 +48,9 @@ class BulkService extends KalturaBaseService
 		$dbBulkUploadJobData->setFilePath($fileData["tmp_name"]);
 		
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
-		
+		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
 		$bulkUpload = new KalturaBulkUpload();
-		$bulkUpload->fromObject($dbJob);
+		$bulkUpload->fromObject($dbJobLog);
 		
 		return $bulkUpload;
 	}
@@ -90,9 +90,10 @@ class BulkService extends KalturaBaseService
 		$dbBulkUploadJobData->setFilePath($fileData["tmp_name"]);
 		
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
+		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
 		
 		$bulkUpload = new KalturaBulkUpload();
-		$bulkUpload->fromObject($dbJob);
+		$bulkUpload->fromObject($dbJobLog);
 		
 		return $bulkUpload;
 	}
@@ -130,9 +131,10 @@ class BulkService extends KalturaBaseService
 		$dbBulkUploadJobData->setFilePath($fileData["tmp_name"]);
 		
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
+		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
 		
 		$bulkUpload = new KalturaBulkUpload();
-		$bulkUpload->fromObject($dbJob);
+		$bulkUpload->fromObject($dbJobLog);
 		
 		return $bulkUpload;
 	}
@@ -170,9 +172,9 @@ class BulkService extends KalturaBaseService
 		$dbBulkUploadJobData->setFilePath($fileData["tmp_name"]);
 		
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
-		
+		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
 		$bulkUpload = new KalturaBulkUpload();
-		$bulkUpload->fromObject($dbJob);
+		$bulkUpload->fromObject($dbJobLog);
 		
 		return $bulkUpload;
 	}
