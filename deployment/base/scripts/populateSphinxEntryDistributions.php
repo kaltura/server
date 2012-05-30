@@ -30,8 +30,10 @@ if($argc > 1 && is_numeric($argv[1]))
 	$c->add(EntryDistributionPeer::ID, $argv[1], Criteria::GREATER_EQUAL);
 if($argc > 2 && is_numeric($argv[2]))
 	$c->add(EntryDistributionPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
-
-$c->addAscendingOrderByColumn(EntryDistributionPeer::ID);
+if($argc > 3 && is_numeric($argv[3]))
+	$c->add(EntryDistributionPeer::UPDATED_AT, $argv[3], Criteria::GREATER_EQUAL);
+	
+$c->addAscendingOrderByColumn(EntryDistributionPeer::UPDATED_AT);
 $c->setLimit(10000);
 
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
@@ -43,7 +45,7 @@ while(count($entries))
 {
 	foreach($entries as $entry)
 	{
-		KalturaLog::log('entry distribution id ' . $entry->getId());
+		KalturaLog::log('entry distribution id ' . $entry->getId() .' updated at ' . $entry->getUpdatedAt(null));
 		
 		try {
 			$ret = $sphinx->saveToSphinx($entry, true);
