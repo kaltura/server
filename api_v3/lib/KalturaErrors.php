@@ -406,6 +406,8 @@ class KalturaErrors extends APIErrors
 	/**
 	 * categoryEntry
 	 */
+	const INVALID_ENTRY_ID ="INVALID_ENTRY_ID,Invalid entry id [\"%s\"]";
+	
 	const CANNOT_ASSIGN_ENTRY_TO_CATEGORY = "CANNOT_ASSIGN_ENTRY_TO_CATEGORY,Cannot assign entry to category";
 
 	const CANNOT_REMOVE_ENTRY_FROM_CATEGORY = "CANNOT_REMOVE_ENTRY_FROM_CATEGORY,Cannot remove entry from category";
