@@ -278,7 +278,13 @@ class CategoryUserService extends KalturaBaseService
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $filter->userIdEqual);
 			if (!$kuser)
-				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
+			{
+				$response = new KalturaCategoryUserListResponse();
+        		$response->objects = new KalturaCategoryUserArray();
+        		$response->totalCount = 0;
+        		
+        		return $response;
+			}
 				
 			$filter->userIdEqual = $kuser->getId();
 		}	
