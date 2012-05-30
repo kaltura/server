@@ -20,7 +20,10 @@ class KalturaStatement extends PDOStatement
 	public function bindValue ($parameter, $value, $data_type = null)
 	{
 		$index = count($this->values) + 1;
-		$this->values[":p{$index}"] = "'" . str_replace("'", "''", $value) . "'";
+		if(is_null($value))
+			$this->values[":p{$index}"] = "NULL";
+		else
+			$this->values[":p{$index}"] = "'" . str_replace("'", "''", $value) . "'";
 		
 		return parent::bindValue ($parameter, $value, $data_type);
 	}
