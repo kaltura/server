@@ -113,7 +113,7 @@ class BulkService extends KalturaBaseService
 	       $bulkUploadData = new KalturaBulkUploadJobData();
 	    }
 	    
-        if ($bulkUploadCategoryUserData)
+        if (!$bulkUploadCategoryUserData)
         {
             $bulkUploadCategoryUserData = new KalturaBulkUploadCategoryUserData();
         }
