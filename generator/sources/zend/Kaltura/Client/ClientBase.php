@@ -344,7 +344,7 @@ class Kaltura_Client_ClientBase
 		}
 		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, '');
+		curl_setopt($ch, CURLOPT_USERAGENT, $this->config->userAgent);
 		if (count($files) > 0)
 			curl_setopt($ch, CURLOPT_TIMEOUT, 0);
 		else
@@ -383,6 +383,7 @@ class Kaltura_Client_ClientBase
 		$formattedData = http_build_query($params , "", "&");
 		$params = array('http' => array(
 					"method" => "POST",
+					"User-Agent: " . $this->config->userAgent . "\r\n".
 					"Accept-language: en\r\n".
 					"Content-type: application/x-www-form-urlencoded\r\n",
 					"content" => $formattedData
@@ -467,7 +468,7 @@ class Kaltura_Client_ClientBase
 		
 		if(!is_array($paramValue))
 		{
-			$params[$paramName] = $paramValue;
+			$params[$paramName] = (string)$paramValue;
 			return;
 		}
 		
@@ -537,6 +538,11 @@ class Kaltura_Client_ClientBase
 	public function isMultiRequest()
 	{
 		return $this->isMultiRequest;	
+	}
+		
+	public function getMultiRequestQueueSize()
+	{
+		return count($this->callsQueue);	
 	}
 	
 	/**

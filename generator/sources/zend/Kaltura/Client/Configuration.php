@@ -40,6 +40,7 @@ class Kaltura_Client_Configuration
 	public $clientTag 	  				= "php5zend";
 	public $curlTimeout   				= 10;
 	public $startZendDebuggerSession 	= false;
+	public $userAgent					= '';
 	
 	/**
 	 * Constructs new Kaltura configuration object
