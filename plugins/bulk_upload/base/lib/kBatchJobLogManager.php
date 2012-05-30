@@ -65,12 +65,7 @@ class kBatchJobLogManager implements kObjectCreatedEventConsumer, kObjectChanged
 	{
 	    $batchJob->copyInto($batchJobLog, true);
 	    $batchJobLog->setJobId($batchJob->getId());
-	    //set param_1 for the $batchJobLog
-	    $batchJobLog->setData($batchJob->getData(true), true);
-	    $batchJobData = $batchJob->getData();
-	    /* @var $batchJobData kBulkUploadJobData */
-	    $batchJobLog->setParam1($batchJobData->getBulkUploadObjectType());
-
+	    
 		return $batchJobLog;
 	}
 	
@@ -89,6 +84,13 @@ class kBatchJobLogManager implements kObjectCreatedEventConsumer, kObjectChanged
 	            KalturaLog::err("Could not set value for BatchJobLog field $fieldName, exception thrown: ".$e->getMessage());
 	        }
 	        $batchJobLog->setByPosition($fieldPosLog, $batchJob->getByPosition($fieldPosJob));
+	        if ($modifiedColumn == BatchJobPeer::DATA)
+	        {
+	            //set param_1 for the $batchJobLog
+        	    $batchJobData = $batchJob->getData();
+        	    /* @var $batchJobData kBulkUploadJobData */
+        	    $batchJobLog->setParam1($batchJobData->getBulkUploadObjectType());
+	        }
 	    }	 
 
 	    return $batchJobLog;
