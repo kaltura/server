@@ -1376,6 +1376,7 @@ class kJobsManager
 	{
 		$job = new BatchJob();
 		$job->setPartnerId($partner->getId());
+		$job->setJobType(BatchJobType::BULKUPLOAD);
 		$job->setJobSubType($bulkUploadType);
 		$job->save();
 
