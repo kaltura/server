@@ -15,7 +15,6 @@ const jobXml = '<?xml version="1.0"?>
   <MediaFile
     VideoResizeMode="Letterbox"
 	ThumbnailCodec="Jpeg" 
-	ThumbnailTime="00:00:03"
     ThumbnailMode="Custom">
     <OutputFormat>
     </OutputFormat>
@@ -102,12 +101,24 @@ const videoVariableBitrateXml = '<Bitrate>
 					AverageBitrate="700" />
 			</Bitrate>
 ';
-	
+
+const clippedSourcesXml = '<Sources>
+      <Source
+        AudioStreamIndex="0">
+        <Clips>
+          <Clip
+            StartTime="00:00:00"
+            EndTime="00:00:40" />
+        </Clips>
+      </Source>
+    </Sources>
+';
     public function GenerateConfigData(KDLFlavor $design, KDLFlavor $target)
 	{
 				// Remove slaches that were added to solve
 				// JSON serialization issue
-		$xmlStr=str_replace ('"' , '\"' ,  self::GeneratePresetFile($target));
+		$xmlStr=self::GeneratePresetFile($target);
+		$xmlStr=str_replace ('"', '\"', $xmlStr);
 		return $xmlStr;
 	}
 
@@ -278,6 +289,25 @@ $contObj = $target->_container;
 			$outputFormat=$jobElem->MediaFile->OutputFormat->addChild($formatName);
 		}
 		
+		/*
+		 * Set EE3 cliping if the target is clipped 
+		 */
+		$sourcesElem = new SimpleXMLElement(self::clippedSourcesXml);
+		$clipElem = null;
+		if(isset($target->_clipStart) && $target->_clipStart>0){
+			$clipStartStr = self::formatTimesForEE3Xml($target->_clipStart);
+			$clipElem = $sourcesElem->Source->Clips->Clip;
+			$clipElem['StartTime']= $clipStartStr;
+		}
+		if(isset($target->_explicitClipDur) && $target->_explicitClipDur>0){
+			$clipEndStr = self::formatTimesForEE3Xml($target->_clipStart+$target->_explicitClipDur);
+			$clipElem = $sourcesElem->Source->Clips->Clip;
+			$clipElem['EndTime'] = $clipEndStr;
+		}
+		if(isset($clipElem)){
+			KDLUtils::AddXMLElement($jobElem->MediaFile, $sourcesElem);
+		}
+		
 		if(isset($audioProfileElem)) {
 			KDLUtils::AddXMLElement($outputFormat, $audioProfileElem);
 		}
@@ -292,6 +322,7 @@ $contObj = $target->_container;
 		else {
 			$jobElem->Job['DefaultMediaOutputFileName']=$defaultMediaOutputFileName;
 		}
+		
 /*
 	Since there are certain constraints on those values for the EE3 presets, 
 	those values are set in the templates only
@@ -422,5 +453,18 @@ KalturaLog::log("-->xmlBR=".$br->VariableConstrainedBitrate['AverageBitrate'].",
 			$prev = $v;
 		}
 		return $prev;
+	}
+	
+	/* ------------------------------
+	 * lookForClosest
+	 */
+	private static function formatTimesForEE3Xml($timeInMsec)
+	{
+		$msecs = $timeInMsec%1000;
+		$secs = floor($timeInMsec/1000);
+		$dt = new DateTime("@$secs");
+		$str = $dt->format('H:i:s');
+		return "$str.".sprintf("%03d",$msecs);
+		
 	}
 }
