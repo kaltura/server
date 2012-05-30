@@ -217,7 +217,7 @@ class kBatchExclusiveLock
 								$atmp IS NULL
 							)";
 								
-		$crit1 = $c->getNewCriterion($stat, BatchJob::BATCHJOB_STATUS_PENDING);
+		$crit1 = $c->getNewCriterion($stat, array(BatchJob::BATCHJOB_STATUS_PENDING, BatchJob::BATCHJOB_STATUS_ALMOST_DONE), Criteria::IN);
 		$crit1->addOr($c->getNewCriterion($schd, $query1, Criteria::CUSTOM));
 		$crit1->addOr($c->getNewCriterion($schd, $query2, Criteria::CUSTOM));
 		$crit1->addOr($c->getNewCriterion($schd, $query3, Criteria::CUSTOM));
