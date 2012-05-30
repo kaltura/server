@@ -205,7 +205,6 @@ class CategoryService extends KalturaBaseService
 	 * @param int $id
 	 * @param bool $shouldUpdate
 	 * @return int category int id
-	 * @serverOnly
 	 */
 	function indexAction($id, $shouldUpdate = true)
 	{
