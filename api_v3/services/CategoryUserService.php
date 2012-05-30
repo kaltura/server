@@ -374,7 +374,6 @@ class CategoryUserService extends KalturaBaseService
 	 * @param bool $shouldUpdate
 	 * @throws KalturaErrors::INVALID_CATEGORY_USER_ID
 	 * @return int
-	 * @serverOnly
 	 */
 	public function indexAction($userId, $categoryId, $shouldUpdate = true)
 	{

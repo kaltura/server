@@ -185,7 +185,6 @@ class CategoryEntryService extends KalturaBaseService
 	 * @param bool $shouldUpdate
 	 * @throws KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY
 	 * @return int
-	 * @serverOnly
 	 */
 	function indexAction($entryId, $categoryId, $shouldUpdate = true)
 	{

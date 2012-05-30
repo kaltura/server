@@ -833,9 +833,8 @@ class BaseEntryService extends KalturaEntryService
 	 * @param string $id
 	 * @param bool $shouldUpdate
 	 * @return int entry int id
-	 * @serverOnly
 	 */
-	function indexAction($id, $shouldUpdate)
+	function indexAction($id, $shouldUpdate = true)
 	{
 		$entryDb = entryPeer::retrieveByPK($id);
 		if (!$entryDb)
