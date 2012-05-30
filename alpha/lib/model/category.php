@@ -105,6 +105,9 @@ class category extends Basecategory implements IIndexable
 			$this->reSetDepth();
 		}
 		
+		if( $this->isColumnModified(categoryPeer::PARENT_ID) && $this->getParentId())
+			$this->incrementDirectSubCategoriesCount($this->getParentId());
+		
 		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PARENT_ID))
 		{
 			$this->resetFullIds();
@@ -266,6 +269,16 @@ class category extends Basecategory implements IIndexable
 		{
 			$this->addRecalcCategoriesCount($this->getId());
 			$this->addRecalcCategoriesCount($this->old_parent_id);
+			$this->decrementDirectSubCategoriesCount($this->old_parent_id);
+		}
+		
+		if ($this->isColumnModified(categoryPeer::STATUS) && 
+			($this->getStatus() == CategoryStatus::PURGED || 
+			 $this->getStatus() == CategoryStatus::DELETED) &&
+			($this->getColumnsOldValue(categoryPeer::STATUS) == CategoryStatus::ACTIVE || 
+			 $this->getColumnsOldValue(categoryPeer::STATUS) == CategoryStatus::UPDATING))
+		{
+			$this->decrementDirectSubCategoriesCount($this->parent_id);
 		}
 
 		// check if parnet is deleted and could be purged
@@ -926,6 +939,9 @@ class category extends Basecategory implements IIndexable
 			
 			parent::save();
 		}
+		
+		if($this->getParentId())
+			$this->incrementDirectSubCategoriesCount($this->getParentId());
 			
 		if (!$this->alreadyInSave)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
@@ -1116,10 +1132,10 @@ class category extends Basecategory implements IIndexable
 		}
 
 		$parentCategory = $this->getParentCategory();
-		$privacyContext = explode(',', $parentCategory->getPrivacyContexts());
+		$privacyContext = explode(' ', $parentCategory->getPrivacyContexts());
 		$privacyContext[] = $v;
 
-		$this->setPrivacyContexts(implode(',', $privacyContext));
+		$this->setPrivacyContexts(implode(' ', $privacyContext));
 		parent::setPrivacyContext($v);
 	}
 
@@ -1325,7 +1341,7 @@ class category extends Basecategory implements IIndexable
 	public function getSearchIndexPrivacyContext()
 	{
 		if(is_null($this->getPrivacyContext()) || $this->getPrivacyContext() == '')
-			return kEntitlementUtils::DEFAULT_CONTEXT;
+			return '';
 			
 		return $this->getPrivacyContexts() . ' ' . kEntitlementUtils::NOT_DEFAULT_CONTEXT;
 	}
@@ -1362,6 +1378,30 @@ class category extends Basecategory implements IIndexable
 			return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 			
 		return self::$sphinxFieldsEscapeType[$fieldName];
+	}
+	
+	public function decrementDirectSubCategoriesCount($categoryId, $shouldSave = false)
+	{
+		$category = categoryPeer::retrieveByPK($categoryId);
+		if($category)
+		{
+			$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() - 1);
+			
+			if($shouldSave)
+				$category->save();
+		}
+	}
+	
+	public function incrementDirectSubCategoriesCount($categoryId, $shouldSave = false)
+	{
+		$category = categoryPeer::retrieveByPK($categoryId);
+		if($category)
+		{
+			$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() + 1);
+			
+			if($shouldSave)
+				$category->save();
+		}
 	}
 	
 }
