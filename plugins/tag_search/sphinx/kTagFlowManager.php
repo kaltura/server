@@ -66,7 +66,10 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public function objectChanged (BaseObject $object, array $modifiedColumns)
     {
-        $tagsIdsToRemove = $this->checkExistForDelete($object, $object->getColumnsOldValue(self::getClassConstValue(get_class($object->getPeer()), self::TAGS_FIELD_NAME)));
+        $tagsIdsToRemove = array();
+        $oldTags = $object->getColumnsOldValue(self::getClassConstValue(get_class($object->getPeer()), self::TAGS_FIELD_NAME));
+        if ($oldTags && $oldTags != "")
+            $tagsIdsToRemove = $this->checkExistForDelete($object,$oldTags );
         $tagsToRemove = TagPeer::retrieveByPKs($tagsIdsToRemove);
         
         foreach ($tagsToRemove as $tagToRemove)
@@ -104,6 +107,11 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	{
 	    KalturaLog::info("In Object Added handler");
 	    $objectTags = $this->trimObjectTags($object->getTags());
+	    
+	    if (!count($objectTags))
+	    {
+	        return array();
+	    }
 	    
 	    $c = $this->getTagObjectsByTagStringsCriteria($objectTags, $this->getObjectIdByClassName(get_class($object)), $object->getPartnerId());
 	    $c->applyFilters();
