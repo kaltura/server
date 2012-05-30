@@ -77,7 +77,7 @@ class kBatchJobLogManager implements kObjectCreatedEventConsumer, kObjectChanged
 	        {
     	        $fieldName = BatchJobPeer::translateFieldName($modifiedColumn, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME);
     	        $fieldPosJob = BatchJobPeer::translateFieldName($modifiedColumn, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
-    	        $fieldPosLog = BatchJobPeer::translateFieldName($fieldName, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM);
+    	        $fieldPosLog = BatchJobLogPeer::translateFieldName($fieldName, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM);
 	        }
 	        catch (PropelException $e)
 	        {
