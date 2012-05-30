@@ -1385,7 +1385,7 @@ class category extends Basecategory implements IIndexable
 		$category = categoryPeer::retrieveByPK($categoryId);
 		if($category)
 		{
-			$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() - 1);
+		//	$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() - 1);
 			
 			if($shouldSave)
 				$category->save();
@@ -1397,7 +1397,7 @@ class category extends Basecategory implements IIndexable
 		$category = categoryPeer::retrieveByPK($categoryId);
 		if($category)
 		{
-			$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() + 1);
+		//	$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() + 1);
 			
 			if($shouldSave)
 				$category->save();
