@@ -17,7 +17,6 @@ class kEntitlementUtils
 	
 	public static function getEntitlementEnforcement()
 	{
-		//return false;
 		return self::$entitlementEnforcement;
 	}
 	
@@ -301,8 +300,7 @@ class kEntitlementUtils
 			return array(self::DEFAULT_CONTEXT);
 			
 		$ksPrivacyContexts = $ks->getPrivacyContext();
-		
-		if(is_null($ksPrivacyContexts) || $ksPrivacyContexts = '')
+		if(is_null($ksPrivacyContexts) || $ksPrivacyContexts == '')
 			return array(self::DEFAULT_CONTEXT);
 			
 		return explode(',', $ksPrivacyContexts);
