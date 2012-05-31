@@ -252,10 +252,6 @@ class KalturaUser extends KalturaObject implements IFilterable
 	
 	public function toObject($dbObject = null, $skip = array())
 	{
-	    $this->validatePropertyNumeric('dateOfBirth', true);
-	    $this->validatePropertyNumeric('isAdmin', true);
-	    $this->validatePropertyNumeric('gender', true);
-	    
 		if (is_null($dbObject))
 			$dbObject = new kuser();
 		parent::toObject($dbObject, $skip);
