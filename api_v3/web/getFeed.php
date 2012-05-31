@@ -67,7 +67,7 @@ if ($limit)
 	$short_limit = kConf::hasParam("v3cache_getfeed_short_limit") ? kConf::get("v3cache_getfeed_short_limit") : 50;
 	if ($limit < $short_limit)
 	{
-		$cache->setExpiry(kConf::hasParam("v3cache_getfeed_short_expiry") ? kConf::get("v3cache_getfeed_short_expiry") : 900);
+		KalturaResponseCacher::setExpiry(kConf::hasParam("v3cache_getfeed_short_expiry") ? kConf::get("v3cache_getfeed_short_expiry") : 900);
 	}
 }
 
@@ -81,7 +81,7 @@ foreach($expiryArr as $params)
 	if ($item["key"] == "partnerId" && $item["value"] == $partnerId ||
 		$item["key"] == "feedId" && $item["value"] == $feedId)
 	{
-		$cache->setExpiry($item["expiry"]);
+		KalturaResponseCacher::setExpiry($item["expiry"]);
 		break;
 	}
 }
