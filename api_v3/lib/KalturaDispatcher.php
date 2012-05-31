@@ -1,6 +1,7 @@
 <?php
 /**
  * @package api
+ * @subpackage v3
  */
 class KalturaDispatcher 
 {
@@ -182,4 +183,3 @@ class KalturaDispatcher
 			throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 	}
 }
-

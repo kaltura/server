@@ -1,9 +1,17 @@
 <?php
+/**
+ * @package api
+ * @subpackage v3
+ */
 require_once(dirname(__FILE__) . '/../../infra/kConf.php');
 require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/requestUtils.class.php');
 require_once(dirname(__FILE__) . '/../../infra/cache/kCacheManager.php');
 require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/webservices/kSessionBase.class.php');
 
+/**
+ * @package api
+ * @subpackage v3
+ */
 class KalturaResponseCacher
 {
 	// copied from KalturaResponseType

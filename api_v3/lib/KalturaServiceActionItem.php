@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage v3
+ */
 class KalturaServiceActionItem
 {
     /**

@@ -2,7 +2,9 @@
 /**
  * Class is used for reflecting actions in a service class whether or not it is currently generated into the 
  * KalturaServiceMap.cache, so long as the service class can be found. Internal use only.
- *
+ * 
+ * @package api
+ * @subpackage v3
  */
 class KalturaActionReflector extends KalturaReflector
 {

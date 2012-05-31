@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage objects.factory
+ */
 class KalturaSyndicationFeedFactory
 {
 	static function getInstanceByType ($type)
@@ -31,4 +35,3 @@ class KalturaSyndicationFeedFactory
 		return $obj;
 	}
 }
-?>

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage v3
+ */
 class KalturaParamInfo extends KalturaPropertyInfo 
 {
 	private $_optional = false;

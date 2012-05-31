@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage objects.factory
+ */
 class KalturaEntryFactory
 {
 	/**
@@ -49,4 +53,3 @@ class KalturaEntryFactory
 		return $obj;
 	}
 }
-?>

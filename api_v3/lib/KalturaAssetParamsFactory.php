@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage objects.factory
+ */
 class KalturaAssetParamsFactory
 {
 	static function getAssetParamsOutputInstance($type)

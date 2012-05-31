@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage v3
+ */
 class KalturaReportHelper
 {
 	public static function getValidateExecutionParameters(Report $report, KalturaKeyValueArray $params = null)

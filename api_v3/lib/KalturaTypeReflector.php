@@ -1,9 +1,10 @@
 <?php
-
 /**
  * This class is used to reflect specific Kaltura objects, arrays & enums
- * This will be the place to boost performance by caching the reflection results to memcache or the filesystem 
- *
+ * This will be the place to boost performance by caching the reflection results to memcache or the filesystem
+ *  
+ * @package api
+ * @subpackage v3
  */
 class KalturaTypeReflector
 {

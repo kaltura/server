@@ -1,6 +1,7 @@
 <?php
 /**
- * @ignore
+ * @package api
+ * @subpackage v3
  */
 class KalturaDocCommentParser
 {

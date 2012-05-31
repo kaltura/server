@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Retrieve information and invoke actions on all asset types
  * Used as base class for all asset services

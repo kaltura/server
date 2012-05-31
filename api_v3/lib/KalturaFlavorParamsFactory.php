@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage objects.factory
+ */
 class KalturaFlavorParamsFactory
 {
 	static function getFlavorParamsOutputInstance($type)

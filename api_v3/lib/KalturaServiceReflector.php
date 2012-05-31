@@ -1,7 +1,9 @@
 <?php
 /**
  * A helper class to access service actions, action params and does the real invocation.
- *
+ * 
+ * @package api
+ * @subpackage v3
  */
 class KalturaServiceReflector extends KalturaReflector
 {
