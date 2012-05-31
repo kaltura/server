@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Admin
+ * @package Var
  * @subpackage Partners
  */
 class PartnerUsageController extends Zend_Controller_Action

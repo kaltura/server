@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Admin
+ * @package Var
  * @subpackage Errors
  */
 class ErrorController extends Zend_Controller_Action
