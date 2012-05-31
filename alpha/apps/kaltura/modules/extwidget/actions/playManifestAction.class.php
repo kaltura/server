@@ -56,6 +56,16 @@ class playManifestAction extends kalturaAction
 	private $maxBitrate = null;
 	
 	/**
+	 * @var int
+	 */
+	private $preferredBitrate = null;
+	
+	/**
+	 * @var array
+	 */
+	private $preferredFlavor = null;
+	
+	/**
 	 * @var array
 	 */
 	private $flavorIds = null;
@@ -424,11 +434,12 @@ class playManifestAction extends kalturaAction
 	 * Private function which compares 2 flavors in order to sort an array.
 	 * If a flavor's width and height parameters are equal to 0, it is 
 	 * automatically moved down the list so the player will not start playing it by default.
-	 * @param asset $flavor1
-	 * @param asset $flavor2
+	 * @param array $flavor1
+	 * @param array $flavor2
 	 */
     private function flavorCmpFunction ($flavor1, $flavor2)
 	{
+		// move the audio flavors to the end
 	    if ($flavor1['height'] == 0 && $flavor1['width'] == 0)
 	    {
 	        return 1;
@@ -437,9 +448,19 @@ class playManifestAction extends kalturaAction
 	    {
 	        return -1;
 	    }
-	    $bitrate1 = isset($flavor1['bitrate']) ? $flavor1['bitrate'] : 0;
-	    $bitrate2 = isset($flavor2['bitrate']) ? $flavor2['bitrate'] : 0;
-	    if ($bitrate1 >= $bitrate2)
+		
+		// if a preferred bitrate was defined place it first
+		if ($this->preferredFlavor == $flavor2)
+		{
+			return 1;
+		}
+		if ($this->preferredFlavor == $flavor1)
+		{
+			return -1;
+		}
+		
+		// sort the flavors in ascending bitrate order
+	    if ($flavor1['bitrate'] >= $flavor2['bitrate'])
 	    {
 	        return 1;
 	    }
@@ -939,6 +960,23 @@ class playManifestAction extends kalturaAction
 	private function serveAppleHttp()
 	{
 		$flavors = $this->buildHttpFlavorsArray($duration);
+		
+		if ($this->preferredBitrate !== null)
+		{
+			foreach ($flavors as $flavor)
+			{
+				if ($flavor['height'] == 0 && $flavor['width'] == 0)
+					continue;		// audio flavor
+			
+				$bitrateDiff = abs($flavor['bitrate'] - $this->preferredBitrate);
+				if (!$this->preferredFlavor || $bitrateDiff < $minBitrateDiff)
+				{
+					$this->preferredFlavor = $flavor;
+					$minBitrateDiff = $bitrateDiff;
+				}
+			}
+		}
+		
 		uasort($flavors, array($this,'flavorCmpFunction'));
 
 		$renderer = new kM3U8ManifestRenderer();
@@ -1024,6 +1062,7 @@ class playManifestAction extends kalturaAction
 		$this->flavorId = $this->getRequestParameter ( "flavorId", null );
 		$this->storageId = $this->getRequestParameter ( "storageId", null );
 		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
+		$this->preferredBitrate = $this->getRequestParameter ( "preferredBitrate", null );
 		$this->deliveryCode = $this->getRequestParameter( "deliveryCode", null );
 		$playbackContext = $this->getRequestParameter( "playbackContext", null );
 		
