@@ -18,7 +18,7 @@ FROM
 		SUM(count_loads) count_loads,
 		( SUM(count_plays) / SUM(count_loads) ) load_play_ratio
 	FROM 
-		dwh_hourly_events_entry ev
+		dwh_hourly_events_entry ev USE INDEX (PRIMARY)
 	WHERE 	{OBJ_ID_CLAUSE}
 		AND partner_id =  {PARTNER_ID} # PARTNER_ID
         AND date_id BETWEEN IF({TIME_SHIFT}>0,(DATE({FROM_DATE_ID}) - INTERVAL 1 DAY)*1, {FROM_DATE_ID})  
@@ -33,3 +33,5 @@ FROM
 	LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
 ) AS ev_stats, dwh_dim_entries en
 WHERE ev_stats.entry_id = en.entry_id
+
+
