@@ -144,10 +144,14 @@ class downloadAction extends sfAction
 			$url = $_SERVER["REQUEST_URI"];
 			if (strpos($url, "?") !== false) // when query string exists, just remove it (otherwise it might cause redirect loops)
 			{
-				$url = substr($url, 0, strpos($url, "?"));
+				$url .= "&relocate=";
+			}
+			else
+			{
+				$url .= "/relocate/";
 			}
 				
-			$url .= "/relocate/" . $this->encodeUrl($file_name);
+			$url .= $this->encodeUrl($file_name);
 
 			kFile::cacheRedirect($url);
 
