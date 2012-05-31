@@ -239,8 +239,11 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 				$category = categoryPeer::getByFullNameExactMatch ( $cat );
 				KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 				
-				$allCats[] = $category->getFullName();
-				$allIds[] = $category->getId ();
+				if($category)
+				{
+					$allCats[] = $category->getFullName();
+					$allIds[] = $category->getId ();
+				}
 			}
 		}
 		self::$skipEntrySave = false;
