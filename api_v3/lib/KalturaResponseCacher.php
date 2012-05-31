@@ -157,6 +157,11 @@ class KalturaResponseCacher
 	
 	public function setKS($ks)
 	{
+		// if the request triggering the cache warmup was an https request, fool the code to treat the current request as https as well 
+		$warmCacheHeader = self::getRequestHeaderValue(self::WARM_CACHE_HEADER);
+		if ($warmCacheHeader == "https")
+			$_SERVER['HTTPS'] = "on";
+	
 		$this->_ks = $ks;
 		$this->_ksObj = kSessionBase::getKSObject($ks);
 		$this->_ksPartnerId = ($this->_ksObj ? $this->_ksObj->partner_id : null);
@@ -169,15 +174,25 @@ class KalturaResponseCacher
 		$this->_params['___cache___host'] = @$_SERVER['HTTP_HOST'];
 
 		// take only the hostname part of the referrer parameter of baseEntry.getContextData
+		$contextDataObjectType = 'contextDataParams:objectType';
 		foreach ($this->_params as $key => $value)
 		{
-			if (strpos($key, 'contextDataParams:referrer') === false)
+			if (substr($key, -strlen($contextDataObjectType)) !== $contextDataObjectType)
 				continue;
 
+			$keyPrefix = substr($key, 0, -strlen($contextDataObjectType));
+			$referrerKey = $keyPrefix . 'contextDataParams:referrer';
+
 			if (in_array($this->_ksPartnerId, kConf::get('v3cache_include_referrer_in_key')))
-				$this->_params[$key] = parse_url($value, PHP_URL_HOST);
+			{
+				if (isset($this->_params[$referrerKey]))
+					$referrer = $this->_params[$referrerKey];
+				else
+					$referrer = isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : '';
+				$this->_params[$referrerKey] = parse_url($referrer, PHP_URL_HOST);
+			}
 			else
-				unset($this->_params[$key]);
+				unset($this->_params[$referrerKey]);
 				
 			break;
 		}
@@ -196,6 +211,16 @@ class KalturaResponseCacher
 		self::$_activeInstances = array();
 	}
 
+	public static function setExpiry($expiry)
+	{
+		foreach (self::$_activeInstances as $curInstance)
+		{
+			if ($curInstance->_expiry && $curInstance->_expiry < $expiry)
+				continue;
+			$curInstance->_expiry = $expiry;
+		}
+	}
+	
 	public static function disableConditionalCache()
 	{
 		foreach (self::$_activeInstances as $curInstance)
@@ -485,11 +510,6 @@ class KalturaResponseCacher
 		}
 	}
 
-	public function setExpiry($expiry)
-	{
-		$this->_expiry = $expiry;
-	}
-	
 	private function hasCache()
 	{
 		if ($this->_ks && (!$this->_ksObj || !$this->_ksObj->tryToValidateKS()))
@@ -499,10 +519,6 @@ class KalturaResponseCacher
 		$warmCacheHeader = self::getRequestHeaderValue(self::WARM_CACHE_HEADER);
 		if ($warmCacheHeader !== false)
 		{
-			// if the request triggering the cache warmup was an https request, fool the code to treat the current request as https as well 
-			if ($warmCacheHeader == "https")
-				$_SERVER["HTTPS"] = "on";
-						
 			// make a trace in the access log of this being a warmup call
 			header("X-Kaltura:cached-warmup-$warmCacheHeader,".$this->_cacheKey, false);
 		}
@@ -598,7 +614,7 @@ class KalturaResponseCacher
 		}
 		
 		if ($ks && 
-			(($ks->valid_until && $ks->valid_until < time()) ||	// don't cache when the KS is expired
+			($ks->valid_until <= time() ||						// don't cache when the KS is expired
 			$ks->isSetLimitAction())) 							// don't cache when the KS has a limit on the number of actions
 		{
 			self::disableCache();
