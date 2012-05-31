@@ -2841,7 +2841,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 	}
 	
-	public function getSphinxFieldsEscapeType($fieldName)
+	public function getSearchIndexFieldsEscapeType($fieldName)
 	{
 		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 	}

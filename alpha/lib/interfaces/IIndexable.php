@@ -39,7 +39,7 @@ interface IIndexable extends IBaseObject
 	/**
 	 * @return string field escape type for strings
 	 */
-	public function getSphinxFieldsEscapeType($field);
+	public function getSearchIndexFieldsEscapeType($field);
 	
 	/**
 	 * @param int $time

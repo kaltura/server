@@ -1360,8 +1360,11 @@ class category extends Basecategory implements IIndexable
 	{
 		if(is_null($this->getPrivacyContext()) || $this->getPrivacyContext() == '')
 			return '';
+		
+		$privacyContext = explode(',', $this->getPrivacyContext());
+		$privacyContext[] = kEntitlementUtils::NOT_DEFAULT_CONTEXT;
 			
-		return $this->getPrivacyContexts() . ' ' . kEntitlementUtils::NOT_DEFAULT_CONTEXT;
+		return implode(' ', $privacyContext);
 	}
 	
 	public function getSearchIndexPrivacyContexts()
@@ -1369,7 +1372,9 @@ class category extends Basecategory implements IIndexable
 		if(is_null($this->getPrivacyContexts()) || $this->getPrivacyContexts() == '')
 			return kEntitlementUtils::DEFAULT_CONTEXT;
 			
-		return $this->getPrivacyContexts();
+		$privacyContexts = explode(',', $this->getPrivacyContexts());
+			
+		return implode(' ', $privacyContexts);
 	}
 	
 	/**
@@ -1388,7 +1393,7 @@ class category extends Basecategory implements IIndexable
 	
 	public static $sphinxFieldsEscapeType = array();
 	
-	public function getSphinxFieldsEscapeType($fieldName)
+	public function getSearchIndexFieldsEscapeType($fieldName)
 	{
 		if(!isset(self::$sphinxFieldsEscapeType[$fieldName]))
 			return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;

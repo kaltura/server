@@ -363,7 +363,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		return self::$sphinxTypes[$fieldName];
 	}
 	
-	public function getSphinxFieldsEscapeType($fieldName)
+	public function getSearchIndexFieldsEscapeType($fieldName)
 	{
 		if(strpos($fieldName, '.') === false)
 		{

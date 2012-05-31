@@ -1239,7 +1239,7 @@ class kuser extends Basekuser implements IIndexable
 		return $this;
 	}
 	
-	public function getSphinxFieldsEscapeType($fieldName)
+	public function getSearchIndexFieldsEscapeType($fieldName)
 	{
 		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 	}

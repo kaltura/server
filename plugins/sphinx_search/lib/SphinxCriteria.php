@@ -159,7 +159,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 */
 	abstract protected function doCountOnPeer(Criteria $c);
 	
-	public function getSphinxFieldsEscapeType($fieldName)
+	public function getSearchIndexFieldsEscapeType($fieldName)
 	{
 		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 	}
@@ -480,7 +480,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			}
 			
 			$valStr = print_r($val, true);
-			$fieldsEscapeType = $this->getSphinxFieldsEscapeType($fieldName);
+			$fieldsEscapeType = $this->getSearchIndexFieldsEscapeType($fieldName);
 			
 			KalturaLog::debug("Attach field[$fieldName] as sphinx field[$sphinxField] of type [$type] and comparison[$operator] for value[$valStr]");
 			switch($operator)

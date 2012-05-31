@@ -66,7 +66,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 	
 	protected function getStringMatchClause($sphinxField, $comparison, $value)
 	{
-		$fieldsEscapeType = $this->criteria->getSphinxFieldsEscapeType($sphinxField);
+		$fieldsEscapeType = $this->criteria->getSearchIndexFieldsEscapeType($sphinxField);
 		
 		switch($comparison)
 		{

@@ -255,7 +255,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 		foreach($dataStrings as $key => $value)
 		{
-			$escapeType = $object->getSphinxFieldsEscapeType($key);
+			$escapeType = $object->getSearchIndexFieldsEscapeType($key);
 			
 			$value = SphinxUtils::escapeString($value, $escapeType, 1);
 			$search = array("\0", 	"\n",	"\r",	"\x1a");

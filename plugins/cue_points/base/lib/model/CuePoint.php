@@ -314,7 +314,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		return array("cuePoint:id=".$this->getId(), "cuePoint:entryId=".$this->getEntryId());
 	}
 	
-	public function getSphinxFieldsEscapeType($fieldName)
+	public function getSearchIndexFieldsEscapeType($fieldName)
 	{
 		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 	}
