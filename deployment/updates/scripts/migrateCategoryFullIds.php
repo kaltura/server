@@ -12,10 +12,10 @@ if($argc == 1 || strtolower($argv[1]) != 'realrun')
 	KalturaLog::alert('Using dry run mode');
 }
 
-if($argc > 1)
+if($argc > 2)
 	$partnerId = $argv[2];
 
-if($argc > 2)
+if($argc > 3)
 	$startCategoryId = $argv[3];
 	
 $criteria = new Criteria();
