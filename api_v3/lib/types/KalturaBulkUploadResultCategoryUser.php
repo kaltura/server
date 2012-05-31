@@ -67,7 +67,7 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
 	        return null;
 	    }
 	    
-	    $kuser = kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id, $this->userId);
+	    $kuser = kuserPeer::getKuserByPartnerAndUid($this->partnerId, $this->userId);
 	    $categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->categoryId, $kuser->getId());
 	    if ($categoryKuser)
 	        $this->objectId = $categoryKuser->getId();
