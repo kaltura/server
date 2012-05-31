@@ -50,6 +50,7 @@ class categoryTableMap extends TableMap {
 		$this->addColumn('DELETED_AT', 'DeletedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
 		$this->addColumn('DIRECT_ENTRIES_COUNT', 'DirectEntriesCount', 'INTEGER', false, null, 0);
+		$this->addColumn('DIRECT_SUB_CATEGORIES_COUNT', 'DirectSubCategoriesCount', 'INTEGER', false, null, 0);
 		$this->addColumn('MEMBERS_COUNT', 'MembersCount', 'INTEGER', false, null, 0);
 		$this->addColumn('PENDING_MEMBERS_COUNT', 'PendingMembersCount', 'INTEGER', false, null, 0);
 		$this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);

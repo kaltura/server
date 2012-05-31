@@ -257,6 +257,13 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public $defaultOrderBy;
 	
+	/**
+	 * 
+	 * Number of direct children categories
+	 * @var int
+	 */
+	public $directSubCategoriesCount;
+	
 	private static $mapBetweenObjects = array
 	(
 		"id",
@@ -289,6 +296,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"partnerSortValue",
 		"partnerData",
 		"defaultOrderBy",
+		"directSubCategoriesCount",
 	);
 	
 	/* (non-PHPdoc)

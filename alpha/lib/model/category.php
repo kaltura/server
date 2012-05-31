@@ -106,7 +106,7 @@ class category extends Basecategory implements IIndexable
 		}
 		
 		if( $this->isColumnModified(categoryPeer::PARENT_ID) && $this->getParentId())
-			$this->incrementDirectSubCategoriesCount($this->getParentId());
+			$this->incrementDirectSubCategoriesCount($this->getParentId(), true);
 		
 		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PARENT_ID))
 		{
@@ -269,7 +269,7 @@ class category extends Basecategory implements IIndexable
 		{
 			$this->addRecalcCategoriesCount($this->getId());
 			$this->addRecalcCategoriesCount($this->old_parent_id);
-			$this->decrementDirectSubCategoriesCount($this->old_parent_id);
+			$this->decrementDirectSubCategoriesCount($this->old_parent_id, true);
 		}
 		
 		if ($this->isColumnModified(categoryPeer::STATUS) && 
@@ -278,7 +278,7 @@ class category extends Basecategory implements IIndexable
 			($this->getColumnsOldValue(categoryPeer::STATUS) == CategoryStatus::ACTIVE || 
 			 $this->getColumnsOldValue(categoryPeer::STATUS) == CategoryStatus::UPDATING))
 		{
-			$this->decrementDirectSubCategoriesCount($this->parent_id);
+			$this->decrementDirectSubCategoriesCount($this->parent_id, true);
 		}
 
 		// check if parnet is deleted and could be purged
@@ -548,7 +548,10 @@ class category extends Basecategory implements IIndexable
 		
 	private function addIndexEntryJob($categoryId, $shouldUpdate = false)
 	{
-		$this->getPartner()->incrementFeaturesStatusByType(FeatureStatusType::INDEX_ENTRY);
+		$partner = $this->getPartner();
+		
+		if($partner)
+			$partner->incrementFeaturesStatusByType(FeatureStatusType::INDEX_ENTRY);
 		
 		$featureStatusToRemoveIndex = new kFeatureStatus();
 		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_ENTRY);
@@ -610,7 +613,10 @@ class category extends Basecategory implements IIndexable
 
 	private function addIndexCategoryEntryJob($categoryId = null, $shouldUpdate = true)
 	{
-		$this->getPartner()->incrementFeaturesStatusByType(FeatureStatusType::INDEX_CATEGORY_ENTRY);
+		$partner = $this->getPartner();
+		
+		if($partner)
+			$partner->incrementFeaturesStatusByType(FeatureStatusType::INDEX_CATEGORY_ENTRY);
 		
 		$featureStatusToRemoveIndex = new kFeatureStatus();
 		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY_ENTRY);
@@ -627,7 +633,10 @@ class category extends Basecategory implements IIndexable
 	
 	private function addIndexCategoryKuserJob($categoryId = null, $shouldUpdate = true)
 	{
-		$this->getPartner()->incrementFeaturesStatusByType(FeatureStatusType::INDEX_CATEGORY_KUSER);
+		$partner = $this->getPartner();
+		
+		if($partner)
+			$partner->incrementFeaturesStatusByType(FeatureStatusType::INDEX_CATEGORY_KUSER);
 		
 		$featureStatusToRemoveIndex = new kFeatureStatus();
 		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY_KUSER);
@@ -939,9 +948,6 @@ class category extends Basecategory implements IIndexable
 			
 			parent::save();
 		}
-		
-		if($this->getParentId())
-			$this->incrementDirectSubCategoriesCount($this->getParentId());
 			
 		if (!$this->alreadyInSave)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
@@ -1338,6 +1344,18 @@ class category extends Basecategory implements IIndexable
 		}
 	}
 	
+	public function reSetDirectSubCategoriesCount()
+	{
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
+		$c->add (categoryPeer::STATUS, array(CategoryStatus::DELETED, CategoryStatus::PURGED), Criteria::NOT_IN);
+		$c->add (categoryPeer::PARENT_ID, $this->getId(), Criteria::EQUAL);
+				
+		$c->applyFilters();
+		$this->setDirectSubCategoriesCount($c->getRecordsCount());
+	}
+	
 	public function getSearchIndexPrivacyContext()
 	{
 		if(is_null($this->getPrivacyContext()) || $this->getPrivacyContext() == '')
@@ -1368,9 +1386,7 @@ class category extends Basecategory implements IIndexable
 		return $this;
 	}
 	
-	public static $sphinxFieldsEscapeType = array(
-	//	'full_name' => SearchIndexFieldEscapeType::STRIP,
-	);
+	public static $sphinxFieldsEscapeType = array();
 	
 	public function getSphinxFieldsEscapeType($fieldName)
 	{
@@ -1382,10 +1398,13 @@ class category extends Basecategory implements IIndexable
 	
 	public function decrementDirectSubCategoriesCount($categoryId, $shouldSave = false)
 	{
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$category = categoryPeer::retrieveByPK($categoryId);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
 		if($category)
 		{
-		//	$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() - 1);
+			$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() - 1);
 			
 			if($shouldSave)
 				$category->save();
@@ -1394,14 +1413,16 @@ class category extends Basecategory implements IIndexable
 	
 	public function incrementDirectSubCategoriesCount($categoryId, $shouldSave = false)
 	{
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$category = categoryPeer::retrieveByPK($categoryId);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
 		if($category)
 		{
-		//	$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() + 1);
+			$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() + 1);
 			
 			if($shouldSave)
 				$category->save();
 		}
 	}
-	
 }

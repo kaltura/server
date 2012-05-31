@@ -13,10 +13,10 @@ if($argc == 1 || strtolower($argv[1]) != 'realrun')
 }
 
 if($argc > 1)
-	$partnerId = $argv[1];
+	$partnerId = $argv[2];
 
 if($argc > 2)
-	$startCategoryId = $argv[2];
+	$startCategoryId = $argv[3];
 	
 $criteria = new Criteria();
 $criteria->addAscendingOrderByColumn(categoryPeer::DEPTH);
@@ -37,9 +37,9 @@ while(count($categories))
 	foreach($categories as $category)
 	{
 		/* @var $category category */
-		
 		$category->reSetFullIds();
 		$category->reSetDirectEntriesCount();
+		$category->reSetDirectSubCategoriesCount();
 		
 		KalturaStatement::setDryRun($dryRun);
 		$category->save();
@@ -49,10 +49,10 @@ while(count($categories))
 		KalturaLog::info("Migrated category [$startCategoryId].");
 	}
 	kMemoryManager::clearMemory();
-
+	
 	$nextCriteria = clone $criteria;
 	$nextCriteria->add(categoryPeer::ID, $startCategoryId, Criteria::GREATER_THAN);
-	$entries = categoryPeer::doSelect($nextCriteria);
+	$categories = categoryPeer::doSelect($nextCriteria);
 	usleep(100);
 }
 
