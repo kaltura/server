@@ -1,6 +1,6 @@
 <?php 
 /**
- * @package Admin
+ * @package Var
  * @subpackage Partners
  */
 class Form_PartnerCreate extends Infra_Form

@@ -1,6 +1,6 @@
 <?php 
 /**
- * @package Admin
+ * @package Var
  * @subpackage Partners
  */
 class Form_PartnerFilter extends Form_PartnerBaseFilter
