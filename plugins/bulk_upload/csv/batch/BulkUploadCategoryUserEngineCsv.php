@@ -151,7 +151,8 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		    
 		    if ($categoryResults->objects && count($categoryResults->objects))
 		    {
-		        $this->categoryReferenceIdMap[$bulkUploadResult->categoryReferenceId] = $categoryResults->objects[0]->id;
+		        $bulkUploadResult->categoryId = $categoryResults->objects[0]->id;
+		        $this->categoryReferenceIdMap[$bulkUploadResult->categoryReferenceId] = $bulkUploadResult->categoryId;
 		    }
 		}
         
