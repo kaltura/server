@@ -267,7 +267,7 @@ class thumbnailAction extends sfAction
 			}
 		}
 		
-		if ( !$local && !$tempThumbPath)
+		if ( !$local && !$tempThumbPath && $file_sync )
 		{
 			if (!in_array($file_sync->getDc(), kDataCenterMgr::getDcIds()))
 			{
