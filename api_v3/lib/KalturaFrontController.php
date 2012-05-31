@@ -94,20 +94,20 @@ class KalturaFrontController
 		}
 		else
 		{
+			$success = true;
+			$errorCode = null;
+			$this->onRequestStart($this->service, $this->action, $this->params);
 			try
 			{
-				$this->onRequestStart($this->service, $this->action, $this->params);
 		    	$result = $this->dispatcher->dispatch($this->service, $this->action, $this->params);
-	        	$this->onRequestEnd();
 			}
 			catch(Exception $ex)
 			{
+				$success = false;
+				$errorCode = $ex->getCode();				
 				$result = $this->getExceptionObject($ex);
-				// keep caching for GET requests with kalsig (signature of call params) which will be cached by the cdn 
-				if ($_SERVER["REQUEST_METHOD"] != "GET" && !isset($_REQUEST["kalsig"]))
-					KalturaResponseCacher::disableCache();
-	        	$this->onRequestEnd(false, $ex->getCode());
 			}
+	        $this->onRequestEnd($success, $errorCode);
 		}
 		
 		if (isset($_REQUEST["ignoreNull"]))
@@ -226,46 +226,45 @@ class KalturaFrontController
 	        }
 	        
 	        
-	        try 
-	        {  
-	        	// cached parameters should be different when the request is part of a multirequest
-	        	// as part of multirequest - the cached data is a serialized php object
-	        	// when not part of multirequest - the cached data is the actual response
-	        	$currentParams['multirequest'] = true;
-	        	unset($currentParams['format']);
-	        	
-	        	$cache = new KalturaResponseCacher($currentParams);
-	        	if(!isset($currentParams['ks']) && kCurrentContext::$ks) {
-	        		$cache->setKS(kCurrentContext::$ks);
-	        	}
-	        	
-	        	$this->onRequestStart($currentService, $currentAction, $currentParams, $i, true);
-				$cachedResult = $cache->checkCache('X-Kaltura-Part-Of-MultiRequest');
-				if ($cachedResult)
+			// cached parameters should be different when the request is part of a multirequest
+			// as part of multirequest - the cached data is a serialized php object
+			// when not part of multirequest - the cached data is the actual response
+			$currentParams['multirequest'] = true;
+			unset($currentParams['format']);
+			
+			$cache = new KalturaResponseCacher($currentParams);
+			if(!isset($currentParams['ks']) && kCurrentContext::$ks) {
+				$cache->setKS(kCurrentContext::$ks);
+			}
+			
+			$success = true;
+			$errorCode = null;
+			$this->onRequestStart($currentService, $currentAction, $currentParams, $i, true);
+			$cachedResult = $cache->checkCache('X-Kaltura-Part-Of-MultiRequest');
+			if ($cachedResult)
+			{
+				$currentResult = unserialize($cachedResult);
+			}
+			else
+			{
+				if ($i != 1)
 				{
-					$currentResult = unserialize($cachedResult);
+					kMemoryManager::clearMemory();
 				}
-				else
-				{		
-					if ($i != 1)
-					{
-						kMemoryManager::clearMemory();
-					}
-				
-	        		$currentResult = $this->dispatcher->dispatch($currentService, $currentAction, $currentParams);
-	        		// store serialized resposne in cache
-	        		$cache->storeCache(serialize($currentResult));
-				}	
-	        	$this->onRequestEnd(true, null, $i);
-	        }
-	        catch(Exception $ex)
-	        {
-	            $currentResult = $this->getExceptionObject($ex);
-				// keep caching for GET requests with kalsig (signature of call params) which will be cached by the cdn 
-				if ($_SERVER["REQUEST_METHOD"] != "GET" && !isset($_REQUEST["kalsig"]))
-					KalturaResponseCacher::disableCache();
-	        	$this->onRequestEnd(false, $ex->getCode(), $i);
-	        }
+			
+				try 
+				{  
+					$currentResult = $this->dispatcher->dispatch($currentService, $currentAction, $currentParams);
+				}
+				catch(Exception $ex)
+				{
+					$success = false;
+					$errorCode = $ex->getCode();
+					$currentResult = $this->getExceptionObject($ex);
+				}
+				$cache->storeCache(serialize($currentResult));
+			}
+			$this->onRequestEnd($success, $errorCode, $i);
 	        
             $results[$i] = $currentResult;	        
 	        $i++;
@@ -327,6 +326,8 @@ class KalturaFrontController
 	
 	public function getExceptionObject($ex)
 	{
+		$this->adjustApiCacheForException($ex);
+		
 	    if ($ex instanceof KalturaAPIException)
 		{
 		    KalturaLog::err($ex);
@@ -397,6 +398,21 @@ class KalturaFrontController
 		}
 		
 		return $object;
+	}
+	
+	public function adjustApiCacheForException($ex)
+	{
+		KalturaResponseCacher::setExpiry(120);
+		
+		$cacheConditionally = false;
+		if ($ex instanceof KalturaAPIException && kConf::hasParam("v3cache_conditional_cached_errors"))
+		{
+			$cacheConditionally = in_array($ex->getCode(), kConf::get("v3cache_conditional_cached_errors"));
+		}
+		if (!$cacheConditionally)
+		{
+			KalturaResponseCacher::disableConditionalCache();
+		}
 	}
 	
 	public function serializeResponse($object, $ignoreNull = false)
