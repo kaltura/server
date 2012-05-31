@@ -212,5 +212,8 @@ return array (
     'ReportTableMap' => 'lib/model/map/ReportTableMap.php',
     'ReportPeer' => 'lib/model/ReportPeer.php',
     'Report' => 'lib/model/Report.php',
+    'BatchJobLogTableMap' => 'lib/model/map/BatchJobLogTableMap.php',
+    'BatchJobLogPeer' => 'lib/model/BatchJobLogPeer.php',
+    'BatchJobLog' => 'lib/model/BatchJobLog.php',
   ),
 );

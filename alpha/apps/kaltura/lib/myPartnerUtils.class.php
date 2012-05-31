@@ -148,12 +148,13 @@ class myPartnerUtils
 		self::addPartnerToCriteria ( notificationPeer::getCriteriaFilter() , notificationPeer::PARTNER_ID ,  $partner_id );
 */
 		
+		//Category peer should be added before entry - since we select from category on entry->setDefaultCriteria.
 		self::addPartnerToCriteria ( new kuserPeer() , $partner_id , $private_partner_data, $partner_group);
+		self::addPartnerToCriteria ( new categoryPeer() , $partner_id , $private_partner_data , $partner_group);
 		self::addPartnerToCriteria ( new entryPeer() , $partner_id , $private_partner_data, $partner_group , $kaltura_network );
 		self::addPartnerToCriteria ( new kshowPeer() , $partner_id , $private_partner_data, $partner_group , $kaltura_network );
 		self::addPartnerToCriteria ( new moderationPeer() , $partner_id , $private_partner_data , $partner_group);
 		self::addPartnerToCriteria ( new notificationPeer() , $partner_id , $private_partner_data , $partner_group);
-		self::addPartnerToCriteria ( new categoryPeer() , $partner_id , $private_partner_data , $partner_group);
 		self::addPartnerToCriteria ( new categoryEntryPeer() , $partner_id , $private_partner_data , $partner_group);
 		self::addPartnerToCriteria ( new categoryKuserPeer() , $partner_id , $private_partner_data , $partner_group);
 		
