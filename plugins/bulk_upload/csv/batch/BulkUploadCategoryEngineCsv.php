@@ -241,7 +241,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 	{
 	    $category = new KalturaCategory();
 	    $category->name = $bulkUploadCategoryResult->name;
-	    $category->owner = $this->job->data->userId;
+	    //$category->owner = $this->job->data->userId;
 	    //calculate parentId of the category
 	    if ($bulkUploadCategoryResult->relativePath)
 	        $category->parentId = $this->calculateParentId($bulkUploadCategoryResult->relativePath);
