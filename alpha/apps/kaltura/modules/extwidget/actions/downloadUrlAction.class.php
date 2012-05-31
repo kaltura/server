@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class downloadUrlAction extends sfAction
 {
 	/**
@@ -14,4 +17,3 @@ class downloadUrlAction extends sfAction
 		$this->url = $this->getRequestParameter( "url" );
 	}
 }
-?>

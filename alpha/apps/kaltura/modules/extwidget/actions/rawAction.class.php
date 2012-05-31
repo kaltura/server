@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class rawAction extends sfAction
 {
 	/**
@@ -387,4 +390,3 @@ class rawAction extends sfAction
 		return $file_sync;
 	}
 }
-?>

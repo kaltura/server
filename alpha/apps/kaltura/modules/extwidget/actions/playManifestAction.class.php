@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class playManifestAction extends kalturaAction
 {
 	/**

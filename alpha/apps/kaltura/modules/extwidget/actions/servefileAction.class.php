@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class servefileAction extends sfAction
 {
 	/**
@@ -20,4 +23,3 @@ class servefileAction extends sfAction
 		die();
 	}
 }
-?>

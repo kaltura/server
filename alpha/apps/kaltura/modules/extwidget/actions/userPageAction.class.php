@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class userPageAction extends sfAction
 {
 	/**
@@ -19,4 +22,3 @@ class userPageAction extends sfAction
 		die;
 	}
 }
-?>

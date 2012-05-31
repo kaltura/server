@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class streamclipperAction extends kalturaAction
 {
 	public function execute()

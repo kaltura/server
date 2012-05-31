@@ -1,7 +1,14 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 require_once ( MODULES . "/partnerservices2/actions/startsessionAction.class.php" );
 
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class contributionWidgetJSAction extends kalturaAction
 {
 	public function execute()
@@ -50,5 +57,3 @@ class contributionWidgetJSAction extends kalturaAction
 		return sfView::SUCCESS;
 	}
 }
-
-?>

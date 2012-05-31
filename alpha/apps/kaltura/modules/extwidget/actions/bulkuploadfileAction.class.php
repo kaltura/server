@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class bulkuploadfileAction extends sfAction
 {
 	public function execute()

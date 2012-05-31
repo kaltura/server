@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class kseAction extends sfAction
 {
 	// TODO - this is no longer se only - it should be generalized for advanced editro and simple editor
@@ -51,4 +54,3 @@ class kseAction extends sfAction
 		$this->redirect(  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "$wrapper_swf?$params");
 	}
 }
-?>

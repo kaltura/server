@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class thumbnailAction extends sfAction
 {
 	private static function notifyProxy($msg)
@@ -350,4 +353,3 @@ class thumbnailAction extends sfAction
 		// however dumpfile dies at the end so we cant just write it here (maybe register a shutdown callback)
 	}
 }
-?>

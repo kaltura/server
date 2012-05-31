@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class kgenericAction extends sfAction
 {
 	/**
@@ -50,4 +53,3 @@ class kgenericAction extends sfAction
 		$this->redirect(  "$swf_url?$params");
 	}
 }
-?>

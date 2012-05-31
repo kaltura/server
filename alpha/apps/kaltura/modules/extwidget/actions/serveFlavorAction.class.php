@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class serveFlavorAction extends kalturaAction
 {
 	const CHUNK_SIZE = 1048576; // 1024 X 1024

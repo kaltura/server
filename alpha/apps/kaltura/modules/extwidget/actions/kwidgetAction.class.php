@@ -1,11 +1,14 @@
 <?php
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 require_once ( MODULES . "/partnerservices2/actions/getwidgetAction.class.php" );
 
-function klog ( $str )
-{
-	KalturaLog::log( "kwidgetAction: " . $str );
-}
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class kwidgetAction extends sfAction
 {
 	/**
@@ -420,4 +423,3 @@ class kwidgetAction extends sfAction
 		$this->redirect( $url );
 	}
 }
-

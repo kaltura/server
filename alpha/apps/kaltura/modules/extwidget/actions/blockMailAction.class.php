@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class blockMailAction extends sfAction
 {
 	public function execute ()
@@ -13,4 +17,3 @@ class blockMailAction extends sfAction
 		
 	}
 }
-?>

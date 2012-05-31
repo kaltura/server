@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class embedIframeJsAction extends sfAction
 {
 	/**
@@ -63,4 +67,3 @@ class embedIframeJsAction extends sfAction
 		die;
 	}
 }
-

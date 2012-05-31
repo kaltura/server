@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class kpreloaderAction extends sfAction
 {
 	/**
@@ -17,4 +20,3 @@ class kpreloaderAction extends sfAction
 		kFile::dumpFile($preloader_path);
 	}
 }
-?>

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class getWidgetThumbnailAction extends sfAction
 {
 	/**
@@ -26,4 +29,3 @@ class getWidgetThumbnailAction extends sfAction
 		}
 	}
 }
-?>

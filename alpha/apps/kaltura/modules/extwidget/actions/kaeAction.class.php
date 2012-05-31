@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class kaeAction extends sfAction
 {
 	
@@ -48,4 +51,3 @@ class kaeAction extends sfAction
 		$this->redirect(  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "$wrapper_swf?$params");
 	}
 }
-?>

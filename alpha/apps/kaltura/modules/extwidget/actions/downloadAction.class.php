@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class downloadAction extends sfAction
 {
 	/**
@@ -175,4 +178,3 @@ class downloadAction extends sfAction
 		}
 	}
 }
-?>

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage externalWidgets
+ */
 class embedIframeAction extends sfAction
 {
 	/**
@@ -144,4 +148,3 @@ class embedIframeAction extends sfAction
 		$this->redirect($url);
 	}
 }
-
