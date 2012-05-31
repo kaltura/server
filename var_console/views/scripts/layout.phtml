@@ -29,8 +29,8 @@ function addSubTitle(subTitle) {
 	<div id="logo"></div>
 	<h1 class="navigation" > <a class="navigation">Multi-Publisher Management Console </a></h1>
 	<div id="user_links">
-		<?php if (Zend_Auth::getInstance()->hasIdentity()): ?>
-			<span>Hi <?php echo Zend_Auth::getInstance()->getIdentity()->getUser()->firstName; ?></span><br />
+		<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
+			<span>Hi <?php echo Infra_AuthHelper::getAuthInstance()->getIdentity()->getUser()->firstName; ?></span><br />
 			<!--
 			<a href="javascript:alert('link to be provided')">Quick Start Guide</a> &nbsp;| &nbsp;
 			<a href="javascript:alert('link to be provided')">Support</a> &nbsp;| &nbsp;
@@ -41,8 +41,8 @@ function addSubTitle(subTitle) {
 </div>
 <div id="sub-header">
 	<a id="help">[?]</a>
-	<?php if (Zend_Auth::getInstance()->hasIdentity()): ?>
-		<?php if (Zend_Auth::getInstance()->hasIdentity()): ?>
+	<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
+		<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
 			<?php echo $this->navigation()->menu()->renderMenu(null, array(
 				'onlyActiveBranch' => true,
 				'ulClass' => 'sub-navigation', 
