@@ -118,7 +118,8 @@ class CategoryUserService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER_OWNER);
 		
 		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryUser->categoryId, kCurrentContext::$kuser_id ? kCurrentContext::$kuser_id : kCurrentContext::$ks_kuser_id);
-		if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
+		if(kEntitlementUtils::getEntitlementEnforcement() && 
+		(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER))
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER, $categoryUser->categoryId);
 			
 		$dbCategoryKuser->save();
