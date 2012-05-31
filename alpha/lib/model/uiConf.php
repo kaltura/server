@@ -402,21 +402,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				$strict = true; // object has ID or strict specified, so no file will be found for incomplete key
 		}
 		
-			
-		// IMPORTANT !!!! 
-		// caching was removed for this version -  there is no use of caching on production 
-		// $contents = $this->getCachedContent( $kaltura_config , $confFilePath );
-		try
-		{
-			$content = kFileSyncUtils::file_get_contents( $sync_key , true , $strict );
-		}
-		catch ( Exception $ex )
-		{
-			KalturaLog::log(__FILE__.':'.__FUNCTION__.':'.__LINE__.' - uiconf ID ['.$this->getId().'] does NOT have file sync or file on disk. REQUIRES_FIX');
-			return null;
-		}
-		
-		return $content;
+		return kFileSyncUtils::file_get_contents( $sync_key , true , $strict );
 	}
 	
 	public function getConfFile( $force_fetch = false , $strict = true ) 
