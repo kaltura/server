@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<buildpath>
-	<buildpathentry combineaccessrules="false" kind="prj" path="/infra"/>
-	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
-	<buildpathentry combineaccessrules="false" kind="prj" path="/ui_infra"/>
-	<buildpathentry kind="src" path=""/>
-	<buildpathentry combineaccessrules="false" kind="prj" path="/vendor"/>
-	<buildpathentry kind="con" path="org.zend.php.framework.CONTAINER"/>
-</buildpath>
