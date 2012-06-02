@@ -19,6 +19,11 @@ class KalturaQuickPlayDistributionProfile extends KalturaConfigurableDistributio
 	 * @var string
 	 */
 	 public $sftpPass;
+
+	/**
+	 * @var string
+	 */
+	public $sftpBasePath;
 	 
 	/**
 	 * @var string
@@ -93,6 +98,7 @@ class KalturaQuickPlayDistributionProfile extends KalturaConfigurableDistributio
 		'sftpHost',
 		'sftpLogin',
 		'sftpPass',
+		'sftpBasePath',
 		'channelTitle',
 		'channelLink',
 		'channelDescription',

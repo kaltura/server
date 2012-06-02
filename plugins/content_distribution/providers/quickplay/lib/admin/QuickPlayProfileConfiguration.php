@@ -44,9 +44,16 @@ class Form_QuickPlayProfileConfiguration extends Form_ConfigurableProfileConfigu
 			'filters'		=> array('StringTrim'),
 			'required'		=> true
 		));
+
+		$this->addElement('text', 'sftp_base_path', array(
+			'label'			=> 'SFTP Base Path:',
+			'filters'		=> array('StringTrim'),
+			'value'			=> '/upload/',
+			'required'		=> true
+		));
 		
 		$this->addDisplayGroup(
-			array('sftp_host', 'sftp_login', 'sftp_pass'), 
+			array('sftp_host', 'sftp_login', 'sftp_pass', 'sftp_base_path'),
 			'general', 
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);

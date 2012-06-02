@@ -67,8 +67,12 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 			/* @var $thumbnailFilePath KalturaString */
 			if (!file_exists($thumbnailFilePath->value))
 				throw new KalturaDistributionException('Thumbnail file path ['.$thumbnailFilePath.'] not found, assuming it wasn\'t synced and the job will retry');
-				
-			$sftpManager->putFile('/upload/'.pathinfo($thumbnailFilePath->value, PATHINFO_BASENAME), $thumbnailFilePath->value);
+
+			$thumbnailUploadPath = '/'.$distributionProfile->sftpBasePath.'/'.pathinfo($thumbnailFilePath->value, PATHINFO_BASENAME);
+			if ($sftpManager->fileExists($thumbnailUploadPath))
+				KalturaLog::info('File "'.$thumbnailUploadPath.'" already exists, skip it');
+			else
+				$sftpManager->putFile($thumbnailUploadPath, $thumbnailFilePath->value);
 		}
 		
 		// upload the video files
@@ -77,12 +81,19 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 			/* @var $videoFilePath KalturaString */
 			if (!file_exists($videoFilePath->value))
 				throw new KalturaDistributionException('Video file path ['.$videoFilePath.'] not found, assuming it wasn\'t synced and the job will retry');
-				
-			$sftpManager->putFile('/upload/'.pathinfo($videoFilePath->value, PATHINFO_BASENAME), $videoFilePath->value);
+
+			$videoUploadPath = '/'.$distributionProfile->sftpBasePath.'/'.pathinfo($videoFilePath->value, PATHINFO_BASENAME);
+			if ($sftpManager->fileExists($videoUploadPath))
+				KalturaLog::info('File "'.$videoUploadPath.'" already exists, skip it');
+			else
+				$sftpManager->putFile($videoUploadPath, $videoFilePath->value);
 		}
-		
+
+		$tmpfile = tempnam(sys_get_temp_dir(), time());
+		file_put_contents($tmpfile, $providerData->xml);
 		// upload the metadata file
-		$res = $sftpManager->filePutContents('/upload/'.$fileName, $providerData->xml);
+		$res = $sftpManager->putFile('/'.$distributionProfile->sftpBasePath.'/'.$fileName, $tmpfile);
+		unlink($tmpfile);
 				
 		if ($res === false)
 			throw new Exception('Failed to upload metadata file to sftp');

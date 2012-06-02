@@ -8,6 +8,7 @@ class QuickPlayDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_SFTP_HOST 				= 'sftpHost';
 	const CUSTOM_DATA_SFTP_LOGIN 				= 'sftpLogin';
 	const CUSTOM_DATA_SFTP_PASS 				= 'sftpPass';
+	const CUSTOM_DATA_SFTP_BASE_PATH			= 'sftpBasePath';
 	const CUSTOM_DATA_CHANNEL_TITLE 			= 'channelTitle';
 	const CUSTOM_DATA_CHANNEL_LINK 				= 'channelLink';
 	const CUSTOM_DATA_CHANNEL_DESCRIPTION 		= 'channelDescription';
@@ -234,6 +235,7 @@ class QuickPlayDistributionProfile extends ConfigurableDistributionProfile
 	public function getSftpHost()					{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_HOST);}
 	public function getSftpLogin()					{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_LOGIN);}
 	public function getSftpPass()					{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_PASS);}
+	public function getSftpBasePath()				{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_BASE_PATH);}
 	public function getChannelTitle()				{return $this->getFromCustomData(self::CUSTOM_DATA_CHANNEL_TITLE);}
 	public function getChannelLink()				{return $this->getFromCustomData(self::CUSTOM_DATA_CHANNEL_LINK);}
 	public function getChannelDescription()			{return $this->getFromCustomData(self::CUSTOM_DATA_CHANNEL_DESCRIPTION);}
@@ -251,6 +253,7 @@ class QuickPlayDistributionProfile extends ConfigurableDistributionProfile
 	public function setSftpHost($v)					{$this->putInCustomData(self::CUSTOM_DATA_SFTP_HOST, $v);}
 	public function setSftpLogin($v)				{$this->putInCustomData(self::CUSTOM_DATA_SFTP_LOGIN, $v);}
 	public function setSftpPass($v)					{$this->putInCustomData(self::CUSTOM_DATA_SFTP_PASS, $v);}
+	public function setSftpBasePath($v)				{$this->putInCustomData(self::CUSTOM_DATA_SFTP_BASE_PATH, $v);}
 	public function setChannelTitle($v)				{$this->putInCustomData(self::CUSTOM_DATA_CHANNEL_TITLE, $v);}
 	public function setChannelLink($v)				{$this->putInCustomData(self::CUSTOM_DATA_CHANNEL_LINK, $v);}
 	public function setChannelDescription($v)		{$this->putInCustomData(self::CUSTOM_DATA_CHANNEL_DESCRIPTION, $v);}

@@ -113,7 +113,17 @@ class QuickPlayFeed
 		$this->setNodeValueFieldConfigId('/rss/channel/item/qpm:notes', KalturaQuickPlayDistributionField::QPM_NOTES);
 		$this->setNodeValueFieldConfigId('/rss/channel/item/qpm:rating/@scheme', KalturaQuickPlayDistributionField::QPM_RATING_SCHEMA);
 		$this->setNodeValueFieldConfigId('/rss/channel/item/qpm:rating/@value', KalturaQuickPlayDistributionField::QPM_RATING);
-		
+
+		$this->removeNodeIfEmpty('/rss/channel/generator');
+		$this->removeNodeIfEmpty('/rss/channel/rating');
+		$this->removeNodeIfEmpty('/rss/channel/item/qpm:artist');
+		$this->removeNodeIfEmpty('/rss/channel/item/qpm:director');
+		$this->removeNodeIfEmpty('/rss/channel/item/qpm:producer');
+		$this->removeNodeIfEmpty('/rss/channel/item/qpm:expDatePadding');
+		$this->removeNodeIfEmpty('/rss/channel/item/qpm:onDeviceExpirationPadding');
+		$this->removeNodeIfEmpty('/rss/channel/item/qpm:onDeviceExpiration');
+		$this->removeNodeIfEmpty('/rss/channel/item/qpm:groupCategory');
+
 		foreach($thumbnailAssets as $thumbnailAsset)
 		{
 			$encodingProfile = $thumbnailAsset->getWidth().'x'.$thumbnailAsset->getHeight();
@@ -132,8 +142,7 @@ class QuickPlayFeed
 				$encodingProfile = $flavorAsset->getFlavorParams()->getName();
 			else 
 				$encodingProfile = 'Unknown';
-			
-			$this->_enclosuresXmls[] =  
+			$this->_enclosuresXmls[] =
 				$this->createEnclosureXml(
 					$flavorAsset,
 					'content',
@@ -193,6 +202,16 @@ class QuickPlayFeed
 		$dateTime->setTimezone(new DateTimeZone('GMT'));
 		$date = $dateTime->format('r');
 		$this->setNodeValue($xpath, $date, $contextnode);
+	}
+
+	public function removeNodeIfEmpty($xpath)
+	{
+		$node = $this->_xpath->query($xpath)->item(0);
+		if (is_null($node))
+			return;
+
+		if ($node->nodeValue === '')
+			$node->parentNode->removeChild($node);
 	}
 	
 	/**
@@ -266,7 +285,7 @@ class QuickPlayFeed
 	 * @param string $duration
 	 * @param string $url
 	 */
-	protected function createEnclosureXml(asset $asset, $class, $encodingProfile, $duration, $url)
+	protected function createEnclosureXml(asset $asset, $class, $encodingProfile, $duration)
 	{
 		/**
 		 * 
@@ -299,6 +318,6 @@ class QuickPlayFeed
 		$link->setAttribute('duration', $duration);
 		$link->setAttribute('url', pathinfo($fileSync->getFilePath(), PATHINFO_BASENAME));
 		$xmlElement->appendChild($enclosureNode);
-		$this->_enclosuresXmls[] = $enclosureDoc->saveXML($enclosureNode);
+		return $enclosureDoc->saveXML($enclosureNode);
 	}
 }
