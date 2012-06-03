@@ -389,7 +389,7 @@ kmc.utils = {
 		
 		// Lazy init KMC helpMap object
 		if( ! kmc.helpMap ) {
-			$.getScript( 'http://kaltura.trunk/lib/js/help_map.js', function() {
+			$.getScript( kmc.vars.service_url + '/lib/js/help_map.js', function() {
 				goToHelpUrl( key );
 			});
 		} else {
