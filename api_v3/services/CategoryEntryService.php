@@ -147,7 +147,6 @@ class CategoryEntryService extends KalturaBaseService
 		
 		if(kEntitlementUtils::getEntitlementEnforcement() && count($dbCategoriesEntry))
 		{
-			
 			//remove unlisted categories: display in search is set to members only
 			$categoriesIds = array();
 			foreach ($dbCategoriesEntry as $dbCategoryEntry)
@@ -156,8 +155,8 @@ class CategoryEntryService extends KalturaBaseService
 			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 			$c->addSelectColumn(categoryPeer::ID);
 			$c->addAnd(categoryPeer::ID, $categoriesIds, Criteria::IN);
-			$stmt = categoryPeer::doSelectStmt($c);
-			$categoryIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+			$c->applyFilters();
+			$categoryIds = $c->getFetchedIds();
 			
 			foreach ($dbCategoriesEntry as $key => $dbCategoryEntry)
 			{
