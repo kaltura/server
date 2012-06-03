@@ -334,9 +334,6 @@ class entryPeer extends BaseentryPeer
 			 
 				foreach($categories as $category)
 					$categoriesIds[] = $category->getId();
-	
-					$categoriesIds[] = '1234';
-					$categoriesIds[] = '123433';
 					
 				if (count($categoriesIds))
 				{
