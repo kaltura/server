@@ -68,6 +68,10 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
 	    }
 	    
 	    $kuser = kuserPeer::getKuserByPartnerAndUid($this->partnerId, $this->userId);
+	    if (!$kuser)
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+	    }
 	    $categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->categoryId, $kuser->getId());
 	    if ($categoryKuser)
 	        $this->objectId = $categoryKuser->getId();
