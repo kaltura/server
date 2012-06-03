@@ -126,7 +126,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
     		    {
     		        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
     			    $bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
-    			    $bulkUploadResult->errorDescription = "Mandatory parameters missing for action [".$bulkUploadResult->action ."]";
+    			    $bulkUploadResult->errorDescription = "Mandatory parameters missing for action [".$bulkUploadResult->action ."] - categoryId/referenceId";
     		    }
                 else 
                 {
