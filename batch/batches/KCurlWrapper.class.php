@@ -120,7 +120,7 @@ class KCurlWrapper
 	/**
 	 * @param string $url
 	 */
-	public function __construct($url) {
+	public function __construct($url, $verbose = false) {
 		$url = trim($url);
 
 		// this is the default - will change only in very specific conditions (bellow)
@@ -150,6 +150,9 @@ class KCurlWrapper
 		
 		curl_setopt($this->ch, CURLOPT_NOSIGNAL, true);
 		curl_setopt($this->ch, CURLOPT_FORBID_REUSE, true);
+		
+		if($verbose)
+			curl_setopt($this->ch, CURLOPT_VERBOSE, true);
 	}
 	
 	/**

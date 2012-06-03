@@ -74,7 +74,7 @@ class KAsyncImport extends KJobHandlerWorker
 			$resumeOffset = 0;
 			if ($data->destFileLocalPath && file_exists($data->destFileLocalPath) )
 			{ 
-    			$curlWrapper = new KCurlWrapper($sourceUrl);
+    			$curlWrapper = new KCurlWrapper($sourceUrl, $this->taskConfig->params->curlVerbose);
     			$useNoBody = ($job->executionAttempts > 1); // if the process crashed first time, tries with no body instead of range 0-0
     			$curlHeaderResponse = $curlWrapper->getHeader($useNoBody);
     			if(!$curlHeaderResponse || !count($curlHeaderResponse->headers))
@@ -89,7 +89,7 @@ class KAsyncImport extends KJobHandlerWorker
     				KalturaLog::err("Headers error number: " . $curlWrapper->getErrorNumber());
     				$curlWrapper->close();
     				
-    				$curlWrapper = new KCurlWrapper($sourceUrl);
+    				$curlWrapper = new KCurlWrapper($sourceUrl, $this->taskConfig->params->curlVerbose);
     			}
     			
     			if(!$curlHeaderResponse->isGoodCode())
@@ -116,7 +116,7 @@ class KAsyncImport extends KJobHandlerWorker
     				}
     			}
 			}
-			$curlWrapper = new KCurlWrapper($sourceUrl);
+			$curlWrapper = new KCurlWrapper($sourceUrl, $this->taskConfig->params->curlVerbose);
 			$curlWrapper->setTimeout($this->taskConfig->params->curlTimeout);			
 				
 			if($resumeOffset)
