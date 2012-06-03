@@ -168,6 +168,9 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	    if (!$this->permissionLevel)
 	    {
     	    $category = categoryPeer::retrieveByPK($this->categoryId);
+    	    if(!$category)
+    	    	throw new KalturaAPIException ( KalturaErrors::CATEGORY_NOT_FOUND, $this->categoryId );
+    	    
 	        $this->permissionLevel = $category->getDefaultPermissionLevel();
 	    }
 	    

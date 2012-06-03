@@ -41,7 +41,6 @@ class categoryFilter extends baseObjectFilter
 			"_in_status",
 			"_gte_partner_sort_value",
 			"_lte_partner_sort_value",
-			"_likex_full_name",
 			"_eq_full_ids",
 			"_likex_full_ids",
 			"_eq_inherited_parent_id",

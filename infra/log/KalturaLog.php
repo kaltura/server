@@ -222,7 +222,13 @@ class LogIp
 	{
 		if (self::$_ip === null)
 		{
-			self::$_ip = (string)infraRequestUtils::getRemoteAddress();
+			try {
+				self::$_ip = (string)infraRequestUtils::getRemoteAddress();
+			}
+			catch (Exception $ex)
+			{
+				error_log('Could not find IP remote address: ' . $ex->getMessage());
+			}
 		}
 			
 		return self::$_ip;
