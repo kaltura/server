@@ -7,7 +7,7 @@
 	
 	// Setup help map
 	var helpMap = {
-		'test': 'test.html'
+		'section_categories': 'section_categories.html'
 	};
 	
 	// Export helpMap to KMC global object
