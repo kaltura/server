@@ -9,10 +9,8 @@ kmc.vars.help_url = kmc.vars.service_url + '/kmc5help.html';
 
 // Log function
 kmc.log = function(msg) {
-	if(kmc.vars.debug) {
-		if( typeof console !='undefined' && console.log){
-			console.log(arguments);
-		}
+	if( kmc.vars.debug && typeof console !='undefined' && console.log ){
+		console.log(arguments);
 	}
 };
 
@@ -265,6 +263,7 @@ kmc.utils = {
 		$("#server_wrap").css("margin-top", "-"+ (doc_height + 2) +"px");
 	},
 	escapeQuotes : function(string) {
+		if( ! typeof string == 'string' ) { return ; }
 		string = string.replace(/"/g,"&Prime;");
 		string = string.replace(/'/g,"&prime;");
 		return string;
@@ -377,7 +376,26 @@ kmc.utils = {
 		$("#server_frame").attr("src", url);
 		$("#server_wrap").css("margin-top", "-"+ ($("#flash_wrap").height() + 2) +"px");
 		$("#server_wrap").show();
-	}
+	},
+	
+	// Open KMC help file
+	openHelp: function( baseUrl, key ) {
+		
+		var goToHelpUrl = function( key ) {
+			if( kmc.helpMap && key in kmc.helpMap ) {
+				window.open( baseUrl + kmc.helpMap[ key ], 'help' );
+			}
+		};
+		
+		// Lazy init KMC helpMap object
+		if( ! kmc.helpMap ) {
+			$.getScript( 'http://kaltura.trunk/lib/js/help_map.js', function() {
+				goToHelpUrl( key );
+			});
+		} else {
+			goToHelpUrl( key );
+		}
+	}	
 		
 };
 
@@ -485,6 +503,8 @@ kmc.preview_embed = {
 	// Should be changed to accept object with parameters
 	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, is_video) {
 		kmc.log('doPreviewEmbed', arguments);
+		
+		description = description || '';
 
 		var has_mobile_flavors = kmc.preview_embed.hasMobileFlavors( entry_flavors );
 		// default value for is_video
@@ -521,6 +541,7 @@ kmc.preview_embed = {
 		((id == "multitab_playlist") ? '' : kmc.preview_embed.buildSelect(is_playlist, uiconf_id)) +
 		((live_bitrates) ? '' : kmc.preview_embed.buildRtmpOptions()) +
 		kmc.preview_embed.buildHTML5Option(id, name, is_playlist, previewOnly, kmc.vars.partner_id, uiconf_id, has_mobile_flavors, is_video) +
+		kmc.preview_embed.previewUrl() + 
 		'<div class="embed_code_div"><div class="label embedcode">Embed Code:</div> <div class="right"><textarea id="embed_code" rows="5" cols=""' +
 		'readonly="true">' + embed_code + '</textarea></div><br class="clear" />' +
 		'<div id="copy_msg">Press Ctrl+C to copy embed code (Command+C on Mac)</div><div class="center"><button id="select_code">' +
@@ -611,17 +632,20 @@ kmc.preview_embed = {
 		kmc.client.getShortURL(long_url);
 
 		var description = '<div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
-		' <a target="_blank" href="' + kmc.vars.help_url + '#section1432">Read more</a>' +
-		'<br class"clear" />View player outside KMC: <span class="preview_url"><img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...</span></div>';
+		' <a target="_blank" href="' + kmc.vars.help_url + '#section1432">Read more</a></div>';
 
 		if( is_video && ! has_mobile_flavors) {
 			description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.help_url + '#section1432">Read more</a></div>';
 		}
 
-		var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" /> <label for="html5_support">Support iPhone' +
-		' &amp; iPad with HTML5</label></div><br />' + description + '<br />';
+		var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" /> <label for="html5_support">Support Mobile' +
+		' devices by fall-forward to HTML5</label></div><br />' + description + '<br />';
 
 		return html;
+	},
+	
+	previewUrl: function(){
+		return '<div class="label">View a standalone page with this player: <span class="preview_url"><img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...</span></div>';
 	},
 
 	// for content|Manage->drilldown->flavors->preview
