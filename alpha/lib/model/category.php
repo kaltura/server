@@ -894,7 +894,7 @@ class category extends Basecategory implements IIndexable
 			'parent_id' => 'parentId',
 			'partner_id' => 'partnerId',
 			'name' => 'name',
-			'full_name' => 'fullName',
+			'full_name' => 'searchIndexfullName',
 			'full_ids' => 'fullIds',
 			'sort_name' => 'sortName',
 			'description' => 'description',
@@ -1003,12 +1003,15 @@ class category extends Basecategory implements IIndexable
 		return $parentCategory->getId();
 	}
 	
-	public function getInheritParent()
+	private function getInheritParent()
 	{
 		if ($this->getInheritanceType() != InheritanceType::INHERIT || is_null($this->getInheritedParentId()))
 			return null;
 			
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$inheritCategory = categoryPeer::retrieveByPK($this->getInheritedParentId());
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
 		if(!$inheritCategory)
 			throw new kCoreException('Invalid inherited parent categroy id for category id [' . $this->getId() . ']');
 			
@@ -1375,6 +1378,25 @@ class category extends Basecategory implements IIndexable
 		$privacyContexts = explode(',', $this->getPrivacyContexts());
 			
 		return implode(' ', $privacyContexts);
+	}
+	
+	public function searchIndexfullName($fullName)
+	{
+		$fullName = $this->getFullName();
+		return self::getParsedFullNameForSearch($fullName);
+	}
+	
+	public static function getParsedFullNameForSearch($fullName)
+	{
+		$fullNameArr = explode(categoryPeer::CATEGORY_SEPARATOR, $fullName);
+		
+		$i = 0;
+		$parsedFullName = '';
+		foreach ($fullNameArr as $categoryName)
+		{
+			$i++;
+			$parsedFullName .= $i . $categoryName . $i . ' ';
+		} 
 	}
 	
 	/**
