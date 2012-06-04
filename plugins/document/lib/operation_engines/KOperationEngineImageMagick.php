@@ -19,7 +19,7 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 	
 	const IMAGES_LIST_XML_LABEL_NAME = 'name';
 	
-	const IMAGES_LIST_XML_LABEL_COUNT = 'count';
+	const IMAGES_LIST_XML_ATTRIBUTE_COUNT = 'count';
 	
 	
 	
