@@ -62,7 +62,7 @@ if ($_SERVER["SERVER_PORT"] != "80") {
 	$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
 }
  //$_SERVER['PATH_INFO']
-if( $flavor_asset_id ) {
+if( isset($flavor_asset_id) ) {
 	$flavorUrl = $partner_host . '/p/'. $partner_id .'/sp/' . $partner_id . '00/playManifest/entryId/' . $entry_id . '/flavorId/' . $flavor_asset_id . '/format/url/protocol/' . $protocol . '/a.mp4';
 }
 
@@ -85,7 +85,7 @@ if( $flavor_asset_id ) {
 	<meta property="og:video:width" content="<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:video:height" content="<?php echo $uiConf->getHeight();?>" />	
 	<meta property="og:video:type" content="application/x-shockwave-flash" />
-	<?php if( $flavor_asset_id ) { ?>
+	<?php if( isset($flavor_asset_id) ) { ?>
 	<meta property="og:video" content="<?php echo $flavorUrl; ?>" />
 	<meta property="og:video:type" content="video/mp4" />	
 	<?php } ?>
