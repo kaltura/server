@@ -374,7 +374,8 @@ class entryPeer extends BaseentryPeer
 			}
 		}
 
-		$c->addAnd ($critEntitled);
+		if($critEntitled)
+			$c->addAnd ($critEntitled);
 		
 		self::$s_criteria_filter->setFilter($c);
 	}
