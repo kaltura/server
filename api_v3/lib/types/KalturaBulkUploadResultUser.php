@@ -99,16 +99,13 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
 	
     public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		return parent::toInsertableObject(new BulkUploadResultKuser(), $props_to_skip);
-	}
-	
-	public function toObject($object_to_fill = null , $props_to_skip = array())
-	{
 	    if (!is_numeric($this->objectId))
 	    {
 	        $kuser = kuserPeer::getKuserByPartnerAndUid($this->partnerId, $this->objectId);
 	        if ($kuser)
                 $this->objectId = $kuser->getId();	            
 	    }
+	    
+		return parent::toInsertableObject(new BulkUploadResultKuser(), $props_to_skip);
 	}
 }

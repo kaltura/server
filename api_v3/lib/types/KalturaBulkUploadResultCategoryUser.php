@@ -52,16 +52,6 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
 	
     public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		return parent::toInsertableObject(new BulkUploadResultCategoryKuser(), $props_to_skip);
-	}
-	
-	public function toObject($object_to_fill = null , $props_to_skip = array() )
-	{
-	    if (is_null($object_to_fill))
-	    {
-	        return null;
-	    }
-	    
 	    $kuser = kuserPeer::getKuserByPartnerAndUid($this->partnerId, $this->userId);
 	    if (!$kuser)
 	    {
@@ -70,7 +60,7 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
 	    $categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->categoryId, $kuser->getId());
 	    if ($categoryKuser)
 	        $this->objectId = $categoryKuser->getId();
-	    
-	    return parent::toObject($object_to_fill, $props_to_skip);
+	        
+		return parent::toInsertableObject(new BulkUploadResultCategoryKuser(), $props_to_skip);
 	}
 }

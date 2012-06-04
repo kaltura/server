@@ -124,12 +124,15 @@ class KalturaBulkUploadResult extends KalturaObject
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 	    if(is_null($object_to_fill))
+	    {
+			KalturaLog::alert("No object returned from toInsertableObject, object_to_fill [" . get_class($object_to_fill) . "], this [" . get_class($this) . "] line [" . __LINE__ . "]");
 			return null;
+	    }
 	        
 		$dbObject = parent::toInsertableObject($object_to_fill, $props_to_skip);
 		if(!$dbObject)
 		{
-			KalturaLog::alert("No object returned from toInsertableObject, object_to_fill [" . get_class($object_to_fill) . "]");
+			KalturaLog::alert("No object returned from toInsertableObject, object_to_fill [" . get_class($object_to_fill) . "], this [" . get_class($this) . "] line [" . __LINE__ . "]");
 			return null;
 		}
 		
