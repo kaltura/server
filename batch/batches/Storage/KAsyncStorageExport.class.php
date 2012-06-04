@@ -80,8 +80,8 @@ class KAsyncStorageExport extends KJobHandlerWorker
 		if(!file_exists($srcFile))
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $srcFile does not exist", KalturaBatchJobStatus::RETRY);
 		
-		if(!is_file($srcFile))
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $srcFile is not a file", KalturaBatchJobStatus::FAILED);
+		if(!is_file($srcFile) && !is_dir($srcFile))
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $srcFile is not a file or directory", KalturaBatchJobStatus::FAILED);
 			
 		$destFile = str_replace('//', '/', trim($data->destFileSyncStoredPath));
 		$this->updateJob($job, "Exporting $srcFile to $destFile", KalturaBatchJobStatus::QUEUED, 1);
@@ -97,7 +97,17 @@ class KAsyncStorageExport extends KJobHandlerWorker
 		}
 	
 		try{
-			$engine->putFile($destFile, $srcFile, $data->force);
+			if (is_file($srcFile)){
+				$engine->putFile($destFile, $srcFile, $data->force);
+			}
+			else if (is_dir($srcFile)){
+				$filesPaths = kFile::dirList($srcFile);
+				$destDir = $destFile;
+				foreach ($filesPaths as $filePath){
+					$destFile = $destDir.DIRECTORY_SEPARATOR.basename($filePath);
+					$engine->putFile($destFile, $filePath, $data->force);
+				}
+			}
 		}
 		catch(kFileTransferMgrException $e){
 			if($e->getCode() == kFileTransferMgrException::remoteFileExists)
