@@ -28,7 +28,7 @@ class BulkService extends KalturaBaseService
 	{
 	    if (!$bulkUploadData)
 	    {
-	       $bulkUploadData = new KalturaBulkUploadJobData();
+	       $bulkUploadData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', null);
 	    }
 	    
 	    if (!$bulkUploadEntryData)
@@ -49,6 +49,9 @@ class BulkService extends KalturaBaseService
 		
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
 		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
+		if(!$dbJobLog)
+			return null;
+			
 		$bulkUpload = new KalturaBulkUpload();
 		$bulkUpload->fromObject($dbJobLog);
 		
@@ -69,7 +72,7 @@ class BulkService extends KalturaBaseService
 	{
 	    if (!$bulkUploadData)
 	    {
-	       $bulkUploadData = new KalturaBulkUploadJobData();
+	       $bulkUploadData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', null);
 	    }
 	    
 	    if (!$bulkUploadCategoryData)
@@ -91,6 +94,8 @@ class BulkService extends KalturaBaseService
 		
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
 		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
+		if(!$dbJobLog)
+			return null;
 		
 		$bulkUpload = new KalturaBulkUpload();
 		$bulkUpload->fromObject($dbJobLog);
@@ -111,7 +116,7 @@ class BulkService extends KalturaBaseService
 	{
 	    if (!$bulkUploadData)
 	    {
-	       $bulkUploadData = new KalturaBulkUploadJobData();
+	       $bulkUploadData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', null);
 	    }
 	    
         if (!$bulkUploadCategoryUserData)
@@ -132,6 +137,8 @@ class BulkService extends KalturaBaseService
 		
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
 		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
+		if(!$dbJobLog)
+			return null;
 		
 		$bulkUpload = new KalturaBulkUpload();
 		$bulkUpload->fromObject($dbJobLog);
@@ -152,7 +159,7 @@ class BulkService extends KalturaBaseService
 	{
 	   if (!$bulkUploadData)
 	   {
-	       $bulkUploadData = new KalturaBulkUploadJobData();
+	       $bulkUploadData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', null);
 	   }
 	   
 	   if (!$bulkUploadUserData)
@@ -173,6 +180,9 @@ class BulkService extends KalturaBaseService
 		
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
 		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
+		if(!$dbJobLog)
+			return null;
+			
 		$bulkUpload = new KalturaBulkUpload();
 		$bulkUpload->fromObject($dbJobLog);
 		
