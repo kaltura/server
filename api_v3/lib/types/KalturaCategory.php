@@ -419,15 +419,12 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_MUST_SET_PARENT_CATEGORY);
 		}
 		
-		if ((!is_null($sourceObject) && $sourceObject->getInheritanceType() == KalturaInheritanceType::INHERIT && $this->inheritanceType == null) || 
-			($this->inheritanceType == KalturaInheritanceType::INHERIT))
-		{
-			if (($this->userJoinPolicy != null && $this->userJoinPolicy != $sourceObject->getUserJoinPolicy()) ||
-				($this->defaultPermissionLevel != null && $this->defaultPermissionLevel != $sourceObject->getDefaultPermissionLevel()) ||
-				($this->owner != null && $this->owner != $this->getOwner()))
-			{
-				throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES);
-			}
+		if (((!is_null($sourceObject) && $sourceObject->getInheritanceType() == KalturaInheritanceType::INHERIT && $this->inheritanceType == null) || 
+			($this->inheritanceType == KalturaInheritanceType::INHERIT))&& 
+			(($this->userJoinPolicy != null && (!$sourceObject || $this->userJoinPolicy != $sourceObject->getUserJoinPolicy())) ||
+			($this->defaultPermissionLevel != null && (!$sourceObject || $this->defaultPermissionLevel != $sourceObject->getDefaultPermissionLevel()))))
+		{	
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES);
 		}
 		
 		if (!is_null($sourceObject))
