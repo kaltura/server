@@ -42,7 +42,7 @@ class BulkUploadResultKuser extends BulkUploadResult
     public function getObject()
     {
         //The object Id received through the API is not the actual kuser ID, but the puser ID.
-        return kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $this->getObjectId());
+        return kuserPeer::retrieveByPK($this->getObjectId());
     }
     
     //Set properties for users
