@@ -16,7 +16,8 @@ abstract class KBulkUploadEngine
 		KalturaBulkUploadAction::TRANSFORM_XSLT => 'transformxslt'
 	);
 	
-	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
+	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%d';
+	const BULK_UPLOAD_TIME_FORMAT = 'T%H:%i:%s';
 
 	/**
 	 * @var KSchedularTaskConfig
@@ -43,7 +44,7 @@ abstract class KBulkUploadEngine
 	/**
 	 * @var int
 	 */
-	protected $maxRecords = 1000;
+	protected $maxRecords = false;
 	
 	/**
 	 * @var int
@@ -78,16 +79,31 @@ abstract class KBulkUploadEngine
 	 * @var KalturaBulkUploadJobData
 	 */
 	protected $data = null;
+
+	/**
+	 * @param string $class enum class name
+	 * @param string $value
+	 * @return bool
+	 */
+	protected function isValidEnaumValue($class, $value)
+	{
+		if(!class_exists($class))
+			return false;
+			
+		$reflect = new ReflectionClass($class);
+		$constants = $reflect->getConstants();
+		return in_array($value, $constants);
+	}
 	
 	/**
 	 * @param string $str
 	 * @return int
 	 */
-	public static function parseFormatedDate($str)
+	public static function parseFormatedDate($str, $dateOnly = false)
 	{
 		if(function_exists('strptime'))
 		{
-			$ret = strptime($str, self::BULK_UPLOAD_DATE_FORMAT);
+			$ret = strptime($str, self::BULK_UPLOAD_DATE_FORMAT . ($dateOnly ? '' : self::BULK_UPLOAD_TIME_FORMAT));
 			if($ret)
 			{
 				KalturaLog::debug("Formated Date [$ret] " . date('Y-m-d\TH:i:s', $ret));
@@ -185,7 +201,7 @@ abstract class KBulkUploadEngine
 	 * @param array $fields
 	 * @return string
 	 */
-	private static function getDateFormatRegex(&$fields = null)
+	private static function getDateFormatRegex(&$fields = null, $dateOnly = false)
 	{
 		$replace = array(
 			'%Y' => '([1-2][0-9]{3})',
@@ -197,23 +213,24 @@ abstract class KBulkUploadEngine
 //			'%T' => '([A-Z]{3})',
 		);
 	
+		$format = self::BULK_UPLOAD_DATE_FORMAT . ($dateOnly ? '' : self::BULK_UPLOAD_TIME_FORMAT);
 		$fields = array();
 		$arr = null;
-		if(!preg_match_all('/%([YmdTHis])/', self::BULK_UPLOAD_DATE_FORMAT, $arr))
+		if(!preg_match_all('/%([YmdTHis])/', $format, $arr))
 			return false;
 	
 		$fields = $arr[1];
 		
-		return '/' . str_replace(array_keys($replace), $replace, self::BULK_UPLOAD_DATE_FORMAT) . '/';
+		return '/' . str_replace(array_keys($replace), $replace, $format) . '/';
 	}
 	
 	/**
 	 * @param string $str
 	 * @return boolean
 	 */
-	public static function isFormatedDate($str)
+	public static function isFormatedDate($str, $dateOnly = false)
 	{
-		$regex = self::getDateFormatRegex();
+		$regex = self::getDateFormatRegex($dateOnly);
 		return preg_match($regex, $str);
 	}
 	

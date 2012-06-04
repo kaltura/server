@@ -291,7 +291,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 		if(!is_numeric($bulkUploadResult->accessControlProfileId))
 			$bulkUploadResult->accessControlProfileId = null;	
 
-		if($this->lineNumber > $this->maxRecords) // check max records
+		if($this->maxRecords && $this->lineNumber > $this->maxRecords) // check max records
 		{
 			$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;

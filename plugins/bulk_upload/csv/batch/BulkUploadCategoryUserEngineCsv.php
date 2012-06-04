@@ -10,11 +10,6 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 {
     private $categoryReferenceIdMap = array();
     
-    private static $validCategoryUserStatuses = array(KalturaCategoryUserStatus::ACTIVE, KalturaCategoryUserStatus::NOT_ACTIVE, KalturaCategoryUserStatus::PENDING,);
-    
-    private static $validCategoryUserPermissionLevels = array (KalturaCategoryUserPermissionLevel::CONTRIBUTOR, KalturaCategoryUserPermissionLevel::MANAGER, KalturaCategoryUserPermissionLevel::MEMBER, KalturaCategoryUserPermissionLevel::MODERATOR,);
-    
-    private static $validCategoryUserUpdateMethods = array (KalturaUpdateMethodType::AUTOMATIC, KalturaUpdateMethodType::MANUAL,);
 	/**
      * (non-PHPdoc)
      * @see BulkUploadGeneralEngineCsv::createUploadResult()
@@ -112,21 +107,21 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 			$bulkUploadResult->errorDescription = "Missing mandatory parameter categoryId";
 		}
 		
-		if ($bulkUploadResult->requiredObjectStatus && !in_array($bulkUploadResult->requiredObjectStatus, self::$validCategoryUserStatuses))
+		if ($bulkUploadResult->requiredObjectStatus && !$this->isValidEnaumValue('KalturaCategoryUserStatus', $bulkUploadResult->requiredObjectStatus))
 	    {
 	        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
 			$bulkUploadResult->errorDescription = "Wrong value passed for property status.";
 	    }
-	    
-	    if ($bulkUploadResult->permissionLevel && !in_array($bulkUploadResult->permissionLevel, self::$validCategoryUserPermissionLevels))
+	    		
+		if ($bulkUploadResult->permissionLevel && !$this->isValidEnaumValue('KalturaCategoryUserPermissionLevel', $bulkUploadResult->permissionLevel))
 	    {
 	        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
 			$bulkUploadResult->errorDescription = "Wrong value passed for property permissionLevel.";
 	    }
-	    
-	    if ($bulkUploadResult->updateMethod && !in_array($bulkUploadResult->updateMethod, self::$validCategoryUserUpdateMethods))
+	    		
+		if ($bulkUploadResult->updateMethod && !$this->isValidEnaumValue('KalturaUpdateMethodType', $bulkUploadResult->updateMethod))
 	    {
 	        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
@@ -134,7 +129,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 	    }
 	    
 	    
-		if($this->lineNumber > $this->maxRecords) // check max records
+		if($this->maxRecords && $this->lineNumber > $this->maxRecords) // check max records
 		{
 			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;

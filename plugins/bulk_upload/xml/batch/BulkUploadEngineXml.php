@@ -1953,7 +1953,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function createUploadResult(SimpleXMLElement $item, $action)
 	{
-		if(($this->handledRecordsThisRun >= $this->maxRecordsEachRun) || ($this->currentItem > $this->maxRecords))
+		if(($this->handledRecordsThisRun >= $this->maxRecordsEachRun) || ($this->maxRecords && $this->currentItem > $this->maxRecords))
 		{
 			$this->exceededMaxRecordsEachRun = true; 
 			return;

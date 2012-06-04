@@ -150,7 +150,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		}
 		
 
-		if($this->lineNumber > $this->maxRecords) // check max records
+		if($this->maxRecords && $this->lineNumber > $this->maxRecords) // check max records
 		{
 			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;

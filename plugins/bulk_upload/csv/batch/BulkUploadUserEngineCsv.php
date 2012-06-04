@@ -81,8 +81,8 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		}
 		
 		$bulkUploadResult = $this->validateBulkUploadResult($bulkUploadResult);
-		
-		$this->bulkUploadResults[] = $bulkUploadResult;
+		if($bulkUploadResult)
+			$this->bulkUploadResults[] = $bulkUploadResult;
 	}
     
 	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult)
@@ -95,7 +95,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$bulkUploadResult->errorDescription = "Mandatory Column [userId] missing from CSV.";
 		}
 		
-		if ($bulkUploadResult->dateOfBirth && !self::isFormatedDate($bulkUploadResult->dateOfBirth))
+		if ($bulkUploadResult->dateOfBirth && !self::isFormatedDate($bulkUploadResult->dateOfBirth, true))
 		{
 		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
@@ -121,7 +121,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		}
 		
 
-		if($this->lineNumber > $this->maxRecords) // check max records
+		if($this->maxRecords && $this->lineNumber > $this->maxRecords) // check max records
 		{
 			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
@@ -131,9 +131,9 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		if($bulkUploadResult->status == KalturaBulkUploadResultStatus::ERROR)
 		{
 			$this->addBulkUploadResult($bulkUploadResult);
-			return;
+			return null;
 		}	
-
+		
 		return $bulkUploadResult;
 	}
 	
@@ -158,8 +158,8 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		
 		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
-			/* @var $bulkUploadResult KalturaBulkUploadResultCategory */
-		    KalturaLog::debug("Handling bulk upload result: [". $bulkUploadResult->name ."]");
+			/* @var $bulkUploadResult KalturaBulkUploadResultUser */
+		    KalturaLog::debug("Handling bulk upload result: [". $bulkUploadResult->objectId ."]");
 		    switch ($bulkUploadResult->action)
 		    {
 		        case KalturaBulkUploadAction::ADD:
