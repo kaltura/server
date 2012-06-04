@@ -106,4 +106,14 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
 		
 		return $dbObject;
 	}
+	
+	public function toObject($object_to_fill = null , $props_to_skip = array())
+	{
+	    if (!is_numeric($this->objectId))
+	    {
+	        $kuser = kuserPeer::getKuserByPartnerAndUid($this->partnerId, $this->objectId);
+	        if ($kuser)
+                $this->objectId = $kuser->getId();	            
+	    }
+	}
 }
