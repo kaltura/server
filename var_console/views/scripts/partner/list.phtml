@@ -350,19 +350,4 @@ jQuery(function() {
 	});
 });
 
-<?php
-
-// add javascript "pluginControllerUrl variable to be used by plugins javascript code
-echo 'var pluginControllerUrl = \''.$this->url(array('controller' => 'plugin'), null, true).'\';'.PHP_EOL.PHP_EOL;
-
-// add javascript from plugin pages 
-$pluginActionJavascriptStr = '';
-foreach ($this->partnerActionPluginPages as $partnerActionPluginPage)
-{
-	$pluginActionJavascriptStr .= $partnerActionPluginPage->getPublisherAdminActionJavascript().PHP_EOL.PHP_EOL;						
-}
-
-echo $pluginActionJavascriptStr;
-
-?>
 </script>
