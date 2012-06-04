@@ -89,7 +89,7 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 	 */
 	private function startBulkUpload(KalturaBatchJob $job)
 	{
-		KalturaLog::debug ( "startBulkUpload($job->id)" );
+		KalturaLog::debug( "startBulkUpload($job->id)" );
 		
 		//Gets the right Engine instance 
 		$engine = KBulkUploadEngine::getEngine($job->jobSubType, $this->taskConfig, $this->kClient, $job);
@@ -119,7 +119,7 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 		{
 			KalturaLog::debug("Set the job to retry");
 			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
-			return $this->closeJob($job, null, null, "Handled [$countHandledObjects] objects of type [". $job->data->$bulkUploadObjectType ."]", KalturaBatchJobStatus::RETRY);
+			return $this->closeJob($job, null, null, "Handled [$countHandledObjects] objects of type [". $job->data->bulkUploadObjectType ."]", KalturaBatchJobStatus::RETRY);
 		}
 			
 		return $this->closeJob($job, null, null, 'Waiting for objects closure', KalturaBatchJobStatus::ALMOST_DONE, $data);
