@@ -19,6 +19,8 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 	
 	const IMAGES_LIST_XML_LABEL_NAME = 'name';
 	
+	const IMAGES_LIST_XML_LABEL_COUNT = 'count';
+	
 	
 	
 	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
@@ -70,6 +72,7 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
     		$imageNode = $imagesListXML->addChild(self::IMAGES_LIST_XML_LABEL_ITEM);
     		$imageNode->addChild(self::IMAGES_LIST_XML_LABEL_NAME, $image);
 		}
+		$imagesListXML -> addAttribute(self::IMAGES_LIST_XML_LABEL_COUNT, count($imagesList));
 		return $imagesListXML;	
 	}
 	
