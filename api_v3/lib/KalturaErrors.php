@@ -161,6 +161,9 @@ class KalturaErrors extends APIErrors
 	const SOURCE_WIDGET_NOT_FOUND = "SOURCE_WIDGET_NOT_FOUND,Source widget id \"%s\" not found";
 	
 	const CANNOT_DISABLE_ENTITLEMENT_WITH_NO_ENTRY_ID = "CANNOT_DISABLE_ENTITLEMENT_WITH_NO_ENTRY_ID,Cannot disable entitlement when widget is not set to an entry";
+	
+	const CANNOT_DISABLE_ENTITLEMENT_FOR_WIDGET_WHEN_ENTITLEMENT_ENFORCEMENT_ENABLE = "CANNOT_DISABLE_ENTITLEMENT_FOR_WIDGET_WHEN_ENTITLEMENT_ENFORCEMENT_ENABLE,Cannot create widget with no entitlement enforcement when current session is with entitlement enabled";
+	
 	/**
 	 * UiConf Service
 	 */

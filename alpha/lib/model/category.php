@@ -1380,23 +1380,27 @@ class category extends Basecategory implements IIndexable
 		return implode(' ', $privacyContexts);
 	}
 	
-	public function searchIndexfullName($fullName)
+	public function getSearchIndexfullName()
 	{
 		$fullName = $this->getFullName();
-		return self::getParsedFullNameForSearch($fullName);
-	}
-	
-	public static function getParsedFullNameForSearch($fullName)
-	{
 		$fullNameArr = explode(categoryPeer::CATEGORY_SEPARATOR, $fullName);
 		
-		$i = 0;
 		$parsedFullName = '';
+		$fullName = '';
 		foreach ($fullNameArr as $categoryName)
 		{
-			$i++;
-			$parsedFullName .= $i . $categoryName . $i . ' ';
-		} 
+			if($parsedFullName != '')
+				$parsedFullName .= md5($fullName . categoryPeer::CATEGORY_SEPARATOR) . ' '; 
+			
+			if($fullName == '')
+				$fullName = $categoryName;
+			else 
+				$fullName .= '>' . $categoryName;
+			
+			$parsedFullName .= md5($fullName) . ' ';
+		}
+			
+		return $parsedFullName;
 	}
 	
 	/**
@@ -1413,7 +1417,9 @@ class category extends Basecategory implements IIndexable
 		return $this;
 	}
 	
-	public static $sphinxFieldsEscapeType = array();
+	public static $sphinxFieldsEscapeType = array(
+		'full_name' => SearchIndexFieldEscapeType::NO_ESCAPE,
+	);
 	
 	public function getSearchIndexFieldsEscapeType($fieldName)
 	{

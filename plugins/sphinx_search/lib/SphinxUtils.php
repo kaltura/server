@@ -2,8 +2,7 @@
 
 class SphinxUtils
 {
-	const REPLACE_CHARS  = 'zzz'; 
-
+	public static $count = 0;
 	public static function escapeString($str, $escapeType = SearchIndexFieldEscapeType::DEFAULT_ESCAPE, $iterations = 2)
 	{
 		if($escapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE)
@@ -24,14 +23,17 @@ class SphinxUtils
 				return str_replace($from, $toSingle, $str);
 			}
 		}
-		elseif($escapeType == SearchIndexFieldEscapeType::STRIP)
-		{
+		elseif($escapeType == SearchIndexFieldEscapeType::MD5)
+		{				
 			$str = trim($str);
 			
 			if(substr($str, -2) == '\*')
-				return preg_replace('/[^\w\d]/' , self::REPLACE_CHARS , substr($str, -2)) . '\\\*';
+				return md5(substr($str, -2)) . '\\\*';
 				
-			return preg_replace('/([^\w\d]|_)/' , self::REPLACE_CHARS , $str);
+			return md5($str);
+		}elseif($escapeType == SearchIndexFieldEscapeType::NO_ESCAPE)
+		{
+			return $str;
 		}
 	}
 }

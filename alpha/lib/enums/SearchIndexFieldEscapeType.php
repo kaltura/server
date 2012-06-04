@@ -6,5 +6,7 @@
 interface SearchIndexFieldEscapeType extends BaseEnum 
 {
 	const DEFAULT_ESCAPE  = '1';
-	const STRIP  = '2';
+	const NO_ESCAPE = '2';
+	const MD5  = '3';
+	
 }

@@ -93,7 +93,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	);
 	
 	public static $sphinxFieldsEscapeType = array(
-		//'category.FULL_NAME' => SearchIndexFieldEscapeType::STRIP,
+		'category.FULL_NAME' => SearchIndexFieldEscapeType::MD5,
 	);
 
 	/**
@@ -145,16 +145,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	 * @see SphinxCriteria::applyFilterFields()
 	 */
 	protected function applyFilterFields(baseObjectFilter $filter)
-	{
-		$matchAndCats = $filter->get("in_members");
-		if ($matchAndCats !== null)
-		{
-			//TODO - implement pusers to kusers
-			$filter->unsetByName('in_members');
-		}
-		
-		//TODO - CATEGORY_PRIVACY_CONTEXT IS SET - *
-		
+	{				
 		if($filter->get('_free_text'))
 		{
 			$freeTexts = $filter->get('_free_text');
@@ -250,7 +241,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			if($kuser)
 			{
 				$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
-				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . $kuser->getid() . ')';
+				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . $kuser->getid() . ' !(' . $manager . ' << ' . $kuser->getid() .' << ' . $manager .'))';
 			}
 		}
 		$filter->unsetByName('_eq_member');

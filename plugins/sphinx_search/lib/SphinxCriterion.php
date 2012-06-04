@@ -110,7 +110,13 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				if(count($vals))
 				{
 					$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-					$val = '((^' . implode('$) | (^', $vals) . '$))';
+					foreach ($vals as $key => $val)
+					{
+						if (strstr($val, ' '))
+							$vals[$key] = "^$val$";
+					}
+					
+					$val = '((' . implode(') | (', $vals) . '))';
 					return "@$sphinxField $val";
 				}
 				break;
