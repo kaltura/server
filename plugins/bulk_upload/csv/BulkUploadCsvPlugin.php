@@ -215,7 +215,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	    /* @var $bulkUploadResult BulkUploadResultCategoryKuser */
 	    $values = array();
 	    $values[] = $bulkUploadResult->getCategoryId();
-	    $values[] = $bulkUploadResult->getKuserId();
+	    $values[] = $bulkUploadResult->getUserId();
 	    $values[] = $bulkUploadResult->getCategoryReferenceId();
 	    $values[] = $bulkUploadResult->getPermissionLevel();
 	    $values[] = $bulkUploadResult->getUpdateMethod();
