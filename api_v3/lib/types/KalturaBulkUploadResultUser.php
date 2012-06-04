@@ -99,12 +99,7 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
 	
     public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		$dbObject = parent::toInsertableObject(new BulkUploadResultKuser(), $props_to_skip);
-		
-		$pluginsData = $this->createPluginDataMap();
-		$dbObject->setPluginsData($pluginsData);
-		
-		return $dbObject;
+		return parent::toInsertableObject(new BulkUploadResultKuser(), $props_to_skip);
 	}
 	
 	public function toObject($object_to_fill = null , $props_to_skip = array())
