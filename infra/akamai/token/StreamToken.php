@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * Copyright:   Copyright (c) Akamai Conference 2006<p>
  * Company:     Akamai<p>
  *
@@ -7,6 +7,9 @@
  * for constructing tokens.
  *
  * $Id$
+ * 
+ * @package External
+ * @subpackage Akamai.token
 */
 class StreamToken {
     var $codeVersion = "3.0.1";

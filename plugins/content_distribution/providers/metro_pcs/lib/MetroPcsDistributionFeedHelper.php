@@ -1,5 +1,6 @@
 <?php
 /**
+ * @package plugins.metroPcsDistribution
  * @subpackage lib
  */
 class MetroPcsDistributionFeedHelper

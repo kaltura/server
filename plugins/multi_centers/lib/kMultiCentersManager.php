@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.multiCenters
+ * @subpackage lib
+ */
 class kMultiCentersManager
 {
 	

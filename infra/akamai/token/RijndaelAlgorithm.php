@@ -1,5 +1,5 @@
 <?PHP
-/*
+/**
  * Rijndael --pronounced Reindaal-- is a variable block-size (128-, 192- and
  * 256-bit), variable key-size (128-, 192- and 256-bit) symmetric cipher.<p>
  *
@@ -12,6 +12,9 @@
  * <br>All rights reserved.<p>
  *
  * $Id: RijndaelAlgorithm.php 5428 2006-06-06 21:08:18Z rbergstrom $
+ * 
+ * @package External
+ * @subpackage Akamai.token
  */
 require 'RijndaelConstants.php';
 class RijndaelAlgorithm extends RijndaelConstants {

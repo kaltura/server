@@ -1,10 +1,17 @@
 <?PHP
-
+/**
+ * @package External
+ * @subpackage Akamai.token
+ */
 require 'StreamToken.php';
 require 'TypeCToken.php';
 require 'TypeDToken.php';
 require 'TypeEToken.php';
 
+/**
+ * @package External
+ * @subpackage Akamai.token
+ */
 class StreamTokenFactory
 {
     var $mCodeVersion = "3.0.1";

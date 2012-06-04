@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.metadata
+ * @subpackage model.filters
+ */ 
 class MetadataProfileFilter extends baseObjectFilter
 {
 	public function init ()

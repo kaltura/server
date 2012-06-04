@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.tagSearch
+ * @subpackage api.objects
+ */
 class KalturaTagListResponse extends KalturaObject
 {
     /**

@@ -2,6 +2,8 @@
 /**
  * Consumer to disable caching after an object is saved.
  *
+ * @package api
+ * @subpackage cache
  */
 class KalturaCacheDisabler implements kObjectSavedEventConsumer
 {

@@ -1,6 +1,8 @@
 <?php
-
-
+/**
+ * @package plugins.multiCenters
+ * @subpackage lib
+ */
 class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 {
 	/* (non-PHPdoc)

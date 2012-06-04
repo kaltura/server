@@ -1,13 +1,13 @@
 <?PHP
 
 
-/*
-* Copyright:   Copyright (c) Akamai Conference 2006<p>
-* Company:     Akamai<p>
-*
-*/
-
-
+/**
+ * Copyright:   Copyright (c) Akamai Conference 2006<p>
+ * Company:     Akamai<p>
+ *
+ * @package External
+ * @subpackage Akamai.token
+ */
 class RijndaelConstants {
 
     var $S;

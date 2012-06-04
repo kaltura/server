@@ -1,13 +1,16 @@
 <?PHP
 
-/*
+/**
  * Copyright:   Copyright (c) Akamai Conference 2006<p>
  * Company:     Akamai<p>
  *
  * Type D token type.  Double MD5 of user data salted with password.
  *
  * $Id$
-*/
+ * 
+ * @package External
+ * @subpackage Akamai.token
+ */
 class TypeDToken extends StreamToken {
 
     /*

@@ -1,12 +1,15 @@
 <?PHP
 require 'RijndaelAlgorithm.php';
-/*
+/**
  * Copyright:   Copyright (c) Akamai Conference 2006<p>
  * Company:     Akamai<p>
  *
  * NIST wrapper to encryption algorihtm.  Adds multi-block processing.
  *
  * $Id: NIST_CBC.php 5428 2006-06-06 21:08:18Z rbergstrom $
+ * 
+ * @package External
+ * @subpackage Akamai.token
 */
 class NIST_CBC {
     var $BLOCK_SIZE = 16;

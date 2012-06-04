@@ -2,8 +2,8 @@
 /**
  * Class for the handling Bulk upload using XML in the system 
  * 
- * @package Scheduler
- * @subpackage Provision
+ * @package plugins.bulkUploadXml
+ * @subpackage Scheduler.BulkUpload
  */
 class BulkUploadEngineXml extends KBulkUploadEngine
 {

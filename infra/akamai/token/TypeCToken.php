@@ -1,13 +1,16 @@
 <?PHP
 
-/*
+/**
  * Copyright:   Copyright (c) Akamai Conference 2006<p>
  * Company:     Akamai<p>
  *
  * Type C token type.  Essentailly user input with MD5 digest and obfuscated.
  *
  * $Id$
-*/
+ * 
+ * @package External
+ * @subpackage Akamai.token
+ */
 class TypeCToken extends StreamToken {
 
     /*

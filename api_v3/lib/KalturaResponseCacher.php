@@ -1,7 +1,7 @@
 <?php
 /**
  * @package api
- * @subpackage v3
+ * @subpackage cache
  */
 require_once(dirname(__FILE__) . '/../../infra/kConf.php');
 require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/requestUtils.class.php');
@@ -10,7 +10,7 @@ require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/webservices/kSes
 
 /**
  * @package api
- * @subpackage v3
+ * @subpackage cache
  */
 class KalturaResponseCacher
 {
