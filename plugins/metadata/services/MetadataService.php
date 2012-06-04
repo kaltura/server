@@ -94,6 +94,9 @@ class MetadataService extends KalturaBaseService
 		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
 		if(!$dbMetadataProfile)
 			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE, $metadataProfileId);
+			
+		if($dbMetadataProfile->getObjectType() != $objectType)
+			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE_TYPEE, $dbMetadataProfile->getObjectType());
 		
 		$dbMetadata = new Metadata();
 		
