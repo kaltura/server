@@ -44,7 +44,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 			{
 			    $bulkUploadResult->objectId = $values[$index];
 			}
-		    if ($column == 'status')
+		    if ($column == 'status' && $values[$index] != KalturaCategoryUserStatus::PENDING)
 			{
 			    $bulkUploadResult->requiredObjectStatus = $values[$index];
 			}
