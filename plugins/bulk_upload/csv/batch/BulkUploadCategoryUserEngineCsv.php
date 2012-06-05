@@ -364,10 +364,6 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 				$doneWithPrev = true;
 			}
 			
-			// update the results with the new object Id
-			if (property_exists(get_class($requestResult), "id") && $requestResult->id)
-			    $bulkUploadResult->objectId = $requestResult->id;
-			    
 			if ($bulkUploadResult->requiredObjectStatus && $doneWithPrev)
 			{
 				$doneWithPrev = false;
