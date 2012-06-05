@@ -37,4 +37,21 @@ class PartnerPeer extends BasePartnerPeer
 		return array(array("partner:id=%s", self::ID));		
 	}
 	
+	/**
+	 * Function returns the default criteria of the partner class
+	 * @return Criteria
+	 */
+	public static function getDefaultCriteria ()
+	{
+	    $partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+	    
+	    $c = new Criteria();
+	    $subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $partnerId);
+		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $partnerId);
+		$subCriterion1->addOr($subCriterion2);
+		$c->add($subCriterion1);
+		
+		return $c;
+	}
+	
 }
