@@ -40,14 +40,16 @@ switch($delivery_type) {
 if( $playlist_id ) {
 	$entry_name = 'Kaltura Player';
 	$entry_description = '';
-	// build playlist url
-	$playlist_url = $partner_host ."/index.php/partnerservices2/executeplaylist?";
-	$playlist_url .= "partner_id=" . $partner_id . "&subp_id=" . $partner_id . "00&format=8&playlist_id=" . $playlist_id;
+	if( $playlist_id != 'multitab_playlist') {
+		// build playlist url
+		$playlist_url = $partner_host ."/index.php/partnerservices2/executeplaylist?";
+		$playlist_url .= "partner_id=" . $partner_id . "&subp_id=" . $partner_id . "00&format=8&playlist_id=" . $playlist_id;
 
-	// Add playlist flashVars
-	$flashVars["playlistAPI.autoInsert"] = "true";
-	$flashVars["playlistAPI.kpl0Name"] = $playlist_name;
-	$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
+		// Add playlist flashVars
+		$flashVars["playlistAPI.autoInsert"] = "true";
+		$flashVars["playlistAPI.kpl0Name"] = $playlist_name;
+		$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
+	}
 }
 // Transform flashvars array to string
 $flashVars = http_build_query($flashVars, '', '&amp;');
