@@ -54,7 +54,7 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
 	{
 	    //No need to add objectId to result with status ERROR
 	    if ($this->status == KalturaBulkUploadResultStatus::ERROR)
-	        return parent::toInsertableObject($object_to_fill, $props_to_skip);
+	        return parent::toInsertableObject(new BulkUploadResultCategoryKuser(), $props_to_skip);
 	        
 	    $kuser = kuserPeer::getKuserByPartnerAndUid($this->partnerId, $this->userId);
 	    if (!$kuser)
