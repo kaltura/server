@@ -20,6 +20,36 @@ $countLimitEachLoop = 200;
 
 require_once(dirname(__FILE__).'/../../bootstrap.php');
 
+function cast($object, $toClass)
+{
+	if(class_exists($toClass))
+	{
+		$objectIn = serialize($object);
+		$objectOut = 'O:' . strlen($toClass) . ':"' . $toClass . '":' . substr($objectIn, $objectIn[2] + 7);
+		$ret = unserialize($objectOut);
+		if($ret instanceof $toClass)
+			return $ret;
+	}
+	
+	return false;
+}
+
+/**
+ * @package Deployment
+ * @subpackage updates
+ */
+class MigrationFileSync extends FileSync
+{
+	/* (non-PHPdoc)
+	 * @see BaseFileSync::setUpdatedAt()
+	 * 
+	 * Do nothing
+	 */
+	public function setUpdatedAt($v)
+	{
+	}
+}
+
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 
 // find all links that already changed to files
@@ -60,6 +90,8 @@ while(count($fileSyncs))
 		/* @var $firstLink FileSync */
 		if($firstLink)
 		{
+			$firstLink = cast($firstLink, 'MigrationFileSync');
+			
 			$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
 			$firstLink->setFileSize($srcFileSync->getFileSize());
 			$firstLink->setLinkCount(count($links));
@@ -71,6 +103,8 @@ while(count($fileSyncs))
 		// change all the rest of the links to point on the new file sync
 		foreach($links as $link)
 		{
+			$link = cast($link, 'MigrationFileSync');
+			
 			/* @var $link FileSync */
 			$link->setFileType(FileSync::FILE_SYNC_FILE_TYPE_LINK);
 			$link->setLinkedId($firstLink->getId());

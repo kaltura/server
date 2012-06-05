@@ -23,6 +23,36 @@ if (isset($argv[1]) && is_numeric($argv[1]))
 
 require_once(dirname(__FILE__).'/../../bootstrap.php');
 
+function cast($object, $toClass)
+{
+	if(class_exists($toClass))
+	{
+		$objectIn = serialize($object);
+		$objectOut = 'O:' . strlen($toClass) . ':"' . $toClass . '":' . substr($objectIn, $objectIn[2] + 7);
+		$ret = unserialize($objectOut);
+		if($ret instanceof $toClass)
+			return $ret;
+	}
+	
+	return false;
+}
+
+/**
+ * @package Deployment
+ * @subpackage updates
+ */
+class MigrationFileSync extends FileSync
+{
+	/* (non-PHPdoc)
+	 * @see BaseFileSync::setUpdatedAt()
+	 * 
+	 * Do nothing
+	 */
+	public function setUpdatedAt($v)
+	{
+	}
+}
+
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 	
 $criteriaTemplate = new Criteria();
@@ -60,6 +90,8 @@ while(count($fileSyncs))
 		// change the status to current source file sync status 
 		foreach($links as $link)
 		{
+			$link = cast($link, 'MigrationFileSync');
+			
 			/* @var $link FileSync */
 			$link->setStatus($fileSync->getStatus());
 			$link->save();
