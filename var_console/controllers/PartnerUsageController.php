@@ -29,18 +29,17 @@ class PartnerUsageController extends Zend_Controller_Action
 		}
 		
 		// init filters
+		
 		$usageFilter = new Kaltura_Client_Type_ReportInputFilter();
 		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
-		$partners = $client->partner->listAction();
-		$partnerIds = array();
 		
-		foreach ($partners->objects as $partner)
-		    $partnerIds[] = $partner->id;
+		$varConsolePlugin = Kaltura_Client_VarConsole_Plugin::get($client);
 		
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($client->report, "getGraphs", null, Kaltura_Client_Enum_ReportType::PARTNER_USAGE, $usageFilter, null, $partnerIds);
-		$paginator = new Infra_Paginator($paginatorAdapter, $request);
+		$partnerFilter = $this->getPartnerFilterFromForm($form);
+		$paginatorAdapter = new Infra_FilterPaginator();
+		$paginator = new Infra_Paginator($varConsolePlugin->varConsole, "getPartnerUsage", null, $partnerFilter, $usageFilter);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		// set view
