@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Infra
+ * @package UI-infra
  */
 require_once(dirname(__FILE__) . '/../infra/kConf.php');
 
