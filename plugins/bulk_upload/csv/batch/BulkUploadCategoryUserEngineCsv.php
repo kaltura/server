@@ -349,9 +349,9 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 			    $bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
 				$bulkUploadResult->objectStatus = $requestResult['code'];
 				$bulkUploadResult->errorDescription = $requestResult['message'];
-				$this->addBulkUploadResult($bulkUploadResult);
+				if ($bulkUploadResult->requiredObjectStatus)
+				    $bulkUploadResult->requiredObjectStatus = null;
 				$doneWithPrev = true;
-				continue;
 			}
 			
 			if($requestResult instanceof Exception)
@@ -359,9 +359,9 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 				$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
 				$bulkUploadResult->errorDescription = $requestResult->getMessage();
-				$this->addBulkUploadResult($bulkUploadResult);
+				if ($bulkUploadResult->requiredObjectStatus)
+				    $bulkUploadResult->requiredObjectStatus = null;
 				$doneWithPrev = true;
-				continue;
 			}
 			
 			// update the results with the new object Id
