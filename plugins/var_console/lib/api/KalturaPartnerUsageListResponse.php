@@ -6,7 +6,7 @@
 class KalturaPartnerUsageListResponse extends KalturaObject
 {
     /**
-     * @var array
+     * @var KalturaVarPartnerUsageArray
      */
     public $objects;
     
