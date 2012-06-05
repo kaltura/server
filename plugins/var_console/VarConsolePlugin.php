@@ -2,7 +2,7 @@
 /**
  * @package plugins.varConsole
  */
-class VarConsolePlugin extends KalturaPlugin implements IKalturaConfigurator, IKalturaServices
+class VarConsolePlugin extends KalturaPlugin implements IKalturaConfigurator, IKalturaServices, IKalturaPermissions
 {
     const PLUGIN_NAME = "varConsole";
     
@@ -41,8 +41,15 @@ class VarConsolePlugin extends KalturaPlugin implements IKalturaConfigurator, IK
 		
 		return $map;
     }
-
-
-
     
+    /* (non-PHPdoc)
+     * @see IKalturaPermissions::isAllowedPartner($partnerId)
+     */
+    public static function isAllowedPartner($partnerId)
+    {
+        $partner = PartnerPeer::retrieveByPK($partnerId);
+		
+		return $partner->getEnabledService(KalturaPermissionName::FEATURE_VAR_CONSOLE_LOGIN);
+    }
+
 }
