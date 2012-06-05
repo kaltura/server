@@ -2,7 +2,6 @@
 
 class SphinxUtils
 {
-	public static $count = 0;
 	public static function escapeString($str, $escapeType = SearchIndexFieldEscapeType::DEFAULT_ESCAPE, $iterations = 2)
 	{
 		if($escapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE)
@@ -31,7 +30,8 @@ class SphinxUtils
 				return md5(substr($str, -2)) . '\\\*';
 				
 			return md5($str);
-		}elseif($escapeType == SearchIndexFieldEscapeType::NO_ESCAPE)
+		}
+		elseif($escapeType == SearchIndexFieldEscapeType::NO_ESCAPE)
 		{
 			return $str;
 		}
