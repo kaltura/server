@@ -163,11 +163,8 @@ class PartnerService extends KalturaBaseService
 	        $partnerId = $this->getPartnerId();
 	    }
 	    
-	    $c = new Criteria();
-	    $subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $this->getPartnerId());
-		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $this->getPartnerId());
-		$subCriterion1->addOr($subCriterion2);
-		$c->add($subCriterion1);
+	    $c = PartnerPeer::getDefaultCriteria();
+	    
 		$c->addAnd(PartnerPeer::ID ,$partnerId);
 		
 		$dbPartner = PartnerPeer::doSelectOne($c);
@@ -397,11 +394,7 @@ class PartnerService extends KalturaBaseService
 	    $partnerFilter = new partnerFilter();
 	    $filter->toObject($partnerFilter);
 	    
-	    $c = new Criteria();
-	    $subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $this->getPartnerId());
-		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $this->getPartnerId());
-		$subCriterion1->addOr($subCriterion2);
-		$c->add($subCriterion1);
+	    $c = PartnerPeer::getDefaultCriteria();
 		
 	    $partnerFilter->attachToCriteria($c);
 	    $pager->attachToCriteria($c);
