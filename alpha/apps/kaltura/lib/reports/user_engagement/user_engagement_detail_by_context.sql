@@ -4,7 +4,7 @@ SELECT
 	count_plays,
 	sum_time_viewed,
 	avg_time_viewed,
-	0 avg_view_drop_off,
+	avg_view_drop_off,
 	count_loads,
 	load_play_ratio
 FROM
@@ -17,6 +17,7 @@ FROM
 		SUM(count_plays) count_plays,
 #		AVG(distinct_plays) distinct_plays, /* Because we don't know the real number, we use avarage instead*/
 		SUM(count_loads) count_loads,
+		(SUM(IFNULL(count_plays_25,0)) + SUM(IFNULL(count_plays_50,0)) + SUM(IFNULL(count_plays_75,0)) + SUM(IFNULL(count_plays_100,0)))/4/SUM(count_plays) avg_view_drop_off,
 		( SUM(count_plays) / SUM(count_loads) ) load_play_ratio
 	FROM 
 		dwh_hourly_events_context_entry_user_app ev

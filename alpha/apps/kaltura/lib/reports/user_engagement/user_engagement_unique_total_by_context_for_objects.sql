@@ -4,7 +4,7 @@ SUM(count_plays) count_plays,
 SUM(sum_time_viewed) sum_time_viewed,
 SUM(sum_time_viewed)/SUM(count_plays) avg_time_viewed,
 SUM(count_loads) count_loads,
-0 avg_view_drop_off,
+(SUM(IFNULL(count_plays_25,0)) + SUM(IFNULL(count_plays_50,0)) + SUM(IFNULL(count_plays_75,0)) + SUM(IFNULL(count_plays_100,0)))/4/SUM(count_plays) avg_view_drop_off,
 (SUM(count_plays) / SUM(count_loads)) load_play_ratio
 FROM 
 	dwh_hourly_events_context_entry_user_app ev
