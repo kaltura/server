@@ -260,9 +260,9 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		    
 		    if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 			{
-				// make all the media->add as the partner
+				// handle all categoryUser objects as the partner
 				$requestResults = $this->kClient->doMultiRequest();
-				
+				$this->unimpersonate();
 				$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
 				$this->checkAborted();
 				$this->kClient->startMultiRequest();
