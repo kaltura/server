@@ -770,7 +770,7 @@ kmc.preview_embed = {
 			selected = (this_uiconf.id == uiconf_id) ? ' selected="selected"' : '';
 			html_select += '<option ' + selected + ' value="' + this_uiconf.id + '">' + this_uiconf.name + '</option>';
 		}
-		html_select = '<div class="label">Select Player:</div><div class="right"><select id="player_select">' + html_select + '</select></div><br /><div class="note">Kaltura player includes both layout and functionality (advertising, subtitles, etc)</div><br />';
+		html_select = '<div class="label" style="min-width: 140px;">Select Player:</div><div class="right"><select id="player_select">' + html_select + '</select></div><br /><div class="note">Kaltura player includes both layout and functionality (advertising, subtitles, etc)</div><br />';
 		kmc.vars.current_uiconf = null;
 		return html_select;
 	},
