@@ -52,6 +52,10 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
 	
     public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
+	    //No need to add objectId to result with status ERROR
+	    if ($this->status == KalturaBulkUploadResultStatus::ERROR)
+	        return parent::toInsertableObject($object_to_fill, $props_to_skip);
+	        
 	    $kuser = kuserPeer::getKuserByPartnerAndUid($this->partnerId, $this->userId);
 	    if (!$kuser)
 	    {
