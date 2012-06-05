@@ -33,15 +33,6 @@ class BulkUploadResultCategoryKuser extends BulkUploadResult
     }
     
     /* (non-PHPdoc)
-     * @see BulkUploadResult::updateStatusFromObject()
-     */
-    public function updateStatusFromObject()
-    {
-        $this->setStatus(BulkUploadResultStatus::OK);
-        $this->save();
-    }
-    
-    /* (non-PHPdoc)
      * @see BulkUploadResult::getObject()
      */
     public function getObject()
