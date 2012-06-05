@@ -45,8 +45,11 @@ class BulkUploadResult extends BaseBulkUploadResult
 	 */
 	public function updateStatusFromObject ()
 	{
-	    $this->setStatus(BulkUploadResultStatus::OK);
-	    $this->save();
+	    if ($this->getStatus() != BulkUploadResultStatus::ERROR)
+	    {
+    	    $this->setStatus(BulkUploadResultStatus::OK);
+    	    $this->save();
+	    }
 	    
 	    return $this->getStatus();
 	}

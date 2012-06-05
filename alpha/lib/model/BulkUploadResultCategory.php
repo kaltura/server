@@ -23,17 +23,6 @@ class BulkUploadResultCategory extends BulkUploadResult
     const OWNER = "owner";
     const CONTRIBUTION_POLICY = "contribution_policy";
     
-    public function updateStatusFromObject()
-    {
-        if ($this->getObjectStatus() == CategoryStatus::ACTIVE)
-        {
-            $this->setStatus(BulkUploadResultStatus::OK);
-            $this->save();
-        }
-        
-        return $this->getStatus();
-    }
-    
     /* (non-PHPdoc)
      * @see BulkUploadResult::handleRelatedObjects()
      */
