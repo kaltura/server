@@ -265,6 +265,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 				$this->unimpersonate();
 				$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
 				$this->checkAborted();
+				$this->impersonate();
 				$this->kClient->startMultiRequest();
 				$bulkUploadResultChunk = array();
 			}
