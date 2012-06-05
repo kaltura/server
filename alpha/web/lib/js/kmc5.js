@@ -1,17 +1,22 @@
 /* kmc and kmc.vars defined in script block in kmc4success.php */
 
 // For debug enable to true. Debug will show information in the browser console
-kmc.vars.debug = false;
+kmc.vars.debug = true;
 
 // Quickstart guide (should be moved to kmc4success.php)
 kmc.vars.quickstart_guide = "/content/docs/pdf/KMC_Eagle_User_Manual.pdf";
 kmc.vars.help_url = kmc.vars.service_url + '/kmc5help.html';
 
 // Log function
-kmc.log = function(msg) {
+kmc.log = function() {
 	if( kmc.vars.debug && typeof console !='undefined' && console.log ){
-		console.log(arguments);
-	}
+		if (arguments.length == 1) {
+			console.log( arguments[0] );
+		} else {
+			var args = Array.prototype.slice.call(arguments);  
+			console.log( args[0], args.slice( 1 ) );
+		}
+	}	
 };
 
 kmc.functions = {
@@ -156,14 +161,20 @@ kmc.functions = {
 			'height' : 616,
 			'title'	: title,
 			'content' : '<iframe src="' + iframe_url + '" width="100%" height="586" frameborder="0"></iframe>',
-			'style'	: 'iframe'
+			'style'	: 'iframe',
+			'closeCallback': function() {
+				$("#kcms")[0].gotoPage({
+					moduleName: "content",
+					subtab: "manage"
+				});				
+			}
 		} );
 	}
 };
 
 kmc.utils = {
 	// Backward compatability
-	closeModal : function() { kmc.layout.modal.close(); },
+	closeModal : function() {kmc.layout.modal.close();},
 
 	handleMenu : function() {
 
@@ -263,7 +274,7 @@ kmc.utils = {
 		$("#server_wrap").css("margin-top", "-"+ (doc_height + 2) +"px");
 	},
 	escapeQuotes : function(string) {
-		if( ! typeof string == 'string' ) { return ; }
+		if( ! typeof string == 'string' ) {return ;}
 		string = string.replace(/"/g,"&Prime;");
 		string = string.replace(/'/g,"&prime;");
 		return string;
@@ -376,26 +387,7 @@ kmc.utils = {
 		$("#server_frame").attr("src", url);
 		$("#server_wrap").css("margin-top", "-"+ ($("#flash_wrap").height() + 2) +"px");
 		$("#server_wrap").show();
-	},
-	
-	// Open KMC help file
-	openHelp: function( baseUrl, key ) {
-		
-		var goToHelpUrl = function( key ) {
-			if( kmc.helpMap && key in kmc.helpMap ) {
-				window.open( baseUrl + kmc.helpMap[ key ], 'help' );
-			}
-		};
-		
-		// Lazy init KMC helpMap object
-		if( ! kmc.helpMap ) {
-			$.getScript( kmc.vars.service_url + '/lib/js/help_map.js', function() {
-				goToHelpUrl( key );
-			});
-		} else {
-			goToHelpUrl( key );
-		}
-	}	
+	}
 		
 };
 
@@ -502,7 +494,18 @@ kmc.mediator =  {
 kmc.preview_embed = {
 	// Should be changed to accept object with parameters
 	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, is_video) {
-		kmc.log('doPreviewEmbed', arguments);
+		
+		var logMsg = 'doPreviewEmbed\n';
+		logMsg += 'entry_id: ' + id + '\n';
+		logMsg += 'name: ' + name + '\n';
+		logMsg += 'description: ' + description + '\n';
+		logMsg += 'previewOnly: ' + previewOnly + '\n';
+		logMsg += 'is_playlist: ' + is_playlist + '\n';
+		logMsg += 'uiconf_id: ' + uiconf_id + '\n';
+		logMsg += 'live_bitrates: ' + live_bitrates + '\n';
+		logMsg += 'entry_flavors: ' + entry_flavors + '\n';
+		logMsg += 'is_video: ' + is_video + '\n';
+		kmc.log( logMsg );
 		
 		description = description || '';
 
@@ -530,7 +533,7 @@ kmc.preview_embed = {
 		id_type = is_playlist ? "Playlist " + (id == "multitab_playlist" ? "Name" : "ID") : "Embedding",
 		uiconf_details = kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist);
 
-		if( live_bitrates ) { kmc.vars.embed_code_delivery_type = "http"; } // Reset delivery type to http
+		if( live_bitrates ) {kmc.vars.embed_code_delivery_type = "http";} // Reset delivery type to http
 
 		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id);
 		preview_player = embed_code.replace('{FLAVOR}','ks=' + kmc.vars.ks + '&');
@@ -614,8 +617,8 @@ kmc.preview_embed = {
 	},
 		
 	buildHTML5Option : function(entry_id, name, is_playlist, previewOnly, partner_id, uiconf_id, has_mobile_flavors, is_video) {
-		kmc.log('buildHTML5Option');
-		kmc.log(arguments);
+		
+		kmc.log( 'buildHTML5Option' );
 
 		// If preview, return nothing
 		if( previewOnly ) {
@@ -629,7 +632,7 @@ kmc.preview_embed = {
 		} else {
 			long_url += '/entry_id/' + entry_id + '/delivery/' + kmc.vars.embed_code_delivery_type;
 		}
-		kmc.client.getShortURL(long_url);
+		kmc.client.setShortURL(long_url);
 
 		var description = '<div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
 		' <a target="_blank" href="' + kmc.vars.help_url + '#section1432">Read more</a></div>';
@@ -816,6 +819,7 @@ kmc.preview_embed = {
 	},
 		
 	setShortURL : function(id) {
+		kmc.log('PreviewEmbed: setShortURL');
 		var url = kmc.vars.service_url + '/tiny/' + id;
 		//var url_text = url.replace(/http:\/\/|www./ig, '');
 		var url_text = url.replace(/http:\/\//ig, '');
@@ -824,7 +828,7 @@ kmc.preview_embed = {
 		$(".preview_url").html(html);
 	},
 	hasMobileFlavors : function( entry_flavors ) {
-		if( !entry_flavors ) { return false; }
+		if( !entry_flavors ) {return false;}
 		for(var i=0; i<entry_flavors.length; i++) {
 			var asset = entry_flavors[i];
 			
@@ -844,33 +848,70 @@ kmc.preview_embed = {
 	}
 };
 
-// TODO: Create one function to handle all client requests
 kmc.client = {
-			
-	buildClientURL : function(service, action) {
-		//return kmc.vars.service_url + '/api_v3/index.php?service='+service+'&action='+action;
-		return 'http://' + window.location.hostname + '/api_v3/index.php?service='+service+'&action='+action;
+	makeRequest: function( service, action, params, callback ) {
+		var serviceUrl = 'http://' + window.location.hostname + '/api_v3/index.php?service='+service+'&action='+action;
+		var defaultParams = {
+			"ks"		: kmc.vars.ks,
+			"format"	: 1			
+		};
+		// Merge params and defaults
+		$.extend( params, defaultParams);
+		
+		var ksort = function ( arr ) {
+			var sArr = [];
+			var tArr = [];
+			var n = 0;
+			for ( i in arr ){
+				tArr[n++] = i+"|"+arr[i];
+			}
+			tArr = tArr.sort();
+			for (var i=0; i<tArr.length; i++) {
+				var x = tArr[i].split("|");
+				sArr[x[0]] = x[1];
+			}
+			return sArr;
+		};
+		
+		var getSignature = function( params ){
+			params = ksort(params);
+			var str = "";
+			for(var v in params) {
+				var k = params[v];
+				str += k + v;
+			}
+			return md5(str);
+		};
+		
+		var kalsig = getSignature( params );
+		params[ 'kalsig' ] = kalsig;
+	
+		// Make request
+		$.ajax({
+			url: serviceUrl, 
+			dataType: 'json',
+			data: params, 
+			cache: false,
+			success: function(res) {
+				callback( res );
+			}
+		});		
 	},
 		
 	// Get the Short URL code
-	getShortURL : function(url) {
-		kmc.log('getShortURL');
-			
-		// First do short_url :: list action to see if it already exists
-		var service_url = kmc.client.buildClientURL("shortlink_shortlink", "list");
-			
-		var data = {
-			"ks"					: kmc.vars.ks,
-			"format"				: 1,
+	setShortURL : function(url) {
+		kmc.log( 'setShortURL' );
+		
+		var filter = {
 			"filter:objectType"		: "KalturaShortLinkFilter",
 			"filter:userIdEqual"	: kmc.vars.user_id,
 			"filter:systemNameEqual": "KMC-PREVIEW"
 		};
-			
-		$.getJSON( service_url, data, function(res) {
+		
+		kmc.client.makeRequest("shortlink_shortlink", "list", filter, function( res ) {
 			if(res.totalCount == 0) {
 				// if no url were found, create a new one
-				return kmc.client.createShortURL(url);
+				kmc.client.createShortURL(url);
 			} else {
 				// update the url
 				var id = res.objects[0].id;
@@ -878,27 +919,23 @@ kmc.client = {
 				if(url == res_url) {
 					kmc.preview_embed.setShortURL(id);
 				} else {
-					return kmc.client.updateShortURL(url, id);
+					kmc.client.updateShortURL(url, id);
 				}
-			}
-		} );
+			}			
+		});
 	},
 		
 	createShortURL : function(url) {
 		kmc.log('createShortURL');
 			
-		var service_url = kmc.client.buildClientURL("shortlink_shortlink", "add");
-			
 		var data = {
-			"ks"					: kmc.vars.ks, // Set KS
-			"format"				: 1, //format JSON
 			"shortLink:objectType"	: "KalturaShortLink",
 			"shortLink:userId"		: kmc.vars.user_id,
 			"shortLink:systemName"	: "KMC-PREVIEW", // Unique name for filtering
 			"shortLink:fullUrl"		: url
 		};
 			
-		$.getJSON( service_url, data, function(res) {
+		kmc.client.makeRequest("shortlink_shortlink", "add", data, function( res ) {
 			kmc.preview_embed.setShortURL(res.id);
 		});
 	},
@@ -906,18 +943,14 @@ kmc.client = {
 	updateShortURL : function(url, id) {
 		kmc.log('updateShortURL');
 			
-		var service_url = kmc.client.buildClientURL("shortlink_shortlink", "update");
-			
 		var data = {
-			"ks"					: kmc.vars.ks, // Set KS
-			"format"				: 1, //format JSON
 			"id"					: id,
 			"shortLink:objectType"	: "KalturaShortLink",
 			"shortLink:fullUrl"		: url
 		};
 			
-		$.getJSON( service_url, data, function(res) {
-			kmc.preview_embed.setShortURL(id);
+		kmc.client.makeRequest("shortlink_shortlink", "update", data, function( res ) {
+			kmc.preview_embed.setShortURL(res.id);
 		});
 			
 	}
@@ -1015,6 +1048,9 @@ kmc.layout = {
 			// Activate close button
 			$modal.find(".close").click( function() {
 				kmc.layout.modal.close();
+				if( $.isFunction( data.closeCallback ) ) {
+					data.closeCallback();
+				}
 			});
 
 			return $modal;
@@ -1096,7 +1132,7 @@ kmc.user = {
 
 	logout: function() {
 		var message = kmc.functions.checkForOngoingProcess();
-		if( message ) { alert( message ); return false; }
+		if( message ) {alert( message );return false;}
 		var expiry = new Date("January 1, 1970"); // "Thu, 01-Jan-70 00:00:01 GMT";
 		expiry = expiry.toGMTString();
 		document.cookie = "pid=; expires=" + expiry + "; path=/";
@@ -1215,3 +1251,16 @@ kmc.user = {
 /* XD: a backwards compatable implementation of postMessage (http://www.onlineaspect.com/2010/01/15/backwards-compatible-postmessage/) */
 var XD=function(){var e,g,h=1,f,d=this;return{postMessage:function(c,b,a){if(b)if(a=a||parent,d.postMessage)a.postMessage(c,b.replace(/([^:]+:\/\/[^\/]+).*/,"$1"));else if(b)a.location=b.replace(/#.*$/,"")+"#"+ +new Date+h++ +"&"+c},receiveMessage:function(c,b){if(d.postMessage)if(c&&(f=function(a){if(typeof b==="string"&&a.origin!==b||Object.prototype.toString.call(b)==="[object Function]"&&b(a.origin)===!1)return!1;c(a)}),d.addEventListener)d[c?"addEventListener":"removeEventListener"]("message",
 f,!1);else d[c?"attachEvent":"detachEvent"]("onmessage",f);else e&&clearInterval(e),e=null,c&&(e=setInterval(function(){var a=document.location.hash,b=/^#?\d+&/;a!==g&&b.test(a)&&(g=a,c({data:a.replace(b,"")}))},100))}}}();
+
+/* md5 and utf8_encode from phpjs.org */
+function md5(str){var xl;var rotateLeft=function(lValue,iShiftBits){return(lValue<<iShiftBits)|(lValue>>>(32-iShiftBits));};var addUnsigned=function(lX,lY){var lX4,lY4,lX8,lY8,lResult;lX8=(lX&0x80000000);lY8=(lY&0x80000000);lX4=(lX&0x40000000);lY4=(lY&0x40000000);lResult=(lX&0x3FFFFFFF)+(lY&0x3FFFFFFF);if(lX4&lY4){return(lResult^0x80000000^lX8^lY8);}
+if(lX4|lY4){if(lResult&0x40000000){return(lResult^0xC0000000^lX8^lY8);}else{return(lResult^0x40000000^lX8^lY8);}}else{return(lResult^lX8^lY8);}};var _F=function(x,y,z){return(x&y)|((~x)&z);};var _G=function(x,y,z){return(x&z)|(y&(~z));};var _H=function(x,y,z){return(x^y^z);};var _I=function(x,y,z){return(y^(x|(~z)));};var _FF=function(a,b,c,d,x,s,ac){a=addUnsigned(a,addUnsigned(addUnsigned(_F(b,c,d),x),ac));return addUnsigned(rotateLeft(a,s),b);};var _GG=function(a,b,c,d,x,s,ac){a=addUnsigned(a,addUnsigned(addUnsigned(_G(b,c,d),x),ac));return addUnsigned(rotateLeft(a,s),b);};var _HH=function(a,b,c,d,x,s,ac){a=addUnsigned(a,addUnsigned(addUnsigned(_H(b,c,d),x),ac));return addUnsigned(rotateLeft(a,s),b);};var _II=function(a,b,c,d,x,s,ac){a=addUnsigned(a,addUnsigned(addUnsigned(_I(b,c,d),x),ac));return addUnsigned(rotateLeft(a,s),b);};var convertToWordArray=function(str){var lWordCount;var lMessageLength=str.length;var lNumberOfWords_temp1=lMessageLength+8;var lNumberOfWords_temp2=(lNumberOfWords_temp1-(lNumberOfWords_temp1%64))/64;var lNumberOfWords=(lNumberOfWords_temp2+1)*16;var lWordArray=new Array(lNumberOfWords-1);var lBytePosition=0;var lByteCount=0;while(lByteCount<lMessageLength){lWordCount=(lByteCount-(lByteCount%4))/4;lBytePosition=(lByteCount%4)*8;lWordArray[lWordCount]=(lWordArray[lWordCount]|(str.charCodeAt(lByteCount)<<lBytePosition));lByteCount++;}
+lWordCount=(lByteCount-(lByteCount%4))/4;lBytePosition=(lByteCount%4)*8;lWordArray[lWordCount]=lWordArray[lWordCount]|(0x80<<lBytePosition);lWordArray[lNumberOfWords-2]=lMessageLength<<3;lWordArray[lNumberOfWords-1]=lMessageLength>>>29;return lWordArray;};var wordToHex=function(lValue){var wordToHexValue="",wordToHexValue_temp="",lByte,lCount;for(lCount=0;lCount<=3;lCount++){lByte=(lValue>>>(lCount*8))&255;wordToHexValue_temp="0"+lByte.toString(16);wordToHexValue=wordToHexValue+wordToHexValue_temp.substr(wordToHexValue_temp.length-2,2);}
+return wordToHexValue;};var x=[],k,AA,BB,CC,DD,a,b,c,d,S11=7,S12=12,S13=17,S14=22,S21=5,S22=9,S23=14,S24=20,S31=4,S32=11,S33=16,S34=23,S41=6,S42=10,S43=15,S44=21;str=this.utf8_encode(str);x=convertToWordArray(str);a=0x67452301;b=0xEFCDAB89;c=0x98BADCFE;d=0x10325476;xl=x.length;for(k=0;k<xl;k+=16){AA=a;BB=b;CC=c;DD=d;a=_FF(a,b,c,d,x[k+0],S11,0xD76AA478);d=_FF(d,a,b,c,x[k+1],S12,0xE8C7B756);c=_FF(c,d,a,b,x[k+2],S13,0x242070DB);b=_FF(b,c,d,a,x[k+3],S14,0xC1BDCEEE);a=_FF(a,b,c,d,x[k+4],S11,0xF57C0FAF);d=_FF(d,a,b,c,x[k+5],S12,0x4787C62A);c=_FF(c,d,a,b,x[k+6],S13,0xA8304613);b=_FF(b,c,d,a,x[k+7],S14,0xFD469501);a=_FF(a,b,c,d,x[k+8],S11,0x698098D8);d=_FF(d,a,b,c,x[k+9],S12,0x8B44F7AF);c=_FF(c,d,a,b,x[k+10],S13,0xFFFF5BB1);b=_FF(b,c,d,a,x[k+11],S14,0x895CD7BE);a=_FF(a,b,c,d,x[k+12],S11,0x6B901122);d=_FF(d,a,b,c,x[k+13],S12,0xFD987193);c=_FF(c,d,a,b,x[k+14],S13,0xA679438E);b=_FF(b,c,d,a,x[k+15],S14,0x49B40821);a=_GG(a,b,c,d,x[k+1],S21,0xF61E2562);d=_GG(d,a,b,c,x[k+6],S22,0xC040B340);c=_GG(c,d,a,b,x[k+11],S23,0x265E5A51);b=_GG(b,c,d,a,x[k+0],S24,0xE9B6C7AA);a=_GG(a,b,c,d,x[k+5],S21,0xD62F105D);d=_GG(d,a,b,c,x[k+10],S22,0x2441453);c=_GG(c,d,a,b,x[k+15],S23,0xD8A1E681);b=_GG(b,c,d,a,x[k+4],S24,0xE7D3FBC8);a=_GG(a,b,c,d,x[k+9],S21,0x21E1CDE6);d=_GG(d,a,b,c,x[k+14],S22,0xC33707D6);c=_GG(c,d,a,b,x[k+3],S23,0xF4D50D87);b=_GG(b,c,d,a,x[k+8],S24,0x455A14ED);a=_GG(a,b,c,d,x[k+13],S21,0xA9E3E905);d=_GG(d,a,b,c,x[k+2],S22,0xFCEFA3F8);c=_GG(c,d,a,b,x[k+7],S23,0x676F02D9);b=_GG(b,c,d,a,x[k+12],S24,0x8D2A4C8A);a=_HH(a,b,c,d,x[k+5],S31,0xFFFA3942);d=_HH(d,a,b,c,x[k+8],S32,0x8771F681);c=_HH(c,d,a,b,x[k+11],S33,0x6D9D6122);b=_HH(b,c,d,a,x[k+14],S34,0xFDE5380C);a=_HH(a,b,c,d,x[k+1],S31,0xA4BEEA44);d=_HH(d,a,b,c,x[k+4],S32,0x4BDECFA9);c=_HH(c,d,a,b,x[k+7],S33,0xF6BB4B60);b=_HH(b,c,d,a,x[k+10],S34,0xBEBFBC70);a=_HH(a,b,c,d,x[k+13],S31,0x289B7EC6);d=_HH(d,a,b,c,x[k+0],S32,0xEAA127FA);c=_HH(c,d,a,b,x[k+3],S33,0xD4EF3085);b=_HH(b,c,d,a,x[k+6],S34,0x4881D05);a=_HH(a,b,c,d,x[k+9],S31,0xD9D4D039);d=_HH(d,a,b,c,x[k+12],S32,0xE6DB99E5);c=_HH(c,d,a,b,x[k+15],S33,0x1FA27CF8);b=_HH(b,c,d,a,x[k+2],S34,0xC4AC5665);a=_II(a,b,c,d,x[k+0],S41,0xF4292244);d=_II(d,a,b,c,x[k+7],S42,0x432AFF97);c=_II(c,d,a,b,x[k+14],S43,0xAB9423A7);b=_II(b,c,d,a,x[k+5],S44,0xFC93A039);a=_II(a,b,c,d,x[k+12],S41,0x655B59C3);d=_II(d,a,b,c,x[k+3],S42,0x8F0CCC92);c=_II(c,d,a,b,x[k+10],S43,0xFFEFF47D);b=_II(b,c,d,a,x[k+1],S44,0x85845DD1);a=_II(a,b,c,d,x[k+8],S41,0x6FA87E4F);d=_II(d,a,b,c,x[k+15],S42,0xFE2CE6E0);c=_II(c,d,a,b,x[k+6],S43,0xA3014314);b=_II(b,c,d,a,x[k+13],S44,0x4E0811A1);a=_II(a,b,c,d,x[k+4],S41,0xF7537E82);d=_II(d,a,b,c,x[k+11],S42,0xBD3AF235);c=_II(c,d,a,b,x[k+2],S43,0x2AD7D2BB);b=_II(b,c,d,a,x[k+9],S44,0xEB86D391);a=addUnsigned(a,AA);b=addUnsigned(b,BB);c=addUnsigned(c,CC);d=addUnsigned(d,DD);}
+var temp=wordToHex(a)+wordToHex(b)+wordToHex(c)+wordToHex(d);return temp.toLowerCase();}
+function utf8_encode(argString){if(argString===null||typeof argString==="undefined"){return"";}
+var string=(argString+'');var utftext="",start,end,stringl=0;start=end=0;stringl=string.length;for(var n=0;n<stringl;n++){var c1=string.charCodeAt(n);var enc=null;if(c1<128){end++;}else if(c1>127&&c1<2048){enc=String.fromCharCode((c1>>6)|192)+String.fromCharCode((c1&63)|128);}else{enc=String.fromCharCode((c1>>12)|224)+String.fromCharCode(((c1>>6)&63)|128)+String.fromCharCode((c1&63)|128);}
+if(enc!==null){if(end>start){utftext+=string.slice(start,end);}
+utftext+=enc;start=end=n+1;}}
+if(end>start){utftext+=string.slice(start,stringl);}
+return utftext;}
