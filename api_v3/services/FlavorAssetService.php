@@ -412,7 +412,7 @@ class FlavorAssetService extends KalturaAssetService
 	public function getByEntryIdAction($entryId)
 	{
 		// entry could be "display_in_search = 2" - in that case we want to pull it although KN is off in services.ct for this action
-		$c = new Criteria();
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$c->addAnd(entryPeer::ID, $entryId);
 		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $this->getPartnerId());
 		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
@@ -462,7 +462,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'KalturaAssetFilter::entryIdEqual/KalturaAssetFilter::entryIdIn');
 		}
 
-		$c = new Criteria();
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
 		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $this->getPartnerId());
 		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
