@@ -104,10 +104,15 @@ class VarConsoleService extends KalturaBaseService
 		}
 		else
 		{
+		    
+		    $inputFilter = new reportsInputFilter (); 
+			$inputFilter->from_date = ( $usageFilter->fromDate );
+			$inputFilter->to_date = ( $usageFilter->toDate );
+		    
 			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 
 				null , 
 				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
-				$usageFilter ,
+				$inputFilter ,
 				$pager->pageSize , 0 , // pageIndex is 0 because we are using specific ids 
 				null  , // order by  
 				implode("," , $partnerIds ) );
