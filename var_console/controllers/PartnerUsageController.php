@@ -38,8 +38,8 @@ class PartnerUsageController extends Zend_Controller_Action
 		
 		// get results and paginate
 		$partnerFilter = $this->getPartnerFilterFromForm($form);
-		$paginatorAdapter = new Infra_FilterPaginator();
-		$paginator = new Infra_Paginator($varConsolePlugin->varConsole, "getPartnerUsage", null, $partnerFilter, $usageFilter);
+		$paginatorAdapter = new Infra_FilterPaginator($varConsolePlugin->varConsole, "getPartnerUsage", null, $partnerFilter, $usageFilter);
+		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		// set view
