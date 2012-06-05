@@ -24,7 +24,7 @@ class VarConsoleService extends KalturaBaseService
      * @action checkLoginDataExists
      * @actionAlias user.checkLoginDataExists
      * @param KalturaUserLoginDataFilter $filter
-     * @return boolean
+     * @return bool
      */
     public function checkLoginDataExistsAction (KalturaUserLoginDataFilter $filter)
     {
