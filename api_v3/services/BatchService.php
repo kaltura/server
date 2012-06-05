@@ -150,7 +150,7 @@ class BatchService extends KalturaBaseService
 		    /* @var $bulkUploadResult BulkUploadResult */
 			$status = $bulkUploadResult->updateStatusFromObject();
 			
-			if ($status != BulkUploadResultStatus::OK)
+			if ($status == BulkUploadResultStatus::IN_PROGRESS )
 			{	
     			$unclosedEntriesCount++;
 			}
