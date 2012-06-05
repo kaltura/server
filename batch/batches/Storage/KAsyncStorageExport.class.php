@@ -79,10 +79,7 @@ class KAsyncStorageExport extends KJobHandlerWorker
 		
 		if(!file_exists($srcFile))
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $srcFile does not exist", KalturaBatchJobStatus::RETRY);
-		
-		if(!is_file($srcFile) && !is_dir($srcFile))
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $srcFile is not a file or directory", KalturaBatchJobStatus::FAILED);
-			
+					
 		$destFile = str_replace('//', '/', trim($data->destFileSyncStoredPath));
 		$this->updateJob($job, "Exporting $srcFile to $destFile", KalturaBatchJobStatus::QUEUED, 1);
 
