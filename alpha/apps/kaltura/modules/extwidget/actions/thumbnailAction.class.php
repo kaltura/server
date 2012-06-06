@@ -295,36 +295,42 @@ class thumbnailAction extends sfAction
 			}
 			catch(Exception $ex)
 			{
-				if($ex->getCode() == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC)
+				if($ex->getCode() != kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC)
 				{
-					// get original flavor asset
-					$origFlavorAsset = assetPeer::retrieveOriginalByEntryId($entry_id);
-					if($origFlavorAsset)
-					{
-						$syncKey = $origFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-						$remoteFileSync = kFileSyncUtils::getOriginFileSyncForKey($syncKey, false);
-						if(!$remoteFileSync)
-						{
-							// file does not exist on any DC - die
-							KalturaLog::log( "Error - no FileSync for entry [$entry_id]");
-							KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
-						}
-						
-						if($remoteFileSync->getDc() == kDataCenterMgr::getCurrentDcId())
-						{
-							KalturaLog::log("ERROR - Trying to redirect to myself - stop here.");
-							KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
-						}
-						
-						if (!in_array($remoteFileSync->getDc(), kDataCenterMgr::getDcIds()))
-						{
-							KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
-						}
-						
-						$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($remoteFileSync);
-						kFile::dumpUrl($remoteUrl);
-					}
+					KalturaLog::log( "Error - resize image failed");
+					KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
 				}
+				
+				// get original flavor asset
+				$origFlavorAsset = assetPeer::retrieveOriginalByEntryId($entry_id);
+				if(!$origFlavorAsset)
+				{
+					KalturaLog::log( "Error - no original flavor for entry [$entry_id]");
+					KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+				}
+
+				$syncKey = $origFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				$remoteFileSync = kFileSyncUtils::getOriginFileSyncForKey($syncKey, false);
+				if(!$remoteFileSync)
+				{
+					// file does not exist on any DC - die
+					KalturaLog::log( "Error - no FileSync for entry [$entry_id]");
+					KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
+				}
+				
+				if($remoteFileSync->getDc() == kDataCenterMgr::getCurrentDcId())
+				{
+					KalturaLog::log("ERROR - Trying to redirect to myself - stop here.");
+					KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
+				}
+				
+				if (!in_array($remoteFileSync->getDc(), kDataCenterMgr::getDcIds()))
+				{
+					KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
+				}
+
+				$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($remoteFileSync);
+				kFile::dumpUrl($remoteUrl);
 			}
 		}
 		
