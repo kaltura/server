@@ -177,6 +177,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * who can assign entries to this category
 	 *  
 	 * @var KalturaContributionPolicyType
+	 * @filter eq
 	 * @requiresPermission insert,update
 	 */
 	public $contributionPolicy;
@@ -264,6 +265,19 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public $directSubCategoriesCount;
 	
+	/**
+	 * Entries moderation 
+	 * @var bool
+	 */
+	public $moderation;
+	
+	/**
+	 * Nunber of pending moderation entries
+	 * @var int
+	 * @readonly
+	 */
+	public $pendingEntriesCount;
+	
 	private static $mapBetweenObjects = array
 	(
 		"id",
@@ -297,6 +311,8 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		"partnerData",
 		"defaultOrderBy",
 		"directSubCategoriesCount",
+		"moderation",
+		"pendingEntriesCount",
 	);
 	
 	/* (non-PHPdoc)
@@ -393,10 +409,12 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		if(($this->privacyContext == null || $this->privacyContext == '') &&
 			((is_null($sourceObject) &&
 			(($this->appearInList != null && $this->appearInList != KalturaAppearInListType::PARTNER_ONLY) ||
+			($this->moderation != false) ||
 			($this->privacy != null && $this->privacy != KalturaPrivacyType::ALL))) ||
 			($sourceObject && $sourceObject->getPrivacyContexts() == '' &&
 			((($this->appearInList != null && $this->appearInList != KalturaAppearInListType::PARTNER_ONLY) ||
 			($this->appearInList == null && $sourceObject->getDisplayInSearch() != DisplayInSearchType::PARTNER_ONLY)) || 
+			(($this->moderation != false) || ($this->moderation == null && $sourceObject->getModeration() != false)) ||
 			(($this->privacy != null && $this->privacy != KalturaPrivacyType::ALL) ||
 			 $this->privacy == null && $sourceObject->getPrivacy() != KalturaPrivacyType::ALL))))) 
 		{

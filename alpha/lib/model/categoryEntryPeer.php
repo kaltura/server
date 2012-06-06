@@ -53,10 +53,11 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		return self::doSelectOne($c);
 	}
 	
-	public static function retrieveByEntryId($entryId)
+	public static function retrieveActiveByEntryId($entryId)
 	{
 		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
 		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entryId);
+		$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
 		
 		return categoryEntryPeer::doSelect($c);
 	}
@@ -253,4 +254,18 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		return array($categories, $categoriesIds);
 		
 	} 
+	
+	public static function setDefaultCriteriaFilter ()
+	{
+		if ( self::$s_criteria_filter == null )
+		{
+			self::$s_criteria_filter = new criteriaFilter ();
+		}
+		
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS); 
+		$c->addAnd ( categoryEntryPeer::STATUS, CategoryEntryStatus::DELETED, Criteria::NOT_EQUAL);
+
+		self::$s_criteria_filter->setFilter($c);
+	}
+	
 } // categoryEntryPeer

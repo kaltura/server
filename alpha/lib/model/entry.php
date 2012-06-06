@@ -2533,7 +2533,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function getCategoriesEntryIds()
 	{
 		//TODO implement select with pagers
-		$allCategoriesEntry = categoryEntryPeer::retrieveByEntryId($this->getId());
+		$allCategoriesEntry = categoryEntryPeer::retrieveActiveByEntryId($this->getId());
 		
 		$categoriesEntryIds = array();
 		foreach($allCategoriesEntry as $categoryEntry)

@@ -415,6 +415,14 @@ class KalturaErrors extends APIErrors
 
 	const CANNOT_REMOVE_ENTRY_FROM_CATEGORY = "CANNOT_REMOVE_ENTRY_FROM_CATEGORY,Cannot remove entry from category";
 	
+	const CANNOT_ACTIVATE_CATEGORY_ENTRY = "CANNOT_ACTIVATE_CATEGORY_ENTRY,Cannot activate categoryEntry";
+	
+	const CANNOT_ACTIVATE_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING = "CANNOT_ACTIVATE_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING,Cannot activate a non pending categoryEntry";
+	
+	const CANNOT_REJECT_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING = "CANNOT_REJECT_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING,Cannot reject a non pending categoryEntry";
+	
+	const CANNOT_REJECT_CATEGORY_ENTRY = "CANNOT_REJECT_CATEGORY_ENTRY, Cannot reject category entry";
+	
 	const ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY = "ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY,Entry doesn't assigned to category"; 
 	
 	const MUST_FILTER_ENTRY_ID_EQUAL = "MUST_FILTER_ENTRY_ID_EQUAL,Must filter on entry id";

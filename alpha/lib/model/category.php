@@ -382,14 +382,23 @@ class category extends Basecategory implements IIndexable
             $this->save();
       }
       
-      /**
-       * Increment direct entries count (will increment recursively the parent categories too)
-       */
-      public function incrementDirectEntriesCount()
-      {
-            $this->setDirectEntriesCount($this->getDirectEntriesCount() + 1);           
-            $this->save();
-      }
+	/**
+	* Increment direct entries count
+	*/
+	public function incrementDirectEntriesCount()
+	{
+		$this->setDirectEntriesCount($this->getDirectEntriesCount() + 1);           
+		$this->save();
+	}
+      
+    /**
+	* Increment direct pending entries count
+	*/
+	public function incrementPendingEntriesCount()
+	{
+		$this->setPendingEntriesCount($this->getPendingEntriesCount() + 1);           
+		$this->save();
+	}
       
       /**
        * Decrement entries count (will decrement recursively the parent categories too)
@@ -428,6 +437,15 @@ class category extends Basecategory implements IIndexable
 			$this->setDirectEntriesCount($this->getDirectEntriesCount() - 1);            
             $this->save();
       }
+      
+	/**
+	* Decrement direct entries count (will decrement recursively the parent categories too)
+	*/
+	public function decrementPendingEntriesCount()
+	{
+		$this->setPendingEntriesCount($this->getPendingEntriesCount() - 1);            
+		$this->save();
+	}
       
 	protected function validateFullNameIsUnique()
 	{
@@ -550,9 +568,6 @@ class category extends Basecategory implements IIndexable
 	{
 		$partner = $this->getPartner();
 		
-		if($partner)
-			$partner->incrementFeaturesStatusByType(FeatureStatusType::INDEX_ENTRY);
-		
 		$featureStatusToRemoveIndex = new kFeatureStatus();
 		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_ENTRY);
 		
@@ -615,9 +630,6 @@ class category extends Basecategory implements IIndexable
 	{
 		$partner = $this->getPartner();
 		
-		if($partner)
-			$partner->incrementFeaturesStatusByType(FeatureStatusType::INDEX_CATEGORY_ENTRY);
-		
 		$featureStatusToRemoveIndex = new kFeatureStatus();
 		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY_ENTRY);
 		
@@ -634,9 +646,6 @@ class category extends Basecategory implements IIndexable
 	private function addIndexCategoryKuserJob($categoryId = null, $shouldUpdate = true)
 	{
 		$partner = $this->getPartner();
-		
-		if($partner)
-			$partner->incrementFeaturesStatusByType(FeatureStatusType::INDEX_CATEGORY_KUSER);
 		
 		$featureStatusToRemoveIndex = new kFeatureStatus();
 		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY_KUSER);

@@ -50,7 +50,18 @@ class categoryEntry extends BasecategoryEntry {
 	{	
 		parent::postInsert($con);
 		
-		$this->updateEntry();
+		categoryPeer::setUseCriteriaFilter(false);
+		$category = categoryPeer::retrieveByPK($this->getCategoryId());
+		categoryPeer::setUseCriteriaFilter(true);
+		
+		if ($this->getStatus() == CategoryEntryStatus::PENDING)
+			$category->incrementPendingEntriesCount();
+		
+		if($this->getStatus() == CategoryEntryStatus::ACTIVE)
+		{
+			$entry = entryPeer::retrieveByPK($this->getEntryId());
+			$this->setEntryOnCategory($category, $entry);
+		}
 	}
 	
 	/* (non-PHPdoc)
@@ -60,61 +71,57 @@ class categoryEntry extends BasecategoryEntry {
 	{	
 		parent::postUpdate($con);
 		
-		$this->updateEntry();
-	}
-	
-	private function updateEntry()
-	{
+		categoryPeer::setUseCriteriaFilter(false);
 		$category = categoryPeer::retrieveByPK($this->getCategoryId());
-		if($category)
-		{
-			$category->incrementEntriesCount(1, $this->entryCategoriesAddedIds);
-			$category->incrementDirectEntriesCount();
+		categoryPeer::setUseCriteriaFilter(true);
+		if(!$category)
+			throw new kCoreException('category id [' . $this->getCategoryId() . 'was not found', kCoreException::ID_NOT_FOUND);
+
+		$entry = entryPeer::retrieveByPK($this->getEntryId());
 			
-			$entry = entryPeer::retrieveByPK($this->getEntryId());
-			//only categories with no context are saved on entry - this is only for Backward compatible 
-			if($entry && !categoryEntryPeer::getSkipSave() && $category->getPrivacyContext() == '')
+		if($this->getStatus() == CategoryEntryStatus::ACTIVE && 
+			($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING))
+			$this->setEntryOnCategory($category, $entry);
+		
+		if($this->getStatus() == CategoryEntryStatus::REJECTED &&
+			$this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING)
+			$category->decrementPendingEntriesCount();
+			
+		if($this->getStatus() == CategoryEntryStatus::DELETED)
+		{ 
+			if($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::ACTIVE)
 			{
-				$entry->setCategories($entry->getCategories() . entry::ENTRY_CATEGORY_SEPARATOR . $category->getFullName());
+				$category->decrementEntriesCount(1, $this->entryCategoriesRemovedIds);
+				$category->decrementDirectEntriesCount();
+		
+				if(!categoryEntryPeer::getSkipSave())
+				{
+					$entry->removeCategory($category->getFullName());
+					$entry->save();
+				}
 			}
 			
-			$entry->setUpdatedAt(time());
-			$entry->save();	
+			if($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING)
+				$category->decrementPendingEntriesCount();
 		}
 	}
 	
-	/**
-	 * Code to be run after deleting the object from database
-	 * @param PropelPDO $con
-	 */
-	public function postDelete(PropelPDO $con = null)
+	private function setEntryOnCategory($category, $entry = null)
 	{
-		parent::postDelete($con);
+		$category->incrementEntriesCount(1, $this->entryCategoriesAddedIds);
+		$category->incrementDirectEntriesCount();
 		
-		$category = categoryPeer::retrieveByPK($this->category_id);
-		if($category)
-		{
-			$category->decrementEntriesCount(1, $this->entryCategoriesRemovedIds);
-			$category->decrementDirectEntriesCount();
-		}
+		//if was pending - decrease pending entries count!
+		if($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING)
+			$category->decrementPendingEntriesCount();
 		
-		$entry = entryPeer::retrieveByPK($this->getEntryId());
-		if($entry)
-		{
-
-			if (!$category)
-			{
-				categoryPeer::setUseCriteriaFilter(false);
-				$category = categoryPeer::retrieveByPK($this->category_id);
-				categoryPeer::setUseCriteriaFilter(true);
-			}
-
-			if(!categoryEntryPeer::getSkipSave())
-			{
-				$entry->removeCategory($category->getFullName());
-				$entry->save();
-			}
-		}
+		//only categories with no context are saved on entry - this is only for Backward compatible 
+		if($entry && !categoryEntryPeer::getSkipSave() && $category->getPrivacyContext() == '')
+			$entry->setCategories($entry->getCategories() . entry::ENTRY_CATEGORY_SEPARATOR . $category->getFullName());
+			
+		
+		$entry->setUpdatedAt(time());
+		$entry->save();
 	}
 	
 	public function reSetCategoryFullIds()
