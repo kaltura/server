@@ -113,7 +113,12 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 					foreach ($vals as $key => $val)
 					{
 						if (strstr($val, ' '))
-							$vals[$key] = "^$val$";
+						{
+							if (strstr($val, ' '))
+								$val = "^$val$";
+								
+							$vals[$key] = $val;
+						}
 					}
 					
 					$val = '((' . implode(') | (', $vals) . '))';

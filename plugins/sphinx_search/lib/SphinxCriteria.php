@@ -555,7 +555,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(is_numeric($val) || strlen($val) > 0)
 					{
 						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
-						$this->addMatch("@$sphinxField ^$val$");
+						if (strstr($val, ' '))
+							$val = "^$val$";
+								
+						$this->addMatch("@$sphinxField $val");
 						$filter->unsetByName($field);
 					}
 					break;
