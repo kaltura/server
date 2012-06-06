@@ -9,8 +9,6 @@
 class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 {
     
-    const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
-    
     /**
      * (non-PHPdoc)
      * @see BulkUploadGeneralEngineCsv::createUploadResult()
