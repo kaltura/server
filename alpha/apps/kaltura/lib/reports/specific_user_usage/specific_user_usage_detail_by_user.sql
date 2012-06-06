@@ -1,7 +1,7 @@
 SELECT
 	IF('{GROUP_COLUMN}' = 'date_id',day_id,t.month_id) {GROUP_COLUMN}, 
-	IFNULL(SUM(added_storage_kb),0)/1024 added_storage_mb,
 	IFNULL(SUM(added_entries),0) added_entries,
+	IFNULL(SUM(added_storage_kb),0)/1024 added_storage_mb,
 	IFNULL(SUM(added_msecs),0) added_msecs
 FROM kalturadw.dwh_dim_time t LEFT JOIN(
 	SELECT

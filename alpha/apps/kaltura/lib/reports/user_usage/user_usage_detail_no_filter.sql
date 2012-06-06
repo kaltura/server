@@ -2,11 +2,11 @@ SELECT
 	raw_data.kuser_id,
 	users.puser_id NAME,
 	raw_data.added_entries added_entries,
-	total.total_entries total_added_entries,
+	total.total_entries total_entries,
 	raw_data.added_storage_mb added_storage_mb,
-	total.total_storage_mb total_added_storage_mb,
+	total.total_storage_mb total_storage_mb,
 	raw_data.added_msecs added_msecs,
-	total.total_msecs total_added_msecs
+	total.total_msecs total_msecs
 FROM	
 	(SELECT
 		kuser_id, date_id,
