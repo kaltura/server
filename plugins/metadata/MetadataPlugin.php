@@ -495,14 +495,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			return;
 		}
 		
-		$dbMetadata = new Metadata();
-		$dbMetadata->setPartnerId($object->getPartnerId());
-		$dbMetadata->setMetadataProfileId($metadataProfileId);
-		$dbMetadata->setMetadataProfileVersion($metadataProfile->getVersion());
-		$dbMetadata->setObjectType(kMetadataManager::getTypeNameFromObject($object));
-		$dbMetadata->setObjectId($object->getId());
-		$dbMetadata->setStatus(Metadata::STATUS_VALID);
-		$dbMetadata->save();
+		$dbMetadata = $dbMetadata = self::findMetadataObj($object, $metadataProfile);
 		
 		KalturaLog::debug("Metadata [" . $dbMetadata->getId() . "] saved [$xmlData]");
 		
@@ -631,14 +624,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
     		}
     		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
     		
-    		$dbMetadata = new Metadata();
-    		$dbMetadata->setPartnerId($object->getPartnerId());
-    		$dbMetadata->setMetadataProfileId($metadataProfileId);
-    		$dbMetadata->setMetadataProfileVersion($metadataProfile->getVersion());
-    		$dbMetadata->setObjectType(kMetadataManager::getTypeNameFromObject($object));
-    		$dbMetadata->setObjectId($object->getId());
-    		$dbMetadata->setStatus(Metadata::STATUS_VALID);
-    		$dbMetadata->save();
+    		$dbMetadata = self::findMetadataObj($object, $metadataProfile);
     		
     		KalturaLog::debug("Metadata [" . $dbMetadata->getId() . "] saved [$xmlData]");
     		
@@ -647,6 +633,42 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
     		
 		    kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
 	    }
+	}
+	
+	/**
+	 * Function returns metadata object which needs to be set with the new metadata XML
+	 * @param BaseObject $object
+	 * @param MetadataProfile $metadataProfileId
+	 */
+	protected static function findMetadataObj (BaseObject $object, MetadataProfile $metadataProfile)
+	{
+	    $c = new Criteria();
+	    $c->addAnd(MetadataPeer::PARTNER_ID, $object->getPartnerId(), Criteria::EQUAL);  
+	    $c->addAnd(MetadataPeer::OBJECT_ID, $object->getId(), Criteria::EQUAL);
+	    $c->addAnd(MetadataPeer::METADATA_PROFILE_ID, $metadataProfile->getId(), Criteria::EQUAL);
+	    $c->addAnd(MetadataPeer::METADATA_PROFILE_VERSION, $metadataProfile->getVersion(), Criteria::EQUAL);
+	    $c->addAnd(MetadataPeer::OBJECT_TYPE, kMetadataManager::getTypeNameFromObject($object), Criteria::EQUAL);
+	    $c->addAnd(MetadataPeer::STATUS, Metadata::STATUS_VALID);
+	    $dbMetadata = MetadataPeer::doSelectOne($c);
+	    
+	    if (!$dbMetadata)
+	    {
+	        $dbMetadata = new Metadata();
+	        $dbMetadata->setPartnerId($object->getPartnerId());
+    		$dbMetadata->setMetadataProfileId($metadataProfile->getId());
+    		$dbMetadata->setMetadataProfileVersion($metadataProfile->getVersion());
+    		$dbMetadata->setObjectType(kMetadataManager::getTypeNameFromObject($object));
+    		$dbMetadata->setObjectId($object->getId());
+    		$dbMetadata->setStatus(Metadata::STATUS_VALID);
+    		$dbMetadata->save();
+	    }
+	    else
+	    {
+	        $dbMetadata->incrementVersion();
+	        $dbMetadata->save();
+	    }
+	    
+	    return $dbMetadata;
 	}
 	
 	/**
