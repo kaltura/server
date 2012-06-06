@@ -97,6 +97,7 @@ while(count($entries) && (!$limit || $migrated < $limit))
 			$categoryEntry->setCategoryId($categoryId);
 			$categoryEntry->setPartnerId($entry->getPartnerId());
 			$categoryEntry->setCategoryFullIds($category->getFullIds());
+			$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
 			$categoryEntry->save();
 		}
 		KalturaStatement::setDryRun(false);
