@@ -2,9 +2,8 @@
 /**
  * @package api
  * @subpackage objects
- * @abstract
  */
-abstract class KalturaBulkUploadJobData extends KalturaJobData
+class KalturaBulkUploadJobData extends KalturaJobData
 {
 	/**
 	 * @var string
@@ -91,6 +90,13 @@ abstract class KalturaBulkUploadJobData extends KalturaJobData
 	 * @readonly
 	 */
 	public $type;
+	
+	/**
+	 * Recipients of the email for bulk upload success/failure
+	 * @var string
+	 */
+	public $emailRecipients;
+	
 	
 	private static $map_between_objects = array
 	(
