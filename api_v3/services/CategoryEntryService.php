@@ -46,7 +46,7 @@ class CategoryEntryService extends KalturaBaseService
 		}
 		
 		$categoryEntryExists = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryEntry->categoryId, $categoryEntry->entryId);
-		if($categoryEntryExists && $categoryEntryExists->getStatus() != CategoryEntryStatus::ACTIVE)
+		if($categoryEntryExists && $categoryEntryExists->getStatus() == CategoryEntryStatus::ACTIVE)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS);
 		
 		$dbCategoryEntry = new categoryEntry();
