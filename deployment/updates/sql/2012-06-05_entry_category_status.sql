@@ -1,4 +1,7 @@
 ALTER TABLE category_entry
+DROP COLUMN `status`;
+
+ALTER TABLE category_entry
 ADD `status` INTEGER DEFAULT 2;
 
 ALTER TABLE category
