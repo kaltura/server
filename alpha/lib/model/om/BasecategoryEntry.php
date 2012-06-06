@@ -68,6 +68,12 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
+	 * The value for the status field.
+	 * @var        int
+	 */
+	protected $status;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -250,6 +256,16 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [status] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getStatus()
+	{
+		return $this->status;
 	}
 
 	/**
@@ -486,6 +502,29 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	} // setCustomData()
 
 	/**
+	 * Set the value of [status] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     categoryEntry The current object (for fluent API support)
+	 */
+	public function setStatus($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryEntryPeer::STATUS]))
+			$this->oldColumnsValues[categoryEntryPeer::STATUS] = $this->status;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->status !== $v) {
+			$this->status = $v;
+			$this->modifiedColumns[] = categoryEntryPeer::STATUS;
+		}
+
+		return $this;
+	} // setStatus()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -525,6 +564,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->custom_data = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -534,7 +574,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 8; // 8 = categoryEntryPeer::NUM_COLUMNS - categoryEntryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 9; // 9 = categoryEntryPeer::NUM_COLUMNS - categoryEntryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating categoryEntry object", $e);
@@ -1020,6 +1060,9 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			case 7:
 				return $this->getCustomData();
 				break;
+			case 8:
+				return $this->getStatus();
+				break;
 			default:
 				return null;
 				break;
@@ -1049,6 +1092,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$keys[5] => $this->getCreatedAt(),
 			$keys[6] => $this->getUpdatedAt(),
 			$keys[7] => $this->getCustomData(),
+			$keys[8] => $this->getStatus(),
 		);
 		return $result;
 	}
@@ -1104,6 +1148,9 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			case 7:
 				$this->setCustomData($value);
 				break;
+			case 8:
+				$this->setStatus($value);
+				break;
 		} // switch()
 	}
 
@@ -1136,6 +1183,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setCustomData($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setStatus($arr[$keys[8]]);
 	}
 
 	/**
@@ -1155,6 +1203,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryEntryPeer::CREATED_AT)) $criteria->add(categoryEntryPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(categoryEntryPeer::UPDATED_AT)) $criteria->add(categoryEntryPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(categoryEntryPeer::CUSTOM_DATA)) $criteria->add(categoryEntryPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(categoryEntryPeer::STATUS)) $criteria->add(categoryEntryPeer::STATUS, $this->status);
 
 		return $criteria;
 	}
@@ -1234,6 +1283,8 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		$copyObj->setUpdatedAt($this->updated_at);
 
 		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setStatus($this->status);
 
 
 		$copyObj->setNew(true);

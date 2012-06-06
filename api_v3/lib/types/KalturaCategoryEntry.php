@@ -38,12 +38,22 @@ class KalturaCategoryEntry extends KalturaObject implements IFilterable
 	 */
 	public $categoryFullIds;
 	
+	/**
+	 * 
+	 * CategroyEntry status
+	 * @var KalturaCategoryEntryStatus
+	 * @readonly
+	 * @filter eq,in
+	 */
+	public $status;
+	
 	private static $mapBetweenObjects = array
 	(
 		"entryId",
 		"categoryId",
 		"createdAt",
 		"categoryFullIds",
+		"status",
 	);
 	
 	public function getMapBetweenObjects()

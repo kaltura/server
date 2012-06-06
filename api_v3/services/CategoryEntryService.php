@@ -46,11 +46,23 @@ class CategoryEntryService extends KalturaBaseService
 		}
 		
 		$categoryEntryExists = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryEntry->categoryId, $categoryEntry->entryId);
-		if($categoryEntryExists)
+		if($categoryEntryExists && $categoryEntryExists->getStatus() != CategoryEntryStatus::ACTIVE)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS);
 		
 		$dbCategoryEntry = new categoryEntry();
 		$categoryEntry->toInsertableObject($dbCategoryEntry);
+		
+		$dbCategoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
+		
+		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
+		{
+			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::$ks_kuser_id);
+			
+			if(!$categoryKuser ||
+				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER || 
+				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR)
+				$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
+		}
 		
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$dbCategoryEntry->setPartnerId($partnerId);
@@ -100,7 +112,8 @@ class CategoryEntryService extends KalturaBaseService
 		if(!$dbCategoryEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
 		
-		$dbCategoryEntry->delete();
+		$dbCategoryEntry->setStatus(CategoryEntryStatus::DELETED);
+		$dbCategoryEntry->save();
 		
 		//need to select the entry again - after update
 		$entry = entryPeer::retrieveByPK($entryId);		
@@ -206,5 +219,89 @@ class CategoryEntryService extends KalturaBaseService
 		
 		return $dbCategoryEntry->getId();
 				
+	}
+	
+	/**
+	 * activate CategoryEntry when it is pending moderation
+	 * 
+	 * @action activate
+	 * @param string $entryId
+	 * @param int $categoryId
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 * @throws KalturaErrors::CATEGORY_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY
+	 * @throws KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY
+	 */
+	function activateAction($entryId, $categoryId)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$entry)
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+			
+		$category = categoryPeer::retrieveByPK($categoryId);
+		if (!$category)
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
+		
+		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
+		if(!$dbCategoryEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
+			
+		//validate user is entiteld to activate entry from category 
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, kCurrentContext::$ks_kuser_id);
+			if(!$categoryKuser || 
+				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
+				 $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
+					throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY);
+		}
+			
+		if($dbCategoryEntry->getStatus() != CategoryEntryStatus::PENDING)
+			throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING);
+			
+		$dbCategoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
+		$dbCategoryEntry->save();
+	}
+	
+	/**
+	 * activate CategoryEntry when it is pending moderation
+	 * 
+	 * @action reject
+	 * @param string $entryId
+	 * @param int $categoryId
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 * @throws KalturaErrors::CATEGORY_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY
+	 * @throws KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY
+	 */
+	function rejectAction($entryId, $categoryId)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$entry)
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+			
+		$category = categoryPeer::retrieveByPK($categoryId);
+		if (!$category)
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
+		
+		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
+		if(!$dbCategoryEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
+			
+		//validate user is entiteld to reject entry from category 
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, kCurrentContext::$ks_kuser_id);
+			if(!$categoryKuser || 
+				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
+				 $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
+					throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY);
+		}
+			
+		if($dbCategoryEntry->getStatus() != CategoryEntryStatus::PENDING)
+			throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING);
+			
+		$dbCategoryEntry->setStatus(CategoryEntryStatus::REJECTED);
+		$dbCategoryEntry->save();
 	}
 }

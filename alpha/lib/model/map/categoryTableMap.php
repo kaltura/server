@@ -53,6 +53,7 @@ class categoryTableMap extends TableMap {
 		$this->addColumn('DIRECT_SUB_CATEGORIES_COUNT', 'DirectSubCategoriesCount', 'INTEGER', false, null, 0);
 		$this->addColumn('MEMBERS_COUNT', 'MembersCount', 'INTEGER', false, null, 0);
 		$this->addColumn('PENDING_MEMBERS_COUNT', 'PendingMembersCount', 'INTEGER', false, null, 0);
+		$this->addColumn('PENDING_ENTRIES_COUNT', 'PendingEntriesCount', 'INTEGER', false, null, 0);
 		$this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('DISPLAY_IN_SEARCH', 'DisplayInSearch', 'TINYINT', false, null, 1);
@@ -68,6 +69,7 @@ class categoryTableMap extends TableMap {
 		$this->addColumn('PRIVACY_CONTEXT', 'PrivacyContext', 'VARCHAR', false, 255, null);
 		$this->addColumn('PRIVACY_CONTEXTS', 'PrivacyContexts', 'VARCHAR', false, 255, null);
 		$this->addColumn('INHERITED_PARENT_ID', 'InheritedParentId', 'INTEGER', false, null, null);
+		$this->addColumn('MODERATION', 'Moderation', 'BOOLEAN', false, null, false);
 		// validators
 	} // initialize()
 

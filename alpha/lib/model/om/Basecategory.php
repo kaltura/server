@@ -122,6 +122,13 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	protected $pending_members_count;
 
 	/**
+	 * The value for the pending_entries_count field.
+	 * Note: this column has a database default value of: 0
+	 * @var        int
+	 */
+	protected $pending_entries_count;
+
+	/**
 	 * The value for the description field.
 	 * @var        string
 	 */
@@ -218,6 +225,13 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	protected $inherited_parent_id;
 
 	/**
+	 * The value for the moderation field.
+	 * Note: this column has a database default value of: false
+	 * @var        boolean
+	 */
+	protected $moderation;
+
+	/**
 	 * @var        array categoryKuser[] Collection to store aggregation of categoryKuser objects.
 	 */
 	protected $collcategoryKusers;
@@ -286,12 +300,14 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		$this->direct_sub_categories_count = 0;
 		$this->members_count = 0;
 		$this->pending_members_count = 0;
+		$this->pending_entries_count = 0;
 		$this->display_in_search = 1;
 		$this->privacy = 1;
 		$this->inheritance_type = 2;
 		$this->user_join_policy = 3;
 		$this->default_permission_level = 3;
 		$this->contribution_policy = 2;
+		$this->moderation = false;
 	}
 
 	/**
@@ -555,6 +571,16 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Get the [pending_entries_count] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getPendingEntriesCount()
+	{
+		return $this->pending_entries_count;
+	}
+
+	/**
 	 * Get the [description] column value.
 	 * 
 	 * @return     string
@@ -702,6 +728,16 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function getInheritedParentId()
 	{
 		return $this->inherited_parent_id;
+	}
+
+	/**
+	 * Get the [moderation] column value.
+	 * 
+	 * @return     boolean
+	 */
+	public function getModeration()
+	{
+		return $this->moderation;
 	}
 
 	/**
@@ -1154,6 +1190,29 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	} // setPendingMembersCount()
 
 	/**
+	 * Set the value of [pending_entries_count] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setPendingEntriesCount($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::PENDING_ENTRIES_COUNT]))
+			$this->oldColumnsValues[categoryPeer::PENDING_ENTRIES_COUNT] = $this->pending_entries_count;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->pending_entries_count !== $v || $this->isNew()) {
+			$this->pending_entries_count = $v;
+			$this->modifiedColumns[] = categoryPeer::PENDING_ENTRIES_COUNT;
+		}
+
+		return $this;
+	} // setPendingEntriesCount()
+
+	/**
 	 * Set the value of [description] column.
 	 * 
 	 * @param      string $v new value
@@ -1496,6 +1555,29 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	} // setInheritedParentId()
 
 	/**
+	 * Set the value of [moderation] column.
+	 * 
+	 * @param      boolean $v new value
+	 * @return     category The current object (for fluent API support)
+	 */
+	public function setModeration($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryPeer::MODERATION]))
+			$this->oldColumnsValues[categoryPeer::MODERATION] = $this->moderation;
+
+		if ($v !== null) {
+			$v = (boolean) $v;
+		}
+
+		if ($this->moderation !== $v || $this->isNew()) {
+			$this->moderation = $v;
+			$this->modifiedColumns[] = categoryPeer::MODERATION;
+		}
+
+		return $this;
+	} // setModeration()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1529,6 +1611,10 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				return false;
 			}
 
+			if ($this->pending_entries_count !== 0) {
+				return false;
+			}
+
 			if ($this->display_in_search !== 1) {
 				return false;
 			}
@@ -1550,6 +1636,10 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			}
 
 			if ($this->contribution_policy !== 2) {
+				return false;
+			}
+
+			if ($this->moderation !== false) {
 				return false;
 			}
 
@@ -1591,21 +1681,23 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$this->direct_sub_categories_count = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
 			$this->members_count = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
 			$this->pending_members_count = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
-			$this->description = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-			$this->tags = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-			$this->display_in_search = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
-			$this->privacy = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
-			$this->inheritance_type = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
-			$this->user_join_policy = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
-			$this->default_permission_level = ($row[$startcol + 22] !== null) ? (int) $row[$startcol + 22] : null;
-			$this->kuser_id = ($row[$startcol + 23] !== null) ? (int) $row[$startcol + 23] : null;
-			$this->puser_id = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
-			$this->reference_id = ($row[$startcol + 25] !== null) ? (string) $row[$startcol + 25] : null;
-			$this->contribution_policy = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
-			$this->custom_data = ($row[$startcol + 27] !== null) ? (string) $row[$startcol + 27] : null;
-			$this->privacy_context = ($row[$startcol + 28] !== null) ? (string) $row[$startcol + 28] : null;
-			$this->privacy_contexts = ($row[$startcol + 29] !== null) ? (string) $row[$startcol + 29] : null;
-			$this->inherited_parent_id = ($row[$startcol + 30] !== null) ? (int) $row[$startcol + 30] : null;
+			$this->pending_entries_count = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
+			$this->description = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->tags = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
+			$this->display_in_search = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
+			$this->privacy = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
+			$this->inheritance_type = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
+			$this->user_join_policy = ($row[$startcol + 22] !== null) ? (int) $row[$startcol + 22] : null;
+			$this->default_permission_level = ($row[$startcol + 23] !== null) ? (int) $row[$startcol + 23] : null;
+			$this->kuser_id = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
+			$this->puser_id = ($row[$startcol + 25] !== null) ? (string) $row[$startcol + 25] : null;
+			$this->reference_id = ($row[$startcol + 26] !== null) ? (string) $row[$startcol + 26] : null;
+			$this->contribution_policy = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
+			$this->custom_data = ($row[$startcol + 28] !== null) ? (string) $row[$startcol + 28] : null;
+			$this->privacy_context = ($row[$startcol + 29] !== null) ? (string) $row[$startcol + 29] : null;
+			$this->privacy_contexts = ($row[$startcol + 30] !== null) ? (string) $row[$startcol + 30] : null;
+			$this->inherited_parent_id = ($row[$startcol + 31] !== null) ? (int) $row[$startcol + 31] : null;
+			$this->moderation = ($row[$startcol + 32] !== null) ? (boolean) $row[$startcol + 32] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1615,7 +1707,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 31; // 31 = categoryPeer::NUM_COLUMNS - categoryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 33; // 33 = categoryPeer::NUM_COLUMNS - categoryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating category object", $e);
@@ -2145,49 +2237,55 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				return $this->getPendingMembersCount();
 				break;
 			case 16:
-				return $this->getDescription();
+				return $this->getPendingEntriesCount();
 				break;
 			case 17:
-				return $this->getTags();
+				return $this->getDescription();
 				break;
 			case 18:
-				return $this->getDisplayInSearch();
+				return $this->getTags();
 				break;
 			case 19:
-				return $this->getPrivacy();
+				return $this->getDisplayInSearch();
 				break;
 			case 20:
-				return $this->getInheritanceType();
+				return $this->getPrivacy();
 				break;
 			case 21:
-				return $this->getUserJoinPolicy();
+				return $this->getInheritanceType();
 				break;
 			case 22:
-				return $this->getDefaultPermissionLevel();
+				return $this->getUserJoinPolicy();
 				break;
 			case 23:
-				return $this->getKuserId();
+				return $this->getDefaultPermissionLevel();
 				break;
 			case 24:
-				return $this->getPuserId();
+				return $this->getKuserId();
 				break;
 			case 25:
-				return $this->getReferenceId();
+				return $this->getPuserId();
 				break;
 			case 26:
-				return $this->getContributionPolicy();
+				return $this->getReferenceId();
 				break;
 			case 27:
-				return $this->getCustomData();
+				return $this->getContributionPolicy();
 				break;
 			case 28:
-				return $this->getPrivacyContext();
+				return $this->getCustomData();
 				break;
 			case 29:
-				return $this->getPrivacyContexts();
+				return $this->getPrivacyContext();
 				break;
 			case 30:
+				return $this->getPrivacyContexts();
+				break;
+			case 31:
 				return $this->getInheritedParentId();
+				break;
+			case 32:
+				return $this->getModeration();
 				break;
 			default:
 				return null;
@@ -2226,21 +2324,23 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 			$keys[13] => $this->getDirectSubCategoriesCount(),
 			$keys[14] => $this->getMembersCount(),
 			$keys[15] => $this->getPendingMembersCount(),
-			$keys[16] => $this->getDescription(),
-			$keys[17] => $this->getTags(),
-			$keys[18] => $this->getDisplayInSearch(),
-			$keys[19] => $this->getPrivacy(),
-			$keys[20] => $this->getInheritanceType(),
-			$keys[21] => $this->getUserJoinPolicy(),
-			$keys[22] => $this->getDefaultPermissionLevel(),
-			$keys[23] => $this->getKuserId(),
-			$keys[24] => $this->getPuserId(),
-			$keys[25] => $this->getReferenceId(),
-			$keys[26] => $this->getContributionPolicy(),
-			$keys[27] => $this->getCustomData(),
-			$keys[28] => $this->getPrivacyContext(),
-			$keys[29] => $this->getPrivacyContexts(),
-			$keys[30] => $this->getInheritedParentId(),
+			$keys[16] => $this->getPendingEntriesCount(),
+			$keys[17] => $this->getDescription(),
+			$keys[18] => $this->getTags(),
+			$keys[19] => $this->getDisplayInSearch(),
+			$keys[20] => $this->getPrivacy(),
+			$keys[21] => $this->getInheritanceType(),
+			$keys[22] => $this->getUserJoinPolicy(),
+			$keys[23] => $this->getDefaultPermissionLevel(),
+			$keys[24] => $this->getKuserId(),
+			$keys[25] => $this->getPuserId(),
+			$keys[26] => $this->getReferenceId(),
+			$keys[27] => $this->getContributionPolicy(),
+			$keys[28] => $this->getCustomData(),
+			$keys[29] => $this->getPrivacyContext(),
+			$keys[30] => $this->getPrivacyContexts(),
+			$keys[31] => $this->getInheritedParentId(),
+			$keys[32] => $this->getModeration(),
 		);
 		return $result;
 	}
@@ -2321,49 +2421,55 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 				$this->setPendingMembersCount($value);
 				break;
 			case 16:
-				$this->setDescription($value);
+				$this->setPendingEntriesCount($value);
 				break;
 			case 17:
-				$this->setTags($value);
+				$this->setDescription($value);
 				break;
 			case 18:
-				$this->setDisplayInSearch($value);
+				$this->setTags($value);
 				break;
 			case 19:
-				$this->setPrivacy($value);
+				$this->setDisplayInSearch($value);
 				break;
 			case 20:
-				$this->setInheritanceType($value);
+				$this->setPrivacy($value);
 				break;
 			case 21:
-				$this->setUserJoinPolicy($value);
+				$this->setInheritanceType($value);
 				break;
 			case 22:
-				$this->setDefaultPermissionLevel($value);
+				$this->setUserJoinPolicy($value);
 				break;
 			case 23:
-				$this->setKuserId($value);
+				$this->setDefaultPermissionLevel($value);
 				break;
 			case 24:
-				$this->setPuserId($value);
+				$this->setKuserId($value);
 				break;
 			case 25:
-				$this->setReferenceId($value);
+				$this->setPuserId($value);
 				break;
 			case 26:
-				$this->setContributionPolicy($value);
+				$this->setReferenceId($value);
 				break;
 			case 27:
-				$this->setCustomData($value);
+				$this->setContributionPolicy($value);
 				break;
 			case 28:
-				$this->setPrivacyContext($value);
+				$this->setCustomData($value);
 				break;
 			case 29:
-				$this->setPrivacyContexts($value);
+				$this->setPrivacyContext($value);
 				break;
 			case 30:
+				$this->setPrivacyContexts($value);
+				break;
+			case 31:
 				$this->setInheritedParentId($value);
+				break;
+			case 32:
+				$this->setModeration($value);
 				break;
 		} // switch()
 	}
@@ -2405,21 +2511,23 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[13], $arr)) $this->setDirectSubCategoriesCount($arr[$keys[13]]);
 		if (array_key_exists($keys[14], $arr)) $this->setMembersCount($arr[$keys[14]]);
 		if (array_key_exists($keys[15], $arr)) $this->setPendingMembersCount($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setDescription($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setTags($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setDisplayInSearch($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setPrivacy($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setInheritanceType($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setUserJoinPolicy($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setDefaultPermissionLevel($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setKuserId($arr[$keys[23]]);
-		if (array_key_exists($keys[24], $arr)) $this->setPuserId($arr[$keys[24]]);
-		if (array_key_exists($keys[25], $arr)) $this->setReferenceId($arr[$keys[25]]);
-		if (array_key_exists($keys[26], $arr)) $this->setContributionPolicy($arr[$keys[26]]);
-		if (array_key_exists($keys[27], $arr)) $this->setCustomData($arr[$keys[27]]);
-		if (array_key_exists($keys[28], $arr)) $this->setPrivacyContext($arr[$keys[28]]);
-		if (array_key_exists($keys[29], $arr)) $this->setPrivacyContexts($arr[$keys[29]]);
-		if (array_key_exists($keys[30], $arr)) $this->setInheritedParentId($arr[$keys[30]]);
+		if (array_key_exists($keys[16], $arr)) $this->setPendingEntriesCount($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setDescription($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setTags($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setDisplayInSearch($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setPrivacy($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setInheritanceType($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setUserJoinPolicy($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setDefaultPermissionLevel($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setKuserId($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setPuserId($arr[$keys[25]]);
+		if (array_key_exists($keys[26], $arr)) $this->setReferenceId($arr[$keys[26]]);
+		if (array_key_exists($keys[27], $arr)) $this->setContributionPolicy($arr[$keys[27]]);
+		if (array_key_exists($keys[28], $arr)) $this->setCustomData($arr[$keys[28]]);
+		if (array_key_exists($keys[29], $arr)) $this->setPrivacyContext($arr[$keys[29]]);
+		if (array_key_exists($keys[30], $arr)) $this->setPrivacyContexts($arr[$keys[30]]);
+		if (array_key_exists($keys[31], $arr)) $this->setInheritedParentId($arr[$keys[31]]);
+		if (array_key_exists($keys[32], $arr)) $this->setModeration($arr[$keys[32]]);
 	}
 
 	/**
@@ -2447,6 +2555,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryPeer::DIRECT_SUB_CATEGORIES_COUNT)) $criteria->add(categoryPeer::DIRECT_SUB_CATEGORIES_COUNT, $this->direct_sub_categories_count);
 		if ($this->isColumnModified(categoryPeer::MEMBERS_COUNT)) $criteria->add(categoryPeer::MEMBERS_COUNT, $this->members_count);
 		if ($this->isColumnModified(categoryPeer::PENDING_MEMBERS_COUNT)) $criteria->add(categoryPeer::PENDING_MEMBERS_COUNT, $this->pending_members_count);
+		if ($this->isColumnModified(categoryPeer::PENDING_ENTRIES_COUNT)) $criteria->add(categoryPeer::PENDING_ENTRIES_COUNT, $this->pending_entries_count);
 		if ($this->isColumnModified(categoryPeer::DESCRIPTION)) $criteria->add(categoryPeer::DESCRIPTION, $this->description);
 		if ($this->isColumnModified(categoryPeer::TAGS)) $criteria->add(categoryPeer::TAGS, $this->tags);
 		if ($this->isColumnModified(categoryPeer::DISPLAY_IN_SEARCH)) $criteria->add(categoryPeer::DISPLAY_IN_SEARCH, $this->display_in_search);
@@ -2462,6 +2571,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryPeer::PRIVACY_CONTEXT)) $criteria->add(categoryPeer::PRIVACY_CONTEXT, $this->privacy_context);
 		if ($this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS)) $criteria->add(categoryPeer::PRIVACY_CONTEXTS, $this->privacy_contexts);
 		if ($this->isColumnModified(categoryPeer::INHERITED_PARENT_ID)) $criteria->add(categoryPeer::INHERITED_PARENT_ID, $this->inherited_parent_id);
+		if ($this->isColumnModified(categoryPeer::MODERATION)) $criteria->add(categoryPeer::MODERATION, $this->moderation);
 
 		return $criteria;
 	}
@@ -2558,6 +2668,8 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 
 		$copyObj->setPendingMembersCount($this->pending_members_count);
 
+		$copyObj->setPendingEntriesCount($this->pending_entries_count);
+
 		$copyObj->setDescription($this->description);
 
 		$copyObj->setTags($this->tags);
@@ -2587,6 +2699,8 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		$copyObj->setPrivacyContexts($this->privacy_contexts);
 
 		$copyObj->setInheritedParentId($this->inherited_parent_id);
+
+		$copyObj->setModeration($this->moderation);
 
 
 		if ($deepCopy) {

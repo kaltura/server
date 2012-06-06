@@ -227,7 +227,7 @@ class LogIp
 			}
 			catch (Exception $ex)
 			{
-				error_log('Could not find IP remote address: ' . $ex->getMessage());
+				self::$_ip = '';
 			}
 		}
 			
