@@ -67,9 +67,9 @@
 							?>
 						</td>
 						<td><?php echo nl2br(htmlspecialchars(trim($job->description))); ?></td>
-						<td><?php echo date($this->translate('date format'), $job->createdAt); ?></td>
-						<td><?php echo date($this->translate('date format'), $job->queueTime); ?></td>
-						<td><?php echo date($this->translate('date format'), $job->finishTime); ?></td>
+						<td><?php echo $this->dateFormat($job->createdAt, Zend_Date::DATETIME_LONG); ?></td>
+						<td><?php echo $this->dateFormat($job->queueTime, Zend_Date::DATETIME_LONG); ?></td>
+						<td><?php echo $this->dateFormat($job->finishTime, Zend_Date::DATETIME_LONG); ?></td>
 						<td>
 							<?php 
 								$color = 'black';
