@@ -552,9 +552,6 @@ class KalturaResponseCacher
 				if ($cachedInvalidationTime < $invalidationTime)
 					continue;					// something changed since the response was cached
 
-				$this->_wouldHaveUsedCondCache = true;			// XXXXXXX TODO: remove this
-				continue;										// XXXXXXX TODO: remove this
-				
 				if (isset($cacheRules[self::CACHE_MODE_ANONYMOUS]))
 				{
 					// since the conditions matched, we can extend the expiry of the anonymous cache
