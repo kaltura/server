@@ -125,13 +125,28 @@ class BatchService extends KalturaBaseService
 	 */
 	function updateBulkUploadResultsAction($bulkUploadJobId)
 	{
-		
+		$unclosedEntriesCount = 0;
+		$errorObjects = 0;
 		$unclosedEntries = array();
 		$bulkUploadResults = BulkUploadResultPeer::retrieveByBulkUploadId($bulkUploadJobId);
 
 		$bulkUpload = BatchJobPeer::retrieveByPK($bulkUploadJobId);
 		if($bulkUpload)
 		{
+    		foreach($bulkUploadResults as $bulkUploadResult)
+    		{
+    		    /* @var $bulkUploadResult BulkUploadResult */
+    			$status = $bulkUploadResult->updateStatusFromObject();
+    			
+    			if ($status == BulkUploadResultStatus::IN_PROGRESS )
+    			{	
+        			$unclosedEntriesCount++;
+    			}
+    			if ($status == BulkUploadResultStatus::ERROR )
+    			{
+    			    $errorObjects++;
+    			}
+    		}
 			$data = $bulkUpload->getData();
 			if($data && $data instanceof kBulkUploadJobData)
 			{
@@ -139,22 +154,11 @@ class BatchService extends KalturaBaseService
 				// returning objectId "null" for failed entry assets, rather than the entryId to which they pertain.
 				//$data->setNumOfEntries(BulkUploadResultPeer::countWithEntryByBulkUploadId($bulkUploadJobId));
 				$data->setNumOfObjects(BulkUploadResultPeer::countWithObjectTypeByBulkUploadId($bulkUploadJobId, $data->getBulkUploadObjectType()));
+				$data->setNumOfErrorObjects($errorObjects);
 				$bulkUpload->setData($data);
 				$bulkUpload->save();
 			}
-		}
-		
-		$unclosedEntriesCount = 0;
-		foreach($bulkUploadResults as $bulkUploadResult)
-		{
-		    /* @var $bulkUploadResult BulkUploadResult */
-			$status = $bulkUploadResult->updateStatusFromObject();
-			
-			if ($status == BulkUploadResultStatus::IN_PROGRESS )
-			{	
-    			$unclosedEntriesCount++;
-			}
-		}
+		}			
 		
 		return $unclosedEntriesCount;
 	}	
