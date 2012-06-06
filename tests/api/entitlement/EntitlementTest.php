@@ -204,7 +204,7 @@ class EntitlementTest extends EntitlementTestBase
 		$user1->id = $user1->id . rand();
 		$user1 = $this->client->user->add($user1);
 			
-		$this->startSessionWithDiffe(SessionType::USER, $user1->id);
+		$this->startSessionWithDiffe(SessionType::USER, $user1->id, 'privacycontext:' . $category1->privacyContext);
 		
 		$categoryUser = new KalturaCategoryUser();
 		$categoryUser->categoryId = $category1->id;
@@ -220,9 +220,11 @@ class EntitlementTest extends EntitlementTestBase
 				$this->assertTrue(true, 'Category1 is members only and therefor user is not able to get it and to be added to');
 			elseif($category1->userJoinPolicy == KalturaUserJoinPolicyType::NOT_ALLOWED)
 				$this->assertTrue(true, 'User is not allowed to join this category');
+			elseif($ex->getCode() == 'CATEGORY_NOT_FOUND' && $category1->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
+				$this->assertTrue(true, 'User is not allowed to join this category since it unlisted');
 			else
 				$this->assertTrue(false, 'Fialed to add user to category: ' . $ex->getCode());
-			
+				
 			return;
 		}
 
