@@ -495,7 +495,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			return;
 		}
 		
-		$dbMetadata = $dbMetadata = self::findMetadataObj($object, $metadataProfile);
+		$dbMetadata = $dbMetadata = self::createOrFindMetadataObject($object, $metadataProfile);
 		
 		KalturaLog::debug("Metadata [" . $dbMetadata->getId() . "] saved [$xmlData]");
 		
@@ -624,7 +624,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
     		}
     		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
     		
-    		$dbMetadata = self::findMetadataObj($object, $metadataProfile);
+    		$dbMetadata = self::createOrFindMetadataObject($object, $metadataProfile);
     		
     		KalturaLog::debug("Metadata [" . $dbMetadata->getId() . "] saved [$xmlData]");
     		
@@ -640,7 +640,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	 * @param BaseObject $object
 	 * @param MetadataProfile $metadataProfileId
 	 */
-	protected static function findMetadataObj (BaseObject $object, MetadataProfile $metadataProfile)
+	protected static function createOrFindMetadataObject (BaseObject $object, MetadataProfile $metadataProfile)
 	{
 	    $c = new Criteria();
 	    $c->addAnd(MetadataPeer::PARTNER_ID, $object->getPartnerId(), Criteria::EQUAL);  
