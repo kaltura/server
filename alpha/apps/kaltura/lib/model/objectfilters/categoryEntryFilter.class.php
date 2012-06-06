@@ -18,6 +18,8 @@ class categoryEntryFilter extends baseObjectFilter
 			"_lte_created_at",
 			"_likex_category_full_ids",
 			"_eq_category_full_ids",
+			"_eq_status",
+			"_in_status",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( );

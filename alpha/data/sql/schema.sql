@@ -1639,6 +1639,7 @@ CREATE TABLE `category`
 	`direct_sub_categories_count` INTEGER default 0,
 	`members_count` INTEGER default 0,
 	`pending_members_count` INTEGER default 0,
+	`pending_entries_count` INTEGER default 0,
 	`description` TEXT,
 	`tags` TEXT,
 	`display_in_search` TINYINT default 1,
@@ -1654,6 +1655,7 @@ CREATE TABLE `category`
 	`privacy_context` VARCHAR(255),
 	`privacy_contexts` VARCHAR(255),
 	`inherited_parent_id` INTEGER,
+	`moderation` TINYINT default 0,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_full_name_index`(`partner_id`, `full_name`)
 )Type=InnoDB;
@@ -1675,6 +1677,7 @@ CREATE TABLE `category_entry`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
+	`status` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_category_id_index`(`partner_id`, `category_id`),
 	KEY `partner_id_entry_id_index`(`partner_id`, `entry_id`),
@@ -2130,11 +2133,13 @@ DROP TABLE IF EXISTS `batch_job_log`;
 CREATE TABLE `batch_job_log`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`job_id` INTEGER,
 	`job_type` SMALLINT,
 	`job_sub_type` SMALLINT,
 	`data` TEXT,
 	`file_size` INTEGER,
 	`duplication_key` VARCHAR(2047),
+	`log_status` INTEGER,
 	`status` INTEGER,
 	`abort` TINYINT,
 	`check_again_timeout` INTEGER,

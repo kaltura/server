@@ -52,6 +52,7 @@ class categoryFilter extends baseObjectFilter
 			'_gte_pending_members_count',
 			'_lte_pending_members_count',
 		    '_eq_reference_id',
+			'_eq_contribution_policy',		
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "depth", "partner_sort_value", "entries_count", "members_count", "direct_entries_count", "full_name");
