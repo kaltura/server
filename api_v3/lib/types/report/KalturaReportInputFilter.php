@@ -1,24 +1,10 @@
 <?php
 /**
  * @package api
- * @subpackage objects
+ * @subpackage filters
  */
-class KalturaReportInputFilter extends KalturaObject 
+class KalturaReportInputFilter extends KalturaReportInputBaseFilter 
 {
-	/**
-	 * Start date as Unix timestamp (In seconds)
-	 * 
-	 * @var int
-	 */
-	public $fromDate;
-	
-	/**
-	 * End date as Unix timestamp (In seconds)
-	 * 
-	 * @var int
-	 */
-	public $toDate;
-	
 	/**
 	 * Search keywords to filter objects
 	 * 
@@ -62,13 +48,13 @@ class KalturaReportInputFilter extends KalturaObject
 	 */
 	public $interval;
 	
-	public function toReportsInputFilter ($reportInputFilter = null)
+	/* (non-PHPdoc)
+	 * @see KalturaReportInputBaseFilter::toReportsInputFilter()
+	 */
+	public function toReportsInputFilter($reportInputFilter = null)
 	{
-		if (is_null($reportInputFilter)) 
-			$reportInputFilter = new reportsInputFilter();
+		$reportInputFilter = parent::toReportsInputFilter($reportInputFilter);
 		
-		$reportInputFilter->from_date = $this->fromDate;
-		$reportInputFilter->to_date = $this->toDate;
 		$reportInputFilter->keywords = $this->keywords;
 		$reportInputFilter->search_in_tags= $this->searchInTags;
 		$reportInputFilter->search_in_admin_tags = $this->searchInAdminTags;
@@ -79,15 +65,18 @@ class KalturaReportInputFilter extends KalturaObject
 		return $reportInputFilter;
 	}
 	
-	public function fromReportsInputFilter (  $reportInputFilter )
+	/* (non-PHPdoc)
+	 * @see KalturaReportInputBaseFilter::fromReportsInputFilter()
+	 */
+	public function fromReportsInputFilter($reportInputFilter )
 	{
-		$this->fromDate = $reportInputFilter->from_date ;
-		$this->toDate = $reportInputFilter->to_date ;
+		parent::fromReportsInputFilter($reportInputFilter);
+		
 		$this->keywords = $reportInputFilter->keywords ;
 		$this->searchInTags = $reportInputFilter->search_in_tags ;
 		$this->searchInAdminTags = $reportInputFilter->search_in_admin_tags ;
-		$this->categories=$reportInputFilter->categories;
-		$this->timeZoneOffset=$reportInputFilter->timeZoneOffset;
+		$this->categories = $reportInputFilter->categories;
+		$this->timeZoneOffset = $reportInputFilter->timeZoneOffset;
 		
 		return $this;
 	}	
