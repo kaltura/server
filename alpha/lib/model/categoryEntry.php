@@ -117,11 +117,10 @@ class categoryEntry extends BasecategoryEntry {
 		
 		//only categories with no context are saved on entry - this is only for Backward compatible 
 		if($entry && !categoryEntryPeer::getSkipSave() && $category->getPrivacyContext() == '')
+		{
 			$entry->setCategories($entry->getCategories() . entry::ENTRY_CATEGORY_SEPARATOR . $category->getFullName());
-			
-		
-		$entry->setUpdatedAt(time());
-		$entry->save();
+			$entry->save();
+		}
 	}
 	
 	public function reSetCategoryFullIds()
