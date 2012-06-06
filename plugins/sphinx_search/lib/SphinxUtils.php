@@ -27,7 +27,7 @@ class SphinxUtils
 			$str = trim($str);
 			
 			if(substr($str, -2) == '\*')
-				return md5(substr($str, -2)) . '\\\*';
+				return md5(substr($str, 0, strlen($str) - 2)) . '\\\*';
 				
 			return md5($str);
 		}
