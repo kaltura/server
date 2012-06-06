@@ -78,6 +78,12 @@ class kBulkUploadJobData extends kJobData
 	protected $objectData;
 	
 	/**
+	 * Number of bulk upload results is status ERROR 
+	 * @var int
+	 */
+	protected $numOfErrorObjects;
+	
+	/**
 	 * @return the $userId
 	 */
 	public function getUserId() {
@@ -233,5 +239,22 @@ class kBulkUploadJobData extends kJobData
     {
         $this->objectData = $objectData;
     }
+    
+	/**
+     * @return INT
+     */
+    public function getNumOfErrorObjects ()
+    {
+        return $this->numOfErrorObjects;
+    }
+
+	/**
+     * @param int $numOfErrorObjects
+     */
+    public function setNumOfErrorObjects ($numOfErrorObjects)
+    {
+        $this->numOfErrorObjects = $numOfErrorObjects;
+    }
+
 
 }
