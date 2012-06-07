@@ -574,15 +574,15 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
                 }
                 
                 $metadataProfileField = $metadataProfileFields[$fieldSysName];
-				KalturaLog::debug("Found field [" . $metadataProfileField->getXpath() . "] for value [$value]");
+				KalturaLog::debug("Found field [" . $metadataProfileField->getXpath() . "] for value [$fieldValue]");
 				
-				$fieldValues = explode(self::BULK_UPLOAD_MULTI_VALUES_DELIMITER, $value);
-				foreach($fieldValues as $fieldValue)
+				$fieldValues = explode(self::BULK_UPLOAD_MULTI_VALUES_DELIMITER, $fieldValue);
+				foreach($fieldValues as $fieldSingleValue)
 				{
-					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE && !is_numeric($fieldValue))
+					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE && !is_numeric($fieldSingleValue))
 					{
-						$value = self::parseFormatedDate($fieldValue);
-						if(!$value || !strlen($value))
+						$valueAsDate = self::parseFormatedDate($fieldSingleValue);
+						if(!$valueAsDate || !strlen($valueAsDate))
 						{
 							$errorMessage = "Could not parse date format [$fieldValue] for field [$key]";
 							KalturaLog::err($errorMessage);
@@ -590,18 +590,18 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 							continue;
 						}
 							
-						$fieldValue = $value;
+						$fieldValue = $valueAsDate;
 					}
 					
-					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT && !is_numeric($fieldValue))
+					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT && !is_numeric($fieldSingleValue))
 					{
-						$errorMessage = "Could not parse int format [$fieldValue] for field [$key]";
+						$errorMessage = "Could not parse int format [$fieldSingleValue] for field [$key]";
 						KalturaLog::err($errorMessage);
 						self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 						continue;
 					}
 						
-					self::addXpath($xml, $metadataProfileField->getXpath(), $fieldValue);
+					self::addXpath($xml, $metadataProfileField->getXpath(), $fieldSingleValue);
 				}
 					
 				$dataFound = true;
