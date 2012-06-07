@@ -165,7 +165,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	 */
 	public function toInsertableObject($dbObject = null, $skip = array())
 	{
-	    if (!$this->permissionLevel)
+	    if (is_null($this->permissionLevel))
 	    {
     	    $category = categoryPeer::retrieveByPK($this->categoryId);
     	    if(!$category)
