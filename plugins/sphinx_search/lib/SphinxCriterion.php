@@ -338,7 +338,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 		if (count($this->matchClause))
 		{
 			$matchesClause = implode(' ', $this->matchClause);
-			if ($this->hasOr())
+			if ($this->hasOr() && count($this->matchClause) > 1)
 				$matchesClause = "($matchesClause)";
 			
 			$match = $this->getSelfMatchOperator() . $matchesClause;
