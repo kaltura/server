@@ -114,7 +114,7 @@ abstract class KBulkUploadEngine
 //		}
 			
 		$fields = null;
-		$regex = self::getDateFormatRegex($fields);
+		$regex = self::getDateFormatRegex($fields, $dateOnly);
 		
 		$values = null;
 		if(!preg_match($regex, $str, $values))
