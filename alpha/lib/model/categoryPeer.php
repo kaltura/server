@@ -38,7 +38,7 @@ class categoryPeer extends BasecategoryPeer
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
 			//add context as filter
-			$privacyContextCrit = $c->getNewCriterion(self::PRIVACY_CONTEXTS, kEntitlementUtils::getKsPrivacyContext(), Criteria::IN);
+			$privacyContextCrit = $c->getNewCriterion(self::PRIVACY_CONTEXTS, kEntitlementUtils::getKsPrivacyContext(), Criteria::IN_LIKE);
 			$privacyContextCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			$c->addAnd($privacyContextCrit);
 			
@@ -55,7 +55,7 @@ class categoryPeer extends BasecategoryPeer
 
 			if($kuser)
 			{
-				$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kuser->getId(), Criteria::EQUAL);
+				$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kuser->getId(), Criteria::LIKE);
 				$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
      			$crit->addOr($membersCrit);
 			}
