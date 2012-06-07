@@ -1,8 +1,8 @@
 <?php
 return array(
 	// globals
-	'time format' => 'm/d/y H:i:s',
-	'date format' => 'm/d/y H:i:s',
+	'time format' => 'M d, Y H:i:s T',
+	'date format' => 'M d, Y H:i:s T',
 	'csv date' => 'MM-dd-YYYY',
 	'datepicker format' => 'MM/dd/YYYY',
 
