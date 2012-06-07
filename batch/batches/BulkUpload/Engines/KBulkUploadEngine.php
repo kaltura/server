@@ -232,7 +232,8 @@ abstract class KBulkUploadEngine
 	 */
 	public static function isFormatedDate($str, $dateOnly = false)
 	{
-		$regex = self::getDateFormatRegex(null, $dateOnly);
+	    $fields = null;
+		$regex = self::getDateFormatRegex($fields, $dateOnly);
 		return preg_match($regex, $str);
 	}
 	
