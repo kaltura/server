@@ -248,10 +248,7 @@ class kEntitlementUtils
 	}
 	
 	public static function getPrivacyContextForEntry(entry $entry)
-	{
-		$categoriesIds = $entry->getCategoriesIds();
-		$categoriesIds = explode(',', $categoriesIds);
-		
+	{		
 		$privacyContexts = array();
 		$entryPrivacy = null;		
 		
@@ -267,7 +264,7 @@ class kEntitlementUtils
 			$categoryPrivacy = $category->getPrivacy();
 			$categoryPrivacyContexts = $category->getPrivacyContexts();
 			if(!$categoryPrivacyContexts)
-				$categoryPrivacyContexts = '';
+				$categoryPrivacyContexts = self::DEFAULT_CONTEXT;
 			
 			$categoryPrivacyContexts = explode(',', $categoryPrivacyContexts);
 			
