@@ -270,6 +270,9 @@ class kEntitlementUtils
 			
 			foreach ($categoryPrivacyContexts as $categoryPrivacyContext)
 			{
+				if($categoryPrivacyContext == '')
+					 $categoryPrivacyContext = self::DEFAULT_CONTEXT;
+					 
 				if(!isset($privacyContexts[$categoryPrivacyContext]) || $privacyContexts[$categoryPrivacyContext] > $categoryPrivacy)
 					$privacyContexts[$categoryPrivacyContext] = $categoryPrivacy;
 			}
@@ -296,7 +299,7 @@ class kEntitlementUtils
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		$ksPrivacyContexts = $ks->getPrivacyContext();
 		
-		if(is_null($ksPrivacyContexts))
+		if(is_null($ksPrivacyContexts) || $ksPrivacyContexts == '')
 			$ksPrivacyContexts = self::DEFAULT_CONTEXT;
 		
 		$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
@@ -304,7 +307,7 @@ class kEntitlementUtils
 		foreach ($ksPrivacyContexts as $ksPrivacyContext)
 			$privacyContextSearch[] = $ksPrivacyContext . ' << ' . kCurrentContext::$ks_kuser_id . ' << ' . $ksPrivacyContext;
 		
-		$privacyContextSearch[] = self:: ENTRY_PRIVACY_CONTEXT . ' << ' . kCurrentContext::$ks_kuser_id . ' << ' . self:: ENTRY_PRIVACY_CONTEXT;
+		$privacyContextSearch[] = self::ENTRY_PRIVACY_CONTEXT . ' << ' . kCurrentContext::$ks_kuser_id . ' << ' . self::ENTRY_PRIVACY_CONTEXT;
 			
 		return $privacyContextSearch;
 	}
