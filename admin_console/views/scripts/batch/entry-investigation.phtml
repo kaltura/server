@@ -2,7 +2,7 @@
 <p><?php echo $this->translate('entry investigate intro text'); ?></p>
 <br>
 <?php 
-	$enableActions = $this->enableActions;
+	$enableActions = $this->enableActions; 
 	$investigateData = null;
 	$entry = null;
 	if($this->investigateData && $this->investigateData->entry)
@@ -148,7 +148,7 @@
 										?>
 											<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_MediaType', $entry->mediaType); ?></td>
 											<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_SourceType', $entry->sourceType); ?></td>
-											<td><?php echo $this->dateFormat($entry->mediaDate, Zend_Date::DATETIME_LONG); ?></td>
+											<td><?php echo date($this->translate('time format'), $entry->mediaDate); ?></td>
 										<?php 
 									}
 								?>
@@ -161,8 +161,8 @@
 					?>
 					<td><?php echo $entry->partnerData; ?></td>
 					<td><?php echo $entry->searchText; ?></td>
-					<td><?php echo $this->dateFormat($entry->createdAt, Zend_Date::DATETIME_LONG); ?></td>
-					<td><?php echo $this->dateFormat($entry->updatedAt, Zend_Date::DATETIME_LONG); ?></td>
+					<td><?php echo date($this->translate('time format'), $entry->createdAt); ?></td>
+					<td><?php echo date($this->translate('time format'), $entry->updatedAt); ?></td>
 					<?php if($enableActions): ?>
 						<td><button onclick="doReconvertEntry();"><?php echo $this->translate('entry-investigate entry reconvert'); ?></button></td>
 					<?php endif; ?>
@@ -280,9 +280,9 @@
 								<td><?php echo $this->fileSyncSubTypeTranslate($file->fileObjectType, $file->objectSubType); ?></td>
 								<td><?php echo $file->dc; ?></td>
 								<td><?php echo $file->original; ?></td>
-								<td><?php echo $this->dateFormat($file->createdAt, Zend_Date::DATETIME_LONG); ?></td>
-								<td><?php echo $this->dateFormat($file->readyAt, Zend_Date::DATETIME_LONG); ?></td>
-								<td><?php echo $this->dateFormat($file->syncTime, Zend_Date::DATETIME_LONG); ?></td>
+								<td><?php echo date($this->translate('time format'), $file->createdAt); ?></td>
+								<td><?php echo date($this->translate('time format'), $file->readyAt); ?></td>
+								<td><?php echo date($this->translate('time format'), $file->syncTime); ?></td>
 								<td><?php echo $this->enumTranslate('Kaltura_Client_FileSync_Enum_FileSyncStatus', $file->status); ?></td>
 								<td><?php echo $this->enumTranslate('Kaltura_Client_FileSync_Enum_FileSyncType', $file->fileType); ?></td>
 								<td><?php echo $file->linkedId; ?></td>
@@ -355,9 +355,9 @@
 									<td class="link" onclick="toggleView('tr_flavor_data_<?php echo $flavorAsset->id; ?>')"><?php echo $flavorAsset->id; ?></td>
 									<td><?php echo $flavorAsset->version; ?></td>
 									<td><?php echo $flavorAsset->tags; ?></td>
-									<<td><?php echo $this->dateFormat($flavorAsset->createdAt, Zend_Date::DATETIME_LONG); ?></td>
-									<td><?php echo $this->dateFormat($flavorAsset->updatedAt, Zend_Date::DATETIME_LONG); ?></td>
-									<td><?php echo $this->dateFormat($flavorAsset->deletedAt, Zend_Date::DATETIME_LONG); ?></td>
+									<td><?php echo date($this->translate('time format'), $flavorAsset->createdAt); ?></td>
+									<td><?php echo date($this->translate('time format'), $flavorAsset->updatedAt); ?></td>
+									<td><?php echo date($this->translate('time format'), $flavorAsset->deletedAt); ?></td>
 									<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_FlavorAssetStatus', $flavorAsset->status); ?></td>
 									<td><?php echo $flavorAsset->description; ?></td>
 									<td><?php echo $flavorAsset->width; ?></td>
@@ -643,9 +643,9 @@
 															<td><?php echo $this->fileSyncSubTypeTranslate($file->fileObjectType, $file->objectSubType); ?></td>
 															<td><?php echo $file->dc; ?></td>
 															<td><?php echo $file->original; ?></td>
-															<td><?php echo $this->dateFormat($file->createdAt, Zend_Date::DATETIME_LONG); ?></td>
-															<td><?php echo $this->dateFormat($file->readyAt, Zend_Date::DATETIME_LONG); ?></td>
-															<td><?php echo $this->dateFormat($file->syncTime, Zend_Date::DATETIME_LONG); ?></td>
+															<td><?php echo date($this->translate('time format'), $file->createdAt); ?></td>
+															<td><?php echo date($this->translate('time format'), $file->readyAt); ?></td>
+															<td><?php echo date($this->translate('time format'), $file->syncTime); ?></td>
 															<td><?php echo $this->enumTranslate('Kaltura_Client_FileSync_Enum_FileSyncStatus', $file->status); ?></td>
 															<td><?php echo $this->enumTranslate('Kaltura_Client_FileSync_Enum_FileSyncType', $file->fileType); ?></td>
 															<td><?php echo $file->linkedId; ?></td>
@@ -725,9 +725,9 @@
 									<td class="link" onclick="toggleView('tr_thumb_data_<?php echo $thumbAsset->id; ?>')"><?php echo $thumbAsset->id; ?></td>
 									<td><?php echo $thumbAsset->version; ?></td>
 									<td><?php echo $thumbAsset->tags; ?></td>
-									<td><?php echo $this->dateFormat($thumbAsset->createdAt, Zend_Date::DATETIME_LONG); ?></td>
-									<td><?php echo $this->dateFormat($thumbAsset->updatedAt, Zend_Date::DATETIME_LONG); ?></td>
-									<td><?php echo $this->dateFormat($thumbAsset->deletedAt, Zend_Date::DATETIME_LONG); ?></td>
+									<td><?php echo date($this->translate('time format'), $thumbAsset->createdAt); ?></td>
+									<td><?php echo date($this->translate('time format'), $thumbAsset->updatedAt); ?></td>
+									<td><?php echo date($this->translate('time format'), $thumbAsset->deletedAt); ?></td>
 									<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_ThumbAssetStatus', $thumbAsset->status); ?></td>
 									<td><?php echo $thumbAsset->description; ?></td>
 									<td><?php echo $thumbAsset->width; ?></td>
@@ -882,9 +882,9 @@
 															<td><?php echo $this->fileSyncSubTypeTranslate($file->fileObjectType, $file->objectSubType); ?></td>
 															<td><?php echo $file->dc; ?></td>
 															<td><?php echo $file->original; ?></td>
-															<td><?php echo $this->dateFormat($file->createdAt, Zend_Date::DATETIME_LONG); ?></td>
-															<td><?php echo $this->dateFormat($file->readyAt, Zend_Date::DATETIME_LONG); ?></td>
-															<td><?php echo $this->dateFormat($file->syncTime, Zend_Date::DATETIME_LONG); ?></td>
+															<td><?php echo date($this->translate('time format'), $file->createdAt); ?></td>
+															<td><?php echo date($this->translate('time format'), $file->readyAt); ?></td>
+															<td><?php echo date($this->translate('time format'), $file->syncTime); ?></td>
 															<td><?php echo $this->enumTranslate('Kaltura_Client_FileSync_Enum_FileSyncStatus', $file->status); ?></td>
 															<td><?php echo $this->enumTranslate('Kaltura_Client_FileSync_Enum_FileSyncType', $file->fileType); ?></td>
 															<td><?php echo $file->linkedId; ?></td>
@@ -1001,15 +1001,15 @@
 									?>
 								</td>
 								<td><?php echo $job->abort; ?></td>
-								<td><?php echo ($job->checkAgainTimeout ? $this->dateFormat($job->checkAgainTimeout, Zend_Date::DATETIME_LONG): ''); ?></td>
+								<td><?php echo ($job->checkAgainTimeout ? date($this->translate('time format'), $job->checkAgainTimeout) : ''); ?></td>
 								<td><?php echo $job->progress; ?></td>
 								<td><?php echo htmlspecialchars($job->message); ?></td>
 								<td><?php echo nl2br(htmlspecialchars(trim($job->description))); ?></td>
-								<td><?php echo $this->dateFormat($job->createdAt, Zend_Date::DATETIME_LONG); ?></td>
-								<td><?php echo ($job->deletedAt ? $this->dateFormat($job->deletedAt, Zend_Date::DATETIME_LONG) : ''); ?></td>
+								<td><?php echo date($this->translate('time format'), $job->createdAt); ?></td>
+								<td><?php echo ($job->deletedAt ? date($this->translate('time format'), $job->deletedAt) : ''); ?></td>
 								<td><?php echo $job->priority; ?></td>
-								<td><?php echo $this->dateFormat($job->queueTime, Zend_Date::DATETIME_LONG); ?></td>
-								<td><?php echo $this->dateFormat($job->finishTime, Zend_Date::DATETIME_LONG); ?></td>
+								<td><?php echo date($this->translate('time format'), $job->queueTime); ?></td>
+								<td><?php echo date($this->translate('time format'), $job->finishTime); ?></td>
 								<td><?php echo $job->schedulerId; ?></td>
 								<td><?php echo $job->workerId; ?></td>
 								<td><?php echo $job->batchIndex; ?></td>
@@ -1091,8 +1091,8 @@
 						<td><?php echo $track->changedProperties; ?></td>
 						<td><?php echo $track->ks; ?></td>
 						<td><?php echo $track->description; ?></td>
-						<td><?php echo $this->dateFormat($job->createdAt, Zend_Date::DATETIME_LONG); ?></td>
-						<td><?php echo $this->dateFormat($job->updatedAt, Zend_Date::DATETIME_LONG); ?></td>
+						<td><?php echo date($this->translate('time format'), $track->createdAt); ?></td>
+						<td><?php echo date($this->translate('time format'), $track->updatedAt); ?></td>
 						<td><?php echo $track->paramStr1; ?></td>
 						<td><?php echo $track->paramStr2; ?></td>
 						<td><?php echo $track->paramStr3; ?></td>
