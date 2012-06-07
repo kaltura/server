@@ -214,6 +214,7 @@ abstract class KBulkUploadEngine
 		);
 	
 		$format = self::BULK_UPLOAD_DATE_FORMAT . ($dateOnly ? '' : self::BULK_UPLOAD_TIME_FORMAT);
+		
 		$fields = array();
 		$arr = null;
 		if(!preg_match_all('/%([YmdTHis])/', $format, $arr))
@@ -226,11 +227,12 @@ abstract class KBulkUploadEngine
 	
 	/**
 	 * @param string $str
-	 * @return boolean
+	 * @param bool $dateOnly
+	 * @return bool
 	 */
 	public static function isFormatedDate($str, $dateOnly = false)
 	{
-		$regex = self::getDateFormatRegex($dateOnly);
+		$regex = self::getDateFormatRegex(null, $dateOnly);
 		return preg_match($regex, $str);
 	}
 	
