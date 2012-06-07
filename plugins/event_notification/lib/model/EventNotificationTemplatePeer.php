@@ -94,6 +94,26 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 	}
 	
 	/**
+	 * Retrieve event notification tamplates according to partner
+	 *
+	 * @param      int $partnerId use null to retrieve from shared partner only
+	 * @param      PropelPDO $con the connection to use
+	 * @return     array<EventNotificationTemplate>
+	 */
+	public static function retrieveByPartnerId($partnerId = null, PropelPDO $con = null)
+	{
+		$criteria = new Criteria ( EventNotificationTemplatePeer::DATABASE_NAME );
+		$criteria->add ( EventNotificationTemplatePeer::STATUS, EventNotificationTemplateStatus::ACTIVE );
+		
+		if ($partnerId)
+			$criteria->add ( EventNotificationTemplatePeer::PARTNER_ID, array (PartnerPeer::GLOBAL_PARTNER, $partnerId ), Criteria::IN );
+		else
+			$criteria->add ( EventNotificationTemplatePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER );
+		
+		return EventNotificationTemplatePeer::doSelect ( $criteria, $con );
+	}
+	
+	/**
 	 * Retrieve event notification tamplates according to event and object type
 	 *
 	 * @param      int $eventType

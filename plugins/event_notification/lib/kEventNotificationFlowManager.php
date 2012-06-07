@@ -5,6 +5,8 @@
  */
 class kEventNotificationFlowManager implements kGenericEventConsumer
 {
+	static protected $allNotificationTemplates = null;
+	
 	/**
 	 * @var array<EventNotificationTemplate>
 	 */
@@ -142,6 +144,33 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		return true;
 	}
 
+	/**
+	 * @param int $eventType
+	 * @param int $eventObjectType
+	 * @param int $partnerId
+	 * @return array<EventNotificationTemplate>
+	 */
+	public static function getNotificationTemplates($eventType, $eventObjectType, $partnerId)
+	{
+		if(is_null(self::$allNotificationTemplates))
+		{
+			self::$allNotificationTemplates = EventNotificationTemplatePeer::retrieveByPartnerId($partnerId);
+			KalturaLog::debug("Found [" . count(self::$allNotificationTemplates) . "] templates");
+		}
+		
+		$notificationTemplates = array();
+		foreach(self::$allNotificationTemplates as $notificationTemplate)
+		{
+			/* @var $notificationTemplate EventNotificationTemplate */
+			if(	$notificationTemplate->getEventType() == $eventType && 
+				$notificationTemplate->getObjectType() == $eventObjectType &&
+				$notificationTemplate->getAutomaticDispatchEnabled()
+				)
+					$notificationTemplates[] = $notificationTemplate;
+		}
+		return $notificationTemplates;
+	}
+		
 	/* (non-PHPdoc)
 	 * @see kGenericEventConsumer::shouldConsumeEvent()
 	 */
@@ -156,19 +185,13 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		$eventType = self::getEventType($event);
 		$eventObjectType = self::getEventObjectType($event);
 		
-		$notificationTemplates = EventNotificationTemplatePeer::retrieveByEventType($eventType, $eventObjectType, $scope->getPartnerId());
-		KalturaLog::debug("Found [" . count($notificationTemplates) . "] templates for event type [$eventType] and object type [$eventObjectType]");
-		
+		$notificationTemplates = self::getNotificationTemplates($eventType, $eventObjectType, $scope->getPartnerId());
+		if(!count($notificationTemplates))
+			return false;
+			
 		foreach($notificationTemplates as $notificationTemplate)
 		{
 			/* @var $notificationTemplate EventNotificationTemplate */
-			
-			if(!$notificationTemplate->getAutomaticDispatchEnabled())
-			{
-				KalturaLog::notice("Template [" . $notificationTemplate->getId() . "] is not automatic, remove its event type to improve performance");
-				continue;
-			}
-			
 			if($this->notificationTemplatesConditionsFulfilled($notificationTemplate, $scope))
 				$this->notificationTemplates[] = $notificationTemplate;
 		}
