@@ -2815,7 +2815,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		foreach($entitledKusers as $privacyContext => $kusers)
 			$entitledKusersByContexts[] = $privacyContext . ' ' . implode(' ', $kusers) . ' ' . $privacyContext;
 		
-		return $entitledKusersByContexts;
+		return implode(' ', $entitledKusersByContexts);
 	}
 	
 	public function getAllCategoriesIds()
