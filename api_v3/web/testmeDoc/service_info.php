@@ -42,7 +42,7 @@ $serviceInfo = $serviceReflector->serviceInfo;
       {
         $actionReflector = new KalturaActionReflector($service, $actionId, $actionCallback);
         $actionInfo = $actionReflector->getActionInfo();
-        echo '<tr><td><a href="?service='.$service.'&action='.$actionId.'">'.$actionInfo->action.'</td><td>'.nl2br($actionInfo->description).'</td></tr>';
+        echo '<tr><td><a href="?service='.$service.'&action='.$actionId.'">'.$actionReflector->getActionName().'</td><td>'.nl2br($actionInfo->description).'</td></tr>';
       }
       ?>
       </table>
