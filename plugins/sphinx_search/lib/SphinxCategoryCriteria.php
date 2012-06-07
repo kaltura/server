@@ -246,6 +246,12 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		}
 		$filter->unsetByName('_eq_member');
 		
+		
+		if($filter->get('_eq_full_name'))
+		{
+			$filter->set('_eq_full_name', $filter->get('_eq_full_name') . category::FULL_NAME_EQUAL_MATCH_STRING);
+		}
+		
 		if($filter->get('_likex_name_or_reference_id'))
 		{
 			$freeTexts = $filter->get('_likex_name_or_reference_id');

@@ -110,21 +110,31 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				if(count($vals))
 				{
 					$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-					foreach ($vals as $key => $val)
-					{
-						if (strstr($val, ' '))
-						{
-							if (strstr($val, ' '))
-								$val = "^$val$";
-								
-							$vals[$key] = $val;
-						}
-					}
+					$val = '((^' . implode('$) | (^', $vals) . '$))';
+					return "@$sphinxField $val";
+				}
+				break;
+				
+			case KalturaCriteria::IN_LIKE:
+				$vals = is_array($value) ? $value : explode(',', $value);
 					
+				foreach($vals as $valIndex => $valValue)
+				{
+					if(!is_numeric($valValue) && strlen($valValue) <= 1)
+						unset($vals[$valIndex]);
+					else
+						$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
+				}
+				
+				if(count($vals))
+				{
+					$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
 					$val = '((' . implode(') | (', $vals) . '))';
 					return "@$sphinxField $val";
 				}
 				break;
+				
+				
 				
 			default:
 				$value = SphinxUtils::escapeString($value, $fieldsEscapeType);
