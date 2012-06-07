@@ -73,7 +73,7 @@ class kEntitlementUtils
 			if($kuserId != '')
 			{
 				// kuser is set on the entry as creator or uploader
-				if ($entry->getKuserId() == $kuserId || $entry->getCreatorKuserId() == $kuserId)
+				if ($kuserId != '' && ($entry->getKuserId() == $kuserId || $entry->getCreatorKuserId() == $kuserId))
 				{
 					KalturaLog::debug('Entry entitled: ks user is the same as entry->kuserId or entry->creatorKuserId [' . $kuserId . ']');
 					return true;
@@ -270,7 +270,7 @@ class kEntitlementUtils
 			
 			foreach ($categoryPrivacyContexts as $categoryPrivacyContext)
 			{
-				if($categoryPrivacyContext == '')
+				if(trim($categoryPrivacyContext) == '')
 					 $categoryPrivacyContext = self::DEFAULT_CONTEXT;
 					 
 				if(!isset($privacyContexts[$categoryPrivacyContext]) || $privacyContexts[$categoryPrivacyContext] > $categoryPrivacy)
