@@ -483,6 +483,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$fieldsEscapeType = $this->getSearchIndexFieldsEscapeType($fieldName);
 			
 			KalturaLog::debug("Attach field[$fieldName] as sphinx field[$sphinxField] of type [$type] and comparison[$operator] for value[$valStr]");
+
 			switch($operator)
 			{
 				case baseObjectFilter::MULTI_LIKE_OR:
@@ -535,8 +536,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($vals[$valIndex]);
-						elseif(preg_match('/[\s\t]/', $valValue))
-							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
 						else
 							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
 					}
@@ -549,8 +548,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						$filter->unsetByName($field);
 					}
 					break;
-				
-				
+					
 				case baseObjectFilter::EQ:
 					if(is_numeric($val) || strlen($val) > 0)
 					{

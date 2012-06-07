@@ -28,6 +28,8 @@ class category extends Basecategory implements IIndexable
 	
 	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 0;
 	
+	const FULL_NAME_EQUAL_MATCH_STRING = 'fullNameEqualMatchString';
+	
 	const MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY = 10;
 	
 	private static $indexFieldTypes = array(
@@ -1408,8 +1410,10 @@ class category extends Basecategory implements IIndexable
 			
 			$parsedFullName .= md5($fullName) . ' ';
 		}
+		
+		$parsedFullName .= md5($this->getFullName() . category::FULL_NAME_EQUAL_MATCH_STRING);
 			
-		return $parsedFullName;
+		return $parsedFullName ;
 	}
 	
 	/**

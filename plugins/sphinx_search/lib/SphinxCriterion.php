@@ -134,8 +134,6 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				}
 				break;
 				
-				
-				
 			default:
 				$value = SphinxUtils::escapeString($value, $fieldsEscapeType);
 				return "@$sphinxField $value";

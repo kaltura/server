@@ -252,6 +252,18 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$filter->set('_eq_full_name', $filter->get('_eq_full_name') . category::FULL_NAME_EQUAL_MATCH_STRING);
 		}
 		
+		if($filter->get('_in_full_name'))
+		{
+			$fullnames = explode(',', $filter->get('_in_full_name'));
+			
+			$fullnameIn = '';
+			foreach($fullnames as $fullname)
+				$fullnameIn .= $fullname . category::FULL_NAME_EQUAL_MATCH_STRING . ',';
+			
+			$filter->set('_matchor_full_name', $fullnameIn);
+			$filter->unsetByName('_in_full_name');
+		}		
+		
 		if($filter->get('_likex_name_or_reference_id'))
 		{
 			$freeTexts = $filter->get('_likex_name_or_reference_id');

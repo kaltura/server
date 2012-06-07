@@ -2774,7 +2774,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$entitledKusersNoPrivacyContext[] = $this->getCreatorKuserId();
 		
 		$entitledKusers = array();
-		$entitledKusers[kEntitlementUtils::ENTRY_PRIVACY_CONTEXT] = array_unique($entitledKusers);
+		
+		if(count(array_unique($entitledKusers)))
+			$entitledKusers[kEntitlementUtils::ENTRY_PRIVACY_CONTEXT] = array_unique($entitledKusers);
 		
 		if ($this->getAllCategoriesIds() == '')
 			return implode(' ', $entitledKusers);
@@ -2797,6 +2799,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		//get all memebrs
 		foreach ($categories as $category)
 		{
+			if(!count($category->getMembers()))
+				continue;
+				
 			$privacyContexts = explode(',', $category->getPrivacyContexts());
 			if(!count($privacyContexts))
 				$privacyContexts = array(kEntitlementUtils::DEFAULT_CONTEXT); 
@@ -2804,7 +2809,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			foreach ($privacyContexts as $privacyContext)
 			{
 				if(isset($entitledKusers[$privacyContext]))
-					$entitledKusers[$privacyContext] = array_merge($entitledKusers, explode(',', $category->getMembers()));
+					$entitledKusers[$privacyContext] = array_merge($entitledKusers[$privacyContext], explode(',', $category->getMembers()));
 				else
 					$entitledKusers[$privacyContext] = explode(',', $category->getMembers());
 			}

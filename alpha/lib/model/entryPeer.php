@@ -317,14 +317,14 @@ class entryPeer extends BaseentryPeer
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$privacyContexts = kEntitlementUtils::getPrivacyContextSearch();
-			$critEntitled = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, Criteria::IN);
+			$critEntitled = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, KalturaCriteria::IN_LIKE);
 			$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 
 			if(kCurrentContext::$ks_kuser_id)
 			{
 				//ENTITLED_KUSERS field includes $this->entitledUserEdit, $this->entitledUserEdit, and users on work groups categories.
 				$entitledKuserByPrivacyContext = kEntitlementUtils::getEntitledKuserByPrivacyContext();
-				$critEntitledKusers = $c->getNewCriterion(self::ENTITLED_KUSERS, $entitledKuserByPrivacyContext, Criteria::IN);
+				$critEntitledKusers = $c->getNewCriterion(self::ENTITLED_KUSERS, $entitledKuserByPrivacyContext, KalturaCriteria::IN_LIKE);
 				$critEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 				
 				$categoriesIds = array();
