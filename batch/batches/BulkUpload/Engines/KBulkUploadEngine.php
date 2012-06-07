@@ -104,9 +104,10 @@ abstract class KBulkUploadEngine
 		if(function_exists('strptime'))
 		{
 			$ret = strptime($str, self::BULK_UPLOAD_DATE_FORMAT . ($dateOnly ? '' : self::BULK_UPLOAD_TIME_FORMAT));
+			KalturaLog::debug("### ".print_r($ret, true));
 			if($ret)
 			{
-			    $date = mktime($ret["tm_hour"], $ret["tm_min"], $ret["tm_sec"], $ret["tm_mon"], $ret["tm_mday"], $ret["tm_year"]);
+			    $date = gmmktime($ret["tm_hour"], $ret["tm_min"], $ret["tm_sec"], $ret["tm_mon"], $ret["tm_mday"], $ret["tm_year"]);
 			    KalturaLog::debug("Formated Date [$date] " . date('Y-m-d\TH:i:s', $date));
 				return $date;
 			}
