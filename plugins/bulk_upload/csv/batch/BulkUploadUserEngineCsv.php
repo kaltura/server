@@ -134,6 +134,8 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			return null;
 		}	
 		
+		$bulkUploadResult->dateOfBirth = self::parseFormatedDate($bulkUploadResult->dateOfBirth); 
+		
 		return $bulkUploadResult;
 	}
 	
