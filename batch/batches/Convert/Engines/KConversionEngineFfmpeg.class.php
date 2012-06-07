@@ -54,7 +54,8 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 		$kfPrms = explode("_",$kfPrms);
 		$forcedKF=null;
 		for($t=0,$tr=0;$t<=$kfPrms[0]; $t+=$kfPrms[1], $tr+=round($kfPrms[1])){
-			if(round($t)>$tr) {
+			// The check bellow is to prevent 'dripping' of the kf timing
+			if($tr && round($t)>$tr) {
 				$t=$tr;
 			}
 			$forcedKF.=",".round($t,4);
