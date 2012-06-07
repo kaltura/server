@@ -307,7 +307,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 	        $categoryUser->permissionLevel = $bulkUploadCategoryUserResult->permissionLevel;
 	        
 	    $categoryUser->updateMethod = KalturaUpdateMethodType::AUTOMATIC;
-	    if ($bulkUploadCategoryUserResult->updateMethod)
+	    if (!is_null($bulkUploadCategoryUserResult->updateMethod))
 	        $categoryUser->updateMethod = $bulkUploadCategoryUserResult->updateMethod; 
 	        
 	    return $categoryUser;
