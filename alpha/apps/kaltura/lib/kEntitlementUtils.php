@@ -30,11 +30,17 @@ class kEntitlementUtils
 	{
 		// entry is entitled when entitlement is disable
 		if(!self::getEntitlementEnforcement())
+		{
+			KalturaLog::debug('Entry entitled: entitlement disabled');
 			return true;
+		}
 		
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		if($ks && $ks->isWidgetSession() && $ks->getDisableEntitlementForEntry() == $entry->getId())
+		{
+			KalturaLog::debug('Entry entitled: widget session that disble entitlement for this entry');
 			return true;
+		}
 			
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 		$c->add(categoryPeer::ID, explode(',', $entry->getCategoriesIds()), Criteria::IN);
@@ -68,18 +74,27 @@ class kEntitlementUtils
 			{
 				// kuser is set on the entry as creator or uploader
 				if ($entry->getKuserId() == $kuserId || $entry->getCreatorKuserId() == $kuserId)
+				{
+					KalturaLog::debug('Entry entitled: ks user is the same as entry->kuserId or entry->creatorKuserId [' . $kuserId . ']');
 					return true;
+				}
 				
 				// kuser is set on the entry entitled users edit or publish
 				$entitledKusers = array_merge(explode(',', $entry->getEntitledKusersEdit()), explode(',', $entry->getEntitledKusersPublish()));
 				if(in_array($kuserId, $entitledKusers))
-					return true; 
+				{
+					KalturaLog::debug('Entry entitled: ks user is the same as entry->entitledKusersEdit or entry->entitledKusersPublish');
+					return true;
+				} 
 			}
 			
 			// entry that doesn't belong to any category is public
-			$categoryEntries = categoryEntryPeer::retrieveByEntryId($entry->getId());
+			$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entry->getId());
 			if(!count($categoryEntries))
+			{
+				KalturaLog::debug('Entry entitled: entry does not belong to any category');
 				return true;
+			}
 		
 						
 			// kuser is set on the category as member
@@ -99,8 +114,12 @@ class kEntitlementUtils
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 
 		if($category)
+		{
+			KalturaLog::debug('Entry entitled: ks user is a member of this category or category privacy is set to public of authenticated');
 			return true;
+		}
 		
+		KalturaLog::debug('Entry not entitled');
 		return false;
 	} 	
 
