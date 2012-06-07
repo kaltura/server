@@ -97,6 +97,12 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	 */
 	public $emailRecipients;
 	
+	/**
+	 * Number of objects that finished on error status
+	 * @var int
+	 */
+	public $numOfErrorObjects;
+	
 	
 	private static $map_between_objects = array
 	(
