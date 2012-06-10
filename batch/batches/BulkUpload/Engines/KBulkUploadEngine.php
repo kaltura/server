@@ -92,7 +92,7 @@ abstract class KBulkUploadEngine
 			
 		$reflect = new ReflectionClass($class);
 		$constants = $reflect->getConstants();
-		return in_array($value, $constants);
+		return in_array($value, $constants, true);
 	}
 	
 	/**
