@@ -128,11 +128,6 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
     			    $bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
     			    $bulkUploadResult->errorDescription = "Mandatory parameters missing for action [".$bulkUploadResult->action ."] - categoryId/referenceId";
     		    }
-                else 
-                {
-                    $bulkUploadResult->objectId = $this->calculateIdToUpdate($bulkUploadResult);
-                } 
-
 		        break;
 		    
 		    case KalturaBulkUploadAction::DELETE:
@@ -141,10 +136,6 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
     		        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
     			    $bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
     			    $bulkUploadResult->errorDescription = "Mandatory parameters missing for action [".$bulkUploadResult->action ."]";
-    		    }
-    		    else
-    		    {
-    		        $bulkUploadResult->objectId = $this->calculateIdToUpdate($bulkUploadResult);
     		    }
 		        break;
 		}
@@ -201,12 +192,14 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
     		            break;
     		        
     		        case KalturaBulkUploadAction::UPDATE:
+    		            $bulkUploadResult->objectId = $this->calculateIdToUpdate($bulkUploadResult);
     		            $category = $this->createCategoryFromResultAndJobData($bulkUploadResult);
             			$bulkUploadResultChunk[] = $bulkUploadResult;
                 		$requestResults[] = $this->kClient->category->update($bulkUploadResult->objectId, $category);
     		            break;
     		            
     		        case KalturaBulkUploadAction::DELETE:
+    		            $bulkUploadResult->objectId = $this->calculateIdToUpdate($bulkUploadResult);
     		            $bulkUploadResultChunk[] = $bulkUploadResult;
                 		$requestResults[] = $this->kClient->category->delete($bulkUploadResult->objectId);
     		            break;
