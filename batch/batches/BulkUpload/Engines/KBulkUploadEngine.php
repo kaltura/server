@@ -85,7 +85,7 @@ abstract class KBulkUploadEngine
 	 * @param string $value
 	 * @return bool
 	 */
-	protected function isValidEnaumValue($class, $value)
+	protected function isValidEnumValue($class, $value)
 	{
 		if(!class_exists($class))
 			return false;
