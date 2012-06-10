@@ -254,8 +254,9 @@ function serveAction($id)
 		    
 		kJobsManager::abortJob($id, BatchJobType::BULKUPLOAD, true);
 		
+		$batchJobLog = BatchJobLogPeer::retrieveByBatchJobId($id);
 		$ret = new KalturaBulkUpload();
-		$ret->fromObject($batchJob);
+		$ret->fromObject($batchJobLog);
 		return $ret;
 	}
 }
