@@ -266,6 +266,9 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 	    if (!is_null($bulkUploadCategoryResult->defaultPermissionLevel))
 	        $category->defaultPermissionLevel = $bulkUploadCategoryResult->defaultPermissionLevel;
 
+	    if (!is_null($bulkUploadCategoryResult->userJoinPolicy))
+	        $category->userJoinPolicy = $bulkUploadCategoryResult->userJoinPolicy;
+	        
 	    if (!is_null($bulkUploadCategoryResult->partnerSortValue))
 	        $category->partnerSortValue = $bulkUploadCategoryResult->partnerSortValue;
 
