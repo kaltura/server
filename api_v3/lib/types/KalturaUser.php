@@ -142,17 +142,18 @@ class KalturaUser extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var string
+	 * @filter likex
 	 */
 	public $firstName;
 	
 	/**
 	 * @var string
+	 * @filter likex
 	 */
 	public $lastName;
 		
 	/**
 	 * @var bool
-	 * @filter eq
 	 */
 	public $isAdmin;
 	
