@@ -257,11 +257,20 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 	    if ($bulkUploadCategoryResult->appearInList)
 	        $category->appearInList = $bulkUploadCategoryResult->appearInList;
 	        
-	    if ($bulkUploadCategoryResult->inheritance)
-	        $category->inheritance = $bulkUploadCategoryResult->inheritance;
+	    if ($bulkUploadCategoryResult->inheritanceType)
+	        $category->inheritanceType = $bulkUploadCategoryResult->inheritanceType;
 	        
 	    if ($bulkUploadCategoryResult->owner)
 	        $category->owner = $bulkUploadCategoryResult->owner;
+
+	    if (!is_null($bulkUploadCategoryResult->defaultPermissionLevel))
+	        $category->defaultPermissionLevel = $bulkUploadCategoryResult->defaultPermissionLevel;
+
+	    if (!is_null($bulkUploadCategoryResult->partnerSortValue))
+	        $category->partnerSortValue = $bulkUploadCategoryResult->partnerSortValue;
+
+	    if ($bulkUploadCategoryResult->partnerData)
+	        $category->partnerData = $bulkUploadCategoryResult->partnerData;
 	        
 	    return $category;
 	}
