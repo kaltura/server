@@ -19,6 +19,8 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 		"statusIn" => "_in_status",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
+		"firstNameEqual" => "_eq_first_name",
+		"lastNameEqual" => "_eq_last_name",
 		"isAdminEqual" => "_eq_is_admin",
 	);
 
@@ -96,7 +98,17 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * @var KalturaNullableBoolean
+	 * @var string
+	 */
+	public $firstNameEqual;
+
+	/**
+	 * @var string
+	 */
+	public $lastNameEqual;
+
+	/**
+	 * @var bool
 	 */
 	public $isAdminEqual;
 }
