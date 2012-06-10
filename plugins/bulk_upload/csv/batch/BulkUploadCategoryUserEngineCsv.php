@@ -107,21 +107,21 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 			$bulkUploadResult->errorDescription = "Missing mandatory parameter categoryId";
 		}
 		
-		if ($bulkUploadResult->requiredObjectStatus && !$this->isValidEnaumValue('KalturaCategoryUserStatus', $bulkUploadResult->requiredObjectStatus))
+		if ($bulkUploadResult->requiredObjectStatus && !$this->isValidEnumValue('KalturaCategoryUserStatus', $bulkUploadResult->requiredObjectStatus))
 	    {
 	        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
 			$bulkUploadResult->errorDescription = "Wrong value passed for property status.";
 	    }
 	    		
-		if ($bulkUploadResult->permissionLevel && !$this->isValidEnaumValue('KalturaCategoryUserPermissionLevel', $bulkUploadResult->permissionLevel))
+		if ($bulkUploadResult->permissionLevel && !$this->isValidEnumValue('KalturaCategoryUserPermissionLevel', $bulkUploadResult->permissionLevel))
 	    {
 	        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
 			$bulkUploadResult->errorDescription = "Wrong value passed for property permissionLevel.";
 	    }
 	    		
-		if ($bulkUploadResult->updateMethod && !$this->isValidEnaumValue('KalturaUpdateMethodType', $bulkUploadResult->updateMethod))
+		if ($bulkUploadResult->updateMethod && !$this->isValidEnumValue('KalturaUpdateMethodType', $bulkUploadResult->updateMethod))
 	    {
 	        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
