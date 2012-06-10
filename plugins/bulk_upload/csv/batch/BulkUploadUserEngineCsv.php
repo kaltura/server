@@ -102,6 +102,20 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$bulkUploadResult->errorDescription = "Format of property dateOfBirth is incorrect.";
 		}
 		
+		if ($bulkUploadResult->gender && !self::isValidEnumValue("KalturaGender", $bulkUploadResult->gender))
+		{
+		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+			$bulkUploadResult->errorDescription = "Wrong value passed for property gender";
+		}
+		
+	    if (!is_null($bulkUploadResult->isAdmin) && !in_array($bulkUploadResult->isAdmin, array (1, 0), true))
+		{
+		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+			$bulkUploadResult->errorDescription = "Wrong value passed for property isAdmin";
+		}
+		
 	    if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
 		{
 		    $this->impersonate();
