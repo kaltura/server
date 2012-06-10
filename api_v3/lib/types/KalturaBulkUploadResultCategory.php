@@ -42,7 +42,7 @@ class KalturaBulkUploadResultCategory extends KalturaBulkUploadResult
     /**
      * @var int
      */
-    public $inheritance;
+    public $inheritanceType;
     
     /**
      * @var int
@@ -78,7 +78,7 @@ class KalturaBulkUploadResultCategory extends KalturaBulkUploadResult
 	    "tags",
 	    "appearInList",
 	    "privacy",
-	    "inheritance",
+	    "inheritanceType",
 	    "userJoinPolicy",
 	    "defaultPermissionLevel",
 	    "owner",
