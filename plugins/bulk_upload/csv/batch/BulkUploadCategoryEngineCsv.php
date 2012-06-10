@@ -322,7 +322,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		    "referenceId",
 		    "contributionPolicy",
 		    "privacy",
-		    "inheritance",
+		    "inheritanceType",
 		    "owner",
 			"userJoinPolicy",
 		    "appearInList",
