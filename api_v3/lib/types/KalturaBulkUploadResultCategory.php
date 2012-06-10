@@ -64,6 +64,11 @@ class KalturaBulkUploadResultCategory extends KalturaBulkUploadResult
      */
     public $contributionPolicy; 
     
+    /**
+     * @var int
+     */
+    public $partnerSortValue;
+    
     private static $mapBetweenObjects = array
 	(
 	    "relativePath",
@@ -78,6 +83,7 @@ class KalturaBulkUploadResultCategory extends KalturaBulkUploadResult
 	    "defaultPermissionLevel",
 	    "owner",
 	    "contributionPolicy",
+	    "partnerSortValue",
 	);
 	
     public function getMapBetweenObjects()
