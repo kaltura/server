@@ -17,7 +17,7 @@ class BulkUploadResultCategory extends BulkUploadResult
     const REFERENCE_ID = "reference_id";
     const APPEAR_IN_LIST = "appear_in_list";
     const PRIVACY = "privacy";
-    const INHERITANCE = "inheritance";
+    const INHERITANCE = "inheritanceType";
     const USER_JOIN_POLICY = "user_join_policy";
     const DEFAULT_PERMISSION_LEVEL = "default_permission_level";
     const OWNER = "owner";
