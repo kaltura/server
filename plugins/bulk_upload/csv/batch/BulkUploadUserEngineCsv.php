@@ -109,7 +109,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$bulkUploadResult->errorDescription = "Wrong value passed for property gender";
 		}
 		
-	    if (!is_null($bulkUploadResult->isAdmin) && !in_array($bulkUploadResult->isAdmin, array (1, 0), true))
+	    if (!is_null($bulkUploadResult->isAdmin) && !in_array($bulkUploadResult->isAdmin, array (1, 0)))
 		{
 		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
