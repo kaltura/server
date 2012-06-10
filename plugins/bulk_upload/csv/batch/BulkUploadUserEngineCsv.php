@@ -272,6 +272,9 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	    
 	    if ($bulkUploadUserResult->roleIds)
 	        $user->roleIds = $bulkUploadUserResult->roleIds;
+	      
+	    if ($bulkUploadUserResult->partnerData)
+	        $user->partnerData = $bulkUploadUserResult->partnerData;
 
 	    return $user;
 	}
