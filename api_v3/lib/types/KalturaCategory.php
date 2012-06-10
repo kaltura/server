@@ -365,12 +365,9 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		
 		$this->validatePropertyMinLength("name", 1);
 		$this->validatePropertyMaxLength("name", categoryPeer::MAX_CATEGORY_NAME);
-		
 		$this->validateCategory();
-		
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -430,9 +427,9 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			}
 		}
 			
-		if (($this->inheritanceType == KalturaInheritanceType::INHERIT) && 
-			($this->parentId == null) && 
-			(!is_null($sourceObject)) && $sourceObject->getParentId())
+		if ($this->inheritanceType == KalturaInheritanceType::INHERIT && 
+			$this->parentId == null && 
+			(!$sourceObject || $sourceObject->getParentId()))
 		{
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_MUST_SET_PARENT_CATEGORY);
 		}
