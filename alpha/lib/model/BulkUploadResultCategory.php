@@ -22,6 +22,7 @@ class BulkUploadResultCategory extends BulkUploadResult
     const DEFAULT_PERMISSION_LEVEL = "default_permission_level";
     const OWNER = "owner";
     const CONTRIBUTION_POLICY = "contribution_policy";
+    const PARTNER_SORT_VALUE = "partner_sort_value";
     
     /* (non-PHPdoc)
      * @see BulkUploadResult::handleRelatedObjects()
@@ -82,4 +83,8 @@ class BulkUploadResultCategory extends BulkUploadResult
 	
     public function getContributionPolicy()	{return $this->getFromCustomData(self::CONTRIBUTION_POLICY);}
 	public function setContributionPolicy($v)	{$this->putInCustomData(self::CONTRIBUTION_POLICY, $v);}
+
+	public function getPartnerSortValue()	{return $this->getFromCustomData(self::PARTNER_SORT_VALUE);}
+	public function setPartnerSortValue($v)	{$this->putInCustomData(self::PARTNER_SORT_VALUE, $v);}
+	
 }
