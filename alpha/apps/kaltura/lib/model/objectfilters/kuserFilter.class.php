@@ -28,6 +28,8 @@ class kuserFilter extends baseObjectFilter
 				"_eq_partner_id" , 
 				"_eq_puser_id",
 				"_in_puser_id",
+			    "_eq_first_name",
+			    "_eq_last_name",
 				"_eq_id",
 				"_in_id",
 				"_eq_status",
