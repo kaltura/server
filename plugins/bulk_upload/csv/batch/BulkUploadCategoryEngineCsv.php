@@ -334,6 +334,8 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 			"userJoinPolicy",
 		    "appearInList",
 		    "defaultPermissionLevel",
+		    "partnerSortValue",
+		    "partnerData",
 		);
 	}
 	
