@@ -62,6 +62,15 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		return categoryEntryPeer::doSelect($c);
 	}
 	
+	public static function retrieveActiveAndPendingByEntryId($entryId)
+	{
+		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entryId);
+		$c->addAnd(categoryEntryPeer::STATUS, array(CategoryEntryStatus::PENDING, CategoryEntryStatus::ACTIVE), Criteria::IN);
+		
+		return categoryEntryPeer::doSelect($c);
+	}
+	
 	public static function selectByEntryId($entryId)
 	{
 		$c = new Criteria();
@@ -191,6 +200,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 				$categoryEntry->setCategoryId($category->getId());
 				$categoryEntry->setEntryCategoriesAddedIds($alreadyAddedCatIds);
 				$categoryEntry->setPartnerId($entry->getPartnerId());
+				$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
 				$categoryEntry->save();
 			}
 			
@@ -226,7 +236,8 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 					else
 					{
 						$categoryEntryToDelete->setEntryCategoriesRemovedIds($alreadyRemovedCatIds);
-						$categoryEntryToDelete->delete();
+						$categoryEntryToDelete->setStatus(CategoryEntryStatus::DELETED);
+						$categoryEntryToDelete->save();
 					}
 				}
 				

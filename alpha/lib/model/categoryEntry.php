@@ -49,14 +49,13 @@ class categoryEntry extends BasecategoryEntry {
 	public function postInsert(PropelPDO $con = null)
 	{	
 		parent::postInsert($con);
-		
 		categoryPeer::setUseCriteriaFilter(false);
 		$category = categoryPeer::retrieveByPK($this->getCategoryId());
 		categoryPeer::setUseCriteriaFilter(true);
-		
+
 		if ($this->getStatus() == CategoryEntryStatus::PENDING)
 			$category->incrementPendingEntriesCount();
-		
+
 		if($this->getStatus() == CategoryEntryStatus::ACTIVE)
 		{
 			$entry = entryPeer::retrieveByPK($this->getEntryId());
