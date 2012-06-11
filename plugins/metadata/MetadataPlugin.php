@@ -279,15 +279,15 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	{
 		KalturaLog::debug("parseFormatedDate($str)");
 		
-		if(function_exists('strptime'))
-		{
-			$ret = strptime($str, self::BULK_UPLOAD_DATE_FORMAT);
-			if($ret)
-			{
-				KalturaLog::debug("Formated Date [$ret] " . date('Y-m-d\TH:i:s', $ret));
-				return $ret;
-			}
-		}
+//		if(function_exists('strptime'))
+//		{
+//			$ret = strptime($str, self::BULK_UPLOAD_DATE_FORMAT);
+//			if($ret)
+//			{
+//				KalturaLog::debug("Formated Date [$ret] " . date('Y-m-d\TH:i:s', $ret));
+//				return $ret;
+//			}
+//		}
 			
 		$fields = null;
 		$regex = self::getDateFormatRegex($fields);
@@ -525,7 +525,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	            list ($prefix, $metadataProfileSystemName, $metadataProfileFieldName) = explode(self::BULK_UPLOAD_METADATA_SYSTEMNAME_SEPARATOR, $key);
 	            if (!$prefix || !$metadataProfileSystemName || !$metadataProfileFieldName)
 	            {
-	                $errorMessage = "Unexpected key sturcture. Expected metadata::ProfileSystemName::FieldSystemName.";
+	                $errorMessage = "Unexpected key structure. Expected metadata::ProfileSystemName::FieldSystemName.";
                     KalturaLog::err($errorMessage);
                     self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 				    continue; 
