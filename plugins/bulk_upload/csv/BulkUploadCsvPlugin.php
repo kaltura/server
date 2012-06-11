@@ -110,10 +110,12 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			
 		$STDOUT = fopen('php://output', 'w');
 		$data = $batchJob->getData();
-			
+
 		foreach($bulkUploadResults as $bulkUploadResult)
 		{
 		    /* @var $bulkUploadResult BulkUploadResult */
+            $values[] = $bulkUploadResult->getAction();
+            		    
 		    switch ($bulkUploadResult->getObjectType())
 		    {
 		        case BulkUploadObjectType::ENTRY:
