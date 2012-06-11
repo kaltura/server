@@ -115,9 +115,12 @@ class categoryEntry extends BasecategoryEntry {
 			$category->decrementPendingEntriesCount();
 		
 		//only categories with no context are saved on entry - this is only for Backward compatible 
-		if($entry && !categoryEntryPeer::getSkipSave() && $category->getPrivacyContext() == '')
+		if($entry && !categoryEntryPeer::getSkipSave())
 		{
-			$entry->setCategories($entry->getCategories() . entry::ENTRY_CATEGORY_SEPARATOR . $category->getFullName());
+			if($category->getPrivacyContext() == '')
+				$entry->setCategories($entry->getCategories() . entry::ENTRY_CATEGORY_SEPARATOR . $category->getFullName());
+				
+			$entry->setUpdatedAt(time());
 			$entry->save();
 		}
 	}
