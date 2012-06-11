@@ -114,8 +114,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		foreach($bulkUploadResults as $bulkUploadResult)
 		{
 		    /* @var $bulkUploadResult BulkUploadResult */
-            $values[] = $bulkUploadResult->getAction();
-            $values[] = $bulkUploadResult->getStatus();		    
+            	    
             
 		    switch ($bulkUploadResult->getObjectType())
 		    {
@@ -126,7 +125,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		            $values = self::writeCategoryBulkUploadResults($bulkUploadResult, $data);
 		            break;
 		        case BulkUploadObjectType::CATEGORY_USER:
-		            $valeus = self::writeCategoryUserBulkUploadResults($bulkUploadResult, $data);
+		            $values = self::writeCategoryUserBulkUploadResults($bulkUploadResult, $data);
 		            break;
 		        case BulkUploadObjectType::USER: 
 		            $values = self::writeUserBulkUploadResults($bulkUploadResult, $data);
@@ -136,6 +135,8 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		            break;
 		    }
 			
+		    $values[] = $bulkUploadResult->getAction();
+            $values[] = $bulkUploadResult->getStatus();	
 			$values[] = $bulkUploadResult->getObjectId();
 			$values[] = $bulkUploadResult->getObjectStatus();
 			$values[] = $bulkUploadResult->getErrorDescription();
