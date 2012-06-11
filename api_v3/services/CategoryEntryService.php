@@ -62,8 +62,8 @@ class CategoryEntryService extends KalturaBaseService
 		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
 		{
 			if(!$categoryKuser ||
-				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER || 
-				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR)
+				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
+				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
 				$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
 		}
 		
