@@ -267,7 +267,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	
 	/**
 	 * Entries moderation 
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 */
 	public $moderation;
 	
