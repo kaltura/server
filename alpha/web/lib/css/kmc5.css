@@ -189,7 +189,7 @@ fieldset{ border:0 none; position:relative; }
 	  
 	#modal div.right { float: left; margin: 6px 18px 6px 0; }
 	#modal div.center { text-align: center; }
-	#modal input#html5_support { width: auto;  }
+	#modal input#html5_support, #modal input#https_support { width: auto;  }
 	.preview_url { padding: 2px; background: #FFFFBC; }
 	#modal input, textarea { color: #777; }
 	#modal div.note { clear: both; font-size: 11px; color: #333 }
@@ -197,7 +197,8 @@ fieldset{ border:0 none; position:relative; }
 	#modal div.red { color: #ff0000; }
 	#modal select { font-size: 14px; }
 
-	#player_select, #delivery_type { width: 220px; }
+	#player_select { width: 320px; }
+	#delivery_type { width: 220px; }
 
 	/* jw */
 	#modal input { background:#F7F7F7;}

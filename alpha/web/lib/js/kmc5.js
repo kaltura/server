@@ -544,6 +544,7 @@ kmc.preview_embed = {
 		((id == "multitab_playlist") ? '' : kmc.preview_embed.buildSelect(is_playlist, uiconf_id)) +
 		((live_bitrates) ? '' : kmc.preview_embed.buildRtmpOptions()) +
 		kmc.preview_embed.buildHTML5Option(id, name, is_playlist, previewOnly, kmc.vars.partner_id, uiconf_id, has_mobile_flavors, is_video) +
+		kmc.preview_embed.buildHTTPSOption() + 		
 		kmc.preview_embed.previewUrl() + 
 		'<div class="embed_code_div"><div class="label embedcode">Embed Code:</div> <div class="right"><textarea id="embed_code" rows="5" cols=""' +
 		'readonly="true">' + embed_code + '</textarea></div><br class="clear" />' +
@@ -575,10 +576,14 @@ kmc.preview_embed = {
 		});
 			
 		$("#html5_support").change(function(){
-			var html5_support = ($(this).attr("checked")) ? true : false;
-			var val = kmc.preview_embed.buildKalturaEmbed(id,name,description, is_playlist, uiconf_id, html5_support);
+			var val = kmc.preview_embed.buildKalturaEmbed(id,name,description, is_playlist, uiconf_id);
 			$("#embed_code").val(val);
 		});
+		
+		$("#https_support").change(function(){
+			var val = kmc.preview_embed.buildKalturaEmbed(id,name,description, is_playlist, uiconf_id);
+			$("#embed_code").val(val);
+		});		
 			
 		// show the embed code & enable the checkbox if its not a preview
 		if (previewOnly==false) {
@@ -648,6 +653,11 @@ kmc.preview_embed = {
 		return html;
 	},
 	
+	buildHTTPSOption: function() {
+		return '<div class="label checkbox"><input id="https_support" type="checkbox" /> <label for="https_support">' + 
+				'Modify embed code to use HTTPS secure delivery</label></div><br />';
+	},
+	
 	previewUrl: function(){
 		return '<div class="label">View a standalone page with this player: <span class="preview_url"><img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...</span></div>';
 	},
@@ -709,7 +719,10 @@ kmc.preview_embed = {
 
 	// id = entry id, asset id or playlist id; name = entry name or playlist name;
 	// uiconf = uiconfid (normal scenario) or uiconf details json (for #content|Manage->drill down->flavors->preview)
-	buildKalturaEmbed : function(id, name, description, is_playlist, uiconf, html5) {
+	buildKalturaEmbed : function(id, name, description, is_playlist, uiconf ) {
+		
+		var html5_support = ($("#html5_support").attr("checked")) ? true : false;
+		var https_support = ($("#https_support").attr("checked")) ? true : false;		
 
 		name = kmc.utils.escapeQuotes(name); 
 		var uiconf_id = uiconf.uiconf_id || uiconf,
@@ -717,7 +730,7 @@ kmc.preview_embed = {
 		cache_st = kmc.preview_embed.setCacheStartTime(),
 		embed_code;
 
-		embed_code = (html5) ? kmc.preview_embed.embed_code_template.script_tag + '\n' + kmc.preview_embed.embed_code_template.object_tag : kmc.preview_embed.embed_code_template.object_tag;
+		embed_code = (html5_support) ? kmc.preview_embed.embed_code_template.script_tag + '\n' + kmc.preview_embed.embed_code_template.object_tag : kmc.preview_embed.embed_code_template.object_tag;
 		if(!kmc.vars.jw) { // more efficient to add "&& !kmc.vars.silverlight" (?)
 			kmc.vars.embed_code_delivery_type = kmc.vars.embed_code_delivery_type || "http";
 			switch( kmc.vars.embed_code_delivery_type ) {
@@ -761,6 +774,12 @@ kmc.preview_embed = {
 		embed_code = embed_code.replace("{DESCRIPTION}", description);
 		embed_code = embed_code.replace("{IFRAME_URL}", iframe_url); 
 		embed_code = embed_code.replace("{SCRIPT_URL}", script_url); 
+		
+		if( https_support ) {
+			embed_code = embed_code.replace(/http:/g, "https:");
+		} else {
+			embed_code = embed_code.replace(/https:/g, "http:");
+		}
 
 		return embed_code;
 	},
