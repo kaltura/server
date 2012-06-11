@@ -115,7 +115,8 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		{
 		    /* @var $bulkUploadResult BulkUploadResult */
             $values[] = $bulkUploadResult->getAction();
-            		    
+            $values[] = $bulkUploadResult->getStatus();		    
+            
 		    switch ($bulkUploadResult->getObjectType())
 		    {
 		        case BulkUploadObjectType::ENTRY:
