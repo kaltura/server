@@ -61,6 +61,7 @@ class CategoryEntryService extends KalturaBaseService
 		
 		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
 		{
+			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::$ks_kuser_id);
 			if(!$categoryKuser ||
 				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
 				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
