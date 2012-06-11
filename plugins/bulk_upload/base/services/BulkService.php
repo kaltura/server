@@ -271,10 +271,10 @@ class BulkService extends KalturaBaseService
 	function serveAction($id)
 	{
 		$c = new Criteria();
-		$c->addAnd(BatchJobLogPeer::JOB_ID, $id);
-		$c->addAnd(BatchJobLogPeer::PARTNER_ID, $this->getPartnerId());
-		$c->addAnd(BatchJobLogPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
-		$batchJob = BatchJobLogPeer::doSelectOne($c);
+		$c->addAnd(BatchJobPeer::JOB_ID, $id);
+		$c->addAnd(BatchJobPeer::PARTNER_ID, $this->getPartnerId());
+		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
+		$batchJob = BatchJobPeer::doSelectOne($c);
 		
 		if (!$batchJob)
 			throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
