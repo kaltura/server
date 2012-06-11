@@ -10,6 +10,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		"freeText" => "_free_text",
 		"isRoot" => "_is_root",
 		"categoriesFullNameIn" => "_in_categories_full_name",
+		"categoryEntryStatusIn" => "_in_category_entry_status", 
 	);
 
 	public function getMapBetweenObjects()
@@ -31,6 +32,11 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 * @var string
 	 */
 	public $categoriesFullNameIn;
+	
+	/**
+	 * @var string
+	 */
+	public $categoryEntryStatusIn;
 
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()

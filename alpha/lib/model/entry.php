@@ -120,6 +120,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	const ENTRY_ID_THAT_DOES_NOT_EXIST = 0;
 	
+	const CATEGORY_SEARCH_PERFIX = 'cat';
+	
+	const CATEGORY_SEARCH_STATUS = 'status'; 
+	
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -2532,16 +2536,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function getCategoriesEntryIds()
 	{
-		//TODO implement select with pagers
-		$allCategoriesEntry = categoryEntryPeer::retrieveActiveByEntryId($this->getId());
+		$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($this->getId());
 		
-		$categoriesEntryIds = array();
+		$categoriesEntryStringIndex = array();
 		foreach($allCategoriesEntry as $categoryEntry)
 		{
-			$categoriesEntryIds[] = $categoryEntry->getCategoryId();
+			$categoriesEntryStringIndex[] = self::CATEGORY_SEARCH_PERFIX . $categoryEntry->getCategoryId() . ' ' .
+				self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus() . ' ' .
+				self::CATEGORY_SEARCH_PERFIX . $categoryEntry->getCategoryId() ;
 		}
 		
-		return implode(',', $categoriesEntryIds);
+		return implode(' ', $categoriesEntryStringIndex);
 	}
 	
 	/* (non-PHPdoc)

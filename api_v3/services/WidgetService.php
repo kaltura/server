@@ -51,6 +51,9 @@ class WidgetService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::UICONF_ID_NOT_FOUND, $widget->uiConfId);
 		}
 		
+		if($widget->enforceEntitlement == false && kEntitlementUtils::getEntitlementEnforcement())
+			throw new KalturaAPIException(KalturaErrors::CANNOT_DISABLE_ENTITLEMENT_FOR_WIDGET_WHEN_ENTITLEMENT_ENFORCEMENT_ENABLE);
+		
 		if ($widget->entryId !== null)
 		{
 			$entry = entryPeer::retrieveByPK($widget->entryId);

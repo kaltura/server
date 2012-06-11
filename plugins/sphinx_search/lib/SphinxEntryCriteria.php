@@ -195,24 +195,48 @@ class SphinxEntryCriteria extends SphinxCriteria
 	 */
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{
+		$categories = $filter->get( "_matchand_categories_ids");
+		if ($categories !== null)
+		{
+			$statuses = $filter->get("_in_category_entry_status");
+			//if the category exist or the category name is an empty string
+			if ( $filter->categoryIdsToIdsParsed ( $categories, $statuses )!=='' || $categories =='')
+				$filter->set ( "_matchand_categories_ids", $filter->categoryIdsToIdsParsed ( $categories, $statuses ) );
+			else
+		  		$filter->set ( "_matchand_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+		}
+		
+		$categories = $filter->get("_matchor_categories_ids");
+		if ($categories !== null)
+		{
+			$statuses = $filter->get("_in_category_entry_status");
+			//if the category exist or the category name is an empty string
+			if ( $filter->categoryIdsToIdsParsed ( $categories, $statuses )!=='' || $categories =='')
+				$filter->set ( "_matchor_categories_ids", $filter->categoryIdsToIdsParsed ( $categories, $statuses ) );
+			else
+		  		$filter->set ( "_matchor_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+		}
+		
 		$matchAndCats = $filter->get("_matchand_categories");
 		if ($matchAndCats !== null)
 		{
+			$statuses = $filter->get("_in_category_entry_status");
 			//if the category exist or the category name is an empty string
-			if ( $filter->categoryNamesToIds ( $matchAndCats )!=='' || $matchAndCats =='')
-				$filter->set ( "_matchand_categories_ids", $filter->categoryNamesToIds ( $matchAndCats ) );
+			if ( $filter->categoryFullNamesToIdsParsed ( $matchAndCats, $statuses )!=='' || $matchAndCats =='')
+				$filter->set ( "_matchand_categories_ids", $filter->categoryFullNamesToIdsParsed ( $matchAndCats, $statuses ) );
 			else
 		  		$filter->set ( "_matchand_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_matchand_categories');
 		}
-
 		
 		$matchOrCats = $filter->get("_matchor_categories");
 		if ($matchOrCats !== null)
 		{
 			//if the category exist or the category name is an empty string
-			if( $filter->categoryNamesToIds ( $matchOrCats )!=='' || $matchOrCats=='')
-				$filter->set("_matchor_categories_ids", $filter->categoryNamesToIds($matchOrCats));
+			$statuses = $filter->get("_in_category_entry_status");
+			
+			if( $filter->categoryFullNamesToIdsParsed ( $matchOrCats, $statuses )!=='' || $matchOrCats=='')
+				$filter->set("_matchor_categories_ids", $filter->categoryFullNamesToIdsParsed($matchOrCats, $statuses));
 			else
 				$filter->set ( "_matchor_categories_ids",category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_matchor_categories');
@@ -223,12 +247,15 @@ class SphinxEntryCriteria extends SphinxCriteria
 		if ($CatFullNameIn !== null)
 		{
 			//if the category exist or the category name is an empty string
-			if( $filter->categoryFullNamesToIds ( $CatFullNameIn )!=='' || $CatFullNameIn=='')
-				$filter->set("_matchor_categories_ids", $filter->categoryFullNamesToIds($CatFullNameIn));
+			$statuses = $filter->get("_in_category_entry_status");
+			if( $filter->categoryFullNamesToIdsParsed ( $CatFullNameIn, $statuses )!=='' || $CatFullNameIn=='')
+				$filter->set("_matchor_categories_ids", $filter->categoryFullNamesToIdsParsed($CatFullNameIn, $statuses));
 			else
 				$filter->set ( "_matchor_categories_ids",category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_in_categories_full_name');
 		}		
+		
+		$filter->unsetByName('_in_category_entry_status');
 		
 		$matchOrRoots = array();
 		if($filter->is_set('_eq_root_entry_id'))
@@ -236,6 +263,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$matchOrRoots[] = entry::ROOTS_FIELD_ENTRY_PREFIX . ' ' . $filter->get('_eq_root_entry_id');
 			$filter->unsetByName('_eq_root_entry_id');
 		}
+		
 		if($filter->is_set('_in_root_entry_id'))
 		{
 			$roots = explode(baseObjectFilter::IN_SEPARATOR, $filter->get('_in_root_entry_id'));
@@ -244,6 +272,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 				
 			$filter->unsetByName('_in_root_entry_id');
 		}
+		
 		if($filter->is_set('_is_root'))
 		{
 			if($filter->get('_is_root'))

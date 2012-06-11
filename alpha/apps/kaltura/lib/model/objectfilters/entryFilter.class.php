@@ -124,6 +124,7 @@ class entryFilter extends baseObjectFilter
 			"_is_root",
 			"_matchand_roots",
 			"_notin_roots",
+			"_in_category_entry_status",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
@@ -252,7 +253,7 @@ class entryFilter extends baseObjectFilter
 		return implode(",", $catsIds);
 	}
 	
-	/**
+		/**
 	 * Convert the categories to categories ids
 	 * 
 	 * @param string $cats Categories full names
@@ -278,6 +279,80 @@ class entryFilter extends baseObjectFilter
 		}
 
 		return implode(",", $catsIds);
+	}	
+	
+	/**
+	 * Convert the categories to categories ids
+	 * 
+	 * @param string $cats Categories full names
+	 * @param string $statuses comma seperated
+	 * @return string Categogories indexes ids
+	 */
+	public static function categoryIdsToIdsParsed($cats, $statuses)
+	{
+		if ($cats === "")
+			$cats = array();
+		else
+			$cats = explode(",", $cats);
+		kArray::trim($cats);
+			
+		if($statuses == null || trim($statuses) == '')
+			$statuses = CategoryEntryStatus::ACTIVE;
+		
+		$statuses = explode(',', trim($statuses));
+		
+		$categoryFullNamesToIds = array();
+		foreach($cats as $cat)
+		{
+			$category = categoryPeer::retrieveByPK($cat);
+
+			foreach ($statuses as $status)
+			{
+				$categoryFullNamesToIds[] = entry::CATEGORY_SEARCH_PERFIX . $category->getId() . ' ' .
+						entry::CATEGORY_SEARCH_STATUS . $status . ' ' .
+						entry::CATEGORY_SEARCH_PERFIX . $category->getId() ;
+			}
+		}
+
+		return implode(",", $categoryFullNamesToIds);
+	}
+	
+	/**
+	 * Convert the categories to categories ids
+	 * 
+	 * @param string $cats Categories full names
+	 * @param string $statuses comma seperated
+	 * @return string Categogories indexes ids
+	 */
+	public static function categoryFullNamesToIdsParsed($cats, $statuses)
+	{
+		if ($cats === "")
+			$cats = array();
+		else
+			$cats = explode(",", $cats);
+		kArray::trim($cats);
+		
+		if($statuses == null || trim($statuses) == '')
+			$statuses = CategoryEntryStatus::ACTIVE;
+			
+		$statuses = explode(',', trim($statuses));
+		
+		$categoryFullNamesToIds = array();
+		foreach($cats as $cat)
+		{
+			$categories = categoryPeer::getByFullNameWildcardMatch($cat);
+			foreach($categories as $category)
+			{
+				foreach ($statuses as $status)
+				{
+					$categoryFullNamesToIds[] = entry::CATEGORY_SEARCH_PERFIX . $category->getId() . ' ' .
+							entry::CATEGORY_SEARCH_STATUS . $status . ' ' .
+							entry::CATEGORY_SEARCH_PERFIX . $category->getId() ;
+				}
+			}
+		}
+
+		return implode(",", $categoryFullNamesToIds);
 	}	
 	
 	/**

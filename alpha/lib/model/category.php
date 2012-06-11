@@ -91,6 +91,13 @@ class category extends Basecategory implements IIndexable
 			}
 		}
 		
+		if (!$this->getIsIndex() && 
+			($this->isColumnModified(categoryPeer::NAME) || 
+			$this->isColumnModified(categoryPeer::PARENT_ID)))
+		{
+			$this->updateFullName();
+		}
+		
 		if($this->getPrivacyContexts() == '' && $this->getPrivacyContext() == '')
 		{
 			//TODO - might need to throw exception here if the values are diffret.
@@ -113,13 +120,6 @@ class category extends Basecategory implements IIndexable
 		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PARENT_ID))
 		{
 			$this->resetFullIds();
-		}
-		
-		if (!$this->getIsIndex() && 
-			($this->isColumnModified(categoryPeer::NAME) || 
-			$this->isColumnModified(categoryPeer::PARENT_ID)))
-		{
-			$this->updateFullName();
 		}
 		
 		//index + update categoryEntry
@@ -368,6 +368,7 @@ class category extends Basecategory implements IIndexable
        */
       public function incrementEntriesCount($increase = 1, $entryCategoriesAddedIds = null)
       {
+      	KalturaLog::debug('## ' . __LINE__);
             if($entryCategoriesAddedIds && $this->entryAlreadyBlongToCategory($entryCategoriesAddedIds))
                   return;
                   
@@ -389,6 +390,7 @@ class category extends Basecategory implements IIndexable
 	*/
 	public function incrementDirectEntriesCount()
 	{
+		KalturaLog::debug('## ' . __LINE__);
 		$this->setDirectEntriesCount($this->getDirectEntriesCount() + 1);           
 		$this->save();
 	}
@@ -398,6 +400,7 @@ class category extends Basecategory implements IIndexable
 	*/
 	public function incrementPendingEntriesCount()
 	{
+		KalturaLog::debug('## ' . __LINE__);
 		$this->setPendingEntriesCount($this->getPendingEntriesCount() + 1);           
 		$this->save();
 	}
@@ -407,6 +410,7 @@ class category extends Basecategory implements IIndexable
        */
       public function decrementEntriesCount($decrease = 1, $entryCategoriesRemovedIds = null)
       {
+      	KalturaLog::debug('## ' . __LINE__);
             if($this->entryAlreadyBlongToCategory($entryCategoriesRemovedIds))
                   return;
             
@@ -1007,6 +1011,9 @@ class category extends Basecategory implements IIndexable
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$parentCategory = $this->getParentCategory();
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
+		if(!$parentCategory)
+			return null;
 		
 		if ($parentCategory->getInheritanceType() == InheritanceType::INHERIT)
 			return $parentCategory->getInheritedParentId();
