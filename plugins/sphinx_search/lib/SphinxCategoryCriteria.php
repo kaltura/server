@@ -17,7 +17,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'category.STATUS' => 'category_status',
 		'category.KUSER_ID' => 'kuser_id',
 		'category.DISPLAY_IN_SEARCH' => 'display_in_search',	
-		'category.FREE_TEXT' => '(name,tags,description)',
+		'category.FREE_TEXT' => '(name,tags,description,reference_id)',
 		'category.NAME_REFERNCE_ID' => '(name,reference_id)',
 		'category.MEMBERS' => 'members',
 		'plugins_data',
