@@ -200,8 +200,9 @@ class SphinxEntryCriteria extends SphinxCriteria
 		{
 			$statuses = $filter->get("_in_category_entry_status");
 			//if the category exist or the category name is an empty string
-			if ( $filter->categoryIdsToIdsParsed ( $categories, $statuses )!=='' || $categories =='')
-				$filter->set ( "_matchand_categories_ids", $filter->categoryIdsToIdsParsed ( $categories, $statuses ) );
+			$categoriesParsed = $filter->categoryIdsToIdsParsed ( $categories, $statuses );
+			if ( $categoriesParsed !=='' || $categories =='')
+				$filter->set ( "_matchand_categories_ids", $categoriesParsed);
 			else
 		  		$filter->set ( "_matchand_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 		}
@@ -211,8 +212,9 @@ class SphinxEntryCriteria extends SphinxCriteria
 		{
 			$statuses = $filter->get("_in_category_entry_status");
 			//if the category exist or the category name is an empty string
-			if ( $filter->categoryIdsToIdsParsed ( $categories, $statuses )!=='' || $categories =='')
-				$filter->set ( "_matchor_categories_ids", $filter->categoryIdsToIdsParsed ( $categories, $statuses ) );
+			$categoriesParsed = $filter->categoryIdsToIdsParsed ( $categories, $statuses );
+			if ( $categoriesParsed !=='' || $categories =='')
+				$filter->set ( "_matchor_categories_ids", $categoriesParsed);
 			else
 		  		$filter->set ( "_matchor_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 		}
@@ -222,8 +224,9 @@ class SphinxEntryCriteria extends SphinxCriteria
 		{
 			$statuses = $filter->get("_in_category_entry_status");
 			//if the category exist or the category name is an empty string
-			if ( $filter->categoryFullNamesToIdsParsed ( $matchAndCats, $statuses )!=='' || $matchAndCats =='')
-				$filter->set ( "_matchand_categories_ids", $filter->categoryFullNamesToIdsParsed ( $matchAndCats, $statuses ) );
+			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $matchAndCats, $statuses );
+			if ( $categoriesParsed !=='' || $matchAndCats =='')
+				$filter->set ( "_matchand_categories_ids", $categoriesParsed );
 			else
 		  		$filter->set ( "_matchand_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_matchand_categories');
@@ -234,9 +237,9 @@ class SphinxEntryCriteria extends SphinxCriteria
 		{
 			//if the category exist or the category name is an empty string
 			$statuses = $filter->get("_in_category_entry_status");
-			
-			if( $filter->categoryFullNamesToIdsParsed ( $matchOrCats, $statuses )!=='' || $matchOrCats=='')
-				$filter->set("_matchor_categories_ids", $filter->categoryFullNamesToIdsParsed($matchOrCats, $statuses));
+			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $matchOrCats, $statuses );
+			if( $categoriesParsed !=='' || $matchOrCats=='')
+				$filter->set("_matchor_categories_ids", $categoriesParsed);
 			else
 				$filter->set ( "_matchor_categories_ids",category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_matchor_categories');
@@ -248,8 +251,9 @@ class SphinxEntryCriteria extends SphinxCriteria
 		{
 			//if the category exist or the category name is an empty string
 			$statuses = $filter->get("_in_category_entry_status");
-			if( $filter->categoryFullNamesToIdsParsed ( $CatFullNameIn, $statuses )!=='' || $CatFullNameIn=='')
-				$filter->set("_matchor_categories_ids", $filter->categoryFullNamesToIdsParsed($CatFullNameIn, $statuses));
+			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $CatFullNameIn, $statuses );
+			if( $categoriesParsed !=='' || $CatFullNameIn=='')
+				$filter->set("_matchor_categories_ids", $categoriesParsed);
 			else
 				$filter->set ( "_matchor_categories_ids",category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_in_categories_full_name');
