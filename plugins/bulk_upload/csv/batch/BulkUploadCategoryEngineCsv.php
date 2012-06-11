@@ -284,6 +284,9 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 
 	    if ($bulkUploadCategoryResult->partnerData)
 	        $category->partnerData = $bulkUploadCategoryResult->partnerData;
+	    
+	    if (!is_null($bulkUploadCategoryResult->moderation))
+	        $category->moderation = $bulkUploadCategoryResult->moderation;
 	        
 	    return $category;
 	}
@@ -351,6 +354,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		    "defaultPermissionLevel",
 		    "partnerSortValue",
 		    "partnerData",
+		    "moderation",
 		);
 	}
 	
