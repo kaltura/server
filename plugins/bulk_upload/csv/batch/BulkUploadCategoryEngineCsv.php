@@ -93,7 +93,9 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		{
 		    if ( $bulkUploadResult->objectId || $bulkUploadResult->referenceId)
 		    {
+		        $this->impersonate();
 		        $bulkUploadResult->objectId = $this->calculateIdToUpdate($bulkUploadResult);
+		        $this->unimpersonate();
 		        if ($bulkUploadResult->objectId)
 		        {
 		            $bulkUploadResult->action = KalturaBulkUploadAction::UPDATE;
@@ -319,9 +321,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 	        $categoryFilter = new KalturaCategoryFilter();
 	        $categoryFilter->referenceIdEqual = $bulkUploadResult->referenceId;
 	        $categoryFilter->fullNameStartsWith = $bulkUploadResult->relativePath;
-	        $this->impersonate();
 	        $categoryList = $this->kClient->category->listAction($categoryFilter);
-	        $this->unimpersonate();
 	        if (count($categoryList->objects))
 	        {
 	            return $categoryList->objects[0]->id;
