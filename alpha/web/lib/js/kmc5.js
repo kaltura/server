@@ -607,7 +607,8 @@ kmc.preview_embed = {
 		var delivery_type = kmc.vars.embed_code_delivery_type || "http";
 		var html = '<div id="rtmp" class="label">Select Flash Delivery Type:</div> <div class="right"><select id="delivery_type">';
 		var options = '<option value="http"' + ((delivery_type == "http") ? selected : "") + '>Progressive Download (HTTP)&nbsp;</option>' +
-		'<option value="rtmp"' + ((delivery_type == "rtmp") ? selected : "") + '>Adaptive Streaming (RTMP)&nbsp;</option>';
+		'<option value="rtmp"' + ((delivery_type == "rtmp") ? selected : "") + '>Adaptive Streaming (RTMP)&nbsp;</option>' + 
+		'<option value="rtmpe"' + ((delivery_type == "rtmpe") ? selected : "") + '>Secure Transport  (RTMPE)&nbsp;</option>';
 		if(!kmc.vars.hide_akamai_hd_network) {
 			options += '<option value="akamai"' + ((delivery_type == "akamai") ? selected : "") + '>Akamai HD Network &nbsp;</option>';
 		}
@@ -710,6 +711,7 @@ kmc.preview_embed = {
 	// uiconf = uiconfid (normal scenario) or uiconf details json (for #content|Manage->drill down->flavors->preview)
 	buildKalturaEmbed : function(id, name, description, is_playlist, uiconf, html5) {
 
+		name = kmc.utils.escapeQuotes(name); 
 		var uiconf_id = uiconf.uiconf_id || uiconf,
 		uiconf_details = (typeof uiconf == "object") ? uiconf : kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist),  // getUiconfDetails returns json
 		cache_st = kmc.preview_embed.setCacheStartTime(),
@@ -718,10 +720,16 @@ kmc.preview_embed = {
 		embed_code = (html5) ? kmc.preview_embed.embed_code_template.script_tag + '\n' + kmc.preview_embed.embed_code_template.object_tag : kmc.preview_embed.embed_code_template.object_tag;
 		if(!kmc.vars.jw) { // more efficient to add "&& !kmc.vars.silverlight" (?)
 			kmc.vars.embed_code_delivery_type = kmc.vars.embed_code_delivery_type || "http";
-			if(kmc.vars.embed_code_delivery_type == "rtmp") {
-				embed_code = embed_code.replace("{FLASHVARS}", "streamerType=rtmp&amp;{FLASHVARS}"); // rtmp://rtmpakmi.kaltura.com/ondemand
-			} else if (kmc.vars.embed_code_delivery_type == "akamai") {
-				embed_code = embed_code.replace("{FLASHVARS}", "streamerType=hdnetwork&amp;akamaiHD.loadingPolicy=preInitialize&amp;akamaiHD.asyncInit=true&amp;{FLASHVARS}");
+			switch( kmc.vars.embed_code_delivery_type ) {
+				case "rtmp":
+					embed_code = embed_code.replace("{FLASHVARS}", "streamerType=rtmp&amp;{FLASHVARS}");
+					break;
+				case "rtmpe":
+					embed_code = embed_code.replace("{FLASHVARS}", "streamerType=rtmp&amp;mediaProtocol=rtmpe&amp;{FLASHVARS}");
+					break;					
+				case "akamai": 
+					embed_code = embed_code.replace("{FLASHVARS}", "streamerType=hdnetwork&amp;akamaiHD.loadingPolicy=preInitialize&amp;akamaiHD.asyncInit=true&amp;{FLASHVARS}");
+					break;
 			}
 		}
 		if(is_playlist && id != "multitab_playlist") {	// playlist (not multitab)
