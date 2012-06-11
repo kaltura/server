@@ -368,7 +368,6 @@ class category extends Basecategory implements IIndexable
        */
       public function incrementEntriesCount($increase = 1, $entryCategoriesAddedIds = null)
       {
-      	KalturaLog::debug('## ' . __LINE__);
             if($entryCategoriesAddedIds && $this->entryAlreadyBlongToCategory($entryCategoriesAddedIds))
                   return;
                   
@@ -390,7 +389,6 @@ class category extends Basecategory implements IIndexable
 	*/
 	public function incrementDirectEntriesCount()
 	{
-		KalturaLog::debug('## ' . __LINE__);
 		$this->setDirectEntriesCount($this->getDirectEntriesCount() + 1);           
 		$this->save();
 	}
@@ -400,7 +398,6 @@ class category extends Basecategory implements IIndexable
 	*/
 	public function incrementPendingEntriesCount()
 	{
-		KalturaLog::debug('## ' . __LINE__);
 		$this->setPendingEntriesCount($this->getPendingEntriesCount() + 1);           
 		$this->save();
 	}
@@ -410,7 +407,6 @@ class category extends Basecategory implements IIndexable
        */
       public function decrementEntriesCount($decrease = 1, $entryCategoriesRemovedIds = null)
       {
-      	KalturaLog::debug('## ' . __LINE__);
             if($this->entryAlreadyBlongToCategory($entryCategoriesRemovedIds))
                   return;
             

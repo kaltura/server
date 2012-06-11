@@ -53,14 +53,18 @@ class categoryEntry extends BasecategoryEntry {
 		$category = categoryPeer::retrieveByPK($this->getCategoryId());
 		categoryPeer::setUseCriteriaFilter(true);
 
+		$entry = entryPeer::retrieveByPK($this->getEntryId());
+		
 		if ($this->getStatus() == CategoryEntryStatus::PENDING)
 			$category->incrementPendingEntriesCount();
 
 		if($this->getStatus() == CategoryEntryStatus::ACTIVE)
-		{
-			$entry = entryPeer::retrieveByPK($this->getEntryId());
-			$this->setEntryOnCategory($category, $entry);
-		}
+			$entry = $this->setEntryOnCategory($category, $entry);
+			
+		if(!categoryEntryPeer::getSkipSave())
+			$entry->setUpdatedAt(time());
+			
+		$entry->save();
 	}
 	
 	/* (non-PHPdoc)
@@ -80,7 +84,7 @@ class categoryEntry extends BasecategoryEntry {
 			
 		if($this->getStatus() == CategoryEntryStatus::ACTIVE && 
 			($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING))
-			$this->setEntryOnCategory($category, $entry);
+			$entry = $this->setEntryOnCategory($category, $entry);
 		
 		if($this->getStatus() == CategoryEntryStatus::REJECTED &&
 			$this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING)
@@ -96,13 +100,17 @@ class categoryEntry extends BasecategoryEntry {
 				if(!categoryEntryPeer::getSkipSave())
 				{
 					$entry->removeCategory($category->getFullName());
-					$entry->save();
 				}
 			}
 			
 			if($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING)
 				$category->decrementPendingEntriesCount();
 		}
+		
+		if(!categoryEntryPeer::getSkipSave())
+			$entry->setUpdatedAt(time());
+			
+		$entry->save();
 	}
 	
 	private function setEntryOnCategory($category, $entry = null)
@@ -115,14 +123,11 @@ class categoryEntry extends BasecategoryEntry {
 			$category->decrementPendingEntriesCount();
 		
 		//only categories with no context are saved on entry - this is only for Backward compatible 
-		if($entry && !categoryEntryPeer::getSkipSave())
-		{
-			if($category->getPrivacyContext() == '')
+		if($entry && !categoryEntryPeer::getSkipSave() && $category->getPrivacyContext() == '')
 				$entry->setCategories($entry->getCategories() . entry::ENTRY_CATEGORY_SEPARATOR . $category->getFullName());
 				
-			$entry->setUpdatedAt(time());
-			$entry->save();
-		}
+			
+		return $entry;
 	}
 	
 	public function reSetCategoryFullIds()
