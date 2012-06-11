@@ -240,7 +240,6 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
-		
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 		
