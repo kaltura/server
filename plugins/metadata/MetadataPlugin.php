@@ -590,7 +590,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 							continue;
 						}
 							
-						$fieldValue = $valueAsDate;
+						$fieldSingleValue = $valueAsDate;
 					}
 					
 					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT && !is_numeric($fieldSingleValue))
