@@ -2,6 +2,7 @@ USE `kaltura`;
 
 DELIMITER $$
 
+/* Procedure structure for procedure `update_entries` */
 DROP PROCEDURE IF EXISTS `update_entries`$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `update_entries`()
@@ -23,7 +24,7 @@ BEGIN
     END$$
 
 
-
+/* Procedure structure for procedure `update_kusers` */
 DROP PROCEDURE IF EXISTS `update_kusers`$$
 
 CREATE DEFINER=`etl`@`localhost` PROCEDURE `update_kusers`()

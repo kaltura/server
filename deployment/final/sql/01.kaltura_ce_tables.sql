@@ -1,4 +1,8 @@
+CREATE DATABASE IF NOT EXISTS `kaltura`;
 
+USE `kaltura`;
+
+/*Table structure for table `access_control` */
 DROP TABLE IF EXISTS `access_control`;
 
 CREATE TABLE `access_control` (
@@ -11,18 +15,20 @@ CREATE TABLE `access_control` (
   `updated_at` datetime DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,
   `site_restrict_type` tinyint(4) DEFAULT NULL,
-  `site_restrict_list` varchar(1024) DEFAULT NULL,
+  `site_restrict_list` text,
   `country_restrict_type` tinyint(4) DEFAULT NULL,
-  `country_restrict_list` varchar(1024) DEFAULT NULL,
+  `country_restrict_list` text,
   `ks_restrict_privilege` varchar(20) DEFAULT NULL,
   `prv_restrict_privilege` varchar(20) DEFAULT NULL,
   `prv_restrict_length` int(11) DEFAULT NULL,
   `kdir_restrict_type` tinyint(4) DEFAULT NULL,
   `custom_data` text,
-  PRIMARY KEY (`id`)
+  `rules` text,
+  PRIMARY KEY (`id`),
+  KEY `system_name_partner_id` (`system_name`,`partner_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `admin_permission` */
 DROP TABLE IF EXISTS `admin_permission`;
 
 CREATE TABLE `admin_permission` (
@@ -33,7 +39,7 @@ CREATE TABLE `admin_permission` (
   KEY `admin_permission_FI_1` (`admin_kuser_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `alert` */
 DROP TABLE IF EXISTS `alert`;
 
 CREATE TABLE `alert` (
@@ -47,7 +53,7 @@ CREATE TABLE `alert` (
   KEY `subject_index` (`alert_type`,`subject_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `annotation` */
 DROP TABLE IF EXISTS `annotation`;
 
 CREATE TABLE `annotation` (
@@ -72,7 +78,7 @@ CREATE TABLE `annotation` (
   KEY `int_id_index` (`int_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `audit_trail` */
 DROP TABLE IF EXISTS `audit_trail`;
 
 CREATE TABLE `audit_trail` (
@@ -107,7 +113,7 @@ CREATE TABLE `audit_trail` (
   KEY `status_index` (`status`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `audit_trail_config` */
 DROP TABLE IF EXISTS `audit_trail_config`;
 
 CREATE TABLE `audit_trail_config` (
@@ -120,7 +126,7 @@ CREATE TABLE `audit_trail_config` (
   KEY `partner_object_index` (`partner_id`,`object_type`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `audit_trail_data` */
 DROP TABLE IF EXISTS `audit_trail_data`;
 
 CREATE TABLE `audit_trail_data` (
@@ -140,7 +146,7 @@ CREATE TABLE `audit_trail_data` (
   KEY `audit_trail_index` (`audit_trail_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `batch_job` */
 DROP TABLE IF EXISTS `batch_job`;
 
 CREATE TABLE `batch_job` (
@@ -199,9 +205,76 @@ CREATE TABLE `batch_job` (
   KEY `bulk_job_id_index` (`bulk_job_id`),
   KEY `root_job_id_index` (`root_job_id`),
   KEY `parent_job_id_index` (`parent_job_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
+/*Table structure for table `batch_job_log` */
+DROP TABLE IF EXISTS `batch_job_log`;
 
+CREATE TABLE `batch_job_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `job_id` int(11) DEFAULT NULL,
+  `job_type` smallint(6) DEFAULT NULL,
+  `job_sub_type` smallint(6) DEFAULT NULL,
+  `data` text,
+  `file_size` int(11) DEFAULT NULL,
+  `duplication_key` varchar(2047) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `log_status` int(11) DEFAULT NULL,
+  `abort` tinyint(4) DEFAULT NULL,
+  `check_again_timeout` int(11) DEFAULT NULL,
+  `progress` tinyint(4) DEFAULT NULL,
+  `message` varchar(1024) DEFAULT NULL,
+  `description` varchar(1024) DEFAULT NULL,
+  `updates_count` smallint(6) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `created_by` varchar(20) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `updated_by` varchar(20) DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `priority` tinyint(4) DEFAULT NULL,
+  `work_group_id` int(11) DEFAULT NULL,
+  `queue_time` datetime DEFAULT NULL,
+  `finish_time` datetime DEFAULT NULL,
+  `entry_id` varchar(20) DEFAULT '',
+  `partner_id` int(11) DEFAULT '0',
+  `subp_id` int(11) DEFAULT '0',
+  `scheduler_id` int(11) DEFAULT NULL,
+  `worker_id` int(11) DEFAULT NULL,
+  `batch_index` int(11) DEFAULT NULL,
+  `last_scheduler_id` int(11) DEFAULT NULL,
+  `last_worker_id` int(11) DEFAULT NULL,
+  `last_worker_remote` tinyint(4) DEFAULT NULL,
+  `processor_expiration` datetime DEFAULT NULL,
+  `execution_attempts` tinyint(4) DEFAULT NULL,
+  `lock_version` int(11) DEFAULT NULL,
+  `twin_job_id` int(11) DEFAULT NULL,
+  `bulk_job_id` int(11) DEFAULT NULL,
+  `root_job_id` int(11) DEFAULT NULL,
+  `parent_job_id` int(11) DEFAULT NULL,
+  `dc` int(11) DEFAULT NULL,
+  `err_type` int(11) DEFAULT NULL,
+  `err_number` int(11) DEFAULT NULL,
+  `on_stress_divert_to` int(11) DEFAULT NULL,
+  `param_1` int(11) DEFAULT NULL,
+  `param_2` varchar(255) DEFAULT NULL,
+  `param_3` varchar(255) DEFAULT NULL,
+  `param_4` int(11) DEFAULT NULL,
+  `param_5` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `status_job_type_index` (`status`,`job_type`),
+  KEY `entry_id_index_id` (`entry_id`,`id`),
+  KEY `partner_id_index` (`partner_id`),
+  KEY `priority_index` (`priority`),
+  KEY `twin_job_id_index` (`twin_job_id`),
+  KEY `bulk_job_id_index` (`bulk_job_id`),
+  KEY `root_job_id_index` (`root_job_id`),
+  KEY `parent_job_id_index` (`parent_job_id`),
+  KEY `execution_attempts_index` (`job_type`,`execution_attempts`),
+  KEY `processor_expiration_index` (`job_type`,`processor_expiration`),
+  KEY `lock_index` (`batch_index`,`scheduler_id`,`worker_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `bb_forum` */
 DROP TABLE IF EXISTS `bb_forum`;
 
 CREATE TABLE `bb_forum` (
@@ -218,7 +291,7 @@ CREATE TABLE `bb_forum` (
   KEY `bb_forum_FI_1` (`last_post`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `bb_post` */
 DROP TABLE IF EXISTS `bb_post`;
 
 CREATE TABLE `bb_post` (
@@ -240,7 +313,7 @@ CREATE TABLE `bb_post` (
   KEY `bb_post_FI_3` (`parent_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `blocked_email` */
 DROP TABLE IF EXISTS `blocked_email`;
 
 CREATE TABLE `blocked_email` (
@@ -248,7 +321,7 @@ CREATE TABLE `blocked_email` (
   PRIMARY KEY (`email`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `bulk_upload_result` */
 DROP TABLE IF EXISTS `bulk_upload_result`;
 
 CREATE TABLE `bulk_upload_result` (
@@ -279,30 +352,34 @@ CREATE TABLE `bulk_upload_result` (
   `error_description` varchar(255) DEFAULT NULL,
   `plugins_data` varchar(9182) NOT NULL,
   `custom_data` text,
+  `status` int(11) DEFAULT NULL,
+  `object_status` int(11) DEFAULT NULL,
+  `object_error_description` varchar(255) DEFAULT NULL,
+  `error_code` int(11) DEFAULT NULL,
+  `error_type` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `entry_id_index_id` (`object_id`,`id`),
   KEY `job_id_line_index` (`bulk_upload_job_id`,`line_index`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `caption_asset_item` */
 DROP TABLE IF EXISTS `caption_asset_item`;
 
-CREATE TABLE `caption_asset_item`
-(
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`created_at` DATETIME,
-	`partner_id` INTEGER,
-	`entry_id` VARCHAR(20),
-	`caption_asset_id` VARCHAR(20),
-	`content` VARCHAR(255),
-	`start_time` INTEGER,
-	`end_time` INTEGER,
-	PRIMARY KEY (`id`),
-	KEY `caption_asset`(`caption_asset_id`),
-	KEY `partner_caption_asset`(`partner_id`, `caption_asset_id`)
-)ENGINE=MyISAM;
+CREATE TABLE `caption_asset_item` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` datetime DEFAULT NULL,
+  `partner_id` int(11) DEFAULT NULL,
+  `entry_id` varchar(20) DEFAULT NULL,
+  `caption_asset_id` varchar(20) DEFAULT NULL,
+  `content` varchar(255) DEFAULT NULL,
+  `start_time` int(11) DEFAULT NULL,
+  `end_time` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `caption_asset` (`caption_asset_id`),
+  KEY `partner_caption_asset` (`partner_id`,`caption_asset_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `category` */
 DROP TABLE IF EXISTS `category`;
 
 CREATE TABLE `category` (
@@ -311,16 +388,81 @@ CREATE TABLE `category` (
   `depth` tinyint(4) NOT NULL,
   `partner_id` int(11) NOT NULL,
   `name` varchar(128) NOT NULL DEFAULT '',
-  `full_name` varchar(490) NOT NULL DEFAULT '',
+  `full_name` text,
   `entries_count` int(11) NOT NULL DEFAULT '0',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `direct_entries_count` int(11) DEFAULT '0',
+  `members_count` int(11) DEFAULT '0',
+  `pending_members_count` int(11) DEFAULT '0',
+  `description` text,
+  `tags` text,
+  `display_in_search` tinyint(4) DEFAULT '1',
+  `privacy` tinyint(4) DEFAULT '1',
+  `inheritance_type` tinyint(4) DEFAULT '2',
+  `user_join_policy` tinyint(4) DEFAULT '3',
+  `default_permission_level` tinyint(4) DEFAULT '3',
+  `kuser_id` int(11) DEFAULT NULL,
+  `puser_id` varchar(100) NOT NULL,
+  `reference_id` varchar(512) DEFAULT NULL,
+  `contribution_policy` tinyint(4) DEFAULT '2',
+  `custom_data` text,
+  `inherited_parent_id` int(11) DEFAULT NULL,
+  `full_ids` text NOT NULL,
+  `privacy_context` varchar(255) DEFAULT NULL,
+  `privacy_contexts` varchar(255) DEFAULT NULL,
+  `direct_sub_categories_count` int(11) DEFAULT '0',
+  `moderation` tinyint(4) DEFAULT '0',
+  `pending_entries_count` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `full_name_index` (`full_name`(333))
+  KEY `full_name_index` (`full_name`(333)),
+  KEY `partner_id_deleted_at` (`partner_id`,`deleted_at`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
+/*Table structure for table `category_entry` */
+DROP TABLE IF EXISTS `category_entry`;
 
+CREATE TABLE `category_entry` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `partner_id` int(11) NOT NULL,
+  `entry_id` varchar(20) DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `custom_data` text,
+  `updated_at` datetime DEFAULT NULL,
+  `category_full_ids` text NOT NULL,
+  `status` int(11) DEFAULT '2',
+  PRIMARY KEY (`id`),
+  KEY `partner_id_category_id_index` (`partner_id`,`category_id`),
+  KEY `partner_id_entry_id_index` (`partner_id`,`entry_id`),
+  KEY `category_entry_updated_at` (`updated_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `category_kuser` */
+DROP TABLE IF EXISTS `category_kuser`;
+
+CREATE TABLE `category_kuser` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `category_id` int(11) NOT NULL,
+  `kuser_id` int(11) NOT NULL,
+  `puser_id` varchar(100) NOT NULL,
+  `partner_id` int(11) NOT NULL,
+  `permission_level` tinyint(4) DEFAULT NULL,
+  `status` tinyint(4) DEFAULT NULL,
+  `inherit_from_category` int(11) DEFAULT NULL,
+  `update_method` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `custom_data` text,
+  `category_full_ids` text,
+  PRIMARY KEY (`id`),
+  KEY `partner_id_category_index` (`partner_id`,`category_id`,`status`),
+  KEY `partner_id_kuser_index` (`partner_id`,`kuser_id`,`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `comment` */
 DROP TABLE IF EXISTS `comment`;
 
 CREATE TABLE `comment` (
@@ -337,7 +479,7 @@ CREATE TABLE `comment` (
   KEY `comment_FI_1` (`kuser_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `control_panel_command` */
 DROP TABLE IF EXISTS `control_panel_command`;
 
 CREATE TABLE `control_panel_command` (
@@ -362,7 +504,7 @@ CREATE TABLE `control_panel_command` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `conversion` */
 DROP TABLE IF EXISTS `conversion`;
 
 CREATE TABLE `conversion` (
@@ -388,7 +530,7 @@ CREATE TABLE `conversion` (
   KEY `created_at_status_index` (`created_at`,`status`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `conversion_params` */
 DROP TABLE IF EXISTS `conversion_params`;
 
 CREATE TABLE `conversion_params` (
@@ -412,7 +554,7 @@ CREATE TABLE `conversion_params` (
   KEY `partner_id_index` (`partner_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `conversion_profile` */
 DROP TABLE IF EXISTS `conversion_profile`;
 
 CREATE TABLE `conversion_profile` (
@@ -437,7 +579,7 @@ CREATE TABLE `conversion_profile` (
   KEY `updated_at_index` (`updated_at`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `conversion_profile_2` */
 DROP TABLE IF EXISTS `conversion_profile_2`;
 
 CREATE TABLE `conversion_profile_2` (
@@ -462,10 +604,11 @@ CREATE TABLE `conversion_profile_2` (
   `creation_mode` smallint(6) DEFAULT '1',
   `custom_data` text,
   PRIMARY KEY (`id`),
-  KEY `partner_id_status` (`partner_id`,`status`)
+  KEY `partner_id_status` (`partner_id`,`status`),
+  KEY `system_name_partner_id` (`partner_id`,`system_name`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `cue_point` */
 DROP TABLE IF EXISTS `cue_point`;
 
 CREATE TABLE `cue_point` (
@@ -495,7 +638,7 @@ CREATE TABLE `cue_point` (
   KEY `int_id_index` (`int_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `distribution_profile` */
 DROP TABLE IF EXISTS `distribution_profile`;
 
 CREATE TABLE `distribution_profile` (
@@ -525,7 +668,7 @@ CREATE TABLE `distribution_profile` (
   KEY `partner_status_provider` (`partner_id`,`status`,`provider_type`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `drop_folder` */
 DROP TABLE IF EXISTS `drop_folder`;
 
 CREATE TABLE `drop_folder` (
@@ -552,7 +695,7 @@ CREATE TABLE `drop_folder` (
   KEY `dc_index` (`dc`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `drop_folder_file` */
 DROP TABLE IF EXISTS `drop_folder_file`;
 
 CREATE TABLE `drop_folder_file` (
@@ -561,7 +704,7 @@ CREATE TABLE `drop_folder_file` (
   `drop_folder_id` int(11) NOT NULL,
   `file_name` varchar(500) NOT NULL,
   `status` int(11) NOT NULL,
-  `file_size` int(11) NOT NULL,
+  `file_size` bigint(20) NOT NULL,
   `file_size_last_set_at` datetime DEFAULT NULL,
   `error_code` int(11) DEFAULT NULL,
   `error_description` text,
@@ -575,7 +718,7 @@ CREATE TABLE `drop_folder_file` (
   KEY `status_index` (`status`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `dynamic_enum` */
 DROP TABLE IF EXISTS `dynamic_enum`;
 
 CREATE TABLE `dynamic_enum` (
@@ -585,9 +728,9 @@ CREATE TABLE `dynamic_enum` (
   `plugin_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enum_unique` (`enum_name`,`value_name`,`plugin_name`)
-) ENGINE=MyISAM AUTO_INCREMENT=10001 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=10062 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `email_campaign` */
 DROP TABLE IF EXISTS `email_campaign`;
 
 CREATE TABLE `email_campaign` (
@@ -607,7 +750,7 @@ CREATE TABLE `email_campaign` (
   KEY `campaign_mgr_kuser_id_index` (`campaign_mgr_kuser_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `email_ingestion_profile` */
 DROP TABLE IF EXISTS `email_ingestion_profile`;
 
 CREATE TABLE `email_ingestion_profile` (
@@ -627,13 +770,14 @@ CREATE TABLE `email_ingestion_profile` (
   UNIQUE KEY `email_ingestion_profile_email_address_unique` (`email_address`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
+/*Table structure for table `entry` */
 DROP TABLE IF EXISTS `entry`;
 
 CREATE TABLE `entry` (
   `id` varchar(20) NOT NULL DEFAULT '',
   `kshow_id` varchar(20) DEFAULT NULL,
   `kuser_id` int(11) DEFAULT NULL,
-  `name` varchar(60) DEFAULT NULL,
+  `name` varchar(256) DEFAULT NULL,
   `type` smallint(6) DEFAULT NULL,
   `media_type` smallint(6) DEFAULT NULL,
   `data` varchar(48) DEFAULT NULL,
@@ -684,6 +828,7 @@ CREATE TABLE `entry` (
   `start_date` datetime DEFAULT NULL,
   `end_date` datetime DEFAULT NULL,
   `available_from` datetime DEFAULT NULL,
+  `creator_kuser_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `kshow_created_index` (`kshow_id`,`created_at`),
   KEY `int_id_index` (`int_id`),
@@ -703,12 +848,10 @@ CREATE TABLE `entry` (
   KEY `modified_at_index` (`modified_at`),
   KEY `updated_at_index` (`updated_at`),
   KEY `entry_FI_3` (`access_control_id`),
-  KEY `entry_FI_5` (`conversion_profile_id`),
-  FULLTEXT KEY `search_text_index` (`search_text`),
-  FULLTEXT KEY `search_text_discrete_index` (`search_text_discrete`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+  KEY `entry_FI_5` (`conversion_profile_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `entry_distribution` */
 DROP TABLE IF EXISTS `entry_distribution`;
 
 CREATE TABLE `entry_distribution` (
@@ -735,11 +878,31 @@ CREATE TABLE `entry_distribution` (
   `last_report` datetime NOT NULL,
   `custom_data` text,
   PRIMARY KEY (`id`),
-  KEY `partner_entry_profile` (`partner_id`,`entry_id`,`distribution_profile_id`),
-  KEY `partner_profile_status` (`partner_id`,`distribution_profile_id`,`status`)
+  KEY `partner_profile_status` (`partner_id`,`distribution_profile_id`,`status`),
+  KEY `entry_profile` (`entry_id`,`distribution_profile_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
+/*Table structure for table `event_notification_template` */
+DROP TABLE IF EXISTS `event_notification_template`;
 
+CREATE TABLE `event_notification_template` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `partner_id` int(11) NOT NULL,
+  `name` varchar(127) NOT NULL,
+  `system_name` varchar(127) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `type` int(11) NOT NULL,
+  `status` int(11) NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `custom_data` text,
+  `event_type` int(11) DEFAULT NULL,
+  `object_type` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `partner_id_status_index` (`partner_id`,`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `facebook_invite` */
 DROP TABLE IF EXISTS `facebook_invite`;
 
 CREATE TABLE `facebook_invite` (
@@ -754,7 +917,7 @@ CREATE TABLE `facebook_invite` (
   KEY `invited_puser_id_index` (`invited_puser_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `favorite` */
 DROP TABLE IF EXISTS `favorite`;
 
 CREATE TABLE `favorite` (
@@ -768,7 +931,7 @@ CREATE TABLE `favorite` (
   KEY `subject_index` (`subject_type`,`subject_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `file_sync` */
 DROP TABLE IF EXISTS `file_sync`;
 
 CREATE TABLE `file_sync` (
@@ -789,17 +952,18 @@ CREATE TABLE `file_sync` (
   `linked_id` int(11) DEFAULT NULL,
   `link_count` int(11) DEFAULT NULL,
   `file_root` varchar(64) DEFAULT NULL,
-  `file_path` varchar(128) DEFAULT NULL,
+  `file_path` varchar(512) DEFAULT NULL,
   `file_size` bigint(20) DEFAULT NULL,
+  `custom_data` text,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_key` (`object_type`,`object_id`,`version`,`object_sub_type`,`dc`),
   KEY `object_id_object_type_version_subtype_index` (`object_id`,`object_type`,`version`,`object_sub_type`),
   KEY `partner_id_object_id_object_type_index` (`partner_id`,`object_id`,`object_type`),
   KEY `dc_status_index` (`dc`,`status`),
   KEY `updated_at_index` (`updated_at`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `flag` */
 DROP TABLE IF EXISTS `flag`;
 
 CREATE TABLE `flag` (
@@ -816,7 +980,7 @@ CREATE TABLE `flag` (
   KEY `flag_FI_1` (`kuser_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `flavor_asset` */
 DROP TABLE IF EXISTS `flavor_asset`;
 
 CREATE TABLE `flavor_asset` (
@@ -834,13 +998,10 @@ CREATE TABLE `flavor_asset` (
   `description` varchar(255) NOT NULL,
   `width` int(11) NOT NULL DEFAULT '0',
   `height` int(11) NOT NULL DEFAULT '0',
-  `bitrate` int(11) NOT NULL DEFAULT '0',
-  `frame_rate` float NOT NULL DEFAULT '0',
   `size` int(11) NOT NULL DEFAULT '0',
   `is_original` int(11) NOT NULL DEFAULT '0',
   `file_ext` varchar(4) DEFAULT NULL,
   `container_format` varchar(127) DEFAULT NULL,
-  `video_codec_id` varchar(127) DEFAULT NULL,
   `type` int(11) NOT NULL DEFAULT '0',
   `custom_data` text,
   `partner_data` varchar(4096) DEFAULT NULL,
@@ -850,9 +1011,9 @@ CREATE TABLE `flavor_asset` (
   KEY `flavor_asset_FI_2` (`flavor_params_id`),
   KEY `id_indx` (`id`),
   KEY `updated_at_index` (`updated_at`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `flavor_params` */
 DROP TABLE IF EXISTS `flavor_params`;
 
 CREATE TABLE `flavor_params` (
@@ -893,10 +1054,11 @@ CREATE TABLE `flavor_params` (
   `engine_version` smallint(6) DEFAULT NULL,
   `type` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `updated_at_index` (`updated_at`)
-) ENGINE=MyISAM;
+  KEY `updated_at_index` (`updated_at`),
+  KEY `system_name_partner_id` (`partner_id`,`system_name`)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `flavor_params_conversion_profile` */
 DROP TABLE IF EXISTS `flavor_params_conversion_profile`;
 
 CREATE TABLE `flavor_params_conversion_profile` (
@@ -913,9 +1075,9 @@ CREATE TABLE `flavor_params_conversion_profile` (
   KEY `flavor_params_conversion_profile_FI_1` (`conversion_profile_id`),
   KEY `flavor_params_conversion_profile_FI_2` (`flavor_params_id`),
   KEY `updated_at_FI_3` (`updated_at`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `flavor_params_output` */
 DROP TABLE IF EXISTS `flavor_params_output`;
 
 CREATE TABLE `flavor_params_output` (
@@ -964,7 +1126,7 @@ CREATE TABLE `flavor_params_output` (
   KEY `updated_at_index` (`updated_at`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `flickr_token` */
 DROP TABLE IF EXISTS `flickr_token`;
 
 CREATE TABLE `flickr_token` (
@@ -980,7 +1142,7 @@ CREATE TABLE `flickr_token` (
   KEY `is_valid_index` (`is_valid`,`kalt_token`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `generic_distribution_provider` */
 DROP TABLE IF EXISTS `generic_distribution_provider`;
 
 CREATE TABLE `generic_distribution_provider` (
@@ -1002,7 +1164,7 @@ CREATE TABLE `generic_distribution_provider` (
   KEY `partner_and_defaults` (`partner_id`,`is_default`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `generic_distribution_provider_action` */
 DROP TABLE IF EXISTS `generic_distribution_provider_action`;
 
 CREATE TABLE `generic_distribution_provider_action` (
@@ -1027,7 +1189,7 @@ CREATE TABLE `generic_distribution_provider_action` (
   KEY `generic_distribution_provider_status` (`generic_distribution_provider_id`,`status`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `invalid_session` */
 DROP TABLE IF EXISTS `invalid_session`;
 
 CREATE TABLE `invalid_session` (
@@ -1041,7 +1203,7 @@ CREATE TABLE `invalid_session` (
   KEY `ks_valid_until_index` (`ks_valid_until`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `kce_installation_error` */
 DROP TABLE IF EXISTS `kce_installation_error`;
 
 CREATE TABLE `kce_installation_error` (
@@ -1062,7 +1224,7 @@ CREATE TABLE `kce_installation_error` (
   KEY `type_index` (`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `keyword` */
 DROP TABLE IF EXISTS `keyword`;
 
 CREATE TABLE `keyword` (
@@ -1074,7 +1236,7 @@ CREATE TABLE `keyword` (
   KEY `word_index` (`word`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `kshow` */
 DROP TABLE IF EXISTS `kshow`;
 
 CREATE TABLE `kshow` (
@@ -1138,7 +1300,7 @@ CREATE TABLE `kshow` (
   KEY `kshow_FI_1` (`producer_id`),
   KEY `indexed_custom_data_1_index` (`indexed_custom_data_1`),
   KEY `indexed_custom_data_2_index` (`indexed_custom_data_2`),
-  KEY `indexed_custom_data_3_index` (`indexed_custom_data_3`),
+  KEY `indexed_custom_data_3_index` (`indexed_custom_data_3`(255)),
   KEY `partner_id_subp_index` (`partner_id`,`id`,`subp_id`),
   KEY `partner_created_at_indes` (`partner_id`,`created_at`),
   KEY `created_index` (`created_at`),
@@ -1146,11 +1308,10 @@ CREATE TABLE `kshow` (
   KEY `producer_updated_id_index` (`producer_id`,`updated_at`,`id`),
   KEY `partner_subp_entries_index` (`partner_id`,`subp_id`,`entries`),
   KEY `partner_group_index` (`partner_id`,`group_id`),
-  KEY `int_id_index` (`int_id`),
-  FULLTEXT KEY `search_text_index` (`search_text`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  KEY `int_id_index` (`int_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `kshow_kuser` */
 DROP TABLE IF EXISTS `kshow_kuser`;
 
 CREATE TABLE `kshow_kuser` (
@@ -1165,7 +1326,7 @@ CREATE TABLE `kshow_kuser` (
   KEY `subscription_index` (`kshow_id`,`subscription_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `kuser` */
 DROP TABLE IF EXISTS `kuser`;
 
 CREATE TABLE `kuser` (
@@ -1231,11 +1392,10 @@ CREATE TABLE `kuser` (
   KEY `partner_puser_id` (`partner_id`,`puser_id`),
   KEY `updated_at` (`updated_at`),
   KEY `login_data_id_index` (`login_data_id`),
-  KEY `is_admin_index` (`is_admin`),
-  FULLTEXT KEY `search_text_index` (`search_text`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+  KEY `is_admin_index` (`is_admin`)
+) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `kuser_to_user_role` */
 DROP TABLE IF EXISTS `kuser_to_user_role`;
 
 CREATE TABLE `kuser_to_user_role` (
@@ -1247,9 +1407,9 @@ CREATE TABLE `kuser_to_user_role` (
   PRIMARY KEY (`id`),
   KEY `kuser_to_user_role_FI_1` (`kuser_id`),
   KEY `kuser_to_user_role_FI_2` (`user_role_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `kvote` */
 DROP TABLE IF EXISTS `kvote`;
 
 CREATE TABLE `kvote` (
@@ -1259,13 +1419,18 @@ CREATE TABLE `kvote` (
   `kuser_id` int(11) DEFAULT NULL,
   `rank` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `partner_id` int(11) DEFAULT NULL,
+  `kvote_type` int(11) DEFAULT '1',
+  `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `kshow_index` (`kshow_id`),
   KEY `entry_user_index` (`entry_id`),
-  KEY `kvote_FI_3` (`kuser_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  KEY `kvote_FI_3` (`kuser_id`),
+  KEY `entry_user_status_index` (`entry_id`,`kuser_id`,`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `kwidget_log` */
 DROP TABLE IF EXISTS `kwidget_log`;
 
 CREATE TABLE `kwidget_log` (
@@ -1288,15 +1453,15 @@ CREATE TABLE `kwidget_log` (
   `partner_id` int(11) DEFAULT '0',
   `subp_id` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `referer_index` (`referer`(333)),
+  KEY `referer_index` (`referer`(255)),
   KEY `entry_id_kshow_id_index` (`entry_id`,`kshow_id`),
   KEY `partner_id_subp_id_index` (`partner_id`,`subp_id`),
   KEY `kwidget_log_FI_1` (`widget_id`),
   KEY `kwidget_log_FI_2` (`kshow_id`),
   KEY `kwidget_log_FI_4` (`ui_conf_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `mail_job` */
 DROP TABLE IF EXISTS `mail_job`;
 
 CREATE TABLE `mail_job` (
@@ -1332,9 +1497,9 @@ CREATE TABLE `mail_job` (
   KEY `STATUS_PRIORITY_INDEX` (`status`,`mail_priority`),
   KEY `recipient_id_index` (`recipient_id`),
   KEY `partner_id_index` (`partner_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `media_info` */
 DROP TABLE IF EXISTS `media_info`;
 
 CREATE TABLE `media_info` (
@@ -1376,9 +1541,9 @@ CREATE TABLE `media_info` (
   PRIMARY KEY (`id`),
   KEY `flavor_asset_id_index` (`flavor_asset_id`),
   KEY `updated_at_index` (`updated_at`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `metadata` */
 DROP TABLE IF EXISTS `metadata`;
 
 CREATE TABLE `metadata` (
@@ -1393,9 +1558,9 @@ CREATE TABLE `metadata` (
   `object_type` int(11) DEFAULT NULL,
   `status` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `metadata_profile` */
 DROP TABLE IF EXISTS `metadata_profile`;
 
 CREATE TABLE `metadata_profile` (
@@ -1413,9 +1578,9 @@ CREATE TABLE `metadata_profile` (
   `create_mode` int(11) NOT NULL DEFAULT '1',
   `custom_data` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `metadata_profile_field` */
 DROP TABLE IF EXISTS `metadata_profile_field`;
 
 CREATE TABLE `metadata_profile_field` (
@@ -1432,9 +1597,9 @@ CREATE TABLE `metadata_profile_field` (
   `status` tinyint(4) DEFAULT NULL,
   `search_index` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `moderation` */
 DROP TABLE IF EXISTS `moderation`;
 
 CREATE TABLE `moderation` (
@@ -1456,9 +1621,9 @@ CREATE TABLE `moderation` (
   KEY `partner_id_group_id_status_index` (`partner_id`,`group_id`,`status`),
   KEY `object_index` (`partner_id`,`status`,`object_id`,`object_type`),
   KEY `moderation_FI_1` (`kuser_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `moderation_flag` */
 DROP TABLE IF EXISTS `moderation_flag`;
 
 CREATE TABLE `moderation_flag` (
@@ -1479,9 +1644,9 @@ CREATE TABLE `moderation_flag` (
   KEY `moderation_flag_FI_1` (`kuser_id`),
   KEY `moderation_flag_FI_2` (`flagged_entry_id`),
   KEY `moderation_flag_FI_3` (`flagged_kuser_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 
-
+/*Table structure for table `notification` */
 DROP TABLE IF EXISTS `notification`;
 
 CREATE TABLE `notification` (
@@ -1509,9 +1674,9 @@ CREATE TABLE `notification` (
   PRIMARY KEY (`id`),
   KEY `status_partner_id_index` (`status`,`partner_id`),
   KEY `object_type_object_id` (`object_type`,`object_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `partner` */
 DROP TABLE IF EXISTS `partner`;
 
 CREATE TABLE `partner` (
@@ -1561,9 +1726,9 @@ CREATE TABLE `partner` (
   KEY `partner_alias_index` (`partner_alias`),
   KEY `updated_at` (`updated_at`),
   KEY `partner_parent_index` (`partner_parent_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `partner_activity` */
 DROP TABLE IF EXISTS `partner_activity`;
 
 CREATE TABLE `partner_activity` (
@@ -1585,9 +1750,9 @@ CREATE TABLE `partner_activity` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `partner_id` (`partner_id`,`activity_date`,`activity`,`sub_activity`),
   KEY `partner_id_index` (`partner_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `partner_stats` */
 DROP TABLE IF EXISTS `partner_stats`;
 
 CREATE TABLE `partner_stats` (
@@ -1610,9 +1775,9 @@ CREATE TABLE `partner_stats` (
   `widgets` int(11) DEFAULT NULL,
   PRIMARY KEY (`partner_id`),
   KEY `partner_id_index` (`partner_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `partner_transactions` */
 DROP TABLE IF EXISTS `partner_transactions`;
 
 CREATE TABLE `partner_transactions` (
@@ -1628,9 +1793,9 @@ CREATE TABLE `partner_transactions` (
   `transaction_data` text,
   PRIMARY KEY (`id`),
   KEY `partner_id_index` (`partner_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `partnership` */
 DROP TABLE IF EXISTS `partnership`;
 
 CREATE TABLE `partnership` (
@@ -1645,9 +1810,9 @@ CREATE TABLE `partnership` (
   `partnership_date` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `partnership_order_index` (`partnership_order`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `permission` */
 DROP TABLE IF EXISTS `permission`;
 
 CREATE TABLE `permission` (
@@ -1666,10 +1831,11 @@ CREATE TABLE `permission` (
   PRIMARY KEY (`id`),
   KEY `partner_id_index` (`partner_id`),
   KEY `name_index` (`name`),
-  KEY `name_partner_id_index` (`name`,`partner_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+  KEY `name_partner_id_index` (`name`,`partner_id`),
+  KEY `updated_at_index` (`updated_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=192 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `permission_item` */
 DROP TABLE IF EXISTS `permission_item`;
 
 CREATE TABLE `permission_item` (
@@ -1686,9 +1852,9 @@ CREATE TABLE `permission_item` (
   `updated_at` datetime DEFAULT NULL,
   `custom_data` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `permission_to_permission_item` */
 DROP TABLE IF EXISTS `permission_to_permission_item`;
 
 CREATE TABLE `permission_to_permission_item` (
@@ -1700,9 +1866,9 @@ CREATE TABLE `permission_to_permission_item` (
   PRIMARY KEY (`id`),
   KEY `permission_to_permission_item_FI_1` (`permission_id`),
   KEY `permission_to_permission_item_FI_2` (`permission_item_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `pr_news` */
 DROP TABLE IF EXISTS `pr_news`;
 
 CREATE TABLE `pr_news` (
@@ -1716,9 +1882,9 @@ CREATE TABLE `pr_news` (
   `updated_at` datetime DEFAULT NULL,
   `press_date` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `priority_group` */
 DROP TABLE IF EXISTS `priority_group`;
 
 CREATE TABLE `priority_group` (
@@ -1732,9 +1898,9 @@ CREATE TABLE `priority_group` (
   `priority` tinyint(4) DEFAULT NULL,
   `bulk_priority` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `puser_kuser` */
 DROP TABLE IF EXISTS `puser_kuser`;
 
 CREATE TABLE `puser_kuser` (
@@ -1752,9 +1918,9 @@ CREATE TABLE `puser_kuser` (
   KEY `partner_puser_index` (`partner_id`,`puser_id`),
   KEY `kuser_id_index` (`kuser_id`),
   KEY `I_referenced_puser_role_FK_3_1` (`puser_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `puser_role` */
 DROP TABLE IF EXISTS `puser_role`;
 
 CREATE TABLE `puser_role` (
@@ -1770,9 +1936,25 @@ CREATE TABLE `puser_role` (
   KEY `partner_puser_index` (`partner_id`,`puser_id`),
   KEY `kshow_id_index` (`kshow_id`),
   KEY `puser_role_FI_3` (`puser_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+/*Table structure for table `report` */
+DROP TABLE IF EXISTS `report`;
 
+CREATE TABLE `report` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `partner_id` int(11) NOT NULL,
+  `name` varchar(128) NOT NULL DEFAULT '',
+  `system_name` varchar(128) NOT NULL DEFAULT '',
+  `description` varchar(1024) NOT NULL DEFAULT '',
+  `query` text NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `roughcut_entry` */
 DROP TABLE IF EXISTS `roughcut_entry`;
 
 CREATE TABLE `roughcut_entry` (
@@ -1790,9 +1972,9 @@ CREATE TABLE `roughcut_entry` (
   KEY `entry_id_index` (`entry_id`),
   KEY `roughcut_id_index` (`roughcut_id`),
   KEY `roughcut_kshow_id_index` (`roughcut_kshow_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `scheduler` */
 DROP TABLE IF EXISTS `scheduler`;
 
 CREATE TABLE `scheduler` (
@@ -1808,9 +1990,9 @@ CREATE TABLE `scheduler` (
   `last_status` datetime DEFAULT NULL,
   `host` varchar(255) DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `scheduler_config` */
 DROP TABLE IF EXISTS `scheduler_config`;
 
 CREATE TABLE `scheduler_config` (
@@ -1835,9 +2017,9 @@ CREATE TABLE `scheduler_config` (
   KEY `status_created_at_index` (`created_at`),
   KEY `scheduler_id_index` (`scheduler_id`),
   KEY `worker_id_index_type` (`worker_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `scheduler_status` */
 DROP TABLE IF EXISTS `scheduler_status`;
 
 CREATE TABLE `scheduler_status` (
@@ -1858,9 +2040,9 @@ CREATE TABLE `scheduler_status` (
   KEY `status_created_at_index` (`created_at`),
   KEY `scheduler_id_index` (`scheduler_id`),
   KEY `worker_id_index_type` (`worker_id`,`worker_type`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `scheduler_worker` */
 DROP TABLE IF EXISTS `scheduler_worker`;
 
 CREATE TABLE `scheduler_worker` (
@@ -1878,9 +2060,9 @@ CREATE TABLE `scheduler_worker` (
   `statuses` varchar(1023) DEFAULT '',
   `last_status` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `short_link` */
 DROP TABLE IF EXISTS `short_link`;
 
 CREATE TABLE `short_link` (
@@ -1899,9 +2081,9 @@ CREATE TABLE `short_link` (
   KEY `int_id` (`int_id`),
   KEY `partner_id` (`partner_id`),
   KEY `kuser_partner_name` (`partner_id`,`kuser_id`,`system_name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `storage_profile` */
 DROP TABLE IF EXISTS `storage_profile`;
 
 CREATE TABLE `storage_profile` (
@@ -1929,12 +2111,13 @@ CREATE TABLE `storage_profile` (
   `custom_data` text,
   `path_manager_class` varchar(127) DEFAULT NULL,
   `url_manager_class` varchar(127) NOT NULL,
-  `delivery_priority` INTEGER DEFAULT 1,
-  `delivery_status` INTEGER DEFAULT 1,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+  `delivery_priority` int(11) DEFAULT '1',
+  `delivery_status` int(11) DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `system_name_partner_id` (`partner_id`,`system_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `syndication_feed` */
 DROP TABLE IF EXISTS `syndication_feed`;
 
 CREATE TABLE `syndication_feed` (
@@ -1963,11 +2146,28 @@ CREATE TABLE `syndication_feed` (
   `created_at` datetime DEFAULT NULL,
   `custom_data` text,
   `display_in_search` tinyint(4) DEFAULT '1',
+  `privacy_context` varchar(255) DEFAULT NULL,
+  `enforce_entitlement` tinyint(4) DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `int_id_index` (`int_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+/*Table structure for table `tag` */
+DROP TABLE IF EXISTS `tag`;
 
+CREATE TABLE `tag` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tag` varchar(32) NOT NULL,
+  `partner_id` int(11) NOT NULL,
+  `object_type` int(11) NOT NULL,
+  `instance_count` int(11) NOT NULL DEFAULT '1',
+  `created_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `partner_tag` (`partner_id`),
+  KEY `partner_object_tag` (`partner_id`,`object_type`)
+) ENGINE=InnoDB AUTO_INCREMENT=97 DEFAULT CHARSET=latin1;
+
+/*Table structure for table `tagword_count` */
 DROP TABLE IF EXISTS `tagword_count`;
 
 CREATE TABLE `tagword_count` (
@@ -1975,26 +2175,26 @@ CREATE TABLE `tagword_count` (
   `tag_count` int(11) DEFAULT NULL,
   PRIMARY KEY (`tag`),
   KEY `count_index` (`tag_count`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `temp_entry_update` */
 DROP TABLE IF EXISTS `temp_entry_update`;
 
 CREATE TABLE `temp_entry_update` (
   `id` varchar(20) NOT NULL DEFAULT '',
   `views` int(11) DEFAULT '0',
   `plays` int(11) DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `temp_updated_kusers_storage_usage` */
 DROP TABLE IF EXISTS `temp_updated_kusers_storage_usage`;
 
 CREATE TABLE `temp_updated_kusers_storage_usage` (
   `kuser_id` int(11) NOT NULL,
   `storage_kb` int(11) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `tmp` */
 DROP TABLE IF EXISTS `tmp`;
 
 CREATE TABLE `tmp` (
@@ -2025,9 +2225,9 @@ CREATE TABLE `tmp` (
   `updated_at` datetime DEFAULT NULL,
   `partner_id` int(11) DEFAULT '0',
   `display_in_search` tinyint(4) DEFAULT '1'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `track_entry` */
 DROP TABLE IF EXISTS `track_entry`;
 
 CREATE TABLE `track_entry` (
@@ -2054,9 +2254,9 @@ CREATE TABLE `track_entry` (
   KEY `entry_id_indx` (`entry_id`),
   KEY `track_event_type_id_indx` (`track_event_type_id`),
   KEY `param_1_indx` (`param_1_str`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `ui_conf` */
 DROP TABLE IF EXISTS `ui_conf`;
 
 CREATE TABLE `ui_conf` (
@@ -2086,9 +2286,9 @@ CREATE TABLE `ui_conf` (
   KEY `partner_id_index` (`partner_id`),
   KEY `partner_id_creation_mode_index` (`partner_id`,`creation_mode`),
   KEY `updated_at` (`updated_at`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `upload_token` */
 DROP TABLE IF EXISTS `upload_token`;
 
 CREATE TABLE `upload_token` (
@@ -2114,9 +2314,9 @@ CREATE TABLE `upload_token` (
   KEY `status_created_at` (`status`,`created_at`),
   KEY `created_at` (`created_at`),
   KEY `upload_token_FI_1` (`kuser_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `user_login_data` */
 DROP TABLE IF EXISTS `user_login_data`;
 
 CREATE TABLE `user_login_data` (
@@ -2133,16 +2333,16 @@ CREATE TABLE `user_login_data` (
   `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `login_email_index` (`login_email`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `user_role` */
 DROP TABLE IF EXISTS `user_role`;
 
 CREATE TABLE `user_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `str_id` varchar(100) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `system_name` VARCHAR(128) NULL,
+  `system_name` varchar(128) DEFAULT NULL,
   `description` text,
   `partner_id` int(11) NOT NULL,
   `status` int(11) NOT NULL,
@@ -2152,10 +2352,11 @@ CREATE TABLE `user_role` (
   `updated_at` datetime DEFAULT NULL,
   `custom_data` text,
   PRIMARY KEY (`id`),
-  KEY `partner_id_index` (`partner_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+  KEY `partner_id_index` (`partner_id`),
+  KEY `system_name_partner_id` (`partner_id`,`system_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `version_management` */
 DROP TABLE IF EXISTS `version_management`;
 
 CREATE TABLE `version_management` (
@@ -2165,7 +2366,7 @@ CREATE TABLE `version_management` (
   PRIMARY KEY (`filename`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `virus_scan_profile` */
 DROP TABLE IF EXISTS `virus_scan_profile`;
 
 CREATE TABLE `virus_scan_profile` (
@@ -2181,9 +2382,9 @@ CREATE TABLE `virus_scan_profile` (
   `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `partner_id` (`partner_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `widget` */
 DROP TABLE IF EXISTS `widget`;
 
 CREATE TABLE `widget` (
@@ -2202,6 +2403,8 @@ CREATE TABLE `widget` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `partner_data` varchar(4096) DEFAULT NULL,
+  `privacy_context` varchar(255) DEFAULT NULL,
+  `enforce_entitlement` tinyint(4) DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `int_id_index` (`int_id`),
   KEY `widget_FI_1` (`kshow_id`),
@@ -2210,9 +2413,9 @@ CREATE TABLE `widget` (
   KEY `partner_id_index` (`partner_id`),
   KEY `created_at_index` (`created_at`),
   KEY `updated_at` (`updated_at`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
-
+/*Table structure for table `widget_log` */
 DROP TABLE IF EXISTS `widget_log`;
 
 CREATE TABLE `widget_log` (
@@ -2233,16 +2436,16 @@ CREATE TABLE `widget_log` (
   `partner_id` int(11) DEFAULT '0',
   `subp_id` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `referer_index` (`referer`(333)),
+  KEY `referer_index` (`referer`(255)),
   KEY `entry_id_kshow_id_index` (`entry_id`,`kshow_id`),
   KEY `views_index` (`views`),
   KEY `plays_index` (`plays`),
   KEY `partner_id_subp_id_index` (`partner_id`,`subp_id`),
   KEY `created_at` (`created_at`),
   KEY `widget_index` (`widget_type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+/*Table structure for table `work_group` */
 DROP TABLE IF EXISTS `work_group`;
 
 CREATE TABLE `work_group` (
@@ -2254,13 +2457,4 @@ CREATE TABLE `work_group` (
   `name` varchar(20) DEFAULT NULL,
   `description` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-
-
-
-
-
-
-
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
