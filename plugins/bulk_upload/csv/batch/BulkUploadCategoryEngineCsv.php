@@ -199,6 +199,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
     		            {
     		                $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
     		                $bulkUploadResult->errorDescription = "Category reference ID not found";
+    		                break;
     		            }
     		            $category = $this->createCategoryFromResultAndJobData($bulkUploadResult);
             			$bulkUploadResultChunk[] = $bulkUploadResult;
@@ -211,6 +212,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
     		            {
     		                 $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
     		                $bulkUploadResult->errorDescription = "Category reference ID not found";
+    		                break;
     		            }
     		            $bulkUploadResultChunk[] = $bulkUploadResult;
                 		$requestResults[] = $this->kClient->category->delete($bulkUploadResult->objectId);
