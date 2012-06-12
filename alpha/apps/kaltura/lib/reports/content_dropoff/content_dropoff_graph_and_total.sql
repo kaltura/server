@@ -1,10 +1,10 @@
 SELECT 
-	SUM(count_plays) count_plays,
-	SUM(count_plays_25) count_plays_25,
-	SUM(count_plays_50) count_plays_50,
-	SUM(count_plays_75) count_plays_75,
-	SUM(count_plays_100) count_plays_100,
-	( SUM(count_plays_100) / SUM(count_plays) ) play_through_ratio
+	IFNULL(SUM(count_plays),0) count_plays,
+	IFNULL(SUM(count_plays_25),0) count_plays_25,
+	IFNULL(SUM(count_plays_50),0) count_plays_50,
+	IFNULL(SUM(count_plays_75),0) count_plays_75,
+	IFNULL(SUM(count_plays_100),0) count_plays_100,
+	IFNULL(( SUM(count_plays_100) / SUM(count_plays) ),0) play_through_ratio
 FROM 
 	dwh_hourly_events_entry ev, dwh_dim_entries en
 WHERE

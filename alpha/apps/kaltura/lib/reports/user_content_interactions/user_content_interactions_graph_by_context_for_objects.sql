@@ -1,10 +1,10 @@
 SELECT
 	DATE(DATE(date_id) + INTERVAL hour_id HOUR + INTERVAL {TIME_SHIFT} HOUR)*1 date_id, # time shifted date
-	SUM(count_plays) count_plays,
-	SUM(count_edit) count_edit,
-	SUM(count_viral) count_viral,
-	SUM(count_download) count_download,
-	SUM(count_report) count_report
+	IFNULL(SUM(count_plays),0) count_plays,
+	IFNULL(SUM(count_edit),0) count_edit,
+	IFNULL(SUM(count_viral),0) count_viral,
+	IFNULL(SUM(count_download),0) count_download,
+	IFNULL(SUM(count_report),0) count_report
 FROM 
 	dwh_hourly_events_context_entry_user_app ev
 WHERE 	

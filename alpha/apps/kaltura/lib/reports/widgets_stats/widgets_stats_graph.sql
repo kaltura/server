@@ -1,5 +1,5 @@
 SELECT 
-	widget_id, SUM(count_plays) count_plays
+	widget_id, IFNULL(SUM(count_plays),0) count_plays
 FROM 
 	dwh_hourly_events_widget
 WHERE 
