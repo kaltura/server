@@ -54,18 +54,18 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 			}
 
 			//New logic - if specific permissions are required to authenticate the partner/user, check their existence here.
-//			$requiredPermissionsArr = explode(",", $requiredPermissions);
-//			foreach ($requiredPermissionsArr as $requiredPermission)
-//			{
-//			    $filter = new Kaltura_Client_Type_PermissionFilter();
-//			    $filter->nameEqual = $requiredPermission;
-//			    $existingPermissions = $client->permission->listAction($filter);
-//			    KalturaLog::debug("permissions total count: ".$existingPermissions->totalCount);
-//			    if ( !$existingPermissions->totalCount )
-//			    {
-//			        return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
-//			    }
-//			}
+			$requiredPermissionsArr = explode(",", $requiredPermissions);
+			foreach ($requiredPermissionsArr as $requiredPermission)
+			{
+			    $filter = new Kaltura_Client_Type_PermissionFilter();
+			    $filter->nameEqual = $requiredPermission;
+			    $existingPermissions = $client->permission->listAction($filter);
+			    KalturaLog::debug("permissions total count: ".$existingPermissions->totalCount);
+			    if ( !$existingPermissions->totalCount )
+			    {
+			        return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
+			    }
+			}
 			
 			return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
 		}
