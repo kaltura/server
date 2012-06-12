@@ -252,7 +252,7 @@ class CategoryService extends KalturaBaseService
 	}
 	
 	/**
-	 * Move categories that belong to the same parent category to a traget categroy
+	 * Move categories that belong to the same parent category to a traget categroy - enabled only for ks with disable entitlement
 	 * 
 	 * @action move
 	 * @param string $categoryIds
