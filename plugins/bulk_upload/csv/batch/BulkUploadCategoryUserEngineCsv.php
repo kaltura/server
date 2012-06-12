@@ -155,7 +155,9 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		{
 		    try 
 		    {
+		        $this->impersonate();
 		        $categoryUser = $this->kClient->categoryUser->get($bulkUploadResult->categoryId, $bulkUploadResult->userId);
+                $this->unimpersonate();
 		        $bulkUploadResult->action = KalturaBulkUploadAction::UPDATE;
 		    }
 		    catch (Exception $e)
