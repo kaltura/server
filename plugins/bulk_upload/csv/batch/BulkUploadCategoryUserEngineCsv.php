@@ -256,7 +256,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		            
 		        case KalturaBulkUploadAction::DELETE:
 		            $bulkUploadResultChunk[] = $bulkUploadResult;
-        			
+        			$bulkUploadResult->requiredObjectStatus = null;
         			$this->kClient->categoryUser->delete($bulkUploadResult->categoryId, $bulkUploadResult->userId);
         			
 		            break;
