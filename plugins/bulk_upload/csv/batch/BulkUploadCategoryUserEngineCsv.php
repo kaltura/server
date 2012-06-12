@@ -149,9 +149,15 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		        $bulkUploadResult->categoryId = $categoryResults->objects[0]->id;
 		        $this->categoryReferenceIdMap[$bulkUploadResult->categoryReferenceId] = $bulkUploadResult->categoryId;
 		    }
+		    else
+		    {
+		        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+		        $bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+		        $bulkUploadResult->errorDescription = "Could not locate category by given reference ID.";
+		    }
 		}
         
-	    if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
+	    if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE && $bulkUploadResult->status != KalturaBulkUploadResultStatus::ERROR)
 		{
 		    try 
 		    {
