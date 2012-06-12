@@ -84,7 +84,7 @@ class BulkUploadResultPeer extends BaseBulkUploadResultPeer
 		$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $bulkUploadJobId);
 		//$criteria->add(BulkUploadResultPeer::OBJECT_ID, null, Criteria::ISNOTNULL);
 		$criteria->add(BulkUploadResultPeer::OBJECT_TYPE, $bulkUploadObjectType);
-		$criteria->add(BulkUploadResultPeer::STATUS, BulkUploadResultStatus::OK);
+		$criteria->add(BulkUploadResultPeer::STATUS, BulkUploadResultStatus::ERROR);
 		
 		return self::doCount($criteria);
 	}
