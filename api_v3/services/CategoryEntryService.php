@@ -143,28 +143,55 @@ class CategoryEntryService extends KalturaBaseService
 		
 		if ($pager == null)
 			$pager = new KalturaFilterPager();
-		
-		if ($filter->entryIdEqual == null && 
-			kEntitlementUtils::getEntitlementEnforcement())
-			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ENTRY_ID_EQUAL);
 			
 		if ($filter->entryIdEqual == null &&
-			$filter->entryIdIn == null &&
-			$filter->categoryFullIdsEqual == null &&
-			$filter->categoryFullIdsStartsWith == null &&
 			$filter->categoryIdIn == null &&
-			$filter->categoryIdEqual == null)
+			$filter->categoryIdEqual == null && 
+			kEntitlementUtils::getEntitlementEnforcement())
 			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_CATEGORY);		
+			
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			//validate entitl for entry
+			if($filter->entryIdEqual != null)
+			{
+				$entry = entryPeer::retrieveByPK($filter->entryIdEqual);
+				if(!$entry)
+					throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $filter->entryIdEqual);
+			}
+			
+			//validate entitl categories
+			if($filter->categoryIdIn != null)
+			{
+				$categoryIdInArr = $filter->categoryIdIn;
+				$categoryIdInArr = array_unique($categoryIdInArr);
+				
+				$entitledCategories = categoryPeer::retrieveByPKs(explode(',',$filter->categoryIdIn));
+				
+				if(count($entitledCategories) != count($categoryIdInArr))
+					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdIn);
+			}
+			
+			//validate entitl category
+			if($filter->categoryId != null)
+			{
+				$category = categoryPeer::retrieveByPK($filter->categoryId);
+				if(!$category)
+					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdIn);
+			}
+		}
 			
 		$categoryEntryFilter = new categoryEntryFilter();
 		$filter->toObject($categoryEntryFilter);
 		 
 		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
 		$categoryEntryFilter->attachToCriteria($c);
-		$pager->attachToCriteria($c);
+		if(!kEntitlementUtils::getEntitlementEnforcement() || $filter->entryIdEqual == null)
+			$pager->attachToCriteria($c);
+			
 		$dbCategoriesEntry = categoryEntryPeer::doSelect($c);
 		
-		if(kEntitlementUtils::getEntitlementEnforcement() && count($dbCategoriesEntry))
+		if(kEntitlementUtils::getEntitlementEnforcement() && count($dbCategoriesEntry) && $filter->entryIdEqual != null)
 		{
 			//remove unlisted categories: display in search is set to members only
 			$categoriesIds = array();
@@ -173,6 +200,7 @@ class CategoryEntryService extends KalturaBaseService
 				
 			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 			$c->add(categoryPeer::ID, $categoriesIds, Criteria::IN);
+			$pager->attachToCriteria($c);
 			$c->applyFilters();
 			
 			$categoryIds = $c->getFetchedIds();
