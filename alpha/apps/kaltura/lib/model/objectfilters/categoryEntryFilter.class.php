@@ -13,11 +13,9 @@ class categoryEntryFilter extends baseObjectFilter
 			"_eq_category_id",
 			"_in_category_id",
 			"_eq_entry_id",
-			"_in_entry_id",
 			"_gte_created_at",
 			"_lte_created_at",
 			"_likex_category_full_ids",
-			"_eq_category_full_ids",
 			"_eq_status",
 			"_in_status",
 			) , NULL );

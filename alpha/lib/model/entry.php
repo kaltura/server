@@ -2595,6 +2595,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			'roots' => 'roots',
 		
 			'kuser_id' => 'kuserId',
+			'puser_id' => 'puserId',
 			'entry_status' => 'status',
 			'type' => 'type',
 			'media_type' => 'mediaType',
@@ -2623,7 +2624,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			'entitled_kusers_edit' => 'entitledKusersEdit',
 			'entitled_kusers' => 'entitledKusers',
 			'privacy_by_contexts' => 'privacyByContexts',
-			'creator_kuser_id' => 'creatorKuserId',	
+			'creator_kuser_id' => 'creatorKuserId',
+			'creator_puser_id' => 'creatorPuserId',		
 		);
 	}
 	

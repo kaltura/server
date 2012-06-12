@@ -16,7 +16,7 @@ class KalturaCategoryEntry extends KalturaObject implements IFilterable
 	 * User id
 	 * 
 	 * @var string
-	 * @filter eq,in
+	 * @filter eq
 	 */
 	public $entryId;
 	
@@ -34,7 +34,7 @@ class KalturaCategoryEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @readonly
-	 * @filter likex,eq
+	 * @filter likex
 	 */
 	public $categoryFullIds;
 	
