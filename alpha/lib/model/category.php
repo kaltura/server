@@ -1092,6 +1092,18 @@ class category extends Basecategory implements IIndexable
 	 * inherited values are not synced in the DB to child category that inherit from them - but should be returned on the object.
 	 * (values are copied upon update inhertance from inherited to manual)
 	 */
+	public function getPuserId()
+	{
+		if ($this->getInheritanceType() == InheritanceType::INHERIT)
+			return $this->getInheritParent()->getPuserId();
+		else
+			return parent::getPuserId();
+	}
+	
+	/**
+	 * inherited values are not synced in the DB to child category that inherit from them - but should be returned on the object.
+	 * (values are copied upon update inhertance from inherited to manual)
+	 */
 	public function getMembersCount()
 	{
 		if ($this->getInheritanceType() == InheritanceType::INHERIT)
