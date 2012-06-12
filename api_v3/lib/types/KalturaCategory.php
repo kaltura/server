@@ -403,43 +403,37 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		if($this->privacyContext != null && kEntitlementUtils::getEntitlementEnforcement())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT);
 			
-		if(($this->privacyContext == null || $this->privacyContext == '') &&
-			((is_null($sourceObject) &&
-			(($this->appearInList != null && $this->appearInList != KalturaAppearInListType::PARTNER_ONLY) ||
-			($this->moderation != false) ||
-			($this->privacy != null && $this->privacy != KalturaPrivacyType::ALL))) ||
-			($sourceObject && $sourceObject->getPrivacyContexts() == '' &&
-			((($this->appearInList != null && $this->appearInList != KalturaAppearInListType::PARTNER_ONLY) ||
-			($this->appearInList == null && $sourceObject->getDisplayInSearch() != DisplayInSearchType::PARTNER_ONLY)) || 
-			(($this->moderation != false) || ($this->moderation == null && $sourceObject->getModeration() != false)) ||
-			(($this->privacy != null && $this->privacy != KalturaPrivacyType::ALL) ||
-			 $this->privacy == null && $sourceObject->getPrivacy() != KalturaPrivacyType::ALL))))) 
+		if(($this->privacyContext == '') || ($this->privacyContext == null && $sourceObject && $sourceObject->getPrivacyContexts() == ''))
 		{
-			if ($this->parentId != null)
+			if((($this->appearInList != KalturaAppearInListType::PARTNER_ONLY && $this->appearInList != null) || 
+			   ($this->appearInList == null && $sourceObject && $sourceObject->getDisplayInSearch() != DisplayInSearchType::PARTNER_ONLY))|| 
+			   (($this->moderation != KalturaNullableBoolean::FALSE_VALUE && $this->moderation != null) || 
+			   ($this->moderation == null && $sourceObject && $sourceObject->getModeration() != false)) ||
+			   (($this->privacy != KalturaPrivacyType::ALL && $this->privacy != null) || 
+			   ($this->privacy == null && $sourceObject && $sourceObject->getPrivacy() != KalturaPrivacyType::ALL)) ||
+			   ($this->owner != null || 
+			   ($this->owner == null && $sourceObject && $sourceObject->getKuserId() != null)) ||
+			   (($this->userJoinPolicy != KalturaUserJoinPolicyType::NOT_ALLOWED && $this->userJoinPolicy != null) || 
+			   ($this->userJoinPolicy == null && $sourceObject && $sourceObject->getUserJoinPolicy() != KalturaUserJoinPolicyType::NOT_ALLOWED)) ||
+			   (($this->contributionPolicy != KalturaContributionPolicyType::ALL  && $this->contributionPolicy != null ) || 
+			   ($this->contributionPolicy == null && $sourceObject && $sourceObject->getContributionPolicy() != KalturaContributionPolicyType::ALL)) ||
+			   (($this->defaultPermissionLevel != KalturaCategoryUserPermissionLevel::MODERATOR && $this->defaultPermissionLevel != null) || 
+			   ($this->defaultPermissionLevel == null && $sourceObject && $sourceObject->getDefaultPermissionLevel() != KalturaCategoryUserPermissionLevel::MODERATOR )))
 			{
-				$parentCategory = categoryPeer::retrieveByPK($this->parentId);
-				if($parentCategory && $parentCategory->getPrivacyContexts() == '')
+				if ($this->parentId != null)
+				{
+					$parentCategory = categoryPeer::retrieveByPK($this->parentId);
+					if(!$parentCategory)
+						throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $this->parentId);
+					
+					if($parentCategory->getPrivacyContexts() == '')
+						throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT);
+				}
+				else
+				{
 					throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT);
+				}
 			}
-			else
-			{
-				throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT);
-			}
-		}
-			
-		if ($this->inheritanceType == KalturaInheritanceType::INHERIT && 
-			$this->parentId == null && 
-			(!$sourceObject || $sourceObject->getParentId()))
-		{
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_MUST_SET_PARENT_CATEGORY);
-		}
-		
-		if (((!is_null($sourceObject) && $sourceObject->getInheritanceType() == KalturaInheritanceType::INHERIT && $this->inheritanceType == null) || 
-			($this->inheritanceType == KalturaInheritanceType::INHERIT))&& 
-			(($this->userJoinPolicy != null && (!$sourceObject || $this->userJoinPolicy != $sourceObject->getUserJoinPolicy())) ||
-			($this->defaultPermissionLevel != null && (!$sourceObject || $this->defaultPermissionLevel != $sourceObject->getDefaultPermissionLevel()))))
-		{	
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES);
 		}
 		
 		if (!is_null($sourceObject))
