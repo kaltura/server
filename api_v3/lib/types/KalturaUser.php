@@ -154,6 +154,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 		
 	/**
 	 * @var bool
+	 * @filter eq
 	 */
 	public $isAdmin;
 	
