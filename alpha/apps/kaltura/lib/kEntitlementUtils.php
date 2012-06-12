@@ -17,6 +17,7 @@ class kEntitlementUtils
 	
 	public static function getEntitlementEnforcement()
 	{
+		return false;
 		return self::$entitlementEnforcement;
 	}
 	
@@ -53,6 +54,7 @@ class kEntitlementUtils
 			$privacy[] = PrivacyType::AUTHENTICATED_USERS;
 			
 		$crit = $c->getNewCriterion (categoryPeer::PRIVACY, $privacy, Criteria::IN);
+		$ksPrivacyContexts = null;
 		
 		if($ks)
 		{	
@@ -90,7 +92,7 @@ class kEntitlementUtils
 			
 			// entry that doesn't belong to any category is public
 			$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entry->getId());
-			if(!count($categoryEntries))
+			if(!count($categoryEntries) && ($ksPrivacyContexts == null || $ksPrivacyContexts == self::DEFAULT_CONTEXT))
 			{
 				KalturaLog::debug('Entry entitled: entry does not belong to any category');
 				return true;
