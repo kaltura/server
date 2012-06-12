@@ -261,6 +261,9 @@ class CategoryService extends KalturaBaseService
 	 */
 	function moveAction($categoryIds, $targetCategoryParentId)
 	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+			throw new KalturaAPIException(KalturaErrors::CANNOT_MOVE_CATEGORIES_FROM_DIFFERENT_PARENT_CATEGORY);
+		
 		if ($this->getPartner()->getFeaturesStatusByType(FeatureStatusType::LOCK_CATEGORY))
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
 		
