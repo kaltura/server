@@ -163,6 +163,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		    catch (Exception $e)
 		    {
 		        $bulkUploadResult->action = KalturaBulkUploadAction::ADD;
+		        $this->unimpersonate();
 		    }
 		}
 			
