@@ -17,7 +17,6 @@ class kEntitlementUtils
 	
 	public static function getEntitlementEnforcement()
 	{
-		return false;
 		return self::$entitlementEnforcement;
 	}
 	
