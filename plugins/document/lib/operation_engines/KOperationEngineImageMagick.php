@@ -72,7 +72,7 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
     		$imageNode = $imagesListXML->addChild(self::IMAGES_LIST_XML_LABEL_ITEM);
     		$imageNode->addChild(self::IMAGES_LIST_XML_LABEL_NAME, $image);
 		}
-		$imagesListXML -> addAttribute(self::IMAGES_LIST_XML_LABEL_COUNT, count($imagesList));
+		$imagesListXML -> addAttribute(self::IMAGES_LIST_XML_ATTRIBUTE_COUNT, count($imagesList));
 		return $imagesListXML;	
 	}
 	
