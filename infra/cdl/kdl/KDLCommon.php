@@ -265,6 +265,7 @@
 		const VORBIS = "vorbis";
 		const AMRNB = "amrnb";
 		const MPEG2= "mpeg2";
+		const AC3= "ac3";
 		const COPY = "copy";
 	};
 	
