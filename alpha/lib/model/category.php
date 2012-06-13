@@ -1022,14 +1022,14 @@ class category extends Basecategory implements IIndexable
 	private function getInheritParent()
 	{
 		if ($this->getInheritanceType() != InheritanceType::INHERIT || is_null($this->getInheritedParentId()))
-			return null;
+			return $this;
 			
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$inheritCategory = categoryPeer::retrieveByPK($this->getInheritedParentId());
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		if(!$inheritCategory)
-			throw new kCoreException('Invalid inherited parent categroy id for category id [' . $this->getId() . ']');
+			return $this;
 			
 		return $inheritCategory;
 	}
