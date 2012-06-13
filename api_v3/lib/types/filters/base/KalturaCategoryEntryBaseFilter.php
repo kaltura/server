@@ -11,11 +11,9 @@ abstract class KalturaCategoryEntryBaseFilter extends KalturaFilter
 		"categoryIdEqual" => "_eq_category_id",
 		"categoryIdIn" => "_in_category_id",
 		"entryIdEqual" => "_eq_entry_id",
-		"entryIdIn" => "_in_entry_id",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"categoryFullIdsStartsWith" => "_likex_category_full_ids",
-		"categoryFullIdsEqual" => "_eq_category_full_ids",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 	);
@@ -52,11 +50,6 @@ abstract class KalturaCategoryEntryBaseFilter extends KalturaFilter
 	public $entryIdEqual;
 
 	/**
-	 * @var string
-	 */
-	public $entryIdIn;
-
-	/**
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual;
@@ -70,11 +63,6 @@ abstract class KalturaCategoryEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $categoryFullIdsStartsWith;
-
-	/**
-	 * @var string
-	 */
-	public $categoryFullIdsEqual;
 
 	/**
 	 * @var KalturaCategoryEntryStatus

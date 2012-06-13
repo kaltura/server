@@ -13,6 +13,7 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 		"nameOrReferenceIdStartsWith" => "_likex_name_or_reference_id",
 		"managerEqual" => "_eq_manager",
 		"memberEqual" => "_eq_member",
+		"fullNameStartsWithIn" => '_matchor_likex_full_name',
 	);
 
 	private $order_by_map = array
@@ -55,6 +56,11 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 	 * @var string
 	 */
 	public $memberEqual;
+	
+	/**
+	 * @var string
+	 */
+	public $fullNameStartsWithIn;
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()

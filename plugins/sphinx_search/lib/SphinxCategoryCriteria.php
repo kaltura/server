@@ -94,6 +94,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	
 	public static $sphinxFieldsEscapeType = array(
 		'category.FULL_NAME' => SearchIndexFieldEscapeType::MD5,
+		'category.FULL_IDS' => SearchIndexFieldEscapeType::MD5,
 	);
 
 	/**
@@ -146,6 +147,28 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	 */
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{				
+		$categories = $filter->get( "_matchor_likex_full_name");
+		if ($categories !== null)
+		{
+			$categories = explode(',', $categories);
+			$parsedCategories = array();
+			foreach ($categories as $category)
+			{
+				if(trim($category) == '')
+					continue;
+				
+				$parsedCategories[] = $category . '\\*';
+			}
+			
+			$fullNameMatchOr = '';
+			if(count($parsedCategories))
+				$fullNameMatchOr = implode(',' , $parsedCategories);
+			
+			if($fullNameMatchOr != '')
+				$filter->set ( "_matchor_full_name", $fullNameMatchOr);
+		}
+		$filter->unsetByName('_matchor_likex_full_name');
+		
 		if($filter->get('_free_text'))
 		{
 			$freeTexts = $filter->get('_free_text');
@@ -262,7 +285,24 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			
 			$filter->set('_matchor_full_name', $fullnameIn);
 			$filter->unsetByName('_in_full_name');
-		}		
+		}
+
+		if($filter->get('_eq_full_ids'))
+		{
+			$filter->set('_eq_full_ids', $filter->get('_eq_full_ids') . category::FULL_IDS_EQUAL_MATCH_STRING);
+		}
+		
+		if($filter->get('_likex_full_ids'))
+		{
+			$fullids = explode(',', $filter->get('_likex_full_ids'));
+			
+			$fullIdsIn = '';
+			foreach($fullids as $fullid)
+				$fullIdsIn .= $fullid . '\\*,';
+			
+			$filter->set('_matchor_full_ids', $fullIdsIn);
+			$filter->unsetByName('_likex_full_ids');
+		}	
 		
 		if($filter->get('_likex_name_or_reference_id'))
 		{

@@ -30,6 +30,8 @@ class category extends Basecategory implements IIndexable
 	
 	const FULL_NAME_EQUAL_MATCH_STRING = 'fullNameEqualMatchString';
 	
+	const FULL_IDS_EQUAL_MATCH_STRING = 'fullIdsEqualMatchString';
+	
 	const MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY = 10;
 	
 	private static $indexFieldTypes = array(
@@ -138,19 +140,17 @@ class category extends Basecategory implements IIndexable
 			 $this->isColumnModified(categoryPeer::NAME) ||
 			 $this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS)))
 		{
-			$featureStatusToRemoveIndex = null;
+			$lock = false;
 			
 			if ($this->isColumnModified(categoryPeer::PARENT_ID))
-			{
-				$featureStatusToRemoveIndex = new kFeatureStatus();
-				$featureStatusToRemoveIndex->setType(FeatureStatusType::LOCK_CATEGORY);
-			}
+				$lock = true;
 			
-			$this->addIndexCategoryJob($this->getFullIds(), null, null, $featureStatusToRemoveIndex);		
+			$this->addIndexCategoryJob($this->getFullIds(), null, null, $lock);		
 		}
-		elseif (!$this->isNew() && 
-				($this->isColumnModified(categoryPeer::MEMBERS) ||
-			 	$this->isColumnModified(categoryPeer::MEMBERS_COUNT)))
+		
+		if (!$this->isNew() && 
+			($this->isColumnModified(categoryPeer::MEMBERS) ||
+			$this->isColumnModified(categoryPeer::MEMBERS_COUNT)))
 	 	{
 	 		$this->addIndexCategoryJob(null, null, $this->getId());
 	 	}
@@ -599,7 +599,7 @@ class category extends Basecategory implements IIndexable
 		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId);
 	}
 	
-	private function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $inheritedParentId = null, $featureStatusToRemove = null)
+	private function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $inheritedParentId = null, $lock = false)
 	{
 		$featureStatusToRemoveIndex = new kFeatureStatus();
 		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY);
@@ -607,9 +607,12 @@ class category extends Basecategory implements IIndexable
 		$featureStatusesToRemove = array();
 		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
 		
-		if(!is_null($featureStatusToRemove))
+		if($lock)
 		{
-			$featureStatusesToRemove[] = $featureStatusToRemove;
+			$featureStatusToRemoveIndex = new kFeatureStatus();
+			$featureStatusToRemoveIndex->setType(FeatureStatusType::LOCK_CATEGORY);
+			
+			$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
 		}
 
 		$filter = new categoryFilter();
@@ -905,7 +908,7 @@ class category extends Basecategory implements IIndexable
 			'partner_id' => 'partnerId',
 			'name' => 'name',
 			'full_name' => 'searchIndexfullName',
-			'full_ids' => 'fullIds',
+			'full_ids' => 'searchIndexfullIds',
 			'sort_name' => 'sortName',
 			'description' => 'description',
 			'tags' => 'tags',
@@ -1414,20 +1417,41 @@ class category extends Basecategory implements IIndexable
 		$fullName = '';
 		foreach ($fullNameArr as $categoryName)
 		{
-			if($parsedFullName != '')
-				$parsedFullName .= md5($fullName . categoryPeer::CATEGORY_SEPARATOR) . ' '; 
-			
 			if($fullName == '')
 				$fullName = $categoryName;
 			else 
 				$fullName .= '>' . $categoryName;
 			
 			$parsedFullName .= md5($fullName) . ' ';
+			$parsedFullName .= md5($fullName . categoryPeer::CATEGORY_SEPARATOR) . ' ';
 		}
 		
 		$parsedFullName .= md5($this->getFullName() . category::FULL_NAME_EQUAL_MATCH_STRING);
 			
 		return $parsedFullName ;
+	}
+	
+	public function getSearchIndexfullIds()
+	{
+		$fullIds = $this->getFullIds();
+		$fullIdsArr = explode(categoryPeer::CATEGORY_SEPARATOR, $fullIds);
+		
+		$parsedFullId = '';
+		$fullIds = '';
+		foreach ($fullIdsArr as $categoryId)
+		{
+			if($fullIds == '')
+				$fullIds = $categoryId;
+			else 
+				$fullIds .= '>' . $categoryId;
+			
+			$parsedFullId .= md5($fullIds) . ' ';
+			$parsedFullId .= md5($fullIds . categoryPeer::CATEGORY_SEPARATOR) . ' ';
+		}
+		
+		$parsedFullId .= md5($this->getFullIds() . category::FULL_IDS_EQUAL_MATCH_STRING);
+			
+		return $parsedFullId ;
 	}
 	
 	/**
@@ -1446,6 +1470,7 @@ class category extends Basecategory implements IIndexable
 	
 	public static $sphinxFieldsEscapeType = array(
 		'full_name' => SearchIndexFieldEscapeType::NO_ESCAPE,
+		'full_ids' => SearchIndexFieldEscapeType::NO_ESCAPE,
 	);
 	
 	public function getSearchIndexFieldsEscapeType($fieldName)
