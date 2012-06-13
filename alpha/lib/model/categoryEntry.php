@@ -59,12 +59,10 @@ class categoryEntry extends BasecategoryEntry {
 			$category->incrementPendingEntriesCount();
 
 		if($this->getStatus() == CategoryEntryStatus::ACTIVE)
-			$entry = $this->setEntryOnCategory($category, $entry);
+			$this->setEntryOnCategory($category, $entry);
 			
 		if(!categoryEntryPeer::getSkipSave())
-			$entry->setUpdatedAt(time());
-			
-		$entry->save();
+			$entry->indexToSphinx();
 	}
 	
 	/* (non-PHPdoc)
@@ -100,6 +98,7 @@ class categoryEntry extends BasecategoryEntry {
 				if(!categoryEntryPeer::getSkipSave())
 				{
 					$entry->removeCategory($category->getFullName());
+					$entry->save();
 				}
 			}
 			
@@ -108,9 +107,7 @@ class categoryEntry extends BasecategoryEntry {
 		}
 		
 		if(!categoryEntryPeer::getSkipSave())
-			$entry->setUpdatedAt(time());
-			
-		$entry->save();
+			$entry->indexToSphinx();
 	}
 	
 	private function setEntryOnCategory($category, $entry = null)
@@ -124,8 +121,11 @@ class categoryEntry extends BasecategoryEntry {
 		
 		//only categories with no context are saved on entry - this is only for Backward compatible 
 		if($entry && !categoryEntryPeer::getSkipSave() && $category->getPrivacyContexts() == '')
-				$entry->setCategories($entry->getCategories() . entry::ENTRY_CATEGORY_SEPARATOR . $category->getFullName());
-			
+		{
+			$entry->setCategories($entry->getCategories() . entry::ENTRY_CATEGORY_SEPARATOR . $category->getFullName());
+			$entry->save();
+		}
+		
 		return $entry;
 	}
 	
