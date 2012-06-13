@@ -21,12 +21,12 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
    public $userId;
    
    /**
-    * @var KalturaCategoryUserPermissionLevel
+    * @var int
     */
    public $permissionLevel;
    
    /**
-    * @var KalturaUpdateMethodType
+    * @var int
     */
    public $updateMethod;
    
