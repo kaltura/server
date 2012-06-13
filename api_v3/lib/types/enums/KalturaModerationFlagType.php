@@ -9,4 +9,6 @@ class KalturaModerationFlagType extends KalturaEnum
 	const VIOLENT_REPULSIVE = 2;
 	const HARMFUL_DANGEROUS = 3;
 	const SPAM_COMMERCIALS = 4; 
+	const COPYRIGHT = 5;
+	const TERMS_OF_USE_VIOLATION = 6;
 }
