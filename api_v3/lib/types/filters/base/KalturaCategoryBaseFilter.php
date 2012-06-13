@@ -18,6 +18,7 @@ abstract class KalturaCategoryBaseFilter extends KalturaFilter
 		"fullNameIn" => "_in_full_name",
 		"fullIdsEqual" => "_eq_full_ids",
 		"fullIdsStartsWith" => "_likex_full_ids",
+		"fullIdsMatchOr" => "_matchor_full_ids",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -124,6 +125,11 @@ abstract class KalturaCategoryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $fullIdsStartsWith;
+
+	/**
+	 * @var string
+	 */
+	public $fullIdsMatchOr;
 
 	/**
 	 * @var int
