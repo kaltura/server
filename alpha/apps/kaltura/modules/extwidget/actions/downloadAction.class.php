@@ -63,11 +63,11 @@ class downloadAction extends sfAction
 		
 		list($fileBaseName, $fileExt) = $this->getFileName($entry, $flavorAsset);
 
-		if (!$fileName)
+		if (!$fileName){
 			$fileName = $fileBaseName;
-			
-		if ($fileExt && !$fileName)
-			$fileName = $fileName . '.' . $fileExt;
+			if ($fileExt)
+				$fileName = $fileName . '.' . $fileExt;
+		}
 			
 		if (is_null($syncKey))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
