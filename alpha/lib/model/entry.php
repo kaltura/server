@@ -1098,6 +1098,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 	}
 	
+	public function indexToSphinx()
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
+	
 	/**
 	 * Set the categories (use only the most child categories)
 	 * 
