@@ -530,7 +530,13 @@ $plannedDur = 0;
 				$targetVid->_frameRate=24;
 			}
 		}
-
+		/*
+		 * MPEG2 constraint - target fps should be at least 20
+		 */
+		if($targetVid->_id==KDLVideoTarget::MPEG2){
+			$targetVid->_frameRate = max(20,$targetVid->_frameRate);
+		}
+		
 		/*
 		 * GOP - if gop not set, set it to 2min according to the required frame rate, 
 		 * if not set=>60frames
