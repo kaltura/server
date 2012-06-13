@@ -101,6 +101,8 @@ $debug .= "property: $not_property = [$value]\n";
 	public static function createNotification ( $notification_type , $object_data , $partner_id=null , $puser_id=null , $prefix=null ,
 		$extra_notification_data = null, $entry_id = null )
 	{
+		KalturaLog::log ( "Create notification");
+		
 		if(!$entry_id && $object_data instanceof entry)
 			$entry_id = $object_data->getId();
 		
