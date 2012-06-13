@@ -673,9 +673,9 @@ class myEntryUtils
 		$entry_status = $entry->getStatus();
 		 
 		$tempThumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
-		if (!is_null($orig_image_path))
+		if (!$orig_image_path)
 			$tempThumbName  = $tempThumbName ."_{$orig_image_path}";
-		if (!is_null($density))
+		if (!$density)
 			$tempThumbName  = $tempThumbName ."_{$density}";
 				
 		$entryThumbFilename = ($entry->getThumbnail() ? $entry->getThumbnail() : "0.jpg");
