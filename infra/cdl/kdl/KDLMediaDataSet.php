@@ -181,39 +181,44 @@ class KDLMediaDataSet  {
 	 */
 	public function ToString(){
 	$rvStr = null;
-		if($this->_container) {
+	try {
+		if($this->_container && method_exists ($this->_container, 'ToString')) {
 			$str = $this->_container->ToString();
 			if($str)
 				$rvStr = $str;
 		}
-		if($this->_video){
+		if($this->_video && method_exists($this->_video, 'ToString')){
 			$str = $this->_video->ToString();
 			if($str)
 				if($rvStr) $rvStr = $rvStr.", ".$str;
 				else $rvStr = $str;
 		}
-		if($this->_audio){
+		if($this->_audio && method_exists ($this->_audio, 'ToString')){
 			$str = $this->_audio->ToString();
 				if($rvStr) $rvStr = $rvStr.", ".$str;
 				else $rvStr = $str;
 		}
-		if($this->_image){
+		if($this->_image && method_exists ($this->_image, 'ToString')){
 			$str = $this->_image->ToString();
 			if($str)
 				if($rvStr) $rvStr = $rvStr.", ".$str;
 				else $rvStr = $str;
 		}
-		if($this->_pdf){
+		if($this->_pdf && method_exists ($this->_pdf, 'ToString')){
 			$str = $this->_pdf->ToString();
 			if($str)
 				if($rvStr) $rvStr = $rvStr.", ".$str;
 				else $rvStr = $str;
 		}
-		if($this->_swf){
+		if($this->_swf && method_exists ($this->_swf, 'ToString')){
 			$str = $this->_swf->ToString();
 			if($str)
 				if($rvStr) $rvStr = $rvStr.", ".$str;
 				else $rvStr = $str;
+		}
+		}
+		catch(Exception $ex){
+			;
 		}
 		return $rvStr;
 	}
