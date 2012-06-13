@@ -57,9 +57,9 @@ class myPartnerUtils
 	 * checks if the secret matchs the partner_id -
 	 * if not - increment the invlid_login_count and make sure does not exceed the limit
 	 *
-	 * will use cache to reduce the times the partner table is hit (hardley changes over time)
+	 * will use cache to reduce the times the partner table is hit (hardly changes over time)
 	 */
-	public static function isValidSecret ( $partner_id , $partner_secret , $partner_key , &$ks_max_expiry_in_seconds , $admin = false  )
+	public static function isValidSecret ( $partner_id , $partner_secret , $partner_key , &$ks_max_expiry_in_seconds , $admin = SessionType::USER  )
 	{
 		// TODO - handle errors
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
@@ -1398,7 +1398,7 @@ class myPartnerUtils
 	
 	public static function getPartnersArray($partnerIds)
 	{
-		$partners = array();
+		$ret = array();
 		$c = new Criteria();
 		$c->addAnd(PartnerPeer::ID, $partnerIds, Criteria::IN);
 		$c->addAnd(PartnerPeer::STATUS, Partner::PARTNER_STATUS_ACTIVE, Criteria::EQUAL);
@@ -1408,9 +1408,9 @@ class myPartnerUtils
 		foreach ($partners as $partner)
 		{
 			if (!in_array($partner->getId(), array(PartnerPeer::GLOBAL_PARTNER, Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::BATCH_PARTNER_ID))) {
-				$partners[] = $partner;
+				$ret[] = $partner;
 			}
 		}
-		return $partners;
+		return $ret;
 	}
 }
