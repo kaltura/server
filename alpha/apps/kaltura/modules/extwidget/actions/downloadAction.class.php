@@ -66,7 +66,7 @@ class downloadAction extends sfAction
 		if (!$fileName)
 			$fileName = $fileBaseName;
 			
-		if ($fileExt)
+		if ($fileExt && !$fileName)
 			$fileName = $fileName . '.' . $fileExt;
 			
 		if (is_null($syncKey))
@@ -75,6 +75,10 @@ class downloadAction extends sfAction
 		$this->handleFileSyncRedirection($syncKey);
 
 		$filePath = kFileSyncUtils::getReadyLocalFilePathForKey($syncKey);
+		
+		//enable downloading file_name which inside the flavor asset directory 
+		if(is_dir($filePath))
+			$filePath = $filePath.DIRECTORY_SEPARATOR.$fileName;
 		$this->dumpFile($filePath, $fileName);
 		
 		die(); // no view
