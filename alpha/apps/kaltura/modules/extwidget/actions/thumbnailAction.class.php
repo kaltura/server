@@ -54,6 +54,7 @@ class thumbnailAction extends sfAction
 		$stripProfiles = $this->getRequestParameter( "strip" , null);
 		$flavor_id =  $this->getRequestParameter( "flavor_id" , null);
 		$file_name =  $this->getRequestParameter( "file_name" , null);
+		$file_name = basename($file_name);
 		
 		// actual width and height of image from which the src_* values were taken.
 		// these will be used to multiply the src_* parameters to make them relate to the original image size.

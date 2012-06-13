@@ -15,6 +15,7 @@ class serveFlavorAction extends kalturaAction
 		$shouldProxy = $this->getRequestParameter("forceproxy", false);
 		$ks = $this->getRequestParameter( "ks" );
 		$fileParam = $this->getRequestParameter( "file" );
+		$fileParam = basename($fileParam);
 		$referrer = base64_decode($this->getRequestParameter("referrer"));
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';

@@ -13,6 +13,7 @@ class downloadAction extends sfAction
 		$entryId = $this->getRequestParameter("entry_id");
 		$flavorId = $this->getRequestParameter("flavor");
 		$fileName = $this->getRequestParameter("file_name");
+		$fileName = basename($fileName);
 		$ksStr = $this->getRequestParameter("ks");
 		$referrer = $this->getRequestParameter("referrer");
 		$referrer = base64_decode($referrer);
@@ -61,20 +62,21 @@ class downloadAction extends sfAction
 			$syncKey = $this->getBestSyncKeyForEntry($entry);
 		}
 		
-		list($fileBaseName, $fileExt) = $this->getFileName($entry, $flavorAsset);
-
-		if (!$fileName){
-			$fileName = $fileBaseName;
-			if ($fileExt)
-				$fileName = $fileName . '.' . $fileExt;
-		}
-			
 		if (is_null($syncKey))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 			
 		$this->handleFileSyncRedirection($syncKey);
 
 		$filePath = kFileSyncUtils::getReadyLocalFilePathForKey($syncKey);
+		
+		list($fileBaseName, $fileExt) = $this->getFileName($entry, $flavorAsset);
+
+		if (!$fileName)
+			$fileName = $fileBaseName;
+		
+		if ($fileExt && !is_dir($filePath))
+			$fileName = $fileName . '.' . $fileExt;
+			
 		
 		//enable downloading file_name which inside the flavor asset directory 
 		if(is_dir($filePath))
