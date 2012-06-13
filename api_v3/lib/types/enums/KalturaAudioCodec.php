@@ -14,5 +14,6 @@ class KalturaAudioCodec extends KalturaStringEnum
 	const WMAPRO = "wmapro";
 	const AMRNB = "amrnb";
 	const MPEG2 = "mpeg2";
+	const AC3 = "ac3";
 	const COPY = "copy";
 }
