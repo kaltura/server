@@ -50,6 +50,7 @@ class flavorParams extends assetParams
 	const AUDIO_CODEC_WMAPRO = "wmapro";
 	const AUDIO_CODEC_AMRNB = "amrnb";
 	const AUDIO_CODEC_MPEG2 = "mpeg2";
+	const AUDIO_CODEC_AC3 = "ac3";
 	const AUDIO_CODEC_COPY = "copy";
 	
 	const CUSTOM_DATA_FIELD_VIDEO_CODEC = "FlavorVideoCodec";
