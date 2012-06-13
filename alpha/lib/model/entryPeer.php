@@ -351,25 +351,36 @@ class entryPeer extends BaseentryPeer
 		$critKuser = null;
 
 		// when session is not admin and without list:* privilege, allow access to user entries only
-		if ($ks && $ks->isWidgetSession())
+		if ($ks && ($ks->isWidgetSession() || kEntitlementUtils::getEntitlementEnforcement()))
 		{		
 			if(!$critEntitled)
 			{
 				$critEntitled = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
-				$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+				if($ks->isWidgetSession())
+					$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+				else
+					$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+					
 			}else{
 				$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
-				$critKuser->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+				if($ks->isWidgetSession())
+					$critKuser->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+				else
+					$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 				$critEntitled->addOr($critKuser);
 			}
 				
 			$creatorKuserCrit = $c->getNewCriterion(entryPeer::CREATOR_KUSER_ID, kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
-			$creatorKuserCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			if($ks->isWidgetSession())
+				$creatorKuserCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			else
+				$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 			$critEntitled->addOr($creatorKuserCrit);
 			
 			if($ks->getDisableEntitlementForEntry())
 			{
 				$entryCrit = $c->getNewCriterion(entryPeer::ENTRY_ID, $ks->getDisableEntitlementForEntry(), Criteria::EQUAL);
+				$entryCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 				$critEntitled->addOr($entryCrit);
 			}
 		}
