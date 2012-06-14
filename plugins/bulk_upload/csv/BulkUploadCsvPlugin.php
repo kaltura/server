@@ -110,12 +110,20 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			
 		$STDOUT = fopen('php://output', 'w');
 		$data = $batchJob->getData();
-
+        /* @var $data kBulkUploadJobData */
+		
+		//Add header row to the output CSV
+		$headerRow = self::getHeaderRow($data->getBulkUploadObjectType());
+		$headerRow[] = "action";
+		$headerRow[] = "resultStatus";
+		$headerRow[] = "objectId";
+		$headerRow[] = "objectStatus";
+		$headerRow[] = "errorDescription";
+		fputcsv($STDOUT, $headerRow);
+		
 		foreach($bulkUploadResults as $bulkUploadResult)
 		{
 		    /* @var $bulkUploadResult BulkUploadResult */
-            	    
-            
 		    switch ($bulkUploadResult->getObjectType())
 		    {
 		        case BulkUploadObjectType::ENTRY:
@@ -140,13 +148,39 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			$values[] = $bulkUploadResult->getObjectId();
 			$values[] = $bulkUploadResult->getObjectStatus();
 			$values[] = $bulkUploadResult->getErrorDescription();
-				
+			
+			
 			fputcsv($STDOUT, $values);
 		}
 		fclose($STDOUT);
 		
 		kFile::closeDbConnections();
 		exit;
+	}
+	
+	/**
+	 * Returns array of column values for the bulk upload result
+	 * @param int $bulkUploadObjectType
+	 */
+	protected static function getHeaderRow ($bulkUploadObjectType)
+	{
+	    switch ($bulkUploadObjectType)
+	    {
+	        case BulkUploadObjectType::ENTRY:
+	            return array ("title", "description", "tags", "url", "contentType", "conversionProfileId", "accessProfileId",  
+	                    "category", "scheduleStartDate", "scheduleEndDate", "thumbnailUrl", "partnerData", "creatorId", "entitledUsersEdit", "entitledUsersPublish");
+	            break;
+	        case BulkUploadObjectType::CATEGORY:
+	            return array ("name", "relativePath", "tags", "description", "referenceId", "privacy", "appearInList", "contributionPolicy",
+	                        "inheritanceType", "userJoinPolicy", "defaultPermissionLevel", "owner", "partnerData", "partnerSortValue", "moderation");
+	            break;
+	        case BulkUploadObjectType::CATEGORY_USER:
+	            return array ("categoryId", "userId", "categoryReferenceId", "permissionLevel", "updateMethod", "status",);
+	            break;
+	        case BulkUploadObjectType::USER:
+	            return array("screenName", "email", "dateOfBirth", "country", "state", "city", "zip", "gender", "firstName", "lastName", "isAdmin", "tags", "roleIds", "partnerData",);
+	            break;
+	    }
 	}
 	
 	/**
@@ -171,6 +205,9 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	    $values[] = $bulkUploadResult->getUserJoinPolicy();
 	    $values[] = $bulkUploadResult->getDefaultPermissionLevel();
 	    $values[] = $bulkUploadResult->getOwner();
+	    $values[] = $bulkUploadResult->getPartnerData();
+	    $values[] = $bulkUploadResult->getPartnerSortValue();
+	    $values[] = $bulkUploadResult->getModeration();
 	    
 	    return $values;
 	}
@@ -251,6 +288,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	    $values[] = $bulkUploadResult->getIsAdmin();
 	    $values[] = $bulkUploadResult->getTags();
 	    $values[] = $bulkUploadResult->getRoleIds();
+	    $values[] = $bulkUploadResult->getPartnerData();
 	    
 	    return $values;
 	}
