@@ -11,8 +11,7 @@ class kTemporaryException extends kException
 	
 	public function __construct($message, $code = 0)
 	{
-		$this->message = $message;
-		parent::__construct($code);
+		parent::__construct($code, $message);
 	}
 	
 }

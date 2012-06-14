@@ -13,6 +13,6 @@ class APIException extends kException
 		$args = func_get_args();
 		call_user_func_array(array($this, 'parent::__construct'), $args);
 		
-		$this->api_code = $this->kaltura_code;
+		$this->api_code = $this->getCode();
 	}
 }

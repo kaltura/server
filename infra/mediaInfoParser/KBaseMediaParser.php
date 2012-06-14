@@ -8,6 +8,9 @@ abstract class KBaseMediaParser
 	const MEDIA_PARSER_TYPE_MEDIAINFO = '0';
 	const MEDIA_PARSER_TYPE_FFMPEG = '1';
 	
+	const ERROR_NFS_FILE_DOESNT_EXIST = 21; // KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST
+	const ERROR_EXTRACT_MEDIA_FAILED = 31; // KalturaBatchJobAppErrors::EXTRACT_MEDIA_FAILED
+	
 	/**
 	 * @var string
 	 */
@@ -40,7 +43,7 @@ abstract class KBaseMediaParser
 	public function __construct($filePath)
 	{
 		if (!file_exists($filePath))
-			throw new Exception("File not found at [$filePath]");
+			throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
 			
 		$this->filePath = $filePath;
 	}
@@ -63,7 +66,7 @@ abstract class KBaseMediaParser
 		KalturaLog::debug("Executing '$cmd'");
 		$output = shell_exec($cmd);
 		if (trim($output) === "")
-			throw new Exception("Failed to parse media using " . get_class($this));
+			throw new kApplicativeException(KBaseMediaParser::ERROR_EXTRACT_MEDIA_FAILED, "Failed to parse media using " . get_class($this));
 			
 		return $output;
 	}

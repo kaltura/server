@@ -68,6 +68,11 @@ abstract class KJobHandlerWorker extends KBatchBase
 				$this->unimpersonate();
 				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
 			}
+			catch(kApplicativeException $kaex)
+			{
+				$this->unimpersonate();
+				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::APP, $kaex->getCode(), $kaex->getMessage(), KalturaBatchJobStatus::FAILED);
+			}
 			catch(kTemporaryException $ktex)
 			{
 				$this->unimpersonate();

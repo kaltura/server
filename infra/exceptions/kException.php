@@ -5,19 +5,13 @@
  */
 class kException extends Exception
 {
-	public $kaltura_code = null;
 	public $extra_data = null;
 	
-	public function __construct()
+	public function __construct($code = null, $message = null)
 	{
-		parent::__construct();
+		parent::__construct($message, $code);
 		
 		$args = func_get_args();
-		
-		if ( $args && count ( $args) > 0 )
-		{
-			$this->kaltura_code = $args[0];
-			$this->extra_data = $args;
-		}
+		$this->extra_data = $args;
 	}
 }
