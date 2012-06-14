@@ -566,7 +566,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($vals[$valIndex]);
-						elseif(preg_match('/[\s\t]/', $valValue))
+						elseif(preg_match('/[\s\t]/', $valValue)) //if there are spaces or tabs - should add "<VALUE>"
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
 						else
 							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
