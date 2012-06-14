@@ -256,11 +256,11 @@ class KalturaErrors extends APIErrors
 	
 	const CATEGORY_DOES_NOT_HAVE_PARENT_CATEGORY = "CATEGORY_DOES_NOT_HAVE_PARENT_CATEGORY,Category doesn't have parent category";
 	
-	const CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT, Cannot update privacy context";
+	const CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT,Cannot update privacy context";
 	
 	const CANNOT_MOVE_CATEGORIES_FROM_DIFFERENT_PARENT_CATEGORY = "CANNOT_MOVE_CATEGORIES_FROM_DIFFERENT_PARENT_CATEGORIES,Cannot move categories from different parent categories";
 	
-	const CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT,Cannot update category entitlement fields with no privacy context set on the categroy";
+	const CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT,Cannot update category entitlement fields when privacy context is not set on the categroy";
 	
 	/**
 	 * Batch Service
@@ -392,7 +392,7 @@ class KalturaErrors extends APIErrors
 	
 	const CANNOT_UPDATE_CATEGORY_USER = "CANNOT_UPDATE_CATEGORY_USER,cannot update categoryUser";
 	
-	const CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES = "CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES, Cannot update Category that inherit members attributes that are inherited from parent category";
+	const CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES = "CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES, Cannot update Category inherited fields when category is set to inherit";
 	
 	const MUST_FILTER_USERS_OR_CATEGORY = "MUST_FILTER_USERS_OR_CATEGORY, Must filter users or categories";
 	
