@@ -337,7 +337,7 @@ class myPartnerRegistration
 		$newSubPartner = NULL;
 		try {
 			// create the new partner
-			$newPartner = $this->createNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password , $partner );
+			$newPartner = $this->createNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password , $partner , $templatePartnerId);
 
 			// create the sub partner
 			// TODO: when ready, add here the saving of this value, currently it will be only
