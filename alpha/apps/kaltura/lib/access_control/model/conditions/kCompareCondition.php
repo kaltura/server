@@ -110,7 +110,7 @@ abstract class kCompareCondition extends kCondition
 	/* (non-PHPdoc)
 	 * @see kCondition::internalFulfilled()
 	 */
-	public function internalFulfilled(accessControl $accessControl)
+	protected function internalFulfilled(accessControl $accessControl)
 	{
 		$field = $this->getFieldValue($accessControl);
 		$value = $this->getIntegerValue($accessControl->getScope());

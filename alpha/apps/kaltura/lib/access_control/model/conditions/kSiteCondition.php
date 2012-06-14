@@ -69,7 +69,7 @@ class kSiteCondition extends kMatchCondition
 	/* (non-PHPdoc)
 	 * @see kCondition::internalFulfilled()
 	 */
-	public function internalFulfilled(accessControl $accessControl)
+	protected function internalFulfilled(accessControl $accessControl)
 	{
 		$scope = $accessControl->getScope();
 		$referrer = $scope->getReferrer();

@@ -102,7 +102,7 @@ abstract class kMatchCondition extends kCondition
 	/* (non-PHPdoc)
 	 * @see kCondition::internalFulfilled()
 	 */
-	public function internalFulfilled(accessControl $accessControl)
+	protected function internalFulfilled(accessControl $accessControl)
 	{
 		$field = $this->getFieldValue($accessControl);
 		$values = $this->getStringValues($accessControl->getScope());
