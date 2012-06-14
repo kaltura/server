@@ -543,7 +543,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	        {
 	            continue;
 	        }
-	        $metadataProfile = MetadataProfilePeer::retrieveBySystemName($metadataProfileSystemName);
+	        $metadataProfile = MetadataProfilePeer::retrieveBySystemName($metadataProfileSystemName, $object->getPartnerId());
 	        
 	        if (!$metadataProfile)
 	        {
