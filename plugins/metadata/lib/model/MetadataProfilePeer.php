@@ -45,7 +45,7 @@ class MetadataProfilePeer extends BaseMetadataProfilePeer
 	}
 	
 	/**
-	 * Retrieve a single object by system name.
+	 * Retrieve a single object by system name (object is retrieved for the current partner).
 	 *
 	 * @param      int $systemName the system name
 	 * @param      PropelPDO $con the connection to use
@@ -53,9 +53,10 @@ class MetadataProfilePeer extends BaseMetadataProfilePeer
 	 */
 	public static function retrieveBySystemName($systemName, PropelPDO $con = null)
 	{
+	    $partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$criteria = new Criteria();
 		$criteria->add(MetadataProfilePeer::SYSTEM_NAME, $systemName);
-		
+		$criteria->addAnd(MetadataProfilePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 		return MetadataProfilePeer::doSelectOne($criteria, $con);
 	}
 	
