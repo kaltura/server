@@ -36,7 +36,7 @@ abstract class kMatchCondition extends kCondition
 	 * @param kScope $scope
 	 * @return array<string>
 	 */
-	function getStringValues($scope)
+	function getStringValues($scope = null)
 	{
 		$values = array();
 		foreach($this->values as $value)
@@ -44,7 +44,7 @@ abstract class kMatchCondition extends kCondition
 			/* @var $value kStringValue */
 			if(is_object($value))
 			{
-				if($value instanceof kStringField)
+				if($scope && $value instanceof kStringField)
 					$value->setScope($scope);
 					
 				$values[] = $value->getValue();
