@@ -271,7 +271,9 @@ class entryFilter extends baseObjectFilter
 		foreach($cats as $cat)
 		{
 			$category = categoryPeer::getByFullNameExactMatch($cat);
-			$catsIds[] = $category->getId();
+			
+			if($category)
+				$catsIds[] = $category->getId();
 			
 			$categories = categoryPeer::getByFullNameWildcardMatch($cat . categoryPeer::CATEGORY_SEPARATOR);
 			foreach($categories as $category)
@@ -305,6 +307,8 @@ class entryFilter extends baseObjectFilter
 		foreach($cats as $cat)
 		{
 			$category = categoryPeer::retrieveByPK($cat);
+			if(!$category)
+				continue;
 
 			foreach ($statuses as $status)
 			{
