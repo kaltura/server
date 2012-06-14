@@ -320,9 +320,7 @@ class kuserPeer extends BasekuserPeer
 	public static function doStubCount (Criteria $criteria, $distinct = false, $con = null)
 	{
 		return 0;
-	}	
-	
-	
+	}
 	
 	/**
 	 * @param string $email
@@ -340,6 +338,16 @@ class kuserPeer extends BasekuserPeer
 		
 		return $kuser;
 		
+	}
+	
+	/**
+	 * @param int $id
+	 * @return string
+	 */
+	public static function getEmailById($id)
+	{
+		$kuser = kuserPeer::retrieveByPK($id);
+		return $kuser->getEmail();
 	}
 
 	/**
