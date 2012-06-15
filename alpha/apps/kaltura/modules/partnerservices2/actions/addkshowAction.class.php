@@ -104,7 +104,7 @@ class addkshowAction extends defPartnerservices2Action
 		// by default the permissions should be public
 		if ( $kshow->getPermissions () === null )
 		{ 
-			$kshow->setPermissions( myPrivilegesMgr::PERMISSIONS_PUBLIC );
+			$kshow->setPermissions( kshow::PERMISSIONS_PUBLIC );
 		}
 		
 		// have to save the kshow before creating the default entries

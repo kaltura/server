@@ -90,6 +90,11 @@ class kshow extends Basekshow
 	const KSHOW_TYPE_HOWTO = 14;
 	const KSHOW_TYPE_OTHER = 0;
 
+	const PERMISSIONS_PUBLIC 	= 1;
+	const PERMISSIONS_PRIVATE 	= 2;
+	const PERMISSIONS_GROUP 	= 3;
+	const PERMISSIONS_FRIENDS	= 4;
+	
 	private $roughcut_count = -1;
 
 	public static function getColumnNames()	{		return array ( "name" , "description" , "tags" ) ; }
