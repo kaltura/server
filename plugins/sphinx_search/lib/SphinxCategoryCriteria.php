@@ -370,14 +370,6 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			}
 		}
 		$filter->unsetByName('_likex_name_or_reference_id');
-				
-		
-		$fullName = $filter->get( "_eq_full_name");
-		if ($fullName !== null)
-		{
-			$filter->set ( "_like_full_name", $fullName);
-		}
-		$filter->unsetByName('_eq_full_name');
 		
 		return parent::applyFilterFields($filter);
 	}
