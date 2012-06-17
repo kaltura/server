@@ -9,7 +9,10 @@ class kException extends Exception
 	
 	public function __construct($code = null, $message = null)
 	{
-		parent::__construct($message, $code);
+		parent::__construct();
+		
+		$this->message = $message;
+		$this->code = $code;
 		
 		$args = func_get_args();
 		$this->extra_data = $args;
