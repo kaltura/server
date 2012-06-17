@@ -256,8 +256,10 @@ class kEntitlementUtils
 		$privacyContexts = array();
 		$entryPrivacy = null;		
 		
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
-		$c->add(categoryPeer::ID, explode(',', $entry->getCategoriesIds()), Criteria::IN);
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY); 
+		$c->add(categoryPeer::ID, explode(',', $entry->getAllCategoriesIs()), Criteria::IN);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$categories = categoryPeer::doSelect($c);
@@ -290,6 +292,8 @@ class kEntitlementUtils
 		foreach ($privacyContexts as $categoryPrivacyContext => $Privacy)
 			$entryPrivacyContexts[] = $categoryPrivacyContext . ' ' . $Privacy . ' ' . $categoryPrivacyContext;
 		
+		KalturaLog::debug('Privacy by context: ' . print_r($entryPrivacyContexts,true));
+			
 		return $entryPrivacyContexts;
 	}
 	
