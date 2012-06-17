@@ -21,7 +21,7 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"firstNameStartsWith" => "_likex_first_name",
 		"lastNameStartsWith" => "_likex_last_name",
-	    "isAdminEqual" => "_eq_is_admin",
+		"isAdminEqual" => "_eq_is_admin",
 	);
 
 	private $order_by_map = array
@@ -106,4 +106,9 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $lastNameStartsWith;
+
+	/**
+	 * @var bool
+	 */
+	public $isAdminEqual;
 }
