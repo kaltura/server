@@ -258,7 +258,7 @@ class kEntitlementUtils
 		
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY); 
-		$c->add(categoryPeer::ID, explode(',', $entry->getAllCategoriesIs()), Criteria::IN);
+		$c->add(categoryPeer::ID, explode(',', $entry->getAllCategoriesIds()), Criteria::IN);
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
@@ -280,7 +280,7 @@ class kEntitlementUtils
 					 $categoryPrivacyContext = self::DEFAULT_CONTEXT;
 					 
 				if(!isset($privacyContexts[$categoryPrivacyContext]) || $privacyContexts[$categoryPrivacyContext] > $categoryPrivacy)
-					$privacyContexts[$categoryPrivacyContext] = $categoryPrivacy;
+					$privacyContexts[trim($categoryPrivacyContext)] = $categoryPrivacy;
 			}
 		}
 		
