@@ -802,7 +802,7 @@ class category extends Basecategory implements IIndexable
 		$this->setPrivacy(PrivacyType::ALL);
 		$this->setInheritanceType(InheritanceType::MANUAL);
 		$this->setUserJoinPolicy(UserJoinPolicyType::NOT_ALLOWED);
-		$this->setDefaultPermissionLevel(CategoryKuserPermissionLevel::MODERATOR);
+		$this->setDefaultPermissionLevel(CategoryKuserPermissionLevel::MEMBER);
 		$this->setContributionPolicy(ContributionPolicyType::ALL);
 		$this->setStatus(CategoryStatus::ACTIVE);
 	}
@@ -1419,11 +1419,11 @@ class category extends Basecategory implements IIndexable
 		{
 			if($fullName == '')
 			{
-				$parsedFullName .= md5($fullName . categoryPeer::CATEGORY_SEPARATOR) . ' ';
 				$fullName = $categoryName;
 			}
 			else
 			{
+				$parsedFullName .= md5($fullName . categoryPeer::CATEGORY_SEPARATOR) . ' ';
 				$fullName .= '>' . $categoryName;
 			}
 			
@@ -1446,11 +1446,11 @@ class category extends Basecategory implements IIndexable
 		{
 			if($fullIds == '')
 			{
-				$parsedFullId .= md5($fullIds . categoryPeer::CATEGORY_SEPARATOR) . ' ';
 				$fullIds = $categoryId;
 			}
 			else
 			{ 
+				$parsedFullId .= md5($fullIds . categoryPeer::CATEGORY_SEPARATOR) . ' ';
 				$fullIds .= '>' . $categoryId;
 			}
 			
