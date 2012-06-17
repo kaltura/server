@@ -1,6 +1,6 @@
 SELECT 
-	entry_name,
 	e.entry_id,
+	entry_name,
 	e.unique_videos,
 	e.count_plays,
 	e.sum_time_viewed,
