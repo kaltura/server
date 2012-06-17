@@ -1418,12 +1418,16 @@ class category extends Basecategory implements IIndexable
 		foreach ($fullNameArr as $categoryName)
 		{
 			if($fullName == '')
+			{
+				$parsedFullName .= md5($fullName . categoryPeer::CATEGORY_SEPARATOR) . ' ';
 				$fullName = $categoryName;
-			else 
+			}
+			else
+			{
 				$fullName .= '>' . $categoryName;
+			}
 			
 			$parsedFullName .= md5($fullName) . ' ';
-			$parsedFullName .= md5($fullName . categoryPeer::CATEGORY_SEPARATOR) . ' ';
 		}
 		
 		$parsedFullName .= md5($this->getFullName() . category::FULL_NAME_EQUAL_MATCH_STRING);
@@ -1441,12 +1445,16 @@ class category extends Basecategory implements IIndexable
 		foreach ($fullIdsArr as $categoryId)
 		{
 			if($fullIds == '')
+			{
+				$parsedFullId .= md5($fullIds . categoryPeer::CATEGORY_SEPARATOR) . ' ';
 				$fullIds = $categoryId;
-			else 
+			}
+			else
+			{ 
 				$fullIds .= '>' . $categoryId;
+			}
 			
 			$parsedFullId .= md5($fullIds) . ' ';
-			$parsedFullId .= md5($fullIds . categoryPeer::CATEGORY_SEPARATOR) . ' ';
 		}
 		
 		$parsedFullId .= md5($this->getFullIds() . category::FULL_IDS_EQUAL_MATCH_STRING);
