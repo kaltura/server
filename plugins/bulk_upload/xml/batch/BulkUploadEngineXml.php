@@ -141,7 +141,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function loadXslt() 
 	{
 		$data = self::getData();
-		$conversionProfileId = $data->conversionProfileId;
+		$conversionProfileId = $data->objectData->conversionProfileId;
 		if($data->conversionProfileId == -1){
 			$conversionProfileId = PartnerPeer::retrieveByPK($this->currentPartnerId)->getDefaultConversionProfileId();
 		}
