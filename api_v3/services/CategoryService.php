@@ -28,6 +28,12 @@ class CategoryService extends KalturaBaseService
 			$this->getPartner()->getFeaturesStatusByType(FeatureStatusType::LOCK_CATEGORY))
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
 			
+		if($category->privacyContext != null && 
+		   $category->privacyContext != '' && 
+		   !preg_match('/^[a-zA-Z\d]+$/', $category->privacyContext) &&
+		   strlen($category->privacyContext) >= 4)
+		   throw new KalturaAPIException(KalturaErrors::PRIVACY_CONTEXT_INVALID_STRING);
+			
 		try
 		{
 			$categoryDb = new category();
