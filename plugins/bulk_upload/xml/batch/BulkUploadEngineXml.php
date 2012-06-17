@@ -1964,7 +1964,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 //		KalturaLog::debug("Creating upload result");
 		KalturaLog::debug("this->handledRecordsThisRun [$this->handledRecordsThisRun], this->maxRecordsEachRun [$this->maxRecordsEachRun]");
 					
-		$bulkUploadResult = new KalturaBulkUploadResult();
+		$bulkUploadResult = new KalturaBulkUploadResultEntry();
 		$bulkUploadResult->action = $action;
 		$bulkUploadResult->bulkUploadJobId = $this->job->id;
 		
