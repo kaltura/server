@@ -295,11 +295,13 @@ class CategoryService extends KalturaBaseService
 			$dbTargetCategory = categoryPeer::retrieveByPK($targetCategoryParentId);
 			if (!$dbTargetCategory)
 				throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $targetCategoryParentId);
+				
+			$targetCategoryParentId = $dbTargetCategory;
 		}		
 		
 		foreach ($dbCategories as $dbCategory)
 		{
-			$dbCategory->setParentId($dbTargetCategory->getId());
+			$dbCategory->setParentId($targetCategoryParentId);
 			$dbCategory->save();		
 		}
 		
