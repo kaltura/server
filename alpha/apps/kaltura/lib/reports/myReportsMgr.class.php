@@ -270,6 +270,7 @@ class myReportsMgr
 		$page_size , $page_index , $order_by , $object_ids = null )
 	{
 		$start = microtime ( true );
+		$total_count = 0;
 		if (!($input_filter instanceof endUserReportsInputFilter))
 		{
 			$total_count = self::getTotalTableCount( $partner_id , $report_type , $input_filter  ,
