@@ -579,29 +579,32 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 				$fieldValues = explode(self::BULK_UPLOAD_MULTI_VALUES_DELIMITER, $fieldValue);
 				foreach($fieldValues as $fieldSingleValue)
 				{
-					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE && !is_numeric($fieldSingleValue))
-					{
-						$valueAsDate = self::parseFormatedDate($fieldSingleValue);
-						if(!$valueAsDate || !strlen($valueAsDate))
-						{
-							$errorMessage = "Could not parse date format [$fieldValue] for field [$key]";
-							KalturaLog::err($errorMessage);
-							self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
-							continue;
-						}
-							
-						$fieldSingleValue = $valueAsDate;
-					}
-					
-					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT && !is_numeric($fieldSingleValue))
-					{
-						$errorMessage = "Could not parse int format [$fieldSingleValue] for field [$key]";
-						KalturaLog::err($errorMessage);
-						self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
-						continue;
-					}
-						
-					self::addXpath($xml, $metadataProfileField->getXpath(), $fieldSingleValue);
+				    if ($fieldSingleValue)
+				    {
+    					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE && !is_numeric($fieldSingleValue))
+    					{
+    						$valueAsDate = self::parseFormatedDate($fieldSingleValue);
+    						if(!$valueAsDate || !strlen($valueAsDate))
+    						{
+    							$errorMessage = "Could not parse date format [$fieldValue] for field [$key]";
+    							KalturaLog::err($errorMessage);
+    							self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
+    							continue;
+    						}
+    							
+    						$fieldSingleValue = $valueAsDate;
+    					}
+    					
+    					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT && !is_numeric($fieldSingleValue))
+    					{
+    						$errorMessage = "Could not parse int format [$fieldSingleValue] for field [$key]";
+    						KalturaLog::err($errorMessage);
+    						self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
+    						continue;
+    					}
+    						
+    					self::addXpath($xml, $metadataProfileField->getXpath(), $fieldSingleValue);
+				    }
 				}
 					
 				$dataFound = true;
