@@ -21,7 +21,11 @@ fi
 
 # public domain
 
-BASE_PATH=@SPHINX_BIN_DIR@
+if [[ "$SPHINX_BIN_DIR" == "" ]]
+      then
+         SPHINX_BIN_DIR=$BASE_DIR/bin/sphinx
+
+BASE_PATH=$SPHINX_BIN_DIR
 PID_FILE=$BASE_DIR/sphinx/searchd.pid
 CONFIG_FILE=$APP_DIR/configurations/sphinx/kaltura.conf
 

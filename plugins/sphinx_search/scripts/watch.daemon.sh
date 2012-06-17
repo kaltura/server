@@ -8,6 +8,11 @@ fi
 
 MAILTO="$ADMIN_CONSOLE_ADMIN_MAIL"
 MAINT=$BASE_DIR/maintenance
+
+if [[ "$SPHINX_BIN_DIR" == "" ]]
+      then
+         SPHINX_BIN_DIR=$BASE_DIR/bin/sphinx
+
 SUDO_USER=searchd
 
 while getopts "u:" o
@@ -17,7 +22,7 @@ do	case "$o" in
 	esac
 done
 
-BASE_PATH=@SPHINX_BIN_DIR@
+BASE_PATH=$SPHINX_BIN_DIR
 PID_FILE=$BASE_DIR/sphinx/searchd.pid
 CONFIG_FILE=$APP_DIR/configurations/sphinx/kaltura.conf
 
