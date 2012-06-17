@@ -90,6 +90,12 @@ class CategoryService extends KalturaBaseService
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
 			
+		if($category->privacyContext != null && 
+		   $category->privacyContext != '' && 
+		   !preg_match('/^[a-zA-Z\d]+$/', $category->privacyContext) &&
+		   strlen($category->privacyContext) >= 4)
+		   throw new KalturaAPIException(KalturaErrors::PRIVACY_CONTEXT_INVALID_STRING);
+			
 		//it is possible to not all of the sub tree is updated, 
 		//and updateing fileds that will add batch job to reindex categories - might not update all sub categories.
 		//batch to index categories or to move categories might miss this category to be moved or index
