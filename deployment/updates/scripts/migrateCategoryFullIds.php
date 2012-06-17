@@ -40,7 +40,7 @@ while(count($categories))
 		$category->reSetFullIds();
 		$category->reSetDirectEntriesCount();
 		$category->reSetDirectSubCategoriesCount();
-		
+				
 		KalturaStatement::setDryRun($dryRun);
 		$category->save();
 		KalturaStatement::setDryRun(false);
@@ -48,6 +48,8 @@ while(count($categories))
 		$startCategoryId = $category->getId();
 		KalturaLog::info("Migrated category [$startCategoryId].");
 	}
+	
+	kEventsManager::flushEvents();
 	kMemoryManager::clearMemory();
 	
 	$nextCriteria = clone $criteria;
