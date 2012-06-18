@@ -43,7 +43,7 @@ catch(Zend_Config_Exception $ex)
 
 //$server = 'hudsontest4.kaltura.dev';
 //$user = 'root';
-//$pass = 'pepsi69';
+//$pass = '';
 //$port = 22;
 //$remote_path = '/root/anatol';
 //$file = '0_5shsavmd.mpg';
