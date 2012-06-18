@@ -198,7 +198,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
     		            if (is_null($bulkUploadResult->objectId))
     		            {
     		                $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
-    		                $bulkUploadResult->errorDescription = "Category reference ID not found";
+    		                $bulkUploadResult->errorDescription = "Category reference ID not found under the provided relativePath";
     		                $this->unimpersonate();
     		                try {
     		                    $this->addBulkUploadResult($bulkUploadResult);
@@ -220,7 +220,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
     		            if (is_null($bulkUploadResult->objectId))
     		            {
     		                $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
-    		                $bulkUploadResult->errorDescription = "Category reference ID not found";
+    		                $bulkUploadResult->errorDescription = "Category reference ID not found under the provided relativePath";
     		                try {
     		                    $this->addBulkUploadResult($bulkUploadResult);
     		                    $this->impersonate();
