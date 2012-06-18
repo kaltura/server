@@ -60,7 +60,7 @@ class kEdgeCastUrlManager extends kUrlManager
         	    
         	    if ($notFlvFormat) {
         	        // not flv - add ec_seek value in seconds
-        	        $url .= '?ec_seek='.$this->seekFromTime;
+        	        $url .= '?ec_seek='.($this->seekFromTime/1000); // convert milliseconds to seconds
         	    }
         	    else {
         	        // flv - add ec_seek value in bytes
