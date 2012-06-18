@@ -63,7 +63,6 @@ class sftpMgr extends kFileTransferMgr
 	protected function doLoginPubKey($user, $pubKeyFile, $privKeyFile, $passphrase = null)
 	{
 		$crypt = new Crypt_RSA();
-		$crypt->setPublicKey(file_get_contents($pubKeyFile));
 		$crypt->loadKey(file_get_contents($privKeyFile));
 		return $this->sftp->login($user, $crypt);
 	}
