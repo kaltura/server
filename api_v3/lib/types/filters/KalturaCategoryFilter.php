@@ -14,7 +14,7 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 		"managerEqual" => "_eq_manager",
 		"memberEqual" => "_eq_member",
 		"fullNameStartsWithIn" => '_matchor_likex_full_name',
-		"parentCategoryIdIn" => "_in_parent_category_id",
+		"ancestorIdIn" => "_in_ancestor_id",
 	);
 
 	private $order_by_map = array
