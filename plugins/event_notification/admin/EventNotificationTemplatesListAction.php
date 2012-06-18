@@ -82,7 +82,8 @@ class EventNotificationTemplatesListAction extends KalturaAdminConsolePlugin imp
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
-		$newForm->getElement('newPartnerId')->setValue($partnerFilter->idIn);
+		if ($partnerFilter)
+		    $newForm->getElement('newPartnerId')->setValue($partnerFilter->idIn);
 		
 		// set view
 		$action->view->form = $form;
