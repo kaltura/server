@@ -31,7 +31,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		$dbEventNotificationTemplate = $eventNotificationTemplate->toInsertableObject();
 		/* @var $dbEventNotificationTemplate EventNotificationTemplate */
 		$dbEventNotificationTemplate->setStatus(EventNotificationTemplateStatus::ACTIVE);
-		$dbEventNotificationTemplate->setPartnerId($this->getPartnerId());
+		$dbEventNotificationTemplate->setPartnerId($this->impersonatedPartnerId);
 		$dbEventNotificationTemplate->save();
 		
 		// return the saved object
