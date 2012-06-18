@@ -173,7 +173,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	public static function exportEntry(entry $entry, StorageProfile $externalStorage, &$exportedKeys = array(), &$nonExportedKeys = array())
 	{
-		$checkFileSyncsKeys = $this->getEntrySyncKeys($entry, $externalStorage);
+		$checkFileSyncsKeys = self::getEntrySyncKeys($entry, $externalStorage);
 		foreach($checkFileSyncsKeys as $key)
 		{
     		if (self::shouldExport($key, $externalStorage)) {
@@ -265,7 +265,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		// convert profile finished - export source flavor
 		if ($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
-    		return $this->exportSourceAssetFromJob($dbBatchJob);
+    		return self::exportSourceAssetFromJob($dbBatchJob);
 		}
 		return true;
 	}
