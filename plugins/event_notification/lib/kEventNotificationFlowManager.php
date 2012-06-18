@@ -63,6 +63,10 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		{
 			$batchJob = new BatchJob();
 			$batchJob->setEntryId($entryId);
+			if (!$partnerId)
+			{
+			    $partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			}
 			$batchJob->setPartnerId($partnerId ? $partnerId : kCurrentContext::$partner_id);
 		}
 		
