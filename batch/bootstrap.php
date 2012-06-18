@@ -14,6 +14,7 @@ require_once(KALTURA_INFRA_PATH . "/KAutoloader.php");
 KAutoloader::setClassPath(array(
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "infra", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "PHPMailer", "*"),
+	KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "phpseclib", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"),
 	KAutoloader::buildPath(KALTURA_BATCH_PATH, "*"),
 ));
@@ -25,6 +26,8 @@ KAutoloader::setIncludePath(array(
 ));
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/batch/classMap.cache');
 KAutoloader::register();
+
+set_include_path(get_include_path() . ';' . KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "phpseclib"));
 
 // Logger
 $loggerConfigPath = KALTURA_ROOT_PATH . "/configurations/logger.ini";

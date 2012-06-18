@@ -8,12 +8,17 @@ require_once(ROOT_DIR . '/infra/kConf.php');
 require_once(ROOT_DIR . '/infra/bootstrap_base.php');
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
-$include_path = realpath(dirname(__FILE__).'/../../vendor/ZendFramework/library') . PATH_SEPARATOR . get_include_path();
+$include_path = 
+	realpath(dirname(__FILE__).'/../../vendor/ZendFramework/library') . PATH_SEPARATOR . 
+	realpath(dirname(__FILE__).'/../../vendor/phpseclib') . PATH_SEPARATOR .
+	get_include_path();
+	
 set_include_path($include_path);
 
 KalturaLog::info("Build cache: it may take a while.");
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "phpseclib", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/scripts/classMap.cache');
 KAutoloader::register();

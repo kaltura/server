@@ -7,6 +7,7 @@ require_once (KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR.'infra'.DIRECTORY_SEPARATOR.
 // Autoloader
 require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "phpseclib", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "infra", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "base", "*"));
@@ -14,6 +15,8 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "lib", "*")
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "api", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "common", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "unitTests", "*"));
+
+set_include_path(get_include_path() . PATH_SEPARATOR . KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "phpseclib"));
 
 //$paths = explode(PATH_SEPARATOR, get_include_path());
 //foreach($paths as $path)
