@@ -47,20 +47,25 @@ class kFileTransferMgrTest extends KalturaTestCaseApiBase
 	 */
 	public function testLogin($server, $user, $pass, $port, $ftp_passive_mode, $exceptionCode = null)
 	{
-		try 
-		{
+//		try 
+//		{
+			$server = trim($server);
+			$user = trim($user);
+			$pass = trim($pass);
+			$port = trim($port);
+			
 			$actualReturned = $this->kFileTransferMgr->login($server, $user, $pass, $port, $ftp_passive_mode);
-		}
-		catch (kFileTransferMgrException $te)
-		{
-			$this->assertEquals($exceptionCode, $te->getCode(), "Wrong transfer exception code [" . $te->getMessage() . "]");
-			return null;
-		}
-		catch (Exception $e)
-		{
-			$this->assertEquals($exceptionCode, $e->getCode(), "Wrong exception code [" . $e->getMessage() . "]");
-			return null;
-		}
+//		}
+//		catch (kFileTransferMgrException $te)
+//		{
+//			$this->assertEquals($exceptionCode, $te->getCode(), "Wrong transfer exception code [" . $te->getMessage() . "]");
+//			return null;
+//		}
+//		catch (Exception $e)
+//		{
+//			$this->assertEquals($exceptionCode, $e->getCode(), "Wrong exception code [" . $e->getMessage() . "]");
+//			return null;
+//		}
 		
 		if($exceptionCode)
 			$this->fail("Expected exception code [$exceptionCode]");
