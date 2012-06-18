@@ -336,8 +336,6 @@ class assetPeer extends BaseassetPeer
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
 		}
 		
-		$c->addAscendingOrderByColumn(assetPeer::BITRATE);
-		
 		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		
