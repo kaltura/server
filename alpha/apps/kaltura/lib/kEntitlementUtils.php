@@ -28,25 +28,40 @@ class kEntitlementUtils
 	 */
 	public static function isEntryEntitled(entry $entry, $kuserId = null)
 	{
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		
 		// entry is entitled when entitlement is disable
-		if(!self::getEntitlementEnforcement())
+		// for actions with no ks - need to check if partner have default entitlement feature enable.
+		if(!self::getEntitlementEnforcement() && $ks)
 		{
 			KalturaLog::debug('Entry entitled: entitlement disabled');
 			return true;
 		}
 		
-		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		$partner = $entry->getPartner();
+		if(!$ks && !$partner->getDefaultEntitlementEnforcement())
+		{
+			KalturaLog::debug('Entry entitled: no ks and default enforcement ');
+			return true;
+		}
+		
 		if($ks && $ks->isWidgetSession() && $ks->getDisableEntitlementForEntry() == $entry->getId())
 		{
 			KalturaLog::debug('Entry entitled: widget session that disble entitlement for this entry');
 			return true;
 		}
+		
+		$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entry->getId());
+		
+		$categories = array();
+		foreach($allCategoriesEntry as $categoryEntry)	
+			$categories[] = $categoryEntry->getCategoryId();
 			
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
-		$c->add(categoryPeer::ID, explode(',', $entry->getCategoriesIds()), Criteria::IN);
+		$c->add(categoryPeer::ID, $categories, Criteria::IN);
 		
 		$ksPrivacyContexts = null;
-		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		
 		
 		$privacy = array(PrivacyType::ALL);
 		if($ks && !$ks->isWidgetSession())
@@ -61,7 +76,7 @@ class kEntitlementUtils
 			if (!$ksPrivacyContexts)
 				$ksPrivacyContexts = self::DEFAULT_CONTEXT;
 			
-			$c->add(categoryPeer::PRIVACY_CONTEXTS, $ksPrivacyContexts, Criteria::EQUAL);
+			$c->add(categoryPeer::PRIVACY_CONTEXTS, $ksPrivacyContexts, KalturaCriteria::IN_LIKE);
 			
 			if(!$kuserId)
 			{
@@ -108,8 +123,12 @@ class kEntitlementUtils
 			}
 			
 		}
-			
-		$c->addAnd(categoryPeer::ID, explode(',', $entry->getCategoriesIds()), Criteria::IN);
+		else 
+		{
+			//no ks = set privacy context to default.
+			$c->add(categoryPeer::PRIVACY_CONTEXTS, array(self::DEFAULT_CONTEXT), KalturaCriteria::IN_LIKE);
+		}
+		
 		$c->addAnd($crit);
 		
 		//remove default FORCED criteria since categories that has display in search = public - doesn't mean that all of their entries are public

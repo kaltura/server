@@ -57,6 +57,8 @@ class categoryFilter extends baseObjectFilter
 			'_matchor_likex_full_name',
 			'_matchor_full_ids',
 			'_like_full_name',
+			'_matchor_privacy_context',
+			'_in_ancestor_id',
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "depth", "partner_sort_value", "entries_count", "members_count", "direct_entries_count", "name");
