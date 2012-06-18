@@ -238,7 +238,8 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		
 		if($filter->get('_eq_privacy_context') && ($filter->get('_eq_privacy_context') == '*'))
 		{
-			$filter->set('_eq_privacy_context', kEntitlementUtils::NOT_DEFAULT_CONTEXT);
+			$filter->set('_matchor_privacy_context', kEntitlementUtils::NOT_DEFAULT_CONTEXT);
+			$filter->unsetByName('_eq_privacy_context');
 		}
 		
 		if($filter->get('_eq_manager'))
@@ -435,7 +436,8 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			"free_text",
 			"description", 
 			"tags", 
-			"members"
+			"members",
+			"privacy_context",
 		));
 	}
 

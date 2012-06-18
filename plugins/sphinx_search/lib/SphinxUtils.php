@@ -29,7 +29,10 @@ class SphinxUtils
 			if(substr($str, -2) == '\*')
 				return md5(substr($str, 0, strlen($str) - 2)) . '\\\*';
 				
-			return md5($str);
+			$md5Str = md5($str);	
+			KalturaLog::debug('md5(' . $str . ')' . ' = ' . $md5Str );
+			
+			return $md5Str;
 		}
 		elseif($escapeType == SearchIndexFieldEscapeType::NO_ESCAPE)
 		{
