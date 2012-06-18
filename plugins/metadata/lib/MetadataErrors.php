@@ -28,4 +28,6 @@ class MetadataErrors extends KalturaErrors
 	const EXCEEDED_ADDITIONAL_SEARCHABLE_FIELDS_LIMIT = "EXCEEDED_ADDITIONAL_SEARCHABLE_FIELDS_LIMIT,exceeded number of account searchable int/date fields, allowed number is [%d]";
 	
 	const XSLT_VALIDATION_ERROR = "XSLT_VALIDATION_ERROR,XSLT validation error [%s]";
+	
+	const MUST_FILTER_ON_OBJECT_ID = "MUST_FILTER_ON_OBJECT_ID,Must filter on obejct id";
 }

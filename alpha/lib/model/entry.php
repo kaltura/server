@@ -2549,6 +2549,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$categoriesEntryStringIndex[] = self::CATEGORY_SEARCH_PERFIX . $categoryEntry->getCategoryId() . ' ' .
 				self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus() . ' ' .
 				self::CATEGORY_SEARCH_PERFIX . $categoryEntry->getCategoryId() ;
+				
+			if($categoryEntry->getStatus() == CategoryEntryStatus::ACTIVE)
+				$categoriesEntryStringIndex[] = $categoryEntry->getCategoryId();	
 		}
 		
 		return implode(' ', $categoriesEntryStringIndex);
@@ -2831,6 +2834,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		foreach($entitledKusers as $privacyContext => $kusers)
 			$entitledKusersByContexts[] = $privacyContext . ' ' . implode(' ', $kusers) . ' ' . $privacyContext;
+		
+		KalturaLog::debug('Entitled Kuserst: ' . print_r($entitledKusersByContexts,true));
 		
 		return implode(' ', $entitledKusersByContexts);
 	}

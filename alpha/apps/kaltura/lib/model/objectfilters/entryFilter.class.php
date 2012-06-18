@@ -125,6 +125,7 @@ class entryFilter extends baseObjectFilter
 			"_matchand_roots",
 			"_notin_roots",
 			"_in_category_entry_status",
+			"in_category_ancestor_id"
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
@@ -290,7 +291,7 @@ class entryFilter extends baseObjectFilter
 	 * @param string $statuses comma seperated
 	 * @return string Categogories indexes ids
 	 */
-	public static function categoryIdsToIdsParsed($cats, $statuses)
+	public static function categoryIdsToIdsParsed($cats, $statuses = null)
 	{
 		if ($cats === "")
 			$cats = array();
@@ -328,7 +329,7 @@ class entryFilter extends baseObjectFilter
 	 * @param string $statuses comma seperated
 	 * @return string Categogories indexes ids
 	 */
-	public static function categoryFullNamesToIdsParsed($cats, $statuses)
+	public static function categoryFullNamesToIdsParsed($cats, $statuses = null)
 	{
 		if ($cats === "")
 			$cats = array();

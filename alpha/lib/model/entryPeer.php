@@ -269,17 +269,21 @@ class entryPeer extends BaseentryPeer
 	
 	public static function retrieveByPKNoFilter ($pk, $con = null)
 	{
+		self::$filerResults = true;
 		self::setUseCriteriaFilter ( false );
 		$res = parent::retrieveByPK( $pk , $con );
 		self::setUseCriteriaFilter ( true );
+		self::$filerResults = false;
 		return $res;
 	}
 
 	public static function retrieveByPKsNoFilter ($pks, $con = null)
 	{
+		self::$filerResults = true;
 		self::setUseCriteriaFilter ( false );
 		$res = parent::retrieveByPKs( $pks , $con );
 		self::setUseCriteriaFilter ( true );
+		self::$filerResults = false;
 		return $res;
 	}
 	
@@ -337,7 +341,7 @@ class entryPeer extends BaseentryPeer
 					
 				if (count($categoriesIds))
 				{
-					$critCategories = $c->getNewCriterion(self::CATEGORIES_IDS, $categoriesIds, Criteria::IN);
+					$critCategories = $c->getNewCriterion(self::CATEGORIES_IDS, $categoriesIds, KalturaCriteria::IN_LIKE);
 					$critCategories->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 					$critEntitled->addOr($critCategories);
 				}
@@ -611,17 +615,30 @@ class entryPeer extends BaseentryPeer
 	 */
 	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
-		if (!kEntitlementUtils::getEntitlementEnforcement() || 
+		if ((!kEntitlementUtils::getEntitlementEnforcement() && !is_null(kCurrentContext::$ks))|| 
 			KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_ENTRY) || 
 			!self::$filerResults)
 			return parent::filterSelectResults($selectResults, $criteria);
 		
 		KalturaLog::debug('Entitlement: Filter Results');
 		
-		$removedRecordsCount = 0;
-		foreach ($selectResults as $key => $selectResult)
+		if(is_null(kCurrentContext::$ks && count($selectResults)))
 		{
-			if (!kEntitlementUtils::isEntryEntitled($selectResult))
+			$entry = $selectResults[0];
+			$partner = $entry->getPartner();
+			
+			if(!$partner)
+				throw new kCoreException('entry partner not found');
+						
+			if(!$partner->getDefaultEntitlementEnforcement())
+				return parent::filterSelectResults($selectResults, $criteria);			
+		}
+		
+		$removedRecordsCount = 0;
+		
+		foreach ($selectResults as $key => $entry)
+		{
+			if (!kEntitlementUtils::isEntryEntitled($entry))
 			{
 				unset($selectResults[$key]);
 				$removedRecordsCount++;
@@ -635,7 +652,6 @@ class entryPeer extends BaseentryPeer
 		}
 		
 		self::$filerResults = false;
-		
 		parent::filterSelectResults($selectResults, $criteria);
 		
 		KalturaLog::debug('Entitlement: Filter Results - done');

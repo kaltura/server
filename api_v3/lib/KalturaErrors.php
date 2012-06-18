@@ -262,6 +262,8 @@ class KalturaErrors extends APIErrors
 	
 	const CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT,Cannot update category entitlement fields when privacy context is not set on the categroy";
 	
+	const PRIVACY_CONTEXT_INVALID_STRING = 'PRIVACY_CONTEXT_INVALID_STRING,Privacy context is invalid';
+	
 	/**
 	 * Batch Service
 	 */

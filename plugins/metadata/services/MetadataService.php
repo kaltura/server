@@ -310,6 +310,10 @@ class MetadataService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaMetadataFilter;
 			
+		if (kEntitlementUtils::getEntitlementEnforcement() && (is_null($filter->objectIdIn) && is_null($filter->objectIdEqual)))
+			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
+			
+			
 		$metadataFilter = new MetadataFilter();
 		$filter->toObject($metadataFilter);
 		
