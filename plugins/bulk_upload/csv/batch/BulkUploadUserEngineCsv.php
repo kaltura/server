@@ -34,6 +34,8 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		array_walk($values, array('BulkUploadUserEngineCsv', 'trimArray'));
 		
 		// sets the result values
+		$dateOfBirth = null;
+		
 		foreach($columns as $index => $column)
 		{
 			if(!is_numeric($index))
@@ -42,6 +44,11 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			if ($column == 'userId')
 			{
 			    $bulkUploadResult->objectId = $values[$index];
+			}
+			
+			if ($column == 'dateOfBirth')
+			{
+			    $dateOfBirth = $values[$index];
 			}
 				
 			if(iconv_strlen($values[$index], 'UTF-8'))
@@ -80,12 +87,12 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		    $bulkUploadResult->action = KalturaBulkUploadAction::ADD;
 		}
 		
-		$bulkUploadResult = $this->validateBulkUploadResult($bulkUploadResult);
+		$bulkUploadResult = $this->validateBulkUploadResult($bulkUploadResult, $dateOfBirth);
 		if($bulkUploadResult)
 			$this->bulkUploadResults[] = $bulkUploadResult;
 	}
     
-	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult)
+	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult, $dateOfBirth = null)
 	{
 	    /* @var $bulkUploadResult KalturaBulkUploadResultUser */
 		if (!$bulkUploadResult->objectId)
@@ -95,7 +102,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$bulkUploadResult->errorDescription = "Mandatory Column [userId] missing from CSV.";
 		}
 		
-		if ($bulkUploadResult->dateOfBirth && !self::isFormatedDate($bulkUploadResult->dateOfBirth, true))
+		if ($dateOfBirth && !self::isFormatedDate($dateOfBirth, true))
 		{
 		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
