@@ -95,8 +95,9 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	/**
 	 * Returns the log file for bulk upload job
 	 * @param BatchJob $batchJob bulk upload batchjob
+	 * @param bool $addHeaderRow flag signifying whether the header row should be added to the CSV. Default value is false.
 	 */
-	public static function writeBulkUploadLogFile($batchJob)
+	public static function writeBulkUploadLogFile($batchJob, $addHeaderRow = false)
 	{
 		if(($batchJob->getJobSubType() != null) && ($batchJob->getJobSubType() != self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV))){
 			return;
@@ -113,13 +114,17 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
         /* @var $data kBulkUploadJobData */
 		
 		//Add header row to the output CSV
-		$headerRow = self::getHeaderRow($data->getBulkUploadObjectType());
-		$headerRow[] = "action";
-		$headerRow[] = "resultStatus";
-		$headerRow[] = "objectId";
-		$headerRow[] = "objectStatus";
-		$headerRow[] = "errorDescription";
-		fputcsv($STDOUT, $headerRow);
+		if ($addHeaderRow)
+		{
+    		$headerRow = self::getHeaderRow($data->getBulkUploadObjectType());
+    		$headerRow[] = "action";
+    		$headerRow[] = "resultStatus";
+    		$headerRow[] = "objectId";
+    		$headerRow[] = "objectStatus";
+    		$headerRow[] = "errorDescription";
+    		$headerRow[] = "userId";
+    		fputcsv($STDOUT, $headerRow);
+		}
 		
 		foreach($bulkUploadResults as $bulkUploadResult)
 		{
@@ -148,6 +153,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			$values[] = $bulkUploadResult->getObjectId();
 			$values[] = $bulkUploadResult->getObjectStatus();
 			$values[] = $bulkUploadResult->getErrorDescription();
+			$values[] = $batchJob->getData()->getUserId();
 			
 			
 			fputcsv($STDOUT, $values);
