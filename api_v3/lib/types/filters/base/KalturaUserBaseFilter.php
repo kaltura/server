@@ -108,7 +108,7 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	public $lastNameStartsWith;
 
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 */
 	public $isAdminEqual;
 }
