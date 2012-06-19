@@ -57,12 +57,14 @@ class kEntitlementUtils
 		foreach($allCategoriesEntry as $categoryEntry)	
 			$categories[] = $categoryEntry->getCategoryId();
 			
+		//if entry doesn't belong to any category. 
+		$categories[] = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
+			
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 		$c->add(categoryPeer::ID, $categories, Criteria::IN);
 		
 		$ksPrivacyContexts = null;
-		
-		
+				
 		$privacy = array(PrivacyType::ALL);
 		if($ks && !$ks->isWidgetSession())
 			$privacy[] = PrivacyType::AUTHENTICATED_USERS;
@@ -106,7 +108,7 @@ class kEntitlementUtils
 			
 			// entry that doesn't belong to any category is public
 			$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entry->getId());
-			if(!count($categoryEntries) && ($ksPrivacyContexts == null || $ksPrivacyContexts == self::DEFAULT_CONTEXT))
+			if(!count($categoryEntries) && ($ksPrivacyContexts == self::DEFAULT_CONTEXT))
 			{
 				KalturaLog::debug('Entry entitled: entry does not belong to any category');
 				return true;
