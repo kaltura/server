@@ -18,11 +18,6 @@ class SystemPartnerPlugin extends KalturaPlugin implements IKalturaPermissions, 
 		);
 		return $map;
 	}
-	
-	public static function getServiceConfig()
-	{
-		return realpath(dirname(__FILE__).'/../config/system_partner.ct');
-	}
 
 	public static function isAllowedPartner($partnerId)
 	{
