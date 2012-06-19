@@ -70,7 +70,7 @@ class categoryKuser extends BasecategoryKuser {
 	 * @param PropelPDO $con
 	 * @return bloolean
 	 */
-	public function preSave(PropelPDO $con = null)
+	public function postSave(PropelPDO $con = null)
 	{
 		$category = categoryPeer::retrieveByPK($this->category_id);
 		if(!$category)
@@ -103,9 +103,31 @@ class categoryKuser extends BasecategoryKuser {
 			$category->save();
 		}
 		
-		return parent::preSave($con);
+		$this->addIndexCategoryInheritedTreeJob($category->getFullIds());
+		
+		return parent::postSave();
 	}
 	
+	public function addIndexCategoryInheritedTreeJob($fullIdsStartsWithCategoryId)
+	{
+		$featureStatusToRemoveIndex = new kFeatureStatus();
+		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY);
+		
+		$featureStatusesToRemove = array();
+		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
+
+		$filter = new categoryFilter();
+		$filter->setFullIdsStartsWith($fullIdsStartsWithCategoryId);
+		$filter->setInheritanceTypeEqual(InheritanceType::INHERIT);
+		
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);		
+		$filter->attachToCriteria($c);		
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		categoryPeer::doSelect($c);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
+		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY, $filter, true, $featureStatusesToRemove);
+	}
 
 	
 	public function delete(PropelPDO $con = null)
