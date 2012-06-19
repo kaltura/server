@@ -18,9 +18,7 @@ class BulkUploadResultKuser extends BulkUploadResult
     const GENDER = "gender";
     const FIRST_NAME = "first_name";
     const LAST_NAME = "last_name";
-    const IS_ADMIN = "is_admin";
     const TAGS = "tags";
-    const ROLE_IDS = "role_ids";
     
     /* (non-PHPdoc)
      * @see BulkUploadResult::handleRelatedObjects()
@@ -77,12 +75,6 @@ class BulkUploadResultKuser extends BulkUploadResult
 	public function getLastName()	{return $this->getFromCustomData(self::LAST_NAME);}
 	public function setLastName($v)	{$this->putInCustomData(self::LAST_NAME, $v);}
 	
-	public function getIsAdmin()	{return $this->getFromCustomData(self::IS_ADMIN);}
-	public function setIsAdmin($v)	{$this->putInCustomData(self::IS_ADMIN, $v);}
-	
     public function getTags()	{return $this->getFromCustomData(self::TAGS);}
 	public function setTags($v)	{$this->putInCustomData(self::TAGS, $v);}
-	
-    public function getRoleIds()	{return $this->getFromCustomData(self::ROLE_IDS);}
-	public function setRoleIds($v)	{$this->putInCustomData(self::ROLE_IDS, $v);}
 }
