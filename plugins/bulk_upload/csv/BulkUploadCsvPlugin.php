@@ -291,9 +291,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	    $values[] = $bulkUploadResult->getGender();
 	    $values[] = $bulkUploadResult->getFirstName();
 	    $values[] = $bulkUploadResult->getLastName();
-	    $values[] = $bulkUploadResult->getIsAdmin();
 	    $values[] = $bulkUploadResult->getTags();
-	    $values[] = $bulkUploadResult->getRoleIds();
 	    $values[] = $bulkUploadResult->getPartnerData();
 	    
 	    return $values;
