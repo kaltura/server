@@ -358,8 +358,10 @@ class BulkService extends KalturaBaseService
 		$batchJobLog = BatchJobLogPeer::retrieveByBatchJobId($id);
 		
 		$ret = new KalturaBulkUpload();
-		$ret->fromObject($batchJobLog);
-		return $ret;
+		if ($batchJobLog)
+    		$ret->fromObject($batchJobLog);
+    	
+    	return $ret;
 	}
 	
 
