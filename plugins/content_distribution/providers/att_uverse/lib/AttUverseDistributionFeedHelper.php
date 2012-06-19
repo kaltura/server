@@ -121,9 +121,9 @@ class AttUverseDistributionFeedHelper
 		{
 			// if CDATA inside, set the value of CDATA
 			if ($node->childNodes->length > 0 && $node->childNodes->item(0)->nodeType == XML_CDATA_SECTION_NODE)
-				$node->childNodes->item(0)->nodeValue = htmlentities($value);
+				$node->childNodes->item(0)->nodeValue = htmlentities($value,ENT_QUOTES,'UTF-8');
 			else
-				$node->nodeValue = htmlentities($value);
+				$node->nodeValue = htmlentities($value,ENT_QUOTES,'UTF-8');
 		}
 	}
 	
