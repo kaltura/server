@@ -403,7 +403,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		if($this->privacyContext != null && kEntitlementUtils::getEntitlementEnforcement())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT);
 			
-		if(($this->privacyContext == '') || ($this->privacyContext == null && $sourceObject && $sourceObject->getPrivacyContexts() == ''))
+		if(($this->privacyContext === '') || ($this->privacyContext == null && $sourceObject && $sourceObject->getPrivacyContexts() == ''))
 		{
 			if((($this->appearInList != KalturaAppearInListType::PARTNER_ONLY && $this->appearInList != null) || 
 			   ($this->appearInList == null && $sourceObject && $sourceObject->getDisplayInSearch() != DisplayInSearchType::PARTNER_ONLY))|| 
