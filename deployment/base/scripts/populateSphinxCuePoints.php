@@ -58,7 +58,7 @@ while(count($entries))
 	}
 	
 	$c->setOffset($c->getOffset() + count($entries));
-	CuePointPeer::clearInstancePool();
+	kMemoryManager::clearMemory();
 	$entries = CuePointPeer::doSelect($c, $con);
 }
 

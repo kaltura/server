@@ -57,7 +57,7 @@ while(count($entries))
 	}
 	
 	$c->setOffset($c->getOffset() + count($entries));
-	EntryDistributionPeer::clearInstancePool();
+	kMemoryManager::clearMemory();
 	$entries = EntryDistributionPeer::doSelect($c, $con);
 }
 

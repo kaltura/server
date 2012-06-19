@@ -57,10 +57,7 @@ while(count($tags))
 	}
 	
 	$c->setOffset($c->getOffset() + count($tags));
-	TagPeer::clearInstancePool();
-	MetadataPeer::clearInstancePool();
-	MetadataProfilePeer::clearInstancePool();
-	MetadataProfileFieldPeer::clearInstancePool();
+	kMemoryManager::clearMemory();
 	$tags = TagPeer::doSelect($c, $con);
 }
 

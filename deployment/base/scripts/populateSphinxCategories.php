@@ -58,10 +58,7 @@ while(count($categories))
 	}
 	
 	$c->setOffset($c->getOffset() + count($categories));
-	categoryPeer::clearInstancePool();
-	MetadataPeer::clearInstancePool();
-	MetadataProfilePeer::clearInstancePool();
-	MetadataProfileFieldPeer::clearInstancePool();
+	kMemoryManager::clearMemory();
 	$categories = categoryPeer::doSelect($c, $con);
 }
 

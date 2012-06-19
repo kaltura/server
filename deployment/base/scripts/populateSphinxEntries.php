@@ -59,10 +59,7 @@ while(count($entries))
 	}
 	
 	$c->setOffset($c->getOffset() + count($entries));
-	entryPeer::clearInstancePool();
-	MetadataPeer::clearInstancePool();
-	MetadataProfilePeer::clearInstancePool();
-	MetadataProfileFieldPeer::clearInstancePool();
+	kMemoryManager::clearMemory();
 	$entries = entryPeer::doSelect($c, $con);
 }
 

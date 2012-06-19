@@ -58,7 +58,7 @@ while(count($entries))
 	}
 	
 	$c->setOffset($c->getOffset() + count($entries));
-	kuserPeer::clearInstancePool();
+	kMemoryManager::clearMemory();
 	$entries = kuserPeer::doSelect($c, $con);
 }
 
