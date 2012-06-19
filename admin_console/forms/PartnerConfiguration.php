@@ -303,81 +303,81 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addLimitsElements();	
-		
-	//--------------------------- Enable/Disable Features ---------------------------
-	$moduls = Zend_Registry::get('config')->moduls;
-	if ($moduls)
-	{
-
-		foreach($moduls as $name => $modul)
+			
+		//--------------------------- Enable/Disable Features ---------------------------
+		$moduls = Zend_Registry::get('config')->moduls;
+		if ($moduls)
 		{
-			$attributes = array(
-				'label'	  => $modul->label,
-				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
-			);
-			if(!$modul->enabled)
-				$attributes['disabled'] = true;	
-			$this->addElement('checkbox', $modul->permissionName, $attributes);
-			if ($modul->indexLink != null)
+	
+			foreach($moduls as $name => $modul)
 			{
-				//check permission to access the link's page
-				$indexLinkArray = explode('/', $modul->indexLink);
-				
-//				Commented by Tan-Tan
-//				The system admin user is never allowed to use these features, the features are allowed to the partner
-//						
-//				$linkAllowed= false;
-//				if (($indexLinkArray[0])=='plugin'){
-//				 	$linkAllowed = Infra_AclHelper::isAllowed($indexLinkArray[1], null);
-//				}
-//				else{
-//					$linkAllowed = Infra_AclHelper::isAllowed($indexLinkArray[0], $indexLinkArray[1]);
-//				}
-//				if ($linkAllowed)
-//				{
-					$element = $this->getElement($modul->permissionName);
-					$element->setDescription('<a class=linkToPage href="../'.$modul->indexLink.'">(config)</a>');
-					$element->addDecorators(array('ViewHelper',		      
-				        array('Label', array('placement' => 'append')),
-				        array('Description', array('escape' => false, 'tag' => false)),
-				      ));
-//				}		      
+				$attributes = array(
+					'label'	  => $modul->label,
+					'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+				);
+				if(!$modul->enabled)
+					$attributes['disabled'] = true;	
+				$this->addElement('checkbox', $modul->permissionName, $attributes);
+				if ($modul->indexLink != null)
+				{
+					//check permission to access the link's page
+					$indexLinkArray = explode('/', $modul->indexLink);
+					
+	//				Commented by Tan-Tan
+	//				The system admin user is never allowed to use these features, the features are allowed to the partner
+	//						
+	//				$linkAllowed= false;
+	//				if (($indexLinkArray[0])=='plugin'){
+	//				 	$linkAllowed = Infra_AclHelper::isAllowed($indexLinkArray[1], null);
+	//				}
+	//				else{
+	//					$linkAllowed = Infra_AclHelper::isAllowed($indexLinkArray[0], $indexLinkArray[1]);
+	//				}
+	//				if ($linkAllowed)
+	//				{
+						$element = $this->getElement($modul->permissionName);
+						$element->setDescription('<a class=linkToPage href="../'.$modul->indexLink.'">(config)</a>');
+						$element->addDecorators(array('ViewHelper',		      
+					        array('Label', array('placement' => 'append')),
+					        array('Description', array('escape' => false, 'tag' => false)),
+					      ));
+	//				}		      
+				}
+				$permissionNames[$modul->group][$modul->label] = $modul->permissionName;
 			}
-			$permissionNames[$modul->group][$modul->label] = $modul->permissionName;
+			
+			$this->addElement('checkbox', 'moderate_content', array(
+				'label'	  => 'Content Moderation',
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+			));
+			$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]['Content Moderation'] = 'moderate_content';
+		
+			ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
+			ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);
+			ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);		
+			ksort($permissionNames[self::GROUP_NOTIFICATION_CONFIG]);		
+			$this->addAllDisplayGroups($permissionNames);
 		}
 		
-		$this->addElement('checkbox', 'moderate_content', array(
-			'label'	  => 'Content Moderation',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
-		));
-		$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]['Content Moderation'] = 'moderate_content';
-	
-		ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
-		ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);
-		ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);		
-		ksort($permissionNames[self::GROUP_NOTIFICATION_CONFIG]);		
-		$this->addAllDisplayGroups($permissionNames);
-	}
-	
-	//adding display group to all features
-	
-	
-	$this->addDisplayGroup($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES], 'enableDisableFeatures',array('legend' => 'Enable/Disable Features:'));
+		//adding display group to all features
 		
-	//removing decorators from display groups
-	$displayGroups = $this->getDisplayGroups();
-	foreach ($displayGroups as $displayGroup)
-	{
-		$displayGroup->removeDecorator ('label');
-  		$displayGroup->removeDecorator('DtDdWrapper');		
-	}
-	//creating divs for left right dividing
-	$this->setDisplayColumn('generalInformation',  'passwordSecurity', true);
-	$this->setDisplayColumn('accountPackagesService', 'enableDisableFeatures', false);
+		
+		$this->addDisplayGroup($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES], 'enableDisableFeatures',array('legend' => 'Enable/Disable Features:'));
 			
-	//---------------- Display DisplayGroups according to Permissions ---------------	
-	$this->handlePermissions();
-}
+		//removing decorators from display groups
+		$displayGroups = $this->getDisplayGroups();
+		foreach ($displayGroups as $displayGroup)
+		{
+			$displayGroup->removeDecorator ('label');
+	  		$displayGroup->removeDecorator('DtDdWrapper');		
+		}
+		//creating divs for left right dividing
+		$this->setDisplayColumn('generalInformation',  'passwordSecurity', true);
+		$this->setDisplayColumn('accountPackagesService', 'enableDisableFeatures', false);
+				
+		//---------------- Display DisplayGroups according to Permissions ---------------	
+		$this->handlePermissions();
+	}
 	/**
 	 * creating a form display in two columns (left and right).	
 	 * $firstColumnElement - the first display group in the column
@@ -449,7 +449,7 @@ class Form_PartnerConfiguration extends Infra_Form
 	}
 	
 	
-	public function handlePermissions()
+	private function handlePermissions()
 	{
 		//permissions groups 
 		$configureAccountsTechData = array('publisherSpecificDeliverySettings', 'remoteStorageAccountPolicy', 'advancedNotificationSettings', 'publisherSpecificIngestionSettings', 'passwordSecurity'); //EAGLE PRD group 1
@@ -492,6 +492,7 @@ class Form_PartnerConfiguration extends Infra_Form
 	 */
 	public function populateFromObject($object, $add_underscore = true)
 	{
+		/* @var $object Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration */
 		parent::populateFromObject($object, $add_underscore);
 		
 		if (is_array($object->limits))
@@ -513,6 +514,14 @@ class Form_PartnerConfiguration extends Infra_Form
 			$this->setDefault($permission->name, ($permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE));
 		}
 	
+		// partner is set to free trail package
+		if(!$object->partnerPackage == PartnerController::PARTNER_PACKAGE_FREE)
+		{
+			if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-packages-service-paid')))
+			{
+				$this->setPermissionGroupElementsToDisabled(array('accountPackagesService'));
+			}
+		}
 	}
 	
 	/* (non-PHPdoc)
