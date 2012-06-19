@@ -33,6 +33,12 @@
             }
         });
     }
+
+    function getTimeOffset() {
+		var d = new Date();
+		return d.getTimezoneOffset();
+    }
+    
     jQuery(function() {
         if($.browser.msie) {
             jQuery("div.box").corner("8px");
@@ -42,5 +48,6 @@
             }
         }       
         $("input[type='password']").addClass("text");
+        $("#timeZoneOffset").val(getTimeOffset());
     });
 </script>
