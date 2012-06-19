@@ -175,7 +175,7 @@ abstract class KBulkUploadEngine
 		$ret = gmmktime($hour, $minute, $second, $month, $day, $year);
 		if($ret)
 		{
-			KalturaLog::debug("Formated Date [$ret] " . date('Y-m-d\TH:i:s', $ret));
+			KalturaLog::debug("Formated Date [$ret] " . gmdate('Y-m-d\TH:i:s', $ret));
 			return $ret;
 		}
 		return null;
