@@ -64,14 +64,14 @@ class UserController extends Zend_Controller_Action
 					
 				//Save the current timezone offset in a cookie
 			    $timezoneOffset = $request->getPost("timezone_offset");
-			    Zend_Registry::set("timezone_offset", $timezoneOffset);
+			    Zend_Registry::set('timezone_offset', $timezoneOffset);
 			    
 				$nextUri = $this->_getParam('next_uri');
 				KalturaLog::debug("next uri $nextUri");
 				if ($nextUri && strlen($nextUri) > 1)
 					$this->_helper->redirector->gotoUrl($nextUri);
 				else
-					$this->_helper->redirector('list-by-user', 'partner');
+					$this->_helper->redirector('list', 'partner');
 			}
 			else
 			{
