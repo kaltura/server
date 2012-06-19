@@ -287,12 +287,6 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	    
 	    if ($bulkUploadUserResult->dateOfBirth)
 	        $user->dateOfBirth = $bulkUploadUserResult->dateOfBirth; 
-	        
-	    if ($bulkUploadUserResult->isAdmin)
-	        $user->isAdmin = $bulkUploadUserResult->isAdmin;
-	    
-	    if ($bulkUploadUserResult->roleIds)
-	        $user->roleIds = $bulkUploadUserResult->roleIds;
 	      
 	    if ($bulkUploadUserResult->partnerData)
 	        $user->partnerData = $bulkUploadUserResult->partnerData;
@@ -313,7 +307,6 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		    "firstName",
 		    "lastName",
 		    "email",
-		    "isAdmin",
 		    "tags",
 		    "gender",
 		    "zip",
@@ -321,7 +314,6 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		    "state",
 			"city",
 		    "dateOfBirth",
-		    "roleIds",
 			"partnerData",
 		);
 	}
