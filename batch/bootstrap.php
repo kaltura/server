@@ -27,7 +27,7 @@ KAutoloader::setIncludePath(array(
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/batch/classMap.cache');
 KAutoloader::register();
 
-set_include_path(get_include_path() . ';' . KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "phpseclib"));
+set_include_path(get_include_path() . PATH_SEPARATOR . KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "phpseclib"));
 
 // Logger
 $loggerConfigPath = KALTURA_ROOT_PATH . "/configurations/logger.ini";
