@@ -256,6 +256,13 @@ class KalturaUser extends KalturaObject implements IFilterable
 	{
 		if (is_null($dbObject))
 			$dbObject = new kuser();
+			
+	    // The user bulk upload engine cannot create admin users
+	    if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+		{
+		    $this->isAdmin = 0;
+		}
+		
 		parent::toObject($dbObject, $skip);
 		
 		// full name is deprecated and was split to firstName + lastName
