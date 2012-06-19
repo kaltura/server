@@ -387,6 +387,10 @@ kmc.utils = {
 		$("#server_frame").attr("src", url);
 		$("#server_wrap").css("margin-top", "-"+ ($("#flash_wrap").height() + 2) +"px");
 		$("#server_wrap").show();
+	},
+	
+	openHelp: function( key ) {
+		$("#kcms")[0].doHelp( key );
 	}
 		
 };
@@ -554,7 +558,7 @@ kmc.preview_embed = {
 		kmc.layout.modal.open( {
 			'width' : parseInt(uiconf_details.width) + 140,
 			'title' : id_type + ': ' + name,
-			'help' : '<a class="help icon" target="_blank" href="' + kmc.vars.help_url + '#section118"></a>',
+			'help' : '<a class="help icon" target="_blank" href="javascript:kmc.utils.openHelp(\'section_pne\');"></a>',
 			'content' : '<div id="preview_embed">' + modal_content + '</div>'
 		} );
 
@@ -618,7 +622,7 @@ kmc.preview_embed = {
 			options += '<option value="akamai"' + ((delivery_type == "akamai") ? selected : "") + '>Akamai HD Network &nbsp;</option>';
 		}
 		html += options + '</select></div><br /><div class="note">Adaptive Streaming automatically adjusts to the viewer\'s bandwidth,' +
-		'while Progressive Download allows buffering of the content. <a target="_blank" href="' + kmc.vars.help_url + '#1431">Read more</a></div><br />';
+		'while Progressive Download allows buffering of the content. <a href="javascript:kmc.utils.openHelp(\'section_pne_stream\');">Read more</a></div><br />';
 		return html;
 	},
 		
@@ -641,10 +645,10 @@ kmc.preview_embed = {
 		kmc.client.setShortURL(long_url);
 
 		var description = '<div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
-		' <a target="_blank" href="' + kmc.vars.help_url + '#section1432">Read more</a></div>';
+		' <a target="_blank" href="javascript:kmc.utils.openHelp(\'section_pne_ipad\');">Read more</a></div>';
 
 		if( is_video && ! has_mobile_flavors) {
-			description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.help_url + '#section1432">Read more</a></div>';
+			description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="javascript:kmc.utils.openHelp(\'section_pne_ipad\');">Read more</a></div>';
 		}
 
 		var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" /> <label for="html5_support">Support Mobile' +
