@@ -450,29 +450,32 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 				$fieldValues = explode(self::BULK_UPLOAD_MULTI_VALUES_DELIMITER, $value);
 				foreach($fieldValues as $fieldValue)
 				{
-					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE && !is_numeric($fieldValue))
-					{
-						$value = self::parseFormatedDate($fieldValue);
-						if(!$value || !strlen($value))
-						{
-							$errorMessage = "Could not parse date format [$fieldValue] for field [$key]";
-							KalturaLog::err($errorMessage);
-							self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
-							continue;
-						}
-							
-						$fieldValue = $value;
-					}
-					
-					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT && !is_numeric($fieldValue))
-					{
-						$errorMessage = "Could not parse int format [$fieldValue] for field [$key]";
-						KalturaLog::err($errorMessage);
-						self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
-						continue;
-					}
-						
-					self::addXpath($xml, $metadataProfileField->getXpath(), $fieldValue);
+				    if ($fieldValue)
+				    {
+    					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE && !is_numeric($fieldValue))
+    					{
+    						$value = self::parseFormatedDate($fieldValue);
+    						if(!$value || !strlen($value))
+    						{
+    							$errorMessage = "Could not parse date format [$fieldValue] for field [$key]";
+    							KalturaLog::err($errorMessage);
+    							self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
+    							continue;
+    						}
+    							
+    						$fieldValue = $value;
+    					}
+    					
+    					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT && !is_numeric($fieldValue))
+    					{
+    						$errorMessage = "Could not parse int format [$fieldValue] for field [$key]";
+    						KalturaLog::err($errorMessage);
+    						self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
+    						continue;
+    					}
+    						
+    					self::addXpath($xml, $metadataProfileField->getXpath(), $fieldValue);
+				    }
 				}
 					
 				$dataFound = true;
@@ -623,7 +626,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
     		if(!kMetadataManager::validateMetadata($metadataProfileId, $xmlData, $errorMessage))
     		{
     			self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
-    			return;
+    			continue;
     		}
     		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
     		
