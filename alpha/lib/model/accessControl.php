@@ -203,7 +203,7 @@ class accessControl extends BaseaccessControl
 		} 
 		
 		// TODO - remove after full migration
-		if(!count($rules) || $migrate)
+		if(is_null($rulesString) || $migrate)
 		{
 			if (!is_null($this->getSiteRestrictType()))
 				$rules[] = new kAccessControlSiteRestriction($this);
