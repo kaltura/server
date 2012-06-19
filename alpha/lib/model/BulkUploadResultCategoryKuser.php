@@ -46,7 +46,7 @@ class BulkUploadResultCategoryKuser extends BulkUploadResult
 	public function setCategoryId($v)	{$this->putInCustomData(self::CATEGORY_ID, $v);}
 	
     public function getCategoryReferenceId()	{return $this->getFromCustomData(self::CATEGORY_REFERENCE_ID);}
-	public function setCategoryReferenceIdId($v)	{$this->putInCustomData(self::CATEGORY_REFERENCE_ID, $v);}
+	public function setCategoryReferenceId($v)	{$this->putInCustomData(self::CATEGORY_REFERENCE_ID, $v);}
 
     public function getUserId()	{return $this->getFromCustomData(self::USER_ID);}
 	public function setUserId($v)	{$this->putInCustomData(self::USER_ID, $v);}
