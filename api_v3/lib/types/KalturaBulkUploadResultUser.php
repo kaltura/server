@@ -65,15 +65,6 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
      */
     public $lastName;
     
-    /**
-     * @var bool
-     */
-    public $isAdmin;
-    
-    /**
-     * @var string
-     */
-    public $roleIds;
     
     private static $mapBetweenObjects = array
 	(
@@ -87,9 +78,7 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
 	    "gender",
 	    "firstName",
 	    "lastName",
-	    "isAdmin",
 	    "tags",
-	    "roleIds",
 	);
 	
     public function getMapBetweenObjects()
