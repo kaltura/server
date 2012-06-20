@@ -660,13 +660,30 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		return $criterionFields;
 	}
-	
+
+	public function getSkipFields()
+	{
+		return array();
+	}
+		
 	private function shouldSkipSphinx()
 	{
-		$pkCrit = $this->getCriterion($this->getIdField());
-		if(!$pkCrit || (($pkCrit->getComparison() != Criteria::EQUAL) && ($pkCrit->getComparison() != Criteria::IN)))
+		$skipFields = $this->getSkipFields();
+		
+		$hasSkipField = false;
+		foreach ($skipFields as $skipField)
+		{
+			$skipCrit = $this->getCriterion($skipField);
+			if($skipCrit && in_array($skipCrit->getComparison(), array(Criteria::EQUAL, Criteria::IN)))
+			{
+				$hasSkipField = true;
+				break;
+			}
+		}
+		
+		if (!$hasSkipField)
 			return false;
-
+		
 		$fields = array();
 		
 		foreach($this->getMap() as $criterion)
@@ -679,7 +696,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		{	
 			$fieldName = $this->getSphinxFieldName($field);
 
-			if($fieldName == $this->getIdField())
+			if(in_array($field, $skipFields))
 			{
 				continue;
 			}

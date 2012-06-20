@@ -448,6 +448,11 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	{
 		return categoryPeer::ID;
 	}
+
+	public function getSkipFields()
+	{
+		return array(categoryPeer::ID);
+	}
 	
 	public function hasPeerFieldName($fieldName)
 	{

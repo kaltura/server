@@ -108,7 +108,6 @@ class SphinxCuePointCriteria extends SphinxCriteria
 	{
 		return in_array($fieldName, array(
 			'parent_id',
-			'entry_id', 
 			'name', 
 			'system_name',
 			'text', 
@@ -120,5 +119,23 @@ class SphinxCuePointCriteria extends SphinxCriteria
 	public function getIdField()
 	{
 		return CuePointPeer::ID;
+	}
+
+	public function getSkipFields()
+	{
+		return array(CuePointPeer::ID, CuePointPeer::ENTRY_ID);
+	}
+
+	public function hasPeerFieldName($fieldName)
+	{
+		if(strpos($fieldName, '.') === false)
+		{
+			$fieldName = strtoupper($fieldName);
+			$fieldName = "cue_point.$fieldName";
+		}
+		
+		$cuePointFields = CuePointPeer::getFieldNames(BasePeer::TYPE_COLNAME);
+		
+		return in_array($fieldName, $cuePointFields);
 	}
 }

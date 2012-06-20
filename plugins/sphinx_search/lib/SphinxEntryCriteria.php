@@ -473,7 +473,12 @@ class SphinxEntryCriteria extends SphinxCriteria
 	{
 		return entryPeer::ID;
 	}
-	
+
+	public function getSkipFields()
+	{
+		return array(entryPeer::ID);
+	}
+		
 	public function hasPeerFieldName($fieldName)
 	{
 		if(strpos($fieldName, '.') === false)
