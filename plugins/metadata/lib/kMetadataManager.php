@@ -249,7 +249,7 @@ class kMetadataManager
 	 */
 	public static function getAvailableSearchIndex($partnerId, $objectType)
 	{
-		$profileFields = MetadataProfileFieldPeer::retrieveByPartnerAndActive($partnerId);
+		$profileFields = MetadataProfileFieldPeer::retrieveIndexableByPartnerAndType($partnerId, $objectType);
 		
 		$occupiedIndexes = array();	
 		foreach($profileFields as $profileField)
@@ -616,7 +616,7 @@ class kMetadataManager
 	{
 		$additionalSearchableFieldsCounter = 0;
 			
-		$profileFields = MetadataProfileFieldPeer::retrieveByPartnerAndActive($partnerId);
+		$profileFields = MetadataProfileFieldPeer::retrieveIndexableByPartnerAndType($partnerId, $obejctType);
 		
 		foreach($profileFields as $profileField)
 		{		

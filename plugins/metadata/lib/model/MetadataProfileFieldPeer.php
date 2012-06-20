@@ -90,17 +90,26 @@ class MetadataProfileFieldPeer extends BaseMetadataProfileFieldPeer {
 	
 	/**
 	 * @param      int $partnerId
-	 * @param      string $key
-	 * @param      PropelPDO $con the connection to use
+	 * @param      int $objectType
 	 * @return     array<MetadataProfileField>
 	 */
-	public static function retrieveByPartnerAndActive($partnerId, PropelPDO $con = null)
+	public static function retrieveIndexableByPartnerAndType($partnerId, $objectType)
 	{
 		$criteria = new Criteria();
-		$criteria->add(MetadataProfileFieldPeer::PARTNER_ID, $partnerId);
-		$criteria->add(MetadataProfileFieldPeer::STATUS, MetadataProfileField::STATUS_ACTIVE, Criteria::EQUAL);
+		$criteria->addSelectColumn(MetadataProfilePeer::ID);
+		$criteria->add(MetadataProfilePeer::PARTNER_ID, $partnerId);
+		$criteria->add(MetadataProfilePeer::OBJECT_TYPE, $objectType);
 
-		return MetadataProfileFieldPeer::doSelect($criteria, $con);
+		$stmt = MetadataProfilePeer::doSelectStmt($criteria);
+		$metadataProfileIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		
+		$criteria = new Criteria();
+		$criteria->add(MetadataProfileFieldPeer::PARTNER_ID, $partnerId);
+		$criteria->add(MetadataProfileFieldPeer::METADATA_PROFILE_ID, $metadataProfileIds, Criteria::IN);
+		$criteria->add(MetadataProfileFieldPeer::STATUS, MetadataProfileField::STATUS_ACTIVE, Criteria::EQUAL);
+		$criteria->add(MetadataProfileFieldPeer::SEARCH_INDEX, null, Criteria::ISNOTNULL);
+
+		return MetadataProfileFieldPeer::doSelect($criteria);
 	}
 	
 	/**
