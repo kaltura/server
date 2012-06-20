@@ -14,15 +14,27 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 	 * @var string
 	 */
 	protected $password;
+	
+	/**
+	 * @var int
+	 */
+	protected $partnerId;
+	
+	/**
+	 * @var int
+	 */
+	protected $timezoneOffset;
+	
 	/**
 	 * Sets username and password for authentication
 	 *
 	 * @return void
 	 */
-	public function __construct($username, $password)
+	public function __construct($username, $password, $timezoneOffset)
 	{
 		$this->username = $username;
 		$this->password = $password;
+		$this->timezoneOffset = $timezoneOffset;
 	}
 
 	/**
@@ -45,10 +57,10 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		$client->setKs(null);
 		try
 		{
-			$ks = $client->user->loginByLoginId($this->username, $this->password, $authorizedPartnerId);
+			$ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId ? $this->partnerId : $authorizedPartnerId);
 			$client->setKs($ks);
-			$user = $client->user->getByLoginId($this->username, $authorizedPartnerId);
-			$identity = new Infra_UserIdentity($user, $ks);
+			$user = $client->user->getByLoginId($this->username, $this->partnerId ? $this->partnerId : $authorizedPartnerId);
+			$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset);
 			if ($authorizedPartnerId && $user->partnerId != $authorizedPartnerId) {
 				throw new Exception('SYSTEM_USER_INVALID_CREDENTIALS');
 			}

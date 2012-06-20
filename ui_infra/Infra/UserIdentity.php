@@ -35,14 +35,20 @@ class Infra_UserIdentity
 	private $parterPackages = null;
 	
 	/**
+	 * @var int 
+	 */
+	private $timezoneOffset;
+	
+	/**
 	 * Init a new UserIdentity instance with the given parameters
 	 * @param Kaltura_Client_Type_User $user
 	 * @param string $ks
 	 */
-	public function __construct(Kaltura_Client_Type_User $user, $ks)
+	public function __construct(Kaltura_Client_Type_User $user, $ks, $timezoneOffset)
 	{
 		$this->user = $user;
 		$this->ks = $ks;
+		$this->timezoneOffset = $timezoneOffset;
 	}
 	
 	/**
