@@ -6,6 +6,7 @@
 class kuserFilter extends baseObjectFilter
 {
 	const PUSER_ID_OR_SCREEN_NAME = 'puser_id,screen_name';
+	const FIRST_NAME_OR_LAST_NAME = 'full_name,last_name';
 	
 	public function init ()
 	{
@@ -40,7 +41,8 @@ class kuserFilter extends baseObjectFilter
 				"_gte_login_data_id",
 				"_ltornull_login_data_id",
 				"_eq_is_admin",
-				"_likex_puser_id_or_screen_name",			
+				"_likex_puser_id_or_screen_name",
+				'_likex_first_name_or_last_name',			
 			) ,
 			NULL
 		);

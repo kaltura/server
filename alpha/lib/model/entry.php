@@ -1641,13 +1641,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setMarkedForDeletion ( $v )	{	$this->putInCustomData ( "markedForDeletion" , (bool) $v );	}
 	public function getMarkedForDeletion (  )	{	return (bool) $this->getFromCustomData( "markedForDeletion" ,null, false );	}
 	
-	public function setRootEntryId($v)
-	{
-		$this->putInCustomData("rootEntryId", $v);
-	}
+	public function setRootEntryId($v)	{	$this->putInCustomData("rootEntryId", $v); }
 	
 	public function setCreatorPuserId( $v )		{	$this->putInCustomData ( "creatorPuserId" , $v );	}
-	public function getCreatorPuserId ( )  			{	return $this->getFromCustomData( "creatorPuserId", null, 0 );	}
+	
+	public function getCreatorPuserId ( )  	{	return $this->getFromCustomData( "creatorPuserId", null, 0 );	}
+	public function getCreatorKuserId ( )	{	return $this->getFromCustomData( "creatorKuserId", null, 0 );	}
 	
 	public function setEntitledPusersEdit($v)		
 	{	
@@ -2153,7 +2152,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if ( self::getKuserId() == $v )  // same value - don't set for nothing 
 			return;  		
 		
+		//lazy migration for creatorKuserId.
+		if (!$this->isNew() && is_null($this->getCreatorKuserId()))
+			$this->setCreatorKuserId($this->getKuserId());
+
 		parent::setKuserId($v);
+		
 		$kuser = $this->getKuser();
 		if ($kuser)
 			$this->setPuserId($kuser->getPuserId());
@@ -2166,7 +2170,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if ( self::getCreatorKuserId() == $v )  // same value - don't set for nothing 
 			return;  		
 
-		parent::setCreatorKuserId($v);
+		$this->putInCustomData ( "creatorKuserId" , $v );
 		$kuser = kuserPeer::retrieveByPk($v);
 		if ($kuser)
 		{

@@ -842,7 +842,7 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/**
-	 * return comma seperated string of kusers ids that are active members on this category. 
+	 * return space seperated string of kusers ids that are active members on this category. 
 	 */	
 	public function getMembers()
 	{
