@@ -32,6 +32,7 @@ class PartnerUsageController extends Zend_Controller_Action
 		$usageFilter = new Kaltura_Client_Type_ReportInputFilter();
 		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
+		$usageFilter->timeZoneOffset =Infra_AuthHelper::getAuthInstance()->getIdentity()->getTimezoneOffset();
 		
 		$varConsolePlugin = Kaltura_Client_VarConsole_Plugin::get($client);
 		
