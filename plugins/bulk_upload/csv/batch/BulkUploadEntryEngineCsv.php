@@ -135,9 +135,6 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 			if($bulkUploadResult->accessControlProfileId)
 		    	$mediaEntry->accessControlId = $bulkUploadResult->accessControlProfileId;
 		    	
-		    if($bulkUploadResult->category)
-		    	$mediaEntry->categories = $bulkUploadResult->category;
-		    	
 		    if($bulkUploadResult->scheduleStartDate)
 		    	$mediaEntry->startDate = $bulkUploadResult->scheduleStartDate;
 		    	
