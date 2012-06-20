@@ -470,7 +470,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	        $categoryEntry->categoryId = $res->objects[0]->id;
 	        $categoryEntry->entryId = $entryId;
 	        try {
-	            $this->kClient->categoryEntry->add();
+	            $this->kClient->categoryEntry->add($categoryEntry);
 	        }
 	        catch (Exception $e)
 	        {
