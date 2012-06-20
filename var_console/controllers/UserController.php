@@ -53,7 +53,7 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
-			$adapter = new Infra_AuthAdapter($request->getPost('email'), $request->getPost('password'));
+			$adapter = new Infra_AuthAdapter($request->getPost('email'), $request->getPost('password'), $request->getPost('timezone_offset'));
 			$auth = Infra_AuthHelper::getAuthInstance();
 			$result = $auth->authenticate($adapter);
 
@@ -62,10 +62,6 @@ class UserController extends Zend_Controller_Action
 				if ($request->getPost('remember_me'))
 					Zend_Session::rememberMe(60*60*24*7); // 1 week
 					
-				//Save the current timezone offset in a cookie
-			    $timezoneOffset = $request->getPost("timezone_offset");
-			    Zend_Registry::set('timezone_offset', $timezoneOffset);
-			    
 				$nextUri = $this->_getParam('next_uri');
 				KalturaLog::debug("next uri $nextUri");
 				if ($nextUri && strlen($nextUri) > 1)
