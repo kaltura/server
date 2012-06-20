@@ -170,7 +170,7 @@ class category extends Basecategory implements IIndexable
 			if($this->getInheritanceType() == InheritanceType::MANUAL)
 				$this->addDeleteCategoryKuserJob($this->getId());
 			
-			if($this->getParentId() && !is_null($this->move_entries_to_parent_category))
+			if($this->move_entries_to_parent_category)
 			{
 				$this->addMoveEntriesToCategoryJob($this->move_entries_to_parent_category);
 			}
@@ -464,25 +464,23 @@ class category extends Basecategory implements IIndexable
 	
 	public function setDeletedAt($v, $moveEntriesToParentCategory = null)
 	{
-		$this->move_entries_to_parent_category = $moveEntriesToParentCategory;
-
-		if(is_null($moveEntriesToParentCategory))
+		if(is_null($this->move_entries_to_parent_category))
 		{
-			if($this->getParentId())
-			{
+			if(is_null($moveEntriesToParentCategory))
 				$moveEntriesToParentCategory = $this->getParentId();
-				$this->move_entries_to_parent_category = $moveEntriesToParentCategory;
+					
+			$this->move_entries_to_parent_category = $moveEntriesToParentCategory;
+			
+			$this->loadChildsForSave();
+			foreach($this->childs_for_save as $child)
+			{
+				$child->setDeletedAt($v, $moveEntriesToParentCategory);
+				$child->save();
 			}
 		}
 		
-		$this->loadChildsForSave();
-		foreach($this->childs_for_save as $child)
-		{
-			$child->setDeletedAt($v, $moveEntriesToParentCategory);
-		}
 		$this->setStatus(CategoryStatus::DELETED);
 		parent::setDeletedAt($v);
-		$this->save();
 	}
 	
 	public function getRootCategoryFromFullIds($category)
