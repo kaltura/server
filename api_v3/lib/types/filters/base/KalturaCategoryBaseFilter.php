@@ -64,6 +64,8 @@ abstract class KalturaCategoryBaseFilter extends KalturaFilter
 		"-membersCount" => "-members_count",
 		"+partnerSortValue" => "+partner_sort_value",
 		"-partnerSortValue" => "-partner_sort_value",
+		"+directSubCategoriesCount" => "+direct_sub_categories_count",
+		"-directSubCategoriesCount" => "-direct_sub_categories_count",
 	);
 
 	public function getMapBetweenObjects()

@@ -91,6 +91,7 @@ $baseConfigurationIndexs = 	array(
 			'pending_members_count' => SphinxFieldType::RT_ATTR_BIGINT,
 			'entries_count' 		=> SphinxFieldType::RT_ATTR_BIGINT,
 			'direct_entries_count' 	=> SphinxFieldType::RT_ATTR_BIGINT,
+			'direct_sub_categories_count' 	=> SphinxFieldType::RT_ATTR_BIGINT,
 			'inheritance_type'  	=> SphinxFieldType::RT_ATTR_BIGINT,
 			'user_join_policy'  	=> SphinxFieldType::RT_ATTR_BIGINT,
 			'default_permission_level' => SphinxFieldType::RT_ATTR_BIGINT,

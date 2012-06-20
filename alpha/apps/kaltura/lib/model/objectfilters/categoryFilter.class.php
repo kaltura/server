@@ -14,39 +14,39 @@ class categoryFilter extends baseObjectFilter
 		// TODO - should separate the schema of the fields from the actual values
 		// or can use this to set default valuse
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
-			"_eq_id",
-			"_in_id",
-			"_eq_parent_id",
-			"_in_parent_id",
-			"_eq_full_name",
-			"_likex_full_name",
-			"_in_full_name",
-			"_eq_depth",
-			"_gte_created_at",
-			"_lte_created_at",
-			"_free_text",
-			"_likex_name_or_reference_id",
-			"_in_members",
-			"_gte_updated_at",
-			"_lte_updated_at",
-			"_like_tags",
-			"_mlikeor_tags",
-			"_mlikeand_tags",
-			"_eq_display_in_search",
-			"_eq_privacy",
-			"_in_privacy",
-			"_eq_inheritance_type",
-			"_in_inheritance_type",
-			"_eq_status",
-			"_in_status",
-			"_gte_partner_sort_value",
-			"_lte_partner_sort_value",
-			"_eq_full_ids",
-			"_likex_full_ids",
-			"_eq_inherited_parent_id",
-			"_eq_privacy_context",
-			"_eq_manager",
-			"_eq_member",
+			'_eq_id',
+			'_in_id',
+			'_eq_parent_id',
+			'_in_parent_id',
+			'_eq_full_name',
+			'_likex_full_name',
+			'_in_full_name',
+			'_eq_depth',
+			'_gte_created_at',
+			'_lte_created_at',
+			'_free_text',
+			'_likex_name_or_reference_id',
+			'_in_members',
+			'_gte_updated_at',
+			'_lte_updated_at',
+			'_like_tags',
+			'_mlikeor_tags',
+			'_mlikeand_tags',
+			'_eq_display_in_search',
+			'_eq_privacy',
+			'_in_privacy',
+			'_eq_inheritance_type',
+			'_in_inheritance_type',
+			'_eq_status',
+			'_in_status',
+			'_gte_partner_sort_value',
+			'_lte_partner_sort_value',
+			'_eq_full_ids',
+			'_likex_full_ids',
+			'_eq_inherited_parent_id',
+			'_eq_privacy_context',
+			'_eq_manager',
+			'_eq_member',
 			'_gte_members_count',
 			'_lte_members_count',
 			'_gte_pending_members_count',
@@ -61,10 +61,20 @@ class categoryFilter extends baseObjectFilter
 			'_in_ancestor_id',
 			) , NULL );
 
-		$this->allowed_order_fields = array ( "created_at" , "updated_at", "depth", "partner_sort_value", "entries_count", "members_count", "direct_entries_count", "name");
+		$this->allowed_order_fields = array (
+			'created_at', 
+			'updated_at', 
+			'depth', 
+			'partner_sort_value', 
+			'entries_count', 
+			'members_count', 
+			'direct_entries_count', 
+			'direct_sub_categories_count', 
+			'name'
+		);
 
 		$this->aliases = array ( 
-			"owner" => "kuser_id"
+			'owner' => 'kuser_id'
 		);
 	}
 
@@ -72,8 +82,8 @@ class categoryFilter extends baseObjectFilter
 	{
 		return 
 			array (
-				"display_name" => "CategoryFilter",
-				"desc" => ""
+				'display_name' => 'CategoryFilter',
+				'desc' => ''
 			);
 	}
 	

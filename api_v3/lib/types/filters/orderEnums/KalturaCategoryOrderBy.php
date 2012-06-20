@@ -21,4 +21,6 @@ class KalturaCategoryOrderBy extends KalturaStringEnum
 	const MEMBERS_COUNT_DESC = "-membersCount";
 	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";
 	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
+	const DIRECT_SUB_CATEGORIES_COUNT_ASC = "+directSubCategoriesCount";
+	const DIRECT_SUB_CATEGORIES_COUNT_DESC = "-directSubCategoriesCount";
 }
