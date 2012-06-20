@@ -40,6 +40,7 @@ class PartnerUsageController extends Zend_Controller_Action
 		$usageFilter = new Kaltura_Client_SystemPartner_Type_SystemPartnerUsageFilter();
 		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
+		$usageFilter->timezoneOffset = Infra_AuthHelper::getAuthInstance()->getIdentity()->getTimezoneOffset();
 		
 		// get results and paginate
 		$paginatorAdapter = new Infra_FilterPaginator($systemPartnerPlugin->systemPartner, "getUsage", null, $partnerFilter, $usageFilter);
