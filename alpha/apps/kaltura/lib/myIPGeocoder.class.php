@@ -1,4 +1,7 @@
 <?php
+require_once(realpath(dirname(__FILE__)).'/../../../config/sfrootdir.php');
+require_once(dirname(__FILE__) . '/access_control/kGeoCoder.php');
+
 @include("IP2Location.inc.php");
 
 class myIPGeocoder extends kGeoCoder

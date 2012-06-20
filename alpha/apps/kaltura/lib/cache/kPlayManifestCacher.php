@@ -3,17 +3,12 @@
 require_once(dirname(__FILE__) . '/../requestUtils.class.php');
 require_once(dirname(__FILE__) . '/../webservices/kSessionBase.class.php');
 require_once(dirname(__FILE__) . '/../../../../../infra/cache/kCacheManager.php');
+require_once(dirname(__FILE__) . '/../../../../../infra/cache/kApiCache.php');
 
-class kPlayManifestCacher
+class kPlayManifestCacher extends kApiCache
 {
-	const CACHE_EXPIRY = 600;		// 10 min
-	
-	protected $_cacheEnabled = false;
-
-	protected $_cacheKey = "";
 	protected $_cacheWrapper = null;
 	
-	protected $_ksPartnerId = null;
 	protected $_ksValidated = false;
 	
 	protected $_playbackContext = null;
@@ -25,63 +20,63 @@ class kPlayManifestCacher
 	
 	public function __construct()
 	{		
+		$this->_cacheKeyPrefix = 'playManifest-';
+		
+		parent::__construct();
+	
 		if (!kConf::get('enable_cache'))
 			return;
 			
-		$params = requestUtils::getRequestParams();
-		if (isset($params['nocache']))
+		$this->_params = requestUtils::getRequestParams();
+		if (isset($this->_params['nocache']))
 			return;
 		
-		$this->calculateCacheKey($params);
+		$this->calculateCacheKey();
 		
-		$this->_cacheEnabled = true;
+		$this->enableCache();
 	}
 	
-	private function getKsData(&$params)
+	private function getKsData()
 	{
-		$ks = isset($params['ks']) ? $params['ks'] : '';		
-		unset($params['ks']);
+		$ks = isset($this->_params['ks']) ? $this->_params['ks'] : '';		
+		unset($this->_params['ks']);
 
-		$ksObj = kSessionBase::getKSObject($ks);
-		$this->_ksPartnerId = ($ksObj ? $ksObj->partner_id : null);
-		$params["___cache___partnerId"] =  $this->_ksPartnerId;
-		$params["___cache___ksType"] = 	   ($ksObj ? $ksObj->type		: null);
-		$params["___cache___userId"] =     ($ksObj ? $ksObj->user		: null);
-		$params["___cache___privileges"] = ($ksObj ? $ksObj->privileges : null);
+		$this->addKSData($ks);
 		
 		if (!$ks)
 		{
 			$this->_ksValidated = true;
 		}
-		else if ($ksObj && !$ksObj->isAdmin())
+		else if ($this->_ksObj && !$this->_ksObj->isAdmin())
 		{
-			$this->_ksValidated = $ksObj->tryToValidateKS();
+			$this->_ksValidated = $this->_ksObj->tryToValidateKS();
 		}
 	}
 
-	private function calculateCacheKey(&$params)
+	private function calculateCacheKey()
 	{
-		$this->getKsData($params);
+		$this->getKsData();
 		
-		$this->_playbackContext = isset($params['playbackContext']) ? $params['playbackContext'] : null;
-		unset($params['playbackContext']);
+		$this->_playbackContext = isset($this->_params['playbackContext']) ? $this->_params['playbackContext'] : null;
+		unset($this->_params['playbackContext']);
 		
-		$params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-		$params['___cache___host'] = @$_SERVER['HTTP_HOST'];
+		$this->_params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+		$this->_params['___cache___host'] = @$_SERVER['HTTP_HOST'];
 
 		// take only the hostname part of the referrer parameter of baseEntry.getContextData
-		if (isset($params['referrer']))
+		if (isset($this->_params['referrer']))
 		{
-			if (in_array($this->_ksPartnerId, kConf::get('v3cache_include_referrer_in_key')))
-				$params['referrer'] = parse_url($params['referrer'], PHP_URL_HOST);
-			else
-				unset($params['referrer']);
+			$referrer = $this->_params['referrer'];
+			unset($this->_params['referrer']);
 		}
+		else
+			$referrer = isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : '';
+		$this->_referrers[] = $referrer;
 		
-		ksort($params);
-
-		$this->_cacheKey = 'playManifest-' . md5( http_build_query($params) );
-
+		$this->finalizeCacheKey();
+		
+		$this->addExtraFields();
+			
 		$this->_cacheWrapper = kCacheManager::getCache(kCacheManager::FS_PLAY_MANIFEST);
 	}
 	
@@ -96,7 +91,7 @@ class kPlayManifestCacher
 	//	Cache reading functions
 	private function getCachedResponse()
 	{
-		if (!$this->_cacheEnabled)
+		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
 			return false;
 		
 		$startTime = microtime(true);
@@ -116,7 +111,7 @@ class kPlayManifestCacher
 		
 	public function checkOrStart()
 	{
-		if (!$this->_cacheEnabled)
+		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
 			return;
 		
 		$response = $this->getCachedResponse();
@@ -141,6 +136,8 @@ class kPlayManifestCacher
 		if (!$this->_ksValidated)
 			return;
 
+		$this->storeExtraFields();
+			
 		// provide cache key in header unless the X-Kaltura header was already set with a value
 		// such as an error code. the header is used for debugging but it also appears in the access_log
 		// and there we rather show the error than the cache key
@@ -163,6 +160,6 @@ class kPlayManifestCacher
 		$requiredFiles = $renderer->getRequiredFiles();
 		$serializedRenderer = serialize($renderer);
 	
-		$this->_cacheWrapper->set($this->_cacheKey, array($requiredFiles, $serializedRenderer), self::CACHE_EXPIRY);
+		$this->_cacheWrapper->set($this->_cacheKey, array($requiredFiles, $serializedRenderer), $this->_expiry);
 	}
 }
