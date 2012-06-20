@@ -43,6 +43,8 @@ class kCountryCondition extends kMatchCondition
 	public function getFieldValue(accessControl $accessControl)
 	{
 		$scope = $accessControl->getScope();
+		kApiCache::addExtraField(kApiCache::ECF_COUNTRY, kApiCache::COND_MATCH, $this->getStringValues($scope));
+
 		$ip = $scope->getIp();
 		$ipGeo = kGeoCoderManager::getGeoCoder($this->getGeoCoderType());
 		return $ipGeo->getCountry($ip);
@@ -54,5 +56,13 @@ class kCountryCondition extends kMatchCondition
 	protected function matches($field, $value)
 	{
 		return parent::matches(trim(strtolower($field), " \n\r\t"), trim(strtolower($value), " \n\r\t"));
+	}
+
+	/* (non-PHPdoc)
+	 * @see kMatchCondition::shouldFieldDisableCache()
+	 */
+	public function shouldFieldDisableCache($scope)
+	{
+		return false;
 	}
 }
