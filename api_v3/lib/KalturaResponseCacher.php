@@ -4,21 +4,21 @@
  * @subpackage cache
  */
 require_once(dirname(__FILE__) . '/../../infra/kConf.php');
-require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/requestUtils.class.php');
-require_once(dirname(__FILE__) . '/../../infra/cache/kCacheManager.php');
+require_once(dirname(__FILE__) . '/../../infra/cache/kApiCache.php');
 require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/webservices/kSessionBase.class.php');
+require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/requestUtils.class.php');
 
 /**
  * @package api
  * @subpackage cache
  */
-class KalturaResponseCacher
+class KalturaResponseCacher extends kApiCache
 {
 	// copied from KalturaResponseType
 	const RESPONSE_TYPE_XML = 2;
 	const RESPONSE_TYPE_PHP = 3;
 
-	// warm cache constatns
+	// warm cache constants
 	// cache warming is used to maintain continous use of the request caching while preventing a load once the cache expires
 	// during WARM_CACHE_INTERVAL before the cache expiry a single request will be allowed to get through and renew the cache
 	// this request named warm cache request will block other such requests for WARM_CACHE_TTL seconds
@@ -31,18 +31,11 @@ class KalturaResponseCacher
 
 	// time in which a warm cache request will block another request from warming the cache
 	const WARM_CACHE_TTL = 10;
-	
-	// cache statuses
-	const CACHE_STATUS_ACTIVE = 0;				// cache was not explicitly disabled
-	const CACHE_STATUS_ANONYMOUS_ONLY = 1;		// conditional cache was explicitly disabled by calling DisableConditionalCache (e.g. a database query that is not handled by the query cache was issued)
-	const CACHE_STATUS_DISABLED = 2;			// cache was explicitly disabled by calling DisableCache (e.g. getContentData for an entry with access control)
-	
+		
 	// cache modes
 	const CACHE_MODE_ANONYMOUS = 1;				// anonymous caching should be performed - the cached response will not be associated with any conditions
 	const CACHE_MODE_CONDITIONAL = 2;			// cache the response along with its matching conditions
-	
-	const CONDITIONAL_CACHE_EXPIRY = 86400;		// 1 day, must not be greater than the expiry of the query cache keys
-	
+		
 	const EXPIRY_MARGIN = 300;
 
 	const CACHE_DELIMITER = "\r\n\r\n";
@@ -51,36 +44,22 @@ class KalturaResponseCacher
 	const SUFFIX_RULES = '.rules';
 	
 	protected $_cacheStore = null;
-	protected $_params = array();
-	protected $_cacheKey = "";
-	protected $_ks = "";
-	protected $_ksObj = null;
-	protected $_ksPartnerId = null;
 	protected $_defaultExpiry = 600;
-	protected $_expiry = 600;
 	protected $_cacheHeadersExpiry = 60; // cache headers for CDN & browser - used  for GET request with kalsig param
 	protected $_contentType = null;
-	
-	protected $_instanceId = 0;
-	
-	protected $_cacheStatus = self::CACHE_STATUS_DISABLED;	// enabled after the KalturaResponseCacher initializes
+		
 	protected $_cacheId = null;							// the cache id ensures that the conditions are in sync with the response buffer
-	protected $_invalidationKeys = array();				// the list of query cache invalidation keys for the current request
-	protected $_invalidationTime = 0;					// the last invalidation time of the invalidation keys
-	protected $_conditionalCacheExpiry = 0;				// the expiry used for conditional caching, if 0 CONDITIONAL_CACHE_EXPIRY will be used 
 	
 	protected $_wouldHaveUsedCondCache = false;			// XXXXXXX TODO: remove this
-	
-	protected static $_activeInstances = array();		// active class instances: instanceId => instanceObject
-	protected static $_nextInstanceId = 0;
 	
 	protected static $_cacheWarmupInitiated = false;
 	
 	public function __construct($params = null, $cacheType = kCacheManager::FS_API_V3, $expiry = 0)
 	{
-		$this->_instanceId = self::$_nextInstanceId;  
-		self::$_nextInstanceId++;
+		$this->_cacheKeyPrefix = 'cache_v3-';
 		
+		parent::__construct();
+	
 		if ($expiry)
 			$this->_defaultExpiry = $this->_expiry = $expiry;
 			
@@ -151,8 +130,7 @@ class KalturaResponseCacher
 		$this->_params = $params;
 		$this->setKS($ks);
 
-		self::$_activeInstances[$this->_instanceId] = $this;
-		$this->_cacheStatus = self::CACHE_STATUS_ACTIVE;
+		$this->enableCache();
 	}
 	
 	public function setKS($ks)
@@ -162,91 +140,39 @@ class KalturaResponseCacher
 		if ($warmCacheHeader == "https")
 			$_SERVER['HTTPS'] = "on";
 	
-		$this->_ks = $ks;
-		$this->_ksObj = kSessionBase::getKSObject($ks);
-		$this->_ksPartnerId = ($this->_ksObj ? $this->_ksObj->partner_id : null);
-		$this->_params["___cache___partnerId"] =  $this->_ksPartnerId;
-		$this->_params["___cache___ksType"] = 	  ($this->_ksObj ? $this->_ksObj->type		 : null);
-		$this->_params["___cache___userId"] =     ($this->_ksObj ? $this->_ksObj->user		 : null);
-		$this->_params["___cache___privileges"] = ($this->_ksObj ? $this->_ksObj->privileges : null);
+		$this->addKSData($ks);
 		$this->_params['___cache___uri'] = $_SERVER['PHP_SELF'];
 		$this->_params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 		$this->_params['___cache___host'] = @$_SERVER['HTTP_HOST'];
 
-		// take only the hostname part of the referrer parameter of baseEntry.getContextData
+		// extract any baseEntry.getContentData referrer parameters
+		$addExtraFields = false;
 		$contextDataObjectType = 'contextDataParams:objectType';
 		foreach ($this->_params as $key => $value)
 		{
 			if (substr($key, -strlen($contextDataObjectType)) !== $contextDataObjectType)
 				continue;
 
+			$addExtraFields = true;
+				
 			$keyPrefix = substr($key, 0, -strlen($contextDataObjectType));
 			$referrerKey = $keyPrefix . 'contextDataParams:referrer';
 
-			if (in_array($this->_ksPartnerId, kConf::get('v3cache_include_referrer_in_key')))
+			if (isset($this->_params[$referrerKey]))
 			{
-				if (isset($this->_params[$referrerKey]))
-					$referrer = $this->_params[$referrerKey];
-				else
-					$referrer = isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : '';
-				$this->_params[$referrerKey] = parse_url($referrer, PHP_URL_HOST);
+				$referrer = $this->_params[$referrerKey];
+				unset($this->_params[$referrerKey]);
 			}
 			else
-				unset($this->_params[$referrerKey]);
+				$referrer = isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : '';
 				
-			break;
+			$this->_referrers[] = $referrer;
 		}
 		
-		ksort($this->_params);
-
-		$this->_cacheKey = 'cache_v3-' . md5( http_build_query($this->_params) );
-	}
-	
-	public static function disableCache()
-	{
-		foreach (self::$_activeInstances as $curInstance)
-		{
-			$curInstance->_cacheStatus = self::CACHE_STATUS_DISABLED;
-		}
-		self::$_activeInstances = array();
-	}
-
-	public static function setExpiry($expiry)
-	{
-		foreach (self::$_activeInstances as $curInstance)
-		{
-			if ($curInstance->_expiry && $curInstance->_expiry < $expiry)
-				continue;
-			$curInstance->_expiry = $expiry;
-		}
-	}
-	
-	public static function disableConditionalCache()
-	{
-		foreach (self::$_activeInstances as $curInstance)
-		{
-			// no need to check for CACHE_STATUS_DISABLED, since the instances are removed from the list when they get this status
-			$curInstance->_cacheStatus = self::CACHE_STATUS_ANONYMOUS_ONLY;
-		}
-	}
-	
-	public static function setConditionalCacheExpiry($expiry)
-	{
-		foreach (self::$_activeInstances as $curInstance)
-		{
-			if ($curInstance->_conditionalCacheExpiry && $curInstance->_conditionalCacheExpiry < $expiry)
-				continue;
-			$curInstance->_conditionalCacheExpiry = $expiry;
-		}
-	}
-	
-	public static function addInvalidationKeys($invalidationKeys, $invalidationTime)
-	{
-		foreach (self::$_activeInstances as $curInstance)
-		{
-			$curInstance->_invalidationKeys = array_merge($curInstance->_invalidationKeys, $invalidationKeys);
-			$curInstance->_invalidationTime = max($curInstance->_invalidationTime, $invalidationTime);
-		}
+		$this->finalizeCacheKey();
+		
+		if ($addExtraFields)
+			$this->addExtraFields();
 	}
 	
 	/**
@@ -324,11 +250,11 @@ class KalturaResponseCacher
 		}	
 
 		// for GET requests with kalsig (signature of call params) return cdn/browser caching headers
-		if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]))
+		if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]) && !self::hasExtraFields())
 		{
 			$max_age = $this->_cacheHeadersExpiry;
 			header("Cache-Control: private, max-age=$max_age max-stale=0");
-			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
+			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT');
 			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
 		}
 		else
@@ -378,14 +304,19 @@ class KalturaResponseCacher
 	}
 	
 	
-	public function storeCache($response, $contentType = "")
+	public function storeCache($response, $contentType = "", $serializeResponse = false)
 	{
 		// remove $this from the list of active instances - the request is complete
-		unset(self::$_activeInstances[$this->_instanceId]);
+		$this->removeFromActiveList();
 	
 		$cacheModes = $this->getCacheModes();
 		if (!$cacheModes)
 			return;
+			
+		if ($serializeResponse)
+			$response = serialize($response);
+			
+		$this->storeExtraFields();
 
 		// set the X-Kaltura header only if it does not exist or contains 'cache-key'
 		// the header is overwritten for cache-key so that for a multirequest we'll get the key of
