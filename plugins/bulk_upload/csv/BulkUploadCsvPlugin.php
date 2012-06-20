@@ -168,14 +168,17 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	 * Returns array of column values for the bulk upload result
 	 * @param int $bulkUploadObjectType
 	 */
-	protected static function getHeaderRow ($bulkUploadObjectType)
+	protected static function getHeaderRow ($bulkUploadObjectType, $csvVersion)
 	{
 	    switch ($bulkUploadObjectType)
 	    {
 	        case BulkUploadObjectType::ENTRY:
-	            return array ("title", "description", "tags", "url", "contentType", "conversionProfileId", "accessProfileId",  
-	                    "category", "scheduleStartDate", "scheduleEndDate", "thumbnailUrl", "partnerData", "creatorId", "entitledUsersEdit", "entitledUsersPublish");
-	            break;
+	            $ret = array ("title", "description", "tags", "url", "contentType",);
+	            if ($csvVersion > 1)
+    	            array_merge($ret, array ("conversionProfileId", "accessProfileId",  
+    	                    "category", "scheduleStartDate", "scheduleEndDate", "thumbnailUrl", "partnerData", "creatorId", "entitledUsersEdit", "entitledUsersPublish"));
+	            return $ret;
+    	        break;
 	        case BulkUploadObjectType::CATEGORY:
 	            return array ("name", "relativePath", "tags", "description", "referenceId", "privacy", "appearInList", "contributionPolicy",
 	                        "inheritanceType", "userJoinPolicy", "defaultPermissionLevel", "owner", "partnerData", "partnerSortValue", "moderation");
