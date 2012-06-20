@@ -117,4 +117,12 @@ class Infra_UserIdentity
 	public function refreshAllowedPartners() {
 		$this->initPartners();
 	}
+	/**
+     * @return the $timezoneOffset
+     */
+    public function getTimezoneOffset ()
+    {
+        return $this->timezoneOffset;
+    }
+
 }
