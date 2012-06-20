@@ -23,13 +23,14 @@ class loginAction extends kalturaAction
 			if ( (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') && $_SERVER['SERVER_PORT'] != 443)
 			{
     			header('Location:'. $service_url.'/'.$_SERVER['REQUEST_URI']);
-    			exit();
+    			die;
     		}
 			
 		}
 		else {
 			$service_url = 'http://'.$service_url;
-			echo header('Location:'. $service_url.'/'.$_SERVER['REQUEST_URI']);
+			header('Location:'. $service_url.'/'.$_SERVER['REQUEST_URI']);
+    		die;
 		}
 		
 		$this->service_url = $service_url;

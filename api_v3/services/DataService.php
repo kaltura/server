@@ -183,6 +183,7 @@ class DataService extends KalturaEntryService
 			{
 				// or redirect if no proxy
 				header("Location: $remoteUrl");
+				die;
 			}
 		}	
 	}

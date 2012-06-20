@@ -15,6 +15,7 @@ class varpartnerlistAction extends kalturaAction
 		if($partner_id === null)
 		{
 			header("Location: /index.php/kmc/varlogin");
+			die;
 		}
 		
 		sfView::SUCCESS;
@@ -31,7 +32,7 @@ class varpartnerlistAction extends kalturaAction
 		if($res != ks::OK)
 		{
 			header("Location: /index.php/kmc/varlogin");
-			exit();
+			die;
 		}
 		
 		$c = new Criteria;

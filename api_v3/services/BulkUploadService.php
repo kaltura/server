@@ -196,6 +196,7 @@ function serveAction($id)
 			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($fileSync);
 			KalturaLog::info("Redirecting to [$remoteUrl]");
 			header("Location: $remoteUrl");
+			die;
 		}	
 	}
 	

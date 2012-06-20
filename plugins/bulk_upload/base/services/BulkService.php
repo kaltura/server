@@ -297,6 +297,7 @@ class BulkService extends KalturaBaseService
 			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($fileSync);
 			KalturaLog::info("Redirecting to [$remoteUrl]");
 			header("Location: $remoteUrl");
+			die;
 		}	
 	}
 	
