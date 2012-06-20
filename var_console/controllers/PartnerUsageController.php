@@ -7,7 +7,7 @@ class PartnerUsageController extends Zend_Controller_Action
 {
 	public function indexAction()
 	{
-		KalturaLog::alert("### ". Zend_Registry::get("timezone_offset"));
+		KalturaLog::debug("### ".Infra_AuthHelper::getAuthInstance()->getIdentity()->getTimezoneOffset());
 		$request = $this->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
