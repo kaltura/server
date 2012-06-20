@@ -143,7 +143,7 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
-			$adapter = new Infra_AuthAdapter($request->getPost('email'), $request->getPost('password'));
+			$adapter = new Infra_AuthAdapter($request->getPost('email'), $request->getPost('password'), $request->getPost('timezone_offset'));
 			$auth = Infra_AuthHelper::getAuthInstance();
 			$storage = new Zend_Auth_Storage_Session("Zend_Auth_AdminConsole");
 			$auth->setStorage($storage);
