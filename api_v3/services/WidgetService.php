@@ -51,7 +51,7 @@ class WidgetService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::UICONF_ID_NOT_FOUND, $widget->uiConfId);
 		}
 		
-		if($widget->enforceEntitlement == false && kEntitlementUtils::getEntitlementEnforcement())
+		if(!is_null($widget->enforceEntitlement) && $widget->enforceEntitlement == false && kEntitlementUtils::getEntitlementEnforcement())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_DISABLE_ENTITLEMENT_FOR_WIDGET_WHEN_ENTITLEMENT_ENFORCEMENT_ENABLE);
 		
 		if ($widget->entryId !== null)
@@ -95,6 +95,20 @@ class WidgetService extends KalturaBaseService
 		if ( ! $dbWidget )
 			throw new KalturaAPIException ( APIErrors::INVALID_WIDGET_ID , $id );
 		
+		if(!is_null($widget->enforceEntitlement) && $widget->enforceEntitlement == false && kEntitlementUtils::getEntitlementEnforcement())
+			throw new KalturaAPIException(KalturaErrors::CANNOT_DISABLE_ENTITLEMENT_FOR_WIDGET_WHEN_ENTITLEMENT_ENFORCEMENT_ENABLE);
+		
+		if ($widget->entryId !== null)
+		{
+			$entry = entryPeer::retrieveByPK($widget->entryId);
+			if (!$entry)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $widget->entryId);
+		}
+		elseif ($widget->enforceEntitlement != null && $widget->enforceEntitlement == false)
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_DISABLE_ENTITLEMENT_WITH_NO_ENTRY_ID);
+		}
+			
 		$widgetUpdate = $widget->toWidget();
 
 		$allow_empty = true ; // TODO - what is the policy  ? 
