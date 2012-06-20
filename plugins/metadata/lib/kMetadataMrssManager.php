@@ -89,7 +89,7 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 				if ($mrssParams && is_array($mrssParams->getItemXpathsToExtend()) &&
 					in_array($itemXPath, $mrssParams->getItemXpathsToExtend()))
 				{
-					$relatedEntry = entryPeer::retrieveByPK($metadataValue);
+					$relatedEntry = entryPeer::retrieveByPK((string)$metadataValue);
 					if ($relatedEntry)
 					{
 						$relatedItemField = $metadataObject->addChild($metadataField.'_item');
