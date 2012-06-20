@@ -18,4 +18,11 @@ class KalturaSystemPartnerUsageFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $toDate;
+	
+	/**
+	 * Time zone offset
+	 * @var int
+	 */
+	public $timezoneOffset;
+	
 }
