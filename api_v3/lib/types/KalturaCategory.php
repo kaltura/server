@@ -455,6 +455,18 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			}
 		}
 		
+		if(($this->inheritanceType != KalturaInheritanceType::MANUAL && $this->inheritanceType != null) || 
+			($this->inheritanceType == null && $sourceObject && $sourceObject->getInheritanceType() != false))
+		{	
+			if((!$sourceObject && $this->owner != null) || 
+			   ($sourceObject && $this->owner != null && $this->owner != $sourceObject->getKuserId()) ||
+			   (!$sourceObject && $this->userJoinPolicy != null) || 
+			   ($sourceObject && $this->userJoinPolicy != null && $this->userJoinPolicy != $sourceObject->getUserJoinPolicy()) ||
+			   (!$sourceObject && $this->defaultPermissionLevel != null) ||  
+			   ($sourceObject && $this->defaultPermissionLevel != null && $this->defaultPermissionLevel != $sourceObject->getDefaultPermissionLevel()))
+					throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES);
+		}
+		
 		if (!is_null($sourceObject))
 		{
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
