@@ -1675,7 +1675,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$entry = $this->getEntryInstanceByType($entryType);
 		$entry->type = (int)$item->type;
-        $entry->userId = $this->data->userId;		
+        $entry->userId = $this->data->userId;	
+        $entry->creatorId = $this->data->userId;
 		if(isset($item->referenceId))
 			$entry->referenceId = (string)$item->referenceId;
 		if(isset($item->name))
@@ -1687,7 +1688,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($item->categories))
 			$entry->categories = $this->implodeChildElements($item->categories);
 		if(isset($item->userId))
-			$entry->userId = (string)$item->userId;;
+		{
+			$entry->userId = (string)$item->userId;
+			$entry->creatorId = (string)$item->userId;
+		}
 		if(isset($item->licenseType))
 			$entry->licenseType = (string)$item->licenseType;
 		if(isset($item->partnerData))
