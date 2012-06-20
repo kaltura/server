@@ -1674,9 +1674,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new KalturaBulkUploadXmlException("entry type must be set to a value on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		
 		$entry = $this->getEntryInstanceByType($entryType);
-
 		$entry->type = (int)$item->type;
-		
+        $entry->userId = $this->data->userId;		
 		if(isset($item->referenceId))
 			$entry->referenceId = (string)$item->referenceId;
 		if(isset($item->name))
