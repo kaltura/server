@@ -398,12 +398,12 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	
 	protected function updateObjectsResults($requestResults, $bulkUploadResults)
 	{
-	    $this->kClient->startMultiRequest();
 		KalturaLog::info("Updating " . count($requestResults) . " results");
 		
 		// checking the created entries
 		foreach($requestResults as $index => $requestResult)
 		{
+		    /* @var $bulkUploadResult KalturaBulkUploadResultEntry */
 			$bulkUploadResult = $bulkUploadResults[$index];
 			
 			if(is_array($requestResult) && isset($requestResult['code']))
@@ -439,9 +439,48 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 			// update the results with the new entry id
 			$bulkUploadResult->entryId = $requestResult->id;
 			$bulkUploadResult->objectId = $requestResult->id;
+			$this->createCategoryAssocations($bulkUploadResult->entryId, $bulkUploadResult->category, $bulkUploadResult);
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
 		
-		$this->kClient->doMultiRequest();
+	}
+	
+	/**
+	 * Function which creates KalturaCategoryEntry objects for the entry which was added 
+	 * via the bulk upload CSV.
+	 * @param string $entryId
+	 * @param string $categories
+	 * @param KalturaBulkUploadResultEntry $bulkuploadResult
+	 */
+	private function createCategoryAssocations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult)
+	{
+	    $this->impersonate();
+	    
+	    $categoriesArr = explode(",", $categories);
+	    $ret = array();
+	    foreach ($categoriesArr as $categoryName)
+	    {
+	        $categoryFilter = new KalturaCategoryFilter();
+	        $categoryFilter->fullNameEqual = $categoryName;
+	        $res = $this->kClient->category->listAction($categoryFilter, new KalturaFilterPager());
+	        if (!count($res->objects))
+	        {
+	            $bulkuploadResult->errorDescription .= "\n\rCould not find specified category [$categoryName]";
+	            continue;
+	        }
+	        $categoryEntry = new KalturaCategoryEntry();
+	        $categoryEntry->categoryId = $res->objects[0]->id;
+	        $categoryEntry->entryId = $entryId;
+	        try {
+	            $this->kClient->categoryEntry->add();
+	        }
+	        catch (Exception $e)
+	        {
+	            $bulkuploadResult->errorDescription .= $e->getMessage();
+	        }
+	    }
+	    
+	    $this->unimpersonate();
+	    return $bulkuploadResult;
 	}
 }
