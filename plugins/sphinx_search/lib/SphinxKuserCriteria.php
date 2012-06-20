@@ -53,6 +53,7 @@ class SphinxKuserCriteria extends SphinxCriteria
         kuserPeer::INDEXED_PARTNER_DATA_STRING => "indexed_partner_data_string" ,
         kuserPeer::CUSTOM_DATA => "custom_data",
         'kuserPeer.PUSER_ID_OR_SCREEN_NAME' => '(puser_id,screen_name)',
+        'kuserPeer.FIRST_NAME_OR_LAST_NAME' => '(full_name,last_name)',
 		
 	);
 	
@@ -327,6 +328,76 @@ class SphinxKuserCriteria extends SphinxCriteria
 		}
 		
 		$filter->unsetByName('_likex_puser_id_or_screen_name');
+		
+		
+		if($filter->get('_likex_first_name_or_last_name'))
+		{
+			$freeTexts = $filter->get('_likex_first_name_or_last_name');
+			KalturaLog::debug("Attach free text [$freeTexts]");
+			
+			$additionalConditions = array();
+			$advancedSearch = $filter->getAdvancedSearch();
+			if($advancedSearch)
+			{
+				$additionalConditions = $advancedSearch->getFreeTextConditions($freeTexts);
+			}
+			
+			if(preg_match('/^"[^"]+"$/', $freeTexts))
+			{
+				$freeText = str_replace('"', '', $freeTexts);
+				$freeText = SphinxUtils::escapeString($freeText);
+				$freeText = "^$freeText$";
+				$additionalConditions[] = "@(" . kuserFilter::FIRST_NAME_OR_LAST_NAME . ") $freeText\\\*";
+			}
+			else
+			{
+				if(strpos($freeTexts, baseObjectFilter::IN_SEPARATOR) > 0)
+				{
+					str_replace(baseObjectFilter::AND_SEPARATOR, baseObjectFilter::IN_SEPARATOR, $freeTexts);
+				
+					$freeTextsArr = explode(baseObjectFilter::IN_SEPARATOR, $freeTexts);
+					foreach($freeTextsArr as $valIndex => $valValue)
+					{
+						if(!is_numeric($valValue) && strlen($valValue) <= 0)
+							unset($freeTextsArr[$valIndex]);
+						else
+							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
+					}
+							
+					foreach($freeTextsArr as $freeText)
+					{
+						$additionalConditions[] = "@(" . kuserFilter::FIRST_NAME_OR_LAST_NAME . ") $freeText\\\*";
+					}
+				}
+				else
+				{
+					$freeTextsArr = explode(baseObjectFilter::AND_SEPARATOR, $freeTexts);
+					foreach($freeTextsArr as $valIndex => $valValue)
+					{
+						if(!is_numeric($valValue) && strlen($valValue) <= 0)
+							unset($freeTextsArr[$valIndex]);
+						else
+							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
+					}
+						
+					$freeTextsArr = array_unique($freeTextsArr);
+					$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
+					
+					$additionalConditions[] = "@(" . kuserFilter::FIRST_NAME_OR_LAST_NAME . ") $freeTextExpr\\\*";
+				}
+			}
+			if(count($additionalConditions))
+			{	
+				$additionalConditions = array_unique($additionalConditions);
+				$matches = reset($additionalConditions);
+				if(count($additionalConditions) > 1)
+					$matches = '( ' . implode(' ) | ( ', $additionalConditions) . ' )';
+					
+				$this->matchClause[] = $matches;
+			}
+		}
+		
+		$filter->unsetByName('_likex_first_name_or_last_name');
 		
 		return parent::applyFilterFields($filter);
 	}

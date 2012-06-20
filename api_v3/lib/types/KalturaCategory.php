@@ -437,8 +437,8 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			   ($this->userJoinPolicy == null && $sourceObject && $sourceObject->getUserJoinPolicy() != KalturaUserJoinPolicyType::NOT_ALLOWED)) ||
 			   (($this->contributionPolicy != KalturaContributionPolicyType::ALL  && $this->contributionPolicy != null ) || 
 			   ($this->contributionPolicy == null && $sourceObject && $sourceObject->getContributionPolicy() != KalturaContributionPolicyType::ALL)) ||
-			   (($this->defaultPermissionLevel != KalturaCategoryUserPermissionLevel::MODERATOR && $this->defaultPermissionLevel != null) || 
-			   ($this->defaultPermissionLevel == null && $sourceObject && $sourceObject->getDefaultPermissionLevel() != KalturaCategoryUserPermissionLevel::MODERATOR )))
+			   (($this->defaultPermissionLevel != KalturaCategoryUserPermissionLevel::MEMBER && $this->defaultPermissionLevel != null) || 
+			   ($this->defaultPermissionLevel == null && $sourceObject && $sourceObject->getDefaultPermissionLevel() != KalturaCategoryUserPermissionLevel::MEMBER )))
 			{
 				if ($this->parentId != null)
 				{

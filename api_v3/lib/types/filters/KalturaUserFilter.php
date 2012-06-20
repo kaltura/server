@@ -9,6 +9,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	private $map_between_objects = array
 	(
 		"idOrScreenNameStartsWith" => "_likex_puser_id_or_screen_name",
+		'firstNameOrLastNameStartsWith' => "_likex_first_name_or_last_name",
 		"idEqual" => "_eq_puser_id",
 		"idIn" => "_in_puser_id",
 	);
@@ -83,6 +84,11 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	 * @var string
 	 */
 	public $roleIdEqual;
+	
+	/**
+	 * @var string
+	 */
+	public $firstNameOrLastNameStartsWith;
 	
 	
 }
