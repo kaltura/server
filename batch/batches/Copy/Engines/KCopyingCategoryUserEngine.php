@@ -8,7 +8,7 @@ class KCopyingCategoryUserEngine extends KCopyingEngine
 	/* (non-PHPdoc)
 	 * @see KCopyingEngine::copy()
 	 */
-	protected function copy(KalturaFilter $filter, $templateObject)
+	protected function copy(KalturaFilter $filter, KalturaObjectBase $templateObject)
 	{
 		return $this->copyCategoryUsers($filter, $templateObject);
 	}
@@ -32,6 +32,7 @@ class KCopyingCategoryUserEngine extends KCopyingEngine
 			$newCategoryUser = $this->getNewObject($categoryUser, $templateObject);
 			$this->client->categoryUser->add($newCategoryUser);
 		}
+		
 		$results = $this->client->doMultiRequest();
 		foreach($results as $result)
 			if($result instanceof Exception)
