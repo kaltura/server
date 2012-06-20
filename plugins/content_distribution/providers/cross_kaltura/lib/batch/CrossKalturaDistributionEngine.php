@@ -228,7 +228,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	 */
 	protected function getEntryObjects(KalturaClient $client, $entryId, KalturaDistributionJobData $data)
 	{
-        $remoteFlavorAssetContent = $data->distributionProfile->distributeRemoteFalvorAssetContent;
+        $remoteFlavorAssetContent = $data->distributionProfile->distributeRemoteFlavorAssetContent;
         $remoteThumbAssetContent = $data->distributionProfile->distributeRemoteThumbAssetContent;
         $remoteCaptionAssetContent = $data->distributionProfile->distributeRemoteCaptionAssetContent;
 	    
