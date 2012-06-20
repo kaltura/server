@@ -40,7 +40,6 @@ class entryTableMap extends TableMap {
 		$this->addPrimaryKey('ID', 'Id', 'VARCHAR', true, 20, null);
 		$this->addForeignKey('KSHOW_ID', 'KshowId', 'VARCHAR', 'kshow', 'ID', false, 20, null);
 		$this->addForeignKey('KUSER_ID', 'KuserId', 'INTEGER', 'kuser', 'ID', false, null, null);
-		$this->addColumn('CREATOR_KUSER_ID', 'CreatorKuserId', 'INTEGER', false, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 60, null);
 		$this->addColumn('TYPE', 'Type', 'SMALLINT', false, null, null);
 		$this->addColumn('MEDIA_TYPE', 'MediaType', 'SMALLINT', false, null, null);

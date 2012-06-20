@@ -69,6 +69,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the status field.
+	 * Note: this column has a database default value of: 2
 	 * @var        int
 	 */
 	protected $status;
@@ -116,6 +117,27 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			return $this->oldColumnsValues[$name];
 			
 		return null;
+	}
+
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or
+	 * equivalent initialization method).
+	 * @see        __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		$this->status = 2;
+	}
+
+	/**
+	 * Initializes internal state of BasecategoryEntry object.
+	 * @see        applyDefaults()
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->applyDefaultValues();
 	}
 
 	/**
@@ -516,7 +538,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$v = (int) $v;
 		}
 
-		if ($this->status !== $v) {
+		if ($this->status !== $v || $this->isNew()) {
 			$this->status = $v;
 			$this->modifiedColumns[] = categoryEntryPeer::STATUS;
 		}
@@ -534,6 +556,10 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
+			if ($this->status !== 2) {
+				return false;
+			}
+
 		// otherwise, everything was equal, so return TRUE
 		return true;
 	} // hasOnlyDefaultValues()
