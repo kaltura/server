@@ -1148,7 +1148,7 @@ class KalturaEntryService extends KalturaBaseService
 		$kshow->setPartnerId($this->getPartnerId());
 		$kshow->setSubpId($this->getPartnerId() * 100);
 		$kshow->setViewPermissions(kshow::KSHOW_PERMISSION_EVERYONE);
-		$kshow->setPermissions(myPrivilegesMgr::PERMISSIONS_PUBLIC);
+		$kshow->setPermissions(kshow::PERMISSIONS_PUBLIC);
 		$kshow->setAllowQuickEdit(true);
 		$kshow->save();
 		
