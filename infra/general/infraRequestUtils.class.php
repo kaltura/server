@@ -90,8 +90,28 @@ class infraRequestUtils
         
 		return array($start, $end, $length);
 	}                  
+
+	public static function sendCachingHeaders($max_age = 864000, $private = false, $last_modified = null)
+	{
+		if ($max_age)
+		{
+			// added max-stale=0 to fight evil proxies
+			$cache_scope = $private ? "private" : "public";
+			header("Cache-Control: $cache_scope, max-age=$max_age, max-stale=0");
+			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
+			if ($last_modified)
+				header('Last-modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . 'GMT');
+			else
+				header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
+		}
+		else
+		{
+			header("Cache-Control:");
+			header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
+		}
+	}
 	
-	public static function sendCdnHeaders($ext, $content_length, $max_age = 8640000 , $mime = null, $private = false )
+	public static function sendCdnHeaders($ext, $content_length, $max_age = 8640000 , $mime = null, $private = false, $last_modified = null)
 	{
 		if ( $max_age === null ) $max_age = 8640000;
 		while(FALSE !== ob_get_clean());
@@ -131,9 +151,9 @@ class infraRequestUtils
     			case "ts":
     				$content_type ="video/MP2T";
     				break;
-    			case "3gp":
-    				$content_type ="video/3gpp";
-    				break;
+                        case "3gp":
+                                $content_type ="video/3gpp";
+                                break;
     			default:
     				$content_type ="image/$ext";
     				break;
@@ -143,27 +163,13 @@ class infraRequestUtils
 		{
 			$content_type = $mime ;
 		}
+
+		self::sendCachingHeaders($max_age, $private, $last_modified);
 		
-		if ($max_age)
-		{
-			// added max-stale=0 to fight evil proxies
-			$cache_scope = $private ? "private" : "public";
-			header("Cache-Control: $cache_scope, max-age=$max_age max-stale=0");
-			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
-			header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
-		}
-		else
-		{
-			header("Cache-Control:");
-			header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
-		}
-		
-		if ($content_length !== null)	
-			header("Content-Length: $content_length ");
+		header("Content-Length: $content_length ");
 		header("Pragma:");
 		header("Content-Type: $content_type");
 	}
-	
 
 	public static function getRemoteAddress()
 	{
@@ -175,11 +181,31 @@ class infraRequestUtils
 		}
 			
 		$remote_addr = null;
-		if ( isset ( $_SERVER['HTTP_X_REAL_IP'] ))
+
+		// support passing ip when proxying through apache. check the proxying server is indeed an internal server
+		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
+		 	isset($_SERVER['HTTP_X_FORWARDED_SERVER']) &&
+		 	kConf::hasParam('remote_addr_header_server') &&
+		 	$_SERVER['HTTP_X_FORWARDED_SERVER'] == kConf::get('remote_addr_header_server') )
 		{
-			$remote_addr = @$_SERVER['HTTP_X_REAL_IP'];
+			// pick the last ip
+		 	$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
+			$remote_addr = trim($headerIPs[count($headerIPs) - 1]);
+			if (class_exists('KalturaLog'))
+				KalturaLog::log("getRemoteAddress [".@$_SERVER['HTTP_X_FORWARDED_FOR']."] [".$_SERVER['HTTP_X_FORWARDED_SERVER']."] [$remote_addr]");
 		}
 			
+		// support getting the original ip address of the client when using the cdn for API calls (cdnapi)
+		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
+		 	in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) )
+		{
+			// pick the last ip
+		 	$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
+			$remote_addr = trim($headerIPs[0]);
+			if (class_exists('KalturaLog'))
+				KalturaLog::log("getRemoteAddress [".@$_SERVER['HTTP_X_FORWARDED_FOR']."] [".$_SERVER['HTTP_HOST']."] [$remote_addr]");
+		}
+
 		if (!$remote_addr && isset ( $_SERVER['HTTP_X_KALTURA_REMOTE_ADDR'] ) )
 		{
 			list($remote_addr, $time, $uniqueId, $hash) = @explode(",", $_SERVER['HTTP_X_KALTURA_REMOTE_ADDR']);
@@ -208,5 +234,45 @@ class infraRequestUtils
 			$remote_addr = (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null);
 		
 		return $remote_addr;
+	}
+	
+	public static function parseUrlHost($url)
+	{
+		$urlDetails = parse_url($url);
+		if(isset($urlDetails['host']))
+		{
+			$result = $urlDetails['host'];
+		}
+		elseif(isset($urlDetails['path']))
+		{
+			// parse_url could not extract domain, but returned path
+			// we validate that this path could be considered a domain
+			$result = rtrim($urlDetails['path'], '/'); // trim trailing slashes. example: www.kaltura.com/test.php
+			
+			// stop string at first slash. example: httpssss/google.com - malformed url...
+			if (strpos($result, "/") !== false)
+			{
+				$result = substr($result, 0, strpos($result, "/"));
+			}
+		}
+		else // empty path and host, cannot parse the URL
+		{
+			return null;
+		}
+		
+		// some urls might return host or path which is not yet clean for comparison with user's input
+		if (strpos($result, "?") !== false)
+		{
+			$result = substr($result, 0, strpos($result, "?"));
+		}
+		if (strpos($result, "#") !== false)
+		{
+			$result = substr($result, 0, strpos($result, "#"));
+		}
+		if (strpos($result, "&") !== false)
+		{
+			$result = substr($result, 0, strpos($result, "&"));
+		}
+		return $result;
 	}
 }
