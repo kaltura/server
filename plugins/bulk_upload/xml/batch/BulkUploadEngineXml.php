@@ -767,6 +767,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$entry = $this->createEntryFromItem($item); //Creates the entry from the item element
 		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)
+		$entry->creatorId = $this->data->userId;
 		KalturaLog::debug("current entry is: " . print_r($entry, true));
 				
 		$thumbAssets = array();
@@ -1676,7 +1677,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$entry = $this->getEntryInstanceByType($entryType);
 		$entry->type = (int)$item->type;
         $entry->userId = $this->data->userId;	
-        $entry->creatorId = $this->data->userId;
 		if(isset($item->referenceId))
 			$entry->referenceId = (string)$item->referenceId;
 		if(isset($item->name))
@@ -1688,10 +1688,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($item->categories))
 			$entry->categories = $this->implodeChildElements($item->categories);
 		if(isset($item->userId))
-		{
 			$entry->userId = (string)$item->userId;
-			$entry->creatorId = (string)$item->userId;
-		}
 		if(isset($item->licenseType))
 			$entry->licenseType = (string)$item->licenseType;
 		if(isset($item->partnerData))
