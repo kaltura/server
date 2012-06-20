@@ -19,6 +19,8 @@ class kCountryContextField extends kStringField
 	 */
 	protected function getFieldValue(kScope $scope = null)
 	{
+		kApiCache::addExtraField(kApiCache::ECF_COUNTRY);
+
 		if(!$scope)
 			$scope = new kScope();
 			
@@ -42,5 +44,13 @@ class kCountryContextField extends kStringField
 	function getGeoCoderType()
 	{
 		return $this->geoCoderType;
+	}
+
+	/* (non-PHPdoc)
+	 * @see kStringValue::shouldDisableCache()
+	 */
+	public function shouldDisableCache($scope)
+	{
+		return false;
 	}
 }
