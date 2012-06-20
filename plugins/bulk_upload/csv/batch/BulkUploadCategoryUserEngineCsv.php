@@ -40,10 +40,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 			if(!is_numeric($index))
 				continue;
             
-			if ($column == 'categoryUserId')
-			{
-			    $bulkUploadResult->objectId = $values[$index];
-			}
+			
 		    if ($column == 'status' && $values[$index] != KalturaCategoryUserStatus::PENDING)
 			{
 			    $bulkUploadResult->requiredObjectStatus = $values[$index];
