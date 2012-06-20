@@ -123,6 +123,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 		$mediaEntry->description = $bulkUploadResult->description;
 		$mediaEntry->tags = $bulkUploadResult->tags;
 		$mediaEntry->userId = $this->data->userId;
+		$mediaEntry->creatorId = $this->data->userId;
 		$mediaEntry->conversionProfileId = $this->data->objectData->conversionProfileId;
 		
 		//Set values for V1 csv
