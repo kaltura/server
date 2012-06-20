@@ -58,6 +58,7 @@ class SystemPartnerService extends KalturaBaseService
 			$usageFilter = new KalturaSystemPartnerUsageFilter();
 			$usageFilter->fromDate = time() - 60*60*24*30; // last 30 days
 			$usageFilter->toDate = time();
+			$usageFilter->timezoneOffset = 0;
 		}
 		
 		if (is_null($pager))
@@ -94,6 +95,7 @@ class SystemPartnerService extends KalturaBaseService
 			$inputFilter = new reportsInputFilter (); 
 			$inputFilter->from_date = ( $usageFilter->fromDate );
 			$inputFilter->to_date = ( $usageFilter->toDate );
+			$inputFilter->timeZoneOffset = $usageFilter->timezoneOffset;
 	
 			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 
 				null , 
