@@ -1098,7 +1098,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 	}
 	
-	public function indexToSphinx()
+	public function indexToSearchIndex()
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
@@ -2658,6 +2658,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			'sort_name' => IIndexable::FIELD_TYPE_INTEGER,
 			'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
 			'kuser_id' => IIndexable::FIELD_TYPE_STRING,
+			'puser_id' => IIndexable::FIELD_TYPE_STRING,
 			'entry_status' => IIndexable::FIELD_TYPE_INTEGER,
 			'type' => IIndexable::FIELD_TYPE_INTEGER,
 			'media_type' => IIndexable::FIELD_TYPE_INTEGER,
@@ -2687,6 +2688,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			'entitled_kusers' => IIndexable::FIELD_TYPE_STRING,
 			'privacy_by_contexts' => IIndexable::FIELD_TYPE_STRING,
 			'creator_kuser_id' => IIndexable::FIELD_TYPE_STRING,
+			'creator_puser_id' => IIndexable::FIELD_TYPE_STRING,
 	);
 	
 	/**

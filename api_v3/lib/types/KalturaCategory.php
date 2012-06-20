@@ -130,12 +130,14 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public $inheritanceType;
 	
+	//userJoinPolicy is readonly only since product asked - and not because anything else. server code is working, and readonly doccomment can be remove
 	
 	/**
 	 * Who can ask to join this category
 	 *  
 	 * @var KalturaUserJoinPolicyType
 	 * @requiresPermission insert,update
+	 * @readonly
 	 */
 	public $userJoinPolicy;
 	
@@ -353,11 +355,6 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			if (!$parentCategoryDb)
 				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_NOT_FOUND, $this->parentId);
 		}
-		elseif ($this->inheritanceType == KalturaInheritanceType::INHERIT)
-		{
-			//cannot inherit member with no parant
-			throw new KalturaAPIException(KalturaErrors::CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET);
-		}
 	}
 	
 	/* (non-PHPdoc)
@@ -368,6 +365,16 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		$this->validatePropertyMinLength("name", 1);
 		$this->validatePropertyMaxLength("name", categoryPeer::MAX_CATEGORY_NAME);
 		$this->validateCategory();
+		
+		if ($this->parentId !== null)
+		{
+			$this->validateParentId();
+		}
+		elseif ($this->inheritanceType == KalturaInheritanceType::INHERIT)
+		{
+			//cannot inherit member with no parant
+			throw new KalturaAPIException(KalturaErrors::CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET);
+		}
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -384,7 +391,15 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		}
 		
 		if ($this->parentId !== null)
+		{
 			$this->validateParentId();
+		}
+		elseif ($this->inheritanceType == KalturaInheritanceType::INHERIT && 
+		($this->parentId instanceof KalturaNullField || $sourceObject->getParentId() == null))
+		{
+			//cannot inherit member with no parant
+			throw new KalturaAPIException(KalturaErrors::CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET);
+		}
 			
 		$this->validateCategory($sourceObject);
 			

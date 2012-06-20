@@ -116,7 +116,7 @@ class categoryPeer extends BasecategoryPeer
 			return null;
 		
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
-		$c->add(categoryPeer::FULL_NAME, $fullName);
+		$c->add(categoryPeer::FULL_NAME, $fullName . category::FULL_NAME_EQUAL_MATCH_STRING, Criteria::LIKE);
 		
 		if($ignoreCategoryId)
 			$c->add(categoryPeer::ID, $ignoreCategoryId, Criteria::NOT_EQUAL);

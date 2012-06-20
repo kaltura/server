@@ -62,7 +62,7 @@ class categoryEntry extends BasecategoryEntry {
 			$this->setEntryOnCategory($category, $entry);
 			
 		if(!categoryEntryPeer::getSkipSave())
-			$entry->indexToSphinx();
+			$entry->indexToSearchIndex();
 	}
 	
 	/* (non-PHPdoc)
@@ -107,7 +107,7 @@ class categoryEntry extends BasecategoryEntry {
 		}
 		
 		if(!categoryEntryPeer::getSkipSave())
-			$entry->indexToSphinx();
+			$entry->indexToSearchIndex();
 	}
 	
 	private function setEntryOnCategory($category, $entry = null)

@@ -163,12 +163,12 @@ class CategoryEntryService extends KalturaBaseService
 			//validate entitl categories
 			if($filter->categoryIdIn != null)
 			{
-				$categoryIdInArr = $filter->categoryIdIn;
+				$categoryIdInArr = explode(',', $filter->categoryIdIn);
 				$categoryIdInArr = array_unique($categoryIdInArr);
 				
-				$entitledCategories = categoryPeer::retrieveByPKs(explode(',',$filter->categoryIdIn));
+				$entitledCategories = categoryPeer::retrieveByPKs($categoryIdInArr);
 				
-				if(count($entitledCategories) != count($categoryIdInArr))
+				if(!count($entitledCategories))
 					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdIn);
 			}
 			

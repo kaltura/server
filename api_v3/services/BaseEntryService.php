@@ -842,8 +842,7 @@ class BaseEntryService extends KalturaEntryService
 
 		if (!$shouldUpdate)
 		{
-			$entryDb->setUpdatedAt(time());
-			$entryDb->save();
+			$entryDb->indexToSearchIndex();
 			
 			return $entryDb->getIntId();
 		}
