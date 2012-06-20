@@ -56,6 +56,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'entry.ENTITLED_KUSERS' => 'entitled_kusers',
 		'entry.PRIVACY_BY_CONTEXTS' => 'privacy_by_contexts',
 		'entry.CREATOR_KUSER_ID' => 'creator_kuser_id',
+		'entry.CREATOR_PUSER_ID' => 'creator_puser_id',
 		
 	);
 	
@@ -138,6 +139,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'entitled_kusers' => IIndexable::FIELD_TYPE_STRING,
 		'privacy_by_contexts' => IIndexable::FIELD_TYPE_STRING,
 		'creator_kuser_id' => IIndexable::FIELD_TYPE_STRING,
+		'creator_puser_id' => IIndexable::FIELD_TYPE_STRING,
 	);
 
 	/**

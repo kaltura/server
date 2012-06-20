@@ -310,7 +310,7 @@ class CategoryUserService extends KalturaBaseService
 				
 			if($category->getInheritanceType() == InheritanceType::INHERIT)
 			{
-				//if category inheris members - chnage filter to -> inherited from parent id = category->getIheritedParent
+				//if category inheris members - change filter to -> inherited from parent id = category->getIheritedParent
 				$categoriesInheritanceRoot[$category->getInheritedParentId()] = $category->getInheritedParentId();
 			}
 			else

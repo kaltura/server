@@ -20,7 +20,7 @@ class CategoryService extends KalturaBaseService
 	 * @return KalturaCategory
 	 */
 	function addAction(KalturaCategory $category)
-	{
+	{	
 		if($category->owner == '')
 			$category->owner = null;
 			
