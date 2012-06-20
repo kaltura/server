@@ -89,10 +89,16 @@ class categoryFilter extends baseObjectFilter
 	
 	// TODO - move to base class, all that should stay here is the peer class, not the logic of the field translation !
 	// The base class should invoke $peek_class::translateFieldName( $field_name , BasePeer::TYPE_FIELDNAME , BasePeer::TYPE_COLNAME );
-	public function getFieldNameFromPeer ( $field_name )
+	public function getFieldNameFromPeer($field_name)
 	{
-		$res = categoryPeer::translateFieldName( $field_name , $this->field_name_translation_type , BasePeer::TYPE_COLNAME );
-		return $res;
+		try
+		{
+			return categoryPeer::translateFieldName($field_name, $this->field_name_translation_type , BasePeer::TYPE_COLNAME );
+		}
+		catch(PropelException $e)
+		{
+			return 'category.' . strtoupper($field_name);
+		}
 	}
 
 	public function getIdFromPeer (  )
