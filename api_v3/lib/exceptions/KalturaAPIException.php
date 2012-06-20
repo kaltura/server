@@ -23,4 +23,9 @@ class KalturaAPIException extends Exception
 		array_shift($args);
 		$this->message = @call_user_func_array('sprintf', array_merge(array($message), $args)); 
 	}
+	
+	public function __sleep()
+	{
+		return array('code', 'message');
+	}
 }
