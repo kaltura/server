@@ -60,7 +60,7 @@ abstract class KDeletingEngine
 		$this->pager = new KalturaFilterPager();
 		$this->pager->pageSize = 100;
 		
-		if($taskConfig->params->pageSize)
+		if($taskConfig->params && $taskConfig->params->pageSize)
 			$this->pager->pageSize = $taskConfig->params->pageSize;
 	}
 	
