@@ -237,7 +237,6 @@ class KalturaUser extends KalturaObject implements IFilterable
 		"lastName",
 		"isAdmin",
 		"lastLoginTime",
-		"statusUpdatedAt",
 		"deletedAt",
 		"roleIds",
 		"roleNames" => "userRoleNames",
@@ -259,6 +258,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 			
 		
 		parent::toObject($dbObject, $skip);
+		
 		
 		// full name is deprecated and was split to firstName + lastName
 		// this is for backward compatibility with older clients
@@ -282,6 +282,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 		// this is for backward compatibility
 		$this->fullName = $sourceObject->getFullName();
 		$this->loginEnabled = !is_null($sourceObject->getLoginDataId());
+		$this->statusUpdatedAt = $sourceObject->getStatusUpdatedAt(null);
 	}
 	
 	public function getExtraFilters()
