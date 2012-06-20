@@ -99,7 +99,7 @@ class kQueryCache
 				{
 					foreach ($values as $value)
 					{
-						$newInvalidationKeys[] = self::replaceVariable($invalidationKey, $value);
+						$newInvalidationKeys[] = self::replaceVariable($invalidationKey, str_replace(' ', '_', $value));
 					}
 				}
 				$invalidationKeys = $newInvalidationKeys;
@@ -284,7 +284,7 @@ class kQueryCache
 		$currentTime = time();
 		foreach ($invalidationKeys as $invalidationKey)
 		{
-			$invalidationKey = self::CACHE_PREFIX_INVALIDATION_KEY.$invalidationKey;
+			$invalidationKey = self::CACHE_PREFIX_INVALIDATION_KEY . str_replace(' ', '_', $invalidationKey);
 			KalturaLog::debug("kQueryCache: updating invalidation key, invkey=$invalidationKey");
 			if (!self::$s_memcacheKeys->set($invalidationKey, $currentTime, 
 				self::CACHED_QUERIES_EXPIRY_SEC + self::INVALIDATION_KEYS_EXPIRY_MARGIN))
