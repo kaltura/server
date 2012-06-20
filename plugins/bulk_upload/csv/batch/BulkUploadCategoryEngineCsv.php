@@ -320,13 +320,14 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 	    /* @var $parentCategoryIds KalturaCategoryListResponse*/
 	    if (!count($parentCategoryIds->objects))
 	    {
-	        //Error because the relative path of the new category does not exist
+	        throw new Exception("Parent category not found for full name [$fullname]");
 	    }
 	    if (count($parentCategoryIds->objects) > 1)
 	    {
-	        //Error because the relative path of the new category is not unique under the root category.
+	        throw new Exception("Multiple [" . count($parentCategoryIds->objects) . "] parent categories found for full name [$fullname]");
 	    }
-	    return $parentCategoryIds->objects[0]->id;
+	    $parentCategory = reset($parentCategoryIds->objects);
+	    return $parentCategory->id;
 	}
 	
 	protected function calculateIdToUpdate (KalturaBulkUploadResultCategory $bulkUploadResult)
@@ -343,7 +344,8 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 	        $categoryList = $this->kClient->category->listAction($categoryFilter);
 	        if (count($categoryList->objects))
 	        {
-	            return $categoryList->objects[0]->id;
+	        	$category = reset($categoryList->objects);
+	            return $category->id;
 	        }
 	    }
 	    
