@@ -7,12 +7,6 @@
  */
 class CategoryUserService extends KalturaBaseService
 {
-	public function initService($serviceId, $serviceName, $actionName)
-	{
-		parent::initService($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClass(new categoryKuserPeer());
-	}
-	
 	/**
 	 * Add new CategoryUser
 	 * 
@@ -152,7 +146,7 @@ class CategoryUserService extends KalturaBaseService
 		if (!$category)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);						
 
-		if ($category->getInheritanceType() == InheritanceType::INHERIT)
+		if ($category->getInheritanceType() == InheritanceType::INHERIT && kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS, $categoryId);		
 		
 		// only manager can remove memnger or users remove himself
@@ -310,15 +304,22 @@ class CategoryUserService extends KalturaBaseService
 				
 			if($category->getInheritanceType() == InheritanceType::INHERIT)
 			{
-				//if category inheris members - change filter to -> inherited from parent id = category->getIheritedParent
-				$categoriesInheritanceRoot[$category->getInheritedParentId()] = $category->getInheritedParentId();
+				if($filter->categoryDirectMembers && kCurrentContext::$master_partner_id == Partner::BATCH_PARTNER_ID)
+				{
+					$categoriesInheritanceRoot[$category->getId()] = $category->getId();
+				}
+				else
+				{
+					//if category inheris members - change filter to -> inherited from parent id = category->getIheritedParent
+					$categoriesInheritanceRoot[$category->getInheritedParentId()] = $category->getInheritedParentId();	
+				}
 			}
 			else
 			{
 				$categoriesInheritanceRoot[$category->getId()] = $category->getId();
 			}
 		}
-		
+		$filter->categoryDirectMembers = null;
 		$filter->categoryIdEqual = null;
 		$filter->categoryIdIn = implode(',', $categoriesInheritanceRoot);
 

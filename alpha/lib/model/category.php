@@ -545,6 +545,7 @@ class category extends Basecategory implements IIndexable
 	{
 		$filter = new categoryKuserFilter();
 		$filter->setCategoryIdEqual($categoryId);
+		$filter->setCategoryDirectMembers(true);
 
 		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 	}
@@ -1057,12 +1058,6 @@ class category extends Basecategory implements IIndexable
 		$this->reSetPendingMembersCount();
 	}
 	
-	public function copyMembersFromParentCategory()
-	{
-		//TODO - add job to copy all members from parent categroy
-		
-	}
-	
 	/**
 	 * inherited values are not synced in the DB to child category that inherit from them - but should be returned on the object.
 	 * (values are copied upon update inhertance from inherited to manual)
@@ -1071,11 +1066,12 @@ class category extends Basecategory implements IIndexable
 	{
 		if ($this->getInheritanceType() == InheritanceType::INHERIT)
 		{
-			$inheritCategory = $this->getInheritParent();
-			return $inheritCategory->getUserJoinPolicy();
+			$inheritPartner = $this->getInheritParent();
+			if($inheritPartner->getId() != $this->getId())
+				return $this->getInheritParent()->getUserJoinPolicy();
 		}
-		else
-			return parent::getUserJoinPolicy();
+		
+		return parent::getUserJoinPolicy();
 	}
 	
 	/**
@@ -1085,9 +1081,13 @@ class category extends Basecategory implements IIndexable
 	public function getDefaultPermissionLevel()
 	{
 		if ($this->getInheritanceType() == InheritanceType::INHERIT)
-			return $this->getInheritParent()->getDefaultPermissionLevel();
-		else
-			return parent::getDefaultPermissionLevel();
+		{
+			$inheritPartner = $this->getInheritParent();
+			if($inheritPartner->getId() != $this->getId())
+				return $this->getInheritParent()->getDefaultPermissionLevel();
+		}
+		
+		return parent::getDefaultPermissionLevel();
 	}
 	
 	/**
@@ -1097,9 +1097,13 @@ class category extends Basecategory implements IIndexable
 	public function getKuserId()
 	{
 		if ($this->getInheritanceType() == InheritanceType::INHERIT)
-			return $this->getInheritParent()->getKuserId();
-		else
-			return parent::getKuserId();
+		{
+			$inheritPartner = $this->getInheritParent();
+			if($inheritPartner->getId() != $this->getId())
+				return $this->getInheritParent()->getKuserId();
+		}
+		
+		return parent::getKuserId();
 	}
 	
 	/**
@@ -1109,9 +1113,13 @@ class category extends Basecategory implements IIndexable
 	public function getPuserId()
 	{
 		if ($this->getInheritanceType() == InheritanceType::INHERIT)
-			return $this->getInheritParent()->getPuserId();
-		else
-			return parent::getPuserId();
+		{
+			$inheritPartner = $this->getInheritParent();
+			if($inheritPartner->getId() != $this->getId())
+				return $this->getInheritParent()->getPuserId();
+		}
+		
+		return parent::getPuserId();
 	}
 	
 	/**
@@ -1121,9 +1129,13 @@ class category extends Basecategory implements IIndexable
 	public function getMembersCount()
 	{
 		if ($this->getInheritanceType() == InheritanceType::INHERIT)
-			return $this->getInheritParent()->getMembersCount();
-		else
-			return parent::getMembersCount();
+		{
+			$inheritPartner = $this->getInheritParent();
+			if($inheritPartner->getId() != $this->getId())
+				return $this->getInheritParent()->getMembersCount();
+		}
+		
+		return parent::getMembersCount();
 	}
 	
 	/**
@@ -1133,9 +1145,13 @@ class category extends Basecategory implements IIndexable
 	public function getPendingMembersCount()
 	{
 		if ($this->getInheritanceType() == InheritanceType::INHERIT)
-			return $this->getInheritParent()->getPendingMembersCount();
-		else
-			return parent::getPendingMembersCount();
+		{
+			$inheritPartner = $this->getInheritParent();
+			if($inheritPartner->getId() != $this->getId())
+				return $this->getInheritParent()->getPendingMembersCount();
+		}
+		
+		return parent::getPendingMembersCount();
 	}
 	
 	/**
@@ -1411,6 +1427,7 @@ class category extends Basecategory implements IIndexable
 	
 	public function getSearchIndexPrivacyContexts()
 	{
+		
 		if(is_null($this->getPrivacyContexts()) || $this->getPrivacyContexts() == '')
 			return kEntitlementUtils::DEFAULT_CONTEXT;
 			

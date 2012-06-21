@@ -459,10 +459,9 @@ class BaseEntryService extends KalturaEntryService
 	 * @return KalturaBaseEntryListResponse Wrapper for array of base entries and total count
 	 */
 	function listAction(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
-	{
+	{		
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 		
-
 	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 	    
 		$ks = $this->getKs();
