@@ -143,6 +143,46 @@ class categoryPeer extends BasecategoryPeer
 		
 		return categoryPeer::doSelect($c, $con);
 	}
+	
+	/**
+	 * Get categories by id using full ids wildcard match (returns an array)
+	 *  
+	 * @param $id
+	 * @param $con
+	 * @return array
+	 */
+	public static function getByFullIdsWildcardMatchForCategoryId($id, $con = null)
+	{
+		if (trim($id) == '')
+			return null;
+			
+		$category = categoryPeer::retrieveByPK($id);
+		
+		$fullIds = $category->getFullIds();
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
+		$c->add(categoryPeer::FULL_IDS, "$fullIds\\*", Criteria::LIKE);
+
+		return categoryPeer::doSelect($c, $con);
+	}
+	
+	/**
+	 * Get categories by full name using full ids wildcard match (returns an array)
+	 *  
+	 * @param $partnerId
+	 * @param $fullName
+	 * @param $con
+	 * @return array
+	 */
+	public static function getByFullIdsWildcardMatch($fullIds, $con = null)
+	{
+		if (trim($fullIds) == '')
+			return null;
+		
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
+		$c->add(categoryPeer::FULL_IDS, "$fullIds\\*", Criteria::LIKE);
+
+		return categoryPeer::doSelect($c, $con);
+	}
 
 	public static function getCacheInvalidationKeys()
 	{

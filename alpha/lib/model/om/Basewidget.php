@@ -110,19 +110,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	protected $partner_data;
 
 	/**
-	 * The value for the enforce_entitlement field.
-	 * Note: this column has a database default value of: true
-	 * @var        boolean
-	 */
-	protected $enforce_entitlement;
-
-	/**
-	 * The value for the privacy_context field.
-	 * @var        string
-	 */
-	protected $privacy_context;
-
-	/**
 	 * @var        kshow
 	 */
 	protected $akshow;
@@ -180,27 +167,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 			return $this->oldColumnsValues[$name];
 			
 		return null;
-	}
-
-	/**
-	 * Applies default values to this object.
-	 * This method should be called from the object's constructor (or
-	 * equivalent initialization method).
-	 * @see        __construct()
-	 */
-	public function applyDefaultValues()
-	{
-		$this->enforce_entitlement = true;
-	}
-
-	/**
-	 * Initializes internal state of Basewidget object.
-	 * @see        applyDefaults()
-	 */
-	public function __construct()
-	{
-		parent::__construct();
-		$this->applyDefaultValues();
 	}
 
 	/**
@@ -411,26 +377,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	public function getPartnerData()
 	{
 		return $this->partner_data;
-	}
-
-	/**
-	 * Get the [enforce_entitlement] column value.
-	 * 
-	 * @return     boolean
-	 */
-	public function getEnforceEntitlement()
-	{
-		return $this->enforce_entitlement;
-	}
-
-	/**
-	 * Get the [privacy_context] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getPrivacyContext()
-	{
-		return $this->privacy_context;
 	}
 
 	/**
@@ -840,52 +786,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	} // setPartnerData()
 
 	/**
-	 * Set the value of [enforce_entitlement] column.
-	 * 
-	 * @param      boolean $v new value
-	 * @return     widget The current object (for fluent API support)
-	 */
-	public function setEnforceEntitlement($v)
-	{
-		if(!isset($this->oldColumnsValues[widgetPeer::ENFORCE_ENTITLEMENT]))
-			$this->oldColumnsValues[widgetPeer::ENFORCE_ENTITLEMENT] = $this->enforce_entitlement;
-
-		if ($v !== null) {
-			$v = (boolean) $v;
-		}
-
-		if ($this->enforce_entitlement !== $v || $this->isNew()) {
-			$this->enforce_entitlement = $v;
-			$this->modifiedColumns[] = widgetPeer::ENFORCE_ENTITLEMENT;
-		}
-
-		return $this;
-	} // setEnforceEntitlement()
-
-	/**
-	 * Set the value of [privacy_context] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     widget The current object (for fluent API support)
-	 */
-	public function setPrivacyContext($v)
-	{
-		if(!isset($this->oldColumnsValues[widgetPeer::PRIVACY_CONTEXT]))
-			$this->oldColumnsValues[widgetPeer::PRIVACY_CONTEXT] = $this->privacy_context;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->privacy_context !== $v) {
-			$this->privacy_context = $v;
-			$this->modifiedColumns[] = widgetPeer::PRIVACY_CONTEXT;
-		}
-
-		return $this;
-	} // setPrivacyContext()
-
-	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -895,10 +795,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
-			if ($this->enforce_entitlement !== true) {
-				return false;
-			}
-
 		// otherwise, everything was equal, so return TRUE
 		return true;
 	} // hasOnlyDefaultValues()
@@ -936,8 +832,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 			$this->created_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->updated_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
 			$this->partner_data = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->enforce_entitlement = ($row[$startcol + 15] !== null) ? (boolean) $row[$startcol + 15] : null;
-			$this->privacy_context = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -947,7 +841,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 17; // 17 = widgetPeer::NUM_COLUMNS - widgetPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 15; // 15 = widgetPeer::NUM_COLUMNS - widgetPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating widget object", $e);
@@ -1515,12 +1409,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 			case 14:
 				return $this->getPartnerData();
 				break;
-			case 15:
-				return $this->getEnforceEntitlement();
-				break;
-			case 16:
-				return $this->getPrivacyContext();
-				break;
 			default:
 				return null;
 				break;
@@ -1557,8 +1445,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 			$keys[12] => $this->getCreatedAt(),
 			$keys[13] => $this->getUpdatedAt(),
 			$keys[14] => $this->getPartnerData(),
-			$keys[15] => $this->getEnforceEntitlement(),
-			$keys[16] => $this->getPrivacyContext(),
 		);
 		return $result;
 	}
@@ -1635,12 +1521,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 			case 14:
 				$this->setPartnerData($value);
 				break;
-			case 15:
-				$this->setEnforceEntitlement($value);
-				break;
-			case 16:
-				$this->setPrivacyContext($value);
-				break;
 		} // switch()
 	}
 
@@ -1680,8 +1560,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
 		if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
 		if (array_key_exists($keys[14], $arr)) $this->setPartnerData($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setEnforceEntitlement($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setPrivacyContext($arr[$keys[16]]);
 	}
 
 	/**
@@ -1708,8 +1586,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(widgetPeer::CREATED_AT)) $criteria->add(widgetPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(widgetPeer::UPDATED_AT)) $criteria->add(widgetPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(widgetPeer::PARTNER_DATA)) $criteria->add(widgetPeer::PARTNER_DATA, $this->partner_data);
-		if ($this->isColumnModified(widgetPeer::ENFORCE_ENTITLEMENT)) $criteria->add(widgetPeer::ENFORCE_ENTITLEMENT, $this->enforce_entitlement);
-		if ($this->isColumnModified(widgetPeer::PRIVACY_CONTEXT)) $criteria->add(widgetPeer::PRIVACY_CONTEXT, $this->privacy_context);
 
 		return $criteria;
 	}
@@ -1803,10 +1679,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 		$copyObj->setUpdatedAt($this->updated_at);
 
 		$copyObj->setPartnerData($this->partner_data);
-
-		$copyObj->setEnforceEntitlement($this->enforce_entitlement);
-
-		$copyObj->setPrivacyContext($this->privacy_context);
 
 
 		$copyObj->setNew(true);

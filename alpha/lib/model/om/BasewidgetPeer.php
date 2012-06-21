@@ -26,7 +26,7 @@ abstract class BasewidgetPeer {
 	const TM_CLASS = 'widgetTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 17;
+	const NUM_COLUMNS = 15;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -76,12 +76,6 @@ abstract class BasewidgetPeer {
 	/** the column name for the PARTNER_DATA field */
 	const PARTNER_DATA = 'widget.PARTNER_DATA';
 
-	/** the column name for the ENFORCE_ENTITLEMENT field */
-	const ENFORCE_ENTITLEMENT = 'widget.ENFORCE_ENTITLEMENT';
-
-	/** the column name for the PRIVACY_CONTEXT field */
-	const PRIVACY_CONTEXT = 'widget.PRIVACY_CONTEXT';
-
 	/**
 	 * An identiy map to hold any loaded instances of widget objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -98,11 +92,11 @@ abstract class BasewidgetPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'IntId', 'SourceWidgetId', 'RootWidgetId', 'PartnerId', 'SubpId', 'KshowId', 'EntryId', 'UiConfId', 'CustomData', 'SecurityType', 'SecurityPolicy', 'CreatedAt', 'UpdatedAt', 'PartnerData', 'EnforceEntitlement', 'PrivacyContext', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'intId', 'sourceWidgetId', 'rootWidgetId', 'partnerId', 'subpId', 'kshowId', 'entryId', 'uiConfId', 'customData', 'securityType', 'securityPolicy', 'createdAt', 'updatedAt', 'partnerData', 'enforceEntitlement', 'privacyContext', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::INT_ID, self::SOURCE_WIDGET_ID, self::ROOT_WIDGET_ID, self::PARTNER_ID, self::SUBP_ID, self::KSHOW_ID, self::ENTRY_ID, self::UI_CONF_ID, self::CUSTOM_DATA, self::SECURITY_TYPE, self::SECURITY_POLICY, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_DATA, self::ENFORCE_ENTITLEMENT, self::PRIVACY_CONTEXT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'int_id', 'source_widget_id', 'root_widget_id', 'partner_id', 'subp_id', 'kshow_id', 'entry_id', 'ui_conf_id', 'custom_data', 'security_type', 'security_policy', 'created_at', 'updated_at', 'partner_data', 'enforce_entitlement', 'privacy_context', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'IntId', 'SourceWidgetId', 'RootWidgetId', 'PartnerId', 'SubpId', 'KshowId', 'EntryId', 'UiConfId', 'CustomData', 'SecurityType', 'SecurityPolicy', 'CreatedAt', 'UpdatedAt', 'PartnerData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'intId', 'sourceWidgetId', 'rootWidgetId', 'partnerId', 'subpId', 'kshowId', 'entryId', 'uiConfId', 'customData', 'securityType', 'securityPolicy', 'createdAt', 'updatedAt', 'partnerData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::INT_ID, self::SOURCE_WIDGET_ID, self::ROOT_WIDGET_ID, self::PARTNER_ID, self::SUBP_ID, self::KSHOW_ID, self::ENTRY_ID, self::UI_CONF_ID, self::CUSTOM_DATA, self::SECURITY_TYPE, self::SECURITY_POLICY, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'int_id', 'source_widget_id', 'root_widget_id', 'partner_id', 'subp_id', 'kshow_id', 'entry_id', 'ui_conf_id', 'custom_data', 'security_type', 'security_policy', 'created_at', 'updated_at', 'partner_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
 	);
 
 	/**
@@ -112,11 +106,11 @@ abstract class BasewidgetPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'IntId' => 1, 'SourceWidgetId' => 2, 'RootWidgetId' => 3, 'PartnerId' => 4, 'SubpId' => 5, 'KshowId' => 6, 'EntryId' => 7, 'UiConfId' => 8, 'CustomData' => 9, 'SecurityType' => 10, 'SecurityPolicy' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, 'PartnerData' => 14, 'EnforceEntitlement' => 15, 'PrivacyContext' => 16, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'intId' => 1, 'sourceWidgetId' => 2, 'rootWidgetId' => 3, 'partnerId' => 4, 'subpId' => 5, 'kshowId' => 6, 'entryId' => 7, 'uiConfId' => 8, 'customData' => 9, 'securityType' => 10, 'securityPolicy' => 11, 'createdAt' => 12, 'updatedAt' => 13, 'partnerData' => 14, 'enforceEntitlement' => 15, 'privacyContext' => 16, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::INT_ID => 1, self::SOURCE_WIDGET_ID => 2, self::ROOT_WIDGET_ID => 3, self::PARTNER_ID => 4, self::SUBP_ID => 5, self::KSHOW_ID => 6, self::ENTRY_ID => 7, self::UI_CONF_ID => 8, self::CUSTOM_DATA => 9, self::SECURITY_TYPE => 10, self::SECURITY_POLICY => 11, self::CREATED_AT => 12, self::UPDATED_AT => 13, self::PARTNER_DATA => 14, self::ENFORCE_ENTITLEMENT => 15, self::PRIVACY_CONTEXT => 16, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'int_id' => 1, 'source_widget_id' => 2, 'root_widget_id' => 3, 'partner_id' => 4, 'subp_id' => 5, 'kshow_id' => 6, 'entry_id' => 7, 'ui_conf_id' => 8, 'custom_data' => 9, 'security_type' => 10, 'security_policy' => 11, 'created_at' => 12, 'updated_at' => 13, 'partner_data' => 14, 'enforce_entitlement' => 15, 'privacy_context' => 16, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'IntId' => 1, 'SourceWidgetId' => 2, 'RootWidgetId' => 3, 'PartnerId' => 4, 'SubpId' => 5, 'KshowId' => 6, 'EntryId' => 7, 'UiConfId' => 8, 'CustomData' => 9, 'SecurityType' => 10, 'SecurityPolicy' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, 'PartnerData' => 14, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'intId' => 1, 'sourceWidgetId' => 2, 'rootWidgetId' => 3, 'partnerId' => 4, 'subpId' => 5, 'kshowId' => 6, 'entryId' => 7, 'uiConfId' => 8, 'customData' => 9, 'securityType' => 10, 'securityPolicy' => 11, 'createdAt' => 12, 'updatedAt' => 13, 'partnerData' => 14, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::INT_ID => 1, self::SOURCE_WIDGET_ID => 2, self::ROOT_WIDGET_ID => 3, self::PARTNER_ID => 4, self::SUBP_ID => 5, self::KSHOW_ID => 6, self::ENTRY_ID => 7, self::UI_CONF_ID => 8, self::CUSTOM_DATA => 9, self::SECURITY_TYPE => 10, self::SECURITY_POLICY => 11, self::CREATED_AT => 12, self::UPDATED_AT => 13, self::PARTNER_DATA => 14, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'int_id' => 1, 'source_widget_id' => 2, 'root_widget_id' => 3, 'partner_id' => 4, 'subp_id' => 5, 'kshow_id' => 6, 'entry_id' => 7, 'ui_conf_id' => 8, 'custom_data' => 9, 'security_type' => 10, 'security_policy' => 11, 'created_at' => 12, 'updated_at' => 13, 'partner_data' => 14, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
 	);
 
 	/**
@@ -201,8 +195,6 @@ abstract class BasewidgetPeer {
 		$criteria->addSelectColumn(widgetPeer::CREATED_AT);
 		$criteria->addSelectColumn(widgetPeer::UPDATED_AT);
 		$criteria->addSelectColumn(widgetPeer::PARTNER_DATA);
-		$criteria->addSelectColumn(widgetPeer::ENFORCE_ENTITLEMENT);
-		$criteria->addSelectColumn(widgetPeer::PRIVACY_CONTEXT);
 	}
 
 	/**

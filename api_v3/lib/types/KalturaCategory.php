@@ -109,7 +109,6 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * 
 	 * @var KalturaAppearInListType
 	 * @filter eq
-	 * @requiresPermission insert,update
 	 */
 	public $appearInList;
 	

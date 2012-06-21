@@ -261,4 +261,10 @@ class widget extends Basewidget
 	{
 		return array("widget:id=".$this->getId());
 	}
+	
+	public function setPrivacyContext ( $v )	{		$this->putInCustomData ( "privacyContext" , $v );	}
+	public function getprivacyContext (  )	{		return $this->getFromCustomData( "privacyContext" );	}
+	
+	public function setEnforceEntitlement ( $v )	{		$this->putInCustomData ( "enforceEntitlement" , $v );	}
+	public function getEnforceEntitlement (  )	{		return $this->getFromCustomData( "enforceEntitlement" );	}
 }

@@ -14,7 +14,7 @@
  * @subpackage model
  */
 class categoryKuserPeer extends BasecategoryKuserPeer {
-		
+	
 	/**
 	 * 
 	 * @param int $categoryId

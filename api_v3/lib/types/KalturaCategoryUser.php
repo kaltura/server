@@ -91,7 +91,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 		"createdAt",
 		"updatedAt",
 		"updateMethod",
-		"categoryFullIds",	
+		"categoryFullIds",
 	);
 	
 	public function toObject($dbObject = null, $skip = array()) {

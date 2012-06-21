@@ -64,6 +64,7 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 	public $fullNameStartsWithIn;
 		
 	/**
+	 * not includes the category itself (only sub categories)
 	 * @var string
 	 */
 	public $ancestorIdIn;
