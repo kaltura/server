@@ -1,7 +1,7 @@
 SELECT
 	IF('{GROUP_COLUMN}' = 'date_id',day_id,t.month_id) {GROUP_COLUMN}, 
 	IFNULL(SUM(count_bandwidth),0) as bandwidth_consumption,
-	IFNULL(MAX(aggr_storage_mb),0) as used_storage,
+	IFNULL(MAX(aggr_storage_mb),0) as storage_used,
 	IFNULL(SUM(count_bandwidth),0) + IFNULL(MAX(aggr_storage_mb),0)	AS combined_bandwidth_storage
 FROM  kalturadw.dwh_dim_time t LEFT JOIN (
 	SELECT

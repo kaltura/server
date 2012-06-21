@@ -1,7 +1,7 @@
 SELECT
 	{GROUP_COLUMN}, /*partner_id, */ 
 	SUM(count_bandwidth) as bandwidth_consumption,
-	MAX(aggr_storage_mb) as used_storage,
+	MAX(aggr_storage_mb) as storage_used,
 	SUM(count_bandwidth) + MAX(aggr_storage_mb) AS combined_bandwidth_storage
 FROM (
 	SELECT
