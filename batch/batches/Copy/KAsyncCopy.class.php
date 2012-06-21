@@ -62,7 +62,7 @@ class KAsyncCopy extends KJobHandlerWorker
 		{
 			$copiedObjectsCount = $engine->run($filter, $data->templateObject);
 			$continue = (bool) $copiedObjectsCount;
-			$lastCopyId = $engine->getLastIndexId();
+			$lastCopyId = $engine->getLastCopyId();
 			
 			$data->lastCopyId = $lastCopyId;
 			$this->updateJob($job, "Copied $copiedObjectsCount objects", KalturaBatchJobStatus::PROCESSING, null, $data);
