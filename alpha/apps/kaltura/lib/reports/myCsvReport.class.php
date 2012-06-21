@@ -11,7 +11,10 @@ class myCsvReport
 		// store on disk
 		$csv = new myCsvWrapper ();
 		$csv->addNewLine( $report_title);
-		$csv->addNewLine( $csv->formatDate($input_filter->from_date) , $csv->formatDate($input_filter->to_date ) );
+		$origTimeZone = date_default_timezone_get ();
+        date_default_timezone_set('UTC');
+		$csv->addNewLine( $csv->formatDate($input_filter->from_date + $input_filter->timeZoneOffset) , $csv->formatDate($input_filter->to_date + $input_filter->timeZoneOffset)  );
+		date_default_timezone_set($origTimeZone);
 		$csv->addNewLine( $report_text );
 		$csv->addNewLine( "# ------------------------------------" );
 		$csv->addNewLine( "" );
