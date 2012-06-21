@@ -244,6 +244,19 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$filter->unsetByName('_matchor_categories');
 		}
 		
+		$categories = $filter->get( "in_category_ancestor_id");
+		if ($categories !== null)
+		{
+			//if the category exist or the category name is an empty string
+			$categoriesParsed = $filter->categoryIdsToAllSubCategoriesIdsParsed ( $categories );
+
+			if ( $categoriesParsed !=='' || $categories =='')
+				$filter->set ( "_matchand_categories_ids", $categoriesParsed);
+			else
+		  		$filter->set ( "_matchand_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+		}
+		$filter->unsetByName('in_category_ancestor_id');
+		
 		// match categories by full name		
 		$CatFullNameIn = $filter->get("_in_categories_full_name");
 		if ($CatFullNameIn !== null)
