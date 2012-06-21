@@ -17,12 +17,17 @@ class KDLOperatorFfmpeg extends KDLOperatorBase {
 	$cmdStr = null;
 // rem ffmpeg -i <infilename> -vcodec flv   -r 25 -b 500k  -ar 22050 -ac 2 -acodec libmp3lame -f flv -t 60 -y <outfilename>
 
+	$clipStr = null;
 		if(isset($target->_clipStart) && $target->_clipStart>0){
-			$cmdStr .= " -ss ".$target->_clipStart/1000;
+			$clipStr.= " -ss ".$target->_clipStart/1000;
 		}
 		
 		if(isset($target->_clipDur) && $target->_clipDur>0){
-			$cmdStr .= " -t ".$target->_clipDur/1000;
+			$clipStr.= " -t ".$target->_clipDur/1000;
+		}
+		
+		if(isset($clipStr) && $target->_fastSeekTo==true){
+			$cmdStr.= $clipStr;
 		}
 		
 		$cmdStr.= " -i ".KDLCmdlinePlaceholders::InFileName;
@@ -35,8 +40,8 @@ class KDLOperatorFfmpeg extends KDLOperatorBase {
 		 * Following 'dummy' seek-to setting is done to ensure preciseness
 		 * of the main seek command that is done at the beginning o fthe command line
 		 */
-		if(isset($target->_clipStart) && $target->_clipStart>0){
-			$cmdStr.= " -ss 0.01";
+		if(isset($clipStr)){
+			$cmdStr.= $target->_fastSeekTo==true? " -ss 0.01": $clipStr;
 		}
 		
 		if($extra)
@@ -298,6 +303,14 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 			return true;
 		}
 
+		return $this->checkBasicFFmpegConstraints($source, $target, $errors, $warnings);
+	}
+
+	/* ---------------------------
+	 * checkBasicFFmpegConstraints
+	 */
+	protected function checkBasicFFmpegConstraints(KDLMediaDataSet $source, KDLFlavor $target, array &$errors=null, array &$warnings=null)
+	{
 		/*
 		 * Non Mac transcoders should not mess up with QT/WMV/WMA
 		 * 
@@ -313,7 +326,9 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 				KDLWarnings::ToString(KDLWarnings::TranscoderFormat, $this->_id, "qt/wmv/wma");
 			return true;
 		}
+		
 		return false;
 	}
+	
 }
 	
