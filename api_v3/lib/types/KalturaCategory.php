@@ -418,7 +418,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		if($this->privacyContext != null && kEntitlementUtils::getEntitlementEnforcement())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT);
 			
-		if($this->privacyContext === '' || 
+		if($this->privacyContext === '' || $this->privacyContext == null ||
 		($this->privacyContext == null && !$sourceObject) || 
 		($this->privacyContext == null && $sourceObject && $sourceObject->getPrivacyContexts() == ''))
 		{
