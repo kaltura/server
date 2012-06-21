@@ -118,7 +118,7 @@ class category extends Basecategory implements IIndexable
 		}
 		
 		if( $this->isColumnModified(categoryPeer::PARENT_ID) && $this->getParentId())
-			$this->incrementDirectSubCategoriesCount($this->getParentId(), true);
+			$this->incrementDirectSubCategoriesCount($this->getParentId());
 		
 		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PARENT_ID))
 		{
@@ -271,7 +271,7 @@ class category extends Basecategory implements IIndexable
 		{
 			$this->addRecalcCategoriesCount($this->getId());
 			$this->addRecalcCategoriesCount($this->old_parent_id);
-			$this->decrementDirectSubCategoriesCount($this->old_parent_id, true);
+			$this->decrementDirectSubCategoriesCount($this->old_parent_id);
 		}
 		
 		if ($this->isColumnModified(categoryPeer::STATUS) && 
@@ -280,7 +280,7 @@ class category extends Basecategory implements IIndexable
 			($this->getColumnsOldValue(categoryPeer::STATUS) == CategoryStatus::ACTIVE || 
 			 $this->getColumnsOldValue(categoryPeer::STATUS) == CategoryStatus::UPDATING))
 		{
-			$this->decrementDirectSubCategoriesCount($this->parent_id, true);
+			$this->decrementDirectSubCategoriesCount($this->parent_id);
 		}
 
 		// check if parnet is deleted and could be purged
@@ -976,20 +976,28 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function isReadyForPurge()
 	{
-		
-		if(
-			$this->getStatus() != CategoryStatus::DELETED || 
-			$this->getMembersCount() > 0 || 
-			$this->getEntriesCount() > 0
-		)
+		if($this->getStatus() != CategoryStatus::DELETED)
 			return false;
+			
+		if($this->getMembersCount())
+		{
+			KalturaLog::debug("Category still associated with [" . $this->getMembersCount() . "] users");
+			return false;
+		}
+			
+		if($this->getEntriesCount() > 0)
+		{
+			KalturaLog::debug("Category still associated with [" . $this->getEntriesCount() . "] entries");
+			return false;
+		}
+			
+		if($this->getDirectSubCategoriesCount() > 0)
+		{
+			KalturaLog::debug("Category still associated with [" . $this->getDirectSubCategoriesCount() . "] sub categories");
+			return false;
+		}
 		
-		$criteria = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$criteria->add(categoryPeer::PARENT_ID, $this->getId());
-		$criteria->applyFilters();
-		$childCategories = $criteria->getRecordsCount();
-		
-		return ($childCategories == 0);
+		return true;
 	}
 	
 	/* (non-PHPdoc)
@@ -997,7 +1005,6 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function preUpdate(PropelPDO $con = null)
 	{
-		
 		if (!$this->alreadyInSave)
 		{
 			// when the category is deleted and has no entries and no members, it could be purged
@@ -1493,33 +1500,36 @@ class category extends Basecategory implements IIndexable
 		return self::$sphinxFieldsEscapeType[$fieldName];
 	}
 	
-	public function decrementDirectSubCategoriesCount($categoryId, $shouldSave = false)
+	protected function decrementDirectSubCategoriesCount($categoryId)
 	{
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$category = categoryPeer::retrieveByPK($categoryId);
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
-		if($category)
+		if(!$category)
 		{
-			$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() - 1);
-			
-			if($shouldSave)
-				$category->save();
+			KalturaLog::info("Category [$categoryId] not found");
+			return;
 		}
+		
+		$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() - 1);
+		$category->save();
 	}
 	
-	public function incrementDirectSubCategoriesCount($categoryId, $shouldSave = false)
+	protected function incrementDirectSubCategoriesCount($categoryId)
 	{
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$category = categoryPeer::retrieveByPK($categoryId);
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+	
 		
-		if($category)
+		if(!$category)
 		{
-			$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() + 1);
-			
-			if($shouldSave)
-				$category->save();
+			KalturaLog::info("Category [$categoryId] not found");
+			return;
 		}
+		
+		$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() + 1);
+		$category->save();
 	}
 }
