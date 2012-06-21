@@ -32,9 +32,12 @@ class KIndexingCategoryEntryEngine extends KIndexingEngine
 			$this->client->categoryEntry->index($categoryEntry->entryId, $categoryEntry->categoryId , $shouldUpdate);
 		}
 		$results = $this->client->doMultiRequest();
-		foreach($results as $result)
-			if($result instanceof Exception)
-				throw $result;
+		foreach($results as $index => $result)
+			if(!is_int($result))
+				unset($results[$index]);
+				
+		if(!count($results))
+			return 0;
 				
 		$lastIndexId = end($results);
 		$this->setLastIndexId($lastIndexId);

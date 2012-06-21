@@ -32,9 +32,9 @@ class KDeletingCategoryUserEngine extends KDeletingEngine
 			$this->client->categoryUser->delete($categoryUser->categoryId, $categoryUser->userId);
 		}
 		$results = $this->client->doMultiRequest();
-		foreach($results as $result)
-			if($result instanceof Exception)
-				throw $result;
+		foreach($results as $index => $result)
+			if(is_array($result) && isset($result['code']))
+				unset($results[$index]);
 				
 		return count($results);
 	}

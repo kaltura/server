@@ -34,10 +34,13 @@ class KCopyingCategoryUserEngine extends KCopyingEngine
 		}
 		
 		$results = $this->client->doMultiRequest();
-		foreach($results as $result)
-			if($result instanceof Exception)
-				throw $result;
+		foreach($results as $index => $result)
+			if(!is_int($result))
+				unset($results[$index]);
 				
+		if(!count($results))
+			return 0;
+			
 		$lastCopyId = end($results);
 		$this->setLastCopyId($lastCopyId);
 		
