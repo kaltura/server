@@ -105,12 +105,13 @@ class categoryEntry extends BasecategoryEntry {
 			if($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING)
 				$category->decrementPendingEntriesCount();
 		}
+		$category->save();
 		
 		if(!categoryEntryPeer::getSkipSave())
 			$entry->indexToSearchIndex();
 	}
 	
-	private function setEntryOnCategory($category, $entry = null)
+	private function setEntryOnCategory(category $category, $entry = null)
 	{
 		$category->incrementEntriesCount(1, $this->entryCategoriesAddedIds);
 		$category->incrementDirectEntriesCount();
@@ -118,6 +119,8 @@ class categoryEntry extends BasecategoryEntry {
 		//if was pending - decrease pending entries count!
 		if($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING)
 			$category->decrementPendingEntriesCount();
+			
+		$category->save();
 		
 		//only categories with no context are saved on entry - this is only for Backward compatible 
 		if($entry && !categoryEntryPeer::getSkipSave() && $category->getPrivacyContexts() == '')
