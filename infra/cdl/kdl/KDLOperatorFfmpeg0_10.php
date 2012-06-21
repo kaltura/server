@@ -87,22 +87,7 @@ $forcedKF=0;
 	    if(KDLOperatorBase::CheckConstraints($source, $target, $errors, $warnings)==true)
 			return true;
 
-		/*
-		 * Non Mac transcoders should not mess up with QT/WMV/WMA
-		 * 
-		 */
-		$qt_wmv_list = array("wmv1","wmv2","wmv3","wvc1","wmva","wma1","wma2","wmapro");
-		if($source->_container && ($source->_container->_id=="qt" || $source->_container->_format=="qt")
-		&& (
-			($source->_video && (in_array($source->_video->_format,$qt_wmv_list)||in_array($source->_video->_id,$qt_wmv_list)))
-			||($source->_audio && (in_array($source->_audio->_format,$qt_wmv_list)||in_array($source->_audio->_id,$qt_wmv_list)))
-			)
-		){
-			$warnings[KDLConstants::VideoIndex][] = //"The transcoder (".$key.") can not process the (".$sourcePart->_id."/".$sourcePart->_format. ").";
-				KDLWarnings::ToString(KDLWarnings::TranscoderFormat, $this->_id, "qt/wmv/wma");
-			return true;
-		}
-		return false;
+		return $this->checkBasicFFmpegConstraints($source, $target, $errors, $warnings);
 	}
 }
 	
