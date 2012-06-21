@@ -21,13 +21,23 @@ class KDLFlavor extends KDLMediaDataSet {
 	public	$_isTwoPass=false;
 	public  $_clipStart=null;
 	public 	$_clipDur=null;
-	public	$_explicitClipDur=null; // Contrary to to the 'clipDur' data member, the 'explicitClipDur' can not be 0 or null, 
-									// for flavors that have a clip action.
-									// clipDur==0/null means that the clip should end when the source is finised.
-									// Some transcoders require 'explicit' duration (EE3), even in those cases.
-									// For those cases I have set this data member.
-									// Although the 'clipDur' can be changed to act in this way, I prefered to not to touch 
-									// the origina logic (that works for ffmpeg,mec, on2, vlc), but rather set this new data member 
+				/* 
+				 * Contrary to to the 'clipDur' data member, the 'explicitClipDur' can not be 0 or null,
+				 * for flavors that have a clip action.
+				 * clipDur==0/null means that the clip should end when the source is finised.
+				 * Some transcoders require 'explicit' duration (EE3), even in those cases.
+				 * For those cases I have set this data member.
+				 * Although the 'clipDur' can be changed to act in this way, I prefered to not to touch
+				 * the origina logic (that works for ffmpeg,mec, on2, vlc), but rather set this new data member
+				 */
+	public	$_explicitClipDur=null; 
+				/*
+				 * To clip a file, we have to seek to required position.
+				 * There are fast and slow seek method.
+				 * Sveral fromats (mpeg2, theora), don't support fast seeks 
+				 */
+	public 	$_fastSeekTo = true;
+	 
 	public	$_transcoders = array();
 
 		/* --------------------------
@@ -405,6 +415,16 @@ $plannedDur = 0;
 		else
 			$target->_explicitClipDur = $target->_clipDur;
 			
+			/*
+			 * mpeg2 and theora video formats does not allow reliable 'fastSeekTo' (used on clipping)
+			 */
+		if($source->_video && $source->_video->IsFormatOf(array("mpeg video","theora"))){
+			$target->_fastSeekTo = false;
+		}
+		else {
+			$target->_fastSeekTo = true;
+		}
+		
 		$target->_container->_duration = $sourceDur;
 		$target->_video = null;
 		if($this->_video!="") {
