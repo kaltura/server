@@ -310,57 +310,52 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		
 		if($filter->get('_likex_name_or_reference_id'))
 		{
-			$freeTexts = $filter->get('_likex_name_or_reference_id');
-			KalturaLog::debug("Attach free text [$freeTexts]");
+			$names = $filter->get('_likex_name_or_reference_id');
+			KalturaLog::debug("Attach free text [$names]");
 			
 			$additionalConditions = array();
-			$advancedSearch = $filter->getAdvancedSearch();
-			if($advancedSearch)
-			{
-				$additionalConditions = $advancedSearch->getFreeTextConditions($freeTexts);
-			}
 			
-			if(preg_match('/^"[^"]+"$/', $freeTexts))
+			if(preg_match('/^"[^"]+"$/', $names))
 			{
-				$freeText = str_replace('"', '', $freeTexts);
-				$freeText = SphinxUtils::escapeString($freeText);
-				$freeText = "^$freeText$";
-				$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $freeText\\\*";
+				$name = str_replace('"', '', $names);
+				$name = SphinxUtils::escapeString($name);
+				$name = "^$name$";
+				$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $name\\\*";
 			}
 			else
 			{
-				if(strpos($freeTexts, baseObjectFilter::IN_SEPARATOR) > 0)
+				if(strpos($names, baseObjectFilter::IN_SEPARATOR) > 0)
 				{
-					str_replace(baseObjectFilter::AND_SEPARATOR, baseObjectFilter::IN_SEPARATOR, $freeTexts);
+					str_replace(baseObjectFilter::AND_SEPARATOR, baseObjectFilter::IN_SEPARATOR, $names);
 				
-					$freeTextsArr = explode(baseObjectFilter::IN_SEPARATOR, $freeTexts);
-					foreach($freeTextsArr as $valIndex => $valValue)
+					$namesArr = explode(baseObjectFilter::IN_SEPARATOR, $names);
+					foreach($namesArr as $valIndex => $valValue)
 					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 0)
-							unset($freeTextsArr[$valIndex]);
+							unset($namesArr[$valIndex]);
 						else
-							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
+							$namesArr[$valIndex] = SphinxUtils::escapeString($valValue);
 					}
 							
-					foreach($freeTextsArr as $freeText)
+					foreach($namesArr as $name)
 					{
-						$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $freeText\\\*";
+						$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $name\\\*";
 					}
 				}
 				else
 				{
-					$freeTextsArr = explode(baseObjectFilter::AND_SEPARATOR, $freeTexts);
-					foreach($freeTextsArr as $valIndex => $valValue)
+					$namesArr = explode(baseObjectFilter::AND_SEPARATOR, $names);
+					foreach($namesArr as $valIndex => $valValue)
 					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 0)
-							unset($freeTextsArr[$valIndex]);
+							unset($namesArr[$valIndex]);
 						else
-							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
+							$namesArr[$valIndex] = SphinxUtils::escapeString($valValue);
 					}
 							
-					$freeTextsArr = array_unique($freeTextsArr);
-					$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
-					$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $freeTextExpr\\\*";
+					$namesArr = array_unique($namesArr);
+					$nameExpr = implode(baseObjectFilter::AND_SEPARATOR, $namesArr);
+					$additionalConditions[] = "@(" . categoryFilter::NAME_REFERNCE_ID . ") $nameExpr\\\*";
 				}
 			}
 			if(count($additionalConditions))
