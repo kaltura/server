@@ -176,7 +176,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	            $ret = array ("title", "description", "tags", "url", "contentType",);
 	            if ($csvVersion > 1)
     	            array_merge($ret, array ("conversionProfileId", "accessProfileId",  
-    	                    "category", "scheduleStartDate", "scheduleEndDate", "thumbnailUrl", "partnerData", "creatorId", "entitledUsersEdit", "entitledUsersPublish"));
+    	                    "category", "scheduleStartDate", "scheduleEndDate", "thumbnailUrl", "partnerData", "creatorId", "entitledUsersEdit", "entitledUsersPublish", "ownerId"));
 	            return $ret;
     	        break;
 	        case BulkUploadObjectType::CATEGORY:
@@ -249,6 +249,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			$values[] = $bulkUploadResult->getCreatorId();
 			$values[] = $bulkUploadResult->getEntitledUsersEdit();
 			$values[] = $bulkUploadResult->getEntitledUsersPublish();
+			$values[] = $bulkUploadResult->getOwnerId();
 		}
 		
 		return $values;
