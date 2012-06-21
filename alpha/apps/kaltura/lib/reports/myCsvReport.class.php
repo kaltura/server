@@ -13,7 +13,7 @@ class myCsvReport
 		$csv->addNewLine( $report_title);
 		$origTimeZone = date_default_timezone_get ();
         date_default_timezone_set('UTC');
-		$csv->addNewLine( $csv->formatDate($input_filter->from_date + $input_filter->timeZoneOffset) , $csv->formatDate($input_filter->to_date + $input_filter->timeZoneOffset)  );
+		$csv->addNewLine( $csv->formatDate($input_filter->from_date) , $csv->formatDate($input_filter->to_date)  );
 		date_default_timezone_set($origTimeZone);
 		$csv->addNewLine( $report_text );
 		$csv->addNewLine( "# ------------------------------------" );
