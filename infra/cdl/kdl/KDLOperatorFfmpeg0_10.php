@@ -68,7 +68,7 @@ $forcedKF=0;
 		
 		if(isset($vid->_rotation)) {
 			if($vid->_rotation==180)
-				$cmdStr.= " -vf vflip";
+				$cmdStr.= " -vf vflip,hflip";
 			else if($vid->_rotation==90)
 				$cmdStr.= " -vf transpose=1";
 			else if($vid->_rotation==270 || $vid->_rotation==-90)
