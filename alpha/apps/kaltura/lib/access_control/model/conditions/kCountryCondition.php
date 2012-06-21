@@ -24,7 +24,7 @@ class kCountryCondition extends kMatchCondition
 	/**
 	 * @param int $geoCoderType of enum geoCoderType
 	 */
-	public function setGeoCoderType(array $geoCoderType)
+	public function setGeoCoderType($geoCoderType)
 	{
 		$this->geoCoderType = $geoCoderType;
 	}
