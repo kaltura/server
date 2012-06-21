@@ -146,7 +146,7 @@ class category extends Basecategory implements IIndexable
 			if ($this->isColumnModified(categoryPeer::PARENT_ID))
 				$lock = true;
 			
-			$this->addIndexCategoryJob($this->getFullIds(), null, null, $lock);		
+			$this->addIndexCategoryJob($this->oldColumnsValues[categoryPeer::FULL_IDS], null, null, $lock);		
 		}
 		
 		if (!$this->isNew() && 
