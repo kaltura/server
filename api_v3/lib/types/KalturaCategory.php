@@ -420,7 +420,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			
 		if($this->privacyContext === '' || 
 		($this->privacyContext == null && !$sourceObject) || 
-		($this->privacyContext == null && $sourceObject && $sourceObject->getPrivacyContexts() == ''))
+		($this->privacyContext == null && $sourceObject && ($sourceObject->getPrivacyContexts() == null || $sourceObject->getPrivacyContexts() == '')))
 		{
 			if((($this->appearInList != KalturaAppearInListType::PARTNER_ONLY && $this->appearInList != null) || 
 			   ($this->appearInList == null && $sourceObject && $sourceObject->getDisplayInSearch() != DisplayInSearchType::PARTNER_ONLY))|| 
