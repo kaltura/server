@@ -39,6 +39,7 @@ class categoryKuserFilter extends baseObjectFilter
 				"_in_update_method",
 				"_likex_category_full_ids",
 				"_eq_category_full_ids",
+				"_category_direct_members",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name");
@@ -73,5 +74,10 @@ class categoryKuserFilter extends baseObjectFilter
 	public function setCategoryIdEqual($v)
 	{
 		$this->set('_eq_category_id', $v);
+	}
+	
+	public function setCategoryDirectMembers($v)
+	{
+		$this->set('_category_direct_members', $v);
 	}
 }

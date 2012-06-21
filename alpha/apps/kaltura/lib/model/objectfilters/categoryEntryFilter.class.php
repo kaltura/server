@@ -51,4 +51,9 @@ class categoryEntryFilter extends baseObjectFilter
 	{
 		$this->set('_eq_category_id', $v);
 	}
+	
+	public function setEntryIdEqaul($v)
+	{
+		$this->set('_eq_entry_id', $v);
+	}
 }

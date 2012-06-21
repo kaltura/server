@@ -53,6 +53,16 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		return self::doSelectOne($c);
 	}
 	
+	public static function retrieveByCategoryIdAndEntryIdNotRejected($categoryId, $entryId)
+	{
+		$c = new Criteria();
+		$c->add(self::CATEGORY_ID, $categoryId);
+		$c->add(self::ENTRY_ID, $entryId);
+		$c->add(self::STATUS, CategoryEntryStatus::REJECTED, Criteria::NOT_EQUAL);
+		
+		return self::doSelectOne($c);
+	}
+	
 	public static function retrieveActiveByEntryId($entryId)
 	{
 		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);

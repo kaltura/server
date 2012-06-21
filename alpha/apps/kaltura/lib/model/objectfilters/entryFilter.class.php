@@ -304,7 +304,7 @@ class entryFilter extends baseObjectFilter
 		
 		$statuses = explode(',', trim($statuses));
 		
-		$categoryFullNamesToIds = array();
+		$categoryFullIdsToIds = array();
 		foreach($cats as $cat)
 		{
 			$category = categoryPeer::retrieveByPK($cat);
@@ -313,13 +313,54 @@ class entryFilter extends baseObjectFilter
 
 			foreach ($statuses as $status)
 			{
-				$categoryFullNamesToIds[] = entry::CATEGORY_SEARCH_PERFIX . $category->getId() . ' ' .
+				$categoryFullIdsToIds[] = entry::CATEGORY_SEARCH_PERFIX . $category->getId() . ' ' .
 						entry::CATEGORY_SEARCH_STATUS . $status . ' ' .
 						entry::CATEGORY_SEARCH_PERFIX . $category->getId() ;
 			}
 		}
 
-		return implode(",", $categoryFullNamesToIds);
+		return implode(",", $categoryFullIdsToIds);
+	}
+	
+	/**
+	 * Convert the categories to categories ids
+	 * 
+	 * @param string $cats Categories full names
+	 * @param string $statuses comma seperated
+	 * @return string Categogories indexes ids
+	 */
+	public static function categoryIdsToAllSubCategoriesIdsParsed($cats, $statuses = null)
+	{
+		if ($cats === "")
+			$cats = array();
+		else
+			$cats = explode(",", $cats);
+		kArray::trim($cats);
+			
+		if($statuses == null || trim($statuses) == '')
+			$statuses = CategoryEntryStatus::ACTIVE;
+		
+		$statuses = explode(',', trim($statuses));
+		
+		$categoryFullIdsToIds = array();
+		foreach($cats as $cat)
+		{
+			$categories = categoryPeer::getByFullIdsWildcardMatchForCategoryId($cat);
+			if(!$categories)
+				continue;
+
+			foreach($categories as $category)
+			{
+				foreach ($statuses as $status)
+				{
+					$categoryFullIdsToIds[] = entry::CATEGORY_SEARCH_PERFIX . $category->getId() . ' ' .
+							entry::CATEGORY_SEARCH_STATUS . $status . ' ' .
+							entry::CATEGORY_SEARCH_PERFIX . $category->getId() ;
+				}
+			}
+		}
+
+		return implode(",", $categoryFullIdsToIds);
 	}
 	
 	/**

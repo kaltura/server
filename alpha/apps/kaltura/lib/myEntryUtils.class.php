@@ -442,7 +442,7 @@ class myEntryUtils
 		
 		$entry->setStatus ( entryStatus::DELETED ); 
 		
-		$entry->setCategories("");
+		//$entry->setCategories("");
 		
 		// make sure the moderation_status is set to moderation::MODERATION_STATUS_DELETE
 		$entry->setModerationStatus ( moderation::MODERATION_STATUS_DELETE ); 

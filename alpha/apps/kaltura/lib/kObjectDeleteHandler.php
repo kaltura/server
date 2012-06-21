@@ -109,6 +109,11 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			$flavorParamsOutput->setDeletedAt(time());
 			$flavorParamsOutput->save();
 		}
+		
+		$filter = new categoryEntryFilter();
+		$filter->setEntryIdEqaul($entry->getId());
+
+		kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
 	}
 	
 	/**

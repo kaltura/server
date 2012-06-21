@@ -999,8 +999,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_data" type="varchar" size="4096" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="enforce_entitlement" type="boolean" default="1" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy_context" type="varchar" size="255" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="kshow">
 			<reference local="kshow_id" foreign="id" />
 		</foreign-key>

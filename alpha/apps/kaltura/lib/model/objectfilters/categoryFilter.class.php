@@ -120,5 +120,39 @@ class categoryFilter extends baseObjectFilter
 	{
 		$this->set('_eq_inherited_parent_id', $v);
 	}
+	
+	public function setInheritanceTypeEqual($v)
+	{
+		$this->set('_eq_inheritance_type', $v);
+	}
+	
+	/**
+	 * Convert the categories to categories ids - not includes the category itself (only sub categories)
+	 * 
+	 * @param string $cats Categories full names
+	 * @param string $statuses comma seperated
+	 * @return string Comma seperated fullIds
+	 */
+	public static function categoryIdsToAllSubCategoriesIdsParsed($cats)
+	{
+		if ($cats === "")
+			$cats = array();
+		else
+			$cats = explode(",", $cats);
+		kArray::trim($cats);
+		
+		$categoryFullIdsToIds = array();
+		foreach($cats as $cat)
+		{
+			$categories = categoryPeer::getByFullIdsWildcardMatch($cat . '>'); //all sub categories and not the category itself
+			if(!$categories)
+				continue;
+
+			foreach($categories as $category)
+				$categoryFullIdsToIds[] = $category->getFullIds();
+		}
+
+		return implode(",", $categoryFullIdsToIds);
+	}
 }
 
