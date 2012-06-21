@@ -16,64 +16,46 @@ class KalturaBulkUploadResultEntry extends KalturaBulkUploadResult
      */
     public $title;
 
-
-	
 	/**
      * @var string
      */
     public $description;
 
-
-	
 	/**
      * @var string
      */
     public $tags;
 
-
-	
 	/**
      * @var string
      */
     public $url;
 
-
-	
 	/**
      * @var string
      */
     public $contentType;
 
-
-	
 	/**
      * @var int
      */
     public $conversionProfileId;
 
-
-	
 	/**
      * @var int
      */
     public $accessControlProfileId;
 
-
-	
 	/**
      * @var string
      */
     public $category;
 
-
-	
 	/**
      * @var int
      */
     public $scheduleStartDate;
 
-
-	
 	/**
      * @var int
      */
@@ -89,8 +71,6 @@ class KalturaBulkUploadResultEntry extends KalturaBulkUploadResult
      */
     public $thumbnailUrl;
 
-
-	
 	/**
      * @var bool
      */
@@ -126,6 +106,11 @@ class KalturaBulkUploadResultEntry extends KalturaBulkUploadResult
 	 */
 	public $entitledUsersPublish;	
 	
+	/**
+	 * @var string
+	 */
+	public $ownerId;
+	
     
     private static $mapBetweenObjects = array
 	(
@@ -150,6 +135,7 @@ class KalturaBulkUploadResultEntry extends KalturaBulkUploadResult
 		"creatorId",
 		"entitledUsersEdit",
 		"entitledUsersPublish",
+		"ownerId",
 	);
 	
     public function getMapBetweenObjects()
