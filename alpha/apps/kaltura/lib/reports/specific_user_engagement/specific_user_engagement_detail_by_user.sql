@@ -1,5 +1,4 @@
 SELECT 
-	e.entry_id,
 	entry_name,
 	e.unique_videos,
 	e.count_plays,

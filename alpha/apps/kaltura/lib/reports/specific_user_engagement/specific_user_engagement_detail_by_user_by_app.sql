@@ -1,5 +1,4 @@
-SELECT e.entry_id entry_id,
-	en.entry_name entry_name,
+SELECT en.entry_name entry_name,
 	unique_videos,
 	count_plays,
 	sum_time_viewed,
