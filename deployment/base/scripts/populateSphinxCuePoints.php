@@ -27,13 +27,14 @@ DbManager::initialize();
 $c = new Criteria();
 
 if($argc > 1 && is_numeric($argv[1]))
-	$c->add(CuePointPeer::ID, $argv[1], Criteria::GREATER_EQUAL);
+	$c->add(CuePointPeer::UPDATED_AT, $argv[1], Criteria::GREATER_EQUAL);
 if($argc > 2 && is_numeric($argv[2]))
 	$c->add(CuePointPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
 if($argc > 3 && is_numeric($argv[3]))
-	$c->add(CuePointPeer::UPDATED_AT, $argv[3], Criteria::GREATER_EQUAL);
+	$c->add(CuePointPeer::ID, $argv[3], Criteria::GREATER_EQUAL);
 
 $c->addAscendingOrderByColumn(CuePointPeer::UPDATED_AT);
+$c->addAscendingOrderByColumn(CuePointPeer::ID);
 $c->setLimit(10000);
 
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
@@ -62,4 +63,4 @@ while(count($entries))
 	$entries = CuePointPeer::doSelect($c, $con);
 }
 
-KalturaLog::log('Done');
+KalturaLog::log('Done. Cureent time: ' . time());
