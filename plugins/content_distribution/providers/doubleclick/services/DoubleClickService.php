@@ -118,13 +118,15 @@ class DoubleClickService extends KalturaBaseService
 		$feed->setSelfLink($this->getUrl($distributionProfileId, $hash, $page, $period, $stateLastEntryCreatedAt, $stateLastEntryIds));
 		if ($hasNextPage)
 			$feed->setNextLink($this->getUrl($distributionProfileId, $hash, $page + 1, $period, $nextPageStateLastEntryCreatedAt, $nextPageStateLastEntryIds));
-	
-		$cacheDir = kConf::get("global_cache_dir")."double_click/";	
+
+		$profileUpdatedAt = $profile->getUpdatedAt(null);
+		$cacheDir = kConf::get("global_cache_dir")."feeds/dist_$distributionProfileId/";	
 		foreach($entries as $entry)
 		{
 			// check cache
 			$cacheFileName = $cacheDir.myContentStorage::dirForId($entry->getIntId(), $entry->getId().".xml");
-			if (file_exists($cacheFileName) && $entry->getUpdatedAt(null) < filemtime($cacheFileName))
+			$updatedAt = max(profileUpdatedAt,  $entry->getUpdatedAt(null));
+			if (file_exists($cacheFileName) && $updatedAt < filemtime($cacheFileName))
 			{
 				$xml = file_get_contents($cacheFileName);
 			}
