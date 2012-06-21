@@ -661,6 +661,13 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		return $criterionFields;
 	}
 
+	/**
+	 * This function returns a list of fields that indicates whether the query should skip sphinx and go
+	 * directly to the database. For example, if a query on 'entry' contains entry.ID IN (...) going
+	 * through sphinx does not help (unless there is some textual match as well). In this case the function
+	 * should include entry.ID in the returned array.
+	 * @return array
+	 */
 	public function getSkipFields()
 	{
 		return array();
