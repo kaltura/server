@@ -147,8 +147,8 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 		    if($bulkUploadResult->partnerData)
 		    	$mediaEntry->partnerData = $bulkUploadResult->partnerData;
 		    	
-		    if($bulkUploadResult->creatorId)
-		    	$mediaEntry->creatorId = $bulkUploadResult->creatorId;
+		    if($bulkUploadResult->ownerId)
+		    	$mediaEntry->userId = $bulkUploadResult->ownerId;
 		    	
 		    if($bulkUploadResult->entitledUsersEdit)
 		    	$mediaEntry->entitledUsersEdit = $bulkUploadResult->entitledUsersEdit;
@@ -386,7 +386,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	    $ret = $this->getV2Columns();
 	    $ret[] = 'entryId';
 	    $ret[] = 'action';
-	    $ret[] = 'creatorId';
+	    $ret[] = 'ownerId';
 	    $ret[] = 'entitledUsersEdit';
 	    $ret[] = 'entitledUsersPublish';
 	    
