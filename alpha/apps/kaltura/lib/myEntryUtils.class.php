@@ -1056,6 +1056,9 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		// save the entry
  		$newEntry->save();
  		
+ 		//we must flush events to sync categories to sphinx. if categories are not synced - then they might be duplicated, if 2 entries are assign to the same category.
+ 		kEventsManager::flushEvents();
+ 		
  		// restore the original partner id in the default category criteria filter
 		$defaultCategoryFilter->remove(categoryPeer::PARTNER_ID);
  		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $oldPartnerId);
