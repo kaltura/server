@@ -414,9 +414,9 @@ class category extends Basecategory implements IIndexable
 			return;
 		}
 		
-		if($this->getDeletedAt(null))
+		if($this->getStatus() == CategoryStatus::PURGED)
 		{
-			KalturaLog::debug("Category already deleted");
+			KalturaLog::debug("Category already purged at [" . $this->getDeletedAt() . "]");
 			return;
 		}
 		
