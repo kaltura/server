@@ -98,7 +98,7 @@ class PermissionPeer extends BasePermissionPeer
 	public static function enableForPartner($permissionName, $permissionType, $partnerId = null, $friendlyName = null, $description = null)
 	{
 		if(is_null($partnerId))
-			$partnerId = kCurrentContext::$ks_partner_id;
+			$partnerId = (kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id);
 			
 		$permission = new Permission();
 		$permission->setName($permissionName);
