@@ -153,6 +153,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 		while(count($categoryEntriesList->objects))
 		{
 			$this->kClient->startMultiRequest();
+			$entryIds = array();
 			foreach($categoryEntriesList->objects as $oldCategoryEntry)
 			{
 				/* @var $categoryEntry KalturaCategoryEntry */
@@ -160,25 +161,28 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 				$newCategoryEntry->entryId = $oldCategoryEntry->entryId;
 				$newCategoryEntry->categoryId = $data->destCategoryId;
 				$this->kClient->categoryEntry->add($newCategoryEntry);
+				$entryIds[] = $oldCategoryEntry->entryId;
 			}
 			$addedCategoryEntriesResults = $this->kClient->doMultiRequest();
 	
 			$this->kClient->startMultiRequest();
-			foreach($addedCategoryEntriesResults as $addedCategoryEntryResult)
+			foreach($addedCategoryEntriesResults as $index => $addedCategoryEntryResult)
 			{
-				if($addedCategoryEntryResult instanceof Exception)
-				{
-					if(!($addedCategoryEntryResult instanceof KalturaException) || $addedCategoryEntryResult->getCode() != self::CATEGORY_ENTRY_ALREADY_EXISTS)
-						throw $addedCategoryEntryResult;
-				}
+				if(		is_array($addedCategoryEntryResult) 
+					&&	isset($addedCategoryEntryResult['code']) 
+					&& 	$addedCategoryEntryResult['code'] != 'CATEGORY_ENTRY_ALREADY_EXISTS'
+				)
+					continue;
 					
 				if($data->copyOnly)
 					continue;
 					
 				if($addedCategoryEntryResult instanceof KalturaCategoryEntry)
-					$this->kClient->categoryEntry->delete($addedCategoryEntryResult->entryId, $srcCategoryId);
+					$this->kClient->categoryEntry->delete($entryIds[$index], $srcCategoryId);
 			}
 			$deletedCategoryEntriesResults = $this->kClient->doMultiRequest();
+			if(is_null($deletedCategoryEntriesResults))
+				$deletedCategoryEntriesResults = array();
 			
 			foreach($deletedCategoryEntriesResults as $deletedCategoryEntryResult)
 			{
