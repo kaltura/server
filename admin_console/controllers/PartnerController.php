@@ -49,6 +49,11 @@ class PartnerController extends Zend_Controller_Action
 				$config->storageServePriority = Kaltura_Client_Enum_StorageServePriority::EXTERNAL_FIRST;
 				$systemPartnerPlugin->systemPartner->updateConfiguration('{1:result:id}', $config);
 				
+				// set request timeout
+				$clientConfig = $client->getConfig();
+				$clientConfig->curlTimeout = 300;
+				$client->setConfig($clientConfig);
+				
 				// do multirequest
 				$result = $client->doMultiRequest();
 				
