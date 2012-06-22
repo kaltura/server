@@ -508,8 +508,7 @@ class myReportsMgr
 			$has_object_ids = false;
 			if ($input_filter instanceof endUserReportsInputFilter) 
 				$has_object_ids = $input_filter->categories;
-			$has_object_id = $has_object_ids || $object_ids;
-				
+			$has_object_ids = $has_object_ids || $object_ids;	
 			if ( is_numeric( $report_type ))
 			{
 				$file_path = myReportsSqlFileMgr::getSqlFilePath( 
