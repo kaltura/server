@@ -97,7 +97,13 @@ abstract class KBulkUploadEngine
 		    $constants[$constant] = strval($val);
 		}
 		
-		return in_array($value, $constants);
+		if(!in_array($value, $constants))
+		{
+			KalturaLog::debug("Value [$value] not found in class [$class] constants [" . print_r($constants, true) . "]");
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/**
