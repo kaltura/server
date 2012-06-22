@@ -125,7 +125,7 @@ class DoubleClickService extends KalturaBaseService
 		{
 			// check cache
 			$cacheFileName = $cacheDir.myContentStorage::dirForId($entry->getIntId(), $entry->getId().".xml");
-			$updatedAt = max(profileUpdatedAt,  $entry->getUpdatedAt(null));
+			$updatedAt = max($profileUpdatedAt,  $entry->getUpdatedAt(null));
 			if (file_exists($cacheFileName) && $updatedAt < filemtime($cacheFileName))
 			{
 				$xml = file_get_contents($cacheFileName);
