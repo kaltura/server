@@ -143,18 +143,25 @@ class KalturaBulkUploadResultEntry extends KalturaBulkUploadResult
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
 	}
 	
+    /* (non-PHPdoc)
+     * @see KalturaBulkUploadResult::toInsertableObject()
+     */
     public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
+		return parent::toInsertableObject(new BulkUploadResultEntry(), $props_to_skip);
+	}
+	
+    /* (non-PHPdoc)
+     * @see KalturaObject::toObject()
+     */
+    public function toObject($object_to_fill = null, $props_to_skip = array())
+	{
 		if ($this->entryId)
-		{
 		    $this->objectId = $this->entryId;
-		}
 		
 		if ($this->entryStatus)
-		{
 		    $this->objectStatus = $this->entryStatus;
-		}
 		
-		return parent::toInsertableObject(new BulkUploadResultEntry(), $props_to_skip);
+		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 }

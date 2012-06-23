@@ -81,12 +81,18 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
 	    "tags",
 	);
 	
+    /* (non-PHPdoc)
+     * @see KalturaBulkUploadResult::getMapBetweenObjects()
+     */
     public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
 	}
 	
-    public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
+    /* (non-PHPdoc)
+     * @see KalturaBulkUploadResult::toInsertableObject()
+     */
+    public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 	    if (!is_numeric($this->objectId))
 	    {
@@ -96,5 +102,20 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
 	    }
 	    
 		return parent::toInsertableObject(new BulkUploadResultKuser(), $props_to_skip);
+	}
+
+    /* (non-PHPdoc)
+     * @see KalturaObject::toObject()
+     */
+    public function toObject($object_to_fill = null, $props_to_skip = array())
+	{
+	    if (!is_numeric($this->objectId))
+	    {
+	        $kuser = kuserPeer::getKuserByPartnerAndUid($this->partnerId, $this->objectId);
+	        if ($kuser)
+                $this->objectId = $kuser->getId();	            
+	    }
+	    
+		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 }
