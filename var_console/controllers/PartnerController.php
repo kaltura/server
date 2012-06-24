@@ -239,8 +239,8 @@ class PartnerController extends Zend_Controller_Action
 		//$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		$paginatorAdapter = new Infra_FilterPaginator($client->partner, "listPartnersForUser", null);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
-//		if ($paginator->getItemsCount() == 1)
-//		    $this->_helper->redirector('list', 'partner');
+		if ($paginator->getItemsCount() == 1)
+		    $this->_helper->redirector('list', 'partner');
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		
