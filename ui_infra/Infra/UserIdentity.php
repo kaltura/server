@@ -40,15 +40,22 @@ class Infra_UserIdentity
 	private $timezoneOffset;
 	
 	/**
+	 * @var string
+	 */
+	private $password;
+	
+	/**
 	 * Init a new UserIdentity instance with the given parameters
 	 * @param Kaltura_Client_Type_User $user
 	 * @param string $ks
 	 */
-	public function __construct(Kaltura_Client_Type_User $user, $ks, $timezoneOffset)
+	public function __construct(Kaltura_Client_Type_User $user, $ks, $timezoneOffset, $password = null)
 	{
 		$this->user = $user;
 		$this->ks = $ks;
 		$this->timezoneOffset = $timezoneOffset;
+		if ($password)
+		    $this->password = $password;
 	}
 	
 	/**
