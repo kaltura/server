@@ -515,7 +515,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		}
 	
 		// partner is set to free trail package
-		if(!$object->partnerPackage == PartnerController::PARTNER_PACKAGE_FREE)
+		if(intval($object->partnerPackage) == PartnerController::PARTNER_PACKAGE_FREE)
 		{
 			if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-packages-service-paid')))
 			{
