@@ -148,7 +148,12 @@ class categoryFilter extends baseObjectFilter
 			if(!$category)
 				continue;
 
-			$categoryFullIdsToIds[] = $category->getFullIds();
+			$categories = categoryPeer::getByFullIdsWildcardMatch($category->getFullIds() . '>'); //all sub categories and not the category itself
+			if(!$categories)
+				continue;
+
+			foreach($categories as $category)
+				$categoryFullIdsToIds[] = $category->getFullIds();
 		}
 
 		return implode(",", $categoryFullIdsToIds);
