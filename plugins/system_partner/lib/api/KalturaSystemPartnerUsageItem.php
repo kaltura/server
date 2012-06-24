@@ -118,6 +118,24 @@ class KalturaSystemPartnerUsageItem extends KalturaObject
 	public $storage;
 	
 	/**
+	 * The peak amount of storage consumption during the given date range for the specific publisher
+	 * @var float
+	 */
+	public $peakStorage;
+	
+	/**
+	 * The average amount of storage consumption during the given date range for the specific publisher
+	 * @var float
+	 */
+	public $avgStorage;
+	
+	/**
+	 * The combined amount of bandwidth and storage consumed during the given date range for the specific publisher
+	 * @var float
+	 */
+	public $combinedBandwidthStorage;
+	
+	/**
 	 * Enter description here...
 	 * @param string $header - comma separated fields names	
 	 * @param string $str - comma separated fields
@@ -144,7 +162,10 @@ class KalturaSystemPartnerUsageItem extends KalturaObject
 			$item->mixEntriesCount	 = @$arr[12];
 			$item->bandwidth 		= @$arr[13];
 			$item->storage 		= @$arr[14];
-			$item->totalStorage 	= @$arr[15];
+			//$item->totalStorage 	= @$arr[15];
+			$item->peakStorage = @$arr[15];
+			$item->avgStorage = @$arr[16];
+			$item->combinedBandwidthStorage = @$arr[17];
 		
 		return $item;
 	}
