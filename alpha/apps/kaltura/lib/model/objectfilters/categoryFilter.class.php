@@ -144,12 +144,11 @@ class categoryFilter extends baseObjectFilter
 		$categoryFullIdsToIds = array();
 		foreach($cats as $cat)
 		{
-			$categories = categoryPeer::getByFullIdsWildcardMatch($cat . '>'); //all sub categories and not the category itself
-			if(!$categories)
+			$category = categoryPeer::retrieveByPK($cat); //all sub categories and not the category itself
+			if(!$category)
 				continue;
 
-			foreach($categories as $category)
-				$categoryFullIdsToIds[] = $category->getFullIds();
+			$categoryFullIdsToIds[] = $category->getFullIds();
 		}
 
 		return implode(",", $categoryFullIdsToIds);
