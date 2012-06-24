@@ -51,8 +51,6 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		$settings = Zend_Registry::get('config')->settings;
 		$partnerId = $settings->partnerId;
 		
-		$requiredPermissions= $settings->requiredPermissions;
-		
 		$client = Infra_ClientHelper::getClient();
 		$client->setKs(null);
 		
@@ -64,9 +62,10 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		try
 		{
 			//New logic - if specific permissions are required to authenticate the partner/user, check their existence here.
-    		$requiredPermissionsArr = explode(",", $requiredPermissions);
-    		if ($requiredPermissionsArr && count($requiredPermissionsArr))
+    		
+    		if (isset($settings->requiredPermissions))
     		{
+    		    $requiredPermissionsArr = explode(",", $settings->requiredPermissions);
     			$userPartners = $client->partner->listPartnersForUser();
     			
     			$authorizedPartnerId = null;
