@@ -25,7 +25,8 @@ class kFieldMatchCondition extends kMatchCondition
 	 */
 	public function getFieldValue(accessControl $accessControl)
 	{
-		return $this->field->getFieldValue($accessControl->getScope());
+		$this->field->setScope($accessControl->getScope());
+		return $this->field->getValue();
 	}
 	
 	/**
