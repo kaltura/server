@@ -6,6 +6,17 @@
  */
 class ReportAdminService extends KalturaBaseService
 {
+    /* (non-PHPdoc)
+     * @see KalturaBaseService::initService()
+     */
+    public function initService($serviceId, $serviceName, $actionName)
+    {
+        parent::initService($serviceId, $serviceName, $actionName);
+
+		if(!AdminConsolePlugin::isAllowedPartner($this->getPartnerId()))
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+	}
+    
 	/**
 	 * @action add
 	 * @param KalturaReport $report
