@@ -131,5 +131,13 @@ class Infra_UserIdentity
     {
         return $this->timezoneOffset;
     }
+	/**
+     * @return the $password
+     */
+    public function getPassword ()
+    {
+        return $this->password;
+    }
+
 
 }
