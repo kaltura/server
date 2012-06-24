@@ -3,7 +3,7 @@
  * @package plugins.ideticDistribution
  * @subpackage lib
  */
-class IdeticDistributionProviderType extends KalturaDistributionProviderType
+class IdeticDistributionProviderType implements IKalturaPluginEnum, DistributionProviderType
 {
 	const IDETIC = 'IDETIC';
 	
