@@ -15,7 +15,7 @@ class CategoryEntryService extends KalturaBaseService
 	}
 	
 	/**
-	 * Add new CategoryUser
+	 * Add new CategoryEntry
 	 * 
 	 * @action add
 	 * @param KalturaCategoryEntry $categoryEntry
@@ -88,7 +88,7 @@ class CategoryEntryService extends KalturaBaseService
 	}
 	
 	/**
-	 * Delete CategoryUser
+	 * Delete CategoryEntry
 	 * 
 	 * @action delete
 	 * @param string $entryId
