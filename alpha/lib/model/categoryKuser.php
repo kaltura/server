@@ -36,8 +36,10 @@ class categoryKuser extends BasecategoryKuser {
 			return;
 
 		parent::setPuserId($puserId);
+		
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			
-		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id, $puserId);
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
 			
@@ -70,7 +72,7 @@ class categoryKuser extends BasecategoryKuser {
 	 * @param PropelPDO $con
 	 * @return bloolean
 	 */
-	public function postSave(PropelPDO $con = null)
+	public function preSave(PropelPDO $con = null)
 	{
 		$category = categoryPeer::retrieveByPK($this->category_id);
 		if(!$category)
@@ -105,7 +107,7 @@ class categoryKuser extends BasecategoryKuser {
 		
 		$this->addIndexCategoryInheritedTreeJob($category->getFullIds());
 		
-		return parent::postSave();
+		return parent::preSave($con);
 	}
 	
 	public function addIndexCategoryInheritedTreeJob($fullIdsStartsWithCategoryId)
