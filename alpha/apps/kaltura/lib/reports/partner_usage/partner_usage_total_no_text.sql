@@ -15,7 +15,7 @@ WHERE
 (SELECT 
 	MAX(IFNULL(aggr_storage_mb,0)) peak_storage,
 	SUM(IFNULL(aggr_storage_mb,0))/(DATEDIFF({TO_DATE_ID},{FROM_DATE_ID}) + 1) avg_storage,
-	MAX(IFNULL(count_storage_mb,0)) added_storage
+	SUM(IFNULL(count_storage_mb,0)) added_storage
 FROM 
 	kalturadw.dwh_hourly_partner_usage
 WHERE
