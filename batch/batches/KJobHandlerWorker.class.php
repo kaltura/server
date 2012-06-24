@@ -213,7 +213,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 	protected function getQueueFilter($jobType)
 	{
 		$workerQueueFilter = $this->getBaseQueueFilter($jobType);
-		$workerQueueFilter->filter->statusIn = KalturaBatchJobStatus::PENDING . ',' . KalturaBatchJobStatus::RETRY;
+		//$workerQueueFilter->filter->statusIn = KalturaBatchJobStatus::PENDING . ',' . KalturaBatchJobStatus::RETRY;
 		
 		return $workerQueueFilter;
 	}
