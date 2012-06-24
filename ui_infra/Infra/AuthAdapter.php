@@ -49,7 +49,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 			return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
 		
 		$settings = Zend_Registry::get('config')->settings;
-		$authorizedPartnerId = $settings->partnerId;
+		$partnerId = $settings->partnerId;
 		
 		$requiredPermissions= $settings->requiredPermissions;
 		
@@ -57,26 +57,35 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		$client->setKs(null);
 		try
 		{
-			$ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId ? $this->partnerId : $authorizedPartnerId);
+			//New logic - if specific permissions are required to authenticate the partner/user, check their existence here.
+			$requiredPermissionsArr = explode(",", $requiredPermissions);
+			$userPartners = $client->partner->listPartnersForUser();
+			
+			$authorizedPartnerId = null;
+			foreach ($userPartners as $userPartner)
+			{
+			    $authorizedPartnerId = $userPartner->id;
+			    foreach ($requiredPermissionsArr as $requiredPermission)
+			    {
+			        $permissionFilter = new Kaltura_Client_Type_PermissionFilter();
+			        $permissionFilter->nameEqual = $requiredPermission;
+			        $permissionFilter->partnerIdEqual = $userPartner->id;
+			        $permissions = $client->permission->list($permissionFilter, new Kaltura_Client_Type_FilterPager());
+			        if (!$permissions->totalCount)
+			        {
+			            $authorizedPartnerId = null;
+			            break;
+			        }
+			    }
+			    
+			}
+			
+		    $ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId ? $this->partnerId : $authorizedPartnerId);
 			$client->setKs($ks);
-			$user = $client->user->getByLoginId($this->username, $this->partnerId ? $this->partnerId : $authorizedPartnerId);
+			$user = $client->user->getByLoginId($this->username, $partnerId ? $partnerId : $authorizedPartnerId);
 			$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset);
 			if ($authorizedPartnerId && $user->partnerId != $authorizedPartnerId) {
 				throw new Exception('SYSTEM_USER_INVALID_CREDENTIALS');
-			}
-
-			//New logic - if specific permissions are required to authenticate the partner/user, check their existence here.
-			$requiredPermissionsArr = explode(",", $requiredPermissions);
-			foreach ($requiredPermissionsArr as $requiredPermission)
-			{
-			    $filter = new Kaltura_Client_Type_PermissionFilter();
-			    $filter->nameEqual = $requiredPermission;
-			    $existingPermissions = $client->permission->listAction($filter);
-			    KalturaLog::debug("permissions total count: ".$existingPermissions->totalCount);
-			    if ( !$existingPermissions->totalCount )
-			    {
-			        return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
-			    }
 			}
 			
 			return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
