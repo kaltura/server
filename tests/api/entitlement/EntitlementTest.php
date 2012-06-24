@@ -662,9 +662,9 @@ class EntitlementTest extends EntitlementTestBase
 		{
 			KalturaLog::err('Error: line:' . __LINE__ .' ' . $ex->getMessage());
 			
-			if ($ex->getCode() != 'CATEGORY_NOT_FOUND' && $category->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
+			if ($ex->getCode() == 'CATEGORY_NOT_FOUND' && ($category->privacyContext != '' || $category->privacyContext != null))
 			{			
-				$this->assertTrue(true, 'Category is members only and cannot get this entry: ' . $ex->getMessage());
+				$this->assertTrue(true, 'Category is set with a diffrenet privacy contexts: ' . $ex->getMessage());
 			}
 			elseif($category->contributionPolicy != KalturaContributionPolicyType::ALL)
 			{
@@ -750,7 +750,7 @@ class EntitlementTest extends EntitlementTestBase
 		
 		/* @var $category KalturaCategory */
 		$category1->name = $category1->name . rand();
-		
+		$category2->name = $category2->name . rand();
 		try {
 			$category1Response = $this->client->category->add($category1);
 		}
