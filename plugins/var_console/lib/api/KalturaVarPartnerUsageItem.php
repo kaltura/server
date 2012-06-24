@@ -118,6 +118,24 @@ class KalturaVarPartnerUsageItem extends KalturaObject
 	public $storage;
 	
 	/**
+	 * The peak amount of storage consumption during the given date range for the specific publisher
+	 * @var float
+	 */
+	public $peakStorage;
+	
+	/**
+	 * The average amount of storage consumption during the given date range for the specific publisher
+	 * @var float
+	 */
+	public $avgStorage;
+	
+	/**
+	 * The combined amount of bandwidth and storage consumed during the given date range for the specific publisher
+	 * @var float
+	 */
+	public $combinedStorageBandwidth;
+	
+	/**
 	 * Enter description here...
 	 * @param string $header - comma separated fields names	
 	 * @param string $str - comma separated fields
@@ -129,23 +147,26 @@ class KalturaVarPartnerUsageItem extends KalturaObject
 		
 		$item = new KalturaVarPartnerUsageItem();
 		
-			$item->partnerStatus 	= @$arr[0];
-			$item->partnerId  		= @$arr[1];
-			$item->partnerName 		= @$arr[2];
-			$item->partnerCreatedAt = @$arr[3];
-			$item->partnerPackage	= @$arr[4];
-			$item->views 			= @$arr[5];
-			$item->plays 			= @$arr[6];
-			$item->entriesCount 	= @$arr[7];
-			$item->totalEntriesCount = @$arr[8];
-			$item->videoEntriesCount = @$arr[9];
-			$item->imageEntriesCount = @$arr[10];
-			$item->audioEntriesCount = @$arr[11];
-			$item->mixEntriesCount	 = @$arr[12];
-			$item->bandwidth 		= @$arr[13];
-			$item->storage 		= @$arr[14];
-			$item->totalStorage 	= @$arr[15];
-		
+		$item->partnerStatus 	= @$arr[0];
+		$item->partnerId  		= @$arr[1];
+		$item->partnerName 		= @$arr[2];
+		$item->partnerCreatedAt = @$arr[3];
+		$item->partnerPackage	= @$arr[4];
+		$item->views 			= @$arr[5];
+		$item->plays 			= @$arr[6];
+		$item->entriesCount 	= @$arr[7];
+		$item->totalEntriesCount = @$arr[8];
+		$item->videoEntriesCount = @$arr[9];
+		$item->imageEntriesCount = @$arr[10];
+		$item->audioEntriesCount = @$arr[11];
+		$item->mixEntriesCount	 = @$arr[12];
+		$item->bandwidth 		= @$arr[13];
+		$item->storage 		= @$arr[14];
+		//$item->totalStorage 	= @$arr[15];
+		$item->peakStorage =  @$arr[15];
+        $item->avgStorage = @$arr[16];
+        $item->combinedStorageBandwidth = @$arr[17];
+			
 		return $item;
 	}
 	
