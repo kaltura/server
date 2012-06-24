@@ -55,36 +55,51 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		
 		$client = Infra_ClientHelper::getClient();
 		$client->setKs(null);
+		
+		$ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId ? $this->partnerId : $authorizedPartnerId);
+		$client->setKs($ks);
+		$user = $client->user->getByLoginId($this->username, $partnerId);
+
+		
 		try
 		{
 			//New logic - if specific permissions are required to authenticate the partner/user, check their existence here.
-			$requiredPermissionsArr = explode(",", $requiredPermissions);
-			$userPartners = $client->partner->listPartnersForUser();
-			
-			$authorizedPartnerId = null;
-			foreach ($userPartners as $userPartner)
-			{
-			    $authorizedPartnerId = $userPartner->id;
-			    foreach ($requiredPermissionsArr as $requiredPermission)
-			    {
-			        $permissionFilter = new Kaltura_Client_Type_PermissionFilter();
-			        $permissionFilter->nameEqual = $requiredPermission;
-			        $permissionFilter->partnerIdEqual = $userPartner->id;
-			        $permissions = $client->permission->list($permissionFilter, new Kaltura_Client_Type_FilterPager());
-			        if (!$permissions->totalCount)
-			        {
-			            $authorizedPartnerId = null;
-			            break;
-			        }
-			    }
-			    
-			}
-			
-		    $ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId ? $this->partnerId : $authorizedPartnerId);
-			$client->setKs($ks);
-			$user = $client->user->getByLoginId($this->username, $partnerId ? $partnerId : $authorizedPartnerId);
+    		$requiredPermissionsArr = explode(",", $requiredPermissions);
+    		if ($requiredPermissionsArr && count($requiredPermissionsArr))
+    		{
+    			$userPartners = $client->partner->listPartnersForUser();
+    			
+    			$authorizedPartnerId = null;
+    			foreach ($userPartners as $userPartner)
+    			{
+    			    $authorizedPartnerId = $userPartner->id;
+    			    foreach ($requiredPermissionsArr as $requiredPermission)
+    			    {
+    			        $permissionFilter = new Kaltura_Client_Type_PermissionFilter();
+    			        $permissionFilter->nameEqual = $requiredPermission;
+    			        $permissionFilter->partnerIdEqual = $userPartner->id;
+    			        $permissions = $client->permission->list($permissionFilter, new Kaltura_Client_Type_FilterPager());
+    			        if (!$permissions->totalCount)
+    			        {
+    			            $authorizedPartnerId = null;
+    			            break;
+    			        }
+    			    }
+    			    
+    			}
+    			
+    			if (!$authorizedPartnerId)
+    			{
+    			    throw new Exception('SYSTEM_USER_INVALID_CREDENTIALS');
+    			}
+    			
+    		    $ks = $client->user->loginByLoginId($this->username, $this->password, $authorizedPartnerId);
+    			$client->setKs($ks);
+    			$user = $client->user->getByLoginId($this->username, $authorizedPartnerId);
+    		}
+    		
 			$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset);
-			if ($authorizedPartnerId && $user->partnerId != $authorizedPartnerId) {
+			if ($partnerId && $user->partnerId != $partnerId) {
 				throw new Exception('SYSTEM_USER_INVALID_CREDENTIALS');
 			}
 			
