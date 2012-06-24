@@ -76,6 +76,11 @@ class categoryKuserFilter extends baseObjectFilter
 		$this->set('_eq_category_id', $v);
 	}
 	
+	public function setUserIdEqual($v)
+	{
+		$this->set('_eq_user_id', $v);
+	}
+	
 	public function setCategoryDirectMembers($v)
 	{
 		$this->set('_category_direct_members', $v);
