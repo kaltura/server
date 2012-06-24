@@ -25,6 +25,20 @@ class BulkUploadResultPeer extends BaseBulkUploadResultPeer
 		
 		return self::doSelect($criteria);
 	}
+    
+	/**
+	 * @param int $bulkUploadId
+	 * @param int $index
+	 * @return BulkUploadResult
+	 */
+	public static function retrieveByBulkUploadIdAndIndex($bulkUploadId, $index)
+	{
+		$criteria = new Criteria();
+		$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $bulkUploadId);
+		$criteria->add(BulkUploadResultPeer::LINE_INDEX, $index);
+		
+		return self::doSelectOne($criteria);
+	}
 	
 	
 	
