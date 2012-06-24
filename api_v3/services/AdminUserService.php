@@ -5,6 +5,7 @@
  * @service adminUser
  * @package api
  * @subpackage services
+ * @deprecated use user service instead
  */
 class AdminUserService extends KalturaBaseUserService 
 {
