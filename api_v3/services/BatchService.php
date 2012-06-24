@@ -48,7 +48,7 @@ class BatchService extends KalturaBaseService
 			
 		$bulkUploadResult->pluginsData = $pluginDataArray;
 		
-		$dbBulkUploadResult = BulkUploadResultPeer::$index($bulkUploadResult->bulkUploadJobId, $bulkUploadResult->lineIndex);
+		$dbBulkUploadResult = BulkUploadResultPeer::retrieveByBulkUploadIdAndIndex($bulkUploadResult->bulkUploadJobId, $bulkUploadResult->lineIndex);
 		if($dbBulkUploadResult)
 			$dbBulkUploadResult = $bulkUploadResult->toUpdatableObject($dbBulkUploadResult);
 		else
