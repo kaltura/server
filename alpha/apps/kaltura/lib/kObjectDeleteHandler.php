@@ -28,6 +28,9 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		if($object instanceof conversionProfile2)
 			return true;
 			
+		if($object instanceof kuser)
+			return true;
+			
 		return false;
 	}
 	
@@ -56,6 +59,9 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			
 		if($object instanceof conversionProfile2)
 			$this->conversionProfileDeleted($object);
+			
+		if($object instanceof kuser)
+			$this->kuserDelete($object);
 			
 		return true;
 	}
@@ -114,6 +120,14 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		$filter->setEntryIdEqaul($entry->getId());
 
 		kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
+	}
+	
+	protected function kuserDelete(kuser $kuser)
+	{
+		$filter = new categoryKuserFilter();
+		$filter->setUserIdEqual($kuser->getId());
+
+		kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 	}
 	
 	/**

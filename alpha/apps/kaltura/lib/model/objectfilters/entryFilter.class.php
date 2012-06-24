@@ -344,7 +344,7 @@ class entryFilter extends baseObjectFilter
 		
 		$categoryFullIdsToIds = array();
 		foreach($cats as $cat)
-		{
+		{				
 			$categories = categoryPeer::getByFullIdsWildcardMatchForCategoryId($cat);
 			if(!$categories)
 				continue;

@@ -157,6 +157,8 @@ class categoryPeer extends BasecategoryPeer
 			return null;
 			
 		$category = categoryPeer::retrieveByPK($id);
+		if(!$category)
+			return null;
 		
 		$fullIds = $category->getFullIds();
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 

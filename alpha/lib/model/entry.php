@@ -2217,12 +2217,21 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if (!$this->is_categories_modified)
 			return;
 		
-		list($categories, $categoriesIds) = categoryEntryPeer::syncEntriesCategories($this);
-	
-		parent::setCategories ( $categories );
-		parent::setCategoriesIds ( $categoriesIds );
+		if(!kEntitlementUtils::getEntitlementEnforcement())
+			categoryEntryPeer::syncEntriesCategories($this);
+		
 		parent::save ();
 		$this->is_categories_modified = false;
+	}
+	
+	public function parentSetCategories ( $categories )
+	{
+		parent::setCategories ( $categories );
+	}
+	
+	public function parentSetCategoriesIds ( $categoriesIds )
+	{
+		parent::setCategoriesIds ( $categoriesIds );
 	}
 	
 	public function isScheduledNow($time = null)

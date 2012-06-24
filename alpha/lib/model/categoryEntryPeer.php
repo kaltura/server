@@ -90,8 +90,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 	}
 		
 	public static function syncEntriesCategories(entry $entry)
-	{					 
-		//TODO save on entry only with no privacy context 
+	{					 		
 		self::$skipEntrySave = true;
 		
 		if($entry->getNewCategories() != null && $entry->getNewCategories() !== "")
@@ -111,6 +110,10 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 
 		foreach ($dbCategories as $dbCategory)
 		{
+			//skip categoy with privacy contexts.
+			if($dbCategory->getPrivacyContexts() != null && $dbCategory->getPrivacyContexts() != '')
+				continue;
+				
 			$newCats[] = $dbCategory->getFullName();
 		}
 		
@@ -270,10 +273,8 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		}
 		self::$skipEntrySave = false;
 		
-		$categories = implode ( ",", $allCats);
-		$categoriesIds = implode (',', $allIds);
-		return array($categories, $categoriesIds);
-		
+		$entry->parentSetCategories ( implode ( ",", $allCats) );
+		$entry->parentSetCategoriesIds ( implode (',', $allIds) );	
 	} 
 	
 	public static function setDefaultCriteriaFilter ()
