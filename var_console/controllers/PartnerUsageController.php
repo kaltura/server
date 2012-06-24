@@ -110,8 +110,11 @@ class PartnerUsageController extends Zend_Controller_Action
 				$this->view->translate('partner-usage table audioEntriesCount'), ',',
 				$this->view->translate('partner-usage table mixEntriesCount'), ',',
 				$this->view->translate('partner-usage table bandwidth'), ',',
-				$this->view->translate('partner-usage table totalStorage'), ',',
+				//$this->view->translate('partner-usage table totalStorage'), ',',
 				$this->view->translate('partner-usage table storage'),
+				$this->view->translate('partner-usage table peakStorage'),
+				$this->view->translate('partner-usage table avgStorage'),
+				$this->view->translate('partner-usage table combinedBandwidthStorage'),
 				"\r\n";
 
 		// echo the csv data
@@ -132,8 +135,11 @@ class PartnerUsageController extends Zend_Controller_Action
 					(int)$item->audioEntriesCount, ',',
 					(int)$item->mixEntriesCount, ',',
 					(int)$item->bandwidth, ',',
-					(int)$item->totalStorage, ',',
+					//(int)$item->totalStorage, ',',
 					(int)$item->storage,
+					(int)$item->peakStorage,
+					(int)$item->avgStorage,
+					(int)$item->combinedStorageBandwidth,
 					"\r\n";
 		}
 	}
