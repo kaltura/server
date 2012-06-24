@@ -300,16 +300,26 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 	 * @param KalturaSessionType $type
 	 * @param string $userId
 	 */
-	protected function startSession($client, $type = null, $userId = null)
+	protected function startSession($client, $type = null, $userId = null, $privileges = null)
 	{
 		$testConfig = $this->config->get('config');
 		
+		if (is_null($privileges))
+			$privileges = $testConfig->privileges;
+		
 		//$ks = $this->client->session->start($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
-		$ks = $client->generateSession($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
+		$ks = $client->generateSession($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $privileges);
 		if (!$ks)
 			return false;
 		
 		$client->setKs($ks);
+		KalturaLog::debug('$testConfig->secret: ' . print_r($testConfig->secret, true) . 
+		' user id: ' . print_r($testConfig->userId,true) . 
+		' session type: ' . print_r($testConfig->sessionType, true) . 
+		' $testConfig->partnerId: ' . $testConfig->partnerId . 
+		' expiry: ' . print_r($testConfig->expiry, true) . 
+		' privileges: ' . print_r($privileges,true));
+		
 		KalturaLog::info("Session started [$ks]");
 		return true;
 	}
@@ -319,16 +329,20 @@ class KalturaApiTestCase extends KalturaTestCaseApiBase implements IKalturaLogge
 	 * @param KalturaSessionType $type
 	 * @param string $userId
 	 */
-	protected function startSessionWithDiffe($type, $userId, $privileges = '')
+	protected function startSessionWithDiffe($type, $userId, $privileges = null)
 	{
 		$testConfig = $this->config->get('config');
 		
 		$secret = $testConfig->secret;
 		if ($type == SessionType::ADMIN)
 			$secret = $testConfig->userSecret;
+			
+		if(is_null($privileges))
+			$privileges = $testConfig->privilege;
  			
-		$ks = $this->client->generateSession($secret, $userId, $type, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
-
+		$ks = $this->client->generateSession($secret, $userId, $type, $testConfig->partnerId, $testConfig->expiry, $privileges);
+		KalturaLog::debug('Generate session for ks with privileges: ' . print_r($privileges,true) . ' ks: ' . $ks);
+		
 		if (!$ks)
 			return false;
 		
