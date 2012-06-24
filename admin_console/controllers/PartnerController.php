@@ -22,7 +22,15 @@ class PartnerController extends Zend_Controller_Action
 		$partner = Zend_Registry::get('config')->partner;
 		$allowNonePackage = isset($partner->enableNonePackage) ? $partner->enableNonePackage : false;
 		
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package', $allowNonePackage);
+		$packages = $systemPartnerPlugin->systemPartner->getPackages();
+		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-packages-service-paid')))
+		{
+			foreach($packages as $index => $package)
+				if(intval($package->id) != PartnerController::PARTNER_PACKAGE_FREE)
+					unset($packages[$index]);
+		}
+		
+		Form_PackageHelper::addPackagesToForm($form, $packages, 'partner_package', $allowNonePackage);
 		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackagesClassOfService(), 'partner_package_class_of_service');
 		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackagesVertical(), 'vertical_clasiffication');
 		
