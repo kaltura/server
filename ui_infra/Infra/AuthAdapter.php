@@ -69,7 +69,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     			$userPartners = $client->partner->listPartnersForUser();
     			
     			$authorizedPartnerId = null;
-    			foreach ($userPartners as $userPartner)
+    			foreach ($userPartners->objects as $userPartner)
     			{
     			    $authorizedPartnerId = $userPartner->id;
     			    foreach ($requiredPermissionsArr as $requiredPermission)
