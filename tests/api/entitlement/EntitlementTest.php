@@ -44,11 +44,8 @@ class EntitlementTest extends EntitlementTestBase
 		
 		KalturaLog::info('Add categories');		
 		$category1->name = $category1->name . rand();
-		$category1->privacyContext = 'mediaspacetestInheritanceOfUsers';
-		$category1->inheritanceType = InheritanceType::MANUAL;
-		
-		$category2->name = $category2->name . rand();
-		$category2->inheritanceType = InheritanceType::INHERIT;
+		$category1->privacyContext = 'mediaspace';
+		$category1->inheritanceType = kalturaInheritanceType::MANUAL;
 		
 		try
 		{
@@ -71,6 +68,10 @@ class EntitlementTest extends EntitlementTestBase
 		{
 			$this->assertTrue(false, 'Fialed to add category: ' . $ex->getCode());
 		}
+		
+		$category2->name = $category2->name . rand();
+		$category2->inheritanceType = kalturaInheritanceType::INHERIT;
+		$category2->parentId = $category1->id;
 		
 		try
 		{
@@ -539,7 +540,7 @@ class EntitlementTest extends EntitlementTestBase
 		$user->id = $user->id . rand();
 		$user = $this->client->user->add($user);
 			
-		$this->startSessionWithDiffe(SessionType::USER, $user->id);
+		$this->startSessionWithDiffe(SessionType::USER, $user->id, self::PRIVILEGE_PRIVACY_CONTEXT . ':' . $category->privacyContext);
 		
 		$entryResponse = $this->client->baseEntry->add($entry);
 		
@@ -642,7 +643,6 @@ class EntitlementTest extends EntitlementTestBase
 	 */
 	public function testEntryCategoryAdd($category, $entry)
 	{
-		KalturaLog::debug('#### privileges: ' . print_r(self::PRIVILEGE_DISABLE_ENTITLEMENT,true));
 		$this->startSession($this->client, null, null, self::PRIVILEGE_DISABLE_ENTITLEMENT);
 		/* @var $category KalturaCategory */
 		$category->name = $category->name . rand();
@@ -686,11 +686,8 @@ class EntitlementTest extends EntitlementTestBase
 			return;
 		}
 		
-		if($entry->categories != $category->fullName)
-			$this->assertTrue(false, 'CategoryEntry new service didnt update entry->categories');
-			
-		$updatedCategory = new KalturaCategory();
-		$updatedCategory->name = $category->name .' new name';
+		if($entry->categories != $category->fullName && $category->privacyContext != '')
+			$this->assertTrue(false, 'CategoryEntry new service didnt update entry->categories: ' . $entry->categories . ' category->fullName: ' . $category->fullName);
 	}
 	
 	/**
