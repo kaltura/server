@@ -13,8 +13,10 @@ SELECT
 	aggr_p.new_audios "count audio",
 	0 "count mix",
 	FLOOR(aggr_p.count_bandwidth / 1024) "count bandwidth mb",
-	aggr_p.count_storage "count storage mb",
-	IFNULL(kalturadw.calc_partner_storage_data_time_range({FROM_DATE_ID}, {TO_DATE_ID}, aggr_p.partner_id), 0) "storage all time mb"
+	aggr_p.added_storage "added storage mb",
+	aggr_p.peak_storage "peak storage mb",
+	aggr_p.average_storage "average storage mb",
+	FLOOR(aggr_p.count_bandwidth / 1024) + aggr_p.average_storage "combined bandwidth storage"
 FROM
 (
 	SELECT 	STATUS, 	
@@ -28,7 +30,10 @@ FROM
 	new_audios, 
 	new_images, 
 	count_bandwidth, 
-	count_storage FROM 
+	added_storage, 
+	peak_storage,
+	average_storage
+	FROM
 	(	SELECT	partner_status_id STATUS, partner_name, created_at, partner_package,
 	    	dim_partner.partner_id partner_id,	IFNULL(SUM(count_loads), 0) count_loads,
 			IFNULL(SUM(count_plays), 0) count_plays, IFNULL(SUM(new_videos), 0) new_videos,
@@ -42,7 +47,9 @@ FROM
 		ORDER BY dim_partner.partner_id
 		LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */) media_usage,
 	(	SELECT dim_partner.partner_id partner_id, 	IFNULL(SUM(count_bandwidth_kb), 0) count_bandwidth,
-			IFNULL(SUM(count_storage_mb), 0) count_storage
+			IFNULL(SUM(count_storage_mb), 0) added_storage,
+			IFNULL(MAX(aggr_storage_mb), 0) peak_storage,
+			IFNULL(SUM(count_storage_mb), 0) / (DATEDIFF({TO_DATE_ID},{FROM_DATE_ID}) + 1) avgerage_storage
 		FROM kalturadw.dwh_dim_partners dim_partner 
 		LEFT JOIN kalturadw.dwh_hourly_partner_usage hourly_partner_usage 
 		ON (hourly_partner_usage.partner_id = dim_partner.partner_id AND hourly_partner_usage.date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID})
