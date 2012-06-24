@@ -113,10 +113,13 @@ class CategoryEntryService extends KalturaBaseService
 		if(kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, kCurrentContext::$ks_kuser_id);
-			if((!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER) && 
-				($entry->getKuserId() != kCurrentContext::$ks_kuser_id && 
-				$entry->getCreatorKuserId() != kCurrentContext::$ks_kuser_id))
-				throw new KalturaAPIException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
+			if(!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
+				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+				
+			if($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&
+				$entry->getKuserId() != kCurrentContext::$ks_kuser_id && 
+				$entry->getCreatorKuserId() != kCurrentContext::$ks_kuser_id)
+				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);		
 		}
 			
 		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
