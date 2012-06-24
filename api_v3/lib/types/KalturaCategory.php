@@ -427,7 +427,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			   (($this->moderation != KalturaNullableBoolean::FALSE_VALUE && $this->moderation != null) || 
 			   ($this->moderation == null && $sourceObject && $sourceObject->getModeration() != false)) ||
 			   (($this->inheritanceType != KalturaInheritanceType::MANUAL && $this->inheritanceType != null) || 
-			   ($this->inheritanceType == null && $sourceObject && $sourceObject->getInheritanceType() != false)) ||
+			   ($this->inheritanceType == null && $sourceObject && $sourceObject->getInheritanceType() != KalturaInheritanceType::MANUAL)) ||
 			   (($this->privacy != KalturaPrivacyType::ALL && $this->privacy != null) || 
 			   ($this->privacy == null && $sourceObject && $sourceObject->getPrivacy() != KalturaPrivacyType::ALL)) ||
 			   ($this->owner != null || 
