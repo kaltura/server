@@ -8,6 +8,10 @@ require_once(dirname(__FILE__) . '/EntitlementTestBase.php');
  */
 class EntitlementTest extends EntitlementTestBase
 {
+	const PRIVILEGE_ENABLE_ENTITLEMENT = 'enableentitlement';
+	const PRIVILEGE_DISABLE_ENTITLEMENT = 'disableentitlement';
+	const PRIVILEGE_PRIVACY_CONTEXT = "privacycontext";
+	
 	/**
 	 * Set up the test initial data
 	 */
@@ -15,7 +19,84 @@ class EntitlementTest extends EntitlementTestBase
 	{
 		parent::setUp();
 	}
-
+	/**
+	 * Tests testInheritanceOfUsers - all cases when user can ask to join to a category
+	 * @param KalturaCategory $category1
+	 * @param KalturaCategory $category2
+	 * @param KalturaUser $user1
+	 * @dataProvider provideData
+	 */
+	public function testInheritanceOfUsers(KalturaCategory $category1, KalturaCategory $category2, KalturaUser $user1)
+	{
+		$this->startSession($this->client, null, null, self::PRIVILEGE_DISABLE_ENTITLEMENT);
+		
+		try{
+			$this->client->user->add($user1);
+		}
+		catch (Exception $ex)
+		{
+			if($ex->getCode() != 'DUPLICATE_USER_BY_ID')
+			{
+				$this->assertTrue(false, 'Fialed to add user: ' . $ex->getCode());
+				return;
+			}
+		}
+		
+		KalturaLog::info('Add categories');		
+		$category1->name = $category1->name . rand();
+		$category1->privacyContext = 'mediaspacetestInheritanceOfUsers';
+		$category1->inheritanceType = InheritanceType::MANUAL;
+		
+		$category2->name = $category2->name . rand();
+		$category2->inheritanceType = InheritanceType::INHERIT;
+		
+		try
+		{
+			$category1 = $this->client->category->add($category1);
+		}
+		catch (Exception $ex)
+		{
+			$this->assertTrue(false, 'Fialed to add category: ' . $ex->getCode());
+		}
+		
+		$categoryUser = new KalturaCategoryUser();
+		$categoryUser->userId = $user1->id;
+		$categoryUser->categoryId = $category1->id;
+		
+		try
+		{
+			$categoryUser = $this->client->categoryUser->add($categoryUser);
+		}
+		catch (Exception $ex)
+		{
+			$this->assertTrue(false, 'Fialed to add category: ' . $ex->getCode());
+		}
+		
+		try
+		{
+			$category2 = $this->client->category->add($category2);
+		}
+		catch (Exception $ex)
+		{
+			$this->assertTrue(false, 'Fialed to add category: ' . $ex->getCode());
+		}
+		
+		
+		$this->startSessionWithDiffe(SessionType::USER, $user1->id, self::PRIVILEGE_PRIVACY_CONTEXT . ':' . $category1->privacyContext);
+		
+		try
+		{
+			$category2 = $this->client->category->get($category2->id);
+		}
+		catch (Exception $ex)
+		{
+			$this->assertTrue(false, 'Fialed to get category while user is a member of parent category and this category inherits members: ' . $ex->getCode());
+		}
+		
+		if($category2->membersCount != 1)
+			$this->assertTrue(false, 'Fialed: members is not 1');
+	}
+	
 	/**
 	 * Tests testUsersJoinToCategory - all cases when user can ask to join to a category
 	 * @param KalturaCategory $category
@@ -25,7 +106,7 @@ class EntitlementTest extends EntitlementTestBase
 	 */
 	public function testUserJoinAndListCategory(KalturaCategory $category, KalturaUser $user, $categoryUserPermissionLevel)
 	{
-		$this->startSession($this->client);
+		$this->startSession($this->client, null, null, self::PRIVILEGE_DISABLE_ENTITLEMENT);
 		
 		/* @var $category KalturaCategory */
 		$category->name = $category->name . rand();
@@ -35,7 +116,7 @@ class EntitlementTest extends EntitlementTestBase
 		$user->id = $user->id . rand();
 		$user = $this->client->user->add($user);
 			
-		$this->startSessionWithDiffe(SessionType::USER, $user->id);
+		$this->startSessionWithDiffe(SessionType::USER, $user->id, self::PRIVILEGE_PRIVACY_CONTEXT . ':' . $category->privacyContext);
 		
 		$categoryUser = new KalturaCategoryUser();
 		$categoryUser->categoryId = $category->id;
@@ -58,12 +139,16 @@ class EntitlementTest extends EntitlementTestBase
 		}
 		
 		$filterCategory = new KalturaCategoryFilter();
-		$filterCategory->idEqual = $category->id;		
+		$filterCategory->idEqual = $category->id;
+		
+		KalturaLog::info('List Categories');		
 		$categoriesListResponse = $this->client->category->listAction($filterCategory);
 
-		
 		if(!count($categoriesListResponse->objects) && $category->appearInList == KalturaAppearInListType::PARTNER_ONLY)
+		{
+			KalturaLog::err('Category should returned in list since it appearInListType is set to PARTNER_ONLY');
 			$this->assertTrue(false, 'Category should returned in list since it appearInListType is set to PARTNER_ONLY');
+		}
 			
 		if ($category->appearInList != KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
 		{
@@ -134,9 +219,9 @@ class EntitlementTest extends EntitlementTestBase
 	 * @param KalturaUser $user1
 	 * @dataProvider provideData
 	 */
-	public function testCategoryHierarchy($category1, $category2, $category3, $user1, $privileges)
+	public function testCategoryHierarchy($category1, $category2, $category3, $user1)
 	{
-		$this->startSession($this->client, null, null, $privileges);
+		$this->startSession($this->client, null, null, self::PRIVILEGE_DISABLE_ENTITLEMENT);
 		
 		$users = array();
 		$users[] = $category1->owner;
@@ -221,7 +306,7 @@ class EntitlementTest extends EntitlementTestBase
 			elseif($category1->userJoinPolicy == KalturaUserJoinPolicyType::NOT_ALLOWED)
 				$this->assertTrue(true, 'User is not allowed to join this category');
 			elseif($ex->getCode() == 'CATEGORY_NOT_FOUND' && $category1->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
-				$this->assertTrue(true, 'User is not allowed to join this category since it unlisted');
+				$this->assertTrue(true, 'User is not allowed to join this category since it unlisted: ' . $ex->getMessage());
 			else
 				$this->assertTrue(false, 'Fialed to add user to category: ' . $ex->getCode());
 				
@@ -235,7 +320,7 @@ class EntitlementTest extends EntitlementTestBase
 		catch(Exception $ex)
 		{
 			if ($ex->getCode() == 'CATEGORY_NOT_FOUND' && $category1->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
-				$this->assertTrue(true, 'Category is members only and cannot get this entry');
+				$this->assertTrue(true, 'Category is members only and cannot get this entry: ' . $ex->getMessage());
 			else
 				$this->assertTrue(false, 'Could not get category: ' . $ex->getCode());			
 		}
@@ -247,7 +332,7 @@ class EntitlementTest extends EntitlementTestBase
 		catch(Exception $ex)
 		{
 			if ($ex->getCode() == 'CATEGORY_NOT_FOUND' && $category2->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
-				$this->assertTrue(true, 'Category is members only and cannot get this entry');
+				$this->assertTrue(true, 'Category is members only and cannot get this entry: ' . $ex->getMessage());
 			else
 				$this->assertTrue(false, 'Could not get category: ' . $ex->getCode());			
 		}
@@ -259,7 +344,7 @@ class EntitlementTest extends EntitlementTestBase
 		catch(Exception $ex)
 		{
 			if ($ex->getCode() == 'CATEGORY_NOT_FOUND' && $category3->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
-				$this->assertTrue(true, 'Category is members only and cannot get this entry');
+				$this->assertTrue(true, 'Category is members only and cannot get this entry: ' . $ex->getMessage());
 			else
 				$this->assertTrue(false, 'Could not get category: ' . $ex->getCode());			
 		}
@@ -322,7 +407,7 @@ class EntitlementTest extends EntitlementTestBase
 	 */
 	public function testEntryEntit($category, $user, $entry, $categoryUserPermissionLevel)
 	{
-		$this->startSession($this->client);
+		$this->startSession($this->client, null, null, self::PRIVILEGE_DISABLE_ENTITLEMENT);
 		
 		/* @var $category KalturaCategory */
 		$category->name = $category->name . rand();
@@ -347,7 +432,7 @@ class EntitlementTest extends EntitlementTestBase
 			
 			if ($ex->getCode() == 'CATEGORY_NOT_FOUND' && $category->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
 			{			
-				$this->assertTrue(true, 'Category is members only and cannot get this entry');
+				$this->assertTrue(true, 'Category is members only and cannot get this entry: ' . $ex->getMessage());
 			}
 			elseif($category->contributionPolicy != KalturaContributionPolicyType::ALL)
 			{
@@ -362,9 +447,9 @@ class EntitlementTest extends EntitlementTestBase
 		
 		/* @var $user KalturaUser */
 		$user->id = $user->id . rand();
-		$user = $this->client->user->add($user);
+		$user = $this->client->user->add($user, null, null );
 			
-		$this->startSessionWithDiffe(SessionType::USER, $user->id);
+		$this->startSessionWithDiffe(SessionType::USER, $user->id, self::PRIVILEGE_PRIVACY_CONTEXT . ':' . $category->privacyContext);
 		
 		//user get the entry with no permission
 		try {
@@ -380,7 +465,7 @@ class EntitlementTest extends EntitlementTestBase
 		}
 		
 		if($category->privacy == KalturaPrivacyType::MEMBERS_ONLY)
-			$this->assertTrue(false, 'Category privacy if members only and user should not be able to get the entry');	
+			$this->assertTrue(false, 'Category privacy if members only and user should not be able to get the entry: ' . $ex->getMessage());	
 		
 		$this->startSession($this->client);
 		
@@ -399,11 +484,11 @@ class EntitlementTest extends EntitlementTestBase
 			
 			if ($category->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
 			{				
-				$this->assertTrue(true, 'Category is members only and therefor user is not able to get it and to be added to');
+				$this->assertTrue(true, 'Category is members only and therefor user is not able to get it and to be added to: ' . $ex->getMessage());
 			}
 			elseif($category->userJoinPolicy == KalturaUserJoinPolicyType::NOT_ALLOWED)
 			{
-				$this->assertTrue(true, 'User is not allowed to join this category');
+				$this->assertTrue(true, 'User is not allowed to join this category: ' . $ex->getMessage());
 			}
 			else
 			{
@@ -440,7 +525,7 @@ class EntitlementTest extends EntitlementTestBase
 	 */
 	public function testUserAddCategoryEntry($category, $user, $entry, $categoryUserPermissionLevel)
 	{
-		$this->startSession($this->client);
+		$this->startSession($this->client, null, null, self::PRIVILEGE_DISABLE_ENTITLEMENT);
 		
 		/* @var $category KalturaCategory */
 		$category->name = $category->name . rand();
@@ -471,15 +556,15 @@ class EntitlementTest extends EntitlementTestBase
 			
 			if ($ex->getCode() != 'CATEGORY_NOT_FOUND' && $category->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
 			{			
-				$this->assertTrue(true, 'Category is members only and cannot get this entry');
+				$this->assertTrue(true, 'Category is members only and cannot get this entry: ' . $ex->getMessage());
 			}
 			elseif($category->contributionPolicy != KalturaContributionPolicyType::ALL)
 			{
-				$this->assertTrue(true, 'not allowed to add entry to category');
+				$this->assertTrue(true, 'not allowed to add entry to category: ' . $ex->getMessage());
 			}
 			else
 			{
-				$this->assertTrue(false, 'Fialed to add entry to category');
+				$this->assertTrue(false, 'Fialed to add entry to category: ' . $ex->getMessage());
 				return;
 			}
 		}
@@ -510,8 +595,8 @@ class EntitlementTest extends EntitlementTestBase
 			else
 			{
 				$this->assertTrue(false, 'Fialed to add user to category');
-				return;
 			}
+			return;
 		}
 		
 		if($categoryUserResponse->status != KalturaCategoryUserStatus::ACTIVE)
@@ -543,8 +628,8 @@ class EntitlementTest extends EntitlementTestBase
 			else
 			{
 				$this->assertTrue(false, 'Fialed to add entry to category');
-				return;
 			}
+			return;
 		}
 		
 	}
@@ -557,14 +642,15 @@ class EntitlementTest extends EntitlementTestBase
 	 */
 	public function testEntryCategoryAdd($category, $entry)
 	{
-		$this->startSession($this->client);
-					
-		$entry = $this->client->baseEntry->add($entry);
-
+		KalturaLog::debug('#### privileges: ' . print_r(self::PRIVILEGE_DISABLE_ENTITLEMENT,true));
+		$this->startSession($this->client, null, null, self::PRIVILEGE_DISABLE_ENTITLEMENT);
 		/* @var $category KalturaCategory */
 		$category->name = $category->name . rand();
 		$category = $this->client->category->add($category);
 		
+		$this->startSession($this->client);
+		$entry = $this->client->baseEntry->add($entry);
+
 		$categoryCategoryEntry = new KalturaCategoryEntry();
 		$categoryCategoryEntry->categoryId = $category->id;
 		$categoryCategoryEntry->entryId = $entry->id;
@@ -578,15 +664,15 @@ class EntitlementTest extends EntitlementTestBase
 			
 			if ($ex->getCode() != 'CATEGORY_NOT_FOUND' && $category->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
 			{			
-				$this->assertTrue(true, 'Category is members only and cannot get this entry');
+				$this->assertTrue(true, 'Category is members only and cannot get this entry: ' . $ex->getMessage());
 			}
 			elseif($category->contributionPolicy != KalturaContributionPolicyType::ALL)
 			{
-				$this->assertTrue(true, 'not allowed to add entry to category');
+				$this->assertTrue(true, 'not allowed to add entry to category: ' . $ex->getMessage());
 			}
 			else
 			{
-				$this->assertTrue(false, 'Fialed to add entry to category');
+				$this->assertTrue(false, 'Fialed to add entry to category: ' . $ex->getMessage());
 			}
 			return;
 		}
@@ -615,7 +701,7 @@ class EntitlementTest extends EntitlementTestBase
 	 */
 	public function testBackwardCopmatEntryCategoriesAdd($categoryName, $entry)
 	{
-		$this->startSession($this->client);
+		$this->startSession($this->client, null, null, self::PRIVILEGE_DISABLE_ENTITLEMENT);
 					
 		$categoryName = $categoryName . rand();
 		$entry->categories = $categoryName;
@@ -631,7 +717,7 @@ class EntitlementTest extends EntitlementTestBase
 		}
 		catch(Exception $ex)
 		{
-			$this->assertTrue(false, 'Category was not found');
+			$this->assertTrue(false, 'Category was not found' . $ex->getMessage());
 		}
 		
 		if($category->fullName != $categoryName)
@@ -646,7 +732,7 @@ class EntitlementTest extends EntitlementTestBase
 		}
 		catch (Exception $ex)
 		{
-			$this->assertTrue(false, 'Fialed to get category entry');
+			$this->assertTrue(false, 'Fialed to get category entry' . $ex->getMessage());
 			return;
 		}
 		
@@ -706,6 +792,7 @@ class EntitlementTest extends EntitlementTestBase
 		{
 			KalturaLog::err('Error: line:' . __LINE__ .' ' . $ex->getMessage());
 			$this->assertTrue(true, 'Session with no entitlement cannot add category: ' . $ex->getMessage());
+			return;
 		}
 		
 		$this->startSessionWithDiffe(SessionType::USER, 'anyuser', 'privacycontext:' . $category1->privacyContext);
