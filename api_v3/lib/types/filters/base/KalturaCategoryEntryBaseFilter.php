@@ -11,6 +11,7 @@ abstract class KalturaCategoryEntryBaseFilter extends KalturaFilter
 		"categoryIdEqual" => "_eq_category_id",
 		"categoryIdIn" => "_in_category_id",
 		"entryIdEqual" => "_eq_entry_id",
+		"entryIdIn" => "_in_entry_id",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"categoryFullIdsStartsWith" => "_likex_category_full_ids",
@@ -48,6 +49,11 @@ abstract class KalturaCategoryEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $entryIdEqual;
+
+	/**
+	 * @var string
+	 */
+	public $entryIdIn;
 
 	/**
 	 * @var int
