@@ -296,18 +296,6 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$filter->set('_eq_full_ids', $filter->get('_eq_full_ids') . category::FULL_IDS_EQUAL_MATCH_STRING);
 		}
 		
-		if($filter->get('_likex_full_ids'))
-		{
-			$fullids = explode(',', $filter->get('_likex_full_ids'));
-			
-			$fullIdsIn = '';
-			foreach($fullids as $fullid)
-				$fullIdsIn .= $fullid . '\\*,';
-			
-			$filter->set('_matchor_full_ids', $fullIdsIn);
-			$filter->unsetByName('_likex_full_ids');
-		}
-
 		$categories = $filter->get( "_in_ancestor_id");
 		if ($categories !== null)
 		{
@@ -320,6 +308,18 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		}
 		$filter->unsetByName('_in_ancestor_id');
 		
+		if($filter->get('_likex_full_ids'))
+		{
+			$fullids = explode(',', $filter->get('_likex_full_ids'));
+			
+			$fullIdsIn = '';
+			foreach($fullids as $fullid)
+				$fullIdsIn .= $fullid . '\\*,';
+			
+			$filter->set('_matchor_full_ids', $fullIdsIn);
+			$filter->unsetByName('_likex_full_ids');
+		}
+
 		if($filter->get('_likex_name_or_reference_id'))
 		{
 			$names = $filter->get('_likex_name_or_reference_id');
