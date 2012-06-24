@@ -1097,8 +1097,17 @@ class Partner extends BasePartner
 				$ownerKuser->save();
 			}	
 		}
+	
+		$objectDeleted = false;
+		if($this->isColumnModified(PartnerPeer::STATUS) && $this->getStatus() == Partner::PARTNER_STATUS_DELETED)
+			$objectDeleted = true;
 		
-		return parent::postUpdate($con);
+		$ret = parent::postUpdate($con);
+	
+		if ($objectDeleted)
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+		
+		return $ret;
 	}
 	
 	

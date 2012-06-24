@@ -12,10 +12,10 @@ class kMetadataManager
 	const SEARCH_TEXT_SUFFIX = 'mdend';
 	
 	protected static $objectTypeNames = array(
-		Metadata::TYPE_ENTRY => 'entry',
-		Metadata::TYPE_CATEGORY => 'category',
-		Metadata::TYPE_USER => 'kuser',
-		Metadata::TYPE_CATEGORY_USER => 'categoryKuser',
+		MetadataObjectType::ENTRY => 'entry',
+		MetadataObjectType::CATEGORY => 'category',
+		MetadataObjectType::USER => 'kuser',
+		MetadataObjectType::PARTNER => 'Partner',
 	);
 	
 	/**
@@ -545,7 +545,7 @@ class kMetadataManager
 	    if($object instanceof IMetadataObject)
 	    	return $object->getMetadataObjectType();
 	    	
-	    return Metadata::TYPE_ENTRY;
+	    return MetadataObjectType::ENTRY;
 	}
 	
 	/**

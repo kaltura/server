@@ -88,7 +88,7 @@ class FreewheelDistributionProfile extends DistributionProfile
 			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_MEDIAKEY, '');
 			return $validationErrors;
 		}
-		$metadata = MetadataPeer::retrieveByObject($metadataProfileId, Metadata::TYPE_ENTRY, $entryDistribution->getEntryId());
+		$metadata = MetadataPeer::retrieveByObject($metadataProfileId, MetadataObjectType::ENTRY, $entryDistribution->getEntryId());
 		if(!$metadata)
 		{
 			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_MEDIAKEY);

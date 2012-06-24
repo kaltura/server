@@ -82,7 +82,7 @@ class PodcastDistributionProfile extends DistributionProfile
 		
 		$metadataProfileId = $this->getMetadataProfileId();
 
-		$metadatas = MetadataPeer::retrieveAllByObject(Metadata::TYPE_ENTRY, $entryDistribution->getEntryId());
+		$metadatas = MetadataPeer::retrieveAllByObject(MetadataObjectType::ENTRY, $entryDistribution->getEntryId());
 		
 		foreach($metadataFields as $index => $metadataField)
 		{

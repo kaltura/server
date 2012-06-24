@@ -162,7 +162,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 					if(class_exists('Metadata'))
 					{
 						$metadata = MetadataPeer::retrieveByPK($object->getObjectId());
-						if($metadata && $metadata->getObjectType() == Metadata::TYPE_ENTRY)
+						if($metadata && $metadata->getObjectType() == MetadataObjectType::ENTRY)
 							$auditTrail->setEntryId($metadata->getObjectId());
 					}
 					break;
@@ -187,7 +187,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if(method_exists($object, 'getEntryId'))
 			return $object->getEntryId();
 			
-		if(class_exists('Metadata') && $object instanceof Metadata && $object->getObjectType() == Metadata::TYPE_ENTRY)
+		if(class_exists('Metadata') && $object instanceof Metadata && $object->getObjectType() == MetadataObjectType::ENTRY)
 			return $object->getObjectId();
 			
 		KalturaLog::info("Can't get entry id for object type [" . get_class($object) . "]");

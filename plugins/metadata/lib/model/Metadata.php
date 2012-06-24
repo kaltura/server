@@ -20,11 +20,6 @@ class Metadata extends BaseMetadata implements ISyncableFile
 	const STATUS_INVALID = 2;
 	const STATUS_DELETED = 3;
 	
-	const TYPE_ENTRY = 1;
-	const TYPE_CATEGORY = 2;
-	const TYPE_USER = 3;
-	const TYPE_CATEGORY_USER = 4;
-	
 	/**
 	 * @var MetadataProfile
 	 */

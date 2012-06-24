@@ -12,6 +12,15 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandler implements kObj
 	{
 		if($object instanceof entry)
 			return true;
+	
+		if($object instanceof kuser)
+			return true;
+	
+		if($object instanceof category)
+			return true;
+	
+		if($object instanceof Partner)
+			return true;
 			
 		if($object instanceof Metadata)
 			return true;
@@ -47,7 +56,16 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandler implements kObj
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null) 
 	{
 		if($object instanceof entry)
-			$this->deleteMetadataObjects(Metadata::TYPE_ENTRY, $object->getId());
+			$this->deleteMetadataObjects(MetadataObjectType::ENTRY, $object->getId());
+	
+		if($object instanceof kuser)
+			$this->deleteMetadataObjects(MetadataObjectType::USER, $object->getId());
+	
+		if($object instanceof category)
+			$this->deleteMetadataObjects(MetadataObjectType::CATEGORY, $object->getId());
+	
+		if($object instanceof Partner)
+			$this->deleteMetadataObjects(MetadataObjectType::PARTNER, $object->getId());
 			
 		if($object instanceof Metadata)
 			$this->metadataDeleted($object);

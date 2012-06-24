@@ -62,7 +62,7 @@ class ExampleDistributionProfile extends DistributionProfile
 		}
 		
 		// get all metadata objects that related to the entry
-		$metadatas = MetadataPeer::retrieveAllByObject(Metadata::TYPE_ENTRY, $entryDistribution->getEntryId());
+		$metadatas = MetadataPeer::retrieveAllByObject(MetadataObjectType::ENTRY, $entryDistribution->getEntryId());
 		if(!count($metadatas))
 		{
 			$description = 'field is missing because there is no metadata object defined';
