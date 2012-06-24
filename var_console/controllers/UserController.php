@@ -67,7 +67,7 @@ class UserController extends Zend_Controller_Action
 				if ($nextUri && strlen($nextUri) > 1)
 					$this->_helper->redirector->gotoUrl($nextUri);
 				else
-					$this->_helper->redirector('list', 'partner');
+					$this->_helper->redirector('list-by-user', 'partner');
 			}
 			else
 			{
