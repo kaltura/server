@@ -422,22 +422,14 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		($this->privacyContext == null && !$sourceObject) || 
 		($this->privacyContext == null && $sourceObject && ($sourceObject->getPrivacyContexts() == null || $sourceObject->getPrivacyContexts() == '')))
 		{
-			if((($this->appearInList != KalturaAppearInListType::PARTNER_ONLY && $this->appearInList != null) || 
-			   ($this->appearInList == null && $sourceObject && $sourceObject->getDisplayInSearch() != DisplayInSearchType::PARTNER_ONLY))|| 
-			   (($this->moderation != KalturaNullableBoolean::FALSE_VALUE && $this->moderation != null) || 
-			   ($this->moderation == null && $sourceObject && $sourceObject->getModeration() != false)) ||
-			   (($this->inheritanceType != KalturaInheritanceType::MANUAL && $this->inheritanceType != null) || 
-			   ($this->inheritanceType == null && $sourceObject && $sourceObject->getInheritanceType() != KalturaInheritanceType::MANUAL)) ||
-			   (($this->privacy != KalturaPrivacyType::ALL && $this->privacy != null) || 
-			   ($this->privacy == null && $sourceObject && $sourceObject->getPrivacy() != KalturaPrivacyType::ALL)) ||
-			   ($this->owner != null || 
-			   ($this->owner == null && $sourceObject && $sourceObject->getKuserId() != null)) ||
-			   (($this->userJoinPolicy != KalturaUserJoinPolicyType::NOT_ALLOWED && $this->userJoinPolicy != null) || 
-			   ($this->userJoinPolicy == null && $sourceObject && $sourceObject->getUserJoinPolicy() != KalturaUserJoinPolicyType::NOT_ALLOWED)) ||
-			   (($this->contributionPolicy != KalturaContributionPolicyType::ALL  && $this->contributionPolicy != null ) || 
-			   ($this->contributionPolicy == null && $sourceObject && $sourceObject->getContributionPolicy() != KalturaContributionPolicyType::ALL)) ||
-			   (($this->defaultPermissionLevel != KalturaCategoryUserPermissionLevel::MEMBER && $this->defaultPermissionLevel !== null) || 
-			   ($this->defaultPermissionLevel == null && $sourceObject && $sourceObject->getDefaultPermissionLevel() != KalturaCategoryUserPermissionLevel::MEMBER )))
+			if(($this->appearInList != KalturaAppearInListType::PARTNER_ONLY && $this->appearInList != null) || 
+			   ($this->moderation != KalturaNullableBoolean::FALSE_VALUE && $this->moderation != null) || 
+			   ($this->inheritanceType != KalturaInheritanceType::MANUAL && $this->inheritanceType != null) || 
+			   ($this->privacy != KalturaPrivacyType::ALL && $this->privacy != null) || 
+			   ($this->owner != null) || 
+			   ($this->userJoinPolicy != KalturaUserJoinPolicyType::NOT_ALLOWED && $this->userJoinPolicy != null) || 
+			   ($this->contributionPolicy != KalturaContributionPolicyType::ALL  && $this->contributionPolicy != null ) || 
+			   ($this->defaultPermissionLevel != KalturaCategoryUserPermissionLevel::MEMBER && $this->defaultPermissionLevel !== null)) 
 			{
 				if ($this->parentId != null)
 				{
