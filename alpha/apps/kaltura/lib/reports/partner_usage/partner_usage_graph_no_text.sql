@@ -1,10 +1,10 @@
 SELECT
 		{GROUP_COLUMN}, /*partner_id, */
         SUM(count_bandwidth) AS bandwidth_consumption,
-        IF('{GROUP_COLUMN}' = 'date_id', aggr_storage_mb, SUM(aggr_storage_mb)/DAY(LAST_DAY(DATE(month_id) * 100 + 1))) AS average_storage,
+        IF('{GROUP_COLUMN}' = 'date_id', aggr_storage_mb, SUM(aggr_storage_mb)/DAY(LAST_DAY(DATE(month_id * 100 + 1)))) AS average_storage,
         MAX(aggr_storage_mb) AS peak_storage,
         SUM(added_storage_mb) AS added_storage,
-        SUM(count_bandwidth) + IF('{GROUP_COLUMN}' = 'date_id', aggr_storage_mb, SUM(aggr_storage_mb)/DAY(LAST_DAY(DATE(month_id) * 100 + 1))) AS combined_bandwidth_storage
+        SUM(count_bandwidth) + IF('{GROUP_COLUMN}' = 'date_id', aggr_storage_mb, SUM(aggr_storage_mb)/DAY(LAST_DAY(DATE(month_id * 100 + 1)))) AS combined_bandwidth_storage
 
 FROM (
 	SELECT
