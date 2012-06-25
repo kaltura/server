@@ -187,8 +187,8 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
     		    switch ($bulkUploadResult->action)
     		    {
     		        case KalturaBulkUploadAction::ADD:
-        		        $category = $this->createCategoryFromResultAndJobData($bulkUploadResult);
             			$bulkUploadResultChunk[] = $bulkUploadResult;
+        		        $category = $this->createCategoryFromResultAndJobData($bulkUploadResult);
                 		$requestResults[] = $this->kClient->category->add($category);
  
     		            break;
@@ -210,8 +210,8 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
     		                }
     		                break;
     		            }
-    		            $category = $this->createCategoryFromResultAndJobData($bulkUploadResult);
             			$bulkUploadResultChunk[] = $bulkUploadResult;
+    		            $category = $this->createCategoryFromResultAndJobData($bulkUploadResult);
                 		$requestResults[] = $this->kClient->category->update($bulkUploadResult->objectId, $category);
     		            break;
     		            
@@ -221,6 +221,7 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
     		            {
     		                $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
     		                $bulkUploadResult->errorDescription = "Category reference ID not found under the provided relativePath";
+    		                $this->unimpersonate();
     		                try {
     		                    $this->addBulkUploadResult($bulkUploadResult);
     		                    $this->impersonate();
