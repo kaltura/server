@@ -101,16 +101,6 @@ class category extends Basecategory implements IIndexable
 			$this->updateFullName();
 		}
 		
-		if($this->getPrivacyContexts() == '' && $this->getPrivacyContext() == '')
-		{
-			//TODO - might need to throw exception here if the values are diffret.
-			
-			//set default enetitlement default settings = no entitlement
-			$this->setPrivacy(PrivacyType::ALL);
-			$this->setContributionPolicy(ContributionPolicyType::ALL);
-			$this->setDisplayInSearch(DisplayInSearchType::PARTNER_ONLY);
-		}
-
 		// set the depth of the parent category + 1
 		if (!$this->getIsIndex() && ($this->isNew() || $this->isColumnModified(categoryPeer::PARENT_ID)))
 		{
@@ -118,7 +108,15 @@ class category extends Basecategory implements IIndexable
 		}
 		
 		if( $this->isColumnModified(categoryPeer::PARENT_ID) && $this->getParentId())
-			$this->incrementDirectSubCategoriesCount($this->getParentId());
+		{
+			$parentCategory = $this->getParentCategory();
+			
+			if($parentCategory)
+			{
+				$parentCategory->reSetDirectSubCategoriesCount();
+				$parentCategory->save();
+			}
+		}
 		
 		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PARENT_ID))
 		{
@@ -274,7 +272,14 @@ class category extends Basecategory implements IIndexable
 		{
 			$this->addRecalcCategoriesCount($this->getId());
 			$this->addRecalcCategoriesCount($this->old_parent_id);
-			$this->decrementDirectSubCategoriesCount($this->old_parent_id);
+			
+			$oldParentCategory = categoryPeer::retrieveByPK($this->old_parent_id);;
+			
+			if($oldParentCategory)
+			{
+				$oldParentCategory->reSetDirectSubCategoriesCount();
+				$oldParentCategory->save();
+			}
 		}
 		
 		if ($this->isColumnModified(categoryPeer::STATUS) && 
@@ -283,7 +288,13 @@ class category extends Basecategory implements IIndexable
 			($this->getColumnsOldValue(categoryPeer::STATUS) == CategoryStatus::ACTIVE || 
 			 $this->getColumnsOldValue(categoryPeer::STATUS) == CategoryStatus::UPDATING))
 		{
-			$this->decrementDirectSubCategoriesCount($this->parent_id);
+			$parentCategory = $this->getParentCategory();
+			
+			if($parentCategory)
+			{
+				$parentCategory->reSetDirectSubCategoriesCount();
+				$parentCategory->save();
+			}
 		}
 
 		// check if parnet is deleted and could be purged
@@ -1518,38 +1529,5 @@ class category extends Basecategory implements IIndexable
 			return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 			
 		return self::$sphinxFieldsEscapeType[$fieldName];
-	}
-	
-	protected function decrementDirectSubCategoriesCount($categoryId)
-	{
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		$category = categoryPeer::retrieveByPK($categoryId);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		
-		if(!$category)
-		{
-			KalturaLog::info("Category [$categoryId] not found");
-			return;
-		}
-		
-		$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() - 1);
-		$category->save();
-	}
-	
-	protected function incrementDirectSubCategoriesCount($categoryId)
-	{
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		$category = categoryPeer::retrieveByPK($categoryId);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-	
-		
-		if(!$category)
-		{
-			KalturaLog::info("Category [$categoryId] not found");
-			return;
-		}
-		
-		$category->setDirectSubCategoriesCount($category->getDirectSubCategoriesCount() + 1);
-		$category->save();
 	}
 }
