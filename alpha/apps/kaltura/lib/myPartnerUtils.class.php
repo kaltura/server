@@ -803,7 +803,8 @@ class myPartnerUtils
 	
 	const IS_FREE_PACKAGE_PLACE_HOLDER = "{IS_FREE_PACKAGE}";
 	
-	public static function collectPartnerUsageFromDWH($partner, $partnerPackage, $report_date, $data_for_graph = false)
+	
+	public static function collectPartnerStatisticsFromDWH($partner, $partnerPackage, $report_date, $data_for_graph = false)
     {
         // reset values:
         $totalStorage = 0;
@@ -818,7 +819,7 @@ class myPartnerUtils
 		if ($partnerPackage['id'] == 1) // free package
 			$reportFilter->extra_map[self::IS_FREE_PACKAGE_PLACE_HOLDER] = "TRUE";
 		
-		list($header, $data) = myReportsMgr::getTable( $partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE ,
+		list($header, $data) = myReportsMgr::getTable( $partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_USAGE_DASHBOARD ,
 		 $reportFilter, 10000 , 1 , "", null);
 
 		$avg_continuous_aggr_storage_mb_key = array_search('avg_continuous_aggr_storage_mb', $header);
@@ -831,7 +832,48 @@ class myPartnerUtils
         $totalUsage = ($totalStorage*1024) + $totalTraffic; // (MB*1024 => KB) + KB
 
         return array( $totalStorage , $totalUsage , $totalTraffic );
-    }        
+    }
+    
+    /**
+	 * deprecated - use collectPartnerStatisticsFromDWH instead 
+	 */
+	public static function collectPartnerUsageFromDWH($partner, $partnerPackage, $report_date, $data_for_graph = false)
+    {
+    	// reset values:
+        $totalStorage = 0;
+        $totalTraffic = 0;
+        $totalUsage = 0;
+
+		$reportFilter = new reportsInputFilter();
+		list($year, $month, $day) = explode('-', $report_date);
+		$reportFilter->from_date = gmmktime(0,0,0,$month, $day, $year);
+
+		list($header, $data) = myReportsMgr::getTable( $partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE ,
+		 $reportFilter, 10000 , 1 , "", null);
+
+		$avg_continuous_aggr_storage_mb_key = array_search('avg_continuous_aggr_storage_mb', $header);
+		$sum_partner_bandwidth_kb_key = array_search('sum_partner_bandwidth_kb', $header);
+		
+        // according to $partnerPackage['id'], decide which row to take (last date, or full rollup row)
+        if ($partnerPackage['id'] == 1) // free package
+        {
+		    // $res[count($res)-1] => specific partner rollup, relevant for free partner
+            $relevant_row = count($data)-1;
+        }
+        else
+        {
+		    // $res[count($res)-1] => specific partner rollup, relevant for free partner
+		    // $res[count($res)-2] => specific partner, last month, relevant for paying partner
+            $relevant_row = count($data)-2;
+        }
+          
+        $totalStorage = $data[$relevant_row][$avg_continuous_aggr_storage_mb_key]; // MB
+        $totalTraffic = $data[$relevant_row][$sum_partner_bandwidth_kb_key]; // KB
+        $totalUsage = ($totalStorage*1024) + $totalTraffic; // (MB*1024 => KB) + KB
+
+        return array( $totalStorage , $totalUsage , $totalTraffic );
+    }
+            
 	/**
 	 * deprecated - data moved to DWH
 	 */

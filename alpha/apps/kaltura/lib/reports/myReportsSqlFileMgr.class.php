@@ -213,6 +213,10 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"graph" => "",
 				"graph_no_text" => "!graph",
 			),
+			"partner_usage_dashboard" => array (
+				"detail_no_text" => "",
+				"count_no_text" => "",
+			),
 			"partner_usage" => array (
 				"detail_no_text" => "detail_no_text",
 				"count_no_text" => "count_no_text",
