@@ -171,7 +171,10 @@ class EntitlementTest extends EntitlementTestBase
 					if (!$categoryUserResponse)
 						$this->assertTrue(true, 'user cannot be added to this category since it is not allowed');
 					else
-						$this->assertTrue(false, 'user was added to this category although it is not allowed');
+					{
+						KalturaLog::debug('user was added to this category although it is not allowed: ' . print_r($categoryUserResponse, true));
+						$this->assertTrue(false, 'user was added to this category although it is not allowed: ' . print_r($categoryUserResponse, true));
+					}
 					
 					if(count($categoriesListResponse->objects) && $category->appearInList == KalturaAppearInListType::CATEGORY_MEMBERS_ONLY)
 						$this->assertTrue(false, 'Category should not returned in list since it appearInListType is set to CATEGORY_MEMBERS_ONLY and user is not member in this category');
@@ -686,8 +689,11 @@ class EntitlementTest extends EntitlementTestBase
 			return;
 		}
 		
-		if($entry->categories != $category->fullName && $category->privacyContext != '')
+		if($entry->categories != $category->fullName && $category->privacyContext == '')
 			$this->assertTrue(false, 'CategoryEntry new service didnt update entry->categories: ' . $entry->categories . ' category->fullName: ' . $category->fullName);
+			
+		if($entry->categories == $category->fullName && $category->privacyContext != '')
+			$this->assertTrue(false, 'CategoryEntry new service update entry->categories for category with privacy context: ' . $entry->categories . ' category->fullName: ' . $category->fullName);
 	}
 	
 	/**
