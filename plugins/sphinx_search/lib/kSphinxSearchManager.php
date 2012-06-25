@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.sphinxSearch
+ * @subpackage lib
+ */
 class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectReadyForIndexEventConsumer, kObjectErasedEventConsumer
 {
 	const SPHINX_INDEX_NAME = 'kaltura';

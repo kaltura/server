@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.sphinxSearch
+ * @subpackage model.filters
+ */
 class SphinxKuserCriteria extends SphinxCriteria
 {
     public function __construct()
