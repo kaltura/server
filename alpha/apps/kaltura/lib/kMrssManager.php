@@ -212,6 +212,8 @@ class kMrssManager
 		$thumbnail->addAttribute('extension', $thumbAsset->getFileExt());
 		$thumbnail->addAttribute('height', $thumbAsset->getHeight());
 		$thumbnail->addAttribute('width', $thumbAsset->getWidth());
+		$thumbnail->addAttribute('fileSize',$thumbAsset->getSize());
+		$thumbnail->addAttribute('createdAt', $thumbAsset->getCreatedAt());
 		if($thumbAsset->getFlavorParamsId())
 			$thumbnail->addAttribute('thumbParamsId', $thumbAsset->getFlavorParamsId());
 			
@@ -236,6 +238,7 @@ class kMrssManager
 		$content->addAttribute('isSource', $flavorAsset->getIsOriginal() ? 'true' : 'false');
 		$content->addAttribute('containerFormat', $flavorAsset->getContainerFormat());
 		$content->addAttribute('extension', $flavorAsset->getFileExt());
+		$content->addAttribute('createdAt', $flavorAsset->getCreatedAt());
 
 		$mediaParams = array(
 			'format' => $flavorAsset->getContainerFormat(),
