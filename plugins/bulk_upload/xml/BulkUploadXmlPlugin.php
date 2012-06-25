@@ -117,7 +117,7 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			return null;
 		}
 
-		header("Content-Type: text/xml; charset=UTF-8");
+		header("Content-Type: text/xml; charset=UTF-8"); 
 		
 		$data = $batchJob->getData();
 		
@@ -150,7 +150,7 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			$action = (isset($actionsMap[$bulkUploadResult->getAction()]) ? $actionsMap[$bulkUploadResult->getAction()] : $actionsMap[BulkUploadAction::ADD]);
 			$item->addChild('action', $action);
 			
-			$entry = $bulkUploadResult->getEntry();
+			$entry = $bulkUploadResult->getObject();
 			if(!$entry)
 				continue;
 				
