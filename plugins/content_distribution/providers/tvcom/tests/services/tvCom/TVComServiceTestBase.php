@@ -1,7 +1,9 @@
 <?php
-
 /**
  * tvCom service base test case.
+ * 
+ * @package plugins.contentDistribution
+ * @subpackage api.tests
  */
 abstract class TVComServiceTestBase extends KalturaApiTestCase
 {
