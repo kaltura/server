@@ -210,7 +210,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		}
 		$filter->unsetByName('in_category_ancestor_id');
 		
-		$categories = $filter->get( "_matchand_categories_ids");
+		$categories = $filter->get("_matchor_categories_ids");
 		if ($categories !== null)
 		{
 			//if the category exist or the category name is an empty string
@@ -218,25 +218,26 @@ class SphinxEntryCriteria extends SphinxCriteria
 				$categoriesParsed = $filter->categoryIdsToIdsParsed ( $categories );
 			else
 				$categoriesParsed = $categoriesAncestorParsed;
+				
+			if ( $categoriesParsed !=='' || $categories =='')
+				$filter->set ( "_matchor_categories_ids", $categoriesParsed);
+			else
+		  		$filter->set ( "_matchor_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+		}else
+		{
+			$filter->set ( "_matchor_categories_ids", $categoriesAncestorParsed);
+		}
+		
+		$categories = $filter->get( "_matchand_categories_ids");
+		if ($categories !== null)
+		{
+			//if the category exist or the category name is an empty string
+			$categoriesParsed = $filter->categoryIdsToIdsParsed ( $categories );
 			
 			if ( $categoriesParsed !=='' || $categories =='')
 				$filter->set ( "_matchand_categories_ids", $categoriesParsed);
 			else
 		  		$filter->set ( "_matchand_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
-		}else
-		{
-			$filter->set ( "_matchand_categories_ids", $categoriesAncestorParsed);
-		}
-		
-		$categories = $filter->get("_matchor_categories_ids");
-		if ($categories !== null)
-		{
-			//if the category exist or the category name is an empty string
-			$categoriesParsed = $filter->categoryIdsToIdsParsed ( $categories );
-			if ( $categoriesParsed !=='' || $categories =='')
-				$filter->set ( "_matchor_categories_ids", $categoriesParsed);
-			else
-		  		$filter->set ( "_matchor_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 		}
 		
 		$matchAndCats = $filter->get("_matchand_categories");
