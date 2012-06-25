@@ -38,8 +38,7 @@ class myReportsMgr
 	
 	const COUNT_PLAYS_HEADER = "count_plays";
 	const UNIQUE_USERS = "unique_known_users";
-	const UNIQUE_VIDEOS = "unique_videos";
-	const PLAYS_LIMIT = 10000; 
+	const UNIQUE_VIDEOS = "unique_videos"; 
 
 	public static function runQuery ( $query_file , $map , $debug = false )
 	{
@@ -231,7 +230,8 @@ class myReportsMgr
 					$header = array();
 					$data = array();
 				}
-				if ($count_plays > self::PLAYS_LIMIT) {
+				$count_plays_limit = kConf::get('plays_limit');
+				if ($count_plays > $count_plays_limit) {
 					$unique_header[]= self::UNIQUE_USERS;
 					$unique_data[] = "-";
 					$unique_header[]= self::UNIQUE_VIDEOS;
