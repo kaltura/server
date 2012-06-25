@@ -198,6 +198,8 @@ class thumbnailAction extends sfAction
 		$partner = $entry->getPartner();
 		if($density == 0)
 			$density = $partner->getDefThumbDensity();
+		$thumbParams = new kThumbnailParameters();
+		$thumbParams->setSupportAnimatedThumbnail($partner->getSupportAnimatedThumbnails());
 		
 		if(is_null($stripProfiles))
 			$stripProfiles = $partner->getStripThumbProfile();
@@ -292,7 +294,7 @@ class thumbnailAction extends sfAction
 			try
 			{
 				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality,
-				$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices  );
+				$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, null, 0, false, $thumbParams);
 			}
 			catch(Exception $ex)
 			{

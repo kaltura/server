@@ -403,9 +403,11 @@ class myFileConverter
 	 */
 	static public function convertImage($source_file, $target_file,	$width = self::DEFAULT_THUMBNAIL_WIDTH, $height = self::DEFAULT_THUMBNAIL_HEIGHT,
 		$crop_type = self::CROP_TYPE_ORIGINAL_ASPECT_RATIO, $bgcolor = 0xffffff, $force_jpeg = false, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $density = 0, $stripProfiles = false)
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $density = 0, $stripProfiles = false, $thumbParams = null)
 	{
-		
+		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
+			$thumbParams = new kThumbnailParameters();
+
 		if (is_string($bgcolor) && strpos($bgcolor, '0x') === false)
 			$bgcolor = hexdec('0x' . $bgcolor);
 		
@@ -422,8 +424,16 @@ class myFileConverter
 			$type = IMAGETYPE_JPEG;
 		if ($force_jpeg)
 		{
-			$target_file = kFile::replaceExt($target_file, "jpg");
-			$type = IMAGETYPE_JPEG;
+			$ext = self::imageExtByType($type);
+			if($thumbParams->getSupportAnimatedThumbnail() && $ext == "gif")
+			{
+				$target_file = kFile::replaceExt($target_file, "gif");
+			}
+			else
+			{
+				$target_file = kFile::replaceExt($target_file, "jpg");
+				$type = IMAGETYPE_JPEG;
+			}
 		}
 		else
 			$target_file = kFile::replaceExt($target_file, self::imageExtByType($type));

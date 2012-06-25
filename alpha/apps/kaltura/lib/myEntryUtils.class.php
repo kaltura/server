@@ -666,8 +666,11 @@ class myEntryUtils
 	
 	
 	public static function resizeEntryImage( entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false)
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null)
 	{
+		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
+			$thumbParams = new kThumbnailParameters();
+
 		$contentPath = myContentStorage::getFSContentRootPath();
 			
 		$entry_status = $entry->getStatus();
@@ -802,7 +805,7 @@ class myEntryUtils
 			$processing = $cache->get($orig_image_path);
 			if ($processing)
 				KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
-			
+
 			kFile::fullMkdir($tempThumbPath);
 			if ($crop_provider)
 			{
@@ -810,7 +813,11 @@ class myEntryUtils
 			}
 			else
 			{
-				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $tempThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles);
+				$imageSizeArray = getimagesize($orig_image_path);
+				if ($thumbParams->getSupportAnimatedThumbnail() && is_array($imageSizeArray) && $imageSizeArray[2] === IMAGETYPE_GIF)
+					$tempThumbPath = kFile::replaceExt($tempThumbPath, "gif");
+
+				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $tempThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams);
 			}
 			
 			// die if resize operation failed and add failed resizing to cache
