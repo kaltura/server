@@ -136,7 +136,12 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		
 		$oldCategoris = categoryPeer::retrieveByPKsNoFilter($oldCatsIds);
 		foreach($oldCategoris as $category)
+		{
+			if($category->getPrivacyContexts() != '' && $category->getPrivacyContexts() != null)
+				continue;
+				
 			$oldCats[] = $category->getFullName();
+		}
 				
 		
 		foreach ( $oldCats as $cat )
