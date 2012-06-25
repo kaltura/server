@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.shortLink
+ * @subpackage model.filters
+ */
 class ShortLinkFilter extends baseObjectFilter
 {
 	public function init ()
