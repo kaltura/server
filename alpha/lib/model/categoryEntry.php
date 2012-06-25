@@ -126,7 +126,7 @@ class categoryEntry extends BasecategoryEntry {
 		if($entry && !categoryEntryPeer::getSkipSave() && $category->getPrivacyContexts() == '')
 		{
 			$entry->setCategories($entry->getCategories() . entry::ENTRY_CATEGORY_SEPARATOR . $category->getFullName());
-			$entry->save();
+			$entry->justSave();
 		}
 		
 		return $entry;
