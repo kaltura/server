@@ -461,6 +461,13 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		return array(categoryPeer::ID);
 	}
 	
+	public function getSkipOrderByFields()
+	{
+		return array(
+			categoryPeer::FULL_NAME,
+			);
+	}
+	
 	public function hasPeerFieldName($fieldName)
 	{
 		if(strpos($fieldName, '.') === false)
