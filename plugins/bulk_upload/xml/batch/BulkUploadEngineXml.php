@@ -617,6 +617,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			default :
 				throw new KalturaBatchException("Action: {$contentAssetsAction} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 		}
+		//Creates new category associations between the entry and the categories
+		$updatedEntryBulkUploadResult = $this->createCategoryAssocations($entryId, $item->categories, $updatedEntryBulkUploadResult);
 							  
 		//Adds the additional data for the flavors and thumbs
 		$this->handleFlavorAndThumbsAdditionalData($entryId, $flavorAssets, $thumbAssets);
@@ -853,6 +855,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 
 		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
 			
+	    $createdEntryBulkUploadResult = $this->createCategoryAssocations($createdEntry->id, $item->categories, $createdEntryBulkUploadResult);
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$this->updateObjectsResults(array($createdEntry), array($createdEntryBulkUploadResult));
 		
@@ -1068,6 +1071,85 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->unimpersonate();
 		
 		return $updatedEntry;
+	}
+	
+	private function createCategoryAssocations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult)
+	{
+	    $this->impersonate();
+	    
+	    $categoriesArr = explode(",", $categories);
+	    $ret = array();
+	    foreach ($categoriesArr as $categoryName)
+	    {
+	        $categoryFilter = new KalturaCategoryFilter();
+	        $categoryFilter->fullNameEqual = $categoryName;
+	        $res = $this->kClient->category->listAction($categoryFilter, new KalturaFilterPager());
+	        if (!count($res->objects))
+	        {
+	           $res = $this->createCategoryByPath($categoryName);
+	           if (! $res instanceof  KalturaCategory)
+	           {
+	               $bulkuploadResult->errorDescription .= $res;
+	               continue;
+	           }
+	           
+	           $category = $res;
+	        }
+	        else 
+	        {
+	            $category = $res->objects[0];
+	        }
+	        $categoryEntry = new KalturaCategoryEntry();
+	        $categoryEntry->categoryId = $category->id;
+	        $categoryEntry->entryId = $entryId;
+	        try {
+	            $this->kClient->categoryEntry->add($categoryEntry);
+	        }
+	        catch (Exception $e)
+	        {
+	            $bulkuploadResult->errorDescription .= $e->getMessage();
+	        }
+	    }
+	    
+	    $this->unimpersonate();
+	    return $bulkuploadResult;
+	}
+	
+	private function createCategoryByPath ($fullname)
+	{
+        $catNames = explode(">", $fullname);
+        $parentId = null;
+        $fullNameEq = '';
+        foreach ($catNames as $catName)
+        {
+            $category = new KalturaCategory();
+            $category->name = $catName;
+            $category->parentId = $parentId;
+            $fullNameEq .= $catName;
+            try 
+            {
+                $category = $this->kClient->category->add($category);                
+            }
+            catch (Exception $e)
+            {
+                if ($e->getCode() == DUPLICATE_CATEGORY)
+                {
+                    $catFilter = new KalturaCategoryFilter();
+                    $catFilter->fullNameEqual = $fullNameEq;
+                    $res = $this->kClient->category->listAction($catFilter);
+                    $category = $res->objects[0];
+                }
+                else
+                {
+                    return $e->getMessage();
+                }
+            }
+            
+            $parentId = $category->id;
+        }
+        
+        return $category;
+	    
 	}
 	
 	/**
@@ -1685,8 +1767,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$entry->description = (string)$item->description;
 		if(isset($item->tags))
 			$entry->tags = $this->implodeChildElements($item->tags);
-		if(isset($item->categories))
-			$entry->categories = $this->implodeChildElements($item->categories);
+//		if(isset($item->categories))
+//			$entry->categories = $this->implodeChildElements($item->categories);
 		if(isset($item->userId))
 			$entry->userId = (string)$item->userId;
 		if(isset($item->licenseType))
