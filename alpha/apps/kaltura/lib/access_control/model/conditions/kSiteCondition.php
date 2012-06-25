@@ -50,7 +50,7 @@ class kSiteCondition extends kMatchCondition
 				$this->values[] = new kStringValue($globalWhitelistedDomain);
 		}
 
-		kApiCache::addExtraField(kApiCache::ECF_REFERRER, kApiCache::COND_MATCH, $this->getStringValues($scope));
+		kApiCache::addExtraField(kApiCache::ECF_REFERRER, kApiCache::COND_SITE_MATCH, $this->getStringValues($scope));
 		
 		return parent::internalFulfilled($accessControl);
 	}
