@@ -42,6 +42,7 @@ class KalturaResponseCacher extends kApiCache
 	
 	const SUFFIX_DATA =  '.cache';
 	const SUFFIX_RULES = '.rules';
+	const SUFFIX_LOG = '.log';
 	
 	protected $_cacheStore = null;
 	protected $_defaultExpiry = 600;
@@ -164,7 +165,7 @@ class KalturaResponseCacher extends kApiCache
 				unset($this->_params[$referrerKey]);
 			}
 			else
-				$referrer = isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : '';
+				$referrer = self::getHttpReferrer();
 				
 			$this->_referrers[] = $referrer;
 		}
@@ -231,26 +232,10 @@ class KalturaResponseCacher extends kApiCache
 		return $response;
 	}
 	
-		
-	public function checkOrStart()
+	protected function sendCachingHeaders($usingCache)
 	{
-		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
-			return;
-					
-		$response = $this->checkCache();		
-		if (!$response)
-		{
-			ob_start();
-			return;
-		}
-		
-		if ($this->_contentType) 
-		{
-			header($this->_contentType, true);
-		}	
-
 		// for GET requests with kalsig (signature of call params) return cdn/browser caching headers
-		if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]) && !self::hasExtraFields())
+		if ($usingCache && $_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]) && !self::hasExtraFields())
 		{
 			$max_age = $this->_cacheHeadersExpiry;
 			header("Cache-Control: private, max-age=$max_age max-stale=0");
@@ -263,6 +248,30 @@ class KalturaResponseCacher extends kApiCache
 			header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
 			header("Pragma: no-cache", true);
 		}
+	}
+		
+	public function checkOrStart()
+	{
+		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
+		{
+			$this->sendCachingHeaders(false);
+			return;
+		}
+					
+		$response = $this->checkCache();		
+		if (!$response)
+		{
+			$this->sendCachingHeaders(false);
+			ob_start();
+			return;
+		}
+		
+		if ($this->_contentType) 
+		{
+			header($this->_contentType, true);
+		}	
+
+		$this->sendCachingHeaders(true);
 
 		// for jsonp ignore the callback argument and replace it in result (e.g. callback_4([{...}]);
 		if (@$_REQUEST["format"] == 9)
@@ -378,10 +387,12 @@ class KalturaResponseCacher extends kApiCache
 		}
 
 		// write to the cache
+		//$this->_cacheStore->set($this->_cacheKey . self::SUFFIX_LOG, print_r($this->_params, true), $maxExpiry + self::EXPIRY_MARGIN);
+
 		$this->_cacheStore->set($this->_cacheKey . self::SUFFIX_RULES, serialize($cacheRules), $maxExpiry + self::EXPIRY_MARGIN);
 		
 		$this->_cacheStore->set($this->_cacheKey . self::SUFFIX_DATA, implode(self::CACHE_DELIMITER, array($cacheId, $contentType, $response)), $maxExpiry);
-		
+
 		// compare the calculated $response to the previously stored $cachedResponse
 		if ($cachedResponse)			// XXXXXXX TODO: remove this
 		{
