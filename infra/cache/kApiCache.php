@@ -58,6 +58,7 @@ class kApiCache
 	protected $_extraFields = array();
 	protected $_referrers = array();
 	protected static $_country = null;
+	protected static $_usesHttpReferrer = false;
 	protected static $_hasExtraFields = false;
 	
 	protected function __construct()
@@ -164,6 +165,12 @@ class kApiCache
 		return self::$_country;
 	}
 	
+	static protected function getHttpReferrer()
+	{
+		self::$_usesHttpReferrer = true;
+		return isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : '';
+	}
+	
 	protected function getFieldValues($extraField)
 	{
 		switch ($extraField)
@@ -178,7 +185,7 @@ class kApiCache
 
 		case self::ECF_USER_AGENT:
 			if (isset($_SERVER['HTTP_USER_AGENT']))
-				return array(isset($_SERVER['HTTP_USER_AGENT']));
+				return array($_SERVER['HTTP_USER_AGENT']);
 			break;
 		
 		case self::ECF_COUNTRY:
@@ -228,7 +235,8 @@ class kApiCache
 		if (in_array($extraFieldParams, $this->_extraFields))
 			return;			// already added
 		$this->_extraFields[] = $extraFieldParams;
-		self::$_hasExtraFields = true;
+		if ($extraField != self::ECF_REFERRER || self::$_usesHttpReferrer)
+			self::$_hasExtraFields = true;
 		
 		foreach ($this->getFieldValues($extraField) as $valueIndex => $fieldValue)
 		{
@@ -251,7 +259,10 @@ class kApiCache
 			return;
 		
 		foreach ($extraFields as $extraFieldParams)
-			call_user_func_array(array($this, 'addExtraFieldInternal'), $extraFieldParams);
+		{
+			call_user_func_array(array('kApiCache', 'addExtraField'), $extraFieldParams);
+			call_user_func_array(array($this, 'addExtraFieldInternal'), $extraFieldParams);			// the current instance may have not been activated yet
+		}
 		
 		$this->finalizeCacheKey();
 	}
@@ -284,7 +295,7 @@ class kApiCache
 		$this->_cacheKeyDirty = false;
 	
 		ksort($this->_params);
-		$this->_cacheKey = $this->_cacheKeyPrefix . md5( http_build_query($this->_params) );
+		$this->_cacheKey = $this->_cacheKeyPrefix . md5( http_build_query($this->_params, '', '&') );
 		if (is_null($this->_originalCacheKey))
 			$this->_originalCacheKey = $this->_cacheKey;
 	}
