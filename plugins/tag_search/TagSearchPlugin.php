@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.tagSearch
+ */
 class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory, IKalturaSphinxConfiguration, IKalturaEventConsumers, IKalturaServices, IKalturaConfigurator
 {
     const PLUGIN_NAME = "tagSearch";
