@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.symantecScanEngine
+ * @subpackage lib
+ */
 class SymantecScanEngine extends VirusScanEngine
 {
 	

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.symantecScanEngine
+ * @subpackage lib
+ */
 class SymantecScanJavaEngine extends SymantecScanEngine
 {
 	const STATUS_PREFIX = 'Scan Status: ';

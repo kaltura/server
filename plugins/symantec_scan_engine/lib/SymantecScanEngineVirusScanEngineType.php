@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.symantecScanEngine
+ * @subpackage model.enum
  */
 class SymantecScanEngineVirusScanEngineType implements IKalturaPluginEnum, VirusScanEngineType
 {

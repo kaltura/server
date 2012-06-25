@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.symantecScanEngine
+ * @subpackage lib
+ */
 class SymantecScanDirectEngine extends SymantecScanEngine
 {
 	const SCAN_ENGINE_HOST = "127.0.0.1";
