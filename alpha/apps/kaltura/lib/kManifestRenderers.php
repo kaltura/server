@@ -55,7 +55,7 @@ abstract class kManifestRenderer
 			header($header);
 		}
 		
-		requestUtils::sendCachingHeaders($this->cachingHeadersAge);
+		requestUtils::sendCachingHeaders(kApiCache::hasExtraFields() ? 0 : $this->cachingHeadersAge);
 
 		echo $this->getBody();
 		die;
