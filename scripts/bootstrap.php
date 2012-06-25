@@ -15,8 +15,6 @@ $include_path =
 	
 set_include_path($include_path);
 
-KalturaLog::info("Build cache: it may take a while.");
-
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "phpseclib", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
