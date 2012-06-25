@@ -71,7 +71,8 @@ class categoryFilter extends baseObjectFilter
 			'members_count', 
 			'direct_entries_count', 
 			'direct_sub_categories_count', 
-			'name'
+			'name',
+			'full_name',
 		);
 
 		$this->aliases = array ( 
