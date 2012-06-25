@@ -29,10 +29,19 @@ class CategoryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
 			
 		if($category->privacyContext != null && 
-		   $category->privacyContext != '' && 
-		   !preg_match('/^[a-zA-Z\d]+$/', $category->privacyContext) &&
-		   strlen($category->privacyContext) >= 4)
-		   throw new KalturaAPIException(KalturaErrors::PRIVACY_CONTEXT_INVALID_STRING);
+		   $category->privacyContext != '')
+	   	{
+			$privacyContexts = explode(',', $category->privacyContext);  
+		  	
+			foreach($privacyContexts as $privacyContext)
+		  	{
+		  		if(!preg_match('/^[a-zA-Z\d]+$/', $privacyContext) || strlen($privacyContext) < 4)
+		  		{
+		  			KalturaLog::err('Invalid privacy context: ' . print_r($privacyContext, true));
+		   			throw new KalturaAPIException(KalturaErrors::PRIVACY_CONTEXT_INVALID_STRING, $privacyContext);
+		  		}
+		  	}
+	   	}
 			
 		try
 		{
@@ -91,10 +100,19 @@ class CategoryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
 			
 		if($category->privacyContext != null && 
-		   $category->privacyContext != '' && 
-		   !preg_match('/^[a-zA-Z\d]+$/', $category->privacyContext) &&
-		   strlen($category->privacyContext) >= 4)
-		   throw new KalturaAPIException(KalturaErrors::PRIVACY_CONTEXT_INVALID_STRING);
+		   $category->privacyContext != '')
+		   {
+			  $privacyContexts = explode(',', $category->privacyContext);  
+			  
+			  foreach($privacyContexts as $privacyContext)
+			  {
+			  	if(!preg_match('/^[a-zA-Z\d]+$/', $privacyContext) || strlen($privacyContext) < 4)
+			  	{
+			  		KalturaLog::err('Invalid privacy context: ' . print_r($privacyContext, true));
+			   		throw new KalturaAPIException(KalturaErrors::PRIVACY_CONTEXT_INVALID_STRING, $privacyContext);
+			  	}
+			  }
+		   }
 			
 		//it is possible to not all of the sub tree is updated, 
 		//and updateing fileds that will add batch job to reindex categories - might not update all sub categories.
