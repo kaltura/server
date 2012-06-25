@@ -281,7 +281,13 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	{
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $dropFolderId;
-		$dropFolderFiles = $this->dropFolderPlugin->dropFolderFile->listAction($dropFolderFileFilter);
+		
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 1000;
+		if($this->taskConfig->params->pageSize)
+			$pager->pageSize = $this->taskConfig->params->pageSize;
+		
+		$dropFolderFiles = $this->dropFolderPlugin->dropFolderFile->listAction($dropFolderFileFilter, $pager);
 		$dropFolderFiles = $dropFolderFiles->objects;
 		return $dropFolderFiles;
 	}
