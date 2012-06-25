@@ -463,11 +463,21 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	        $res = $this->kClient->category->listAction($categoryFilter, new KalturaFilterPager());
 	        if (!count($res->objects))
 	        {
-	            $bulkuploadResult->errorDescription .= "\n\rCould not find specified category [$categoryName]";
-	            continue;
+	           $res = $this->createCategoryByPath($categoryName);
+	           if (! $res instanceof  KalturaCategory)
+	           {
+	               $bulkuploadResult->errorDescription .= $res;
+	               continue;
+	           }
+	           
+	           $category = $res;
+	        }
+	        else 
+	        {
+	            $category = $res->objects[0];
 	        }
 	        $categoryEntry = new KalturaCategoryEntry();
-	        $categoryEntry->categoryId = $res->objects[0]->id;
+	        $categoryEntry->categoryId = $category->id;
 	        $categoryEntry->entryId = $entryId;
 	        try {
 	            $this->kClient->categoryEntry->add($categoryEntry);
@@ -480,5 +490,42 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	    
 	    $this->unimpersonate();
 	    return $bulkuploadResult;
+	}
+	
+	private function createCategoryByPath ($fullname)
+	{
+        $catNames = explode(">", $fullname);
+        $parentId = null;
+        $fullNameEq = '';
+        foreach ($catNames as $catName)
+        {
+            $category = new KalturaCategory();
+            $category->name = $catName;
+            $category->parentId = $parentId;
+            $fullNameEq .= $catName;
+            try 
+            {
+                $category = $this->kClient->category->add($category);                
+            }
+            catch (Exception $e)
+            {
+                if ($e->getCode() == DUPLICATE_CATEGORY)
+                {
+                    $catFilter = new KalturaCategoryFilter();
+                    $catFilter->fullNameEqual = $fullNameEq;
+                    $res = $this->kClient->category->listAction($catFilter);
+                    $category = $res->objects[0];
+                }
+                else
+                {
+                    return $e->getMessage();
+                }
+            }
+            
+            $parentId = $category->id;
+        }
+        
+        return $category;
+	    
 	}
 }
