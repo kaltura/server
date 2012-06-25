@@ -214,20 +214,11 @@ class SphinxEntryCriteria extends SphinxCriteria
 		if ($categories !== null)
 		{
 			//if the category exist or the category name is an empty string
-			$categoriesParsed = $filter->categoryIdsToIdsParsed ( $categories );
+			if(is_null($categoriesAncestorParsed))
+				$categoriesParsed = $filter->categoryIdsToIdsParsed ( $categories );
+			else 
+				$categoriesParsed = $categoriesAncestorParsed;
 			
-			if(!is_null($categoriesAncestorParsed))
-			{ 
-				if($categoriesParsed !=='' || $categories =='')
-				{
-					$categoriesParsed = ',' . $categoriesAncestorParsed;
-				}
-				else
-				{
-					$categoriesParsed = $categoriesAncestorParsed;
-				}
-			}
-				
 			if ( $categoriesParsed !=='' || $categories =='')
 				$filter->set ( "_matchor_categories_ids", $categoriesParsed);
 			else
