@@ -25,7 +25,10 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *
-* Amazon S3 is a trademark of Amazon.com, Inc. or its affiliates.
+* Amazon S3 is a trademark of Amazon.com, Inc. or its affiliates. 
+* 
+* @package External 
+* @subpackage Amazon
 */
 
 /**
@@ -33,6 +36,9 @@
 *
 * @link http://undesigned.org.za/2007/10/22/amazon-s3-php-class
 * @version 0.5.0-dev
+* 
+* @package External 
+* @subpackage Amazon
 */
 class S3
 {
@@ -1626,6 +1632,10 @@ class S3
 
 }
 
+/** 
+ * @package External 
+ * @subpackage Amazon
+ */
 final class S3Request
 {
 	private $endpoint, $verb, $bucket, $uri, $resource = '', $parameters = array(),
@@ -1913,6 +1923,10 @@ final class S3Request
 
 }
 
+/** 
+ * @package External 
+ * @subpackage Amazon
+ */
 class S3Exception extends Exception {
 	function __construct($message, $file, $line, $code = 0)
 	{

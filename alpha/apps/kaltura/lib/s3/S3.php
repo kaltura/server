@@ -26,6 +26,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * Amazon S3 is a trademark of Amazon.com, Inc. or its affiliates.
+*  
+* @package External 
+* @subpackage Amazon
 */
 
 /**
@@ -33,6 +36,9 @@
 *
 * @link http://undesigned.org.za/2007/10/22/amazon-s3-php-class
 * @version 0.4.0
+*  
+* @package External 
+* @subpackage Amazon
 */
 class S3 {
 	// ACL flags
@@ -1115,6 +1121,10 @@ class S3 {
 
 }
 
+/** 
+ * @package External 
+ * @subpackage Amazon
+ */
 final class S3Request {
 	private $verb, $bucket, $uri, $resource = '', $parameters = array(),
 	$amzHeaders = array(), $headers = array(
