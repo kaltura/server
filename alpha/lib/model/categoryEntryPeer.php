@@ -185,6 +185,10 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 				if(!$unentitedCategory)
 				{
 					$category = category::createByPartnerAndFullName ( $entry->getPartnerId (), $cat );
+					
+					//it is possible to add on an entry a few new categories on the same new parent - 
+					//and we need to sync sphinx once we add so the category will not be duplicated 
+					kEventsManager::flushEvents();
 				}
 			}
 			else
