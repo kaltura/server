@@ -361,6 +361,12 @@ class Kaltura_Client_ClientBase
 			$cookiesStr = http_build_query($cookies, null, '; ');
 			curl_setopt($ch, CURLOPT_COOKIE, $cookiesStr);
 		} 
+	
+		if(!$this->config->verifySSL)
+		{		
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+		}
 
 		$result = curl_exec($ch);
 		$curlError = curl_error($ch);

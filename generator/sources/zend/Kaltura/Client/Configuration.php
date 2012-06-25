@@ -41,6 +41,7 @@ class Kaltura_Client_Configuration
 	public $curlTimeout   				= 10;
 	public $startZendDebuggerSession 	= false;
 	public $userAgent					= '';
+	public $verifySSL 					= true;
 	
 	/**
 	 * Constructs new Kaltura configuration object

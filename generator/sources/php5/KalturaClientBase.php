@@ -423,14 +423,18 @@ class KalturaClientBase
 		}
 		
 		// Set SSL verification
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->config->verifySSL);
+		if(!$this->getConfig()->verifySSL)
+		{		
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+		}
 		
 		// Set custom headers
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->config->requestHeaders );
 
 		// Save response headers
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'readHeader') );
-
+		
 		$result = curl_exec($ch);
 		$curlError = curl_error($ch);
 		curl_close($ch);

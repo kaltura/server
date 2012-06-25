@@ -363,7 +363,11 @@ class Base
 		}
 		
 		// Set SSL verification
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->config->getVerifySSL());
+		if(!$this->config->getVerifySSL())
+		{		
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+		}
 		
 		// Set custom headers
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->config->getRequestHeaders());
