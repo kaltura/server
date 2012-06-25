@@ -144,10 +144,14 @@ class category extends Basecategory implements IIndexable
 			if ($this->isColumnModified(categoryPeer::PARENT_ID))
 				$lock = true;
 			
-			if ($this->isColumnModified(categoryPeer::FULL_IDS))
-			    $this->addIndexCategoryJob($this->oldColumnsValues[categoryPeer::FULL_IDS], null, null, $lock);	
+			if ($this->isColumnModified(categoryPeer::PARENT_ID) && $this->isColumnModified(categoryPeer::FULL_IDS))
+			    $fullIds = $this->oldColumnsValues[categoryPeer::FULL_IDS];	
 			else 
-			    $this->addIndexCategoryJob($this->getFullIds(), null, null, $lock);	
+			    $fullIds = $this->getFullIds();	
+
+			$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id; 			
+			if($partnerId != Partner::BATCH_PARTNER_ID)
+				$this->addIndexCategoryJob($fullIds, null, null, $lock);
 		}
 		
 		if (!$this->isNew() && 

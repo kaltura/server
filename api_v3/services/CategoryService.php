@@ -258,6 +258,7 @@ class CategoryService extends KalturaBaseService
 		$categoryDb->reSetDepth();
 		$categoryDb->reSetFullName();
 		$categoryDb->reSetEntriesCount();
+		$categoryDb->reSetMembersCount();
 		$categoryDb->reSetPendingMembersCount();
 		$categoryDb->reSetPrivacyContext();
 		$categoryDb->reSetDirectSubCategoriesCount();
