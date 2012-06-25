@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.virusScan
+ * @subpackage Scheduler
+ */
 abstract class VirusScanEngine
 {
 		
