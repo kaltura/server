@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Admin
+ * @subpackage forms
+ */
 class Kaltura_Form_Element_EnumSelect extends Zend_Form_Element_Select
 {
 	function __construct($spec, $options = null)

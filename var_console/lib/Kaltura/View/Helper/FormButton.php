@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Var
+ * @subpackage forms
+ */
 class Kaltura_View_Helper_FormButton extends Zend_View_Helper_FormButton
 {
 	 /**

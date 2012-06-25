@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Var
+ * @subpackage Partners
+ */
 class PartnerController extends Zend_Controller_Action
 {
 

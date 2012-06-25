@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Var
+ * @subpackage View
+ */
 class Kaltura_View_Helper_CssId extends Zend_View_Helper_Abstract
 {
 	public function cssId()

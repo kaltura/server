@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Var
+ * @subpackage User
+ */
 class UserController extends Zend_Controller_Action
 {
 

@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package Var
+ * @subpackage Language
+ */
+
 return array(
 	// globals
 	'time format' => 'm/d/y H:i:s',
