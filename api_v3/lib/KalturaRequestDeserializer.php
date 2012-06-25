@@ -64,7 +64,11 @@ class KalturaRequestDeserializer
 			{
 				if (array_key_exists($name, $this->paramsGrouped))
 				{
-					$serviceArguments[] = $this->castSimpleType($type, $this->paramsGrouped[$name]);
+					$value = $this->castSimpleType($type, $this->paramsGrouped[$name]);
+					if(!kXml::isXMLValidContent($value))
+						throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
+						
+					$serviceArguments[] = $value;
 					continue;
 				}
 				
@@ -217,7 +221,10 @@ class KalturaRequestDeserializer
 				$value = $params[$name];
 				if ($property->isSimpleType())
 				{
-					$obj->$name = $this->castSimpleType($type, $value);
+					$value = $this->castSimpleType($type, $value);
+					if(!kXml::isXMLValidContent($value))
+						throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
+					$obj->$name = $value;
 					continue;
 				}
 				
@@ -241,7 +248,10 @@ class KalturaRequestDeserializer
 					if (!$property->getTypeReflector()->checkStringEnumValue($value))
 						throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $value, $name, $property->getType());
 						
-					$obj->$name = $this->castSimpleType("string", $value);
+					$value = $this->castSimpleType("string", $value);
+					if(!kXml::isXMLValidContent($value))
+						throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
+					$obj->$name = $value;
 					continue;
 				}
 			}
@@ -284,7 +294,11 @@ class KalturaRequestDeserializer
 	
 	public function getKS()
 	{
-		return $this->castSimpleType("string", $this->paramsGrouped["ks"]);
+		$value = $this->castSimpleType("string", $this->paramsGrouped["ks"]);
+		if(!kXml::isXMLValidContent($value))
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, 'ks');
+			
+		return $value;
 	}
 	
 	public function getTargetPartnerId()
@@ -294,7 +308,11 @@ class KalturaRequestDeserializer
 	
 	public function getTargetUserId()
 	{
-		return $this->castSimpleType("string", $this->paramsGrouped["targetUserId"]);
+		$value = $this->castSimpleType("string", $this->paramsGrouped["targetUserId"]);
+		if(!kXml::isXMLValidContent($value))
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, 'targetUserId');
+			
+		return $value;
 	}
 	
 	private function castSimpleType($type, $var)
@@ -304,7 +322,7 @@ class KalturaRequestDeserializer
 			case "int":
 				return (int)$var;
 			case "string":
-				return (string)$var;
+				return kString::stripUtf8InvalidChars((string)$var);
 			case "bool":
 				if (strtolower($var) === "false")
 					return false;
