@@ -619,7 +619,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		//Creates new category associations between the entry and the categories
 		$updatedEntryBulkUploadResult = $this->createCategoryAssocations($entryId, $this->implodeChildElements($item->categories), $updatedEntryBulkUploadResult);
-							  
 		//Adds the additional data for the flavors and thumbs
 		$this->handleFlavorAndThumbsAdditionalData($entryId, $flavorAssets, $thumbAssets);
 				
@@ -745,7 +744,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->unimpersonate();
 		
 		$bulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::DELETE);
-		
 		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
 			return;
 		
@@ -763,7 +761,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		//Throw exception in case of  max proccessed items and handle all exceptions there
 		$createdEntryBulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::ADD);
-
 		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
 			return;
 		
@@ -2048,6 +2045,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KalturaLog::debug("this->handledRecordsThisRun [$this->handledRecordsThisRun], this->maxRecordsEachRun [$this->maxRecordsEachRun]");
 					
 		$bulkUploadResult = new KalturaBulkUploadResultEntry();
+		$bulkUploadResult->status = KalturaBulkUploadResultStatus::IN_PROGRESS;
 		$bulkUploadResult->action = $action;
 		$bulkUploadResult->bulkUploadJobId = $this->job->id;
 		
