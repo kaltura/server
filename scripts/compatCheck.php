@@ -197,6 +197,7 @@ function normalizeResultBuffer($result)
 	$result = preg_replace('/<execute_time>[0-9\.]+<\/execute_time>/', '', $result);
 	$result = preg_replace('/<total_time>[0-9\.]+<\/total_time>/', '', $result);
 	$result = preg_replace('/<server_time>[0-9\.]+<\/server_time>/', '', $result);
+	$result = preg_replace('server_time="[0-9\.]+"', '', $result);
 	$result = preg_replace('/kaltura_player_\d+/', 'KP', $result);
 	$result = str_replace($serviceUrlNew, $serviceUrlOld, $result);
 	
