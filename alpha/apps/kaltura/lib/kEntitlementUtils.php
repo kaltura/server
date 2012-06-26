@@ -12,13 +12,14 @@ class kEntitlementUtils
 	
 	const ENTRY_PRIVACY_CONTEXT = 'ENTRYPC'; 
 	
-	protected static $entitlementEnforcement = false;  
+	protected static $entitlementEnforcement = false;
 	protected static $privacyContextSearch = null;	
 	
 	public static function getEntitlementEnforcement()
 	{
 		return self::$entitlementEnforcement;
 	}
+
 	
 	/**
 	 * Returns true if kuser or current kuser is entitled to entryId
@@ -75,7 +76,7 @@ class kEntitlementUtils
 		if($ks)
 		{	
 			$ksPrivacyContexts = $ks->getPrivacyContext();
-			if (!$ksPrivacyContexts)
+			if (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '')
 				$ksPrivacyContexts = self::DEFAULT_CONTEXT;
 			
 			$c->add(categoryPeer::PRIVACY_CONTEXTS, $ksPrivacyContexts, KalturaCriteria::IN_LIKE);
