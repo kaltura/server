@@ -91,6 +91,20 @@ class kConf
 		return self::$map;
 	}
 		
+	public static function hasMap($mapName)
+	{
+		self::init();
+		
+		if($mapName == 'local')
+			return true;
+		
+		if(isset(self::$map[$mapName]))
+			return true;
+		
+		$configDir = realpath(dirname(__file__) . '/../configurations');
+		return file_exists("$configDir/$mapName.ini");
+	}
+		
 	public static function getMap($mapName)
 	{
 		self::init();

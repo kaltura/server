@@ -68,16 +68,18 @@ class kUrlManager
 			$class = $urlManagers[$cdnHost]["class"];
 			$params = @$urlManagers[$cdnHost]["params"];
 			$entry = entryPeer::retrieveByPK($entryId);
-			if ($entry && kConf::hasParam("url_managers_override"))
+			$urlManagersMap = kConf::getMap('url_managers');
+			if ($entry && isset($urlManagersMap["override"]))
 			{
-				$overrides = kConf::get("url_managers_override");
+				$overrides = $urlManagersMap["override"];
 				$partnerId = $entry->getPartnerId();
 				if (array_key_exists($partnerId, $overrides))
 				{
 					$overrides = $overrides[$partnerId];
-					if (array_key_exists($cdnHost, $overrides))
+					foreach($overrides as $override)
 					{
-						$params = array_merge($params, $overrides[$cdnHost]["params"]);
+						if ($override['domain'] == $cdnHost)
+							$params = array_merge($params, $override["params"]);
 					}
 				}
 			}

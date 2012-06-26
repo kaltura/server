@@ -701,10 +701,10 @@ class BaseEntryService extends KalturaEntryService
 		if ($accessControl && $accessControl->hasRules())
 		{
 			$disableCache = true;
-			if (kConf::hasParam("optimized_playback"))
+			if (kConf::hasMap("optimized_playback"))
 			{
 				$partnerId = $accessControl->getPartnerId();
-				$optimizedPlayback = kConf::get("optimized_playback");
+				$optimizedPlayback = kConf::getMap("optimized_playback");
 				if (array_key_exists($partnerId, $optimizedPlayback))
 				{
 					$params = null;

@@ -334,9 +334,9 @@ class kwidgetAction extends sfAction
 				$track_wrapper = "&wrapper_tracker_url=".urlencode(kConf::get('kdpwrapper_track_url')."?activation_key=".kConf::get('kaltura_activation_key')."&package_version=".kConf::get('kaltura_version'));
 			}
 			
-			if (kConf::hasParam("optimized_playback"))
+			if (kConf::hasMap("optimized_playback"))
 			{
-				$optimizedPlayback = kConf::get("optimized_playback");
+				$optimizedPlayback = kConf::getMap("optimized_playback");
 				if (array_key_exists($partner_id, $optimizedPlayback))
 				{
 					// force a specific kdp for the partner

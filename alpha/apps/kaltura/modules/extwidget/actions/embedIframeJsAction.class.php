@@ -30,9 +30,9 @@ class embedIframeJsAction extends sfAction
 
 		$ui_conf_html5_url = $uiConf->getHtml5Url();
 
-		if (kConf::hasParam("optimized_playback"))
+		if (kConf::hasMap("optimized_playback"))
 		{
-			$optimizedPlayback = kConf::get("optimized_playback");
+			$optimizedPlayback = kConf::getMap("optimized_playback");
 			if (array_key_exists($partner_id, $optimizedPlayback))
 			{
 				// force a specific kdp for the partner
