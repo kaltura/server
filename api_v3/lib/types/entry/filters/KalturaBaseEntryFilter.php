@@ -10,7 +10,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		"freeText" => "_free_text",
 		"isRoot" => "_is_root",
 		"categoriesFullNameIn" => "_in_categories_full_name", 
-		"categoryAncestorIdIn" => "in_category_ancestor_id",
+		"categoryAncestorIdIn" => "_in_category_ancestor_id",
 	);
 
 	public function getMapBetweenObjects()

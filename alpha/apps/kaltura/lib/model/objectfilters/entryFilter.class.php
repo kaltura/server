@@ -125,7 +125,7 @@ class entryFilter extends baseObjectFilter
 			"_matchand_roots",
 			"_notin_roots",
 			"_in_category_entry_status",
-			"in_category_ancestor_id"
+			"_in_category_ancestor_id"
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
