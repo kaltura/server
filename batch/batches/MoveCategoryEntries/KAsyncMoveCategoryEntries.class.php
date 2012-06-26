@@ -177,8 +177,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 				if($data->copyOnly)
 					continue;
 					
-				if($addedCategoryEntryResult instanceof KalturaCategoryEntry)
-					$this->kClient->categoryEntry->delete($entryIds[$index], $srcCategoryId);
+				$this->kClient->categoryEntry->delete($entryIds[$index], $srcCategoryId);
 			}
 			$deletedCategoryEntriesResults = $this->kClient->doMultiRequest();
 			if(is_null($deletedCategoryEntriesResults))
