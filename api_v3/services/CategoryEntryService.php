@@ -110,16 +110,13 @@ class CategoryEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
 		
 		//validate user is entiteld to remove entry from category 
-		if(kEntitlementUtils::getEntitlementEnforcement())
+		if(kEntitlementUtils::getEntitlementEnforcement() && 
+			$entry->getKuserId() != kCurrentContext::$ks_kuser_id && 
+			$entry->getCreatorKuserId() != kCurrentContext::$ks_kuser_id)
 		{
 			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, kCurrentContext::$ks_kuser_id);
-			if(!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
-				
-			if($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&
-				$entry->getKuserId() != kCurrentContext::$ks_kuser_id && 
-				$entry->getCreatorKuserId() != kCurrentContext::$ks_kuser_id)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);		
+			if(!$categoryKuser || $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
+				throw new KalturaAPIException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);		
 		}
 			
 		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
