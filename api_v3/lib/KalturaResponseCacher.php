@@ -233,8 +233,11 @@ class KalturaResponseCacher extends kApiCache
 	
 	protected function sendCachingHeaders($usingCache)
 	{
+		// we should never return caching headers for non widget sessions since the KS can be ended and the CDN won't know
+		$isAnonymous = !$this->_ks || ($this->_ksObj && $this->_ksObj->isWidgetSession());
+		
 		// for GET requests with kalsig (signature of call params) return cdn/browser caching headers
-		if ($usingCache && $_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]) && !self::hasExtraFields())
+		if ($usingCache && $isAnonymous && $_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]) && !self::hasExtraFields())
 		{
 			$max_age = $this->_cacheHeadersExpiry;
 			header("Cache-Control: private, max-age=$max_age max-stale=0");
