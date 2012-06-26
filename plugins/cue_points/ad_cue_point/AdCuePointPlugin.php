@@ -38,6 +38,9 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 	
 		if($baseEnumName == 'CuePointType')
 			return array('AdCuePointType');
+		
+		if($baseEnumName == 'MetadataObjectType')
+			return array('AdCuePointMetadataObjectType');
 			
 		return array();
 	}
