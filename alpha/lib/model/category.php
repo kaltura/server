@@ -246,6 +246,7 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		kEventsManager::flushEvents();
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 		
