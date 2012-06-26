@@ -672,17 +672,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	{
 		return array();
 	}
-	
-	/**
-	 * This function returns a list of orderby fields that indicates whether the query should skip sphinx and go
-	 * directly to the database. For example, if a query on 'category' contains order by fullname going
-	 * through sphinx does not help since sphinx cannot order by string fields.
-	 * @return array
-	 */
-	public function getSkipOrderByFields()
-	{
-		return array();
-	}
 		
 	private function shouldSkipSphinx()
 	{
@@ -698,42 +687,20 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				break;
 			}
 		}
-
-		$orderByColumns = $this->getOrderByColumns();
-		$skipOrderByFields = $this->getSkipOrderByFields();
 		
-		$orderByColumnsFixed = array();
-		foreach($orderByColumns as $orderByColumn)
-		{
-			$column = $orderByColumn;
-			if(preg_match('/^\s*([^\s]+)\s+(ASC|DESC)\s*$/i', $orderByColumn, $matches))
-				list($match, $column, $direction) = $matches;
-				
-			$orderByColumnsFixed[] = $column;
-		}
-		
-		if(count(array_intersect($orderByColumnsFixed, $skipOrderByFields)))
-			$hasSkipField = true;
-
 		if (!$hasSkipField)
 			return false;
-
-		$fields = array();		
+		
+		$fields = array();
+		
 		foreach($this->getMap() as $criterion)
 			$fields = array_merge($fields, $this->getAllCriterionFields($criterion));
 		
+		$orderByColumns = $this->getOrderByColumns();		
 		$fields = array_unique(array_merge($fields, $orderByColumns));
 		
 		foreach($fields as $field)
 		{	
-			$matches = null;
-			//ORDER BY fields have ASC or DESC - for example: category.FULL_NAME ASC
-			if(preg_match('/^\s*([^\s]+)\s+(ASC|DESC)\s*$/i', $field, $matches))
-			{
-				list($match, $column, $direction) = $matches;
-				$field = $column;
-			}
-						
 			$fieldName = $this->getSphinxFieldName($field);
 
 			if(in_array($field, $skipFields))
@@ -745,7 +712,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				KalturaLog::debug('Peer does not have the field [' . print_r($field,true) .']');
 				return false;
 			}
-			elseif($this->getSphinxFieldType($fieldName) == IIndexable::FIELD_TYPE_STRING && !in_array($field, $skipOrderByFields))
+			elseif($this->getSphinxFieldType($fieldName) == IIndexable::FIELD_TYPE_STRING)
 			{
 				KalturaLog::debug('Field is textual [' . print_r($fieldName,true) .']');
 				return false;
