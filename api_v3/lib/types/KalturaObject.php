@@ -339,6 +339,7 @@ abstract class KalturaObject
 						//throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
 						//TODO: not throwing exception to not break clients that sends -1 as null for integer values (etc...)
 						$e = new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
+						KalturaLog::err($e->getMessage());
 						$this->$propertyName = null;
 						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
 					}
@@ -458,6 +459,7 @@ abstract class KalturaObject
 		
 		return $useableProperties;
 	}
+	
 	
 	private function getObjectPropertyName($propertyName)
 	{
