@@ -235,7 +235,6 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
-		kEventsManager::flushEvents();
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 		
@@ -262,26 +261,16 @@ class category extends Basecategory implements IIndexable
 			$this->addIndexEntryJob($this->getId(), true);
 		}
 		
+		$oldParentCategoryToResetSubCategories = null;
+		$parentCategoryToResetSubCategories = null;
+		
 		if($this->isColumnModified(categoryPeer::PARENT_ID))
 		{
 			$this->addRecalcCategoriesCount($this->getId());
 			$this->addRecalcCategoriesCount($this->old_parent_id);
 			
-			$oldParentCategory = categoryPeer::retrieveByPK($this->old_parent_id);;
-			
-			if($oldParentCategory)
-			{
-				$oldParentCategory->reSetDirectSubCategoriesCount();
-				$oldParentCategory->save();
-			}
-			
-			$parentCategory = $this->getParentCategory();
-			
-			if($parentCategory)
-			{
-				$parentCategory->reSetDirectSubCategoriesCount();
-				$parentCategory->save();
-			}
+			$oldParentCategoryToResetSubCategories = categoryPeer::retrieveByPK($this->old_parent_id);;
+			$parentCategoryToResetSubCategories = $this->getParentCategory();
 		}
 		
 		if ($this->isColumnModified(categoryPeer::STATUS) && 
@@ -290,13 +279,7 @@ class category extends Basecategory implements IIndexable
 			($this->getColumnsOldValue(categoryPeer::STATUS) == CategoryStatus::ACTIVE || 
 			 $this->getColumnsOldValue(categoryPeer::STATUS) == CategoryStatus::UPDATING))
 		{
-			$parentCategory = $this->getParentCategory();
-			
-			if($parentCategory)
-			{
-				$parentCategory->reSetDirectSubCategoriesCount();
-				$parentCategory->save();
-			}
+			$parentCategoryToResetSubCategories = $this->getParentCategory();
 		}
 
 		// check if parnet is deleted and could be purged
@@ -319,6 +302,20 @@ class category extends Basecategory implements IIndexable
 		if($objectUpdated)
 			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
 			
+		kEventsManager::flushEvents();
+		
+		if($oldParentCategoryToResetSubCategories)
+		{
+			$oldParentCategoryToResetSubCategories->reSetDirectSubCategoriesCount();
+			$oldParentCategoryToResetSubCategories->save();
+		}
+		
+		if($parentCategoryToResetSubCategories)
+		{
+			$parentCategoryToResetSubCategories->reSetDirectSubCategoriesCount();
+			$parentCategoryToResetSubCategories->save();
+		}
+		
 		return $ret;
 	}
 	
