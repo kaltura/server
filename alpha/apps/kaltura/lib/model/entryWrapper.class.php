@@ -27,7 +27,7 @@ class entryWrapper extends objectWrapperBase
 			"licenseType" , "credit"  , "groupId" , "partnerData", "conversionQuality", "permissions" , "dataContent" , "desiredVersion" ,
 			"url" , "thumbUrl" , "filename" , "realFilename" , "indexedCustomData1" ,
 			"thumbOffset" ,
-			"mediaId", "screenName", "siteUrl" , "description", "mediaDate" , "conversionQuality", "securityPolicy" );
+			"mediaId", "screenName", "siteUrl" , "description", "mediaDate" , "conversionQuality", "securityPolicy", "partnerSortValue");
 	
 	// allow to set some other field in some cases - logic should be set in the caller funtion
 	protected $updateable_fields_ext = array ( "adminTags" );
