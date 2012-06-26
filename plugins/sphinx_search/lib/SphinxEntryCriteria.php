@@ -199,7 +199,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{
 		$categoriesAncestorParsed = null;
-		$categories = $filter->get( "in_category_ancestor_id");
+		$categories = $filter->get( "_in_category_ancestor_id");
 		if ($categories !== null)
 		{
 			//if the category exist or the category name is an empty string
@@ -208,7 +208,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 			if(!( $categoriesAncestorParsed !=='' || $categories ==''))
 				$categoriesAncestorParsed = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
 		}
-		$filter->unsetByName('in_category_ancestor_id');
+		$filter->unsetByName('_in_category_ancestor_id');
 		
 		$categories = $filter->get("_matchor_categories_ids");
 		if ($categories !== null)
