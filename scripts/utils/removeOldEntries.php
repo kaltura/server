@@ -1,12 +1,16 @@
 <?php
 
-if($argc != 2)
+if($argc < 2)
 {
 	echo "Arguments missing.\n\n";
 	echo "Usage: php removeOldEntries.php {days old}\n";
 	exit;
 } 
 $daysOld = $argv[1];
+$dryRun = true;
+if($argc > 2 && strtolower($argv[1]) == 'realrun')
+	$dryRun = false;
+	
 $updatedAt = time() - ($daysOld * 24 * 60 * 60);
 
 chdir(dirname(__FILE__));
@@ -34,13 +38,21 @@ $c->add(entryPeer::PARTNER_ID, 100, Criteria::GREATER_THAN);
 $c->add(entryPeer::UPDATED_AT, $updatedAt, Criteria::LESS_THAN);
 if(count($typesToDelete))
 	$c->add(entryPeer::TYPE, $typesToDelete, Criteria::IN);
-
+ 
+$count = 0;
 $entries = entryPeer::doSelect($c);
-
-foreach($entries as $entry)
+while($entries)
 {
-	KalturaLog::debug("Deletes entry [" . $entry->getId() . "]");
-	myEntryUtils::deleteEntry($entry, $entry->getPartnerId());
+	$count += count($entries);
+	foreach($entries as $entry)
+	{
+		KalturaLog::debug("Deletes entry [" . $entry->getId() . "]");
+		KalturaStatement::setDryRun($dryRun);
+		myEntryUtils::deleteEntry($entry, $entry->getPartnerId());
+		KalturaStatement::setDryRun(false);
+	}
+	kMemoryManager::clearMemory();
+	$entries = entryPeer::doSelect($c);
 }
-KalturaLog::debug("Done");
+KalturaLog::debug("Deleted [$count] entries");
 
