@@ -1,5 +1,7 @@
 <?php
 
+// IMPORTANT !!! This class should not depend on anything other than kConf (e.g. NOT KalturaLog)
+
 /**
  * Will hold helper functions and conventions for working with the HttpRequest object
  *
@@ -8,6 +10,9 @@
  */
 class infraRequestUtils
 {
+	protected static $isInGetRemoteAddress = false;
+
+	//
 	// the function check the http range header and sets http response headers accordingly
 	// an array of the start, end and length of the requested range is returned.
 	// multiple ranges are not allowed
@@ -173,6 +178,18 @@ class infraRequestUtils
 
 	public static function getRemoteAddress()
 	{
+		// Prevent call cycles in case KalturaLog will be used in internalGetRemoteAddress
+		if (self::$isInGetRemoteAddress)
+			return null;
+		
+		self::$isInGetRemoteAddress = true;
+		$result = self::internalGetRemoteAddress();		
+		self::$isInGetRemoteAddress = false;
+		return $result;
+	}
+	
+	protected static function internalGetRemoteAddress()
+	{
 		// enable access control debug
 		if(isset($_POST['debug_ip']) && kConf::hasParam('debug_ip_enabled') && kConf::get('debug_ip_enabled'))
 		{
@@ -191,8 +208,6 @@ class infraRequestUtils
 			// pick the last ip
 		 	$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
 			$remote_addr = trim($headerIPs[count($headerIPs) - 1]);
-			if (class_exists('KalturaLog'))
-				KalturaLog::log("getRemoteAddress [".@$_SERVER['HTTP_X_FORWARDED_FOR']."] [".$_SERVER['HTTP_X_FORWARDED_SERVER']."] [$remote_addr]");
 		}
 			
 		// support getting the original ip address of the client when using the cdn for API calls (cdnapi)
@@ -202,8 +217,6 @@ class infraRequestUtils
 			// pick the last ip
 		 	$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
 			$remote_addr = trim($headerIPs[0]);
-			if (class_exists('KalturaLog'))
-				KalturaLog::log("getRemoteAddress [".@$_SERVER['HTTP_X_FORWARDED_FOR']."] [".$_SERVER['HTTP_HOST']."] [$remote_addr]");
 		}
 
 		if (!$remote_addr && isset ( $_SERVER['HTTP_X_KALTURA_REMOTE_ADDR'] ) )
