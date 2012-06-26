@@ -90,6 +90,7 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 
 	/**
 	 * @var KalturaMetadataProfileCreateMode
+	 * @filter eq,not,in,notin
 	 */
 	public $createMode;
 	

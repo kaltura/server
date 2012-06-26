@@ -22,6 +22,10 @@ abstract class KalturaMetadataProfileBaseFilter extends KalturaFilter
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
+		"createModeEqual" => "_eq_create_mode",
+		"createModeNotEqual" => "_not_create_mode",
+		"createModeIn" => "_in_create_mode",
+		"createModeNotIn" => "_notin_create_mode",
 	);
 
 	private $order_by_map = array
@@ -112,4 +116,24 @@ abstract class KalturaMetadataProfileBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $statusIn;
+
+	/**
+	 * @var KalturaMetadataProfileCreateMode
+	 */
+	public $createModeEqual;
+
+	/**
+	 * @var KalturaMetadataProfileCreateMode
+	 */
+	public $createModeNotEqual;
+
+	/**
+	 * @var string
+	 */
+	public $createModeIn;
+
+	/**
+	 * @var string
+	 */
+	public $createModeNotIn;
 }

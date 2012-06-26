@@ -24,7 +24,11 @@ class MetadataProfileFilter extends baseObjectFilter
 			"_eq_system_name", 
 			"_in_system_name", 
 			"_eq_object_type", 
-			"_in_object_type"
+			"_in_object_type",
+			"_eq_create_mode",
+			"_not_create_mode",
+			"_in_create_mode",
+			"_notin_create_mode",
 			) , NULL );
 
 		$this->allowed_order_fields = array ("created_at" , "updated_at")	;
