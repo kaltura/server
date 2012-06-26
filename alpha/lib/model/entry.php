@@ -1651,10 +1651,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$creatorPuserId = $this->getFromCustomData( "creatorPuserId", null, null );
 
 		if(is_null($creatorPuserId))
-			return $this->getPuserId();
-		else
-			return $creatorPuserId;
+		{
+			$creatorPuserId =  $this->getPuserId();
+		}
+		$this->setCreatorPuserId($creatorPuserId);
+		
+		return $creatorPuserId;
 	}
+	
 	public function getCreatorKuserId ( )	
 	{	
 		$creatorKuserId = $this->getFromCustomData( "creatorKuserId", null, null );
