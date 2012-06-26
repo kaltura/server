@@ -1145,7 +1145,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!ContentDistributionPlugin::isAllowedPartner($metadata->getPartnerId()))
 			return true;
 			
-		if($metadata->getObjectType() != KalturaMetadataObjectType::ENTRY)
+		if($metadata->getObjectType() != MetadataObjectType::ENTRY)
 			return true;
 		
 		KalturaLog::log("Metadata [" . $metadata->getId() . "] for entry [" . $metadata->getObjectId() . "] deleted");
@@ -1229,7 +1229,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!ContentDistributionPlugin::isAllowedPartner($metadata->getPartnerId()))
 			return true;
 			
-		if($metadata->getObjectType() != KalturaMetadataObjectType::ENTRY)
+		if($metadata->getObjectType() != MetadataObjectType::ENTRY)
 			return true;
 		
 		KalturaLog::log("Metadata [" . $metadata->getId() . "] for entry [" . $metadata->getObjectId() . "] changed");
