@@ -1447,7 +1447,7 @@ class category extends Basecategory implements IIndexable
 	
 	public function getSearchIndexPrivacyContext()
 	{
-		if(is_null($this->getPrivacyContext()) || $this->getPrivacyContext() == '')
+		if(is_null($this->getPrivacyContext()) || trim($this->getPrivacyContext()) == '')
 			return '';
 		
 		$privacyContext = explode(',', $this->getPrivacyContext());
@@ -1458,8 +1458,7 @@ class category extends Basecategory implements IIndexable
 	
 	public function getSearchIndexPrivacyContexts()
 	{
-		
-		if(is_null($this->getPrivacyContexts()) || $this->getPrivacyContexts() == '')
+		if(is_null($this->getPrivacyContexts()) || trim($this->getPrivacyContexts()) == '')
 			return kEntitlementUtils::DEFAULT_CONTEXT;
 			
 		$privacyContexts = explode(',', $this->getPrivacyContexts());
