@@ -123,7 +123,7 @@ class categoryEntry extends BasecategoryEntry {
 		$category->save();
 		
 		//only categories with no context are saved on entry - this is only for Backward compatible 
-		if($entry && !categoryEntryPeer::getSkipSave() && $category->getPrivacyContexts() == '')
+		if($entry && !categoryEntryPeer::getSkipSave() && ($category->getPrivacyContexts() == '' || $category->getPrivacyContexts() == null))
 		{
 			$entry->setCategories($entry->getCategories() . entry::ENTRY_CATEGORY_SEPARATOR . $category->getFullName());
 			$entry->justSave();
