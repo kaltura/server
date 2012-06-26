@@ -107,17 +107,6 @@ class category extends Basecategory implements IIndexable
 			$this->reSetDepth();
 		}
 		
-		if( $this->isColumnModified(categoryPeer::PARENT_ID) && $this->getParentId())
-		{
-			$parentCategory = $this->getParentCategory();
-			
-			if($parentCategory)
-			{
-				$parentCategory->reSetDirectSubCategoriesCount();
-				$parentCategory->save();
-			}
-		}
-		
 		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PARENT_ID))
 		{
 			$this->resetFullIds();
@@ -992,6 +981,17 @@ class category extends Basecategory implements IIndexable
 			$this->reSetFullIds();
 			
 			parent::save();
+		}
+		
+		if($this->isColumnModified(categoryPeer::PARENT_ID))
+		{			
+			$parentCategory = $this->getParentCategory();
+			
+			if($parentCategory)
+			{
+				$parentCategory->reSetDirectSubCategoriesCount();
+				$parentCategory->save();
+			}
 		}
 			
 		if (!$this->alreadyInSave)
