@@ -209,6 +209,8 @@ class thumbnailAction extends sfAction
 		$referrer = base64_decode($base64Referrer);
 		if (!is_string($referrer)) 
 			$referrer = ""; // base64_decode can return binary data
+		if (!$referrer)
+			$referrer = kApiCache::getHttpReferrer();
 		$ksStr = $this->getRequestParameter("ks");
 		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, accessControlContextType::THUMBNAIL);
 		$securyEntryHelper->validateForPlay();
@@ -339,7 +341,8 @@ class thumbnailAction extends sfAction
 		
 		$nocache = strpos($tempThumbPath, "_NOCACHE_") !== false;
 		
-		if($securyEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields()) 
+		if ($securyEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
+			(!$securyEntryHelper->isKsWidget() && $securyEntryHelper->hasRules())) 
 			$nocache = true;
 
 		// notify external proxy, so it'll cache this url

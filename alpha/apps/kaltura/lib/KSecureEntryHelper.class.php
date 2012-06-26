@@ -245,6 +245,11 @@ class KSecureEntryHelper
 		 return ($this->ks && $this->ks->isAdmin());
 	}
 	
+	public function isKsWidget()
+	{
+		 return (!$this->ksStr || ($this->ks && $this->ks->isWidgetSession()));
+	}
+	
 	protected function isEntryInModeration()
 	{
 		$entry = $this->entry;

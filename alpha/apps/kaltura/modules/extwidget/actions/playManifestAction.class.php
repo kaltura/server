@@ -1194,7 +1194,8 @@ class playManifestAction extends kalturaAction
 				break;
 		}
 				
-		if (!$renderer->tokenizer && !$securyEntryHelper->shouldDisableCache() && !$securyEntryHelper->isKsAdmin())
+		if (!$renderer->tokenizer && !$securyEntryHelper->shouldDisableCache() && !$securyEntryHelper->isKsAdmin() &&
+			($securyEntryHelper->isKsWidget() || !$securyEntryHelper->hasRules()))
 		{
 			$renderer->cachingHeadersAge = 60;
 		}
