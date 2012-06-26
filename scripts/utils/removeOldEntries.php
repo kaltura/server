@@ -8,7 +8,7 @@ if($argc < 2)
 } 
 $daysOld = $argv[1];
 $dryRun = true;
-if($argc > 2 && strtolower($argv[1]) == 'realrun')
+if($argc > 2 && strtolower($argv[2]) == 'realrun')
 	$dryRun = false;
 	
 $updatedAt = time() - ($daysOld * 24 * 60 * 60);
@@ -46,11 +46,16 @@ while($entries)
 	$count += count($entries);
 	foreach($entries as $entry)
 	{
+		kCurrentContext::$ks_partner_id = $entry->getPartnerId();
+		kCurrentContext::$partner_id = $entry->getPartnerId();
+		kCurrentContext::$master_partner_id = $entry->getPartnerId();
+		
 		KalturaLog::debug("Deletes entry [" . $entry->getId() . "]");
 		KalturaStatement::setDryRun($dryRun);
 		myEntryUtils::deleteEntry($entry, $entry->getPartnerId());
 		KalturaStatement::setDryRun(false);
 	}
+	kEventsManager::flushEvents();
 	kMemoryManager::clearMemory();
 	$entries = entryPeer::doSelect($c);
 }
