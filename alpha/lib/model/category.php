@@ -641,7 +641,8 @@ class category extends Basecategory implements IIndexable
 		$filter->setIdIn($categoriesIdsIn);
 		
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);		
-		$filter->attachToCriteria($c);		
+		$filter->attachToCriteria($c);	
+			
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		categoryPeer::doSelect($c);
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
@@ -982,8 +983,12 @@ class category extends Basecategory implements IIndexable
 			
 			parent::save();
 		}
-		
-		if($this->isColumnModified(categoryPeer::PARENT_ID))
+		if (!$this->alreadyInSave)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
+
+		kEventsManager::flushEvents();
+			
+		if($this->getParentCategory())
 		{			
 			$parentCategory = $this->getParentCategory();
 			
@@ -993,9 +998,6 @@ class category extends Basecategory implements IIndexable
 				$parentCategory->save();
 			}
 		}
-			
-		if (!$this->alreadyInSave)
-			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 	}
 	
 	/**
@@ -1436,8 +1438,10 @@ class category extends Basecategory implements IIndexable
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 		$c->add (categoryPeer::STATUS, array(CategoryStatus::DELETED, CategoryStatus::PURGED), Criteria::NOT_IN);
 		$c->add (categoryPeer::PARENT_ID, $this->getId(), Criteria::EQUAL);
-				
+			
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$c->applyFilters();
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$this->setDirectSubCategoriesCount($c->getRecordsCount());
 	}
 	
