@@ -656,6 +656,21 @@ class entryPeer extends BaseentryPeer
 		
 		KalturaLog::debug('Entitlement: Filter Results - done');
 	}
+
+	/* (non-PHPdoc)
+	 * @see BaseentryPeer::retrieveByPKs()
+	 * 
+	 * Override this function in order to use KalturaCriteria
+	 */
+	public static function retrieveByPKs($pks, PropelPDO $con = null)
+	{
+		if (empty($pks))
+			return array();
+			
+		$criteria = KalturaCriteria::create(self::OM_CLASS);
+		$criteria->add(entryPeer::ID, $pks, Criteria::IN);
+		return entryPeer::doSelect($criteria, $con);
+	}
 }
 
 class entryPool
