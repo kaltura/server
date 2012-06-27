@@ -203,12 +203,12 @@ class category extends Basecategory implements IIndexable
 		if ($kuserChanged && $this->inheritance_type == InheritanceType::MANUAL)
 		{	
 			
-			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->getId(), $this->kuser_id);
+			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->getId(), $this->getKuserId());
 			if (!$categoryKuser)
 			{
 				$categoryKuser = new categoryKuser();
 				$categoryKuser->setCategoryId($this->getId());
-				$categoryKuser->setKuserId($this->kuser_id);
+				$categoryKuser->setKuserId($this->getKuserId());
 			}
 			
 			$categoryKuser->setPermissionLevel(CategoryKuserPermissionLevel::MANAGER);
@@ -216,7 +216,14 @@ class category extends Basecategory implements IIndexable
 			$categoryKuser->setPartnerId($this->getPartnerId());
 			$categoryKuser->setUpdateMethod(UpdateMethodType::MANUAL);
 			$categoryKuser->save();
+			
+			$this->indexToSearchIndex();
 		}
+	}
+	
+	protected function indexToSearchIndex()
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
 	
 	protected function addRecalcCategoriesCount($categoryId)
