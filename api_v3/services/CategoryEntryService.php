@@ -102,8 +102,12 @@ class CategoryEntryService extends KalturaBaseService
 	function deleteAction($entryId, $categoryId)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
+
 		if (!$entry)
-			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+		{
+			if (kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
+				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+		}
 			
 		$category = categoryPeer::retrieveByPK($categoryId);
 		if (!$category)
