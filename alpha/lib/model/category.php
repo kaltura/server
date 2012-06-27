@@ -1222,10 +1222,17 @@ class category extends Basecategory implements IIndexable
 		}
 
 		$parentCategory = $this->getParentCategory();
-		$privacyContext = explode(',', $parentCategory->getPrivacyContexts());
-		$privacyContext[] = $v;
+		$privacyContexts = explode(',', $parentCategory->getPrivacyContexts());
+		$privacyContexts[] = $v;
+		
+		$privacyContextsTrimed = array();
+		foreach($privacyContexts as $privacyContext)
+		{
+			if(trim($privacyContext) != '')
+				$privacyContextsTrimed[] = trim($privacyContext);
+		}
 
-		$this->setPrivacyContexts(trim(implode(',', $privacyContext)));
+		$this->setPrivacyContexts(trim(implode(',', $privacyContextsTrimed)));
 		parent::setPrivacyContext($v);
 	}
 
