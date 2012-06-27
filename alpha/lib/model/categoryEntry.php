@@ -125,10 +125,16 @@ class categoryEntry extends BasecategoryEntry {
 		//only categories with no context are saved on entry - this is only for Backward compatible 
 		if($entry && !categoryEntryPeer::getSkipSave() && (trim($category->getPrivacyContexts()) == '' || $category->getPrivacyContexts() == null))
 		{
-			$categories = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategories());
+			$categories = array();
+			if(trim($entry->getCategories()) != '')
+				$categories = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategories());
+				
 			$categories[] = $category->getFullName();
 			
-			$categoriesIds = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategoriesIds());
+			$categoriesIds = array();
+			if(trim($entry->getCategoriesIds()) != '')
+				$categoriesIds = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategoriesIds());
+				
 			$categoriesIds[] = $category->getId();
 			
 			$entry->parentSetCategories(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categories));
