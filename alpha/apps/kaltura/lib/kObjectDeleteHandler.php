@@ -125,7 +125,7 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	protected function kuserDelete(kuser $kuser)
 	{
 		$filter = new categoryKuserFilter();
-		$filter->setUserIdEqual($kuser->getId());
+		$filter->setUserIdEqual($kuser->getPuserId());
 
 		kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 	}
