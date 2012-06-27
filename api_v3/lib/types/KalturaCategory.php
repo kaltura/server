@@ -418,9 +418,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		if($this->privacyContext != null && kEntitlementUtils::getEntitlementEnforcement())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT);
 			
-		if($this->privacyContext === '' || 
-		($this->privacyContext == null && !$sourceObject) || 
-		($this->privacyContext == null && $sourceObject && ($sourceObject->getPrivacyContexts() == null || $sourceObject->getPrivacyContexts() == '')))
+		if(!$this->privacyContext && (!$sourceObject || !$sourceObject->getPrivacyContexts()))
 		{
 			if(($this->appearInList != KalturaAppearInListType::PARTNER_ONLY && $this->appearInList != null) || 
 			   ($this->moderation != KalturaNullableBoolean::FALSE_VALUE && $this->moderation != null) || 
@@ -469,6 +467,9 @@ class KalturaCategory extends KalturaObject implements IFilterable
 
 		if ($this->owner && $this->owner != '' && !($this->owner instanceof KalturaNullField) )
 		{
+			if(!preg_match(kuser::PUSER_ID_REGEXP, $user->owner))
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'owner');
+		
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			kuserPeer::createKuserForPartner($partnerId, $this->owner);
 		}
