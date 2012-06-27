@@ -9,6 +9,8 @@ class serveFlavorAction extends kalturaAction
 	
 	public function execute()
 	{
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
 		requestUtils::handleConditionalGet();
 
 		$flavorId = $this->getRequestParameter("flavorId");
@@ -23,10 +25,6 @@ class serveFlavorAction extends kalturaAction
 		$flavorAsset = assetPeer::retrieveById($flavorId);	
 		if (is_null($flavorAsset))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-
-		$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
-		if (is_null($entry))
-			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 	
 		$clipTo = null;
 //		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, accessControlContextType::PLAY);
