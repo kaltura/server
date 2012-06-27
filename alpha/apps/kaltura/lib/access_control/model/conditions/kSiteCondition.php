@@ -40,14 +40,18 @@ class kSiteCondition extends kMatchCondition
 
 		if (!$this->globalWhitelistDomainsAppended && strpos($referrer, "kwidget") === false && kConf::hasParam("global_whitelisted_domains"))
 		{
-			$this->globalWhitelistDomainsAppended = true;
+			$ks = $scope->getKs();
+			if (!$ks || !in_array($ks->partner_id, kConf::get('global_whitelisted_domains_exclude')))
+			{
+				$this->globalWhitelistDomainsAppended = true;
 			
-			$globalWhitelistedDomains = kConf::get("global_whitelisted_domains");
-			if(!is_array($globalWhitelistedDomains))
-				$globalWhitelistedDomains = explode(',', $globalWhitelistedDomains);
+				$globalWhitelistedDomains = kConf::get("global_whitelisted_domains");
+				if(!is_array($globalWhitelistedDomains))
+					$globalWhitelistedDomains = explode(',', $globalWhitelistedDomains);
 				
-			foreach($globalWhitelistedDomains as $globalWhitelistedDomain)
-				$this->values[] = new kStringValue($globalWhitelistedDomain);
+				foreach($globalWhitelistedDomains as $globalWhitelistedDomain)
+					$this->values[] = new kStringValue($globalWhitelistedDomain);
+			}
 		}
 
 		kApiCache::addExtraField(kApiCache::ECF_REFERRER, kApiCache::COND_SITE_MATCH, $this->getStringValues($scope));
