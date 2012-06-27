@@ -19,7 +19,6 @@ class kEntitlementUtils
 	{
 		return self::$entitlementEnforcement;
 	}
-
 	
 	/**
 	 * Returns true if kuser or current kuser is entitled to entryId
