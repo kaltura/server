@@ -220,7 +220,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $providerData);
 		$feed->setAction('Delete');
 		$feed->setVideoId($data->remoteId);
-		$feed->setDistributionRestrictionRule(); //to update <yt:distribution_restriction> field 
+		$feed->setDistributionRestrictionRule(""); //to update <yt:distribution_restriction> field 
 		
 		$sftpManager = $this->getSFTPManager($distributionProfile);
 		
