@@ -67,6 +67,7 @@ class EntitlementTest extends EntitlementTestBase
 		catch (Exception $ex)
 		{
 			$this->assertTrue(false, 'Fialed to add category: ' . $ex->getCode());
+			return;
 		}
 		
 		$category2->name = $category2->name . rand();
@@ -82,20 +83,19 @@ class EntitlementTest extends EntitlementTestBase
 			$this->assertTrue(false, 'Fialed to add category: ' . $ex->getCode());
 		}
 		
-		
 		$this->startSessionWithDiffe(SessionType::USER, $user1->id, self::PRIVILEGE_PRIVACY_CONTEXT . ':' . $category1->privacyContext);
 		
 		try
 		{
-			$category2 = $this->client->category->get($category2->id);
+			$category1 = $this->client->category->get($category1->id);
 		}
 		catch (Exception $ex)
 		{
 			$this->assertTrue(false, 'Fialed to get category while user is a member of parent category and this category inherits members: ' . $ex->getCode());
 		}
 		
-		if($category2->membersCount != 1)
-			$this->assertTrue(false, 'Fialed: members is not 1');
+		if($category1->membersCount != 1)
+			$this->assertTrue(false, 'Failed: members is not 1. category id: ' . print_r($category1->id, true) . ' $category1->membersCount: ' . print_r($category1->membersCount,true));
 	}
 	
 	/**
