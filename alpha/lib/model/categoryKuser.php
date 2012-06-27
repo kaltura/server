@@ -125,10 +125,11 @@ class categoryKuser extends BasecategoryKuser {
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);		
 		$filter->attachToCriteria($c);		
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		categoryPeer::doSelect($c);
+		$categories = categoryPeer::doSelect($c);
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
-		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY, $filter, true, $featureStatusesToRemove);
+		if(count($categories))
+			kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY, $filter, true, $featureStatusesToRemove);
 	}
 
 	
