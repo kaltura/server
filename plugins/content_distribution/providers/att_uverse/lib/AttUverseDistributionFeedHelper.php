@@ -23,16 +23,6 @@ class AttUverseDistributionFeedHelper
 	/**
 	 * @var DOMElement
 	 */
-	protected $tags;
-	
-	/**
-	 * @var DOMElement
-	 */
-	protected $tag;
-	
-	/**
-	 * @var DOMElement
-	 */
 	protected $category;
 	
 	/**
@@ -72,12 +62,6 @@ class AttUverseDistributionFeedHelper
 		$node = $this->xpath->query('/rss/channel/item')->item(0);
 		$this->item = $node->cloneNode(true);
 		$node->parentNode->removeChild($node);		
-		
-		// tag node template
-		$node = $this->xpath->query('tags/tag', $this->item)->item(0);
-		$this->tag = $node->cloneNode(true);
-		$this->tags = $node->parentNode;
-		$node->parentNode->removeChild($node);	
 		
 		// category node template
 		$node = $this->xpath->query('category', $this->item)->item(0);
@@ -153,9 +137,6 @@ class AttUverseDistributionFeedHelper
 		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
 		$channelNode->appendChild($item);
 		
-		//setting tags node to the current item tags node
-		$this->tags = $this->xpath->query('tags', $item)->item(0);
-		
 		$this->setNodeValue('entryId', $values[AttUverseDistributionField::ITEM_ENTRY_ID], $item);
 		
 		//date fields
@@ -174,8 +155,8 @@ class AttUverseDistributionFeedHelper
 		$this->setNodeValue('title', $values[AttUverseDistributionField::ITEM_TITLE], $item);
 		$this->setNodeValue('description', $values[AttUverseDistributionField::ITEM_DESCRIPTION], $item);
 		
-		//tags
-		$this->addTags($this->tags, $values[AttUverseDistributionField::ITEM_TAGS]);
+		$this->setNodeValue('tags',  $values[AttUverseDistributionField::ITEM_TAGS], $item);
+		
 		//categories
 		$this->addCategories($item, $values[AttUverseDistributionField::ITEM_CATEGORIES]);
 
@@ -203,28 +184,6 @@ class AttUverseDistributionFeedHelper
 	public function setChannelTitle($value)
 	{
 		$this->setNodeValue('/rss/channel/title', $value);
-	}
-	
-	public function addTags($tagsNode, $value)
-	{
-		$tags = explode(',', $value);
-		if ($tags)
-		{									
-			foreach ($tags as $tag)
-			{
-				if ($tag){
-					$tagNode = $this->tag->cloneNode(true);				
-					$tagsNode->appendChild($tagNode);
-					$this->setNodeValue('.', $tag, $tagNode);
-				}
-			}
-		}
-		//remove <tag> tag from xml
-		else {			
-			$node = $this->tag->cloneNode(true);
-			$parentNode = $node->parentNode;	
-			$parentNode->removeChild($node);
-		}
 	}
 	
 	public function addCategories($item, $categoryValue)
