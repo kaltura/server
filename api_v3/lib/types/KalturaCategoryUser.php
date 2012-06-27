@@ -154,6 +154,9 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 		$kuser = kuserPeer::getKuserByPartnerAndUid ($partnerId , $this->userId);
 		if(!$kuser)
 		{
+			if(!preg_match(kuser::PUSER_ID_REGEXP, $this->userId))
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'userId');
+				
 			kuserPeer::createKuserForPartner($partnerId, $this->userId);
 		}
 		
