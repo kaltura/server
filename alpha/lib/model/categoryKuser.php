@@ -72,11 +72,11 @@ class categoryKuser extends BasecategoryKuser {
 	 * @param PropelPDO $con
 	 * @return bloolean
 	 */
-	public function postUpdate(PropelPDO $con = null)
+	public function preUpdate(PropelPDO $con = null)
 	{
 		$this->updateCategroy();
 		
-		return parent::postUpdate($con);
+		return parent::preUpdate($con);
 	}
 	
 	/**
@@ -84,11 +84,11 @@ class categoryKuser extends BasecategoryKuser {
 	 * @param PropelPDO $con
 	 * @return bloolean
 	 */
-	public function postInsert(PropelPDO $con = null)
+	public function preInsert(PropelPDO $con = null)
 	{
 		$this->updateCategroy();
 		
-		return parent::postInsert($con);
+		return parent::preInsert($con);
 	}
 	
 	private function updateCategroy()
@@ -123,7 +123,7 @@ class categoryKuser extends BasecategoryKuser {
 				
 			$category->save();
 		}
-		
+
 		$this->addIndexCategoryInheritedTreeJob($category->getFullIds());
 		$category->indexToSearchIndex();
 	}
