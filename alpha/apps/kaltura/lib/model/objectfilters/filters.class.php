@@ -984,7 +984,7 @@ abstract class baseObjectFilter extends myBaseObject
 		if(isset($simple_xml_node->advancedSearch))
 		{
 			$attr = $simple_xml_node->advancedSearch->attributes();
-			if(isset($attr['type']) && class_exists($attr['type']) && is_subclass_of($attr['type'], 'AdvancedSearchFilterItem'))
+			if(isset($attr['type']) && class_exists($attr['type']) && is_subclass_of((string)$attr['type'], 'AdvancedSearchFilterItem'))
 			{
 				$type = (string) $attr['type'];
 				KalturaLog::debug("Advanced Search type[$type] and value[" . $simple_xml_node->advancedSearch->asXML() . "]");
