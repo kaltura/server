@@ -105,7 +105,7 @@ class categoryKuser extends BasecategoryKuser {
 			if($this->status == CategoryKuserStatus::ACTIVE)
 				$category->setMembersCount($category->getMembersCount() + 1);
 			
-			
+			$category->save();			
 		}
 		elseif($this->isColumnModified(categoryKuserPeer::STATUS))
 		{
