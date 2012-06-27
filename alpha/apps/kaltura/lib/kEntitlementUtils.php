@@ -40,6 +40,7 @@ class kEntitlementUtils
 		}
 		
 		$partner = $entry->getPartner();
+		
 		if(!$ks && !$partner->getDefaultEntitlementEnforcement())
 		{
 			KalturaLog::debug('Entry entitled: no ks and default enforcement ');
