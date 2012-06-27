@@ -467,7 +467,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 
 		if ($this->owner && $this->owner != '' && !($this->owner instanceof KalturaNullField) )
 		{
-			if(!preg_match(kuser::PUSER_ID_REGEXP, $user->owner))
+			if(!preg_match(kuser::PUSER_ID_REGEXP, $this->owner))
 				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'owner');
 		
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
