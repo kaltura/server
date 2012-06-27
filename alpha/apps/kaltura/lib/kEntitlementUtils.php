@@ -120,7 +120,7 @@ class kEntitlementUtils
 			// this ugly code is temporery - since we have a bug in sphinxCriteria::getAllCriterionFields
 			if($kuserId != '')
 			{
-				$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $kuserId, Criteria::EQUAL);
+				$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $kuserId, Criteria::LIKE);
 				$membersCrit->addOr($crit);
 				$crit = $membersCrit;	
 			}
