@@ -182,11 +182,11 @@ class CategoryEntryService extends KalturaBaseService
 			}
 			
 			//validate entitl category
-			if($filter->categoryId != null)
+			if($filter->categoryIdEqual != null)
 			{
-				$category = categoryPeer::retrieveByPK($filter->categoryId);
+				$category = categoryPeer::retrieveByPK($filter->categoryIdEqual);
 				if(!$category)
-					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdIn);
+					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdEqual);
 			}
 		}
 			
