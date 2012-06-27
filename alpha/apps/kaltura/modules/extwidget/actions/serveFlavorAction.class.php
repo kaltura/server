@@ -9,6 +9,7 @@ class serveFlavorAction extends kalturaAction
 	
 	public function execute()
 	{
+		//entitlement should be disabled to serveFlavor action as we do not get ks on this action.
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		requestUtils::handleConditionalGet();
