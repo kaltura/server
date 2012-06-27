@@ -72,7 +72,26 @@ class categoryKuser extends BasecategoryKuser {
 	 * @param PropelPDO $con
 	 * @return bloolean
 	 */
-	public function preSave(PropelPDO $con = null)
+	public function postUpdate(PropelPDO $con = null)
+	{
+		$this->updateCategroy();
+		
+		return parent::postUpdate($con);
+	}
+	
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		$this->updateCategroy();
+		
+		return parent::postInsert($con);
+	}
+	
+	private function updateCategroy()
 	{
 		$category = categoryPeer::retrieveByPK($this->category_id);
 		if(!$category)
@@ -86,7 +105,7 @@ class categoryKuser extends BasecategoryKuser {
 			if($this->status == CategoryKuserStatus::ACTIVE)
 				$category->setMembersCount($category->getMembersCount() + 1);
 			
-			$category->save();
+			
 		}
 		elseif($this->isColumnModified(categoryKuserPeer::STATUS))
 		{
@@ -106,8 +125,7 @@ class categoryKuser extends BasecategoryKuser {
 		}
 		
 		$this->addIndexCategoryInheritedTreeJob($category->getFullIds());
-		
-		return parent::preSave($con);
+		$category->indexToSearchIndex();
 	}
 	
 	public function addIndexCategoryInheritedTreeJob($fullIdsStartsWithCategoryId)
