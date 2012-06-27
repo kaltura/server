@@ -668,7 +668,7 @@ class Partner extends BasePartner
 	
 	//default entitlement scope for ks
 	public function setDefaultEntitlementEnforcement($v) { $this->putInCustomData('defaultEntitlementEnforcement', $v, 'entitlement');}
-	public function getDefaultEntitlementEnforcement() { return $this->getFromCustomData('defaultEntitlementEnforcement', 'entitlement', null);}
+	public function getDefaultEntitlementEnforcement() { return $this->getFromCustomData('defaultEntitlementEnforcement', 'entitlement', true);}
 	
 	//category work group size - to index all category members on each entry if category size is a group.
 	public function setCategoryGroupSize($v) { $this->putInCustomData('categoryGroupSize', $v, 'entitlement');}
