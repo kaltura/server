@@ -73,6 +73,14 @@ class kEntitlementUtils
 		$crit = $c->getNewCriterion (categoryPeer::PRIVACY, $privacy, Criteria::IN);
 		$ksPrivacyContexts = null;
 		
+		// entry that doesn't belong to any category is public
+		$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entry->getId());
+		if(!count($categoryEntries) && (!$ks || $ksPrivacyContexts == self::DEFAULT_CONTEXT))
+		{
+			KalturaLog::debug('Entry entitled: entry does not belong to any category');
+			return true;
+		}
+		
 		if($ks)
 		{	
 			$ksPrivacyContexts = $ks->getPrivacyContext();
@@ -107,15 +115,6 @@ class kEntitlementUtils
 				} 
 			}
 			
-			// entry that doesn't belong to any category is public
-			$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entry->getId());
-			if(!count($categoryEntries) && ($ksPrivacyContexts == self::DEFAULT_CONTEXT))
-			{
-				KalturaLog::debug('Entry entitled: entry does not belong to any category');
-				return true;
-			}
-		
-						
 			// kuser is set on the category as member
 			// this ugly code is temporery - since we have a bug in sphinxCriteria::getAllCriterionFields
 			if($kuserId != '')
