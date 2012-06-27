@@ -362,12 +362,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			return; // error - can't get file size
 		}
 		
-		if ($physicalFileSize < $dropFolderFile->fileSize)
-		{
-			KalturaLog::err('Physical file size ['.$physicalFileSize.'] for ['.$sharedPhysicalFilePath.'] is smaller than the file size ['.$dropFolderFile->fileSize.'] of the drop folder file id ['.$dropFolderFile->id.'] - something went wrong!');
-			return; // error - file size became smaller
-		}
-		else if ($physicalFileSize > $dropFolderFile->fileSize)
+		if ($physicalFileSize != $dropFolderFile->fileSize)
 		{
 			try {
 				$updateDropFolderFile = new KalturaDropFolderFile();
