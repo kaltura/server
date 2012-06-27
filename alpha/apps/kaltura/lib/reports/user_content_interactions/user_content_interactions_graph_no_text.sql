@@ -6,7 +6,7 @@ SELECT
 	IFNULL(SUM(count_download),0) count_download,
 	IFNULL(SUM(count_report),0) count_report
 FROM 
-	dwh_hourly_events_context_app ev
+	dwh_hourly_events_context_entry_user_app ev
 WHERE 	{OBJ_ID_CLAUSE} # ev.entry_id in 
 	AND ev.partner_id =  {PARTNER_ID} # PARTNER_ID
 	AND date_id BETWEEN IF({TIME_SHIFT}>0,(DATE({FROM_DATE_ID}) - INTERVAL 1 DAY)*1, {FROM_DATE_ID})  
