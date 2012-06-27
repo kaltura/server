@@ -221,7 +221,7 @@ class category extends Basecategory implements IIndexable
 		}
 	}
 	
-	protected function indexToSearchIndex()
+	public function indexToSearchIndex()
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
