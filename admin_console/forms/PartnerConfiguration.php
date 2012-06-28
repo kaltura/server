@@ -362,7 +362,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			));
 			
 			$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]['Content Moderation'] = 'moderate_content';
-		    $permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]['Default Entitlement Enforcement'] = 'default_entitlement_enforcement';
+		    $permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Default Entitlement Enforcement'] = 'default_entitlement_enforcement';
 			ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
 			ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);
 			ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);		
