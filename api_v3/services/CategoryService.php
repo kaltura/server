@@ -25,7 +25,7 @@ class CategoryService extends KalturaBaseService
 			$category->owner = null;
 			
 		if ($category->parentId != null && //batch to index categories or to move categories might miss this category to be moved or index
-			$this->getPartner()->getFeaturesStatusByType(FeatureStatusType::LOCK_CATEGORY))
+			$this->getPartner()->getFeaturesStatusByType(IndexObjectType::LOCK_CATEGORY))
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
 			
 		if($category->privacyContext != null && 
@@ -118,7 +118,7 @@ class CategoryService extends KalturaBaseService
 		//and updateing fileds that will add batch job to reindex categories - might not update all sub categories.
 		//batch to index categories or to move categories might miss this category to be moved or index
 		if (($category->parentId != null && $category->parentId !=  $categoryDb->getParentId()) && 
-			$this->getPartner()->getFeaturesStatusByType(FeatureStatusType::LOCK_CATEGORY))
+			$this->getPartner()->getFeaturesStatusByType(IndexObjectType::LOCK_CATEGORY))
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
 
 		$category->id = $id; // for KalturaCategory->ValidateForUpdate
@@ -158,7 +158,7 @@ class CategoryService extends KalturaBaseService
 	 */
 	function deleteAction($id, $moveEntriesToParetCategory = true)
 	{
-		if ($this->getPartner()->getFeaturesStatusByType(FeatureStatusType::LOCK_CATEGORY))
+		if ($this->getPartner()->getFeaturesStatusByType(IndexObjectType::LOCK_CATEGORY))
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
 
 		$categoryDb = categoryPeer::retrieveByPK($id);
@@ -172,7 +172,7 @@ class CategoryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
 
-		$this->getPartner()->addFeaturesStatus(FeatureStatusType::LOCK_CATEGORY);
+		$this->getPartner()->addFeaturesStatus(IndexObjectType::LOCK_CATEGORY);
 
 		try
 		{
@@ -182,11 +182,11 @@ class CategoryService extends KalturaBaseService
 				$categoryDb->setDeletedAt(time(), 0);
 				
 			$categoryDb->save();	
-			$this->getPartner()->removeFeaturesStatus(FeatureStatusType::LOCK_CATEGORY);
+			$this->getPartner()->removeFeaturesStatus(IndexObjectType::LOCK_CATEGORY);
 		}
 		catch(Exception $ex)
 		{
-			$this->getPartner()->removeFeaturesStatus(FeatureStatusType::LOCK_CATEGORY);
+			$this->getPartner()->removeFeaturesStatus(IndexObjectType::LOCK_CATEGORY);
 			throw $ex;
 		}
 	} 
@@ -303,7 +303,7 @@ class CategoryService extends KalturaBaseService
 		if(kEntitlementUtils::getEntitlementEnforcement())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_MOVE_CATEGORIES_FROM_DIFFERENT_PARENT_CATEGORY);
 		
-		if ($this->getPartner()->getFeaturesStatusByType(FeatureStatusType::LOCK_CATEGORY))
+		if ($this->getPartner()->getFeaturesStatusByType(IndexObjectType::LOCK_CATEGORY))
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
 		
 		$categories = explode(',', $categoryIds);
@@ -350,6 +350,6 @@ class CategoryService extends KalturaBaseService
 	 */
 	function unlockCategoriesAction()
 	{
-		$this->getPartner()->removeFeaturesStatus(FeatureStatusType::LOCK_CATEGORY);
+		$this->getPartner()->removeFeaturesStatus(IndexObjectType::LOCK_CATEGORY);
 	}
 }
