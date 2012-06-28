@@ -56,12 +56,13 @@ function extendKsExpiry($ks)
 		return null;
 	
 	$partnerId = $splittedStr[0];
-	$splittedStr[2] = str(time() + 86400);
+	$splittedStr[2] = time() + 86400;
 	$ksStr = implode(';', $splittedStr);
 	$adminSecret = $partnerSecretPool->getPartnerSecret($partnerId);
 	if (!$adminSecret)
 		return null;
-	return base64_encode(sha1($adminSecret . $ksStr) . '|' . $ksStr);
+	$ks = base64_encode(sha1($adminSecret . $ksStr) . '|' . $ksStr);
+	return $ks;
 }
 
 function isKsExpired($ks)
@@ -276,7 +277,7 @@ function normalizeResultBuffer($result)
 	$result = preg_replace('/<execute_time>[0-9\.]+<\/execute_time>/', '', $result);
 	$result = preg_replace('/<total_time>[0-9\.]+<\/total_time>/', '', $result);
 	$result = preg_replace('/<server_time>[0-9\.]+<\/server_time>/', '', $result);
-	$result = preg_replace('server_time="[0-9\.]+"', '', $result);
+	$result = preg_replace('/server_time="[0-9\.]+"/', '', $result);
 	$result = preg_replace('/kaltura_player_\d+/', 'KP', $result);
 	$result = str_replace($serviceUrlNew, $serviceUrlOld, $result);
 	
