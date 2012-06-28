@@ -282,8 +282,15 @@ class CategoryUserService extends KalturaBaseService
 		if($filter->userIdEqual)
 		{
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $filter->userIdEqual);
-			if (!$kuser)
+			
+			$c = new Criteria();
+			$c->add(kuserPeer::PARTNER_ID, $partnerId);
+			$c->add(kuserPeer::PUSER_ID, $filter->userIdEqual);
+			
+			$kuser = kuserPeer::doSelectOne($c);
+			
+			//batch should be abke to get categoryUser of deleted users.
+			if (!$kuser || ($kuser->getStatus() != KuserStatus::ACTIVE && kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID))
 			{
 				$response = new KalturaCategoryUserListResponse();
         		$response->objects = new KalturaCategoryUserArray();
