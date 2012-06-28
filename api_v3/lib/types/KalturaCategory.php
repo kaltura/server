@@ -446,7 +446,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		}
 		
 		if(($this->inheritanceType != KalturaInheritanceType::MANUAL && $this->inheritanceType != null) || 
-			($this->inheritanceType == null && $sourceObject && $sourceObject->getInheritanceType() != false))
+			($this->inheritanceType == null && $sourceObject && $sourceObject->getInheritanceType() != KalturaInheritanceType::MANUAL))
 		{	
 			if((!$sourceObject && $this->owner != null) || 
 			   ($sourceObject && $this->owner != null && $this->owner != $sourceObject->getKuserId()) ||
