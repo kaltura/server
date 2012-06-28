@@ -565,25 +565,20 @@ class KalturaResponseCacher extends kApiCache
 		$isAnonymous = !$ks || (!$ks->isAdmin() && ($ks->user === "0" || $ks->user === null));
         
 		// force caching of actions listed in kConf even if admin ks is used
-		if(kConf::hasMap('v3cache_ignore_admin_ks'))
+		if(!$isAnonymous && kConf::hasMap('v3cache_ignore_admin_ks'))
 		{
-			foreach(kConf::getMap('v3cache_ignore_admin_ks') as $partnerId => $params)
+			$v3cacheIgnoreAdminKS = kConf::getMap('v3cache_ignore_admin_ks');
+			if(isset($v3cacheIgnoreAdminKS[$ks->partner_id]))
 			{
-				if ($ks->partner_id != $partnerId)
-					continue;
-					
-				$ignoreParams = null;
-				parse_str($params, $ignoreParams);
-
-				$matches = 0;
-				foreach($ignoreParams as $key => $value)
-					if (isset($this->_params[$key]) && $this->_params[$key] == $value)
-						$matches++;
-				
-				if ($matches == count($ignoreParams))
+				$actions = explode(',', $v3cacheIgnoreAdminKS[$ks->partner_id]);
+				foreach($actions as $action)
 				{
-					$isAnonymous = true;
-					break;
+					list($serviceId, $actionId) = explode('.', $action);
+					if($this->_params['service'] == $serviceId && $this->_params['action'] == $actionId)
+					{
+						$isAnonymous = true;
+						break;
+					}
 				}
 			}
 		}
