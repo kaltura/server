@@ -472,26 +472,24 @@ class Partner extends BasePartner
 	
 	public function decrementFeaturesStatusByType($type)
 	{
-		$featuresStatus = $this->getFeaturesStatus();
+		$featuresStatuses = $this->getFeaturesStatus();
 
-		if(isset($featuresStatus[$type]))
+		if(isset($featuresStatuses[$type]))
 		{
-			$featureStatus = $featuresStatus[$type];
+			$featureStatus = $featuresStatuses[$type];
 
 			if ($featureStatus->getValue() > 1 )
 			{
-				$featureStatus  = $featuresStatus[$type];
 				$featureStatus->setValue($featureStatus->getValue() - 1);
-				
-				$featuresStatus[$type] = $featureStatus;
+				$featuresStatuses[$type] = $featureStatus;
 			}
 			else
 			{
-				unset($featuresStatus[$type]);
+				unset($featuresStatuses[$type]);
 			}
 		}
 
-		$this->setFeaturesStatus($featuresStatus);
+		$this->setFeaturesStatus($featuresStatuses);
 		$this->save();
 	}
 	
