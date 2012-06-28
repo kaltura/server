@@ -154,6 +154,7 @@ class CategoryEntryService extends KalturaBaseService
 			$pager = new KalturaFilterPager();
 			
 		if ($filter->entryIdEqual == null &&
+			$filter->entryIdIn == null &&
 			$filter->categoryIdIn == null &&
 			$filter->categoryIdEqual == null && 
 			kEntitlementUtils::getEntitlementEnforcement())
@@ -167,6 +168,14 @@ class CategoryEntryService extends KalturaBaseService
 				$entry = entryPeer::retrieveByPK($filter->entryIdEqual);
 				if(!$entry)
 					throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $filter->entryIdEqual);
+			}
+			
+			//validate entitl for entryIn
+			if($filter->entryIdIn != null)
+			{
+				$entry = entryPeer::retrieveByPKs($filter->entryIdIn);
+				if(!$entry)
+					throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $filter->entryIdIn);
 			}
 			
 			//validate entitl categories
