@@ -135,6 +135,7 @@ class CategoryUserService extends KalturaBaseService
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
+		
 		if (!$kuser)
 		{	
 			if (kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
