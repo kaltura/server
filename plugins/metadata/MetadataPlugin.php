@@ -481,7 +481,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 				$dataFound = true;
 			}
 			
-			if($dataFound)
+			if($dataFound && $xml->hasChildNodes())
 			{
 				$xmlData = $xml->saveXML($xml->firstChild);
 				$xmlData = trim($xmlData, " \n\r\t");
@@ -612,7 +612,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 					
 				$dataFound = true;
 				
-                if($dataFound)
+                if($dataFound && $xml->hasChildNodes())
     			{
     				$xmlDataArray[$metadataProfileId] = $xml->saveXML($xml->firstChild);
     				$xmlDataArray[$metadataProfileId] = trim($xmlDataArray[$metadataProfileId], " \n\r\t");
