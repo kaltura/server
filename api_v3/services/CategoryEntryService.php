@@ -263,11 +263,32 @@ class CategoryEntryService extends KalturaBaseService
 			
 			return $dbCategoryEntry->getIntId();
 		}
-				
+		
 		$dbCategoryEntry->reSetCategoryFullIds();
-
-		//TODO should skip all categoryentry logic 
 		$dbCategoryEntry->save();
+		
+		
+		$entry = entryPeer::retrieveByPK($dbCategoryEntry->getEntryId());	
+		if($entry)
+		{
+			$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entryId);
+			
+			$categoriesIds = array();
+			foreach($categoryEntries as $categoryEntry)
+			{
+				$categoriesIds[] = $categoryEntry->getCategoryId();
+			}
+			
+			$categories = categoryPeer::retrieveByPK($categoriesIds);
+			
+			$categoriesFullName = array();
+			foreach($categories as $category)
+				$categoriesFullName[] = $category->getFullName(); 
+				
+			$entry->setCategories($categoriesFullName);
+			categoryEntryPeer::syncEntriesCategories($entry);
+			$entry->save();
+		}
 		
 		return $dbCategoryEntry->getId();
 				
