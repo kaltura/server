@@ -340,8 +340,7 @@ class kwidgetAction extends sfAction
 				if (array_key_exists($partner_id, $optimizedPlayback))
 				{
 					// force a specific kdp for the partner
-					$params = null;
-					parse_str($optimizedPlayback[$partner_id], $params);
+					$params = $optimizedPlayback[$partner_id];
 					if (array_key_exists('kdp_version', $params))
 						$swf_url =  $partner_cdnHost . myPartnerUtils::getUrlForPartner ( $partner_id , $subp_id ) . "/flash/kdp3/".$params['kdp_version']."/kdp3.swf";
 						

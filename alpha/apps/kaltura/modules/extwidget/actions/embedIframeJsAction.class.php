@@ -36,8 +36,7 @@ class embedIframeJsAction extends sfAction
 			if (array_key_exists($partner_id, $optimizedPlayback))
 			{
 				// force a specific kdp for the partner
-				$params = null;
-				parse_str($optimizedPlayback[$partner_id], $params);
+				$params = $optimizedPlayback[$partner_id];
 				if (array_key_exists('html5_url', $params))
 				{
 					$ui_conf_html5_url = $params['html5_url'];
