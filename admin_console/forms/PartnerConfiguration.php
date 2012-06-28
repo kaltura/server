@@ -286,9 +286,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 	//--------------- Live Stream Params ----------------------------
 		$sourceTypes = array(Kaltura_Client_Enum_SourceType::AKAMAI_LIVE => 'Akamai Live');
-		if (defined('Kaltura_Client_Enum_SourceType::LIMELIGHT_LIVE')) {
-		    $sourceTypes[Kaltura_Client_Enum_SourceType::LIMELIGHT_LIVE] = 'Lime Light Live';
-		}
+//		if (defined('Kaltura_Client_Enum_SourceType::LIMELIGHT_LIVE')) {
+//		    $sourceTypes[Kaltura_Client_Enum_SourceType::LIMELIGHT_LIVE] = 'Lime Light Live';
+//		}
 
 		$this->addElement('select', 'default_live_stream_entry_source_type', array(
 		   'label'   => 'Live Stream source type:',
@@ -355,6 +355,12 @@ class Form_PartnerConfiguration extends Infra_Form
 				'label'	  => 'Content Moderation',
 				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 			));
+			
+			$this->addElement('checkbox', 'default_entitlement_enforcement', array(
+				'label'	  => 'Default Entitlement Enforcement',
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+			));
+			
 			$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]['Content Moderation'] = 'moderate_content';
 		
 			ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
