@@ -589,7 +589,7 @@ class category extends Basecategory implements IIndexable
 		$partner = $this->getPartner();
 		
 		$featureStatusToRemoveIndex = new kFeatureStatus();
-		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_ENTRY);
+		$featureStatusToRemoveIndex->setType(IndexObjectType::ENTRY);
 		
 		$featureStatusesToRemove = array();
 		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
@@ -620,19 +620,22 @@ class category extends Basecategory implements IIndexable
 	
 	protected function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $lock = false)
 	{
-		$featureStatusToRemoveIndex = new kFeatureStatus();
-		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY);
+		$jobSubType = IndexObjectType::CATEGORY;
+		if($lock)
+		{
+			$jobSubType = IndexObjectType::LOCK_CATEGORY;
+			
+			$featureStatusToRemoveIndex = new kFeatureStatus();
+			$featureStatusToRemoveIndex->setType(IndexObjectType::LOCK_CATEGORY);
+		}
+		else
+		{
+			$featureStatusToRemoveIndex = new kFeatureStatus();
+			$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY);
+		}
 		
 		$featureStatusesToRemove = array();
 		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
-		
-		if($lock)
-		{
-			$featureStatusToRemoveIndex = new kFeatureStatus();
-			$featureStatusToRemoveIndex->setType(FeatureStatusType::LOCK_CATEGORY);
-			
-			$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
-		}
 
 		$filter = new categoryFilter();
 		$filter->setFullIdsStartsWith($fullIdsStartsWithCategoryId);
@@ -646,7 +649,7 @@ class category extends Basecategory implements IIndexable
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		if($c->getRecordsCount() > 0)
-			kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY, $filter, true, $featureStatusesToRemove);
+			kJobsManager::addIndexJob($this->getPartnerId(), $jobSubType, $filter, true, $featureStatusesToRemove);
 	}
 
 	protected function addIndexCategoryEntryJob($categoryId = null, $shouldUpdate = true)
@@ -654,7 +657,7 @@ class category extends Basecategory implements IIndexable
 		$partner = $this->getPartner();
 		
 		$featureStatusToRemoveIndex = new kFeatureStatus();
-		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY_ENTRY);
+		$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY_ENTRY);
 		
 		$featureStatusesToRemove = array();
 		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
@@ -671,7 +674,7 @@ class category extends Basecategory implements IIndexable
 		$partner = $this->getPartner();
 		
 		$featureStatusToRemoveIndex = new kFeatureStatus();
-		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY_KUSER);
+		$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY_USER);
 		
 		$featureStatusesToRemove = array();
 		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
