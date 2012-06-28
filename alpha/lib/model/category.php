@@ -126,7 +126,9 @@ class category extends Basecategory implements IIndexable
 			($this->isColumnModified(categoryPeer::PARENT_ID) || 
 			 $this->isColumnModified(categoryPeer::INHERITANCE_TYPE) ||
 			 $this->isColumnModified(categoryPeer::NAME) ||
-			 $this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS)))
+			 $this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS) || 
+			 $this->isColumnModified(categoryPeer::MEMBERS) ||
+			 $this->isColumnModified(categoryPeer::MEMBERS_COUNT)))
 		{
 			$lock = false;
 			
@@ -140,15 +142,8 @@ class category extends Basecategory implements IIndexable
 
 			$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id; 			
 			if($partnerId != Partner::BATCH_PARTNER_ID)
-				$this->addIndexCategoryJob($fullIds, null, null, $lock);
+				$this->addIndexCategoryJob($fullIds . categoryPeer::CATEGORY_SEPARATOR, null, $lock);
 		}
-		
-		if (!$this->isNew() && 
-			($this->isColumnModified(categoryPeer::MEMBERS) ||
-			$this->isColumnModified(categoryPeer::MEMBERS_COUNT)))
-	 	{
-	 		$this->addIndexCategoryJob(null, null, $this->getId());
-	 	}
 		
 		// save the childs for action category->delete - delete category is not done by async batch. 
 		foreach($this->childs_for_save as $child)
@@ -623,7 +618,7 @@ class category extends Basecategory implements IIndexable
 		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId);
 	}
 	
-	protected function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $inheritedParentId = null, $lock = false)
+	protected function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $lock = false)
 	{
 		$featureStatusToRemoveIndex = new kFeatureStatus();
 		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY);
@@ -641,7 +636,6 @@ class category extends Basecategory implements IIndexable
 
 		$filter = new categoryFilter();
 		$filter->setFullIdsStartsWith($fullIdsStartsWithCategoryId);
-		$filter->setInheritedParentId($inheritedParentId);
 		$filter->setIdIn($categoriesIdsIn);
 		
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);		
