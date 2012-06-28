@@ -707,8 +707,7 @@ class BaseEntryService extends KalturaEntryService
 				$optimizedPlayback = kConf::getMap("optimized_playback");
 				if (array_key_exists($partnerId, $optimizedPlayback))
 				{
-					$params = null;
-					parse_str($optimizedPlayback[$partnerId], $params);
+					$params = $optimizedPlayback[$partnerId];
 					if (array_key_exists('cache_kdp_acccess_control', $params) && $params['cache_kdp_acccess_control'])
 						$disableCache = false;
 				}
