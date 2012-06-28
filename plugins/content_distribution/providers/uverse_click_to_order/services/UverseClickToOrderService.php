@@ -96,6 +96,8 @@ class UverseClickToOrderService extends KalturaBaseService
 				'id' => $entry->getId(),
 				'thumbnailUrl' => $thumbUrl,
 				'downloadUrl' => $flavorUrl,
+				'updatedAt' =>  $entry->getUpdatedAt(),
+				'sortValue' => $profile->getFieldValue($entryDistribution, UverseClickToOrderDistributionField::SORT_ITEMS_BY_FIELD),
 			);
 			
 		}
@@ -112,7 +114,8 @@ class UverseClickToOrderService extends KalturaBaseService
 			$categoryName = $relatedEntryObject->getName();
 			$categoryFile = $relatedEntryObject->getThumbnailUrl().'/width/'.$fields[UverseClickToOrderDistributionField::CATEGORY_IMAGE_WIDTH].'/height/'.$fields[UverseClickToOrderDistributionField::CATEGORY_IMAGE_HEIGHT];
 			$categoryNode = $feed->addCategory($categoryName, $categoryFile);
-
+			usort($entriesUnderCategory, Array($this,'sortItems'));
+			
 			//getting all entries under a category
 			foreach ($entriesUnderCategory as $entryInfo)
 			{	
@@ -128,6 +131,23 @@ class UverseClickToOrderService extends KalturaBaseService
 		header('Content-Type: text/xml');
 		echo $feed->getXml();
 		die;
+	}
+	
+	
+	//sorting the entries inside a category using 'sortValue' as primary comparison and 'updatedAt' as secondary comparison. 
+	private function sortItems($lEntryInfo,$rEntryInfo){
+		if (isset($lEntryInfo['sortValue']) &&  isset($rEntryInfo['sortValue'])) {
+            if ($lEntryInfo['sortValue'] == $rEntryInfo['sortValue'])
+				return $this->sortItemsByUpdatedAt($lEntryInfo,$rEntryInfo);
+    		return ($lEntryInfo['sortValue'] < $rEntryInfo['sortValue']) ? -1 : 1;
+    	}
+    	return $this->sortItemsByUpdatedAt($lEntryInfo,$rEntryInfo);
+	}
+	
+	private function sortItemsByUpdatedAt($lEntryInfo,$rEntryInfo){
+		if ($lEntryInfo['updatedAt'] == $rEntryInfo['updatedAt'])
+			return 0;
+    	return ($lEntryInfo['updatedAt'] < $rEntryInfo['updatedAt']) ? -1 : 1;
 	}
 	
 	private function getImageUrl($entryId, $width = null, $height = null)

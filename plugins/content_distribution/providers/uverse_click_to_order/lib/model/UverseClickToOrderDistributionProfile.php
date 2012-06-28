@@ -119,6 +119,13 @@ class UverseClickToOrderDistributionProfile extends ConfigurableDistributionProf
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(UverseClickToOrderDistributionField::SORT_ITEMS_BY_FIELD);
+		$fieldConfig->setUserFriendlyFieldName('Sort by field');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/UverseClickToOrderSortItemsByField" />');
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED); 
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		
 		return $fieldConfigArray;
 	}
 
