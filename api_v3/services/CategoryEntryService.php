@@ -110,7 +110,7 @@ class CategoryEntryService extends KalturaBaseService
 		}
 			
 		$category = categoryPeer::retrieveByPK($categoryId);
-		if (!$category)
+		if (!$category && kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
 		
 		//validate user is entiteld to remove entry from category 
