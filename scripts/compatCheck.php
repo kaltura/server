@@ -4,6 +4,85 @@ define('PS2_START_MARKER', 'symfony [info] {sfRequest} request parameters ');
 define('APIV3_START_MARKER', '[KalturaFrontController->run] DEBUG: Params [');
 define('APIV3_GETFEED_MARKER', '[syndicationFeedRenderer] [global] DEBUG: getFeed Params [');
 
+define('DB_HOST_NAME', 'dbgoeshere');
+define('DB_USER_NAME', 'root');
+define('DB_PASSWORD', 'root');
+
+class PartnerSecretPool
+{
+	protected $secrets = array();
+
+	public function __construct()
+	{
+		$this->link = mysql_connect(DB_HOST_NAME, DB_USER_NAME, DB_PASSWORD)
+			or die('Error: Could not connect: ' . mysql_error() . "\n");
+
+		mysql_select_db('kaltura', $this->link) or die("Error: Could not select 'kaltura' database\n");
+	}
+
+	public function __destruct()
+	{
+		mysql_close($this->link);
+	}
+
+	public function getPartnerSecret($partnerId)
+	{
+		if (isset($this->secrets[$partnerId]))
+			return $this->secrets[$partnerId];
+		if (!is_numeric($partnerId))
+			return null;
+			
+		$query = "SELECT admin_secret FROM partner WHERE id='{$partnerId}'";
+		$result = mysql_query($query, $this->link) or die('Error: Select from func table query failed: ' . mysql_error() . "\n");
+		$line = mysql_fetch_array($result, MYSQL_NUM);
+		if (!$line)
+			return null;
+		$this->secrets[$partnerId] = $line[0];
+		return $line[0];
+	}
+}
+
+function extendKsExpiry($ks)
+{
+	global $partnerSecretPool;
+
+	$decodedKs = base64_decode($ks);
+	if (strpos($decodedKs, "|") === false)
+		return null;
+
+	list($hash , $ksStr) = explode( "|" , $decodedKs , 2 );
+	$splittedStr = explode(';', $ksStr);
+	if (count($splittedStr) < 3)
+		return null;
+	
+	$partnerId = $splittedStr[0];
+	$splittedStr[2] = str(time() + 86400);
+	$ksStr = implode(';', $splittedStr);
+	$adminSecret = $partnerSecretPool->getPartnerSecret($partnerId);
+	if (!$adminSecret)
+		return null;
+	return base64_encode(sha1($adminSecret . $ksStr) . '|' . $ksStr);
+}
+
+function isKsExpired($ks)
+{
+	$ks = base64_decode($ks, true);
+	@list($hash, $ks) = @explode ("|", $ks, 2);
+	$ksParts = explode(";", $ks);
+	if (count($ksParts) < 3)
+	{
+		return false;
+	}
+	
+	list(
+		$partnerId, 
+		$partnerPattern, 
+		$validUntil
+	) = $ksParts;
+	
+	return (time() >= $validUntil);
+}
+
 function print_r_reverse($in) {
     $lines = explode("\n", trim($in));
     if (trim($lines[0]) != 'Array') {
@@ -360,39 +439,37 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array())
 	print $resultOld . "\n";
 }
 
-function isRequestExpired($parsedParams)
+function extendRequestKss(&$parsedParams)
 {
-	$ks = null;
 	if (array_key_exists('ks', $parsedParams))
 	{
 		$ks = $parsedParams['ks'];
-	}
-	else if (array_key_exists('1:ks', $parsedParams))
-	{
-		$ks = $parsedParams['1:ks'];
-	}
-	else
-	{
-		return false;
-	}
-	
-	$ks = base64_decode($ks, true);
-	@list($hash, $ks) = @explode ("|", $ks, 2);
-	$ksParts = explode(";", $ks);
-	if (count($ksParts) < 5)
-	{
-		return true;
+		if (isKsExpired($ks))
+		{
+			$ks = extendKsExpiry($ks);
+			if (is_null($ks))
+				return false;
+			$parsedParams['ks'] = $ks;
+		}
 	}
 	
-	list(
-		$partnerId, 
-		$partnerPattern, 
-		$validUntil, 
-		$type, 
-		$rand, 
-	) = $ksParts;
+	for ($i = 1; ; $i++)
+	{
+		$ksKey = "{$i}:ks";
+		if (!array_key_exists($ksKey, $parsedParams))
+			break;
+		
+		$ks = $parsedParams[$ksKey];
+		if (isKsExpired($ks))
+		{
+			$ks = extendKsExpiry($ks);
+			if (is_null($ks))
+				return false;
+			$parsedParams[$ksKey] = $ks;
+		}
+	}
 	
-	return (time() >= $validUntil);
+	return true;
 }
 
 function isActionApproved($fullActionName, $action)
@@ -451,7 +528,7 @@ function processMultiRequest($parsedParams)
 		$fullActionName .= '/'.$curFullActionName;
 	}
 
-	if (isRequestExpired($parsedParams))
+	if (!extendRequestKss($parsedParams))
 	{
 		return;
 	}
@@ -505,7 +582,7 @@ function processRequest($parsedParams)
 	$parsedParams['format'] = '2';		# XML
 	
 	if (!isActionApproved($fullActionName, $action) ||
-		isRequestExpired($parsedParams))
+		!extendRequestKss($parsedParams))
 	{
 		return;
 	}
@@ -528,7 +605,7 @@ function processFeedRequest($parsedParams)
 {
 	$fullActionName = "getfeed";
 		
-	if (isRequestExpired($parsedParams))
+	if (!extendRequestKss($parsedParams))
 	{
 		return;
 	}
@@ -739,6 +816,8 @@ $serviceUrlNew = $argv[2];
 $apiLogPath = $argv[3];
 $logFormat = strtolower($argv[4]);
 
+$partnerSecretPool = new PartnerSecretPool();
+
 if (strpos($apiLogPath, ':') !== false)
 {
 	$localLogPath = tempnam("/tmp", "CompatCheck");
@@ -782,3 +861,5 @@ if (array_key_exists('extension', $logFileInfo) && $logFileInfo['extension'] == 
 	processGZipFile($apiLogPath, $logProcessor);
 else
 	processRegularFile($apiLogPath, $logProcessor);
+
+$partnerSecretPool = null;
