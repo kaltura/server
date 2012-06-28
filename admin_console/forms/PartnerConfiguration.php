@@ -73,6 +73,11 @@ class Form_PartnerConfiguration extends Infra_Form
 			'readonly'		=> true,
 			'ignore' 		=> true,
 		));
+		
+		$this->addElement('checkbox', 'default_entitlement_enforcement', array(
+				'label'	  => 'Default Entitlement Enforcement',
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+			));
 						
 //--------------------------- Publisher specific Delivery Settings ---------------------------		 
 		$this->addElement('checkbox', 'checkbox_host', array(
@@ -356,13 +361,8 @@ class Form_PartnerConfiguration extends Infra_Form
 				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 			));
 			
-			$this->addElement('checkbox', 'default_entitlement_enforcement', array(
-				'label'	  => 'Default Entitlement Enforcement',
-				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
-			));
-			
 			$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]['Content Moderation'] = 'moderate_content';
-		
+		    $permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]['Default Entitlement Enforcement'] = 'default_entitlement_enforcement';
 			ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
 			ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);
 			ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);		
