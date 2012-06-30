@@ -112,7 +112,12 @@ class executeplaylistAction extends defPartnerservices2Action
 		{
 			if ( $this->isAdmin() )
 				return null;			
-			$cache_key_arr = array ( "playlist_id" => $playlist_id , "filters" => $extra_filters );
+			$cache_key_arr = array ( 
+				"playlist_id" => $playlist_id , 
+				"filters" => $extra_filters , 
+				"partner_id" => $partner_id , 
+				"detailed" => $detailed , 
+				"is_admin" => $this->isAdmin() );
 			$cahce_key = new executionCacheKey( );
 			$cahce_key->expiry =  600 ;
 			$cahce_key->key = md5( print_r($cache_key_arr,true ) );
