@@ -54,8 +54,10 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 			$name = $recipient->getName();
 			if($scope && $name instanceof kStringField)
 				$name->setScope($scope);
-
-			$theName = $name->getValue();
+				
+            $theName = "";
+            if ($name)
+			    $theName = $name->getValue();
 			$recipientsArray[$email->getValue()] = is_null($theName) ? '' : $theName;
 		}
 		return $recipientsArray;
