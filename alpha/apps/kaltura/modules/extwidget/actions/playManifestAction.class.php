@@ -1058,18 +1058,17 @@ class playManifestAction extends kalturaAction
 	
 	public function execute()
 	{
-		$ks = $this->getRequestParameter ( "ks", null );
+		$ksStr = $this->getRequestParameter("ks");
+		$this->entryId = $this->getRequestParameter ( "entryId", null );
 		
-		if($ks)
+		if($ksStr)
 		{
-			kCurrentContext::initKsPartnerUser($ks);
+			kCurrentContext::initKsPartnerUser($ksStr);
 		}
 		else
 		{
-			$entryId = $this->getRequestParameter ( "entryId", null );
-			
 			try {
-				kCurrentContext::initPartnerByEntryId($entryId);
+				kCurrentContext::initPartnerByEntryId($this->entryId);
 			}
 			catch(Exception $ex)
 			{
@@ -1079,7 +1078,6 @@ class playManifestAction extends kalturaAction
 		
 		kEntitlementUtils::initEntitlementEnforcement();
 		
-		$this->entryId = $this->getRequestParameter ( "entryId", null );
 		$this->flavorId = $this->getRequestParameter ( "flavorId", null );
 		$this->storageId = $this->getRequestParameter ( "storageId", null );
 		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
@@ -1151,8 +1149,6 @@ class playManifestAction extends kalturaAction
 		if(($this->maxBitrate) && ((!is_numeric($this->maxBitrate)) || ($this->maxBitrate <= 0)))
 			KExternalErrors::dieError(KExternalErrors::INVALID_MAX_BITRATE);
 			
-		$ksStr = $this->getRequestParameter("ks");
-	
 		$base64Referrer = $this->getRequestParameter("referrer");
 		
 		// replace space in the base64 string with + as space is invalid in base64 strings and caused
