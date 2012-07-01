@@ -318,7 +318,10 @@ class entryPeer extends BaseentryPeer
 		
 		$critEntitled = null;
 		
-		if (kEntitlementUtils::getEntitlementEnforcement())
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		
+		if (kEntitlementUtils::getEntitlementEnforcement() && 
+			(kCurrentContext::$is_admin_session || ( $ks && $ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))))
 		{
 			$privacyContexts = kEntitlementUtils::getPrivacyContextSearch();
 			$critEntitled = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, KalturaCriteria::IN_LIKE);
@@ -349,33 +352,44 @@ class entryPeer extends BaseentryPeer
 				$critEntitled->addOr($critEntitledKusers);
 			}
 		}
-
-		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		
 		$critKuser = null;
 
 		// when session is not admin and without list:* privilege, allow access to user entries only
-		if (!kCurrentContext::$is_admin_session || kEntitlementUtils::getEntitlementEnforcement())
-		{		
+		// or when session is with entitlment - user should be able to get all entries s\he uploaded.
+		if ((!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
+			|| kEntitlementUtils::getEntitlementEnforcement())
+		{
 			if(!$critEntitled)
 			{
 				$critEntitled = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
-				if(!kCurrentContext::$is_admin_session)
+				
+				if(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
+				{
 					$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+				}
 				else
+				{
 					$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-					
-			}else{
+				}	
+			}
+			else
+			{
 				$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
-				if(!kCurrentContext::$is_admin_session)
+				
+				if(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
+				{
 					$critKuser->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+				}
 				else
+				{
 					$critKuser->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+				}
 				$critEntitled->addOr($critKuser);
 			}
 				
 			$creatorKuserCrit = $c->getNewCriterion(entryPeer::CREATOR_KUSER_ID, kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
-			if(!kCurrentContext::$is_admin_session)
+			if(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
 				$creatorKuserCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 			else
 				$creatorKuserCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
