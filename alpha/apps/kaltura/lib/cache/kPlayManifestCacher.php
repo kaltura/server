@@ -6,6 +6,8 @@ require_once(dirname(__FILE__) . '/../../../../../infra/cache/kApiCache.php');
 
 class kPlayManifestCacher extends kApiCache
 {
+	const CACHE_VERSION = '1';
+
 	protected $_cacheWrapper = null;
 	
 	protected $_ksValidated = false;
@@ -61,6 +63,7 @@ class kPlayManifestCacher extends kApiCache
 		
 		$this->_params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 		$this->_params['___cache___host'] = @$_SERVER['HTTP_HOST'];
+		$this->_params['___cache___version'] = self::CACHE_VERSION;
 
 		// take only the hostname part of the referrer parameter of baseEntry.getContextData
 		if (isset($this->_params['referrer']))
