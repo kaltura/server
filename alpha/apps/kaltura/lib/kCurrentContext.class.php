@@ -133,9 +133,12 @@ class kCurrentContext
 	
 	public static function initPartnerByEntryId($entryId)
 	{		
+		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
 		$entry = entryPeer::retrieveByPKNoFilter($entryId);
+		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
+		
 		if(!$entry)
-			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
+			return false;
 			
 		kCurrentContext::$ks = null;
 		kCurrentContext::$ks_partner_id = $entry->getPartnerId();
@@ -145,6 +148,8 @@ class kCurrentContext
 		kCurrentContext::$is_admin_session = false;
 		kCurrentContext::$kuser_id = null;
 		kCurrentContext::$ks_kuser_id = 0;
+		
+		return true;
 	}
 	
 	public static function initKsPartnerUser($ksString, $requestedPartnerId = null, $requestedPuserId = null)
