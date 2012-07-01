@@ -131,6 +131,21 @@ class kCurrentContext
 		return false;
 	}
 	
+	public static function initPartnerByEntryId($entryId)
+	{		
+		$entry = entryPeer::retrieveByPKNoFilter($entryId);
+		if(!$entry)
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
+			
+		kCurrentContext::$ks = null;
+		kCurrentContext::$ks_partner_id = $entry->getPartnerId();
+		kCurrentContext::$ks_uid = null;
+		kCurrentContext::$master_partner_id = null;
+		kCurrentContext::$partner_id = $entry->getPartnerId();
+		kCurrentContext::$is_admin_session = false;
+		kCurrentContext::$kuser_id = null;
+		kCurrentContext::$ks_kuser_id = 0;
+	}
 	
 	public static function initKsPartnerUser($ksString, $requestedPartnerId = null, $requestedPuserId = null)
 	{		
