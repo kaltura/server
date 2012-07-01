@@ -61,7 +61,7 @@ class KalturaDispatcher
         
 		$actionParams = $actionReflector->getActionParams();
 		// services.ct - check if partner is allowed to access service ...
-
+        
 		// validate it's ok to access this service
 		$deserializer = new KalturaRequestDeserializer($params);
 		$arguments = $deserializer->buildActionArguments($actionParams);
@@ -80,6 +80,12 @@ class KalturaDispatcher
 		kPermissionManager::init(kConf::get('enable_cache'));
 		kEntitlementUtils::initEntitlementEnforcement();
 		KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		
+		$disableTags = explode(",", $actionReflector->getActionInfo()->disableTags);
+		foreach ($disableTags as $disableTag)
+		{
+		    KalturaCriterion::disableTag($disableTag);
+		}
 		
 		$actionInfo = $actionReflector->getActionInfo();
 
