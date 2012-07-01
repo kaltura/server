@@ -42,6 +42,8 @@ class KalturaResponseCacher extends kApiCache
 	const SUFFIX_DATA =  '.cache';
 	const SUFFIX_RULES = '.rules';
 	const SUFFIX_LOG = '.log';
+
+	const CACHE_VERSION = '1';
 	
 	protected $_cacheStore = null;
 	protected $_defaultExpiry = 600;
@@ -144,6 +146,7 @@ class KalturaResponseCacher extends kApiCache
 		$this->_params['___cache___uri'] = $_SERVER['PHP_SELF'];
 		$this->_params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 		$this->_params['___cache___host'] = @$_SERVER['HTTP_HOST'];
+		$this->_params['___cache___version'] = self::CACHE_VERSION;
 
 		// extract any baseEntry.getContentData referrer parameters
 		$addExtraFields = false;
