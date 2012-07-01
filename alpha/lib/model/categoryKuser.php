@@ -131,7 +131,7 @@ class categoryKuser extends BasecategoryKuser {
 	public function addIndexCategoryInheritedTreeJob($fullIdsStartsWithCategoryId)
 	{
 		$featureStatusToRemoveIndex = new kFeatureStatus();
-		$featureStatusToRemoveIndex->setType(FeatureStatusType::INDEX_CATEGORY);
+		$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY);
 		
 		$featureStatusesToRemove = array();
 		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;

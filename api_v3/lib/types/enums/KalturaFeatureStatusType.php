@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class KalturaFeatureStatusType extends KalturaEnum implements FeatureStatusType
+class KalturaFeatureStatusType extends KalturaEnum implements IndexObjectType
 {
 
 }

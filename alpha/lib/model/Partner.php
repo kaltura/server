@@ -449,51 +449,45 @@ class Partner extends BasePartner
 		return null;
 	}
 	
-	
-	public function incrementFeaturesStatusByType($type)
+	public function resetFeaturesStatusByType($type)
 	{
-		$featuresStatus = $this->getFeaturesStatus();
+		$openStatuses = array(BatchJob::BATCHJOB_STATUS_ALMOST_DONE,
+							  BatchJob::BATCHJOB_STATUS_RETRY,
+							  BatchJob::BATCHJOB_STATUS_PENDING,
+							  BatchJob::BATCHJOB_STATUS_QUEUED,
+							  BatchJob::BATCHJOB_STATUS_PROCESSING,
+							  BatchJob::BATCHJOB_STATUS_PROCESSED,
+							  BatchJob::BATCHJOB_STATUS_MOVEFILE
+							);
 		
-		if(isset($featuresStatus[$type]))
-		{
-			$featureStatus  = $featuresStatus[$type];
-			$featureStatus->setValue($featureStatus->getValue() + 1);
-			$featuresStatus[$type] = $featureStatus;
-		}else {
-			$featureStatus = new kFeatureStatus();
-			$featureStatus->setType($type);
-			$featureStatus->setValue(1);
-			$featuresStatus[$type] = $featureStatus;
-		}
-
-		$this->setFeaturesStatus($featuresStatus);
-		$this->save();
-	}
-	
-	public function decrementFeaturesStatusByType($type)
-	{
+		$criteria = new Criteria();
+		$criteria->add(BatchJobPeer::PARTNER_ID, $this->getId());
+		$criteria->add(BatchJobPeer::JOB_TYPE, BatchJobType::INDEX);
+		$criteria->add(BatchJobPeer::JOB_SUB_TYPE, $type);
+		$criteria->add(BatchJobPeer::STATUS, $openStatuses, Criteria::IN);
+		
+		$batchJob = BatchJobPeer::doSelectOne($criteria);
+		
 		$featuresStatuses = $this->getFeaturesStatus();
 
-		if(isset($featuresStatuses[$type]))
+		if($batchJob)
 		{
-			$featureStatus = $featuresStatuses[$type];
-
-			if ($featureStatus->getValue() > 1 )
-			{
-				$featureStatus->setValue($featureStatus->getValue() - 1);
-				$featuresStatuses[$type] = $featureStatus;
-			}
-			else
-			{
-				unset($featuresStatuses[$type]);
-			}
+			$newFeatureStatus = new kFeatureStatus();
+			$newFeatureStatus->setType($type);
+			$newFeatureStatus->setValue(1);
+		
+			$featuresStatuses[$type] = $newFeatureStatus;
 		}
-
+		elseif(isset($featuresStatuses[$type]))
+		{
+			unset($featuresStatuses[$type]);
+		}
+		
 		$this->setFeaturesStatus($featuresStatuses);
+		$this->setUpdatedAt(time());
 		$this->save();
 	}
 	
-		
 	/**
 	 * @return bool
 	 * @deprecated

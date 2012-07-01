@@ -461,7 +461,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		{
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			$partner = PartnerPeer::retrieveByPK($partnerId);
-			if (!$partner || $partner->getFeaturesStatusByType(FeatureStatusType::LOCK_CATEGORY))
+			if (!$partner || $partner->getFeaturesStatusByType(IndexObjectType::LOCK_CATEGORY))
 				throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);		
 		}
 

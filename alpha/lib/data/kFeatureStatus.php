@@ -8,7 +8,7 @@
 class kFeatureStatus
 {
 	/**
-	 * @var featureStatusType
+	 * @var IndexObjectType
 	 */
 	protected  $type;
 	

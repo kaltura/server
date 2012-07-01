@@ -154,9 +154,9 @@ class CategoryService extends KalturaBaseService
 	 * 
 	 * @action delete
 	 * @param int $id
-	 * @param bool $moveEntriesToParetCategory
+	 * @param KalturaNullableBoolean $moveEntriesToParetCategory
 	 */
-	function deleteAction($id, $moveEntriesToParetCategory = true)
+	function deleteAction($id, $moveEntriesToParetCategory = KalturaNullableBoolean::TRUE_VALUE)
 	{
 		if ($this->getPartner()->getFeaturesStatusByType(IndexObjectType::LOCK_CATEGORY))
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);

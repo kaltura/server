@@ -1948,7 +1948,7 @@ class kFlowHelper
 			if(!($featureStatusToRemove instanceof kFeatureStatus))
 				continue;
 			
-			$dbBatchJob->getPartner()->incrementFeaturesStatusByType($featureStatusToRemove->getType());
+			$dbBatchJob->getPartner()->resetFeaturesStatusByType($featureStatusToRemove->getType());
 		}
 		return $dbBatchJob;
 	}
@@ -1961,7 +1961,7 @@ class kFlowHelper
 			if(!($featureStatusToRemove instanceof kFeatureStatus))
 				continue;
 			
-			$dbBatchJob->getPartner()->decrementFeaturesStatusByType($featureStatusToRemove->getType());
+			$dbBatchJob->getPartner()->resetFeaturesStatusByType($featureStatusToRemove->getType());
 		}
 		
 		return $dbBatchJob;
@@ -1975,7 +1975,7 @@ class kFlowHelper
 			if(!($featureStatusToRemove instanceof kFeatureStatus))
 				continue;
 				
-			$dbBatchJob->getPartner()->decrementFeaturesStatusByType($featureStatusToRemove->getType());
+			$dbBatchJob->getPartner()->resetFeaturesStatusByType($featureStatusToRemove->getType());
 		}
 		
 		return $dbBatchJob;
