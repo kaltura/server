@@ -1067,13 +1067,8 @@ class playManifestAction extends kalturaAction
 		}
 		else
 		{
-			try {
-				kCurrentContext::initPartnerByEntryId($this->entryId);
-			}
-			catch(Exception $ex)
-			{
+			if(kCurrentContext::initPartnerByEntryId($this->entryId))
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
-			}
 		}
 		
 		kEntitlementUtils::initEntitlementEnforcement();
