@@ -29,6 +29,9 @@ class previewAction extends kalturaAction
 		$this->entry_id = $this->getRequestParameter('entry_id');
 		if( $this->entry_id ) {
 			$entry = entryPeer::retrieveByPK($this->entry_id);
+			if( ! $entry ) {
+				die( 'Error getting entry data' );
+			}
 			$this->entry_name = $entry->getName();
 			$this->entry_description = $entry->getDescription();
 			$this->entry_thumbnail_url = $entry->getThumbnailUrl();
