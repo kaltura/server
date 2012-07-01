@@ -38,9 +38,9 @@ class thumbnailAction extends sfAction
 		$widget_id = $this->getRequestParameter( "widget_id", 0 );
 		$upload_token_id = $this->getRequestParameter( "upload_token_id" );
 		$version = $this->getRequestParameter( "version", null );
-		$width = $this->getRequestParameter( "width", -1 );
 		$type = $this->getRequestParameter( "type" , 1);
 		//Hack: if KMS sends thumbnail request containing "!" char, the type should be treated as 5.
+		$width = $this->getRequestParameter( "width", -1 );
 		if (strpos($width, "!" ))
 		{
 		    list ($width, $rest) = explode("!", $width);
