@@ -1653,8 +1653,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if(is_null($creatorPuserId))
 		{
 			$creatorPuserId =  $this->getPuserId();
+			$this->setCreatorPuserId($creatorPuserId);
+			$this->save();
 		}
-		$this->setCreatorPuserId($creatorPuserId);
+		
 		
 		return $creatorPuserId;
 	}
