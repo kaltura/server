@@ -39,8 +39,19 @@ class thumbnailAction extends sfAction
 		$upload_token_id = $this->getRequestParameter( "upload_token_id" );
 		$version = $this->getRequestParameter( "version", null );
 		$width = $this->getRequestParameter( "width", -1 );
-		$height = $this->getRequestParameter( "height", -1 );
 		$type = $this->getRequestParameter( "type" , 1);
+		//Hack: if KMS sends thumbnail request containing "!" char, the type should be treated as 5.
+		if (strpos($width, "!" ))
+		{
+		    list ($width, $rest) = explode("!", $width);
+		    $type = 5;
+		}
+		$height = $this->getRequestParameter( "height", -1 );
+	    if (strpos($height, "!" ))
+		{
+		    list ($height, $rest) = explode("!", $height);
+		    $type = 5;
+		}
 		$crop_provider = $this->getRequestParameter( "crop_provider", null);
 		$quality = $this->getRequestParameter( "quality" , 20);
 		$src_x = $this->getRequestParameter( "src_x" , 0);
@@ -79,25 +90,25 @@ class thumbnailAction extends sfAction
 		
 		// validating the inputs
 		if(!is_numeric($quality) || $quality < 20 || $quality > 100)
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'quality must be btween 20 and 100');
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'quality must be between 20 and 100');
 		
 		if(!is_numeric($src_x) || $src_x < 0 || $src_x > 10000)
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_x must be btween 0 and 10000');
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_x must be between 0 and 10000');
 		
 		if(!is_numeric($src_y) || $src_y < 0 || $src_y > 10000)
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_y must be btween 0 and 10000');
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_y must be between 0 and 10000');
 			
 		if(!is_numeric($src_w) || $src_w < 0 || $src_w > 10000)
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_w must be btween 0 and 10000');
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_w must be between 0 and 10000');
 			
 		if(!is_numeric($src_h) || $src_h < 0 || $src_h > 10000)
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_h must be btween 0 and 10000');
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_h must be between 0 and 10000');
 			
 		if(!is_numeric($width) || $width < 0 || $width > 10000)
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'width must be btween 0 and 10000');
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'width must be between 0 and 10000');
 			
 		if(!is_numeric($height) || $height < 0 || $height > 10000)
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'height must be btween 0 and 10000');
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'height must be between 0 and 10000');
 			
 		if(!is_numeric($density) || $density < 0)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'density must be positive');
