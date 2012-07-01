@@ -15,6 +15,8 @@ class Form_HuluProfileConfiguration extends Form_ConfigurableProfileConfiguratio
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		
+		KalturaLog::debug(print_r($properties));
+		
 		$additionalCategories = isset($properties['series_additional_categories']) && is_array($properties['itemXpathsToExtend']) ? $properties['series_additional_categories'] : array();
 		foreach($additionalCategories as &$val)
 		{

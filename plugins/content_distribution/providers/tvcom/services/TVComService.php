@@ -15,6 +15,7 @@ class TVComService extends KalturaBaseService
 	
 	/**
 	 * @action getFeed
+	 * @disableTags TAG_WIDGET_SESSION
 	 * @param int $distributionProfileId
 	 * @param string $hash
 	 */

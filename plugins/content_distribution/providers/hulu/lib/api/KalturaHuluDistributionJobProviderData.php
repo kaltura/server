@@ -25,7 +25,7 @@ class KalturaHuluDistributionJobProviderData extends KalturaConfigurableDistribu
 	 */
 	public $fileBaseName;
 	
-
+ 
 	/**
 	 * Called on the server side and enables you to populate the object with any data from the DB
 	 * 

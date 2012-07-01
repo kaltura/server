@@ -94,7 +94,7 @@ class ComcastMrssDistributionPlugin extends KalturaPlugin implements IKalturaPer
 		{
 			if($baseClass == 'KalturaDistributionProfile')
 				return 'KalturaComcastMrssDistributionProfile';
-		}
+		} 
 		
 		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::COMCAST_MRSS)
 		{
