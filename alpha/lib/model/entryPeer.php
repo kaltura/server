@@ -674,7 +674,7 @@ class entryPeer extends BaseentryPeer
 
 	public static function filterEntriesByPartnerOrKalturaNetwork(array $entryIds, $partnerId)
 	{
-		$c = new Criteria();
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS); 
 		$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
 		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $partnerId);
 		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
