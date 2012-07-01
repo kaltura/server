@@ -317,7 +317,7 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"total_by_app" => "user_engagement/total_by_app",
 			    "total_by_app_for_objects" => "user_engagement/total_by_app_for_objects",
 				"total_by_context_by_app" => "user_engagement/total_by_app",
-				"total_by_context_by_app_for_objects" => "total_by_app_for_objects",
+				"total_by_context_by_app_for_objects" => "user_engagement/total_by_app_for_objects",
 				"total_by_user_by_app" => "user_engagement/total_by_user_by_app",
 				"total_by_context_by_user_by_app" => "user_engagement/total_by_user_by_app",
 				"detail_no_text" => "user_engagement/detail_no_text",
