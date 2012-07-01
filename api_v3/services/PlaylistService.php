@@ -288,6 +288,7 @@ class PlaylistService extends KalturaEntryService
 	
 	/**
 	 * Retrieve playlist for playing purpose
+	 * @disableTags TAG_WIDGET_SESSION
 	 * 
 	 * @action execute
 	 * @param string $id 
@@ -326,6 +327,7 @@ class PlaylistService extends KalturaEntryService
 
 	/**
 	 * Retrieve playlist for playing purpose, based on content
+	 * @disableTags TAG_WIDGET_SESSION
 	 * 
 	 * @action executeFromContent
 	 * @param KalturaPlaylistType $playlistType  
@@ -353,7 +355,7 @@ class PlaylistService extends KalturaEntryService
 	
 	/**
 	 * Revrieve playlist for playing purpose, based on media entry filters
-	 * 
+	 * @disableTags TAG_WIDGET_SESSION
 	 * @action executeFromFilters
 	 * @param KalturaMediaEntryFilterForPlaylistArray $filters
 	 * @param int $totalResults
