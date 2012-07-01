@@ -1058,6 +1058,27 @@ class playManifestAction extends kalturaAction
 	
 	public function execute()
 	{
+		$ks = $this->getRequestParameter ( "ks", null );
+		
+		if($ks)
+		{
+			kCurrentContext::initKsPartnerUser($ks);
+		}
+		else
+		{
+			$entryId = $this->getRequestParameter ( "entryId", null );
+			
+			try {
+				kCurrentContext::initPartnerByEntryId($entryId);
+			}
+			catch(Exception $ex)
+			{
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+			}
+		}
+		
+		kEntitlementUtils::initEntitlementEnforcement();
+		
 		$this->entryId = $this->getRequestParameter ( "entryId", null );
 		$this->flavorId = $this->getRequestParameter ( "flavorId", null );
 		$this->storageId = $this->getRequestParameter ( "storageId", null );
@@ -1070,8 +1091,15 @@ class playManifestAction extends kalturaAction
 		if ($flavorIdsStr)
 			$this->flavorIds = explode(",", $flavorIdsStr);
 		
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$this->entry = entryPeer::retrieveByPK($this->entryId);
+		}
+		else
+		{
+			$this->entry = entryPeer::retrieveByPKNoFilter( $this->entryId );
+		}
 		
-		$this->entry = entryPeer::retrieveByPKNoFilter( $this->entryId );
 		if ( ! $this->entry )
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
