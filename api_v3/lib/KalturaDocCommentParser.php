@@ -45,6 +45,8 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_ALIAS_ACTION = "/\\@actionAlias\\s(\\w+\\.\\w+)/";
     
+    const DOCCOMMENT_DISABLE_TAGS = "/\\@disableTags ([.\\w]*)/";
+    
     /**
      * @var bool
      */
@@ -175,6 +177,12 @@ class KalturaDocCommentParser
      */
     public $actionAlias = null;
     
+    
+    /**
+     * @var string
+     */
+    public $disableTags = null;
+    
     /**
      * Parse a docComment
      *
@@ -263,6 +271,10 @@ class KalturaDocCommentParser
         if (preg_match(self::DOCCOMMENT_ALIAS_ACTION, $comment, $result))
         	$this->actionAlias = $result[1]; 	
             
+        $result = null;
+        if (preg_match(self::DOCCOMMENT_DISABLE_TAGS, $comment, $result))
+        	$this->disableTags = $result[1];
+        	
         $result = null;
         if (preg_match(self::DOCCOMMENT_VALIDATE_USER, $comment, $result))
         {
