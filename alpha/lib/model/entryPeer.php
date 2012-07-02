@@ -283,7 +283,9 @@ class entryPeer extends BaseentryPeer
 	{
 		self::$filerResults = true;
 		self::setUseCriteriaFilter ( false );
+		Propel::disableInstancePooling();
 		$res = parent::retrieveByPKs( $pks , $con );
+		Propel::enableInstancePooling();
 		self::setUseCriteriaFilter ( true );
 		self::$filerResults = false;
 		return $res;
@@ -625,8 +627,8 @@ class entryPeer extends BaseentryPeer
 	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 		if ((!kEntitlementUtils::getEntitlementEnforcement() && !is_null(kCurrentContext::$ks))|| 
-			KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_ENTRY) || //if entitlement tag is enabled - resultes were filterd in sphinx.
-			!self::$filerResults)
+			!self::$filerResults ||
+			!kEntitlementUtils::getInitialized()) // if initEntitlement hasn't run - skip filters.
 			return parent::filterSelectResults($selectResults, $criteria);
 		
 		KalturaLog::debug('Entitlement: Filter Results');
