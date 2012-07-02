@@ -1,7 +1,7 @@
 prod:
   .settings:
     no_script_name:           off
-    logging_enabled:        of
+    logging_enabled:        off
     error_reporting:        4095
 
 	       
