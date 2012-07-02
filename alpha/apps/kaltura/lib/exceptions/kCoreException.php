@@ -61,4 +61,6 @@ class kCoreException extends Exception
 	const SEARCH_TOO_GENERAL = "SEARCH_TOO_GENERAL";
 	
 	const ID_NOT_FOUND = 'ID_NOT_FOUND';
+	
+	const INVALID_KS = 'INVALID_KS';
 }

@@ -176,8 +176,7 @@ class kCurrentContext
 			catch(Exception $ex)
 			{
 				if (strpos($ex->getMessage(), "INVALID_STR") !== null)
-					//TODO: throw different type of error
-					throw new KalturaAPIException(APIErrors::INVALID_KS, $ksString, ks::INVALID_STR, ks::getErrorStr(ks::INVALID_STR));
+					throw new kCoreException($ex->getMessage(), kCoreException::INVALID_KS, $ksString);
 				else 
 					throw $ex;
 			}

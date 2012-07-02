@@ -345,6 +345,10 @@ class KalturaFrontController
 		{
 			switch($ex->getCode())
 			{	
+				case kCoreException::INVALID_KS:
+					$object = new KalturaAPIException(KalturaErrors::INVALID_KS, $ex->getData(), ks::INVALID_STR, 'INVALID_STR');
+					break;
+					
 				case kCoreException::MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED:
 					$object = new KalturaAPIException(KalturaErrors::MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED, $ex->getData());
 					break;
