@@ -12,12 +12,18 @@ class kEntitlementUtils
 	
 	const ENTRY_PRIVACY_CONTEXT = 'ENTRYPC'; 
 	
+	protected static $initialized = false;
 	protected static $entitlementEnforcement = false;
 	protected static $privacyContextSearch = null;	
 	
 	public static function getEntitlementEnforcement()
 	{
 		return self::$entitlementEnforcement;
+	}
+	
+	public static function getInitialized()
+	{
+		return self::$initialized;
 	}
 	
 	/**
@@ -190,6 +196,8 @@ class kEntitlementUtils
 	 */
 	public static function initEntitlementEnforcement($partnerId = null, $enableEntit = null)
 	{
+		self::$initialized = true; 
+		
 		if(is_null($partnerId)) 
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			 
