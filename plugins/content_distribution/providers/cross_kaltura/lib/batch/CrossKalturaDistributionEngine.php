@@ -498,6 +498,9 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    $targetEntry->endDate = $this->getValueForField(KalturaCrossKalturaDistributionField::BASE_ENTRY_END_DATE);
 	    $targetEntry->referenceId = $this->getValueForField(KalturaCrossKalturaDistributionField::BASE_ENTRY_REFERENCE_ID);
 	    $targetEntry->licenseType = $this->getValueForField(KalturaCrossKalturaDistributionField::BASE_ENTRY_LICENSE_TYPE);
+	    if (isset($targetEntry->conversionQuality)) {
+	        $targetEntry->conversionQuality = null;
+	    }
 	    
 	    // turn problematic empty fields to null
 	    if (!$targetEntry->startDate) { $targetEntry->startDate = null; }
