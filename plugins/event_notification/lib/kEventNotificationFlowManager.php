@@ -131,6 +131,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 */
 	protected function notificationTemplatesConditionsFulfilled(EventNotificationTemplate $notificationTemplate, kEventScope $scope) 
 	{
+	    KalturaLog::info("Checking conditions for notification templat ID [". $notificationTemplate->getId() ."] and scope: ". print_r($scope, true));
 		$eventConditions = $notificationTemplate->getEventConditions();
 		if(!$eventConditions || !count($eventConditions))
 			return true;
