@@ -1089,7 +1089,13 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
     		{
     			KalturaLog::debug('Deleting partial new target entry ['.$this->targetEntryId.']');
     			// delete entry from target account - may throw an exception
-	    		$deleteResult = $this->targetClient->baseEntry->delete($this->targetEntryId);
+    			try {
+	    		    $deleteResult = $this->targetClient->baseEntry->delete($this->targetEntryId);
+    			}
+    			catch (Exception $ignoredException)
+    			{
+    			    KalturaLog::err('Failed deleting partial entry ['.$this->targetEntryId.'] - '.$ignoredException->getMessage());
+    			}
     		}
     		
     		// delete original exception
