@@ -17,17 +17,17 @@ class kConf
 		if (self::$map) 
 			return;
 		
-		$configDir = realpath(dirname(__file__) . '/../configurations');
+		$cacheDir = realpath(dirname(__file__) . '/../cache');
 		
 		self::$map = array();
 		if(function_exists('apc_exists') && apc_exists(self::APC_CACHE_MAP))
 		{
 			// existence of base.reload file means that the kConf should be reloaded from the file
-			if(file_exists("$configDir/base.reload"))
+			if(file_exists("$cacheDir/base.reload"))
 			{
 				if(apc_delete(self::APC_CACHE_MAP))
 				{
-					$deleted = unlink("$configDir/base.reload");
+					$deleted = @unlink("$cacheDir/base.reload");
 					error_log("Base configuration reloaded");
 					if(!$deleted)
 						error_log("Failed to delete base.reload file");
@@ -45,6 +45,7 @@ class kConf
 			}
 		}
 		
+		$configDir = realpath(dirname(__file__) . '/../configurations');
 		if(!file_exists("$configDir/base.ini"))
 		{
 			error_log("Base configuration not found [$configDir/base.ini]");
