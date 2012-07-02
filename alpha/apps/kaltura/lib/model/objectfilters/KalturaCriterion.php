@@ -18,7 +18,7 @@ abstract class KalturaCriterion extends Criterion implements IKalturaDbQuery
 	 */
 	protected $criteria = false;
 	
-	protected static $enabledTags = array();
+	protected static $enabledTags = array(self::TAG_WIDGET_SESSION => 0);
 	
 	protected $tags = array();
 	
