@@ -625,7 +625,7 @@ class entryPeer extends BaseentryPeer
 	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 		if ((!kEntitlementUtils::getEntitlementEnforcement() && !is_null(kCurrentContext::$ks))|| 
-			KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_ENTRY) || //for ret 
+			KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_ENTRY) || //if entitlement tag is enabled - resultes were filterd in sphinx.
 			!self::$filerResults)
 			return parent::filterSelectResults($selectResults, $criteria);
 		
