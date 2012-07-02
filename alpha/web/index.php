@@ -34,7 +34,7 @@ function checkCache()
 		$cache->checkOrStart();
 	}
 	
-	if (strpos($uri, "/partnerservices2") !== false)
+	if(strpos($uri, "/partnerservices2") !== false)
 	{
 		$params = $_GET + $_POST;
 		unset($params['ks']);
@@ -223,6 +223,7 @@ try // we don't want to fail when logger is not configured right
 {
 	$config = new Zend_Config_Ini($loggerConfigPath);
 	$ps2 = $config->ps2;
+	KalturaLog::setContext('PS2');
 	KalturaLog::initLog($ps2);
 }
 catch(Zend_Config_Exception $ex)
@@ -230,7 +231,16 @@ catch(Zend_Config_Exception $ex)
 	$config = null;
 }
 
-sfLogger::registerLogger(KalturaLog::getInstance());
+class CoreLogger extends sfLogger
+{
+	static public function initLog($log)
+	{
+		self::$logger = $log;
+	}
+}
+
+CoreLogger::initLog(KalturaLog::getInstance());
+sfConfig::set('sf_logging_enabled', true);
 
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
