@@ -8,6 +8,8 @@ class kMrssManager
 	 */
 	private static $mrssContributors = null;
 	
+	private static $addedIsmUrl = false;
+	
 	/**
 	 * @param string $string
 	 * @return string
@@ -227,7 +229,7 @@ class kMrssManager
 	 * @param SimpleXMLElement $mrss
 	 * @return SimpleXMLElement
 	 */
-	protected static function appendFlavorAssetMrss(flavorAsset $flavorAsset, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null)
+	protected static function appendFlavorAssetMrss(flavorAsset $flavorAsset, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null,entry $entry)
 	{
 		if(!$mrss)
 			$mrss = new SimpleXMLElement('<item/>');
@@ -283,8 +285,74 @@ class kMrssManager
 		}
 			
 		$tags = $content->addChild('tags');
-		foreach(explode(',', $flavorAsset->getTags()) as $tag)
+		foreach(explode(',', $flavorAsset->getTags()) as $tag){
 			$tags->addChild('tag', self::stringToSafeXml($tag));
+			if($tag == assetparams::TAG_SLWEB && !self::$addedIsmUrl){
+				self::addIsmLink($entry, $mrss);
+				self::$addedIsmUrl = true;
+			}
+		}	
+	}
+	
+	//if the one of the flavors is an .ismv file we will add to the mrss a url of the entry's .ism file.
+	private static function addIsmLink (entry $entry ,SimpleXMLElement $mrss ){
+	
+		$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+		
+		$kalturaFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
+	
+		$urlPrefix = myPartnerUtils::getIisHost($entry->getPartnerId(), StorageProfile::PLAY_FORMAT_HTTP);
+		$iisHost = parse_url($urlPrefix, PHP_URL_HOST);
+		
+		$matches = null;
+		if(preg_match('/(https?:\/\/[^\/]+)(.*)/', $urlPrefix, $matches))
+		{
+			$urlPrefix = $matches[1];
+		}
+		$urlManager = kUrlManager::getUrlManagerByCdn($iisHost, $entry->getId());
+		$urlManager->setFileExtension(pathinfo($kalturaFileSync->getFilePath(), PATHINFO_EXTENSION));
+		$urlManager->setProtocol(StorageProfile::PLAY_FORMAT_SILVER_LIGHT);
+		
+		
+		$partner = $entry->getPartner();
+		if(!$partner->getStorageServePriority() || 
+			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY ||
+			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST)
+		{
+			if($kalturaFileSync)
+			{
+				$url = $urlManager->getFileSyncUrl($kalturaFileSync, false);
+				$mrss->addChild('ismUrl',$urlPrefix.$url);
+				return;
+			}
+		}
+		
+		if(!$partner->getStorageServePriority() || 
+			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
+		{
+			return null;
+		}
+			
+		$externalFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);		
+		if($externalFileSync)
+		{
+			$urlManager = kUrlManager::getUrlManagerByStorageProfile($externalFileSync->getDc(), $entry->getId());
+			$urlManager->setFileExtension(pathinfo($externalFileSync->getFilePath(), PATHINFO_EXTENSION));
+			$urlManager->setProtocol(StorageProfile::PLAY_FORMAT_SILVER_LIGHT);
+			$url = $urlManager->getFileSyncUrl($externalFileSync, false);
+			$mrss->addChild('ismUrl',$urlPrefix.$url);
+			return;
+		}
+
+		if($partner->getStorageServePriority() != StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
+		{
+			if($kalturaFileSync)
+			{
+				$url = $urlManager->getFileSyncUrl($kalturaFileSync, false);
+				$mrss->addChild('ismUrl',$urlPrefix.$url);
+				return;
+			}
+		}		
 	}
 	
 	/**
@@ -382,7 +450,7 @@ class kMrssManager
 				continue;
 
 			if($asset instanceof flavorAsset)
-				self::appendFlavorAssetMrss($asset, $mrss, $mrssParams);
+				self::appendFlavorAssetMrss($asset, $mrss, $mrssParams,$entry);
 				
 			if($asset instanceof thumbAsset)
 				self::appendThumbAssetMrss($asset, $mrss);
