@@ -1,5 +1,7 @@
 <?php
 
+require_once(dirname(__FILE__).'/../../infra/kConf.php');
+
 require_once(realpath(dirname(__FILE__)).'/../config/sfrootdir.php');
 define('SF_APP',         'kaltura');
 define('SF_ENVIRONMENT', 'dev');
@@ -9,20 +11,32 @@ define('MODULES' , SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF
 
 require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
 
-DbManager::setConfig(kConf::getDB());
-DbManager::initialize();
-
 // Logger
-$loggerConfigPath = realpath(dirname(__FILE__) . "/../configurations/logger.ini");
+$loggerConfigPath = realpath(dirname(__FILE__) . "/../../configurations/logger.ini");
 try // we don't want to fail when logger is not configured right
 {
 	$config = new Zend_Config_Ini($loggerConfigPath);
 	$ps2 = $config->ps2_dev;
 	KalturaLog::initLog($ps2);
+	KalturaLog::setContext('PS2');
 }
 catch(Zend_Config_Exception $ex)
 {
 	$config = null;
 }
+
+class CoreDebugLogger extends sfLogger
+{
+	static public function initLog($log)
+	{
+		self::$logger = $log;
+	}
+}
+
+CoreDebugLogger::initLog(KalturaLog::getInstance());
+sfConfig::set('sf_logging_enabled', true);
+
+DbManager::setConfig(kConf::getDB());
+DbManager::initialize();
 
 sfContext::getInstance()->getController()->dispatch();
