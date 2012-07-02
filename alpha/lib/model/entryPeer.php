@@ -387,13 +387,6 @@ class entryPeer extends BaseentryPeer
 				}
 				$critEntitled->addOr($critKuser);
 			}
-				
-			$creatorKuserCrit = $c->getNewCriterion(entryPeer::CREATOR_KUSER_ID, kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
-			if(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
-				$creatorKuserCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
-			else
-				$creatorKuserCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-			$critEntitled->addOr($creatorKuserCrit);
 			
 			if($ks && $ks->getDisableEntitlementForEntry())
 			{
@@ -630,13 +623,13 @@ class entryPeer extends BaseentryPeer
 	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 		if ((!kEntitlementUtils::getEntitlementEnforcement() && !is_null(kCurrentContext::$ks))|| 
-			KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_ENTRY) || 
+			!KalturaCriterion::isTagEnable(KalturaCriterion::TAG_ENTITLEMENT_ENTRY) || 
 			!self::$filerResults)
 			return parent::filterSelectResults($selectResults, $criteria);
 		
 		KalturaLog::debug('Entitlement: Filter Results');
 		
-		if(is_null(kCurrentContext::$ks && count($selectResults)))
+		if(is_null(kCurrentContext::$ks) && count($selectResults))
 		{
 			$entry = $selectResults[0];
 			$partner = $entry->getPartner();
