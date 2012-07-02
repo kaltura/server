@@ -91,22 +91,30 @@ class kEntitlementUtils
 		{	
 			$ksPrivacyContexts = $ks->getPrivacyContext();
 			if (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '')
+			{
 				$ksPrivacyContexts = self::DEFAULT_CONTEXT;
+				
+				if(!count($allCategoriesEntry))
+				{
+					KalturaLog::debug('Entry entitled: entry does not belong to any category and privacy context on the ks is not set');
+					return true;
+				}
+			}
 			
 			$c->add(categoryPeer::PRIVACY_CONTEXTS, $ksPrivacyContexts, KalturaCriteria::IN_LIKE);
 			
 			if(!$kuserId)
 			{
 				$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-				$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid);
+				$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid, true);
 				if($kuser)
 					$kuserId = $kuser->getId();
 			}
 			
-			if($kuserId != '')
+			if(!$kuserId)
 			{
 				// kuser is set on the entry as creator or uploader
-				if ($kuserId != '' && ($entry->getKuserId() == $kuserId || $entry->getCreatorKuserId() == $kuserId))
+				if ($kuserId != '' && ($entry->getKuserId() == $kuserId))
 				{
 					KalturaLog::debug('Entry entitled: ks user is the same as entry->kuserId or entry->creatorKuserId [' . $kuserId . ']');
 					return true;
