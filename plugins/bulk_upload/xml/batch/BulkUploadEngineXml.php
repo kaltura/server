@@ -618,7 +618,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				throw new KalturaBatchException("Action: {$contentAssetsAction} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 		}
 		//Creates new category associations between the entry and the categories
-		$updatedEntryBulkUploadResult = $this->createCategoryAssocations($entryId, $this->implodeChildElements($item->categories), $updatedEntryBulkUploadResult);
+		$updatedEntryBulkUploadResult = $this->createCategoryAssociations($entryId, $this->implodeChildElements($item->categories), $updatedEntryBulkUploadResult);
 		//Adds the additional data for the flavors and thumbs
 		$this->handleFlavorAndThumbsAdditionalData($entryId, $flavorAssets, $thumbAssets);
 				
@@ -853,7 +853,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
 			
 		if (isset ($item->categories))
-	        $createdEntryBulkUploadResult = $this->createCategoryAssocations($createdEntry->id, $this->implodeChildElements($item->categories), $createdEntryBulkUploadResult);
+	        $createdEntryBulkUploadResult = $this->createCategoryAssociations($createdEntry->id, $this->implodeChildElements($item->categories), $createdEntryBulkUploadResult);
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$this->updateObjectsResults(array($createdEntry), array($createdEntryBulkUploadResult));
 		
@@ -871,6 +871,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$pluginsInstance->handleItemAdded($createdEntry, $item);
 			}catch (Exception $e)
 			{
+			    $this->unimpersonate();
 				KalturaLog::err($pluginsInstance->getContainerName() . ' failed: ' . $e->getMessage());
 				$pluginsErrorResults[] = $pluginsInstance->getContainerName() . ' failed: ' . $e->getMessage();
 			}
@@ -1071,7 +1072,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		return $updatedEntry;
 	}
 	
-	private function createCategoryAssocations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult)
+	private function createCategoryAssociations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult)
 	{
 	    $this->impersonate();
 	    
