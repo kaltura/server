@@ -230,6 +230,8 @@ catch(Zend_Config_Exception $ex)
 	$config = null;
 }
 
+sfLogger::registerLogger(KalturaLog::getInstance());
+
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 
