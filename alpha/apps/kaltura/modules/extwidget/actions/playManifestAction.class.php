@@ -1063,7 +1063,13 @@ class playManifestAction extends kalturaAction
 		
 		if($ksStr)
 		{
-			kCurrentContext::initKsPartnerUser($ksStr);
+			try {
+				kCurrentContext::initKsPartnerUser($ksStr);
+			}
+			catch (Exception $ex)
+			{
+				KExternalErrors::dieError(KExternalErrors::INVALID_KS);	
+			}
 		}
 		else
 		{
