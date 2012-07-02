@@ -48,7 +48,7 @@ class kEntitlementUtils
 		
 		if(!$ks && !$partner->getDefaultEntitlementEnforcement())
 		{
-			KalturaLog::debug('Entry entitled: no ks and default enforcement ');
+			KalturaLog::debug('Entry entitled: no ks and default is with no enforcement');
 			return true;
 		}
 		
