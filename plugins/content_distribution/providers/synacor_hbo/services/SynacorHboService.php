@@ -8,11 +8,6 @@
  */
 class SynacorHboService extends KalturaBaseService
 {
-	public function initService($serviceId, $serviceName, $actionName)
-	{
-		parent::initService($serviceId, $serviceName, $actionName);
-	}
-	
 	/**
 	 * @action getFeed
 	 * @disableTags TAG_WIDGET_SESSION
