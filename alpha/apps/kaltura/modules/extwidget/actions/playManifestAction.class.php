@@ -1073,7 +1073,8 @@ class playManifestAction extends kalturaAction
 		}
 		else
 		{
-			if(!kCurrentContext::initPartnerByEntryId($this->entryId))
+			$this->entry = kCurrentContext::initPartnerByEntryId($this->entryId);
+			if(!$this->entry)
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
@@ -1090,16 +1091,17 @@ class playManifestAction extends kalturaAction
 		if ($flavorIdsStr)
 			$this->flavorIds = explode(",", $flavorIdsStr);
 		
-		if(kEntitlementUtils::getEntitlementEnforcement())
-		{
-			$this->entry = entryPeer::retrieveByPK($this->entryId);
-		}
-		else
+		if(!$this->entry)
 		{
 			$this->entry = entryPeer::retrieveByPKNoFilter( $this->entryId );
 		}
-		
-		if ( ! $this->entry )
+		else
+		{
+			if(!kEntitlementUtils::isEntryEntitled($this->entry))
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
+				
+		if (!$this->entry)
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
