@@ -1,7 +1,7 @@
 prod:
   .settings:
     no_script_name:           off
-    logging_enabled:        on  
+    logging_enabled:        of
     error_reporting:        4095
 
 	       
@@ -10,7 +10,7 @@ dev:
     # E_ALL | E_STRICT = 4095
     error_reporting:        4095
     web_debug:              on
-    logging_enabled:        on
+    logging_enabled:        off
     cache:                  off
     no_script_name:         off
     etag:                   off
