@@ -34,10 +34,13 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('CodeCuePointType');
+			return array('CodeCuePointType', 'CodeCuePointMetadataObjectType');
 	
 		if($baseEnumName == 'CuePointType')
 			return array('CodeCuePointType');
+		
+		if($baseEnumName == 'MetadataObjectType')
+			return array('CodeCuePointMetadataObjectType');
 			
 		return array();
 	}

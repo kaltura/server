@@ -34,7 +34,7 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('AdCuePointType');
+			return array('AdCuePointType', 'AdCuePointMetadataObjectType');
 	
 		if($baseEnumName == 'CuePointType')
 			return array('AdCuePointType');

@@ -45,10 +45,13 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('AnnotationCuePointType');
+			return array('AnnotationCuePointType', 'AnnotationMetadataObjectType');
 	
 		if($baseEnumName == 'CuePointType')
 			return array('AnnotationCuePointType');
+		
+		if($baseEnumName == 'MetadataObjectType')
+			return array('AnnotationMetadataObjectType');
 			
 		return array();
 	}
