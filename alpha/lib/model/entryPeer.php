@@ -366,32 +366,35 @@ class entryPeer extends BaseentryPeer
 		if ((!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
 			|| kEntitlementUtils::getEntitlementEnforcement())
 		{
-			if(!$critEntitled)
+			if(!is_null(kCurrentContext::$ks_kuser_id))
 			{
-				$critEntitled = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
-				
-				if(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
+				if(!$critEntitled)
 				{
-					$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+					$critEntitled = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
+					
+					if(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
+					{
+						$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+					}
+					else
+					{
+						$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+					}	
 				}
 				else
 				{
-					$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-				}	
-			}
-			else
-			{
-				$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
-				
-				if(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
-				{
-					$critKuser->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+					$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
+					
+					if(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
+					{
+						$critKuser->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+					}
+					else
+					{
+						$critKuser->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+					}
+					$critEntitled->addOr($critKuser);
 				}
-				else
-				{
-					$critKuser->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-				}
-				$critEntitled->addOr($critKuser);
 			}
 			
 			if($ks && $ks->getDisableEntitlementForEntry())
