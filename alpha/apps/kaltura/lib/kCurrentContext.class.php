@@ -138,7 +138,7 @@ class kCurrentContext
 		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
 		
 		if(!$entry)
-			return false;
+			return null;
 			
 		kCurrentContext::$ks = null;
 		kCurrentContext::$ks_partner_id = $entry->getPartnerId();
@@ -149,7 +149,7 @@ class kCurrentContext
 		kCurrentContext::$kuser_id = null;
 		kCurrentContext::$ks_kuser_id = 0;
 		
-		return true;
+		return $entry;
 	}
 	
 	public static function initKsPartnerUser($ksString, $requestedPartnerId = null, $requestedPuserId = null)
