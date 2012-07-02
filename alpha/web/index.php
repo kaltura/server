@@ -231,15 +231,8 @@ catch(Zend_Config_Exception $ex)
 	$config = null;
 }
 
-class CoreLogger extends sfLogger
-{
-	static public function initLog($log)
-	{
-		self::$logger = $log;
-	}
-}
-
-CoreLogger::initLog(KalturaLog::getInstance());
+sfLogger::getInstance()->registerLogger(KalturaLog::getInstance());
+sfLogger::getInstance()->setLogLevel(7);
 sfConfig::set('sf_logging_enabled', true);
 
 DbManager::setConfig(kConf::getDB());
