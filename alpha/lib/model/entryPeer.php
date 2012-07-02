@@ -271,7 +271,9 @@ class entryPeer extends BaseentryPeer
 	{
 		self::$filerResults = true;
 		self::setUseCriteriaFilter ( false );
+		Propel::disableInstancePooling();
 		$res = parent::retrieveByPK( $pk , $con );
+		Propel::enableInstancePooling();
 		self::setUseCriteriaFilter ( true );
 		self::$filerResults = false;
 		return $res;
