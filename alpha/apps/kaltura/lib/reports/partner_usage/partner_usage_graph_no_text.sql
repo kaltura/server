@@ -24,6 +24,6 @@ FROM  kalturadw.dwh_dim_time t LEFT JOIN (
         ) raw_data ON date_id = day_id
 WHERE day_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID}
 GROUP BY IF('{GROUP_COLUMN}' = 'date_id',day_id,t.month_id) 
-LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */ 
+
 
 
