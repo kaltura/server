@@ -95,7 +95,13 @@ class categoryKuser extends BasecategoryKuser {
 	{
 		$category = categoryPeer::retrieveByPK($this->category_id);
 		if(!$category)
-			throw new kCoreException('category not found');
+		{ 
+			if(kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
+				throw new kCoreException('category not found');
+			
+			return;
+		}
+			
 			
 		if ($this->isNew())
 		{
