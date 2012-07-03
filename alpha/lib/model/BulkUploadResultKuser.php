@@ -7,8 +7,9 @@
  */ 
 class BulkUploadResultKuser extends BulkUploadResult
 {
-    //kUser property names
-    const SCREEN_NAME = "screen_name";
+    //kuser property names
+    const PUSER_ID = "puser_id";
+    const SCREEN_NAME = "screen_name"; 
     const EMAIL = "email";
     const DATE_OF_BIRTH = "date_of_birth";
     const COUNTRY = "country";
@@ -44,6 +45,9 @@ class BulkUploadResultKuser extends BulkUploadResult
     }
     
     //Set properties for users
+    
+    public function getPuserId()	{return $this->getFromCustomData(self::PUSER_ID);}
+	public function setPuserId($v)	{$this->putInCustomData(self::PUSER_ID, $v);}
 	
     public function getScreenName()	{return $this->getFromCustomData(self::SCREEN_NAME);}
 	public function setScreenName($v)	{$this->putInCustomData(self::SCREEN_NAME, $v);}
