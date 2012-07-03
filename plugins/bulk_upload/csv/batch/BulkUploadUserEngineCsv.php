@@ -41,11 +41,6 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			if(!is_numeric($index))
 				continue;
             
-			if ($column == 'userId')
-			{
-			    $bulkUploadResult->objectId = $values[$index];
-			}
-			
 			if ($column == 'dateOfBirth')
 			{
 			    $dateOfBirth = $values[$index];
@@ -340,10 +335,6 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 				$this->addBulkUploadResult($bulkUploadResult);
 				continue;
 			}
-			
-			// update the results with the new object Id
-			if ($requestResult->id)
-			    $bulkUploadResult->objectId = $requestResult->id;
 			
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
