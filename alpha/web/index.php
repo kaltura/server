@@ -1,5 +1,6 @@
 <?php
 
+$start = microtime(true);
 require_once(dirname(__FILE__).'/../../infra/kConf.php');
  
 function checkCache()
