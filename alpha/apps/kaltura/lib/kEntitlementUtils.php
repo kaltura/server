@@ -111,7 +111,7 @@ class kEntitlementUtils
 					$kuserId = $kuser->getId();
 			}
 			
-			if(!$kuserId)
+			if($kuserId)
 			{
 				// kuser is set on the entry as creator or uploader
 				if ($kuserId != '' && ($entry->getKuserId() == $kuserId))
