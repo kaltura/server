@@ -93,15 +93,12 @@ class categoryKuser extends BasecategoryKuser {
 	
 	private function updateCategroy()
 	{
+		categoryPeer::setUseCriteriaFilter(false);
 		$category = categoryPeer::retrieveByPK($this->category_id);
+		categoryPeer::setUseCriteriaFilter(true);
+		
 		if(!$category)
-		{ 
-			if(kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
-				throw new kCoreException('category not found');
-			
-			return;
-		}
-			
+			throw new kCoreException('category not found');
 			
 		if ($this->isNew())
 		{

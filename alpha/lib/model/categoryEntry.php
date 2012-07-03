@@ -95,7 +95,7 @@ class categoryEntry extends BasecategoryEntry {
 				$category->decrementEntriesCount(1, $this->entryCategoriesRemovedIds);
 				$category->decrementDirectEntriesCount();
 		
-				if(!categoryEntryPeer::getSkipSave() && $entry) //entry might be deleted.
+				if(!categoryEntryPeer::getSkipSave() && $entry) //entry might be deleted - and delete job remove the categoryEntry object
 				{
 					$entry->removeCategory($category->getFullName());
 					$entry->save();

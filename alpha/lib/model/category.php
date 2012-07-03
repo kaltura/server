@@ -203,6 +203,7 @@ class category extends Basecategory implements IIndexable
 			{
 				$categoryKuser = new categoryKuser();
 				$categoryKuser->setCategoryId($this->getId());
+				$categoryKuser->setCategoryId($this->getFullId());
 				$categoryKuser->setKuserId($this->getKuserId());
 			}
 			
