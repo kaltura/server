@@ -97,7 +97,7 @@
 					<xs:documentation>Entry type</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="licenseType" minOccurs="1" maxOccurs="1" type="KalturaLicenseType">
+			<xs:element name="licenseType" minOccurs="0" maxOccurs="1" type="KalturaLicenseType">
 				<xs:annotation>
 					<xs:documentation>Entry license type</xs:documentation>
 				</xs:annotation>
