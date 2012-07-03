@@ -122,7 +122,6 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
     		$headerRow[] = "objectId";
     		$headerRow[] = "objectStatus";
     		$headerRow[] = "errorDescription";
-    		$headerRow[] = "userId";
     		fputcsv($STDOUT, $headerRow);
 		}
 		
@@ -153,7 +152,6 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			$values[] = $bulkUploadResult->getObjectId();
 			$values[] = $bulkUploadResult->getObjectStatus();
 			$values[] = $bulkUploadResult->getErrorDescription();
-			$values[] = $batchJob->getData()->getUserId();
 			
 			
 			fputcsv($STDOUT, $values);
@@ -285,6 +283,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	{
 	    /* @var $bulkUploadResult BulkUploadResultKuser */
 	    $values = array();
+	    $values[] = $bulkUploadResult->getPuserId();
 	    $values[] = $bulkUploadResult->getScreenName();
 	    $values[] = $bulkUploadResult->getEmail();
 	    $values[] = is_null($bulkUploadResult->getDateOfBirth()) ? '' : date('Y-m-d', $bulkUploadResult->getDateOfBirth());
