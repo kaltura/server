@@ -337,7 +337,7 @@ class entryPeer extends BaseentryPeer
 			{
 				//ENTITLED_KUSERS field includes $this->entitledUserEdit, $this->entitledUserEdit, and users on work groups categories.
 				$entitledKuserByPrivacyContext = kEntitlementUtils::getEntitledKuserByPrivacyContext();
-				$critEntitledKusers = $c->getNewCriterion(self::ENTITLED_KUSERS, $entitledKuserByPrivacyContext, KalturaCriteria::IN_LIKE);
+				$critEntitledKusers = $c->getNewCriterion(self::ENTITLED_KUSERS, $entitledKuserByPrivacyContext, KalturaCriteria::IN_LIKE_ORDER);
 				$critEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 				
 				$categoriesIds = array();
