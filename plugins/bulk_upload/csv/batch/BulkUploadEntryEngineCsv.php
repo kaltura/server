@@ -437,7 +437,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 			// update the results with the new entry id
 			$bulkUploadResult->entryId = $requestResult->id;
 			$bulkUploadResult->objectId = $requestResult->id;
-			$this->createCategoryAssocations($bulkUploadResult->entryId, $bulkUploadResult->category, $bulkUploadResult);
+			$this->createCategoryAssociations($bulkUploadResult->entryId, $bulkUploadResult->category, $bulkUploadResult);
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
 		
@@ -450,7 +450,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	 * @param string $categories
 	 * @param KalturaBulkUploadResultEntry $bulkuploadResult
 	 */
-	private function createCategoryAssocations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult)
+	private function createCategoryAssociations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult)
 	{
 	    $this->impersonate();
 	    
