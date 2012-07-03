@@ -8,6 +8,10 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
     /**
      * @var string
      */
+    public $userId;
+    /**
+     * @var string
+     */
     public $screenName;
     
     /**
@@ -68,6 +72,7 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
     
     private static $mapBetweenObjects = array
 	(
+		"userId" => "puserId",
 		"screenName",
 	    "email",
 	    "dateOfBirth",
@@ -94,9 +99,9 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
      */
     public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
-	    if (!is_numeric($this->objectId))
+	    if ($this->userId)
 	    {
-	        $kuser = kuserPeer::getKuserByPartnerAndUid($this->partnerId, $this->objectId);
+	        $kuser = kuserPeer::getKuserByPartnerAndUid($this->partnerId, $this->userId);
 	        if ($kuser)
                 $this->objectId = $kuser->getId();	            
 	    }
