@@ -287,7 +287,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	    $values = array();
 	    $values[] = $bulkUploadResult->getScreenName();
 	    $values[] = $bulkUploadResult->getEmail();
-	    $values[] = $bulkUploadResult->getDateOfBirth();
+	    $values[] = is_null($bulkUploadResult->getDateOfBirth()) ? '' : date('Y-m-d', $bulkUploadResult->getDateOfBirth());
 	    $values[] = $bulkUploadResult->getCountry();
 	    $values[] = $bulkUploadResult->getState();
 	    $values[] = $bulkUploadResult->getCity();
