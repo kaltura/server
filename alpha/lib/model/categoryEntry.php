@@ -77,7 +77,7 @@ class categoryEntry extends BasecategoryEntry {
 		categoryPeer::setUseCriteriaFilter(true);
 		if(!$category)
 			throw new kCoreException('category id [' . $this->getCategoryId() . 'was not found', kCoreException::ID_NOT_FOUND);
-
+			
 		$entry = entryPeer::retrieveByPK($this->getEntryId());
 			
 		if($this->getStatus() == CategoryEntryStatus::ACTIVE && 
@@ -95,7 +95,7 @@ class categoryEntry extends BasecategoryEntry {
 				$category->decrementEntriesCount(1, $this->entryCategoriesRemovedIds);
 				$category->decrementDirectEntriesCount();
 		
-				if(!categoryEntryPeer::getSkipSave())
+				if(!categoryEntryPeer::getSkipSave() && $entry) //entry might be deleted.
 				{
 					$entry->removeCategory($category->getFullName());
 					$entry->save();
