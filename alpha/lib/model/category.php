@@ -1432,16 +1432,6 @@ class category extends Basecategory implements IIndexable
 		$this->addCopyCategoryKuserJob($categoryId);
 	}
 	
-	public function reSetPrivacyContext()
-	{
-		$this->setPrivacyContext($this->getPrivacyContext());
-		
-		if($this->getPrivacyContexts() == '')
-		{
-			$this->setDefaultUnEntitlmenetCategory();
-		}
-	}
-	
 	protected function setDefaultUnEntitlmenetCategory()
 	{
 		//default non-entitlement fields
