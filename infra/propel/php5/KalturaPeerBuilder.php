@@ -287,12 +287,12 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 		if(\$criteriaForSelect instanceof KalturaCriteria)
 			\$criteriaForSelect->applyResultsSort(\$queryResult);
 		
-		".$this->getPeerClassname()."::filterSelectResults(\$queryResult, \$criteria);
-		
 		if (\$cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults(\$cacheKey, \$queryResult);
 		}
+		
+		".$this->getPeerClassname()."::filterSelectResults(\$queryResult, \$criteria);
 		
 		".$this->getPeerClassname()."::addInstancesToPool(\$queryResult);
 		return \$queryResult;
