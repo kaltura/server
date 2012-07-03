@@ -101,6 +101,9 @@ class category extends Basecategory implements IIndexable
 			$this->updateFullName();
 		}
 		
+		if(trim($this->getPrivacyContexts()) == '')
+			$this->setDefaultUnEntitlmenetCategory();
+		
 		// set the depth of the parent category + 1
 		if (!$this->getIsIndex() && ($this->isNew() || $this->isColumnModified(categoryPeer::PARENT_ID)))
 		{
@@ -203,7 +206,7 @@ class category extends Basecategory implements IIndexable
 			{
 				$categoryKuser = new categoryKuser();
 				$categoryKuser->setCategoryId($this->getId());
-				$categoryKuser->setCategoryId($this->getFullId());
+				$categoryKuser->setCategoryId($this->getFullIds());
 				$categoryKuser->setKuserId($this->getKuserId());
 			}
 			
@@ -1218,10 +1221,7 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	public function setPrivacyContext($v)
-	{
-		if(trim($v) == '')
-			$this->setDefaultUnEntitlmenetCategory();
-			
+	{			
 		if (!$this->getParentId())
 		{
 			$this->setPrivacyContexts($v);
