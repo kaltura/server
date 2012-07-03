@@ -70,13 +70,13 @@ class kEntitlementUtils
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
 		$c->add(categoryPeer::ID, $categories, Criteria::IN);
 		
-		$ksPrivacyContexts = null;
 				
 		$privacy = array(PrivacyType::ALL);
 		if($ks && !$ks->isWidgetSession())
 			$privacy[] = PrivacyType::AUTHENTICATED_USERS;
 			
 		$crit = $c->getNewCriterion (categoryPeer::PRIVACY, $privacy, Criteria::IN);
+		
 		$ksPrivacyContexts = null;
 		
 		// entry that doesn't belong to any category is public
@@ -350,9 +350,9 @@ class kEntitlementUtils
 		$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
 		
 		foreach ($ksPrivacyContexts as $ksPrivacyContext)
-			$privacyContextSearch[] = $ksPrivacyContext . ' << ' . kCurrentContext::$ks_kuser_id . ' << ' . $ksPrivacyContext;
+			$privacyContextSearch[] = $ksPrivacyContext . ',' . kCurrentContext::$ks_kuser_id . ',' . $ksPrivacyContext;
 		
-		$privacyContextSearch[] = self::ENTRY_PRIVACY_CONTEXT . ' << ' . kCurrentContext::$ks_kuser_id . ' << ' . self::ENTRY_PRIVACY_CONTEXT;
+		$privacyContextSearch[] = self::ENTRY_PRIVACY_CONTEXT . ',' . kCurrentContext::$ks_kuser_id . ',' . self::ENTRY_PRIVACY_CONTEXT;
 			
 		return $privacyContextSearch;
 	}
