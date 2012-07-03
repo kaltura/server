@@ -468,12 +468,12 @@ abstract class BaseassetParamsOutputPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		assetParamsOutputPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		assetParamsOutputPeer::filterSelectResults($queryResult, $criteria);
 		
 		assetParamsOutputPeer::addInstancesToPool($queryResult);
 		return $queryResult;

@@ -352,12 +352,12 @@ abstract class BasecategoryEntryPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		categoryEntryPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		categoryEntryPeer::filterSelectResults($queryResult, $criteria);
 		
 		categoryEntryPeer::addInstancesToPool($queryResult);
 		return $queryResult;

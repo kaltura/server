@@ -484,12 +484,12 @@ abstract class BaseBatchJobPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		BatchJobPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		BatchJobPeer::filterSelectResults($queryResult, $criteria);
 		
 		BatchJobPeer::addInstancesToPool($queryResult);
 		return $queryResult;

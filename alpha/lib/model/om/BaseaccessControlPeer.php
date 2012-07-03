@@ -388,12 +388,12 @@ abstract class BaseaccessControlPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		accessControlPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		accessControlPeer::filterSelectResults($queryResult, $criteria);
 		
 		accessControlPeer::addInstancesToPool($queryResult);
 		return $queryResult;

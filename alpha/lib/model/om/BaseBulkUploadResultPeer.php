@@ -444,12 +444,12 @@ abstract class BaseBulkUploadResultPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		BulkUploadResultPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		BulkUploadResultPeer::filterSelectResults($queryResult, $criteria);
 		
 		BulkUploadResultPeer::addInstancesToPool($queryResult);
 		return $queryResult;

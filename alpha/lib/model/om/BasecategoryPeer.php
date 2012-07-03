@@ -448,12 +448,12 @@ abstract class BasecategoryPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		categoryPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		categoryPeer::filterSelectResults($queryResult, $criteria);
 		
 		categoryPeer::addInstancesToPool($queryResult);
 		return $queryResult;

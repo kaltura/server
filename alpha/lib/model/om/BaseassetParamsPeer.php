@@ -456,12 +456,12 @@ abstract class BaseassetParamsPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		assetParamsPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		assetParamsPeer::filterSelectResults($queryResult, $criteria);
 		
 		assetParamsPeer::addInstancesToPool($queryResult);
 		return $queryResult;

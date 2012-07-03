@@ -512,12 +512,12 @@ abstract class BaseBatchJobLogPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		BatchJobLogPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		BatchJobLogPeer::filterSelectResults($queryResult, $criteria);
 		
 		BatchJobLogPeer::addInstancesToPool($queryResult);
 		return $queryResult;

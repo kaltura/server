@@ -320,12 +320,12 @@ abstract class BaseblockedEmailPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		blockedEmailPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		blockedEmailPeer::filterSelectResults($queryResult, $criteria);
 		
 		blockedEmailPeer::addInstancesToPool($queryResult);
 		return $queryResult;
