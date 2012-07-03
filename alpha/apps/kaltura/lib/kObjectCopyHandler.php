@@ -25,19 +25,7 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 	 */
 	public function shouldConsumeCopiedEvent(BaseObject $fromObject, BaseObject $toObject)
 	{
-		if($fromObject instanceof assetParams)
-			return true;
-			
-		if($fromObject instanceof assetParamsOutput)
-			return true;
-		
-		if($fromObject instanceof conversionProfile2)
-			return true;
-			
-		if($fromObject instanceof entry)
-			return true;
-			
-		return false;
+		return true;
 	}
 	
 	/* (non-PHPdoc)
@@ -45,18 +33,43 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 	 */
 	public function objectCopied(BaseObject $fromObject, BaseObject $toObject)
 	{
-		if($fromObject instanceof assetParams)
-			self::mapIds('assetParams', $fromObject->getId(), $toObject->getId());
-		
-		if($fromObject instanceof conversionProfile2)
-			self::mapIds('conversionProfile2', $fromObject->getId(), $toObject->getId());
-		
-		if($fromObject instanceof assetParamsOutput)
+		if($fromObject instanceof asset)
 		{
+			self::mapIds('asset', $fromObject->getId(), $toObject->getId());
+		
 			$flavorParamsId = self::getMappedId('assetParams', $fromObject->getFlavorParamsId());
 			if($flavorParamsId)
 			{
 				$toObject->setFlavorParamsId($flavorParamsId);
+				$toObject->save();
+			}
+		}
+		elseif($fromObject instanceof assetParams)
+		{
+			self::mapIds('assetParams', $fromObject->getId(), $toObject->getId());
+		}
+		elseif($fromObject instanceof assetParamsOutput)
+		{
+			self::mapIds('assetParamsOutput', $fromObject->getId(), $toObject->getId());
+		
+			$flavorParamsId = self::getMappedId('assetParams', $fromObject->getFlavorParamsId());
+			if($flavorParamsId)
+			{
+				$toObject->setFlavorParamsId($flavorParamsId);
+				$toObject->save();
+			}
+		}
+		else
+		{
+			self::mapIds(get_class($fromObject), $fromObject->getId(), $toObject->getId());
+		}
+		
+		if($fromObject instanceof category && $fromObject->getParentId())
+		{
+			$parentId = self::getMappedId('category', $fromObject->getParentId());
+			if($parentId)
+			{
+				$toObject->setParentId($parentId);
 				$toObject->save();
 			}
 		}
@@ -67,6 +80,13 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 			if($conversionProfileId)
 			{
 				$toObject->setConversionProfileId($conversionProfileId);
+				$toObject->save();
+			}
+		
+			$accessControlId = self::getMappedId('accessControl', $fromObject->getAccessControlId());
+			if($accessControlId)
+			{
+				$toObject->setAccessControlId($accessControlId);
 				$toObject->save();
 			}
 		}

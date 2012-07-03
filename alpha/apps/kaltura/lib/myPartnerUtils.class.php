@@ -507,7 +507,7 @@ class myPartnerUtils
 		$conversion_profile_2_id = $entry->getConversionProfileId();
 		$conversion_quality = "";
 		
-		KalturaLog::log("getConversionProfile2ForEntry: conversion_profile_2_id [$conversion_profile_2_id]");
+		KalturaLog::log("conversion_profile_2_id [$conversion_profile_2_id]");
 		if ( is_null($conversion_profile_2_id) || $conversion_profile_2_id <= 0 )
 		{
 			// this is assumed to be the old conversion profile
@@ -521,7 +521,7 @@ class myPartnerUtils
 				throw new Exception ( "Cannot find partner for entry [$entry_id]" );
 			}
 			
-			KalturaLog::log("getConversionProfile2ForEntry: conversion_quality [$conversion_quality]");
+			KalturaLog::log("conversion_quality [$conversion_quality]");
 			$partner_kmc_version = $partner->getKmcVersion ( );
 			if ( is_null($partner_kmc_version ) || version_compare( $partner_kmc_version , "2" , "<" ) ) 
 			{
@@ -1171,7 +1171,7 @@ class myPartnerUtils
  				$toPartner->putInCustomData($customDataName, $customDataValue);
 		
 		$toPartner->save();
- 		
+		
 		// copy permssions before trying to copy additional objects such as distribution profiles which are not enabled yet for the partner
  		self::copyPermissions($fromPartner, $toPartner);
 		self::copyUserRoles($fromPartner, $toPartner);
@@ -1182,8 +1182,11 @@ class myPartnerUtils
  		self::copyFlavorParams($fromPartner, $toPartner);
  		self::copyConversionProfiles($fromPartner, $toPartner);
 		
+		categoryEntryPeer::setUseCriteriaFilter(false);
+ 		self::copyCategories($fromPartner, $toPartner);
  		self::copyEntriesByType($fromPartner, $toPartner, entryType::MEDIA_CLIP, $dontCopyUsers);
  		self::copyEntriesByType($fromPartner, $toPartner, entryType::PLAYLIST, $dontCopyUsers);
+		categoryEntryPeer::setUseCriteriaFilter(true);
  		
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
@@ -1191,7 +1194,7 @@ class myPartnerUtils
  	
 	public static function copyUserRoles(Partner $fromPartner, Partner $toPartner)
  	{
- 		KalturaLog::log('copyUserRoles - Copying user roles from partner ['.$fromPartner->getId().'] to partner ['.$toPartner->getId().']');
+ 		KalturaLog::log('Copying user roles from partner ['.$fromPartner->getId().'] to partner ['.$toPartner->getId().']');
  		UserRolePeer::setUseCriteriaFilter ( false );
  		$c = new Criteria();
  		$c->addAnd(UserRolePeer::PARTNER_ID, $fromPartner->getId(), Criteria::EQUAL);
@@ -1207,7 +1210,7 @@ class myPartnerUtils
  	
 	public static function copyPermissions(Partner $fromPartner, Partner $toPartner)
  	{
- 		KalturaLog::log('copyPermissions - Copying permissions from partner ['.$fromPartner->getId().'] to partner ['.$toPartner->getId().']');
+ 		KalturaLog::log('Copying permissions from partner ['.$fromPartner->getId().'] to partner ['.$toPartner->getId().']');
  		PermissionPeer::setUseCriteriaFilter ( false );
  		$c = new Criteria();
  		$c->addAnd(PermissionPeer::PARTNER_ID, $fromPartner->getId(), Criteria::EQUAL);
@@ -1221,9 +1224,53 @@ class myPartnerUtils
  		}
  	}
  	
+ 	public static function copyCategories(Partner $fromPartner, Partner $toPartner)
+ 	{
+ 		KalturaLog::log("Copying categories from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."]");
+ 		
+ 		categoryPeer::setUseCriteriaFilter(false);
+ 		$c = new Criteria();
+ 		$c->addAnd(categoryPeer::PARTNER_ID, $fromPartner->getId());
+ 		$c->addAnd(categoryPeer::STATUS, CategoryStatus::ACTIVE);
+ 		$c->addAscendingOrderByColumn(categoryPeer::DEPTH);
+ 		$c->addAscendingOrderByColumn(categoryPeer::CREATED_AT);
+ 		$categories = categoryPeer::doSelect($c);
+ 		categoryPeer::setUseCriteriaFilter(true);
+ 		
+ 		foreach($categories as $category)
+ 		{
+ 			/* @var $category category */
+ 			$newCategory= $category->copy();
+ 			$newCategory->setPartnerId($toPartner->getId());
+ 			if($category->getParentId())
+ 				$newCategory->setParentId(kObjectCopyHandler::getMappedId('category', $category->getParentId()));
+ 				
+ 			$newCategory->save();
+ 			
+			$newCategory->setIsIndex(true);
+ 			categoryPeer::setUseCriteriaFilter(false);
+			$newCategory->reSetFullIds();
+			$newCategory->reSetInheritedParentId();
+			$newCategory->reSetDepth();
+			$newCategory->reSetFullName();
+			$newCategory->reSetPrivacyContext();
+ 			categoryPeer::setUseCriteriaFilter(true);
+			
+			$newCategory->setEntriesCount(0);
+			$newCategory->setMembersCount(0);
+			$newCategory->setPendingMembersCount(0);
+			$newCategory->setDirectSubCategoriesCount(0);
+			$newCategory->setDirectEntriesCount(0);
+			$newCategory->save();
+ 			
+ 			kEventsManager::flushEvents();
+ 			KalturaLog::log("Copied [".$category->getId()."], new id is [".$newCategory->getId()."]");
+ 		}
+ 	}
+ 	
  	public static function copyEntriesByType(Partner $fromPartner, Partner $toPartner, $entryType, $dontCopyUsers = false)
  	{
- 		KalturaLog::log("copyEntriesByType - Copying entries from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."] with type [".$entryType."]");
+ 		KalturaLog::log("Copying entries from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."] with type [".$entryType."]");
  		entryPeer::setUseCriteriaFilter ( false );
  		$c = new Criteria();
  		$c->addAnd(entryPeer::PARTNER_ID, $fromPartner->getId());
@@ -1235,12 +1282,13 @@ class myPartnerUtils
  		foreach($entries as $entry)
  		{
  			myEntryUtils::copyEntry($entry, $toPartner, $dontCopyUsers);
+ 			kEventsManager::flushEvents();
  		}
  	}
  	
  	public static function copyUiConfsByType(Partner $fromPartner, Partner $toPartner, $uiConfType)
  	{
- 		KalturaLog::log("copyUiConfsByType - Copying uiconfs from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."] with type [".$uiConfType."]");
+ 		KalturaLog::log("Copying uiconfs from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."] with type [".$uiConfType."]");
  		uiConfPeer::setUseCriteriaFilter(false);
  		$c = new Criteria();
  		$c->addAnd(uiConfPeer::PARTNER_ID, $fromPartner->getId());
@@ -1256,7 +1304,7 @@ class myPartnerUtils
  			$newUiConf->setPartnerId($toPartner->getId());
  			$newUiConf = $uiConf->cloneToNew($newUiConf);
  			$newUiConf->save();
- 			KalturaLog::log("copyUiConfsByType - UIConf [".$newUiConf->getId()."] was created");
+ 			KalturaLog::log("UIConf [".$newUiConf->getId()."] was created");
  		}
  	}
  	
@@ -1282,7 +1330,7 @@ class myPartnerUtils
  	{
 		$copiedList = array();
 		
- 		KalturaLog::log("copyConversionProfiles - Copying conversion profiles from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."]");
+ 		KalturaLog::log("Copying conversion profiles from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."]");
  		
  		$c = new Criteria();
  		$c->add(conversionProfile2Peer::PARTNER_ID, $fromPartner->getId());
@@ -1294,7 +1342,7 @@ class myPartnerUtils
  			$newConversionProfile->setPartnerId($toPartner->getId());
  			$newConversionProfile->save();
  			
- 			KalturaLog::log("copyConversionProfiles - Copied [".$conversionProfile->getId()."], new id is [".$newConversionProfile->getId()."]");
+ 			KalturaLog::log("Copied [".$conversionProfile->getId()."], new id is [".$newConversionProfile->getId()."]");
 			$copiedList[$conversionProfile->getId()] = $newConversionProfile->getId();
  			
  			$c = new Criteria();
@@ -1367,14 +1415,14 @@ class myPartnerUtils
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if (is_null($partner))
 		{
-			KalturaLog::log ( "blockInactivePartner: BLOCK_PARNTER partner [$partnerId] doesnt exist" );
+			KalturaLog::log ( "BLOCK_PARNTER partner [$partnerId] doesnt exist" );
 			KExternalErrors::dieError(KExternalErrors::PARTNER_NOT_FOUND);
 		}
 			
 		$status = $partner->getStatus();
 		if ($status != Partner::PARTNER_STATUS_ACTIVE)
 		{
-			KalturaLog::log ( "blockInactivePartner: BLOCK_PARNTER_STATUS partner [$partnerId] status [$status]" );
+			KalturaLog::log ( "BLOCK_PARNTER_STATUS partner [$partnerId] status [$status]" );
 			KExternalErrors::dieError(KExternalErrors::PARTNER_NOT_ACTIVE);
 		}
 
@@ -1397,7 +1445,7 @@ class myPartnerUtils
 			$blockedCountry = requestUtils::matchIpCountry( $blockContries , $currentCountry );
 			if ($blockedCountry)
 			{
-				KalturaLog::log ( "blockInactivePartner: IP_BLOCK partner [$partnerId] from country [$currentCountry]" );
+				KalturaLog::log ( "IP_BLOCK partner [$partnerId] from country [$currentCountry]" );
 				KExternalErrors::dieError(KExternalErrors::IP_COUNTRY_BLOCKED);			
 			}
 		}
@@ -1433,7 +1481,7 @@ class myPartnerUtils
 		
 		if ($restricted)
 		{
-			KalturaLog::log ( "enforceDelivery: DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
+			KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
 			KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);			
 		}
 	}

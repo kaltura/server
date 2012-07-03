@@ -1001,6 +1001,9 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		KalturaLog::log("copyEntry - Copying entry [".$entry->getId()."] to partner [".$toPartner->getId()."]");
  		$newEntry = $entry->copy();
  		$newEntry->setIntId(null);
+		$newEntry->setCategories(null);
+		$newEntry->setCategoriesIds(null);
+		
  		if ($toPartner instanceof Partner)
  		{
  			$newEntry->setPartnerId($toPartner->getId());
@@ -1140,7 +1143,28 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
 			$sourceAsset->copyToEntry($newEntry->getId(), $newEntry->getPartnerId());
+ 	
+		// copy relationships to categories
+		KalturaLog::debug('Copy relationships to categories from entry [' . $entry->getId() . '] to entry [' . $newEntry->getId() . ']');
+		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entry->getId());
+		$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
+		$c->addAnd(categoryEntryPeer::PARTNER_ID, $entry->getPartnerId());
 		
+		$categoryEntries = categoryEntryPeer::doSelect($c);
+		foreach($categoryEntries as $categoryEntry)
+		{
+			/* @var $categoryEntry categoryEntry */
+			$newCategoryEntry = $categoryEntry->copy();
+			$newCategoryEntry->setPartnerId($newEntry->getPartnerId());
+			$newCategoryEntry->setEntryId($newEntry->getId());
+		
+			$categoryId = kObjectCopyHandler::getMappedId('category', $newCategoryEntry->getCategoryId());
+			if($categoryId)
+				$newCategoryEntry->setCategoryId($categoryId);
+			
+			$newCategoryEntry->save();
+		}
  	}
  	
  	/*

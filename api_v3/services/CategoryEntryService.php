@@ -279,13 +279,13 @@ class CategoryEntryService extends KalturaBaseService
 				$categoriesIds[] = $categoryEntry->getCategoryId();
 			}
 			
-			$categories = categoryPeer::retrieveByPK($categoriesIds);
+			$categories = categoryPeer::retrieveByPKs($categoriesIds);
 			
 			$categoriesFullName = array();
 			foreach($categories as $category)
 				$categoriesFullName[] = $category->getFullName(); 
 				
-			$entry->setCategories($categoriesFullName);
+			$entry->setCategories(implode(',', $categoriesFullName));
 			categoryEntryPeer::syncEntriesCategories($entry);
 			$entry->save();
 		}
