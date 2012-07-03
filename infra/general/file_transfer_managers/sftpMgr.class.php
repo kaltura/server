@@ -40,6 +40,8 @@ class sftpMgr extends kFileTransferMgr
 	 */
 	protected function doConnect($sftp_server, &$sftp_port)
 	{
+		if(!$sftp_port)
+			$sftp_port = 22; 
 		$this->sftp = new Net_SFTP($sftp_server, $sftp_port);
 		return $this->sftp->fsock;
 	}
