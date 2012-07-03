@@ -143,22 +143,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 				  
 				$dc = kDataCenterMgr::getCurrentDcId(); 
 				
-                if ($this->getEntryId())
-                {
-               		$srcflavorAsset = assetPeer::retrieveOriginalReadyByEntryId($this->getEntryId());
-                    if ($srcflavorAsset)
-                    {
-                    	$srcFlavorSyncKey = $srcflavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-						// if the file sync is ready in the local datacenter, use it
-						list($srcflavorFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcFlavorSyncKey, true, false);
-						if (!$local && $srcflavorFileSync)
-							$dc = $srcflavorFileSync->getDc();                  	
-                    }
-                    else
-                    {
-                    	$dc = kDataCenterMgr::getDCByObjectId($this->getEntryId(), true);
-                    }
-		    	}
 		    	kalturaLog::debug("setting the job's DC to [$dc]");
 				$this->setDc ( $dc );
 			}
