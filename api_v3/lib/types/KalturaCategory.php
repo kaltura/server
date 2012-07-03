@@ -264,6 +264,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 * Number of direct children categories
 	 * @filter order
 	 * @var int
+	 * @readonly
 	 */
 	public $directSubCategoriesCount;
 	
