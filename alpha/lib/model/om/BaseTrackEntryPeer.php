@@ -388,12 +388,12 @@ abstract class BaseTrackEntryPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		TrackEntryPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		TrackEntryPeer::filterSelectResults($queryResult, $criteria);
 		
 		TrackEntryPeer::addInstancesToPool($queryResult);
 		return $queryResult;

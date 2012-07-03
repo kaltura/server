@@ -392,12 +392,12 @@ abstract class BasenotificationPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		notificationPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		notificationPeer::filterSelectResults($queryResult, $criteria);
 		
 		notificationPeer::addInstancesToPool($queryResult);
 		return $queryResult;

@@ -372,12 +372,12 @@ abstract class BaseSystemUserPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		SystemUserPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		SystemUserPeer::filterSelectResults($queryResult, $criteria);
 		
 		SystemUserPeer::addInstancesToPool($queryResult);
 		return $queryResult;

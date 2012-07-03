@@ -424,12 +424,12 @@ abstract class BasesyndicationFeedPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		syndicationFeedPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		syndicationFeedPeer::filterSelectResults($queryResult, $criteria);
 		
 		syndicationFeedPeer::addInstancesToPool($queryResult);
 		return $queryResult;

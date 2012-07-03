@@ -376,12 +376,12 @@ abstract class BasewidgetPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		widgetPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		widgetPeer::filterSelectResults($queryResult, $criteria);
 		
 		widgetPeer::addInstancesToPool($queryResult);
 		return $queryResult;

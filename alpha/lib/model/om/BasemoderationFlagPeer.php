@@ -360,12 +360,12 @@ abstract class BasemoderationFlagPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		moderationFlagPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		moderationFlagPeer::filterSelectResults($queryResult, $criteria);
 		
 		moderationFlagPeer::addInstancesToPool($queryResult);
 		return $queryResult;

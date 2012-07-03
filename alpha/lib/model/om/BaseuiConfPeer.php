@@ -404,12 +404,12 @@ abstract class BaseuiConfPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		uiConfPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		uiConfPeer::filterSelectResults($queryResult, $criteria);
 		
 		uiConfPeer::addInstancesToPool($queryResult);
 		return $queryResult;

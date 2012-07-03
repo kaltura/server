@@ -376,12 +376,12 @@ abstract class BaseUploadTokenPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		UploadTokenPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		UploadTokenPeer::filterSelectResults($queryResult, $criteria);
 		
 		UploadTokenPeer::addInstancesToPool($queryResult);
 		return $queryResult;

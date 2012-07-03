@@ -420,12 +420,12 @@ abstract class BaseStorageProfilePeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		StorageProfilePeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		StorageProfilePeer::filterSelectResults($queryResult, $criteria);
 		
 		StorageProfilePeer::addInstancesToPool($queryResult);
 		return $queryResult;

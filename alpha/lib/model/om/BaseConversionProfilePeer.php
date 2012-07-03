@@ -376,12 +376,12 @@ abstract class BaseConversionProfilePeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		ConversionProfilePeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		ConversionProfilePeer::filterSelectResults($queryResult, $criteria);
 		
 		ConversionProfilePeer::addInstancesToPool($queryResult);
 		return $queryResult;

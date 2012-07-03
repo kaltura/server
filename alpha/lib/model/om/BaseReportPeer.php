@@ -352,12 +352,12 @@ abstract class BaseReportPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		ReportPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		ReportPeer::filterSelectResults($queryResult, $criteria);
 		
 		ReportPeer::addInstancesToPool($queryResult);
 		return $queryResult;

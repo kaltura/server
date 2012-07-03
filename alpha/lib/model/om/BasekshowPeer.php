@@ -520,12 +520,12 @@ abstract class BasekshowPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		kshowPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		kshowPeer::filterSelectResults($queryResult, $criteria);
 		
 		kshowPeer::addInstancesToPool($queryResult);
 		return $queryResult;

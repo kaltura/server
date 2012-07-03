@@ -364,12 +364,12 @@ abstract class BaseUserRolePeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		UserRolePeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		UserRolePeer::filterSelectResults($queryResult, $criteria);
 		
 		UserRolePeer::addInstancesToPool($queryResult);
 		return $queryResult;

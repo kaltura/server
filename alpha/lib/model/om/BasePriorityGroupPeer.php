@@ -352,12 +352,12 @@ abstract class BasePriorityGroupPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		PriorityGroupPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		PriorityGroupPeer::filterSelectResults($queryResult, $criteria);
 		
 		PriorityGroupPeer::addInstancesToPool($queryResult);
 		return $queryResult;

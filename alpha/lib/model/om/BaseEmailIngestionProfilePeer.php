@@ -364,12 +364,12 @@ abstract class BaseEmailIngestionProfilePeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		EmailIngestionProfilePeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		EmailIngestionProfilePeer::filterSelectResults($queryResult, $criteria);
 		
 		EmailIngestionProfilePeer::addInstancesToPool($queryResult);
 		return $queryResult;

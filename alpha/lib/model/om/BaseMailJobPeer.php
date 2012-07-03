@@ -416,12 +416,12 @@ abstract class BaseMailJobPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		MailJobPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		MailJobPeer::filterSelectResults($queryResult, $criteria);
 		
 		MailJobPeer::addInstancesToPool($queryResult);
 		return $queryResult;

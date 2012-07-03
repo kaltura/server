@@ -348,12 +348,12 @@ abstract class BaseflickrTokenPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		flickrTokenPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		flickrTokenPeer::filterSelectResults($queryResult, $criteria);
 		
 		flickrTokenPeer::addInstancesToPool($queryResult);
 		return $queryResult;

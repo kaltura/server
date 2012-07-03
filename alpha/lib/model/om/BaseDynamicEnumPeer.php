@@ -332,12 +332,12 @@ abstract class BaseDynamicEnumPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		DynamicEnumPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		DynamicEnumPeer::filterSelectResults($queryResult, $criteria);
 		
 		DynamicEnumPeer::addInstancesToPool($queryResult);
 		return $queryResult;

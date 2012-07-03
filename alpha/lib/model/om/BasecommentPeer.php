@@ -348,12 +348,12 @@ abstract class BasecommentPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		commentPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		commentPeer::filterSelectResults($queryResult, $criteria);
 		
 		commentPeer::addInstancesToPool($queryResult);
 		return $queryResult;

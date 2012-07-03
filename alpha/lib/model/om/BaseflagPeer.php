@@ -348,12 +348,12 @@ abstract class BaseflagPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		flagPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		flagPeer::filterSelectResults($queryResult, $criteria);
 		
 		flagPeer::addInstancesToPool($queryResult);
 		return $queryResult;

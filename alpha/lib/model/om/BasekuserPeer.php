@@ -500,12 +500,12 @@ abstract class BasekuserPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		kuserPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		kuserPeer::filterSelectResults($queryResult, $criteria);
 		
 		kuserPeer::addInstancesToPool($queryResult);
 		return $queryResult;

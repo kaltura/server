@@ -336,12 +336,12 @@ abstract class BasefavoritePeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		favoritePeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		favoritePeer::filterSelectResults($queryResult, $criteria);
 		
 		favoritePeer::addInstancesToPool($queryResult);
 		return $queryResult;

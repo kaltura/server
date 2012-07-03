@@ -336,12 +336,12 @@ abstract class BaseinvalidSessionPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		invalidSessionPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		invalidSessionPeer::filterSelectResults($queryResult, $criteria);
 		
 		invalidSessionPeer::addInstancesToPool($queryResult);
 		return $queryResult;

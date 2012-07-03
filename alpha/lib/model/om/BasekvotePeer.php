@@ -356,12 +356,12 @@ abstract class BasekvotePeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		kvotePeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		kvotePeer::filterSelectResults($queryResult, $criteria);
 		
 		kvotePeer::addInstancesToPool($queryResult);
 		return $queryResult;

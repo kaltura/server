@@ -356,12 +356,12 @@ abstract class BaseKceInstallationErrorPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		KceInstallationErrorPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		KceInstallationErrorPeer::filterSelectResults($queryResult, $criteria);
 		
 		KceInstallationErrorPeer::addInstancesToPool($queryResult);
 		return $queryResult;

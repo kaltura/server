@@ -388,12 +388,12 @@ abstract class BaseControlPanelCommandPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		ControlPanelCommandPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		ControlPanelCommandPeer::filterSelectResults($queryResult, $criteria);
 		
 		ControlPanelCommandPeer::addInstancesToPool($queryResult);
 		return $queryResult;

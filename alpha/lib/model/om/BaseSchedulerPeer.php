@@ -360,12 +360,12 @@ abstract class BaseSchedulerPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		SchedulerPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		SchedulerPeer::filterSelectResults($queryResult, $criteria);
 		
 		SchedulerPeer::addInstancesToPool($queryResult);
 		return $queryResult;

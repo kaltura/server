@@ -364,12 +364,12 @@ abstract class BasePermissionPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		PermissionPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		PermissionPeer::filterSelectResults($queryResult, $criteria);
 		
 		PermissionPeer::addInstancesToPool($queryResult);
 		return $queryResult;

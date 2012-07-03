@@ -456,12 +456,12 @@ abstract class BasemediaInfoPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		mediaInfoPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		mediaInfoPeer::filterSelectResults($queryResult, $criteria);
 		
 		mediaInfoPeer::addInstancesToPool($queryResult);
 		return $queryResult;

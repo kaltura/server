@@ -392,12 +392,12 @@ abstract class BaseFileSyncPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		FileSyncPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		FileSyncPeer::filterSelectResults($queryResult, $criteria);
 		
 		FileSyncPeer::addInstancesToPool($queryResult);
 		return $queryResult;

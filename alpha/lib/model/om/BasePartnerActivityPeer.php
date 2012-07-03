@@ -372,12 +372,12 @@ abstract class BasePartnerActivityPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		PartnerActivityPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		PartnerActivityPeer::filterSelectResults($queryResult, $criteria);
 		
 		PartnerActivityPeer::addInstancesToPool($queryResult);
 		return $queryResult;
