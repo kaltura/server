@@ -6,6 +6,8 @@
 class KalturaCriteria extends Criteria implements IKalturaDbQuery
 {
 	const IN_LIKE = 'IN_LIKE';
+	const IN_LIKE_ORDER ='IN_LIKE_ORDER';
+	
 	/**
 	 * The count of total returned items
 	 * @var int
