@@ -131,7 +131,7 @@ class kEntitlementUtils
 			
 			// kuser is set on the category as member
 			// this ugly code is temporery - since we have a bug in sphinxCriteria::getAllCriterionFields
-			if($kuserId != '')
+			if($kuserId)
 			{
 				$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $kuserId, Criteria::LIKE);
 				$membersCrit->addOr($crit);
