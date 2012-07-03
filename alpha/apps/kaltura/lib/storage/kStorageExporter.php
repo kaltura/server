@@ -205,6 +205,9 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_COLLECTION && $dbBatchJob->getJobSubType() == conversionEngineType::EXPRESSION_ENCODER3)
 			return true;
 		
+		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
+			return true;
+		
 		return false;
 	}
 	
