@@ -229,7 +229,7 @@ class kMrssManager
 	 * @param SimpleXMLElement $mrss
 	 * @return SimpleXMLElement
 	 */
-	protected static function appendFlavorAssetMrss(flavorAsset $flavorAsset, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null,entry $entry)
+	protected static function appendFlavorAssetMrss(flavorAsset $flavorAsset, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null)
 	{
 		if(!$mrss)
 			$mrss = new SimpleXMLElement('<item/>');
@@ -285,18 +285,18 @@ class kMrssManager
 		}
 			
 		$tags = $content->addChild('tags');
-		foreach(explode(',', $flavorAsset->getTags()) as $tag){
+		foreach(explode(',', $flavorAsset->getTags()) as $tag)
 			$tags->addChild('tag', self::stringToSafeXml($tag));
-			if($tag == assetparams::TAG_SLWEB && !self::$addedIsmUrl){
-				self::addIsmLink($entry, $mrss);
-				self::$addedIsmUrl = true;
-			}
-		}	
+				
+		if ($flavorAsset->hasTag(assetparams::TAG_SLWEB))
+			self::addIsmLink($flavorAsset->getentry(), $mrss);	
 	}
 	
 	//if the one of the flavors is an .ismv file we will add to the mrss a url of the entry's .ism file.
 	private static function addIsmLink (entry $entry ,SimpleXMLElement $mrss ){
-	
+		if (self::$addedIsmUrl)
+			return;
+		self::$addedIsmUrl = true;
 		$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
 		
 		$kalturaFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
@@ -450,7 +450,7 @@ class kMrssManager
 				continue;
 
 			if($asset instanceof flavorAsset)
-				self::appendFlavorAssetMrss($asset, $mrss, $mrssParams,$entry);
+				self::appendFlavorAssetMrss($asset, $mrss, $mrssParams);
 				
 			if($asset instanceof thumbAsset)
 				self::appendThumbAssetMrss($asset, $mrss);
