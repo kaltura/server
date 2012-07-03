@@ -1219,6 +1219,9 @@ class category extends Basecategory implements IIndexable
 	
 	public function setPrivacyContext($v)
 	{
+		if(trim($v) == '')
+			$this->setDefaultUnEntitlmenetCategory();
+			
 		if (!$this->getParentId())
 		{
 			$this->setPrivacyContexts($v);
@@ -1435,16 +1438,21 @@ class category extends Basecategory implements IIndexable
 		
 		if($this->getPrivacyContexts() == '')
 		{
-			//default non-entitlement fields
-			$this->setPrivacy(PrivacyType::ALL);
-			$this->setDisplayInSearch(DisplayInSearchType::PARTNER_ONLY);
-			$this->setModeration(false);
-			$this->setInheritanceType(InheritanceType::MANUAL);
-			$this->setKuserId(null);
-			$this->setUserJoinPolicy(UserJoinPolicyType::NOT_ALLOWED);
-			$this->setContributionPolicy(ContributionPolicyType::ALL);
-			$this->setDefaultPermissionLevel(CategoryKuserPermissionLevel::MEMBER);
+			$this->setDefaultUnEntitlmenetCategory();
 		}
+	}
+	
+	protected function setDefaultUnEntitlmenetCategory()
+	{
+		//default non-entitlement fields
+		$this->setPrivacy(PrivacyType::ALL);
+		$this->setDisplayInSearch(DisplayInSearchType::PARTNER_ONLY);
+		$this->setModeration(false);
+		$this->setInheritanceType(InheritanceType::MANUAL);
+		$this->setKuserId(null);
+		$this->setUserJoinPolicy(UserJoinPolicyType::NOT_ALLOWED);
+		$this->setContributionPolicy(ContributionPolicyType::ALL);
+		$this->setDefaultPermissionLevel(CategoryKuserPermissionLevel::MEMBER);
 	}
 	
 	public function reSetDirectSubCategoriesCount()
