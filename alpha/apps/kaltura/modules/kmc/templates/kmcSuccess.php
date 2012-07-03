@@ -100,7 +100,7 @@ var kmc = {};
 	<div id="kmcHeader">
 		<img src="<?php echo $service_url; ?>/lib/images/kmc/logo_kmc.png" alt="Kaltura CMS" />
 		<div id="user_links">
-        	<a href="<?php echo $service_url; ?>/content/docs/pdf/KMC_Eagle_User_Manual.pdf" target="_blank">User Manual</a>
+        	<a href="<?php echo $service_url; ?>/content/docs/pdf/KMC_User_Manual.pdf" target="_blank">User Manual</a>
 		</div> 
 	</div><!-- end kmcHeader -->
     

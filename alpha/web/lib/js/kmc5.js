@@ -4,7 +4,7 @@
 kmc.vars.debug = true;
 
 // Quickstart guide (should be moved to kmc4success.php)
-kmc.vars.quickstart_guide = "/content/docs/pdf/KMC_Eagle_User_Manual.pdf";
+kmc.vars.quickstart_guide = "/content/docs/pdf/KMC_User_Manual.pdf";
 kmc.vars.help_url = kmc.vars.service_url + '/kmc5help.html';
 
 // Log function
