@@ -138,8 +138,16 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 			KalturaLog::debug("Creating new entry");
 			$entry = new entry();
 		}
-			
+		
+		KalturaLog::debug("type: {$this->mediaType} , duration: {$this->msDuration}");
+		
 		$entry = parent::toObject($entry);
+		
+		if (($entry->mediaType == KalturaMediaType::IMAGE && $entry->msDuration) ||
+			($this->mediaType == KalturaMediaType::IMAGE && $this->msDuration))
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE, "msDuration");
+		}
 		
 		if ($this->sourceType === KalturaSourceType::SEARCH_PROVIDER)
 		{
@@ -149,6 +157,13 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 		{
 			$entry->setSource(kPluginableEnumsManager::apiToCore('EntrySourceType', $this->sourceType));
 		}
+		
+		if ($this->isNull("creatorId") && is_null($entry->getCreatorPuserId()))
+		{
+            $creatorId = $entry->getPuserId() ? $entry->getPuserId() : $this->userId;
+            $entry->setCreatorPuserId($creatorId);		  
+		}
+		
 		return $entry;
 	}
 }
