@@ -695,7 +695,10 @@ class entryPeer extends BaseentryPeer
 		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $partnerId);
 		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
 		$c->addAnd($criterionPartnerOrKn);
+
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		$dbEntries = self::doSelect($c);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		
 		$entryIds = array();
 		foreach ($dbEntries as $dbEntry)
