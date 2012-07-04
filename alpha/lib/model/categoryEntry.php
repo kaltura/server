@@ -79,8 +79,11 @@ class categoryEntry extends BasecategoryEntry {
 			throw new kCoreException('category id [' . $this->getCategoryId() . 'was not found', kCoreException::ID_NOT_FOUND);
 			
 		$entry = entryPeer::retrieveByPK($this->getEntryId());
-			
-		if($this->getStatus() == CategoryEntryStatus::ACTIVE && 
+		if(!$entry && $this->getStatus() != CategoryEntryStatus::DELETED)
+			throw new kCoreException('entry id [' . $this->getEntryId() . 'was not found', kCoreException::ID_NOT_FOUND);
+		
+		
+		if($entry && $this->getStatus() == CategoryEntryStatus::ACTIVE && 
 			($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING))
 			$entry = $this->setEntryOnCategory($category, $entry);
 		
@@ -95,7 +98,7 @@ class categoryEntry extends BasecategoryEntry {
 				$category->decrementEntriesCount(1, $this->entryCategoriesRemovedIds);
 				$category->decrementDirectEntriesCount();
 		
-				if(!categoryEntryPeer::getSkipSave() && $entry) //entry might be deleted - and delete job remove the categoryEntry object
+				if($entry && !categoryEntryPeer::getSkipSave()) //entry might be deleted - and delete job remove the categoryEntry object
 				{
 					$entry->removeCategory($category->getFullName());
 					$entry->save();
@@ -107,7 +110,7 @@ class categoryEntry extends BasecategoryEntry {
 		}
 		$category->save();
 		
-		if(!categoryEntryPeer::getSkipSave())
+		if($entry && !categoryEntryPeer::getSkipSave())
 			$entry->indexToSearchIndex();
 	}
 	
