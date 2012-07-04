@@ -310,7 +310,8 @@ class kMrssManager
 			$urlPrefix = $matches[1];
 		}
 		$urlManager = kUrlManager::getUrlManagerByCdn($iisHost, $entry->getId());
-		$urlManager->setFileExtension(pathinfo($kalturaFileSync->getFilePath(), PATHINFO_EXTENSION));
+		if ($kalturaFileSync)
+			$urlManager->setFileExtension(pathinfo($kalturaFileSync->getFilePath(), PATHINFO_EXTENSION));
 		$urlManager->setProtocol(StorageProfile::PLAY_FORMAT_SILVER_LIGHT);
 		
 		
