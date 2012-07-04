@@ -64,7 +64,10 @@ class HuluDistributionEngine extends DistributionEngine implements
 		KalturaLog::info('XML:' . $xml);
 		
 		$sftpManager->putFile($videoSFTPPath, $videoFilePath);
-		$sftpManager->putFile($thumbSFTPPath, $thumbAssetFilePath);
+		
+		if($thumbAssetFilePath && file_exists($thumbAssetFilePath))
+			$sftpManager->putFile($thumbSFTPPath, $thumbAssetFilePath);
+			
 		$sftpManager->filePutContents($xmlSFTPPath, $xml);
 	}
 	
