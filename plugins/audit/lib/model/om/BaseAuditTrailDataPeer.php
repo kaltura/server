@@ -356,12 +356,12 @@ abstract class BaseAuditTrailDataPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		AuditTrailDataPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		AuditTrailDataPeer::filterSelectResults($queryResult, $criteria);
 		
 		AuditTrailDataPeer::addInstancesToPool($queryResult);
 		return $queryResult;

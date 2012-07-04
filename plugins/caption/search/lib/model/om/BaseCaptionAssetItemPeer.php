@@ -348,12 +348,12 @@ abstract class BaseCaptionAssetItemPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		CaptionAssetItemPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		CaptionAssetItemPeer::filterSelectResults($queryResult, $criteria);
 		
 		CaptionAssetItemPeer::addInstancesToPool($queryResult);
 		return $queryResult;

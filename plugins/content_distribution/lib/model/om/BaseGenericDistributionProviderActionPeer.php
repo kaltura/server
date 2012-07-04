@@ -380,12 +380,12 @@ abstract class BaseGenericDistributionProviderActionPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		GenericDistributionProviderActionPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		GenericDistributionProviderActionPeer::filterSelectResults($queryResult, $criteria);
 		
 		GenericDistributionProviderActionPeer::addInstancesToPool($queryResult);
 		return $queryResult;

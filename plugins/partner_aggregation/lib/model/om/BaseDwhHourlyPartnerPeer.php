@@ -560,12 +560,12 @@ abstract class BaseDwhHourlyPartnerPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		DwhHourlyPartnerPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		DwhHourlyPartnerPeer::filterSelectResults($queryResult, $criteria);
 		
 		DwhHourlyPartnerPeer::addInstancesToPool($queryResult);
 		return $queryResult;

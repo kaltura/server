@@ -360,12 +360,12 @@ abstract class BaseShortLinkPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		ShortLinkPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		ShortLinkPeer::filterSelectResults($queryResult, $criteria);
 		
 		ShortLinkPeer::addInstancesToPool($queryResult);
 		return $queryResult;

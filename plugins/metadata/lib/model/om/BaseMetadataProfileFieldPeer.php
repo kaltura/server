@@ -364,12 +364,12 @@ abstract class BaseMetadataProfileFieldPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		MetadataProfileFieldPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		MetadataProfileFieldPeer::filterSelectResults($queryResult, $criteria);
 		
 		MetadataProfileFieldPeer::addInstancesToPool($queryResult);
 		return $queryResult;

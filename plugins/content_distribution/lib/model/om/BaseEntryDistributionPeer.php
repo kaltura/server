@@ -404,12 +404,12 @@ abstract class BaseEntryDistributionPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		EntryDistributionPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		EntryDistributionPeer::filterSelectResults($queryResult, $criteria);
 		
 		EntryDistributionPeer::addInstancesToPool($queryResult);
 		return $queryResult;

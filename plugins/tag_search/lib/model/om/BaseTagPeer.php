@@ -340,12 +340,12 @@ abstract class BaseTagPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		TagPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		TagPeer::filterSelectResults($queryResult, $criteria);
 		
 		TagPeer::addInstancesToPool($queryResult);
 		return $queryResult;

@@ -396,12 +396,12 @@ abstract class BaseDistributionProfilePeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		DistributionProfilePeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		DistributionProfilePeer::filterSelectResults($queryResult, $criteria);
 		
 		DistributionProfilePeer::addInstancesToPool($queryResult);
 		return $queryResult;

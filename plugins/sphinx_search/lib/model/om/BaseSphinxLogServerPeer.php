@@ -340,12 +340,12 @@ abstract class BaseSphinxLogServerPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		SphinxLogServerPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		SphinxLogServerPeer::filterSelectResults($queryResult, $criteria);
 		
 		SphinxLogServerPeer::addInstancesToPool($queryResult);
 		return $queryResult;

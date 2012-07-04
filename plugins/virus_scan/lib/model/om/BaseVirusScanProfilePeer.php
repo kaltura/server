@@ -356,12 +356,12 @@ abstract class BaseVirusScanProfilePeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		VirusScanProfilePeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		VirusScanProfilePeer::filterSelectResults($queryResult, $criteria);
 		
 		VirusScanProfilePeer::addInstancesToPool($queryResult);
 		return $queryResult;
