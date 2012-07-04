@@ -1257,7 +1257,6 @@ class myPartnerUtils
 			$newCategory->reSetInheritedParentId();
 			$newCategory->reSetDepth();
 			$newCategory->reSetFullName();
-			$newCategory->reSetPrivacyContext();
  			categoryPeer::setUseCriteriaFilter(true);
 			
 			$newCategory->setEntriesCount(0);
