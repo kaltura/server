@@ -12,6 +12,13 @@ class kEventsManager
 	
 	protected static $deferredEvents = array();
 	
+	/**
+	 * When this flag is false, deferred events are raised synchronously.
+	 * 
+	 * @var bool
+	 */
+	protected static $deferredEventsEnabled = true;
+	
 	protected static function loadConsumers()
 	{
 		$cachePath = kConf::get('cache_root_path') . '/EventConsumers.cache';
@@ -101,6 +108,16 @@ class kEventsManager
 		return $consumers;
 	}
 	
+	/**
+	 * Enable or disable deferred events
+	 * 
+	 * @param bool $enable
+	 */
+	public static function enableDeferredEvents($enable)
+	{
+		self::$deferredEventsEnabled = $enable;
+	}
+	
 	public static function flushEvents()
 	{	
 		
@@ -133,6 +150,9 @@ class kEventsManager
 	{
 		$eventKey = $event->getKey();
 		
+		if(!self::$deferredEventsEnabled)
+			return self::raiseEvent($event);
+			
 		if (!is_null($eventKey))
 			self::$deferredEvents[$eventKey] = $event;
 		else

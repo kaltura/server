@@ -1164,6 +1164,8 @@ class myPartnerUtils
  	
  	public static function copyTemplateContent(Partner $fromPartner, Partner $toPartner, $dontCopyUsers = false)
  	{
+ 		kEventsManager::enableDeferredEvents(false);
+ 		
  		$partnerCustomDataArray = $fromPartner->getCustomDataObj()->toArray();
  		$excludeCustomDataFields = kConf::get('template_partner_custom_data_exclude_fields');
  		foreach($partnerCustomDataArray as $customDataName => $customDataValue)
@@ -1190,6 +1192,8 @@ class myPartnerUtils
  		
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
+ 		
+ 		kEventsManager::enableDeferredEvents(true);
  	}
  	
 	public static function copyUserRoles(Partner $fromPartner, Partner $toPartner)
@@ -1263,7 +1267,6 @@ class myPartnerUtils
 			$newCategory->setDirectEntriesCount(0);
 			$newCategory->save();
  			
- 			kEventsManager::flushEvents();
  			KalturaLog::log("Copied [".$category->getId()."], new id is [".$newCategory->getId()."]");
  		}
  	}
@@ -1282,7 +1285,6 @@ class myPartnerUtils
  		foreach($entries as $entry)
  		{
  			myEntryUtils::copyEntry($entry, $toPartner, $dontCopyUsers);
- 			kEventsManager::flushEvents();
  		}
  	}
  	
@@ -1304,6 +1306,7 @@ class myPartnerUtils
  			$newUiConf->setPartnerId($toPartner->getId());
  			$newUiConf = $uiConf->cloneToNew($newUiConf);
  			$newUiConf->save();
+ 			
  			KalturaLog::log("UIConf [".$newUiConf->getId()."] was created");
  		}
  	}
