@@ -90,7 +90,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult, $dateOfBirth = null)
 	{
 	    /* @var $bulkUploadResult KalturaBulkUploadResultUser */
-		if (!$bulkUploadResult->objectId)
+		if (!$bulkUploadResult->userId)
 		{
 		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
