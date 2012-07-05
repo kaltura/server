@@ -968,6 +968,7 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->setPuserId($this->getKuser()->getPuserId());
 			$dbEntry->setKuserId($this->getKuser()->getId());
 			$dbEntry->setCreatorKuserId($this->getKuser()->getId());
+			$dbEntry->setCreatorPuserId($this->getKuser()->getPuserId());
 			return;
 		}
 		
@@ -988,6 +989,7 @@ class KalturaEntryService extends KalturaBaseService
 		KalturaLog::debug("Set kuser id [" . $kuser->getId() . "] line [" . __LINE__ . "]");
 		$dbEntry->setKuserId($kuser->getId());
 		$dbEntry->setCreatorKuserId($creator->getId());
+		$dbEntry->setCreatorPuserId($creator->getPuserId());
 	}
 	
    	/**
