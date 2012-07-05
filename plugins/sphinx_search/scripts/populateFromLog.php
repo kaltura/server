@@ -99,15 +99,15 @@ while(true)
 		
 		try
 		{
-			if($serverLastLog->getId() == $executedServerId)
-			{
-				KalturaLog::debug("SQL already executed on server [$executedServerId] synchronously.");
-			}
-			else
-			{
+//			if($serverLastLog->getId() == $executedServerId)
+//			{
+//				KalturaLog::debug("SQL already executed on server [$executedServerId] synchronously.");
+//			}
+//			else
+//			{
 				$sql = $sphinxLog->getSql();
 				$affected = $sphinxCon->exec($sql);
-			}
+//			}
 			
 			if(!$affected)
 			{
