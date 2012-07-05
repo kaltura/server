@@ -1163,7 +1163,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			if($categoryId)
 				$newCategoryEntry->setCategoryId($categoryId);
 			
+			categoryPeer::setUseCriteriaFilter(false);
+			entryPeer::setUseCriteriaFilter(false);
 			$newCategoryEntry->save();
+			entryPeer::setUseCriteriaFilter(true);
+			categoryPeer::setUseCriteriaFilter(true);
 		}
  	}
  	
