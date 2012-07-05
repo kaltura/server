@@ -1239,6 +1239,8 @@ class category extends Basecategory implements IIndexable
 				$privacyContextsTrimed[] = trim($privacyContext);
 		}
 
+		$privacyContextsTrimed = array_unique($privacyContextsTrimed);
+		
 		$this->setPrivacyContexts(trim(implode(',', $privacyContextsTrimed)));
 		parent::setPrivacyContext($v);
 	}
