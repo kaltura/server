@@ -154,7 +154,6 @@ class CategoryEntryService extends KalturaBaseService
 			$pager = new KalturaFilterPager();
 			
 		if ($filter->entryIdEqual == null &&
-			$filter->entryIdIn == null &&
 			$filter->categoryIdIn == null &&
 			$filter->categoryIdEqual == null && 
 			kEntitlementUtils::getEntitlementEnforcement())
@@ -204,7 +203,9 @@ class CategoryEntryService extends KalturaBaseService
 		 
 		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
 		$categoryEntryFilter->attachToCriteria($c);
-		if(!kEntitlementUtils::getEntitlementEnforcement() || $filter->entryIdEqual == null)
+		$totalCount = categoryEntryPeer::doCount($c);
+		
+		if(!kEntitlementUtils::getEntitlementEnforcement() || ($filter->entryIdEqual == null && $filter->entryIdEqual == null))
 			$pager->attachToCriteria($c);
 			
 		$dbCategoriesEntry = categoryEntryPeer::doSelect($c);
@@ -231,12 +232,14 @@ class CategoryEntryService extends KalturaBaseService
 					unset($dbCategoriesEntry[$key]);
 				}
 			}
+			
+			$totalCount = $c->getRecordsCount();
 		}
 		
 		$categoryEntrylist = KalturaCategoryEntryArray::fromCategoryEntryArray($dbCategoriesEntry);
 		$response = new KalturaCategoryEntryListResponse();
 		$response->objects = $categoryEntrylist;
-		$response->totalCount = count($categoryEntrylist); // no pager since category entry is limited to ENTRY::MAX_CATEGORIES_PER_ENTRY
+		$response->totalCount = $totalCount; // no pager since category entry is limited to ENTRY::MAX_CATEGORIES_PER_ENTRY
 		return $response;
 	}
 	

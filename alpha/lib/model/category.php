@@ -1397,6 +1397,20 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/**
+	 * reset category's priacyContexts by calculate it.
+	 */
+	public function reSetPrivacyContext()
+	{
+		$this->setPrivacyContext($this->getPrivacyContext());
+		
+		if($this->getPrivacyContexts() == '')
+		{
+			$this->setPrivacy(PrivacyType::ALL);
+			$this->setDisplayInSearch(DisplayInSearchType::PARTNER_ONLY);
+		}
+	}
+	
+	/**
 	 * reset category's pendingMembersCount by calculate it.
 	 */
 	public function reSetPendingMembersCount()

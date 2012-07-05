@@ -13,6 +13,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	protected $new_categories_ids = '';
 	protected $old_categories;
 	protected $is_categories_modified = false;
+	protected $is_categories_names_modified = false;
 	protected $creator_kuser_id = null;
 	
 	
@@ -1124,6 +1125,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$this->new_categories = implode(self::ENTRY_CATEGORY_SEPARATOR, $newCats);
 		$this->modifiedColumns[] = entryPeer::CATEGORIES;
 		$this->is_categories_modified = true;
+		$this->is_categories_names_modified = true;
 	}
 	
 	public function setCategoriesIds($v)
@@ -2221,7 +2223,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			return;
 		
 		if(!kEntitlementUtils::getEntitlementEnforcement())
-			categoryEntryPeer::syncEntriesCategories($this);
+			categoryEntryPeer::syncEntriesCategories($this, $this->is_categories_names_modified);
 		
 		parent::save ();
 		$this->is_categories_modified = false;

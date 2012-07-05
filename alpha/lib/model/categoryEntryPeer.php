@@ -89,7 +89,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		return self::doSelect($c);
 	}
 		
-	public static function syncEntriesCategories(entry $entry)
+	public static function syncEntriesCategories(entry $entry, $isCategoriesModified)
 	{					 		
 		self::$skipEntrySave = true;
 		
@@ -97,24 +97,27 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 			$newCats = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getNewCategories());
 		else
 			$newCats = array();
-			
-		if($entry->getNewCategoriesIds() != null && $entry->getNewCategoriesIds() !== "")
-			$newCatsIds = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getNewCategoriesIds());
-		else
-			$newCatsIds = array();	
-			
-		
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		$dbCategories = categoryPeer::retrieveByPKs($newCatsIds);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 
-		foreach ($dbCategories as $dbCategory)
+		if(!$isCategoriesModified)
 		{
-			//skip categoy with privacy contexts.
-			if($dbCategory->getPrivacyContexts() != null && $dbCategory->getPrivacyContexts() != '')
-				continue;
+			if($entry->getNewCategoriesIds() != null && $entry->getNewCategoriesIds() !== "")
+				$newCatsIds = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getNewCategoriesIds());
+			else
+				$newCatsIds = array();	
 				
-			$newCats[] = $dbCategory->getFullName();
+			
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+			$dbCategories = categoryPeer::retrieveByPKs($newCatsIds);
+			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+	
+			foreach ($dbCategories as $dbCategory)
+			{
+				//skip categoy with privacy contexts.
+				if($dbCategory->getPrivacyContexts() != null && $dbCategory->getPrivacyContexts() != '')
+					continue;
+					
+				$newCats[] = $dbCategory->getFullName();
+			}
 		}
 		
 		$newCats = array_unique($newCats);
