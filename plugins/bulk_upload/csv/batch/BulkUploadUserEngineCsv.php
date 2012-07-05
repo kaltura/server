@@ -116,7 +116,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		    $this->impersonate();
 		    try 
 		    {
-		        $user = $this->kClient->user->get($bulkUploadResult->objectId);
+		        $user = $this->kClient->user->get($bulkUploadResult->userId);
     		    if ( $user )
     		    {
     		        $bulkUploadResult->action = KalturaBulkUploadAction::UPDATE;
@@ -170,7 +170,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
 			/* @var $bulkUploadResult KalturaBulkUploadResultUser */
-		    KalturaLog::debug("Handling bulk upload result: [". $bulkUploadResult->objectId ."]");
+		    KalturaLog::debug("Handling bulk upload result: [". $bulkUploadResult->userId ."]");
 		    switch ($bulkUploadResult->action)
 		    {
 		        case KalturaBulkUploadAction::ADD:
@@ -190,7 +190,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
         			$bulkUploadResultChunk[] = $bulkUploadResult;
         			
         			$this->impersonate();
-        			$this->kClient->user->update($bulkUploadResult->objectId, $category);
+        			$this->kClient->user->update($bulkUploadResult->userId, $category);
         			$this->unimpersonate();
         			
         			
@@ -200,7 +200,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		            $bulkUploadResultChunk[] = $bulkUploadResult;
         			
         			$this->impersonate();
-        			$this->kClient->user->delete($bulkUploadResult->objectId);
+        			$this->kClient->user->delete($bulkUploadResult->userId);
         			$this->unimpersonate();
         			
 		            break;
@@ -240,8 +240,8 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	{
 	    $user = new KalturaUser();
 	    //Prepare object
-	    if ($bulkUploadUserResult->objectId)
-	        $user->id = $bulkUploadUserResult->objectId;
+	    if ($bulkUploadUserResult->userId)
+	        $user->id = $bulkUploadUserResult->userId;
 	    
 	    if ($bulkUploadUserResult->screenName)
 	        $user->screenName = $bulkUploadUserResult->screenName;
