@@ -349,11 +349,6 @@ class BulkService extends KalturaBaseService
 	    if (!$batchJob)
 		    throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
 		
-		if (!in_array($batchJob->getStatus(), BatchJobPeer::getClosedStatusList()))
-		{
-		    throw new KalturaAPIException(KalturaErrors::CANNOT_ABORT_BULKUPLOAD_UNFINISHED_JOB, $id);
-		}
-		    
 		kJobsManager::abortJob($id, BatchJobType::BULKUPLOAD, true);
 		
 		$batchJobLog = BatchJobLogPeer::retrieveByBatchJobId($id);
