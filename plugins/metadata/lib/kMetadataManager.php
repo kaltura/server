@@ -475,10 +475,10 @@ class kMetadataManager
 		}
 		
 		$metadataProfileKey = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION, $metadataProfileVersion);
-		$xsdPath = kFileSyncUtils::getLocalFilePathForKey($metadataProfileKey);
-		if(!file_exists($xsdPath))
+		$xsdData = kFileSyncUtils::file_get_contents($metadataProfileKey, true, false);
+		if(!$xsdData)
 		{
-			$errorMessage = "Metadata profile xsd [$xsdPath] not found";
+			$errorMessage = "Metadata profile xsd not found";
 			KalturaLog::err($errorMessage);
 			return false;
 		}
@@ -487,7 +487,7 @@ class kMetadataManager
 		libxml_clear_errors();
 		$xml = new DOMDocument();
 		$xml->loadXML($metadata);
-		if($xml->schemaValidate($xsdPath))
+		if($xml->schemaValidateSource($xsdData))
 		{
 			KalturaLog::debug("Metadata is valid");
 			return true;
