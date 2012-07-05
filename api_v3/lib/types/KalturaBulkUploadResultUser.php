@@ -116,7 +116,7 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
 	{
 	    if (!is_numeric($this->objectId))
 	    {
-	        $kuser = kuserPeer::getKuserByPartnerAndUid($this->partnerId, $this->objectId);
+	        $kuser = kuserPeer::getKuserByPartnerAndUid($this->partnerId, $this->userId);
 	        if ($kuser)
                 $this->objectId = $kuser->getId();	            
 	    }
