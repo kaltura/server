@@ -86,7 +86,7 @@
 			<th title="<?php echo $this->translate('batch setup workers status tooltip'); ?>"><?php echo $this->translate('batch setup workers status th'); ?></th>
 			<th title="<?php echo $this->translate('batch setup workers enabled tooltip'); ?>"><?php echo $this->translate('batch setup workers enabled th'); ?></th>
 			<th title="<?php echo $this->translate('batch setup workers max instances tooltip'); ?>"><?php echo $this->translate('batch setup workers max instances th'); ?></th>
-			<th><?php echo $this->translate('batch setup workers action th'); ?></th>
+			<!-- th><?php echo $this->translate('batch setup workers action th'); ?></th -->
 		</tr>
 	</thead>
 	<tbody>
@@ -186,7 +186,7 @@
 			<td><?php echo $runningStr; ?></td>
 			<td><?php echo $enabledStr; ?></td>
 			<td><?php echo $maxInstances; ?></td>
-			<td>
+			<!-- td>
 				<?php $disabled = (!Infra_AclHelper::isAllowed('batch', 'setup-stop-start')) ? ' disabled="disabled"' : ''; ?>
 				<select onchange="callAction(<?php echo $worker->id; ?>, this.value)"<?php echo $disabled;?>>
 					<option><?php echo $this->translate('batch setup worker action select'); ?></option>
@@ -194,7 +194,7 @@
 						<option value="<?php echo $action; ?>"><?php echo $text; ?></option>
 					<?php endforeach; ?>
 				</select>
-			</td>
+			</td -->
 		</tr>
 		<tr class="additionalData" id="tr_worker_data_<?php echo $worker->id; ?>" style="display: none">
 			<td colspan="15"><textarea rows="20" cols="100"><?php
