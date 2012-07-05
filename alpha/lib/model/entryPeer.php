@@ -646,7 +646,7 @@ class entryPeer extends BaseentryPeer
 			if(!$partner)
 				throw new kCoreException('entry partner not found');
 						
-			if(!$partner->getDefaultEntitlementEnforcement())
+			if(!$partner->getDefaultEntitlementEnforcement() || !PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partner->getId()))
 				return parent::filterSelectResults($selectResults, $criteria);			
 		}
 		
