@@ -66,11 +66,11 @@ class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 	        return;
 	    }
 	
-		if (($nWindow < 0) || (!is_integer($nWindow))) {
+		if (($nWindow < 0) || (!is_numeric($nWindow))) {
 			return;
 		}
 	
-		if (($nTime <= 0) || (!is_integer($nTime))) {
+		if (($nTime <= 0) || (!is_numeric($nTime))) {
 			$nTime = time();
 		}
 	
@@ -95,7 +95,7 @@ class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 			return;
 		}
 	
-		if (($nWindow < 0) || (!is_integer($nWindow))) {
+		if (($nWindow < 0) || (!is_numeric($nWindow))) {
 			return;
 		}
 	
@@ -107,7 +107,7 @@ class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 			$sExtract = "";
 		}
 	
-		if (($nTime <= 0) || (!is_integer($nTime))) {
+		if (($nTime <= 0) || (!is_numeric($nTime))) {
 			$nTime = time();
 		}
 	
