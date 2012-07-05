@@ -148,6 +148,13 @@ class category extends Basecategory implements IIndexable
 				$this->addIndexCategoryJob($fullIds . categoryPeer::CATEGORY_SEPARATOR, null, $lock);
 		}
 		
+		if (!$this->isNew() && 
+			$this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS) && 
+			$this->getPrivacyContexts() == '')
+		{
+			$this->addDeleteCategoryKuserJob($this->getId());
+		}
+		
 		// save the childs for action category->delete - delete category is not done by async batch. 
 		foreach($this->childs_for_save as $child)
 		{
