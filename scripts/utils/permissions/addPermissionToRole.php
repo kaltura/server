@@ -5,8 +5,8 @@
 	'Manager' => 'CONTENT_MANAGE_CATEGORY_USERS,CONTENT_MANAGE_ENTRY_USERS'.
 	'Content Uploader' => 'CONTENT_MANAGE_ENTRY_USERS'.
 */
-require_once (dirname ( __FILE__ ) . '/../../bootstrap.php');
-
+require_once(dirname(__FILE__).'/../../../alpha/config/sfrootdir.php');
+require_once(dirname(__FILE__).'/../../../api_v3/bootstrap.php');
 KalturaLog::setLogger(new KalturaStdoutLogger());
 
 $partnerId = null;
