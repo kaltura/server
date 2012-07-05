@@ -662,9 +662,6 @@ class Partner extends BasePartner
 	public function setDefaultEntitlementEnforcement($v) { $this->putInCustomData('defaultEntitlementEnforcement', $v, 'entitlement');}
 	public function getDefaultEntitlementEnforcement() 
 	{
-		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $this->getId()))
-			return false;
-				 
 		return $this->getFromCustomData('defaultEntitlementEnforcement', 'entitlement', true);
 	}
 	
