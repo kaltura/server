@@ -158,12 +158,6 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 			$entry->setSource(kPluginableEnumsManager::apiToCore('EntrySourceType', $this->sourceType));
 		}
 		
-		if ($this->isNull("creatorId") && is_null($entry->getCreatorPuserId()))
-		{
-            $creatorId = $entry->getPuserId() ? $entry->getPuserId() : $this->userId;
-            $entry->setCreatorPuserId($creatorId);		  
-		}
-		
 		return $entry;
 	}
 }
