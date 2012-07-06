@@ -49,18 +49,7 @@ class SynacorHboFeed
 	 */
 	public function setNodeValue($xpath, $value, DOMNode $contextnode = null)
 	{
-		if ($contextnode)
-			$node = $this->xpath->query($xpath, $contextnode)->item(0);
-		else 
-			$node = $this->xpath->query($xpath)->item(0);
-		if (!is_null($node))
-		{
-			// if CDATA inside, set the value of CDATA
-			if ($node->childNodes->length > 0 && $node->childNodes->item(0)->nodeType == XML_CDATA_SECTION_NODE)
-				$node->childNodes->item(0)->nodeValue = htmlentities($value);
-			else
-				$node->nodeValue = htmlentities($value);
-		}
+		kXml::setNodeValue($this->doc, $this->xpath, $xpath, $value, $contextnode);
 	}
 	
 	public function removeNode($xpath, DOMNode $contextnode = null)
