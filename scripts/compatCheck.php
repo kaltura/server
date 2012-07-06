@@ -235,7 +235,7 @@ function compareValues($newValue, $oldValue)
 	return $newValue == $oldValue;
 }	
 	
-function compareArrays($resultNew, $resultOld, $path)
+function compareArraysInternal($resultNew, $resultOld, $path)
 {
 	$errors = array();
 	foreach ($resultOld as $key => $oldValue)
@@ -256,6 +256,8 @@ function compareArrays($resultNew, $resultOld, $path)
 			if (!compareValues($newValue, $oldValue))
 			{
 				$errors[] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
+				if ($key == 'id')
+					break;		// id is different, all other fields will be different as well
 			}
 		}
 		else
@@ -263,8 +265,52 @@ function compareArrays($resultNew, $resultOld, $path)
 			$errors[] = "field $key has different type (path=$path new=$newValue old=$oldValue)";
 		}
 	}
-	
+
 	return $errors;
+}
+
+function compareArraysById($item1, $item2)
+{
+	if (!is_array($item1) || !is_array($item2) || 
+		!isset($item1['id']) || !isset($item2['id']))
+		return 0;
+	
+	return strcmp($item1['id'], $item2['id']);
+}
+	
+function compareArrays($resultNew, $resultOld, $path)
+{
+	$errors = compareArraysInternal($resultNew, $resultOld, $path);
+	if (count($errors) < 2)
+		return $errors;
+	
+	$ids = array();
+	$isOnlyIdErrors = true;
+	foreach ($errors as $curError)
+	{
+		if (!beginsWith($curError, 'field id has different value'))
+		{
+			$isOnlyIdErrors = false;
+			break;
+		}
+		preg_match('/new=([^ ]+)/', $curError, $newMatch);
+		preg_match('/old=([^\)]+)/', $curError, $oldMatch);
+
+		$ids[] = "'".$newMatch[1]."'";
+		$ids[] = "'".$oldMatch[1]."'";
+	}
+	
+	if (!$isOnlyIdErrors)
+		return $errors;
+	
+	usort($resultNew, 'compareArraysById');
+	usort($resultOld, 'compareArraysById');
+	$newErrors = compareArraysInternal($resultNew, $resultOld, $path);
+	if ($newErrors)				// sorting didn't help
+		return $errors;
+		
+	$ids = implode(',', array_unique($ids));
+	return array('Different order ' . $ids);
 }
 
 function normalizeResultBuffer($result)
@@ -434,10 +480,14 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array())
 	{
 		print "\tError: $error\n";
 	}
-	print "Result - new\n";
-	print $resultNew . "\n";
-	print "Result - old\n";
-	print $resultOld . "\n";
+	
+	if (count($errors) != 1 || !beginsWith($errors[0], 'Different order '))
+	{
+		print "Result - new\n";
+		print $resultNew . "\n";
+		print "Result - old\n";
+		print $resultOld . "\n";
+	}
 }
 
 function extendRequestKss(&$parsedParams)
