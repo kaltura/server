@@ -113,7 +113,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	        return array();
 	    }
 	    
-	    $c = $this->getTagObjectsByTagStringsCriteria($objectTags, $this->getObjectIdByClassName(get_class($object)), $object->getPartnerId());
+	    $c = self::getTagObjectsByTagStringsCriteria($objectTags, $this->getObjectIdByClassName(get_class($object)), $object->getPartnerId());
 	    $c->applyFilters();
 	    
 	    $numTagsFound = $c->getRecordsCount(); 
@@ -182,7 +182,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    if (count($tagsToKeep))
 	    {
     	    //Decrement instance count for the tags that we keep
-    	    $c = $this->getTagObjectsByTagStringsCriteria($tagsToKeep, $this->getObjectIdByClassName(get_class($object)), $object->getPartnerId());
+    	    $c = self::getTagObjectsByTagStringsCriteria($tagsToKeep, $this->getObjectIdByClassName(get_class($object)), $object->getPartnerId());
     	    $tagsToKeepObjects = TagPeer::doSelect($c);
     	    foreach ($tagsToKeepObjects as $tagToKeepObject)
     	    {
@@ -198,7 +198,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    if ($tagsToRemove)
 	    {
 	    
-    	    $c = $this->getTagObjectsByTagStringsCriteria($tagsToRemove, $this->getObjectIdByClassName(get_class($object)) , $object->getPartnerId());
+    	    $c = self::getTagObjectsByTagStringsCriteria($tagsToRemove, $this->getObjectIdByClassName(get_class($object)) , $object->getPartnerId());
     	    $c->applyFilters();
     	    $recordsToRemove = $c->getRecordsCount();
     	    return $c->getFetchedIds();
@@ -256,7 +256,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	 * @param int $partnerId
 	 * @return KalturaCriteria
 	 */
-	protected function getTagObjectsByTagStringsCriteria ($tagStrings, $objectType, $partnerId)
+	public static function getTagObjectsByTagStringsCriteria ($tagStrings, $objectType, $partnerId)
 	{
 	    $c = KalturaCriteria::create(TagPeer::OM_CLASS);
 	    $c->addAnd(TagPeer::TAG, $tagStrings, KalturaCriteria::IN);
