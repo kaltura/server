@@ -502,7 +502,12 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
             $category = new KalturaCategory();
             $category->name = $catName;
             $category->parentId = $parentId;
-            $fullNameEq .= $catName;
+            
+            if ($fullNameEq == '')
+            	$fullNameEq .= $catName;
+            else
+            	$fullNameEq .= ">$catName";
+            	
             try 
             {
                 $category = $this->kClient->category->add($category);                
