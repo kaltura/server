@@ -66,8 +66,8 @@ class TimeWarnerService extends KalturaBaseService
 			$feed->addItem($fields, $flavorAssets, $thumbAssets);
 		}
 		
-		header('Content-Type: text/xml');
-		echo str_replace('&','&amp;',html_entity_decode($feed->getXml()));
+		header('Content-Type: text/xml');		
+		echo $feed->getXml();
 		die;
 	}
 }
