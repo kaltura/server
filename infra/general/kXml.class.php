@@ -407,4 +407,30 @@ class kXml
 		return str_replace($from, $to, $encodeXml);
 	}
 	
+	public static function setNodeValue(DOMDocument $doc, DOMXPath $domXpath, $xpathPath, $value, DOMNode $contextnode = null)
+	{
+		if ($contextnode)
+		{
+			$node = $domXpath->query($xpathPath, $contextnode)->item(0);
+		}
+		else
+		{
+			$node = $domXpath->query($xpathPath)->item(0);
+		}
+		
+		if (is_null($node))
+		{
+			return;
+		}
+		
+		// if CDATA inside, set the value of CDATA
+		if ($node->childNodes->length > 0 && $node->childNodes->item(0)->nodeType == XML_CDATA_SECTION_NODE)
+		{
+			$node->childNodes->item(0)->nodeValue = htmlspecialchars($value);
+		}
+		else
+		{
+			$node->nodeValue = htmlspecialchars($value);
+		}
+	}	
 }
