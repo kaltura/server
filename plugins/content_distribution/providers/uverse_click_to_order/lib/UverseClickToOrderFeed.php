@@ -40,7 +40,7 @@ class UverseClickToOrderFeed
 	public function __construct($templateName)
 	{
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml_templates/' . $templateName;
-		$this->doc = new DOMDocument();
+		$this->doc = new DOMDocument('1.0', 'UTF-8');
 		$this->doc->formatOutput = true;
 		$this->doc->preserveWhiteSpace = false;
 		$this->doc->load($xmlTemplate);
@@ -64,18 +64,7 @@ class UverseClickToOrderFeed
 	 */
 	public function setNodeValue($xpath, $value, DOMNode $contextnode = null)
 	{
-		if ($contextnode)
-			$node = $this->xpath->query($xpath, $contextnode)->item(0);
-		else 
-			$node = $this->xpath->query($xpath)->item(0);
-		if (!is_null($node))
-		{
-			// if CDATA inside, set the value of CDATA
-			if ($node->childNodes->length > 0 && $node->childNodes->item(0)->nodeType == XML_CDATA_SECTION_NODE)
-				$node->childNodes->item(0)->nodeValue = htmlentities($value);
-			else
-				$node->nodeValue = htmlentities($value);
-		}
+		kXml::setNodeValue($this->doc, $this->xpath, $xpath, $value, $contextnode);
 	}
 	
 	/**
@@ -144,7 +133,7 @@ class UverseClickToOrderFeed
 	
 	public function getXml()
 	{
-		return $this->doc->saveXML();
+		return $this->doc->saveXML($dom->documentElement);
 	}
 	
 }
