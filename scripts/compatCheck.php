@@ -8,6 +8,44 @@ define('DB_HOST_NAME', 'dbgoeshere');
 define('DB_USER_NAME', 'root');
 define('DB_PASSWORD', 'root');
 
+$PS2_TESTED_XML_ACTIONS = array(
+		'extwidget.playmanifest', 
+		'keditorservices.getmetadata', 
+		'keditorservices.getentryinfo', 
+		'partnerservices2.executeplaylist',
+		'partnerservices2.getentries',
+		'partnerservices2.getallentries',
+		'partnerservices2.getentry',
+		'partnerservices2.getentryroughcuts',
+		'partnerservices2.getkshow',
+		'partnerservices2.getuiconf',
+		'partnerservices2.getwidget',
+		'partnerservices2.listentries',
+		'partnerservices2.listkshows',
+		'partnerservices2.listplaylists',
+		'extwidget.embedIframeJs',
+		);
+
+$PS2_TESTED_BIN_ACTIONS = array(
+		'extwidget.serveFlavor',
+		'extwidget.kwidget',
+		'extwidget.thumbnail',
+		'extwidget.download',
+		'keditorservices.flvclipper',
+		'extwidget.raw',	
+		);
+
+$APIV3_TESTED_ACTIONS = array(
+		'syndicationFeed.execute',			// api_v3/getFeed.php
+		'playlist.execute',
+		'*.get',
+		'*.list',
+		'*.count',
+		'*.serve',
+		'*.goto',
+		'*.search',
+		);
+
 class PartnerSecretPool
 {
 	protected $secrets = array();
@@ -131,7 +169,7 @@ function print_r_reverse($in) {
     }
 }
 
-function doCurl($url, $params = array(), $files = array())
+function doCurl($url, $params = array(), $files = array(), $range = null)
 {
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
@@ -149,6 +187,10 @@ function doCurl($url, $params = array(), $files = array())
 	{
 		$opt = http_build_query($params, null, "&");
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $opt);
+	}
+	if (!is_null($range))
+	{
+		curl_setopt($ch, CURLOPT_RANGE, $range);
 	}
 	curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -441,7 +483,7 @@ function shouldProcessRequest($fullActionName, $parsedParams)
 	return 'yes';
 }
 
-function testAction($fullActionName, $parsedParams, $uri, $postParams = array())
+function testAction($fullActionName, $parsedParams, $uri, $postParams = array(), $binaryCompare = false)
 {
 	global $serviceUrlOld, $serviceUrlNew;
 	
@@ -449,10 +491,14 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array())
 	
 	usleep(200000);         // sleep for 0.2 sec to avoid hogging the server
 	
+	$range = null;
+	if ($binaryCompare)
+		$range = '0-262144';		// 256K
+	
 	for ($retries = 0; $retries < 3; $retries++)
 	{
-		list($resultNew, $curlErrorNew, $newTime) = doCurl($serviceUrlNew . $uri, $postParams);
-		list($resultOld, $curlErrorOld, $oldTime) = doCurl($serviceUrlOld . $uri, $postParams);
+		list($resultNew, $curlErrorNew, $newTime) = doCurl($serviceUrlNew . $uri, $postParams, array(), $range);
+		list($resultOld, $curlErrorOld, $oldTime) = doCurl($serviceUrlOld . $uri, $postParams, array(), $range);
 		
 		if ($curlErrorNew || $curlErrorOld)
 		{
@@ -460,7 +506,17 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array())
 			return;
 		}
 		
-		$errors = compareResults($resultNew, $resultOld);
+		if ($binaryCompare)
+		{
+			if ($resultNew === $resultOld)
+				$errors = array();
+			else
+				$errors = array('Data does not match - newSize='.strlen($resultNew).' oldSize='.strlen($resultOld));
+		}
+		else
+		{
+			$errors = compareResults($resultNew, $resultOld);
+		}
 		
 		if (!count($errors))
 		{
@@ -481,7 +537,7 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array())
 		print "\tError: $error\n";
 	}
 	
-	if (count($errors) != 1 || !beginsWith($errors[0], 'Different order '))
+	if (!$binaryCompare && (count($errors) != 1 || !beginsWith($errors[0], 'Different order ')))
 	{
 		print "Result - new\n";
 		print $resultNew . "\n";
@@ -525,11 +581,21 @@ function extendRequestKss(&$parsedParams)
 
 function isActionApproved($fullActionName, $action)
 {
-	return 
-		beginsWith($fullActionName, 'playlist.execute') ||
-		beginsWith($action, 'get') ||
-		beginsWith($action, 'list') ||
-		beginsWith($action, 'count');
+	global $APIV3_TESTED_ACTIONS;
+	foreach ($APIV3_TESTED_ACTIONS as $approvedAction)
+	{
+		if (beginsWith($approvedAction, '*.'))
+		{
+			if (beginsWith($action, substr($approvedAction, 2)))
+				return true;
+		}
+		else
+		{
+			if (beginsWith($fullActionName, $approvedAction))
+				return true;
+		}
+	}
+	return false;
 }
 
 function processMultiRequest($parsedParams)
@@ -648,15 +714,16 @@ function processRequest($parsedParams)
 	}
 	
 	$uri = "/api_v3/index.php?service=$service&action=$action";
-	
-	testAction($fullActionName, $parsedParams, $uri, $parsedParams);
+	$compareBinary = beginsWith($action, 'serve');
+	testAction($fullActionName, $parsedParams, $uri, $parsedParams, $compareBinary);
 }
 
 function processFeedRequest($parsedParams)
 {
 	$fullActionName = "getfeed";
-		
-	if (!extendRequestKss($parsedParams))
+
+	if (!isActionApproved('syndicationFeed.execute', 'execute') ||
+		!extendRequestKss($parsedParams))
 	{
 		return;
 	}
@@ -743,7 +810,7 @@ class LogProcessorApiV3
 
 function processPS2Request($parsedParams)
 {
-	global $serviceUrlOld, $serviceUrlNew;
+	global $serviceUrlOld, $serviceUrlNew, $PS2_TESTED_XML_ACTIONS, $PS2_TESTED_BIN_ACTIONS;
 
 	if (!array_key_exists('module', $parsedParams) ||
 		!array_key_exists('action', $parsedParams))
@@ -769,22 +836,8 @@ function processPS2Request($parsedParams)
 	
 	$fullActionName = strtolower("$module.$action");
 	
-	if (!in_array($fullActionName, array(
-		'extwidget.playmanifest', 
-		'keditorservices.getmetadata', 
-		'keditorservices.getentryinfo', 
-		'partnerservices2.executeplaylist',
-		'partnerservices2.getentries',
-		'partnerservices2.getallentries',
-		'partnerservices2.getentry',
-		'partnerservices2.getentryroughcuts',
-		'partnerservices2.getkshow',
-		'partnerservices2.getuiconf',
-		'partnerservices2.getwidget',
-		'partnerservices2.listentries',
-		'partnerservices2.listkshows',
-		'partnerservices2.listplaylists',
-		)))
+	if (!in_array($fullActionName, $PS2_TESTED_XML_ACTIONS) && 
+		!in_array($fullActionName, $PS2_TESTED_BIN_ACTIONS))
 	{
 		return;
 	}
@@ -800,7 +853,8 @@ function processPS2Request($parsedParams)
 	
 	$uri = "/index.php/$module/$action?" . http_build_query($parsedParams, null, "&");
 
-	testAction($fullActionName, $parsedParams, $uri);
+	$compareBinary = in_array($fullActionName, $PS2_TESTED_BIN_ACTIONS);
+	testAction($fullActionName, $parsedParams, $uri, array(), $compareBinary);
 }
 
 class LogProcessorPS2
