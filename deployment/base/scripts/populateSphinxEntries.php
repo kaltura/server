@@ -18,6 +18,8 @@ KAutoloader::register();
 
 error_reporting(E_ALL);
 
+kCurrentContext::$ps_vesion = 'ps3';
+
 KalturaLog::setLogger(new KalturaStdoutLogger());
 
 $dbConf = kConf::getDB();
