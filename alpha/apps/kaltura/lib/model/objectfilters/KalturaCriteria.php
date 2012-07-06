@@ -8,6 +8,8 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 	const IN_LIKE = 'IN_LIKE';
 	const IN_LIKE_ORDER ='IN_LIKE_ORDER';
 	
+	protected static $maxRecords = 1000;
+	
 	/**
 	 * The count of total returned items
 	 * @var int
@@ -30,6 +32,22 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 	 * @var bool
 	 */
 	protected $doCount = true;
+
+	/**
+	 * @return int
+	 */
+	public static function getMaxRecords() 
+	{
+		return self::$maxRecords;
+	}
+
+	/**
+	 * @param int $maxRecords
+	 */
+	public static function setMaxRecords($maxRecords) 
+	{
+		self::$maxRecords = $maxRecords;
+	}
 	
 	/**
 	 * @return int $recordsCount

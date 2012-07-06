@@ -11,6 +11,8 @@ abstract class baseObjectFilter extends myBaseObject
 {
 	public $fields;
 	
+	protected static $maxInValues = 500;
+	
 	/**
 	 * @var AdvancedSearchFilterItem
 	 */
@@ -63,9 +65,7 @@ abstract class baseObjectFilter extends myBaseObject
 	 */
 
 	const MATCH_KALTURA_NETWORK_AND_PRIVATE = "-1"; 
-	
-	const MAX_IN_VALUES = 500;
-	
+		
 	protected $partner_search_scope = null;
 		 
 	protected $aliases;
@@ -75,6 +75,22 @@ abstract class baseObjectFilter extends myBaseObject
 	protected $allowed_order_fields = array();
 
 	protected $field_operators = null;
+
+	/**
+	 * @return int
+	 */
+	public static function getMaxInValues() 
+	{
+		return self::$maxInValues;
+	}
+
+	/**
+	 * @param int $maxInValues
+	 */
+	public static function setMaxInValues($maxInValues) 
+	{
+		self::$maxInValues = $maxInValues;
+	}
 	
 	public function getLimit()
 	{
@@ -865,7 +881,7 @@ abstract class baseObjectFilter extends myBaseObject
 	private static function createSqlIn ( $origonal_val )
 	{
 		$in_values = explode ( self::IN_SEPARATOR , $origonal_val );
-		$values = array_slice($in_values, 0, self::MAX_IN_VALUES);
+		$values = array_slice($in_values, 0, self::getMaxInValues());
 		
 		return $values;
 	}

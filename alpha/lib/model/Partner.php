@@ -34,7 +34,7 @@ class Partner extends BasePartner
 	const MAX_ACCESS_CONTROLS = 24;
 	
 	//this is not enforced anymore, but for default pager size when listing ctagoeries (since we didn't have pager before flacon)
-	const MAX_NUMBER_OF_CATEGORIES = 1000;
+	const MAX_NUMBER_OF_CATEGORIES = 1500;
 	
 	// added by Tan-Tan, 06/10/09
 	const PARTNER_TYPE_KMC = 1;

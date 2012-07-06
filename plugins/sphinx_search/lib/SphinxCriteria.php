@@ -416,7 +416,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 			
 		$index = $this->getSphinxIndexName();
-		$maxMatches = kSphinxSearchManager::SPHINX_MAX_RECORDS;
+		$maxMatches = self::getMaxRecords();
 		$limit = $maxMatches;
 		
 		if($this->criteriasLeft)

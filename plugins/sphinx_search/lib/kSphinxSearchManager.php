@@ -6,7 +6,6 @@
 class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectReadyForIndexEventConsumer, kObjectErasedEventConsumer
 {
 	const SPHINX_INDEX_NAME = 'kaltura';
-	const SPHINX_MAX_RECORDS = 1000;
 
 	/**
 	 * @param string $baseName
