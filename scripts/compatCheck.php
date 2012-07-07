@@ -526,6 +526,11 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array(),
 			return;
 		}
 		
+		if (count($errors) == 1 && beginsWith($errors[0], 'Different order '))
+		{
+			break;			// retry doesn't help with different order, we can save the time
+		}
+		
 		print "\nRetrying $fullActionName...";
 		usleep(1000000);
 	}
