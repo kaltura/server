@@ -407,19 +407,15 @@ class assetPeer extends BaseassetPeer
 	
 	public static function compareBitrate(asset $a, asset $b)
 	{
-		if(!($a instanceof flavorAsset) && ($b instanceof flavorAsset))
-			return 1;
+		$bitrate1 = 0;
+		if ($a instanceof flavorAsset)
+			$bitrate1 = $a->getBitrate();
 
-		if(($a instanceof flavorAsset) && !($b instanceof flavorAsset))
-			return -1;
-
-		if(!($a instanceof flavorAsset) && !($b instanceof flavorAsset))
-			return 0;
-
-		if ($a->getBitrate() == $b->getBitrate())
-			return 0;
-            
-		return ($a->getBitrate() > $b->getBitrate()) ? +1 : -1;
+		$bitrate2 = 0;
+		if ($b instanceof flavorAsset)
+			$bitrate2 = $b->getBitrate();
+			
+		return ($bitrate1 - $bitrate2); 
 	}
 	
 	public static function retrieveReadyByEntryIdAndTag($entryId, $tag)
