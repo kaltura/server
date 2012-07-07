@@ -22,6 +22,11 @@ abstract class KalturaCriterion extends Criterion implements IKalturaDbQuery
 	
 	protected $tags = array();
 	
+	public static function clearTags()
+	{
+		self::$enabledTags = array();
+	}
+	
 	public function setTags($tags)
 	{
 		$this->tags = $tags;

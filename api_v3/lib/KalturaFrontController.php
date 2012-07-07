@@ -250,6 +250,7 @@ class KalturaFrontController
 				if ($i != 1)
 				{
 					kMemoryManager::clearMemory();
+					KalturaCriterion::clearTags();
 				}
 			
 				try 
