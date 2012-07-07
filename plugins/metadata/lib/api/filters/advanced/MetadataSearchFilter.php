@@ -167,7 +167,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						// exact match
 						elseif ($xPaths[$field]->getType() == self::KMC_FIELD_TYPE_LIST)
 						{
-							$dataCondition = "\\\\\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}" . "\\\\\"";
+							$dataCondition = "\\\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}" . "\\\"";
 						}
 						
 						// anywhere in the field
