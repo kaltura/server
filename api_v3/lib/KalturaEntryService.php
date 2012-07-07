@@ -881,14 +881,15 @@ class KalturaEntryService extends KalturaBaseService
 		
 		// when session is not admin and without list:* privilege, allow access to user entries only
 		//moved to Additional criteria on entryPeer
-		/*if (!$this->getKs() || (!$this->getKs()->isAdmin() && !$this->getKs()->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)))
+		if (!$this->getKs() || (!$this->getKs()->isAdmin() && !$this->getKs()->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)))
 		{
-			$filter->userIdEqual = $this->getKuser()->getPuserId();
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			
+			/*$filter->userIdEqual = $this->getKuser()->getPuserId();
 		
 			$crit = $c->getNewCriterion(entryPeer::KUSER_ID , $this->getKuser()->getId(), Criteria::EQUAL);
-			$crit->addOr($c->getNewCriterion(entryPeer::CREATOR_KUSER_ID, $this->getKuser()->getId(), Criteria::EQUAL) );
-			$c->addAnd($crit);
-		}*/
+			$c->addAnd($crit);*/
+		}
 			
 		return $c;
 	}
