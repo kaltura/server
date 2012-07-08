@@ -30,11 +30,11 @@ function issueQuery($pdo, $sql)
 }
 
 if ($argc < 3)
-	die("Usage:\n\tphp sphinxCompatCheck <sphinx1> <sphinx2>\n");
+	die("Usage:\n\tphp sphinxCompatCheck <sphinx1 host> <sphinx1 port> <sphinx2 host> <sphinx2 port>\n");
 
 
-$conn1 = createSphinxConnection($argv[1]);
-$conn2 = createSphinxConnection($argv[2]);
+$conn1 = createSphinxConnection($argv[1], $argv[2]);
+$conn2 = createSphinxConnection($argv[3], $argv[4]);
 
 $serverTime1 = 0;
 $serverTime2 = 0;
