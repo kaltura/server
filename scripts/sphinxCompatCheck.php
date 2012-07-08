@@ -39,6 +39,7 @@ if ($argc < 3)
 	
 $conn1 = createSphinxConnection($argv[1], $argv[2]);
 $conn2 = createSphinxConnection($argv[3], $argv[4]);
+$strictMode = false;
 
 $serverTime1 = 0;
 $serverTime2 = 0;
@@ -55,9 +56,9 @@ while($line = stream_get_line($fp, 65535, "\n"))
 	$res1 = issueQuery($conn1, $query);
 	$serverTime1 += microtime(true) - $startTime;
 
-        $startTime = microtime(true);
+	$startTime = microtime(true);
 	$res2 = issueQuery($conn2, $query);
-        $serverTime2 += microtime(true) - $startTime;
+	$serverTime2 += microtime(true) - $startTime;
 	
 	if (strpos($query, 'ORDER BY ') === false && is_array($res1) && is_array($res2))
 	{
@@ -67,6 +68,20 @@ while($line = stream_get_line($fp, 65535, "\n"))
 
 	if ($res1 != $res2)
 	{
+		$limit = null;
+		if (preg_match('/LIMIT (\d+)/', $query, $matches))
+			$limit = $matches[1];
+
+		if (!$strictMode)
+		{
+			if ($limit && count($res2) == $limit)
+				continue;		// the new config returned max results
+
+			$removedIds = array_diff($res1, $res2);
+			if (!$removedIds)
+				continue;		// no ids were removed
+		}
+
 		$sev = 'ERROR';
 		if (strpos($query, 'ORDER BY ') === false && is_array($res1) && is_array($res2) && count($res1) == 1000 && count($res2) == 1000)
 			$sev = 'WARNING';
@@ -82,7 +97,6 @@ while($line = stream_get_line($fp, 65535, "\n"))
 	}
 	else
 		print '.';
-	sleep(.1);
 }
 fclose($fp);
 
