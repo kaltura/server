@@ -29,10 +29,14 @@ function issueQuery($pdo, $sql)
 	return $ids;
 }
 
+function addQuotes($str)
+{
+	return "'{$str}'";
+}
+
 if ($argc < 3)
 	die("Usage:\n\tphp sphinxCompatCheck <sphinx1 host> <sphinx1 port> <sphinx2 host> <sphinx2 port>\n");
-
-
+	
 $conn1 = createSphinxConnection($argv[1], $argv[2]);
 $conn2 = createSphinxConnection($argv[3], $argv[4]);
 
@@ -67,12 +71,14 @@ while($line = stream_get_line($fp, 65535, "\n"))
 		if (strpos($query, 'ORDER BY ') === false && is_array($res1) && is_array($res2) && count($res1) == 1000 && count($res2) == 1000)
 			$sev = 'WARNING';
 		print "\n$sev - $query\n";
+		print 'Old count: '.count($res1)."\n";
+		print 'New count: '.count($res2)."\n";
 		$removedIds = array_diff($res1, $res2);
 		if ($removedIds)
-			print 'Removed ids: '.implode(',', $removedIds)."\n";
+			print 'Removed ids: '.implode(',', array_map('addQuotes', $removedIds))."\n";
 		$addedIds = array_diff($res2, $res1);
 		if ($addedIds)
-			print 'Added ids: '.implode(',', $addedIds)."\n";
+			print 'Added ids: '.implode(',', array_map('addQuotes', $addedIds))."\n";
 	}
 	else
 		print '.';
