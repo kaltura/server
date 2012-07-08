@@ -88,7 +88,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 
 		KalturaLog::debug('Geo blocking array: '.print_r($geoBlocking, true));
 		if (count($geoBlocking))
-			$props['geoblocking'] = strtolower(implode(',', $geoBlocking));
+			$props['geoblocking'] = $geoBlocking;
 
 		return $props;
 	}
@@ -311,6 +311,8 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 			$geoBlocking = array_merge($geoBlocking, explode(',', $providerData->accessControlGeoBlockingCountryList));
 		}
 
+		foreach($geoBlocking as &$tmpstr)
+			$tmpstr = strtolower($tmpstr);
 		return $geoBlocking;
 	}
 }
