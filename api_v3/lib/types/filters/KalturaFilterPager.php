@@ -12,7 +12,7 @@ class KalturaFilterPager extends KalturaObject
 	 * 
 	 * @var int 
 	 */
-	public $pageSize = 30;
+	public $pageSize = 100;
 	
 	/**
 	 * The page number for which {pageSize} of objects should be retrieved (Default is 1).
