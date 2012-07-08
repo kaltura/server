@@ -25,9 +25,10 @@ class SphinxUtils
 				return str_replace($from, $toSingle, $str);
 			}
 		}
-		elseif($escapeType == SearchIndexFieldEscapeType::MD5)
+		elseif($escapeType == SearchIndexFieldEscapeType::MD5_LOWER_CASE)
 		{				
 			$str = trim($str);
+			$str = strtolower($str);
 			
 			if(substr($str, -2) == '\*')
 				return md5(substr($str, 0, strlen($str) - 2)) . '\\\*';

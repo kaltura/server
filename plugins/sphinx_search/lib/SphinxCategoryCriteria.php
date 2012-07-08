@@ -96,8 +96,8 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	);
 	
 	public static $sphinxFieldsEscapeType = array(
-		'category.FULL_NAME' => SearchIndexFieldEscapeType::MD5,
-		'category.FULL_IDS' => SearchIndexFieldEscapeType::MD5,
+		'category.FULL_NAME' => SearchIndexFieldEscapeType::MD5_LOWER_CASE,
+		'category.FULL_IDS' => SearchIndexFieldEscapeType::MD5_LOWER_CASE,
 	);
 
 	/**
