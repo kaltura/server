@@ -146,7 +146,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    $targetClientConfig = new KalturaConfiguration($distributionProfile->targetAccountId);
         $targetClientConfig->serviceUrl = $distributionProfile->targetServiceUrl;
         $this->targetClient = new KalturaClient($targetClientConfig);
-        $ks = $this->targetClient->user->loginByLoginId($distributionProfile->targetLoginId, $distributionProfile->targetLoginPassword);
+        $ks = $this->targetClient->user->loginByLoginId($distributionProfile->targetLoginId, $distributionProfile->targetLoginPassword, "", 86400, 'disableentitlement');
         $this->targetClient->setKs($ks);
 	}
 	
