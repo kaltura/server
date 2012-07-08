@@ -372,12 +372,12 @@ abstract class BaseDropFolderFilePeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		DropFolderFilePeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		DropFolderFilePeer::filterSelectResults($queryResult, $criteria);
 		
 		DropFolderFilePeer::addInstancesToPool($queryResult);
 		return $queryResult;

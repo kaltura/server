@@ -400,12 +400,12 @@ abstract class BaseCuePointPeer {
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
 		
-		CuePointPeer::filterSelectResults($queryResult, $criteria);
-		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
+		
+		CuePointPeer::filterSelectResults($queryResult, $criteria);
 		
 		CuePointPeer::addInstancesToPool($queryResult);
 		return $queryResult;
