@@ -28,9 +28,9 @@ class category extends Basecategory implements IIndexable
 	
 	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 0;
 	
-	const FULL_NAME_EQUAL_MATCH_STRING = 'fullNameEqualMatchString';
+	const FULL_NAME_EQUAL_MATCH_STRING = 'fullnameequalmatchstring';
 	
-	const FULL_IDS_EQUAL_MATCH_STRING = 'fullIdsEqualMatchString';
+	const FULL_IDS_EQUAL_MATCH_STRING = 'fullIdsequalmatchstring';
 	
 	const MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY = 10;
 	
@@ -1505,7 +1505,9 @@ class category extends Basecategory implements IIndexable
 	public function getSearchIndexfullName()
 	{
 		$fullName = $this->getFullName();
-		$fullNameArr = explode(categoryPeer::CATEGORY_SEPARATOR, $fullName);
+		$fullNameLowerCase = strtolower($fullName);
+		
+		$fullNameArr = explode(categoryPeer::CATEGORY_SEPARATOR, $fullNameLowerCase);
 		
 		$parsedFullName = '';
 		$fullName = '';
@@ -1517,6 +1519,7 @@ class category extends Basecategory implements IIndexable
 			}
 			else
 			{
+				
 				$parsedFullName .= md5($fullName . categoryPeer::CATEGORY_SEPARATOR) . ' ';
 				$fullName .= '>' . $categoryName;
 			}
@@ -1524,9 +1527,9 @@ class category extends Basecategory implements IIndexable
 			$parsedFullName .= md5($fullName) . ' ';
 		}
 		
-		$parsedFullName .= md5($this->getFullName() . category::FULL_NAME_EQUAL_MATCH_STRING);
-			
-		return $parsedFullName ;
+		$parsedFullName .= md5($fullNameLowerCase . category::FULL_NAME_EQUAL_MATCH_STRING);
+
+		return $parsedFullName;
 	}
 	
 	public function getSearchIndexfullIds()
