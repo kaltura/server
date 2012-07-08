@@ -2832,7 +2832,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if(count(array_unique($entitledKusers)))
 			$entitledKusers[kEntitlementUtils::ENTRY_PRIVACY_CONTEXT] = array_unique($entitledKusers);
 		
-		if ($this->getAllCategoriesIds() == '')
+		if ($this->getAllCategoriesIds(true) == '')
 			return implode(' ', $entitledKusers);
 		
 		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
@@ -2842,7 +2842,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			
 		//get categories for this entry that have small amount of members.
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$c->add(categoryPeer::ID, $this->getAllCategoriesIds(), Criteria::IN);
+		$c->add(categoryPeer::ID, $this->getAllCategoriesIds(true), Criteria::IN);
 		$c->add(categoryPeer::MEMBERS_COUNT, $categoryGroupSize, Criteria::LESS_EQUAL);
 		$c->add(categoryPeer::ENTRIES_COUNT, entry::CATEGORY_ENTRIES_COUNT_LIMIT_TO_BE_INDEXED, Criteria::LESS_EQUAL);
 		
@@ -2879,11 +2879,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(' ', $entitledKusersByContexts);
 	}
 	
-	public function getAllCategoriesIds()
+	public function getAllCategoriesIds($includePending = false)
 	{
-		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
-		$c->addAnd(categoryEntryPeer::ENTRY_ID, $this->getId());
-		$categoriesEntry = categoryEntryPeer::doSelect($c);
+		if(!$includePending)
+		{
+			$categoriesEntry = categoryEntryPeer::retrieveActiveByEntryId($this->getId());
+		}
+		else
+		{
+			$categoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($this->getId());
+		}
+		
 		
 		$categoriesIds = array();
 		foreach($categoriesEntry as $categoryEntry)
