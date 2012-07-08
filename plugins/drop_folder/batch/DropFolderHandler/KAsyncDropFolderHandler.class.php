@@ -89,8 +89,21 @@ class KAsyncDropFolderHandler extends KPeriodicWorker
 	{
 		KalturaLog::debug('Handling folder ['.$folder->id.']');
 		
+		$fileNamePatterns = explode(',', $folder->fileNamePatterns);
+		if(count($fileNamePatterns) > 1)
+		{
+			$fileNamePatterns = null;
+		}
+		elseif(count($fileNamePatterns) == 1)
+		{
+			foreach($fileNamePatterns as $index => $fileNamePattern)
+				$fileNamePatterns[$index] = trim($fileNamePattern, ' *');
+				
+			$fileNamePatterns = reset($fileNamePatterns);
+		}
+			
 		try {
-			$dropFolderFiles = $this->getPendingWaitingFiles($folder->id);
+			$dropFolderFiles = $this->getPendingWaitingFiles($folder->id, $fileNamePatterns);
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Cannot get list of files for drop folder id ['.$folder->id.'] - '.$e->getMessage());
@@ -163,12 +176,20 @@ class KAsyncDropFolderHandler extends KPeriodicWorker
 	 * @param int $dropFolderId
 	 * @return array of KalturaDropFolderFile
 	 */
-	private function getPendingWaitingFiles($dropFolderId)
+	private function getPendingWaitingFiles($dropFolderId, $fileNamePatterns = null)
 	{
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $dropFolderId;
 		$dropFolderFileFilter->statusIn = KalturaDropFolderFileStatus::PENDING.','.KalturaDropFolderFileStatus::WAITING.','.KalturaDropFolderFileStatus::NO_MATCH;
-		$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter);
+		if($fileNamePatterns)
+			$dropFolderFileFilter->fileNameLike = $fileNamePatterns;
+			
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 1000;
+		if($this->taskConfig->params->pageSize)
+			$pager->pageSize = $this->taskConfig->params->pageSize;
+			
+		$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter, $pager);
 		$dropFolderFiles = $dropFolderFiles->objects;
 		return $dropFolderFiles;
 	}
