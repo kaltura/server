@@ -179,7 +179,7 @@ class KalturaDocCommentParser
     
     
     /**
-     * @var string
+     * @var array
      */
     public $disableTags = null;
     
@@ -273,7 +273,7 @@ class KalturaDocCommentParser
             
         $result = null;
         if (preg_match(self::DOCCOMMENT_DISABLE_TAGS, $comment, $result))
-        	$this->disableTags = $result[1];
+        	$this->disableTags = explode(",", $result);
         	
         $result = null;
         if (preg_match(self::DOCCOMMENT_VALIDATE_USER, $comment, $result))
