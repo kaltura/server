@@ -45,7 +45,7 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_ALIAS_ACTION = "/\\@actionAlias\\s(\\w+\\.\\w+)/";
     
-    const DOCCOMMENT_DISABLE_TAGS = "/\\@disableTags ([.\\w]*)/";
+    const DOCCOMMENT_DISABLE_TAGS = "/\\@disableTags ([\\w\\,\\s\\d]*)/";
     
     /**
      * @var bool
