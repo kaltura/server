@@ -48,6 +48,8 @@ $APIV3_TESTED_ACTIONS = array(
 		'*.search',
 		);
 
+$ID_FIELDS = array('id', 'guid', 'loc');
+
 class PartnerSecretPool
 {
 	protected $secrets = array();
@@ -185,7 +187,7 @@ function doCurl($url, $params = array(), $files = array(), $range = null)
 			$file = "@".$file; // let curl know its a file
 		curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
 	}
-	else
+	else if ($params)
 	{
 		$opt = http_build_query($params, null, "&");
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $opt);
@@ -281,6 +283,8 @@ function compareValues($newValue, $oldValue)
 	
 function compareArraysInternal($resultNew, $resultOld, $path)
 {
+	global $ID_FIELDS;
+
 	$errors = array();
 	foreach ($resultOld as $key => $oldValue)
 	{
@@ -300,7 +304,7 @@ function compareArraysInternal($resultNew, $resultOld, $path)
 			if (!compareValues($newValue, $oldValue))
 			{
 				$errors[] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
-				if ($key == 'id')
+				if (in_array($key, $ID_FIELDS))
 					break;		// id is different, all other fields will be different as well
 			}
 		}
@@ -315,11 +319,18 @@ function compareArraysInternal($resultNew, $resultOld, $path)
 
 function compareArraysById($item1, $item2)
 {
-	if (!is_array($item1) || !is_array($item2) || 
-		!isset($item1['id']) || !isset($item2['id']))
+	global $ID_FIELDS;
+
+	if (!is_array($item1) || !is_array($item2))
 		return 0;
 	
-	return strcmp($item1['id'], $item2['id']);
+	foreach ($ID_FIELDS as $idField)
+	{
+		if (isset($item1[$idField]) && isset($item2[$idField]))
+			return strcmp($item1[$idField], $item2[$idField]);
+	}
+	
+	return 0;
 }
 	
 function compareArrays($resultNew, $resultOld, $path)
@@ -332,7 +343,17 @@ function compareArrays($resultNew, $resultOld, $path)
 	$isOnlyIdErrors = true;
 	foreach ($errors as $curError)
 	{
-		if (!beginsWith($curError, 'field id has different value'))
+		$isCurIdError = false;
+		foreach ($ID_FIELDS as $idField)
+		{
+			if (beginsWith($curError, "field {$idField} has different value"))
+			{
+				$isCurIdError = true;
+				break;
+			}
+		}
+		
+		if (!$isCurIdError)
 		{
 			$isOnlyIdErrors = false;
 			break;
