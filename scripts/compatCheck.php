@@ -335,6 +335,8 @@ function compareArraysById($item1, $item2)
 	
 function compareArrays($resultNew, $resultOld, $path)
 {
+	global $ID_FIELDS;
+
 	$errors = compareArraysInternal($resultNew, $resultOld, $path);
 	if (count($errors) < 2)
 		return $errors;
