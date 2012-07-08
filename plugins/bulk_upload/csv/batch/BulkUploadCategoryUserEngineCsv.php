@@ -308,9 +308,8 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 	}
 	
 	
-protected function updateObjectsResults($requestResults, $bulkUploadResults)
+    protected function updateObjectsResults($requestResults, $bulkUploadResults)
 	{
-	    $this->kClient->startMultiRequest();
 		KalturaLog::info("Updating " . count($requestResults) . " results");
 		
 		// checking the created entries
@@ -342,7 +341,6 @@ protected function updateObjectsResults($requestResults, $bulkUploadResults)
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
 		
-		$this->kClient->doMultiRequest();
 	}
 	
 	protected function changeCategoryKuserStatus (KalturaBulkUploadResultCategoryUser $bulkuploadResult)
