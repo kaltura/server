@@ -11,6 +11,8 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 {
 	const FILE_SYNC_SYNDICATION_FEED_XSLT = 1;
 	
+	const CUSTOM_DATA_FIELD_ADD_XML_HEADER = 'addXmlHeader';
+	
 	private $xslt;
 		
 	/* (non-PHPdoc)
@@ -132,6 +134,14 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 		$key = $this->getSyncKey(self::FILE_SYNC_SYNDICATION_FEED_XSLT);
 		$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
 		return $this->xslt;
+	}
+	
+	public function getAddXmlHeader(){
+		return parent::getFromCustomData(self::CUSTOM_DATA_FIELD_ADD_XML_HEADER);
+	}
+	
+	public function setAddXmlHeader($addXmlHeader){
+		parent::putInCustomData(self::CUSTOM_DATA_FIELD_ADD_XML_HEADER, $addXmlHeader);
 	}
 	
 	

@@ -135,6 +135,7 @@ class PodcastDistributionProfile extends DistributionProfile
 		$podcastFeed->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$podcastFeed->setAllowEmbed(false);
 		$podcastFeed->setType(syndicationFeedType::KALTURA);
+		$podcastFeed->setAddXmlHeader(true);
 		$podcastFeed->save();
 		
 		$this->setFeedId($podcastFeed->getId());

@@ -96,7 +96,7 @@ class kSyndicationFeedManager
 	 * @param $syndicationFeed
 	 * @return string
 	 */
-	public static function getMrssHeader($title, $link = null, $description = null, syndicationFeed $syndicationFeed = null)
+	public static function getMrssHeader($title, $link = null, $description = null, genericSyndicationFeed $syndicationFeed = null)
 	{
 		$mrss = self::getKalturaMrssXml($title, $link, $description);
 	
@@ -108,8 +108,11 @@ class kSyndicationFeedManager
 		
 		$divideHeaderFromFooter = strpos($mrss,self::ITEMS_PLACEHOLDER);		
 		$mrss = substr($mrss,0,$divideHeaderFromFooter);
-		$mrss = self::removeXmlHeader($mrss);
 		
+		$addXmlHeader =  $syndicationFeed->getAddXmlHeader();
+			
+		if (is_null($addXmlHeader) || $addXmlHeader == false)
+			$mrss = self::removeXmlHeader($mrss);
 		return $mrss;
 	}
 	
