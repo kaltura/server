@@ -330,7 +330,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$this->ranker = self::RANKER_NONE;
 		if(count($this->matchClause))
 		{
-			$this->ranker = self::RANKER_SPH04;
+			//$this->ranker = self::RANKER_SPH04;
 			$this->matchClause = array_unique($this->matchClause);
 			$matches = reset($this->matchClause);
 			if(count($this->matchClause) > 1)
