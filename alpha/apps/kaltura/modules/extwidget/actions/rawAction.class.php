@@ -302,12 +302,6 @@ class rawAction extends sfAction
 				$url = str_replace( "format" , "" , $url );
 			}
 			
-			if ( $ret_file_name &&  pathinfo ( $ret_file_name , PATHINFO_EXTENSION ) != "" )
-			{
-				// if the name holds an extension - prefer it over the real file's extension
-				$ext = pathinfo ( $ret_file_name , PATHINFO_EXTENSION );
-			}
-			
 			if ( !$ret_file_name)
 			{
 				// don't leave the name empty - if it is empty - use the entry id
