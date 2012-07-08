@@ -326,9 +326,17 @@ class rawAction extends sfAction
 			{
 				$url .= "/$ret_file_name_safe.{$ext}?relocate=f.{$ext}";   // add the ufname as a query parameter
 			}
-			
-			// redirect and create the url so it will have the ufname
-			header ( "Location: {$url}" );
+		
+			$shouldProxy = $this->getRequestParameter("forceproxy", false);
+			if($shouldProxy)
+			{
+				kFile::dumpUrl($url);
+			}
+			else
+			{
+				// or redirect if no proxy
+				$this->redirect($url);
+			}
 		}
 		die();
 	}
