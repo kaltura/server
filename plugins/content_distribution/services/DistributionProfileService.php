@@ -149,7 +149,10 @@ class DistributionProfileService extends KalturaBaseService
 			
 		if (!$pager)
 		    $pager = new KalturaFilterPager();
-		    
+        
+		 //Change the pageSize to support clients who hae had all their dist. profiles listed in Eagle
+		$pager->pageSize = 100;
+		
 		$c = new Criteria();
 		$distributionProfileFilter = new DistributionProfileFilter();
 		$filter->toObject($distributionProfileFilter);
