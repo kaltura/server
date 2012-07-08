@@ -417,7 +417,7 @@ class entryPeer extends BaseentryPeer
 		/*if (kEntitlementUtils::getEntitlementEnforcement())
 			throw new kCoreException('doCount is not supported for entitlement scope enable');
 		*/
-		parent::doCount($criteria, $distinct, $con);
+		return parent::doCount($criteria, $distinct, $con);
 	}
 	
 	public static function doCountWithLimit (Criteria $criteria, $distinct = false, $con = null)
