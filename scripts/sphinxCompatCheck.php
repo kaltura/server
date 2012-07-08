@@ -66,7 +66,13 @@ while($line = stream_get_line($fp, 65535, "\n"))
 		$sev = 'ERROR';
 		if (strpos($query, 'ORDER BY ') === false && is_array($res1) && is_array($res2) && count($res1) == 1000 && count($res2) == 1000)
 			$sev = 'WARNING';
-		print "$sev - $query\n";
+		print "\n$sev - $query\n";
+		$removedIds = array_diff($res1, $res2);
+		if ($removedIds)
+			print 'Removed ids: '.implode(',', $removedIds)."\n";
+		$addedIds = array_diff($res2, $res1);
+		if ($addedIds)
+			print 'Added ids: '.implode(',', $addedIds)."\n";
 	}
 	else
 		print '.';
