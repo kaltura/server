@@ -8,6 +8,10 @@
  */
 class getuiconfAction extends defPartnerservices2Action
 {
+    protected function partnerGroup2() {return  '0';}
+                
+	protected function kalturaNetwork2() {return true;}
+	
 	public function describe()
 	{
 		return 	
