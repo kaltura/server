@@ -12,7 +12,7 @@ class KalturaFilterPager extends KalturaObject
 	 * 
 	 * @var int 
 	 */
-	public $pageSize = 100;
+	public $pageSize = 30;
 	
 	/**
 	 * The page number for which {pageSize} of objects should be retrieved (Default is 1).
@@ -21,14 +21,16 @@ class KalturaFilterPager extends KalturaObject
 	 */
 	public $pageIndex = 1;	
 	
+	
+	public $maxPageSize = 500;
 	private $minPageIndex = 1;
-
+	
 	public function attachToCriteria ( Criteria $c )
 	{
 		$limit = $this->pageSize;
-		if($limit > baseObjectFilter::getMaxInValues()) 
+		if ( $limit > $this->maxPageSize ) 
 		{	
-			$limit = baseObjectFilter::getMaxInValues();
+			$limit = $this->maxPageSize;
 		}
 		
 		$page = max ( $this->minPageIndex ,  $this->pageIndex );
@@ -38,3 +40,4 @@ class KalturaFilterPager extends KalturaObject
 		if ( $offset > 0 ) $c->setOffset( $offset );
 	}
 }
+?>
