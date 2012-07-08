@@ -10,7 +10,7 @@ class NdnService extends KalturaBaseService
 {
 	/**
 	 * @action getFeed
-	 * @disableTags TAG_WIDGET_SESSION
+	 * @disableTags TAG_WIDGET_SESSION,TAG_ENTITLEMENT_ENTRY,TAG_ENTITLEMENT_CATEGORY
 	 * @param int $distributionProfileId
 	 * @param string $hash
 	 * @return file
