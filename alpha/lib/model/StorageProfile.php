@@ -191,10 +191,11 @@ class StorageProfile extends BaseStorageProfile
 	    {
 	        $key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 	        $shouldExport = kStorageExporter::shouldExport($key, $this);
-	    }
-	    else
-	    {
-	        KalturaLog::log("no need to export key [$key] to externalStorage id[" . $this->getId() . "]");
+	        
+	        if (!$shouldExport)
+	        {
+	            KalturaLog::log("no need to export key [$key] to externalStorage id[" . $this->getId() . "]");
+	        }
 	    }
 	    
 	    return $shouldExport;
