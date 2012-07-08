@@ -201,7 +201,7 @@ class CategoryEntryService extends KalturaBaseService
 		$categoryEntryFilter = new categoryEntryFilter();
 		$filter->toObject($categoryEntryFilter);
 		 
-		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+		$c = new Criteria();
 		$categoryEntryFilter->attachToCriteria($c);
 		$totalCount = categoryEntryPeer::doCount($c);
 		
