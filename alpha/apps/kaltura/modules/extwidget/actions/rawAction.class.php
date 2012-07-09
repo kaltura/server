@@ -329,7 +329,7 @@ class rawAction extends sfAction
 			else
 			{
 				// or redirect if no proxy
-				$this->redirect($url);
+				header ( "Location: {$url}" );
 			}
 		}
 		die();
