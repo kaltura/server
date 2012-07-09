@@ -107,23 +107,18 @@ function extendKsExpiry($ks)
 	return $ks;
 }
 
-function isKsExpired($ks)
+function isKsParsable($ks)
 {
 	$ks = base64_decode($ks, true);
-	@list($hash, $ks) = @explode ("|", $ks, 2);
+	if (strpos($ks, "|") === false)
+		return false;
+
+	list($hash, $ks) = @explode ("|", $ks, 2);
 	$ksParts = explode(";", $ks);
 	if (count($ksParts) < 3)
-	{
 		return false;
-	}
 	
-	list(
-		$partnerId, 
-		$partnerPattern, 
-		$validUntil
-	) = $ksParts;
-	
-	return (time() >= $validUntil);
+	return true;
 }
 
 function print_r_reverse($in) {
@@ -582,7 +577,7 @@ function extendRequestKss(&$parsedParams)
 	if (array_key_exists('ks', $parsedParams))
 	{
 		$ks = $parsedParams['ks'];
-		if (isKsExpired($ks))
+		if (isKsParsable($ks))
 		{
 			$ks = extendKsExpiry($ks);
 			if (is_null($ks))
@@ -598,7 +593,7 @@ function extendRequestKss(&$parsedParams)
 			break;
 		
 		$ks = $parsedParams[$ksKey];
-		if (isKsExpired($ks))
+		if (isKsParsable($ks))
 		{
 			$ks = extendKsExpiry($ks);
 			if (is_null($ks))
