@@ -53,7 +53,7 @@ class thumbnailAction extends sfAction
 		    $type = 5;
 		}
 		$crop_provider = $this->getRequestParameter( "crop_provider", null);
-		$quality = $this->getRequestParameter( "quality" , 20);
+		$quality = $this->getRequestParameter( "quality" , 0);
 		$src_x = $this->getRequestParameter( "src_x" , 0);
 		$src_y = $this->getRequestParameter( "src_y" , 0);
 		$src_w = $this->getRequestParameter( "src_w" , 0);
@@ -89,7 +89,7 @@ class thumbnailAction extends sfAction
 		
 		
 		// validating the inputs
-		if(!is_numeric($quality) || $quality < 20 || $quality > 100)
+		if(!is_numeric($quality) || ($quality && ($quality < 20 || $quality > 100)))
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'quality must be between 20 and 100');
 		
 		if(!is_numeric($src_x) || $src_x < 0 || $src_x > 10000)
