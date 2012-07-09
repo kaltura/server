@@ -48,7 +48,7 @@ $APIV3_TESTED_ACTIONS = array(
 		'*.search',
 		);
 
-$ID_FIELDS = array('id', 'guid', 'loc', 'title');
+$ID_FIELDS = array('id', 'guid', 'loc', 'title', 'link');
 
 class PartnerSecretPool
 {
@@ -326,7 +326,8 @@ function compareArraysById($item1, $item2)
 	
 	foreach ($ID_FIELDS as $idField)
 	{
-		if (isset($item1[$idField]) && isset($item2[$idField]))
+		if (isset($item1[$idField]) && isset($item2[$idField]) && 
+			$item1[$idField] != $item2[$idField])
 			return strcmp($item1[$idField], $item2[$idField]);
 	}
 	
