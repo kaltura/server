@@ -313,9 +313,8 @@ class entryFilter extends baseObjectFilter
 
 			foreach ($statuses as $status)
 			{
-				$categoryFullIdsToIds[] = entry::CATEGORY_SEARCH_PERFIX . $category->getId() . ' ' .
-						entry::CATEGORY_SEARCH_STATUS . $status . ' ' .
-						entry::CATEGORY_SEARCH_PERFIX . $category->getId() ;
+				$categoryFullIdsToIds[] = entry::CATEGORY_SEARCH_PERFIX . $category->getId() . 
+						entry::CATEGORY_SEARCH_STATUS . $status;
 			}
 		}
 
@@ -353,9 +352,8 @@ class entryFilter extends baseObjectFilter
 			{
 				foreach ($statuses as $status)
 				{
-					$categoryFullIdsToIds[] = entry::CATEGORY_SEARCH_PERFIX . $category->getId() . ' ' .
-							entry::CATEGORY_SEARCH_STATUS . $status . ' ' .
-							entry::CATEGORY_SEARCH_PERFIX . $category->getId() ;
+					$categoryFullIdsToIds[] = entry::CATEGORY_SEARCH_PERFIX . $category->getId() . 
+							entry::CATEGORY_SEARCH_STATUS . $status;
 				}
 			}
 		}
@@ -391,9 +389,8 @@ class entryFilter extends baseObjectFilter
 			{
 				foreach ($statuses as $status)
 				{
-					$categoryFullNamesToIds[] = entry::CATEGORY_SEARCH_PERFIX . $category->getId() . ' ' .
-							entry::CATEGORY_SEARCH_STATUS . $status . ' ' .
-							entry::CATEGORY_SEARCH_PERFIX . $category->getId() ;
+					$categoryFullNamesToIds[] = entry::CATEGORY_SEARCH_PERFIX . $category->getId() .
+							entry::CATEGORY_SEARCH_STATUS . $status;
 				}
 			}
 		}
