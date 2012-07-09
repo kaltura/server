@@ -9,6 +9,9 @@
  */
 class BaseEntryService extends KalturaEntryService
 {
+    /* (non-PHPdoc)
+     * @see KalturaEntryService::initService()
+     */
     public function initService($serviceId, $serviceName, $actionName)
     {
         parent::initService($serviceId, $serviceName, $actionName);
@@ -83,7 +86,7 @@ class BaseEntryService extends KalturaEntryService
     }
 	
     /**
-     * Generic add entry, should be used when the uploaded entry type is not known.
+     * Attach content resource to entry in status NO_MEDIA
      *
      * @action addContent
 	 * @param string $entryId
@@ -362,7 +365,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Update base entry. Only the properties that were set will be updated.
+	 * Update the content resource associated with the entry.
 	 * 
 	 * @action updateContent
 	 * @param string $entryId Entry id to update
@@ -406,7 +409,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Get base entry by comma separated entry ids.
+	 * Get an array of KalturaBaseEntry objects by a comma-separated list of ids.
 	 * 
 	 * @action getByIds
 	 * @param string $entryIds Comma separated string of entry ids
@@ -585,7 +588,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Update entry thumbnail from a different entry by a specified time offset (In seconds).
+	 * Update entry thumbnail from a different entry by a specified time offset (in seconds).
 	 * 
 	 * @action updateThumbnailFromSourceEntry
 	 * @param string $entryId Media entry id
@@ -617,7 +620,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Reject the entry and mark the pending flags (if any) as moderated (this will make the entry non playable).
+	 * Reject the entry and mark the pending flags (if any) as moderated (this will make the entry non-playable).
 	 *
 	 * @action reject
 	 * @param string $entryId
@@ -826,7 +829,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * index Entry by id
+	 * Index and entry by id.
 	 * 
 	 * @action index
 	 * @param string $id
