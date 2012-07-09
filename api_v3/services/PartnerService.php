@@ -152,7 +152,7 @@ class PartnerService extends KalturaBaseService
 	 * @param int $partnerId
 	 * @return KalturaPartner
 	 *
-	 * @throws APIErrors::ADMIN_KUSER_NOT_FOUND
+	 * @throws APIErrors::INVALID_PARTNER_ID
 	 */
 	public function getAction ($partnerId = null)
 	{
