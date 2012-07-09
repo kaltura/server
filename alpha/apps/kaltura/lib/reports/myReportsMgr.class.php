@@ -562,7 +562,7 @@ class myReportsMgr
 			
 			if ($input_filter->categories) 
 			{ 
-				$entryFilter->set("_matchand_categories", $input_filter->categories);
+				$entryFilter->set("_matchor_categories", $input_filter->categories);
 				$shouldSelectFromSearchEngine = true;
 			}
 			
