@@ -829,7 +829,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Index and entry by id.
+	 * Index an entry by id.
 	 * 
 	 * @action index
 	 * @param string $id
