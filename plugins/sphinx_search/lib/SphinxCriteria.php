@@ -327,10 +327,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		KalturaLog::debug("Applied " . count($this->matchClause) . " matches, " . count($this->whereClause) . " clauses, " . count($this->keyToRemove) . " keys removed, $this->criteriasLeft keys left");
 		
-		$this->ranker = self::RANKER_NONE;
 		if(count($this->matchClause))
 		{
-			//$this->ranker = self::RANKER_SPH04;
 			$this->matchClause = array_unique($this->matchClause);
 			$matches = reset($this->matchClause);
 			if(count($this->matchClause) > 1)
@@ -405,7 +403,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 		
 		if(count($orders))
-		{
+		{			
 			$this->applySortRequired = true;
 			$orders = array_unique($orders);
 			$orderBy = 'ORDER BY ' . implode(',', $orders);
@@ -414,7 +412,13 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		{
 			$this->applySortRequired = false;
 		}
-			
+		
+		$this->ranker = self::RANKER_NONE;
+		if (strpos($orderBy, '@weight') !== false)
+		{
+			$this->ranker = self::RANKER_SPH04;
+		}
+		
 		$index = $this->getSphinxIndexName();
 		$maxMatches = self::getMaxRecords();
 		$limit = $maxMatches;
