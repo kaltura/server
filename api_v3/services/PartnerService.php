@@ -150,8 +150,6 @@ class PartnerService extends KalturaBaseService
 	 * 
 	 * @action get
 	 * @param int $partnerId
-	 * @param string $adminEmail
-	 * @param string $cmsPassword
 	 * @return KalturaPartner
 	 *
 	 * @throws APIErrors::ADMIN_KUSER_NOT_FOUND
