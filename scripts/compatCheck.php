@@ -48,7 +48,7 @@ $APIV3_TESTED_ACTIONS = array(
 		'*.search',
 		);
 
-$ID_FIELDS = array('id', 'guid', 'loc');
+$ID_FIELDS = array('id', 'guid', 'loc', 'title');
 
 class PartnerSecretPool
 {
@@ -360,11 +360,11 @@ function compareArrays($resultNew, $resultOld, $path)
 			$isOnlyIdErrors = false;
 			break;
 		}
-		preg_match('/new=([^ ]+)/', $curError, $newMatch);
-		preg_match('/old=([^\)]+)/', $curError, $oldMatch);
+		$explodedError = explode(' new=', rtrim($curError, ')'));
+		$explodedError = explode(' old=', $explodedError[1]);
 
-		$ids[] = "'".$newMatch[1]."'";
-		$ids[] = "'".$oldMatch[1]."'";
+		$ids[] = "'".$explodedError[0]."'";
+		$ids[] = "'".$explodedError[1]."'";
 	}
 	
 	if (!$isOnlyIdErrors)
