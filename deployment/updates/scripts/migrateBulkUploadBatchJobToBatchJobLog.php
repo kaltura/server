@@ -17,16 +17,16 @@ $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 	
 $c = new Criteria();
 
-if (isset($argv[1]))
+if (isset($argv[1]) && $argv[1])
 {
     $c->addAnd(BatchJobPeer::ID, $argv[1], Criteria::GREATER_EQUAL);
 }
-if (isset($argv[2]))
+else if (isset($argv[2]) && $argv[2])
 {
     $c->addAnd(BatchJobPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
 }
 
-if (isset($argv[3]))
+else if (isset($argv[3]) && $argv[3])
 {
     $c->addAnd(BatchJobPeer::UPDATED_AT, $argv[3], Criteria::GREATER_EQUAL);
 }
