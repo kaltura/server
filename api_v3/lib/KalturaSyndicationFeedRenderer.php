@@ -110,9 +110,10 @@ class KalturaSyndicationFeedRenderer
 		categoryPeer::addPartnerToCriteria($this->syndicationFeed->partnerId, true);
 		assetPeer::addPartnerToCriteria($this->syndicationFeed->partnerId, true);
 		
-		
-		$this->baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		entryPeer::setDefaultCriteriaFilter();	
 
+		$this->baseCriteria = entryPeer::getDefaultCriteriaFilter();
+		
 		$startDateCriterion = $this->baseCriteria->getNewCriterion(entryPeer::START_DATE, time(), Criteria::LESS_EQUAL);
 		$startDateCriterion->addOr($this->baseCriteria->getNewCriterion(entryPeer::START_DATE, null));
 		$this->baseCriteria->addAnd($startDateCriterion);
