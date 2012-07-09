@@ -122,9 +122,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	const ENTRY_ID_THAT_DOES_NOT_EXIST = 0;
 	
-	const CATEGORY_SEARCH_PERFIX = 'cat';
+	const CATEGORY_SEARCH_PERFIX = 'c';
 	
-	const CATEGORY_SEARCH_STATUS = 'status'; 
+	const CATEGORY_SEARCH_STATUS = 's'; 
 	
 	private $appears_in = null;
 
@@ -2583,9 +2583,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$categoriesEntryStringIndex = array();
 		foreach($allCategoriesEntry as $categoryEntry)
 		{
-			$categoriesEntryStringIndex[] = self::CATEGORY_SEARCH_PERFIX . $categoryEntry->getCategoryId() . ' ' .
-				self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus() . ' ' .
-				self::CATEGORY_SEARCH_PERFIX . $categoryEntry->getCategoryId() ;
+			$categoriesEntryStringIndex[] = self::CATEGORY_SEARCH_PERFIX . $categoryEntry->getCategoryId() . 
+			self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus();
 				
 			if($categoryEntry->getStatus() == CategoryEntryStatus::ACTIVE)
 				$categoriesEntryStringIndex[] = $categoryEntry->getCategoryId();	
