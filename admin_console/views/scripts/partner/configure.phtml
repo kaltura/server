@@ -98,7 +98,7 @@ function onPageLoad() {
 		{
 			var $partner_parent_id = $('#partner_parent_id');
 			
-			if ($(this).val() == 1){
+			if ($(this).val() == 1 || $(this).val() == 4){
 				$partner_parent_id.removeAttr('readonly');
 		    }else{
 				$partner_parent_id.attr("readonly", 1);
