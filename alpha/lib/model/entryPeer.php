@@ -313,7 +313,7 @@ class entryPeer extends BaseentryPeer
 		{
 			self::$s_criteria_filter = new criteriaFilter ();
 		}
-		
+
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS); 
 		$c->addAnd ( entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
 
@@ -407,8 +407,13 @@ class entryPeer extends BaseentryPeer
 
 		if($critEntitled)
 			$c->addAnd ($critEntitled);
-		
-		self::$s_criteria_filter->setFilter($c);
+
+			self::$s_criteria_filter->setFilter($c);
+	}
+	
+	public static function getDefaultCriteriaFilter()
+	{
+		return self::$s_criteria_filter->getFilter();
 	}
 	
 	public static function doCount(Criteria $criteria, $distinct = false, PropelPDO $con = null)
