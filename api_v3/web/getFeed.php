@@ -25,6 +25,7 @@ KalturaLog::debug("getFeed Params [" . print_r(requestUtils::getRequestParams(),
 kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : null);
 kCurrentContext::$user_ip = requestUtils::getRemoteAddress();
 kCurrentContext::$ps_vesion = "ps3";
+kCurrentContext::$is_admin_session = true;
 
 $feedId = $_GET['feedId'];
 $entryId = (isset($_GET['entryId']) ? $_GET['entryId'] : null);
@@ -67,18 +68,21 @@ if ($limit)
 	$short_limit = kConf::hasParam("v3cache_getfeed_short_limit") ? kConf::get("v3cache_getfeed_short_limit") : 50;
 	if ($limit < $short_limit)
 	{
-		KalturaResponseCacher::setExpiry(kConf::hasParam("v3cache_getfeed_short_expiry") ? kConf::get("v3cache_getfeed_short_expiry") : 900);
+		$cache->setExpiry(kConf::hasParam("v3cache_getfeed_short_expiry") ? kConf::get("v3cache_getfeed_short_expiry") : 900);
 	}
 }
 
 $partnerId = $syndicationFeedDB->getPartnerId();
-$expiryArr = kConf::hasMap("v3cache_getfeed_expiry") ? kConf::getMap("v3cache_getfeed_expiry") : array();
-foreach($expiryArr as $item)
+$expiryArr = kConf::hasParam("v3cache_getfeed_expiry") ? kConf::get("v3cache_getfeed_expiry") : array();
+foreach($expiryArr as $params)
 {
+	$item = null;
+	parse_str($params, $item);
+	
 	if ($item["key"] == "partnerId" && $item["value"] == $partnerId ||
 		$item["key"] == "feedId" && $item["value"] == $feedId)
 	{
-		KalturaResponseCacher::setExpiry($item["expiry"]);
+		$cache->setExpiry($item["expiry"]);
 		break;
 	}
 }
