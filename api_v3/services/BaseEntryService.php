@@ -670,6 +670,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
+	 * This action delivers entry-related data, based on the user's context: access control, restriction, playback format and storage information.
 	 * @action getContextData
 	 * @param string $entryId
 	 * @param KalturaEntryContextDataParams $contextDataParams
