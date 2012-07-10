@@ -146,29 +146,29 @@ class PartnerService extends KalturaBaseService
 	
 	
 	/**
-	 * Retrieve partner secret and admin secret
+	 * Retrieve partner object by Id
 	 * 
 	 * @action get
-	 * @param int $partnerId
+	 * @param int $pid
 	 * @return KalturaPartner
 	 *
 	 * @throws APIErrors::INVALID_PARTNER_ID
 	 */
-	public function getAction ($partnerId = null)
+	public function getAction ($pid = null)
 	{
-	    if (is_null($partnerId))
+	    if (is_null($pid))
 	    {
-	        $partnerId = $this->getPartnerId();
+	        $pid = $this->getPartnerId();
 	    }
 	    
 	    $c = PartnerPeer::getDefaultCriteria();
 	    
-		$c->addAnd(PartnerPeer::ID ,$partnerId);
+		$c->addAnd(PartnerPeer::ID ,$pid);
 		
 		$dbPartner = PartnerPeer::doSelectOne($c);
 		if (is_null($dbPartner))
 		{
-		    throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
+		    throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $pid);
 		}
 		
 		$partner = new KalturaPartner();
