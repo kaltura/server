@@ -407,12 +407,10 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			foreach ($cats as $cat)
 			{ 
 				$catName = categoryPeer::retrieveByPK($cat);
-				if (!is_null($catName))
-					$catsNames[] = $catName->getFullName();
-				else
-				{
-					throw new KalturaAPIException(KalturaErrors::CANT_UPDATE_PARAMETER, $cat);
-				}
+				if (is_null($catName))
+					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $cat);
+					
+				$catsNames[] = $catName->getFullName();
 			}
 			
 			$catNames = implode(",", $catsNames);
@@ -500,7 +498,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			{ 
 				$catName = categoryPeer::retrieveByPK($cat);
 				if (is_null($catName))
-					throw new KalturaAPIException(KalturaErrors::CANT_UPDATE_PARAMETER, $cat);
+					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $cat);
 			}
 		}
 		
@@ -518,7 +516,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 					KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 					$catName = categoryPeer::retrieveByPK($cat);
 					if ($catName)
-						throw new KalturaAPIException(KalturaErrors::CANT_UPDATE_PARAMETER, $cat);
+						throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_PERMITTED, $cat);
 					KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 				}
 			}

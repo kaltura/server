@@ -240,6 +240,8 @@ class KalturaErrors extends APIErrors
 	 */
 	const CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND,Category id \"%s\" not found";
 	
+	const CATEGORY_NOT_PERMITTED = "CATEGORY_NOT_PERMITTED,Category \"%s\" is not permitted";
+	
 	const PARENT_CATEGORY_NOT_FOUND = "PARENT_CATEGORY_NOT_FOUND,Parent category id \"%s\" not found";
 	
 	const DUPLICATE_CATEGORY = "DUPLICATE_CATEGORY,The category \"%s\" already exists";
