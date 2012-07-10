@@ -172,5 +172,21 @@ class SwfFlavorParams extends flavorParams
 		return parent::getFromCustomData('flatten');
 	}
 	
+	/**
+	 * @return boolean
+	 */
+	public function getPoly2bitmap()
+	{
+		return parent::getFromCustomData('poly2Bitmap');
+	}
+	
+	/**
+	 * @return boolean
+	 */
+	public function setPoly2bitmap($poly2Bitmap)
+	{
+		parent::putInCustomData('poly2Bitmap',$poly2Bitmap);
+	}
+	
 	
 }

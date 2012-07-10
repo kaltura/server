@@ -432,7 +432,8 @@ include_once("KDLCommon.php");
 				$rvStr=$rvStr.","."storeFonts:".$this->_storeFonts;
 			if($this->_flatten)
 				$rvStr=$rvStr.","."flatten:".$this->_flatten;
-				
+			if($this->_poly2Bitmap)
+				$rvStr=$rvStr.","."poly2Bitmap:".$this->_poly2Bitmap;
 			if($rvStr)
 				$rvStr = "SWF(".$rvStr.")";
 			return $rvStr;
@@ -461,6 +462,8 @@ include_once("KDLCommon.php");
 			if($this->_storeFonts)
 				return true;
 			if($this->_flatten)
+				return true;
+			if($this->_poly2Bitmap)
 				return true;
 			return false;
 		}

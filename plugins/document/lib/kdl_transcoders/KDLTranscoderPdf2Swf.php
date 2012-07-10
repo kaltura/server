@@ -46,6 +46,9 @@ class KDLTranscoderPdf2Swf extends KDLOperatorBase
 			if ($target->_swf->_flatten) {
 				$cmdStr .= '--flatten ';
 			}
+			if ($target->_swf->_poly2Bitmap) {
+				$cmdStr .= '-s poly2bitmap';
+			}
 		}
 		$cmdStr .= $extra . KDLCmdlinePlaceholders::InFileName.
 		           ' -o '.KDLCmdlinePlaceholders::OutFileName;

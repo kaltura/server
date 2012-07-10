@@ -15,8 +15,20 @@ class KalturaSwfFlavorParamsOutput extends KalturaFlavorParamsOutput
 		return $object;
 	}
 	
+	/**
+	 * @var int
+	 */
+	public $flashVersion;
+	
+	/**
+	 * @var bool
+	 */
+	public $poly2Bitmap;
+	
 	private static $map_between_objects = array
 	(
+	'flashVersion',
+	'poly2Bitmap',
 	);
 	
 	// attributes that defined in flavorParams and not in SwfFlavorParamsOutput
