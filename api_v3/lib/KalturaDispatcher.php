@@ -80,10 +80,13 @@ class KalturaDispatcher
 		kPermissionManager::init(kConf::get('enable_cache'));
 		kEntitlementUtils::initEntitlementEnforcement();
 		
-		$disableTags = $actionReflector->getActionInfo()->disableTags;
-		foreach ($disableTags as $disableTag)
+	    $disableTags = $actionReflector->getActionInfo()->disableTags;
+		if ($disableTags)
 		{
-		    KalturaCriterion::disableTag($disableTag);
+			foreach ($disableTags as $disableTag)
+			{
+			    KalturaCriterion::disableTag($disableTag);
+			}
 		}
 		
 		$actionInfo = $actionReflector->getActionInfo();
