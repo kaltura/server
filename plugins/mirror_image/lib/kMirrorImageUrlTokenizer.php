@@ -32,13 +32,13 @@ class kMirrorImageUrlTokenizer extends kUrlTokenizer
 		$startTime = time();	
 				
 		// build the full file sync URL to decorate
-		$urlToDecorate = $baseUrl.'/'. ltrim($url, '/');
+		$urlToDecorate = $this->baseUrl.'/'. ltrim($url, '/');
 		
 		// decorate URLs
 		$decoratedUrl = self::decorateUrl($urlToDecorate, $this->secret, time(), $this->window, $this->useDummyHost);
 		
 		// remove the base URL from the decorated URL
-		return substr($decoratedUrl, strlen($baseUrl.'/'));
+		return substr($decoratedUrl, strlen($this->baseUrl.'/'));
 	}
 	
 	/**
