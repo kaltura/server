@@ -2593,6 +2593,25 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(' ', $categoriesEntryStringIndex);
 	}
 	
+	/*
+	 * get all categoryEntry objects from categoryEntryPeer
+	 */
+	public function getCategoriesWithNoPrivacyContext()
+	{
+		$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($this->getId());
+		
+		$categoriesWithNoPrivacyContext = array();
+		foreach($allCategoriesEntry as $categoryEntry)
+		{
+			$category = categoryPeer::retrieveByPK($categoryEntry->getCategoryId());
+
+			if($category && $category->getPrivacyContexts() == null)
+				$categoriesWithNoPrivacyContext[] = $category;
+		}
+		
+		return $categoriesWithNoPrivacyContext;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see IIndexable::getEntryId()
 	 */

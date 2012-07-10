@@ -1176,7 +1176,19 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  	 */
  	public static function index(entry $entry)
  	{
-		$entry->setCategoriesIds($entry->getCategoriesIds());
+ 		$categoriesWithNoPrivacyContext = $entry->getCategoriesWithNoPrivacyContext();
+ 		
+ 		$categoriesFullName = array();
+ 		$categoriesIds = array();
+ 		
+ 		foreach($categoriesWithNoPrivacyContext as $category)
+ 		{
+ 			$categoriesFullName[] = $category->getFullName();
+ 			$categoriesIds[] = $category->getId();
+ 		}
+ 		
+ 		$entry->parentSetCategories(implode(',', $categoriesFullName));
+		$entry->parentsetCategoriesIds(implode(',', $categoriesIds));
 		$entry->save();
 		
 		return $entry->getIntId();
