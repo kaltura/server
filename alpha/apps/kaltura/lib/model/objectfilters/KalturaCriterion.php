@@ -8,6 +8,8 @@ abstract class KalturaCriterion extends Criterion implements IKalturaDbQuery
 	const TAG_ENTITLEMENT_ENTRY = 'TAG_ENTITLEMENT_ENTRY';
 	const TAG_ENTITLEMENT_CATEGORY = 'TAG_ENTITLEMENT_CATEGORY';
 	const TAG_WIDGET_SESSION = 'TAG_WIDGET_SESSION';
+	const TAG_SESSION_PARTNER = 'TAG_SESSION_PARTNER';
+	
 	/**
 	 * @var KalturaCriterion
 	 */

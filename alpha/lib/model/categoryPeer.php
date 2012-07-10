@@ -65,7 +65,89 @@ class categoryPeer extends BasecategoryPeer
 		
 		self::$s_criteria_filter->setFilter ( $c );
 	}
+	
+	/* (non-PHPdoc)
+	 * @see BasecategoryPeer::addPartnerToCriteria()
+	 * 
+	 * Override parent implementation in order to add tag to pertner id criterion in order to be able to disable it later 
+	 */
+	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
+	{
+		$criteriaFilter = self::getCriteriaFilter();
+		$criteria = $criteriaFilter->getFilter();
+		
+		if(!$privatePartnerData)
+		{
+			// the private partner data is not allowed - 
+			if($kalturaNetwork)
+			{
+				// allow only the kaltura netword stuff
+				$criteria->addAnd(self::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
+				
+				if($partnerId)
+				{
+					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the pattner_id and then the rest
+					myCriteria::addComment($criteria , "Only Kaltura Network");
+					$criteria->addAscendingOrderByColumn($orderBy);//, Criteria::CUSTOM );
+				}
+			}
+			else
+			{
+				// no private data and no kaltura_network - 
+				// add a criteria that will return nothing
+				$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
+			}
+		}
+		else
+		{
+			$criterion = null;
+			
+			// private data is allowed
+			if(!strlen(strval($partnerGroup)))
+			{
+				// the default case
+				$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partnerId);
+				$criteria->addAnd($criterion);
+			}
+			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			{
+				// all is allowed - don't add anything to the criteria
+			}
+			else 
+			{
+				// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
+				$partners = explode(',', trim($partnerGroup));
+				foreach($partners as &$p)
+					trim($p); // make sure there are not leading or trailing spaces
 
+				// add the partner_id to the partner_group
+				if (!in_array(strval($partnerId), $partners))
+					$partners[] = strval($partnerId);
+				
+				if(count($partners) == 1 && reset($partners) == $partnerId)
+				{
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partnerId);
+					$criteria->addAnd($criterion);
+				}
+				else 
+				{
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
+					if($kalturaNetwork)
+					{
+						$criterionNetwork = $criteria->getNewCriterion(self::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
+						$criterion->addOr($criterionNetwork);
+					}
+					$criteria->addAnd($criterion);
+				}
+			}
+			
+			if($criterion && $criterion instanceof KalturaCriterion)
+				$criterion->addTag(KalturaCriterion::TAG_SESSION_PARTNER);
+		}
+			
+		$criteriaFilter->enable();
+	}
+	
 	public static function retrieveByPKNoFilter ($pk, $con = null)
 	{
 		self::setUseCriteriaFilter ( false );
@@ -103,12 +185,12 @@ class categoryPeer extends BasecategoryPeer
 	/**
 	 * Get category by full name using exact match (returns null or category object)
 	 *  
-	 * @param $partnerId
 	 * @param $fullName
-	 * @param $con
+	 * @param $ignoreCategoryId
+	 * @param $partnerId
 	 * @return category
 	 */
-	public static function getByFullNameExactMatch($fullName, $ignoreCategoryId = null, $con = null)
+	public static function getByFullNameExactMatch($fullName, $ignoreCategoryId = null, $partnerId = null)
 	{
 		$fullName = self::getParsedFullName($fullName);
 		
@@ -121,7 +203,15 @@ class categoryPeer extends BasecategoryPeer
 		if($ignoreCategoryId)
 			$c->add(categoryPeer::ID, $ignoreCategoryId, Criteria::NOT_EQUAL);
 		
-		return categoryPeer::doSelectOne($c, $con);
+		if(!is_null($partnerId))
+		{
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_SESSION_PARTNER);
+			$c->add(categoryPeer::PARTNER_ID, $partnerId);
+		}
+		
+		$ret = categoryPeer::doSelectOne($c);
+		KalturaCriterion::restoreTag(KalturaCriterion::TAG_SESSION_PARTNER);
+		return $ret;
 	}
 	
 	/**

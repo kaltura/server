@@ -482,9 +482,13 @@ class category extends Basecategory implements IIndexable
 	{
 		$fullName = $this->getFullName();
 		$fullName = categoryPeer::getParsedFullName($fullName);
-				
+		
+		$partnerId = null;
+		if($this->getPartnerId() != kCurrentContext::$ks_partner_id)
+			$partnerId = $this->getPartnerId();
+		
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		$category = categoryPeer::getByFullNameExactMatch($fullName, $this->getId());
+		$category = categoryPeer::getByFullNameExactMatch($fullName, $this->getId(), $partnerId);
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		if ($category)
