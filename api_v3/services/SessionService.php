@@ -9,6 +9,24 @@
  */
 class SessionService extends KalturaBaseService
 {
+    
+    /* (non-PHPdoc)
+     * @see KalturaBaseService::initService()
+     */
+    public function initService($serviceId, $serviceName, $actionName)
+    {
+        parent::initService($serviceId, $serviceName, $actionName);
+        
+        //Calculate partner group
+        $c = PartnerPeer::getDefaultCriteria();
+        $partners = PartnerPeer::doSelect($c);
+        $partnerIds = array();
+        foreach ($partners as $partner)
+        {
+            $partnerIds[] = $partner->getId();
+        }
+        $this->partnerGroup = implode(",", $partnerIds);
+    }
 	
 	protected function partnerRequired($actionName)
 	{
