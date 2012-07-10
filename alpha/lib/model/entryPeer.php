@@ -523,7 +523,7 @@ class entryPeer extends BaseentryPeer
 		
 		if($c instanceof KalturaCriteria)
 		{
-			$skipApplyFilters = entryPeer::applyEntitlmentCriteria($c);
+			$skipApplyFilters = entryPeer::applyEntitlementCriteria($c);
 			
 			if(!$skipApplyFilters)
 			{
@@ -548,7 +548,7 @@ class entryPeer extends BaseentryPeer
 		
 		if($c instanceof KalturaCriteria)
 		{
-			$skipApplyFilters = entryPeer::applyEntitlmentCriteria($c);
+			$skipApplyFilters = entryPeer::applyEntitlementCriteria($c);
 			
 			if(!$skipApplyFilters)
 			{
@@ -567,7 +567,7 @@ class entryPeer extends BaseentryPeer
 		return $queryResult;
 	}
 	
-	private static function applyEntitlmentCriteria(Criteria &$c)
+	private static function applyEntitlementCriteria(Criteria &$c)
 	{
 		$skipApplyFilters = false;
 		
