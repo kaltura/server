@@ -81,7 +81,7 @@ class KalturaDispatcher
 		kEntitlementUtils::initEntitlementEnforcement();
 		
 	    $disableTags = $actionReflector->getActionInfo()->disableTags;
-		if ($disableTags)
+		if($disableTags && is_array($disableTags) && count($disableTags))
 		{
 			foreach ($disableTags as $disableTag)
 			{
