@@ -38,25 +38,24 @@ class kuserPeer extends BasekuserPeer
 	}
 	
 	/**
-	 * @param int $partner_id
-	 * @param string $puser_id
+	 * @param int $partnerId
+	 * @param string $puserId
 	 * @param bool $ignore_puser_kuser
 	 * @return kuser
 	 */
-	public static function getKuserByPartnerAndUid($partner_id , $puser_id, $ignore_puser_kuser = false)
+	public static function getKuserByPartnerAndUid($partnerId, $puserId, $ignorePuserKuser = false)
 	{
-		if ($ignore_puser_kuser || kCurrentContext::isApiV3Context())
+		if(!$ignorePuserKuser && !kCurrentContext::isApiV3Context())
 		{
-			$c = new Criteria();
-			$c->add(self::PARTNER_ID, $partner_id);
-			$c->add(self::PUSER_ID, $puser_id);
-			return self::doSelectOne($c);			
+			$puserKuser = PuserKuserPeer::retrieveByPartnerAndUid($partnerId, 0, $puserId, true);
+			if($puserKuser)
+				return $puserKuser->getKuser();
 		}
 		
-		// just grab the kuser, we dont mind which subp we get
-		$puser_kuser = PuserKuserPeer::retrieveByPartnerAndUid( $partner_id , 0, $puser_id , true );
-		if ( !$puser_kuser ) return false;
-		return $puser_kuser->getKuser();
+		$c = new Criteria();
+		$c->add(self::PARTNER_ID, $partnerId);
+		$c->add(self::PUSER_ID, $puserId);
+		return self::doSelectOne($c);
 	}
 	
 	/**
