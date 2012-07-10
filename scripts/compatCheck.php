@@ -549,6 +549,13 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array(),
 					$sig = $parsedParams['kalsig'];
 				else if (isset($parsedParams['sig']))
 					$sig = $parsedParams['sig'];
+				else if (isset($parsedParams['ks']))
+					$sig = substr($parsedParams['ks'], 0, 20);
+				else if (isset($parsedParams['1:ks']))
+					$sig = substr($parsedParams['1:ks'], 0, 20);
+				else
+					$sig = print_r($parsedParams, true);
+					
 				print "Warning: API became slow ({$sig})\n";
 			}			
 			return;
