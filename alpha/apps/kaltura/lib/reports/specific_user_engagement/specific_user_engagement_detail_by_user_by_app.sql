@@ -3,7 +3,7 @@ SELECT en.entry_name entry_name,
 	count_plays,
 	sum_time_viewed,
 	avg_time_viewed,
-	avg_view_drop_off
+	avg_view_drop_off,
 	count_loads,
 	load_play_ratio
 FROM (SELECT 
