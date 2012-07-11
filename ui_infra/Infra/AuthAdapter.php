@@ -75,6 +75,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     			    {
     			        $permissionFilter = new Kaltura_Client_Type_PermissionFilter();
     			        $permissionFilter->nameEqual = $requiredPermission;
+    			        $permissionFilter->statusEqual = Kaltura_Client_Enum_PermissionStatus::ACTIVE;
     			        $permissionFilter->partnerIdEqual = $userPartner->id;
     			        $permissions = $client->permission->listAction($permissionFilter, new Kaltura_Client_Type_FilterPager());
     			        if (!$permissions->totalCount)
