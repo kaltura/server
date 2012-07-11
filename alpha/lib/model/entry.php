@@ -978,7 +978,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return myContentStorage::getGeneralEntityPath("entry/thumbnail", $this->getIntId(), $this->getId(), $this->getThumbnail() , $version );
 	}
 
-	public function getThumbnailUrl( $version = NULL )
+	public function getThumbnailUrl($version = null, $protocol = null)
 	{
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_KMC_DRILL_DOWN_THUMB_RESIZE, $this->getPartnerId()))
 		{
@@ -1030,7 +1030,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 			
 			if($serveRemote && $fileSync)
-				return $fileSync->getExternalUrl($this->getId());
+			{
+				$url = $fileSync->getExternalUrl($this->getId());
+				if (!is_null($protocol))
+					$url = preg_replace('/^https?/', $protocol, $url);
+		
+				return $url;
+			}
 		}
 		
 		//$path = $this->getThumbnailPath ( $version );
@@ -1040,7 +1046,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$path .= "/version/$version";
 		else
 			$path .= "/version/$current_version";
-		$url = myPartnerUtils::getThumbnailHost($this->getPartnerId()) . $path ;
+		$url = myPartnerUtils::getThumbnailHost($this->getPartnerId(), $protocol) . $path ;
 		return $url;
 	}
 
