@@ -156,8 +156,8 @@ class PartnerController extends Zend_Controller_Action
 		$partnerId = $this->_getParam('partner_id');
 		$status = $this->_getParam('status');
 		$client = Infra_ClientHelper::getClient();
-		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
-		$systemPartnerPlugin->systemPartner->updateStatus($partnerId, $status);
+		$varConsolePlugin = Kaltura_Client_VarConsole_Plugin::get($client);
+		$varConsolePlugin->varConsole->updateStatus($partnerId, $status);
 		echo $this->_helper->json('ok', false);
 	}
 	
