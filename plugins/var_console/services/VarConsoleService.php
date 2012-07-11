@@ -144,9 +144,11 @@ class VarConsoleService extends KalturaBaseService
     }
     
 	/**
+	 * Function to change a sub-publisher's status
 	 * @action updateStatus
 	 * @param int $partnerId
 	 * @param KalturaPartnerStatus $status
+	 * @throws KalturaErrors::UNKNOWN_PARTNER_ID
 	 */
 	public function updateStatusAction($partnerId, $status)
 	{
