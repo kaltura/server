@@ -36,6 +36,7 @@ class category extends Basecategory implements IIndexable
 	
 	private static $indexFieldTypes = array(
 		'category_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'str_category_id' => IIndexable::FIELD_TYPE_STRING,
 		'parent_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'name' => IIndexable::FIELD_TYPE_STRING,
@@ -940,6 +941,7 @@ class category extends Basecategory implements IIndexable
 		return array(
 		/*sphinx => propel */
 			'category_id' => 'id',
+			'str_category_id' => 'id',
 			'parent_id' => 'parentId',
 			'partner_id' => 'partnerId',
 			'name' => 'name',
