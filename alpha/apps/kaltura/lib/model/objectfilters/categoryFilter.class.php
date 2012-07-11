@@ -5,7 +5,7 @@
  */ 
 class categoryFilter extends baseObjectFilter
 {
-	const FREE_TEXT_FIELDS = 'category_id,name,tags,description,reference_id';
+	const FREE_TEXT_FIELDS = 'str_category_id,name,tags,description,reference_id';
 	const NAME_REFERNCE_ID = 'name,reference_id';
 	const MEMBERS = 'members';
 	
