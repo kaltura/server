@@ -30,17 +30,17 @@ while (false !== ($iniFile = $configDir->read()))
 }
 $configDir->close();
 
-try
-{
-	$config = new Zend_Config(kConf::getAll());
-	$configWriter = new Zend_Config_Writer_Xml();
-	$configWriter->write($xmlFilename, $config);
-	KalturaLog::info("Saved config to history [$xmlFilename]");
-}
-catch(Exception $e)
-{
-	KalturaLog::err($e->getMessage());
-}
+//try
+//{
+//	$config = new Zend_Config(kConf::getAll());
+//	$configWriter = new Zend_Config_Writer_Xml();
+//	$configWriter->write($xmlFilename, $config);
+//	KalturaLog::info("Saved config to history [$xmlFilename]");
+//}
+//catch(Exception $e)
+//{
+//	KalturaLog::err($e->getMessage());
+//}
 
 $reports = array();
 foreach($tamplates as $mapName => $tamplate)
