@@ -231,9 +231,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			{
 				foreach($meta as $metaItem)
 				{
-					KalturaLog::debug("Sphinx query " . $metaItem['Variable_name'] . ': ' . $metaItem['Value']);
 					if($metaItem['Variable_name'] == 'total_found')
+					{
 						$this->recordsCount = (int)$metaItem['Value'];
+						KalturaLog::debug('Sphinx query total_found: ' . $this->recordsCount);
+						break;
+					}
 				}
 			}
 		}
