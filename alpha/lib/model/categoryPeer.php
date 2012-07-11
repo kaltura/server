@@ -81,7 +81,7 @@ class categoryPeer extends BasecategoryPeer
 			// the private partner data is not allowed - 
 			if($kalturaNetwork)
 			{
-				// allow only the kaltura netword stuff
+				// allow only the kaltura network stuff
 				$criteria->addAnd(self::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
 				
 				if($partnerId)
@@ -210,7 +210,10 @@ class categoryPeer extends BasecategoryPeer
 		}
 		
 		$ret = categoryPeer::doSelectOne($c);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_SESSION_PARTNER);
+		
+		//If the tag is disabled it should be restored
+		if (!KalturaCriterion::isTagEnable(KalturaCriterion::TAG_SESSION_PARTNER))
+		    KalturaCriterion::restoreTag(KalturaCriterion::TAG_SESSION_PARTNER);
 		return $ret;
 	}
 	
