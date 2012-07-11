@@ -12,7 +12,9 @@ class categoryPeer extends BasecategoryPeer
 	const CATEGORY_SEPARATOR = ">";
 	
 	const MAX_CATEGORY_NAME = 60;
+	
 	const MEMBERS = 'category.MEMBERS';
+	const CATEGORY_ID = 'category.CATEGORY_ID';
 	
 	private static $invalid_characters = array('>','<',',');
 	
