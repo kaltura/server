@@ -104,7 +104,6 @@ class PartnerUsageController extends Zend_Controller_Action
 				$this->view->translate('partner-usage table partnerName'), ',',
 				$this->view->translate('partner-usage table partnerId'), ',',
 				$this->view->translate('partner-usage table partnerCreatedAt'), ',',
-				$this->view->translate('partner-usage table partnerPackage'), ',',
 				$this->view->translate('partner-usage table views'), ',',
 				$this->view->translate('partner-usage table plays'), ',',
 				$this->view->translate('partner-usage table entriesCount'), ',',
@@ -129,7 +128,6 @@ class PartnerUsageController extends Zend_Controller_Action
 					$item->partnerName, ',', 
 					$item->partnerId, ',', 
 					'"',$d->toString(Zend_Date::DATE_LONG), '",', 
-					$this->view->translate($this->view->packageNameById($item->partnerPackage)), ',',
 					(int)$item->views, ',',
 					(int)$item->plays, ',',
 					(int)$item->entriesCount, ',',
@@ -156,7 +154,6 @@ class PartnerUsageController extends Zend_Controller_Action
 		$includeActive = $form->getValue('include_active');
 		$includeBlocked = $form->getValue('include_blocked');
 		$includeRemoved = $form->getValue('include_removed');
-		$filterPackage = $form->getValue('partner_package');
 		
 		if ($filterType == 'byid')
 		{
