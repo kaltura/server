@@ -150,7 +150,9 @@ class VarConsoleService extends KalturaBaseService
 	 */
 	public function updateStatusAction($partnerId, $status)
 	{
-		$dbPartner = PartnerPeer::retrieveByPK($partnerId);
+        $c = PartnerPeer::getDefaultCriteria();
+        $c->addAnd(PartnerPeer::ID, $partnerId);
+        $dbPartner = PartnerPeer::doSelectOne($c);		
 		if (!$dbPartner)
 			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
 			
