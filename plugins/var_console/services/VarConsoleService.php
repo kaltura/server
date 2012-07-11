@@ -142,4 +142,20 @@ class VarConsoleService extends KalturaBaseService
 		$response->objects = $items;
 		return $response;
     }
+    
+	/**
+	 * @action updateStatus
+	 * @param int $partnerId
+	 * @param KalturaPartnerStatus $status
+	 */
+	public function updateStatusAction($partnerId, $status)
+	{
+		$dbPartner = PartnerPeer::retrieveByPK($partnerId);
+		if (!$dbPartner)
+			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
+			
+		$dbPartner->setStatus($status);
+		$dbPartner->save();
+		PartnerPeer::removePartnerFromCache($partnerId);
+	}
 }
