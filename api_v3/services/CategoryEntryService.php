@@ -225,7 +225,7 @@ class CategoryEntryService extends KalturaBaseService
 			foreach ($dbCategoriesEntry as $dbCategoryEntry)
 				$categoriesIds[] = $dbCategoryEntry->getCategoryId();
 				
-			$c = new Criteria();
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 			$c->add(categoryPeer::ID, $categoriesIds, Criteria::IN);
 			$pager->attachToCriteria($c);
 			$c->applyFilters();
