@@ -173,9 +173,6 @@ class PartnerUsageController extends Zend_Controller_Action
 			$statuses[] = Kaltura_Client_Enum_PartnerStatus::BLOCKED;
 		if ($includeRemoved)
 			$statuses[] = Kaltura_Client_Enum_PartnerStatus::FULL_BLOCK;
-			
-		if ($filterPackage != '')
-			$filter->partnerPackageEqual = $filterPackage;
 						
 		$filter->statusIn = implode(',', $statuses);
 		$filter->orderBy = Kaltura_Client_Enum_PartnerOrderBy::ID_DESC;
