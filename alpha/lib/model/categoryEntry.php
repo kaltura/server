@@ -95,6 +95,30 @@ class categoryEntry extends BasecategoryEntry {
 		{ 
 			if($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::ACTIVE)
 			{
+				if(is_null($this->entryCategoriesRemovedIds))
+				{
+					$categoriesEntries = categoryEntryPeer::retrieveActiveByEntryId($this->getEntryId());
+					
+					$categoriesIds = array();
+					foreach ($categoriesEntries as $categroyEntry)
+					{
+						//cannot get directly the full ids - since it might not be updated.
+						if($categroyEntry->getCategoryId() != $this->getCategoryId())
+							$categoriesIds[] = $categroyEntry->getCategoryId();
+					}
+					
+					$categoriesRemoved = categoryPeer::retrieveByPKs($categoriesIds);
+					
+					$entryCategoriesRemovedIds = array();
+					foreach($categoriesRemoved as $categoryRemoved)
+					{
+						$fullIds = explode(categoryPeer::CATEGORY_SEPARATOR, $categoryRemoved->getFullIds());
+						$entryCategoriesRemovedIds = array_merge($entryCategoriesRemovedIds, $fullIds);
+					}
+					
+					$this->entryCategoriesRemovedIds = $entryCategoriesRemovedIds;
+				}
+				
 				$category->decrementEntriesCount(1, $this->entryCategoriesRemovedIds);
 				$category->decrementDirectEntriesCount();
 		
@@ -116,6 +140,30 @@ class categoryEntry extends BasecategoryEntry {
 	
 	private function setEntryOnCategory(category $category, $entry = null)
 	{
+		if(is_null($this->entryCategoriesAddedIds))
+		{
+			$categoriesEntries = categoryEntryPeer::retrieveActiveByEntryId($this->getEntryId());
+			
+			$categoriesIds = array();
+			foreach ($categoriesEntries as $categroyEntry)
+			{
+				//cannot get directly the full ids - since it might not be updated.
+				if($categroyEntry->getCategoryId() != $this->getCategoryId())
+					$categoriesIds[] = $categroyEntry->getCategoryId();
+			}
+			
+			$categoriesAdded = categoryPeer::retrieveByPKs($categoriesIds);
+			
+			$entryCategoriesAddedIds = array();
+			foreach($categoriesAdded as $categoryAdded)
+			{
+				$fullIds = explode(categoryPeer::CATEGORY_SEPARATOR, $categoryAdded->getFullIds());
+				$entryCategoriesAddedIds = array_merge($entryCategoriesAddedIds, $fullIds);
+			}
+			
+			$this->entryCategoriesAddedIds = $entryCategoriesAddedIds;
+		}
+		
 		$category->incrementEntriesCount(1, $this->entryCategoriesAddedIds);
 		$category->incrementDirectEntriesCount();
 		
