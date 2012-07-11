@@ -68,6 +68,7 @@ class PartnerUsageController extends Zend_Controller_Action
 		$usageFilter = new Kaltura_Client_Type_ReportInputFilter();
 		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
+		$usageFilter->timeZoneOffset =Infra_AuthHelper::getAuthInstance()->getIdentity()->getTimezoneOffset();
 		$partners = $client->partner->listAction();
 		$partnerIds = array();
 		
@@ -78,10 +79,13 @@ class PartnerUsageController extends Zend_Controller_Action
 		$pager = new Kaltura_Client_Type_FilterPager();
 		$pager->pageIndex = 1;
 		$pager->pageSize = 500;
+		
+		$varConsolePlugin = Kaltura_Client_VarConsole_Plugin::get($client);
+		
 		$items = array();
 		while(true)
 		{
-			$response = $client->report->getGraphs(Kaltura_Client_Enum_ReportType::PARTNER_USAGE, $usageFilter, null, $partnerIds);
+		    $response = $varConsolePlugin->varConsole->getPartnerUsage($partnerFilter, $usageFilter, $pager);
 			if (count($response->objects) <= 0)
 				break;
 				
