@@ -120,7 +120,7 @@ class VarConsoleService extends KalturaBaseService
 			$unsortedItems = array();
 			foreach ( $reportData as $line )
 			{
-				$item = KalturaSystemPartnerUsageItem::fromString( $reportHeader , $line );
+				$item = KalturaVarPartnerUsageItem::fromString( $reportHeader , $line );
 				if ( $item )	
 					$unsortedItems[$item->partnerId] = $item;	
 			}
@@ -133,7 +133,7 @@ class VarConsoleService extends KalturaBaseService
 				else
 				{
 					// if no item for partner - get its details from the db
-					$items[] = KalturaSystemPartnerUsageItem::fromPartner(PartnerPeer::retrieveByPK($partnerId));
+					$items[] = KalturaVarPartnerUsageItem::fromPartner(PartnerPeer::retrieveByPK($partnerId));
 				}  
 			}
 		}
