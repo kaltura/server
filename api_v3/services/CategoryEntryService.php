@@ -225,7 +225,7 @@ class CategoryEntryService extends KalturaBaseService
 			foreach ($dbCategoriesEntry as $dbCategoryEntry)
 				$categoriesIds[] = $dbCategoryEntry->getCategoryId();
 				
-			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			$c = new Criteria();
 			$c->add(categoryPeer::ID, $categoriesIds, Criteria::IN);
 			$pager->attachToCriteria($c);
 			$c->applyFilters();
@@ -294,7 +294,10 @@ class CategoryEntryService extends KalturaBaseService
 			
 			$categoriesFullName = array();
 			foreach($categories as $category)
-				$categoriesFullName[] = $category->getFullName(); 
+			{
+				if($category->getPrivacyContexts() == null)
+					$categoriesFullName[] = $category->getFullName();
+			} 
 				
 			$entry->setCategories(implode(',', $categoriesFullName));
 			categoryEntryPeer::syncEntriesCategories($entry);

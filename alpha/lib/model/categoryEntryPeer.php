@@ -65,7 +65,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 	
 	public static function retrieveActiveByEntryId($entryId)
 	{
-		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+		$c = new Criteria();
 		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entryId);
 		$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
 		
@@ -74,7 +74,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 	
 	public static function retrieveActiveAndPendingByEntryId($entryId)
 	{
-		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+		$c = new Criteria();
 		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entryId);
 		$c->addAnd(categoryEntryPeer::STATUS, array(CategoryEntryStatus::PENDING, CategoryEntryStatus::ACTIVE), Criteria::IN);
 		
@@ -296,7 +296,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 			self::$s_criteria_filter = new criteriaFilter ();
 		}
 		
-		$c = KalturaCriteria::create(entryPeer::OM_CLASS); 
+		$c =  new Criteria(); 
 		$c->addAnd ( categoryEntryPeer::STATUS, CategoryEntryStatus::DELETED, Criteria::NOT_EQUAL);
 
 		self::$s_criteria_filter->setFilter($c);
