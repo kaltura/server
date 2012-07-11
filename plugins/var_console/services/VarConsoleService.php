@@ -146,20 +146,20 @@ class VarConsoleService extends KalturaBaseService
 	/**
 	 * Function to change a sub-publisher's status
 	 * @action updateStatus
-	 * @param int $partnerId
+	 * @param int $id
 	 * @param KalturaPartnerStatus $status
 	 * @throws KalturaErrors::UNKNOWN_PARTNER_ID
 	 */
-	public function updateStatusAction($partnerId, $status)
+	public function updateStatusAction($id, $status)
 	{
         $c = PartnerPeer::getDefaultCriteria();
-        $c->addAnd(PartnerPeer::ID, $partnerId);
+        $c->addAnd(PartnerPeer::ID, $id);
         $dbPartner = PartnerPeer::doSelectOne($c);		
 		if (!$dbPartner)
-			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
+			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $id);
 			
 		$dbPartner->setStatus($status);
 		$dbPartner->save();
-		PartnerPeer::removePartnerFromCache($partnerId);
+		PartnerPeer::removePartnerFromCache($id);
 	}
 }
