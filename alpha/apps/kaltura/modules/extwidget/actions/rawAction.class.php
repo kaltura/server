@@ -28,11 +28,37 @@ class rawAction extends sfAction
 		
 		$direct_serve = $this->getRequestParameter( "direct_serve" );
 	
-		$entry = entryPeer::retrieveByPK( $entry_id );
+		
+		if($ks)
+		{
+			try {
+				kCurrentContext::initKsPartnerUser($ks);
+			}
+			catch (Exception $ex)
+			{
+				KExternalErrors::dieError(KExternalErrors::INVALID_KS);	
+			}
+		}
+		else
+		{
+			$entry = kCurrentContext::initPartnerByEntryId($entry_id);
+			if(!$entry)
+				die();
+		}
+		
+		kEntitlementUtils::initEntitlementEnforcement();
+		
 		if ( ! $entry )
 		{
-			// what to return ??
-			die();
+			$entry = entryPeer::retrieveByPK( $entry_id );
+			
+			if(!$entry)
+				die();
+		}
+		else
+		{
+			if(!kEntitlementUtils::isEntryEntitled($entry))
+				die();
 		}
 
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
