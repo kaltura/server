@@ -19,6 +19,10 @@ class downloadAction extends sfAction
 		$referrer = base64_decode($referrer);
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = "";
+			
+		kCurrentContext::initKsPartnerUser($ksStr);
+		kEntitlementUtils::initEntitlementEnforcement();
+			
 		// get entry
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (is_null($entry))
