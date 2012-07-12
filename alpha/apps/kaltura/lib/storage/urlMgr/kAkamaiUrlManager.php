@@ -186,8 +186,19 @@ class kAkamaiUrlManager extends kUrlManager
 		$serverUrl = $storage->getDeliveryIisBaseUrl();
 		$partnerPath = myPartnerUtils::getUrlForPartner($fileSync->getPartnerId(), $fileSync->getPartnerId() * 100);
 		
-		if ($this->protocol == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
-			return $partnerPath.$fileSync->getFilePath()."/playlist.m3u8";
+		if ($this->protocol == StorageProfile::PLAY_FORMAT_APPLE_HTTP && isset($this->params["hd_ios"])){
+			$path = $fileSync->getFilePath();
+			$urlSuffix = str_replace('\\', '/', $path)."/index_0_av.m3u8";
+			$urlPrefix = "http://".$this->params["hd_ios"].'/i/';
+			return $urlPrefix.ltrim($urlSuffix, '/');
+		}
+		
+		if($this->protocol == "hdnetworksmil" && isset($this->params["hd_flash"])){
+			$path = $fileSync->getFilePath();
+			$urlSuffix = str_replace('\\', '/', $path);
+			$urlPrefix = "http://".$this->params["hd_flash"];
+			return $urlPrefix. '/' . ltrim($urlSuffix, '/');
+		}
 		
 		if($fileSync->getObjectSubType() != entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
 			return parent::doGetFileSyncUrl($fileSync);

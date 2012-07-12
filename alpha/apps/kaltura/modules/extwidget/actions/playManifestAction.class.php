@@ -192,11 +192,14 @@ class playManifestAction extends kalturaAction
 		if(!$storage)
 			return null;
 			
-		$urlManager = $this->getUrlManagerByStorageProfile($fileSync->getDc(), $fileSync, $flavorAsset, StorageProfile::PLAY_FORMAT_HTTP);
+		$urlManager = $this->getUrlManagerByStorageProfile($fileSync->getDc(), $fileSync, $flavorAsset);
 		$urlManager->setSeekFromTime($this->seekFrom);
 		
-		$urlPrefix = rtrim($storage->getDeliveryHttpBaseUrl(), "/") . "/";
 		$url = ltrim($urlManager->getFileSyncUrl($fileSync, false), "/");		
+        $urlPrefix = '';                    
+        if (strpos($url, "://") === false)
+         	$urlPrefix = rtrim($storage->getDeliveryHttpBaseUrl(), "/") . "/";
+         			
 		$this->tokenizer = $urlManager->getTokenizer();
 
 		return $this->getFlavorAssetInfo($url, $urlPrefix, $flavorAsset);
@@ -582,7 +585,9 @@ class playManifestAction extends kalturaAction
 		foreach($flavorAssets as $flavorAsset)
 		{
 			/* @var $flavorAsset flavorAsset */			
-			$flavors[] = $this->getFlavorHttpUrl($flavorAsset);
+			$httpUrl = $this->getFlavorHttpUrl($flavorAsset);
+			if ($httpUrl)		
+				$flavors[] = $httpUrl;
 		}
 		return $flavors;
 	}
