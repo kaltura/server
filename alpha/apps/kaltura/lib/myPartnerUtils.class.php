@@ -961,7 +961,7 @@ class myPartnerUtils
         // We are now working with the DWH and a stored-procedure, and not with record type 6 on partner_activity.
         $report_date = dateUtils::todayOffset(-1);
 
-		list ( $totalStorage , $totalUsage , $totalTraffic ) = myPartnerUtils::collectPartnerUsageFromDWH($partner, $partnerPackage, $report_date);
+		list ( $totalStorage , $totalUsage , $totalTraffic ) = myPartnerUtils::collectPartnerStatisticsFromDWH($partner, $partnerPackage, $report_date);
 		$totalUsageGB = $totalUsage/1024/1024; // from KB to GB
 		$percent = round( ($totalUsageGB / $partnerPackage['cycle_bw'])*100, 2);
 
