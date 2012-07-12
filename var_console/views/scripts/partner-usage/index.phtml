@@ -17,11 +17,6 @@
 				<th title="<?php echo $this->translate('partner-usage table combinedBandwidthStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table combinedBandwidthStorage'); ?></th>
 			</tr>
 		</thead>
-		<tfoot>
-			<tr>
-				<td colspan="16"><?php echo $this->paginator; ?></td>
-			</tr>
-		</tfoot>
 		<tbody>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
 				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->bandwidth); ?> MB</td>
@@ -51,6 +46,11 @@
 				<th title="<?php echo $this->translate('partner-usage table combinedBandwidthStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table combinedBandwidthStorage'); ?></th>
 			</tr>
 		</thead>
+		<tfoot>
+			<tr>
+				<td colspan="16"><?php echo $this->paginator; ?></td>
+			</tr>
+		</tfoot>
 		<tbody>
 			<?php foreach($this->paginator as $item): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
