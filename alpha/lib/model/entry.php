@@ -2898,8 +2898,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		foreach($entitledKusers as $privacyContext => $kusers)
 			$entitledKusersByContexts[] = $privacyContext . ' ' . implode(' ', $kusers) . ' ' . $privacyContext;
 		
-		KalturaLog::debug('Entitled Kuserst: ' . print_r($entitledKusersByContexts,true));
-		
 		return implode(' ', $entitledKusersByContexts);
 	}
 	
