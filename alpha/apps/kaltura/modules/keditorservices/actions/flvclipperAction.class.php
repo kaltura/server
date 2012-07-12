@@ -42,9 +42,38 @@ class flvclipperAction extends kalturaAction
 		$request = str_replace("/referrer/$base64_referrer", "", $request);
 		$request = str_replace("/ks/$ks_str", "", $request);
 		
+		if($ks_str)
+		{
+			try {
+				kCurrentContext::initKsPartnerUser($ks_str);
+			}
+			catch (Exception $ex)
+			{
+				KExternalErrors::dieError(KExternalErrors::INVALID_KS);	
+			}
+		}
+		else
+		{
+			$entry = kCurrentContext::initPartnerByEntryId($entry_id);
+			if(!$entry)
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
+		
+		kEntitlementUtils::initEntitlementEnforcement();
+		
 		// workaround the filter which hides all the deleted entries - 
 		// now that deleted entries are part of xmls (they simply point to the 'deleted' templates), we should allow them here
-		$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
+		
+		if(!$entry)
+		{
+			$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
+		}
+		else
+		{
+			if(!kEntitlementUtils::isEntryEntitled($entry))
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
+		
 		if ( ! $entry )
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
