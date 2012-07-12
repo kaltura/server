@@ -28,6 +28,7 @@ class rawAction extends sfAction
 		
 		$direct_serve = $this->getRequestParameter( "direct_serve" );
 	
+		$entry = null;
 		
 		if($ks)
 		{
