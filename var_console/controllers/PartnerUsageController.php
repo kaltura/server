@@ -69,12 +69,6 @@ class PartnerUsageController extends Zend_Controller_Action
 		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->timeZoneOffset =Infra_AuthHelper::getAuthInstance()->getIdentity()->getTimezoneOffset();
-		$partners = $client->partner->listAction();
-		$partnerIds = array();
-		
-		foreach ($partners->objects as $partner)
-		    $partnerIds[] = $partner->id;
-		
 		
 		$pager = new Kaltura_Client_Type_FilterPager();
 		$pager->pageIndex = 1;
