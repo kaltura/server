@@ -111,7 +111,7 @@ class VarConsoleService extends KalturaBaseService
 		    
 			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 
 				null , 
-				myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE , 
+				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
 				$inputFilter ,
 				$pager->pageSize , 0 , // pageIndex is 0 because we are using specific ids 
 				null  , // order by  
