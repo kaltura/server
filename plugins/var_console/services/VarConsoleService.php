@@ -119,16 +119,14 @@ class VarConsoleService extends KalturaBaseService
     				null  , // order by  
     				"$partnerId");
     				
-    			$item = new KalturaVarPartnerUsageItem();
-    			$item->fromPartner(PartnerPeer::retrieveByPK($partnerId));
     			foreach ( $reportData as $line )
     			{
+        			$item = new KalturaVarPartnerUsageItem();
+        			$item->fromPartner(PartnerPeer::retrieveByPK($partnerId));
     				$item->fromString( $reportHeader , $line );
-    				if ( $item )	
-    					$unsortedItems[$item->partnerId] = $item;	
+        			$items[] = $item;
     			}
 			    
-    			$items[] = $item;
 			}
 			
 		}
