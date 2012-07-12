@@ -5,8 +5,37 @@
  <li><?php echo $this->translate('partner-usage intro text3'); ?></li>
 </ul>
 <?php echo $this->form; ?>
-<div id="results" class="clear">
-	<h2>Results <span>(<?php echo $this->paginator->getItemsCount(); ?> publishers | <a class="exportCsv"><?php echo $this->translate('Export to CSV'); ?></a>)</span></h2>
+<div id="resultsTotal" class="clear">
+	<h2>Sub-Accounts' Details <span>(<?php echo $this->paginator->getItemsCount(); ?> publishers | <a class="exportCsv"><?php echo $this->translate('Export to CSV'); ?></a>)</span></h2>
+	<table class="clear">
+		<thead>
+			<tr>
+				<th title="<?php echo $this->translate('partner-usage table bandwidth tooltip'); ?>"><?php echo $this->translate('partner-usage table bandwidth'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table storage tooltip'); ?>"><?php echo $this->translate('partner-usage table storage'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table peakStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table peakStorage'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table averageStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table averageStorage'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table combinedBandwidthStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table combinedBandwidthStorage'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<td colspan="16"><?php echo $this->paginator; ?></td>
+			</tr>
+		</tfoot>
+		<tbody>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->bandwidth); ?> MB</td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->storage); ?> MB</td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->peakStorage); ?> MB</td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->avgStorage); ?> MB</td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->combinedStorageBandwidth); ?> MB</td>
+			</tr>
+		</tbody>
+	</table>
+	<a class="exportCsv"><?php echo $this->translate('Export to CSV'); ?></a>
+</div>
+<div id="resultsSubs" class="clear">
+	<h2>Sub-Accounts' Details <span>(<?php echo $this->paginator->getItemsCount(); ?> publishers | <a class="exportCsv"><?php echo $this->translate('Export to CSV'); ?></a>)</span></h2>
 	<table class="clear">
 		<thead>
 			<tr>
