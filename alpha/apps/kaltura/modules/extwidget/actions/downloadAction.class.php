@@ -20,14 +20,40 @@ class downloadAction extends sfAction
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = "";
 			
-		kCurrentContext::initKsPartnerUser($ksStr);
+		$entry = null;
+		
+		if($ksStr)
+		{
+			try {
+				kCurrentContext::initKsPartnerUser($ksStr);
+			}
+			catch (Exception $ex)
+			{
+				KExternalErrors::dieError(KExternalErrors::INVALID_KS);	
+			}
+		}
+		else
+		{
+			$entry = kCurrentContext::initPartnerByEntryId($entryId);
+			if(!$entry)
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
+		
 		kEntitlementUtils::initEntitlementEnforcement();
+		
+		if (!$entry)
+		{
+			$entry = entryPeer::retrieveByPK($entryId);
 			
-		// get entry
-		$entry = entryPeer::retrieveByPK($entryId);
-		if (is_null($entry))
-			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
-			
+			if(!$entry)
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
+		else
+		{
+			if(!kEntitlementUtils::isEntryEntitled($entry))
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
+		
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 			
 		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, accessControlContextType::DOWNLOAD);
