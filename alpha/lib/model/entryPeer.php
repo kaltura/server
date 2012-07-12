@@ -326,36 +326,38 @@ class entryPeer extends BaseentryPeer
 		
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		
-		if (kEntitlementUtils::getEntitlementEnforcement() && 
-			(kCurrentContext::$is_admin_session || ( $ks && $ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))))
+		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$privacyContexts = kEntitlementUtils::getPrivacyContextSearch();
 			$critEntitled = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, KalturaCriteria::IN_LIKE);
 			$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-
-			if(kCurrentContext::$ks_kuser_id)
+			
+			if ((kCurrentContext::$is_admin_session || ( $ks && $ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))))
 			{
-				//ENTITLED_KUSERS field includes $this->entitledUserEdit, $this->entitledUserEdit, and users on work groups categories.
-				$entitledKuserByPrivacyContext = kEntitlementUtils::getEntitledKuserByPrivacyContext();
-				$critEntitledKusers = $c->getNewCriterion(self::ENTITLED_KUSERS, $entitledKuserByPrivacyContext, KalturaCriteria::IN_LIKE_ORDER);
-				$critEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-				
-				$categoriesIds = array();
-				$categories = categoryPeer::doSelectEntitledAndNonIndexedCategories(kCurrentContext::$ks_kuser_id, entry::CATEGORY_SEARCH_LIMIT);
-				if(count($categories) == entry::CATEGORY_SEARCH_LIMIT)
-					self::$kuserBlongToMoreThanMaxCategoriesForSearch = true;
-			 
-				foreach($categories as $category)
-					$categoriesIds[] = $category->getId();
-					
-				if (count($categoriesIds))
+				if(kCurrentContext::$ks_kuser_id)
 				{
-					$critCategories = $c->getNewCriterion(self::CATEGORIES_IDS, $categoriesIds, KalturaCriteria::IN_LIKE);
-					$critCategories->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-					$critEntitled->addOr($critCategories);
+					//ENTITLED_KUSERS field includes $this->entitledUserEdit, $this->entitledUserEdit, and users on work groups categories.
+					$entitledKuserByPrivacyContext = kEntitlementUtils::getEntitledKuserByPrivacyContext();
+					$critEntitledKusers = $c->getNewCriterion(self::ENTITLED_KUSERS, $entitledKuserByPrivacyContext, KalturaCriteria::IN_LIKE_ORDER);
+					$critEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+					
+					$categoriesIds = array();
+					$categories = categoryPeer::doSelectEntitledAndNonIndexedCategories(kCurrentContext::$ks_kuser_id, entry::CATEGORY_SEARCH_LIMIT);
+					if(count($categories) == entry::CATEGORY_SEARCH_LIMIT)
+						self::$kuserBlongToMoreThanMaxCategoriesForSearch = true;
+				 
+					foreach($categories as $category)
+						$categoriesIds[] = $category->getId();
+						
+					if (count($categoriesIds))
+					{
+						$critCategories = $c->getNewCriterion(self::CATEGORIES_IDS, $categoriesIds, KalturaCriteria::IN_LIKE);
+						$critCategories->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+						$critEntitled->addOr($critCategories);
+					}
+					
+					$critEntitled->addOr($critEntitledKusers);
 				}
-				
-				$critEntitled->addOr($critEntitledKusers);
 			}
 		}
 		
@@ -636,6 +638,19 @@ class entryPeer extends BaseentryPeer
 	 */
 	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
+		
+		 KalturaLog::debug('Entitlement: Filter Results');
+
+if((!kEntitlementUtils::getEntitlementEnforcement() && !is_null(kCurrentContext::$ks)))
+        KalturaLog::debug('Entitlement: Filter Results: line: ' . __LINE__);
+
+if(!self::$filerResults)
+        KalturaLog::debug('Entitlement: Filter Results: line: ' . __LINE__);
+
+if(!kEntitlementUtils::getInitialized())
+        KalturaLog::debug('Entitlement: Filter Results : line: ' . __LINE__);
+        
+		
 		if ((!kEntitlementUtils::getEntitlementEnforcement() && !is_null(kCurrentContext::$ks))|| 
 			!self::$filerResults ||
 			!kEntitlementUtils::getInitialized()) // if initEntitlement hasn't run - skip filters.

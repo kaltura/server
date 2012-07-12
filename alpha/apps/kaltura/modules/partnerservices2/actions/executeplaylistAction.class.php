@@ -51,8 +51,6 @@ class executeplaylistAction extends defPartnerservices2Action
 		return $this->executeImpl( $partner_id , $subp_id , $puser_id , null , null , true );
 	}
 	
-
-	
 	protected function setExtraFilters ( entryFilter &$fields_set )	{	}
 	
 	protected function joinOnDetailed () { return true;}
@@ -96,17 +94,7 @@ class executeplaylistAction extends defPartnerservices2Action
 				$extra_filters[$i] = $extra_filter;
 		}
 		
-		// this service is executed twice! (first time for the cache key, second time for the execution)
-		if (is_null($this->playlist))
-		{
-			$playlist = entryPeer::retrieveByPK($playlist_id);
-			if (!$playlist)
-				throw new APIException(APIErrors::INVALID_ENTRY_ID, "Playlist", $playlist_id) ;
-				 
-			myPartnerUtils::addPartnerToCriteria ( new accessControlPeer() , $playlist->getPartnerId() , $this->getPrivatePartnerData(), $this->partnerGroup2(), null);
-			
-			$this->playlist = $playlist;
-		}
+
 
 		if ( $create_cachekey ) 
 		{
@@ -122,6 +110,18 @@ class executeplaylistAction extends defPartnerservices2Action
 			$cahce_key->expiry =  600 ;
 			$cahce_key->key = md5( print_r($cache_key_arr,true ) );
 			return $cahce_key;
+		}
+		
+		// this service is executed twice! (first time for the cache key, second time for the execution)
+		if (is_null($this->playlist))
+		{
+			$playlist = entryPeer::retrieveByPK($playlist_id);
+			if (!$playlist)
+				throw new APIException(APIErrors::INVALID_ENTRY_ID, "Playlist", $playlist_id) ;
+				 
+			myPartnerUtils::addPartnerToCriteria ( new accessControlPeer() , $playlist->getPartnerId() , $this->getPrivatePartnerData(), $this->partnerGroup2(), null);
+			
+			$this->playlist = $playlist;
 		}
 		
 		if ($this->isAdmin())

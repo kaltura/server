@@ -332,17 +332,21 @@ $this->benchmarkStart( "beforeImpl" );
 			if ( ! $renderer->hasContentForCacheKey ( $this->response_type ) )
 			{
 				
-	$this->benchmarkStart( "applyPartnerFilters" );
-			// apply filters for Criteria so there will be no chance of exposure of date from other partners !
-			// TODO - add the parameter for allowing kaltura network
-			myPartnerUtils::applyPartnerFilters ( $partner_id , $private_partner_data , $this->partnerGroup2() , $this->kalturaNetwork2()  );
-	$this->benchmarkEnd( "applyPartnerFilters" );
-	$this->benchmarkStart( "puserKuser" );						
+				$this->benchmarkStart( "applyPartnerFilters" );
+				
+				//init entitlement before set the default criteire by myPartnerUtils::applyPartnerFilters
+				kEntitlementUtils::initEntitlementEnforcement();
+				
+				// apply filters for Criteria so there will be no chance of exposure of date from other partners !
+				// TODO - add the parameter for allowing kaltura network
+				myPartnerUtils::applyPartnerFilters ( $partner_id , $private_partner_data , $this->partnerGroup2() , $this->kalturaNetwork2()  );
+				
+				$this->benchmarkEnd( "applyPartnerFilters" );
+				$this->benchmarkStart( "puserKuser" );						
 				list ( $partner_id , $subp_id , $puser_id , $partner_prefix ) = $this->preparePartnerPuserDetails ( $partner_id , $subp_id , $puser_id );
 				$puser_kuser = $this->getPuserKuser ( $partner_id , $subp_id, $puser_id );
-	$this->benchmarkEnd( "puserKuser" );		
-	$this->benchmarkEnd( "beforeImpl" );
-			kEntitlementUtils::initEntitlementEnforcement();
+				$this->benchmarkEnd( "puserKuser" );		
+				$this->benchmarkEnd( "beforeImpl" );
 			
 				// ----------------------------- impl --------------------------
 				
