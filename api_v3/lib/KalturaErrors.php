@@ -260,7 +260,7 @@ class KalturaErrors extends APIErrors
 	
 	const CANNOT_MOVE_CATEGORIES_FROM_DIFFERENT_PARENT_CATEGORY = "CANNOT_MOVE_CATEGORIES_FROM_DIFFERENT_PARENT_CATEGORIES,Cannot move categories from different parent categories";
 	
-	const CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT,Cannot update category entitlement fields when privacy context is not set on the categroy";
+	const CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT,Cannot update category's entitlement fields when privacy context is not set on the categroy";
 	
 	const PRIVACY_CONTEXT_INVALID_STRING = "PRIVACY_CONTEXT_INVALID_STRING,Privacy context is invalid \"%s\"";
 	
