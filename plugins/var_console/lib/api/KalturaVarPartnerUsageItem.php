@@ -136,51 +136,45 @@ class KalturaVarPartnerUsageItem extends KalturaObject
 	public $combinedStorageBandwidth;
 	
 	/**
-	 * Enter description here...
+	 * TGhe date at which the report was taken - Unix Timestamp
+	 * @var int 
+	 */
+	public $dateId;
+	
+	/**
+	 * Function which parses a report line into an object
 	 * @param string $header - comma separated fields names	
 	 * @param string $str - comma separated fields
 	 * @return KalturaVarPartnerUsageItem
 	 */
-	public static function fromString ( $header , $arr )
+	public function fromString ( $header , $arr )
 	{
 		if ( ! $arr ) return null ;
 		
-		$item = new KalturaVarPartnerUsageItem();
+		//$item = new KalturaVarPartnerUsageItem();
 		
-		$item->partnerStatus 	= @$arr[0];
-		$item->partnerId  		= @$arr[1];
-		$item->partnerName 		= @$arr[2];
-		$item->partnerCreatedAt = @$arr[3];
-		$item->partnerPackage	= @$arr[4];
-		$item->views 			= @$arr[5];
-		$item->plays 			= @$arr[6];
-		$item->entriesCount 	= @$arr[7];
-		$item->totalEntriesCount = @$arr[8];
-		$item->videoEntriesCount = @$arr[9];
-		$item->imageEntriesCount = @$arr[10];
-		$item->audioEntriesCount = @$arr[11];
-		$item->mixEntriesCount	 = @$arr[12];
-		$item->bandwidth 		= @$arr[13];
-		$item->storage 		= @$arr[14];
+		$this->dateId          = @$arr[0];
+		$this->bandwidth 		= @$arr[1];
+		$this->storage 		= @$arr[2];
 		//$item->totalStorage 	= @$arr[15];
-		$item->peakStorage =  @$arr[15];
-        $item->avgStorage = @$arr[16];
-        $item->combinedStorageBandwidth = @$arr[17];
+		$this->peakStorage =  @$arr[3];
+        $this->avgStorage = @$arr[4];
+        $this->combinedStorageBandwidth = @$arr[5];
 			
-		return $item;
+		//return $item;
 	}
 	
-	public static function fromPartner(Partner $partner)
+	public function fromPartner(Partner $partner)
 	{
-		$item = new KalturaVarPartnerUsageItem();
+		//$item = new KalturaVarPartnerUsageItem();
 		if ($partner)
 		{
-			$item->partnerStatus 	= $partner->getStatus();
-			$item->partnerId  		= $partner->getId();
-			$item->partnerName 		= $partner->getPartnerName();
-			$item->partnerCreatedAt = $partner->getCreatedAt(null);
-			$item->partnerPackage	= $partner->getPartnerPackage();
+			$this->partnerStatus 	= $partner->getStatus();
+			$this->partnerId  		= $partner->getId();
+			$this->partnerName 		= $partner->getPartnerName();
+			$this->partnerCreatedAt = $partner->getCreatedAt(null);
+			$this->partnerPackage	= $partner->getPartnerPackage();
 		}
-		return $item;
+		//return $item;
 	}
 }
