@@ -205,17 +205,19 @@ class categoryPeer extends BasecategoryPeer
 		if($ignoreCategoryId)
 			$c->add(categoryPeer::ID, $ignoreCategoryId, Criteria::NOT_EQUAL);
 		
+		$tagDisabled = false;
 		if(!is_null($partnerId))
 		{
+			$tagDisabled = true;
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_SESSION_PARTNER);
 			$c->add(categoryPeer::PARTNER_ID, $partnerId);
 		}
 		
 		$ret = categoryPeer::doSelectOne($c);
 		
-		//If the tag is disabled it should be restored
-		if (!KalturaCriterion::isTagEnable(KalturaCriterion::TAG_SESSION_PARTNER))
+		if ($tagDisabled)
 		    KalturaCriterion::restoreTag(KalturaCriterion::TAG_SESSION_PARTNER);
+		    
 		return $ret;
 	}
 	
