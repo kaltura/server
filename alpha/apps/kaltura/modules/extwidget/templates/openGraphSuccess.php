@@ -26,7 +26,7 @@
 	<body>
 
 <div id="player_container" ></div> 
-<script src="http://cdnbakmi.kaltura.com/content/uiconf/ps/kaltura/js/flashembed.js"></script> 
+<script src="http://<?php echo kConf::get('cdn_host'); ?>/content/uiconf/ps/kaltura/js/flashembed.js"></script> 
 <script type="text/javascript"> 
 
 //Define Player Parameters
@@ -40,12 +40,12 @@
   }
 
 //Include HTML5 library
-var includeUrl = "http://www.kaltura.com/p/"+playerConfig['partnerId']+"/sp/"+playerConfig['partnerId']+"00/embedIframeJs/uiconf_id/"+playerConfig['uiconfId']+"/partner_id/"+playerConfig['partnerId'];
+var includeUrl = "http://<?php echo kConf::get('www_host'); ?>/p/"+playerConfig['partnerId']+"/sp/"+playerConfig['partnerId']+"00/embedIframeJs/uiconf_id/"+playerConfig['uiconfId']+"/partner_id/"+playerConfig['partnerId'];
 document.write('<scr' + 'ipt src="'+includeUrl+'"></scr' + 'ipt>');
 //build embed code
 var embedCodeConfig = {
 	//This is the base config
-	'src' : "http://www.kaltura.com/index.php/kwidget/cache_st/1322734888791/wid/_" + playerConfig.partnerId + "/uiconf_id/" + playerConfig.uiconfId + "/entry_id/"  + playerConfig.entryId, 
+	'src' : "http://<?php echo kConf::get('www_host'); ?>/index.php/kwidget/cache_st/1322734888791/wid/_" + playerConfig.partnerId + "/uiconf_id/" + playerConfig.uiconfId + "/entry_id/"  + playerConfig.entryId, 
 	'flashvars' : {	
 		externalInterfaceDisabled : "false"
 		}
