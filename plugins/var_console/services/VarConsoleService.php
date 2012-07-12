@@ -96,6 +96,10 @@ class VarConsoleService extends KalturaBaseService
 			$partnerIds[] = $partner->getId();
 		
 		$items = array();
+		
+		$inputFilter = new reportsInputFilter (); 
+		$inputFilter->from_date = ( $usageFilter->fromDate );
+		$inputFilter->to_date = ( $usageFilter->toDate );
 		if ( ! count($partnerIds ) )
 		{
 			// no partners fit the filter - don't fetch data	
@@ -104,11 +108,6 @@ class VarConsoleService extends KalturaBaseService
 		}
 		else
 		{
-		    
-		    $inputFilter = new reportsInputFilter (); 
-			$inputFilter->from_date = ( $usageFilter->fromDate );
-			$inputFilter->to_date = ( $usageFilter->toDate );
-		    
 			foreach ($partnerIds as $partnerId)
 			{
     			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 
@@ -130,6 +129,7 @@ class VarConsoleService extends KalturaBaseService
 			}
 			
 		}
+		
 		$response = new KalturaPartnerUsageListResponse();
 		
 		list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTotal( 
