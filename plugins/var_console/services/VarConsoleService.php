@@ -131,6 +131,18 @@ class VarConsoleService extends KalturaBaseService
 			
 		}
 		$response = new KalturaPartnerUsageListResponse();
+		
+		list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTotal( 
+    				null , 
+    				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
+    				$inputFilter ,
+    				$pager->pageSize , 0 , // pageIndex is 0 because we are using specific ids 
+    				null  , // order by  
+    				implode(",", $partnerIds));
+		
+		$total = new KalturaVarPartnerUsageItem();
+		$total->fromString($reportHeader, $reportData);
+		$response->total = $total; 
 		$response->totalCount = $totalCount;
 		$response->objects = $items;
 		return $response;
