@@ -195,6 +195,8 @@ class CategoryService extends KalturaBaseService
 	 * List all categories
 	 * 
 	 * @action list
+	 * @param KalturaCategoryFilter $filter
+	 * @param KalturaFilterPager $pager
 	 * @return KalturaCategoryListResponse
 	 */
 	function listAction(KalturaCategoryFilter $filter = null, KalturaFilterPager $pager = null)
