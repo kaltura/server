@@ -109,33 +109,28 @@ class VarConsoleService extends KalturaBaseService
 			$inputFilter->from_date = ( $usageFilter->fromDate );
 			$inputFilter->to_date = ( $usageFilter->toDate );
 		    
-			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 
-				null , 
-				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
-				$inputFilter ,
-				$pager->pageSize , 0 , // pageIndex is 0 because we are using specific ids 
-				null  , // order by  
-				implode("," , $partnerIds ) );
+			foreach ($partnerIds as $partnerId)
+			{
+    			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 
+    				null , 
+    				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
+    				$inputFilter ,
+    				$pager->pageSize , 0 , // pageIndex is 0 because we are using specific ids 
+    				null  , // order by  
+    				"$partnerId");
+    				
+    			$item = new KalturaVarPartnerUsageItem();
+    			$item->fromPartner(PartnerPeer::retrieveByPK($partnerId));
+    			foreach ( $reportData as $line )
+    			{
+    				$item->fromString( $reportHeader , $line );
+    				if ( $item )	
+    					$unsortedItems[$item->partnerId] = $item;	
+    			}
+			    
+    			$items[] = $item;
+			}
 			
-			$unsortedItems = array();
-			foreach ( $reportData as $line )
-			{
-				$item = KalturaVarPartnerUsageItem::fromString( $reportHeader , $line );
-				if ( $item )	
-					$unsortedItems[$item->partnerId] = $item;	
-			}
-					
-			// create the items in the order of the partnerIds and create some dummy for ones that don't exist
-			foreach ( $partnerIds as $partnerId )
-			{
-				if ( isset ( $unsortedItems[$partnerId] ))
-					$items[] = $unsortedItems[$partnerId];
-				else
-				{
-					// if no item for partner - get its details from the db
-					$items[] = KalturaVarPartnerUsageItem::fromPartner(PartnerPeer::retrieveByPK($partnerId));
-				}  
-			}
 		}
 		$response = new KalturaPartnerUsageListResponse();
 		$response->totalCount = $totalCount;
