@@ -21,4 +21,9 @@ class KalturaVarConsolePartnerFilter extends KalturaPartnerFilter
     	"groupTypeEq" => "_eq_partner_group_type",
         "groupTypeIn" => "_in_partner_group_type",
     );
+    
+    public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+	}
 }
