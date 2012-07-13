@@ -99,7 +99,7 @@ jQuery('#date_range').change(function() {
 	{
 		case "yesterday":
 			var val = new Date();
-			val.setDate(val.getDate() - 24*60*60);
+			val.setDate(val.getDate() - 1);
 			jQuery('#from_date').val(val);
 			jQuery('#to_date').val(val);
 			break;
