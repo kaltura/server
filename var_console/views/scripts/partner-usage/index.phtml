@@ -93,6 +93,37 @@ jQuery('#clear_dates').click(function() {
 	jQuery('#to_date').val('');
 });
 
+jQuery('#date_range').change(function() {
+	var today;
+	switch (this.value)
+	{
+		case "yesterday":
+			var val = new Date();
+			val.setDate(val.getDate() - 24*60*60);
+			jQuery('#from_date').val(val);
+			jQuery('#to_date').val(val);
+			break;
+		case "last_7_days":
+			break;
+		case "week":
+			break;
+		case "last_week":
+			break;
+		case "last_30_days":
+			break;
+		case "this_month":
+			break;
+		case "last_month":
+			break;
+		case "last_12_months":
+			break;
+		case "this_year":
+			break;
+		case "custom":
+			break;
+	}
+});
+
 
 jQuery('.exportCsv').click(function() {
 	// change the form action to the csv handler
