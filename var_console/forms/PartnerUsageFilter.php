@@ -15,6 +15,34 @@ class Form_PartnerUsageFilter extends Zend_Form
 			array('HtmlTag', array('tag' => 'fieldset'))
 		));
 		
+		//date range
+		$this->addElement('select', 'date_range', array(
+			'required' 		=> true,
+			'multiOptions' 	=> array(
+				'yesterday' => 'Yesterday',
+		        'last_7_days' => 'Last 7 Days',
+		        'week'		=> 'This week',
+		        'last_week' => 'Last week',
+		        'last_30_days' => 'Last 30 days',
+		        'this_month'   => 'This month',
+		        'last_month'   => 'Last month',
+		        'last_12_months' => 'Last 12 months',
+		        'this_year' =>    'This year',
+		        'custom' => 'Custom',
+			),
+			'decorators' => array('ViewHelper', 'Label'),
+		));
+		
+		//Interval
+		$this->addElement('select', 'interval', array(
+			'required' 		=> true,
+			'multiOptions' 	=> array(
+				'daily' => 'Daily',
+		        'monthly' => 'Monthly',
+			),
+			'decorators' => array('ViewHelper', 'Label'),
+		));
+			
 		// filter type
 		$this->addElement('select', 'filter_type', array(
 			'required' 		=> true,
@@ -92,6 +120,15 @@ class Form_PartnerUsageFilter extends Zend_Form
 		
 		$this->addDisplayGroup(array('filter_type', 'filter_input', 'filter_input_help'), 'filter_type_group', array(
 			'description' => 'partner-usage filter by',
+			'decorators' => array(
+				array('Description', array('tag' => 'legend')), 
+				'FormElements', 
+				'Fieldset'
+			)
+		));
+		
+		$this->addDisplayGroup(array('date_range', 'interval'), 'date_range_group', array(
+			'description' => 'date-range filter type',
 			'decorators' => array(
 				array('Description', array('tag' => 'legend')), 
 				'FormElements', 
