@@ -33,6 +33,10 @@ class PartnerUsageController extends Zend_Controller_Action
 		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->timeZoneOffset =Infra_AuthHelper::getAuthInstance()->getIdentity()->getTimezoneOffset();
+		if ($form->getElement('interval')->getValue())
+		{
+		    $usageFilter->interval = ($form->getElement('interval')->getValue() == 'daily') ? Kaltura_Client_Enum_ReportInterval::DAYS : Kaltura_Client_Enum_ReportInterval::MONTHS;
+		}
 		
 		$varConsolePlugin = Kaltura_Client_VarConsole_Plugin::get($client);
 		
