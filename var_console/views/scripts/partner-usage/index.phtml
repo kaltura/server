@@ -100,8 +100,8 @@ jQuery('#date_range').change(function() {
 		case "yesterday":
 			var val = new Date();
 			val.setDate(val.getDate() - 1);
-			jQuery('#from_date').val(val);
-			jQuery('#to_date').val(val);
+			jQuery('#from_date').val(val.toDateString());
+			jQuery('#to_date').val(val.toDateString());
 			break;
 		case "last_7_days":
 			break;
