@@ -100,6 +100,9 @@ class VarConsoleService extends KalturaBaseService
 		$inputFilter = new reportsInputFilter (); 
 		$inputFilter->from_date = ( $usageFilter->fromDate );
 		$inputFilter->to_date = ( $usageFilter->toDate );
+		$inputFilter->timeZoneOffset = $usageFilter->timeZoneOffset;
+		$inputFilter->interval = $usageFilter->interval;
+		
 		if ( ! count($partnerIds ) )
 		{
 			// no partners fit the filter - don't fetch data	
