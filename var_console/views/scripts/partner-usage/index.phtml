@@ -147,6 +147,12 @@ jQuery('#date_range').change(function() {
 			jQuery('#to_date').val(to.toDateString());
 			break;
 		case "last_12_months":
+			from = new Date();
+			to = new Date();
+			from.setDate(from.getDate()-1);
+			to.setMonth(to.getMonth()-12);
+			jQuery('#from_date').val(from.toDateString());
+			jQuery('#to_date').val(to.toDateString());
 			break;
 		case "this_year":
 			break;
