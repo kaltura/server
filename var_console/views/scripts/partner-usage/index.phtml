@@ -94,22 +94,41 @@ jQuery('#clear_dates').click(function() {
 });
 
 jQuery('#date_range').change(function() {
-	var today;
+	var from;
+	var to;
 	switch (this.value)
 	{
 		case "yesterday":
-			var val = new Date();
-			val.setDate(val.getDate() - 1);
-			jQuery('#from_date').val(val.toDateString());
-			jQuery('#to_date').val(val.toDateString());
+			from = new Date();
+			from.setDate(from.getDate() - 1);
+			jQuery('#from_date').val(from.toDateString());
+			jQuery('#to_date').val(from.toDateString());
 			break;
 		case "last_7_days":
+			from = new Date();
+			to = new Date();
+			from.setDate(from.getDate() - 8);
+			to.setDate(to.getDate()-1);
+			jQuery('#from_date').val(from.toDateString());
+			jQuery('#to_date').val(to.toDateString());
 			break;
 		case "week":
+			from = new Date();
+			to = new Date();
+			from.setDate(from.getDate() - 7);
+			to.setDate(to.getDate()-1);
+			jQuery('#from_date').val(from.toDateString());
+			jQuery('#to_date').val(to.toDateString());
 			break;
 		case "last_week":
 			break;
 		case "last_30_days":
+			from = new Date();
+			to = new Date();
+			from.setDate(from.getDate() - 30);
+			to.setDate(to.getDate()-1);
+			jQuery('#from_date').val(from.toDateString());
+			jQuery('#to_date').val(to.toDateString());
 			break;
 		case "this_month":
 			break;
