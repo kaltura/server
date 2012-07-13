@@ -153,10 +153,24 @@ jQuery('#date_range').change(function() {
 			break;
 	}
 
-	jQuery('#from_date').val(from.format('mm/dd/yyyy'));
-	jQuery('#to_date').val(to.format('mm/dd/yyyy'));
+	jQuery('#from_date').val(formatDate(from));
+	jQuery('#to_date').val(formatDate(to));
 });
 
+
+function formatDate(date) {
+	var dd = date.getDate();
+	var mm = date.getMonth()+1;//January is 0!
+	var yyyy = date.getFullYear();
+	if(dd<10) {
+		dd='0'+dd;
+	}
+	if(mm<10) {
+		mm='0'+mm;
+	}
+
+	return mm+'/'+dd+'/'+yyyy ;
+}
 
 jQuery('.exportCsv').click(function() {
 	// change the form action to the csv handler
