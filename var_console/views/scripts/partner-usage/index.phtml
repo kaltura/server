@@ -101,24 +101,20 @@ jQuery('#date_range').change(function() {
 		case "yesterday":
 			from = new Date();
 			from.setDate(from.getDate() - 1);
-			jQuery('#from_date').val(from.toDateString());
-			jQuery('#to_date').val(from.toDateString());
+			to = new Date();
+			to.setDate(to.getDate() - 1);
 			break;
 		case "last_7_days":
 			from = new Date();
 			to = new Date();
 			from.setDate(from.getDate() - 8);
 			to.setDate(to.getDate()-1);
-			jQuery('#from_date').val(from.toDateString());
-			jQuery('#to_date').val(to.toDateString());
 			break;
 		case "week":
 			from = new Date();
 			to = new Date();
 			from.setDate(from.getDate() - 7);
 			to.setDate(to.getDate()-1);
-			jQuery('#from_date').val(from.toDateString());
-			jQuery('#to_date').val(to.toDateString());
 			break;
 		case "last_week":
 			break;
@@ -127,46 +123,38 @@ jQuery('#date_range').change(function() {
 			to = new Date();
 			from.setDate(from.getDate() - 30);
 			to.setDate(to.getDate()-1);
-			jQuery('#from_date').val(from.toDateString());
-			jQuery('#to_date').val(to.toDateString());
 			break;
 		case "this_month":
 			from = new Date();
 			to = new Date();
 			from.setDate(1);
 			to.setDate(to.getDate()-1);
-			jQuery('#from_date').val(from.toDateString());
-			jQuery('#to_date').val(to.toDateString());
 			break;
 		case "last_month":
 			from = new Date();
 			to = new Date();
 			from.setMonth(from.getMonth()-1, 1);
 			to.setMonth(to.getMonth(), 0);
-			jQuery('#from_date').val(from.toDateString());
-			jQuery('#to_date').val(to.toDateString());
 			break;
 		case "last_12_months":
 			from = new Date();
 			to = new Date();
 			from.setMonth(to.getMonth()-12);
 			to.setDate(to.getDate()-1);
-			jQuery('#from_date').val(from.toDateString());
-			jQuery('#to_date').val(to.toDateString());
 			break;
 		case "this_year":
 			from = new Date();
 			to = new Date();
 			from.setFullYear(to.getFullYear(), 0, 1);
 			to.setDate(to.getDate()-1);
-			jQuery('#from_date').val(from.toDateString());
-			jQuery('#to_date').val(to.toDateString());
-			break;
 			break;
 		case "custom":
 			//do nothing
 			break;
 	}
+
+	jQuery('#from_date').val(from.format('mm/dd/yyyy'));
+	jQuery('#to_date').val(to.format('mm/dd/yyyy'));
 });
 
 
