@@ -149,14 +149,22 @@ jQuery('#date_range').change(function() {
 		case "last_12_months":
 			from = new Date();
 			to = new Date();
-			from.setDate(from.getDate()-1);
-			to.setMonth(to.getMonth()-12);
+			from.setMonth(to.getMonth()-12);
+			to.setDate(to.getDate()-1);
 			jQuery('#from_date').val(from.toDateString());
 			jQuery('#to_date').val(to.toDateString());
 			break;
 		case "this_year":
+			from = new Date();
+			to = new Date();
+			from.setFullYear(to.getFullYear(), 0, 1);
+			to.setDate(to.getDate()-1);
+			jQuery('#from_date').val(from.toDateString());
+			jQuery('#to_date').val(to.toDateString());
+			break;
 			break;
 		case "custom":
+			//do nothing
 			break;
 	}
 });
