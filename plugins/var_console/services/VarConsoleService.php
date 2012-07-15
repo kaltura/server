@@ -83,7 +83,6 @@ class VarConsoleService extends KalturaBaseService
 		//add filter to criteria
 		$c = PartnerPeer::getDefaultCriteria();
 		$partnerFilterDb->attachToCriteria($c);
-		$totalCount = PartnerPeer::doCount($c);
 		
 		// add pager to criteria
 		$pager->attachToCriteria($c);
@@ -111,6 +110,7 @@ class VarConsoleService extends KalturaBaseService
 		}
 		else
 		{
+		    $totalCount = 0;
 			foreach ($partnerIds as $partnerId)
 			{
     			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 
@@ -128,6 +128,8 @@ class VarConsoleService extends KalturaBaseService
     				$item->fromString( $reportHeader , $line );
         			$items[] = $item;
     			}
+    			
+    			$totalCount += count($reportData);
 			    
 			}
 			
