@@ -291,33 +291,37 @@ class kEntitlementUtils
 	public static function getPrivacyContextForEntry(entry $entry)
 	{		
 		$privacyContexts = array();
-		$entryPrivacy = null;		
+		$entryPrivacy = null;
+		$categories = array();		
 		
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY); 
-		$c->add(categoryPeer::ID, explode(',', $entry->getAllCategoriesIds()), Criteria::IN);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		$categories = categoryPeer::doSelect($c);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		
-		foreach ($categories as $category)
-		{				
-			$categoryPrivacy = $category->getPrivacy();
-			$categoryPrivacyContexts = $category->getPrivacyContexts();
-			if(!$categoryPrivacyContexts)
-				$categoryPrivacyContexts = self::DEFAULT_CONTEXT;
+		if ($entry->getAllCategoriesIds() != '')
+		{
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY); 
+			$c->add(categoryPeer::ID, explode(',', $entry->getAllCategoriesIds()), Criteria::IN);
+			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			
-			$categoryPrivacyContexts = explode(',', $categoryPrivacyContexts);
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+			$categories = categoryPeer::doSelect($c);
+			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			
-			foreach ($categoryPrivacyContexts as $categoryPrivacyContext)
-			{
-				if(trim($categoryPrivacyContext) == '')
-					 $categoryPrivacyContext = self::DEFAULT_CONTEXT;
-					 
-				if(!isset($privacyContexts[$categoryPrivacyContext]) || $privacyContexts[$categoryPrivacyContext] > $categoryPrivacy)
-					$privacyContexts[trim($categoryPrivacyContext)] = $categoryPrivacy;
+			foreach ($categories as $category)
+			{								
+				$categoryPrivacy = $category->getPrivacy();
+				$categoryPrivacyContexts = $category->getPrivacyContexts();
+				if(!$categoryPrivacyContexts)
+					$categoryPrivacyContexts = self::DEFAULT_CONTEXT;
+				
+				$categoryPrivacyContexts = explode(',', $categoryPrivacyContexts);
+				
+				foreach ($categoryPrivacyContexts as $categoryPrivacyContext)
+				{
+					if(trim($categoryPrivacyContext) == '')
+						 $categoryPrivacyContext = self::DEFAULT_CONTEXT;
+						 
+					if(!isset($privacyContexts[$categoryPrivacyContext]) || $privacyContexts[$categoryPrivacyContext] > $categoryPrivacy)
+						$privacyContexts[trim($categoryPrivacyContext)] = $categoryPrivacy;
+				}
 			}
 		}
 		
