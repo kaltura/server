@@ -812,7 +812,7 @@ return array(
 	'batch setup worker confirm enable' 		=> "Are you sure you want to enable the task?						\\nIf you sure, please complete the reason for this change and click the \\\"OK\\\" button, otherwise, click the \\\"Cancel\\\" button.\\n\\nReason for task change:",
 
 	// partner-usage
-	'partner-usage intro text' => 'This page shows usage information for all Publishers registered on your Kaltura Video Platform deployment.',
+	'partner-usage intro text' => 'This page shows usage information for your accounts.',
 	'partner-usage intro text2' => 'Use the filters and date fields to filter the results.',
 	'partner-usage intro text3' => 'To download the information, click "Export to CSV".',
 
@@ -826,9 +826,9 @@ return array(
 	'partner-usage filter clear dates' => 'Clear Dates',
 
 	'partner-usage table partnerStatus' => 'Status',
-	'partner-usage table partnerName' => 'Name',
+	'partner-usage table partnerName' => 'Account Name',
 	'partner-usage table partnerId' => 'ID',
-	'partner-usage table partnerCreatedAt' => 'Creation Date',
+	'partner-usage table partnerCreatedAt' => 'Account Creation Date',
 	'partner-usage table partnerPackage' => 'Usage Package',
 	'partner-usage table views' => 'Player Loads',
 	'partner-usage table plays' => 'Plays',
@@ -838,12 +838,12 @@ return array(
 	'partner-usage table imagesEntriesCount' => 'Images',
 	'partner-usage table audioEntriesCount' => 'Audio',
 	'partner-usage table mixEntriesCount' => 'Mixes',
-	'partner-usage table bandwidth' => 'Bandwidth Used',
+	'partner-usage table bandwidth' => 'Bandwidth Consumption',
 	'partner-usage table totalStorage' => 'Total Storage',
 	'partner-usage table storage' => 'Storage Added',
 	'partner-usage table peakStorage' => 'Peak Storage',
     'partner-usage table averageStorage' => 'Average Storage',
-    'partner-usage table combinedBandwidthStorage' => 'Combined Bandwidth and Storage',
+    'partner-usage table combinedBandwidthStorage' => 'Combined Storage and Bandwidth Consumption',
 
 	'partner-usage table partnerStatus tooltip' => 'The status of the Publisher account can be either active or blocked',
 	'partner-usage table partnerName tooltip' => 'The name of the Publisher',
@@ -872,13 +872,13 @@ return array(
 	'partner-filter search' => 'Search',
 	
 	// partner-list
-	'partner-list intro text' => 'Here you can manage all Publisher accounts that registered on your Kaltura video platform deployment',
-	'are you sure block partner?' => 'Are you sure you want to block this publisher?',
-	'are you sure unblock partner?' => 'Are you sure you want to unblock this publisher?',
-	'are you sure remove partner?' => 'Are you sure you want to remove this publisher?',
-	'partner was blocked' => 'Publisher was blocked successfully',
-	'partner was unblocked' => 'Publisher was unblocked successfully',
-	'partner was removed' => 'Publisher was successfully removed',
+	'partner-list intro text' => 'Here you can manage and access the KMC of each your accounts',
+	'are you sure block partner?' => 'Are you sure you want to block this account?',
+	'are you sure unblock partner?' => 'Are you sure you want to unblock this account?',
+	'are you sure remove partner?' => 'Are you sure you want to delete this account?',
+	'partner was blocked' => 'Account was blocked successfully',
+	'partner was unblocked' => 'Account was unblocked successfully',
+	'partner was removed' => 'Account was successfully removed',
 	'partner-list commercial filtered' => 'Commercial partners filtered from results',
 
 	// partner-selector
@@ -893,17 +893,18 @@ return array(
 	// partner-create
 	'partner-create intro text' => 'Please fill in the following form to create a new sub-account. When a new account is created, a registration email will automatically be sent to the Administrator Email you have provided below.',
 
-	'partner-create form name' => 'Name:',
-	'partner-create form company' => 'Company:',
+	'partner-create form name' => 'Administrator:',
+	'partner-create form company' => 'Account Name:',
 	'partner-create form admin email' => 'Administrator Email:',
 	'partner-create form admin phone' => 'Administrator Phone:',
 	'partner-create form description' => 'Describe Company:',
 	'partner-create form package' => 'Service Edition Type:',
 
-	'partner-create form url' => 'Website Url:',
+	'partner-create form url' => 'Website URL:',
 	'partner-create form content' => 'Website Content:',
 	'partner-create form adult' => 'Includes adult content?',
 	'partner-create form create' => 'Create',
+    'partner-create from copy partner' => 'Copy Content from Template Account:',   
 
 	// partner-kmc-users
 	'partner-kmc-users intro text' => 'From here you can log into the KMC as a specific user of this publisher account.',
@@ -1091,7 +1092,7 @@ return array(
 	// user role
 	'user role intro text' => '',
 
-    'Results' => 'Sub-Accounts',
+    'Results' => 'Accounts',
 
     'partner-list-by-user intro text' => 'This user has access to several partners of type VAR/group parent. Please select the relevant partner:',
 );
