@@ -90,7 +90,7 @@ class KalturaActionReflector extends KalturaReflector
      */
     public function getActionInfo ( )
     {
-        if (!is_null($this->_actionParams))
+        if (is_null($this->_actionParams))
         {
            $reflectionClass = new ReflectionClass($this->_actionClass);
            $reflectionMethod = $reflectionClass->getMethod($this->_actionMethodName);
@@ -107,7 +107,7 @@ class KalturaActionReflector extends KalturaReflector
      */
     public function getActionParams ( )
     {
-        if (!is_null($this->_actionParams))
+        if (is_null($this->_actionParams))
         {
     		// reflect the service 
     		$reflectionClass = new ReflectionClass($this->_actionClass);
@@ -190,7 +190,7 @@ class KalturaActionReflector extends KalturaReflector
      */
     public function getActionClassInfo ()
     {
-        if (!is_null($this->_actionParams))
+        if (is_null($this->_actionParams))
         {
             $reflectionClass = new ReflectionClass($this->_actionClass);
             $this->_actionClassInfo = new KalturaDocCommentParser($reflectionClass->getDocComment());
