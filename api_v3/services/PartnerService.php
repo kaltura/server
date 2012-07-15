@@ -395,14 +395,15 @@ class PartnerService extends KalturaBaseService
 	    $c = PartnerPeer::getDefaultCriteria();
 		
 	    $partnerFilter->attachToCriteria($c);
+		$response = new KalturaPartnerListResponse();
+		$response->totalCount = PartnerPeer::doCount($c);
+		
 	    $pager->attachToCriteria($c);
 	    $dbPartners = PartnerPeer::doSelect($c);
 	    
 		$partnersArray = KalturaPartnerArray::fromPartnerArray($dbPartners);
 		
-		$response = new KalturaPartnerListResponse();
 		$response->objects = $partnersArray;
-		$response->totalCount = PartnerPeer::doCount($c);
 		return $response;
 	}
 	
