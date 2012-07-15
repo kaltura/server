@@ -13,7 +13,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"> 
 <head>  
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Kaltura Multi-Publishers console</title>
+	<title>Kaltura Multi-Account Console</title>
 <?php echo $this->headLink()->toString().PHP_EOL; ?>
 <?php echo $this->headScript()->toString().PHP_EOL;?>
 
@@ -27,7 +27,7 @@ function addSubTitle(subTitle) {
 <body id="<?php echo $this->cssId(); ?>">
 <div id="kmcHeader" >
 	<div id="logo"></div>
-	<h1 class="navigation" > <a class="navigation">Multi-Publisher Management Console </a></h1>
+	<h1 class="navigation" > <a class="navigation">Multi-Account Management Console </a></h1>
 	<div id="user_links">
 		<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
 			<span>Hi <?php echo Infra_AuthHelper::getAuthInstance()->getIdentity()->getUser()->firstName; ?></span><br />
