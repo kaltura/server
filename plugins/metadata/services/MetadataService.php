@@ -14,24 +14,16 @@ class MetadataService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 
 		myPartnerUtils::addPartnerToCriteria(new MetadataProfilePeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-		if ($actionName != 'list')
-			myPartnerUtils::addPartnerToCriteria(new MetadataPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		myPartnerUtils::addPartnerToCriteria(new MetadataPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		myPartnerUtils::addPartnerToCriteria(new entryPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		myPartnerUtils::addPartnerToCriteria(new categoryPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+        myPartnerUtils::addPartnerToCriteria(new kuserPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		//		myPartnerUtils::addPartnerToCriteria(new FileSyncPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		
 		if(!MetadataPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 	}
 	
-	protected function kalturaNetworkAllowed($actionName)
-	{
-		if ($actionName == 'list')
-		{
-			$this->partnerGroup .= ',0';
-			return true;
-		}
-			
-		return parent::kalturaNetworkAllowed($actionName);
-	}
 
 	/**
 	 * Allows you to add a metadata object and metadata content associated with Kaltura object
@@ -47,14 +39,11 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addAction($metadataProfileId, $objectType, $objectId, $xmlData)
 	{
-		if($objectType == KalturaMetadataObjectType::USER)
-		{
-			$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $objectId);
-			if($kuser)				
-				$objectId = $kuser->getId();
-		}
-		
 		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
+		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
+		if ($metadataProfile->getObjectType() != $objectType)
+		    throw new KalturaAPIException(MetadataErrors::INCOMPATIBLE_METADATA_PROFILE_OBJECT_TYPE, $metadataProfile->getObjectType() , $objectType);
+		
 		$check = MetadataPeer::retrieveByObject($metadataProfileId, $objectType, $objectId);
 		if($check)
 			throw new KalturaAPIException(MetadataErrors::METADATA_ALREADY_EXISTS, $check->getId());
@@ -105,9 +94,6 @@ class MetadataService extends KalturaBaseService
 		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
 		if(!$dbMetadataProfile)
 			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE, $metadataProfileId);
-			
-		if($dbMetadataProfile->getObjectType() != $objectType)
-			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE_TYPE, $dbMetadataProfile->getObjectType());
 		
 		$dbMetadata = new Metadata();
 		
@@ -169,7 +155,7 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addFromUrlAction($metadataProfileId, $objectType, $objectId, $url)
 	{
-		$xmlData = file_get_contents($filePath);
+		$xmlData = file_get_contents($url);
 		return $this->addAction($metadataProfileId, $objectType, $objectId, $xmlData);
 	}
 	
@@ -321,44 +307,16 @@ class MetadataService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaMetadataFilter;
 			
-		if (kEntitlementUtils::getEntitlementEnforcement() && (is_null($filter->objectIdIn) && is_null($filter->objectIdEqual)))
-			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
-			
-		$entryIds = null;
-		if ($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
-		{
-			if ($filter->objectIdEqual)
-			{
-				$entryIds = array($filter->objectIdEqual);
-			}
-			else if ($filter->objectIdIn)
-			{
-				$entryIds = explode(',', $filter->objectIdIn);
-			}
-		}
-		
-		if (is_null($entryIds))
-		{
-			myPartnerUtils::addPartnerToCriteria(new MetadataPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-		}
-		else
-		{
-			$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, $this->getPartnerId());
-			$filter->objectIdEqual = null;
-			$filter->objectIdIn = implode(',', $entryIds);
-		}
-		
 		$metadataFilter = new MetadataFilter();
 		$filter->toObject($metadataFilter);
 		
 		$c = new Criteria();
 		$metadataFilter->attachToCriteria($c);
-		if ($entryIds === array())
-			$c->addAnd(MetadataPeer::OBJECT_ID, array(), Criteria::IN);
 		$count = MetadataPeer::doCount($c);
 		
 		if (! $pager)
 			$pager = new KalturaFilterPager ();
+			
 		$pager->attachToCriteria($c);
 		$list = MetadataPeer::doSelect($c);
 		
