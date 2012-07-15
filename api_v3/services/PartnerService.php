@@ -402,7 +402,7 @@ class PartnerService extends KalturaBaseService
 		
 		$response = new KalturaPartnerListResponse();
 		$response->objects = $partnersArray;
-		$response->totalCount = count($partnersArray);
+		$response->totalCount = PartnerPeer::doCount($c);
 		return $response;
 	}
 	
