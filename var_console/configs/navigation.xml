@@ -11,12 +11,12 @@
 				<action>list</action>
 			</accounts-management>
 			<account-new>
-				<label>Add New Sub-Account</label>
+				<label>Add New Account</label>
 				<controller>partner</controller>
 				<action>create</action>
 			</account-new>
 			<account-usage>
-				<label>Publishers' Usage</label>
+				<label>Usage Reports</label>
 				<controller>partner-usage</controller>
 				<action>index</action>
 			</account-usage>
