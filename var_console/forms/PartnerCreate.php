@@ -44,14 +44,14 @@ class Form_PartnerCreate extends Infra_Form
 		));
 		
 		$this->addElement('select', 'copyPartner', array(
-		    'label' => 'Copy content from partner:',
+		    'label' => 'partner-create from copy partner',
 		    'filters'		=> array('StringTrim'),
 			'required' 		=> true,
 		    'RegisterInArrayValidator' => false
 		));
 		
 		$this->addDisplayGroup(array('name', 'company', 'admin_email', 'phone', 'describe_yourself', 'website', 'copyPartner'), 'partner_info', array(
-			'legend' => 'Publisher Info',
+			'legend' => 'Account Info',
 			'decorators' => array(
 				'Description', 
 				'FormElements', 

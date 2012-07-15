@@ -12,8 +12,8 @@ class Form_PartnerFilter extends Form_PartnerBaseFilter
 		$filterType = $this->getElement('filter_type');
 		$filterType->setMultiOptions(array(
 				'none' => 'None', 
-				'byid' => 'Publisher ID',
-				'byname' => 'Publisher Name',
+				'byid' => 'Partner ID',
+				'byname' => 'Account Name',
 				'free' => 'Free-form text'
 		));
 		

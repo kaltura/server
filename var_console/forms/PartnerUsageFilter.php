@@ -48,8 +48,8 @@ class Form_PartnerUsageFilter extends Zend_Form
 			'required' 		=> true,
 			'multiOptions' 	=> array(
 				'none' => 'None', 
-				'byid' => 'Publisher ID',
-				'byname' => 'Publisher Name',
+				'byid' => 'Partner ID',
+				'byname' => 'Account Name',
 				'free' => 'Free-form text'
 			),
 			'decorators' => array('ViewHelper', 'Label'),
