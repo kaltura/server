@@ -395,6 +395,15 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			return;
 		}
 		
+		if ($metadataProfile->getObjectType() != kMetadataManager::getTypeNameFromObject($object))
+		{
+		    $errorMessage = "Metadata profile [$metadataProfileId] object type [". $metadataProfile->getObjectType() . "] is not compatible with object type [". kMetadataManager::getTypeNameFromObject($object) . "]";
+			KalturaLog::err($errorMessage);
+			self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
+			return;
+		}
+		
+		
 		if(isset($data[self::BULK_UPLOAD_COLUMN_URL]))
 		{
 			try{
@@ -555,6 +564,14 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
                 self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
 				continue;   
 	        }
+	        
+	        if ($metadataProfile->getObjectType() != kMetadataManager::getTypeNameFromObject($object))
+		    {
+    		    $errorMessage = "Metadata profile [$metadataProfileSystemName] object type [". $metadataProfile->getObjectType() . "] is not compatible with object type [". kMetadataManager::getTypeNameFromObject($object) . "]";
+    			KalturaLog::err($errorMessage);
+    			self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
+    			continue;
+		    }
 	        
 	        $metadataProfileId = $metadataProfile->getId();
 	        $xml = new DOMDocument();
