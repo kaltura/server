@@ -68,7 +68,7 @@ class PartnerController extends Zend_Controller_Action
 		$templatePartnerList = $client->partner->listAction($varConsoleFilter, $pager);
 		
 		$providers = array();
-		$providers[0] = "default";
+		$providers[0] = $this->view->translate('partner-create default copy partner');
 		foreach ($templatePartnerList->objects as $templatePartner)
 		{
 		    /* @var $templatePartner Kaltura_Client_Type_Partner */
