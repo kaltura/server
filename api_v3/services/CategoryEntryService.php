@@ -292,15 +292,19 @@ class CategoryEntryService extends KalturaBaseService
 			
 			$categories = categoryPeer::retrieveByPKs($categoriesIds);
 			
+			$isCategoriesModified = false;
 			$categoriesFullName = array();
 			foreach($categories as $category)
 			{
 				if($category->getPrivacyContexts() == null)
+				{
 					$categoriesFullName[] = $category->getFullName();
+					$isCategoriesModified = true;
+				}
 			} 
 				
 			$entry->setCategories(implode(',', $categoriesFullName));
-			categoryEntryPeer::syncEntriesCategories($entry);
+			categoryEntryPeer::syncEntriesCategories($entry, $isCategoriesModified);
 			$entry->save();
 		}
 		
