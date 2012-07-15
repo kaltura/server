@@ -77,9 +77,9 @@ class KalturaActionReflector extends KalturaReflector
 			$actionFromCache = apc_fetch("{$this->_serviceId}_{$this->_actionId}", $fetchFromAPCSuccess);
 			if($fetchFromAPCSuccess && $actionFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == KalturaServicesMap::getServiceMapModificationTime())
 			{
-			    $this->_actionInfo = $actionFromCache["actionInfo"];
-        		$this->_actionParams = $actionFromCache["actionParams"];
-        		$this->_actionClassInfo = $actionFromCache["actionClassInfo"];
+                    $this->_actionInfo = $actionFromCache["actionInfo"];
+                    $this->_actionParams = $actionFromCache["actionParams"];
+                    $this->_actionClassInfo = $actionFromCache["actionClassInfo"];
 			}
 		}
     }
@@ -90,7 +90,7 @@ class KalturaActionReflector extends KalturaReflector
      */
     public function getActionInfo ( )
     {
-        if (!$this->_actionInfo)
+        if (!is_null($this->_actionParams))
         {
            $reflectionClass = new ReflectionClass($this->_actionClass);
            $reflectionMethod = $reflectionClass->getMethod($this->_actionMethodName);
@@ -107,7 +107,7 @@ class KalturaActionReflector extends KalturaReflector
      */
     public function getActionParams ( )
     {
-        if (!$this->_actionParams)
+        if (!is_null($this->_actionParams))
         {
     		// reflect the service 
     		$reflectionClass = new ReflectionClass($this->_actionClass);
@@ -155,7 +155,6 @@ class KalturaActionReflector extends KalturaReflector
     			
     			$this->_actionParams[$name] = $paramInfo;
     		}
-    		
 			$this->cacheReflectionValues();
         }
 		
@@ -191,7 +190,7 @@ class KalturaActionReflector extends KalturaReflector
      */
     public function getActionClassInfo ()
     {
-        if (!$this->_actionClassInfo)
+        if (!is_null($this->_actionParams))
         {
             $reflectionClass = new ReflectionClass($this->_actionClass);
             $this->_actionClassInfo = new KalturaDocCommentParser($reflectionClass->getDocComment());
