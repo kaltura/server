@@ -42,6 +42,8 @@ class flvclipperAction extends kalturaAction
 		$request = str_replace("/referrer/$base64_referrer", "", $request);
 		$request = str_replace("/ks/$ks_str", "", $request);
 		
+		$entry = null;
+		
 		if($ks_str)
 		{
 			try {
