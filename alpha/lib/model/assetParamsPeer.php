@@ -14,7 +14,18 @@ class assetParamsPeer extends BaseassetParamsPeer
 	const THUMBNAIL_OM_CLASS = 'thumbParams';
 	
 	static protected $filterPartner = null;
+	
+	static protected $isDefaultInDefaultCriteria = true;
 
+	/**
+	 * Define if is_default needed in the default criteria for partner zero
+	 * @param bool $is
+	 */
+	public static function setIsDefaultInDefaultCriteria($is)
+	{
+		self::$isDefaultInDefaultCriteria = $is;
+	}
+	
 	public static function setDefaultCriteriaFilter ()
 	{
 		if(is_null(self::$s_criteria_filter))
@@ -41,6 +52,9 @@ class assetParamsPeer extends BaseassetParamsPeer
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
 		self::$filterPartner = $partnerId;
+		
+		if(!self::$isDefaultInDefaultCriteria)
+			return parent::addPartnerToCriteria($partnerId, $privatePartnerData, $partnerGroup, $kalturaNetwork);
 		
 		$criteriaFilter = self::getCriteriaFilter();
 		$criteria = $criteriaFilter->getFilter();

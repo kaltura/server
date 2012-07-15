@@ -21,7 +21,10 @@ class ConversionProfileService extends KalturaBaseService
 			$actionName == 'add' ||
 			$actionName == 'update'
 			)
+		{
 			$partnerGroup = $this->partnerGroup . ',0';
+			assetParamsPeer::setIsDefaultInDefaultCriteria(false);
+		}
 			
 		parent::applyPartnerFilterForClass(new assetParamsPeer(), $partnerGroup);
 	}
