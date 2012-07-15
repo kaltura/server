@@ -904,7 +904,8 @@ return array(
 	'partner-create form content' => 'Website Content:',
 	'partner-create form adult' => 'Includes adult content?',
 	'partner-create form create' => 'Create',
-    'partner-create from copy partner' => 'Copy Content from Template Account:',   
+    'partner-create from copy partner' => 'Copy Content from Template Account:',
+    'partner-create default copy partner' => 'Default Template Account',   
 
 	// partner-kmc-users
 	'partner-kmc-users intro text' => 'From here you can log into the KMC as a specific user of this publisher account.',
