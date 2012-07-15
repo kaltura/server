@@ -51,7 +51,6 @@ class MetadataService extends KalturaBaseService
 		if ($metadataProfile->getObjectType() != $objectType)
 		    throw new KalturaAPIException(MetadataErrors::INCOMPATIBLE_METADATA_PROFILE_OBJECT_TYPE, $metadataProfile->getObjectType() , $objectType);
 		
-	    
 		if($objectType == KalturaMetadataObjectType::USER)
 		{
 			$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $objectId);
