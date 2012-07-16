@@ -108,13 +108,13 @@ jQuery('#date_range').change(function() {
 			from = new Date();
 			to = new Date();
 			from.setDate(from.getDate() - 8);
-			to.setDate(to.getDate()-1);
+			to.setDate(to.getDate()-2);
 			break;
 		case "week":
 			from = new Date();
 			to = new Date();
 			from.setDate(from.getDate() - 7);
-			to.setDate(to.getDate()-1);
+			to.setDate(to.getDate()-2);
 			break;
 		case "last_week":
 			break;
@@ -122,13 +122,13 @@ jQuery('#date_range').change(function() {
 			from = new Date();
 			to = new Date();
 			from.setDate(from.getDate() - 30);
-			to.setDate(to.getDate()-1);
+			to.setDate(to.getDate()-2);
 			break;
 		case "this_month":
 			from = new Date();
 			to = new Date();
 			from.setDate(1);
-			to.setDate(to.getDate()-1);
+			to.setDate(to.getDate()-2);
 			break;
 		case "last_month":
 			from = new Date();
@@ -140,13 +140,13 @@ jQuery('#date_range').change(function() {
 			from = new Date();
 			to = new Date();
 			from.setMonth(to.getMonth()-12);
-			to.setDate(to.getDate()-1);
+			to.setDate(to.getDate()-2);
 			break;
 		case "this_year":
 			from = new Date();
 			to = new Date();
 			from.setFullYear(to.getFullYear(), 0, 1);
-			to.setDate(to.getDate()-1);
+			to.setDate(to.getDate()-2);
 			break;
 		case "custom":
 			//do nothing
