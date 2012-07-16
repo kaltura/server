@@ -84,15 +84,16 @@ class VarConsoleService extends KalturaBaseService
 		$c = PartnerPeer::getDefaultCriteria();
 		$partnerFilterDb->attachToCriteria($c);
 		
+		$partners = PartnerPeer::doSelect($c);
+		$partnerIds = array();
+		foreach($partners as &$partner)
+			$partnerIds[] = $partner->getId();
+		
 		// add pager to criteria
 		$pager->attachToCriteria($c);
 		$c->addAscendingOrderByColumn(PartnerPeer::ID);
 		
 		// select partners
-		$partners = PartnerPeer::doSelect($c);
-		$partnerIds = array();
-		foreach($partners as &$partner)
-			$partnerIds[] = $partner->getId();
 		
 		$items = array();
 		
