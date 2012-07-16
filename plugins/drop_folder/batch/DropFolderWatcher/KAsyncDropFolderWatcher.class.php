@@ -515,5 +515,9 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		
 		return true;
 	}
-		
+	
+	function log($message)
+	{
+		KalturaLog::debug($message);
+	}	
 }

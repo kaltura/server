@@ -193,5 +193,9 @@ class KAsyncDropFolderHandler extends KPeriodicWorker
 		$dropFolderFiles = $dropFolderFiles->objects;
 		return $dropFolderFiles;
 	}
-		
+	
+	function log($message)
+	{
+		KalturaLog::debug($message);
+	}
 }
