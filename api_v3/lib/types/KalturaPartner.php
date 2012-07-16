@@ -260,12 +260,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public function toPartner()
 	{
-	    $this->validatePropertyNotNull("name");
-		$this->validatePropertyNotNull("adminName");
-		$this->validatePropertyNotNull("adminEmail");
-		$this->validatePropertyNotNull("description");
-		$this->validatePropertyMaxLength("country", 2, true);
-		$this->validatePropertyMaxLength("state", 2, true);
 		
 		if($this->adminName && $this->firstName === null && $this->lastName === null)
 		{
@@ -282,6 +276,13 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		{
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_DEPRECATED, "adminName");
 		}
+
+		$this->validatePropertyNotNull("name");
+		$this->validatePropertyNotNull("adminName");
+		$this->validatePropertyNotNull("adminEmail");
+		$this->validatePropertyNotNull("description");
+		$this->validatePropertyMaxLength("country", 2, true);
+		$this->validatePropertyMaxLength("state", 2, true);
 
 		$partner = new Partner();
 		$partner = parent::toObject( $partner );
