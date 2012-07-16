@@ -115,7 +115,6 @@ abstract class KBulkUploadEngine
 //		if(function_exists('strptime'))
 //		{
 //			$ret = strptime($str, self::BULK_UPLOAD_DATE_FORMAT . ($dateOnly ? '' : self::BULK_UPLOAD_TIME_FORMAT));
-//			KalturaLog::debug("### ".print_r($ret, true));
 //			if($ret)
 //			{
 //			    $date = gmmktime($ret["tm_hour"], $ret["tm_min"], $ret["tm_sec"], $ret["tm_mon"], $ret["tm_mday"], $ret["tm_year"]);
