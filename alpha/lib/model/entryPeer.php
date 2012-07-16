@@ -637,20 +637,7 @@ class entryPeer extends BaseentryPeer
 	 * @param	   Criteria $criteria
 	 */
 	public static function filterSelectResults(&$selectResults, Criteria $criteria)
-	{
-		
-		 KalturaLog::debug('Entitlement: Filter Results');
-
-if((!kEntitlementUtils::getEntitlementEnforcement() && !is_null(kCurrentContext::$ks)))
-        KalturaLog::debug('Entitlement: Filter Results: line: ' . __LINE__);
-
-if(!self::$filerResults)
-        KalturaLog::debug('Entitlement: Filter Results: line: ' . __LINE__);
-
-if(!kEntitlementUtils::getInitialized())
-        KalturaLog::debug('Entitlement: Filter Results : line: ' . __LINE__);
-        
-		
+	{		
 		if ((!kEntitlementUtils::getEntitlementEnforcement() && !is_null(kCurrentContext::$ks))|| 
 			!self::$filerResults ||
 			!kEntitlementUtils::getInitialized()) // if initEntitlement hasn't run - skip filters.
