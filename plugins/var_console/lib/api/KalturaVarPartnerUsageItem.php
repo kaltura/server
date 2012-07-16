@@ -155,7 +155,9 @@ class KalturaVarPartnerUsageItem extends KalturaObject
 		
 		$dateString         = @$arr[0];
 		//Get timestamp of the timeunit.
-		$this->dateId = DateTime::createFromFormat(strlen($dateString) == 8 ? 'Ymd' : 'Ym', $dateString)->getTimestamp();      
+		$dateTime = DateTime::createFromFormat(strlen($dateString) == 8 ? 'Ymd' : 'Ym', $dateString);
+		if ($dateTime)
+		    $this->dateId = $dateTime->getTimestamp();      
 		$this->bandwidth 		= @$arr[1];
 		$this->storage 		= @$arr[2];
 		//$item->totalStorage 	= @$arr[15];
