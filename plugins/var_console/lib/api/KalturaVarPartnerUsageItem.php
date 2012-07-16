@@ -137,7 +137,7 @@ class KalturaVarPartnerUsageItem extends KalturaObject
 	
 	/**
 	 * TGhe date at which the report was taken - Unix Timestamp
-	 * @var int 
+	 * @var string 
 	 */
 	public $dateId;
 	
