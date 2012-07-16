@@ -506,15 +506,15 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		{
 			$catsNames = array ();
 			
-			$cats = explode(",", $this->categoriesIds);
+			$cats = explode(",", $this->categories);
 			
 			foreach ($cats as $cat)
 			{ 
-				$catName = categoryPeer::retrieveByPK($cat);
+				$catName = categoryPeer::getByFullNameExactMatch($cat);
 				if (is_null($catName))
 				{
 					KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-					$catName = categoryPeer::retrieveByPK($cat);
+					$catName = categoryPeer::getByFullNameExactMatch($cat);
 					if ($catName)
 						throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_PERMITTED, $cat);
 					KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
