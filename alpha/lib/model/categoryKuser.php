@@ -79,6 +79,13 @@ class categoryKuser extends BasecategoryKuser {
 		return parent::preUpdate($con);
 	}
 	
+	public function preDelete(PropelPDO $con = null)
+	{
+		$this->updateCategroy(true);
+		
+		return parent::preDelete();	
+	}	
+	
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
@@ -91,7 +98,7 @@ class categoryKuser extends BasecategoryKuser {
 		return parent::preInsert($con);
 	}
 	
-	private function updateCategroy()
+	private function updateCategroy($isDelete = false)
 	{
 		categoryPeer::setUseCriteriaFilter(false);
 		$category = categoryPeer::retrieveByPK($this->category_id);
@@ -107,8 +114,8 @@ class categoryKuser extends BasecategoryKuser {
 			
 			if($this->status == CategoryKuserStatus::ACTIVE)
 				$category->setMembersCount($category->getMembersCount() + 1);
-			
-			$category->save();			
+				
+			$category->save();
 		}
 		elseif($this->isColumnModified(categoryKuserPeer::STATUS))
 		{
@@ -126,7 +133,18 @@ class categoryKuser extends BasecategoryKuser {
 				
 			$category->save();
 		}
-
+		
+		if($isDelete)
+		{				
+			if($this->status == CategoryKuserStatus::PENDING)
+				$category->setPendingMembersCount($category->getPendingMembersCount() - 1);
+				
+			if($this->status == CategoryKuserStatus::ACTIVE)
+				$category->setMembersCount($category->getMembersCount() - 1);
+				
+			$category->save();
+		}
+		
 		$this->addIndexCategoryInheritedTreeJob($category->getFullIds());
 		$category->indexToSearchIndex();
 	}
@@ -151,24 +169,6 @@ class categoryKuser extends BasecategoryKuser {
 		
 		if(count($categories))
 			kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY, $filter, true, $featureStatusesToRemove);
-	}
-
-	
-	public function delete(PropelPDO $con = null)
-	{
-		$category = categoryPeer::retrieveByPK($this->category_id);
-		if(!$category)
-			throw new kCoreException('category not found');
-			
-		if($this->status == CategoryKuserStatus::PENDING)
-			$category->setPendingMembersCount($category->getPendingMembersCount() - 1);
-			
-		if($this->status == CategoryKuserStatus::ACTIVE)
-			$category->setMembersCount($category->getMembersCount() - 1);
-			
-		$category->save();
-		
-		parent::delete($con);
 	}
 	
 	public function reSetCategoryFullIds()
