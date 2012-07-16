@@ -88,7 +88,7 @@ function onPageLoad() {
 
 	$("#partner_group_type-element select").each(function(inx, value){
 		var $partner_parent_id = $('#partner_parent_id');
-		if ($(this).val() != 1){
+		if ($(this).val() != 1 && $(this).val() != 4){
 			$partner_parent_id.attr("readonly", 1);
 			$partner_parent_id.val('');
 	    } 
