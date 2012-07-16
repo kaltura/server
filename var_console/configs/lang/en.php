@@ -844,6 +844,7 @@ return array(
 	'partner-usage table peakStorage' => 'Peak Storage',
     'partner-usage table averageStorage' => 'Average Storage',
     'partner-usage table combinedBandwidthStorage' => 'Combined Storage and Bandwidth Consumption',
+    'partner-usage table timeUnit' => 'Time Unit',
 
 	'partner-usage table partnerStatus tooltip' => 'The status of the Publisher account can be either active or blocked',
 	'partner-usage table partnerName tooltip' => 'The name of the Publisher',
@@ -864,7 +865,7 @@ return array(
     'partner-usage table peakStorage tooltip' => 'The peak amount of storage consumption during the given date range for the specific publisher',
     'partner-usage table averageStorage tooltip' => 'The average amount of storage consumption during the given date range for the specific publisher',
     'partner-usage table combinedBandwidthStorage tooltip' => 'The combined amount of bandwidth and storage consumed during the given date range for the specific publisher',
-
+    'partner-usage table timeUnit tooltip' => 'The time unit at which the report was taken',
 
 
 	// partner-filter
