@@ -821,7 +821,7 @@ return array(
 	'partner-usage filter blocked' => 'Blocked',
 	'partner-usage filter removed' => 'Removed',
 	'partner-usage filter search' => 'Search',
-	'partner-usage filter range limit' => 'Limit By Date Range:',
+	'partner-usage filter range limit' => 'Dates:',
 	'partner-usage filter status types' => 'Show Status Types:',
 	'partner-usage filter clear dates' => 'Clear Dates',
 
@@ -866,7 +866,8 @@ return array(
     'partner-usage table averageStorage tooltip' => 'The average amount of storage consumption during the given date range for the specific publisher',
     'partner-usage table combinedBandwidthStorage tooltip' => 'The combined amount of bandwidth and storage consumed during the given date range for the specific publisher',
     'partner-usage table timeUnit tooltip' => 'The time unit at which the report was taken',
-
+    'partner-usage date-range filter type' => 'Date Range',
+    'partner-usage date-interval filter type' => 'Time Unit',
 
 	// partner-filter
 	'partner-filter filter by' => 'Search By:',
