@@ -30,6 +30,7 @@ class Form_PartnerUsageFilter extends Zend_Form
 		        'this_year' =>    'This year',
 		        'custom' => 'Custom',
 			),
+			'value'		=> 'last_30_days',
 			'decorators' => array('ViewHelper', 'Label'),
 		));
 		
