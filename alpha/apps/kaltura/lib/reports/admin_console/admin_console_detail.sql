@@ -49,7 +49,7 @@ FROM
 	(	SELECT dim_partner.partner_id partner_id, 	IFNULL(SUM(count_bandwidth_kb), 0) count_bandwidth,
 			IFNULL(SUM(count_storage_mb), 0) added_storage,
 			IFNULL(MAX(aggr_storage_mb), 0) peak_storage,
-			IFNULL(SUM(count_storage_mb), 0) / (DATEDIFF({TO_DATE_ID},{FROM_DATE_ID}) + 1) average_storage
+			IFNULL(SUM(aggr_storage_mb), 0) / (DATEDIFF({TO_DATE_ID},{FROM_DATE_ID}) + 1) average_storage
 		FROM kalturadw.dwh_dim_partners dim_partner 
 		LEFT JOIN kalturadw.dwh_hourly_partner_usage hourly_partner_usage 
 		ON (hourly_partner_usage.partner_id = dim_partner.partner_id AND hourly_partner_usage.date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID})
