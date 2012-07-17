@@ -72,6 +72,14 @@ class VarConsoleService extends KalturaBaseService
             $usageFilter->fromDate = time() - 60*60*24*30; // last 30 days
 			$usageFilter->toDate = time();
         }
+        else
+        {
+            //The first time the filter is sent, it it sent with 0 as fromDate
+            if (!$usageFilter->fromDate)
+                $usageFilter->fromDate = time() - 60*60*24*30;
+            if (!$usageFilter->interval)
+                $usageFilter->interval = KalturaReportInterval::MONTHS;
+        }
         
         if (is_null($pager))
         {
