@@ -14,13 +14,13 @@ class Form_PartnerCreate extends Infra_Form
 		$this->setName('new_account'); // form id
 		$this->setAttrib('class', 'inline-form');
 		
-		$this->addElement('text', 'name', array(
+		$this->addElement('text', 'admin_name', array(
 			'label' => 'partner-create form name',
 			'required' => true,
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('text', 'company', array(
+		$this->addElement('text', 'name', array(
 			'label' => 'partner-create form company',
 			'filters'		=> array('StringTrim'),
 		));
