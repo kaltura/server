@@ -273,14 +273,15 @@ class kJobsManager
 		$convertCollectionData->setSrcFileSyncRemoteUrl($remoteUrl);
 		$convertCollectionData->setDestFileName($fileName);
 		
-$clipOff=null;
-$clipDur=null;
+		$clipOffset = null;
+		$clipDuration = null;
+		
 		// look for clipping params
 		foreach($flavorParamsOutputs as $flavorParamsOutput){
-			$clipOff = $flavorParamsOutput->getClipOffset();
-			$clipDur = $flavorParamsOutput->getClipDuration();
-			if(isset($clipOff) || isset($clipDur)){
-				KalturaLog::log("Found clipping params: clipOffset($clipOff),clipDuration($clipDur)");
+			$clipOffset = $flavorParamsOutput->getClipOffset();
+			$clipDuration = $flavorParamsOutput->getClipDuration();
+			if(isset($clipOffset) || isset($clipDuration)){
+				KalturaLog::log("Found clipping params: clipOffset($clipOffset),clipDuration($clipDuration)");
 				break;
 			}
 		}
@@ -289,20 +290,20 @@ $clipDur=null;
 		$finalFlavorParamsOutputs = array();
 	
 		// check bitrates duplications & update clipping params
-		foreach($flavorParamsOutputs as $iFp=>$flavorParamsOutput)
+		foreach($flavorParamsOutputs as $flavorParamsOutputIndex => $flavorParamsOutput)
 		{
 			if(!isset($bitrates[$flavorParamsOutput->getVideoBitrate()]))
 				$bitrates[$flavorParamsOutput->getVideoBitrate()] = array();
 
 			// if one of clip params exsits - update the object and db
-			if(isset($clipOff)){
-				$flavorParamsOutputs[$iFp]->setClipOffset($clipOff);
+			if(isset($clipOffset)){
+				$flavorParamsOutputs[$flavorParamsOutputIndex]->setClipOffset($clipOffset);
 			}
-			if(isset($clipDur)){
-				$flavorParamsOutputs[$iFp]->setClipDuration($clipDur);
+			if(isset($clipDuration)){
+				$flavorParamsOutputs[$flavorParamsOutputIndex]->setClipDuration($clipDuration);
 			}
-			if(isset($clipOff) || isset($clipDur)){
-				$flavorParamsOutputs[$iFp]->save();
+			if(isset($clipOffset) || isset($clipDuration)){
+				$flavorParamsOutputs[$flavorParamsOutputIndex]->save();
 			}
 			$bitrates[$flavorParamsOutput->getVideoBitrate()][] = $flavorParamsOutput->getId();
 			$finalFlavorParamsOutputs[$flavorParamsOutput->getId()] = $flavorParamsOutput;
