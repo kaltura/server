@@ -794,7 +794,7 @@ class myReportsMgr
 				"count_plays"
 			),
 			"user_engagement" => array (
-				"unique_videos".
+				"unique_videos",
 				"count_plays" ,	
 				"sum_time_viewed" ,
 				"avg_time_viewed" ,
