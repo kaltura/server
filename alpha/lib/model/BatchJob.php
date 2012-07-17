@@ -45,6 +45,11 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	private $aParentJob = null;
 	private $aRootJob = null;
 	
+	/*
+	 * @var boolean
+	 */
+	protected $useNewRoot = false;
+	
 	private static $BATCHJOB_TYPE_NAMES = array(
 		BatchJobType::CONVERT => 'Convert',
 		BatchJobType::IMPORT => 'Import',
@@ -161,7 +166,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		
 		$res = parent::save( $con );
 		
-		if($is_new && !$this->root_job_id && $this->id)
+		if(($is_new && !$this->root_job_id && $this->id) || $this->useNewRoot)
 		{
 			// set the root to point to itself
 			$this->setRootJobId($this->id);
@@ -500,4 +505,12 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		if(is_null($v))
 			parent::setProcessorExpiration(null);
 	}
+	
+	/*
+	 * @param boolean $useNewRoot
+	 */
+	public function setUseNewRoot($useNewRoot)
+	{
+		$this->useNewRoot = $useNewRoot;
+	}	
 }

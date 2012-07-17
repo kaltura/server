@@ -1124,6 +1124,7 @@ class kJobsManager
 			$batchJob = new BatchJob();
 			$batchJob->setEntryId($entry->getId());
 			$batchJob->setPartnerId($entry->getPartnerId());
+			$batchJob->setUseNewRoot(true);
 		}
 		return self::addJob($batchJob, $jobData, BatchJobType::CONVERT_PROFILE);
 	}
