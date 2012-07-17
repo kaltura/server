@@ -41,6 +41,7 @@ class Form_PartnerUsageFilter extends Zend_Form
 				'daily' => 'Daily',
 		        'monthly' => 'Monthly',
 			),
+			'value'	=> 'monthly',
 			'decorators' => array('ViewHelper', 'Label'),
 		));
 			
