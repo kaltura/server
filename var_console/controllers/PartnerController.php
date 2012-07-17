@@ -36,7 +36,6 @@ class PartnerController extends Zend_Controller_Action
 				if(is_array($partner->contentCategories))
 					$partner->contentCategories = implode(',', $partner->contentCategories);
 					
-				$partner->adminName = $partner->name;
 				$partner->description = "Multi-publishers console";
 				$partner->type = Kaltura_Client_Enum_PartnerType::ADMIN_CONSOLE;
 				
