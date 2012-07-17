@@ -158,12 +158,12 @@ class KalturaVarPartnerUsageItem extends KalturaObject
 		$dateTime = DateTime::createFromFormat(strlen($dateString) == 8 ? 'Ymd' : 'Ym', $dateString);
 		if ($dateTime)
 		    $this->dateId = $dateTime->getTimestamp();      
-		$this->bandwidth 		= @$arr[1];
-		$this->storage 		= @$arr[2];
+		$this->bandwidth 		= ceil(@$arr[1]);
+		$this->storage 		= ceil(@$arr[2]);
 		//$item->totalStorage 	= @$arr[15];
-		$this->peakStorage =  @$arr[3];
-        $this->avgStorage = @$arr[4];
-        $this->combinedStorageBandwidth = @$arr[5];
+		$this->peakStorage =  ceil(@$arr[3]);
+        $this->avgStorage = ceil(@$arr[4]);
+        $this->combinedStorageBandwidth = ceil(@$arr[5]);
 			
 		//return $item;
 	}
