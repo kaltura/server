@@ -44,6 +44,8 @@ class VirusScanProfilePeer extends BaseVirusScanProfilePeer
 			KalturaLog::err('Cannot find entry with id ['.$entryId.']');
 			return null;
 		}
+
+		if ($entry->getSource() == entry::ENTRY_MEDIA_SOURCE_WEBCAM) return null;
 		
 		$cProfile = new Criteria();
 		$cProfile->addAnd(VirusScanProfilePeer::PARTNER_ID, $entry->getPartnerId());
