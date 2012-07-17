@@ -171,7 +171,7 @@ class VarConsoleService extends KalturaBaseService
 		$total->fromString($reportHeader, $reportData);
 		
 		//Sort partner usage results by time unit
-		uasort($items, 'sortByDate');
+		uasort($items, array($this, 'sortByDate'));
 		
 		$response->total = $total; 
 		$response->totalCount = $totalCount;
