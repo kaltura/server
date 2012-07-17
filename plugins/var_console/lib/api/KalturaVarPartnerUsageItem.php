@@ -137,7 +137,7 @@ class KalturaVarPartnerUsageItem extends KalturaObject
 	
 	/**
 	 * TGhe date at which the report was taken - Unix Timestamp
-	 * @var int 
+	 * @var string 
 	 */
 	public $dateId;
 	
@@ -153,11 +153,7 @@ class KalturaVarPartnerUsageItem extends KalturaObject
 		
 		//$item = new KalturaVarPartnerUsageItem();
 		
-		$dateString         = @$arr[0];
-		//Get timestamp of the timeunit.
-		$dateTime = DateTime::createFromFormat(strlen($dateString) == 8 ? 'Ymd' : 'Ym', $dateString);
-		if ($dateTime)
-		    $this->dateId = $dateTime->getTimestamp();      
+		$this->dateId         = @$arr[0];
 		$this->bandwidth 		= ceil(@$arr[1]);
 		$this->storage 		= ceil(@$arr[2]);
 		//$item->totalStorage 	= @$arr[15];
