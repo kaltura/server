@@ -6,7 +6,7 @@
 		<action>dynamic_action</action>
 		<pages>
 			<accounts-management>
-				<label>Publisher Management</label>
+				<label>Accounts</label>
 				<controller>partner</controller>
 				<action>list</action>
 			</accounts-management>
