@@ -144,7 +144,7 @@ class VarConsoleService extends KalturaBaseService
     				$inputFilter ,
     				implode(",", $partnerIds));
 		
-		$total = new KalturaVarPartnerUsageItem();
+		$total = new KalturaVarPartnerUsageTotalItem();
 		$total->fromString($reportHeader, $reportData);
 		$response->total = $total; 
 		$response->totalCount = $totalCount;
