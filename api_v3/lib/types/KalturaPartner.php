@@ -8,7 +8,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter eq,in,order
+	 * @filter eq,in,order,notin
 	 */
 	public $id;
 	
