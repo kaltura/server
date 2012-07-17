@@ -91,12 +91,14 @@ class PartnerController extends Zend_Controller_Action
 
 		$client = Infra_ClientHelper::getClient();
 		
+		$currentPartner = $client->partner->getInfo();
+		
 		$form = new Form_PartnerFilter();
 		$form->setAction($action);
 		
 		// init filter
 		$partnerFilter = $this->getPartnerFilterFromRequest($request);
-		$partnerFilter->idNotIn = Infra_ClientHelper::getPartnerId();
+		$partnerFilter->idNotIn = $currentPartner->id;
 		
 		$paginatorAdapter = new Infra_FilterPaginator($client->partner, "listAction", null, $partnerFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
