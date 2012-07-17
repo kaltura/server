@@ -22,6 +22,7 @@ class Form_PartnerCreate extends Infra_Form
 		
 		$this->addElement('text', 'name', array(
 			'label' => 'partner-create form company',
+			'required' => true,
 			'filters'		=> array('StringTrim'),
 		));
 		
