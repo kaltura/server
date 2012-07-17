@@ -70,10 +70,10 @@
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<?php if (Infra_AclHelper::isAllowedPartner($partner->id, $partner->partnerPackage)): ?>
 							<?php if ($partner->status != Kaltura_Client_Enum_PartnerStatus::FULL_BLOCK): ?>
-								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')): ?>
+								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect') && $partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
 									<option value="manage" ><?php echo $this->translate('Manage'); ?></option>
 								<?php endif; ?>	
-								<?php if (Infra_AclHelper::isAllowed('partner','kmc-users') && $partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
+								<?php if (Infra_AclHelper::isAllowed('partner','kmc-users')): ?>
 									<option value="kmcUsers" ><?php echo $this->translate('KMC Users'); ?></option>
 								<?php endif; ?>
 								<?php if ($partner->id != Infra_Consts::TEMPLATE_PARTNER_ID): ?>
