@@ -23,6 +23,12 @@ class thumbnailAction extends sfAction
         }
 	}	
 	
+	static private $extensions = array(
+		'jpg',
+		'gif',
+		'png',
+	);
+
 	/* (non-PHPdoc)
 	 * @see /symfony/action/sfComponent#getRequestParameter()
 	 * 
@@ -30,11 +36,13 @@ class thumbnailAction extends sfAction
 	 */
 	public function getRequestParameter($name, $default = null)
 	{
+		$exts = implode('|', self::$extensions);
+	
 		$val = $this->getRequestParameter($name, $default);
 		if(!$val)
 			return $val;
 			
-		return preg_replace('/^(.*)\.jpg$/', '$1', $val);
+		return preg_replace("/^(.*)\.($exts)$/", '$1', $val);
 	}
   
 	/**
