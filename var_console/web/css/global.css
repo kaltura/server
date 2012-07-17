@@ -111,7 +111,7 @@ div#my_info, div#new_admin { clear: both;}
 
 /* partner-create */
 #partner-create #new_account { width: 350px; }
-#partner-create #new_account fieldset { width: 305px; }
+#partner-create #new_account fieldset { width: 340px; }
 
 	option { padding-right:8px;}
 	input, select { font: normal 11px arial,sans-serif;}
