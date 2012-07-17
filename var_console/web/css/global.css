@@ -116,7 +116,7 @@ div#my_info, div#new_admin { clear: both;}
 	option { padding-right:8px;}
 	input, select { font: normal 11px arial,sans-serif;}
 	select { height:19px;}
-	 tbody td select { width:100px;}
+	 tbody td select { width:120px;}
 	.help { width:16px; height:16px; margin-top:-1px;  display:block; text-indent:-9999px; cursor:help; background:url(../images/sprite.png) no-repeat 0 -74px;}
 	input#from_date, input#to_date { width:58px; padding-top:1px;}
 	fieldset { padding: 5px 20px 4px 10px; padding: 0 20px 0 0; border: solid 1px #B7BABC; margin: 17px 0 18px 21px; display:table; float:left; clear:both; background:#f7f7f7; }
@@ -308,7 +308,7 @@ form.inline-form { padding-top:15px; display:table; clear:both;}
   form.inline-form input[type="password"] { width:148px; height:18px; padding: 4px 0 0 4px;}
   form.inline-form input[type="radio"] { vertical-align:-2px;}
   form.inline-form textarea { padding: 4px 0 0 4px; } 
-  form.inline-form select { width:154px; height:26px; padding: 4px; }
+  form.inline-form select { width:174px; height:26px; padding: 4px; }
   form.inline-form .disabled { background-color: #f0f0f0; color: #6d6d6d; }
    form.inline-form option { padding: 2px 8px 2px 0;}
   form.inline-form select[multiple="multiple"], form.inline-form #content_categories { height:auto;}
