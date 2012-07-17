@@ -28,6 +28,7 @@ class partnerFilter extends baseObjectFilter
 			"_lte_partner_package",
 		    "_eq_partner_group_type",
 		    "_in_partner_group_type",
+		    "_notin_id"
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "id", "name", "website", "admin_name", "admin_email", "status");
