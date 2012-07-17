@@ -169,10 +169,33 @@ class VarConsoleService extends KalturaBaseService
 		
 		$total = new KalturaVarPartnerUsageTotalItem();
 		$total->fromString($reportHeader, $reportData);
+		
+		//Sort partner usage results by time unit
+		uasort($items, sortByDate);
+		
 		$response->total = $total; 
 		$response->totalCount = $totalCount;
 		$response->objects = $items;
 		return $response;
+    }
+    
+    private function sortByDate ($item1, $item2)
+    {
+        $dateItem1 = strlen($item1->dateId) == 6 ? DateTime::createFromFormat( "Ym" , $item1->dateId)->getTimestamp() : DateTime::createFromFormat( "Ymd" , $item1->dateId)->getTimestamp();
+        $dateItem2 = strlen($item2->dateId) == 6 ? DateTime::createFromFormat( "Ym" , $item2->dateId)->getTimestamp() : DateTime::createFromFormat( "Ymd" , $item2->dateId)->getTimestamp();
+        
+        if ($dateItem1 == $dateItem2)
+        {
+            return 0;
+        }
+        else if ($dateItem1 > $dateItem2)
+        {
+            return 1;
+        }
+        else
+        {
+            return -1;
+        }
     }
     
 	/**
