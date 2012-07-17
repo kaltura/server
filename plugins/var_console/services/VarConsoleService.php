@@ -121,7 +121,7 @@ class VarConsoleService extends KalturaBaseService
 		{
 		    $totalCount = 0;
 		    // since the pager will not really work here, we needc to customize its activity.
-		    $startingLine = $pager->pageSize*$pager->pageIndex -9;
+		    $startingLine = $pager->pageSize*($pager->pageIndex -1) +1;
 		    $countedLines = 0;
 			foreach ($partnerIds as $partnerId)
 			{
