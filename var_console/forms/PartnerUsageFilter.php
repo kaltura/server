@@ -114,8 +114,17 @@ class Form_PartnerUsageFilter extends Zend_Form
 		));
 
 		
-		$this->addDisplayGroup(array('date_range', 'interval'), 'date_range_group', array(
-			'description' => 'date-range filter type',
+		$this->addDisplayGroup(array('date_range'), 'date_range_group', array(
+			'description' => 'partner-usage date-range filter type',
+			'decorators' => array(
+				array('Description', array('tag' => 'legend')), 
+				'FormElements', 
+				'Fieldset'
+			)
+		));
+		
+		$this->addDisplayGroup(array('interval'), 'interval_group', array(
+			'description' => 'partner-usage date-interval filter type',
 			'decorators' => array(
 				array('Description', array('tag' => 'legend')), 
 				'FormElements', 
