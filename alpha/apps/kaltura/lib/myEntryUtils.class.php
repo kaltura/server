@@ -813,6 +813,9 @@ class myEntryUtils
 			}
 			else
 			{
+				if (!file_exists($orig_image_path))
+					KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
+					
 				$imageSizeArray = getimagesize($orig_image_path);
 				if ($thumbParams->getSupportAnimatedThumbnail() && is_array($imageSizeArray) && $imageSizeArray[2] === IMAGETYPE_GIF)
 					$tempThumbPath = kFile::replaceExt($tempThumbPath, "gif");
