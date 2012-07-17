@@ -23,6 +23,20 @@ class thumbnailAction extends sfAction
         }
 	}	
 	
+	/* (non-PHPdoc)
+	 * @see /symfony/action/sfComponent#getRequestParameter()
+	 * 
+	 * Needed because some partners add .jpg at the end of the url, it might be added to a real attribute.
+	 */
+	public function getRequestParameter($name, $default = null)
+	{
+		$val = $this->getRequestParameter($name, $default);
+		if(!$val)
+			return $val;
+			
+		return preg_replace('/^(.*)\.jpg$/', '$1', $val);
+	}
+  
 	/**
 	 * Will forward to the regular swf player according to the widget_id 
 	 */
