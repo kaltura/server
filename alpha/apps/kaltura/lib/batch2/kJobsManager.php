@@ -273,17 +273,41 @@ class kJobsManager
 		$convertCollectionData->setSrcFileSyncRemoteUrl($remoteUrl);
 		$convertCollectionData->setDestFileName($fileName);
 		
-		// check bitrates duplications
+$clipOff=null;
+$clipDur=null;
+		// look for clipping params
+		foreach($flavorParamsOutputs as $flavorParamsOutput){
+			$clipOff = $flavorParamsOutput->getClipOffset();
+			$clipDur = $flavorParamsOutput->getClipDuration();
+			if(isset($clipOff) || isset($clipDur)){
+				KalturaLog::log("Found clipping params: clipOffset($clipOff),clipDuration($clipDur)");
+				break;
+			}
+		}
+
 		$bitrates = array();
 		$finalFlavorParamsOutputs = array();
-		foreach($flavorParamsOutputs as $flavorParamsOutput)
+	
+		// check bitrates duplications & update clipping params
+		foreach($flavorParamsOutputs as $iFp=>$flavorParamsOutput)
 		{
 			if(!isset($bitrates[$flavorParamsOutput->getVideoBitrate()]))
 				$bitrates[$flavorParamsOutput->getVideoBitrate()] = array();
-				
+
+			// if one of clip params exsits - update the object and db
+			if(isset($clipOff)){
+				$flavorParamsOutputs[$iFp]->setClipOffset($clipOff);
+			}
+			if(isset($clipDur)){
+				$flavorParamsOutputs[$iFp]->setClipDuration($clipDur);
+			}
+			if(isset($clipOff) || isset($clipDur)){
+				$flavorParamsOutputs[$iFp]->save();
+			}
 			$bitrates[$flavorParamsOutput->getVideoBitrate()][] = $flavorParamsOutput->getId();
 			$finalFlavorParamsOutputs[$flavorParamsOutput->getId()] = $flavorParamsOutput;
 		}
+		
 		foreach($bitrates as $bitrate => $flavorParamsOutputIds)
 		{
 			if(count($flavorParamsOutputIds) == 1) // no bitrate dupliaction
