@@ -9,6 +9,8 @@
  */
 class VarConsoleService extends KalturaBaseService
 {
+    const MAX_SUB_PUBLISHERS = 2000;
+    
     public function initService($serviceId, $serviceName, $actionName)
     {
         parent::initService($serviceId, $serviceName, $actionName);
@@ -84,6 +86,12 @@ class VarConsoleService extends KalturaBaseService
 		$c = PartnerPeer::getDefaultCriteria();
 		$partnerFilterDb->attachToCriteria($c);
 		
+		$partnersCount = PartnerPeer::doCount($c);
+		if ($partnersCount > self::MAX_SUB_PUBLISHERS)
+		{
+		    throw new KalturaAPIException(KalturaVarConsoleErrors::MAX_SUB_PUBLISHERS_EXCEEDED);
+		}
+		
 		$partners = PartnerPeer::doSelect($c);
 		$partnerIds = array();
 		foreach($partners as &$partner)
@@ -112,6 +120,9 @@ class VarConsoleService extends KalturaBaseService
 		else
 		{
 		    $totalCount = 0;
+		    // since the pager will not really work here, we needc to customize its activity.
+		    $startingLine = $pager->pageSize*$pager->pageIndex -9;
+		    $countedLines = 0;
 			foreach ($partnerIds as $partnerId)
 			{
     			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 
@@ -122,15 +133,27 @@ class VarConsoleService extends KalturaBaseService
     				null  , // order by  
     				"$partnerId");
     				
-    			foreach ( $reportData as $line )
-    			{
-        			$item = new KalturaVarPartnerUsageItem();
-        			$item->fromPartner(PartnerPeer::retrieveByPK($partnerId));
-    				$item->fromString( $reportHeader , $line );
-        			$items[] = $item;
-    			}
-    			
+    			$countedLines += count($reportData);
+    				
     			$totalCount += count($reportData);
+    			if ( count($items) < $pager->pageSize)
+    			{
+        			foreach ( $reportData as $line )
+        			{
+                        $countedLines++;
+                        if ($countedLines >= $startingLine && count($items) < $pager->pageSize )
+                        {
+                			$item = new KalturaVarPartnerUsageItem();
+                			$item->fromPartner(PartnerPeer::retrieveByPK($partnerId));
+            				$item->fromString( $reportHeader , $line );
+                			$items[] = $item;
+                        }
+                        else if (count($items) >= $pager->pageSize)
+                        {
+                            break;
+                        }
+        			}
+    			}
 			    
 			}
 			
