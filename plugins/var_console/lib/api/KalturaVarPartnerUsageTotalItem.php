@@ -15,12 +15,12 @@ class KalturaVarPartnerUsageTotalItem extends KalturaVarPartnerUsageItem
 	{
 		if ( ! $arr ) return null ;
 		
-		$this->bandwidth 		= @$arr[0];
-		$this->storage 		= @$arr[1];
+		$this->bandwidth 		= ceil(@$arr[0]);
+		$this->storage 		= ceil(@$arr[1]);
 		//$item->totalStorage 	= @$arr[15];
-		$this->peakStorage =  @$arr[2];
-        $this->avgStorage = @$arr[3];
-        $this->combinedStorageBandwidth = @$arr[4];
+		$this->peakStorage =  ceil(@$arr[2]);
+        $this->avgStorage = ceil(@$arr[3]);
+        $this->combinedStorageBandwidth = ceil(@$arr[4]);
 			
 		//return $item;
 	}
