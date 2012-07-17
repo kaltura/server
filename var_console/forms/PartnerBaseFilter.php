@@ -33,12 +33,6 @@ class Form_PartnerBaseFilter extends Zend_Form
 			'decorators' 	=> array('ViewHelper', array('HtmlTag', array('tag' => 'div', 'id' => 'filter_text')))
 		));
 		
-		$this->addElement('text', 'filter_input_help', array(
-			'decorators' => array(
-				array('HtmlTag', array('tag' => 'div', 'class' => 'help', 'placement' => 'append')),
-			)
-		));
-		
 		
 		$this->addDisplayGroup(array('filter_type', 'filter_input', 'filter_input_help' ), 'filter_type_group', array(
 			'description' => 'partner-usage filter by',
