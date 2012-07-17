@@ -73,7 +73,7 @@
 								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')): ?>
 									<option value="manage" ><?php echo $this->translate('Manage'); ?></option>
 								<?php endif; ?>	
-								<?php if (Infra_AclHelper::isAllowed('partner','kmc-users')): ?>
+								<?php if (Infra_AclHelper::isAllowed('partner','kmc-users') && $partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
 									<option value="kmcUsers" ><?php echo $this->translate('KMC Users'); ?></option>
 								<?php endif; ?>
 								<?php if ($partner->id != Infra_Consts::TEMPLATE_PARTNER_ID): ?>
