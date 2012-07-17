@@ -866,8 +866,8 @@ return array(
     'partner-usage table averageStorage tooltip' => 'The average amount of storage consumption during the given date range for the specific publisher',
     'partner-usage table combinedBandwidthStorage tooltip' => 'The combined amount of bandwidth and storage consumed during the given date range for the specific publisher',
     'partner-usage table timeUnit tooltip' => 'The time unit at which the report was taken',
-    'partner-usage date-range filter type' => 'Date Range',
-    'partner-usage date-interval filter type' => 'Time Unit',
+    'partner-usage date-range filter type' => 'Date Range:',
+    'partner-usage date-interval filter type' => 'Time Unit:',
 
 	// partner-filter
 	'partner-filter filter by' => 'Search By:',
