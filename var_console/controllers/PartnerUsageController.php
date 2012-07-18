@@ -98,7 +98,8 @@ class PartnerUsageController extends Zend_Controller_Action
 		header('Content-Disposition: attachment; filename="'.$fileName.'"');
 
 		// echo the csv header
-		echo 	$this->view->translate('partner-usage table partnerStatus'), ',',
+		echo 	$this->view->translate('partner-usage table timeUnit'), ',',
+		        $this->view->translate('partner-usage table partnerStatus'), ',',
 				$this->view->translate('partner-usage table partnerName'), ',',
 				$this->view->translate('partner-usage table partnerId'), ',',
 				$this->view->translate('partner-usage table partnerCreatedAt'), ',',
@@ -106,7 +107,7 @@ class PartnerUsageController extends Zend_Controller_Action
 				//$this->view->translate('partner-usage table totalStorage'), ',',
 				$this->view->translate('partner-usage table storage'),',',
 				$this->view->translate('partner-usage table peakStorage'),',',
-				$this->view->translate('partner-usage table avgStorage'),',',
+				$this->view->translate('partner-usage table averageStorage'),',',
 				$this->view->translate('partner-usage table combinedBandwidthStorage'),
 				"\r\n";
 
@@ -114,7 +115,9 @@ class PartnerUsageController extends Zend_Controller_Action
 		foreach($items as $item)
 		{
 			$d = (new Zend_Date($item->partnerCreatedAt));
-			echo 	$this->view->enumTranslate('KalturaPartnerStatus', $item->partnerStatus), ',',
+			$dateId = strlen($item->dateId) == 6 ? DateTime::createFromFormat("Ym", $item->dateId) : DateTime::createFromFormat("Ymd", $item->dateId); 
+			echo 	strlen($item->dateId) == 6 ? $dateId->format("M Y") : $dateId->format("d M Y"),',',
+			        $this->view->enumTranslate('KalturaPartnerStatus', $item->partnerStatus), ',',
 					$item->partnerName, ',', 
 					$item->partnerId, ',', 
 					'"',$d->toString(Zend_Date::DATE_LONG), '",', 
