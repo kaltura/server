@@ -92,7 +92,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     			
     			if (!$authorizedPartnerId)
     			{
-    			    throw new Exception('Partner does not have the permissions required to proceed','SYSTEM_USER_INVALID_CREDENTIALS');
+    			    throw new Infra_UIInfraException('SYSTEM_USER_INVALID_CREDENTIALS');
     			}
     			
     		    $ks = $client->user->loginByLoginId($this->username, $this->password, $authorizedPartnerId);
@@ -102,7 +102,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     		
 			$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $this->password);
 			if ($partnerId && $user->partnerId != $partnerId) {
-				throw new Exception('Partner login info icorrect.','SYSTEM_USER_INVALID_CREDENTIALS');
+				throw new Infra_UIInfraException('SYSTEM_USER_INVALID_CREDENTIALS');
 			}
 			
 			return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
