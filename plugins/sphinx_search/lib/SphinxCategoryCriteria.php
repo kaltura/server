@@ -294,11 +294,6 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$filter->unsetByName('_in_full_name');
 		}
 
-		if($filter->get('_eq_full_ids'))
-		{
-			$filter->set('_eq_full_ids', $filter->get('_eq_full_ids') . category::FULL_IDS_EQUAL_MATCH_STRING);
-		}
-		
 		$categories = $filter->get( "_in_ancestor_id");
 		if ($categories !== null)
 		{
@@ -322,6 +317,12 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$filter->set('_matchor_full_ids', $fullIdsIn);
 			$filter->unsetByName('_likex_full_ids');
 		}
+		
+		if($filter->get('_eq_full_ids'))
+		{
+			$filter->set('_matchor_full_ids', $filter->get('_eq_full_ids') . category::FULL_IDS_EQUAL_MATCH_STRING);
+		}
+		$filter->unsetByName('_eq_full_ids');
 
 		if($filter->get('_likex_name_or_reference_id'))
 		{
