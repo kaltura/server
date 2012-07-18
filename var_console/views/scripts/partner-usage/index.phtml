@@ -153,7 +153,7 @@ jQuery('#date_range').change(function() {
 			from = new Date();
 			to = new Date();
 			from.setMonth(to.getMonth()-12);
-			from.setMonth(to.getDate()-1);
+			from.setDate(to.getDate()-1);
 			to.setDate(to.getDate()-2);
 			break;
 		case "this_year":
