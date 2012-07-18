@@ -122,10 +122,14 @@ jQuery('#date_range').change(function() {
 		case "week":
 			from = new Date();
 			to = new Date();
-			from.setDate(from.getDate() - 7);
-			to.setDate(to.getDate()-2);
+			from.setDate(from.getDate() - from.getDay());
+			to.setDate(to.getDay()-2 > 0 ? to.getDate()-2 : to.getDate());
 			break;
 		case "last_week":
+			from = new Date();
+			to = new Date();
+			from.setDate(from.getDate() - from.getDay()-7);
+			to.setDate(from.getDate + 6);
 			break;
 		case "last_30_days":
 			from = new Date();
@@ -166,6 +170,23 @@ jQuery('#date_range').change(function() {
 	jQuery('#to_date').val(formatDate(to));
 });
 
+
+function calcLastSunday(date) {
+	switch (date.getDay())
+	{
+		case 0:
+			return date;
+		case 1:
+			return date.setDate(date.getDate()-1);
+		case 2:
+			return date.setDate(date.getDate()-2);
+		case 3:
+			return date.setDate(date.getDate()-3);
+		case 4:
+		case 5:
+		case 6:
+	}
+}
 
 function formatDate(date) {
 	var dd = date.getDate();
