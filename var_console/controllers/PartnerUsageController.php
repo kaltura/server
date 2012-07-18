@@ -166,7 +166,7 @@ class PartnerUsageController extends Zend_Controller_Action
 	
 	private function getDefaultFromDate()
 	{
-		$ret = time() - 32*24*60*60;
+		$ret = time() - 31*24*60*60;
 		return date("m/d/Y", $ret);
 		
 	}
