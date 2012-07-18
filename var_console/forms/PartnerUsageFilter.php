@@ -85,7 +85,7 @@ class Form_PartnerUsageFilter extends Zend_Form
 		));
 		
 		// from
-		$from = new Zend_Date(time() - (60*60*24*30));
+		$from = new Zend_Date(time() - (60*60*24*32));
 		$this->addElement('text', 'from_date', array(
 			'value' 		=> $from->toString(self::getDefaultTranslator()->translate('datepicker format')),
 			'filters'		=> array('StringTrim'),
@@ -102,7 +102,7 @@ class Form_PartnerUsageFilter extends Zend_Form
 		));
 
 		// to
-		$to = new Zend_Date(time());
+		$to = new Zend_Date(time() - 2*24*60*60);
 		$this->addElement('text', 'to_date', array(
 			'value' 		=> $to->toString(self::getDefaultTranslator()->translate('datepicker format')), 
 			'filters'		=> array('StringTrim'),
