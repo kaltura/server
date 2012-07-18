@@ -18,6 +18,7 @@ class kEntitlementUtils
 	
 	public static function getEntitlementEnforcement()
 	{
+		return false;
 		return self::$entitlementEnforcement;
 	}
 	
@@ -298,7 +299,7 @@ class kEntitlementUtils
 		{
 			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY); 
-			$c->add(categoryPeer::ID, explode(',', $entry->getAllCategoriesIds()), Criteria::IN);
+			$c->add(categoryPeer::ID, explode(',', $entry->getAllCategoriesIds(true)), Criteria::IN);
 			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
