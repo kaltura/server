@@ -30,7 +30,7 @@ class category extends Basecategory implements IIndexable
 	
 	const FULL_NAME_EQUAL_MATCH_STRING = 'fullnameequalmatchstring';
 	
-	const FULL_IDS_EQUAL_MATCH_STRING = 'fullIdsequalmatchstring';
+	const FULL_IDS_EQUAL_MATCH_STRING = 'fullidsequalmatchstring';
 	
 	const MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY = 10;
 	
@@ -601,8 +601,6 @@ class category extends Basecategory implements IIndexable
 		
 	protected function addIndexEntryJob($categoryId, $shouldUpdate = false)
 	{
-		$partner = $this->getPartner();
-		
 		$featureStatusToRemoveIndex = new kFeatureStatus();
 		$featureStatusToRemoveIndex->setType(IndexObjectType::ENTRY);
 		
@@ -669,8 +667,6 @@ class category extends Basecategory implements IIndexable
 
 	protected function addIndexCategoryEntryJob($categoryId = null, $shouldUpdate = true)
 	{
-		$partner = $this->getPartner();
-		
 		$featureStatusToRemoveIndex = new kFeatureStatus();
 		$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY_ENTRY);
 		
@@ -686,8 +682,6 @@ class category extends Basecategory implements IIndexable
 	
 	protected function addIndexCategoryKuserJob($categoryId = null, $shouldUpdate = true)
 	{
-		$partner = $this->getPartner();
-		
 		$featureStatusToRemoveIndex = new kFeatureStatus();
 		$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY_USER);
 		
@@ -698,7 +692,6 @@ class category extends Basecategory implements IIndexable
 		$filter->setCategoryIdEqual($categoryId);
 
 		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_USER, $filter, $shouldUpdate, $featureStatusesToRemove);
-		
 	}
 	
 	/**
@@ -1552,15 +1545,19 @@ class category extends Basecategory implements IIndexable
 				$fullIds = $categoryId;
 			}
 			else
-			{ 
+			{
 				$parsedFullId .= md5($fullIds . categoryPeer::CATEGORY_SEPARATOR) . ' ';
+				KalturaLog::debug('#####: ' . __LINE__ . ' ## ' . $fullIds . categoryPeer::CATEGORY_SEPARATOR . ' = ' . $parsedFullId);
 				$fullIds .= '>' . $categoryId;
 			}
 			
 			$parsedFullId .= md5($fullIds) . ' ';
+			KalturaLog::debug('#####: ' . __LINE__ . ' ## ' . $fullIds . ' = ' . $parsedFullId);
 		}
 		
-		$parsedFullId .= md5($this->getFullIds() . category::FULL_IDS_EQUAL_MATCH_STRING);
+		$parsedFullId .= md5($fullIds . category::FULL_IDS_EQUAL_MATCH_STRING);
+		
+		KalturaLog::debug('#####: ' . __LINE__ . ' ## ' . print_r($this->getFullIds(), true) . category::FULL_IDS_EQUAL_MATCH_STRING . ' = ' . $parsedFullId);
 			
 		return $parsedFullId ;
 	}
