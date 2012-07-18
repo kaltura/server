@@ -134,7 +134,7 @@ jQuery('#date_range').change(function() {
 		case "last_30_days":
 			from = new Date();
 			to = new Date();
-			from.setDate(from.getDate() - 30);
+			from.setDate(from.getDate() - 31);
 			to.setDate(to.getDate()-2);
 			break;
 		case "this_month":
@@ -153,6 +153,7 @@ jQuery('#date_range').change(function() {
 			from = new Date();
 			to = new Date();
 			from.setMonth(to.getMonth()-12);
+			from.setMonth(to.getDate()-1);
 			to.setDate(to.getDate()-2);
 			break;
 		case "this_year":
