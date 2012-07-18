@@ -166,12 +166,17 @@ class PartnerUsageController extends Zend_Controller_Action
 	
 	private function getDefaultFromDate()
 	{
-		return 0;
+		$ret = time() - 32*24*60*60;
+		$dateTime = new DateTime($ret);
+		return $dateTime->format('m/d/Y');
+		
 	}
 	
 	private function getDefaultToDate()
 	{
-		return time();
+		$ret = time() - 2*24*60*60;
+		$dateTime = new DateTime($ret);
+		return $dateTime->format('m/d/Y');
 	}
 	
 	private static function generateKs() {
