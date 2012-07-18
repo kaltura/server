@@ -278,8 +278,9 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		
 		if($filter->get('_eq_full_name'))
 		{
-			$filter->set('_eq_full_name', $filter->get('_eq_full_name') . category::FULL_NAME_EQUAL_MATCH_STRING);
+			$filter->set('_matchor_full_name', $filter->get('_eq_full_name') . category::FULL_NAME_EQUAL_MATCH_STRING);
 		}
+		$filter->unsetByName('_eq_full_name');
 		
 		if($filter->get('_in_full_name'))
 		{
