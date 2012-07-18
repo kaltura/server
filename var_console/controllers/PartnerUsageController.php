@@ -58,8 +58,8 @@ class PartnerUsageController extends Zend_Controller_Action
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		$request = $this->getRequest();
-		$from = new Zend_Date($this->_getParam('from_date', $this->getDefaultFromDate()));
-		$to = new Zend_Date($this->_getParam('to_date', $this->getDefaultToDate()));
+		$from = $this->_getParam('from_date', $this->getDefaultFromDate());
+		$to = $this->_getParam('to_date', $this->getDefaultToDate());
 		$client = Infra_ClientHelper::getClient();
 		if ($client->getKs() == null) {
 			$client->setKs(self::generateKs());
@@ -70,8 +70,8 @@ class PartnerUsageController extends Zend_Controller_Action
 		// init filters
 		$partnerFilter = $this->getPartnerFilterFromForm($form);
 		$usageFilter = new Kaltura_Client_Type_ReportInputFilter();
-		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
-		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
+		$usageFilter->fromDate = DateTime::createFromFormat('m/d/Y', $from)->getTimestamp();
+		$usageFilter->toDate = DateTime::createFromFormat('m/d/Y', $to)->getTimestamp();
 		$usageFilter->timeZoneOffset =Infra_AuthHelper::getAuthInstance()->getIdentity()->getTimezoneOffset();
 		
 		$pager = new Kaltura_Client_Type_FilterPager();
