@@ -44,6 +44,21 @@ class thumbnailAction extends sfAction
 			
 		return preg_replace("/^(.*)\.($exts)$/", '$1', $val);
 	}
+
+	public function getIntRequestParameter($name, $default, $min, $max)
+	{
+		return min($max, max($min, intval($this->getRequestParameter($name, $default))));
+	}
+
+	public function getFloatRequestParameter($name, $default, $min, $max = null)
+	{
+		$val = max($min, floatval($this->getRequestParameter($name, $default)));
+		if(is_null($max))
+			return $val;
+			
+		return min($max, $val);
+	}
+  
   
 	/**
 	 * Will forward to the regular swf player according to the widget_id 
@@ -56,43 +71,40 @@ class thumbnailAction extends sfAction
 		
 		ignore_user_abort();
 		
-		$entry_id = $this->getRequestParameter( "entry_id" );
-		$widget_id = $this->getRequestParameter( "widget_id", 0 );
-		$upload_token_id = $this->getRequestParameter( "upload_token_id" );
-		$version = $this->getRequestParameter( "version", null );
-		$type = $this->getRequestParameter( "type" , 1);
+		$entry_id = $this->getRequestParameter("entry_id");
+		$widget_id = $this->getRequestParameter("widget_id", 0);
+		$upload_token_id = $this->getRequestParameter("upload_token_id");
+		$version = $this->getIntRequestParameter("version", null, 0, 10000000);
+		$type = $this->getIntRequestParameter("type", 1, 1, 5);
 		//Hack: if KMS sends thumbnail request containing "!" char, the type should be treated as 5.
-		$width = $this->getRequestParameter( "width", -1 );
-		if (strpos($width, "!" ))
-		{
-		    list ($width, $rest) = explode("!", $width);
-		    $type = 5;
-		}
-		$height = $this->getRequestParameter( "height", -1 );
-	    if (strpos($height, "!" ))
-		{
-		    list ($height, $rest) = explode("!", $height);
-		    $type = 5;
-		}
-		$crop_provider = $this->getRequestParameter( "crop_provider", null);
-		$quality = $this->getRequestParameter( "quality" , 0);
-		$src_x = $this->getRequestParameter( "src_x" , 0);
-		$src_y = $this->getRequestParameter( "src_y" , 0);
-		$src_w = $this->getRequestParameter( "src_w" , 0);
-		$src_h = $this->getRequestParameter( "src_h" , 0);
-		$vid_sec = $this->getRequestParameter( "vid_sec" , -1);
-		$vid_slice = $this->getRequestParameter( "vid_slice" , -1);
-		$vid_slices = $this->getRequestParameter( "vid_slices" , -1);
-		$density = $this->getRequestParameter( "density" , 0);
-		$stripProfiles = $this->getRequestParameter( "strip" , null);
-		$flavor_id =  $this->getRequestParameter( "flavor_id" , null);
-		$file_name =  $this->getRequestParameter( "file_name" , null);
+		
+		$width = $this->getRequestParameter("width", -1);
+		$height = $this->getRequestParameter("height", -1);
+		if(strpos($width, "!") || strpos($height, "!"))
+			$type = 5;
+		
+		$width = $this->getFloatRequestParameter("width", -1, -1, 10000);
+		$height = $this->getFloatRequestParameter("height", -1, -1, 10000);
+		
+		$crop_provider = $this->getRequestParameter("crop_provider", null);
+		$quality = $this->getIntRequestParameter("quality", 0, 20, 100);
+		$src_x = $this->getFloatRequestParameter("src_x", 0, 0, 10000);
+		$src_y = $this->getFloatRequestParameter("src_y", 0, 0, 10000);
+		$src_w = $this->getFloatRequestParameter("src_w", 0, 0, 10000);
+		$src_h = $this->getFloatRequestParameter("src_h", 0, 0, 10000);
+		$vid_sec = $this->getFloatRequestParameter("vid_sec", -1, 0);
+		$vid_slice = $this->getRequestParameter("vid_slice", -1);
+		$vid_slices = $this->getRequestParameter("vid_slices", -1);
+		$density = $this->getFloatRequestParameter("density", 0, 0);
+		$stripProfiles = $this->getRequestParameter("strip", null);
+		$flavor_id = $this->getRequestParameter("flavor_id", null);
+		$file_name = $this->getRequestParameter("file_name", null);
 		$file_name = basename($file_name);
 		
 		// actual width and height of image from which the src_* values were taken.
 		// these will be used to multiply the src_* parameters to make them relate to the original image size.
-		$rel_width  = $this->getRequestParameter( "rel_width", -1 );
-		$rel_height = $this->getRequestParameter( "rel_height", -1 );
+		$rel_width = $this->getFloatRequestParameter("rel_width", -1, -1, 10000);
+		$rel_height = $this->getFloatRequestParameter("rel_height", -1, -1, 10000);
 				
 		if ($width == -1 && $height == -1) // for sake of backward compatibility if no dimensions where specified create 120x90 thumbnail
 		{
