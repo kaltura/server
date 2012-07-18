@@ -1547,18 +1547,14 @@ class category extends Basecategory implements IIndexable
 			else
 			{
 				$parsedFullId .= md5($fullIds . categoryPeer::CATEGORY_SEPARATOR) . ' ';
-				KalturaLog::debug('#####: ' . __LINE__ . ' ## ' . $fullIds . categoryPeer::CATEGORY_SEPARATOR . ' = ' . $parsedFullId);
 				$fullIds .= '>' . $categoryId;
 			}
 			
 			$parsedFullId .= md5($fullIds) . ' ';
-			KalturaLog::debug('#####: ' . __LINE__ . ' ## ' . $fullIds . ' = ' . $parsedFullId);
 		}
 		
 		$parsedFullId .= md5($fullIds . category::FULL_IDS_EQUAL_MATCH_STRING);
 		
-		KalturaLog::debug('#####: ' . __LINE__ . ' ## ' . print_r($this->getFullIds(), true) . category::FULL_IDS_EQUAL_MATCH_STRING . ' = ' . $parsedFullId);
-			
 		return $parsedFullId ;
 	}
 	
