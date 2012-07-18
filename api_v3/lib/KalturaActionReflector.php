@@ -82,12 +82,6 @@ class KalturaActionReflector extends KalturaReflector
                     $this->_actionClassInfo = $actionFromCache["actionClassInfo"];
 			}
 		}
-		else 
-		{
-		    $this->_actionInfo = null;
-            $this->_actionParams = null;
-            $this->_actionClassInfo = null;
-		}
     }
     
     /**
