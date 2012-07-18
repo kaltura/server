@@ -10,8 +10,8 @@ class PartnerUsageController extends Zend_Controller_Action
 		$request = $this->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
-		$from = new Zend_Date($this->_getParam('from_date', $this->getDefaultFromDate()));
-		$to = new Zend_Date($this->_getParam('to_date', $this->getDefaultToDate()));
+		//$from = new Zend_Date($this->_getParam('from_date', $this->getDefaultFromDate()));
+		//$to = new Zend_Date($this->_getParam('to_date', $this->getDefaultToDate()));
 		
 		$client = Infra_ClientHelper::getClient();
 		
@@ -30,8 +30,8 @@ class PartnerUsageController extends Zend_Controller_Action
 		// init filters
 		
 		$usageFilter = new Kaltura_Client_Type_ReportInputFilter();
-		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
-		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
+		$usageFilter->fromDate = DateTime::createFromFormat('m/d/Y', $from)->getTimestamp();
+		$usageFilter->toDate = DateTime::createFromFormat('m/d/Y', $to)->getTimestamp();
 		$usageFilter->timeZoneOffset = Infra_AuthHelper::getAuthInstance()->getIdentity()->getTimezoneOffset();
 		if ($form->getElement('interval')->getValue())
 		{
