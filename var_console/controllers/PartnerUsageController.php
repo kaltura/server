@@ -10,8 +10,8 @@ class PartnerUsageController extends Zend_Controller_Action
 		$request = $this->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
-		//$from = new Zend_Date($this->_getParam('from_date', $this->getDefaultFromDate()));
-		//$to = new Zend_Date($this->_getParam('to_date', $this->getDefaultToDate()));
+		$from = $this->_getParam('from_date', $this->getDefaultFromDate());
+		$to = $this->_getParam('to_date', $this->getDefaultToDate());
 		
 		$client = Infra_ClientHelper::getClient();
 		
