@@ -93,7 +93,7 @@ class PartnerUsageController extends Zend_Controller_Action
 		}
 		
 		$format = $this->view->translate('csv date');
-		$fileName = 'Usage report '.$from->toString($format).' to '.$to->toString($format).'.csv';
+		$fileName = 'Usage report '.$from.' to '.$to.'.csv';
 		header('Content-type: text/csv');
 		header('Content-Disposition: attachment; filename="'.$fileName.'"');
 
