@@ -32,7 +32,7 @@ class PartnerUsageController extends Zend_Controller_Action
 		$usageFilter = new Kaltura_Client_Type_ReportInputFilter();
 		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
-		$usageFilter->timeZoneOffset =Infra_AuthHelper::getAuthInstance()->getIdentity()->getTimezoneOffset();
+		$usageFilter->timeZoneOffset = Infra_AuthHelper::getAuthInstance()->getIdentity()->getTimezoneOffset();
 		if ($form->getElement('interval')->getValue())
 		{
 		    $usageFilter->interval = ($form->getElement('interval')->getValue() == 'daily') ? Kaltura_Client_Enum_ReportInterval::DAYS : Kaltura_Client_Enum_ReportInterval::MONTHS;
@@ -104,9 +104,9 @@ class PartnerUsageController extends Zend_Controller_Action
 				$this->view->translate('partner-usage table partnerCreatedAt'), ',',
 				$this->view->translate('partner-usage table bandwidth'), ',',
 				//$this->view->translate('partner-usage table totalStorage'), ',',
-				$this->view->translate('partner-usage table storage'),
-				$this->view->translate('partner-usage table peakStorage'),
-				$this->view->translate('partner-usage table avgStorage'),
+				$this->view->translate('partner-usage table storage'),',',
+				$this->view->translate('partner-usage table peakStorage'),',',
+				$this->view->translate('partner-usage table avgStorage'),',',
 				$this->view->translate('partner-usage table combinedBandwidthStorage'),
 				"\r\n";
 
@@ -120,10 +120,10 @@ class PartnerUsageController extends Zend_Controller_Action
 					'"',$d->toString(Zend_Date::DATE_LONG), '",', 
 					(int)$item->bandwidth, ',',
 					//(int)$item->totalStorage, ',',
-					(int)$item->storage,
-					(int)$item->peakStorage,
-					(int)$item->avgStorage,
-					(int)$item->combinedStorageBandwidth,
+					(int)$item->storage,',',
+					(int)$item->peakStorage,',',
+					(int)$item->avgStorage,',',
+					(int)$item->combinedStorageBandwidth,',',
 					"\r\n";
 		}
 	}
