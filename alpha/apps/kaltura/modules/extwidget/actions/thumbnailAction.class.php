@@ -38,7 +38,7 @@ class thumbnailAction extends sfAction
 	{
 		$exts = implode('|', self::$extensions);
 	
-		$val = $this->getRequestParameter($name, $default);
+		$val = parent::getRequestParameter($name, $default);
 		if(!$val)
 			return $val;
 			
