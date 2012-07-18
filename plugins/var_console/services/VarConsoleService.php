@@ -141,8 +141,6 @@ class VarConsoleService extends KalturaBaseService
     				null  , // order by  
     				"$partnerId");
     				
-    			$countedLines += count($reportData);
-    				
     			$totalCount += count($reportData);
     			if ( count($items) < $pager->pageSize)
     			{
