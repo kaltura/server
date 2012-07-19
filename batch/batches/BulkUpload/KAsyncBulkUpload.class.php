@@ -111,15 +111,16 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 		$data = $engine->getData();
 
 		$countHandledObjects = $this->countCreatedObjects($job->id, $job->data->bulkUploadObjectType);
-		
+				
 		if(!$countHandledObjects)
-			throw new KalturaBatchException("No objects were handled successfully", KalturaBatchJobAppErrors::BULK_NO_ENTRIES_HANDLED);
-			
+			throw new KalturaBatchException("None of the uploaded items were processed succsessfuly", KalturaBatchJobAppErrors::BULK_NO_ENTRIES_HANDLED);
+		
 		if($engine->shouldRetry())
 		{
+			$handledObjectsTypeName = $this->getBulkUploadObectTypeName($job->data->bulkUploadObjectType);
 			KalturaLog::debug("Set the job to retry");
 			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
-			return $this->closeJob($job, null, null, "Handled [$countHandledObjects] objects of type [". $job->data->bulkUploadObjectType ."]", KalturaBatchJobStatus::RETRY);
+			return $this->closeJob($job, null, null, "Retrying: [$countHandledObjects] $handledObjectsTypeName objects were handled untill now", KalturaBatchJobStatus::RETRY);
 		}
 			
 		return $this->closeJob($job, null, null, 'Waiting for objects closure', KalturaBatchJobStatus::ALMOST_DONE, $data);
@@ -133,5 +134,33 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 	protected function countCreatedObjects($jobId, $bulkuploadObjectType) 
 	{
 		return $this->kClient->batch->countBulkUploadEntries($jobId, $bulkuploadObjectType);
+	}
+	
+	/**
+	 * 
+	 * Extract bulkUploadObjectType name from enum according to it's id
+	 * @param int $bulkuploadObjectType
+	 * @return string
+	 */
+	private function getBulkUploadObectTypeName($bulkuploadObjectType)
+	{
+		$bulkuploadObjectTypeName = $bulkuploadObjectType;
+	    try 
+	    {
+        	$reflectedClass = new ReflectionClass('KalturaBulkUploadObjectType');
+        	$array = $reflectedClass->getConstants();
+        	foreach ($array as $typeName => $typeId) {
+        		if ($typeId == $bulkuploadObjectType) {
+        			$bulkuploadObjectTypeName = $typeName;
+         			return $bulkuploadObjectTypeName;
+        		}
+        	}
+    	} 
+    	catch (Exception $exception) 
+    	{
+        	//return type id
+        	KalturaLog::debug($exception);
+    	} 
+		return $bulkuploadObjectTypeName;
 	}
 }
