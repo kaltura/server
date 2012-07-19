@@ -92,7 +92,7 @@ class thumbnailAction extends sfAction
 		$src_y = $this->getFloatRequestParameter("src_y", 0, 0, 10000);
 		$src_w = $this->getFloatRequestParameter("src_w", 0, 0, 10000);
 		$src_h = $this->getFloatRequestParameter("src_h", 0, 0, 10000);
-		$vid_sec = $this->getFloatRequestParameter("vid_sec", -1, 0);
+		$vid_sec = $this->getFloatRequestParameter("vid_sec", -1);
 		$vid_slice = $this->getRequestParameter("vid_slice", -1);
 		$vid_slices = $this->getRequestParameter("vid_slices", -1);
 		$density = $this->getFloatRequestParameter("density", 0, 0);
