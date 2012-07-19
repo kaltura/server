@@ -525,8 +525,8 @@ abstract public class KalturaClientBase {
 			
 			// remove line breaks in the session string
 			String ks = hashedString.replace("\n", "");
-			ks = hashedString.replace("\r", "");
-			
+			ks = ks.replace("\r", "");
+
 			// return the generated session key (KS)
 			return ks;
 		} catch (NoSuchAlgorithmException ex)
