@@ -121,13 +121,17 @@
 							$serviceId = $serviceActionItem->serviceId;
 							$serviceName = $serviceActionItem->serviceInfo->serviceName;
 							$serviceLabel = $serviceActionItem->serviceInfo->serviceName;
-							$pluginName = $serviceActionItem->serviceInfo->package;
-							
-							if ($pluginName)
+
+							$package = $serviceActionItem->serviceInfo->package;
+							if (kString::beginsWith($package, 'plugins.'))
+							{
+								$package = explode('.', $package);
+								$pluginName = $package[1];
 								$serviceName = "$pluginName.$serviceName";
+							}
 							
 							if ($serviceActionItem->serviceInfo->deprecated)
-								$serviceLabel . ' (deprecated)';
+								$serviceLabel .= ' (deprecated)';
 							
 							echo "<option value=\"$serviceId\" title=\"$serviceName\">$serviceLabel</option>";
 						}

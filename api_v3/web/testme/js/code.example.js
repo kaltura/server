@@ -683,7 +683,7 @@ KCodeExamplePHP.prototype.getService = function (service, plugin, entity){
 	
 	var pluginClientName = plugin + "ClientPlugin";
 	var pluginClientClass = "Kaltura" + pluginClientName.substr(0, 1).toUpperCase() + pluginClientName.substr(1);
-	var jqPluginObject = this.codeVar("pluginClientName");
+	var jqPluginObject = this.codeVar(plugin + "Plugin");
 	var jqFunction = this.codeFunction('get', [this.jqClientObject.clone(true)]);
 	
 	this.addCode(this.codeAssign(jqPluginObject.clone(true), this.codeClassMethod(pluginClientClass, jqFunction)), entity);
