@@ -8,56 +8,56 @@ class kBulkUploadJobData extends kJobData
 /**
 	 * @var int
 	 */
-	protected $userId;
+	private $userId;
 	
 	/**
 	 * The screen name of the user
 	 * 
 	 * @var string
 	 */
-	protected $uploadedBy;
+	private $uploadedBy;
 	
 	/**
 	 * Selected profile id for all bulk entries
 	 * @deprecated
 	 * @var int
 	 */
-	protected $conversionProfileId;
+	private $conversionProfileId;
 		
 	/**
 	 * Number of created entries
 	 * @deprecated Use numOfObjects instead
 	 * @var int
 	 */
-	protected $numOfEntries;
+	private $numOfEntries;
 	
 	/**
 	 * Created by the API
 	 * 
 	 * @var string
 	 */
-	protected $resultsFileLocalPath;
+	private $resultsFileLocalPath;
 	
 	/**
 	 * Created by the API
 	 * 
 	 * @var string
 	 */
-	protected $resultsFileUrl;
+	private $resultsFileUrl;
 
 	/**
 	 * 
 	 * The bulk upload job file path
 	 * @var string
 	 */
-	protected $filePath;
+	private $filePath;
 	
 	/**
 	 * 
 	 * The bulk upload job file name
 	 * @var string
 	 */
-	protected $fileName;
+	private $fileName;
 	
 	/**
 	 * Type of object for bulk upload
@@ -241,7 +241,7 @@ class kBulkUploadJobData extends kJobData
     }
     
 	/**
-     * @return INT
+     * @return int
      */
     public function getNumOfErrorObjects ()
     {
