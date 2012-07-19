@@ -109,10 +109,10 @@ class Form_PartnerUsageFilter extends Zend_Form
 			'decorators' 	=> array('ViewHelper')
 		));
 		
-		$this->addElement('text', 'clear_dates', array(
-			'description' => 'partner-usage filter clear dates',
-			'decorators' 	=> array(array('Description', array('tag' => 'a', 'id' => 'clear_dates')))
-		));
+//		$this->addElement('text', 'clear_dates', array(
+//			'description' => 'partner-usage filter clear dates',
+//			'decorators' 	=> array(array('Description', array('tag' => 'a', 'id' => 'clear_dates')))
+//		));
 
 		
 		$this->addDisplayGroup(array('date_range'), 'date_range_group', array(
