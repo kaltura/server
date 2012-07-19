@@ -19,7 +19,6 @@ class PartnerUsageController extends Zend_Controller_Action
 		
 		$form->populate($request->getParams());
 		
-		$form->setAction('index');
 		
 		// when no statuses selected
 		if (!$form->getElement('include_active')->getValue() && !$form->getElement('include_blocked')->getValue() && !$form->getElement('include_removed')->getValue())
