@@ -364,6 +364,17 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			return null;
 		}
 		
+		if (!$this->isNull('partnerParentId'))
+		{
+		    $parentPartnerDb = PartnerPeer::retrieveByPK($this->partnerParentId);
+		    
+		    if ($parentPartnerDb->getPartnerGroupType() != KalturaPartnerGroupType::GROUP 
+		        && $parentPartnerDb->getPartnerGroupType() != KalturaPartnerGroupType::VAR_GROUP)
+		    {
+		        throw new KalturaAPIException(SystemPartnerErrors::UNABLE_TO_FORM_GROUP_ASSOCIATION, $this->partnerParentId, $parentPartnerDb->getPartnerGroupType());
+		    }
+		}
+		
 		if(!is_null($this->permissions))
 		{
 			foreach($this->permissions as $permission)
