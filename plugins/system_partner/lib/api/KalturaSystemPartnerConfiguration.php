@@ -364,7 +364,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			return null;
 		}
 		
-		if (!$this->isNull('partnerParentId'))
+		if (!$this->isNull('partnerParentId') && $this->partnerParentId > 0)
 		{
 		    $parentPartnerDb = PartnerPeer::retrieveByPK($this->partnerParentId);
 		    
