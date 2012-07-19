@@ -63,6 +63,7 @@ class PartnerController extends Zend_Controller_Action
 		
 		$varConsoleFilter = new Kaltura_Client_VarConsole_Type_VarConsolePartnerFilter();
 		$varConsoleFilter->groupTypeEq = Kaltura_Client_Enum_PartnerGroupType::TEMPLATE;
+		$varConsoleFilter->statusEqual = Kaltura_Client_Enum_PartnerStatus::ACTIVE;
 		$pager = new Kaltura_Client_Type_FilterPager();
 		$templatePartnerList = $client->partner->listAction($varConsoleFilter, $pager);
 		
