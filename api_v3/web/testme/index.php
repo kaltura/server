@@ -125,7 +125,7 @@
 							$package = $serviceActionItem->serviceInfo->package;
 							if (kString::beginsWith($package, 'plugins.'))
 							{
-								$package = explode('.', $package);
+								$package = explode('.', $package, 2);
 								$pluginName = $package[1];
 								$serviceName = "$pluginName.$serviceName";
 							}
