@@ -171,24 +171,6 @@ jQuery('#date_range').change(function() {
 	jQuery('#to_date').val(formatDate(to));
 });
 
-
-function calcLastSunday(date) {
-	switch (date.getDay())
-	{
-		case 0:
-			return date;
-		case 1:
-			return date.setDate(date.getDate()-1);
-		case 2:
-			return date.setDate(date.getDate()-2);
-		case 3:
-			return date.setDate(date.getDate()-3);
-		case 4:
-		case 5:
-		case 6:
-	}
-}
-
 function formatDate(date) {
 	var dd = date.getDate();
 	var mm = date.getMonth()+1;//January is 0!
