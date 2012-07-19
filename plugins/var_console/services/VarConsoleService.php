@@ -58,6 +58,7 @@ class VarConsoleService extends KalturaBaseService
      * @param KalturaReportInputFilter $usageFilter
      * @param KalturaFilterPager $pager
      * @return KalturaPartnerUsageListResponse
+     * @throws KalturaVarConsoleErrors::MAX_SUB_PUBLISHERS_EXCEEDED
      */
     public function getPartnerUsageAction (KalturaPartnerFilter $partnerFilter = null, KalturaReportInputFilter $usageFilter = null, KalturaFilterPager $pager = null)
     {
@@ -121,6 +122,7 @@ class VarConsoleService extends KalturaBaseService
 		
 		if ( ! count($partnerIds ) )
 		{
+		    $total = new KalturaVarPartnerUsageTotalItem();
 			// no partners fit the filter - don't fetch data	
 			$totalCount = 0;
 			// the items are set to an empty KalturaSystemPartnerUsageArray
@@ -163,18 +165,18 @@ class VarConsoleService extends KalturaBaseService
 			    
 			}
 			
-		}
-		
-		$response = new KalturaPartnerUsageListResponse();
-		
-		list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTotal( 
+			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTotal( 
     				null , 
     				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
     				$inputFilter ,
     				implode(",", $partnerIds));
 		
-		$total = new KalturaVarPartnerUsageTotalItem();
-		$total->fromString($reportHeader, $reportData);
+    		$total = new KalturaVarPartnerUsageTotalItem();
+    		$total->fromString($reportHeader, $reportData);
+			
+		}
+		
+		$response = new KalturaPartnerUsageListResponse();
 		
 		//Sort partner usage results by time unit
 		uasort($items, array($this, 'sortByDate'));
