@@ -2,7 +2,7 @@
 
 ini_set("memory_limit", "2048M");
 
-define('PS2_START_MARKER', 'symfony [info] {sfRequest} request parameters ');
+define('PS2_START_MARKER', '[sfWebRequest->loadParameters] INFO: {sfRequest} request parameters ');
 define('APIV3_START_MARKER', '[KalturaFrontController->run] DEBUG: Params [');
 define('APIV3_GETFEED_MARKER', '[syndicationFeedRenderer] [global] DEBUG: getFeed Params [');
 
