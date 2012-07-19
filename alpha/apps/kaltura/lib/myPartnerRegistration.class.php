@@ -368,12 +368,35 @@ class myPartnerRegistration
 		entryPeer::setUseCriteriaFilter(false);
 		$allEntries = entryPeer::doSelect($c);
 		entryPeer::setUseCriteriaFilter(true);
+		
+		
+		// set the new partner id into the default category criteria filter
+ 		$defaultCategoryFilter = categoryPeer::getCriteriaFilter()->getFilter();
+ 		$oldPartnerIdCategory = $defaultCategoryFilter->get(categoryPeer::PARTNER_ID);
+ 		$defaultCategoryFilter->remove(categoryPeer::PARTNER_ID);
+ 		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $partnerId);
+ 		
+ 		// set the new partner id into the default category criteria filter
+ 		$defaultCategoryEntryFilter = categoryEntryPeer::getCriteriaFilter()->getFilter();
+ 		$oldPartnerIdCategoryEntry = $defaultCategoryFilter->get(categoryEntryPeer::PARTNER_ID);
+ 		$defaultCategoryEntryFilter->remove(categoryEntryPeer::PARTNER_ID);
+ 		$defaultCategoryEntryFilter->addAnd(categoryEntryPeer::PARTNER_ID, $partnerId);
+
 		foreach ($allEntries as $entry)
 		{
 			$entry->setKuserId($kuserId);
 			$entry->setCreatorKuserId($kuserId);
 			$entry->save();
 		}
+		
+		kEventsManager::flushEvents();
+		
+		// restore the original partner id in the default category criteria filter
+		$defaultCategoryFilter->remove(categoryPeer::PARTNER_ID);
+ 		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $oldPartnerIdCategory);
+ 		
+ 		$defaultCategoryEntryFilter->remove(categoryEntryPeer::PARTNER_ID);
+ 		$defaultCategoryEntryFilter->addAnd(categoryEntryPeer::PARTNER_ID, $oldPartnerIdCategoryEntry);
 	}
 }
 
