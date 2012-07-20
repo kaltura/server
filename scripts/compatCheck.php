@@ -388,7 +388,10 @@ function normalizeResultBuffer($result)
 	$result = preg_replace('/<server_time>[0-9\.]+<\/server_time>/', '', $result);
 	$result = preg_replace('/server_time="[0-9\.]+"/', '', $result);
 	$result = preg_replace('/kaltura_player_\d+/', 'KP', $result);
-	$result = str_replace($serviceUrlNew, $serviceUrlOld, $result);
+	if (strlen($serviceUrlOld) < strlen($serviceUrlNew))		// this if is for case where one of the url is a prefix of the other
+		$result = str_replace($serviceUrlNew, $serviceUrlOld, $result);
+	else
+		$result = str_replace($serviceUrlOld, $serviceUrlNew, $result);
 	
 	$patterns = array('/\/ks\/([a-zA-Z0-9+]+=*)/', '/&ks=([a-zA-Z0-9+\/]+=*)/', '/\?ks=([a-zA-Z0-9+\/]+=*)/');
 	foreach ($patterns as $pattern)
