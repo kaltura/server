@@ -100,7 +100,7 @@ jQuery('#from_date').change( function() {
 	if (from.getTime() > to.getTime())
 	{	
 		alert('The from date is larger than the to date');
-		this.setAttribute('value', '');
+		jQuery('#from_date').val('');
 	}
 });
 
@@ -111,7 +111,7 @@ jQuery('#to_date').change( function() {
 	if (from.getTime() > to.getTime())
 	{	
 		alert('The from date is larger than the to date');
-		this.setAttribute('value', '');
+		jQuery('#to_date').val('');
 	}
 });
 
