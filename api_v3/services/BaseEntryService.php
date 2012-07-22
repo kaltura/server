@@ -277,6 +277,7 @@ class BaseEntryService extends KalturaEntryService
 	    $dbEntry->setSubpId($this->getPartnerId() * 100);
 	    $dbEntry->setSourceId( $uploadTokenId );
 	    $dbEntry->setSourceLink( $entryFullPath );
+	    myEntryUtils::setEntryTypeAndMediaTypeFromFile($dbEntry, $entryFullPath);
 	    $dbEntry->setDefaultModerationStatus();
 		
 		// hack due to KCW of version  from KMC
@@ -287,9 +288,7 @@ class BaseEntryService extends KalturaEntryService
 	    
 	    $kshow = $this->createDummyKShow();
 	    $kshowId = $kshow->getId();
-			    
-	    myEntryUtils::setEntryTypeAndMediaTypeFromFile($dbEntry, $entryFullPath);
-				
+	    
 	    // setup the needed params for my insert entry helper
 	    $paramsArray = array (
 		    "entry_media_source" => KalturaSourceType::FILE,
