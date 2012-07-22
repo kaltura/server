@@ -103,13 +103,17 @@ class UserController extends Zend_Controller_Action
 		{
 			$client = Infra_ClientHelper::getClient();
 			$userEmail = $request->getPost('email');
-
-			$client->user->resetPassword($userEmail); // ask to reset password
-			//TODO: check for exceptions!
-			
-			$tranlsate = $this->getFrontController()->getParam('bootstrap')->getResource('translate'); // TODO: add translate action helper
-			$form->setDescription(sprintf($tranlsate->_('password instructions emailed to %s'), $request->getPost('email')));
-			$form->hideForm();
+            try 
+            {
+    			$client->user->resetPassword($userEmail); // ask to reset password
+    			$tranlsate = $this->getFrontController()->getParam('bootstrap')->getResource('translate'); // TODO: add translate action helper
+    			$form->setDescription(sprintf($tranlsate->_('password instructions emailed to %s'), $request->getPost('email')));
+    			$form->hideForm();
+            }
+            catch (Exception $e)
+            {
+                $form->setDescription('Login error: '.$e->getMessage());
+            }
 			
 		}
 		
