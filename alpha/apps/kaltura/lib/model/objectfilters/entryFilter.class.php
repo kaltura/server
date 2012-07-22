@@ -342,19 +342,13 @@ class entryFilter extends baseObjectFilter
 		$statuses = explode(',', trim($statuses));
 		
 		$categoryFullIdsToIds = array();
-		foreach($cats as $cat)
+		foreach($cats as $catId)
 		{				
-			$categories = categoryPeer::getByFullIdsWildcardMatchForCategoryId($cat);
-			if(!$categories)
-				continue;
-
-			foreach($categories as $category)
+			foreach ($statuses as $status)
 			{
-				foreach ($statuses as $status)
-				{
-					$categoryFullIdsToIds[] = entry::CATEGORY_SEARCH_PERFIX . $category->getId() . 
-							entry::CATEGORY_SEARCH_STATUS . $status;
-				}
+				//should return category itsef or sub categories
+				$categoryFullIdsToIds[] = entry::CATEGORY_SEARCH_PERFIX		   . $catId . entry::CATEGORY_SEARCH_STATUS . $status;
+				$categoryFullIdsToIds[] = entry::CATEGORY_PARENT_SEARCH_PERFIX . $catId . entry::CATEGORY_SEARCH_STATUS . $status;
 			}
 		}
 
@@ -384,14 +378,27 @@ class entryFilter extends baseObjectFilter
 		$categoryFullNamesToIds = array();
 		foreach($cats as $cat)
 		{
-			$categories = categoryPeer::getByFullNameWildcardMatch($cat);
-			foreach($categories as $category)
+			if(substr($cat, -1) == '>')
 			{
-				foreach ($statuses as $status)
-				{
-					$categoryFullNamesToIds[] = entry::CATEGORY_SEARCH_PERFIX . $category->getId() .
-							entry::CATEGORY_SEARCH_STATUS . $status;
-				}
+				//entries that doesn't belog directly to this category - but only to the sub categories.
+				$categorySearchPrefix = entry::CATEGORY_PARENT_SEARCH_PERFIX;
+				$cat = substr($cat, 0, strlen($cat) - 1);
+			}
+			else
+			{
+				//entries that belog directly to this category or to a sub categories.
+				$categorySearchPrefix = entry::CATEGORY_OR_PARENT_SEARCH_PERFIX;
+			} 
+			
+			$category = categoryPeer::getByFullNameExactMatch($cat);
+			
+			if(!$category)
+				$category = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
+			
+			foreach ($statuses as $status)
+			{
+				$categoryFullNamesToIds[] = $categorySearchPrefix . $category->getId() .
+						entry::CATEGORY_SEARCH_STATUS . $status;
 			}
 		}
 

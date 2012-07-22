@@ -123,7 +123,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const ENTRY_ID_THAT_DOES_NOT_EXIST = 0;
 	
 	const CATEGORY_SEARCH_PERFIX = 'c';
-	
+	const CATEGORY_PARENT_SEARCH_PERFIX = 'p';
+	const CATEGORY_OR_PARENT_SEARCH_PERFIX = 'pc';
 	const CATEGORY_SEARCH_STATUS = 's'; 
 	
 	private $appears_in = null;
@@ -2590,11 +2591,30 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		foreach($allCategoriesEntry as $categoryEntry)
 		{
 			$categoriesEntryStringIndex[] = self::CATEGORY_SEARCH_PERFIX . $categoryEntry->getCategoryId() . 
-			self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus();
+				self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus();
+			
+			//index all category's parents - for easier searchs on entry->list with filter of categoriesMatchOr
+			$categoryFullIds = explode(categoryPeer::CATEGORY_SEPARATOR, $categoryEntry->getCategoryFullIds());
+			
+			foreach($categoryFullIds as $categoryId)
+			{
+				if($categoryId != $categoryEntry->getCategoryId())
+				{
+					//parent category
+					$categoriesEntryStringIndex[] = self::CATEGORY_PARENT_SEARCH_PERFIX . $categoryId . 
+						self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus();
+				}
+				
+				//parent category or category itself
+				$categoriesEntryStringIndex[] = self::CATEGORY_OR_PARENT_SEARCH_PERFIX . $categoryId . 
+						self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus();
+			}
 				
 			if($categoryEntry->getStatus() == CategoryEntryStatus::ACTIVE)
 				$categoriesEntryStringIndex[] = $categoryEntry->getCategoryId();	
 		}
+		
+		$categoriesEntryStringIndex = array_unique($categoriesEntryStringIndex);
 		
 		return implode(' ', $categoriesEntryStringIndex);
 	}
