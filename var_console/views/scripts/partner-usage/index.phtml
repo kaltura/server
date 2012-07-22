@@ -95,11 +95,11 @@ jQuery('#clear_dates').click(function() {
 
 jQuery('#from_date').change( function() {
 	jQuery('#date_range').val('custom');
-	from = new Date(this.val());
+	from = new Date(this.value);
 	to = new Date(jQuery('#to_date').val());
 	if (from.getTime() > to.getTime())
 	{	
-		Window().alert('The "from" date is larger than the "to" date');
+		Window().alert('The from date is larger than the to date');
 		this.val('');
 	}
 });
@@ -107,10 +107,10 @@ jQuery('#from_date').change( function() {
 jQuery('#to_date').change( function() {
 	jQuery('#date_range').val('custom');
 	from = new Date(jQuery('#from_date').val());
-	to = new Date(this.val());
+	to = new Date(this.value);
 	if (from.getTime() > to.getTime())
 	{	
-		Window().alert('The "from" date is larger than the "to" date');
+		Window().alert('The from date is larger than the to date');
 		this.val('');
 	}
 });
