@@ -1,7 +1,7 @@
 /* kmc and kmc.vars defined in script block in kmc4success.php */
 
 // For debug enable to true. Debug will show information in the browser console
-kmc.vars.debug = true;
+kmc.vars.debug = false;
 
 // Quickstart guide (should be moved to kmc4success.php)
 kmc.vars.quickstart_guide = "/content/docs/pdf/KMC_User_Manual.pdf";
@@ -558,7 +558,7 @@ kmc.preview_embed = {
 		kmc.layout.modal.open( {
 			'width' : parseInt(uiconf_details.width) + 140,
 			'title' : id_type + ': ' + name,
-			'help' : '<a class="help icon" target="_blank" href="javascript:kmc.utils.openHelp(\'section_pne\');"></a>',
+			'help' : '<a class="help icon" href="javascript:kmc.utils.openHelp(\'section_pne\');"></a>',
 			'content' : '<div id="preview_embed">' + modal_content + '</div>'
 		} );
 
@@ -644,11 +644,11 @@ kmc.preview_embed = {
 		}
 		kmc.client.setShortURL(long_url);
 
-		var description = '<div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
-		' <a target="_blank" href="javascript:kmc.utils.openHelp(\'section_pne_ipad\');">Read more</a></div>';
+		var description = "<div class=\"note\">If you enable the HTML5 player, the viewer device will be automatically detected." +
+		" <a href=\"javascript:kmc.utils.openHelp('section_pne_ipad');\">Read more</a></div>";
 
 		if( is_video && ! has_mobile_flavors) {
-			description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="javascript:kmc.utils.openHelp(\'section_pne_ipad\');">Read more</a></div>';
+			description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a href="javascript:kmc.utils.openHelp(\'section_pne_ipad\');">Read more</a></div>';
 		}
 
 		var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" /> <label for="html5_support">Support Mobile' +
