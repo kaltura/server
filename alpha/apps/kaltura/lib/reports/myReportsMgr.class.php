@@ -834,7 +834,7 @@ class myReportsMgr
 				"added_storage",
 				"combined_bandwidth_storage",
 			    "month_id,partner_id",
-			    "day_id,partner_id",
+			    "date_id,partner_id",
 			),
 			"partner_usage" => array (
 				"month_id",
