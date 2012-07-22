@@ -35,5 +35,5 @@ FROM  (
         ) raw_data 
 GROUP BY {GROUP_COLUMN}, partner_id) p_usage
 WHERE p_usage.partner_id = p.partner_id
-LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */ 
 ORDER BY {SORT_FIELD}
+LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */ 
