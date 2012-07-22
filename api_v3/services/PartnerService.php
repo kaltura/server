@@ -38,7 +38,7 @@ class PartnerService extends KalturaBaseService
 		$c->addAnd(UserLoginDataPeer::LOGIN_EMAIL, $partner->adminEmail, Criteria::EQUAL);
 		$c->setLimit(1);
 		$existingUser = UserLoginDataPeer::doCount($c) > 0;
-				
+
 		try
 		{
 			if ( $cmsPassword == "" ) {
@@ -61,6 +61,13 @@ class PartnerService extends KalturaBaseService
 							$parentPartner->getPartnerGroupType() == PartnerGroupType::GROUP ) )
 					{
 						throw new KalturaAPIException( KalturaErrors::NON_GROUP_PARTNER_ATTEMPTING_TO_ASSIGN_CHILD , $parentPartnerId );
+					}
+					
+					if ($templatePartnerId)
+					{
+					    $templatePartner = PartnerPeer::retrieveByPK($templatePartnerId);
+					    if (!$templatePartner || $templatePartner->getPartnerParentId() != $parentPartnerId)
+					        throw new KalturaAPIException( KalturaErrors::NON_GROUP_PARTNER_ATTEMPTING_TO_ASSIGN_CHILD , $parentPartnerId );
 					}
 				}
 			}
