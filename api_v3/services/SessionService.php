@@ -97,7 +97,11 @@ class SessionService extends KalturaBaseService
 		// verify partner is allowed to start session for another partner
 		if (!myPartnerUtils::allowPartnerAccessPartner($partnerId, $this->partnerGroup(), $impersonatedPartnerId))
 		{
-			throw new KalturaAPIException ( APIErrors::START_SESSION_ERROR ,$partnerId );
+		    $c = PartnerPeer::getDefaultCriteria();
+		    $c->addAnd(PartnerPeer::ID, $impersonatedPartnerId);
+		    $impersonatedPartner = PartnerPeer::doSelectOne($c);
+		    if (!$impersonatedPartner)
+			    throw new KalturaAPIException ( APIErrors::START_SESSION_ERROR ,$partnerId );
 		}
 		
 		// get impersonated partner
