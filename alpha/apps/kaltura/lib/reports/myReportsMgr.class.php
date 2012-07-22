@@ -34,6 +34,7 @@ class myReportsMgr
 	const REPORT_TYPE_APPLICATIONS = 16;
 	const REPORT_TYPE_USER_USAGE = 17;
 	const REPORT_TYPE_SPECIFIC_USER_USAGE = 18;
+	const REPORT_TYPE_VAR_USAGE = 19;
 	
 	const REPORTS_COUNT_CACHE = 60;
 	
@@ -618,7 +619,7 @@ class myReportsMgr
 				{
 					$obj_ids_clause = "dim_partner.partner_id in ( $object_ids_str)";
 				}			
-				else if ( $report_type == self::REPORT_TYPE_PARTNER_USAGE )
+				else if ( $report_type == self::REPORT_TYPE_PARTNER_USAGE || $report_type == self::REPORT_TYPE_VAR_USAGE)
 				{
 					$obj_ids_clause = "partner_id in ($object_ids_str)";
 				}		
@@ -715,6 +716,7 @@ class myReportsMgr
 		self::REPORT_TYPE_APPLICATIONS => 'applications',
 		self::REPORT_TYPE_USER_USAGE => 'user_usage',
 		self::REPORT_TYPE_SPECIFIC_USER_USAGE => 'specific_user_usage',
+		self::REPORT_TYPE_VAR_USAGE => 'var_usage'
 		
 	);
 	
@@ -823,42 +825,68 @@ class myReportsMgr
 				"count_download" ,
 				"count_report" ,
 			),
-			
+			"var_usage" => array (
+				"month_id",
+				"date_id",
+				"bandwidth_consumption",
+				"average_storage",
+				"peak_storage",
+				"added_storage",
+				"combined_bandwidth_storage",
+			    "month_id,partner_id",
+			    "day_id,partner_id",
+			),
+			"partner_usage" => array (
+				"month_id",
+				"date_id",
+				"bandwidth_consumption",
+				"average_storage",
+				"peak_storage",
+				"added_storage",
+				"combined_bandwidth_storage",
+			),
 		);
-			
-		if ( $order_by[0] == '-' )
-		{
-			$order_by_field =  substr($order_by,1);
-			$order_by_dir = "DESC";
-		}
-		elseif ( $order_by[0] == '+' )
-		{
-			$order_by_field =  substr($order_by,1);
-			$order_by_dir = "ASC";
-		}
-		else
-		{
-			$order_by_field =  $order_by;
-			$order_by_dir = "DESC";
-		}
-		
-		// if the order by is not explicitly allowed - don't allow it !
 		
 		$valid_field  = false;
-		
+
+		// if the order by is not explicitly allowed - don't allow it !
 		if ( isset ( $map[$report_type] ) )
 		{
 			$section = $map[$report_type];
-
-			if ( in_array ( $order_by_field , $section ) )
+			$order_by_without_direction = str_replace("+", "", $order_by);
+			$order_by_without_direction = str_replace("-", "", $order_by_without_direction);
+			
+			if ( in_array ( trim($order_by_without_direction) , $section ) )
 			{
-				$order_by_str = "$order_by_field $order_by_dir";
 				$valid_field = true;
 			}
 		}
 		
-		
-		if ( ! $valid_field )
+		if ( $valid_field ) {
+			$order_by_fields = explode(',', $order_by);
+			$order_by_str = "";
+			foreach($order_by_fields as $curr_order_by)
+			{
+				if ( $curr_order_by[0] == '-' )
+				{
+					$order_by_field =  substr($curr_order_by,1);
+					$order_by_dir = "DESC";
+				}
+				elseif ( $curr_order_by[0] == '+' )
+				{
+					$order_by_field =  substr($curr_order_by,1);
+					$order_by_dir = "ASC";
+				}
+				else
+				{
+					$order_by_field =  $curr_order_by;
+					$order_by_dir = "DESC";
+				}
+			    $order_by_str = "$order_by_str $order_by_field $order_by_dir ,";
+			}
+			$order_by_str = substr($order_by_str,0,-1);
+		}
+		else 
 		{
 			$order_by_str = "1=1 /* [$report_type][$valid_field]: BAD order field [" . 
 				str_replace ( array ( "/" , "*" ) , array ( "" , "" ) , $order_by_field ) . 

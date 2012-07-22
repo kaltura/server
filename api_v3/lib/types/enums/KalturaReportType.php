@@ -27,5 +27,7 @@ class KalturaReportType extends KalturaEnum
 	const USER_USAGE = 17;
 	const SPECIFIC_USER_USAGE = 18;
 	const PARTNER_USAGE = 201; 
+	const VAR_USAGE = 19;
+	
 
 }

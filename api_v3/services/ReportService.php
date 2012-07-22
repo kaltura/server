@@ -55,7 +55,7 @@ class ReportService extends KalturaBaseService
 	 */
 	public function getGraphsAction( $reportType , KalturaReportInputFilter $reportInputFilter , $dimension = null , $objectIds = null  )
 	{
-		if($reportType == KalturaReportType::PARTNER_USAGE)
+		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
 		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray ( myReportsMgr::getGraph( $this->getPartnerId() , 
@@ -78,7 +78,7 @@ class ReportService extends KalturaBaseService
 	 */
 	public function getTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null )
 	{
-		if($reportType == KalturaReportType::PARTNER_USAGE)
+		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
 		$reportTotal = new KalturaReportTotal();
@@ -124,7 +124,7 @@ class ReportService extends KalturaBaseService
 	 */
 	public function getTableAction($reportType, KalturaReportInputFilter $reportInputFilter, KalturaFilterPager $pager, $order = null, $objectIds = null)
 	{
-		if($reportType == KalturaReportType::PARTNER_USAGE)
+		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
 		$reportTable = new KalturaReportTable();
@@ -162,7 +162,7 @@ class ReportService extends KalturaBaseService
 		KalturaFilterPager $pager = null , 
 		$order = null , $objectIds = null )
 	{
-		if($reportType == KalturaReportType::PARTNER_USAGE)
+		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
 		$report = myReportsMgr::getUrlForReportAsCsv( $this->getPartnerId() ,  $reportTitle , $reportText , $headers , $reportType , 
