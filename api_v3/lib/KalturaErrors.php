@@ -318,6 +318,7 @@ class KalturaErrors extends APIErrors
 	 */
 	const NON_GROUP_PARTNER_ATTEMPTING_TO_ASSIGN_CHILD = "NON_GROUP_PARTNER_ATTEMPTING_TO_ASSIGN_CHILD,Partner id [%s] is not a VAR/GROUP, but is attempting to create child partner";	
 	
+	const NON_PARENT_PARTNER_ATTEMPTING_TO_COPY_PARTNER = "NON_PARENT_PARTNER_ATTEMPTING_TO_COPY_PARTNER,Partner id [%s] is not the parent of template partner [%s]";
 	
 	const INVALID_OBJECT_ID = "INVALID_OBJECT_ID,Invalid object id [%s]";
 	
