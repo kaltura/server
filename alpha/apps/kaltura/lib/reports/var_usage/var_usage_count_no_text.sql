@@ -1,4 +1,4 @@
-SELECT COUNT(*)
+SELECT COUNT(*) count_all
 FROM kalturadw.dwh_dim_partners p,
 (SELECT
         {GROUP_COLUMN},
