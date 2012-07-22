@@ -208,6 +208,9 @@ class kEntitlementUtils
 		
 		if(is_null($partnerId)) 
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			
+		if(is_null($partnerId))
+			return;
 			 
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$partner)
