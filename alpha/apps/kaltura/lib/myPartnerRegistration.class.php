@@ -5,6 +5,7 @@ class myPartnerRegistration
 
 	public function __construct( $partnerParentId = null )
 	{
+	    set_time_limit(600);
 		$this->partnerParentId = $partnerParentId;	
 	}
 	
@@ -177,6 +178,12 @@ class myPartnerRegistration
 		$newPartner->setIsFirstLogin(true);
 		/* fix drupal5 module partner type */
 		//var_dump($description);
+		
+		if ($templatePartnerId)
+		{
+		    $templatePartner = PartnerPeer::retrieveByPK($templatePartnerId);
+		    $newPartner->setPartnerPackage($templatePartner->getPartnerPackage());
+		}
 		
 		if ( $this->partnerParentId )
 		{
