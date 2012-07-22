@@ -95,17 +95,19 @@ class SessionService extends KalturaBaseService
 		}
 				
 		// verify partner is allowed to start session for another partner
+		$impersonatedPartner = null;
 		if (!myPartnerUtils::allowPartnerAccessPartner($partnerId, $this->partnerGroup(), $impersonatedPartnerId))
 		{
 		    $c = PartnerPeer::getDefaultCriteria();
 		    $c->addAnd(PartnerPeer::ID, $impersonatedPartnerId);
 		    $impersonatedPartner = PartnerPeer::doSelectOne($c);
-		    if (!$impersonatedPartner)
-			    throw new KalturaAPIException ( APIErrors::START_SESSION_ERROR ,$partnerId );
+		}
+		else 
+		{
+    		// get impersonated partner
+    		$impersonatedPartner = PartnerPeer::retrieveByPK($impersonatedPartnerId);
 		}
 		
-		// get impersonated partner
-		$impersonatedPartner = PartnerPeer::retrieveByPK($impersonatedPartnerId);
 		if(!$impersonatedPartner)
 		{
 			// impersonated partner could not be fetched from the DB
