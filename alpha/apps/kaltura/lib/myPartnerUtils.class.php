@@ -11,6 +11,8 @@ class myPartnerUtils
 	
 	const ALL_PARTNERS_WILD_CHAR = "*";
 	
+	const COPY_PARTNER_LIMIT = 10;
+	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
 
@@ -1219,6 +1221,7 @@ class myPartnerUtils
  		$c = new Criteria();
  		$c->addAnd(PermissionPeer::PARTNER_ID, $fromPartner->getId(), Criteria::EQUAL);
  		$c->addDescendingOrderByColumn(PermissionPeer::CREATED_AT);
+ 		$c->setLimit(self::COPY_PARTNER_LIMIT);
  		$permissions = PermissionPeer::doSelect($c);
  		PermissionPeer::setUseCriteriaFilter ( true );
  		foreach($permissions as $permission)
@@ -1238,6 +1241,7 @@ class myPartnerUtils
  		$c->addAnd(categoryPeer::STATUS, CategoryStatus::ACTIVE);
  		$c->addAscendingOrderByColumn(categoryPeer::DEPTH);
  		$c->addAscendingOrderByColumn(categoryPeer::CREATED_AT);
+ 		$c->setLimit(self::COPY_PARTNER_LIMIT);
  		$categories = categoryPeer::doSelect($c);
  		categoryPeer::setUseCriteriaFilter(true);
  		
@@ -1279,6 +1283,7 @@ class myPartnerUtils
  		$c->addAnd(entryPeer::TYPE, $entryType);
  		$c->addAnd(entryPeer::STATUS, entryStatus::READY);
  		$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
+ 		$c->setLimit(self::COPY_PARTNER_LIMIT);
  		$entries = entryPeer::doSelect($c);
  		entryPeer::setUseCriteriaFilter ( true );
  		foreach($entries as $entry)
@@ -1295,6 +1300,7 @@ class myPartnerUtils
  		$c->addAnd(uiConfPeer::PARTNER_ID, $fromPartner->getId());
  		$c->addAnd(uiConfPeer::OBJ_TYPE, $uiConfType);
  		$c->addAnd(uiConfPeer::STATUS, uiConf::UI_CONF_STATUS_READY);
+ 		$c->setLimit(self::COPY_PARTNER_LIMIT);
  		$uiConfs = uiConfPeer::doSelect($c);
  		uiConfPeer::setUseCriteriaFilter ( true );
  		foreach($uiConfs as $uiConf)
@@ -1336,6 +1342,7 @@ class myPartnerUtils
  		
  		$c = new Criteria();
  		$c->add(conversionProfile2Peer::PARTNER_ID, $fromPartner->getId());
+ 		$c->setLimit(self::COPY_PARTNER_LIMIT);
  		
  		$conversionProfiles = conversionProfile2Peer::doSelect($c);
  		foreach($conversionProfiles as $conversionProfile)
@@ -1383,6 +1390,7 @@ class myPartnerUtils
  		
  		$c = new Criteria();
  		$c->add(accessControlPeer::PARTNER_ID, $fromPartner->getId());
+ 		$c->setLimit(self::COPY_PARTNER_LIMIT);
  		
  		$accessControls = accessControlPeer::doSelect($c);
  		foreach($accessControls as $accessControl)
