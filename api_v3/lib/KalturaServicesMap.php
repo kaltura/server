@@ -64,6 +64,11 @@ class KalturaServicesMap
 		return $serviceIds;
 	}
 	
+	static function filterEmptyServices($service)
+	{
+		return count($service->actionMap) != 0;
+	}
+	
 	//TODO create a function for the subsequent loops
 	static function cacheMap($servicePath, $cacheFilePath)
 	{
@@ -107,6 +112,7 @@ class KalturaServicesMap
 		}
 		
 		//Add core & plugin services to the services map
+		$aliasActions = array();
 		foreach($serviceClasses as $serviceId => $serviceClass)
 		{
 			$serviceReflectionClass = KalturaServiceReflector::constructFromClassName($serviceClass);
@@ -120,33 +126,31 @@ class KalturaServicesMap
             {
                 $actionMap[strtolower($actionId)] = array ("serviceClass" => $serviceClass, "actionMethodName" => $actionName, "serviceId" => $serviceId, "actionName" => $actionId);
             }	
+
+            $serviceMapEntry->actionMap = $actionMap;
+            $serviceMap[strtolower($serviceId)] = $serviceMapEntry;
             
-            //Loop over all service classes and find the alias actions for the $serviceClass
-            foreach ($serviceClasses as $extServiceId => $extServiceClass)
-            {
-                $aliasServiceClass = KalturaServiceReflector::constructFromClassName($extServiceClass);
-                $aliasActions = $aliasServiceClass->getAliasActions($serviceId);
-                foreach ($aliasActions as $aliasAction => $actionName)
-                {
-                    if (isset($actionMap[$aliasAction]))
-                    {
-                        throw new Exception("Cannot use the same action alias from 2 service classes! Action alias [$aliasAction], classes [".$actionMap[$aliasAction]."], [$extServiceClass]");
-                    }
-                    $actionMap[strtolower($aliasAction)] = array ("serviceClass" => $extServiceClass, "actionMethodName" => $actionName, "serviceId" => $extServiceId, "actionName" => $aliasAction);
-                }
-                
-            }
-            
-            if (count($actionMap))
-            {
-                $serviceMapEntry->actionMap = $actionMap;
-                $serviceMap[strtolower($serviceId)] = $serviceMapEntry;
-            }
+            foreach ($serviceReflectionClass->getAliasActions() as $alias => $methodName)
+            	$aliasActions[$alias] = "$serviceId.$methodName";
 		}
 		
-//		$cachedFile = '';
-//		$cachedFile .= ('<?php' . PHP_EOL);
-//		$cachedFile .= ('self::$services = ' . var_export($serviceMap, true) . ';' . PHP_EOL);
+		// add aliases
+		foreach ($aliasActions as $aliasAction => $sourceAction)
+		{
+			list($aliasService, $aliasAction) = explode('.', $aliasAction);
+			list($sourceService, $sourceAction) = explode('.', $sourceAction);
+			$aliasService = strtolower($aliasService);
+			$sourceService = strtolower($sourceService);
+			
+			$extServiceClass = $serviceClasses[$sourceService];
+			
+			$serviceMap[$aliasService]->actionMap[strtolower($aliasAction)] = 
+				array ("serviceClass" => $extServiceClass, "actionMethodName" => $sourceAction, "serviceId" => $sourceService, "actionName" => $aliasAction);
+		}
+		
+		// filter out services that have no actions
+		$serviceMap = array_filter($serviceMap, array('KalturaServicesMap', 'filterEmptyServices'));
+
 		if (!is_dir(dirname($cacheFilePath))) {
 			mkdir(dirname($cacheFilePath), 0777);
 		}
