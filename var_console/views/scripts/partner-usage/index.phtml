@@ -6,7 +6,7 @@
 </ul>
 <?php echo $this->form; ?>
 <div id="resultsTotal" class="clear">
-	<h2>Totals<?php $this->paginator->getItemsCount(); ?></h2>
+	<h2>Totals<?php $this->paginator->getItemsCount(); ?><?php if ($this->paginator->filtered) echo 'Filtered'?></h2>
 	<table class="clear">
 		<thead>
 			<tr>
@@ -85,6 +85,7 @@ jQuery('#filter_type').change(function() {
 			$("div.help").hide();
 	}
 });
+
 
 jQuery('#filter_type').change();
 
