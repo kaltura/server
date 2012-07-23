@@ -36,10 +36,10 @@ class ftpMgr extends kFileTransferMgr
 	{
 		// try to login
 		$res = ftp_login($this->getConnection(), $ftp_user, $ftp_pass);
-//		if ($res) {
-//			// set FTP passive mode
-//			$res = ftp_pasv($this->getConnection() , $ftp_passive_mode);
-//		}
+		if ($res) {
+			// set FTP passive mode
+			ftp_pasv($this->getConnection() , $ftp_passive_mode);
+		}
 		return $res;
 	}
 
