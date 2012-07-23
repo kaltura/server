@@ -54,7 +54,7 @@ class kFile
 			return filesize($filename);
 
 		$filename = str_replace ("\\", "/", $filename);
-		$url = "file://$filename";
+		$url = "file://localhost/$filename";
 		
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_NOBODY, true);
