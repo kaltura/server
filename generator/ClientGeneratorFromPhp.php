@@ -169,16 +169,34 @@ abstract class ClientGeneratorFromPhp
 					$this->addType(KalturaTypeReflectorCacher::get($filterOrderByStringEnumTypeName));
 			}
 		}
-		
-	    foreach($this->_types as $typeReflector)
-		{
-			if ($typeReflector->isEnum() || $typeReflector->isStringEnum())
-			    $enumTypes[$typeReflector->getType()] = $typeReflector;
-		    else
-		        $classTypes[$typeReflector->getType()] = $typeReflector; 
-		};
-		
+
 		uasort($this->_types, array($this, 'compareTypes'));
+		
+		$sortedTypes = array();
+		$this->fixTypeDependencies($this->_types, $sortedTypes);
+		$this->_types = $sortedTypes;
+	}
+	
+	/**
+	 * This function arranges the types in bottom up order
+	 * @param array $input
+	 * @param array $output
+	 */
+	private function fixTypeDependencies(array &$input, array &$output)
+	{
+		foreach ($input as $typeName => $typeReflector)
+		{
+			if (array_key_exists($typeName, $output))
+				continue;		// already added
+
+			if (!$typeReflector->isEnum() && !$typeReflector->isStringEnum())
+			{
+				$dependencies = $this->getTypeDependencies($typeReflector);
+				$this->fixTypeDependencies($dependencies, $output);
+			}
+			
+			$output[$typeName] = $typeReflector;
+		}
 	}
 	
 	/**
@@ -193,7 +211,13 @@ abstract class ClientGeneratorFromPhp
 			
 		if($b->isEnum() && !$a->isEnum())
 			return 1;
-		
+
+		if($a->isStringEnum() && !$b->isStringEnum())
+			return -1;
+			
+		if($b->isStringEnum() && !$a->isStringEnum())
+			return 1;
+			
 		if($a->getInheritanceLevel() != $b->getInheritanceLevel())
 			return ($a->getInheritanceLevel() < $b->getInheritanceLevel() ? -1 : 1);
 			
@@ -320,6 +344,34 @@ abstract class ClientGeneratorFromPhp
 		}
 	}
 	
+	private function getTypeDependencies(KalturaTypeReflector $typeReflector)
+	{
+		$result = array();
+		
+	    $parentTypeReflector = $typeReflector->getParentTypeReflector();
+	    if ($parentTypeReflector)
+	    {
+            $result[$parentTypeReflector->getType()] = $parentTypeReflector;
+	    }
+	    
+		$properties = $typeReflector->getProperties();
+		foreach($properties as $property)
+		{
+			$subTypeReflector = $property->getTypeReflector();
+			if ($subTypeReflector)
+				$result[$subTypeReflector->getType()] = $subTypeReflector;
+		}
+		
+		if ($typeReflector->isArray())
+		{
+			$arrayTypeReflector = KalturaTypeReflectorCacher::get($typeReflector->getArrayType());
+			if($arrayTypeReflector)
+				$result[$arrayTypeReflector->getType()] = $arrayTypeReflector;
+		}
+
+		return $result;
+	}
+	
 	private function loadTypesRecursive(KalturaTypeReflector $typeReflector)
 	{
 		if(in_array($typeReflector->getType(), $this->_typesToIgnore))
@@ -329,26 +381,9 @@ abstract class ClientGeneratorFromPhp
 		if ($this->isPathExcluded($this->_classMap[$typeReflector->getType()]))
 			return;
 			
-	    $parentTypeReflector = $typeReflector->getParentTypeReflector();
-	    if ($parentTypeReflector)
-	    {
-	        $parentType = $parentTypeReflector->getType();
-            $this->loadTypesRecursive($parentTypeReflector);   
-	    }
-	    
-		$properties = $typeReflector->getProperties();
-		foreach($properties as $property)
+		foreach ($this->getTypeDependencies($typeReflector) as $subTypeReflector)
 		{
-			$subTypeReflector = $property->getTypeReflector();
-			if ($subTypeReflector)
-				$this->loadTypesRecursive($subTypeReflector);
-		}
-		
-		if ($typeReflector->isArray())
-		{
-			$arrayTypeReflector = KalturaTypeReflectorCacher::get($typeReflector->getArrayType());
-			if($arrayTypeReflector)
-				$this->loadTypesRecursive($arrayTypeReflector);
+			$this->loadTypesRecursive($subTypeReflector);
 		}
 		
 		$this->loadChildTypes($typeReflector);
