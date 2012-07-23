@@ -81,6 +81,10 @@ class KalturaActionReflector extends KalturaReflector
 				$this->_actionParams = $actionFromCache["actionParams"];
 				$this->_actionClassInfo = $actionFromCache["actionClassInfo"];
 			}
+			else
+			{
+				$this->cacheReflectionValues();
+			}
 		}
 	}
 	
@@ -95,8 +99,6 @@ class KalturaActionReflector extends KalturaReflector
 			$reflectionClass = new ReflectionClass($this->_actionClass);
 			$reflectionMethod = $reflectionClass->getMethod($this->_actionMethodName);
 			$this->_actionInfo = new KalturaDocCommentParser($reflectionMethod->getDocComment());
-		
-			$this->cacheReflectionValues();
 		}
 		return $this->_actionInfo;
 	}
@@ -155,7 +157,6 @@ class KalturaActionReflector extends KalturaReflector
 				
 				$this->_actionParams[$name] = $paramInfo;
 			}
-			$this->cacheReflectionValues();
 		}
 		
 		return $this->_actionParams;
@@ -194,8 +195,6 @@ class KalturaActionReflector extends KalturaReflector
 		{
 			$reflectionClass = new ReflectionClass($this->_actionClass);
 			$this->_actionClassInfo = new KalturaDocCommentParser($reflectionClass->getDocComment());
-			
-			$this->cacheReflectionValues();
 		}
 		return $this->_actionClassInfo;
 	}
