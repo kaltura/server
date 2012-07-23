@@ -122,7 +122,7 @@ class PartnerUsageController extends Zend_Controller_Action
 			$d = (new Zend_Date($item->partnerCreatedAt));
 			$dateId = strlen($item->dateId) == 6 ? DateTime::createFromFormat("Ym", $item->dateId) : DateTime::createFromFormat("Ymd", $item->dateId); 
 			echo 	strlen($item->dateId) == 6 ? $dateId->format("M Y") : $dateId->format("d M Y"),',',
-			        $this->view->enumTranslate('KalturaPartnerStatus', $item->partnerStatus), ',',
+			        $this->view->enumTranslate('Kaltura_Client_Enum_PartnerStatus', $item->partnerStatus), ',',
 					$item->partnerName, ',', 
 					$item->partnerId, ',', 
 					'"',$d->toString(Zend_Date::DATE_LONG), '",', 
