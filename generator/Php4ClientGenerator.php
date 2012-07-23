@@ -320,4 +320,3 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("}");
 	}
 }
-?>

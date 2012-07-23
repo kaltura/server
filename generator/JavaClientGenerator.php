@@ -875,4 +875,3 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	}
 
 }
-?>

@@ -913,4 +913,3 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 		}
 	}
 }
-?>

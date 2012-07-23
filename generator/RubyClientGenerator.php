@@ -321,4 +321,3 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	end");
 	}
 }
-?>

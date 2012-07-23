@@ -383,4 +383,3 @@ class JsClientGenerator extends ClientGeneratorFromXml
 		//echo "Create Project File.\r\n";
 	}
 }
-?>
