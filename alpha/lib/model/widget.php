@@ -267,4 +267,7 @@ class widget extends Basewidget
 	
 	public function setEnforceEntitlement ( $v )	{		$this->putInCustomData ( "enforceEntitlement" , $v );	}
 	public function getEnforceEntitlement (  )	{		return $this->getFromCustomData( "enforceEntitlement" );	}
+	
+	public function setIsPlayList ( $v )	{		$this->putInCustomData ( "isPlayList" , $v );	}
+	public function getIsPlayList (  )	{		return $this->getFromCustomData( "isPlayList", null, false );	}
 }
