@@ -287,6 +287,7 @@ class CategoryUserService extends KalturaBaseService
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId);
 			$c->add(kuserPeer::PUSER_ID, $filter->userIdEqual);
+			$c->add(kuserPeer::STATUS, KuserStatus::ACTIVE);
 			
 			kuserPeer::setUseCriteriaFilter(false);
 			$kuser = kuserPeer::doSelectOne($c);
