@@ -74,7 +74,7 @@ class UserController extends Zend_Controller_Action
 			}
 			else
 			{
-				$loginForm->setDescription('login error');
+				$loginForm->setDescription('invalid login');
 			}
 		}
 		
