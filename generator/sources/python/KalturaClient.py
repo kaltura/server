@@ -69,6 +69,9 @@ class PluginServicesProxy:
         setattr(self, serviceName, serviceClass)
 
 class KalturaClient:
+    METHOD_POST = 0
+    METHOD_GET = 1
+
     def __init__(self, config):
         self.apiVersion = API_VERSION
         self.config = None
@@ -76,6 +79,9 @@ class KalturaClient:
         self.shouldLog = False
         self.multiRequest = False
         self.callsQueue = []
+
+        self.method = KalturaClient.METHOD_POST
+        self.requestHeaders = {}
 
         self.config = config
         logger = self.config.getLogger()
@@ -180,6 +186,10 @@ class KalturaClient:
         signature = params.signature()
         params.put("kalsig", signature)
 
+        if self.method == KalturaClient.METHOD_GET and len(files.get()) == 0:
+            url += '&' + urllib.urlencode(params.get())
+            params = None
+
         self.log("request url: [%s]" % url)
 
         return (url, params, files)
@@ -189,21 +199,23 @@ class KalturaClient:
         fh.close()
 
     @staticmethod
-    def openRequestUrl(url, params, files):
+    def openRequestUrl(url, params, files, requestHeaders):
         if len(files.get()) == 0:
-            try:
-                f = urllib.urlopen(url, urllib.urlencode(params.get()))
-            except Exception, e:
-                raise KalturaClientException(e, KalturaClientException.ERROR_CONNECTION_FAILED)
+            data = None
+            if params != None:
+                data = urllib.urlencode(params.get())
+            request = urllib2.Request(url, data, requestHeaders)
         else:
             fullParams = params
             fullParams.update(files)
             datagen, headers = multipart_encode(fullParams.get())
+            headers.update(requestHeaders)
             request = urllib2.Request(url, datagen, headers)
-            try:
-                f = urllib2.urlopen(request)
-            except Exception, e:
-                raise KalturaClientException(e, KalturaClientException.ERROR_CONNECTION_FAILED)
+
+        try:
+            f = urllib2.urlopen(request)
+        except Exception, e:
+            raise KalturaClientException(e, KalturaClientException.ERROR_CONNECTION_FAILED)
         return f
 
     @staticmethod
@@ -234,7 +246,7 @@ class KalturaClient:
             origSocketTimeout = socket.getdefaulttimeout()
             socket.setdefaulttimeout(requestTimeout)
         try:
-            f = self.openRequestUrl(url, params, files)
+            f = self.openRequestUrl(url, params, files, self.requestHeaders)
             data = self.readHttpResponse(f, requestTimeout)
             self.responseHeaders = f.info().headers
         finally:
