@@ -27,7 +27,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof entry)
+		if($object instanceof entry && $object->getStatus() != entryStatus::DELETED)
 		{
 			if(in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
 				return self::onEntryReady($object);
@@ -893,10 +893,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			
 			if($entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_SUBMITTING)
 			{
+				KalturaLog::notice("Submitting add entry distribution [" . $entryDistribution->getId() . "]");
 				kContentDistributionManager::submitAddEntryDistribution($entryDistribution, $distributionProfile, true);
 			}
 			elseif($entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_UPDATING)
 			{
+				KalturaLog::notice("Submitting update entry distribution [" . $entryDistribution->getId() . "]");
 				kContentDistributionManager::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);	
 			}
 		}
