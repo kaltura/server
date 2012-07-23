@@ -224,7 +224,7 @@ class KalturaTypeReflector
 		if($this->_type == 'KalturaObject')
 			return 0;
 			
-		if(is_subclass_of($this->_type, 'IKalturaEnum'))
+		if($this->isEnum() || $this->isStringEnum())
 			return 1;
 			
 		$parentTypeReflector = $this->getParentTypeReflector();
