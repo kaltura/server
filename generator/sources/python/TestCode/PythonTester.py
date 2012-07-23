@@ -89,6 +89,7 @@ def SampleMetadataOperations():
 
     # make sure we have a metadata profile
     profile = KalturaMetadataProfile()
+    profile.setName('TestProfile')
     profile.setMetadataObjectType(KalturaMetadataObjectType.ENTRY)
     viewsData = ""
 
@@ -109,6 +110,7 @@ def SampleMetadataOperations():
 
     # Add a custom data entry in the KMC  (Settings -> Custom Data)
     profile = KalturaMetadataProfile()
+    profile.setName('TestProfile')
     profile.setMetadataObjectType(KalturaMetadataObjectType.ENTRY)
     viewsData = ""
 
