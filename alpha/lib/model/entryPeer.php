@@ -591,11 +591,10 @@ class entryPeer extends BaseentryPeer
 				$c->setRecordsCount($entitlementCrit->getRecordsCount());
 		 		$skipApplyFilters = true;
 		 		self::$filerResults = true;
-		 		//TODO add header the not full search
+		 		//TODO add header that not full search
 			}
 			else
 			{
-				self::$s_criteria_filter->enableAdditional();
 				self::$filerResults = false;
 			}
 		}
