@@ -71,6 +71,10 @@ class WidgetService extends KalturaBaseService
 		$widgetId = $dbWidget->calculateId($dbWidget);
 
 		$dbWidget->setId($widgetId);
+		
+		if ($entry && $entry->getType() == entryType::PLAYLIST)
+			$dbWidget->setIsPlayList(true);
+			
 		$dbWidget->save();
 		$savedWidget = widgetPeer::retrieveByPK($widgetId);
 		
@@ -110,6 +114,15 @@ class WidgetService extends KalturaBaseService
 		}
 			
 		$widgetUpdate = $widget->toWidget();
+		
+		if ($entry && $entry->getType() == entryType::PLAYLIST)
+		{
+			$dbWidget->setIsPlayList(true);
+		}
+		else 
+		{
+			$dbWidget->setIsPlayList(false);
+		}
 
 		$allow_empty = true ; // TODO - what is the policy  ? 
 		baseObjectUtils::autoFillObjectFromObject ( $widgetUpdate , $dbWidget , $allow_empty );
