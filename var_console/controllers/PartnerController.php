@@ -39,7 +39,14 @@ class PartnerController extends Zend_Controller_Action
 				$partner->description = "Multi-publishers console";
 				$partner->type = Kaltura_Client_Enum_PartnerType::ADMIN_CONSOLE;
 				
-				$result = $client->partner->register($partner, null, $templatePartnerId);
+				try 
+				{
+				    $result = $client->partner->register($partner, null, $templatePartnerId);
+				}
+				catch (Exception $e)
+				{
+				    $form->setDescription('An error occured: ' . $e->getMessage());    
+				}
 				
 				// check for errors in partner.register
 				if ($client->isError($result)) 
