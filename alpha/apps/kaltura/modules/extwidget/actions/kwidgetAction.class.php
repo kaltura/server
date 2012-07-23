@@ -220,6 +220,11 @@ class kwidgetAction extends sfAction
 		$widgetIdStr = "widget_id=$widget_id";
 		$partnerIdStr = "partner_id=$partner_id&subp_id=$subp_id";
 		
+		$entryVarName = 'entryId';
+			
+		if($widget->getIsPlayList())
+			$entryVarName = 'playlistId';
+		
 		if ($uiConf)
 		{
 			$ks_flashvars = "";
@@ -370,7 +375,7 @@ class kwidgetAction extends sfAction
 				"&cdnHost=" . str_replace("http://", "", str_replace("https://", "", $partner_cdnHost)).
 				( $show_version ? "&entryVersion=$show_version" : "" ) .
 				( $kshow_id ? "&kshowId=$kshow_id" : "" ).
-				( $entry_id ? "&entryId=$entry_id" : "" ) .
+				( $entry_id ? "&$entryVarName=$entry_id" : "" ) .
 				$uiconf_id_str  . // will be empty if nothing to add
 				$ks_flashvars.
 				($cache_st ? "&clientTag=cache_st:$cache_st" : "").
@@ -404,7 +409,7 @@ class kwidgetAction extends sfAction
 			$dynamic_date = "kshowId=$kshow_id" .
 			"&host=" . requestUtils::getRequestHostId() .
 			( $show_version ? "&entryVersion=$show_version" : "" ) .
-			( $entry_id ? "&entryId=$entry_id" : "" ) .
+			( $entry_id ? "&$entryVarName=$entry_id" : "" ) .
 			( $entry_id ? "&KmediaType=$kmedia_type" : "");
 			$dynamic_date .= "&isWidget=$widget_type&referer=".urlencode($referer);
 			$dynamic_date .= "&kdata=$kdata";
