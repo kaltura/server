@@ -6,7 +6,7 @@
 </ul>
 <?php echo $this->form; ?>
 <div id="resultsTotal" class="clear">
-	<h2>Totals<?php $this->paginator->getItemsCount(); ?><?php if ($this->paginator->filtered) echo 'Filtered'?></h2>
+	<h2>Totals<?php $this->paginator->getItemsCount(); ?><font color="red"><?php if ($this->paginator->filtered) echo ' Filtered'?></font></h2>
 	<table class="clear">
 		<thead>
 			<tr>
@@ -29,7 +29,7 @@
 	</table>
 </div>
 <div id="resultsSubs" class="clear">
-	<h2>Details <span>(<?php echo $this->paginator->getItemsCount(); ?> results | <a class="exportCsv"><?php echo $this->translate('Export to CSV'); ?></a>)</span></h2>
+	<h2>Details <font color="red"><?php if ($this->paginator->filtered) echo ' Filtered'?></font><span>(<?php echo $this->paginator->getItemsCount(); ?> results | <a class="exportCsv"><?php echo $this->translate('Export to CSV'); ?></a>)</span></h2>
 	<table class="clear">
 		<thead>
 			<tr>
