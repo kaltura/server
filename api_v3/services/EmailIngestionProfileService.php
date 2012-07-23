@@ -1,4 +1,4 @@
- <?php
+<?php
 /**
  * EmailIngestionProfile service lets you manage email ingestion profile records
  *
