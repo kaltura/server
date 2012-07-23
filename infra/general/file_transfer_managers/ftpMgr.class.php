@@ -36,10 +36,10 @@ class ftpMgr extends kFileTransferMgr
 	{
 		// try to login
 		$res = ftp_login($this->getConnection(), $ftp_user, $ftp_pass);
-		if ($res) {
-			// set FTP passive mode
-			ftp_pasv($this->getConnection() , $ftp_passive_mode);
-		}
+//		if ($res) {
+//			// set FTP passive mode
+//			$res = ftp_pasv($this->getConnection() , $ftp_passive_mode);
+//		}
 		return $res;
 	}
 
@@ -167,7 +167,7 @@ class ftpMgr extends kFileTransferMgr
 		KalturaLog::debug("ftp rawlist [" . print_r($filesInfo, true) . "]");
 	    
 	    // -rw-r--r-- 1 kaltura kaltura 1876084736 Oct 31 14:31 1615.mpeg
-	    $regexUnix = '^(?P<permissions>[-drw]{10})\s+(?P<number>\d{1})\s+(?P<owner>[\d\w]+)\s+(?P<group>[\d\w]+)\s+(?P<fileSize>\d*)\s+(?P<month>\w{3})\s+(?P<day>\d{1,2})\s+((?P<hour>\d{2}):(?P<minute>\d{2})|(?P<year>\d{4}))\s+(?P<file>.+)\s*$';
+	    $regexUnix = '^(?P<permissions>[-drwx]{10})\s+(?P<number>\d{1})\s+(?P<owner>[\d\w]+)\s+(?P<group>[\d\w]+)\s+(?P<fileSize>\d*)\s+(?P<month>\w{3})\s+(?P<day>\d{1,2})\s+((?P<hour>\d{2}):(?P<minute>\d{2})|(?P<year>\d{4}))\s+(?P<file>.+)\s*$';
 	    
 		// 08/08/2011  08:52 PM               174 .buildpath
 		// 08/08/2011  08:52 PM               706 .project
