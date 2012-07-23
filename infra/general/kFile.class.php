@@ -53,7 +53,7 @@ class kFile
 		if(PHP_INT_SIZE >= 8)
 			return filesize($filename);
 
-		$filename = str_replace (array("\\". "/"), "/", $filename);
+		$filename = str_replace ("\\", "/", $filename);
 		$url = "file://$filename";
 		
 		$ch = curl_init($url);
