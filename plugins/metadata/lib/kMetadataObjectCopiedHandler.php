@@ -100,6 +100,8 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer
  		$c = new Criteria();
  		$c->add(MetadataProfilePeer::PARTNER_ID, $fromPartnerId);
  		
+ 		$limit = kConf::get('copy_partner_limit');
+ 		$c->setLimit($limit);
  		$metadataProfiles = MetadataProfilePeer::doSelect($c);
  		foreach($metadataProfiles as $metadataProfile)
  		{
