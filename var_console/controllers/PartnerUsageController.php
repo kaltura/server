@@ -10,6 +10,8 @@ class PartnerUsageController extends Zend_Controller_Action
 		$request = $this->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
+		$filterApplied = false;
+		
 		$from = $this->_getParam('from_date', $this->getDefaultFromDate());
 		$to = $this->_getParam('to_date', $this->getDefaultToDate());
 		
@@ -43,8 +45,18 @@ class PartnerUsageController extends Zend_Controller_Action
 		
 		// get results and paginate
 		$partnerFilter = $this->getPartnerFilterFromForm($form);
+		
+		if ($partnerFilter->idIn || $partnerFilter->nameLike || $partnerFilter->partnerNameDescriptionWebsiteAdminNameAdminEmailLike)
+		{
+		    $filterApplied = true;
+		}
+		
 		$paginatorAdapter = new Form_PartnerUsageFilterPaginator($varConsolePlugin->varConsole, "getPartnerUsage", null, $partnerFilter, $usageFilter);
 		$paginator = new Form_PartnerUsagePaginator($paginatorAdapter, $request);
+		
+		if ($filterApplied)
+		    $paginator->filtered = true;
+		
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		// set view
