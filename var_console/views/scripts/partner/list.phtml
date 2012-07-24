@@ -28,7 +28,7 @@
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_PartnerStatus', $partner->status); ?></td>
 				<td><?php echo $partner->id; ?></td>
-				<td><?php echo $partner->name; ?></td>
+				<td><?php echo $partner->name; if ($partner->id == $this->currentPartnerId) echo ' (you)'?></td>
 				<td><?php echo $partner->website ? $partner->website : "N/A"; ?></td>
 				<td><?php echo $partner->adminName; ?></td>
 				<td><?php echo $partner->adminEmail; ?></td>
@@ -41,15 +41,15 @@
 								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect') && $partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
 									<option value="manage" ><?php echo $this->translate('KMC Login'); ?></option>
 								<?php endif; ?>	
-								<?php if ($partner->id != Infra_Consts::TEMPLATE_PARTNER_ID): ?>
+								<?php if ($partner->id != Infra_Consts::TEMPLATE_PARTNER_ID && $partner->id != $this->currentPartnerId): ?>
 									<?php if (Infra_AclHelper::isAllowed('partner','block')): ?>		
-										<?php if ($partner->status == Kaltura_Client_Enum_PartnerStatus::ACTIVE && $partner->id != $this->currentPartnerId): ?>
+										<?php if ($partner->status == Kaltura_Client_Enum_PartnerStatus::ACTIVE): ?>
 											<option value="block"><?php echo $this->translate('Block'); ?></option>
 										<?php elseif ($partner->status == Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
 											<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
 										<?php endif; ?>
 									<?php endif; ?>
-									<?php if (Infra_AclHelper::isAllowed('partner','remove')): ?>
+									<?php if (Infra_AclHelper::isAllowed('partner','remove') && $partner->id != $this->currentPartnerId): ?>
 										<option value="remove"><?php echo $this->translate('Remove'); ?></option>
 									<?php endif; ?>
 								<?php endif; ?>
