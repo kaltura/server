@@ -32,6 +32,7 @@ if (isset($argv[3]))
 }
 
 $c->addAnd(entryPeer::TAGS, null, KalturaCriteria::NOT_EQUAL);
+$c->addAnd(entryPeer::STATUS, entryStatus::DELETED, KalturaCriteria::NOT_EQUAL);
 $c->setLimit($countLimitEachLoop);
 $c->addAscendingOrderByColumn(entryPeer::UPDATED_AT);
 $entryResults = entryPeer::doSelect($c, $con);
