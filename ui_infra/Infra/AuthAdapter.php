@@ -60,6 +60,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     		$ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId);
     		$client->setKs($ks);
     		$user = $client->user->getByLoginId($this->username, $partnerId);
+    		$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $this->partnerId, $this->password);
 			//New logic - if specific permissions are required to authenticate the partner/user, check their existence here.
     		
     		if (isset($settings->requiredPermissions))
@@ -98,9 +99,10 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     		    $ks = $client->user->loginByLoginId($this->username, $this->password, $authorizedPartnerId);
     			$client->setKs($ks);
     			$user = $client->user->getByLoginId($this->username, $authorizedPartnerId);
+    			$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $authorizedPartnerId, $this->password);
     		}
     		
-			$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $this->password);
+			
 			if ($partnerId && $user->partnerId != $partnerId) {
 				throw new Infra_UIInfraException('SYSTEM_USER_INVALID_CREDENTIALS');
 			}
