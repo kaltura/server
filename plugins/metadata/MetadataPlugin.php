@@ -836,15 +836,15 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		
 		If ($obejctType == MetadataObjectType::ENTRY)
 		{
-			$partnerSearchIndex = $partner->getSearchIndex(entryPeer::TABLE_NAME);
+			$partnerSearchIndex = $partner->getSearchIndex(entryPeer::TABLE_NAME, entryPeer::TABLE_NAME);
 		}
 		elseif ($obejctType == MetadataObjectType::CATEGORY)
 		{
-			$partnerSearchIndex = $partner->getSearchIndex(categoryPeer::TABLE_NAME);
+			$partnerSearchIndex = $partner->getSearchIndex(categoryPeer::TABLE_NAME, categoryPeer::TABLE_NAME);
 		}
 		elseif ($obejctType == MetadataObjectType::USER)
 		{
-			$partnerSearchIndex = $partner->getSearchIndex(kuserPeer::TABLE_NAME);
+			$partnerSearchIndex = $partner->getSearchIndex(kuserPeer::TABLE_NAME, kuserPeer::TABLE_NAME);
 		}
 		else 
 		{

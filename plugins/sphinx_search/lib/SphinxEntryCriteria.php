@@ -164,7 +164,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		if (!$partner)
 			return kSphinxSearchManager::getSphinxIndexName(entryPeer::TABLE_NAME);
 		
-		$partnerSearchIndex = $partner->getSearchIndex(entryPeer::TABLE_NAME);
+		$partnerSearchIndex = $partner->getSearchIndex(entryPeer::TABLE_NAME, entryPeer::TABLE_NAME);
 		
 		return kSphinxSearchManager::getSphinxIndexName($partnerSearchIndex);
 	}

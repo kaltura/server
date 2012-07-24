@@ -560,8 +560,8 @@ class Partner extends BasePartner
 	public function getAppStudioExamplePlayList1() { return $this->getFromCustomData("appStudioExamplePlayList1", null); }
 	public function setAppStudioExamplePlayList1( $v ) { $this->putInCustomData("appStudioExamplePlayList1", $v); }
 
-	public function getSearchIndex($defaultSearchIndex) { return $this->getFromCustomData("SearchIndex", null, $defaultSearchIndex); }
-	public function setSearchIndex( $v ) { $this->putInCustomData("SearchIndex", $v); }
+	public function getSearchIndex($searchIndex, $defaultSearchIndex) { return $this->getFromCustomData("SearchIndex", $searchIndex, $defaultSearchIndex); }
+	public function setSearchIndex($searchIndex, $v) { $this->putInCustomData("SearchIndex", $v, $searchIndex); }
 
 	/** Partner Packges and classification **/
 	public function getPartnerPackageClassOfService() { return $this->getFromCustomData("partnerPackageClassOfService", null); }
@@ -793,6 +793,9 @@ class Partner extends BasePartner
 		$this->putInCustomData('password_replace_freq', $replaceFreq, null);
 	}
 
+	public function setDefaultSftpEngine($v)			{$this->putInCustomData('default_sftp_engine', $v);}
+	public function getDefaultSftpEngine()				{return $this->getFromCustomData('default_sftp_engine', null, kFileTransferMgrType::SFTP);}
+	
 	public function setLoginUsersQuota($v)				{$this->putInCustomData('login_users_quota', $v);}
 	public function setAdminLoginUsersQuota($v)			{$this->putInCustomData('admin_login_users_quota', $v);}
 	public function setPublishersQuota($v)				{$this->putInCustomData('publishers_quota', $v);}
