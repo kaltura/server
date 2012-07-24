@@ -2180,13 +2180,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		// if we set the kuserId when not needed - this causes the kuser object to be reset (even if the joinKuser was done properly)
 		if ( self::getKuserId() == $v )  // same value - don't set for nothing 
 			return;  		
-		
-		//lazy migration for creatorKuserId.
-		if (is_null($this->getCreatorKuserId() && !is_null($this->getKuserId())))
-		{
-			$this->setCreatorKuserId($this->getKuserId());
-		}
 
+		$this->setCreatorKuserPuserIdMigration();
+		
 		parent::setKuserId($v);
 		
 		$kuser = $this->getKuser();
@@ -2194,11 +2190,25 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$this->setPuserId($kuser->getPuserId());
 	}
 	
+	/**
+	 * 
+	 * Lazy migration for old entries for cases where creator Kuser and Puser id 
+	 * wasn't initialized
+	 */
+	private function setCreatorKuserPuserIdMigration()
+	{
+		$creatorKuserId = $this->getFromCustomData( "creatorKuserId", null, null );		
+		if (is_null($creatorKuserId) && !is_null($this->getKuserId()))
+		{	
+			$this->setCreatorKuserId($this->getKuserId());
+		}
+	}
+	
 	public function setCreatorKuserId($v)
 	{
 		$this->creator_kuser_id = $v;
 		// if we set the kuserId when not needed - this causes the kuser object to be reset (even if the joinKuser was done properly)
-		if ( $this->getCreatorKuserId() == $v )  // same value - don't set for nothing 
+		if ( $this->getFromCustomData( "creatorKuserId", null, null ) == $v )  // same value - don't set for nothing 
 			return;  	
 
 		$this->putInCustomData ( "creatorKuserId" , $v );
