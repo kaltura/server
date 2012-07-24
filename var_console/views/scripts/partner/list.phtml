@@ -43,7 +43,7 @@
 								<?php endif; ?>	
 								<?php if ($partner->id != Infra_Consts::TEMPLATE_PARTNER_ID): ?>
 									<?php if (Infra_AclHelper::isAllowed('partner','block')): ?>		
-										<?php if ($partner->status == Kaltura_Client_Enum_PartnerStatus::ACTIVE): ?>
+										<?php if ($partner->status == Kaltura_Client_Enum_PartnerStatus::ACTIVE && $partner->id != $this->currentPartnerId): ?>
 											<option value="block"><?php echo $this->translate('Block'); ?></option>
 										<?php elseif ($partner->status == Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
 											<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
