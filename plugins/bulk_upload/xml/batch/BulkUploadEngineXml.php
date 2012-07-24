@@ -142,9 +142,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$data = self::getData();
 		$conversionProfileId = $data->objectData->conversionProfileId;
-		if($data->conversionProfileId == -1){
-			$conversionProfileId = PartnerPeer::retrieveByPK($this->currentPartnerId)->getDefaultConversionProfileId();
-		}
+
 		
 		$this->impersonate();
 		$conversionProfile = $this->kClient->conversionProfile->get($conversionProfileId);
