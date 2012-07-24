@@ -536,6 +536,7 @@ class myReportsMgr
 			}
 			
 			$entryFilter = new entryFilter();
+			$entryFilter->setPartnerSearchScope($partner_id);
 			$shouldSelectFromSearchEngine = false;
 			
 			$category_ids_clause = "1=1"; 
