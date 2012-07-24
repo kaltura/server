@@ -1207,7 +1207,7 @@ class myPartnerUtils
  		$c = new Criteria();
  		$c->addAnd(UserRolePeer::PARTNER_ID, $fromPartner->getId(), Criteria::EQUAL);
  		$c->addDescendingOrderByColumn(UserRolePeer::CREATED_AT);
- 		$c->setLimit(self::COPY_PARTNER_LIMIT);
+ 		$c->setLimit($this->copyPartnerLimit);
  		$roles = UserRolePeer::doSelect($c);
  		UserRolePeer::setUseCriteriaFilter ( true );
  		foreach($roles as $role)
