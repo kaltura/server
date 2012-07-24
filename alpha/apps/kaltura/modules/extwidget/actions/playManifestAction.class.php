@@ -1148,6 +1148,25 @@ class playManifestAction extends kalturaAction
 		if(!$this->format)
 			$this->format = StorageProfile::PLAY_FORMAT_HTTP;
 		
+		$playbackParams = array();
+		if (kConf::hasMap("optimized_playback"))
+		{
+			$partnerId = $this->entry->getPartnerId();
+			$optimizedPlayback = kConf::getMap("optimized_playback");
+			if (array_key_exists($partnerId, $optimizedPlayback))
+			{
+				$playbackParams = $optimizedPlayback[$partnerId];
+			}
+		}
+
+		if (array_key_exists('enforce_encryption', $playbackParams) && $playbackParams['enforce_encryption'])
+		{
+			if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on')
+				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED, 'unencrypted manifest request - forbidden');
+			if (strtolower($this->protocol) != 'https')
+				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED, 'unencrypted playback protocol - forbidden');
+		}
+
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
 		$partner = $this->entry->getPartner();
 		
