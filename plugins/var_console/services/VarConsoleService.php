@@ -135,7 +135,7 @@ class VarConsoleService extends KalturaBaseService
     				null , 
     				myReportsMgr::REPORT_TYPE_VAR_USAGE , 
     				$inputFilter ,
-    				$pager->pageSize , $pager->pageIndex, // pageIndex is 0 because we are using specific ids 
+    				$pager->pageSize , 0, // pageIndex is 0 because we are using specific ids 
     				null  , // order by  
     				implode(",", $partnerIds));
     				
