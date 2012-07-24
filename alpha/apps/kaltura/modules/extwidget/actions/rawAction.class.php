@@ -296,70 +296,60 @@ class rawAction extends sfAction
 		}
 
 //		echo "[$archive_file][" . file_exists ( $archive_file ) . "]";
-		$mime_type = kFile::mimeType( $archive_file );
+		$mime_type = kFile::mimeType( $archive_file);
 //		echo "[[$mime_type]]";
 
 
-		if ( ! empty ( $relocate ) )
+		$shouldProxy = $this->getRequestParameter("forceproxy", false);
+		if($shouldProxy || !empty($relocate))
 		{
-			// after relocation - dump the file
+			// dump the file
 			kFile::dumpFile($archive_file , $mime_type );
 			die();
 		}
+		
+		// use new Location to add the best extension we can find for the file
+		$file_ext = pathinfo ( $archive_file , PATHINFO_EXTENSION );
+		if ( $file_ext != "flv" )
+		{
+			// if the file does not end with "flv" - it is the real extension
+			$ext = $file_ext;
+		}
 		else
 		{
-			// use new Location to add the best extension we can find for the file
-			$file_ext = pathinfo ( $archive_file , PATHINFO_EXTENSION );
-			if ( $file_ext != "flv" )
-			{
-				// if the file does not end with "flv" - it is the real extension
-				$ext = $file_ext;
-			}
-			else
-			{
-				// for now - if "flv" return "flv" - // TODO - find the real extension from the file itself
-				$ext = "flv";
-			}	
-			
-			// rebuild the URL and redirect to it with extraa parameters
-			$url = $_SERVER["REQUEST_URI"];
-			$format = $this->getRequestParameter( "format" );
-			if ( ! $format )
-			{
-				$url = str_replace( "format" , "" , $url );
-			}
-			
-			if ( !$ret_file_name)
-			{
-				// don't leave the name empty - if it is empty - use the entry id
-				$ret_file_name = $entry_id;
-			}
-			
-			$ret_file_name_safe = str_replace(' ', '-', $ret_file_name); // spaces replace with "-"
-			$ret_file_name_safe = preg_replace('/[^a-zA-Z0-9-_]/', '', $ret_file_name_safe); // only "a-z", "A-Z", "0-9", "-" & "_" are left
-
-			if ( strpos ($url , "?" ) > 0 ) // replace BEFORE the query string
-			{
-				$url = str_replace( "?" , "/$ret_file_name_safe.{$ext}?" ,  $url );
-				$url .= "&relocate=f.{$ext}"; // add the ufname as a query parameter
-			}
-			else
-			{
-				$url .= "/$ret_file_name_safe.{$ext}?relocate=f.{$ext}";   // add the ufname as a query parameter
-			}
+			// for now - if "flv" return "flv" - // TODO - find the real extension from the file itself
+			$ext = "flv";
+		}	
 		
-			$shouldProxy = $this->getRequestParameter("forceproxy", false);
-			if($shouldProxy)
-			{
-				$url = kConf::get('www_host') . $url;
-				kFile::dumpUrl($url);
-			}
-			else
-			{
-				// or redirect if no proxy
-				header ( "Location: {$url}" );
-			}
+		// rebuild the URL and redirect to it with extraa parameters
+		$url = $_SERVER["REQUEST_URI"];
+		$format = $this->getRequestParameter( "format" );
+		if ( ! $format )
+		{
+			$url = str_replace( "format" , "" , $url );
 		}
+		
+		if ( !$ret_file_name)
+		{
+			// don't leave the name empty - if it is empty - use the entry id
+			$ret_file_name = $entry_id;
+		}
+		
+		$ret_file_name_safe = str_replace(' ', '-', $ret_file_name); // spaces replace with "-"
+		$ret_file_name_safe = preg_replace('/[^a-zA-Z0-9-_]/', '', $ret_file_name_safe); // only "a-z", "A-Z", "0-9", "-" & "_" are left
+
+		if ( strpos ($url , "?" ) > 0 ) // replace BEFORE the query string
+		{
+			$url = str_replace( "?" , "/$ret_file_name_safe.{$ext}?" ,  $url );
+			$url .= "&relocate=f.{$ext}"; // add the ufname as a query parameter
+		}
+		else
+		{
+			$url .= "/$ret_file_name_safe.{$ext}?relocate=f.{$ext}";   // add the ufname as a query parameter
+		}
+		
+		// or redirect if no proxy
+		header ( "Location: {$url}" );
 		die();
 	}
 	
