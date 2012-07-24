@@ -136,7 +136,7 @@ class VarConsoleService extends KalturaBaseService
     				myReportsMgr::REPORT_TYPE_VAR_USAGE , 
     				$inputFilter ,
     				$pager->pageSize , 0, // pageIndex is 0 because we are using specific ids 
-    				'date_id,partner_id'  , // order by  
+    				null  , // order by  
     				implode(",", $partnerIds));
     				
 		    foreach ( $reportData as $line )
@@ -175,7 +175,14 @@ class VarConsoleService extends KalturaBaseService
         
         if ($dateItem1 == $dateItem2)
         {
-            return 0;
+            if ($item1->partnerId > $item2->partnerId)
+            {
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
         }
         else if ($dateItem1 > $dateItem2)
         {
