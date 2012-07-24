@@ -45,6 +45,12 @@ class Infra_UserIdentity
 	private $password;
 	
 	/**
+	 * Partner id of the current logged-in partner.
+	 * @var int
+	 */
+	private $partnerId;
+	
+	/**
 	 * Init a new UserIdentity instance with the given parameters
 	 * @param Kaltura_Client_Type_User $user
 	 * @param string $ks
