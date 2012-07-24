@@ -5,7 +5,7 @@ class myPartnerRegistration
 
 	public function __construct( $partnerParentId = null )
 	{
-	    set_time_limit(kConf::get(partner_registration_timeout));
+	    set_time_limit(kConf::get('partner_registration_timeout'));
 		$this->partnerParentId = $partnerParentId;	
 	}
 	
