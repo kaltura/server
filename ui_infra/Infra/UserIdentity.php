@@ -55,11 +55,12 @@ class Infra_UserIdentity
 	 * @param Kaltura_Client_Type_User $user
 	 * @param string $ks
 	 */
-	public function __construct(Kaltura_Client_Type_User $user, $ks, $timezoneOffset, $password = null)
+	public function __construct(Kaltura_Client_Type_User $user, $ks, $timezoneOffset, $partnerId, $password = null)
 	{
 		$this->user = $user;
 		$this->ks = $ks;
 		$this->timezoneOffset = $timezoneOffset;
+		$this->partnerId = $partnerId;
 		if ($password)
 		    $this->password = $password;
 	}
