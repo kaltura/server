@@ -6,11 +6,12 @@
 require_once '../bootstrap.php';
 
 
-if ($argc !== 3) {
-	die ( 'usage: php ' . $_SERVER ['SCRIPT_NAME'] . "[partner_id] [search_index]" . PHP_EOL );
+if ($argc !== 4) {
+	die ( 'usage: php ' . $_SERVER ['SCRIPT_NAME'] . "[partner_id] [index type entry/category/kuser] [search_index_name]" . PHP_EOL );
 }
 $partnerId = $argv [1];
 $searchIndex = $argv [2];
+$searchIndexName = $argv [3];
 
 $partner = PartnerPeer::retrieveByPK ( $partnerId );
 if (! $partner)
@@ -21,7 +22,7 @@ $searchIndexes = kConf::get('search_indexes');
 if(!isset($searchIndexes[$searchIndex]))
 	die ( "no such search index [$searchIndex]." . print_r($searchIndexes,true) . PHP_EOL );
 	
-$partner->setSearchIndex($searchIndex);
+$partner->setSearchIndex($searchIndex, $searchIndexName);
 $partner->save();
 
 echo "done." . PHP_EOL;
