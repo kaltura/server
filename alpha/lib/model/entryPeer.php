@@ -327,13 +327,13 @@ class entryPeer extends BaseentryPeer
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		
 		if (kEntitlementUtils::getEntitlementEnforcement())
-		{
-			$privacyContexts = kEntitlementUtils::getPrivacyContextSearch();
-			$critEntitled = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, KalturaCriteria::IN_LIKE);
-			$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-			
+		{			
 			if ((kCurrentContext::$is_admin_session || ( $ks && $ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))))
 			{
+				$privacyContexts = kEntitlementUtils::getPrivacyContextSearch();
+				$critEntitled = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, KalturaCriteria::IN_LIKE);
+				$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+				
 				if(kCurrentContext::$ks_kuser_id)
 				{
 					//ENTITLED_KUSERS field includes $this->entitledUserEdit, $this->entitledUserEdit, and users on work groups categories.
@@ -343,7 +343,7 @@ class entryPeer extends BaseentryPeer
 					
 					$categoriesIds = array();
 					$categories = categoryPeer::doSelectEntitledAndNonIndexedCategories(kCurrentContext::$ks_kuser_id, entry::CATEGORY_SEARCH_LIMIT);
-					if(count($categories) == entry::CATEGORY_SEARCH_LIMIT)
+					if(count($categories) >= entry::CATEGORY_SEARCH_LIMIT)
 						self::$kuserBlongToMoreThanMaxCategoriesForSearch = true;
 				 
 					foreach($categories as $category)
