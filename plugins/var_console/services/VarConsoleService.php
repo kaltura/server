@@ -130,44 +130,60 @@ class VarConsoleService extends KalturaBaseService
 		else
 		{
 		    $totalCount = 0;
-		    // since the pager will not really work here, we needc to customize its activity.
-		    $startingLine = $pager->pageSize*($pager->pageIndex -1) +1;
-		    $countedLines = 0;
-			foreach ($partnerIds as $partnerId)
-			{
-    			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 
+		    
+		    list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 
     				null , 
-    				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
+    				myReportsMgr::REPORT_TYPE_VAR_USAGE , 
     				$inputFilter ,
-    				365*2 , 0 , // pageIndex is 0 because we are using specific ids 
+    				$pager->pageSize , $pager->pageIndex, // pageIndex is 0 because we are using specific ids 
     				null  , // order by  
-    				"$partnerId");
+    				implode(",", $partnerIds));
     				
-    			$totalCount += count($reportData);
-    			if ( count($items) < $pager->pageSize)
-    			{
-        			foreach ( $reportData as $line )
-        			{
-                        $countedLines++;
-                        if ($countedLines >= $startingLine && count($items) < $pager->pageSize )
-                        {
-                			$item = new KalturaVarPartnerUsageItem();
-                			$item->fromPartner(PartnerPeer::retrieveByPK($partnerId));
-            				$item->fromString( $reportHeader , $line );
-                			$items[] = $item;
-                        }
-                        else if (count($items) >= $pager->pageSize)
-                        {
-                            break;
-                        }
-        			}
-    			}
-			    
+		    foreach ( $reportData as $line )
+			{
+    			$item = new KalturaVarPartnerUsageItem();
+				$item->fromString( $reportHeader , $line );
+    			$items[] = $item;
+
 			}
+		    // since the pager will not really work here, we needc to customize its activity.
+//		    $startingLine = $pager->pageSize*($pager->pageIndex -1) +1;
+		    //$countedLines = 0;
+//			foreach ($partnerIds as $partnerId)
+//			{
+//    			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 
+//    				null , 
+//    				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
+//    				$inputFilter ,
+//    				365*2 , 0 , // pageIndex is 0 because we are using specific ids 
+//    				null  , // order by  
+//    				"$partnerId");
+//    				
+//    			$totalCount += count($reportData);
+//    			if ( count($items) < $pager->pageSize)
+//    			{
+//        			foreach ( $reportData as $line )
+//        			{
+//                        $countedLines++;
+//                        if ($countedLines >= $startingLine && count($items) < $pager->pageSize )
+//                        {
+//                			$item = new KalturaVarPartnerUsageItem();
+//                			$item->fromPartner(PartnerPeer::retrieveByPK($partnerId));
+//            				$item->fromString( $reportHeader , $line );
+//                			$items[] = $item;
+//                        }
+//                        else if (count($items) >= $pager->pageSize)
+//                        {
+//                            break;
+//                        }
+//        			}
+//    			}
+//			    
+//			}
 			
 			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTotal( 
     				null , 
-    				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
+    				myReportsMgr::REPORT_TYPE_VAR_USAGE , 
     				$inputFilter ,
     				implode(",", $partnerIds));
 		
@@ -224,5 +240,36 @@ class VarConsoleService extends KalturaBaseService
 		$dbPartner->setStatus($status);
 		$dbPartner->save();
 		PartnerPeer::removePartnerFromCache($id);
+	}
+	
+	/**
+	 * @action getAdminSession
+	 * @param int $partnerId
+	 * @param string $userId
+	 * @return string
+	 */
+	public function getAdminSessionAction($partnerId, $userId = null)
+	{
+	    $c = PartnerPeer::getDefaultCriteria();
+	    $c->addAnd(PartnerPeer::ID, $partnerId);
+		$dbPartner = PartnerPeer::doSelectOne($c);
+		if (!$dbPartner)
+			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
+		
+		if (!$userId) {
+			$userId = $dbPartner->getAdminUserId();
+		}
+		
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
+		if (!$kuser) {
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
+		}
+		if (!$kuser->getIsAdmin()) {
+			throw new KalturaAPIException(KalturaErrors::USER_NOT_ADMIN, $userId);
+		}
+			
+		$ks = "";
+		kSessionUtils::createKSessionNoValidations($dbPartner->getId(), $userId, $ks, 86400, 2, "", '*,' . ks::PRIVILEGE_DISABLE_ENTITLEMENT);
+		return $ks;
 	}
 }

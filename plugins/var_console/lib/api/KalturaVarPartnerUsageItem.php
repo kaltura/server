@@ -154,12 +154,16 @@ class KalturaVarPartnerUsageItem extends KalturaObject
 		//$item = new KalturaVarPartnerUsageItem();
 		
 		$this->dateId         = @$arr[0];
-		$this->bandwidth 		= ceil(@$arr[1]);
+		$this->partnerStatus 	= @$arr[1];
+		$this->partnerName 		= @$arr[2];
+		$this->partnerId  		= @$arr[3];
+		$this->partnerCreatedAt = @$arr[4];
+		$this->bandwidth 		= ceil(@$arr[5]);
 		//$item->totalStorage 	= @$arr[15];
-        $this->avgStorage = ceil(@$arr[2]);
-		$this->peakStorage =  ceil(@$arr[3]);
-		$this->storage 		= ceil(@$arr[4]);
-        $this->combinedStorageBandwidth = ceil(@$arr[5]);
+        $this->avgStorage = ceil(@$arr[6]);
+		$this->peakStorage =  ceil(@$arr[7]);
+		$this->storage 		= ceil(@$arr[8]);
+        $this->combinedStorageBandwidth = ceil(@$arr[9]);
 			
 		//return $item;
 	}
