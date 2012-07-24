@@ -144,22 +144,22 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 	 */
 	private function getBulkUploadObectTypeName($bulkuploadObjectType)
 	{
-		$bulkuploadObjectTypeName = $bulkuploadObjectType;
+		$bulkuploadObjectTypeName = null;
 	    try 
 	    {
         	$reflectedClass = new ReflectionClass('KalturaBulkUploadObjectType');
         	$array = $reflectedClass->getConstants();
-        	foreach ($array as $typeName => $typeId) {
-        		if ($typeId == $bulkuploadObjectType) {
-        			$bulkuploadObjectTypeName = $typeName;
-         			return $bulkuploadObjectTypeName;
-        		}
+        	$bulkuploadObjectTypeName = array_search($bulkuploadObjectType, $array);
+        	if(!$bulkuploadObjectTypeName)
+        	{
+         		KalturaLog::debug("Definition not found for type $bulkuploadObjectType in KalturaBulkUploadObjectType");
+         		$bulkuploadObjectTypeName = $bulkuploadObjectType;
         	}
     	} 
     	catch (Exception $exception) 
     	{
-        	//return type id
-        	KalturaLog::debug($exception);
+        	KalturaLog::err($exception);
+        	$bulkuploadObjectTypeName = $bulkuploadObjectType;
     	} 
 		return $bulkuploadObjectTypeName;
 	}
