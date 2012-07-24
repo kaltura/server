@@ -136,7 +136,7 @@ class VarConsoleService extends KalturaBaseService
     				myReportsMgr::REPORT_TYPE_VAR_USAGE , 
     				$inputFilter ,
     				$pager->pageSize , 0, // pageIndex is 0 because we are using specific ids 
-    				null  , // order by  
+    				'date_id,partner_id'  , // order by  
     				implode(",", $partnerIds));
     				
 		    foreach ( $reportData as $line )
@@ -144,42 +144,7 @@ class VarConsoleService extends KalturaBaseService
     			$item = new KalturaVarPartnerUsageItem();
 				$item->fromString( $reportHeader , $line );
     			$items[] = $item;
-
 			}
-		    // since the pager will not really work here, we needc to customize its activity.
-//		    $startingLine = $pager->pageSize*($pager->pageIndex -1) +1;
-		    //$countedLines = 0;
-//			foreach ($partnerIds as $partnerId)
-//			{
-//    			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 
-//    				null , 
-//    				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
-//    				$inputFilter ,
-//    				365*2 , 0 , // pageIndex is 0 because we are using specific ids 
-//    				null  , // order by  
-//    				"$partnerId");
-//    				
-//    			$totalCount += count($reportData);
-//    			if ( count($items) < $pager->pageSize)
-//    			{
-//        			foreach ( $reportData as $line )
-//        			{
-//                        $countedLines++;
-//                        if ($countedLines >= $startingLine && count($items) < $pager->pageSize )
-//                        {
-//                			$item = new KalturaVarPartnerUsageItem();
-//                			$item->fromPartner(PartnerPeer::retrieveByPK($partnerId));
-//            				$item->fromString( $reportHeader , $line );
-//                			$items[] = $item;
-//                        }
-//                        else if (count($items) >= $pager->pageSize)
-//                        {
-//                            break;
-//                        }
-//        			}
-//    			}
-//			    
-//			}
 			
 			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTotal( 
     				null , 
