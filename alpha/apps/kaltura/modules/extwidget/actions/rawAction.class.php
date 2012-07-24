@@ -351,6 +351,7 @@ class rawAction extends sfAction
 			$shouldProxy = $this->getRequestParameter("forceproxy", false);
 			if($shouldProxy)
 			{
+				$url = kConf::get('www_host') . $url;
 				kFile::dumpUrl($url);
 			}
 			else
