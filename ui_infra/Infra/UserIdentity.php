@@ -145,6 +145,14 @@ class Infra_UserIdentity
     {
         return $this->password;
     }
+	/**
+     * @return the $partnerId
+     */
+    public function getPartnerId ()
+    {
+        return $this->partnerId;
+    }
+
 
 
 }
