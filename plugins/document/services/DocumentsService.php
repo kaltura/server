@@ -445,6 +445,14 @@ class DocumentsService extends KalturaEntryService
 	 */
 	public function serveByFlavorParamsIdAction($entryId, $flavorParamsId = null, $forceProxy = false)
 	{
+		// temporary workaround for getting the referrer from a url with the format ....&forceProxy/true/referrer/...
+		$referrer = null;
+		if (isset($_GET["forceProxy"]) && kString::beginsWith($_GET["forceProxy"], "true/referrer/"))
+		{
+			$referrer = substr($_GET["forceProxy"], strlen("true/referrer/"));
+			$referrer = base64_decode($referrer);
+		}
+
 		KalturaResponseCacher::disableCache();
 		
 		entryPeer::setDefaultCriteriaFilter();
@@ -455,7 +463,7 @@ class DocumentsService extends KalturaEntryService
 					
 		$ksObj = $this->getKs();
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
-		$securyEntryHelper = new KSecureEntryHelper($dbEntry, $ks, null, accessControlContextType::DOWNLOAD);
+		$securyEntryHelper = new KSecureEntryHelper($dbEntry, $ks, $referrer, accessControlContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload();			
 			
 		$flavorAsset = null;
