@@ -24,7 +24,6 @@ class PartnerController extends Zend_Controller_Action
 		$form = new Form_PartnerCreate();
 		
 		$partner = Zend_Registry::get('config')->partner;
-		$allowNonePackage = isset($partner->enableNonePackage) ? $partner->enableNonePackage : false;
 		
 		if ($request->isPost())
 		{
@@ -85,8 +84,13 @@ class PartnerController extends Zend_Controller_Action
 		$form->setProviders($providers);
 		
 		//If available sub-publisher quota was reached, submit button should be disabled.
-		$subPublisherCount = $client->partner->count();
+		//Exclude publisher iteself, template sub-publisher and deleted sub-publisher
 		$currentPartner = $client->partner->getInfo();
+		$filter = new Kaltura_Client_VarConsole_Type_VarConsolePartnerFilter();
+		$filter->idNotIn = $currentPartner->id;
+		$filter->statusIn = implode(",", array (Kaltura_Client_Enum_PartnerStatus::ACTIVE, Kaltura_Client_Enum_PartnerStatus::BLOCKED));
+		$filter->groupTypeEq = Kaltura_Client_Enum_PartnerGroupType::PUBLISHER;
+		$subPublisherCount = $client->partner->count($filter);
 		/* @var $currentPartner Kaltura_Client_Type_Partner */
 		if ($currentPartner->publishersQuota - $subPublisherCount->value <= 0)
 		{
