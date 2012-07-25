@@ -441,6 +441,21 @@ class PartnerService extends KalturaBaseService
 		return $response;
 	}
 	
-
+	/**
+	 * Count partner's existing sub-publishers
+	 * 
+	 * @action count
+	 * @return int
+	 */
+    public function countAction (KalturaPartnerFilter $filter)
+    {
+        $dbFilter = new partnerFilter();
+        $filter->toObject($dbFilter);
+        
+        $c = PartnerPeer::getDefaultCriteria();
+        $dbFilter->attachToCriteria($c);
+        
+        return PartnerPeer::doCount($c);
+    }
 	
 }
