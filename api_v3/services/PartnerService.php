@@ -445,6 +445,7 @@ class PartnerService extends KalturaBaseService
 	 * Count partner's existing sub-publishers (count includes the partner itself).
 	 * 
 	 * @action count
+	 * @param KalturaPartnerFilter $filter
 	 * @return int
 	 */
     public function countAction (KalturaPartnerFilter $filter = null)
