@@ -895,6 +895,12 @@ return array(
 
 	// partner-create
 	'partner-create intro text' => 'Please fill in the following form to create a new sub-account. When a new account is created, a registration email will automatically be sent to the Administrator Email you have provided below.',
+    'partner-create current publisher quota status text' => 'Current status:',
+    'partner-create publisher quota test part 1' =>  'accounts in use*.',
+    'partner-create publisher quota test part 2' => 'additional remaining.',
+	'partner-create publisher quota test part 3' => 'Need more accounts?',
+    'partner-create publisher quota test part 4' => 'to request an upgrade.',
+    'contact kaltura' => 'Contact Kaltura',
 
 	'partner-create form name' => 'Administrator:',
 	'partner-create form company' => 'Account Name:',
