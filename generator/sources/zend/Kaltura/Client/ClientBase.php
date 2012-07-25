@@ -525,9 +525,22 @@ class Kaltura_Client_ClientBase
 			if (!($resultObject instanceof $objectType))
 				throw new Kaltura_Client_ClientException("Invalid object type", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
-		else if (gettype($resultObject) != "NULL" && gettype($resultObject) != $objectType)
+		else 
 		{
-			throw new Kaltura_Client_ClientException("Invalid object type [" . gettype($resultObject) . "] expected [$objectType]", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
+		    switch ($objectType)
+		    {
+		        case "integer":
+		            $resStringVal = strval(intval($resultObject));
+		            break;
+		        case "float":
+                    $resStringVal = strval(floatval($resultObject));
+		            break;
+		        case "string":
+		            $resStringVal = $resultObject;
+		            break;
+		    }
+		    if ($resStringVal !== $resultObject)
+			    throw new Kaltura_Client_ClientException("Invalid object type [" . gettype($resultObject) . "] expected [$objectType]", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 	}
 	
