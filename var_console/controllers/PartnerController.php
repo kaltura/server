@@ -84,6 +84,12 @@ class PartnerController extends Zend_Controller_Action
 		
 		$form->setProviders($providers);
 		
+		//If available sub-publisher quota was reached, submit button should be disabled.
+		$submitBtn = $form->getElement('submit');
+        $submitBtn->setOptions(array(
+            'disable' => array(1, 2)
+        ));
+		
 		$this->view->form = $form;
 	}
     
