@@ -525,7 +525,7 @@ class Kaltura_Client_ClientBase
 			if (!($resultObject instanceof $objectType))
 				throw new Kaltura_Client_ClientException("Invalid object type", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
-		else 
+		else if( $objectType != 'string')
 		{
 		    switch ($objectType)
 		    {
@@ -534,9 +534,6 @@ class Kaltura_Client_ClientBase
 		            break;
 		        case "float":
                     $resStringVal = strval(floatval($resultObject));
-		            break;
-		        case "string":
-		            $resStringVal = $resultObject;
 		            break;
 		    }
 		    if ($resStringVal !== $resultObject)
