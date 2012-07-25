@@ -447,8 +447,11 @@ class PartnerService extends KalturaBaseService
 	 * @action count
 	 * @return int
 	 */
-    public function countAction (KalturaPartnerFilter $filter)
+    public function countAction (KalturaPartnerFilter $filter = null)
     {
+        if (!$filter)
+            $filter = new KalturaPartnerFilter();
+            
         $dbFilter = new partnerFilter();
         $filter->toObject($dbFilter);
         
