@@ -4,7 +4,7 @@
  * @subpackage Partners
  */
 class Form_PartnerCreate extends Infra_Form
-{	
+{	    
 	public function init()
 	{
 		parent::init();
@@ -64,7 +64,6 @@ class Form_PartnerCreate extends Infra_Form
 			'label' => 'partner-create form create',
 			'type' => 'submit',
 			'decorators' => array('ViewHelper'),
-		    'attribs' => array ('disabled' => 'disable')
 		));
 		
 		
