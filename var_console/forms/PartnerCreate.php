@@ -63,7 +63,8 @@ class Form_PartnerCreate extends Infra_Form
 		$this->addElement('button', 'submit', array(
 			'label' => 'partner-create form create',
 			'type' => 'submit',
-			'decorators' => array('ViewHelper')
+			'decorators' => array('ViewHelper'),
+		    'attribs' => array ('disabled' => 'disable')
 		));
 		
 		
