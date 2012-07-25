@@ -100,6 +100,9 @@ class PartnerController extends Zend_Controller_Action
             ));
 		}
 		
+		$this->view->publishersQuota = $currentPartner->publishersQuot;
+		$this->view->remainingPublishers = $currentPartner->publishersQuota - $subPublisherCount->value > 0? $currentPartner->publishersQuota - $subPublisherCount->value : 0;
+		
 		$this->view->form = $form;
 	}
     
