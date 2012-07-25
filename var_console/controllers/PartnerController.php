@@ -88,7 +88,7 @@ class PartnerController extends Zend_Controller_Action
 		$subPublisherCount = $client->partner->count();
 		$currentPartner = $client->partner->getInfo();
 		/* @var $currentPartner Kaltura_Client_Type_Partner */
-		if ($currentPartner->publishersQuota - $subPublisherCount <= 0)
+		if ($currentPartner->publishersQuota - $subPublisherCount->count <= 0)
 		{
     		$submitBtn = $form->getElement('submit');
             $submitBtn->setOptions(array(
