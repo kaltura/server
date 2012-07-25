@@ -24,7 +24,7 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 			$targetType = "image2";		
 		KalturaLog::debug("position[$position], width[$width], height[$height], frameCount[$frameCount], frameCount[$frameCount], dar[$dar]");
 		if(isset($dar) && $dar>0 && isset($height)){
-			$width = round($height*$dar);
+			$width = floor(round($height*$dar)  /2) * 2;
 		}
 		// TODO - calculate the width and height according to dar
 		$cmdArr = $this->getCommand($position, $width, $height, $frameCount, $targetType);
