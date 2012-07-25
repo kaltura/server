@@ -16,6 +16,7 @@ if ( !PartnerPeer::retrieveByPK($partnerId) )
 
 $criteria = new Criteria();
 $criteria->add(categoryPeer::PARTNER_ID,$partnerId,Criteria::EQUAL);
+$criteria->addAscendingOrderByColumn(categoryPeer::DEPTH);
 $allCats = categoryPeer::doSelect($criteria);
 
 
