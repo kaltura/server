@@ -219,6 +219,11 @@ class UserService extends KalturaBaseUserService
 		if (!$kuser) {
 			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
 		}
+
+		// users that are not publisher administrator are only allowed to get their own object   
+		if ($kuser->getId() != kCurrentContext::$ks_kuser_id && !in_array(PermissionName::MANAGE_ADMIN_USERS, kPermissionManager::getCurrentPermissions()))
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginId);
+		
 		$user = new KalturaUser();
 		$user->fromObject($kuser);
 		
