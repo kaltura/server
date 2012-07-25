@@ -19,28 +19,10 @@ $criteria->add(categoryPeer::PARTNER_ID,$partnerId,Criteria::EQUAL);
 $allCats = categoryPeer::doSelect($criteria);
 
 
-foreach ($allCats as $cat)
+foreach ($allCats as $categoryDb)
 {
-	/* @var $cat category */
-	$allChildren = $cat->getAllChildren();
-	$allSubCatsIds = array();
-	$allSubCatsIds[] = $cat->getId();
-	
-	if (count($allChildren))
-	{
-		foreach ($allChildren as $child)
-			$allSubCatsIds[] = $child->getId();	
-	}
-
-	$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-	$entryFilter = new entryFilter();
-	$entryFilter->set("_matchor_categories_ids", implode(',',$allSubCatsIds));
-	$entryFilter->attachToCriteria($c);
-	$entriesList = entryPeer::doSelect($c);
-	$entriesCount = $c->getRecordsCount();
-	
-	echo "Number of entries in category <". $cat->getName().">: ". $entriesCount ."\r\n";
-	
-	$cat->setEntriesCount($entriesCount);
-	$cat->save();
+	$categoryDb->reSetEntriesCount();
+	$categoryDb->reSetDirectSubCategoriesCount();
+	$categoryDb->reSetDirectEntriesCount();	
+	$categoryDb->save();
 }
