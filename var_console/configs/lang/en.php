@@ -900,6 +900,7 @@ return array(
     'partner-create publisher quota test part 2' => 'additional remaining.',
 	'partner-create publisher quota test part 3' => 'Need more accounts?',
     'partner-create publisher quota test part 4' => 'to request an upgrade.',
+    'partner-create publisher quota test part 5' => '*active or blocked accounts which are not used as templates.',
     'contact kaltura' => 'Contact Kaltura',
 
 	'partner-create form name' => 'Administrator:',
