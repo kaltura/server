@@ -645,7 +645,7 @@ class KalturaSyndicationFeedRenderer
 	private function writeFullXmlNode($nodeName, $value, $level, $attributes = array())
 	{
 		$this->writeOpenXmlNode($nodeName, $level, $attributes, false);
-		echo "$value";
+		echo kString::xmlEncode(kString::xmlDecode("$value"));
 		$this->writeClosingXmlNode($nodeName, 0);
 	}
 	

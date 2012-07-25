@@ -263,6 +263,11 @@ class kString
 		return str_replace ( array ( "&", '"' , '<', '>', "'" ) , array ( "&amp;", "&quot;" , "&lt;", "&gt;", "&apos;" ), $str );
 	}
 	
+	public static function xmlDecode($str)
+	{
+		return str_replace ( array ( "&amp;", "&quot;" , "&lt;", "&gt;", "&apos;" ) , array ( "&", '"' , '<', '>', "'" ), $str );
+	}
+	
 	/**
 	 * @param string $string
 	 * @return string
