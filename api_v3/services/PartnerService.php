@@ -442,7 +442,7 @@ class PartnerService extends KalturaBaseService
 	}
 	
 	/**
-	 * Count partner's existing sub-publishers
+	 * Count partner's existing sub-publishers (count includes the partner itself).
 	 * 
 	 * @action count
 	 * @return int
