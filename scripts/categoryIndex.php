@@ -22,6 +22,8 @@ $allCats = categoryPeer::doSelect($criteria);
 
 foreach ($allCats as $categoryDb)
 {
+	$categoryDb->setIsIndex(true);
+	
 	$categoryDb->reSetFullIds();
 	$categoryDb->reSetInheritedParentId();
 	$categoryDb->reSetDepth();
@@ -33,4 +35,6 @@ foreach ($allCats as $categoryDb)
 	$categoryDb->reSetDirectSubCategoriesCount();
 	$categoryDb->reSetDirectEntriesCount();	
 	$categoryDb->save();
+	
+	$categoryDb->indexToSearchIndex();
 }
