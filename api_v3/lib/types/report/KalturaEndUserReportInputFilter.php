@@ -40,10 +40,10 @@ class KalturaEndUserReportInputFilter extends KalturaReportInputFilter
 		$endUserReportsInputFilter->playbackContext = $this->playbackContext;
 		
 		
-		if ($this->application) {
+		if ($this->application != null) {
 			$endUserReportsInputFilter->extra_map[self::APPLICATION_NAME_PLACE_HOLDER] = "'" . $this->application . "'";
 		} 
-		if ($this->userIds) {
+		if ($this->userIds != null) {
 			$objectIds = explode(',', $this->userIds);
 			$puserIds = "('" . implode("','", $objectIds) . "')";
 			// replace puser_id '0' with 'Unknown' as it saved on dwh pusers table
