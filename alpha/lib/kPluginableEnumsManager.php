@@ -13,9 +13,15 @@ class kPluginableEnumsManager
 	
 	/**
 	 * All dynamic enums, mapped on the api name as key
-	 * @var unknown_type
+	 * @var array
 	 */
 	protected static $apiMap;
+	
+	/**
+	 * Enable dynamic creation of new values
+	 * @var bool
+	 */
+	protected static $createNew = false;
 	
 	protected static function reloadMaps()
 	{
@@ -150,6 +156,9 @@ class kPluginableEnumsManager
 		$dynamicEnum = DynamicEnumPeer::retrieveByPluginConstant($type, $valueName, $pluginName);
 		if(!$dynamicEnum)
 		{
+			if(!self::$createNew)
+				throw new kCoreException("Dynamic enum not found [$value] for type [$type]", kCoreException::ENUM_NOT_FOUND);
+				
 			$dynamicEnum = new DynamicEnum();
 			$dynamicEnum->setEnumName($type);
 			$dynamicEnum->setValueName($valueName);
@@ -177,5 +186,14 @@ class kPluginableEnumsManager
 			return $plugin;
 			
 		return null;
+	}
+	
+	
+	/**
+	 * Enable dynamic creation of new values
+	 */
+	public static function enableNewValues()
+	{
+		self::$createNew = true;
 	}
 }

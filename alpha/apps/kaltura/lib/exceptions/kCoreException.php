@@ -34,6 +34,8 @@ class kCoreException extends Exception
 	
 	const INVALID_ENUM_FORMAT = "INVALID_ENUM_FORMAT";
 	
+	const ENUM_NOT_FOUND = "ENUM_NOT_FOUND";
+	
 	const DUPLICATE_CATEGORY = "DUPLICATE_CATEGORY";
 	
 	const PARENT_ID_IS_CHILD = "PARENT_ID_IS_CHILD";

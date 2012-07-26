@@ -2,6 +2,8 @@
 
 require_once(dirname(__FILE__) . '/../../bootstrap.php');
 
+kPluginableEnumsManager::enableNewValues();
+
 $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
 foreach($pluginInstances as $pluginInstance)
 {
