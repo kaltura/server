@@ -6,6 +6,8 @@
 class BatchController extends Zend_Controller_Action
 {
 
+	const BATCH_JOBS_PAGER_SIZE = 500;
+	
 	public function indexAction()
 	{
 		$this->_helper->redirector('entry-lifecycle');
@@ -638,8 +640,10 @@ class BatchController extends Zend_Controller_Action
 		
 		$filter = new Infra_BatchJobFilter();
 		$filter->entryIdEqual = $entryId;
+		$pager = new Kaltura_Client_Type_FilterPager();
+		$pager->pageSize = self::BATCH_JOBS_PAGER_SIZE;
 		try{
-			$jobsList = $client->jobs->listBatchJobs($filter);
+			$jobsList = $client->jobs->listBatchJobs($filter,$pager);
 			$investigateData->jobs = $jobsList;
 		}
 		catch(Exception $e){
