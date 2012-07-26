@@ -41,7 +41,12 @@ class myCsvReport
 			}	
 			else if($dimension)
 			{	
-				$csv->addNewLine( $csv->formatDate( myReportsMgr::formatDateFromDateId( $data ) ), $value );		
+				if (strlen($data) == 6) { //foramt is yyyymm
+					$date = DateTime::createFromFormat("Ym", $data);
+					$csv->addNewLine( $date->format("M Y"), $value );
+				} else {
+					$csv->addNewLine( $csv->formatDate( myReportsMgr::formatDateFromDateId( $data ) ), $value );
+				}		
 			}
 			
 		}
