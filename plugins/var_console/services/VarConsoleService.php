@@ -151,14 +151,14 @@ class VarConsoleService extends KalturaBaseService
     			}
 			}
 			
-			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTotal( 
-    				null , 
-    				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
-    				$inputFilter ,
-    				implode(",", $partnerIds));
-		
-    		$total = new KalturaVarPartnerUsageTotalItem();
-    		$total->fromString($reportHeader, $reportData);
+//			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTotal( 
+//    				null , 
+//    				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
+//    				$inputFilter ,
+//    				implode(",", $partnerIds));
+//		
+//    		$total = new KalturaVarPartnerUsageTotalItem();
+//    		$total->fromString($reportHeader, $reportData);
 			
 		}
 		
@@ -169,7 +169,7 @@ class VarConsoleService extends KalturaBaseService
 		$items = array_values($unsortedItems);
 		uasort($items, array($this, 'sortByDate'));
 		
-		$response->total = $total; 
+		//$response->total = $total; 
 		$response->totalCount = $totalCount;
 		$response->objects = $items;
 		return $response;
