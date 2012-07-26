@@ -275,6 +275,9 @@ class kwidgetAction extends sfAction
 					$ks = "";
 					
 					$privileges = "view:*,widget:1";
+					if($widget->getIsPlayList())
+						$privileges = "list:*,widget:1";
+						
 					if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partner_id) &&
 						!$widget->getEnforceEntitlement() && $widget->getEntryId())
 						$privileges .= ','. kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY . ':' . $widget->getEntryId();
