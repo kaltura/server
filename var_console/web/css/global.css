@@ -107,11 +107,11 @@ div#my_info, div#new_admin { clear: both;}
 #partner-list .hint { color: #FF3200; }
 
 /* partner-usage-index */ 
-#partner-usage-index input { vertical-align: top; }
+#partner-usage-index input { vertical-align: top; }"apache/my_kaltura.conf"
 
 /* partner-create */
 #partner-create #new_account { width: 350px; }
-#partner-create #new_account fieldset { width: 340px; }
+#partner-create #new_account fieldset { width: 340px; }"apache/my_kaltura.conf"
 
 	option { padding-right:8px;}
 	input, select { font: normal 11px arial,sans-serif;}
@@ -253,6 +253,7 @@ div#my_info, div#new_admin { clear: both;}
 		
 /* partner-create */
 #partner-create form { clear: both; }
+#partner-create p { font:9px}
 
 /* widget-dialog*/
 #widget-dialog { padding-top:10px;}
