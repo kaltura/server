@@ -28,6 +28,8 @@ class KalturaEndUserReportInputFilter extends KalturaReportInputFilter
 	
 	const APPLICATION_NAME_PLACE_HOLDER = "{APPLICATION_NAME}";
 	const PUSERS_PLACE_HOLDER = "{PUSER_ID}";
+	const UNKNOWN_PUSER_ID_CLAUSE = "'0'";
+	const UNKNOWN_NAME_CLAUSE = "'Unknown'";
 	
 	public function toReportsInputFilter ($reportsInputFilter = null)
 	{
@@ -44,6 +46,8 @@ class KalturaEndUserReportInputFilter extends KalturaReportInputFilter
 		if ($this->userIds) {
 			$objectIds = explode(',', $this->userIds);
 			$puserIds = "('" . implode("','", $objectIds) . "')";
+			// replace puser_id '0' with 'Unknown' as it saved on dwh pusers table
+			$puserIds = str_replace(self::UNKNOWN_PUSER_ID_CLAUSE, self::UNKNOWN_NAME_CLAUSE, $puserIds);
 			$endUserReportsInputFilter->extra_map[self::PUSERS_PLACE_HOLDER] = $puserIds;
 		}
 		return $endUserReportsInputFilter;
