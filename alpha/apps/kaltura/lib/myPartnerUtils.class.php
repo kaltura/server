@@ -11,7 +11,6 @@ class myPartnerUtils
 	
 	const ALL_PARTNERS_WILD_CHAR = "*";
 	
-    protected static $copyPartnerLimit;
 	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
@@ -1175,8 +1174,6 @@ class myPartnerUtils
  				$toPartner->putInCustomData($customDataName, $customDataValue);
 		
 		$toPartner->save();
-		
-		self::$copyPartnerLimit = kConf::get("copy_partner_limit");
 		
 		// copy permssions before trying to copy additional objects such as distribution profiles which are not enabled yet for the partner
  		self::copyPermissions($fromPartner, $toPartner);
