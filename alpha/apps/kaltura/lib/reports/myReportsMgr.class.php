@@ -1192,11 +1192,11 @@ class endUserReportsInputFilter extends reportsInputFilter
 	
 	public function getFilterBy() {
 		$filterBy = ""; 
-		if ($this->playbackContext) 
+		if ($this->playbackContext != null) 
 			$filterBy = "_by_context";
-		if ($this->userIds) 
+		if ($this->userIds != null) 
 			$filterBy = "_by_user";
-		if ($this->application)
+		if ($this->application != null)
 			$filterBy = $filterBy . "_by_app";
 
 		return $filterBy;
