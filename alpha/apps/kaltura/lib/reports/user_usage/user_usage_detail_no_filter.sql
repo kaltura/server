@@ -1,6 +1,6 @@
 SELECT
 	raw_data.kuser_id,
-	users.puser_id NAME,
+	users.puser_id name,
 	raw_data.added_entries added_entries,
 	total.total_entries total_entries,
 	raw_data.added_storage_mb added_storage_mb,

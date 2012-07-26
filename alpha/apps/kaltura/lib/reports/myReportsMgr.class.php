@@ -775,6 +775,7 @@ class myReportsMgr
 				"avg_time_viewed" ,
 				"count_loads" ,
 				"load_play_ratio" ,	
+				"avg_view_drop_off",
 			),
 			"top_contributors" => array (
 #				"screen_name",			
@@ -802,13 +803,25 @@ class myReportsMgr
 				"sum_time_viewed" ,
 				"avg_time_viewed" ,
 				"count_loads" ,
+				"avg_view_drop_off",
 				"load_play_ratio" ,		
 			),
-			"user_top_content" => array (				
+			"specific_user_engagement" => array (
+				"unique_videos",
 				"count_plays" ,	
 				"sum_time_viewed" ,
 				"avg_time_viewed" ,
 				"count_loads" ,
+				"avg_view_drop_off",
+				"load_play_ratio" ,		
+			),
+			"user_top_content" => array (
+				"unique_videos",				
+				"count_plays" ,	
+				"sum_time_viewed" ,
+				"avg_time_viewed" ,
+				"count_loads" ,
+				"avg_view_drop_off",
 				"load_play_ratio" ,	
 			),
 			"user_content_dropoff" => array (
@@ -846,6 +859,21 @@ class myReportsMgr
 				"added_storage",
 				"combined_bandwidth_storage",
 			),
+			"user_usage" => array (
+				"added_entries",
+	 			"total_entries",
+				"added_storage_mb",
+				"total_storage_mb",
+				"added_msecs",
+				"total_msecs",
+			),
+			"specific_user_usage" => array (
+				"date_id",
+				"month_id",
+				"added_entries",
+				"added_storage_mb",
+				"added_msecs",
+			)
 		);
 		
 		$valid_field  = false;

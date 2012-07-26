@@ -1,12 +1,12 @@
 SELECT 
 	entry_name,
-	e.unique_videos,
-	e.count_plays,
-	e.sum_time_viewed,
-	e.avg_time_viewed,
-	e.avg_view_drop_off,
-	e.count_loads,
-	e.load_play_ratio
+	e.unique_videos unique_videos,
+	e.count_plays count_plays,
+	e.sum_time_viewed sum_time_viewed,
+	e.avg_time_viewed avg_time_viewed,
+	e.avg_view_drop_off avg_view_drop_off,
+	e.count_loads count_loads,
+	e.load_play_ratio load_play_ratio
 FROM
 (SELECT 
 	ev.entry_id entry_id,

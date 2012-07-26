@@ -1,6 +1,6 @@
 SELECT 
 	kuser_id object_id,
-	IFNULL(screen_name, puser_id),
+	IFNULL(screen_name, puser_id) name,
 	COUNT(DISTINCT entry_id) count_total,
 	COUNT(DISTINCT IF(entry_media_type_id = 1, entry_id,NULL)) count_video ,
 	COUNT(DISTINCT IF(entry_media_type_id = 5, entry_id,NULL)) count_audio ,
