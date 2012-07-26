@@ -459,10 +459,7 @@ class PartnerService extends KalturaBaseService
         $c = PartnerPeer::getDefaultCriteria();
         $dbFilter->attachToCriteria($c);
         
-        $ret = new KalturaIntegerValue();
-        $ret->value = PartnerPeer::doCount($c);
-        
-        return $ret;
+        return PartnerPeer::doCount($c);
     }
 	
 }
