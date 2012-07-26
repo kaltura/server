@@ -5,6 +5,14 @@
  */
 class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 {
+    const SYSTEM_USER_INVALID_CREDENTIALS = 'SYSTEM_USER_INVALID_CREDENTIALS';
+    
+    const SYSTEM_USER_DISABLED = 'SYSTEM_USER_DISABLED';
+    
+    const USER_WRONG_PASSWORD = 'USER_WRONG_PASSWORD';
+    
+    const USER_NOT_FOUND = 'USER_NOT_FOUND';
+    
 	/**
 	 * @var string
 	 */
@@ -93,7 +101,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     			
     			if (!$authorizedPartnerId)
     			{
-    			    throw new Infra_UIInfraException('SYSTEM_USER_INVALID_CREDENTIALS');
+    			    throw new Infra_UIInfraException(self::SYSTEM_USER_INVALID_CREDENTIALS);
     			}
     			
     		    $ks = $client->user->loginByLoginId($this->username, $this->password, $authorizedPartnerId);
@@ -104,14 +112,14 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     		
 			
 			if ($partnerId && $user->partnerId != $partnerId) {
-				throw new Infra_UIInfraException('SYSTEM_USER_INVALID_CREDENTIALS');
+				throw new Infra_UIInfraException(self::SYSTEM_USER_INVALID_CREDENTIALS);
 			}
 			
 			return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
 		}
 		catch(Exception $ex)
 		{
-			if ($ex->getCode() === 'SYSTEM_USER_INVALID_CREDENTIALS' || $ex->getCode() === 'SYSTEM_USER_DISABLED' || $ex->getCode() === 'USER_WRONG_PASSWORD' || $ex->getCode() === 'USER_NOT_FOUND')
+			if ($ex->getCode() === self::SYSTEM_USER_INVALID_CREDENTIALS || $ex->getCode() === self::SYSTEM_USER_DISABLED || $ex->getCode() === self::USER_WRONG_PASSWORD || $ex->getCode() === self::USER_NOT_FOUND)
 				return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
 			else
 				throw $ex;
