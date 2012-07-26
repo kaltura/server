@@ -144,7 +144,7 @@ class categoryPeer extends BasecategoryPeer
 			}
 			
 			if($criterion && $criterion instanceof KalturaCriterion)
-				$criterion->addTag(KalturaCriterion::TAG_SESSION_PARTNER);
+				$criterion->addTag(KalturaCriterion::TAG_PARTNER_SESSION);
 		}
 			
 		$criteriaFilter->enable();
@@ -209,14 +209,14 @@ class categoryPeer extends BasecategoryPeer
 		if(!is_null($partnerId))
 		{
 			$tagDisabled = true;
-			KalturaCriterion::disableTag(KalturaCriterion::TAG_SESSION_PARTNER);
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_PARTNER_SESSION);
 			$c->add(categoryPeer::PARTNER_ID, $partnerId);
 		}
 		
 		$ret = categoryPeer::doSelectOne($c);
 		
 		if ($tagDisabled)
-		    KalturaCriterion::restoreTag(KalturaCriterion::TAG_SESSION_PARTNER);
+		    KalturaCriterion::restoreTag(KalturaCriterion::TAG_PARTNER_SESSION);
 		    
 		return $ret;
 	}
