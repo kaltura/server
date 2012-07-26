@@ -446,7 +446,7 @@ class PartnerService extends KalturaBaseService
 	 * 
 	 * @action count
 	 * @param KalturaPartnerFilter $filter
-	 * @return KalturaIntegerValue
+	 * @return int
 	 */
     public function countAction (KalturaPartnerFilter $filter = null)
     {
