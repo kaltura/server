@@ -1207,7 +1207,7 @@ class myPartnerUtils
  		$c = new Criteria();
  		$c->addAnd(UserRolePeer::PARTNER_ID, $fromPartner->getId(), Criteria::EQUAL);
  		$c->addDescendingOrderByColumn(UserRolePeer::CREATED_AT);
- 		$c->setLimit(self::$copyPartnerLimit);
+ 		$c->setLimit(kConf::get('copy_partner_limit_user_roles'));
  		$roles = UserRolePeer::doSelect($c);
  		UserRolePeer::setUseCriteriaFilter ( true );
  		foreach($roles as $role)
@@ -1243,7 +1243,7 @@ class myPartnerUtils
  		$c->addAnd(categoryPeer::STATUS, CategoryStatus::ACTIVE);
  		$c->addAscendingOrderByColumn(categoryPeer::DEPTH);
  		$c->addAscendingOrderByColumn(categoryPeer::CREATED_AT);
- 		$c->setLimit(self::$copyPartnerLimit);
+ 		$c->setLimit(kConf::get('copy_partner_limit_categories'));
  		$categories = categoryPeer::doSelect($c);
  		categoryPeer::setUseCriteriaFilter(true);
  		
@@ -1285,7 +1285,7 @@ class myPartnerUtils
  		$c->addAnd(entryPeer::TYPE, $entryType);
  		$c->addAnd(entryPeer::STATUS, entryStatus::READY);
  		$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
- 		$c->setLimit(self::$copyPartnerLimit);
+ 		$c->setLimit(kConf::get('copy_partner_limit_entries'));
  		$entries = entryPeer::doSelect($c);
  		entryPeer::setUseCriteriaFilter ( true );
  		foreach($entries as $entry)
@@ -1302,7 +1302,7 @@ class myPartnerUtils
  		$c->addAnd(uiConfPeer::PARTNER_ID, $fromPartner->getId());
  		$c->addAnd(uiConfPeer::OBJ_TYPE, $uiConfType);
  		$c->addAnd(uiConfPeer::STATUS, uiConf::UI_CONF_STATUS_READY);
- 		$c->setLimit(self::$copyPartnerLimit);
+ 		$c->setLimit(kConf::get('copy_partner_limit_ui_confs'));
  		$uiConfs = uiConfPeer::doSelect($c);
  		uiConfPeer::setUseCriteriaFilter ( true );
  		foreach($uiConfs as $uiConf)
@@ -1324,7 +1324,7 @@ class myPartnerUtils
  		
  		$c = new Criteria();
  		$c->add(assetParamsPeer::PARTNER_ID, $fromPartner->getId());
- 		$c->setLimit(self::$copyPartnerLimit*3);
+ 		$c->setLimit(kConf::get('copy_partner_limit_flavor_params'));
  		$flavorParamsObjects = assetParamsPeer::doSelect($c);
  		foreach($flavorParamsObjects as $flavorParams)
  		{
@@ -1344,7 +1344,7 @@ class myPartnerUtils
  		
  		$c = new Criteria();
  		$c->add(conversionProfile2Peer::PARTNER_ID, $fromPartner->getId());
- 		$c->setLimit(self::$copyPartnerLimit);
+ 		$c->setLimit(kConf::get('copy_partner_limit_conversion_profiles'));
  		
  		$conversionProfiles = conversionProfile2Peer::doSelect($c);
  		foreach($conversionProfiles as $conversionProfile)
@@ -1392,7 +1392,7 @@ class myPartnerUtils
  		
  		$c = new Criteria();
  		$c->add(accessControlPeer::PARTNER_ID, $fromPartner->getId());
- 		$c->setLimit(self::$copyPartnerLimit);
+ 		$c->setLimit(kConf::get('copy_partner_limit_ac_profiles'));
  		
  		$accessControls = accessControlPeer::doSelect($c);
  		foreach($accessControls as $accessControl)
