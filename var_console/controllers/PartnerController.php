@@ -92,7 +92,7 @@ class PartnerController extends Zend_Controller_Action
 		$filter->groupTypeEq = Kaltura_Client_Enum_PartnerGroupType::PUBLISHER;
 		$subPublisherCount = $client->partner->count($filter);
 		/* @var $currentPartner Kaltura_Client_Type_Partner */
-		if ($currentPartner->publishersQuota - $subPublisherCount->value <= 0)
+		if ($currentPartner->publishersQuota - $subPublisherCount <= 0)
 		{
     		$submitBtn = $form->getElement('submit');
             $submitBtn->setOptions(array(
@@ -101,7 +101,7 @@ class PartnerController extends Zend_Controller_Action
 		}
 		
 		$this->view->publisherQuota = $currentPartner->publishersQuota;
-		$this->view->remainingPublishers = $currentPartner->publishersQuota - $subPublisherCount->value > 0? $currentPartner->publishersQuota - $subPublisherCount->value : 0;
+		$this->view->remainingPublishers = $currentPartner->publishersQuota - $subPublisherCount > 0? $currentPartner->publishersQuota - $subPublisherCount : 0;
 		
 		$this->view->form = $form;
 	}
