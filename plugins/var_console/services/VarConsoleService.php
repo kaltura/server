@@ -210,11 +210,11 @@ class VarConsoleService extends KalturaBaseService
             foreach ($partners as $partner)
             {
                 /* @var $partner Partner */
-                if (!isset($items[$dayString][$partner->id]))
+                if (!isset($items[$dayString][$partner->getId()]))
                 {
                     $fillerItem = new KalturaVarPartnerUsageItem();
                     $fillerItem->fromPartner($partner);
-                    $items[$dayString][$partner->id] = $fillerItem; 
+                    $items[$dayString][$partner->getId()] = $fillerItem; 
                 }
             }
         }
