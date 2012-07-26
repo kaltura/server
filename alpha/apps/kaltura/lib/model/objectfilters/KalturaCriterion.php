@@ -8,7 +8,7 @@ abstract class KalturaCriterion extends Criterion implements IKalturaDbQuery
 	const TAG_ENTITLEMENT_ENTRY = 'TAG_ENTITLEMENT_ENTRY';
 	const TAG_ENTITLEMENT_CATEGORY = 'TAG_ENTITLEMENT_CATEGORY';
 	const TAG_WIDGET_SESSION = 'TAG_WIDGET_SESSION';
-	const TAG_SESSION_PARTNER = 'TAG_SESSION_PARTNER';
+	const TAG_PARTNER_SESSION = 'TAG_PARTNER_SESSION';
 	
 	/**
 	 * @var KalturaCriterion
@@ -20,7 +20,7 @@ abstract class KalturaCriterion extends Criterion implements IKalturaDbQuery
 	 */
 	protected $criteria = false;
 	
-	protected static $enabledTags = array('TAG_SESSION_PARTNER' => 0,);
+	protected static $enabledTags = array('TAG_PARTNER_SESSION' => 0,);
 	
 	
 	
@@ -28,7 +28,7 @@ abstract class KalturaCriterion extends Criterion implements IKalturaDbQuery
 	
 	public static function clearTags()
 	{
-		self::$enabledTags = array('TAG_SESSION_PARTNER' => 0,);
+		self::$enabledTags = array('TAG_PARTNER_SESSION' => 0,);
 	}
 	
 	public function setTags($tags)
