@@ -131,6 +131,8 @@ class VarConsoleService extends KalturaBaseService
 		{
 		    $totalCount = 0;
 		    
+		    $unsortedItems = array();
+		    
 		    list ( $reportHeader , $reportData , $totalCount ) = myReportsMgr::getTable( 
     				null , 
     				myReportsMgr::REPORT_TYPE_VAR_USAGE , 
@@ -143,7 +145,10 @@ class VarConsoleService extends KalturaBaseService
 			{
     			$item = new KalturaVarPartnerUsageItem();
 				$item->fromString( $reportHeader , $line );
-    			$items[] = $item;
+    			if ($item)
+    			{
+    			    $unsortedItems[$item->dateId][$item->partnerId] = $item;
+    			}
 			}
 			
 			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTotal( 
@@ -160,6 +165,8 @@ class VarConsoleService extends KalturaBaseService
 		$response = new KalturaPartnerUsageListResponse();
 		
 		//Sort partner usage results by time unit
+		$unsortedItems = $this->addFiller ($unsortedItems, $partners, $usageFilter);
+		$items = array_values($unsortedItems);
 		uasort($items, array($this, 'sortByDate'));
 		
 		$response->total = $total; 
@@ -194,6 +201,27 @@ class VarConsoleService extends KalturaBaseService
         }
     }
     
+    private function addFiller (array $items, array $partners, KalturaReportInputFilter $usageFilter)
+    {
+        $format = $usageFilter->interval == KalturaReportInterval::DAYS ? "Ymd" : "Ym";
+        for($day = $usageFilter->fromDate; $day <= $usageFilter->toDate; $day+24*60*60)
+        {
+            $dayString = date($format, $day);
+            foreach ($partners as $partner)
+            {
+                /* @var $partner Partner */
+                if (!isset($items[$dayString][$partner->id]))
+                {
+                    $fillerItem = new KalturaVarPartnerUsageItem();
+                    $fillerItem->fromPartner($partner);
+                    $items[$dayString][$partner->id] = $fillerItem; 
+                }
+            }
+        }
+        
+        return $items;
+    }   
+     
 	/**
 	 * Function to change a sub-publisher's status
 	 * @action updateStatus
