@@ -101,7 +101,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     			
     			if (!$authorizedPartnerId)
     			{
-    			    throw new Infra_UIInfraException(self::SYSTEM_USER_INVALID_CREDENTIALS);
+    			    return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
     			}
     			
     		    $ks = $client->user->loginByLoginId($this->username, $this->password, $authorizedPartnerId);
@@ -112,7 +112,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     		
 			
 			if ($partnerId && $user->partnerId != $partnerId) {
-				throw new Infra_UIInfraException(self::SYSTEM_USER_INVALID_CREDENTIALS);
+				return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
 			}
 			
 			return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
