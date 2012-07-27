@@ -26,8 +26,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 	/**
 	 * @var int
 	 */
-	protected $partnerId;
-	
+	protected $partnerId;	
 	/**
 	 * @var int
 	 */
@@ -71,7 +70,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     		$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $this->partnerId, $this->password);
 			//New logic - if specific permissions are required to authenticate the partner/user, check their existence here.
     		
-    		if (isset($settings->requiredPermissions))
+    		if (isset($settings->requiredPermissions) && $settings->requiredPermissions)
     		{
     		    $requiredPermissionsArr = explode(",", $settings->requiredPermissions);
     			$userPartners = $client->partner->listPartnersForUser();
