@@ -165,11 +165,20 @@ class VarConsoleService extends KalturaBaseService
 		$response = new KalturaPartnerUsageListResponse();
 		
 		//Sort partner usage results by time unit
-		//$unsortedItems = $this->addFiller ($unsortedItems, $partners, $usageFilter);
-		$items = array_values($unsortedItems);
+		$unsortedItems = $this->addFiller ($unsortedItems, $partners, $usageFilter);
+        $unsortedItems = array_values($unsortedItems);
+		
+		foreach ($unsortedItems as $unsortedArr)
+		{
+		    foreach ($unsortedArr as $partnerId=>$item)
+		    {
+		        $items[] = $item;
+		    }    
+		}
+		
 		uasort($items, array($this, 'sortByDate'));
 		
-          $response->total = $total; 
+        $response->total = $total; 
 		$response->totalCount = $totalCount;
 		$response->objects = $items;
 		return $response;
@@ -204,7 +213,8 @@ class VarConsoleService extends KalturaBaseService
     private function addFiller (array $items, array $partners, KalturaReportInputFilter $usageFilter)
     {
         $format = $usageFilter->interval == KalturaReportInterval::DAYS ? "Ymd" : "Ym";
-        for($day = $usageFilter->fromDate; $day <= $usageFilter->toDate; $day+24*60*60)
+        $interval = $format == "Ymd" ? 24*60*60 : 31*24*60*60;
+        for($day = $usageFilter->fromDate; $day <= $usageFilter->toDate; $day+=$interval)
         {
             $dayString = date($format, $day);
             foreach ($partners as $partner)
