@@ -179,7 +179,7 @@ class VarConsoleService extends KalturaBaseService
 		uasort($items, array($this, 'sortByDate'));
 		
         $response->total = $total; 
-		$response->totalCount = $totalCount;
+		$response->totalCount = count($items);
 		$response->objects = $items;
 		return $response;
     }
