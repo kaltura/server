@@ -229,7 +229,7 @@ class VarConsoleService extends KalturaBaseService
     {
         $format = $usageFilter->interval == KalturaReportInterval::DAYS ? "Ymd" : "Ym";
         $interval = $format == "Ymd" ? 24*60*60 : 30*24*60*60;
-        for($day = $usageFilter->fromDate; $day <= $usageFilter->toDate+24*60*60; $day+=$interval)
+        for($day = $usageFilter->fromDate; $day < $usageFilter->toDate+24*60*60; $day+=$interval)
         {
             $dayString = date($format, $day);
             foreach ($partners as $partner)
