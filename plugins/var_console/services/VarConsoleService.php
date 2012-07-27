@@ -224,6 +224,7 @@ class VarConsoleService extends KalturaBaseService
                 {
                     $fillerItem = new KalturaVarPartnerUsageItem();
                     $fillerItem->fromPartner($partner);
+                    $fillerItem->dateId = $dayString;
                     $items[$dayString][$partner->getId()] = $fillerItem; 
                 }
             }
