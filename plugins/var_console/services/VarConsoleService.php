@@ -175,10 +175,11 @@ class VarConsoleService extends KalturaBaseService
 		
 		$response = new KalturaPartnerUsageListResponse();
 		
-		//Sort partner usage results by time unit
+		//Add filler lines, for partners whose info was not returned (means that they had no usage in the viewed time segment)
 		$unsortedItems = $this->addFiller ($unsortedItems, $partners, $usageFilter);
-        $unsortedItems = array_values($unsortedItems);
-		
+        //Thin down the array
+		$unsortedItems = array_values($unsortedItems);
+		//Construct 1-dimensional array from the $unsortedItems matrix
 		foreach ($unsortedItems as $unsortedArr)
 		{
 		    foreach ($unsortedArr as $partnerId=>$item)
@@ -187,10 +188,11 @@ class VarConsoleService extends KalturaBaseService
 		    }    
 		}
 		
-		
+		//Sort according to dateId and partnerId
 		uasort($items, array($this, 'sortByDate'));
 		
 		$origItems = $items;
+		//Determine portion of the $items array to display in the page according to the pager's pageSize and pageIndex properties
 		$returnedItems = array_splice($origItems, $pager->pageSize * ($pager->pageIndex -1), $pager->pageSize);
 		
         $response->total = $total; 
@@ -199,7 +201,12 @@ class VarConsoleService extends KalturaBaseService
 		return $response;
     }
     
-    private function sortByDate ($item1, $item2)
+    /**
+     * Sorting function - returns array sorted first by dateId and secondly by partnerId
+     * @param KalturaVarPartnerUsageItem $item1
+     * @param KalturaVarPartnerUsageItem $item2
+     */
+    private function sortByDate (KalturaVarPartnerUsageItem $item1, KalturaVarPartnerUsageItem $item2)
     {
         $dateItem1 = strlen($item1->dateId) == 6 ? DateTime::createFromFormat( "Ym" , $item1->dateId)->getTimestamp() : DateTime::createFromFormat( "Ymd" , $item1->dateId)->getTimestamp();
         $dateItem2 = strlen($item2->dateId) == 6 ? DateTime::createFromFormat( "Ym" , $item2->dateId)->getTimestamp() : DateTime::createFromFormat( "Ymd" , $item2->dateId)->getTimestamp();
@@ -225,10 +232,19 @@ class VarConsoleService extends KalturaBaseService
         }
     }
     
+    /**
+     * Function adds filler lines to the var_usage table, for partners whose information was not available in the DWH.
+     * @param array $items
+     * @param array $partners
+     * @param KalturaReportInputFilter $usageFilter
+     * @return Ambigous <multitype:, KalturaVarPartnerUsageItem>
+     */
     private function addFiller (array $items, array $partners, KalturaReportInputFilter $usageFilter)
     {
         $format = $usageFilter->interval == KalturaReportInterval::DAYS ? "Ymd" : "Ym";
+        // Interval by which the dateId is calculated - 24 hours for daily interval, 30.5 days (average length of a month) for monthly interval.
         $interval = $format == "Ymd" ? 24*60*60 : 30.5*24*60*60;
+        //Marginal error value - needs be bigger in case the interval is monthly.
         $marginal = $format == "Ymd" ? 24*60*60 : 48*60*60;
         for($day = $usageFilter->fromDate; $day < $usageFilter->toDate+$marginal; $day+=$interval)
         {
