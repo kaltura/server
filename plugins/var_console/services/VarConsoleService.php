@@ -137,7 +137,7 @@ class VarConsoleService extends KalturaBaseService
 		    
 		    if ($usageFilter->interval == KalturaReportInterval::DAYS)
 		    {
-		        $pageSize = ceil (($usageFilter->toDate - $usageFilter->fromDate) / 24*60*60);
+		        $pageSize = floor (($usageFilter->toDate - $usageFilter->fromDate) / 24*60*60);
 		    }
 		    else 
 		    {
