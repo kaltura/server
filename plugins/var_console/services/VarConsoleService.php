@@ -183,7 +183,7 @@ class VarConsoleService extends KalturaBaseService
 		
         $response->total = $total; 
 		$response->totalCount = count($items);
-		$response->objects = $items;
+		$response->objects = $returnedItems;
 		return $response;
     }
     
