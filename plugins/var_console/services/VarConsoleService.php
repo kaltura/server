@@ -217,7 +217,7 @@ class VarConsoleService extends KalturaBaseService
     private function addFiller (array $items, array $partners, KalturaReportInputFilter $usageFilter)
     {
         $format = $usageFilter->interval == KalturaReportInterval::DAYS ? "Ymd" : "Ym";
-        $interval = $format == "Ymd" ? 24*60*60 : 31*24*60*60;
+        $interval = $format == "Ymd" ? 24*60*60 : 30*24*60*60;
         for($day = $usageFilter->fromDate; $day <= $usageFilter->toDate; $day+=$interval)
         {
             $dayString = date($format, $day);
