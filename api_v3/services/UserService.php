@@ -8,12 +8,8 @@
  * @subpackage services
  */
 class UserService extends KalturaBaseUserService 
-{
-	function initService($serviceId, $serviceName, $actionName)
-	{
-	    parent::initService($serviceId, $serviceName, $actionName);
-	}
-    
+{   
+
 	/**
 	 * Adds a new user to an existing account in the Kaltura database.
 	 * Input param $id is the unique identifier in the partner's system.
