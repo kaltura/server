@@ -180,7 +180,7 @@ class VarConsoleService extends KalturaBaseService
 		uasort($items, array($this, 'sortByDate'));
 		
 		$origItems = $items;
-		$returnedItems = array_splice($origItems, $pager->pageSize * ($pager->pageIndex -1), $pager->pageSize*$pager->pageIndex);
+		$returnedItems = array_splice($origItems, $pager->pageSize * ($pager->pageIndex -1), $pager->pageSize*$pager->pageIndex-1);
 		
         $response->total = $total; 
 		$response->totalCount = count($items);
