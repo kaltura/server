@@ -133,11 +133,22 @@ class VarConsoleService extends KalturaBaseService
 		    
 		    $unsortedItems = array();
 		    
+		    $pageSize = 0;
+		    
+		    if ($usageFilter->interval == KalturaReportInterval::DAYS)
+		    {
+		        $pageSize = ceil (($usageFilter->toDate - $usageFilter->fromDate) / 24*60*60);
+		    }
+		    else 
+		    {
+		        $pageSize = ceil (($usageFilter->toDate - $usageFilter->fromDate) / 30*24*60*60);
+		    }
+		    
 		    list ( $reportHeader , $reportData , $totalCount ) = myReportsMgr::getTable( 
     				null , 
     				myReportsMgr::REPORT_TYPE_VAR_USAGE , 
     				$inputFilter ,
-    				$pager->pageSize , 0, // pageIndex is 0 because we are using specific ids 
+    				$pageSize , 0, // pageIndex is 0 because we are using specific ids 
     				null  , // order by  
     				implode(",", $partnerIds));
     				
