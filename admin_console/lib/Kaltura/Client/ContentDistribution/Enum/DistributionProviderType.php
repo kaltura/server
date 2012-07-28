@@ -42,6 +42,7 @@ class Kaltura_Client_ContentDistribution_Enum_DistributionProviderType
 	const COMCAST_MRSS = "comcastMrssDistribution.COMCAST_MRSS";
 	const FREEWHEEL = "freewheelDistribution.FREEWHEEL";
 	const YOUTUBE = "youTubeDistribution.YOUTUBE";
+	const MSN = "msnDistribution.MSN";
 	const AVN = "avnDistribution.AVN";
 	const TIME_WARNER = "timeWarnerDistribution.TIME_WARNER";
 	const FREEWHEEL_GENERIC = "freewheelGenericDistribution.FREEWHEEL_GENERIC";

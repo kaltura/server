@@ -69,4 +69,20 @@ class Kaltura_Client_VarConsole_VarConsoleService extends Kaltura_Client_Service
 		$this->client->throwExceptionIfError($resultObject);
 		return $resultObject;
 	}
+
+	function getAdminSession($partnerId, $userId = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "partnerId", $partnerId);
+		$this->client->addParam($kparams, "userId", $userId);
+		$this->client->queueServiceActionCall("varconsole_varconsole", "getAdminSession", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		if(!$resultObject)
+			$resultObject = array();
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
 }

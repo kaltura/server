@@ -31,25 +31,37 @@
  * @package Admin
  * @subpackage Client
  */
-class Kaltura_Client_Enum_ReportType
+class Kaltura_Client_MsnDistribution_Plugin extends Kaltura_Client_Plugin
 {
-	const TOP_CONTENT = 1;
-	const CONTENT_DROPOFF = 2;
-	const CONTENT_INTERACTIONS = 3;
-	const MAP_OVERLAY = 4;
-	const TOP_CONTRIBUTORS = 5;
-	const TOP_SYNDICATION = 6;
-	const CONTENT_CONTRIBUTIONS = 7;
-	const WIDGETS_STATS = 8;
-	const USER_ENGAGEMENT = 11;
-	const SPEFICIC_USER_ENGAGEMENT = 12;
-	const USER_TOP_CONTENT = 13;
-	const USER_CONTENT_DROPOFF = 14;
-	const USER_CONTENT_INTERACTIONS = 15;
-	const APPLICATIONS = 16;
-	const USER_USAGE = 17;
-	const SPECIFIC_USER_USAGE = 18;
-	const PARTNER_USAGE = 201;
-	const VAR_USAGE = 19;
+	protected function __construct(Kaltura_Client_Client $client)
+	{
+		parent::__construct($client);
+	}
+
+	/**
+	 * @return Kaltura_Client_MsnDistribution_Plugin
+	 */
+	public static function get(Kaltura_Client_Client $client)
+	{
+		return new Kaltura_Client_MsnDistribution_Plugin($client);
+	}
+
+	/**
+	 * @return array<Kaltura_Client_ServiceBase>
+	 */
+	public function getServices()
+	{
+		$services = array(
+		);
+		return $services;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return 'msnDistribution';
+	}
 }
 
