@@ -28,7 +28,7 @@
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_PartnerStatus', $partner->status); ?></td>
 				<td><?php echo $partner->id; ?></td>
-				<td><?php echo $partner->name; if ($partner->id == $this->currentPartnerId) echo ' (you)'?></td>
+				<td><?php echo $partner->name; if ($partner->id == $this->currentPartnerId) echo ' (Parent Account)'?></td>
 				<td><?php echo $partner->website ? $partner->website : "N/A"; ?></td>
 				<td><?php echo $partner->adminName; ?></td>
 				<td><?php echo $partner->adminEmail; ?></td>
