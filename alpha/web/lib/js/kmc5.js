@@ -52,6 +52,10 @@ kmc.functions = {
 			openCw				: "kmc.functions.openKcw",
 			language			: kmc.vars.language
 		};
+		// Disable analytics
+		if( kmc.vars.disable_analytics ) {
+			flashvars[ 'disableAnalytics' ] = true;
+		}
 		var params = {
 			allowNetworking: "all",
 			allowScriptAccess: "always"

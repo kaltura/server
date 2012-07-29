@@ -18,14 +18,15 @@
  <div id="wrap">
  <?php echo $sf_content ?>
  </div>
+<?php if( ! kConf::get('kmc_disable_analytics') ){ ?>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
 try {
 var pageTracker = _gat._getTracker("<?php echo kConf::get('ga_account'); ?>");
 pageTracker._trackPageview();
-} catch(err) {}</script>
+} catch(err) {}
+</script>
+<?php } ?>
 </body>
 </html>
