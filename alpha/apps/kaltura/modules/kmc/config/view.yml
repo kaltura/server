@@ -1,7 +1,7 @@
 default:
   has_layout:   on
   layout:       kmclayout
-  javascripts:  [ http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js , http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js , /lib/js/modal.js , /lib/js/scripts.js ]
+  javascripts:  [  /lib/js/scripts.js ]
   stylesheets:  [ /lib/css/modal, /lib/css/kmc ]
 
 kmc1Success:
@@ -13,7 +13,7 @@ kmc1Success:
 kmc4Success:
   has_layout:     on
   layout:       kmclayout
-  javascripts:  [ -*, http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js , http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js ]
+  javascripts:  [ -* ]
   stylesheets:  [ -*, /lib/css/kmc5 ]
  
 varpartnerlistSuccess:
@@ -30,7 +30,7 @@ varpartnerlistSuccess:
 supportSuccess:
   has_layout:     off
   layout:         kmc1layout
-  javascripts:    [ -*, http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js ]
+  javascripts:    [ -*, /lib/js/jquery.v1.4.2.min.js ]
   stylesheets:    [ -* ]
 
 helpSuccess:
@@ -42,7 +42,7 @@ helpSuccess:
 kmc2helpSuccess:
   has_layout:     on
   layout:         helplayout
-  javascripts:    [ -*, http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js ]
+  javascripts:    [ -*, /lib/js/jquery.v1.4.2.min.js ]
   stylesheets:    [ -*, /lib/css/kmc ]
   
 previewSuccess:
