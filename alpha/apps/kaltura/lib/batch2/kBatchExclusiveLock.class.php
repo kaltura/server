@@ -198,9 +198,12 @@ class kBatchExclusiveLock
 			
 		//	"others unfinished jobs " - the expiration should be SMALLER than the current time to make sure the job is not 
 		// being processed
-		$closedStatuses = implode(',', BatchJobPeer::getClosedStatusList());
+		$unclosedStatuses = BatchJobPeer::getUnClosedStatusList();
+		$unclosedStatuses[] = BatchJob::BATCHJOB_STATUS_ALMOST_DONE;
+		$unclosedStatuses = implode(',', $unclosedStatuses);
+		
 		$query2 = "(
-							$stat NOT IN ($closedStatuses)
+							$stat IN ($unclosedStatuses)
 						AND	$expr <= '$now_str'
 					)";
 		
