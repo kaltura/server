@@ -146,6 +146,16 @@ class kSessionBase
 		return false;
 	}
 	
+	public function getPrivileges()
+	{
+		return $this->privileges;
+	}
+	
+	public function getPartnerId()
+	{
+		return $this->partner_id;
+	}
+	
 	public function tryToValidateKS()
 	{
 		if (!$this->real_str || !$this->hash)
