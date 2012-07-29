@@ -378,7 +378,8 @@ class entryPeer extends BaseentryPeer
 					{
 						$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 					}
-					else
+					
+					if(kEntitlementUtils::getEntitlementEnforcement())
 					{
 						$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 					}	
@@ -391,7 +392,8 @@ class entryPeer extends BaseentryPeer
 					{
 						$critKuser->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 					}
-					else
+					
+					if(kEntitlementUtils::getEntitlementEnforcement())
 					{
 						$critKuser->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 					}
