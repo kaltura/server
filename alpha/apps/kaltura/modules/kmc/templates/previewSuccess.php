@@ -37,20 +37,22 @@ switch($delivery_type) {
 		break;
 }
 
-if( $playlist_id ) {
+if( $playlist_id || ! $entry_id ) {
 	$entry_name = 'Kaltura Player';
 	$entry_description = '';
-	if( $playlist_id != 'multitab_playlist') {
-		// build playlist url
-		$playlist_url = $partner_host ."/index.php/partnerservices2/executeplaylist?";
-		$playlist_url .= "partner_id=" . $partner_id . "&subp_id=" . $partner_id . "00&format=8&playlist_id=" . $playlist_id;
-
-		// Add playlist flashVars
-		$flashVars["playlistAPI.autoInsert"] = "true";
-		$flashVars["playlistAPI.kpl0Name"] = $playlist_name;
-		$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
-	}
 }
+
+if( $playlist_id && $playlist_id != 'multitab_playlist') {
+	// build playlist url
+	$playlist_url = $partner_host ."/index.php/partnerservices2/executeplaylist?";
+	$playlist_url .= "partner_id=" . $partner_id . "&subp_id=" . $partner_id . "00&format=8&playlist_id=" . $playlist_id;
+
+	// Add playlist flashVars
+	$flashVars["playlistAPI.autoInsert"] = "true";
+	$flashVars["playlistAPI.kpl0Name"] = $playlist_name;
+	$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
+}
+
 // Transform flashvars array to string
 $flashVars = http_build_query($flashVars, '', '&amp;');
 
@@ -76,7 +78,7 @@ if( isset($flavor_asset_id) ) {
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<?php if( ! $playlist_id ) { ?>
+	<?php if( $entry_id ) { ?>
 	<meta property="og:url" content="<?php echo $pageURL; ?>" />
 	<meta property="og:title" content="<?php echo htmlspecialchars($entry_name); ?>" />
 	<meta property="og:description" content="<?php echo htmlspecialchars($entry_description); ?>" />

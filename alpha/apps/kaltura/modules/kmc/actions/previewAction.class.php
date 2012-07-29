@@ -29,20 +29,21 @@ class previewAction extends kalturaAction
 		$this->entry_id = $this->getRequestParameter('entry_id');
 		if( $this->entry_id ) {
 			$entry = entryPeer::retrieveByPK($this->entry_id);
-			if( ! $entry ) {
-				die( 'Error getting entry data' );
-			}
-			$this->entry_name = $entry->getName();
-			$this->entry_description = $entry->getDescription();
-			$this->entry_thumbnail_url = $entry->getThumbnailUrl();
+			if( $entry ) {
+				$this->entry_name = $entry->getName();
+				$this->entry_description = $entry->getDescription();
+				$this->entry_thumbnail_url = $entry->getThumbnailUrl();
 
-			$flavor_tag = $this->getRequestParameter('flavor_tag', 'iphone');
-			$flavor_assets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entry_id, $flavor_tag);
-			$flavor_asset = reset($flavor_assets);
-			/* @var $flavor_asset flavorAsset */
-			$this->flavor_asset_id = null;
-			if( $flavor_asset ) {
-				$this->flavor_asset_id = $flavor_asset->getId();
+				$flavor_tag = $this->getRequestParameter('flavor_tag', 'iphone');
+				$flavor_assets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entry_id, $flavor_tag);
+				$flavor_asset = reset($flavor_assets);
+				/* @var $flavor_asset flavorAsset */
+				$this->flavor_asset_id = null;
+				if( $flavor_asset ) {
+					$this->flavor_asset_id = $flavor_asset->getId();
+				}
+			} else {
+				$this->entry_id = null;
 			}
 		}
 		
