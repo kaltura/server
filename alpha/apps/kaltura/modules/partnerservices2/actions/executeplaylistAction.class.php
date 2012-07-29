@@ -99,12 +99,26 @@ class executeplaylistAction extends defPartnerservices2Action
 		if ( $create_cachekey ) 
 		{
 			if ( $this->isAdmin() )
-				return null;			
+				return null;		
+
+			$ks_partner_id = null; 
+			$privileges = null;
+				
+			$ks = ks::fromSecureString(kCurrentContext::$ks);
+			if($ks)
+			{
+				$ks_partner_id = $ks->getPartnerId();
+				$privileges = $ks->getPrivileges();
+			}
+				
 			$cache_key_arr = array ( 
 				"playlist_id" => $playlist_id , 
 				"filters" => $extra_filters , 
-				"partner_id" => $partner_id , 
-				"detailed" => $detailed , 
+				"partner_id" => $partner_id ,
+				"ks_partner_id" => $ks_partner_id ,  
+				"detailed" => $detailed,
+				"user" => kCurrentContext::$ks_uid,
+				"privileges" => $privileges,
 				"is_admin" => $this->isAdmin() );
 			$cahce_key = new executionCacheKey( );
 			$cahce_key->expiry =  600 ;
