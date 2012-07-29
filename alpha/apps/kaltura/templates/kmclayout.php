@@ -10,7 +10,7 @@
 
 <?php if (@$extraHead) echo $extraHead; ?>
 
-<script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/jquery_v1.4.2.js"></script>
+<script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/jquery_v1.4.2.min.js"></script>
 <script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/swfobject_v2.2.js"></script>
 
 </head>
