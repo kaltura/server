@@ -6,6 +6,7 @@ SELECT {GROUP_COLUMN},
 		bandwidth_consumption,
 		average_storage,
 		peak_storage,
+		added_storage,
 		combined_bandwidth_storage
 FROM kalturadw.dwh_dim_partners p,
 (SELECT
