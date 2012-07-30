@@ -107,7 +107,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	{
 	    KalturaLog::info("In Object Added handler");
 	    $objectTags = $this->trimObjectTags($object->getTags());
-	    
+	    $objectTags = str_replace(array ('!', '*'), array ('\!', '\*'), $objectTags);
 	    if (!count($objectTags))
 	    {
 	        return array();
@@ -148,6 +148,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	protected function checkExistForDelete (BaseObject $object, $tagsToCheck = null)
 	{
 	    $objectTags = $tagsToCheck ? $this->trimObjectTags($tagsToCheck) : $this->trimObjectTags($object->getTags());
+	    $objectTags = str_replace(array ('!', '*'), array ('\!', '\*'), $objectTags);
 	    $tagsToKeep = array();
 	    foreach($objectTags as $objectTag)
 	    {
@@ -265,6 +266,11 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    return $c;
 	}
 	
+	/**
+	 * Function removes spaces between the tags
+	 * @param string $tagsString
+	 * @return array
+	 */
 	protected function trimObjectTags ($tagsString)
 	{
 	    $arr = explode(",", $tagsString);
