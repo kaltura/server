@@ -115,24 +115,6 @@ class Form_PartnerUsageFilter extends Zend_Form
 //		));
 
 		
-		$this->addDisplayGroup(array('date_range'), 'date_range_group', array(
-			'description' => 'partner-usage date-range filter type',
-			'decorators' => array(
-				array('Description', array('tag' => 'legend')), 
-				'FormElements', 
-				'Fieldset'
-			)
-		));
-		
-		$this->addDisplayGroup(array('interval'), 'interval_group', array(
-			'description' => 'partner-usage date-interval filter type',
-			'decorators' => array(
-				array('Description', array('tag' => 'legend')), 
-				'FormElements', 
-				'Fieldset'
-			)
-		));
-		
 		$this->addDisplayGroup(array('filter_type', 'filter_input', 'filter_input_help'), 'filter_type_group', array(
 			'description' => 'partner-usage filter by',
 			'decorators' => array(
@@ -153,6 +135,23 @@ class Form_PartnerUsageFilter extends Zend_Form
 			)
 		));
 		
+		$this->addDisplayGroup(array('date_range'), 'date_range_group', array(
+			'description' => 'partner-usage date-range filter type',
+			'decorators' => array(
+				array('Description', array('tag' => 'legend')), 
+				'FormElements', 
+				'Fieldset'
+			)
+		));
+		
+		$this->addDisplayGroup(array('interval'), 'interval_group', array(
+			'description' => 'partner-usage date-interval filter type',
+			'decorators' => array(
+				array('Description', array('tag' => 'legend')), 
+				'FormElements', 
+				'Fieldset'
+			)
+		));
 		
 		$this->addDisplayGroup(array('from_date', 'dates_separator', 'to_date', 'clear_dates'), 'dates', array(
 			'description' => 'partner-usage filter range limit', 
