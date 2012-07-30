@@ -19,10 +19,10 @@
 		</thead>
 		<tbody>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
-				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->bandwidth); ?> MB</td>
-				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->avgStorage); ?> MB</td>
-				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->peakStorage); ?> MB</td>
-				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->storage); ?> MB</td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->bandwidth); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->avgStorage); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->peakStorage); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->storage); ?></td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->combinedStorageBandwidth); ?> MB</td>
 			</tr>
 		</tbody>
@@ -58,11 +58,11 @@
 				<td><?php echo $item->partnerName; ?></td>
 				<td><?php echo $item->partnerId; ?></td>
 				<td><?php $d = (new Zend_Date($item->partnerCreatedAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
-				<td><?php echo Zend_Locale_Format::toNumber((int)$item->bandwidth); ?> MB</td>
-				<td><?php echo Zend_Locale_Format::toNumber((int)$item->avgStorage); ?> MB</td>
-				<td><?php echo Zend_Locale_Format::toNumber((int)$item->peakStorage); ?> MB</td>
-				<td><?php echo Zend_Locale_Format::toNumber((int)$item->storage); ?> MB</td>
-				<td><?php echo Zend_Locale_Format::toNumber((int)$item->combinedStorageBandwidth); ?> MB</td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->bandwidth); ?> </td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->avgStorage); ?> </td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->peakStorage); ?> </td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->storage); ?> </td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->combinedStorageBandwidth); ?> </td>
 			</tr>
 			<?php endforeach; ?>
 		</tbody>
