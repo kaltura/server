@@ -36,7 +36,7 @@ class KalturaNull
 	
 	private function __construct()
 	{
-        
+		
 	}
 	
 	public static function getInstance() 
@@ -50,7 +50,7 @@ class KalturaNull
 	
 	function __toString()
 	{
-        return '';
+		return '';
 	}
 	
 	
@@ -103,9 +103,9 @@ class Kaltura_Client_ClientBase
 	 */
 	public function __construct(Kaltura_Client_Configuration $config)
 	{
-	    $this->config = $config;
-	    
-	    $logger = $this->config->getLogger();
+		$this->config = $config;
+		
+		$logger = $this->config->getLogger();
 		if ($logger)
 			$this->shouldLog = true;	
 	}
@@ -144,7 +144,7 @@ class Kaltura_Client_ClientBase
 		if (!isset($params["partnerId"]) || $params["partnerId"] === -1)
 			$params["partnerId"] = $this->config->partnerId;
 		if (!isset($params["partnerId"]))
-		    $params["partnerId"] = null;
+			$params["partnerId"] = null;
 			
 		$this->addParam($params, "ks", $this->ks);
 		
@@ -393,7 +393,7 @@ class Kaltura_Client_ClientBase
 					"Accept-language: en\r\n".
 					"Content-type: application/x-www-form-urlencoded\r\n",
 					"content" => $formattedData
-		          ));
+				  ));
 
 		$ctx = stream_context_create($params);
 		$fp = @fopen($url, 'rb', false, $ctx);
@@ -466,7 +466,7 @@ class Kaltura_Client_ClientBase
 		if(is_object($paramValue) && $paramValue instanceof Kaltura_Client_ObjectBase)
 		{
 			$this->addParam($params, "$paramName:objectType", $paramValue->getKalturaObjectType());
-		    foreach($paramValue as $prop => $val)
+			foreach($paramValue as $prop => $val)
 				$this->addParam($params, "$paramName:$prop", $val);
 				
 			return;
@@ -527,17 +527,19 @@ class Kaltura_Client_ClientBase
 		}
 		else if( $objectType != 'string')
 		{
-		    switch ($objectType)
-		    {
-		        case "integer":
-		            $resStringVal = strval(intval($resultObject));
-		            break;
-		        case "float":
-                    $resStringVal = strval(floatval($resultObject));
-		            break;
-		    }
-		    if ($resStringVal !== $resultObject)
-			    throw new Kaltura_Client_ClientException("Invalid object type [" . gettype($resultObject) . "] expected [$objectType]", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
+			switch ($objectType)
+			{
+				case "integer":
+					$resStringVal = strval(intval($resultObject));
+					break;
+				case "float":
+					$resStringVal = strval(floatval($resultObject));
+					break;
+				default:
+					$resStringVal = $resultObject;	
+			}
+			if ($resStringVal !== $resultObject)
+				throw new Kaltura_Client_ClientException("Invalid object type [" . gettype($resultObject) . "] expected [$objectType]", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 	}
 	
@@ -632,6 +634,6 @@ class Kaltura_Client_ClientBase
 	 */
 	public static function getKalturaNullValue()
 	{
-        return KalturaNull::getInstance();
+		return KalturaNull::getInstance();
 	}
 }
