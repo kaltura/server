@@ -66,6 +66,7 @@ class kmc4Action extends kalturaAction
 			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, $this->uid, $this->screen_name, $this->email, self::CURRENT_KMC_VERSION);
 			$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
 			$this->ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
+			$this->ignoreEntrySeoLinks = PermissionPeer::isValidForPartner(PermissionName::FEATURE_IGNORE_ENTRY_SEO_LINKS, $this->partner_id);
 		}
 	/** END - load partner from DB, and set templatePartnerId **/
 

@@ -45,6 +45,7 @@ if( count($allowedPartners) > 1 ) {
 			first_login		: <?php echo ($first_login) ? "true" : "false"; ?>,
 			whitelabel		: <?php echo $templatePartnerId; ?>,
 			ignore_seo_links: <?php echo $ignoreSeoLinks; ?>,
+			ignore_entry_seo: <?php echo $ignoreEntrySeoLinks; ?>,
 			kcw_webcam_uiconf : "<?php echo $content_uiconfs_upload_webcam->getId(); ?>",
 			kcw_import_uiconf : "<?php echo $content_uiconfs_upload_import->getId(); ?>",
 			default_kdp		: {
