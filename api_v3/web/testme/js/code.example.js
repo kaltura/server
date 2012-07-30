@@ -1283,7 +1283,7 @@ KCodeExamplePython.prototype.init = function(entity, codeLanguage){
 	KCodeExampleBase.prototype.init.apply(this, arguments);
 };
 
-KCodeExampleBase.prototype.getNull = function (){
+KCodeExamplePython.prototype.getNull = function (){
 	return jQuery("<span class=\"code-" + this.lang + "-system\">None</span>");
 };
 
