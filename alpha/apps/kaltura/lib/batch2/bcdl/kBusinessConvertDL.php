@@ -152,7 +152,7 @@ class kBusinessConvertDL
 			kFileSyncUtils::createSyncFileLinkForKey($realEntrySyncKey, $tempEntrySyncKey);
 		}
 		
-		
+		$entry->setDimensions($tempEntry->getWidth(), $tempEntry->getHeight());
 		$entry->setLengthInMsecs($tempEntry->getLengthInMsecs());
 		$entry->setConversionProfileId($tempEntry->getConversionProfileId());
 		$entry->setConversionQuality($tempEntry->getConversionQuality());
