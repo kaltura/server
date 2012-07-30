@@ -57,6 +57,8 @@ class executeplaylistfromcontentAction extends defPartnerservices2Action
 		// TODO -  verify permissions for viewing lists
 
 		$detailed = $this->getP ( "detailed" , false );
+		if (!$detailed)
+			$detailed = false;
 		$limit = $this->getP ( "page_size" , 10 );
 		$limit = $this->maxPageSize ( $limit );
 
