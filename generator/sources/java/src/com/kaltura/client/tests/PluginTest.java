@@ -1,6 +1,7 @@
 package com.kaltura.client.tests;
 
 import com.kaltura.client.KalturaApiException;
+import com.kaltura.client.enums.KalturaMetadataObjectType;
 import com.kaltura.client.types.KalturaMetadataProfile;
 
 
@@ -12,7 +13,9 @@ public class PluginTest extends BaseTest {
 		BaseTest.startAdminSession(client, kalturaConfig);
 
 		KalturaMetadataProfile profile = new KalturaMetadataProfile();
-		profile = client.getMetadataProfileService().add(profile, "");
+		profile.metadataObjectType = KalturaMetadataObjectType.ENTRY;
+		profile.name = "asdasd";
+		profile = client.getMetadataProfileService().add(profile, "<xml></xml>");
 		assertNotNull(profile.id);
 		
 		KalturaMetadataProfile updateProfile = new KalturaMetadataProfile();
