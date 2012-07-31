@@ -83,18 +83,37 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     		if (isset($settings->requiredPermissions) && $settings->requiredPermissions)
     		{
     		    $requiredPermissionsArr = explode(",", $settings->requiredPermissions);
-
-			    foreach ($requiredPermissionsArr as $requiredPermission)
+    		    
+    		    $hasRequiredPermissions = true;
+    		    foreach ($requiredPermissionsArr as $requiredPermission)
 			    {
 			        $permissionFilter = new Kaltura_Client_Type_PermissionFilter();
 			        $permissionFilter->nameEqual = $requiredPermission;
 			        $permissionFilter->statusEqual = Kaltura_Client_Enum_PermissionStatus::ACTIVE;
+			        $permissionFilter->partnerIdEqual = $userPartner->id;
 			        $permissions = $client->permission->listAction($permissionFilter, new Kaltura_Client_Type_FilterPager());
 			        if (!$permissions->totalCount)
 			        {
-			            return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
+			            $hasRequiredPermissions = false;
+			            break;
 			        }
 			    }
+		    
+    		    $filter = new Kaltura_Client_VarConsole_Type_VarConsolePartnerFilter();
+		        $filter->partnerPermissionsExist = $settings->requiredPermissions;
+		        $filter->groupTypeIn = Kaltura_Client_Enum_PartnerGroupType::GROUP . "," . Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP;
+    		    
+    			$userPartners = $client->partner->listPartnersForUser($filter);
+    			
+    			if (!$userPartners->totalCount)
+    			    return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
+    			
+    			$authorizedPartnerId = $userPartners->objects[0]->id;
+    			
+    		    $ks = $client->user->loginByLoginId($this->username, $this->password, $authorizedPartnerId);
+    			$client->setKs($ks);
+    			$user = $client->user->getByLoginId($this->username, $authorizedPartnerId);
+    			$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $authorizedPartnerId, $this->password);
     		}
     		
 			
