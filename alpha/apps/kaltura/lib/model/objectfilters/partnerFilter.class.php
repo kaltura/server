@@ -28,7 +28,8 @@ class partnerFilter extends baseObjectFilter
 			"_lte_partner_package",
 		    "_eq_partner_group_type",
 		    "_in_partner_group_type",
-		    "_notin_id"
+		    "_notin_id",
+			"_partner_permissions_exist",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "id", "name", "website", "admin_name", "admin_email", "status");
@@ -55,11 +56,52 @@ class partnerFilter extends baseObjectFilter
 		$res = PartnerPeer::translateFieldName( $field_name , $this->field_name_translation_type , BasePeer::TYPE_COLNAME );
 		return $res;
 	}
-
+		
+	/* (non-PHPdoc)
+	 * @see baseObjectFilter::attachToFinalCriteria()
+	 */
+	public function attachToFinalCriteria(Criteria $criteria)
+	{
+		if(!is_null($this->get('_partner_permissions_exist')))
+		{
+	        $permissions = explode (',' , $this->get('_partner_permissions_exist'));
+	        
+	        $tmpCriteria =  new Criteria();
+	        $tmpCriteria->addSelectColumn(PermissionPeer::PARTNER_ID);
+	        $tmpCriteria->addAnd(PermissionPeer::NAME, $permissions,  Criteria::IN);
+	        
+	        if(!is_null($this->get('_in_id')))
+	        {
+		        $ids = explode(',', $this->get('_in_id'));
+		        $tmpCriteria->addAnd(PermissionPeer::PARTNER_ID, $ids, Criteria::IN);
+	        }
+	        
+	        $tmpCriteria->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
+	        $stmt = PermissionPeer::doSelectStmt($tmpCriteria);
+	        $this->setIdIn($stmt->fetchAll(PDO::FETCH_COLUMN));
+			
+			$this->unsetByName('_partner_permissions_exist');
+		}
+		
+		return parent::attachToFinalCriteria($criteria);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see baseObjectFilter::getIdFromPeer()
+	 */
 	public function getIdFromPeer (  )
 	{
 		return PartnerPeer::ID;
 	}
+
+	/**
+	 * Set filter _in_id attribute
+	 *  
+	 * @param array $ids
+	 */
+	public function setIdIn(array $ids)
+	{
+		$this->set('_in_id', implode(',', $ids));
+	}
 }
 
-?>

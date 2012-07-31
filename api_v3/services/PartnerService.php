@@ -370,20 +370,8 @@ class PartnerService extends KalturaBaseService
 		{
 		    $partnerDbFilter = new partnerFilter();
 		    $partnerFilter->toObject($partnerDbFilter);
+		    $partnerDbFilter->setIdIn($allowedIds);
 		    $partnerDbFilter->attachToCriteria($c);
-		    //TODO implement this as advanced filter on the partnerFilter class.
-		    if (isset($partnerFilter->partnerPermissionsExist) && $partnerFilter->partnerPermissionsExist)
-		    {
-		        $permissionsArr = explode (',' , $partnerFilter->partnerPermissionsExist);
-		        
-		        $criteria =  new Criteria();
-		        $criteria->addSelectColumn(PermissionPeer::PARTNER_ID);
-		        $criteria->addAnd(PermissionPeer::NAME, $permissionsArr,  Criteria::IN);
-		        $criteria->addAnd(PermissionPeer::PARTNER_ID, $allowedIds, Criteria::IN);
-		        $criteria->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
-		        $stmt = PermissionPeer::doSelectStmt($criteria);
-		        $allowedIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
-		    }
 		}
 		
 		$partners = array();
