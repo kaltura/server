@@ -1495,10 +1495,11 @@ class myPartnerUtils
 		}
 	}
 	
-	public static function getPartnersArray($partnerIds)
+	public static function getPartnersArray(array $partnerIds, Criteria $c = null)
 	{
 		$ret = array();
-		$c = new Criteria();
+		if (!$c)
+		    $c = new Criteria();
 		$c->addAnd(PartnerPeer::ID, $partnerIds, Criteria::IN);
 		$c->addAnd(PartnerPeer::STATUS, Partner::PARTNER_STATUS_ACTIVE, Criteria::EQUAL);
 		PartnerPeer::setUseCriteriaFilter(false);
