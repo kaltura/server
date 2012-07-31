@@ -908,6 +908,8 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				return "kevent";
 			case "params":
 				return "params_";
+			case "override":
+				return "override_";
 			default:
 				return $param;
 		}
