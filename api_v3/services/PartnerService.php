@@ -352,20 +352,28 @@ class PartnerService extends KalturaBaseService
 	 * Retrieve a list of partner IDs which the current user is allowed to access.
 	 * 
 	 * @action listPartnersForUser
+	 * @param KalturaPartnerFilter $partnerFilter
 	 * @return KalturaPartnerListResponse
 	 * 
 	 */
-	public function listPartnersForUserAction()
+	public function listPartnersForUserAction(KalturaPartnerFilter $partnerFilter = null)
 	{	
 		$partnerId = kCurrentContext::$master_partner_id;
 		
 		if (isset(kCurrentContext::$partner_id))
 			$partnerId = kCurrentContext::$partner_id;
 		
+		$c = new Criteria();
+		if ($partnerFilter)
+		{
+		    $partnerDbFilter = new partnerFilter();
+		    $partnerFilter->fromObject($partnerDbFilter);
+		    $partnerDbFilter->attachToCriteria($c);
+		}
 		$partners = array();
 		$currentUser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid, true);
 		if($currentUser)
-			$partners = myPartnerUtils::getPartnersArray($currentUser->getAllowedPartnerIds());	
+			$partners = myPartnerUtils::getPartnersArray($currentUser->getAllowedPartnerIds(), $c);	
 		
 		$kalturaPartners = KalturaPartnerArray::fromPartnerArray($partners );
 		$response = new KalturaPartnerListResponse();
