@@ -78,7 +78,26 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     		$client->setKs($ks);
     		$user = $client->user->getByLoginId($this->username, $partnerId);
     		$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $partnerId, $this->password);
+			//New logic - if specific permissions are required to authenticate the partner/user, check their existence here.
     		
+    		if (isset($settings->requiredPermissions) && $settings->requiredPermissions)
+    		{
+    		    $requiredPermissionsArr = explode(",", $settings->requiredPermissions);
+
+			    foreach ($requiredPermissionsArr as $requiredPermission)
+			    {
+			        $permissionFilter = new Kaltura_Client_Type_PermissionFilter();
+			        $permissionFilter->nameEqual = $requiredPermission;
+			        $permissionFilter->statusEqual = Kaltura_Client_Enum_PermissionStatus::ACTIVE;
+			        $permissions = $client->permission->listAction($permissionFilter, new Kaltura_Client_Type_FilterPager());
+			        if (!$permissions->totalCount)
+			        {
+			            return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
+			        }
+			    }
+    		}
+    		
+			
 			if ($partnerId && $user->partnerId != $partnerId) {
 				return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
 			}
