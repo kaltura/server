@@ -25,6 +25,7 @@ class KalturaVarConsolePartnerFilter extends KalturaPartnerFilter
     (
     	"groupTypeEq" => "_eq_partner_group_type",
         "groupTypeIn" => "_in_partner_group_type",
+        "partnerPermissionsExist" => "_partner_permissions_exist",
     );
     
     public function getMapBetweenObjects()
