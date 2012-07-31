@@ -364,16 +364,29 @@ class PartnerService extends KalturaBaseService
 			$partnerId = kCurrentContext::$partner_id;
 		
 		$c = new Criteria();
+		$currentUser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid, true);
+		$allowedIds = $currentUser->getAllowedPartnerIds();
 		if ($partnerFilter)
 		{
 		    $partnerDbFilter = new partnerFilter();
 		    $partnerFilter->fromObject($partnerDbFilter);
 		    $partnerDbFilter->attachToCriteria($c);
+		    //TODO implement this as advanced filter on the partnerFilter class. Meanwhile, whine.
+		    if (isset($partnerFilter->partnerPermissionsExist) && $partnerFilter->partnerPermissionsExist)
+		    {
+		        $permissionsArr = explode (',' , $partnerFilter->partnerPermissionsExist);
+		        $criteria =  new Criteria();
+		        $criteria->addSelectColumn(PermissionPeer::PARTNER_ID);
+		        $criteria->addAnd($permissionsArr, PermissionPeer::NAME, Criteria::IN);
+		        $criteria->addAnd($currentUser->getAllowedPartnerIds(), PermissionPeer::PARTNER_ID, Criteria::IN);
+		        $stmt = PermissionPeer::doSelectStmt($criteria);
+		        $allowedIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		    }
 		}
+		
 		$partners = array();
-		$currentUser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid, true);
 		if($currentUser)
-			$partners = myPartnerUtils::getPartnersArray($currentUser->getAllowedPartnerIds(), $c);	
+			$partners = myPartnerUtils::getPartnersArray($allowedIds, $c);	
 		
 		$kalturaPartners = KalturaPartnerArray::fromPartnerArray($partners );
 		$response = new KalturaPartnerListResponse();
