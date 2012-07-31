@@ -683,6 +683,10 @@ kmc.preview_embed = {
 	},
 	
 	previewUrl: function(entry_id, name, is_playlist, partner_id, uiconf_id){
+		var update_html = '<img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...';
+		if( $(".preview_url").length ) {
+			$(".preview_url").html( update_html );
+		}
 		// Base preview url
 		var protocol = ($("#https_support").attr("checked")) ? 'https://' : 'http://';		
 		var long_url = protocol + kmc.vars.host + '/index.php/kmc/preview/partner_id/' + partner_id + '/uiconf_id/' + uiconf_id;
@@ -693,7 +697,7 @@ kmc.preview_embed = {
 		}
 		kmc.client.setShortURL(long_url);
 		
-		return '<div class="item preview_link"><div class="label_text">View a standalone page with this player: &nbsp;<span class="preview_url"><img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...</span></div></div>';
+		return '<div class="item preview_link"><div class="label_text">View a standalone page with this player: &nbsp;<span class="preview_url">' + update_html + '</span></div></div>';
 	},
 
 	// for content|Manage->drilldown->flavors->preview
