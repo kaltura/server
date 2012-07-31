@@ -288,7 +288,7 @@ class kMrssManager
 		foreach(explode(',', $flavorAsset->getTags()) as $tag)
 			$tags->addChild('tag', self::stringToSafeXml($tag));
 				
-		if ($flavorAsset->hasTag(assetparams::TAG_SLWEB))
+		if ($flavorAsset->hasTag(assetParams::TAG_SLWEB))
 			self::addIsmLink($flavorAsset->getentry(), $mrss);	
 	}
 	
