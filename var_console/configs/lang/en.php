@@ -1105,7 +1105,8 @@ return array(
 
     'Results' => 'Accounts',
 
-    'partner-list-by-user intro text' => 'This user has access to several partners of type VAR/group parent. Please select the relevant partner:',
+    'partner-list-by-user intro text' => 'You are listed as a user of more than one Parent Account. Please select the Parent Account you want to work with:
+    ',
 );
 
 
