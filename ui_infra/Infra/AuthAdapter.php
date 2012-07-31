@@ -37,11 +37,13 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 	 *
 	 * @return void
 	 */
-	public function __construct($username, $password, $timezoneOffset)
+	public function __construct($username, $password, $timezoneOffset, $partnerId = null)
 	{
 		$this->username = $username;
 		$this->password = $password;
 		$this->timezoneOffset = $timezoneOffset;
+		if ($partnerId)
+		    $this->partnerId = $partnerId;
 	}
 
 	/**
@@ -61,13 +63,21 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		$client = Infra_ClientHelper::getClient();
 		$client->setKs(null);
 		
+		if ($this->partnerId)
+		{
+		    $ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId);
+    		$client->setKs($ks);
+    		$user = $client->user->getByLoginId($this->username, $this->partnerId);
+    		$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $this->partnerId, $this->password);
+    		return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
+		}
 		
 		try
 		{
-    		$ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId);
+    		$ks = $client->user->loginByLoginId($this->username, $this->password, $partnerId);
     		$client->setKs($ks);
     		$user = $client->user->getByLoginId($this->username, $partnerId);
-    		$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $this->partnerId, $this->password);
+    		$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $partnerId, $this->password);
 			//New logic - if specific permissions are required to authenticate the partner/user, check their existence here.
     		
     		if (isset($settings->requiredPermissions) && $settings->requiredPermissions)
@@ -76,6 +86,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     			$userPartners = $client->partner->listPartnersForUser();
     			
     			$authorizedPartnerId = null;
+    			
     			foreach ($userPartners->objects as $userPartner)
     			{
     			    $authorizedPartnerId = $userPartner->id;
