@@ -369,7 +369,7 @@ class PartnerService extends KalturaBaseService
 		if ($partnerFilter)
 		{
 		    $partnerDbFilter = new partnerFilter();
-		    $partnerFilter->fromObject($partnerDbFilter);
+		    $partnerFilter->toObject($partnerDbFilter);
 		    $partnerDbFilter->attachToCriteria($c);
 		    //TODO implement this as advanced filter on the partnerFilter class. Meanwhile, whine.
 		    if (isset($partnerFilter->partnerPermissionsExist) && $partnerFilter->partnerPermissionsExist)
