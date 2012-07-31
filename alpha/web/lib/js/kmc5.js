@@ -367,12 +367,14 @@ kmc.utils = {
 			} else {
 				// For other browsers we're just make it
 				$("#flash_wrap").css("visibility","hidden");
+				$("#flash_wrap object").css("visibility","hidden");
 			}
 		} else {
 			if( $.browser.msie ) {
 				$("#flash_wrap").css("margin-right","0");
 			} else {
 				$("#flash_wrap").css("visibility","visible");
+				$("#flash_wrap object").css("visibility","visible");
 			}
 		}
 	},
@@ -548,26 +550,26 @@ kmc.preview_embed = {
 		embed_code = embed_code.replace('{FLAVOR}','');
 		
 		var modal_content = ((live_bitrates) ? kmc.preview_embed.buildLiveBitrates(name,live_bitrates) : '') +
-		'<div id="player_wrap">' + preview_player + '</div>' +
+		'<div id="player_wrap">' + preview_player + '</div><div id="preview_embed">' +
 		((id == "multitab_playlist") ? '' : kmc.preview_embed.buildSelect(is_playlist, uiconf_id)) +
-		((live_bitrates) ? '' : kmc.preview_embed.buildRtmpOptions()) +
-		kmc.preview_embed.buildHTML5Option(id, name, is_playlist, previewOnly, kmc.vars.partner_id, uiconf_id, has_mobile_flavors, is_video) +
-		kmc.preview_embed.buildHTTPSOption() + 		
+		((live_bitrates) ? '' : kmc.preview_embed.buildRtmpOptions()) + '<div class="hr"></div>' + 
+		kmc.preview_embed.buildHTML5Option(id, name, is_playlist, previewOnly, kmc.vars.partner_id, uiconf_id, has_mobile_flavors, is_video) + '<div class="hr"></div>' + 
 		kmc.preview_embed.previewUrl() + 
-		'<div class="embed_code_div"><div class="label embedcode">Embed Code:</div> <div class="right"><textarea id="embed_code" rows="5" cols=""' +
-		'readonly="true">' + embed_code + '</textarea></div><br class="clear" />' +
-		'<div id="copy_msg">Press Ctrl+C to copy embed code (Command+C on Mac)</div><div class="center"><button id="select_code">' +
-		'<span>Select Code</span></button></div></div>';
+		'<div class="item embed_code clearfix"><div class="label">Embed Code</div> <textarea id="embed_code" readonly="true">' + embed_code + '</textarea></div>' +
+		'</div><div id="embed_code_button"><div id="copy_msg">Press Ctrl+C to copy embed code (Command+C on Mac)</div>' +
+		'<div class="center"><a id="select_code" class="blue_button" href="#">Select Code</a></div></div></div>';
 
 		kmc.layout.modal.open( {
-			'width' : parseInt(uiconf_details.width) + 140,
+			'width' : parseInt(uiconf_details.width) + 160,
 			'title' : id_type + ': ' + name,
+			'style' : 'preview_embed',
 			'help' : '<a class="help icon" href="javascript:kmc.utils.openHelp(\'section_pne\');"></a>',
-			'content' : '<div id="preview_embed">' + modal_content + '</div>'
+			'content' : modal_content
 		} );
 
 		// attach events here instead of writing them inline
-		$("#embed_code, #select_code").click(function(){
+		$("#embed_code, #select_code").click(function( e ){
+			e.preventDefault();
 			$("#copy_msg").show();
 			setTimeout(function(){
 				$("#copy_msg").hide(500);
@@ -595,7 +597,7 @@ kmc.preview_embed = {
 			
 		// show the embed code & enable the checkbox if its not a preview
 		if (previewOnly==false) {
-			$('.embed_code_div').show();
+			$('.embed_code, #embed_code_button').show();
 		}
 		// Disable checkbox if no mobile flavors
 		if(is_video && ! has_mobile_flavors) {
@@ -603,6 +605,25 @@ kmc.preview_embed = {
 		}
 	}, // doPreviewEmbed
 
+	buildSelect : function(is_playlist, uiconf_id) {
+
+		uiconf_id = kmc.vars.current_uiconf || uiconf_id; 
+		var list_type = is_playlist ? "playlist" : "player",
+		list_length = eval("kmc.vars." + list_type + "s_list.length"),
+		html_select = '',
+		this_uiconf, selected;
+
+		for(var i=0; i<list_length; i++) {
+			this_uiconf = eval("kmc.vars." + list_type + "s_list[" + i + "]"),
+			selected = (this_uiconf.id == uiconf_id) ? ' selected="selected"' : '';
+			html_select += '<option ' + selected + ' value="' + this_uiconf.id + '">' + this_uiconf.name + '</option>';
+		}
+		html_select = '<div class="clearfix"><div class="label" style="min-width: 140px;">Select Player:</div><select id="player_select">' + html_select + '</select></div>';
+		html_select += '<div class="note">Kaltura player includes both layout and functionality (advertising, subtitles, etc)</div>';
+		kmc.vars.current_uiconf = null;
+		return '<div class="item">' + html_select + '</div>';
+	},
+	
 	buildLiveBitrates : function(name,live_bitrates) {
 		var bitrates = "",
 		len = live_bitrates.length,
@@ -618,16 +639,16 @@ kmc.preview_embed = {
 	buildRtmpOptions : function() {
 		var selected = ' selected="selected"';
 		var delivery_type = kmc.vars.embed_code_delivery_type || "http";
-		var html = '<div id="rtmp" class="label">Select Flash Delivery Type:</div> <div class="right"><select id="delivery_type">';
+		var html = '<div class="clearfix"><div id="rtmp" class="label">Select Flash Delivery Type:</div> <select id="delivery_type">';
 		var options = '<option value="http"' + ((delivery_type == "http") ? selected : "") + '>Progressive Download (HTTP)&nbsp;</option>' +
 		'<option value="rtmp"' + ((delivery_type == "rtmp") ? selected : "") + '>Adaptive Streaming (RTMP)&nbsp;</option>' + 
 		'<option value="rtmpe"' + ((delivery_type == "rtmpe") ? selected : "") + '>Secure Transport  (RTMPE)&nbsp;</option>';
 		if(!kmc.vars.hide_akamai_hd_network) {
 			options += '<option value="akamai"' + ((delivery_type == "akamai") ? selected : "") + '>Akamai HD Network &nbsp;</option>';
 		}
-		html += options + '</select></div><br /><div class="note">Adaptive Streaming automatically adjusts to the viewer\'s bandwidth,' +
-		'while Progressive Download allows buffering of the content. <a href="javascript:kmc.utils.openHelp(\'section_pne_stream\');">Read more</a></div><br />';
-		return html;
+		html += options + '</select></div><div class="note">Adaptive Streaming automatically adjusts to the viewer\'s bandwidth,' +
+		'while Progressive Download allows buffering of the content. <a href="javascript:kmc.utils.openHelp(\'section_pne_stream\');">Read more</a></div>';
+		return '<div class="item">' + html + '</div>';;
 	},
 		
 	buildHTML5Option : function(entry_id, name, is_playlist, previewOnly, partner_id, uiconf_id, has_mobile_flavors, is_video) {
@@ -655,19 +676,20 @@ kmc.preview_embed = {
 			description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a href="javascript:kmc.utils.openHelp(\'section_pne_ipad\');">Read more</a></div>';
 		}
 
-		var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" /> <label for="html5_support">Support Mobile' +
-		' devices by fall-forward to HTML5</label></div><br />' + description + '<br />';
+		var html = '<div class="checkbox clearfix"><input id="html5_support" type="checkbox" /> <label class="label_text" for="html5_support">Support Mobile' +
+		' devices by fall-forward to HTML5</label></div>' + description;
+		html = '<div class="html5_support">' + html + '</div>' + kmc.preview_embed.buildHTTPSOption();
 
-		return html;
+		return '<div class="item clearfix">' + html + '</div>';
 	},
 	
 	buildHTTPSOption: function() {
-		return '<div class="label checkbox"><input id="https_support" type="checkbox" /> <label for="https_support">' + 
-				'Modify embed code to use HTTPS secure delivery</label></div><br />';
+		return '<div class="https_support"><div class="label checkbox"><input id="https_support" type="checkbox" /> <label class="label_text" for="https_support">' + 
+				'Modify embed code to use HTTPS secure delivery</label></div></div>';
 	},
 	
 	previewUrl: function(){
-		return '<div class="label">View a standalone page with this player: <span class="preview_url"><img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...</span></div>';
+		return '<div class="item preview_link"><div class="label_text">View a standalone page with this player: &nbsp;<span class="preview_url"><img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...</span></div></div>';
 	},
 
 	// for content|Manage->drilldown->flavors->preview
@@ -677,7 +699,7 @@ kmc.preview_embed = {
 		var player_code = kmc.preview_embed.buildKalturaEmbed(entry_id,entry_name,null,false,kmc.vars.default_kdp);
 		player_code = player_code.replace('&{FLAVOR}', '&flavorId=' + flavor_details.asset_id + '&ks=' + kmc.vars.ks);
 		
-		var modal_content = player_code + '<dl>' +
+		var modal_content = '<div class="center">' + player_code + '</div><dl>' +
 		'<dt>Entry Name:</dt><dd>&nbsp;' + entry_name + '</dd>' +
 		'<dt>Entry Id:</dt><dd>&nbsp;' + entry_id + '</dd>' +
 		'<dt>Flavor Name:</dt><dd>&nbsp;' + flavor_details.flavor_name + '</dd>' +
@@ -748,7 +770,7 @@ kmc.preview_embed = {
 				case "rtmpe":
 					embed_code = embed_code.replace("{FLASHVARS}", "streamerType=rtmp&amp;mediaProtocol=rtmpe&amp;{FLASHVARS}");
 					break;					
-				case "akamai": 
+				case "akamai":
 					embed_code = embed_code.replace("{FLASHVARS}", "streamerType=hdnetwork&amp;akamaiHD.loadingPolicy=preInitialize&amp;akamaiHD.asyncInit=true&amp;{FLASHVARS}");
 					break;
 			}
@@ -790,24 +812,6 @@ kmc.preview_embed = {
 		}
 
 		return embed_code;
-	},
-
-	buildSelect : function(is_playlist, uiconf_id) {
-
-		uiconf_id = kmc.vars.current_uiconf || uiconf_id; 
-		var list_type = is_playlist ? "playlist" : "player",
-		list_length = eval("kmc.vars." + list_type + "s_list.length"),
-		html_select = '',
-		this_uiconf, selected;
-
-		for(var i=0; i<list_length; i++) {
-			this_uiconf = eval("kmc.vars." + list_type + "s_list[" + i + "]"),
-			selected = (this_uiconf.id == uiconf_id) ? ' selected="selected"' : '';
-			html_select += '<option ' + selected + ' value="' + this_uiconf.id + '">' + this_uiconf.name + '</option>';
-		}
-		html_select = '<div class="label" style="min-width: 140px;">Select Player:</div><div class="right"><select id="player_select">' + html_select + '</select></div><br /><div class="note">Kaltura player includes both layout and functionality (advertising, subtitles, etc)</div><br />';
-		kmc.vars.current_uiconf = null;
-		return html_select;
 	},
 
 	getUiconfDetails : function(uiconf_id,is_playlist) {
@@ -1077,8 +1081,7 @@ kmc.layout = {
 			}
 			$modal.find(".help").remove();
 			$modal_title.parent().append( options.help );
-			
-			$modal_content.html(options.content);
+			$modal_content[0].innerHTML = options.content;
 
 			// Activate close button
 			$modal.find(".close").click( function() {
