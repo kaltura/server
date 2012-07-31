@@ -263,6 +263,7 @@ namespace Kaltura
             // Add a custom data entry in the KMC  (Settings -> Custom Data)
             KalturaMetadataProfile profile = new KalturaMetadataProfile();
             profile.MetadataObjectType = KalturaMetadataObjectType.ENTRY;
+            profile.Name = metadata[0].Name;
             string viewsData = "";
 
             StreamReader fileStream = File.OpenText(xsdFile);
