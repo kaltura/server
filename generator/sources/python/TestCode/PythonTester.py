@@ -93,14 +93,13 @@ def SampleMetadataOperations():
     profile.setMetadataObjectType(KalturaMetadataObjectType.ENTRY)
     viewsData = ""
 
-    client.metadata.metadataProfile.add(profile, file(xsdFile, 'rb').read(), viewsData)
+    newProfile = client.metadata.metadataProfile.add(profile, file(xsdFile, 'rb').read(), viewsData)
 
     # Check if there are any custom fields defined in the KMC (Settings -> Custom Data)
     # for the first item returned by the previous listaction
     filter = KalturaMetadataProfileFilter()
     metadata = client.metadata.metadataProfile.list(filter, pager).objects
 
-    profileId = metadata[0].getId()
     name = entries[0].getName()
     id = entries[0].getId()
     if metadata[0].getXsd() != None:
@@ -114,7 +113,7 @@ def SampleMetadataOperations():
     profile.setMetadataObjectType(KalturaMetadataObjectType.ENTRY)
     viewsData = ""
 
-    metadataResult = client.metadata.metadataProfile.update(profileId, profile, file(xsdFile, 'rb').read(), viewsData)
+    metadataResult = client.metadata.metadataProfile.update(newProfile.id, profile, file(xsdFile, 'rb').read(), viewsData)
 
     assert(metadataResult.xsd != None)
 
@@ -122,7 +121,7 @@ def SampleMetadataOperations():
     filter2 = KalturaMetadataFilter()
     filter2.setObjectIdEqual(entries[0].id)
     xmlData = "<metadata><SubtitleFormat>" + fieldValue + "</SubtitleFormat></metadata>"
-    metadata2 = client.metadata.metadata.add(profileId, profile.metadataObjectType, entries[0].id, xmlData)
+    metadata2 = client.metadata.metadata.add(newProfile.id, profile.metadataObjectType, entries[0].id, xmlData)
 
     assert(metadata2.xml != None)
     
@@ -134,6 +133,7 @@ def SampleMetadataOperations():
     # Get the metadata for the video
     filter3 = KalturaMetadataFilter()
     filter3.setObjectIdEqual(entries[0].id)
+    filter3.setMetadataProfileIdEqual(newProfile.id)
     metadataList = client.metadata.metadata.list(filter3).objects
     assert(metadataList[0].xml != None)
 
@@ -170,7 +170,7 @@ def AdvancedMultiRequestExample():
     mixEntry = client.mixing.add(mixEntry)
 
     # Request 3
-    uploadTokenId = client.media.upload(file('demovideo.flv', 'rb'))
+    uploadTokenId = client.media.upload(file('DemoVideo.flv', 'rb'))
 
     mediaEntry = KalturaMediaEntry()
     mediaEntry.setName("Media Entry For Mix")
@@ -201,7 +201,7 @@ ks = client.generateSession(ADMIN_SECRET, USER_NAME, KalturaSessionType.ADMIN, P
 client.setKs(ks)
 
 # add media
-uploadTokenId = client.media.upload(file('demovideo.flv', 'rb'))
+uploadTokenId = client.media.upload(file('DemoVideo.flv', 'rb'))
 
 mediaEntry = KalturaMediaEntry()
 mediaEntry.setName("Media Entry Using Python Client")
