@@ -53,7 +53,7 @@
 		<tbody>
 			<?php foreach($this->paginator as $item): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
-				<td><?php $d = strlen($item->dateId) == 6 ? DateTime::createFromFormat("Ym", $item->dateId) : DateTime::createFromFormat("Ymd", $item->dateId); echo strlen($item->dateId) == 6 ? $d->format("M Y") : $d->format("d M Y"); ?></td>
+				<td><?php $d = strlen($item->dateId) == 6 ? DateTime::createFromFormat("Ym", $item->dateId) : DateTime::createFromFormat("Ymd", $item->dateId); echo strlen($item->dateId) == 6 ? date("M Y", $d->getTimestamp()) : date("d M Y", $d->getTimestamp()); ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_PartnerStatus', $item->partnerStatus); ?></td>
 				<td><?php echo $item->partnerName; ?></td>
 				<td><?php echo $item->partnerId; ?></td>
