@@ -8,6 +8,7 @@ import com.kaltura.client.enums.KalturaNullableBoolean;
 import com.kaltura.client.enums.KalturaSiteRestrictionType;
 import com.kaltura.client.types.KalturaAccessControl;
 import com.kaltura.client.types.KalturaBaseRestriction;
+import com.kaltura.client.types.KalturaConversionProfile;
 import com.kaltura.client.types.KalturaCountryRestriction;
 import com.kaltura.client.types.KalturaSiteRestriction;
 import com.kaltura.client.types.KalturaThumbParams;
@@ -62,37 +63,63 @@ public class MediaServiceFieldsTest extends BaseTest {
 	
 	/**
 	 * Tests that when we ask to set parameters to null, we indeed set them to null
-	 * The parameter types that are tested : 
-	 * String, int.
+	 * The parameter types that are tested : String
 	 */
-	public void testSetFieldsToNull() throws KalturaApiException {
+	public void testSetFieldsToNullString() throws KalturaApiException {
 
 		BaseTest.startAdminSession(client, kalturaConfig);
 
 		final String testString = "Kaltura test string";
-		final int testInt = 42;
 
 		KalturaThumbParams params = new KalturaThumbParams();
 		params.name = testString;
 		params.description = testString;
-		params.density = testInt;
 
 		// Regular update works
 		params = client.getThumbParamsService().add(params);
 
 		assertEquals(testString, params.description);
-		assertEquals(testInt, params.density);
 
 		// Set to null
 		KalturaThumbParams params2 = new KalturaThumbParams();
 		params2.description = "__null_string__";
-		params2.density = Integer.MAX_VALUE;
 
 		params2 = client.getThumbParamsService().update(params.id, params2);
 		assertNull(params2.description);
-		assertEquals(Integer.MIN_VALUE, params2.density);
 
 		client.getThumbParamsService().delete(params.id);
+		
+	}
+	
+	/**
+	 * Tests that when we ask to set parameters to null, we indeed set them to null
+	 * The parameter types that are tested : int
+	 */
+	public void testSetFieldsToNullInt() throws KalturaApiException {
+
+		BaseTest.startAdminSession(client, kalturaConfig);
+		final int testInt = 42;
+
+		KalturaConversionProfile profile = new KalturaConversionProfile();
+		profile.name = "Kaltura test string";
+		profile.flavorParamsIds = "0";
+		profile.storageProfileId = testInt;
+
+		// Regular update works
+		profile = client.getConversionProfileService().add(profile);
+
+		assertEquals(testInt, profile.storageProfileId);
+
+		// Set to null
+		KalturaConversionProfile profile2 = new KalturaConversionProfile();
+		profile2.storageProfileId = Integer.MAX_VALUE;
+
+		profile2 = client.getConversionProfileService().update(profile.id, profile2);
+		assertEquals(Integer.MIN_VALUE, profile2.storageProfileId);
+
+		client.getConversionProfileService().delete(profile.id);
+		
+		
 	}
 	
 	/**
