@@ -1105,8 +1105,7 @@ return array(
 
     'Results' => 'Accounts',
 
-    'partner-list-by-user intro text' => 'You are listed as a user of more than one Parent Account. Please select the Parent Account you want to work with:
-    ',
+    'partner-list-by-user intro text' => 'You are listed as a user of more than one Parent Account. Please select the Parent Account you want to work with:',
 );
 
 
