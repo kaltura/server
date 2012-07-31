@@ -74,7 +74,17 @@ class UserController extends Zend_Controller_Action
 			}
 			else
 			{
-				$loginForm->setDescription('invalid login');
+			    $settings = Zend_Registry::get('config')->settings;
+			    $filter = new Kaltura_Client_VarConsole_Type_VarConsolePartnerFilter();
+		        if (isset($settings->requiredPermissions) && $settings->requiredPermissions)
+		            $filter->partnerPermissionsExist = $settings->requiredPermissions;
+		        $filter->groupTypeIn = Kaltura_Client_Enum_PartnerGroupType::GROUP . "," . Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP;
+				$client = Infra_ClientHelper::getClient();
+				$partners = $client->partner->listPartnersForUser($filter);
+				if ($partners->totalCount)
+				    $this->_helper->redirector('list-by-user', 'partner');
+				else
+		            $loginForm->setDescription('invalid login');
 			}
 		}
 		
