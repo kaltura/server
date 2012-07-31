@@ -378,7 +378,7 @@ class PartnerService extends KalturaBaseService
 		        $criteria =  new Criteria();
 		        $criteria->addSelectColumn(PermissionPeer::PARTNER_ID);
 		        $criteria->addAnd($permissionsArr, PermissionPeer::NAME, Criteria::IN);
-		        $criteria->addAnd($currentUser->getAllowedPartnerIds(), PermissionPeer::PARTNER_ID, Criteria::IN);
+		        $criteria->addAnd($allowedIds, PermissionPeer::PARTNER_ID, Criteria::IN);
 		        $stmt = PermissionPeer::doSelectStmt($criteria);
 		        $allowedIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		    }
