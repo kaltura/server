@@ -259,7 +259,7 @@ class PartnerController extends Zend_Controller_Action
 	    $request = $this->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
-		
+		$settings = Zend_Registry::get('config')->settings;
 		// reset form url
 		$action = $this->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
 
@@ -271,6 +271,10 @@ class PartnerController extends Zend_Controller_Action
 		
 		// get results and paginate
 		//$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+		$filter = new Kaltura_Client_VarConsole_Type_VarConsolePartnerFilter();
+		if (isset($settings->requiredPermissions) && $settings->requiredPermissions)
+		    $filter->partnerPermissionsExist = $settings->requiredPermissions;
+		$filter->groupTypeIn = Kaltura_Client_Enum_PartnerGroupType::GROUP . "," . Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP;
 		$paginatorAdapter = new Infra_FilterPaginator($client->partner, "listPartnersForUser", null);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		if ($paginator->getItemsCount() == 1)
