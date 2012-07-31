@@ -106,6 +106,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$enumType = $enumNode->getAttribute ( "enumType" );
 		$enumCount = 0;
 		$enum2Val = array();
+		$enumValues = array();
 		
 		foreach ( $enumNode->childNodes as $constNode )
 		{
@@ -114,6 +115,11 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 				
 			$propertyName = $constNode->getAttribute ( "name" );
 			$propertyValue = $constNode->getAttribute ( "value" );
+			
+			if (in_array($propertyValue, $enumValues))
+				continue;			// Java does not allow duplicate values in enums
+			$enumValues[] = $propertyValue;
+			
 			if ($enumType == "string")
 			{
 				$propertyValue = "\"" . $propertyValue . "\"";
@@ -165,7 +171,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$str .= "    public static $enumName get(int hashCode) {\n";
 			$str .= "        switch(hashCode) {\n";
 		}
-			
+
+		$enumValues = array();
+		
 		$defaultPropertyName = "";
 		foreach ( $enumNode->childNodes as $constNode )
 		{
@@ -173,11 +181,15 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 				continue;
 	
 			$propertyName = $constNode->getAttribute ( "name" );
-	
+			$propertyValue = $constNode->getAttribute ( "value" );
+			
+			if (in_array($propertyValue, $enumValues))
+				continue;			// Java does not allow duplicate values in enums
+			$enumValues[] = $propertyValue;
+			
 			if ($defaultPropertyName == "")
 				$defaultPropertyName = $propertyName;
 	
-			$propertyValue = $constNode->getAttribute ( "value" );
 			if ($enumType == "string")
 			{
 				$propertyValue = "\"" . $propertyValue . "\"";
