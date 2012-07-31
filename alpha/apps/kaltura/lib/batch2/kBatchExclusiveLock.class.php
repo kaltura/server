@@ -199,7 +199,6 @@ class kBatchExclusiveLock
 		//	"others unfinished jobs " - the expiration should be SMALLER than the current time to make sure the job is not 
 		// being processed
 		$unclosedStatuses = BatchJobPeer::getUnClosedStatusList();
-		$unclosedStatuses[] = BatchJob::BATCHJOB_STATUS_ALMOST_DONE;
 		$unclosedStatuses = implode(',', $unclosedStatuses);
 		
 		$query2 = "(
@@ -209,7 +208,7 @@ class kBatchExclusiveLock
 		
 		// "retry jobs"
 		$query3 = "(
-						$stat = " . BatchJob::BATCHJOB_STATUS_RETRY  . "
+						$stat IN (" . BatchJob::BATCHJOB_STATUS_RETRY  . ", " . BatchJob::BATCHJOB_STATUS_ALMOST_DONE  . ")
 						AND $recheck <= $now
 					)";
 									
@@ -220,7 +219,7 @@ class kBatchExclusiveLock
 								$atmp IS NULL
 							)";
 								
-		$crit1 = $c->getNewCriterion($stat, array(BatchJob::BATCHJOB_STATUS_PENDING, BatchJob::BATCHJOB_STATUS_ALMOST_DONE), Criteria::IN);
+		$crit1 = $c->getNewCriterion($stat, BatchJob::BATCHJOB_STATUS_PENDING);
 		$crit1->addOr($c->getNewCriterion($schd, $query1, Criteria::CUSTOM));
 		$crit1->addOr($c->getNewCriterion($schd, $query2, Criteria::CUSTOM));
 		$crit1->addOr($c->getNewCriterion($schd, $query3, Criteria::CUSTOM));
