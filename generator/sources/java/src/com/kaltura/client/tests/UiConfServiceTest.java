@@ -55,6 +55,7 @@ public class UiConfServiceTest extends BaseTest {
 		uiConf.height = 373;
 		uiConf.width = 750;
 		uiConf.creationMode = KalturaUiConfCreationMode.ADVANCED;
+		uiConf.confFile = "NON_EXISTING_CONF_FILE";
 		
 		// this uiConf won't be editable in the KMC until it gets a config added to it, I think
 		
