@@ -554,7 +554,7 @@ kmc.preview_embed = {
 		((id == "multitab_playlist") ? '' : kmc.preview_embed.buildSelect(is_playlist, uiconf_id)) +
 		((live_bitrates) ? '' : kmc.preview_embed.buildRtmpOptions()) + '<div class="hr"></div>' + 
 		kmc.preview_embed.buildHTML5Option(id, name, is_playlist, previewOnly, kmc.vars.partner_id, uiconf_id, has_mobile_flavors, is_video) + '<div class="hr"></div>' + 
-		kmc.preview_embed.previewUrl() + 
+		kmc.preview_embed.previewUrl(id, name, is_playlist, kmc.vars.partner_id, uiconf_id) + 
 		'<div class="item embed_code clearfix"><div class="label">Embed Code</div> <textarea id="embed_code" readonly="true">' + embed_code + '</textarea></div>' +
 		'</div><div id="embed_code_button"><div id="copy_msg">Press Ctrl+C to copy embed code (Command+C on Mac)</div>' +
 		'<div class="center"><a id="select_code" class="blue_button" href="#">Select Code</a></div></div></div>';
@@ -591,6 +591,9 @@ kmc.preview_embed = {
 		});
 		
 		$("#https_support").change(function(){
+			// Update short link
+			kmc.preview_embed.previewUrl(id, name, is_playlist, kmc.vars.partner_id, uiconf_id);
+			// Update embed code
 			var val = kmc.preview_embed.buildKalturaEmbed(id,name,description, is_playlist, uiconf_id);
 			$("#embed_code").val(val);
 		});		
@@ -660,15 +663,6 @@ kmc.preview_embed = {
 			return '';
 		}
 
-		// Base preview url
-		var long_url = kmc.vars.service_url + '/index.php/kmc/preview/partner_id/' + partner_id + '/uiconf_id/' + uiconf_id;
-		if( is_playlist ) {
-			long_url += '/playlist_id/' + entry_id + '/playlist_name/' + name;
-		} else {
-			long_url += '/entry_id/' + entry_id + '/delivery/' + kmc.vars.embed_code_delivery_type;
-		}
-		kmc.client.setShortURL(long_url);
-
 		var description = "<div class=\"note\">If you enable the HTML5 player, the viewer device will be automatically detected." +
 		" <a href=\"javascript:kmc.utils.openHelp('section_pne_ipad');\">Read more</a></div>";
 
@@ -688,7 +682,17 @@ kmc.preview_embed = {
 				'Modify embed code to use HTTPS secure delivery</label></div></div>';
 	},
 	
-	previewUrl: function(){
+	previewUrl: function(entry_id, name, is_playlist, partner_id, uiconf_id){
+		// Base preview url
+		var protocol = ($("#https_support").attr("checked")) ? 'https://' : 'http://';		
+		var long_url = protocol + kmc.vars.host + '/index.php/kmc/preview/partner_id/' + partner_id + '/uiconf_id/' + uiconf_id;
+		if( is_playlist ) {
+			long_url += '/playlist_id/' + entry_id + '/playlist_name/' + name;
+		} else {
+			long_url += '/entry_id/' + entry_id + '/delivery/' + kmc.vars.embed_code_delivery_type;
+		}
+		kmc.client.setShortURL(long_url);
+		
 		return '<div class="item preview_link"><div class="label_text">View a standalone page with this player: &nbsp;<span class="preview_url"><img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...</span></div></div>';
 	},
 
@@ -752,7 +756,7 @@ kmc.preview_embed = {
 	buildKalturaEmbed : function(id, name, description, is_playlist, uiconf ) {
 		
 		var html5_support = ($("#html5_support").attr("checked")) ? true : false;
-		var https_support = ($("#https_support").attr("checked")) ? true : false;		
+		var https_support = ($("#https_support").attr("checked")) ? true : false;
 
 		name = kmc.utils.escapeQuotes(name); 
 		var uiconf_id = uiconf.uiconf_id || uiconf,
