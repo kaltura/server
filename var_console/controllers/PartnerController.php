@@ -275,7 +275,7 @@ class PartnerController extends Zend_Controller_Action
 		if (isset($settings->requiredPermissions) && $settings->requiredPermissions)
 		    $filter->partnerPermissionsExist = $settings->requiredPermissions;
 		$filter->groupTypeIn = Kaltura_Client_Enum_PartnerGroupType::GROUP . "," . Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP;
-		$paginatorAdapter = new Infra_FilterPaginator($client->partner, "listPartnersForUser", null);
+		$paginatorAdapter = new Infra_FilterPaginator($client->partner, "listPartnersForUser", null, $filter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		if ($paginator->getItemsCount() == 1)
 		    $this->_helper->redirector('list', 'partner');
