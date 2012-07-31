@@ -271,7 +271,9 @@ class KalturaPluginManager
 		//TODO - do we need to get all the instances? maybe create just the required plugin.
 		// unless they are all created at bootstrap anyway for event handling purposes
 		$plugins = self::getPluginInstances();
-		return @$plugins[$pluginName];
+		if (!isset($plugins[$pluginName]))
+			return null;
+		return $plugins[$pluginName];
 	}
 	
 	/**
