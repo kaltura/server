@@ -110,6 +110,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     			
     			$authorizedPartnerId = $userPartners->objects[0]->id;
     			
+    			$client->setKs(null);
     		    $ks = $client->user->loginByLoginId($this->username, $this->password, $authorizedPartnerId);
     			$client->setKs($ks);
     			$user = $client->user->getByLoginId($this->username, $authorizedPartnerId);
