@@ -154,7 +154,7 @@ class KalturaServicesMap
 		if (!is_dir(dirname($cacheFilePath))) {
 			mkdir(dirname($cacheFilePath), 0777);
 		}
-		file_put_contents($cacheFilePath, serialize($serviceMap));
+		kFile::safeFilePutContents($cacheFilePath, serialize($serviceMap));
 	}
 	
 	public static function getServiceMapModificationTime ()
