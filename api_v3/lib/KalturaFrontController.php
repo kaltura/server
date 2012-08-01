@@ -424,6 +424,9 @@ class KalturaFrontController
 	{
 		$start = microtime(true);
 		KalturaLog::debug("Serialize start");
+		
+		KalturaResponseCacher::endCacheIfDisabled();
+		
 		$format = isset($this->params["format"]) ? $this->params["format"] : KalturaResponseType::RESPONSE_TYPE_XML;
 	
 		if(isset($this->params['content-type']))
@@ -452,12 +455,11 @@ class KalturaFrontController
 		{
 			case KalturaResponseType::RESPONSE_TYPE_XML:
 				$serializer = new KalturaXmlSerializer($ignoreNull);
-				$serializer->serialize($object);
 				
 				echo '<?xml version="1.0" encoding="utf-8"?>';
 				echo "<xml>";
 					echo "<result>";
-						echo $serializer->getSerializedData();
+						$serializer->serialize($object);
 					echo "</result>";
 					echo "<executionTime>" . ($this->end - $this->start) ."</executionTime>";
 				echo "</xml>";

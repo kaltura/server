@@ -54,6 +54,8 @@ class KalturaResponseCacher extends kApiCache
 	
 	protected $_wouldHaveUsedCondCache = false;			// XXXXXXX TODO: remove this
 	
+	protected $_cacheModes = null;
+	
 	protected static $_cacheWarmupInitiated = false;
 	
 	public function __construct($params = null, $cacheType = kCacheManager::FS_API_V3, $expiry = 0)
@@ -186,6 +188,19 @@ class KalturaResponseCacher extends kApiCache
 		return count(self::$_activeInstances);
 	}
 	
+	public static function endCacheIfDisabled()
+	{
+		$lastInstance = end(self::$_activeInstances);
+		if ($lastInstance)
+			$lastInstance->initCacheModes();
+		
+		if (self::isCacheEnabled())
+			return;
+		
+		while(ob_get_level())
+			ob_end_clean();
+	}
+	
 	/**
 	 * This functions checks if a certain response resides in cache.
 	 * In case it dose, the response is returned from cache and a response header is added.
@@ -296,7 +311,8 @@ class KalturaResponseCacher extends kApiCache
 		
 	public function end()
 	{
-		if (!$this->getCacheModes())
+		$this->initCacheModes();
+		if (!$this->_cacheModes)
 			return;
 	
 		$response = ob_get_contents();
@@ -323,8 +339,8 @@ class KalturaResponseCacher extends kApiCache
 		// remove $this from the list of active instances - the request is complete
 		$this->removeFromActiveList();
 	
-		$cacheModes = $this->getCacheModes();
-		if (!$cacheModes)
+		$this->initCacheModes();
+		if (!$this->_cacheModes)
 			return;
 			
 		if ($serializeResponse)
@@ -353,7 +369,7 @@ class KalturaResponseCacher extends kApiCache
 		
 		$cacheRules = array();
 		$maxExpiry = 0;
-		foreach ($cacheModes as $cacheMode)
+		foreach ($this->_cacheModes as $cacheMode)
 		{
 			$expiry = $this->_expiry;
 			$conditions = null;
@@ -540,10 +556,14 @@ class KalturaResponseCacher extends kApiCache
 		return max($cacheResult);
 	}
 
-	private function getCacheModes()
+	private function initCacheModes()
 	{
+		if (!is_null($this->_cacheModes))
+			return;
+		
+		$this->_cacheModes = array();
 		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
-			return null;
+			return;
 			
 		$ks = null;
 		try
@@ -554,7 +574,7 @@ class KalturaResponseCacher extends kApiCache
 		{
 			KalturaLog::err($e->getMessage());
 			self::disableCache();
-			return null;
+			return;
 		}
 		
 		if ($ks && 
@@ -562,7 +582,7 @@ class KalturaResponseCacher extends kApiCache
 			$ks->isSetLimitAction())) 							// don't cache when the KS has a limit on the number of actions
 		{
 			self::disableCache();
-			return null;
+			return;
 		}
 		
 		$isAnonymous = !$ks || (!$ks->isAdmin() && ($ks->user === "0" || $ks->user === null));
@@ -589,17 +609,14 @@ class KalturaResponseCacher extends kApiCache
 		if (!$isAnonymous && $this->_cacheStatus == self::CACHE_STATUS_ANONYMOUS_ONLY)
 		{
 			self::disableCache();
-			return null;
+			return;
 		}
 		
-		$result = array();
 		if ($isAnonymous)
-			$result[] = self::CACHE_MODE_ANONYMOUS;
+			$this->_cacheModes[] = self::CACHE_MODE_ANONYMOUS;
 		
 		if ($this->_cacheStatus != self::CACHE_STATUS_ANONYMOUS_ONLY)
-			$result[] = self::CACHE_MODE_CONDITIONAL;
-		
-		return $result;
+			$this->_cacheModes[] = self::CACHE_MODE_CONDITIONAL;
 	}
 	
 	private static function getRequestHeaderValue($headerName)
