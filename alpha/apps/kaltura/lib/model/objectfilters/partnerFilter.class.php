@@ -62,19 +62,23 @@ class partnerFilter extends baseObjectFilter
 	 */
 	public function attachToFinalCriteria(Criteria $criteria)
 	{
+	    
 		if(!is_null($this->get('_partner_permissions_exist')))
 		{
+		    if(is_null($this->get('_in_id')))
+		    {
+		        $mandatoryParameter = "_in_id";
+		        throw new kCoreException("Mandatory parameter $mandatoryParameter missing from the filter" ,kCoreException::MISSING_MANDATORY_PARAMETERS, $mandatoryParameter);
+		    }
+		    
 	        $permissions = explode (',' , $this->get('_partner_permissions_exist'));
 	        
 	        $tmpCriteria =  new Criteria();
 	        $tmpCriteria->addSelectColumn(PermissionPeer::PARTNER_ID);
 	        $tmpCriteria->addAnd(PermissionPeer::NAME, $permissions,  Criteria::IN);
 	        
-	        if(!is_null($this->get('_in_id')))
-	        {
-		        $ids = explode(',', $this->get('_in_id'));
-		        $tmpCriteria->addAnd(PermissionPeer::PARTNER_ID, $ids, Criteria::IN);
-	        }
+	        $ids = explode(',', $this->get('_in_id'));
+	        $tmpCriteria->addAnd(PermissionPeer::PARTNER_ID, $ids, Criteria::IN);
 	        
 	        $tmpCriteria->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
 	        $stmt = PermissionPeer::doSelectStmt($tmpCriteria);
