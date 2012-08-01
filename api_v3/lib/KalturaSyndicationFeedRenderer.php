@@ -834,11 +834,9 @@ class KalturaSyndicationFeedRenderer
 			$this->writeOpenXmlNode('url',1);
 			$this->writeFullXmlNode('loc', $this->syndicationFeed->landingPage.$e->id, 2);
 			$this->writeOpenXmlNode('video:video', 2);
-			$this->writeFullXmlNode('video:content_loc', $this->getFlavorAssetUrl($e), 3);
-			if($this->syndicationFeed->allowEmbed)
-			{
-				$this->writeFullXmlNode('video:player_loc', $this->getPlayerUrl($e->id), 3, array('allow_embed' => 'yes'));
-			}
+			//$this->writeFullXmlNode('video:content_loc', $this->getFlavorAssetUrl($e), 3);
+			$allow_embed = $this->syndicationFeed->allowEmbed ? 'yes' : 'no';
+			$this->writeFullXmlNode('video:player_loc', $this->getPlayerUrl($e->id), 3, array('allow_embed' => $allow_embed));
 			$this->writeFullXmlNode('video:thumbnail_loc', $e->thumbnailUrl . '/width/480', 3);
 			$this->writeFullXmlNode('video:title', $this->stringToSafeXml($e->name), 3);
 			$this->writeFullXmlNode('video:description', $this->stringToSafeXml($e->description), 3);
