@@ -245,11 +245,15 @@ class LogDuration
 	public function __toString()
 	{
 		$curTime = microtime(true);
-
+		
 		if (self::$_lastMicroTime === null)
-			$result = "0";
-		else		
-			$result = sprintf("%.6f", $curTime - self::$_lastMicroTime);
+		{
+			if (isset($GLOBALS["start"]))
+				self::$_lastMicroTime = $GLOBALS["start"];
+			else
+				self::$_lastMicroTime = $curTime;
+    	}
+		$result = sprintf("%.6f", $curTime - self::$_lastMicroTime);
 			
 		self::$_lastMicroTime = $curTime;
 		
