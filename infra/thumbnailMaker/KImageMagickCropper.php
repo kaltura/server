@@ -279,7 +279,31 @@ class KImageMagickCropper extends KBaseCropper
 		if(!count($attributes))
 			return null;
 
+		$targetFileExtension = pathinfo($this->targetPath, PATHINFO_EXTENSION);
+		if ($targetFileExtension === 'gif')
+			$this->setAttributesForGifFormat($attributes);
+
 		$options = implode(' ', $attributes);
 		return "\"$this->cmdPath\" \"$this->srcPath\" $options \"$this->targetPath\"";
+	}
+
+	protected function setAttributesForGifFormat(array &$attributes)
+	{
+		// for proper animated gif support we need to change "-resize" to "-size"
+		foreach($attributes as &$attribStr)
+		{
+			list($key, $value) = $this->parseAttribute($attribStr);
+			if ($key === 'resize')
+				$attribStr = '-size '.$value;
+		}
+	}
+
+	protected function parseAttribute($attribStr)
+	{
+		$out = array();
+		if (preg_match('/\-([\w]*)\s?(.*)/', $attribStr, $out))
+			return array($out[1], $out[2]);
+		else
+			return array(null, null);
 	}
 }
