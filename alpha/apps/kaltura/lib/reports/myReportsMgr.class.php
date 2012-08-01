@@ -481,9 +481,13 @@ class myReportsMgr
 			$partner_id_str = md5($partner_id);
 		else
 			$partner_id_str = $partner_id;
-		return $partner_id_str . "|" . $report_type . "|" . 
+			
+		$key = 	$partner_id_str . "|" . $report_type . "|" . 
 			$input_filter->from_date . $input_filter->to_date . $input_filter->keywords . $input_filter->search_in_admin_tags . $input_filter->search_in_tags . $input_filter->interval .
-			$object_ids;
+			$object_ids . $input_filter->categories;
+		if ($input_filter instanceof endUserReportsInputFilter)
+			$key = $key .  $input_filter->application . $input_filter->userIds . $input_filter->playbackContext;
+		return $key;
 	}
 	
 	public static function formatDateFromDateId ( $val )
