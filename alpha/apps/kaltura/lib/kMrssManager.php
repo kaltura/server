@@ -309,6 +309,7 @@ class kMrssManager
 		{
 			$urlPrefix = $matches[1];
 		}
+		$urlPrefix.='/';
 		$urlManager = kUrlManager::getUrlManagerByCdn($iisHost, $entry->getId());
 		if ($kalturaFileSync)
 			$urlManager->setFileExtension(pathinfo($kalturaFileSync->getFilePath(), PATHINFO_EXTENSION));
@@ -341,6 +342,9 @@ class kMrssManager
 			$urlManager->setFileExtension(pathinfo($externalFileSync->getFilePath(), PATHINFO_EXTENSION));
 			$urlManager->setProtocol(StorageProfile::PLAY_FORMAT_SILVER_LIGHT);
 			$url = $urlManager->getFileSyncUrl($externalFileSync, false);
+			$url = ltrim($url,'/');
+        	if (strpos($url, "://") !== false)
+         		$urlPrefix = '';
 			$mrss->addChild('ismUrl',$urlPrefix.$url);
 			return;
 		}

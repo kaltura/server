@@ -237,7 +237,7 @@ class kUrlManager
 		$fileSync = kFileSyncUtils::resolve($fileSync);
 		
 		if($fileSync->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
-			return $fileSync->getSmoothStreamUrl()."/manifest";
+			return $fileSync->getSmoothStreamUrl();
 		
 		$url = $fileSync->getFilePath();
 		$url = str_replace('\\', '/', $url);
