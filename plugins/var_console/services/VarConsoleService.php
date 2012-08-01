@@ -285,34 +285,5 @@ class VarConsoleService extends KalturaBaseService
 		PartnerPeer::removePartnerFromCache($id);
 	}
 	
-	/**
-	 * @action getAdminSession
-	 * @param int $partnerId
-	 * @param string $userId
-	 * @return string
-	 */
-	public function getAdminSessionAction($partnerId, $userId = null)
-	{
-	    $c = PartnerPeer::getDefaultCriteria();
-	    $c->addAnd(PartnerPeer::ID, $partnerId);
-		$dbPartner = PartnerPeer::doSelectOne($c);
-		if (!$dbPartner)
-			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
-		
-		if (!$userId) {
-			$userId = $dbPartner->getAdminUserId();
-		}
-		
-		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
-		if (!$kuser) {
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
-		}
-		if (!$kuser->getIsAdmin()) {
-			throw new KalturaAPIException(KalturaErrors::USER_NOT_ADMIN, $userId);
-		}
-			
-		$ks = "";
-		kSessionUtils::createKSessionNoValidations($dbPartner->getId(), $userId, $ks, 86400, 2, "", '*,' . ks::PRIVILEGE_DISABLE_ENTITLEMENT);
-		return $ks;
-	}
+	
 }
