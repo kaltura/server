@@ -322,13 +322,18 @@ class kwidgetAction extends sfAction
 						if (!$ui_conf_result->confFile)
 							die;
 							
+						ob_start();
 						$serializer = new KalturaXmlSerializer(false);
 						$serializer->serialize($widget_result);
-						$widget_xml = $serializer->getSerializedData();
+						$widget_xml = ob_get_contents();
+						ob_end_clean();
 
+						ob_start();
 						$serializer = new KalturaXmlSerializer(false);
 						$serializer->serialize($ui_conf_result);
-						$ui_conf_xml = $serializer->getSerializedData();
+						$ui_conf_xml = ob_get_contents();
+						ob_end_clean();
+
 						$patcher = new kPatchSwf( $root . $base_wrapper_swf);
 						$result = "<xml><result>$widget_xml</result><result>$ui_conf_xml</result></xml>";
 						$patcher->patch($result, $cached_swf);
