@@ -538,7 +538,7 @@ class Kaltura_Client_ClientBase
 				default:
 					$resStringVal = $resultObject;	
 			}
-			if ($resStringVal !== $resultObject)
+			if ($resStringVal != $resultObject)
 				throw new Kaltura_Client_ClientException("Invalid object type [" . gettype($resultObject) . "] expected [$objectType]", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 	}
