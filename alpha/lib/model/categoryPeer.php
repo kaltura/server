@@ -306,6 +306,8 @@ class categoryPeer extends BasecategoryPeer
 	}
 	
 	/**
+	 * return all categories kuser is entitled to view the content.
+	 * (user might be able to category->get a category - but not to view it's content
 	 * @param Criteria $criteria
 	 * @param PropelPDO $con
 	 */
@@ -326,8 +328,43 @@ class categoryPeer extends BasecategoryPeer
 
 		$c->setLimit($limit);
 		$c->addDescendingOrderByColumn(categoryPeer::UPDATED_AT);
+		
+		//all fields needed from default criteria
+		//here we cannot use the default criteria, as we need to get all categories user is entitled to view the content.
+		
+		//not deleted or purged
+		$c->add ( self::STATUS, array(CategoryStatus::DELETED, CategoryStatus::PURGED), Criteria::NOT_IN );
 
+		//add privacy context
+		$privacyContextCrit = $c->getNewCriterion(self::PRIVACY_CONTEXTS, kEntitlementUtils::getKsPrivacyContext(), KalturaCriteria::IN_LIKE);
+		$privacyContextCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		$c->addAnd($privacyContextCrit);
+			
+		//set privacy by ks and type
+		$crit = $c->getNewCriterion ( self::PRIVACY, kEntitlementUtils::getPrivacyForKs(), Criteria::IN);
+		$crit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+		
+		//user is entitled to view all cantent that belong to categoires he is a membr of
+		$kuser = null;
+		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
+		if($ksString <> '')
+		{
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid);
+		}
+		
+		if($kuser)
+		{
+			$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kuser->getId(), Criteria::LIKE);
+			$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+   			$crit->addOr($membersCrit);
+		}
+				
+		$c->addAnd ( $crit );
+		
+		categoryPeer::setUseCriteriaFilter(false);
 		$categories = self::doSelect($c);
+		categoryPeer::setUseCriteriaFilter(true);
 		
 		return $categories;
 	}

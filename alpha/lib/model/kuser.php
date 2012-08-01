@@ -123,6 +123,24 @@ class kuser extends Basekuser implements IIndexable
 		}
 		
 		$this->roleIdsChanged = false;
+		
+		//update all categoryKuser object with kuser
+		
+		if (categoryKuserPeer::isCategroyKuserExistsForKuser($this->getId()))
+		{
+			$featureStatusToRemoveIndex = new kFeatureStatus();
+			$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY_USER);
+			
+			$featureStatusesToRemove = array();
+			$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
+			
+			$filter = new categoryKuserFilter();
+			$filter->setUserIdEqual($this->getPuserId());
+	
+			kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_USER, $filter, true, $featureStatusesToRemove);
+		}
+			
+		
 		return parent::postSave();	
 	}
 	

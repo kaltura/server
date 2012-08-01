@@ -873,7 +873,7 @@ class category extends Basecategory implements IIndexable
 	/**
 	 * return space seperated string of kusers ids that are active members on this category. 
 	 */	
-	public function getMembers()
+	public function getMembersByPermissionLevel()
 	{
 		$categoryIdToGetAllMembers = $this->getId();
 		$inheritedParentId = $this->getInheritedParentId();
@@ -900,6 +900,29 @@ class category extends Basecategory implements IIndexable
 							self::getPermissionLevelName($permissionLevel); 
 		
 		return implode(' ', $membersIds);
+	}
+	
+	/**
+	 * return kusers ids that are active members on this category. 
+	 */	
+	public function getMembers()
+	{
+		$categoryIdToGetAllMembers = $this->getId();
+		$inheritedParentId = $this->getInheritedParentId();
+		if($inheritedParentId)
+			$categoryIdToGetAllMembers = $inheritedParentId;
+		
+		$members = categoryKuserPeer::retrieveActiveKusersByCategoryId($categoryIdToGetAllMembers);
+		if (!$members)
+			return array();
+		
+		$membersIds = array();
+		foreach ($members as $member)
+		{
+			$membersIds[] = $member->getKuserId();
+		}
+		
+		return $membersIds;
 	}
 	
 	public static function getPermissionLevelName($permissionLevel)
@@ -952,7 +975,7 @@ class category extends Basecategory implements IIndexable
 			'privacy_contexts' => 'searchIndexPrivacyContexts',
 			'members_count' => 'membersCount',
 			'pending_members_count' => 'pendingMembersCount',
-			'members' => 'members',
+			'members' => 'membersByPermissionLevel',
 			'entries_count' => 'entriesCount',
 			'direct_entries_count' => 'directEntriesCount',
 			'direct_sub_categories_count' => 'directSubCategoriesCount',

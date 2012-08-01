@@ -26,6 +26,16 @@ class kEntitlementUtils
 		return self::$initialized;
 	}
 	
+	public static function isKsPrivacyContextSet()
+	{
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		
+		if(!ks || !$ks->getPrivacyContext())
+			return true;
+			
+		return false;		
+	}
+	
 	/**
 	 * Returns true if kuser or current kuser is entitled to entryId
 	 * @param entry $entry
@@ -79,14 +89,6 @@ class kEntitlementUtils
 		
 		$ksPrivacyContexts = null;
 		
-		// entry that doesn't belong to any category is public
-		$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entry->getId());
-		if(!count($categoryEntries) && (!$ks || $ksPrivacyContexts == self::DEFAULT_CONTEXT))
-		{
-			KalturaLog::debug('Entry entitled: entry does not belong to any category');
-			return true;
-		}
-		
 		if($ks)
 		{	
 			$ksPrivacyContexts = $ks->getPrivacyContext();
@@ -96,6 +98,7 @@ class kEntitlementUtils
 				
 				if(!count($allCategoriesEntry))
 				{
+					// entry that doesn't belong to any category is public
 					KalturaLog::debug('Entry entitled: entry does not belong to any category and privacy context on the ks is not set');
 					return true;
 				}
@@ -255,6 +258,15 @@ class kEntitlementUtils
 		}
 	}
 	
+	public static function getPrivacyForKs()
+	{
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		if(!$ks || $ks->isWidgetSession())
+			return array(PrivacyType::ALL);
+			
+		return array(PrivacyType::ALL, PrivacyType::AUTHENTICATED_USERS);
+	}
+	
 	public static function getPrivacyContextSearch()
 	{
 		if (self::$privacyContextSearch)
@@ -264,7 +276,7 @@ class kEntitlementUtils
 			
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		if(!$ks)
-			return array(self::DEFAULT_CONTEXT . ' ' . PrivacyType::ALL . ' ' . self::DEFAULT_CONTEXT);
+			return array(self::DEFAULT_CONTEXT . '_' . PrivacyType::ALL);
 			
 		$ksPrivacyContexts = $ks->getPrivacyContext();
 		
@@ -275,10 +287,10 @@ class kEntitlementUtils
 		
 		foreach ($ksPrivacyContexts as $ksPrivacyContext)
 		{
-			$privacyContextSearch[] = $ksPrivacyContext . ' ' . PrivacyType::ALL . ' ' . $ksPrivacyContext;
+			$privacyContextSearch[] = $ksPrivacyContext . '_' . PrivacyType::ALL;
 			
 			if (!$ks->isWidgetSession())
-				$privacyContextSearch[] = $ksPrivacyContext . ' ' . PrivacyType::AUTHENTICATED_USERS . ' ' . $ksPrivacyContext;
+				$privacyContextSearch[] = $ksPrivacyContext . '_' . PrivacyType::AUTHENTICATED_USERS;
 		}
 		
 		self::$privacyContextSearch = $privacyContextSearch;
@@ -288,7 +300,7 @@ class kEntitlementUtils
 	
 	public static function setPrivacyContextSearch($privacyContextSearch)
 	{
-		self::$privacyContextSearch = array($privacyContextSearch . ' ' . PrivacyType::ALL . ' ' . $privacyContextSearch);
+		self::$privacyContextSearch = array($privacyContextSearch . '_' . PrivacyType::ALL);
 	}
 	
 	public static function getPrivacyContextForEntry(entry $entry)
@@ -334,7 +346,7 @@ class kEntitlementUtils
 		
 		$entryPrivacyContexts = array();
 		foreach ($privacyContexts as $categoryPrivacyContext => $Privacy)
-			$entryPrivacyContexts[] = $categoryPrivacyContext . ' ' . $Privacy . ' ' . $categoryPrivacyContext;
+			$entryPrivacyContexts[] = $categoryPrivacyContext . '_' . $Privacy;
 		
 		KalturaLog::debug('Privacy by context: ' . print_r($entryPrivacyContexts,true));
 			
@@ -357,9 +369,9 @@ class kEntitlementUtils
 		$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
 		
 		foreach ($ksPrivacyContexts as $ksPrivacyContext)
-			$privacyContextSearch[] = $ksPrivacyContext . ',' . kCurrentContext::$ks_kuser_id . ',' . $ksPrivacyContext;
+			$privacyContextSearch[] = $ksPrivacyContext . '_' . kCurrentContext::$ks_kuser_id;
 		
-		$privacyContextSearch[] = self::ENTRY_PRIVACY_CONTEXT . ',' . kCurrentContext::$ks_kuser_id . ',' . self::ENTRY_PRIVACY_CONTEXT;
+		$privacyContextSearch[] = self::ENTRY_PRIVACY_CONTEXT . '_' . kCurrentContext::$ks_kuser_id;
 			
 		return $privacyContextSearch;
 	}

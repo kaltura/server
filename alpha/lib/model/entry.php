@@ -117,6 +117,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const ENTRY_CATEGORY_ESCAPE = "_";
 	const ENTRY_CATEGORY_SEPARATOR = ",";
 	
+	//TODO - move this configuration to kconf
 	const CATEGORY_SEARCH_LIMIT = 100;
 	const CATEGORY_ENTRIES_COUNT_LIMIT_TO_BE_INDEXED = 100;
 	
@@ -2239,7 +2240,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if (!$this->is_categories_modified)
 			return;
 		
-		if(!kEntitlementUtils::getEntitlementEnforcement())
+		if(!kEntitlementUtils::getEntitlementEnforcement() || !kEntitlementUtils::isKsPrivacyContextSet())
 			categoryEntryPeer::syncEntriesCategories($this, $this->is_categories_names_modified);
 		
 		parent::save ();
@@ -2877,17 +2878,24 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		$entitledKusersPublish = explode(',', $this->getEntitledKusersPublish());
 		$entitledKusersEdit = explode(',', $this->getEntitledKusersEdit());
+		
 		$entitledKusersNoPrivacyContext = array_merge($entitledKusersPublish, $entitledKusersEdit);
 		$entitledKusersNoPrivacyContext[] = $this->getKuserId();
 		$entitledKusersNoPrivacyContext[] = $this->getCreatorKuserId();
 		
+		foreach ($entitledKusersNoPrivacyContext as $key => $value)
+		{
+			if(!$value)
+				unset($entitledKusersNoPrivacyContext[$key]);
+		}
+				
 		$entitledKusers = array();
 		
-		if(count(array_unique($entitledKusers)))
-			$entitledKusers[kEntitlementUtils::ENTRY_PRIVACY_CONTEXT] = array_unique($entitledKusers);
+		if(count(array_unique($entitledKusersNoPrivacyContext)))
+			$entitledKusers[kEntitlementUtils::ENTRY_PRIVACY_CONTEXT] = array_unique($entitledKusersNoPrivacyContext);
 		
 		if ($this->getAllCategoriesIds(true) == '')
-			return implode(' ', $entitledKusers);
+			return kEntitlementUtils::ENTRY_PRIVACY_CONTEXT . '_' . implode(' ' . kEntitlementUtils::ENTRY_PRIVACY_CONTEXT . '_', $entitledKusersNoPrivacyContext);
 		
 		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
 		$partner = $this->getPartner();
@@ -2917,17 +2925,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			foreach ($privacyContexts as $privacyContext)
 			{
 				if(isset($entitledKusers[$privacyContext]))
-					$entitledKusers[$privacyContext] = array_merge($entitledKusers[$privacyContext], explode(',', $category->getMembers()));
+					$entitledKusers[$privacyContext] = array_merge($entitledKusers[$privacyContext], $category->getMembers());
 				else
-					$entitledKusers[$privacyContext] = explode(',', $category->getMembers());
+					$entitledKusers[$privacyContext] = $category->getMembers();
 			}
 		}
 		
 		$entitledKusersByContexts = array();
 		
 		foreach($entitledKusers as $privacyContext => $kusers)
-			$entitledKusersByContexts[] = $privacyContext . ' ' . implode(' ', $kusers) . ' ' . $privacyContext;
-		
+			$entitledKusersByContexts[] =  $privacyContext . '_' . implode(' ' . $privacyContext . '_', $kusers);
+			
 		return implode(' ', $entitledKusersByContexts);
 	}
 	

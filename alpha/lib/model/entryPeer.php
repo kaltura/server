@@ -324,103 +324,86 @@ class entryPeer extends BaseentryPeer
 		
 		$critEntitled = null;
 		
+		$kuserId = kuser::KUSER_ID_THAT_DOES_NOT_EXIST;
+		if(!is_null(kCurrentContext::$ks_kuser_id))
+			$kuserId = kCurrentContext::$ks_kuser_id;
+		
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
-		
-		if (kEntitlementUtils::getEntitlementEnforcement())
-		{			
-			if ((kCurrentContext::$is_admin_session || ( $ks && $ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))))
-			{
-				$privacyContexts = kEntitlementUtils::getPrivacyContextSearch();
-				$critEntitled = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, KalturaCriteria::IN_LIKE);
-				$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-				
-				if(kCurrentContext::$ks_kuser_id)
-				{
-					//ENTITLED_KUSERS field includes $this->entitledUserEdit, $this->entitledUserEdit, and users on work groups categories.
-					$entitledKuserByPrivacyContext = kEntitlementUtils::getEntitledKuserByPrivacyContext();
-					$critEntitledKusers = $c->getNewCriterion(self::ENTITLED_KUSERS, $entitledKuserByPrivacyContext, KalturaCriteria::IN_LIKE_ORDER);
-					$critEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-					
-					$categoriesIds = array();
-					$categories = categoryPeer::doSelectEntitledAndNonIndexedCategories(kCurrentContext::$ks_kuser_id, entry::CATEGORY_SEARCH_LIMIT);
-					if(count($categories) >= entry::CATEGORY_SEARCH_LIMIT)
-						self::$kuserBlongToMoreThanMaxCategoriesForSearch = true;
-				 
-					foreach($categories as $category)
-						$categoriesIds[] = $category->getId();
-						
-					if (count($categoriesIds))
-					{
-						$critCategories = $c->getNewCriterion(self::CATEGORIES_IDS, $categoriesIds, KalturaCriteria::IN_LIKE);
-						$critCategories->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-						$critEntitled->addOr($critCategories);
-					}
-					
-					$critEntitled->addOr($critEntitledKusers);
-				}
-			}
-		}
-		
-		$critKuser = null;
-
-		// when session is not admin and without list:* privilege, allow access to user entries only
-		// or when session is with entitlment - user should be able to get all entries s\he uploaded.
-		if ((!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
-			|| kEntitlementUtils::getEntitlementEnforcement())
+			
+		//when entitlement is enable and admin session or user session with list:* privilege
+		if (kEntitlementUtils::getEntitlementEnforcement() &&
+		   ((kCurrentContext::$is_admin_session || ( $ks && $ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)))))
 		{
-			if(!is_null(kCurrentContext::$ks_kuser_id))
+			$privacyContexts = kEntitlementUtils::getPrivacyContextSearch();
+			$critEntitled = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, KalturaCriteria::IN_LIKE);
+			$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+			
+			if(kCurrentContext::$ks_kuser_id)
 			{
-				if(!$critEntitled)
+				//ENTITLED_KUSERS field includes $this->entitledUserEdit, $this->entitledUserEdit, and users on work groups categories.
+				$entitledKuserByPrivacyContext = kEntitlementUtils::getEntitledKuserByPrivacyContext();
+				$critEntitledKusers = $c->getNewCriterion(self::ENTITLED_KUSERS, $entitledKuserByPrivacyContext, KalturaCriteria::IN_LIKE);
+				$critEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+				
+				$categoriesIds = array();
+				$categories = categoryPeer::doSelectEntitledAndNonIndexedCategories($kuserId, entry::CATEGORY_SEARCH_LIMIT);
+				if(count($categories) >= entry::CATEGORY_SEARCH_LIMIT)
+					self::$kuserBlongToMoreThanMaxCategoriesForSearch = true;
+			 
+				foreach($categories as $category)
+					$categoriesIds[] = $category->getId();
+					
+				if (count($categoriesIds))
 				{
-					$critEntitled = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
-					
-					if(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
-					{
-						$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
-					}
-					
-					if(kEntitlementUtils::getEntitlementEnforcement())
-					{
-						$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-					}	
+					$critCategories = $c->getNewCriterion(self::CATEGORIES_IDS, $categoriesIds, KalturaCriteria::IN_LIKE);
+					$critCategories->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+					$critEntitled->addOr($critCategories);
 				}
-				else
-				{
-					$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::$ks_kuser_id, Criteria::EQUAL);
-					
-					if(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
-					{
-						$critKuser->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
-					}
-					
-					if(kEntitlementUtils::getEntitlementEnforcement())
-					{
-						$critKuser->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-					}
-					$critEntitled->addOr($critKuser);
-				}
+				
+				$critEntitled->addOr($critEntitledKusers);
 			}
 			
-			if($ks && $ks->getDisableEntitlementForEntry())
+			//user should be able to get all entries s\he uploaded - outside the privacy context
+			$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , $kuserId, Criteria::EQUAL);
+			$critKuser->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			$critEntitled->addOr($critKuser);
+		}
+		elseif(kEntitlementUtils::getEntitlementEnforcement()) // when session is not admin and without list:* privilege, allow access to user entries only
+		{
+			$critEntitled = $c->getNewCriterion(entryPeer::KUSER_ID , $kuserId, Criteria::EQUAL);
+			
+			if(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
 			{
-				$entryCrit = $c->getNewCriterion(entryPeer::ENTRY_ID, $ks->getDisableEntitlementForEntry(), Criteria::EQUAL);
-				$entryCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
-				
-				if($critEntitled)
-				{
-					$critEntitled->addOr($entryCrit);
-				}
-				else 
-				{
-					$critEntitled = $entryCrit;
-				}
+				$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			}
+			
+			$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+		}
+		elseif(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)) //widget
+		{
+			$critEntitled = $c->getNewCriterion(entryPeer::KUSER_ID , $kuserId, Criteria::EQUAL);
+			$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		}
+		
+		if($ks && $ks->getDisableEntitlementForEntry())
+		{
+			$entryCrit = $c->getNewCriterion(entryPeer::ENTRY_ID, $ks->getDisableEntitlementForEntry(), Criteria::EQUAL);
+			$entryCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			
+			if($critEntitled)
+			{
+				$critEntitled->addOr($entryCrit);
+			}
+			else 
+			{
+				$critEntitled = $entryCrit;
 			}
 		}
 
 		if($critEntitled)
 			$c->addAnd ($critEntitled);
 
-			self::$s_criteria_filter->setFilter($c);
+		self::$s_criteria_filter->setFilter($c);
 	}
 	
 	public static function getDefaultCriteriaFilter()

@@ -35,6 +35,25 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 	
 	/**
 	 * 
+	 * @param int $kuserId
+	 * @return bool - no need to fetch the objects
+	 */
+	public static function isCategroyKuserExistsForKuser($kuserId)
+	{
+		$criteria = new Criteria();
+
+		$criteria->add(categoryKuserPeer::KUSER_ID, $kuserId);
+		
+		$categoryKuser = categoryKuserPeer::doSelectOne($criteria);
+		
+		if($categoryKuser)
+			return true;
+			
+		return false;
+	}
+	
+	/**
+	 * 
 	 * @param int $categoryId
 	 * @param int $kuserId
 	 * @param $con

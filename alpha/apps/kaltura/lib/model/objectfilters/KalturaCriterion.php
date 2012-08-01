@@ -22,8 +22,6 @@ abstract class KalturaCriterion extends Criterion implements IKalturaDbQuery
 	
 	protected static $enabledTags = array('TAG_PARTNER_SESSION' => 0,);
 	
-	
-	
 	protected $tags = array();
 	
 	public static function clearTags()
