@@ -1341,8 +1341,11 @@ class kJobsManager
 			else
 			{
 				$entry = entryPeer::retrieveByPKNoFilter($batchJob->getEntryId()); // some jobs could be on deleted entry
-				$batchJob->setRootJobId($entry->getBulkUploadId());
-				$batchJob->setBulkJobId($entry->getBulkUploadId());
+				if($entry)
+				{	
+					$batchJob->setRootJobId($entry->getBulkUploadId());
+					$batchJob->setBulkJobId($entry->getBulkUploadId());		
+				}
 			}
 		}
 			
