@@ -116,6 +116,9 @@ class KImageMagickCropper extends KBaseCropper
 				$attributes[] = "-rotate 270";
 			break;
 		}
+		
+		//reseting orientation on the image EXIF.
+		$attributes[] = "-orient undefined";
 
 		if($quality)
 			$attributes[] = "-quality $quality";
