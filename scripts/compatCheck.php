@@ -382,7 +382,7 @@ function normalizeResultBuffer($result)
 	
 	$result = preg_replace('/<executionTime>[0-9\.]+<\/executionTime>/', '', $result);
 	$result = preg_replace('/<serverTime>[0-9\.]+<\/serverTime>/', '', $result);
-	$result = preg_replace('/<execute_impl_time>[0-9\.]+<\/execute_impl_time>/', '', $result);
+	$result = preg_replace('/<execute_impl_time>[\-0-9\.]+<\/execute_impl_time>/', '', $result);
 	$result = preg_replace('/<execute_time>[0-9\.]+<\/execute_time>/', '', $result);
 	$result = preg_replace('/<total_time>[0-9\.]+<\/total_time>/', '', $result);
 	$result = preg_replace('/<server_time>[0-9\.]+<\/server_time>/', '', $result);
@@ -923,6 +923,16 @@ class LogProcessorPS2
 	}
 }
 
+class LogProcessorFeedList
+{
+	function processLine($buffer)
+	{
+		$feedId = trim($buffer);
+		$parsedParams = array('feedId' => $feedId);
+		processFeedRequest($parsedParams);
+	}
+}
+
 function processRegularFile($apiLogPath, $logProcessor)
 {
 	$handle = @fopen($apiLogPath, "r");
@@ -959,7 +969,7 @@ function processGZipFile($apiLogPath, $logProcessor)
 
 // parse the command line
 if ($argc < 5)
-	die("Usage:\n\tphp compatCheck <old service url> <new service url> <api log> <api_v3/ps2> [<start position> [<end position> [<max tests per action>]]]\n");
+	die("Usage:\n\tphp compatCheck <old service url> <new service url> <api log> <api_v3/ps2/feedIds> [<start position> [<end position> [<max tests per action>]]]\n");
 
 $serviceUrlOld = $argv[1];
 $serviceUrlNew = $argv[2];
@@ -976,8 +986,8 @@ if (strpos($apiLogPath, ':') !== false)
 	$apiLogPath = $localLogPath;
 }
 
-if (!in_array($logFormat, array('api_v3', 'ps2')))
-	die("Log format shoud be either api_v3 or ps2");
+if (!in_array($logFormat, array('api_v3', 'ps2', 'feedids')))
+	die("Log format should be one of: api_v3, ps2, feedids");
 
 if (!beginsWith(strtolower($serviceUrlOld), 'http://'))
 	$serviceUrlOld = 'http://' . $serviceUrlOld;
@@ -1000,10 +1010,18 @@ $testedActions = array();
 $testedRequests = array();
 $requestNumber = 0;
 
-if ($logFormat == 'api_v3')
+switch ($logFormat)
+{
+case 'api_v3':
 	$logProcessor = new LogProcessorApiV3();
-else
+	break;
+case 'ps2':
 	$logProcessor = new LogProcessorPS2();
+	break;
+case 'feedids':
+	$logProcessor = new LogProcessorFeedList();
+	break;
+}
 
 $logFileInfo = pathinfo($apiLogPath);
 
