@@ -309,7 +309,7 @@ class kMrssManager
 		{
 			$urlPrefix = $matches[1];
 		}
-		$urlPrefix.='/';
+		$urlPrefix = rtrim($urlPrefix,'/').'/';
 		$urlManager = kUrlManager::getUrlManagerByCdn($iisHost, $entry->getId());
 		if ($kalturaFileSync)
 			$urlManager->setFileExtension(pathinfo($kalturaFileSync->getFilePath(), PATHINFO_EXTENSION));
