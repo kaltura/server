@@ -365,8 +365,14 @@ class PartnerService extends KalturaBaseService
 		
 		$c = new Criteria();
 		$currentUser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid, true);
-		if($currentUser)
-		    $allowedIds = $currentUser->getAllowedPartnerIds();
+		
+		if(!$currentUser)
+		{
+		    $userId = kCurrentContext::$ks_uid;
+		    throw new kCoreException("User with id $userId not found", kCoreException::INVALID_USER_ID, $userId);
+		}
+		
+		$allowedIds = $currentUser->getAllowedPartnerIds();
 		    
 		if ($partnerFilter)
 		{
