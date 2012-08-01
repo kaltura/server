@@ -339,58 +339,64 @@ class kwidgetAction extends sfAction
 						$patcher->patch($result, $cached_swf);
 					}
 
-				if (file_exists($cached_swf))
-				{
-					$wrapper_swf = $new_swf_path;
+					if (file_exists($cached_swf))
+					{
+						$wrapper_swf = $new_swf_path;
+					}
 				}
-			}
-			
-
-			$kdp_version_2 = strpos($swf_url, "kdp/v2." ) > 0;
-			if ($partner_host == "http://www.kaltura.com" && !$kdp_version_2 && !$kdp3)
-			{
-				$partner_host = 1; // otherwise the kdp will try going to cdnwww.kaltura.com
-			}
-			
-			$track_wrapper = '';
-			if (kConf::get('track_kdpwrapper') && kConf::get('kdpwrapper_track_url')) {
-				$track_wrapper = "&wrapper_tracker_url=".urlencode(kConf::get('kdpwrapper_track_url')."?activation_key=".kConf::get('kaltura_activation_key')."&package_version=".kConf::get('kaltura_version'));
-			}
-			
-			if (kConf::hasMap("optimized_playback"))
-			{
-				$optimizedPlayback = kConf::getMap("optimized_playback");
-				if (array_key_exists($partner_id, $optimizedPlayback))
+				
+	
+				$kdp_version_2 = strpos($swf_url, "kdp/v2." ) > 0;
+				if ($partner_host == "http://www.kaltura.com" && !$kdp_version_2 && !$kdp3)
 				{
-					// force a specific kdp for the partner
-					$params = $optimizedPlayback[$partner_id];
-					if (array_key_exists('kdp_version', $params))
-						$swf_url =  $partner_cdnHost . myPartnerUtils::getUrlForPartner ( $partner_id , $subp_id ) . "/flash/kdp3/".$params['kdp_version']."/kdp3.swf";
-						
-					if (array_key_exists('conf_vars', $params))
-						$conf_vars .= "&".$params['conf_vars'];
-						
-					// cache immidiately
-					$cache_st =0;
-					$allowCache = true;
+					$partner_host = 1; // otherwise the kdp will try going to cdnwww.kaltura.com
 				}
-			}
-
-			$dynamic_date = $widgetIdStr .
-			$track_wrapper.
-				"&kdpUrl=".urlencode($swf_url).
-				"&host=" . str_replace("http://", "", str_replace("https://", "", $partner_host)).
-				"&cdnHost=" . str_replace("http://", "", str_replace("https://", "", $partner_cdnHost)).
-				( $show_version ? "&entryVersion=$show_version" : "" ) .
-				( $kshow_id ? "&kshowId=$kshow_id" : "" ).
-				( $entry_id ? "&$entryVarName=$entry_id" : "" ) .
-				$uiconf_id_str  . // will be empty if nothing to add
-				$ks_flashvars.
-				($cache_st ? "&clientTag=cache_st:$cache_st" : "").
-				$conf_vars;
-
-				// for now changed back to $host since kdp version prior to 1.0.15 didnt support loading by external domain kdpwrapper
-				$url =  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "/$wrapper_swf?$dynamic_date";
+				
+				$track_wrapper = '';
+				if (kConf::get('track_kdpwrapper') && kConf::get('kdpwrapper_track_url')) {
+					$track_wrapper = "&wrapper_tracker_url=".urlencode(kConf::get('kdpwrapper_track_url')."?activation_key=".kConf::get('kaltura_activation_key')."&package_version=".kConf::get('kaltura_version'));
+				}
+				
+				if (kConf::hasMap("optimized_playback"))
+				{
+					$optimizedPlayback = kConf::getMap("optimized_playback");
+					if (array_key_exists($partner_id, $optimizedPlayback))
+					{
+						// force a specific kdp for the partner
+						$params = $optimizedPlayback[$partner_id];
+						if (array_key_exists('kdp_version', $params))
+							$swf_url =  $partner_cdnHost . myPartnerUtils::getUrlForPartner ( $partner_id , $subp_id ) . "/flash/kdp3/".$params['kdp_version']."/kdp3.swf";
+							
+						if (array_key_exists('conf_vars', $params))
+							$conf_vars .= "&".$params['conf_vars'];
+							
+						// cache immidiately
+						$cache_st =0;
+						$allowCache = true;
+					}
+				}
+	
+				$stats_host = ($protocol == "https") ? kConf::get("stats_host_https") : kConf::get("stats_host");	
+				$wrapper_stats = kConf::get('kdp3_wrapper_stats_url') ? "&wrapper_stats_url=$protocol://$stats_host".
+					urlencode(str_replace("{partnerId}", $partner_id, kConf::get('kdp3_wrapper_stats_url'))) : "";
+	
+				$dynamic_date = $widgetIdStr .
+					$track_wrapper.
+					$wrapper_stats.
+					"&kdpUrl=".urlencode($swf_url).
+					"&host=" . str_replace("http://", "", str_replace("https://", "", $partner_host)).
+					"&cdnHost=" . str_replace("http://", "", str_replace("https://", "", $partner_cdnHost)).
+					(($protocol == "https") ? "&statistics.statsDomain=$stats_host" : "").
+					( $show_version ? "&entryVersion=$show_version" : "" ) .
+					( $kshow_id ? "&kshowId=$kshow_id" : "" ).
+					( $entry_id ? "&$entryVarName=$entry_id" : "" ) .
+					$uiconf_id_str  . // will be empty if nothing to add
+					$ks_flashvars.
+					($cache_st ? "&clientTag=cache_st:$cache_st" : "").
+					$conf_vars;
+					
+					// for now changed back to $host since kdp version prior to 1.0.15 didnt support loading by external domain kdpwrapper
+					$url =  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "/$wrapper_swf?$dynamic_date";
 				
 				// patch wrapper with flashvars and dump to browser
 				if (version_compare($uiConf->getSwfUrlVersion(), "2.6.6", ">="))
