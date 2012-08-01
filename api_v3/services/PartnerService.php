@@ -365,7 +365,9 @@ class PartnerService extends KalturaBaseService
 		
 		$c = new Criteria();
 		$currentUser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid, true);
-		$allowedIds = $currentUser->getAllowedPartnerIds();
+		if($currentUser)
+		    $allowedIds = $currentUser->getAllowedPartnerIds();
+		    
 		if ($partnerFilter)
 		{
 		    $partnerDbFilter = new partnerFilter();
@@ -375,8 +377,8 @@ class PartnerService extends KalturaBaseService
 		}
 		
 		$partners = array();
-		if($currentUser)
-			$partners = myPartnerUtils::getPartnersArray($allowedIds, $c);	
+		
+		$partners = myPartnerUtils::getPartnersArray($allowedIds, $c);	
 		
 		$kalturaPartners = KalturaPartnerArray::fromPartnerArray($partners );
 		$response = new KalturaPartnerListResponse();
