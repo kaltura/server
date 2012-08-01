@@ -302,4 +302,8 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("categoryEntry:entryId=%s", self::ENTRY_ID));		
+	}
 } // categoryEntryPeer
