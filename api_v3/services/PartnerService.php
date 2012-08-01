@@ -349,7 +349,7 @@ class PartnerService extends KalturaBaseService
 	}
 	
 	/**
-	 * Retrieve a list of partner IDs which the current user is allowed to access.
+	 * Retrieve a list of partner objects which the current user is allowed to access.
 	 * 
 	 * @action listPartnersForUser
 	 * @param KalturaPartnerFilter $partnerFilter
