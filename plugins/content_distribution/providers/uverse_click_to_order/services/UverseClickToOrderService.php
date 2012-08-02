@@ -75,7 +75,11 @@ class UverseClickToOrderService extends KalturaBaseService
 			$relatedEntryId = $fields[UverseClickToOrderDistributionField::CATEGORY_ENTRY_ID];
 			
 			if (!isset($relatedEntriesArray[$relatedEntryId])) {
+				$relatedEntry = entryPeer::retrieveByPK($relatedEntryId);
+				$relatedEntrySortValue = $this->getRelatedEntrySortValue($profile, $relatedEntryId);
 				$relatedEntriesArray[$relatedEntryId] = array();
+				$relatedEntriesArray[$relatedEntryId]['sortValue'] = $relatedEntrySortValue;
+				$relatedEntriesArray[$relatedEntryId]['updatedAt'] = $relatedEntry->getUpdatedAt(); 
 			}
 			
 			$flavorAssets = array_map('trim', explode(',', $entryDistribution->getFlavorAssetIds()));
@@ -97,6 +101,16 @@ class UverseClickToOrderService extends KalturaBaseService
 			);
 			
 		}
+		//sorting the related entries.
+		usort($relatedEntriesArray, Array($this,'sortItems'));
+		
+		//removing the values that where used for sorting.
+		foreach ($relatedEntriesArray as $key=>$relatedEntry){
+			unset($relatedEntry['sortValue']);
+			unset($relatedEntry['updatedAt']);
+			$relatedEntriesArray[$key] = $relatedEntry;
+		}
+		
 		//retreive each category and add it to the xml
 		foreach ($relatedEntriesArray as $relatedEntryId => $entriesUnderCategory)
 		{
@@ -127,6 +141,14 @@ class UverseClickToOrderService extends KalturaBaseService
 		header('Content-Type: text/xml');
 		echo $feed->getXml();
 		die;
+	}
+	
+	private function getRelatedEntrySortValue($profile , $relatedEntryId){
+		$relatedEntrydistribution = new EntryDistribution();
+		$relatedEntrydistribution->setEntryId($relatedEntryId);
+		$relatedEntrydistribution->setPartnerId($profile->getPartnerId());
+		$relatedEntrydistribution->setDistributionProfileId($profile->getId());
+		return $profile->getFieldValue($relatedEntrydistribution, UverseClickToOrderDistributionField::SORT_ITEMS_BY_FIELD);
 	}
 	
 	
