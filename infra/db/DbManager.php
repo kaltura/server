@@ -7,6 +7,8 @@ class DbManager
 {
 	const DB_CONFIG_SPHINX = 'sphinx';
 	
+	const EXTRA_DB_CONFIG_KEY = 'extra_db_configs';
+	
 	/**
 	 * @var array
 	 */
@@ -44,13 +46,33 @@ class DbManager
 		Propel::setConfiguration(self::$config);
 	}
 	
-	public static function initialize() 
+	protected static function getExtraDatabaseConfigs()
 	{
+		if (function_exists('apc_fetch'))
+		{
+			$dbConfigs = apc_fetch(self::EXTRA_DB_CONFIG_KEY);
+			if ($dbConfigs !== false)
+			{
+				return $dbConfigs;
+			}
+		}
+			
 		$dbConfigs = array();
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDatabaseConfig');
 		foreach($pluginInstances as $pluginInstance)
 			$dbConfigs[] = $pluginInstance->getDatabaseConfig();
+
+		if (function_exists('apc_store'))
+		{
+			apc_store(self::EXTRA_DB_CONFIG_KEY, $dbConfigs);
+		}
 		
+		return $dbConfigs;
+	}
+	
+	public static function initialize() 
+	{
+		$dbConfigs = self::getExtraDatabaseConfigs();	
 		foreach($dbConfigs as $dbConfig)
 			self::addExtraConfiguration($dbConfig);
 		
