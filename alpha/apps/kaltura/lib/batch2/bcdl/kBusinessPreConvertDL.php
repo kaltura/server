@@ -960,6 +960,19 @@ class kBusinessPreConvertDL
 				$errDescription = null;
 				$sourceFlavorOutput = self::validateFlavorAndMediaInfo($sourceFlavor, $mediaInfo, $errDescription);
 				
+				if(!$sourceFlavorOutput)
+				{
+					if(!$errDescription)
+						$errDescription = "Failed to create flavor params output from source flavor";
+						
+					$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
+					$originalFlavorAsset->setStatus(flavorAsset::ASSET_STATUS_ERROR);
+					$originalFlavorAsset->save();
+					
+					kBatchManager::updateEntry($entryId, entryStatus::ERROR_CONVERTING);
+					return false;
+				}
+				
 				// save flavor params
 				$sourceFlavorOutput->setPartnerId($sourceFlavorOutput->getPartnerId());
 				$sourceFlavorOutput->setEntryId($entryId);
