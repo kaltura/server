@@ -21,6 +21,7 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 	
 	const IMAGES_LIST_XML_ATTRIBUTE_COUNT = 'count';
 	
+	const LEADING_ZEROS_PADDING = '-%03d';
 	
 	
 	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
@@ -49,7 +50,7 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 			//outFilePath will be the path to the directory in which the images will be saved.
 			$outDirPath = $this->outFilePath;
 			//imageMagick decides the format of the output file according to the outFilePath's extension.so the format need to be added.
-			$this->outFilePath = $this->outFilePath.DIRECTORY_SEPARATOR.basename($this->outFilePath).'.'.$this->flavorParamsOutput->format;
+			$this->outFilePath = $this->outFilePath.DIRECTORY_SEPARATOR.basename($this->outFilePath).self::LEADING_ZEROS_PADDING.'.'.$this->flavorParamsOutput->format;
 		}
 		else
 		{
@@ -67,6 +68,7 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 	// information about the created images.
 	private function createImagesListXML($outDirPath){
 		$imagesList = kFile::dirList($outDirPath,false);
+		sort($imagesList);
 		$imagesListXML = new SimpleXMLElement('<'.self::IMAGES_LIST_XML_LABEL_ITEMS.'/>');
 		foreach ($imagesList as $image) {
     		$imageNode = $imagesListXML->addChild(self::IMAGES_LIST_XML_LABEL_ITEM);
