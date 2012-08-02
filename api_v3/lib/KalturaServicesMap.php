@@ -201,10 +201,10 @@ class KalturaServicesMap
 		}
 		$reflector = $serviceMap[$serviceId];
 		
-		if(function_exists('apc_store') && $apcFetchSuccess)
+		if(function_exists('apc_store'))
 		{
 			$servicesMapLastModTime = self::getServiceMapModificationTime();
-			$success = apc_store("$serviceId", array("serviceActionItem" => $serviceMap[$serviceId], KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime));
+			$success = apc_store($serviceId, array("serviceActionItem" => $serviceMap[$serviceId], KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME => $servicesMapLastModTime));
 		}
 		
 		return $reflector;
