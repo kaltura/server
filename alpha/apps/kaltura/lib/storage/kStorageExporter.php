@@ -303,8 +303,13 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 					$entryId = $asset->getEntryId();
 					//the next piece of code checks whether the entry to which
 					//the deleted asset belongs to is a "replacement" entry
-                    $entry = entryPeer::retrieveByPK($entryId);
-                    if ($entry->getReplacedEntryId())
+                    $entry = entryPeer::retrieveByPKNoFilter($entryId);
+                    if (!$entry) 
+                    {
+                    	KalturaLog::alert("No entry found by the ID of [$entryId]");
+                    }
+                    
+                    else if ($entry->getReplacedEntryId())
                     {
                         KalturaLog::info("Will not handle event - deleted asset belongs to replacement entry");
                         return;
