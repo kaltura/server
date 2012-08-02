@@ -306,12 +306,14 @@ class categoryPeer extends BasecategoryPeer
 	}
 	
 	/**
-	 * return all categories kuser is entitled to view the content.
-	 * (user might be able to category->get a category - but not to view it's content
-	 * @param Criteria $criteria
-	 * @param PropelPDO $con
+	 * Return all categories kuser is entitled to view the content.
+	 * (User may call category->get to view a category - but not to view its content)
+	 * 
+	 * @param int $kuserId
+	 * @param int $limit
+	 * @return array<categories>
 	 */
-	public static function doSelectEntitledAndNonIndexedCategories($kuserId, $limit)
+	public static function retrieveEntitledAndNonIndexedByKuser($kuserId, $limit)
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$partner = PartnerPeer::retrieveByPK($partnerId);
