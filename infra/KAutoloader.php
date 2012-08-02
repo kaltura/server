@@ -45,7 +45,8 @@ class KAutoloader
 			return;
 		}
 		
-		self::loadClassMap();
+		if (!self::$_classMap)
+			self::loadClassMap();
 		
 		if (array_key_exists($class, self::$_classMap))
 		{
