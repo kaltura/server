@@ -16,6 +16,11 @@ class kCurrentContext
 	public static $ks_object;
 	
 	/**
+	 * @var string
+	 */
+	public static $ks_hash;
+	
+	/**
 	 * @var int
 	 */
 	public static $partner_id;
@@ -141,13 +146,16 @@ class kCurrentContext
 			return null;
 			
 		kCurrentContext::$ks = null;
+		kCurrentContext::$ks_object = null;
+		kCurrentContext::$ks_hash = null;
 		kCurrentContext::$ks_partner_id = $entry->getPartnerId();
 		kCurrentContext::$ks_uid = null;
+		kCurrentContext::$ks_kuser_id = 0;
 		kCurrentContext::$master_partner_id = null;
 		kCurrentContext::$partner_id = $entry->getPartnerId();
+		kCurrentContext::$uid = null;
 		kCurrentContext::$is_admin_session = false;
 		kCurrentContext::$kuser_id = null;
-		kCurrentContext::$ks_kuser_id = 0;
 		
 		return $entry;
 	}
@@ -157,14 +165,16 @@ class kCurrentContext
 		if (!$ksString)
 		{
 			kCurrentContext::$ks = null;
+			kCurrentContext::$ks_object = null;
+			kCurrentContext::$ks_hash = null;
 			kCurrentContext::$ks_partner_id = null;
 			kCurrentContext::$ks_uid = null;
+			kCurrentContext::$ks_kuser_id = 0;
 			kCurrentContext::$master_partner_id = null;
 			kCurrentContext::$partner_id = $requestedPartnerId;
 			kCurrentContext::$uid = $requestedPuserId;
 			kCurrentContext::$is_admin_session = false;
 			kCurrentContext::$kuser_id = null;
-			kCurrentContext::$ks_kuser_id = 0;
 		}
 		else
 		{
@@ -179,14 +189,15 @@ class kCurrentContext
 		
 			kCurrentContext::$ks = $ksString;
 			kCurrentContext::$ks_object = $ksObj;
+			kCurrentContext::$ks_hash = $ksObj->getHash();
 			kCurrentContext::$ks_partner_id = $ksObj->partner_id;
 			kCurrentContext::$ks_uid = $ksObj->user;
+			kCurrentContext::$ks_kuser_id = 0;
 			kCurrentContext::$master_partner_id = $ksObj->master_partner_id ? $ksObj->master_partner_id : kCurrentContext::$ks_partner_id;
 			kCurrentContext::$is_admin_session = $ksObj->isAdmin();
 			kCurrentContext::$partner_id = $requestedPartnerId;
 			kCurrentContext::$uid = $requestedPuserId;
 			kCurrentContext::$kuser_id = null;
-			kCurrentContext::$ks_kuser_id = 0;
 				
 			$ksKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid, true);
 			if($ksKuser)
