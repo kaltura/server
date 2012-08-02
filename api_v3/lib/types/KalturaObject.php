@@ -5,6 +5,8 @@
  */
 abstract class KalturaObject 
 {
+	static protected $fromObjectMap = array();
+	
 	protected function getReadOnly ()
 	{
 		
@@ -45,18 +47,24 @@ abstract class KalturaObject
 	}
 		
 
-	public function fromObject ( $source_object  )
+	public function getFromObjectMap ()
 	{
-		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
+		$className = get_class($this);
+		$cacheKey = kCurrentContext::$ks_hash . '_' . $className;
+		if (isset(self::$fromObjectMap[$cacheKey]))
+			return self::$fromObjectMap[$cacheKey];
+
+		$reflector = KalturaTypeReflectorCacher::get($className);
 		if(!$reflector)
-			return false;
+			return array();
 			
 		$properties = $reflector->getProperties();
 		
-		if ($reflector->requiresReadPermission() && !kPermissionManager::getReadPermitted(get_class($this), kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
-			return false; // current user has no permission for accessing this object class
+		if ($reflector->requiresReadPermission() && !kPermissionManager::getReadPermitted($className, kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
+			return array(); // current user has no permission for accessing this object class
 		}
 		
+		$result = array(); 
 		foreach ( $this->getMapBetweenObjects() as $this_prop => $object_prop )
 		{
 			if ( is_numeric( $this_prop) ) 
@@ -69,35 +77,63 @@ abstract class KalturaObject
 			if ($properties[$this_prop]->requiresReadPermission() && !kPermissionManager::getReadPermitted($this->getDeclaringClassName($this_prop), $this_prop))
 				continue;
 				
-            $getter_callback = array ( $source_object ,"get{$object_prop}"  );
-            if (is_callable($getter_callback))
-            {
-                $value = call_user_func($getter_callback);
-                
-                if($properties[$this_prop]->isArray() && is_array($value))
-                {
-                	$class = $properties[$this_prop]->getType();
-                	if(method_exists($class, 'fromDbArray'))
-	                	$value = call_user_func(array($class, 'fromDbArray'), $value);
-                }
-                elseif($properties[$this_prop]->isDynamicEnum())
-                {
-					$propertyType = $properties[$this_prop]->getType();
-					$enumType = call_user_func(array($propertyType, 'getEnumClass'));
-                	$value = kPluginableEnumsManager::coreToApi($enumType, $value);
-                }
-                	
-                $this->$this_prop = $value;
-            }
-            else
-            { 
-            	KalturaLog::alert("getter for property [$object_prop] was not found on object class [" . get_class($source_object) . "]");
-            }
-                
+            $getter_name = "get{$object_prop}";
+            
+            $getter_params = array();
             if (in_array($this_prop, array("createdAt", "updatedAt", "deletedAt")))
+				$getter_params = array(null);            
+            
+			$arrayClass = null;
+			if ($properties[$this_prop]->isArray())
+			{
+				$class = $properties[$this_prop]->getType();
+				if(method_exists($class, 'fromDbArray'))
+					$arrayClass = $class;
+			}
+			
+			$enumMap = null;
+			if ($properties[$this_prop]->isDynamicEnum())
             {
-                $this->$this_prop = call_user_func_array($getter_callback, array(null)); // when passing null to getCreatedAt, timestamp will be returned
+            	$propertyType = $properties[$this_prop]->getType();
+            	$enumClass = call_user_func(array($propertyType, 'getEnumClass'));
+            	if ($enumClass)
+            		$enumMap = kPluginableEnumsManager::getCoreMap($enumClass);
             }
+            
+            $result[] = array($this_prop, $getter_name, $getter_params, $arrayClass, $enumMap);
+		}
+
+		self::$fromObjectMap[$cacheKey] = $result;
+		return $result;
+	}
+	
+	public function fromObject ( $source_object  )
+	{
+		$map = $this->getFromObjectMap();
+		foreach ($map as $curProp)
+		{
+			list($this_prop, $getter_name, $getter_params, $arrayClass, $enumMap) = $curProp;
+
+			$getter_callback = array($source_object, $getter_name);
+			
+            if (!is_callable($getter_callback))
+            {
+            	KalturaLog::alert("getter for property [$object_prop] was not found on object class [" . get_class($source_object) . "]");
+            	continue;
+            }
+            
+            $value = call_user_func_array($getter_callback, $getter_params);
+                
+            if($arrayClass && is_array($value))
+            {
+             	$value = call_user_func(array($arrayClass, 'fromDbArray'), $value);
+            }
+            elseif($enumMap && isset($enumMap[$value]))
+            {
+              	$value = $enumMap[$value];
+            }
+               	
+            $this->$this_prop = $value;
 		}
 	}
 	
