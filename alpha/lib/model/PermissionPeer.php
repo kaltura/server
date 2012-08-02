@@ -199,6 +199,7 @@ class PermissionPeer extends BasePermissionPeer
 				(!is_array($partnerIdsArray) && $partnerIdsArray != '*')
 			) 
 		{
+			$partnerIdsArray = array_map('strval', $partnerIdsArray);
 			$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
 		}
 		$c->addAnd(PermissionPeer::NAME, $permissionName, Criteria::EQUAL);
