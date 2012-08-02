@@ -1,7 +1,7 @@
 default:
   has_layout:   on
   layout:       kmclayout
-  javascripts:  [  /lib/js/scripts.js ]
+  javascripts:  [ -*, /lib/js/scripts.js ]
   stylesheets:  [ /lib/css/modal, /lib/css/kmc ]
 
 kmc1Success:
