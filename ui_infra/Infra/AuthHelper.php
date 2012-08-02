@@ -10,6 +10,9 @@ class Infra_AuthHelper
         $settings = Zend_Registry::get("config")->settings;
         $defNameSpace = isset($settings->cookieNameSpace) ? $settings->cookieNameSpace : Zend_Auth_Storage_Session::NAMESPACE_DEFAULT;
         
+        if ($settings->get('sessionSavePath'))
+            session_save_path($settings->get('sessionSavePath'));
+        
         $auth = Zend_Auth::getInstance();
 		$storage = new Zend_Auth_Storage_Session($defNameSpace);
 		$auth->setStorage($storage);
