@@ -6,9 +6,43 @@
 class playManifestAction extends kalturaAction
 {
 	/**
+	 * Short names for action arguments
+	 * @var array
+	 */
+	static protected $shortNames = array(
+		"cdnHost" => 'ch',
+		"clipTo" => 'ct',
+		"deliveryCode" => 'dc',
+		"entryId" => 'e',
+		"expiry" => 'ex',
+		"flavorId" => 'fi',
+		"flavorIds" => 'fs',
+		"flavorParamId" => 'fp',
+		"flavorParamIds" => 'fps',
+		"format" => 'f',
+		"maxBitrate" => 'mb',
+		"playbackContext" => 'pc',
+		"preferredBitrate" => 'pb',
+		"protocol" => 'pt',
+		"referrer" => 'r',
+		"seekFrom" => 'sf',
+		"storageId" => 'si',
+		"tags" => 't',
+		"uiConfId" => 'ui',
+	);
+	
+	const KALTURA_TOKEN_MARKER = '{kt}';
+	
+	/**
 	 * @var string
 	 */
 	private $format;
+	
+	/**
+	 * may contain several fallbacks options, each one with a set of tags 
+	 * @var array
+	 */
+	private $tags;
 	
 	/**
 	 * @var string
@@ -79,6 +113,36 @@ class playManifestAction extends kalturaAction
 	 * @var kUrlTokenizer
 	 */
 	private $tokenizer = null;
+	
+	/**
+	 * @var KSecureEntryHelper
+	 */
+	private $secureEntryHelper = null;
+	
+	///////////////////////////////////////////////////////////////////////////////////
+	//	URL tokenization functions
+	
+	/**
+	 * @param string $url
+	 * @param string $urlToken
+	 * @return boolean
+	 */
+	static protected function validateKalturaToken($url, $urlToken)
+	{
+		$url = str_replace($urlToken, self::KALTURA_TOKEN_MARKER, $url);
+		$calcToken = sha1(kConf::get('url_token_secret') . $url);
+		return $calcToken == $urlToken;
+	}
+	
+	/**
+	 * @param string $url
+	 * @return string
+	 */
+	static protected function calculateKalturaToken($url)
+	{
+		$token = sha1(kConf::get('url_token_secret') . $url);
+		return str_replace(self::KALTURA_TOKEN_MARKER, $token, $url);
+	}
 	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	URL building functions
@@ -327,6 +391,30 @@ class playManifestAction extends kalturaAction
 		return null;
 	}
 	
+	/**
+	 * @return array
+	 */
+	private function getSecureHdUrl()
+	{
+		$urlManager = $this->getUrlManagerByCdn($this->cdnHost);
+		if (!method_exists($urlManager, 'getManifestUrl'))
+			return null;
+
+		$url = $this->getTokenizedManifestUrl('hdnetworksmil', 'a.smil');
+		
+		$flavor = $urlManager->getManifestUrl($url);
+		if (!$flavor)
+			return null;
+		
+		if (strpos($flavor['urlPrefix'], '://') === false)
+			$flavor['urlPrefix'] = $this->protocol . '://' . $flavor['urlPrefix'];
+
+		$urlManager->setProtocol('hdnetworkmanifest');
+		$this->tokenizer = $urlManager->getTokenizer();
+		
+		return $flavor;
+	} 
+	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	Flavor array utility functions
 
@@ -471,6 +559,78 @@ class playManifestAction extends kalturaAction
         return -1;
 	}
 	
+	/**
+	 * @param array $flavors
+	 * @return array
+	 */
+	private function sortFlavors($flavors)
+	{
+		if ($this->preferredBitrate !== null)
+		{
+			foreach ($flavors as $flavor)
+			{
+				if ($flavor['height'] == 0 && $flavor['width'] == 0)
+					continue;		// audio flavor
+			
+				$bitrateDiff = abs($flavor['bitrate'] - $this->preferredBitrate);
+				if (!$this->preferredFlavor || $bitrateDiff < $minBitrateDiff)
+				{
+					$this->preferredFlavor = $flavor;
+					$minBitrateDiff = $bitrateDiff;
+				}
+			}
+		}
+		
+		uasort($flavors, array($this,'flavorCmpFunction'));
+		
+		return $flavors;
+	}
+
+	/**
+	 * @param asset $flavorAsset
+	 * @return boolean
+	 */
+	private function assetMatchesTags(asset $flavorAsset)
+	{
+		foreach ($this->tags as $tagsFallback)
+		{
+			foreach ($tagsFallback as $tagOption)
+			{
+				if ($flavorAsset->hasTag($tagOption))
+					return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * @return array
+	 */
+	private function getReadyFlavorsByTags()
+	{
+		$allFlavors = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
+		foreach ($this->tags as $tagsFallback)
+		{
+			$curFlavors = array();
+			
+			foreach ($allFlavors as $flavorAsset)
+			{
+				foreach ($tagsFallback as $tagOption)
+				{
+					if (!$flavorAsset->hasTag($tagOption))
+						continue;
+					$curFlavors[] = $flavorAsset;
+					break;
+				}
+			}
+			
+			if ($curFlavors)
+				return $curFlavors;
+		}
+		return array();
+	}
+	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	Flavor array building functions
 
@@ -484,29 +644,16 @@ class playManifestAction extends kalturaAction
 		
 		if($this->flavorId && ($flavorAsset = assetPeer::retrieveById($this->flavorId)) != null)
 		{
-			if ($this->format != StorageProfile::PLAY_FORMAT_SILVER_LIGHT && 
-				$flavorAsset->hasTag(assetParams::TAG_WEB) && 
-				$flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
-				$flavorAssets[] = $flavorAsset;
-				
-			if ($this->format == StorageProfile::PLAY_FORMAT_SILVER_LIGHT && 
-				$flavorAsset->hasTag(assetParams::TAG_SLWEB) && 
+			if ($this->assetMatchesTags($flavorAsset) &&
 				$flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 				$flavorAssets[] = $flavorAsset;
 		}
 		elseif($oneOnly)
 		{
-			$flavorAsset = assetPeer::retrieveBestPlayByEntryId($this->entryId);
-			
+			$flavorAsset = assetPeer::retrieveBestPlayByEntryId($this->entryId);			
 			if(!$flavorAsset)
 			{
-				$tag = assetParams::TAG_WEB;
-				if($this->format == StorageProfile::PLAY_FORMAT_SILVER_LIGHT)
-					$tag = assetParams::TAG_SLWEB;
-				elseif($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
-					$tag = assetParams::TAG_APPLEMBR;
-					
-				$webFlavorAssets = assetPeer::retrieveReadyByEntryIdAndTag($this->entryId, $tag);
+				$webFlavorAssets = $this->getReadyFlavorsByTags();
 				if(count($webFlavorAssets))
 					$flavorAsset = reset($webFlavorAssets);
 			}
@@ -519,7 +666,6 @@ class playManifestAction extends kalturaAction
 			if ($this->flavorIds)
 			{
 				$tmpFlavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
-				$flavorAssets = array();
 				foreach($tmpFlavorAssets as $flavorAsset)
 				{
 					if (in_array($flavorAsset->getId(), $this->flavorIds))
@@ -528,39 +674,7 @@ class playManifestAction extends kalturaAction
 			}
 			else 
 			{
-				$tag = assetParams::TAG_MBR;
-				if($this->format == StorageProfile::PLAY_FORMAT_SILVER_LIGHT)
-					$tag = assetParams::TAG_SLWEB;
-				elseif($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
-					$tag = assetParams::TAG_APPLEMBR;
-				$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entryId, $tag);
-
-				if(!count($flavorAssets) && $tag == assetParams::TAG_MBR)
-					$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entryId, assetParams::TAG_WEB);
-				
-				// if format is APPLE HTTP and there aren't any segmented flavors use ipad and iphone with
-				// akamai hd on the fly segmenter
-				if(!count($flavorAssets) && $this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
-				{
-					$tmpFlavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
-					$flavorAssets = array();
-					
-					$tagVersions = array("new", "");
-
-					// try first the ipadnew and iphonenew, optimized for segmenting (with fixed GOP and IDR frames)
-					// if no such flavors were found, use the ipad,iphone and pray
-					foreach($tagVersions as $tagVersion)
-					{
-						foreach($tmpFlavorAssets as $flavorAsset)
-						{
-							if ($flavorAsset->hasTag("ipad$tagVersion") || $flavorAsset->hasTag("iphone$tagVersion"))
-								$flavorAssets[] = $flavorAsset;
-						}
-						
-						if (count($flavorAssets))
-							break;
-					}
-				}
+				$flavorAssets = $this->getReadyFlavorsByTags();
 			}
 		}
 		
@@ -603,7 +717,7 @@ class playManifestAction extends kalturaAction
 		if($this->flavorId)
 		{
 			$flavorAsset = assetPeer::retrieveById($this->flavorId);
-			if(!$flavorAsset->hasTag(assetParams::TAG_WEB))
+			if(!$this->assetMatchesTags($flavorAsset))
 				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 				
 			if($flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
@@ -613,9 +727,7 @@ class playManifestAction extends kalturaAction
 		}
 		else 
 		{
-			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entryId, assetParams::TAG_MBR);
-			if(!count($flavorAssets))
-				$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entryId, assetParams::TAG_WEB);
+			$flavorAssets = $this->getReadyFlavorsByTags(); 
 		}
 
 		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
@@ -964,31 +1076,42 @@ class playManifestAction extends kalturaAction
 	 */
 	private function serveAppleHttp()
 	{
-		$flavors = $this->buildHttpFlavorsArray($duration);
-		
-		if ($this->preferredBitrate !== null)
+		$flavor = $this->getSecureHdUrl();
+		if ($flavor)
 		{
-			foreach ($flavors as $flavor)
-			{
-				if ($flavor['height'] == 0 && $flavor['width'] == 0)
-					continue;		// audio flavor
-			
-				$bitrateDiff = abs($flavor['bitrate'] - $this->preferredBitrate);
-				if (!$this->preferredFlavor || $bitrateDiff < $minBitrateDiff)
-				{
-					$this->preferredFlavor = $flavor;
-					$minBitrateDiff = $bitrateDiff;
-				}
-			}
+			$renderer = new kRedirectManifestRenderer();
+			$renderer->entryId = $this->entryId;
+			$renderer->tokenizer = $this->tokenizer;
+			$renderer->flavor = $flavor;
+			return $renderer;
 		}
 		
-		uasort($flavors, array($this,'flavorCmpFunction'));
+		$flavors = $this->buildHttpFlavorsArray($duration);
+		
+		$flavors = $this->sortFlavors($flavors);
 
 		$renderer = new kM3U8ManifestRenderer();
 		$renderer->entryId = $this->entryId;
 		$renderer->tokenizer = $this->tokenizer;
 		$renderer->flavors = $flavors;
 		return $renderer;
+	}
+
+	/**
+	 * @return kManifestRenderer
+	 */
+	private function serveHds()
+	{
+		$flavors = $this->buildHttpFlavorsArray($duration);
+		
+		$flavors = $this->sortFlavors($flavors);
+
+		$renderer = new kF4Mv2ManifestRenderer();
+		$renderer->entryId = $this->entryId;
+		$renderer->tokenizer = $this->tokenizer;						
+		$renderer->flavors = $flavors;
+		$renderer->duration = $duration;
+		return $renderer;		
 	}
 	
 	/**
@@ -1019,6 +1142,75 @@ class playManifestAction extends kalturaAction
 		$renderer->duration = $duration;
 		$renderer->mediaUrl = $mediaUrl;
 		return $renderer;
+	}
+
+	/**
+	 * @param array $params
+	 * @return array
+	 */
+	private function convertToShortNames(array $params)
+	{
+		$result = array();
+		foreach ($params as $key => $value)
+		{
+			if (isset(self::$shortNames[$key]))
+				$shortName = self::$shortNames[$key];
+			else
+				$shortName = $key;
+			
+			$result[$shortName] = $value;
+		}
+		
+		return $result;
+	}
+	
+	/**
+	 * @param string $format
+	 * @param string $fileName
+	 * @return string
+	 */
+	private function getTokenizedManifestUrl($format, $fileName)
+	{
+		$params = requestUtils::getRequestParams();
+		$params['format'] = $format;
+		
+		$excludeList = array('kt', 'ks', 'referrer', 'extwidget', 'a');		
+		foreach ($excludeList as $excludedParam)
+		{
+			unset($params[$excludedParam]);
+		}
+		if ($this->clipTo)
+			$params['clipTo'] = $this->clipTo;		// in order to enforce preview access control
+			
+		$params = $this->convertToShortNames($params);
+		
+		$partnerId = $this->entry->getPartnerId();
+				
+		$url = "/p/{$partnerId}/playManifest/kt/".self::KALTURA_TOKEN_MARKER;
+		foreach ($params as $key => $value)
+			$url .= "/$key/$value";
+		$url .= "/{$fileName}";
+
+		return self::calculateKalturaToken($url);
+	}
+	
+	/**
+	 * @return kManifestRenderer
+	 */
+	private function serveHDNetworkManifest()
+	{			
+		$flavor = $this->getSecureHdUrl();
+		if (!$flavor)
+			return null;
+			
+		$duration = $this->entry->getDurationInt();
+		
+		$renderer = new kF4MManifestRenderer();
+		$renderer->entryId = $this->entryId;
+		$renderer->duration = $duration;
+		$renderer->flavors = array($flavor);
+		$renderer->tokenizer = $this->tokenizer;
+		return $renderer;
 	}	
 
 	/**
@@ -1039,6 +1231,25 @@ class playManifestAction extends kalturaAction
 	///////////////////////////////////////////////////////////////////////////////////
 	//	Main functions
 
+	/* (non-PHPdoc)
+	 * @see /symfony/action/sfComponent#getRequestParameter()
+	 */
+	public function getRequestParameter($name, $default = null)
+	{
+		$val = parent::getRequestParameter($name, null);
+		if (!is_null($val))
+			return $val;
+
+		if (isset(self::$shortNames[$name]))
+		{
+			$val = parent::getRequestParameter(self::$shortNames[$name], null);
+			if (!is_null($val))
+				return $val;
+		}
+
+		return $default;
+	}
+  
 	public function validateStorageId()
 	{
 		if(!$this->storageId)
@@ -1055,62 +1266,19 @@ class playManifestAction extends kalturaAction
 		// partner configured to use kaltura data centers only
 		if($partner->getStorageServePriority() ==  StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
 			die;
-				 
+		
 		// storage doesn't belong to the partner
 		if($storage->getPartnerId() != $partner->getId())
 			die;
 	}
 	
-	public function execute()
+	protected function initFlavorIds()
 	{
-		$ksStr = $this->getRequestParameter("ks");
-		$this->entryId = $this->getRequestParameter ( "entryId", null );
-		
-		if($ksStr)
-		{
-			try {
-				kCurrentContext::initKsPartnerUser($ksStr);
-			}
-			catch (Exception $ex)
-			{
-				KExternalErrors::dieError(KExternalErrors::INVALID_KS);	
-			}
-		}
-		else
-		{
-			$this->entry = kCurrentContext::initPartnerByEntryId($this->entryId);
-			if(!$this->entry)
-				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
-		}
-		
-		kEntitlementUtils::initEntitlementEnforcement();
-		
-		$this->flavorId = $this->getRequestParameter ( "flavorId", null );
-		$this->storageId = $this->getRequestParameter ( "storageId", null );
-		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
-		$this->preferredBitrate = $this->getRequestParameter ( "preferredBitrate", null );
-		$this->deliveryCode = $this->getRequestParameter( "deliveryCode", null );
-		$playbackContext = $this->getRequestParameter( "playbackContext", null );
-		
 		$flavorIdsStr = $this->getRequestParameter ( "flavorIds", null );
 		if ($flavorIdsStr)
 			$this->flavorIds = explode(",", $flavorIdsStr);
 		
-		if(!$this->entry)
-		{
-			$this->entry = entryPeer::retrieveByPKNoFilter( $this->entryId );
-		}
-		else
-		{
-			if(!kEntitlementUtils::isEntryEntitled($this->entry))
-				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
-		}
-				
-		if (!$this->entry)
-		{
-			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
-		}
-		
+		$this->flavorId = $this->getRequestParameter ( "flavorId", null );
 		if (!$this->flavorId) // in case a flavorId wasnt specified checking for a flavorParamId 
 		{ 
 			$flavorParamIds = $this->getRequestParameter ( "flavorParamIds", null );
@@ -1137,8 +1305,98 @@ class playManifestAction extends kalturaAction
 				}
 			}
 		}	
+	}
+
+	protected function initEntry()  
+	{
+		$this->entryId = $this->getRequestParameter ( "entryId", null );
+
+		// look for a valid token
+		$expiry = $this->getRequestParameter("expiry");
+		if ($expiry && $expiry <= time())
+			KExternalErrors::dieError(KExternalErrors::EXPIRED_TOKEN);
+
+		$urlToken = $this->getRequestParameter("kt");
+		if ($urlToken)
+		{
+			if ($_SERVER["REQUEST_METHOD"] != "GET" ||			// don't allow tokens in post requests since the token protects only the URI and not the post parameters 
+				!self::validateKalturaToken($_SERVER["REQUEST_URI"], $urlToken))
+				KExternalErrors::dieError(KExternalErrors::INVALID_TOKEN);
+		}
 		
-		$this->validateStorageId();
+		// initalize the context
+		$ksStr = $this->getRequestParameter("ks");
+		if($ksStr && !$urlToken)
+		{
+			try 
+			{
+				kCurrentContext::initKsPartnerUser($ksStr);
+			}
+			catch (Exception $ex)
+			{
+				KExternalErrors::dieError(KExternalErrors::INVALID_KS);	
+			}
+		}
+		else
+		{
+			$this->entry = kCurrentContext::initPartnerByEntryId($this->entryId);
+			if (!$this->entry || $this->entry->getStatus() == entryStatus::DELETED)
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
+		
+		// no need for any further check if a token was used
+		if ($urlToken)
+		{
+			return;
+		}
+		
+		// enforce entitlement
+		kEntitlementUtils::initEntitlementEnforcement();
+
+		if(!$this->entry)
+		{
+			$this->entry = entryPeer::retrieveByPKNoFilter( $this->entryId );
+			if (!$this->entry || $this->entry->getStatus() == entryStatus::DELETED)
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
+		else
+		{
+			if(!kEntitlementUtils::isEntryEntitled($this->entry))
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
+		
+		// enforce access control
+		$base64Referrer = $this->getRequestParameter("referrer");
+		
+		// replace space in the base64 string with + as space is invalid in base64 strings and caused
+		// by symfony calling str_parse to replace + with spaces.
+		// this happens only with params passed in the url path and not the query strings. specifically the ~ char at
+		// a columns divided by 3 causes this issue (e.g. http://www.xyzw.com/~xxx)
+		$referrer = base64_decode(str_replace(" ", "+", $base64Referrer));
+		if (!is_string($referrer)) 
+			$referrer = ""; // base64_decode can return binary data
+			
+		$this->secureEntryHelper = new KSecureEntryHelper($this->entry, $ksStr, $referrer, accessControlContextType::PLAY);
+		if ($this->secureEntryHelper->shouldPreview())
+		{
+			$this->clipTo = $this->secureEntryHelper->getPreviewLength() * 1000;
+		}
+		else
+		{
+			$this->secureEntryHelper->validateForPlay();
+		}
+	}
+	
+	public function execute()
+	{
+		$this->seekFrom = $this->getRequestParameter ( "seekFrom" , -1);
+		if ($this->seekFrom <= 0)
+			$this->seekFrom = -1;
+
+		$this->clipTo = $this->getRequestParameter ( "clipTo" , 0);
+		
+		$this->deliveryCode = $this->getRequestParameter( "deliveryCode", null );
+		$playbackContext = $this->getRequestParameter( "playbackContext", null );
 		
 		$this->protocol = $this->getRequestParameter ( "protocol", null );
 		if(!$this->protocol || $this->protocol === "null")
@@ -1147,7 +1405,58 @@ class playManifestAction extends kalturaAction
 		$this->format = $this->getRequestParameter ( "format" );
 		if(!$this->format)
 			$this->format = StorageProfile::PLAY_FORMAT_HTTP;
+			
+		$this->tags = $this->getRequestParameter ( "tags", null );
+		if (!$this->tags)
+		{
+			switch ($this->format)
+			{
+			case StorageProfile::PLAY_FORMAT_SILVER_LIGHT:
+				$this->tags = array(
+					array(assetParams::TAG_SLWEB),
+				);
+				break;
+				
+			case StorageProfile::PLAY_FORMAT_APPLE_HTTP:
+			case StorageProfile::PLAY_FORMAT_HDS:
+				$this->tags = array(
+					array(assetParams::TAG_APPLEMBR),
+				 	array('ipadnew', 'iphonenew'),
+				 	array('ipad', 'iphone'),
+				);
+				break;
+				
+			default:
+				$this->tags = array(
+					array(assetParams::TAG_MBR),
+					array(assetParams::TAG_WEB),
+				);
+			}
+		}
+		else
+		{
+			$this->tags = array(array($tags));
+		}
 		
+		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
+		
+		$this->preferredBitrate = $this->getRequestParameter ( "preferredBitrate", null );
+		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
+		if(($this->maxBitrate) && ((!is_numeric($this->maxBitrate)) || ($this->maxBitrate <= 0)))
+			KExternalErrors::dieError(KExternalErrors::INVALID_MAX_BITRATE);
+			
+		$this->initEntry();
+		
+		$this->initFlavorIds();
+		
+		$this->storageId = $this->getRequestParameter ( "storageId", null );
+		$this->validateStorageId();		
+		
+		$partner = $this->entry->getPartner();
+		
+		if(!$this->cdnHost || $partner->getForceCdnHost())
+			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
+
 		$playbackParams = array();
 		if (kConf::hasMap("optimized_playback"))
 		{
@@ -1166,47 +1475,7 @@ class playManifestAction extends kalturaAction
 			if (strtolower($this->protocol) != 'https')
 				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED, 'unencrypted playback protocol - forbidden');
 		}
-
-		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
-		$partner = $this->entry->getPartner();
-		
-		if(!$this->cdnHost || $partner->getForceCdnHost())
-			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
-		
-		if(($this->maxBitrate) && ((!is_numeric($this->maxBitrate)) || ($this->maxBitrate <= 0)))
-			KExternalErrors::dieError(KExternalErrors::INVALID_MAX_BITRATE);
 			
-		$base64Referrer = $this->getRequestParameter("referrer");
-		
-		// replace space in the base64 string with + as space is invalid in base64 strings and caused
-		// by symfony calling str_parse to replace + with spaces.
-		// this happens only with params passed in the url path and not the query strings. specifically the ~ char at
-		// a columns divided by 3 causes this issue (e.g. http://www.xyzw.com/~xxx)
-		$referrer = base64_decode(str_replace(" ", "+", $base64Referrer));
-		if (!is_string($referrer)) 
-			$referrer = ""; // base64_decode can return binary data
-			
-		$securyEntryHelper = new KSecureEntryHelper($this->entry, $ksStr, $referrer, accessControlContextType::PLAY);
-		if ($securyEntryHelper->shouldPreview())
-		{
-			$this->clipTo = $securyEntryHelper->getPreviewLength() * 1000;
-		}
-		else
-		{
-			$securyEntryHelper->validateForPlay();
-		}
-		
-		// grab seekFrom parameter and normalize url
-		$this->seekFrom = $this->getRequestParameter ( "seekFrom" , -1);
-		if ($this->seekFrom <= 0)
-			$this->seekFrom = -1;
-		
-		if ( $this->entry->getStatus() == entryStatus::DELETED )
-		{
-			// because the fiter was turned off - a manual check for deleted entries must be done.
-			die;
-		}
-				
 		$renderer = null;
 	
 		switch($this->format)
@@ -1226,6 +1495,10 @@ class playManifestAction extends kalturaAction
 			case StorageProfile::PLAY_FORMAT_APPLE_HTTP:
 				$renderer = $this->serveAppleHttp();
 				break;
+
+			case StorageProfile::PLAY_FORMAT_HDS:
+				$renderer = $this->serveHds();
+				break;
 				
 			case "url":
 				$this->format = "http"; // build url for an http delivery
@@ -1243,15 +1516,33 @@ class playManifestAction extends kalturaAction
 			case "hdnetwork":
 				$renderer = $this->serveHDNetwork();
 				break;
+
+			case "hdnetworkmanifest":
+				$renderer = $this->serveHDNetworkManifest();
+				break;
 		}
-				
-		if (!$renderer->tokenizer && !$securyEntryHelper->shouldDisableCache() && !$securyEntryHelper->isKsAdmin() &&
-			($securyEntryHelper->isKsWidget() || !$securyEntryHelper->hasRules()))
+		
+		if (!$renderer)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'This format is unsupported');
+		
+		$canCacheAccessControl = false;
+		if (!$this->secureEntryHelper)
 		{
+			$canCacheAccessControl = true;			// TODO: reconsider this if/when expired ktokens will be used
+		}
+		else if (!$this->secureEntryHelper->shouldDisableCache() && !$this->secureEntryHelper->isKsAdmin() &&
+			($this->secureEntryHelper->isKsWidget() || !$this->secureEntryHelper->hasRules()))
+		{
+			$canCacheAccessControl = true;
+		}
+		
+		if (!$renderer->tokenizer && $canCacheAccessControl)
+		{
+			// Note: kApiCache::hasExtraFields is checked in kManifestRenderers
 			$renderer->cachingHeadersAge = 60;
 		}
 		
-		if (!$securyEntryHelper->shouldDisableCache())
+		if (!$this->secureEntryHelper || !$this->secureEntryHelper->shouldDisableCache())
 		{
 			$cache = kPlayManifestCacher::getInstance();
 			$cache->storeCache($renderer);

@@ -50,7 +50,18 @@ class kAkamaiUrlManager extends kUrlManager
 					$this->params['smooth_auth_salt'],
 					'');
 			}
-			break;		
+			break;
+
+		case "hdnetworkmanifest":
+			if (@$this->params['secure_hd_auth_salt'])
+			{
+				return new kAkamaiSecureHDUrlTokenizer(
+					$this->params['secure_hd_auth_seconds'],
+					$this->params['secure_hd_auth_param'],
+					$this->params['secure_hd_auth_acl_regex'],
+					$this->params['secure_hd_auth_salt']);
+			}
+			break;
 		}
 		
 		return null;
@@ -239,4 +250,24 @@ class kAkamaiUrlManager extends kUrlManager
 		return $delivery;
 	}
 
+	public function getManifestUrl($url)
+	{
+		if ($this->protocol == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+		{
+			if (!isset($this->params["hd_secure_ios"]))
+				return null;
+				
+			$url = '/i' . $url . '/master.m3u8';
+			$urlPrefix = $this->params["hd_secure_ios"];
+		}
+		else
+		{
+			if (!isset($this->params["hd_secure_hds"]))
+				return null;
+				
+			$url = '/z' . $url . '/manifest.f4m';		
+			$urlPrefix = $this->params["hd_secure_hds"];
+		}
+		return array('url' => $url, 'urlPrefix' => $urlPrefix);		
+	}
 }

@@ -31,6 +31,8 @@ class KExternalErrors
 	const MULTIREQUEST_PROXY_FAILED = 24;
 	const BAD_QUERY = 25;
 	const INVALID_FLAVOR_ASSET_TYPE = 26;
+	const INVALID_TOKEN = 27;
+	const EXPIRED_TOKEN = 28;
 	
 	private static $errorDescriptionMap = array(
 			self::ENTRY_NOT_FOUND => "requested entry not found",
@@ -59,8 +61,9 @@ class KExternalErrors
 			self::MULTIREQUEST_PROXY_FAILED => "tried to dump not the first request",
 			self::BAD_QUERY => "wrong query attributes",
 			self::INVALID_FLAVOR_ASSET_TYPE => "requested flavor asset type is invalid",
-			
-		);
+			self::INVALID_TOKEN => "the supplied token is invalid",
+			self::EXPIRED_TOKEN => "the supplied token is expired",
+			);
 	
 	public static function dieError($errorCode, $message = null)
 	{

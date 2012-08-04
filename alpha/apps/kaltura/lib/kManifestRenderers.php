@@ -238,6 +238,58 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 	}
 }
 	
+class kF4Mv2ManifestRenderer extends kMultiFlavorManifestRenderer
+{
+	/**
+	 * @return array<string>
+	 */
+	public function getHeaders()
+	{
+		return array(
+			"Content-Type: text/xml; charset=UTF-8",
+			"Content-Disposition: inline; filename=manifest.xml",
+			);
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function buildFlavorsXml()
+	{
+		$flavorsXml = '';
+
+		foreach($this->flavors as $flavor)
+		{
+			$url = $flavor['url'];
+			$bitrate	= isset($flavor['bitrate'])	? $flavor['bitrate']	: 0;
+			$width		= isset($flavor['width'])	? $flavor['width']		: 0;
+			$height		= isset($flavor['height'])	? $flavor['height']		: 0;
+			
+			$flavorsXml .= "<media href=\"$url\" bitrate=\"$bitrate\" width=\"$width\" height=\"$height\"/>";
+		}		
+		
+		return $flavorsXml;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getBody()
+	{		
+		$durationXml = ($this->duration ? "<duration>{$this->duration}</duration>" : '');
+		$flavorsXml = $this->buildFlavorsXml();
+		$mediaUrl = '';
+				
+		return 
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<manifest xmlns=\"http://ns.adobe.com/f4m/2.0\">
+	<id>{$this->entryId}</id>
+	{$durationXml}
+	{$flavorsXml}
+</manifest>";
+	}
+}
+	
 class kSilverLightManifestRenderer extends kSingleUrlManifestRenderer
 {
 	/**
