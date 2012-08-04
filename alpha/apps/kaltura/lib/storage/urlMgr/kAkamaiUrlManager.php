@@ -13,7 +13,7 @@ class kAkamaiUrlManager extends kUrlManager
 		switch ($this->protocol)
 		{
 		case StorageProfile::PLAY_FORMAT_HTTP:
-			if (@$this->params['http_auth_salt'])
+			if (isset($this->params['http_auth_salt']) && $this->params['http_auth_salt'])
 			{
 				return new kAkamaiHttpUrlTokenizer(
 					$this->params['http_auth_seconds'],
@@ -24,7 +24,7 @@ class kAkamaiUrlManager extends kUrlManager
 			break;
 			
 		case StorageProfile::PLAY_FORMAT_RTMP:
-			if (@$this->params['rtmp_auth_salt'])
+			if (isset($this->params['rtmp_auth_salt']) && $this->params['rtmp_auth_salt'])
 			{
 				return new kAkamaiRtmpUrlTokenizer(
 					$this->params['rtmp_auth_profile'],
@@ -42,7 +42,7 @@ class kAkamaiUrlManager extends kUrlManager
 				$this->params["rtsp_cpcode"]);
 
 		case StorageProfile::PLAY_FORMAT_SILVER_LIGHT:
-			if (@$this->params['smooth_auth_salt'])
+			if (isset($this->params['smooth_auth_salt']) && $this->params['smooth_auth_salt'])
 			{
 				return new kAkamaiHttpUrlTokenizer(
 					$this->params['smooth_auth_seconds'],
@@ -53,7 +53,7 @@ class kAkamaiUrlManager extends kUrlManager
 			break;
 
 		case "hdnetworkmanifest":
-			if (@$this->params['secure_hd_auth_salt'])
+			if (isset($this->params['secure_hd_auth_salt']) && $this->params['secure_hd_auth_salt'])
 			{
 				return new kAkamaiSecureHDUrlTokenizer(
 					$this->params['secure_hd_auth_seconds'],
