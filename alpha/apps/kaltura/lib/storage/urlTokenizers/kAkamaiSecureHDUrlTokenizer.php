@@ -239,19 +239,26 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	/**
 	 * @var string
 	 */
+	protected $aclPostfix;
+	
+	/**
+	 * @var string
+	 */
 	protected $salt;
 
 	/**
 	 * @param int $window
 	 * @param string $param
+	 * @param string $aclRegex
+	 * @param string $aclPostfix
 	 * @param string $salt
-	 * @param string $root_dir
 	 */
-	public function __construct($window, $param, $aclRegex, $salt)
+	public function __construct($window, $param, $aclRegex, $aclPostfix, $salt)
 	{
 		$this->window = $window;
 		$this->param = $param;
 		$this->aclRegex = $aclRegex;
+		$this->aclPostfix = $aclPostfix;
 		$this->salt = $salt;
 	}
 	
@@ -264,7 +271,7 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 		if (!preg_match($this->aclRegex, $url, $matches))
 			return $url;
 			
-		$acl = $matches[0];		
+		$acl = $matches[0] . $this->aclPostfix;		
 		
 		$c = new Akamai_EdgeAuth_Config();
 		$c->set_acl($acl);

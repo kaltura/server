@@ -59,6 +59,7 @@ class kAkamaiUrlManager extends kUrlManager
 					$this->params['secure_hd_auth_seconds'],
 					$this->params['secure_hd_auth_param'],
 					$this->params['secure_hd_auth_acl_regex'],
+					$this->params['secure_hd_auth_acl_postfix'],
 					$this->params['secure_hd_auth_salt']);
 			}
 			break;
