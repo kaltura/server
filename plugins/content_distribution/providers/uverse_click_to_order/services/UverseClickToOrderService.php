@@ -80,6 +80,7 @@ class UverseClickToOrderService extends KalturaBaseService
 				$relatedEntriesArray[$relatedEntryId] = array();
 				$relatedEntriesArray[$relatedEntryId]['sortValue'] = $relatedEntrySortValue;
 				$relatedEntriesArray[$relatedEntryId]['updatedAt'] = $relatedEntry->getUpdatedAt(); 
+				$relatedEntriesArray[$relatedEntryId]['relatedEntryId'] = $relatedEntryId;
 			}
 			
 			$flavorAssets = array_map('trim', explode(',', $entryDistribution->getFlavorAssetIds()));
@@ -106,9 +107,12 @@ class UverseClickToOrderService extends KalturaBaseService
 		
 		//removing the values that where used for sorting.
 		foreach ($relatedEntriesArray as $key=>$relatedEntry){
+			$relatedEntryId = $relatedEntry['relatedEntryId'];
+			unset($relatedEntry['relatedEntryId']);
 			unset($relatedEntry['sortValue']);
 			unset($relatedEntry['updatedAt']);
-			$relatedEntriesArray[$key] = $relatedEntry;
+			unset($relatedEntriesArray[$key]);
+			$relatedEntriesArray[$relatedEntryId] = $relatedEntry;
 		}
 		
 		//retreive each category and add it to the xml
