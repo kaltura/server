@@ -1435,7 +1435,7 @@ class playManifestAction extends kalturaAction
 		}
 		else
 		{
-			$this->tags = array(array($tags));
+			$this->tags = array(array($this->tags));
 		}
 		
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
