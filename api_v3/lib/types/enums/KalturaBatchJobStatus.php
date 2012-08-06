@@ -17,4 +17,5 @@ class KalturaBatchJobStatus extends KalturaEnum
 	const RETRY = 9;  // in queue
 	const FATAL = 10; // done
 	const DONT_PROCESS = 11; // done
+	const FINISHED_PARTIALLY = 12;
 }
