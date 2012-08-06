@@ -69,6 +69,7 @@ return array(
 	'Kaltura_Client_Enum_BatchJobStatus::PROCESSED' => 'Processed',
 	'Kaltura_Client_Enum_BatchJobStatus::MOVEFILE' => 'Moving File',
 	'Kaltura_Client_Enum_BatchJobStatus::FINISHED' => 'Finished',
+	'Kaltura_Client_Enum_BatchJobStatus::FINISHED_PARTIALLY' => 'Finished Partially',
 	'Kaltura_Client_Enum_BatchJobStatus::FAILED' => 'Failed',
 	'Kaltura_Client_Enum_BatchJobStatus::ABORTED' => 'Aborted',
 	'Kaltura_Client_Enum_BatchJobStatus::ALMOST_DONE' => 'Almost Done',
