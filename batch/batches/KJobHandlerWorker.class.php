@@ -344,13 +344,12 @@ abstract class KJobHandlerWorker extends KBatchBase
 		$job = $this->updateExclusiveJob($job->id, $updateJob);
 		if($job instanceof KalturaBatchJob)
 			$this->onUpdate($job);
-		$this->onUpdate($job);
 		
 		KalturaLog::info("Free job[$job->id]");
 		$job = $this->freeExclusiveJob($job);
 		if($job instanceof KalturaBatchJob)
 			$this->onFree($job);
 		
-		return $job;
+		return $job;		
 	}
 }

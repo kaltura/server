@@ -32,7 +32,7 @@ if(!file_exists($inFile))
 /* --------  Parse input XML -------- */
 
 $xmlFormat = '<xml>
-	<request service="serviceName" action="actionName">
+	<request service="serviceName" action="actionName" plugin="pluginName">
 		<itemName1 objectType="KalturaObjectClass1">
 			<attr1>value1</attr1>
 			<attr2>value2</attr2>
@@ -158,15 +158,28 @@ foreach($inXml->request as $request)
 				
 	$serviceName = strval($request['service']);
 	$actionName = strval($request['action']);
+	$pluginName = ucfirst(strval($request['plugin']));
 	
-	$services = get_object_vars($client);
-	if(!isset($services[$serviceName]))
+	if(isset($pluginName)) //get plugin service
 	{
-		echo "Service [$serviceName] not found, note that plugin service currently not supported\n";
-		exit;
+		$pluginClass = "Kaltura{$pluginName}ClientPlugin";
+		require_once "lib/KalturaPlugins/$pluginClass.php";
+		
+		$plugin = call_user_func(array($pluginClass, 'get'), $client);
+		$service = $plugin->$serviceName;
+	}
+	else //get core service
+	{
+		$services = get_object_vars($client);
+		if(!isset($services[$serviceName]))
+		{
+			echo "Service [$serviceName] not found\n";
+			exit;
+		}
+		
+		$service = $services[$serviceName];
 	}
 	
-	$service = $services[$serviceName];
 	if(!method_exists($service, $actionName))
 	{
 		echo "Action [$actionName] not found on service [$serviceName]\n";

@@ -22,6 +22,8 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 	 */
 	static protected $mailer = null;
 	
+	static protected $emailFooterTemplate = null;
+	
 	/* (non-PHPdoc)
 	 * @see KDispatchEventNotificationEngine::__construct()
 	 */
@@ -128,7 +130,17 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			$this::$mailer->Hostname = $data->hostname;
 		if($data->messageID)
 			$this::$mailer->MessageID = $data->messageID;
-		
+
+		$contentParameters = array();
+		if(is_array($data->contentParameters) && count($data->contentParameters))
+		{
+			foreach($data->contentParameters as $contentParameter)
+			{
+				/* @var $contentParameter KalturaKeyValue */
+				$contentParameters['{' .$contentParameter->key. '}'] = $contentParameter->value;
+			}		
+		}
+			
 		if(is_array($data->to))
 		{
 			foreach ($data->to as $to)
@@ -136,6 +148,11 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 				/* @var $to KalturaKeyValue */
 				$email = $to->key;
 				$name = $to->value;
+				if(is_array($contentParameters) && count($contentParameters))
+				{
+					$email = str_replace(array_keys($contentParameters), $contentParameters, $email);
+					$name = str_replace(array_keys($contentParameters), $contentParameters, $name);
+				}
 				KalturaLog::info("Add TO recipient [$email<$name>]");
 				$this::$mailer->AddAddress($email, $name);
 			}
@@ -148,6 +165,11 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 				/* @var $to KalturaKeyValue */
 				$email = $to->key;
 				$name = $to->value;
+				if(is_array($contentParameters) && count($contentParameters))
+				{
+					$email = str_replace(array_keys($contentParameters), $contentParameters, $email);
+					$name = str_replace(array_keys($contentParameters), $contentParameters, $name);
+				}				
 				KalturaLog::info("Add CC recipient [$email<$name>]");
 				$this::$mailer->AddCC($email, $name);
 			}
@@ -160,6 +182,11 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 				/* @var $to KalturaKeyValue */
 				$email = $to->key;
 				$name = $to->value;
+				if(is_array($contentParameters) && count($contentParameters))
+				{
+					$email = str_replace(array_keys($contentParameters), $contentParameters, $email);
+					$name = str_replace(array_keys($contentParameters), $contentParameters, $name);
+				}
 				KalturaLog::info("Add BCC recipient [$email<$name>]");
 				$this::$mailer->AddBCC($email, $name);
 			}
@@ -172,6 +199,11 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 				/* @var $to KalturaKeyValue */
 				$email = $to->key;
 				$name = $to->value;
+				if(is_array($contentParameters) && count($contentParameters))
+				{
+					$email = str_replace(array_keys($contentParameters), $contentParameters, $email);
+					$name = str_replace(array_keys($contentParameters), $contentParameters, $name);
+				}
 				KalturaLog::info("Add REPLY-TO recipient [$email<$name>]");
 				$this::$mailer->AddReplyTo($email, $name);
 			}
@@ -179,9 +211,17 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			
 		if(!is_null($data->fromEmail)) 
 		{
-			$this::$mailer->Sender = $data->fromEmail;
-			$this::$mailer->From = $data->fromEmail;
-			$this::$mailer->FromName = $data->fromName;
+			$email = $data->fromEmail;
+			$name = $data->fromName;
+			if(is_array($contentParameters) && count($contentParameters))
+			{
+					$email = str_replace(array_keys($contentParameters), $contentParameters, $email);
+					$name = str_replace(array_keys($contentParameters), $contentParameters, $name);
+			}
+			
+			$this::$mailer->Sender = $email;
+			$this::$mailer->From = $email;
+			$this::$mailer->FromName = $name;
 		}
 		else
 		{
@@ -193,20 +233,19 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		
 		$subject = $emailNotificationTemplate->subject;
 		$body = $emailNotificationTemplate->body;
-		
-		$contentParameters = array();
-		if(is_array($data->contentParameters) && count($data->contentParameters))
+
+		$footer = $this->getEmailFooter();
+		if(!is_null(footer))
 		{
-			foreach($data->contentParameters as $contentParameter)
-			{
-				/* @var $contentParameter KalturaKeyValue */
-				$contentParameters['{' . $contentParameter->key . '}'] = $contentParameter->value;
-			}
+			$body .= "\n" . $footer;
+		}
 		
+		if(is_array($contentParameters) && count($contentParameters))
+		{		
 			$subject = str_replace(array_keys($contentParameters), $contentParameters, $subject);
 			$body = str_replace(array_keys($contentParameters), $contentParameters, $body);
 		}
-		
+				
 		KalturaLog::info("Subject [$subject]");
 		KalturaLog::info("Body [$body]");
 		
@@ -217,8 +256,15 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		{
 			foreach($data->customHeaders as $customHeader)
 			{
+				$key = $customHeader->key;
+				$value = $customHeader->value;
 				/* @var $customHeader KalturaKeyValue */
-				$this::$mailer->AddCustomHeader("{$customHeader->key}: {$customHeader->value}");
+				if(is_array($contentParameters) && count($contentParameters))
+				{
+					$key = str_replace(array_keys($contentParameters), $contentParameters, $key);
+					$value = str_replace(array_keys($contentParameters), $contentParameters, $value);
+				}
+				$this::$mailer->AddCustomHeader("{key}: {$value}");
 			}
 		}
 		
@@ -234,5 +280,22 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		}
 			
 		return true;
+	}
+	
+	private function getEmailFooter()
+	{
+		if(is_null(self::$emailFooterTemplate))
+		{
+			$file_path = dirname(__FILE__)."/emailFooter.html";
+			if(file_exists($file_path))
+			{
+				$file_content = file_get_contents($file_path);
+				self::$emailFooterTemplate = $file_content;
+			}
+		}
+		$forumsLink = kConf::get('forum_url');
+		
+		$footer = vsprintf( self::$emailFooterTemplate, array( $forumsLink) );	
+		return $footer;
 	}
 }

@@ -173,12 +173,12 @@ class Form_PartnerConfiguration extends Infra_Form
 		));	
 
 		$this->addElement('checkbox', 'enable_bulk_upload_notifications_emails', array(
-			'label'	  => 'Bulk Upload Notifications Emails',
+			'label'	  => 'Bulk Upload Notifications Emails (Legacy)',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
 		
 		$this->addElement('text', 'bulk_upload_notifications_email', array(
-			'label'	  => 'Bulk Upload Notifications Email',
+			'label'	  => 'Bulk Upload Notifications Email (Legacy)',
 		));
 			
 //--------------------------- Password Security ---------------------------			
