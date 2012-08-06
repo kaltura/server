@@ -34,5 +34,21 @@
 		</tbody>
 	</table>
 </div>
+<script type="text/javascript">
+
+function doAction(action, partnerId) {
+	if (action && eval('typeof ' + action) == 'function')
+	{
+		f = eval(action);
+		Array.prototype.shift.apply(arguments);
+		f.apply(this, arguments);
+	}
+	jQuery('select.options').val('');
+}
+
+function manage(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'var-console-redirect', 'partner_id' => ''), null, true); ?>' + partnerId;
+	window.open(url);
+}
 
 </script>
