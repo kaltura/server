@@ -42,6 +42,8 @@ class MetadataProfileServiceTest < Test::Unit::TestCase
       
      # creates a metadata_profile  
      metadata_profile = Kaltura::KalturaMetadataProfile.new
+     metadata_profile.name = "test profile"
+     metadata_profile.metadata_object_type = Kaltura::KalturaMetadataObjectType::ENTRY 
      metadata_profile.create_mode = Kaltura::KalturaMetadataProfileCreateMode::API 
      
      created_metadata_profile = @client.metadata_profile_service.add(metadata_profile, "<xsd:schema></xsd:schema>", "viewsData") 
