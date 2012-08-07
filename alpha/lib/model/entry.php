@@ -2609,6 +2609,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			
 			foreach($categoryFullIds as $categoryId)
 			{
+				if(!trim($categoryId))
+					continue;
+					
 				if($categoryId != $categoryEntry->getCategoryId())
 				{
 					//parent category
