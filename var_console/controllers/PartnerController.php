@@ -100,7 +100,7 @@ class PartnerController extends Zend_Controller_Action
             ));
 		}
 		
-		$this->view->publisherQuota = $currentPartner->publishersQuota;
+		$this->view->usedPublishers = $subPublisherCount;
 		$this->view->remainingPublishers = $currentPartner->publishersQuota - $subPublisherCount > 0? $currentPartner->publishersQuota - $subPublisherCount : 0;
 		
 		$this->view->form = $form;
@@ -108,6 +108,7 @@ class PartnerController extends Zend_Controller_Action
     
     public function listAction ()
     {
+        
         $request = $this->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
@@ -278,7 +279,7 @@ class PartnerController extends Zend_Controller_Action
 		$paginatorAdapter = new Infra_FilterPaginator($client->partner, "listPartnersForUser", null, $filter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		if ($paginator->getItemsCount() == 1)
-		    $this->_helper->redirector('list', 'partner');
+		    //$this->_helper->redirector('list', 'partner');
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		
