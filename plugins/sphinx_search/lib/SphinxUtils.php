@@ -27,7 +27,6 @@ class SphinxUtils
 		}
 		elseif($escapeType == SearchIndexFieldEscapeType::MD5_LOWER_CASE)
 		{				
-			$str = trim($str);
 			$str = strtolower($str);
 			
 			if(substr($str, -2) == '\*')
