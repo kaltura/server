@@ -517,29 +517,25 @@ class sfFileCache extends sfCache
     $try = 1;
     while ($try <= 2)
     {
-      $fp = @fopen($path.$file, 'wb');
+      $tempFile = $path.$file.uniqid();
+      $fp = @fopen($tempFile, 'wb');
       if ($fp)
       {
-        if ($this->fileLocking)
-        {
-          @flock($fp, LOCK_EX);
-        }
         if ($this->readControl)
         {
-          @fwrite($fp, $this->hash($data), 32);
+          fwrite($fp, $this->hash($data), 32);
         }
-        @fwrite($fp, $data);
-        if ($this->fileLocking)
-        {
-          @flock($fp, LOCK_UN);
-        }
-        @fclose($fp);
+        fwrite($fp, $data);
+        fclose($fp);
 
         // change file mode
         $current_umask = umask();
         umask(0000);
-        chmod($path.$file, 0666);
+        chmod($tempFile, 0666);
         umask($current_umask);
+        
+        // replace the cache file with the contents of the temp file
+        rename($tempFile, $path.$file);
 
         return true;
       }
