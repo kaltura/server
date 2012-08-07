@@ -1529,7 +1529,7 @@ class category extends Basecategory implements IIndexable
 	public function getSearchIndexfullName()
 	{
 		$fullName = $this->getFullName();
-		$fullNameLowerCase = strtolower($fullName);
+		$fullNameLowerCase = trim(strtolower($fullName));
 		
 		$fullNameArr = explode(categoryPeer::CATEGORY_SEPARATOR, $fullNameLowerCase);
 		
