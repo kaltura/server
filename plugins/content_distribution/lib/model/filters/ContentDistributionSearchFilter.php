@@ -189,8 +189,8 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 	{
 		$condition = $this->getCondition();
 		KalturaLog::debug("condition [" . print_r($condition, true) . "]");
-		$key = '@' . ContentDistributionSphinxPlugin::getSphinxFieldName(ContentDistributionPlugin::SPHINX_EXPANDER_FIELD_DATA);
-		$query->addMatch("$key $condition");
+		$key = '(@' . ContentDistributionSphinxPlugin::getSphinxFieldName(ContentDistributionPlugin::SPHINX_EXPANDER_FIELD_DATA);
+		$query->addMatch("$key $condition)");
 	}
 	
 	public function addToXml(SimpleXMLElement &$xmlElement)
