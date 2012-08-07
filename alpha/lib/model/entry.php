@@ -2894,7 +2894,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if(count(array_unique($entitledKusersNoPrivacyContext)))
 			$entitledKusers[kEntitlementUtils::ENTRY_PRIVACY_CONTEXT] = array_unique($entitledKusersNoPrivacyContext);
 		
-		if ($this->getAllCategoriesIds(true) == '')
+		if (!count($this->getAllCategoriesIds(true)))
 			return kEntitlementUtils::ENTRY_PRIVACY_CONTEXT . '_' . implode(' ' . kEntitlementUtils::ENTRY_PRIVACY_CONTEXT . '_', $entitledKusersNoPrivacyContext);
 		
 		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
@@ -2955,7 +2955,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		foreach($categoriesEntry as $categoryEntry)
 			$categoriesIds[] = $categoryEntry->getCategoryId();
 			
-		return implode(',', $categoriesIds);
+		return $categoriesIds;
 	}
 	
 	public function reSetCategories()
