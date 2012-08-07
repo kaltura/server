@@ -252,7 +252,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 				if($categoryEntryToDelete)
 				{
 					$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntryToDelete->getCategoryId(), kCurrentContext::$ks_kuser_id);
-					if(kEntitlementUtils::getEntitlementEnforcement() && (!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
+					if($category->getPrivacyContexts() && (!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
 					{
 						//not entiteld to delete - should be set back on the entry.
 						$allCats[] = $category->getFullName();
