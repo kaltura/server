@@ -30,10 +30,10 @@ class kEntitlementUtils
 	{
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		
-		if(!ks || !$ks->getPrivacyContext())
-			return true;
+		if(!$ks || !$ks->getPrivacyContext())
+			return false;
 			
-		return false;		
+		return true;		
 	}
 	
 	/**
@@ -309,11 +309,11 @@ class kEntitlementUtils
 		$entryPrivacy = null;
 		$categories = array();		
 		
-		if ($entry->getAllCategoriesIds() != '')
+		if (count($entry->getAllCategoriesIds(true)))
 		{
 			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY); 
-			$c->add(categoryPeer::ID, explode(',', $entry->getAllCategoriesIds(true)), Criteria::IN);
+			$c->add(categoryPeer::ID, $entry->getAllCategoriesIds(true), Criteria::IN);
 			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
