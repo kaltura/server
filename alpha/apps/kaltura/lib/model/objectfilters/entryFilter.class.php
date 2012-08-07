@@ -343,7 +343,10 @@ class entryFilter extends baseObjectFilter
 		
 		$categoryFullIdsToIds = array();
 		foreach($cats as $catId)
-		{				
+		{
+			if(!$catId)
+				continue;
+							
 			foreach ($statuses as $status)
 			{
 				//should return category itsef or sub categories
