@@ -14,9 +14,9 @@
 
 @implementation HomeViewController_iPad
 
-@synthesize uploadFilePath;
 @synthesize popoverController;
 @synthesize cancelAlert;
+@synthesize uploadFilePath;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -41,7 +41,7 @@
 
 - (IBAction)buttonUploadInfoClose {
     
-    if (buttonUpload.hidden && uploadedSize > 0) {
+    if (buttonUpload.hidden && [[Client instance] uploadingInProgress]) {
         
         self.cancelAlert = [[UIAlertView alloc] initWithTitle:@"Uploading is in progress!\nDo you want to cancel?" message:nil delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
         [self.cancelAlert show];
@@ -64,29 +64,12 @@
 
 }
 
-- (void)endUploading {
-    
-    if (token) {
-        
-        [token release];
-        
-    }
-    
-    KalturaClient *client = [Client instance].client;
-    client.delegate = nil;
-    client.uploadProgressDelegate = nil;
-    
-    
-}
+
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
     
     if (buttonIndex == 1) {
         
-        KalturaClient *client = [Client instance].client;
-        
-        [client cancelRequest];
-        
-        [self endUploading];
+        [[Client instance] cancelUploading];
         
         [viewUploadInfo removeFromSuperview];
         
@@ -98,25 +81,20 @@
     self.cancelAlert = nil;
 }
 
-- (void)request:(ASIHTTPRequest *)request didSendBytes:(long long)bytes {
+- (void)updateProgress:(NSNumber *)value {
     
-    uploadedSize += bytes;
-    
-    progressUploadingProcess.progress = (float)(uploadedSize * 300 / fileSize) / 300.0;
+    progressUploadingProcess.progress = [value floatValue];
     
 }
 
-- (void)requestFinished:(KalturaClientBase*)aClient withResult:(id)result {
-    
-    NSLog(@"requestFinished");
-    
+- (void)uploadFinished {
+
     if (self.cancelAlert) {
         
         [self.cancelAlert dismissWithClickedButtonIndex:0 animated:YES];
         
     }
     
-    [self endUploading];
     
     imageViewThumbSuccess.image = imageViewThumb.image;
     [viewUploadInfo removeFromSuperview];
@@ -125,49 +103,29 @@
     
 }
 
-- (void)requestFailed:(KalturaClientBase*)aClient {
+- (void)uploadFailed {
+
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Uploading error\nPlease try again" message:nil delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+    [alert show];
+    [alert release];
     
-    NSLog(@"requestFailed");
+    buttonCategory.enabled = YES;
+    textVTitle.enabled = YES;
+    textDescription.editable = YES;
+    textTags.enabled = YES;
     
-    [self endUploading];
-        
+    
+    buttonUpload.hidden = NO;
+    viewUploadingProcess.hidden = YES;
+    
 }
 
 - (void)uploadProcess {
     
-    KalturaClient *client = [Client instance].client;
-    client.delegate = nil;
+    NSDictionary *data = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:labelCategoryName.text, textVTitle.text, textDescription.text, textTags.text, self.uploadFilePath, nil] 
+                                                     forKeys:[NSArray arrayWithObjects:@"category", @"title", @"description", @"tags", @"path", nil]];
     
-    token = [[KalturaUploadToken alloc] init];
-    token.fileName = @"video.m4v";
-    token = [client.uploadToken addWithUploadToken:token];
-
-    
-    // return: object, params: object
-    KalturaMediaEntry* entry = [[[KalturaMediaEntry alloc] init] autorelease];
-    entry.name = textVTitle.text;
-    entry.mediaType = [KalturaMediaType VIDEO];
-    entry.categories = labelCategoryName.text;
-    entry.description = textDescription.text;
-    entry.tags = textTags.text;
-    
-    entry = [client.media addWithEntry:entry];
-    
-    // return: object, params: string, object
-    KalturaUploadedFileTokenResource* resource = [[[KalturaUploadedFileTokenResource alloc] init] autorelease];
-    resource.token = token.id;
-    entry = [client.media addContentWithEntryId:entry.id withResource:resource];
-    
-    client.delegate = self;
-    client.uploadProgressDelegate = self;
-    
-    NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.uploadFilePath error:nil];
-    
-    NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
-    fileSize = [fileSizeNumber longLongValue];
-    uploadedSize = 0;
-   
-    token = [client.uploadToken uploadWithUploadTokenId:token.id withFileData:self.uploadFilePath];
+    [[Client instance] uploadProcess:data withDelegate:self];
     
 }
 
@@ -212,13 +170,10 @@
     viewUploadingProcess.hidden = YES;
     progressUploadingProcess.progress = 0.0;
     
-    uploadedSize = 0;
-    
     [viewUploadSelect removeFromSuperview];
     [self.view addSubview:viewUploadInfo];
     
-    
-    //[self.view addSubview:viewUploadSuccess];
+
 }  
 
 - (IBAction)buttonUploadPressed {

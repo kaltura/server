@@ -10,7 +10,7 @@
 
 @class AppDelegate_iPhone;
 
-@interface UploadProcessViewController_iPhone : UIViewController <KalturaClientDelegate, ASIProgressDelegate> {
+@interface UploadProcessViewController_iPhone : UIViewController {
     
     AppDelegate_iPhone *app;
     
@@ -25,12 +25,8 @@
     
     IBOutlet UIActivityIndicatorView *activityView;
     
-    KalturaUploadToken* token;
-    
     IBOutlet UIButton *buttonMenu;
     
-    long long fileSize;
-    long long uploadedSize;
     
     UIAlertView *cancelAlert;
 }

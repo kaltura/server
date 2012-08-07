@@ -266,7 +266,7 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateExpansionKey</key>
 							<array>
 								<string>29B97314FDCFA39411CA2CEA</string>
-								<string>848E877A14FC3C95000D2A13</string>
+								<string>843B4E9515480F17003AF28D</string>
 								<string>2860E324111B887F00E27156</string>
 								<string>29B97323FDCFA39411CA2CEA</string>
 								<string>1C37FABC05509CD000000102</string>
@@ -298,7 +298,7 @@
 							<real>186</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>421 196 991 750 0 0 1680 1028 </string>
+						<string>159 197 991 750 0 0 1680 1028 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -326,11 +326,11 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>848D224B14FC3F9900C90127</string>
+										<string>847AE0851548110D00F495B3</string>
 										<key>history</key>
 										<array>
 											<string>848D224914FC3F9900C90127</string>
-											<string>848D224A14FC3F9900C90127</string>
+											<string>848D224B14FC3F9900C90127</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -342,14 +342,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 0}, {783, 515}}</string>
+								<string>{{0, 0}, {783, 509}}</string>
 								<key>RubberWindowFrame</key>
-								<string>421 196 991 750 0 0 1680 1028 </string>
+								<string>159 197 991 750 0 0 1680 1028 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
 							<key>Proportion</key>
-							<string>515pt</string>
+							<string>509pt</string>
 						</dict>
 						<dict>
 							<key>ContentConfiguration</key>
@@ -362,14 +362,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 520}, {783, 189}}</string>
+								<string>{{0, 514}, {783, 195}}</string>
 								<key>RubberWindowFrame</key>
-								<string>421 196 991 750 0 0 1680 1028 </string>
+								<string>159 197 991 750 0 0 1680 1028 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
 							<key>Proportion</key>
-							<string>189pt</string>
+							<string>195pt</string>
 						</dict>
 					</array>
 					<key>Proportion</key>
@@ -388,9 +388,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>848D224C14FC3F9900C90127</string>
+				<string>847AE0861548110D00F495B3</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>848D224D14FC3F9900C90127</string>
+				<string>847AE0871548110D00F495B3</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -528,14 +528,11 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>1C530D57069F1CE1000CFCEE</string>
-		<string>1CD10A99069EF8BA00B06720</string>
 		<string>848E876D14FC3C39000D2A13</string>
-		<string>1C78EAAD065D492600B07095</string>
-		<string>/Users/admin/Documents/IPhoneApps/Kaltura/Kaltura.xcodeproj</string>
+		<string>/Users/admin/Documents/IPhoneApps/Kaltura/DemoApplication/Kaltura.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>421 196 991 750 0 0 1680 1028 </string>
+	<string>159 197 991 750 0 0 1680 1028 </string>
 	<key>WindowToolsV3</key>
 	<array>
 		<dict>
@@ -573,8 +570,6 @@
 							<string>378pt</string>
 						</dict>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -614,7 +609,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>848E876D14FC3C39000D2A13</string>
-				<string>848D222214FC3E3D00C90127</string>
+				<string>847AE0881548110D00F495B3</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>

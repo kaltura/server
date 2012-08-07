@@ -252,14 +252,11 @@ NSInteger playsPadSort(id media1, id media2, void *reverse)
     
     if (button.tag == 0) {
         
-        NSString *strURL = [NSString stringWithFormat:@"https://www.facebook.com/sharer/sharer.php?u=%@", mediaEntry.dataUrl];
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:strURL]];
+        [[Client instance] shareFacebook:mediaEntry];
         
     } else if (button.tag == 1) {
         
-        NSString *strURL = [NSString stringWithFormat:@"http://twitter.com/intent/tweet?url=%@", mediaEntry.dataUrl];
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:strURL]];
-        
+        [[Client instance] shareTwitter:mediaEntry];
         
     } else if (button.tag == 2) {
         
@@ -270,7 +267,7 @@ NSInteger playsPadSort(id media1, id media2, void *reverse)
             
             [_controller setSubject:@"Kaltura"];
             
-            NSString *str = [NSString stringWithFormat:@"I just saw this great video on Kaltura mobile app, check it out:\n%@", mediaEntry.dataUrl];
+            NSString *str = [NSString stringWithFormat:@"I just saw this great video on Kaltura mobile app, check it out:\n%@", [[Client instance] getShareURL:mediaEntry]];
             [_controller setMessageBody:str isHTML:NO];
             
             [self presentModalViewController:_controller animated:YES];

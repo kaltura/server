@@ -32,18 +32,6 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
-NSInteger bitratesPhoneSort(id media1, id media2, void *reverse)
-{
-	
-	int bitrate1 = [[media1 objectForKey:@"bitrate"] intValue];
-	int bitrate2 = [[media2 objectForKey:@"bitrate"] intValue];
-	
-	if (bitrate1 > bitrate2) {
-		return NSOrderedAscending;
-	} else {
-		return NSOrderedDescending;
-	}
-}
 
 - (void)MPMoviePlayerLoadStateDidChange:(NSNotification *)notification {
     
@@ -140,8 +128,8 @@ NSInteger bitratesPhoneSort(id media1, id media2, void *reverse)
     
     [buttonBitrate setTitle:[Utils getStrBitrate:[dic objectForKey:@"bitrate"]] forState:UIControlStateNormal];
     
-    NSString *strURL = [NSString stringWithFormat:@"http://cdnbakmi.kaltura.com/p/%d/sp/%d00/playManifest/entryId/%@/flavorIds/%@/format/applehttp/protocol/http/a.mp4", [Client instance].partnerId, [Client instance].partnerId, self.mediaEntry.id, [dic objectForKey:@"id"]];
-    
+    NSString *strURL = [[Client instance] getVideoURL:self.mediaEntry forFlavor:[dic objectForKey:@"id"]];
+        
     NSTimeInterval interval = self.moviePlayerViewController.moviePlayer.currentPlaybackTime;
     [self.moviePlayerViewController.moviePlayer stop];
     [self.moviePlayerViewController.moviePlayer setContentURL:[NSURL URLWithString:strURL]];
@@ -215,8 +203,6 @@ NSInteger bitratesPhoneSort(id media1, id media2, void *reverse)
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
 	
-//	[self updateInterfaceOrientation:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
-
     if (viewBitrates.alpha > 0.0) {
         viewBitrates.alpha = 0.0;
     }
@@ -226,40 +212,11 @@ NSInteger bitratesPhoneSort(id media1, id media2, void *reverse)
 }
 
 - (void)updateBitrates {
-    
-    KalturaClient *client = [Client instance].client;
-    
-    KalturaAssetFilter *_filter = [[KalturaAssetFilter alloc] init];
-    _filter.entryIdEqual = mediaEntry.id;
-    
-    KalturaFlavorAssetListResponse* _response = [client.flavorAsset listWithFilter:_filter];
-    [_filter release];
-    
+
     totalTimeLabel.text = [NSString stringWithFormat:@"/ %@", [Utils getTimeStr:self.mediaEntry.duration]];
     
-    NSLog(@"asset '%@'   %@", mediaEntry.id, mediaEntry.dataUrl);
+    self.bitrates = [[Client instance] getBitratesList:mediaEntry withFilter:@"iphonenew"];
     
-    for (KalturaFlavorAsset *asset in _response.objects) {
-        
-        if ([asset.tags rangeOfString:@"iphone"].length > 0) {
-            
-            NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] init];
-            
-            [dictionary setObject:asset.id forKey:@"id"];
-            [dictionary setObject:[NSNumber numberWithInt:asset.bitrate] forKey:@"bitrate"];
-            
-            [self.bitrates addObject:dictionary];
-            [dictionary release];
-            
-            //NSLog(@"%@  %@   %d", asset.id, asset.tags, asset.bitrate * 8);
-        }
-        
-    }
-    
-    [self.bitrates sortUsingFunction:bitratesPhoneSort context:nil];
-    
-   
-
     if ([self.bitrates count] > 0) {
         
         for (int i = 0; i < [self.bitrates count]; i++) {
@@ -312,9 +269,6 @@ NSInteger bitratesPhoneSort(id media1, id media2, void *reverse)
         
         self.moviePlayerViewController.moviePlayer.view.frame = CGRectMake(0, 0, (isLandscape ? 480 : 320), (isLandscape ? 300 : 460));
 
-        
-        // serviceUrl + '/p/' + partnerId + '/sp/' + partnerId + '00/playManifest/entryId/' + entryId + '/flavorIds/' + flavorIds.join(',') + '/format/applehttp/protocol/http/a.m3u8?ks=' + ks + '&referrer=' + base64_encode(application_name)
-        
         [self.view insertSubview:self.moviePlayerViewController.moviePlayer.view atIndex:0];
         [self registerForNotifications];
         
@@ -438,7 +392,6 @@ NSInteger bitratesPhoneSort(id media1, id media2, void *reverse)
 
 - (void)dealloc {
     
-    [self.bitrates removeAllObjects];
     [self.bitrates release];
     
     if (self.moviePlayerViewController) {
@@ -470,7 +423,6 @@ NSInteger bitratesPhoneSort(id media1, id media2, void *reverse)
 {
     [super viewDidAppear:YES];
     
-    self.bitrates = [[NSMutableArray alloc] init];
     [self updateBitrates];
     
     // Do any additional setup after loading the view from its nib.

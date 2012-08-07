@@ -17,7 +17,7 @@
     IBOutlet UIActivityIndicatorView *activity;
     
     KalturaMediaEntry *mediaEntry;
-    NSMutableArray *bitrates;
+    NSArray *bitrates;
     
     IBOutlet UIView *toolsView;
 
@@ -57,7 +57,7 @@
 - (IBAction)volumePressed:(UIButton *)button;
 
 @property (nonatomic, retain) KalturaMediaEntry *mediaEntry;
-@property (nonatomic, retain) NSMutableArray *bitrates;
+@property (nonatomic, retain) NSArray *bitrates;
 @property (nonatomic, retain) MPMoviePlayerViewController *moviePlayerViewController;
 
 @end

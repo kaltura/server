@@ -36,29 +36,12 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
-- (void)endUploading {
-    
-    if (token) {
-        
-        [token release];
-        
-    }
-    
-    KalturaClient *client = [Client instance].client;
-    client.delegate = nil;
-    client.uploadProgressDelegate = nil;
-    
-    
-}
+
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
     
     if (buttonIndex == 1) {
         
-        KalturaClient *client = [Client instance].client;
-        
-        [client cancelRequest];
-        
-        [self endUploading];
+        [[Client instance] cancelUploading];
         
         [app.navigation popToRootViewControllerAnimated:YES];
     }
@@ -69,7 +52,7 @@
 
 - (IBAction)menuBarButtonPressed:(UIButton *)button {
     
-    if (uploadedSize == 0) {
+    if (![[Client instance] uploadingInProgress]) {
         [app.navigation popToRootViewControllerAnimated:YES];
     } else {
         
@@ -79,17 +62,13 @@
     }
 }
 
-- (void)request:(ASIHTTPRequest *)request didSendBytes:(long long)bytes {
-    
-    uploadedSize += bytes;
-    
-    progressView.progress = (float)(uploadedSize * 300 / fileSize) / 300.0;
-    
+- (void)updateProgress:(NSNumber *)value {
+
+    progressView.progress = [value floatValue];
+
 }
 
-- (void)requestFinished:(KalturaClientBase*)aClient withResult:(id)result {
-    
-    NSLog(@"requestFinished");
+- (void)uploadFinished {
     
     if (self.cancelAlert) {
         
@@ -97,62 +76,31 @@
         
     }
     
-    [self endUploading];
-    
-    
     UploadSuccessViewController_iPhone *controller = [[UploadSuccessViewController_iPhone alloc] initWithNibName:@"UploadSuccessViewController_iPhone" bundle:nil];
     [app.navigation pushViewController:controller animated:YES];
     [controller release];
     
 }
 
-- (void)requestFailed:(KalturaClientBase*)aClient {
-    
-    NSLog(@"requestFailed");
-    
-    [self endUploading];
-    
-    
+- (void)uploadFailed {
+
     buttonMenu.enabled = YES;
+
+    [app.navigation popViewControllerAnimated:YES];
+
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Uploading error\nPlease try again" message:nil delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+    [alert show];
+    [alert release];
+    
+
     
 }
 
 - (void)uploadProcess {
     
-    KalturaClient *client = [Client instance].client;
-    client.delegate = nil;
+    [[Client instance] uploadProcess:data withDelegate:self];
     
-    token = [[KalturaUploadToken alloc] init];
-    token.fileName = @"video.m4v";
-    token = [client.uploadToken addWithUploadToken:token];
-    
-    // return: object, params: object
-    KalturaMediaEntry* entry = [[[KalturaMediaEntry alloc] init] autorelease];
-    entry.name = [self.data objectForKey:@"title"];
-    entry.mediaType = [KalturaMediaType VIDEO];
-    entry.categories = [self.data objectForKey:@"category"];
-    entry.description = [self.data objectForKey:@"description"];
-    entry.tags = [self.data objectForKey:@"tags"];
-    
-    entry = [client.media addWithEntry:entry];
-    
-    // return: object, params: string, object
-    KalturaUploadedFileTokenResource* resource = [[[KalturaUploadedFileTokenResource alloc] init] autorelease];
-    resource.token = token.id;
-    entry = [client.media addContentWithEntryId:entry.id withResource:resource];
-   
-    client.delegate = self;
-    client.uploadProgressDelegate = self;
-    
-    NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[self.data objectForKey:@"path"] error:nil];
-    
-    NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
-    fileSize = [fileSizeNumber longLongValue];
-    uploadedSize = 0;
-    
-    token = [client.uploadToken uploadWithUploadTokenId:token.id withFileData:[self.data objectForKey:@"path"]];
-
-    
+        
 }
 
 #pragma -
@@ -162,9 +110,7 @@
 
     [super viewDidAppear:YES];
     
-    
-    //NSLog([self.data description]);
-    [self performSelector:@selector(uploadProcess) withObject:nil afterDelay:0.1];
+     [self performSelector:@selector(uploadProcess) withObject:nil afterDelay:0.1];
 }
 
 - (void)viewDidLoad

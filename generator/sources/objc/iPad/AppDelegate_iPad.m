@@ -40,6 +40,24 @@
 		}
 	}
 
+    NSString *userEmail = [[NSUserDefaults standardUserDefaults] objectForKey:@"userEmail"];
+    
+    if (!userEmail || [userEmail length] == 0) {
+
+        NSString *userEmail = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UserEmail"];
+        NSString *userPassword = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UserPassword"];
+        
+        if (userEmail && [userEmail length] > 0 && userPassword && [userPassword length] > 0) {
+            
+            [[NSUserDefaults standardUserDefaults] setObject:userEmail forKey:@"userEmail"];
+            [[NSUserDefaults standardUserDefaults] setObject:userPassword forKey:@"userPassword"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            
+
+        }
+        
+    }
+    
     HomeViewController_iPad *homeController = [[HomeViewController_iPad alloc] initWithNibName:@"HomeViewController_iPad" bundle:nil];
     
     self.navigation = [[UINavigationController alloc] initWithRootViewController:homeController];

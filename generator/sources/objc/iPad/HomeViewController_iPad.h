@@ -10,7 +10,7 @@
 
 @class AppDelegate_iPad;
 
-@interface HomeViewController_iPad : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, KalturaClientDelegate, ASIProgressDelegate> {
+@interface HomeViewController_iPad : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate> {
     
     AppDelegate_iPad *app;
 
@@ -67,8 +67,6 @@
     IBOutlet UIPickerView *pickerCategories;
     IBOutlet UIToolbar *toolbar;
     
-    NSString *uploadFilePath;
-
     UIPopoverController *popoverController;
     
     int type;
@@ -77,8 +75,7 @@
     
     KalturaUploadToken* token;
     
-    long long fileSize;
-    long long uploadedSize;
+    NSString *uploadFilePath;
     
     UIAlertView *cancelAlert;
     
@@ -107,8 +104,8 @@
 
 - (IBAction)buttonUploadPressed;
 
-@property (nonatomic, retain) NSString *uploadFilePath;
 @property (nonatomic, retain) UIPopoverController *popoverController;
 @property (nonatomic, retain) UIAlertView *cancelAlert;
+@property (nonatomic, retain) NSString *uploadFilePath;
 
 @end

@@ -38,4 +38,37 @@
     
 }
 
++ (NSString *)getDocPath:(NSString *)fileName {
+	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES);
+	NSString *docsDir = [paths objectAtIndex:0];
+	
+	return [docsDir stringByAppendingPathComponent:fileName];
+}
+
++ (void)deleteBufferFile {
+    
+    NSString *bufferPath = [self getDocPath:@"buffer.tmp"];
+    
+    NSFileManager *fManager = [NSFileManager defaultManager];
+    if ([fManager fileExistsAtPath:bufferPath]) {
+        NSError *error;
+        [fManager removeItemAtPath:bufferPath error:&error];
+    }
+}
+
++ (void)createBuffer:(NSString *)path offset:(long long)offset {
+    
+    [self deleteBufferFile];
+    
+    NSString *bufferPath = [self getDocPath:@"buffer.tmp"];
+    
+    NSFileHandle *fileHandleIn = [NSFileHandle fileHandleForReadingAtPath:path];
+    [fileHandleIn seekToFileOffset:offset];
+    
+    NSData *data = [fileHandleIn readDataOfLength:CHUNK_SIZE];
+    
+    [data writeToFile:bufferPath atomically:NO];
+    [fileHandleIn closeFile];
+}
+
 @end

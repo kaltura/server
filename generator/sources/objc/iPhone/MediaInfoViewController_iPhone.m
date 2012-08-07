@@ -48,13 +48,11 @@
     
     if (button.tag == 0) {
         
-        NSString *strURL = [NSString stringWithFormat:@"https://www.facebook.com/sharer/sharer.php?u=%@", self.mediaEntry.dataUrl];
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:strURL]];
+        [[Client instance] shareFacebook:self.mediaEntry];
         
     } else if (button.tag == 1) {
         
-        NSString *strURL = [NSString stringWithFormat:@"http://twitter.com/intent/tweet?url=%@", self.mediaEntry.dataUrl];
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:strURL]];
+        [[Client instance] shareTwitter:self.mediaEntry];
         
         
     } else if (button.tag == 2) {
@@ -66,7 +64,7 @@
             
             [_controller setSubject:@"Kaltura"];
             
-            NSString *str = [NSString stringWithFormat:@"I just saw this great video on Kaltura mobile app, check it out:\n%@", self.mediaEntry.dataUrl];
+            NSString *str = [NSString stringWithFormat:@"I just saw this great video on Kaltura mobile app, check it out:\n%@", [[Client instance] getShareURL:self.mediaEntry]];
             [_controller setMessageBody:str isHTML:NO];
             
             [self presentModalViewController:_controller animated:YES];
