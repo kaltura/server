@@ -517,7 +517,7 @@ class sfFileCache extends sfCache
     $try = 1;
     while ($try <= 2)
     {
-      $tempFile = $path.$file.uniqid();
+      $tempFile = $path.$file.uniqid().getmypid();
       $fp = @fopen($tempFile, 'wb');
       if ($fp)
       {
