@@ -395,10 +395,12 @@ class entryFilter extends baseObjectFilter
 			
 			$category = categoryPeer::getByFullNameExactMatch($cat);
 			
-			$categoryId = $category->getId();
+			$categoryId = null;
 			
 			if(!$category)
 				$categoryId = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
+			else
+				$categoryId = $category->getId();
 			
 			foreach ($statuses as $status)
 			{
