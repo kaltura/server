@@ -163,6 +163,12 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	protected $created_at;
 
 	/**
+	 * The value for the updated_at field.
+	 * @var        string
+	 */
+	protected $updated_at;
+
+	/**
 	 * The value for the custom_data field.
 	 * @var        string
 	 */
@@ -507,6 +513,46 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 				$dt = new DateTime($this->created_at);
 			} catch (Exception $x) {
 				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
+	}
+
+	/**
+	 * Get the [optionally formatted] temporal [updated_at] column value.
+	 * 
+	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
+	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
+	 *
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw unix timestamp integer will be returned.
+	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 */
+	public function getUpdatedAt($format = 'Y-m-d H:i:s')
+	{
+		if ($this->updated_at === null) {
+			return null;
+		}
+
+
+		if ($this->updated_at === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->updated_at);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
 			}
 		}
 
@@ -1116,6 +1162,55 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	} // setCreatedAt()
 
 	/**
+	 * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+	 * 
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     syndicationFeed The current object (for fluent API support)
+	 */
+	public function setUpdatedAt($v)
+	{
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		if ( $this->updated_at !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = syndicationFeedPeer::UPDATED_AT;
+			}
+		} // if either are not null
+
+		return $this;
+	} // setUpdatedAt()
+
+	/**
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
@@ -1287,10 +1382,11 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			$this->feed_image_url = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
 			$this->feed_author = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
 			$this->created_at = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
-			$this->custom_data = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
-			$this->display_in_search = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
-			$this->enforce_entitlement = ($row[$startcol + 25] !== null) ? (boolean) $row[$startcol + 25] : null;
-			$this->privacy_context = ($row[$startcol + 26] !== null) ? (string) $row[$startcol + 26] : null;
+			$this->updated_at = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
+			$this->custom_data = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
+			$this->display_in_search = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
+			$this->enforce_entitlement = ($row[$startcol + 26] !== null) ? (boolean) $row[$startcol + 26] : null;
+			$this->privacy_context = ($row[$startcol + 27] !== null) ? (string) $row[$startcol + 27] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1300,7 +1396,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 27; // 27 = syndicationFeedPeer::NUM_COLUMNS - syndicationFeedPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 28; // 28 = syndicationFeedPeer::NUM_COLUMNS - syndicationFeedPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating syndicationFeed object", $e);
@@ -1569,6 +1665,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	{
     	$this->setCreatedAt(time());
     	
+		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
 	
@@ -1654,6 +1751,9 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			return true;
 		}	
 		
+		
+		if($this->isModified())
+			$this->setUpdatedAt(time());
 		
 		$this->tempModifiedColumns = $this->modifiedColumns;
 		return parent::preUpdate($con);
@@ -1827,15 +1927,18 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 				return $this->getCreatedAt();
 				break;
 			case 23:
-				return $this->getCustomData();
+				return $this->getUpdatedAt();
 				break;
 			case 24:
-				return $this->getDisplayInSearch();
+				return $this->getCustomData();
 				break;
 			case 25:
-				return $this->getEnforceEntitlement();
+				return $this->getDisplayInSearch();
 				break;
 			case 26:
+				return $this->getEnforceEntitlement();
+				break;
+			case 27:
 				return $this->getPrivacyContext();
 				break;
 			default:
@@ -1882,10 +1985,11 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			$keys[20] => $this->getFeedImageUrl(),
 			$keys[21] => $this->getFeedAuthor(),
 			$keys[22] => $this->getCreatedAt(),
-			$keys[23] => $this->getCustomData(),
-			$keys[24] => $this->getDisplayInSearch(),
-			$keys[25] => $this->getEnforceEntitlement(),
-			$keys[26] => $this->getPrivacyContext(),
+			$keys[23] => $this->getUpdatedAt(),
+			$keys[24] => $this->getCustomData(),
+			$keys[25] => $this->getDisplayInSearch(),
+			$keys[26] => $this->getEnforceEntitlement(),
+			$keys[27] => $this->getPrivacyContext(),
 		);
 		return $result;
 	}
@@ -1987,15 +2091,18 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 				$this->setCreatedAt($value);
 				break;
 			case 23:
-				$this->setCustomData($value);
+				$this->setUpdatedAt($value);
 				break;
 			case 24:
-				$this->setDisplayInSearch($value);
+				$this->setCustomData($value);
 				break;
 			case 25:
-				$this->setEnforceEntitlement($value);
+				$this->setDisplayInSearch($value);
 				break;
 			case 26:
+				$this->setEnforceEntitlement($value);
+				break;
+			case 27:
 				$this->setPrivacyContext($value);
 				break;
 		} // switch()
@@ -2045,10 +2152,11 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[20], $arr)) $this->setFeedImageUrl($arr[$keys[20]]);
 		if (array_key_exists($keys[21], $arr)) $this->setFeedAuthor($arr[$keys[21]]);
 		if (array_key_exists($keys[22], $arr)) $this->setCreatedAt($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setCustomData($arr[$keys[23]]);
-		if (array_key_exists($keys[24], $arr)) $this->setDisplayInSearch($arr[$keys[24]]);
-		if (array_key_exists($keys[25], $arr)) $this->setEnforceEntitlement($arr[$keys[25]]);
-		if (array_key_exists($keys[26], $arr)) $this->setPrivacyContext($arr[$keys[26]]);
+		if (array_key_exists($keys[23], $arr)) $this->setUpdatedAt($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setCustomData($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setDisplayInSearch($arr[$keys[25]]);
+		if (array_key_exists($keys[26], $arr)) $this->setEnforceEntitlement($arr[$keys[26]]);
+		if (array_key_exists($keys[27], $arr)) $this->setPrivacyContext($arr[$keys[27]]);
 	}
 
 	/**
@@ -2083,6 +2191,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(syndicationFeedPeer::FEED_IMAGE_URL)) $criteria->add(syndicationFeedPeer::FEED_IMAGE_URL, $this->feed_image_url);
 		if ($this->isColumnModified(syndicationFeedPeer::FEED_AUTHOR)) $criteria->add(syndicationFeedPeer::FEED_AUTHOR, $this->feed_author);
 		if ($this->isColumnModified(syndicationFeedPeer::CREATED_AT)) $criteria->add(syndicationFeedPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(syndicationFeedPeer::UPDATED_AT)) $criteria->add(syndicationFeedPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(syndicationFeedPeer::CUSTOM_DATA)) $criteria->add(syndicationFeedPeer::CUSTOM_DATA, $this->custom_data);
 		if ($this->isColumnModified(syndicationFeedPeer::DISPLAY_IN_SEARCH)) $criteria->add(syndicationFeedPeer::DISPLAY_IN_SEARCH, $this->display_in_search);
 		if ($this->isColumnModified(syndicationFeedPeer::ENFORCE_ENTITLEMENT)) $criteria->add(syndicationFeedPeer::ENFORCE_ENTITLEMENT, $this->enforce_entitlement);
@@ -2104,6 +2213,18 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		$criteria = new Criteria(syndicationFeedPeer::DATABASE_NAME);
 
 		$criteria->add(syndicationFeedPeer::ID, $this->id);
+		
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(syndicationFeedPeer::UPDATED_AT))
+		{
+			$theModifiedColumn = null;
+			foreach($this->modifiedColumns as $modifiedColumn)
+				if($modifiedColumn != syndicationFeedPeer::UPDATED_AT)
+					$theModifiedColumn = $modifiedColumn;
+					
+			$atomicColumns = syndicationFeedPeer::getAtomicColumns();
+			if(in_array($theModifiedColumn, $atomicColumns))
+				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+		}
 
 		return $criteria;
 	}
@@ -2184,6 +2305,8 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		$copyObj->setFeedAuthor($this->feed_author);
 
 		$copyObj->setCreatedAt($this->created_at);
+
+		$copyObj->setUpdatedAt($this->updated_at);
 
 		$copyObj->setCustomData($this->custom_data);
 
