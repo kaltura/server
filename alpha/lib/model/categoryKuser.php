@@ -44,6 +44,7 @@ class categoryKuser extends BasecategoryKuser {
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
 			
 		parent::setKuserId($kuser->getId());
+		parent::setScreenName($kuser->getScreenName());
 	}
 	
 	public function setKuserId($kuserId)
@@ -52,11 +53,11 @@ class categoryKuser extends BasecategoryKuser {
 			return;
 
 		parent::setKuserId($kuserId);
-			
+
 		$kuser = kuserPeer::retrieveByPK($kuserId);
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
-			
+
 		parent::setPuserId($kuser->getPuserId());
 		parent::setScreenName($kuser->getScreenName());
 	}
