@@ -20,8 +20,6 @@ class PartnerUsageController extends Zend_Controller_Action
 		$form = new Form_PartnerUsageFilter();
 		
 		$form->populate($request->getParams());
-		
-		
 		// when no statuses selected
 		if (!$form->getElement('include_active')->getValue() && !$form->getElement('include_blocked')->getValue() && !$form->getElement('include_removed')->getValue())
 		{
@@ -59,6 +57,10 @@ class PartnerUsageController extends Zend_Controller_Action
 		
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
+		
+		$auth = Infra_AuthHelper::getAuthInstance();
+		$this->view->partnerId = $auth->getIdentity()->getPartnerId();
+		
 		// set view
 		$this->view->from = $from;
 		$this->view->to = $to;
@@ -224,4 +226,5 @@ class PartnerUsageController extends Zend_Controller_Action
 	{
 		return sha1($salt . $str);
 	}
+	
 }
