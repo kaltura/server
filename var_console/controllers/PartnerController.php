@@ -259,7 +259,7 @@ class PartnerController extends Zend_Controller_Action
 	{
 	    $request = $this->getRequest();
 		$page = $this->_getParam('page', 1);
-		$pageSize = $this->_getParam('pageSize', 10);
+		$pageSize = $this->_getParam('pageSize', 500);
 		$settings = Zend_Registry::get('config')->settings;
 		// reset form url
 		$action = $this->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
