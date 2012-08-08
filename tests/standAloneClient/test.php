@@ -160,7 +160,7 @@ foreach($inXml->request as $request)
 	$actionName = strval($request['action']);
 	$pluginName = ucfirst(strval($request['plugin']));
 	
-	if(isset($pluginName)) //get plugin service
+	if(isset($pluginName) && $pluginName != '') //get plugin service
 	{
 		$pluginClass = "Kaltura{$pluginName}ClientPlugin";
 		require_once "lib/KalturaPlugins/$pluginClass.php";
