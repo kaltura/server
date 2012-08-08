@@ -58,6 +58,7 @@ class categoryKuser extends BasecategoryKuser {
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $this->userId);
 			
 		parent::setPuserId($kuser->getPuserId());
+		parent::setScreenName($kuser->getScreenName());
 	}
 	
 	public function setStatus($v)
@@ -178,6 +179,12 @@ class categoryKuser extends BasecategoryKuser {
 			throw new kCoreException('category id [' . $this->getCategoryId() . 'was not found', kCoreException::ID_NOT_FOUND);
 			
 		$this->setCategoryFullIds($category->getFullIds());
+	}
+	
+	public function reSetScreenName()
+	{
+		$kuser = kuserPeer::retrieveByPK($this->getKuserId());
+		$this->setScreenName($kuser->getScreenName());
 	}
 	
 	//	set properties in custom data

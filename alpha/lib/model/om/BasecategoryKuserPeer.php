@@ -26,7 +26,7 @@ abstract class BasecategoryKuserPeer {
 	const TM_CLASS = 'categoryKuserTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 13;
+	const NUM_COLUMNS = 14;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -42,6 +42,9 @@ abstract class BasecategoryKuserPeer {
 
 	/** the column name for the PUSER_ID field */
 	const PUSER_ID = 'category_kuser.PUSER_ID';
+
+	/** the column name for the SCREEN_NAME field */
+	const SCREEN_NAME = 'category_kuser.SCREEN_NAME';
 
 	/** the column name for the PARTNER_ID field */
 	const PARTNER_ID = 'category_kuser.PARTNER_ID';
@@ -86,11 +89,11 @@ abstract class BasecategoryKuserPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CategoryId', 'KuserId', 'PuserId', 'PartnerId', 'PermissionLevel', 'Status', 'InheritFromCategory', 'UpdateMethod', 'CreatedAt', 'UpdatedAt', 'CustomData', 'CategoryFullIds', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'categoryId', 'kuserId', 'puserId', 'partnerId', 'permissionLevel', 'status', 'inheritFromCategory', 'updateMethod', 'createdAt', 'updatedAt', 'customData', 'categoryFullIds', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CATEGORY_ID, self::KUSER_ID, self::PUSER_ID, self::PARTNER_ID, self::PERMISSION_LEVEL, self::STATUS, self::INHERIT_FROM_CATEGORY, self::UPDATE_METHOD, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, self::CATEGORY_FULL_IDS, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'category_id', 'kuser_id', 'puser_id', 'partner_id', 'permission_level', 'status', 'inherit_from_category', 'update_method', 'created_at', 'updated_at', 'custom_data', 'category_full_ids', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CategoryId', 'KuserId', 'PuserId', 'ScreenName', 'PartnerId', 'PermissionLevel', 'Status', 'InheritFromCategory', 'UpdateMethod', 'CreatedAt', 'UpdatedAt', 'CustomData', 'CategoryFullIds', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'categoryId', 'kuserId', 'puserId', 'screenName', 'partnerId', 'permissionLevel', 'status', 'inheritFromCategory', 'updateMethod', 'createdAt', 'updatedAt', 'customData', 'categoryFullIds', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CATEGORY_ID, self::KUSER_ID, self::PUSER_ID, self::SCREEN_NAME, self::PARTNER_ID, self::PERMISSION_LEVEL, self::STATUS, self::INHERIT_FROM_CATEGORY, self::UPDATE_METHOD, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, self::CATEGORY_FULL_IDS, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'category_id', 'kuser_id', 'puser_id', 'screen_name', 'partner_id', 'permission_level', 'status', 'inherit_from_category', 'update_method', 'created_at', 'updated_at', 'custom_data', 'category_full_ids', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
 	);
 
 	/**
@@ -100,11 +103,11 @@ abstract class BasecategoryKuserPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CategoryId' => 1, 'KuserId' => 2, 'PuserId' => 3, 'PartnerId' => 4, 'PermissionLevel' => 5, 'Status' => 6, 'InheritFromCategory' => 7, 'UpdateMethod' => 8, 'CreatedAt' => 9, 'UpdatedAt' => 10, 'CustomData' => 11, 'CategoryFullIds' => 12, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'categoryId' => 1, 'kuserId' => 2, 'puserId' => 3, 'partnerId' => 4, 'permissionLevel' => 5, 'status' => 6, 'inheritFromCategory' => 7, 'updateMethod' => 8, 'createdAt' => 9, 'updatedAt' => 10, 'customData' => 11, 'categoryFullIds' => 12, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CATEGORY_ID => 1, self::KUSER_ID => 2, self::PUSER_ID => 3, self::PARTNER_ID => 4, self::PERMISSION_LEVEL => 5, self::STATUS => 6, self::INHERIT_FROM_CATEGORY => 7, self::UPDATE_METHOD => 8, self::CREATED_AT => 9, self::UPDATED_AT => 10, self::CUSTOM_DATA => 11, self::CATEGORY_FULL_IDS => 12, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'category_id' => 1, 'kuser_id' => 2, 'puser_id' => 3, 'partner_id' => 4, 'permission_level' => 5, 'status' => 6, 'inherit_from_category' => 7, 'update_method' => 8, 'created_at' => 9, 'updated_at' => 10, 'custom_data' => 11, 'category_full_ids' => 12, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CategoryId' => 1, 'KuserId' => 2, 'PuserId' => 3, 'ScreenName' => 4, 'PartnerId' => 5, 'PermissionLevel' => 6, 'Status' => 7, 'InheritFromCategory' => 8, 'UpdateMethod' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, 'CustomData' => 12, 'CategoryFullIds' => 13, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'categoryId' => 1, 'kuserId' => 2, 'puserId' => 3, 'screenName' => 4, 'partnerId' => 5, 'permissionLevel' => 6, 'status' => 7, 'inheritFromCategory' => 8, 'updateMethod' => 9, 'createdAt' => 10, 'updatedAt' => 11, 'customData' => 12, 'categoryFullIds' => 13, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CATEGORY_ID => 1, self::KUSER_ID => 2, self::PUSER_ID => 3, self::SCREEN_NAME => 4, self::PARTNER_ID => 5, self::PERMISSION_LEVEL => 6, self::STATUS => 7, self::INHERIT_FROM_CATEGORY => 8, self::UPDATE_METHOD => 9, self::CREATED_AT => 10, self::UPDATED_AT => 11, self::CUSTOM_DATA => 12, self::CATEGORY_FULL_IDS => 13, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'category_id' => 1, 'kuser_id' => 2, 'puser_id' => 3, 'screen_name' => 4, 'partner_id' => 5, 'permission_level' => 6, 'status' => 7, 'inherit_from_category' => 8, 'update_method' => 9, 'created_at' => 10, 'updated_at' => 11, 'custom_data' => 12, 'category_full_ids' => 13, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
 	);
 
 	/**
@@ -178,6 +181,7 @@ abstract class BasecategoryKuserPeer {
 		$criteria->addSelectColumn(categoryKuserPeer::CATEGORY_ID);
 		$criteria->addSelectColumn(categoryKuserPeer::KUSER_ID);
 		$criteria->addSelectColumn(categoryKuserPeer::PUSER_ID);
+		$criteria->addSelectColumn(categoryKuserPeer::SCREEN_NAME);
 		$criteria->addSelectColumn(categoryKuserPeer::PARTNER_ID);
 		$criteria->addSelectColumn(categoryKuserPeer::PERMISSION_LEVEL);
 		$criteria->addSelectColumn(categoryKuserPeer::STATUS);

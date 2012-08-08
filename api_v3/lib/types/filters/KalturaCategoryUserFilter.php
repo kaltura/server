@@ -7,6 +7,7 @@ class KalturaCategoryUserFilter extends KalturaCategoryUserBaseFilter
 {
 	private $map_between_objects = array
 	(
+		"freeText" => "_mlikeor_screen_name-puser_id",
 		"categoryDirectMembers" => "_category_direct_members",
 	);
 	
@@ -33,4 +34,10 @@ class KalturaCategoryUserFilter extends KalturaCategoryUserBaseFilter
 	 * @requiresPermission read
 	 */
 	public $categoryDirectMembers;
+	
+	/**
+	 * Free text search on user id or screen name
+	 * @var string
+	 */
+	public $freeText;
 }

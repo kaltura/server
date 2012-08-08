@@ -40,6 +40,7 @@ class categoryKuserFilter extends baseObjectFilter
 				"_likex_category_full_ids",
 				"_eq_category_full_ids",
 				"_category_direct_members",
+				"_mlikeor_screen_name-puser_id",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name");

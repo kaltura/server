@@ -44,6 +44,12 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 	protected $puser_id;
 
 	/**
+	 * The value for the screen_name field.
+	 * @var        string
+	 */
+	protected $screen_name;
+
+	/**
 	 * The value for the partner_id field.
 	 * @var        int
 	 */
@@ -190,6 +196,16 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 	public function getPuserId()
 	{
 		return $this->puser_id;
+	}
+
+	/**
+	 * Get the [screen_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getScreenName()
+	{
+		return $this->screen_name;
 	}
 
 	/**
@@ -441,6 +457,29 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setPuserId()
+
+	/**
+	 * Set the value of [screen_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     categoryKuser The current object (for fluent API support)
+	 */
+	public function setScreenName($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryKuserPeer::SCREEN_NAME]))
+			$this->oldColumnsValues[categoryKuserPeer::SCREEN_NAME] = $this->screen_name;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->screen_name !== $v) {
+			$this->screen_name = $v;
+			$this->modifiedColumns[] = categoryKuserPeer::SCREEN_NAME;
+		}
+
+		return $this;
+	} // setScreenName()
 
 	/**
 	 * Set the value of [partner_id] column.
@@ -734,15 +773,16 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			$this->category_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->kuser_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
 			$this->puser_id = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->partner_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->permission_level = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->inherit_from_category = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->update_method = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->created_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->updated_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->custom_data = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->category_full_ids = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->screen_name = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->partner_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->permission_level = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+			$this->status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->inherit_from_category = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->update_method = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->created_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->updated_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->custom_data = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->category_full_ids = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -752,7 +792,7 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 13; // 13 = categoryKuserPeer::NUM_COLUMNS - categoryKuserPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 14; // 14 = categoryKuserPeer::NUM_COLUMNS - categoryKuserPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating categoryKuser object", $e);
@@ -1272,30 +1312,33 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 				return $this->getPuserId();
 				break;
 			case 4:
-				return $this->getPartnerId();
+				return $this->getScreenName();
 				break;
 			case 5:
-				return $this->getPermissionLevel();
+				return $this->getPartnerId();
 				break;
 			case 6:
-				return $this->getStatus();
+				return $this->getPermissionLevel();
 				break;
 			case 7:
-				return $this->getInheritFromCategory();
+				return $this->getStatus();
 				break;
 			case 8:
-				return $this->getUpdateMethod();
+				return $this->getInheritFromCategory();
 				break;
 			case 9:
-				return $this->getCreatedAt();
+				return $this->getUpdateMethod();
 				break;
 			case 10:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 11:
-				return $this->getCustomData();
+				return $this->getUpdatedAt();
 				break;
 			case 12:
+				return $this->getCustomData();
+				break;
+			case 13:
 				return $this->getCategoryFullIds();
 				break;
 			default:
@@ -1323,15 +1366,16 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 			$keys[1] => $this->getCategoryId(),
 			$keys[2] => $this->getKuserId(),
 			$keys[3] => $this->getPuserId(),
-			$keys[4] => $this->getPartnerId(),
-			$keys[5] => $this->getPermissionLevel(),
-			$keys[6] => $this->getStatus(),
-			$keys[7] => $this->getInheritFromCategory(),
-			$keys[8] => $this->getUpdateMethod(),
-			$keys[9] => $this->getCreatedAt(),
-			$keys[10] => $this->getUpdatedAt(),
-			$keys[11] => $this->getCustomData(),
-			$keys[12] => $this->getCategoryFullIds(),
+			$keys[4] => $this->getScreenName(),
+			$keys[5] => $this->getPartnerId(),
+			$keys[6] => $this->getPermissionLevel(),
+			$keys[7] => $this->getStatus(),
+			$keys[8] => $this->getInheritFromCategory(),
+			$keys[9] => $this->getUpdateMethod(),
+			$keys[10] => $this->getCreatedAt(),
+			$keys[11] => $this->getUpdatedAt(),
+			$keys[12] => $this->getCustomData(),
+			$keys[13] => $this->getCategoryFullIds(),
 		);
 		return $result;
 	}
@@ -1376,30 +1420,33 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 				$this->setPuserId($value);
 				break;
 			case 4:
-				$this->setPartnerId($value);
+				$this->setScreenName($value);
 				break;
 			case 5:
-				$this->setPermissionLevel($value);
+				$this->setPartnerId($value);
 				break;
 			case 6:
-				$this->setStatus($value);
+				$this->setPermissionLevel($value);
 				break;
 			case 7:
-				$this->setInheritFromCategory($value);
+				$this->setStatus($value);
 				break;
 			case 8:
-				$this->setUpdateMethod($value);
+				$this->setInheritFromCategory($value);
 				break;
 			case 9:
-				$this->setCreatedAt($value);
+				$this->setUpdateMethod($value);
 				break;
 			case 10:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 11:
-				$this->setCustomData($value);
+				$this->setUpdatedAt($value);
 				break;
 			case 12:
+				$this->setCustomData($value);
+				break;
+			case 13:
 				$this->setCategoryFullIds($value);
 				break;
 		} // switch()
@@ -1430,15 +1477,16 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setCategoryId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setKuserId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setPuserId($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setPartnerId($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setPermissionLevel($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setInheritFromCategory($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setUpdateMethod($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setCustomData($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setCategoryFullIds($arr[$keys[12]]);
+		if (array_key_exists($keys[4], $arr)) $this->setScreenName($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setPartnerId($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setPermissionLevel($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setStatus($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setInheritFromCategory($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setUpdateMethod($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setCustomData($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setCategoryFullIds($arr[$keys[13]]);
 	}
 
 	/**
@@ -1454,6 +1502,7 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryKuserPeer::CATEGORY_ID)) $criteria->add(categoryKuserPeer::CATEGORY_ID, $this->category_id);
 		if ($this->isColumnModified(categoryKuserPeer::KUSER_ID)) $criteria->add(categoryKuserPeer::KUSER_ID, $this->kuser_id);
 		if ($this->isColumnModified(categoryKuserPeer::PUSER_ID)) $criteria->add(categoryKuserPeer::PUSER_ID, $this->puser_id);
+		if ($this->isColumnModified(categoryKuserPeer::SCREEN_NAME)) $criteria->add(categoryKuserPeer::SCREEN_NAME, $this->screen_name);
 		if ($this->isColumnModified(categoryKuserPeer::PARTNER_ID)) $criteria->add(categoryKuserPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(categoryKuserPeer::PERMISSION_LEVEL)) $criteria->add(categoryKuserPeer::PERMISSION_LEVEL, $this->permission_level);
 		if ($this->isColumnModified(categoryKuserPeer::STATUS)) $criteria->add(categoryKuserPeer::STATUS, $this->status);
@@ -1534,6 +1583,8 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 		$copyObj->setKuserId($this->kuser_id);
 
 		$copyObj->setPuserId($this->puser_id);
+
+		$copyObj->setScreenName($this->screen_name);
 
 		$copyObj->setPartnerId($this->partner_id);
 
