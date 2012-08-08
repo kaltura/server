@@ -256,13 +256,14 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			if($kuser)
 			{
 				$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
-				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . $manager . ' << ' . $kuser->getid() .' << ' . $manager . ')';
+				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . $manager . '_' . $kuser->getid() . ')';
 			}
 		}
 		$filter->unsetByName('_eq_manager');
 		
 		if($filter->get('_eq_member'))
 		{
+			//memeber but not a menager
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id; 
 			
 			$puserId = $filter->get('_eq_member');
@@ -270,7 +271,14 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			if($kuser)
 			{
 				$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
-				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . $kuser->getid() . ' !(' . $manager . ' << ' . $kuser->getid() .' << ' . $manager .'))';
+				$member = category::getPermissionLevelName(CategoryKuserPermissionLevel::MEMBER);
+				$moderator = category::getPermissionLevelName(CategoryKuserPermissionLevel::MODERATOR);
+				$contributor = category::getPermissionLevelName(CategoryKuserPermissionLevel::CONTRIBUTOR);
+				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . 
+					'(' . $member . '_' . $kuser->getid() . ' | ' . 
+						  $moderator . '_' . $kuser->getid() . ' | ' . 
+						  $contributor . '_' . $kuser->getid() . ' ) ' . 
+						  ' !(' . $manager . '_' . $kuser->getid() . '))';
 			}
 		}
 		$filter->unsetByName('_eq_member');

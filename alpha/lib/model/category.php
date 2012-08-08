@@ -895,9 +895,10 @@ class category extends Basecategory implements IIndexable
 		
 		$membersIds = array();
 		foreach ($membersIdsByPermission as $permissionLevel => $membersIdByPermission)
-			$membersIds[] = self::getPermissionLevelName($permissionLevel) . ' ' . 
-							implode(' ', $membersIdByPermission) . ' ' . 
-							self::getPermissionLevelName($permissionLevel); 
+		{
+			$permissionLevelByName = self::getPermissionLevelName($permissionLevel);
+			$membersIds[] = $permissionLevelByName . '_' . implode($permissionLevelByName . '_', $membersIdByPermission);
+		}
 		
 		return implode(' ', $membersIds);
 	}
