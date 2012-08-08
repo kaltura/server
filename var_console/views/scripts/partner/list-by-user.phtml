@@ -13,11 +13,6 @@
 				<th><?php echo $this->translate('Options'); ?></th>
 			</tr>
 		</thead>
-		<tfoot>
-			<tr>
-				<td colspan="16"><?php echo $this->paginator; ?></td>
-			</tr>
-		</tfoot>
 		<tbody>
 			<?php foreach($this->paginator as /* Kaltura_Client_Type_Partner */ $partner): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
