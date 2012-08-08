@@ -206,7 +206,7 @@ class category extends Basecategory implements IIndexable
 
 		parent::save($con);
 		
-		if ($kuserChanged && $this->inheritance_type != InheritanceType::INHERIT)
+		if ($kuserChanged && $this->inheritance_type != InheritanceType::INHERIT && $this->getKuserId())
 		{	
 			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->getId(), $this->getKuserId());
 			if (!$categoryKuser)

@@ -185,7 +185,11 @@ class categoryKuser extends BasecategoryKuser {
 	public function reSetScreenName()
 	{
 		$kuser = kuserPeer::retrieveByPK($this->getKuserId());
-		$this->setScreenName($kuser->getScreenName());
+		
+		if($kuser)
+		{
+			$this->setScreenName($kuser->getScreenName());
+		}
 	}
 	
 	//	set properties in custom data
