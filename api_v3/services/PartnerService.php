@@ -353,10 +353,11 @@ class PartnerService extends KalturaBaseService
 	 * 
 	 * @action listPartnersForUser
 	 * @param KalturaPartnerFilter $partnerFilter
+	 * @param KalturaFilterPager $pager
 	 * @return KalturaPartnerListResponse
 	 * 
 	 */
-	public function listPartnersForUserAction(KalturaPartnerFilter $partnerFilter = null)
+	public function listPartnersForUserAction(KalturaPartnerFilter $partnerFilter = null, KalturaFilterPager $pager)
 	{	
 		$partnerId = kCurrentContext::$master_partner_id;
 		
@@ -380,6 +381,7 @@ class PartnerService extends KalturaBaseService
 		    $partnerFilter->toObject($partnerDbFilter);
 		    $partnerDbFilter->setIdIn($allowedIds);
 		    $partnerDbFilter->attachToCriteria($c);
+		    $pager->attachToCriteria($c);
 		}
 		
 		$partners = array();
