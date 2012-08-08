@@ -373,7 +373,7 @@ class PartnerService extends KalturaBaseService
 		    throw new kCoreException("User with id $userId not found", kCoreException::INVALID_USER_ID, $userId);
 		}
 		
-		if (!pager)
+		if (!$pager)
 		{
 		    $pager = new KalturaFilterPager();
 		}
