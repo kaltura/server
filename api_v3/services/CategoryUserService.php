@@ -427,6 +427,7 @@ class CategoryUserService extends KalturaBaseService
 		}
 				
 		$dbCategoryKuser->reSetCategoryFullIds();
+		$dbCategoryKuser->reSetScreenName();
 		$dbCategoryKuser->save();
 		
 		return $dbCategoryKuser->getId();
