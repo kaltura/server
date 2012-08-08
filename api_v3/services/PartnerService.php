@@ -357,7 +357,7 @@ class PartnerService extends KalturaBaseService
 	 * @return KalturaPartnerListResponse
 	 * 
 	 */
-	public function listPartnersForUserAction(KalturaPartnerFilter $partnerFilter = null, KalturaFilterPager $pager)
+	public function listPartnersForUserAction(KalturaPartnerFilter $partnerFilter = null, KalturaFilterPager $pager = null)
 	{	
 		$partnerId = kCurrentContext::$master_partner_id;
 		
@@ -371,6 +371,11 @@ class PartnerService extends KalturaBaseService
 		{
 		    $userId = kCurrentContext::$ks_uid;
 		    throw new kCoreException("User with id $userId not found", kCoreException::INVALID_USER_ID, $userId);
+		}
+		
+		if (!pager)
+		{
+		    $pager = new KalturaFilterPager();
 		}
 		
 		$allowedIds = $currentUser->getAllowedPartnerIds();
