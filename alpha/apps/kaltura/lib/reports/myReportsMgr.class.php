@@ -396,12 +396,18 @@ class myReportsMgr
 			$report_type , 
 			$input_filter , $object_ids );			
 		
+			
 		list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id , 
 			$report_type , 
 			$input_filter ,
 			$page_size , $page_index ,
 			$order_by ,  $object_ids );		
 
+		if ($input_filter instanceof endUserReportsInputFilter)
+		{
+			$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
+		}
+			
 		$data = myCsvReport::createReport( $report_title , $report_text , $headers ,
 			$report_type , $input_filter , $dimension , 
 			$arr , $total_header , $total_data , $table_header , $table_data , $table_total_count);
