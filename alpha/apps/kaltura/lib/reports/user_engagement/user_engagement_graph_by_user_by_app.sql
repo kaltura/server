@@ -26,4 +26,3 @@ WHERE
 		  count_loads > 0 )
 GROUP BY DATE(DATE(date_id) + INTERVAL hour_id HOUR + INTERVAL {TIME_SHIFT} HOUR)*1
 ORDER BY DATE(DATE(date_id) + INTERVAL hour_id HOUR + INTERVAL {TIME_SHIFT} HOUR)*1
-LIMIT 0,365  /* pagination  */

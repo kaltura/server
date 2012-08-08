@@ -16,5 +16,4 @@ FROM kalturadw.dwh_hourly_events_country ev, dwh_dim_locations c
 			AND hour_id < IF (date_id = IF({TIME_SHIFT}<=0,(DATE({TO_DATE_ID}) + INTERVAL 1 DAY)*1, {TO_DATE_ID}), IF({TIME_SHIFT}>0, 24 - {TIME_SHIFT}, ABS({TIME_SHIFT})), 24)
 GROUP BY ev.country_id,c.country
 ORDER BY count_plays DESC
-LIMIT 0,365  /* pagination  */ 
 	
