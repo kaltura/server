@@ -1202,17 +1202,16 @@ class kJobsManager
 		return self::addJob($batchJob, $moveCategoryEntriesData, BatchJobType::MOVE_CATEGORY_ENTRIES);
 	}
 	
-	public static function addStorageDeleteJob(BatchJob $parentJob = null, $entryId = null, StorageProfile $storage, FileSyncKey $syncKey)
+	public static function addStorageDeleteJob(BatchJob $parentJob = null, $entryId = null, StorageProfile $storage, FileSync $fileSync)
 	{
-		$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
-		$fileSync = FileSyncPeer::retrieveByFileSyncKey($syncKey);
-		
+		//$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
+		//$fileSync = FileSyncPeer::retrieveByFileSyncKey($syncKey);
 		$netStorageDeleteData = new kStorageDeleteJobData();
 	    $netStorageDeleteData->setServerUrl($storage->getStorageUrl()); 
 	    $netStorageDeleteData->setServerUsername($storage->getStorageUsername()); 
 	    $netStorageDeleteData->setServerPassword($storage->getStoragePassword());
 	    $netStorageDeleteData->setFtpPassiveMode($storage->getStorageFtpPassiveMode());
-	    $netStorageDeleteData->setSrcFileSyncLocalPath($srcFileSyncLocalPath);
+	    $netStorageDeleteData->setSrcFileSyncLocalPath($fileSync->getFilePath());
 		$netStorageDeleteData->setSrcFileSyncId($fileSync->getId());
 		$netStorageDeleteData->setDestFileSyncStoredPath($storage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
 		if ($parentJob)

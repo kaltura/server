@@ -297,7 +297,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				
 			case FileSyncObjectType::ASSET:
 				assetPeer::setUseCriteriaFilter(false);
-				$asset = assetPeer::retrieveByPK($object->getObjectId());
+				$asset = assetPeer::retrieveById($object->getId());
 				if ($asset)
 				{
 					$entryId = $asset->getEntryId();
@@ -322,7 +322,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		
 		$storage = StorageProfilePeer::retrieveByPK($object->getDc());
 		
-		kJobsManager::addStorageDeleteJob($raisedJob, $entryId ,$storage, $syncKey);		
+		kJobsManager::addStorageDeleteJob($raisedJob, $entryId ,$storage, $object);		
 	}
 	
 	/**
