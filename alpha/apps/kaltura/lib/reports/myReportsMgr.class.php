@@ -647,7 +647,7 @@ class myReportsMgr
 				$obj_ids_clause = "ev.entry_id in ( $entryIds )";
 			}
 			
-			if ($input_filter instanceof endUserReportsInputFilter && $input_filter->userIds && ($report_type == self::REPORT_TYPE_USER_USAGE || $report_type == self::REPORT_TYPE_SPECIFIC_USER_USAGE) ) {
+			if ($input_filter instanceof endUserReportsInputFilter && ($input_filter->userIds != null) && ($report_type == self::REPORT_TYPE_USER_USAGE || $report_type == self::REPORT_TYPE_SPECIFIC_USER_USAGE) ) {
 					$userFilter = new kuserFilter();
 					$userFilter->set("_in_puser_id", $input_filter->userIds);
 					$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
