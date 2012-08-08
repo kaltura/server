@@ -2433,8 +2433,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if($this->isColumnModified(entryPeer::STATUS) && $this->getStatus() == entryStatus::DELETED)
 			$objectDeleted = true;
 			
-		$ret = parent::postUpdate($con);
-	
 		$trackColumns = array(
 			entryPeer::STATUS,
 			entryPeer::MODERATION_STATUS,
@@ -2455,6 +2453,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 		}
 		
+		$ret = parent::postUpdate($con);
+	
 		if($objectDeleted)
 		{
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
