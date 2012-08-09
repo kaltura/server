@@ -145,7 +145,6 @@ class UserController extends Zend_Controller_Action
 	 */
 	public function adminLoginAction ()
 	{
-	    KalturaLog::debug('here');
 	    $ks = $this->_getParam('ks');
 	    
 	    $form = new Form_AdminLogin();
