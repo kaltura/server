@@ -621,6 +621,7 @@ class kFile
 
 	public static function dumpUrl($url, $allowRange = true, $passHeaders = false)
 	{
+		KalturaLog::debug("URL [$url], $allowRange [$allowRange], $passHeaders [$passHeaders]");
 		self::closeDbConnections();
 		
 		$ch = curl_init();
@@ -687,6 +688,7 @@ class kFile
 		header("X-Kaltura:dumpUrl");
 		// grab URL and pass it to the browser
 		$content = curl_exec($ch);
+		KalturaLog::debug("CURL executed [$content]");
 		
 		// close curl resource, and free up system resources
 		curl_close($ch);
