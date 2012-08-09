@@ -5,18 +5,28 @@
  */
 class Infra_AuthPlugin extends Zend_Controller_Plugin_Abstract 
 {
-	private $_whitelist;
-	
-	public function __construct() 
-	{
-		$this->_whitelist = array(
+	private static $_whitelist = array(
 			'error/error', 
 			'error/denied', 
 			'user/login', 
 			'user/reset-password', 
 			'user/reset-password-link', 
-			'user/reset-password-ok'
+			'user/reset-password-ok',
+			
 		);
+	
+	public function __construct() 
+	{
+		
+	}
+	
+	/**
+	 * Add a certain URL to the whitelist
+	 * @param string $url
+	 */
+	public static function addToWhitelist ($url)
+	{
+	    self::$_whitelist[] = $url;
 	}
 	
 	public function preDispatch(Zend_Controller_Request_Abstract $request) 
@@ -25,7 +35,7 @@ class Infra_AuthPlugin extends Zend_Controller_Plugin_Abstract
 		$action = strtolower($request->getActionName());
 		$route = $controller . '/' . $action;
 		
-		if (in_array($route, $this->_whitelist)) {
+		if (in_array($route, self::$_whitelist)) {
 			return;
 		}
 		

@@ -236,7 +236,7 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
       			if ($requiredPermissions != '*')
       			{
 	      			$allAccess[$resource] = $requiredPermissions;
-      				
+	      			
       				$requiredPermissions = array_map('trim', explode(',', $requiredPermissions));
 	      			
 	      			foreach ($requiredPermissions as $required) {
@@ -282,6 +282,12 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		      					break;
 		      				}
 		      			}
+		      		}
+		      		else
+		      		{
+		      		    //If no special permission is required to view this resource, it should be added to the whitelisted resources
+    	      			$resourceUrl = "$resource/$action";
+    	      			Infra_AuthPlugin::addToWhitelist($resourceUrl);
 		      		}
 	      			
 	      			if ($allow) {
