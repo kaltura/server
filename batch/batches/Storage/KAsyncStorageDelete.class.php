@@ -42,7 +42,9 @@ class KAsyncStorageDelete extends KJobHandlerWorker
 	protected function getFilter()
 	{
 		$filter = parent::getFilter();
-		$filter->jobSubTypeIn = $this->getSupportedProtocols();
+		
+		if(is_null($filter->jobSubTypeIn))
+			$filter->jobSubTypeIn = $this->getSupportedProtocols();
 		
 		if($this->taskConfig->params->minFileSize && is_numeric($this->taskConfig->params->minFileSize))
 			$filter->fileSizeGreaterThan = $this->taskConfig->params->minFileSize;
