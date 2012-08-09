@@ -274,11 +274,9 @@ class SphinxCategoryCriteria extends SphinxCriteria
 				$member = category::getPermissionLevelName(CategoryKuserPermissionLevel::MEMBER);
 				$moderator = category::getPermissionLevelName(CategoryKuserPermissionLevel::MODERATOR);
 				$contributor = category::getPermissionLevelName(CategoryKuserPermissionLevel::CONTRIBUTOR);
+				$kuserId = $kuser->getid();
 				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . 
-					'(' . $member . '_' . $kuser->getid() . ' | ' . 
-						  $moderator . '_' . $kuser->getid() . ' | ' . 
-						  $contributor . '_' . $kuser->getid() . ' ) ' . 
-						  ' !(' . $manager . '_' . $kuser->getid() . '))';
+					"({$member}_{$kuserId} | {$moderator}_{$kuserId} | {$contributor}_{$kuserId} ) !({$manager}_{$kuserId}))";
 			}
 		}
 		$filter->unsetByName('_eq_member');
