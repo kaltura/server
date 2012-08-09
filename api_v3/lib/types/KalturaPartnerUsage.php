@@ -32,7 +32,7 @@ class KalturaPartnerUsage extends KalturaObject
 	/**
 	 * total usage in GB - including bandwidth and storage
 	 * 
-	 * @var int
+	 * @var float
 	 * @readonly
 	 */
 	public $usageGB;
