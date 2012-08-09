@@ -871,7 +871,11 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/**
-	 * return space seperated string of kusers ids that are active members on this category. 
+	 * Return space seperated string of permission level and kusers ids that are active members on this category.
+	 * Example: "CONTRIBUTOR kuserId1 kuserId2 CONTRIBUTOR MANAGER kuserId3 kuserId4 MANAGER"
+	 * Used by index engine.
+	 * 
+	 * @return string
 	 */	
 	public function getMembersByPermissionLevel()
 	{
@@ -905,7 +909,9 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/**
-	 * return kusers ids that are active members on this category. 
+	 * Return kusers ids that are active members on this category.
+	 *  
+	 * @return array
 	 */	
 	public function getMembers()
 	{
@@ -933,19 +939,15 @@ class category extends Basecategory implements IIndexable
 		{
 			case CategoryKuserPermissionLevel::CONTRIBUTOR:
 				return 'CONTRIBUTOR';
-				break;
 				
 			case CategoryKuserPermissionLevel::MANAGER:
 				return 'MANAGER';
-				break;
 				
 			case CategoryKuserPermissionLevel::MEMBER:
 				return 'MEMBER';
-				break;
 				
 			case CategoryKuserPermissionLevel::MODERATOR:
 				return 'MODERATOR';
-				break;
 		}
 		
 		return '';
