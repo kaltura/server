@@ -29,6 +29,8 @@ class kContentDistributionManager
 	
 	protected static function addImportJob($dc, $entryUrl, asset $asset)
 	{
+		KalturaLog::debug("Importing asset [" . $asset->getId() . "] from dc [$dc] with URL [$entryUrl]");
+		
 		$entryUrl = str_replace('//', '/', $entryUrl);
 		$entryUrl = preg_replace('/^((https?)|(ftp)|(scp)|(sftp)):\//', '$1://', $entryUrl);
 	
@@ -118,18 +120,22 @@ class kContentDistributionManager
 			$dcs[$fileSyncDc][$assetId] = $fileSync->getId();					
 		}
 		
-		if(isset($dcs[$dc]) && count($dcs[$dc]) == count($assets)) // all files exist in the current/preferred dc
+		if(isset($dcs[$dc]) && count($dcs[$dc]) == count($assets))
+		{
+			KalturaLog::debug("All files exist in the preferred dc [$dc]");
 			return true;
+		}
 		
 		// check if all files exist on any of the remote dcs
 		$otherDcs = kDataCenterMgr::getAllDcs(true);
 		foreach($otherDcs as $remoteDc)
 		{
 			$remoteDcId = $remoteDc['id'];
-			if(count($dcs[$remoteDcId]) != count($assets))
+			if(!isset($dcs[$remoteDcId]) && count($dcs[$remoteDcId]) != count($assets))
 				continue;
 			
 			$dc = $remoteDcId;
+			KalturaLog::debug("All files exist in none-preferred dc [$dc]");
 			return true;
 		}
 		
@@ -138,13 +144,22 @@ class kContentDistributionManager
 			||
 			$entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_UPDATING
 		)
+		{
+			KalturaLog::debug("Entry distribution already importing");
 			return false;
+		}
 		
 		// create all needed import jobs
 		$destinationDc = $distributionProfile->getRecommendedDcForDownload();
 		$dcExistingFiles = $dcs[$destinationDc];
 		foreach($assetObjects as $assetId => $assetObject)
 		{
+			if(is_null($assetObject['downloadUrl']))
+			{
+				KalturaLog::debug("Download URL not found for asset [$assetId]");
+				continue;
+			}
+			
 			$asset = $assetObject['asset'];
 			/* @var $asset asset */
 			
@@ -168,7 +183,10 @@ class kContentDistributionManager
 	protected static function addSubmitAddJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
 		if($entryDistribution->getStatus() == EntryDistributionStatus::SUBMITTING)
+		{
+			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] already submitting");
 			return null;
+		}
 		
 		$dc = $distributionProfile->getRecommendedDcForExecute();
 		if(is_null($dc))
@@ -360,7 +378,7 @@ class kContentDistributionManager
 		
 		if(!in_array($entryDistribution->getStatus(), $validStatus))
 		{
-			KalturaLog::notice("wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
+			KalturaLog::notice("Wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
 			return null;
 		} 
 		
@@ -546,7 +564,10 @@ class kContentDistributionManager
 	public static function submitAddEntryDistribution(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile, $submitWhenReady = true)
 	{
 		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::DISABLED)
+		{
+			KalturaLog::debug("Submission is not enabled");
 			return null;
+		}
 			
 		$validStatus = array(
 			EntryDistributionStatus::ERROR_DELETING,
@@ -561,7 +582,7 @@ class kContentDistributionManager
 		
 		if(!in_array($entryDistribution->getStatus(), $validStatus))
 		{
-			KalturaLog::notice("wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
+			KalturaLog::notice("Wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
 			return null;
 		} 
 		
@@ -569,10 +590,12 @@ class kContentDistributionManager
 		$validationErrors = $entryDistribution->getValidationErrors();
 		if(!count($validationErrors))
 		{
+			KalturaLog::debug("No validation errors found");
 		    $returnValue = true;
 			$sunrise = $entryDistribution->getSunrise(null);
 			if($sunrise)
 			{
+				KalturaLog::debug("Applying sunrise [$sunrise]");
 				$distributionProvider = $distributionProfile->getProvider();
 				if(!$distributionProvider->isScheduleUpdateEnabled() && !$distributionProvider->isAvailabilityUpdateEnabled())
 				{
@@ -594,6 +617,7 @@ class kContentDistributionManager
 		{
 			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
 			$entryDistribution->save();
+			KalturaLog::debug("Will be submitted when ready");
 		}
 		
 		if(!count($validationErrors))
