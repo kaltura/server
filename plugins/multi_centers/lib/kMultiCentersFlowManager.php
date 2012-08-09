@@ -27,6 +27,12 @@ class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 	}
 	
 		
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kFileSyncImportJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
 	protected function updatedFileSyncImport(BatchJob $dbBatchJob, kFileSyncImportJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
@@ -45,42 +51,60 @@ class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 		}
 	}
 	
+	/**
+	 * Update relevant filesync as READY
+	 * 
+	 * @param BatchJob $dbBatchJob
+	 * @param kFileSyncImportJobData $data
+	 * @param BatchJob $twinJob
+	 * @throws KalturaAPIException
+	 * @return BatchJob
+	 */
 	protected function updatedFileSyncImportFinished(BatchJob $dbBatchJob, kFileSyncImportJobData $data, BatchJob $twinJob = null)
 	{
-		// Update relevant filesync as READY
 		$fileSyncId = $data->getFilesyncId();
 		if (!$fileSyncId) {
 			KalturaLog::err('File sync ID not found in job data.');
 			throw new KalturaAPIException(MultiCentersErrors::INVALID_FILESYNC_ID);
 		}
+		
 		$fileSync = FileSyncPeer::retrieveByPK($fileSyncId);
 		if (!$fileSync) {
 			KalturaLog::err("Invalid filesync record with id [$fileSyncId]");
 			throw new KalturaAPIException(MultiCentersErrors::INVALID_FILESYNC_RECORD, $fileSyncId);
 		}
+		
 		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
 		$fileSync->setFileSizeFromPath(kFileSyncUtils::getLocalFilePathForKey(kFileSyncUtils::getKeyForFileSync($fileSync)));
 		$fileSync->save();
 		return $dbBatchJob;
 	}
 	
+	/**
+	 * Update relevant filesync as FAILED.
+	 * No need to throw exception if the file sync not found, the job already marked as failed anyway.
+	 * 
+	 * @param BatchJob $dbBatchJob
+	 * @param kFileSyncImportJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
 	protected function updatedFileSyncImportFailed(BatchJob $dbBatchJob, kFileSyncImportJobData $data, BatchJob $twinJob = null)
 	{
-		// Update relevant filesync as FAILED
 		$fileSyncId = $data->getFilesyncId();
 		if (!$fileSyncId) {
 			KalturaLog::err('File sync ID not found in job data.');
-			throw new KalturaAPIException(MultiCentersErrors::INVALID_FILESYNC_ID);
+			return $dbBatchJob;
 		}
+		
 		$fileSync = FileSyncPeer::retrieveByPK($fileSyncId);
 		if (!$fileSync) {
 			KalturaLog::err("Invalid filesync record with id [$fileSyncId]");
-			throw new KalturaAPIException(MultiCentersErrors::INVALID_FILESYNC_RECORD, $fileSyncId);
+			return $dbBatchJob;
 		}
+		
 		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
 		$fileSync->save();
 		return $dbBatchJob;
 	}
-	
-	
 }
