@@ -45,7 +45,9 @@ class CaptionAssetItemFilter extends baseObjectFilter
 			"_in_id", 
 			"_gte_deleted_at", 
 			"_eq_id", 
-			"_lte_deleted_at"
+			"_lte_deleted_at",
+		    "_eq_flavor_params_id",
+		 	"_in_flavor_params_id",
 		), null);
 
 		$this->allowed_order_fields = array(
