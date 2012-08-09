@@ -1204,15 +1204,13 @@ class kJobsManager
 	
 	public static function addStorageDeleteJob(BatchJob $parentJob = null, $entryId = null, StorageProfile $storage, FileSync $fileSync)
 	{
-		//$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
-		//$fileSync = FileSyncPeer::retrieveByFileSyncKey($syncKey);
 		$netStorageDeleteData = new kStorageDeleteJobData();
 	    $netStorageDeleteData->setServerUrl($storage->getStorageUrl()); 
 	    $netStorageDeleteData->setServerUsername($storage->getStorageUsername()); 
 	    $netStorageDeleteData->setServerPassword($storage->getStoragePassword());
 	    $netStorageDeleteData->setFtpPassiveMode($storage->getStorageFtpPassiveMode());
-	    $netStorageDeleteData->setSrcFileSyncLocalPath($fileSync->getFilePath());
-		$netStorageDeleteData->setSrcFileSyncId($fileSync->getId());
+
+	    $netStorageDeleteData->setSrcFileSyncId($fileSync->getId());
 		$netStorageDeleteData->setDestFileSyncStoredPath($storage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
 		if ($parentJob)
 		{
