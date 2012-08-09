@@ -16,13 +16,23 @@ if ( !PartnerPeer::retrieveByPK($partnerId) )
 
 $criteria = new Criteria();
 $criteria->add(categoryPeer::PARTNER_ID,$partnerId,Criteria::EQUAL);
+$criteria->setLimit(1000);
 $allCats = categoryPeer::doSelect($criteria);
 
-
-foreach ($allCats as $categoryDb)
+while(count($allCats))
 {
-	$categoryDb->reSetEntriesCount();
-	$categoryDb->reSetDirectSubCategoriesCount();
-	$categoryDb->reSetDirectEntriesCount();	
-	$categoryDb->save();
+	foreach ($allCats as $categoryDb)
+	{
+		$categoryDb->reSetEntriesCount();
+		$categoryDb->reSetDirectSubCategoriesCount();
+		$categoryDb->reSetDirectEntriesCount();	
+		$categoryDb->save();
+		
+	}
+	
+	$criteria->setOffset($criteria->getOffset() + count($allCats));
+	kMemoryManager::clearMemory();
+	$allCats = categoryPeer::doSelect($criteria);
 }
+
+KalturaLog::log('Done.');
