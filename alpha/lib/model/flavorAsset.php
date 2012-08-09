@@ -96,18 +96,6 @@ class flavorAsset extends asset
 		}
 		return $this->aassetParams;
 	}
-
-	const CUSTOM_DATA_FIELD_BITRATE = "FlavorBitrate";
-	const CUSTOM_DATA_FIELD_FRAME_RATE = "FlavorFrameRate";
-	const CUSTOM_DATA_FIELD_VIDEO_CODEC_ID = "FlavorVideoCodecId";
-	
-	public function getBitrate()			{return $this->getFromCustomData(flavorAsset::CUSTOM_DATA_FIELD_BITRATE, null, 0);}
-	public function getFrameRate()			{return $this->getFromCustomData(flavorAsset::CUSTOM_DATA_FIELD_FRAME_RATE, null, 0);}
-	public function getVideoCodecId()		{return $this->getFromCustomData(flavorAsset::CUSTOM_DATA_FIELD_VIDEO_CODEC_ID);}
-	
-	public function setBitrate($v)			{$this->putInCustomData(flavorAsset::CUSTOM_DATA_FIELD_BITRATE, $v);}
-	public function setFrameRate($v)		{$this->putInCustomData(flavorAsset::CUSTOM_DATA_FIELD_FRAME_RATE, $v);}
-	public function setVideoCodecId($v)		{$this->putInCustomData(flavorAsset::CUSTOM_DATA_FIELD_VIDEO_CODEC_ID, $v);}
 	
 	public function getIsWeb()
 	{
