@@ -92,6 +92,11 @@
 									<?php if (Infra_AclHelper::isAllowed('partner','remove')): ?>
 										<option value="remove"><?php echo $this->translate('Remove'); ?></option>
 									<?php endif; ?>
+									<?php if (Infra_AclHelper::isAllowed('partner','mpRedirect')): ?>
+										<?php if ($partner->groupType == Kaltura_Client_Enum_PartnerGroupType::GROUP || $partner->groupType == Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP): ?>
+											<option value="mpLogin"><?php echo $this->translate('MP login'); ?></option>
+										<?php endif; ?>
+									<?php endif; ?>
 								<?php endif; ?>
 							<?php endif; ?>
 						<?php endif; ?>							
@@ -195,6 +200,11 @@ function widgets(partnerId) {
 
 function manage(partnerId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kmc-redirect', 'partner_id' => ''), null, true); ?>' + partnerId;
+	window.open(url);
+}
+
+function mpLogin(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'mp-console-redirect', 'partner_id' => ''), null, true); ?>' + partnerId;
 	window.open(url);
 }
 
