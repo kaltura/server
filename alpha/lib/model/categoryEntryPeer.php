@@ -44,6 +44,19 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		return parent::doSelect($c, $con);
 	}
 	
+	
+	public static function doCount(Criteria $criteria, PropelPDO $con = null)
+	{
+		$c = clone $criteria;
+
+		// since we use advaned filter for this object, it must be kalturaCriteria.
+		if($c instanceof KalturaCriteria)
+			$c->applyFilters();
+			
+		return parent::doCount($c, $con);
+	}
+	
+	
 	public static function retrieveByCategoryIdAndEntryId($categoryId, $entryId)
 	{
 		$c = new Criteria();
