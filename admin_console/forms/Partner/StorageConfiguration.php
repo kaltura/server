@@ -166,7 +166,7 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 		{
 			$checked = in_array($flavorParamsItem->id, $selectedFlavorParams);
 			$this->addElement('checkbox', 'flavorParamsId_' . $flavorParamsItem->id, array(
-				'label'			=> "Flavor Params $flavorParamsItem->name",
+				'label'			=> "Flavor Params {$flavorParamsItem->name} ({$flavorParamsItem->id})",
 				'checked'		=> $checked,
 			    'indicator'		=> 'dynamic',
 				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append'))),
