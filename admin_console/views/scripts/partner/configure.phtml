@@ -88,7 +88,7 @@ function onPageLoad() {
 
 	$("#partner_group_type-element select").each(function(inx, value){
 		var $partner_parent_id = $('#partner_parent_id');
-		if ($(this).val() != 1 && $(this).val() != 4){
+		if ($(this).val() != <?php echo Kaltura_Client_Enum_PartnerGroupType::PUBLISHER; ?> && $(this).val() != <?php echo Kaltura_Client_Enum_PartnerGroupType::TEMPLATE; ?>){
 			$partner_parent_id.attr("readonly", 1);
 			$partner_parent_id.val('');
 	    } 
@@ -98,7 +98,7 @@ function onPageLoad() {
 		{
 			var $partner_parent_id = $('#partner_parent_id');
 			
-			if ($(this).val() == 1 || $(this).val() == 4){
+			if ($(this).val() == <?php echo Kaltura_Client_Enum_PartnerGroupType::PUBLISHER; ?> || $(this).val() == <?php echo Kaltura_Client_Enum_PartnerGroupType::TEMPLATE; ?>){
 				$partner_parent_id.removeAttr('readonly');
 		    }else{
 				$partner_parent_id.attr("readonly", 1);
