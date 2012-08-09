@@ -564,5 +564,34 @@ class PartnerController extends Zend_Controller_Action
 		}
 		$this->view->form = $resetPasswordForm;
 	}
+	
+	public function mpConsoleRedirectAction ()
+	{
+	    $partnerId = $this->_getParam('partner_id');
+		$userId = $this->_getParam('user_id');
+		$client = Infra_ClientHelper::getClient();
+		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+		try
+		{
+			$ks = $systemPartnerPlugin->systemPartner->getAdminSession($partnerId, $userId);
+		}
+		catch(Exception $e)
+		{
+			$this->view->partnerId = $partnerId;
+			$this->view->errorMessage = $e->getMessage();
+			return;
+		}
+
+		$url = null;
+		$settings = Zend_Registry::get('config')->settings;
+		if($settings->mpConsoleUrl)
+		{
+			$url = Infra_ClientHelper::getServiceUrl();	
+			$url .= $settings->mpConsoleUrl;
+		}
+		
+		$url .= '?ks='.$ks;
+		$this->getResponse()->setRedirect($url);
+	}
 
 }
