@@ -74,16 +74,13 @@ class ScriptsRunner {
 		} else {
 			$cmd = sprintf("mysql -h%s -u%s -p%s -P%s %s < %s", $this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], $this->dbParams['port'], $this->dbParams['dbname'], $file);
 		}
-//		logMessage(L_INFO, "Executing $cmd");
-		@exec($cmd . ' 2>&1', $output, $return_var);
+		echo "Executing [$cmd]" . PHP_EOL;
+		passthru($cmd . ' 2>&1', $return_var);
 		if ($return_var === 0) {
-//			logMessage(L_INFO, "Command $cmd Executed Successfully");
-			echo "Command ".$cmd." Executed Successfully".PHP_EOL;	
+			echo "Command [$cmd] Executed Successfully" . PHP_EOL . PHP_EOL;	
 			return true;
 		} else {
-			echo "Failed to run: ".$cmd." ".PHP_EOL.implode("\n",$output).PHP_EOL;	
-//			logMessage(L_INFO, "Failed to run: Failed to run:  $cmd ");
-//			logMessage(L_INFO, implode("\n",$output));
+			echo "Failed to run [$cmd]" . PHP_EOL . PHP_EOL;	
 			return false;
 		}
 	}
@@ -193,15 +190,15 @@ class ScriptsRunner {
 			return false;
 		}
 		
-		echo "running ".$file.PHP_EOL;
+		echo "Running [$file]" . PHP_EOL;
 		
-		exec("php " .  $file . " realrun", $logFile, $return_var);
+		passthru("php " .  $file . " realrun", $return_var);
 		
 		if ($return_var === 0) {
-			echo "finish: ".$file.PHP_EOL;
+			echo "Finish [$file]" . PHP_EOL . PHP_EOL;
 			return true;
 		} else {
-			echo "Failed to run: ".$file.PHP_EOL.implode("\n",$logFile).PHP_EOL;	
+			echo "Failed to run [$file]" . PHP_EOL . PHP_EOL;	
 			return false;
 		}
 	}
