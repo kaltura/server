@@ -148,7 +148,7 @@ class VarConsoleService extends KalturaBaseService
     				null , 
     				myReportsMgr::REPORT_TYPE_VAR_USAGE , 
     				$inputFilter ,
-    				$pageSize , 0, // pageIndex is 0 because we are using specific ids 
+    				$pager->pageSize , 0, // pageIndex is 0 because we are using specific ids 
     				null  , // order by  
     				implode(",", $partnerIds));
     				
@@ -158,7 +158,7 @@ class VarConsoleService extends KalturaBaseService
 				$item->fromString( $reportHeader , $line );
     			if ($item)
     			{
-    			    $unsortedItems[$item->dateId][$item->partnerId] = $item;
+    			    $items[] = $item;
     			}
 			}
 			
@@ -175,29 +175,12 @@ class VarConsoleService extends KalturaBaseService
 		
 		$response = new KalturaPartnerUsageListResponse();
 		
-		//Add filler lines, for partners whose info was not returned (means that they had no usage in the viewed time segment)
-		$unsortedItems = $this->addFiller ($unsortedItems, $partners, $usageFilter);
-        //Thin down the array
-		$unsortedItems = array_values($unsortedItems);
-		//Construct 1-dimensional array from the $unsortedItems matrix
-		foreach ($unsortedItems as $unsortedArr)
-		{
-		    foreach ($unsortedArr as $partnerId=>$item)
-		    {
-		        $items[] = $item;
-		    }    
-		}
-		
 		//Sort according to dateId and partnerId
 		uasort($items, array($this, 'sortByDate'));
 		
-		$origItems = $items;
-		//Determine portion of the $items array to display in the page according to the pager's pageSize and pageIndex properties
-		$returnedItems = array_splice($origItems, $pager->pageSize * ($pager->pageIndex -1), $pager->pageSize);
-		
         $response->total = $total; 
-		$response->totalCount = count($items);
-		$response->objects = $returnedItems;
+		$response->totalCount = $totalCount;
+		$response->objects = $items;
 		return $response;
     }
     
@@ -232,39 +215,6 @@ class VarConsoleService extends KalturaBaseService
         }
     }
     
-    /**
-     * Function adds filler lines to the var_usage table, for partners whose information was not available in the DWH.
-     * @param array $items
-     * @param array $partners
-     * @param KalturaReportInputFilter $usageFilter
-     * @return Ambigous <multitype:, KalturaVarPartnerUsageItem>
-     */
-    private function addFiller (array $items, array $partners, KalturaReportInputFilter $usageFilter)
-    {
-        $format = $usageFilter->interval == KalturaReportInterval::DAYS ? "Ymd" : "Ym";
-        // Interval by which the dateId is calculated - 24 hours for daily interval, 30.5 days (average length of a month) for monthly interval.
-        $interval = $format == "Ymd" ? 24*60*60 : 30.5*24*60*60;
-        //Marginal error value - needs be bigger in case the interval is monthly.
-        $marginal = $format == "Ymd" ? 24*60*60 : 48*60*60;
-        for($day = $usageFilter->fromDate; $day < $usageFilter->toDate+$marginal; $day+=$interval)
-        {
-            $dayString = date($format, $day);
-            foreach ($partners as $partner)
-            {
-                /* @var $partner Partner */
-                if (!isset($items[$dayString][$partner->getId()]))
-                {
-                    $fillerItem = new KalturaVarPartnerUsageItem();
-                    $fillerItem->fromPartner($partner);
-                    $fillerItem->dateId = $dayString;
-                    $items[$dayString][$partner->getId()] = $fillerItem; 
-                }
-            }
-        }
-        
-        return $items;
-    }   
-     
 	/**
 	 * Function to change a sub-publisher's status
 	 * @action updateStatus
