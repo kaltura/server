@@ -349,7 +349,7 @@ class entryFilter extends baseObjectFilter
 		
 		$categoryFullIdsToIds = array();
 		foreach($cats as $catId)
-		{
+		{				
 			if(!$catId)
 				continue;
 							
@@ -368,7 +368,7 @@ class entryFilter extends baseObjectFilter
 	 * Convert the categories to categories ids
 	 * to make search query shorter and to solve search problem when category tree is big.
  	 *
-	 *	let’s say entry belong to 2 categories with these full_ids
+	 *	let's say entry belong to 2 categories with these full_ids
 	 * 	111>222>333
 	 *	111>444
 	 * Old categories fields was: 
@@ -378,10 +378,10 @@ class entryFilter extends baseObjectFilter
 	 * pc111,p111,pc222,p222,pc333,c333,pc444,c444
 	 * 
 	 * so why do we need pc111?
-	 * If baseEntry->list with filter categoriesMatchOr= ‘111’ you need to search for match pc111
+	 * If baseEntry->list with filter categoriesMatchOr= "111" you need to search for match pc111
 	 * 
 	 * so why do we need p111?
-	 * If baseEntry->list with filter categoriesMatchOr= ‘111>’ you need to search for match p111
+	 * If baseEntry->list with filter categoriesMatchOr= "111>" you need to search for match p111
 	 * 	  
 	 * @param string $cats Categories full names
 	 * @param string $statuses comma seperated
