@@ -83,7 +83,7 @@ function createSelect ( $id , $name , $default_value , $list_name )
 			StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST => 'External storages first',
 			StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY => 'External storages only',
 		) ,
-		"partner_packages" => createPackageList(),
+//		"partner_packages" => createPackageList(),
 	);
 
 
@@ -273,7 +273,7 @@ if ( count ( $partner_list ) > 1 )
 <?php echo  prop ( $partner , "landingPage"  , "text" , "60" , ""  , "" ,  "landing page for the entry on the partner's site"  ) ?>
 <?php echo  prop ( $partner , "userLandingPage"  , "text" , "60" , ""  , "" , "landing page for the user on the partner's site"  ) ?>
 <?php echo  prop ( $partner , "serviceConfigId"  , "text" , "60" , ""  , "" , "configuration file to use for partner"  ) ?>
-<?php echo  prop ( $partner , "partnerPackage"  , "select" , "1" , "0"  , "partner_packages" , "package type of partner"  ) ?>
+<!-- ?php echo  prop ( $partner , "partnerPackage"  , "select" , "1" , "0"  , "partner_packages" , "package type of partner"  ) ?-->
 <?php echo  prop ( $partner , "monitorUsage"  , "select" , "1" , "0"  , "boolean_int_type" , "when true, partner will be included in daily usage monitoring and will get warning emails."  ) ?>
 <?php echo  prop ( $partner , "isFirstLogin"  , "select" , "1" , "0"  , "boolean_int_type" , "when true, on next login to kmc a different msg will be displayed"  ) ?>
 <?php echo  prop ( $partner , "templatePartnerId"  , "text" , "" , ""  , "" , "partner id to fetch uiconftemplates from"  ) ?>
