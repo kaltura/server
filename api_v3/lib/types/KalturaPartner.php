@@ -227,6 +227,13 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $publishersQuota;
 	
 	/**
+	 * @var KalturaPartnerGroupType
+	 * @requiresPermission read
+	 * @readonly
+	 */
+	public $partnerGroupType;
+	
+	/**
 	 * 
 	 * @var bool
 	 * @readonly
@@ -239,7 +246,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		"description" , "commercialUse" , "landingPage" , "userLandingPage" , "contentCategories" , "type" , "phone" , "describeYourself" ,
 		"adultContent" , "defConversionProfileType" , "notify" , "status" , "allowQuickEdit" , "mergeEntryLists" , "notificationsConfig" ,
 		"maxUploadSize" , "partnerPackage" , "secret" , "adminSecret" , "allowMultiNotification", "adminLoginUsersQuota", "adminUserId",
-		"firstName" , "lastName" , "country" , "state" , "publishersQuota", "defaultEntitlementEnforcement", 
+		"firstName" , "lastName" , "country" , "state" , "publishersQuota", "partnerGroupType", "defaultEntitlementEnforcement", 
 	);
 	
 	public function getMapBetweenObjects ( )
