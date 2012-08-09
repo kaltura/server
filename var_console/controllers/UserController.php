@@ -57,11 +57,12 @@ class UserController extends Zend_Controller_Action
 		if ($request->isPost())
 		{
 			$adapter = new Infra_AuthAdapter($request->getPost('email'), $request->getPost('password'), $request->getPost('timezone_offset'));
-			$auth = Infra_AuthHelper::getAuthInstance();
+			//$adapter = new Zend_Auth_Adapter_DbTable($zendDb);
+		    $auth = Infra_AuthHelper::getAuthInstance();
 			$result = $auth->authenticate($adapter);
-
 			if ($result->isValid())
 			{
+			   // Zend_Session::getSaveHandler()->write(uniqid(), $result->getIdentity());
 				if ($request->getPost('remember_me'))
 					Zend_Session::rememberMe(60*60*24*7); // 1 week
 					
@@ -137,6 +138,41 @@ class UserController extends Zend_Controller_Action
 	public function resetPasswordOkAction()
 	{
 		$this->view->invalidToken = $this->getRequest()->get('invalid-token');
+	}
+	
+	/**
+	 * This action can only be accessed from the admin console, and passes a KS with which it is possible to access the VAR console
+	 */
+	public function adminLoginAction ()
+	{
+	    KalturaLog::debug('here');
+	    $ks = $this->_getParam('ks');
+	    
+	    $form = new Form_AdminLogin();
+	    $this->view->form = $form;
+	    
+	    $client = Infra_ClientHelper::getClient();
+	    $client->setKs($ks);
+	    $user = $client->user->get();
+	    /* @var $user Kaltura_Client_Type_User */
+	    $userLoginId = $user->email;
+	    $partnerId = $user->partnerId;
+	    
+	    KalturaLog::debug('creating auth adapter');
+	    $adapter = new Infra_AuthAdapter($userLoginId, null, $form->getValue('timezone_offset'), null, $ks);
+		//$adapter = new Zend_Auth_Adapter_DbTable($zendDb);
+	    $auth = Infra_AuthHelper::getAuthInstance();
+		$result = $auth->authenticate($adapter);
+		if ($result->isValid())
+		{
+			$this->_helper->redirector('list-by-user', 'partner');
+		}
+		else
+		{
+	         $form->setDescription('invalid login');
+		}
+		
+		$form->setDefault('next_uri', $this->_getParam('next_uri')); // set in Infra_AuthPlugin
 	}
 
 }
