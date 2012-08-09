@@ -125,7 +125,13 @@ class entryFilter extends baseObjectFilter
 			"_matchand_roots",
 			"_notin_roots",
 			"_in_category_entry_status",
-			"_in_category_ancestor_id"
+			"_in_category_ancestor_id",
+			"_eq_creator_id",
+			"_lte_total_rank",
+			"_lt_ms_duration",
+			"_gt_ms_duration",
+			"_lte_ms_duration",
+			"_gte_ms_duration",		
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
