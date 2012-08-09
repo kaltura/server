@@ -209,7 +209,7 @@ class YahooDistributionEngine extends DistributionEngine implements
 	/**
 	 * 
 	 * @param KalturaYahooDistributionProfile $distributionProfile
-	 * @return sftpMgr
+	 * @return ftpMgr
 	 */
 	protected function getFTPManager(KalturaYahooDistributionProfile $distributionProfile)
 	{
