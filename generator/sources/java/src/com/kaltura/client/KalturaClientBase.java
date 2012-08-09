@@ -41,6 +41,7 @@ import java.util.Map.Entry;
 
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -56,8 +57,6 @@ import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
-
-import sun.misc.BASE64Encoder;
 
 import com.kaltura.client.utils.XmlUtils;
 
@@ -518,15 +517,13 @@ abstract public class KalturaClientBase {
 			// build final string to base64 encode
 			StringBuilder sbToEncode = new StringBuilder();
 			sbToEncode.append(signature.toString()).append("|").append(sbInfo.toString());
-			BASE64Encoder encoder = new BASE64Encoder();
-			
-			// encode the signature and info with base64
-			String hashedString = encoder.encode(sbToEncode.toString().getBytes());
+
+			String hashedString = Base64.encodeBase64String(sbToEncode.toString().getBytes());
 			
 			// remove line breaks in the session string
 			String ks = hashedString.replace("\n", "");
 			ks = ks.replace("\r", "");
-
+			
 			// return the generated session key (KS)
 			return ks;
 		} catch (NoSuchAlgorithmException ex)

@@ -768,8 +768,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		}
 		
 		if($importXml) {
-			$serviceImports[] ="import com.kaltura.client.utils.XmlUtils;";
-			$this->appendLine ( "        String resultText = XmlUtils.getTextValue(resultXmlElement, \"result\");" );
+			$this->appendLine ( "        String resultText = resultXmlElement.getTextContent();" );
 			$returnCall .= "return ParseUtils.parse" . ucwords($resultType) . "(resultText);";
 		}
 		$this->appendLine($returnCall);

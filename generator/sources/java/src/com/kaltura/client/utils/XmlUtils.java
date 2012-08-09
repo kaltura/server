@@ -34,7 +34,6 @@ import java.io.Reader;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -42,11 +41,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.traversal.NodeIterator;
 import org.xml.sax.SAXException;
-
-import com.sun.org.apache.xpath.internal.XPathAPI;
 
 public class XmlUtils {
 	public static Element parseXml(String xml) {
@@ -77,29 +72,7 @@ public class XmlUtils {
 		
 		return null;
 	}
-	
-	public static  String getTextValue(Element ele, String tagName) {
-		String textVal = null;
 		
-		try {
-			NodeIterator ni = XPathAPI.selectNodeIterator(ele, "//" + tagName);
-			
-			if (ni != null) {
-				Element el = (Element)ni.nextNode();
-				if (el != null)	{
-					Node child = el.getFirstChild();
-					if (child != null) textVal = child.getNodeValue();
-				}
-			}
-
-		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return textVal;
-	}
-	
 	public static boolean hasChildren (Element e) {
 		if (e == null) return false;
 		return e.getFirstChild() != null;
