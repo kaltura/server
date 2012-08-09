@@ -42,7 +42,7 @@ class KalturaTagFilter extends KalturaFilter
 		"tagEqual" => "_eq_tag",
 		"tagStartsWith" => "_likex_tag",
 	    "instanceCountEqual" => "_eq_instance_count",
-	    "instanceCountIn" => "in_instance_count", 
+	    "instanceCountIn" => "_in_instance_count", 
 	);
 
 	private $order_by_map = array
