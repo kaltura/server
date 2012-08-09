@@ -3,6 +3,7 @@ require_once(dirname(__FILE__).'/../../bootstrap.php');
 
 $permissionName = 'FEATURE_END_USER_REPORTS';
 $startUpdatedAt = null;
+$startPartnerId = 0;
 $limit = null;
 $page = 200;
 
@@ -20,9 +21,9 @@ if($argc > 3)
 	$limit = $argv[3];
 	
 $criteria = new Criteria();
-$criteria->add(PartnerPeer::ID, 0, Criteria::GREATER_THAN);
+$criteria->add(PartnerPeer::ID, $startPartnerId, Criteria::GREATER_THAN);
 $criteria->add(PartnerPeer::PARTNER_PACKAGE, 1);
-$criteria->addAscendingOrderByColumn(PartnerPeer::UPDATED_AT);
+$criteria->addAscendingOrderByColumn(PartnerPeer::ID);
 
 if($startUpdatedAt)
 	$criteria->add(PartnerPeer::UPDATED_AT, $startUpdatedAt, Criteria::GREATER_THAN);
@@ -55,12 +56,13 @@ while(count($partners) && (!$limit || $migrated < $limit))
 		KalturaStatement::setDryRun(false);
 		
 		$startUpdatedAt = $partner->getUpdatedAt(null);
+		$startPartnerId = $partner->getId();
 		KalturaLog::info("Migrated partner [" . $partner->getId() . "] with updated at [$startUpdatedAt: " . $partner->getUpdatedAt() . "].");
 	}
 	kMemoryManager::clearMemory();
 
 	$nextCriteria = clone $criteria;
-	$nextCriteria->add(PartnerPeer::UPDATED_AT, $startUpdatedAt, Criteria::GREATER_THAN);
+	$nextCriteria->add(PartnerPeer::ID, $startPartnerId, Criteria::GREATER_THAN);
 	$partners = PartnerPeer::doSelect($nextCriteria);
 }
 
