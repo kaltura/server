@@ -7,16 +7,19 @@
 class KalturaVarConsolePartnerFilter extends KalturaPartnerFilter
 {
     /**
+     * Eq filter for the partner's group type
      * @var KalturaPartnerGroupType
      */
     public $groupTypeEq;
     
     /**
+     * In filter for the partner's group type
      * @var string
      */
     public $groupTypeIn;
     
     /**
+     * Filter for partner permissions- filter contains comma-separated string of permission names which the returned partners should have.
      * @var string
      */
     public $partnerPermissionsExist;
