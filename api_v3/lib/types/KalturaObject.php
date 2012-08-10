@@ -75,7 +75,10 @@ abstract class KalturaObject
 				
 			// ignore property if it requires a read permission which the current user does not have
 			if ($properties[$this_prop]->requiresReadPermission() && !kPermissionManager::getReadPermitted($this->getDeclaringClassName($this_prop), $this_prop))
+			{
+			    KalturaLog::debug("Missing read permission for property $this_prop");
 				continue;
+			}
 				
             $getter_name = "get{$object_prop}";
             
