@@ -93,7 +93,7 @@
 										<option value="remove"><?php echo $this->translate('Remove'); ?></option>
 									<?php endif; ?>
 									<?php if (Infra_AclHelper::isAllowed('partner','mpRedirect')): ?>
-										<?php if ($partner->groupType == Kaltura_Client_Enum_PartnerGroupType::GROUP || $partner->groupType == Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP): ?>
+										<?php if ($partner->partnerGroupType == Kaltura_Client_Enum_PartnerGroupType::GROUP || $partner->partnerGroupType == Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP): ?>
 											<option value="mpLogin"><?php echo $this->translate('MA login'); ?></option>
 										<?php endif; ?>
 									<?php endif; ?>
