@@ -118,7 +118,7 @@ package com.kaltura.delegates {
 
 		protected function onConnectTimeout(event:TimerEvent):void {
 			var kError:KalturaError = new KalturaError();
-			kError.errorCode = "KMC_CONNECTION_TIMEOUT";
+			kError.errorCode = "CONNECTION_TIMEOUT";
 			kError.errorMsg = "Connection Timeout: " + CONNECT_TIME / 1000 + " sec with no post command from kaltura client.";
 			_call.handleError(kError);
 			dispatchEvent(new KalturaEvent(KalturaEvent.FAILED, false, false, false, null, kError));
@@ -134,7 +134,7 @@ package com.kaltura.delegates {
 			close();
 
 			var kError:KalturaError = new KalturaError();
-			kError.errorCode = "KMC_POST_TIMEOUT";
+			kError.errorCode = "POST_TIMEOUT";
 			kError.errorMsg = "Post Timeout: " + LOAD_TIME / 1000 + " sec with no post result.";
 			_call.handleError(kError);
 			dispatchEvent(new KalturaEvent(KalturaEvent.FAILED, false, false, false, null, kError));
