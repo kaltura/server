@@ -114,13 +114,14 @@ function resetUserPassword(partnerId, userId) {
 }
 
 function resetUserPasswordSuccess(html) {
-	if (jQuery(html).parent().find('#frmKmcUsersResetPassword').hasClass('valid')) 
+	
+	jQuery('#resetUserPasswordPage').replaceWith(html);
+	if (jQuery('#frmKmcUsersResetPassword').hasClass('valid')) 
 	{
 		jQuery('#reset-user-password-dialog').dialog('close');
 	}
 	else
 	{
-		jQuery('#resetUserPasswordPage').replaceWith(html);
 		jQuery('#frmKmcUsersResetPassword').ajaxForm(resetUserPasswordSuccess);
 	}
 }
