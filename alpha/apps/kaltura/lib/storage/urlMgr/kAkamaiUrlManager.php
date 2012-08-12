@@ -77,14 +77,13 @@ class kAkamaiUrlManager extends kUrlManager
 		$partnerId = $flavorAsset->getPartnerId();
 		$subpId = $flavorAsset->getentry()->getSubpId();
 		$flavorAssetId = $flavorAsset->getId();
-		$flavorAssetVersion = $flavorAsset->getVersion();
 
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		
 		$this->setFileExtension($flavorAsset->getFileExt());
 		$this->setContainerFormat($flavorAsset->getContainerFormat());	
 
-		$versionString = (!$flavorAssetVersion || $flavorAssetVersion == 1 ? '' : "/v/$flavorAssetVersion");
+		$versionString = $this->getFlavorVersionString($flavorAsset);
 		$url = "$partnerPath/serveFlavor{$versionString}/flavorId/$flavorAssetId";
 		if($this->protocol==StorageProfile::PLAY_FORMAT_RTSP) {
 			return $url;

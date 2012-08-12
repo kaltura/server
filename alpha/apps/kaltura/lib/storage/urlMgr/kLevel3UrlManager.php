@@ -45,12 +45,11 @@ class kLevel3UrlManager extends kUrlManager
 		$partnerId = $entry->getPartnerId();
 		$subpId = $entry->getSubpId();
 		$flavorAssetId = $flavorAsset->getId();
-		$flavorAssetVersion = $flavorAsset->getVersion();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		
 		$this->setFileExtension($flavorAsset->getFileExt());
 
-		$versionString = (!$flavorAssetVersion || $flavorAssetVersion == 1 ? '' : "/v/$flavorAssetVersion");
+		$versionString = $this->getFlavorVersionString($flavorAsset);
 		$url = "$partnerPath/serveFlavor{$versionString}/flavorId/$flavorAssetId";
 		
 		if($this->clipTo)

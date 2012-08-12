@@ -275,6 +275,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $defaultEntitlementEnforcement;
 	
+	/**
+	 * @var int
+	 */
+	public $cacheFlavorVersion;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -329,6 +334,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"liveStreamProvisionParams",
 		"logoutUrl",
 	    "defaultEntitlementEnforcement",
+		"cacheFlavorVersion",
 	);
 
 	public function getMapBetweenObjects()

@@ -319,6 +319,20 @@ class kUrlManager
 			
 		return $url;
 	}
+
+	protected function getFlavorVersionString(flavorAsset $flavorAsset)
+	{
+		$entry = $flavorAsset->getentry();
+		$partner = $entry->getPartner();
+
+		$flavorAssetVersion = $flavorAsset->getVersion();
+		$partnerFlavorVersion = $partner->getCacheFlavorVersion();
+		$entryFlavorVersion = $entry->getCacheFlavorVersion();
+
+		return (!$flavorAssetVersion || $flavorAssetVersion == 1 ? '' : "/v/$flavorAssetVersion").
+			($partnerFlavorVersion ? "/pv/$partnerFlavorVersion" : '') .
+			($entryFlavorVersion ? "/ev/$entryFlavorVersion" : '');
+	}
 	
 	/**
 	 * @param flavorAsset $flavorAsset
@@ -330,12 +344,11 @@ class kUrlManager
 		$subpId = $flavorAsset->getentry()->getSubpId();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		$flavorAssetId = $flavorAsset->getId();
-		$flavorAssetVersion = $flavorAsset->getVersion();
 		
 		$this->setFileExtension($flavorAsset->getFileExt());
 		$this->setContainerFormat($flavorAsset->getContainerFormat());
 	
-		$versionString = (!$flavorAssetVersion || $flavorAssetVersion == 1 ? '' : "/v/$flavorAssetVersion");
+		$versionString = $this->getFlavorVersionString($flavorAsset);
 		$url = "$partnerPath/serveFlavor{$versionString}/flavorId/$flavorAssetId";
 		if($this->seekFromTime)
 			$url .= "/seekFrom/$this->seekFromTime";
