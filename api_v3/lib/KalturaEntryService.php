@@ -18,6 +18,13 @@ class KalturaEntryService extends KalturaBaseService
 	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
+		if (($actionName == 'list' || $actionName == 'count') &&
+		  (!$this->getKs() || (!$this->getKs()->isAdmin() && !$this->getKs()->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))))
+		{
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			entryPeer::setUserContentOnly(true);
+		}
+		
 		parent::initService($serviceId, $serviceName, $actionName);
 		parent::applyPartnerFilterForClass(new ConversionProfilePeer());
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
@@ -881,15 +888,16 @@ class KalturaEntryService extends KalturaBaseService
 		
 		// when session is not admin and without list:* privilege, allow access to user entries only
 		//moved to Additional criteria on entryPeer
-		if (!$this->getKs() || (!$this->getKs()->isAdmin() && !$this->getKs()->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)))
+		//moved it init service.
+		/*if (!$this->getKs() || (!$this->getKs()->isAdmin() && !$this->getKs()->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)))
 		{
-			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);*/
 			
 			/*$filter->userIdEqual = $this->getKuser()->getPuserId();
 		
 			$crit = $c->getNewCriterion(entryPeer::KUSER_ID , $this->getKuser()->getId(), Criteria::EQUAL);
 			$c->addAnd($crit);*/
-		}
+		/*}*/
 			
 		return $c;
 	}

@@ -17,6 +17,8 @@ class entryPeer extends BaseentryPeer
 	private static $s_default_count_limit = 301;
 	private static $filerResults = false;
 	
+	private static $userContentOnly = false;
+	
 	private static $kuserBlongToMoreThanMaxCategoriesForSearch = false;
 	
 	// cache classes by their type
@@ -28,6 +30,11 @@ class entryPeer extends BaseentryPeer
 		entryType::DATA => parent::OM_CLASS,
 		entryType::LIVE_STREAM => parent::OM_CLASS,
 	);
+	
+	public static function setUserContentOnly($contentOnly)
+	{
+		self::$userContentOnly = $contentOnly;
+	}
 	
 	/**
 	 * This function sets the requested order of entries to the given criteria object.
@@ -316,11 +323,6 @@ class entryPeer extends BaseentryPeer
 
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS); 
 		$c->addAnd ( entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
-
-		// logic should be ( kuserId || creatorKuserId) || 
-		//  				(privacyByContext of type 1 or 2) || 
-		//					privacyByContext << entitledKusers << privacyByContext || 
-		//					categoriesWithinPrivacyContext))
 		
 		$critEntitled = null;
 		
@@ -332,7 +334,7 @@ class entryPeer extends BaseentryPeer
 			
 		//when entitlement is enable and admin session or user session with list:* privilege
 		if (kEntitlementUtils::getEntitlementEnforcement() &&
-		   ((kCurrentContext::$is_admin_session || ( $ks && $ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)))))
+		   ((kCurrentContext::$is_admin_session || !self::$userContentOnly)))
 		{
 			$privacyContexts = kEntitlementUtils::getPrivacyContextSearch();
 			$critEntitled = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, KalturaCriteria::IN_LIKE);
@@ -368,18 +370,7 @@ class entryPeer extends BaseentryPeer
 			$critKuser->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 			$critEntitled->addOr($critKuser);
 		}
-		elseif(kEntitlementUtils::getEntitlementEnforcement()) // when session is not admin and without list:* privilege, allow access to user entries only
-		{
-			$critEntitled = $c->getNewCriterion(entryPeer::KUSER_ID , $kuserId, Criteria::EQUAL);
-			
-			if(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))
-			{
-				$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
-			}
-			
-			$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-		}
-		elseif(!kCurrentContext::$is_admin_session && $ks && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)) //widget
+		elseif(self::$userContentOnly) // when session is not admin and without list:* privilege, allow access to user entries only
 		{
 			$critEntitled = $c->getNewCriterion(entryPeer::KUSER_ID , $kuserId, Criteria::EQUAL);
 			$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
