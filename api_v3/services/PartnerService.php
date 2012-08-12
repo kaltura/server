@@ -378,21 +378,18 @@ class PartnerService extends KalturaBaseService
 		    $pager = new KalturaFilterPager();
 		}
 		
-		$allowedIds = $currentUser->getAllowedPartnerIds();
-		    
+		$dbFilter = null;
 		if ($partnerFilter)
 		{
-		    $partnerDbFilter = new partnerFilter();
-		    $partnerFilter->toObject($partnerDbFilter);
-		    $partnerDbFilter->setIdIn($allowedIds);
-		    $partnerDbFilter->attachToCriteria($c);
-		    $pager->attachToCriteria($c);
-		}
+		    $dbFilter = new partnerFilter();
+		    $partnerFilter->toObject($dbFilter);
+		}	
+			
+		$allowedIds = $currentUser->getAllowedPartnerIds($dbFilter);
 		
+		$pager->attachToCriteria($c);
 		$partners = array();
-		
 		$partners = myPartnerUtils::getPartnersArray($allowedIds, $c);	
-		
 		$kalturaPartners = KalturaPartnerArray::fromPartnerArray($partners );
 		$response = new KalturaPartnerListResponse();
 		$response->objects = $kalturaPartners;
