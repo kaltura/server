@@ -204,6 +204,8 @@ class KAsyncConvert extends KJobHandlerWorker
 		catch(KOperationEngineException $e)
 		{
 			$log = $this->operationEngine->getLogData();
+			//removing unsuported XML chars 
+			$log  = preg_replace('/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u','',$log);
 			if($log && strlen($log))
 				$this->kClient->batch->logConversion($data->flavorAssetId, $log);
 			$err = "engine [" . get_class($this->operationEngine) . "] converted failed: " . $e->getMessage();
