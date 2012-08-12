@@ -61,7 +61,7 @@ public class BaseTest extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
-		if (KalturaTestConfig.SECRET.isEmpty()) {
+		if (KalturaTestConfig.SECRET.length() == 0) {
 			throw new Error("Please fill the partner credentials to use");
 		}
 		
