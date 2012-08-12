@@ -45,7 +45,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 	}
 	
 	
-	public static function doCount(Criteria $criteria, PropelPDO $con = null)
+	public static function doCount(Criteria $criteria, $distinct = false, PropelPDO $con = null)
 	{
 		$c = clone $criteria;
 
