@@ -835,7 +835,7 @@ class kuser extends Basekuser implements IIndexable
 		return UserLoginDataPeer::retrieveByPK($loginDataId);
 	}
 	
-	public function getAllowedPartnerIds()
+	public function getAllowedPartnerIds(partnerFilter $partnerFilter = null)
 	{
 		$currentLoginDataId = $this->getLoginDataId();
 		if (!$currentLoginDataId) {
@@ -849,6 +849,21 @@ class kuser extends Basekuser implements IIndexable
 		$stmt = kuserPeer::doSelectStmt($c);
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		kuserPeer::setUseCriteriaFilter(true);
+		
+		// apply filter on partner ids
+		if ($partnerFilter)
+		{
+    		$c = new Criteria();
+    		$c->addSelectColumn(PartnerPeer::ID);
+    		$c->addAnd(PartnerPeer::ID, $ids, Criteria::IN);
+    		if ($partnerFilter)
+    		{
+    		    $partnerFilter->attachToCriteria($c);
+    		}
+    		$stmt = PartnerPeer::doSelectStmt($c);
+    		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		}
+		
 		return $ids;
 	}
 	
