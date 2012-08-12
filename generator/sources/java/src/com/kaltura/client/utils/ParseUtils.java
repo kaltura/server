@@ -2,39 +2,41 @@ package com.kaltura.client.utils;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.KalturaObjectFactory;
+import com.kaltura.client.KalturaLogger;
 
 public final class ParseUtils {
 	
-	private static Logger logger = Logger.getLogger(ParseUtils.class);
+	private static KalturaLogger logger = KalturaLogger.getLogger(ParseUtils.class);
 	
 	public static String parseString(String txt) {
 		 return txt;
 	}
 
 	public static int parseInt(String txt) {
-		if (!txt.isEmpty()) {
+		if (txt.length() != 0) {
 			try {
 				return Integer.parseInt(txt);
 			} catch (NumberFormatException nfe) {
-				logger.warn("Failed to parse [" + txt + "] as int", nfe);
+				if (logger.isEnabled())
+					logger.warn("Failed to parse [" + txt + "] as int", nfe);
 			}
 		}
 		return 0;
 	}
 	
 	public static float parseFloat(String txt) {
-		if (!txt.isEmpty()) {
+		if (txt.length() != 0) {
 			try {
 				return Float.parseFloat(txt);
 			} catch (NumberFormatException nfe) {
-				logger.warn("Failed to parse [" + txt + "] as float", nfe);
+				if (logger.isEnabled())
+					logger.warn("Failed to parse [" + txt + "] as float", nfe);
 			}
 		}
 		return 0;

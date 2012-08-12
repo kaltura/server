@@ -37,8 +37,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.KalturaClient;
 import com.kaltura.client.enums.KalturaEntryStatus;
@@ -57,10 +55,11 @@ import com.kaltura.client.types.KalturaModerationFlag;
 import com.kaltura.client.types.KalturaModerationFlagListResponse;
 import com.kaltura.client.types.KalturaUploadToken;
 import com.kaltura.client.types.KalturaUploadedFileTokenResource;
+import com.kaltura.client.KalturaLogger;
 
 public class MediaServiceTest extends BaseTest {
 
-	private Logger logger = Logger.getLogger(MediaServiceTest.class);
+	private KalturaLogger logger = KalturaLogger.getLogger(MediaServiceTest.class);
 	
 	/**
 	 * Tests the following : 
@@ -68,7 +67,8 @@ public class MediaServiceTest extends BaseTest {
 	 *  - add From Url
 	 */
 	public void testAddFromUrl() {
-        logger.info("Test Add From URL");
+		if (logger.isEnabled()) 
+			logger.info("Test Add From URL");
         
 		String name = "test (" + new Date() + ")";
 		
@@ -117,7 +117,8 @@ public class MediaServiceTest extends BaseTest {
 	 */
 	public void testUploadTokenAddGivenFile() {
 		
-		logger.info("Test upload token add");
+		if (logger.isEnabled())
+			logger.info("Test upload token add");
 		File file = new File("bin/DemoVideo.flv");
 		
 		try {
@@ -201,7 +202,8 @@ public class MediaServiceTest extends BaseTest {
 	 * http://www.kaltura.org/how-update-supposed-work-api-v3
 	 */
 	public void testUpdate() {
-		logger.info("Test Update Entry");
+		if (logger.isEnabled())
+			logger.info("Test Update Entry");
 		
 		String name = "test (" + new Date() + ")";
 		
@@ -232,7 +234,8 @@ public class MediaServiceTest extends BaseTest {
 	 *  - Get
 	 */
 	public void testBadGet() {
-		logger.info("Starting badGet test");
+		if (logger.isEnabled())
+			logger.info("Starting badGet test");
 		
 		// look for one we know doesn't exist
 		KalturaMediaEntry badEntry = null;
@@ -254,7 +257,8 @@ public class MediaServiceTest extends BaseTest {
 	 *  - Get
 	 */
 	public void testGet() {
-		logger.info("Starting get test");
+		if (logger.isEnabled())
+			logger.info("Starting get test");
 		
 		String name = "test (" + new Date() + ")";
 		
@@ -281,7 +285,8 @@ public class MediaServiceTest extends BaseTest {
 	 */
 	public void testList() {
 
-		logger.info("Test List");
+		if (logger.isEnabled())
+			logger.info("Test List");
 
 		try {
 			startUserSession(client, kalturaConfig);
@@ -310,7 +315,8 @@ public class MediaServiceTest extends BaseTest {
 			boolean found1 = false;
 			boolean found2 = false;
 			for (KalturaMediaEntry entry : listResponse.objects) {
-				logger.debug("id:" + entry.id);
+				if (logger.isEnabled())
+					logger.debug("id:" + entry.id);
 				if (entry.id.equals(addedEntry1.id)) {
 					found1 = true;
 				} else if (entry.id.equals(addedEntry2.id)) {
@@ -335,11 +341,13 @@ public class MediaServiceTest extends BaseTest {
 	 */
 	public void testModeration() {
 		
-		logger.info("Starting moderation test");
+		if (logger.isEnabled())
+			logger.info("Starting moderation test");
 		
 		final String FLAG_COMMENTS = "This is a test flag";
 		
-		logger.info("Starting addFromUrl test");
+		if (logger.isEnabled())
+			logger.info("Starting addFromUrl test");
         
 		String name = "test (" + new Date() + ")";
 		
@@ -370,7 +378,8 @@ public class MediaServiceTest extends BaseTest {
 			assertEquals(retFlag.comments, FLAG_COMMENTS);
 			
 		} catch (Exception e) {
-			logger.error("Got exception testing moderation flag", e);	
+			if (logger.isEnabled())
+				logger.error("Got exception testing moderation flag", e);	
 			e.printStackTrace();
 			fail();
 		} 
@@ -384,7 +393,8 @@ public class MediaServiceTest extends BaseTest {
 	 *  - delete
 	 */
 	public void testDelete() throws KalturaApiException {
-		logger.info("Starting delete test");
+		if (logger.isEnabled())
+			logger.info("Starting delete test");
 		
 		String name = "test (" + new Date() + ")";
 		String idToDelete = "";
@@ -405,7 +415,8 @@ public class MediaServiceTest extends BaseTest {
 			mediaService.delete(idToDelete);
 			
 		} catch (Exception e) {
-			logger.error("Trouble deleting", e);
+			if (logger.isEnabled())
+				logger.error("Trouble deleting", e);
 			fail();
 		} 
 
@@ -430,7 +441,8 @@ public class MediaServiceTest extends BaseTest {
 	 *  - add from uploaded file
 	 */
 	public void testUpload() {
-		logger.info("Starting delete test");
+		if (logger.isEnabled())
+			logger.info("Starting delete test");
 		
 		String name = "test (" + new Date() + ")";
 		
@@ -440,13 +452,15 @@ public class MediaServiceTest extends BaseTest {
 			KalturaMediaService mediaService = this.client.getMediaService();
 			File file = new File("bin/DemoVideo.flv");
 			String result = mediaService.upload(file);
-			logger.debug("After upload, result:" + result);			
+			if (logger.isEnabled())
+				logger.debug("After upload, result:" + result);			
 			entry.name = name;
 			entry.type = KalturaEntryType.MEDIA_CLIP;
 			entry.mediaType = KalturaMediaType.VIDEO;
 			entry = mediaService.addFromUploadedFile(entry, result);
 		} catch (Exception e) {
-			logger.error("Trouble uploading", e);
+			if (logger.isEnabled())
+				logger.error("Trouble uploading", e);
 			fail();
 		} 
 		
@@ -458,7 +472,8 @@ public class MediaServiceTest extends BaseTest {
 	}
 	
 	public void testDataServe() {
-		logger.info("Starting test data serve");
+		if (logger.isEnabled())
+			logger.info("Starting test data serve");
 		try {
 			startUserSession(client, kalturaConfig);
 			//client.getDataService().serve();
@@ -469,7 +484,8 @@ public class MediaServiceTest extends BaseTest {
 	}
 	
 	public void testPlaylist() {
-		logger.info("Starting test playlist execute from filters");
+		if (logger.isEnabled())	
+			logger.info("Starting test playlist execute from filters");
 		try {
 			startAdminSession(client, kalturaConfig);
 			

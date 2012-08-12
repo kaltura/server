@@ -27,16 +27,16 @@
 // ===================================================================================================
 package com.kaltura.client;
 
-import java.io.File;
 import java.util.HashMap;
 
 /**
  * Helper class that provides a collection of Files.
  * 
  * @author jpotts
+ * @author azeckoski
  *
  */
-public class KalturaFiles extends HashMap<String, File> {
+public class KalturaFiles extends HashMap<String, KalturaFile> {
 	
 	private static final long serialVersionUID = -5838275045069221834L;
 	
@@ -44,12 +44,17 @@ public class KalturaFiles extends HashMap<String, File> {
 
 	public void add(KalturaFiles files) {
 		this.putAll(files);
-    }
+	}
 	
 	public void add(String objectName, KalturaFiles files) {
-		for (java.util.Map.Entry<String, File> itr : files.entrySet()) {
+		for (java.util.Map.Entry<String, KalturaFile> itr : files.entrySet()) {
 			this.put(objectName + PARAMS_SEPERATOR + itr.getKey(), itr.getValue());           
 		}
-    }
+	}
 
+	public void add(String key, KalturaFile value) {
+		if (value == null)
+			return;
+		this.put(key, value);
+	}
 }

@@ -27,19 +27,20 @@
 // ===================================================================================================
 package com.kaltura.client.tests;
 
-import org.apache.log4j.Logger;
+import com.kaltura.client.KalturaLogger;
 
 import com.kaltura.client.services.KalturaSystemService;
 
 public class SystemServiceTest extends BaseTest {
 	
-	private Logger logger = Logger.getLogger(SystemServiceTest.class);
+	private KalturaLogger logger = KalturaLogger.getLogger(SystemServiceTest.class);
 			
 	/**
 	 * Tests that ping to the session works
 	 */
 	public void testPing() {
-		logger.info("Starting ping test");
+		if (logger.isEnabled())
+			logger.info("Starting ping test");
 
 		try {
 			BaseTest.startUserSession(client,kalturaConfig);
