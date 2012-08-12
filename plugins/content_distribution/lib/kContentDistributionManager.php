@@ -188,6 +188,14 @@ class kContentDistributionManager
 			return null;
 		}
 		
+		$entryDistribution->setStatus(EntryDistributionStatus::SUBMITTING);
+		$entryDistribution->setDirtyStatus(null);
+		if(!$entryDistribution->save())
+		{
+			KalturaLog::err("Unable to save entry distribution [" . $entryDistribution->getId() . "] status");
+			return null;
+		}
+	
 		$dc = $distributionProfile->getRecommendedDcForExecute();
 		if(is_null($dc))
 			$dc = kDataCenterMgr::getCurrentDcId();
@@ -227,6 +235,14 @@ class kContentDistributionManager
 	 */
 	protected static function addSubmitDisableJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
+		$entryDistribution->setStatus(EntryDistributionStatus::UPDATING);
+		$entryDistribution->setDirtyStatus(null);
+		if(!$entryDistribution->save())
+		{
+			KalturaLog::err("Unable to save entry distribution [" . $entryDistribution->getId() . "] status");
+			return null;
+		}
+		
  		$jobData = new kDistributionDisableJobData();
  		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
  		$jobData->setEntryDistributionId($entryDistribution->getId());
@@ -251,6 +267,14 @@ class kContentDistributionManager
 	 */
 	protected static function addSubmitEnableJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
+		$entryDistribution->setStatus(EntryDistributionStatus::UPDATING);
+		$entryDistribution->setDirtyStatus(null);
+		if(!$entryDistribution->save())
+		{
+			KalturaLog::err("Unable to save entry distribution [" . $entryDistribution->getId() . "] status");
+			return null;
+		}
+		
  		$jobData = new kDistributionEnableJobData();
  		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
  		$jobData->setEntryDistributionId($entryDistribution->getId());
@@ -277,7 +301,14 @@ class kContentDistributionManager
 	{
 		if($entryDistribution->getStatus() == EntryDistributionStatus::UPDATING)
 			return null;
-		
+	
+		$entryDistribution->setStatus(EntryDistributionStatus::UPDATING);
+		$entryDistribution->setDirtyStatus(null);
+		if(!$entryDistribution->save())
+		{
+			KalturaLog::err("Unable to save entry distribution [" . $entryDistribution->getId() . "] status");
+			return null;
+		}
 		
 		$dc = $distributionProfile->getRecommendedDcForExecute();
 		if(is_null($dc))
@@ -343,6 +374,14 @@ class kContentDistributionManager
 	 */
 	protected static function addSubmitDeleteJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
+		$entryDistribution->setStatus(EntryDistributionStatus::DELETING);
+		$entryDistribution->setDirtyStatus(null);
+		if(!$entryDistribution->save())
+		{
+			KalturaLog::err("Unable to save entry distribution [" . $entryDistribution->getId() . "] status");
+			return null;
+		}
+	
  		$jobData = new kDistributionDeleteJobData();
  		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
  		$jobData->setEntryDistributionId($entryDistribution->getId());

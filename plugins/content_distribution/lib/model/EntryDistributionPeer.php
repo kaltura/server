@@ -97,6 +97,15 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer
 			
 		return parent::doSelect($c, $con);
 	}
+
+	
+	/* (non-PHPdoc)
+	 * @see BaseEntryDistributionPeer::getAtomicColumns()
+	 */
+	public static function getAtomicColumns()
+	{
+		return array(BaseEntryDistributionPeer::STATUS);
+	}
 	
 	public static function getCacheInvalidationKeys()
 	{

@@ -587,17 +587,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onDistributionSubmitJobPending(BatchJob $dbBatchJob, kDistributionSubmitJobData $data, BatchJob $twinJob = null)
 	{
-		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
-		if(!$entryDistribution)
-		{
-			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
-			return $dbBatchJob;
-		}
-		
-		$entryDistribution->setStatus(EntryDistributionStatus::SUBMITTING);
-		$entryDistribution->setDirtyStatus(null);
-		$entryDistribution->save();
-	
 		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
 		{
 			$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
@@ -614,17 +603,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onDistributionUpdateJobPending(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
 	{
-		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
-		if(!$entryDistribution)
-		{
-			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
-			return $dbBatchJob;
-		}
-		
-		$entryDistribution->setStatus(EntryDistributionStatus::UPDATING);
-		$entryDistribution->setDirtyStatus(null);
-		$entryDistribution->save();
-	
 		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
 		{
 			$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
@@ -641,17 +619,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onDistributionEnableJobPending(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
 	{
-		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
-		if(!$entryDistribution)
-		{
-			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
-			return $dbBatchJob;
-		}
-		
-		$entryDistribution->setStatus(EntryDistributionStatus::UPDATING);
-		$entryDistribution->setDirtyStatus(null);
-		$entryDistribution->save();
-	
 		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
 		{
 			$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
@@ -668,17 +635,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onDistributionDisableJobPending(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
 	{
-		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
-		if(!$entryDistribution)
-		{
-			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
-			return $dbBatchJob;
-		}
-		
-		$entryDistribution->setStatus(EntryDistributionStatus::UPDATING);
-		$entryDistribution->setDirtyStatus(null);
-		$entryDistribution->save();
-	
 		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
 		{
 			$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
@@ -695,17 +651,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onDistributionDeleteJobPending(BatchJob $dbBatchJob, kDistributionDeleteJobData $data, BatchJob $twinJob = null)
 	{
-		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
-		if(!$entryDistribution)
-		{
-			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
-			return $dbBatchJob;
-		}
-		
-		$entryDistribution->setStatus(EntryDistributionStatus::DELETING);
-		$entryDistribution->setDirtyStatus(null);
-		$entryDistribution->save();
-	
 		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
 		{
 			$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
