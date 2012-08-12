@@ -30,10 +30,10 @@ package com.kaltura.client.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-public class KalturaTestSuite {
-		
-	public static Test suite() {
-			
+public class KalturaTestSuite extends TestSuite
+{		
+	public static Test suite()
+	{
 		TestSuite suite = new TestSuite();
 		suite.addTestSuite(SystemServiceTest.class);
 		suite.addTestSuite(SessionServiceTest.class);
@@ -45,7 +45,5 @@ public class KalturaTestSuite {
 		suite.addTestSuite(ErrorTest.class);
 
 		return suite;
-
 	}
-
 }
