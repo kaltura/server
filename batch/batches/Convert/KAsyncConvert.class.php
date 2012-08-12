@@ -207,7 +207,16 @@ class KAsyncConvert extends KJobHandlerWorker
 			//removing unsuported XML chars 
 			$log  = preg_replace('/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u','',$log);
 			if($log && strlen($log))
-				$this->kClient->batch->logConversion($data->flavorAssetId, $log);
+			{
+				try
+				{
+					$this->kClient->batch->logConversion($data->flavorAssetId, $log);
+				}
+				catch(Exception $ee)
+				{
+					KalturaLog::err("Log conversion: " . $ee->getMessage());
+				}
+			}
 			$err = "engine [" . get_class($this->operationEngine) . "] converted failed: " . $e->getMessage();
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CONVERSION_FAILED, $err, KalturaBatchJobStatus::FAILED);
 		}

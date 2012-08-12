@@ -64,7 +64,15 @@ class KAsyncVirusScan extends KJobHandlerWorker
 				KalturaLog::notice('Virus scan engine ['.get_class($engine).'] did not return any log for file ['.$data->srcFilePath.']');
 				$output = 'Virus scan engine ['.get_class($engine).'] did not return any log';
 			}
-			$this->kClient->batch->logConversion($data->flavorAssetId, $output);
+		
+			try
+			{
+				$this->kClient->batch->logConversion($data->flavorAssetId, $output);
+			}
+			catch(Exception $e)
+			{
+				KalturaLog::err("Log conversion: " . $e->getMessage());
+			}
 
 			// check scan results
 			switch ($data->scanResult)
