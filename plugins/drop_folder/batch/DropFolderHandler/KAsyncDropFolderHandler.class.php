@@ -106,7 +106,7 @@ class KAsyncDropFolderHandler extends KPeriodicWorker
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $folder->id;
 		$dropFolderFileFilter->statusIn = KalturaDropFolderFileStatus::PENDING.','.KalturaDropFolderFileStatus::WAITING.','.KalturaDropFolderFileStatus::NO_MATCH;
-		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::UPDATED_AT_DESC;
+		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_DESC;
 		if($fileNamePatterns)
 			$dropFolderFileFilter->fileNameLike = $fileNamePatterns;
 		$pager = new KalturaFilterPager();
