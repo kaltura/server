@@ -85,7 +85,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     		    $this->ks = $client->user->loginByLoginId($this->username, $this->password, $partnerId);
     		$client->setKs($this->ks);
     		$user = $client->user->getByLoginId($this->username, $partnerId);
-    		$identity = new Infra_UserIdentity($user, $this->ks, $this->timezoneOffset, $partnerId, $this->password);
+    		$identity = new Infra_UserIdentity($user, $this->ks, $this->timezoneOffset, $user->partnerId, $this->password);
 			//New logic - if specific permissions are required to authenticate the partner/user, check their existence here.
     		
     		if (isset($settings->requiredPermissions) && $settings->requiredPermissions)
