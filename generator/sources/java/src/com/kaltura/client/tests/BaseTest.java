@@ -28,7 +28,9 @@
 package com.kaltura.client.tests;
 
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,18 +125,20 @@ public class BaseTest extends TestCase {
 	
 	// Entry utils
 	
-	public static KalturaMediaEntry addTestImage(BaseTest container, KalturaClient client, String name) throws KalturaApiException
+	public static KalturaMediaEntry addTestImage(BaseTest container, KalturaClient client, String name) throws KalturaApiException, IOException, FileNotFoundException
 	{
 		KalturaMediaEntry entry = new KalturaMediaEntry();
 		entry.name = name;
 		entry.mediaType = KalturaMediaType.IMAGE;
-		File file = new File(KalturaTestConfig.UPLOAD_IMAGE);
+		
+		InputStream fileData = TestUtils.getTestImage();
+		int fileSize = fileData.available();
 		entry = client.getMediaService().add(entry);
 		
 		// Upload token
 		KalturaUploadToken uploadToken = new KalturaUploadToken();
-		uploadToken.fileName = file.getName();
-		uploadToken.fileSize = file.length();
+		uploadToken.fileName = KalturaTestConfig.UPLOAD_IMAGE;
+		uploadToken.fileSize = fileSize;
 		KalturaUploadToken token = client.getUploadTokenService().add(uploadToken);
 		assertNotNull(token);
 		
@@ -145,7 +149,7 @@ public class BaseTest extends TestCase {
 		assertNotNull(entry);
 		
 		// upload
-		uploadToken = client.getUploadTokenService().upload(token.id, file, false);
+		uploadToken = client.getUploadTokenService().upload(token.id, fileData, KalturaTestConfig.UPLOAD_IMAGE, fileSize, false);
 		container.testIds.add(entry.id);
 		return client.getMediaService().get(entry.id);
 	}

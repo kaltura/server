@@ -27,7 +27,7 @@
 // ===================================================================================================
 package com.kaltura.client.tests;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,7 +46,7 @@ import com.kaltura.client.utils.ParseUtils;
 public class MultiRequestTest extends BaseTest{
 
 	@SuppressWarnings("unchecked")
-	public void testMultiRequest() throws KalturaApiException {
+	public void testMultiRequest() throws Exception {
 		
 		BaseTest.startAdminSession(client,kalturaConfig);
 		client.setMultiRequest(true);
@@ -58,14 +58,14 @@ public class MultiRequestTest extends BaseTest{
 		KalturaMediaEntry entry = new KalturaMediaEntry();
 		entry.name = "test (" + new Date() + ")";
 		entry.mediaType = KalturaMediaType.IMAGE;
-		File file = new File(KalturaTestConfig.UPLOAD_IMAGE);
+		InputStream fileData = TestUtils.getTestImage();
 		entry = client.getMediaService().add(entry);
 		assertNull(entry);
 		
 		// 3. Upload token (Object : Object)
 		KalturaUploadToken uploadToken = new KalturaUploadToken();
-		uploadToken.fileName = file.getName();
-		uploadToken.fileSize = file.length();
+		uploadToken.fileName = KalturaTestConfig.UPLOAD_IMAGE;
+		uploadToken.fileSize = fileData.available();
 		KalturaUploadToken token = client.getUploadTokenService().add(uploadToken);
 		assertNull(token);
 		
@@ -76,7 +76,7 @@ public class MultiRequestTest extends BaseTest{
 		assertNull(entry);
 		
 		// 5. upload (Object : String, file, boolean)
-		uploadToken = client.getUploadTokenService().upload("{3:result:id}", file, false);
+		uploadToken = client.getUploadTokenService().upload("{3:result:id}", fileData, KalturaTestConfig.UPLOAD_IMAGE, fileData.available(), false);
 		
 		KalturaMultiResponse multi = client.doMultiRequest();
 		// 0

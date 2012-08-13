@@ -29,6 +29,7 @@ package com.kaltura.client.tests;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -119,9 +120,11 @@ public class MediaServiceTest extends BaseTest {
 		
 		if (logger.isEnabled())
 			logger.info("Test upload token add");
-		File file = new File("bin/DemoVideo.flv");
 		
 		try {
+			InputStream fileData = TestUtils.getTestVideo();
+			int fileSize = fileData.available();
+			
 			startUserSession(client, kalturaConfig);
 			int sz = client.getMediaService().count();
 			
@@ -138,8 +141,8 @@ public class MediaServiceTest extends BaseTest {
 			
 			// Create token
 			KalturaUploadToken uploadToken = new KalturaUploadToken();
-			uploadToken.fileName = file.getName();
-			uploadToken.fileSize = file.length();
+			uploadToken.fileName = KalturaTestConfig.UPLOAD_VIDEO;
+			uploadToken.fileSize = fileSize;
 			KalturaUploadToken token = client.getUploadTokenService().add(uploadToken);
 			assertNotNull(token);
 			
@@ -150,7 +153,7 @@ public class MediaServiceTest extends BaseTest {
 			assertNotNull(entry);
 			
 			// upload
-			uploadToken = client.getUploadTokenService().upload(token.id, file, false);
+			uploadToken = client.getUploadTokenService().upload(token.id, fileData, KalturaTestConfig.UPLOAD_VIDEO, fileSize, false);
 			assertNotNull(uploadToken);
 			
 			// Test Creation
@@ -166,7 +169,7 @@ public class MediaServiceTest extends BaseTest {
 			int sz2 = client.getMediaService().count();
 			assertTrue(sz + 1 == sz2);
 			
-		} catch (KalturaApiException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		}
@@ -189,8 +192,8 @@ public class MediaServiceTest extends BaseTest {
 		try {
 			client.getUploadTokenService().upload(token.id, file, false);
 			fail();
-		} catch (KalturaApiException e) {
-			assertEquals("Upload failed", e.getMessage());
+		} catch (IllegalArgumentException e) {
+			assert(e.getMessage().contains("is not readable or not a file"));
 		}
 	}
 	
@@ -271,7 +274,7 @@ public class MediaServiceTest extends BaseTest {
 			assertNotNull(retrievedEntry);
 			assertEquals(addedEntry.id, retrievedEntry.id);
 			
-		} catch (KalturaApiException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		}
@@ -327,7 +330,7 @@ public class MediaServiceTest extends BaseTest {
 			assertTrue(found1);
 			assertTrue(found2);
 
-		} catch (KalturaApiException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		}
@@ -450,8 +453,11 @@ public class MediaServiceTest extends BaseTest {
 		try {
 			startUserSession(client, kalturaConfig);
 			KalturaMediaService mediaService = this.client.getMediaService();
-			File file = new File("bin/DemoVideo.flv");
-			String result = mediaService.upload(file);
+
+			InputStream fileData = TestUtils.getTestVideo();
+			int fileSize = fileData.available();
+
+			String result = mediaService.upload(fileData, KalturaTestConfig.UPLOAD_VIDEO, fileSize);
 			if (logger.isEnabled())
 				logger.debug("After upload, result:" + result);			
 			entry.name = name;

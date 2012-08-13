@@ -27,13 +27,17 @@
 // ===================================================================================================
 package com.kaltura.client.tests;
 
-public class KalturaTestConfig {
-	public static final  int PARTNER_ID = 0;
-	public static final  String SECRET = "";
-	public static final  String ADMIN_SECRET = "";
-	public static final String ENDPOINT = "http://www.kaltura.com";
-	public static final String TEST_URL = "http://www.kaltura.org/demos/videos/DemoVideo.flv";
-	public static final String UPLOAD_VIDEO = "DemoVideo.flv";
-	public static final String UPLOAD_IMAGE = "DemoImage.jpg";
-	public static final String USER_NAME = "SomeOneWeKnow";
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.FileNotFoundException;
+
+public class TestUtils {
+
+	static public InputStream getTestVideo() throws FileNotFoundException {
+		return new FileInputStream("bin/" + KalturaTestConfig.UPLOAD_VIDEO);
+	}
+	
+	static public InputStream getTestImage() throws FileNotFoundException {
+		return new FileInputStream("bin/" + KalturaTestConfig.UPLOAD_IMAGE);
+	}
 }
