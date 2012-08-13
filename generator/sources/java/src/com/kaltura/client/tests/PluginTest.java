@@ -25,7 +25,7 @@
 //
 // @ignore
 // ===================================================================================================
-package com.kaltura.client.tests;
+package com.kaltura.client.test;
 
 import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.enums.KalturaMetadataObjectType;

@@ -25,7 +25,7 @@
 //
 // @ignore
 // ===================================================================================================
-package com.kaltura.client.tests;
+package com.kaltura.client.test;
 
 import java.io.BufferedReader;
 import java.io.File;

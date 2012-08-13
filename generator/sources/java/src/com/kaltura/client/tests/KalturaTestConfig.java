@@ -25,7 +25,7 @@
 //
 // @ignore
 // ===================================================================================================
-package com.kaltura.client.tests;
+package com.kaltura.client.test;
 
 public class KalturaTestConfig {
 	public static final  int PARTNER_ID = 0;
