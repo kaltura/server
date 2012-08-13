@@ -116,6 +116,8 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	{
 		parent::fromObject($entry);
 
+		$this->mediaDate = $entry->getMediaDate(null);
+		
 		$reflect = KalturaTypeReflectorCacher::get('KalturaSourceType');
 		$constants = $reflect->getConstantsValues();
 		$sourceApi = kPluginableEnumsManager::coreToApi('EntrySourceType', $entry->getSource());
