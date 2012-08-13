@@ -163,11 +163,11 @@ public class UiConfServiceTest extends BaseTest {
 	}
 	
 	@Override
-	protected void tearDown() {
-		
-		if (!doCleanup) return;
+	protected void tearDown() throws Exception {
 		
 		super.tearDown();
+		
+		if (!doCleanup) return;
 		
 		if (logger.isEnabled())
 			logger.info("Cleaning up test UI Conf entries after test");

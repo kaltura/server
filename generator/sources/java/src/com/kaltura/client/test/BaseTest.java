@@ -63,6 +63,8 @@ public class BaseTest extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
+		super.setUp();
+		
 		if (KalturaTestConfig.SECRET.length() == 0) {
 			throw new Error("Please fill the partner credentials to use");
 		}
@@ -76,7 +78,8 @@ public class BaseTest extends TestCase {
 	}
 	
 	@Override
-	protected void tearDown() {
+	protected void tearDown() throws Exception {
+		super.tearDown();
 		
 		if (!doCleanup) return;
 		

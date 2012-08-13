@@ -47,7 +47,7 @@ abstract class ClientGeneratorFromXml
 	public function generate()
 	{
 		if (is_dir($this->_sourcePath))
-			$this->addSourceFiles($this->_sourcePath);
+			$this->addSourceFiles($this->_sourcePath, $this->_sourcePath . DIRECTORY_SEPARATOR, "");
 	}
 	
 	public function getOutputFiles()
@@ -84,12 +84,12 @@ abstract class ClientGeneratorFromXml
 		$this->_files[$fileName] = $fileContents;
 	}
 	
-	protected function addSourceFiles($directory)
+	protected function addSourceFiles($directory, $rootSourceFolder, $rootDestFolder)
 	{
 		// add if file
 		if (is_file($directory)) 
 		{
-			$file = str_replace($this->_sourcePath.DIRECTORY_SEPARATOR, "", $directory);
+			$file = str_replace($rootSourceFolder, $rootDestFolder, $directory);
 			$this->addFile($file, file_get_contents($directory), false);
 			return;
 		}
@@ -115,7 +115,7 @@ abstract class ClientGeneratorFromXml
 		$dir->close();
 		
 		foreach($sourceFilesPaths as $sourceFilesPath)
-			$this->addSourceFiles($sourceFilesPath);
+			$this->addSourceFiles($sourceFilesPath, $rootSourceFolder, $rootDestFolder);
 	}
 	
 	protected function endsWith($str, $end) 

@@ -14,10 +14,11 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	 */
 	private $_doc = null;
 	private $_csprojIncludes = array ();
+	protected $_baseClientPath = "src/com/kaltura/client";
 	
-	public function JavaClientGenerator($xmlPath) 
+	public function JavaClientGenerator($xmlPath, $sourcePath = "sources/java") 
 	{
-		parent::ClientGeneratorFromXml ( $xmlPath, realpath ( "sources/java" ) );
+		parent::ClientGeneratorFromXml ( $xmlPath, realpath ( $sourcePath ) );
 		$this->_doc = new DOMDocument ();
 		$this->_doc->load ( $this->_xmlFile );
 	}
@@ -95,7 +96,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$this->generateEnumGetFunction($str, $enumNode, $enumType,  $enumName);
 		
 		$str .= "}\n";
-		$file = "src/com/kaltura/client/enums/$enumName.java";
+		$file = $this->_baseClientPath . "/enums/$enumName.java";
 		$this->addFile ( $file, $str );
 	}
 	
@@ -222,7 +223,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$type = $classNode->getAttribute ( "name" );
 		
 		// File name
-		$file = "src/com/kaltura/client/types/$type.java";
+		$file = $this->_baseClientPath . "/types/$type.java";
 		
 		// Basic imports
 		$imports = "";
@@ -479,7 +480,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		foreach($serviceImports as $import) 
 			$imports .= "import $import;\n";
 		
-		$file = "src/com/kaltura/client/services/" . $javaServiceType . ".java";
+		$file = $this->_baseClientPath . "/services/" . $javaServiceType . ".java";
 		$this->addFile ( $file, $imports . $this->getTextBlock () );
 	}
 	
@@ -740,7 +741,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		$imports .= "\n";
 		
-		$this->addFile ( "src/com/kaltura/client/KalturaClient.java", $imports . $this->getTextBlock () );
+		$this->addFile ( $this->_baseClientPath . "/KalturaClient.java", $imports . $this->getTextBlock () );
 	
 	}
 	
