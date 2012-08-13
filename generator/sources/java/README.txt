@@ -5,7 +5,7 @@ You should read this before setting up the client in eclipse.
 
  - Kaltura Java Client Library API (/src/com)
  - Compilation and Run test script (/src/Kaltura.java)
- - JUnit tests (/src/com/kaltura/tests)
+ - JUnit tests (/src/com/kaltura/client/test)
  - lib (JARs required to build the client library)
 
 

@@ -26,7 +26,9 @@
 // @ignore
 // ===================================================================================================
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.KalturaClient;
@@ -36,12 +38,14 @@ import com.kaltura.client.enums.KalturaEntryStatus;
 import com.kaltura.client.enums.KalturaMediaType;
 import com.kaltura.client.enums.KalturaSessionType;
 import com.kaltura.client.services.KalturaMediaService;
-import com.kaltura.client.tests.KalturaTestConfig;
 import com.kaltura.client.types.KalturaMediaEntry;
 import com.kaltura.client.types.KalturaMediaListResponse;
 import com.kaltura.client.types.KalturaPartner;
 import com.kaltura.client.types.KalturaUploadToken;
 import com.kaltura.client.types.KalturaUploadedFileTokenResource;
+
+import com.kaltura.client.test.KalturaTestConfig;
+import com.kaltura.client.test.TestUtils;
 
 public class Kaltura {
 	
@@ -163,7 +167,6 @@ public class Kaltura {
 			System.out.println("Uploading a video file...");
 			
 			// upload upload token
-			File fileData = new File(KalturaTestConfig.UPLOAD_FILE);
 			KalturaUploadToken upToken = client.getUploadTokenService().add();
 			KalturaUploadedFileTokenResource fileTokenResource = new KalturaUploadedFileTokenResource();
 			
@@ -171,11 +174,24 @@ public class Kaltura {
 			fileTokenResource.token = upToken.id;
 			entry = client.getMediaService().addContent(entry.id, fileTokenResource);
 			
-			
 			// Upload actual data
-			client.getUploadTokenService().upload(upToken.id, fileData);
-			
-			System.out.println("Uploaded a new Video file to entry: " + entry.id);
+			try
+			{
+				InputStream fileData = TestUtils.getTestVideo();
+				int fileSize = fileData.available();
+
+				client.getUploadTokenService().upload(upToken.id, fileData, KalturaTestConfig.UPLOAD_VIDEO, fileSize);
+				
+				System.out.println("Uploaded a new Video file to entry: " + entry.id);
+			}
+			catch (FileNotFoundException e)
+			{
+				System.out.println("Failed to open test video file");
+			}
+			catch (IOException e)
+			{
+				System.out.println("Failed to read test video file");
+			}
 	}
 	
 	/** 
