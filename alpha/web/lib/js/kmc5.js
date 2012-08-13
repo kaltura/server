@@ -732,9 +732,7 @@ kmc.preview_embed = {
 	// eventually replace with <? php echo $embedCodeTemplate; ?>  ;  (variables used: HEIGHT WIDTH HOST CACHE_ST UICONF_ID PARTNER_ID PLAYLIST_ID ENTRY_ID) + {VER}, {SILVERLIGHT}, {INIT_PARAMS} for Silverlight + NAME, DESCRIPTION
 	embed_code_template :	{
 		object_tag :	'<object id="kaltura_player_{CACHE_ST}" name="kaltura_player_{CACHE_ST}" type="application/x-shockwave-flash" allowFullScreen="true" ' +
-		'allowNetworking="all" allowScriptAccess="always" height="{HEIGHT}" width="{WIDTH}" bgcolor="#000000" ' +
-		'xmlns:dc="http://purl.org/dc/terms/" xmlns:media="http://search.yahoo.com/searchmonkey/media/" rel="media:{MEDIA}" ' +
-		'resource="http://{HOST}/index.php/kwidget/cache_st/{CACHE_ST}/wid/_{PARTNER_ID}/uiconf_id/{UICONF_ID}{ENTRY_ID}" ' +
+		'allowNetworking="all" allowScriptAccess="always" height="{HEIGHT}" width="{WIDTH}" bgcolor="#000000" {SEO_ATTS}' +
 		'data="http://{HOST}/index.php/kwidget/cache_st/{CACHE_ST}/wid/_{PARTNER_ID}/uiconf_id/{UICONF_ID}{ENTRY_ID}">' +
 		'<param name="allowFullScreen" value="true" /><param name="allowNetworking" value="all" />' +
 		'<param name="allowScriptAccess" value="always" /><param name="bgcolor" value="#000000" />' +
@@ -752,7 +750,9 @@ kmc.preview_embed = {
 		media_seo_info :	'<a rel="media:thumbnail" href="http://{CDN_HOST}/p/{PARTNER_ID}/sp/{PARTNER_ID}00/thumbnail{ENTRY_ID}/width/120/height/90/bgcolor/000000/type/2"></a> ' +
 		'<span property="dc:description" content="{DESCRIPTION}"></span><span property="media:title" content="{NAME}"></span> ' +
 		'<span property="media:width" content="{WIDTH}"></span><span property="media:height" content="{HEIGHT}"></span> ' +
-		'<span property="media:type" content="application/x-shockwave-flash"></span>'
+		'<span property="media:type" content="application/x-shockwave-flash"></span>',
+		media_seo_atts: 'xmlns:dc="http://purl.org/dc/terms/" xmlns:media="http://search.yahoo.com/searchmonkey/media/" rel="media:{MEDIA}" ' +
+		'resource="http://{HOST}/index.php/kwidget/cache_st/{CACHE_ST}/wid/_{PARTNER_ID}/uiconf_id/{UICONF_ID}{ENTRY_ID}" '
 	},
 
 	// id = entry id, asset id or playlist id; name = entry name or playlist name;
@@ -769,6 +769,8 @@ kmc.preview_embed = {
 		embed_code;
 
 		embed_code = (html5_support) ? kmc.preview_embed.embed_code_template.script_tag + '\n' + kmc.preview_embed.embed_code_template.object_tag : kmc.preview_embed.embed_code_template.object_tag;
+		// Add SEO Atts
+		embed_code = embed_code.replace("{SEO_ATTS}", (kmc.vars.ignore_entry_seo ? "" : kmc.pre.embe.media_seo_atts));
 		if(!kmc.vars.jw) { // more efficient to add "&& !kmc.vars.silverlight" (?)
 			kmc.vars.embed_code_delivery_type = kmc.vars.embed_code_delivery_type || "http";
 			switch( kmc.vars.embed_code_delivery_type ) {
@@ -786,9 +788,10 @@ kmc.preview_embed = {
 		if(is_playlist && id != "multitab_playlist") {	// playlist (not multitab)
 			embed_code = embed_code.replace(/{ENTRY_ID}/g,"");
 			embed_code = embed_code.replace("{FLASHVARS}",kmc.preview_embed.embed_code_template.playlist_flashvars);
+			embed_code = embed_code.replace("{SEO}", "");
 		}
 		else {											// player and multitab playlist
-			embed_code = embed_code.replace("{SEO}", (is_playlist ? "" : kmc.preview_embed.embed_code_template.media_seo_info));
+			embed_code = embed_code.replace("{SEO}", (kmc.vars.ignore_entry_seo ? "" : kmc.preview_embed.embed_code_template.media_seo_info));
 			embed_code = embed_code.replace(/{ENTRY_ID}/g, (is_playlist ? "" : "/entry_id/" + id));
 			embed_code = embed_code.replace("{FLASHVARS}", "");
 		}
