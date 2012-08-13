@@ -101,17 +101,19 @@ class KAsyncDropFolderHandler extends KPeriodicWorker
 				
 			$fileNamePatterns = reset($fileNamePatterns);
 		}
-	 
+	 	
+		$dropFolderFilePlugin = KalturaDropFolderClientPlugin::get($this->kClient);
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $folder->id;
 		$dropFolderFileFilter->statusIn = KalturaDropFolderFileStatus::PENDING.','.KalturaDropFolderFileStatus::WAITING.','.KalturaDropFolderFileStatus::NO_MATCH;
+		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::UPDATED_AT_DESC;
 		if($fileNamePatterns)
 			$dropFolderFileFilter->fileNameLike = $fileNamePatterns;
 		$pager = new KalturaFilterPager();
 		$pager->pageIndex = 1;
 		
 		try{		
-			$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter, $pager);
+			$dropFolderFiles = $dropFolderFilePlugin->dropFolderFile->listAction($dropFolderFileFilter, $pager);
 			/* @var $dropFolderFiles KalturaDropFolderFileListResponse */ 
 		}
 		catch (KalturaAPIException $e) {
@@ -132,7 +134,7 @@ class KAsyncDropFolderHandler extends KPeriodicWorker
 			
 			$pager->pageIndex++;
 			try{	
-			$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter, $pager);
+				$dropFolderFiles = $dropFolderFilePlugin->dropFolderFile->listAction($dropFolderFileFilter, $pager);
 			}
 			catch (KalturaAPIException $e) {
 				KalturaLog::err('Cannot get list of files for drop folder id ['.$folder->id.'] pageIndex ['.$pager->pageIndex.']- '.$e->getMessage());
