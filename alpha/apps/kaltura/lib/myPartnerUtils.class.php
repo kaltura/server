@@ -1204,11 +1204,6 @@ class myPartnerUtils
  		$c = new Criteria();
  		$c->addAnd(UserRolePeer::PARTNER_ID, $fromPartner->getId(), Criteria::EQUAL);
  		$c->addDescendingOrderByColumn(UserRolePeer::CREATED_AT);
- 		$count = UserRolePeer::doCount($c);
- 		if ($count > kConf::get('copy_partner_limit_user_roles'))
- 		{
- 		    throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "userRole");
- 		}
  		
  		$roles = UserRolePeer::doSelect($c);
  		UserRolePeer::setUseCriteriaFilter ( true );
@@ -1245,12 +1240,7 @@ class myPartnerUtils
  		$c->addAnd(categoryPeer::STATUS, CategoryStatus::ACTIVE);
  		$c->addAscendingOrderByColumn(categoryPeer::DEPTH);
  		$c->addAscendingOrderByColumn(categoryPeer::CREATED_AT);
- 		$count = categoryPeer::doCount($c);
- 	    if ($count > kConf::get('copy_partner_limit_categories'))
-        {
-            throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "category");
-        }
-        
+ 		
  		$categories = categoryPeer::doSelect($c);
  		categoryPeer::setUseCriteriaFilter(true);
  		
@@ -1292,11 +1282,6 @@ class myPartnerUtils
  		$c->addAnd(entryPeer::TYPE, $entryType);
  		$c->addAnd(entryPeer::STATUS, entryStatus::READY);
  		$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
- 		$count = entryPeer::doCount($c);
- 		if ($count > kConf::get('copy_partner_limit_entries'))
- 		{
- 		    throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "entry");
- 		}
  		
  		$entries = entryPeer::doSelect($c);
  		entryPeer::setUseCriteriaFilter ( true );
@@ -1314,11 +1299,6 @@ class myPartnerUtils
  		$c->addAnd(uiConfPeer::PARTNER_ID, $fromPartner->getId());
  		$c->addAnd(uiConfPeer::OBJ_TYPE, $uiConfType);
  		$c->addAnd(uiConfPeer::STATUS, uiConf::UI_CONF_STATUS_READY);
- 		$count = uiConfPeer::doCount($c);
- 		if ($count > kConf::get('copy_partner_limit_ui_confs'))
- 		{
- 		    throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "uiConf");
- 		}
  		
  		$uiConfs = uiConfPeer::doSelect($c);
  		uiConfPeer::setUseCriteriaFilter ( true );
@@ -1341,11 +1321,6 @@ class myPartnerUtils
  		
  		$c = new Criteria();
  		$c->add(assetParamsPeer::PARTNER_ID, $fromPartner->getId());
- 		$count = assetParamsPeer::doCount($c);
- 		if ($count > kConf::get('copy_partner_limit_flavor_params'))
- 		{
- 		    throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "assetParam");
- 		}
  		
  		$flavorParamsObjects = assetParamsPeer::doSelect($c);
  		foreach($flavorParamsObjects as $flavorParams)
@@ -1366,11 +1341,6 @@ class myPartnerUtils
  		
  		$c = new Criteria();
  		$c->add(conversionProfile2Peer::PARTNER_ID, $fromPartner->getId());
- 		$count = conversionProfile2Peer::doCount($c);
- 		if ($count > kConf::get('copy_partner_limit_conversion_profiles'))
- 		{
- 		    throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "conversionProfile");
- 		}
  		
  		$conversionProfiles = conversionProfile2Peer::doSelect($c);
  		foreach($conversionProfiles as $conversionProfile)
@@ -1418,12 +1388,6 @@ class myPartnerUtils
  		
  		$c = new Criteria();
  		$c->add(accessControlPeer::PARTNER_ID, $fromPartner->getId());
- 		$count = accessControlPeer::doCount($c);
- 		
-        if ($count > kConf::get('copy_partner_limit_ac_profiles'))
-        {
-            throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "accessControl");
-        } 		
  		
  		$accessControls = accessControlPeer::doSelect($c);
  		foreach($accessControls as $accessControl)

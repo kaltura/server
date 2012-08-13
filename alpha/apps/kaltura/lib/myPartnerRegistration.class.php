@@ -343,6 +343,9 @@ class myPartnerRegistration
 		$newPartner = NULL;
 		$newSubPartner = NULL;
 		try {
+		    //validate that the template partner object counts do not exceed the limits stated in the local.ini
+		    $templatePartner = PartnerPeer::retrieveByPK($templatePartnerId ? $templatePartnerId : kConf::get('template_partner_id'));
+		    $this->validateTemplatePartner($templatePartner);
 			// create the new partner
 			$newPartner = $this->createNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password , $partner , $templatePartnerId);
 
@@ -366,6 +369,102 @@ class myPartnerRegistration
 
 			throw $e;
 		}
+	}
+	
+	/**
+	 * Validate the amount of core and plugin objects found on the template partner.
+	 * @param Partner $templatePartner
+	 */
+	private function validateTemplatePartner (Partner $templatePartner)
+	{
+	    //access control profiles
+	    $c = new Criteria();
+ 		$c->add(accessControlPeer::PARTNER_ID, $templatePartner->getId());
+ 		$count = accessControlPeer::doCount($c);
+ 		
+        if ($count > kConf::get('copy_partner_limit_ac_profiles'))
+        {
+            throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "accessControl");
+        }
+        
+        //categories
+        categoryPeer::setUseCriteriaFilter(false);
+ 		$c = new Criteria();
+ 		$c->addAnd(categoryPeer::PARTNER_ID, $templatePartner->getId());
+ 		$c->addAnd(categoryPeer::STATUS, CategoryStatus::ACTIVE);
+ 		$c->addAscendingOrderByColumn(categoryPeer::DEPTH);
+ 		$c->addAscendingOrderByColumn(categoryPeer::CREATED_AT);
+ 		$count = categoryPeer::doCount($c);
+ 	    if ($count > kConf::get('copy_partner_limit_categories'))
+        {
+            throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "category");
+        }
+        
+ 		categoryPeer::setUseCriteriaFilter(true);
+ 		
+ 		//conversion profiles
+	    $c = new Criteria();
+ 		$c->add(conversionProfile2Peer::PARTNER_ID, $templatePartner->getId());
+ 		$count = conversionProfile2Peer::doCount($c);
+ 		if ($count > kConf::get('copy_partner_limit_conversion_profiles'))
+ 		{
+ 		    throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "conversionProfile");
+ 		}
+ 		//entries
+ 		entryPeer::setUseCriteriaFilter ( false );
+ 		$c = new Criteria();
+ 		$c->addAnd(entryPeer::PARTNER_ID, $templatePartner->getId());
+ 		$c->addAnd(entryPeer::TYPE, $entryType);
+ 		$c->addAnd(entryPeer::STATUS, entryStatus::READY);
+ 		$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
+ 		$count = entryPeer::doCount($c);
+ 		if ($count > kConf::get('copy_partner_limit_entries'))
+ 		{
+ 		    throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "entry");
+ 		}
+ 		
+ 		entryPeer::setUseCriteriaFilter ( true );
+ 		
+ 		//flavor params
+	    $c = new Criteria();
+ 		$c->add(assetParamsPeer::PARTNER_ID, $templatePartner->getId());
+ 		$count = assetParamsPeer::doCount($c);
+ 		if ($count > kConf::get('copy_partner_limit_flavor_params'))
+ 		{
+ 		    throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "assetParam");
+ 		}
+ 		
+ 		//uiconfs
+ 		uiConfPeer::setUseCriteriaFilter(false);
+ 		$c = new Criteria();
+ 		$c->addAnd(uiConfPeer::PARTNER_ID, $templatePartner->getId());
+ 		$c->addAnd(uiConfPeer::OBJ_TYPE, $uiConfType);
+ 		$c->addAnd(uiConfPeer::STATUS, uiConf::UI_CONF_STATUS_READY);
+ 		$count = uiConfPeer::doCount($c);
+ 		if ($count > kConf::get('copy_partner_limit_ui_confs'))
+ 		{
+ 		    throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "uiConf");
+ 		}
+ 		uiConfPeer::setUseCriteriaFilter ( true );
+ 		
+ 		//user roles
+ 		UserRolePeer::setUseCriteriaFilter ( false );
+ 		$c = new Criteria();
+ 		$c->addAnd(UserRolePeer::PARTNER_ID, $templatePartner->getId(), Criteria::EQUAL);
+ 		$c->addDescendingOrderByColumn(UserRolePeer::CREATED_AT);
+ 		$count = UserRolePeer::doCount($c);
+ 		if ($count > kConf::get('copy_partner_limit_user_roles'))
+ 		{
+ 		    throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "userRole");
+ 		}
+ 		UserRolePeer::setUseCriteriaFilter ( true );
+ 		
+ 		$validatorPlugins = KalturaPluginManager::getPluginInstances('IKalturaObjectValidator');
+ 		foreach ($validatorPlugins as $validatorPlugins)
+ 		{
+ 		    $validatorPlugins->validateObject ($templatePartner);
+ 		}
+        
 	}
 	
 	private function setAllTemplateEntriesToAdminKuser($partnerId, $kuserId)
