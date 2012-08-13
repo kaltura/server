@@ -141,8 +141,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function loadXslt() 
 	{
 		$data = self::getData();
-		$conversionProfileId = $data->objectData->conversionProfileId;
-
+		//TODO: remove this statement once its purpose is served - conversionProfileId information should be taken only from the objectData
+		$conversionProfileId = isset ($data->objectData->conversionProfileId) ? $data->objectData->conversionProfileId : $data->conversionProfileId;
+        if(!$conversionProfileId)
+           throw new KalturaBatchException("Conversion profile not defined", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		
 		$this->impersonate();
 		$conversionProfile = $this->kClient->conversionProfile->get($conversionProfileId);
