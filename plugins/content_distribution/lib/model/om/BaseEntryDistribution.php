@@ -86,6 +86,12 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 	protected $flavor_asset_ids;
 
 	/**
+	 * The value for the asset_ids field.
+	 * @var        string
+	 */
+	protected $asset_ids;
+
+	/**
 	 * The value for the sunrise field.
 	 * @var        string
 	 */
@@ -394,6 +400,16 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 	public function getFlavorAssetIds()
 	{
 		return $this->flavor_asset_ids;
+	}
+
+	/**
+	 * Get the [asset_ids] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getAssetIds()
+	{
+		return $this->asset_ids;
 	}
 
 	/**
@@ -931,6 +947,29 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 	} // setFlavorAssetIds()
 
 	/**
+	 * Set the value of [asset_ids] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     EntryDistribution The current object (for fluent API support)
+	 */
+	public function setAssetIds($v)
+	{
+		if(!isset($this->oldColumnsValues[EntryDistributionPeer::ASSET_IDS]))
+			$this->oldColumnsValues[EntryDistributionPeer::ASSET_IDS] = $this->asset_ids;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->asset_ids !== $v) {
+			$this->asset_ids = $v;
+			$this->modifiedColumns[] = EntryDistributionPeer::ASSET_IDS;
+		}
+
+		return $this;
+	} // setAssetIds()
+
+	/**
 	 * Sets the value of [sunrise] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
@@ -1310,17 +1349,18 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 			$this->dirty_status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->thumb_asset_ids = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->flavor_asset_ids = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->sunrise = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->sunset = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->remote_id = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->plays = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
-			$this->views = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
-			$this->validation_errors = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-			$this->error_type = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
-			$this->error_number = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
-			$this->error_description = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
-			$this->last_report = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
-			$this->custom_data = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+			$this->asset_ids = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->sunrise = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->sunset = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->remote_id = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->plays = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
+			$this->views = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
+			$this->validation_errors = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->error_type = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->error_number = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
+			$this->error_description = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
+			$this->last_report = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+			$this->custom_data = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1330,7 +1370,7 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 22; // 22 = EntryDistributionPeer::NUM_COLUMNS - EntryDistributionPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 23; // 23 = EntryDistributionPeer::NUM_COLUMNS - EntryDistributionPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating EntryDistribution object", $e);
@@ -1815,36 +1855,39 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 				return $this->getFlavorAssetIds();
 				break;
 			case 11:
-				return $this->getSunrise();
+				return $this->getAssetIds();
 				break;
 			case 12:
-				return $this->getSunset();
+				return $this->getSunrise();
 				break;
 			case 13:
-				return $this->getRemoteId();
+				return $this->getSunset();
 				break;
 			case 14:
-				return $this->getPlays();
+				return $this->getRemoteId();
 				break;
 			case 15:
-				return $this->getViews();
+				return $this->getPlays();
 				break;
 			case 16:
-				return $this->getValidationErrors();
+				return $this->getViews();
 				break;
 			case 17:
-				return $this->getErrorType();
+				return $this->getValidationErrors();
 				break;
 			case 18:
-				return $this->getErrorNumber();
+				return $this->getErrorType();
 				break;
 			case 19:
-				return $this->getErrorDescription();
+				return $this->getErrorNumber();
 				break;
 			case 20:
-				return $this->getLastReport();
+				return $this->getErrorDescription();
 				break;
 			case 21:
+				return $this->getLastReport();
+				break;
+			case 22:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1879,17 +1922,18 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 			$keys[8] => $this->getDirtyStatus(),
 			$keys[9] => $this->getThumbAssetIds(),
 			$keys[10] => $this->getFlavorAssetIds(),
-			$keys[11] => $this->getSunrise(),
-			$keys[12] => $this->getSunset(),
-			$keys[13] => $this->getRemoteId(),
-			$keys[14] => $this->getPlays(),
-			$keys[15] => $this->getViews(),
-			$keys[16] => $this->getValidationErrors(),
-			$keys[17] => $this->getErrorType(),
-			$keys[18] => $this->getErrorNumber(),
-			$keys[19] => $this->getErrorDescription(),
-			$keys[20] => $this->getLastReport(),
-			$keys[21] => $this->getCustomData(),
+			$keys[11] => $this->getAssetIds(),
+			$keys[12] => $this->getSunrise(),
+			$keys[13] => $this->getSunset(),
+			$keys[14] => $this->getRemoteId(),
+			$keys[15] => $this->getPlays(),
+			$keys[16] => $this->getViews(),
+			$keys[17] => $this->getValidationErrors(),
+			$keys[18] => $this->getErrorType(),
+			$keys[19] => $this->getErrorNumber(),
+			$keys[20] => $this->getErrorDescription(),
+			$keys[21] => $this->getLastReport(),
+			$keys[22] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1955,36 +1999,39 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 				$this->setFlavorAssetIds($value);
 				break;
 			case 11:
-				$this->setSunrise($value);
+				$this->setAssetIds($value);
 				break;
 			case 12:
-				$this->setSunset($value);
+				$this->setSunrise($value);
 				break;
 			case 13:
-				$this->setRemoteId($value);
+				$this->setSunset($value);
 				break;
 			case 14:
-				$this->setPlays($value);
+				$this->setRemoteId($value);
 				break;
 			case 15:
-				$this->setViews($value);
+				$this->setPlays($value);
 				break;
 			case 16:
-				$this->setValidationErrors($value);
+				$this->setViews($value);
 				break;
 			case 17:
-				$this->setErrorType($value);
+				$this->setValidationErrors($value);
 				break;
 			case 18:
-				$this->setErrorNumber($value);
+				$this->setErrorType($value);
 				break;
 			case 19:
-				$this->setErrorDescription($value);
+				$this->setErrorNumber($value);
 				break;
 			case 20:
-				$this->setLastReport($value);
+				$this->setErrorDescription($value);
 				break;
 			case 21:
+				$this->setLastReport($value);
+				break;
+			case 22:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -2022,17 +2069,18 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[8], $arr)) $this->setDirtyStatus($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setThumbAssetIds($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setFlavorAssetIds($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setSunrise($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setSunset($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setRemoteId($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setPlays($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setViews($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setValidationErrors($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setErrorType($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setErrorNumber($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setErrorDescription($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setLastReport($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setCustomData($arr[$keys[21]]);
+		if (array_key_exists($keys[11], $arr)) $this->setAssetIds($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setSunrise($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setSunset($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setRemoteId($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setPlays($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setViews($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setValidationErrors($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setErrorType($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setErrorNumber($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setErrorDescription($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setLastReport($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setCustomData($arr[$keys[22]]);
 	}
 
 	/**
@@ -2055,6 +2103,7 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(EntryDistributionPeer::DIRTY_STATUS)) $criteria->add(EntryDistributionPeer::DIRTY_STATUS, $this->dirty_status);
 		if ($this->isColumnModified(EntryDistributionPeer::THUMB_ASSET_IDS)) $criteria->add(EntryDistributionPeer::THUMB_ASSET_IDS, $this->thumb_asset_ids);
 		if ($this->isColumnModified(EntryDistributionPeer::FLAVOR_ASSET_IDS)) $criteria->add(EntryDistributionPeer::FLAVOR_ASSET_IDS, $this->flavor_asset_ids);
+		if ($this->isColumnModified(EntryDistributionPeer::ASSET_IDS)) $criteria->add(EntryDistributionPeer::ASSET_IDS, $this->asset_ids);
 		if ($this->isColumnModified(EntryDistributionPeer::SUNRISE)) $criteria->add(EntryDistributionPeer::SUNRISE, $this->sunrise);
 		if ($this->isColumnModified(EntryDistributionPeer::SUNSET)) $criteria->add(EntryDistributionPeer::SUNSET, $this->sunset);
 		if ($this->isColumnModified(EntryDistributionPeer::REMOTE_ID)) $criteria->add(EntryDistributionPeer::REMOTE_ID, $this->remote_id);
@@ -2151,6 +2200,8 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 		$copyObj->setThumbAssetIds($this->thumb_asset_ids);
 
 		$copyObj->setFlavorAssetIds($this->flavor_asset_ids);
+
+		$copyObj->setAssetIds($this->asset_ids);
 
 		$copyObj->setSunrise($this->sunrise);
 

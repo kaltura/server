@@ -48,6 +48,7 @@ class EntryDistributionTableMap extends TableMap {
 		$this->addColumn('DIRTY_STATUS', 'DirtyStatus', 'TINYINT', false, null, null);
 		$this->addColumn('THUMB_ASSET_IDS', 'ThumbAssetIds', 'VARCHAR', false, 255, null);
 		$this->addColumn('FLAVOR_ASSET_IDS', 'FlavorAssetIds', 'VARCHAR', false, 255, null);
+		$this->addColumn('ASSET_IDS', 'AssetIds', 'VARCHAR', false, 255, null);
 		$this->addColumn('SUNRISE', 'Sunrise', 'TIMESTAMP', false, null, null);
 		$this->addColumn('SUNSET', 'Sunset', 'TIMESTAMP', false, null, null);
 		$this->addColumn('REMOTE_ID', 'RemoteId', 'VARCHAR', false, 31, null);

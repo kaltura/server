@@ -58,6 +58,7 @@ CREATE TABLE `entry_distribution`
 	`dirty_status` TINYINT,
 	`thumb_asset_ids` VARCHAR(255),
 	`flavor_asset_ids` VARCHAR(255),
+	`asset_ids` VARCHAR(255),
 	`sunrise` DATETIME,
 	`sunset` DATETIME,
 	`remote_id` VARCHAR(31),

@@ -46,6 +46,7 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="dirty_status" type="tinyint" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="thumb_asset_ids" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="flavor_asset_ids" type="varchar" size="255" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="asset_ids" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="sunrise" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="sunset" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="remote_id" type="varchar" size="31" />
