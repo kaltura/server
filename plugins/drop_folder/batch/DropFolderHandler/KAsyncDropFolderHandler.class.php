@@ -101,26 +101,49 @@ class KAsyncDropFolderHandler extends KPeriodicWorker
 				
 			$fileNamePatterns = reset($fileNamePatterns);
 		}
-			
-		try {
-			$dropFolderFiles = $this->getPendingWaitingFiles($folder->id, $fileNamePatterns);
+	 
+		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
+		$dropFolderFileFilter->dropFolderIdEqual = $folder->id;
+		$dropFolderFileFilter->statusIn = KalturaDropFolderFileStatus::PENDING.','.KalturaDropFolderFileStatus::WAITING.','.KalturaDropFolderFileStatus::NO_MATCH;
+		if($fileNamePatterns)
+			$dropFolderFileFilter->fileNameLike = $fileNamePatterns;
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 1;
+		
+		try{		
+			$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter, $pager);
+			/* @var $dropFolderFiles KalturaDropFolderFileListResponse */ 
 		}
-		catch (Exception $e) {
-			KalturaLog::err('Cannot get list of files for drop folder id ['.$folder->id.'] - '.$e->getMessage());
+		catch (KalturaAPIException $e) {
+			KalturaLog::err('Cannot get list of files for drop folder id ['.$folder->id.'] pageIndex ['.$pager->pageIndex.'] - '.$e->getMessage());
 			return false;
 		}
 		
-		foreach ($dropFolderFiles as $file)
-		{
-			$fileHandled = $this->handleFile($folder, $file);
-			
-			if ($fileHandled) {
-				// break loop and go to next folder, because current folder files' status might have changed
-				return true;
+		while (count ($dropFolderFiles->objects)){
+			foreach ($dropFolderFiles->objects as $file)
+			{
+				$fileHandled = $this->handleFile($folder, $file);
+				
+				if ($fileHandled) {
+					// break loop and go to next folder, because current folder files' status might have changed
+					return true;
+				}
 			}
+			
+			$pager->pageIndex++;
+			try{	
+			$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter, $pager);
+			}
+			catch (KalturaAPIException $e) {
+				KalturaLog::err('Cannot get list of files for drop folder id ['.$folder->id.'] pageIndex ['.$pager->pageIndex.']- '.$e->getMessage());
+				return false;
+			} 
 		}
 		
-		return false; // no file was handled
+		if ($pager->pageIndex > 1)
+			return true;
+		else
+			return false; // no file was handled
 	}
 	
 	/**
@@ -169,29 +192,6 @@ class KAsyncDropFolderHandler extends KPeriodicWorker
 			KalturaLog::err('File was not handled!');
 			return false;
 		}
-	}
-	
-	
-	/**
-	 * @param int $dropFolderId
-	 * @return array of KalturaDropFolderFile
-	 */
-	private function getPendingWaitingFiles($dropFolderId, $fileNamePatterns = null)
-	{
-		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
-		$dropFolderFileFilter->dropFolderIdEqual = $dropFolderId;
-		$dropFolderFileFilter->statusIn = KalturaDropFolderFileStatus::PENDING.','.KalturaDropFolderFileStatus::WAITING.','.KalturaDropFolderFileStatus::NO_MATCH;
-		if($fileNamePatterns)
-			$dropFolderFileFilter->fileNameLike = $fileNamePatterns;
-			
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 1000;
-		if($this->taskConfig->params->pageSize)
-			$pager->pageSize = $this->taskConfig->params->pageSize;
-			
-		$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter, $pager);
-		$dropFolderFiles = $dropFolderFiles->objects;
-		return $dropFolderFiles;
 	}
 	
 	function log($message)
