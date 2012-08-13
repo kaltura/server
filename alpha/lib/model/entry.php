@@ -2930,6 +2930,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 							
 			foreach ($privacyContexts as $privacyContext)
 			{
+				$privacyContext = trim($privacyContext);
 				if(isset($entitledKusers[$privacyContext]))
 					$entitledKusers[$privacyContext] = array_merge($entitledKusers[$privacyContext], $category->getMembers());
 				else
