@@ -1032,6 +1032,14 @@ $(window).load(function(){
 	kmc.vars.isLoadedInterval = setInterval("kmc.utils.isModuleLoaded()",200);
 });
 
+// Auto resize modal windows
+$(window).resize(function() {
+		// Exit if not open
+	if( kmc.layout.modal.isOpen() ) {
+		kmc.layout.modal.position();
+	}
+});
+
 // If we have ongoing process, we show a warning message when the user try to leaves the page
 window.onbeforeunload = kmc.functions.checkForOngoingProcess;
 
