@@ -770,7 +770,7 @@ kmc.preview_embed = {
 
 		embed_code = (html5_support) ? kmc.preview_embed.embed_code_template.script_tag + '\n' + kmc.preview_embed.embed_code_template.object_tag : kmc.preview_embed.embed_code_template.object_tag;
 		// Add SEO Atts
-		embed_code = embed_code.replace("{SEO_ATTS}", (kmc.vars.ignore_entry_seo ? "" : kmc.pre.embe.media_seo_atts));
+		embed_code = embed_code.replace("{SEO_ATTS}", (kmc.vars.ignore_entry_seo ? "" : kmc.preview_embed.embed_code_template.media_seo_atts));
 		if(!kmc.vars.jw) { // more efficient to add "&& !kmc.vars.silverlight" (?)
 			kmc.vars.embed_code_delivery_type = kmc.vars.embed_code_delivery_type || "http";
 			switch( kmc.vars.embed_code_delivery_type ) {
