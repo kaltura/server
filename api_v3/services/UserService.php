@@ -177,7 +177,7 @@ class UserService extends KalturaBaseUserService
 	 */		
 	public function getAction($userId = null)
 	{
-	    if (!$userId)
+	    if (is_null($userId) || $userId == '')
 	    {
             $userId = kCurrentContext::$ks_uid;	        
 	    }
