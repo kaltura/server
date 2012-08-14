@@ -28,7 +28,7 @@ try
 {
 	$config = new Zend_Config_Ini($loggerConfigPath);
 	KalturaLog::initLog($config->scripts);
-	KalturaLog::setContext("SCRIPT");
+	KalturaLog::setContext(basename($_SERVER['SCRIPT_NAME']));
 }
 catch (Zend_Config_Exception $ex)
 {
