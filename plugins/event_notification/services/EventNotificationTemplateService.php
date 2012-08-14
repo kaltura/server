@@ -227,7 +227,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 			
 			$partnerFilter = new partnerFilter();
 			$filter->toObject($partnerFilter);
-			$partnerFilter->set('_gt_id', 0);
+			$partnerFilter->set('_gt_id', -1);
 			
 			$partnerCriteria = new Criteria();
 			$partnerFilter->attachToCriteria($partnerCriteria);
