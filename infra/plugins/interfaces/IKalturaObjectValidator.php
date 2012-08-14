@@ -6,11 +6,13 @@
  */
 interface IKalturaObjectValidator extends IKalturaBase
 {
+    const OPERATION_COPY = "1";
+    
     /**
-     * Function validates required operation on an object and throws exception if it fails.
+     * Function validates an object and throws exception if it fails.
      * @param BaseObject $object object to validate.
-     * 
+     * @param int $operation operation in which context the validation is performed.
      * 
      */
-    public static function validateObject (BaseObject $object);
+    public static function validateObject (BaseObject $object, $operation);
 }
