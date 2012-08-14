@@ -847,7 +847,7 @@ kmc.preview_embed = {
 
 		var type = is_playlist ? "playlist" : "player";
 		$.ajax({
-			url: kmc.vars.getuiconfs_url,
+			url: window.location.protocol + '//' + window.location.hostname + kmc.vars.getuiconfs_url,
 			type: "POST",
 			data: {
 				"type": type,
@@ -900,7 +900,7 @@ kmc.preview_embed = {
 
 kmc.client = {
 	makeRequest: function( service, action, params, callback ) {
-		var serviceUrl = 'http://' + window.location.hostname + '/api_v3/index.php?service='+service+'&action='+action;
+		var serviceUrl = window.location.protocol + '//' + window.location.hostname + '/api_v3/index.php?service='+service+'&action='+action;
 		var defaultParams = {
 			"ks"		: kmc.vars.ks,
 			"format"	: 1			
