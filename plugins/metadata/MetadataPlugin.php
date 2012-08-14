@@ -976,7 +976,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	}
 	
 	
-	public static function validateObject (BaseObject $object)
+	public static function validateObject (BaseObject $object, $operation)
 	{
 	    if ($object instanceof Partner)
 	    {
