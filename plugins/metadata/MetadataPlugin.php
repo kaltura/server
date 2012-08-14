@@ -978,7 +978,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	
 	public static function validateObject (BaseObject $object)
 	{
-	    if (get_class($object) == "Partner")
+	    if ($object instanceof Partner)
 	    {
 	        $c = new Criteria();
  		    $c->add(MetadataProfilePeer::PARTNER_ID, $object->getId());
