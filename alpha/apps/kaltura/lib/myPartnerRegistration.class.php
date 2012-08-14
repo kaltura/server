@@ -392,8 +392,6 @@ class myPartnerRegistration
  		$c = new Criteria();
  		$c->addAnd(categoryPeer::PARTNER_ID, $templatePartner->getId());
  		$c->addAnd(categoryPeer::STATUS, CategoryStatus::ACTIVE);
- 		$c->addAscendingOrderByColumn(categoryPeer::DEPTH);
- 		$c->addAscendingOrderByColumn(categoryPeer::CREATED_AT);
  		$count = categoryPeer::doCount($c);
  	    if ($count > kConf::get('copy_partner_limit_categories'))
         {
@@ -416,7 +414,6 @@ class myPartnerRegistration
  		$c->addAnd(entryPeer::PARTNER_ID, $templatePartner->getId());
  		$c->addAnd(entryPeer::TYPE, $entryType);
  		$c->addAnd(entryPeer::STATUS, entryStatus::READY);
- 		$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
  		$count = entryPeer::doCount($c);
  		if ($count > kConf::get('copy_partner_limit_entries'))
  		{
@@ -451,7 +448,6 @@ class myPartnerRegistration
  		UserRolePeer::setUseCriteriaFilter ( false );
  		$c = new Criteria();
  		$c->addAnd(UserRolePeer::PARTNER_ID, $templatePartner->getId(), Criteria::EQUAL);
- 		$c->addDescendingOrderByColumn(UserRolePeer::CREATED_AT);
  		$count = UserRolePeer::doCount($c);
  		if ($count > kConf::get('copy_partner_limit_user_roles'))
  		{
