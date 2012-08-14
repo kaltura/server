@@ -1,12 +1,13 @@
 <?php
-require_once('myBatchBase.class.php');
-define('MODULES' , SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR."modules".DIRECTORY_SEPARATOR);
-
+/**
+ * @package Core
+ * @subpackage Server-Batch
+ */
 class myBatchPartnerUsage extends myBatchBase
 {
 	const SLEEP_TIME = 1;
 	
-	public function myBatchPartnerUsage()
+	public function myBatchPartnerUsage($partnerId = null)
 	{
 		self::initDb();
 		$partners_exists = true;
@@ -15,8 +16,12 @@ class myBatchPartnerUsage extends myBatchBase
 		while($partners_exists)
 		{
 			$c = new Criteria();
-			// get only free partners
-			$c->addAnd(PartnerPeer::PARTNER_PACKAGE, 1);
+			if(!is_null($partnerId))
+			{
+				$c->addAnd(PartnerPeer::ID, $partnerId);
+			}
+			
+			$c->addAnd(PartnerPeer::PARTNER_PACKAGE, 1); // get only free partners
 			$c->addAnd(PartnerPeer::MONITOR_USAGE, 1);
 			$c->addAnd(PartnerPeer::STATUS, Partner::PARTNER_STATUS_DELETED, CRITERIA::NOT_EQUAL);
 			$c->setOffset($start_pos);
@@ -42,5 +47,3 @@ class myBatchPartnerUsage extends myBatchBase
 	}
 
 }
-
-?>
