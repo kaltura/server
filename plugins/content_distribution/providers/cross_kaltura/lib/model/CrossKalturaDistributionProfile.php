@@ -230,7 +230,7 @@ class CrossKalturaDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(CrossKalturaDistributionField::BASE_ENTRY_REFERENCE_ID);
 	    $fieldConfig->setUserFriendlyFieldName('Reference ID');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(referenceId)" />');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(referenceID)" />');
 	    $fieldConfig->setUpdateOnChange(true);
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
