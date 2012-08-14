@@ -856,10 +856,8 @@ class kuser extends Basekuser implements IIndexable
     		$c = new Criteria();
     		$c->addSelectColumn(PartnerPeer::ID);
     		$c->addAnd(PartnerPeer::ID, $ids, Criteria::IN);
-    		if ($partnerFilter)
-    		{
-    		    $partnerFilter->attachToCriteria($c);
-    		}
+    		$partnerFilter->setIdIn($ids);
+    		$partnerFilter->attachToCriteria($c);
     		$stmt = PartnerPeer::doSelectStmt($c);
     		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		}
