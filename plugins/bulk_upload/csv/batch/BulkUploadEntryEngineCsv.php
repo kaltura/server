@@ -452,6 +452,10 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	 */
 	private function createCategoryAssociations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult)
 	{
+		if($categories == "") {	// skip this prcoess if no categories are present
+			KalturaLog::notice("No categories found for entry ID [$entryId], skipping association creating");
+			return;
+		}
 	    $this->impersonate();
 	    
 	    $categoriesArr = explode(",", $categories);
@@ -489,7 +493,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	    }
 	    
 	    $this->unimpersonate();
-	    return $bulkuploadResult;
+	    return;
 	}
 	
 	private function createCategoryByPath ($fullname)
