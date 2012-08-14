@@ -550,7 +550,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(count($vals))
 					{
 						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-						$val = '(^' . implode('$ | ^', $vals) . '$)';
+						$val = '((^' . implode('$) | (^', $vals) . '$))';
 						$this->addMatch("@$sphinxField $val");
 						$filter->unsetByName($field);
 					}
