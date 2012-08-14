@@ -2627,7 +2627,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 						self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus();
 			}
 				
-			if($categoryEntry->getStatus() == CategoryEntryStatus::ACTIVE)
+			if($categoryEntry->getStatus() == CategoryEntryStatus::ACTIVE || $categoryEntry->getStatus() == CategoryEntryStatus::PENDING)
 				$categoriesEntryStringIndex[] = $categoryEntry->getCategoryId();	
 		}
 		
