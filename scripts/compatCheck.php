@@ -48,6 +48,11 @@ $APIV3_TESTED_ACTIONS = array(
 		'*.search',
 		);
 
+// compare modes
+define('CM_XML', 0);
+define('CM_BINARY', 1);
+define('CM_WIDGET', 2);
+
 $ID_FIELDS = array('id', 'guid', 'loc', 'title', 'link');
 
 class PartnerSecretPool
@@ -405,6 +410,11 @@ function normalizeResultBuffer($result)
 	return $result;
 }
 
+function uncompressWidget($buffer)
+{
+	return gzuncompress(substr($buffer, 8));
+}
+
 function compareResults($resultNew, $resultOld)
 {
 	$resultNew = normalizeResultBuffer($resultNew);
@@ -507,7 +517,7 @@ function shouldProcessRequest($fullActionName, $parsedParams)
 	return 'yes';
 }
 
-function testAction($fullActionName, $parsedParams, $uri, $postParams = array(), $binaryCompare = false)
+function testAction($fullActionName, $parsedParams, $uri, $postParams = array(), $compareMode = CM_XML)
 {
 	global $serviceUrlOld, $serviceUrlNew;
 	
@@ -516,7 +526,7 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array(),
 	usleep(200000);         // sleep for 0.2 sec to avoid hogging the server
 	
 	$range = null;
-	if ($binaryCompare)
+	if ($compareMode == CM_BINARY)
 		$range = '0-262144';		// 256K
 	
 	for ($retries = 0; $retries < 3; $retries++)
@@ -530,16 +540,24 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array(),
 			return;
 		}
 		
-		if ($binaryCompare)
+		switch ($compareMode)
 		{
+		case CM_WIDGET:
+			$resultOld = uncompressWidget($resultOld);
+			$resultNew = uncompressWidget($resultNew);
+
+		case CM_BINARY:
+			$resultOld = normalizeResultBuffer($resultOld);
+			$resultNew = normalizeResultBuffer($resultNew);
 			if ($resultNew === $resultOld)
 				$errors = array();
 			else
 				$errors = array('Data does not match - newSize='.strlen($resultNew).' oldSize='.strlen($resultOld));
-		}
-		else
-		{
+			break;
+					
+		case CM_XML:
 			$errors = compareResults($resultNew, $resultOld);
+			break;
 		}
 		
 		if (!count($errors))
@@ -582,7 +600,7 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array(),
 		print "\tError: $error\n";
 	}
 	
-	if (!$binaryCompare && (count($errors) != 1 || !beginsWith($errors[0], 'Different order ')))
+	if ($compareMode == CM_XML && (count($errors) != 1 || !beginsWith($errors[0], 'Different order ')))
 	{
 		print "Result - new\n";
 		print $resultNew . "\n";
@@ -759,8 +777,8 @@ function processRequest($parsedParams)
 	}
 	
 	$uri = "/api_v3/index.php?service=$service&action=$action";
-	$compareBinary = beginsWith($action, 'serve');
-	testAction($fullActionName, $parsedParams, $uri, $parsedParams, $compareBinary);
+	$compareMode = (beginsWith($action, 'serve') ? CM_BINARY : CM_XML);
+	testAction($fullActionName, $parsedParams, $uri, $parsedParams, $compareMode);
 }
 
 function processFeedRequest($parsedParams)
@@ -898,8 +916,13 @@ function processPS2Request($parsedParams)
 	
 	$uri = "/index.php/$module/$action?" . http_build_query($parsedParams, null, "&");
 
-	$compareBinary = in_array($fullActionName, $PS2_TESTED_BIN_ACTIONS);
-	testAction($fullActionName, $parsedParams, $uri, array(), $compareBinary);
+	if (in_array($fullActionName, $PS2_TESTED_XML_ACTIONS))
+		$compareMode = CM_XML;
+	else if ($fullActionName == 'extwidget.kwidget')
+		$compareMode = CM_WIDGET;
+	else
+		$compareMode = CM_BINARY;
+	testAction($fullActionName, $parsedParams, $uri, array(), $compareMode);
 }
 
 class LogProcessorPS2
