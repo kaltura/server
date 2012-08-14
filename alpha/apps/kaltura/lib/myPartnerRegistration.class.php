@@ -458,7 +458,7 @@ class myPartnerRegistration
  		$validatorPlugins = KalturaPluginManager::getPluginInstances('IKalturaObjectValidator');
  		foreach ($validatorPlugins as $validatorPlugins)
  		{
- 		    $validatorPlugins->validateObject ($templatePartner);
+ 		    $validatorPlugins->validateObject ($templatePartner, IKalturaObjectValidator::OPERATION_COPY);
  		}
         
 	}
