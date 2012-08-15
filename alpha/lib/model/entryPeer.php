@@ -367,7 +367,7 @@ class entryPeer extends BaseentryPeer
 			
 			//user should be able to get all entries s\he uploaded - outside the privacy context
 			$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , $kuserId, Criteria::EQUAL);
-			$critKuser->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			$critKuser->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 			$critEntitled->addOr($critKuser);
 		}
 		elseif(self::$userContentOnly) // when session is not admin and without list:* privilege, allow access to user entries only
