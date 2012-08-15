@@ -18,11 +18,6 @@ class kEntitlementUtils
 	
 	public static function getEntitlementEnforcement()
 	{
-		if(self::$entitlementEnforcement)
-			KalturaLog::debug('Entitlement - enable');
-		else
-			KalturaLog::debug('Entitlement - disable');
-			
 		return self::$entitlementEnforcement;
 	}
 	
@@ -95,8 +90,9 @@ class kEntitlementUtils
 		$ksPrivacyContexts = null;
 		
 		// entry that doesn't belong to any category is public
+		//when ks is not provided - the entry is still public (for example - download action)
 		$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entry->getId());
-		if(!count($categoryEntries) && (!$ks))
+		if(!count($categoryEntries) && !$ks)
 		{
 			KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
 			return true;
