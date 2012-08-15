@@ -452,7 +452,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	 */
 	private function createCategoryAssociations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult)
 	{
-		if($categories == "") {	// skip this prcoess if no categories are present
+		if(!$categories) {	// skip this prcoess if no categories are present
 			KalturaLog::notice("No categories found for entry ID [$entryId], skipping association creating");
 			return;
 		}
