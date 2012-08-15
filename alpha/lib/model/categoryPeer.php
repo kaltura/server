@@ -336,6 +336,7 @@ class categoryPeer extends BasecategoryPeer
 		
 		//not deleted or purged
 		$c->add ( self::STATUS, array(CategoryStatus::DELETED, CategoryStatus::PURGED), Criteria::NOT_IN );
+		$c->add(self::PARENT_ID, $partnerId, Criteria::EQUAL);
 
 		//add privacy context
 		$privacyContextCrit = $c->getNewCriterion(self::PRIVACY_CONTEXTS, kEntitlementUtils::getKsPrivacyContext(), KalturaCriteria::IN_LIKE);
