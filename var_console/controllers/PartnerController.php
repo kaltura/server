@@ -47,7 +47,7 @@ class PartnerController extends Zend_Controller_Action
     					if (strpos($result[0]['message'], 'already exists in system') !== false)
     						$form->getElement('admin_email')->addError('Email already exists');
     					else
-    					    $form->setDescription('An error occured: ' . $result[0]['message']); 
+    					    $this->view->errorDescription = 'An error occured: ' . $e->getMessage();   
     				}
     				else
     				{
@@ -57,7 +57,7 @@ class PartnerController extends Zend_Controller_Action
 				}
 				catch (Exception $e)
 				{
-				    $form->setDescription('An error occured: ' . $e->getMessage());    
+				    $this->view->errorDescription = 'An error occured: ' . $e->getMessage();   
 				}
 				
 			}
