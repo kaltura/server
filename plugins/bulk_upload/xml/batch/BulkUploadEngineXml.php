@@ -350,6 +350,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 			catch (Exception $e)
 			{
+				//in case an exception was thrown we need to change back to batch user in order to addBulkResult
+				$this->unimpersonate();
 				KalturaLog::err('Item failed (' . get_class($e) . '): ' . $e->getMessage());
 				$bulkUploadResult = $this->createUploadResult($item, $action);
 				$bulkUploadResult->errorDescription = $e->getMessage();
