@@ -1090,6 +1090,26 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 				$shouldCopyDataForClip = true;
 			   }
 		}
+	    //if entry is a static playlist, link between it and its new child entries
+		if ($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+		{
+		    $key = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		    //should be a comma separated string of entry ids
+		    $from = kFileSyncUtils::file_get_contents($key);
+		    KalturaLog::debug("Entries to copy from source static playlist: [$from]");
+            $fromEntryIds = explode(",", $from);
+            $toEntryIds = array();
+            foreach ($fromEntryIds as $fromEntryId)
+            {
+                $fromEntryId[] = kObjectCopyHandler::getMappedId("entry", $fromEntryId);
+            }
+            
+            $newSyncKey = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+            $newFilSync = kFileSyncUtils::file_put_contents($newSyncKey, implode(",", $toEntryIds));
+            
+            		    
+		}
+		
 		if($shouldCopyDataForNonClip || $shouldCopyDataForClip)
 		{
 	 		// copy the data
