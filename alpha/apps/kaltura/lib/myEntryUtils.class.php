@@ -1079,7 +1079,12 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		KalturaLog::log("copyEntry - New entry [".$newEntry->getId()."] was created");
 		
 		// for any type that does not require assets:
-		$shouldCopyDataForNonClip = ($entry->getType() != entryType::MEDIA_CLIP && $entry->getType() != entryType::PLAYLIST);
+		$shouldCopyDataForNonClip = true;
+		if ($entry->getType() == entryType::MEDIA_CLIP)
+		    $shouldCopyDataForNonClip = false;    
+		if ($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+		    $shouldCopyDataForNonClip = false;
+		
 		$shouldCopyDataForClip = false;
 		// only images get their data copied
 		if($entry->getType() == entryType::MEDIA_CLIP)
@@ -1094,20 +1099,16 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  	    //if entry is a static playlist, link between it and its new child entries
 		if ($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
 		{
-		    $key = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-		    //should be a comma separated string of entry ids
-		    $from = kFileSyncUtils::file_get_contents($key);
+		    $from = $entry->getDataContent();
 		    KalturaLog::debug("Entries to copy from source static playlist: [$from]");
             $fromEntryIds = explode(",", $from);
             $toEntryIds = array();
             foreach ($fromEntryIds as $fromEntryId)
             {
-                $toEntryIds[] = kObjectCopyHandler::getMappedId("entry", $fromEntryId);
+                $toEntryIds[] = kObjectCopyHandler::getMappedId(entryPeer::OM_CLASS, $fromEntryId);
             }
             
-            $newSyncKey = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-            $filesync = FileSyncPeer::retrieveByFileSyncKey($newSyncKey);
-            $newFilSync = kFileSyncUtils::file_put_contents($newSyncKey, implode(",", $toEntryIds));
+            $newEntry->setDataContent(implode(",", $toEntryIds));
 		}
 		
 		if($shouldCopyDataForNonClip || $shouldCopyDataForClip)
