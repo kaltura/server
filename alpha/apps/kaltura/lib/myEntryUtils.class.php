@@ -1192,7 +1192,9 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		
  		$entry->parentSetCategories(implode(',', $categoriesFullName));
 		$entry->parentsetCategoriesIds(implode(',', $categoriesIds));
-		$entry->save();
+		
+		if(!$entry->save())		
+			$entry->indexToSearchIndex();
 		
 		return $entry->getIntId();
  	}
