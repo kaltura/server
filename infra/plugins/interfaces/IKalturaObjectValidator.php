@@ -6,7 +6,7 @@
  */
 interface IKalturaObjectValidator extends IKalturaBase
 {
-    const OPERATION_COPY = "1";
+    const OPERATION_COPY = 1;
     
     /**
      * Function validates an object and throws exception if it fails.
