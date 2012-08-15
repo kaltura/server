@@ -41,7 +41,12 @@ class kEventScope extends kScope
 	 */
 	public function getPartnerId()
 	{
-		return $this->partnerId ? $this->partnerId : kCurrentContext::$ks_partner_id;
+	    if (! $this->partnerId)
+	    {
+	        return kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+	    }
+		
+	    return $this->partnerId;
 	}
 
 	/**
