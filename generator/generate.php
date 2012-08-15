@@ -126,7 +126,7 @@ foreach($config as $name => $item)
 	
 	// check if generator is valid (not null and there is a class by this name)
 	if ($generator === null)
-		throw new Exception("No generator for [".$name."]");
+		continue;
 	if (!class_exists($generator))
 		throw new Exception("Generator [".$generator."] not found");
 	
