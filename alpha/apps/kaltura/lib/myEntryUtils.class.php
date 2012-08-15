@@ -1079,7 +1079,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		KalturaLog::log("copyEntry - New entry [".$newEntry->getId()."] was created");
 		
 		// for any type that does not require assets:
-		$shouldCopyDataForNonClip = ($entry->getType() != entryType::MEDIA_CLIP);
+		$shouldCopyDataForNonClip = ($entry->getType() != entryType::MEDIA_CLIP && $entry->getType() != entryType::PLAYLIST);
 		$shouldCopyDataForClip = false;
 		// only images get their data copied
 		if($entry->getType() == entryType::MEDIA_CLIP)
@@ -1089,6 +1089,25 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			   {
 				$shouldCopyDataForClip = true;
 			   }
+		}
+		
+ 	    //if entry is a static playlist, link between it and its new child entries
+		if ($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+		{
+		    $key = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		    //should be a comma separated string of entry ids
+		    $from = kFileSyncUtils::file_get_contents($key);
+		    KalturaLog::debug("Entries to copy from source static playlist: [$from]");
+            $fromEntryIds = explode(",", $from);
+            $toEntryIds = array();
+            foreach ($fromEntryIds as $fromEntryId)
+            {
+                $toEntryIds[] = kObjectCopyHandler::getMappedId("entry", $fromEntryId);
+            }
+            
+            $newSyncKey = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+            $filesync = FileSyncPeer::retrieveByFileSyncKey($newSyncKey);
+            $newFilSync = kFileSyncUtils::file_put_contents($newSyncKey, implode(",", $toEntryIds));
 		}
 		
 		if($shouldCopyDataForNonClip || $shouldCopyDataForClip)
@@ -1174,25 +1193,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			categoryPeer::setUseCriteriaFilter(true);
 		}
 		
- 	    //if entry is a static playlist, link between it and its new child entries
-		if ($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
-		{
-		    $key = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-		    //should be a comma separated string of entry ids
-		    $from = kFileSyncUtils::file_get_contents($key);
-		    KalturaLog::debug("Entries to copy from source static playlist: [$from]");
-            $fromEntryIds = explode(",", $from);
-            $toEntryIds = array();
-            foreach ($fromEntryIds as $fromEntryId)
-            {
-                $toEntryIds[] = kObjectCopyHandler::getMappedId("entry", $fromEntryId);
-            }
-            
-            $newSyncKey = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-            $newFilSync = kFileSyncUtils::file_put_contents($newSyncKey, implode(",", $toEntryIds));
-		}
- 	}
- 	
+ 	} 	
  	/*
  	 * re-index to search index, and recalculate fields.
  	 */
