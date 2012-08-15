@@ -229,7 +229,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	public $status;
 	
 	/**
-	 * the category id that this category inherit its members and members permission (for contribution and join)
+	 * The category id that this category inherit its members and members permission (for contribution and join)
 	 * 
 	 * @var int
 	 * @readonly
@@ -269,7 +269,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	public $directSubCategoriesCount;
 	
 	/**
-	 * Entries moderation 
+	 * Moderation to add entries to this category by users that are not of permission level Manager or Moderator.  
 	 * @var KalturaNullableBoolean
 	 */
 	public $moderation;
