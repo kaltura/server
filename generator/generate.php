@@ -73,7 +73,7 @@ kFile::fullMkdir($outputPathBase);
 
 //pull the generator config ini
 $config = new Zend_Config_Ini("../configurations/generator.ini", null, array('allowModifications' => true));
-$config = KalturaPluginManager::mergeConfigs($config, 'generator');
+$config = KalturaPluginManager::mergeConfigs($config, 'generator', false);
 
 //if we got specific generator request, tes if this requested generator does exist
 if ($generateSingle != null)
