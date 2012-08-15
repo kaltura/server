@@ -25,6 +25,8 @@ class PartnerController extends Zend_Controller_Action
 		
 		$partner = Zend_Registry::get('config')->partner;
 		
+		 $this->view->errorDescription = "";
+		
 		if ($request->isPost())
 		{
 			if ($form->isValid($request->getPost()))
