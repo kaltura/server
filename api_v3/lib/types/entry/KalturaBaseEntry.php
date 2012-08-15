@@ -75,6 +75,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	public $adminTags;
 	
 	/**
+	 * Categories with no entitlement that this entry belong to. This field is deprecated - use CategoryEntry service.
 	 * 
 	 * @var string
 	 * @filter matchand, matchor
@@ -83,6 +84,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	public $categories;
 	
 	/**
+	 * Categories Ids of categories no entitlement that this entry belong to
 	 * 
 	 * @var string
 	 * @filter matchand, matchor
