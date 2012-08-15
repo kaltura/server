@@ -1101,7 +1101,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
             $toEntryIds = array();
             foreach ($fromEntryIds as $fromEntryId)
             {
-                $fromEntryId[] = kObjectCopyHandler::getMappedId("entry", $fromEntryId);
+                $toEntryIds[] = kObjectCopyHandler::getMappedId("entry", $fromEntryId);
             }
             
             $newSyncKey = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
