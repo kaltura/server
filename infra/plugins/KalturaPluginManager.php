@@ -97,12 +97,18 @@ class KalturaPluginManager
 		{
 			foreach($newConfig as $key => $value)
 			{
-				if(!$srcConfig->$key)
-					$returnedConfig->$key = $newConfig->$key;
-				elseif($value instanceof Iterator)
+				if($value instanceof Iterator)
+				{
+					if(!$srcConfig->$key)
+						$srcConfig->$key = new Zend_Config(array(), true);
 					$returnedConfig->$key = self::mergeConfigItem($srcConfig->$key, $newConfig->$key, $valuesOnly);
+				}
 				else
-					$returnedConfig->$key = $srcConfig->$key . ',' . $newConfig->$key;
+				{
+					if ($srcConfig->$key)
+						$returnedConfig->$key .= ',';
+					$returnedConfig->$key .= $newConfig->$key;
+				}
 			}
 		}
 		
