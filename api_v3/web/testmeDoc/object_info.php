@@ -287,7 +287,7 @@ else
 	if(!KalturaTypeReflector::hasClassInheritMapCache())
 	{
 		$config = new Zend_Config_Ini("../../config/testme.ini", null, array('allowModifications' => true));
-		$config = KalturaPluginManager::mergeConfigs($config, 'testme');
+		$config = KalturaPluginManager::mergeConfigs($config, 'testme', false);
 		$indexConfig = $config->get('testmedoc');
 		
 		$include = $indexConfig->get("include");

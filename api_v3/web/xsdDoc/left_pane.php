@@ -1,6 +1,6 @@
 <?php 
 	$config = new Zend_Config_Ini("../../config/testme.ini", null, array('allowModifications' => true));
-	$config = KalturaPluginManager::mergeConfigs($config, 'xsddoc');
+	$config = KalturaPluginManager::mergeConfigs($config, 'xsddoc', false);
 	$indexConfig = $config->get('xsddoc');
 	
 	$exclude = explode(',', $indexConfig->get("exclude"));
