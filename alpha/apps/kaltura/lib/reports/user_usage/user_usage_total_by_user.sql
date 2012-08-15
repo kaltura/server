@@ -1,9 +1,12 @@
-SELECT added_entries, total_entries, added_storage_mb, total_storage_mb, added_msecs, total_msecs
+SELECT added_entries, deleted_entries, total_entries, added_storage_mb, deleted_storage_mb, total_storage_mb, added_msecs, deleted_msecs, total_msecs
 FROM 
 	(SELECT
 		IFNULL(SUM(added_storage_kb),0)/1024 added_storage_mb,
+		IFNULL(SUM(deleted_storage_kb),0)/1024 deleted_storage_mb,
 		IFNULL(SUM(added_entries),0) added_entries,
-		IFNULL(SUM(added_msecs),0) added_msecs
+		IFNULL(SUM(deleted_entries),0) deleted_entries,
+		IFNULL(SUM(added_msecs),0) added_msecs,
+		IFNULL(SUM(deleted_msecs),0) deleted_msecs
 	FROM
 			kalturadw.dwh_hourly_user_usage u
 			WHERE

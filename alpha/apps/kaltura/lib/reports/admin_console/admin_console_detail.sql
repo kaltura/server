@@ -14,6 +14,7 @@ SELECT
 	0 "count mix",
 	FLOOR(aggr_p.count_bandwidth / 1024) "count bandwidth mb",
 	aggr_p.added_storage "added storage mb",
+	aggr_p.deleted_storage "deleted storage mb",
 	aggr_p.peak_storage "peak storage mb",
 	aggr_p.average_storage "average storage mb",
 	FLOOR(aggr_p.count_bandwidth / 1024) + aggr_p.average_storage "combined bandwidth storage"
@@ -30,7 +31,8 @@ FROM
 	new_audios, 
 	new_images, 
 	count_bandwidth, 
-	added_storage, 
+	added_storage,
+	deleted_storage,
 	peak_storage,
 	average_storage
 	FROM
@@ -47,7 +49,8 @@ FROM
 		ORDER BY dim_partner.partner_id
 		LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */) media_usage,
 	(	SELECT dim_partner.partner_id partner_id, 	IFNULL(SUM(count_bandwidth_kb), 0) count_bandwidth,
-			IFNULL(SUM(count_storage_mb), 0) added_storage,
+			IFNULL(SUM(added_storage_mb), 0) added_storage,
+			IFNULL(SUM(deleted_storage_mb), 0) deleted_storage,
 			IFNULL(MAX(aggr_storage_mb), 0) peak_storage,
 			IFNULL(SUM(aggr_storage_mb), 0) / (DATEDIFF({TO_DATE_ID},{FROM_DATE_ID}) + 1) average_storage
 		FROM kalturadw.dwh_dim_partners dim_partner 

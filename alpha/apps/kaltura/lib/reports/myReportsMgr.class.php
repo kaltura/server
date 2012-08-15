@@ -856,6 +856,7 @@ class myReportsMgr
 				"average_storage",
 				"peak_storage",
 				"added_storage",
+				"deleted_storage",
 				"combined_bandwidth_storage",
 			    "month_id,partner_id",
 			    "date_id,partner_id",
@@ -867,22 +868,29 @@ class myReportsMgr
 				"average_storage",
 				"peak_storage",
 				"added_storage",
+				"deleted_storage",
 				"combined_bandwidth_storage",
 			),
 			"user_usage" => array (
 				"added_entries",
+				"deleted_entries",
 	 			"total_entries",
 				"added_storage_mb",
+				"deleted_storage_mb",
 				"total_storage_mb",
 				"added_msecs",
+				"deleted_msecs",
 				"total_msecs",
 			),
 			"specific_user_usage" => array (
 				"date_id",
 				"month_id",
 				"added_entries",
+				"deleted_entries",
 				"added_storage_mb",
+				"deleted_storage_mb",
 				"added_msecs",
+				"deleted_msecs",
 			)
 		);
 		
