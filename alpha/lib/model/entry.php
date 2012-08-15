@@ -2596,6 +2596,23 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	/*
 	 * get all categoryEntry objects from categoryEntryPeer
+	 * to make search query shorter and to solve search problem when category tree is big.
+ 	 *
+	 *	let’s say entry belong to 2 categories with these full_ids
+	 * 	111>222>333
+	 *	111>444
+	 * Old categories fields was: 
+	 *	333,444
+	 * 
+	 * New categories filed:
+	 * pc111s2,p111s2,pc222s2,p222s2,pc333s2,c333s2,pc444s2,c444s2
+	 * 
+	 * 
+	 * so why do we need pc111?
+	 * If baseEntry->list with filter categoriesMatchOr= ‘111’ you need to search for match pc111s2
+	 * 
+	 * so why do we need p111?
+	 * If baseEntry->list with filter categoriesMatchOr= ‘111>’ you need to search for match p111s2
 	 */
 	public function getCategoriesEntryIds()
 	{
@@ -2887,7 +2904,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		$entitledKusersNoPrivacyContext = array_merge($entitledKusersPublish, $entitledKusersEdit);
 		$entitledKusersNoPrivacyContext[] = $this->getKuserId();
-		$entitledKusersNoPrivacyContext[] = $this->getCreatorKuserId();
 		
 		foreach ($entitledKusersNoPrivacyContext as $key => $value)
 		{

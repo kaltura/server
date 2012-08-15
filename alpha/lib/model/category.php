@@ -1457,7 +1457,7 @@ class category extends Basecategory implements IIndexable
 	public function setBulkUploadId ( $bulkUploadId )	{		$this->putInCustomData ( "bulk_upload_id" , $bulkUploadId );	}
 	public function getBulkUploadId (  )	{		return $this->getFromCustomData( "bulk_upload_id" );	}
 	
-	/*
+	/**
 	 * to be set when category is indexing - recalculating inheritance fields.
 	 */
 	public function setIsIndex($v)
@@ -1465,7 +1465,7 @@ class category extends Basecategory implements IIndexable
 		$this->is_index = $v;
 	}
 	
-	/*
+	/**
 	 * if category is reindexing - recalculating inheritance fields.
 	 * no need to add all batch job, 
 	 * because some of the batch jobs are already done by the parent category.
