@@ -412,7 +412,7 @@ class myPartnerRegistration
  		entryPeer::setUseCriteriaFilter ( false );
  		$c = new Criteria();
  		$c->addAnd(entryPeer::PARTNER_ID, $templatePartner->getId());
- 		$c->addAnd(entryPeer::TYPE, $entryType);
+ 		$c->addAnd(entryPeer::TYPE, array (entryType::MEDIA_CLIP, entryType::PLAYLIST), Criteria::IN);
  		$c->addAnd(entryPeer::STATUS, entryStatus::READY);
  		$count = entryPeer::doCount($c);
  		if ($count > kConf::get('copy_partner_limit_entries'))
@@ -435,7 +435,7 @@ class myPartnerRegistration
  		uiConfPeer::setUseCriteriaFilter(false);
  		$c = new Criteria();
  		$c->addAnd(uiConfPeer::PARTNER_ID, $templatePartner->getId());
- 		$c->addAnd(uiConfPeer::OBJ_TYPE, $uiConfType);
+ 		$c->addAnd(uiConfPeer::OBJ_TYPE, array (uiConf::UI_CONF_TYPE_KDP3, uiConf::UI_CONF_TYPE_WIDGET), Criteria::IN);
  		$c->addAnd(uiConfPeer::STATUS, uiConf::UI_CONF_STATUS_READY);
  		$count = uiConfPeer::doCount($c);
  		if ($count > kConf::get('copy_partner_limit_ui_confs'))
