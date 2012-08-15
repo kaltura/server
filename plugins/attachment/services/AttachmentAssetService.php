@@ -53,7 +53,7 @@ class AttachmentAssetService extends KalturaAssetService
     function addAction($entryId, KalturaAttachmentAsset $attachmentAsset)
     {
     	$dbEntry = entryPeer::retrieveByPK($entryId);
-    	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO, KalturaMediaType::IMAGE)))
+    	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
 		
