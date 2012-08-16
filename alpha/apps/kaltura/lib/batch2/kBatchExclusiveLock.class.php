@@ -87,7 +87,10 @@ class kBatchExclusiveLock
 		
 		// added to support nfs delay
 		if($jobType == BatchJobType::EXTRACT_MEDIA || $jobType == BatchJobType::POSTCONVERT || $jobType == BatchJobType::STORAGE_EXPORT)
-			$c->add ( BatchJobPeer::CREATED_AT, (time() - 30), Criteria::LESS_THAN);
+		{
+			$interval = kConf::hasParam('nfs_safety_margin_sec') ? kConf::get('nfs_safety_margin_sec') : 5; 
+			$c->add ( BatchJobPeer::CREATED_AT, (time() - $interval), Criteria::LESS_THAN);
+		}
 		
 		$c->add ( BatchJobPeer::JOB_TYPE, $jobType );
 		$c->add ( BatchJobPeer::PRIORITY, $priority, Criteria::GREATER_EQUAL );
