@@ -164,7 +164,7 @@ class CategoryEntryService extends KalturaBaseService
 		if ($filter->entryIdEqual == null &&
 			$filter->categoryIdIn == null &&
 			$filter->categoryIdEqual == null && 
-			kEntitlementUtils::getEntitlementEnforcement())
+			(kEntitlementUtils::getEntitlementEnforcement() || !kCurrentContext::$is_admin_session))
 			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_CATEGORY);		
 			
 		if(kEntitlementUtils::getEntitlementEnforcement())
