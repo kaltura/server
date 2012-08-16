@@ -20,6 +20,8 @@ abstract class KalturaBaseSyndicationFeedBaseFilter extends KalturaFilter
 		"-type" => "-type",
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
+		"+updatedAt" => "+updated_at",
+		"-updatedAt" => "-updated_at",
 	);
 
 	public function getMapBetweenObjects()
