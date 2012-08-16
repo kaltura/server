@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="item_divider">1dp</dimen>
+    <dimen name="bottomRightRadius">0dp</dimen>
+    <dimen name="bottomLeftRadius">0dp</dimen>
+    <dimen name="topLeftRadius">0dp</dimen>
+    <dimen name="topRightRadius">0dp</dimen>
+    
+</resources>

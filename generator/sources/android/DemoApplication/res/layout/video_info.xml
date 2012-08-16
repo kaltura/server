@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background">
+
+	<include layout="@layout/bar"
+	    android:id="@+id/bar"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"/>
+    
+	
+	<ScrollView 
+		android:layout_width="match_parent" 
+		android:layout_height="match_parent"
+		android:layout_margin="15dp">
+    
+	    <LinearLayout
+	        android:layout_width="match_parent"
+		    android:layout_height="match_parent"
+		    android:orientation="vertical"
+		    android:gravity="center_vertical" >
+		    
+		    <TextView
+		        android:id="@+id/tv_category"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/upload_category"
+		        android:textColor="@color/black"
+		        android:textSize="20sp" />
+		
+		    <RelativeLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_marginBottom="20dp">
+
+		        	<Spinner
+				        style="@style/style_et"
+				        android:id="@+id/sp_category"
+				        android:layout_width="match_parent"
+				        android:layout_height="match_parent"/>
+					
+		        	<ImageView 
+		        	    android:layout_width="wrap_content"
+		        	    android:layout_height="wrap_content"
+		        	    android:background="@drawable/down"
+		        	    android:layout_centerVertical="true"
+		        	    android:layout_alignParentRight="true"
+		        	    android:layout_marginRight="15dp"/>
+		    </RelativeLayout>
+		    
+		    <TextView
+		        android:id="@+id/tv_title"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/upload_title"
+		        android:textColor="@color/black"
+		        android:textSize="20sp" />
+		
+		    <EditText
+		        style="@style/style_et"
+		        android:id="@+id/et_title"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_marginBottom="20dp"/>
+		
+		    <TextView
+		        android:id="@+id/tv_description"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/upload_description"
+		        android:textColor="@color/black"
+		        android:textSize="20sp" />
+		
+		    <EditText
+		        style="@style/style_et"
+		        android:id="@+id/et_description"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:inputType="textMultiLine"
+		        android:layout_marginBottom="20dp" />
+		
+		    <TextView
+		        android:id="@+id/tv_tags"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/upload_tags"
+		        android:textColor="@color/black"
+		        android:textSize="20sp" />
+		
+		    <EditText
+		        style="@style/style_et"
+		        android:id="@+id/et_tags"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_marginBottom="20dp" />
+		
+		    <RelativeLayout
+	            style="@style/style_button"
+	            android:id="@+id/rl_upload"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:onClick="onClick"
+	            android:gravity="center">
+	
+			    <ImageView
+			        android:id="@+id/iv_upload"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:src="@drawable/upload"
+			        android:layout_centerVertical="true"/>
+		
+			    <TextView
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_centerVertical="true"
+			        android:layout_toRightOf="@id/iv_upload"
+			        android:text="@string/upload"
+			        android:textColor="@color/white"
+			        android:textSize="20sp"
+			        android:layout_marginLeft="20dp"/>
+	        </RelativeLayout>
+		</LinearLayout>
+	</ScrollView>
+</LinearLayout>

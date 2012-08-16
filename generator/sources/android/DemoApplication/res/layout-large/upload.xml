@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background"
+    android:id="@+id/ll_upload">
+
+    
+    
+    <RelativeLayout 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:paddingLeft="20dp"
+    	android:paddingRight="20dp">
+    	
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_title"
+                android:text="@string/upload"
+                android:textColor="@color/black"
+                android:textSize="30sp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:paddingTop="40dp"/>
+        
+        <ImageView
+            android:id="@+id/iv_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/close_button"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="20dp" />
+        
+   	</RelativeLayout>
+    	
+    <LinearLayout 
+        android:layout_width="match_parent"
+    	android:layout_height="match_parent"
+    	android:orientation="horizontal"
+    	android:gravity="center_vertical|center_horizontal"
+    	android:paddingLeft="20dp"
+    	android:paddingRight="20dp"
+    	android:padding="10dp">
+
+        <RelativeLayout
+            android:id="@+id/rl_recod_video"
+            style="@style/style_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onClick"
+            android:layout_marginRight="20dp">
+
+            <ImageView
+                android:id="@+id/iv_record_video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/camera"
+                android:layout_marginBottom="20dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/iv_record_video"
+                android:layout_centerHorizontal="true"
+                android:text="@string/upload_record_video"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+        </RelativeLayout>
+
+
+   
+        <RelativeLayout
+            android:id="@+id/rl_pick_from_gallery"
+            style="@style/style_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onClick"
+            android:layout_marginRight="20dp">
+
+            <ImageView
+                android:id="@+id/iv_pick_from_gallery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/picture"
+                android:layout_marginBottom="20dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/iv_pick_from_gallery"
+                android:layout_centerHorizontal="true"
+                android:text="@string/upload_pick_from_gallery"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+        </RelativeLayout>
+	
+    </LinearLayout>
+</LinearLayout>
