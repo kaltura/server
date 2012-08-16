@@ -73,7 +73,7 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	{			
 		if ($baseClass == 'DropFolderFileHandler')
 		{
-			if ($enumValue == DropFolderFileHandlerType::CONTENT)
+			if ($enumValue == KalturaDropFolderFileHandlerType::CONTENT)
 			{
 				return 'DropFolderContentFileHandler';
 			}
