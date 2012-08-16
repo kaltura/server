@@ -532,6 +532,27 @@ abstract class KBatchBase implements IKalturaLogger
 		$this->monitorHandle = null;
 	}
 	
+	/**
+	 * @param string $fileName
+	 * @return boolean
+	 */
+	protected function pollingFileExists($fileName)
+	{
+		$retries = ($this->taskConfig->inputFileExistRetries ? $this->taskConfig->inputFileExistRetries : 10);
+		$interval = ($this->taskConfig->inputFileExistInterval ? $this->taskConfig->inputFileExistInterval : 5);
+		
+		for ($retry = 0; $retry < $retries; $retry++)
+		{
+			clearstatcache();
+			if (file_exists($fileName))
+				return true;
+			
+			KalturaLog::log("File $fileName does not exist, try $retry, waiting $interval seconds");
+			sleep($interval);
+		}
+		return false;
+	}
+	
 	function log($message)
 	{
 		KalturaLog::log($message);

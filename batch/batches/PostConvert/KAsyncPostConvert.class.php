@@ -67,7 +67,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			
 			if(!$data->flavorParamsOutput || !$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 			{
-				if(!file_exists($mediaFile))
+				if(!$this->pollingFileExists($mediaFile))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile does not exist", KalturaBatchJobStatus::RETRY);
 				
 				if(!is_file($mediaFile))

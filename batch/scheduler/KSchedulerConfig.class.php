@@ -249,6 +249,8 @@ class KSchedulerConfig
 			$task->baseTempLocalPath = $taskData->baseTempLocalPath;	  
 			$task->baseTempSharedPath = $taskData->baseTempSharedPath;	  
 			$task->minCreatedAtMinutes = $taskData->minCreatedAtMinutes;	  
+			$task->inputFileExistRetries = $taskData->inputFileExistRetries;
+			$task->inputFileExistInterval = $taskData->inputFileExistInterval;
 			
 			$task->params = $taskData->params;
 			if($taskData->filter)
@@ -361,6 +363,8 @@ class KSchedularTaskConfig
 	public $baseTempLocalPath;
 	public $baseTempSharedPath;
 	public $minCreatedAtMinutes;
+	public $inputFileExistRetries;
+	public $inputFileExistInterval;
 	
 	/**
 	 * @var array
