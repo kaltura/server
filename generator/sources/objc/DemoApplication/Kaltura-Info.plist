@@ -64,5 +64,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>UserEmail</key>
+	<string>user@email.com</string>
+	<key>UserPassword</key>
+	<string>password</string>
 </dict>
 </plist>

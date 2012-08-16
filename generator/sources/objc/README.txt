@@ -39,9 +39,19 @@ Running the library test code
 1. Open XCode
 2. Open the KalturaClientTester project (File->Open)
 3. Edit KalturaClientTester.m and fill out your partner id and admin secret (optionally, change the user id)
-4. Choose the iPhone simulator scheme
+4. Choose the KalturaClientTester > iPhone simulator scheme
 5. Build the project (Product->Build)
 6. Hit play
 7. Click the Go button in the test app
 
 Note: The library was tested under iPhone Simulator V4.3, built under xCode V4.1
+
+
+Running the demo application
+==============================
+1. Open XCode
+2. Open the Kaltura project under DemoApplication (File->Open)
+3. Open Shared/Kaltura-Info.plist
+4. Type your KMC credentials under the UserEmail / UserPassword fields
+5. Choose the Kaltura > iPhone simulator scheme
+6. Hit play
