@@ -18,7 +18,7 @@ class syndicationFeedFilter extends baseObjectFilter
 			"_lte_created_at"
 			) , NULL );
 
-		$this->allowed_order_fields = array ( "created_at" , "name", "type", "playlist_id" );
+		$this->allowed_order_fields = array ( "created_at" , "name", "type", "playlist_id", "updated_at" );
 			
 	}
 
