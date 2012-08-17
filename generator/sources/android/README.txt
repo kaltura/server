@@ -14,8 +14,9 @@ Running the test code
 	a. right click in the Package Explorer
 	b. Import...
 	c. Android->Existing Android Code Into Workspace
-2. Right click on KalturaClientTester/src/com.kaltura.client.test/KalturaTestSuite
-3. Run As->Android JUnit Test
+2. Edit KalturaClientTester/src/com.kaltura.client.test/KalturaTestConfig and fill out your Kaltura account information
+3. Right click on KalturaClientTester/src/com.kaltura.client.test/KalturaTestSuite
+4. Run As->Android JUnit Test
 
 
 Running the demo application
