@@ -25,5 +25,3 @@ Running the demo application
 3. Search for etEmail.setText and etPassword.setText
 4. Set the default user / password to the credentials of you Kaltura KMC account
 5. Hit the play button
-
-Note: in order to run the demo application you will need both the Android SDK and the Google APIs.

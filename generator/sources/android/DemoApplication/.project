@@ -3,6 +3,7 @@
 	<name>Kaltura</name>
 	<comment></comment>
 	<projects>
+		<project>KalturaClient</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
