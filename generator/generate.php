@@ -118,12 +118,6 @@ foreach($config as $name => $item)
 	//check if we should create a folder for this client library files, or directly create files on main output folder
 	$mainOutput = $item->get("nofolder");
 
-	//check if this client should be internal or public (on the UI)
-	$isInternal = $item->get("internal");
-	
-	if ($isInternal === null || ($useReadySchema != null && $useReadySchema != ''))
-		$generatedClients[] = $name;
-	
 	// check if generator is valid (not null and there is a class by this name)
 	if ($generator === null)
 		continue;
@@ -133,6 +127,12 @@ foreach($config as $name => $item)
 	// when generating a single client, skip the generators not relvant
 	if ($generateSingle && strtolower($name) !== strtolower($generateSingle)) 
 		continue;
+
+	//check if this client should be internal or public (on the UI)
+	$isInternal = $item->get("internal");
+	
+	if ($isInternal === null || ($useReadySchema != null && $useReadySchema != ''))
+		$generatedClients[] = $name;
 	
 	KalturaLog::info("Now generating: $name using $generator");
 	
