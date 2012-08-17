@@ -1114,30 +1114,38 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 			$c->add(FileSyncPeer::LINKED_ID, $fileSync->getId());
 			$c->addAscendingOrderByColumn(FileSyncPeer::PARTNER_ID);
 			
+			//relink the links into groups of 100 links
+			$c->setLimit(100);
+			
 			$links = FileSyncPeer::doSelect($c);
-			
-			// choose the first link and convert it to file
-			$firstLink = array_shift($links);
-			/* @var $firstLink FileSync */
-			if($firstLink)
+			while(count($links))
 			{
-				$firstLink->setStatus($fileSync->getStatus());
-				$firstLink->setFileSize($fileSync->getFileSize());
-				$firstLink->setFileRoot($fileSync->getFileRoot());
-				$firstLink->setFilePath($fileSync->getFilePath());
-				$firstLink->setFileType(FileSync::FILE_SYNC_FILE_TYPE_FILE);
-				$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
-				$firstLink->setLinkCount(count($links));
-				$firstLink->save();
-			}
-			
-			// change all the rest of the links to point on the new file sync
-			foreach($links as $link)
-			{
-				/* @var $link FileSync */
-				$link->setStatus($fileSync->getStatus());
-				$link->setLinkedId($firstLink->getId());
-				$link->save();
+				// choose the first link and convert it to file
+				$firstLink = array_shift($links);
+				/* @var $firstLink FileSync */
+				if($firstLink)
+				{
+					$firstLink->setStatus($fileSync->getStatus());
+					$firstLink->setFileSize($fileSync->getFileSize());
+					$firstLink->setFileRoot($fileSync->getFileRoot());
+					$firstLink->setFilePath($fileSync->getFilePath());
+					$firstLink->setFileType(FileSync::FILE_SYNC_FILE_TYPE_FILE);
+					$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
+					$firstLink->setLinkCount(count($links));
+					$firstLink->save();
+				}
+				
+				// change all the rest of the links to point on the new file sync
+				foreach($links as $link)
+				{
+					/* @var $link FileSync */
+					$link->setStatus($fileSync->getStatus());
+					$link->setLinkedId($firstLink->getId());
+					$link->save();
+				}
+				
+				FileSyncPeer::clearInstancePool();
+				$links = FileSyncPeer::doSelect($c);
 			}
 		}
 	}
