@@ -67,6 +67,13 @@ class CategoryUserService extends KalturaBaseService
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 			
+		$category = categoryPeer::retrieveByPK($categoryId);
+		if (!$category)
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);						
+
+		if($category->getInheritanceType() == InheritanceType::INHERIT)
+			$categoryId = $category->getInheritedParentId();
+					
 		$dbCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryId, $kuser->getId());
 		if (!$dbCategoryKuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $userId);
@@ -408,6 +415,9 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	public function indexAction($userId, $categoryId, $shouldUpdate = true)
 	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+			throw new KalturaAPIException(KalturaErrors::CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE);
+		
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $userId);
 
