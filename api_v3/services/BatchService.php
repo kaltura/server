@@ -416,7 +416,7 @@ class BatchService extends KalturaBaseService
 	function getQueueSizeAction(KalturaWorkerQueueFilter $workerQueueFilter)
 	{
 		$jobType = kPluginableEnumsManager::apiToCore('BatchJobType', $workerQueueFilter->jobType);
-		$filter = $workerQueueFilter->filter->toObject(new BatchJobFilter());
+		$filter = $workerQueueFilter->filter->toFilter($jobType);
 		
 		return kBatchManager::getQueueSize($workerQueueFilter->schedulerId, $workerQueueFilter->workerId, $jobType, $filter);
 	}	
