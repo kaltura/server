@@ -120,6 +120,14 @@ class KSchedulerConfig
 		return $this->config->KScheduler->statusInterval;
 	}
 	
+	public function getSchedulerStatusInterval()
+	{
+		if(isset($this->config->KScheduler->schedulerStatusInterval))
+			return $this->config->KScheduler->schedulerStatusInterval;
+			
+		return 60;
+	}
+	
 	public function getTasksetPath()
 	{
 		return $this->config->KScheduler->tasksetPath;

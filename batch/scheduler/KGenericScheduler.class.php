@@ -22,7 +22,9 @@ class KGenericScheduler
 	private $phpPath = null;
 	private $maxExecutionTime;
 	private $statusInterval;
+	private $schedulerStatusInterval;
 	private $nextStatusTime = 0;
+	private $nextSchedulerStatusTime = 0;
 	
 	/**
 	 * Stores all groups of tasks, the index is the task type
@@ -159,6 +161,7 @@ class KGenericScheduler
 		$this->logDir = $this->schedulerConfig->getLogDir();
 		$this->maxExecutionTime = $this->schedulerConfig->getMaxExecutionTime();
 		$this->statusInterval = $this->schedulerConfig->getStatusInterval();
+		$this->schedulerStatusInterval = $this->schedulerConfig->getSchedulerStatusInterval();
 		KDwhClient::setEnabled($this->schedulerConfig->getDwhEnabled());
 		KDwhClient::setFileName($this->schedulerConfig->getDwhPath());
 		
@@ -200,6 +203,7 @@ class KGenericScheduler
 	public function sendStatusNow()
 	{
 		$this->nextStatusTime = 0;
+		$this->nextSchedulerStatusTime = 0;
 	}
 	
 	public function run()
@@ -213,12 +217,21 @@ class KGenericScheduler
 			$this->loadCommands();
 		
 			$fullCycle = false;
+			$sendSchedulerStatus = false;
 			if($this->nextStatusTime < time())
 			{
 				$fullCycle = true;
 				
 				$this->nextStatusTime = time() + $this->statusInterval;
 				KalturaLog::debug("Next Status Time: " . date('H:i:s', $this->nextStatusTime));
+			}
+		
+			if($this->nextSchedulerStatusTime < time())
+			{
+				$sendSchedulerStatus = true;
+				
+				$this->nextSchedulerStatusTime = time() + $this->schedulerStatusInterval;
+				KalturaLog::debug("Next Status Time: " . date('H:i:s', $this->nextSchedulerStatusTime));
 			}
 			
 			$statuses = array();
@@ -251,11 +264,11 @@ class KGenericScheduler
 					$this->spawn($taskConfig);
 			}
 			
-			if($fullCycle)
-			{
+			if($sendSchedulerStatus)
 				$statuses[] = $this->createSchedulerStatus(KalturaSchedulerStatusType::RUNNING_BATCHES_IS_RUNNING, 1);
+				
+			if(count($statuses))
 				KScheduleHelperManager::saveStatuses($this->schedulerConfig->getStatusFilePath(), $statuses);
-			}
 			
 			$runningBatches = KScheduleHelperManager::loadRunningBatches($this->schedulerConfig->getCommandsDir());
 			foreach($this->runningTasks as $taskName => &$tasks)
