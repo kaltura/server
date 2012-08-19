@@ -247,6 +247,9 @@ class CategoryService extends KalturaBaseService
 	 */
 	function indexAction($id, $shouldUpdate = true)
 	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+			throw new KalturaAPIException(KalturaErrors::CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE);
+			
 		$categoryDb = categoryPeer::retrieveByPK($id);
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
@@ -274,7 +277,8 @@ class CategoryService extends KalturaBaseService
 		$categoryDb->reSetDirectEntriesCount();
 
 		//TODO should skip all category logic 
-		$categoryDb->save();
+		if(!$categoryDb->save())
+			$categoryDb->indexToSearchIndex();
 		
 		return $categoryDb->getId();
 	}

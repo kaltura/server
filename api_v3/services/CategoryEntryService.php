@@ -263,6 +263,9 @@ class CategoryEntryService extends KalturaBaseService
 	 */
 	function indexAction($entryId, $categoryId, $shouldUpdate = true)
 	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+			throw new KalturaAPIException(KalturaErrors::CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE);
+		
 		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
 		if(!$dbCategoryEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);

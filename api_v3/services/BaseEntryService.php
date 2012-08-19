@@ -837,6 +837,9 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	function indexAction($id, $shouldUpdate = true)
 	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+			throw new KalturaAPIException(KalturaErrors::CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE);
+			
 		$entryDb = entryPeer::retrieveByPK($id);
 		if (!$entryDb)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $id);
