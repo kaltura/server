@@ -6,6 +6,7 @@
 class KalturaDispatcher 
 {
 	private static $instance = null;
+	private $arguments = null;
 	
 	/**
 	 * Return a KalturaDispatcher instance
@@ -20,6 +21,11 @@ class KalturaDispatcher
 		}
 		    
 		return self::$instance;
+	}
+	
+	public function getArguments()
+	{
+		return $this->arguments;
 	}
 	
 	public function dispatch($service, $action, $params = array()) 
@@ -64,8 +70,8 @@ class KalturaDispatcher
         
 		// validate it's ok to access this service
 		$deserializer = new KalturaRequestDeserializer($params);
-		$arguments = $deserializer->buildActionArguments($actionParams);
-		KalturaLog::debug("Dispatching service [".$service."], action [".$action."] with params " . print_r($arguments, true));
+		$this->arguments = $deserializer->buildActionArguments($actionParams);
+		KalturaLog::debug("Dispatching service [".$service."], action [".$action."] with params " . print_r($this->arguments, true));
 
 		$serviceInstance = $actionReflector->getServiceInstance();
 		
@@ -107,7 +113,7 @@ class KalturaDispatcher
 		
 		$invokeStart = microtime(true);
 		KalturaLog::debug("Invoke start");
-		$res =  $actionReflector->invoke( $arguments );
+		$res =  $actionReflector->invoke( $this->arguments );
 		
 		kEventsManager::flushEvents();
 		

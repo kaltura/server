@@ -27,6 +27,57 @@ class KalturaEntryService extends KalturaBaseService
 			entryPeer::setUserContentOnly(true);
 		}
 		
+		if ($actionName == 'list' && kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$dispatcher = KalturaDispatcher::getInstance();
+			$arguments = $dispatcher->getArguments();
+			
+			$categoriesIds = array();
+			$categories = array();
+			foreach($arguments as $argument)
+			{
+				if ($argument instanceof KalturaBaseEntryFilter)
+				{
+					if(isset($argument->categoriesMatchAnd))
+						$categories = array_merge($categories, explode(',', $argument->categoriesMatchAnd));
+						
+					if(isset($argument->categoriesMatchOr))
+						$categories = array_merge($categories, explode(',', $argument->categoriesMatchOr));
+					
+					if(isset($argument->categoriesFullNameIn))
+						$categories = array_merge($categories, explode(',', $argument->categoriesFullNameIn));
+						
+					if(count($categories))
+					{
+						$categories = categoryPeer::getByFullNamesExactMatch($categories);
+						
+						foreach ($categories as $category)
+							$categoriesIds[] = $category->getId();
+					}
+										
+					if(isset($argument->categoriesIdsMatchAnd))
+						$categoriesIds = array_merge($categoriesIds, explode(',', $argument->categoriesIdsMatchAnd));
+					
+					if(isset($argument->categoriesIdsMatchOr))
+						$categoriesIds = array_merge($categoriesIds, explode(',', $argument->categoriesIdsMatchOr));
+					
+					if(isset($argument->categoryAncestorIdIn))
+						$categoriesIds = array_merge($categoriesIds, explode(',', $argument->categoryAncestorIdIn));
+				}
+			}
+			
+			foreach($categoriesIds as $key => $categoryId)
+			{
+				if(!$categoryId)
+				{
+					unset($categoriesIds[$key]);
+				}
+			}
+			
+			if(count($categoriesIds))
+				entryPeer::setFilterdCategoriesIds($categoriesIds);
+		}
+		
 		parent::initService($serviceId, $serviceName, $actionName);
 		parent::applyPartnerFilterForClass(new ConversionProfilePeer());
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());

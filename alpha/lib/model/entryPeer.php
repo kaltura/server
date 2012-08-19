@@ -18,6 +18,7 @@ class entryPeer extends BaseentryPeer
 	private static $filerResults = false;
 	
 	private static $userContentOnly = false;
+	private static $filteredCategoriesIds = array();
 	
 	private static $kuserBlongToMoreThanMaxCategoriesForSearch = false;
 	
@@ -314,6 +315,16 @@ class entryPeer extends BaseentryPeer
 		return $res;
 	}
 	
+	public static function setFilterdCategoriesIds($filteredCategoriesIds)
+	{
+		self::$filteredCategoriesIds = $filteredCategoriesIds;
+	}
+	
+	public static function getFilterdCategoriesIds()
+	{
+		return self::$filteredCategoriesIds;
+	}
+	
 	public static function setDefaultCriteriaFilter ()
 	{
 		if ( self::$s_criteria_filter == null )
@@ -575,11 +586,11 @@ class entryPeer extends BaseentryPeer
 				$c->setRecordsCount($entitlementCrit->getRecordsCount());
 		 		$skipApplyFilters = true;
 		 		self::$filerResults = true;
-		 		//TODO add header that not full search
 			}
 			else
 			{
 				self::$filerResults = false;
+				//TODO add header that not full search
 			}
 		}
 		

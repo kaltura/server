@@ -356,8 +356,7 @@ class entryFilter extends baseObjectFilter
 			foreach ($statuses as $status)
 			{
 				//should return category itsef or sub categories
-				$categoryFullIdsToIds[] = entry::CATEGORY_SEARCH_PERFIX		   . $catId . entry::CATEGORY_SEARCH_STATUS . $status;
-				$categoryFullIdsToIds[] = entry::CATEGORY_PARENT_SEARCH_PERFIX . $catId . entry::CATEGORY_SEARCH_STATUS . $status;
+				$categoryFullIdsToIds[] = entry::CATEGORY_OR_PARENT_SEARCH_PERFIX . $catId . entry::CATEGORY_SEARCH_STATUS . $status;
 			}
 		}
 

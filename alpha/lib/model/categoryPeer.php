@@ -222,6 +222,31 @@ class categoryPeer extends BasecategoryPeer
 	}
 	
 	/**
+	 * Get categories by full name using exact match (returns null or category object)
+	 *  
+	 * @param $fullNames
+	 * @return category
+	 */
+	public static function getByFullNamesExactMatch($fullNames)
+	{
+		$fullNameParsed = array();
+		foreach ($fullNames as $fullName)
+		{
+			$fullName = self::getParsedFullName($fullName);
+			
+			if (trim($fullName) == '')
+				continue;
+				
+			$fullNameParsed[] = $fullName . category::FULL_NAME_EQUAL_MATCH_STRING;
+		}
+		
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
+		$c->add(categoryPeer::FULL_NAME, $fullNameParsed, KalturaCriteria::IN_LIKE);
+
+		return categoryPeer::doSelect($c);
+	}
+	
+	/**
 	 * Get categories by full name using full name wildcard match (returns an array)
 	 *  
 	 * @param $partnerId
@@ -323,6 +348,12 @@ class categoryPeer extends BasecategoryPeer
 			$categoryGroupSize = $partner->getCategoryGroupSize();
 
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		
+		$filteredCategoriesIds = entryPeer::getFilterdCategoriesIds();
+		
+		if(count($filteredCategoriesIds))
+			$c->addAnd(categoryPeer::ID, $filteredCategoriesIds, Criteria::IN);
+			
 		$membersCountCrit = $c->getNewCriterion (categoryPeer::MEMBERS_COUNT, $categoryGroupSize, Criteria::GREATER_THAN);
 		$membersCountCrit->addOr($c->getNewCriterion (categoryPeer::ENTRIES_COUNT, 
 										entry::CATEGORY_ENTRIES_COUNT_LIMIT_TO_BE_INDEXED, Criteria::GREATER_THAN));		
