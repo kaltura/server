@@ -192,7 +192,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 	
 	/**
 	 * @param string $email
-	 * @param string $use_bd
 	 * @return UserLoginData
 	 */
 	public static function getByEmail($email)
