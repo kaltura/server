@@ -110,7 +110,7 @@ class assetParamsPeer extends BaseassetParamsPeer
 					}
 	
 					// add the partner_id to the partner_group
-					$partners[] = $partnerId;
+					$partners[] = strval($partnerId);
 					
 					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
 					
