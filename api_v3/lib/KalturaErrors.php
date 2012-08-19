@@ -435,4 +435,9 @@ class KalturaErrors extends APIErrors
 	const CATEGORY_ENTRY_ALREADY_EXISTS = "CATEGORY_ENTRY_ALREADY_EXISTS,Entry already assigned to this category";
 	
 	const CATEGORY_IS_LOCKED = 'CATEGORY_IS_LOCKED,Category is locked - cannot delete or change parent id';
+	
+	/**
+	 * Entitlement
+	 */
+	const CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE = 'CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE,Cannot index object when enetitlment is enabled'; 
 }
