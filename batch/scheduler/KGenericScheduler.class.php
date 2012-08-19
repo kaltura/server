@@ -231,7 +231,7 @@ class KGenericScheduler
 				$sendSchedulerStatus = true;
 				
 				$this->nextSchedulerStatusTime = time() + $this->schedulerStatusInterval;
-				KalturaLog::debug("Next Status Time: " . date('H:i:s', $this->nextSchedulerStatusTime));
+				KalturaLog::debug("Next Scheduler Status Time: " . date('H:i:s', $this->nextSchedulerStatusTime));
 			}
 			
 			$statuses = array();
