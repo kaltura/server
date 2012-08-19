@@ -545,11 +545,6 @@ kmc.preview_embed = {
 
 		if( live_bitrates ) {kmc.vars.embed_code_delivery_type = "http";} // Reset delivery type to http
 
-		// Set default value for HTTPS checkbox
-		if( kmc.vars.embed_code_protocol_https ) {
-			$("#https_support").prop("checked", true);
-		}
-
 		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id);
 		preview_player = embed_code.replace('{FLAVOR}','ks=' + kmc.vars.ks + '&');
 		embed_code = embed_code.replace('{FLAVOR}','');
@@ -571,6 +566,11 @@ kmc.preview_embed = {
 			'help' : '<a class="help icon" href="javascript:kmc.utils.openHelp(\'section_pne\');"></a>',
 			'content' : modal_content
 		} );
+
+		// Set default value for HTTPS checkbox
+		if( kmc.vars.embed_code_protocol_https ) {
+			$("#https_support").prop("checked", true);
+		}		
 
 		// attach events here instead of writing them inline
 		$("#embed_code, #select_code").click(function( e ){
