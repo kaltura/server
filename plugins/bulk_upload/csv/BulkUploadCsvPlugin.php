@@ -87,7 +87,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	 */
 	public static function getFileExtension($enumValue)
 	{
-		if(is_null($enumValue) || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML))
+		if(is_null($enumValue) || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV))
 			return 'csv';
 	}
 	
