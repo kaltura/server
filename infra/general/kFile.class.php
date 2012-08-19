@@ -830,7 +830,7 @@ class kFile
 		}
 	}
 
-	public static function safeFilePutContents($filePath, $var)
+	public static function safeFilePutContents($filePath, $var, $mode=null)
 	{
 		// write to a temp file and then rename, so that the write will be atomic
 		$tempFilePath = tempnam(dirname($filePath), basename($filePath));
@@ -840,6 +840,10 @@ class kFile
 		{
 			@unlink($tempFilePath);
 			return false;
+		}
+		if($mode)
+		{
+			chmod($filePath, $mode);
 		}
 		return true;
 	}

@@ -118,7 +118,8 @@ class KAutoloader
 		self::$_classMapFileLocation = $path;
 		$dirName = dirname($path);
 		if (!is_dir($dirName)) {
-			mkdir($dirName, 0777);
+			mkdir($dirName);
+			chmod($dirName, 0766);
 		}
 	}
 	
