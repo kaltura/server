@@ -53,30 +53,20 @@ class KAsyncBulkUploadCloser extends KJobCloserWorker
 		{
 		    $numOfObjects = $job->data->numOfObjects;
 		    $numOfErrorObjects = $job->data->numOfErrorObjects;
-		    if ($numOfErrorObjects < $numOfObjects)
+		    KalturaLog::debug("numOfSuccessObjects: $numOfObjects, numOfErrorObjects: $numOfErrorObjects");
+		    
+		    if ($numOfErrorObjects == 0)
 		    {
 			    return $this->closeJob($job, null, null, 'Finished successfully', KalturaBatchJobStatus::FINISHED);
+		    }
+		    else if($numOfObjects > 0) //some objects created successfully
+		    {
+		    	return $this->closeJob($job, null, null, 'Finished, but with some errors', KalturaBatchJobStatus::FINISHED_PARTIALLY);
 		    }
 		    else
 		    {
 		        return $this->closeJob($job, null, null, 'Failed to create objects', KalturaBatchJobStatus::FAILED);
 		    }
-		    
-		    //TODO: uncomment for ticket 2783
-//		    KalturaLog::debug("numOfSuccessObjects: $numOfObjects, numOfErrorObjects: $numOfErrorObjects");
-//		    
-//		    if ($numOfErrorObjects == 0)
-//		    {
-//			    return $this->closeJob($job, null, null, 'Finished successfully', KalturaBatchJobStatus::FINISHED);
-//		    }
-//		    else if($numOfObjects > 0) //some objects created successfully
-//		    {
-//		    	return $this->closeJob($job, null, null, 'Finished, but with some errors', KalturaBatchJobStatus::FINISHED_PARTIALLY);
-//		    }
-//		    else
-//		    {
-//		        return $this->closeJob($job, null, null, 'Failed to create objects', KalturaBatchJobStatus::FAILED);
-//		    }
 		}	
 		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ALMOST_DONE);
 	}
