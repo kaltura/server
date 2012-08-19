@@ -9,5 +9,5 @@
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/scripts/utils/permissions/addPermissionsAndItems.php';
-$config = realpath(dirname(__FILE__)) . '/../../../../plugins/system_partner/config/admin_multi_publisher_login.ini';
+$config = realpath(dirname(__FILE__)) . '/configs/admin_multi_publisher_login.ini';
 passthru("php $script $config");
