@@ -62,6 +62,7 @@ class kmc4Action extends kalturaAction
 		$this->templatePartnerId = self::SYSTEM_DEFAULT_PARTNER;
 		$this->ignoreSeoLinks = false;
 		$this->ignoreEntrySeoLinks = false;
+		$this->useEmbedCodeProtocolHttps = false;
 		
 		if ($this->partner_id !== NULL)
 		{
@@ -70,6 +71,7 @@ class kmc4Action extends kalturaAction
 			$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
 			$this->ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
 			$this->ignoreEntrySeoLinks = PermissionPeer::isValidForPartner(PermissionName::FEATURE_IGNORE_ENTRY_SEO_LINKS, $this->partner_id);
+			$this->useEmbedCodeProtocolHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EMBED_CODE_DEFAULT_PROTOCOL_HTTPS, $this->partner_id);
 		}
 	/** END - load partner from DB, and set templatePartnerId **/
 
