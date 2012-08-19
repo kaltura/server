@@ -428,7 +428,7 @@ class myPartnerRegistration
  		$c->addAnd(entryPeer::TYPE, entryType::PLAYLIST);
  		$c->addAnd(entryPeer::STATUS, entryStatus::READY);
  		$count = entryPeer::doCount($c);
- 		if ($count > kConf::get('copy_partner_limit_entries'))
+ 		if ($count > kConf::get('copy_partner_limit_playlists'))
  		{
  		    throw new kCoreException("Template partner's number of PLAYLIST objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED);
  		}
