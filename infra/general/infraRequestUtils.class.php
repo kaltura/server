@@ -209,10 +209,13 @@ class infraRequestUtils
 		 	$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
 			$remote_addr = trim($headerIPs[count($headerIPs) - 1]);
 		}
-			
+
 		// support getting the original ip address of the client when using the cdn for API calls (cdnapi)
+		// validate either HTTP_HOST or HTTP_X_FORWARDED_HOST in case of a proxy
 		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
-		 	in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) )
+			(in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ||
+			isset($_SERVER['HTTP_X_FORWARDED_HOST']) &&
+			in_array($_SERVER['HTTP_X_FORWARDED_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ) )
 		{
 			// pick the last ip
 		 	$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
