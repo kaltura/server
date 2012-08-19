@@ -244,7 +244,8 @@ class KGenericScheduler
 					continue;
 				
 				$runningTasksCount = $this->numberOfRunningTasks($taskConfig->name);
-				$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_COUNT, $runningTasksCount);
+				if($fullCycle)
+					$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_COUNT, $runningTasksCount);
 				
 				$shouldRun = true;
 				
