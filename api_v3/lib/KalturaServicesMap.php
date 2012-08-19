@@ -152,9 +152,10 @@ class KalturaServicesMap
 		$serviceMap = array_filter($serviceMap, array('KalturaServicesMap', 'filterEmptyServices'));
 
 		if (!is_dir(dirname($cacheFilePath))) {
-			mkdir(dirname($cacheFilePath), 0777);
+			mkdir(dirname($cacheFilePath));
+			chmod(dirname($cacheFilePath), 0766);
 		}
-		kFile::safeFilePutContents($cacheFilePath, serialize($serviceMap));
+		kFile::safeFilePutContents($cacheFilePath, serialize($serviceMap), 0644);
 	}
 	
 	public static function getServiceMapModificationTime ()
