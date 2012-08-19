@@ -565,12 +565,7 @@ kmc.preview_embed = {
 			'style' : 'preview_embed',
 			'help' : '<a class="help icon" href="javascript:kmc.utils.openHelp(\'section_pne\');"></a>',
 			'content' : modal_content
-		} );
-
-		// Set default value for HTTPS checkbox
-		if( kmc.vars.embed_code_protocol_https ) {
-			$("#https_support").prop("checked", true);
-		}		
+		} );		
 
 		// attach events here instead of writing them inline
 		$("#embed_code, #select_code").click(function( e ){
@@ -601,7 +596,12 @@ kmc.preview_embed = {
 			// Update embed code
 			var val = kmc.preview_embed.buildKalturaEmbed(id,name,description, is_playlist, uiconf_id);
 			$("#embed_code").val(val);
-		});		
+		});
+
+		// Set default value for HTTPS checkbox
+		if( kmc.vars.embed_code_protocol_https ) {
+			$("#https_support").attr('checked','checked').trigger('change');
+		}
 			
 		// show the embed code & enable the checkbox if its not a preview
 		if (previewOnly==false) {
