@@ -95,6 +95,7 @@ kmc.functions = {
 		var flashvars = {
 			host			: kmc.vars.host,
 			cdnhost			: kmc.vars.cdn_host,
+			protocol 		: window.location.protocol + '//',
 			userId			: kmc.vars.user_id,
 			partnerid		: kmc.vars.partner_id,
 			subPartnerId	: kmc.vars.subp_id,
