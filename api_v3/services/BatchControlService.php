@@ -79,31 +79,34 @@ class BatchControlService extends KalturaBaseService
 		
 		// creates a response
 		$schedulerStatusResponse = new KalturaSchedulerStatusResponse();
-		
-		// gets the control pannel commands
-		$c = new Criteria();
-		$c->add(ControlPanelCommandPeer::SCHEDULER_ID, $schedulerDb->getId());
-		$c->add(ControlPanelCommandPeer::TYPE, KalturaControlPanelCommandType::CONFIG, Criteria::NOT_EQUAL);
-		$c->add(ControlPanelCommandPeer::STATUS, KalturaControlPanelCommandStatus::PENDING);
-		$commandsList = ControlPanelCommandPeer::doSelect($c);
-		foreach($commandsList as $command)
+
+		if(kConf::hasParam('batch_enable_control_panel') && kConf::get('batch_enable_control_panel'))
 		{
-			$command->setStatus(KalturaControlPanelCommandStatus::HANDLED);
-			$command->save();
+			// gets the control pannel commands
+			$c = new Criteria();
+			$c->add(ControlPanelCommandPeer::SCHEDULER_ID, $schedulerDb->getId());
+			$c->add(ControlPanelCommandPeer::TYPE, KalturaControlPanelCommandType::CONFIG, Criteria::NOT_EQUAL);
+			$c->add(ControlPanelCommandPeer::STATUS, KalturaControlPanelCommandStatus::PENDING);
+			$commandsList = ControlPanelCommandPeer::doSelect($c);
+			foreach($commandsList as $command)
+			{
+				$command->setStatus(KalturaControlPanelCommandStatus::HANDLED);
+				$command->save();
+			}
+			$schedulerStatusResponse->controlPanelCommands = KalturaControlPanelCommandArray::fromControlPanelCommandArray($commandsList);
+			
+			// gets new configs
+			$c = new Criteria();
+			$c->add(SchedulerConfigPeer::SCHEDULER_ID, $schedulerDb->getId());
+			$c->add(SchedulerConfigPeer::COMMAND_STATUS, KalturaControlPanelCommandStatus::PENDING);
+			$configList = SchedulerConfigPeer::doSelect($c);
+			foreach($configList as $config)
+			{
+				$config->setCommandStatus(KalturaControlPanelCommandStatus::HANDLED);
+				$config->save();
+			}
+			$schedulerStatusResponse->schedulerConfigs = KalturaSchedulerConfigArray::fromSchedulerConfigArray($configList);
 		}
-		$schedulerStatusResponse->controlPanelCommands = KalturaControlPanelCommandArray::fromControlPanelCommandArray($commandsList);
-		
-		// gets new configs
-		$c = new Criteria();
-		$c->add(SchedulerConfigPeer::SCHEDULER_ID, $schedulerDb->getId());
-		$c->add(SchedulerConfigPeer::COMMAND_STATUS, KalturaControlPanelCommandStatus::PENDING);
-		$configList = SchedulerConfigPeer::doSelect($c);
-		foreach($configList as $config)
-		{
-			$config->setCommandStatus(KalturaControlPanelCommandStatus::HANDLED);
-			$config->save();
-		}
-		$schedulerStatusResponse->schedulerConfigs = KalturaSchedulerConfigArray::fromSchedulerConfigArray($configList);
 		
 		// gets queues length
 		$schedulerStatusResponse->queuesStatus = new KalturaBatchQueuesStatusArray();
