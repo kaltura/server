@@ -215,6 +215,41 @@ $parsed = array();
 		}
 	}
 	
+	/* ---------------------------
+	 * CalcH264Level
+	 */
+	public static function CalcH264Level($w, $h, $fr)
+	{
+$levels = array(
+	0=>		null,
+	1485=>	'1', 	
+	1485=>	'1b', 	
+	3000=>	'1.1', 	
+	6000=>	'1.2', 	
+	11880=>	'1.3', 	
+	11880=>	'2', 	
+	19800=>	'2.1', 	
+	20250=>	'2.2', 	
+	40500=>	'3', 	
+	108000=>'3.1', 	
+	216000=>'3.2', 	
+	245760=>'4', 	
+	245760=>'4.1', 	
+	522240=>'4.2', 	
+	589824=>'5', 	
+	983040=>'5.1',
+	2073600=>'5.2');
+	
+		$result = null;
+		$macroblocks = ceil($w/16) * ceil($h/16) * $fr;
+		foreach ($levels as $lvlMcbs=>$lvl){
+			if ($lvlMcbs > $macroblocks) {
+				$result=$levels[$lvlMcbs];
+				break;
+			}
+		}
+		return $result;
+	}
 	
 }
 
