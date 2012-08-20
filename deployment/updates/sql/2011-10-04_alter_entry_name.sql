@@ -1,1 +1,0 @@
-alter table entry modify name varchar(256) DEFAULT NULL;

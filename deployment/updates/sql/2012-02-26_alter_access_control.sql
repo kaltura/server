@@ -1,1 +1,0 @@
-ALTER TABLE  `access_control` ADD  `rules` TEXT NULL DEFAULT NULL AFTER  `custom_data`;
