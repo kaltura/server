@@ -23,7 +23,7 @@ kmc.functions = {
 
 	loadSwf : function() {
 
-		var kmc_swf_url = 'http://' + kmc.vars.cdn_host + '/flash/kmc/' + kmc.vars.kmc_version + '/kmc.swf';
+		var kmc_swf_url = window.location.protocol + '//' + kmc.vars.cdn_host + '/flash/kmc/' + kmc.vars.kmc_version + '/kmc.swf';
 
 		var flashvars = {
 			// kmc configuration
@@ -154,7 +154,7 @@ kmc.functions = {
 	},
 	openClipApp : function( entry_id, mode ) {
 		
-		var iframe_url = 'http://' + window.location.hostname + '/apps/clipapp/' + kmc.vars.clipapp.version;
+		var iframe_url = window.location.protocol + '//' + window.location.hostname + '/apps/clipapp/' + kmc.vars.clipapp.version;
 			iframe_url += '/?kdpUiconf=' + kmc.vars.clipapp.kdp + '&kclipUiconf=' + kmc.vars.clipapp.kclip;
 			iframe_url += '&partnerId=' + kmc.vars.partner_id + '&mode=' + mode + '&config=kmc&entryId=' + entry_id;
 
