@@ -684,7 +684,8 @@ kmc.preview_embed = {
 	},
 	
 	buildHTTPSOption: function() {
-		return '<div class="https_support"><div class="label checkbox"><input id="https_support" type="checkbox" /> <label class="label_text" for="https_support">' + 
+		var checked = (location.protocol == 'https:') ? ' checked' : '';
+		return '<div class="https_support"><div class="label checkbox"><input id="https_support" type="checkbox"' + checked + ' /> <label class="label_text" for="https_support">' + 
 				'Modify embed code to use HTTPS secure delivery</label></div></div>';
 	},
 	
