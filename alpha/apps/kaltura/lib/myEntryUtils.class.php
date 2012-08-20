@@ -1152,8 +1152,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			                }
 			                $entryFilter->fields["_in_category_ancestor_id"] = implode (",", $newCategoriesIds);
 			            }
-			            
-			            $toFiltersXml->addChild("filter", $entryFilter->toXml());
+			            $toEntryFilterXML = $toFiltersXml->addChild("filter");
+			            $toEntryFilterXML = $entryFilter->toXml($toEntryFilterXML);
 		            }
 		            
 		            $newEntry->setDataContent($toPlaylistXml);
