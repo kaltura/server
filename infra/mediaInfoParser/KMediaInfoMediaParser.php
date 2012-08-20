@@ -214,6 +214,14 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 			case "frame rate":
 				$mediaInfo->videoFrameRate = (float)self::trima($val);
 				break;
+			case "nominal frame rate":
+					/*
+					 * nominal fps should not be used if a 'regular' fps is provided.
+					 */
+				if(!isset($mediaInfo->videoFrameRate)){
+					$mediaInfo->videoFrameRate = (float)self::trima($val);
+				}
+				break;
 			case "display aspect ratio":
 				$val = self::trima($val);
 				if(strstr($val, ":")==true){
