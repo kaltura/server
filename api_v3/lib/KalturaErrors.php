@@ -262,7 +262,29 @@ class KalturaErrors extends APIErrors
 	
 	const CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT,Cannot update category's entitlement fields when privacy context is not set on the categroy";
 	
+	const CANNOT_SET_APPEAR_IN_LIST_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_APPEAR_IN_LIST_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set appear in list field when privacy context is not set on the categroy";
+	
+	const CANNOT_SET_MODERATION_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_MODERATION_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set moderation field when privacy context is not set on the categroy";
+	
+	const CANNOT_SET_INHERITANCE_TYPE_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_INHERITANCE_TYPE_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set inheritance field when privacy context is not set on the categroy";
+	
+	const CANNOT_SET_PRIVACY_FIELD_WITH_NO_PRIVACY_CONTEX = "CANNOT_SET_PRIVACY_FIELD_WITH_NO_PRIVACY_CONTEX, Cannot set privacy field when privacy context is not set on the categroy";
+	
+	const CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set owner field when privacy context is not set on the categroy";
+	
+	const CANNOT_SET_USER_JOIN_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_USER_JOIN_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set user join policy field when privacy context is not set on the categroy";
+	
+	const CANNOT_SET_CONTIRUBUTION_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_CONTIRUBUTION_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set contribution policy field when privacy context is not set on the categroy";
+	
+	const CANNOT_SET_DEFAULT_PERMISSION_LEVEL_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_DEFAULT_PERMISSION_LEVEL_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set default permission level field when privacy context is not set on the categroy";
+	
 	const PRIVACY_CONTEXT_INVALID_STRING = "PRIVACY_CONTEXT_INVALID_STRING,Privacy context is invalid \"%s\"";
+	
+	const CANNOT_SET_OWNER_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_OWNER_WHEN_CATEGORY_INHERIT_MEMBERS, Cannot set owner when category is set to inherit";
+	
+	const CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS, Cannot set user join policy when category is set to inherit";
+	
+	const CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS, Cannot set default permission level when category is set to inherit";
 	
 	/**
 	 * Batch Service
@@ -394,8 +416,6 @@ class KalturaErrors extends APIErrors
 	const CATEGORY_USER_JOIN_NOT_ALLOWED = "CATEGORY_USER_JOIN_NOT_ALLOWED,cannot register to this category [\"%s\"]";
 	
 	const CANNOT_UPDATE_CATEGORY_USER = "CANNOT_UPDATE_CATEGORY_USER,cannot update categoryUser";
-	
-	const CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES = "CATEGORY_INHERIT_MEMBERS_CANNOT_UPDATE_INHERITED_ATTRIBUTES, Cannot update Category inherited fields when category is set to inherit";
 	
 	const MUST_FILTER_USERS_OR_CATEGORY = "MUST_FILTER_USERS_OR_CATEGORY, Must filter users or categories";
 	
