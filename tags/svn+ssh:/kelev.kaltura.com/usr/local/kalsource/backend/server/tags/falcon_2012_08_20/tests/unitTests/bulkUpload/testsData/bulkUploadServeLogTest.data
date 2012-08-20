@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<TestCaseData testCaseName="BulkUploadServeLogTest">
-  <TestProcedureData testProcedureName="testServeLog">
-    <TestCaseData testCaseInstanceName="testServeLog with data set #1">
-      <Input name="id" type="string" key="@XSLT_BULK_UPLOAD_ID_1@"/>
-      <OutputReference name="output" type="fileHandler" key="/testsData/test1.xml"/>
-    </TestCaseData>
-  </TestProcedureData>
-</TestCaseData>
