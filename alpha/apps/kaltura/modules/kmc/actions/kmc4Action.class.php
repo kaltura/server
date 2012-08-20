@@ -83,9 +83,9 @@ class kmc4Action extends kalturaAction
 	
 	/** set values for template **/
 	$this->service_url = myPartnerUtils::getHost($this->partner_id);
-	$this->host = str_replace ( "http://" , "" , $this->service_url );
+	$this->host = $this->stripProtocol( $this->service_url );
 	$this->cdn_url = myPartnerUtils::getCdnHost($this->partner_id);
-	$this->cdn_host = str_replace ( "http://" , "" , $this->cdn_url );
+	$this->cdn_host = $this->stripProtocol( $this->cdn_url );
 	$this->rtmp_host = myPartnerUtils::getRtmpUrl($this->partner_id);
 	$this->flash_dir = $this->cdn_url . myContentStorage::getFSFlashRootPath ();
 	
@@ -163,6 +163,17 @@ class kmc4Action extends kalturaAction
 		
 		/** get templateXmlUrl for whitelabeled partners **/
 		//$this->appstudio_templatesXmlUrl = $this->getAppStudioTemplatePath();
+	}
+
+	private function stripProtocol( $url )
+	{
+		$find_pos = strpos("://", $url);
+		if( $find_pos !== false ){
+			$find_pos = $find_pos + 3; // ends of protocol position
+			return substr($url, $find_pos);
+		} else {
+			return $url;
+		}
 	}
 
 	private function getAppStudioTemplatePath()
