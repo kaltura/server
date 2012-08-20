@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<mrss xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	version="2.0">
+	<channel>
+		<item>
+			<result>
+				<errorDescription></errorDescription>
+			</result>
+			<action>add</action>
+			<entryId>0_lhue3kl5</entryId>
+			<createdAt>1313082863</createdAt>
+			<updatedAt>1313082864</updatedAt>
+			<title>Don't Tase Me Bro</title>
+			<type>1</type>
+			<licenseType>-1</licenseType>
+			<userId>batchUser</userId>
+			<name>Don't Tase Me Bro</name>
+			<status>7</status>
+			<description>Dan accidentally reveals confidential information</description>
+			<thumbnailUrl
+				url="http://devtests.kaltura.co.cc/p/495888/sp/49588800/thumbnail/entry_id/0_lhue3kl5/version/0" />
+			<tags>
+				<tag>fullepisode=true</tag>
+				<tag> series=the good guys</tag>
+				<tag> the good guys</tag>
+				<tag> don't tase me bro</tag>
+			</tags>
+			<partnerData></partnerData>
+			<accessControlId>385385</accessControlId>
+			<startDate>1280876400</startDate>
+			<endDate>1317541500</endDate>
+			<media>
+				<mediaType>1</mediaType>
+				<duration>0</duration>
+				<flavorParamsIds />
+			</media>
+		</item>
+	</channel>
+</mrss>

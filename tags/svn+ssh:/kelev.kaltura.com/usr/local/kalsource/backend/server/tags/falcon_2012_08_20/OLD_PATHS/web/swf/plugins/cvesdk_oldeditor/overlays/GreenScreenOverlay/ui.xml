@@ -1,0 +1,87 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Advanced Ui Test</name>
+
+	<UI>
+		<InfoPanel type="VBox">
+			<UIComponents>
+				<UIComponent type="HBox">
+
+					<UIComponent type="VBox">
+						<UIComponent type="HSlider" id="preBlur" label="Pre Blur">
+							<mxAttributes liveDragging="true"/>
+							<parameters>
+								<parameter name="value0" controls="preBlur" />
+							</parameters>
+						</UIComponent>
+
+						<UIComponent type="HSlider" id="postBlur" label="Post Blur">
+							<mxAttributes liveDragging="true"/>
+							<parameters>
+								<parameter name="value0" controls="postBlur" />
+							</parameters>
+						</UIComponent>
+
+						<UIComponent type="HSlider" id="MaskGamma" label="Mask Gamma">
+							<mxAttributes liveDragging="true"/>
+							<parameters>
+								<parameter name="value0" controls="MaskGamma" />
+							</parameters>
+						</UIComponent>
+
+						<UIComponent type="HSlider" id="MaskIn" label="Mask In">
+							<mxAttributes liveDragging="true"/>
+							<parameters>
+								<parameter name="value0" controls="MaskIn" />
+							</parameters>
+						</UIComponent>
+
+						<UIComponent type="HSlider" id="MaskOut" label="Mask Out">
+							<mxAttributes liveDragging="true"/>
+							<parameters>
+								<parameter name="value0" controls="MaskOut" />
+							</parameters>
+						</UIComponent>
+					<!--End VBox-->
+					</UIComponent>
+
+					<UIComponent type="HBox" verticalAlign="top">
+						<UIComponent type="VBox">
+							<UIComponent type="ModuleLoader" id="VideoColorPicker">
+								<url>
+									/swf/plugins/cvesdk_oldeditor/customUI/VideoColorPicker.swf
+								</url>
+
+								<parameters>
+									<parameter name="mediaInfo" controls="mediaInfo" />
+									<parameter name="pickedColor" controls="KeyColor" />
+								</parameters>
+
+							</UIComponent>
+						</UIComponent>
+
+						<UIComponent type="VBox" horizontalAlign="center">
+							<mxAttributes liveDragging="true" />
+
+							<UIComponent type="Label">
+								<mxAttributes text="Volume"/>
+							</UIComponent>
+
+							<UIComponent type="VSlider" id="volume">
+								<mxAttributes height="100" liveDragging="true"/>
+								<parameters>
+									<parameter name="value0" controls="VolumeSlider" />
+								</parameters>
+							</UIComponent>
+						</UIComponent>
+					</UIComponent>
+
+
+				<!--End HBox-->
+				</UIComponent>
+			</UIComponents>
+		</InfoPanel>
+	</UI>
+
+</definition>

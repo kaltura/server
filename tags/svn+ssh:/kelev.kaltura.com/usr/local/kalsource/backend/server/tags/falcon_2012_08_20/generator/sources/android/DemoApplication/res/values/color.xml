@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#ffffffff</color>
+    <color name="black">#000000</color>
+    <color name="bar_background">#03080b</color>
+    <color name="item_divider">#8498ac</color>
+    <color name="blue_kaltura">#02c2e2</color>
+    <color name="grey">#7b7b7b</color>
+    
+</resources>

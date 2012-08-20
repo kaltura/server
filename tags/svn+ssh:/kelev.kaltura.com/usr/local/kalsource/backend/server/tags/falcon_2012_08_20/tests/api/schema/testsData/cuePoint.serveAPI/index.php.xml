@@ -1,0 +1,1894 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scenes>
+	<scene-annotation sceneId="0_o5t8e2n0" entryId="0_cm0lnf2o"
+		systemName="SYSTEM_NAME_1">
+		<sceneStartTime>00:00:01</sceneStartTime>
+		<userId>Tan-Tan@test7.com</userId>
+		<tags>
+			<tag>test</tag>
+			<tag>aaa</tag>
+		</tags>
+		<sceneEndTime>00:00:01.5</sceneEndTime>
+		<sceneText>text 111</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_i3nqwbw7" entryId="0_cm0lnf2o"
+		systemName="SYSTEM_NAME_1">
+		<sceneStartTime>00:00:01</sceneStartTime>
+		<userId>Tan-Tan@test7.com</userId>
+		<tags>
+			<tag>test</tag>
+			<tag>aaa</tag>
+		</tags>
+		<sceneEndTime>00:00:01.5</sceneEndTime>
+		<sceneText>text 111</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_m7w1g2q9" entryId="0_cm0lnf2o"
+		systemName="SYSTEM_NAME_2">
+		<sceneStartTime>00:00:01.5</sceneStartTime>
+		<userId>Tan-Tan@test7.com</userId>
+		<tags>
+			<tag>test</tag>
+			<tag>bbb</tag>
+		</tags>
+		<sceneEndTime>00:00:01.8</sceneEndTime>
+		<sceneText>text 222</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_7gnb2n4x" entryId="0_sz5bim4i">
+		<sceneStartTime>00:00:01</sceneStartTime>
+		<userId>Tan-Tan@test7.com</userId>
+		<tags>
+			<tag>test</tag>
+			<tag>aaa</tag>
+		</tags>
+		<sceneEndTime>00:00:01</sceneEndTime>
+	</scene-annotation>
+	<scene-code-cue-point sceneId="0_8vn4iab4"
+		entryId="0_cm0lnf2o" systemName="THE_CODE">
+		<sceneStartTime>00:00:00.6</sceneStartTime>
+		<userId>Tan-Tan@test7.com</userId>
+		<tags>
+			<tag>test</tag>
+			<tag>www</tag>
+		</tags>
+		<code>code red</code>
+		<description>my code</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_3r8q98vn" entryId="0_cm0lnf2o">
+		<sceneStartTime>00:00:00</sceneStartTime>
+		<userId>Tan-Tan@test7.com</userId>
+		<sceneEndTime>00:00:00</sceneEndTime>
+		<parent>SYSTEM_NAME_1</parent>
+		<parentId>0_i3nqwbw7</parentId>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_s9ci5q94" entryId="0_4lo3mfte"
+		systemName="MY_SYSTEM_NAME">
+		<sceneStartTime>00:00:01</sceneStartTime>
+		<userId>Tan-Tan@test7.com</userId>
+		<tags>
+			<tag>test.123</tag>
+		</tags>
+		<sceneEndTime>00:00:01.5</sceneEndTime>
+		<sceneTitle>my title</sceneTitle>
+		<sourceUrl>http://my.url.com</sourceUrl>
+		<adType>1</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_1bwodk66" entryId="">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-annotation sceneId="0_po4hwgyd" entryId="">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation text</sceneText>
+	</scene-annotation>
+	<scene-code-cue-point sceneId="0_ypko64nk"
+		entryId="">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-ad-cue-point sceneId="0_4jzmvx4h" entryId="0_gophawc4"
+		systemName="MY_AD_CUE_POINT">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+		<scene-customData metadataId="230569"
+			metadataVersion="1" metadataProfileId="1309" metadataProfileVersion="1"
+			metadataProfile="AD_PROFILE_1" metadataProfileName="ad profile">
+			<metadata>
+				<adData>my ad custom data</adData>
+				<TextMulti>test aaa</TextMulti>
+				<TextMulti>test bbb</TextMulti>
+				<List1>aaa</List1>
+			</metadata>
+		</scene-customData>
+	</scene-ad-cue-point>
+	<scene-annotation sceneId="0_1e46b18j" entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation text</sceneText>
+	</scene-annotation>
+	<scene-code-cue-point sceneId="0_5ckudw0i"
+		entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_wwza48ip" entryId="0_gophawc4"
+		systemName="MY_ANN_PARENT">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+		<scene-customData metadataId="230570"
+			metadataVersion="1" metadataProfileId="1312" metadataProfileVersion="1"
+			metadataProfile="ANNOTATION_PROFILE_1" metadataProfileName="annotation profile">
+			<metadata>
+				<annotationData>my annotation custom data1</annotationData>
+				<TextMulti>test ccc</TextMulti>
+				<TextMulti>test ddd</TextMulti>
+				<List1>bbb</List1>
+			</metadata>
+		</scene-customData>
+	</scene-annotation>
+	<scene-annotation sceneId="0_1xii4158" entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT</parent>
+		<parentId>0_wwza48ip</parentId>
+	</scene-annotation>
+	<scene-code-cue-point sceneId="0_zdrmf1e1"
+		entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_ixjjobvz" entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT</parent>
+		<parentId>0_wwza48ip</parentId>
+	</scene-annotation>
+	<scene-code-cue-point sceneId="0_0fgzijzo"
+		entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_ejm58uz7" entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT</parent>
+		<parentId>0_wwza48ip</parentId>
+	</scene-annotation>
+	<scene-code-cue-point sceneId="0_a7271h4b"
+		entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-ad-cue-point sceneId="0_e73fkha0" entryId="0_ovglv3ub"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test2</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_tg8hufki" entryId="0_ovglv3ub"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-annotation sceneId="0_pdtoq2rz" entryId="0_ovglv3ub"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_ieid3rtz" entryId="0_ovglv3ub">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_6x3vvdix" entryId="0_6vp90joo"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test2</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_npkiknaz" entryId="0_6vp90joo"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_p0huwvev"
+		entryId="0_6vp90joo">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_y0r5mu37" entryId="0_6vp90joo"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_ycccgdst" entryId="0_6vp90joo">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_ur1atg8z" entryId="0_066cy7fc"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test2</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_a3z1ifxe" entryId="0_066cy7fc"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_kq9zywdt"
+		entryId="0_066cy7fc">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_ovjder2l" entryId="0_066cy7fc"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_i2eji21e" entryId="0_066cy7fc">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_xmi0o815" entryId="0_40otickd"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test2</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_68knjjzx" entryId="0_40otickd"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_4wpk4tr5"
+		entryId="0_40otickd">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_gq8utqxi" entryId="0_40otickd"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_lxt31wpn" entryId="0_40otickd">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_vmvhluon" entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT</parent>
+		<parentId>0_wwza48ip</parentId>
+	</scene-annotation>
+	<scene-code-cue-point sceneId="0_uhxyxel7"
+		entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-ad-cue-point sceneId="0_jd9zn1a3" entryId="0_w1snoo8i"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test2</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_jdg6qlae" entryId="0_w1snoo8i"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_3xznkk7h"
+		entryId="0_w1snoo8i">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_2wepn8da" entryId="0_w1snoo8i"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_2wa55ktv" entryId="0_w1snoo8i">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_0asp8zbt" entryId="0_l2ynjt3m"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test2</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_2gss7s1l" entryId="0_l2ynjt3m"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_n47biatn"
+		entryId="0_l2ynjt3m">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-ad-cue-point sceneId="0_brvey4ve" entryId="0_hasi24gs"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test2</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_eil5zuky" entryId="0_hasi24gs"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_twt5t9eh"
+		entryId="0_hasi24gs">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-ad-cue-point sceneId="0_qwzkd8v9" entryId="0_jhvbx5b6"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test2</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_biehkd4w" entryId="0_jhvbx5b6"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_85q050w0"
+		entryId="0_jhvbx5b6">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-ad-cue-point sceneId="0_8sgbrxuc" entryId="0_u9fttk39"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test2</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_23twxvi2" entryId="0_u9fttk39"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_6xdb65te"
+		entryId="0_u9fttk39">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-ad-cue-point sceneId="0_qv15pi5p" entryId="0_vxcjvc8k"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test2</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_1sdzrhpp" entryId="0_vxcjvc8k"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_sxinoct4"
+		entryId="0_vxcjvc8k">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_e5g5n3la" entryId="0_vxcjvc8k"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_qeaoxggb" entryId="0_vxcjvc8k">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT_1</parent>
+		<parentId>0_e5g5n3la</parentId>
+	</scene-annotation>
+	<scene-annotation sceneId="0_84xvjlbt" entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT</parent>
+		<parentId>0_wwza48ip</parentId>
+		<scene-customData metadataId="230571"
+			metadataVersion="1" metadataProfileId="1312" metadataProfileVersion="1"
+			metadataProfile="ANNOTATION_PROFILE_1" metadataProfileName="annotation profile">
+			<metadata>
+				<annotationData>my annotation custom data2</annotationData>
+				<TextMulti>test eee</TextMulti>
+				<TextMulti>test fff</TextMulti>
+				<List1>ccc</List1>
+			</metadata>
+		</scene-customData>
+	</scene-annotation>
+	<scene-code-cue-point sceneId="0_v7ggze9r"
+		entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+		<scene-customData metadataId="230572"
+			metadataVersion="1" metadataProfileId="1311" metadataProfileVersion="1"
+			metadataProfile="CODE_PROFILE_1" metadataProfileName="code profile">
+			<metadata>
+				<codeData>my code custom data</codeData>
+				<TextMulti>test eee</TextMulti>
+				<TextMulti>test fff</TextMulti>
+				<List1>ccc</List1>
+			</metadata>
+		</scene-customData>
+	</scene-code-cue-point>
+	<scene-ad-cue-point sceneId="0_f30xqw4w" entryId="0_4cu66lkd"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test2</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_fr4etl9f" entryId="0_4cu66lkd"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_fzdjfa01"
+		entryId="0_4cu66lkd">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_bf9ns7u6" entryId="0_4cu66lkd"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_t2av5tp1" entryId="0_4cu66lkd">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT_1</parent>
+		<parentId>0_bf9ns7u6</parentId>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_7o3db4gb" entryId="0_rie5v768"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test2</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_7wp8lsn1" entryId="0_rie5v768"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_tgunex03"
+		entryId="0_rie5v768">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_zn3ytptm" entryId="0_rie5v768"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_gvqe81rm" entryId="0_rie5v768">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT_1</parent>
+		<parentId>0_zn3ytptm</parentId>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_cip2n5hs" entryId="0_ppp76htt"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_a5e586qq" entryId="0_ppp76htt"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_62whg2a2"
+		entryId="0_ppp76htt">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_wx7bw3we" entryId="0_ppp76htt"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_wftftc6m" entryId="0_ppp76htt">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT_1</parent>
+		<parentId>0_wx7bw3we</parentId>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_d1xk8syv" entryId="0_bau93lys"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_iby2xjvy" entryId="0_bau93lys"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_p8o1dvkg"
+		entryId="0_bau93lys">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_65n7j4au" entryId="0_bau93lys"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_le8d4rcs" entryId="0_bau93lys">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT_1</parent>
+		<parentId>0_65n7j4au</parentId>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_bbxyuqep" entryId="0_tk734de3"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_440if2xu" entryId="0_tk734de3"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_dw9a5r9z"
+		entryId="0_tk734de3">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_zf45477x" entryId="0_tk734de3"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_9lt41kg7" entryId="0_tk734de3">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT_1</parent>
+		<parentId>0_zf45477x</parentId>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_4e50qq1c" entryId="0_g293j95s"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_criaze00" entryId="0_g293j95s"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_sxbkn9hq"
+		entryId="0_g293j95s">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_hcvttg56" entryId="0_g293j95s"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+	</scene-annotation>
+	<scene-annotation sceneId="0_ed8ny057" entryId="0_g293j95s">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT_1</parent>
+		<parentId>0_hcvttg56</parentId>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_953xj7hl" entryId="0_4f00gj3r"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_s59o8i30" entryId="0_4f00gj3r"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_ntem3zjl" entryId="0_2vfsv4zg"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_o18iff44" entryId="0_2vfsv4zg"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_0a8m1jat" entryId="0_c0li8qnl"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_izoxu4ts" entryId="0_c0li8qnl"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_k9ubkft2" entryId="0_drg2mzab"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_xt5ysvkb" entryId="0_drg2mzab"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_9jexrjiz" entryId="0_na6xl6ik"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_6094300v" entryId="0_na6xl6ik"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_w3cul9g4" entryId="0_aw8bso8u"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+		<scene-customData metadataId="230575"
+			metadataVersion="1" metadataProfileId="1309" metadataProfileVersion="1"
+			metadataProfile="AD_PROFILE_1" metadataProfileName="ad profile">
+			<metadata>
+				<adData>my ad custom data1</adData>
+				<TextMulti>test aaa</TextMulti>
+				<TextMulti>test bbb</TextMulti>
+				<List1>aaa</List1>
+			</metadata>
+		</scene-customData>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_gsx85zse" entryId="0_aw8bso8u"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+		<scene-customData metadataId="230576"
+			metadataVersion="1" metadataProfileId="1309" metadataProfileVersion="1"
+			metadataProfile="AD_PROFILE_1" metadataProfileName="ad profile">
+			<metadata>
+				<adData>my ad custom data2</adData>
+				<TextMulti>test aaa</TextMulti>
+				<TextMulti>test bbb</TextMulti>
+				<List1>aaa</List1>
+			</metadata>
+		</scene-customData>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_9ylcdoeo"
+		entryId="0_aw8bso8u">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+		<scene-customData metadataId="230577"
+			metadataVersion="1" metadataProfileId="1311" metadataProfileVersion="1"
+			metadataProfile="CODE_PROFILE_1" metadataProfileName="code profile">
+			<metadata>
+				<codeData>my code custom data</codeData>
+				<TextMulti>test eee</TextMulti>
+				<TextMulti>test fff</TextMulti>
+				<List1>ccc</List1>
+			</metadata>
+		</scene-customData>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_uu4q3ylu" entryId="0_aw8bso8u"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+		<scene-customData metadataId="230578"
+			metadataVersion="1" metadataProfileId="1312" metadataProfileVersion="1"
+			metadataProfile="ANNOTATION_PROFILE_1" metadataProfileName="annotation profile">
+			<metadata>
+				<annotationData>my annotation custom data1</annotationData>
+				<TextMulti>test ccc</TextMulti>
+				<TextMulti>test ddd</TextMulti>
+				<List1>bbb</List1>
+			</metadata>
+		</scene-customData>
+	</scene-annotation>
+	<scene-annotation sceneId="0_hquc84sr" entryId="0_aw8bso8u">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT_1</parent>
+		<parentId>0_uu4q3ylu</parentId>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_50vrspd0" entryId="0_pzzcrsr0"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+		<scene-customData metadataId="230579"
+			metadataVersion="1" metadataProfileId="1309" metadataProfileVersion="1"
+			metadataProfile="AD_PROFILE_1" metadataProfileName="ad profile">
+			<metadata>
+				<adData>my ad custom data1</adData>
+				<TextMulti>test aaa</TextMulti>
+				<TextMulti>test bbb</TextMulti>
+				<List1>aaa</List1>
+			</metadata>
+		</scene-customData>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_16ng5rhp" entryId="0_pzzcrsr0"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+		<scene-customData metadataId="230580"
+			metadataVersion="1" metadataProfileId="1309" metadataProfileVersion="1"
+			metadataProfile="AD_PROFILE_1" metadataProfileName="ad profile">
+			<metadata>
+				<adData>my ad custom data2</adData>
+				<TextMulti>test aaa</TextMulti>
+				<TextMulti>test bbb</TextMulti>
+				<List1>aaa</List1>
+			</metadata>
+		</scene-customData>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_bzcrbnpt"
+		entryId="0_pzzcrsr0">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+		<scene-customData metadataId="230581"
+			metadataVersion="1" metadataProfileId="1311" metadataProfileVersion="1"
+			metadataProfile="CODE_PROFILE_1" metadataProfileName="code profile">
+			<metadata>
+				<codeData>my code custom data</codeData>
+				<TextMulti>test eee</TextMulti>
+				<TextMulti>test fff</TextMulti>
+				<List1>ccc</List1>
+			</metadata>
+		</scene-customData>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_0ikkgjy7" entryId="0_pzzcrsr0"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+		<scene-customData metadataId="230582"
+			metadataVersion="1" metadataProfileId="1312" metadataProfileVersion="1"
+			metadataProfile="ANNOTATION_PROFILE_1" metadataProfileName="annotation profile">
+			<metadata>
+				<annotationData>my annotation custom data1</annotationData>
+				<TextMulti>test ccc</TextMulti>
+				<TextMulti>test ddd</TextMulti>
+				<List1>bbb</List1>
+			</metadata>
+		</scene-customData>
+	</scene-annotation>
+	<scene-annotation sceneId="0_umei91oo" entryId="0_pzzcrsr0">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT_1</parent>
+		<parentId>0_0ikkgjy7</parentId>
+		<scene-customData metadataId="230583"
+			metadataVersion="1" metadataProfileId="1312" metadataProfileVersion="1"
+			metadataProfile="ANNOTATION_PROFILE_1" metadataProfileName="annotation profile">
+			<metadata>
+				<annotationData>my annotation custom data2</annotationData>
+				<TextMulti>test eee</TextMulti>
+				<TextMulti>test fff</TextMulti>
+				<List1>ccc</List1>
+			</metadata>
+		</scene-customData>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_5w4fsh86" entryId="0_fm0c49gk"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+		<scene-customData metadataId="230584"
+			metadataVersion="1" metadataProfileId="1309" metadataProfileVersion="1"
+			metadataProfile="AD_PROFILE_1" metadataProfileName="ad profile">
+			<metadata>
+				<adData>my ad custom data1</adData>
+				<TextMulti>test aaa</TextMulti>
+				<TextMulti>test bbb</TextMulti>
+				<List1>aaa</List1>
+			</metadata>
+		</scene-customData>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_5bbroe03" entryId="0_fm0c49gk"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+		<scene-customData metadataId="230585"
+			metadataVersion="1" metadataProfileId="1309" metadataProfileVersion="1"
+			metadataProfile="AD_PROFILE_1" metadataProfileName="ad profile">
+			<metadata>
+				<adData>my ad custom data2</adData>
+				<TextMulti>test aaa</TextMulti>
+				<TextMulti>test bbb</TextMulti>
+				<List1>aaa</List1>
+			</metadata>
+		</scene-customData>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_a83sso5f"
+		entryId="0_fm0c49gk">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+		<scene-customData metadataId="230586"
+			metadataVersion="1" metadataProfileId="1311" metadataProfileVersion="1"
+			metadataProfile="CODE_PROFILE_1" metadataProfileName="code profile">
+			<metadata>
+				<codeData>my code custom data</codeData>
+				<TextMulti>test eee</TextMulti>
+				<TextMulti>test fff</TextMulti>
+				<List1>ccc</List1>
+			</metadata>
+		</scene-customData>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_74xyeofz" entryId="0_fm0c49gk"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+		<scene-customData metadataId="230587"
+			metadataVersion="1" metadataProfileId="1312" metadataProfileVersion="1"
+			metadataProfile="ANNOTATION_PROFILE_1" metadataProfileName="annotation profile">
+			<metadata>
+				<annotationData>my annotation custom data1</annotationData>
+				<TextMulti>test ccc</TextMulti>
+				<TextMulti>test ddd</TextMulti>
+				<List1>bbb</List1>
+			</metadata>
+		</scene-customData>
+	</scene-annotation>
+	<scene-annotation sceneId="0_m79jqw2m" entryId="0_fm0c49gk">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT_1</parent>
+		<parentId>0_74xyeofz</parentId>
+		<scene-customData metadataId="230588"
+			metadataVersion="1" metadataProfileId="1312" metadataProfileVersion="1"
+			metadataProfile="ANNOTATION_PROFILE_1" metadataProfileName="annotation profile">
+			<metadata>
+				<annotationData>my annotation custom data2</annotationData>
+				<TextMulti>test eee</TextMulti>
+				<TextMulti>test fff</TextMulti>
+				<List1>ccc</List1>
+			</metadata>
+		</scene-customData>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_gfr55s5m" entryId="0_pjsk6quc"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+		<scene-customData metadataId="230589"
+			metadataVersion="1" metadataProfileId="1309" metadataProfileVersion="1"
+			metadataProfile="AD_PROFILE_1" metadataProfileName="ad profile">
+			<metadata>
+				<adData>my ad custom data1</adData>
+				<TextMulti>test aaa</TextMulti>
+				<TextMulti>test bbb</TextMulti>
+				<List1>aaa</List1>
+			</metadata>
+		</scene-customData>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_hx57tf2s" entryId="0_pjsk6quc"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+		<scene-customData metadataId="230590"
+			metadataVersion="1" metadataProfileId="1309" metadataProfileVersion="1"
+			metadataProfile="AD_PROFILE_1" metadataProfileName="ad profile">
+			<metadata>
+				<adData>my ad custom data2</adData>
+				<TextMulti>test aaa</TextMulti>
+				<TextMulti>test bbb</TextMulti>
+				<List1>aaa</List1>
+			</metadata>
+		</scene-customData>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_ncxpc992"
+		entryId="0_pjsk6quc">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+		<scene-customData metadataId="230591"
+			metadataVersion="1" metadataProfileId="1311" metadataProfileVersion="1"
+			metadataProfile="CODE_PROFILE_1" metadataProfileName="code profile">
+			<metadata>
+				<codeData>my code custom data</codeData>
+				<TextMulti>test eee</TextMulti>
+				<TextMulti>test fff</TextMulti>
+				<List1>ccc</List1>
+			</metadata>
+		</scene-customData>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_dbdpzafr" entryId="0_pjsk6quc"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+		<scene-customData metadataId="230592"
+			metadataVersion="1" metadataProfileId="1312" metadataProfileVersion="1"
+			metadataProfile="ANNOTATION_PROFILE_1" metadataProfileName="annotation profile">
+			<metadata>
+				<annotationData>my annotation custom data1</annotationData>
+				<TextMulti>test ccc</TextMulti>
+				<TextMulti>test ddd</TextMulti>
+				<List1>bbb</List1>
+			</metadata>
+		</scene-customData>
+	</scene-annotation>
+	<scene-annotation sceneId="0_oxwrwefy" entryId="0_pjsk6quc">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT_1</parent>
+		<parentId>0_dbdpzafr</parentId>
+		<scene-customData metadataId="230593"
+			metadataVersion="1" metadataProfileId="1312" metadataProfileVersion="1"
+			metadataProfile="ANNOTATION_PROFILE_1" metadataProfileName="annotation profile">
+			<metadata>
+				<annotationData>my annotation custom data2</annotationData>
+				<TextMulti>test eee</TextMulti>
+				<TextMulti>test fff</TextMulti>
+				<List1>ccc</List1>
+			</metadata>
+		</scene-customData>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_okvow82f" entryId="0_zy0hittn"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+		<scene-customData metadataId="230594"
+			metadataVersion="1" metadataProfileId="1309" metadataProfileVersion="1"
+			metadataProfile="AD_PROFILE_1" metadataProfileName="ad profile">
+			<metadata>
+				<adData>my ad custom data1</adData>
+				<TextMulti>test aaa</TextMulti>
+				<TextMulti>test bbb</TextMulti>
+				<List1>aaa</List1>
+			</metadata>
+		</scene-customData>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_7ad1ypeg" entryId="0_zy0hittn"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+		<scene-customData metadataId="230595"
+			metadataVersion="1" metadataProfileId="1309" metadataProfileVersion="1"
+			metadataProfile="AD_PROFILE_1" metadataProfileName="ad profile">
+			<metadata>
+				<adData>my ad custom data2</adData>
+				<TextMulti>test aaa</TextMulti>
+				<TextMulti>test bbb</TextMulti>
+				<List1>aaa</List1>
+			</metadata>
+		</scene-customData>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_9stmnv4r"
+		entryId="0_zy0hittn">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+		<scene-customData metadataId="230596"
+			metadataVersion="1" metadataProfileId="1311" metadataProfileVersion="1"
+			metadataProfile="CODE_PROFILE_1" metadataProfileName="code profile">
+			<metadata>
+				<codeData>my code custom data</codeData>
+				<TextMulti>test eee</TextMulti>
+				<TextMulti>test fff</TextMulti>
+				<List1>ccc</List1>
+			</metadata>
+		</scene-customData>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_flkskfxg" entryId="0_zy0hittn"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+		<scene-customData metadataId="230597"
+			metadataVersion="1" metadataProfileId="1312" metadataProfileVersion="1"
+			metadataProfile="ANNOTATION_PROFILE_1" metadataProfileName="annotation profile">
+			<metadata>
+				<annotationData>my annotation custom data1</annotationData>
+				<TextMulti>test ccc</TextMulti>
+				<TextMulti>test ddd</TextMulti>
+				<List1>bbb</List1>
+			</metadata>
+		</scene-customData>
+	</scene-annotation>
+	<scene-annotation sceneId="0_lkht8h5w" entryId="0_zy0hittn">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT_1</parent>
+		<parentId>0_flkskfxg</parentId>
+		<scene-customData metadataId="230598"
+			metadataVersion="1" metadataProfileId="1312" metadataProfileVersion="1"
+			metadataProfile="ANNOTATION_PROFILE_1" metadataProfileName="annotation profile">
+			<metadata>
+				<annotationData>my annotation custom data2</annotationData>
+				<TextMulti>test eee</TextMulti>
+				<TextMulti>test fff</TextMulti>
+				<List1>ccc</List1>
+			</metadata>
+		</scene-customData>
+	</scene-annotation>
+	<scene-ad-cue-point sceneId="0_vx4xqj3e" entryId="0_2urpn8z9"
+		systemName="SCENE_AD_CUE_POINT_1">
+		<sceneStartTime>00:00:03.5</sceneStartTime>
+		<tags>
+			<tag>ad1</tag>
+			<tag>test3</tag>
+		</tags>
+		<sceneEndTime>00:00:06.5</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://my.test.url/to/source.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+		<scene-customData metadataId="230599"
+			metadataVersion="1" metadataProfileId="1309" metadataProfileVersion="1"
+			metadataProfile="AD_PROFILE_1" metadataProfileName="ad profile">
+			<metadata>
+				<adData>my ad custom data1</adData>
+				<TextMulti>test aaa</TextMulti>
+				<TextMulti>test bbb</TextMulti>
+				<List1>aaa</List1>
+			</metadata>
+		</scene-customData>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_7rcvhva7" entryId="0_2urpn8z9"
+		systemName="SCENE_AD_CUE_POINT_2">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my second ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>2</adType>
+		<protocolType>2</protocolType>
+		<scene-customData metadataId="230600"
+			metadataVersion="1" metadataProfileId="1309" metadataProfileVersion="1"
+			metadataProfile="AD_PROFILE_1" metadataProfileName="ad profile">
+			<metadata>
+				<adData>my ad custom data2</adData>
+				<TextMulti>test aaa</TextMulti>
+				<TextMulti>test bbb</TextMulti>
+				<List1>aaa</List1>
+			</metadata>
+		</scene-customData>
+	</scene-ad-cue-point>
+	<scene-code-cue-point sceneId="0_8qu8xb77"
+		entryId="0_2urpn8z9">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+		<scene-customData metadataId="230601"
+			metadataVersion="1" metadataProfileId="1311" metadataProfileVersion="1"
+			metadataProfile="CODE_PROFILE_1" metadataProfileName="code profile">
+			<metadata>
+				<codeData>my code custom data</codeData>
+				<TextMulti>test eee</TextMulti>
+				<TextMulti>test fff</TextMulti>
+				<List1>ccc</List1>
+			</metadata>
+		</scene-customData>
+	</scene-code-cue-point>
+	<scene-annotation sceneId="0_hzk4gd5r" entryId="0_2urpn8z9"
+		systemName="MY_ANN_PARENT_1">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+		<scene-customData metadataId="230602"
+			metadataVersion="1" metadataProfileId="1312" metadataProfileVersion="1"
+			metadataProfile="ANNOTATION_PROFILE_1" metadataProfileName="annotation profile">
+			<metadata>
+				<annotationData>my annotation custom data1</annotationData>
+				<TextMulti>test ccc</TextMulti>
+				<TextMulti>test ddd</TextMulti>
+				<List1>bbb</List1>
+			</metadata>
+		</scene-customData>
+	</scene-annotation>
+	<scene-annotation sceneId="0_jx6dia7z" entryId="0_2urpn8z9">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT_1</parent>
+		<parentId>0_hzk4gd5r</parentId>
+		<scene-customData metadataId="230603"
+			metadataVersion="1" metadataProfileId="1312" metadataProfileVersion="1"
+			metadataProfile="ANNOTATION_PROFILE_1" metadataProfileName="annotation profile">
+			<metadata>
+				<annotationData>my annotation custom data2</annotationData>
+				<TextMulti>test eee</TextMulti>
+				<TextMulti>test fff</TextMulti>
+				<List1>ccc</List1>
+			</metadata>
+		</scene-customData>
+	</scene-annotation>
+</scenes>

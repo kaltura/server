@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="onPremUninstall" default="restartApache" >
+    <!-- ============================================  -->
+    <!-- Target: run uninstall                         -->
+    <!-- ============================================  -->
+    <target name="uninstall">
+         <!--echo msg="uninstall..." /-->
+         <property name="properties.v4"  value="null" override="false" />
+         <property name="properties.v5"  value="null" override="false" />
+         <available file="/opt/kaltura/uninstaller" type="dir" property="properties.unins" />
+         <!--echo message="value is ${properties.unins}" /-->
+
+         <if>
+              <equals arg1="${properties.unins}" arg2="true" />
+         <then>
+              <echo msg="uninstall..." />
+              <exec command="php uninstall.php -s" dir="/opt/kaltura/uninstaller" />
+         </then>
+         </if>
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: uninclude kaltura                     -->
+    <!-- ============================================  -->
+    <target name="unincludeKaltura" depends="uninstall">
+         <echo msg="uninclude kaltura ..." />
+
+         <copy file="/etc/httpd/conf/httpd.conf" tofile="/etc/httpd/conf/httpd.conf.bak" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                       <regexp pattern="Include \/opt\/kaltura\/app\/configurations\/apache\/my_kaltura.conf" replace="# Dynamic Shared Object (DSO) Support"/>
+                       <regexp pattern="LoadModule filter_module modules\/mod_filter.so" replace="# LoadModule foo_module modules/mod_foo.so"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+         <copy file="/etc/httpd/conf/httpd.conf.bak" tofile="/etc/httpd/conf/httpd.conf" overwrite="true"/>
+
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: delete Kaltura folder                 -->
+    <!-- ============================================  -->
+    <target name="deleteKalturaFolder">
+         <echo msg="delete Kaltura Folder..." />
+         <exec command="rm -rf kaltura" dir="/opt/" />
+         <exec command="rm -rf instlBkgrndRun.log" dir="/opt/" />
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: restart apache                        -->
+    <!-- ============================================  -->
+    <target name="restartApache" depends="uninstall,unincludeKaltura,deleteKalturaFolder">
+         <echo msg="restart apache..." />
+         <exec command="apachectl restart" dir="." />
+    </target>
+
+
+</project>

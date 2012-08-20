@@ -1,0 +1,66 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Draggable Text</name>
+	<restrictions>	
+		<restriction type="string" default="Enter text here.">
+			<id>text</id>
+		</restriction>
+		
+		<restriction type="number" default="0">
+			<id>textXPos</id>
+		</restriction>
+		
+		<restriction type="number" default="0">
+			<id>textYPos</id>
+		</restriction>
+		
+		<restriction type="number" default="0">
+			<id>textRotation</id>
+		</restriction>
+		
+		<restriction type="number" default="0.5">
+			<id>textScaleX</id>
+		</restriction>
+		
+		<restriction type="number" default="0.5">
+			<id>textScaleY</id>
+		</restriction>
+		
+		<restriction type="number" default="0x000000">
+			<id>fontColor</id>
+		</restriction>
+		
+		<restriction type="string" default="Arial">
+			<id>fontName</id>
+			<enums>
+				<enum value="Amsterdam"/>
+				<enum value="Arial"/>
+				<enum value="Arista"/>
+				<enum value="Berthsid"/>
+				<enum value="Chopin"/>
+				<enum value="Coolvetica"/>
+				<enum value="Grotesk"/>
+				<enum value="Retriga"/>
+				<enum value="Scribblings"/><enum value="BradyBunch"></enum>
+			</enums>
+		</restriction>
+		<restriction default="100" type="string">
+			<id>fontSize</id>
+		<enums><enum value="50"></enum><enum value="56"></enum><enum value="60"></enum><enum value="72"></enum><enum value="90"></enum><enum value="100"></enum><enum value="110"></enum><enum value="120"></enum>
+			<enum value="130"></enum>
+			<enum value="140"></enum></enums></restriction>
+		<restriction type="string" default="Normal">
+			<id>fontWidth</id>
+			<enums>
+				<enum value="Bold"></enum>
+				<enum value="Italic"></enum><enum value="Bold Italic"></enum><enum value="Normal"></enum></enums></restriction>
+
+	<restriction default="0xffffff" type="number">
+			<id>bgColor</id></restriction><restriction default="1" type="number">
+			<id>bgAlpha</id>
+			<range>
+				<stepSize value="0.1"></stepSize>
+				<min value="0"></min>
+				<max value="1"></max></range></restriction></restrictions>
+</definition>

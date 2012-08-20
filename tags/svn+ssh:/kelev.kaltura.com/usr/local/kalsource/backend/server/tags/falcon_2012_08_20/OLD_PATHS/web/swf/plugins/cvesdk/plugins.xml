@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<transitions>
+		<category type="ignore">
+			<plugin label="None" plugin_id="None" thumbnail="" creator="Kaltura">
+				<description>
+				</description>
+			</plugin>
+		</category>
+		<category type="Masks">
+			<plugin label="3D Paper" plugin_id="3D_paper" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Smashing Bars" plugin_id="smashing_bars" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Collasping Bubbles" plugin_id="collasping_bubbles" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Stripes" plugin_id="stripes" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="TV Noise" plugin_id="tv_noise" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Clock" plugin_id="clock" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Curtains" plugin_id="curtains" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="123" plugin_id="123" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="OldSchool Countdown" plugin_id="oldschool_countdown" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Pinky Glows" plugin_id="pinky_glows" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Arrows" plugin_id="arrows" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Revealing Screen" plugin_id="revealing_screen" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Shutter" plugin_id="shutter" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Dropping Columns" plugin_id="col_drop" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Collapsing Box" plugin_id="collapsing_box" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Corner Rollout" plugin_id="corner_rollout" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Crazy Blocks" plugin_id="crazy_blocks" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Dripping Blood" plugin_id="dripping_blood" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Filling Blocks" plugin_id="filling_blocks" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Filling Blocks Diagonal" plugin_id="filling_blocks_diagonal" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Filling Blocks Left" plugin_id="filling_blocks_left" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Filling Bubbles" plugin_id="filling_bubbles" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Filling Bubbles Diagonal" plugin_id="filling_bubbles_diagonal" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Glowing Star" plugin_id="glowing_star" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Heart" plugin_id="heart" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Skull" plugin_id="skull" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Pacman" plugin_id="pacman" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Squares Snake" plugin_id="squares_snake" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Star Slide" plugin_id="starSlide" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Surprising Bubbles" plugin_id="surprising_bubbles" thumbnail="" creator="Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Painting Brush" plugin_id="paintingBrush" thumbnail="" creator="akurtser and Yair Even-Or">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="The End" plugin_id="the_end" thumbnail="" creator="Yair Even-Or">
+			    <description>
+			    </description>
+			 </plugin>
+			 <plugin label="Twisted Blinds" plugin_id="twisted_blinds" thumbnail="" creator="Yair Even-Or">
+			    <description>
+			    </description>
+			 </plugin>
+			 <plugin label="Falling Ground" plugin_id="falling_ground" thumbnail="" creator="Yair Even-Or">
+			    <description>
+			    </description>
+			 </plugin>
+		</category>
+		<category type="Faders">
+			<plugin label="Cross Dissolve" plugin_id="dissolve" thumbnail="" creator="Zohar Babin">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Pixel Dissolve" plugin_id="PixelDissolve" thumbnail="" creator="Zohar Babin">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Fading Squares" plugin_id="Squares" thumbnail="" creator="akurtser">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Cross Burn" plugin_id="CrossBurn" thumbnail="" creator="Zohar Babin">
+				<description>
+				</description>
+			</plugin>
+		</category>
+		<category type="Animations">
+			<plugin label="Retro Girl" plugin_id="RetroGirl" thumbnail="" creator="akurtser">
+				<description>
+				</description>
+			</plugin>
+		</category>
+		<category type="Geometrics">
+			<plugin label="Move" plugin_id="move" thumbnail="" creator="akurtser">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Rotating Resize" plugin_id="crossResize" thumbnail="" creator="akurtser">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Growing Circle" plugin_id="GrowingCircle" thumbnail="" creator="akurtser">
+				<description>
+				</description>
+			</plugin>
+			<plugin label="Soft Wipe" plugin_id="SoftWipe" thumbnail="" creator="akurtser">
+				<description>
+				</description>
+			</plugin>
+		</category>
+	</transitions>
+	<overlays>
+		<category type="Generic">
+			<plugin label="Generic Asset Loader" plugin_id="genericAssetOverlay" thumbnail="" creator="Zohar Babin">
+				<description>Loads an external url and plays it on screen according to saved definitions.</description>
+			</plugin>
+		<plugin label="Free Falling Leaves" plugin_id="fallingLeaves" thumbnail="" creator="Almog Kurtser">
+				<description>Just a bunch of leaves...</description>
+			</plugin><plugin label="Snow" plugin_id="snow" thumbnail="" creator="Almog Kurtser">
+				<description>It is snowing in the summer!</description>
+			</plugin><plugin label="Text Titles" plugin_id="freeTransfromText" thumbnail="" creator="Almog Kurtser">
+				<description>just a text...</description>
+			</plugin></category>
+	</overlays>
+	<textOverlays>
+	</textOverlays>
+	<effects>
+	<category type="Generic">
+			<plugin label="Black &amp; White Filter" plugin_id="blackWhite" thumbnail="" creator="Zohar Babin">
+				<description>turn the image to black and white gray shades</description>
+			</plugin>
+		<plugin label="Emboss" plugin_id="emboss" thumbnail="" creator="Zohar Babin">
+				<description>Turn to stone!</description>
+			</plugin><plugin label="Invert" plugin_id="invertColors" thumbnail="" creator="Zohar Babin">
+				<description>Invert the colors...</description>
+			</plugin><plugin label="Speia Filter" plugin_id="sepia" thumbnail="" creator="Zohar Babin">
+				<description>Give it the old film look!</description>
+			</plugin></category></effects>
+</xml>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<mrss>
+	<channel>
+		<item>
+			<action>add</action>
+			<type>1</type>
+			<licenseType>1</licenseType>
+			<userId>assaf</userId>
+			<name>Kaltura ABC Test #2.0.9.1</name>
+			<description>Multiple items in one XML - see example of multiple items ingested in one XML</description>
+			<tags>
+				<tag>test2</tag>
+				<tag>item1</tag>		
+			</tags>
+			<categories>
+				<category>tests->test2</category>
+			</categories>
+			<!-- what information might be useful to put here? -->
+			<partnerData></partnerData>
+			
+			<conversionProfile>INGESTED_WITH_SOURCE</conversionProfile>
+			<!--
+			<conversionProfileId>1910771</conversionProfileId>
+			-->
+			
+			
+			<!--
+			<startDate>2011-05-05T00:00:00</startDate>
+			<endDate>2011-12-19T00:00:00</endDate>
+			-->
+
+			<media>
+				<mediaType>1</mediaType>
+				<!--
+				Not supported
+				<playlists>
+					<playlist playlistId="1_h8nmsbyg" />
+				</playlists>
+				-->
+			</media>
+
+			<content flavorParams="source"> 
+				<tags>
+					<tag>web,mbr</tag>
+				</tags>
+				<remoteStorageContentResource url="mp4/644x362/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4">
+					<storageProfile>ll.media.abc.com</storageProfile>
+				</remoteStorageContentResource>
+			</content>
+
+			<content flavorParams="mp4-526x296-700k"> 
+				<tags>
+					<tag>web,mbr</tag>
+				</tags>
+				<remoteStorageContentResource url="mp4/526x296/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4">
+					<storageProfile>ll.media.abc.com</storageProfile>
+				</remoteStorageContentResource>
+			</content>
+
+			<content flavorParams="mp4-426x240-600k"> 
+				<tags>
+					<tag>web,mbr</tag>
+				</tags>
+				<remoteStorageContentResource url="mp4/426x240/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4">
+					<storageProfile>ll.media.abc.com</storageProfile>
+				</remoteStorageContentResource>
+			</content>
+
+			<content flavorParams="mp4-298x168-400k"> 
+				<tags>
+					<tag>web,mbr</tag>
+				</tags>
+				<remoteStorageContentResource url="mp4/298x168/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4">
+					<storageProfile>ll.media.abc.com</storageProfile>
+				</remoteStorageContentResource>
+			</content>
+			
+			<thumbnail isDefault="true">
+				<tags>
+					<tag>test</tag>
+				</tags>
+				<urlContentResource url="http://ll.media.abc.com/video/thumbnails/644x362/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.jpg" /> 
+			</thumbnail>
+		</item>
+		
+		
+		<item>
+			<action>add</action>
+			<type>1</type>
+			<licenseType>1</licenseType>
+			<userId>assaf</userId>
+			<name>Kaltura ABC Test #2.0.9.2</name>
+			<description>Multiple items in one XML - see example of multiple items ingested in one XML</description>
+			<tags>
+				<tag>test2</tag>
+				<tag>item1</tag>		
+			</tags>
+			<categories>
+				<category>tests->test2</category>
+			</categories>
+			<!-- what information might be useful to put here? -->
+			<partnerData></partnerData>
+			
+			<conversionProfile>INGESTED_WITH_SOURCE</conversionProfile>
+			<!--
+			<conversionProfile>INGESTED_WITH_SOURCE</conversionProfile>
+			<conversionProfileId>1910771</conversionProfileId>
+			-->
+			
+			
+			<!--
+			<startDate>2011-05-05T00:00:00</startDate>
+			<endDate>2011-12-19T00:00:00</endDate>
+			-->
+
+			<media>
+				<mediaType>1</mediaType>
+				<!--
+				Not supported
+				<playlists>
+					<playlist playlistId="1_h8nmsbyg" />
+				</playlists>
+				-->
+			</media>
+
+			<content flavorParams="source"> 
+				<tags>
+					<tag>web,mbr</tag>
+				</tags>
+				<remoteStorageContentResource url="mp4/644x362/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4">
+					<storageProfile>ll.media.abc.com</storageProfile>
+				</remoteStorageContentResource>
+			</content>
+
+			<content flavorParams="mp4-526x296-700k"> 
+				<tags>
+					<tag>web,mbr</tag>
+				</tags>
+				<remoteStorageContentResource url="mp4/526x296/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4">
+					<storageProfile>ll.media.abc.com</storageProfile>
+				</remoteStorageContentResource>
+			</content>
+
+			<content flavorParams="mp4-426x240-600k"> 
+				<tags>
+					<tag>web,mbr</tag>
+				</tags>
+				<remoteStorageContentResource url="mp4/426x240/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4">
+					<storageProfile>ll.media.abc.com</storageProfile>
+				</remoteStorageContentResource>
+			</content>
+
+			<content flavorParams="mp4-298x168-400k"> 
+				<tags>
+					<tag>web,mbr</tag>
+				</tags>
+				<remoteStorageContentResource url="mp4/298x168/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4">
+					<storageProfile>ll.media.abc.com</storageProfile>
+				</remoteStorageContentResource>
+			</content>
+			
+			<thumbnail isDefault="true">
+				<tags>
+					<tag>test</tag>
+				</tags>
+				<urlContentResource url="http://ll.media.abc.com/video/thumbnails/644x362/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.jpg" /> 
+			</thumbnail>
+		</item>
+		
+		
+	</channel>
+</mrss>

@@ -1,0 +1,15 @@
+<definition>
+	<name>Soft wipe</name>
+	<version>1.00</version>
+	<restrictions>	
+		<restriction type="number" default="1">
+			<id>gradWidth</id>
+			<range>
+				<stepSize value="0.001" />
+				<min value="0"/>
+				<max value="1"/>
+			</range>
+		</restriction>
+	</restrictions>
+</definition>
+

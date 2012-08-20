@@ -1,0 +1,456 @@
+
+[config]
+source                                            = ini
+serviceUrl                                        = www.kaltura.com
+partnerId                                         = 528281
+clientTag                                         = unitTest
+curlTimeout                                       = 120
+startSession                                      = 1
+secret                                            = 767aed746ac10996c0c6cc57ab386661
+userId                                            = 
+sessionType                                       = 2
+expiry                                            = 86400
+privileges                                        = 
+
+[testAdd]
+test1.accessControl.objectType                    = KalturaAccessControl
+test1.accessControl.name                          = test1
+test1.accessControl.systemName                    = TEST1
+test1.accessControl.description                   = Unit test access control
+test1.accessControl.isDefault = false
+
+test1.reference.objectType                        = KalturaAccessControl
+test1.reference.name                              = test1
+test1.reference.systemName                        = TEST1
+test1.reference.description                       = Unit test access control
+test1.reference.isDefault = false
+test1.reference.containsUnsuportedRestrictions    =
+ 
+test2.accessControl.objectType                    = KalturaAccessControl
+test2.accessControl.name                          = test2
+test2.accessControl.systemName                    = TEST2
+test2.accessControl.description                   = Unit test access control
+test2.accessControl.isDefault = false
+test2.accessControl.restrictions.objectType       = array
+test2.accessControl.restrictions.item1.objectType = KalturaSiteRestriction
+test2.accessControl.restrictions.item1.siteRestrictionType= 0
+test2.accessControl.restrictions.item1.siteList   = my.domain.com
+
+
+test2.reference.objectType                        = KalturaAccessControl
+test2.reference.name                              = test2
+test2.reference.systemName                        = TEST2
+test2.reference.description                       = Unit test access control
+test2.reference.isDefault = false
+test2.reference.containsUnsuportedRestrictions    = 
+test2.reference.restrictions.objectType           = array
+test2.reference.restrictions.item1.objectType     = KalturaSiteRestriction
+test2.reference.restrictions.item1.siteRestrictionType= 0
+test2.reference.restrictions.item1.siteList       = my.domain.com
+
+
+test3.accessControl.objectType                    = KalturaAccessControl
+test3.accessControl.name                          = test3
+test3.accessControl.systemName                    = TEST3
+test3.accessControl.description                   = Unit test access control
+test3.accessControl.isDefault = false
+test3.accessControl.restrictions.objectType       = array
+test3.accessControl.restrictions.item1.objectType = KalturaCountryRestriction
+test3.accessControl.restrictions.item1.countryRestrictionType= 1
+test3.accessControl.restrictions.item1.siteList   = IL
+test3.reference.objectType                        = KalturaAccessControl
+test3.reference.name                              = test3
+test3.reference.systemName                        = TEST3
+test3.reference.description                       = Unit test access control
+test3.reference.isDefault = false
+test3.reference.containsUnsuportedRestrictions    = 
+test3.reference.restrictions.objectType           = array
+test3.reference.restrictions.item1.objectType     = KalturaCountryRestriction
+test3.reference.restrictions.item1.countryRestrictionType= 1
+test3.reference.restrictions.item1.siteList       = IL
+test4.accessControl.objectType                    = KalturaAccessControl
+test4.accessControl.name                          = test4
+test4.accessControl.systemName                    = TEST4
+test4.accessControl.description                   = Unit test access control
+test4.accessControl.isDefault = false
+test4.accessControl.restrictions.objectType       = array
+test4.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test4.accessControl.restrictions.item1.ipAddressRestrictionType= 0
+test4.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test4.reference.objectType                        = KalturaAccessControl
+test4.reference.name                              = test4
+test4.reference.systemName                        = TEST4
+test4.reference.description                       = Unit test access control
+test4.reference.isDefault = false
+test4.reference.containsUnsuportedRestrictions    = 
+test4.reference.restrictions.objectType           = array
+test4.reference.restrictions.item1.objectType     = KalturaIpAddressRestriction
+test4.reference.restrictions.item1.ipAddressRestrictionType= 0
+test4.reference.restrictions.item1.ipAddressList  = 255.198.196.253,255.198.196.254
+test5.accessControl.objectType                    = KalturaAccessControl
+test5.accessControl.name                          = test5
+test5.accessControl.systemName                    = TEST5
+test5.accessControl.description                   = Unit test access control
+test5.accessControl.isDefault = false
+test5.accessControl.restrictions.objectType       = array
+test5.accessControl.restrictions.item1.objectType = KalturaPreviewRestriction
+test5.accessControl.restrictions.item1.previewLength= 45
+test5.reference.objectType                        = KalturaAccessControl
+test5.reference.name                              = test5
+test5.reference.systemName                        = TEST5
+test5.reference.description                       = Unit test access control
+test5.reference.isDefault = false
+test5.reference.containsUnsuportedRestrictions    = 
+test5.reference.restrictions.objectType           = array
+test5.reference.restrictions.item1.objectType     = KalturaPreviewRestriction
+test5.reference.restrictions.item1.previewLength  = 45
+test6.accessControl.objectType                    = KalturaAccessControl
+test6.accessControl.name                          = test6
+test6.accessControl.systemName                    = TEST6
+test6.accessControl.description                   = Unit test access control
+test6.accessControl.isDefault = false
+test6.accessControl.restrictions.objectType       = array
+test6.accessControl.restrictions.item1.objectType = KalturaUserAgentRestriction
+test6.accessControl.restrictions.item1.userAgentRestrictionType= 0
+test6.accessControl.restrictions.item1.userAgentRegexList= .*Chrom.*
+test6.reference.objectType                        = KalturaAccessControl
+test6.reference.name                              = test6
+test6.reference.systemName                        = TEST6
+test6.reference.description                       = Unit test access control
+test6.reference.isDefault = false
+test6.reference.containsUnsuportedRestrictions    = 
+test6.reference.restrictions.objectType           = array
+test6.reference.restrictions.item1.objectType     = KalturaUserAgentRestriction
+test6.reference.restrictions.item1.userAgentRestrictionType= 0
+test6.reference.restrictions.item1.userAgentRegexList= .*Chrom.*
+test7.accessControl.objectType                    = KalturaAccessControl
+test7.accessControl.name                          = test7
+test7.accessControl.systemName                    = TEST7
+test7.accessControl.description                   = Unit test access control
+test7.accessControl.isDefault = false
+test7.accessControl.restrictions.objectType       = array
+test7.accessControl.restrictions.item1.objectType = KalturaSessionRestriction
+test7.reference.objectType                        = KalturaAccessControl
+test7.reference.name                              = test7
+test7.reference.systemName                        = TEST7
+test7.reference.description                       = Unit test access control
+test7.reference.isDefault = false
+test7.reference.containsUnsuportedRestrictions    = 
+test7.reference.restrictions.objectType           = array
+test7.reference.restrictions.item1.objectType     = KalturaSessionRestriction
+
+[testGet]
+test1.id                                          = 
+test1.reference.objectType                        = KalturaAccessControl
+test1.reference.name                              = test1
+test1.reference.systemName                        = TEST1
+test1.reference.description                       = Unit test access control
+test1.reference.containsUnsuportedRestrictions    = 
+
+[testUpdate]
+test1.id                                          = 
+test1.accessControl.objectType                    = KalturaAccessControl
+test1.accessControl.name                          = updated test1
+test1.accessControl.systemName                    = TEST1_UPDATED
+test1.accessControl.description                   = Unit test access control updated
+test1.reference.objectType                        = KalturaAccessControl
+test1.reference.name                              = updated test1
+test1.reference.systemName                        = TEST1_UPDATED
+test1.reference.description                       = Unit test access control updated
+
+[testDelete]
+test1.id                                          = 
+
+[testListAction]
+test1.filter.objectType                           = KalturaAccessControlFilter
+test1.pager.objectType                            = KalturaFilterPager
+test1.reference.objectType                        = KalturaAccessControlListResponse
+
+[testGetContext]
+test1.accessControl.objectType                    = KalturaAccessControl
+test1.accessControl.name                          = test1
+test1.accessControl.systemName                    = TEST1
+test1.accessControl.description                   = Unit test access control profile
+test1.accessControl.isDefault = false
+test1.accessControl.restrictions.objectType       = array
+test1.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test1.accessControl.restrictions.item1.ipAddressRestrictionType= 0
+test1.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+
+test1.contextDataParams.objectType                = KalturaEntryContextDataParams
+
+test1.contextDataResultReference.objectType       = KalturaEntryContextDataResult
+test1.contextDataResultReference.isScheduledNow   = 1
+test1.contextDataResultReference.isAdmin          = 1
+test1.contextDataResultReference.streamerType     = http
+test1.contextDataResultReference.mediaProtocol    = http
+test1.contextDataResultReference.isIpAddressRestricted    = false
+
+
+
+test2.accessControl.objectType                    = KalturaAccessControl
+test2.accessControl.name                          = test2
+test2.accessControl.systemName                    = test2
+test2.accessControl.description                   = Unit test access control profile
+test2.accessControl.isDefault = false
+test2.accessControl.restrictions.objectType       = array
+test2.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test2.accessControl.restrictions.item1.ipAddressRestrictionType= 1
+test2.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+
+test2.contextDataParams.objectType                = KalturaEntryContextDataParams
+
+test2.contextDataResultReference.objectType       = KalturaEntryContextDataResult
+test2.contextDataResultReference.isScheduledNow   = 1
+test2.contextDataResultReference.isAdmin          = 1
+test2.contextDataResultReference.streamerType     = http
+test2.contextDataResultReference.mediaProtocol    = http
+test2.contextDataResultReference.isIpAddressRestricted    = true
+
+
+
+
+
+
+test3.accessControl.objectType                    = KalturaAccessControl
+test3.accessControl.name                          = test3
+test3.accessControl.systemName                    = TEST3
+test3.accessControl.description                   = Unit test access control profile
+test3.accessControl.isDefault = false
+test3.accessControl.restrictions.objectType       = array
+test3.accessControl.restrictions.item1.objectType = KalturaUserAgentRestriction
+test3.accessControl.restrictions.item1.userAgentRestrictionType= 1
+
+test3.contextDataParams.objectType                = KalturaEntryContextDataParams
+test3.contextDataParams.userAgent = my chrome browser
+
+test3.contextDataResultReference.objectType       = KalturaEntryContextDataResult
+test3.contextDataResultReference.isScheduledNow   = true
+test3.contextDataResultReference.isAdmin          = 1
+test3.contextDataResultReference.streamerType     = http
+test3.contextDataResultReference.mediaProtocol    = http
+test3.contextDataResultReference.isUserAgentRestricted    = true
+
+
+
+
+
+test4.accessControl.objectType                    = KalturaAccessControl
+test4.accessControl.name                          = test4
+test4.accessControl.systemName                    = TEST4
+test4.accessControl.description                   = Unit test access control profile
+test4.accessControl.isDefault = false
+test4.accessControl.restrictions.objectType       = array
+test4.accessControl.restrictions.item1.objectType = KalturaUserAgentRestriction
+test4.accessControl.restrictions.item1.userAgentRestrictionType= 0
+
+test4.contextDataParams.objectType                = KalturaEntryContextDataParams
+test4.contextDataParams.userAgent = my chrome browser
+
+test4.contextDataResultReference.objectType       = KalturaEntryContextDataResult
+test4.contextDataResultReference.isScheduledNow   = true
+test4.contextDataResultReference.isAdmin          = 1
+test4.contextDataResultReference.streamerType     = http
+test4.contextDataResultReference.mediaProtocol    = http
+test4.contextDataResultReference.isUserAgentRestricted    = false
+
+
+[testFeed]
+test1.accessControl.objectType                    = KalturaAccessControl
+test1.accessControl.name                          = test1
+test1.accessControl.systemName                    = TEST1
+test1.accessControl.description                   = Unit test access control profile
+test1.accessControl.isDefault = false
+test1.accessControl.restrictions.objectType       = array
+test1.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test1.accessControl.restrictions.item1.ipAddressRestrictionType= 0
+test1.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test1.mediaFilePath                               = C:\Users\TanTan\Videos\Examples\sample.1.flv
+test1.success                                     = 1
+
+[testThumbnail]
+test1.accessControl.objectType                    = KalturaAccessControl
+test1.accessControl.name                          = test1
+test1.accessControl.systemName                    = TEST1
+test1.accessControl.description                   = Unit test access control profile
+test1.accessControl.isDefault = false
+test1.accessControl.restrictions.objectType       = array
+test1.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test1.accessControl.restrictions.item1.ipAddressRestrictionType= 0
+test1.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test1.mediaFilePath                               = C:\Users\TanTan\Videos\Examples\sample.1.flv
+test1.referrer                                    = localhost
+test1.success                                     = 1
+
+
+test2.accessControl.objectType                    = KalturaAccessControl
+test2.accessControl.name                          = test2
+test2.accessControl.systemName                    = TEST2
+test2.accessControl.description                   = Unit test access control profile
+test2.accessControl.isDefault = false
+test2.accessControl.restrictions.objectType       = array
+test2.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test2.accessControl.restrictions.item1.ipAddressRestrictionType= 1
+test2.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test2.mediaFilePath                               = C:\Users\TanTan\Videos\Examples\sample.1.flv
+test2.referrer                                    = localhost
+test2.success                                     = 1
+
+
+[testPlayManifest]
+test1.accessControl.objectType                    = KalturaAccessControl
+test1.accessControl.name                          = test1
+test1.accessControl.systemName                    = TEST1
+test1.accessControl.description                   = Unit test access control profile
+test1.accessControl.isDefault = false
+test1.accessControl.restrictions.objectType       = array
+test1.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test1.accessControl.restrictions.item1.ipAddressRestrictionType= 1
+test1.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test1.mediaFilePath                               = C:\Users\TanTan\Videos\Examples\sample.1.flv
+test1.success                                     = 0
+
+test2.accessControl.objectType                    = KalturaAccessControl
+test2.accessControl.name                          = test2
+test2.accessControl.systemName                    = TEST2
+test2.accessControl.description                   = Unit test access control profile
+test2.accessControl.isDefault = false
+test2.accessControl.restrictions.objectType       = array
+test2.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test2.accessControl.restrictions.item1.ipAddressRestrictionType= 0
+test2.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test2.mediaFilePath                               = C:\Users\TanTan\Videos\Examples\sample.1.flv
+test2.success                                     = 1
+
+
+[testRaw]
+test1.accessControl.objectType                    = KalturaAccessControl
+test1.accessControl.name                          = test1
+test1.accessControl.systemName                    = TEST1
+test1.accessControl.description                   = Unit test access control profile
+test1.accessControl.isDefault = false
+test1.accessControl.restrictions.objectType       = array
+test1.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test1.accessControl.restrictions.item1.ipAddressRestrictionType= 1
+test1.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test1.mediaFilePath                               = C:\Users\TanTan\Videos\Examples\sample.1.flv
+test1.success                                     = 0
+
+
+test2.accessControl.objectType                    = KalturaAccessControl
+test2.accessControl.name                          = test2
+test2.accessControl.systemName                    = TEST2
+test2.accessControl.description                   = Unit test access control profile
+test2.accessControl.isDefault = false
+test2.accessControl.restrictions.objectType       = array
+test2.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test2.accessControl.restrictions.item1.ipAddressRestrictionType= 0
+test2.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test2.mediaFilePath                               = C:\Users\TanTan\Videos\Examples\sample.1.flv
+test2.success                                     = 1
+
+[testDownload]
+test1.accessControl.objectType                    = KalturaAccessControl
+test1.accessControl.name                          = test1
+test1.accessControl.systemName                    = TEST1
+test1.accessControl.description                   = Unit test access control profile
+test1.accessControl.isDefault = false
+test1.accessControl.restrictions.objectType       = array
+test1.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test1.accessControl.restrictions.item1.ipAddressRestrictionType= 1
+test1.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test1.mediaFilePath                               = C:\Users\TanTan\Videos\Examples\sample.1.flv
+test1.success                                     = 0
+
+
+test2.accessControl.objectType                    = KalturaAccessControl
+test2.accessControl.name                          = test2
+test2.accessControl.systemName                    = TEST2
+test2.accessControl.description                   = Unit test access control profile
+test2.accessControl.isDefault = false
+test2.accessControl.restrictions.objectType       = array
+test2.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test2.accessControl.restrictions.item1.ipAddressRestrictionType= 0
+test2.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test2.mediaFilePath                               = C:\Users\TanTan\Videos\Examples\sample.1.flv
+test2.success                                     = 1
+
+[testFlvClipper]
+test1.accessControl.objectType                    = KalturaAccessControl
+test1.accessControl.name                          = test1
+test1.accessControl.systemName                    = TEST1
+test1.accessControl.description                   = Unit test access control profile
+test1.accessControl.isDefault = false
+test1.accessControl.restrictions.objectType       = array
+test1.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test1.accessControl.restrictions.item1.ipAddressRestrictionType= 1
+test1.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test1.mediaFilePath                               = C:\Users\TanTan\Videos\Examples\sample.1.flv
+test1.success                                     = 0
+
+test2.accessControl.objectType                    = KalturaAccessControl
+test2.accessControl.name                          = test2
+test2.accessControl.systemName                    = TEST2
+test2.accessControl.description                   = Unit test access control profile
+test2.accessControl.isDefault = false
+test2.accessControl.restrictions.objectType       = array
+test2.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test2.accessControl.restrictions.item1.ipAddressRestrictionType= 0
+test2.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test2.mediaFilePath                               = C:\Users\TanTan\Videos\Examples\sample.1.flv
+test2.success                                     = 1
+
+[testServeFlavor]
+test1.accessControl.objectType                    = KalturaAccessControl
+test1.accessControl.name                          = test1
+test1.accessControl.systemName                    = TEST1
+test1.accessControl.description                   = Unit test access control profile
+test1.accessControl.isDefault = false
+test1.accessControl.restrictions.objectType       = array
+test1.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test1.accessControl.restrictions.item1.ipAddressRestrictionType= 1
+test1.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test1.mediaFilePath                               = C:\Users\TanTan\Videos\Examples\sample.1.flv
+test1.success                                     = 0
+
+test2.accessControl.objectType                    = KalturaAccessControl
+test2.accessControl.name                          = test2
+test2.accessControl.systemName                    = TEST2
+test2.accessControl.description                   = Unit test access control profile
+test2.accessControl.isDefault = false
+test2.accessControl.restrictions.objectType       = array
+test2.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test2.accessControl.restrictions.item1.ipAddressRestrictionType= 0
+test2.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+test2.mediaFilePath                               = C:\Users\TanTan\Videos\Examples\sample.1.flv
+test2.success                                     = 1
+
+[testMigrate]
+test1.accessControl.objectType                    = KalturaAccessControl
+test1.accessControl.name                          = test1
+test1.accessControl.systemName                    = TEST1
+test1.accessControl.description                   = Unit test access control profile
+test1.accessControl.isDefault = false
+test1.accessControl.restrictions.objectType       = array
+test1.accessControl.restrictions.item1.objectType = KalturaIpAddressRestriction
+test1.accessControl.restrictions.item1.ipAddressRestrictionType= 0
+test1.accessControl.restrictions.item1.ipAddressList= 255.198.196.253,255.198.196.254
+
+test1.reference.objectType                        = KalturaAccessControlProfile
+test1.reference.name                          = test1
+test1.reference.systemName                    = TEST1
+test1.reference.description                   = Unit test access control profile
+test1.reference.isDefault = false
+test1.reference.rules.objectType            = array
+test1.reference.rules.item0.objectType            = KalturaRule
+test1.reference.rules.item0.message               = 
+test1.reference.rules.item0.actions.objectType  = array
+test1.reference.rules.item0.actions.item0.objectType  = KalturaAccessControlBlockAction
+test1.reference.rules.item0.actions.item0.type        = 1
+test1.reference.rules.item0.conditions.objectType= array
+test1.reference.rules.item0.conditions.item0.objectType= KalturaIpAddressCondition
+test1.reference.rules.item0.conditions.item0.values.objectType= array
+test1.reference.rules.item0.conditions.item0.values.item0.objectType= kalturaStringValue
+test1.reference.rules.item0.conditions.item0.values.item0.value= 255.198.196.253
+test1.reference.rules.item0.conditions.item0.values.item1.objectType= kalturaStringValue
+test1.reference.rules.item0.conditions.item0.values.item1.value= 255.198.196.254

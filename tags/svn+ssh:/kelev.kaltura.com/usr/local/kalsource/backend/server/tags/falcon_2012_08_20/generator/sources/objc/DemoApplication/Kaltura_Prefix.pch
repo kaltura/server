@@ -1,0 +1,17 @@
+//
+// Prefix header for all source files of the 'Kaltura' target in the 'Kaltura' project
+//
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+    #import <UIKit/UIKit.h>
+#endif
+
+#import "Client.h"
+#import <MobileCoreServices/MobileCoreServices.h>
+#import "ASIHTTPRequest.h"
+#import <MediaPlayer/MediaPlayer.h>
+#import "Utils.h"
+#import <CoreMedia/CoreMedia.h>
+#import <AVFoundation/AVFoundation.h>
+#import "KalturaThumbView.h"

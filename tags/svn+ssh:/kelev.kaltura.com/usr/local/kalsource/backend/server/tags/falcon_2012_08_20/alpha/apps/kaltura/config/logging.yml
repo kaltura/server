@@ -1,0 +1,23 @@
+prod:
+  enabled: on
+  level:   debug
+  rotate:  on
+  period:  7
+  history: 30
+  purge:   on
+  
+batch:
+  enabled: on
+  level:   debug
+  rotate:  on
+  period:  7
+  history: 30
+  purge:   on
+
+#all:
+#  enabled: on
+#  level:   debug
+#  rotate:  off
+#  period:  7
+#  history: 10
+#  purge:   on

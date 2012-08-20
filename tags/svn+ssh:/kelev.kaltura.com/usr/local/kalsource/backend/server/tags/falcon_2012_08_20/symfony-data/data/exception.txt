@@ -1,0 +1,11 @@
+[exception]   <?php echo $name ?> 
+[message]     <?php echo $message ?> 
+<?php if (count($traces) > 0): ?>
+[stack trace]
+<?php foreach ($traces as $line): ?>
+  <?php echo $line ?>
+
+<?php endforeach; ?>
+<?php endif; ?>
+[symfony]     v. <?php echo sfConfig::get('sf_version') ?> (symfony-project.com)
+[PHP]         v. <?php echo PHP_VERSION ?> 

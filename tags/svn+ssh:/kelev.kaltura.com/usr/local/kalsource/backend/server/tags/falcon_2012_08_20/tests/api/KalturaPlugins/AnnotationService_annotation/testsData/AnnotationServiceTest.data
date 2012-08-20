@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="AnnotationServiceTest">
+  <TestProcedureData testProcedureName="testAdd">
+    <TestCaseData testCaseInstanceName="testAdd with data set #0">
+      <Input name="cuePoint" type="KalturaAnnotation" key="">
+        <parentId></parentId>
+        <text></text>
+        <endTime type="string">10</endTime>
+        <duration></duration>
+        <id></id>
+        <cuePointType></cuePointType>
+        <status></status>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
+        <partnerId></partnerId>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <tags></tags>
+        <startTime type="string">1</startTime>
+        <userId></userId>
+        <partnerData></partnerData>
+        <partnerSortValue></partnerSortValue>
+        <forceStop></forceStop>
+        <thumbOffset></thumbOffset>
+        <systemName></systemName>
+      </Input>
+      <OutputReference name="output" type="KalturaAnnotation" key="object key">
+        <parentId type="string">0</parentId>
+        <text></text>
+        <endTime type="string">10</endTime>
+        <duration type="string">1</duration>
+        <id></id>
+        <cuePointType type="string">annotation.Annotation</cuePointType>
+        <status type="string">1</status>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <tags></tags>
+        <startTime type="string">0</startTime>
+        <userId></userId>
+        <partnerData></partnerData>
+        <partnerSortValue></partnerSortValue>
+        <forceStop></forceStop>
+        <thumbOffset></thumbOffset>
+        <systemName></systemName>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testGet">
+    <TestCaseData testCaseInstanceName="testGet with data set #0">
+      <Input name="id" type="string" key=""/>
+      <OutputReference name="output" type="KalturaAnnotation" key="object key">
+        <parentId type="string">0</parentId>
+        <text></text>
+        <endTime type="string">10</endTime>
+        <duration type="string">9</duration>
+        <id></id>
+        <cuePointType type="string">annotation.Annotation</cuePointType>
+        <status type="string">1</status>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <tags></tags>
+        <startTime type="string">1</startTime>
+        <userId></userId>
+        <partnerData></partnerData>
+        <partnerSortValue></partnerSortValue>
+        <forceStop></forceStop>
+        <thumbOffset></thumbOffset>
+        <systemName></systemName>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testListAction">
+    <TestCaseData testCaseInstanceName="testListAction with data set #0">
+      <Input name="filter" type="KalturaCuePointFilter" key="">
+        <idEqual></idEqual>
+        <idIn></idIn>
+        <cuePointTypeEqual></cuePointTypeEqual>
+        <cuePointTypeIn></cuePointTypeIn>
+        <statusEqual></statusEqual>
+        <statusIn></statusIn>
+        <entryIdEqual></entryIdEqual>
+        <entryIdIn></entryIdIn>
+        <createdAtGreaterThanOrEqual></createdAtGreaterThanOrEqual>
+        <createdAtLessThanOrEqual></createdAtLessThanOrEqual>
+        <updatedAtGreaterThanOrEqual></updatedAtGreaterThanOrEqual>
+        <updatedAtLessThanOrEqual></updatedAtLessThanOrEqual>
+        <startTimeGreaterThanOrEqual></startTimeGreaterThanOrEqual>
+        <startTimeLessThanOrEqual></startTimeLessThanOrEqual>
+        <userIdEqual></userIdEqual>
+        <userIdIn></userIdIn>
+        <partnerSortValueEqual></partnerSortValueEqual>
+        <partnerSortValueIn></partnerSortValueIn>
+        <partnerSortValueGreaterThanOrEqual></partnerSortValueGreaterThanOrEqual>
+        <partnerSortValueLessThanOrEqual></partnerSortValueLessThanOrEqual>
+        <forceStopEqual></forceStopEqual>
+        <systemNameEqual></systemNameEqual>
+        <systemNameIn></systemNameIn>
+        <orderBy></orderBy>
+        <advancedSearch type="string">KalturaSearchItem</advancedSearch>
+      </Input>
+      <Input name="pager" type="KalturaFilterPager" key="">
+        <pageSize></pageSize>
+        <pageIndex></pageIndex>
+      </Input>
+      <OutputReference name="output" type="KalturaCuePointListResponse" key="object key">
+        <objects></objects>
+        <totalCount></totalCount>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testUpdate">
+    <TestCaseData testCaseInstanceName="testUpdate with data set #0">
+      <Input name="id" type="string" key=""/>
+      <Input name="cuePoint" type="KalturaAnnotation" key="">
+        <parentId></parentId>
+        <text></text>
+        <endTime>13</endTime>
+        <duration></duration>
+        <id></id>
+        <cuePointType></cuePointType>
+        <status></status>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <tags></tags>
+        <startTime>3</startTime>
+        <userId></userId>
+        <partnerData></partnerData>
+        <partnerSortValue></partnerSortValue>
+        <forceStop></forceStop>
+        <thumbOffset></thumbOffset>
+        <systemName></systemName>
+      </Input>
+      <OutputReference name="output" type="KalturaAnnotation" key="object key">
+        <parentId type="string">0</parentId>
+        <text></text>
+        <endTime type="string">13</endTime>
+        <duration type="string">10</duration>
+        <id></id>
+        <cuePointType type="string">annotation.Annotation</cuePointType>
+        <status type="string">1</status>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <tags></tags>
+        <startTime type="string">3</startTime>
+        <userId></userId>
+        <partnerData></partnerData>
+        <partnerSortValue></partnerSortValue>
+        <forceStop></forceStop>
+        <thumbOffset></thumbOffset>
+        <systemName></systemName>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testDelete">
+    <TestCaseData testCaseInstanceName="testDelete with data set #0">
+      <Input name="id" type="string" key=""/>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>

@@ -1,0 +1,59 @@
+autoload:
+
+  # symfony core
+  symfony:
+    name:           symfony
+    path:           %SF_SYMFONY_LIB_DIR%
+    recursive:      on
+    exclude:        [vendor,addon]
+
+  propel:
+    name:           propel
+    path:           %SF_SYMFONY_LIB_DIR%/vendor/propel
+    recursive:      on
+
+  creole:
+    name:           creole
+    path:           %SF_SYMFONY_LIB_DIR%/vendor/creole
+    recursive:      on
+
+  #propel_addon:
+  #  name:           propel addon
+  #  files:
+  #    Propel:       %SF_SYMFONY_LIB_DIR%/addon/propel/sfPropelAutoload.php
+
+  # plugins
+  plugins_lib:
+    name:           plugins lib
+    path:           %SF_PLUGINS_DIR%/*/lib
+    recursive:      on
+
+  plugins_module_lib:
+    name:           plugins module lib
+    path:           %SF_PLUGINS_DIR%/*/modules/*/lib
+    prefix:         2
+    recursive:      on
+
+  # project
+  project:
+    name:           project
+    path:           %SF_LIB_DIR%
+    recursive:      on
+    exclude:        [model, symfony]
+
+  project_model:
+    name:           project model
+    path:           %SF_MODEL_LIB_DIR%
+    recursive:      on
+
+  # application
+  application:
+    name:           application
+    path:           %SF_APP_LIB_DIR%
+    recursive:      on
+
+  modules:
+    name:           module
+    path:           %SF_APP_DIR%/modules/*/lib
+    prefix:         1
+    recursive:      on

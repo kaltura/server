@@ -1,0 +1,155 @@
+2010-05-16:
+CNG - WMA/Speach/Voice added to the Mencoder black list to avoid huge traget files on lectures/presentation transcoding
+
+auto deinterlace
+multi-stream support
+alpha/apps/lib/batch2/model/kConvertJobData.php
+admin_console/../en.php
+admin_console/lib/Kaltura/KalturaClient.php - KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS
+api_v3/lib/types/enums/KalturaConversionEngineType.php - KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS
+batch/batches/convert/engines/KConversionEngine.class.php - $engine = new KConversionEngineQuickTimePlayerTools( $engine_config );
+	to add batch/batches/convert/Engines/KConversionEngineQuickTimePlayerTools.class.php
+batch/batches/convert/OperationEngines/KOperationManager.php - return new KOperationEngineQuickTimePlayerTools($taskConfig->params->quickTimePlayerToolsCmd);
+	to add batch/batches/convert/OperationEngines/KOperationEngineQuickTimeTools.php
+	to add quickTimePlayerToolsCmd to taskConfig->params->params/config 
+batch/batches/convert/KAsyncConvert.class.php - add to supported
+batch/batches/convert/KAsyncConvert.class.php - shorten the length of the tmp filename
+
+batch/client/KalturaClient.php - const QUICK_TIME_TOOLS = 6
+infra/mediaInfoParser/KMediaInfoMediaParser.php - support for scan_type/deinterlace
+
+/web/kaltura/app/alpha/apps/kaltura/modules/system/actions/flavorParamsAction.class.php - add operators for the flavorParams utility
+/web/kaltura/app/alpha/apps/kaltura/modules/system/templates/flavorParamsSuccess.php
+
+kConf.php - to add FastStartPlugin and QuickTimeToolsPlugin to default_plugins
+batch_config.ini - 'params.useFastStart = true' & 'params.fastStartCmd		= qt-faststart'
+
+2010-09-01
+fix - KDLWrap: on the cdl2kdl conv copy cmd for flavorParamsOutput as well
+
+2010-09-29
+KDLCommon - new - webm
+KDLflavor - new - webm 
+KDLTranscodeerComm - new - webm
+KDLWrap - in ConvertMediainfoCdl2FlavorAsset logging
+
+2010-10-04
+api_v3/lib/KalturaFlavorParamsFactory - WEBM support
+api_v3/lib/types/enums/KalturaContainerFormat - WEBM support
+batch/client/KalturaClinet.php - WEBM suppor
+plugins/quick_time_tools/lib/KDLTranscoderQTPTools/php - WEBM support, clip dur
+
+2010-10-11
+KDLCommon - new EXP_ENC
+KDLFlavor - fix - audio targets (mp3, wma) should not have video object
+KDLWrap - new - support to EXPRESSION_ENCODER plugin
+wnvPresetTemplate.xml - upd - CBR 2 pass support
+admin_console/configs/lang/en.php - new EXPRESSION_ENCODER
+alpha/lib/model/flavorParams - webm support
+batch/batches/Convert/KAsyncConvert.class.php - new EXPRESSION_ENCODER support
+batch/batches/Convert/Engines/KConvertEngineExpressionencoder.class.php - new file
+batch/batches/Convert/Engines/KConversionEngine.class.php - EXPRESSION_ENCODER support
+alpha/apps/kaltura/lib/batch2/model/kConvertJobdata.php - EXPRESSION_ENCODER enum = 5, EXPRESSION_ENCODER3=55
+api_v3/lib/types/enums/KalturaConversionEngineType.class.php - EXPRESSION_ENCODER enum = 5, EXPRESSION_ENCODER3=55
+plugins/expression_encoder - new plugin
+DB flavor_params record - needs json flavor params for ISM -> engine_version 1
+
+2010-10-17 - Reverting to pre ExpressionEncoder-for-ism
+KDLCommon - do not revert (only ExpressionEncoder enum)
+KDLFlavor - do not revert (audio targets fix)
+KDLWrap - do not revert (stripslashes is not activated, better logging)
+KDLOperatorbase - do not revert (logging)
+KDLProcessor - revert - ProceessFlavorsForCollection is allowed for EE3 enum (vs. ExpressionEncoder enum)
+KDLTranscoderComm - do not revert - minor changes in KDLOperatorWrapper constructor (black-list settings)
+
+alpha/lib/model/flavorParams - o not revert (webm support)
+batch/batches/Convert/KAsyncConvert.class.php - do not revert ( EXPRESSION_ENCODER support)
+batch/batches/Convert/Engines/KConversionEngineExpressionEncoder.class.php - new file, revert to original KJobConversionEngine derivation (instead of KCollectionConversionEngine)
+batch/batches/Convert/Engines/KConversionEngine.class.php - do not revert (EXPRESSION_ENCODER support)
+alpha/apps/kaltura/lib/batch2/model/kConvertJobdata.php - revert - EXPRESSION_ENCODER enum = 55, EXPRESSION_ENCODER3=5
+api_v3/lib/types/enums/KalturaConversionEngineType.class.php - revert - EXPRESSION_ENCODER enum = 55, EXPRESSION_ENCODER3=5
+
+admin_console/lib/Klatura/KlaturaClient.php - reverted EXPRESSION_ENCODER to 55, EXPRESSION_ENCODER3 to 5
+alpha/apps/kaltura/lib/batch2/kJobsManager - reverted EXPRESSION_ENCODER3 (instead of EXPRESSION_ENCODER)
+alpha/apps/kaltura/lib/storage/kStorageExporter.php - reverted EXPRESSION_ENCODER3 (instead of EXPRESSION_ENCODER)
+batch/batches/Convert/KAsyncConvertCollection.class.php - reverted EXPRESSION_ENCODER3 (instead of EXPRESSION_ENCODER), keep the log
+batch/batches/Convert/OperationEngines/KOperationManager.php - reverted
+batch\client\KalturaClient.php - reverted - EXPRESSION_ENCODER enum = 55, EXPRESSION_ENCODER3=5
+
+2010-11-17
+admin_console/configs/lang/en.php - avidemux
+- batch/batches/Convert/KAsyncConvert.class.php - avidemux and fix not used qt 
+- batch/batches/Convert/Engines/KConversionEngine.class.php - remove plugin-ed engines from 'old type' conv
+- batch/batches/Convert/Engines/KConversionExpEnc.class.php - delete
+- batch/batches/Convert/Engines/KConversionQTP.class.php - delete 
+- batch/batches/Convert/OperationEngines/KSingleOutputOperationEngine.php - config file support
+- batch/batches/client/KalturaClient.php -  
+     const EXPRESSION_ENCODER3 = "expressionEncoder.ExpressionEncoder3"; // 55
+     const AVIDEMUX = "avidemux"; // 8
+- infra/cdl/kdl/KDLcommon.php - avidemux
+- infra/cdl/kdl/KDLFlavor.php - config file support at generateCommandLines/generateOperationSetCommandLines
+- infra/cdl/kdl/KDLOperatorBase.php - config file support
+- infra/cdl/kdl/KDLProcessor - ProceessFlavorsForCollection- audio only crash fix
+- infra/cdl/kdl/KDLTranscoderCommand.php - remove 'extra' from cmd line
+- infra/cdl/kdl/KDLWrap.php - config & avidemux
+- plugins/fast_start/lib/KDLOperatorQTFastStart.php - remove 'extra' param from GenerateCommandLine
+- plugins/quick_time_tools/lib/KDLTranscoderQTPTools.php - remove 'extra' param from GenerateCommandLine, ctor fix
+- plugins/quick_time_tools/lib/KOperationEngineQtTools.php - 
+- plugins/exp_enc/lib/KDLOperatorExpressionEncoder.php - config/extra
+- plugins/exp_enc/lib/ismtempl.xml
+- plugins/exp_enc/lib/wmvtempl.xml
+- plugins/exp_enc/lib/KOperationEngineExpressionEncoder.php
+
+2010-11-20
+KDLOperationParams::GenerateCommandLine - restore extra
+KDLTranscoderCommand - KDLOperatorWrapper::GenerateCommandLine - restore extra
+KDLFlavor - added extra
+   $transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $auxTrg, $trPrmObj->_extra);
+KDLCommon - removed ogv/theora from ffmpeg-aux source blacklist    
+KDLTranscoderQTPTools::GenerateCommandLine - restore extra
+KDLOperatorQTFastStart::GenerateCommandLine - restore extra
+KDLOperatorExpressionEncoder::GenerateCommandLine - restore extra
+
+2010-11-21
+plugins/avidemux/AvidemuxPlugin.php - loadObject, getObjectClass
+plugins/avidemux/lib/AvidemuxConversionEngineType.php - new
+plugins/ee/EEPlugin.php - loadObject, getObjectClass
+plugins/quick_time_tools/QuickTimeToolsPlugin.php - loadObject, getObjectClass
+
+----- for QA drop Nov 28-------------------------------------------------
+2010-11-22
+tr+tag - kJobsManager.php - remove 'stripslashes' not in tag yet
+
+2010-11-24
+tr+tar - KAsyncConvert.class.php - remove 'stripslashes' not in trunk & tag yet
+
+2010-11-24
+tr+tag - KDLOperatorAvidemax - - restore the 'extra' arg
+tr+tag - K:\opt\kaltura\app\plugins\avidemux\AvidemuxPlugin.php - 'implements' in class def
+tag - kConf - add EE & AVI & faststart
+batch_config.ini - add EE & AVI & faststart
+tr+tag - /opt/kaltura/app/admin_console/lib/Kaltura/KalturaClient.php - const AVIDEMUX = "avidemux.Avidemux";
+tr+tag - /opt/kaltura/app/batch/client/KalturaClient.php: -  - const AVIDEMUX = "avidemux.Avidemux";
+tr - batch_config.template.ini - avidmux
+tr - kConfLocal.php - avidemux + ee
+
+
+/alpha/apps/kaltura/lib/batch2/kFlowHelper.php - 'handleConvertFinished' fixed to handle applehttp
+/alpha/lib/model/assetParams.php - 'mpeg','mpegts' and 'applehttp' format enums
+/admin_console/lib/Kaltura/KalturaEnums.php - 'mpeg','mpegts' and 'applehttp' format enums
+/api_v3/lib/types/enums/KalturaContainerFormat.php - 'mpeg','mpegts' and 'applehttp' format enums
+/batch/batches/KBatchBase.class.php - 'checkFileExists' to handle directories
+/batch/client/KalturaEnums.php - 'mpeg','mpegts' and 'applehttp' format enums
+/infra/cdl/kOperator.php - additional operator params
+/infra/cdl/kOperatorSets.php - to support additional params
+/infra/cdl/kdl/KDLCommon.php - 'mpeg','mpegts' and 'applehttp' format enums
+/infra/cdl/kdl/KDLFlavor.php - supports 'mpeg','mpegts' and 'applehttp' formats
+/infra/cdl/kdl/KDLOperatorBase.php - additional operator params
+/infra/cdl/kdl/KDLTranscoderCommand.php - supports 'mpeg','mpegts' and 'applehttp' formats
+/infra/cdl/kdl/KDLWrap.php - additional operator params
+plugins/segmenter - new operator
+SaaS/alpha/config/kConfLocal.php - add SegmenterPlugin to  additional plugins
+batch_config.ini - addition to [KAsyncConvert] 
+   params.useSegmenter		= true;
+   params.segmenterCmd		= segmenter;
+

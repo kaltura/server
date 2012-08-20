@@ -1,0 +1,22 @@
+<definition>
+	<version>1.00</version>
+	<name>move</name>
+	<type>xml</type>
+	
+	<UI name="move">
+		<name>move</name>
+		
+		<InfoPanel>
+			<UIComponents>
+			
+				<UIComponent type="ComboBox" id="direction" label="Select a direction:">
+					<parameters>
+						<parameter name="selectedItem" controls="direction" />
+					</parameters>
+				</UIComponent>
+			
+			</UIComponents>
+		</InfoPanel>
+			
+	</UI>
+</definition>

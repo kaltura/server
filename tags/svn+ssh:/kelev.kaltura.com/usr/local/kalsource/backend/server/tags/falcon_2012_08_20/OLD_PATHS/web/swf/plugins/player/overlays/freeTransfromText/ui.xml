@@ -1,0 +1,86 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Draggable Text</name>
+	
+	<UI>
+		<InfoPanel>
+			<UIComponents>	
+				
+				<UIComponent type="HBox">
+					<UIComponent type="Label">
+						<mxAttributes text="Select Color: " />
+					</UIComponent>
+					
+					<UIComponent type="ColorPicker" id="color" >
+						<parameters>
+							<parameter name="selectedColor" controls="fontColor" />
+						</parameters>
+					</UIComponent>
+				</UIComponent>
+			
+				<UIComponent type="HBox">
+					<UIComponent type="Label">
+						<mxAttributes text="Font type:" />
+					</UIComponent>
+					
+					<UIComponent type="ComboBox" id="fontName" >
+						<parameters>
+							<parameter name="selectedItem" controls="fontName" />
+						</parameters>
+					</UIComponent>
+				</UIComponent>
+					
+			</UIComponents>
+		</InfoPanel>
+
+		<PlayerPanel>
+			<UIComponents>
+				<UIComponent type="ModuleLoader" id="TextHandles">
+				
+					<url>plugins/editor/customUI/TextHandles.swf</url>
+					
+					<parameters>
+						<parameter name="text" controls="text" />
+						<parameter name="ohX" controls="textXPos" />
+						<parameter name="ohY" controls="textYPos" />
+						<parameter name="angle" controls="textRotation" />
+						<parameter name="textScaleX" controls="textScaleX" />
+						<parameter name="textScaleY" controls="textScaleY" />
+					</parameters>
+					
+					
+					
+				</UIComponent>		
+			</UIComponents>
+		</PlayerPanel>	
+
+		<UIBindings>
+			<Binding>
+				<source>
+					<UIComponentID>fontName</UIComponentID>
+					<parameterName>selectedItem</parameterName>
+				</source>
+				
+				<target>
+					<UIComponentID>TextHandles</UIComponentID>
+					<propertyName>fontName</propertyName>
+				</target>
+			</Binding>
+			
+			<Binding>
+				<source>
+					<UIComponentID>color</UIComponentID>
+					<parameterName>selectedColor</parameterName>
+				</source>
+				
+				<target>
+					<UIComponentID>TextHandles</UIComponentID>
+					<propertyName>fontColor</propertyName>
+				</target>
+			</Binding>
+
+			
+		</UIBindings>
+	</UI>
+</definition>

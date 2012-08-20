@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_player_panel1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#80060606"
+    android:paddingLeft="10dp"
+    android:paddingRight="20dp"
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp"
+    android:visibility="gone">
+
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tv_player_position"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:text="Duration"
+            android:textSize="15sp"
+            android:layout_gravity="left|center_vertical"
+            android:textColor="@color/blue_kaltura"
+            android:singleLine="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" / " 
+            android:textSize="15sp"
+            android:layout_gravity="left|center_vertical"/>
+            
+        <TextView
+            android:id="@+id/tv_player_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Duration"
+            android:textSize="15sp"
+            android:layout_gravity="left|center_vertical"/>
+
+        <SeekBar
+            android:id="@+id/sb_player_duration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_gravity="right"
+            android:thumb="@drawable/thumb"
+            android:progressDrawable="@drawable/seek_bar_progress_duration"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:minHeight="10dp"
+            android:maxHeight="10dp"
+            android:progress="20"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginLeft="15dp">
+
+            <ImageView 
+                android:id="@+id/iv_palyer_play"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/button_player_play_selector"
+                android:layout_centerVertical="true"
+                android:onClick="onClick"/>
+
+            <ImageView 
+                android:id="@+id/iv_deliver"
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/iv_palyer_play"/>
+
+
+            <LinearLayout
+                android:id="@+id/ll_palyer_sound"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="25dp"
+                android:padding="5dp">
+                
+            <ImageView 
+                android:id="@+id/iv_palyer_sound"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/volume_ico"
+                android:onClick="onClick"/>
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/rate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"
+                android:layout_toLeftOf="@id/ll_palyer_sound"
+                android:layout_centerVertical="true"
+                android:paddingBottom="5dp">
+                
+                <include 
+                    layout="@layout/rate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </RelativeLayout>
+    </RelativeLayout>
+</LinearLayout>    

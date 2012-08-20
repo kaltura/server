@@ -1,0 +1,4 @@
+default:
+  has_layout:  on
+  layout:      corp_layout
+  javascripts: [-jqkaltura.js, -utils, jCorp, AC_OETags]

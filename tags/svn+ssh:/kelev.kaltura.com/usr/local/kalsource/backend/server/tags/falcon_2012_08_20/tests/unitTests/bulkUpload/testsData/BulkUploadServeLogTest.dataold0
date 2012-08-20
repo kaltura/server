@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="BulkUploadServeLogTest">
+  <TestProcedureData testProcedureName="testServeLog">
+    <TestCaseData testCaseInstanceName="testServeLog with data set #0">
+      <Input name="id" type="string" key="142334" value="142334"/>
+      <OutputReference name="output" type="string" key="object key" value="1"/>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>

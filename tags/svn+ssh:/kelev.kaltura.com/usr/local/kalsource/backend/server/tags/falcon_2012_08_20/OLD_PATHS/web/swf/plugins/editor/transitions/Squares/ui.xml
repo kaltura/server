@@ -1,0 +1,44 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Squares</name>
+	<UI>	
+		<InfoPanel>
+			<UIComponents>
+				<UIComponent type="HBox">
+					<UIComponent type="Label">
+						<mxAttributes text="Vertical rectangles"/>
+					</UIComponent>
+					<UIComponent type="HSlider" id="rows">
+						<parameters>
+							<parameter name="value0" controls="rows" />
+						</parameters>
+					</UIComponent>
+				</UIComponent>
+				
+				<UIComponent type="HBox">
+					<UIComponent type="Label">
+						<mxAttributes text="Horizontal rectangles"/>
+					</UIComponent>
+					<UIComponent type="HSlider" id="columns" >
+						<parameters>
+							<parameter name="value0" controls="columns" />
+						</parameters>
+					</UIComponent>
+				</UIComponent>	
+					
+				<UIComponent type="HBox">
+					<UIComponent type="Label">
+						<mxAttributes text="Fade duration time"/>
+					</UIComponent>
+					<UIComponent type="NumericStepper" id="fadeDuration" >
+						<parameters>
+							<parameter name="value" controls="fadeDuration" />
+						</parameters>
+					</UIComponent>
+				</UIComponent>
+				
+			</UIComponents> 
+		</InfoPanel>
+	</UI>
+</definition>

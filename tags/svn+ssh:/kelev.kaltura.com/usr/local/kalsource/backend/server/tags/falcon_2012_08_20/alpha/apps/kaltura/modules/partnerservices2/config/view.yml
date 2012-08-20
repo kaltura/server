@@ -1,0 +1,7 @@
+testmeSuccess:
+  has_layout: on
+  layout: emptylayout
+
+  stylesheets: [ pages ]
+  javascripts: [ jqkaltura.packed.js, utils.js ]
+ 

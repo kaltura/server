@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mrss>
+	<channel>
+		<item>
+			<action>add</action>
+			<type>1</type>
+			<licenseType>-1</licenseType>
+			<userId>test1</userId>
+			<name>Time based test4</name>
+			<description>Time based test4</description>
+			<tags>
+				<tag>time</tag>
+				<tag>test2</tag>
+			</tags>
+			<categories>
+				<category>time based-&gt;test2</category>
+			</categories>
+			<conversionProfileId>641</conversionProfileId>
+			<media>
+				<mediaType>1</mediaType> 
+			</media>
+			<content flavorParamsId="0">
+				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/nice_Flv.flv"/>
+			</content>
+			<thumbnail>
+				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/thumbs/horse.jpg"/>
+			</thumbnail>
+			<!--
+			<subTitle>
+				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/example.srt"/>
+			</subTitle>
+			<attachment>
+				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/example.txt"/>
+			</attachment>
+			-->
+			
+		</item>
+	</channel>
+</mrss>

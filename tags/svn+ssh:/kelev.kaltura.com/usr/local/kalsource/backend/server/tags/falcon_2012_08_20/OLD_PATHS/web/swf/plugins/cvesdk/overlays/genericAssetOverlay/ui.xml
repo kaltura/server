@@ -1,0 +1,31 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Asset Overlay</name>
+
+	<UI>
+
+		<InfoPanel>
+			<UIComponents>
+				<UIComponent type="HBox">
+					<UIComponent type="Label">
+						<mxAttributes text="Source Link:"></mxAttributes></UIComponent><UIComponent type="TextInput" id="assetUrltxt" fontSize="12">
+						<parameters>
+						<parameter name="text" controls="assetUrl"></parameter>
+					</parameters>
+			</UIComponent></UIComponent></UIComponents>
+			</InfoPanel>
+
+		<PlayerPanel>
+			<UIComponents>
+				<UIComponent type="ModuleLoader" id="objectHandles">
+
+					<url>/swf/plugins/cvesdk/ui/ObjectHandlesUI.swf</url>
+
+					<parameters>
+					<parameter name="xx" controls="xPosition"></parameter><parameter name="yy" controls="yPosition"></parameter><parameter name="rotationContent" controls="rotation"></parameter><parameter name="scaleXContent" controls="xScale"></parameter><parameter name="scaleYContent" controls="yScale"></parameter></parameters>
+				</UIComponent>
+			</UIComponents>
+		</PlayerPanel>
+		</UI>
+</definition>

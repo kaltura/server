@@ -1,0 +1,60 @@
+
+[config]
+managerType                                       = 1
+source                                            = ini
+
+[testLogin]
+test0.server                                      = projects.kaltura.com
+test0.user                                        = nobody
+test0.pass                                        = Sismaleftp
+test0.port                                        = 
+test0.ftp_passive_mode                            = 
+
+test1.server                                      = projects.kaltura.com
+test1.user                                        = nobody
+test1.pass                                        = wrong
+test1.port                                        = 
+test1.ftp_passive_mode                            = 
+test1.exceptionCode                               = 2
+
+[testListDir]
+test0.kFileTransferMgr = depend
+test0.remote_path = hila
+test0.list.objectType = array
+test0.list.item0 = 20111228
+test0.list.item1 = 20120111
+test0.list.item2 = 6.mts
+test0.list.item3 = 8.mts
+test0.list.item4 = MTS test 1.MTS
+test0.list.item5 = MTS test 1.mts
+test0.list.item6 = MTS test 2.MTS
+test0.list.item7 = MTS test 3.MTS
+test0.list.item8 = MTS test 4.mts
+test0.list.item9 = MTS test 5.mts
+test0.list.item10 = Wildlife.wmv
+test0.list.item11 = kaltura_logo2.mp4
+test0.list.item12 = sample_mpeg4.mp4
+test0.list.item13 = test 7.mts
+
+
+
+[testFileSize]
+test0.kFileTransferMgr = depend
+test0.remote_path = hila
+test0.file = 6.mts
+test0.expectedSize = 12472320
+
+test1.kFileTransferMgr = depend
+test1.remote_path = hila
+test1.file = 8.mts
+test1.expectedSize = 12472320
+
+test2.kFileTransferMgr = depend
+test2.remote_path = hila
+test2.file = MTS test 1.MTS
+test2.expectedSize = 10899456
+
+test3.kFileTransferMgr = depend
+test3.remote_path = hila
+test3.file = MTS test 1.mts
+test3.expectedSize = 10899456

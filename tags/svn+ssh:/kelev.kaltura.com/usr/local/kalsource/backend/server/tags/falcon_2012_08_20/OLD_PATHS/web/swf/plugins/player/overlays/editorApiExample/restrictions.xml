@@ -1,0 +1,83 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Advanced Ui Test</name>
+
+	<restrictions>	
+
+		<restriction type="string" default="">
+			<id>clipInfo</id>
+		</restriction>
+		
+		<restriction type="string" default="">
+			<id>AssetURL</id>
+		</restriction>
+		
+		<restriction type="string" default="">
+			<id>AssetType</id>
+		</restriction>
+		
+		<restriction type="number" default="0">
+			<id>AssetLength</id>
+		</restriction>
+		
+		<restriction type="number" default="10">
+			<id>preBlur</id>
+			<range>
+				<stepSize value="1" />
+				<min value="0"/>
+				<max value="100"/>
+			</range>
+		</restriction>
+		
+		<restriction type="number" default="40">
+			<id>postBlur</id>
+			<range>
+				<stepSize value="1" />
+				<min value="0"/>
+				<max value="160"/>
+			</range>
+		</restriction>
+		
+		<restriction type="number" default="110">
+			<id>MaskGamma</id>
+			<range>
+				<stepSize value="1" />
+				<min value="1"/>
+				<max value="400"/>
+			</range>
+		</restriction>
+		
+		<restriction type="number" default="35">
+			<id>MaskIn</id>
+			<range>
+				<stepSize value="1" />
+				<min value="0"/>
+				<max value="256"/>
+			</range>
+		</restriction>
+		
+		<restriction type="number" default="45">
+			<id>MaskOut</id>
+			<range>
+				<stepSize value="1" />
+				<min value="0"/>
+				<max value="256"/>
+			</range>
+		</restriction>
+		
+		<restriction type="number" default="100">
+			<id>VolumeSlider</id>
+			<range>
+				<stepSize value="1" />
+				<min value="0"/>
+				<max value="100"/>
+			</range>
+		</restriction>
+		
+		<restriction type="uint">
+			<id>KeyColor</id>
+		</restriction>
+		
+	</restrictions>
+</definition>

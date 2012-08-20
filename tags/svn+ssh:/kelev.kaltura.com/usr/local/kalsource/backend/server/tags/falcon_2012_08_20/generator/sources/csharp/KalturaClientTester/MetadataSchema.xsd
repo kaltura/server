@@ -1,0 +1,51 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="metadata">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element id="md_62DE8EE5-4AED-23FF-FC42-CB8E7093E347" name="SubtitleFormat" minOccurs="0" maxOccurs="1">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Subtitle Format</label>
+              <key>Subtitle Format</key>
+              <searchable>false</searchable>
+              <description>Choice of subtitle format</description>
+            </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="listType">
+              <xsd:enumeration value="AQTitle"/>
+              <xsd:enumeration value="MicroDVD"/>
+              <xsd:enumeration value="MPSub"/>
+              <xsd:enumeration value="Ogg Writ"/>
+              <xsd:enumeration value="RealText"/>
+              <xsd:enumeration value="SAMI"/>
+              <xsd:enumeration value="SubRip"/>
+              <xsd:enumeration value="Gloss Subtitle"/>
+              <xsd:enumeration value="VobSub"/>
+              <xsd:enumeration value="XSUB"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="textType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="dateType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:long"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="objectType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:simpleType name="listType">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+</xsd:schema>

@@ -1,0 +1,31 @@
+<definition>
+	<name>Squares</name>
+	<version>1.00</version>
+	<restrictions>	
+		<restriction type="number" default="8">
+			<id>columns</id>
+			<range>
+				<stepSize value="1" />
+				<min value="1"/>
+				<max value="20"/>
+			</range>
+		</restriction>
+		<restriction type="number" default="8">
+			<id>rows</id>
+			<range>
+				<stepSize value="1" />
+				<min value="1"/>
+				<max value="20"/>
+			</range>
+		</restriction>
+		<restriction type="number" default="0.300">
+			<id>fadeDuration</id>
+			<range>
+				<stepSize value="0.001"/>
+				<min value="0"/>
+				<max value="1"/>
+			</range>
+		</restriction>
+	</restrictions>
+</definition>
+

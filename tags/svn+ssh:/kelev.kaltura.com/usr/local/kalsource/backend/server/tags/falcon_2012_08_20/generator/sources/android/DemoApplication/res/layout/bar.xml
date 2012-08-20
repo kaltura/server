@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_bar"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#02060a" >
+    
+	
+
+	<ImageView
+	    android:id="@+id/iv_bar_menu"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:background="@drawable/button_menu_selector"
+	    android:onClick="onClick"
+	    android:layout_alignParentRight="true"
+	    android:layout_centerVertical="true" />
+        
+            <RelativeLayout 
+                android:id="@+id/rl_button_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_back_selector"
+                android:layout_centerVertical="true"
+                android:onClick="onClick">
+
+                <TextView
+                    android:id="@+id/tv_name_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:paddingLeft="35dp"
+                    android:paddingRight="30dp"
+                    android:text="Categories"
+                    android:visibility="gone"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"/>
+
+                <ImageView
+                    android:id="@+id/iv_movie"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/movie"
+                    android:visibility="gone"/>
+
+            </RelativeLayout>
+            
+	<ImageView
+	    android:id="@+id/iv_bar_search"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:background="@drawable/button_search_selector"
+	    android:onClick="onClick"
+	    android:layout_toLeftOf="@id/iv_bar_menu"
+	    android:layout_centerVertical="true"
+	    android:layout_marginRight="10dp" />
+
+
+	<TextView
+	    android:id="@+id/tv_bar_title"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerVertical="true"
+	    android:layout_toLeftOf="@+id/iv_bar_search"
+	    android:layout_toRightOf="@+id/rl_button_back"
+	    android:gravity="center"
+	    android:singleLine="true"
+	    android:text="Action Bar"
+	    android:textColor="@color/grey"
+	    android:textSize="25sp" />
+
+</RelativeLayout>

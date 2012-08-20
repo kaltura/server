@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+<mrss xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ingestion.xsd" >
+	<channel>
+		<item>
+			<action>add</action>
+			<referenceId>abc123</referenceId>
+			<type>1</type>
+			<userId>example</userId>
+			<name>new entry</name>
+			<description>Homepage video with music</description>
+			<tags>
+				<tag>Homepage</tag>
+				<tag>Cat</tag>
+			</tags>
+			<categories>
+				<category>cat</category>
+				<category>mitzi</category>
+			</categories>
+			<!-- <accessControlId>...</accessControlId> -->
+			<!-- <conversionProfileId>...</conversionProfileId> -->
+			<startDate>2011-09-01T09:00:00</startDate>
+			<endDate>2012-09-01T09:00:00</endDate>
+			<media>
+				<mediaType>1</mediaType> 
+			</media>
+			<msDuration>137400</msDuration>
+			<customDataItems>
+				<action>update</action>
+				<customData metadataProfile='my-profile-unitest-1'>
+					<action>replace</action>
+					<xmlData><metadata><MyText1>my text 1</MyText1><MyList1>a</MyList1></metadata></xmlData>
+				</customData>
+				<customData metadataProfile='my-profile-unitest-1'>
+					<action>transformXslt</action>
+					<xslt>&lt;?xml version=&quot;1.0&quot; encoding=&quot;ISO-8859-1&quot;?&gt;
+&lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt;
+	&lt;xsl:template match=&quot;/&quot;&gt;
+		&lt;metadata&gt;
+		  &lt;MyText1&gt;&lt;xsl:value-of select=&quot;metadata/MyText1&quot;/&gt;&lt;/MyText1&gt;
+		  &lt;MyText2&gt;My new text 2&lt;/MyText2&gt;
+		  &lt;MyList1&gt;&lt;xsl:value-of select=&quot;metadata/MyList1&quot;/&gt;&lt;/MyList1&gt;
+		&lt;/metadata&gt;
+	&lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;
+					</xslt>
+				</customData>
+				<customData metadataProfile='my-profile-unitest-2'>
+					<xmlData><metadata><MyText1>my new metadata</MyText1><MyList1>a</MyList1></metadata></xmlData>
+				</customData>
+			</customDataItems>
+		</item>
+	</channel>
+</mrss>

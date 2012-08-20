@@ -1,0 +1,251 @@
+<?xml version="1.0"?>
+<UnitTests>
+  <Failures>
+    <UnitTestFailures>
+      <Inputs>
+        <Input type="string" stringId="103"/>
+        <Input type="string" stringId="554ac9ee29650a512affd04d328f472b"/>
+        <Input type="string" stringId="local.trunk"/>
+        <Input type="string" stringId="1"/>
+        <Input type="string" stringId="123"/>
+      </Inputs>
+      <Failures>
+        <Failure>
+          <Field>batchcontrol::reportstatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::configloaded</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::setcommandresult</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>4096</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Object of class KalturaControlPanelCommandStatus could not be converted to string</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::reportstatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::configloaded</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::setcommandresult</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batch::addbulkuploadresult</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>data::serve</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>call_user_func_array() expects parameter 1 to be a valid callback, class 'KalturaDataService' does not have a method 'serve'</Message>
+        </Failure>
+        <Failure>
+          <Field>document::addfromentry</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>call_user_func_array() expects parameter 1 to be a valid callback, first array member is not a valid class name or object</Message>
+        </Failure>
+        <Failure>
+          <Field>document::addfromflavorasset</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>call_user_func_array() expects parameter 1 to be a valid callback, first array member is not a valid class name or object</Message>
+        </Failure>
+        <Failure>
+          <Field>document::convert</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>call_user_func_array() expects parameter 1 to be a valid callback, first array member is not a valid class name or object</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataBatch::addbulkuploadresult</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>storageProfile::updatestatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [fileSync-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::sync</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::updatestatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+      </Failures>
+    </UnitTestFailures>
+    <UnitTestFailures>
+      <Inputs>
+        <Input type="string" stringId="103"/>
+        <Input type="string" stringId="554ac9ee29650a512affd04d328f472b"/>
+        <Input type="string" stringId="local.trunk"/>
+        <Input type="string" stringId="1"/>
+        <Input type="string" stringId="1234"/>
+      </Inputs>
+      <Failures>
+        <Failure>
+          <Field>batchcontrol::reportstatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::configloaded</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::setcommandresult</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>4096</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Object of class KalturaControlPanelCommandStatus could not be converted to string</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::reportstatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::configloaded</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::setcommandresult</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batch::addbulkuploadresult</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>data::serve</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>call_user_func_array() expects parameter 1 to be a valid callback, class 'KalturaDataService' does not have a method 'serve'</Message>
+        </Failure>
+        <Failure>
+          <Field>document::addfromentry</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>call_user_func_array() expects parameter 1 to be a valid callback, first array member is not a valid class name or object</Message>
+        </Failure>
+        <Failure>
+          <Field>document::addfromflavorasset</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>call_user_func_array() expects parameter 1 to be a valid callback, first array member is not a valid class name or object</Message>
+        </Failure>
+        <Failure>
+          <Field>document::convert</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>call_user_func_array() expects parameter 1 to be a valid callback, first array member is not a valid class name or object</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataBatch::addbulkuploadresult</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>storageProfile::updatestatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [fileSync-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::sync</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::updatestatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+      </Failures>
+    </UnitTestFailures>
+  </Failures>
+</UnitTests>

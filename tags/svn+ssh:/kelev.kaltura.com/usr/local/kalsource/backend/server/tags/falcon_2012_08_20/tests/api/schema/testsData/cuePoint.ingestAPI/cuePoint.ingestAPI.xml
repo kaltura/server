@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scenes	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:noNamespaceSchemaLocation="cuePoint.ingestAPI.xsd"
+>
+	<scene-ad-cue-point entryId="0_gophawc4" systemName="MY_AD_CUE_POINT">
+		<sceneStartTime>00:00:05</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>adcue</tag>
+		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-annotation entryId="0_gophawc4" systemName="MY_ANN_PARENT">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>parent</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
+	</scene-annotation>
+	<scene-annotation entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>annotation</tag>
+			<tag>child</tag>
+		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT</parent>
+	</scene-annotation>
+	<scene-code-cue-point entryId="0_gophawc4">
+		<sceneStartTime>00:00:05.3</sceneStartTime>
+		<tags>
+			<tag>test</tag>
+			<tag>code</tag>
+		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
+	</scene-code-cue-point>
+</scenes>

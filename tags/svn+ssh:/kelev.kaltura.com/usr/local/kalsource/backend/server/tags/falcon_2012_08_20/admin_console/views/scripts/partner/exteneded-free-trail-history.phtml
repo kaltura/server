@@ -1,0 +1,46 @@
+<?php if($this->errMessage) echo "<div class=\"error\">{$this->errMessage}</div>"; ?>
+<?php $this->form->setAction($this->url(array('controller' => 'partner', 'action' => 'exteneded-free-trail-history'))); ?>
+
+<?php if (!isset($this->auditList) || !count($this->auditList)):?>
+	<div>No Trial Extension history</div>
+<?php else:?>
+
+<table class="clear">
+		<thead>
+			<tr>
+				<th>Extended By</th>
+				<th>Extended On</th>				
+				<th>Until Experation Date</th>
+				<th>Experation Reason</th>
+			</tr>
+		</thead>
+		<tbody>
+			
+		
+			<?php foreach($this->auditList as $audit): ?>
+			<tr class="1">
+				<td><?php echo $audit->userId; ?></td>
+				<td><?php echo date('m/d/y H:m:s',$audit->createdAt);?></td>
+				<td>
+				<?php
+				if (@$audit->data->changedItems){
+					foreach($audit->data->changedItems as $changedItems){
+					 if ($changedItems->descriptor == 'extendedFreeTrailExpiryDate'){ 
+					 	echo date('m/d/y',$changedItems->newValue); 
+					 	break;
+					 }
+				}}?>
+					</td><td>
+				<?php if (@$audit->data->changedItems){
+					foreach($audit->data->changedItems as $changedItems){
+					 	if ($changedItems->descriptor == 'extendedFreeTrailExpiryReason'){ 
+					 		echo $changedItems->newValue; 
+					 		break;
+						}
+					}}?>
+					</td>
+			</tr>
+			<?php endforeach;?>
+		</tbody>
+	</table>
+<?php endif;?>

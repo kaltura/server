@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExampleExternalApiMediaItem mediaId="{fill}">
+	<title>{fill}</title>
+	<description>{fill}</description>
+	<width>{fill}</width>
+	<height>{fill}</height>
+	<thumb></thumb>
+	<videos/>
+</ExampleExternalApiMediaItem>
