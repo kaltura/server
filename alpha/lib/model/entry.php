@@ -2942,7 +2942,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				
 			$privacyContexts = explode(',', $category->getPrivacyContexts());
 			if(!count($privacyContexts))
-				$privacyContexts = array(kEntitlementUtils::DEFAULT_CONTEXT); 
+				$privacyContexts = array(kEntitlementUtils::DEFAULT_CONTEXT . $this->getPartnerId()); 
 							
 			foreach ($privacyContexts as $privacyContext)
 			{

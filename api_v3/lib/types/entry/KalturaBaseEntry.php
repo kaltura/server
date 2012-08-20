@@ -433,7 +433,9 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		$this->endDate = $sourceObject->getEndDate(null);
 		$this->operationAttributes = KalturaOperationAttributesArray::fromOperationAttributesArray($sourceObject->getOperationAttributes());
 		
-		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::DEFAULT_CONTEXT)
+		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
+		
+		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::DEFAULT_CONTEXT . $partnerId)
 		{
 			$this->categories = null;
 			$this->categoriesIds = null;
@@ -486,7 +488,9 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 */
 	public function validateCategories()
 	{
-		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::DEFAULT_CONTEXT && 
+		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
+		
+		if (implode(',', kEntitlementUtils::getKsPrivacyContext()) != kEntitlementUtils::DEFAULT_CONTEXT . $partnerId && 
 			($this->categoriesIds != null || $this->categories != null))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_CATEGORY_FIELD_IS_DEPRECATED);
 			

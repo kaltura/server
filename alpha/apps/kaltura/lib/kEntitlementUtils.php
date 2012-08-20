@@ -103,7 +103,7 @@ class kEntitlementUtils
 			$ksPrivacyContexts = $ks->getPrivacyContext();
 			if (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '')
 			{
-				$ksPrivacyContexts = self::DEFAULT_CONTEXT;
+				$ksPrivacyContexts = self::DEFAULT_CONTEXT . $partner->getId();
 				
 				if(!count($allCategoriesEntry))
 				{
@@ -154,7 +154,7 @@ class kEntitlementUtils
 		else 
 		{
 			//no ks = set privacy context to default.
-			$c->add(categoryPeer::PRIVACY_CONTEXTS, array(self::DEFAULT_CONTEXT), KalturaCriteria::IN_LIKE);
+			$c->add(categoryPeer::PRIVACY_CONTEXTS, array(self::DEFAULT_CONTEXT . $partner->getId()), KalturaCriteria::IN_LIKE);
 		}
 		
 		$c->addAnd($crit);
@@ -278,6 +278,8 @@ class kEntitlementUtils
 	
 	public static function getPrivacyContextSearch()
 	{
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		
 		if (self::$privacyContextSearch)
 			return self::$privacyContextSearch;
 			 
@@ -285,12 +287,12 @@ class kEntitlementUtils
 			
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		if(!$ks)
-			return array(self::DEFAULT_CONTEXT . '_' . PrivacyType::ALL);
+			return array(self::DEFAULT_CONTEXT . $partnerId . '_' . PrivacyType::ALL);
 			
 		$ksPrivacyContexts = $ks->getPrivacyContext();
 		
 		if(is_null($ksPrivacyContexts))
-			$ksPrivacyContexts = self::DEFAULT_CONTEXT;
+			$ksPrivacyContexts = self::DEFAULT_CONTEXT . $partnerId;
 		
 		$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
 		
@@ -334,14 +336,14 @@ class kEntitlementUtils
 				$categoryPrivacy = $category->getPrivacy();
 				$categoryPrivacyContexts = $category->getPrivacyContexts();
 				if(!$categoryPrivacyContexts)
-					$categoryPrivacyContexts = self::DEFAULT_CONTEXT;
+					$categoryPrivacyContexts = self::DEFAULT_CONTEXT . $entry->getPartnerId();
 				
 				$categoryPrivacyContexts = explode(',', $categoryPrivacyContexts);
 				
 				foreach ($categoryPrivacyContexts as $categoryPrivacyContext)
 				{
 					if(trim($categoryPrivacyContext) == '')
-						 $categoryPrivacyContext = self::DEFAULT_CONTEXT;
+						 $categoryPrivacyContext = self::DEFAULT_CONTEXT . $entry->getPartnerId();
 						 
 					if(!isset($privacyContexts[$categoryPrivacyContext]) || $privacyContexts[$categoryPrivacyContext] > $categoryPrivacy)
 						$privacyContexts[trim($categoryPrivacyContext)] = $categoryPrivacy;
@@ -351,7 +353,7 @@ class kEntitlementUtils
 		
 		//Entry That doesn't assinged to any category is public.
 		if (!count($categories))
-			$privacyContexts[self::DEFAULT_CONTEXT] = PrivacyType::ALL ;
+			$privacyContexts[self::DEFAULT_CONTEXT . $entry->getPartnerId()] = PrivacyType::ALL ;
 		
 		$entryPrivacyContexts = array();
 		foreach ($privacyContexts as $categoryPrivacyContext => $Privacy)
@@ -364,6 +366,8 @@ class kEntitlementUtils
 	
 	public static function getEntitledKuserByPrivacyContext()
 	{
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		
 		if(kCurrentContext::$ks_kuser_id && kCurrentContext::$ks_kuser_id == '')
 			return null;
 			
@@ -373,7 +377,7 @@ class kEntitlementUtils
 		$ksPrivacyContexts = $ks->getPrivacyContext();
 		
 		if(is_null($ksPrivacyContexts) || $ksPrivacyContexts == '')
-			$ksPrivacyContexts = self::DEFAULT_CONTEXT;
+			$ksPrivacyContexts = self::DEFAULT_CONTEXT . $partnerId;
 		
 		$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
 		
@@ -387,13 +391,15 @@ class kEntitlementUtils
 	
 	public static function getKsPrivacyContext()
 	{
+		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
+		
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		if(!$ks)
-			return array(self::DEFAULT_CONTEXT);
+			return array(self::DEFAULT_CONTEXT . $partnerId);
 			
 		$ksPrivacyContexts = $ks->getPrivacyContext();
 		if(is_null($ksPrivacyContexts) || $ksPrivacyContexts == '')
-			return array(self::DEFAULT_CONTEXT);
+			return array(self::DEFAULT_CONTEXT . $partnerId);
 			
 		return explode(',', $ksPrivacyContexts);
 	}
