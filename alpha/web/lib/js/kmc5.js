@@ -545,8 +545,8 @@ kmc.preview_embed = {
 		uiconf_details = kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist);
 
 		if( live_bitrates ) {kmc.vars.embed_code_delivery_type = "http";} // Reset delivery type to http
-
-		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id);
+		var use_https = (location.protocol == 'https:') ? true : false;
+		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id, use_https);
 		preview_player = embed_code.replace('{FLAVOR}','ks=' + kmc.vars.ks + '&');
 		embed_code = embed_code.replace('{FLAVOR}','');
 		
@@ -763,7 +763,7 @@ kmc.preview_embed = {
 
 	// id = entry id, asset id or playlist id; name = entry name or playlist name;
 	// uiconf = uiconfid (normal scenario) or uiconf details json (for #content|Manage->drill down->flavors->preview)
-	buildKalturaEmbed : function(id, name, description, is_playlist, uiconf ) {
+	buildKalturaEmbed : function(id, name, description, is_playlist, uiconf, use_https ) {
 		
 		var html5_support = ($("#html5_support").attr("checked")) ? true : false;
 		var https_support = ($("#https_support").attr("checked")) ? true : false;
@@ -822,7 +822,7 @@ kmc.preview_embed = {
 		embed_code = embed_code.replace("{IFRAME_URL}", iframe_url); 
 		embed_code = embed_code.replace("{SCRIPT_URL}", script_url); 
 		
-		if( https_support ) {
+		if( https_support || use_https ) {
 			embed_code = embed_code.replace(/http:/g, "https:");
 		} else {
 			embed_code = embed_code.replace(/https:/g, "http:");
