@@ -280,9 +280,7 @@ class entryPeer extends BaseentryPeer
 		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
 		self::$filerResults = true;
 		self::setUseCriteriaFilter ( false );
-		Propel::disableInstancePooling();
 		$res = parent::retrieveByPK( $pk , $con );
-		Propel::enableInstancePooling();
 		self::setUseCriteriaFilter ( true );
 		self::$filerResults = false;
 		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
@@ -293,9 +291,7 @@ class entryPeer extends BaseentryPeer
 	{
 		self::$filerResults = true;
 		self::setUseCriteriaFilter ( false );
-		Propel::disableInstancePooling();
 		$res = parent::retrieveByPKs( $pks , $con );
-		Propel::enableInstancePooling();
 		self::setUseCriteriaFilter ( true );
 		self::$filerResults = false;
 		return $res;
