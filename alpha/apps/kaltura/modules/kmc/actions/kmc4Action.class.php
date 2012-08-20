@@ -167,10 +167,9 @@ class kmc4Action extends kalturaAction
 
 	private function stripProtocol( $url )
 	{
-		$find_pos = strpos("://", $url);
-		if( $find_pos !== false ){
-			$find_pos = $find_pos + 3; // ends of protocol position
-			return substr($url, $find_pos);
+		$url_data = parse_url( $url );
+		if( $url_data !== false ){
+			return $url_data['host'];
 		} else {
 			return $url;
 		}
