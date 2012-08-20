@@ -27,7 +27,10 @@ class KalturaEntryService extends KalturaBaseService
 			entryPeer::setUserContentOnly(true);
 		}
 		
-		if ($actionName == 'list' && kEntitlementUtils::getEntitlementEnforcement())
+		
+/*		//to support list categories with entitlmenet for user that is a member of more then 100 large categories
+ 		//large category is a category with > 10 members or > 100 entries. 				
+  		if ($actionName == 'list' && kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$dispatcher = KalturaDispatcher::getInstance();
 			$arguments = $dispatcher->getArguments();
@@ -76,7 +79,7 @@ class KalturaEntryService extends KalturaBaseService
 			
 			if(count($categoriesIds))
 				entryPeer::setFilterdCategoriesIds($categoriesIds);
-		}
+		}*/
 		
 		parent::initService($serviceId, $serviceName, $actionName);
 		parent::applyPartnerFilterForClass(new ConversionProfilePeer());
