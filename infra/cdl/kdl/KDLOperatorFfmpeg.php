@@ -329,6 +329,28 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 		
 		return false;
 	}
-	
+
+	/* ---------------------------
+	 * SplitArgumentsString
+	 */
+	public static function SplitArgumentsString($argsStr)
+	{
+		$paramsArr = explode(" ",$argsStr);
+		$params = array();
+		$prev = null;
+		foreach($paramsArr as $prm){
+			$prm = trim($prm);
+			if(strlen($prm)==0)
+				continue;
+			if($prm[0]=='-'){
+				$params[$prm]=null;
+				$prev=$prm;
+			}
+			else {
+				$params[$prev]=$prm;
+			}
+		}
+		return $params;
+	}
 }
 	
