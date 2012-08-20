@@ -17,6 +17,8 @@ class kCacheManager
 	const FS_API_V3_FEED = 22;
 	const FS_PLAY_MANIFEST = 23;
 	
+	const COMPRESSED = 1;
+	
 	const KCONF_PARAM_PREFIX = 'kConf:';
 	
 	protected static $caches = array();
@@ -26,7 +28,7 @@ class kCacheManager
 		
 		self::MC_LOCAL => 			array('Memcache',	'kConf:memcache_host', 					'kConf:memcache_port',					0),
 		self::MC_GLOBAL_KEYS => 	array('Memcache',	'kConf:global_keys_memcache_host', 		'kConf:global_keys_memcache_port',		0),
-		self::MC_GLOBAL_QUERIES => 	array('Memcache',	'kConf:global_queries_memcache_host', 	'kConf:global_queries_memcache_port',	MEMCACHE_COMPRESSED),
+		self::MC_GLOBAL_QUERIES => 	array('Memcache',	'kConf:global_queries_memcache_host', 	'kConf:global_queries_memcache_port',	self::COMPRESSED),
 
 		self::FS_API_V3 => 			array('FileSystem',	'kConf:response_cache_dir', 'cache_v3-600', 		2, false, 600,	 	false),
 		self::FS_API_V3_FEED => 	array('FileSystem',	'kConf:global_cache_dir', 	'feed/cache_v3-86400', 	2, false, 86400,	false),

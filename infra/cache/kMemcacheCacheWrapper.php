@@ -33,7 +33,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 		
 		$this->hostName = $hostName;
 		$this->port = $port;
-		$this->flags = $flags;
+		$this->flags = ($flags == kCacheManager::COMPRESSED ? MEMCACHE_COMPRESSED : 0);
 		
 		return $this->reconnect();
 	}
