@@ -248,7 +248,7 @@ class UserController extends Zend_Controller_Action
 		$client = Infra_ClientHelper::getClient();
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package', $allowNonePackage);
+		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package');
 		
 		$form->getElement('name')->setValue($user->fullName);
 		$form->getElement('partners')->setValue($user->allowedPartnerIds);
