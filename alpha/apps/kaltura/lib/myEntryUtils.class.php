@@ -1097,18 +1097,68 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 		
  	    //if entry is a static playlist, link between it and its new child entries
-		if ($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+		if ($entry->getType() == entryType::PLAYLIST)
 		{
-		    $from = $entry->getDataContent();
-		    KalturaLog::debug("Entries to copy from source static playlist: [$from]");
-            $fromEntryIds = explode(",", $from);
-            $toEntryIds = array();
-            foreach ($fromEntryIds as $fromEntryId)
-            {
-                $toEntryIds[] = kObjectCopyHandler::getMappedId(entryPeer::OM_CLASS, $fromEntryId);
-            }
-            
-            $newEntry->setDataContent(implode(",", $toEntryIds));
+		    switch ($entry->getMediaType())
+		    {
+		        case entry::ENTRY_MEDIA_TYPE_TEXT:
+        		    $from = $entry->getDataContent();
+        		    KalturaLog::debug("Entries to copy from source static playlist: [$from]");
+                    $fromEntryIds = explode(",", $from);
+                    $toEntryIds = array();
+                    foreach ($fromEntryIds as $fromEntryId)
+                    {
+                        $toEntryIds[] = kObjectCopyHandler::getMappedId(entryPeer::OM_CLASS, $fromEntryId);
+                    }
+                    
+                    $newEntry->setDataContent(implode(",", $toEntryIds));
+                    break;
+		        case entry::ENTRY_MEDIA_TYPE_XML:
+		            list($totalResults, $fromFiltersList) = myPlaylistUtils::getPlaylistFilterListStruct($entry->getDataContent());
+		            $toPlaylistXml = new SimpleXMLElement("<playlist/>");
+		            $toPlaylistXml->addChild("total_results", $totalResults);
+		            $toFiltersXml = $toPlaylistXml->addChild("filters");
+		            foreach ($fromFiltersList as $filterXML)
+		            {
+		                $entryFilter = new entryFilter();
+			            $entryFilter->fillObjectFromXml($filterXML, "_"); 
+			            if (isset($entryFilter->fields["_matchand_categories_ids"]))
+			            {
+			                $categoriesIds = explode(",", $entryFilter->fields["_matchand_categories_ids"]);
+			                $newCategoriesIds = array();
+			                foreach ($categoriesIds as $categoryId)
+			                {
+			                    $newCategoriesIds[] = kObjectCopyHandler::getMappedId(categoryPeer::OM_CLASS, $categoryId);
+			                }
+			                $entryFilter->fields["_matchand_categories_ids"] = implode (",", $newCategoriesIds);
+			            }
+		                if (isset($entryFilter->fields["_matchor_categories_ids"]))
+			            {
+			                $categoriesIds = explode(",", $entryFilter->fields["_matchor_categories_ids"]);
+			                $newCategoriesIds = array();
+			                foreach ($categoriesIds as $categoryId)
+			                {
+			                    $newCategoriesIds[] = kObjectCopyHandler::getMappedId(categoryPeer::OM_CLASS, $categoryId);
+			                }
+			                $entryFilter->fields["_matchor_categories_ids"] = implode (",", $newCategoriesIds);
+			            }
+		                if (isset($entryFilter->fields["_in_category_ancestor_id"]))
+			            {
+			                $categoriesIds = explode(",", $entryFilter->fields["_in_category_ancestor_id"]);
+			                $newCategoriesIds = array();
+			                foreach ($categoriesIds as $categoryId)
+			                {
+			                    $newCategoriesIds[] = kObjectCopyHandler::getMappedId(categoryPeer::OM_CLASS, $categoryId);
+			                }
+			                $entryFilter->fields["_in_category_ancestor_id"] = implode (",", $newCategoriesIds);
+			            }
+			            
+			            $toFiltersXml->addChild("filter", $entryFilter->toXml());
+		            }
+		            
+		            $newEntry->setDataContent($toPlaylistXml);
+		            break;
+		    }
 		}
 		
 		if($shouldCopyDataForNonClip || $shouldCopyDataForClip)
