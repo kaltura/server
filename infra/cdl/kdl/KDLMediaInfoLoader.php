@@ -125,6 +125,12 @@ include_once 'KDLUtils.php';
 				$videoData->_frameRate = KDLUtils::trima($val);
 				settype($videoData->_frameRate, "float");
 				break;
+			case "nominal frame rate":
+				if(!isset($videoData->_frameRate)){
+					$videoData->_frameRate = KDLUtils::trima($val);
+					settype($videoData->_frameRate, "float");
+				}
+				break;
 			case "display aspect ratio":
 				$val = KDLUtils::trima($val);
 				if(strstr($val, ":")==true){
