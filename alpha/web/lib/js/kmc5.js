@@ -545,9 +545,13 @@ kmc.preview_embed = {
 		uiconf_details = kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist);
 
 		if( live_bitrates ) {kmc.vars.embed_code_delivery_type = "http";} // Reset delivery type to http
-		var use_https = (location.protocol == 'https:') ? true : false;
-		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id, use_https);
+
+		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id);
 		preview_player = embed_code.replace('{FLAVOR}','ks=' + kmc.vars.ks + '&');
+		// Change preview player protocol if kmc was loaded in https
+		if( location.protocol == 'https:' ) {
+			preview_player = preview_player.replace(/http:/g, "https:");
+		}		
 		embed_code = embed_code.replace('{FLAVOR}','');
 		
 		var modal_content = ((live_bitrates) ? kmc.preview_embed.buildLiveBitrates(name,live_bitrates) : '') +
@@ -684,8 +688,7 @@ kmc.preview_embed = {
 	},
 	
 	buildHTTPSOption: function() {
-		var checked = (location.protocol == 'https:') ? ' checked' : '';
-		return '<div class="https_support"><div class="label checkbox"><input id="https_support" type="checkbox"' + checked + ' /> <label class="label_text" for="https_support">' + 
+		return '<div class="https_support"><div class="label checkbox"><input id="https_support" type="checkbox" /> <label class="label_text" for="https_support">' + 
 				'Modify embed code to use HTTPS secure delivery</label></div></div>';
 	},
 	
@@ -764,7 +767,7 @@ kmc.preview_embed = {
 
 	// id = entry id, asset id or playlist id; name = entry name or playlist name;
 	// uiconf = uiconfid (normal scenario) or uiconf details json (for #content|Manage->drill down->flavors->preview)
-	buildKalturaEmbed : function(id, name, description, is_playlist, uiconf, use_https ) {
+	buildKalturaEmbed : function(id, name, description, is_playlist, uiconf ) {
 		
 		var html5_support = ($("#html5_support").attr("checked")) ? true : false;
 		var https_support = ($("#https_support").attr("checked")) ? true : false;
@@ -823,7 +826,7 @@ kmc.preview_embed = {
 		embed_code = embed_code.replace("{IFRAME_URL}", iframe_url); 
 		embed_code = embed_code.replace("{SCRIPT_URL}", script_url); 
 		
-		if( https_support || use_https ) {
+		if( https_support ) {
 			embed_code = embed_code.replace(/http:/g, "https:");
 		} else {
 			embed_code = embed_code.replace(/https:/g, "http:");
