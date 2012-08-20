@@ -35,6 +35,7 @@ kmc.functions = {
 			host				: kmc.vars.host,
 			cdnhost				: kmc.vars.cdn_host,
 			srvurl				: "api_v3/index.php",
+			protocol 			: window.location.protocol + '//',
 			partnerid			: kmc.vars.partner_id,
 			subpid				: kmc.vars.subp_id,
 			uid					: kmc.vars.user_id,
