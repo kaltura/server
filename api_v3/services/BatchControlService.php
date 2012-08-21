@@ -107,6 +107,11 @@ class BatchControlService extends KalturaBaseService
 			}
 			$schedulerStatusResponse->schedulerConfigs = KalturaSchedulerConfigArray::fromSchedulerConfigArray($configList);
 		}
+		else
+		{
+			$schedulerStatusResponse->controlPanelCommands = new KalturaControlPanelCommandArray();
+			$schedulerStatusResponse->schedulerConfigs = new KalturaSchedulerConfigArray();
+		}
 		
 		// gets queues length
 		$schedulerStatusResponse->queuesStatus = new KalturaBatchQueuesStatusArray();
