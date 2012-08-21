@@ -6,7 +6,7 @@ require_once(dirname(__FILE__) . '/EntitlementTestBase.php');
 /**
  * report service test case.
  */
-class EntitlementTest extends EntitlementTestBase
+class EntitlementTest extends KalturaApiTestCase 
 {
 	const PRIVILEGE_ENABLE_ENTITLEMENT = 'enableentitlement';
 	const PRIVILEGE_DISABLE_ENTITLEMENT = 'disableentitlement';
