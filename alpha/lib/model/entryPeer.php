@@ -609,7 +609,7 @@ class entryPeer extends BaseentryPeer
 	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("entry:id=%s", self::ID));		
+		return array(array("entry:id=%s", self::ID), array("entry:partnerId=%s", self::PARTNER_ID));		
 	}
 	
 	/* (non-PHPdoc)

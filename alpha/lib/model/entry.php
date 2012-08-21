@@ -2815,7 +2815,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("entry:id=".$this->getId());
+		return array("entry:id=".$this->getId(), "entry:partnerId=".$this->getPartnerId());
 	}
 	
 	/**
