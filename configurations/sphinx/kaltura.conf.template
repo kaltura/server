@@ -1,7 +1,7 @@
 index kaltura_entry
 {
 	type	 = rt
-	path	 = @SPHINX_DIR@/kaltura_rt
+	path	 = @BASE_DIR@/sphinx/kaltura_rt
 	rt_field	 = entry_id
 	rt_field	 = name
 	rt_field	 = tags
@@ -106,7 +106,7 @@ index kaltura_entry
 index kaltura_category
 {
 	type	 = rt
-	path	 = @SPHINX_DIR@/kaltura_category_rt
+	path	 = @BASE_DIR@/sphinx/kaltura_category_rt
 	dict	 = keywords
 	min_prefix_len	 = 1
 	enable_star	 = 1
@@ -197,7 +197,7 @@ index kaltura_category
 
 index kaltura_kuser
 {
-	path	 = @SPHINX_DIR@/kaltura_kuser_rt
+	path	 = @BASE_DIR@/sphinx/kaltura_kuser_rt
 	dict	 = keywords
 	min_prefix_len	 = 3
 	enable_star	 = 1
@@ -302,7 +302,7 @@ index kaltura_kuser
 
 index kaltura_cue_point
 {
-	path	 = @SPHINX_DIR@/kaltura_cue_point_rt
+	path	 = @BASE_DIR@/sphinx/kaltura_cue_point_rt
 	rt_field	 = parent_id
 	rt_field	 = entry_id
 	rt_field	 = name
@@ -376,7 +376,7 @@ index kaltura_cue_point
 }
 index kaltura_entry_distribution
 {
-	path	 = @SPHINX_DIR@/kaltura_distribution_rt
+	path	 = @BASE_DIR@/sphinx/kaltura_distribution_rt
 	rt_field	 = entry_id
 	rt_field	 = thumb_asset_ids
 	rt_field	 = flavor_asset_ids
@@ -450,7 +450,7 @@ index kaltura_entry_distribution
 }
 index kaltura_caption_item
 {
-	path	 = @SPHINX_DIR@/kaltura_caption_item_rt
+	path	 = @BASE_DIR@/sphinx/kaltura_caption_item_rt
 	rt_field	 = entry_id
 	rt_field	 = caption_asset_id
 	rt_field	 = tags
@@ -522,7 +522,7 @@ index kaltura_caption_item
 }
 index kaltura_tag
 {
-	path	 = @SPHINX_DIR@/kaltura_tag_rt
+	path	 = @BASE_DIR@/sphinx/kaltura_tag_rt
 	rt_attr_uint	 = int_id
 	rt_field	 = tag
 	rt_attr_uint	 = object_type
@@ -587,7 +587,7 @@ searchd
 	query_log_format = sphinxql
 	read_timeout = 5
 	max_children = 30
-	pid_file = @SPHINX_DIR@/searchd.pid
+	pid_file = @BASE_DIR@/sphinx/searchd.pid
 	max_matches = 10000
 	preopen_indexes = 0
 	unlink_old = 1
