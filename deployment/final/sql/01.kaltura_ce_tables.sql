@@ -862,6 +862,7 @@ CREATE TABLE `entry_distribution` (
   `dirty_status` tinyint(4) DEFAULT NULL,
   `thumb_asset_ids` varchar(255) DEFAULT NULL,
   `flavor_asset_ids` varchar(255) DEFAULT NULL,
+  `asset_ids` varchar(255) DEFAULT NULL,
   `sunrise` datetime DEFAULT NULL,
   `sunset` datetime DEFAULT NULL,
   `remote_id` varchar(255) DEFAULT NULL,
