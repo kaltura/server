@@ -19,8 +19,9 @@ class KalturaVarPartnerUsageTotalItem extends KalturaVarPartnerUsageItem
         $this->avgStorage = ceil(@$arr[1]);
 		//$item->totalStorage 	= @$arr[15];
 		$this->peakStorage =  ceil(@$arr[2]);
-		$this->storage 		= ceil(@$arr[3]);
-        $this->combinedStorageBandwidth = ceil(@$arr[4]);
+		$this->addedStorage 		= ceil(@$arr[3]);
+		$this->deletedStorage = ceil(@$arr[4]);
+        $this->combinedStorageBandwidth = ceil(@$arr[5]);
 			
 		//return $item;
 	}

@@ -111,11 +111,17 @@ class KalturaVarPartnerUsageItem extends KalturaObject
 	public $totalStorage;
 	
 	/**
-	 * The change in storage consumption (new uploads) during the given date range (in MB)
+	 * The added storage consumption (new uploads) during the given date range (in MB)
 	 *  
 	 * @var float
 	 */
-	public $storage;
+	public $addedStorage;
+	
+	/**
+	 * The deleted storage consumption (new uploads) during the given date range (in MB)
+	 * @var float
+	 */
+	public $deletedStorage;
 	
 	/**
 	 * The peak amount of storage consumption during the given date range for the specific publisher
@@ -162,8 +168,9 @@ class KalturaVarPartnerUsageItem extends KalturaObject
 		//$item->totalStorage 	= @$arr[15];
         $this->avgStorage = ceil(@$arr[6]);
 		$this->peakStorage =  ceil(@$arr[7]);
-		$this->storage 		= ceil(@$arr[8]);
-        $this->combinedStorageBandwidth = ceil(@$arr[9]);
+		$this->addedStorage 		= ceil(@$arr[8]);
+		$this->deletedStorage = ceil(@$arr[9]);
+        $this->combinedStorageBandwidth = ceil(@$arr[10]);
 			
 		//return $item;
 	}
