@@ -136,6 +136,12 @@ class KalturaSystemPartnerUsageItem extends KalturaObject
 	public $combinedBandwidthStorage;
 	
 	/**
+	 * Amount of deleted storage in MB
+	 * @var float
+	 */
+	public $deletedStorage;
+	
+	/**
 	 * Enter description here...
 	 * @param string $header - comma separated fields names	
 	 * @param string $str - comma separated fields
@@ -162,10 +168,11 @@ class KalturaSystemPartnerUsageItem extends KalturaObject
 			$item->mixEntriesCount	 = @$arr[12];
 			$item->bandwidth 		= @$arr[13];
 			$item->storage 		= @$arr[14];
+			$item->deletedStorage 		= @$arr[15];
 			//$item->totalStorage 	= @$arr[15];
-			$item->peakStorage = @$arr[15];
-			$item->avgStorage = @$arr[16];
-			$item->combinedBandwidthStorage = @$arr[17];
+			$item->peakStorage = @$arr[16];
+			$item->avgStorage = @$arr[17];
+			$item->combinedBandwidthStorage = @$arr[18];
 		
 		return $item;
 	}
