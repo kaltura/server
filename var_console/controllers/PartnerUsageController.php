@@ -127,6 +127,7 @@ class PartnerUsageController extends Zend_Controller_Action
 				$this->view->translate('partner-usage table averageStorage'),',',
 				$this->view->translate('partner-usage table peakStorage'),',',
 				$this->view->translate('partner-usage table storage'),',',
+				$this->view->translate('partner-usage table deletedStorage'),',',
 				$this->view->translate('partner-usage table combinedBandwidthStorage'),
 				"\r\n";
 
@@ -145,6 +146,7 @@ class PartnerUsageController extends Zend_Controller_Action
 					(int)$item->avgStorage,',',
 					(int)$item->peakStorage,',',
 					(int)$item->storage,',',
+					(int)$item->deletedStorage,',',
 					(int)$item->combinedStorageBandwidth,',',
 					"\r\n";
 		}
