@@ -46,6 +46,6 @@ class DropFolderFile extends BaseDropFolderFile
 		
 	public function getCacheInvalidationKeys()
 	{
-		return array("dropFolderFile:id=".$this->getId(), "dropFolderFile:dropFolderId=".$this->getDropFolderId());
+		return array("dropFolderFile:id=".$this->getId(), "dropFolderFile:fileName=".$this->getFileName(), "dropFolderFile:dropFolderId=".$this->getDropFolderId());
 	}
 } // DropFolderFile
