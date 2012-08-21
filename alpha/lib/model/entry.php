@@ -117,10 +117,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const ENTRY_CATEGORY_ESCAPE = "_";
 	const ENTRY_CATEGORY_SEPARATOR = ",";
 	
-	//TODO - move this configuration to kconf
-	const CATEGORY_SEARCH_LIMIT = 100;
-	const CATEGORY_ENTRIES_COUNT_LIMIT_TO_BE_INDEXED = 100;
-	
 	const ENTRY_ID_THAT_DOES_NOT_EXIST = 0;
 	
 	const CATEGORY_SEARCH_PERFIX = 'c';
@@ -2919,7 +2915,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if (!count($this->getAllCategoriesIds(true)))
 			return kEntitlementUtils::ENTRY_PRIVACY_CONTEXT . '_' . implode(' ' . kEntitlementUtils::ENTRY_PRIVACY_CONTEXT . '_', $entitledKusersNoPrivacyContext);
 		
-		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
+		$categoryGroupSize = kConf::get('max_number_of_memebrs_to_be_indexed_on_entry');
 		$partner = $this->getPartner();
 		if($partner && $partner->getCategoryGroupSize())
 			$categoryGroupSize = $partner->getCategoryGroupSize();
@@ -2928,7 +2924,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		$c->add(categoryPeer::ID, $this->getAllCategoriesIds(true), Criteria::IN);
 		$c->add(categoryPeer::MEMBERS_COUNT, $categoryGroupSize, Criteria::LESS_EQUAL);
-		$c->add(categoryPeer::ENTRIES_COUNT, entry::CATEGORY_ENTRIES_COUNT_LIMIT_TO_BE_INDEXED, Criteria::LESS_EQUAL);
+		$c->add(categoryPeer::ENTRIES_COUNT, kConf::get('category_entries_count_limit_to_be_indexed'), Criteria::LESS_EQUAL);
 		
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$categories	= categoryPeer::doSelect($c);

@@ -32,8 +32,6 @@ class category extends Basecategory implements IIndexable
 	
 	const FULL_IDS_EQUAL_MATCH_STRING = 'fullidsequalmatchstring';
 	
-	const MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY = 10;
-	
 	private static $indexFieldTypes = array(
 		'category_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'str_category_id' => IIndexable::FIELD_TYPE_STRING,
@@ -257,7 +255,7 @@ class category extends Basecategory implements IIndexable
 		if($this->isColumnModified(categoryPeer::DELETED_AT) && !is_null($this->getDeletedAt()))
 			$objectDeleted = true;
 				
-		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
+		$categoryGroupSize = kConf::get('max_number_of_memebrs_to_be_indexed_on_entry');
 		$partner = $this->getPartner();
 		if($partner && $partner->getCategoryGroupSize())
 			$categoryGroupSize = $partner->getCategoryGroupSize();	
@@ -269,7 +267,7 @@ class category extends Basecategory implements IIndexable
 			$this->isColumnModified(categoryPeer::FULL_NAME) || 
 			($this->isColumnModified(categoryPeer::MEMBERS_COUNT) && 
 			$this->members_count <= $categoryGroupSize && 
-			$this->entries_count <= entry::CATEGORY_ENTRIES_COUNT_LIMIT_TO_BE_INDEXED))
+			$this->entries_count <= kConf::get('category_entries_count_limit_to_be_indexed')))
 		{
 			$this->addIndexEntryJob($this->getId(), true);
 		}

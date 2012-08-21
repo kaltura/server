@@ -355,8 +355,8 @@ class entryPeer extends BaseentryPeer
 				$critEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 				
 				$categoriesIds = array();
-				$categories = categoryPeer::retrieveEntitledAndNonIndexedByKuser($kuserId, entry::CATEGORY_SEARCH_LIMIT);
-				if(count($categories) >= entry::CATEGORY_SEARCH_LIMIT)
+				$categories = categoryPeer::retrieveEntitledAndNonIndexedByKuser($kuserId, kConf::get('category_search_limit'));
+				if(count($categories) >= kConf::get('category_search_limit'))
 					self::$kuserBlongToMoreThanMaxCategoriesForSearch = true;
 			 
 				foreach($categories as $category)

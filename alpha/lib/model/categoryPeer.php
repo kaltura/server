@@ -343,7 +343,7 @@ class categoryPeer extends BasecategoryPeer
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		
-		$categoryGroupSize = category::MAX_NUMBER_OF_MEMBERS_TO_BE_INDEXED_ON_ENTRY;
+		$categoryGroupSize = kConf::get('max_number_of_memebrs_to_be_indexed_on_entry');
 		if($partner && $partner->getCategoryGroupSize())
 			$categoryGroupSize = $partner->getCategoryGroupSize();
 
@@ -356,7 +356,7 @@ class categoryPeer extends BasecategoryPeer
 			
 		$membersCountCrit = $c->getNewCriterion (categoryPeer::MEMBERS_COUNT, $categoryGroupSize, Criteria::GREATER_THAN);
 		$membersCountCrit->addOr($c->getNewCriterion (categoryPeer::ENTRIES_COUNT, 
-										entry::CATEGORY_ENTRIES_COUNT_LIMIT_TO_BE_INDEXED, Criteria::GREATER_THAN));		
+										kConf::get('category_entries_count_limit_to_be_indexed'), Criteria::GREATER_THAN));		
 		$c->addAnd($membersCountCrit);
 
 		$c->setLimit($limit);
