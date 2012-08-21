@@ -1156,7 +1156,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			            $toEntryFilterXML = $entryFilter->toXml($toEntryFilterXML);
 		            }
 		            
-		            $newEntry->setDataContent($toPlaylistXml);
+		            $newEntry->setDataContent($toPlaylistXml->asXML());
 		            break;
 		    }
 		}
