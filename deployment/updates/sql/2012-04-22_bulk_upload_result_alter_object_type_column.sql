@@ -1,0 +1,1 @@
+ALTER TABLE bulk_upload_result modify object_type INT DEFAULT 1;
