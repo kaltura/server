@@ -343,7 +343,6 @@ class KalturaTypeReflector
 				$enums = $pluginInstance->getEnums($baseEnumName);
 				foreach($enums as $enum)
 				{
-					$enumConstans = call_user_func(array($enum, 'getAdditionalValues'));
 					$enumConstans = $enum::getAdditionalValues();
 					foreach($enumConstans as $name => $value)
 						$this->_constantsValues[$name] = $pluginName . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value;
@@ -618,6 +617,9 @@ class KalturaTypeReflector
 			
 		if ($this->_constants === null)
 			$this->getConstants();
+			
+		if ($this->_constantsValues === null)
+			$this->getConstantsValues();
 		
 		return array("_type", "_properties", "_currentProperties", "_constants", "_constantsValues", "_description", "_abstract", "_comments", "_permissions", "_subpackage", "_package", "_serverOnly", "_deprecated");
 	}
