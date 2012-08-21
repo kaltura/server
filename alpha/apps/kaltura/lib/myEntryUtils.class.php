@@ -1082,7 +1082,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$shouldCopyDataForNonClip = true;
 		if ($entry->getType() == entryType::MEDIA_CLIP)
 		    $shouldCopyDataForNonClip = false;    
-		if ($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+		if ($entry->getType() == entryType::PLAYLIST)
 		    $shouldCopyDataForNonClip = false;
 		
 		$shouldCopyDataForClip = false;
