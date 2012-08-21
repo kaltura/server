@@ -13,6 +13,12 @@ class KalturaEntryContextDataParams extends KalturaAccessControlScope
 	public $flavorAssetId;
 	
 	/**
+	 * The tags of the flavors that should be used for playback.
+	 * @var string
+	 */
+	public $flavorTags;
+	
+	/**
 	 * Playback streamer type: RTMP, HTTP, appleHttps, rtsp, sl.
 	 * @var string
 	 */
