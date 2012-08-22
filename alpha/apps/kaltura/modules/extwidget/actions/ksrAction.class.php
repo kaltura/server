@@ -1,0 +1,250 @@
+<?php
+
+// uncomment extend declaration in symfony
+class ksrAction /*extends sfAction */
+{
+    const SOM_JS_FILENAME = 'som.js';
+    const SOM_DETECT_JS_FILENAME = 'som-detect.js';
+    const KALTURA_LIB_JS_FILENAME = 'lib.js';
+    const KALTURA_LIB_API_JS_FILENAME = 'api.js';
+    const JS_PATH_IN_JARS_FOLDER = 'js';
+    
+    private $jsTemplateParams = array(
+        /** environment options **/
+        'KALTURA_SERVER' => array( 'method' => '_getKalturaHost', ), // comes from local.ini
+        'JAR_HOST_PATH' => array( 'method' => '_buildJarsHostPath' ), // CDN host + swf_url [ conf object +  ]
+        'SOM_PARTNER_ID' => array( 'method' => '_getSomPartnerInfo', 'param' => 'id', ), // comes from local.ini
+        'SOM_PARTNER_SITE' => array( 'method' => '_getSomPartnerInfo', 'param' => 'site', ), // comes from local.ini, empty by default
+        'SOM_PARTNER_KEY' => array( 'method' => '_getSomPartnerInfo', 'param' => 'key', ),// comes from local.ini
+
+        /** uiconf object originated options **/
+        'SOM_JAR_RUN' => array( 'method' => '_getRunJarNameFromSwfUrl' ), // parse swf_url for filename.jar
+
+        /** uiconf XML originated options **/
+        'KALTURA_VIDEOBITRATE' => array( 'value' => 0, 'method' => '_getFromXml', 'param' => '/uiconf/kaltura/videoBitRate', ),
+        'KALTURA_CATEGORY' => array( 'method' => '_getFromXml', 'param' => '/uiconf/kaltura/category', ),
+        'KALTURA_CONVERSIONPROFILEID' => array( 'method' => '_getFromXml', 'param' => '/uiconf/kaltura/conversionProfileId', ),
+        'KALTURA_SUBMIT_TITLE_VALUE' => array( 'method' => '_getFromXml', 'param' => '/uiconf/kaltura/submit/title/value', ),
+        'KALTURA_SUBMIT_DESCRIPTION_VALUE' => array( 'method' => '_getFromXml', 'param' => '/uiconf/kaltura/submit/description/value', ),
+        'KALTURA_SUBMIT_TAGS_VALUE' => array( 'method' => '_getFromXml', 'param' => '/uiconf/kaltura/submit/tags/value', ),
+        'KALTURA_SUBMIT_TITLE_ENABLED' => array( 'method' => '_getFromXml', 'param' => '/uiconf/kaltura/submit/title/enabled', ),
+        'KALTURA_SUBMIT_DESCRIPTION_ENABLED' => array( 'method' => '_getFromXml', 'param' => '/uiconf/kaltura/submit/description/enabled', ),
+        'KALTURA_SUBMIT_TAGS_ENABLED' => array( 'method' => '_getFromXml', 'param' => '/uiconf/kaltura/submit/tags/enabled', ),
+        
+        'KALTURA_ERROR_MESSAGES' => array( 'value' => '', 'method' => '_getErrorMessagesFromXml'),
+        'SOM_CAPTURE_ID' => array( 'method' => '_getFromXml', 'param' => '/uiconf/som/captureId', ),
+        'SOM_MAC_NAME' => array( 'method' => '_getFromXml', 'param' => '/uiconf/som/macName', ),
+        'SOM_SIDE_PANEL_ONLY' => array(
+            'value' => 'true', // default value here, due to JS no wrapped in quotes
+            'method' => '_getFromXml', 'param' => '/uiconf/som/sidePanelOnly',
+        ),
+        'SOM_JARS' => array( 'method' => '_getJarsFromXml', ),
+        'SOM_RECORDER_OPTIONS_SKIN0' => array( 'method' => '_getFromXml', 'param' => '/uiconf/som/recorderOptions/skin0', ),
+        'SOM_RECORDER_OPTIONS_MAXCAPTURESEC' => array(
+            'value' => 7200, // default value here, due to JS not wrapped in quotes
+            'method' => '_getFromXml',  'param' => '/uiconf/som/recorderOptions/maxCaptureSec',
+        ), 
+    );
+
+    private $uiconfObj;
+    private $uiconfXmlObj;
+    private $jsResult = '';
+
+    /**
+     * Will forward to the regular swf player according to the widget_id
+     */
+    public function execute()
+    {
+        // make sure output is not parsed as HTML
+        header("Content-type: application/x-javascript");
+        
+        $uiconfId = @$_GET['uiconfId']; // replace all $_GET with $this->getRequestParameter()
+        // load uiconf from DB.
+
+        // for the sake of example I use a globally defined object (instead the one loaded from DB)
+        //global $uiconfObj;
+        $this->uiconfObj = uiConfPeer::retrieveByPK($uiconfId);
+        
+        @libxml_use_internal_errors(true);
+        // TODO - change ->confFile to ->getConfFile()
+        $this->uiconfXmlObj = new SimpleXMLElement($this->uiconfObj->getConfFile());
+        if(!($this->uiconfXmlObj instanceof SimpleXMLElement))
+        {
+            // no xml or invalid XML, so throw exception
+            throw new Exception('uiconf XML is invalid');
+        }
+        // unsupress the xml errors
+        @libxml_use_internal_errors(false);
+
+
+        $this->_initReplacementTokens();;
+        $this->_prepareLibJs();
+        $this->_prepareJs();
+
+        // TODO - pass this to view?
+        echo $this->jsResult;
+    }
+    
+    private function _initReplacementTokens()
+    {
+        foreach($this->jsTemplateParams as $token => $settings)
+        {
+            if(!isset($settings['value'])) $this->jsTemplateParams[$token]['value'] = ''; // init empty value where needed
+            $method = $settings['method'];
+            $param = (isset($settings['param']))? $settings['param']: null;
+
+            $value = $this->$method($param);
+            if($value !== false)
+            {
+                $this->jsTemplateParams[$token]['value'] = $value;
+            }
+        }
+    }
+
+    private function _getJarsPathFromSwfUrl()
+    {
+        $lastSlash = strrpos($this->uiconfObj->swfUrl, '/');
+        return substr($this->uiconfObj->swfUrl, 0, $lastSlash);
+    }
+
+    private function _getRunJarNameFromSwfUrl()
+    {
+        $lastSlash = strrpos($this->uiconfObj->swfUrl, '/');
+        return substr($this->uiconfObj->swfUrl, $lastSlash+1);
+    }
+
+    // TODO - update this method to also return HTTPS or HTTP according to $_SERVER['HTTPS']
+    private function _buildJarsHostPath()
+    {
+        $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+        $cdnHost = myPartnerUtils::getCdnHost($this->uiconfObj->getPartnerId());
+        
+        $baseUrl = $protocol.$cdnHost; // TODO - change to dynamically set CDN Host - myPartnerUtils::getCdnHost()
+        
+        $webBaseUrl = getWebBaseUrl();
+        if($webBaseUrl) $webBaseUrl .= '/';
+
+        $jarPath = $this->_getJarsPathFromSwfUrl();
+
+        $scheme = parse_url($jarPath, PHP_URL_SCHEME);
+        if(!is_null($scheme)) // $jarsPath is absolute URL -just return it.
+        {
+            return $jarPath;
+        }
+        else
+        {
+            $jarPath = ltrim($jarPath, '/');
+            $fullUrl = $baseUrl .'/'. $webBaseUrl. $jarPath;;
+            return $fullUrl;
+        }
+    }
+
+    private function _getKalturaHost()
+    {
+        return kConf::get('www_host'); // TODO - change to read from local.ini
+    }
+
+    private function _getSomPartnerInfo($what)
+    {
+        // TODO - change to read from local.ini or similar
+        switch($what)
+        {
+            case 'id':   return kConf::get('ksr_id');
+            case 'site': return kConf::get('ksr_site');
+            case 'key':  return kConf::get('ksr_key');
+        }
+    }
+
+    private function _getFromXml($xpath)
+    {
+        $xpathArr = $this->uiconfXmlObj->xpath($xpath);
+        if (is_array($xpathArr) && count($xpathArr))
+        {
+            return (string)$xpathArr[0];
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private function _getJarsFromXml()
+    {
+        $jarsStr = '';
+        $xpath = '/uiconf/jars/jar';
+
+        $xpathArr = $this->uiconfXmlObj->xpath($xpath);
+        if (is_array($xpathArr) && count($xpathArr))
+        {
+            foreach($xpathArr as $jar)
+            {
+                $jarsStr .= PHP_EOL."'".(string)$jar."',";
+            }
+            $jarsStr = rtrim($jarsStr, ',').PHP_EOL;
+        }
+        return $jarsStr;
+    }
+
+    // this is the only place where this code "knows" the JS because we want to loop dynamically over all error messages override in uiconf
+    private function _getErrorMessagesFromXml()
+    {
+        $errormsgs = array();
+        $xpath = '/uiconf/kaltura/errorMessages/*';
+
+        $xpathArr = $this->uiconfXmlObj->xpath($xpath);
+        if (is_array($xpathArr) && count($xpathArr))
+        {
+            foreach($xpathArr as $key => $msgNode)
+            {
+                $msgDetails = (array)$msgNode->children();
+                if(isset($msgDetails['starts']) && isset($msgDetails['replace']))
+                {
+                    $starts = $msgDetails['starts'];
+                    $replace = $msgDetails['replace'];
+                    $errormsgs[] = 'name = "kaltura.error.messages.'.$key.'.starts";'.PHP_EOL;
+                    $errormsgs[] = "kalturaScreenRecord.errorMessages[name] = '".$starts."';".PHP_EOL;
+                    $errormsgs[] = 'name = "kaltura.error.messages.'.$key.'.replace";'.PHP_EOL;
+                    $errormsgs[] = "kalturaScreenRecord.errorMessages[name] = '".$replace."';".PHP_EOL;
+                }
+            }
+        }
+        $returnStr = implode('', $errormsgs);
+        return $returnStr;
+    }
+
+    private function _getJsFilesPath()
+    {
+        $jarsPath = $this->_getJarsPathFromSwfUrl();
+        $scheme = parse_url($jarsPath, PHP_URL_SCHEME);
+        if(!is_null($scheme))
+        {
+            // TODO - do we want to handle loading the JS file from remote URL?
+            // or artenatively find a way to get them locally?
+            throw new Exception("cannot load JS files from absolute URL");
+        }
+
+        // TODO - change value to get from system.ini
+        $baseServerPath = rtrim(kConf::get('ksr_web_path'), '/').'/';
+        return $baseServerPath.$jarsPath.'/'.self::JS_PATH_IN_JARS_FOLDER .'/';
+    }
+    
+    private function _prepareLibJs()
+    {
+        $this->jsResult = file_get_contents( $this->_getJsFilesPath(). self::KALTURA_LIB_JS_FILENAME);
+
+        foreach($this->jsTemplateParams as $token => $info)
+        {
+            $value = $info['value'];
+            $this->jsResult = str_replace($token, $value, $this->jsResult);
+        }
+    }
+
+    private function _prepareJs()
+    {
+        $somDetectJs = file_get_contents($this->_getJsFilesPath(). self::SOM_DETECT_JS_FILENAME);
+        $somJs = file_get_contents($this->_getJsFilesPath(). self::SOM_JS_FILENAME);
+        $apiJs = file_get_contents($this->_getJsFilesPath(). self::KALTURA_LIB_API_JS_FILENAME);
+        $fullJs = $somDetectJs. PHP_EOL. $somJs . PHP_EOL . $this->jsResult . PHP_EOL . $apiJs;
+        $this->jsResult = $fullJs;
+    }
+}
