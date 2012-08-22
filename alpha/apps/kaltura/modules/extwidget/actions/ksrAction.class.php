@@ -81,7 +81,8 @@ class ksrAction extends sfAction
         $this->_prepareLibJs();
         $this->_prepareJs();
 
-        $this->js = $this->jsResult;
+        echo $this->jsResult;
+	die;
     }
     
     private function _initReplacementTokens()
