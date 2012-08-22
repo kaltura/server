@@ -1,7 +1,6 @@
 <?php
 
-// uncomment extend declaration in symfony
-class ksrAction /*extends sfAction */
+class ksrAction extends sfAction 
 {
     const SOM_JS_FILENAME = 'som.js';
     const SOM_DETECT_JS_FILENAME = 'som-detect.js';
@@ -64,6 +63,10 @@ class ksrAction /*extends sfAction */
         // for the sake of example I use a globally defined object (instead the one loaded from DB)
         //global $uiconfObj;
         $this->uiconfObj = uiConfPeer::retrieveByPK($uiconfId);
+	if(!$this->uiconfObj)
+	{
+		KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
+	}
         
         @libxml_use_internal_errors(true);
         $this->uiconfXmlObj = new SimpleXMLElement($this->uiconfObj->getConfFile());
