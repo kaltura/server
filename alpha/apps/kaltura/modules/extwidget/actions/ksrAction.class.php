@@ -60,8 +60,6 @@ class ksrAction extends sfAction
         $uiconfId = $this->getRequestParameter("uiconfId"); // replace all $_GET with $this->getRequestParameter()
         // load uiconf from DB.
 
-        // for the sake of example I use a globally defined object (instead the one loaded from DB)
-        //global $uiconfObj;
         $this->uiconfObj = uiConfPeer::retrieveByPK($uiconfId);
 	if(!$this->uiconfObj)
 	{
@@ -104,14 +102,14 @@ class ksrAction extends sfAction
 
     private function _getJarsPathFromSwfUrl()
     {
-        $lastSlash = strrpos($this->uiconfObj->swfUrl, '/');
-        return substr($this->uiconfObj->swfUrl, 0, $lastSlash);
+        $lastSlash = strrpos($this->uiconfObj->getSwfUrl(), '/');
+        return substr($this->uiconfObj->getSwfUrl(), 0, $lastSlash);
     }
 
     private function _getRunJarNameFromSwfUrl()
     {
-        $lastSlash = strrpos($this->uiconfObj->swfUrl, '/');
-        return substr($this->uiconfObj->swfUrl, $lastSlash+1);
+        $lastSlash = strrpos($this->uiconfObj->getSwfUrl(), '/');
+        return substr($this->uiconfObj->getSwfUrl(), $lastSlash+1);
     }
 
     
