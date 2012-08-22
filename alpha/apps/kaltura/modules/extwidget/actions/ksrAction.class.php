@@ -221,7 +221,7 @@ class ksrAction /*extends sfAction */
         }
 
         // TODO - find a way to extract this value from an .ini file
-        $baseServerPath = rtrim("/web", '/').'/';
+        $baseServerPath = rtrim(myContentStorage::getFSContentRootPath(), '/').'/';
         return $baseServerPath.$jarsPath.'/'.self::JS_PATH_IN_JARS_FOLDER .'/';
     }
     
