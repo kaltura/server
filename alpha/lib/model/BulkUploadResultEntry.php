@@ -48,18 +48,26 @@ class BulkUploadResultEntry extends BulkUploadResult
 		$this->save();
 		
     	$closedStatuses = array (
-    	    entryStatus::ERROR_IMPORTING,
-			entryStatus::ERROR_CONVERTING,
 			entryStatus::READY,
 			entryStatus::DELETED,
 			entryStatus::PENDING,
 			entryStatus::NO_CONTENT,
     	);
+    	
+    	$errorStatuses = array (
+    	    entryStatus::ERROR_IMPORTING,
+			entryStatus::ERROR_CONVERTING,
+	    );
 
 		if(in_array($this->getObjectStatus(), $closedStatuses))
 		{
 			$this->updateEntryThumbnail();
 		    $this->setStatus(BulkUploadResultStatus::OK);
+		    $this->save();
+		}
+		else if (in_array($this->getObjectStatus(), $errorStatuses))
+		{
+		    $this->setStatus(BulkUploadResultStatus::ERROR);
 		    $this->save();
 		}
 			
