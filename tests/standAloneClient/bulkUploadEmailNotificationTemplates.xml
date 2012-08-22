@@ -47,7 +47,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>Categories CSV - Bulk Job Completed Successfully</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed successfully.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed successfully.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -146,7 +146,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>Categories CSV - Bulk Job Completed with some Errors</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed, but with some errors.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed, but with some errors.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -245,7 +245,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>Categories CSV - Bulk Job Failed</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has failed.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has failed.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -344,7 +344,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>End-Users CSV - Bulk Job Completed Successfully</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed successfully.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed successfully.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -443,7 +443,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>End-Users CSV - Bulk Job Completed with Errors</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed, but with some errors.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed, but with some errors.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -542,7 +542,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>End-Users CSV - Bulk Job Failed</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has failed.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has failed.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -641,7 +641,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>End-User Entitlements CSV - Bulk Job Completed Successfully</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed successfully.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed successfully.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -740,7 +740,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>End-User Entitlements CSV - Bulk Job Completed with Errors</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed, but with some errors.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed, but with some errors.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -839,7 +839,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>End-User Entitlements CSV - Bulk Job Failed</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has failed.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has failed.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -938,7 +938,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>Media CSV - Bulk Job Completed Successfully</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed successfully.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed successfully.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -1037,7 +1037,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>Media CSV - Bulk Job Completed with Errors</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed, but with some errors.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed, but with some errors.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -1136,7 +1136,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>Media CSV - Bulk Job Failed</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has failed.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has failed.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -1235,7 +1235,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>Media XML - Bulk Job Completed Successfully</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed successfully.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed successfully.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -1334,7 +1334,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>Media XML - Bulk Job Completed with Errors</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed, but with some errors.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has been completed, but with some errors.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
@@ -1433,7 +1433,7 @@
 			</eventConditions>
 			<format>1</format>
 			<subject>Media XML - Bulk Job Failed</subject>
-			<body><![CDATA[ Hello,<p>The processing of your bulk job has failed.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: {log_url}</p><p>Kaltura Customer Service</p>]]></body>
+			<body><![CDATA[ Hello,<p>The processing of your bulk job has failed.</p><p>Bulk Job ID = {job_id} <br>Job Submission Date/Time:  {date_time}</p><p>More details are available in the log file, at: <a href={log_url}>{log_url}</a></p><p>Kaltura Customer Service</p>]]></body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="array">
