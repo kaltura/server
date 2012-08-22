@@ -193,7 +193,7 @@ class KalturaDispatcher
 			
 		}
 
-		if ($dbObject->getPuserId() != kCurrentContext::$ks_uid) 
+		if (strtolower($dbObject->getPuserId()) != strtolower(kCurrentContext::$ks_uid)) 
 			throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 	}
 }

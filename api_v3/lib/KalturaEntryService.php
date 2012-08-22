@@ -1041,7 +1041,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			// non admin cannot specify a different user on the entry other than himself
 			$ksPuser = $this->getKuser()->getPuserId();
-			if ($entry->userId != $ksPuser)
+			if (strtolower($entry->userId) != strtolower($ksPuser))
 			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 			}
@@ -1080,7 +1080,7 @@ class KalturaEntryService extends KalturaBaseService
 			$entryPuserId = $dbEntry->getPuserId();
 			
 			// non admin cannot change the owner of an existing entry
-			if ($entry->userId != $entryPuserId)
+			if (strtolower($entry->userId) != strtolower($entryPuserId))
 			{
 				KalturaLog::debug('API entry userId ['.$entry->userId.'], DB entry userId ['.$entryPuserId.'] - change required but KS is not admin');
 				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
@@ -1333,7 +1333,7 @@ class KalturaEntryService extends KalturaBaseService
 		// if session is not admin, we should check that the user that is updating the thumbnail is the one created the entry
 		if (!$this->getKs() || !$this->getKs()->isAdmin())
 		{
-			if ($dbEntry->getPuserId() !== $this->getKs()->user)
+			if (strtolower($dbEntry->getPuserId()) !== strtolower($this->getKs()->user))
 			{
 				throw new KalturaAPIException(KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY);
 			}
