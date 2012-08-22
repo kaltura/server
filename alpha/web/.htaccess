@@ -39,6 +39,10 @@ RewriteRule ^p/[0-9]+/raw/(.*)$ /index.php/extwidget/raw/$1 [L]
 RewriteRule ^p/[0-9]+/sp/[0-9]+/download/(.*)$ index.php/extwidget/download/$1 [L]
 RewriteRule ^p/[0-9]+/download/(.*)$ index.php/extwidget/download/$1 [L]
 
+# added Kaltura Screen Recorder Rewrite
+RewriteRule ^p/[0-9]+/sp/[0-9]+/ksr/(.*)$ index.php/extwidget/ksr/$1 [L]
+RewriteRule ^p/[0-9]+/ksr/(.*)$ index.php/extwidget/ksr/$1 [L]
+
 RewriteRule ^index.php/downloadUrl(.*)$ /index.php/extwidget/downloadUrl/$1 [L]
 RewriteRule ^downloadUrl(.*)$ /index.php/extwidget/downloadUrl/$1 [L]
 RewriteRule ^entryPage(.*)$ /index.php/extwidget/entryPage/$1 [L]
