@@ -116,13 +116,7 @@ class ksrAction extends sfAction
     
     private function _buildJarsHostPath()
     {
-        $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-        $cdnHost = myPartnerUtils::getCdnHost($this->uiconfObj->getPartnerId());
-        
-        $baseUrl = $protocol.$cdnHost; 
-        
-        $webBaseUrl = myContentStorage::getFSFlashRootPath();
-        if($webBaseUrl) $webBaseUrl .= '/';
+        $baseUrl = myPartnerUtils::getCdnHost($this->uiconfObj->getPartnerId());
 
         $jarPath = $this->_getJarsPathFromSwfUrl();
 
@@ -134,7 +128,7 @@ class ksrAction extends sfAction
         else
         {
             $jarPath = ltrim($jarPath, '/');
-            $fullUrl = $baseUrl .'/'. $webBaseUrl. $jarPath;;
+            $fullUrl = $baseUrl .'/'. $jarPath;;
             return $fullUrl;
         }
     }
