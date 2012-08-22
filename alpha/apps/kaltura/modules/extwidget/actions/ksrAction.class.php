@@ -58,7 +58,7 @@ class ksrAction /*extends sfAction */
         // make sure output is not parsed as HTML
         header("Content-type: application/x-javascript");
         
-        $uiconfId = @$_GET['uiconfId']; // replace all $_GET with $this->getRequestParameter()
+        $uiconfId = $this->getRequestParameter("uiconfId"); // replace all $_GET with $this->getRequestParameter()
         // load uiconf from DB.
 
         // for the sake of example I use a globally defined object (instead the one loaded from DB)
@@ -66,7 +66,6 @@ class ksrAction /*extends sfAction */
         $this->uiconfObj = uiConfPeer::retrieveByPK($uiconfId);
         
         @libxml_use_internal_errors(true);
-        // TODO - change ->confFile to ->getConfFile()
         $this->uiconfXmlObj = new SimpleXMLElement($this->uiconfObj->getConfFile());
         if(!($this->uiconfXmlObj instanceof SimpleXMLElement))
         {
@@ -81,7 +80,6 @@ class ksrAction /*extends sfAction */
         $this->_prepareLibJs();
         $this->_prepareJs();
 
-        // TODO - pass this to view?
         echo $this->jsResult;
     }
     
@@ -113,15 +111,15 @@ class ksrAction /*extends sfAction */
         return substr($this->uiconfObj->swfUrl, $lastSlash+1);
     }
 
-    // TODO - update this method to also return HTTPS or HTTP according to $_SERVER['HTTPS']
+    
     private function _buildJarsHostPath()
     {
         $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
         $cdnHost = myPartnerUtils::getCdnHost($this->uiconfObj->getPartnerId());
         
-        $baseUrl = $protocol.$cdnHost; // TODO - change to dynamically set CDN Host - myPartnerUtils::getCdnHost()
+        $baseUrl = $protocol.$cdnHost; 
         
-        $webBaseUrl = getWebBaseUrl();
+        $webBaseUrl = myContentStorage::getFSFlashRootPath();
         if($webBaseUrl) $webBaseUrl .= '/';
 
         $jarPath = $this->_getJarsPathFromSwfUrl();
@@ -141,12 +139,11 @@ class ksrAction /*extends sfAction */
 
     private function _getKalturaHost()
     {
-        return kConf::get('www_host'); // TODO - change to read from local.ini
+        return kConf::get('www_host'); 
     }
 
     private function _getSomPartnerInfo($what)
     {
-        // TODO - change to read from local.ini or similar
         switch($what)
         {
             case 'id':   return kConf::get('ksr_id');
@@ -223,8 +220,8 @@ class ksrAction /*extends sfAction */
             throw new Exception("cannot load JS files from absolute URL");
         }
 
-        // TODO - change value to get from system.ini
-        $baseServerPath = rtrim(kConf::get('ksr_web_path'), '/').'/';
+        // TODO - find a way to extract this value from an .ini file
+        $baseServerPath = rtrim("/web", '/').'/';
         return $baseServerPath.$jarsPath.'/'.self::JS_PATH_IN_JARS_FOLDER .'/';
     }
     
