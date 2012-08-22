@@ -145,7 +145,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 		
 		$entry = parent::toObject($entry);
 		
-		if (($entry->mediaType == KalturaMediaType::IMAGE && $entry->msDuration) ||
+		if (($entry->getMediaType() == KalturaMediaType::IMAGE && $entry->msDuration) ||
 			($this->mediaType == KalturaMediaType::IMAGE && $this->msDuration))
 		{
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE, "msDuration");
