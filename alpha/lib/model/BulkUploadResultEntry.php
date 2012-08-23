@@ -42,7 +42,7 @@ class BulkUploadResultEntry extends BulkUploadResult
 	{
 		$entry = entryPeer::retrieveByPKNoFilter($this->getObjectId());
 		if(!$entry)
-			return;
+			return $this->getStatus();
 			
 		$this->setEntryStatus($entry->getStatus());
 		$this->save();
