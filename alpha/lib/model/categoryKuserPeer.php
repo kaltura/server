@@ -73,6 +73,25 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 	
 	/**
 	 * 
+	 * @param array $categoriesIds
+	 * @param int $kuserId
+	 * @param $con
+	 * 
+	 * @return categoryKuser
+	 */
+	public static function retrieveByCategoriesIdsAndActiveKuserId($categoriesIds, $kuserId, $con = null)
+	{
+		$criteria = new Criteria();
+
+		$criteria->add(categoryKuserPeer::CATEGORY_ID, $categoriesIds, Criteria::IN);
+		$criteria->add(categoryKuserPeer::KUSER_ID, $kuserId);
+		$criteria->add(categoryKuserPeer::STATUS, CategoryKuserStatus::ACTIVE);
+
+		return categoryKuserPeer::doSelectOne($criteria, $con);
+	}
+	
+	/**
+	 * 
 	 * @param int $categoryId
 	 * @param int $kuserId
 	 * @param $con

@@ -193,8 +193,23 @@ class CategoryEntryService extends KalturaBaseService
 				
 				$entitledCategories = categoryPeer::retrieveByPKs($categoryIdInArr);
 				
-				if(!count($entitledCategories))
+				if(!count($entitledCategories) || count($entitledCategories) != count($categoryIdInArr))
 					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdIn);
+					
+				$categoriesIdsUnlisted = array();
+				foreach($entitledCategories as $category)
+				{
+					if($category->getDisplayInSearch() == DisplayInSearchType::CATEGORY_MEMBERS_ONLY)
+						$categoriesIdsUnlisted[] = $category->getId();
+				}
+
+				if(count($categoriesIdsUnlisted))
+				{
+					$categoriesUnlistWithMembership = categoryKuserPeer::retrieveByCategoriesIdsAndActiveKuserId($categoriesIdsUnlisted, kCurrentContext::$kuser_id);
+
+					if(count($categoriesIdsUnlisted) != count($categoriesUnlistWithMembership))
+						throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdIn);
+				}
 			}
 			
 			//validate entitl category
@@ -203,6 +218,12 @@ class CategoryEntryService extends KalturaBaseService
 				$category = categoryPeer::retrieveByPK($filter->categoryIdEqual);
 				if(!$category && kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
 					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdEqual);
+
+				if(($category->getDisplayInSearch() == DisplayInSearchType::CATEGORY_MEMBERS_ONLY) && 
+					!categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($category->getId(), kCurrentContext::$kuser_id))
+				{
+					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdEqual);
+				}
 			}
 		}
 			
