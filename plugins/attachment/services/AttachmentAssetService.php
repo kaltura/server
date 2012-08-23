@@ -94,7 +94,7 @@ class AttachmentAssetService extends KalturaAssetService
    			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbAttachmentAsset->getentry();
-    	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+    	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbAttachmentAsset->getEntryId());
 		
 		
@@ -137,7 +137,7 @@ class AttachmentAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbAttachmentAsset->getentry();
-    	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+    	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbAttachmentAsset->getEntryId());
 		
 		
@@ -489,7 +489,7 @@ class AttachmentAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
 	
 		$dbEntry = $attachmentAssetDb->getentry();
-    	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+    	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $attachmentAssetDb->getEntryId());
 		
 		
