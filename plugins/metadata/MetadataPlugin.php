@@ -987,7 +987,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
      		    $count = MetadataProfilePeer::doCount($c);
      		    if ($count > kConf::get('copy_partner_limit_metadata_profiles'))
      		    {
-     		        throw new kCoreException("Template partner's number of [%s] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED, "metadataProfile");
+     		        throw new kCoreException("Template partner's number of [metadataProfile] objects exceed allowed limit", kCoreException::TEMPLATE_PARTNER_COPY_LIMIT_EXCEEDED);
      		    }
      		    
     	    }
