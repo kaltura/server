@@ -182,8 +182,6 @@ class KDLFlavor extends KDLMediaDataSet {
 				$this->generateOperationSetCommandLines($target, $trPrmObj);
 			}
 			else{
-//				$transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $target, $trPrmObj->_extra);
-//				$transcoders[$key]->_cfg = $trPrmObj->_engine->GenerateConfigData($this, $target);
 				$transcoders[$key] = $trPrmObj->GenerateCommandAndConfig($this, $target);
 			}
 		}
@@ -682,10 +680,16 @@ $plannedDur = 0;
 
 		$target->_height = round($target->_height);
 		$target->_width  = round($target->_width);
+		
 		/*
-		 * x16 - make sure both hgt/wid comply to
+		 * x16 - make sure both hgt/wid comply to x16
+		 * - if the frame size is an 'industry-standard', skip x16 constraint 
 		 */
-		if(!isset($target->_forceMult16) || $target->_forceMult16==1) {
+		if((isset($target->_forceMult16) && $target->_forceMult16==0)
+		|| ($target->_width==640 && $target->_height==360)){
+			;
+		}
+		else {
 			$target->_height = $target->_height -($target->_height%16);
 			$target->_width  = $target->_width  -($target->_width%16);
 		}
