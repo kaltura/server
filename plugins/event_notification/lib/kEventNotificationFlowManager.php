@@ -17,30 +17,33 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 */
 	public function consumeEvent(KalturaEvent $event) 
 	{
-		foreach($this->notificationTemplates as $notificationTemplate)
-		{
-			/* @var $notificationTemplate EventNotificationTemplate */
-			
-			$parentJob = null;
-			if(method_exists($event, 'getRaisedJob'))
-			{
-				$parentJob = $event->getRaisedJob();
-			}
-			
-			$entryId = null;
-			if(method_exists($event, 'getObject'))
-			{
-				$object = $event->getObject();
-				if($object instanceof entry)
-					$entryId = $object->getId();
-				elseif(method_exists($event, 'getEntryId'))
-					$entryId = $object->getEntryId();
-			}
-			
-			$type = $notificationTemplate->getType();
-			$jobData = $notificationTemplate->getJobData($event->getScope());
-			self::addEventNotificationDispatchJob($type, $jobData, null, $entryId, $parentJob);
-		}
+	    if (EventNotificationPlugin::isAllowedPartner($event->getScope()->getPartnerId()))
+	    {
+    		foreach($this->notificationTemplates as $notificationTemplate)
+    		{
+    			/* @var $notificationTemplate EventNotificationTemplate */
+    			
+    			$parentJob = null;
+    			if(method_exists($event, 'getRaisedJob'))
+    			{
+    				$parentJob = $event->getRaisedJob();
+    			}
+    			
+    			$entryId = null;
+    			if(method_exists($event, 'getObject'))
+    			{
+    				$object = $event->getObject();
+    				if($object instanceof entry)
+    					$entryId = $object->getId();
+    				elseif(method_exists($event, 'getEntryId'))
+    					$entryId = $object->getEntryId();
+    			}
+    			
+    			$type = $notificationTemplate->getType();
+    			$jobData = $notificationTemplate->getJobData($event->getScope());
+    			self::addEventNotificationDispatchJob($type, $jobData, null, $entryId, $parentJob);
+    		}
+	    }
 	}
 
 	/**
@@ -131,7 +134,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 */
 	protected function notificationTemplatesConditionsFulfilled(EventNotificationTemplate $notificationTemplate, kEventScope $scope) 
 	{
-	    KalturaLog::info("Checking conditions for notification templat ID [". $notificationTemplate->getId() ."] and scope: ". print_r($scope, true));
+	    KalturaLog::info("Checking conditions for notification template ID [". $notificationTemplate->getId() ."] and scope: ". print_r($scope, true));
 		$eventConditions = $notificationTemplate->getEventConditions();
 		if(!$eventConditions || !count($eventConditions))
 			return true;
