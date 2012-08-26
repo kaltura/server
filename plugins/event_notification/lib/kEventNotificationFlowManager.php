@@ -17,33 +17,30 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 */
 	public function consumeEvent(KalturaEvent $event) 
 	{
-	    if (EventNotificationPlugin::isAllowedPartner($event->getScope()->getPartnerId()))
-	    {
-    		foreach($this->notificationTemplates as $notificationTemplate)
-    		{
-    			/* @var $notificationTemplate EventNotificationTemplate */
-    			
-    			$parentJob = null;
-    			if(method_exists($event, 'getRaisedJob'))
-    			{
-    				$parentJob = $event->getRaisedJob();
-    			}
-    			
-    			$entryId = null;
-    			if(method_exists($event, 'getObject'))
-    			{
-    				$object = $event->getObject();
-    				if($object instanceof entry)
-    					$entryId = $object->getId();
-    				elseif(method_exists($event, 'getEntryId'))
-    					$entryId = $object->getEntryId();
-    			}
-    			
-    			$type = $notificationTemplate->getType();
-    			$jobData = $notificationTemplate->getJobData($event->getScope());
-    			self::addEventNotificationDispatchJob($type, $jobData, null, $entryId, $parentJob);
-    		}
-	    }
+		foreach($this->notificationTemplates as $notificationTemplate)
+		{
+			/* @var $notificationTemplate EventNotificationTemplate */
+			
+			$parentJob = null;
+			if(method_exists($event, 'getRaisedJob'))
+			{
+				$parentJob = $event->getRaisedJob();
+			}
+			
+			$entryId = null;
+			if(method_exists($event, 'getObject'))
+			{
+				$object = $event->getObject();
+				if($object instanceof entry)
+					$entryId = $object->getId();
+				elseif(method_exists($event, 'getEntryId'))
+					$entryId = $object->getEntryId();
+			}
+			
+			$type = $notificationTemplate->getType();
+			$jobData = $notificationTemplate->getJobData($event->getScope());
+			self::addEventNotificationDispatchJob($type, $jobData, null, $entryId, $parentJob);
+		}
 	}
 
 	/**
@@ -188,6 +185,8 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		
 		$scope = $event->getScope();
 		if($scope->getPartnerId() <= 0)
+			return;
+		if (!EventNotificationPlugin::isAllowedPartner($event->getScope()->getPartnerId()))
 			return;
 			
 		$eventType = self::getEventType($event);
