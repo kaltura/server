@@ -1,22 +1,6 @@
 <?php
-define ('ROOT_DIR','/monsoon/opt/kaltura/app');  
-require_once(ROOT_DIR.'/api_v3/bootstrap.php');
-require_once(ROOT_DIR . '/alpha/config/kConfLocal.php');
-require_once(ROOT_DIR . '/infra/bootstrap_base.php');
-require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
-KAutoloader::addClassPath(KAutoloader::buildPath(ROOT_DIR, "vendor", "propel", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(ROOT_DIR, "plugins", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(ROOT_DIR, "infra", "*"));
-KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/deploy/classMap.cache');
-KAutoloader::register();
- 
-require_once(ROOT_DIR.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR."infra".DIRECTORY_SEPARATOR."bootstrap_base.php");
-
-require_once (ROOT_DIR.DIRECTORY_SEPARATOR.'alpha'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'kConf.php');
-
-// Autoloader
-require_once(ROOT_DIR. DIRECTORY_SEPARATOR."infra".DIRECTORY_SEPARATOR."KAutoloader.php");
+require_once '../bootstrap.php';
 
 $f = fopen("php://stdin", "r");
 $count = 0;
