@@ -16,7 +16,6 @@ class TagServiceTest extends TagServiceTestBase
 	 */
 	public function testSearch(KalturaTagFilter $tagFilter, KalturaFilterPager $pager , KalturaTagListResponse $reference)
 	{
-	    
 	    $tagPlugin = KalturaTagSearchClientPlugin::get($this->client);
 		$resultObject = $tagPlugin->tag->search($tagFilter, $pager);
 		if(method_exists($this, 'assertInstanceOf'))
@@ -25,6 +24,43 @@ class TagServiceTest extends TagServiceTestBase
 			$this->assertType('KalturaTagListResponse', $resultObject);
 			
 		$this->assertAPIObjects($reference, $resultObject, array('totalCount'));
+	}
+	
+	/**
+	 * Tests addition of tag with special character
+	 * @param string $specialChar
+	 * @dataProvider provideData
+	 */
+	public function testTagAdditionSpecialChar ($specialChar)
+	{
+	    //Ini file is normalized before runtime, therefore it is impossible to pass "!" character
+	    if (!$specialChar)
+	        $specialChar = '!';
+	    $media = new KalturaMediaEntry();
+	    $media->name = uniqid('media_');
+	    $media->mediaType = KalturaMediaType::VIDEO;
+	    $media->tags = uniqid() . $specialChar;
+        $media = $this->client->media->add($media);
+
+	}
+	
+	/**
+	 * Tests addition of tag with special character
+	 * @param string $specialChar
+	 * @dataProvider provideData
+	 */
+	public function testTagRemovalSpecialChar ($specialChar)
+	{
+	    //Ini file is normalized before runtime, therefore it is impossible to pass "!" character
+	     if (!$specialChar)
+	        $specialChar = '!';
+	    $media = new KalturaMediaEntry();
+	    $media->name = uniqid('media_');
+	    $media->mediaType = KalturaMediaType::VIDEO;
+	    $media->tags = uniqid() . $specialChar;
+        $media = $this->client->media->add($media);
+        
+        $media = $this->client->media->delete($media->id);
 	}
 	
 	/**
