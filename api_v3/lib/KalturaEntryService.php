@@ -140,6 +140,12 @@ class KalturaEntryService extends KalturaBaseService
 				$newMediaInfo->setFlavorAssetId($dbAsset->getId());
 				$newMediaInfo->save();
 			}
+			
+			if ($dbAsset->getStatus() == flavorAsset::ASSET_STATUS_READY)
+			{
+				$dbEntry->addFlavorParamsId($dbAsset->getFlavorParamsId());
+				$dbEntry->save();
+			}
 		}
 		
 		return $dbAsset;
