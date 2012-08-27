@@ -55,6 +55,7 @@ referrer
 	 * KalturaStatsEvent $event
 	 * 
 	 * @action collect
+	 * @return bool
 	 */
 	
 	// TODO - should move to a lighter php script that is not part of the API - it is unnecessarily  heavy	
