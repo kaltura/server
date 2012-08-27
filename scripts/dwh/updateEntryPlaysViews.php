@@ -9,7 +9,6 @@ $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
 DbManager::initialize();
 $connection = Propel::getConnection();
-$partnerId=100;
 while($s = trim(fgets($f))){
         $sep = strpos($s, "\t") ? "\t" : " ";
         list($entryId, $plays, $views) = explode($sep, $s);
@@ -37,7 +36,7 @@ while($s = trim(fgets($f))){
 			$sql = $sphinxMgr->getSphinxSaveSql($entry, false);
 			$sphinxLog = new SphinxLog();
 			$sphinxLog->setEntryId($entryId);
-			$sphinxLog->setPartnerId($partnerId);
+			$sphinxLog->setPartnerId($entry->getPartnerId());
 			$sphinxLog->setSql($sql);
 			$sphinxLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 
