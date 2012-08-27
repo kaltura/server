@@ -170,7 +170,8 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			{
 				if(		is_array($addedCategoryEntryResult) 
 					&&	isset($addedCategoryEntryResult['code']) 
-					&& 	$addedCategoryEntryResult['code'] != 'CATEGORY_ENTRY_ALREADY_EXISTS'
+					&& 	!( $addedCategoryEntryResult['code'] == 'CATEGORY_ENTRY_ALREADY_EXISTS' ||
+						  $addedCategoryEntryResult['code'] == 'INVALID_ENTRY_ID') //deleted entry
 				)
 					continue;
 					
