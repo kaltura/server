@@ -9,9 +9,9 @@ fi
 MAILTO="$ADMIN_CONSOLE_ADMIN_MAIL"
 MAINT=$BASE_DIR/maintenance
 
-if [[ "$SPHINX_BIN_DIR" == "" ]]
-      then
+if [[ "$SPHINX_BIN_DIR" == "" ]];then
          SPHINX_BIN_DIR=$BASE_DIR/bin/sphinx
+fi
 
 SUDO_USER=searchd
 
