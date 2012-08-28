@@ -17,7 +17,7 @@ class uiConfWrapper extends objectWrapperBase
 
         protected $updateable_fields = array ( "name" , "objType" , "width" , "height" ,
                 "htmlParams", "swfUrl" ,"creationMode" ,  "swfUrlVersion" , /*"confFilePath"  , */ "confFile" , "confFileFeatures", "confVars" , "useCdn" , "tags" ,
-        		"autoplay" , "automuted", "html5Url" );
+        		"autoplay" , "automuted", "html5Url", "description" );
         
         protected $objs_cache = array ( );
 
