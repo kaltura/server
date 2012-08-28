@@ -13,6 +13,7 @@
 class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 {
 	const CATEGORY_ENTRY_ALREADY_EXISTS = 'CATEGORY_ENTRY_ALREADY_EXISTS';
+	const INVALID_ENTRY_ID = 'INVALID_ENTRY_ID';
 	
 	/**
 	 * Indicates that the moving of the entries could be started
@@ -168,10 +169,9 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			$this->kClient->startMultiRequest();
 			foreach($addedCategoryEntriesResults as $index => $addedCategoryEntryResult)
 			{
-				if(		is_array($addedCategoryEntryResult) 
-					&&	isset($addedCategoryEntryResult['code']) 
-					&& 	!( $addedCategoryEntryResult['code'] == 'CATEGORY_ENTRY_ALREADY_EXISTS' ||
-						  $addedCategoryEntryResult['code'] == 'INVALID_ENTRY_ID') //deleted entry
+				if(	is_array($addedCategoryEntryResult) 
+					&& isset($addedCategoryEntryResult['code']) 
+					&& !in_array($addedCategoryEntryResult['code'], array(self::CATEGORY_ENTRY_ALREADY_EXISTS, self::INVALID_ENTRY_ID))
 				)
 					continue;
 					
@@ -184,10 +184,10 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			if(is_null($deletedCategoryEntriesResults))
 				$deletedCategoryEntriesResults = array();
 			
-			foreach($deletedCategoryEntriesResults as $deletedCategoryEntryResult)
+			foreach($deletedCategoryEntriesResults as $index => $deletedCategoryEntryResult)
 			{
-				if($deletedCategoryEntryResult instanceof Exception)
-					throw $deletedCategoryEntryResult;
+				if(is_array($deletedCategoryEntryResult) && isset($deletedCategoryEntryResult['code']))
+					unset($deletedCategoryEntriesResults[$index]);
 			}
 			
 			$movedEntries += count($deletedCategoryEntriesResults);
