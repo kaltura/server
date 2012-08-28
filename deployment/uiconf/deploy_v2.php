@@ -15,6 +15,7 @@ ini_set("memory_limit", "512M");
 error_reporting(E_ALL);
 $code = array();
 $uiConfIds = array();
+$tokenValues = array();
 
 //$argv = array( 1=> "--ini=c:/web/flash/kmc/v4.0.4/config.ini", 2 => "--no-create"); //used to teswt inside the zend studio
 
@@ -183,7 +184,7 @@ class uiConfDeployment
 						
 						//Add this id to the dependencies data array
 						$uiConfIds[$widgetIdentifier] = $uiconf_id;
-
+						
 						//If the widget has dependencies
 						if(isset($widgetValue->dependencies))
 						{
@@ -195,13 +196,16 @@ class uiConfDeployment
 									$dependUiConfValue = $uiConfIds[$dependencyValue];
 									
 									uiConfDeployment::updateUIConfFile($uiConf, $dependUiConfValue, "@@{$dependencyValue}@@"); // set new value instead of the dependency
-								}
+								
+								}								
 								else
 								{ 
-									echo "Missing dependency: {$dependencyName} = {$dependencyValue} for widget: {$widgetName}" . PHP_EOL;
+									uiConfDeployment::updateFeaturesFile($uiConf, $dependencyValue, "@@{$dependencyName}@@");
+									echo "Missing dependency: {$dependencyName} = {$dependencyValue} for widget: {$widgetName}. Attempting to replace the token in uiconf features file" . PHP_EOL;
 								}
 							}
 						}
+						
 					}
 					else
 					{
@@ -479,11 +483,11 @@ class uiConfDeployment
 	 * @param string $uiconfId
 	 * @param string $replacementString
 	 */
-	public static function updateFeaturesFile(uiConf $uiconf, $uiconfId, $replacementString)
+	public static function updateFeaturesFile(uiConf $uiconf, $replacementString, $replacementToken)
 	{
 		$conf_file = $uiconf->getConfFile(true);
 		$featuresFile = $uiconf->getConfFileFeatures(true);
-		$newFeatures = str_replace($replacementString, $uiconfId, $featuresFile);
+		$newFeatures = str_replace($replacementToken, $replacementString, $featuresFile);
 		$uiconf->setConfFile($conf_file);
 		$uiconf->setConfFileFeatures($newFeatures);
 		$uiconf->save();
