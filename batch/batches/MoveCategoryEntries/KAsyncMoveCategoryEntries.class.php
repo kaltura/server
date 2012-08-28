@@ -187,7 +187,10 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			foreach($deletedCategoryEntriesResults as $index => $deletedCategoryEntryResult)
 			{
 				if(is_array($deletedCategoryEntryResult) && isset($deletedCategoryEntryResult['code']))
+				{
+					KalturaLog::err('error: ' . $deletedCategoryEntryResult['code']);
 					unset($deletedCategoryEntriesResults[$index]);
+				}
 			}
 			
 			$movedEntries += count($deletedCategoryEntriesResults);
