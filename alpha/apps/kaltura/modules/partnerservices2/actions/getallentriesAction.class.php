@@ -90,7 +90,7 @@ class getallentriesAction extends defPartnerservices2Action
 
 		$aggrigate_id_list = array();
 $this->benchmarkStart( "list_type_kshow" );		
-		if ( $list_type & self::LIST_TYPE_KSHOW )
+		if ( ($list_type & self::LIST_TYPE_KSHOW) && $kshow_id)
 		{
 			$c = new Criteria();
 			$c->addAnd ( entryPeer::TYPE , entryType::MEDIA_CLIP );
@@ -235,7 +235,7 @@ $this->benchmarkEnd( "list_type_kuser" );
 $this->benchmarkStart( "list_type_episode" );
 		if ( $list_type & self::LIST_TYPE_EPISODE )
 		{
-			if ( $kshow->getEpisodeId() )
+			if ( $kshow && $kshow->getEpisodeId() )
 			{
 				// episode_id will point to the "parent" kshow
 				// fetch the entries of the parent kshow
