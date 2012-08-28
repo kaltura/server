@@ -51,6 +51,7 @@ class TimeWarnerService extends KalturaBaseService
 		
 		$feed = new TimeWarnerFeed('time_warner_template.xml');
 		$feed->setDistributionProfile($profile);
+		$counter = 0;
 		foreach($entries as $entry)
 		{
 			/* @var $entry entry */
@@ -64,6 +65,13 @@ class TimeWarnerService extends KalturaBaseService
 			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
 			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
 			$feed->addItem($fields, $flavorAssets, $thumbAssets);
+			$counter++;
+			
+			//to avoid the cache exceeding the memory size 
+			if ($counter == 100){
+				kMemoryManager::clearMemory();
+				$counter = 0;
+			}
 		}
 		
 		header('Content-Type: text/xml');		
