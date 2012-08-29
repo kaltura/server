@@ -621,6 +621,17 @@ class ThumbAssetService extends KalturaAssetService
 		$thumbAssetsDb = assetPeer::retrieveById($thumbAssetId);
 		if (!$thumbAssetsDb || !($thumbAssetsDb instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
+			
+			
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$entry = entryPeer::retrieveByPK($thumbAssetsDb->getEntryId());
+			if(!$entry)
+			{
+				//we will throw thumb asset not found, as the user is not entitled, and should not know that the entry exists.
+				throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
+			}	
+		}
 		
 		$thumbAssets = new KalturaThumbAsset();
 		$thumbAssets->fromObject($thumbAssetsDb);
