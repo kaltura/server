@@ -68,7 +68,7 @@ class TimeWarnerService extends KalturaBaseService
 			$counter++;
 			
 			//to avoid the cache exceeding the memory size 
-			if ($counter == 100){
+			if ($counter >= 100){
 				kMemoryManager::clearMemory();
 				$counter = 0;
 			}
