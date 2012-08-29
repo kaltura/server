@@ -169,9 +169,6 @@ class flavorAsset extends asset
 	    $statusModified = $this->isColumnModified(assetPeer::STATUS);
 	    $flavorParamsIdModified = $this->isColumnModified(assetPeer::FLAVOR_PARAMS_ID);
 	    
-	    if($flavorParamsIdModified)
-	    	$oldFlavorParamsId = 
-	    
 	    // save the asset
 		$saveResult = parent::save();
 		
