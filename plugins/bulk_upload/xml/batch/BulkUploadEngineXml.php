@@ -354,6 +354,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->unimpersonate();
 				KalturaLog::err('Item failed (' . get_class($e) . '): ' . $e->getMessage());
 				$bulkUploadResult = $this->createUploadResult($item, $action);
+				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 				$bulkUploadResult->errorDescription = $e->getMessage();
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$this->addBulkUploadResult($bulkUploadResult);
