@@ -20,6 +20,11 @@ class StorageProfileService extends KalturaBaseService
 				
 			parent::applyPartnerFilterForClass(new StorageProfilePeer());
 		}
+		else
+		{
+			$partnerId = $partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			myPartnerUtils::addPartnerToCriteria(new StorageProfilePeer(), $partnerId, $this->private_partner_data , $this->partnerGroup() , null);
+		}
 	}
 	
 	/**
