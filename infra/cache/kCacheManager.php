@@ -12,6 +12,7 @@ class kCacheManager
 	const MC_LOCAL = 11;
 	const MC_GLOBAL_KEYS = 12;
 	const MC_GLOBAL_QUERIES = 13;
+	const MC_GLOBAL_FILESYNC = 14;
 	
 	const FS_API_V3 = 21;
 	const FS_API_V3_FEED = 22;
@@ -29,7 +30,8 @@ class kCacheManager
 		self::MC_LOCAL => 			array('Memcache',	'kConf:memcache_host', 					'kConf:memcache_port',					0),
 		self::MC_GLOBAL_KEYS => 	array('Memcache',	'kConf:global_keys_memcache_host', 		'kConf:global_keys_memcache_port',		0),
 		self::MC_GLOBAL_QUERIES => 	array('Memcache',	'kConf:global_queries_memcache_host', 	'kConf:global_queries_memcache_port',	self::COMPRESSED),
-
+		self::MC_GLOBAL_FILESYNC => array('Memcache',	'kConf:global_filesync_memcache_host', 	'kConf:global_filesync_memcache_port',	self::COMPRESSED),
+		
 		self::FS_API_V3 => 			array('FileSystem',	'kConf:response_cache_dir', 'cache_v3-600', 		2, false, 600,	 	false),
 		self::FS_API_V3_FEED => 	array('FileSystem',	'kConf:global_cache_dir', 	'feed/cache_v3-86400', 	2, false, 86400,	false),
 		self::FS_PLAY_MANIFEST => 	array('FileSystem',	'kConf:response_cache_dir', 'cache_manifest', 		2, true,  600,		true ),
