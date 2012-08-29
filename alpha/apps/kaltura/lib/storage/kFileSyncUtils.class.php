@@ -5,6 +5,14 @@
  */
 class kFileSyncUtils implements kObjectChangedEventConsumer
 {
+	const MAX_CACHED_FILE_SIZE = 2097152;		// 2MB
+	const CACHE_KEY_PREFIX = 'fileSyncContent_';
+	const FILE_SYNC_CACHE_EXPIRY = 0;			// never expires
+	
+	protected static $uncachedObjectTypes = array(
+		FileSyncObjectType::ASSET,				// should not cache conversion logs since they can change (batch.logConversion)
+		);
+	
 	/**
 	 * @var array<int order, int storageId> 
 	 */
@@ -87,6 +95,18 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	
 	public static function file_get_contents ( FileSyncKey $key , $fetch_from_remote_if_no_local = true , $strict = true )
 	{
+		$cacheStore = kCacheManager::getCache(kCacheManager::MC_GLOBAL_FILESYNC);
+		if ($cacheStore)
+		{
+			$cacheKey = self::CACHE_KEY_PREFIX . "{$key->object_id}_{$key->object_type}_{$key->object_sub_type}_{$key->version}";
+			$result = $cacheStore->get($cacheKey);
+			if ($result)
+			{
+				KalturaLog::log("returning from cache, key [$cacheKey] size [".strlen($result)."]");
+				return $result;
+			}
+		}
+		
 		KalturaLog::log(__METHOD__." - key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
 		list ( $file_sync , $local ) = self::getReadyFileSyncForKey( $key , $fetch_from_remote_if_no_local , $strict );
 		if($file_sync)
@@ -95,7 +115,16 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		}
 		
 		if($file_sync)
-			return self::getContentsByFileSync ( $file_sync , $local , $fetch_from_remote_if_no_local , $strict );
+		{
+			$result = self::getContentsByFileSync ( $file_sync , $local , $fetch_from_remote_if_no_local , $strict );
+			if ($cacheStore && $result && strlen($result) < self::MAX_CACHED_FILE_SIZE && 
+				!in_array($key->object_type, self::$uncachedObjectTypes))
+			{
+				KalturaLog::log("saving to cache, key [$cacheKey] size [".strlen($result)."]");
+				$cacheStore->set($cacheKey, $result, self::FILE_SYNC_CACHE_EXPIRY);
+			}
+			return $result;
+		}
 		
 		KalturaLog::log(__METHOD__." - FileSync not found");
 		return null;
