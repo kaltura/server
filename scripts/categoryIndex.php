@@ -43,6 +43,7 @@ while(count($allCats))
 	
 	$criteria->setOffset($criteria->getOffset() + count($allCats));
 	kMemoryManager::clearMemory();
+	usleep(200);
 	$allCats = categoryPeer::doSelect($criteria);
 }
 
