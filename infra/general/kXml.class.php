@@ -407,7 +407,13 @@ class kXml
 		return str_replace($from, $to, $encodeXml);
 	}
 	
-	public static function setNodeValue(DOMDocument $doc, DOMXPath $domXpath, $xpathPath, $value, DOMNode $contextnode = null)
+	/**
+	 * @param DOMXPath $domXpath - the DOMXPath in which to set the value  
+	 * @param unknown_type $xpathPath - the path in the DOMXPath object of where the value should be set
+	 * @param string $value
+	 * @param DOMNode $contextnode
+	 */
+	public static function setNodeValue(DOMXPath $domXpath, $xpathPath, $value, DOMNode $contextnode = null)
 	{
 		if ($contextnode)
 		{
@@ -418,7 +424,7 @@ class kXml
 			$node = $domXpath->query($xpathPath)->item(0);
 		}
 		
-		if (is_null($node))
+		if (!$node)
 		{
 			return;
 		}
