@@ -16,6 +16,8 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/deploy/' . basename(__FILE__) . '.cache');
 KAutoloader::register();
 
+date_default_timezone_set(kConf::get("date_default_timezone"));
+
 error_reporting(E_ALL);
 
 KalturaLog::setLogger(new KalturaStdoutLogger());
