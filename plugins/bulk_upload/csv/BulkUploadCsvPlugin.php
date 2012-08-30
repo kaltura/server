@@ -6,6 +6,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 {
 	const PLUGIN_NAME = 'bulkUploadCsv';
 
+	const FEATURE_CSV_HEADER_ROW = 'FEATURE_CSV_HEADER_ROW';
 	/**
 	 * 
 	 * Returns the plugin name
@@ -95,9 +96,8 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	/**
 	 * Returns the log file for bulk upload job
 	 * @param BatchJob $batchJob bulk upload batchjob
-	 * @param bool $addHeaderRow flag signifying whether the header row should be added to the CSV. Default value is false.
 	 */
-	public static function writeBulkUploadLogFile($batchJob, $addHeaderRow = false)
+	public static function writeBulkUploadLogFile($batchJob)
 	{
 		if(($batchJob->getJobSubType() != null) && ($batchJob->getJobSubType() != self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV))){
 			return;
@@ -113,8 +113,9 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		$data = $batchJob->getData();
         /* @var $data kBulkUploadJobData */
 		
-		//Add header row to the output CSV
-		if ($addHeaderRow)
+		//Add header row to the output CSV only if partner level permission for it exists
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		if (PermissionPeer::isValidForPartner(self::FEATURE_CSV_HEADER_ROW, $partnerId))
 		{
     		$headerRow = self::getHeaderRow($data->getBulkUploadObjectType());
     		$headerRow[] = "action";
