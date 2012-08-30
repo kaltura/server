@@ -284,7 +284,7 @@ class KImageMagickCropper extends KBaseCropper
 		$targetFileExtension = pathinfo($this->targetPath, PATHINFO_EXTENSION);
 		if ($targetFileExtension === 'gif')
 		{
-			$tmpTarget = $this->targetPath.'.tmp';
+			$tmpTarget = $this->targetPath.'.tmp.gif';
 			$coalesceCmd = "\"$this->cmdPath\" \"$this->srcPath\" -coalesce \"$tmpTarget\"";
 			$mainCmd = "\"$this->cmdPath\" \"$tmpTarget\" $options \"$this->targetPath\"";
 			$rmCmd = "rm \"$tmpTarget\"";
