@@ -172,21 +172,21 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	    switch ($bulkUploadObjectType)
 	    {
 	        case BulkUploadObjectType::ENTRY:
-	            $ret = array ("title", "description", "tags", "url", "contentType",);
+	            $ret = array ("*title", "description", "tags", "url", "contentType",);
 	            if ($csvVersion > 1)
     	            array_merge($ret, array ("conversionProfileId", "accessProfileId",  
     	                    "category", "scheduleStartDate", "scheduleEndDate", "thumbnailUrl", "partnerData", "creatorId", "entitledUsersEdit", "entitledUsersPublish", "ownerId"));
 	            return $ret;
     	        break;
 	        case BulkUploadObjectType::CATEGORY:
-	            return array ("name", "relativePath", "tags", "description", "referenceId", "privacy", "appearInList", "contributionPolicy",
+	            return array ("*name", "relativePath", "tags", "description", "referenceId", "privacy", "appearInList", "contributionPolicy",
 	                        "inheritanceType", "userJoinPolicy", "defaultPermissionLevel", "owner", "partnerData", "partnerSortValue", "moderation");
 	            break;
 	        case BulkUploadObjectType::CATEGORY_USER:
-	            return array ("categoryId", "userId", "categoryReferenceId", "permissionLevel", "updateMethod", "status",);
+	            return array ("*categoryId", "userId", "categoryReferenceId", "permissionLevel", "updateMethod", "status",);
 	            break;
 	        case BulkUploadObjectType::USER:
-	            return array("screenName", "email", "dateOfBirth", "country", "state", "city", "zip", "gender", "firstName", "lastName", "isAdmin", "tags", "roleIds", "partnerData",);
+	            return array("*screenName", "email", "dateOfBirth", "country", "state", "city", "zip", "gender", "firstName", "lastName", "isAdmin", "tags", "roleIds", "partnerData",);
 	            break;
 	    }
 	}
