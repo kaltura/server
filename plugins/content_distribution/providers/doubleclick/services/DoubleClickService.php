@@ -153,6 +153,70 @@ class DoubleClickService extends KalturaBaseService
 	}
 	
 	/**
+	 * @action getFeedByEntryId
+	 * @disableTags TAG_WIDGET_SESSION,TAG_ENTITLEMENT_ENTRY,TAG_ENTITLEMENT_CATEGORY
+	 * @param int $distributionProfileId
+	 * @param string $hash
+	 * @param string $entryId
+	 * @return file
+	 */
+	public function getFeedByEntryIdAction($distributionProfileId, $hash, $entryId = null) {
+		if (! $this->getPartnerId () || ! $this->getPartner ())
+			throw new KalturaAPIException ( KalturaErrors::INVALID_PARTNER_ID, $this->getPartnerId () );
+		
+		$profile = DistributionProfilePeer::retrieveByPK ( $distributionProfileId );
+		if (! $profile || ! $profile instanceof DoubleClickDistributionProfile)
+			throw new KalturaAPIException ( ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $distributionProfileId );
+		
+		if ($profile->getStatus () != KalturaDistributionProfileStatus::ENABLED)
+			throw new KalturaAPIException ( ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $distributionProfileId );
+		
+		if ($profile->getUniqueHashForFeedUrl () != $hash)
+			throw new KalturaAPIException ( DoubleClickDistributionErrors::INVALID_FEED_URL );
+		
+		// Creates entry filter with advanced filter
+		$entry = entryPeer::retrieveByPK ( $entryId );
+		if (! $entry || ($entry->getPartnerId () != $this->getPartnerId ()))
+			throw new KalturaAPIException ( KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId );
+		
+		$totalCount = 1;
+		
+		// Construct the feed
+		$feed = new DoubleClickFeed ( 'doubleclick_template.xml', $profile );
+		$feed->setTotalResult ( 1 );
+		$feed->setStartIndex ( 1 );
+		
+		$profileUpdatedAt = $profile->getUpdatedAt ( null );
+		$cacheDir = kConf::get ( "global_cache_dir" ) . "feeds/dist_$distributionProfileId/";
+		
+		// check cache
+		$cacheFileName = $cacheDir . myContentStorage::dirForId ( $entry->getIntId (), $entry->getId () . ".xml" );
+		$updatedAt = max ( $profileUpdatedAt, $entry->getUpdatedAt ( null ) );
+		if (file_exists ( $cacheFileName ) && $updatedAt < filemtime ( $cacheFileName )) {
+			$xml = file_get_contents ( $cacheFileName );
+		} else {
+			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId ( $entry->getId (), $profile->getId () );
+			if (! $entryDistribution) {
+				KalturaLog::err ( 'Entry distribution was not found for entry [' . $entry->getId () . '] and profile [' . $profile->getId () . ']' );
+				continue;
+			}
+			$fields = $profile->getAllFieldValues ( $entryDistribution );
+			$flavorAssets = assetPeer::retrieveByIds ( explode ( ',', $entryDistribution->getFlavorAssetIds () ) );
+			$thumbAssets = assetPeer::retrieveByIds ( explode ( ',', $entryDistribution->getThumbAssetIds () ) );
+			
+			$cuePoints = $this->getCuePoints ( $entry->getPartnerId (), $entry->getId () );
+			$xml = $feed->getItemXml ( $fields, $flavorAssets, $thumbAssets, $cuePoints );
+			mkdir ( dirname ( $cacheFileName ), 0777, true );
+			file_put_contents ( $cacheFileName, $xml );
+		}
+		$feed->addItemXml ( $xml );
+		
+		header ( 'Content-Type: text/xml' );
+		echo $feed->getXml ();
+		die ();
+	}
+	
+	/**
 	 * @param $entryId
 	 */
 	protected function getCuePoints($partnerId, $entryId)
