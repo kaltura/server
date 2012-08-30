@@ -838,7 +838,7 @@ return array(
 	'partner-usage table bandwidth' => 'Bandwidth Used',
 	'partner-usage table totalStorage' => 'Total Storage',
 	'partner-usage table storage' => 'Storage Added',
-    'partner-usage table deletedStorage' => 'Deleted Storage (MB)',
+    'partner-usage table deletedStorage' => 'Deleted Storage',
     'partner-usage table peakStorage' => 'Peak Storage',
     'partner-usage table averageStorage' => 'Average Storage',
     'partner-usage table combinedBandwidthStorage' => 'Combined Bandwidth and Storage',
