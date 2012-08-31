@@ -3,10 +3,8 @@
 						->appendStylesheet($this->baseUrl('css/jquery-ui/smoothness/jquery-ui-1.7.2.custom.css'))
 						->appendStylesheet($this->baseUrl('css/global.css'));
 					 
-	$protocol  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
-	
 	$this->headScript()	->setIndent("	")
-						->prependFile($protocol . '://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js')
+						->appendFile($this->baseUrl('js/jquery-1.4.2.min.js'))
 						->appendFile($this->baseUrl('js/jquery-ui-1.7.2.custom.min.js'))
 						->appendFile($this->baseUrl('js/jquery.form.js'))
 						->appendFile($this->baseUrl('js/main.js'));
