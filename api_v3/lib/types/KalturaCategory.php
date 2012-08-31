@@ -436,51 +436,60 @@ class KalturaCategory extends KalturaObject implements IFilterable
 				$isInheritedPrivacyContext = false;
 			}
 			
-			if($this->appearInList != KalturaAppearInListType::PARTNER_ONLY && $this->appearInList != null && !$isInheritedPrivacyContext)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_APPEAR_IN_LIST_FIELD_WITH_NO_PRIVACY_CONTEXT);
+			if(!$isInheritedPrivacyContext)
+			{
+				if($this->appearInList != KalturaAppearInListType::PARTNER_ONLY && !$this->isNull('appearInList'))
+					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_APPEAR_IN_LIST_FIELD_WITH_NO_PRIVACY_CONTEXT);
+					
+				if ($this->moderation != KalturaNullableBoolean::FALSE_VALUE && !$this->isNull('moderation'))
+					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_MODERATION_FIELD_WITH_NO_PRIVACY_CONTEXT); 
 				
-			if ($this->moderation != KalturaNullableBoolean::FALSE_VALUE && $this->moderation != null && !$isInheritedPrivacyContext)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_MODERATION_FIELD_WITH_NO_PRIVACY_CONTEXT); 
-			
-			if ($this->inheritanceType != KalturaInheritanceType::MANUAL && $this->inheritanceType != null && !$isInheritedPrivacyContext)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_INHERITANCE_TYPE_FIELD_WITH_NO_PRIVACY_CONTEXT);
-				 
-			if ($this->privacy != KalturaPrivacyType::ALL && $this->privacy != null && !$isInheritedPrivacyContext)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_PRIVACY_FIELD_WITH_NO_PRIVACY_CONTEXT);
-				 
-			if ($this->owner != null && !$isInheritedPrivacyContext)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT);
-
-			if ($this->userJoinPolicy != KalturaUserJoinPolicyType::NOT_ALLOWED && $this->userJoinPolicy != null && !$isInheritedPrivacyContext)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_USER_JOIN_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT);
-			
-			if ($this->contributionPolicy != KalturaContributionPolicyType::ALL  && $this->contributionPolicy != null && !$isInheritedPrivacyContext)
-			   throw new KalturaAPIException(KalturaErrors::CANNOT_SET_CONTIRUBUTION_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT);
-			   
-			if ($this->defaultPermissionLevel != KalturaCategoryUserPermissionLevel::MEMBER && $this->defaultPermissionLevel !== null && !$isInheritedPrivacyContext)
-			   throw new KalturaAPIException(KalturaErrors::CANNOT_SET_DEFAULT_PERMISSION_LEVEL_FIELD_WITH_NO_PRIVACY_CONTEXT); 
+				if ($this->inheritanceType != KalturaInheritanceType::MANUAL && !$this->isNull('inheritanceType'))
+					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_INHERITANCE_TYPE_FIELD_WITH_NO_PRIVACY_CONTEXT);
+					 
+				if ($this->privacy != KalturaPrivacyType::ALL && !$this->isNull('privacy'))
+					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_PRIVACY_FIELD_WITH_NO_PRIVACY_CONTEXT);
+					 
+				if (!$this->isNull('owner'))
+					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT);
+	
+				if ($this->userJoinPolicy != KalturaUserJoinPolicyType::NOT_ALLOWED && !$this->isNull('userJoinPolicy'))
+					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_USER_JOIN_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT);
+				
+				if ($this->contributionPolicy != KalturaContributionPolicyType::ALL  && !$this->isNull('contributionPolicy'))
+				   throw new KalturaAPIException(KalturaErrors::CANNOT_SET_CONTIRUBUTION_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT);
+				   
+				if ($this->defaultPermissionLevel != KalturaCategoryUserPermissionLevel::MEMBER && !$this->isNull('defaultPermissionLevel'))
+				   throw new KalturaAPIException(KalturaErrors::CANNOT_SET_DEFAULT_PERMISSION_LEVEL_FIELD_WITH_NO_PRIVACY_CONTEXT);
+			}
 		}
 		
 		if(($this->inheritanceType != KalturaInheritanceType::MANUAL && $this->inheritanceType != null) || 
 			($this->inheritanceType == null && $sourceObject && $sourceObject->getInheritanceType() != KalturaInheritanceType::MANUAL))
 		{	
-			if (!$sourceObject && $this->owner != null)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_OWNER_WHEN_CATEGORY_INHERIT_MEMBERS);
+			if ($this->owner != null)
+			{
+				if (!$sourceObject)
+					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_OWNER_WHEN_CATEGORY_INHERIT_MEMBERS);
+				elseif ($this->owner != $sourceObject->getKuserId())
+					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_OWNER_WHEN_CATEGORY_INHERIT_MEMBERS);
+			}
 				
-			if ($sourceObject && $this->owner != null && $this->owner != $sourceObject->getKuserId())
-				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_OWNER_WHEN_CATEGORY_INHERIT_MEMBERS);
+			if ($this->userJoinPolicy != null)
+			{
+				if (!$sourceObject)
+					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS);
+				elseif ($this->userJoinPolicy != $sourceObject->getUserJoinPolicy())
+					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS);
+			}
 				
-			if (!$sourceObject && $this->userJoinPolicy != null)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS);
-				 
-			if ($sourceObject && $this->userJoinPolicy != null && $this->userJoinPolicy != $sourceObject->getUserJoinPolicy())
-				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS);
-				
-			if (!$sourceObject && $this->defaultPermissionLevel != null)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS);
-				
-			if ($sourceObject && $this->defaultPermissionLevel != null && $this->defaultPermissionLevel != $sourceObject->getDefaultPermissionLevel())
-				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS);
+			if ($this->defaultPermissionLevel != null)
+			{
+				if (!$sourceObject)
+					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS);
+				elseif ($this->defaultPermissionLevel != $sourceObject->getDefaultPermissionLevel())
+					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS);
+			}
 		}
 		
 		if (!is_null($sourceObject))
