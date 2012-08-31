@@ -1,6 +1,6 @@
 <?php
 /**
- * Applicative event that raised implicitly by the developer
+ * Applicative event that raised by the developer when indexed object is ready for indexing in the index server
  */
 interface kObjectReadyForIndexEventConsumer extends KalturaEventConsumer
 {
