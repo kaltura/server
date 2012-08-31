@@ -17,14 +17,9 @@ class StorageProfileService extends KalturaBaseService
 		{
 			if(!$this->getPartner()->getEnabledService(PermissionName::FEATURE_REMOTE_STORAGE))
 				throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
-				
-			parent::applyPartnerFilterForClass(new StorageProfilePeer());
 		}
-		else
-		{
-			$partnerId = $partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-			myPartnerUtils::addPartnerToCriteria(new StorageProfilePeer(), $partnerId, $this->private_partner_data , $this->partnerGroup() , null);
-		}
+		
+		self::applyPartnerFilterForClass(new StorageProfilePeer());
 	}
 	
 	/**
