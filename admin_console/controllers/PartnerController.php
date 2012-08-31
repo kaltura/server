@@ -75,7 +75,7 @@ class PartnerController extends Zend_Controller_Action
 				}
 				else
 				{
-					Infra_AclHelper::refreshCurrentUserAllowrdPartners();
+					Infra_AclHelper::refreshCurrentUserAllowedPartners();
 					$this->_helper->redirector('list');
 				}
 			}
