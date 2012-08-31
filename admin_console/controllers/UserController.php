@@ -458,10 +458,10 @@ class UserController extends Zend_Controller_Action
 		
 		$config = Zend_Registry::get('config');
 		
-		$filter = new Kaltura_Client_Type_UserFilter();
+		$filter = new Kaltura_Client_Type_UserRoleFilter();
 		$filter->partnerIdEqual = $config->settings->partnerId;
 		$filter->orderBy = Kaltura_Client_Enum_UserOrderBy::CREATED_AT_DESC;
-		$paginatorAdapter = new Infra_FilterPaginator($client->userRole, "listAction", null, null);
+		$paginatorAdapter = new Infra_FilterPaginator($client->userRole, "listAction", null, $filter);
 		$paginator = new Infra_Paginator($paginatorAdapter);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
