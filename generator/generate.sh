@@ -18,10 +18,12 @@ rm -fr ../admin_console/lib/Kaltura/Client
 rm -fr ../var_console/lib/Kaltura/Client
 rm -fr ../batch/client/*
 rm -fr ../tests/lib/*
+rm -fr ../clients/php5
 
 rsync -avC $output_path/php5ZendClientAdminConsole/ ../admin_console/lib
 rsync -avC $output_path/php5ZendVarConsole/ ../var_console/lib
 rsync -avC $output_path/batchClient/ ../batch/client
 rsync -avC  $output_path/testsClient/* ../tests/lib
+rsync -avC  $output_path/php5 ../clients
 
 rm -fr ../cache/batch/*
