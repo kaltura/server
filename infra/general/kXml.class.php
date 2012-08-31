@@ -409,7 +409,7 @@ class kXml
 	
 	/**
 	 * @param DOMXPath $domXpath - the DOMXPath in which to set the value  
-	 * @param unknown_type $xpathPath - the path in the DOMXPath object of where the value should be set
+	 * @param string $xpathPath - the path in the DOMXPath object of where the value should be set
 	 * @param string $value
 	 * @param DOMNode $contextnode
 	 */
