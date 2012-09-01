@@ -14,6 +14,10 @@ Running the test code
 	a. right click in the Package Explorer
 	b. Import...
 	c. Android->Existing Android Code Into Workspace
+	d. Select the root dir containing all 3 android projects (KalturaClient, KalturaClientTester and DemoApplication)
+	e. Make sure all 3 projects are selected, click ok
+	f. Wait until the projects are automatically compiled (initially some errors will appear, 
+		until the KalturaClient is compiled, they should go away automatically)
 2. Edit KalturaClientTester/src/com.kaltura.client.test/KalturaTestConfig and fill out your Kaltura account information
 3. Right click on KalturaClientTester/src/com.kaltura.client.test/KalturaTestSuite
 4. Run As->Android JUnit Test
