@@ -121,7 +121,7 @@ abstract class KalturaObject
 			
             if (!is_callable($getter_callback))
             {
-            	KalturaLog::alert("getter for property [$object_prop] was not found on object class [" . get_class($source_object) . "]");
+            	KalturaLog::alert("getter for property [$this_prop] was not found on object class [" . get_class($source_object) . "]");
             	continue;
             }
             
