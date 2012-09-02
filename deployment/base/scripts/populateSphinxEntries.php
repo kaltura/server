@@ -1,32 +1,8 @@
 <?php
-
-set_time_limit(0);
-
-ini_set("memory_limit","700M");
-
 chdir(dirname(__FILE__));
 
-define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
-require_once(ROOT_DIR . '/infra/bootstrap_base.php');
-require_once(ROOT_DIR . '/infra/KAutoloader.php');
-require_once(ROOT_DIR . '/infra/kConf.php');
+require_once('../../bootstrap.php');
 
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
-KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/deploy/' . basename(__FILE__) . '.cache');
-KAutoloader::register();
-
-date_default_timezone_set(kConf::get("date_default_timezone"));
-
-error_reporting(E_ALL);
-
-kCurrentContext::$ps_vesion = 'ps3';
-
-KalturaLog::setLogger(new KalturaStdoutLogger());
-
-$dbConf = kConf::getDB();
-DbManager::setConfig($dbConf);
-DbManager::initialize();
 
 $c = new Criteria();
 if($argc > 1 && is_numeric($argv[1]))
