@@ -92,7 +92,13 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $flavorAssetIds;
-
+	
+	/**
+	 * Comma separated asset ids
+	 * @var string
+	 */
+	public $assetIds;
+	
 	/**
 	 * Entry distribution publish time as Unix timestamp (In seconds)
 	 * 
@@ -204,6 +210,7 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 		'dirtyStatus',
 		'thumbAssetIds',
 		'flavorAssetIds',
+	 	'assetIds',
 		'sunrise',
 		'sunset',
 		'remoteId',

@@ -19,6 +19,7 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_METADATA_FILENAME_XSLT = 'metadataFilenameXslt';
 	const CUSTOM_DATA_FLAVOR_ASSET_FILENAME_XSLT = 'flavorAssetFilenameXslt';
 	const CUSTOM_DATA_THUMBNAIL_ASSET_FILENAME_XSLT = 'thumbnailAssetFilenameXslt';
+	const CUSTOM_DATA_ASSET_FILENAME_XSLT = 'assetFilenameXslt';
 	
 	protected $maxLengthValidation= array (
 	);
@@ -34,6 +35,9 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{
 		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
+		$allFieldValues = $this->getAllFieldValues($entryDistribution);
+		if (!is_array($allFieldValues))
+			$allFieldValues = array();
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($this->maxLengthValidation, $allFieldValues, $action));
 		$validationErrors = array_merge($validationErrors, $this->validateInListOrNull($this->inListOrNullValidation, $allFieldValues, $action));
 
@@ -52,6 +56,14 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	{
 		if ($this->getThumbnailAssetFilenameXslt())
 			return trim($this->transformXslForEntry($entryDistribution, $this->getThumbnailAssetFilenameXslt(), array('thumbnailAssetId' => $thumbnailAssetId)));
+		else
+			return $defaultFilename;
+	}
+	
+	public function getAssetFilename(EntryDistribution $entryDistribution, $defaultFilename, $thumbnailAssetId)
+	{
+		if ($this->getAssetFilenameXslt())
+			return trim($this->transformXslForEntry($entryDistribution, $this->getAssetFilenameXslt(), array('assetId' => $thumbnailAssetId)));
 		else
 			return $defaultFilename;
 	}
@@ -156,6 +168,8 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	public function getMetadataFilenameXslt()			{return $this->getFromCustomData(self::CUSTOM_DATA_METADATA_FILENAME_XSLT);}
 	public function getFlavorAssetFilenameXslt()		{return $this->getFromCustomData(self::CUSTOM_DATA_FLAVOR_ASSET_FILENAME_XSLT);}
 	public function getThumbnailAssetFilenameXslt()		{return $this->getFromCustomData(self::CUSTOM_DATA_THUMBNAIL_ASSET_FILENAME_XSLT);}
+	public function getAssetFilenameXslt()				{return $this->getFromCustomData(self::CUSTOM_DATA_ASSET_FILENAME_XSLT);}
+	
 	
 	public function setProtocol($v)						{$this->putInCustomData(self::CUSTOM_DATA_PROTOCOL, $v);}
 	public function setHost($v)							{$this->putInCustomData(self::CUSTOM_DATA_HOST, $v);}
@@ -171,4 +185,5 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	public function setMetadataFilenameXslt($v)			{$this->putInCustomData(self::CUSTOM_DATA_METADATA_FILENAME_XSLT, $v);}
 	public function setFlavorAssetFilenameXslt($v)		{$this->putInCustomData(self::CUSTOM_DATA_FLAVOR_ASSET_FILENAME_XSLT, $v);}
 	public function setThumbnailAssetFilenameXslt($v)	{$this->putInCustomData(self::CUSTOM_DATA_THUMBNAIL_ASSET_FILENAME_XSLT, $v);}
+	public function setAssetFilenameXslt($v)			{$this->putInCustomData(self::CUSTOM_DATA_ASSET_FILENAME_XSLT, $v);}
 }

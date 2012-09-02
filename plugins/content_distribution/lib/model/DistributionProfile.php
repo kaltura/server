@@ -23,6 +23,8 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	const CUSTOM_DATA_FIELD_RECOMMENDED_STORAGE_PROFILE_DOWNLOAD	= "recommendedStorageProfileForDownload";
 	const CUSTOM_DATA_FIELD_RECOMMENDED_DC_DOWNLOAD					= "recommendedDcForDownload";
 	const CUSTOM_DATA_FIELD_RECOMMENDED_DC_EXECUTE					= "recommendedDcForExecute";
+	const CUSTOM_DATA_FIELD_REQUIRED_ASSET_DISTRIBUTION_RULES		= "requiredAssetDistributionRules";
+	const CUSTOM_DATA_FIELD_OPTIONAL_ASSET_DISTRIBUTION_RULES		= "optionalAssetDistributionRules";
 	
 	/**
 	 * @return IDistributionProvider
@@ -339,6 +341,30 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		
 		foreach($requiredThumbDimensionsWithKeys as $key => $requiredThumbDimension)
 			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_THUMBNAIL, $key);
+		
+		$entryAssets = assetPeer::retrieveReadyByEntryId($entryDistribution->getEntryId());
+		
+		$requiredAssetDistributionRules = $this->getRequiredAssetDistributionRules();
+		foreach($requiredAssetDistributionRules as $entryAssetDistributionRule)
+		{
+			$foundMatchingAsset = false;
+			
+			/* @var $entryAssetDistributionRule kAssetDistributionRule */
+			foreach($entryAssets as $entryAsset)
+			{
+				/* @var $entryAsset asset */
+				if ($entryAssetDistributionRule->fulfilled($entryAsset))
+				{
+					$foundMatchingAsset = true;
+					break;
+				}
+			}
+			
+			if (!$foundMatchingAsset)
+			{
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_ASSET, $entryAssetDistributionRule->getValidationError());
+			}
+		}
 				
 		return $validationErrors;
 	}
@@ -405,6 +431,8 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	public function getRecommendedStorageProfileForDownload()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_STORAGE_PROFILE_DOWNLOAD);}	
 	public function getRecommendedDcForDownload()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_DC_DOWNLOAD);}
 	public function getRecommendedDcForExecute()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_DC_EXECUTE);}
+	public function getRequiredAssetDistributionRules()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_REQUIRED_ASSET_DISTRIBUTION_RULES, null, array());}
+	public function getOptionalAssetDistributionRules()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_OPTIONAL_ASSET_DISTRIBUTION_RULES, null, array());}
 	
 	public function incrementConfigVersion()					{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_CONFIG_VERSION);}
 	public function setSunriseDefaultOffset($v)					{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET, $v);}
@@ -412,6 +440,8 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	public function setRecommendedStorageProfileForDownload($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_STORAGE_PROFILE_DOWNLOAD, $v);}
 	public function setRecommendedDcForDownload($v)				{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_DC_DOWNLOAD, $v);}
 	public function setRecommendedDcForExecute($v)				{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_DC_EXECUTE, $v);}
+	public function setRequiredAssetDistributionRules($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_REQUIRED_ASSET_DISTRIBUTION_RULES, $v);}
+	public function setOptionalAssetDistributionRules($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_OPTIONAL_ASSET_DISTRIBUTION_RULES, $v);}
 	
 	public function getCacheInvalidationKeys()
 	{

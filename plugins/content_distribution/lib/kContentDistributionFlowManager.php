@@ -1405,6 +1405,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			EntryDistributionPeer::SUNSET,
 			EntryDistributionPeer::FLAVOR_ASSET_IDS,
 			EntryDistributionPeer::THUMB_ASSET_IDS,
+			EntryDistributionPeer::ASSET_IDS,
 		);
 		
 		foreach($updateRequiredFields as $updateRequiredField)
@@ -1709,6 +1710,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			{
 				$listChanged = kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
 				$listChanged = ($listChanged | kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
+				$listChanged = ($listChanged | kContentDistributionManager::assignAssets($entryDistribution, $entry, $distributionProfile));
 				
 				if(!$listChanged)
 				{
@@ -1744,6 +1746,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 				$listChanged = kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
 				$listChanged = ($listChanged | kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
+				$listChanged = ($listChanged | kContentDistributionManager::assignAssets($entryDistribution, $entry, $distributionProfile));
 				
 				if(!$listChanged)
 				{

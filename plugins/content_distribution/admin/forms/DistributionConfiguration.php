@@ -60,6 +60,36 @@ class Form_DistributionConfiguration extends Infra_Form
 					$object->optionalThumbDimensions[] = $dimensions;
 			}
 		}
+
+		$requiredAssetDistributionRules = array();
+		$optionalAssetDistributionRules = array();
+		foreach($properties as $key => $value)
+		{
+			if (strpos($key, 'asset_distribution_rule_') === 0)
+			{
+				$assetDistributionRule = new Kaltura_Client_ContentDistribution_Type_AssetDistributionRule();
+				$assetDistributionRule->validationError = $value['validation_error'];
+				$assetDistributionRule->assetDistributionConditions = array();
+				foreach($value as $subKey => $subValue)
+				{
+					if (strpos($subKey, 'asset_distribution_property_condition_') === 0)
+					{
+						$assetDistributionPropertyCondition = new Kaltura_Client_ContentDistribution_Type_AssetDistributionPropertyCondition();
+						$assetDistributionPropertyCondition->propertyName = $subValue['property_name'];
+						$assetDistributionPropertyCondition->propertyValue = $subValue['property_value'];
+						$assetDistributionRule->assetDistributionConditions[] = $assetDistributionPropertyCondition;
+					}
+				}
+
+				if (isset($value['required']) && $value['required'])
+					$requiredAssetDistributionRules[] = $assetDistributionRule;
+				else
+					$optionalAssetDistributionRules[] = $assetDistributionRule;
+			}
+		}
+
+		$object->requiredAssetDistributionRules = $requiredAssetDistributionRules;
+		$object->optionalAssetDistributionRules = $optionalAssetDistributionRules;
 		
 		return $object;
 	}
@@ -198,5 +228,28 @@ class Form_DistributionConfiguration extends Infra_Form
 				'decorators' => array('FormElements', 'Fieldset', array('HtmlTag',array('tag'=>'div','style'=>'display: none;', 'class' => 'newThumbDimensions'))),
 			)
 		);
+	}
+
+	public function addDistributionAssetRules($optionalDistributionAssetRules, $requiredDistributionAssetRules)
+	{
+		if (!is_array($optionalDistributionAssetRules))
+			$optionalDistributionAssetRules = array();
+		if (!is_array($requiredDistributionAssetRules))
+			$requiredDistributionAssetRules = array();
+
+		$assetDistributionRules = array_merge($requiredDistributionAssetRules, $optionalDistributionAssetRules);
+		$assetDistributionRulesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
+		$assetDistributionRulesSubForm->addDecorator('ViewScript', array(
+			'viewScript' => 'asset-distribution-rules-sub-form.phtml',
+		));
+		foreach($assetDistributionRules as $assetDistributionRule)
+		{
+			$assetDistributionRuleSubForm = new Form_AssetDistributionRuleSubForm();
+			$assetDistributionRuleSubForm->populateFromObject($assetDistributionRule);
+			if (in_array($assetDistributionRule, $requiredDistributionAssetRules))
+				$assetDistributionRuleSubForm->setIsRequired(true);
+			$assetDistributionRulesSubForm->addSubForm($assetDistributionRuleSubForm, 'asset_distribution_rule_'.spl_object_hash($assetDistributionRule));
+		}
+		$this->addSubForm($assetDistributionRulesSubForm, 'asset_distribution_rules');
 	}
 }

@@ -27,6 +27,10 @@ class KalturaDistributionValidationErrorArray extends KalturaTypedArray
 				case DistributionErrorType::MISSING_METADATA:
     				$nObj = new KalturaDistributionValidationErrorMissingMetadata();
     				break;
+
+				case DistributionErrorType::MISSING_ASSET:
+					$nObj = new KalturaDistributionValidationErrorMissingAsset();
+					break;
     			
 				case DistributionErrorType::INVALID_DATA:
 					if($obj->getMetadataProfileId())

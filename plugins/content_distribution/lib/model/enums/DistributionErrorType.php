@@ -9,4 +9,5 @@ interface DistributionErrorType extends BaseEnum
 	const MISSING_THUMBNAIL = 2;
 	const MISSING_METADATA = 3;
 	const INVALID_DATA = 4;
+	const MISSING_ASSET = 5;
 }

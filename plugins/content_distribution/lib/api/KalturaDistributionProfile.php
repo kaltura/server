@@ -95,7 +95,7 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 	public $optionalFlavorParamsIds;
 
 	/**
-	 * Comma separated flavor params ids that required to be readt before submission
+	 * Comma separated flavor params ids that required to be ready before submission
 	 * @var string
 	 */
 	public $requiredFlavorParamsIds;
@@ -112,6 +112,18 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 	 */
 	public $requiredThumbDimensions;
 	
+	/**
+	 * Asset Distribution Rules for assets that should be submitted if ready
+	 * @var KalturaAssetDistributionRulesArray
+	 */
+	public $optionalAssetDistributionRules;
+	
+	/**
+	 * Assets Asset Distribution Rules for assets that are required to be ready before submission
+	 * @var KalturaAssetDistributionRulesArray
+	 */
+	public $requiredAssetDistributionRules;
+		
 	/**
 	 * If entry distribution sunrise not specified that will be the default since entry creation time, in seconds
 	 * @var int
@@ -198,6 +210,29 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 				
 			$dbObject->setRequiredThumbDimensionsObjects($requiredThumbDimensionsArray);
 		}
+		
+		if($this->optionalAssetDistributionRules)
+		{
+			$optionalAssetDistributionRulesArray = array();
+			foreach($this->optionalAssetDistributionRules as $optionalAssetDistributionRule)
+			{
+				$optionalAssetDistributionRulesArray[] = $optionalAssetDistributionRule->toObject();
+			}
+		
+			$dbObject->setOptionalAssetDistributionRules($optionalAssetDistributionRulesArray);
+		}
+		
+			
+		if($this->requiredAssetDistributionRules)
+		{
+			$requiredAssetDistributionRulesArray = array();
+			foreach($this->requiredAssetDistributionRules as $requiredAssetDistributionRule)
+			{
+				$requiredAssetDistributionRulesArray[] = $requiredAssetDistributionRule->toObject();
+			}
+		
+			$dbObject->setRequiredAssetDistributionRules($requiredAssetDistributionRulesArray);
+		}
 
 		return $dbObject;
 	}
@@ -211,6 +246,9 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 		
 		$this->optionalThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getOptionalThumbDimensionsObjects());
 		$this->requiredThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getRequiredThumbDimensionsObjects());
+		
+		$this->optionalAssetDistributionRules = KalturaAssetDistributionRulesArray::fromDbArray($sourceObject->getOptionalAssetDistributionRules());
+		$this->requiredAssetDistributionRules = KalturaAssetDistributionRulesArray::fromDbArray($sourceObject->getRequiredAssetDistributionRules());
 	}
 	
 	public function getExtraFilters()

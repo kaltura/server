@@ -95,6 +95,11 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 		$thumbAssetIdsNode = $distribution->addChild('thumbAssetIds');
 		foreach($thumbAssetIds as $thumbAssetId)
 			$thumbAssetIdsNode->addChild('thumbAssetId', $thumbAssetId);
+		
+		$assetIds = explode(',', $entryDistribution->getAssetIds());
+		$assetIdsNode = $distribution->addChild('assetIds');
+		foreach($assetIds as $assetId)
+			$assetIdsNode->addChild('assetId', $assetId);
 			
 		if($entryDistribution->getErrorDescription())
 			$distribution->addChild('errorDescription', kMrssManager::stringToSafeXml($entryDistribution->getErrorDescription()));

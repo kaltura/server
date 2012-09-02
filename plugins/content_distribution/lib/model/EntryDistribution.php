@@ -255,6 +255,18 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 			
 		return parent::setThumbAssetIds($v);
 	}
+	
+	public function setAssetIds($v)
+	{
+		if(is_array($v))
+		{
+			$v = array_unique($v);
+			sort($v); // the sort is importanet to idetify changes, when the list is changed the update required flag is raised
+			$v = implode(',', $v);
+		}
+			
+		return parent::setAssetIds($v);
+	}
 
 	/**
 	 * @return array<kDistributionValidationError>
@@ -334,6 +346,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 			'dirty_status' => 'dirtyStatus',
 			'thumb_asset_ids' => 'thumbAssetIds',
 			'flavor_asset_ids' => 'flavorAssetIds',
+			'asset_ids' => 'assetIds',
 			'sunrise' => 'sunrise',
 			'sunset' => 'sunset',
 			'sun_status' => 'sunStatus',
@@ -359,6 +372,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		'dirty_status' => IIndexable::FIELD_TYPE_INTEGER,
 		'thumb_asset_ids' => IIndexable::FIELD_TYPE_STRING,
 		'flavor_asset_ids' => IIndexable::FIELD_TYPE_STRING,
+		'asset_ids' => IIndexable::FIELD_TYPE_STRING,
 		'sunrise' => IIndexable::FIELD_TYPE_DATETIME,
 		'sunset' => IIndexable::FIELD_TYPE_DATETIME,
 		'sun_status' => IIndexable::FIELD_TYPE_INTEGER,

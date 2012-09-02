@@ -38,6 +38,7 @@ class KalturaFtpDistributionJobProviderData extends KalturaConfigurableDistribut
 			return KalturaLog::err('Distribution profile #'.$distributionJobData->distributionProfileId.' is not instance of FtpDistributionProfile');
 
 		$this->filesForDistribution = $this->getDistributionFiles($distributionProfileDb, $entryDistributionDb);
+		KalturaLog::log("Files for distribution: ".print_r($this->filesForDistribution, true));
 	}
 		
 	/**
@@ -75,7 +76,13 @@ class KalturaFtpDistributionJobProviderData extends KalturaConfigurableDistribut
 		
 		$flavorAssetsIds = explode(',', $entryDistributionDb->getFlavorAssetIds());
 		$thumbnailAssetIds = explode(',', $entryDistributionDb->getThumbAssetIds());
-		$assets = assetPeer::retrieveByIds(array_merge($flavorAssetsIds, $thumbnailAssetIds));
+		$assetIds = explode(',', $entryDistributionDb->getAssetIds());
+		
+		
+		$assets = assetPeer::retrieveByIds(array_merge($flavorAssetsIds, $thumbnailAssetIds, $assetIds));
+		
+		KalturaLog::log("Assets to distribute: ".print_r($assets, true));
+		
 		foreach($assets as $asset) 
 		{
 			/* @var $assets asset */
@@ -83,13 +90,17 @@ class KalturaFtpDistributionJobProviderData extends KalturaConfigurableDistribut
 			
 			$file = new KalturaFtpDistributionFile();
 			$file->assetId = $asset->getId();
+			
 			$file->localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 			$file->version = $syncKey->getVersion();
 			$defaultFilename = pathinfo($file->localFilePath, PATHINFO_BASENAME);
+			
 			if ($asset instanceof thumbAsset)
 				$file->filename = $distributionProfileDb->getThumbnailAssetFilename($entryDistributionDb, $defaultFilename, $asset->getId());
-			else
+			else if ($asset instanceof flavorAsset)
 				$file->filename = $distributionProfileDb->getFlavorAssetFilename($entryDistributionDb, $defaultFilename, $asset->getId());
+			else 
+				$file->filename = $distributionProfileDb->getAssetFilename($entryDistributionDb, $defaultFilename, $asset->getId());
 				
 			$files[] = $file;
 		}

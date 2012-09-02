@@ -853,6 +853,70 @@ class kContentDistributionManager
 	}
 	
 	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param entry $entry
+	 * @param DistributionProfile $distributionProfile
+	 * @return boolean
+	 */
+	public static function assignAssets(EntryDistribution $entryDistribution, entry $entry, DistributionProfile $distributionProfile)
+	{
+		$submittingStatuses = array(
+				EntryDistributionStatus::PENDING,
+				EntryDistributionStatus::QUEUED,
+				EntryDistributionStatus::SUBMITTING,
+				EntryDistributionStatus::IMPORT_SUBMITTING,
+				EntryDistributionStatus::ERROR_SUBMITTING,
+		);
+	
+		// if not in first submmiting status then it's an update and need to check if update is supported.
+		if(!in_array($entryDistribution->getStatus(), $submittingStatuses))
+		{
+			$distributionProvider = $distributionProfile->getProvider();
+			if(!$distributionProvider)
+			{
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider not found");
+				return false;
+			}
+	
+			if(!$distributionProvider->isUpdateEnabled() || !$distributionProvider->isMediaUpdateEnabled())
+			{
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+				return false;
+			}
+		}
+	
+		$requiredAssetsConditions = $distributionProfile->getRequiredAssetDistributionRules();
+		$optionalAssetsConditions = $distributionProfile->getOptionalAssetDistributionRules();
+		$assetDistributionRules = array_merge($requiredAssetsConditions, $optionalAssetsConditions);
+
+		if(!is_array($assetDistributionRules))
+		{
+			return false;
+		}
+		
+		$assetIds = array();
+		$originalList = $entryDistribution->getAssetIds();
+		
+		$entryAssets = assetPeer::retrieveReadyByEntryId($entryDistribution->getEntryId());
+		
+		foreach ($assetDistributionRules as $assetDistributionRule)
+		{
+			/* @var $assetDistributionRule kAssetDistributionRule */
+			foreach ($entryAssets as $asset)
+			{
+				/* @var $asset asset */
+				if ($assetDistributionRule->fulfilled($asset))
+				{
+					$assetIds[] = $asset->getId(); 
+				}
+			}
+		}
+			
+		$entryDistribution->setAssetIds($assetIds);
+		return ($originalList != $entryDistribution->getAssetIds());
+	}
+	
+	/**
 	 * @param entry $entry
 	 * @param DistributionProfile $distributionProfile
 	 * @return EntryDistribution
@@ -867,6 +931,7 @@ class kContentDistributionManager
 		
 		self::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
 		self::assignThumbAssets($entryDistribution, $entry, $distributionProfile);
+		self::assignAssets($entryDistribution, $entry, $distributionProfile);
 		
 		$entryDistribution->save(); // need to save before checking validations
 		$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);

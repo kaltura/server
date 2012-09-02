@@ -176,6 +176,8 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 				$form->addThumbDimensions($dimensions, false);
 				
 		$form->addThumbDimensionsForm();
+
+		$form->addDistributionAssetRules($distributionProfile->optionalAssetDistributionRules, $distributionProfile->requiredAssetDistributionRules);
 	}
 }
 

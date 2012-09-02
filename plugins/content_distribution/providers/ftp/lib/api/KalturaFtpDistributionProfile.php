@@ -74,6 +74,11 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 	 * @var string
 	 */
 	 public $thumbnailAssetFilenameXslt;
+	 
+	 /**
+	  * @var string
+	  */
+	 public $assetFilenameXslt;
 	
 	
 	/*
@@ -95,6 +100,7 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 		'metadataFilenameXslt',
 		'flavorAssetFilenameXslt',
 		'thumbnailAssetFilenameXslt',
+		'assetFilenameXslt',
 	);
 		 
 	public function getMapBetweenObjects()

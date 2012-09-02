@@ -397,6 +397,16 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="assetIds" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Ids of assets to be submitted to the remote site</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="assetId" minOccurs="0" maxOccurs="unbounded" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="errorDescription" minOccurs="0" maxOccurs="1" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Submission error description</xs:documentation>
