@@ -27,15 +27,45 @@ class TagServiceTest extends TagServiceTestBase
 	}
 	
 	/**
+	 * Tests addition of tag with !
+	 * @param string $specialChar
+	 * @dataProvider provideData
+	 */
+	public function testTagAdditionExclamationMark($specialChar)
+	{
+	    return $this->testTagAdditionSpecialChar('!');
+
+	}
+	
+	/**
+	 * Tests addition of tag with "
+	 * @param string $specialChar
+	 * @dataProvider provideData
+	 */
+	public function testTagAdditionQuotes($specialChar)
+	{
+	    return $this->testTagAdditionSpecialChar('"');
+
+	}
+	
+	/**
+	 * Tests addition of tag with '
+	 * @param string $specialChar
+	 * @dataProvider provideData
+	 */
+	public function testTagAdditionApostrophe($specialChar)
+	{
+	    return $this->testTagAdditionSpecialChar("'");
+
+	}
+	
+	/**
 	 * Tests addition of tag with special character
 	 * @param string $specialChar
 	 * @dataProvider provideData
 	 */
 	public function testTagAdditionSpecialChar ($specialChar)
 	{
-	    //Ini file is normalized before runtime, therefore it is impossible to pass "!" character
-	    if (!$specialChar)
-	        $specialChar = '!';
 	    $media = new KalturaMediaEntry();
 	    $media->name = uniqid('media_');
 	    $media->mediaType = KalturaMediaType::VIDEO;
@@ -45,15 +75,45 @@ class TagServiceTest extends TagServiceTestBase
 	}
 	
 	/**
-	 * Tests addition of tag with special character
+	 * Tests addition of tag with !
+	 * @param string $specialChar
+	 * @dataProvider provideData
+	 */
+	public function testTagRemovalExclamationMark($specialChar)
+	{
+	    return $this->testTagRemovalSpecialChar('!');
+
+	}
+	
+	/**
+	 * Tests removal of tag with "
+	 * @param string $specialChar
+	 * @dataProvider provideData
+	 */
+	public function testTagRemovalQuotes($specialChar)
+	{
+	    return $this->testTagRemovalSpecialChar('"');
+
+	}
+	
+	/**
+	 * Tests removal of tag with '
+	 * @param string $specialChar
+	 * @dataProvider provideData
+	 */
+	public function testTagRemovalApostrophe($specialChar)
+	{
+	    return $this->testTagRemovalSpecialChar("'");
+
+	}
+	
+	/**
+	 * Tests removal of tag with special character
 	 * @param string $specialChar
 	 * @dataProvider provideData
 	 */
 	public function testTagRemovalSpecialChar ($specialChar)
 	{
-	    //Ini file is normalized before runtime, therefore it is impossible to pass "!" character
-	     if (!$specialChar)
-	        $specialChar = '!';
 	    $media = new KalturaMediaEntry();
 	    $media->name = uniqid('media_');
 	    $media->mediaType = KalturaMediaType::VIDEO;
