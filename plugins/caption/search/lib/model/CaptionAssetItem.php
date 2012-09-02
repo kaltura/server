@@ -54,6 +54,14 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		return $this->getId();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::indexToSearchIndex()
+	 */
+	public function indexToSearchIndex()
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
 
 	/**
 	 * @return string

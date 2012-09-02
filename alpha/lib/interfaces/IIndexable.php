@@ -46,4 +46,9 @@ interface IIndexable extends IBaseObject
 	 * @return IIndexable
 	 */
 	public function setUpdatedAt($time);
+	
+	/**
+	 * Index the object in the search engine
+	 */
+	public function indexToSearchIndex();
 }

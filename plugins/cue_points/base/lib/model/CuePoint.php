@@ -270,6 +270,14 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 			
 		return null;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::indexToSearchIndex()
+	 */
+	public function indexToSearchIndex()
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
 
 	/**
 	 * Get the [duration] column value.

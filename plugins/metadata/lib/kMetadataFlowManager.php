@@ -106,6 +106,7 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 		{
 			$relatedObject->setUpdatedAt(time());
 			$relatedObject->save();
+			$relatedObject->indexToSearchIndex();
 		}
 		
 		return true;

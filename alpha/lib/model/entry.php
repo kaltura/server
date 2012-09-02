@@ -1104,6 +1104,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IIndexable::indexToSearchIndex()
+	 */
 	public function indexToSearchIndex()
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
@@ -2594,7 +2597,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 * get all categoryEntry objects from categoryEntryPeer
 	 * to make search query shorter and to solve search problem when category tree is big.
  	 *
-	 *	let’s say entry belong to 2 categories with these full_ids
+	 *	letï¿½s say entry belong to 2 categories with these full_ids
 	 * 	111>222>333
 	 *	111>444
 	 * Old categories fields was: 
@@ -2605,10 +2608,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 * 
 	 * 
 	 * so why do we need pc111?
-	 * If baseEntry->list with filter categoriesMatchOr= ‘111’ you need to search for match pc111s2
+	 * If baseEntry->list with filter categoriesMatchOr= ï¿½111ï¿½ you need to search for match pc111s2
 	 * 
 	 * so why do we need p111?
-	 * If baseEntry->list with filter categoriesMatchOr= ‘111>’ you need to search for match p111s2
+	 * If baseEntry->list with filter categoriesMatchOr= ï¿½111>ï¿½ you need to search for match p111s2
 	 */
 	public function getCategoriesEntryIds()
 	{

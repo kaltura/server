@@ -1234,6 +1234,14 @@ class kuser extends Basekuser implements IIndexable
 			
 		return null;
     }
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::indexToSearchIndex()
+	 */
+	public function indexToSearchIndex()
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
     
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Baseentry#postInsert()

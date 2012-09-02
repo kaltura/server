@@ -383,6 +383,14 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	}
 	
 	/* (non-PHPdoc)
+	 * @see IIndexable::indexToSearchIndex()
+	 */
+	public function indexToSearchIndex()
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
+	
+	/* (non-PHPdoc)
 	 * @see lib/model/om/BaseEntryDistribution#postUpdate()
 	 */
 	public function postUpdate(PropelPDO $con = null)

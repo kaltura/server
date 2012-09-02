@@ -115,6 +115,14 @@ class Tag extends BaseTag implements IIndexable
         // TODO Auto-generated method stub
         
     }
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::indexToSearchIndex()
+	 */
+	public function indexToSearchIndex()
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
     
 	public function getSearchIndexFieldsEscapeType($fieldName)
 	{
