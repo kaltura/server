@@ -925,6 +925,7 @@ class myPartnerUtils
 	
 	public static function doPartnerUsage(Partner $partner)
 	{
+		KalturaLog::debug("Validating partner [" . $partner->getId() . "]");
 		if($partner->getExtendedFreeTrail())
 		{
 			if($partner->getExtendedFreeTrailExpiryDate() < time())
@@ -944,6 +945,7 @@ class myPartnerUtils
 					myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_EXTENED_FREE_TRAIL_ENDS_WARNING, $partner, $mail_parmas);
 				}			
 				
+				KalturaLog::debug("Partner [" . $partner->getId() . "] trial account extended");
 				return;
 			}
 			
