@@ -175,9 +175,7 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 	
 	protected function _initTimeZone()
 	{
-		$this->bootstrap('config');
-		$config = Zend_Registry::get('config');
-		date_default_timezone_set($config->settings->timeZone);
+		date_default_timezone_set(kConf::get('date_default_timezone'));
 	}
 	
 	protected function _initConfig()
