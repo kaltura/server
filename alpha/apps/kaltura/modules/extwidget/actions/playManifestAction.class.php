@@ -650,16 +650,9 @@ class playManifestAction extends kalturaAction
 		}
 		elseif($oneOnly)
 		{
-			$flavorAsset = assetPeer::retrieveBestPlayByEntryId($this->entryId);			
-			if(!$flavorAsset)
-			{
-				$webFlavorAssets = $this->getReadyFlavorsByTags();
-				if(count($webFlavorAssets))
-					$flavorAsset = reset($webFlavorAssets);
-			}
-				
-			if($flavorAsset)
-				$flavorAssets[] = $flavorAsset;
+			$webFlavorAssets = $this->getReadyFlavorsByTags();
+			if(count($webFlavorAssets))
+				$flavorAssets[] = reset($webFlavorAssets);
 		}
 		else 
 		{
