@@ -62,9 +62,9 @@ class kEntitlementUtils
 			return true;
 		}
 		
-		if($ks && $ks->isWidgetSession() && $ks->getDisableEntitlementForEntry() == $entry->getId())
+		if($ks && in_array($entry->getId(), $ks->getDisableEntitlementForEntry()))
 		{
-			KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: widget session that disble entitlement for this entry');
+			KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: ks disble entitlement for this entry');
 			return true;
 		}
 		

@@ -383,9 +383,9 @@ class entryPeer extends BaseentryPeer
 			$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		}
 		
-		if($ks && $ks->getDisableEntitlementForEntry())
+		if($ks && count($ks->getDisableEntitlementForEntry()))
 		{
-			$entryCrit = $c->getNewCriterion(entryPeer::ENTRY_ID, $ks->getDisableEntitlementForEntry(), Criteria::EQUAL);
+			$entryCrit = $c->getNewCriterion(entryPeer::ENTRY_ID, $ks->getDisableEntitlementForEntry(), Criteria::IN);
 			$entryCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 			
 			if($critEntitled)

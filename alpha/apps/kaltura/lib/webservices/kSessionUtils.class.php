@@ -326,6 +326,7 @@ class ks extends kSessionBase
 	
 	public function isValid( $partner_id , $puser_id , $type = false)
 	{
+		
 		if ( ! $this->valid_string ) return self::INVALID_STR;
 		if ( ! $this->matchPartner ( $partner_id ) ) return self::INVALID_PARTNER;
 		if ( ! $this->matchUser ( $puser_id ) ) return self::INVALID_USER;
@@ -525,15 +526,18 @@ class ks extends kSessionBase
 		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
 		// edit privilege (edit:XX,edit:YYY,...)
 		$allPrivileges = explode(',', $this->privileges);
+		
+		$entries = array();
+		
 		// foreach pair - check privileges on playlist
 		foreach($allPrivileges as $priv)
 		{
 			$exPrivileges = explode(':', $priv);
 			if ($exPrivileges[0] == self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY) 
-				return $exPrivileges[1];
+				$entries[] =  $exPrivileges[1];
 		}
 		
-		return false;
+		return $entries;
 	}
 	
 	public function getPrivacyContext()
