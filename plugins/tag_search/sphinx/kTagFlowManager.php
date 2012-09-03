@@ -5,6 +5,9 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     
     const PARTNER_ID_FIELD = "partner_id";
     
+    private static $specialCharacters = array ('!', '*', '"');
+    private static $specialCharactersReplacement = array ('\\!', '\\*', '\\"');
+    
 	/* (non-PHPdoc)
      * @see kObjectDeletedEventConsumer::objectDeleted()
      */
@@ -107,7 +110,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	{
 	    KalturaLog::info("In Object Added handler");
 	    $objectTags = $this->trimObjectTags($object->getTags());
-	    $objectTags = str_replace(array ('!', '*'), array ('\\!', '\\*'), $objectTags);
+	    $objectTags = str_replace(self::$specialCharacters, self::$specialCharactersReplacement, $objectTags);
 	    if (!count($objectTags))
 	    {
 	        return array();
@@ -148,7 +151,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	protected function checkExistForDelete (BaseObject $object, $tagsToCheck = null)
 	{
 	    $objectTags = $tagsToCheck ? $this->trimObjectTags($tagsToCheck) : $this->trimObjectTags($object->getTags());
-	    $objectTags = str_replace(array ('!', '*'), array ('\\!', '\\*'), $objectTags);
+	    $objectTags = str_replace(self::$specialCharacters, self::$specialCharactersReplacement, $objectTags);
 	    $tagsToKeep = array();
 	    foreach($objectTags as $objectTag)
 	    {
