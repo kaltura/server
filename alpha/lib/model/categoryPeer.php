@@ -50,10 +50,7 @@ class categoryPeer extends BasecategoryPeer
 			$kuser = null;
 			$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
 			if($ksString <> '')
-			{
-				$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-				$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid);
-			}
+				$kuser = kCurrentContext::getCurrentKsKuser();
 
 			if($kuser)
 			{
@@ -373,7 +370,7 @@ class categoryPeer extends BasecategoryPeer
 		$privacyContextCrit = $c->getNewCriterion(self::PRIVACY_CONTEXTS, kEntitlementUtils::getKsPrivacyContext(), KalturaCriteria::IN_LIKE);
 		$privacyContextCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$c->addAnd($privacyContextCrit);
-			
+
 		//set privacy by ks and type
 		$crit = $c->getNewCriterion ( self::PRIVACY, kEntitlementUtils::getPrivacyForKs(), Criteria::IN);
 		$crit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
@@ -382,10 +379,7 @@ class categoryPeer extends BasecategoryPeer
 		$kuser = null;
 		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
 		if($ksString <> '')
-		{
-			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid);
-		}
+			$kuser = kCurrentContext::getCurrentKsKuser();
 		
 		if($kuser)
 		{
