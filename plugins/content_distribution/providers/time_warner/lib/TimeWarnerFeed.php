@@ -85,7 +85,7 @@ class TimeWarnerFeed
 	 */
 	public function setNodeValue($xpath, $value, DOMNode $contextnode = null)
 	{
-		kXml::setNodeValue($this->doc, $this->xpath, $xpath, $value, $contextnode);
+		kXml::setNodeValue($this->xpath, $xpath, $value, $contextnode);
 	}
 	
 	/**
