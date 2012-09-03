@@ -65,7 +65,11 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
 			}
 			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
+				$passwordStracturePolicy = kConf::get('invalid_password_structure_message');
+				$partner = $dbUser->getPartner();
+				if($partner && $partner->getPasswordStracturePolicy())
+					$passwordStracturePolicy = $partner->getPasswordStracturePolicy();
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$passwordStracturePolicy);
 			}
 			throw $e;			
 		}

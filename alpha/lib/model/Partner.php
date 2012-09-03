@@ -236,6 +236,42 @@ class Partner extends BasePartner
 		return $this->putInCustomData( "flvConversionString", $v );
 	}	
 	
+	public function getPasswordStructureValidations()
+	{
+		return $this->getFromCustomData( "passwordStructureValidation" , null  );
+	}
+	
+	public function setPasswordStructureValidations( $v )
+	{
+		return $this->putInCustomData( "passwordStructureValidation", $v );
+	}
+	
+	
+	public function getPasswordStructurePolicy(){
+		$passwordStructurePolicy = '';
+		$structureValidations = $this->getPasswordStructureValidations();
+		if($structureValidations){
+			foreach ($structureValidations as $structureValidation){
+				$passwordStructurePolicy.= $structureValidation[1];	
+			}
+		}
+		return $passwordStructurePolicy;
+	}
+	
+	public function getPasswordValidationRegex(){
+		$regexps = array();
+		$partnerStructureValidations = $this->getPasswordStructureValidations();
+		if($partnerStructureValidations){
+			foreach ($partnerStructureValidations as $partnerStructureValidation){
+				if($partnerStructureValidation[0])
+					$regexps[] = $partnerStructureValidation[0];	
+			}
+		}		
+		return $regexps;
+	}
+	
+	
+	
 	/**
 	 * @deprecated getDefaultConversionProfileId should be used and is used by the new conversion profiles
 	 * @deprecated once the old conversion mechanism is completely obsolete - have this changed to the DEFAULT_COVERSION_PROFILE_TYPE 

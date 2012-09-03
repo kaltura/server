@@ -71,7 +71,15 @@ class KalturaBaseUserService extends KalturaBaseService
 					throw new KalturaAPIException(KalturaErrors::WRONG_OLD_PASSWORD);
 			}
 			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
+				$c = new Criteria(); 
+				$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
+				$loginData = UserLoginDataPeer::doSelectOne($c);
+				$partnerId = $loginData->getConfigPartnerId();
+				$partner = PartnerPeer::retrieveByPK($partnerId);
+				$passwordStracturePolicy = kConf::get('invalid_password_structure_message');
+				if($partner && $partner->getPasswordStracturePolicy())
+					$passwordStracturePolicy = $partner->getPasswordStracturePolicy();
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$passwordStracturePolicy);
 			}
 			else if ($code == kUserException::PASSWORD_ALREADY_USED) {
 				throw new KalturaAPIException(KalturaErrors::PASSWORD_ALREADY_USED);
@@ -244,7 +252,13 @@ class KalturaBaseUserService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_FOUND);
 			}
 			if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
+				$loginData = UserLoginDataPeer::isHashKeyValid($hashKey);
+				$partnerId = $loginData->getConfigPartnerId();
+				$partner = PartnerPeer::retrieveByPK($partnerId);
+				$passwordStructurePolicy = kConf::get('invalid_password_structure_message');
+				if($partner && $partner->getPasswordStructurePolicy())
+					$passwordStructurePolicy = $partner->getPasswordStructurePolicy();
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$passwordStructurePolicy);
 			}
 			if ($code == kUserException::NEW_PASSWORD_HASH_KEY_EXPIRED) {
 				throw new KalturaAPIException(KalturaErrors::NEW_PASSWORD_HASH_KEY_EXPIRED);
