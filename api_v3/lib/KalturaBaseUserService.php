@@ -76,10 +76,10 @@ class KalturaBaseUserService extends KalturaBaseService
 				$loginData = UserLoginDataPeer::doSelectOne($c);
 				$partnerId = $loginData->getConfigPartnerId();
 				$partner = PartnerPeer::retrieveByPK($partnerId);
-				$passwordStracturePolicy = kConf::get('invalid_password_structure_message');
-				if($partner && $partner->getPasswordStracturePolicy())
-					$passwordStracturePolicy = $partner->getPasswordStracturePolicy();
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$passwordStracturePolicy);
+				$passwordStructurePolicy = kConf::get('invalid_password_structure_message');
+				if($partner && $partner->getPasswordStructurePolicy())
+					$passwordStructurePolicy = $partner->getPasswordStructurePolicy();
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$passwordStructurePolicy);
 			}
 			else if ($code == kUserException::PASSWORD_ALREADY_USED) {
 				throw new KalturaAPIException(KalturaErrors::PASSWORD_ALREADY_USED);
