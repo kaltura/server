@@ -7,12 +7,15 @@
 class KalturaAssetDistributionRule extends KalturaObject
 {
 	/**
+	 * The validation error description that will be set on the "data" property on KalturaDistributionValidationErrorMissingAsset if rule was not fulfilled
+	 *
 	 * @var string
 	 */
 	public $validationError;
 
 	/**
-	 * Assets that should be submitted if ready
+	 * An array of asset distribution conditions
+	 *
 	 * @var KalturaAssetDistributionConditionsArray
 	 */
 	public $assetDistributionConditions;

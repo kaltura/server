@@ -1,17 +1,24 @@
 <?php
 
 /**
+ * Defines the condition to match a property and value on core asset object (or one if its inherited objects)
+ *
  * @package plugins.contentDistribution
  * @subpackage api.objects
  */
 class KalturaAssetDistributionPropertyCondition extends KalturaAssetDistributionCondition
 {
 	/**
+	 * The property name to look for, this will match to a getter on the asset object.
+	 * Should be camelCase naming convention (defining "myPropertyName" will look for getMyPropertyName())
+	 *
 	 * @var string
 	 */
 	public $propertyName;
 	
 	/**
+	 * The value to compare
+	 *
 	 * @var string
 	 */
 	public $propertyValue;

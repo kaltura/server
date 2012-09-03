@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Array of asset distribution conditions
+ *
  * @package plugins.contentDistribution
  * @subpackage api.objects
  */
