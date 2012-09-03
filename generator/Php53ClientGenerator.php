@@ -433,7 +433,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		if ($classNode->hasAttribute('base'))
 		{
 			$baseClassInfo = $this->getTypeClassInfo($classNode->getAttribute('base'));
-			$baseClass = $baseClassInfo->getClassName();
+			$baseClass = $baseClassInfo->getFullyQualifiedName();
 		}
 			
 		$this->appendLine($abstract . "class {$type->getClassName()} extends $baseClass");
