@@ -6,7 +6,7 @@
  */
 abstract class KalturaFileSyncBaseFilter extends KalturaFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"partnerIdEqual" => "_eq_partner_id",
 		"fileObjectTypeEqual" => "_eq_file_object_type",
@@ -39,7 +39,7 @@ abstract class KalturaFileSyncBaseFilter extends KalturaFilter
 		"fileSizeLessThanOrEqual" => "_lte_file_size",
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
@@ -55,12 +55,12 @@ abstract class KalturaFileSyncBaseFilter extends KalturaFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), KalturaFileSyncBaseFilter::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), KalturaFileSyncBaseFilter::$order_by_map);
 	}
 
 	/**

@@ -6,7 +6,7 @@
  */
 abstract class KalturaAttachmentAssetBaseFilter extends KalturaAssetFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"formatEqual" => "_eq_format",
 		"formatIn" => "_in_format",
@@ -15,18 +15,18 @@ abstract class KalturaAttachmentAssetBaseFilter extends KalturaAssetFilter
 		"statusNotIn" => "_notin_status",
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 	);
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), KalturaAttachmentAssetBaseFilter::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), KalturaAttachmentAssetBaseFilter::$order_by_map);
 	}
 
 	/**

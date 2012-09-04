@@ -6,7 +6,7 @@
  */
 abstract class KalturaAnnotationBaseFilter extends KalturaCuePointFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"parentIdEqual" => "_eq_parent_id",
 		"parentIdIn" => "_in_parent_id",
@@ -19,7 +19,7 @@ abstract class KalturaAnnotationBaseFilter extends KalturaCuePointFilter
 		"durationLessThanOrEqual" => "_lte_duration",
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 		"+endTime" => "+end_time",
 		"-endTime" => "-end_time",
@@ -29,12 +29,12 @@ abstract class KalturaAnnotationBaseFilter extends KalturaCuePointFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), KalturaAnnotationBaseFilter::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), KalturaAnnotationBaseFilter::$order_by_map);
 	}
 
 	/**

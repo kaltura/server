@@ -6,7 +6,7 @@
  */
 abstract class KalturaDropFolderFileBaseFilter extends KalturaFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
@@ -33,7 +33,7 @@ abstract class KalturaDropFolderFileBaseFilter extends KalturaFilter
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 		"+id" => "+id",
 		"-id" => "-id",
@@ -55,12 +55,12 @@ abstract class KalturaDropFolderFileBaseFilter extends KalturaFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), KalturaDropFolderFileBaseFilter::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), KalturaDropFolderFileBaseFilter::$order_by_map);
 	}
 
 	/**

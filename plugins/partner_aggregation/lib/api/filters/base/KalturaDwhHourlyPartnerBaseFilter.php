@@ -6,7 +6,7 @@
  */
 abstract class KalturaDwhHourlyPartnerBaseFilter extends KalturaFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"partnerIdEqual" => "_eq_partner_id",
 		"aggregatedTimeLessThanOrEqual" => "_lte_aggregated_time",
@@ -123,7 +123,7 @@ abstract class KalturaDwhHourlyPartnerBaseFilter extends KalturaFilter
 		"aggregatedLiveStreamingBandwidthGreaterThanOrEqual" => "_gte_aggregated_live_streaming_bandwidth",
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 		"+aggregatedTime" => "+aggregated_time",
 		"-aggregatedTime" => "-aggregated_time",
@@ -241,12 +241,12 @@ abstract class KalturaDwhHourlyPartnerBaseFilter extends KalturaFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), KalturaDwhHourlyPartnerBaseFilter::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), KalturaDwhHourlyPartnerBaseFilter::$order_by_map);
 	}
 
 	/**
