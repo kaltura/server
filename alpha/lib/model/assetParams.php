@@ -25,6 +25,7 @@ class assetParams extends BaseassetParams
 	const CONTAINER_FORMAT_MPEG = "mpeg";
 	const CONTAINER_FORMAT_MPEGTS = "mpegts";
 	const CONTAINER_FORMAT_APPLEHTTP = "applehttp";
+	const CONTAINER_FORMAT_WAV = "wav";
 	
 	const CONTAINER_FORMAT_PDF = 'pdf';
 	const CONTAINER_FORMAT_SWF = 'swf';
