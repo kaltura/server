@@ -421,14 +421,6 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		self::$kuser = !self::isEmpty(kCurrentContext::getCurrentKsKuser(true)) ? kCurrentContext::getCurrentKsKuser(true) : null;
 		self::$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : null;
 		self::$adminSession = !self::isEmpty(kCurrentContext::$is_admin_session) ? kCurrentContext::$is_admin_session : false;
-			
-		// clear instance pools
-		//TODO: may not be needed
-		UserRolePeer::clearInstancePool();
-		PermissionPeer::clearInstancePool();
-		PermissionItemPeer::clearInstancePool();
-		PermissionToPermissionItemPeer::clearInstancePool();
-		kuserPeer::clearInstancePool();
 		
 		// if ks defined - check that it is valid
 		self::errorIfKsNotValid();
