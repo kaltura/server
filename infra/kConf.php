@@ -21,16 +21,9 @@ class kConf
 		
 		self::$map = array();
 		
-		$deleted = false;
-		if(file_exists("$cacheDir/base.reload"))
-		{
-			$deleted = @unlink("$cacheDir/base.reload");
-			error_log("Base configuration reloaded");
-			if(!$deleted)
-				error_log("Failed to delete base.reload file");
-		}
+		$reloadFileExists = file_exists("$cacheDir/base.reload");
 		
-		if (!$deleted && function_exists('apc_fetch'))
+		if (!$reloadFileExists && function_exists('apc_fetch'))
 		{
 			self::$map = apc_fetch(self::APC_CACHE_MAP);
 			if(self::$map)
@@ -74,8 +67,18 @@ class kConf
 			
 		self::$map = $config;
 		
+		$res = true;
 		if(function_exists('apc_store'))
-			apc_store(self::APC_CACHE_MAP, self::$map);
+			$res = apc_store(self::APC_CACHE_MAP, self::$map);
+			
+		if($reloadFileExists && $res)
+		{
+			$deleted = @unlink("$cacheDir/base.reload");
+			error_log("Base configuration reloaded");
+			if(!$deleted)
+				error_log("Failed to delete base.reload file");
+		}
+			
 	}
 	
 	public static function getAll()
