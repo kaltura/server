@@ -796,6 +796,10 @@ abstract class BaseKshowKuserPeer {
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
+		
+		if($criteria instanceof KalturaCriteria)
+			$criteria->applyResultsSort($results);
+		
 		return $results;
 	}
 
@@ -862,6 +866,10 @@ abstract class BaseKshowKuserPeer {
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
+		
+		if($criteria instanceof KalturaCriteria)
+			$criteria->applyResultsSort($results);
+		
 		return $results;
 	}
 
