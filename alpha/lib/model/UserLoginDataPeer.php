@@ -511,7 +511,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			throw new kUserException('', kUserException::INVALID_EMAIL);
 		}
 			
-		$partner = partnerPeer::retrieveByPK($partnerId);
+		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$partner) {
 			throw new kUserException('', kUserException::INVALID_PARTNER);
 		}
