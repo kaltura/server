@@ -65,7 +65,5 @@ class KalturaTagFilter extends KalturaFilter
 	{
 		$this->validatePropertyMinLength('tagStartsWith', TagSearchPlugin::MIN_TAG_SEARCH_LENGTH, true);
 		$this->validatePropertyMinLength('tagEqual', TagSearchPlugin::MIN_TAG_SEARCH_LENGTH, true);
-		$this->validatePropertyNotNull(array ('tagEqual','tagStartsWith'), true);
-		
 	}
 }
