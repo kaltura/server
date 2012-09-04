@@ -6,23 +6,23 @@
  */
 abstract class KalturaUserLoginDataBaseFilter extends KalturaFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"loginEmailEqual" => "_eq_login_email",
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 	);
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), KalturaUserLoginDataBaseFilter::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), KalturaUserLoginDataBaseFilter::$order_by_map);
 	}
 
 	/**

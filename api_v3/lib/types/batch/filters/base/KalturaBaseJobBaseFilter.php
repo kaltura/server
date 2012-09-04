@@ -6,7 +6,7 @@
  */
 abstract class KalturaBaseJobBaseFilter extends KalturaFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"idEqual" => "_eq_id",
 		"idGreaterThanOrEqual" => "_gte_id",
@@ -25,7 +25,7 @@ abstract class KalturaBaseJobBaseFilter extends KalturaFilter
 		"lockVersionLessThanOrEqual" => "_lte_lock_version",
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
@@ -41,12 +41,12 @@ abstract class KalturaBaseJobBaseFilter extends KalturaFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), KalturaBaseJobBaseFilter::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), KalturaBaseJobBaseFilter::$order_by_map);
 	}
 
 	/**

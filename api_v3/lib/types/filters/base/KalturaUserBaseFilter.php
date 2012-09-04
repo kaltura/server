@@ -6,7 +6,7 @@
  */
 abstract class KalturaUserBaseFilter extends KalturaFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"partnerIdEqual" => "_eq_partner_id",
 		"screenNameLike" => "_like_screen_name",
@@ -24,7 +24,7 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 		"isAdminEqual" => "_eq_is_admin",
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 		"+id" => "+id",
 		"-id" => "-id",
@@ -34,12 +34,12 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), KalturaUserBaseFilter::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), KalturaUserBaseFilter::$order_by_map);
 	}
 
 	/**

@@ -6,7 +6,7 @@
  */
 abstract class KalturaReportBaseFilter extends KalturaFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
@@ -16,7 +16,7 @@ abstract class KalturaReportBaseFilter extends KalturaFilter
 		"systemNameIn" => "_in_system_name",
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
@@ -24,12 +24,12 @@ abstract class KalturaReportBaseFilter extends KalturaFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), KalturaReportBaseFilter::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), KalturaReportBaseFilter::$order_by_map);
 	}
 
 	/**

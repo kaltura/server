@@ -6,7 +6,7 @@
  */
 abstract class KalturaFlavorParamsOutputBaseFilter extends KalturaFlavorParamsFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"flavorParamsIdEqual" => "_eq_flavor_params_id",
 		"flavorParamsVersionEqual" => "_eq_flavor_params_version",
@@ -14,18 +14,18 @@ abstract class KalturaFlavorParamsOutputBaseFilter extends KalturaFlavorParamsFi
 		"flavorAssetVersionEqual" => "_eq_flavor_asset_version",
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 	);
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), KalturaFlavorParamsOutputBaseFilter::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), KalturaFlavorParamsOutputBaseFilter::$order_by_map);
 	}
 
 	/**

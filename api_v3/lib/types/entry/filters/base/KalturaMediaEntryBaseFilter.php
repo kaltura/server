@@ -6,7 +6,7 @@
  */
 abstract class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"mediaTypeEqual" => "_eq_media_type",
 		"mediaTypeIn" => "_in_media_type",
@@ -16,7 +16,7 @@ abstract class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
 		"flavorParamsIdsMatchAnd" => "_matchand_flavor_params_ids",
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 		"+mediaType" => "+media_type",
 		"-mediaType" => "-media_type",
@@ -24,12 +24,12 @@ abstract class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), KalturaMediaEntryBaseFilter::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), KalturaMediaEntryBaseFilter::$order_by_map);
 	}
 
 	/**

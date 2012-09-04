@@ -6,7 +6,7 @@
  */
 abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"durationLessThan" => "_lt_duration",
 		"durationGreaterThan" => "_gt_duration",
@@ -19,7 +19,7 @@ abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 		"durationTypeMatchOr" => "_matchor_duration_type",
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 		"+plays" => "+plays",
 		"-plays" => "-plays",
@@ -33,12 +33,12 @@ abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), KalturaPlayableEntryBaseFilter::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), KalturaPlayableEntryBaseFilter::$order_by_map);
 	}
 
 	/**
