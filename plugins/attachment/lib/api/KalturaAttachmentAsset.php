@@ -37,7 +37,6 @@ class KalturaAttachmentAsset extends KalturaAsset
 	(
 		"filename",
 		"title",
-		"description",
 		"format" => "containerFormat",
 		"status",
 	);
