@@ -310,5 +310,16 @@ class UserLoginData extends BaseUserLoginData {
 		
 		return true;
 	}
+	
+	//will return the relevant invalid password message in case the provided password is not valid.
+	public function getInvalidPasswordStructureMessage(){
+		$invalidPasswordStructureMessage='';
+		$partnerId = $this->getConfigPartnerId();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if($partner && $partner->getInvalidPasswordStructureMessage())
+			$invalidPasswordStructureMessage = $partner->getInvalidPasswordStructureMessage();
+		return $invalidPasswordStructureMessage; 
+	}
+	
 		
 } // UserLoginData

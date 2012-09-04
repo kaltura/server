@@ -209,8 +209,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		$regexps = kConf::get('user_login_password_structure');
 		if($partnerId){
 			$partner = PartnerPeer::retrieveByPK($partnerId);
-			if($partner && $partner->getPasswordValidationRegex())
-				$regexps = $partner->getPasswordValidationRegex();
+			if($partner && $partner->getPasswordStructureRegex())
+				$regexps = $partner->getPasswordStructureRegex();
 		}
 		if (!is_array($regexps)) {
 			$regexps = array($regexps);

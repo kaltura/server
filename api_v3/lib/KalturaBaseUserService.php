@@ -74,8 +74,8 @@ class KalturaBaseUserService extends KalturaBaseService
 				$c = new Criteria(); 
 				$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
 				$loginData = UserLoginDataPeer::doSelectOne($c);
-				$passwordStructureInvalidMessage = $this->getPasswordStructureInvalidMessage($loginData);
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$passwordStructureInvalidMessage);
+				$invalidPasswordStructureMessage = $loginData->getInvalidPasswordStructureMessage();
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$invalidPasswordStructureMessage);
 			}
 			else if ($code == kUserException::PASSWORD_ALREADY_USED) {
 				throw new KalturaAPIException(KalturaErrors::PASSWORD_ALREADY_USED);
@@ -249,8 +249,8 @@ class KalturaBaseUserService extends KalturaBaseService
 			}
 			if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
 				$loginData = UserLoginDataPeer::isHashKeyValid($hashKey);
-				$passwordStructureInvalidMessage = $this->getPasswordStructureInvalidMessage($loginData);
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$passwordStructureInvalidMessage);
+				$invalidPasswordStructureMessage = $loginData->getInvalidPasswordStructureMessage();
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$invalidPasswordStructureMessage);
 			}
 			if ($code == kUserException::NEW_PASSWORD_HASH_KEY_EXPIRED) {
 				throw new KalturaAPIException(KalturaErrors::NEW_PASSWORD_HASH_KEY_EXPIRED);
@@ -269,13 +269,4 @@ class KalturaBaseUserService extends KalturaBaseService
 		}
 	}
 	
-	
-	private function getPasswordStructureInvalidMessage($loginData){
-		$partnerId = $loginData->getConfigPartnerId();
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		$passwordStructureInvalidMessage = kConf::get('invalid_password_structure_message');
-		if($partner && $partner->getPasswordStructurePolicy())
-			$passwordStructureInvalidMessage = $partner->getPasswordStructurePolicy();
-		return $passwordStructureInvalidMessage; 
-	}
 }

@@ -247,27 +247,29 @@ class Partner extends BasePartner
 	}
 	
 	
-	public function getPasswordStructurePolicy(){
-		$passwordStructurePolicy = '';
+	public function getInvalidPasswordStructureMessage(){
+		$invalidPasswordStructureMessage = kConf::get('invalid_password_structure_message');
 		$structureValidations = $this->getPasswordStructureValidations();
-		if($structureValidations){
+		if($structureValidations && is_array($structureValidations)){
+			$invalidPasswordStructureMessage ='';
 			foreach ($structureValidations as $structureValidation){
-				$passwordStructurePolicy.= $structureValidation[1];	
+				$invalidPasswordStructureMessage.= $structureValidation[1];	
 			}
 		}
-		return $passwordStructurePolicy;
+		return $invalidPasswordStructureMessage;
 	}
 	
-	public function getPasswordValidationRegex(){
-		$regexps = array();
-		$partnerStructureValidations = $this->getPasswordStructureValidations();
-		if($partnerStructureValidations){
-			foreach ($partnerStructureValidations as $partnerStructureValidation){
-				if($partnerStructureValidation[0])
-					$regexps[] = $partnerStructureValidation[0];	
+	public function getPasswordStructureRegex(){
+		$passwordStructureRegex = null;
+		$structureValidations = $this->getPasswordStructureValidations();
+		if($structureValidations && is_array($structureValidations)){
+			$passwordStructureRegex = array();
+			foreach ($structureValidations as $structureValidation){
+				if($structureValidation[0])
+					$passwordStructureRegex[] = $structureValidation[0];	
 			}
 		}		
-		return $regexps;
+		return $passwordStructureRegex;
 	}
 	
 	
