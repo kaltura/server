@@ -42,17 +42,25 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	protected function getFilePath($key)
 	{
 		$filePath = $this->baseFolder;
+		$keyFileName = basename($key);
+		$keyDirName = dirname($key);
+		if ($keyDirName != '.')
+			$filePath .= $keyDirName . '/';
 		if ($this->keyFolderChars)
 		{
-			$dashPos = strrpos($key, '-');
+			$dashPos = strrpos($keyFileName, '-');
 			$startPos = 0;
 			if ($dashPos !== false)
 			{
 				$startPos = $dashPos + 1;
 			}
-			$filePath .= substr($key, $startPos, $this->keyFolderChars) . '/';
+			$foldersPart = substr($keyFileName, $startPos, $this->keyFolderChars);
+			for ($curPos = 0; $curPos < strlen($foldersPart); $curPos += 2)
+			{
+				$filePath .= substr($foldersPart, $curPos, 2) . '/';
+			}
 		}
-		return $filePath . $key;
+		return $filePath . $keyFileName;
 	}
 
 	/**
