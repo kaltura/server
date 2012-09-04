@@ -20,11 +20,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	
 	public static function file_exists ( FileSyncKey $key , $fetch_from_remote_if_no_local = false )
 	{
-		KalturaLog::log(__METHOD__." - key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local]");
+		KalturaLog::log("key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local]");
 		list ( $file_sync , $local ) = self::getReadyFileSyncForKey( $key , $fetch_from_remote_if_no_local , false  );
 		if ( ! $file_sync ) 
 		{
-			KalturaLog::log(__METHOD__." - FileSync not found");
+			KalturaLog::log("FileSync not found");
 			return false;
 		}
 		else
@@ -36,18 +36,18 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 
 		$file_exists = file_exists ( $file_sync->getFullPath() );
 		
-		KalturaLog::log(__METHOD__." - file_exists? [$file_exists] fe took [".(microtime(true)-$startTime)."] path [".$file_sync->getFullPath()."]");
+		KalturaLog::log("file_exists? [$file_exists] fe took [".(microtime(true)-$startTime)."] path [".$file_sync->getFullPath()."]");
 		
 		return $file_exists;
 	}
 	
 	public static function fileSync_exists ( FileSyncKey $key )
 	{
-		KalturaLog::log(__METHOD__." - key [$key]");
+		KalturaLog::log("key [$key]");
 		list ( $file_sync , $local ) = self::getReadyFileSyncForKey( $key , true , false  );
 		if ( ! $file_sync ) 
 		{
-			KalturaLog::log(__METHOD__." - FileSync not found");
+			KalturaLog::log("FileSync not found");
 			return false;
 		}
 		return true;
@@ -62,13 +62,13 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 			{
 				$startTime = microtime(true);
 				$contents = file_get_contents( $real_path);
-				KalturaLog::log(__METHOD__." - file was found locally at [$real_path] fgc took [".(microtime(true) - $startTime)."]");
+				KalturaLog::log("file was found locally at [$real_path] fgc took [".(microtime(true) - $startTime)."]");
 
 				return $contents;
 			}
 			else
 			{
-				KalturaLog::log(__METHOD__." - file was not found locally [$real_path]");
+				KalturaLog::log("file was not found locally [$real_path]");
 				throw new kFileSyncException("Cannot find file on local disk [$real_path] for file sync [" . $file_sync->getId() . "]", kFileSyncException::FILE_DOES_NOT_EXIST_ON_DISK);
 			}
 		}
@@ -107,7 +107,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 			}
 		}
 		
-		KalturaLog::log(__METHOD__." - key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
+		KalturaLog::log("key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
 		list ( $file_sync , $local ) = self::getReadyFileSyncForKey( $key , $fetch_from_remote_if_no_local , $strict );
 		if($file_sync)
 		{
@@ -126,7 +126,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 			return $result;
 		}
 		
-		KalturaLog::log(__METHOD__." - FileSync not found");
+		KalturaLog::log("FileSync not found");
 		return null;
 	}
 	
@@ -138,7 +138,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	 */
 	public static function file_put_contents ( FileSyncKey $key , $content , $strict = true )
 	{
-		KalturaLog::log(__METHOD__." - key [$key], strict [$strict]");
+		KalturaLog::log("key [$key], strict [$strict]");
 		
 		// make sure that there is not yet a record for the key
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
@@ -159,7 +159,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		
 		if ( !file_exists( dirname( $fullPath ))) 
 		{
-			KalturaLog::log(__METHOD__." - creating directory for file");
+			KalturaLog::log("creating directory for file");
 			kFile::fullMkdir ( $fullPath );
 		}
 		
@@ -185,7 +185,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		
 		if(file_exists($target_file_path))
 		{
-			KalturaLog::log(__METHOD__." - $target_file_path file exists");	
+			KalturaLog::debug("Target file [$target_file_path] exists");	
 			if(!$overwrite)
 			{
 				KalturaLog::log("target [$target_file_path] exists, not overwriting");
@@ -203,7 +203,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		}
 		else
 		{
-			KalturaLog::log(__METHOD__." - $target_file_path file doesnt exist");	
+			KalturaLog::log("$target_file_path file doesnt exist");	
 		}
 		
 		// make sure folder exists
@@ -244,7 +244,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	
 	public static function moveFromFile ( $temp_file_path , FileSyncKey $target_key , $strict = true, $copyOnly = false, $cacheOnly = false)
 	{
-		KalturaLog::log(__METHOD__." - move file: [$temp_file_path] to key [$target_key], ");
+		KalturaLog::log("move file: [$temp_file_path] to key [$target_key], ");
 		
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $target_key );
 		
@@ -256,7 +256,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		$existsFileSync = FileSyncPeer::doSelectOne( $c );
 		if($existsFileSync)
 		{
-			KalturaLog::log(__METHOD__." - file already exists");
+			KalturaLog::log("file already exists");
 			if($strict)
 				throw new Exception ( "key [" . $target_key . "] already exists");
 		}
@@ -265,22 +265,22 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		if(!$targetFullPath)
 		{
 			$targetFullPath = kPathManager::getFilePath($target_key);
-			KalturaLog::log(__METHOD__." - Generated new path [$targetFullPath]");
+			KalturaLog::log("Generated new path [$targetFullPath]");
 		}
 		
 		if ( !file_exists( dirname( $targetFullPath )))
 		{
-			KalturaLog::log(__METHOD__." - creating directory for file");
+			KalturaLog::log("creating directory for file");
 			kFile::fullMkdir ( $targetFullPath );
 		}
 		
 		if ( file_exists( $temp_file_path ))
 		{
-			KalturaLog::log(__METHOD__." - $temp_file_path file exists");	
+			KalturaLog::log("$temp_file_path file exists");	
 		}
 		else
 		{
-			KalturaLog::log(__METHOD__." - $temp_file_path file doesnt exist");	
+			KalturaLog::log("$temp_file_path file doesnt exist");	
 		}
 		
 		if($copyOnly)
@@ -299,7 +299,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		}
 		else
 		{
-			KalturaLog::log(__METHOD__." - could not move file from [$temp_file_path] to [{$targetFullPath}]");
+			KalturaLog::log("could not move file from [$temp_file_path] to [{$targetFullPath}]");
 			throw new Exception ( "Could not move file from [$temp_file_path] to [{$targetFullPath}]");
 		}
 		
@@ -307,14 +307,14 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	
 	public static function copyFromSyncKey(FileSyncKey $source_key, FileSyncKey $target_key, $strict = true)
 	{
-		KalturaLog::log(__METHOD__." - copy to url: source_key [$source_key], target_key [$target_key]");
+		KalturaLog::log("copy to url: source_key [$source_key], target_key [$target_key]");
 		
 		// check if source exists
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $source_key );
 		$srcRes = FileSyncPeer::doSelectOne( $c );
 		if ( !$srcRes )
 		{
-			KalturaLog::log(__METHOD__." - file does not exists");
+			KalturaLog::log("file does not exists");
 			throw new Exception ( "key [" . $source_key . "] does not exists");
 		}
 	
@@ -322,7 +322,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		$destRes = FileSyncPeer::doSelectOne( $c );
 		if ( $destRes && $strict )
 		{
-			KalturaLog::log(__METHOD__." - url already exists");
+			KalturaLog::log("url already exists");
 			throw new Exception ( "key [" . $target_key . "] already exists");
 		}
 		
@@ -331,7 +331,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	
 	public static function copyFromFile ($temp_file_path , FileSyncKey $target_key , $strict = true)
 	{
-		KalturaLog::log(__METHOD__." - copy file: [$temp_file_path] to key [$target_key], ");
+		KalturaLog::log("copy file: [$temp_file_path] to key [$target_key], ");
 		kFileSyncUtils::moveFromFile($temp_file_path, $target_key, $strict, true);
 	}
 
@@ -620,7 +620,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		}
 		else
 		{
-			$error = __METHOD__. " Cannot find object type [" . $key->getObjectType() . "] with object_id [" . $key->getObjectId() . "] for FileSync id [" . $key->getId() . "]";
+			$error = "Cannot find object type [" . $key->getObjectType() . "] with object_id [" . $key->getObjectId() . "] for FileSync id [" . $key->getId() . "]";
 			KalturaLog::log($error);
 			throw new Exception ( $error );
 		}
@@ -665,7 +665,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	 */
 	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true )
 	{
-		KalturaLog::log(__METHOD__." - key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
+		KalturaLog::log("key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
 		$dc = kDataCenterMgr::getCurrentDc();
 		$dc_id = $dc["id"];
 		$c = new Criteria();
@@ -682,7 +682,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		$file_sync_list = FileSyncPeer::doSelect( $c );
 		if ( $file_sync_list == null )
 		{
-			KalturaLog::log(__METHOD__." - FileSync was not found"); 
+			KalturaLog::log("FileSync was not found"); 
 			if ( $strict )
 				throw new Exception ( "Cannot find ANY FileSync for " . ( $key ) );
 			else 
@@ -719,14 +719,14 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		if ( $desired_file_sync )
 		{
 			if ($local)
-				KalturaLog::log(__METHOD__." - FileSync was found locally");
+				KalturaLog::log("FileSync was found locally");
 			else
-				KalturaLog::log(__METHOD__." - FileSync was found but doesn't exists locally");
+				KalturaLog::log("FileSync was found but doesn't exists locally");
 				
 			return array ( $desired_file_sync , $local );
 		}		
 		
-		KalturaLog::log(__METHOD__." - exact FileSync was not found");
+		KalturaLog::log("exact FileSync was not found");
 		
 		if ( $strict )
 			throw new Exception ( "Cannot find EXACT FileSync for " . ( $key ) );
@@ -741,13 +741,13 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	 */
 	public static function getLocalFilePathForKey ( FileSyncKey $key , $strict = false )
 	{
-		KalturaLog::log(__METHOD__." - key [$key], strict [$strict]");
+		KalturaLog::log("key [$key], strict [$strict]");
 		$file_sync = self::getLocalFileSyncForKey( $key , $strict );
 		if ( $file_sync )
 		{
 			$parent_file_sync = self::resolve($file_sync);
 			$path = $parent_file_sync->getFileRoot() . $parent_file_sync->getFilePath();
-			KalturaLog::log(__METHOD__." - path [$path]");
+			KalturaLog::log("path [$path]");
 			return $path;
 		}
 		
@@ -762,26 +762,26 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	 */
 	public static function getRelativeFilePathForKey ( FileSyncKey $key , $strict = false )
 	{
-		KalturaLog::log(__METHOD__." - key [$key], strict [$strict]");
+		KalturaLog::log("key [$key], strict [$strict]");
 		$file_sync = self::getLocalFileSyncForKey( $key , $strict );
 		if ( $file_sync )
 		{
 			$parent_file_sync = self::resolve($file_sync);
 			$path = $parent_file_sync->getFilePath();
-			KalturaLog::log(__METHOD__." - path [$path]");
+			KalturaLog::log("path [$path]");
 			return $path;
 		}
 	}
 	
 	public static function getReadyLocalFilePathForKey( FileSyncKey $key , $strict = false )
 	{
-		KalturaLog::log(__METHOD__." - key [$key], strict [$strict]");
+		KalturaLog::log("key [$key], strict [$strict]");
 		list ( $file_sync , $local )= self::getReadyFileSyncForKey( $key , false , $strict );
 		if ( $file_sync )
 		{
 			$parent_file_sync = self::resolve($file_sync);
 			$path = $parent_file_sync->getFileRoot() . $parent_file_sync->getFilePath();
-			KalturaLog::log(__METHOD__." - path [$path]");
+			KalturaLog::log("path [$path]");
 			return $path;
 		}
 	}
@@ -795,7 +795,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	 */
 	public static function createSyncFileForKey ( FileSyncKey $key , $strict = true , $already_exists = false, $cacheOnly = false)
 	{
-		KalturaLog::log(__METHOD__." - key [$key], strict[$strict], already_exists[$already_exists]");
+		KalturaLog::log("key [$key], strict[$strict], already_exists[$already_exists]");
 		// TODO - see that if in strict mode - there are no duplicate keys -> update existing records AND set the other DC's records to PENDING
 		$dc = kDataCenterMgr::getCurrentDc();
 		$dc_id = $dc["id"];
@@ -890,7 +890,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	public static function createPendingExternalSyncFileForKey(FileSyncKey $key, StorageProfile $externalStorage)
 	{
 		$externalStorageId = $externalStorage->getId();
-		KalturaLog::log(__METHOD__." - key [$key], externalStorage [$externalStorageId]");
+		KalturaLog::log("key [$key], externalStorage [$externalStorageId]");
 		
 		list($fileRoot, $realPath) = kPathManager::getFilePathArr($key, $externalStorageId);
 		
@@ -932,7 +932,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	public static function createReadyExternalSyncFileForKey(FileSyncKey $key, $url, StorageProfile $externalStorage)
 	{
 		$externalStorageId = $externalStorage->getId();
-		KalturaLog::log(__METHOD__." - key [$key], externalStorage [$externalStorageId]");
+		KalturaLog::log("key [$key], externalStorage [$externalStorageId]");
 		
 		$fileRoot = $externalStorage->getDeliveryHttpBaseUrl();
 		$filePath = str_replace($fileRoot, '', $url);
@@ -966,7 +966,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	 */
 	public static function createSyncFileLinkForKey ( FileSyncKey $target_key , FileSyncKey $source_key )
 	{
-		KalturaLog::log(__METHOD__." - target_key [$target_key], source_key [$source_key]");
+		KalturaLog::log("target_key [$target_key], source_key [$source_key]");
 		// TODO - see that if in strict mode - there are no duplicate keys -> update existing records AND set the other DC's records to PENDING
 		$dc = kDataCenterMgr::getCurrentDc();
 		$dc_id = $dc["id"];
@@ -974,7 +974,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		list($sourceFile, $local) = self::getReadyFileSyncForKey($source_key, true, false);
 		if (!$sourceFile)
 		{
-			KalturaLog::log(__METHOD__." - Warning: no source. target_key [$target_key], source_key [$source_key] ");
+			KalturaLog::log("Warning: no source. target_key [$target_key], source_key [$source_key] ");
 			return null;
 		}
 		
@@ -1196,7 +1196,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 	 */
 	public static function retrieveObjectForFileSync ( FileSync $file_sync )
 	{
-		KalturaLog::log(__METHOD__." - FileSync id [" . $file_sync->getId() . "]" );
+		KalturaLog::log("FileSync id [" . $file_sync->getId() . "]" );
 		return kFileSyncObjectManager::retrieveObject( $file_sync->getObjectType(), $file_sync->getObjectId() );
 	}
 	
