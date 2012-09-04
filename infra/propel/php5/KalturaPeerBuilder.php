@@ -762,6 +762,10 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 			\$results[] = \$obj1;
 		}
 		\$stmt->closeCursor();
+		
+		if(\$criteria instanceof KalturaCriteria)
+			\$criteria->applyResultsSort(\$results);
+		
 		return \$results;
 	}
 ";
