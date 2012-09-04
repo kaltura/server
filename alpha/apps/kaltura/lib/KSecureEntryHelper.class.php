@@ -250,6 +250,20 @@ class KSecureEntryHelper
 		 return (!$this->ksStr || ($this->ks && $this->ks->isWidgetSession()));
 	}
 	
+	/**
+	 * Indicates that the KS user is the owner of the entry
+	 * @return bool
+	 */
+	protected function isKsUserOwnsEntry()
+	{
+		return (!$this->isKsWidget() && $this->ks && $this->entry && $this->entry->getKuserId() == $this->ks->getKuserId());
+	}
+	
+	
+	/**
+	 * Indicates that the entry is not approved
+	 * @return bool
+	 */
 	protected function isEntryInModeration()
 	{
 		$entry = $this->entry;
@@ -259,7 +273,13 @@ class KSecureEntryHelper
 			entry::ENTRY_MODERATION_STATUS_REJECTED
 		);
 		
-		return in_array($moderationStatus, $invalidModerationStatuses);
+		if(!in_array($moderationStatus, $invalidModerationStatuses))
+			return false;
+			
+		if($this->isKsAdmin() || $this->isKsUserOwnsEntry())
+			return false;
+			
+		return true;
 	}
 	
 	/**

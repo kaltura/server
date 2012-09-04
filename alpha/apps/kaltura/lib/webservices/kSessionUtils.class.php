@@ -244,6 +244,11 @@ class ks extends kSessionBase
 	public $error;
 
 	private $valid_string=false;
+	
+	/**
+	 * @var kuser
+	 */
+	protected $kuser = null;
 
 	public static function getErrorStr ( $code )
 	{
@@ -372,15 +377,39 @@ class ks extends kSessionBase
 		// creates the kuser
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_END_USER_REPORTS, $partner_id))
 		{
-			$kuser = kuserPeer::createKuserForPartner($partner_id, $puser_id);
+			$this->kuser = kuserPeer::createKuserForPartner($partner_id, $puser_id);
 			if(!$puser_id)
 			{
-				$kuser->setScreenName('Unknown');
-				$kuser->save();
+				$this->kuser->setScreenName('Unknown');
+				$this->kuser->save();
 			}
 		}
 		
 		return self::OK;
+	}
+	
+	/**
+	 * @return kuser
+	 */
+	public function getKuser()
+	{
+		if(!$this->kuser)
+			$this->kuser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $this->user);
+			
+		return $this->kuser;
+	}
+	
+	/**
+	 * @return int
+	 */
+	public function getKuserId()
+	{
+		$this->getKuser();
+		
+		if($this->kuser)			
+			return $this->kuser->getId();
+			
+		return null;
 	}
 	
 	public function isValidForPartner($partner_id)
