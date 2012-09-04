@@ -125,7 +125,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		$this->appendLine(" */");
 		$this->appendLine("abstract class $filterClassName extends $partnetClassName");
 		$this->appendLine("{");
-		$this->appendLine("	private \$map_between_objects = array");
+		$this->appendLine("	static private \$map_between_objects = array");
 		$this->appendLine("	(");
 		
 		// properies map
@@ -170,7 +170,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		$this->appendLine("");
 		
 		// order by map
-		$this->appendLine("	private \$order_by_map = array");
+		$this->appendLine("	static private \$order_by_map = array");
 		$this->appendLine("	(");
 		foreach($type->getCurrentProperties() as $prop)
 		{
@@ -206,12 +206,12 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		
 		$this->appendLine("	public function getMapBetweenObjects()");
 		$this->appendLine("	{");
-		$this->appendLine("		return array_merge(parent::getMapBetweenObjects(), \$this->map_between_objects);");
+		$this->appendLine("		return array_merge(parent::getMapBetweenObjects(), {$filterClassName}::\$map_between_objects);");
 		$this->appendLine("	}");
 		$this->appendLine();
 		$this->appendLine("	public function getOrderByMap()");
 		$this->appendLine("	{");
-		$this->appendLine("		return array_merge(parent::getOrderByMap(), \$this->order_by_map);");
+		$this->appendLine("		return array_merge(parent::getOrderByMap(), {$filterClassName}::\$order_by_map);");
 		$this->appendLine("	}");
 		
 		// class properties
