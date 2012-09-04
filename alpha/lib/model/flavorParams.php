@@ -40,6 +40,11 @@ class flavorParams extends assetParams
 	const VIDEO_CODEC_WVC1A = "wvc1a";
 	const VIDEO_CODEC_VP8 = "vp8";
 	const VIDEO_CODEC_MPEG2 = "mpeg2";
+	const VIDEO_CODEC_APCO = "apco";
+	const VIDEO_CODEC_APCS = "apcs";
+	const VIDEO_CODEC_APCN = "apcn";
+	const VIDEO_CODEC_APCH = "apch";
+	const VIDEO_CODEC_DNXHD = "dnxhd";
 	const VIDEO_CODEC_COPY = "copy";
 	
 	const AUDIO_CODEC_NONE = "";
@@ -51,6 +56,7 @@ class flavorParams extends assetParams
 	const AUDIO_CODEC_AMRNB = "amrnb";
 	const AUDIO_CODEC_MPEG2 = "mpeg2";
 	const AUDIO_CODEC_AC3 = "ac3";
+	const AUDIO_CODEC_PCMS16LE = "pcm_s16le";
 	const AUDIO_CODEC_COPY = "copy";
 	
 	const CUSTOM_DATA_FIELD_VIDEO_CODEC = "FlavorVideoCodec";
@@ -110,4 +116,13 @@ class flavorParams extends assetParams
 	
 	public function setIsGopInSec($v)	{$this->putInCustomData('IsGopInSec', $v);}
 	public function getIsGopInSec()	{return $this->getFromCustomData('IsGopInSec', null, 0);}
+	
+	public function setIsAvoidVideoShrinkFramesizeToSource($v) 	{$this->putInCustomData('IsAvoidVideoShrinkFramesizeToSource', $v);}
+	public function getIsAvoidVideoShrinkFramesizeToSource()	{return $this->getFromCustomData('IsAvoidVideoShrinkFramesizeToSource', null, 0);}
+
+	public function setIsAvoidVideoShrinkBitrateToSource($v) 	{$this->putInCustomData('IsAvoidVideoShrinkBitrateToSource', $v);}
+	public function getIsAvoidVideoShrinkBitrateToSource()		{return $this->getFromCustomData('IsAvoidVideoShrinkBitrateToSource', null, 0);}
+
+	public function setIsVideoFrameRateForLowBrAppleHls($v) 	{$this->putInCustomData('IsVideoFrameRateForLowBrAppleHls', $v);}
+	public function getIsVideoFrameRateForLowBrAppleHls()		{return $this->getFromCustomData('IsVideoFrameRateForLowBrAppleHls', null, 0);}
 }
