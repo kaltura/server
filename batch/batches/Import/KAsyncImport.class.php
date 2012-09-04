@@ -58,7 +58,15 @@ class KAsyncImport extends KJobHandlerWorker
 		KalturaLog::debug("fetchFile($job->id)");
 		
 		$jobSubType = $job->jobSubType;
-		if (in_array($jobSubType, array(kFileTransferMgrType::SCP, kFileTransferMgrType::SFTP)))
+		
+		$sshProtocols = array(
+			kFileTransferMgrType::SCP, 
+			kFileTransferMgrType::SFTP,
+			kFileTransferMgrType::SFTP_CMD,
+			kFileTransferMgrType::SFTP_SEC_LIB,
+		);
+		
+		if (in_array($jobSubType, $sshProtocols))
 		{
 		    // use SSH file transfer manager for SFTP/SCP
             return $this->fetchFileSsh($job, $data);
@@ -229,7 +237,7 @@ class KAsyncImport extends KJobHandlerWorker
 			    return $job;
 			}
 			if (!$remotePath) {
-			    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, 'Error: missing host', KalturaBatchJobStatus::FAILED);
+			    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, 'Error: missing path', KalturaBatchJobStatus::FAILED);
 			    return $job;
 			}
 			

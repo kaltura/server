@@ -97,6 +97,14 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			{
 				return 'SftpDropFolder';
 			}
+			if ($enumValue == DropFolderType::SFTP_CMD)
+			{
+				return 'SftpDropFolder';
+			}
+			if ($enumValue == DropFolderType::SFTP_SEC_LIB)
+			{
+				return 'SftpDropFolder';
+			}
 		}
 		
 		if (class_exists('Kaltura_Client_Client'))

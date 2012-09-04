@@ -19,6 +19,7 @@ class kFileTransferMgrType
 	const S3 = 6;
 	const LOCAL = 7;
 	const SFTP_CMD = 8; // SFTP Protocol
+	const SFTP_SEC_LIB = 9; // SFTP Protocol
 }
 // path where the classes extending kFileTransferMgr are stored relative to this file
 define ("PATH_TO_MANAGERS", "file_transfer_managers");
@@ -243,6 +244,9 @@ abstract class kFileTransferMgr
 			case kFileTransferMgrType::SFTP_CMD:
 				return new sftpMgr(true);
 
+			case kFileTransferMgrType::SFTP_SEC_LIB:
+				return new sftpSecLibMgr();
+
 			case kFileTransferMgrType::HTTP:
 			case kFileTransferMgrType::HTTPS:
 				return new httpMgr();
@@ -309,12 +313,12 @@ abstract class kFileTransferMgr
 	/**
 	 * Connect & authenticate on the given server, using the given given public key.
 	 *
-	 * @param $server Server's hostname or IP address
-	 * @param $remoteUser remote username
-	 * @param $pubKeyFile public key file
-	 * @param $privKeyFile  private key file
-	 * @param $port server's listening port
-	 * @param $passphrase if $privKeyFile is encrypted (which it should be), the passphrase must be provided
+	 * @param string $server Server's hostname or IP address
+	 * @param string $remoteUser remote username
+	 * @param string $pubKeyFile public key file
+	 * @param string $privKeyFile  private key file
+	 * @param int $port server's listening port
+	 * @param string $passphrase if $privKeyFile is encrypted (which it should be), the passphrase must be provided
 	 *
 	 * @throws kFileTransferMgrException
 	 *
@@ -346,16 +350,17 @@ abstract class kFileTransferMgr
 	/**
 	 * Upload a file to the server
 	 *
-	 * @param $remote_file Remote file name
-	 * @param $local_file Local file name
-	 * @param $overwrite true if should overwrite an existing remote file, or false otherwise
-	 * @param $ftp_mode FTP_BINARY or FTP_ASCII - used for FTP only
+	 * @param string $remote_file Remote file name
+	 * @param string $local_file Local file name
+	 * @param bool $overwrite true if should overwrite an existing remote file, or false otherwise
+	 * @param int $ftp_mode FTP_BINARY or FTP_ASCII - used for FTP only
+	 * @param bool $overwrite_if_different put will be ignored if file already exists with the same size
 	 *
 	 * @throws kFileTransferMgrException
 	 *
 	 * @return FILETRANSFERMGR_RES_OK / FILETRANSFERMGR_RES_ERR
 	 */
-	public function putFile ($remote_file, $local_file, $overwrite = false, $ftp_mode = FTP_BINARY, $http_field_name = null, $http_file_name = null)
+	public function putFile ($remote_file, $local_file, $overwrite = false, $ftp_mode = FTP_BINARY, $http_field_name = null, $http_file_name = null, $overwrite_if_different = true)
 	{
 		KalturaLog::debug("Puts file [$remote_file] from local [$local_file] overwrite [$overwrite]");
 		
@@ -657,6 +662,11 @@ abstract class kFileTransferMgr
 		}
 	}
 
+	/**
+	 * Lists all files and folders names
+	 * 
+	 * @return array
+	 */
 	public function listDir ($remote_path)
 	{
 		KalturaLog::debug("Listing directory [$remote_path]");

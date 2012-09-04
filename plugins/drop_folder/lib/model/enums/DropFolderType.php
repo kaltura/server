@@ -9,4 +9,7 @@ interface DropFolderType extends BaseEnum
 	const FTP = 2;
 	const SCP = 3;
 	const SFTP = 4;
+	const S3 = 6;
+	const SFTP_CMD = 8;
+	const SFTP_SEC_LIB = 9;
 }
