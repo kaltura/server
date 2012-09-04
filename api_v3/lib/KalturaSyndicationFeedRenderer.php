@@ -8,6 +8,12 @@ class KalturaSyndicationFeedRenderer
 	const MAX_RETUREND_ENTRIES = 10000;
 	const ENTRY_PEER_LIMIT_QUERY = 500;
 	const LEVEL_INDENTATION = '  ';
+	const CACHE_CREATION_TIME_SUFFIX = ".time";
+	const CACHE_CREATION_MARGIN = 30;
+	
+	const STATE_HEADER = 1;
+	const STATE_BODY = 2;
+	const STATE_FOOTER = 3;
 
 	/**
 	 * Maximum number of items to list
@@ -19,6 +25,11 @@ class KalturaSyndicationFeedRenderer
 	 * @var KalturaBaseSyndicationFeed
 	 */
 	public $syndicationFeed = null;
+	
+	/**
+	 * @var syndicationFeed
+	 */
+	private $syndicationFeedDb = null;
 	
 	/**
 	 * Array of entry filters, based on playlist or entire entries pool
@@ -93,18 +104,19 @@ class KalturaSyndicationFeedRenderer
 		DbManager::setConfig(kConf::getDB());
 		DbManager::initialize();
 		
-		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
+		$this->syndicationFeedDB = $syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
 		if( !$syndicationFeedDB )
 			throw new Exception("Feed Id not found");
 		
 		kEntitlementUtils::initEntitlementEnforcement($syndicationFeedDB->getPartnerId(), $syndicationFeedDB->getEnforceEntitlement());
-		
+
 		if(!is_null($syndicationFeedDB->getPrivacyContext()) && $syndicationFeedDB->getPrivacyContext() != '')
 			kEntitlementUtils::setPrivacyContextSearch($syndicationFeedDB->getPrivacyContext());
 			
 		$tmpSyndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
 		$tmpSyndicationFeed->fromObject($syndicationFeedDB);
 		$this->syndicationFeed = $tmpSyndicationFeed;
+		
 		
 		// add partner to default criteria
 		categoryPeer::addPartnerToCriteria($this->syndicationFeed->partnerId, true);
@@ -297,7 +309,6 @@ class KalturaSyndicationFeedRenderer
 			$this->lastEntryIds = array();
 			$this->lastEntryCreatedAt = null;
 		}
-			
 		return $entry;
 	}
 	
@@ -360,6 +371,7 @@ class KalturaSyndicationFeedRenderer
 		} 
 			
 		$this->entriesCurrentPage = $nextPage;
+		reset($this->entriesCurrentPage);
 	}
 	
 	/**
@@ -403,7 +415,7 @@ class KalturaSyndicationFeedRenderer
 		
 		return $c;
 	}
-	
+
 	public function execute($limit = 0)
 	{
 		if($this->executed)
@@ -413,28 +425,83 @@ class KalturaSyndicationFeedRenderer
 			$this->limit = $limit;
 			
 		$microTimeStart = microtime(true);
+
+		$renderers = array(
+			KalturaSyndicationFeedType::GOOGLE_VIDEO => "renderGoogleVideoFeed",
+			KalturaSyndicationFeedType::ITUNES => "renderITunesFeed",
+			KalturaSyndicationFeedType::TUBE_MOGUL => "renderTubeMogulFeed",
+			KalturaSyndicationFeedType::YAHOO => "renderYahooFeed",
+			KalturaSyndicationFeedType::KALTURA => "renderKalturaFeed",
+			KalturaSyndicationFeedType::KALTURA_XSLT => "renderKalturaFeed"
+		);
 		
-		switch($this->syndicationFeed->type)
+		$renderer = array($this, $renderers[$this->syndicationFeed->type]);
+		
+		call_user_func($renderer, self::STATE_HEADER);
+		
+		$cacheStore = kCacheManager::getCache(kCacheManager::FS_ENTRY);
+		$cachePrefix = "feed_{$this->syndicationFeed->id}/entry-";
+		$feedUpdatedAt = $this->syndicationFeedDB->getUpdatedAt(null);
+
+		$e = null;
+		$kalturaFeed = $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT;
+
+		$nextEntry = $this->getNextEntry();
+		while($nextEntry)
 		{
-			case KalturaSyndicationFeedType::GOOGLE_VIDEO:
-				$this->renderGoogleVideoFeed();
-				break;
-			case KalturaSyndicationFeedType::ITUNES:
-				$this->renderITunesFeed();
-				break;
-			case KalturaSyndicationFeedType::TUBE_MOGUL:
-				$this->renderTubeMogulFeed();
-				break;
-			case KalturaSyndicationFeedType::YAHOO:
-				$this->renderYahooFeed();
-				break;
-			case KalturaSyndicationFeedType::KALTURA:
-				$this->renderKalturaFeed();
-				break;
-			case KalturaSyndicationFeedType::KALTURA_XSLT:
-				$this->renderKalturaFeed();
-				break;
+			$entry = $nextEntry;
+			$nextEntry = $this->getNextEntry();
+
+			// in case no video player is requested by user and the entry is mix, skip it	
+			if ($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed)
+				continue;
+				
+			$xml = false;
+
+			// check cache
+			$updatedAt = max($feedUpdatedAt,  $entry->getUpdatedAt(null));
+
+			if ($cacheStore)
+			{	
+				$cacheKey = $cachePrefix.str_replace("_", "-", $entry->getId()); // replace _ with - so cache folders will be created with random entry id and not 0_/1_
+				$cacheTime = $cacheStore->get($cacheKey.self::CACHE_CREATION_TIME_SUFFIX);
+				if ($cacheTime !== false && $cacheTime > $updatedAt + self::CACHE_CREATION_MARGIN)
+				{
+					$xml = $cacheStore->get($cacheKey);
+					if ($xml !== false) // valid entry found in cache
+					{
+						echo $xml;
+						continue;
+					}
+				}
+			}
+
+			$e = null;
+			if (!$kalturaFeed) // non kaltura feed use the KalturaMediaEntry
+			{
+				$e = new KalturaMediaEntry();
+				$e->fromObject($entry);
+				// non kaltura feeds require a flavor asset url
+				if (!$kalturaFeed && $entry->getType() !== entryType::MIX && $this->getFlavorAssetUrl($e) == null)
+					$xml = ""; // cache empty result to avoid checking getFlavorAssetUrl next time
+					
+			}
+	
+			if ($xml === false)
+			{	
+				ob_start();
+				call_user_func($renderer, self::STATE_BODY, $entry, $e, $nextEntry !== false);
+				$xml = ob_get_flush();
+			}
+
+			if ($cacheStore)
+			{
+				$cacheStore->set($cacheKey.self::CACHE_CREATION_TIME_SUFFIX, time());
+				$cacheStore->set($cacheKey, $xml);
+			}
 		}
+		
+		call_user_func($renderer, self::STATE_FOOTER);
 		
 		$microTimeEnd = microtime(true);
 		KalturaLog::info("syndicationFeedRenderer- render time for ({$this->syndicationFeed->type}) is " . ($microTimeEnd - $microTimeStart));
@@ -469,56 +536,44 @@ class KalturaSyndicationFeedRenderer
 		return $ret;
 	}
 	
-	private function renderKalturaFeed()
+	private function renderKalturaFeed($state, $entry = null, $e = null, $moreItems = false)
 	{
-		header ("content-type: text/xml; charset=utf-8");
-
-		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($this->syndicationFeed->id);
-		if( !$syndicationFeedDB )
-			throw new Exception("Feed Id not found");
-			
-		//header xml
-		echo kSyndicationFeedManager::getMrssHeader($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $syndicationFeedDB);
-		//items
-		$nextEntry = $this->getNextEntry();
-		while($nextEntry)
+		switch ($state)
 		{
-			$entry = $nextEntry;
-			$nextEntry = $this->getNextEntry();
-			// in case no video player is requested by user and the entry is mix, skip it	
-			if ($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed)
-				continue;
-				
+		case self::STATE_HEADER:
+			header ("content-type: text/xml; charset=utf-8");
+			echo kSyndicationFeedManager::getMrssHeader($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $this->syndicationFeedDB);
+			break;
+
+		case self::STATE_BODY:
 			//syndication parameters to pass to XSLT
 			$xslParams = array();	
-			$xslParams[XsltParameterName::KALTURA_HAS_NEXT_ITEM] = $nextEntry ? true : false;
-			$xslParams[XsltParameterName::KALTURA_SYNDICATION_FEED_FLAVOR_PARAM_ID] = $syndicationFeedDB->getFlavorParamId();
+			$xslParams[XsltParameterName::KALTURA_HAS_NEXT_ITEM] = $moreItems;
+			$xslParams[XsltParameterName::KALTURA_SYNDICATION_FEED_FLAVOR_PARAM_ID] = $this->syndicationFeedDB->getFlavorParamId();
+				
+			echo kSyndicationFeedManager::getMrssEntry($entry, $this->syndicationFeedDB, $this->syndicationFeed->landingPage, $xslParams);				
+			break;
 			
-			echo kSyndicationFeedManager::getMrssEntry($entry, $syndicationFeedDB, $this->syndicationFeed->landingPage, $xslParams);				
+ 		case self::STATE_FOOTER:
+			echo kSyndicationFeedManager::getMrssFooter($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $this->syndicationFeedDB);
+			break;
 		}
-		echo kSyndicationFeedManager::getMrssFooter($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $syndicationFeedDB);
 	}
 	
-	private function renderYahooFeed()
+	private function renderYahooFeed($state, $entry = null, $e = null, $moreItems = false)
 	{
-		header ("content-type: text/xml; charset=utf-8");
-		$this->writeOpenXmlNode('rss', 0, array('version' => "2.0",  'xmlns:media' => "http://search.yahoo.com/mrss/", 'xmlns:dcterms' => "http://purl.org/dc/terms/"));
-		$this->writeOpenXmlNode('channel',1);
-		$this->writeFullXmlNode('title', $this->stringToSafeXml($this->syndicationFeed->name), 2);
-		$this->writeFullXmlNode('link', $this->syndicationFeed->feedLandingPage, 2);
-		$this->writeFullXmlNode('description', $this->stringToSafeXml($this->syndicationFeed->feedDescription), 2);
-		
-		while($entry = $this->getNextEntry())
+		switch ($state)
 		{
-			$e= new KalturaMediaEntry();
-			$e->fromObject($entry);
-			// in case no video player is requested by user and the entry is mix, skip it	
-			if (($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed) ||
-				($entry->getType() !== entryType::MIX && $this->getFlavorAssetUrl($e) == null))
-			{
-				continue;
-			}
-			
+		case self::STATE_HEADER:
+			header ("content-type: text/xml; charset=utf-8");
+			$this->writeOpenXmlNode('rss', 0, array('version' => "2.0",  'xmlns:media' => "http://search.yahoo.com/mrss/", 'xmlns:dcterms' => "http://purl.org/dc/terms/"));
+			$this->writeOpenXmlNode('channel',1);
+			$this->writeFullXmlNode('title', $this->stringToSafeXml($this->syndicationFeed->name), 2);
+			$this->writeFullXmlNode('link', $this->syndicationFeed->feedLandingPage, 2);
+			$this->writeFullXmlNode('description', $this->stringToSafeXml($this->syndicationFeed->feedDescription), 2);
+			break;
+
+		case self::STATE_BODY:
 			$this->writeOpenXmlNode('item',2); // open ITEM
 			$this->writeFullXmlNode('title', $this->stringToSafeXml($e->name), 3);
 			$this->writeFullXmlNode('link', $this->syndicationFeed->landingPage.$e->id, 3);
@@ -542,9 +597,13 @@ class KalturaSyndicationFeedRenderer
 			$this->writeFullXmlNode('media:rating',$this->syndicationFeed->adultContent, 4, array( 'scheme' => "urn:simple"));
 			$this->writeClosingXmlNode('media:content',3);
 			$this->writeClosingXmlNode('item',2); // close ITEM
+			break;
+			
+ 		case self::STATE_FOOTER:
+			$this->writeClosingXmlNode('channel',1); // close CHANNEL
+			$this->writeClosingXmlNode('rss'); // close RSS
+			break;
 		}
-		$this->writeClosingXmlNode('channel',1); // close CHANNEL
-		$this->writeClosingXmlNode('rss'); // close RSS
 	}
 	
 	private function getPlayerUrl($entryId)
@@ -645,26 +704,22 @@ class KalturaSyndicationFeedRenderer
 	private function writeFullXmlNode($nodeName, $value, $level, $attributes = array())
 	{
 		$this->writeOpenXmlNode($nodeName, $level, $attributes, false);
-		echo kString::xmlEncode(kString::xmlDecode("$value"));
+		echo kString::xmlEncode(kString::xmlDecode("$value")); //to create a valid XML (without unescaped special chars) 
+		//we decode before encoding to avoid breaking an xml which its special chars had already been escaped 
 		$this->writeClosingXmlNode($nodeName, 0);
 	}
 	
-	private function renderTubeMogulFeed()
+	private function renderTubeMogulFeed($state, $entry = null, $e = null, $moreItems = false)
 	{
-		header ("content-type: text/xml; charset=utf-8");
-		$this->writeOpenXmlNode('rss', 0, array('version'=>"2.0", 'xmlns:media'=>"http://search.yahoo.com/mrss/", 'xmlns:tm'=>"http://www.tubemogul.com/mrss"));
-		$this->writeOpenXmlNode('channel',1);
-		while($entry = $this->getNextEntry())
+		switch ($state)
 		{
-			$e= new KalturaMediaEntry();
-			$e->fromObject($entry);
-			// in case no video player is requested by user and the entry is mix, skip it	
-			if (($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed) ||
-				($entry->getType() !== entryType::MIX && $this->getFlavorAssetUrl($e) == null))
-			{
-				continue;
-			}
-			
+		case self::STATE_HEADER:
+			header ("content-type: text/xml; charset=utf-8");
+			$this->writeOpenXmlNode('rss', 0, array('version'=>"2.0", 'xmlns:media'=>"http://search.yahoo.com/mrss/", 'xmlns:tm'=>"http://www.tubemogul.com/mrss"));
+			$this->writeOpenXmlNode('channel',1);
+			break;
+
+		case self::STATE_BODY:
 			$entryDescription = $this->stringToSafeXml($e->description);
 			if(!$entryDescription) 
 				$entryDescription = $this->stringToSafeXml($e->name);
@@ -688,96 +743,100 @@ class KalturaSyndicationFeedRenderer
 			
 			$this->writeFullXmlNode('media:content', '', 3, array('url'=> $this->getFlavorAssetUrl($e)));
 			$this->writeClosingXmlNode('item',1);
+			break;
+
+		case self::STATE_FOOTER:
+			$this->writeClosingXmlNode('channel',1);
+			$this->writeClosingXmlNode('rss');
+			break;
 		}
-		$this->writeClosingXmlNode('channel',1);
-		$this->writeClosingXmlNode('rss');
 	}
 
-	private function renderITunesFeed()
+	private function renderITunesFeed($state, $entry = null, $e = null, $moreItems = false)
 	{
-		if(is_null($this->mimeType))
+		switch ($state)
 		{
-			$flavor = assetParamsPeer::retrieveByPK($this->syndicationFeed->flavorParamId);
-			if(!$flavor)
-				throw new Exception("flavor not found for id " . $this->syndicationFeed->flavorParamId);
-		
-			switch($flavor->getFormat())
+		case self::STATE_HEADER:
+			if(is_null($this->mimeType))
 			{
-				case 'mp4':
-					$this->mimeType = 'video/mp4';
-					break;
-				case 'm4v':
-					$this->mimeType = 'video/x-m4v';
-					break;
-				case 'mov':
-					$this->mimeType = 'video/quicktime';
-					break;
-				default:
-					$this->mimeType = 'video/mp4';
+				$flavor = assetParamsPeer::retrieveByPK($this->syndicationFeed->flavorParamId);
+				if(!$flavor)
+					throw new Exception("flavor not found for id " . $this->syndicationFeed->flavorParamId);
+			
+				switch($flavor->getFormat())
+				{
+					case 'mp4':
+						$this->mimeType = 'video/mp4';
+						break;
+					case 'm4v':
+						$this->mimeType = 'video/x-m4v';
+						break;
+					case 'mov':
+						$this->mimeType = 'video/quicktime';
+						break;
+					default:
+						$this->mimeType = 'video/mp4';
+				}
 			}
-		}
-		
-		$partner = PartnerPeer::retrieveByPK($this->syndicationFeed->partnerId);
-		header ("content-type: text/xml; charset=utf-8");
-		'<?xml version="1.0" encoding="utf-8"?>'.PHP_EOL;
-		$this->writeOpenXmlNode('rss', 0, array('xmlns:itunes'=>"http://www.itunes.com/dtds/podcast-1.0.dtd",  'version'=>"2.0"));
-		$this->writeOpenXmlNode('channel', 1);
-		$this->writeFullXmlNode('title', $this->stringToSafeXml($this->syndicationFeed->name), 2);
-		$this->writeFullXmlNode('link', $this->syndicationFeed->feedLandingPage, 2);
-		$this->writeFullXmlNode('language', $this->syndicationFeed->language, 2);
-		$this->writeFullXmlNode('copyright', $partner->getName(), 2);
-		$this->writeFullXmlNode('itunes:subtitle', $this->syndicationFeed->name, 2);
-		$this->writeFullXmlNode('itunes:author', $this->syndicationFeed->feedAuthor, 2);
-		$this->writeFullXmlNode('itunes:summary', $this->syndicationFeed->feedDescription, 2);
-		$this->writeFullXmlNode('description', $this->syndicationFeed->feedDescription, 2);
-		$this->writeOpenXmlNode('itunes:owner', 2);
-		$this->writeFullXmlNode('itunes:name', $this->syndicationFeed->ownerName, 3);
-		$this->writeFullXmlNode('itunes:email', $this->syndicationFeed->ownerEmail, 3);
-		$this->writeClosingXmlNode('itunes:owner', 2);
+			
+			$partner = PartnerPeer::retrieveByPK($this->syndicationFeed->partnerId);
+			header ("content-type: text/xml; charset=utf-8");
+			'<?xml version="1.0" encoding="utf-8"?>'.PHP_EOL;
+			$this->writeOpenXmlNode('rss', 0, array('xmlns:itunes'=>"http://www.itunes.com/dtds/podcast-1.0.dtd",  'version'=>"2.0"));
+			$this->writeOpenXmlNode('channel', 1);
+			$this->writeFullXmlNode('title', $this->stringToSafeXml($this->syndicationFeed->name), 2);
+			$this->writeFullXmlNode('link', $this->syndicationFeed->feedLandingPage, 2);
+			$this->writeFullXmlNode('language', $this->syndicationFeed->language, 2);
+			$this->writeFullXmlNode('copyright', $partner->getName(), 2);
+			$this->writeFullXmlNode('itunes:subtitle', $this->syndicationFeed->name, 2);
+			$this->writeFullXmlNode('itunes:author', $this->syndicationFeed->feedAuthor, 2);
+			$this->writeFullXmlNode('itunes:summary', $this->syndicationFeed->feedDescription, 2);
+			$this->writeFullXmlNode('description', $this->syndicationFeed->feedDescription, 2);
+			$this->writeOpenXmlNode('itunes:owner', 2);
+			$this->writeFullXmlNode('itunes:name', $this->syndicationFeed->ownerName, 3);
+			$this->writeFullXmlNode('itunes:email', $this->syndicationFeed->ownerEmail, 3);
+			$this->writeClosingXmlNode('itunes:owner', 2);
 
-		if($this->syndicationFeed->feedImageUrl)
-		{
-			$this->writeOpenXmlNode('image', 2);
-			$this->writeFullXmlNode('link', $this->syndicationFeed->feedLandingPage,3);
-			$this->writeFullXmlNode('url', $this->syndicationFeed->feedLandingPage, 3);
-			$this->writeFullXmlNode('title', $this->syndicationFeed->name, 3);
-			$this->writeClosingXmlNode('image', 2);
-			$this->writeFullXmlNode('itunes:image', '', 2, array( 'href'=> $this->syndicationFeed->feedImageUrl));
-		}
+			if($this->syndicationFeed->feedImageUrl)
+			{
+				$this->writeOpenXmlNode('image', 2);
+				$this->writeFullXmlNode('link', $this->syndicationFeed->feedLandingPage,3);
+				$this->writeFullXmlNode('url', $this->syndicationFeed->feedLandingPage, 3);
+				$this->writeFullXmlNode('title', $this->syndicationFeed->name, 3);
+				$this->writeClosingXmlNode('image', 2);
+				$this->writeFullXmlNode('itunes:image', '', 2, array( 'href'=> $this->syndicationFeed->feedImageUrl));
+			}
 
-		$categories = explode(',', $this->syndicationFeed->categories);
-		$catTree = array();
-		foreach($categories as $category)
-		{
-			if(!$category) continue;
-			if(strpos($category, '/')) // category & subcategory
+			$categories = explode(',', $this->syndicationFeed->categories);
+			$catTree = array();
+			foreach($categories as $category)
 			{
-				$category_parts = explode('/', $category);
-				$catTree[$category_parts[0]][] = $category_parts[1];
+				if(!$category) continue;
+				if(strpos($category, '/')) // category & subcategory
+				{
+					$category_parts = explode('/', $category);
+					$catTree[$category_parts[0]][] = $category_parts[1];
+				}
+				else
+				{
+					$this->writeFullXmlNode('itunes:category', '', 2, array( 'text'=> $category ));
+				}
 			}
-			else
+			
+			foreach($catTree as $topCat => $subCats)
 			{
-				$this->writeFullXmlNode('itunes:category', '', 2, array( 'text'=> $category ));
+				if(!$topCat) continue;
+				$this->writeOpenXmlNode('itunes:category', 2, array( 'text' => $topCat ));
+				foreach($subCats as $cat)
+				{
+					if(!$cat) continue;
+					$this->writeFullXmlNode('itunes:category', '', 3, array( 'text'=> $cat ));
+				}
+				$this->writeClosingXmlNode('itunes:category', 2);
 			}
-		}
-		
-		foreach($catTree as $topCat => $subCats)
-		{
-			if(!$topCat) continue;
-			$this->writeOpenXmlNode('itunes:category', 2, array( 'text' => $topCat ));
-			foreach($subCats as $cat)
-			{
-				if(!$cat) continue;
-				$this->writeFullXmlNode('itunes:category', '', 3, array( 'text'=> $cat ));
-			}
-			$this->writeClosingXmlNode('itunes:category', 2);
-		}
-		
-		while($entry = $this->getNextEntry())
-		{
-			$e= new KalturaMediaEntry();
-			$e->fromObject($entry);
-						
+			break;
+
+		case self::STATE_BODY:
 			$url = $this->getFlavorAssetUrl($e);
 			$this->writeOpenXmlNode('item',2);
 			$this->writeFullXmlNode('title', $this->stringToSafeXml($e->name), 3);
@@ -808,29 +867,27 @@ class KalturaSyndicationFeedRenderer
 			if($e->tags)
 				$this->writeFullXmlNode('itunes:keywords', $this->stringToSafeXml($e->tags), 3);
 			$this->writeClosingXmlNode('item',2);
+			break;
+			
+		case self::STATE_FOOTER:
+			$this->writeClosingXmlNode('channel', 1);
+			$this->writeClosingXmlNode('rss');
+			break;
 		}
-		
-		$this->writeClosingXmlNode('channel', 1);
-		$this->writeClosingXmlNode('rss');
 	}
 	
-	private function renderGoogleVideoFeed()
+	private function renderGoogleVideoFeed($state, $entry = null, $e = null, $moreItems = false)
 	{
-		header ("content-type: text/xml; charset=utf-8");
-		$uiconfId = ($this->syndicationFeed->playerUiconfId)? '/ui_conf_id/'.$this->syndicationFeed->playerUiconfId: '';
-		
-		$this->writeOpenXmlNode('urlset', 0, array( 'xmlns' => "http://www.sitemaps.org/schemas/sitemap/0.9", 
-		'xmlns:video' => "http://www.google.com/schemas/sitemap-video/1.1" ));
-		while($entry = $this->getNextEntry())
+		switch ($state)
 		{
-			$e= new KalturaMediaEntry();
-			$e->fromObject($entry);
-			// in case no video player is requested by user and the entry is mix, skip it	
-			if (($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed) ||
-				($entry->getType() !== entryType::MIX && $this->getFlavorAssetUrl($e) == null))
-			{
-				continue;
-			}
+		case self::STATE_HEADER:
+			header ("content-type: text/xml; charset=utf-8");
+			
+			$this->writeOpenXmlNode('urlset', 0, array( 'xmlns' => "http://www.sitemaps.org/schemas/sitemap/0.9", 
+				'xmlns:video' => "http://www.google.com/schemas/sitemap-video/1.1" ));
+			break;
+			
+		case self::STATE_BODY:
 			$this->writeOpenXmlNode('url',1);
 			$this->writeFullXmlNode('loc', $this->syndicationFeed->landingPage.$e->id, 2);
 			$this->writeOpenXmlNode('video:video', 2);
@@ -863,8 +920,12 @@ class KalturaSyndicationFeedRenderer
 			$this->writeFullXmlNode('video:duration', $e->duration, 3);
 			$this->writeClosingXmlNode('video:video', 2);
 			$this->writeClosingXmlNode('url', 1);
+			break;
+			
+		case self::STATE_FOOTER:
+			$this->writeClosingXmlNode('urlset');
+			break;
 		}
-		$this->writeClosingXmlNode('urlset');
 	}
 
 	private function getOrderByColumn()
