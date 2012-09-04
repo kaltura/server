@@ -52,10 +52,14 @@ class conversionProfile2Peer extends BaseconversionProfile2Peer
 
 	public static function getIds(Criteria $criteria, $con = null)
 	{
-		$criteria->addSelectColumn(conversionProfile2Peer::ID);
-
-		$stmt = conversionProfile2Peer::doSelectStmt($criteria, $con);
-		return $stmt->fetchAll(PDO::FETCH_COLUMN);
+		$result = array();
+		$profiles = conversionProfile2Peer::doSelect($criteria, $con);
+		foreach ($profiles as $profile)
+		{
+			$result[] = $profile->getId();
+		}
+		
+		return $result;
 	}
 	public static function getCacheInvalidationKeys()
 	{
