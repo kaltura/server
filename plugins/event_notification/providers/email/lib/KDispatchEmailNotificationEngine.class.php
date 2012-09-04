@@ -235,7 +235,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		$body = $emailNotificationTemplate->body;
 
 		$footer = $this->getEmailFooter();
-		if(!is_null(footer))
+		if(!is_null($footer))
 		{
 			$body .= "\n" . $footer;
 		}
