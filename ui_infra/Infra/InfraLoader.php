@@ -14,7 +14,7 @@ class Infra_InfraLoader implements Zend_Loader_Autoloader_Interface
 		require_once($infaDir . DIRECTORY_SEPARATOR . 'KAutoloader.php');
 		KAutoloader::setClassPath(array($infaDir . DIRECTORY_SEPARATOR . '*'));
 		KAutoloader::addClassPath(KAutoloader::buildPath($pluginsDir, '*'));
-		KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/admin/classMap.cache');
+		KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/infra/classMap.cache');
 		KAutoloader::register();
 	}
 	
