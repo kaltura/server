@@ -125,6 +125,7 @@ var kmc = {};
 			loginF: "loginF",
 			closeF: "closeLoginF",
 			host: "<?php echo $www_host; ?>",
+			displayErrorFromServer: "<?php echo ($displayErrorFromServer)? 'true': 'false'; ?>",
 			visibleSignup: "<?php echo (kConf::get('kmc_login_show_signup_link'))? 'true': 'false'; ?>",
 			urchinNumber: "UA-12055206-1",
 			srvurl: "api_v3/index.php"

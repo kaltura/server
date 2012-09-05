@@ -17,16 +17,20 @@ class kmcAction extends kalturaAction
 		$this->kmc_login_version 	= kConf::get('kmc_login_version');
 		$this->setPassHashKey = $this->getRequestParameter( "setpasshashkey" );
 		$this->hashKeyErrorCode = null;
+		$this->displayErrorFromServer = false;
 		if ($this->setPassHashKey) {
 			try {
-				if (!UserLoginDataPeer::isHashKeyValid($this->setPassHashKey)) {
-					$this->hashKeyErrorCode = kUserException::NEW_PASSWORD_HASH_KEY_INVALID;
-				}
+				$loginData = UserLoginDataPeer::isHashKeyValid($this->setPassHashKey);
+				$partnerId = $loginData->getConfigPartnerId();
+				$partner = PartnerPeer::retrieveByPK($partnerId);
+				if ($partner && $partner->getPasswordStructureValidations())
+					$this->displayErrorFromServer = true;  			
+				
 			}
 			catch (kCoreException $e) {
 				$this->hashKeyErrorCode = $e->getCode();
 			}
-		}
+		}		
 		sfView::SUCCESS;
 	}
 }
