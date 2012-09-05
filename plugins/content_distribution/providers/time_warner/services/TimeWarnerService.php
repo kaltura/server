@@ -64,7 +64,8 @@ class TimeWarnerService extends KalturaBaseService
 			$fields = $profile->getAllFieldValues($entryDistribution);
 			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
 			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
-			$feed->addItem($fields, $flavorAssets, $thumbAssets);
+			$additionalAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getAssetIds()));
+			$feed->addItem($fields, $flavorAssets, $thumbAssets,$additionalAssets);
 			$counter++;
 			
 			//to avoid the cache exceeding the memory size 
