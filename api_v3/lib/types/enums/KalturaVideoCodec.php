@@ -21,5 +21,10 @@ class KalturaVideoCodec extends KalturaStringEnum
 	const WVC1A = "wvc1a";
 	const VP8 = "vp8";
 	const MPEG2 = "mpeg2";
+	const APCO = "apco";	// 36mbps,	profile:0
+	const APCS = "apcs";	// 75mbps,	profile:1
+	const APCN = "apcn";	// 112mbps,	profile:2
+	const APCH = "apch";	// 185mbps,	profile:3
+	const DNXHD= "dnxhd";
 	const COPY = "copy";
 }
