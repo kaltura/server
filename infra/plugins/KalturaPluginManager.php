@@ -24,6 +24,24 @@ class KalturaPluginManager
 	 */
 	protected static $pluginInstances = array();
 	
+	/**
+	 * Were all the plugins loaded or not 
+	 * @var boolean
+	 */
+	protected static $loadedAllPlugins = false;
+	
+	/**
+	 * A list of interfaces for which the plugins were loaded
+	 * @var array
+	 */
+	protected static $loadedInterfaces = array();
+	
+	/**
+	 * Should the list of plugins implementing some interface be cached
+	 * @var boolean
+	 */
+	protected static $useCache = true;
+	
 	protected function __construct()
 	{
 		
@@ -228,42 +246,107 @@ class KalturaPluginManager
 	}
 	
 	/**
+	 * Loads the specified list of plugins
+	 * @param array $plugins
+	 * @param boolean $validateDependencies
+	 */
+	protected static function loadPlugins(array $plugins, $validateDependencies = true)
+	{
+		if (self::$loadedAllPlugins)
+			return;		// already loaded everything
+		
+		foreach($plugins as $pluginName => $pluginClass)
+		{
+			if (isset(self::$pluginInstances[$pluginName]))
+				continue;		// already loaded
+			
+			if (!$pluginClass || !class_exists($pluginClass))
+				continue;		// class does not exist
+
+			if ($validateDependencies && 
+				!self::isValid($pluginClass, array_keys(self::$pluginInstances)))
+					continue;		// missing dependencies
+				
+			$pluginObject = new $pluginClass();
+			if (!($pluginObject instanceof IKalturaPlugin))
+				continue;		// the plugin does not implement the base interface 
+				
+			self::$pluginInstances[$pluginName] = $pluginObject;
+		}
+	}
+	
+	/**
+	 * Loads all available plugins
+	 */
+	protected static function loadAllPlugins()
+	{				
+		self::loadPlugins(self::getPlugins());
+		self::$loadedAllPlugins = true;
+	}
+	
+	/**
+	 * Gets the implementations of $interface from the plugins listed in $pluginNames
+	 * @param array $pluginNames
+	 * @param string $interface
+	 */
+	protected static function getPluginInstancesByNames(array $pluginNames, $interface)
+	{
+		$instances = array();
+		foreach ($pluginNames as $pluginName)
+		{
+			if (!isset(self::$pluginInstances[$pluginName]))
+				continue;		// not loaded
+			
+			$pluginInstance = self::$pluginInstances[$pluginName];
+			$instance = $pluginInstance->getInstance($interface);
+			if (!$instance)
+				continue;		// doesn't implement the required interface
+			
+			$instances[strtolower($pluginName)] = $instance;
+		}
+		return $instances;
+	}
+	
+	/**
 	 * Returns all instances that implement the requested interface or all of them in not supplied
 	 * @param string $interface
 	 * @return array<KalturaPlugin>
 	 */
 	public static function getPluginInstances($interface = null)
 	{
-		if(!count(self::$pluginInstances))
+		$cacheStore = kCacheManager::getCache(kCacheManager::APC);
+		if ($cacheStore && self::$useCache)
 		{
-			self::$pluginInstances = array();
-			$plugins = self::getPlugins();
-			
-			foreach($plugins as $pluginName => $pluginClass)
+			$cacheKey = "pluginsByInterface_$interface";
+			$plugins = $cacheStore->get($cacheKey);
+			if ($plugins !== false)
 			{
-				if(!$pluginClass || !class_exists($pluginClass))
-					continue;
-
-				if(!self::isValid($pluginClass, array_keys(self::$pluginInstances)))
-					continue;
-					
-				self::$pluginInstances[$pluginName] = new $pluginClass();
+				if (!in_array($interface, self::$loadedInterfaces))
+				{
+					self::loadPlugins($plugins, false);
+					self::$loadedInterfaces[] = $interface;
+				}
+				return self::getPluginInstancesByNames(array_keys($plugins), $interface);
 			}
 		}
+		
+		self::loadAllPlugins();
 		
 		if(is_null($interface))
 			return self::$pluginInstances;
 		
+		$plugins = array();
 		$instances = array();
-		foreach(self::$pluginInstances as $pluginInstance)
+		foreach(self::$pluginInstances as $pluginName => $pluginInstance)
 		{
-			if ($pluginInstance instanceof IKalturaPlugin)
-			{
-				$instance = $pluginInstance->getInstance($interface);
-				if ($instance)
-					$instances[strtolower($pluginInstance->getPluginName())] = $instance;
-			}
+			$instance = $pluginInstance->getInstance($interface);
+			if (!$instance)
+				continue;
+			$plugins[$pluginName] = self::$plugins[$pluginName];
+			$instances[strtolower($pluginName)] = $instance;
 		}
+		if ($cacheStore && self::$useCache)
+			$cacheStore->set($cacheKey, $plugins);
 		return $instances;
 	}
 	
@@ -292,6 +375,7 @@ class KalturaPluginManager
 		$pluginName = $plugin->getPluginName();
 		self::$plugins[$pluginName] = $pluginClass;
 		self::$pluginInstances[$pluginName] = $plugin;
+		self::$useCache = false;		// disable the cache so that the added plugin will have effect
 	}
 	
 	/**
