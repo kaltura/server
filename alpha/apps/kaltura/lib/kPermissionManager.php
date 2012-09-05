@@ -418,7 +418,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		self::$requestedPartnerId = !self::isEmpty(kCurrentContext::$partner_id) ? kCurrentContext::$partner_id : null;
 		self::$ksPartnerId = !self::isEmpty(kCurrentContext::$ks_partner_id) ? kCurrentContext::$ks_partner_id : null;
 		self::$ksUserId = !self::isEmpty(kCurrentContext::$ks_uid) ? kCurrentContext::$ks_uid : null;
-		self::$kuser = !self::isEmpty(kCurrentContext::getCurrentKsKuser(true)) ? kCurrentContext::getCurrentKsKuser(true) : null;
+		self::$kuser = !self::isEmpty(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser() : null;
 		self::$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : null;
 		self::$adminSession = !self::isEmpty(kCurrentContext::$is_admin_session) ? kCurrentContext::$is_admin_session : false;
 		
