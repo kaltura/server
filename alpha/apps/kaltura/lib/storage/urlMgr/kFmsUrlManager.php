@@ -16,9 +16,16 @@ class kFmsUrlManager extends kUrlManager
 		$url = parent::doGetFileSyncUrl($fileSync);
 		$url = ltrim($url, '/');
 
-		if ($this->protocol == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+		switch ($this->protocol)
+		{
+		case StorageProfile::PLAY_FORMAT_APPLE_HTTP:
 			return "/hls-vod/{$url}.m3u8";
 		
-		return "/hds-vod/{$url}.f4m";
+		case StorageProfile::PLAY_FORMAT_HDS:
+			return "/hds-vod/{$url}.f4m";
+		
+		default:
+			return $url;
+		}
 	}
 }
