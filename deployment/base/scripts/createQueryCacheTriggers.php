@@ -24,7 +24,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "drop_folder_file", 				'keys' => array(array("'dropFolderFile:id='", '@OBJ@.id'), array("'dropFolderFile:fileName='", '@OBJ@.file_name'), array("'dropFolderFile:dropFolderId='", '@OBJ@.drop_folder_id')),			'plugin' => 'drop_folder'),
 	array('table' => "flavor_params_output", 			'keys' => array(array("'flavorParamsOutput:id='", '@OBJ@.id'), array("'flavorParamsOutput:flavorAssetId='", '@OBJ@.flavor_asset_id')),	'class' => 'assetParamsOutput'),
 	array('table' => "entry_distribution", 				'keys' => array(array("'entryDistribution:entryId='", '@OBJ@.entry_id')),																'plugin' => 'content_distribution'),
-	array('table' => "flavor_params", 					'keys' => array(array("'flavorParams:id='", '@OBJ@.id')),																				'class' => 'assetParams'),
+	array('table' => "flavor_params", 					'keys' => array(array("'flavorParams:id='", '@OBJ@.id'), array("'flavorParams:partnerId='", '@OBJ@.partner_id')),						'class' => 'assetParams'),
 	array('table' => "flavor_params_conversion_profile",'keys' => array(array("'flavorParamsConversionProfile:flavorParamsId='", '@OBJ@.flavor_params_id', "',conversionProfileId='", '@OBJ@.conversion_profile_id'), array("'flavorParamsConversionProfile:conversionProfileId='", '@OBJ@.conversion_profile_id'))),
 	array('table' => "user_role", 						'keys' => array(array("'userRole:id='", '@OBJ@.id'))),
 	array('table' => "invalid_session", 				'keys' => array(array("'invalidSession:ks='", '@OBJ@.ks'))),
