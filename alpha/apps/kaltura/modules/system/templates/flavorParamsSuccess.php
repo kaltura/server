@@ -46,6 +46,10 @@ if ($editFlavorParam)
 			<label for="forceFrameToMultiplication16">ForceMod16:</label><input type="checkbox" id="forceFrameToMultiplication16" name="forceFrameToMultiplication16" value="1" <?php echo ($editFlavorParam->getForceFrameToMultiplication16()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
 			<label for="isGopInSec">IsGopInSec:</label><input type="checkbox" id="isGopInSec" name="isGopInSec" value="1" <?php echo ($editFlavorParam->getIsGopInSec()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
 			<br />
+			<label for="isAvoidVideoShrinkFramesizeToSource">NoFrameSizeShrink:</label><input type="checkbox" id="isAvoidVideoShrinkFramesizeToSource" name="isAvoidVideoShrinkFramesizeToSource" value="1" <?php echo ($editFlavorParam->getIsAvoidVideoShrinkFramesizeToSource()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
+			<label for="isAvoidVideoShrinkBitrateToSource">NoBitRateShrink:</label><input type="checkbox" id="isAvoidVideoShrinkBitrateToSource" name="isAvoidVideoShrinkBitrateToSource" value="1" <?php echo ($editFlavorParam->getIsAvoidVideoShrinkBitrateToSource()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
+			<label for="isVideoFrameRateForLowBrAppleHls">LowBrAppleHls:</label><input type="checkbox" id="isVideoFrameRateForLowBrAppleHls" name="isVideoFrameRateForLowBrAppleHls" value="1" <?php echo ($editFlavorParam->getIsVideoFrameRateForLowBrAppleHls()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
+			<br />
 			<label for="video-codec">Video codec: </label>
 			<select id="video-codec" name="video-codec" <?php echo $disabled; ?>>
 				<?php foreach($videoCodecs as $name => $videoCodec): ?>
