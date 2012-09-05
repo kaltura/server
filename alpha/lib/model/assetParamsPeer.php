@@ -296,6 +296,6 @@ class assetParamsPeer extends BaseassetParamsPeer
 	}
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("flavorParams:id=%s", self::ID));		
+		return array(array("flavorParams:id=%s", self::ID), array("flavorParams:partnerId=%s", self::PARTNER_ID));		
 	}
 }
