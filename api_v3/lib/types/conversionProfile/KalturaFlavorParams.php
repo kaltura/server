@@ -140,6 +140,21 @@ class KalturaFlavorParams extends KalturaAssetParams
 	/**
 	 * @var int
 	 */
+	public $isAvoidVideoShrinkFramesizeToSource;
+	
+	/**
+	 * @var int
+	 */
+	public $isAvoidVideoShrinkBitrateToSource;
+	
+	/**
+	 * @var int
+	 */
+	public $isVideoFrameRateForLowBrAppleHls;
+	
+	/**
+	 * @var int
+	 */
 	public $videoConstantBitrate;
 
 	/**
@@ -180,6 +195,9 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"aspectRatioProcessingMode",
 		"forceFrameToMultiplication16",
 		"isGopInSec",
+		"isAvoidVideoShrinkFramesizeToSource",
+		"isAvoidVideoShrinkBitrateToSource",
+		"isVideoFrameRateForLowBrAppleHls",
 		"videoConstantBitrate",
 		"videoBitrateTolerance",
 		"clipOffset",
