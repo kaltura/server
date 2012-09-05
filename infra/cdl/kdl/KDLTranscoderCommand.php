@@ -22,9 +22,12 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 		$cmdLineGenerator = new KDLTranscoderCommand($predesign, $target);
 		$params = new KDLOperationParams();
 		$params->Set($this->_id, $extra);
-		return $cmdLineGenerator->Generate($params, $predesign->_video->_bitRate);
+		if(isset($predesign->_video))
+			return $cmdLineGenerator->Generate($params, $predesign->_video->_bitRate);
+		else 
+			return $cmdLineGenerator->Generate($params, 0);
 	}
-	
+
     /* ---------------------------
 	 * CheckConstraints
 	 */
