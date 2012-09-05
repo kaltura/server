@@ -10,8 +10,11 @@ class AdminConsoleGalleryPlugin extends KalturaPlugin implements IKalturaAdminCo
 	{
 		return self::PLUGIN_NAME;
 	}
-
-	public static function getAdminConsolePages()
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaAdminConsolePages::getApplicationPages()
+	 */
+	public static function getApplicationPages()
 	{
 		$pages = array();
 		$pages[] = new AdminConsoleGalleryAction();

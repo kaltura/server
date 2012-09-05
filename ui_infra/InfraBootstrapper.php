@@ -59,88 +59,76 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 
 		$navigation = new Zend_Navigation($config);
 		
-		$additionalNavigation = Zend_Registry::get('config')->navigation;
-		$menu = $additionalNavigation->monitoring;
-		$subMenu = $menu->enableDisable;
-		
-		$target = '';
-		if($subMenu->target)
-			$target = $subMenu->target;
-			
-		$navigation->addPage(array(
-			    'label' => $subMenu->label,
-			    'uri' => $subMenu->uri,
-				'target' => $target
-		));
-		$menuPage = $navigation->findOneBy('label', 'Monitoring');
-		$subMenuPage = $navigation->findOneBy('label', $subMenu->label);
-		$subMenuPage->setParent($menuPage);
-		
-		
-		$pluginAdminConsolePages = array();
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaAdminConsolePages');
-		foreach($pluginInstances as $pluginInstance)
-			foreach($pluginInstance->getAdminConsolePages() as $pluginAdminConsolePage)
-				$pluginAdminConsolePages[] = $pluginAdminConsolePage;
-		
-		foreach($pluginAdminConsolePages as $pluginAdminConsolePage)
+		$baseSettings = Zend_Registry::get('config')->settings;
+		if(isset($baseSettings->pluginInterface))
 		{
-			if(!($pluginAdminConsolePage instanceof KalturaAdminConsolePlugin))
-			{
-				KalturaLog::err("Class [" . get_class($pluginAdminConsolePage) . "] is not instance of KalturaAdminConsolePlugin");
-				continue;
-			}
-			
-			$resource = get_class($pluginAdminConsolePage);
-			
-			$acl = Zend_Registry::get('acl');
-			$acl->addResource(new Zend_Acl_Resource($resource));
-				
-			if(!($pluginAdminConsolePage->accessCheck(Infra_AclHelper::getCurrentPermissions())))
-			{
-				$acl->deny(Infra_AclHelper::getCurrentRole(), $resource);
-				KalturaLog::err("Class [" . get_class($pluginAdminConsolePage) . "] requires permissions [" . print_r($pluginAdminConsolePage->getRequiredPermissions(), true) . "]");
-				continue;
-			}
-			
-			$acl->allow(Infra_AclHelper::getCurrentRole(), $resource);				
-			
-			$menuPage = null;
-			
-			if($pluginAdminConsolePage->getNavigationRootLabel())
-			{
-				$menuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->getNavigationRootLabel());
-				
-				if(!$menuPage)
-				{
-					$navigation->addPage(array(
-						'label' => $pluginAdminConsolePage->getNavigationRootLabel(),
-					    'controller' => 'plugin',
-						'action' => get_class($pluginAdminConsolePage)));
+			$pluginInterface = $baseSettings->pluginInterface;
 					
-					$menuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->getNavigationRootLabel());
-				}
-			}
-				
-			$subMenuPage = null;
+			$pluginPages = array();
+			$pluginInstances = KalturaPluginManager::getPluginInstances($pluginInterface);
+			foreach($pluginInstances as $pluginInstance)
+				foreach($pluginInstance->getApplicationPages() as $pluginPage)
+					$pluginPages[] = $pluginPage;
 			
-			if($pluginAdminConsolePage->getNavigationActionLabel())
+			foreach($pluginPages as $pluginPage)
 			{
-				$subMenuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->getNavigationActionLabel());
-				
-				if (!$subMenuPage)
+				if(!($pluginPage instanceof KalturaApplicationPlugin))
 				{
-					$navigation->addPage(array(
-					    'label' => $pluginAdminConsolePage->getNavigationActionLabel(),
-					    'controller' => 'plugin',
-						'action' => get_class($pluginAdminConsolePage)));
+					KalturaLog::err("Class [" . get_class($pluginPage) . "] is not instance of KalturaApplicationPlugin");
+					continue;
 				}
-
-				$subMenuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->getNavigationActionLabel());
-			}		
 				
-			if($menuPage && $subMenuPage)
-				$subMenuPage->setParent($menuPage);
+				$resource = get_class($pluginPage);
+				
+				$acl = Zend_Registry::get('acl');
+				$acl->addResource(new Zend_Acl_Resource($resource));
+					
+				if(!($pluginPage->accessCheck(Infra_AclHelper::getCurrentPermissions())))
+				{
+					$acl->deny(Infra_AclHelper::getCurrentRole(), $resource);
+					KalturaLog::err("Class [" . get_class($pluginPage) . "] requires permissions [" . print_r($pluginPage->getRequiredPermissions(), true) . "]");
+					continue;
+				}
+				
+				$acl->allow(Infra_AclHelper::getCurrentRole(), $resource);				
+				
+				$menuPage = null;
+				
+				if($pluginPage->getNavigationRootLabel())
+				{
+					$menuPage = $navigation->findOneBy('label', $pluginPage->getNavigationRootLabel());
+					
+					if(!$menuPage)
+					{
+						$navigation->addPage(array(
+							'label' => $pluginPage->getNavigationRootLabel(),
+						    'controller' => 'plugin',
+							'action' => get_class($pluginPage)));
+						
+						$menuPage = $navigation->findOneBy('label', $pluginPage->getNavigationRootLabel());
+					}
+				}
+					
+				$subMenuPage = null;
+				
+				if($pluginPage->getNavigationActionLabel())
+				{
+					$subMenuPage = $navigation->findOneBy('label', $pluginPage->getNavigationActionLabel());
+					
+					if (!$subMenuPage)
+					{
+						$navigation->addPage(array(
+						    'label' => $pluginPage->getNavigationActionLabel(),
+						    'controller' => 'plugin',
+							'action' => get_class($pluginPage)));
+					}
+	
+					$subMenuPage = $navigation->findOneBy('label', $pluginPage->getNavigationActionLabel());
+				}		
+					
+				if($menuPage && $subMenuPage)
+					$subMenuPage->setParent($menuPage);
+			}
 		}
 		
 		$this->checkAclForNavigation($navigation);
@@ -169,8 +157,6 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		));
 		$clientAutoloader->addResourceType('kaltura', 'lib/Kaltura', 'Kaltura');
 		$autoloader->pushAutoloader($clientAutoloader);
-		
-//		$autoloader->pushAutoloader(new Infra_ClientLoader());
 	}
 	
 	protected function _initTimeZone()

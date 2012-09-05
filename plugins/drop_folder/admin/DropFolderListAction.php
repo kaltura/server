@@ -3,7 +3,7 @@
  * @package plugins.dropFolder
  * @subpackage Admin
  */
-class DropFolderListAction extends KalturaAdminConsolePlugin implements IKalturaAdminConsolePublisherAction
+class DropFolderListAction extends KalturaApplicationPlugin implements IKalturaAdminConsolePublisherAction
 {
 	public function __construct()
 	{

@@ -3,7 +3,7 @@
  * @package plugins.eventNotification
  * @subpackage admin
  */
-class EventNotificationTemplateUpdateStatusAction extends KalturaAdminConsolePlugin
+class EventNotificationTemplateUpdateStatusAction extends KalturaApplicationPlugin
 {
 	public function __construct()
 	{
@@ -11,7 +11,7 @@ class EventNotificationTemplateUpdateStatusAction extends KalturaAdminConsolePlu
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KalturaAdminConsolePlugin::getTemplatePath()
+	 * @see KalturaApplicationPlugin::getTemplatePath()
 	 */
 	public function getTemplatePath()
 	{
@@ -19,7 +19,7 @@ class EventNotificationTemplateUpdateStatusAction extends KalturaAdminConsolePlu
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KalturaAdminConsolePlugin::getRequiredPermissions()
+	 * @see KalturaApplicationPlugin::getRequiredPermissions()
 	 */
 	public function getRequiredPermissions()
 	{
@@ -27,7 +27,7 @@ class EventNotificationTemplateUpdateStatusAction extends KalturaAdminConsolePlu
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KalturaAdminConsolePlugin::doAction()
+	 * @see KalturaApplicationPlugin::doAction()
 	 */
 	public function doAction(Zend_Controller_Action $action)
 	{

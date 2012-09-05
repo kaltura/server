@@ -3,7 +3,7 @@
  * @package plugins.adminConsoleGallery
  * @subpackage admin
  */
-class AdminConsoleGalleryAction extends KalturaAdminConsolePlugin
+class AdminConsoleGalleryAction extends KalturaApplicationPlugin
 {
 	public function __construct()
 	{

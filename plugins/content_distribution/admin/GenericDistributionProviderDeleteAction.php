@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution 
  * @subpackage admin
  */
-class GenericDistributionProviderDeleteAction extends KalturaAdminConsolePlugin
+class GenericDistributionProviderDeleteAction extends KalturaApplicationPlugin
 {
 	public function __construct()
 	{

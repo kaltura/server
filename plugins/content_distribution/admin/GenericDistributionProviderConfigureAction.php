@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution 
  * @subpackage admin
  */
-class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlugin
+class GenericDistributionProviderConfigureAction extends KalturaApplicationPlugin
 {
 	protected $client;
 	

@@ -3,7 +3,7 @@
  * @package plugins.dropFolder
  * @subpackage Admin
  */
-class DropFolderConfigureAction extends KalturaAdminConsolePlugin
+class DropFolderConfigureAction extends KalturaApplicationPlugin
 {	
 	/**
 	 * @return string - absolute file path of the phtml template

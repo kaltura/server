@@ -4,10 +4,6 @@
  * @package infra
  * @subpackage Plugins
  */
-interface IKalturaAdminConsolePages extends IKalturaBase
+interface IKalturaAdminConsolePages extends IKalturaApplicationPages
 {
-	/**
-	 * @return array
-	 */
-	public static function getAdminConsolePages();	
 }

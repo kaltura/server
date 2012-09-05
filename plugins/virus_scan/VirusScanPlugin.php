@@ -158,10 +158,10 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 //	    VirusScanProfilePeer::clearInstancePool();
 	}
 	
-	/**
-	 * @return array
+	/* (non-PHPdoc)
+	 * @see IKalturaAdminConsolePages::getApplicationPages()
 	 */
-	public static function getAdminConsolePages()
+	public static function getApplicationPages()
 	{
 		$pages = array();
 		$pages[] = new VirusScanListAction();

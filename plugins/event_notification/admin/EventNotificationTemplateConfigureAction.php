@@ -3,7 +3,7 @@
  * @package plugins.eventNotification
  * @subpackage admin
  */
-class EventNotificationTemplateConfigureAction extends KalturaAdminConsolePlugin
+class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 {
 	protected $client;
 	

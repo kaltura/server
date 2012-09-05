@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution 
  * @subpackage admin
  */
-class XsltTesterAction extends KalturaAdminConsolePlugin
+class XsltTesterAction extends KalturaApplicationPlugin
 {
     protected $client;
 

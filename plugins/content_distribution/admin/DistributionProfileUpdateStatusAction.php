@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution 
  * @subpackage admin
  */
-class DistributionProfileUpdateStatusAction extends KalturaAdminConsolePlugin
+class DistributionProfileUpdateStatusAction extends KalturaApplicationPlugin
 {
 	public function __construct()
 	{

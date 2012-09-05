@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution 
  * @subpackage admin
  */
-class DistributionProfileListAction extends KalturaAdminConsolePlugin implements IKalturaAdminConsolePublisherAction
+class DistributionProfileListAction extends KalturaApplicationPlugin implements IKalturaAdminConsolePublisherAction
 {
 	public function __construct()
 	{

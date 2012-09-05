@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution 
  * @subpackage admin
  */
-class GenericDistributionProvidersListAction extends KalturaAdminConsolePlugin implements IKalturaAdminConsolePublisherAction
+class GenericDistributionProvidersListAction extends KalturaApplicationPlugin implements IKalturaAdminConsolePublisherAction
 {
 	public function __construct()
 	{

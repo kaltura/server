@@ -203,7 +203,10 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		return array();
 	}
 
-	public static function getAdminConsolePages()
+	/* (non-PHPdoc)
+	 * @see IKalturaAdminConsolePages::getApplicationPages()
+	 */
+	public static function getApplicationPages()
 	{
 		$pages = array();
 		$pages[] = new DropFolderListAction();

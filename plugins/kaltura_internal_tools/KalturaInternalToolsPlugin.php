@@ -30,11 +30,11 @@ class KalturaInternalToolsPlugin extends KalturaPlugin implements IKalturaServic
 	{
 		return realpath(dirname(__FILE__).'/config/kaltura_internal_tools.ct');
 	}
-
-	/**
-	 * @return array<KalturaAdminConsolePlugin>
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaAdminConsolePages::getApplicationPages()
 	 */
-	public static function getAdminConsolePages()
+	public static function getApplicationPages()
 	{
 		$KalturaInternalTools = new KalturaInternalToolsPluginSystemHelperAction();
 		return array($KalturaInternalTools);

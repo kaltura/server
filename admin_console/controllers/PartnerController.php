@@ -144,7 +144,7 @@ class PartnerController extends Zend_Controller_Action
 		$partnerActionPluginPages = array();
 		foreach($pluginInstances as $pluginInstance)
 		{
-			$pluginPages = $pluginInstance->getAdminConsolePages(Infra_AclHelper::getCurrentPermissions());
+			$pluginPages = $pluginInstance->getApplicationPages(Infra_AclHelper::getCurrentPermissions());
 			foreach ($pluginPages as $pluginPage)
 			{
 				if ($pluginPage instanceof IKalturaAdminConsolePublisherAction && $pluginPage->accessCheck(Infra_AclHelper::getCurrentPermissions()))

@@ -3,7 +3,7 @@
  * @package plugins.dropFolder
  * @subpackage Admin
  */
-class DropFolderSetStatusAction extends KalturaAdminConsolePlugin
+class DropFolderSetStatusAction extends KalturaApplicationPlugin
 {
 	
 	/**

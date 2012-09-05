@@ -3,7 +3,7 @@
  * @package plugins.virusScan
  * @subpackage Admin
  */
-class VirusScanListAction extends KalturaAdminConsolePlugin implements IKalturaAdminConsolePublisherAction
+class VirusScanListAction extends KalturaApplicationPlugin implements IKalturaAdminConsolePublisherAction
 {
 	
 	public function __construct()

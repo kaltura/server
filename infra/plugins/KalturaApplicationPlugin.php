@@ -3,7 +3,7 @@
  * @package infra
  * @subpackage Plugins
  */
-abstract class KalturaAdminConsolePlugin
+abstract class KalturaApplicationPlugin
 {
 	/**
 	 * @var string - keep null for top level

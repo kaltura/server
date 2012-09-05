@@ -3,7 +3,7 @@
  * @package plugins.KalturaInternalTools
  * @subpackage admin
  */
-class KalturaInternalToolsPluginSystemHelperAction extends KalturaAdminConsolePlugin
+class KalturaInternalToolsPluginSystemHelperAction extends KalturaApplicationPlugin
 {
 	
 	public function __construct()

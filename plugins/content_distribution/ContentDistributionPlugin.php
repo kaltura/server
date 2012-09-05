@@ -266,9 +266,9 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaAdminConsolePages::getAdminConsolePages()
+	 * @see IKalturaAdminConsolePages::getApplicationPages()
 	 */
-	public static function getAdminConsolePages()
+	public static function getApplicationPages()
 	{
 		$pages = array();
 		
