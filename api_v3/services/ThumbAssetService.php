@@ -35,6 +35,9 @@ class ThumbAssetService extends KalturaAssetService
 	{
 		if ($actionName === 'serve') 
 			return false;
+
+		if ($actionName === 'serveByEntryId') 
+			return false;
 		
 		return parent::partnerRequired($actionName);
 	}
@@ -387,7 +390,24 @@ class ThumbAssetService extends KalturaAssetService
 	 */
 	public function serveByEntryIdAction($entryId, $thumbParamId = null)
 	{
-		$entry = entryPeer::retrieveByPK($entryId);
+		if (!kCurrentContext::$ks)
+		{
+			$entry = kCurrentContext::initPartnerByEntryId($entryId);
+			
+			if (!$entry || $entry->getStatus() == entryStatus::DELETED)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+				
+			// enforce entitlement
+			kEntitlementUtils::initEntitlementEnforcement();
+			
+			if(!kEntitlementUtils::isEntryEntitled($entry))
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);				
+		}
+		else 
+		{	
+			$entry = entryPeer::retrieveByPK($entryId);
+		}
+		
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
