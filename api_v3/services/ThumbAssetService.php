@@ -28,6 +28,17 @@ class ThumbAssetService extends KalturaAssetService
 		return parent::kalturaNetworkAllowed($actionName);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerRequired()
+	 */
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'serve') 
+			return false;
+		
+		return parent::partnerRequired($actionName);
+	}
+	
     /**
      * Add thumbnail asset
      *
@@ -405,9 +416,33 @@ class ThumbAssetService extends KalturaAssetService
 	 */
 	public function serveAction($thumbAssetId, $version = null)
 	{
-		$thumbAsset = assetPeer::retrieveById($thumbAssetId);
+		if (!kCurrentContext::$ks)
+		{
+			$thumbAsset = kCurrentContext::initPartnerByAssetId($thumbAssetId);
+			
+			if (!$thumbAsset || $thumbAsset->getStatus() == asset::ASSET_STATUS_DELETED)
+				throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
+				
+			// enforce entitlement
+			kEntitlementUtils::initEntitlementEnforcement();
+		}
+		else 
+		{	
+			$thumbAsset = assetPeer::retrieveById($thumbAssetId);
+		}
+			
 		if (!$thumbAsset || !($thumbAsset instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
+			
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$entry = entryPeer::retrieveByPK($thumbAsset->getEntryId());
+			if(!$entry)
+			{
+				//we will throw thumb asset not found, as the user is not entitled, and should not know that the entry exists.
+				throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
+			}	
+		}
 
 		$ext = $thumbAsset->getFileExt();
 		if(is_null($ext))

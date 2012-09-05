@@ -165,6 +165,30 @@ class kCurrentContext
 		return $entry;
 	}
 	
+	public static function initPartnerByAssetId($assetId)
+	{		
+		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
+		$asset = assetPeer::retrieveByIdNoFilter($assetId);
+		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
+		
+		if(!$asset)
+			return null;
+			
+		kCurrentContext::$ks = null;
+		kCurrentContext::$ks_object = null;
+		kCurrentContext::$ks_hash = null;
+		kCurrentContext::$ks_partner_id = $asset->getPartnerId();
+		kCurrentContext::$ks_uid = null;
+		kCurrentContext::$ks_kuser_id = 0;
+		kCurrentContext::$master_partner_id = null;
+		kCurrentContext::$partner_id = $asset->getPartnerId();
+		kCurrentContext::$uid = null;
+		kCurrentContext::$is_admin_session = false;
+		kCurrentContext::$kuser_id = null;
+		
+		return $asset;
+	}
+	
 	public static function initKsPartnerUser($ksString, $requestedPartnerId = null, $requestedPuserId = null)
 	{		
 		if (!$ksString)
