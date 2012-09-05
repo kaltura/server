@@ -208,6 +208,10 @@ include_once("KDLCommon.php");
 		public $_cbr=0;		// Constant bit rate, when set - -b 50M -minrate 50M -maxrate 50M -bt 5M -bufsize 10M 
 		public $_bt=0;		// bitrate tolerance
 		public $_isGopInSec=0;// if set the value of gop is in seconds, vs. frames
+												// execute flavor to source adaptations - 
+		public $_isShrinkFramesizeToSource=1;	// - frame size
+		public $_isShrinkBitrateToSource=1;		// - frame rate
+		public $_isFrameRateForLowBrAppleHls=0; // for default fr (keep source fr),adjust for Apple HLS recommendations. Relevant only for <200 kbps;
 			   
 		public function GetSectionEnum() { return KDLConstants::VideoIndex; }
 		
