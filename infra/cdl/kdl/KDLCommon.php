@@ -110,6 +110,7 @@
 		
 		const MaxFramerate = 30.0;
 		const DefaultGOP = 60;
+		const DefaultGOPinSec = 2;
 		const DefaultAudioSampleRate = 44100;
 		const MinAudioSampleRate = 11025;
 		const MaxAudioSampleRate = 48000;
@@ -237,6 +238,7 @@
 		const MPEG = "mpeg";
 		const MPEGTS = "mpegts";
 		const APPLEHTTP = "applehttp";
+		const WAV = "wav";
 	};
 
 	class KDLVideoTarget {
@@ -254,6 +256,13 @@
 		const THEORA = "theora";
 		const VP8 = "vp8";
 		const MPEG2= "mpeg2";
+//	It has rate-control for 4 profiles: 'apch' - 185mbps, 'apcn' - 112mbps, 'apcs' - 75mbps, 'apco' - 36mbps.
+//	The profiles are triggered from ffmpeg command line via '-profile' option ( 0 - apco, 1 - apcs, 2 - apcn, 3 - apch), the default profile is apch.
+		const APCO = "apco";	// 36mbps,	profile:0, 'acpo' (Proxy)
+		const APCS = "apcs";	// 75mbps,	profile:1, 'apcs' (LT),
+		const APCN = "apcn";	// 112mbps,	profile:2, 'apcn' (SD)
+		const APCH = "apch";	// 185mbps,	profile:3, 'apch' (HQ)
+		const DNXHD= "dnxhd";
 		const COPY = "copy";
 	}
 
@@ -266,6 +275,7 @@
 		const AMRNB = "amrnb";
 		const MPEG2= "mpeg2";
 		const AC3= "ac3";
+		const PCMS16LE= "pcm_s16le";
 		const COPY = "copy";
 	};
 	
@@ -276,6 +286,8 @@
 		const MissingMediaStream = 1103;
 		const NoValidMediaStream = 1104;
 		const InvalidDuration = 1105;
+		const PackageMovOnly = 1106;
+		const DnxhdUnsupportedParams = 1107;
 		const Other = 1500;
 		
 		public static function ToString($err, $param1=null, $param2=null){
@@ -293,7 +305,6 @@
 					else
 						$str = $err."#Invalid frame dimension.";
 					break;
-					break;
 				case self::NoValidTranscoders:
 					$str = $err."#No valid transcoders.";
 					break;
@@ -305,6 +316,12 @@
 					break;
 				case self::InvalidDuration:
 					$str = $err."#Product invalid duration - product($param1 sec), source($param2 sec).";
+					break;
+				case self::PackageMovOnly:
+					$str = $err."#Video codec ($param1) can be packaged only in MOV format.";
+					break;
+				case self::DnxhdUnsupportedParams:
+					$str = $err."#Following params set is not supported by DNXHD video codec ($param1).";
 					break;
 				case self::Other:
 				default:
