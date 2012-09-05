@@ -99,7 +99,7 @@ class SynacorHboFeed
 	 * @param array $flavorAssets
 	 * @param array $thumbAssets
 	 */
-	public function addItem(array $values, entry $entry, array $flavorAssets = null, array $thumbAssets = null)
+	public function addItem(array $values, entry $entry, array $flavorAssets = null, array $thumbAssets = null,array $additionalAssets = null)
 	{
 		$item = $this->item->cloneNode(true);
 		$feedNode = $this->xpath->query('/atom:feed', $item)->item(0);
@@ -192,6 +192,34 @@ class SynacorHboFeed
     		$this->setNodeValue('atom:link[@type=\'image/jpeg\']/@href', $thumbUrl, $item);
 		}
 		
+		if(is_array($additionalAssets)){
+			foreach ($additionalAssets as $additionalAsset){
+				/* @var $additionalAsset asset */
+				$assetType = $additionalAsset->getType();
+				switch($assetType){
+					case CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION):
+						/* @var $captionPlugin CaptionPlugin */
+						$captionPlugin = KalturaPluginManager::getPluginInstance(CaptionPlugin::PLUGIN_NAME);
+						$dummyElement = new SimpleXMLElement('<dummy/>');
+						$captionPlugin->contributeCaptionAssets($additionalAsset, $dummyElement);
+						$dummyDom = dom_import_simplexml($dummyElement);
+						$captionDom = $dummyDom->getElementsByTagName('subTitle');
+						$captionDom = $this->doc->importNode($captionDom->item(0),true);
+						$captionDom = $item->appendChild($captionDom);
+						break;
+					case AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT):
+						/* @var $attachmentPlugin AttachmentPlugin */
+						$attachmentPlugin = KalturaPluginManager::getPluginInstance(AttachmentPlugin::PLUGIN_NAME);
+						$dummyElement = new SimpleXMLElement('<dummy/>');
+						$attachmentPlugin->contributeAttachmentAssets($additionalAsset, $dummyElement);
+						$dummyDom = dom_import_simplexml($dummyElement);
+						$attachmentDom = $dummyDom->getElementsByTagName('attachment');
+						$attachmentDom = $this->doc->importNode($attachmentDom->item(0),true);
+						$attachmentDom = $item->appendChild($attachmentDom);
+						break;
+				}			
+			}
+		}
 	}
 	
 	public function getAssetUrl(asset $asset)
