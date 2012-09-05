@@ -80,6 +80,9 @@ class flavorParamsAction extends kalturaSystemAction
 						$this->editFlavorParam->setAspectRatioProcessingMode($this->getRequestParameter("aspectRatioProcessingMode",0));
 						$this->editFlavorParam->setIsGopInSec($this->getRequestParameter("isGopInSec",0));
 						$this->editFlavorParam->setForceFrameToMultiplication16($this->getRequestParameter("forceFrameToMultiplication16"));
+						$this->editFlavorParam->setIsAvoidVideoShrinkFramesizeToSource($this->getRequestParameter("isAvoidVideoShrinkFramesizeToSource",0));
+						$this->editFlavorParam->setIsAvoidVideoShrinkBitrateToSource($this->getRequestParameter("isAvoidVideoShrinkBitrateToSource",0));
+						$this->editFlavorParam->setIsVideoFrameRateForLowBrAppleHls($this->getRequestParameter("isVideoFrameRateForLowBrAppleHls",0));
 						$this->editFlavorParam->setWidth($this->getRequestParameter("width")); 
 						$this->editFlavorParam->setHeight($this->getRequestParameter("height"));
 						$this->editFlavorParam->setVideoCodec($this->getRequestParameter("video-codec"));
