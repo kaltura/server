@@ -15,5 +15,6 @@ class KalturaAudioCodec extends KalturaStringEnum
 	const AMRNB = "amrnb";
 	const MPEG2 = "mpeg2";
 	const AC3 = "ac3";
+	const PCMS16LE = "pcm_s16le";
 	const COPY = "copy";
 }
