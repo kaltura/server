@@ -145,10 +145,21 @@ abstract class KConversionEngine
 	 */
 	protected function getQuickStartCmdLine($add_log)
 	{
-		$cmd_line = "__inFileName__ __outFileName__";
-		
-		$exe = $this->engine_config->params->fastStartCmd;
-		
+		/*
+		 * If there is 'fastStartWithMp4box' set in ini- use MP4Box for mp4 faststart adjustment. 
+		 * The mp4box removes unrequired menu metadata from the file, that caused rtmp streaming problems 
+		 */
+		if(isset($this->engine_config->params->mp4boxCmd) 
+		&& isset($this->engine_config->params->fastStartWithMp4box) && $this->engine_config->params->fastStartWithMp4box==1) {
+			$inFile = $this->inFilePath;
+			$tmpFile = "$inFile.tmp";
+			$cmd_line = "-add $tmpFile ".$this->outFilePath." && mv $tmpFile $inFile";
+			$exe = "mv $inFile $tmpFile && ".$this->engine_config->params->mp4boxCmd;
+		}
+		else {
+			$cmd_line = "__inFileName__ __outFileName__";
+			$exe = $this->engine_config->params->fastStartCmd;
+		}
 		// I have commented out the audio parameters so we don't decrease the quality - it stays as-is
 		$exec_cmd = "$exe " . 
 			str_replace ( 
