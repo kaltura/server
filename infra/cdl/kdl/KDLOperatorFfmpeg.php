@@ -61,57 +61,32 @@ class KDLOperatorFfmpeg extends KDLOperatorBase {
 			return " -vn";
 		}
 		
-$vcodecParams = "fl";
-$cmdStr = null;
+		$vcodecParams = $this->getVideoCodecSpecificParams($design, $target);
+		if(!isset($vcodecParams))
+			return null;
+		
 $vid = $target->_video;
-$vbrFixedVp6=null;
+$vidBr = $vid->_bitRate;
 		switch($vid->_id){
-			case KDLVideoTarget::VP6:
-				if(isset($design->_video) && $design->_video->_bitRate)
-					$vbrFixedVp6=$this->fixVP6BitRate($design->_video->_bitRate, $vid->_bitRate);
-			case KDLVideoTarget::FLV:
-			case KDLVideoTarget::H263:
-				$vcodecParams = "flv";
-				break; 
-			case KDLVideoTarget::H264:
-			case KDLVideoTarget::H264B:
-			case KDLVideoTarget::H264M:
-			case KDLVideoTarget::H264H:
-				$vcodecParams = $this->generateH264params($vid);
-				break; 				
-			case KDLVideoTarget::MPEG4:
-				$vcodecParams = "mpeg4";
-				break;
-			case KDLVideoTarget::THEORA:
-				$vcodecParams = "libtheora";
-				break;
-			case KDLVideoTarget::WMV2:
-			case KDLVideoTarget::WMV3:
-			case KDLVideoTarget::WVC1A:
-				$vcodecParams = "wmv2";
-				break;
-			case KDLVideoTarget::VP8:
-				$vcodecParams = "libvpx";
-				break; 
-			case KDLVideoTarget::MPEG2:
-				$vcodecParams = "mpeg2video";
-				break;
-			case KDLVideoTarget::COPY:
-				$vcodecParams = "copy";
-				break; 
+		case KDLVideoTarget::VP6:
+			if(isset($design->_video) && $design->_video->_bitRate){
+				$vidBr=$this->fixVP6BitRate($design->_video->_bitRate, $vid->_bitRate);
+			}
+			break;
 		}
 		
+$cmdStr = null;
 		$cmdStr = $cmdStr." -vcodec ".$vcodecParams;
-$vBr = isset($vbrFixedVp6)? $vbrFixedVp6: $vid->_bitRate;
-		if($vBr){
-			$cmdStr .= " -b ".$vBr."k";
+		
+		if($vidBr){
+			$cmdStr .= " -b ".$vidBr."k";
 		}
 $bt=0;
 		if(isset($vid->_cbr) && $vid->_cbr>0) {
-			$bt = round($vBr/10);
-			$cmdStr.= " -minrate ".$vBr."k";
-			$cmdStr.= " -maxrate ".$vBr."k";
-			$cmdStr.= " -bufsize ".round($vBr/5)."k";
+			$bt = round($vidBr/10);
+			$cmdStr.= " -minrate ".$vidBr."k";
+			$cmdStr.= " -maxrate ".$vidBr."k";
+			$cmdStr.= " -bufsize ".round($vidBr/5)."k";
 		}
 		if(isset($vid->_bt) && $vid->_bt>0) {
 			$cmdStr.= " -bt ".$vid->_bt."k";
@@ -137,6 +112,41 @@ $bt=0;
 		}
 
 		return $cmdStr;
+	}
+	
+	/* ---------------------------
+	 * getVideoCodecName
+	 */
+    protected function getVideoCodecSpecificParams(KDLFlavor $design, KDLFlavor $target)
+	{
+$vidObj = $target->_video;
+		switch($vidObj->_id){
+		case KDLVideoTarget::VP6:
+		case KDLVideoTarget::FLV:
+		case KDLVideoTarget::H263:
+			return "flv";
+		case KDLVideoTarget::H264:
+		case KDLVideoTarget::H264B:
+		case KDLVideoTarget::H264M:
+		case KDLVideoTarget::H264H:
+			return "libx264 ".$this->generateH264params($vidObj);
+		case KDLVideoTarget::MPEG4:
+			return "mpeg4";
+		case KDLVideoTarget::THEORA:
+			return "libtheora";
+		case KDLVideoTarget::WMV2:
+		case KDLVideoTarget::WMV3:
+		case KDLVideoTarget::WVC1A:
+			return "wmv2";
+		case KDLVideoTarget::VP8:
+			return "libvpx";
+		case KDLVideoTarget::MPEG2:
+			return "mpeg2video";
+		case KDLVideoTarget::COPY:
+			return "copy";
+		default:
+			return null;
+		}
 	}
 	
 	/* ---------------------------
@@ -173,6 +183,10 @@ $aud = $target->_audio;
 				break;
 			case KDLAudioTarget::AC3:
 				$acodec = "ac3";
+				break;
+			case KDLAudioTarget::PCMS16LE:
+				$acodec = "pcm_s16le";
+				$aud->_bitRate = null;		// PCM should not have br notation  
 				break;
 			case KDLAudioTarget::COPY:
 				$acodec = "copy";
@@ -232,6 +246,9 @@ $con = $target->_container;
 			case KDLContainerTarget::MPEG:
 				$format = "mpeg";
 				break;
+			case KDLContainerTarget::WAV:
+				$format = "wav";
+				break;
 		}
 		$cmdStr.= " -f ".$format;
 
@@ -258,25 +275,25 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 		$ffQsettings = " -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4";
 		switch($videoObject->_id) {
 		case KDLVideoTarget::H264:
-			$h264params=" libx264 -subq 2".$ffQsettings;
+			$h264params=" -subq 2".$ffQsettings;
 			if($videoObject->_bitRate<KDLConstants::LowBitrateThresHold) {
 				$h264params .= " -crf 30";
 			}
 			break;
 		case KDLVideoTarget::H264B:
-			$h264params=" libx264 -subq 2".$ffQsettings." -coder 0";;
+			$h264params=" -subq 2".$ffQsettings." -coder 0";;
 			if($videoObject->_bitRate<KDLConstants::LowBitrateThresHold) {
 				$h264params .= " -crf 30";
 			}
 			break;
 		case KDLVideoTarget::H264M:
-			$h264params="libx264 -subq 5".$ffQsettings." -coder 1 -refs 2";
+			$h264params=" -subq 5".$ffQsettings." -coder 1 -refs 2";
 			if($videoObject->_bitRate<KDLConstants::LowBitrateThresHold) {
 				$h264params .= " -crf 30";
 			}
 			break;
 		case KDLVideoTarget::H264H:				
-			$h264params=" libx264 -subq 7".$ffQsettings." -bf 16 -coder 1 -refs 6 -flags2 +bpyramid+wpred+mixed_refs+dct8x8+fastpskip";
+			$h264params=" -subq 7".$ffQsettings." -bf 16 -coder 1 -refs 6 -flags2 +bpyramid+wpred+mixed_refs+dct8x8+fastpskip";
 			if($videoObject->_bitRate<KDLConstants::LowBitrateThresHold) {
 				$h264params .= " -crf 30";
 			}
