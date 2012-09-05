@@ -64,23 +64,25 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		if (!$this->ks && (!$this->username || !$this->password))
 			return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
 		
+		$partnerId = null;
 		$settings = Zend_Registry::get('config')->settings;
-		$partnerId = $settings->partnerId;
+		if(isset($settings->partnerId))
+			$partnerId = $settings->partnerId;
 		
 		$client = Infra_ClientHelper::getClient();
 		$client->setKs(null);
 		
-		if ($this->partnerId)
-		{
-		    $ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId);
-    		$client->setKs($ks);
-    		$user = $client->user->getByLoginId($this->username, $this->partnerId);
-    		$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $this->partnerId, $this->password);
-    		return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
-		}
-		
 		try
 		{
+			if ($this->partnerId)
+			{
+			    $ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId);
+	    		$client->setKs($ks);
+	    		$user = $client->user->getByLoginId($this->username, $this->partnerId);
+	    		$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $this->partnerId, $this->password);
+	    		return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
+			}
+			
 		    if (!$this->ks)
     		    $this->ks = $client->user->loginByLoginId($this->username, $this->password, $partnerId);
     		$client->setKs($this->ks);
