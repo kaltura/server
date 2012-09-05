@@ -4,7 +4,9 @@ if [ -L $0 ];then
 else
 	REAL_SCRIPT=$0
 fi
-. `dirname $REAL_SCRIPT`/../configurations/system.ini
+BASEDIR=`dirname $REAL_SCRIPT`
+cd $BASEDIR
+. ../configurations/system.ini
 
 output_path=$WEB_DIR/content/clientlibs
 
