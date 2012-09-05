@@ -622,7 +622,6 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$thumbAssetsDb || !($thumbAssetsDb instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 			
-			
 		if(kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$entry = entryPeer::retrieveByPK($thumbAssetsDb->getEntryId());
@@ -812,7 +811,17 @@ class ThumbAssetService extends KalturaAssetService
 		$thumbAssetDb = assetPeer::retrieveById($thumbAssetId);
 		if (!$thumbAssetDb || !($thumbAssetDb instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
-	
+
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$entry = entryPeer::retrieveByPK($thumbAssetDb->getEntryId());
+			if(!$entry)
+			{
+				//we will throw thumb asset not found, as the user is not entitled, and should not know that the entry exists.
+				throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
+			}	
+		}
+			
 		if($thumbAssetDb->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_DEFAULT, $thumbAssetId);
 		
@@ -842,6 +851,16 @@ class ThumbAssetService extends KalturaAssetService
 		$assetDb = assetPeer::retrieveById($id);
 		if (!$assetDb || !($assetDb instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
+			
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$entry = entryPeer::retrieveByPK($assetDb->getEntryId());
+			if(!$entry)
+			{
+				//we will throw thumb asset not found, as the user is not entitled, and should not know that the entry exists.
+				throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
+			}	
+		}
 
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
@@ -866,6 +885,16 @@ class ThumbAssetService extends KalturaAssetService
 		$assetDb = assetPeer::retrieveById($id);
 		if (!$assetDb || !($assetDb instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
+			
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$entry = entryPeer::retrieveByPK($assetDb->getEntryId());
+			if(!$entry)
+			{
+				//we will throw thumb asset not found, as the user is not entitled, and should not know that the entry exists.
+				throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
+			}	
+		}
 
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
