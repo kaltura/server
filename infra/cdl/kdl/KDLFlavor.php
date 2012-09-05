@@ -165,7 +165,7 @@ class KDLFlavor extends KDLMediaDataSet {
 				// "No valid transcoder";
 				$target->_errors[KDLConstants::ContainerIndex][] = KDLErrors::ToString(KDLErrors::NoValidTranscoders);
 			}
-//kLog::log(__METHOD__."==>\n".print_r($target->_transcoders,true));
+//kLog::log("==>\n".print_r($target->_transcoders,true));
 		}
 		$this->generateCommandLines($target, $target->_transcoders);
 
@@ -191,7 +191,7 @@ class KDLFlavor extends KDLMediaDataSet {
 	 * generateOperationSetCommandLines
 	 */
 	private function generateOperationSetCommandLines(KDLFlavor $target, $transcoders){
-KalturaLog::log(__METHOD__."==>\n");
+KalturaLog::log("==>\n");
 		
 		$cnt = count($transcoders);
 		$i=1;
@@ -512,12 +512,13 @@ $plannedDur = 0;
 					break;
 			}
 		}
+		
 		/*
 		 * Evaluate flavor frame-size
 		 */
-		$this->evaluateTargetVideoFramesize($sourceVid, $targetVid);
+ 		$this->evaluateTargetVideoFramesize($sourceVid, $targetVid);
 
-		/*
+ 		/*
 		 * Following code is a hack to overcome ffmpeg/x264 AR disorder 
 		 * that happens with several hdv source formats
 		 */
@@ -527,41 +528,26 @@ $plannedDur = 0;
 		&& !($targetVid->_width==0 || $targetVid->_height==0)) {
 			$targetVid->_dar = round($targetVid->_width/$targetVid->_height,4);
 		}
+		
 		/*
-		 * If flavor BR is higher than the source - keep the source BR
+		 * Evaluate flavor bitrate
 		 */
 		$this->evaluateTargetVideoBitrate($sourceVid, $targetVid);
-
+		
 		/*
 		 * Frame Rate - If the flavor fps is zero, evaluate it from the source and
 		 * the constants theshold.
 		 */
-		if($flavorVid->_frameRate==0) {
-			$targetVid->_frameRate = $sourceVid->_frameRate;
-			if($targetVid->_frameRate>KDLConstants::MaxFramerate) {
-				$targetVid->_warnings[KDLConstants::VideoIndex][] =
-				KDLWarnings::ToString(KDLWarnings::TruncatingFramerate, KDLConstants::MaxFramerate, $targetVid->_frameRate);
-				$targetVid->_frameRate=KDLConstants::MaxFramerate;
-			}
-			// For webcam/h263 - if FR==0, set FR=24
-			else if($targetVid->_frameRate==0 && $sourceVid->IsFormatOf(array("h.263")) ){
-				$targetVid->_frameRate=24;
-			}
-		}
+		$this->evaluateTargetVideoFramerate($sourceVid, $targetVid);
+				
 		/*
-		 * MPEG2 constraint - target fps should be at least 20
-		 */
-		if($targetVid->_id==KDLVideoTarget::MPEG2){
-			$targetVid->_frameRate = max(20,$targetVid->_frameRate);
-		}
-		
-		/*
-		 * GOP - if gop not set, set it to 2min according to the required frame rate, 
-		 * if not set=>60frames
+		 * GOP - if gop not set, set it to 2sec according to the required frame rate,
+		 * otherwise if gop param is in sec (_isGopInSec) ==> calculate form framerate,
+		 * If framerate not set - DefaultGOP(60)
 		 */
 		if($flavorVid->_gop===null || $flavorVid->_gop==0) {
 			if(isset($targetVid->_frameRate)){
-				$targetVid->_gop = round(2*$targetVid->_frameRate);
+				$targetVid->_gop = round(KDLConstants::DefaultGOPinSec*$targetVid->_frameRate);
 			}
 			else {
 				$targetVid->_gop = KDLConstants::DefaultGOP;
@@ -581,12 +567,14 @@ $plannedDur = 0;
 		
 		return $targetVid;
 	}
-
+	
 	/* ---------------------------
 	 * evaluateTargetVideoFramesize
 	 */
-	private static function evaluateTargetVideoFramesize(KDLVideoData $source, KDLVideoData $target) {
-
+	private static function evaluateTargetVideoFramesize(KDLVideoData $source, KDLVideoData $target) 
+	{
+		$shrinkToSource = $target->_isShrinkFramesizeToSource;
+		
 		$widSrc = $source->_width;
 		$hgtSrc = $source->_height;
 		if($widSrc==0 || $hgtSrc==0)
@@ -622,7 +610,7 @@ $plannedDur = 0;
 			 */
 		else if($target->_width==0 || $target->_width==""){
 			$target->_width = $target->_height*$darSrcFrame;
-			if($target->_width>$widSrc) {
+			if($shrinkToSource && $target->_width>$widSrc) {
 				$target->_height = $hgtSrc;
 				$target->_width  = $widSrc;
 			}
@@ -633,7 +621,7 @@ $plannedDur = 0;
 			 */
 		else if($target->_height==0 || $target->_height==""){
 			$target->_height = $target->_width/$darSrcFrame;
-			if($target->_height>$hgtSrc) {
+			if($shrinkToSource && $target->_height>$hgtSrc) {
 				$target->_height = $hgtSrc;
 				$target->_width  = $widSrc;
 			}
@@ -650,7 +638,7 @@ $plannedDur = 0;
 				 */
 			if($darTrgFrame>$darSrcFrame){
 				$target->_width = $target->_height*$darSrcFrame;
-				if($target->_width>$widSrc) {
+				if($shrinkToSource && $target->_width>$widSrc) {
 					$target->_height = $hgtSrc;
 					$target->_width  = $widSrc;
 				}
@@ -660,7 +648,7 @@ $plannedDur = 0;
 				 */
 			else {
 				$target->_height = $target->_width/$darSrcFrame;
-				if($target->_height>$hgtSrc) {
+				if($shrinkToSource && $target->_height>$hgtSrc) {
 					$target->_height = $hgtSrc;
 					$target->_width  = $widSrc;
 				}
@@ -669,7 +657,7 @@ $plannedDur = 0;
 			/*
 			 * Fixed target frame size
 			 */
-		else {
+		else if($shrinkToSource) {
 			if($target->_width>$source->_width) {
 				$target->_width=$source->_width;
 			}
@@ -697,17 +685,68 @@ $plannedDur = 0;
 
 	/* ---------------------------
 	 * evaluateTargetVideoBitrate
+	 * If flavor BR is higher than the source - keep the source BR
 	 */
-	//bitrate calc should take in account source frame size(heightXwidth), relativly to the flavor/target frame size.
-	//therefore the Evaluate frame sze should be called before this func
 	private static function evaluateTargetVideoBitrate(KDLVideoData $source, KDLVideoData $target) 
 	{
+		if($target->_isShrinkBitrateToSource!=1) {
+			return $target->_bitRate;
+		}
 		$brSrcNorm = KDLVideoBitrateNormalize::NormalizeSourceToTarget($source->_id, $source->_bitRate, $target->_id);
 		
 		if($target->_bitRate>$brSrcNorm){
 			$target->_bitRate = $brSrcNorm;
 		}
 		return $target->_bitRate = round($target->_bitRate, 0);
+	}
+
+	/* ---------------------------
+	 * evaluateTargetVideoFramerate
+	 */
+	//bitrate calc should take in account source frame size(heightXwidth), relativly to the flavor/target frame size.
+	//therefore the Evaluate frame sze should be called before this func
+	private static function evaluateTargetVideoFramerate(KDLVideoData $source, KDLVideoData $target) 
+	{
+		/*
+		 * Frame Rate - If the flavor fps is zero, evaluate it from the source and
+		 * the constants theshold.
+		 */
+		if($target->_frameRate==0) {
+			$target->_frameRate = $source->_frameRate;
+			if($target->_frameRate>KDLConstants::MaxFramerate) {
+				$target->_warnings[KDLConstants::VideoIndex][] =
+					KDLWarnings::ToString(KDLWarnings::TruncatingFramerate, KDLConstants::MaxFramerate, $target->_frameRate);
+				$target->_frameRate=$target->_frameRate==50?25:KDLConstants::MaxFramerate;
+			}
+			// For webcam/h263 - if FR==0, set FR=24
+			else if($target->_frameRate==0 && $source->IsFormatOf(array("h.263")) ){
+				$target->_frameRate=24;
+			}
+			
+			/*
+			 * For frame rates to comply w/HLS (relevant for low br 110 and 200 kfps)
+			 * 
+			 * 110 - either 10 (for ~30fps) or 8 (for 24/25fps)
+			 * 200 - for 24 to 30fps, take half of the original targetFR
+			 * otherwise - keep the targetFR (the targetFR<24)
+			 */
+			if($target->_isFrameRateForLowBrAppleHls){
+				if($target->_bitRate<=110) {
+					$target->_frameRate = $target->_frameRate>=29.97? 10: 8;
+				}
+				else if($target->_bitRate<=200 && round($target->_frameRate)>=24) {
+					$target->_frameRate = round($target->_frameRate/2,2);
+				}
+			}
+		}
+
+		/*
+		 * MPEG2 constraint - target fps should be at least 20
+		 */
+		if($target->_id==KDLVideoTarget::MPEG2){
+			$target->_frameRate = max(20,$target->_frameRate);
+		}
+		return $target->_frameRate;
 	}
 
 	/* ---------------------------
@@ -832,9 +871,9 @@ $plannedDur = 0;
 	 * validateTranscoders
 	 * - Remove the engines that in the blacklist for that codec/format/etc
 	 */
-	private function validateTranscoders(KDLMediaDataSet $source, &$transcoders, $inSet=false){
-
-KalturaLog::log(__METHOD__."==>\n");
+	private function validateTranscoders(KDLMediaDataSet $source, &$transcoders, $inSet=false)
+	{
+KalturaLog::log("==>\n");
 		$cnt = count($transcoders);
 		$i = 0;
 		foreach($transcoders as $key=>$trPrm) {
@@ -855,7 +894,7 @@ KalturaLog::log(__METHOD__."==>\n");
 				}
 				else {
 					if($inSet){		
-						KalturaLog::log(__METHOD__.": inSet,cnt:$cnt,i:$i");
+						KalturaLog::log(": inSet,cnt:$cnt,i:$i");
 						if($i>0){
 							$transcoders[$key]->_engine->set_sourceBlacklist(null);
 						}
