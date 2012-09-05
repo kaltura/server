@@ -1,0 +1,31 @@
+<?php 
+    $this->headScript() ->appendFile($this->baseUrl('js/excanvas.compiled.js'))
+                        ->appendFile($this->baseUrl('js/jquery.corner.js')); 
+?>
+<div class="box">
+    <div class="header">
+        <h1>Login</h1>
+    </div>
+    <div class="main">
+        <?php echo $this->loginForm->setAction($this->url(array('controller' => 'user', 'action' => 'login')));?>
+    </div>
+</div>
+<script>
+
+    function getTimeOffset() {
+		var d = new Date();
+		return d.getTimezoneOffset();
+    }
+    
+    jQuery(function() {
+        if($.browser.msie) {
+            jQuery("div.box").corner("8px");
+//          jQuery("input[type='text']").corner("8px")
+            if($.browser.version < 7 ) {
+                jQuery("input[type='text']").addClass("text");
+            }
+        }       
+        $("input[type='password']").addClass("text");
+        $("#timezone_offset").val(getTimeOffset());
+    });
+</script>

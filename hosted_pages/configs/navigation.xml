@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configdata>
+	<reports>
+		<label>Reports</label>
+		<controller>reports</controller>
+		<action>category-media</action>
+		<pages>
+			<category-media>
+				<label>Course Media</label>
+				<controller>reports</controller>
+				<action>category-media</action>
+			</category-media>
+			<user-media>
+				<label>User Engagement</label>
+				<controller>reports</controller>
+				<action>user-media</action>
+			</user-media>
+		</pages>
+	</reports>
+</configdata>
