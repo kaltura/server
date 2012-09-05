@@ -117,6 +117,9 @@ class criteriaFilter
 			/* @var $clause Criterion */
 			
 			$newCriterion = $criteriaToFilter->getNewCriterion ( $clause->getTable() . "." . $clause->getColumn() ,  $clause->getValue() , $clause->getComparison() );
+			
+			$this->addClauses( $criteriaToFilter , $clause , $newCriterion );
+			
 			$conj = @$conjunctions[$i];
 				
 			if ( $conj == Criterion::UND ) $criterion->addAnd( $newCriterion );

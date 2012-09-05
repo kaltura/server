@@ -58,11 +58,57 @@ class kQueryCache
 		return substr_replace($formatString, $variableValue, $firstVarPos, 2);
 	}
 	
+	protected static function getCriterionValues($criterion, $columnName)
+	{
+		// get current criterion values
+		if ($criterion->getComparison() == Criteria::EQUAL)
+		{
+			$result = array($criterion->getValue());
+		}
+		else if ($criterion->getComparison() == Criteria::IN && 
+			is_array($criterion->getValue()) &&
+			count($criterion->getValue()) < self::MAX_IN_CRITERION_INVALIDATION_KEYS)
+		{
+			$result = $criterion->getValue();
+		}
+		else
+		{
+			return null;
+		}
+		
+		// get child clause values
+		if (in_array(Criterion::ODER, $criterion->getConjunctions()))
+		{
+			$childClauses = $criterion->getClauses();
+			if (count($childClauses) != 1)
+			{
+				return null;			// we currently support a single OR child
+			}
+			
+			$childClause = reset($childClauses);
+			$childColumn = $childClause->getTable() . "." . $childClause->getColumn();
+			if ($childColumn != $columnName)
+			{
+				return null;			// child clause is on a different column
+			}
+			
+			$childValues = self::getCriterionValues($childClause, $columnName);
+			if ($childValues === null)
+			{
+				return null;			// failed to get child values
+			}
+			
+			$result = array_merge($result, $childValues);
+		}
+		
+		return array_unique($result);		
+	}
+
 	protected static function getInvalidationKeysForQuery($invalidationKeyRules, Criteria $criteria)
 	{
 		foreach ($invalidationKeyRules as $invalidationKeyRule)
 		{
-			$invalidationKeys = array($invalidationKeyRule[0]);
+			$invalidationKeys = array($invalidationKeyRule[0]);		// first element is the format string
 			for ($colIndex = 1; $colIndex < count($invalidationKeyRule); $colIndex++)
 			{
 				$columnName = $invalidationKeyRule[$colIndex];
@@ -73,22 +119,8 @@ class kQueryCache
 					break;
 				}
 				
-				if (in_array(Criterion::ODER, $criterion->getConjunctions()))
-				{
-					$invalidationKeys = null;
-					break;
-				}
-				
-				if ($criterion->getComparison() == Criteria::EQUAL)
-				{
-					$values = array($criterion->getValue());
-				}
-				else if ($criterion->getComparison() == Criteria::IN && 
-					count($criterion->getValue()) < self::MAX_IN_CRITERION_INVALIDATION_KEYS)
-				{
-					$values = $criterion->getValue();
-				}
-				else
+				$values = self::getCriterionValues($criterion, $columnName);
+				if ($values === null)
 				{
 					$invalidationKeys = null;
 					break;

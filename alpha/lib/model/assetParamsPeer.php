@@ -116,8 +116,9 @@ class assetParamsPeer extends BaseassetParamsPeer
 					
 					if($hasPartnerZero)
 					{
-						$query = "(" . self::PARTNER_ID . " = 0 AND " . self::IS_DEFAULT . " = 1)";
-						$criterion->addOr($criteria->getNewCriterion(self::PARTNER_ID, $query, Criteria::CUSTOM));
+						$defaultAndGlobal = $criteria->getNewCriterion(self::PARTNER_ID, 0);
+						$defaultAndGlobal->addAnd($criteria->getNewCriterion(self::IS_DEFAULT, 1));
+						$criterion->addOr($defaultAndGlobal);
 					}
 				}
 				else 
@@ -284,10 +285,14 @@ class assetParamsPeer extends BaseassetParamsPeer
 
 	public static function getIds(Criteria $criteria, $con = null)
 	{
-		$criteria->addSelectColumn(assetParamsPeer::ID);
-
-		$stmt = assetParamsPeer::doSelectStmt($criteria, $con);
-		return $stmt->fetchAll(PDO::FETCH_COLUMN);
+		$result = array();
+		$objects = assetParamsPeer::doSelect($criteria, $con);
+		foreach ($objects as $object)
+		{
+			$result[] = $object->getId();
+		}
+		
+		return $result;		
 	}
 	public static function getCacheInvalidationKeys()
 	{
