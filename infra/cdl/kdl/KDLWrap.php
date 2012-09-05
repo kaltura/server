@@ -336,6 +336,9 @@ class KDLWrap
 				$kdlFlavor->_video->_cbr = $cdlFlavor->getVideoConstantBitrate();
 				$kdlFlavor->_video->_bt = $cdlFlavor->getVideoBitrateTolerance();
 				$kdlFlavor->_video->_isGopInSec = $cdlFlavor->getIsGopInSec();
+				$kdlFlavor->_video->_isShrinkFramesizeToSource = !$cdlFlavor->getIsAvoidVideoShrinkFramesizeToSource();
+				$kdlFlavor->_video->_isShrinkBitrateToSource   = !$cdlFlavor->getIsAvoidVideoShrinkBitrateToSource();
+				$kdlFlavor->_video->_isFrameRateForLowBrAppleHls = $cdlFlavor->getIsVideoFrameRateForLowBrAppleHls();
 			}
 			//		$flavor->_video->_dar = $api->getVideoDar();
 			if($kdlFlavor->_video->IsDataSet()==false)
