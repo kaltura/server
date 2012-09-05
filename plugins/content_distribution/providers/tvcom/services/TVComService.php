@@ -63,7 +63,8 @@ class TVComService extends KalturaBaseService
 			$fields = $profile->getAllFieldValues($entryDistribution);
 			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
 			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
-			$feed->addItem($fields, count($flavorAssets) ? $flavorAssets[0] : null, count($thumbAssets) ? $thumbAssets[0] : null);
+			$additionalAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getAssetIds()));
+			$feed->addItem($fields, count($flavorAssets) ? $flavorAssets[0] : null, count($thumbAssets) ? $thumbAssets[0] : null,$additionalAssets);
 		}
 		
 		echo $feed->getXml();
