@@ -294,7 +294,7 @@ class KAutoloader
 			if (self::$_noCache === false && self::$_classMapFileLocation)
 			{
 				// save the cached map
-				$bytesWritten = file_put_contents(self::$_classMapFileLocation, serialize(self::$_classMap));
+				$bytesWritten = self::safeFilePutContents(self::$_classMapFileLocation, serialize(self::$_classMap));
 				if(!$bytesWritten)
 				{
 					$folderPermission = substr(decoct(fileperms(dirname(self::$_classMapFileLocation))), 2);
@@ -315,5 +315,20 @@ class KAutoloader
 				die('PHP Class map could not be loaded');
 			}
 		}
+	}
+
+	// code copied from kFile, since we can't depend on other classes here
+	public static function safeFilePutContents($filePath, $var)
+	{
+		// write to a temp file and then rename, so that the write will be atomic
+		$tempFilePath = tempnam(dirname($filePath), basename($filePath));
+		if (file_put_contents($tempFilePath, $var) === false)
+			return false;
+		if (rename($tempFilePath, $filePath) === false)
+		{
+			@unlink($tempFilePath);
+			return false;
+		}
+		return true;
 	}
 }
