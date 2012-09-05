@@ -126,7 +126,9 @@ class kuser extends Basekuser implements IIndexable
 		
 		//update all categoryKuser object with kuser
 		
-		if (categoryKuserPeer::isCategroyKuserExistsForKuser($this->getId()))
+		//TODO - need to check if kuser needs to add job
+		if ($this->getColumnsOldValue(categoryEntryPeer::STATUS) != $this->getScreenName() &&
+			categoryKuserPeer::isCategroyKuserExistsForKuser($this->getId()))
 		{
 			$featureStatusToRemoveIndex = new kFeatureStatus();
 			$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY_USER);
