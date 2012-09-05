@@ -268,9 +268,22 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 			'filters'		=> array('StringTrim'),
 		));
 		$this->getElement('thumbnail_asset_filename_xslt')->removeDecorator('Label');
+
+		// asset file names
+		$this->addElement('checkbox', 'enable_asset_filename', array(
+			'label'			=> 'Custom Asset Filename',
+			'filters'		=> array('StringTrim'),
+		));
+		$this->getElement('enable_asset_filename')->getDecorator('Label')->setOption('placement', 'APPEND');
+
+		$this->addElement('textarea', 'asset_filename_xslt', array(
+			'label'			=> 'Asset Filename Xslt:',
+			'filters'		=> array('StringTrim'),
+		));
+		$this->getElement('asset_filename_xslt')->removeDecorator('Label');
 		
 		$this->addDisplayGroup(
-			array('enable_metadata_filename', 'metadata_filename_xslt', 'enable_flavor_asset_filename', 'flavor_asset_filename_xslt', 'enable_thumbnail_asset_filename', 'thumbnail_asset_filename_xslt'), 
+			array('enable_metadata_filename', 'metadata_filename_xslt', 'enable_flavor_asset_filename', 'flavor_asset_filename_xslt', 'enable_thumbnail_asset_filename', 'thumbnail_asset_filename_xslt', 'enable_asset_filename', 'asset_filename_xslt'),
 			'file_names', 
 			array('legend' => 'File Names', 'decorators' => array('FormElements', 'Fieldset'))
 		);

@@ -46,6 +46,7 @@
 	jQuery('#enable_metadata_filename').change(toggleXsltTextarea);
 	jQuery('#enable_flavor_asset_filename').change(toggleXsltTextarea);
 	jQuery('#enable_thumbnail_asset_filename').change(toggleXsltTextarea);
+	jQuery('#enable_asset_filename').change(toggleXsltTextarea);
 	
 	jQuery(function() {
 		if (jQuery('#metadata_xslt').val())
@@ -59,12 +60,16 @@
 		
 		if (jQuery('#thumbnail_asset_filename_xslt').val())
 			jQuery('#enable_thumbnail_asset_filename').attr('checked', true).change();
+
+		if (jQuery('#asset_filename_xslt').val())
+			jQuery('#enable_asset_filename').attr('checked', true).change();
 		
 		jQuery('#frmDistributionProfileConfig').submit(function() {
 			clearIfNotEnabled('#enable_metadata_xslt');
 			clearIfNotEnabled('#enable_metadata_filename');
 			clearIfNotEnabled('#enable_flavor_asset_filename');
 			clearIfNotEnabled('#enable_thumbnail_asset_filename');
+			clearIfNotEnabled('#enable_asset_filename');
 		});
 
         jQuery('#protocol').change(function() {
