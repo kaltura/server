@@ -24,6 +24,20 @@ class CaptionAssetService extends KalturaAssetService
 		return parent::kalturaNetworkAllowed($actionName);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerRequired()
+	 */
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'serve') 
+			return false;
+
+		if ($actionName === 'serveByEntryId') 
+			return false;
+		
+		return parent::partnerRequired($actionName);
+	}
+	
     /**
      * Add caption asset
      *
@@ -349,7 +363,24 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	public function serveByEntryIdAction($entryId, $captionParamId = null)
 	{
-		$entry = entryPeer::retrieveByPK($entryId);
+		if (!kCurrentContext::$ks)
+		{
+			$entry = kCurrentContext::initPartnerByEntryId($entryId);
+			
+			if (!$entry || $entry->getStatus() == entryStatus::DELETED)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+				
+			// enforce entitlement
+			kEntitlementUtils::initEntitlementEnforcement();
+			
+			if(!kEntitlementUtils::isEntryEntitled($entry))
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);				
+		}
+		else 
+		{	
+			$entry = entryPeer::retrieveByPK($entryId);
+		}
+		
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
@@ -449,9 +480,33 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	public function serveAction($captionAssetId)
 	{
-		$captionAsset = assetPeer::retrieveById($captionAssetId);
+		if (!kCurrentContext::$ks)
+		{	
+			$captionAsset = kCurrentContext::initPartnerByAssetId($captionAssetId);
+			
+			if (!$captionAsset || $captionAsset->getStatus() == asset::ASSET_STATUS_DELETED)
+				throw new KalturaAPIException(KalturaErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
+				
+			// enforce entitlement
+			kEntitlementUtils::initEntitlementEnforcement();
+		}
+		else 
+		{	
+			$captionAsset = assetPeer::retrieveById($captionAssetId);
+		}
+		
 		if (!$captionAsset || !($captionAsset instanceof CaptionAsset))
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
+			
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$entry = entryPeer::retrieveByPK($captionAsset->getEntryId());
+			if(!$entry)
+			{
+				//we will throw caption asset not found, as the user is not entitled, and should not know that the entry exists.
+				throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
+			}	
+		}			
 
 		$ext = $captionAsset->getFileExt();
 		if(is_null($ext))
