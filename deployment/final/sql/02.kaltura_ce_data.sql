@@ -3364,7 +3364,8 @@ insert  into `permission_to_permission_item`(`id`,`permission_id`,`permission_it
 (119487,118,769,now(),now()),
 (119488,118,770,now(),now()),
 (119489,118,771,now(),now()),
-(119490,118,838,now(),now());
+(119490,118,838,now(),now()),
+(119491,117,708,now(),now());
 
 insert  into `storage_profile`(`id`,`created_at`,`updated_at`,`partner_id`,`name`,`system_name`,`desciption`,`status`,`protocol`,`storage_url`,`storage_base_dir`,`storage_username`,`storage_password`,`storage_ftp_passive_mode`,`delivery_http_base_url`,`delivery_rmp_base_url`,`delivery_iis_base_url`,`min_file_size`,`max_file_size`,`flavor_params_ids`,`max_concurrent_connections`,`custom_data`,`path_manager_class`,`url_manager_class`,`delivery_priority`,`delivery_status`) values 
 (0,now(),now(),0,'@DC_NAME@','','@DC_DESCRIPTION@',3,0,NULL,'@STORAGE_BASE_DIR@',NULL,NULL,NULL,'@DELIVERY_HTTP_BASE_URL@','@DELIVERY_RTMP_BASE_URL@','@DELIVERY_ISS_BASE_URL@',NULL,NULL,NULL,NULL,NULL,NULL,'',1,1);
