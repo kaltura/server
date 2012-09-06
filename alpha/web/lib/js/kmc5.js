@@ -7,6 +7,9 @@ kmc.vars.debug = false;
 kmc.vars.quickstart_guide = "/content/docs/pdf/KMC_User_Manual.pdf";
 kmc.vars.help_url = kmc.vars.service_url + '/kmc5help.html';
 
+// Set base URL
+kmc.vars.base_url = window.location.protocol + '//' + window.location.hostname;
+
 // Log function
 kmc.log = function() {
 	if( kmc.vars.debug && typeof console !='undefined' && console.log ){
@@ -156,7 +159,7 @@ kmc.functions = {
 	},
 	openClipApp : function( entry_id, mode ) {
 		
-		var iframe_url = window.location.protocol + '//' + window.location.hostname + '/apps/clipapp/' + kmc.vars.clipapp.version;
+		var iframe_url = kmc.vars.base_url + '/apps/clipapp/' + kmc.vars.clipapp.version;
 			iframe_url += '/?kdpUiconf=' + kmc.vars.clipapp.kdp + '&kclipUiconf=' + kmc.vars.clipapp.kclip;
 			iframe_url += '&partnerId=' + kmc.vars.partner_id + '&mode=' + mode + '&config=kmc&entryId=' + entry_id;
 
@@ -858,7 +861,7 @@ kmc.preview_embed = {
 
 		var type = is_playlist ? "playlist" : "player";
 		$.ajax({
-			url: window.location.protocol + '//' + window.location.hostname + kmc.vars.getuiconfs_url,
+			url: kmc.vars.base_url + kmc.vars.getuiconfs_url,
 			type: "POST",
 			data: {
 				"type": type,
@@ -911,7 +914,7 @@ kmc.preview_embed = {
 
 kmc.client = {
 	makeRequest: function( service, action, params, callback ) {
-		var serviceUrl = window.location.protocol + '//' + window.location.hostname + '/api_v3/index.php?service='+service+'&action='+action;
+		var serviceUrl = kmc.vars.base_url + '/api_v3/index.php?service='+service+'&action='+action;
 		var defaultParams = {
 			"ks"		: kmc.vars.ks,
 			"format"	: 1			
@@ -945,10 +948,11 @@ kmc.client = {
 		};
 		
 		var kalsig = getSignature( params );
-		params[ 'kalsig' ] = kalsig;
+		serviceUrl += '&kalsig=' + kalsig;
 	
 		// Make request
 		$.ajax({
+			type: 'POST',
 			url: serviceUrl, 
 			dataType: 'json',
 			data: params, 
@@ -1211,7 +1215,7 @@ kmc.user = {
 		document.cookie = "email=; expires=" + expiry + "; path=/";
 		var state = kmc.mediator.readUrlHash();
 		$.ajax({
-			url: location.protocol + "//" + location.hostname + "/index.php/kmc/logout",
+			url: kmc.vars.base_url + "/index.php/kmc/logout",
 			type: "POST",
 			data: {
 				"ks": kmc.vars.ks
@@ -1304,9 +1308,32 @@ kmc.user = {
 		} );
 
 		$("#do_change_partner").click(function() {
-			var pid = $('input[name=pid]:radio:checked').val();
-			var url = '/index.php/kmc/extlogin?ks=' + kmc.vars.ks + '&partner_id=' + pid;
-			window.location.href = url;
+
+			var url = kmc.vars.base_url + '/index.php/kmc/extlogin';
+
+			// Setup input fields
+			var ks_input = $('<input />').attr({
+				'type': 'hidden',
+				'name': 'ks',
+				'value': kmc.vars.ks
+			});
+			var partner_id_input = $('<input />').attr({
+				'type': 'hidden',
+				'name': 'partner_id',
+				'value': $('input[name=pid]:radio:checked').val() // grab the selected partner id
+			});
+
+			var $form = $('<form />')
+						.attr({
+							'action': url, 
+							'method': 'post',
+							'style': 'display: none'
+						})
+						.append( ks_input, partner_id_input );
+
+			// Submit the form
+			$('body').append( $form );
+			$form[0].submit();
 		});
 
 		return false;
