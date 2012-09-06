@@ -3,7 +3,7 @@
  * Add reports pages to the hosted pages application
  * @package plugins.hostedReports
  */
-class HostedReportsPlugin extends KalturaPlugin implements IKalturaHostedPages, IKalturaConfigurator
+class HostedReportsPlugin extends KalturaPlugin implements IKalturaHostedPages, IKalturaConfigurator, IKalturaApplicationTranslations
 {
 	const PLUGIN_NAME = 'hostedReports';
 	
@@ -25,6 +25,14 @@ class HostedReportsPlugin extends KalturaPlugin implements IKalturaHostedPages, 
 //		$pages[] = new MediaItemReportAction();
 //		$pages[] = new UserMediaReportAction();
 		return $pages;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaApplicationTranslations::getTranslations()
+	 */
+	public static function getTranslations()
+	{
+		
 	}
 	
 	/* (non-PHPdoc)
