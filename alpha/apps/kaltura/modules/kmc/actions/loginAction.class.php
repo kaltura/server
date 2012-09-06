@@ -14,6 +14,9 @@ class loginAction extends kalturaAction
 	public function execute ( ) 
 	{
 
+		// Prevent the page fron being embeded in an iframe
+		header( 'X-Frame-Options: DENY' );
+		
 		$service_url = requestUtils::getHost();
 		$service_url = str_replace ( "http://" , "" , $service_url );
 
