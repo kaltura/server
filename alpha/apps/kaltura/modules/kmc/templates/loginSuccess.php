@@ -17,7 +17,7 @@
 </div>
 
 <div id="mainLogin" class="kmcLoginPage">
-	<form method="post" id="loginForm">
+	<form method="post" id="loginForm" autocomplete="off">
 		<div class="title"><h1>Login</h1></div>
 		<div class="content">
 				<div class="item clearfix">
@@ -94,7 +94,7 @@
 </div>
 
 <div id="newPasswordSuccess" class="kmcLoginPage">
-	<form method="post" id="newPasswordSuccessForm">
+	<form method="post" id="newPasswordSuccessForm" autocomplete="off">
 		<div class="title"><h1>Set Password</h1></div>
 		<div class="content">
 				<div class="item">
@@ -122,7 +122,7 @@
 </div>
 
 <div id="passwordExpired" class="kmcLoginPage">
-	<form method="post" id="passwordExpiredForm">
+	<form method="post" id="passwordExpiredForm" autocomplete="off">
 		<div class="title"><h1>Password Expired</h1></div>
 		<div class="content">
 				<div class="item bottomSpace">

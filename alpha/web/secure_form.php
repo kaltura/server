@@ -119,7 +119,7 @@ class secForm {
 		$this->showHead();
 		
 		echo <<<HTML
-		<form method="post"><br />
+		<form method="post" autocomplete="off"><br />
 			<input type="hidden" name="do" value="password" />
 			<div class="left">Current Password:</div>
 			<div class="right"><input id="focused" type="password" name="cur_password" /></div>
@@ -182,7 +182,7 @@ HTML;
 		$this->showHead();
 	
 		echo <<<HTML
-		<form method="post">
+		<form method="post" autocomplete="off">
 			<input type="hidden" name="do" value="email" />
 			<div class="left">Current email address:</div>
 			<div class="right current truncated" title="{$this->email}">{$this->email}</div>
@@ -238,7 +238,7 @@ HTML;
 		$this->showHead();
 	
 		echo <<<HTML
-		<form method="post">
+		<form method="post" autocomplete="off">
 			<input type="hidden" name="do" value="name" />
 			<div class="left">Current name:</div>
 			<div class="right current truncated" title="{$this->fname} {$this->lname}">{$this->fname} {$this->lname}</div>
