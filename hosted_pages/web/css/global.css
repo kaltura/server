@@ -192,15 +192,9 @@ div#user_links a:hover {
 }
 
 .navigation {
-	margin: 2px 0 0 36px;
 }
 
 .navigation a {
-	float: left;
-	display: block;
-	font-size: 14px;
-	color: #fff;
-	text-decoration: none;
 }
 
 /* sub navigation */

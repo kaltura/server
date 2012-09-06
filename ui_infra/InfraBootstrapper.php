@@ -177,22 +177,6 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		return $config;
 	}
 	
-	protected function _initLanguage()
-	{
-	    $translate = Zend_Registry::get(Zend_Application_Resource_Translate::DEFAULT_REGISTRY_KEY);
-	    
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaApplicationTranslations');
-		foreach($pluginInstances as $pluginInstance)
-		{
-			/* @var $pluginInstance IKalturaApplicationTranslations */
-			KalturaLog::debug("Loading plugin[" . $pluginInstance->getPluginName() . "]");
-			$translations =  $pluginInstance->getTranslations();
-			$translate = array_merge($translate, $translations);
-		}
-		
-		Zend_Registry::set(Zend_Application_Resource_Translate::DEFAULT_REGISTRY_KEY, $translate);
-	}
-	
 	protected function _initController()
 	{
 		$this->bootstrap('acl');
