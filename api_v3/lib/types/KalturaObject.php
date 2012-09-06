@@ -167,11 +167,12 @@ abstract class KalturaObject
 		{
 		 	if ( is_numeric( $this_prop) ) 
 		 		$this_prop = $object_prop;
-			if (in_array($this_prop, $props_to_skip)) 
-				continue;
 			
 			$value = $this->$this_prop;
 			if (is_null($value)) 
+				continue;
+				
+			if (in_array($this_prop, $props_to_skip)) 
 				continue;
 				
 			$propertyInfo = $typeReflector->getProperty($this_prop);

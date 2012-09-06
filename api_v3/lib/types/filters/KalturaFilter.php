@@ -89,6 +89,9 @@ class KalturaFilter extends KalturaObject
 		 		$this_prop = $object_prop;
 		 		
 			$value = $this->$this_prop;
+			if (is_null($value))
+				continue;
+			
 			$propertyInfo = $typeReflector->getProperty($this_prop);
 			if(!$propertyInfo)
 			{
@@ -102,7 +105,7 @@ class KalturaFilter extends KalturaObject
 				$enumType = call_user_func(array($propertyType, 'getEnumClass'));
 				$value = kPluginableEnumsManager::apiToCore($enumType, $value);
 			}
-			elseif($propertyInfo->getDynamicType()&& !is_null($value) && strlen($value))
+			elseif($propertyInfo->getDynamicType()&& strlen($value))
 			{
 				$propertyType = $propertyInfo->getDynamicType();
 				$enumType = call_user_func(array($propertyType, 'getEnumClass'));

@@ -198,121 +198,91 @@ class KalturaRequestDeserializer
 	    $class = $typeReflector->getType();
 		$obj = new $class;
 		$properties = $typeReflector->getProperties();
-		foreach($properties as $property)
+		
+		foreach($params as $name => $value)
 		{
-			/* @var $property KalturaPropertyInfo */
-			$name = $property->getName();
-			$type = $property->getType();
-			
-			if ($property->isSimpleType() || $property->isEnum() || $property->isStringEnum())
+			$isNull = false;
+			if (kString::endsWith($name, '__null'))
 			{
-				if (array_key_exists($name . '__null', $params))
-				{
-					$obj->$name = new KalturaNullField();
-					continue;
-				}
-				
-				if (!array_key_exists($name, $params))
-				{
-					// missing parameters should be null or default propery value
-					continue;
-				}
-				
-				$value = $params[$name];
-				if ($property->isSimpleType())
-				{
-					$value = $this->castSimpleType($type, $value);
-					if(!kXml::isXMLValidContent($value))
-						throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
-					$obj->$name = $value;
-					continue;
-				}
-				
-				if ($property->isEnum())
-				{
-					if (!$property->getTypeReflector()->checkEnumValue($value))
-						throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $value, $name, $property->getType());
-				
-					if($type == 'KalturaNullableBoolean')
-					{
-						$obj->$name = KalturaNullableBoolean::toBoolean($value);
-						continue;
-					}
-					
-					$obj->$name = $this->castSimpleType("int", $value);
-					continue;
-				}
-				
-				if ($property->isStringEnum())
-				{
-					if (!$property->getTypeReflector()->checkStringEnumValue($value))
-						throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $value, $name, $property->getType());
-						
-					$value = $this->castSimpleType("string", $value);
-					if(!kXml::isXMLValidContent($value))
-						throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
-					$obj->$name = $value;
-					continue;
-				}
+				$name = str_replace('__null', '', $name);
+				$isNull = true;
 			}
 			
-			if ($property->isArray())
+			if (!array_key_exists($name, $properties))
 			{
-				if (isset($params[$name]) && is_array($params[$name]))
-				{
-					ksort($params[$name]);
-					$arrayObj = new $type();
-					foreach($params[$name] as $arrayItemParams)
-					{
-						$arrayObj[] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
-					}
-					$obj->$name = $arrayObj;
-				}
 				continue;
 			}
 			
-			if ($property->isComplexType())
+			$property = $properties[$name];
+			$type = $property->getType();
+			
+			if ($isNull && ($property->isSimpleType() || $property->isEnum() || $property->isStringEnum()))
 			{
-				if (isset($params[$name]) && is_array($params[$name]))
+				$obj->$name = new KalturaNullField();
+				continue;
+			}
+							
+			if ($property->isSimpleType())
+			{
+				$value = $this->castSimpleType($type, $value);
+				if(!kXml::isXMLValidContent($value))
+					throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
+				$obj->$name = $value;
+				continue;
+			}
+			
+			if ($property->isEnum())
+			{
+				if (!$property->getTypeReflector()->checkEnumValue($value))
+					throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $value, $name, $property->getType());
+			
+				if($type == 'KalturaNullableBoolean')
 				{
-					$obj->$name = $this->buildObject($property->getTypeReflector(), $params[$name], "{$objectName}:$name");
+					$obj->$name = KalturaNullableBoolean::toBoolean($value);
+					continue;
 				}
+				
+				$obj->$name = $this->castSimpleType("int", $value);
+				continue;
+			}
+			
+			if ($property->isStringEnum())
+			{
+				if (!$property->getTypeReflector()->checkStringEnumValue($value))
+					throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $value, $name, $property->getType());
+					
+				$value = $this->castSimpleType("string", $value);
+				if(!kXml::isXMLValidContent($value))
+					throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
+				$obj->$name = $value;
+				continue;
+			}
+			
+			if ($property->isArray() && is_array($value))
+			{
+				ksort($value);
+				$arrayObj = new $type();
+				foreach($value as $arrayItemParams)
+				{
+					$arrayObj[] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
+				}
+				$obj->$name = $arrayObj;
+				continue;
+			}
+			
+			if ($property->isComplexType() && is_array($value))
+			{
+				$obj->$name = $this->buildObject($property->getTypeReflector(), $value, "{$objectName}:$name");
 				continue;
 			}
 			
 			if ($property->isFile())
 			{
-				if (isset($params[$name]))
-				{
-					$obj->$name = $params[$name];
-				}
+				$obj->$name = $value;
 				continue;
 			}
 		}
 		return $obj;
-	}
-	
-	public function getKS()
-	{
-		$value = $this->castSimpleType("string", $this->paramsGrouped["ks"]);
-		if(!kXml::isXMLValidContent($value))
-			throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, 'ks');
-			
-		return $value;
-	}
-	
-	public function getTargetPartnerId()
-	{
-		return $this->castSimpleType("int", $this->paramsGrouped["targetPartnerId"]);
-	}
-	
-	public function getTargetUserId()
-	{
-		$value = $this->castSimpleType("string", $this->paramsGrouped["targetUserId"]);
-		if(!kXml::isXMLValidContent($value))
-			throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, 'targetUserId');
-			
-		return $value;
 	}
 	
 	private function castSimpleType($type, $var)
