@@ -27,7 +27,7 @@ class UserController extends Zend_Controller_Action
 				if ($nextUri && strlen($nextUri) > 1)
 					$this->_helper->redirector->gotoUrl($nextUri);
 				else
-					$this->_helper->redirector('index', 'debug');
+					$this->_helper->redirector('index', 'index');
 			}
 			else
 			{
@@ -47,7 +47,7 @@ class UserController extends Zend_Controller_Action
 		$client = Infra_ClientHelper::getClient();
 		$client->session->end();
 		Infra_AuthHelper::getAuthInstance()->clearIdentity();
-		$this->_helper->redirector('index', 'index');
+		$this->_helper->redirector('user', 'login');
 	}
 }
 
