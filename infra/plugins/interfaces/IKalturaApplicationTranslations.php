@@ -9,5 +9,5 @@ interface IKalturaApplicationTranslations extends IKalturaBase
 	/**
 	 * @return array
 	 */
-	public static function getTranslations();	
+	public static function getTranslations($locale);	
 }
