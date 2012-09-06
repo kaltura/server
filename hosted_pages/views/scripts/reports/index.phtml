@@ -1,3 +1,6 @@
+<?php 
+require_once '../index/index.phtml';
+?>
 <div id="sub-header">
 	<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
 		<?php echo $this->navigation()->menu()->renderMenu(null, array(
