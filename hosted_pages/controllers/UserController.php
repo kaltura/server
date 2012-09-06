@@ -47,7 +47,7 @@ class UserController extends Zend_Controller_Action
 		$client = Infra_ClientHelper::getClient();
 		$client->session->end();
 		Infra_AuthHelper::getAuthInstance()->clearIdentity();
-		$this->_helper->redirector('user', 'login');
+		$this->_helper->redirector('login', 'user');
 	}
 }
 
