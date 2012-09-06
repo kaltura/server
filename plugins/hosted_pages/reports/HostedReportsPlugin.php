@@ -42,7 +42,7 @@ class HostedReportsPlugin extends KalturaPlugin implements IKalturaHostedPages, 
 	 */
 	public static function getConfig($configName)
 	{
-		if($configName == 'hosted_pages')
-			return new Zend_Config_Ini(dirname(__FILE__) . '/config/hosted_pages.ini');
+//		if($configName == 'hosted_pages')
+//			return new Zend_Config_Ini(dirname(__FILE__) . '/config/hosted_pages.ini');
 	}
 }
