@@ -67,18 +67,17 @@ class kConf
 			
 		self::$map = $config;
 		
-		$res = true;
 		if(function_exists('apc_store'))
+		{			
 			$res = apc_store(self::APC_CACHE_MAP, self::$map);
-			
-		if($reloadFileExists && $res)
-		{
-			$deleted = @unlink("$cacheDir/base.reload");
-			error_log("Base configuration reloaded");
-			if(!$deleted)
-				error_log("Failed to delete base.reload file");
-		}
-			
+			if($reloadFileExists && $res)
+			{
+				$deleted = @unlink("$cacheDir/base.reload");
+				error_log("Base configuration reloaded");
+				if(!$deleted)
+					error_log("Failed to delete base.reload file");
+			}
+		}			
 	}
 	
 	public static function getAll()
