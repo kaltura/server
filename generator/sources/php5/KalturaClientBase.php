@@ -229,7 +229,7 @@ class KalturaClientBase
 	public function queueServiceActionCall($service, $action, $params = array(), $files = array())
 	{
 		// in start session partner id is optional (default -1). if partner id was not set, use the one in the config
-		if (!isset($params["partnerId"]) || $params["partnerId"] === -1 || !is_null($this->config->partnerId))
+		if ((!isset($params["partnerId"]) || $params["partnerId"] === -1) && !is_null($this->config->partnerId))
 			$params["partnerId"] = $this->config->partnerId;
 			
 		$this->addParam($params, "ks", $this->ks);
