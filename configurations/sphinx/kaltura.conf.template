@@ -111,6 +111,7 @@ index kaltura_category
 	min_prefix_len	 = 1
 	enable_star	 = 1
 	rt_attr_uint	 = category_id
+	rt_field         = str_category_id
 	rt_attr_uint	 = parent_id
 	rt_field	 = name
 	rt_attr_bigint	 = partner_id
