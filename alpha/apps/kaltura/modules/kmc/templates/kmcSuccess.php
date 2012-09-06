@@ -2,7 +2,8 @@
 $service_url = requestUtils::getHost();
 
 $www_host = kConf::get('www_host');
-if (kConf::get('kmc_secured_login')) {
+$https_enabled = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? true : false;
+if (kConf::get('kmc_secured_login') || $https_enabled) {
 	$flash_dir = 'https://';
 }
 else {
