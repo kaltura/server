@@ -101,10 +101,18 @@ class KalturaWidget extends KalturaObject implements IFilterable
 	 */
 	public $privacyContext;
 
+	/**
+	 * 
+	 * Addes the HTML5 script line to the widget's embed code
+	 * @var bool
+	 */
+	
+	public $addEmbedHtml5Support = false;
+	
 	private static $map_between_objects = array
 	(
 		"id" , "sourceWidgetId" , "rootWidgetId" , "partnerId" , "entryId" , "uiConfId" , "widgetHTML" , 
-		"securityType" , "securityPolicy" , "createdAt" , "updatedAt" , "partnerData", "enforceEntitlement", "privacyContext",
+		"securityType" , "securityPolicy" , "createdAt" , "updatedAt" , "partnerData", "enforceEntitlement", "privacyContext", "addEmbedHtml5Support",
 	);
 
 	public function getMapBetweenObjects ( )

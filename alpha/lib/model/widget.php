@@ -232,11 +232,13 @@ class widget extends Basewidget
 	   	if ( $player_name == null )
 	   		$player_name = 'kaltura_player_' . (int)microtime(true);
 
-	   	$widget = /*$extra_links .*/
-				// following line is html5 support
-//			 '<script type="text/javascript" 
-//src="http://www.kaltura.com/p/'.$this->getPartnerId().'/sp/'.$this->getPartnerId().'00/embedIframeJs/uiconf_id/'.$this->getUiConfId().'/partner_id/' . $this->getPartnerId() . '"></script>'.
-			 '<object name="'.$player_name.'" id="' . $player_name . '" type="application/x-shockwave-flash" allowScriptAccess="always" allowNetworking="all" allowFullScreen="true" height="' . $height . '" width="' . $width . '" data="'.$domain. $swf_url . '">'.
+	   	if ($this->getAddEmbedHtml5Support()) {
+		   	//following line is html5 support
+			$widget = '<script type="text/javascript" src="http://www.kaltura.com/p/'.$this->getPartnerId().'/sp/'.$this->getPartnerId().'00/embedIframeJs/uiconf_id/'.$this->getUiConfId().'/partner_id/' . $this->getPartnerId() . '"></script>';
+	   	}
+	   	
+	   	$widget .= /*$extra_links .*/
+			 	'<object name="'.$player_name.'" id="' . $player_name . '" type="application/x-shockwave-flash" allowScriptAccess="always" allowNetworking="all" allowFullScreen="true" height="' . $height . '" width="' . $width . '" data="'.$domain. $swf_url . '">'.
 				'<param name="allowScriptAccess" value="always" />'.
 				'<param name="allowNetworking" value="all" />'.
 				'<param name="allowFullScreen" value="true" />'.
@@ -270,4 +272,7 @@ class widget extends Basewidget
 	
 	public function setIsPlayList ( $v )	{		$this->putInCustomData ( "isPlayList" , $v );	}
 	public function getIsPlayList (  )	{		return $this->getFromCustomData( "isPlayList", null, false );	}
+	
+	public function setAddEmbedHtml5Support ( $v )	{	$this->putInCustomData ( "addEmbedHtml5Support" , (bool) $v );	}
+	public function getAddEmbedHtml5Support (  )	{	return (bool) $this->getFromCustomData( "addEmbedHtml5Support" ,null, false );	}
 }
