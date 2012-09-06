@@ -29,7 +29,7 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		$loggerConfigPath = realpath(APPLICATION_PATH . '/../configurations/logger.ini');
 		$loggerConfig = new Zend_Config_Ini($loggerConfigPath);
 		$configSettings = Zend_Registry::get('config')->settings;
-		$loggerName = $configSettings->loggerName;
+		$loggerName = $configSettings->applicationName;
 		$appLogger = $loggerConfig->get($loggerName);
 		KalturaLog::initLog($appLogger);
 		KalturaLog::debug('starting request');
@@ -67,8 +67,12 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 			$pluginPages = array();
 			$pluginInstances = KalturaPluginManager::getPluginInstances($pluginInterface);
 			foreach($pluginInstances as $pluginInstance)
+			{
+				/* @var $pluginInstance KalturaPlugin */
+				KalturaLog::debug("Loading plugin[" . $pluginInstance->getPluginName() . "]");
 				foreach($pluginInstance->getApplicationPages() as $pluginPage)
 					$pluginPages[] = $pluginPage;
+			}
 			
 			foreach($pluginPages as $pluginPage)
 			{
@@ -138,7 +142,6 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 
 	protected function _initAutoloaders()
 	{
-	    $this->bootstrap('config');
 		$autoloader = Zend_Loader_Autoloader::getInstance();
 
 		$moduleAutoloader = new Zend_Application_Module_Autoloader(array(
@@ -149,11 +152,9 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		$autoloader->pushAutoloader($moduleAutoloader);
 		$autoloader->pushAutoloader(new Infra_InfraLoader());
 		
-		$baseSettings = Zend_Registry::get('config')->settings;
-		$clientBasePath = $baseSettings->basePath;
 		$clientAutoloader = new Zend_Application_Module_Autoloader(array(
 			'namespace' => '',
-			'basePath'  => $clientBasePath,
+			'basePath'  => APPLICATION_PATH,
 		));
 		$clientAutoloader->addResourceType('kaltura', 'lib/Kaltura', 'Kaltura');
 		$autoloader->pushAutoloader($clientAutoloader);
@@ -166,7 +167,12 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 	
 	protected function _initConfig()
 	{
+	    $this->bootstrap('autoloaders');
+	    
 		$config = new Zend_Config($this->getOptions(), true);
+		$configSettings = $config->settings;
+		$configName = $configSettings->applicationName;
+		$config = KalturaPluginManager::mergeConfigs($config, $configName, false);		
 		Zend_Registry::set('config', $config);
 		return $config;
 	}
