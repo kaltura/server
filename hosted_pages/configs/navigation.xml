@@ -3,18 +3,13 @@
 	<reports>
 		<label>Reports</label>
 		<controller>reports</controller>
-		<action>index</action>
+		<action>dynamic_action</action>
 		<pages>
-			<category-media>
+			<reports-category>
 				<label>Course Media</label>
 				<controller>reports</controller>
 				<action>category-media</action>
-			</category-media>
-			<user-media>
-				<label>User Engagement</label>
-				<controller>reports</controller>
-				<action>user-media</action>
-			</user-media>
+			</reports-category>
 		</pages>
 	</reports>
 </configdata>
