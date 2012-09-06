@@ -3,7 +3,7 @@
 	<reports>
 		<label>Reports</label>
 		<controller>reports</controller>
-		<action>dynamic_action</action>
+		<action>index</action>
 		<pages>
 			<reports-category>
 				<label>Course Media</label>
@@ -13,3 +13,4 @@
 		</pages>
 	</reports>
 </configdata>
+

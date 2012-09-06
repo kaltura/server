@@ -187,9 +187,8 @@ div#user_links a:hover {
 
 /* wrapper */
 #wrapper {
-	padding: 10px;
 	clear: both;
-	width: 95%;
+	width: 100%;
 }
 
 .navigation {
@@ -1146,7 +1145,6 @@ body#user-login a#help,body#user-reset-password-link a#help {
 }
 
 #wrapper {
-	padding: 0 0 22px 21px;
 	display: table;
 	zoom: 1;
 }
