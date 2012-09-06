@@ -34,6 +34,37 @@ class CategoryMediaReportAction extends KalturaApplicationPlugin
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$request = $action->getRequest();
+		$this->view->errMessage = null;
+		
+		$categoryId = $request->getParam('categoryId');
+		if(!$categoryId)
+		{
+			$this->view->errMessage = 'category-media-report category not supplied';
+			return;
+		}
+		
+		$client = Infra_ClientHelper::getClient();
+		try
+		{
+			$category = $client->category->get($categoryId);
+		}
+		catch (Kaltura_Client_Exception $ke)
+		{
+			$this->view->errMessage = $ke->getMessage();
+		}
+		catch (Kaltura_Client_ClientException $kce)
+		{
+			$this->view->errMessage = $kce->getMessage();
+		}
+		catch (Exception $e)
+		{
+			$this->view->errMessage = 'category-media-report category not found';
+		}
+		
+		if(!$category)
+			return;
+			
+		$this->view->errcategory = $category;
 	}
 }
 
