@@ -205,7 +205,7 @@ class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			
 		$attachment->addChild('filename', $attachmentAsset->getFilename());
 		$attachment->addChild('title', $attachmentAsset->getTitle());
-		$attachment->addChild('description', $attachmentAsset->getDescription());
+		$attachment->addChild('description', $attachmentAsset->getPartnerDescription());
 	}
 	
 	/**
