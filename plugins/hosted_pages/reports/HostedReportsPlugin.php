@@ -30,7 +30,7 @@ class HostedReportsPlugin extends KalturaPlugin implements IKalturaHostedPages, 
 	/* (non-PHPdoc)
 	 * @see IKalturaApplicationTranslations::getTranslations()
 	 */
-	public static function getTranslations()
+	public static function getTranslations($locale)
 	{
 		return array(
 		
