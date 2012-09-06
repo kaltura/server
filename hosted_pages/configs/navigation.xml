@@ -3,7 +3,7 @@
 	<reports>
 		<label>Reports</label>
 		<controller>reports</controller>
-		<action>category-media</action>
+		<action>index</action>
 		<pages>
 			<category-media>
 				<label>Course Media</label>

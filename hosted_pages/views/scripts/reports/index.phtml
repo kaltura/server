@@ -1,0 +1,10 @@
+<div id="sub-header">
+	<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
+		<?php echo $this->navigation()->menu()->renderMenu(null, array(
+			'onlyActiveBranch' => true,
+			'ulClass' => 'sub-navigation', 
+			'minDepth' => 1, 
+			'maxDepth' => 1
+		)); ?>
+	<?php endif; ?>
+</div>

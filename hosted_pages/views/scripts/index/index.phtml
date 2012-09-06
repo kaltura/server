@@ -1,6 +1,9 @@
 
 <div id="kmcHeader" >
 	<div id="logo"></div>
+	<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
+		<?php echo $this->navigation()->menu()->renderMenu(null, array('maxDepth' => 0)); ?>
+	<?php endif; ?>
 	<h1 class="navigation" > <a class="navigation">Kaltura Applications Hosted Pages</a></h1>
 	<div id="user_links">
 		<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
@@ -8,17 +11,4 @@
 			<a href="<?php echo $this->url(array('controller' => 'user', 'action' => 'logout'), null, true); ?>">Logout</a>
 		<?php endif; ?>
 	</div>
-</div>
-<div id="sub-header">
-	<a id="help">[?]</a>
-	<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
-		<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
-			<?php echo $this->navigation()->menu()->renderMenu(null, array(
-				'onlyActiveBranch' => true,
-				'ulClass' => 'sub-navigation', 
-				'minDepth' => 1, 
-				'maxDepth' => 1
-			)); ?>
-		<?php endif; ?>
-	<?php endif; ?>
 </div>
