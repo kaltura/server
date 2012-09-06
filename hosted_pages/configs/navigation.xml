@@ -1,16 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configdata>
-	<reports>
-		<label>Reports</label>
-		<controller>reports</controller>
-		<action>index</action>
-		<pages>
-			<reports-category>
-				<label>Course Media</label>
-				<controller>reports</controller>
-				<action>category-media</action>
-			</reports-category>
-		</pages>
-	</reports>
 </configdata>
 

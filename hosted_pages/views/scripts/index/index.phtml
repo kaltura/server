@@ -1,8 +1,5 @@
 <div id="kmcHeader" >
 	<div id="logo"></div>
-	<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
-		<?php echo $this->navigation()->menu()->renderMenu(null, array('maxDepth' => 0)); ?>
-	<?php endif; ?>
 	<h1 class="navigation" > <a class="navigation">Kaltura Applications Hosted Pages</a></h1>
 	<div id="user_links">
 		<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
@@ -11,3 +8,10 @@
 		<?php endif; ?>
 	</div>
 </div>
+
+<div class="map">
+	<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
+		<?php echo $this->navigation()->menu; ?>
+	<?php endif; ?>
+</div>
+

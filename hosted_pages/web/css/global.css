@@ -205,47 +205,26 @@ div#user_links a:hover {
 
 /* sub navigation */
 .sub-navigation {
-	display: table;
-	zoom: 1;
-	margin-left: 0;
+	display: list-item;
 }
 
 .sub-navigation li {
-	height: 19px;
-	padding-left: 15px;
-	margin-right: 1px;
-	float: left;
 	display: inline;
-	list-style: none inside none;
 }
 
 .sub-navigation li a {
-	float: left;
-	height: 19px;
-	padding: 2px 15px 0 0;
-	display: block;
-	font: bold 11px arial, sans-serif;
-	color: #222;
-	text-decoration: none;
 }
 
 .sub-navigation li a:visited {
-	color: #222;
-	text-decoration: none;
 }
 
 .sub-navigation li a:hover {
-	color: #000;
 }
 
 .sub-navigation li.active {
-	margin-top: 1px;
-	background: url(../images/sprite.png) no-repeat 0 -219px;
 }
 
 .sub-navigation li.active a:visited,.sub-navigation li.active a {
-	color: #f2f2f2;
-	background: url(../images/sprite.png) no-repeat right -219px;
 }
 
 table,table td,table th {
