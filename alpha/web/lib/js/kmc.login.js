@@ -31,7 +31,9 @@ function loginF( remMe, partner_id, subp_id, uid, ks , screen_name, email ) {
 	// Set cookie options
 	var options = {
 		// Save data as raw
-		raw: true, 
+		raw: true,
+		// Set path
+		path: "/",
 		// Set expiration time for cookie ( Number - days )
 		expires: ( remMe ) ? 30 : 1,
 		// Set secure cookie flag based on domain protocol
