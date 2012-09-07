@@ -30,11 +30,13 @@
 					<?php echo $this->translate('category-media-report sum entriesPlaysCount'); ?>
 				</td>
 				<td>
-					<?php echo $this->translate('category-media-report sum maxPlaysEntry part-1'); ?>
-					<a href="<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CategoryMediaReportAction', 'entryId' => $this->maxPlaysEntry['object_id'])); ?>"><?php echo $this->maxPlaysEntry['entry_name']; ?></a>
-					<?php echo $this->translate('category-media-report sum maxPlaysEntry part-2'); ?>
-					<?php echo $this->maxPlaysEntry['count_plays']; ?>
-					<?php echo $this->translate('category-media-report sum maxPlaysEntry part-3'); ?>
+					<?php if($this->maxPlaysEntry): ?>
+						<?php echo $this->translate('category-media-report sum maxPlaysEntry part-1'); ?>
+						<a href="<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CategoryMediaReportAction', 'entryId' => $this->maxPlaysEntry['object_id'])); ?>"><?php echo $this->maxPlaysEntry['entry_name']; ?></a>
+						<?php echo $this->translate('category-media-report sum maxPlaysEntry part-2'); ?>
+						<?php echo $this->maxPlaysEntry['count_plays']; ?>
+						<?php echo $this->translate('category-media-report sum maxPlaysEntry part-3'); ?>
+					<?php endif; ?>
 				</td>
 			</tr>
 		</table>

@@ -80,8 +80,8 @@ class CategoryMediaReportAction extends KalturaApplicationPlugin
 			
 		$action->view->category = $category;
 		$action->view->filterForm = new DateRangeFilter();
-		$action->view->playedEntriesCount = null;
-		$action->view->entriesPlaysCount = null;
+		$action->view->playedEntriesCount = 0;
+		$action->view->entriesPlaysCount = 0;
 		$action->view->maxPlaysEntry = null;
 		$action->view->top = null;
 		
@@ -109,19 +109,22 @@ class CategoryMediaReportAction extends KalturaApplicationPlugin
 		$table = $client->report->getTable(Kaltura_Client_Enum_ReportType::TOP_CONTENT, $filter, $pager);
 		/* @var $table Kaltura_Client_Type_ReportTable */
 		
-		$action->view->playedEntriesCount = $table->totalCount;
-		
-		//object_id,entry_name,count_plays,sum_time_viewed,avg_time_viewed,count_loads,load_play_ratio,avg_view_drop_off
-		$tableTopData = explode(';', $table->data);
-		
-		$top = array();
-		foreach($tableTopData as $tableData)
+		if($table->totalCount)
 		{
-			$top[] = array_combine(explode(',', $table->header), explode(',', $tableData));
+			$action->view->playedEntriesCount = $table->totalCount;
+			
+			//object_id,entry_name,count_plays,sum_time_viewed,avg_time_viewed,count_loads,load_play_ratio,avg_view_drop_off
+			$tableTopData = explode(';', $table->data);
+			
+			$top = array();
+			foreach($tableTopData as $tableData)
+			{
+				$top[] = array_combine(explode(',', $table->header), explode(',', $tableData));
+			}
+			
+			$action->view->maxPlaysEntry = reset($top);
+			$action->view->top = $top;
 		}
-		
-		$action->view->maxPlaysEntry = reset($top);
-		$action->view->top = $top;
 	}
 }
 
