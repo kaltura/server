@@ -31,7 +31,7 @@ class HostedReportsPlugin extends KalturaPlugin implements IKalturaHostedPages, 
 	{
 		$langFilePath = __DIR__ . "/config/lang/$locale.php";
 		if(file_exists($langFilePath))
-			require_once $langFilePath;
+			return include($langFilePath);
 			
 		return array();
 	}

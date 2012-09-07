@@ -14,22 +14,20 @@ class DateRangeFilter extends Infra_Form
 			array('HtmlTag', array('tag' => 'fieldset'))
 		));
 		
-		$translator = $this->getDefaultTranslator();
-		
 		//date range
 		$this->addElement('select', 'date_range', array(
 			'required' 		=> true,
 			'multiOptions' 	=> array(
-				'yesterday' => $translator->translate('yesterday'),
-		        'last_7_days' => $translator->translate('last_7_days'),
-		        'week'		=> $translator->translate('week'),
-		        'last_week' => $translator->translate('last_week'),
-		        'last_30_days' => $translator->translate('last_30_days'),
-		        'this_month'   => $translator->translate('this_month'),
-		        'last_month'   => $translator->translate('last_month'),
-		        'last_12_months' => $translator->translate('last_12_months'),
-		        'this_year' =>    $translator->translate('this_year'),
-		        'custom' => $translator->translate('custom'),
+				'yesterday' => 'Yesterday',
+		        'last_7_days' => 'Last 7 Days',
+		        'week'		=> 'This week',
+		        'last_week' => 'Last week',
+		        'last_30_days' => 'Last 30 days',
+		        'this_month'   => 'This month',
+		        'last_month'   => 'Last month',
+		        'last_12_months' => 'Last 12 months',
+		        'this_year' =>    'This year',
+		        'custom' => 'Custom',
 			),
 			'value'		=> 'last_30_days',
 			'decorators' => array('ViewHelper', 'Label'),
