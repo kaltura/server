@@ -2,7 +2,7 @@
 	<div class="error"><?php echo $this->errMessage ?></div><br/>
 <?php endif; ?>
 
-<?php if($this->category): ?>
+<?php if($this->category && $this->category instanceof Kaltura_Client_Type_Category): ?>
 
 	<h2><?php echo $this->translate('category-media-report intro text'); ?></h2>
 	
@@ -18,7 +18,7 @@
 			<tr>
 				<td><?php echo $this->translate('category-media-report table title'); ?></td>
 				<td>
-					<?php echo $this->entriesCount; ?>
+					<?php echo $this->category->entriesCount; ?>
 					<?php echo $this->translate('category-media-report sum entriesCount'); ?>
 				</td>
 				<td>
@@ -31,47 +31,162 @@
 				</td>
 				<td>
 					<?php echo $this->translate('category-media-report sum maxPlaysEntry part-1'); ?>
-					<a href="<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CategoryMediaReportAction', 'entryId' => $this->maxPlaysEntryId)); ?>"><?php echo $this->maxPlaysEntryName; ?></a>
+					<a href="<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CategoryMediaReportAction', 'entryId' => $this->maxPlaysEntry['object_id'])); ?>"><?php echo $this->maxPlaysEntry['entry_name']; ?></a>
 					<?php echo $this->translate('category-media-report sum maxPlaysEntry part-2'); ?>
-					<?php echo $this->maxPlaysCount; ?>
+					<?php echo $this->maxPlaysEntry['count_plays']; ?>
 					<?php echo $this->translate('category-media-report sum maxPlaysEntry part-3'); ?>
 				</td>
 			</tr>
 		</table>
 	</div>
 	
-	<div id="category-media-report-top" class="clear">
-		<table>
-			<thead>
-				<tr>
-					<th><?php echo $this->translate('category-media-report-top entry-name'); ?></th>
-					<th><?php echo $this->translate('category-media-report-top entry-creatorId'); ?></th>
-					<th><?php echo $this->translate('category-media-report-top entry-plays'); ?></th>
-					<th><?php echo $this->translate('category-media-report-top entry-minutesViewed'); ?></th>
-					<th><?php echo $this->translate('category-media-report-top entry-avgViewTime'); ?></th>
-					<th><?php echo $this->translate('category-media-report-top entry-avgDropOff'); ?></th>
-				</tr>
-			</thead>
-			<tfoot>
-			<tr>
-				<td colspan="6">
-				<?php echo $this->paginator; ?>
-				</td>
-			</tr>
-			</tfoot>
-			<tbody>
-				<?php foreach($this->paginator as $entry): ?>
-				<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
-					<td><a href="<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CategoryMediaReportAction', 'entryId' => $entry->id)); ?>"><?php echo $entry->name; ?></a></td>
-					<td><?php echo $entry->name; ?></td>
-					<td><?php echo $entry->plays; ?></td>
-					<td><?php echo $entry->minutesViewed; ?></td>
-					<td><?php echo $entry->avgViewTime; ?></td>
-					<td><?php echo $entry->avgDropOff; ?></td>
-				</tr>
-				<?php endforeach; ?>
-			</tbody>
-		</table>
-	</div>
-
+	<?php if($this->top): ?>
+		<div id="category-media-report-top" class="clear">
+			<table>
+				<thead>
+					<tr>
+						<th><?php echo $this->translate('category-media-report-top entry-name'); ?></th>
+						<th><?php echo $this->translate('category-media-report-top entry-creatorId'); ?></th>
+						<th><?php echo $this->translate('category-media-report-top entry-plays'); ?></th>
+						<th><?php echo $this->translate('category-media-report-top entry-minutesViewed'); ?></th>
+						<th><?php echo $this->translate('category-media-report-top entry-avgViewTime'); ?></th>
+						<th><?php echo $this->translate('category-media-report-top entry-avgDropOff'); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach($this->top as $entry): ?>
+						<?php 
+							//object_id,entry_name,count_plays,sum_time_viewed,avg_time_viewed,count_loads,load_play_ratio,avg_view_drop_off
+						?>
+						<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+							<td><a href="<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CategoryMediaReportAction', 'entryId' => $entry['object_id'])); ?>"><?php echo $entry['entry_name']; ?></a></td>
+							<td><?php echo $entry['creator_id']; ?></td>
+							<td><?php echo $entry['count_plays']; ?></td>
+							<td><?php echo round($entry['sum_time_viewed'], 2, PHP_ROUND_HALF_UP) ; ?></td>
+							<td><?php echo round($entry['avg_time_viewed'], 2, PHP_ROUND_HALF_UP); ?></td>
+							<td><?php echo $entry['avg_view_drop_off']; ?></td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+	<?php endif; ?>
 <?php endif; ?>
+
+
+<script type="text/javascript">
+
+
+function formatDate(date) {
+	var dd = date.getDate();
+	var mm = date.getMonth()+1;//January is 0!
+	var yyyy = date.getFullYear();
+	if(dd<10) {
+		dd='0'+dd;
+	}
+	if(mm<10) {
+		mm='0'+mm;
+	}
+
+	return mm+'/'+dd+'/'+yyyy ;
+}
+
+jQuery(function(){
+	jQuery('#from_date, #to_date').datepicker({showOn: 'both', buttonImage: '<?php echo $this->baseUrl('images/calendar.gif'); ?>', buttonImageOnly: true});
+
+
+	jQuery('#from_date').change( function() {
+		jQuery('#date_range').val('custom');
+		from = new Date(this.value);
+		to = new Date(jQuery('#to_date').val());
+		if (from.getTime() > to.getTime())
+		{	
+			alert('The from date is larger than the to date');
+			jQuery('#from_date').val('');
+		}
+	});
+
+	jQuery('#to_date').change( function() {
+		jQuery('#date_range').val('custom');
+		from = new Date(jQuery('#from_date').val());
+		to = new Date(this.value);
+		if (from.getTime() > to.getTime())
+		{	
+			alert('The from date is larger than the to date');
+			jQuery('#to_date').val('');
+		}
+	});
+
+
+	jQuery('#date_range').change(function() {
+		var from;
+		var to;
+		switch (this.value)
+		{
+			case "yesterday":
+				from = new Date();
+				from.setDate(from.getDate() - 2);
+				to = new Date();
+				to.setDate(to.getDate() - 2);
+				break;
+			case "last_7_days":
+				from = new Date();
+				to = new Date();
+				from.setDate(from.getDate() - 8);
+				to.setDate(to.getDate()-2);
+				break;
+			case "week":
+				from = new Date();
+				to = new Date();
+				from.setDate(from.getDate() - from.getDay());
+				to.setDate(to.getDay()-2 > 0 ? to.getDate()-2 : to.getDate());
+				break;
+			case "last_week":
+				from = new Date();
+				to = new Date();
+				from.setDate(from.getDate() - from.getDay()-7);
+				to.setDate(from.getDate() + 6);
+				break;
+			case "last_30_days":
+				from = new Date();
+				to = new Date();
+				from.setDate(from.getDate() - 31);
+				to.setDate(to.getDate()-2);
+				break;
+			case "this_month":
+				from = new Date();
+				to = new Date();
+				from.setDate(1);
+				to.setDate(to.getDate()-2);
+				break;
+			case "last_month":
+				from = new Date();
+				to = new Date();
+				from.setMonth(from.getMonth()-1, 1);
+				to.setMonth(to.getMonth(), 0);
+				break;
+			case "last_12_months":
+				from = new Date();
+				to = new Date();
+				from.setMonth(to.getMonth()-12);
+				from.setDate(to.getDate()-1);
+				to.setDate(to.getDate()-2);
+				break;
+			case "this_year":
+				from = new Date();
+				to = new Date();
+				from.setFullYear(to.getFullYear(), 0, 1);
+				to.setDate(to.getDate()-2);
+				break;
+			case "custom":
+				//do nothing
+				break;
+		}
+
+		jQuery('#from_date').val(formatDate(from));
+		jQuery('#to_date').val(formatDate(to));
+	});
+		
+});
+
+</script>

@@ -4,6 +4,8 @@
  */
 class CategoryMediaReportAction extends KalturaApplicationPlugin
 {
+	const TOP_COUNT = 5;
+	
 	public function __construct()
 	{
 		$this->action = 'CategoryMediaReportAction';
@@ -25,6 +27,19 @@ class CategoryMediaReportAction extends KalturaApplicationPlugin
 	public function getRequiredPermissions()
 	{
 		return array(Kaltura_Client_Enum_PermissionName::USER_SESSION_PERMISSION);
+	}
+
+	private function getDefaultFromDate()
+	{
+		$ret = time() - 31*24*60*60;
+		return date("m/d/Y", $ret);
+		
+	}
+	
+	private function getDefaultToDate()
+	{
+		$ret = time() - 2*24*60*60;
+		return date("m/d/Y", $ret);
 	}
 	
 	/* (non-PHPdoc)
@@ -60,11 +75,50 @@ class CategoryMediaReportAction extends KalturaApplicationPlugin
 			$action->view->errMessage = 'category-media-report category not found';
 		}
 		
-		if(!$category)
+		if(!$category || !($category instanceof Kaltura_Client_Type_Category))
 			return;
 			
 		$action->view->category = $category;
 		$action->view->filterForm = new DateRangeFilter();
+		$action->view->playedEntriesCount = null;
+		$action->view->entriesPlaysCount = null;
+		$action->view->maxPlaysEntry = null;
+		$action->view->top = null;
+		
+		
+		$filter = new Kaltura_Client_Type_ReportInputFilter();
+		
+		$from = $request->getParam('from_date', $this->getDefaultFromDate());
+		$to = $request->getParam('to_date', $this->getDefaultToDate());
+		
+		$filter->categories = $category->fullName;
+		$filter->fromDate = DateTime::createFromFormat('m/d/Y', $from)->getTimestamp();
+		$filter->toDate = DateTime::createFromFormat('m/d/Y', $to)->getTimestamp();
+		$filter->timeZoneOffset = Infra_AuthHelper::getAuthInstance()->getIdentity()->getTimezoneOffset();
+		
+		$total = $client->report->getTotal(Kaltura_Client_Enum_ReportType::TOP_CONTENT, $filter);
+		/* @var $total Kaltura_Client_Type_ReportTotal */
+		$totalData = array_combine(explode(',', $total->header), explode(',', $total->data));
+		
+		// count_plays,sum_time_viewed,avg_time_viewed,count_loads,load_play_ratio,avg_view_drop_off
+		$action->view->entriesPlaysCount = $totalData['count_plays'];
+		
+		$table = $client->report->getTable(Kaltura_Client_Enum_ReportType::TOP_CONTENT, $filter);
+		/* @var $table Kaltura_Client_Type_ReportTable */
+		
+		$action->view->playedEntriesCount = $table->totalCount;
+		
+		//object_id,entry_name,count_plays,sum_time_viewed,avg_time_viewed,count_loads,load_play_ratio,avg_view_drop_off
+		$tableTopData = array_slice(explode(';', $table->data), 0, self::TOP_COUNT);
+		
+		$top = array();
+		foreach($tableTopData as $tableData)
+		{
+			$top[] = array_combine(explode(',', $table->header), explode(',', $tableData));
+		}
+		
+		$action->view->maxPlaysEntry = reset($top);
+		$action->view->top = $top;
 	}
 }
 
