@@ -34,12 +34,12 @@ class CategoryMediaReportAction extends KalturaApplicationPlugin
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$request = $action->getRequest();
-		$this->view->errMessage = null;
+		$action->view->errMessage = null;
 		
 		$categoryId = $request->getParam('categoryId');
 		if(!$categoryId)
 		{
-			$this->view->errMessage = 'category-media-report category not supplied';
+			$action->view->errMessage = 'category-media-report category not supplied';
 			return;
 		}
 		
@@ -50,21 +50,21 @@ class CategoryMediaReportAction extends KalturaApplicationPlugin
 		}
 		catch (Kaltura_Client_Exception $ke)
 		{
-			$this->view->errMessage = $ke->getMessage();
+			$action->view->errMessage = $ke->getMessage();
 		}
 		catch (Kaltura_Client_ClientException $kce)
 		{
-			$this->view->errMessage = $kce->getMessage();
+			$action->view->errMessage = $kce->getMessage();
 		}
 		catch (Exception $e)
 		{
-			$this->view->errMessage = 'category-media-report category not found';
+			$action->view->errMessage = 'category-media-report category not found';
 		}
 		
 		if(!$category)
 			return;
 			
-		$this->view->errcategory = $category;
+		$action->view->errcategory = $category;
 	}
 }
 
