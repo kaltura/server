@@ -78,13 +78,17 @@ class CategoryMediaReportAction extends KalturaApplicationPlugin
 		
 		if(!$category || !($category instanceof Kaltura_Client_Type_Category))
 			return;
-			
+
+		$form = new DateRangeFilter();
+		$form->populate($request->getParams());
+		
 		$action->view->category = $category;
-		$action->view->filterForm = new DateRangeFilter();
+		$action->view->filterForm = $form;
 		$action->view->playedEntriesCount = 0;
 		$action->view->entriesPlaysCount = 0;
 		$action->view->maxPlaysEntry = null;
 		$action->view->top = null;
+		
 		
 		
 		$filter = new Kaltura_Client_Type_ReportInputFilter();
