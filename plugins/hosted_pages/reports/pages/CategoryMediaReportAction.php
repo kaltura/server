@@ -1,7 +1,6 @@
 <?php
 /**
- * @package plugins.dropFolder
- * @subpackage Admin
+ * @package plugins.hostedReports
  */
 class CategoryMediaReportAction extends KalturaApplicationPlugin
 {
@@ -64,7 +63,8 @@ class CategoryMediaReportAction extends KalturaApplicationPlugin
 		if(!$category)
 			return;
 			
-		$action->view->errcategory = $category;
+		$action->view->category = $category;
+		$action->view->filterForm = new DateRangeFilter();
 	}
 }
 
