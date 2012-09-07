@@ -6,17 +6,19 @@
  */
 class Infra_TranslateAdapter extends Zend_Translate_Adapter_Array
 {
-    public function __construct($data, $locale = null, array $options = array())
+    protected function _loadTranslationData($data, $locale, array $options = array())
     {
+        $translate = parent::_loadTranslationData($data, $locale, $options);
+        
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaApplicationTranslations');
 		foreach($pluginInstances as $pluginInstance)
 		{
 			/* @var $pluginInstance IKalturaApplicationTranslations */
 			KalturaLog::debug("Loading plugin[" . $pluginInstance->getPluginName() . "]");
 			$translations =  $pluginInstance->getTranslations($locale);
-			$data = array_merge($data, $translations);
+			$translate = array_merge($translate, $translations);
 		}
 		
-        parent::__construct($data, $locale, $options);
+		return $translate;
     }
 }
