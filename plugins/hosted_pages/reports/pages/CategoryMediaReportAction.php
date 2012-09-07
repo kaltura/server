@@ -101,7 +101,7 @@ class CategoryMediaReportAction extends KalturaApplicationPlugin
 		$totalData = array_combine(explode(',', $total->header), explode(',', $total->data));
 		
 		// count_plays,sum_time_viewed,avg_time_viewed,count_loads,load_play_ratio,avg_view_drop_off
-		if(isset($totalData['count_plays']))
+		if(isset($totalData['count_plays']) && $totalData['count_plays'])
 			$action->view->entriesPlaysCount = $totalData['count_plays'];
 		
 		$pager = new Kaltura_Client_Type_FilterPager();
