@@ -103,13 +103,16 @@ class CategoryMediaReportAction extends KalturaApplicationPlugin
 		// count_plays,sum_time_viewed,avg_time_viewed,count_loads,load_play_ratio,avg_view_drop_off
 		$action->view->entriesPlaysCount = $totalData['count_plays'];
 		
-		$table = $client->report->getTable(Kaltura_Client_Enum_ReportType::TOP_CONTENT, $filter);
+		$pager = new Kaltura_Client_Type_FilterPager();
+		$pager->pageSize= self::TOP_COUNT;
+		$pager->page = 1;
+		$table = $client->report->getTable(Kaltura_Client_Enum_ReportType::TOP_CONTENT, $filter, $pager);
 		/* @var $table Kaltura_Client_Type_ReportTable */
 		
 		$action->view->playedEntriesCount = $table->totalCount;
 		
 		//object_id,entry_name,count_plays,sum_time_viewed,avg_time_viewed,count_loads,load_play_ratio,avg_view_drop_off
-		$tableTopData = array_slice(explode(';', $table->data), 0, self::TOP_COUNT);
+		$tableTopData = explode(';', $table->data);
 		
 		$top = array();
 		foreach($tableTopData as $tableData)
