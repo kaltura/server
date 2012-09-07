@@ -16,7 +16,7 @@ class Infra_TranslateAdapter extends Zend_Translate_Adapter_Array
 			/* @var $pluginInstance IKalturaApplicationTranslations */
 			KalturaLog::debug("Loading plugin[" . $pluginInstance->getPluginName() . "]");
 			$translations =  $pluginInstance->getTranslations($locale);
-			$translate = array_merge($translate, $translations);
+			$translate = array_merge_recursive($translate, $translations);
 		}
 		
 		return $translate;
