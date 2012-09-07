@@ -14,20 +14,22 @@ class DateRangeFilter extends Infra_Form
 			array('HtmlTag', array('tag' => 'fieldset'))
 		));
 		
+		$translator = $this->getDefaultTranslator();
+		
 		//date range
 		$this->addElement('select', 'date_range', array(
 			'required' 		=> true,
 			'multiOptions' 	=> array(
-				'yesterday' => 'Yesterday',
-		        'last_7_days' => 'Last 7 Days',
-		        'week'		=> 'This week',
-		        'last_week' => 'Last week',
-		        'last_30_days' => 'Last 30 days',
-		        'this_month'   => 'This month',
-		        'last_month'   => 'Last month',
-		        'last_12_months' => 'Last 12 months',
-		        'this_year' =>    'This year',
-		        'custom' => 'Custom',
+				'yesterday' => $translator->translate('yesterday'),
+		        'last_7_days' => $translator->translate('last_7_days'),
+		        'week'		=> $translator->translate('week'),
+		        'last_week' => $translator->translate('last_week'),
+		        'last_30_days' => $translator->translate('last_30_days'),
+		        'this_month'   => $translator->translate('this_month'),
+		        'last_month'   => $translator->translate('last_month'),
+		        'last_12_months' => $translator->translate('last_12_months'),
+		        'this_year' =>    $translator->translate('this_year'),
+		        'custom' => $translator->translate('custom'),
 			),
 			'value'		=> 'last_30_days',
 			'decorators' => array('ViewHelper', 'Label'),
@@ -59,7 +61,7 @@ class DateRangeFilter extends Infra_Form
 		));
 		
 		$this->addDisplayGroup(array('date_range'), 'date_range_group', array(
-			'description' => 'partner-usage date-range filter type',
+			'description' => 'date-range filter type',
 			'decorators' => array(
 				array('Description', array('tag' => 'legend')), 
 				'FormElements', 
@@ -68,7 +70,7 @@ class DateRangeFilter extends Infra_Form
 		));
 		
 		$this->addDisplayGroup(array('from_date', 'dates_separator', 'to_date'), 'dates', array(
-			'description' => 'partner-usage filter range limit', 
+			'description' => 'date-range filter range limit', 
 			'decorators' => array(
 				array('Description', array('tag' => 'legend')), 
 				'FormElements', 
@@ -80,7 +82,7 @@ class DateRangeFilter extends Infra_Form
 		$this->addElement('button', 'submit', array(
 			'type' => 'submit',
 			'id' => 'do_filter',
-			'label'		=> 'partner-usage filter search',
+			'label'		=> 'date-range filter search',
 			'decorators' => array('ViewHelper'),
 		));
 	}
