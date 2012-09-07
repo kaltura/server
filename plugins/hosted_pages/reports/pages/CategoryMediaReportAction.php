@@ -58,6 +58,7 @@ class CategoryMediaReportAction extends KalturaApplicationPlugin
 		}
 		
 		$client = Infra_ClientHelper::getClient();
+		$category = null;
 		try
 		{
 			$category = $client->category->get($categoryId);
@@ -120,7 +121,8 @@ class CategoryMediaReportAction extends KalturaApplicationPlugin
 			$top = array();
 			foreach($tableTopData as $tableData)
 			{
-				$top[] = array_combine(explode(',', $table->header), explode(',', $tableData));
+				if(trim($tableData))
+					$top[] = array_combine(explode(',', $table->header), explode(',', $tableData));
 			}
 			
 			$action->view->maxPlaysEntry = reset($top);

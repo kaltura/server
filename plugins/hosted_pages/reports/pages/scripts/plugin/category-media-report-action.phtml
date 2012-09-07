@@ -62,7 +62,7 @@
 						?>
 						<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
 							<td><a href="<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CategoryMediaReportAction', 'entryId' => $entry['object_id'])); ?>"><?php echo $entry['entry_name']; ?></a></td>
-							<td><?php echo $entry['creator_id']; ?></td>
+							<td><?php //echo $entry['creator_id']; ?></td>
 							<td><?php echo $entry['count_plays']; ?></td>
 							<td><?php echo round($entry['sum_time_viewed'], 2, PHP_ROUND_HALF_UP) ; ?></td>
 							<td><?php echo round($entry['avg_time_viewed'], 2, PHP_ROUND_HALF_UP); ?></td>
