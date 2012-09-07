@@ -27,14 +27,21 @@ class HostedReportsPlugin extends KalturaPlugin implements IKalturaHostedPages, 
 		return $pages;
 	}
 	
+	private static function getTranslationsArray($locale)
+	{
+		$langFilePath = __DIR__ . "/config/lang/$locale.php";
+		if(file_exists($langFilePath))
+			require_once $langFilePath;
+			
+		return array();
+	}
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaApplicationTranslations::getTranslations()
 	 */
 	public static function getTranslations($locale)
 	{
-		return array(
-		
-		);
+		return array($locale => self::getTranslationsArray($locale));
 	}
 	
 	/* (non-PHPdoc)
