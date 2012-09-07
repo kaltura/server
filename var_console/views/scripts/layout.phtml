@@ -42,14 +42,12 @@ function addSubTitle(subTitle) {
 <div id="sub-header">
 	<a id="help">[?]</a>
 	<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
-		<?php if (Infra_AuthHelper::getAuthInstance()->hasIdentity()): ?>
-			<?php echo $this->navigation()->menu()->renderMenu(null, array(
-				'onlyActiveBranch' => true,
-				'ulClass' => 'sub-navigation', 
-				'minDepth' => 1, 
-				'maxDepth' => 1
-			)); ?>
-		<?php endif; ?>
+		<?php echo $this->navigation()->menu()->renderMenu(null, array(
+			'onlyActiveBranch' => true,
+			'ulClass' => 'sub-navigation', 
+			'minDepth' => 1, 
+			'maxDepth' => 1
+		)); ?>
 	<?php endif; ?>
 </div>
 <div id="wrapper">
