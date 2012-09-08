@@ -381,6 +381,7 @@ index kaltura_entry_distribution
 	rt_field	 = entry_id
 	rt_field	 = thumb_asset_ids
 	rt_field	 = flavor_asset_ids
+	rt_field	 = asset_ids
 	rt_field	 = remote_id
 	rt_attr_uint	 = int_entry_id
 	rt_attr_uint	 = entry_distribution_id
