@@ -390,6 +390,7 @@ class ThumbAssetService extends KalturaAssetService
 	 */
 	public function serveByEntryIdAction($entryId, $thumbParamId = null)
 	{
+		$entry = null;
 		if (!kCurrentContext::$ks)
 		{
 			$entry = kCurrentContext::initPartnerByEntryId($entryId);
@@ -411,6 +412,9 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
+		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, accessControlContextType::THUMBNAIL);
+		$securyEntryHelper->validateAccessControl();
+		
 		$fileName = $entry->getId() . '.jpg';
 		
 		if(is_null($thumbParamId))
@@ -454,15 +458,15 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$thumbAsset || !($thumbAsset instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 			
-		if(kEntitlementUtils::getEntitlementEnforcement())
+		$entry = entryPeer::retrieveByPK($thumbAsset->getEntryId());
+		if(!$entry)
 		{
-			$entry = entryPeer::retrieveByPK($thumbAsset->getEntryId());
-			if(!$entry)
-			{
-				//we will throw thumb asset not found, as the user is not entitled, and should not know that the entry exists.
-				throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
-			}	
+			//we will throw thumb asset not found, as the user is not entitled, and should not know that the entry exists.
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		}
+		
+		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, accessControlContextType::THUMBNAIL);
+		$securyEntryHelper->validateAccessControl();
 
 		$ext = $thumbAsset->getFileExt();
 		if(is_null($ext))
