@@ -404,10 +404,35 @@ class AttachmentAssetService extends KalturaAssetService
 	 */
 	public function serveAction($attachmentAssetId)
 	{
-		$attachmentAsset = assetPeer::retrieveById($attachmentAssetId);
+		$attachmentAsset = null;
+		if (!kCurrentContext::$ks)
+		{	
+			$attachmentAsset = kCurrentContext::initPartnerByAssetId($attachmentAssetId);
+			
+			if (!$attachmentAsset || $attachmentAsset->getStatus() == asset::ASSET_STATUS_DELETED)
+				throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
+				
+			// enforce entitlement
+			kEntitlementUtils::initEntitlementEnforcement();
+		}
+		else 
+		{	
+			$attachmentAsset = assetPeer::retrieveById($attachmentAssetId);
+		}
+		
 		if (!$attachmentAsset || !($attachmentAsset instanceof AttachmentAsset))
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
-
+		
+		$entry = entryPeer::retrieveByPK($attachmentAsset->getEntryId());
+		if(!$entry)
+		{
+			//we will throw attachment asset not found, as the user is not entitled, and should not know that the entry exists.
+			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
+		}
+		
+		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, accessControlContextType::DOWNLOAD);
+		$securyEntryHelper->validateForDownload();
+		
 		$ext = $attachmentAsset->getFileExt();
 		if(is_null($ext))
 			$ext = 'txt';
