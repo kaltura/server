@@ -6,7 +6,7 @@ FROM (
 		(SELECT entry_id
 		FROM dwh_hourly_events_context_entry_user_app ev, dwh_dim_applications ap
 			WHERE
-				AND {OBJ_ID_CLAUSE}
+				{OBJ_ID_CLAUSE}
 				AND {CAT_ID_CLAUSE}
 				AND ap.name = {APPLICATION_NAME}
 				AND ap.partner_id = ev.partner_id
