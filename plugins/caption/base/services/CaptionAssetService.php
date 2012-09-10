@@ -363,6 +363,7 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	public function serveByEntryIdAction($entryId, $captionParamId = null)
 	{
+		$entry = null;
 		if (!kCurrentContext::$ks)
 		{
 			$entry = kCurrentContext::initPartnerByEntryId($entryId);
@@ -384,6 +385,9 @@ class CaptionAssetService extends KalturaAssetService
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
+		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, accessControlContextType::DOWNLOAD);
+		$securyEntryHelper->validateForDownload();
+		
 		$captionAsset = null;
 		if(is_null($captionParamId))
 		{
@@ -480,6 +484,7 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	public function serveAction($captionAssetId)
 	{
+		$captionAsset = null;
 		if (!kCurrentContext::$ks)
 		{	
 			$captionAsset = kCurrentContext::initPartnerByAssetId($captionAssetId);
@@ -498,15 +503,16 @@ class CaptionAssetService extends KalturaAssetService
 		if (!$captionAsset || !($captionAsset instanceof CaptionAsset))
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 			
-		if(kEntitlementUtils::getEntitlementEnforcement())
+		$entry = entryPeer::retrieveByPK($captionAsset->getEntryId());
+		if(!$entry)
 		{
-			$entry = entryPeer::retrieveByPK($captionAsset->getEntryId());
-			if(!$entry)
-			{
-				//we will throw caption asset not found, as the user is not entitled, and should not know that the entry exists.
-				throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
-			}	
-		}			
+			//we will throw caption asset not found, as the user is not entitled, and should not know that the entry exists.
+			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
+		}
+		
+		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, accessControlContextType::DOWNLOAD);
+		$securyEntryHelper->validateForDownload();
+		
 
 		$ext = $captionAsset->getFileExt();
 		if(is_null($ext))
