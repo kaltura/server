@@ -186,6 +186,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				self::UI_CONF_CLIENTSIDE_ENCODER => "Express Uploader",
 				self::UI_CONF_KMC_GENERAL => "KMC",
 				self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => "KMC Roles and Permissions",
+				self::UI_CONF_CLIPPER => "Kaltura Clipper",
 				self::UI_CONF_TYPE_KSR => "Kaltura Screen Recorder",
 			);
 		}
