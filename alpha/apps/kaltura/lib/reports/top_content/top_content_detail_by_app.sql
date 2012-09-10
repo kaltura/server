@@ -34,6 +34,6 @@ FROM
 		  count_plays > 0 OR
 		  count_loads > 0 )
 GROUP BY ev.entry_id) stats, kalturadw.dwh_dim_entries en
-WHERE en.entry_id=ev.entry_id
+WHERE en.entry_id=stats.object_id
 ORDER BY {SORT_FIELD}
 LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
