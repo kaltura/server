@@ -435,7 +435,8 @@ insert  into `permission`(`id`,`type`,`name`,`friendly_name`,`description`,`part
 (191,1,'ADMIN_USER_BULK','Users Bulk Upload','Users Bulk Upload',0,1,'FEATURE_END_USER_MANAGE','',now(),now(),'a:1:{s:13:\"partner_group\";s:0:\"\";}'),
 (192,1,'systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_PACKAGES_SERVICE_PAID','System admin config publisher paid package service','Permission to modify publishers packages service into paid package',-2,1,'','',now(),now(),'a:1:{s:13:\"partner_group\";s:0:\"\";}'),
 (193,1,'MANAGE_ADMIN_USERS','manage KMC users and roles','manage KMC users and roles',0,1,'','',now(),now(),'a:1:{s:13:\"partner_group\";s:0:\"\";}'),
-(194,1,'SYSTEM_ADMIN_MP_REDIRECT','Base system admin permission','',-2,1,'','',now(),now(),'a:1:{s:13:\"partner_group\";s:0:\"\";}');
+(194,1,'SYSTEM_ADMIN_MP_REDIRECT','Base system admin permission','',-2,1,'','',now(),now(),'a:1:{s:13:\"partner_group\";s:0:\"\";}'),
+(195,2,'FEATURE_END_USER_REPORTS',NULL,NULL,99,1,NULL,NULL,now(),now(),NULL);
 
 insert  into `permission_item`(`id`,`type`,`partner_id`,`param_1`,`param_2`,`param_3`,`param_4`,`param_5`,`tags`,`created_at`,`updated_at`,`custom_data`) values 
 (1,'kApiActionPermissionItem',0,'metadata_metadataprofile','list','','','',NULL,now(),now(),NULL),
