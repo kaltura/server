@@ -110,6 +110,7 @@ class KalturaAccessControl extends KalturaObject implements IFilterable
 			foreach($this->restrictions as $restriction)
 			{
 				/* @var $restriction KalturaBaseRestriction */
+				$restrictions = clone $this->restrictions;
 				$rule = $restriction->toRule($this->restrictions);
 				if($rule)
 					$rules[] = $rule;
@@ -162,7 +163,7 @@ class KalturaAccessControl extends KalturaObject implements IFilterable
 	public function toUpdatableObject($dbObject, $skip = array())
 	{
 		/* @var $dbObject accessControl */
-		$rules = $dbObject->getRules();
+		$rules = $dbObject->getRulesArray();
 		foreach($rules as $rule)
 			if(!($rule instanceof kAccessControlRestriction))
 				throw new KalturaAPIException(KalturaErrors::ACCESS_CONTROL_NEW_VERSION_UPDATE, $dbObject->getId());
