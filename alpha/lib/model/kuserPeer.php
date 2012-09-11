@@ -500,7 +500,7 @@ class kuserPeer extends BasekuserPeer
 				}
 				else
 				{
-					$bodyParams = array($adminName, $creatorUserName, $publisherName, $loginEmail, $publisherName, $roleName, $publisherName, $puserId);
+					$bodyParams = array($adminName, $creatorUserName, $publisherName, $loginEmail, $publisherName, $roleName, $publisherName, $partnerId);
 				}
 				
 				// add mail job
