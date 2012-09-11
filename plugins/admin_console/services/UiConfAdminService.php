@@ -52,7 +52,7 @@ class UiConfAdminService extends KalturaBaseService
 	{
 		$dbUiConf = uiConfPeer::retrieveByPK( $id );
 		
-		if (!$dbUiConf)
+		if (!$dbUiConf || $dbUiConf->getPartnerId() == PartnerPeer::GLOBAL_PARTNER)
 			throw new KalturaAPIException ( APIErrors::INVALID_UI_CONF_ID , $id );
 		
 		$dbUiConf = $uiConf->toObject($dbUiConf);
