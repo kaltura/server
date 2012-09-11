@@ -231,7 +231,8 @@ class widget extends Basewidget
 	   	
 	   	if ( $player_name == null )
 	   		$player_name = 'kaltura_player_' . (int)microtime(true);
-
+		
+	   	$widget = "";
 	   	if ($this->getAddEmbedHtml5Support()) {
 		   	//following line is html5 support
 			$widget = '<script type="text/javascript" src="http://www.kaltura.com/p/'.$this->getPartnerId().'/sp/'.$this->getPartnerId().'00/embedIframeJs/uiconf_id/'.$this->getUiConfId().'/partner_id/' . $this->getPartnerId() . '"></script>';
