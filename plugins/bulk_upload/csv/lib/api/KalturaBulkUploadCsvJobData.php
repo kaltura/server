@@ -15,6 +15,12 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 	public $csvVersion = null;
 	
 	/**
+	 * Array containing CSV headers
+	 * @var KalturaStringArray
+	 */
+	public $columns;
+	
+	/**
 	 * 
 	 * Maps between objects and the properties
 	 * @var array
