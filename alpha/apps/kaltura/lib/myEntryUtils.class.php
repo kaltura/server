@@ -676,10 +676,13 @@ class myEntryUtils
 		$entry_status = $entry->getStatus();
 		 
 		$tempThumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
+			
 		if ($orig_image_path)
 			$tempThumbName.= '_oip_'.basename($orig_image_path);
 		if ($density)
 			$tempThumbName.= "_dns_{$density}";
+		if($stripProfiles)
+			$tempThumbName .= "_stp_{$stripProfiles}";
 				
 		$entryThumbFilename = ($entry->getThumbnail() ? $entry->getThumbnail() : "0.jpg");
 		if ($entry->getStatus() != entryStatus::READY || @$entryThumbFilename[0] == '&')
