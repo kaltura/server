@@ -2,10 +2,15 @@
 
 class kQueryCache 
 {
-	const INVALIDATION_TIME_MARGIN_SEC = 60;		// When comparing the invalidation key timestamp to the query timestamp, 
+	const CLOCK_SYNC_TIME_MARGIN_SEC = 10;			// When comparing the invalidation key timestamp to the query timestamp, 
 													// the query timestamp should be greater by this value to use the cache
-	const QUERY_MASTER_TIME_MARGIN_SEC = 300;		// The time frame after a change to a row during which we should query the master
-	const MAX_CACHED_OBJECT_COUNT = 100;			// Select queries that return more objects than this const will not be cached
+													// in order to compensate for clock differences
+	const SLAVE_LAG_TIME_MARGIN_SEC = 70;			// This value is added to the measured slave lag as a safety margin.
+													// it is composed of the lag measuring period (60) and the clock sync margin (10)
+	const MAX_QUERY_MASTER_TIME_MARGIN_SEC = 300;	// The maximum time frame after a DB change during which we should query the master
+	
+	const MAX_CACHED_OBJECT_COUNT = 500;			// Select queries that return more objects than this const will not be cached
+													// 500 serialized entries take 110K after compression, well below the memcache 1M limit  
 	const CACHED_QUERIES_EXPIRY_SEC = 86400;		// The expiry of the query keys in the memcache 	
 	const INVALIDATION_KEYS_EXPIRY_MARGIN = 3600;	// An extra expiry time given to invalidation keys over cached queries
 
@@ -14,6 +19,7 @@ class kQueryCache
 	const CACHE_PREFIX_QUERY = 'QCQ-';				// = Query Cache - Query
 	const CACHE_PREFIX_INVALIDATION_KEY = 'QCI-';	// = Query Cache - Invalidation key
 	const DONT_CACHE_KEY = 'QCC-DontCache';			// when set new queries won't be cached in the memcache
+	const MAX_SLAVE_LAG_KEY = 'QCC-MaxSlaveLag';	// the maximum lag of slaves in the current DC
 	
 	const QUERY_TYPE_SELECT = 'sel-';
 	const QUERY_TYPE_COUNT =  'cnt-';
@@ -190,6 +196,7 @@ class kQueryCache
 
 		$keysToGet = $invalidationKeys;
 		$keysToGet[] = self::DONT_CACHE_KEY;
+		$keysToGet[] = self::MAX_SLAVE_LAG_KEY;
 		
 		$queryStart = microtime(true);
 		$cacheResult = self::$s_memcacheKeys->multiGet($keysToGet);
@@ -200,52 +207,74 @@ class kQueryCache
 			KalturaLog::debug("kQueryCache: failed to query keys memcache, not using query cache");
 			return null;
 		}
+
+		// get max slave lag
+		$queryMasterThreshold = self::MAX_QUERY_MASTER_TIME_MARGIN_SEC;
+		$maxSlaveLag = null;		
+		if (array_key_exists(self::MAX_SLAVE_LAG_KEY, $cacheResult) && 
+			strlen($cacheResult[self::MAX_SLAVE_LAG_KEY]) && 
+			is_numeric($cacheResult[self::MAX_SLAVE_LAG_KEY]))
+		{
+			$maxSlaveLag = $cacheResult[self::MAX_SLAVE_LAG_KEY];
+			$maxSlaveLag += self::SLAVE_LAG_TIME_MARGIN_SEC;
+			$queryMasterThreshold = min($maxSlaveLag, $queryMasterThreshold);
+		}
+		unset($cacheResult[self::MAX_SLAVE_LAG_KEY]);
 		
 		// don't cache the result if the 'dont cache' flag is enabled
 		$cacheQuery = true;
-		if (array_key_exists(self::DONT_CACHE_KEY, $cacheResult))
+		if (array_key_exists(self::DONT_CACHE_KEY, $cacheResult) && 
+			$cacheResult[self::DONT_CACHE_KEY])
 		{
-			if ($cacheResult[self::DONT_CACHE_KEY])
-			{
-				KalturaLog::debug("kQueryCache: dontCache key is set -> not caching the result");
-				if (class_exists('KalturaResponseCacher'))
-					KalturaResponseCacher::disableConditionalCache();
-				$cacheQuery = false;
-			}
-			unset($cacheResult[self::DONT_CACHE_KEY]);
+			KalturaLog::debug("kQueryCache: dontCache key is set -> not caching the result");
+			$cacheQuery = false;
 		}
+		unset($cacheResult[self::DONT_CACHE_KEY]);
 		
+		// get max invalidation time
+		$maxInvalidationTime = null;
+		$maxInvalidationKey = null;
+		if (count($cacheResult))
+		{
+			$maxInvalidationTime = max($cacheResult);
+			$maxInvalidationKey = array_search($maxInvalidationTime, $cacheResult);
+		}
+
 		// check whether we should query the master
 		$queryDB = self::QUERY_DB_SLAVE;
-		$currentTime = time();
-		foreach ($cacheResult as $invalidationKey => $invalidationTime)
-		{			
-			if ($currentTime < $invalidationTime + self::QUERY_MASTER_TIME_MARGIN_SEC)
+		$currentTime = time();		
+		if (!is_null($maxInvalidationTime) && 
+			$currentTime < $maxInvalidationTime + $queryMasterThreshold)
+		{
+			KalturaLog::debug("kQueryCache: changed recently -> query master, peer=$peerClassName, invkey=$maxInvalidationKey querytime=$currentTime invtime=$maxInvalidationTime threshold=$queryMasterThreshold");
+			$queryDB = self::QUERY_DB_MASTER;
+			if ($currentTime < $maxInvalidationTime + self::CLOCK_SYNC_TIME_MARGIN_SEC)
 			{
-				KalturaLog::debug("kQueryCache: changed recently -> query master, peer=$peerClassName, invkey=$invalidationKey querytime=$currentTime invtime=$invalidationTime");
-				$queryDB = self::QUERY_DB_MASTER;
-				if ($currentTime < $invalidationTime + self::INVALIDATION_TIME_MARGIN_SEC)
-				{
-					return null;			// The query won't be cached since cacheKey is null, it's ok cause it won't be used anyway
-				}
+				return null;			// The query won't be cached since cacheKey is null, it's ok cause it won't be used anyway
 			}
 		}
-		
-		if (class_exists('KalturaResponseCacher'))
+
+		if ($queryDB == self::QUERY_DB_SLAVE && 
+			!is_null($maxInvalidationTime) && 
+			$currentTime < $maxInvalidationTime + $maxSlaveLag)
 		{
-			$invalidationTime = 0;
-			if ($cacheResult)
-				$invalidationTime = max($cacheResult);
-			KalturaResponseCacher::addInvalidationKeys($invalidationKeys, $invalidationTime);
+			KalturaLog::debug("kQueryCache: using an out of date slave -> not caching the result, peer=$peerClassName, invkey=$maxInvalidationKey querytime=$currentTime invtime=$maxInvalidationTime slavelag=$maxSlaveLag");
+			$cacheQuery = false;
+		}
+					
+		// get the cache key and update the api cache
+		$origCacheKey = self::CACHE_PREFIX_QUERY . $queryType . md5(serialize($criteria) . self::CACHE_VERSION);
+		if ($cacheQuery)
+		{
+			kApiCache::addInvalidationKeys($invalidationKeys, $maxInvalidationTime);
+			$cacheKey = $origCacheKey; 
+		}
+		else 
+		{
+			kApiCache::disableConditionalCache();
 		}
 		
 		// check whether we have a valid cached query
-		$origCacheKey = self::CACHE_PREFIX_QUERY.$queryType.md5(serialize($criteria) . self::CACHE_VERSION);
-		if ($cacheQuery)
-		{
-			$cacheKey = $origCacheKey; 
-		}
-		
 		$queryStart = microtime(true);
 		$queryResult = self::$s_memcacheQueries->get($origCacheKey);
 		KalturaLog::debug("kQueryCache: query took " . (microtime(true) - $queryStart) . " seconds");
@@ -258,19 +287,19 @@ class kQueryCache
 		
 		list($queryResult, $queryTime, $debugInfo) = $queryResult;
 		
+		if (!is_null($maxInvalidationTime) && 
+			$queryTime < $maxInvalidationTime + self::CLOCK_SYNC_TIME_MARGIN_SEC)
+		{
+			KalturaLog::debug("kQueryCache: cached query invalid, peer=$peerClassName, key=$origCacheKey, invkey=$maxInvalidationKey querytime=$queryTime debugInfo=$debugInfo invtime=$maxInvalidationTime");
+			return null;
+		}
+		
+		// return from memcache
 		$existingInvKeys = array();
 		foreach ($cacheResult as $invalidationKey => $invalidationTime)
 		{
 			$existingInvKeys[] = "$invalidationKey:$invalidationTime";
-			
-			if ($queryTime < $invalidationTime + self::INVALIDATION_TIME_MARGIN_SEC)
-			{
-				KalturaLog::debug("kQueryCache: cached query invalid, peer=$peerClassName, key=$origCacheKey, invkey=$invalidationKey querytime=$queryTime debugInfo=$debugInfo invtime=$invalidationTime");
-				return null;
-			}
 		}
-		
-		// return from memcache
 		$existingInvKeys = implode(',', $existingInvKeys);
 		
 		KalturaLog::debug("kQueryCache: returning from memcache, peer=$peerClassName, key=$origCacheKey queryTime=$queryTime debugInfo=$debugInfo invkeys=[$existingInvKeys]");
