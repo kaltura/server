@@ -148,10 +148,10 @@ class myContentStorage
 	 */
 	public static function generateRandomFileName($fileName, $previousFileName = NULL )
 	{
-		if( $fileName == null )
+		if( $fileName === null )
 			return null;
 		
-		
+				
 		if ($previousFileName)
 		{
 			$c = strstr($previousFileName, '^') ?  '^' : '&';
