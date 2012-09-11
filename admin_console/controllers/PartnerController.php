@@ -232,10 +232,11 @@ class PartnerController extends Zend_Controller_Action
 		
 		$request = $this->getRequest();
 		
-		
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500; 
 		if (!$editMode) //new
 		{
-			$flavorParamsResponse = $client->flavorParams->listAction();
+			$flavorParamsResponse = $client->flavorParams->listAction(null, $pager);
 			$form->addFlavorParamsFields($flavorParamsResponse);
 			$form->getElement('partnerId')->setAttrib('readonly',true);
 			$form->getElement('partnerId')->setValue($request->getParam('new_partner_id'));
@@ -244,7 +245,7 @@ class PartnerController extends Zend_Controller_Action
 		{			
 			$storage = $client->storageProfile->get($storageId);	
 			Infra_ClientHelper::impersonate($storage->partnerId);
-			$flavorParamsResponse = $client->flavorParams->listAction();
+			$flavorParamsResponse = $client->flavorParams->listAction(null, $pager);
 			Infra_ClientHelper::unimpersonate();
 			$flavorParamsIds = array();
 			if($storage->flavorParamsIds)
