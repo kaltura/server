@@ -6,8 +6,7 @@ SELECT
 	avg_time_viewed,
 	count_loads,
 	load_play_ratio,
-	avg_view_drop_off,
-	puser_id
+	avg_view_drop_off
 FROM 
 	(SELECT
 		entry_id object_id,
