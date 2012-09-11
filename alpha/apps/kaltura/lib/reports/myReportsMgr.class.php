@@ -14,7 +14,6 @@ class myReportsMgr
 	const REPORT_TYPE_TOP_CONTRIBUTORS = 5;
 	const REPORT_TYPE_TOP_SYNDICATION = 6;
 	const REPORT_TYPE_CONTENT_CONTRIBUTIONS = 7;
-	const REPORT_TYPE_WIDGETS_STATS = 8;
 	const REPORT_TYPE_ADMIN_CONSOLE = 10;
 	const REPORT_TYPE_USER_ENGAGEMENT = 11;
 	const REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE = 110;
@@ -40,7 +39,15 @@ class myReportsMgr
 	
 	const COUNT_PLAYS_HEADER = "count_plays";
 	const UNIQUE_USERS = "unique_known_users";
-	const UNIQUE_VIDEOS = "unique_videos"; 
+	const UNIQUE_VIDEOS = "unique_videos";
+
+	static $unique_total_reports = array (self::REPORT_TYPE_USER_ENGAGEMENT,
+										self::REPORT_TYPE_SPEFICIC_USER_ENGAGEMENT, 
+										self::REPORT_TYPE_USER_TOP_CONTENT,
+										self::REPORT_TYPE_USER_CONTENT_DROPOFF,
+										self::REPORT_TYPE_USER_CONTENT_INTERACTIONS);
+										
+										
 
 	public static function runQuery ( $query_file , $map , $debug = false )
 	{
@@ -218,7 +225,7 @@ class myReportsMgr
 				$data[] = $value;
 			}
 			$res = array ( $header , $data );
-			if ($input_filter instanceof endUserReportsInputFilter && $report_type != self::REPORT_TYPE_USER_USAGE && $report_type != self::REPORT_TYPE_SPECIFIC_USER_USAGE) 
+			if ($input_filter instanceof endUserReportsInputFilter && in_array($report_type, $unique_total_reports)) 
 			{
 				foreach ( $row as $name => $value )
 				{
@@ -707,7 +714,6 @@ class myReportsMgr
 		self::REPORT_TYPE_TOP_CONTRIBUTORS => "top_contributors" ,
 		self::REPORT_TYPE_TOP_SYNDICATION => "top_syndication" ,
 		self::REPORT_TYPE_CONTENT_CONTRIBUTIONS => "content_contributions" ,
-		self::REPORT_TYPE_WIDGETS_STATS => "widgets_stats" ,
 		self::REPORT_TYPE_ADMIN_CONSOLE => "admin_console" ,
 		self::REPORT_TYPE_USER_ENGAGEMENT => "user_engagement",
 		self::REPORT_TYPE_USER_ENGAGEMENT_TOTAL_UNIQUE => "user_engagement_unique",
@@ -802,10 +808,6 @@ class myReportsMgr
 				"avg_time_viewed" ,
 				"count_loads" ,
 				"load_play_ratio" ,	
-			),
-			"widgets_stats" => array (
-				"widget_id",
-				"count_plays"
 			),
 			"user_engagement" => array (
 				"unique_videos",
