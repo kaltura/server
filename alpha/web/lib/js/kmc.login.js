@@ -42,9 +42,9 @@ function loginF( remMe, partner_id, subp_id, uid, ks , screen_name, email ) {
 
 	if ( ! has_cookie ) {
 		$.cookie("kmcks", ks, options);
-		/*
 		$.cookie("pid", partner_id, options);
 		$.cookie("subpid", subp_id, options);
+		/*
 		$.cookie("uid", uid , options);
 		$.cookie("screen_name", screen_name, options);
 		$.cookie("email", email, options);
