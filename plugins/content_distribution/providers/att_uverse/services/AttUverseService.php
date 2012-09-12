@@ -51,6 +51,7 @@ class AttUverseService extends KalturaBaseService
 		
 		$feed = new AttUverseDistributionFeedHelper('feed_template.xml',$profile );
 		$channelTitle = $profile->getChannelTitle();	
+		$counter = 0;
 		foreach($entries as $entry)
 		{
 			/* @var $entry entry */
@@ -72,6 +73,12 @@ class AttUverseService extends KalturaBaseService
 			$remoteThumbailFileUrls = unserialize($entryDistribution->getFromCustomData(AttUverseEntryDistributionCustomDataField::REMOTE_THUMBNAIL_FILE_URLS));
 			
 			$feed->addItem($fields, $flavorAssets, $remoteAssetFileUrls, $thumbAssets, $remoteThumbailFileUrls);
+			$counter++;
+			//to avoid the cache exceeding the memory size 
+			if ($counter >= 100){
+				kMemoryManager::clearMemory();
+				$counter = 0;
+			}
 		}
 		
 		//set channel title
