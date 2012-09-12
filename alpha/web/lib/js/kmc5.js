@@ -161,7 +161,7 @@ kmc.functions = {
 		
 		var iframe_url = kmc.vars.base_url + '/apps/clipapp/' + kmc.vars.clipapp.version;
 			iframe_url += '/?kdpUiconf=' + kmc.vars.clipapp.kdp + '&kclipUiconf=' + kmc.vars.clipapp.kclip;
-			iframe_url += '&partnerId=' + kmc.vars.partner_id + '&mode=' + mode + '&config=kmc&entryId=' + entry_id;
+			iframe_url += '&partnerId=' + kmc.vars.partner_id + '&userId=' + kmc.vars.user_id + '&mode=' + mode + '&config=kmc&entryId=' + entry_id;
 
 		var title = ( mode == 'trim' ) ? 'Trimming Tool' : 'Clipping Tool';
 

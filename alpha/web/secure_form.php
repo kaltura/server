@@ -13,8 +13,6 @@ class secForm {
 	var $email;
 	var $fname;
 	var $lname;
-	var $partnerId;
-	var $userId;
 	var $Ks;
 	var $error;
 	var $curAction;
@@ -22,9 +20,6 @@ class secForm {
 	function secForm() {
 		//echo '<pre>'; print_r( explode(";", base64_decode($_COOKIE['kmcks'])) ); exit();
 		// Get data from cookies
-		$this->email = $_COOKIE['email'];
-		$this->partnerId = $_COOKIE['pid'];
-		$this->userId = $_COOKIE['uid'];
 		$this->Ks = $_COOKIE['kmcks'];
 
 		// Get data from url parameters
@@ -77,7 +72,7 @@ class secForm {
 		require_once( realpath( dirname(__FILE__) ) . '/../../clients/php5/KalturaClient.php' );
 				
 		try {		
-			$conf = new KalturaConfiguration( $this->partnerId );
+			$conf = new KalturaConfiguration( null );
 			$conf->serviceUrl = 'http://' . $kConf->get('www_host');
 			$client = new KalturaClient( $conf );
 			$client->setKS( $this->Ks );
@@ -282,7 +277,6 @@ HTML;
 			
 			// Changing name
 			$client->user->updateLoginData($this->email, $_POST['password'], null, null, $_POST['fname'], $_POST['lname']);
-			setcookie("screen_name", $_POST['fname'] . ' ' . $_POST['lname'] );
 			
 			// Show success message
 			$this->showSuccess();
