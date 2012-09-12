@@ -26,7 +26,7 @@
 	<body>
 
 <div id="player_container" ></div> 
-<script src="http://<?php echo kConf::get('cdn_host'); ?>/content/uiconf/ps/kaltura/js/flashembed.js"></script> 
+<script src="/lib/js/flashembed.js"></script> 
 <script type="text/javascript"> 
 
 //Define Player Parameters
