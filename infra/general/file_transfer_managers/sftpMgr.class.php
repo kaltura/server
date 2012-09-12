@@ -276,9 +276,10 @@ class sftpMgr extends kFileTransferMgr
 		
 		$filesInfo = array_filter(array_map('trim', explode("\n", $exec_output)), 'strlen');
 			    
+		$escRemoteFolder = str_replace('/', '\/', $remote_folder);
 		// drwxrwxrwx 10 root root 4096 2010-11-24 23:45 file.ext
 		// -rw-r--r--+ 1 mikew Domain Users 7270248766 Feb  9 11:16 Kaltura/LegislativeBriefing2012.mov
-		$regexUnix = "^(?P<permissions>[-drwx]{10})\+?\s+(?P<number>\d{1,2})\s+(?P<owner>[\d\w]+)\s+(?P<group>[\d\w\s]+)\s+(?P<fileSize>\d*)\s+((?P<year1>\w{4})-(?P<month1>\d{2})-(?P<day1>\d{2})\s+(?P<hour1>\d{2}):(?P<minute1>\d{2})|(?P<month2>\w{3})\s+(?P<day2>\d{1,2})\s+((?P<hour2>\d{2}):(?P<minute2>\d{2})|(?P<year2>\d{4})))\s+$remote_folder\/(?P<file>.+)\s*$";
+		$regexUnix = "^(?P<permissions>[-drwx]{10})\+?\s+(?P<number>\d{1,2})\s+(?P<owner>[\d\w]+)\s+(?P<group>[\d\w\s]+)\s+(?P<fileSize>\d*)\s+((?P<year1>\w{4})-(?P<month1>\d{2})-(?P<day1>\d{2})\s+(?P<hour1>\d{2}):(?P<minute1>\d{2})|(?P<month2>\w{3})\s+(?P<day2>\d{1,2})\s+((?P<hour2>\d{2}):(?P<minute2>\d{2})|(?P<year2>\d{4})))\s+$escRemote_folder\/(?P<file>.+)\s*$";
 	    
 	    foreach($filesInfo as $fileInfo)
 	    {
