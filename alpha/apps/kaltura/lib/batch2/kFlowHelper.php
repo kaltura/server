@@ -464,7 +464,7 @@ class kFlowHelper
 
 					if($flavorAsset->getType() == assetType::FLAVOR)
 					{
-						$flavorAsset->setBitrate($flavorParamsOutput->getVideoBitrate());
+						$flavorAsset->setBitrate($flavorParamsOutput->getVideoBitrate()+$flavorParamsOutput->getAudioBitrate());
 						$flavorAsset->setWidth($flavorParamsOutput->getWidth());
 						$flavorAsset->setHeight($flavorParamsOutput->getHeight());
 						$flavorAsset->setFrameRate($flavorParamsOutput->getFrameRate());
