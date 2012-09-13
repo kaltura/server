@@ -2,11 +2,6 @@
 /**
  * @package UI-infra
  */
-require_once(dirname(__FILE__) . '/../infra/kConf.php');
-
-/**
- * @package Admin
- */
 class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 {
 	/**
@@ -162,7 +157,9 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 	
 	protected function _initTimeZone()
 	{
-		date_default_timezone_set(kConf::get('date_default_timezone'));
+		$this->bootstrap('config');
+		$config = Zend_Registry::get('config');
+		date_default_timezone_set($config->settings->timeZone);
 	}
 	
 	protected function _initConfig()
