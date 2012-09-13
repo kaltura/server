@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../../../../infra/cache/kCacheManager.php');
-require_once(dirname(__FILE__) . '/../../../../../infra/cache/kApiCache.php');
+require_once(dirname(__FILE__) . '/../../../../../server_infra/cache/kCacheManager.php');
+require_once(dirname(__FILE__) . '/../../../../../server_infra/cache/kApiCache.php');
 
 class kPlayManifestCacher extends kApiCache
 {

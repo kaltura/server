@@ -65,7 +65,7 @@ class secForm {
 	function getClient() {
 
 		// Get kaltura configuration file
-		require_once( realpath( dirname(__FILE__) ) . '/../../infra/kConf.php' );
+		require_once( realpath( dirname(__FILE__) ) . '/../../server_infra/kConf.php' );
 		$kConf = new kConf();
 		
 		// Load kaltura client

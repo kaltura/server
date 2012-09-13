@@ -1,5 +1,5 @@
 <?php
-require_once ( dirname(__FILE__) . "/../../infra/kConf.php" ); // kaltura configuration
+require_once ( dirname(__FILE__) . "/../../server_infra/kConf.php" ); // kaltura configuration
 // symfony directories
 
 

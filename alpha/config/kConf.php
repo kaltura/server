@@ -1,2 +1,2 @@
 <?php
-require_once(dirname(__FILE__) . '/../../infra/kConf.php');
+require_once(dirname(__FILE__) . '/../../server_infra/kConf.php');
