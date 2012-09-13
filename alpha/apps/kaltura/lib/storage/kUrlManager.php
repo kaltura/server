@@ -221,8 +221,7 @@ class kUrlManager
 			if ($tokenizer)
 			{
 				$url = $tokenizer->tokenizeSingleUrl($url);
-				if (class_exists('KalturaResponseCacher'))
-					KalturaResponseCacher::disableCache();
+				kApiCache::disableCache();
 			}
 		}
 		return $url;
@@ -311,8 +310,7 @@ class kUrlManager
 				if ($tokenizer)
 				{
 					$url = $tokenizer->tokenizeSingleUrl($url);
-					if (class_exists('KalturaResponseCacher'))
-						KalturaResponseCacher::disableCache();
+					kApiCache::disableCache();
 				}
 			}
 		}

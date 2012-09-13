@@ -1538,7 +1538,7 @@ class playManifestAction extends kalturaAction
 		if (!$this->secureEntryHelper || !$this->secureEntryHelper->shouldDisableCache())
 		{
 			$cache = kPlayManifestCacher::getInstance();
-			$cache->storeCache($renderer);
+			$cache->storeRendererToCache($renderer);
 		}
 
 		$renderer->output($playbackContext);

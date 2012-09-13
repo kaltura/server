@@ -1044,8 +1044,7 @@ class myReportsMgr
 	
 	private static function executeQuery ( $query )
 	{
-		if (class_exists('KalturaResponseCacher'))
-			KalturaResponseCacher::disableConditionalCache();
+		kApiCache::disableConditionalCache();
 	
 		$mysql_function = (strpos($query, 'CALL') === false)? 'mysql': 'mysqli';
 		
