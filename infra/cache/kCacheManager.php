@@ -35,7 +35,7 @@ class kCacheManager
 		
 		self::FS_API_V3 => 			array('FileSystem',	'kConf:response_cache_dir', 'cache_v3-600', 		2, false, 600,	 	false),
 		self::FS_API_V3_FEED => 	array('FileSystem',	'kConf:global_cache_dir', 	'feed/cache_v3-86400', 	2, false, 86400,	false),
-		self::FS_PLAY_MANIFEST => 	array('FileSystem',	'kConf:response_cache_dir', 'cache_manifest', 		2, true,  600,		true ),
+		self::FS_PLAY_MANIFEST => 	array('FileSystem',	'kConf:response_cache_dir', 'cache_manifest', 		2, false,  600,		false),
 		self::FS_ENTRY => 			array('FileSystem',	'kConf:global_cache_dir', 	'entry', 				4, false, 0,		false),
 	);
 	

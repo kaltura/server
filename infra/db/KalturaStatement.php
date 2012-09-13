@@ -30,8 +30,7 @@ class KalturaStatement extends PDOStatement
 
 	public function execute ($input_parameters = null) 
 	{
-		if (class_exists('KalturaResponseCacher'))
-			KalturaResponseCacher::disableConditionalCache();
+		kApiCache::disableConditionalCache();
 	
 		$search = array();
 		$replace = array();
