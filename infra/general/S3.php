@@ -2,7 +2,7 @@
 /**
 * $Id$
 *
-* Copyright (c) 2011, Donovan Schönknecht.  All rights reserved.
+* Copyright (c) 2011, Donovan Schï¿½nknecht.  All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -434,7 +434,7 @@ class S3
 			self::__triggerError('S3::inputFile(): Unable to open input file: '.$file, __FILE__, __LINE__);
 			return false;
 		}
-		return array('file' => $file, 'size' => kFile::fileSize($file), 'md5sum' => $md5sum !== false ?
+		return array('file' => $file, 'size' => kFileBase::fileSize($file), 'md5sum' => $md5sum !== false ?
 		(is_string($md5sum) ? $md5sum : base64_encode(md5_file($file, true))) : '');
 	}
 
@@ -495,7 +495,7 @@ class S3
 			$rest->size = $input['size'];
 		else {
 			if (isset($input['file']))
-				$rest->size = kFile::fileSize($input['file']);
+				$rest->size = kFileBase::fileSize($input['file']);
 			elseif (isset($input['data']))
 				$rest->size = strlen($input['data']);
 		}

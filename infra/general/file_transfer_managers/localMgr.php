@@ -104,7 +104,7 @@ class localMgr extends kFileTransferMgr
 	
 	protected function doFileSize($remote_file)
 	{
-		return kFile::fileSize($remote_file);
+		return kFileBase::fileSize($remote_file);
 	}
 	
     protected function doModificationTime($remote_file)
@@ -118,4 +118,3 @@ class localMgr extends kFileTransferMgr
 	}	
 
 }
-?>
