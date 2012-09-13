@@ -1,6 +1,6 @@
 <?php
 
-@include("IP2Location.inc.php");
+include(__DIR__ . "/IP2Location.inc.php");
 
 /**
  * @package infra
