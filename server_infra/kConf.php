@@ -142,15 +142,6 @@ class kConf extends kEnvironment
 		
 		return self::$map[$mapName];
 	}
-		
-	public static function get($paramName)
-	{
-		self::init();
-		if(isset(self::$map[$paramName]))
-			return self::$map[$paramName];
-		
-		throw new Exception("Cannot find [$paramName] in config"); 
-	}
 	
 	public static function hasParam($paramName)
 	{

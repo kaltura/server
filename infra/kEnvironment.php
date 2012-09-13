@@ -26,5 +26,14 @@ class kEnvironment
 			'syndication_core_xsd_path' => "$appDir/alpha/config/syndication.core.xsd",
 		);
 	}
+		
+	public static function get($paramName)
+	{
+		self::init();
+		if(isset(self::$map[$paramName]))
+			return self::$map[$paramName];
+		
+		throw new Exception("Cannot find [$paramName] in config"); 
+	}
 }
 
