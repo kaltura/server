@@ -2,13 +2,6 @@
 /**
  * @package infra
  * @subpackage Plugins
- * @todo remove kConf require after config moved to DB or external file
- */
-require_once realpath(dirname(__FILE__) . '/../../') . '/infra/kConf.php';
-
-/**
- * @package infra
- * @subpackage Plugins
  */
 class KalturaPluginManager
 {
@@ -386,22 +379,31 @@ class KalturaPluginManager
 		if(count(self::$plugins))
 			return self::$plugins;
 			
-		if(!kConf::hasParam("default_plugins"))
+		$configDir = self::getConfigDir();
+		$configFile = "$configDir/plugins.ini";
+		if(!file_exists($configFile))
 			return array();
+		
+		$pluginNames = file($configFile);
+		$plugins = array();
+		foreach($pluginNames as $pluginName)
+		{
+			if(!preg_match('/^[A-Z][\w\d]+$/', $pluginName))
+				continue;
+				
+			$pluginClass = $pluginName . 'Plugin';
+			if(!class_exists($pluginClass))
+			{
+				KalturaLog::err("Plugin [$pluginName] not found with class [$pluginClass].");
+				continue;
+			}
 			
-		$plugins = kConf::get("default_plugins");
-		if(!is_array($plugins))
-			return array();
+			$plugins[] = $pluginClass;
+		}
 			
 		self::$plugins = array();
 		foreach($plugins as $pluginClass)	
-		{
-			if(!class_exists($pluginClass))
-			{
-				KalturaLog::err("Plugin [$pluginClass] class not found.");
-				continue;
-			}
-				
+		{		
 			// TODO remove call_user_func after moving to php 5.3
 			$pluginName = call_user_func(array($pluginClass, 'getPluginName'));
 //			$pluginName = $pluginClass::getPluginName();
