@@ -29,7 +29,7 @@ class kConf extends kEnvironment
 				return;
 		}
 		
-		$configDir = realpath(dirname(__file__) . '/../configurations');
+		$configDir = self::getConfigDir();
 		if(!file_exists("$configDir/base.ini"))
 		{
 			error_log("Base configuration not found [$configDir/base.ini]");

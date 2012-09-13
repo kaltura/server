@@ -27,6 +27,11 @@ class kEnvironment
 		);
 	}
 		
+	public static function getConfigDir()
+	{
+		return realpath(__DIR__ . '/../configurations');
+	}
+		
 	public static function get($paramName)
 	{
 		self::init();
