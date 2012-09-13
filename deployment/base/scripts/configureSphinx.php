@@ -3,8 +3,8 @@
 define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
 define('SPHINX_CONFIG_DIR', ROOT_DIR . '/configurations/sphinx/');
 
-require_once(ROOT_DIR . '/infra/kConf.php');
-require_once(ROOT_DIR . '/infra/bootstrap_base.php');
+require_once(ROOT_DIR . '/server_infra/kConf.php');
+require_once(ROOT_DIR . '/server_infra/bootstrap_base.php');
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));

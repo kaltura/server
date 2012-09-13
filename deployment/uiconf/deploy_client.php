@@ -131,7 +131,7 @@ function init($conf_file_path, $infra_path)
 {
   $conf = parse_ini_file($conf_file_path, true);
   require_once($infra_path.DIRECTORY_SEPARATOR."bootstrap_base.php");
-  require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
+  require_once(KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."infra".DIRECTORY_SEPARATOR."KAutoloader.php");
   KAutoloader::setIncludePath(array(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "ZendFramework", "library"),));
   KAutoloader::register();
   

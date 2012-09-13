@@ -4,15 +4,17 @@
  * @package Scheduler
  */
 
-require_once("../infra/bootstrap_base.php");
-require_once(KALTURA_ROOT_PATH . '/infra/kConf.php');
+chdir(__DIR__);
+define('KALTURA_ROOT_PATH', realpath(__DIR__ . '/../'));
+require_once(KALTURA_ROOT_PATH . '/server_infra/kConf.php');
 
 define("KALTURA_BATCH_PATH", KALTURA_ROOT_PATH . "/batch");
 
 // Autoloader - override the autoloader defaults
-require_once(KALTURA_INFRA_PATH . "/KAutoloader.php");
+require_once(KALTURA_ROOT_PATH . "/infra/KAutoloader.php");
 KAutoloader::setClassPath(array(
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "infra", "*"),
+	KAutoloader::buildPath(KALTURA_ROOT_PATH, "server_infra", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "PHPMailer", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "phpseclib", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"),
