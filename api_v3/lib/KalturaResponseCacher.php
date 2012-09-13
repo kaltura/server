@@ -3,7 +3,7 @@
  * @package api
  * @subpackage cache
  */
-require_once(dirname(__FILE__) . '/../../infra/cache/kApiCache.php');
+require_once(dirname(__FILE__) . '/../../server_infra/cache/kApiCache.php');
 
 /**
  * @package api
