@@ -291,10 +291,9 @@ class kApiCache
 	{
 		if (is_null(self::$_country))
 		{
-			require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/myIPGeocoder.class.php');
+			require_once(dirname(__FILE__) . '/../request/kIP2Location.php');
 			$ipAddress = infraRequestUtils::getRemoteAddress();
-			$geoCoder = new myIPGeocoder();
-			self::$_country = $geoCoder->getCountry($ipAddress);
+			self::$_country = kIP2Location::ipToCountry($ipAddress);
 		}
 		return self::$_country;
 	}
