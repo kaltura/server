@@ -1,15 +1,12 @@
 <?php
 
 define('KALTURA_ROOT_PATH', realpath(dirname(__FILE__) . '/../../../../..'));
-echo KALTURA_ROOT_PATH;
-require_once(KALTURA_ROOT_PATH . '/infra/bootstrap_base.php');
 require_once(KALTURA_ROOT_PATH . '/infra/KAutoloader.php');
 
 define("KALTURA_API_PATH", KALTURA_ROOT_PATH . "/api_v3");
 
-require_once(KALTURA_ROOT_PATH . '/infra/kConf.php');
+require_once(KALTURA_ROOT_PATH . '/server_infra/kConf.php');
 // Autoloader
-require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "lib", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "services", "*"));

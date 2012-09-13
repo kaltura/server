@@ -23,14 +23,6 @@ class KalturaInternalToolsPlugin extends KalturaPlugin implements IKalturaServic
 		return $map;
 	}
 	
-	/**
-	 * @return string - the path to services.ct
-	 */
-	public static function getServiceConfig()
-	{
-		return realpath(dirname(__FILE__).'/config/kaltura_internal_tools.ct');
-	}
-	
 	/* (non-PHPdoc)
 	 * @see IKalturaAdminConsolePages::getApplicationPages()
 	 */

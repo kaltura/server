@@ -21,12 +21,4 @@ class PartnerAggregationPlugin extends KalturaPlugin implements IKalturaServices
 		);
 		return $map;
 	}
-	
-	/**
-	 * @return string - the path to services.ct
-	 */
-	public static function getServiceConfig()
-	{
-		return realpath(dirname(__FILE__).'/config/partner_aggregation.ct');
-	}
 }

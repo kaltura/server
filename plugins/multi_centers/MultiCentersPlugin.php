@@ -36,14 +36,6 @@ class MultiCentersPlugin extends KalturaPlugin implements IKalturaServices, IKal
 	}
 	
 	/**
-	 * @return string - the path to services.ct
-	 */
-	public static function getServiceConfig()
-	{
-		return null;
-	}
-	
-	/**
 	 * @param string $baseClass
 	 * @param string $enumValue
 	 * @param array $constructorArgs

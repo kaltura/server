@@ -216,14 +216,6 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 		);
 		return $map;
 	}
-	
-	/**
-	 * @return string - the path to services.ct
-	 */
-	public static function getServiceConfig()
-	{
-		return realpath(dirname(__FILE__).'/config/document.ct');
-	}
 
 	/**
 	 * @return array

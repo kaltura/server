@@ -2,7 +2,7 @@
 
 define('QUERIES_FILE', realpath(dirname(__FILE__) . '/queries.ini'));
 define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
-require_once(ROOT_DIR . '/infra/kConf.php');
+require_once(ROOT_DIR . '/server_infra/kConf.php');
 
 if (!kConf::get('usage_tracking_optin')) {
 	echo "Usage tracking is not enabled".PHP_EOL;

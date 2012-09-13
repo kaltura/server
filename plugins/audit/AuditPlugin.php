@@ -28,14 +28,6 @@ class AuditPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltura
 		);
 		return $map;
 	}
-	
-	/**
-	 * @return string - the path to services.ct
-	 */
-	public static function getServiceConfig()
-	{
-		return realpath(dirname(__FILE__).'/config/audit.ct');
-	}
 
 	/**
 	 * @return array

@@ -22,14 +22,6 @@ class ShortLinkPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 		);
 		return $map;
 	}
-	
-	/**
-	 * @return string - the path to services.ct
-	 */
-	public static function getServiceConfig()
-	{
-		return realpath(dirname(__FILE__).'/config/short_link.ct');
-	}
 
 	/**
 	 * @return array
