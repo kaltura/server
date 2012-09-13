@@ -117,7 +117,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		if (PermissionPeer::isValidForPartner(self::FEATURE_CSV_HEADER_ROW, $partnerId))
 		{
-    		$headerRow = self::getHeaderRow($data->getBulkUploadObjectType());
+    		$headerRow = $data->getColumns();
     		$headerRow[] = "action";
     		$headerRow[] = "resultStatus";
     		$headerRow[] = "objectId";

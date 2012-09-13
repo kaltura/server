@@ -13,7 +13,13 @@ class kBulkUploadCsvJobData extends kBulkUploadJobData
 	 * 
 	 * @var int
 	 */
-	private $csvVersion;
+	protected $csvVersion;
+	
+	/**
+	 * Array containing the column headers of the CSV file
+	 * @var array
+	 */
+	protected $columns;
 
 	/**
 	 * @return the $csvVersion
@@ -28,4 +34,20 @@ class kBulkUploadCsvJobData extends kBulkUploadJobData
 	public function setCsvVersion($csvVersion) {
 		$this->csvVersion = $csvVersion;
 	}
+	/**
+     * @return array
+     */
+    public function getColumns ()
+    {
+        return $this->columns;
+    }
+
+	/**
+     * @param array $columns
+     */
+    public function setColumns ($columns)
+    {
+        $this->columns = $columns;
+    }
+
 }
