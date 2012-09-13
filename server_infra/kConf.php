@@ -1,26 +1,25 @@
 <?php
 setlocale(LC_ALL, 'en_US.UTF-8');
 
+require_once __DIR__;
+
 /**
  * Manages all Kaltura configurations
  * @package infra
  * @subpackage Configuration
  */
-class kConf
+class kConf extends kEnvironment
 {
 	const APC_CACHE_MAP = 'kConf';
-	
-	protected static $map = null;
 	
 	private static function init()
 	{
 		if (self::$map) 
 			return;
 		
-		$cacheDir = realpath(dirname(__file__) . '/../cache');
+		parent::init();
 		
-		self::$map = array();
-		
+		$cacheDir = self::$map['cache_root_path'];
 		$reloadFileExists = file_exists("$cacheDir/base.reload");
 		
 		if (!$reloadFileExists && function_exists('apc_fetch'))
