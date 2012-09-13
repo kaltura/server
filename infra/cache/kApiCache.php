@@ -3,7 +3,7 @@
 require_once(dirname(__FILE__) . '/../kConf.php');
 require_once(dirname(__FILE__) . '/../general/infraRequestUtils.class.php');
 require_once(dirname(__FILE__) . '/kCacheManager.php');
-require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/webservices/kSessionBase.class.php');
+require_once(dirname(__FILE__) . '/../request/kSessionBase.class.php');
 
 /**
  * @package infra
