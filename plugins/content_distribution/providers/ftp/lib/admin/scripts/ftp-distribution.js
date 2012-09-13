@@ -18,7 +18,14 @@
         showFormDtDd('#sftp_private_key_readonly');
         showFormDtDd('#sftp_public_key');
         showFormDtDd('#sftp_private_key');
-        hideFormDtDd('#password');
+    }
+
+    function sftpSecLibMode() {
+    	hideFormDtDd('#passphrase');
+        showFormDtDd('#sftp_public_key_readonly');
+        showFormDtDd('#sftp_private_key_readonly');
+        hideFormDtDd('#sftp_public_key');
+        showFormDtDd('#sftp_private_key');
     }
 
     function ftpMode() {
@@ -27,7 +34,6 @@
         hideFormDtDd('#sftp_private_key_readonly');
         hideFormDtDd('#sftp_public_key');
         hideFormDtDd('#sftp_private_key');
-        showFormDtDd('#password');
     }
 
     function hideFormDtDd(elementId) {
@@ -79,6 +85,12 @@
                    break;
                case 3: // sftp
                    sftpMode();
+                   break;
+               case 8: // sftp sec lib
+            	   sftpMode();
+                   break;
+               case 9: // sftp sec lib
+            	   sftpSecLibMode();
                    break;
            }
         });
