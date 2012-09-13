@@ -1,13 +1,14 @@
 <?php
 
-require_once (dirname ( __FILE__ ) . "/../../infra/bootstrap_base.php");
-require_once (KALTURA_ROOT_PATH . '/infra/kConf.php');
+require_once (dirname ( __FILE__ ) . "/../../server_infra/bootstrap_base.php");
+require_once (KALTURA_ROOT_PATH . '/server_infra/kConf.php');
 
 // Autoloader - override the autoloader defaults
-require_once (KALTURA_INFRA_PATH . DIRECTORY_SEPARATOR . "KAutoloader.php");
+require_once (KALTURA_ROOT_PATH . DIRECTORY_SEPARATOR . "infra" . DIRECTORY_SEPARATOR . "KAutoloader.php");
 
 KAutoloader::setClassPath ( array( 	KAutoloader::buildPath ( KALTURA_ROOT_PATH, "vendor", "propel", "*" ), // both 
-					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "infra", "*" ),  // both
+					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "infra", "*" ),  // both 
+					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "server_infra", "*" ),  // both
 					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "alpha", "lib", "*" ), // server
 					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "plugins", "*" ),  // both 
 					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "tests", "base", "*" ), 

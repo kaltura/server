@@ -3,7 +3,6 @@
 ini_set("memory_limit","1024M");
 
 define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../'));
-require_once(ROOT_DIR . '/infra/bootstrap_base.php');
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));

@@ -1,9 +1,8 @@
 <?php
 
-require_once (dirname ( __FILE__ ) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'infra' . DIRECTORY_SEPARATOR . 'bootstrap_base.php');
-require_once (dirname ( __FILE__ ) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'infra' . DIRECTORY_SEPARATOR . 'kConf.php');
-//require_once (dirname ( __FILE__ ) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'alpha' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'kConf.php');
-require_once (KALTURA_INFRA_PATH . DIRECTORY_SEPARATOR . 'KAutoloader.php');
+require_once (dirname ( __FILE__ ) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'server_infra' . DIRECTORY_SEPARATOR . 'bootstrap_base.php');
+require_once (dirname ( __FILE__ ) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'server_infra' . DIRECTORY_SEPARATOR . 'kConf.php');
+require_once (KALTURA_ROOT_PATH . DIRECTORY_SEPARATOR . "infra" . DIRECTORY_SEPARATOR . 'KAutoloader.php');
 KAutoloader::setClassMapFilePath(kConf::get('cache_root_path') . '/tests/thumbnail.classMap.cache');
 KAutoloader::register ();
 

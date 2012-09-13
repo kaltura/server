@@ -2,7 +2,7 @@
 
 error_reporting(E_ALL);
 
-require_once(dirname(__FILE__).'/../infra/kConf.php');
+require_once(dirname(__FILE__).'/../server_infra/kConf.php');
 
 $interactive = true;
 if ($argc == 2 && $argv[1] == '-y')

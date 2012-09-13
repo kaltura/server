@@ -1,4 +1,7 @@
 <?php
+
+defined('KALTURA_ROOT_PATH') ||  define('KALTURA_ROOT_PATH', realpath(__DIR__ . '/../'));
+
 /**
  * @package infra
  * @subpackage autoloader
@@ -244,11 +247,11 @@ class KAutoloader
 	private static function setDefaultClassPath()
 	{
 		self::$_classPath = array(
-			self::buildPath(KALTURA_ROOT_PATH, "infra", "*"),
-	   		self::buildPath(KALTURA_ROOT_PATH, "vendor", "symfony", "*"),
-	   		self::buildPath(SF_ROOT_DIR, "lib", "*"),
-	   		self::buildPath(SF_ROOT_DIR, "config"),
-	   		self::buildPath(SF_ROOT_DIR, "apps", "kaltura", "lib", "*"),
+			self::buildPath(KALTURA_ROOT_PATH, 'infra', '*'),
+	   		self::buildPath(KALTURA_ROOT_PATH, 'vendor', 'symfony', '*'),
+	   		self::buildPath(KALTURA_ROOT_PATH, 'alpha', 'lib', '*'),
+	   		self::buildPath(KALTURA_ROOT_PATH, 'alpha', 'config'),
+	   		self::buildPath(KALTURA_ROOT_PATH, 'alpha', 'apps', 'kaltura', 'lib', '*'),
 		);	
 	}
 	
@@ -259,12 +262,12 @@ class KAutoloader
 	{
 		self::$_includePath = array(
 			self::buildPath(KALTURA_ROOT_PATH),
-			self::buildPath(KALTURA_ROOT_PATH, "vendor", "symfony"),
-			self::buildPath(KALTURA_ROOT_PATH, "vendor", "symfony", "vendor"),
-			self::buildPath(KALTURA_ROOT_PATH, "vendor", "ZendFramework", "library"),
-			self::buildPath(SF_ROOT_DIR),
-			self::buildPath(SF_ROOT_DIR, "lib"),
-			self::buildPath(SF_ROOT_DIR, "apps", "kaltura", "lib"),
+			self::buildPath(KALTURA_ROOT_PATH, 'vendor', 'symfony'),
+			self::buildPath(KALTURA_ROOT_PATH, 'vendor', 'symfony', 'vendor'),
+			self::buildPath(KALTURA_ROOT_PATH, 'vendor', 'ZendFramework', 'library'),
+			self::buildPath(KALTURA_ROOT_PATH, 'alpha'),
+			self::buildPath(KALTURA_ROOT_PATH, 'alpha', 'lib'),
+			self::buildPath(KALTURA_ROOT_PATH, 'alpha', 'apps', 'kaltura', 'lib'),
 		);
 	}
 	

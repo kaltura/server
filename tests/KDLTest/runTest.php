@@ -1,14 +1,14 @@
 <?
 
 Include_once 'runTestAux.php';
-require_once 'K:\opt\kaltura\app\infra\cdl\kOperator.php';
-require_once 'K:\opt\kaltura\app\infra\cdl\kOperatorSets.php';
+require_once 'K:\opt\kaltura\app\server_infra\cdl\kOperator.php';
+require_once 'K:\opt\kaltura\app\server_infra\cdl\kOperatorSets.php';
 
-include_once("K:\opt\kaltura\app\infra\cdl\kdl\KDLMediaInfoLoader.php");
-include_once('K:\opt\kaltura\app\infra\cdl\kdl\KDLProcessor.php');
-include_once 'K:\opt\kaltura\app\infra\cdl\kdl\KDLUtils.php';
-include_once 'K:\opt\kaltura\app\infra\cdl\kdl\KDLWrap.php';
-include_once 'K:\opt\kaltura\app\infra\cdl\kdl\KDLTest.php';
+include_once("K:\opt\kaltura\app\server_infra\cdl\kdl\KDLMediaInfoLoader.php");
+include_once('K:\opt\kaltura\app\server_infra\cdl\kdl\KDLProcessor.php');
+include_once 'K:\opt\kaltura\app\server_infra\cdl\kdl\KDLUtils.php';
+include_once 'K:\opt\kaltura\app\server_infra\cdl\kdl\KDLWrap.php';
+include_once 'K:\opt\kaltura\app\server_infra\cdl\kdl\KDLTest.php';
 Include_once 'K:\opt\kaltura\app\plugins/quick_time_tools/lib/KDLTranscoderQTPTools.php';
 Include_once 'K:\opt\kaltura\app\plugins/fast_start/lib/KDLOperatorQTFastStart.php';
 Include_once 'K:\opt\kaltura\app\plugins/expression_encoder/lib/KDLOperatorExpressionEncoder.php';

@@ -4,8 +4,8 @@ set_time_limit(0);
 ini_set("memory_limit","700M");
 
 define('ROOT_DIR', realpath(dirname(__FILE__) . '/../'));
-require_once(ROOT_DIR . '/infra/kConf.php');
-require_once(ROOT_DIR . '/infra/bootstrap_base.php');
+require_once(ROOT_DIR . '/server_infra/kConf.php');
+require_once(ROOT_DIR . '/server_infra/bootstrap_base.php');
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
 $include_path = 

@@ -1,15 +1,16 @@
 <?php
 
-require_once(dirname(__FILE__) . "/../../infra/bootstrap_base.php");
-require_once(KALTURA_ROOT_PATH . '/infra/kConf.php');
+require_once(dirname(__FILE__) . "/../../server_infra/bootstrap_base.php");
+require_once(KALTURA_ROOT_PATH . '/server_infra/kConf.php');
 
 define("KALTURA_TEST_BASE_PATH", KALTURA_ROOT_PATH . "/tests/base");
 
 // Autoloader - override the autoloader defaults
-require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
+require_once(KALTURA_ROOT_PATH . DIRECTORY_SEPARATOR . "infra".DIRECTORY_SEPARATOR."KAutoloader.php");
 KAutoloader::setClassPath(array(
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "infra", "*"),
+	KAutoloader::buildPath(KALTURA_ROOT_PATH, "server_infra", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "alpha", "lib", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "alpha", "apps", "kaltura", "lib", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"),

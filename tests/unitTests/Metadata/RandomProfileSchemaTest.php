@@ -4,7 +4,7 @@ require_once('config/config_rand_test.php');
 require_once('XSDEditor.php');
 require_once(dirname(__FILE__). "/../../../infra/general/kXsd.php");
 require_once(dirname(__FILE__). "/../../../infra/log/KalturaLog.php");
-require_once(dirname(__FILE__). "/../../../infra/bootstrap_base.php");
+require_once(dirname(__FILE__). "/../../../server_infra/bootstrap_base.php");
 
 
 class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
