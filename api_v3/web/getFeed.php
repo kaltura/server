@@ -11,7 +11,7 @@ require_once(dirname(__FILE__).'/../../alpha/config/sfrootdir.php');
 require_once("../lib/KalturaResponseCacher.php");
 require_once(dirname(__FILE__) . '/../../infra/cache/kCacheManager.php');
 $expiry = kConf::hasParam("v3cache_getfeed_default_expiry") ? kConf::get("v3cache_getfeed_default_expiry") : 86400;
-$cache = new KalturaResponseCacher(null, kCacheManager::FS_API_V3_FEED, $expiry);
+$cache = new KalturaResponseCacher(null, array(kCacheManager::FS_API_V3_FEED), $expiry);
 $cache->checkOrStart();
 
 require_once("../bootstrap.php");
