@@ -1,7 +1,7 @@
 <?php
 setlocale(LC_ALL, 'en_US.UTF-8');
 
-require_once __DIR__;
+require_once __DIR__ . '/../infra/kEnvironment.php';
 
 /**
  * Manages all Kaltura configurations
