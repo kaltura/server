@@ -12,11 +12,6 @@ class requestUtils extends infraRequestUtils
 	
 	private static $s_cookies_to_be_set = array();
 	
-	static public function isPost ( $context )
-	{
-		return ($context->getRequest()->getMethod() == sfRequest::POST) ;
-	}
-
 	static public function getParameter ( $param_name , $value_if_missing = NULL , $update_request_with_value = false )
 	{
 		if ( array_key_exists( $param_name , $_REQUEST ) )
@@ -40,18 +35,10 @@ class requestUtils extends infraRequestUtils
 	 		{
 	 			// the parameter does not exist and there is no default value - 
 	 			// return what the trivial method would ...
-	 			// TODO - do we wnat some better default value to return  ?? 
 	 			return @$_REQUEST[$param_name];
 	 		}
 	 	}
 	}
-	
-	// TODO - implement a generic method to be used by getGetParam, getPostParam , getCookie ...
-	static private function getWithDefault ( )
-	{
-
-	}
-
 
 	public static function getHost ( )
 	{
@@ -92,9 +79,9 @@ class requestUtils extends infraRequestUtils
 		if ( $include_host )
 		{
 			$url = self::getHost();
-			$url = preg_replace("/www\d\.kaltura\.com/", "www.kaltura.com", $url);
-			$url = preg_replace("/kaldev\d\.kaltura\.com/", "kaldev.kaltura.com", $url);
-			$url = preg_replace("/sandbox\d\.kaltura\.com/", "sandbox.kaltura.com", $url);
+			$url = preg_replace('/www\d\.kaltura\.com/', "www.kaltura.com", $url);
+			$url = preg_replace('/kaldev\d\.kaltura\.com/', "kaldev.kaltura.com", $url);
+			$url = preg_replace('/sandbox\d\.kaltura\.com/', "sandbox.kaltura.com", $url);
 		}
 
 		$request_url = self::requestUri();
@@ -282,6 +269,7 @@ class requestUtils extends infraRequestUtils
 	public static function getIpCountry ( )
 	{
 		$remote_addr = self::getRemoteAddress();
+		// TODO that's the only reason to keep it in alpha
 		$ip_geo = new myIPGeocoder();
 		$country = $ip_geo->iptocountry( $remote_addr );
 		return $country;
