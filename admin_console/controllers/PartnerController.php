@@ -232,7 +232,7 @@ class PartnerController extends Zend_Controller_Action
 		
 		$request = $this->getRequest();
 		
-		$pager = new KalturaFilterPager();
+		$pager = new Kaltura_Client_Type_FilterPager();
 		$pager->pageSize = 500; 
 		if (!$editMode) //new
 		{
