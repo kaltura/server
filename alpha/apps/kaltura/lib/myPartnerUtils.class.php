@@ -928,6 +928,7 @@ class myPartnerUtils
 		KalturaLog::debug("Validating partner [" . $partner->getId() . "]");
 		if($partner->getExtendedFreeTrail())
 		{
+			KalturaLog::debug("Partner [" . $partner->getId() . "] trial account has extension");
 			if($partner->getExtendedFreeTrailExpiryDate() < time())
 			{
 				//ExtendedFreeTrail ended
