@@ -8,20 +8,20 @@ SELECT
 	COUNT(DISTINCT IF(entry_media_type_id = 6, entry_id,NULL)) count_mix 
 FROM (
 	SELECT 	
-		en.kuser_id,
+		ev.kuser_id,
 		ku.screen_name,
 		ku.puser_id,
-		en.entry_id,
-		en.entry_media_type_id
+		ev.entry_id,
+		ev.entry_media_type_id
 	FROM 
-		dwh_dim_entries ev JOIN dwh_dim_kusers ku ON en.kuser_id = ku.kuser_id  
+		dwh_dim_entries ev JOIN dwh_dim_kusers ku ON ev.kuser_id = ku.kuser_id  
 	WHERE {OBJ_ID_CLAUSE} 
 		AND entry_media_type_id IN (1,2,5,6)
-		AND en.partner_id = {PARTNER_ID} /* PARTNER_ID*/
-		AND en.created_at BETWEEN '{FROM_TIME}' - interval {TIME_SHIFT} hour /*FROM_TIME*/ 
+		AND ev.partner_id = {PARTNER_ID} /* PARTNER_ID*/
+		AND ev.created_at BETWEEN '{FROM_TIME}' - interval {TIME_SHIFT} hour /*FROM_TIME*/ 
 			AND '{TO_TIME}' - interval {TIME_SHIFT} hour /*TO_TIME*/
 	 
-	GROUP BY en.kuser_id,ku.screen_name,en.entry_id,en.entry_media_type_id
+	GROUP BY ev.kuser_id,ku.screen_name,ev.entry_id,ev.entry_media_type_id
 ) a
 GROUP BY kuser_id,screen_name
 ORDER BY {SORT_FIELD}

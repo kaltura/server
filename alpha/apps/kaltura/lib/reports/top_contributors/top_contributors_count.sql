@@ -1,4 +1,4 @@
-SELECT 	COUNT(DISTINCT en.kuser_id) count_all
+SELECT 	COUNT(DISTINCT ev.kuser_id) count_all
 FROM dwh_dim_entries ev
 WHERE 
 	{OBJ_ID_CLAUSE}
