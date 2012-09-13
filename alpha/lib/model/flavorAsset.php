@@ -106,7 +106,7 @@ class flavorAsset extends asset
 	{
 		parent::setFromAssetParams($dbAssetParams);
 		
-		$this->setBitrate($dbAssetParams->getVideoBitrate());
+		$this->setBitrate($dbAssetParams->getVideoBitrate()+$dbAssetParams->getAudioBitrate());
 		$this->setFrameRate($dbAssetParams->getFrameRate());
 		$this->setVideoCodecId($dbAssetParams->getVideoCodec());
 	}
