@@ -31,12 +31,5 @@ class KalturaStringArray extends KalturaTypedArray
 	{
 		return parent::__construct("KalturaString");
 	}
-	
-	public function toObjectsArray()
-	{
-		$array = array();
-		foreach($this->array as $obj)
-			$array[] = $obj->value;
-		return $array;
-	}
+
 }
