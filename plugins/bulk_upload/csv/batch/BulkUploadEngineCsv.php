@@ -83,7 +83,7 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 			$values = fgetcsv($fileHandle);
 		}
 		
-		foreach ($this->getColumns() as $columnName)
+		foreach ($columns as $columnName)
 		{
 		    $columnNameObj = new KalturaString();
 		    $columnNameObj->value = $columnName;
