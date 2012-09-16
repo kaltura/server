@@ -17,7 +17,6 @@
         showFormDtDd('#sftp_public_key_readonly');
         showFormDtDd('#sftp_private_key_readonly');
         showFormDtDd('#sftp_public_key');
-        showFormDtDd('#sftp_private_key');
     }
 
     function sftpSecLibMode() {
@@ -25,7 +24,6 @@
         showFormDtDd('#sftp_public_key_readonly');
         showFormDtDd('#sftp_private_key_readonly');
         hideFormDtDd('#sftp_public_key');
-        showFormDtDd('#sftp_private_key');
     }
 
     function ftpMode() {
