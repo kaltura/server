@@ -27,7 +27,8 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 	 */
 	private static $map_between_objects = array
 	(
-		"csvVersion"
+		"csvVersion",
+	    "columns",
 	);
 
 	
