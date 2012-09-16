@@ -83,9 +83,7 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 			$values = fgetcsv($fileHandle);
 		}
 		
-		$dataColumns = new KalturaStringArray();
-		$dataColumns->fromArray($columns);
-		$this->data->columns = $dataColumns;
+		$this->data->columns = $columns;
 		
 		fclose($fileHandle);
 		
