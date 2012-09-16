@@ -118,7 +118,6 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		if (PermissionPeer::isValidForPartner(self::FEATURE_CSV_HEADER_ROW, $partnerId))
 		{
     		$headerRow = $data->getColumns();
-    		$headerRow[] = "action";
     		$headerRow[] = "resultStatus";
     		$headerRow[] = "objectId";
     		$headerRow[] = "objectStatus";
@@ -129,26 +128,26 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		foreach($bulkUploadResults as $bulkUploadResult)
 		{
 		    /* @var $bulkUploadResult BulkUploadResult */
-		    switch ($bulkUploadResult->getObjectType())
-		    {
-		        case BulkUploadObjectType::ENTRY:
-		            $values = self::writeEntryBulkUploadResults($bulkUploadResult, $data);
-		            break;
-		        case BulkUploadObjectType::CATEGORY:
-		            $values = self::writeCategoryBulkUploadResults($bulkUploadResult, $data);
-		            break;
-		        case BulkUploadObjectType::CATEGORY_USER:
-		            $values = self::writeCategoryUserBulkUploadResults($bulkUploadResult, $data);
-		            break;
-		        case BulkUploadObjectType::USER: 
-		            $values = self::writeUserBulkUploadResults($bulkUploadResult, $data);
-		            break;
-		        default:
-		            
-		            break;
-		    }
+		    $values = explode(",", $bulkUploadResult->getRowData());
+//		    switch ($bulkUploadResult->getObjectType())
+//		    {
+//		        case BulkUploadObjectType::ENTRY:
+//		            $values = self::writeEntryBulkUploadResults($bulkUploadResult, $data);
+//		            break;
+//		        case BulkUploadObjectType::CATEGORY:
+//		            $values = self::writeCategoryBulkUploadResults($bulkUploadResult, $data);
+//		            break;
+//		        case BulkUploadObjectType::CATEGORY_USER:
+//		            $values = self::writeCategoryUserBulkUploadResults($bulkUploadResult, $data);
+//		            break;
+//		        case BulkUploadObjectType::USER: 
+//		            $values = self::writeUserBulkUploadResults($bulkUploadResult, $data);
+//		            break;
+//		        default:
+//		            
+//		            break;
+//		    }
 			
-		    $values[] = $bulkUploadResult->getAction();
             $values[] = $bulkUploadResult->getStatus();	
 			$values[] = $bulkUploadResult->getObjectId();
 			$values[] = $bulkUploadResult->getObjectStatus();
