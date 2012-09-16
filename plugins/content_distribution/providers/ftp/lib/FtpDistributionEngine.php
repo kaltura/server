@@ -259,7 +259,7 @@ class FtpDistributionEngine extends DistributionEngine implements
         $privateKey = $distributionProfile->sftpPrivateKey;
         $passphrase = $distributionProfile->passphrase ? $distributionProfile->passphrase : null;
 		$fileTransferManager = kFileTransferMgr::getInstance($protocol);
-        if ($distributionProfile->protocol === KalturaDistributionProtocol::SFTP)
+        if ($distributionProfile->protocol === KalturaDistributionProtocol::SFTP && trim($publicKey) && trim($privateKey))
         {
             $publicKeyTempPath = $this->tempFilePath . '/' . uniqid(null, true);
             $privateKeyTempPath = $this->tempFilePath . '/' . uniqid(null, true);
