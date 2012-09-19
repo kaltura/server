@@ -184,27 +184,8 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	 */
 	protected function createUploadResult($values, $columns)
 	{
-		if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
-		{
-			$this->exceededMaxRecordsEachRun = true;
-			return;
-		}
-		$this->handledRecordsThisRun++;
-		
-		$bulkUploadResult = new KalturaBulkUploadResultEntry();
+	    $bulkUploadResult = parent::createUploadResult($values, $columns);
 		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadResultObjectType::ENTRY;
-		$bulkUploadResult->bulkUploadJobId = $this->job->id;
-		$bulkUploadResult->lineIndex = $this->lineNumber;
-		$bulkUploadResult->partnerId = $this->job->partnerId;
-		
-		foreach ($values as $value)
-		{
-		    if (strpos($value, ","))
-		    {
-		        $value = '"'.$value.'"';
-		    }
-		}
-		$bulkUploadResult->rowData = implode(",", $values);
 				
 		// Check variables count
 		if($this->csvVersion != KalturaBulkUploadCsvVersion::V3)

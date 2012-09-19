@@ -16,20 +16,8 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
      */
     protected function createUploadResult($values, $columns)
 	{
-		if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
-		{
-			$this->exceededMaxRecordsEachRun = true;
-			return;
-		}
-		$this->handledRecordsThisRun++;
-		
-		$bulkUploadResult = new KalturaBulkUploadResultCategoryUser();
+	    $bulkUploadResult = parent::createUploadResult($values, $columns);
 		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadResultObjectType::CATEGORY_USER;
-		$bulkUploadResult->bulkUploadJobId = $this->job->id;
-		$bulkUploadResult->lineIndex = $this->lineNumber;
-		$bulkUploadResult->partnerId = $this->job->partnerId;
-		$bulkUploadResult->rowData = join(',', $values);
-			 
 				
 		// trim the values
 		array_walk($values, array('BulkUploadUserEngineCsv', 'trimArray'));

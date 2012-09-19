@@ -127,8 +127,33 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * Creates a new upload result object from the given parameters
 	 * @param array $values
 	 * @param array $columns
+	 * @return KalturaBulkUploadResult
 	 */
-	abstract protected function createUploadResult($values, $columns);
+	protected function createUploadResult($values, $columns)
+	{
+	    if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
+		{
+			$this->exceededMaxRecordsEachRun = true;
+			return;
+		}
+		$this->handledRecordsThisRun++;
+		
+	    $bulkUploadResult = new KalturaBulkUploadResultEntry();
+		$bulkUploadResult->bulkUploadJobId = $this->job->id;
+		$bulkUploadResult->lineIndex = $this->lineNumber;
+		$bulkUploadResult->partnerId = $this->job->partnerId;
+		//CSV files allow values to contain the "," character, on the condition that the value is surrounded by "".
+		foreach ($values as $value)
+		{
+		    if (strpos($value, ","))
+		    {
+		        $value = '"'.$value.'"';
+		    }
+		}
+		$bulkUploadResult->rowData = implode(",", $values);
+		
+		return $bulkUploadResult;
+	}
 
 
 	/**
