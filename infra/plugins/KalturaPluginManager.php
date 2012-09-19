@@ -379,7 +379,7 @@ class KalturaPluginManager
 		if(count(self::$plugins))
 			return self::$plugins;
 			
-		$configDir = self::getConfigDir();
+		$configDir = kEnvironment::getConfigDir();
 		$configFile = "$configDir/plugins.ini";
 		if(!file_exists($configFile))
 			return array();
