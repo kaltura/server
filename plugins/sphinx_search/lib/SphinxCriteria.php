@@ -679,7 +679,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	{
 		return array();
 	}
-		
+	
 	private function shouldSkipSphinx()
 	{
 		$skipFields = $this->getSkipFields();
@@ -703,9 +703,23 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		foreach($this->getMap() as $criterion)
 			$fields = array_merge($fields, $this->getAllCriterionFields($criterion));
 		
-		$orderByColumns = $this->getOrderByColumns();		
-		$fields = array_unique(array_merge($fields, $orderByColumns));
-		
+		foreach ($this->getOrderByColumns() as $orderByColumn)
+		{
+			// strip asc / desc
+			$orderByColumn = str_replace(' ASC', '', str_replace(' DESC', '', $orderByColumn));
+			
+			// strip ()'s
+			if (preg_match('/^\(.*\)$/', $orderByColumn))
+				$orderByColumn = substr($orderByColumn, 1, -1);
+				
+			// strip <> operator (for PARTNER_ID<>1234 order by added by addPartnerToCriteria)
+			$explodedColumn = explode('<>', $orderByColumn);
+			$orderByColumn = $explodedColumn[0];
+			
+			$fields[] = $orderByColumn;
+		}
+		$fields = array_unique($fields);
+								
 		foreach($fields as $field)
 		{	
 			$fieldName = $this->getSphinxFieldName($field);
