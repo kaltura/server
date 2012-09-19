@@ -132,17 +132,21 @@ class KalturaPDO extends PropelPDO
 		$comment = $this->getCommentWrapped();
 		$sql = $comment . $sql;
 		
+		$sqlStart = microtime(true);
 		try
 		{
 			if (version_compare(PHP_VERSION, '5.3', '<'))
-				return call_user_func_array(array($this, 'parent::query'), $args);
-			
-			return call_user_func_array('parent::query', $args);
+				$result = call_user_func_array(array($this, 'parent::query'), $args);
+			else
+				$result = call_user_func_array('parent::query', $args);
 		}
 		catch(PropelException $pex)
 		{
 			KalturaLog::alert($pex->getMessage());
 			throw new PropelException("Database error");
 		}
+		KalturaLog::debug("Sql took - " . (microtime(true) - $sqlStart) . " seconds");
+		
+		return $result;
 	}
 }
