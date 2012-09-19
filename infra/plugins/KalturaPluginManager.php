@@ -384,10 +384,11 @@ class KalturaPluginManager
 		if(!file_exists($configFile))
 			return array();
 		
-		$pluginNames = file($configFile);
-		$plugins = array();
+		$pluginNames = file($configFile);			
+		self::$plugins = array();
 		foreach($pluginNames as $pluginName)
 		{
+			$pluginName = trim($pluginName, " \t\r\n");
 			if(!preg_match('/^[A-Z][\w\d]+$/', $pluginName))
 				continue;
 				
@@ -398,15 +399,7 @@ class KalturaPluginManager
 				continue;
 			}
 			
-			$plugins[] = $pluginClass;
-		}
-			
-		self::$plugins = array();
-		foreach($plugins as $pluginClass)	
-		{		
-			// TODO remove call_user_func after moving to php 5.3
-			$pluginName = call_user_func(array($pluginClass, 'getPluginName'));
-//			$pluginName = $pluginClass::getPluginName();
+			$pluginName = $pluginClass::getPluginName();
 			self::$plugins[$pluginName] = $pluginClass;
 		}
 			
