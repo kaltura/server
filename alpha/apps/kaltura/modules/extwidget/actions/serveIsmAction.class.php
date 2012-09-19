@@ -83,6 +83,6 @@ class serveIsmAction extends sfAction
 		
 		$path = kFileSyncUtils::getReadyLocalFilePathForKey($syncKey);
 		
-		kFile::dumpFile($path);
+		kFileUtils::dumpFile($path);
 	}
 }

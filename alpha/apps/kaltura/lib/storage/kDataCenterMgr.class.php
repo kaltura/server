@@ -255,7 +255,7 @@ class kDataCenterMgr
 		else
 		{
 			KalturaLog::log("Serving file from [".$resolvedPath."]");
-			kFile::dumpFile( $resolvedPath );
+			kFileUtils::dumpFile( $resolvedPath );
 		}
 		
 	}

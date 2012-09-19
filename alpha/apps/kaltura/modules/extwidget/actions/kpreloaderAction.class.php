@@ -17,6 +17,6 @@ class kpreloaderAction extends sfAction
 		if (!file_exists($preloader_path))
 			$preloader_path = myContentStorage::getFSContentRootPath()."/content" . myContentStorage::getFSUiconfRootPath() . "/preloader_2.swf";
 		
-		kFile::dumpFile($preloader_path);
+		kFileUtils::dumpFile($preloader_path);
 	}
 }

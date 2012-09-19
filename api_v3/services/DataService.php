@@ -169,7 +169,7 @@ class DataService extends KalturaEntryService
 		{
 			$filePath = $fileSync->getFullPath();
 			$mimeType = kFile::mimeType($filePath);
-			kFile::dumpFile($filePath, $mimeType);
+			kFileUtils::dumpFile($filePath, $mimeType);
 		}
 		else
 		{

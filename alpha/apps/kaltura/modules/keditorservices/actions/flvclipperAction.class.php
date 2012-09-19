@@ -123,7 +123,7 @@ class flvclipperAction extends kalturaAction
 			$tempThumbPath = myEntryUtils::resizeEntryImage( $entry ,  $version , $width , $height , $type , $bgcolor , $crop_provider, $quality,
 			$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices );
 			
-			kFile::dumpFile($tempThumbPath, null, strpos($tempThumbPath, "_NOCACHE_") === false ? null : 0);
+			kFileUtils::dumpFile($tempThumbPath, null, strpos($tempThumbPath, "_NOCACHE_") === false ? null : 0);
 		}
 		
 		$audio_only = $this->getRequestParameter ( "audio_only" ); // milliseconds
@@ -427,7 +427,7 @@ class flvclipperAction extends kalturaAction
 		// mp4
 		if (!$isFlv)
 		{
-			kFile::dumpFile($path);
+			kFileUtils::dumpFile($path);
 		}
 		
 		$this->logMessage( "flvclipperAction: serving file [$path] entry_id [$entry_id] clip_from [$clip_from] clip_to [$clip_to]" , "warning" );

@@ -200,7 +200,7 @@ class downloadAction extends sfAction
 				header("Content-Disposition: attachment; filename=\"$file_name\"");
 				
 			$mime_type = kFile::mimeType($file_path);
-			kFile::dumpFile($file_path, $mime_type);
+			kFileUtils::dumpFile($file_path, $mime_type);
 		}
 	}
 	

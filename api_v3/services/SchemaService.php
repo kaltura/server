@@ -39,7 +39,7 @@ class SchemaService extends KalturaBaseService
 		header("Content-Type: text/plain; charset=UTF-8");
 		
 		$cacheXsdFile = self::getSchemaPath($type);
-		kFile::dumpFile($cacheXsdFile);
+		kFileUtils::dumpFile($cacheXsdFile);
 	}
 	
 	/**

@@ -3,7 +3,7 @@
  * @package infra
  * @subpackage Storage
  */
-class kFileBase
+class kFile
 {
 	/**
 	 * Returns directory $path contents as an array of :
@@ -544,56 +544,6 @@ class kFileBase
 		return $length;
 	}
 	
-	public static function dumpApiRequest($host)
-	{
-		if (kCurrentContext::$multiRequest_index > 1)
-            KExternalErrors::dieError(KExternalErrors::MULTIREQUEST_PROXY_FAILED);
-		self::closeDbConnections();
-		
-		// prevent loop back of the proxied request by detecting the "X-Kaltura-Proxy header
-		if (isset($_SERVER["HTTP_X_KALTURA_PROXY"]))
-			KExternalErrors::dieError(KExternalErrors::PROXY_LOOPBACK);
-			
-		$get_params = $post_params = array();
-		
-		// pass uploaded files by adding them as post data with curl @ prefix
-		// signifying a file. the $_FILES[xxx][tmp_name] points to the location
-		// of the uploaded file.
-		// we preserve the original file name by passing the extra ;filename=$_FILES[xxx][name]
-		foreach($_FILES as $key => $value)
-		{
-			$post_params[$key] = "@".$value['tmp_name'].";filename=".$value['name'];
-		}
-		
-		foreach($_POST as $key => $value)
-		{
-			$post_params[$key] = $value;
-		}
-		
-		$url = $_SERVER['REQUEST_URI'];
-		
-		$ch = curl_init();
-		// set URL and other appropriate options
-		curl_setopt($ch, CURLOPT_URL, $host . $url );
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-Kaltura-Proxy: dumpApiRequest"));
-		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_POST, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $post_params);
-		// Set callback function for body
-		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileBase::read_body');
-		// Set callback function for headers
-		curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'kFileBase::read_header');
-		
-		header("X-Kaltura:dumpApiRequest " . kDataCenterMgr::getCurrentDcId());
-		// grab URL and pass it to the browser
-		$content = curl_exec($ch);
-		
-		// close curl resource, and free up system resources
-		curl_close($ch);
-		die();
-	}
-	
 	public static function getRequestHeaders()
 	{
 		if(function_exists('apache_request_headers'))
@@ -617,83 +567,6 @@ class kFileBase
 			$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 			apc_store("redirect-".$protocol.$_SERVER["REQUEST_URI"], $url, 60);
 		}
-	}
-
-	public static function dumpUrl($url, $allowRange = true, $passHeaders = false)
-	{
-		KalturaLog::debug("URL [$url], $allowRange [$allowRange], $passHeaders [$passHeaders]");
-		self::closeDbConnections();
-		
-		$ch = curl_init();
-		
-		// set URL and other appropriate options
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
-
-		// prevent loop back of the proxied request by detecting the "X-Kaltura-Proxy header
-		if (isset($_SERVER["HTTP_X_KALTURA_PROXY"]))
-			KExternalErrors::dieError(KExternalErrors::PROXY_LOOPBACK);
-			
-		$sendHeaders = array("X-Kaltura-Proxy: dumpUrl");
-		
-		if($passHeaders)
-		{
-			$sentHeaders = self::getRequestHeaders();
-			foreach($sentHeaders as $header => $value)
-				$sendHeaders[] = "$header: $value";
-		}
-		elseif($allowRange && isset($_SERVER['HTTP_RANGE']) && $_SERVER['HTTP_RANGE'])
-		{
-			// get range parameters from HTTP range requst headers
-			list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
-			curl_setopt($ch, CURLOPT_RANGE, $range);
-		}
-		
-		// when proxying request to other datacenter we may be already in a proxied request (from one of the internal proxy servers)
-		// we need to ensure the original HOST is sent in order to allow restirctions checks
-
-		$host = isset($_SERVER["HTTP_X_FORWARDED_HOST"]) ? $_SERVER["HTTP_X_FORWARDED_HOST"] : $_SERVER["HTTP_HOST"];
-
-		for($i = 0; $i < count($sendHeaders); $i++)
-		{
-			if (strpos($sendHeaders[$i], "HOST:") === 0)
-			{
-				array_splice($sendHeaders, $i, 1);
-				break;
-			}
-		}
-
-		$sendHeaders[] = "HOST:$host";
-
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $sendHeaders);
-
-		if($_SERVER['REQUEST_METHOD'] == 'HEAD')
-		{
-			// request was HEAD, proxy only HEAD response
-			curl_setopt($ch, CURLOPT_HEADER, 1);
-			curl_setopt($ch, CURLOPT_NOBODY, 1);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		}
-		else
-		{
-			// Set callback function for body
-			curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileBase::read_body');
-		}
-		// Set callback function for headers
-		curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'kFileBase::read_header');
-		
-		//curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-		
-		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
-		header("X-Kaltura:dumpUrl");
-		// grab URL and pass it to the browser
-		$content = curl_exec($ch);
-		KalturaLog::debug("CURL executed [$content]");
-		
-		// close curl resource, and free up system resources
-		curl_close($ch);
-		
-		die();
 	}
 	
 	public static function closeDbConnections()

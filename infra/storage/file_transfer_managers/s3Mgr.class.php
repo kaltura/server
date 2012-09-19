@@ -72,7 +72,7 @@ class s3Mgr extends kFileTransferMgr
 		if ($res)
 		{
 			$info = $this->s3->getObjectInfo($bucket, $remote_file);
-			if ($info && $info['size'] == kFileBase::fileSize($local_file))
+			if ($info && $info['size'] == kFile::fileSize($local_file))
 			{
 				KalturaLog::debug("File uploaded to Amazon, info: ".print_r($info, true));
 				return true;

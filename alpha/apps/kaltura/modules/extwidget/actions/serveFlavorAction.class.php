@@ -79,7 +79,7 @@ class serveFlavorAction extends kalturaAction
 
 		if($fileParam && is_dir($path)) {
 			$path .= "/$fileParam";
-			kFile::dumpFile($path, null, null);
+			kFileUtils::dumpFile($path, null, null);
 			die;
 		}
 		else if (!$isFlv) // dump as regular file if the forceproxy parameter was specified or the file isn't an flv
@@ -95,7 +95,7 @@ class serveFlavorAction extends kalturaAction
 					$limit_file_size = floor(@kFile::fileSize($path) * ($clipTo / $duration));
 				}
 			}
-			kFile::dumpFile($path, null, null, $limit_file_size);
+			kFileUtils::dumpFile($path, null, null, $limit_file_size);
 			die;
 		}
 		

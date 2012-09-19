@@ -76,7 +76,7 @@ class KalturaUploadedFileTokenResource extends KalturaDataCenterContentResource
 			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($this->token, kDataCenterMgr::getCurrentDcId());
 			if($remoteDCHost)
 			{
-				kFile::dumpApiRequest($remoteDCHost);
+				kFileUtils::dumpApiRequest($remoteDCHost);
 			}
 			else
 			{

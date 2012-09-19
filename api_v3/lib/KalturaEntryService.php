@@ -762,7 +762,7 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		else if(!$local)
 		{
-			kFile::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
+			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
 		}
 		
 		// even if it null

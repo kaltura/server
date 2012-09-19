@@ -79,7 +79,7 @@ class DocumentsService extends KalturaEntryService
 			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
 			if($remoteDCHost)
 			{
-				kFile::dumpApiRequest($remoteDCHost);
+				kFileUtils::dumpApiRequest($remoteDCHost);
 			}
 			else
 			{
@@ -360,7 +360,7 @@ class DocumentsService extends KalturaEntryService
 			if(!$local)
 			{
     			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrl($fileSync);
-				kFile::dumpApiRequest($remoteDCHost);
+				kFileUtils::dumpApiRequest($remoteDCHost);
 			}
 			
 			KalturaLog::log("convertPptToSwf sync key doesn't exists");
@@ -513,7 +513,7 @@ class DocumentsService extends KalturaEntryService
 		{
 			$filePath = $fileSync->getFullPath();
 			$mimeType = kFile::mimeType($filePath);
-			kFile::dumpFile($filePath, $mimeType);
+			kFileUtils::dumpFile($filePath, $mimeType);
 		}
 		else
 		{

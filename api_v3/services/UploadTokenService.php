@@ -87,7 +87,7 @@ class UploadTokenService extends KalturaBaseService
 		$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
 		if($remoteDCHost)
 		{
-			kFile::dumpApiRequest($remoteDCHost);
+			kFileUtils::dumpApiRequest($remoteDCHost);
 		}
 
 		$uploadTokenMgr = new kUploadTokenMgr($uploadTokenDb);

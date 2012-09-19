@@ -430,7 +430,7 @@ class MediaService extends KalturaEntryService
 			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
 			if($remoteDCHost)
 			{
-				kFile::dumpApiRequest($remoteDCHost);
+				kFileUtils::dumpApiRequest($remoteDCHost);
 			}
 			else
 			{
@@ -495,7 +495,7 @@ class MediaService extends KalturaEntryService
 	    $webcamBasePath = $content."/content/webcam/".$webcamTokenId; // filesync ok
 		$entryFullPath = $webcamBasePath.'.flv';
 		if (! file_exists ( $entryFullPath )) {
-			kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
+			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 			throw new KalturaAPIException ( KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND );
 		}
 			
@@ -686,7 +686,7 @@ class MediaService extends KalturaEntryService
 			if ($dcIndex != kDataCenterMgr::getCurrentDcId())
 			{
 				kalturaLog::debug("EntryID [$entryId] wasn't found on current DC. dumping the request to DC id [$dcIndex]");
-				kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ($dcIndex ) );
+				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ($dcIndex ) );
 			}
 		}
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)

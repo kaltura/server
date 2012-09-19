@@ -587,7 +587,7 @@ class FlavorAssetService extends KalturaAssetService
 		
 		if(!$local && $fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
 		{
-			kFile::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
+			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
 		}
 		$err = "";
 		

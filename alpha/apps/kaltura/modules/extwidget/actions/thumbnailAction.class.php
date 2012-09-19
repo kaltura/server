@@ -193,7 +193,7 @@ class thumbnailAction extends sfAction
 						
 					// and resize it
 					myFileConverter::convertImage($src_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles);
-					kFile::dumpFile($thumb_full_path);
+					kFileUtils::dumpFile($thumb_full_path);
 				} else {
 					KalturaLog::debug ( "token_id [$upload_token_id] not found in DC [". kDataCenterMgr::getCurrentDcId ()."]. dump url to romote DC");
 					$remoteUrl = kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) .$_SERVER['REQUEST_URI'];
@@ -209,7 +209,7 @@ class thumbnailAction extends sfAction
 			if ( ! $entry )
 			{ 
 				// problem could be due to replication lag
-				kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
+				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 			}
 		}
 		else
@@ -306,7 +306,7 @@ class thumbnailAction extends sfAction
 							"entry_error.swf" : "entry_converting.swf";
 			}
 						
-			kFile::dumpFile($msgPath, null, 0);
+			kFileUtils::dumpFile($msgPath, null, 0);
 		}
 			
 		if ( ! $file_sync ) 
@@ -404,7 +404,7 @@ class thumbnailAction extends sfAction
 			$cache->put($requestKey, $tempThumbPath);
 		}
 		
-		kFile::dumpFile($tempThumbPath, null, $nocache ? 0 : null);
+		kFileUtils::dumpFile($tempThumbPath, null, $nocache ? 0 : null);
 		
 		// TODO - can delete from disk assuming we caneasily recreate it and it will anyway be cached in the CDN
 		// however dumpfile dies at the end so we cant just write it here (maybe register a shutdown callback)

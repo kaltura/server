@@ -3,7 +3,7 @@
  * @package infra
  * @subpackage Storage
  */
-class kFile extends kFileBase
+class kFileUtils extends kFile
 {
 	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0)
 	{
@@ -96,6 +96,56 @@ class kFile extends kFileBase
 			fclose($fh);
 		}
 		
+		die();
+	}
+
+	public static function dumpApiRequest($host)
+	{
+		if (kCurrentContext::$multiRequest_index > 1)
+            KExternalErrors::dieError(KExternalErrors::MULTIREQUEST_PROXY_FAILED);
+		self::closeDbConnections();
+		
+		// prevent loop back of the proxied request by detecting the "X-Kaltura-Proxy header
+		if (isset($_SERVER["HTTP_X_KALTURA_PROXY"]))
+			KExternalErrors::dieError(KExternalErrors::PROXY_LOOPBACK);
+			
+		$get_params = $post_params = array();
+		
+		// pass uploaded files by adding them as post data with curl @ prefix
+		// signifying a file. the $_FILES[xxx][tmp_name] points to the location
+		// of the uploaded file.
+		// we preserve the original file name by passing the extra ;filename=$_FILES[xxx][name]
+		foreach($_FILES as $key => $value)
+		{
+			$post_params[$key] = "@".$value['tmp_name'].";filename=".$value['name'];
+		}
+		
+		foreach($_POST as $key => $value)
+		{
+			$post_params[$key] = $value;
+		}
+		
+		$url = $_SERVER['REQUEST_URI'];
+		
+		$ch = curl_init();
+		// set URL and other appropriate options
+		curl_setopt($ch, CURLOPT_URL, $host . $url );
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-Kaltura-Proxy: dumpApiRequest"));
+		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch, CURLOPT_POST, TRUE);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $post_params);
+		// Set callback function for body
+		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
+		// Set callback function for headers
+		curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'kFileUtils::read_header');
+		
+		header("X-Kaltura:dumpApiRequest " . kDataCenterMgr::getCurrentDcId());
+		// grab URL and pass it to the browser
+		$content = curl_exec($ch);
+		
+		// close curl resource, and free up system resources
+		curl_close($ch);
 		die();
 	}
 }

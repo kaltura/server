@@ -249,7 +249,7 @@ class BaseEntryService extends KalturaEntryService
 			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
 			if($remoteDCHost)
 			{
-				kFile::dumpApiRequest($remoteDCHost);
+				kFileUtils::dumpApiRequest($remoteDCHost);
 			}
 			else
 			{

@@ -41,7 +41,7 @@ class KalturaAssetsParamsResourceContainers extends KalturaResource
     	if(!is_null($dc) && $dc != kDataCenterMgr::getCurrentDcId())
     	{
     		$remoteHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($dc);
-    		kFile::dumpApiRequest($remoteHost);
+    		kFileUtils::dumpApiRequest($remoteHost);
     	}
 	}
 	

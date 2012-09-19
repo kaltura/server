@@ -288,7 +288,7 @@ abstract class KalturaBaseService
 		{
 			$filePath = $fileSync->getFullPath();
 			$mimeType = kFile::mimeType($filePath);
-			kFile::dumpFile($filePath, $mimeType); 
+			kFileUtils::dumpFile($filePath, $mimeType); 
 		}
 		else if ( in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()) )
 		{
@@ -296,7 +296,7 @@ abstract class KalturaBaseService
 			KalturaLog::info("Redirecting to [$remoteUrl]");
 			if($forceProxy)
 			{
-				kFile::dumpApiRequest($remoteUrl);
+				kFileUtils::dumpApiRequest($remoteUrl);
 			}
 			else
 			{

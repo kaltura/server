@@ -1806,7 +1806,7 @@ class kFlowHelper
 			if(!$remoteDCHost)
 				return;
 
-			kFile::dumpApiRequest($remoteDCHost);
+			kFileUtils::dumpApiRequest($remoteDCHost);
 		}
 			
 		if(is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS))

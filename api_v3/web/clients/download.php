@@ -17,7 +17,7 @@ foreach($config as $name => $item)
 		$outputFilePath = KAutoloader::buildPath($generatorOutputPath, $fileName);
 		$outputFilePath = realpath($outputFilePath);
 		header("Content-disposition: attachment; filename=$fileName");
-		kFile::dumpFile($outputFilePath, "application/gzip");
+		kFileUtils::dumpFile($outputFilePath, "application/gzip");
 		die;
 	}
 }

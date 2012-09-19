@@ -26,7 +26,7 @@ class serveFileAction extends kalturaSystemAction
 		} 
 		$mime_type = kFile::mimeType( $file_path );
 //		echo "[[$mime_type]]";
-		kFile::dumpFile($file_path , $mime_type );
+		kFileUtils::dumpFile($file_path , $mime_type );
 		die();
 	}
 }

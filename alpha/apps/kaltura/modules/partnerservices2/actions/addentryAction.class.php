@@ -111,7 +111,7 @@ class addentryAction extends defPartnerservices2Action
 			{
 				$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId(1 - kDataCenterMgr::getCurrentDcId());
 				if($remoteDCHost)
-					kFile::dumpApiRequest($remoteDCHost);
+					kFileUtils::dumpApiRequest($remoteDCHost);
 				
 				$this->addError(APIErrors::INVALID_FILE_NAME, $filename);
 				return ;

@@ -2083,7 +2083,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 //		$dataPath = myContentStorage::getFSContentRootPath() . $this->getDataPath(); // replaced__getDataPath
 		
-//		kFile::dumpFile($dataPath);
+//		kFileUtils::dumpFile($dataPath);
 
 		$sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
 		
@@ -3040,7 +3040,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 								KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
 							}
 							//Ready fileSync is on the other DC - dumping
-							kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
+							kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 						}
 						KalturaLog::err ( 'No ready fileSync found on any DC.' );
 						KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );

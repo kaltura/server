@@ -21,7 +21,7 @@ abstract class KalturaDataCenterContentResource extends KalturaContentResource
 			
 		$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($dc);
 		if($remoteDCHost)
-			kFile::dumpApiRequest($remoteDCHost);
+			kFileUtils::dumpApiRequest($remoteDCHost);
 			
 		throw new KalturaAPIException(KalturaErrors::REMOTE_DC_NOT_FOUND, $dc);
 	}
