@@ -143,11 +143,11 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 		$bulkUploadResult->lineIndex = $this->lineNumber;
 		$bulkUploadResult->partnerId = $this->job->partnerId;
 		//CSV files allow values to contain the "," character, on the condition that the value is surrounded by "".
-		foreach ($values as $value)
+		for ($index = 0; $index < count($values); $index++)
 		{
-		    if (strpos($value, ","))
+		    if (strpos($values[$index], ",") !== false)
 		    {
-		        $value = '"'.$value.'"';
+		        $values[$index] = '"'.$values[$index].'"';
 		    }
 		}
 		$bulkUploadResult->rowData = implode(",", $values);
