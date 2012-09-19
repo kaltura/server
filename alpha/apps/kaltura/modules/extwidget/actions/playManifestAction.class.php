@@ -920,6 +920,19 @@ class playManifestAction extends kalturaAction
 		return $flavors;
 	}
 
+	private function ensureUniqueBitrates(array &$flavors)
+	{
+		$seenBitrates = array();
+		foreach ($flavors as &$flavor)
+		{
+			while (in_array($flavor['bitrate'], $seenBitrates))
+			{
+				$flavor['bitrate']++;
+			}
+			$seenBitrates[] = $flavor['bitrate'];
+		}
+	}
+	
 	/**
 	 * @return flavorAsset
 	 */
@@ -1113,6 +1126,8 @@ class playManifestAction extends kalturaAction
 	private function serveHDNetworkSmil()
 	{
 		$flavors = $this->buildHttpFlavorsArray($duration);
+		
+		$this->ensureUniqueBitrates($flavors);		// When playing HDS with Akamai HD the bitrates in the manifest must be unique 
 
 		$renderer = new kSmilManifestRenderer();
 		$renderer->entryId = $this->entryId;
