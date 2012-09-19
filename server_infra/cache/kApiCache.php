@@ -627,28 +627,14 @@ class kApiCache
 		$this->_cacheModes = array();
 		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
 			return;
-			
-		$ks = null;
-		try
-		{
-			$ks = kSessionUtils::crackKs($this->_ks);
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::err($e->getMessage());
-			self::disableCache();
-			return;
-		}
-		
-		if ($ks && 
-			($ks->valid_until <= time() ||						// don't cache when the KS is expired
-			$ks->isSetLimitAction())) 							// don't cache when the KS has a limit on the number of actions
+
+		if ($this->_ks && (!$this->_ksObj || !$this->_ksObj->tryToValidateKS()))
 		{
 			self::disableCache();
 			return;
 		}
 		
-		$isAnonymous = $this->isAnonymous($ks);				
+		$isAnonymous = $this->isAnonymous($this->_ksObj);				
 		if (!$isAnonymous && $this->_cacheStatus == self::CACHE_STATUS_ANONYMOUS_ONLY)
 		{
 			self::disableCache();
