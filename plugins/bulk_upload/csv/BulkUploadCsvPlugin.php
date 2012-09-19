@@ -128,7 +128,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		foreach($bulkUploadResults as $bulkUploadResult)
 		{
 		    /* @var $bulkUploadResult BulkUploadResult */
-		    $values = explode(",", $bulkUploadResult->getRowData());
+		    $values = str_getcsv($bulkUploadResult->getRowData());
 //		    switch ($bulkUploadResult->getObjectType())
 //		    {
 //		        case BulkUploadObjectType::ENTRY:
