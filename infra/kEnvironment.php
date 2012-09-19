@@ -11,7 +11,7 @@ class kEnvironment
 	
 	protected static $map = null;
 	
-	private static function init()
+	protected static function init()
 	{
 		if (self::$map) 
 			return;
