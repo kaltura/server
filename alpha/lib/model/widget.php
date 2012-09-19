@@ -235,7 +235,7 @@ class widget extends Basewidget
 	   	$widget = "";
 	   	if ($this->getAddEmbedHtml5Support()) {
 		   	//following line is html5 support
-			$widget .= '<script type="text/javascript" src="http://www.kaltura.com/p/'.$this->getPartnerId().'/sp/'.$this->getPartnerId().'00/embedIframeJs/uiconf_id/'.$this->getUiConfId().'/partner_id/' . $this->getPartnerId() . '"></script>';
+			$widget .= '<script type="text/javascript" src="http://'. kConf::get('www_host') .'/p/'.$this->getPartnerId().'/sp/'.$this->getPartnerId().'00/embedIframeJs/uiconf_id/'.$this->getUiConfId().'/partner_id/' . $this->getPartnerId() . '"></script>';
 	   	}
 	   	
 	   	$widget .= /*$extra_links .*/
