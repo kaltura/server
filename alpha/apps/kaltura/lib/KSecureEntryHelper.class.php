@@ -85,7 +85,9 @@ class KSecureEntryHelper
 		if ($accessControl)
 		{
 			$context = new kEntryContextDataResult();
-			$accessControl->applyContext($context, $this->getAccessControlScope());
+			$scope = $this->getAccessControlScope();
+			if (!$scope->getKs() || !($scope->getKs() instanceof ks) || !$scope->getKs()->isAdmin())
+				$accessControl->applyContext($context, $scope);
 			
 			$actions = $context->getAccessControlActions();
 			$previewActionFound = false;
@@ -110,7 +112,9 @@ class KSecureEntryHelper
 		if ($accessControl)
 		{
 			$context = new kEntryContextDataResult();
-			$accessControl->applyContext($context, $this->getAccessControlScope());
+			$scope = $this->getAccessControlScope();
+			if (!$scope->getKs() || !($scope->getKs() instanceof ks) || !$scope->getKs()->isAdmin())
+				$accessControl->applyContext($context, $scope);
 			
 			$actions = $context->getAccessControlActions();
 			$previewActionFound = false;
@@ -166,7 +170,11 @@ class KSecureEntryHelper
 			return;
 			
 		$context = new kEntryContextDataResult();
-		$this->disableCache = $accessControl->applyContext($context, $this->getAccessControlScope());
+		$scope = $this->getAccessControlScope();
+		if (!$scope->getKs() || !($scope->getKs() instanceof ks) || !$scope->getKs()->isAdmin())
+			$accessControl->applyContext($context, $scope);
+		else
+			$this->disableCache = false;
 		
 		if(count($context->getAccessControlMessages()))
 		{

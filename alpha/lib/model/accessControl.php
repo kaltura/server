@@ -151,11 +151,7 @@ class accessControl extends BaseaccessControl
 	{
 		if($scope)
 			$this->setScope($scope);
-		$scope = $this->getScope();
-		
-		if ($scope->getKs() && ($scope->getKs() instanceof ks) && $scope->getKs()->isAdmin())
-			return false;
-		
+
 		$disableCache = false;
 		
 		$rules = $this->getRulesArray();
