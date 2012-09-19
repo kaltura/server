@@ -196,7 +196,15 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 		$bulkUploadResult->bulkUploadJobId = $this->job->id;
 		$bulkUploadResult->lineIndex = $this->lineNumber;
 		$bulkUploadResult->partnerId = $this->job->partnerId;
-		$bulkUploadResult->rowData = join(',', $values);
+		
+		foreach ($values as $value)
+		{
+		    if (strpos($value, ","))
+		    {
+		        $value = '"'.$value.'"';
+		    }
+		}
+		$bulkUploadResult->rowData = implode(",", $values);
 				
 		// Check variables count
 		if($this->csvVersion != KalturaBulkUploadCsvVersion::V3)
