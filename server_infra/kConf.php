@@ -12,11 +12,14 @@ class kConf extends kEnvironment
 {
 	const APC_CACHE_MAP = 'kConf';
 	
-	private static function init()
+	protected static $initialized = false;
+	
+	protected static function init()
 	{
-		if (self::$map) 
+		if (self::$initialized) 
 			return;
 		
+		self::$initialized = true;
 		parent::init();
 		
 		$cacheDir = self::$map['cache_root_path'];
@@ -77,6 +80,12 @@ class kConf extends kEnvironment
 					error_log("Failed to delete base.reload file");
 			}
 		}			
+	}
+
+	public static function get($paramName)
+	{
+		self::init();
+		return parent::get($paramName); 
 	}
 	
 	public static function getAll()
