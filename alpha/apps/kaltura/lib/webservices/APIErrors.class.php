@@ -163,6 +163,8 @@ class APIErrors
 	const SERVICE_FORBIDDEN_FULLY_BLOCKED = "SERVICE_FORBIDDEN_FULLY_BLOCKED,The access to this service is forbidden since the specified partner is fully blocked";
 	
 	const SERVICE_FORBIDDEN_PARTNER_DELETED = "SERVICE_FORBIDDEN_PARTNER_DELETED,The access to this service is forbidden since the specified partner is deleted";
+
+	const SERVICE_ACCESS_CONTROL_RESTRICTED = "SERVICE_ACCESS_CONTROL_RESTRICTED,The access to service [%s] is forbidden due to access control restriction";
 	
 	const PARTNER_ACCESS_FORBIDDEN = "PARTNER_ACCESS_FORBIDDEN,Partner [%s] cannot access partner [%s]";
 	

@@ -22,7 +22,18 @@ class kIpAddressCondition extends kMatchCondition
 		$scope = $accessControl->getScope();
 		return $scope->getIp();	
 	}
-	
+
+	/* (non-PHPdoc)
+	 * @see kCondition::internalFulfilled()
+	 */
+	protected function internalFulfilled(accessControl $accessControl)
+	{
+		$scope = $accessControl->getScope();
+
+		kApiCache::addExtraField(kApiCache::ECF_IP, kApiCache::COND_IP_RANGE, $this->getStringValues($scope));
+		return parent::internalFulfilled($accessControl);
+	}
+
 	/* (non-PHPdoc)
 	 * @see kMatchCondition::matches()
 	 */

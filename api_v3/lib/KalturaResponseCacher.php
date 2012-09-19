@@ -43,15 +43,12 @@ class KalturaResponseCacher extends kApiCache
 		$this->_params['___cache___uri'] = $_SERVER['PHP_SELF'];
 
 		// extract any baseEntry.getContentData referrer parameters
-		$addExtraFields = false;
 		$contextDataObjectType = 'contextDataParams:objectType';
 		foreach ($this->_params as $key => $value)
 		{
 			if (substr($key, -strlen($contextDataObjectType)) !== $contextDataObjectType)
 				continue;
 
-			$addExtraFields = true;
-				
 			$keyPrefix = substr($key, 0, -strlen($contextDataObjectType));
 			$referrerKey = $keyPrefix . 'contextDataParams:referrer';
 
@@ -68,8 +65,7 @@ class KalturaResponseCacher extends kApiCache
 		
 		$this->finalizeCacheKey();
 		
-		if ($addExtraFields)
-			$this->addExtraFields();
+		$this->addExtraFields();
 				
 		return true;
 	}

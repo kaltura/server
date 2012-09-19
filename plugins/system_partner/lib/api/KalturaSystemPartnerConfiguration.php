@@ -279,6 +279,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var int
 	 */
 	public $cacheFlavorVersion;
+
+	/**
+	 * @var int
+	 */
+	public $apiAccessControlId;
 	
 	
 	private static $map_between_objects = array
@@ -335,6 +340,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"logoutUrl",
 	    "defaultEntitlementEnforcement",
 		"cacheFlavorVersion",
+		"apiAccessControlId",
 	);
 
 	public function getMapBetweenObjects()

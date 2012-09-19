@@ -15,6 +15,7 @@ class kApiCache
 	const ECF_REFERRER = 'referrer';
 	const ECF_USER_AGENT = 'userAgent';
 	const ECF_COUNTRY = 'country';
+	const ECF_IP = 'ip';
 
 	// extra cache fields conditions
 	// 	the conditions will be applied on the extra fields when generating the cache key
@@ -25,6 +26,7 @@ class kApiCache
 	const COND_MATCH = 'match';					// used by kCountryCondition
 	const COND_REGEX = 'regex';					// used by kUserAgentCondition
 	const COND_SITE_MATCH = 'siteMatch';		// used by kSiteCondition
+	const COND_IP_RANGE = 'ipRange';			// used by kIpAddressCondition
 	
 	const EXTRA_KEYS_PREFIX = 'extra-keys-';	// apc cache key prefix
 
@@ -102,6 +104,7 @@ class kApiCache
 	protected $_extraFields = array();
 	protected $_referrers = array();				// a request can theoritically have more than one referrer, in case of several baseEntry.getContextData calls in a single multirequest
 	protected static $_country = null;				// caches the country of the user issuing this request
+	protected static $_ip = null;					// caches the ip of the user issuing this request
 	protected static $_usesHttpReferrer = false;	// enabled if the request is dependent on the http referrer field (opposed to an API parameter referrer)
 	protected static $_hasExtraFields = false;		// set to true if the response depends on http headers and should not return caching headers to the user / cdn
 	
@@ -297,7 +300,16 @@ class kApiCache
 		}
 		return self::$_country;
 	}
-	
+
+	static protected function getIp()
+	{
+		if (is_null(self::$_ip))
+		{
+			self::$_ip = infraRequestUtils::getRemoteAddress();
+		}
+		return self::$_ip;
+	}
+
 	static public function getHttpReferrer()
 	{
 		self::$_usesHttpReferrer = true;
@@ -324,6 +336,9 @@ class kApiCache
 		
 		case self::ECF_COUNTRY:
 			return array(self::getCountry());
+
+		case self::ECF_IP:
+			return array(self::getIp());
 		}
 		
 		return array();
@@ -358,7 +373,18 @@ class kApiCache
 					strpos($fieldValue, "." . $curRefValue) !== false)
 					return true;
 			}
-			return false;	
+			return false;
+
+		case self::COND_IP_RANGE:
+			if (!count($refValue))
+				return null;
+			require_once(dirname(__FILE__) . '/../../server_infra/request/kIpAddressUtils.php');
+			foreach($refValue as $curRefValue)
+			{
+				if (kIpAddressUtils::isIpInRange($fieldValue, $curRefValue))
+					return true;
+			}
+			return false;
 		}
 		return $fieldValue;
 	}
@@ -371,6 +397,8 @@ class kApiCache
 		case self::COND_MATCH:
 		case self::COND_SITE_MATCH:
 			return "_{$condition}_" . implode(',', $refValue);
+		case self::COND_IP_RANGE:
+			return "_{$condition}_" . implode(',', str_replace('/', '_', $refValue)); // ip range can contain slashes
 		}
 		return '';
 	}

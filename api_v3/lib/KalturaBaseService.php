@@ -118,6 +118,8 @@ abstract class KalturaBaseService
 			header("X-Kaltura-App: exiting on error ".$e->getCode()." - ".$e->getMessage());
 			throw $e;		
 		}
+
+		$this->validateApiAccessControl();
 		
 		// init partner filter parameters
 		$this->private_partner_data = $allowPrivatePartnerData;
@@ -313,5 +315,44 @@ abstract class KalturaBaseService
 			die;
 		}	
 	}
-	
+
+	protected function validateApiAccessControl()
+	{
+		if (is_null($this->partner))
+			return;
+
+		$accessControl = $this->partner->getApiAccessControl();
+		if (is_null($accessControl))
+			return;
+
+		$context = new kEntryContextDataResult();
+		$accessControl->applyContext($context, $this->getApiAccessControlScope());
+
+		if(count($context->getAccessControlMessages()))
+		{
+			foreach($context->getAccessControlMessages() as $msg)
+				header("X-Kaltura: api-access-control: $msg");
+		}
+
+		if(count($context->getAccessControlActions()))
+		{
+			$actions = $context->getAccessControlActions();
+			foreach($actions as $action)
+			{
+				/* @var $action kAccessControlAction */
+				if($action->getType() == accessControlActionType::BLOCK)
+				{
+					throw new KalturaAPIException(APIErrors::SERVICE_ACCESS_CONTROL_RESTRICTED, $this->serviceId.'->'.$this->actionName);
+				}
+			}
+		}
+	}
+
+	private function getApiAccessControlScope()
+	{
+		$scope = new accessControlScope();
+		$scope->setKs(kCurrentContext::$ks);
+		$scope->setContexts(array(accessControlContextType::PLAY));
+		return $scope;
+	}
 }
