@@ -247,6 +247,9 @@ class asset extends Baseasset implements ISyncableFile
 		self::validateFileSyncSubType ( $sub_type );
 		
 		$entry = $this->getentry();
+		if(!$entry)
+			return null;
+			
 		$fileName = $entry->getId() . "_" . $this->getId() . "_$version";
 				 
 		switch($sub_type)
