@@ -5,8 +5,8 @@
  */
 class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator, Countable
 {
-	protected $array = array();
-	protected $class = "";
+	private $array = array();
+	private $class = "";
 	
 	/**
 	 * @var int $count
