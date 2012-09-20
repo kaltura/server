@@ -234,9 +234,9 @@ class KAsyncMailer extends KJobHandlerWorker
 		$body = $cultureTexts['bodies'][$type];
 
 		$forumsLink = kConf::get('forum_url');
-		$unsubscribeLink = kConf::get('unsubscribe_mail_url').$recipientemail;
+		$unsubscribeLink = kConf::get('unsubscribe_mail_url').self::createBlockEmailStr($recipientemail);
 		
-		$footer = vsprintf( $footer, array( $forumsLink, $unsubscribeLink , self::createBlockEmailStr( $recipientemail ) ) );
+		$footer = vsprintf($footer, array($forumsLink, $unsubscribeLink) );
 
 		$body .= "\n" . $footer;
 		KalturaLog::debug("type [$type]");
