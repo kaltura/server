@@ -21,9 +21,14 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		$this->bootstrap('autoloaders');
 		$this->bootstrap('timezone');
 		
-		$loggerConfigPath = realpath(APPLICATION_PATH . '/../configurations/logger.ini');
-		$loggerConfig = new Zend_Config_Ini($loggerConfigPath);
 		$configSettings = Zend_Registry::get('config')->settings;
+		$loggerConfigPath = null;
+		if(isset($configSettings->loggerConfigPath))
+			$loggerConfigPath = $configSettings->loggerConfigPath;
+		else
+			$loggerConfigPath = realpath(APPLICATION_PATH . '/../configurations/logger.ini');
+			
+		$loggerConfig = new Zend_Config_Ini($loggerConfigPath);
 		$loggerName = $configSettings->applicationName;
 		$appLogger = $loggerConfig->get($loggerName);
 		KalturaLog::initLog($appLogger);
@@ -139,13 +144,15 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 	{
 		$autoloader = Zend_Loader_Autoloader::getInstance();
 
+		$config = new Zend_Config($this->getOptions(), true);
+		
 		$moduleAutoloader = new Zend_Application_Module_Autoloader(array(
 			'namespace' => '',
 			'basePath'  => dirname(__FILE__),
 		));
 		$moduleAutoloader->addResourceType('infra', 'Infra', 'Infra');
 		$autoloader->pushAutoloader($moduleAutoloader);
-		$autoloader->pushAutoloader(new Infra_InfraLoader());
+		$autoloader->pushAutoloader(new Infra_InfraLoader($config->settings));
 		
 		$clientAutoloader = new Zend_Application_Module_Autoloader(array(
 			'namespace' => '',

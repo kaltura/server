@@ -5,16 +5,35 @@
  */
 class Infra_InfraLoader implements Zend_Loader_Autoloader_Interface
 {
-	public function Infra_InfraLoader()
+	public function Infra_InfraLoader(Zend_Config $config = null)
 	{
-		$infaDir = realpath(dirname(__FILE__) . '/../../infra/');
-		$pluginsDir = realpath(dirname(__FILE__) . '/../../plugins/');
+		$infaFolder = null;
+		$pluginsFolder = null;
+		$cachePath = null;
+		if($config)
+		{
+			if(isset($config->cachePath))
+				$cachePath = $config->cachePath;
+			if(isset($config->infaFolder))
+				$infaFolder = $config->infaFolder;
+			if(isset($config->pluginsFolder))
+				$pluginsFolder = $config->pluginsFolder;
+		}
 		
-		require_once($infaDir . DIRECTORY_SEPARATOR . 'KAutoloader.php');
-		require_once($infaDir . DIRECTORY_SEPARATOR . 'kEnvironment.php');
-		KAutoloader::setClassPath(array($infaDir . DIRECTORY_SEPARATOR . '*'));
-		KAutoloader::addClassPath(KAutoloader::buildPath($pluginsDir, '*'));
-		KAutoloader::setClassMapFilePath(kEnvironment::get("cache_root_path") . '/infra/classMap.cache');
+		if(!$infaFolder)
+			$infaFolder = realpath(dirname(__FILE__) . '/../../infra/');
+		if(!$pluginsFolder)
+			$pluginsFolder = realpath(dirname(__FILE__) . '/../../plugins/');
+		if(!$cachePath)
+			$cachePath = kEnvironment::get("cache_root_path") . '/infra/classMap.cache';
+		
+		require_once($infaFolder . DIRECTORY_SEPARATOR . 'KAutoloader.php');
+		require_once($infaFolder . DIRECTORY_SEPARATOR . 'kEnvironment.php');
+		
+			
+		KAutoloader::setClassPath(array($infaFolder . DIRECTORY_SEPARATOR . '*'));
+		KAutoloader::addClassPath(KAutoloader::buildPath($pluginsFolder, '*'));
+		KAutoloader::setClassMapFilePath($cachePath);
 		KAutoloader::register();
 	}
 	
