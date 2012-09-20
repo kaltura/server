@@ -211,6 +211,16 @@ function loadDropFolder(paramStr)
 
 
 function loadDropFolderSuccess(html) {
+	if (jQuery(html).filter('#frmDropFolderConfigure').hasClass('valid')) 
+	{
+		dialogDiv.dialog('close');
+		if (jQuery('#frmPaginator1').length){
+			jQuery('#frmPaginator1').submit();
+		}
+		else {
+			jQuery('#frmPartnerIdFilter').submit();
+		}
+	}
 	jQuery('#frmDropFolderConfigure').replaceWith(html);
 	jQuery('#frmDropFolderConfigure').ajaxForm(loadDropFolderSuccess);
 }
