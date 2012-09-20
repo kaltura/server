@@ -155,6 +155,16 @@ function newStorage(partnerId) {
 }
 
 function newStorageSuccess(html) {
+	if (jQuery(html).filter('#frmStorageConfig').hasClass('valid')) 
+	{
+		dialogDiv.dialog('close');
+		if (jQuery('#frmPaginator1').length){
+			jQuery('#frmPaginator1').submit();
+		}
+		else {
+			jQuery('#frmPartnerIdFilter').submit();
+		}
+	}
 	jQuery('#frmStorageConfig').replaceWith(html);
 	jQuery('#frmStorageConfig').ajaxForm(newStorageSuccess);
 }
