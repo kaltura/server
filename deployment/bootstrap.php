@@ -8,6 +8,7 @@ require_once(ROOT_DIR . '/server_infra/kConf.php');
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "server_infra", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/deploy/classMap.cache');
 KAutoloader::register();
