@@ -456,6 +456,7 @@ class myPartnerRegistration
  		UserRolePeer::setUseCriteriaFilter ( false );
  		$c = new Criteria();
  		$c->addAnd(UserRolePeer::PARTNER_ID, $templatePartner->getId(), Criteria::EQUAL);
+ 		$c->addAnd(UserRolePeer::STATUS, UserRoleStatus::ACTIVE, Criteria::EQUAL);
  		$count = UserRolePeer::doCount($c);
  		if ($count > kConf::get('copy_partner_limit_user_roles'))
  		{
