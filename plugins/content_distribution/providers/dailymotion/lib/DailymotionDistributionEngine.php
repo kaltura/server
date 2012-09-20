@@ -304,7 +304,8 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 			$geoBlockingCountryList = $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_GEO_BLOCKING_COUNTRY_LIST);
 			if ($geoBlockingOperation)
 				$geoBlocking[] = $geoBlockingOperation;
-			$geoBlocking = array_merge($geoBlocking, explode(',', $geoBlockingCountryList));
+			if ($geoBlockingCountryList)
+				$geoBlocking = array_merge($geoBlocking, explode(',', $geoBlockingCountryList));
 		}
 		elseif ($distributionProfile->geoBlockingMapping == KalturaDailymotionGeoBlockingMapping::ACCESS_CONTROL) {
 			$geoBlocking[] = $providerData->accessControlGeoBlockingOperation;
