@@ -331,6 +331,33 @@ class YouTubeApiImpl
 	{
 		return self::$categoriesMap;
 	}
+	
+	public function uploadCaption($videoRemoteId, $captionContent, $language) {
+		$headerParams = array ();
+		$headerParams[] = 'Content-Language: '.$language;
+		$contetType = 'application/vnd.youtube.timedtext; charset=UTF-8';
+		$url = "http://gdata.youtube.com/feeds/api/videos/$videoRemoteId/captions";
+		$response = $this->yt->post($captionContent,$url,null,$contetType,$headerParams);
+		KalturaLog::debug('YouTube api response:'.print_r($response,true));
+		//getting the new caption remote id
+		$location = $response->getHeader('Location');
+		$matches = array();
+		preg_match('/captions\/(.+)\?/', $location, $matches);
+		if($matches)
+			return $matches[1];
+		return null;
+	}
+	
+	public function updateCaption($videoRemoteId, $captionRemoteId, $captionContent) {
+		$contetType = 'application/vnd.youtube.timedtext; charset=UTF-8';
+		$url = "http://gdata.youtube.com/feeds/api/videos/$videoRemoteId/captiondata/$captionRemoteId";
+		$this->yt->put($captionContent,$url,null,$contetType,null);
+	}
+	
+	public function deleteCaption($videoRemoteId, $captionRemoteId) {
+		$url = "http://gdata.youtube.com/feeds/api/videos/$videoRemoteId/captions/$captionRemoteId";
+		$this->yt->delete($url,null);
+	}
 }
 
 ?>

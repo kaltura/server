@@ -142,6 +142,14 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			unlink($videoFilePath);
 		}
 		$data->remoteId = $remoteId;
+		
+		$captionsInfo = $data->providerData->captionsInfo;
+		/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
+		foreach ($captionsInfo as $captionInfo){
+			if ($captionInfo->action == KalturaYouTubeApiDistributionCaptionAction::SUBMIT_ACTION){
+				$data->mediaFiles[] = $this->submitCaption($youTubeApiImpl, $captionInfo, $data->remoteId);
+			}
+		}
 		return true;
 	}
 	
@@ -219,6 +227,23 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
 		$youTubeApiImpl->updateEntry($data->remoteId, $props, $private);
 		
+		$captionsInfo = $data->providerData->captionsInfo;
+		/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
+		foreach ($captionsInfo as $captionInfo){
+			switch ($captionInfo->action){
+				case KalturaYouTubeApiDistributionCaptionAction::SUBMIT_ACTION:
+					$data->mediaFiles[] = $this->submitCaption($youTubeApiImpl,$captionInfo, $data->remoteId);
+					break;
+				case KalturaYouTubeApiDistributionCaptionAction::UPDATE_ACTION:
+					$captionContent = $this->getFileBinaryContent($captionInfo->filePath);
+					$youTubeApiImpl->updateCaption ( $data->remoteId, $captionInfo->remoteId, $captionContent );
+					$this->updateRemoteMediaFileVersion($data,$captionInfo);
+					break;
+				case KalturaYouTubeApiDistributionCaptionAction::DELETE_ACTION:
+					$youTubeApiImpl->deleteCaption($data->remoteId, $captionInfo->remoteId);
+					break;
+			}
+		}
 		return true;
 	}
 	
@@ -232,6 +257,13 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		
 		$youTubeApiImpl->deleteEntry($data->remoteId);
 		
+		$captionsInfo = $data->providerData->captionsInfo;
+		/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
+		foreach ($captionsInfo as $captionInfo){
+			if ($captionInfo->action == KalturaYouTubeApiDistributionCaptionAction::DELETE_ACTION){
+				$youTubeApiImpl->deleteCaption ( $data->remoteId, $captionInfo->remoteId);
+			}
+		}
 		return true;
 	}
 	
@@ -257,5 +289,38 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	        return $this->fieldValues[$fieldName];
 	    }
 	    return null;
+	}
+	
+	private function getFileBinaryContent($filePath){
+		if (! file_exists( $filePath )){
+			throw new KalturaDistributionException ( "Caption file [$filePath] was not found" );
+		}
+		$fh = fopen ( $filePath, 'r' );
+		return fread ( $fh, filesize ( $filePath ) );
+	}
+	
+	private function getNewRemoteMediaFile($captionRemoteId , $captionInfo) {
+		$remoteMediaFile = new KalturaDistributionRemoteMediaFile ();
+		$mediaFile->remoteId = $captionRemoteId;
+		$mediaFile->version = $captionInfo->version;
+		$mediaFile->assetId = $captionInfo->assetId;
+		return $remoteMediaFile;
+	}
+	
+	private function updateRemoteMediaFileVersion(KalturaDistributionRemoteMediaFileArray &$remoteMediaFiles, KalturaYouTubeApiCaptionDistributionInfo $captionInfo){
+		/* @var $mediaFile KalturaDistributionRemoteMediaFile */
+		foreach ($remoteMediaFiles as $remoteMediaFile){
+			if ($remoteMediaFile->assetId == $mediaFile->assetId){
+				$remoteMediaFile->version = $captionInfo->version;
+				break;
+			}			
+		}
+	}
+	
+	private function submitCaption($youTubeApiImpl, $captionInfo, $remoteId) {
+		$captionContent = $this->getFileBinaryContent ( $captionInfo->filePath );
+		KalturaLog::debug ( 'Submitting caption [' . $captionInfo->assetId . ']' );
+		$captionRemoteId = $youTubeApiImpl->uploadCaption ( $data->remoteId, $captionContent, $captionInfo->language );
+		return $this->getNewRemoteMediaFile ( $captionRemoteId, $captionInfo );
 	}
 }
