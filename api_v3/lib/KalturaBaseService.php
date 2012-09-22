@@ -321,6 +321,11 @@ abstract class KalturaBaseService
 		if (is_null($this->partner))
 			return;
 
+		// ignore for system partners
+		// for cases where an api action has a 'partnerId' parameter which will causes loading that partner instead of the ks partner
+		if ($this->getKs() && $this->getKs()->partner_id < 0)
+			return;
+
 		$accessControl = $this->partner->getApiAccessControl();
 		if (is_null($accessControl))
 			return;
