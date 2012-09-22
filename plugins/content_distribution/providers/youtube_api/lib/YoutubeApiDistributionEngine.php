@@ -235,6 +235,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 					$data->mediaFiles[] = $this->submitCaption($youTubeApiImpl,$captionInfo, $data->remoteId);
 					break;
 				case KalturaYouTubeApiDistributionCaptionAction::UPDATE_ACTION:
+					if (!file_exists($captionInfo->filePath ))
+						throw new KalturaDistributionException('The caption file ['.$captionInfo->filePath.'] was not found (probably not synced yet), the job will retry');
 					$captionContent = $this->getFileBinaryContent($captionInfo->filePath);
 					$youTubeApiImpl->updateCaption ( $data->remoteId, $captionInfo->remoteId, $captionContent );
 					$this->updateRemoteMediaFileVersion($data,$captionInfo);
@@ -301,9 +303,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	
 	private function getNewRemoteMediaFile($captionRemoteId , $captionInfo) {
 		$remoteMediaFile = new KalturaDistributionRemoteMediaFile ();
-		$mediaFile->remoteId = $captionRemoteId;
-		$mediaFile->version = $captionInfo->version;
-		$mediaFile->assetId = $captionInfo->assetId;
+		$remoteMediaFile->remoteId = $captionRemoteId;
+		$remoteMediaFile->version = $captionInfo->version;
+		$remoteMediaFile->assetId = $captionInfo->assetId;
 		return $remoteMediaFile;
 	}
 	
@@ -318,9 +320,11 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	}
 	
 	private function submitCaption($youTubeApiImpl, $captionInfo, $remoteId) {
+		if (!file_exists($captionInfo->filePath ))
+			throw new KalturaDistributionException('The caption file ['.$captionInfo->filePath.'] was not found (probably not synced yet), the job will retry');
 		$captionContent = $this->getFileBinaryContent ( $captionInfo->filePath );
 		KalturaLog::debug ( 'Submitting caption [' . $captionInfo->assetId . ']' );
-		$captionRemoteId = $youTubeApiImpl->uploadCaption ( $data->remoteId, $captionContent, $captionInfo->language );
+		$captionRemoteId = $youTubeApiImpl->uploadCaption ( $remoteId, $captionContent, $captionInfo->language );
 		return $this->getNewRemoteMediaFile ( $captionRemoteId, $captionInfo );
 	}
 }
