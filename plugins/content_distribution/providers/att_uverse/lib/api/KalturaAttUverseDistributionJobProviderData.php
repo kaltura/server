@@ -17,6 +17,11 @@ class KalturaAttUverseDistributionJobProviderData extends KalturaConfigurableDis
 	public $thumbLocalPaths;
 	
 	/**
+	 * @var string
+	 */
+	public $captionLocalPaths;
+	
+	/**
 	 * The remote URL of the video asset that was distributed
 	 * 
 	 * @var string
@@ -24,12 +29,18 @@ class KalturaAttUverseDistributionJobProviderData extends KalturaConfigurableDis
 	public $remoteAssetFileUrls;
 	
 	/**
-	 * The remote URL of the video asset that was distributed
+	 * The remote URL of the thumbnail asset that was distributed
 	 * 
 	 * @var string
 	 */
 	public $remoteThumbnailFileUrls;
 	
+	/**
+	 * The remote URL of the caption asset that was distributed
+	 * 
+	 * @var string
+	 */
+	public $remoteCaptionFileUrls;
 	
 	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
@@ -85,12 +96,35 @@ class KalturaAttUverseDistributionJobProviderData extends KalturaConfigurableDis
 			$this->thumbLocalPaths = serialize($thumbAssetFilePathArray);
 		}	
 		
+		//additional assets
+		$additionalAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->assetIds));
+		if(count($additionalAssets))
+		{	
+			$captionAssetFilePathArray = array();
+			foreach ($additionalAssets as $additionalAsset)
+			{	
+				$assetType = $additionalAsset->getType();
+				$syncKey = $additionalAsset->getSyncKey(CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+				$id = $additionalAsset->getId();
+				if(kFileSyncUtils::fileSync_exists($syncKey)){
+					if (($assetType == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))||
+						($assetType == AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT))){									
+						$captionAssetFilePathArray[$id] = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);				    
+					}
+				}
+			}
+			$captionLocalIds = array_keys($captionAssetFilePathArray);
+			$distributedCaptionIds = implode(',', $captionLocalIds);
+			$this->captionLocalPaths = serialize($captionAssetFilePathArray);
+		}	
+		
 		//putting distributed flavors ids and distributed thumbnail ids in entry distribution custom data		
 		$entryDistributionDb = EntryDistributionPeer::retrieveByPK($distributionJobData->entryDistributionId);
 		if ($entryDistributionDb)
 		{
 			$entryDistributionDb->putInCustomData(AttUverseEntryDistributionCustomDataField::DISTRIBUTED_FLAVOR_IDS, $distributedFlavorIds);
 			$entryDistributionDb->putInCustomData(AttUverseEntryDistributionCustomDataField::DISTRIBUTED_THUMBNAIL_IDS, $distributedThumbIds);
+			$entryDistributionDb->putInCustomData(AttUverseEntryDistributionCustomDataField::DISTRIBUTED_CAPTION_IDS, $distributedCaptionIds);
 			$entryDistributionDb->save();
 		}
 		else

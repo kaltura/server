@@ -96,6 +96,21 @@ class AttUverseDistributionEngine extends DistributionEngine implements
 		}
 		//save thumnail assets on provider data to use in the service
 		$providerData->remoteThumbnailFileUrls = serialize($remoteThumbnailFileUrls);
+		
+		//upload captions to FTP
+		$remoteCaptionFileUrls = array();
+		$captionLocalPathsArray = unserialize($providerData->captionLocalPaths);
+		if ($captionLocalPathsArray)
+		{
+			foreach ($captionLocalPathsArray as $captionId => $captionLocalPath)
+			{
+				$captionDestFilePath = $this->getRemoteFilePath($captionLocalPath, $distributionProfile->ftpPath);
+				$this->uploadAssetsFiles($ftpManager, $captionDestFilePath, $captionLocalPath);				
+				$remoteCaptionFileUrls[$captionId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$captionDestFilePath;			
+			}
+		}
+		//save thumnail assets on provider data to use in the service
+		$providerData->remoteCaptionFileUrls = serialize($remoteCaptionFileUrls);
 
 	}	
 	

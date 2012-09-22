@@ -131,7 +131,7 @@ class AttUverseDistributionFeedHelper
 	 * @param array $thumbAssets
 	 * @param array $remoteThumbailFileUrls
 	 */
-	public function addItem(array $values, array $flavorAssets = null, $remoteAssetFileUrls = null, array $thumbAssets = null, $remoteThumbailFileUrls = null)
+	public function addItem(array $values, array $flavorAssets = null, $remoteAssetFileUrls = null, array $thumbAssets = null, $remoteThumbailFileUrls = null, $captionAssets = null)
 	{		
 		$item = $this->item->cloneNode(true);
 		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
@@ -170,6 +170,12 @@ class AttUverseDistributionFeedHelper
 		if (!is_null($thumbAssets) && is_array($thumbAssets))
 		{
 			$this->setThumbAsset($item, $thumbAssets, $remoteThumbailFileUrls);			
+		}
+		
+		//caption
+		if (!is_null($captionAssets) && is_array($captionAssets))
+		{
+			$this->setCaptionAsset($item, $captionAssets);			
 		}
 	
 		
@@ -264,6 +270,43 @@ class AttUverseDistributionFeedHelper
 		}
 		$node->parentNode->removeChild($node);		
 	}
+	
+	/**
+	 * @param DOMElement $item
+	 * @param array $captionAssets
+	 * @param array $remoteCaptionFileUrls
+	 */
+	public function setCaptionAsset($item, array $captionAssets) {
+		if (is_array ( $captionAssets )) {
+			foreach ( $captionAssets as $captionAsset ) {
+				/* @var $additionalAsset asset */
+				$assetType = $captionAsset->getType ();
+				switch ($assetType) {
+					case CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION ):
+						/* @var $captionPlugin CaptionPlugin */
+						$captionPlugin = KalturaPluginManager::getPluginInstance ( CaptionPlugin::PLUGIN_NAME );
+						$dummyElement = new SimpleXMLElement ( '<dummy/>' );
+						$captionPlugin->contributeCaptionAssets ( $captionAsset, $dummyElement );
+						$dummyDom = dom_import_simplexml ( $dummyElement );
+						$captionDom = $dummyDom->getElementsByTagName ( 'subTitle' );
+						$captionDom = $this->doc->importNode ( $captionDom->item ( 0 ), true );
+						$captionDom = $item->appendChild ( $captionDom );
+						break;
+					case AttachmentPlugin::getAssetTypeCoreValue ( AttachmentAssetType::ATTACHMENT ):
+						/* @var $attachmentPlugin AttachmentPlugin */
+						$attachmentPlugin = KalturaPluginManager::getPluginInstance ( AttachmentPlugin::PLUGIN_NAME );
+						$dummyElement = new SimpleXMLElement ( '<dummy/>' );
+						$attachmentPlugin->contributeAttachmentAssets ( $captionAsset, $dummyElement );
+						$dummyDom = dom_import_simplexml ( $dummyElement );
+						$attachmentDom = $dummyDom->getElementsByTagName ( 'attachment' );
+						$attachmentDom = $this->doc->importNode ( $attachmentDom->item ( 0 ), true );
+						$attachmentDom = $item->appendChild ( $attachmentDom );
+						break;
+				}
+			}
+		}
+	}
+	
 	
 	public function getXml()
 	{
