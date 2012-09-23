@@ -3,8 +3,10 @@
  * @package api
  * @subpackage enum
  */
-class KalturaModerationFlagStatus extends KalturaEnum
+class KalturaModerationFlagStatus extends KalturaDynamicEnum implements moderationFlagStatus
 {
-	const PENDING = 1;
-	const MODERATED = 2;
+	public static function getEnumClass()
+	{
+		return 'moderationFlagStatus';
+	}
 }

@@ -3,8 +3,10 @@
  * @package api
  * @subpackage enum
  */
-class KalturaModerationObjectType extends KalturaEnum
+class KalturaModerationObjectType extends KalturaDynamicEnum implements moderationObjectType
 {
-	const ENTRY = 2;
-	const USER = 3;
+	public static function getEnumClass()
+	{
+		return 'moderationObjectType';
+	}
 }
