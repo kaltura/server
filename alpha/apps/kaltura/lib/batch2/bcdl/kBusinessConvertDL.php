@@ -176,7 +176,7 @@ class kBusinessConvertDL
 		/* @var $thumbAsset thumbAsset */
 		$entry = $thumbAsset->getentry();
 		if (!$entry)
-			throw new kCoreException("Could not retrieve entry ID [".$thumbAsset->getEntryId()."] from ThumbAsset ID [".$thumbAsset->getId()."]",KalturaErrors::ENTRY_ID_NOT_FOUND);
+			throw new kCoreException("Could not retrieve entry ID [".$thumbAsset->getEntryId()."] from ThumbAsset ID [".$thumbAsset->getId()."]", APIErrors::ENTRY_ID_NOT_FOUND);
 		
 		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());			
 		foreach($entryThumbAssets as $entryThumbAsset)
