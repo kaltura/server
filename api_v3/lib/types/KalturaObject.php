@@ -526,7 +526,7 @@ abstract class KalturaObject
 		return $objectPropertyName;
 	}
 	
-	public function trimStringProperty(array $propertyNames)
+	public function trimStringProperties(array $propertyNames)
 	{
 	    foreach ($propertyNames as $propertyName)
 	    {
