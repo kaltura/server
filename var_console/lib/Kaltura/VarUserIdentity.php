@@ -3,7 +3,7 @@
  * @package Var
  * @subpackage Authentication
  */
-class Kaltura_VarUserIdentity
+class Kaltura_VarUserIdentity extends Infra_UserIdentity
 {
 	/**
 	 * @var string
