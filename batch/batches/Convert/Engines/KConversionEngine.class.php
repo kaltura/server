@@ -231,7 +231,7 @@ abstract class KConversionEngine
 				$this->addToLogFile ( $log_file ,"Cannot find file [$file]" ) ;
 			}
 		}
-		catch ( Exaption $ex ) { /* do nothing */ }		
+		catch ( Exception $ex ) { /* do nothing */ }		
 	}
 	
 	/**
