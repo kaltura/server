@@ -54,7 +54,7 @@ class deleteuserAction extends defPartnerservices2Action
 //			$this->addMsg ( "deleted_kuser" , objectWrapperBase::getWrapperClass( $kuser , objectWrapperBase::DETAIL_LEVEL_REGULAR ) );
 
 			try {
-				$kuser->setStatus(KalturaUserStatus::DELETED);
+				$kuser->setStatus(KuserStatus::DELETED);
 			}
 			catch (kUserException $e) {
 				$code = $e->getCode();
@@ -71,4 +71,3 @@ class deleteuserAction extends defPartnerservices2Action
 
 	}
 }
-?>
