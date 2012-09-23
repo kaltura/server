@@ -143,10 +143,10 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
-			$adapter = new Infra_AuthAdapter($request->getPost('email'), $request->getPost('password'), $request->getPost('timezone_offset'));
+			$adapter = new Kaltura_AdminAuthAdapter();
+			$adapter->setCredentials($request->getPost('email'), $request->getPost('password'));
+			$adapter->setTimezoneOffset($request->getPost('timezone_offset'));
 			$auth = Infra_AuthHelper::getAuthInstance();
-			$storage = new Zend_Auth_Storage_Session("Zend_Auth_AdminConsole");
-			$auth->setStorage($storage);
 			$result = $auth->authenticate($adapter);
             
 			if ($result->isValid())
@@ -320,7 +320,7 @@ class UserController extends Zend_Controller_Action
 					throw new Exception('', 'LOGIN_DATA_NOT_FOUND');
 				}
 				
-				$identity = new Infra_UserIdentity($user, $ks);
+				$identity = new Kaltura_AdminUserIdentity($user, $ks);
 				$auth->getStorage()->write($identity); // new identity (email could be updated)
 				
 				$this->view->done = true;
