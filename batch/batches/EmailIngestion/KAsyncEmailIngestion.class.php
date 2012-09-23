@@ -477,7 +477,7 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 		if (strlen($description) <= 0) {
 			$description = null;
 		}
-		$description = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $description);
+		$description = preg_replace('/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/', "\n", $description);
 		$this->putIfNotNull($mediaEntry->description, $description);
 
 		//remove 'TO:' and 'FW:' from media title
