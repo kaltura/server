@@ -71,6 +71,8 @@ class APIErrors
 	// %s - kshow_id , %s - $desired_version
 	const ERROR_KSHOW_ROLLBACK = "ERROR_KSOHW_ROLLBACK,Error while rollbacking kshow [%s] to version [%s]";
 	
+	const ENTRY_ID_NOT_FOUND = "ENTRY_ID_NOT_FOUND,Entry id \"%s\" not found";
+	
 	// %s - type
 	const INVALID_ENTRY_TYPE = "INVALID_ENTRY_TYPE,source entry must be of type [%s]";
 	

@@ -96,8 +96,6 @@ class KalturaErrors extends APIErrors
 	 * Media Service
 	 */
 	
-	const ENTRY_ID_NOT_FOUND = "ENTRY_ID_NOT_FOUND,Entry id \"%s\" not found";
-	
 	const ENTRY_NOT_READY = "ENTRY_NOT_READY,Entry \"%s\" is not ready";
 	
 	const INVALID_ENTRY_TYPE = "INVALID_ENTRY_TYPE,Entry \"%s\" type is \"%s\", type must be \"%s\"";
