@@ -55,6 +55,11 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 			return new DocumentEntry();
 		}
 		
+		if($baseClass == 'KalturaBaseEntry' && $enumValue == entryType::DOCUMENT)
+		{
+			return new KalturaDocumentEntry();
+		}
+		
 		
 		// KALTURA FLAVOR PARAMS
 		
