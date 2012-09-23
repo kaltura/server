@@ -24,19 +24,6 @@ $objectsToTrack = array(
 			accessControlPeer::KDIR_RESTRICT_TYPE,
 		),
 	),
-	// admin_kuser is deperecated
-	KalturaAuditTrailObjectType::ADMIN_KUSER => array(
-		'actions' => array(
-			KalturaAuditTrailAction::CREATED,
-			KalturaAuditTrailAction::CHANGED,
-			KalturaAuditTrailAction::DELETED,
-		),
-		'descriptors' => array(
-			adminKuserPeer::FULL_NAME,
-			adminKuserPeer::EMAIL,
-			adminKuserPeer::LOGIN_BLOCKED_UNTIL,
-		),
-	),
 	KalturaAuditTrailObjectType::CONVERSION_PROFILE_2 => array(
 		'actions' => array(
 			KalturaAuditTrailAction::CREATED,
