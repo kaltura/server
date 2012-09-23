@@ -11,6 +11,7 @@
 class infraRequestUtils
 {
 	protected static $isInGetRemoteAddress = false;
+	protected static $remoteAddress = null;
 
 	//
 	// the function check the http range header and sets http response headers accordingly
@@ -178,18 +179,24 @@ class infraRequestUtils
 
 	public static function getRemoteAddress()
 	{
+		if(self::$remoteAddress)
+			return self::$remoteAddress;
+			
 		// Prevent call cycles in case KalturaLog will be used in internalGetRemoteAddress
 		if (self::$isInGetRemoteAddress)
 			return null;
 		
 		self::$isInGetRemoteAddress = true;
-		$result = self::internalGetRemoteAddress();		
+		self::$remoteAddress = self::internalGetRemoteAddress();		
 		self::$isInGetRemoteAddress = false;
-		return $result;
+		return self::$remoteAddress;
 	}
 	
 	protected static function internalGetRemoteAddress()
 	{
+		if(self::$remoteAddress)
+			return self::$remoteAddress;
+			
 		// enable access control debug
 		if(isset($_POST['debug_ip']) && kConf::hasParam('debug_ip_enabled') && kConf::get('debug_ip_enabled'))
 		{
