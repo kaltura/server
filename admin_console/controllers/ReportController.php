@@ -26,7 +26,7 @@ class ReportController extends Zend_Controller_Action
 		// get results and paginate
 		$client = Infra_ClientHelper::getClient();
 		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
-		$paginatorAdapter = new Infra_FilterPaginatorWithPartnerLoader($adminConsolePlugin->reportAdmin, "listAction", null, $reportFilter);
+		$paginatorAdapter = new Kaltura_FilterPaginatorWithPartnerLoader($adminConsolePlugin->reportAdmin, "listAction", null, $reportFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
