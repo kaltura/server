@@ -102,7 +102,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	/**
 	 * Return single integer value that represents the event object type
 	 * @param KalturaEvent $event
-	 * @return int
+	 * @return string class name
 	 */
 	protected function getEventObjectType(KalturaEvent $event) 
 	{
@@ -113,15 +113,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 			return null;
 			
 		$object = $event->getObject();
-		$constName = strtoupper(get_class($object));
-		if(defined("EventNotificationEventObjectType::{$constName}"))
-		{
-			$type = constant("EventNotificationEventObjectType::{$constName}");
-			if($type)
-				return $type;
-		}
-			
-		return DynamicEnumPeer::retrieveValueByEnumValueName('EventNotificationEventObjectType', $constName);
+		return get_class($object);
 	}
 
 	/**
@@ -151,11 +143,11 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 
 	/**
 	 * @param int $eventType
-	 * @param int $eventObjectType
+	 * @param string $eventObjectClassName core class name
 	 * @param int $partnerId
 	 * @return array<EventNotificationTemplate>
 	 */
-	public static function getNotificationTemplates($eventType, $eventObjectType, $partnerId)
+	public static function getNotificationTemplates($eventType, $eventObjectClassName, $partnerId)
 	{
 		if(is_null(self::$allNotificationTemplates))
 		{
@@ -167,8 +159,11 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		foreach(self::$allNotificationTemplates as $notificationTemplate)
 		{
 			/* @var $notificationTemplate EventNotificationTemplate */
+			
+			$templateObjectClassName = KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $notificationTemplate->getObjectType());
+		
 			if(	$notificationTemplate->getEventType() == $eventType && 
-				$notificationTemplate->getObjectType() == $eventObjectType &&
+				is_subclass_of($eventObjectClassName, $templateObjectClassName) &&
 				$notificationTemplate->getAutomaticDispatchEnabled()
 				)
 					$notificationTemplates[] = $notificationTemplate;
@@ -188,9 +183,9 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 			return false;
 			
 		$eventType = self::getEventType($event);
-		$eventObjectType = self::getEventObjectType($event);
+		$eventObjectClassName = self::getEventObjectType($event);
 		
-		$notificationTemplates = self::getNotificationTemplates($eventType, $eventObjectType, $scope->getPartnerId());
+		$notificationTemplates = self::getNotificationTemplates($eventType, $eventObjectClassName, $scope->getPartnerId());
 		if(!count($notificationTemplates))
 			return false;
 			

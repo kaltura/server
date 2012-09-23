@@ -131,6 +131,109 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(EventNotificationBatchType::EVENT_NOTIFICATION_HANDLER))
 			return 'KalturaEventNotificationDispatchJobData';
 			
+		if($baseClass == 'EventNotificationEventObjectType')
+		{
+			switch($enumValue)
+			{
+			    case EventNotificationEventObjectType::ENTRY:
+			    	return 'entry';
+			    	
+			    case EventNotificationEventObjectType::CATEGORY:
+					return 'category';
+
+			    case EventNotificationEventObjectType::ASSET:
+					return 'asset';
+
+			    case EventNotificationEventObjectType::FLAVORASSET:
+					return 'flavorAsset';
+
+			    case EventNotificationEventObjectType::THUMBASSET:
+					return 'thumbAsset';
+
+			    case EventNotificationEventObjectType::KUSER:
+					return 'kuser';
+
+			    case EventNotificationEventObjectType::ACCESSCONTROL:
+					return 'accessControl';
+
+				case EventNotificationEventObjectType::BATCHJOB:
+					return 'BatchJob';
+
+				case EventNotificationEventObjectType::BULKUPLOADRESULT:
+					return 'BulkUploadResult';
+
+				case EventNotificationEventObjectType::CATEGORYKUSER:
+					return 'categoryKuser';
+
+				case EventNotificationEventObjectType::CONVERSIONPROFILE2:
+					return 'conversionProfile2';
+
+				case EventNotificationEventObjectType::FLAVORPARAMS:
+					return 'flavorParams';
+
+				case EventNotificationEventObjectType::FLAVORPARAMSCONVERSIONPROFILE:
+					return 'flavorParamsConversionProfile';
+
+				case EventNotificationEventObjectType::FLAVORPARAMSOUTPUT:
+					return 'flavorParamsOutput';
+
+				case EventNotificationEventObjectType::GENERICSYNDICATIONFEED:
+					return 'genericSyndicationFeed';
+
+				case EventNotificationEventObjectType::KUSERTOUSERROLE:
+					return 'KuserToUserRole';
+
+				case EventNotificationEventObjectType::PARTNER:
+					return 'Partner';
+
+				case EventNotificationEventObjectType::PERMISSION:
+					return 'Permission';
+
+				case EventNotificationEventObjectType::PERMISSIONITEM:
+					return 'PermissionItem';
+
+				case EventNotificationEventObjectType::PERMISSIONTOPERMISSIONITEM:
+					return 'PermissionToPermissionItem';
+
+				case EventNotificationEventObjectType::SCHEDULER:
+					return 'Scheduler';
+
+				case EventNotificationEventObjectType::SCHEDULERCONFIG:
+					return 'SchedulerConfig';
+
+				case EventNotificationEventObjectType::SCHEDULERSTATUS:
+					return 'SchedulerStatus';
+
+				case EventNotificationEventObjectType::SCHEDULERWORKER:
+					return 'SchedulerWorker';
+
+				case EventNotificationEventObjectType::STORAGEPROFILE:
+					return 'StorageProfile';
+
+				case EventNotificationEventObjectType::SYNDICATIONFEED:
+					return 'syndicationFeed';
+
+				case EventNotificationEventObjectType::THUMBPARAMS:
+					return 'thumbParams';
+
+				case EventNotificationEventObjectType::THUMBPARAMSOUTPUT:
+					return 'thumbParamsOutput';
+
+				case EventNotificationEventObjectType::UPLOADTOKEN:
+					return 'UploadToken';
+
+				case EventNotificationEventObjectType::USERLOGINDATA:
+					return 'UserLoginData';
+
+				case EventNotificationEventObjectType::USERROLE:
+					return 'UserRole';
+
+				case EventNotificationEventObjectType::WIDGET:
+					return 'widget';
+
+			}
+		}
+			
 		return null;
 	}
 	
