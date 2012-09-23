@@ -185,7 +185,7 @@ class Zend2ClientTester
 		{
 			$backtrace = debug_backtrace();
 			$msg = 'Assert failed on line: ' . $backtrace[0]['line'];
-			throw new Exception($msg);
+			throw new \Exception($msg);
 		}
 	}
 
@@ -200,7 +200,7 @@ class Zend2ClientTester
 				gettype($expected),
 				$actual,
 				gettype($actual));
-			throw new Exception($msg);
+			throw new \Exception($msg);
 		}
 	}
 }
