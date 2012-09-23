@@ -89,7 +89,7 @@ class UserRole extends BaseUserRole
 			}
 		}
 				
-		$this->setStatus(KalturaUserRoleStatus::DELETED);
+		$this->setStatus(UserRoleStatus::DELETED);
 		return $this;
 	}
 	
