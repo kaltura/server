@@ -29,7 +29,6 @@ class kMemoryManager
 //	    PuserRolePeer::clearInstancePool();
 	    PartnerPeer::clearInstancePool();
 //	    WidgetLogPeer::clearInstancePool();
-//	    adminKuserPeer::clearInstancePool();
 //	    notificationPeer::clearInstancePool();
 	    moderationPeer::clearInstancePool();
 	    moderationFlagPeer::clearInstancePool();
