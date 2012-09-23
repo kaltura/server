@@ -187,7 +187,7 @@ class DbManager
 				throw new Exception("DB Config [$key] not found");
 
 			$dataSource = self::$config['datasources'][$key]['connection']['dsn'];
-			self::$sphinxConnection = new KalturaPDO($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout));
+			self::$sphinxConnection = new KalturaPDO($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout, KalturaPDO::KALTURA_ATTR_NAME => $key));
 					
 			self::$sphinxConnection->setCommentsEnabled(false);
 			
