@@ -172,7 +172,6 @@ class kXml
 			{
 				if (!$parent_element)
 				{
-					debugUtils::st();
 					return false;
 				}
 				// need to create and set the value
@@ -183,32 +182,6 @@ class kXml
 		
 		return $modified;
 	}
-
-	/**
-	 * 
-	 * Sets the given object's given property value 
-	 * @param unknown_type $objectInstace
-	 * @param $fieldName
-	 * @param unknown_type $fieldValue
-	 */
-	private static function setPropertyValue(&$objectInstace, $fieldName, $fieldValue, $fieldValueType)
-	{
-		//set the object to this value
-		if($objectInstace instanceof BaseObject)
-		{
-			$objectInstace->setByName($fieldName, $fieldValue);
-		}
-		else if($objectInstace instanceof KalturaObjectBase)
-		{
-			$objectInstace->$fieldName = $fieldValue;
-		}
-		else
-		{
-			//Set the attribute to its right type
-			settype($fieldValue, $fieldValueType);
-			$objectInstace = $fieldValue;
-		}
-	} 
 	
 	/**
 	 * 
