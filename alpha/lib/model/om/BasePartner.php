@@ -289,16 +289,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	protected $akuser;
 
 	/**
-	 * @var        array adminKuser[] Collection to store aggregation of adminKuser objects.
-	 */
-	protected $colladminKusers;
-
-	/**
-	 * @var        Criteria The criteria used to select the current contents of colladminKusers.
-	 */
-	private $lastadminKuserCriteria = null;
-
-	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -2069,9 +2059,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		if ($deep) {  // also de-associate any related objects?
 
 			$this->akuser = null;
-			$this->colladminKusers = null;
-			$this->lastadminKuserCriteria = null;
-
 		} // if (deep)
 	}
 
@@ -2223,14 +2210,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 				}
 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
-			}
-
-			if ($this->colladminKusers !== null) {
-				foreach ($this->colladminKusers as $referrerFK) {
-					if (!$referrerFK->isDeleted()) {
-						$affectedRows += $referrerFK->save($con);
-					}
-				}
 			}
 
 			$this->alreadyInSave = false;
@@ -2457,14 +2436,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 				$failureMap = array_merge($failureMap, $retval);
 			}
 
-
-				if ($this->colladminKusers !== null) {
-					foreach ($this->colladminKusers as $referrerFK) {
-						if (!$referrerFK->validate($columns)) {
-							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-						}
-					}
-				}
 
 
 			$this->alreadyInValidation = false;
@@ -3102,20 +3073,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		$copyObj->setKmcVersion($this->kmc_version);
 
 
-		if ($deepCopy) {
-			// important: temporarily setNew(false) because this affects the behavior of
-			// the getter/setter methods for fkey referrer objects.
-			$copyObj->setNew(false);
-
-			foreach ($this->getadminKusers() as $relObj) {
-				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addadminKuser($relObj->copy($deepCopy));
-				}
-			}
-
-		} // if ($deepCopy)
-
-
 		$copyObj->setNew(true);
 
 		$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -3228,160 +3185,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Clears out the colladminKusers collection (array).
-	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addadminKusers()
-	 */
-	public function clearadminKusers()
-	{
-		$this->colladminKusers = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the colladminKusers collection (array).
-	 *
-	 * By default this just sets the colladminKusers collection to an empty array (like clearcolladminKusers());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @return     void
-	 */
-	public function initadminKusers()
-	{
-		$this->colladminKusers = array();
-	}
-
-	/**
-	 * Gets an array of adminKuser objects which contain a foreign key that references this object.
-	 *
-	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
-	 * Otherwise if this Partner has previously been saved, it will retrieve
-	 * related adminKusers from storage. If this Partner is new, it will return
-	 * an empty collection or the current collection, the criteria is ignored on a new object.
-	 *
-	 * @param      PropelPDO $con
-	 * @param      Criteria $criteria
-	 * @return     array adminKuser[]
-	 * @throws     PropelException
-	 */
-	public function getadminKusers($criteria = null, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(PartnerPeer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->colladminKusers === null) {
-			if ($this->isNew()) {
-			   $this->colladminKusers = array();
-			} else {
-
-				$criteria->add(adminKuserPeer::PARTNER_ID, $this->id);
-
-				adminKuserPeer::addSelectColumns($criteria);
-				$this->colladminKusers = adminKuserPeer::doSelect($criteria, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return the collection.
-
-
-				$criteria->add(adminKuserPeer::PARTNER_ID, $this->id);
-
-				adminKuserPeer::addSelectColumns($criteria);
-				if (!isset($this->lastadminKuserCriteria) || !$this->lastadminKuserCriteria->equals($criteria)) {
-					$this->colladminKusers = adminKuserPeer::doSelect($criteria, $con);
-				}
-			}
-		}
-		$this->lastadminKuserCriteria = $criteria;
-		return $this->colladminKusers;
-	}
-
-	/**
-	 * Returns the number of related adminKuser objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related adminKuser objects.
-	 * @throws     PropelException
-	 */
-	public function countadminKusers(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(PartnerPeer::DATABASE_NAME);
-		} else {
-			$criteria = clone $criteria;
-		}
-
-		if ($distinct) {
-			$criteria->setDistinct();
-		}
-
-		$count = null;
-
-		if ($this->colladminKusers === null) {
-			if ($this->isNew()) {
-				$count = 0;
-			} else {
-
-				$criteria->add(adminKuserPeer::PARTNER_ID, $this->id);
-
-				$count = adminKuserPeer::doCount($criteria, false, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return count of the collection.
-
-
-				$criteria->add(adminKuserPeer::PARTNER_ID, $this->id);
-
-				if (!isset($this->lastadminKuserCriteria) || !$this->lastadminKuserCriteria->equals($criteria)) {
-					$count = adminKuserPeer::doCount($criteria, false, $con);
-				} else {
-					$count = count($this->colladminKusers);
-				}
-			} else {
-				$count = count($this->colladminKusers);
-			}
-		}
-		return $count;
-	}
-
-	/**
-	 * Method called to associate a adminKuser object to this object
-	 * through the adminKuser foreign key attribute.
-	 *
-	 * @param      adminKuser $l adminKuser
-	 * @return     void
-	 * @throws     PropelException
-	 */
-	public function addadminKuser(adminKuser $l)
-	{
-		if ($this->colladminKusers === null) {
-			$this->initadminKusers();
-		}
-		if (!in_array($l, $this->colladminKusers, true)) { // only add it if the **same** object is not already associated
-			array_push($this->colladminKusers, $l);
-			$l->setPartner($this);
-		}
-	}
-
-	/**
 	 * Resets all collections of referencing foreign keys.
 	 *
 	 * This method is a user-space workaround for PHP's inability to garbage collect objects
@@ -3393,14 +3196,8 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	public function clearAllReferences($deep = false)
 	{
 		if ($deep) {
-			if ($this->colladminKusers) {
-				foreach ((array) $this->colladminKusers as $o) {
-					$o->clearAllReferences($deep);
-				}
-			}
 		} // if ($deep)
 
-		$this->colladminKusers = null;
 			$this->akuser = null;
 	}
 
