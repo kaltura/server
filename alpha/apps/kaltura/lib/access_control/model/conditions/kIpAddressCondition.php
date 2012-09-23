@@ -20,18 +20,8 @@ class kIpAddressCondition extends kMatchCondition
 	public function getFieldValue(accessControl $accessControl)
 	{
 		$scope = $accessControl->getScope();
-		return $scope->getIp();	
-	}
-
-	/* (non-PHPdoc)
-	 * @see kCondition::internalFulfilled()
-	 */
-	protected function internalFulfilled(accessControl $accessControl)
-	{
-		$scope = $accessControl->getScope();
-
 		kApiCache::addExtraField(kApiCache::ECF_IP, kApiCache::COND_IP_RANGE, $this->getStringValues($scope));
-		return parent::internalFulfilled($accessControl);
+		return $scope->getIp();	
 	}
 
 	/* (non-PHPdoc)
@@ -40,5 +30,14 @@ class kIpAddressCondition extends kMatchCondition
 	protected function matches($field, $value)
 	{
 		return kIpAddressUtils::isIpInRange($field, $value);
+	}
+
+	/**
+	 * @param kScope $scope
+	 * @return bool
+	 */
+	public function shouldFieldDisableCache($scope)
+	{
+		return false;
 	}
 }
