@@ -888,9 +888,14 @@ class myFlvHandler
  */
 class myFlvStaticHandler
 {
+	private static function getFileNameEdit ( $file_name )
+	{
+		return str_replace( ".flv" , "_edit.flv" , $file_name );
+	}
+	
 	public static function isMultiFlavor ( $file_name )
 	{
-		$edit_file_name = myContentStorage::getFileNameEdit( $file_name );
+		$edit_file_name = self::getFileNameEdit( $file_name );
 		return ( file_exists ( $edit_file_name ) && kFile::fileSize ( $edit_file_name ) > 0 ) ;
 	}
 
@@ -900,7 +905,7 @@ class myFlvStaticHandler
 	*/
 	public static function getBestFileFlavor ( $file_name  )
 	{
-		$edit_file_name = myContentStorage::getFileNameEdit( $file_name );
+		$edit_file_name = self::getFileNameEdit( $file_name );
 		if ( file_exists ( $edit_file_name ) && kFile::fileSize ( $edit_file_name ) > 0 )
 		{
 			return $edit_file_name;
