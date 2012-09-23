@@ -1,17 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:complexType name="T_mrss">
 		<xs:sequence>
-			<xs:element ref="channel" maxOccurs="unbounded" minOccurs="1">
+			<xs:element maxOccurs="unbounded" minOccurs="1" ref="channel">
 				<xs:annotation>
 					<xs:documentation>holding multiple item elements</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			
-			<xs:element ref="mrss-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="mrss-extension"/>
 			
 		</xs:sequence>
-		<xs:attribute name="version" use="optional" type="xs:string">
+		<xs:attribute name="version" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:documentation>
 					Indicates the XSD version to be used
@@ -22,156 +23,156 @@
 	
 	<xs:complexType name="T_channel">
 		<xs:sequence>
-			<xs:element ref="item" maxOccurs="unbounded" minOccurs="1">
+			<xs:element maxOccurs="unbounded" minOccurs="1" ref="item">
 				<xs:annotation>
 					<xs:documentation>holding entry element</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			
-			<xs:element ref="channel-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="channel-extension"/>
 			
 		</xs:sequence>
 	</xs:complexType>
 	
 	<xs:complexType name="T_item">
 		<xs:sequence>
-			<xs:element ref="result" maxOccurs="1" minOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="1" ref="result">
 				<xs:annotation>
 					<xs:documentation>Action results</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="action" minOccurs="1" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="1" name="action">
 				<xs:annotation>
 					<xs:documentation>Entry action that applied on the entry element</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:enumeration value="add" />
-						<xs:enumeration value="update" />
-						<xs:enumeration value="delete" />
+						<xs:enumeration value="add"/>
+						<xs:enumeration value="update"/>
+						<xs:enumeration value="delete"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element name="entryId" minOccurs="1" maxOccurs="1" nillable="false">
+			<xs:element maxOccurs="1" minOccurs="1" name="entryId" nillable="false">
 				<xs:annotation>
 					<xs:documentation>ID of entry that the action appled on</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:maxLength value="20" />
+						<xs:maxLength value="20"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element name="referenceID" minOccurs="0" maxOccurs="1" type="xs:string">
+			<xs:element maxOccurs="1" minOccurs="0" name="referenceID" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Partner external reference string</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="createdAt" minOccurs="1" maxOccurs="1" type="xs:int">
+			<xs:element maxOccurs="1" minOccurs="1" name="createdAt" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>Entry creation date as Unix timestamp (In seconds)</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="updatedAt" minOccurs="1" maxOccurs="1" type="xs:int">
+			<xs:element maxOccurs="1" minOccurs="1" name="updatedAt" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>Entry last update date as Unix timestamp (In seconds)</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="title" minOccurs="1" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="1" name="title">
 				<xs:annotation>
 					<xs:documentation>Entry name</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:maxLength value="60" />
+						<xs:maxLength value="60"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element name="type" minOccurs="1" maxOccurs="1" type="KalturaEntryType">
+			<xs:element maxOccurs="1" minOccurs="1" name="type" type="KalturaEntryType">
 				<xs:annotation>
 					<xs:documentation>Entry type</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="licenseType" minOccurs="1" maxOccurs="1" type="KalturaLicenseType">
+			<xs:element maxOccurs="1" minOccurs="1" name="licenseType" type="KalturaLicenseType">
 				<xs:annotation>
 					<xs:documentation>Entry license type</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="userId" minOccurs="1" maxOccurs="1" type="xs:string">
+			<xs:element maxOccurs="1" minOccurs="1" name="userId" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>The ID of the user who is the owner of this entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="name" minOccurs="1" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="1" name="name">
 				<xs:annotation>
 					<xs:documentation>Entry name</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:maxLength value="60" />
+						<xs:maxLength value="60"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element name="status" minOccurs="1" maxOccurs="1" type="KalturaEntryStatus">
+			<xs:element maxOccurs="1" minOccurs="1" name="status" type="KalturaEntryStatus">
 				<xs:annotation>
 					<xs:documentation>Entry current status</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string">
+			<xs:element maxOccurs="1" minOccurs="0" name="description" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Entry free text description</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="thumbnailUrl" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" name="thumbnailUrl">
 				<xs:annotation>
 					<xs:documentation>Download URL of the entry thumbnail</xs:documentation>
 				</xs:annotation>
 				<xs:complexType>
-					<xs:attribute name="url" type="xs:string" />
+					<xs:attribute name="url" type="xs:string"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" ref="tags">
 				<xs:annotation>
 					<xs:documentation>Entry searchable keywords</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="category" minOccurs="0" maxOccurs="unbounded">
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="category">
 				<xs:annotation>
 					<xs:documentation>Entry assigned category</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="partnerData" minOccurs="0" maxOccurs="1" type="xs:string">
+			<xs:element maxOccurs="1" minOccurs="0" name="partnerData" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Used to store various partner related data as a string</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="partnerSortData" minOccurs="0" maxOccurs="1" type="xs:int">
+			<xs:element maxOccurs="1" minOccurs="0" name="partnerSortData" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>Used to store various partner related data as a numeric value</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="accessControlId" minOccurs="0" maxOccurs="1" type="xs:int">
+			<xs:element maxOccurs="1" minOccurs="0" name="accessControlId" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>The id of the access control profile that assigned to this entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="conversionProfileId" minOccurs="0" maxOccurs="1" type="xs:int">
+			<xs:element maxOccurs="1" minOccurs="0" name="conversionProfileId" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>The ingestion profile that used to ingest this entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="startDate" minOccurs="0" maxOccurs="1" type="xs:int">
+			<xs:element maxOccurs="1" minOccurs="0" name="startDate" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>Entry scheduling start date</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="endDate" minOccurs="0" maxOccurs="1" type="xs:int">
+			<xs:element maxOccurs="1" minOccurs="0" name="endDate" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>Entry scheduling end date.<br/>If not specified the entry will be available forever</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:element ref="media" minOccurs="1" maxOccurs="1">
+			<xs:choice maxOccurs="1" minOccurs="0">
+				<xs:element maxOccurs="1" minOccurs="1" ref="media">
 					<xs:annotation>
 						<xs:documentation>Media related information, such as media type</xs:documentation>
 					</xs:annotation>
@@ -181,25 +182,25 @@
 					minOccurs="1" maxOccurs="1"/> <xs:element ref="liveStream" minOccurs="1" 
 					maxOccurs="1"/> -->
 			</xs:choice>
-			<xs:choice minOccurs="0" maxOccurs="unbounded">
-				<xs:element ref="content" minOccurs="1" maxOccurs="1">
+			<xs:choice maxOccurs="unbounded" minOccurs="0">
+				<xs:element maxOccurs="1" minOccurs="1" ref="content">
 					<xs:annotation>
 						<xs:documentation>Flavor asset information</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="thumbnail" minOccurs="1" maxOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" ref="thumbnail">
 					<xs:annotation>
 						<xs:documentation>Thumbnail asset information</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 			</xs:choice>
-			<xs:element ref="item-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="item-extension"/>
 		</xs:sequence>
 	</xs:complexType>
 	
 	<xs:complexType name="T_tags">
 		<xs:sequence>
-			<xs:element name="tag" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+			<xs:element maxOccurs="unbounded" minOccurs="1" name="tag" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Free text keyword</xs:documentation>
 				</xs:annotation>
@@ -209,7 +210,7 @@
 	
 	<xs:complexType name="T_result">
 		<xs:sequence>
-			<xs:element name="errorDescription" maxOccurs="1" minOccurs="1" type="xs:string">
+			<xs:element maxOccurs="1" minOccurs="1" name="errorDescription" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Ingestion error description</xs:documentation>
 				</xs:annotation>
@@ -220,7 +221,7 @@
 	<xs:complexType name="T_category">
 		<xs:simpleContent>
 			<xs:extension base="xs:string">
-				<xs:attribute name="name" use="required" type="xs:string">
+				<xs:attribute name="name" type="xs:string" use="required">
 					<xs:annotation>
 						<xs:documentation>Category name</xs:documentation>
 					</xs:annotation>
@@ -231,33 +232,33 @@
 	
 	<xs:complexType name="T_media">
 		<xs:sequence>
-			<xs:element name="mediaType" minOccurs="1" maxOccurs="1" type="KalturaMediaType">
+			<xs:element maxOccurs="1" minOccurs="1" name="mediaType" type="KalturaMediaType">
 				<xs:annotation>
 					<xs:documentation>Entry media type</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="duration" minOccurs="1" maxOccurs="1" type="xs:int">
+			<xs:element maxOccurs="1" minOccurs="1" name="duration" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>Entry media (video/audio) duration</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="flavorParamsIds" minOccurs="1" maxOccurs="1" type="xs:string">
+			<xs:element maxOccurs="1" minOccurs="1" name="flavorParamsIds" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Flavor params ids that have compatible ready flavor asset</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="media-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="media-extension"/>
 		</xs:sequence>
 	</xs:complexType>
 	
 	<xs:complexType name="T_thumbnail">
 		<xs:sequence>
-			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" ref="tags">
 				<xs:annotation>
 					<xs:documentation>Entry searchable keywords</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="thumbnail-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="thumbnail-extension"/>
 		</xs:sequence>
 		<xs:attribute name="url" type="xs:string" use="required">
 			<xs:annotation>
@@ -298,12 +299,12 @@
 	
 	<xs:complexType name="T_content">
 		<xs:sequence>
-			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" ref="tags">
 				<xs:annotation>
 					<xs:documentation>Specifies specific tags you want to set for the flavor asset</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="content-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="content-extension"/>
 		</xs:sequence>
 		<xs:attribute name="url" type="xs:string" use="required">
 			<xs:annotation>
@@ -530,22 +531,8 @@
 						<action>add</action>
 						<entryId>{entry id}</entryId>
 						<media>...</media>
-						<content	url="http://kaltura.domain/path/my_flavor_asset.flv"
-									isSource="true" 
-									containerFormat="flash video" 
-									extension="flv" 
-									assetId="{flavor asset id}"
-									flavorParamsId="0"
-									flavorParamsName="Source" 
-									format="" 
-									videoBitrate="0" 
-									videoCodec="" 
-									audioBitrate="0" 
-									audioCodec="" 
-									frameRate="0" 
-									height="0" 
-									width="0">
-						>
+						<content assetId="{flavor asset id}" audioBitrate="0" audioCodec="" containerFormat="flash video" extension="flv" flavorParamsId="0" flavorParamsName="Source" format="" frameRate="0" height="0" isSource="true" url="http://kaltura.domain/path/my_flavor_asset.flv" videoBitrate="0" videoCodec="" width="0">
+						&gt;
 							<tags>
 								<tag>example</tag>
 								<tag>my_tag</tag>
@@ -568,13 +555,7 @@
 						<action>add</action>
 						<entryId>{entry id}</entryId>
 						<media>...</media>
-						<thumbnail	url="http://kaltura.domain/path/my_thumbnail_asset.flv" 
-									thumbAssetId="{thumb asset id}" 
-									isDefault="false" 
-									format="" 
-									height="120" 
-									width="120"
-						>
+						<thumbnail format="" height="120" isDefault="false" thumbAssetId="{thumb asset id}" url="http://kaltura.domain/path/my_thumbnail_asset.flv" width="120">
 							<tags>
 								<tag>example</tag>
 								<tag>my_tag</tag>
@@ -586,11 +567,11 @@
 		</xs:annotation>
 	</xs:element>
 	
-	<xs:element name="mrss-extension" />
-	<xs:element name="channel-extension" />
-	<xs:element name="item-extension" />
-	<xs:element name="media-extension" />
-	<xs:element name="content-extension" />
-	<xs:element name="thumbnail-extension" />
-	<xs:element name="player-extension" />
+	<xs:element name="mrss-extension"/>
+	<xs:element name="channel-extension"/>
+	<xs:element name="item-extension"/>
+	<xs:element name="media-extension"/>
+	<xs:element name="content-extension"/>
+	<xs:element name="thumbnail-extension"/>
+	<xs:element name="player-extension"/>
 </xs:schema>
