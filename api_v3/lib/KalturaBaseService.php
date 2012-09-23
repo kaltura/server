@@ -337,8 +337,7 @@ abstract class KalturaBaseService
 
 		if(count($context->getAccessControlMessages()))
 		{
-			foreach($context->getAccessControlMessages() as $msg)
-				header("X-Kaltura: api-access-control: $msg");
+			header("X-Kaltura-API-Access-Control: ".implode(', ', $context->getAccessControlMessages()));
 		}
 
 		if(count($context->getAccessControlActions()))
