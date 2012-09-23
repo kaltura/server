@@ -121,13 +121,13 @@ class KConversionEngineEncodingCom  extends KJobConversionEngine
 		if(!$responseXml)
 			return array(false, $err);
 	
-		if(preg_match("/\<errors\>(.+)\<\/errors\>/i", $responseXml, $arr))
+		if(preg_match('/\<errors\>(.+)\<\/errors\>/i', $responseXml, $arr))
 		{
 			$err = isset($arr[1]) ? $arr[1] : $responseXml;
 			return array(false, $err);
 		}
 		
-		if(preg_match("/\<mediaid\>(\w*)\<\/mediaid\>/i", $responseXml, $arr))
+		if(preg_match('/\<mediaid\>(\w*)\<\/mediaid\>/i', $responseXml, $arr))
 		{
 			$media_id = isset($arr[1]) ? $arr[1] : null;
 			if (!$media_id)
