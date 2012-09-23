@@ -590,7 +590,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			        if(strlen($val) > 0)
 					{
 						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
-						$this->addMatch("@$sphinxField $val\\\*");
+						$this->addMatch('@' .  $sphinxField . '"' .$val . '\\\*"');
 						$filter->unsetByName($field);
 					}
 				    break;	
@@ -679,7 +679,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	{
 		return array();
 	}
-	
+		
 	private function shouldSkipSphinx()
 	{
 		$skipFields = $this->getSkipFields();
@@ -703,23 +703,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		foreach($this->getMap() as $criterion)
 			$fields = array_merge($fields, $this->getAllCriterionFields($criterion));
 		
-		foreach ($this->getOrderByColumns() as $orderByColumn)
-		{
-			// strip asc / desc
-			$orderByColumn = str_replace(' ASC', '', str_replace(' DESC', '', $orderByColumn));
-			
-			// strip ()'s
-			if (preg_match('/^\(.*\)$/', $orderByColumn))
-				$orderByColumn = substr($orderByColumn, 1, -1);
-				
-			// strip <> operator (for PARTNER_ID<>1234 order by added by addPartnerToCriteria)
-			$explodedColumn = explode('<>', $orderByColumn);
-			$orderByColumn = $explodedColumn[0];
-			
-			$fields[] = $orderByColumn;
-		}
-		$fields = array_unique($fields);
-								
+		$orderByColumns = $this->getOrderByColumns();		
+		$fields = array_unique(array_merge($fields, $orderByColumns));
+		
 		foreach($fields as $field)
 		{	
 			$fieldName = $this->getSphinxFieldName($field);
