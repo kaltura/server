@@ -114,7 +114,7 @@ class kmc3Action extends kalturaAction
 		$defaultPlugins = kConf::get('default_plugins');
 		if(is_array($defaultPlugins) && in_array('MetadataPlugin', $defaultPlugins) && $partner)
 		{
-			if ($partner->getPluginEnabled(MetadataPlugin::PLUGIN_NAME) && $partner->getKmcVersion() == self::CURRENT_KMC_VERSION)
+			if ($partner->getPluginEnabled('metadata') && $partner->getKmcVersion() == self::CURRENT_KMC_VERSION)
 			{
 				$this->kmc_enable_custom_data = 'true';
 			}
