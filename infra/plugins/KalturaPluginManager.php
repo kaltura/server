@@ -35,9 +35,46 @@ class KalturaPluginManager
 	 */
 	protected static $useCache = true;
 	
+	/**
+	 * Full path of the plugins configuration file
+	 * @var string
+	 */
+	protected static $configFile = null;
+	
+	/**
+	 * Cache namespace, to avoid collision between different applications.
+	 * @var string
+	 */
+	protected static $cacheNamespace = '';
+	
 	protected function __construct()
 	{
 		
+	}
+	
+	/**
+	 * Initialize the plugins management
+	 * @param string $configFile
+	 * @param string $cacheNamespace
+	 */
+	public static function init($configFile = null, $cacheNamespace = null)
+	{
+		// already initialized
+		if(self::$configFile) 
+			return;
+			
+		if($configFile)
+		{
+			self::$configFile = $configFile;
+		}
+		else
+		{
+			$configDir = kEnvironment::getConfigDir();
+			self::$configFile = "$configDir/plugins.ini";
+		}
+			
+		if($cacheNamespace)
+			self::$cacheNamespace = $cacheNamespace;
 	}
 	
 	/**
@@ -304,7 +341,7 @@ class KalturaPluginManager
 		$cacheStore = kCacheManager::getCache(kCacheManager::APC);
 		if ($cacheStore && self::$useCache)
 		{
-			$cacheKey = "pluginsByInterface_$interface";
+			$cacheKey = self::$cacheNamespace . "pluginsByInterface_$interface";
 			$plugins = $cacheStore->get($cacheKey);
 			if ($plugins !== false)
 			{
@@ -373,12 +410,12 @@ class KalturaPluginManager
 		if(count(self::$plugins))
 			return self::$plugins;
 			
-		$configDir = kEnvironment::getConfigDir();
-		$configFile = "$configDir/plugins.ini";
-		if(!file_exists($configFile))
+		self::init();
+		
+		if(!file_exists(self::$configFile))
 			return array();
 		
-		$pluginNames = file($configFile);			
+		$pluginNames = file(self::$configFile);
 		self::$plugins = array();
 		foreach($pluginNames as $pluginName)
 		{
