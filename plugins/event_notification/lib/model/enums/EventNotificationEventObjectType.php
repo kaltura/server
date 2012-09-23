@@ -7,6 +7,7 @@ interface EventNotificationEventObjectType extends BaseEnum
 {
     const ENTRY = 1;
     const CATEGORY = 2;
+    const ASSET = 3;
     const FLAVORASSET = 4;
     const THUMBASSET = 5;
     const KUSER = 8;
@@ -14,7 +15,6 @@ interface EventNotificationEventObjectType extends BaseEnum
 	const BATCHJOB = 10;
 	const BULKUPLOADRESULT = 11;
 	const CATEGORYKUSER = 12;
-	const CONTROLPANELCOMMAND = 13;
 	const CONVERSIONPROFILE2 = 14;
 	const FLAVORPARAMS = 15;
 	const FLAVORPARAMSCONVERSIONPROFILE = 16;
