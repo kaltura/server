@@ -52,6 +52,8 @@ abstract class KalturaCategoryBaseFilter extends KalturaFilter
 		"-depth" => "-depth",
 		"+name" => "+name",
 		"-name" => "-name",
+		"+fullName" => "+full_name",
+		"-fullName" => "-full_name",
 		"+entriesCount" => "+entries_count",
 		"-entriesCount" => "-entries_count",
 		"+createdAt" => "+created_at",
