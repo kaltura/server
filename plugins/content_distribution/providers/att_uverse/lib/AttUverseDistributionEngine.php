@@ -109,7 +109,7 @@ class AttUverseDistributionEngine extends DistributionEngine implements
 				$remoteCaptionFileUrls[$captionId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$captionDestFilePath;			
 			}
 		}
-		//save thumnail assets on provider data to use in the service
+		//save caption assets on provider data to use in the service
 		$providerData->remoteCaptionFileUrls = serialize($remoteCaptionFileUrls);
 
 	}	
