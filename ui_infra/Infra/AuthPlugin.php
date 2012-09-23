@@ -5,7 +5,20 @@
  */
 class Infra_AuthPlugin extends Zend_Controller_Plugin_Abstract 
 {
+	/**
+	 * The default controller name
+	 * @var string
+	 */
+	private static $defaultController = 'user';
+	
+	/**
+	 * The default action name
+	 * @var string
+	 */
+	private static $defaultAction = 'login';
+	
 	private static $_whitelist = array(
+			'error/index', 
 			'error/error', 
 			'error/denied', 
 			'user/login', 
@@ -21,12 +34,22 @@ class Infra_AuthPlugin extends Zend_Controller_Plugin_Abstract
 	}
 	
 	/**
+	 * Define the default action when login failed
+	 * @param string $url
+	 */
+	public static function setDefaultAction($controller, $action = 'index')
+	{
+	    self::$defaultController = $controller;
+	    self::$defaultAction = $action;
+	}
+	
+	/**
 	 * Add a certain URL to the whitelist
 	 * @param string $url
 	 */
 	public static function addToWhitelist ($url)
 	{
-	    self::$_whitelist[] = $url;
+	    self::$_whitelist[] = strtolower($url);
 	}
 	
 	public function preDispatch(Zend_Controller_Request_Abstract $request) 
@@ -45,8 +68,8 @@ class Infra_AuthPlugin extends Zend_Controller_Plugin_Abstract
 		}
 		
 		$request->setDispatched(false);
-		$request->setControllerName('user');
-		$request->setActionName('login');
+		$request->setControllerName(self::$defaultController);
+		$request->setActionName(self::$defaultAction);
 		$request->setParam('next_uri', $request->getPathInfo());
 	}
 }
