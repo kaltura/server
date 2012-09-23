@@ -840,27 +840,6 @@
 			<index-column name="subp_id" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="admin_kuser" phpName="adminKuser">
-		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="screen_name" type="varchar" size="20" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="full_name" type="varchar" size="40" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="email" type="varchar" size="50" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="sha1_password" type="varchar" size="40" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="salt" type="varchar" size="32" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="picture" type="varchar" size="48" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="icon" type="tinyint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="login_blocked_until" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="partner">
-			<reference local="partner_id" foreign="id" />
-		</foreign-key>
-		<index name="screen_name_index">
-			<index-column name="screen_name" />
-		</index>
-	</table>
 	<table skipSql="false" abstract="false" name="notification" phpName="notification">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />

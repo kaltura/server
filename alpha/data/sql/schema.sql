@@ -903,36 +903,6 @@ CREATE TABLE `widget_log`
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
-#-- admin_kuser
-#-----------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `admin_kuser`;
-
-
-CREATE TABLE `admin_kuser`
-(
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`screen_name` VARCHAR(20),
-	`full_name` VARCHAR(40),
-	`email` VARCHAR(50),
-	`sha1_password` VARCHAR(40),
-	`salt` VARCHAR(32),
-	`picture` VARCHAR(48),
-	`icon` TINYINT,
-	`created_at` DATETIME,
-	`updated_at` DATETIME,
-	`partner_id` INTEGER,
-	`login_blocked_until` DATETIME,
-	`custom_data` TEXT,
-	PRIMARY KEY (`id`),
-	KEY `screen_name_index`(`screen_name`),
-	INDEX `admin_kuser_FI_1` (`partner_id`),
-	CONSTRAINT `admin_kuser_FK_1`
-		FOREIGN KEY (`partner_id`)
-		REFERENCES `partner` (`id`)
-)Type=InnoDB;
-
-#-----------------------------------------------------------------------------
 #-- notification
 #-----------------------------------------------------------------------------
 
@@ -1531,10 +1501,13 @@ CREATE TABLE `flavor_asset`
 	`description` VARCHAR(255),
 	`width` INTEGER default 0 NOT NULL,
 	`height` INTEGER default 0 NOT NULL,
+	`bitrate` INTEGER default 0 NOT NULL,
+	`frame_rate` FLOAT default 0 NOT NULL,
 	`size` INTEGER default 0 NOT NULL,
 	`is_original` TINYINT default 0,
 	`file_ext` VARCHAR(4),
 	`container_format` VARCHAR(127),
+	`video_codec_id` VARCHAR(127),
 	`type` INTEGER default 0 NOT NULL,
 	`custom_data` TEXT,
 	PRIMARY KEY (`int_id`),
