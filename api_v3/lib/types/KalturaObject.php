@@ -513,4 +513,15 @@ abstract class KalturaObject
 		}
 		return $objectPropertyName;
 	}
+	
+	public function trimStringProperty(array $propertyNames)
+	{
+	    foreach ($propertyNames as $propertyName)
+	    {
+	        if (!$this->isNull($propertyName))
+	        {
+	            $this->$propertyName = trim($this->$propertyName);
+	        }
+	    }
+	}
 }
