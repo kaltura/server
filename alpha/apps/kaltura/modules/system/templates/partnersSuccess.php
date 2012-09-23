@@ -333,7 +333,7 @@ $version_text = (version_compare($version, 2, "<"))? "Old KMC": "New KMC";
 					
 						$default_value = '0';
 						if($partner)
-							$default_value = $partner->getPluginEnabled(MetadataPlugin::PLUGIN_NAME);
+							$default_value = $partner->getPluginEnabled('metadata');
 							
 						$default_value_selected = "";
 						foreach ( $list as $value => $option  )
@@ -366,7 +366,7 @@ $version_text = (version_compare($version, 2, "<"))? "Old KMC": "New KMC";
 					
 						$default_value = '0';
 						if($partner)
-							$default_value = $partner->getPluginEnabled(AuditPlugin::PLUGIN_NAME);
+							$default_value = $partner->getPluginEnabled('audit');
 							
 						$default_value_selected = "";
 						foreach ( $list as $value => $option  )
@@ -399,7 +399,7 @@ $version_text = (version_compare($version, 2, "<"))? "Old KMC": "New KMC";
 					
 						$default_value = '0';
 						if($partner)
-							$default_value = $partner->getPluginEnabled(AnnotationPlugin::PLUGIN_NAME);
+							$default_value = $partner->getPluginEnabled('annotation');
 							
 						$default_value_selected = "";
 						foreach ( $list as $value => $option  )
@@ -432,7 +432,7 @@ $version_text = (version_compare($version, 2, "<"))? "Old KMC": "New KMC";
 					
 						$default_value = '0';
 						if($partner)
-							$default_value = $partner->getPluginEnabled(VirusScanPlugin::PLUGIN_NAME);
+							$default_value = $partner->getPluginEnabled('virusScan');
 							
 						$default_value_selected = "";
 						foreach ( $list as $value => $option  )

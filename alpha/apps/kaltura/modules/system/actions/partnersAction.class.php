@@ -60,16 +60,16 @@ class partnersAction extends kalturaSystemAction
 			}
 			
 			if(class_exists('MetadataPlugin'))
-				$partner_from_db->setPluginEnabled(MetadataPlugin::PLUGIN_NAME, $_REQUEST['partner_enableMetadata']);
+				$partner_from_db->setPluginEnabled('metadata', $_REQUEST['partner_enableMetadata']);
 			
 			if(class_exists('AuditPlugin'))
-				$partner_from_db->setPluginEnabled(AuditPlugin::PLUGIN_NAME, $_REQUEST['partner_enableAuditTrail']);
+				$partner_from_db->setPluginEnabled('audit', $_REQUEST['partner_enableAuditTrail']);
 			
 			if(class_exists('AnnotationPlugin'))
-				$partner_from_db->setPluginEnabled(AnnotationPlugin::PLUGIN_NAME, $_REQUEST['partner_enableAnnotation']);
+				$partner_from_db->setPluginEnabled('annotation', $_REQUEST['partner_enableAnnotation']);
 			
 			if(class_exists('VirusScanPlugin'))
-				$partner_from_db->setPluginEnabled(VirusScanPlugin::PLUGIN_NAME, $_REQUEST['partner_enableVirusScan']);
+				$partner_from_db->setPluginEnabled('virusScan', $_REQUEST['partner_enableVirusScan']);
 
 			if ( $partner_from_db->getServiceConfigId() == "" ) $partner_from_db->setServiceConfigId ( null );
 			
