@@ -75,11 +75,11 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 		$this->captionsInfo = array ();
 		
 		foreach ( $assetIdsArray as $assetId ) {
-			$asset = assetPeer::retrieveById ( $assetId );
-			if ($asset) {
+			$asset = assetPeer::retrieveByIdNoFilter( $assetId );
+			if ($asset->getStatus() == asset::ASSET_STATUS_READY) {
 				$assets [] = $asset;
-			} //if the asset was not retrieved it means the asset was deleted
-			else {
+			}
+			elseif($asset->getStatus()== asset::ASSET_STATUS_DELETED) {
 				$captionInfo = new KalturaYouTubeApiCaptionDistributionInfo ();
 				$captionInfo->action = KalturaYouTubeApiDistributionCaptionAction::DELETE_ACTION;
 				$captionInfo->assetId = $assetId;
@@ -92,13 +92,16 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 					}
 				}
 			}
+			else{
+				KalturaLog::err("Asset [$assetId] has status [".$asset->getStatus()."]. not added to provider data");
+			}
 		}
 		
 		foreach ( $assets as $asset ) {
 			$assetType = $asset->getType ();
 			switch ($assetType) {
 				case CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION ):
-					/* @var $asset CaptionAsset */
+					
 					$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
 					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
 						$captionInfo = $this->getCaptionInfo($asset, $syncKey);
@@ -113,8 +116,8 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
 						$captionInfo = $this->getCaptionInfo($asset, $syncKey);
 						if ($captionInfo){
-							//TODO how to get the caption language
-							$captionInfo->language = 'en'; 
+							//language should be set in the attachment's title
+							$captionInfo->language = $asset->getTitle();
 							$this->captionsInfo [] = $captionInfo;
 						}
 					}
