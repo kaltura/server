@@ -9,6 +9,8 @@ require_once(dirname(__FILE__) . '/kBaseCacheWrapper.php');
 class kMemcacheCacheWrapper extends kBaseCacheWrapper
 {
 	const MAX_CONNECT_ATTEMPTS = 4;
+	
+	const COMPRESSED = 1;
 
 	protected $hostName;
 	protected $port;
@@ -33,7 +35,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 		
 		$this->hostName = $hostName;
 		$this->port = $port;
-		$this->flags = ($flags == kCacheManager::COMPRESSED ? MEMCACHE_COMPRESSED : 0);
+		$this->flags = ($flags == self::COMPRESSED ? MEMCACHE_COMPRESSED : 0);
 		
 		return $this->reconnect();
 	}
