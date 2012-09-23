@@ -104,7 +104,6 @@ class kApiCache
 	protected $_extraFields = array();
 	protected $_referrers = array();				// a request can theoritically have more than one referrer, in case of several baseEntry.getContextData calls in a single multirequest
 	protected static $_country = null;				// caches the country of the user issuing this request
-	protected static $_ip = null;					// caches the ip of the user issuing this request
 	protected static $_usesHttpReferrer = false;	// enabled if the request is dependent on the http referrer field (opposed to an API parameter referrer)
 	protected static $_hasExtraFields = false;		// set to true if the response depends on http headers and should not return caching headers to the user / cdn
 	
@@ -301,15 +300,6 @@ class kApiCache
 		return self::$_country;
 	}
 
-	static protected function getIp()
-	{
-		if (is_null(self::$_ip))
-		{
-			self::$_ip = infraRequestUtils::getRemoteAddress();
-		}
-		return self::$_ip;
-	}
-
 	static public function getHttpReferrer()
 	{
 		self::$_usesHttpReferrer = true;
@@ -338,7 +328,7 @@ class kApiCache
 			return array(self::getCountry());
 
 		case self::ECF_IP:
-			return array(self::getIp());
+			return array(infraRequestUtils::getRemoteAddress());
 		}
 		
 		return array();
