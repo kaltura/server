@@ -56,7 +56,9 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
-			$adapter = new Infra_AuthAdapter($request->getPost('email'), $request->getPost('password'), $request->getPost('timezone_offset'));
+			$adapter = new Kaltura_VarAuthAdapter();
+			$adapter->setCredentials($request->getPost('email'), $request->getPost('password'));
+			$adapter->setTimezoneOffset($request->getPost('timezone_offset'));
 			//$adapter = new Zend_Auth_Adapter_DbTable($zendDb);
 		    $auth = Infra_AuthHelper::getAuthInstance();
 			$result = $auth->authenticate($adapter);
@@ -158,7 +160,10 @@ class UserController extends Zend_Controller_Action
 	    $partnerId = $user->partnerId;
 	    
 	    KalturaLog::debug('creating auth adapter');
-	    $adapter = new Infra_AuthAdapter($userLoginId, null, $form->getValue('timezone_offset'), null, $ks);
+	    $adapter = new Kaltura_VarAuthAdapter($userLoginId, null, $form->getValue('timezone_offset'), null, $ks);
+	    $adapter->setCredentials($userLoginId);
+	    $adapter->setTimezoneOffset($form->getValue('timezone_offset'));
+	    $adapter->setKS($ks);
 		//$adapter = new Zend_Auth_Adapter_DbTable($zendDb);
 	    $auth = Infra_AuthHelper::getAuthInstance();
 		$result = $auth->authenticate($adapter);

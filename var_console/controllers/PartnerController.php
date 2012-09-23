@@ -49,7 +49,7 @@ class PartnerController extends Zend_Controller_Action
     					if (strpos($result[0]['message'], 'already exists in system') !== false)
     						$form->getElement('admin_email')->addError('Email already exists');
     					else
-    					    $this->view->errorDescription = 'An error occured: ' . $e->getMessage();   
+    					    $this->view->errorDescription = 'An error occured: ' . $result[0]['message'];   
     				}
     				else
     				{
@@ -243,7 +243,10 @@ class PartnerController extends Zend_Controller_Action
 		$password = Infra_AuthHelper::getAuthInstance()->getIdentity()->getPassword();
 		$timezoneOffset = Infra_AuthHelper::getAuthInstance()->getIdentity()->getTimezoneOffset();
 		
-	    $adapter = new Infra_AuthAdapter($email, $password, $timezoneOffset, $authorizedPartnerId);
+	    $adapter = new Kaltura_VarAuthAdapter();
+	    $adapter->setCredentials($email, $password);
+	    $adapter->setPartnerId($authorizedPartnerId);
+	    $adapter->setTimezoneOffset($timezoneOffset);
 		$auth = Infra_AuthHelper::getAuthInstance();
 		$result = $auth->authenticate($adapter);
 		
@@ -253,7 +256,7 @@ class PartnerController extends Zend_Controller_Action
 		}
 		else
 		{
-			$loginForm->setDescription('login error');
+			throw new Exception("login failed");
 		}
 	}
 	
