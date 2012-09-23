@@ -32,24 +32,34 @@ abstract class KalturaApplicationPlugin
 	
 	abstract public function doAction(Zend_Controller_Action $action);
 	
-	abstract public function getRequiredPermissions();
+	/**
+	 * Returns array of required permission names
+	 * @return array
+	 */
+	public function getRequiredPermissions()
+	{
+		return array();
+	}
+	
+	/**
+	 * Indicates that this action requires login
+	 * @return boolean
+	 */
+	public function isLoginRequired()
+	{
+		return true;
+	}
 	
 	public function accessCheck($currentPermissions)
 	{
 		$requiredPermissions = $this->getRequiredPermissions();
-
-		$legalAccess = true;
-		
 		foreach ($requiredPermissions as $permission)
 		{
 			if (!in_array($permission, $currentPermissions))
-			{
-				$legalAccess = false;
-				break;
-			}
+				return false;
 		}
 		
-		return $legalAccess;
+		return true;
 	}
 	
 	/**
