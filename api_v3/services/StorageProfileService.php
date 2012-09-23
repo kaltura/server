@@ -19,7 +19,6 @@ class StorageProfileService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 		}
 		myPartnerUtils::addPartnerToCriteria(new StorageProfilePeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-		//self::applyPartnerFilterForClass(new StorageProfilePeer());
 	}
 	
 	/**
