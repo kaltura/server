@@ -302,15 +302,15 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		if ($distributionProfile->geoBlockingMapping == KalturaDailymotionGeoBlockingMapping::METADATA) {
 			$geoBlockingOperation = $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_GEO_BLOCKING_OPERATION);
 			$geoBlockingCountryList = $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_GEO_BLOCKING_COUNTRY_LIST);
-			if ($geoBlockingOperation)
-				$geoBlocking[] = $geoBlockingOperation;
-			if ($geoBlockingCountryList)
-				$geoBlocking = array_merge($geoBlocking, explode(',', $geoBlockingCountryList));
 		}
 		elseif ($distributionProfile->geoBlockingMapping == KalturaDailymotionGeoBlockingMapping::ACCESS_CONTROL) {
-			$geoBlocking[] = $providerData->accessControlGeoBlockingOperation;
-			$geoBlocking = array_merge($geoBlocking, explode(',', $providerData->accessControlGeoBlockingCountryList));
+			$geoBlockingOperation = $providerData->accessControlGeoBlockingOperation;
+			$geoBlockingCountryList = $providerData->accessControlGeoBlockingCountryList;
 		}
+		if ($geoBlockingOperation)
+				$geoBlocking[] = $geoBlockingOperation;
+		if ($geoBlockingCountryList)
+				$geoBlocking = array_merge($geoBlocking, explode(',', $geoBlockingCountryList));
 
 		foreach($geoBlocking as &$tmpstr)
 			$tmpstr = strtolower($tmpstr);
