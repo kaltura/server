@@ -172,10 +172,10 @@ class KSecureEntryHelper
 		$context = new kEntryContextDataResult();
 		$scope = $this->getAccessControlScope();
 		if (!$scope->getKs() || !($scope->getKs() instanceof ks) || !$scope->getKs()->isAdmin())
-			$accessControl->applyContext($context, $scope);
+			$this->disableCache = $accessControl->applyContext($context, $scope);
 		else
 			$this->disableCache = false;
-		
+
 		if(count($context->getAccessControlMessages()))
 		{
 			foreach($context->getAccessControlMessages() as $msg)

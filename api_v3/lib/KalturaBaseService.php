@@ -331,7 +331,9 @@ abstract class KalturaBaseService
 			return;
 
 		$context = new kEntryContextDataResult();
-		$accessControl->applyContext($context, $this->getApiAccessControlScope());
+		$disableCache = $accessControl->applyContext($context, $this->getApiAccessControlScope());
+		if ($disableCache)
+			KalturaResponseCacher::disableCache();
 
 		if(count($context->getAccessControlMessages()))
 		{
