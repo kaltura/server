@@ -1302,7 +1302,12 @@ class KalturaEntryService extends KalturaBaseService
 			}
 		}*/
 		
-		return myEntryUtils::updateThumbnailFromFile($dbEntry, $url, $fileSyncType);
+		myEntryUtils::updateThumbnailFromFile($dbEntry, $url, $fileSyncType);
+		
+		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
+		$entry->fromObject($dbEntry);
+		
+		return $entry;
 	}
 	
 	protected function updateThumbnailJpegForEntry($entryId, $fileData, $entryType = null, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
@@ -1322,7 +1327,12 @@ class KalturaEntryService extends KalturaBaseService
 			}
 		}*/
 		
-		return myEntryUtils::updateThumbnailFromFile($dbEntry, $fileData["tmp_name"], $fileSyncType);
+		myEntryUtils::updateThumbnailFromFile($dbEntry, $fileData["tmp_name"], $fileSyncType);
+		
+		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
+		$entry->fromObject($dbEntry);
+		
+		return $entry;
 	}
 	
 	protected function updateThumbnailForEntryFromSourceEntry($entryId, $sourceEntryId, $timeOffset, $entryType = null, $flavorParamsId = null)

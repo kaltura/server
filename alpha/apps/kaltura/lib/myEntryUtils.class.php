@@ -16,12 +16,6 @@ class myEntryUtils
 		$wrapper->removeFromCache("entry", $dbEntry->getId());
 		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_THUMBNAIL, $dbEntry);
-		
-		// TODO - can't use API objects in core
-		$mediaEntry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$mediaEntry->fromObject($dbEntry);
-		
-		return $mediaEntry;
 	}
 	
 	public static function deepClone ( entry $source , $kshow_id , $override_fields, $echo = false)
