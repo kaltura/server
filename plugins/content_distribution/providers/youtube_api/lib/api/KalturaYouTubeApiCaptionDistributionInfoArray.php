@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.contentDistribution
+ * @package plugins.youtubeApiDistribution
  * @subpackage api.objects
  */
 class KalturaYouTubeApiCaptionDistributionInfoArray extends KalturaTypedArray

@@ -62,7 +62,7 @@ class kYoutubeApiDistributionJobProviderData extends kConfigurableDistributionJo
 	}
 
 	/**
-	 * @param KalturaYouTubeApiCaptionDistributionInfo $captionsInfo
+	 * @param KalturaYouTubeApiCaptionDistributionInfoArray $captionsInfo
 	 */
 	public function setCaptionsInfo($captionsInfo)
 	{

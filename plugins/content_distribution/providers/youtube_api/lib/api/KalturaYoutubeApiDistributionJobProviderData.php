@@ -71,11 +71,16 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 	private function addCaptionsData(KalturaDistributionJobData $distributionJobData) {
 		/* @var $mediaFile KalturaDistributionRemoteMediaFile */
 		$assetIdsArray = explode ( ',', $distributionJobData->entryDistribution->assetIds );
+		if (empty($assetIdsArray)) return;
 		$assets = array ();
-		$this->captionsInfo = array ();
+		$this->captionsInfo = new KalturaYouTubeApiCaptionDistributionInfoArray();
 		
 		foreach ( $assetIdsArray as $assetId ) {
 			$asset = assetPeer::retrieveByIdNoFilter( $assetId );
+			if (!$asset){
+				KalturaLog::err("Asset [$assetId] not found");
+				continue;
+			}
 			if ($asset->getStatus() == asset::ASSET_STATUS_READY) {
 				$assets [] = $asset;
 			}
@@ -104,7 +109,7 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 					
 					$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
 					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
-						$captionInfo = $this->getCaptionInfo($asset, $syncKey);
+						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
 						if ($captionInfo){
 							$captionInfo->language = $asset->getLanguage();
 							$this->captionsInfo [] = $captionInfo;
@@ -114,7 +119,7 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 				case AttachmentPlugin::getAssetTypeCoreValue ( AttachmentAssetType::ATTACHMENT ) :
 					$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
 					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
-						$captionInfo = $this->getCaptionInfo($asset, $syncKey);
+						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
 						if ($captionInfo){
 							//language should be set in the attachment's title
 							$captionInfo->language = $asset->getTitle();
@@ -126,7 +131,7 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 		}
 	}
 	
-	private function getCaptionInfo($asset, $syncKey) {
+	private function getCaptionInfo($asset, $syncKey, KalturaDistributionJobData $distributionJobData) {
 		$captionInfo = new KalturaYouTubeApiCaptionDistributionInfo ();
 		$captionInfo->filePath = kFileSyncUtils::getLocalFilePathForKey ( $syncKey, false );
 		$captionInfo->assetId = $asset->getId();
