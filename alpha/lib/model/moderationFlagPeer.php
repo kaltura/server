@@ -22,12 +22,12 @@ class moderationFlagPeer extends BasemoderationFlagPeer
 	{
 		$c = new Criteria();
 		$c->addAnd(moderationFlagPeer::PARTNER_ID, $partnerId);
-		$c->addAnd(moderationFlagPeer::OBJECT_TYPE, KalturaModerationObjectType::ENTRY);
+		$c->addAnd(moderationFlagPeer::OBJECT_TYPE, moderationObjectType::ENTRY);
 		$c->addAnd(moderationFlagPeer::FLAGGED_ENTRY_ID, $entryId);
-		$c->addAnd(moderationFlagPeer::STATUS, KalturaModerationFlagStatus::PENDING);
+		$c->addAnd(moderationFlagPeer::STATUS, moderationFlagStatus::PENDING);
 		
 		$update = new Criteria();
-		$update->add(moderationFlagPeer::STATUS, KalturaModerationFlagStatus::MODERATED);
+		$update->add(moderationFlagPeer::STATUS, moderationFlagStatus::MODERATED);
 		self::doUpdateAll($c, $update);
 	}
 	
@@ -35,12 +35,12 @@ class moderationFlagPeer extends BasemoderationFlagPeer
 	{
 		$c = new Criteria();
 		$c->addAnd(moderationFlagPeer::PARTNER_ID, $partnerId);
-		$c->addAnd(moderationFlagPeer::OBJECT_TYPE, KalturaModerationObjectType::ENTRY);
+		$c->addAnd(moderationFlagPeer::OBJECT_TYPE, moderationObjectType::ENTRY);
 		$c->addAnd(moderationFlagPeer::FLAGGED_KUSER_ID, $kuserId);
-		$c->addAnd(moderationFlagPeer::STATUS, KalturaModerationFlagStatus::PENDING);
+		$c->addAnd(moderationFlagPeer::STATUS, moderationFlagStatus::PENDING);
 		
 		$update = new Criteria();
-		$update->add(moderationFlagPeer::STATUS, KalturaModerationFlagStatus::MODERATED);
+		$update->add(moderationFlagPeer::STATUS, moderationFlagStatus::MODERATED);
 		self::doUpdateAll($c, $update);
 	}
 }
