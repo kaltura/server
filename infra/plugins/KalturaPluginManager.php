@@ -338,11 +338,10 @@ class KalturaPluginManager
 	 */
 	public static function getPluginInstances($interface = null)
 	{
-		$cacheStore = kCacheManager::getCache(kCacheManager::APC);
-		if ($cacheStore && self::$useCache)
+		if (function_exists('apc_fetch') && self::$useCache)
 		{
 			$cacheKey = self::$cacheNamespace . "pluginsByInterface_$interface";
-			$plugins = $cacheStore->get($cacheKey);
+			$plugins = apc_fetch($cacheKey);
 			if ($plugins !== false)
 			{
 				if (!in_array($interface, self::$loadedInterfaces))
@@ -369,8 +368,8 @@ class KalturaPluginManager
 			$plugins[$pluginName] = self::$plugins[$pluginName];
 			$instances[strtolower($pluginName)] = $instance;
 		}
-		if ($cacheStore && self::$useCache)
-			$cacheStore->set($cacheKey, $plugins);
+		if (function_exists('apc_store') && self::$useCache)
+			apc_store($cacheKey, $plugins);
 		return $instances;
 	}
 	

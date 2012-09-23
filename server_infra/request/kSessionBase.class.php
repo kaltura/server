@@ -1,7 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . '/infraRequestUtils.class.php');
-require_once(dirname(__FILE__) . '/../../infra/cache/kCacheManager.php');
+require_once(dirname(__FILE__) . '/../cache/kCacheManager.php');
 
 // NOTE: this code runs before the API dispatcher - should not use Propel / autoloader
 class kSessionBase
