@@ -9,60 +9,43 @@ class Infra_UserIdentity
 	 * Current user object
 	 * @var Kaltura_Client_Type_User
 	 */
-	private $user;
+	protected $user;
 	
 	/**
 	 * Current kaltura session string
 	 * @var string
 	 */
-	private $ks;
+	protected $ks;
 	
 	/**
 	 * Current user permissions
 	 * @var array<string>
 	 */
-	private $permissions = null;
-	
-	/**
-	 * Current user partners
-	 * @var array<string>
-	 */
-	private $partners = null;
-
-	/**
-	@var array<string>
-	 */
-	private $parterPackages = null;
+	protected $permissions = null;
 	
 	/**
 	 * @var int 
 	 */
-	private $timezoneOffset;
-	
-	/**
-	 * @var string
-	 */
-	private $password;
+	protected $timezoneOffset;
 	
 	/**
 	 * Partner id of the current logged-in partner.
 	 * @var int
 	 */
-	private $partnerId;
+	protected $partnerId;
 	
 	/**
 	 * Init a new UserIdentity instance with the given parameters
 	 * @param Kaltura_Client_Type_User $user
 	 * @param string $ks
+	 * @param int $partnerId
 	 */
-	public function __construct(Kaltura_Client_Type_User $user, $ks, $timezoneOffset, $partnerId, $password = null)
+	public function __construct(Kaltura_Client_Type_User $user, $ks, $timezoneOffset = null, $partnerId = null)
 	{
 		$this->user = $user;
 		$this->ks = $ks;
 		$this->timezoneOffset = $timezoneOffset;
 		$this->partnerId = $partnerId;
-		if ($password)
-		    $this->password = $password;
 	}
 	
 	/**
@@ -74,7 +57,7 @@ class Infra_UserIdentity
 	}
 	
 	/**
-	 * @return save ks string
+	 * @return string ks string
 	 */
 	public function getKs()
 	{
@@ -97,40 +80,6 @@ class Infra_UserIdentity
 		$this->permissions = array_map('trim', explode(',', $permissions));
 	}
 	
-	public function getAllowedPartners() {
-		if (is_null($this->partners)) {
-			$this->initPartners();
-		}
-		return $this->partners;
-	}
-	
-	public function getAllowedPartnerPackages() {
-		if (is_null($this->partnerPackages)) {
-			$this->initPartnerPackages();
-		}
-		return $this->partnerPackages;
-	}
-	
-	private function initPartnerPackages()
-	{
-		$client = Infra_ClientHelper::getClient();
-		$user = $client->user->get($this->user->id, -2);
-		$this->partnerPackages = array_map('trim', explode(',',$user->allowedPartnerPackages));
-	}
-	
-	private function initPartners()
-	{
-		$client = Infra_ClientHelper::getClient();
-		$user = $client->user->get($this->user->id);
-		$userPartners = array_map('trim', explode(',',$user->allowedPartnerIds));
-		$this->partners = $userPartners;
-	}
-	
-	
-	
-	public function refreshAllowedPartners() {
-		$this->initPartners();
-	}
 	/**
      * @return the $timezoneOffset
      */
@@ -138,21 +87,12 @@ class Infra_UserIdentity
     {
         return $this->timezoneOffset;
     }
+    
 	/**
-     * @return the $password
-     */
-    public function getPassword ()
-    {
-        return $this->password;
-    }
-	/**
-     * @return the $partnerId
+     * @return int $partnerId
      */
     public function getPartnerId ()
     {
         return $this->partnerId;
     }
-
-
-
 }
