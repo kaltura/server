@@ -54,7 +54,7 @@ class roughcutEntryPeer extends BaseroughcutEntryPeer
 			}
 			
 			// now fetch all the relevant entries
-			if ( $entry_criteria == null ) $entry_criteria = new Critaria();
+			if ( $entry_criteria == null ) $entry_criteria = new Criteria();
 			$debug = __METHOD__ . " " . print_r ( $roughcut_ids , true ) . "\n" . print_r ( $entry_ids , true );
 //print ($debug);			
 KalturaLog::debug($debug);
