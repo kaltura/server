@@ -26,10 +26,6 @@ class KalturaEntryFactory
 				$obj = new KalturaPlaylist();
 				break;
 				
-			case KalturaEntryType::DOCUMENT:
-				$obj = new KalturaDocumentEntry();
-				break;
-				
 			case KalturaEntryType::DATA:
 				$obj = new KalturaDataEntry();
 				break;
@@ -46,7 +42,11 @@ class KalturaEntryFactory
 				break;
 				
 			default:
-				$obj = new KalturaBaseEntry();
+				$obj = KalturaPluginManager::loadObject('KalturaBaseEntry', $type);
+				
+				if(!$obj)
+					$obj = new KalturaBaseEntry();
+					
 				break;
 		}
 		
