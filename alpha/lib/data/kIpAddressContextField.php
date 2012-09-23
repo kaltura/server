@@ -12,9 +12,11 @@ class kIpAddressContextField extends kStringField
 	 */
 	protected function getFieldValue(kScope $scope = null)
 	{
+		kApiCache::addExtraField(kApiCache::ECF_IP);
+
 		if(!$scope)
 			$scope = new kScope();
-			
+
 		return $scope->getIp();
 	}
 }
