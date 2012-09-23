@@ -39,20 +39,40 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 	
 	/**
 	 * Sets username and password for authentication
-	 *
-	 * @return void
 	 */
-	public function __construct($username, $password = null, $timezoneOffset = null, $partnerId = null, $ks = null)
+	public function setCredentials($username, $password = null)
 	{
 		$this->username = $username;
 		$this->password = $password;
-		$this->timezoneOffset = $timezoneOffset;
-		if ($partnerId)
-		    $this->partnerId = $partnerId;
-		if ($ks)
-		    $this->ks = $ks;
 	}
 
+	public function setPartnerId($partnerId)
+	{
+		$this->partnerId = $partnerId;
+	}
+
+	public function setTimezoneOffset($timezoneOffset)
+	{
+		$this->timezoneOffset = $timezoneOffset;
+	}
+
+	public function setKS($ks)
+	{
+		$this->ks = $ks;
+	}
+	
+	/**
+	 * @param Kaltura_Client_Type_User $user
+	 * @param string $ks
+	 * @param int $partnerId
+	 * 
+	 * @return Infra_UserIdentity
+	 */
+	protected function getUserIdentity(Kaltura_Client_Type_User $user, $ks, $partnerId)
+	{
+		return new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $partnerId);
+	}
+	
 	/**
 	 * Performs an authentication attempt
 	 *
@@ -79,7 +99,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 			    $ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId);
 	    		$client->setKs($ks);
 	    		$user = $client->user->getByLoginId($this->username, $this->partnerId);
-	    		$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $this->partnerId, $this->password);
+	    		$identity = $this->getUserIdentity($user, $ks, $this->partnerId);
 	    		return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
 			}
 			
@@ -87,48 +107,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
     		    $this->ks = $client->user->loginByLoginId($this->username, $this->password, $partnerId);
     		$client->setKs($this->ks);
     		$user = $client->user->getByLoginId($this->username, $partnerId);
-    		$identity = new Infra_UserIdentity($user, $this->ks, $this->timezoneOffset, $user->partnerId, $this->password);
-			//New logic - if specific permissions are required to authenticate the partner/user, check their existence here.
-    		
-    		if (isset($settings->requiredPermissions) && $settings->requiredPermissions)
-    		{
-    		    $requiredPermissionsArr = explode(",", $settings->requiredPermissions);
-    		    
-    		    $hasRequiredPermissions = true;
-    		    foreach ($requiredPermissionsArr as $requiredPermission)
-			    {
-			        $permissionFilter = new Kaltura_Client_Type_PermissionFilter();
-			        $permissionFilter->nameEqual = $requiredPermission;
-			        $permissionFilter->statusEqual = Kaltura_Client_Enum_PermissionStatus::ACTIVE;
-			        $permissions = $client->permission->listAction($permissionFilter, new Kaltura_Client_Type_FilterPager());
-			        if (!$permissions->totalCount)
-			        {
-			            $hasRequiredPermissions = false;
-			            break;
-			        }
-			    }
-		    
-			    if (!$hasRequiredPermissions)
-			    {
-			        $filter = new Kaltura_Client_VarConsole_Type_VarConsolePartnerFilter();
-    		        $filter->partnerPermissionsExist = $settings->requiredPermissions;
-    		        $filter->groupTypeIn = Kaltura_Client_Enum_PartnerGroupType::GROUP . "," . Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP;
-        		    
-        			$userPartners = $client->partner->listPartnersForUser($filter);
-        			
-        			if (!$userPartners->totalCount)
-        			    return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
-        			
-        			$authorizedPartnerId = $userPartners->objects[0]->id;
-        			
-        			$client->setKs(null);
-        		    $ks = $client->user->loginByLoginId($this->username, $this->password, $authorizedPartnerId);
-        			$client->setKs($ks);
-        			$user = $client->user->getByLoginId($this->username, $authorizedPartnerId);
-        			$identity = new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $authorizedPartnerId, $this->password);
-			    }
-    		}
-    		
+    		$identity = $this->getUserIdentity($user, $this->ks, $user->partnerId);
 			
 			if ($partnerId && $user->partnerId != $partnerId) {
 				return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
