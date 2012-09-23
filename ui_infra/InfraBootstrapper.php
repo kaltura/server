@@ -71,6 +71,7 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		$this->bootstrap('log');
 		$this->bootstrap('layout');
 		$this->bootstrap('acl');
+		$this->bootstrap('session');
 	    $this->bootstrap('plugins');
 		$layout = $this->getResource('layout');
 		$view = $layout->getView();
@@ -221,6 +222,7 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 	protected function _initController()
 	{
 		$this->bootstrap('acl');
+		$this->bootstrap('session');
 		
 		$front = Zend_Controller_Front::getInstance();
 		
@@ -231,8 +233,15 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		$front->registerPlugin(new Infra_ControllerPluginAcl($acl, Infra_AclHelper::getCurrentRole()));
 	}
 	
+	protected function _initSession()
+	{
+		$resources = $this->getConfig()->resources;
+		Zend_Session::setOptions(array('cookie_path' => dirname($resources->frontController->baseurl)));
+	}
+	
 	protected function _initAcl()
 	{
+		$this->bootstrap('session');
 		$this->bootstrap('config');
 		$settings = $this->getConfig()->settings;
 		if($settings->defaultController)
