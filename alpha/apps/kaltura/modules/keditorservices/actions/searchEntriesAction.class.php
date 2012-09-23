@@ -30,7 +30,7 @@ class searchEntriesAction extends kalturaAction
 		$partner_id = $this->getP ( "partner_id" , null );
 		if ( false && $partner_id )
 		{
-			$criteria_filter = enrtyPeer::getCriteriaFilter();
+			$criteria_filter = entryPeer::getCriteriaFilter();
 			$criteria = $criteria_filter->getFilter();
 			$criteria->addAnd ( entryPeer::PARTNER_ID , "(" . entryPeer::PARTNER_ID . "<100 OR " . entryPeer::PARTNER_ID . "=$partner_id )" , Criteria::CUSTOM );
 			entryPeer::enable();
