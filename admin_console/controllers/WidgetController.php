@@ -27,7 +27,7 @@ class WidgetController extends Zend_Controller_Action
 		// get results and paginate
 		$client = Infra_ClientHelper::getClient();
 		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
-		$paginatorAdapter = new Infra_FilterPaginatorWithPartnerLoader($adminConsolePlugin->uiConfAdmin, "listAction", null, $uiConfFilter);
+		$paginatorAdapter = new Kaltura_FilterPaginatorWithPartnerLoader($adminConsolePlugin->uiConfAdmin, "listAction", null, $uiConfFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
