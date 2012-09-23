@@ -5,6 +5,22 @@
 class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 {
 	/**
+	 * Static configuration that could be used before loading the config to the registry
+	 * @var Zend_Config
+	 */
+	private static $config = null;
+
+	/**
+	 * @return Zend_Config
+	 */
+	private function getConfig()
+	{
+		if(!self::$config)
+			self::$config = new Zend_Config($this->getOptions(), true);
+			
+		return self::$config;
+	}
+	/**
 	 * Run a check to make sure the client existing in the lib directory.
 	 * It must be checked before session is initiated, as the session object might contain a class from the client that will cause a fatal error 
 	 */
@@ -17,11 +33,11 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 	
 	protected function _initLog()
 	{
-		$this->bootstrap('config');
 		$this->bootstrap('autoloaders');
 		$this->bootstrap('timezone');
 		
-		$configSettings = Zend_Registry::get('config')->settings;
+		$config = $this->getConfig();
+		$configSettings = $config->settings;
 		$loggerConfigPath = null;
 		if(isset($configSettings->loggerConfigPath))
 			$loggerConfigPath = $configSettings->loggerConfigPath;
@@ -34,7 +50,8 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		KalturaLog::initLog($appLogger);
 		KalturaLog::debug('starting request');
 		
-	}	
+	}
+	
 	protected function _initDoctype()
 	{
 		$this->bootstrap('view');
@@ -51,15 +68,17 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 
 	protected function _initNavigation()
 	{
+		$this->bootstrap('log');
 		$this->bootstrap('layout');
 		$this->bootstrap('acl');
+	    $this->bootstrap('plugins');
 		$layout = $this->getResource('layout');
 		$view = $layout->getView();
 		$config = new Zend_Config_Xml(APPLICATION_PATH.'/configs/navigation.xml');
 
 		$navigation = new Zend_Navigation($config);
 		
-		$baseSettings = Zend_Registry::get('config')->settings;
+		$baseSettings = $this->getConfig()->settings;
 		if(isset($baseSettings->pluginInterface))
 		{
 			$pluginInterface = $baseSettings->pluginInterface;
@@ -86,13 +105,16 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 				
 				$acl = Zend_Registry::get('acl');
 				$acl->addResource(new Zend_Acl_Resource($resource));
-					
+				
 				if(!($pluginPage->accessCheck(Infra_AclHelper::getCurrentPermissions())))
 				{
 					$acl->deny(Infra_AclHelper::getCurrentRole(), $resource);
 					KalturaLog::err("Class [" . get_class($pluginPage) . "] requires permissions [" . print_r($pluginPage->getRequiredPermissions(), true) . "]");
 					continue;
 				}
+				
+				if(!$pluginPage->isLoginRequired())
+					Infra_AuthPlugin::addToWhitelist('plugin/' . $pluginPage->getNavigationActionName());
 				
 				$acl->allow(Infra_AclHelper::getCurrentRole(), $resource);				
 				
@@ -140,11 +162,25 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		$view->navigation($navigation);
 	}
 
+	protected function _initPlugins()
+	{
+		$pluginsConfigPath = null;
+		$pluginsCacheNamespace = null;
+		
+		$config = $this->getConfig();
+		if(isset($config->settings->pluginsConfigPath))
+			$pluginsConfigPath = $config->settings->pluginsConfigPath;
+		if(isset($config->settings->applicationName))
+			$pluginsCacheNamespace = $config->settings->applicationName;
+			
+		KalturaPluginManager::init($pluginsConfigPath, $pluginsCacheNamespace);
+	}
+	
 	protected function _initAutoloaders()
 	{
 		$autoloader = Zend_Loader_Autoloader::getInstance();
 
-		$config = new Zend_Config($this->getOptions(), true);
+		$config = $this->getConfig();
 		
 		$moduleAutoloader = new Zend_Application_Module_Autoloader(array(
 			'namespace' => '',
@@ -164,16 +200,17 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 	
 	protected function _initTimeZone()
 	{
-		$this->bootstrap('config');
-		$config = Zend_Registry::get('config');
+		$config = $this->getConfig();
 		date_default_timezone_set($config->settings->timeZone);
 	}
 	
 	protected function _initConfig()
 	{
 	    $this->bootstrap('autoloaders');
+		$this->bootstrap('log');
+	    $this->bootstrap('plugins');
 	    
-		$config = new Zend_Config($this->getOptions(), true);
+		$config = $this->getConfig();
 		$configSettings = $config->settings;
 		$configName = $configSettings->applicationName;
 		$config = KalturaPluginManager::mergeConfigs($config, $configName, false);		
@@ -190,12 +227,22 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		$front->registerPlugin(new Infra_AuthPlugin());
 		
 		$acl = Zend_Registry::get('acl');
-		$config = Zend_Registry::get('config');
+		$config = $this->getConfig();
 		$front->registerPlugin(new Infra_ControllerPluginAcl($acl, Infra_AclHelper::getCurrentRole()));
 	}
 	
 	protected function _initAcl()
 	{
+		$this->bootstrap('config');
+		$settings = $this->getConfig()->settings;
+		if($settings->defaultController)
+		{
+			if($settings->defaultAction)
+				Infra_AuthPlugin::setDefaultAction($settings->defaultController, $settings->defaultAction);
+			else
+				Infra_AuthPlugin::setDefaultAction($settings->defaultController);
+		}
+		
 		$acl = new Zend_Acl();
 		
 		$acl->addRole(Infra_AclHelper::ROLE_GUEST);
@@ -207,7 +254,7 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 			$acl->addRole($currentRole);
 		}
 		
-      	$accessItems = Zend_Registry::get('config')->access;
+      	$accessItems = $this->getConfig()->access;
       	$allAccess = array();
       	
       	foreach($accessItems as $resource => $accessConfig)
@@ -301,7 +348,7 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 	
 	protected function checkAclForNavigation(Zend_Navigation_Container $navigation)
 	{
-	    $accessConfig = Zend_Registry::get('config')->access;
+	    $accessConfig = $this->getConfig()->access;
 		$pages = $navigation->getPages();
 
 		foreach($pages as $page)
