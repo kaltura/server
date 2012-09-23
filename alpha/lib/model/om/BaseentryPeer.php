@@ -1146,6 +1146,10 @@ abstract class BaseentryPeer {
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
+		
+		if($criteria instanceof KalturaCriteria)
+			$criteria->applyResultsSort($results);
+		
 		return $results;
 	}
 
@@ -1284,6 +1288,10 @@ abstract class BaseentryPeer {
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
+		
+		if($criteria instanceof KalturaCriteria)
+			$criteria->applyResultsSort($results);
+		
 		return $results;
 	}
 
@@ -1351,6 +1359,10 @@ abstract class BaseentryPeer {
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
+		
+		if($criteria instanceof KalturaCriteria)
+			$criteria->applyResultsSort($results);
+		
 		return $results;
 	}
 
