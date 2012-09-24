@@ -438,7 +438,7 @@ class kXsd
 	
 		$xsl = '<?xml version="1.0" encoding="ISO-8859-1"?>
 	<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-		<xsl:output method="xml" version="1.0" encoding="iso-8859-1" indent="yes"/>
+		<xsl:output method="xml" version="1.0" omit-xml-declaration="yes" indent="yes"/>
 		<xsl:strip-space elements="*" />
 		<xsl:template match="/">' . $xsl . '
 		</xsl:template>
