@@ -796,7 +796,7 @@ kmc.preview_embed = {
 					break;					
 				case "akamai":
 					var v2param = (kmc.vars.has_v2_flavors) ? '&amp;twoPhaseManifest=true' : '';
-					embed_code = embed_code.replace("{FLASHVARS}", "streamerType=hdnetwork&amp;akamaiHD.loadingPolicy=preInitialize&amp;akamaiHD.asyncInit=true" . v2param . "&amp;{FLASHVARS}");
+					embed_code = embed_code.replace("{FLASHVARS}", "streamerType=hdnetwork&amp;akamaiHD.loadingPolicy=preInitialize&amp;akamaiHD.asyncInit=true" + v2param + "&amp;{FLASHVARS}");
 					break;
 			}
 		}
