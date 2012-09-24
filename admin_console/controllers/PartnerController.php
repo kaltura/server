@@ -566,6 +566,9 @@ class PartnerController extends Zend_Controller_Action
 		$this->view->form = $resetPasswordForm;
 	}
 	
+	/**
+	 * Multi-Publisher Console redirect
+	 */
 	public function mpConsoleRedirectAction ()
 	{
 	    $partnerId = $this->_getParam('partner_id');
@@ -591,7 +594,15 @@ class PartnerController extends Zend_Controller_Action
 			$url .= $settings->mpConsoleUrl;
 		}
 		
-		$url .= '?ks='.$ks;
+		$identiry = Infra_AuthHelper::getAuthInstance()->getIdentity();
+		/* @var $identiry Infra_UserIdentity */
+		
+		$formdata = array(
+			'ks' => $ks,
+			'timezone_offset' => $identiry->getTimezoneOffset(),
+		);
+		
+		$url .= '?' . http_build_query($formdata);
 		$this->getResponse()->setRedirect($url);
 	}
 
