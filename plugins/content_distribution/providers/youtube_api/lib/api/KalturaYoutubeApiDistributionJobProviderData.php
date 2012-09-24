@@ -106,13 +106,15 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 			$assetType = $asset->getType ();
 			switch ($assetType) {
 				case CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION ):
-					
 					$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
 					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
 						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
 						if ($captionInfo){
-							$captionInfo->language = $asset->getLanguage();
-							$this->captionsInfo [] = $captionInfo;
+							$captionInfo->language = $this->getLanguageCode($asset->getLanguage);
+							if ($captionInfo->language)
+								$this->captionsInfo [] = $captionInfo;
+							else
+								KalturaLog::err('The caption ['.$asset->getId().'] has unrecognized language ['.$asset->getLanguage.']'); 
 						}
 					}
 					break;
@@ -121,14 +123,32 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
 						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
 						if ($captionInfo){
-							//language should be set in the attachment's title
+							//language code should be set in the attachments title
 							$captionInfo->language = $asset->getTitle();
-							$this->captionsInfo [] = $captionInfo;
+							
+							$languageCodeReflector = KalturaTypeReflectorCacher::get('KalturaLanguageCode');
+							//check if the language code exists 
+						    if($languageCodeReflector && $languageCodeReflector->getConstantName($captionInfo->language))
+								$this->captionsInfo [] = $captionInfo;
+							else
+								KalturaLog::err('The attachment ['.$asset->getId().'] has unrecognized language ['.$asset->getTitle().']'); 		    
 						}
 					}
 					break;
 			}
 		}
+	}
+	
+	private function getLanguageCode($language = null){
+		$languageReflector = KalturaTypeReflectorCacher::get('KalturaLanguage');
+		$languageCodeReflector = KalturaTypeReflectorCacher::get('KalturaLanguageCode');
+		if($languageReflector && $languageCodeReflector)
+		{
+			$languageCode = $languageReflector->getConstantName($language);
+			if($languageCode)
+				return $languageCodeReflector->getConstantValue($languageCode);
+		}
+		return null;
 	}
 	
 	private function getCaptionInfo($asset, $syncKey, KalturaDistributionJobData $distributionJobData) {
