@@ -735,7 +735,7 @@ kmc.preview_embed = {
 		'</dl>';
 
 		kmc.layout.modal.open( {
-			'width' : parseInt(kmc.vars.default_kdp.width) + 20,
+			'width' : parseInt(kmc.vars.default_kdp.width) + 120,
 			'height' : parseInt(kmc.vars.default_kdp.height) + 300,
 			'title' : 'Flavor Preview',
 			'content' : '<div id="preview_embed">' + modal_content + '</div>'
