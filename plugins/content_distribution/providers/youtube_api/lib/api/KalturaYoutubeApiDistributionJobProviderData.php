@@ -110,11 +110,11 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
 						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
 						if ($captionInfo){
-							$captionInfo->language = $this->getLanguageCode($asset->getLanguage);
+							$captionInfo->language = $this->getLanguageCode($asset->getLanguage());
 							if ($captionInfo->language)
 								$this->captionsInfo [] = $captionInfo;
 							else
-								KalturaLog::err('The caption ['.$asset->getId().'] has unrecognized language ['.$asset->getLanguage.']'); 
+								KalturaLog::err('The caption ['.$asset->getId().'] has unrecognized language ['.$asset->getLanguage().']'); 
 						}
 					}
 					break;
