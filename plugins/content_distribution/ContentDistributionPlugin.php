@@ -98,6 +98,9 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			
 		if($baseEnumName == 'FileSyncObjectType')
 			return array('ContentDistributionFileSyncObjectType');
+		
+		if($baseEnumName == 'BatchJobObjectType')
+			return array('ContentDistributionBatchJobObjectType');
 			
 		return array();
 	}

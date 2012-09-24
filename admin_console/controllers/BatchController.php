@@ -153,7 +153,7 @@ class BatchController extends Zend_Controller_Action
 		
 		
 		$filter = new Infra_BatchJobFilter();
-		$filter->orderBy = Kaltura_Client_Enum_BaseJobOrderBy::CREATED_AT_DESC;
+		$filter->orderBy = Kaltura_Client_Enum_BatchJobOrderBy::CREATED_AT_DESC;
 	
 		if($request->getParam('createdAtFrom', false))
 		{
@@ -312,7 +312,7 @@ class BatchController extends Zend_Controller_Action
         $submitAction->setValue('');
 		
 		$filter = new Infra_BatchJobFilter();
-		$filter->orderBy = Kaltura_Client_Enum_BaseJobOrderBy::CREATED_AT_DESC;
+		$filter->orderBy = Kaltura_Client_Enum_BatchJobOrderBy::CREATED_AT_DESC;
 	
 		if($request->getParam('createdAtFrom', false))
 		{

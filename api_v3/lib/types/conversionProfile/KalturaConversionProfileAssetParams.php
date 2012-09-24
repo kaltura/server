@@ -46,6 +46,15 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IFilt
 	 * @filter eq,in
 	 */
 	public $systemName;
+	
+	/**
+	 * The priority of the flavor params
+	 *
+	 * @var int
+	 * @filter eq,in
+	 */
+	public $priority;
+	
 
 	/**
 	 * Starts conversion even if the decision layer reduced the configuration to comply with the source
@@ -61,6 +70,7 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IFilt
 		'origin',
 		'systemName',
 		'forceNoneComplied',
+		'priority',
 	);
 	
 	public function getMapBetweenObjects ( )

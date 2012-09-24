@@ -939,7 +939,6 @@
 						<th title="<?php echo $this->translate('entry-investigate history status tooltip'); ?>"><?php echo $this->translate('entry-investigate history status th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history abort th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history recheck th'); ?></th>
-						<th><?php echo $this->translate('entry-investigate history progress th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history msg th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history info th'); ?></th>
 						<th title="<?php echo $this->translate('entry-investigate history create time tooltip'); ?>"><?php echo $this->translate('entry-investigate history create time th'); ?></th>
@@ -953,17 +952,12 @@
 						<th><?php echo $this->translate('entry-investigate history expire th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history lock version th'); ?></th>
 						<th title="<?php echo $this->translate('entry-investigate history attempts tooltip'); ?>"><?php echo $this->translate('entry-investigate history attempts th'); ?></th>
-						<th><?php echo $this->translate('entry-investigate history last scheduler th'); ?></th>
-						<th><?php echo $this->translate('entry-investigate history last worker th'); ?></th>
-						<th><?php echo $this->translate('entry-investigate history distrib th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history parent th'); ?></th>
-						<th><?php echo $this->translate('entry-investigate history twin th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history bulk th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history root th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history dc th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history err type th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history err num th'); ?></th>
-						<th><?php echo $this->translate('entry-investigate history divert th'); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -1002,7 +996,6 @@
 								</td>
 								<td><?php echo $job->abort; ?></td>
 								<td><?php echo ($job->checkAgainTimeout ? date($this->translate('time format'), $job->checkAgainTimeout) : ''); ?></td>
-								<td><?php echo $job->progress; ?></td>
 								<td><?php echo htmlspecialchars($job->message); ?></td>
 								<td><?php echo nl2br(htmlspecialchars(trim($job->description))); ?></td>
 								<td><?php echo date($this->translate('time format'), $job->createdAt); ?></td>
@@ -1013,20 +1006,15 @@
 								<td><?php echo $job->schedulerId; ?></td>
 								<td><?php echo $job->workerId; ?></td>
 								<td><?php echo $job->batchIndex; ?></td>
-								<td><?php echo $job->processorExpiration; ?></td>
+								<td><?php echo $job->lockExpiration; ?></td>
 								<td><?php echo $job->lockVersion; ?></td>
 								<td><?php echo $job->executionAttempts; ?></td>
-								<td><?php echo $job->lastSchedulerId; ?></td>
-								<td><?php echo $job->lastWorkerId; ?></td>
-								<td><?php echo ($job->lastWorkerRemote ? 'True' : 'False'); ?></td>
 								<td><?php echo $job->parentJobId; ?></td>
-								<td><?php echo $job->twinJobId; ?></td>
 								<td><?php echo $job->bulkJobId; ?></td>
 								<td><?php echo $job->rootJobId; ?></td>
 								<td><?php echo $job->dc; ?></td>
 								<td><?php echo $job->errType; ?></td>
 								<td><?php echo $job->errNumber; ?></td>
-								<td><?php echo $job->onStressDivertTo; ?></td>
 							</tr>
 							<tr class="additionalData" id="tr_job_data_<?php echo $job->id; ?>" style="display: none">
 								<td colspan="28">
@@ -1041,6 +1029,33 @@
 									?>
 									<br/>
 									<?php echo $this->printKalturaObject($job->data); ?>
+									<br/>
+									<table valign="middle">
+										<thead>
+											<tr>
+												<th><?php echo $this->translate('entry-investigate history_records timeStamp th'); ?></th>
+												<th><?php echo $this->translate('entry-investigate history_records schedulerId th'); ?></th>
+												<th><?php echo $this->translate('entry-investigate history_records workerId th'); ?></th>
+												<th><?php echo $this->translate('entry-investigate history_records batchIndex th'); ?></th>
+												<th><?php echo $this->translate('entry-investigate history_records message th'); ?></th>
+												<th><?php echo $this->translate('entry-investigate history_records errType th'); ?></th>
+												<th><?php echo $this->translate('entry-investigate history_records errNumber th'); ?></th>
+											</tr>
+										</thead>
+										<tbody>
+											<?php foreach($job->history as $historyRecord): ?>
+												<tr>
+													<td><?php echo $historyRecord->timeStamp; ?></td>
+													<td><?php echo $historyRecord->schedulerId; ?></td>
+													<td><?php echo $historyRecord->workerId; ?></td>
+													<td><?php echo $historyRecord->batchIndex; ?></td>
+													<td><?php echo $historyRecord->message; ?></td>
+													<td><?php echo $historyRecord->errType; ?></td>
+													<td><?php echo $historyRecord->errNumber; ?></td>
+												</tr>
+											<?php endforeach; ?>
+										</tbody>
+									</table>
 								</td>
 							</tr>
 						<?php endforeach; ?>

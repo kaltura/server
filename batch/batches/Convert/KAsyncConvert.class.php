@@ -114,19 +114,16 @@ class KAsyncConvert extends KJobHandlerWorker
 		if(isset($data->flavorParamsOutputId))
 			$data->flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
 		
-		if($this->taskConfig->params->isRemoteOutput)
-			$job->lastWorkerRemote = true;
-			
 		$data->actualSrcFileSyncLocalPath = $this->translateSharedPath2Local($data->srcFileSyncLocalPath);
 		$updateData = new KalturaConvartableJobData();
 		$updateData->actualSrcFileSyncLocalPath = $data->actualSrcFileSyncLocalPath;
-		$job = $this->updateJob($job, null, KalturaBatchJobStatus::QUEUED, 1, $updateData, $job->lastWorkerRemote);
+		$job = $this->updateJob($job, null, KalturaBatchJobStatus::QUEUED, $updateData);
 	
 		// creates a temp file path
 //		$uniqid = uniqid("convert_{$job->entryId}_");
 		$uniqid = uniqid();
 		$uniqid = "convert_{$job->entryId}_".substr($uniqid,-5);
-		$data->destFileSyncLocalPath = "{$this->localTempPath}/$uniqid";
+		$data->destFileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid;
 		
 		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $this->taskConfig, $data, $this->kClient);
 		
@@ -229,7 +226,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			return $this->closeJob($job, null, null, $msg, KalturaBatchJobStatus::ALMOST_DONE, $data);
 		}
 		
-		$job = $this->updateJob($job, "engine [" . get_class($this->operationEngine) . "] converted successfully", KalturaBatchJobStatus::MOVEFILE, 90, $data);
+		$job = $this->updateJob($job, "engine [" . get_class($this->operationEngine) . "] converted successfully", KalturaBatchJobStatus::MOVEFILE, $data);
 		return $this->moveFile($job, $data);
 	}
 
@@ -250,7 +247,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		KalturaLog::debug("moveFile($job->id, $data->destFileSyncLocalPath)");
 		
 		$uniqid = uniqid("convert_{$job->entryId}_");
-		$sharedFile = "{$this->sharedTempPath}/$uniqid";
+		$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . $uniqid;
 				
 		if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 		{

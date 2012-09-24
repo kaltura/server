@@ -933,8 +933,10 @@ class JobsService extends KalturaBaseService
 		if($dbBatchJob->getJobType() != $dbJobType)
 			throw new KalturaAPIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $jobType, $dbBatchJob->getId());
 		
+		$dbBatchJobLock = BatchJobLockPeer::retrieveByPK($jobId);
+		
 		$job = new KalturaBatchJob();
-		$job->fromObject($dbBatchJob);
+		$job->fromObject($dbBatchJob,$dbBatchJobLock);
 		
 		$batchJobResponse = new KalturaBatchJobResponse();
 		$batchJobResponse->batchJob = $job;
@@ -1013,11 +1015,11 @@ class JobsService extends KalturaBaseService
 	 */
 	function listBatchJobsAction(KalturaBatchJobFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!$filter)
+		if (!$filter) 
 			$filter = new KalturaBatchJobFilter();
 			
-		$batchJobFilter = new BatchJobFilter ();
-		$filter->toObject($batchJobFilter );
+		$batchJobFilter = new BatchJobFilter (true);
+		$filter->toObject($batchJobFilter);
 		
 		$c = new Criteria();
 //		$c->add(BatchJobPeer::DELETED_AT, null);
@@ -1030,6 +1032,7 @@ class JobsService extends KalturaBaseService
 		$pager->attachToCriteria($c);
 		
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
+		
 		$list = BatchJobPeer::doSelect($c);
 		
 		$c->setLimit(false);

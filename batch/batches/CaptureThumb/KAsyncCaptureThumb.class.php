@@ -70,7 +70,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile is not a file", KalturaBatchJobStatus::FAILED);
 				
 			KalturaLog::debug("mediaFile [$mediaFile]");
-			$this->updateJob($job,"Capturing thumbnail on $mediaFile", KalturaBatchJobStatus::QUEUED, 1);
+			$this->updateJob($job,"Capturing thumbnail on $mediaFile", KalturaBatchJobStatus::QUEUED);
 		}
 		catch(Exception $ex)
 		{
@@ -103,7 +103,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			{
 				// creates the path
 				$uniqid = uniqid('thumb_');
-				$capturePath = realpath($rootPath) . "/$uniqid";
+				$capturePath = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
 					
 				$mediaInfoWidth = null;
 				$mediaInfoHeight = null;
@@ -128,7 +128,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 				if(!$created || !file_exists($capturePath))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not created", KalturaBatchJobStatus::FAILED);
 				
-				$this->updateJob($job, "Thumbnail captured [$capturePath]", KalturaBatchJobStatus::PROCESSING, 40);
+				$this->updateJob($job, "Thumbnail captured [$capturePath]", KalturaBatchJobStatus::PROCESSING);
 			}
 			else 
 			{
@@ -136,7 +136,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			}
 			
 			$uniqid = uniqid('thumb_');
-			$thumbPath = realpath($rootPath) . "/$uniqid";
+			$thumbPath = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
 			
 			$quality = $thumbParamsOutput->quality;
 			$cropType = $thumbParamsOutput->cropType;
@@ -202,7 +202,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		}
 		
 		$uniqid = uniqid('thumb_');
-		$sharedFile = realpath($rootPath) . "/$uniqid";
+		$sharedFile = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
 		
 		clearstatcache();
 		$fileSize = filesize($data->thumbPath);

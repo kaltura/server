@@ -21,6 +21,7 @@ class KOperationEngineOldVersionWrapper extends KOperationEngine
 	{
 		$this->data = $data;
 		$this->convertor = KConversionEngine::getInstance($type, $taskConfig);
+		$this->logFilePath = $data->destFileSyncLocalPath . ".log";
 	}
 
 	protected function doOperation()

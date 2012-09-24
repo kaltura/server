@@ -214,22 +214,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function updateExclusiveConvertJobSubTypeAction($id ,KalturaExclusiveLockKey $lockKey, $subType)
 	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::CONVERT)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), null);
-			
-		$msg = "Engine Divreted from " . $dbBatchJob->getJobSubType() . " to $subType";	
-		$description = $dbBatchJob->getDescription() . "\n$msg";
-		
-		$dbBatchJob->setMessage($msg);
-		$dbBatchJob->setDescription($description);
-		$dbBatchJob->setJobSubType($subType);
-		$dbBatchJob->save();
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
+		throw new KalturaAPIException("This function is no longer supported");
 	}
 	
 // --------------------------------- ConvertJob functions 	--------------------------------- //
@@ -322,7 +307,57 @@ class BatchService extends KalturaBaseService
 
 	
 // --------------------------------- generic functions 	--------------------------------- //
-
+	
+	private static function handleBefore($partnerLoadA, $partnerLoadB) {
+		if ($partnerLoadA->getPartnerId() < $partnerLoadB->getPartnerId())
+			return true;
+		if(($partnerLoadA->getPartnerId() == $partnerLoadB->getPartnerId()) && ($partnerLoadA->getJobType() < $partnerLoadB->getJobType()))
+			return true;
+		return false;
+	}
+	
+	/**
+	 * batch updatePartnerLoadTable action cleans the partner load table
+	 *
+	 * @action updatePartnerLoadTable
+	 */
+	function updatePartnerLoadTableAction() {
+		
+		try {
+			
+			KalturaLog::info(" --- updateing partner load table --- ");
+			$actualPartnerLoads = BatchJobLockPeer::getPartnerLoads();
+			
+			$c = new Criteria();
+			$currentPartnerLoads = PartnerLoadPeer::doSelect($c);
+			
+			foreach ($currentPartnerLoads as $partnerLoad) {
+				$key = $partnerLoad->getPartnerId() . "#" . $partnerLoad->getJobType();
+				if(array_key_exists($key, $actualPartnerLoads)) {
+					$actualLoad = $actualPartnerLoads[$key];
+					// Update
+					$partnerLoad->setPartnerLoad($actualLoad->getPartnerLoad());
+					$partnerLoad->setWeightedPartnerLoad($actualLoad->getWeightedPartnerLoad());
+					$partnerLoad->save();
+					
+					unset($actualPartnerLoads[$key]);
+				} else {
+					
+					// Delete
+					$partnerLoad->delete();
+				}
+			}
+			
+			foreach($actualPartnerLoads as $actualPartnerLoad) {
+				// Insert
+				$actualPartnerLoad->save();
+			}
+		    
+		    KalturaLog::info(" --- Done updateing partner load table --- ");
+		} catch (Exception $e) {
+			KalturaLog::err("Failed while updating partner load table with error : " . $e->getMessage());
+		}
+	}
 	
 	/**
 	 * batch resetJobExecutionAttempts action resets the execution attempts of the job 
@@ -340,13 +375,13 @@ class BatchService extends KalturaBaseService
 		
 		$c = new Criteria();
 		
-		$c->add(BatchJobPeer::ID, $id );
-		$c->add(BatchJobPeer::SCHEDULER_ID, $lockKey->schedulerId );			
-		$c->add(BatchJobPeer::WORKER_ID, $lockKey->workerId );			
-		$c->add(BatchJobPeer::BATCH_INDEX, $lockKey->batchIndex );
+		$c->add(BatchJobLockPeer::ID, $id );
+		$c->add(BatchJobLockPeer::SCHEDULER_ID, $lockKey->schedulerId );			
+		$c->add(BatchJobLockPeer::WORKER_ID, $lockKey->workerId );			
+		$c->add(BatchJobLockPeer::BATCH_INDEX, $lockKey->batchIndex );
 		
-		$job = BatchJobPeer::doSelectOne ( $c );
-		if(!$job)
+		$job = BatchJobLockPeer::doSelectOne ( $c );
+		if(!$job) 
 			throw new KalturaAPIException(KalturaErrors::UPDATE_EXCLUSIVE_JOB_FAILED, $id, $lockKey->schedulerId, $lockKey->workerId, $lockKey->batchIndex);
 		
 		// verifies that the job is of the right type
@@ -383,19 +418,19 @@ class BatchService extends KalturaBaseService
 		
 		// gets queues length
 		$c = new Criteria();
-		$c->add(BatchJobPeer::STATUS, array(KalturaBatchJobStatus::PENDING, KalturaBatchJobStatus::RETRY, KalturaBatchJobStatus::ALMOST_DONE), Criteria::IN);
-		$c->add(BatchJobPeer::JOB_TYPE, $jobType);
-		$queueSize = BatchJobPeer::doCount($c, false, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
+		$c->add(BatchJobLockPeer::STATUS, array(KalturaBatchJobStatus::PENDING, KalturaBatchJobStatus::RETRY, KalturaBatchJobStatus::ALMOST_DONE), Criteria::IN);
+		$c->add(BatchJobLockPeer::JOB_TYPE, $jobType);
+		$queueSize = BatchJobLockPeer::doCount($c, false, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
 		
 		if(!$queueSize)
 		{
 			// gets queues length
 			$c = new Criteria();
-			$c->add(BatchJobPeer::BATCH_INDEX, null, Criteria::ISNOTNULL);
-			$c->add(BatchJobPeer::PROCESSOR_EXPIRATION, time(), Criteria::GREATER_THAN);
-			$c->add(BatchJobPeer::EXECUTION_ATTEMPTS, BatchJobPeer::getMaxExecutionAttempts($jobType), Criteria::LESS_THAN);
-			$c->add(BatchJobPeer::JOB_TYPE, $jobType);
-			$queueSize = BatchJobPeer::doCount($c, false, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
+			$c->add(BatchJobLockPeer::BATCH_INDEX, null, Criteria::ISNOTNULL);
+			$c->add(BatchJobLockPeer::EXPIRATION, time(), Criteria::GREATER_THAN);
+			$c->add(BatchJobLockPeer::EXECUTION_ATTEMPTS, BatchJobLockPeer::getMaxExecutionAttempts($jobType), Criteria::LESS_THAN);
+			$c->add(BatchJobLockPeer::JOB_TYPE, $jobType);
+			$queueSize = BatchJobLockPeer::doCount($c, false, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
 		}
 		
 		$response = new KalturaFreeJobResponse();
@@ -454,7 +489,7 @@ class BatchService extends KalturaBaseService
 	function getExclusiveAlmostDoneAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$jobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
-		$jobsFilter = new BatchJobFilter();
+		$jobsFilter = new BatchJobFilter(false);
 		if ($filter)
 			$jobsFilter = $filter->toFilter($jobType);
 		

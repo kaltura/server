@@ -155,7 +155,7 @@ class myPartnerUtils
 		self::addPartnerToCriteria ( new entryPeer() , $partner_id , $private_partner_data, $partner_group , $kaltura_network );
 		self::addPartnerToCriteria ( new kshowPeer() , $partner_id , $private_partner_data, $partner_group , $kaltura_network );
 		self::addPartnerToCriteria ( new moderationPeer() , $partner_id , $private_partner_data , $partner_group);
-		self::addPartnerToCriteria ( new notificationPeer() , $partner_id , $private_partner_data , $partner_group);
+		//self::addPartnerToCriteria ( new notificationPeer() , $partner_id , $private_partner_data , $partner_group);
 		self::addPartnerToCriteria ( new categoryEntryPeer() , $partner_id , $private_partner_data , $partner_group);
 		self::addPartnerToCriteria ( new categoryKuserPeer() , $partner_id , $private_partner_data , $partner_group);
 		

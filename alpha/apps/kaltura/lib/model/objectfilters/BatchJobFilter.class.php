@@ -9,27 +9,33 @@ class BatchJobFilter extends baseObjectFilter
 	const JOB_TYPE_AND_SUB_TYPE_TYPE_DELIMITER = ':';
 	const JOB_TYPE_AND_SUB_TYPE_SUB_DELIMITER = ',';
 	
-	public function init ()
-	{
-		// TODO - should separate the schema of the fields from the actual values
-		// or can use this to set default valuse
-		$this->fields = kArray::makeAssociativeDefaultValue ( array (
+	protected $BATCH_JOB_FIELDS =	array(
+			"_gte_created_at",
+			"_lte_created_at",
+			"_gte_updated_at",
+			"_lte_updated_at",
+			"_gte_queue_time",
+			"_lte_queue_time",
+			"_gte_finish_time",
+			"_lte_finish_time",
+			"_in_err_type");
+	
+	 protected $BATCH_JOB_LOCK_FIELDS = array(
+			"_gte_expiration",
+			"_lte_expiration",
+			"_gte_execution_attempts",
+			"_lte_execution_attempts",
+			"_gte_lock_version",
+			"_lte_lock_version",
+			"_lt_estimated_effort",
+			"_gt_estimated_effort",);
+	
+	protected $BATCH_JOB_COMMON_FIELDS = array(
 			"_eq_id",
 			"_gte_id",
 			"_eq_partner_id",
 			"_in_partner_id",
 			"_notin_partner_id",
-			"_gte_created_at",
-			"_lte_created_at",
-			"_gte_updated_at",
-			"_lte_updated_at",
-			"_gte_processor_expiration",
-			"_lte_processor_expiration",
-			"_gte_execution_attempts",
-			"_lte_execution_attempts",
-			"_gte_lock_version",
-			"_lte_lock_version",
-		
 			"_eq_entry_id",
 			"_eq_job_type",
 			"_in_job_type",
@@ -37,33 +43,44 @@ class BatchJobFilter extends baseObjectFilter
 			"_eq_job_sub_type",
 			"_in_job_sub_type",
 			"_notin_job_sub_type",
-			"_in_on_stress_divert_to",
 			"_eq_status",
 			"_in_status",
 			"_gte_priority",
 			"_lte_priority",
-			"_gte_queue_time",
-			"_lte_queue_time",
-			"_gte_finish_time",
-			"_lte_finish_time",
-			"_in_err_type",
-			"_lt_file_size",
-			"_gt_file_size",
-			
-			"_in_job_type_and_sub_type",
-			) , NULL );
-			
-		$this->allowed_order_fields = array (
-			"created_at",
-			"updated_at",
-			"processor_expiration",
-			"execution_attempts",
-			"lock_version",
-			"status",
-			"queue_time",
-			"finish_time",
-		);
-			
+			"_in_job_type_and_sub_type",);
+	
+	protected $queryFromBatchJob;
+	
+	public function BatchJobFilter($queryFromBatchJob) {
+		$this->queryFromBatchJob = $queryFromBatchJob; 
+		parent::__construct();
+	}
+	
+	public function init ()
+	{
+		
+		// TODO - should separate the schema of the fields from the actual values
+		// or can use this to set default valuse
+		
+		if($this->queryFromBatchJob) {
+			$fieldsArray = array_merge($this->BATCH_JOB_FIELDS, $this->BATCH_JOB_COMMON_FIELDS);
+			$this->fields = kArray::makeAssociativeDefaultValue ($fieldsArray , NULL );
+			$this->allowed_order_fields = array (
+					"created_at",
+					"updated_at",
+					"status",
+					"queue_time",
+					"finish_time");
+		} else {
+			$fieldsArray = array_merge($this->BATCH_JOB_LOCK_FIELDS, $this->BATCH_JOB_COMMON_FIELDS);
+			$this->fields = kArray::makeAssociativeDefaultValue ( $fieldsArray , NULL );
+			$this->allowed_order_fields = array (
+					"lock_expiration",
+					"execution_attempts",
+					"lock_version",
+					"status");
+		}
+		
 	}
 
 	public function describe() 
@@ -79,13 +96,18 @@ class BatchJobFilter extends baseObjectFilter
 	// The base class should invoke $peek_class::translateFieldName( $field_name , BasePeer::TYPE_FIELDNAME , BasePeer::TYPE_COLNAME );
 	public function getFieldNameFromPeer ( $field_name )
 	{
-		$res = BatchJobPeer::translateFieldName( $field_name , $this->field_name_translation_type , BasePeer::TYPE_COLNAME );
-		return $res;
+		if($this->queryFromBatchJob) 
+			return BatchJobPeer::translateFieldName( $field_name , $this->field_name_translation_type , BasePeer::TYPE_COLNAME );
+		else
+			return BatchJobLockPeer::translateFieldName( $field_name , $this->field_name_translation_type , BasePeer::TYPE_COLNAME );
 	}
 
 	public function getIdFromPeer (  )
 	{
-		return BatchJobPeer::ID;
+		if($this->queryFromBatchJob)
+			return BatchJobPeer::ID;
+		else 
+			return BatchJobLockPeer::ID;
 	}
 
 	
@@ -94,7 +116,9 @@ class BatchJobFilter extends baseObjectFilter
 		$jobTypeAndSubTypeIn = $this->get("_in_job_type_and_sub_type");
 		if ($jobTypeAndSubTypeIn !== null)
 		{
-
+			$type = $this->queryFromBatchJob ? BatchJobPeer::JOB_TYPE: BatchJobLockPeer::JOB_TYPE;
+			$subType =  $this->queryFromBatchJob ? BatchJobPeer::JOB_SUB_TYPE : BatchJobLockPeer::JOB_SUB_TYPE;
+			
 			$finalTypesAndSubTypes = array();
 			$arr = explode(self::JOB_TYPE_AND_SUB_TYPE_MAIN_DELIMITER, $jobTypeAndSubTypeIn);
 			foreach($arr as $jobTypeIn)
@@ -115,13 +139,13 @@ class BatchJobFilter extends baseObjectFilter
 						{
 							$finalSubTypesArr = explode(self::JOB_TYPE_AND_SUB_TYPE_SUB_DELIMITER, $finalSubTypes);
 							
-							$jobTypeCriterion = $criteria->getNewCriterion(BatchJobPeer::JOB_TYPE, $finalJobType);
-							$jobTypeCriterion->addAnd($criteria->getNewCriterion(BatchJobPeer::JOB_SUB_TYPE, $finalSubTypesArr, Criteria::IN));
+							$jobTypeCriterion = $criteria->getNewCriterion($type, $finalJobType);
+							$jobTypeCriterion->addAnd($criteria->getNewCriterion($subType, $finalSubTypesArr, Criteria::IN));
 							$mainCriterion->addOr($jobTypeCriterion);
 						}
 						else
 						{
-							$jobTypeCriterion = $criteria->getNewCriterion(BatchJobPeer::JOB_TYPE, $finalJobType);
+							$jobTypeCriterion = $criteria->getNewCriterion($type, $finalJobType);
 							$mainCriterion->addOr($jobTypeCriterion);
 						}
 					}
@@ -131,12 +155,12 @@ class BatchJobFilter extends baseObjectFilter
 						{
 							$finalSubTypesArr = explode(self::JOB_TYPE_AND_SUB_TYPE_SUB_DELIMITER, $finalSubTypes);
 							
-							$mainCriterion = $criteria->getNewCriterion(BatchJobPeer::JOB_TYPE, $finalJobType);
-							$mainCriterion->addAnd($criteria->getNewCriterion(BatchJobPeer::JOB_SUB_TYPE, $finalSubTypesArr, Criteria::IN));
+							$mainCriterion = $criteria->getNewCriterion($type, $finalJobType);
+							$mainCriterion->addAnd($criteria->getNewCriterion($subType, $finalSubTypesArr, Criteria::IN));
 						}
 						else
 						{
-							$mainCriterion = $criteria->getNewCriterion(BatchJobPeer::JOB_TYPE, $finalJobType);
+							$mainCriterion = $criteria->getNewCriterion($type, $finalJobType);
 						}
 					}
 				}

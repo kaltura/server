@@ -558,6 +558,8 @@ class kMetadataManager
 	{
 		$job = new BatchJob();
 		$job->setPartnerId($partnerId);
+		$job->setObjectType(MetadataBatchJobObjectType::METADATA);
+		$job->setObjectId($metadataId);
 		
 		$data = new kImportMetadataJobData();
 		$data->setMetadataId($metadataId);
@@ -587,6 +589,8 @@ class kMetadataManager
 		
 		$job = new BatchJob();
 		$job->setPartnerId($partnerId);
+		$job->setObjectId($metadataProfileId);
+		$job->setObjectType(MetadataBatchJobObjectType::METADATA_PROFILE);
 		$data = new kTransformMetadataJobData();
 		
 		if($xsl)

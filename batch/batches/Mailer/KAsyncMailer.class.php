@@ -9,7 +9,7 @@
  * The state machine of the job is as follows:
  * 	 	parse URL	(youTube is a special case) 
  * 		fetch heraders (to calculate the size of the file)
- * 		fetch file (update the job's progress - 100% is when the whole file as appeared in the header)
+ * 		fetch file 
  * 		move the file to the archive
  * 		set the entry's new status and file details  (check if FLV) 
  *

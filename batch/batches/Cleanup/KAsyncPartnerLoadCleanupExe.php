@@ -1,12 +1,12 @@
 <?php
 /**
- * Will run KAsyncConvert
+ * Will run the KAsyncPartnerLoadCleanup 
  *
  * @package Scheduler
- * @subpackage Conversion
+ * @subpackage Cleanup
  */
 require_once("bootstrap.php");
 
-$instance = new KAsyncDivertConvert();
+$instance = new KAsyncPartnerLoadCleanup ( );
 $instance->run(); 
 $instance->done();

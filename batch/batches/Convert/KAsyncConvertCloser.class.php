@@ -117,7 +117,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 			{
 				$updateData = new KalturaConvertJobData();
 				$updateData->destFileSyncRemoteUrl = $data->destFileSyncRemoteUrl;
-				$this->updateJob($job, $errMessage, KalturaBatchJobStatus::ALMOST_DONE, 90, $updateData);
+				$this->updateJob($job, $errMessage, KalturaBatchJobStatus::ALMOST_DONE, $updateData);
 			}
 			else
 			{
@@ -135,7 +135,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		
 		// creates a temp file path
 		$uniqid = uniqid('convert_');
-		$data->destFileSyncLocalPath = "{$this->localTempPath}/$uniqid";
+		$data->destFileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid;
 	
 		$err = null;
 		if(!$this->fetchFile($data->destFileSyncRemoteUrl, $data->destFileSyncLocalPath, $err))
@@ -152,7 +152,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		KalturaLog::debug("moveFile($job->id, $data->destFileSyncLocalPath)");
 		
 		$uniqid = uniqid('convert_');
-		$sharedFile = "{$this->sharedTempPath}/$uniqid";
+		$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . $uniqid;
 		
 		try
 		{

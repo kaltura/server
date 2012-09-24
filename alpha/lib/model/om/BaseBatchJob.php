@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Base class that represents a row from the 'batch_job' table.
+ * Base class that represents a row from the 'batch_job_sep' table.
  *
  * 
  *
@@ -38,22 +38,35 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	protected $job_sub_type;
 
 	/**
+	 * The value for the object_id field.
+	 * Note: this column has a database default value of: ''
+	 * @var        string
+	 */
+	protected $object_id;
+
+	/**
+	 * The value for the object_type field.
+	 * @var        int
+	 */
+	protected $object_type;
+
+	/**
 	 * The value for the data field.
 	 * @var        string
 	 */
 	protected $data;
 
 	/**
-	 * The value for the file_size field.
-	 * @var        int
-	 */
-	protected $file_size;
-
-	/**
-	 * The value for the duplication_key field.
+	 * The value for the history field.
 	 * @var        string
 	 */
-	protected $duplication_key;
+	protected $history;
+
+	/**
+	 * The value for the lock_info field.
+	 * @var        string
+	 */
+	protected $lock_info;
 
 	/**
 	 * The value for the status field.
@@ -62,22 +75,10 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	protected $status;
 
 	/**
-	 * The value for the abort field.
+	 * The value for the execution_status field.
 	 * @var        int
 	 */
-	protected $abort;
-
-	/**
-	 * The value for the check_again_timeout field.
-	 * @var        int
-	 */
-	protected $check_again_timeout;
-
-	/**
-	 * The value for the progress field.
-	 * @var        int
-	 */
-	protected $progress;
+	protected $execution_status;
 
 	/**
 	 * The value for the message field.
@@ -92,34 +93,16 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	protected $description;
 
 	/**
-	 * The value for the updates_count field.
-	 * @var        int
-	 */
-	protected $updates_count;
-
-	/**
 	 * The value for the created_at field.
 	 * @var        string
 	 */
 	protected $created_at;
 
 	/**
-	 * The value for the created_by field.
-	 * @var        string
-	 */
-	protected $created_by;
-
-	/**
 	 * The value for the updated_at field.
 	 * @var        string
 	 */
 	protected $updated_at;
-
-	/**
-	 * The value for the updated_by field.
-	 * @var        string
-	 */
-	protected $updated_by;
 
 	/**
 	 * The value for the deleted_at field.
@@ -132,12 +115,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	 * @var        int
 	 */
 	protected $priority;
-
-	/**
-	 * The value for the work_group_id field.
-	 * @var        int
-	 */
-	protected $work_group_id;
 
 	/**
 	 * The value for the queue_time field.
@@ -166,23 +143,22 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	protected $partner_id;
 
 	/**
-	 * The value for the subp_id field.
-	 * Note: this column has a database default value of: 0
+	 * The value for the bulk_job_id field.
 	 * @var        int
 	 */
-	protected $subp_id;
+	protected $bulk_job_id;
 
 	/**
-	 * The value for the scheduler_id field.
+	 * The value for the root_job_id field.
 	 * @var        int
 	 */
-	protected $scheduler_id;
+	protected $root_job_id;
 
 	/**
-	 * The value for the worker_id field.
+	 * The value for the parent_job_id field.
 	 * @var        int
 	 */
-	protected $worker_id;
+	protected $parent_job_id;
 
 	/**
 	 * The value for the batch_index field.
@@ -203,54 +179,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	protected $last_worker_id;
 
 	/**
-	 * The value for the last_worker_remote field.
-	 * @var        boolean
-	 */
-	protected $last_worker_remote;
-
-	/**
-	 * The value for the processor_expiration field.
-	 * @var        string
-	 */
-	protected $processor_expiration;
-
-	/**
-	 * The value for the execution_attempts field.
-	 * @var        int
-	 */
-	protected $execution_attempts;
-
-	/**
-	 * The value for the lock_version field.
-	 * @var        int
-	 */
-	protected $lock_version;
-
-	/**
-	 * The value for the twin_job_id field.
-	 * @var        int
-	 */
-	protected $twin_job_id;
-
-	/**
-	 * The value for the bulk_job_id field.
-	 * @var        int
-	 */
-	protected $bulk_job_id;
-
-	/**
-	 * The value for the root_job_id field.
-	 * @var        int
-	 */
-	protected $root_job_id;
-
-	/**
-	 * The value for the parent_job_id field.
-	 * @var        int
-	 */
-	protected $parent_job_id;
-
-	/**
 	 * The value for the dc field.
 	 * @var        int
 	 */
@@ -269,10 +197,25 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	protected $err_number;
 
 	/**
-	 * The value for the on_stress_divert_to field.
+	 * The value for the batch_job_lock_id field.
 	 * @var        int
 	 */
-	protected $on_stress_divert_to;
+	protected $batch_job_lock_id;
+
+	/**
+	 * @var        BatchJobLock
+	 */
+	protected $aBatchJobLock;
+
+	/**
+	 * @var        array BatchJobLock[] Collection to store aggregation of BatchJobLock objects.
+	 */
+	protected $collBatchJobLocks;
+
+	/**
+	 * @var        Criteria The criteria used to select the current contents of collBatchJobLocks.
+	 */
+	private $lastBatchJobLockCriteria = null;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -327,9 +270,9 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	 */
 	public function applyDefaultValues()
 	{
+		$this->object_id = '';
 		$this->entry_id = '';
 		$this->partner_id = 0;
-		$this->subp_id = 0;
 	}
 
 	/**
@@ -373,6 +316,26 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Get the [object_id] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getObjectId()
+	{
+		return $this->object_id;
+	}
+
+	/**
+	 * Get the [object_type] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getObjectType()
+	{
+		return $this->object_type;
+	}
+
+	/**
 	 * Get the [data] column value.
 	 * 
 	 * @return     string
@@ -383,23 +346,23 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [file_size] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getFileSize()
-	{
-		return $this->file_size;
-	}
-
-	/**
-	 * Get the [duplication_key] column value.
+	 * Get the [history] column value.
 	 * 
 	 * @return     string
 	 */
-	public function getDuplicationKey()
+	public function getHistory()
 	{
-		return $this->duplication_key;
+		return $this->history;
+	}
+
+	/**
+	 * Get the [lock_info] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getLockInfo()
+	{
+		return $this->lock_info;
 	}
 
 	/**
@@ -413,33 +376,13 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [abort] column value.
+	 * Get the [execution_status] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getAbort()
+	public function getExecutionStatus()
 	{
-		return $this->abort;
-	}
-
-	/**
-	 * Get the [check_again_timeout] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getCheckAgainTimeout()
-	{
-		return $this->check_again_timeout;
-	}
-
-	/**
-	 * Get the [progress] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getProgress()
-	{
-		return $this->progress;
+		return $this->execution_status;
 	}
 
 	/**
@@ -460,16 +403,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function getDescription()
 	{
 		return $this->description;
-	}
-
-	/**
-	 * Get the [updates_count] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getUpdatesCount()
-	{
-		return $this->updates_count;
 	}
 
 	/**
@@ -513,16 +446,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [created_by] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getCreatedBy()
-	{
-		return $this->created_by;
-	}
-
-	/**
 	 * Get the [optionally formatted] temporal [updated_at] column value.
 	 * 
 	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
@@ -560,16 +483,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
-	}
-
-	/**
-	 * Get the [updated_by] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getUpdatedBy()
-	{
-		return $this->updated_by;
 	}
 
 	/**
@@ -620,16 +533,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function getPriority()
 	{
 		return $this->priority;
-	}
-
-	/**
-	 * Get the [work_group_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getWorkGroupId()
-	{
-		return $this->work_group_id;
 	}
 
 	/**
@@ -733,33 +636,33 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [subp_id] column value.
+	 * Get the [bulk_job_id] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getSubpId()
+	public function getBulkJobId()
 	{
-		return $this->subp_id;
+		return $this->bulk_job_id;
 	}
 
 	/**
-	 * Get the [scheduler_id] column value.
+	 * Get the [root_job_id] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getSchedulerId()
+	public function getRootJobId()
 	{
-		return $this->scheduler_id;
+		return $this->root_job_id;
 	}
 
 	/**
-	 * Get the [worker_id] column value.
+	 * Get the [parent_job_id] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getWorkerId()
+	public function getParentJobId()
 	{
-		return $this->worker_id;
+		return $this->parent_job_id;
 	}
 
 	/**
@@ -793,116 +696,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [last_worker_remote] column value.
-	 * 
-	 * @return     boolean
-	 */
-	public function getLastWorkerRemote()
-	{
-		return $this->last_worker_remote;
-	}
-
-	/**
-	 * Get the [optionally formatted] temporal [processor_expiration] column value.
-	 * 
-	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
-	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
-	 *
-	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
-	 *							If format is NULL, then the raw unix timestamp integer will be returned.
-	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-	 * @throws     PropelException - if unable to parse/validate the date/time value.
-	 */
-	public function getProcessorExpiration($format = 'Y-m-d H:i:s')
-	{
-		if ($this->processor_expiration === null) {
-			return null;
-		}
-
-
-		if ($this->processor_expiration === '0000-00-00 00:00:00') {
-			// while technically this is not a default value of NULL,
-			// this seems to be closest in meaning.
-			return null;
-		} else {
-			try {
-				$dt = new DateTime($this->processor_expiration);
-			} catch (Exception $x) {
-				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->processor_expiration, true), $x);
-			}
-		}
-
-		if ($format === null) {
-			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
-			return (int) $dt->format('U');
-		} elseif (strpos($format, '%') !== false) {
-			return strftime($format, $dt->format('U'));
-		} else {
-			return $dt->format($format);
-		}
-	}
-
-	/**
-	 * Get the [execution_attempts] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getExecutionAttempts()
-	{
-		return $this->execution_attempts;
-	}
-
-	/**
-	 * Get the [lock_version] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getLockVersion()
-	{
-		return $this->lock_version;
-	}
-
-	/**
-	 * Get the [twin_job_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getTwinJobId()
-	{
-		return $this->twin_job_id;
-	}
-
-	/**
-	 * Get the [bulk_job_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getBulkJobId()
-	{
-		return $this->bulk_job_id;
-	}
-
-	/**
-	 * Get the [root_job_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getRootJobId()
-	{
-		return $this->root_job_id;
-	}
-
-	/**
-	 * Get the [parent_job_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getParentJobId()
-	{
-		return $this->parent_job_id;
-	}
-
-	/**
 	 * Get the [dc] column value.
 	 * 
 	 * @return     int
@@ -933,13 +726,13 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [on_stress_divert_to] column value.
+	 * Get the [batch_job_lock_id] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getOnStressDivertTo()
+	public function getBatchJobLockId()
 	{
-		return $this->on_stress_divert_to;
+		return $this->batch_job_lock_id;
 	}
 
 	/**
@@ -1012,6 +805,52 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	} // setJobSubType()
 
 	/**
+	 * Set the value of [object_id] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     BatchJob The current object (for fluent API support)
+	 */
+	public function setObjectId($v)
+	{
+		if(!isset($this->oldColumnsValues[BatchJobPeer::OBJECT_ID]))
+			$this->oldColumnsValues[BatchJobPeer::OBJECT_ID] = $this->object_id;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->object_id !== $v || $this->isNew()) {
+			$this->object_id = $v;
+			$this->modifiedColumns[] = BatchJobPeer::OBJECT_ID;
+		}
+
+		return $this;
+	} // setObjectId()
+
+	/**
+	 * Set the value of [object_type] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     BatchJob The current object (for fluent API support)
+	 */
+	public function setObjectType($v)
+	{
+		if(!isset($this->oldColumnsValues[BatchJobPeer::OBJECT_TYPE]))
+			$this->oldColumnsValues[BatchJobPeer::OBJECT_TYPE] = $this->object_type;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->object_type !== $v) {
+			$this->object_type = $v;
+			$this->modifiedColumns[] = BatchJobPeer::OBJECT_TYPE;
+		}
+
+		return $this;
+	} // setObjectType()
+
+	/**
 	 * Set the value of [data] column.
 	 * 
 	 * @param      string $v new value
@@ -1035,50 +874,50 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	} // setData()
 
 	/**
-	 * Set the value of [file_size] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setFileSize($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::FILE_SIZE]))
-			$this->oldColumnsValues[BatchJobPeer::FILE_SIZE] = $this->file_size;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->file_size !== $v) {
-			$this->file_size = $v;
-			$this->modifiedColumns[] = BatchJobPeer::FILE_SIZE;
-		}
-
-		return $this;
-	} // setFileSize()
-
-	/**
-	 * Set the value of [duplication_key] column.
+	 * Set the value of [history] column.
 	 * 
 	 * @param      string $v new value
 	 * @return     BatchJob The current object (for fluent API support)
 	 */
-	public function setDuplicationKey($v)
+	public function setHistory($v)
 	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::DUPLICATION_KEY]))
-			$this->oldColumnsValues[BatchJobPeer::DUPLICATION_KEY] = $this->duplication_key;
+		if(!isset($this->oldColumnsValues[BatchJobPeer::HISTORY]))
+			$this->oldColumnsValues[BatchJobPeer::HISTORY] = $this->history;
 
 		if ($v !== null) {
 			$v = (string) $v;
 		}
 
-		if ($this->duplication_key !== $v) {
-			$this->duplication_key = $v;
-			$this->modifiedColumns[] = BatchJobPeer::DUPLICATION_KEY;
+		if ($this->history !== $v) {
+			$this->history = $v;
+			$this->modifiedColumns[] = BatchJobPeer::HISTORY;
 		}
 
 		return $this;
-	} // setDuplicationKey()
+	} // setHistory()
+
+	/**
+	 * Set the value of [lock_info] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     BatchJob The current object (for fluent API support)
+	 */
+	public function setLockInfo($v)
+	{
+		if(!isset($this->oldColumnsValues[BatchJobPeer::LOCK_INFO]))
+			$this->oldColumnsValues[BatchJobPeer::LOCK_INFO] = $this->lock_info;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->lock_info !== $v) {
+			$this->lock_info = $v;
+			$this->modifiedColumns[] = BatchJobPeer::LOCK_INFO;
+		}
+
+		return $this;
+	} // setLockInfo()
 
 	/**
 	 * Set the value of [status] column.
@@ -1104,73 +943,27 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	} // setStatus()
 
 	/**
-	 * Set the value of [abort] column.
+	 * Set the value of [execution_status] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     BatchJob The current object (for fluent API support)
 	 */
-	public function setAbort($v)
+	public function setExecutionStatus($v)
 	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::ABORT]))
-			$this->oldColumnsValues[BatchJobPeer::ABORT] = $this->abort;
+		if(!isset($this->oldColumnsValues[BatchJobPeer::EXECUTION_STATUS]))
+			$this->oldColumnsValues[BatchJobPeer::EXECUTION_STATUS] = $this->execution_status;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->abort !== $v) {
-			$this->abort = $v;
-			$this->modifiedColumns[] = BatchJobPeer::ABORT;
+		if ($this->execution_status !== $v) {
+			$this->execution_status = $v;
+			$this->modifiedColumns[] = BatchJobPeer::EXECUTION_STATUS;
 		}
 
 		return $this;
-	} // setAbort()
-
-	/**
-	 * Set the value of [check_again_timeout] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setCheckAgainTimeout($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::CHECK_AGAIN_TIMEOUT]))
-			$this->oldColumnsValues[BatchJobPeer::CHECK_AGAIN_TIMEOUT] = $this->check_again_timeout;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->check_again_timeout !== $v) {
-			$this->check_again_timeout = $v;
-			$this->modifiedColumns[] = BatchJobPeer::CHECK_AGAIN_TIMEOUT;
-		}
-
-		return $this;
-	} // setCheckAgainTimeout()
-
-	/**
-	 * Set the value of [progress] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setProgress($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::PROGRESS]))
-			$this->oldColumnsValues[BatchJobPeer::PROGRESS] = $this->progress;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->progress !== $v) {
-			$this->progress = $v;
-			$this->modifiedColumns[] = BatchJobPeer::PROGRESS;
-		}
-
-		return $this;
-	} // setProgress()
+	} // setExecutionStatus()
 
 	/**
 	 * Set the value of [message] column.
@@ -1217,29 +1010,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setDescription()
-
-	/**
-	 * Set the value of [updates_count] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setUpdatesCount($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::UPDATES_COUNT]))
-			$this->oldColumnsValues[BatchJobPeer::UPDATES_COUNT] = $this->updates_count;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->updates_count !== $v) {
-			$this->updates_count = $v;
-			$this->modifiedColumns[] = BatchJobPeer::UPDATES_COUNT;
-		}
-
-		return $this;
-	} // setUpdatesCount()
 
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -1291,29 +1061,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	} // setCreatedAt()
 
 	/**
-	 * Set the value of [created_by] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setCreatedBy($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::CREATED_BY]))
-			$this->oldColumnsValues[BatchJobPeer::CREATED_BY] = $this->created_by;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->created_by !== $v) {
-			$this->created_by = $v;
-			$this->modifiedColumns[] = BatchJobPeer::CREATED_BY;
-		}
-
-		return $this;
-	} // setCreatedBy()
-
-	/**
 	 * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
@@ -1361,29 +1108,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setUpdatedAt()
-
-	/**
-	 * Set the value of [updated_by] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setUpdatedBy($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::UPDATED_BY]))
-			$this->oldColumnsValues[BatchJobPeer::UPDATED_BY] = $this->updated_by;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->updated_by !== $v) {
-			$this->updated_by = $v;
-			$this->modifiedColumns[] = BatchJobPeer::UPDATED_BY;
-		}
-
-		return $this;
-	} // setUpdatedBy()
 
 	/**
 	 * Sets the value of [deleted_at] column to a normalized version of the date/time value specified.
@@ -1459,29 +1183,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setPriority()
-
-	/**
-	 * Set the value of [work_group_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setWorkGroupId($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::WORK_GROUP_ID]))
-			$this->oldColumnsValues[BatchJobPeer::WORK_GROUP_ID] = $this->work_group_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->work_group_id !== $v) {
-			$this->work_group_id = $v;
-			$this->modifiedColumns[] = BatchJobPeer::WORK_GROUP_ID;
-		}
-
-		return $this;
-	} // setWorkGroupId()
 
 	/**
 	 * Sets the value of [queue_time] column to a normalized version of the date/time value specified.
@@ -1634,73 +1335,73 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	} // setPartnerId()
 
 	/**
-	 * Set the value of [subp_id] column.
+	 * Set the value of [bulk_job_id] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     BatchJob The current object (for fluent API support)
 	 */
-	public function setSubpId($v)
+	public function setBulkJobId($v)
 	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::SUBP_ID]))
-			$this->oldColumnsValues[BatchJobPeer::SUBP_ID] = $this->subp_id;
+		if(!isset($this->oldColumnsValues[BatchJobPeer::BULK_JOB_ID]))
+			$this->oldColumnsValues[BatchJobPeer::BULK_JOB_ID] = $this->bulk_job_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->subp_id !== $v || $this->isNew()) {
-			$this->subp_id = $v;
-			$this->modifiedColumns[] = BatchJobPeer::SUBP_ID;
+		if ($this->bulk_job_id !== $v) {
+			$this->bulk_job_id = $v;
+			$this->modifiedColumns[] = BatchJobPeer::BULK_JOB_ID;
 		}
 
 		return $this;
-	} // setSubpId()
+	} // setBulkJobId()
 
 	/**
-	 * Set the value of [scheduler_id] column.
+	 * Set the value of [root_job_id] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     BatchJob The current object (for fluent API support)
 	 */
-	public function setSchedulerId($v)
+	public function setRootJobId($v)
 	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::SCHEDULER_ID]))
-			$this->oldColumnsValues[BatchJobPeer::SCHEDULER_ID] = $this->scheduler_id;
+		if(!isset($this->oldColumnsValues[BatchJobPeer::ROOT_JOB_ID]))
+			$this->oldColumnsValues[BatchJobPeer::ROOT_JOB_ID] = $this->root_job_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->scheduler_id !== $v) {
-			$this->scheduler_id = $v;
-			$this->modifiedColumns[] = BatchJobPeer::SCHEDULER_ID;
+		if ($this->root_job_id !== $v) {
+			$this->root_job_id = $v;
+			$this->modifiedColumns[] = BatchJobPeer::ROOT_JOB_ID;
 		}
 
 		return $this;
-	} // setSchedulerId()
+	} // setRootJobId()
 
 	/**
-	 * Set the value of [worker_id] column.
+	 * Set the value of [parent_job_id] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     BatchJob The current object (for fluent API support)
 	 */
-	public function setWorkerId($v)
+	public function setParentJobId($v)
 	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::WORKER_ID]))
-			$this->oldColumnsValues[BatchJobPeer::WORKER_ID] = $this->worker_id;
+		if(!isset($this->oldColumnsValues[BatchJobPeer::PARENT_JOB_ID]))
+			$this->oldColumnsValues[BatchJobPeer::PARENT_JOB_ID] = $this->parent_job_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->worker_id !== $v) {
-			$this->worker_id = $v;
-			$this->modifiedColumns[] = BatchJobPeer::WORKER_ID;
+		if ($this->parent_job_id !== $v) {
+			$this->parent_job_id = $v;
+			$this->modifiedColumns[] = BatchJobPeer::PARENT_JOB_ID;
 		}
 
 		return $this;
-	} // setWorkerId()
+	} // setParentJobId()
 
 	/**
 	 * Set the value of [batch_index] column.
@@ -1772,219 +1473,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	} // setLastWorkerId()
 
 	/**
-	 * Set the value of [last_worker_remote] column.
-	 * 
-	 * @param      boolean $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setLastWorkerRemote($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::LAST_WORKER_REMOTE]))
-			$this->oldColumnsValues[BatchJobPeer::LAST_WORKER_REMOTE] = $this->last_worker_remote;
-
-		if ($v !== null) {
-			$v = (boolean) $v;
-		}
-
-		if ($this->last_worker_remote !== $v) {
-			$this->last_worker_remote = $v;
-			$this->modifiedColumns[] = BatchJobPeer::LAST_WORKER_REMOTE;
-		}
-
-		return $this;
-	} // setLastWorkerRemote()
-
-	/**
-	 * Sets the value of [processor_expiration] column to a normalized version of the date/time value specified.
-	 * 
-	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setProcessorExpiration($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::PROCESSOR_EXPIRATION]))
-			$this->oldColumnsValues[BatchJobPeer::PROCESSOR_EXPIRATION] = $this->processor_expiration;
-
-		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
-		// -- which is unexpected, to say the least.
-		if ($v === null || $v === '') {
-			$dt = null;
-		} elseif ($v instanceof DateTime) {
-			$dt = $v;
-		} else {
-			// some string/numeric value passed; we normalize that so that we can
-			// validate it.
-			try {
-				if (is_numeric($v)) { // if it's a unix timestamp
-					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
-					// We have to explicitly specify and then change the time zone because of a
-					// DateTime bug: http://bugs.php.net/bug.php?id=43003
-					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
-				} else {
-					$dt = new DateTime($v);
-				}
-			} catch (Exception $x) {
-				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
-			}
-		}
-
-		if ( $this->processor_expiration !== null || $dt !== null ) {
-			// (nested ifs are a little easier to read in this case)
-
-			$currNorm = ($this->processor_expiration !== null && $tmpDt = new DateTime($this->processor_expiration)) ? $tmpDt->format('Y-m-d H:i:s') : null;
-			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
-
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
-			{
-				$this->processor_expiration = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = BatchJobPeer::PROCESSOR_EXPIRATION;
-			}
-		} // if either are not null
-
-		return $this;
-	} // setProcessorExpiration()
-
-	/**
-	 * Set the value of [execution_attempts] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setExecutionAttempts($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::EXECUTION_ATTEMPTS]))
-			$this->oldColumnsValues[BatchJobPeer::EXECUTION_ATTEMPTS] = $this->execution_attempts;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->execution_attempts !== $v) {
-			$this->execution_attempts = $v;
-			$this->modifiedColumns[] = BatchJobPeer::EXECUTION_ATTEMPTS;
-		}
-
-		return $this;
-	} // setExecutionAttempts()
-
-	/**
-	 * Set the value of [lock_version] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setLockVersion($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::LOCK_VERSION]))
-			$this->oldColumnsValues[BatchJobPeer::LOCK_VERSION] = $this->lock_version;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->lock_version !== $v) {
-			$this->lock_version = $v;
-			$this->modifiedColumns[] = BatchJobPeer::LOCK_VERSION;
-		}
-
-		return $this;
-	} // setLockVersion()
-
-	/**
-	 * Set the value of [twin_job_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setTwinJobId($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::TWIN_JOB_ID]))
-			$this->oldColumnsValues[BatchJobPeer::TWIN_JOB_ID] = $this->twin_job_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->twin_job_id !== $v) {
-			$this->twin_job_id = $v;
-			$this->modifiedColumns[] = BatchJobPeer::TWIN_JOB_ID;
-		}
-
-		return $this;
-	} // setTwinJobId()
-
-	/**
-	 * Set the value of [bulk_job_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setBulkJobId($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::BULK_JOB_ID]))
-			$this->oldColumnsValues[BatchJobPeer::BULK_JOB_ID] = $this->bulk_job_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->bulk_job_id !== $v) {
-			$this->bulk_job_id = $v;
-			$this->modifiedColumns[] = BatchJobPeer::BULK_JOB_ID;
-		}
-
-		return $this;
-	} // setBulkJobId()
-
-	/**
-	 * Set the value of [root_job_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setRootJobId($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::ROOT_JOB_ID]))
-			$this->oldColumnsValues[BatchJobPeer::ROOT_JOB_ID] = $this->root_job_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->root_job_id !== $v) {
-			$this->root_job_id = $v;
-			$this->modifiedColumns[] = BatchJobPeer::ROOT_JOB_ID;
-		}
-
-		return $this;
-	} // setRootJobId()
-
-	/**
-	 * Set the value of [parent_job_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setParentJobId($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::PARENT_JOB_ID]))
-			$this->oldColumnsValues[BatchJobPeer::PARENT_JOB_ID] = $this->parent_job_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->parent_job_id !== $v) {
-			$this->parent_job_id = $v;
-			$this->modifiedColumns[] = BatchJobPeer::PARENT_JOB_ID;
-		}
-
-		return $this;
-	} // setParentJobId()
-
-	/**
 	 * Set the value of [dc] column.
 	 * 
 	 * @param      int $v new value
@@ -2054,27 +1542,31 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	} // setErrNumber()
 
 	/**
-	 * Set the value of [on_stress_divert_to] column.
+	 * Set the value of [batch_job_lock_id] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     BatchJob The current object (for fluent API support)
 	 */
-	public function setOnStressDivertTo($v)
+	public function setBatchJobLockId($v)
 	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::ON_STRESS_DIVERT_TO]))
-			$this->oldColumnsValues[BatchJobPeer::ON_STRESS_DIVERT_TO] = $this->on_stress_divert_to;
+		if(!isset($this->oldColumnsValues[BatchJobPeer::BATCH_JOB_LOCK_ID]))
+			$this->oldColumnsValues[BatchJobPeer::BATCH_JOB_LOCK_ID] = $this->batch_job_lock_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->on_stress_divert_to !== $v) {
-			$this->on_stress_divert_to = $v;
-			$this->modifiedColumns[] = BatchJobPeer::ON_STRESS_DIVERT_TO;
+		if ($this->batch_job_lock_id !== $v) {
+			$this->batch_job_lock_id = $v;
+			$this->modifiedColumns[] = BatchJobPeer::BATCH_JOB_LOCK_ID;
+		}
+
+		if ($this->aBatchJobLock !== null && $this->aBatchJobLock->getId() !== $v) {
+			$this->aBatchJobLock = null;
 		}
 
 		return $this;
-	} // setOnStressDivertTo()
+	} // setBatchJobLockId()
 
 	/**
 	 * Indicates whether the columns in this object are only set to default values.
@@ -2086,15 +1578,15 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
+			if ($this->object_id !== '') {
+				return false;
+			}
+
 			if ($this->entry_id !== '') {
 				return false;
 			}
 
 			if ($this->partner_id !== 0) {
-				return false;
-			}
-
-			if ($this->subp_id !== 0) {
 				return false;
 			}
 
@@ -2123,45 +1615,33 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->job_type = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->job_sub_type = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-			$this->data = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->file_size = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->duplication_key = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->abort = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->check_again_timeout = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->progress = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->object_id = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+			$this->object_type = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+			$this->data = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->history = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->lock_info = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->execution_status = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
 			$this->message = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
 			$this->description = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->updates_count = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-			$this->created_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->created_by = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->updated_at = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-			$this->updated_by = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-			$this->deleted_at = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-			$this->priority = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
-			$this->work_group_id = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
-			$this->queue_time = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
-			$this->finish_time = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
-			$this->entry_id = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
-			$this->partner_id = ($row[$startcol + 23] !== null) ? (int) $row[$startcol + 23] : null;
-			$this->subp_id = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
-			$this->scheduler_id = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
-			$this->worker_id = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
-			$this->batch_index = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
-			$this->last_scheduler_id = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
-			$this->last_worker_id = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
-			$this->last_worker_remote = ($row[$startcol + 30] !== null) ? (boolean) $row[$startcol + 30] : null;
-			$this->processor_expiration = ($row[$startcol + 31] !== null) ? (string) $row[$startcol + 31] : null;
-			$this->execution_attempts = ($row[$startcol + 32] !== null) ? (int) $row[$startcol + 32] : null;
-			$this->lock_version = ($row[$startcol + 33] !== null) ? (int) $row[$startcol + 33] : null;
-			$this->twin_job_id = ($row[$startcol + 34] !== null) ? (int) $row[$startcol + 34] : null;
-			$this->bulk_job_id = ($row[$startcol + 35] !== null) ? (int) $row[$startcol + 35] : null;
-			$this->root_job_id = ($row[$startcol + 36] !== null) ? (int) $row[$startcol + 36] : null;
-			$this->parent_job_id = ($row[$startcol + 37] !== null) ? (int) $row[$startcol + 37] : null;
-			$this->dc = ($row[$startcol + 38] !== null) ? (int) $row[$startcol + 38] : null;
-			$this->err_type = ($row[$startcol + 39] !== null) ? (int) $row[$startcol + 39] : null;
-			$this->err_number = ($row[$startcol + 40] !== null) ? (int) $row[$startcol + 40] : null;
-			$this->on_stress_divert_to = ($row[$startcol + 41] !== null) ? (int) $row[$startcol + 41] : null;
+			$this->created_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->updated_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->deleted_at = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->priority = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
+			$this->queue_time = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->finish_time = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->entry_id = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
+			$this->partner_id = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
+			$this->bulk_job_id = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
+			$this->root_job_id = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
+			$this->parent_job_id = ($row[$startcol + 22] !== null) ? (int) $row[$startcol + 22] : null;
+			$this->batch_index = ($row[$startcol + 23] !== null) ? (int) $row[$startcol + 23] : null;
+			$this->last_scheduler_id = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
+			$this->last_worker_id = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
+			$this->dc = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
+			$this->err_type = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
+			$this->err_number = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
+			$this->batch_job_lock_id = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -2171,7 +1651,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 42; // 42 = BatchJobPeer::NUM_COLUMNS - BatchJobPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 30; // 30 = BatchJobPeer::NUM_COLUMNS - BatchJobPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating BatchJob object", $e);
@@ -2194,6 +1674,9 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function ensureConsistency()
 	{
 
+		if ($this->aBatchJobLock !== null && $this->batch_job_lock_id !== $this->aBatchJobLock->getId()) {
+			$this->aBatchJobLock = null;
+		}
 	} // ensureConsistency
 
 	/**
@@ -2234,6 +1717,10 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 		$this->hydrate($row, 0, true); // rehydrate
 
 		if ($deep) {  // also de-associate any related objects?
+
+			$this->aBatchJobLock = null;
+			$this->collBatchJobLocks = null;
+			$this->lastBatchJobLockCriteria = null;
 
 		} // if (deep)
 	}
@@ -2348,6 +1835,18 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 		if (!$this->alreadyInSave) {
 			$this->alreadyInSave = true;
 
+			// We call the save method on the following object(s) if they
+			// were passed to this object by their coresponding set
+			// method.  This object relates to these object(s) by a
+			// foreign key reference.
+
+			if ($this->aBatchJobLock !== null) {
+				if ($this->aBatchJobLock->isModified() || $this->aBatchJobLock->isNew()) {
+					$affectedRows += $this->aBatchJobLock->save($con);
+				}
+				$this->setBatchJobLock($this->aBatchJobLock);
+			}
+
 			if ($this->isNew() ) {
 				$this->modifiedColumns[] = BatchJobPeer::ID;
 			}
@@ -2374,6 +1873,14 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 				}
 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
+			}
+
+			if ($this->collBatchJobLocks !== null) {
+				foreach ($this->collBatchJobLocks as $referrerFK) {
+					if (!$referrerFK->isDeleted()) {
+						$affectedRows += $referrerFK->save($con);
+					}
+				}
 			}
 
 			$this->alreadyInSave = false;
@@ -2580,10 +2087,30 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			$failureMap = array();
 
 
+			// We call the validate method on the following object(s) if they
+			// were passed to this object by their coresponding set
+			// method.  This object relates to these object(s) by a
+			// foreign key reference.
+
+			if ($this->aBatchJobLock !== null) {
+				if (!$this->aBatchJobLock->validate($columns)) {
+					$failureMap = array_merge($failureMap, $this->aBatchJobLock->getValidationFailures());
+				}
+			}
+
+
 			if (($retval = BatchJobPeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
 			}
 
+
+				if ($this->collBatchJobLocks !== null) {
+					foreach ($this->collBatchJobLocks as $referrerFK) {
+						if (!$referrerFK->validate($columns)) {
+							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+						}
+					}
+				}
 
 
 			$this->alreadyInValidation = false;
@@ -2628,25 +2155,25 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 				return $this->getJobSubType();
 				break;
 			case 3:
-				return $this->getData();
+				return $this->getObjectId();
 				break;
 			case 4:
-				return $this->getFileSize();
+				return $this->getObjectType();
 				break;
 			case 5:
-				return $this->getDuplicationKey();
+				return $this->getData();
 				break;
 			case 6:
-				return $this->getStatus();
+				return $this->getHistory();
 				break;
 			case 7:
-				return $this->getAbort();
+				return $this->getLockInfo();
 				break;
 			case 8:
-				return $this->getCheckAgainTimeout();
+				return $this->getStatus();
 				break;
 			case 9:
-				return $this->getProgress();
+				return $this->getExecutionStatus();
 				break;
 			case 10:
 				return $this->getMessage();
@@ -2655,94 +2182,58 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 				return $this->getDescription();
 				break;
 			case 12:
-				return $this->getUpdatesCount();
-				break;
-			case 13:
 				return $this->getCreatedAt();
 				break;
-			case 14:
-				return $this->getCreatedBy();
-				break;
-			case 15:
+			case 13:
 				return $this->getUpdatedAt();
 				break;
-			case 16:
-				return $this->getUpdatedBy();
-				break;
-			case 17:
+			case 14:
 				return $this->getDeletedAt();
 				break;
-			case 18:
+			case 15:
 				return $this->getPriority();
 				break;
-			case 19:
-				return $this->getWorkGroupId();
-				break;
-			case 20:
+			case 16:
 				return $this->getQueueTime();
 				break;
-			case 21:
+			case 17:
 				return $this->getFinishTime();
 				break;
-			case 22:
+			case 18:
 				return $this->getEntryId();
 				break;
-			case 23:
+			case 19:
 				return $this->getPartnerId();
 				break;
-			case 24:
-				return $this->getSubpId();
-				break;
-			case 25:
-				return $this->getSchedulerId();
-				break;
-			case 26:
-				return $this->getWorkerId();
-				break;
-			case 27:
-				return $this->getBatchIndex();
-				break;
-			case 28:
-				return $this->getLastSchedulerId();
-				break;
-			case 29:
-				return $this->getLastWorkerId();
-				break;
-			case 30:
-				return $this->getLastWorkerRemote();
-				break;
-			case 31:
-				return $this->getProcessorExpiration();
-				break;
-			case 32:
-				return $this->getExecutionAttempts();
-				break;
-			case 33:
-				return $this->getLockVersion();
-				break;
-			case 34:
-				return $this->getTwinJobId();
-				break;
-			case 35:
+			case 20:
 				return $this->getBulkJobId();
 				break;
-			case 36:
+			case 21:
 				return $this->getRootJobId();
 				break;
-			case 37:
+			case 22:
 				return $this->getParentJobId();
 				break;
-			case 38:
+			case 23:
+				return $this->getBatchIndex();
+				break;
+			case 24:
+				return $this->getLastSchedulerId();
+				break;
+			case 25:
+				return $this->getLastWorkerId();
+				break;
+			case 26:
 				return $this->getDc();
 				break;
-			case 39:
+			case 27:
 				return $this->getErrType();
 				break;
-			case 40:
+			case 28:
 				return $this->getErrNumber();
 				break;
-			case 41:
-				return $this->getOnStressDivertTo();
+			case 29:
+				return $this->getBatchJobLockId();
 				break;
 			default:
 				return null;
@@ -2768,45 +2259,33 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			$keys[0] => $this->getId(),
 			$keys[1] => $this->getJobType(),
 			$keys[2] => $this->getJobSubType(),
-			$keys[3] => $this->getData(),
-			$keys[4] => $this->getFileSize(),
-			$keys[5] => $this->getDuplicationKey(),
-			$keys[6] => $this->getStatus(),
-			$keys[7] => $this->getAbort(),
-			$keys[8] => $this->getCheckAgainTimeout(),
-			$keys[9] => $this->getProgress(),
+			$keys[3] => $this->getObjectId(),
+			$keys[4] => $this->getObjectType(),
+			$keys[5] => $this->getData(),
+			$keys[6] => $this->getHistory(),
+			$keys[7] => $this->getLockInfo(),
+			$keys[8] => $this->getStatus(),
+			$keys[9] => $this->getExecutionStatus(),
 			$keys[10] => $this->getMessage(),
 			$keys[11] => $this->getDescription(),
-			$keys[12] => $this->getUpdatesCount(),
-			$keys[13] => $this->getCreatedAt(),
-			$keys[14] => $this->getCreatedBy(),
-			$keys[15] => $this->getUpdatedAt(),
-			$keys[16] => $this->getUpdatedBy(),
-			$keys[17] => $this->getDeletedAt(),
-			$keys[18] => $this->getPriority(),
-			$keys[19] => $this->getWorkGroupId(),
-			$keys[20] => $this->getQueueTime(),
-			$keys[21] => $this->getFinishTime(),
-			$keys[22] => $this->getEntryId(),
-			$keys[23] => $this->getPartnerId(),
-			$keys[24] => $this->getSubpId(),
-			$keys[25] => $this->getSchedulerId(),
-			$keys[26] => $this->getWorkerId(),
-			$keys[27] => $this->getBatchIndex(),
-			$keys[28] => $this->getLastSchedulerId(),
-			$keys[29] => $this->getLastWorkerId(),
-			$keys[30] => $this->getLastWorkerRemote(),
-			$keys[31] => $this->getProcessorExpiration(),
-			$keys[32] => $this->getExecutionAttempts(),
-			$keys[33] => $this->getLockVersion(),
-			$keys[34] => $this->getTwinJobId(),
-			$keys[35] => $this->getBulkJobId(),
-			$keys[36] => $this->getRootJobId(),
-			$keys[37] => $this->getParentJobId(),
-			$keys[38] => $this->getDc(),
-			$keys[39] => $this->getErrType(),
-			$keys[40] => $this->getErrNumber(),
-			$keys[41] => $this->getOnStressDivertTo(),
+			$keys[12] => $this->getCreatedAt(),
+			$keys[13] => $this->getUpdatedAt(),
+			$keys[14] => $this->getDeletedAt(),
+			$keys[15] => $this->getPriority(),
+			$keys[16] => $this->getQueueTime(),
+			$keys[17] => $this->getFinishTime(),
+			$keys[18] => $this->getEntryId(),
+			$keys[19] => $this->getPartnerId(),
+			$keys[20] => $this->getBulkJobId(),
+			$keys[21] => $this->getRootJobId(),
+			$keys[22] => $this->getParentJobId(),
+			$keys[23] => $this->getBatchIndex(),
+			$keys[24] => $this->getLastSchedulerId(),
+			$keys[25] => $this->getLastWorkerId(),
+			$keys[26] => $this->getDc(),
+			$keys[27] => $this->getErrType(),
+			$keys[28] => $this->getErrNumber(),
+			$keys[29] => $this->getBatchJobLockId(),
 		);
 		return $result;
 	}
@@ -2848,25 +2327,25 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 				$this->setJobSubType($value);
 				break;
 			case 3:
-				$this->setData($value);
+				$this->setObjectId($value);
 				break;
 			case 4:
-				$this->setFileSize($value);
+				$this->setObjectType($value);
 				break;
 			case 5:
-				$this->setDuplicationKey($value);
+				$this->setData($value);
 				break;
 			case 6:
-				$this->setStatus($value);
+				$this->setHistory($value);
 				break;
 			case 7:
-				$this->setAbort($value);
+				$this->setLockInfo($value);
 				break;
 			case 8:
-				$this->setCheckAgainTimeout($value);
+				$this->setStatus($value);
 				break;
 			case 9:
-				$this->setProgress($value);
+				$this->setExecutionStatus($value);
 				break;
 			case 10:
 				$this->setMessage($value);
@@ -2875,94 +2354,58 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 				$this->setDescription($value);
 				break;
 			case 12:
-				$this->setUpdatesCount($value);
-				break;
-			case 13:
 				$this->setCreatedAt($value);
 				break;
-			case 14:
-				$this->setCreatedBy($value);
-				break;
-			case 15:
+			case 13:
 				$this->setUpdatedAt($value);
 				break;
-			case 16:
-				$this->setUpdatedBy($value);
-				break;
-			case 17:
+			case 14:
 				$this->setDeletedAt($value);
 				break;
-			case 18:
+			case 15:
 				$this->setPriority($value);
 				break;
-			case 19:
-				$this->setWorkGroupId($value);
-				break;
-			case 20:
+			case 16:
 				$this->setQueueTime($value);
 				break;
-			case 21:
+			case 17:
 				$this->setFinishTime($value);
 				break;
-			case 22:
+			case 18:
 				$this->setEntryId($value);
 				break;
-			case 23:
+			case 19:
 				$this->setPartnerId($value);
 				break;
-			case 24:
-				$this->setSubpId($value);
-				break;
-			case 25:
-				$this->setSchedulerId($value);
-				break;
-			case 26:
-				$this->setWorkerId($value);
-				break;
-			case 27:
-				$this->setBatchIndex($value);
-				break;
-			case 28:
-				$this->setLastSchedulerId($value);
-				break;
-			case 29:
-				$this->setLastWorkerId($value);
-				break;
-			case 30:
-				$this->setLastWorkerRemote($value);
-				break;
-			case 31:
-				$this->setProcessorExpiration($value);
-				break;
-			case 32:
-				$this->setExecutionAttempts($value);
-				break;
-			case 33:
-				$this->setLockVersion($value);
-				break;
-			case 34:
-				$this->setTwinJobId($value);
-				break;
-			case 35:
+			case 20:
 				$this->setBulkJobId($value);
 				break;
-			case 36:
+			case 21:
 				$this->setRootJobId($value);
 				break;
-			case 37:
+			case 22:
 				$this->setParentJobId($value);
 				break;
-			case 38:
+			case 23:
+				$this->setBatchIndex($value);
+				break;
+			case 24:
+				$this->setLastSchedulerId($value);
+				break;
+			case 25:
+				$this->setLastWorkerId($value);
+				break;
+			case 26:
 				$this->setDc($value);
 				break;
-			case 39:
+			case 27:
 				$this->setErrType($value);
 				break;
-			case 40:
+			case 28:
 				$this->setErrNumber($value);
 				break;
-			case 41:
-				$this->setOnStressDivertTo($value);
+			case 29:
+				$this->setBatchJobLockId($value);
 				break;
 		} // switch()
 	}
@@ -2991,45 +2434,33 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
 		if (array_key_exists($keys[1], $arr)) $this->setJobType($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setJobSubType($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setData($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setFileSize($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setDuplicationKey($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setAbort($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setCheckAgainTimeout($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setProgress($arr[$keys[9]]);
+		if (array_key_exists($keys[3], $arr)) $this->setObjectId($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setObjectType($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setData($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setHistory($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setLockInfo($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setStatus($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setExecutionStatus($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setMessage($arr[$keys[10]]);
 		if (array_key_exists($keys[11], $arr)) $this->setDescription($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setUpdatesCount($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setCreatedAt($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setCreatedBy($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setUpdatedAt($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setUpdatedBy($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setDeletedAt($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setPriority($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setWorkGroupId($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setQueueTime($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setFinishTime($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setEntryId($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setPartnerId($arr[$keys[23]]);
-		if (array_key_exists($keys[24], $arr)) $this->setSubpId($arr[$keys[24]]);
-		if (array_key_exists($keys[25], $arr)) $this->setSchedulerId($arr[$keys[25]]);
-		if (array_key_exists($keys[26], $arr)) $this->setWorkerId($arr[$keys[26]]);
-		if (array_key_exists($keys[27], $arr)) $this->setBatchIndex($arr[$keys[27]]);
-		if (array_key_exists($keys[28], $arr)) $this->setLastSchedulerId($arr[$keys[28]]);
-		if (array_key_exists($keys[29], $arr)) $this->setLastWorkerId($arr[$keys[29]]);
-		if (array_key_exists($keys[30], $arr)) $this->setLastWorkerRemote($arr[$keys[30]]);
-		if (array_key_exists($keys[31], $arr)) $this->setProcessorExpiration($arr[$keys[31]]);
-		if (array_key_exists($keys[32], $arr)) $this->setExecutionAttempts($arr[$keys[32]]);
-		if (array_key_exists($keys[33], $arr)) $this->setLockVersion($arr[$keys[33]]);
-		if (array_key_exists($keys[34], $arr)) $this->setTwinJobId($arr[$keys[34]]);
-		if (array_key_exists($keys[35], $arr)) $this->setBulkJobId($arr[$keys[35]]);
-		if (array_key_exists($keys[36], $arr)) $this->setRootJobId($arr[$keys[36]]);
-		if (array_key_exists($keys[37], $arr)) $this->setParentJobId($arr[$keys[37]]);
-		if (array_key_exists($keys[38], $arr)) $this->setDc($arr[$keys[38]]);
-		if (array_key_exists($keys[39], $arr)) $this->setErrType($arr[$keys[39]]);
-		if (array_key_exists($keys[40], $arr)) $this->setErrNumber($arr[$keys[40]]);
-		if (array_key_exists($keys[41], $arr)) $this->setOnStressDivertTo($arr[$keys[41]]);
+		if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setDeletedAt($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setPriority($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setQueueTime($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setFinishTime($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setEntryId($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setPartnerId($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setBulkJobId($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setRootJobId($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setParentJobId($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setBatchIndex($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setLastSchedulerId($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setLastWorkerId($arr[$keys[25]]);
+		if (array_key_exists($keys[26], $arr)) $this->setDc($arr[$keys[26]]);
+		if (array_key_exists($keys[27], $arr)) $this->setErrType($arr[$keys[27]]);
+		if (array_key_exists($keys[28], $arr)) $this->setErrNumber($arr[$keys[28]]);
+		if (array_key_exists($keys[29], $arr)) $this->setBatchJobLockId($arr[$keys[29]]);
 	}
 
 	/**
@@ -3044,45 +2475,33 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(BatchJobPeer::ID)) $criteria->add(BatchJobPeer::ID, $this->id);
 		if ($this->isColumnModified(BatchJobPeer::JOB_TYPE)) $criteria->add(BatchJobPeer::JOB_TYPE, $this->job_type);
 		if ($this->isColumnModified(BatchJobPeer::JOB_SUB_TYPE)) $criteria->add(BatchJobPeer::JOB_SUB_TYPE, $this->job_sub_type);
+		if ($this->isColumnModified(BatchJobPeer::OBJECT_ID)) $criteria->add(BatchJobPeer::OBJECT_ID, $this->object_id);
+		if ($this->isColumnModified(BatchJobPeer::OBJECT_TYPE)) $criteria->add(BatchJobPeer::OBJECT_TYPE, $this->object_type);
 		if ($this->isColumnModified(BatchJobPeer::DATA)) $criteria->add(BatchJobPeer::DATA, $this->data);
-		if ($this->isColumnModified(BatchJobPeer::FILE_SIZE)) $criteria->add(BatchJobPeer::FILE_SIZE, $this->file_size);
-		if ($this->isColumnModified(BatchJobPeer::DUPLICATION_KEY)) $criteria->add(BatchJobPeer::DUPLICATION_KEY, $this->duplication_key);
+		if ($this->isColumnModified(BatchJobPeer::HISTORY)) $criteria->add(BatchJobPeer::HISTORY, $this->history);
+		if ($this->isColumnModified(BatchJobPeer::LOCK_INFO)) $criteria->add(BatchJobPeer::LOCK_INFO, $this->lock_info);
 		if ($this->isColumnModified(BatchJobPeer::STATUS)) $criteria->add(BatchJobPeer::STATUS, $this->status);
-		if ($this->isColumnModified(BatchJobPeer::ABORT)) $criteria->add(BatchJobPeer::ABORT, $this->abort);
-		if ($this->isColumnModified(BatchJobPeer::CHECK_AGAIN_TIMEOUT)) $criteria->add(BatchJobPeer::CHECK_AGAIN_TIMEOUT, $this->check_again_timeout);
-		if ($this->isColumnModified(BatchJobPeer::PROGRESS)) $criteria->add(BatchJobPeer::PROGRESS, $this->progress);
+		if ($this->isColumnModified(BatchJobPeer::EXECUTION_STATUS)) $criteria->add(BatchJobPeer::EXECUTION_STATUS, $this->execution_status);
 		if ($this->isColumnModified(BatchJobPeer::MESSAGE)) $criteria->add(BatchJobPeer::MESSAGE, $this->message);
 		if ($this->isColumnModified(BatchJobPeer::DESCRIPTION)) $criteria->add(BatchJobPeer::DESCRIPTION, $this->description);
-		if ($this->isColumnModified(BatchJobPeer::UPDATES_COUNT)) $criteria->add(BatchJobPeer::UPDATES_COUNT, $this->updates_count);
 		if ($this->isColumnModified(BatchJobPeer::CREATED_AT)) $criteria->add(BatchJobPeer::CREATED_AT, $this->created_at);
-		if ($this->isColumnModified(BatchJobPeer::CREATED_BY)) $criteria->add(BatchJobPeer::CREATED_BY, $this->created_by);
 		if ($this->isColumnModified(BatchJobPeer::UPDATED_AT)) $criteria->add(BatchJobPeer::UPDATED_AT, $this->updated_at);
-		if ($this->isColumnModified(BatchJobPeer::UPDATED_BY)) $criteria->add(BatchJobPeer::UPDATED_BY, $this->updated_by);
 		if ($this->isColumnModified(BatchJobPeer::DELETED_AT)) $criteria->add(BatchJobPeer::DELETED_AT, $this->deleted_at);
 		if ($this->isColumnModified(BatchJobPeer::PRIORITY)) $criteria->add(BatchJobPeer::PRIORITY, $this->priority);
-		if ($this->isColumnModified(BatchJobPeer::WORK_GROUP_ID)) $criteria->add(BatchJobPeer::WORK_GROUP_ID, $this->work_group_id);
 		if ($this->isColumnModified(BatchJobPeer::QUEUE_TIME)) $criteria->add(BatchJobPeer::QUEUE_TIME, $this->queue_time);
 		if ($this->isColumnModified(BatchJobPeer::FINISH_TIME)) $criteria->add(BatchJobPeer::FINISH_TIME, $this->finish_time);
 		if ($this->isColumnModified(BatchJobPeer::ENTRY_ID)) $criteria->add(BatchJobPeer::ENTRY_ID, $this->entry_id);
 		if ($this->isColumnModified(BatchJobPeer::PARTNER_ID)) $criteria->add(BatchJobPeer::PARTNER_ID, $this->partner_id);
-		if ($this->isColumnModified(BatchJobPeer::SUBP_ID)) $criteria->add(BatchJobPeer::SUBP_ID, $this->subp_id);
-		if ($this->isColumnModified(BatchJobPeer::SCHEDULER_ID)) $criteria->add(BatchJobPeer::SCHEDULER_ID, $this->scheduler_id);
-		if ($this->isColumnModified(BatchJobPeer::WORKER_ID)) $criteria->add(BatchJobPeer::WORKER_ID, $this->worker_id);
-		if ($this->isColumnModified(BatchJobPeer::BATCH_INDEX)) $criteria->add(BatchJobPeer::BATCH_INDEX, $this->batch_index);
-		if ($this->isColumnModified(BatchJobPeer::LAST_SCHEDULER_ID)) $criteria->add(BatchJobPeer::LAST_SCHEDULER_ID, $this->last_scheduler_id);
-		if ($this->isColumnModified(BatchJobPeer::LAST_WORKER_ID)) $criteria->add(BatchJobPeer::LAST_WORKER_ID, $this->last_worker_id);
-		if ($this->isColumnModified(BatchJobPeer::LAST_WORKER_REMOTE)) $criteria->add(BatchJobPeer::LAST_WORKER_REMOTE, $this->last_worker_remote);
-		if ($this->isColumnModified(BatchJobPeer::PROCESSOR_EXPIRATION)) $criteria->add(BatchJobPeer::PROCESSOR_EXPIRATION, $this->processor_expiration);
-		if ($this->isColumnModified(BatchJobPeer::EXECUTION_ATTEMPTS)) $criteria->add(BatchJobPeer::EXECUTION_ATTEMPTS, $this->execution_attempts);
-		if ($this->isColumnModified(BatchJobPeer::LOCK_VERSION)) $criteria->add(BatchJobPeer::LOCK_VERSION, $this->lock_version);
-		if ($this->isColumnModified(BatchJobPeer::TWIN_JOB_ID)) $criteria->add(BatchJobPeer::TWIN_JOB_ID, $this->twin_job_id);
 		if ($this->isColumnModified(BatchJobPeer::BULK_JOB_ID)) $criteria->add(BatchJobPeer::BULK_JOB_ID, $this->bulk_job_id);
 		if ($this->isColumnModified(BatchJobPeer::ROOT_JOB_ID)) $criteria->add(BatchJobPeer::ROOT_JOB_ID, $this->root_job_id);
 		if ($this->isColumnModified(BatchJobPeer::PARENT_JOB_ID)) $criteria->add(BatchJobPeer::PARENT_JOB_ID, $this->parent_job_id);
+		if ($this->isColumnModified(BatchJobPeer::BATCH_INDEX)) $criteria->add(BatchJobPeer::BATCH_INDEX, $this->batch_index);
+		if ($this->isColumnModified(BatchJobPeer::LAST_SCHEDULER_ID)) $criteria->add(BatchJobPeer::LAST_SCHEDULER_ID, $this->last_scheduler_id);
+		if ($this->isColumnModified(BatchJobPeer::LAST_WORKER_ID)) $criteria->add(BatchJobPeer::LAST_WORKER_ID, $this->last_worker_id);
 		if ($this->isColumnModified(BatchJobPeer::DC)) $criteria->add(BatchJobPeer::DC, $this->dc);
 		if ($this->isColumnModified(BatchJobPeer::ERR_TYPE)) $criteria->add(BatchJobPeer::ERR_TYPE, $this->err_type);
 		if ($this->isColumnModified(BatchJobPeer::ERR_NUMBER)) $criteria->add(BatchJobPeer::ERR_NUMBER, $this->err_number);
-		if ($this->isColumnModified(BatchJobPeer::ON_STRESS_DIVERT_TO)) $criteria->add(BatchJobPeer::ON_STRESS_DIVERT_TO, $this->on_stress_divert_to);
+		if ($this->isColumnModified(BatchJobPeer::BATCH_JOB_LOCK_ID)) $criteria->add(BatchJobPeer::BATCH_JOB_LOCK_ID, $this->batch_job_lock_id);
 
 		return $criteria;
 	}
@@ -3153,39 +2572,31 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 
 		$copyObj->setJobSubType($this->job_sub_type);
 
+		$copyObj->setObjectId($this->object_id);
+
+		$copyObj->setObjectType($this->object_type);
+
 		$copyObj->setData($this->data);
 
-		$copyObj->setFileSize($this->file_size);
+		$copyObj->setHistory($this->history);
 
-		$copyObj->setDuplicationKey($this->duplication_key);
+		$copyObj->setLockInfo($this->lock_info);
 
 		$copyObj->setStatus($this->status);
 
-		$copyObj->setAbort($this->abort);
-
-		$copyObj->setCheckAgainTimeout($this->check_again_timeout);
-
-		$copyObj->setProgress($this->progress);
+		$copyObj->setExecutionStatus($this->execution_status);
 
 		$copyObj->setMessage($this->message);
 
 		$copyObj->setDescription($this->description);
 
-		$copyObj->setUpdatesCount($this->updates_count);
-
 		$copyObj->setCreatedAt($this->created_at);
 
-		$copyObj->setCreatedBy($this->created_by);
-
 		$copyObj->setUpdatedAt($this->updated_at);
-
-		$copyObj->setUpdatedBy($this->updated_by);
 
 		$copyObj->setDeletedAt($this->deleted_at);
 
 		$copyObj->setPriority($this->priority);
-
-		$copyObj->setWorkGroupId($this->work_group_id);
 
 		$copyObj->setQueueTime($this->queue_time);
 
@@ -3195,11 +2606,11 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 
 		$copyObj->setPartnerId($this->partner_id);
 
-		$copyObj->setSubpId($this->subp_id);
+		$copyObj->setBulkJobId($this->bulk_job_id);
 
-		$copyObj->setSchedulerId($this->scheduler_id);
+		$copyObj->setRootJobId($this->root_job_id);
 
-		$copyObj->setWorkerId($this->worker_id);
+		$copyObj->setParentJobId($this->parent_job_id);
 
 		$copyObj->setBatchIndex($this->batch_index);
 
@@ -3207,29 +2618,27 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 
 		$copyObj->setLastWorkerId($this->last_worker_id);
 
-		$copyObj->setLastWorkerRemote($this->last_worker_remote);
-
-		$copyObj->setProcessorExpiration($this->processor_expiration);
-
-		$copyObj->setExecutionAttempts($this->execution_attempts);
-
-		$copyObj->setLockVersion($this->lock_version);
-
-		$copyObj->setTwinJobId($this->twin_job_id);
-
-		$copyObj->setBulkJobId($this->bulk_job_id);
-
-		$copyObj->setRootJobId($this->root_job_id);
-
-		$copyObj->setParentJobId($this->parent_job_id);
-
 		$copyObj->setDc($this->dc);
 
 		$copyObj->setErrType($this->err_type);
 
 		$copyObj->setErrNumber($this->err_number);
 
-		$copyObj->setOnStressDivertTo($this->on_stress_divert_to);
+		$copyObj->setBatchJobLockId($this->batch_job_lock_id);
+
+
+		if ($deepCopy) {
+			// important: temporarily setNew(false) because this affects the behavior of
+			// the getter/setter methods for fkey referrer objects.
+			$copyObj->setNew(false);
+
+			foreach ($this->getBatchJobLocks() as $relObj) {
+				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+					$copyObj->addBatchJobLock($relObj->copy($deepCopy));
+				}
+			}
+
+		} // if ($deepCopy)
 
 
 		$copyObj->setNew(true);
@@ -3295,6 +2704,209 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Declares an association between this object and a BatchJobLock object.
+	 *
+	 * @param      BatchJobLock $v
+	 * @return     BatchJob The current object (for fluent API support)
+	 * @throws     PropelException
+	 */
+	public function setBatchJobLock(BatchJobLock $v = null)
+	{
+		if ($v === null) {
+			$this->setBatchJobLockId(NULL);
+		} else {
+			$this->setBatchJobLockId($v->getId());
+		}
+
+		$this->aBatchJobLock = $v;
+
+		// Add binding for other direction of this n:n relationship.
+		// If this object has already been added to the BatchJobLock object, it will not be re-added.
+		if ($v !== null) {
+			$v->addBatchJob($this);
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * Get the associated BatchJobLock object
+	 *
+	 * @param      PropelPDO Optional Connection object.
+	 * @return     BatchJobLock The associated BatchJobLock object.
+	 * @throws     PropelException
+	 */
+	public function getBatchJobLock(PropelPDO $con = null)
+	{
+		if ($this->aBatchJobLock === null && ($this->batch_job_lock_id !== null)) {
+			$this->aBatchJobLock = BatchJobLockPeer::retrieveByPk($this->batch_job_lock_id);
+			/* The following can be used additionally to
+			   guarantee the related object contains a reference
+			   to this object.  This level of coupling may, however, be
+			   undesirable since it could result in an only partially populated collection
+			   in the referenced object.
+			   $this->aBatchJobLock->addBatchJobs($this);
+			 */
+		}
+		return $this->aBatchJobLock;
+	}
+
+	/**
+	 * Clears out the collBatchJobLocks collection (array).
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addBatchJobLocks()
+	 */
+	public function clearBatchJobLocks()
+	{
+		$this->collBatchJobLocks = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collBatchJobLocks collection (array).
+	 *
+	 * By default this just sets the collBatchJobLocks collection to an empty array (like clearcollBatchJobLocks());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @return     void
+	 */
+	public function initBatchJobLocks()
+	{
+		$this->collBatchJobLocks = array();
+	}
+
+	/**
+	 * Gets an array of BatchJobLock objects which contain a foreign key that references this object.
+	 *
+	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
+	 * Otherwise if this BatchJob has previously been saved, it will retrieve
+	 * related BatchJobLocks from storage. If this BatchJob is new, it will return
+	 * an empty collection or the current collection, the criteria is ignored on a new object.
+	 *
+	 * @param      PropelPDO $con
+	 * @param      Criteria $criteria
+	 * @return     array BatchJobLock[]
+	 * @throws     PropelException
+	 */
+	public function getBatchJobLocks($criteria = null, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(BatchJobPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collBatchJobLocks === null) {
+			if ($this->isNew()) {
+			   $this->collBatchJobLocks = array();
+			} else {
+
+				$criteria->add(BatchJobLockPeer::BATCH_JOB_ID, $this->id);
+
+				BatchJobLockPeer::addSelectColumns($criteria);
+				$this->collBatchJobLocks = BatchJobLockPeer::doSelect($criteria, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return the collection.
+
+
+				$criteria->add(BatchJobLockPeer::BATCH_JOB_ID, $this->id);
+
+				BatchJobLockPeer::addSelectColumns($criteria);
+				if (!isset($this->lastBatchJobLockCriteria) || !$this->lastBatchJobLockCriteria->equals($criteria)) {
+					$this->collBatchJobLocks = BatchJobLockPeer::doSelect($criteria, $con);
+				}
+			}
+		}
+		$this->lastBatchJobLockCriteria = $criteria;
+		return $this->collBatchJobLocks;
+	}
+
+	/**
+	 * Returns the number of related BatchJobLock objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related BatchJobLock objects.
+	 * @throws     PropelException
+	 */
+	public function countBatchJobLocks(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(BatchJobPeer::DATABASE_NAME);
+		} else {
+			$criteria = clone $criteria;
+		}
+
+		if ($distinct) {
+			$criteria->setDistinct();
+		}
+
+		$count = null;
+
+		if ($this->collBatchJobLocks === null) {
+			if ($this->isNew()) {
+				$count = 0;
+			} else {
+
+				$criteria->add(BatchJobLockPeer::BATCH_JOB_ID, $this->id);
+
+				$count = BatchJobLockPeer::doCount($criteria, false, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return count of the collection.
+
+
+				$criteria->add(BatchJobLockPeer::BATCH_JOB_ID, $this->id);
+
+				if (!isset($this->lastBatchJobLockCriteria) || !$this->lastBatchJobLockCriteria->equals($criteria)) {
+					$count = BatchJobLockPeer::doCount($criteria, false, $con);
+				} else {
+					$count = count($this->collBatchJobLocks);
+				}
+			} else {
+				$count = count($this->collBatchJobLocks);
+			}
+		}
+		return $count;
+	}
+
+	/**
+	 * Method called to associate a BatchJobLock object to this object
+	 * through the BatchJobLock foreign key attribute.
+	 *
+	 * @param      BatchJobLock $l BatchJobLock
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addBatchJobLock(BatchJobLock $l)
+	{
+		if ($this->collBatchJobLocks === null) {
+			$this->initBatchJobLocks();
+		}
+		if (!in_array($l, $this->collBatchJobLocks, true)) { // only add it if the **same** object is not already associated
+			array_push($this->collBatchJobLocks, $l);
+			$l->setBatchJob($this);
+		}
+	}
+
+	/**
 	 * Resets all collections of referencing foreign keys.
 	 *
 	 * This method is a user-space workaround for PHP's inability to garbage collect objects
@@ -3306,8 +2918,15 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function clearAllReferences($deep = false)
 	{
 		if ($deep) {
+			if ($this->collBatchJobLocks) {
+				foreach ((array) $this->collBatchJobLocks as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
 		} // if ($deep)
 
+		$this->collBatchJobLocks = null;
+			$this->aBatchJobLock = null;
 	}
 
 } // BaseBatchJob

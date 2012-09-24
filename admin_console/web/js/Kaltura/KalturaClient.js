@@ -1975,13 +1975,6 @@ KalturaBatchJob.prototype.jobSubType = null;
 /**
  * 
  *
- * @var int
- */
-KalturaBatchJob.prototype.onStressDivertTo = null;
-
-/**
- * 
- *
  * @var KalturaJobData
  */
 KalturaBatchJob.prototype.data = null;
@@ -2048,13 +2041,6 @@ KalturaBatchJob.prototype.priority = null;
  * @var int
  */
 KalturaBatchJob.prototype.workGroupId = null;
-
-/**
- * The id of identical job
- *
- * @var int
- */
-KalturaBatchJob.prototype.twinJobId = null;
 
 /**
  * The id of the bulk upload job that initiated this job
@@ -2158,13 +2144,6 @@ KalturaBatchJobFilter.prototype.jobSubTypeEqual = null;
  * @var string
  */
 KalturaBatchJobFilter.prototype.jobSubTypeIn = null;
-
-/**
- * 
- *
- * @var string
- */
-KalturaBatchJobFilter.prototype.onStressDivertToIn = null;
 
 /**
  * 

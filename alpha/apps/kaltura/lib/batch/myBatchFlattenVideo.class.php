@@ -39,8 +39,7 @@ class myBatchFlattenClient
 		$job->setJobType(BatchJobType::FLATTEN);
 		$job->setData($data, true);
 		$job->setStatus(BatchJob::BATCHJOB_STATUS_PENDING);
-		$job->setCheckAgainTimeout(time() + 10);
-		$job->setProgress(0);
+		//$job->setCheckAgainTimeout(time() + 10);
 		$job->setMessage('Queued');
 		$job->setDescription('Queued, waiting to run');
 		$job->setUpdatesCount(0);

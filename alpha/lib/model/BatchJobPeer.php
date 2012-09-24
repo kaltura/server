@@ -10,8 +10,6 @@
  */ 
 class BatchJobPeer extends BaseBatchJobPeer
 {
-	const COUNT = 'COUNT(batch_job.ID)';
-	
 	public static function getInProcStatus()
 	{
 		return BatchJob::BATCHJOB_STATUS_QUEUED;
@@ -47,108 +45,6 @@ class BatchJobPeer extends BaseBatchJobPeer
 			BatchJob::BATCHJOB_STATUS_DONT_PROCESS,
 			BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY
 		);
-	}
-	
-	public static function getCheckAgainTimeout($job_type = null)
-	{
-		$jobCheckAgainTimeouts = kConf::get('job_retry_intervals');
-		if(isset($jobCheckAgainTimeouts[$job_type]))
-			return $jobCheckAgainTimeouts[$job_type];
-			
-		return kConf::get('default_job_retry_interval');
-	}
-	
-	public static function getMaxExecutionAttempts($job_type = null)
-	{
-		$jobMaxExecutionAttempts = kConf::get('job_execution_attempt');
-		if(isset($jobMaxExecutionAttempts[$job_type]))
-			return $jobMaxExecutionAttempts[$job_type];
-			
-		return kConf::get('default_job_execution_attempt');
-	}
-	
-	public static function getMaxDuplicationTime($job_type = null)
-	{
-		$jobMaxDuplicationTimes = kConf::get('job_duplication_time_frame');
-		if(isset($jobMaxDuplicationTimes[$job_type]))
-			return $jobMaxDuplicationTimes[$job_type];
-			
-		return kConf::get('default_duplication_time_frame');
-	}
-	
-	public static function createDuplicationKey($jobType, $data)
-	{
-		switch($jobType)
-		{
-			case BatchJobType::IMPORT:
-				if($data instanceof kImportJobData)
-					return sha1($data->getSrcFileUrl());
-				return null;
-				
-			case BatchJobType::EXTRACT_MEDIA:
-				if($data instanceof kExtractMediaJobData)
-					return sha1($data->getSrcFileSyncLocalPath());
-				return null;
-				
-			case BatchJobType::CONVERT:
-			case BatchJobType::DELETE:
-			case BatchJobType::FLATTEN:
-			case BatchJobType::BULKUPLOAD:
-			case BatchJobType::DOWNLOAD:
-			case BatchJobType::CONVERT_PROFILE:
-			case BatchJobType::POSTCONVERT:
-			default:
-				return null;
-		}
-		return null;
-	}
-	
-	public static function retrieveDuplicated($jobType, $data)
-	{
-		$duplicationKey = self::createDuplicationKey($jobType, $data);
-		if(!$duplicationKey)
-			return null;
-			
-		$c = new Criteria();
-		$c->add (self::CREATED_AT, date('Y-m-d H:i', time() - self::getMaxDuplicationTime($jobType)), Criteria::GREATER_THAN);
-		$c->add (self::STATUS, BatchJob::BATCHJOB_STATUS_FINISHED);
-		$c->add (self::DUPLICATION_KEY, $duplicationKey);
-		$c->addDescendingOrderByColumn(self::CREATED_AT);
-		$duplicatedJobs = self::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
-		if(!count($duplicatedJobs))
-			return null;
-			
-		switch($jobType)
-		{
-			case BatchJobType::IMPORT:
-				foreach($duplicatedJobs as $index => $duplicatedJob)
-				{
-					$duplicatedData = $duplicatedJob->getData();
-					if(!($duplicatedData instanceof kImportJobData) || $duplicatedData->getSrcFileUrl() != $data->getSrcFileUrl())
-						unset($duplicatedJobs[$index]);
-				}
-				return $duplicatedJobs;
-				
-			case BatchJobType::EXTRACT_MEDIA:
-				foreach($duplicatedJobs as $index => $duplicatedJob)
-				{
-					$duplicatedData = $duplicatedJob->getData();
-					if(!($duplicatedData instanceof kExtractMediaJobData) || $duplicatedData->getSrcFileSyncLocalPath() != $data->getSrcFileSyncLocalPath())
-						unset($duplicatedJobs[$index]);
-				}
-				return $duplicatedJobs;
-				
-			case BatchJobType::CONVERT:
-			case BatchJobType::DELETE:
-			case BatchJobType::FLATTEN:
-			case BatchJobType::BULKUPLOAD:
-			case BatchJobType::DOWNLOAD:
-			case BatchJobType::CONVERT_PROFILE:
-			case BatchJobType::POSTCONVERT:
-			default:
-				return null;
-		}
-		return null;
 	}
 	
 	public static function retrieveByEntryIdAndType($entryId, $jobType, $jobSubType = null)
@@ -233,28 +129,49 @@ class BatchJobPeer extends BaseBatchJobPeer
 	
 		return $stmt->fetchAll();
 	}
-
-	public static function doCountGroupBy(Criteria $criteria, $con = null)
-	{
-		$criteria = clone $criteria;
-		$criteria->addSelectColumn(BatchJobPeer::COUNT);
-
-		foreach($criteria->getGroupByColumns() as $column)
-		{
-			$criteria->addSelectColumn($column);
-		}
-
-		$cols = $criteria->getSelectColumns();
-		
-		return self::doSelectStmt($criteria, $con);
-		
-//		$rs->setFetchMode(ResultSet::FETCHMODE_ASSOC);
-//			
-//		$results = array();
-//		while($rs->next()) 
-//			$results[] = $rs->getRow();
-//			
-//		return $results;
-	}	
 	
+	
+	public static function postLockUpdate(kExclusiveLockKey $lockKey, array $exclusive_objects_ids, $con)
+	{
+		
+		$batchJobs = BatchJobPeer::retrieveByPKs($exclusive_objects_ids);
+		
+		foreach($batchJobs as $batchJob) {
+
+			// Set history
+			$historyRecord = new kBatchHistoryData();
+			$historyRecord->setWorkerId($lockKey->getWorkerId());
+			$historyRecord->setSchedulerId($lockKey->getSchedulerId());
+			$historyRecord->setBatchIndex($lockKey->getBatchIndex());
+			
+			$batchJob->addHistoryRecord($historyRecord);
+			
+			// Set fields
+			$batchJob->setLastWorkerId($lockKey->getWorkerId());
+			$batchJob->setLastSchedulerId($lockKey->getSchedulerId());
+			$batchJob->setBatchIndex($lockKey->getBatchIndex() );
+			
+			// Set fields from batch job lock
+			$lockInfo = $batchJob->getLockInfo();
+			$lockInfo->setLockVersion($lockInfo->getLockVersion() + 1);
+			$batchJob->setLockInfo($lockInfo);
+				
+			$batchJob->save($con);
+		}
+	
+		return $batchJobs;
+	}
+	
+	public static function postBatchJobUpdate(BatchJob $batchJob) {
+		if($batchJob->isColumnModified(BatchJobPeer::ERR_NUMBER) || $batchJob->isColumnModified(BatchJobPeer::ERR_TYPE) || 
+				$batchJob->isColumnModified(BatchJobPeer::MESSAGE)) {
+			
+			$historyRecord = new kBatchHistoryData();
+			$historyRecord->setErrNumber($batchJob->getErrNumber());
+			$historyRecord->setErrType($batchJob->getErrType());
+			$historyRecord->setMessage($batchJob->getMessage());
+				
+			$batchJob->addHistoryRecord($historyRecord);
+		}
+	}
 }

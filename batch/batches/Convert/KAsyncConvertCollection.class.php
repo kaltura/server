@@ -147,7 +147,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 		}
 		KalturaLog::debug ( "Flavors data: " . print_r($data->flavors, true));
 			
-		$job = $this->updateJob($job, "engine [" . get_class($this->operationEngine) . "] convert successfully", KalturaBatchJobStatus::MOVEFILE, 90, $data);
+		$job = $this->updateJob($job, "engine [" . get_class($this->operationEngine) . "] convert successfully", KalturaBatchJobStatus::MOVEFILE, $data);
 		return $this->moveFiles($job, $job->data);
 	}
 	

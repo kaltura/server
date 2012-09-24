@@ -6,7 +6,7 @@
 class KalturaBatchGetExclusiveNotificationJobsResponse extends KalturaObject
 {
 	/**
-	 * @var KalturaNotificationArray
+	 * @var KalturaBatchJobArray
 	 * @readonly
 	 */
 	public $notifications;

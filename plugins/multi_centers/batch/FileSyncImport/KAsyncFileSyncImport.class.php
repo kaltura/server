@@ -54,7 +54,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CANNOT_CREATE_DIRECTORY, $msg, KalturaBatchJobStatus::RETRY);				
 				}
 				$job->data->tmpFilePath = $tmpPath;
-				$this->updateJob($job, "Temp destination set", KalturaBatchJobStatus::PROCESSING, 2, $job->data);
+				$this->updateJob($job, "Temp destination set", KalturaBatchJobStatus::PROCESSING, $job->data);
 			}
 			// destination = temporary path
 			$fileDestination = $job->data->tmpFilePath;
@@ -585,7 +585,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		
 		// add a unique id to the temporary file path
 		$uniqid = uniqid('filesync_import_');
-		$destFile = realpath($rootPath) . "/$uniqid";
+		$destFile = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
 		KalturaLog::debug("destFile [$destFile]");
 		
 		// add file extension if any

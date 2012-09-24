@@ -19,7 +19,7 @@ class KAsyncStorageSync extends KAsyncStorageExport
 		KalturaLog::debug("export($job->id)");
 		
 		$srcFile = str_replace('//', '/', trim($data->srcFileSyncLocalPath));
-		$this->updateJob($job, "Syncing $srcFile, id: $data->srcFileSyncId", KalturaBatchJobStatus::QUEUED, 1);
+		$this->updateJob($job, "Syncing $srcFile, id: $data->srcFileSyncId", KalturaBatchJobStatus::QUEUED);
 
 		$remoteClientConfig = clone $this->kClient->getConfig();
 		$remoteClientConfig->serviceUrl = $data->serverUrl;

@@ -24,7 +24,7 @@ class kLimeLightLiveFlowManager implements kBatchJobStatusEventConsumer
 		return false;
 	}
 	
-	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
+	public function updatedJob(BatchJob $dbBatchJob)
 	{
 		
 		if ($dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_PENDING)

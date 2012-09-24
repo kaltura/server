@@ -74,6 +74,18 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	protected $updated_at;
 
 	/**
+	 * The value for the priority field.
+	 * @var        int
+	 */
+	protected $priority;
+
+	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
+
+	/**
 	 * @var        conversionProfile2
 	 */
 	protected $aconversionProfile2;
@@ -276,6 +288,26 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [priority] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getPriority()
+	{
+		return $this->priority;
+	}
+
+	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
 	}
 
 	/**
@@ -546,6 +578,49 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	} // setUpdatedAt()
 
 	/**
+	 * Set the value of [priority] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     flavorParamsConversionProfile The current object (for fluent API support)
+	 */
+	public function setPriority($v)
+	{
+		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::PRIORITY]))
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::PRIORITY] = $this->priority;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->priority !== $v) {
+			$this->priority = $v;
+			$this->modifiedColumns[] = flavorParamsConversionProfilePeer::PRIORITY;
+		}
+
+		return $this;
+	} // setPriority()
+
+	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     flavorParamsConversionProfile The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = flavorParamsConversionProfilePeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -586,6 +661,8 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			$this->force_none_complied = ($row[$startcol + 6] !== null) ? (boolean) $row[$startcol + 6] : null;
 			$this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->priority = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -595,7 +672,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 9; // 9 = flavorParamsConversionProfilePeer::NUM_COLUMNS - flavorParamsConversionProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 11; // 11 = flavorParamsConversionProfilePeer::NUM_COLUMNS - flavorParamsConversionProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating flavorParamsConversionProfile object", $e);
@@ -854,6 +931,8 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -864,7 +943,9 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	public function postSave(PropelPDO $con = null) 
 	{
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 		parent::postSave($con);
 	}
 	
@@ -1125,6 +1206,12 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			case 8:
 				return $this->getUpdatedAt();
 				break;
+			case 9:
+				return $this->getPriority();
+				break;
+			case 10:
+				return $this->getCustomData();
+				break;
 			default:
 				return null;
 				break;
@@ -1155,6 +1242,8 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			$keys[6] => $this->getForceNoneComplied(),
 			$keys[7] => $this->getCreatedAt(),
 			$keys[8] => $this->getUpdatedAt(),
+			$keys[9] => $this->getPriority(),
+			$keys[10] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1213,6 +1302,12 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			case 8:
 				$this->setUpdatedAt($value);
 				break;
+			case 9:
+				$this->setPriority($value);
+				break;
+			case 10:
+				$this->setCustomData($value);
+				break;
 		} // switch()
 	}
 
@@ -1246,6 +1341,8 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		if (array_key_exists($keys[6], $arr)) $this->setForceNoneComplied($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setPriority($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
 	}
 
 	/**
@@ -1266,6 +1363,8 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		if ($this->isColumnModified(flavorParamsConversionProfilePeer::FORCE_NONE_COMPLIED)) $criteria->add(flavorParamsConversionProfilePeer::FORCE_NONE_COMPLIED, $this->force_none_complied);
 		if ($this->isColumnModified(flavorParamsConversionProfilePeer::CREATED_AT)) $criteria->add(flavorParamsConversionProfilePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(flavorParamsConversionProfilePeer::UPDATED_AT)) $criteria->add(flavorParamsConversionProfilePeer::UPDATED_AT, $this->updated_at);
+		if ($this->isColumnModified(flavorParamsConversionProfilePeer::PRIORITY)) $criteria->add(flavorParamsConversionProfilePeer::PRIORITY, $this->priority);
+		if ($this->isColumnModified(flavorParamsConversionProfilePeer::CUSTOM_DATA)) $criteria->add(flavorParamsConversionProfilePeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1347,6 +1446,10 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		$copyObj->setCreatedAt($this->created_at);
 
 		$copyObj->setUpdatedAt($this->updated_at);
+
+		$copyObj->setPriority($this->priority);
+
+		$copyObj->setCustomData($this->custom_data);
 
 
 		$copyObj->setNew(true);
@@ -1527,4 +1630,121 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			$this->aassetParams = null;
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BaseflavorParamsConversionProfile

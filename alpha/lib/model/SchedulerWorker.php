@@ -47,11 +47,11 @@ class SchedulerWorker extends BaseSchedulerWorker
 	public function getLockedJobs()
 	{
 		$c = new Criteria();
-		$c->add(BatchJobPeer::BATCH_INDEX, null, Criteria::ISNOTNULL);
-		$c->add(BatchJobPeer::SCHEDULER_ID, $this->scheduler_configured_id);
-		$c->add(BatchJobPeer::WORKER_ID, $this->configured_id);
+		$c->add(BatchJobLockPeer::BATCH_INDEX, null, Criteria::ISNOTNULL);
+		$c->add(BatchJobLockPeer::SCHEDULER_ID, $this->scheduler_configured_id);
+		$c->add(BatchJobLockPeer::WORKER_ID, $this->configured_id);
 		
-		return BatchJobPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+		return BatchJobLockPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 	}
 	
 	public function getConfigs()

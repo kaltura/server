@@ -53,11 +53,12 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 */
 	public static function addEventNotificationDispatchJob($eventNotificationType, kEventNotificationDispatchJobData $jobData, $partnerId = null, $entryId = null, BatchJob $parentJob = null) 
 	{
+		$jobType = EventNotificationPlugin::getBatchJobTypeCoreValue(EventNotificationBatchType::EVENT_NOTIFICATION_HANDLER);
 		$batchJob = null;
 		
 		if ($parentJob)
 		{
-			$batchJob = $parentJob->createChild(false);
+			$batchJob = $parentJob->createChild($jobType, $eventNotificationType, false);
 		}
 		else
 		{
@@ -72,7 +73,9 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		
 		KalturaLog::log("Creating event notification dispatch job on template id [" . $jobData->getTemplateId() . "] engine[$eventNotificationType]");
 		
-		$jobType = EventNotificationPlugin::getBatchJobTypeCoreValue(EventNotificationBatchType::EVENT_NOTIFICATION_HANDLER); 
+		$batchJob->setObjectId($entryId);
+		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
+		
 		return kJobsManager::addJob($batchJob, $jobData, $jobType, $eventNotificationType);
 	}
 

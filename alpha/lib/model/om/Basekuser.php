@@ -362,16 +362,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	private $lastKshowKuserCriteria = null;
 
 	/**
-	 * @var        array MailJob[] Collection to store aggregation of MailJob objects.
-	 */
-	protected $collMailJobs;
-
-	/**
-	 * @var        Criteria The criteria used to select the current contents of collMailJobs.
-	 */
-	private $lastMailJobCriteria = null;
-
-	/**
 	 * @var        array PuserKuser[] Collection to store aggregation of PuserKuser objects.
 	 */
 	protected $collPuserKusers;
@@ -2401,9 +2391,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			$this->collKshowKusers = null;
 			$this->lastKshowKuserCriteria = null;
 
-			$this->collMailJobs = null;
-			$this->lastMailJobCriteria = null;
-
 			$this->collPuserKusers = null;
 			$this->lastPuserKuserCriteria = null;
 
@@ -2611,14 +2598,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 
 			if ($this->collKshowKusers !== null) {
 				foreach ($this->collKshowKusers as $referrerFK) {
-					if (!$referrerFK->isDeleted()) {
-						$affectedRows += $referrerFK->save($con);
-					}
-				}
-			}
-
-			if ($this->collMailJobs !== null) {
-				foreach ($this->collMailJobs as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
 						$affectedRows += $referrerFK->save($con);
 					}
@@ -2944,14 +2923,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 
 				if ($this->collKshowKusers !== null) {
 					foreach ($this->collKshowKusers as $referrerFK) {
-						if (!$referrerFK->validate($columns)) {
-							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-						}
-					}
-				}
-
-				if ($this->collMailJobs !== null) {
-					foreach ($this->collMailJobs as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
@@ -3751,12 +3722,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			foreach ($this->getKshowKusers() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
 					$copyObj->addKshowKuser($relObj->copy($deepCopy));
-				}
-			}
-
-			foreach ($this->getMailJobs() as $relObj) {
-				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addMailJob($relObj->copy($deepCopy));
 				}
 			}
 
@@ -4983,160 +4948,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		$this->lastKshowKuserCriteria = $criteria;
 
 		return $this->collKshowKusers;
-	}
-
-	/**
-	 * Clears out the collMailJobs collection (array).
-	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addMailJobs()
-	 */
-	public function clearMailJobs()
-	{
-		$this->collMailJobs = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the collMailJobs collection (array).
-	 *
-	 * By default this just sets the collMailJobs collection to an empty array (like clearcollMailJobs());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @return     void
-	 */
-	public function initMailJobs()
-	{
-		$this->collMailJobs = array();
-	}
-
-	/**
-	 * Gets an array of MailJob objects which contain a foreign key that references this object.
-	 *
-	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
-	 * Otherwise if this kuser has previously been saved, it will retrieve
-	 * related MailJobs from storage. If this kuser is new, it will return
-	 * an empty collection or the current collection, the criteria is ignored on a new object.
-	 *
-	 * @param      PropelPDO $con
-	 * @param      Criteria $criteria
-	 * @return     array MailJob[]
-	 * @throws     PropelException
-	 */
-	public function getMailJobs($criteria = null, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(kuserPeer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->collMailJobs === null) {
-			if ($this->isNew()) {
-			   $this->collMailJobs = array();
-			} else {
-
-				$criteria->add(MailJobPeer::RECIPIENT_ID, $this->id);
-
-				MailJobPeer::addSelectColumns($criteria);
-				$this->collMailJobs = MailJobPeer::doSelect($criteria, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return the collection.
-
-
-				$criteria->add(MailJobPeer::RECIPIENT_ID, $this->id);
-
-				MailJobPeer::addSelectColumns($criteria);
-				if (!isset($this->lastMailJobCriteria) || !$this->lastMailJobCriteria->equals($criteria)) {
-					$this->collMailJobs = MailJobPeer::doSelect($criteria, $con);
-				}
-			}
-		}
-		$this->lastMailJobCriteria = $criteria;
-		return $this->collMailJobs;
-	}
-
-	/**
-	 * Returns the number of related MailJob objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related MailJob objects.
-	 * @throws     PropelException
-	 */
-	public function countMailJobs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(kuserPeer::DATABASE_NAME);
-		} else {
-			$criteria = clone $criteria;
-		}
-
-		if ($distinct) {
-			$criteria->setDistinct();
-		}
-
-		$count = null;
-
-		if ($this->collMailJobs === null) {
-			if ($this->isNew()) {
-				$count = 0;
-			} else {
-
-				$criteria->add(MailJobPeer::RECIPIENT_ID, $this->id);
-
-				$count = MailJobPeer::doCount($criteria, false, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return count of the collection.
-
-
-				$criteria->add(MailJobPeer::RECIPIENT_ID, $this->id);
-
-				if (!isset($this->lastMailJobCriteria) || !$this->lastMailJobCriteria->equals($criteria)) {
-					$count = MailJobPeer::doCount($criteria, false, $con);
-				} else {
-					$count = count($this->collMailJobs);
-				}
-			} else {
-				$count = count($this->collMailJobs);
-			}
-		}
-		return $count;
-	}
-
-	/**
-	 * Method called to associate a MailJob object to this object
-	 * through the MailJob foreign key attribute.
-	 *
-	 * @param      MailJob $l MailJob
-	 * @return     void
-	 * @throws     PropelException
-	 */
-	public function addMailJob(MailJob $l)
-	{
-		if ($this->collMailJobs === null) {
-			$this->initMailJobs();
-		}
-		if (!in_array($l, $this->collMailJobs, true)) { // only add it if the **same** object is not already associated
-			array_push($this->collMailJobs, $l);
-			$l->setkuser($this);
-		}
 	}
 
 	/**
@@ -6601,11 +6412,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 					$o->clearAllReferences($deep);
 				}
 			}
-			if ($this->collMailJobs) {
-				foreach ((array) $this->collMailJobs as $o) {
-					$o->clearAllReferences($deep);
-				}
-			}
 			if ($this->collPuserKusers) {
 				foreach ((array) $this->collPuserKusers as $o) {
 					$o->clearAllReferences($deep);
@@ -6654,7 +6460,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		$this->collflags = null;
 		$this->collfavorites = null;
 		$this->collKshowKusers = null;
-		$this->collMailJobs = null;
 		$this->collPuserKusers = null;
 		$this->collPartners = null;
 		$this->collmoderations = null;

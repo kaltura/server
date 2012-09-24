@@ -282,6 +282,21 @@ class assetParamsPeer extends BaseassetParamsPeer
 		
 		return assetParamsPeer::doSelect($criteria, $con);
 	}
+	
+	public static function retrieveMinimalBitrate($pks, PropelPDO $con = null) 
+	{
+		$criteria = new Criteria(assetParamsPeer::DATABASE_NAME);
+		$criteria->add(assetParamsPeer::ID, $pks, Criteria::IN);
+		$criteria->add(assetParamsPeer::VIDEO_BITRATE, 0, Criteria::GREATER_THAN);
+		
+		$notAudioCond = $criteria->getNewCriterion(assetParamsPeer::WIDTH, 0, Criteria::GREATER_THAN);
+		$notAudioCond->addOr($criteria->getNewCriterion(assetParamsPeer::HEIGHT, 0, Criteria::GREATER_THAN));
+		
+		$criteria->add($notAudioCond);
+		$criteria->addAscendingOrderByColumn(assetParamsPeer::VIDEO_BITRATE);
+		
+		return assetParamsPeer::doSelectOne($criteria, $con);
+	}
 
 	public static function getIds(Criteria $criteria, $con = null)
 	{

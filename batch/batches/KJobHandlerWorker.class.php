@@ -182,7 +182,6 @@ abstract class KJobHandlerWorker extends KBatchBase
 		$event->batch_parant_id = $job->parentJobId;
 		$event->batch_root_id = $job->rootJobId;
 		$event->batch_status = $job->status;
-		$event->batch_progress = $job->progress;
 		
 		$this->onEvent($event_id, $event);
 	}
@@ -269,12 +268,11 @@ abstract class KJobHandlerWorker extends KBatchBase
 	 * @param KalturaBatchJob $job
 	 * @param string $msg
 	 * @param int $status
-	 * @param int $progress
 	 * @param unknown_type $data
 	 * @param boolean $remote
 	 * @return KalturaBatchJob
 	 */
-	protected function updateJob(KalturaBatchJob $job, $msg, $status, $progress = null, KalturaJobData $data = null, $remote = null)
+	protected function updateJob(KalturaBatchJob $job, $msg, $status, KalturaJobData $data = null)
 	{
 		$updateJob = $this->newEmptyJob();
 		
@@ -285,9 +283,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 		}
 		
 		$updateJob->status = $status;
-		$updateJob->progress = $progress;
 		$updateJob->data = $data;
-		$updateJob->lastWorkerRemote = $remote;
 		
 		KalturaLog::info("job[$job->id] status: [$status] msg : [$msg]");
 		if($this->isUnitTest)
@@ -322,9 +318,6 @@ abstract class KJobHandlerWorker extends KBatchBase
 			$updateJob->description = $job->description . "\n$msg";
 		}
 		
-		if($status == KalturaBatchJobStatus::FINISHED)
-			$updateJob->progress = 100;
-			
 		$updateJob->status = $status;
 		$updateJob->errType = $errType;
 		$updateJob->errNumber = $errNumber;

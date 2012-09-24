@@ -37,8 +37,9 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD = 1;
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG = 3;
-
+	
 	const MAX_SERIALIZED_JOB_DATA_SIZE = 8192;
+	const BATCH_JOB_DEFAULT_PRIORITY = 3;
 	private static $indicator = null;//= new myFileIndicator( "gogobatchjob" );
 	
 	private $aEntry = null;
@@ -103,15 +104,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		self::BATCHJOB_STATUS_DONT_PROCESS => 'Dont Process',
 	);
 	
-	private static $LOCK_VERSION_AFFECTED_BY_COLUMNS_NAMES = array(
-		BatchJobPeer::STATUS,
-		BatchJobPeer::SCHEDULER_ID,
-		BatchJobPeer::WORKER_ID,
-		BatchJobPeer::BATCH_INDEX, 
-		BatchJobPeer::EXECUTION_ATTEMPTS, 
-		BatchJobPeer::CHECK_AGAIN_TIMEOUT, 
-		BatchJobPeer::PROCESSOR_EXPIRATION
-	);
 	
 	public static function getStatusName($status)
 	{
@@ -130,65 +122,80 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		return self::$BATCHJOB_TYPE_NAMES[$type];
 	}
 	
-	public function save(PropelPDO $con = null)
+	public function preInsert(PropelPDO $con = null)
 	{
-		KalturaLog::log( "BatchJob [{$this->getJobType()}][{$this->getJobSubType()}]: save()" );
-		$is_new = $this->isNew() ;
-		
-		if ( $this->isNew() )
+	
+		// set the dc ONLY if it wasnt initialized
+		// this is required in the special case of file_sync import jobs which are created on one dc but run from the other
+		// all other jobs run from the same datacenter they were created on.
+		// setting the dc later results in a race condition were the job is picked up by the current datacenter before the dc value is changed
+		if(is_null($this->dc) || !$this->isColumnModified(BatchJobPeer::DC))
 		{
-			// set the dc ONLY if it wasnt initialized
-			// this is required in the special case of file_sync import jobs which are created on one dc but run from the other
-			// all other jobs run from the same datacenter they were created on.
-			// setting the dc later results in a race condition were the job is picked up by the current datacenter before the dc value is changed 
-			if(is_null($this->dc) || !$this->isColumnModified(BatchJobPeer::DC))
-			{
-				// by default set the dc to the current data center. However whenever a batch job is operating on an entry, we rather run it
-				// in the DC where the file sync of the entry exists. Since the batch job doesnt refer to a flavor (we only have an entry id member)
-				// we check the file sync of the source flavor asset (if one exists)
-				  
-				$dc = kDataCenterMgr::getCurrentDcId(); 
-				
-		    	kalturaLog::debug("setting the job's DC to [$dc]");
-				$this->setDc ( $dc );
-			}
-		    // if the status not set upon creation
-			if(is_null($this->status) || !$this->isColumnModified(BatchJobPeer::STATUS))
-			{
-				//echo "sets the status to " . self::BATCHJOB_STATUS_PENDING . "\n";
-				$this->setStatus(self::BATCHJOB_STATUS_PENDING);
-			}
+			// by default set the dc to the current data center. However whenever a batch job is operating on an entry, we rather run it
+			// in the DC where the file sync of the entry exists. Since the batch job doesnt refer to a flavor (we only have an entry id member)
+			// we check the file sync of the source flavor asset (if one exists)
+	
+			$dc = kDataCenterMgr::getCurrentDcId();
+	
+			kalturaLog::debug("setting the job's DC to [$dc]");
+			$this->setDc ( $dc );
 		}
-				
-		$result = array_intersect(self::$LOCK_VERSION_AFFECTED_BY_COLUMNS_NAMES, $this->getModifiedColumns());
-		if (count($result) > 0) 
-			$this->setLockVersion($this->getLockVersion() + 1);
 			
+		// if the status not set upon creation
+		if(is_null($this->status) || !$this->isColumnModified(BatchJobPeer::STATUS))
+		{
+			//echo "sets the status to " . self::BATCHJOB_STATUS_PENDING . "\n";
+			$this->setStatus(self::BATCHJOB_STATUS_PENDING);
+		}
+	
+		if($this->getLockInfo() === null) {
+			$lockInfo = new kLockInfoData($this);
+			$this->setLockInfo($lockInfo);
+		}
+	
+		if($this->getPriority() == 0) {
+			$this->setPriority(self::BATCH_JOB_DEFAULT_PRIORITY);
+		}
+	
+		return parent::preInsert($con);
+	}
+	
+	public function preUpdate(PropelPDO $con = null) {
 		
-		$res = parent::save( $con );
-		
-		if(($is_new && !$this->root_job_id && $this->id) || $this->useNewRoot)
+		if(BatchJobLockPeer::shouldUpdateLockObject($this, $con)) {
+			BatchJobLockPeer::updateLockObject($this, $con);
+		}
+	
+		BatchJobPeer::postBatchJobUpdate($this);
+		return parent::preUpdate($con);
+	}
+	
+	public function postInsert(PropelPDO $con = null) {
+	
+		if((!$this->root_job_id && $this->id) || ($this->useNewRoot))
 		{
 			// set the root to point to itself
 			$this->setRootJobId($this->id);
 			$res = parent::save($con);
 		}
-/*		
- * 	remove - no need to use file indicators any more
-		// when new object or status is pending - add the indicator for the batch job to start running
-		if ( $is_new || ( $this->getStatus() == self::BATCHJOB_STATUS_PENDING ) )
-		{
-			self::addIndicator( $this->getId() , $this->getJobType() );
-			KalturaLog::log ( "BatchJob: Added indicator for BatchJob [" . $this->getId() . "] of type [{$this->getJobType() }]" );
-			//debugUtils::st();			
+	
+		if(BatchJobLockPeer::shouldCreateLockObject($this,true, $con)) {
+			$batchJobLock = BatchJobLockPeer::createLockObject($this);
+			$this->setBatchJobLock($batchJobLock);
+			parent::save($con);
 		}
-		else
-		{
-			KalturaLog::log ( "BatchJob: Didn't add an indicator for BatchJob [" . $this->getId() . "]" );
+	
+		return parent::postInsert($con);
+	}
+	
+	public function postUpdate(PropelPDO $con = null) {
+		if(BatchJobLockPeer::shouldCreateLockObject($this,false, $con)) {
+			$batchJobLock = BatchJobLockPeer::createLockObject($this);
+			$this->setBatchJobLock($batchJobLock);
+			parent::save($con);
 		}
-*/		
-		return $res;
-		
+	
+		return parent::postUpdate($con);
 	}
 	
 	
@@ -263,36 +270,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	public function getFormattedUpdatedAt( $format = dateUtils::KALTURA_FORMAT )
 	{
 		return dateUtils::formatKalturaDate( $this , 'getUpdatedAt' , $format );
-	}
-	
-	public static function isIndicatorSet ( $type = BatchJobType::IMPORT )
-	{
-		return self::getIndicator( $type )->isIndicatorSet();
-	}
-	
-	public static function addIndicator ( $id , $type = BatchJobType::IMPORT)
-	{
-		// TODO - remove the double indicator !
-		self::getIndicator( $type )->addIndicator( $id );
-		self::getIndicator( $type )->addIndicator( $id . "_"); // for now add an extra indicator 
-	}
-	
-	
-	public static function removeIndicator ( $type = BatchJobType::IMPORT )
-	{
-		self::getIndicator( $type )->removeIndicator();
-	}
-	
-	private static function getIndicator( $type = BatchJobType::IMPORT )
-	{
-		if ( ! self::$indicator ) self::$indicator = array();
-		
-		if ( ! isset ( self::$indicator[$type] ) )
-		{
-			self::$indicator[$type] = new myFileIndicator( "gogobatchjob_{$type}" ); 
-		}
-		
-		return self::$indicator[$type];
 	}
 	
 	/**
@@ -388,18 +365,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 			throw new FileSyncException(FileSyncObjectType::BATCHJOB, $sub_type, $valid_sub_types);		
 	}
 	
-	public function isRetriesExceeded()
-	{
-		return ($this->execution_attempts >= BatchJobPeer::getMaxExecutionAttempts($this->job_type));
-	}
-	
-	public function getTwinJobs()
-	{
-		$c = new Criteria();
-		$c->add(BatchJobPeer::TWIN_JOB_ID, $this->id);
-		return BatchJobPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
-	}
-	
 	public function getChildJobs(Criteria $c = null)
 	{
 		if(!$c)
@@ -428,16 +393,19 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	/**
 	 * @return BatchJob
 	 */
-	public function createChild($same_root = true, $dc = null)
+	public function createChild( $type, $subType = null, $same_root = true, $dc = null)
 	{
 		$child = new BatchJob();
 		
 		$child->setStatus(self::BATCHJOB_STATUS_PENDING);
+		$child->setJobType($type);
+		if($subType !== null)
+			$child->setJobSubType($subType);
+		
 		$child->setParentJobId($this->id);
 		$child->setPartnerId($this->partner_id);
 		$child->setEntryId($this->entry_id);
 		$child->setPriority($this->priority);
-		$child->setSubpId($this->subp_id);
 		$child->setBulkJobId($this->bulk_job_id);
 		
 		// the condition is required in the special case of file_sync import jobs which are created on one dc but run from the other
@@ -487,7 +455,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	public function setData($v, $bypassSerialization = false) {
 		if ($bypassSerialization)
 			return parent::setData ( $v );
-		$this->setDuplicationKey ( BatchJobPeer::createDuplicationKey ( $this->getJobType (), $v ) );
 		if (! is_null ( $v )) {
 			$sereializedValue = serialize ( $v );
 			if (strlen ( ( string ) $sereializedValue ) > self::MAX_SERIALIZED_JOB_DATA_SIZE ) { 
@@ -499,19 +466,123 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 			parent::setData ( null );
 	} 
 	
-	
-	// make this attribute readonly
-	public function setProcessorExpiration($v)
+	/**
+	 * @return kLockInfoData
+	 */
+	public function getLockInfo()
 	{
-		if(is_null($v))
-			parent::setProcessorExpiration(null);
+		$data = parent::getLockInfo();
+		if(!is_null($data))
+			return unserialize ( $data );
+		return null;
+	}
+	
+	public function setLockInfo($v) {
+		if (! is_null ( $v )) 
+			parent::setLockInfo ( serialize ( $v ) );
+		else
+			parent::setLockInfo ( null );
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function getHistory()
+	{
+		$data = parent::getHistory();
+		if(!is_null($data))
+			return unserialize ( $data );
+		return null;
+	}
+	
+	public function setHistory($v) {
+		if (! is_null ( $v ))
+			parent::setHistory ( serialize ( $v ) );
+		else
+			parent::setHistory ( null );
+	}
+	
+	public function addHistoryRecord($v) {
+		$historyArr = $this->getHistory();
+		if($historyArr === null)
+			$historyArr = array();
+		$historyArr[] = $v;
+		$this->setHistory($historyArr);
 	}
 	
 	/*
 	 * @param boolean $useNewRoot
-	 */
+	*/
 	public function setUseNewRoot($useNewRoot)
 	{
 		$this->useNewRoot = $useNewRoot;
-	}	
+	}
+	
+	public function setObjectType($v) {
+		$objectType = kPluginableEnumsManager::apiToCore('BatchJobObjectType', $v);
+		parent::setObjectType($objectType);
+	}
+	
+	/**
+	 * Get the [object_type] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getObjectType()
+	{
+		$objectType = parent::getObjectType();
+		return kPluginableEnumsManager::coreToApi('BatchJobObjectType', $objectType);
+	} 
+	
+	
+	public function copyInto($copyObj, $deepCopy = false)
+	{
+		// Batch Job Fields
+		$copyObj->setJobType($this->job_type);
+		$copyObj->setJobSubType($this->job_sub_type);
+		$copyObj->setData($this->data);
+		$copyObj->setStatus($this->status);
+		$copyObj->setAbort($this->execution_status == BatchJobExecutionStatus::ABORTED);
+		$copyObj->setMessage($this->message);
+		$copyObj->setDescription($this->description);
+		$copyObj->setCreatedAt($this->created_at);
+		$copyObj->setUpdatedAt($this->updated_at);
+		$copyObj->setDeletedAt($this->deleted_at);
+		$copyObj->setPriority($this->priority);
+		$copyObj->setQueueTime($this->queue_time);
+		$copyObj->setFinishTime($this->finish_time);
+		$copyObj->setEntryId($this->entry_id);
+		$copyObj->setPartnerId($this->partner_id);
+		$copyObj->setLastSchedulerId($this->last_scheduler_id);
+		$copyObj->setLastWorkerId($this->last_worker_id);
+		$copyObj->setBulkJobId($this->bulk_job_id);
+		$copyObj->setRootJobId($this->root_job_id);
+		$copyObj->setParentJobId($this->parent_job_id);
+		$copyObj->setDc($this->dc);
+		$copyObj->setErrType($this->err_type);
+		$copyObj->setErrNumber($this->err_number);
+		
+		// Batch job lock info		
+		if($this->getLockInfo() != null) {
+			$copyObj->setFileSize($this->getLockInfo()->getEstimatedEffort());
+			$copyObj->setLockVersion($this->getLockInfo()->getLockVersion());
+		}
+		
+		// Batch job lock fields
+		$dbBatchJobLock = $this->getBatchJobLock();
+		if($dbBatchJobLock !== null)
+		{
+			$copyObj->setProcessorExpiration($dbBatchJobLock->getExpiration());
+			$copyObj->setExecutionAttempts($dbBatchJobLock->getExecutionAttempts());
+			$copyObj->setCheckAgainTimeout($dbBatchJobLock->getStartAt());
+		
+			$copyObj->setSchedulerId( $dbBatchJobLock->getSchedulerId());
+			$copyObj->setWorkerId($dbBatchJobLock->getWorkerId());
+			$copyObj->setBatchIndex($dbBatchJobLock->getBatchIndex());
+		}
+		
+		$copyObj->setNew(true);
+		$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
+	
+	}
 }

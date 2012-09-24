@@ -9,7 +9,7 @@
  * The state machine of the job is as follows:
  * 	 	parse URL	(youTube is a special case) 
  * 		fetch heraders (to calculate the size of the file)
- * 		fetch file (update the job's progress - 100% is when the whole file as appeared in the header)
+ * 		fetch file
  * 		move the file to the archive
  * 		set the entry's new status and file details  (check if FLV) 
  *
@@ -77,7 +77,7 @@ class KAsyncImport extends KJobHandlerWorker
 			$sourceUrl = $data->srcFileUrl;
 			KalturaLog::debug("sourceUrl [$sourceUrl]");
 			
-			$this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED, 1);
+			$this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED);
 			$fileSize = null;
 			$resumeOffset = 0;
 			if ($data->destFileLocalPath && file_exists($data->destFileLocalPath) )
@@ -137,7 +137,7 @@ class KAsyncImport extends KJobHandlerWorker
 				$destFile = $this->getTempFilePath($sourceUrl);			
 				KalturaLog::debug("destFile [$destFile]");
 				$data->destFileLocalPath = $destFile;
-				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, 2, $data);
+				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
 			}
 			
 			KalturaLog::debug("Executing curl");
@@ -182,7 +182,7 @@ class KAsyncImport extends KJobHandlerWorker
 				if($actualFileSize < $fileSize)
 				{
 					$percent = floor($actualFileSize * 100 / $fileSize);
-					$this->updateJob($job, "Downloaded size: $actualFileSize($percent%)", KalturaBatchJobStatus::PROCESSING, $percent, $data);
+					$this->updateJob($job, "Downloaded size: $actualFileSize($percent%)", KalturaBatchJobStatus::PROCESSING, $data);
 					$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 //					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_WRONG_SIZE, "Expected file size[$fileSize] actual file size[$actualFileSize]", KalturaBatchJobStatus::RETRY);
 					return $job;
@@ -190,7 +190,7 @@ class KAsyncImport extends KJobHandlerWorker
 			}
 			
 			
-			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED, 90);
+			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
 			
 			$job = $this->moveFile($job, $data->destFileLocalPath, $fileSize);
 		}
@@ -276,7 +276,7 @@ class KAsyncImport extends KJobHandlerWorker
 			KalturaLog::debug("destFile [$destFile]");
 			
 			// download file - overwrite local if exists
-			$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, 2, $data);
+			$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
 			KalturaLog::debug("Downloading remote file [$remotePath] to local path [$destFile]");
 			$res = $fileTransferMgr->getFile($remotePath, $destFile);
 			
@@ -295,13 +295,13 @@ class KAsyncImport extends KJobHandlerWorker
 				if($actualFileSize < $fileSize)
 				{
 					$percent = floor($actualFileSize * 100 / $fileSize);
-					$job = $this->updateJob($job, "Downloaded size: $actualFileSize($percent%)", KalturaBatchJobStatus::PROCESSING, $percent, $data);
+					$job = $this->updateJob($job, "Downloaded size: $actualFileSize($percent%)", KalturaBatchJobStatus::PROCESSING, $data);
 					$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 					return $job;
 				}
 			}
 			
-			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED, 90);
+			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
 			
 			$job = $this->moveFile($job, $data->destFileLocalPath, $fileSize);
 		}
@@ -334,7 +334,7 @@ class KAsyncImport extends KJobHandlerWorker
 				die(); 
 			}
 			$uniqid = uniqid('import_');
-			$sharedFile = realpath($rootPath) . "/$uniqid";
+			$sharedFile = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
 			
 			$ext = pathinfo($destFile, PATHINFO_EXTENSION);
 			if(strlen($ext))
@@ -408,7 +408,7 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 			
 		$uniqid = uniqid('import_');
-		$destFile = realpath($rootPath) . "/$uniqid";
+		$destFile = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
 		
 		// in case the url has added arguments, remove them (and reveal the real URL path)
 		// in order to find the file extension

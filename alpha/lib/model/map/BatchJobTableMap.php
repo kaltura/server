@@ -2,7 +2,7 @@
 
 
 /**
- * This class defines the structure of the 'batch_job' table.
+ * This class defines the structure of the 'batch_job_sep' table.
  *
  *
  *
@@ -31,54 +31,42 @@ class BatchJobTableMap extends TableMap {
 	public function initialize()
 	{
 	  // attributes
-		$this->setName('batch_job');
+		$this->setName('batch_job_sep');
 		$this->setPhpName('BatchJob');
 		$this->setClassname('BatchJob');
 		$this->setPackage('Core');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-		$this->addColumn('JOB_TYPE', 'JobType', 'SMALLINT', false, null, null);
-		$this->addColumn('JOB_SUB_TYPE', 'JobSubType', 'SMALLINT', false, null, null);
+		$this->addColumn('JOB_TYPE', 'JobType', 'INTEGER', false, null, null);
+		$this->addColumn('JOB_SUB_TYPE', 'JobSubType', 'INTEGER', false, null, null);
+		$this->addColumn('OBJECT_ID', 'ObjectId', 'VARCHAR', false, 20, '');
+		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'INTEGER', false, null, null);
 		$this->addColumn('DATA', 'Data', 'LONGVARCHAR', false, null, null);
-		$this->addColumn('FILE_SIZE', 'FileSize', 'INTEGER', false, null, null);
-		$this->addColumn('DUPLICATION_KEY', 'DuplicationKey', 'VARCHAR', false, 2047, null);
+		$this->addColumn('HISTORY', 'History', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('LOCK_INFO', 'LockInfo', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
-		$this->addColumn('ABORT', 'Abort', 'TINYINT', false, null, null);
-		$this->addColumn('CHECK_AGAIN_TIMEOUT', 'CheckAgainTimeout', 'INTEGER', false, null, null);
-		$this->addColumn('PROGRESS', 'Progress', 'TINYINT', false, null, null);
+		$this->addColumn('EXECUTION_STATUS', 'ExecutionStatus', 'INTEGER', false, null, null);
 		$this->addColumn('MESSAGE', 'Message', 'VARCHAR', false, 1024, null);
 		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', false, 1024, null);
-		$this->addColumn('UPDATES_COUNT', 'UpdatesCount', 'SMALLINT', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('CREATED_BY', 'CreatedBy', 'VARCHAR', false, 20, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('UPDATED_BY', 'UpdatedBy', 'VARCHAR', false, 20, null);
 		$this->addColumn('DELETED_AT', 'DeletedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('PRIORITY', 'Priority', 'TINYINT', false, null, null);
-		$this->addColumn('WORK_GROUP_ID', 'WorkGroupId', 'INTEGER', false, null, null);
 		$this->addColumn('QUEUE_TIME', 'QueueTime', 'TIMESTAMP', false, null, null);
 		$this->addColumn('FINISH_TIME', 'FinishTime', 'TIMESTAMP', false, null, null);
 		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', false, 20, '');
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, 0);
-		$this->addColumn('SUBP_ID', 'SubpId', 'INTEGER', false, null, 0);
-		$this->addColumn('SCHEDULER_ID', 'SchedulerId', 'INTEGER', false, null, null);
-		$this->addColumn('WORKER_ID', 'WorkerId', 'INTEGER', false, null, null);
-		$this->addColumn('BATCH_INDEX', 'BatchIndex', 'INTEGER', false, null, null);
-		$this->addColumn('LAST_SCHEDULER_ID', 'LastSchedulerId', 'INTEGER', false, null, null);
-		$this->addColumn('LAST_WORKER_ID', 'LastWorkerId', 'INTEGER', false, null, null);
-		$this->addColumn('LAST_WORKER_REMOTE', 'LastWorkerRemote', 'BOOLEAN', false, null, null);
-		$this->addColumn('PROCESSOR_EXPIRATION', 'ProcessorExpiration', 'TIMESTAMP', false, null, null);
-		$this->addColumn('EXECUTION_ATTEMPTS', 'ExecutionAttempts', 'TINYINT', false, null, null);
-		$this->addColumn('LOCK_VERSION', 'LockVersion', 'INTEGER', false, null, null);
-		$this->addColumn('TWIN_JOB_ID', 'TwinJobId', 'INTEGER', false, null, null);
 		$this->addColumn('BULK_JOB_ID', 'BulkJobId', 'INTEGER', false, null, null);
 		$this->addColumn('ROOT_JOB_ID', 'RootJobId', 'INTEGER', false, null, null);
 		$this->addColumn('PARENT_JOB_ID', 'ParentJobId', 'INTEGER', false, null, null);
+		$this->addColumn('BATCH_INDEX', 'BatchIndex', 'INTEGER', false, null, null);
+		$this->addColumn('LAST_SCHEDULER_ID', 'LastSchedulerId', 'INTEGER', false, null, null);
+		$this->addColumn('LAST_WORKER_ID', 'LastWorkerId', 'INTEGER', false, null, null);
 		$this->addColumn('DC', 'Dc', 'INTEGER', false, null, null);
 		$this->addColumn('ERR_TYPE', 'ErrType', 'INTEGER', false, null, null);
 		$this->addColumn('ERR_NUMBER', 'ErrNumber', 'INTEGER', false, null, null);
-		$this->addColumn('ON_STRESS_DIVERT_TO', 'OnStressDivertTo', 'INTEGER', false, null, null);
+		$this->addForeignKey('BATCH_JOB_LOCK_ID', 'BatchJobLockId', 'INTEGER', 'batch_job_lock', 'ID', false, null, null);
 		// validators
 	} // initialize()
 
@@ -87,6 +75,8 @@ class BatchJobTableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
+    $this->addRelation('BatchJobLock', 'BatchJobLock', RelationMap::MANY_TO_ONE, array('batch_job_lock_id' => 'id', ), null, null);
+    $this->addRelation('BatchJobLock', 'BatchJobLock', RelationMap::ONE_TO_MANY, array('id' => 'batch_job_id', ), null, null);
 	} // buildRelations()
 
 } // BatchJobTableMap

@@ -152,28 +152,28 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
-	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
+	public function updatedJob(BatchJob $dbBatchJob)
 	{
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
-			self::onDistributionSubmitJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+			self::onDistributionSubmitJobUpdated($dbBatchJob, $dbBatchJob->getData());
 		
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
-			self::onDistributionUpdateJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+			self::onDistributionUpdateJobUpdated($dbBatchJob, $dbBatchJob->getData());
 		
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
-			self::onDistributionDeleteJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+			self::onDistributionDeleteJobUpdated($dbBatchJob, $dbBatchJob->getData());
 		
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
-			self::onDistributionFetchReportJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+			self::onDistributionFetchReportJobUpdated($dbBatchJob, $dbBatchJob->getData());
 		
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_ENABLE))
-			self::onDistributionEnableJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+			self::onDistributionEnableJobUpdated($dbBatchJob, $dbBatchJob->getData());
 		 
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DISABLE))
-			self::onDistributionDisableJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+			self::onDistributionDisableJobUpdated($dbBatchJob, $dbBatchJob->getData());
 		
 		if($dbBatchJob->getJobType() == BatchJobType::IMPORT)
-			self::onImportJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+			self::onImportJobUpdated($dbBatchJob, $dbBatchJob->getData());
 		
 		return true;
 	}
@@ -256,10 +256,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionSubmitJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionSubmitJobUpdated(BatchJob $dbBatchJob, kDistributionSubmitJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionSubmitJobUpdated(BatchJob $dbBatchJob, kDistributionSubmitJobData $data)
 	{
 		if($data->getRemoteId() || $data->getResults() || $data->getSentData() || $data->getMediaFiles())
 		{
@@ -304,12 +303,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_PENDING:
-				return self::onDistributionSubmitJobPending($dbBatchJob, $data, $twinJob);
+				return self::onDistributionSubmitJobPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return self::onDistributionSubmitJobFinished($dbBatchJob, $data, $twinJob);
+				return self::onDistributionSubmitJobFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return self::onDistributionSubmitJobFailed($dbBatchJob, $data, $twinJob);
+				return self::onDistributionSubmitJobFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
@@ -318,10 +317,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionUpdateJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionUpdateJobUpdated(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionUpdateJobUpdated(BatchJob $dbBatchJob, kDistributionUpdateJobData $data)
 	{
 		if($data->getResults() || $data->getSentData() || $data->getMediaFiles())
 		{
@@ -363,12 +361,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_PENDING:
-				return self::onDistributionUpdateJobPending($dbBatchJob, $data, $twinJob);
+				return self::onDistributionUpdateJobPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return self::onDistributionUpdateJobFinished($dbBatchJob, $data, $twinJob);
+				return self::onDistributionUpdateJobFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return self::onDistributionUpdateJobFailed($dbBatchJob, $data, $twinJob);
+				return self::onDistributionUpdateJobFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
@@ -377,10 +375,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionUpdateJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionEnableJobUpdated(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionEnableJobUpdated(BatchJob $dbBatchJob, kDistributionUpdateJobData $data)
 	{
 		if($data->getResults() || $data->getSentData())
 		{
@@ -419,12 +416,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_PENDING:
-				return self::onDistributionEnableJobPending($dbBatchJob, $data, $twinJob);
+				return self::onDistributionEnableJobPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return self::onDistributionEnableJobFinished($dbBatchJob, $data, $twinJob);
+				return self::onDistributionEnableJobFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return self::onDistributionEnableJobFailed($dbBatchJob, $data, $twinJob);
+				return self::onDistributionEnableJobFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
@@ -433,18 +430,17 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kImportJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onImportJobUpdated(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
+	public static function onImportJobUpdated(BatchJob $dbBatchJob, kImportJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return self::onImportJobFinished($dbBatchJob, $data, $twinJob);
+				return self::onImportJobFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return self::onImportJobFailed($dbBatchJob, $data, $twinJob);
+				return self::onImportJobFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
@@ -453,10 +449,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionUpdateJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionDisableJobUpdated(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionDisableJobUpdated(BatchJob $dbBatchJob,kDistributionUpdateJobData $data)
 	{
 		if($data->getResults() || $data->getSentData())
 		{
@@ -495,12 +490,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_PENDING:
-				return self::onDistributionDisableJobPending($dbBatchJob, $data, $twinJob);
+				return self::onDistributionDisableJobPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return self::onDistributionDisableJobFinished($dbBatchJob, $data, $twinJob);
+				return self::onDistributionDisableJobFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return self::onDistributionDisableJobFailed($dbBatchJob, $data, $twinJob);
+				return self::onDistributionDisableJobFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
@@ -509,10 +504,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionDeleteJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionDeleteJobUpdated(BatchJob $dbBatchJob, kDistributionDeleteJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionDeleteJobUpdated(BatchJob $dbBatchJob, kDistributionDeleteJobData $data)
 	{
 		if($data->getResults() || $data->getSentData())
 		{
@@ -551,12 +545,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_PENDING:
-				return self::onDistributionDeleteJobPending($dbBatchJob, $data, $twinJob);
+				return self::onDistributionDeleteJobPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return self::onDistributionDeleteJobFinished($dbBatchJob, $data, $twinJob);
+				return self::onDistributionDeleteJobFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return self::onDistributionDeleteJobFailed($dbBatchJob, $data, $twinJob);
+				return self::onDistributionDeleteJobFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
@@ -565,15 +559,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionFetchReportJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionFetchReportJobUpdated(BatchJob $dbBatchJob, kDistributionFetchReportJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionFetchReportJobUpdated(BatchJob $dbBatchJob, kDistributionFetchReportJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return self::onDistributionFetchReportJobFinished($dbBatchJob, $data, $twinJob);
+				return self::onDistributionFetchReportJobFinished($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
@@ -582,10 +575,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionSubmitJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionSubmitJobPending(BatchJob $dbBatchJob, kDistributionSubmitJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionSubmitJobPending(BatchJob $dbBatchJob, kDistributionSubmitJobData $data)
 	{
 		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
 		{
@@ -598,10 +590,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionUpdateJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionUpdateJobPending(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionUpdateJobPending(BatchJob $dbBatchJob, kDistributionUpdateJobData $data)
 	{
 		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
 		{
@@ -614,10 +605,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionUpdateJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionEnableJobPending(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionEnableJobPending(BatchJob $dbBatchJob, kDistributionUpdateJobData $data)
 	{
 		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
 		{
@@ -630,10 +620,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionUpdateJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionDisableJobPending(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionDisableJobPending(BatchJob $dbBatchJob, kDistributionUpdateJobData $data)
 	{
 		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
 		{
@@ -646,10 +635,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionDeleteJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionDeleteJobPending(BatchJob $dbBatchJob, kDistributionDeleteJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionDeleteJobPending(BatchJob $dbBatchJob, kDistributionDeleteJobData $data)
 	{
 		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
 		{
@@ -662,10 +650,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionSubmitJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionSubmitJobFinished(BatchJob $dbBatchJob, kDistributionSubmitJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionSubmitJobFinished(BatchJob $dbBatchJob, kDistributionSubmitJobData $data)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)
@@ -714,10 +701,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionUpdateJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionUpdateJobFinished(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionUpdateJobFinished(BatchJob $dbBatchJob, kDistributionUpdateJobData $data)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)
@@ -766,10 +752,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionUpdateJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionEnableJobFinished(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionEnableJobFinished(BatchJob $dbBatchJob, kDistributionUpdateJobData $data)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)
@@ -819,10 +804,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kImportJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onImportJobFinished(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
+	public static function onImportJobFinished(BatchJob $dbBatchJob, kImportJobData $data)
 	{
 		$statuses = array(
 			EntryDistributionStatus::IMPORT_SUBMITTING,
@@ -852,10 +836,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kImportJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onImportJobFailed(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
+	public static function onImportJobFailed(BatchJob $dbBatchJob, kImportJobData $data)
 	{
 		$statuses = array(
 			EntryDistributionStatus::IMPORT_SUBMITTING,
@@ -884,10 +867,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionUpdateJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionDisableJobFinished(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionDisableJobFinished(BatchJob $dbBatchJob, kDistributionUpdateJobData $data)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)
@@ -911,10 +893,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionDeleteJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionDeleteJobFinished(BatchJob $dbBatchJob, kDistributionDeleteJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionDeleteJobFinished(BatchJob $dbBatchJob, kDistributionDeleteJobData $data)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)
@@ -936,10 +917,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionFetchReportJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionFetchReportJobFinished(BatchJob $dbBatchJob, kDistributionFetchReportJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionFetchReportJobFinished(BatchJob $dbBatchJob, kDistributionFetchReportJobData $data)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)
@@ -957,10 +937,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionSubmitJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionSubmitJobFailed(BatchJob $dbBatchJob, kDistributionSubmitJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionSubmitJobFailed(BatchJob $dbBatchJob, kDistributionSubmitJobData $data)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)
@@ -983,10 +962,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionUpdateJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionUpdateJobFailed(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionUpdateJobFailed(BatchJob $dbBatchJob, kDistributionUpdateJobData $data)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)
@@ -1009,10 +987,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionUpdateJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionEnableJobFailed(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionEnableJobFailed(BatchJob $dbBatchJob, kDistributionUpdateJobData $data)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)
@@ -1035,10 +1012,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionUpdateJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionDisableJobFailed(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionDisableJobFailed(BatchJob $dbBatchJob, kDistributionUpdateJobData $data)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)
@@ -1061,10 +1037,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionDeleteJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionDeleteJobFailed(BatchJob $dbBatchJob, kDistributionDeleteJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionDeleteJobFailed(BatchJob $dbBatchJob, kDistributionDeleteJobData $data)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)

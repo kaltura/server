@@ -742,7 +742,7 @@ class Partner extends BasePartner
 	public function isCategoriesLocked()
 	{
 		return $this->getCategoriesLock();
-	}
+		}
 
 	public function getOpenId ()
 	{
@@ -754,25 +754,6 @@ class Partner extends BasePartner
 		$service_config_id = $this->getServiceConfigId() ;
 		return  myServiceConfig::getInstance ( $service_config_id );	
 	}
-	
-	public function getPriority($isBulk)
-	{
-		$priorityGroup = PriorityGroupPeer::retrieveByPK($this->getPriorityGroupId());
-		
-		if(!$priorityGroup)
-		{
-			if($isBulk)
-				return PriorityGroup::DEFAULT_BULK_PRIORITY;
-				
-			return PriorityGroup::DEFAULT_PRIORITY;
-		}
-		
-		if($isBulk)
-			return $priorityGroup->getBulkPriority();
-			
-		return $priorityGroup->getPriority();
-	}
-	
 	
 	public function getMaxLoginAttempts()
 	{
@@ -1353,7 +1334,7 @@ class Partner extends BasePartner
 		}
 		return $id;
 	}
-
+	
 	/**
 	 * @return AccessControl
 	 */
@@ -1364,5 +1345,5 @@ class Partner extends BasePartner
 			return accessControlPeer::retrieveByPK($id);
 		else
 			return null;
-	}
+	}	
 }

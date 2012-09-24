@@ -35,7 +35,7 @@ class KAsyncParseCaptionAsset extends KJobHandlerWorker
 		
 		try
 		{
-			$this->updateJob($job, "Start parsing caption asset [$data->captionAssetId]", KalturaBatchJobStatus::QUEUED, 1);
+			$this->updateJob($job, "Start parsing caption asset [$data->captionAssetId]", KalturaBatchJobStatus::QUEUED);
 			
 			$captionSearchPlugin = KalturaCaptionSearchClientPlugin::get($this->kClient);
 			$captionSearchPlugin->captionAssetItem->parse($data->captionAssetId);

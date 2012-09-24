@@ -19,9 +19,9 @@ class kIdeticDistributionReportHandler implements kBatchJobStatusEventConsumer
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
-	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
+	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		self::onDistributionFetchReportJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+		self::onDistributionFetchReportJobUpdated($dbBatchJob, $dbBatchJob->getData());
 			
 		return true;
 	}
@@ -29,15 +29,14 @@ class kIdeticDistributionReportHandler implements kBatchJobStatusEventConsumer
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionFetchReportJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionFetchReportJobUpdated(BatchJob $dbBatchJob, kDistributionFetchReportJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionFetchReportJobUpdated(BatchJob $dbBatchJob, kDistributionFetchReportJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return self::onDistributionFetchReportJobFinished($dbBatchJob, $data, $twinJob);
+				return self::onDistributionFetchReportJobFinished($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
@@ -46,10 +45,9 @@ class kIdeticDistributionReportHandler implements kBatchJobStatusEventConsumer
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionFetchReportJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionFetchReportJobFinished(BatchJob $dbBatchJob, kDistributionFetchReportJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionFetchReportJobFinished(BatchJob $dbBatchJob, kDistributionFetchReportJobData $data)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)

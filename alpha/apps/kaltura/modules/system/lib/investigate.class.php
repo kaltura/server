@@ -723,8 +723,8 @@ file_sizeint(11)
 "deleted_at", "priority", "work_group_id","queue_time","finish_time","entry_id",
 "partner_id","subp_id","scheduler_id","worker_id","batch_index","last_scheduler_id",
 "last_worker_id","last_worker_remote",/*"processor_name",*/"processor_expiration",
-/*"processor_location",*/"execution_attempts","lock_version","twin_job_id","bulk_job_id",
-"dc","err_type","err_number","on_stress_divert_to"
+/*"processor_location",*/"execution_attempts","lock_version","bulk_job_id",
+"dc","err_type","err_number",
 	);
 	public static function printBatchjobHeader ()
 	{
@@ -759,7 +759,6 @@ file_sizeint(11)
 		"<td>Data</td>".
 		"<td title=\"$status_txt\">Status</td>".
 		"<td>Abort</td>".
-		"<td>Progress</td>".
 		"<td style='width:120px' >Message</td>".
 		"<td style='width:120px' >Description</td>".
 		"<td>Updates Count</td>".
@@ -835,7 +834,6 @@ file_sizeint(11)
 		'<td title="' . $title . '" style="background-color:' . $status_bg . '">' . $bj->status .'</td>'.
 		'<td>'. $bj->abort .'</td>'.
 		
-		'<td>'. $bj->progress .'</td>'.
 		'<td>'. $bj->message .'</td>'.
 		'<td>'. $bj->description  .'</td>'.
 		'<td>'. $bj->updatesCount .'</td>'.

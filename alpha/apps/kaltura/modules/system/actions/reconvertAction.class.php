@@ -89,6 +89,8 @@ class reconvertAction extends kalturaSystemAction
 		$dbBatchJob->setStatus(BatchJob::BATCHJOB_STATUS_PENDING);
 		$dbBatchJob->setDc( kDataCenterMgr::getCurrentDcId() );
 		$dbBatchJob->setPriority ( $job_priority );
+		$dbBatchJob->setObjectId($entry_id);
+		$dbBatchJob->setObjectType(BatchJobObjectType::ENTRY);
 		$dbBatchJob->save();
 		
 		// creates a convert profile job

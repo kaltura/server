@@ -51,10 +51,9 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kImportJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleImportFailed(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
+	public static function handleImportFailed(BatchJob $dbBatchJob, kImportJobData $data)
 	{
 		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_IMPORTING);
 		
@@ -74,21 +73,17 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kImportJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleImportFinished(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
+	public static function handleImportFinished(BatchJob $dbBatchJob, kImportJobData $data)
 	{
 		KalturaLog::debug("Import finished, with file: " . $data->getDestFileLocalPath());
 
-		if($dbBatchJob->getAbort())
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 			
-		if(!$twinJob)
-		{
-			if(!file_exists($data->getDestFileLocalPath()))
+		if(!file_exists($data->getDestFileLocalPath()))
 			throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFileLocalPath());
-		}
 
 		// get entry
 		$entryId = $dbBatchJob->getEntryId();
@@ -140,36 +135,16 @@ class kFlowHelper
 		if(kFileSyncUtils::fileSync_exists($syncKey))
 			$isNewContent = false;
 
-		if($twinJob)
-		{
-			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			// copy file sync
-			$twinData = $twinJob->getData();
-			if($twinData instanceof kImportJobData)
-			{
-				$twinFlavorAsset = assetPeer::retrieveById($twinData->getFlavorAssetId());
-				if($twinFlavorAsset)
-				{
-					$twinSyncKey = $twinFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-					if($twinSyncKey && kFileSyncUtils::file_exists($twinSyncKey))
-					{
-						kFileSyncUtils::softCopy($twinSyncKey, $syncKey);
-					}
-				}
-			}
-		}
-		else
-		{
-			$ext = pathinfo($data->getDestFileLocalPath(), PATHINFO_EXTENSION);
-			KalturaLog::info("Imported file extension: $ext");
-			if(!$flavorAsset->getVersion())
-				$flavorAsset->incrementVersion();
+		$ext = pathinfo($data->getDestFileLocalPath(), PATHINFO_EXTENSION);
+		KalturaLog::info("Imported file extension: $ext");
+		if(!$flavorAsset->getVersion())
+			$flavorAsset->incrementVersion();
 
-			$flavorAsset->setFileExt($ext);
-			$flavorAsset->save();
-			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());
-		}
+		$flavorAsset->setFileExt($ext);
+		$flavorAsset->save();
+		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());
+		
 
 		// set the path in the job data
 		$localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
@@ -180,7 +155,7 @@ class kFlowHelper
 
 		if($isNewContent || $dbEntry->getStatus() == entryStatus::IMPORT)
 			// check if status == import for importing file of type url (filesync exists, and we want to raise event for conversion profile to start) 
-			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
+			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob)); 
 		
 		if(!$isNewFlavor && $flavorAsset->getIsOriginal())
 		{
@@ -216,39 +191,18 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kExtractMediaJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleExtractMediaClosed(BatchJob $dbBatchJob, kExtractMediaJobData $data, BatchJob $twinJob = null)
+	public static function handleExtractMediaClosed(BatchJob $dbBatchJob, kExtractMediaJobData $data)
 	{
 		KalturaLog::debug("Extract media closed");
 
-		if($dbBatchJob->getAbort())
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
 		$rootBatchJob = $dbBatchJob->getRootJob();
 		if(!$rootBatchJob)
 			return $dbBatchJob;
-
-		if($twinJob)
-		{
-			// copy media info
-			$twinData = $twinJob->getData();
-			if($twinData->getMediaInfoId())
-			{
-				$twinMediaInfo = mediaInfoPeer::retrieveByPK($twinData->getMediaInfoId());
-				if($twinMediaInfo)
-				{
-					$mediaInfo = $twinMediaInfo->copy();
-					$mediaInfo->setFlavorAssetId($data->getFlavorAssetId());
-					$mediaInfo = kBatchManager::addMediaInfo($mediaInfo);
-
-					$data->setMediaInfoId($mediaInfo->getId());
-					$dbBatchJob->setData($data);
-					$dbBatchJob->save();
-				}
-			}
-		}
 
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
@@ -273,10 +227,9 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertPending(BatchJob $dbBatchJob, kConvertJobData $data, BatchJob $twinJob = null)
+	public static function handleConvertPending(BatchJob $dbBatchJob, kConvertJobData $data)
 	{
 		KalturaLog::debug("Convert created with source file: " . $data->getSrcFileSyncLocalPath());
 
@@ -302,10 +255,9 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertCollectionJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertCollectionPending(BatchJob $dbBatchJob, kConvertCollectionJobData $data, BatchJob $twinJob = null)
+	public static function handleConvertCollectionPending(BatchJob $dbBatchJob, kConvertCollectionJobData $data)
 	{
 		KalturaLog::debug("Convert collection created with source file: " . $data->getSrcFileSyncLocalPath());
 
@@ -330,14 +282,13 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertFinished(BatchJob $dbBatchJob, kConvertJobData $data, BatchJob $twinJob = null)
+	public static function handleConvertFinished(BatchJob $dbBatchJob, kConvertJobData $data)
 	{
 		KalturaLog::debug("Convert finished with destination file: " . $data->getDestFileSyncLocalPath());
 
-		if($dbBatchJob->getAbort())
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
 		// verifies that flavor asset created
@@ -441,7 +392,8 @@ class kFlowHelper
 		if($nextOperator)
 		{
 			//			KalturaLog::debug("Found next operator");
-			$nextJob = kJobsManager::addFlavorConvertJob($syncKey, $flavorParamsOutput, $data->getFlavorAssetId(), $data->getMediaInfoId(), $dbBatchJob, $dbBatchJob->getJobSubType());
+			$nextJob = kJobsManager::addFlavorConvertJob($syncKey, $flavorParamsOutput, $data->getFlavorAssetId(), null,
+					$data->getMediaInfoId(), $dbBatchJob, $dbBatchJob->getJobSubType());
 		}
 
 		if(!$nextJob)
@@ -511,14 +463,12 @@ class kFlowHelper
 				"conversion_quality" => $entry->getConversionQuality(),
 				"download_url" => $downloadUrl,
 				"status" => $entry->getStatus(),
-				"abort" => $dbBatchJob->getAbort(),
-				"progress" => $dbBatchJob->getProgress(),
+				"abort" => ($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED),
 				"message" => $dbBatchJob->getMessage(),
 				"description" => $dbBatchJob->getDescription(),
 				"updates_count" => $dbBatchJob->getUpdatesCount(),
 				"job_type" => BatchJobType::DOWNLOAD,
 				"status" => BatchJob::BATCHJOB_STATUS_FINISHED,
-				"progress" => 100,
 				"debug" => __LINE__,
 			);
 
@@ -531,14 +481,13 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kCaptureThumbJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleCaptureThumbFinished(BatchJob $dbBatchJob, kCaptureThumbJobData $data, BatchJob $twinJob = null)
+	public static function handleCaptureThumbFinished(BatchJob $dbBatchJob, kCaptureThumbJobData $data)
 	{
 		KalturaLog::debug("Capture thumbnail finished with destination file: " . $data->getThumbPath());
 
-		if($dbBatchJob->getAbort())
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
 		// verifies that thumb asset created
@@ -637,10 +586,9 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertQueued(BatchJob $dbBatchJob, kConvertJobData $data, BatchJob $twinJob = null)
+	public static function handleConvertQueued(BatchJob $dbBatchJob, kConvertJobData $data)
 	{
 		$rootBatchJob = $dbBatchJob->getRootJob();
 		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
@@ -666,14 +614,12 @@ class kFlowHelper
 			//				"email" => '',
 				"conversion_quality" => $entry->getConversionQuality(),
 				"status" => $entry->getStatus(),
-				"abort" => $dbBatchJob->getAbort(),
-				"progress" => $dbBatchJob->getProgress(),
+				"abort" => ($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED),
 				"message" => $dbBatchJob->getMessage(),
 				"description" => $dbBatchJob->getDescription(),
 				"updates_count" => $dbBatchJob->getUpdatesCount(),
 				"job_type" => BatchJobType::DOWNLOAD,
 				"status" => BatchJob::BATCHJOB_STATUS_QUEUED,
-				"progress" => 0,
 				"debug" => __LINE__,
 			);
 
@@ -687,14 +633,13 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertFailed(BatchJob $dbBatchJob, kConvertJobData $data, BatchJob $twinJob = null)
+	public static function handleConvertFailed(BatchJob $dbBatchJob, kConvertJobData $data)
 	{
 		KalturaLog::debug("Convert failed with destination file: " . $data->getDestFileSyncLocalPath());
 
-		if($dbBatchJob->getAbort())
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
 		// verifies that flavor asset created
@@ -759,15 +704,13 @@ class kFlowHelper
 				//				"email" => '',
 					"conversion_quality" => $entry->getConversionQuality(),
 					"status" => $entry->getStatus(),
-					"abort" => $dbBatchJob->getAbort(),
-					"progress" => $dbBatchJob->getProgress(),
+					"abort" => ($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED),
 					"message" => $dbBatchJob->getMessage(),
 					"description" => $dbBatchJob->getDescription(),
 					"updates_count" => $dbBatchJob->getUpdatesCount(),
 					"job_type" => BatchJobType::DOWNLOAD,
 					"conversion_error" => "Error while converting [$entryId] [$fileFormat]",
 					"status" => BatchJob::BATCHJOB_STATUS_FAILED,
-					"progress" => 0,
 					"debug" => __LINE__,
 				);
 
@@ -782,14 +725,13 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kCaptureThumbJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleCaptureThumbFailed(BatchJob $dbBatchJob, kCaptureThumbJobData $data, BatchJob $twinJob = null)
+	public static function handleCaptureThumbFailed(BatchJob $dbBatchJob, kCaptureThumbJobData $data)
 	{
 		KalturaLog::debug("Captura thumbnail failed with destination file: " . $data->getThumbPath());
 
-		if($dbBatchJob->getAbort())
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
 		// verifies that thumb asset created
@@ -811,10 +753,9 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kPostConvertJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handlePostConvertFailed(BatchJob $dbBatchJob, kPostConvertJobData $data, BatchJob $twinJob = null)
+	public static function handlePostConvertFailed(BatchJob $dbBatchJob, kPostConvertJobData $data)
 	{
 		KalturaLog::debug("Post Convert failed for flavor params output: " . $data->getFlavorParamsOutputId());
 
@@ -858,14 +799,13 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertCollectionJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertCollectionFinished(BatchJob $dbBatchJob, kConvertCollectionJobData $data, BatchJob $twinJob = null)
+	public static function handleConvertCollectionFinished(BatchJob $dbBatchJob, kConvertCollectionJobData $data)
 	{
 		KalturaLog::debug("Convert Collection finished for entry id: " . $dbBatchJob->getEntryId());
 
-		if($dbBatchJob->getAbort())
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
 
@@ -994,14 +934,12 @@ class kFlowHelper
 				"conversion_quality" => $entry->getConversionQuality(),
 				"download_url" => $downloadUrl,
 				"status" => $entry->getStatus(),
-				"abort" => $dbBatchJob->getAbort(),
-				"progress" => $dbBatchJob->getProgress(),
+				"abort" => ($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED),
 				"message" => $dbBatchJob->getMessage(),
 				"description" => $dbBatchJob->getDescription(),
 				"updates_count" => $dbBatchJob->getUpdatesCount(),
 				"job_type" => BatchJobType::DOWNLOAD,
 				"status" => BatchJob::BATCHJOB_STATUS_FINISHED,
-				"progress" => 100,
 				"debug" => __LINE__,
 			);
 
@@ -1014,10 +952,9 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertCollectionJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertCollectionFailed(BatchJob $dbBatchJob, kConvertCollectionJobData $data, BatchJob $twinJob = null)
+	public static function handleConvertCollectionFailed(BatchJob $dbBatchJob, kConvertCollectionJobData $data)
 	{
 		KalturaLog::debug("Convert Collection failed for entry id: " . $dbBatchJob->getEntryId());
 
@@ -1223,13 +1160,12 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kPostConvertJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob|BatchJob
 	 */
-	public static function handlePostConvertFinished(BatchJob $dbBatchJob, kPostConvertJobData $data, BatchJob $twinJob = null)
+	public static function handlePostConvertFinished(BatchJob $dbBatchJob, kPostConvertJobData $data)
 	{
-		if($dbBatchJob->getAbort())
-		return $dbBatchJob;
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
+			return $dbBatchJob;
 
 		if($data->getCreateThumb())
 		{
@@ -1330,10 +1266,9 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kBulkUploadJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleBulkUploadFinished(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
+	public static function handleBulkUploadFinished(BatchJob $dbBatchJob, kBulkUploadJobData $data)
 	{
 		if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
 			self::sendBulkUploadNotificationEmail($dbBatchJob, MailType::MAIL_TYPE_BULKUPLOAD_FINISHED, array($dbBatchJob->getPartner()->getAdminName(), $dbBatchJob->getId(), self::createBulkUploadLogUrl($dbBatchJob)));
@@ -1343,10 +1278,9 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kBulkUploadJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleBulkUploadFailed(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
+	public static function handleBulkUploadFailed(BatchJob $dbBatchJob, kBulkUploadJobData $data)
 	{
 		if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
 				self::sendBulkUploadNotificationEmail($dbBatchJob, MailType::MAIL_TYPE_BULKUPLOAD_FAILED, array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), $dbBatchJob->getErrType(), $dbBatchJob->getErrNumber(), $dbBatchJob->getMessage(), self::createBulkUploadLogUrl($dbBatchJob)));
@@ -1444,10 +1378,9 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertProfileJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertProfilePending(BatchJob $dbBatchJob, kConvertProfileJobData $data, BatchJob $twinJob = null)
+	public static function handleConvertProfilePending(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
 		KalturaLog::debug("Convert Profile created, with input file: " . $data->getInputFileSyncLocalPath());
 
@@ -1475,7 +1408,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	public static function handleConvertProfileFailed(BatchJob $dbBatchJob, kConvertProfileJobData $data, BatchJob $twinJob = null)
+	public static function handleConvertProfileFailed(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
 		KalturaLog::debug("Convert Profile failed");
 
@@ -1492,7 +1425,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	public static function handleConvertProfileFinished(BatchJob $dbBatchJob, kConvertProfileJobData $data, BatchJob $twinJob = null)
+	public static function handleConvertProfileFinished(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
 		KalturaLog::debug("Convert Profile finished");
 
@@ -1509,7 +1442,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	public static function handleBulkDownloadPending(BatchJob $dbBatchJob, kBulkDownloadJobData $data, BatchJob $twinJob = null)
+	public static function handleBulkDownloadPending(BatchJob $dbBatchJob, kBulkDownloadJobData $data)
 	{
 		$entryIds = explode(',', $data->getEntryIds());
 		$flavorParamsId = $data->getFlavorParamsId();
@@ -1565,14 +1498,12 @@ class kFlowHelper
 							"conversion_quality" => $entry->getConversionQuality(),
 							"download_url" => $downloadUrl,
 							"status" => $entry->getStatus(),
-							"abort" => $dbBatchJob->getAbort(),
-							"progress" => $dbBatchJob->getProgress(),
+							"abort" => ($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED),
 							"message" => $dbBatchJob->getMessage(),
 							"description" => $dbBatchJob->getDescription(),
 							"updates_count" => $dbBatchJob->getUpdatesCount(),
 							"job_type" => BatchJobType::DOWNLOAD,
 							"status" => BatchJob::BATCHJOB_STATUS_FINISHED,
-							"progress" => 100,
 							"debug" => __LINE__,
 						);
 
@@ -1602,7 +1533,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	public static function handleProvisionProvideFinished(BatchJob $dbBatchJob, kProvisionJobData $data, BatchJob $twinJob = null)
+	public static function handleProvisionProvideFinished(BatchJob $dbBatchJob, kProvisionJobData $data)
 	{
 		$entry = $dbBatchJob->getEntry();
 		$entry->setStreamUsername($data->getEncoderUsername());
@@ -1617,15 +1548,15 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	public static function handleProvisionProvideFailed(BatchJob $dbBatchJob, kProvisionJobData $data, BatchJob $twinJob = null)
+	public static function handleProvisionProvideFailed(BatchJob $dbBatchJob, kProvisionJobData $data)
 	{
 		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 		return $dbBatchJob;
 	}
 
-	public static function handleBulkDownloadFinished(BatchJob $dbBatchJob, kBulkDownloadJobData $data, BatchJob $twinJob = null)
+	public static function handleBulkDownloadFinished(BatchJob $dbBatchJob, kBulkDownloadJobData $data)
 	{
-		if($dbBatchJob->getAbort())
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 			
 		$partner = PartnerPeer::retrieveByPK($dbBatchJob->getPartnerId());
@@ -1685,7 +1616,7 @@ class kFlowHelper
 		$jobData->setRecipientEmail($recipientEmail);
 		$jobData->setSubjectParamsArray(array());
 
-		kJobsManager::addJob($dbBatchJob->createChild(), $jobData, BatchJobType::MAIL, $jobData->getMailType());
+		kJobsManager::addJob($dbBatchJob->createChild(BatchJobType::MAIL, $jobData->getMailType()), $jobData, BatchJobType::MAIL, $jobData->getMailType());
 
 		return $dbBatchJob;
 	}
@@ -1939,7 +1870,7 @@ class kFlowHelper
 		}
 	}
 	
-	public static function handleIndexPending(BatchJob $dbBatchJob, kIndexJobData $data, $twinJob)
+	public static function handleIndexPending(BatchJob $dbBatchJob, kIndexJobData $data)
 	{
 		$featureStatusesToRemove = $data->getFeatureStatusesToRemove();
 		
@@ -1953,7 +1884,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 	
-	public static function handleIndexFinished(BatchJob $dbBatchJob, kIndexJobData $data, $twinJob)
+	public static function handleIndexFinished(BatchJob $dbBatchJob, kIndexJobData $data)
 	{
 		$featureStatusesToRemove = $data->getFeatureStatusesToRemove();
 		foreach($featureStatusesToRemove as $featureStatusToRemove)
@@ -1967,7 +1898,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 		
-	public static function handleIndexFailed(BatchJob $dbBatchJob, kIndexJobData $data, $twinJob)
+	public static function handleIndexFailed(BatchJob $dbBatchJob, kIndexJobData $data)
 	{
 		$featureStatusesToRemove = $data->getFeatureStatusesToRemove();
 		foreach($featureStatusesToRemove as $featureStatusToRemove)

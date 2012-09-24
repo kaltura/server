@@ -54,4 +54,33 @@ class PartnerPeer extends BasePartnerPeer
 		return $c;
 	}
 	
+	public static function getPartnerPriorityFactor($partnerId, $urgency)
+	{
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$priority = self::getPriority($partner, $urgency);
+		$priority2Factor = kConf::get('priority_factor');
+		$priorityFactor = $priority2Factor[$priority];
+		return $priorityFactor;
+	}
+	
+	private static function getPriority($partner, $urgency)
+	{
+		// TODO : Bounded to kJobsManager::generateLockInfoData, when it changes - the next lines should be updated accordingly.
+		//  In the future the urgency will be a factor of the urgency. for the time being, we will treat it only as isbulk factor
+		$isBulk = BatchJobUrgencyType::isBulkUpload($urgency);
+		$priorityGroup = PriorityGroupPeer::retrieveByPK($partner->getPriorityGroupId());
+	
+		if(!$priorityGroup)
+		{
+			if($isBulk)
+				return PriorityGroup::DEFAULT_BULK_PRIORITY;
+	
+			return PriorityGroup::DEFAULT_PRIORITY;
+		}
+	
+		if($isBulk)
+			return $priorityGroup->getBulkPriority();
+			
+		return $priorityGroup->getPriority();
+	}
 }

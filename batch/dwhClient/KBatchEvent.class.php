@@ -24,7 +24,6 @@
  * 	,batch_parant_id int
  * 	,batch_root_id int
  * 	,batch_status smallint
- * 	,batch_progress int
  * 	,value_1 int
  * 	,value_2 string
  * 
@@ -61,7 +60,6 @@ class KBatchEvent extends KDwhEventBase
 	public $batch_parant_id = null;			// int
 	public $batch_root_id = null; 			// int
 	public $batch_status = null; 			// smallint
-	public $batch_progress = null; 			// int
 	public $value_1 = null; 				// int
 	public $value_2 = null; 				// string
 		
@@ -84,7 +82,6 @@ class KBatchEvent extends KDwhEventBase
 			$this->batch_parant_id . self::EVENT_FIELD_SEPARATOR .
 			$this->batch_root_id . self::EVENT_FIELD_SEPARATOR .
 			$this->batch_status . self::EVENT_FIELD_SEPARATOR .
-			$this->batch_progress . self::EVENT_FIELD_SEPARATOR .
 			$this->value_1  . self::EVENT_FIELD_SEPARATOR .
 			$this->value_2 
 			. self::EVENT_LINE_DELIMITER;	

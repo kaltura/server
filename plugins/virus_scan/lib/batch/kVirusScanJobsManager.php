@@ -13,6 +13,8 @@ class kVirusScanJobsManager extends kJobsManager
 	 */
 	public static function addVirusScanJob(BatchJob $parentJob = null, $partnerId, $entryId, $flavorAssetId, $srcFilePath, $virusScanEngine, $virusFoundAction)
 	{
+		$jobType = VirusScanPlugin::getBatchJobTypeCoreValue(VirusScanBatchJobType::VIRUS_SCAN);
+		
  		$jobData = new kVirusScanJobData();
  		$jobData->setSrcFilePath($srcFilePath);
  		$jobData->setFlavorAssetId($flavorAssetId);
@@ -21,7 +23,7 @@ class kVirusScanJobsManager extends kJobsManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild();
+			$batchJob = $parentJob->createChild($jobType, $virusScanEngine);
 		}
 		else
 		{
@@ -30,7 +32,9 @@ class kVirusScanJobsManager extends kJobsManager
 			$batchJob->setPartnerId($partnerId);
 		}
 		
-		$jobType = VirusScanPlugin::getBatchJobTypeCoreValue(VirusScanBatchJobType::VIRUS_SCAN);
+		$batchJob->setObjectId($flavorAssetId);
+		$batchJob->setObjectType(BatchJobObjectType::ASSET);
+		
 		return self::addJob($batchJob, $jobData, $jobType, $virusScanEngine);
 	}
 }

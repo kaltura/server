@@ -48,7 +48,6 @@ elseif ( $type == "batch" )
 	,batch_parant_id int
 	,batch_root_id int
 	,batch_status smallint
-	,batch_progress int
 	,value_1 int
  */
 $header = array ( "client version" , "event type id" , "batch name" , "event_time" , "session_id" , "batch type" , "host name" ,

@@ -75,7 +75,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			}
 			
 			KalturaLog::debug("mediaFile [$mediaFile]");
-			$this->updateJob($job,"Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED, 1);
+			$this->updateJob($job,"Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED);
 		}
 		catch(Exception $ex)
 		{
@@ -114,7 +114,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			$createdMediaInfo = $this->getClient()->batch->addMediaInfo($mediaInfo);
 			
 			// must save the mediaInfoId before reporting that the task is finished
-			$this->updateJob($job, "Saving media info id $createdMediaInfo->id", KalturaBatchJobStatus::PROCESSED, 50, $data);
+			$this->updateJob($job, "Saving media info id $createdMediaInfo->id", KalturaBatchJobStatus::PROCESSED, $data);
 			
 			$data->thumbPath = null;
 			if(!$data->createThumb)
@@ -126,7 +126,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 				
 			// creates the path
 			$uniqid = uniqid('thumb_');
-			$thumbPath = realpath($rootPath) . "/$uniqid";
+			$thumbPath = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
 			
 			$videoDurationSec = floor($mediaInfo->videoDuration / 1000);
 			$data->thumbOffset = max(0 ,min($data->thumbOffset, $videoDurationSec));
@@ -189,7 +189,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		}
 		
 		$uniqid = uniqid('thumb_');
-		$sharedFile = realpath($rootPath) . "/$uniqid";
+		$sharedFile = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
 		
 		clearstatcache();
 		$fileSize = kFile::fileSize($data->thumbPath);

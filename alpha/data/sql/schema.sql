@@ -371,50 +371,6 @@ CREATE TABLE `kshow_kuser`
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
-#-- mail_job
-#-----------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `mail_job`;
-
-
-CREATE TABLE `mail_job`
-(
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`mail_type` SMALLINT,
-	`mail_priority` SMALLINT,
-	`recipient_name` VARCHAR(64),
-	`recipient_email` VARCHAR(64),
-	`recipient_id` INTEGER,
-	`from_name` VARCHAR(64),
-	`from_email` VARCHAR(64),
-	`body_params` VARCHAR(2048),
-	`subject_params` VARCHAR(512),
-	`template_path` VARCHAR(512),
-	`culture` TINYINT,
-	`status` TINYINT,
-	`created_at` DATETIME,
-	`campaign_id` INTEGER,
-	`min_send_date` DATETIME,
-	`scheduler_id` INTEGER,
-	`worker_id` INTEGER,
-	`batch_index` INTEGER,
-	`processor_expiration` DATETIME,
-	`execution_attempts` TINYINT,
-	`lock_version` INTEGER,
-	`partner_id` INTEGER default 0,
-	`updated_at` DATETIME,
-	`dc` VARCHAR(2),
-	PRIMARY KEY (`id`),
-	KEY `mail_job_index`(`mail_priority`, `created_at`),
-	KEY `recipient_id_index`(`recipient_id`),
-	KEY `campaign_id_index`(`campaign_id`),
-	KEY `partner_id_index`(`partner_id`),
-	CONSTRAINT `mail_job_FK_1`
-		FOREIGN KEY (`recipient_id`)
-		REFERENCES `kuser` (`id`)
-)Type=InnoDB;
-
-#-----------------------------------------------------------------------------
 #-- scheduler
 #-----------------------------------------------------------------------------
 
@@ -553,68 +509,126 @@ CREATE TABLE `control_panel_command`
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
-#-- batch_job
+#-- batch_job_sep
 #-----------------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `batch_job`;
+DROP TABLE IF EXISTS `batch_job_sep`;
 
 
-CREATE TABLE `batch_job`
+CREATE TABLE `batch_job_sep`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`job_type` SMALLINT,
-	`job_sub_type` SMALLINT,
+	`job_type` INTEGER,
+	`job_sub_type` INTEGER,
+	`object_id` VARCHAR(20) default '',
+	`object_type` INTEGER,
 	`data` TEXT,
-	`file_size` INTEGER,
-	`duplication_key` VARCHAR(2047),
+	`history` TEXT,
+	`lock_info` TEXT,
 	`status` INTEGER,
-	`abort` TINYINT,
-	`check_again_timeout` INTEGER,
-	`progress` TINYINT,
+	`execution_status` INTEGER,
 	`message` VARCHAR(1024),
 	`description` VARCHAR(1024),
-	`updates_count` SMALLINT,
 	`created_at` DATETIME,
-	`created_by` VARCHAR(20),
 	`updated_at` DATETIME,
-	`updated_by` VARCHAR(20),
 	`deleted_at` DATETIME,
 	`priority` TINYINT,
-	`work_group_id` INTEGER,
 	`queue_time` DATETIME,
 	`finish_time` DATETIME,
 	`entry_id` VARCHAR(20) default '',
 	`partner_id` INTEGER default 0,
-	`subp_id` INTEGER default 0,
-	`scheduler_id` INTEGER,
-	`worker_id` INTEGER,
-	`batch_index` INTEGER,
-	`last_scheduler_id` INTEGER,
-	`last_worker_id` INTEGER,
-	`last_worker_remote` TINYINT,
-	`processor_expiration` DATETIME,
-	`execution_attempts` TINYINT,
-	`lock_version` INTEGER,
-	`twin_job_id` INTEGER,
 	`bulk_job_id` INTEGER,
 	`root_job_id` INTEGER,
 	`parent_job_id` INTEGER,
+	`batch_index` INTEGER,
+	`last_scheduler_id` INTEGER,
+	`last_worker_id` INTEGER,
 	`dc` INTEGER,
 	`err_type` INTEGER,
 	`err_number` INTEGER,
-	`on_stress_divert_to` INTEGER,
+	`batch_job_lock_id` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `status_job_type_index`(`status`, `job_type`),
 	KEY `entry_id_index_id`(`entry_id`, `id`),
+	KEY `object_index_id`(`object_id`, `object_type`, `id`),
 	KEY `partner_id_index`(`partner_id`),
 	KEY `priority_index`(`priority`),
-	KEY `twin_job_id_index`(`twin_job_id`),
 	KEY `bulk_job_id_index`(`bulk_job_id`),
 	KEY `root_job_id_index`(`root_job_id`),
 	KEY `parent_job_id_index`(`parent_job_id`),
+	KEY `created_at_job_type_status_index`(`created_at`, `job_type`, `status`),
+	KEY `partner_type_index`(`partner_id`, `job_type`, `status`),
+	KEY `partner_type_status_index`(`partner_id`, `job_type`, `status`, `execution_status`),
+	INDEX `batch_job_sep_FI_1` (`batch_job_lock_id`),
+	CONSTRAINT `batch_job_sep_FK_1`
+		FOREIGN KEY (`batch_job_lock_id`)
+		REFERENCES `batch_job_lock` (`id`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- batch_job_lock
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `batch_job_lock`;
+
+
+CREATE TABLE `batch_job_lock`
+(
+	`id` INTEGER  NOT NULL,
+	`job_type` INTEGER,
+	`job_sub_type` INTEGER,
+	`object_id` VARCHAR(20) default '',
+	`object_type` INTEGER,
+	`estimated_effort` BIGINT,
+	`status` INTEGER,
+	`execution_status` INTEGER,
+	`start_at` DATETIME,
+	`created_at` DATETIME,
+	`priority` TINYINT,
+	`urgency` TINYINT,
+	`entry_id` VARCHAR(20) default '',
+	`partner_id` INTEGER default 0,
+	`scheduler_id` INTEGER,
+	`worker_id` INTEGER,
+	`batch_index` INTEGER,
+	`expiration` DATETIME,
+	`execution_attempts` TINYINT,
+	`version` INTEGER,
+	`dc` INTEGER,
+	`batch_job_id` INTEGER,
+	PRIMARY KEY (`id`),
+	KEY `status_job_type_index`(`status`, `job_type`),
+	KEY `entry_id_index_id`(`entry_id`, `id`),
+	KEY `object_index_id`(`object_id`, `object_type`, `id`),
+	KEY `partner_type_index`(`partner_id`, `job_type`, `status`),
+	KEY `partner_type_status_index`(`partner_id`, `job_type`, `status`, `execution_status`),
+	KEY `partner_id_index`(`partner_id`),
+	KEY `status_index`(`status`),
+	KEY `partner_status_index`(`partner_id`, `status`),
 	KEY `execution_attempts_index`(`job_type`, `execution_attempts`),
-	KEY `processor_expiration_index`(`job_type`, `processor_expiration`),
-	KEY `lock_index`(`batch_index`, `scheduler_id`, `worker_id`)
+	KEY `expiration_index`(`job_type`, `expiration`),
+	KEY `lock_index`(`batch_index`, `scheduler_id`, `worker_id`),
+	INDEX `batch_job_lock_FI_1` (`batch_job_id`),
+	CONSTRAINT `batch_job_lock_FK_1`
+		FOREIGN KEY (`batch_job_id`)
+		REFERENCES `batch_job_sep` (`id`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- partner_load
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `partner_load`;
+
+
+CREATE TABLE `partner_load`
+(
+	`job_type` INTEGER  NOT NULL,
+	`partner_id` INTEGER  NOT NULL,
+	`partner_load` INTEGER,
+	`weighted_partner_load` INTEGER,
+	PRIMARY KEY (`job_type`,`partner_id`),
+	KEY `partner_index`(`partner_id`, `job_type`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
@@ -900,38 +914,6 @@ CREATE TABLE `widget_log`
 	CONSTRAINT `widget_log_FK_1`
 		FOREIGN KEY (`entry_id`)
 		REFERENCES `entry` (`id`)
-)Type=InnoDB;
-
-#-----------------------------------------------------------------------------
-#-- notification
-#-----------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `notification`;
-
-
-CREATE TABLE `notification`
-(
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`partner_id` INTEGER,
-	`puser_id` VARCHAR(64),
-	`type` SMALLINT,
-	`object_id` VARCHAR(20),
-	`status` INTEGER,
-	`notification_data` VARCHAR(4096),
-	`number_of_attempts` SMALLINT default 0,
-	`created_at` DATETIME,
-	`updated_at` DATETIME,
-	`notification_result` VARCHAR(256),
-	`object_type` SMALLINT,
-	`scheduler_id` INTEGER,
-	`worker_id` INTEGER,
-	`batch_index` INTEGER,
-	`processor_expiration` DATETIME,
-	`execution_attempts` TINYINT,
-	`lock_version` INTEGER,
-	`dc` VARCHAR(2),
-	PRIMARY KEY (`id`),
-	KEY `status_partner_id_index`(`status`, `partner_id`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
@@ -1573,6 +1555,8 @@ CREATE TABLE `flavor_params_conversion_profile`
 	`force_none_complied` TINYINT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
+	`priority` TINYINT,
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	INDEX `flavor_params_conversion_profile_FI_1` (`conversion_profile_id`),
 	CONSTRAINT `flavor_params_conversion_profile_FK_1`

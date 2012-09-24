@@ -29,7 +29,7 @@ class kMultiCentersManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild(true, $dc);
+			$batchJob = $parentJob->createChild(BatchJobType::FILESYNC_IMPORT, null, true, $dc);
 		}
 		else
 		{
@@ -40,6 +40,8 @@ class kMultiCentersManager
 		}
 
 		$batchJob->setFileSize($fileSize);
+		$batchJob->setObjectId($fileSyncId);
+		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		
 		KalturaLog::log("Creating Filesync Import job, with file sync id: $fileSyncId size: $fileSize"); 
 		return kJobsManager::addJob($batchJob, $fileSyncImportData, BatchJobType::FILESYNC_IMPORT);

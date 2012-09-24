@@ -117,7 +117,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 				$categoryPager->pageIndex++;
 				
 				$data->lastMovedCategoryPageIndex = $categoryPager->pageIndex;
-				$this->updateJob($job, null, KalturaBatchJobStatus::PROCESSING, null, $data);
+				$this->updateJob($job, null, KalturaBatchJobStatus::PROCESSING, $data);
 				
 				$categoriesList = $this->kClient->category->listAction($categoryFilter, $categoryPager);
 			}
@@ -126,7 +126,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 		$data->lastMovedCategoryId = $srcCategoryId;
 		
 		$this->unimpersonate();
-		$this->updateJob($job, "Moved [$movedEntries] entries", KalturaBatchJobStatus::PROCESSING, null, $data);
+		$this->updateJob($job, "Moved [$movedEntries] entries", KalturaBatchJobStatus::PROCESSING, $data);
 		$this->impersonate($job->partnerId);
 		
 		return $job;
@@ -200,7 +200,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 				$categoryEntryPager->pageIndex++;
 				
 				$data->lastMovedCategoryEntryPageIndex = $categoryEntryPager->pageIndex;
-				$this->updateJob($job, null, KalturaBatchJobStatus::PROCESSING, null, $data);
+				$this->updateJob($job, null, KalturaBatchJobStatus::PROCESSING, $data);
 			}
 				
 			$categoryEntriesList = $this->kClient->categoryEntry->listAction($categoryEntryFilter, $categoryEntryPager);

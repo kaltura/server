@@ -72,11 +72,11 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 		$jobData = new kParseCaptionAssetJobData();
 		$jobData->setCaptionAssetId($captionAsset->getId());
 			
- 		
+ 		$batchJobType = CaptionSearchPlugin::getBatchJobTypeCoreValue(CaptionSearchBatchJobType::PARSE_CAPTION_ASSET);
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild();
+			$batchJob = $parentJob->createChild($batchJobType);
 		}
 		else
 		{
@@ -85,7 +85,9 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 			$batchJob->setPartnerId($captionAsset->getPartnerId());
 		}
 			
-		return kJobsManager::addJob($batchJob, $jobData, CaptionSearchPlugin::getBatchJobTypeCoreValue(CaptionSearchBatchJobType::PARSE_CAPTION_ASSET));
+		$batchJob->setObjectId($captionAsset->getId());
+		$batchJob->setObjectType(BatchJobObjectType::ASSET);
+		return kJobsManager::addJob($batchJob, $jobData, $batchJobType);
 	}
 
 	/* (non-PHPdoc)

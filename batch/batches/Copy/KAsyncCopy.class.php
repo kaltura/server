@@ -65,7 +65,7 @@ class KAsyncCopy extends KJobHandlerWorker
 			$lastCopyId = $engine->getLastCopyId();
 			
 			$data->lastCopyId = $lastCopyId;
-			$this->updateJob($job, "Copied $copiedObjectsCount objects", KalturaBatchJobStatus::PROCESSING, null, $data);
+			$this->updateJob($job, "Copied $copiedObjectsCount objects", KalturaBatchJobStatus::PROCESSING, $data);
 			
 			$advancedFilter->indexIdGreaterThan = $lastCopyId;
 			$filter->advancedSearch = $advancedFilter;

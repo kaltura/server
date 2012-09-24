@@ -10,7 +10,7 @@ class KalturaBatchJobListResponse extends KalturaObject
 	 * @readonly
 	 */
 	public $objects;
-
+	
 	/**
 	 * @var int
 	 * @readonly

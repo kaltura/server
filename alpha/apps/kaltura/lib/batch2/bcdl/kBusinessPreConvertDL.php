@@ -31,7 +31,7 @@ class kBusinessPreConvertDL
 			return null;
 		}
 		
-		return kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAssetId, $mediaInfoId, $parentJob, $lastEngineType);
+		return kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAssetId, null, $mediaInfoId, $parentJob, $lastEngineType);
 	}
 	
 	/**
@@ -274,7 +274,7 @@ class kBusinessPreConvertDL
 		
 		$srcPath = $fileSync->getFullPath();
 		$uniqid = uniqid('thumb_');
-		$destPath = kConf::get('temp_folder') . "/thumb/$uniqid.jpg";
+		$destPath = kConf::get('temp_folder') . DIRECTORY_SEPARATOR . "thumb" . DIRECTORY_SEPARATOR . $uniqid.jpg;
 		$logPath = $destPath . '.log';
 	
 		if(!file_exists($srcPath))
@@ -309,7 +309,7 @@ class kBusinessPreConvertDL
 				}
 				$srcPath = $destPath;
 				$uniqid = uniqid('thumb_');
-				$destPath = kConf::get('temp_folder') . "/thumb/$uniqid.jpg";
+				$destPath = kConf::get('temp_folder') . DIRECTORY_SEPARATOR . "thumb" . DIRECTORY_SEPARATOR . $uniqid . ".jpg";
 			}
 			
 			$quality = $destThumbParamsOutput->getQuality();
@@ -340,33 +340,6 @@ class kBusinessPreConvertDL
 			$errDescription = $ex->getMessage();
 			return false;
 		}
-	}
-	
-	/**
-	 * decideFlavorConvert is the decision layer for a single flavor conversion 
-	 * 
-	 * @param FileSyncKey $srcSyncKey
-	 * @param int $flavorParamsId
-	 * @param string $errDescription
-	 * @param int $mediaInfoId
-	 * @param BatchJob $parentJob
-	 * @param int $lastEngineType
-	 * @return BatchJob 
-	 */
-	public static function decideFlavorConvert(FileSyncKey $srcSyncKey, $flavorParamsId, &$errDescription, $mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null)
-	{
-		$flavorParams = assetParamsPeer::retrieveByPK($flavorParamsId);
-		$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
-		
-		$flavor = self::validateFlavorAndMediaInfo($flavorParams, $mediaInfo, $errDescription);
-		if(is_null($flavor))
-			return null;
-		
-		$flavorAsset = kBatchManager::createFlavorAsset($flavor, $parentJob->getPartnerId(), $parentJob->getEntryId());
-		if(is_null($flavorAsset))
-			return null;
-		
-		return kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAsset->getId(), $mediaInfo->getId(), $parentJob, $lastEngineType);
 	}
 	
 	/**
@@ -462,14 +435,6 @@ class kBusinessPreConvertDL
 			if(!$entry)
 				throw new APIException(APIErrors::INVALID_ENTRY, $parentJob, $entryId);
 		
-			$dbConvertCollectionJob = null;
-			if ($parentJob)
-			{
-				$dbConvertCollectionJob = $parentJob->createChild(false);
-				$dbConvertCollectionJob->setEntryId($entryId);
-				$dbConvertCollectionJob->save();
-			}
-			
 			$flavorAssets = assetPeer::retrieveFlavorsByEntryId($entryId);
 			$flavorAssets = assetPeer::filterByTag($flavorAssets, $collectionTag);
 			$flavors = array();
@@ -509,7 +474,7 @@ class kBusinessPreConvertDL
 			{
 				case flavorParams::TAG_ISM:
 					KalturaLog::log("Calling addConvertIsmCollectionJob with [" . count($flavors) . "] flavor params");
-					return kJobsManager::addConvertIsmCollectionJob($collectionTag, $srcSyncKey, $entry, $parentJob, $flavors, $dbConvertCollectionJob);
+					return kJobsManager::addConvertIsmCollectionJob($collectionTag, $srcSyncKey, $entry, $parentJob, $flavors, false);
 					
 				default:
 					KalturaLog::log("Error: Invalid collection tag [$collectionTag]");
@@ -517,15 +482,7 @@ class kBusinessPreConvertDL
 			}
 		}
 
-		$dbConvertFlavorJob = null;
-		if ($parentJob)
-		{
-			$dbConvertFlavorJob = $parentJob->createChild(false);
-			$dbConvertFlavorJob->setEntryId($entryId);
-			$dbConvertFlavorJob->save();
-		}
-
-		return kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAsset->getId(), $mediaInfoId, $parentJob, null, $dbConvertFlavorJob);
+		return kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAsset->getId(), $conversionProfile->getId(), $mediaInfoId, $parentJob, null, false);
 	}
 	
 	/**
@@ -1026,7 +983,7 @@ class kBusinessPreConvertDL
 				$sourceFlavorOutput->setFlavorAssetVersion($originalFlavorAsset->getVersion());
 				$sourceFlavorOutput->save();
 				
-				kJobsManager::addFlavorConvertJob($srcSyncKey, $sourceFlavorOutput, $originalFlavorAsset->getId(), $mediaInfoId, $parentJob);
+				kJobsManager::addFlavorConvertJob($srcSyncKey, $sourceFlavorOutput, $originalFlavorAsset->getId(), $profile->getId(), $mediaInfoId, $parentJob);
 				return false;
 			}
 			
@@ -1055,7 +1012,7 @@ class kBusinessPreConvertDL
 			}
 		}
 
-		return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams, $mediaInfo);
+		return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams,  $profile->getId(), $mediaInfo);
 	}
 		
 	public static function continueProfileConvert(BatchJob $parentJob)
@@ -1172,10 +1129,10 @@ class kBusinessPreConvertDL
 	
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($originalFlavorAsset->getId());
 		
-		return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams, $mediaInfo);
+		return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams,  $profile->getId(), $mediaInfo);
 	}
 		
-	public static function decideProfileFlavorsConvert(BatchJob $parentJob, BatchJob $convertProfileJob, array $flavors, array $conversionProfileFlavorParams, mediaInfo $mediaInfo = null)
+	public static function decideProfileFlavorsConvert(BatchJob $parentJob, BatchJob $convertProfileJob, array $flavors, array $conversionProfileFlavorParams, $conversionProfileId, mediaInfo $mediaInfo = null)
 	{
 		$entryId = $convertProfileJob->getEntryId();
 		
@@ -1235,7 +1192,7 @@ class kBusinessPreConvertDL
 				
 			KalturaLog::log("Adding flavor conversion with flavor params output id [" . $flavor->getId() . "] and flavor params asset id [" . $flavorAsset->getId() . "]");
 			$madiaInfoId = $mediaInfo ? $mediaInfo->getId() : null;
-			$createdJob = kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAsset->getId(), $madiaInfoId, $parentJob);
+			$createdJob = kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAsset->getId(), $conversionProfileId, $madiaInfoId, $parentJob);
 			
 			if($createdJob)
 				$conversionsCreated++;

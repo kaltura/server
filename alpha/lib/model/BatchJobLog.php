@@ -56,7 +56,6 @@ class BatchJobLog extends BaseBatchJobLog {
 	public function setData($v, $bypassSerialization = false) {
 		if ($bypassSerialization)
 			return parent::setData ( $v );
-		$this->setDuplicationKey ( BatchJobPeer::createDuplicationKey ( $this->getJobType (), $v ) );
 		if (! is_null ( $v )) {
 			$sereializedValue = serialize ( $v );
 			if (strlen ( ( string ) $sereializedValue ) > BatchJob::MAX_SERIALIZED_JOB_DATA_SIZE ) { 

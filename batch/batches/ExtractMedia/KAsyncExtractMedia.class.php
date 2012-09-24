@@ -91,7 +91,7 @@ class KAsyncExtractMedia extends KJobHandlerWorker
  			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile is not a file", KalturaBatchJobStatus::FAILED);
 			
 		KalturaLog::debug("mediaFile [$mediaFile]");
-		$this->updateJob($job, "Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED, 1);
+		$this->updateJob($job, "Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED);
 			
 		$mediaInfo = null;
 		try
@@ -127,7 +127,7 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		$mediaInfo = $this->getClient()->batch->addMediaInfo($mediaInfo);
 		$data->mediaInfoId = $mediaInfo->id;
 		
-		$this->updateJob($job, "Saving media info id $mediaInfo->id", KalturaBatchJobStatus::PROCESSED, 99, $data);
+		$this->updateJob($job, "Saving media info id $mediaInfo->id", KalturaBatchJobStatus::PROCESSED, $data);
 		$this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
 		return $job;
 	}

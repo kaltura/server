@@ -263,7 +263,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
-	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
+	public function updatedJob(BatchJob $dbBatchJob)
 	{
 		// convert profile finished - export source flavor
 		if ($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)

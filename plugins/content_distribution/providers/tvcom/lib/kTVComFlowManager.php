@@ -27,7 +27,7 @@ class kTVComFlowManager implements kBatchJobStatusEventConsumer
 		return false;
 	}
 	
-	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
+	public function updatedJob(BatchJob $dbBatchJob)
 	{
 		$data = $dbBatchJob->getData();
 		if (!$data instanceof kDistributionJobData)

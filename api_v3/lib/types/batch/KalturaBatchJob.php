@@ -3,8 +3,65 @@
  * @package api
  * @subpackage objects
  */
-class KalturaBatchJob extends KalturaBaseJob implements IFilterable
+class KalturaBatchJob extends KalturaObject implements IFilterable
 {
+	
+	/**
+	 * @var int
+	 * @readonly
+	 * @filter eq,gte
+	 */
+	public $id;
+	
+	/**
+	 * @var int
+	 * @readonly
+	 * @filter eq,in,notin
+	 */
+	public $partnerId;
+	
+	
+	/**
+	 * @var int
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $createdAt;
+	
+	/**
+	 * @var int
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $updatedAt;
+	
+	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $deletedAt;
+	
+	/**
+	 * @var int
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $lockExpiration;
+	
+	/**
+	 * @var int
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $executionAttempts;
+	
+	/**
+	 * @var int
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $lockVersion;
+	
 	/**
 	 * @var string
 	 * @filter eq
@@ -30,13 +87,6 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
     public $jobSubType;
     
 	/**
-	 * @var int
-	 * @filter eq,in,notin
-	 */
-    public $onStressDivertTo;
-    
-    
-	/**
 	 * @var KalturaJobData
 	 */
     public $data;
@@ -60,12 +110,6 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
     public $checkAgainTimeout;
 
     /**
-	 * @var int
-	 * @filter gte,lte,order
-	 */
-    public $progress;
-    
-    /**
 	 * @var string
 	 */
     public $message ;
@@ -77,24 +121,14 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
     
     /**
 	 * @var int
-	 * @filter gte,lte,order
-	 */
-    public $updatesCount ;
-    
-    /**
-	 * @var int
 	 * @filter gte,lte,eq,in,notin,order
 	 */
     public $priority ;
     
-    
     /**
-     * The id of identical job
-	 * @var int
-	 * @filter eq,in,notin
-	 */    
-    public $twinJobId;
-    
+     * @var KalturaBatchHistoryDataArray
+     */
+    public $history ;
     
     /**
      * The id of the bulk upload job that initiated this job
@@ -154,15 +188,8 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 	 * @var int
 	 * @filter lt,gt,order
 	 */    
-    public $fileSize;
+    public $estimatedEffort;
     
-    
-    /**
-	 * @var bool
-	 * @filter eq
-	 */    
-    public $lastWorkerRemote;
-	
     
     /**
 	 * @var int
@@ -197,7 +224,6 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 	 * @filter eq,in,notin
 	 */    
     public $lastWorkerId;
-	
     
     /**
 	 * @var int
@@ -208,29 +234,28 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 	
 	private static $map_between_objects = array
 	(
+		"id" ,
+		"partnerId" ,
+		"createdAt" , "updatedAt" , "deletedAt" ,
 		"entryId" ,
 		"jobType" , 
-	 	"status" , "abort" , "checkAgainTimeout" , "progress" ,
-		"message", "description" , "updatesCount" , "parentJobId" ,
-		"rootJobId", "bulkJobId" , "twinJobId" , "priority" ,
-		"queueTime" , "finishTime" , "errType", "errNumber", "fileSize",
-		"lastWorkerRemote", "onStressDivertTo",
-		"schedulerId",
-		"workerId",
-		"batchIndex",
-		"lastSchedulerId",
-		"lastWorkerId",
+	 	"status" ,  
+		"message", "description" , "parentJobId" ,
+		"rootJobId", "bulkJobId" , "priority" ,
+		"queueTime" , "finishTime" , "errType", "errNumber", 
 		"dc",
+		"lastSchedulerId", "lastWorkerId" , "batchIndex", 
 	);
-
+	
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	    
-	public function fromStatisticsObject($dbBatchJob)
+	public function fromStatisticsObject($dbBatchJob, $dbLockObj = null)
 	{
-		$this->fromObject($dbBatchJob);
+		$dbBatchJobLock = BatchJobLockPeer::retrieveByPK($dbBatchJob->getId());
+		$this->fromObject($dbBatchJob, $dbBatchJobLock);
 		
 		if(!($dbBatchJob instanceof BatchJob))
 			return $this;
@@ -349,12 +374,25 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 		if($this->data)
 			$this->data->fromObject($dbData);
 	}
-	    
-	public function fromObject($dbBatchJob)
+	
+	public function fromLockObject(BatchJob $dbBatchJob, BatchJobLock $dbBatchJobLock) 
+	{
+		$this->lockExpiration = $dbBatchJobLock->getExpiration();
+		$this->executionAttempts = $dbBatchJobLock->getExecutionAttempts();
+		$this->lockVersion = $dbBatchJobLock->getVersion();
+		$this->checkAgainTimeout = $dbBatchJobLock->getStartAt();
+		$this->estimatedEffort = $dbBatchJobLock->getEstimatedEffort();
+		
+		$this->schedulerId = $dbBatchJobLock->getSchedulerId();
+		$this->workerId = $dbBatchJobLock->getWorkerId();
+	}
+	
+	public function fromObject($dbBatchJob, BatchJobLock $dbBatchJobLock = null) 
 	{
 		parent::fromObject( $dbBatchJob );
 		$this->queueTime = $dbBatchJob->getQueueTime(null); // to return the timestamp and not string
 		$this->finishTime = $dbBatchJob->getFinishTime(null); // to return the timestamp and not string
+		$this->abort = $dbBatchJob->getExecutionStatus();
 		
 		if(!($dbBatchJob instanceof BatchJob))
 			return $this;
@@ -363,6 +401,16 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 		$this->fromData($dbBatchJob, $dbData);
 		if($this->data)
 			$this->jobSubType = $this->data->fromSubType($dbBatchJob->getJobSubType());
+		
+		if($dbBatchJobLock) {
+			$this->fromLockObject($dbBatchJob, $dbBatchJobLock);
+		} else {
+			$this->lockVersion = $dbBatchJob->getLockInfo()->getLockVersion();
+			$this->estimatedEffort = $dbBatchJob->getLockInfo()->getEstimatedEffort();
+		}
+		
+		if($dbBatchJob->getHistory() != null)
+			$this->history = KalturaBatchHistoryDataArray::fromDbArray($dbBatchJob->getHistory());
 		
 		return $this;
 	}

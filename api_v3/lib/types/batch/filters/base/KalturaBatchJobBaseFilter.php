@@ -4,10 +4,25 @@
  * @subpackage filters.base
  * @abstract
  */
-abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
+abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 {
 	static private $map_between_objects = array
 	(
+		"idEqual" => "_eq_id",
+		"idGreaterThanOrEqual" => "_gte_id",
+		"partnerIdEqual" => "_eq_partner_id",
+		"partnerIdIn" => "_in_partner_id",
+		"partnerIdNotIn" => "_notin_partner_id",
+		"createdAtGreaterThanOrEqual" => "_gte_created_at",
+		"createdAtLessThanOrEqual" => "_lte_created_at",
+		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
+		"updatedAtLessThanOrEqual" => "_lte_updated_at",
+		"lockExpirationGreaterThanOrEqual" => "_gte_lock_expiration",
+		"lockExpirationLessThanOrEqual" => "_lte_lock_expiration",
+		"executionAttemptsGreaterThanOrEqual" => "_gte_execution_attempts",
+		"executionAttemptsLessThanOrEqual" => "_lte_execution_attempts",
+		"lockVersionGreaterThanOrEqual" => "_gte_lock_version",
+		"lockVersionLessThanOrEqual" => "_lte_lock_version",
 		"entryIdEqual" => "_eq_entry_id",
 		"jobTypeEqual" => "_eq_job_type",
 		"jobTypeIn" => "_in_job_type",
@@ -15,27 +30,17 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 		"jobSubTypeEqual" => "_eq_job_sub_type",
 		"jobSubTypeIn" => "_in_job_sub_type",
 		"jobSubTypeNotIn" => "_notin_job_sub_type",
-		"onStressDivertToEqual" => "_eq_on_stress_divert_to",
-		"onStressDivertToIn" => "_in_on_stress_divert_to",
-		"onStressDivertToNotIn" => "_notin_on_stress_divert_to",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"statusNotIn" => "_notin_status",
 		"abortEqual" => "_eq_abort",
 		"checkAgainTimeoutGreaterThanOrEqual" => "_gte_check_again_timeout",
 		"checkAgainTimeoutLessThanOrEqual" => "_lte_check_again_timeout",
-		"progressGreaterThanOrEqual" => "_gte_progress",
-		"progressLessThanOrEqual" => "_lte_progress",
-		"updatesCountGreaterThanOrEqual" => "_gte_updates_count",
-		"updatesCountLessThanOrEqual" => "_lte_updates_count",
 		"priorityGreaterThanOrEqual" => "_gte_priority",
 		"priorityLessThanOrEqual" => "_lte_priority",
 		"priorityEqual" => "_eq_priority",
 		"priorityIn" => "_in_priority",
 		"priorityNotIn" => "_notin_priority",
-		"twinJobIdEqual" => "_eq_twin_job_id",
-		"twinJobIdIn" => "_in_twin_job_id",
-		"twinJobIdNotIn" => "_notin_twin_job_id",
 		"bulkJobIdEqual" => "_eq_bulk_job_id",
 		"bulkJobIdIn" => "_in_bulk_job_id",
 		"bulkJobIdNotIn" => "_notin_bulk_job_id",
@@ -55,9 +60,8 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 		"errNumberEqual" => "_eq_err_number",
 		"errNumberIn" => "_in_err_number",
 		"errNumberNotIn" => "_notin_err_number",
-		"fileSizeLessThan" => "_lt_file_size",
-		"fileSizeGreaterThan" => "_gt_file_size",
-		"lastWorkerRemoteEqual" => "_eq_last_worker_remote",
+		"estimatedEffortLessThan" => "_lt_estimated_effort",
+		"estimatedEffortGreaterThan" => "_gt_estimated_effort",
 		"schedulerIdEqual" => "_eq_scheduler_id",
 		"schedulerIdIn" => "_in_scheduler_id",
 		"schedulerIdNotIn" => "_notin_scheduler_id",
@@ -80,22 +84,28 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 
 	static private $order_by_map = array
 	(
+		"+createdAt" => "+created_at",
+		"-createdAt" => "-created_at",
+		"+updatedAt" => "+updated_at",
+		"-updatedAt" => "-updated_at",
+		"+lockExpiration" => "+lock_expiration",
+		"-lockExpiration" => "-lock_expiration",
+		"+executionAttempts" => "+execution_attempts",
+		"-executionAttempts" => "-execution_attempts",
+		"+lockVersion" => "+lock_version",
+		"-lockVersion" => "-lock_version",
 		"+status" => "+status",
 		"-status" => "-status",
 		"+checkAgainTimeout" => "+check_again_timeout",
 		"-checkAgainTimeout" => "-check_again_timeout",
-		"+progress" => "+progress",
-		"-progress" => "-progress",
-		"+updatesCount" => "+updates_count",
-		"-updatesCount" => "-updates_count",
 		"+priority" => "+priority",
 		"-priority" => "-priority",
 		"+queueTime" => "+queue_time",
 		"-queueTime" => "-queue_time",
 		"+finishTime" => "+finish_time",
 		"-finishTime" => "-finish_time",
-		"+fileSize" => "+file_size",
-		"-fileSize" => "-file_size",
+		"+estimatedEffort" => "+estimated_effort",
+		"-estimatedEffort" => "-estimated_effort",
 	);
 
 	public function getMapBetweenObjects()
@@ -107,6 +117,81 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	{
 		return array_merge(parent::getOrderByMap(), KalturaBatchJobBaseFilter::$order_by_map);
 	}
+
+	/**
+	 * @var int
+	 */
+	public $idEqual;
+
+	/**
+	 * @var int
+	 */
+	public $idGreaterThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $partnerIdEqual;
+
+	/**
+	 * @var string
+	 */
+	public $partnerIdIn;
+
+	/**
+	 * @var string
+	 */
+	public $partnerIdNotIn;
+
+	/**
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $lockExpirationGreaterThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $lockExpirationLessThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $executionAttemptsGreaterThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $executionAttemptsLessThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $lockVersionGreaterThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $lockVersionLessThanOrEqual;
 
 	/**
 	 * @var string
@@ -146,21 +231,6 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	public $jobSubTypeNotIn;
 
 	/**
-	 * @var int
-	 */
-	public $onStressDivertToEqual;
-
-	/**
-	 * @var string
-	 */
-	public $onStressDivertToIn;
-
-	/**
-	 * @var string
-	 */
-	public $onStressDivertToNotIn;
-
-	/**
 	 * @var KalturaBatchJobStatus
 	 */
 	public $statusEqual;
@@ -193,26 +263,6 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	/**
 	 * @var int
 	 */
-	public $progressGreaterThanOrEqual;
-
-	/**
-	 * @var int
-	 */
-	public $progressLessThanOrEqual;
-
-	/**
-	 * @var int
-	 */
-	public $updatesCountGreaterThanOrEqual;
-
-	/**
-	 * @var int
-	 */
-	public $updatesCountLessThanOrEqual;
-
-	/**
-	 * @var int
-	 */
 	public $priorityGreaterThanOrEqual;
 
 	/**
@@ -234,21 +284,6 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	 * @var string
 	 */
 	public $priorityNotIn;
-
-	/**
-	 * @var int
-	 */
-	public $twinJobIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $twinJobIdIn;
-
-	/**
-	 * @var string
-	 */
-	public $twinJobIdNotIn;
 
 	/**
 	 * @var int
@@ -348,17 +383,12 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	/**
 	 * @var int
 	 */
-	public $fileSizeLessThan;
+	public $estimatedEffortLessThan;
 
 	/**
 	 * @var int
 	 */
-	public $fileSizeGreaterThan;
-
-	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $lastWorkerRemoteEqual;
+	public $estimatedEffortGreaterThan;
 
 	/**
 	 * @var int

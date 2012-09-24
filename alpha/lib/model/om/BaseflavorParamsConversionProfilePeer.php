@@ -26,7 +26,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 	const TM_CLASS = 'flavorParamsConversionProfileTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 9;
+	const NUM_COLUMNS = 11;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -58,6 +58,12 @@ abstract class BaseflavorParamsConversionProfilePeer {
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'flavor_params_conversion_profile.UPDATED_AT';
 
+	/** the column name for the PRIORITY field */
+	const PRIORITY = 'flavor_params_conversion_profile.PRIORITY';
+
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'flavor_params_conversion_profile.CUSTOM_DATA';
+
 	/**
 	 * An identiy map to hold any loaded instances of flavorParamsConversionProfile objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -74,11 +80,11 @@ abstract class BaseflavorParamsConversionProfilePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'ConversionProfileId', 'FlavorParamsId', 'SystemName', 'Origin', 'ReadyBehavior', 'ForceNoneComplied', 'CreatedAt', 'UpdatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'conversionProfileId', 'flavorParamsId', 'systemName', 'origin', 'readyBehavior', 'forceNoneComplied', 'createdAt', 'updatedAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CONVERSION_PROFILE_ID, self::FLAVOR_PARAMS_ID, self::SYSTEM_NAME, self::ORIGIN, self::READY_BEHAVIOR, self::FORCE_NONE_COMPLIED, self::CREATED_AT, self::UPDATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'conversion_profile_id', 'flavor_params_id', 'system_name', 'origin', 'ready_behavior', 'force_none_complied', 'created_at', 'updated_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'ConversionProfileId', 'FlavorParamsId', 'SystemName', 'Origin', 'ReadyBehavior', 'ForceNoneComplied', 'CreatedAt', 'UpdatedAt', 'Priority', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'conversionProfileId', 'flavorParamsId', 'systemName', 'origin', 'readyBehavior', 'forceNoneComplied', 'createdAt', 'updatedAt', 'priority', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CONVERSION_PROFILE_ID, self::FLAVOR_PARAMS_ID, self::SYSTEM_NAME, self::ORIGIN, self::READY_BEHAVIOR, self::FORCE_NONE_COMPLIED, self::CREATED_AT, self::UPDATED_AT, self::PRIORITY, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'conversion_profile_id', 'flavor_params_id', 'system_name', 'origin', 'ready_behavior', 'force_none_complied', 'created_at', 'updated_at', 'priority', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -88,11 +94,11 @@ abstract class BaseflavorParamsConversionProfilePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ConversionProfileId' => 1, 'FlavorParamsId' => 2, 'SystemName' => 3, 'Origin' => 4, 'ReadyBehavior' => 5, 'ForceNoneComplied' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'conversionProfileId' => 1, 'flavorParamsId' => 2, 'systemName' => 3, 'origin' => 4, 'readyBehavior' => 5, 'forceNoneComplied' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CONVERSION_PROFILE_ID => 1, self::FLAVOR_PARAMS_ID => 2, self::SYSTEM_NAME => 3, self::ORIGIN => 4, self::READY_BEHAVIOR => 5, self::FORCE_NONE_COMPLIED => 6, self::CREATED_AT => 7, self::UPDATED_AT => 8, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'conversion_profile_id' => 1, 'flavor_params_id' => 2, 'system_name' => 3, 'origin' => 4, 'ready_behavior' => 5, 'force_none_complied' => 6, 'created_at' => 7, 'updated_at' => 8, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ConversionProfileId' => 1, 'FlavorParamsId' => 2, 'SystemName' => 3, 'Origin' => 4, 'ReadyBehavior' => 5, 'ForceNoneComplied' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, 'Priority' => 9, 'CustomData' => 10, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'conversionProfileId' => 1, 'flavorParamsId' => 2, 'systemName' => 3, 'origin' => 4, 'readyBehavior' => 5, 'forceNoneComplied' => 6, 'createdAt' => 7, 'updatedAt' => 8, 'priority' => 9, 'customData' => 10, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CONVERSION_PROFILE_ID => 1, self::FLAVOR_PARAMS_ID => 2, self::SYSTEM_NAME => 3, self::ORIGIN => 4, self::READY_BEHAVIOR => 5, self::FORCE_NONE_COMPLIED => 6, self::CREATED_AT => 7, self::UPDATED_AT => 8, self::PRIORITY => 9, self::CUSTOM_DATA => 10, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'conversion_profile_id' => 1, 'flavor_params_id' => 2, 'system_name' => 3, 'origin' => 4, 'ready_behavior' => 5, 'force_none_complied' => 6, 'created_at' => 7, 'updated_at' => 8, 'priority' => 9, 'custom_data' => 10, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -171,6 +177,8 @@ abstract class BaseflavorParamsConversionProfilePeer {
 		$criteria->addSelectColumn(flavorParamsConversionProfilePeer::FORCE_NONE_COMPLIED);
 		$criteria->addSelectColumn(flavorParamsConversionProfilePeer::CREATED_AT);
 		$criteria->addSelectColumn(flavorParamsConversionProfilePeer::UPDATED_AT);
+		$criteria->addSelectColumn(flavorParamsConversionProfilePeer::PRIORITY);
+		$criteria->addSelectColumn(flavorParamsConversionProfilePeer::CUSTOM_DATA);
 	}
 
 	/**

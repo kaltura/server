@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Base static class for performing query and update operations on the 'batch_job' table.
+ * Base static class for performing query and update operations on the 'batch_job_sep' table.
  *
  * 
  *
@@ -14,7 +14,7 @@ abstract class BaseBatchJobPeer {
 	const DATABASE_NAME = 'propel';
 
 	/** the table name for this class */
-	const TABLE_NAME = 'batch_job';
+	const TABLE_NAME = 'batch_job_sep';
 
 	/** the related Propel class for this table */
 	const OM_CLASS = 'BatchJob';
@@ -26,136 +26,100 @@ abstract class BaseBatchJobPeer {
 	const TM_CLASS = 'BatchJobTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 42;
+	const NUM_COLUMNS = 30;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
-	const ID = 'batch_job.ID';
+	const ID = 'batch_job_sep.ID';
 
 	/** the column name for the JOB_TYPE field */
-	const JOB_TYPE = 'batch_job.JOB_TYPE';
+	const JOB_TYPE = 'batch_job_sep.JOB_TYPE';
 
 	/** the column name for the JOB_SUB_TYPE field */
-	const JOB_SUB_TYPE = 'batch_job.JOB_SUB_TYPE';
+	const JOB_SUB_TYPE = 'batch_job_sep.JOB_SUB_TYPE';
+
+	/** the column name for the OBJECT_ID field */
+	const OBJECT_ID = 'batch_job_sep.OBJECT_ID';
+
+	/** the column name for the OBJECT_TYPE field */
+	const OBJECT_TYPE = 'batch_job_sep.OBJECT_TYPE';
 
 	/** the column name for the DATA field */
-	const DATA = 'batch_job.DATA';
+	const DATA = 'batch_job_sep.DATA';
 
-	/** the column name for the FILE_SIZE field */
-	const FILE_SIZE = 'batch_job.FILE_SIZE';
+	/** the column name for the HISTORY field */
+	const HISTORY = 'batch_job_sep.HISTORY';
 
-	/** the column name for the DUPLICATION_KEY field */
-	const DUPLICATION_KEY = 'batch_job.DUPLICATION_KEY';
+	/** the column name for the LOCK_INFO field */
+	const LOCK_INFO = 'batch_job_sep.LOCK_INFO';
 
 	/** the column name for the STATUS field */
-	const STATUS = 'batch_job.STATUS';
+	const STATUS = 'batch_job_sep.STATUS';
 
-	/** the column name for the ABORT field */
-	const ABORT = 'batch_job.ABORT';
-
-	/** the column name for the CHECK_AGAIN_TIMEOUT field */
-	const CHECK_AGAIN_TIMEOUT = 'batch_job.CHECK_AGAIN_TIMEOUT';
-
-	/** the column name for the PROGRESS field */
-	const PROGRESS = 'batch_job.PROGRESS';
+	/** the column name for the EXECUTION_STATUS field */
+	const EXECUTION_STATUS = 'batch_job_sep.EXECUTION_STATUS';
 
 	/** the column name for the MESSAGE field */
-	const MESSAGE = 'batch_job.MESSAGE';
+	const MESSAGE = 'batch_job_sep.MESSAGE';
 
 	/** the column name for the DESCRIPTION field */
-	const DESCRIPTION = 'batch_job.DESCRIPTION';
-
-	/** the column name for the UPDATES_COUNT field */
-	const UPDATES_COUNT = 'batch_job.UPDATES_COUNT';
+	const DESCRIPTION = 'batch_job_sep.DESCRIPTION';
 
 	/** the column name for the CREATED_AT field */
-	const CREATED_AT = 'batch_job.CREATED_AT';
-
-	/** the column name for the CREATED_BY field */
-	const CREATED_BY = 'batch_job.CREATED_BY';
+	const CREATED_AT = 'batch_job_sep.CREATED_AT';
 
 	/** the column name for the UPDATED_AT field */
-	const UPDATED_AT = 'batch_job.UPDATED_AT';
-
-	/** the column name for the UPDATED_BY field */
-	const UPDATED_BY = 'batch_job.UPDATED_BY';
+	const UPDATED_AT = 'batch_job_sep.UPDATED_AT';
 
 	/** the column name for the DELETED_AT field */
-	const DELETED_AT = 'batch_job.DELETED_AT';
+	const DELETED_AT = 'batch_job_sep.DELETED_AT';
 
 	/** the column name for the PRIORITY field */
-	const PRIORITY = 'batch_job.PRIORITY';
-
-	/** the column name for the WORK_GROUP_ID field */
-	const WORK_GROUP_ID = 'batch_job.WORK_GROUP_ID';
+	const PRIORITY = 'batch_job_sep.PRIORITY';
 
 	/** the column name for the QUEUE_TIME field */
-	const QUEUE_TIME = 'batch_job.QUEUE_TIME';
+	const QUEUE_TIME = 'batch_job_sep.QUEUE_TIME';
 
 	/** the column name for the FINISH_TIME field */
-	const FINISH_TIME = 'batch_job.FINISH_TIME';
+	const FINISH_TIME = 'batch_job_sep.FINISH_TIME';
 
 	/** the column name for the ENTRY_ID field */
-	const ENTRY_ID = 'batch_job.ENTRY_ID';
+	const ENTRY_ID = 'batch_job_sep.ENTRY_ID';
 
 	/** the column name for the PARTNER_ID field */
-	const PARTNER_ID = 'batch_job.PARTNER_ID';
-
-	/** the column name for the SUBP_ID field */
-	const SUBP_ID = 'batch_job.SUBP_ID';
-
-	/** the column name for the SCHEDULER_ID field */
-	const SCHEDULER_ID = 'batch_job.SCHEDULER_ID';
-
-	/** the column name for the WORKER_ID field */
-	const WORKER_ID = 'batch_job.WORKER_ID';
-
-	/** the column name for the BATCH_INDEX field */
-	const BATCH_INDEX = 'batch_job.BATCH_INDEX';
-
-	/** the column name for the LAST_SCHEDULER_ID field */
-	const LAST_SCHEDULER_ID = 'batch_job.LAST_SCHEDULER_ID';
-
-	/** the column name for the LAST_WORKER_ID field */
-	const LAST_WORKER_ID = 'batch_job.LAST_WORKER_ID';
-
-	/** the column name for the LAST_WORKER_REMOTE field */
-	const LAST_WORKER_REMOTE = 'batch_job.LAST_WORKER_REMOTE';
-
-	/** the column name for the PROCESSOR_EXPIRATION field */
-	const PROCESSOR_EXPIRATION = 'batch_job.PROCESSOR_EXPIRATION';
-
-	/** the column name for the EXECUTION_ATTEMPTS field */
-	const EXECUTION_ATTEMPTS = 'batch_job.EXECUTION_ATTEMPTS';
-
-	/** the column name for the LOCK_VERSION field */
-	const LOCK_VERSION = 'batch_job.LOCK_VERSION';
-
-	/** the column name for the TWIN_JOB_ID field */
-	const TWIN_JOB_ID = 'batch_job.TWIN_JOB_ID';
+	const PARTNER_ID = 'batch_job_sep.PARTNER_ID';
 
 	/** the column name for the BULK_JOB_ID field */
-	const BULK_JOB_ID = 'batch_job.BULK_JOB_ID';
+	const BULK_JOB_ID = 'batch_job_sep.BULK_JOB_ID';
 
 	/** the column name for the ROOT_JOB_ID field */
-	const ROOT_JOB_ID = 'batch_job.ROOT_JOB_ID';
+	const ROOT_JOB_ID = 'batch_job_sep.ROOT_JOB_ID';
 
 	/** the column name for the PARENT_JOB_ID field */
-	const PARENT_JOB_ID = 'batch_job.PARENT_JOB_ID';
+	const PARENT_JOB_ID = 'batch_job_sep.PARENT_JOB_ID';
+
+	/** the column name for the BATCH_INDEX field */
+	const BATCH_INDEX = 'batch_job_sep.BATCH_INDEX';
+
+	/** the column name for the LAST_SCHEDULER_ID field */
+	const LAST_SCHEDULER_ID = 'batch_job_sep.LAST_SCHEDULER_ID';
+
+	/** the column name for the LAST_WORKER_ID field */
+	const LAST_WORKER_ID = 'batch_job_sep.LAST_WORKER_ID';
 
 	/** the column name for the DC field */
-	const DC = 'batch_job.DC';
+	const DC = 'batch_job_sep.DC';
 
 	/** the column name for the ERR_TYPE field */
-	const ERR_TYPE = 'batch_job.ERR_TYPE';
+	const ERR_TYPE = 'batch_job_sep.ERR_TYPE';
 
 	/** the column name for the ERR_NUMBER field */
-	const ERR_NUMBER = 'batch_job.ERR_NUMBER';
+	const ERR_NUMBER = 'batch_job_sep.ERR_NUMBER';
 
-	/** the column name for the ON_STRESS_DIVERT_TO field */
-	const ON_STRESS_DIVERT_TO = 'batch_job.ON_STRESS_DIVERT_TO';
+	/** the column name for the BATCH_JOB_LOCK_ID field */
+	const BATCH_JOB_LOCK_ID = 'batch_job_sep.BATCH_JOB_LOCK_ID';
 
 	/**
 	 * An identiy map to hold any loaded instances of BatchJob objects.
@@ -173,11 +137,11 @@ abstract class BaseBatchJobPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'JobType', 'JobSubType', 'Data', 'FileSize', 'DuplicationKey', 'Status', 'Abort', 'CheckAgainTimeout', 'Progress', 'Message', 'Description', 'UpdatesCount', 'CreatedAt', 'CreatedBy', 'UpdatedAt', 'UpdatedBy', 'DeletedAt', 'Priority', 'WorkGroupId', 'QueueTime', 'FinishTime', 'EntryId', 'PartnerId', 'SubpId', 'SchedulerId', 'WorkerId', 'BatchIndex', 'LastSchedulerId', 'LastWorkerId', 'LastWorkerRemote', 'ProcessorExpiration', 'ExecutionAttempts', 'LockVersion', 'TwinJobId', 'BulkJobId', 'RootJobId', 'ParentJobId', 'Dc', 'ErrType', 'ErrNumber', 'OnStressDivertTo', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'jobType', 'jobSubType', 'data', 'fileSize', 'duplicationKey', 'status', 'abort', 'checkAgainTimeout', 'progress', 'message', 'description', 'updatesCount', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy', 'deletedAt', 'priority', 'workGroupId', 'queueTime', 'finishTime', 'entryId', 'partnerId', 'subpId', 'schedulerId', 'workerId', 'batchIndex', 'lastSchedulerId', 'lastWorkerId', 'lastWorkerRemote', 'processorExpiration', 'executionAttempts', 'lockVersion', 'twinJobId', 'bulkJobId', 'rootJobId', 'parentJobId', 'dc', 'errType', 'errNumber', 'onStressDivertTo', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::JOB_TYPE, self::JOB_SUB_TYPE, self::DATA, self::FILE_SIZE, self::DUPLICATION_KEY, self::STATUS, self::ABORT, self::CHECK_AGAIN_TIMEOUT, self::PROGRESS, self::MESSAGE, self::DESCRIPTION, self::UPDATES_COUNT, self::CREATED_AT, self::CREATED_BY, self::UPDATED_AT, self::UPDATED_BY, self::DELETED_AT, self::PRIORITY, self::WORK_GROUP_ID, self::QUEUE_TIME, self::FINISH_TIME, self::ENTRY_ID, self::PARTNER_ID, self::SUBP_ID, self::SCHEDULER_ID, self::WORKER_ID, self::BATCH_INDEX, self::LAST_SCHEDULER_ID, self::LAST_WORKER_ID, self::LAST_WORKER_REMOTE, self::PROCESSOR_EXPIRATION, self::EXECUTION_ATTEMPTS, self::LOCK_VERSION, self::TWIN_JOB_ID, self::BULK_JOB_ID, self::ROOT_JOB_ID, self::PARENT_JOB_ID, self::DC, self::ERR_TYPE, self::ERR_NUMBER, self::ON_STRESS_DIVERT_TO, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'job_type', 'job_sub_type', 'data', 'file_size', 'duplication_key', 'status', 'abort', 'check_again_timeout', 'progress', 'message', 'description', 'updates_count', 'created_at', 'created_by', 'updated_at', 'updated_by', 'deleted_at', 'priority', 'work_group_id', 'queue_time', 'finish_time', 'entry_id', 'partner_id', 'subp_id', 'scheduler_id', 'worker_id', 'batch_index', 'last_scheduler_id', 'last_worker_id', 'last_worker_remote', 'processor_expiration', 'execution_attempts', 'lock_version', 'twin_job_id', 'bulk_job_id', 'root_job_id', 'parent_job_id', 'dc', 'err_type', 'err_number', 'on_stress_divert_to', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'JobType', 'JobSubType', 'ObjectId', 'ObjectType', 'Data', 'History', 'LockInfo', 'Status', 'ExecutionStatus', 'Message', 'Description', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'Priority', 'QueueTime', 'FinishTime', 'EntryId', 'PartnerId', 'BulkJobId', 'RootJobId', 'ParentJobId', 'BatchIndex', 'LastSchedulerId', 'LastWorkerId', 'Dc', 'ErrType', 'ErrNumber', 'BatchJobLockId', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'jobType', 'jobSubType', 'objectId', 'objectType', 'data', 'history', 'lockInfo', 'status', 'executionStatus', 'message', 'description', 'createdAt', 'updatedAt', 'deletedAt', 'priority', 'queueTime', 'finishTime', 'entryId', 'partnerId', 'bulkJobId', 'rootJobId', 'parentJobId', 'batchIndex', 'lastSchedulerId', 'lastWorkerId', 'dc', 'errType', 'errNumber', 'batchJobLockId', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::JOB_TYPE, self::JOB_SUB_TYPE, self::OBJECT_ID, self::OBJECT_TYPE, self::DATA, self::HISTORY, self::LOCK_INFO, self::STATUS, self::EXECUTION_STATUS, self::MESSAGE, self::DESCRIPTION, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::PRIORITY, self::QUEUE_TIME, self::FINISH_TIME, self::ENTRY_ID, self::PARTNER_ID, self::BULK_JOB_ID, self::ROOT_JOB_ID, self::PARENT_JOB_ID, self::BATCH_INDEX, self::LAST_SCHEDULER_ID, self::LAST_WORKER_ID, self::DC, self::ERR_TYPE, self::ERR_NUMBER, self::BATCH_JOB_LOCK_ID, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'job_type', 'job_sub_type', 'object_id', 'object_type', 'data', 'history', 'lock_info', 'status', 'execution_status', 'message', 'description', 'created_at', 'updated_at', 'deleted_at', 'priority', 'queue_time', 'finish_time', 'entry_id', 'partner_id', 'bulk_job_id', 'root_job_id', 'parent_job_id', 'batch_index', 'last_scheduler_id', 'last_worker_id', 'dc', 'err_type', 'err_number', 'batch_job_lock_id', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, )
 	);
 
 	/**
@@ -187,11 +151,11 @@ abstract class BaseBatchJobPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'JobType' => 1, 'JobSubType' => 2, 'Data' => 3, 'FileSize' => 4, 'DuplicationKey' => 5, 'Status' => 6, 'Abort' => 7, 'CheckAgainTimeout' => 8, 'Progress' => 9, 'Message' => 10, 'Description' => 11, 'UpdatesCount' => 12, 'CreatedAt' => 13, 'CreatedBy' => 14, 'UpdatedAt' => 15, 'UpdatedBy' => 16, 'DeletedAt' => 17, 'Priority' => 18, 'WorkGroupId' => 19, 'QueueTime' => 20, 'FinishTime' => 21, 'EntryId' => 22, 'PartnerId' => 23, 'SubpId' => 24, 'SchedulerId' => 25, 'WorkerId' => 26, 'BatchIndex' => 27, 'LastSchedulerId' => 28, 'LastWorkerId' => 29, 'LastWorkerRemote' => 30, 'ProcessorExpiration' => 31, 'ExecutionAttempts' => 32, 'LockVersion' => 33, 'TwinJobId' => 34, 'BulkJobId' => 35, 'RootJobId' => 36, 'ParentJobId' => 37, 'Dc' => 38, 'ErrType' => 39, 'ErrNumber' => 40, 'OnStressDivertTo' => 41, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'jobType' => 1, 'jobSubType' => 2, 'data' => 3, 'fileSize' => 4, 'duplicationKey' => 5, 'status' => 6, 'abort' => 7, 'checkAgainTimeout' => 8, 'progress' => 9, 'message' => 10, 'description' => 11, 'updatesCount' => 12, 'createdAt' => 13, 'createdBy' => 14, 'updatedAt' => 15, 'updatedBy' => 16, 'deletedAt' => 17, 'priority' => 18, 'workGroupId' => 19, 'queueTime' => 20, 'finishTime' => 21, 'entryId' => 22, 'partnerId' => 23, 'subpId' => 24, 'schedulerId' => 25, 'workerId' => 26, 'batchIndex' => 27, 'lastSchedulerId' => 28, 'lastWorkerId' => 29, 'lastWorkerRemote' => 30, 'processorExpiration' => 31, 'executionAttempts' => 32, 'lockVersion' => 33, 'twinJobId' => 34, 'bulkJobId' => 35, 'rootJobId' => 36, 'parentJobId' => 37, 'dc' => 38, 'errType' => 39, 'errNumber' => 40, 'onStressDivertTo' => 41, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::JOB_TYPE => 1, self::JOB_SUB_TYPE => 2, self::DATA => 3, self::FILE_SIZE => 4, self::DUPLICATION_KEY => 5, self::STATUS => 6, self::ABORT => 7, self::CHECK_AGAIN_TIMEOUT => 8, self::PROGRESS => 9, self::MESSAGE => 10, self::DESCRIPTION => 11, self::UPDATES_COUNT => 12, self::CREATED_AT => 13, self::CREATED_BY => 14, self::UPDATED_AT => 15, self::UPDATED_BY => 16, self::DELETED_AT => 17, self::PRIORITY => 18, self::WORK_GROUP_ID => 19, self::QUEUE_TIME => 20, self::FINISH_TIME => 21, self::ENTRY_ID => 22, self::PARTNER_ID => 23, self::SUBP_ID => 24, self::SCHEDULER_ID => 25, self::WORKER_ID => 26, self::BATCH_INDEX => 27, self::LAST_SCHEDULER_ID => 28, self::LAST_WORKER_ID => 29, self::LAST_WORKER_REMOTE => 30, self::PROCESSOR_EXPIRATION => 31, self::EXECUTION_ATTEMPTS => 32, self::LOCK_VERSION => 33, self::TWIN_JOB_ID => 34, self::BULK_JOB_ID => 35, self::ROOT_JOB_ID => 36, self::PARENT_JOB_ID => 37, self::DC => 38, self::ERR_TYPE => 39, self::ERR_NUMBER => 40, self::ON_STRESS_DIVERT_TO => 41, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'job_type' => 1, 'job_sub_type' => 2, 'data' => 3, 'file_size' => 4, 'duplication_key' => 5, 'status' => 6, 'abort' => 7, 'check_again_timeout' => 8, 'progress' => 9, 'message' => 10, 'description' => 11, 'updates_count' => 12, 'created_at' => 13, 'created_by' => 14, 'updated_at' => 15, 'updated_by' => 16, 'deleted_at' => 17, 'priority' => 18, 'work_group_id' => 19, 'queue_time' => 20, 'finish_time' => 21, 'entry_id' => 22, 'partner_id' => 23, 'subp_id' => 24, 'scheduler_id' => 25, 'worker_id' => 26, 'batch_index' => 27, 'last_scheduler_id' => 28, 'last_worker_id' => 29, 'last_worker_remote' => 30, 'processor_expiration' => 31, 'execution_attempts' => 32, 'lock_version' => 33, 'twin_job_id' => 34, 'bulk_job_id' => 35, 'root_job_id' => 36, 'parent_job_id' => 37, 'dc' => 38, 'err_type' => 39, 'err_number' => 40, 'on_stress_divert_to' => 41, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'JobType' => 1, 'JobSubType' => 2, 'ObjectId' => 3, 'ObjectType' => 4, 'Data' => 5, 'History' => 6, 'LockInfo' => 7, 'Status' => 8, 'ExecutionStatus' => 9, 'Message' => 10, 'Description' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, 'DeletedAt' => 14, 'Priority' => 15, 'QueueTime' => 16, 'FinishTime' => 17, 'EntryId' => 18, 'PartnerId' => 19, 'BulkJobId' => 20, 'RootJobId' => 21, 'ParentJobId' => 22, 'BatchIndex' => 23, 'LastSchedulerId' => 24, 'LastWorkerId' => 25, 'Dc' => 26, 'ErrType' => 27, 'ErrNumber' => 28, 'BatchJobLockId' => 29, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'jobType' => 1, 'jobSubType' => 2, 'objectId' => 3, 'objectType' => 4, 'data' => 5, 'history' => 6, 'lockInfo' => 7, 'status' => 8, 'executionStatus' => 9, 'message' => 10, 'description' => 11, 'createdAt' => 12, 'updatedAt' => 13, 'deletedAt' => 14, 'priority' => 15, 'queueTime' => 16, 'finishTime' => 17, 'entryId' => 18, 'partnerId' => 19, 'bulkJobId' => 20, 'rootJobId' => 21, 'parentJobId' => 22, 'batchIndex' => 23, 'lastSchedulerId' => 24, 'lastWorkerId' => 25, 'dc' => 26, 'errType' => 27, 'errNumber' => 28, 'batchJobLockId' => 29, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::JOB_TYPE => 1, self::JOB_SUB_TYPE => 2, self::OBJECT_ID => 3, self::OBJECT_TYPE => 4, self::DATA => 5, self::HISTORY => 6, self::LOCK_INFO => 7, self::STATUS => 8, self::EXECUTION_STATUS => 9, self::MESSAGE => 10, self::DESCRIPTION => 11, self::CREATED_AT => 12, self::UPDATED_AT => 13, self::DELETED_AT => 14, self::PRIORITY => 15, self::QUEUE_TIME => 16, self::FINISH_TIME => 17, self::ENTRY_ID => 18, self::PARTNER_ID => 19, self::BULK_JOB_ID => 20, self::ROOT_JOB_ID => 21, self::PARENT_JOB_ID => 22, self::BATCH_INDEX => 23, self::LAST_SCHEDULER_ID => 24, self::LAST_WORKER_ID => 25, self::DC => 26, self::ERR_TYPE => 27, self::ERR_NUMBER => 28, self::BATCH_JOB_LOCK_ID => 29, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'job_type' => 1, 'job_sub_type' => 2, 'object_id' => 3, 'object_type' => 4, 'data' => 5, 'history' => 6, 'lock_info' => 7, 'status' => 8, 'execution_status' => 9, 'message' => 10, 'description' => 11, 'created_at' => 12, 'updated_at' => 13, 'deleted_at' => 14, 'priority' => 15, 'queue_time' => 16, 'finish_time' => 17, 'entry_id' => 18, 'partner_id' => 19, 'bulk_job_id' => 20, 'root_job_id' => 21, 'parent_job_id' => 22, 'batch_index' => 23, 'last_scheduler_id' => 24, 'last_worker_id' => 25, 'dc' => 26, 'err_type' => 27, 'err_number' => 28, 'batch_job_lock_id' => 29, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, )
 	);
 
 	/**
@@ -264,45 +228,33 @@ abstract class BaseBatchJobPeer {
 		$criteria->addSelectColumn(BatchJobPeer::ID);
 		$criteria->addSelectColumn(BatchJobPeer::JOB_TYPE);
 		$criteria->addSelectColumn(BatchJobPeer::JOB_SUB_TYPE);
+		$criteria->addSelectColumn(BatchJobPeer::OBJECT_ID);
+		$criteria->addSelectColumn(BatchJobPeer::OBJECT_TYPE);
 		$criteria->addSelectColumn(BatchJobPeer::DATA);
-		$criteria->addSelectColumn(BatchJobPeer::FILE_SIZE);
-		$criteria->addSelectColumn(BatchJobPeer::DUPLICATION_KEY);
+		$criteria->addSelectColumn(BatchJobPeer::HISTORY);
+		$criteria->addSelectColumn(BatchJobPeer::LOCK_INFO);
 		$criteria->addSelectColumn(BatchJobPeer::STATUS);
-		$criteria->addSelectColumn(BatchJobPeer::ABORT);
-		$criteria->addSelectColumn(BatchJobPeer::CHECK_AGAIN_TIMEOUT);
-		$criteria->addSelectColumn(BatchJobPeer::PROGRESS);
+		$criteria->addSelectColumn(BatchJobPeer::EXECUTION_STATUS);
 		$criteria->addSelectColumn(BatchJobPeer::MESSAGE);
 		$criteria->addSelectColumn(BatchJobPeer::DESCRIPTION);
-		$criteria->addSelectColumn(BatchJobPeer::UPDATES_COUNT);
 		$criteria->addSelectColumn(BatchJobPeer::CREATED_AT);
-		$criteria->addSelectColumn(BatchJobPeer::CREATED_BY);
 		$criteria->addSelectColumn(BatchJobPeer::UPDATED_AT);
-		$criteria->addSelectColumn(BatchJobPeer::UPDATED_BY);
 		$criteria->addSelectColumn(BatchJobPeer::DELETED_AT);
 		$criteria->addSelectColumn(BatchJobPeer::PRIORITY);
-		$criteria->addSelectColumn(BatchJobPeer::WORK_GROUP_ID);
 		$criteria->addSelectColumn(BatchJobPeer::QUEUE_TIME);
 		$criteria->addSelectColumn(BatchJobPeer::FINISH_TIME);
 		$criteria->addSelectColumn(BatchJobPeer::ENTRY_ID);
 		$criteria->addSelectColumn(BatchJobPeer::PARTNER_ID);
-		$criteria->addSelectColumn(BatchJobPeer::SUBP_ID);
-		$criteria->addSelectColumn(BatchJobPeer::SCHEDULER_ID);
-		$criteria->addSelectColumn(BatchJobPeer::WORKER_ID);
-		$criteria->addSelectColumn(BatchJobPeer::BATCH_INDEX);
-		$criteria->addSelectColumn(BatchJobPeer::LAST_SCHEDULER_ID);
-		$criteria->addSelectColumn(BatchJobPeer::LAST_WORKER_ID);
-		$criteria->addSelectColumn(BatchJobPeer::LAST_WORKER_REMOTE);
-		$criteria->addSelectColumn(BatchJobPeer::PROCESSOR_EXPIRATION);
-		$criteria->addSelectColumn(BatchJobPeer::EXECUTION_ATTEMPTS);
-		$criteria->addSelectColumn(BatchJobPeer::LOCK_VERSION);
-		$criteria->addSelectColumn(BatchJobPeer::TWIN_JOB_ID);
 		$criteria->addSelectColumn(BatchJobPeer::BULK_JOB_ID);
 		$criteria->addSelectColumn(BatchJobPeer::ROOT_JOB_ID);
 		$criteria->addSelectColumn(BatchJobPeer::PARENT_JOB_ID);
+		$criteria->addSelectColumn(BatchJobPeer::BATCH_INDEX);
+		$criteria->addSelectColumn(BatchJobPeer::LAST_SCHEDULER_ID);
+		$criteria->addSelectColumn(BatchJobPeer::LAST_WORKER_ID);
 		$criteria->addSelectColumn(BatchJobPeer::DC);
 		$criteria->addSelectColumn(BatchJobPeer::ERR_TYPE);
 		$criteria->addSelectColumn(BatchJobPeer::ERR_NUMBER);
-		$criteria->addSelectColumn(BatchJobPeer::ON_STRESS_DIVERT_TO);
+		$criteria->addSelectColumn(BatchJobPeer::BATCH_JOB_LOCK_ID);
 	}
 
 	/**
@@ -790,7 +742,7 @@ abstract class BaseBatchJobPeer {
 	}
 	
 	/**
-	 * Method to invalidate the instance pool of all tables related to batch_job
+	 * Method to invalidate the instance pool of all tables related to batch_job_sep
 	 * by a foreign key with ON DELETE CASCADE
 	 */
 	public static function clearRelatedInstancePool()
@@ -846,6 +798,238 @@ abstract class BaseBatchJobPeer {
 		$stmt->closeCursor();
 		return $results;
 	}
+
+	/**
+	 * Returns the number of rows matching criteria, joining the related BatchJobLock table
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+	 * @param      PropelPDO $con
+	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+	 * @return     int Number of matching rows.
+	 */
+	public static function doCountJoinBatchJobLock(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		// we're going to modify criteria, so copy it first
+		$criteria = clone $criteria;
+
+		// We need to set the primary table name, since in the case that there are no WHERE columns
+		// it will be impossible for the BasePeer::createSelectSql() method to determine which
+		// tables go into the FROM clause.
+		$criteria->setPrimaryTableName(BatchJobPeer::TABLE_NAME);
+
+		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+			$criteria->setDistinct();
+		}
+
+		if (!$criteria->hasSelectClause()) {
+			BatchJobPeer::addSelectColumns($criteria);
+		}
+		
+		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+		
+		// Set the correct dbName
+		$criteria->setDbName(self::DATABASE_NAME);
+		
+		
+		$criteria->addJoin(BatchJobPeer::BATCH_JOB_LOCK_ID, BatchJobLockPeer::ID, $join_behavior);
+
+		$stmt = BatchJobPeer::doCountStmt($criteria, $con);
+
+		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+			$count = (int) $row[0];
+		} else {
+			$count = 0; // no rows returned; we infer that means 0 matches.
+		}
+		$stmt->closeCursor();
+		return $count;
+	}
+
+
+	/**
+	 * Selects a collection of BatchJob objects pre-filled with their BatchJobLock objects.
+	 * @param      Criteria  $criteria
+	 * @param      PropelPDO $con
+	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+	 * @return     array Array of BatchJob objects.
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
+	 */
+	public static function doSelectJoinBatchJobLock(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		$criteria = clone $criteria;
+
+		// Set the correct dbName if it has not been overridden
+		if ($criteria->getDbName() == Propel::getDefaultDB()) {
+			$criteria->setDbName(self::DATABASE_NAME);
+		}
+
+		BatchJobPeer::addSelectColumns($criteria);
+		$startcol = (BatchJobPeer::NUM_COLUMNS - BatchJobPeer::NUM_LAZY_LOAD_COLUMNS);
+		BatchJobLockPeer::addSelectColumns($criteria);
+
+		$criteria->addJoin(BatchJobPeer::BATCH_JOB_LOCK_ID, BatchJobLockPeer::ID, $join_behavior);
+
+		$stmt = BatchJobPeer::doSelectStmt($criteria, $con);
+		$results = array();
+
+		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+			$key1 = BatchJobPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj1 = BatchJobPeer::getInstanceFromPool($key1))) {
+				// We no longer rehydrate the object, since this can cause data loss.
+				// See http://propel.phpdb.org/trac/ticket/509
+				// $obj1->hydrate($row, 0, true); // rehydrate
+			} else {
+
+				$cls = BatchJobPeer::getOMClass(false);
+
+				$obj1 = new $cls();
+				$obj1->hydrate($row);
+				BatchJobPeer::addInstanceToPool($obj1, $key1);
+			} // if $obj1 already loaded
+
+			$key2 = BatchJobLockPeer::getPrimaryKeyHashFromRow($row, $startcol);
+			if ($key2 !== null) {
+				$obj2 = BatchJobLockPeer::getInstanceFromPool($key2);
+				if (!$obj2) {
+
+					$cls = BatchJobLockPeer::getOMClass(false);
+
+					$obj2 = new $cls();
+					$obj2->hydrate($row, $startcol);
+					BatchJobLockPeer::addInstanceToPool($obj2, $key2);
+				} // if obj2 already loaded
+				
+				// Add the $obj1 (BatchJob) to $obj2 (BatchJobLock)
+				$obj2->addBatchJob($obj1);
+
+			} // if joined row was not null
+
+			$results[] = $obj1;
+		}
+		$stmt->closeCursor();
+		
+		if($criteria instanceof KalturaCriteria)
+			$criteria->applyResultsSort($results);
+		
+		return $results;
+	}
+
+
+	/**
+	 * Returns the number of rows matching criteria, joining all related tables
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+	 * @param      PropelPDO $con
+	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+	 * @return     int Number of matching rows.
+	 */
+	public static function doCountJoinAll(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		// we're going to modify criteria, so copy it first
+		$criteria = clone $criteria;
+
+		// We need to set the primary table name, since in the case that there are no WHERE columns
+		// it will be impossible for the BasePeer::createSelectSql() method to determine which
+		// tables go into the FROM clause.
+		$criteria->setPrimaryTableName(BatchJobPeer::TABLE_NAME);
+
+		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+			$criteria->setDistinct();
+		}
+
+		if (!$criteria->hasSelectClause()) {
+			BatchJobPeer::addSelectColumns($criteria);
+		}
+		
+		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+		
+		// Set the correct dbName
+		$criteria->setDbName(self::DATABASE_NAME);
+		
+		
+		$criteria->addJoin(BatchJobPeer::BATCH_JOB_LOCK_ID, BatchJobLockPeer::ID, $join_behavior);
+
+		$stmt = BatchJobPeer::doCountStmt($criteria, $con);
+
+		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+			$count = (int) $row[0];
+		} else {
+			$count = 0; // no rows returned; we infer that means 0 matches.
+		}
+		$stmt->closeCursor();
+		return $count;
+	}
+
+	/**
+	 * Selects a collection of BatchJob objects pre-filled with all related objects.
+	 *
+	 * @param      Criteria  $criteria
+	 * @param      PropelPDO $con
+	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+	 * @return     array Array of BatchJob objects.
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
+	 */
+	public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		$criteria = clone $criteria;
+
+		// Set the correct dbName if it has not been overridden
+		if ($criteria->getDbName() == Propel::getDefaultDB()) {
+			$criteria->setDbName(self::DATABASE_NAME);
+		}
+
+		BatchJobPeer::addSelectColumns($criteria);
+		$startcol2 = (BatchJobPeer::NUM_COLUMNS - BatchJobPeer::NUM_LAZY_LOAD_COLUMNS);
+
+		BatchJobLockPeer::addSelectColumns($criteria);
+		$startcol3 = $startcol2 + (BatchJobLockPeer::NUM_COLUMNS - BatchJobLockPeer::NUM_LAZY_LOAD_COLUMNS);
+
+		$criteria->addJoin(BatchJobPeer::BATCH_JOB_LOCK_ID, BatchJobLockPeer::ID, $join_behavior);
+
+		$stmt = BatchJobPeer::doSelectStmt($criteria, $con);
+		$results = array();
+
+		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+			$key1 = BatchJobPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj1 = BatchJobPeer::getInstanceFromPool($key1))) {
+				// We no longer rehydrate the object, since this can cause data loss.
+				// See http://propel.phpdb.org/trac/ticket/509
+				// $obj1->hydrate($row, 0, true); // rehydrate
+			} else {
+				$cls = BatchJobPeer::getOMClass(false);
+
+				$obj1 = new $cls();
+				$obj1->hydrate($row);
+				BatchJobPeer::addInstanceToPool($obj1, $key1);
+			} // if obj1 already loaded
+
+			// Add objects for joined BatchJobLock rows
+
+			$key2 = BatchJobLockPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+			if ($key2 !== null) {
+				$obj2 = BatchJobLockPeer::getInstanceFromPool($key2);
+				if (!$obj2) {
+
+					$cls = BatchJobLockPeer::getOMClass(false);
+
+					$obj2 = new $cls();
+					$obj2->hydrate($row, $startcol2);
+					BatchJobLockPeer::addInstanceToPool($obj2, $key2);
+				} // if obj2 loaded
+
+				// Add the $obj1 (BatchJob) to the collection in $obj2 (BatchJobLock)
+				$obj2->addBatchJob($obj1);
+			} // if joined row not null
+
+			$results[] = $obj1;
+		}
+		$stmt->closeCursor();
+		return $results;
+	}
+
 	/**
 	 * Returns the TableMap related to this peer.
 	 * This method is not needed for general use but a specific application could have a need.
@@ -973,7 +1157,7 @@ abstract class BaseBatchJobPeer {
 	}
 
 	/**
-	 * Method to DELETE all rows from the batch_job table.
+	 * Method to DELETE all rows from the batch_job_sep table.
 	 *
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 */

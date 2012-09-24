@@ -44,7 +44,7 @@ class KAsyncProvisionDelete extends KJobHandlerWorker
 	{
 		KalturaLog::notice ( "Provision entry");
 		
-		$job = $this->updateJob($job, null, KalturaBatchJobStatus::QUEUED, 1);
+		$job = $this->updateJob($job, null, KalturaBatchJobStatus::QUEUED);
 	
 		$engine = KProvisionEngine::getInstance( $job->jobSubType , $this->taskConfig, $data);
 		

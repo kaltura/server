@@ -19,30 +19,30 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
-	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
+	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		$dbBatchJob = $this->updatedTransformMetadata($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+		$dbBatchJob = $this->updatedTransformMetadata($dbBatchJob, $dbBatchJob->getData());
 				
 		return true;
 	}
 	
-	protected function updatedTransformMetadata(BatchJob $dbBatchJob, kTransformMetadataJobData $data, BatchJob $twinJob = null)
+	protected function updatedTransformMetadata(BatchJob $dbBatchJob, kTransformMetadataJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_PENDING:
-				return $this->updatedTransformMetadataPending($dbBatchJob, $data, $twinJob);
+				return $this->updatedTransformMetadataPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return $this->updatedTransformMetadataFinished($dbBatchJob, $data, $twinJob);
+				return $this->updatedTransformMetadataFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return $this->updatedTransformMetadataFailed($dbBatchJob, $data, $twinJob);
+				return $this->updatedTransformMetadataFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
 	}
 	
-	protected function updatedTransformMetadataPending(BatchJob $dbBatchJob, kTransformMetadataJobData $data, BatchJob $twinJob = null)
+	protected function updatedTransformMetadataPending(BatchJob $dbBatchJob, kTransformMetadataJobData $data)
 	{
 		if($data->getSrcXslPath())
 		{
@@ -54,7 +54,7 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 		return $dbBatchJob;
 	}
 	
-	protected function updatedTransformMetadataFinished(BatchJob $dbBatchJob, kTransformMetadataJobData $data, BatchJob $twinJob = null)
+	protected function updatedTransformMetadataFinished(BatchJob $dbBatchJob, kTransformMetadataJobData $data)
 	{
 		if($data->getSrcXslPath())
 		{
@@ -66,7 +66,7 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 		return $dbBatchJob;
 	}
 	
-	protected function updatedTransformMetadataFailed(BatchJob $dbBatchJob, kTransformMetadataJobData $data, BatchJob $twinJob = null)
+	protected function updatedTransformMetadataFailed(BatchJob $dbBatchJob, kTransformMetadataJobData $data)
 	{
 		if(!$data->getMetadataProfileId())
 			return $dbBatchJob;

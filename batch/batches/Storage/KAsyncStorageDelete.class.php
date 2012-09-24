@@ -68,7 +68,7 @@ class KAsyncStorageDelete extends KJobHandlerWorker
 		
 		$srcFile = str_replace('//', '/', trim($data->srcFileSyncLocalPath));
 		$destFile = str_replace('//', '/', trim($data->destFileSyncStoredPath));
-		$this->updateJob($job, "Deleting $srcFile to $destFile", KalturaBatchJobStatus::QUEUED, 1);
+		$this->updateJob($job, "Deleting $srcFile to $destFile", KalturaBatchJobStatus::QUEUED);
 
 		$engine = kFileTransferMgr::getInstance($job->jobSubType);
 		

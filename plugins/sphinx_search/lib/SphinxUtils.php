@@ -7,6 +7,7 @@ class SphinxUtils
 {
 	public static function escapeString($str, $escapeType = SearchIndexFieldEscapeType::DEFAULT_ESCAPE, $iterations = 2)
 	{
+		
 		if($escapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE)
 		{
 			// NOTE: it appears that sphinx performs double decoding on SELECT values, so we encode twice.

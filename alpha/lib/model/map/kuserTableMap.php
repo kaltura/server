@@ -97,7 +97,6 @@ class kuserTableMap extends TableMap {
     $this->addRelation('flag', 'flag', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
     $this->addRelation('favorite', 'favorite', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
     $this->addRelation('KshowKuser', 'KshowKuser', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
-    $this->addRelation('MailJob', 'MailJob', RelationMap::ONE_TO_MANY, array('id' => 'recipient_id', ), null, null);
     $this->addRelation('PuserKuser', 'PuserKuser', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
     $this->addRelation('Partner', 'Partner', RelationMap::ONE_TO_MANY, array('id' => 'anonymous_kuser_id', ), null, null);
     $this->addRelation('moderation', 'moderation', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);

@@ -71,11 +71,15 @@ class kBatchJobLogManager implements kObjectCreatedEventConsumer, kObjectChanged
 	
 	protected function copyModifiedColumns (BatchJobLog $batchJobLog, BatchJob $batchJob, array $modifiedColumns)
 	{
+		$shouldSkipInTranslation = array("lock_info");
 	    foreach ($modifiedColumns as $modifiedColumn)
 	    {
 	        try 
 	        {
     	        $fieldName = BatchJobPeer::translateFieldName($modifiedColumn, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME);
+    	        if(in_array($fieldName, $shouldSkipInTranslation))
+    	        	continue;
+    	        
     	        $fieldPosJob = BatchJobPeer::translateFieldName($modifiedColumn, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
     	        $fieldPosLog = BatchJobLogPeer::translateFieldName($fieldName, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM);
 	        }

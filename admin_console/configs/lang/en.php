@@ -572,7 +572,6 @@ return array(
 	'entry-investigate history status tooltip' => 'The status of this task. The task status is one of the following: Waiting, In Process, completed, Failed',
 	'entry-investigate history abort th' => 'Aborted',
 	'entry-investigate history recheck th' => 'Check Again',
-	'entry-investigate history progress th' => 'Progress',
 	'entry-investigate history msg th' => 'Message',
 	'entry-investigate history info th' => 'Description',
 	'entry-investigate history create time th' => 'Create Time (' . date('T') . ')',
@@ -595,15 +594,22 @@ return array(
 	'entry-investigate history last worker th' => 'Last Service ID',
 	'entry-investigate history distrib th' => 'Distributed',
 	'entry-investigate history parent th' => 'Parent Task ID',
-	'entry-investigate history twin th' => 'Twin Task ID',
 	'entry-investigate history bulk th' => 'Bulk Task ID',
 	'entry-investigate history root th' => 'Root Task ID',
 	'entry-investigate history dc th' => 'Data Center',
 	'entry-investigate history err type th' => 'Error Type',
 	'entry-investigate history err num th' => 'Error #',
-	'entry-investigate history divert th' => 'On Stress Divert To',
 
 	'entry-investigate history retry' => 'Retry',
+		
+	// History records	
+	'entry-investigate history_records schedulerId th' => 'Scheduler Id',
+	'entry-investigate history_records workerId th' => 'Worker Id',
+	'entry-investigate history_records batchIndex th' => 'Batch Index',
+	'entry-investigate history_records timeStamp th' => 'Time stamp',
+	'entry-investigate history_records message th' => 'Message',
+	'entry-investigate history_records errType th' => 'Error type',
+	'entry-investigate history_records errNumber th' => 'Error number',
 
 
 	// entries gallery

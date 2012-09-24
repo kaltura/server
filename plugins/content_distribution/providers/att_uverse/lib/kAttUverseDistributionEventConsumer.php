@@ -23,7 +23,7 @@ class kAttUverseDistributionEventConsumer implements kBatchJobStatusEventConsume
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
-	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
+	public function updatedJob(BatchJob $dbBatchJob)
 	{		
 		$data = $dbBatchJob->getData();
 		if (!$data instanceof kDistributionJobData)
@@ -43,7 +43,7 @@ class kAttUverseDistributionEventConsumer implements kBatchJobStatusEventConsume
 		);
 		if (in_array($dbBatchJob->getJobType(),$jobTypesToFinish) && $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{				
-			return self::onDistributionJobFinished($dbBatchJob, $data, $twinJob);
+			return self::onDistributionJobFinished($dbBatchJob, $data);
 		}
 		
 		if ($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE) &&
@@ -57,10 +57,9 @@ class kAttUverseDistributionEventConsumer implements kBatchJobStatusEventConsume
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionJobData $data
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function onDistributionJobFinished(BatchJob $dbBatchJob, kDistributionJobData $data, BatchJob $twinJob = null)
+	public static function onDistributionJobFinished(BatchJob $dbBatchJob, kDistributionJobData $data)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)

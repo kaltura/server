@@ -149,28 +149,28 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
-	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
+	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		$dbBatchJob = $this->updatedVirusScan($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+		$dbBatchJob = $this->updatedVirusScan($dbBatchJob, $dbBatchJob->getData());
 
 		return true;
 	}
 		
-	protected function updatedVirusScan(BatchJob $dbBatchJob, kVirusScanJobData $data, BatchJob $twinJob = null)
+	protected function updatedVirusScan(BatchJob $dbBatchJob, kVirusScanJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return $this->updatedVirusScanFinished($dbBatchJob, $data, $twinJob);
+				return $this->updatedVirusScanFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return $this->updatedVirusScanFailed($dbBatchJob, $data, $twinJob);
+				return $this->updatedVirusScanFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
 	}
 	
-	protected function updatedVirusScanFinished(BatchJob $dbBatchJob, kVirusScanJobData $data, BatchJob $twinJob = null)
+	protected function updatedVirusScanFinished(BatchJob $dbBatchJob, kVirusScanJobData $data)
 	{
 		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		if (!$flavorAsset)
@@ -241,7 +241,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		return $dbBatchJob;
 	}
 	
-	protected function updatedVirusScanFailed(BatchJob $dbBatchJob, kVirusScanJobData $data, BatchJob $twinJob = null)
+	protected function updatedVirusScanFailed(BatchJob $dbBatchJob, kVirusScanJobData $data)
 	{
 		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
 		if ($entry)

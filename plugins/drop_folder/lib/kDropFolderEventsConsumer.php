@@ -17,28 +17,28 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
-	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
+	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		$dbBatchJob = $this->updatedImport($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+		$dbBatchJob = $this->updatedImport($dbBatchJob, $dbBatchJob->getData());
 
 		return true;
 	}
 		
-	protected function updatedImport(BatchJob $dbBatchJob, kDropFolderImportJobData $data, BatchJob $twinJob = null)
+	protected function updatedImport(BatchJob $dbBatchJob, kDropFolderImportJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return $this->updatedImportFinished($dbBatchJob, $data, $twinJob);
+				return $this->updatedImportFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return $this->updatedImportFailed($dbBatchJob, $data, $twinJob);
+				return $this->updatedImportFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
 	}
 	
-	protected function updatedImportFinished(BatchJob $dbBatchJob, kDropFolderImportJobData $data, BatchJob $twinJob = null)
+	protected function updatedImportFinished(BatchJob $dbBatchJob, kDropFolderImportJobData $data)
 	{
 		$dropFolderFile = DropFolderFilePeer::retrieveByPK($data->getDropFolderFileId());
 		$dropFolderFile->setStatus(DropFolderFileStatus::HANDLED);
@@ -47,7 +47,7 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer
 		return $dbBatchJob;
 	}
 	
-	protected function updatedImportFailed(BatchJob $dbBatchJob, kDropFolderImportJobData $data, BatchJob $twinJob = null)
+	protected function updatedImportFailed(BatchJob $dbBatchJob, kDropFolderImportJobData $data)
 	{
 	    // set drop folder file status to ERROR_DOWNLOADING
 		$dropFolderFile = DropFolderFilePeer::retrieveByPK($data->getDropFolderFileId());

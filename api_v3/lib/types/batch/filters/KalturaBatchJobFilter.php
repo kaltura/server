@@ -110,7 +110,7 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 	 */
 	public function toFilter($jobType = null)
 	{
-		$batchJobFilter = $this->toObject(new BatchJobFilter());
+		$batchJobFilter = $this->toObject(new BatchJobFilter(false));
 		
 		if(!is_null($jobType) && !is_null($this->jobSubTypeIn))
 		{

@@ -91,6 +91,9 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	
 		if($baseEnumName == 'ConditionType')
 			return array('MetadataConditionType');
+		
+		if($baseEnumName == 'BatchJobObjectType')
+			return array('MetadataBatchJobObjectType');
 			
 		return array();
 	}

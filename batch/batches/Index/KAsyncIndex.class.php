@@ -65,7 +65,7 @@ class KAsyncIndex extends KJobHandlerWorker
 			$lastIndexId = $engine->getLastIndexId();
 			
 			$data->lastIndexId = $lastIndexId;
-			$this->updateJob($job, "Indexed $indexedObjectsCount objects", KalturaBatchJobStatus::PROCESSING, null, $data);
+			$this->updateJob($job, "Indexed $indexedObjectsCount objects", KalturaBatchJobStatus::PROCESSING, $data);
 			
 			$advancedFilter->indexIdGreaterThan = $lastIndexId;
 			$filter->advancedSearch = $advancedFilter;

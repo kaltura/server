@@ -1180,9 +1180,6 @@ package="lib.model">
     autoIncrement="false" lazyLoad="false"
     name="check_again_timeout" type="integer" />
     <column primaryKey="false" required="false"
-    autoIncrement="false" lazyLoad="false" name="progress"
-    type="tinyint" />
-    <column primaryKey="false" required="false"
     autoIncrement="false" lazyLoad="false" name="message"
     type="varchar" size="1024" />
     <column primaryKey="false" required="false"
@@ -1255,9 +1252,6 @@ package="lib.model">
     autoIncrement="false" lazyLoad="false" name="lock_version"
     type="integer" />
     <column primaryKey="false" required="false"
-    autoIncrement="false" lazyLoad="false" name="twin_job_id"
-    type="integer" default="null" />
-    <column primaryKey="false" required="false"
     autoIncrement="false" lazyLoad="false" name="bulk_job_id"
     type="integer" default="null" />
     <column primaryKey="false" required="false"
@@ -1275,10 +1269,6 @@ package="lib.model">
     <column primaryKey="false" required="false"
     autoIncrement="false" lazyLoad="false" name="err_number"
     type="integer" />
-    <column primaryKey="false" required="false"
-    autoIncrement="false" lazyLoad="false"
-    name="on_stress_divert_to" type="integer" />
-    <index name="status_job_type_index">
       <index-column name="status" />
       <index-column name="job_type" />
     </index>
@@ -1293,8 +1283,6 @@ package="lib.model">
       <index-column name="work_group_id" />
       <index-column name="priority" />
     </index>
-    <index name="twin_job_id_index">
-      <index-column name="twin_job_id" />
     </index>
     <index name="bulk_job_id_index">
       <index-column name="bulk_job_id" />

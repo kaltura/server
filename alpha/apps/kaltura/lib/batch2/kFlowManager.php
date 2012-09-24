@@ -14,81 +14,81 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	{
 	}
 
-	protected function updatedImport(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
+	protected function updatedImport(BatchJob $dbBatchJob, kImportJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return kFlowHelper::handleImportFinished($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleImportFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return kFlowHelper::handleImportFailed($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleImportFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
 	}
 
-	protected function updatedIndex(BatchJob $dbBatchJob, kIndexJobData $data, BatchJob $twinJob = null)
+	protected function updatedIndex(BatchJob $dbBatchJob, kIndexJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_PENDING:
-				return kFlowHelper::handleIndexPending($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleIndexPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return kFlowHelper::handleIndexFinished($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleIndexFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return kFlowHelper::handleIndexFailed($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleIndexFailed($dbBatchJob, $data);
 				return $dbBatchJob;
 			default:
 				return $dbBatchJob;
 		}
 	}
 
-	protected function updatedCopy(BatchJob $dbBatchJob, kCopyJobData $data, BatchJob $twinJob = null)
+	protected function updatedCopy(BatchJob $dbBatchJob, kCopyJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-//				return kFlowHelper::handleCopyFinished($dbBatchJob, $data, $twinJob);
+//				return kFlowHelper::handleCopyFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-//				return kFlowHelper::handleCopyFailed($dbBatchJob, $data, $twinJob);
+//				return kFlowHelper::handleCopyFailed($dbBatchJob, $data);
 				return $dbBatchJob;
 			default:
 				return $dbBatchJob;
 		}
 	}
-
-	protected function updatedDelete(BatchJob $dbBatchJob, kDeleteJobData $data, BatchJob $twinJob = null)
+	
+	protected function updatedDelete(BatchJob $dbBatchJob, kDeleteJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-//				return kFlowHelper::handleDeleteFinished($dbBatchJob, $data, $twinJob);
+				//				return kFlowHelper::handleDeleteFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-//				return kFlowHelper::handleDeleteFailed($dbBatchJob, $data, $twinJob);
+				//				return kFlowHelper::handleDeleteFailed($dbBatchJob, $data);
 				return $dbBatchJob;
 			default:
 				return $dbBatchJob;
 		}
 	}
 
-	protected function updatedExtractMedia(BatchJob $dbBatchJob, kExtractMediaJobData $data, BatchJob $twinJob = null)
+	protected function updatedExtractMedia(BatchJob $dbBatchJob, kExtractMediaJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return kFlowHelper::handleExtractMediaClosed($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleExtractMediaClosed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
 	}
 
-	protected function updatedMoveCategoryEntries(BatchJob $dbBatchJob, kMoveCategoryEntriesJobData $data, BatchJob $twinJob = null)
+	protected function updatedMoveCategoryEntries(BatchJob $dbBatchJob, kMoveCategoryEntriesJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
@@ -102,7 +102,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 
-	protected function updatedStorageExport(BatchJob $dbBatchJob, kStorageExportJobData $data, BatchJob $twinJob = null)
+	protected function updatedStorageExport(BatchJob $dbBatchJob, kStorageExportJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
@@ -116,7 +116,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 	
-	protected function updatedStorageDelete(BatchJob $dbBatchJob, kStorageDeleteJobData $data, BatchJob $twinJob = null)
+	protected function updatedStorageDelete(BatchJob $dbBatchJob, kStorageDeleteJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
@@ -127,15 +127,15 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 
-	protected function updatedCaptureThumb(BatchJob $dbBatchJob, kCaptureThumbJobData $data, BatchJob $twinJob = null)
+	protected function updatedCaptureThumb(BatchJob $dbBatchJob, kCaptureThumbJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return kFlowHelper::handleCaptureThumbFinished($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleCaptureThumbFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return kFlowHelper::handleCaptureThumbFailed($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleCaptureThumbFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
@@ -154,110 +154,110 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}	
 	}
 
-	protected function updatedConvert(BatchJob $dbBatchJob, kConvertJobData $data, BatchJob $twinJob = null)
+	protected function updatedConvert(BatchJob $dbBatchJob, kConvertJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_PENDING:
-				return kFlowHelper::handleConvertPending($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleConvertPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_QUEUED:
-				return kFlowHelper::handleConvertQueued($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleConvertQueued($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return kFlowHelper::handleConvertFinished($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleConvertFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return kFlowHelper::handleConvertFailed($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleConvertFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
 	}
 
-	protected function updatedPostConvert(BatchJob $dbBatchJob, kPostConvertJobData $data, BatchJob $twinJob = null)
+	protected function updatedPostConvert(BatchJob $dbBatchJob, kPostConvertJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return kFlowHelper::handlePostConvertFinished($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handlePostConvertFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return kFlowHelper::handlePostConvertFailed($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handlePostConvertFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
 	}
 
-	protected function updatedBulkUpload(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
+	protected function updatedBulkUpload(BatchJob $dbBatchJob, kBulkUploadJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FAILED: 
 			case BatchJob::BATCHJOB_STATUS_FATAL: 
-				return kFlowHelper::handleBulkUploadFailed($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleBulkUploadFailed($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED: 
-				return kFlowHelper::handleBulkUploadFinished($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleBulkUploadFinished($dbBatchJob, $data);
 			default: return $dbBatchJob;
 		}
 	}
 
-	protected function updatedConvertCollection(BatchJob $dbBatchJob, kConvertCollectionJobData $data, BatchJob $twinJob = null)
+	protected function updatedConvertCollection(BatchJob $dbBatchJob, kConvertCollectionJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_PENDING:
-				return kFlowHelper::handleConvertCollectionPending($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleConvertCollectionPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return kFlowHelper::handleConvertCollectionFinished($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleConvertCollectionFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return kFlowHelper::handleConvertCollectionFailed($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleConvertCollectionFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
 	}
 
-	protected function updatedConvertProfile(BatchJob $dbBatchJob, kConvertProfileJobData $data, BatchJob $twinJob = null)
+	protected function updatedConvertProfile(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_PENDING:
-				return kFlowHelper::handleConvertProfilePending($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleConvertProfilePending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return kFlowHelper::handleConvertProfileFinished($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleConvertProfileFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return kFlowHelper::handleConvertProfileFailed($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleConvertProfileFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
 	}
 
-	protected function updatedBulkDownload(BatchJob $dbBatchJob, kBulkDownloadJobData $data, BatchJob $twinJob = null)
+	protected function updatedBulkDownload(BatchJob $dbBatchJob, kBulkDownloadJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_PENDING:
-				return kFlowHelper::handleBulkDownloadPending($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleBulkDownloadPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return kFlowHelper::handleBulkDownloadFinished($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleBulkDownloadFinished($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
 	}
 
-	protected function updatedProvisionDelete(BatchJob $dbBatchJob, kProvisionJobData $data, BatchJob $twinJob = null)
+	protected function updatedProvisionDelete(BatchJob $dbBatchJob, kProvisionJobData $data)
 	{
 		return $dbBatchJob;
 	}
 
-	protected function updatedProvisionProvide(BatchJob $dbBatchJob, kProvisionJobData $data, BatchJob $twinJob = null)
+	protected function updatedProvisionProvide(BatchJob $dbBatchJob, kProvisionJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return kFlowHelper::handleProvisionProvideFinished($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleProvisionProvideFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return kFlowHelper::handleProvisionProvideFailed($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleProvisionProvideFailed($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
@@ -274,10 +274,21 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
-	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
-	{
+	public function updatedJob(BatchJob $dbBatchJob)
+	{ 
+		$dbBatchJobLock = $dbBatchJob->getBatchJobLock();
+		
 		try
 		{
+			if(!in_array($dbBatchJob->getStatus(), BatchJobLockPeer::getSchedulingRequiredStatusList())) {
+				
+				if($dbBatchJobLock !== null) {	
+					$dbBatchJobLock->delete();
+					$dbBatchJob->setBatchJobLock(null);
+					$dbBatchJob->save();
+				}
+			}
+				
 			$jobType = $dbBatchJob->getJobType();
 
 			if(is_null($dbBatchJob->getQueueTime()) && $dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_PENDING && $dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_RETRY)
@@ -294,14 +305,12 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 
 			if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_RETRY)
 			{
-				$dbBatchJob->setCheckAgainTimeout(time() + BatchJobPeer::getCheckAgainTimeout($jobType));
 				$dbBatchJob->setQueueTime(null);
 				$dbBatchJob->save();
 			}
 
 			if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_ALMOST_DONE)
 			{
-				$dbBatchJob->setCheckAgainTimeout(time() + BatchJobPeer::getCheckAgainTimeout($jobType));
 				$dbBatchJob->save();
 			}
 
@@ -316,59 +325,59 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			switch($jobType)
 			{
 				case BatchJobType::IMPORT:
-					$dbBatchJob = $this->updatedImport($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedImport($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				case BatchJobType::EXTRACT_MEDIA:
-					$dbBatchJob = $this->updatedExtractMedia($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedExtractMedia($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				case BatchJobType::CONVERT:
-					$dbBatchJob = $this->updatedConvert($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedConvert($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				case BatchJobType::POSTCONVERT:
-					$dbBatchJob = $this->updatedPostConvert($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedPostConvert($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				case BatchJobType::BULKUPLOAD:
-					$dbBatchJob = $this->updatedBulkUpload($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedBulkUpload($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				case BatchJobType::CONVERT_PROFILE:
-					$dbBatchJob = $this->updatedConvertProfile($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedConvertProfile($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				case BatchJobType::BULKDOWNLOAD:
-					$dbBatchJob = $this->updatedBulkDownload($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedBulkDownload($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				case BatchJobType::PROVISION_PROVIDE:
-					$dbBatchJob = $this->updatedProvisionProvide($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedProvisionProvide($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				case BatchJobType::PROVISION_DELETE:
-					$dbBatchJob = $this->updatedProvisionDelete($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedProvisionDelete($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				case BatchJobType::CONVERT_COLLECTION:
-					$dbBatchJob = $this->updatedConvertCollection($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedConvertCollection($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				case BatchJobType::STORAGE_EXPORT:
-					$dbBatchJob = $this->updatedStorageExport($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedStorageExport($dbBatchJob, $dbBatchJob->getData());
 					break;
 					
 				case BatchJobType::MOVE_CATEGORY_ENTRIES:
-					$dbBatchJob = $this->updatedMoveCategoryEntries($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedMoveCategoryEntries($dbBatchJob, $dbBatchJob->getData());
 					break;
-					
+							
 				case BatchJobType::STORAGE_DELETE:
-					$dbBatchJob = $this->updatedStorageDelete($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedStorageDelete($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				case BatchJobType::CAPTURE_THUMB:
-					$dbBatchJob = $this->updatedCaptureThumb($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					$dbBatchJob = $this->updatedCaptureThumb($dbBatchJob, $dbBatchJob->getData());
 					break;
 					
 				case BatchJobType::DELETE_FILE:
@@ -390,27 +399,14 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				default:
 					break;
 			}
-
-			if(!kConf::get("batch_ignore_duplication"))
-			{
-				if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
-				{
-					$twinBatchJobs = $dbBatchJob->getTwinJobs();
-					// update status at all twin jobs
-					foreach($twinBatchJobs as $twinBatchJob)
-					{
-						if($twinBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
-						kJobsManager::updateBatchJob($twinBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
-					}
-				}
-			}
-
-			if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_RETRY && $dbBatchJob->getExecutionAttempts() >= BatchJobPeer::getMaxExecutionAttempts($jobType))
-			{
-				$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FAILED);
+			
+			if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_RETRY) {
+				
+				if($dbBatchJobLock->getExecutionAttempts() >= BatchJobLockPeer::getMaxExecutionAttempts($jobType))
+					$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FAILED);
 			}
 			
-			if(in_array($dbBatchJob->getStatus(),BatchJobPeer::getClosedStatusList()))
+			if(in_array($dbBatchJob->getStatus(), BatchJobPeer::getClosedStatusList()))
 			{
 				$jobEntry = $dbBatchJob->getEntry();
 				if($jobEntry && $jobEntry->getMarkedForDeletion())
@@ -443,7 +439,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		$jobData->setRecipientEmail(kConf::get("batch_alert_email"));
 		$jobData->setSubjectParamsArray( array() );
 
-		kJobsManager::addJob($dbBatchJob->createChild(), $jobData, BatchJobType::MAIL, $jobData->getMailType());
+		kJobsManager::addJob($dbBatchJob->createChild(BatchJobType::MAIL, $jobData->getMailType()), $jobData, BatchJobType::MAIL, $jobData->getMailType());
 	}
 
 	/* (non-PHPdoc)

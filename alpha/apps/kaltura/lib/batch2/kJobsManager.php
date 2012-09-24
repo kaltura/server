@@ -23,18 +23,18 @@ class kJobsManager
 	/**
 	 * @param BatchJob $batchJob
 	 * @param int $status
-	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function updateBatchJob(BatchJob $batchJob, $status, BatchJob $twinJob = null)
+	public static function updateBatchJob(BatchJob $batchJob, $status)
 	{
 		$batchJob->setStatus($status);
 		$changed = $batchJob->save();
 		
-		if(!$changed)
+		if(!$changed) {
 			return $batchJob;
+		}
 		
-		$event = new kBatchJobStatusEvent($batchJob, $twinJob);
+		$event = new kBatchJobStatusEvent($batchJob);
 		kEventsManager::raiseEvent($event);
 		$batchJob->reload();
 		return $batchJob;
@@ -71,13 +71,16 @@ class kJobsManager
 	
 	public static function abortDbBatchJob(BatchJob $dbBatchJob, $force = false)
 	{
+		
 		if(!$force && in_array($dbBatchJob->getStatus(), BatchJobPeer::getClosedStatusList()))
 			return $dbBatchJob;
 			
-		$dbBatchJob->setAbort(1); // 1 = true
+		$dbBatchJob->setExecutionStatus(BatchJobExecutionStatus::ABORTED); 
 		
 		// if not currently locked
-		if(!$dbBatchJob->getSchedulerId())
+		$dbBatchJobLock = $dbBatchJob->getBatchJobLock();
+		
+		if(($dbBatchJobLock) && (!$dbBatchJobLock->getSchedulerId()))
 		{
 			$dbBatchJob = self::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_ABORTED);
 		}
@@ -113,26 +116,35 @@ class kJobsManager
 	public static function retryJob($jobId, $jobType, $force = false)
 	{
 		$dbBatchJob = BatchJobPeer::retrieveByPK($jobId);
-		if($dbBatchJob->getJobType() != $jobType)
+		if($dbBatchJob->getJobType() != $jobType) {
 			throw new APIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $jobType, $dbBatchJob->getId());
+		}
 			
-		$dbBatchJob->setAbort(false);
+		$dbBatchJob->setExecutionStatus(BatchJobExecutionStatus::NORMAL);
 		
 		// if not currently locked
-		if(!$dbBatchJob->getSchedulerId())
-		{
-			$dbBatchJob->setExecutionAttempts(0);
+		$dbBatchJobLock = $dbBatchJob->getBatchJobLock();
+		if($dbBatchJobLock === null) {
+			
+			// retry of non locked entry
 			$dbBatchJob = self::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_RETRY);
-		}
-		elseif($force)
-		{
-			$dbBatchJob->setExecutionAttempts(0);
+			
+		} elseif (!$dbBatchJobLock->getSchedulerId()) {
+			
+			// retry of non-scheduled entry
+			$dbBatchJobLock->setExecutionAttempts(0);
+			$dbBatchJob->save();
+			
+		} elseif ($force) {
+			
+			// retry of scheduled entry
+			$dbBatchJobLock->setExecutionAttempts(0);
+			$dbBatchJobLock->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
+			$dbBatchJobLock->setExpiration(time() + BatchJobLockPeer::getRetryInterval($jobType));
 			$dbBatchJob->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
-			$dbBatchJob->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
-			$dbBatchJob->setCheckAgainTimeout(time() + BatchJobPeer::getCheckAgainTimeout($jobType));
 			$dbBatchJob->save();
 		}
-			
+		
 		return $dbBatchJob;
 	}
 	
@@ -159,7 +171,7 @@ class kJobsManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild();
+			$batchJob = $parentJob->createChild(BatchJobType::MAIL, $mailType);
 		}
 		else
 		{
@@ -167,6 +179,9 @@ class kJobsManager
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
 		}
+		
+		$batchJob->setObjectId($entryId);
+		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
 		return self::addJob($batchJob, $jobData, BatchJobType::MAIL, $mailType);
 	}
 	
@@ -174,12 +189,12 @@ class kJobsManager
 	{
  		$jobData = new kProvisionJobData();
  		$jobData->setStreamID($entry->getStreamRemoteId());
- 		
+ 		$subType = $entry->getSource();
  		
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild();
+			$batchJob = $parentJob->createChild(BatchJobType::PROVISION_DELETE, $subType);
 		}
 		else
 		{
@@ -188,7 +203,8 @@ class kJobsManager
 			$batchJob->setPartnerId($entry->getPartnerId());
 		}
 		
-		$subType = $entry->getSource();
+		$batchJob->setObjectId($entry->getId());
+		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
 		return self::addJob($batchJob, $jobData, BatchJobType::PROVISION_DELETE, $subType);
 	}
 	
@@ -227,7 +243,7 @@ class kJobsManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild();
+			$batchJob = $parentJob->createChild(BatchJobType::PROVISION_PROVIDE, $subType);
 		}
 		else
 		{
@@ -236,6 +252,8 @@ class kJobsManager
 			$batchJob->setPartnerId($entry->getPartnerId());
 		}
 				
+		$batchJob->setObjectId($entry->getId());
+		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
 		return self::addJob($batchJob, $jobData, BatchJobType::PROVISION_PROVIDE, $subType);
 	}
 
@@ -249,7 +267,7 @@ class kJobsManager
 	 * @param array<flavorParamsOutput> $flavorParamsOutputs
 	 * @return BatchJob
 	 */
-	public static function addConvertIsmCollectionJob($tag, FileSyncKey $srcSyncKey, entry $entry, BatchJob $parentJob = null, array $flavorParamsOutputs, $dbConvertCollectionJob = null)
+	public static function addConvertIsmCollectionJob($tag, FileSyncKey $srcSyncKey, entry $entry, BatchJob $parentJob = null, array $flavorParamsOutputs, $sameRoot = null)
 	{		
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 		
@@ -343,12 +361,12 @@ class kJobsManager
 		$currentConversionEngine = conversionEngineType::EXPRESSION_ENCODER3;
 		KalturaLog::log("Using conversion engine [$currentConversionEngine]");
 		
-		if(!$dbConvertCollectionJob)
+		if($sameRoot == null)
 		{
 			// creats a child convert job
 			if($parentJob)
 			{
-				$dbConvertCollectionJob = $parentJob->createChild();
+				$dbConvertCollectionJob = $parentJob->createChild(BatchJobType::CONVERT_COLLECTION, $currentConversionEngine);
 				KalturaLog::log("Created from parent convert job with entry id [" . $dbConvertCollectionJob->getEntryId() . "]");
 			}
 			else
@@ -356,10 +374,17 @@ class kJobsManager
 				$dbConvertCollectionJob = new BatchJob();
 				$dbConvertCollectionJob->setEntryId($entry->getId());
 				$dbConvertCollectionJob->setPartnerId($entry->getPartnerId());
+				$dbConvertCollectionJob->setJobType(BatchJobType::CONVERT_COLLECTION);
+				$dbConvertCollectionJob->setJobSubType($currentConversionEngine);
 				$dbConvertCollectionJob->save();
 				KalturaLog::log("Created from convert collection job with entry id [" . $dbConvertCollectionJob->getEntryId() . "]");
 			}
+		} else {
+			$dbConvertCollectionJob = $parentJob->createChild(BatchJobType::CONVERT_COLLECTION, $currentConversionEngine, false);
 		}
+		
+		$dbConvertCollectionJob->setObjectId($entry->getId());
+		$dbConvertCollectionJob->setObjectType(BatchJobObjectType::ENTRY);
 		
 		KalturaLog::log("Calling CDLProceessFlavorsForCollection with [" . count($finalFlavorParamsOutputs) . "] flavor params");
 		$xml = KDLWrap::CDLProceessFlavorsForCollection($finalFlavorParamsOutputs);
@@ -381,7 +406,9 @@ class kJobsManager
 		$convertCollectionData->setInputXmlRemoteUrl($remoteUrl);
 		$convertCollectionData->setCommandLinesStr($commandLinesStr);
 		
-		$dbConvertCollectionJob->setFileSize(kFile::fileSize($convertCollectionData->getSrcFileSyncLocalPath()));
+		$lockJobInfo = new kLockInfoData($dbConvertCollectionJob);
+		$lockJobInfo->setEstimatedEffort(kFile::fileSize());
+		$dbConvertCollectionJob->setLockInfo($lockJobInfo);
 		
 		return kJobsManager::addJob($dbConvertCollectionJob, $convertCollectionData, BatchJobType::CONVERT_COLLECTION, $currentConversionEngine);
 	}
@@ -393,13 +420,15 @@ class kJobsManager
 	 * @param FileSyncKey $srcSyncKey
 	 * @param flavorParamsOutput $flavor
 	 * @param int $flavorAssetId
+	 * @param int $conversionProfileId
 	 * @param int $mediaInfoId
 	 * @param BatchJob $parentJob
 	 * @param int $lastEngineType  
-	 * @param BatchJob $dbConvertFlavorJob
+	 * @param bool $sameRoot
 	 * @return BatchJob 
 	 */
-	public static function addFlavorConvertJob(FileSyncKey $srcSyncKey, flavorParamsOutput $flavor, $flavorAssetId, $mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, BatchJob $dbConvertFlavorJob = null)
+	public static function addFlavorConvertJob(FileSyncKey $srcSyncKey, flavorParamsOutput $flavor, $flavorAssetId, $conversionProfileId = null,
+			$mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, $sameRoot = true)
 	{
 		$localPath = null;
 		$remoteUrl = null;
@@ -572,30 +601,43 @@ class kJobsManager
 			}
 		}
 		KalturaLog::log("Using conversion engine [$currentConversionEngine]");
+		$dbCurrentConversionEngine = kPluginableEnumsManager::apiToCore('conversionEngineType', $currentConversionEngine);
 		
 		// creats a child convert job
-		if(is_null($dbConvertFlavorJob))
+		if($parentJob)
 		{
-			if($parentJob)
-			{
-				$dbConvertFlavorJob = $parentJob->createChild();
-				KalturaLog::log("Created from parent convert job with entry id [" . $dbConvertFlavorJob->getEntryId() . "]");
-			}
-			else
-			{
-				$dbConvertFlavorJob = new BatchJob();
-				$dbConvertFlavorJob->setEntryId($flavor->getEntryId());
-				$dbConvertFlavorJob->setPartnerId($flavor->getPartnerId());
-				$dbConvertFlavorJob->save();
-				KalturaLog::log("Created from flavor convert job with entry id [" . $dbConvertFlavorJob->getEntryId() . "]");
+			$dbConvertFlavorJob = $parentJob->createChild( BatchJobType::CONVERT, $dbCurrentConversionEngine, $sameRoot);
+			KalturaLog::log("Created from parent convert job with entry id [" . $dbConvertFlavorJob->getEntryId() . "]");
+		}
+		else
+		{
+			$dbConvertFlavorJob = new BatchJob();
+			$dbConvertFlavorJob->setEntryId($flavor->getEntryId());
+			$dbConvertFlavorJob->setPartnerId($flavor->getPartnerId());
+			$dbConvertFlavorJob->setJobType(BatchJobType::CONVERT);
+			$dbConvertFlavorJob->setJobSubType($dbCurrentConversionEngine);
+			$dbConvertFlavorJob->save();
+			KalturaLog::log("Created from flavor convert job with entry id [" . $dbConvertFlavorJob->getEntryId() . "]");
+		}
+		
+		$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
+		$estimatedEffort = kFile::fileSize($convertData->getSrcFileSyncLocalPath());
+		if($mediaInfo !== NULL) 
+			$estimatedEffort = max($mediaInfo->getVideoDuration(),$mediaInfo->getAudioDuration(),$mediaInfo->getContainerDuration());
+		
+		$dbConvertFlavorJob->setObjectId($flavorAssetId);
+		$dbConvertFlavorJob->setObjectType(BatchJobObjectType::ASSET);
+		$lockInfo = new kLockInfoData($dbConvertFlavorJob);
+		$lockInfo->fillLockInfo($flavor, $conversionProfileId, $dbConvertFlavorJob, $estimatedEffort);
+		
+		$dbConvertFlavorJob->setLockInfo($lockInfo);
+		
+		if($conversionProfileId !== NULL) {
+			$fpcp = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorAsset->getFlavorParamsId(), $conversionProfileId);
+			if($fpcp->getPriority() != 0) {
+				$dbConvertFlavorJob->setPriority($fpcp->getPriority());
 			}
 		}
-		$dbConvertFlavorJob->setFileSize(kFile::fileSize($convertData->getSrcFileSyncLocalPath()));
-		
-		// TODO remove after all old version flavors migrated
-		if(in_array(conversionEngineType::ENCODING_COM, $conversionEngines))
-			$dbConvertFlavorJob->setOnStressDivertTo(conversionEngineType::ENCODING_COM);
-		// remove until here
 		
 		/*
 			// Remarked by Dor until Tantan's return.
@@ -617,10 +659,8 @@ class kJobsManager
 			$convertData->setConfigRemoteUrl($remoteUrl);
 		}
 		*/
-		$dbCurrentConversionEngine = kPluginableEnumsManager::apiToCore('conversionEngineType', $currentConversionEngine);
 		return kJobsManager::addJob($dbConvertFlavorJob, $convertData, BatchJobType::CONVERT, $dbCurrentConversionEngine);
 	}
-	
 	
 	/**
 	 * @param BatchJob $parentJob
@@ -708,7 +748,7 @@ class kJobsManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild();
+			$batchJob = $parentJob->createChild(BatchJobType::CAPTURE_THUMB);
 		}
 		else
 		{
@@ -717,6 +757,8 @@ class kJobsManager
 			$batchJob->setPartnerId($partnerId);
 		}
 		
+		$batchJob->setObjectId($thumbAssetId);
+		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		return kJobsManager::addJob($batchJob, $data, BatchJobType::CAPTURE_THUMB);
 	}
 	
@@ -805,6 +847,7 @@ class kJobsManager
 		}
 	
 		$batchJob = null;
+		$mediaParserType = ($flavorParamsOutput ? $flavorParamsOutput->getMediaParserType() : mediaParserType::MEDIAINFO);
 		if($parentJob)
 		{
 			//Job will be created with parent job as his root job
@@ -812,7 +855,7 @@ class kJobsManager
 			if($parentJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 				$useSameRoot = false;
 				
-			$batchJob = $parentJob->createChild($useSameRoot); 
+			$batchJob = $parentJob->createChild(BatchJobType::POSTCONVERT, $mediaParserType, $useSameRoot); 
 		}
 		else
 		{
@@ -821,9 +864,11 @@ class kJobsManager
 			$batchJob->setPartnerId($flavorAsset->getPartnerId());
 		}
 		
+		$batchJob->setObjectId($flavorAsset->getId());
+		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		KalturaLog::log("Post Convert created with file: " . $postConvertData->getSrcFileSyncLocalPath());
 		
-		$mediaParserType = ($flavorParamsOutput ? $flavorParamsOutput->getMediaParserType() : mediaParserType::MEDIAINFO);
+		
 		return kJobsManager::addJob($batchJob, $postConvertData, BatchJobType::POSTCONVERT, $mediaParserType);
 	}
 	
@@ -897,7 +942,7 @@ class kJobsManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild();
+			$batchJob = $parentJob->createChild(BatchJobType::IMPORT, $subType);
 		}
 		else
 		{
@@ -905,6 +950,9 @@ class kJobsManager
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
 		}
+		
+		$batchJob->setObjectId($jobData->getFlavorAssetId());
+		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		return self::addJob($batchJob, $jobData, BatchJobType::IMPORT, $subType);
 	}
 	
@@ -1112,7 +1160,7 @@ class kJobsManager
 				return null;
 			}
 		}
-	
+		
 		if($entry->getStatus() != entryStatus::READY)
 		{
 			$entry->setStatus(entryStatus::PRECONVERT);
@@ -1133,7 +1181,7 @@ class kJobsManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild();
+			$batchJob = $parentJob->createChild(BatchJobType::CONVERT_PROFILE);
 		}
 		else
 		{
@@ -1142,6 +1190,10 @@ class kJobsManager
 			$batchJob->setPartnerId($entry->getPartnerId());
 			$batchJob->setUseNewRoot(true);
 		}
+		
+		$batchJob->setObjectId($entry->getId());
+		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
+		
 		return self::addJob($batchJob, $jobData, BatchJobType::CONVERT_PROFILE);
 	}
 	
@@ -1173,7 +1225,7 @@ class kJobsManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild(false);
+			$batchJob = $parentJob->createChild( BatchJobType::STORAGE_EXPORT, $externalStorage->getProtocol(), false);
 		}
 		else
 		{
@@ -1182,6 +1234,8 @@ class kJobsManager
 			$batchJob->setPartnerId($partnerId);
 		}
 		
+		$batchJob->setObjectId($fileSync->getId());
+		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		$batchJob->setDc($dc);
 		KalturaLog::log("Creating Storage export job, with source file: " . $netStorageExportData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $netStorageExportData, BatchJobType::STORAGE_EXPORT, $externalStorage->getProtocol());
@@ -1207,7 +1261,7 @@ class kJobsManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild(false);
+			$batchJob = $parentJob->createChild(BatchJobType::MOVE_CATEGORY_ENTRIES, null, false);
 		}
 		else
 		{
@@ -1230,7 +1284,7 @@ class kJobsManager
 		$netStorageDeleteData->setDestFileSyncStoredPath($storage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
 		if ($parentJob)
 		{
-			$batchJob = $parentJob->createChild(false);
+			$batchJob = $parentJob->createChild(BatchJobType::STORAGE_DELETE, $storage->getProtocol(), false);
 		}
 		else
 		{
@@ -1239,6 +1293,8 @@ class kJobsManager
 			$batchJob->setPartnerId($storage->getPartnerId());
 		}
 		
+		$batchJob->setObjectId($fileSync->getId());
+		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		KalturaLog::log("Creating Net-Storage Delete job, with source file: " . $netStorageDeleteData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $netStorageDeleteData, BatchJobType::STORAGE_DELETE, $storage->getProtocol());
 	}
@@ -1253,7 +1309,7 @@ class kJobsManager
 		
 		if ($parentJob)
 		{
-			$batchJob = $parentJob->createChild(false);
+			$batchJob = $parentJob->createChild(BatchJobType::DELETE_FILE, null, false);
 		}
 		else
 		{
@@ -1292,7 +1348,9 @@ class kJobsManager
 		$extractMediaData->setSrcFileSyncLocalPath($inputFileSyncLocalPath);
 		$extractMediaData->setFlavorAssetId($flavorAssetId);
 		
-		$batchJob = $parentJob->createChild(false);
+		$batchJob = $parentJob->createChild(BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine, false);
+		$batchJob->setObjectId($flavorAssetId);
+		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		
 		KalturaLog::log("Creating Extract Media job, with source file: " . $extractMediaData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $extractMediaData, BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine);
@@ -1311,7 +1369,7 @@ class kJobsManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild();
+			$batchJob = $parentJob->createChild(BatchJobType::NOTIFICATION, $notificationType);
 		}
 		else
 		{
@@ -1320,6 +1378,8 @@ class kJobsManager
 			$batchJob->setPartnerId($partnerId);
 		}
 			
+		$batchJob->setObjectId($entryId); 
+		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
 		$batchJob = self::addJob($batchJob, $jobData, BatchJobType::NOTIFICATION, $notificationType);
 		
 		if($sendType == kNotificationJobData::NOTIFICATION_MGR_NO_SEND || $sendType == kNotificationJobData::NOTIFICATION_MGR_SEND_SYNCH)
@@ -1362,50 +1422,11 @@ class kJobsManager
 			}
 		}
 			
-		// validate partner id
-		$partnerId = $batchJob->getPartnerId();
-//		if(!$partnerId)
-//			throw new APIException(APIErrors::PARTNER_NOT_SET);
-			
-		// validate that partner exists
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if(!$partner)
-		{
-			KalturaLog::err("Invalid partner id [$partnerId]");
-			throw new APIException(APIErrors::INVALID_PARTNER_ID, $partnerId);
-		}
-		
-		// set the priority and work group
-		$batchJob->setPriority($partner->getPriority($batchJob->getBulkJobId()));
-		
 		$batchJob = self::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
-		
-		// look for identical jobs
-		$twinJobs = BatchJobPeer::retrieveDuplicated($type, $data);
-		$twinJob = null;
-		
-		if(count($twinJobs))
-			foreach($twinJobs as $currentTwinJob)
-				if($currentTwinJob->getId() != $batchJob->getId())
-					$twinJob = reset($twinJobs);
-					
-		if(!is_null($twinJob))
-		{
-			$batchJob->setTwinJobId($twinJob->getId());
-			
-			if(!kConf::get("batch_ignore_duplication"))
-			{
-				$batchJob = self::updateBatchJob($batchJob, $twinJob->getStatus(), $twinJob);
-			}
-			else
-			{
-				$batchJob->save();
-			}
-		}
-		
+
 		return $batchJob;		
 	}
-
+	
 	/**
 	 * Function adds bulk upload job to the queue
 	 * @param Partner $partner

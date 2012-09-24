@@ -386,49 +386,6 @@
 			<index-column name="subscription_type" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="mail_job">
-		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="mail_type" type="smallint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="mail_priority" type="smallint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="recipient_name" type="varchar" size="64" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="recipient_email" type="varchar" size="64" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="recipient_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="from_name" type="varchar" size="64" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="from_email" type="varchar" size="64" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="body_params" type="varchar" size="2048" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="subject_params" type="varchar" size="512" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="template_path" type="varchar" size="512" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="culture" type="tinyint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="tinyint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="campaign_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="min_send_date" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="scheduler_id" type="integer" default="null" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="worker_id" type="integer" default="null" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_index" type="integer" default="null" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="processor_expiration" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="execution_attempts" type="tinyint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="lock_version" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" default="0" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="varchar" size="2" />
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="kuser">
-			<reference local="recipient_id" foreign="id" />
-		</foreign-key>
-		<index name="mail_job_index">
-			<index-column name="mail_priority" />
-			<index-column name="created_at" />
-		</index>
-		<index name="recipient_id_index">
-			<index-column name="recipient_id" />
-		</index>
-		<index name="campaign_id_index">
-			<index-column name="campaign_id" />
-		</index>
-		<index name="partner_id_index">
-			<index-column name="partner_id" />
-		</index>
-	</table>
 	<table skipSql="false" abstract="false" name="scheduler" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
@@ -535,49 +492,40 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="description" type="varchar" size="255" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="error_description" type="varchar" size="255" />
 	</table>
-	<table skipSql="false" abstract="false" name="batch_job">
+	<table skipSql="false" abstract="false" name="batch_job_sep" phpName="BatchJob">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_type" type="smallint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_sub_type" type="smallint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_type" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_sub_type" type="integer" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_id" type="varchar" default="" size="20" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_type" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="data" type="longvarchar" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_size" type="integer" default="null" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="duplication_key" type="varchar" size="2047" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="history" type="longvarchar" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="lock_info" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="abort" type="tinyint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="check_again_timeout" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="progress" type="tinyint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="execution_status" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="message" type="varchar" size="1024" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="description" type="varchar" size="1024" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updates_count" type="smallint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_by" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_by" type="varchar" size="20" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="deleted_at" type="timestamp" />
+    	<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="deleted_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="priority" type="tinyint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="work_group_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="queue_time" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="finish_time" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" default="" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" default="0" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="subp_id" type="integer" default="0" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="scheduler_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="worker_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_index" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_scheduler_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_worker_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_worker_remote" type="boolean" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="processor_expiration" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="execution_attempts" type="tinyint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="lock_version" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="twin_job_id" type="integer" default="null" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="bulk_job_id" type="integer" default="null" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="root_job_id" type="integer" default="null" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parent_job_id" type="integer" default="null" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_index" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_scheduler_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_worker_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="err_type" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="err_number" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="on_stress_divert_to" type="integer" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_job_lock_id" type="integer" />
+        <foreign-key foreignTable="batch_job_lock">
+            <reference local="batch_job_lock_id" foreign="id"/>
+        </foreign-key>
 		<index name="status_job_type_index">
 			<index-column name="status" />
 			<index-column name="job_type" />
@@ -586,14 +534,16 @@
 			<index-column name="entry_id" />
 			<index-column name="id" />
 		</index>
+        <index name="object_index_id">
+			<index-column name="object_id" />
+			<index-column name="object_type" />
+			<index-column name="id" />
+		</index>
 		<index name="partner_id_index">
 			<index-column name="partner_id" />
 		</index>
 		<index name="priority_index">
 			<index-column name="priority" />
-		</index>
-		<index name="twin_job_id_index">
-			<index-column name="twin_job_id" />
 		</index>
 		<index name="bulk_job_id_index">
 			<index-column name="bulk_job_id" />
@@ -604,18 +554,105 @@
 		<index name="parent_job_id_index">
 			<index-column name="parent_job_id" />
 		</index>
+        <index name="created_at_job_type_status_index">
+			<index-column name="created_at" />
+			<index-column name="job_type" />
+			<index-column name="status" />
+		</index>
+        <index name="partner_type_index">
+			<index-column name="partner_id" />
+			<index-column name="job_type" />
+            <index-column name="status" />
+		</index>
+        <index name="partner_type_status_index">
+			<index-column name="partner_id" />
+			<index-column name="job_type" />
+            <index-column name="status" />
+            <index-column name="execution_status" />
+		</index>
+	</table>
+    <table skipSql="false" abstract="false" name="batch_job_lock" raiseEvents="false">
+		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="false" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_type" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_sub_type" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_id" type="varchar" default="" size="20" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_type" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="estimated_effort" type="bigint" default="null" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="execution_status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="start_at" type="timestamp" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="priority" type="tinyint" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="urgency" type="tinyint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" default="" size="20" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" default="0" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="scheduler_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="worker_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_index" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="expiration" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="execution_attempts" type="tinyint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="version" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_job_id" type="integer" />
+        <foreign-key foreignTable="batch_job_sep">
+            <reference local="batch_job_id" foreign="id"/>
+        </foreign-key>
+		<index name="status_job_type_index">
+			<index-column name="status" />
+			<index-column name="job_type" />
+		</index>
+		<index name="entry_id_index_id">
+			<index-column name="entry_id" />
+			<index-column name="id" />
+		</index>
+        <index name="object_index_id">
+			<index-column name="object_id" />
+			<index-column name="object_type" />
+			<index-column name="id" />
+		</index>
+        <index name="partner_type_index">
+			<index-column name="partner_id" />
+			<index-column name="job_type" />
+            <index-column name="status" />
+		</index>
+        <index name="partner_type_status_index">
+			<index-column name="partner_id" />
+			<index-column name="job_type" />
+            <index-column name="status" />
+            <index-column name="execution_status" />
+		</index>
+		<index name="partner_id_index">
+			<index-column name="partner_id" />
+		</index>
+        <index name="status_index">
+			<index-column name="status" />
+		</index>
+        <index name="partner_status_index">
+			<index-column name="partner_id" />
+			<index-column name="status" />
+		</index>
 		<index name="execution_attempts_index">
 			<index-column name="job_type" />
 			<index-column name="execution_attempts" />
 		</index>
-		<index name="processor_expiration_index">
+		<index name="expiration_index">
 			<index-column name="job_type" />
-			<index-column name="processor_expiration" />
+			<index-column name="expiration" />
 		</index>
 		<index name="lock_index">
 			<index-column name="batch_index" />
 			<index-column name="scheduler_id" />
 			<index-column name="worker_id" />
+		</index>
+	</table>
+     <table skipSql="false" abstract="false" name="partner_load" raiseEvents="false">
+		<column primaryKey="true" required="true" autoIncrement="false" lazyLoad="false" name="job_type" type="integer" />
+		<column primaryKey="true" required="true" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_load" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="weighted_partner_load" type="integer" />
+		<index name="partner_index">
+			<index-column name="partner_id" />
+			<index-column name="job_type" />
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="priority_group" raiseEvents="false">
@@ -838,31 +875,6 @@
 		<index name="partner_id_subp_id_index">
 			<index-column name="partner_id" />
 			<index-column name="subp_id" />
-		</index>
-	</table>
-	<table skipSql="false" abstract="false" name="notification" phpName="notification">
-		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="puser_id" type="varchar" size="64" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="type" type="smallint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_id" type="varchar" size="20" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="notification_data" type="varchar" size="4096" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="number_of_attempts" type="smallint" default="0" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="notification_result" type="varchar" size="256" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_type" type="smallint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="scheduler_id" type="integer" default="null" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="worker_id" type="integer" default="null" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_index" type="integer" default="null" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="processor_expiration" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="execution_attempts" type="tinyint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="lock_version" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="varchar" size="2" />
-		<index name="status_partner_id_index">
-			<index-column name="status" />
-			<index-column name="partner_id" />
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="moderation" phpName="moderation">
@@ -1383,6 +1395,8 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="force_none_complied" type="boolean" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="priority" type="tinyint" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="conversion_profile_2">
 			<reference local="conversion_profile_id" foreign="id" />
 		</foreign-key>

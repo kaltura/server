@@ -49,7 +49,7 @@ class listdownloadsAction extends defPartnerservices2Action
 		$c->add ( BatchJobPeer::JOB_TYPE , $download_types , Criteria::IN );
 		
 		// filter		
-		$filter = new BatchJobFilter();
+		$filter = new BatchJobFilter(true);
 		$fields_set = $filter->fillObjectFromRequest( $this->getInputParams() , "filter_" , null );
 		$filter->attachToCriteria( $c );
 		
