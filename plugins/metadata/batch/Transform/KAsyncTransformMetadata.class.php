@@ -54,12 +54,18 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 		return 1;
 	}
 	
-	private function handleErrors($results, $transformObjectIds = array())
+	private function invalidateFailedMetadatas($results, $transformObjectIds = array())
 	{
 		foreach($results as $index => $result){
-        	if(is_array($result) && isset($result['code'])){
-              	KalturaLog::err('error in object id['.$transformObjectIds[$index] .'] with code: '. $result['code']."\n".$result['message']." going to invalidate it");
-              	$this->kClient->metadata->invalidate($transformObjectIds[$index]);
+        	if(is_array($result) && isset($result['code']) && isset($result['message'])){
+              	KalturaLog::ERR('error in object id['.$transformObjectIds[$index] .'] with code: '. $result['code']."\n".$result['message']." going to invalidate it");
+              	try{
+              		$this->kClient->metadata->invalidate($transformObjectIds[$index]);
+              	}
+              	catch (KalturaAPIException $e){
+              		KalturaLog::ERR("object id[".$transformObjectIds[$index] ."] with error: ".$e->getMessage());
+              		continue;
+              	}
             }
         }
         $transformObjectIds = array();		
@@ -121,13 +127,13 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 			{
 				$results = $this->kClient->doMultiRequest();
-				$this->handleErrors($results, $transformObjectIds);
+				$this->invalidateFailedMetadatas($results, $transformObjectIds);
 				$this->kClient->startMultiRequest();
 			}
 			
 		}
 		$results = $this->kClient->doMultiRequest();
-		$this->handleErrors($results, $transformObjectIds);
+		$this->invalidateFailedMetadatas($results, $transformObjectIds);
 		
 		$this->closeJob($job, null, null, "Metadata objects [" . count($transformList->objects) . "] transformed", KalturaBatchJobStatus::RETRY);
 		
