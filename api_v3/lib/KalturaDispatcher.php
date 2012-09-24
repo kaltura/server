@@ -71,7 +71,8 @@ class KalturaDispatcher
 		// validate it's ok to access this service
 		$deserializer = new KalturaRequestDeserializer($params);
 		$this->arguments = $deserializer->buildActionArguments($actionParams);
-		KalturaLog::debug("Dispatching service [".$service."], action [".$action."] with params " . print_r($this->arguments, true));
+		KalturaLog::debug("Dispatching service [".$service."], action [".$action."], reqIndex [".
+			kCurrentContext::$multiRequest_index."] with params " . print_r($this->arguments, true));
 
 		$serviceInstance = $actionReflector->getServiceInstance();
 		
