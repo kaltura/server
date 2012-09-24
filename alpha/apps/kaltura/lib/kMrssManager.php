@@ -464,7 +464,16 @@ class kMrssManager
 		$mrssContributors = self::getMrssContributors();
 		if(count($mrssContributors))
 			foreach($mrssContributors as $mrssContributor)
-				$mrssContributor->contribute($entry, $mrss, $mrssParams);
+			{
+				try
+				{
+					$mrssContributor->contribute($entry, $mrss, $mrssParams);
+				}
+				catch(kCoreException $ex)
+				{
+					KalturaLog::err("Unable to add MRSS element for contributor [".get_class($mrssContributor)."] message [".$ex->getMessage()."]");
+				}
+			}
 		
 		if ($mrssParams && 
 			$mrssParams->getIncludePlayerTag())
