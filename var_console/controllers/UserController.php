@@ -147,23 +147,13 @@ class UserController extends Zend_Controller_Action
 	 */
 	public function adminLoginAction ()
 	{
-	    $ks = $this->_getParam('ks');
-	    
 	    $form = new Form_AdminLogin();
 	    $this->view->form = $form;
 	    
-	    $client = Infra_ClientHelper::getClient();
-	    $client->setKs($ks);
-	    $user = $client->user->get();
-	    /* @var $user Kaltura_Client_Type_User */
-	    $userLoginId = $user->email;
-	    $partnerId = $user->partnerId;
-	    
 	    KalturaLog::debug('creating auth adapter');
-	    $adapter = new Kaltura_VarAuthAdapter($userLoginId, null, $form->getValue('timezone_offset'), null, $ks);
-	    $adapter->setCredentials($userLoginId);
-	    $adapter->setTimezoneOffset($form->getValue('timezone_offset'));
-	    $adapter->setKS($ks);
+	    $adapter = new Kaltura_VarAuthAdapter();
+	    $adapter->setTimezoneOffset($this->_getParam('timezone_offset'));
+	    $adapter->setKS($this->_getParam('ks'));
 		//$adapter = new Zend_Auth_Adapter_DbTable($zendDb);
 	    $auth = Infra_AuthHelper::getAuthInstance();
 		$result = $auth->authenticate($adapter);
