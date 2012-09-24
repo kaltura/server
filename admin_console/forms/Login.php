@@ -49,7 +49,7 @@ class Form_Login extends Zend_Form
 			'decorators' => array('ViewHelper')
 		));
 		
-		$this->addElement('hidden', 'tomezone_offset', array(
+		$this->addElement('hidden', 'timezone_offset', array(
 			'decorators' => array('ViewHelper')
 		));
 		
