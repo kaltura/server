@@ -795,7 +795,8 @@ kmc.preview_embed = {
 					embed_code = embed_code.replace("{FLASHVARS}", "streamerType=rtmp&amp;mediaProtocol=rtmpe&amp;{FLASHVARS}");
 					break;					
 				case "akamai":
-					embed_code = embed_code.replace("{FLASHVARS}", "streamerType=hdnetwork&amp;akamaiHD.loadingPolicy=preInitialize&amp;akamaiHD.asyncInit=true&amp;{FLASHVARS}");
+					var v2param = (kmc.vars.has_v2_flavors) ? '&amp;twoPhaseManifest=true' : '';
+					embed_code = embed_code.replace("{FLASHVARS}", "streamerType=hdnetwork&amp;akamaiHD.loadingPolicy=preInitialize&amp;akamaiHD.asyncInit=true" . v2param . "&amp;{FLASHVARS}");
 					break;
 			}
 		}

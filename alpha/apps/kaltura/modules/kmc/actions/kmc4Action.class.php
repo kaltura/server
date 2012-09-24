@@ -63,6 +63,7 @@ class kmc4Action extends kalturaAction
 		$this->ignoreSeoLinks = false;
 		$this->ignoreEntrySeoLinks = false;
 		$this->useEmbedCodeProtocolHttps = false;
+		$this->v2Flavors = false;
 		
 		if ($this->partner_id !== NULL)
 		{
@@ -72,6 +73,7 @@ class kmc4Action extends kalturaAction
 			$this->ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
 			$this->ignoreEntrySeoLinks = PermissionPeer::isValidForPartner(PermissionName::FEATURE_IGNORE_ENTRY_SEO_LINKS, $this->partner_id);
 			$this->useEmbedCodeProtocolHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EMBED_CODE_DEFAULT_PROTOCOL_HTTPS, $this->partner_id);
+			$this->v2Flavors = PermissionPeer::isValidForPartner(PermissionName::FEATURE_V2_FLAVORS, $this->partner_id);
 		}
 	/** END - load partner from DB, and set templatePartnerId **/
 
