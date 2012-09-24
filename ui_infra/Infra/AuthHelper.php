@@ -5,6 +5,10 @@
  */
 class Infra_AuthHelper
 {
+    /**
+     * @param string $namespace
+     * @return Zend_Auth
+     */
     static public function getAuthInstance ($namespace = null)
     {
         $settings = Zend_Registry::get("config")->settings;
