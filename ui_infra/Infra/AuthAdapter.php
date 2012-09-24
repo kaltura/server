@@ -81,7 +81,18 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 	 */
 	public function authenticate()
 	{
-		if (!$this->ks && (!$this->username || !$this->password))
+		if($this->ks)
+		{
+			$client = Infra_ClientHelper::getClient();
+			$client->setKs($this->ks);
+			
+    		$user = $client->user->get();
+    		/* @var $user Kaltura_Client_Type_User */
+    		$identity = $this->getUserIdentity($user, $this->ks, $user->partnerId);
+    		return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
+		}
+		
+		if (!$this->username || !$this->password)
 			return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
 		
 		$partnerId = null;
