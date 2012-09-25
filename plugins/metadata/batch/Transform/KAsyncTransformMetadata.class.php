@@ -58,17 +58,16 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 	{
 		foreach($results as $index => $result){
         	if(is_array($result) && isset($result['code']) && isset($result['message'])){
-              	KalturaLog::ERR('error in object id['.$transformObjectIds[$index] .'] with code: '. $result['code']."\n".$result['message']." going to invalidate it");
+              	KalturaLog::err('error in object id['.$transformObjectIds[$index] .'] with code: '. $result['code']."\n".$result['message']." going to invalidate it");
               	try{
               		$this->kClient->metadata->invalidate($transformObjectIds[$index]);
               	}
               	catch (KalturaAPIException $e){
-              		KalturaLog::ERR("object id[".$transformObjectIds[$index] ."] with error: ".$e->getMessage());
+              		KalturaLog::err("object id[".$transformObjectIds[$index] ."] with error: ".$e->getMessage());
               		continue;
               	}
             }
-        }
-        $transformObjectIds = array();		
+        }		
 	}
 	
 	private function upgrade(KalturaBatchJob $job, KalturaTransformMetadataJobData $data)
@@ -128,6 +127,7 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 			{
 				$results = $this->kClient->doMultiRequest();
 				$this->invalidateFailedMetadatas($results, $transformObjectIds);
+				$transformObjectIds = array();
 				$this->kClient->startMultiRequest();
 			}
 			
