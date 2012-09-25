@@ -38,5 +38,6 @@ class KalturaEntryContext extends KalturaContext
         
         parent::toObject($dbObject);
         $dbObject->setEntry(entryPeer::retrieveByPK($this->entryId));
+        return $dbObject;
     }
 }
