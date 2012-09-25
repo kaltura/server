@@ -6,10 +6,14 @@ class myPlaylistUtils
 {
 	// change the total results to 30 for performance reasons
 	const TOTAL_RESULTS = 200;
+
+	const CONTEXT_DELIMITER = "context";
 	
 	private static $user_cache = null;
 	
 	private static $isAdminKs = false;
+	
+	private static $playlistContext;
 	
 	public static function setIsAdminKs($v)
 	{
@@ -98,7 +102,7 @@ class myPlaylistUtils
 	 * if after the entryFilter retrieved a list, still not enough entries (less than list's total number of results) - go to next list
 	 * 
 	 */
-	public static function executePlaylistById ( $partner_id , $playlist_id ,  $extra_filters = null , $detailed = true )
+	public static function executePlaylistById ( $partner_id , $playlist_id ,  $extra_filters = null , $detailed = true, kContext $context = null)
 	{
 		$playlist = entryPeer::retrieveByPK( $playlist_id );
 
@@ -114,7 +118,11 @@ class myPlaylistUtils
 		
 		// the default of detrailed should be true - most of the time the kuse is needed 
 		if ( is_null ( $detailed ) ) $detailed = true ; 
-		return self::executePlaylist ( $partner_id , $playlist ,  $extra_filters , $detailed );
+		
+		if ($context)
+		    self::$playlistContext = $context;
+		
+		return self::executePlaylist ( $partner_id , $playlist ,  $extra_filters , $detailed);
 	}
 	
 	public static function executePlaylist ( $partner_id , $playlist ,  $extra_filters = null , $detailed = true )
@@ -343,7 +351,7 @@ class myPlaylistUtils
 		return $entry_filters;
 	}
 	
-	public static function executeDynamicPlaylist ( $partner_id , $xml , $extra_filters = null ,$detailed = true )
+	public static function executeDynamicPlaylist ( $partner_id , $xml , $extra_filters = null ,$detailed = true)
 	{
 		list ( $total_results , $list_of_filters ) = self::getPlaylistFilterListStruct ( $xml );
 	
@@ -354,9 +362,12 @@ class myPlaylistUtils
 		$i = 1; // the extra_filter is 1-based
 		foreach ( $list_of_filters as $entry_filter_xml )
 		{
+		    /* @var $entry_filter_xml SimpleXMLElement */
 			// 	in general this service can fetch entries from kaltura networks.
 			// for each filter we should decide if thie assumption is true...
 			$allow_partner_only = true;
+			
+			$entry_filter_as_string = self::replaceContextTokens($entry_filter_xml);
 			
 			// compile all the filters - only then execute them if not yet reached the total_results
 			// TODO - optimize - maybe create them only when needed. - For now it's safer to compile all even if not needed.
@@ -734,5 +745,38 @@ HTML;
 			if(in_array($entryId, $entryIds)) return true;
 		}*/
 		return false;
+	}
+	
+	/**
+	 * Function replaces tokens of structure context::[object]::[attribute] in dynamic playlist's entry filter.
+	 * @param SimpleXMLElement $contentXml
+	 */
+	protected static function replaceContextTokens (SimpleXMLElement $contentXml)
+	{
+	    $properties = $contentXml->children();
+	    foreach ($properties as $property)
+	    {
+	        /* @var $property SimpleXMLElement */
+	        $propertyAttributes = $property->attributes();
+	        if (isset($propertyAttributes['dynamic']) && $propertyAttributes['dynamic'] = 1)
+	        {
+	            $tokenValue = (string)$property;
+	            $tokenValue = explode("::", $tokenValue);
+	            if ($tokenValue[0] == self::CONTEXT_DELIMITER)
+	            {
+    	            array_shift($tokenValue);
+    	            $replaceValue = self::$playlistContext;
+    	            foreach ($tokenValue as $tokenPart)
+    	            {
+    	                $getter = "get".$tokenPart;
+    	                $replaceValue = $replaceValue->$getter();
+    	            }
+    	            
+                    $propertyAsDom = dom_import_simplexml($property);
+                    $propertyAsDom->nodeValue = $replaceValue;
+	            }
+                        
+	        }
+	    }
 	}
 }
