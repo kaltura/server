@@ -469,6 +469,7 @@ class kFlowHelper
 				"updates_count" => $dbBatchJob->getUpdatesCount(),
 				"job_type" => BatchJobType::DOWNLOAD,
 				"status" => BatchJob::BATCHJOB_STATUS_FINISHED,
+				"progress" => 100,
 				"debug" => __LINE__,
 			);
 
@@ -620,6 +621,7 @@ class kFlowHelper
 				"updates_count" => $dbBatchJob->getUpdatesCount(),
 				"job_type" => BatchJobType::DOWNLOAD,
 				"status" => BatchJob::BATCHJOB_STATUS_QUEUED,
+				"progress" => 0,
 				"debug" => __LINE__,
 			);
 
@@ -711,6 +713,7 @@ class kFlowHelper
 					"job_type" => BatchJobType::DOWNLOAD,
 					"conversion_error" => "Error while converting [$entryId] [$fileFormat]",
 					"status" => BatchJob::BATCHJOB_STATUS_FAILED,
+					"progress" => 0,
 					"debug" => __LINE__,
 				);
 
@@ -940,6 +943,7 @@ class kFlowHelper
 				"updates_count" => $dbBatchJob->getUpdatesCount(),
 				"job_type" => BatchJobType::DOWNLOAD,
 				"status" => BatchJob::BATCHJOB_STATUS_FINISHED,
+				"progress" => 100,
 				"debug" => __LINE__,
 			);
 
@@ -1504,6 +1508,7 @@ class kFlowHelper
 							"updates_count" => $dbBatchJob->getUpdatesCount(),
 							"job_type" => BatchJobType::DOWNLOAD,
 							"status" => BatchJob::BATCHJOB_STATUS_FINISHED,
+							"progress" => 100,
 							"debug" => __LINE__,
 						);
 
