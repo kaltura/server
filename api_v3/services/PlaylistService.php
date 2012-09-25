@@ -293,9 +293,10 @@ class PlaylistService extends KalturaEntryService
 	 * @action execute
 	 * @param string $id 
 	 * @param string $detailed
+	 * @param KalturaPlaylistContext $playlistContext
 	 * @return KalturaBaseEntryArray
 	 */
-	function executeAction( $id , $detailed = false )
+	function executeAction( $id , $detailed = false, KalturaContext $playlistContext = null )
 	{
 		
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
@@ -307,7 +308,12 @@ class PlaylistService extends KalturaEntryService
 
 		try 
 		{		
-			$entryList= myPlaylistUtils::executePlaylistById( $this->getPartnerId() , $id , $extraFilters , $detailed );
+		    $basePlaylistContext = null;
+		    if ($playlistContext)
+		    {
+		        $basePlaylistContext = $playlistContext->toObject();
+		    }
+			$entryList= myPlaylistUtils::executePlaylistById( $this->getPartnerId() , $id , $extraFilters , $detailed, $basePlaylistContext);
 		} 
 		catch (kCoreException $ex) 
 		{
