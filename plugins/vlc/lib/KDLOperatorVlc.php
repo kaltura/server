@@ -51,7 +51,6 @@ $acodec = "libmp3lam";
 			$cmdStr .= " --run-time=".$target->_clipDur/1000;
 		}
 
-$transcodeStr;
 		$transcodeStr = " --sout='#transcode{";
 		
 $vid = $target->_video;
