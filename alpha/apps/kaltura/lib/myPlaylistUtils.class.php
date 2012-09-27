@@ -778,5 +778,7 @@ HTML;
                         
 	        }
 	    }
+	    
+	    self::$playlistContext = null;
 	}
 }
