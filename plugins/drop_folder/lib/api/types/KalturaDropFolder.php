@@ -196,10 +196,12 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	
 	public function toUpdatableObject ( $object_to_fill , $props_to_skip = array() )
 	{
+		/* @var $object_to_fill DropFolder */
 		$this->validateForUpdate($object_to_fill, $props_to_skip); // will check that not updatable properties are not set 
 		
 		$dbUpdatedHandlerConfig = null;
 		if (!is_null($this->fileHandlerConfig)) {
+			$dbOldHanlderConfig = $object_to_fill->getFileHandlerConfig();
 			$dbUpdatedHandlerConfig = $this->fileHandlerConfig->toUpdatableObject($dbOldHanlderConfig);
 		}
 		
