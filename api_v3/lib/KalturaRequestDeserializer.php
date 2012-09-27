@@ -49,7 +49,7 @@ class KalturaRequestDeserializer
 	}
 	
 	function set_element(&$path, $data) {
-	    return ($key = array_pop($path)) ? set_element($path, array($key=>$data)) : $data;
+	    return ($key = array_pop($path)) ? $this->set_element($path, array($key=>$data)) : $data;
 	}
 
 	public function buildActionArguments(&$actionParams)
