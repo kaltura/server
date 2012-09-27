@@ -103,7 +103,7 @@ class EntryDistributionService extends KalturaBaseService
 		{
 			kContentDistributionManager::assignFlavorAssets($dbEntryDistribution, $dbEntry, $dbDistributionProfile);
 			kContentDistributionManager::assignThumbAssets($dbEntryDistribution, $dbEntry, $dbDistributionProfile);
-			kContentDistributionManager::assignAssets($entryDistribution, $entry, $distributionProfile);
+			kContentDistributionManager::assignAssets($dbEntryDistribution, $dbEntry, $dbDistributionProfile);
 		}
 		
 		$validationErrors = $dbDistributionProfile->validateForSubmission($dbEntryDistribution, DistributionAction::SUBMIT);
