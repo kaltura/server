@@ -775,11 +775,15 @@ HTML;
     	            foreach ($tokenValue as $tokenPart)
     	            {
     	                $getter = "get".$tokenPart;
-    	                $replaceValue = $replaceValue->$getter();
+    	                if (method_exists($replaceValue, $getter))
+    	                    $replaceValue = $replaceValue->$getter();
     	            }
     	            
-                    $propertyAsDom = dom_import_simplexml($property);
-                    $propertyAsDom->nodeValue = $replaceValue;
+    	            if (is_numeric($replaceValue) || is_string($replaceValue))
+    	            {
+                        $propertyAsDom = dom_import_simplexml($property);
+                        $propertyAsDom->nodeValue = $replaceValue;
+    	            }
 	            }
                         
 	        }
