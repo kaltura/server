@@ -293,7 +293,7 @@ class PlaylistService extends KalturaEntryService
 	 * @action execute
 	 * @param string $id 
 	 * @param string $detailed
-	 * @param KalturaPlaylistContext $playlistContext
+	 * @param KalturaContext $playlistContext
 	 * @return KalturaBaseEntryArray
 	 */
 	function executeAction( $id , $detailed = false, KalturaContext $playlistContext = null )
@@ -306,14 +306,14 @@ class PlaylistService extends KalturaEntryService
 		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
 			myPlaylistUtils::setIsAdminKs(true);
 
+	    $corePlaylistContext = null;
+	    if ($playlistContext)
+	    {
+	        $corePlaylistContext = $playlistContext->toObject();
+	    }
 		try 
 		{		
-		    $basePlaylistContext = null;
-		    if ($playlistContext)
-		    {
-		        $basePlaylistContext = $playlistContext->toObject();
-		    }
-			$entryList= myPlaylistUtils::executePlaylistById( $this->getPartnerId() , $id , $extraFilters , $detailed, $basePlaylistContext);
+			$entryList= myPlaylistUtils::executePlaylistById( $this->getPartnerId() , $id , $extraFilters , $detailed, $corePlaylistContext);
 		} 
 		catch (kCoreException $ex) 
 		{
