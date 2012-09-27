@@ -8,5 +8,5 @@ abstract class KalturaContext extends KalturaObject
     /**
      * Function to validate the context.
      */
-    abstract function validate ();
+    abstract protected function validate ();
 }
