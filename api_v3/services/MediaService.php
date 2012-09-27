@@ -766,6 +766,12 @@ class MediaService extends KalturaEntryService
 			case entryReplacementStatus::NOT_READY_AND_NOT_APPROVED:
 				$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
 				$dbEntry->save();
+				//preventing race conditions of temp entry being ready just as you approve the replacement
+				if (entryPeer::retrieveByPK($dbEntry->getReplacingEntryId())->getStatus() == entryStatus::READY)
+				{
+					kBusinessConvertDL::replaceEntry($dbEntry);
+				}
+				
 				break;
 			
 			case entryReplacementStatus::NONE:
