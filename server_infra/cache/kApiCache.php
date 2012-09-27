@@ -621,6 +621,8 @@ class kApiCache
 		self::disableConditionalCache();
 
 		$processingTime = microtime(true) - $startTime;
+		if (self::hasExtraFields())
+			$cacheHeader = 'cached-with-extra-fields';
 		header("$cacheHeaderName:$cacheHeader,$this->_cacheKey,$processingTime", false);
 
 		return $response;
