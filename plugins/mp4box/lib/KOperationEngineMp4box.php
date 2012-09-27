@@ -149,7 +149,7 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 		{
 			$errDescription = "Error: " . $curlWrapper->getError();
 			$curlWrapper->close();
-			KalturaLog::err("Failed to curl the caption file url(".$cptUrl."). Error ($errDescription)");
+			KalturaLog::err("Failed to curl the caption file url($captionUrl). Error ($errDescription)");
 			return null;
 		}
 		$curlWrapper->close();
