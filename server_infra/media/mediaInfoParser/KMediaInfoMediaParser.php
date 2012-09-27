@@ -288,7 +288,7 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 	
 	private static function trima($str)
 	{
-		$str = str_replace(array("\n", "\r", "\t", " ", "\o", "\xOB"), '', $str);
+		$str = str_replace(array("\n", "\r", "\t", " ", '\o', "\xOB"), '', $str);
 		return $str;
 	}
 	
