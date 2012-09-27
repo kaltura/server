@@ -310,6 +310,7 @@ class PlaylistService extends KalturaEntryService
 	    if ($playlistContext)
 	    {
 	        $corePlaylistContext = $playlistContext->toObject();
+	        myPlaylistUtils::setPlaylistContext($corePlaylistContext);
 	    }
 		try 
 		{		
