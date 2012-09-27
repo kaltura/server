@@ -7,7 +7,7 @@ class KDLUtils
 	 */
 	public static function trima($str)
 	{
-		$str = str_replace(array("\n", "\r", "\t", " ", "\o", "\xOB"), '', $str);
+		$str = str_replace(array("\n", "\r", "\t", " ", '\o', "\xOB"), '', $str);
 		return $str;
 	}
 
@@ -120,8 +120,8 @@ $parsed = array();
 				continue;
 			}
 			$trPrs = array();
-			preg_match_all("/([^\#]*)\#?/", $trGrp, $trPrs);
-//			preg_match_all("/([0-9]*)\#?/", $trGrp, $trPrs);
+			preg_match_all('/([^\#]*)\#?/', $trGrp, $trPrs);
+//			preg_match_all('/([0-9]*)\#?/', $trGrp, $trPrs);
 			if(count($trPrs[1])>2){
 				$parsed[] = $trPrs[1];
 			}
@@ -171,8 +171,8 @@ $parsed = array();
 	 */
 	static function parseTranscoderList($transStr, $extraStr, array $transDictionary=null)
 	{
-		$transParse = KDLUtils::parseTranscodingDataList($transStr, "\,");
-		$extraParse = KDLUtils::parseTranscodingDataList($extraStr, "\|");
+		$transParse = KDLUtils::parseTranscodingDataList($transStr, '\,');
+		$extraParse = KDLUtils::parseTranscodingDataList($extraStr, '\|');
 		$trPrmArr = array();
 		$trPrmArr = KDLUtils::mergeTranscoderObjArr($trPrmArr, $transParse, $extraParse, $transDictionary);
 
