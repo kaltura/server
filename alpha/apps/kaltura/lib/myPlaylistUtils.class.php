@@ -102,7 +102,7 @@ class myPlaylistUtils
 	 * if after the entryFilter retrieved a list, still not enough entries (less than list's total number of results) - go to next list
 	 * 
 	 */
-	public static function executePlaylistById ( $partner_id , $playlist_id ,  $extra_filters = null , $detailed = true, kContext $context = null)
+	public static function executePlaylistById ( $partner_id , $playlist_id ,  $extra_filters = null , $detailed = true)
 	{
 		$playlist = entryPeer::retrieveByPK( $playlist_id );
 
@@ -118,9 +118,6 @@ class myPlaylistUtils
 		
 		// the default of detrailed should be true - most of the time the kuse is needed 
 		if ( is_null ( $detailed ) ) $detailed = true ; 
-		
-		if ($context)
-		    self::$playlistContext = $context;
 		
 		return self::executePlaylist ( $partner_id , $playlist ,  $extra_filters , $detailed);
 	}
@@ -367,7 +364,7 @@ class myPlaylistUtils
 			// for each filter we should decide if thie assumption is true...
 			$allow_partner_only = true;
 			
-			$entry_filter_as_string = self::replaceContextTokens($entry_filter_xml);
+			self::replaceContextTokens($entry_filter_xml);
 			
 			// compile all the filters - only then execute them if not yet reached the total_results
 			// TODO - optimize - maybe create them only when needed. - For now it's safer to compile all even if not needed.
@@ -745,6 +742,15 @@ HTML;
 			if(in_array($entryId, $entryIds)) return true;
 		}*/
 		return false;
+	}
+	
+	/**
+	 * Static method to set the static $playlistContext variable
+	 * @param kContext $v
+	 */
+	public static function setPlaylistContext (kContext $v)
+	{
+	    self::$playlistContext = $v;
 	}
 	
 	/**
