@@ -38,12 +38,12 @@ class KOperationEngineInletArmada  extends KSingleOutputOperationEngine
 	{
 		KalturaLog::debug("operator==>".print_r($operator,1));
 
-$encodingTemplateId;
-$encodingTemplateName;
+$encodingTemplateId = null;
+$encodingTemplateName = null;
 $cloneAndUpadate=false;
-$srcPrefixWindows;
-$srcPrefixLinux;
-$trgPrefixWindows;
+$srcPrefixWindows = null;
+$srcPrefixLinux = null;
+$trgPrefixWindows = null;
 
 			// ---------------------------------
 			// Evaluate and set various Inlet Armada session params
