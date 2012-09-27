@@ -14,13 +14,11 @@ class KalturaEntryContext extends KalturaContext
     /* (non-PHPdoc)
      * @see KalturaPlaylistContext::validate()
      */
-    public function validate ()
+    protected function validate ()
     {
         //Validate the provided entryId belongs to the partner and that it is a valid entry (status READY, etc)
-        $c = KalturaCriteria::create('entry');
-        $c->addAnd(entryPeer::ENTRY_ID, $this->entryId);
-        $entryCount = entryPeer::doCount($c);
-        if (!$entryCount)
+        $entry = entryPeer::retrieveByPK($this->entryId);
+        if (!$entry)
             throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
         
     }
