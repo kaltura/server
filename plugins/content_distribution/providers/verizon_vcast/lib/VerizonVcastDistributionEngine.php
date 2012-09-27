@@ -174,7 +174,7 @@ class VerizonVcastDistributionEngine extends DistributionEngine implements
 			}
 			else if (preg_match ( "/{$data->remoteId}.*.err/" , $fileArray[$i] , $matches))
 			{
-				$res = preg_split ("/\./", $matches[0]);
+				$res = preg_split ('/\./', $matches[0]);
 				return $res[1];			
 			}
 		}
