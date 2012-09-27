@@ -27,7 +27,7 @@ class WidgetLog extends BaseWidgetLog
 	{
 		$entry_id = self::getKshowEntryId($kshow_id, $entry_id);
 		
-		$unwanted_pattern = "/MyToken=[^\&]*/i";
+		$unwanted_pattern = '/MyToken=[^\&]*/i';
 		$fixed_referer = preg_replace ( $unwanted_pattern , "" , $referer );
 		
 		$unwanted_pattern = "/#.*/i";
