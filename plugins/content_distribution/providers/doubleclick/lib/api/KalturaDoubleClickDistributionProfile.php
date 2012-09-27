@@ -35,6 +35,11 @@ class KalturaDoubleClickDistributionProfile extends KalturaConfigurableDistribut
 	 * @var string
 	 */
 	public $itemsPerPage;
+
+	/**
+	 * @var bool
+	 */
+	public $ignoreSchedulingInFeed;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -47,6 +52,7 @@ class KalturaDoubleClickDistributionProfile extends KalturaConfigurableDistribut
 		'feedUrl',
 		'cuePointsProvider',
 		'itemsPerPage',
+		'ignoreSchedulingInFeed',
 	);
 		 
 	public function getMapBetweenObjects()

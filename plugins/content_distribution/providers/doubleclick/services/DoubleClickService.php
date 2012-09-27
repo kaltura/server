@@ -16,14 +16,16 @@ class DoubleClickService extends KalturaBaseService
 	 * @param int $page
 	 * @param int $period
 	 * @param string $state
+	 * @param bool $ignoreScheduling
 	 * @return file
 	 */
-	public function getFeedAction($distributionProfileId, $hash, $page = 1, $period = -1, $state = '')
+	public function getFeedAction($distributionProfileId, $hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false)
 	{
 		if (!$this->getPartnerId() || !$this->getPartner())
 			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $this->getPartnerId());
 			
 		$profile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+		/* @var $profile DoubleClickDistributionProfile */
 		if (!$profile || !$profile instanceof DoubleClickDistributionProfile)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $distributionProfileId);
 
@@ -53,7 +55,8 @@ class DoubleClickService extends KalturaBaseService
 		// "Creates advanced filter on distribution profile
 		$distributionAdvancedSearch = new ContentDistributionSearchFilter();
 		$distributionAdvancedSearch->setDistributionProfileId($profile->getId());
-		$distributionAdvancedSearch->setDistributionSunStatus(EntryDistributionSunStatus::AFTER_SUNRISE);
+		if ($ignoreScheduling !== true && $profile->getIgnoreSchedulingInFeed() !== true)
+			$distributionAdvancedSearch->setDistributionSunStatus(EntryDistributionSunStatus::AFTER_SUNRISE);
 		$distributionAdvancedSearch->setEntryDistributionStatus(EntryDistributionStatus::READY);
 		$distributionAdvancedSearch->setEntryDistributionFlag(EntryDistributionDirtyStatus::NONE);
 		$distributionAdvancedSearch->setHasEntryDistributionValidationErrors(false);

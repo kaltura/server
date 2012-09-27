@@ -59,9 +59,13 @@ class Form_DoubleClickProfileConfiguration extends Form_ConfigurableProfileConfi
 		$element = new Zend_Form_Element_Text('channel_link');
 		$element->setLabel('Channel link:');
 		$this->addElement($element);
+
+		$element = new Zend_Form_Element_Checkbox('ignore_scheduling_in_feed');
+		$element->setLabel('Ignore Scheduling In Feed, As Default Feed Behavior');
+		$this->addElement($element);
 		
 		$this->addDisplayGroup(
-			array('channel_title', 'channel_description', 'channel_link'), 
+			array('channel_title', 'channel_description', 'channel_link', 'ignore_scheduling_in_feed'),
 			'channel', 
 			array('legend' => 'Feed Configuration', 'decorators' => array('FormElements', 'Fieldset'))
 		);

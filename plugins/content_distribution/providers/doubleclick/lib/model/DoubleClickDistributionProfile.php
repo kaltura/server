@@ -11,7 +11,8 @@ class DoubleClickDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_CHANNEL_LINK = 'channelLink';
 	const CUSTOM_DATA_CUE_POINTS_PROVIDER = 'cuePointsProvider';
 	const CUSTOM_DATA_ITEMS_PER_PAGE = 'itemsPerPage';
-	
+	const CUSTOM_DATA_IGNORE_SCHEDULING_IN_FEED = 'ignoreSchedulingInFeed';
+
 	protected $maxLengthValidation= array (
 	);
 	
@@ -193,4 +194,7 @@ class DoubleClickDistributionProfile extends ConfigurableDistributionProfile
 	
 	public function getItemsPerPage()				{return $this->getFromCustomData(self::CUSTOM_DATA_ITEMS_PER_PAGE);}
 	public function setItemsPerPage($v)				{$this->putInCustomData(self::CUSTOM_DATA_ITEMS_PER_PAGE, $v);}
+
+	public function getIgnoreSchedulingInFeed()		{return (bool)$this->getFromCustomData(self::CUSTOM_DATA_IGNORE_SCHEDULING_IN_FEED);}
+	public function setIgnoreSchedulingInFeed($v)	{$this->putInCustomData(self::CUSTOM_DATA_IGNORE_SCHEDULING_IN_FEED, (pbool)$v);}
 }
