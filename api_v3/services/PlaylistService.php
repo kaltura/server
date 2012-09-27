@@ -314,7 +314,7 @@ class PlaylistService extends KalturaEntryService
 	    }
 		try 
 		{		
-			$entryList= myPlaylistUtils::executePlaylistById( $this->getPartnerId() , $id , $extraFilters , $detailed, $corePlaylistContext);
+			$entryList= myPlaylistUtils::executePlaylistById( $this->getPartnerId() , $id , $extraFilters , $detailed);
 		} 
 		catch (kCoreException $ex) 
 		{
