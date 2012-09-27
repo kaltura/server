@@ -56,18 +56,19 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 	
 	private function invalidateFailedMetadatas($results, $transformObjectIds = array())
 	{
+		$this->kClient->startMultiRequest();
 		foreach($results as $index => $result){
         	if(is_array($result) && isset($result['code']) && isset($result['message'])){
               	KalturaLog::err('error in object id['.$transformObjectIds[$index] .'] with code: '. $result['code']."\n".$result['message']." going to invalidate it");
-              	try{
-              		$this->kClient->metadata->invalidate($transformObjectIds[$index]);
-              	}
-              	catch (KalturaAPIException $e){
-              		KalturaLog::err("object id[".$transformObjectIds[$index] ."] with error: ".$e->getMessage());
-              		continue;
-              	}
-            }
-        }		
+              	$this->kClient->metadata->invalidate($transformObjectIds[$index]);
+        	}
+        }
+        $resultsOfInvalidating = $this->kClient->doMultiRequest();	
+		foreach($resultsOfInvalidating as $index => $resultOfInvalidating){
+        	if(is_array($resultOfInvalidating) && isset($resultOfInvalidating['code']) && isset($resultOfInvalidating['message'])){
+              	KalturaLog::err('error while invalidating object id['.$transformObjectIds[$index] .'] with code: '. $resultOfInvalidating['code']."\n".$resultOfInvalidating['message']);        	
+        	}
+        }	
 	}
 	
 	private function upgrade(KalturaBatchJob $job, KalturaTransformMetadataJobData $data)
