@@ -6,8 +6,7 @@ require_once(dirname(__FILE__) . '/../cache/kCacheManager.php');
 // NOTE: this code runs before the API dispatcher - should not use Propel / autoloader
 class kSessionBase
 {
-	const SEPARATOR = ";";
-
+	// Common constants
 	const TYPE_KS =  0; // change to be 1
 	const TYPE_KAS = 1; // change to be 2
 
@@ -29,7 +28,29 @@ class kSessionBase
 
 	const INVALID_SESSION_KEY_PREFIX = 'invalid_session_';
 	const INVALID_SESSIONS_SYNCED_KEY = 'invalid_sessions_synched';
+
+	// KS V1 constants
+	const SEPARATOR = ";";
 	
+	// KS V2 constants
+	const SHA1_SIZE = 20;
+	const RANDOM_SIZE = 16;
+	
+	const FIELD_EXPIRY =              '_e';
+	const FIELD_TYPE =                '_t';
+	const FIELD_USER =                '_u';
+	const FIELD_MASTER_PARTNER_ID =   '_m';
+	const FIELD_ADDITIONAL_DATA =     '_d';
+
+	protected static $fieldMapping = array(
+		self::FIELD_EXPIRY => 'valid_until',
+		self::FIELD_TYPE => 'type',
+		self::FIELD_USER => 'user',
+		self::FIELD_MASTER_PARTNER_ID => 'master_partner_id',
+		self::FIELD_ADDITIONAL_DATA => 'additional_data',
+	);
+	
+	// Members
 	protected $hash = null;
 	protected $real_str = null;
 	protected $original_str = "";
@@ -58,6 +79,19 @@ class kSessionBase
 	
 	public function parseKS($encoded_str)
 	{
+		// try V2
+		if ($this->parseKsV2($encoded_str))
+			return true;
+	
+		// try V1
+		if ($this->parseKsV1($encoded_str))
+			return true;
+			
+		return false;
+	}
+	
+	public function parseKsV1($encoded_str)
+	{
 		$str = base64_decode($encoded_str, true);
 		if (strpos($str, "|") === false)
 			return false;
@@ -66,6 +100,13 @@ class kSessionBase
 
 		$parts = explode(self::SEPARATOR, $real_str);
 		if (count($parts) < 3)
+			return false;
+		
+		$salt = $this->getAdminSecret(reset($parts));
+		if (!$salt)
+			return false;
+
+		if (sha1($salt . $real_str) != $hash)
 			return false;
 		
 		list(
@@ -121,6 +162,16 @@ class kSessionBase
 		return $secrets;
 	}
 	
+	protected function getAdminSecret($partnerId)
+	{
+		$secrets = self::getSecretsFromCache($partnerId);
+		if (!$secrets)
+			return null;
+		
+		list($adminSecret, $userSecret) = $secrets;
+		return $adminSecret;
+	}
+	
 	protected function isKSInvalidated()
 	{
 		if (strpos($this->privileges, self::PRIVILEGE_ACTIONS_LIMIT) !== false)
@@ -164,14 +215,6 @@ class kSessionBase
 		if ($this->valid_until <= time())
 			return false;						// KS is expired
 			
-		$secrets = self::getSecretsFromCache($this->partner_id);
-		if (!$secrets)
-			return false;						// admin secret not found in APC, can't validate the KS
-		
-		list($adminSecret, $userSecret) = $secrets;
-		if (sha1($adminSecret . $this->real_str) != $this->hash)
-			return false;						// wrong KS signature
-
 		if ($this->partner_id == -1 ||			// Batch KS are never invalidated
 			$this->isWidgetSession())			// Since anyone can create a widget session, no need to check for invalidation
 			return true;
@@ -194,8 +237,13 @@ class kSessionBase
 
 		return true;
 	}
+
+	public static function generateSession($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId = null, $additionalData = null)
+	{
+		return self::generateKsV1($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData);
+	}
 	
-	public static function generateSession($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges)
+	public static function generateKsV1($adminSecret, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData)
 	{
 		$rand = microtime(true);
 		$expiry = time() + $expiry;
@@ -207,15 +255,125 @@ class kSessionBase
 			$rand,
 			$userId,
 			$privileges,
-			'',
-			'',
+			$masterPartnerId,
+			$additionalData,
 		);
 		$info = implode ( ";" , $fields );
 
-		$signature = sha1( $adminSecretForSigning . $info );
+		$signature = sha1( $adminSecret . $info );
 		$strToHash =  $signature . "|" . $info ;
 		$encoded_str = base64_encode( $strToHash );
 
 		return $encoded_str;
 	}
+
+	// KS V2 functions
+	protected static function aesEncrypt($key, $message)
+	{
+		return mcrypt_encrypt(
+			MCRYPT_RIJNDAEL_128,
+			substr(sha1($key, true), 0, 16),
+			$message,
+			MCRYPT_MODE_CBC, 
+			str_repeat("\0", 16)	// no need for an IV since we add a random string to the message anyway
+		);
+	}
+
+	protected static function aesDecrypt($key, $message)
+	{
+		return mcrypt_decrypt(
+			MCRYPT_RIJNDAEL_128,
+			substr(sha1($key, true), 0, 16),
+			$message,
+			MCRYPT_MODE_CBC, 
+			str_repeat("\0", 16)	// no need for an IV since we add a random string to the message anyway
+		);
+	}
+
+	public static function generateKsV2($adminSecret, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData)
+	{
+		// build fields array
+		$fields = array();
+		foreach (explode(',', $privileges) as $privilege)
+		{
+			$privilege = trim($privilege);
+			if (!$privilege)
+				continue;
+			if ($privilege == '*')
+				$privilege = 'all:*';
+			$splittedPrivilege = explode(':', $privilege, 2);
+			if (count($splittedPrivilege) > 1)
+				$fields[$splittedPrivilege[0]] = $splittedPrivilege[1];
+			else
+				$fields[$splittedPrivilege[0]] = '';
+		}
+		$fields[self::FIELD_EXPIRY] = time() + $expiry;
+		$fields[self::FIELD_TYPE] = $type;
+		$fields[self::FIELD_USER] = $userId;
+		$fields[self::FIELD_MASTER_PARTNER_ID] = $masterPartnerId;
+		$fields[self::FIELD_ADDITIONAL_DATA] = $additionalData;
+
+		// build fields string
+		$fieldsStr = http_build_query($fields, '', '&');
+		$fieldsStr = mcrypt_create_iv(self::RANDOM_SIZE) . $fieldsStr;
+		$fieldsStr = sha1($fieldsStr, true) . $fieldsStr;
+		
+		// encrypt and encode
+		$encryptedFields = self::aesEncrypt($adminSecret, $fieldsStr);
+		$decodedKs = "v2|{$partnerId}|" . $encryptedFields;
+		return str_replace(array('+', '/'), array('-', '_'), base64_encode($decodedKs));
+	}
+	
+	public function parseKsV2($ks)
+	{
+		$decodedKs = base64_decode(str_replace(array('-', '_'), array('+', '/'), $ks), true);
+		if (!$decodedKs)
+			return false;
+		
+		$explodedKs = explode('|', $decodedKs , 3);
+		if (count($explodedKs) != 3 || $explodedKs[0] != 'v2')
+			return false;						// not KS V2
+		
+		list($version, $partnerId, $encKs) = $explodedKs;
+		$adminSecret = $this->getAdminSecret($partnerId);
+		if (!$adminSecret)
+			return false;						// admin secret not found, can't decrypt the KS
+				
+		$decKs = self::aesDecrypt($adminSecret, $encKs);
+		$decKs = rtrim($decKs, "\0");
+		
+		$hash = substr($decKs, 0, self::SHA1_SIZE);
+		$fields = substr($decKs, self::SHA1_SIZE);
+		if ($hash != sha1($fields, true))
+			return false;						// invalid signature
+		
+		$rand = substr($fields, 0, self::RANDOM_SIZE);
+		$fields = substr($fields, self::RANDOM_SIZE);
+		
+		$fieldsArr = null;
+		parse_str($fields, $fieldsArr);
+		
+		// TODO: the following code translates a KS v2 into members that are more suitable for V1
+		//	in the future it makes sense to change the structure of the ks class
+		$privileges = array();
+		foreach ($fieldsArr as $fieldName => $fieldValue)
+		{
+			if (isset(self::$fieldMapping[$fieldName]))
+			{
+				$fieldMember = self::$fieldMapping[$fieldName];
+				$this->$fieldMember = $fieldValue;
+				continue;
+			}
+			$privileges[] = "{$fieldName}:{$fieldValue}";
+		}
+		
+		$this->hash = bin2hex($hash);
+		$this->original_str = $ks;
+		$this->partner_id = $partnerId;
+		$this->rand = bin2hex($rand);
+		$this->privileges = implode(',', $privileges);
+
+		return true;
+	}
+
 }
