@@ -1,4 +1,9 @@
 #!/bin/bash
+# Kaltura dedicated Sphinx     This shell script takes care of starting and stopping a Kaltura Batch Service
+#
+# chkconfig: 2345 13 87
+# description: Kaltura dedicated Sphinx
+
 if [ -L $0 ];then
 	REAL_SCRIPT=`readlink $0`
 else
@@ -6,7 +11,7 @@ else
 fi
 . `dirname $REAL_SCRIPT`/../configurations/system.ini
 
-COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.daemon.sh -u root"
+COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.daemon.sh"
 POP_COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.populate.sh"
 
 # Source function library
@@ -41,7 +46,7 @@ stop() {
 		echo -n "Stopping Sphinx Watch Daemon: "
         #Kills the watch.dameon
 		KP=$(pgrep watch.daemon.sh)
-		if [[ "X$KP" != "X" ]]
+		if [ -n "$KP" ]
 		      then
 				kill -9 $KP
 		fi
@@ -50,7 +55,7 @@ stop() {
 		echo -n "Stopping populateFromLog.php script: "
 		#kills the populate from log
 		KP=$(pgrep -f populateFromLog.php)
-		if [[ "X$KP" != "X" ]]
+		if [ -n "$KP" ]
 		      then
 				kill -9 $KP
 		fi
@@ -59,7 +64,7 @@ stop() {
 		echo -n "Stopping searchd service: "
 		#kills the search service
 		KP=$(pgrep searchd)
-		if [[ "X$KP" != "X" ]]
+		if [ -n "$KP" ]
 		      then
 				kill -9 $KP
 		fi
