@@ -384,7 +384,7 @@ class baseObjectUtils
 		
 		if ( is_string($param_names))
 		{
-			return 	$obj->getByName( $param_name , BasePeer::TYPE_FIELDNAME ) ;
+			return 	$obj->getByName( $param_names , BasePeer::TYPE_FIELDNAME ) ;
 		}
 		
 		$first_time = true;
