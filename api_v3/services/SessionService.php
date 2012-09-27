@@ -144,7 +144,7 @@ class SessionService extends KalturaBaseService
 	 * Type, expiry and privileges won't be changed if they're not set
 	 * 
 	 * @action impersonateByKs
-	 * @param string $ks The old KS of the impersonated partner
+	 * @param string $session The old KS of the impersonated partner
 	 * @param KalturaSessionType $type Type of the new KS 
 	 * @param int $expiry Expiry time in seconds of the new KS
 	 * @param string $privileges Privileges of the new KS
@@ -152,14 +152,14 @@ class SessionService extends KalturaBaseService
 	 *
 	 * @throws APIErrors::START_SESSION_ERROR
 	 */
-	function impersonateByKsAction($ks, $type = null, $expiry = null , $privileges = null)
+	function impersonateByKsAction($session, $type = null, $expiry = null , $privileges = null)
 	{
 		KalturaResponseCacher::disableCache();
 		
 		$oldKS = null;
 		try
 		{
-			$oldKS = ks::fromSecureString($ks);
+			$oldKS = ks::fromSecureString($session);
 		}
 		catch(Exception $e)
 		{
