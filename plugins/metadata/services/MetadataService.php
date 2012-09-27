@@ -173,7 +173,7 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addFromUrlAction($metadataProfileId, $objectType, $objectId, $url)
 	{
-		$xmlData = file_get_contents($filePath);
+		$xmlData = file_get_contents($url);
 		return $this->addAction($metadataProfileId, $objectType, $objectId, $xmlData);
 	}
 	
