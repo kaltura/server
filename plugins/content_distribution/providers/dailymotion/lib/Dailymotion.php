@@ -515,6 +515,8 @@ class Dailymotion
      */
     protected function oauthTokenRequest(Array $args)
     {
+    	$status_code = null;
+    	$response_headers = null;
         $result = json_decode($response = $this->httpRequest($this->oauthTokenEndpointUrl, $args, null, $status_code, $response_headers), true);
 
         if (!isset($result))
