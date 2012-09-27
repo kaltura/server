@@ -12,7 +12,7 @@ if ($handle) {
 		if ($i % 10000 == 0) fprintf($stderr, "$i\r");
         
         $result = array();
-	        if (preg_match_all("/\"GET \/p\/(\d+)\/.*?\" 200 (\d+)/", $line, $matches))
+	        if (preg_match_all('/"GET \/p\/(\d+)\/.*?" 200 (\d+)/', $line, $matches))
         {
         	//print $matches[0][0].":".$matches[1][0].":".$matches[2][0]."\n";
         	$partner_id = intval($matches[1][0]);
