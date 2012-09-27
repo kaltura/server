@@ -775,9 +775,18 @@ HTML;
     	            foreach ($tokenValue as $tokenPart)
     	            {
     	                $getter = "get".$tokenPart;
-    	                if (method_exists($replaceValue, $getter))
-    	                    $replaceValue = $replaceValue->$getter();
+    	                if (!method_exists($replaceValue, $getter))
+    	                {
+    	                	KalturaLog::err("Method [$getter] not found on class [" . get_class($replaceValue) . "] for token [$property]");
+    	                	$replaceValue = null;
+    	                	break;
+    	                }
+    	                    
+    	                $replaceValue = $replaceValue->$getter();
     	            }
+    	            
+    	            if(is_null($replaceValue))
+    	            	continue;
     	            
     	            if (is_numeric($replaceValue) || is_string($replaceValue))
     	            {
