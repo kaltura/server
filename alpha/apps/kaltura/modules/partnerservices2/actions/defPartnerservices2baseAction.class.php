@@ -120,20 +120,18 @@ class defPartnerservices2baseAction extends kalturaAction
 	
 	private function getKsData($ks)
 	{
-		$str = base64_decode($ks, true);
+		$partnerId = null;
+		$userId = null;
+		$validUntil = null;
 		
-		if (strpos($str, "|") === false)
+		$ksObj = kSessionBase::getKSObject($ks);
+		if ($ksObj)
 		{
-			$partnerId = null;
-			$userId = null;
-			$validUntil = null;
+			$partnerId = $ksObj->partner_id;
+			$userId = $ksObj->user;
+			$validUntil = $ksObj->valid_until;
 		}
-		else
-		{
-			@list($hash, $realStr) = @explode("|", $str, 2);
-			@list($partnerId, $dummy, $validUntil, $dummy, $dummy, $userId, $dummy) = @explode (";", $realStr);
-		}
+		
 		return array("partnerId" => $partnerId, "userId" => $userId, "validUntil" => $validUntil );
 	}
 }
-

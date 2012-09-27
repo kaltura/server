@@ -105,7 +105,8 @@ class kSessionUtils
 			$ks->type = ks::TYPE_KS;
 		else
 			$ks->type = $admin ; // if the admin > 1 - use it rather than automatially setting it to be 2
-			$ks->partner_id = $partner_id;
+		
+		$ks->partner_id = $partner_id;
 		$ks->partner_pattern = $partner_id;
 		$ks->error = 0;
 		$ks->rand = microtime(true);
@@ -282,12 +283,6 @@ class ks extends kSessionBase
 			throw new Exception ( self::getErrorStr ( self::INVALID_STR ) );
 		}
 
-		$salt = $ks->getSalt();
-		if (self::hash ( $salt , $ks->real_str ) != $ks->hash )
-		{
-			throw new Exception ( self::getErrorStr ( self::INVALID_STR ) );
-		}			
-
 		$ks->valid_string = true;
 		return $ks;
 	}
@@ -299,29 +294,20 @@ class ks extends kSessionBase
 	
 	public function getHash()
 	{
-		if ($this->hash)
-			return $this->hash;
-		
-		$salt = $this->getSalt();
-		$this->hash = self::hash($salt, $this->getSecureFields());
-		
 		return $this->hash;
 	}
 	
-	private function getSecureFields()
-	{
-		$fields = array ( $this->partner_id , $this->partner_pattern , $this->valid_until , $this->type , $this->rand , $this->user , $this->privileges , $this->master_partner_id , $this->additional_data);
-		$str = implode ( self::SEPARATOR , $fields );
-		
-		return $str;
-	}
-
 	public function toSecureString()
 	{
-		$hashed_str = $this->getHash() . "|" . $this->getSecureFields() ;
-		$decoded_str = base64_encode( $hashed_str );
-
-		return $decoded_str;
+		return kSessionBase::generateSession(
+			$this->getAdminSecret($this->partner_id), 
+			$this->user, 
+			$this->type, 
+			$this->partner_id, 
+			$this->valid_until - time(), 
+			$this->privileges, 
+			$this->master_partner_id, 
+			$this->additional_data);
 	}
 	
 	public function isWidgetSession()
@@ -660,36 +646,24 @@ class ks extends kSessionBase
 		return $this->user == $puser_id;
 	}
 
-	private function getSalt ( )
+	protected function getAdminSecret($partnerId)
 	{
-		$cacheKey = null;
-		if (function_exists('apc_fetch'))
-		{
-			$cacheKey = self::SECRETS_CACHE_PREFIX . $this->partner_id;
-			$secrets = apc_fetch($cacheKey);
-			if ($secrets)
-			{
-				list($adminSecret, $userSecret) = $secrets;
-				return $adminSecret;
-			}
-		}
+		$adminSecret = parent::getAdminSecret($partnerId);
+		if ($adminSecret)
+			return $adminSecret;
 		
-		$p = PartnerPeer::retrieveByPK( $this->partner_id )	;
-		if ( ! $p )  return ""; // VERY big problem
-		if ($cacheKey)
-			apc_store($cacheKey, array($p->getAdminSecret(), $p->getSecret()));
-		return $p->getAdminSecret();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if (!$partner)
+			return null; // VERY big problem
+		
+		if (function_exists('apc_store'))
+			apc_store(self::SECRETS_CACHE_PREFIX . $partnerId, array($partner->getAdminSecret(), $partner->getSecret()));
+		
+		return $partner->getAdminSecret();
 	}
-	
-	private static function hash ( $salt , $str )
-	{
-		return sha1($salt.$str);
-	}
-	
+		
 	public function kill()
 	{
 		invalidSessionPeer::invalidateKs($this);		
 	}
 }
-
-?>
