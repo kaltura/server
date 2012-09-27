@@ -133,7 +133,7 @@ function print_r_reverse($in) {
         return $in;
     } else {
         // this is an array, lets parse it
-        if (preg_match("/(\s{5,})\(/", $lines[1], $match)) {
+        if (preg_match('/(\s{5,})\(/', $lines[1], $match)) {
             // this is a tested array/recursive call to this function
             // take a set of spaces off the beginning
             $spaces = $match[1];
@@ -150,7 +150,7 @@ function print_r_reverse($in) {
         array_pop($lines); // )
         $in = implode("\n", $lines);
         // make sure we only match stuff with 4 preceding spaces (stuff for this array and not a nested one)
-        preg_match_all("/^\s{4}\[(.+?)\] \=\> /m", $in, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        preg_match_all('/^\s{4}\[(.+?)\] \=\> /m', $in, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
         $pos = array();
         $previous_key = '';
         $in_length = strlen($in);
