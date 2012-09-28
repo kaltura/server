@@ -18,8 +18,11 @@ if ($editFlavorParam)
 			<label for="partner-id">Partner Id: </label><br />
 			<input type="text" id="partner-id" name="partner-id" value="<?php echo $editFlavorParam->getPartnerId(); ?>" size="5" />
 			<br />
-			<label for="name">Name: </label><br />
+			<label for="name">Name: </label>
+			<span style="color: white; background:white;><label for="name">..............................................</label><span style="color: black; background:white;>
+			<label for="name">SystemName: </label><br />
 			<input type="text" id="name" name="name" value="<?php echo $editFlavorParam->getName(); ?>" size="30" <?php echo $disabled; ?>/>
+			<input type="text" id="systemName" name="systemName" value="<?php echo $editFlavorParam->getSystemName(); ?>" size="30" <?php echo $disabled; ?>/>
 			<br />
 			<label for="name">Description: </label><br />
 			<textarea id="description" name="description" cols="30" rows="2" <?php echo $disabled; ?>><?php echo $editFlavorParam->getDescription(); ?></textarea>
@@ -79,6 +82,7 @@ if ($editFlavorParam)
 			<input type="text" id="audio-resolution" name="audio-resolution" value="<?php echo $editFlavorParam->getAudioResolution(); ?>" size="5" <?php echo $disabled; ?>/>
 			<br />
 			<label for="conversion-engines">Conversion engines:     (Delimited with ",") </label>
+			<span style="color: white; background:white;><label for="name">...............................................</label><span style="color: black; background:white;>
 			<label for="conversion-engines-extra-params">Extra params:(Delimited with "|") </label><br /> 
 			 
 			<input type="text" id="conversion-engines" name="conversion-engines" value="<?php echo $editFlavorParam->getConversionEngines(); ?>" size="60" <?php echo $disabled; ?>/> 
