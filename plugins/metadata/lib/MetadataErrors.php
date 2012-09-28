@@ -5,6 +5,8 @@
  */
 class MetadataErrors extends KalturaErrors
 {
+	const METADATA_PROFILE_NOT_FOUND = "METADATA_PROFILE_NOT_FOUND,metadata profile not found, id [%s]";
+	
 	const INVALID_METADATA_PROFILE = "INVALID_METADATA_PROFILE,invalid metadata profile [%s]";
 	
 	const INVALID_METADATA_PROFILE_SCHEMA = "INVALID_METADATA_PROFILE_SCHEMA,invalid metadata profile schema: %s";
@@ -16,6 +18,8 @@ class MetadataErrors extends KalturaErrors
 	const INVALID_METADATA_VERSION = "INVALID_METADATA_VERSION,invalid metadata version [%s]";
 	
 	const INVALID_METADATA_DATA = "INVALID_METADATA_DATA,invalid metadata data: %s";
+	
+	const METADATA_NOT_FOUND = "METADATA_NOT_FOUND,metadata not found, id [%s]";
 	
 	const METADATA_FILE_NOT_FOUND = "METADATA_FILE_NOT_FOUND,Metadata file not found [%s]";
 	
