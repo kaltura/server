@@ -20,28 +20,28 @@ class infraRequestUtils
 	public static function handleRangeRequest($full_content_length, $set_content_length_header = false)
 	{
 		$size = $full_content_length;
-        $length = $size;           // Content length
-        $start  = 0;               // Start byte
-        $end    = $size - 1;       // End byte
-        // Now that we've gotten so far without errors we send the accept range header
-        /* At the moment we only support single ranges.
-         * Multiple ranges requires some more work to ensure it works correctly
-         * and comply with the spesifications: http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.2
-         *
-         * Multirange support annouces itself with:
-         * header('Accept-Ranges: bytes');
-         *
-         * Multirange content must be sent with multipart/byteranges mediatype,
-         * (mediatype = mimetype)
-         * as well as a boundry header to indicate the various chunks of data.
-         */
-        // header('Accept-Ranges: bytes');
-        // multipart/byteranges
-        // http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.2
-        if (isset($_SERVER['HTTP_RANGE']))
-        {
+		$length = $size;		   // Content length
+		$start  = 0;			   // Start byte
+		$end	= $size - 1;	   // End byte
+		// Now that we've gotten so far without errors we send the accept range header
+		/* At the moment we only support single ranges.
+		 * Multiple ranges requires some more work to ensure it works correctly
+		 * and comply with the spesifications: http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.2
+		 *
+		 * Multirange support annouces itself with:
+		 * header('Accept-Ranges: bytes');
+		 *
+		 * Multirange content must be sent with multipart/byteranges mediatype,
+		 * (mediatype = mimetype)
+		 * as well as a boundry header to indicate the various chunks of data.
+		 */
+		// header('Accept-Ranges: bytes');
+		// multipart/byteranges
+		// http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.2
+		if (isset($_SERVER['HTTP_RANGE']))
+		{
 			header("Accept-Ranges: 0-$length");
-      	
+	  	
 			$c_start = $start;
 			$c_end   = $end;
 			// Extract the range string
@@ -82,10 +82,10 @@ class infraRequestUtils
 				header('HTTP/1.1 416 Requested Range Not Satisfiable');
 				header("Content-Range: bytes $start-$end/$size");
 				// (?) Echo some info to the client?
-		        exit;
+				exit;
 			}
 			$start  = $c_start;
-			$end    = $c_end;
+			$end	= $c_end;
 			$length = $end - $start + 1; // Calculate new content length
 			header('HTTP/1.1 206 Partial Content');
 			header("Content-Range: bytes $start-$end/$size");
@@ -93,9 +93,9 @@ class infraRequestUtils
 		// Notify the client the byte range we'll be outputting
 		if ($set_content_length_header)
 			header("Content-Length: $length");
-        
+		
 		return array($start, $end, $length);
-	}                  
+	}				  
 
 	public static function sendCachingHeaders($max_age = 864000, $private = false, $last_modified = null)
 	{
@@ -126,43 +126,43 @@ class infraRequestUtils
 		{
 			switch ($ext)
 			{
-			    case "flv":
-    				$content_type ="video/x-flv";
-    				break;
-			    case "mp4":
-			        $content_type ="video/mp4";
-			        break;
-    			case "mov": 
-    			case "qt":
-    				$content_type ="video/quicktime";
-    				break;
-    			case "webm":
-    				$content_type ="video/webm";
-    				break;
-    			case "ogg":
-    				$content_type ="video/ogg";
-    				break;
-    			case "mp3":
-    				$content_type ="audio/mpeg";
-    				break;
-    			case "jpg":
-    				$content_type ="image/jpeg";
-    				break;
-    			case "swf":
-    				$content_type ="application/x-shockwave-flash";
-    				break;
-    			case "m3u8":
-    				$content_type ="application/x-mpegURL";
-    				break;
-    			case "ts":
-    				$content_type ="video/MP2T";
-    				break;
-                        case "3gp":
-                                $content_type ="video/3gpp";
-                                break;
-    			default:
-    				$content_type ="image/$ext";
-    				break;
+				case "flv":
+					$content_type ="video/x-flv";
+					break;
+				case "mp4":
+					$content_type ="video/mp4";
+					break;
+				case "mov": 
+				case "qt":
+					$content_type ="video/quicktime";
+					break;
+				case "webm":
+					$content_type ="video/webm";
+					break;
+				case "ogg":
+					$content_type ="video/ogg";
+					break;
+				case "mp3":
+					$content_type ="audio/mpeg";
+					break;
+				case "jpg":
+					$content_type ="image/jpeg";
+					break;
+				case "swf":
+					$content_type ="application/x-shockwave-flash";
+					break;
+				case "m3u8":
+					$content_type ="application/x-mpegURL";
+					break;
+				case "ts":
+					$content_type ="video/MP2T";
+					break;
+						case "3gp":
+								$content_type ="video/3gpp";
+								break;
+				default:
+					$content_type ="image/$ext";
+					break;
 			}
 		}
 		else
@@ -177,6 +177,31 @@ class infraRequestUtils
 		header("Content-Type: $content_type");
 	}
 
+	public static function isIpPrivate($ip)
+	{
+		$privateRanges = array(
+			'10.0.0.0|10.255.255.255',
+			'172.16.0.0|172.31.255.255',
+			'192.168.0.0|192.168.255.255',
+			'169.254.0.0|169.254.255.255',
+			'127.0.0.0|127.255.255.255',
+		);
+		
+		$longIp = ip2long($ip);
+		if ($longIp && $longIp != -1)
+		{
+			foreach ($privateRanges as $range)
+			{
+				list($start, $end) = explode('|', $range);
+				if ($longIp >= ip2long($start) && $longIp <= ip2long($end)) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 	public static function getRemoteAddress()
 	{
 		if(self::$remoteAddress)
@@ -206,29 +231,6 @@ class infraRequestUtils
 			
 		$remote_addr = null;
 
-		// support passing ip when proxying through apache. check the proxying server is indeed an internal server
-		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
-		 	isset($_SERVER['HTTP_X_FORWARDED_SERVER']) &&
-		 	kConf::hasParam('remote_addr_header_server') &&
-		 	$_SERVER['HTTP_X_FORWARDED_SERVER'] == kConf::get('remote_addr_header_server') )
-		{
-			// pick the last ip
-		 	$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
-			$remote_addr = trim($headerIPs[count($headerIPs) - 1]);
-		}
-
-		// support getting the original ip address of the client when using the cdn for API calls (cdnapi)
-		// validate either HTTP_HOST or HTTP_X_FORWARDED_HOST in case of a proxy
-		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
-			(in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ||
-			isset($_SERVER['HTTP_X_FORWARDED_HOST']) &&
-			in_array($_SERVER['HTTP_X_FORWARDED_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ) )
-		{
-			// pick the last ip
-		 	$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
-			$remote_addr = trim($headerIPs[0]);
-		}
-
 		if (!$remote_addr && isset ( $_SERVER['HTTP_X_KALTURA_REMOTE_ADDR'] ) )
 		{
 			list($remote_addr, $time, $uniqueId, $hash) = @explode(",", $_SERVER['HTTP_X_KALTURA_REMOTE_ADDR']);
@@ -239,8 +241,8 @@ class infraRequestUtils
 				$timeout = kConf::get("remote_addr_header_timeout");
 				
 				if ($timeout) {
-				    // Compare the absolute value of the difference between the current time
-		    		// and the "token" time.
+					// Compare the absolute value of the difference between the current time
+					// and the "token" time.
 					if (abs(time() - $time) > $timeout )
 						die("REMOTE_ADDR header invalid time");
 				}
@@ -252,6 +254,44 @@ class infraRequestUtils
 			}						
 		}
 		
+		// support passing ip when proxying through apache. check the proxying server is indeed an internal server
+		if (!$remote_addr && 
+			isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
+		 	isset($_SERVER['HTTP_X_FORWARDED_SERVER']) &&
+		 	kConf::hasParam('remote_addr_header_server') &&
+		 	$_SERVER['HTTP_X_FORWARDED_SERVER'] == kConf::get('remote_addr_header_server') )
+		{
+			// pick the last ip
+		 	$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
+			$remote_addr = trim($headerIPs[count($headerIPs) - 1]);
+		}
+
+		// support getting the original ip address of the client when using the cdn for API calls (cdnapi)
+		// validate either HTTP_HOST or HTTP_X_FORWARDED_HOST in case of a proxy
+		if (!$remote_addr && 
+			isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
+			(in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ||
+			isset($_SERVER['HTTP_X_FORWARDED_HOST']) &&
+			in_array($_SERVER['HTTP_X_FORWARDED_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ) )
+		{
+			// pick the first non private ip
+			$headerIPs = trim($_SERVER['HTTP_X_FORWARDED_FOR'], ',');
+			$headerIPs = explode(',', $headerIPs);
+			foreach ($headerIPs as $ip)
+			{
+				preg_match("/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/", trim($ip), $matches); // ignore any string after the ip address
+				if (!isset($matches[0]))
+					continue;
+					
+	 			$tempAddr = trim($matches[0]);
+	 			if (self::isIpPrivate($tempAddr))	// verify that ip is not from a private range
+	 				continue;
+	 			
+	 			$remote_addr = $tempAddr;
+	 			break;
+		 	}			
+		}
+
 		// if still empty .... 
 		if (!$remote_addr)
 			$remote_addr = (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null);
@@ -301,19 +341,19 @@ class infraRequestUtils
 
 	public static function getRequestParams()
 	{
-    	$scriptParts = explode('/', $_SERVER['SCRIPT_NAME']);
-    	$pathParts = explode('/', $_SERVER['PHP_SELF']);
-    	$pathParts = array_diff($pathParts, $scriptParts);
-    	
-    	$params = array();
-    	reset($pathParts);
-    	while(current($pathParts))
-    	{
-    		$key = each($pathParts);
-    		$value = each($pathParts);
-    		$params[$key['value']] = $value['value'];
-    	}
-    		
+		$scriptParts = explode('/', $_SERVER['SCRIPT_NAME']);
+		$pathParts = explode('/', $_SERVER['PHP_SELF']);
+		$pathParts = array_diff($pathParts, $scriptParts);
+		
+		$params = array();
+		reset($pathParts);
+		while(current($pathParts))
+		{
+			$key = each($pathParts);
+			$value = each($pathParts);
+			$params[$key['value']] = $value['value'];
+		}
+			
 		return array_merge($params, $_GET, $_POST, $_FILES);
-    }
+	}
 }
