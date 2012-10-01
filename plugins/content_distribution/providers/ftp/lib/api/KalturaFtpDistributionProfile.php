@@ -79,6 +79,16 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 	  * @var string
 	  */
 	 public $assetFilenameXslt;
+	 
+	 /**
+	 * @var string
+	 */
+	 public $asperaPublicKey;
+
+	/**
+	 * @var string
+	 */
+	 public $asperaPrivateKey;
 	
 	
 	/*
@@ -101,6 +111,8 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 		'flavorAssetFilenameXslt',
 		'thumbnailAssetFilenameXslt',
 		'assetFilenameXslt',
+		'asperaPublicKey',
+		'asperaPrivateKey',
 	);
 		 
 	public function getMapBetweenObjects()

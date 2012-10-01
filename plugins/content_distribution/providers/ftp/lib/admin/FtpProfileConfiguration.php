@@ -27,25 +27,17 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
         $files = $upload->getFileInfo();
 
         if(isset($files['sftp_public_key']))
-        {
-            $file = $files['sftp_public_key'];
-            if ($file['error'] === UPLOAD_ERR_OK)
-            {
-                $content = file_get_contents($file['tmp_name']);
-                $object->sftpPublicKey = $content;
-            }
-        }
+        	$object->sftpPublicKey = $this->getFileContent($files['sftp_public_key']);
 
         if(isset($files['sftp_private_key']))
-        {
-            $file = $files['sftp_private_key'];
-            if ($file['error'] === UPLOAD_ERR_OK)
-            {
-                $content = file_get_contents($file['tmp_name']);
-                $object->sftpPrivateKey = $content;
-            }
-        }
+            $object->sftpPrivateKey = $this->getFileContent($files['sftp_private_key']);
 
+        if(isset($files['aspera_public_key']))
+        	$object->asperaPublicKey = $this->getFileContent($files['aspera_public_key']);
+        
+       	if(isset($files['aspera_private_key']))
+            $object->asperaPrivateKey = $this->getFileContent($files['aspera_private_key']);
+             
 		$updateRequiredEntryFields = array();
 		$updateRequiredMetadataXpaths = array();
 		
@@ -89,6 +81,13 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 		return $object;
 	}
 	
+	private function getFileContent(array $file){
+		if ($file['error'] === UPLOAD_ERR_OK){
+               return file_get_contents($file['tmp_name']);			
+		}
+        return null;
+	}
+	
 	public function populateFromObject($object, $add_underscore = true)
 	{
         /* @var Kaltura_Client_FtpDistribution_Type_FtpDistributionProfile $object */
@@ -102,6 +101,8 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 
         $this->setDefault('sftp_public_key_readonly', $object->sftpPublicKey);
 		$this->setDefault('sftp_private_key_readonly', $object->sftpPrivateKey);
+		$this->setDefault('aspera_public_key_readonly', $object->asperaPublicKey);
+		$this->setDefault('aspera_private_key_readonly', $object->asperaPrivateKey);
 
 		foreach($fieldConfigArray as $fieldConfig)
 		{
@@ -122,7 +123,7 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 	protected function addProviderElements()
 	{
 		$element = new Zend_Form_Element_Hidden('providerElements');
-		$element->setLabel('FTP/SFTP Specific Configuration');
+		$element->setLabel('FTP/SFTP/ASPERA Specific Configuration');
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		
 		$this->addElements(array($element));
@@ -135,6 +136,7 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SFTP => 'SFTP',
 				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SFTP_CMD => 'SFTP Command line',
 				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SFTP_SEC_LIB => 'SFTP SecLib',
+				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::ASPERA => 'ASPERA',
 			),
 			'required'		=> true,
 		));
@@ -174,6 +176,11 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
             'label'			=> 'Sftp Passphrase:',
             'filters'		=> array('StringTrim'),
         ));
+        
+        $this->addElement('text', 'passphrase', array(
+            'label'			=> 'Aspera Passphrase:',
+            'filters'		=> array('StringTrim'),
+        ));
 
 		$this->addElement('file', 'sftp_public_key', array(
 			'label'			=> 'Sftp Public Key:',
@@ -192,9 +199,27 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
             'label'			=> 'Sftp Private Key:',
             'readonly'      => true,
         ));
+        
+        $this->addElement('file', 'aspera_public_key', array(
+			'label'			=> 'Aspera Public Key:',
+		));
+
+        $this->addElement('textarea', 'aspera_public_key_readonly', array(
+            'label'			=> 'Aspera Public Key:',
+            'readonly'      => true,
+        ));
+		
+		$this->addElement('file', 'aspera_private_key', array(
+			'label'			=> 'Aspera Private Key:',
+		));
+
+        $this->addElement('textarea', 'aspera_private_key_readonly', array(
+            'label'			=> 'Aspera Private Key:',
+            'readonly'      => true,
+        ));
 		
 		$this->addDisplayGroup(
-			array('protocol', 'host', 'port', 'base_path', 'username', 'password', 'passphrase', 'sftp_public_key', 'sftp_public_key_readonly', 'sftp_private_key', 'sftp_private_key_readonly'),
+			array('protocol', 'host', 'port', 'base_path', 'username', 'password', 'passphrase', 'sftp_public_key', 'sftp_public_key_readonly', 'sftp_private_key', 'sftp_private_key_readonly', 'aspera_public_key', 'aspera_public_key_readonly', 'aspera_private_key', 'aspera_private_key_readonly'),
 			'server', 
 			array('legend' => 'Server', 'decorators' => array('FormElements', 'Fieldset'))
 		);
