@@ -255,13 +255,15 @@ class FtpDistributionEngine extends DistributionEngine implements
 		$protocol = $distributionProfile->protocol;
 		$username = $distributionProfile->username;
 		$password = $distributionProfile->password;
-		if ($protocol == KalturaDistributionProtocol::SFTP || $protocol == KalturaDistributionProtocol::SFTP_CMD || $protocol == KalturaDistributionProtocol::SFTP_SEC_LIB){
-       		$publicKey = $distributionProfile->sftpPublicKey ;
-        	$privateKey = $distributionProfile->sftpPrivateKey ;
+		if ($protocol == KalturaDistributionProtocol::ASPERA)
+		{
+			$publicKey = $distributionProfile->asperaPublicKey;
+        	$privateKey = $distributionProfile->asperaPrivateKey;
 		}
-		else if ($protocol == KalturaDistributionProtocol::ASPERA){
-			$publicKey = $distributionProfile->asperaPublicKey ;
-        	$privateKey = $distributionProfile->asperaPrivateKey ;
+		else 
+		{
+			$publicKey = $distributionProfile->sftpPublicKey;
+        	$privateKey = $distributionProfile->sftpPrivateKey;
 		}
         
         $passphrase = $distributionProfile->passphrase ? $distributionProfile->passphrase : null;
