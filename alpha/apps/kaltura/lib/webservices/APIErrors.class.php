@@ -314,6 +314,8 @@ class APIErrors
 	
 	const CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN = "CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN,Root admin user cannot be set to not admin";
 
+	const CANNOT_CHANGE_OWN_ROLE = "CANNOT_CHANGE_OWN_ROLE,User cannot change his own role";
+	
 	const PERMISSION_NOT_FOUND = "PERMISSION_NOT_FOUND,%s";
 	
 	const PERMISSION_ALREADY_EXISTS = "PERMISSION_ALREADY_EXISTS,Permission [%s] already exists for partner [%s]";
