@@ -8,11 +8,6 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 	/**
 	 * @var string
 	 */
-	protected $condition = null;
-	
-	/**
-	 * @var string
-	 */
 	protected  $contentLike;
 
 	/**
@@ -68,28 +63,15 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 		$this->contentMultiLikeAnd = $contentMultiLikeAnd;
 	}
 
-	public function getCondition()
-	{
-		if($this->condition)
-			return $this->condition;
-			
-		$conditions = array();
-		
-		if(!is_null($this->contentLike))
-			$conditions[] = $this->contentLike;
-		
-		if(!is_null($this->contentMultiLikeAnd))
-			$conditions[] = $this->contentMultiLikeAnd;
-		
-		if(!is_null($this->contentMultiLikeOr))
-			$conditions[] = $this->contentMultiLikeOr ;
-			
-		if(!count($conditions))
-			return null;
-			
-		$this->condition = implode(' ', $conditions);
-		$this->condition = "ca_prefix<<$this->condition<<ca_sufix";
-		return $this->condition;
+	private function addCondition($conditionStr, IKalturaIndexQuery $query)
+	{		
+		if(!is_null($conditionStr))
+		{
+			$condition = "ca_prefix<<$conditionStr<<ca_sufix";
+			KalturaLog::debug("condition [" . print_r($condition, true) . "]");
+			$key = '@' . CaptionSearchPlugin::getSearchFieldName(CaptionSearchPlugin::SEARCH_FIELD_DATA);
+			$query->addMatch("($key $condition)");			
+		}
 	}
 	
 	/* (non-PHPdoc)
@@ -97,10 +79,9 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 	 */
 	public function applyCondition(IKalturaIndexQuery $query)
 	{
-		$condition = $this->getCondition();
-		KalturaLog::debug("condition [" . print_r($condition, true) . "]");
-		$key = '@' . CaptionSearchPlugin::getSearchFieldName(CaptionSearchPlugin::SEARCH_FIELD_DATA);
-		$query->addMatch("($key $condition)");
+		$this->addCondition($this->getContentLike(), $query);
+		$this->addCondition($this->getContentMultiLikeAnd(), $query);
+		$this->addCondition($this->getContentMultiLikeOr(), $query);
 	}
 	
 	public function addToXml(SimpleXMLElement &$xmlElement)
