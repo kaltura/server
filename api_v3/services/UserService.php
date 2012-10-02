@@ -124,6 +124,10 @@ class UserService extends KalturaBaseUserService
 		{
 			if (!is_null($user->roleIds)) {
 				UserRolePeer::testValidRolesForUser($user->roleIds, $this->getPartnerId());
+				if ($user->roleIds != $dbUser->getRoleIds() &&
+					$dbUser->getId() == $this->getKuser()->getId()) {
+					throw new KalturaAPIException(KalturaErrors::CANNOT_CHANGE_OWN_ROLE);
+				}
 			}
 			if (!is_null($user->id) && $user->id != $userId) {
 				if(!preg_match(kuser::PUSER_ID_REGEXP, $user->id)) {
