@@ -17,8 +17,9 @@ class KDLTranscoderImageMagick extends KDLOperatorBase{
 		$cmdStr = '';
 		if($target->_image) {
 			$cmdStr.= $this->getTwoDimensionsParams('density', $target->_image->_densityWidth, $target->_image->_densityHeight);
-			$cmdStr.= $this->getTwoDimensionsParams('size', $target->_image->_sizeWidth , $target->_image->_sizeHeight);
+			$cmdStr.= $this->getTwoDimensionsParams('geometry', $target->_image->_sizeWidth , $target->_image->_sizeHeight);
 			$cmdStr.= $this->getSimpleParam('depth', $target->_image->_depth);
+			$cmdStr.= '-colorspace RGB';
 		}
 		$cmdStr .= $extra . KDLCmdlinePlaceholders::InFileName.' '.KDLCmdlinePlaceholders::OutFileName;
 		return $cmdStr;
