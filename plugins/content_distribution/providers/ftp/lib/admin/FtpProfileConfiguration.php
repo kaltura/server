@@ -173,12 +173,7 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 		));
 
         $this->addElement('text', 'passphrase', array(
-            'label'			=> 'Sftp Passphrase:',
-            'filters'		=> array('StringTrim'),
-        ));
-        
-        $this->addElement('text', 'passphrase', array(
-            'label'			=> 'Aspera Passphrase:',
+            'label'			=> 'Key Passphrase:',
             'filters'		=> array('StringTrim'),
         ));
 
