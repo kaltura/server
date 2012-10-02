@@ -86,8 +86,15 @@ class CaptionAssetItemService extends KalturaBaseService
 		if ($entryFilter)
 		{
 			$entryCoreFilter = new entryFilter();
-			$entryFilter->toObject($entryCoreFilter);
-				
+			$entryFilter->toObject($entryCoreFilter);		
+			
+			//create advanced filter on entry caption
+			$entryCaptionAdvancedSearch = new EntryCaptionAssetSearchFilter();
+			$entryCaptionAdvancedSearch->setContentLike($captionAssetItemFilter->contentLike);
+			$entryCaptionAdvancedSearch->setContentMultiLikeAnd($captionAssetItemFilter->contentMultiLikeAnd);
+			$entryCaptionAdvancedSearch->setContentMultiLikeOr($captionAssetItemFilter->contentMultiLikeOr);
+			$entryCoreFilter->setAdvancedSearch($entryCaptionAdvancedSearch);
+			
 			$entryCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 			$entryCoreFilter->attachToCriteria($entryCriteria);
 			$entryCriteria->applyFilters();
