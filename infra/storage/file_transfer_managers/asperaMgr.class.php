@@ -20,9 +20,9 @@ class asperaMgr extends sftpMgr
 		$cmd.=" $local_file $this->user@$this->server:$remote_file";
 		KalturaLog::debug('Put file using command: '.$cmd);
 		$return_value = null;
-		$beginTime = date();
+		$beginTime = time();
 		system ( $cmd, $return_value );
-		$duration = (date() - $beginTime)/1000;
+		$duration = (time() - $beginTime)/1000;
 		KalturaLog::debug("upload took [$duration]sec with value [$return_value]");
 		return $return_value;
 	}
@@ -38,9 +38,9 @@ class asperaMgr extends sftpMgr
 		$cmd.=" $this->user@$this->server:$remote_file $local_file";
 		KalturaLog::debug('Get file using command: '.$cmd);
 		$return_value = null;
-		$beginTime = date();
+		$beginTime = time();
 		system($cmd, $return_value);
-		$duration = (date() - $beginTime)/1000;
+		$duration = (time() - $beginTime)/1000;
 		KalturaLog::debug("Download took [$duration]sec with value [$return_value]");
 		return $return_value;
 	}
