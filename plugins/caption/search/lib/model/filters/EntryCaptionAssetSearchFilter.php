@@ -46,14 +46,27 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 	 * @param string $contentLike
 	 */
 	public function setContentLike($contentLike) {
-		$this->contentLike = $contentLike;
+		$this->contentLike = $this->formatCondition($contentLike, ' ', ' ');
 	}
 
 	/**
 	 * @param string $contentMultiLikeOr
 	 */
 	public function setContentMultiLikeOr($contentMultiLikeOr) {
-		$vals = is_array($contentMultiLikeOr) ? $contentMultiLikeOr : explode(',', $contentMultiLikeOr);
+		$this->contentMultiLikeOr = $this->formatCondition($contentMultiLikeOr, ',', ' | ');
+	}
+
+	/**
+	 * @param string $contentMultiLikeAnd
+	 */
+	public function setContentMultiLikeAnd($contentMultiLikeAnd) {
+		$this->contentMultiLikeAnd = $this->formatCondition($contentMultiLikeAnd, ' ', ' ');
+	}
+
+	private function formatCondition($conditionString, $explodeDelimiter, $implodeDelimiter)
+	{
+		$res = null;		
+		$vals = is_array($conditionString) ? $conditionString : explode($explodeDelimiter, $conditionString);
 		foreach($vals as $valIndex => $valValue)
 		{
 			if(!is_numeric($valValue) && strlen($valValue) <= 0)
@@ -66,18 +79,11 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 					
 		if(count($vals))
 		{
-			$val = implode(' | ', $vals);
-			$this->contentMultiLikeOr = $val;
+			$res = implode($implodeDelimiter, $vals);
 		}		
+		return $res;
 	}
-
-	/**
-	 * @param string $contentMultiLikeAnd
-	 */
-	public function setContentMultiLikeAnd($contentMultiLikeAnd) {
-		$this->contentMultiLikeAnd = $contentMultiLikeAnd;
-	}
-
+	
 	private function addCondition($conditionStr, IKalturaIndexQuery $query)
 	{		
 		if(!is_null($conditionStr))
