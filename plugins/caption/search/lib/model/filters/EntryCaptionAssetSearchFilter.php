@@ -53,7 +53,22 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 	 * @param string $contentMultiLikeOr
 	 */
 	public function setContentMultiLikeOr($contentMultiLikeOr) {
-		$this->contentMultiLikeOr = $contentMultiLikeOr;
+		$vals = is_array($contentMultiLikeOr) ? $contentMultiLikeOr : explode(',', $contentMultiLikeOr);
+		foreach($vals as $valIndex => $valValue)
+		{
+			if(!is_numeric($valValue) && strlen($valValue) <= 0)
+				unset($vals[$valIndex]);
+			elseif(preg_match('/[\s\t]/', $valValue))
+				$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
+			else
+				$vals[$valIndex] = SphinxUtils::escapeString($valValue);
+		}
+					
+		if(count($vals))
+		{
+			$val = implode(' | ', $vals);
+			$this->contentMultiLikeOr = $val;
+		}		
 	}
 
 	/**
@@ -88,9 +103,9 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 	{
 		parent::addToXml($xmlElement);
 		
-		$xmlElement->addAttribute('contentLike', $this->contentLike);
-		$xmlElement->addAttribute('contentMultiLikeAnd', $this->contentMultiLikeAnd);
-		$xmlElement->addAttribute('contentMultiLikeOr', $this->contentMultiLikeOr);
+		$xmlElement->addAttribute('contentLike', $this->getContentLike());
+		$xmlElement->addAttribute('contentMultiLikeAnd', $this->getContentMultiLikeAnd());
+		$xmlElement->addAttribute('contentMultiLikeOr', $this->getContentMultiLikeOr());
 	}
 	
 	public function fillObjectFromXml(SimpleXMLElement $xmlElement)
@@ -99,10 +114,10 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 		
 		$attr = $xmlElement->attributes();
 		if(isset($attr['contentLike']) && strlen($attr['contentLike']))
-			$this->contentLike = $attr['contentLike'];
+			$this->setContentLike($attr['contentLike']);
 		if(isset($attr['contentMultiLikeAnd']) && strlen($attr['contentMultiLikeAnd']))
-			$this->contentMultiLikeAnd = $attr['contentMultiLikeAnd'];
+			$this->setContentMultiLikeAnd($attr['contentMultiLikeAnd']);
 		if(isset($attr['contentMultiLikeOr']) && strlen($attr['contentMultiLikeOr']))
-			$this->contentMultiLikeOr = $attr['contentMultiLikeOr'];
+			$this->setContentMultiLikeOr($attr['contentMultiLikeOr']);
 	}
 }
