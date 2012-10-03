@@ -88,12 +88,7 @@ class CaptionAssetItemService extends KalturaBaseService
 			$entryCoreFilter = new entryFilter();
 			$entryFilter->toObject($entryCoreFilter);		
 			
-			//create advanced filter on entry caption
-			$entryCaptionAdvancedSearch = new EntryCaptionAssetSearchFilter();
-			$entryCaptionAdvancedSearch->setContentLike($captionAssetItemFilter->contentLike);
-			$entryCaptionAdvancedSearch->setContentMultiLikeAnd($captionAssetItemFilter->contentMultiLikeAnd);
-			$entryCaptionAdvancedSearch->setContentMultiLikeOr($captionAssetItemFilter->contentMultiLikeOr);
-			$entryCoreFilter->setAdvancedSearch($entryCaptionAdvancedSearch);
+			$this->addEntryAdvancedSearchFilter($captionAssetItemFilter, $entryCoreFilter);
 			
 			$entryCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 			$entryCoreFilter->attachToCriteria($entryCriteria);
@@ -118,5 +113,26 @@ class CaptionAssetItemService extends KalturaBaseService
 		$response->objects = $list;
 		$response->totalCount = $captionAssetItemCriteria->getRecordsCount();
 		return $response;    
+	}
+	
+	private function addEntryAdvancedSearchFilter(KalturaCaptionAssetItemFilter $captionAssetItemFilter, entryFilter $entryCoreFilter)
+	{
+		//create advanced filter on entry caption
+		$entryCaptionAdvancedSearch = new EntryCaptionAssetSearchFilter();
+		$entryCaptionAdvancedSearch->setContentLike($captionAssetItemFilter->contentLike);
+		$entryCaptionAdvancedSearch->setContentMultiLikeAnd($captionAssetItemFilter->contentMultiLikeAnd);
+		$entryCaptionAdvancedSearch->setContentMultiLikeOr($captionAssetItemFilter->contentMultiLikeOr);
+		$inputAdvancedSearch = $entryCoreFilter->getAdvancedSearch();
+		if(!is_null($inputAdvancedSearch))
+		{
+			$advancedSearchOp = new AdvancedSearchFilterOperator();
+			$advancedSearchOp->setType(AdvancedSearchFilterOperator::SEARCH_AND);
+			$advancedSearchOp->setItems(array ($inputAdvancedSearch, $entryCaptionAdvancedSearch));
+			$entryCoreFilter->setAdvancedSearch($advancedSearchOp);
+		}
+		else
+		{
+			$entryCoreFilter->setAdvancedSearch($entryCaptionAdvancedSearch);
+		}
 	}
 }

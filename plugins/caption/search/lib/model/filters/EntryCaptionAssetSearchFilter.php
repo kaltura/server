@@ -66,7 +66,7 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 	private function formatCondition($conditionString, $explodeDelimiter, $implodeDelimiter)
 	{
 		$res = null;		
-		$vals = is_array($conditionString) ? $conditionString : explode($explodeDelimiter, $conditionString);
+		$vals = explode($explodeDelimiter, $conditionString);
 		foreach($vals as $valIndex => $valValue)
 		{
 			if(!is_numeric($valValue) && strlen($valValue) <= 0)
