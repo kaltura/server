@@ -33,7 +33,7 @@ class KalturaTypeReflectorCacher
 			if (!is_dir($cachedDir))
 			{
 				mkdir($cachedDir);
-				chmod($cachedDir, 0766);
+				chmod($cachedDir, 0755);
 			}
 				
 			$cachedFilePath = $cachedDir.DIRECTORY_SEPARATOR.$type.".cache";
