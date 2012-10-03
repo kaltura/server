@@ -105,7 +105,7 @@
                case 9: // sftp sec lib
             	   sftpSecLibMode();
                    break;
-               case 10: // sftp sec lib
+               case 10: // aspera
             	   asperaMode();
                    break;
            }
