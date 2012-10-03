@@ -176,7 +176,7 @@ class SessionService extends KalturaBaseService
 			$impersonatedType = $type;
 		if(!is_null($expiry)) 
 			$impersonatedExpiry = $expiry;
-		if(!is_null($privileges)) 
+		if($privileges) 
 			$impersonatedPrivileges = $privileges;
 		
 		// verify partner is allowed to start session for another partner
@@ -195,7 +195,7 @@ class SessionService extends KalturaBaseService
 		
 		if(!$impersonatedPartner)
 		{
-			// impersonated partner could not be fetched from the DB
+			KalturaLog::err("Impersonated partner [$impersonatedPartnerId ]could not be fetched from the DB");
 			throw new KalturaAPIException(APIErrors::START_SESSION_ERROR, $this->getPartnerId());
 		}
 		
@@ -213,7 +213,10 @@ class SessionService extends KalturaBaseService
 		
 		$result = kSessionUtils::startKSession($impersonatedPartnerId, $impersonatedSecret, $impersonatedUserId, $sessionInfo->ks, $impersonatedExpiry, $impersonatedType, '', $impersonatedPrivileges, $this->getPartnerId());
 		if($result < 0)
+		{
+			KalturaLog::err("Failed starting a session with result [$result]");
 			throw new KalturaAPIException(APIErrors::START_SESSION_ERROR, $this->getPartnerId());
+		}
 	
 		// getting the kuser from the db
 		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
@@ -234,7 +237,7 @@ class SessionService extends KalturaBaseService
 		else 
 		{
 			$user->id =  $impersonatedUserId;
-			$user->partner = $impersonatedPartnerId;
+			$user->partnerId = $impersonatedPartnerId;
 			$user->screenName =  $impersonatedUserId;
 			$user->isAdmin = ($impersonatedType == KalturaSessionType::ADMIN);
 		}
