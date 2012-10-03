@@ -75,9 +75,16 @@ class Infra_UserIdentity
 	
 	private function initPermissions()
 	{
-		$client = Infra_ClientHelper::getClient();
-		$permissions = $client->permission->getCurrentPermissions();
-		$this->permissions = array_map('trim', explode(',', $permissions));
+		try{
+			$client = Infra_ClientHelper::getClient();
+			$permissions = $client->permission->getCurrentPermissions();
+			$this->permissions = array_map('trim', explode(',', $permissions));
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			$this->permissions = array(Kaltura_Client_Enum_PermissionName::ALWAYS_ALLOWED_ACTIONS);
+		}
 	}
 	
 	/**
