@@ -153,7 +153,7 @@ class KalturaServicesMap
 
 		if (!is_dir(dirname($cacheFilePath))) {
 			mkdir(dirname($cacheFilePath));
-			chmod(dirname($cacheFilePath), 0777);
+			chmod(dirname($cacheFilePath), 0755);
 		}
 		kFile::safeFilePutContents($cacheFilePath, serialize($serviceMap), 0644);
 	}
