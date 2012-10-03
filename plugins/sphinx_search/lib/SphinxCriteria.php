@@ -498,7 +498,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					$vals = is_array($val) ? $val : explode(',', $val);
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 0)
+						if(!$valValue)
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue))
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
@@ -519,7 +519,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 0)
+						if(!$valValue)
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue))
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
@@ -541,7 +541,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 0)
+						if(!$valValue)
 							unset($vals[$valIndex]);
 						else
 							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
@@ -567,11 +567,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				
 				case baseObjectFilter::MULTI_LIKE_AND:
 				case baseObjectFilter::MATCH_AND:
-				case baseObjectFilter::LIKE:
-					$vals = is_array($val) ? $val : explode(' ', $val);
+					$vals = is_array($val) ? $val : explode(',', $val);
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 0)
+						if(!$valValue)
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue)) //if there are spaces or tabs - should add "<VALUE>"
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
@@ -585,9 +584,23 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						$this->addMatch("@$sphinxField $val");
 						$filter->unsetByName($field);
 					}
+					break;		
+								
+				case baseObjectFilter::LIKE:
+					if(strlen($val))
+					{
+						if(preg_match('/[\s\t]/', $val)) //if there are spaces or tabs - should add "<VALUE>"
+							$val = '"' . SphinxUtils::escapeString($val, $fieldsEscapeType) . '"';
+						else
+							$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
+						
+						$this->addMatch("@$sphinxField $val");
+						$filter->unsetByName($field);
+					}
 					break;
+					
 				case baseObjectFilter::LIKEX:
-			        if(strlen($val) > 0)
+			        if(strlen($val))
 					{
 						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
 						$this->addMatch('@' .  $sphinxField . ' "' .$val . '\\\*"');
