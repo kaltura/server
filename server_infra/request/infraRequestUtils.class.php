@@ -177,6 +177,21 @@ class infraRequestUtils
 		header("Content-Type: $content_type");
 	}
 
+	public static function getSignedIpAddressHeader($ip = null)
+	{	
+		if (!kConf::hasParam('remote_addr_header_salt'))
+			return null;
+			
+		if (!$ip)
+			$ip = self::getRemoteAddress();
+
+		$salt = kConf::get('remote_addr_header_salt');
+		$baseHeader = array(trim($ip), time(), microtime(true));
+		$baseHeader = implode(',', $baseHeader);
+		$ipHeader = $baseHeader . ',' . md5($baseHeader . ',' . $salt);
+		return array('X_KALTURA_REMOTE_ADDR', $ipHeader);
+	}
+	
 	public static function isIpPrivate($ip)
 	{
 		$privateRanges = array(

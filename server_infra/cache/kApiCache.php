@@ -621,7 +621,7 @@ class kApiCache
 		self::disableConditionalCache();
 
 		$processingTime = microtime(true) - $startTime;
-		if (self::hasExtraFields())
+		if (self::hasExtraFields() && $cacheHeaderName == 'X-Kaltura')
 			$cacheHeader = 'cached-with-extra-fields';
 		header("$cacheHeaderName:$cacheHeader,$this->_cacheKey,$processingTime", false);
 
@@ -808,10 +808,11 @@ class kApiCache
 		$sentHeaders[self::WARM_CACHE_HEADER] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 
 		// if the request wasn't proxied pass the ip on the X-FORWARDED-FOR header
-		if (!isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+		$ipHeader = infraRequestUtils::getSignedIpAddressHeader();
+		if ($ipHeader)
 		{
-			$sentHeaders["X-FORWARDED-FOR"] = $_SERVER['REMOTE_ADDR'];
-			$sentHeaders["X-FORWARDED-SERVER"] = kConf::get('remote_addr_header_server');
+			list($headerName, $headerValue) = $ipHeader;
+			$sentHeaders[$headerName] = $headerValue; 
 		}
 
 		foreach($sentHeaders as $header => $value)
