@@ -23,6 +23,8 @@ class sftpMgr extends kFileTransferMgr
 	
 	private $useCmd;
 	
+	protected $passphrase;
+	
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct($useCmd = false)
 	{
@@ -87,7 +89,7 @@ class sftpMgr extends kFileTransferMgr
 	{
 		$this->user = $user;
 		$this->privKeyFile = $privKeyFile;
-		
+		$this->passphrase = $passphrase;
 		// try to login
 		if (ssh2_auth_pubkey_file($this->getSsh2Connection(), $user, $pubKeyFile, $privKeyFile, $passphrase)) {
 			$this->sftp_id = ssh2_sftp($this->getSsh2Connection());
