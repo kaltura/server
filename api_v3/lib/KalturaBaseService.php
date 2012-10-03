@@ -145,6 +145,7 @@ abstract class KalturaBaseService
 		// if no partner defined but required -> error MISSING_KS
 		if (!$this->partner && $this->partnerRequired($this->actionName))
 		{
+			KalturaLog::err("Partner is required and ks not supplied");
 			throw new KalturaAPIException(KalturaErrors::MISSING_KS);
 		}
 		
@@ -156,6 +157,7 @@ abstract class KalturaBaseService
 			$allowPrivatePartnerData = true; // allow private partner data
 			return true; // action permitted with access to partner private data
 		}
+		KalturaLog::err("Action is not permitted");
 		
 		// action not permitted for current user - check if kaltura network is allowed
 		if (!kCurrentContext::$ks && $this->kalturaNetworkAllowed($this->actionName))
@@ -164,6 +166,7 @@ abstract class KalturaBaseService
 			$allowPrivatePartnerData = false; // DO NOT allow private partner data
 			return true; // action permitted (without private partner data)
 		}
+		KalturaLog::err("Kaltura network is not allowed");
 		
 		// action not permitted, not even without private partner data access
 		return false;
