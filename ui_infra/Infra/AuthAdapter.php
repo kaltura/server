@@ -68,7 +68,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 	 * 
 	 * @return Infra_UserIdentity
 	 */
-	protected function getUserIdentity(Kaltura_Client_Type_User $user, $ks, $partnerId)
+	protected function getUserIdentity(Kaltura_Client_Type_User $user = null, $ks = null, $partnerId = null)
 	{
 		return new Infra_UserIdentity($user, $ks, $this->timezoneOffset, $partnerId);
 	}

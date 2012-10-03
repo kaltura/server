@@ -40,7 +40,7 @@ class Infra_UserIdentity
 	 * @param string $ks
 	 * @param int $partnerId
 	 */
-	public function __construct(Kaltura_Client_Type_User $user, $ks, $timezoneOffset = null, $partnerId = null)
+	public function __construct(Kaltura_Client_Type_User $user = null, $ks = null, $timezoneOffset = null, $partnerId = null)
 	{
 		$this->user = $user;
 		$this->ks = $ks;
