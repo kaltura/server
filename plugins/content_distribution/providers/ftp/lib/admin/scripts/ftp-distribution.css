@@ -1,6 +1,7 @@
 #frmDistributionProfileConfig textarea { height: 64px; }
 
 #frmDistributionProfileConfig #disable_metadata-element,
+#frmDistributionProfileConfig #send_metadata_after_assets-element,
 #frmDistributionProfileConfig #enable_metadata_xslt-element,
 #frmDistributionProfileConfig #enable_metadata_filename-element, 
 #frmDistributionProfileConfig #enable_flavor_asset_filename-element, 
@@ -8,6 +9,7 @@
 #frmDistributionProfileConfig #enable_asset_filename-element { float: left; clear: both; margin: 0 4px 5px 0; }
 
 #frmDistributionProfileConfig #disable_metadata-label,
+#frmDistributionProfileConfig #send_metadata_after_assets-label,
 #frmDistributionProfileConfig #enable_metadata_xslt-label,
 #frmDistributionProfileConfig #enable_metadata_filename-label, 
 #frmDistributionProfileConfig #enable_flavor_asset_filename-label, 

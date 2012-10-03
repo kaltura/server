@@ -22,6 +22,7 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_ASSET_FILENAME_XSLT = 'assetFilenameXslt';
 	const CUSTOM_DATA_ASPERA_PUBLIC_KEY = 'asperaPublicKey';
 	const CUSTOM_DATA_ASPERA_PRIVATE_KEY = 'asperaPrivateKey';
+	const CUSTOM_DATA_SEND_METADATA_AFTER_ASSETS = 'sendMetadataAfterAssets';
 	
 	protected $maxLengthValidation= array (
 	);
@@ -173,6 +174,7 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	public function getAssetFilenameXslt()				{return $this->getFromCustomData(self::CUSTOM_DATA_ASSET_FILENAME_XSLT);}
 	public function getAsperaPublicKey()				{return $this->getFromCustomData(self::CUSTOM_DATA_ASPERA_PUBLIC_KEY);}
 	public function getAsperaPrivateKey()				{return $this->getFromCustomData(self::CUSTOM_DATA_ASPERA_PRIVATE_KEY);}
+	public function getSendMetadataAfterAssets()		{return $this->getFromCustomData(self::CUSTOM_DATA_SEND_METADATA_AFTER_ASSETS);}
 	
 	public function setProtocol($v)						{$this->putInCustomData(self::CUSTOM_DATA_PROTOCOL, $v);}
 	public function setHost($v)							{$this->putInCustomData(self::CUSTOM_DATA_HOST, $v);}
@@ -191,4 +193,5 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	public function setAssetFilenameXslt($v)			{$this->putInCustomData(self::CUSTOM_DATA_ASSET_FILENAME_XSLT, $v);}
  	public function setAsperaPublicKey($v)				{$this->putInCustomData(self::CUSTOM_DATA_ASPERA_PUBLIC_KEY, $v);}
     public function setAsperaPrivateKey($v)				{$this->putInCustomData(self::CUSTOM_DATA_ASPERA_PRIVATE_KEY, $v);}
+	public function setSendMetadataAfterAssets($v)		{$this->putInCustomData(self::CUSTOM_DATA_SEND_METADATA_AFTER_ASSETS, $v);}
 }

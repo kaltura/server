@@ -89,6 +89,12 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 	 * @var string
 	 */
 	 public $asperaPrivateKey;
+	 
+	 /**
+	 * @var bool
+	 */
+	 public $sendMetadataAfterAssets;
+	 
 	
 	
 	/*
@@ -113,6 +119,7 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 		'assetFilenameXslt',
 		'asperaPublicKey',
 		'asperaPrivateKey',
+		'sendMetadataAfterAssets',
 	);
 		 
 	public function getMapBetweenObjects()

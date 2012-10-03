@@ -22,7 +22,6 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 	{
 		/* @var $object Kaltura_Client_FtpDistribution_Type_FtpDistributionProfile */
 		$object = parent::getObject($objectType, $properties, $add_underscore, true);
-
         $upload = new Zend_File_Transfer_Adapter_Http();
         $files = $upload->getFileInfo();
 
@@ -37,6 +36,10 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
         
        	if(isset($files['aspera_private_key']))
             $object->asperaPrivateKey = $this->getFileContent($files['aspera_private_key']);
+            
+        if(isset($properties['send_metadata_after_assets']))
+        	$object->sendMetadataAfterAssets = $properties['send_metadata_after_assets'];
+        	
              
 		$updateRequiredEntryFields = array();
 		$updateRequiredMetadataXpaths = array();
@@ -234,6 +237,12 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 		));
 		$this->getElement('disable_metadata')->getDecorator('Label')->setOption('placement', 'APPEND');
 		
+		$this->addElement('checkbox', 'send_metadata_after_assets', array(
+			'label'			=> 'Send metadata after assets',
+			'filters'		=> array('StringTrim'),
+		));
+		$this->getElement('send_metadata_after_assets')->getDecorator('Label')->setOption('placement', 'APPEND');
+		
 		$this->addElement('checkbox', 'enable_metadata_xslt', array(
 			'label'			=> 'Custom Metadata Xslt',
 			'filters'		=> array('StringTrim'),
@@ -247,7 +256,7 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 		$this->getElement('metadata_xslt')->removeDecorator('Label');
 		
 		$this->addDisplayGroup(
-			array('disable_metadata', 'enable_metadata_xslt', 'metadata_xslt'), 
+			array('disable_metadata', 'send_metadata_after_assets', 'enable_metadata_xslt', 'metadata_xslt'), 
 			'metadata', 
 			array('legend' => 'Metadata', 'decorators' => array('FormElements', 'Fieldset'))
 		);
