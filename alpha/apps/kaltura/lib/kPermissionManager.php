@@ -670,9 +670,25 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		$service = strtolower($service);
 		$action = strtolower($action);	
+		
 		$partnerAccessPermitted = self::isPartnerAccessAllowed($service, $action);
-		$servicePermitted  = $partnerAccessPermitted && isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]);
-		$actionPermitted   = $servicePermitted && isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service][$action]);
+		if(!$partnerAccessPermitted)
+		{
+			KalturaLog::err("Partner is not allowed");
+			return false;
+		}
+		
+		$servicePermitted  = isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]);
+		if(!$servicePermitted)
+		{
+			KalturaLog::err("Service is not permitted");
+			return false;
+		}
+		
+		$actionPermitted   = isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service][$action]);
+		if(!$actionPermitted)
+			KalturaLog::err("Action is not permitted");
+		
 		return $actionPermitted;
 	}
 	
