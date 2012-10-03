@@ -250,6 +250,59 @@ class SessionService extends KalturaBaseService
 		
 		return $sessionInfo;
 	}
+
+	/**
+	 * Parse session key and return its info
+	 * 
+	 * @action get
+	 * @param string $session The KS to be parsed, keep it empty to use current session.
+	 * @return KalturaSessionInfo
+	 *
+	 * @throws APIErrors::START_SESSION_ERROR
+	 */
+	function getAction($session = null)
+	{
+		if(!$session)
+			$session = kCurrentContext::$ks;
+		
+		$ks = ks::fromSecureString($session);
+		
+		$sessionInfo = new KalturaSessionInfo();
+		$sessionInfo->ks = $session;
+		
+		// getting the kuser from the db
+		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
+		$c->add(kuserPeer::PARTNER_ID, $ks->partner_id);
+		$c->add(kuserPeer::PUSER_ID, $ks->user);
+		$c->add(kuserPeer::STATUS, KuserStatus::DELETED, KalturaCriteria::NOT_EQUAL);
+
+		
+		kuserPeer::setUseCriteriaFilter(false);
+		$kuser = kuserPeer::doSelectOne($c);
+		kuserPeer::setUseCriteriaFilter(true);
+		
+		// assign the kuser into KalturaUser object
+		$user = new KalturaUser();
+		if($kuser)
+		{
+			$user->fromObject($kuser);
+		}
+		else 
+		{
+			$user->id =  $ks->user;
+			$user->partnerId = $ks->partner_id;
+			$user->screenName =  $ks->user;
+			$user->isAdmin = ($ks->type == KalturaSessionType::ADMIN);
+		}
+		
+		$sessionInfo->partnerId = $ks->partner_id;
+		$sessionInfo->user = $user;
+		$sessionInfo->expiry = $ks->valid_until;
+		$sessionInfo->sessionType = $ks->type;
+		$sessionInfo->privileges = $ks->privileges;
+		
+		return $sessionInfo;
+	}
 	
 	/**
 	 * Start a session for Kaltura's flash widgets
