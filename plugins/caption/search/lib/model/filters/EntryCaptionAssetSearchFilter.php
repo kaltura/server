@@ -46,7 +46,7 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 	 * @param string $contentLike
 	 */
 	public function setContentLike($contentLike) {
-		$this->contentLike = $this->formatCondition($contentLike, ' ', ' ');
+		$this->contentLike = $this->formatCondition($contentLike, null, ' ');
 	}
 
 	/**
@@ -60,27 +60,43 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 	 * @param string $contentMultiLikeAnd
 	 */
 	public function setContentMultiLikeAnd($contentMultiLikeAnd) {
-		$this->contentMultiLikeAnd = $this->formatCondition($contentMultiLikeAnd, ' ', ' ');
+		$this->contentMultiLikeAnd = $this->formatCondition($contentMultiLikeAnd, ',', ' ');
 	}
 
 	private function formatCondition($conditionString, $explodeDelimiter, $implodeDelimiter)
 	{
-		$res = null;		
-		$vals = explode($explodeDelimiter, $conditionString);
-		foreach($vals as $valIndex => $valValue)
+		if(!strlen($conditionString))
 		{
-			if(!is_numeric($valValue) && strlen($valValue) <= 0)
-				unset($vals[$valIndex]);
-			elseif(preg_match('/[\s\t]/', $valValue))
-				$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
-			else
-				$vals[$valIndex] = SphinxUtils::escapeString($valValue);
+			return null;
 		}
-					
-		if(count($vals))
+		
+		$res = null;
+		if($explodeDelimiter)
+		{		
+			$vals = explode($explodeDelimiter, $conditionString);
+			foreach($vals as $valIndex => $valValue)
+			{
+				if(!$valValue)
+					unset($vals[$valIndex]);
+				elseif(preg_match('/[\s\t]/', $valValue))
+					$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
+				else
+					$vals[$valIndex] = SphinxUtils::escapeString($valValue);
+			}
+						
+			if(count($vals))
+			{
+				$res = implode($implodeDelimiter, $vals);
+			}	
+		}	
+		else
 		{
-			$res = implode($implodeDelimiter, $vals);
-		}		
+			if(preg_match('/[\s\t]/', $conditionString)) 
+				$res = '"' . SphinxUtils::escapeString($conditionString) . '"';
+			else
+				$res = SphinxUtils::escapeString($conditionString);
+									
+		}
 		return $res;
 	}
 	
