@@ -122,7 +122,7 @@ class KAutoloader
 		$dirName = dirname($path);
 		if (!is_dir($dirName)) {
 			mkdir($dirName);
-			chmod($dirName, 0766);
+			chmod($dirName, 0755);
 		}
 	}
 	
