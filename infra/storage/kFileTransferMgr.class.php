@@ -20,6 +20,7 @@ class kFileTransferMgrType
 	const LOCAL = 7;
 	const SFTP_CMD = 8; // SFTP Protocol
 	const SFTP_SEC_LIB = 9; // SFTP Protocol
+	const ASPERA = 10;
 }
 // path where the classes extending kFileTransferMgr are stored relative to this file
 define ("PATH_TO_MANAGERS", "file_transfer_managers");
@@ -256,6 +257,8 @@ abstract class kFileTransferMgr
 				
 			case kFileTransferMgrType::LOCAL:
 			    return new localMgr();
+			case kFileTransferMgrType::ASPERA:
+				return new asperaMgr();
 		}
 
 		return null;
