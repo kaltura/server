@@ -18,6 +18,8 @@ class TrackEntry extends BaseTrackEntry
 	const TRACK_ENTRY_EVENT_TYPE_DELETED_ENTRY = 6;
 	const TRACK_ENTRY_EVENT_TYPE_REPLACED_ENTRY = 7;
 	
+	const CUSTOM_DATA_FIELD_SESSION_ID = 'sessionId';
+	
 	public static function addTrackEntry ( TrackEntry $te )
 	{
 		// can be switched of once we decide this is not needed
@@ -30,8 +32,12 @@ class TrackEntry extends BaseTrackEntry
 			if ( ! $te->getUid() ) $te->setUid(  kCurrentContext::$uid );
 			if ( ! $te->getUserIp() ) $te->setUserIp( kCurrentContext::$user_ip );
 			$te->setContext( kCurrentContext::$client_version . "|" .  kCurrentContext::$client_lang . "|" . kCurrentContext::$service . "|" . kCurrentContext::$action );
-			$te->putInCustomData('sessionId', new UniqueId());
+			$te->setSessionId(new UniqueId());
 			$te->save();
 		}
 	}
+	
+	public function setSessionId($v) { $this->putInCustomData(TrackEntry::CUSTOM_DATA_FIELD_SESSION_ID, $v);}
+	public function getSessionId() { return $this->getFromCustomData(TrackEntry::CUSTOM_DATA_FIELD_SESSION_ID);}
+	
 }
