@@ -153,26 +153,26 @@ class KalturaSystemPartnerUsageItem extends KalturaObject
 		
 		$item = new KalturaSystemPartnerUsageItem();
 		
-			$item->partnerStatus 	= @$arr[0];
-			$item->partnerId  		= @$arr[1];
-			$item->partnerName 		= @$arr[2];
-			$item->partnerCreatedAt = @$arr[3];
-			$item->partnerPackage	= @$arr[4];
-			$item->views 			= @$arr[5];
-			$item->plays 			= @$arr[6];
-			$item->entriesCount 	= @$arr[7];
-			$item->totalEntriesCount = @$arr[8];
-			$item->videoEntriesCount = @$arr[9];
-			$item->imageEntriesCount = @$arr[10];
-			$item->audioEntriesCount = @$arr[11];
-			$item->mixEntriesCount	 = @$arr[12];
-			$item->bandwidth 		= @$arr[13];
-			$item->storage 		= @$arr[14];
-			$item->deletedStorage 		= @$arr[15];
-			//$item->totalStorage 	= @$arr[15];
-			$item->peakStorage = @$arr[16];
-			$item->avgStorage = @$arr[17];
-			$item->combinedBandwidthStorage = @$arr[18];
+		$item->partnerStatus 	        = @$arr[0];
+        $item->partnerId  		        = @$arr[1];
+        $item->partnerName 		        = @$arr[2];
+        $item->partnerCreatedAt         = @$arr[3];
+        $item->partnerPackage	        = @$arr[4];
+        $item->views 			        = @$arr[5];
+        $item->plays 			        = @$arr[6];
+        $item->entriesCount 	        = @$arr[7];
+        $item->totalEntriesCount        = @$arr[8];
+        $item->videoEntriesCount        = @$arr[9];
+        $item->imageEntriesCount        = @$arr[10];
+        $item->audioEntriesCount        = @$arr[11];
+        $item->mixEntriesCount	        = @$arr[12];
+        $item->bandwidth 		        = ceil(@$arr[13]);
+        $item->storage 		            = ceil(@$arr[14]);
+        $item->deletedStorage 	        = ceil(@$arr[15]);
+        //$item->totalStorage 	        = ceil(@$arr[15]);
+        $item->peakStorage              = ceil(@$arr[16]);
+        $item->avgStorage               = ceil(@$arr[17]);
+        $item->combinedBandwidthStorage = ceil(@$arr[18]);
 		
 		return $item;
 	}
