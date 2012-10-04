@@ -45,12 +45,14 @@ class asperaMgr extends sftpMgr
 	}
 	
 	private function executeCmd($cmd){
-		KalturaLog::debug('Get file using command: '.$cmd);
+		KalturaLog::debug('Executing command: '.$cmd);
 		$return_value = null;
 		$beginTime = time();
 		system($cmd, $return_value);
 		$duration = (time() - $beginTime)/1000;
-		KalturaLog::debug("Download took [$duration]sec with value [$return_value]");
-		return $return_value;
+		KalturaLog::debug("Execution took [$duration]sec with value [$return_value]");
+		if ($return_value == 0)
+			return true;
+		return false;
 	}
 }
