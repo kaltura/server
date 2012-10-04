@@ -19,4 +19,12 @@ class kIpAddressContextField extends kStringField
 
 		return $scope->getIp();
 	}
+
+	/* (non-PHPdoc)
+	 * @see kStringValue::shouldDisableCache()
+	 */
+	public function shouldDisableCache($scope)
+	{
+		return false;
+	}
 }
