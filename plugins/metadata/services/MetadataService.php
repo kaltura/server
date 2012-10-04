@@ -205,14 +205,14 @@ class MetadataService extends KalturaBaseService
 	 * @action get
 	 * @param int $id 
 	 * @return KalturaMetadata
-	 * @throws KalturaErrors::METADATA_NOT_FOUND
+	 * @throws MetadataErrors::METADATA_NOT_FOUND
 	 */		
 	function getAction($id)
 	{
 		$dbMetadata = MetadataPeer::retrieveByPK( $id );
 		
 		if(!$dbMetadata)
-			throw new KalturaAPIException(KalturaErrors::METADATA_NOT_FOUND, $id);
+			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND, $id);
 			
 		$metadata = new KalturaMetadata();
 		$metadata->fromObject($dbMetadata);
@@ -228,7 +228,7 @@ class MetadataService extends KalturaBaseService
 	 * @param string $xmlData XML metadata
 	 * @param int $version Enable update only if the metadata object version did not change by other process
 	 * @return KalturaMetadata
-	 * @throws KalturaErrors::METADATA_NOT_FOUND
+	 * @throws MetadataErrors::METADATA_NOT_FOUND
 	 * @throws MetadataErrors::INVALID_METADATA_DATA
 	 * @throws MetadataErrors::INVALID_METADATA_VERSION
 	 */	
@@ -236,7 +236,7 @@ class MetadataService extends KalturaBaseService
 	{
 		$dbMetadata = MetadataPeer::retrieveByPK($id);
 		if(!$dbMetadata)
-			throw new KalturaAPIException(KalturaErrors::METADATA_NOT_FOUND, $id);
+			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND, $id);
 			
 		if($version && $dbMetadata->getVersion() != $version)
 			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_VERSION, $dbMetadata->getVersion());
@@ -301,7 +301,7 @@ class MetadataService extends KalturaBaseService
 	 * @param int $id 
 	 * @param file $xmlFile XML metadata
 	 * @return KalturaMetadata
-	 * @throws KalturaErrors::METADATA_NOT_FOUND
+	 * @throws MetadataErrors::METADATA_NOT_FOUND
 	 * @throws MetadataErrors::METADATA_FILE_NOT_FOUND
 	 * @throws MetadataErrors::INVALID_METADATA_DATA
 	 */	
@@ -412,14 +412,14 @@ class MetadataService extends KalturaBaseService
 	 * 
 	 * @action delete
 	 * @param int $id
-	 * @throws KalturaErrors::METADATA_NOT_FOUND
+	 * @throws MetadataErrors::METADATA_NOT_FOUND
 	 */		
 	function deleteAction($id)
 	{
 		$dbMetadata = MetadataPeer::retrieveByPK($id);
 		
 		if(!$dbMetadata)
-			throw new KalturaAPIException(KalturaErrors::METADATA_NOT_FOUND, $id);
+			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND, $id);
 		
 		$dbMetadata->setStatus(KalturaMetadataStatus::DELETED);
 		$dbMetadata->save();
@@ -433,14 +433,14 @@ class MetadataService extends KalturaBaseService
 	 * @action invalidate
 	 * @param int $id
 	 * @param int $version Enable update only if the metadata object version did not change by other process
-	 * @throws KalturaErrors::METADATA_NOT_FOUND
+	 * @throws MetadataErrors::METADATA_NOT_FOUND
 	 * @throws MetadataErrors::INVALID_METADATA_VERSION
 	 */		
 	function invalidateAction($id, $version = null)
 	{
 		$dbMetadata = MetadataPeer::retrieveByPK($id);
 		if(!$dbMetadata)
-			throw new KalturaAPIException(KalturaErrors::METADATA_NOT_FOUND, $id);
+			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND, $id);
 
 		if($version && $dbMetadata->getVersion() != $version)
 			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_VERSION, $dbMetadata->getVersion());
@@ -458,7 +458,7 @@ class MetadataService extends KalturaBaseService
 	 * @param int $id
 	 * @return file
 	 *  
-	 * @throws KalturaErrors::METADATA_NOT_FOUND
+	 * @throws MetadataErrors::METADATA_NOT_FOUND
 	 * @throws KalturaErrors::FILE_DOESNT_EXIST
 	 */
 	public function serveAction($id)
@@ -466,7 +466,7 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata = MetadataPeer::retrieveByPK( $id );
 		
 		if(!$dbMetadata)
-			throw new KalturaAPIException(KalturaErrors::METADATA_NOT_FOUND, $id);
+			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND, $id);
 		
 		$fileName = $dbMetadata->getObjectId() . '.xml';
 		$fileSubType = Metadata::FILE_SYNC_METADATA_DATA;
