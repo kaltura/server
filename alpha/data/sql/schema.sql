@@ -1741,6 +1741,7 @@ CREATE TABLE `track_entry`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`user_ip` VARCHAR(20),
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_event_type_indx`(`partner_id`, `track_event_type_id`),
 	KEY `entry_id_indx`(`entry_id`),

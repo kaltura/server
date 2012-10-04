@@ -128,6 +128,12 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	protected $user_ip;
 
 	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -410,6 +416,16 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function getUserIp()
 	{
 		return $this->user_ip;
+	}
+
+	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
 	}
 
 	/**
@@ -879,6 +895,26 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	} // setUserIp()
 
 	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     TrackEntry The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = TrackEntryPeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -928,6 +964,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 			$this->created_at = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
 			$this->updated_at = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
 			$this->user_ip = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->custom_data = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -937,7 +974,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 18; // 18 = TrackEntryPeer::NUM_COLUMNS - TrackEntryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 19; // 19 = TrackEntryPeer::NUM_COLUMNS - TrackEntryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating TrackEntry object", $e);
@@ -1169,6 +1206,8 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -1179,7 +1218,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function postSave(PropelPDO $con = null) 
 	{
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 		parent::postSave($con);
 	}
 	
@@ -1374,6 +1415,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 			case 17:
 				return $this->getUserIp();
 				break;
+			case 18:
+				return $this->getCustomData();
+				break;
 			default:
 				return null;
 				break;
@@ -1413,6 +1457,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 			$keys[15] => $this->getCreatedAt(),
 			$keys[16] => $this->getUpdatedAt(),
 			$keys[17] => $this->getUserIp(),
+			$keys[18] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1498,6 +1543,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 			case 17:
 				$this->setUserIp($value);
 				break;
+			case 18:
+				$this->setCustomData($value);
+				break;
 		} // switch()
 	}
 
@@ -1540,6 +1588,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[15], $arr)) $this->setCreatedAt($arr[$keys[15]]);
 		if (array_key_exists($keys[16], $arr)) $this->setUpdatedAt($arr[$keys[16]]);
 		if (array_key_exists($keys[17], $arr)) $this->setUserIp($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setCustomData($arr[$keys[18]]);
 	}
 
 	/**
@@ -1569,6 +1618,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(TrackEntryPeer::CREATED_AT)) $criteria->add(TrackEntryPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(TrackEntryPeer::UPDATED_AT)) $criteria->add(TrackEntryPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(TrackEntryPeer::USER_IP)) $criteria->add(TrackEntryPeer::USER_IP, $this->user_ip);
+		if ($this->isColumnModified(TrackEntryPeer::CUSTOM_DATA)) $criteria->add(TrackEntryPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1669,6 +1719,8 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 
 		$copyObj->setUserIp($this->user_ip);
 
+		$copyObj->setCustomData($this->custom_data);
+
 
 		$copyObj->setNew(true);
 
@@ -1748,4 +1800,121 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BaseTrackEntry
