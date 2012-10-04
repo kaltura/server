@@ -17,6 +17,7 @@
         showFormDtDd('#sftp_public_key_readonly');
         showFormDtDd('#sftp_private_key_readonly');
         showFormDtDd('#sftp_public_key');
+        showFormDtDd('#sftp_private_key');
         hideFormDtDd('#aspera_public_key_readonly');
         hideFormDtDd('#aspera_private_key_readonly');
         hideFormDtDd('#aspera_public_key');
