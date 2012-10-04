@@ -322,7 +322,7 @@ class kString
 	
 	public static function isEmailString($string)
 	{
-		return preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i', $string);
+		return preg_match("/^[_a-z0-9,!#\$%&'\*\+\?\^_`\{\|}~-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i", $string);
 	}
 	
 	public static function nameSplit($fullName)
