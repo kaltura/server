@@ -17,6 +17,10 @@
         showFormDtDd('#sftp_public_key_readonly');
         showFormDtDd('#sftp_private_key_readonly');
         showFormDtDd('#sftp_public_key');
+        hideFormDtDd('#aspera_public_key_readonly');
+        hideFormDtDd('#aspera_private_key_readonly');
+        hideFormDtDd('#aspera_public_key');
+        hideFormDtDd('#aspera_private_key');
     }
     
     function asperaMode() {
@@ -28,6 +32,7 @@
         showFormDtDd('#aspera_public_key_readonly');
         showFormDtDd('#aspera_private_key_readonly');
         showFormDtDd('#aspera_public_key');
+        showFormDtDd('#aspera_private_key');
     }
 
     function sftpSecLibMode() {
@@ -35,6 +40,10 @@
         showFormDtDd('#sftp_public_key_readonly');
         showFormDtDd('#sftp_private_key_readonly');
         hideFormDtDd('#sftp_public_key');
+        hideFormDtDd('#aspera_public_key_readonly');
+        hideFormDtDd('#aspera_private_key_readonly');
+        hideFormDtDd('#aspera_public_key');
+        hideFormDtDd('#aspera_private_key');
     }
 
     function ftpMode() {
