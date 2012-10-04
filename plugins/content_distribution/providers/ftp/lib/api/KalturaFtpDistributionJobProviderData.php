@@ -107,9 +107,11 @@ class KalturaFtpDistributionJobProviderData extends KalturaConfigurableDistribut
 				$file->filename = $distributionProfileDb->getAssetFilename($entryDistributionDb, $defaultFilename, $asset->getId());
 				
 			$files[] = $file;
-			if (!$distributionProfileDb->getDisableMetadata() && $sendMetadataAfterAssets)
-				$files[] = $metadataFile;
 		}
+		
+		//sending metadata after assets as configured in the connector profile
+		if ($metadataFile && $sendMetadataAfterAssets)
+			$files[] = $metadataFile;
 		
 		return $files;
 	}

@@ -37,10 +37,6 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
        	if(isset($files['aspera_private_key']))
             $object->asperaPrivateKey = $this->getFileContent($files['aspera_private_key']);
             
-        if(isset($properties['send_metadata_after_assets']))
-        	$object->sendMetadataAfterAssets = $properties['send_metadata_after_assets'];
-        	
-             
 		$updateRequiredEntryFields = array();
 		$updateRequiredMetadataXpaths = array();
 		
