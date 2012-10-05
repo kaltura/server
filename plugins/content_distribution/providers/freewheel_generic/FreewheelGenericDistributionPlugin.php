@@ -20,9 +20,10 @@ class FreewheelGenericDistributionPlugin extends KalturaPlugin implements IKaltu
 			self::CONTENT_DSTRIBUTION_VERSION_MAJOR,
 			self::CONTENT_DSTRIBUTION_VERSION_MINOR,
 			self::CONTENT_DSTRIBUTION_VERSION_BUILD);
-			
-		$dependency = new KalturaDependency(ContentDistributionPlugin::getPluginName(), $contentDistributionVersion);
-		return array($dependency);
+
+		$dependency1 = new KalturaDependency(ContentDistributionPlugin::getPluginName(), $contentDistributionVersion);
+		$dependency2 = new KalturaDependency(CuePointPlugin::getPluginName());
+		return array($dependency1, $dependency2);
 	}
 	
 	public static function isAllowedPartner($partnerId)
