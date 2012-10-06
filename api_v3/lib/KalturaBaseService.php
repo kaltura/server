@@ -15,6 +15,11 @@ abstract class KalturaBaseService
 	 * @var Partner
 	 */
 	private $partner = null;
+
+	/**
+	 * @var int
+	 */
+	private $partnerId = null;
 	
 	/**
 	 * @var kuser
@@ -103,8 +108,7 @@ abstract class KalturaBaseService
 		if(is_null($partnerId))
 			$partnerId = 0;
 		
-		$this->partner = PartnerPeer::retrieveByPK( $partnerId );
-		if (!$this->partner) { $this->partner = null; }		
+		$this->partnerId = $partnerId;
 
 		// check if current aciton is allowed and if private partner data access is allowed
 		$allowPrivatePartnerData = false;
@@ -143,7 +147,9 @@ abstract class KalturaBaseService
 	protected function isPermitted(&$allowPrivatePartnerData)
 	{		
 		// if no partner defined but required -> error MISSING_KS
-		if (!$this->partner && $this->partnerRequired($this->actionName))
+		if ($this->partnerId != Partner::BATCH_PARTNER_ID && 
+			!$this->getPartner() && 
+			$this->partnerRequired($this->actionName))
 		{
 			KalturaLog::err("Partner is required and ks not supplied");
 			throw new KalturaAPIException(KalturaErrors::MISSING_KS);
@@ -217,10 +223,7 @@ abstract class KalturaBaseService
 
 	public function getPartnerId()
 	{
-		if ($this->partner) 
-			return $this->partner->getId();
-			
-		return null;
+		return $this->partnerId;
 	}
 	
 	/**
@@ -228,6 +231,9 @@ abstract class KalturaBaseService
 	 */
 	public function getPartner()
 	{
+		if (!$this->partner)
+			$this->partner = PartnerPeer::retrieveByPK( $this->partnerId );
+			
 		return $this->partner; 
 	}
 	
@@ -321,15 +327,16 @@ abstract class KalturaBaseService
 
 	protected function validateApiAccessControl()
 	{
-		if (is_null($this->partner))
-			return;
-
 		// ignore for system partners
 		// for cases where an api action has a 'partnerId' parameter which will causes loading that partner instead of the ks partner
 		if ($this->getKs() && $this->getKs()->partner_id < 0)
 			return;
+			
+		$partner = $this->getPartner();
+		if (!$partner)
+			return;
 
-		$accessControl = $this->partner->getApiAccessControl();
+		$accessControl = $partner->getApiAccessControl();
 		if (is_null($accessControl))
 			return;
 

@@ -141,7 +141,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 				throw new KalturaAPIException ( KalturaErrors::CATEGORY_USER_ALREADY_EXISTS );
 		}
 		
-		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId ( $this->categoryId, kCurrentContext::$ks_kuser_id );
+		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId ( $this->categoryId, kCurrentContext::getCurrentKsKuserId() );
 		if ((! $currentKuserCategoryKuser || 
 				$currentKuserCategoryKuser->getPermissionLevel () != CategoryKuserPermissionLevel::MANAGER) && 
 				$category->getUserJoinPolicy () == UserJoinPolicyType::NOT_ALLOWED && 

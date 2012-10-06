@@ -225,7 +225,7 @@ class UserService extends KalturaBaseUserService
 		}
 
 		// users that are not publisher administrator are only allowed to get their own object   
-		if ($kuser->getId() != kCurrentContext::$ks_kuser_id && !in_array(PermissionName::MANAGE_ADMIN_USERS, kPermissionManager::getCurrentPermissions()))
+		if ($kuser->getId() != kCurrentContext::getCurrentKsKuserId() && !in_array(PermissionName::MANAGE_ADMIN_USERS, kPermissionManager::getCurrentPermissions()))
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginId);
 		
 		$user = new KalturaUser();
