@@ -361,7 +361,8 @@ class ks extends kSessionBase
 		}
 		
 		// creates the kuser
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_END_USER_REPORTS, $partner_id))
+		if($partner_id != Partner::BATCH_PARTNER_ID && 
+			PermissionPeer::isValidForPartner(PermissionName::FEATURE_END_USER_REPORTS, $partner_id))
 		{
 			$this->kuser = kuserPeer::createKuserForPartner($partner_id, $puser_id);
 			if(!$puser_id)

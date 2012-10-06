@@ -418,7 +418,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		self::$requestedPartnerId = !self::isEmpty(kCurrentContext::$partner_id) ? kCurrentContext::$partner_id : null;
 		self::$ksPartnerId = !self::isEmpty(kCurrentContext::$ks_partner_id) ? kCurrentContext::$ks_partner_id : null;
 		self::$ksUserId = !self::isEmpty(kCurrentContext::$ks_uid) ? kCurrentContext::$ks_uid : null;
-		self::$kuser = !self::isEmpty(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser() : null;
+		if (self::$ksPartnerId != Partner::BATCH_PARTNER_ID)
+			self::$kuser = !self::isEmpty(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser() : null;
 		self::$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : null;
 		self::$adminSession = !self::isEmpty(kCurrentContext::$is_admin_session) ? kCurrentContext::$is_admin_session : false;
 		
@@ -447,7 +448,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	private static function initRoleIds()
 	{
 		$roleIds = null;
-		if (!self::$operatingPartner || !self::$ksString)
+		if (!self::$ksString || 
+			(!self::$operatingPartner && self::$ksPartnerId != Partner::BATCH_PARTNER_ID))
 		{
 			// no partner or session -> no role
 			$roleIds = null;
@@ -481,17 +483,35 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			// if user has no defined roles or no user is defined -> get default role IDs according to session type (admin/not)
 			if (!$roleIds)
 			{
-				if ($ks->isWidgetSession()){
-					//there is only one partner widget role defined in the system
-                    $roleIds = self::$operatingPartner->getWidgetSessionRoleId();
+				if (!self::$operatingPartner)
+				{
+					// use system default roles
+					if ($ks->isWidgetSession()) {
+						$strId = UserRoleId::WIDGET_SESSION_ROLE;
+					}
+					elseif (self::$adminSession) {
+						$strId = UserRoleId::PARTNER_ADMIN_ROLE;
+					}
+					else {
+						$strId = UserRoleId::BASE_USER_SESSION_ROLE;
+					}
+					
+					$roleIds = UserRolePeer::getIdByStrId ($strId);
 				}
-				elseif (self::$adminSession) {
-					// there is only one partner admin role defined in the system
-					$roleIds = self::$operatingPartner->getAdminSessionRoleId();
-				}
-				else {
-					// a partner may have special defined user session roles - get them from partner object
-					$roleIds = self::$operatingPartner->getUserSessionRoleId();
+				else
+				{
+					if ($ks->isWidgetSession()){
+						//there is only one partner widget role defined in the system
+	                    $roleIds = self::$operatingPartner->getWidgetSessionRoleId();
+					}
+					elseif (self::$adminSession) {
+						// there is only one partner admin role defined in the system
+						$roleIds = self::$operatingPartner->getAdminSessionRoleId();
+					}
+					else {
+						// a partner may have special defined user session roles - get them from partner object
+						$roleIds = self::$operatingPartner->getUserSessionRoleId();
+					}
 				}
 			}
 			
@@ -506,6 +526,12 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	
 	private static function initPartnerUserObjects()
 	{
+		if (self::$ksPartnerId == Partner::BATCH_PARTNER_ID) {
+			self::$operatingPartner = null;
+			self::$operatingPartnerId = self::$ksPartnerId;
+			return;
+		}
+		
 		$ksPartner = null;
 		$requestedPartner = null;
 		

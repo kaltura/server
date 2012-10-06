@@ -221,7 +221,7 @@ class kEntitlementUtils
 		if(is_null($partnerId)) 
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			
-		if(is_null($partnerId))
+		if(is_null($partnerId) || $partnerId == Partner::BATCH_PARTNER_ID)
 			return;
 			 
 		$partner = PartnerPeer::retrieveByPK($partnerId);
@@ -368,7 +368,7 @@ class kEntitlementUtils
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		
-		if(kCurrentContext::$ks_kuser_id && kCurrentContext::$ks_kuser_id == '')
+		if(kCurrentContext::getCurrentKsKuserId() && kCurrentContext::getCurrentKsKuserId() == '')
 			return null;
 			
 		$privacyContextSearch = array();
@@ -382,9 +382,9 @@ class kEntitlementUtils
 		$ksPrivacyContexts = explode(',', $ksPrivacyContexts);
 		
 		foreach ($ksPrivacyContexts as $ksPrivacyContext)
-			$privacyContextSearch[] = $ksPrivacyContext . '_' . kCurrentContext::$ks_kuser_id;
+			$privacyContextSearch[] = $ksPrivacyContext . '_' . kCurrentContext::getCurrentKsKuserId();
 		
-		$privacyContextSearch[] = self::ENTRY_PRIVACY_CONTEXT . '_' . kCurrentContext::$ks_kuser_id;
+		$privacyContextSearch[] = self::ENTRY_PRIVACY_CONTEXT . '_' . kCurrentContext::getCurrentKsKuserId();
 			
 		return $privacyContextSearch;
 	}

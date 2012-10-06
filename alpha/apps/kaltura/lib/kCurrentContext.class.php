@@ -51,9 +51,9 @@ class kCurrentContext
 	public static $ks_uid;
 	
 	/**
-	 * @var string
+	 * @var int
 	 */
-	public static $ks_kuser_id;
+	public static $ks_kuser_id = null;
 	
 	/**
 	 * @var string
@@ -155,7 +155,6 @@ class kCurrentContext
 		kCurrentContext::$ks_hash = null;
 		kCurrentContext::$ks_partner_id = $entry->getPartnerId();
 		kCurrentContext::$ks_uid = null;
-		kCurrentContext::$ks_kuser_id = 0;
 		kCurrentContext::$master_partner_id = null;
 		kCurrentContext::$partner_id = $entry->getPartnerId();
 		kCurrentContext::$uid = null;
@@ -179,7 +178,6 @@ class kCurrentContext
 		kCurrentContext::$ks_hash = null;
 		kCurrentContext::$ks_partner_id = $asset->getPartnerId();
 		kCurrentContext::$ks_uid = null;
-		kCurrentContext::$ks_kuser_id = 0;
 		kCurrentContext::$master_partner_id = null;
 		kCurrentContext::$partner_id = $asset->getPartnerId();
 		kCurrentContext::$uid = null;
@@ -198,7 +196,6 @@ class kCurrentContext
 			kCurrentContext::$ks_hash = null;
 			kCurrentContext::$ks_partner_id = null;
 			kCurrentContext::$ks_uid = null;
-			kCurrentContext::$ks_kuser_id = 0;
 			kCurrentContext::$master_partner_id = null;
 			kCurrentContext::$partner_id = $requestedPartnerId;
 			kCurrentContext::$uid = $requestedPuserId;
@@ -221,18 +218,11 @@ class kCurrentContext
 			kCurrentContext::$ks_hash = $ksObj->getHash();
 			kCurrentContext::$ks_partner_id = $ksObj->partner_id;
 			kCurrentContext::$ks_uid = $ksObj->user;
-			kCurrentContext::$ks_kuser_id = 0;
 			kCurrentContext::$master_partner_id = $ksObj->master_partner_id ? $ksObj->master_partner_id : kCurrentContext::$ks_partner_id;
 			kCurrentContext::$is_admin_session = $ksObj->isAdmin();
 			kCurrentContext::$partner_id = $requestedPartnerId;
 			kCurrentContext::$uid = $requestedPuserId;
 			kCurrentContext::$kuser_id = null;
-				
-			$ksKuser = kCurrentContext::getCurrentKsKuser(false);
-			if($ksKuser)
-			{
-				kCurrentContext::$ks_kuser_id = $ksKuser->getId();
-			}
 		}
 
 		// set partner ID for logger
@@ -259,5 +249,19 @@ class kCurrentContext
 		   	return null;
 			
 		return kCurrentContext::$ks_kuser;
+	}
+
+	public static function getCurrentKsKuserId()
+	{
+		if (!is_null(kCurrentContext::$ks_kuser_id))
+			return kCurrentContext::$ks_kuser_id;
+			
+		$ksKuser = kCurrentContext::getCurrentKsKuser(false);
+		if($ksKuser)
+			kCurrentContext::$ks_kuser_id = $ksKuser->getId();
+		else 
+			kCurrentContext::$ks_kuser_id = 0;
+			
+		return kCurrentContext::$ks_kuser_id;
 	}
 }

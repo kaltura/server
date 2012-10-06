@@ -333,10 +333,6 @@ class entryPeer extends BaseentryPeer
 		
 		$critEntitled = null;
 		
-		$kuserId = kuser::KUSER_ID_THAT_DOES_NOT_EXIST;
-		if(!is_null(kCurrentContext::$ks_kuser_id))
-			$kuserId = kCurrentContext::$ks_kuser_id;
-		
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 			
 		//when entitlement is enable and admin session or user session with list:* privilege
@@ -347,7 +343,7 @@ class entryPeer extends BaseentryPeer
 			$critEntitled = $c->getNewCriterion (self::PRIVACY_BY_CONTEXTS, $privacyContexts, KalturaCriteria::IN_LIKE);
 			$critEntitled->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 			
-			if(kCurrentContext::$ks_kuser_id)
+			if(kCurrentContext::getCurrentKsKuserId())
 			{
 				//ENTITLED_KUSERS field includes $this->entitledUserEdit, $this->entitledUserEdit, and users on work groups categories.
 				$entitledKuserByPrivacyContext = kEntitlementUtils::getEntitledKuserByPrivacyContext();
@@ -355,7 +351,7 @@ class entryPeer extends BaseentryPeer
 				$critEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 				
 				$categoriesIds = array();
-				$categories = categoryPeer::retrieveEntitledAndNonIndexedByKuser($kuserId, kConf::get('category_search_limit'));
+				$categories = categoryPeer::retrieveEntitledAndNonIndexedByKuser(kCurrentContext::getCurrentKsKuserId(), kConf::get('category_search_limit'));
 				if(count($categories) >= kConf::get('category_search_limit'))
 					self::$kuserBlongToMoreThanMaxCategoriesForSearch = true;
 			 
@@ -373,13 +369,13 @@ class entryPeer extends BaseentryPeer
 			}
 			
 			//user should be able to get all entries s\he uploaded - outside the privacy context
-			$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , $kuserId, Criteria::EQUAL);
+			$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::getCurrentKsKuserId(), Criteria::EQUAL);
 			$critKuser->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 			$critEntitled->addOr($critKuser);
 		}
 		elseif(self::$userContentOnly) // when session is not admin and without list:* privilege, allow access to user entries only
 		{
-			$critEntitled = $c->getNewCriterion(entryPeer::KUSER_ID , $kuserId, Criteria::EQUAL);
+			$critEntitled = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::getCurrentKsKuserId(), Criteria::EQUAL);
 			$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		}
 		

@@ -214,7 +214,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 			}
 			else
 			{
-				$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($category->getId(), kCurrentContext::$ks_kuser_id);
+				$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($category->getId(), kCurrentContext::getCurrentKsKuserId());
 				if(kEntitlementUtils::getEntitlementEnforcement() && 
 					$category->getContributionPolicy() != ContributionPolicyType::ALL &&
 					(!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
@@ -264,7 +264,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 				$categoryEntryToDelete = categoryEntryPeer::retrieveByCategoryIdAndEntryId($category->getId(), $entry->getId());
 				if($categoryEntryToDelete)
 				{
-					$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntryToDelete->getCategoryId(), kCurrentContext::$ks_kuser_id);
+					$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntryToDelete->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
 					if($category->getPrivacyContexts() && (!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
 					{
 						//not entiteld to delete - should be set back on the entry.
