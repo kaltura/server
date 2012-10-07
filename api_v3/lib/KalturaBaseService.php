@@ -147,9 +147,9 @@ abstract class KalturaBaseService
 	protected function isPermitted(&$allowPrivatePartnerData)
 	{		
 		// if no partner defined but required -> error MISSING_KS
-		if ($this->partnerId != Partner::BATCH_PARTNER_ID && 
-			!$this->getPartner() && 
-			$this->partnerRequired($this->actionName))
+		if ($this->partnerRequired($this->actionName) && 
+			$this->partnerId != Partner::BATCH_PARTNER_ID && 
+			!$this->getPartner())
 		{
 			KalturaLog::err("Partner is required and ks not supplied");
 			throw new KalturaAPIException(KalturaErrors::MISSING_KS);
