@@ -368,9 +368,6 @@ class kEntitlementUtils
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		
-		if(kCurrentContext::getCurrentKsKuserId() && kCurrentContext::getCurrentKsKuserId() == '')
-			return null;
-			
 		$privacyContextSearch = array();
 			
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
