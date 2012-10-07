@@ -16,6 +16,14 @@ class HuluDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_SEASON_TUNE_IN_INFORMATION = 'seasonTuneInInformation';
 	const CUSTOM_DATA_VIDEO_MEDIA_TYPE = 'videoMediaType';
 	const CUSTOM_DATA_DISABLE_EPISODE_NUMBER_CUSTOM_VALIDATION= 'disableEpisodeNumberCustomValidation';
+	const CUSTOM_DATA_ASPERA_HOST = 'asperaHost';
+	const CUSTOM_DATA_ASPERA_LOGIN = 'asperaLogin';
+	const CUSTOM_DATA_ASPERA_PASS = 'asperaPass';
+	const CUSTOM_DATA_ASPERA_PUBLIC_KEY = 'asperaPublicKey';
+	const CUSTOM_DATA_ASPERA_PRIVATE_KEY = 'asperaPrivateKey';
+	const CUSTOM_DATA_PORT = 'port';
+	const CUSTOM_DATA_PASSPHRASE = 'passphrase';
+	const CUSTOM_DATA_PROTOCOL = 'protocol';
 	
 	protected $maxLengthValidation= array (
 		HuluDistributionField::SERIES_TITLE => 96,
@@ -529,6 +537,14 @@ class HuluDistributionProfile extends ConfigurableDistributionProfile
 	public function getSeasonTuneInInformation()		{return $this->getFromCustomData(self::CUSTOM_DATA_SEASON_TUNE_IN_INFORMATION);}
 	public function getVideoMediaType()					{return $this->getFromCustomData(self::CUSTOM_DATA_VIDEO_MEDIA_TYPE);}
 	public function getDisableEpisodeNumberCustomValidation()	{return $this->getFromCustomData(self::CUSTOM_DATA_DISABLE_EPISODE_NUMBER_CUSTOM_VALIDATION);}
+	public function getAsperaHost()						{return $this->getFromCustomData(self::CUSTOM_DATA_ASPERA_HOST);}
+	public function getAsperaLogin()					{return $this->getFromCustomData(self::CUSTOM_DATA_ASPERA_LOGIN);}
+	public function getAsperaPass()						{return $this->getFromCustomData(self::CUSTOM_DATA_ASPERA_PASS);}
+	public function getAsperaPublicKey()				{return $this->getFromCustomData(self::CUSTOM_DATA_ASPERA_PUBLIC_KEY);}
+	public function getAsperaPrivateKey()				{return $this->getFromCustomData(self::CUSTOM_DATA_ASPERA_PRIVATE_KEY);}
+	public function getPort()							{return $this->getFromCustomData(self::CUSTOM_DATA_PORT);}
+	public function getPassphrase()						{return $this->getFromCustomData(self::CUSTOM_DATA_PASSPHRASE);}
+	public function getProtocol()						{return $this->getFromCustomData(self::CUSTOM_DATA_PROTOCOL);}
 	
 	public function setSftpHost($v)						{$this->putInCustomData(self::CUSTOM_DATA_SFTP_HOST, $v);}
 	public function setSftpLogin($v)					{$this->putInCustomData(self::CUSTOM_DATA_SFTP_LOGIN, $v);}
@@ -541,4 +557,12 @@ class HuluDistributionProfile extends ConfigurableDistributionProfile
 	public function setSeasonTuneInInformation ($v)		{$this->putInCustomData(self::CUSTOM_DATA_SEASON_TUNE_IN_INFORMATION, $v);}
 	public function setVideoMediaType ($v)				{$this->putInCustomData(self::CUSTOM_DATA_VIDEO_MEDIA_TYPE, $v);}
 	public function setDisableEpisodeNumberCustomValidation ($v)	{$this->putInCustomData(self::CUSTOM_DATA_DISABLE_EPISODE_NUMBER_CUSTOM_VALIDATION, $v);}
+	public function setAsperaHost($v)					{$this->putInCustomData(self::CUSTOM_DATA_ASPERA_HOST, $v);}
+	public function setAsperaLogin($v)					{$this->putInCustomData(self::CUSTOM_DATA_ASPERA_LOGIN, $v);}
+	public function setAsperaPass($v)					{$this->putInCustomData(self::CUSTOM_DATA_ASPERA_PASS, $v);}
+	public function setAsperaPublicKey($v)				{$this->putInCustomData(self::CUSTOM_DATA_ASPERA_PUBLIC_KEY, $v);}
+    public function setAsperaPrivateKey($v)				{$this->putInCustomData(self::CUSTOM_DATA_ASPERA_PRIVATE_KEY, $v);}
+	public function setPort($v)							{$this->putInCustomData(self::CUSTOM_DATA_PORT, $v);}
+ 	public function setPassphrase($v)				    {$this->putInCustomData(self::CUSTOM_DATA_PASSPHRASE, $v);}
+	public function setProtocol($v)						{$this->putInCustomData(self::CUSTOM_DATA_PROTOCOL, $v);}
 }

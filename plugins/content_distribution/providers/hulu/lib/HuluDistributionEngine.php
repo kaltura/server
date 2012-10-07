@@ -49,7 +49,7 @@ class HuluDistributionEngine extends DistributionEngine implements
 		$feed = new HuluFeedHelper('hulu_template.xml', $distributionProfile, $providerData);
 		$xml = $feed->getXml();
 		
-		$sftpManager = $this->getSFTPManager($distributionProfile);
+		$fileManager = $this->getFileTransferManager($distributionProfile);
 		
 		$videoFilePath = $providerData->videoAssetFilePath;
 		$thumbAssetFilePath = $providerData->thumbAssetFilePath;
@@ -63,12 +63,12 @@ class HuluDistributionEngine extends DistributionEngine implements
 		KalturaLog::info('$xmlSFTPPath:' . $xmlSFTPPath);
 		KalturaLog::info('XML:' . $xml);
 		
-		$sftpManager->putFile($videoSFTPPath, $videoFilePath);
+		$fileManager->putFile($videoSFTPPath, $videoFilePath);
 		
 		if($thumbAssetFilePath && file_exists($thumbAssetFilePath))
-			$sftpManager->putFile($thumbSFTPPath, $thumbAssetFilePath);
+			$fileManager->putFile($thumbSFTPPath, $thumbAssetFilePath);
 			
-		$sftpManager->filePutContents($xmlSFTPPath, $xml);
+		$fileManager->filePutContents($xmlSFTPPath, $xml);
 	}
 	
 	/* (non-PHPdoc)
@@ -81,16 +81,55 @@ class HuluDistributionEngine extends DistributionEngine implements
 	/**
 	 * 
 	 * @param KalturaHuluDistributionProfile $distributionProfile
-	 * @return sftpMgr
+	 * @return kFileTransferMgr
 	 */
-	protected function getSFTPManager(KalturaHuluDistributionProfile $distributionProfile)
+	protected function getFileTransferManager(KalturaHuluDistributionProfile $distributionProfile)
 	{
-		$serverUrl = $distributionProfile->sftpHost;
-		$loginName = $distributionProfile->sftpLogin;
-		$loginPass = $distributionProfile->sftpPass;
-		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP_CMD);
-		$sftpManager->login($serverUrl, $loginName, $loginPass);
-		return $sftpManager;
+		$port = $distributionProfile->port;
+		$protocol = $distributionProfile->protocol ?  $distributionProfile->protocol : KalturaDistributionProtocol::SFTP_CMD;
+		switch ($protocol){
+			case KalturaDistributionProtocol::ASPERA:
+				$host = $distributionProfile->asperaHost;
+				$username = $distributionProfile->asperaLogin;
+				$password = $distributionProfile->asperaPass;
+				$publicKey = $distributionProfile->asperaPublicKey;
+	        	$privateKey = $distributionProfile->asperaPrivateKey;
+	        	$passphrase = $distributionProfile->passphrase;
+				break;
+			case KalturaDistributionProtocol::SFTP_CMD:
+				$host = $distributionProfile->sftpHost;
+				$username = $distributionProfile->sftpLogin;
+				$password = $distributionProfile->sftpPass;
+				break;
+		}
+		$fileTransferManager = kFileTransferMgr::getInstance($protocol);
+        if (trim($privateKey))
+        {
+            $publicKeyTempPath = $this->tempFilePath . '/' . uniqid(null, true);
+            $privateKeyTempPath = $this->tempFilePath . '/' . uniqid(null, true);
+            try
+            {
+                file_put_contents($publicKeyTempPath, $publicKey);
+                file_put_contents($privateKeyTempPath, $privateKey);
+                $fileTransferManager->loginPubKey($host, $username, $publicKeyTempPath, $privateKeyTempPath, $passphrase, ($port) ? $port : null);
+                unlink($publicKeyTempPath);
+                unlink($privateKeyTempPath);
+            }
+            catch(Exception $ex)
+            {
+                if (file_exists($publicKeyTempPath))
+                    unlink($publicKeyTempPath);
+                if (file_exists($privateKeyTempPath))
+                    unlink($privateKeyTempPath);
+                throw $ex;
+            }
+        }
+        else
+        {
+            $fileTransferManager->login($host, $username, $password, ($port) ? $port : null);
+            KalturaLog::debug("here");
+        }
+		return $fileTransferManager;
 	}
 
 }

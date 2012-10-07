@@ -9,14 +9,27 @@ class Form_HuluProfileConfiguration extends Form_ConfigurableProfileConfiguratio
 	{
 		parent::init();
 		$this->setDescription('Hulu Distribution Profile');
+		$this->getView()->addBasePath(realpath(dirname(__FILE__)));
+		$this->addDecorator('ViewScript', array(
+			'viewScript' => 'hulu-distribution.phtml',
+			'placement' => 'APPEND'
+		));
 	}
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
+		$upload = new Zend_File_Transfer_Adapter_Http();
+        $files = $upload->getFileInfo();
 		
 		KalturaLog::debug(print_r($properties));
 		
+		if(isset($files['aspera_public_key']))
+        	$object->asperaPublicKey = $this->getFileContent($files['aspera_public_key']);
+        
+       	if(isset($files['aspera_private_key']))
+            $object->asperaPrivateKey = $this->getFileContent($files['aspera_private_key']);
+            
 		$additionalCategories = isset($properties['series_additional_categories']) && is_array($properties['itemXpathsToExtend']) ? $properties['series_additional_categories'] : array();
 		foreach($additionalCategories as &$val)
 		{
@@ -29,9 +42,19 @@ class Form_HuluProfileConfiguration extends Form_ConfigurableProfileConfiguratio
 		return $object;
 	}
 	
+	private function getFileContent(array $file){
+		if ($file['error'] === UPLOAD_ERR_OK){
+               return file_get_contents($file['tmp_name']);			
+		}
+        return null;
+	}
+	
 	public function populateFromObject($object, $add_underscore = true)
 	{
 		parent::populateFromObject($object, $add_underscore);
+		
+		$this->setDefault('aspera_public_key_readonly', $object->asperaPublicKey);
+		$this->setDefault('aspera_private_key_readonly', $object->asperaPrivateKey);
 		
 		$additionalCategories = array();
 		foreach($object->seriesAdditionalCategories as $category)
@@ -50,10 +73,32 @@ class Form_HuluProfileConfiguration extends Form_ConfigurableProfileConfiguratio
 		
 		$this->addElements(array($element));
 		
+		$this->addElement('select', 'protocol', array(
+			'label'			=> 'Protocol:',
+			'filters'		=> array('StringTrim'),
+			'multiOptions' 		=> array(
+				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SFTP_CMD => 'SFTP Command line',
+				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::ASPERA => 'ASPERA',
+			),
+			'required'		=> true,
+		));
+		
 		$this->addElement('text', 'sftp_host', array(
 			'label'			=> 'SFTP Host:',
 			'filters'		=> array('StringTrim'),
 			'default'		=> 'sftp.hulu.com'
+		));
+		
+		$this->addElement('text', 'aspera_host', array(
+			'label'			=> 'Aspera Host:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'port', array(
+			'label'			=> 'Port:',
+			'filters'		=> array('StringTrim'),
+			'value'			=> '22',
+			'required'		=> true,
 		));
 	
 		$this->addElement('text', 'sftp_login', array(
@@ -66,8 +111,42 @@ class Form_HuluProfileConfiguration extends Form_ConfigurableProfileConfiguratio
 			'filters'		=> array('StringTrim'),
 		));
 		
+		
+		$this->addElement('text', 'aspera_login', array(
+			'label'			=> 'Aspera Login:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'aspera_pass', array(
+			'label'			=> 'Aspera Password:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'passphrase', array(
+            'label'			=> 'Key Passphrase:',
+            'filters'		=> array('StringTrim'),
+        ));
+		
+		$this->addElement('file', 'aspera_public_key', array(
+			'label'			=> 'Public Key:',
+		));
+
+        $this->addElement('textarea', 'aspera_public_key_readonly', array(
+            'label'			=> 'Public Key:',
+            'readonly'      => true,
+        ));
+		
+		$this->addElement('file', 'aspera_private_key', array(
+			'label'			=> 'Private Key:',
+		));
+
+        $this->addElement('textarea', 'aspera_private_key_readonly', array(
+            'label'			=> 'Private Key:',
+            'readonly'      => true,
+        ));
+		
 		$this->addDisplayGroup(
-			array('sftp_host', 'sftp_login', 'sftp_pass'), 
+			array('protocol', 'sftp_host', 'port', 'sftp_login', 'sftp_pass', 'aspera_host', 'aspera_login', 'aspera_pass', 'passphrase', 'aspera_public_key','aspera_public_key_readonly','aspera_private_key','aspera_private_key_readonly'), 
 			'general', 
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);

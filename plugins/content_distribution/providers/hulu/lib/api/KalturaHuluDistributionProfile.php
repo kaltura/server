@@ -61,6 +61,45 @@ class KalturaHuluDistributionProfile extends KalturaConfigurableDistributionProf
 	 */
 	public $disableEpisodeNumberCustomValidation;
 	
+	/**
+	 * @var KalturaDistributionProtocol
+	 */
+	 public $protocol;
+	 
+	 /**
+	 * @var string
+	 */
+	public $asperaHost;
+	
+	/**
+	 * @var string
+	 */
+	public $asperaLogin;
+	
+	/**
+	 * @var string
+	 */
+	public $asperaPass;
+	 
+	 /**
+	 * @var int
+	 */
+	 public $port;
+	 
+	 /**
+     * @var string
+     */
+    public $passphrase;
+    
+    /**
+	 * @var string
+	 */
+	 public $asperaPublicKey;
+
+	/**
+	 * @var string
+	 */
+	 public $asperaPrivateKey;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -76,7 +115,15 @@ class KalturaHuluDistributionProfile extends KalturaConfigurableDistributionProf
 		'seasonSynopsis',
 		'seasonTuneInInformation',
 		'videoMediaType',
-		'disableEpisodeNumberCustomValidation'
+		'disableEpisodeNumberCustomValidation',
+		'asperaHost',
+		'asperaLogin',
+		'asperaPass',
+		'protocol',
+		'port',
+		'passphrase',
+		'asperaPublicKey',
+		'asperaPrivateKey',
 	);
 		 
 	public function getMapBetweenObjects()
