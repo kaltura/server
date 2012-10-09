@@ -84,6 +84,12 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			'filters'		=> array('StringTrim'),
 		));
 		
+		$this->addElement('text', 'sftp_port', array(
+			'label'			=> 'SFTP Port:',
+			'value'			=> '22',
+			'filters'		=> array('StringTrim'),
+		));
+
 		$this->addElement('text', 'sftp_login', array(
 			'label'			=> 'SFTP Login:',
 			'filters'		=> array('StringTrim'),
@@ -103,7 +109,7 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 		));
 		
 		$this->addDisplayGroup(
-			array('sftp_host', 'sftp_login', 'sftp_public_key', 'sftp_private_key', 'sftp_base_dir'), 
+			array('sftp_host', 'sftp_port', 'sftp_login', 'sftp_public_key', 'sftp_private_key', 'sftp_base_dir'),
 			'sftp', 
 			array('legend' => 'SFTP Configuration', 'decorators' => array('FormElements', 'Fieldset'))
 		);

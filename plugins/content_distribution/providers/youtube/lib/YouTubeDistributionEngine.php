@@ -15,6 +15,11 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	const TEMP_DIRECTORY = 'youtube_distribution';
 	const FEED_TEMPLATE = 'feed_template.xml';
 
+	/**
+	 * @var sftpMgr
+	 */
+	protected $_sftpManager;
+
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
@@ -46,7 +51,14 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
 
 		if ($statusXml === false) // no status yet
+		{
+			// try to get batch status xml to see if there is an internal error on youtube's batch
+			$batchStatus = $this->fetchBatchStatus($data, $data->distributionProfile, $data->providerData);
+			if ($batchStatus)
+				throw new Exception('Internal failure on YouTube, internal_failure-status.xml was found. Error ['.$batchStatus.']');
+
 			return false;
+		}
 			
 		$statusParser = new YouTubeDistributionStatusParser($statusXml);
 		$status = $statusParser->getStatusForCommand('Insert');
@@ -283,21 +295,47 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$statusFilePath = $providerData->sftpDirectory . '/' . 'status-' . $providerData->sftpMetadataFilename;
 		$sftpManager = $this->getSFTPManager($distributionProfile);
 		$statusXml = null;
-		try 
+		try
 		{
 			KalturaLog::info('Trying to get the following status file: ['.$statusFilePath.']');
 			$statusXml = $sftpManager->fileGetContents($statusFilePath);
 		}
 		catch(kFileTransferMgrException $ex) // file is still missing
 		{
+			KalturaLog::debug($ex);
 			KalturaLog::info('File doesn\'t exist yet, retry later');
 			return false;
 		}
-		
+
 		KalturaLog::info('Status file was found');
-		
+
 		$data->results = $statusXml;
 		return $statusXml;
+	}
+
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaYouTubeDistributionProfile $distributionProfile
+	 * @param KalturaYouTubeDistributionJobProviderData $providerData
+	 * @return string Status XML or FALSE when status is not available yet
+	 */
+	protected function fetchBatchStatus(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
+	{
+		$statusFilePath = $providerData->sftpDirectory . '/internal_failure-status.xml';
+		$sftpManager = $this->getSFTPManager($distributionProfile);
+		$statusXml = null;
+		try
+		{
+			KalturaLog::info('Trying to get the following status file: ['.$statusFilePath.']');
+			$statusXml = $sftpManager->fileGetContents($statusFilePath);
+			KalturaLog::info('Status file was found');
+			return $statusXml;
+		}
+		catch(kFileTransferMgrException $ex) // file is still missing
+		{
+			KalturaLog::info('File doesn\'t exist yet, so no internal failure was found till now');
+			return false;
+		}
 	}
 	
 	/**
@@ -307,13 +345,20 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	 */
 	protected function getSFTPManager(KalturaYouTubeDistributionProfile $distributionProfile)
 	{
+		if (!is_null($this->_sftpManager))
+			return $this->_sftpManager;
+
 		$serverUrl = $distributionProfile->sftpHost;
 		$loginName = $distributionProfile->sftpLogin;
 		$publicKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPublicKey, 'publickey');
 		$privateKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPrivateKey, 'privatekey');
+		$port = 22;
+		if ($distributionProfile->sftpPort)
+			$port = $distributionProfile->sftpPort;
 		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP_CMD);
-		$sftpManager->loginPubKey($serverUrl, $loginName, $publicKeyFile, $privateKeyFile);
-		return $sftpManager;
+		$sftpManager->loginPubKey($serverUrl, $loginName, $publicKeyFile, $privateKeyFile, null, $port);
+		$this->_sftpManager = $sftpManager;
+		return $this->_sftpManager;
 	}
 	
 	/*

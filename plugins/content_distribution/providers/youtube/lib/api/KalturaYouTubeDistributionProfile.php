@@ -19,6 +19,11 @@ class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionP
 	 * @var string
 	 */
 	public $sftpHost;
+
+	/**
+	 * @var int
+	 */
+	public $sftpPort;
 	
 	/**
 	 * 
@@ -126,6 +131,7 @@ class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionP
 		'username',
 		'notificationEmail',
 		'sftpHost',
+		'sftpPort',
 		'sftpLogin',
 		'sftpPublicKey',
 		'sftpPrivateKey',
