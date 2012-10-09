@@ -563,6 +563,11 @@ class Kaltura_Client_ClientBase
 		return count($this->callsQueue);	
 	}
 	
+    public function getMultiRequestResult()
+	{
+        return new Kaltura_Client_MultiRequestSubResult($this->getMultiRequestQueueSize() . ':result');
+	}	
+	
 	/**
 	 * @param string $msg
 	 */
