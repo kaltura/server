@@ -284,7 +284,7 @@ class myPartnerRegistration
 		return array($password, $loginData->getPasswordHashKey(), $kuser->getId());
 	}
 
-	public function initNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null, $ignorePassword = false, $templatePartnerId = null, $parentPartnerId = null  )
+	public function initNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null, $ignorePassword = false, $templatePartnerId = null)
 	{
 		// Validate input fields
 		if( $partner_name == "" )
