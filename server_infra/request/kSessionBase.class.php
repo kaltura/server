@@ -364,7 +364,10 @@ class kSessionBase
 				$this->$fieldMember = $fieldValue;
 				continue;
 			}
-			$privileges[] = "{$fieldName}:{$fieldValue}";
+			if ($fieldValue)
+				$privileges[] = "{$fieldName}:{$fieldValue}";
+			else 
+				$privileges[] = "{$fieldName}";
 		}
 		
 		$this->hash = bin2hex($hash);
@@ -372,6 +375,8 @@ class kSessionBase
 		$this->partner_id = $partnerId;
 		$this->rand = bin2hex($rand);
 		$this->privileges = implode(',', $privileges);
+		if ($this->privileges == 'all:*')
+			$this->privileges = '*';
 
 		return true;
 	}
