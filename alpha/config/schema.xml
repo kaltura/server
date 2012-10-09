@@ -507,7 +507,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="description" type="varchar" size="1024" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
-    	<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="deleted_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="priority" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="queue_time" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="finish_time" type="timestamp" />
@@ -516,7 +515,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="bulk_job_id" type="integer" default="null" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="root_job_id" type="integer" default="null" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parent_job_id" type="integer" default="null" />
-        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_index" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_scheduler_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_worker_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
@@ -579,7 +577,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_type" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="estimated_effort" type="bigint" default="null" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="execution_status" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="start_at" type="timestamp" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="priority" type="tinyint" />
@@ -647,12 +644,14 @@
 	</table>
      <table skipSql="false" abstract="false" name="partner_load" raiseEvents="false">
 		<column primaryKey="true" required="true" autoIncrement="false" lazyLoad="false" name="job_type" type="integer" />
+        <column primaryKey="true" required="false" autoIncrement="false" lazyLoad="false" name="job_sub_type" type="integer" default="0"/>
 		<column primaryKey="true" required="true" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_load" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="weighted_partner_load" type="integer" />
 		<index name="partner_index">
 			<index-column name="partner_id" />
 			<index-column name="job_type" />
+			<index-column name="job_sub_type" />
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="priority_group" raiseEvents="false">

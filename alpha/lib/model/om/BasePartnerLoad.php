@@ -26,6 +26,13 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 	protected $job_type;
 
 	/**
+	 * The value for the job_sub_type field.
+	 * Note: this column has a database default value of: 0
+	 * @var        int
+	 */
+	protected $job_sub_type;
+
+	/**
 	 * The value for the partner_id field.
 	 * @var        int
 	 */
@@ -89,6 +96,27 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or
+	 * equivalent initialization method).
+	 * @see        __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		$this->job_sub_type = 0;
+	}
+
+	/**
+	 * Initializes internal state of BasePartnerLoad object.
+	 * @see        applyDefaults()
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->applyDefaultValues();
+	}
+
+	/**
 	 * Get the [job_type] column value.
 	 * 
 	 * @return     int
@@ -96,6 +124,16 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 	public function getJobType()
 	{
 		return $this->job_type;
+	}
+
+	/**
+	 * Get the [job_sub_type] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getJobSubType()
+	{
+		return $this->job_sub_type;
 	}
 
 	/**
@@ -150,6 +188,29 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setJobType()
+
+	/**
+	 * Set the value of [job_sub_type] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     PartnerLoad The current object (for fluent API support)
+	 */
+	public function setJobSubType($v)
+	{
+		if(!isset($this->oldColumnsValues[PartnerLoadPeer::JOB_SUB_TYPE]))
+			$this->oldColumnsValues[PartnerLoadPeer::JOB_SUB_TYPE] = $this->job_sub_type;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->job_sub_type !== $v || $this->isNew()) {
+			$this->job_sub_type = $v;
+			$this->modifiedColumns[] = PartnerLoadPeer::JOB_SUB_TYPE;
+		}
+
+		return $this;
+	} // setJobSubType()
 
 	/**
 	 * Set the value of [partner_id] column.
@@ -230,6 +291,10 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
+			if ($this->job_sub_type !== 0) {
+				return false;
+			}
+
 		// otherwise, everything was equal, so return TRUE
 		return true;
 	} // hasOnlyDefaultValues()
@@ -253,9 +318,10 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 		try {
 
 			$this->job_type = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-			$this->partner_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-			$this->partner_load = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-			$this->weighted_partner_load = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+			$this->job_sub_type = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+			$this->partner_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+			$this->partner_load = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+			$this->weighted_partner_load = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -265,7 +331,7 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 4; // 4 = PartnerLoadPeer::NUM_COLUMNS - PartnerLoadPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 5; // 5 = PartnerLoadPeer::NUM_COLUMNS - PartnerLoadPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating PartnerLoad object", $e);
@@ -644,12 +710,15 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 				return $this->getJobType();
 				break;
 			case 1:
-				return $this->getPartnerId();
+				return $this->getJobSubType();
 				break;
 			case 2:
-				return $this->getPartnerLoad();
+				return $this->getPartnerId();
 				break;
 			case 3:
+				return $this->getPartnerLoad();
+				break;
+			case 4:
 				return $this->getWeightedPartnerLoad();
 				break;
 			default:
@@ -674,9 +743,10 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 		$keys = PartnerLoadPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getJobType(),
-			$keys[1] => $this->getPartnerId(),
-			$keys[2] => $this->getPartnerLoad(),
-			$keys[3] => $this->getWeightedPartnerLoad(),
+			$keys[1] => $this->getJobSubType(),
+			$keys[2] => $this->getPartnerId(),
+			$keys[3] => $this->getPartnerLoad(),
+			$keys[4] => $this->getWeightedPartnerLoad(),
 		);
 		return $result;
 	}
@@ -712,12 +782,15 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 				$this->setJobType($value);
 				break;
 			case 1:
-				$this->setPartnerId($value);
+				$this->setJobSubType($value);
 				break;
 			case 2:
-				$this->setPartnerLoad($value);
+				$this->setPartnerId($value);
 				break;
 			case 3:
+				$this->setPartnerLoad($value);
+				break;
+			case 4:
 				$this->setWeightedPartnerLoad($value);
 				break;
 		} // switch()
@@ -745,9 +818,10 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 		$keys = PartnerLoadPeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setJobType($arr[$keys[0]]);
-		if (array_key_exists($keys[1], $arr)) $this->setPartnerId($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setPartnerLoad($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setWeightedPartnerLoad($arr[$keys[3]]);
+		if (array_key_exists($keys[1], $arr)) $this->setJobSubType($arr[$keys[1]]);
+		if (array_key_exists($keys[2], $arr)) $this->setPartnerId($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setPartnerLoad($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setWeightedPartnerLoad($arr[$keys[4]]);
 	}
 
 	/**
@@ -760,6 +834,7 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 		$criteria = new Criteria(PartnerLoadPeer::DATABASE_NAME);
 
 		if ($this->isColumnModified(PartnerLoadPeer::JOB_TYPE)) $criteria->add(PartnerLoadPeer::JOB_TYPE, $this->job_type);
+		if ($this->isColumnModified(PartnerLoadPeer::JOB_SUB_TYPE)) $criteria->add(PartnerLoadPeer::JOB_SUB_TYPE, $this->job_sub_type);
 		if ($this->isColumnModified(PartnerLoadPeer::PARTNER_ID)) $criteria->add(PartnerLoadPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(PartnerLoadPeer::PARTNER_LOAD)) $criteria->add(PartnerLoadPeer::PARTNER_LOAD, $this->partner_load);
 		if ($this->isColumnModified(PartnerLoadPeer::WEIGHTED_PARTNER_LOAD)) $criteria->add(PartnerLoadPeer::WEIGHTED_PARTNER_LOAD, $this->weighted_partner_load);
@@ -780,6 +855,7 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 		$criteria = new Criteria(PartnerLoadPeer::DATABASE_NAME);
 
 		$criteria->add(PartnerLoadPeer::JOB_TYPE, $this->job_type);
+		$criteria->add(PartnerLoadPeer::JOB_SUB_TYPE, $this->job_sub_type);
 		$criteria->add(PartnerLoadPeer::PARTNER_ID, $this->partner_id);
 
 		return $criteria;
@@ -796,7 +872,9 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 
 		$pks[0] = $this->getJobType();
 
-		$pks[1] = $this->getPartnerId();
+		$pks[1] = $this->getJobSubType();
+
+		$pks[2] = $this->getPartnerId();
 
 		return $pks;
 	}
@@ -812,7 +890,9 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 
 		$this->setJobType($keys[0]);
 
-		$this->setPartnerId($keys[1]);
+		$this->setJobSubType($keys[1]);
+
+		$this->setPartnerId($keys[2]);
 
 	}
 
@@ -830,6 +910,8 @@ abstract class BasePartnerLoad extends BaseObject  implements Persistent {
 	{
 
 		$copyObj->setJobType($this->job_type);
+
+		$copyObj->setJobSubType($this->job_sub_type);
 
 		$copyObj->setPartnerId($this->partner_id);
 

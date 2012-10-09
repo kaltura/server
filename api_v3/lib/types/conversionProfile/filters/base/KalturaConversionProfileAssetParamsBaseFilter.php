@@ -18,8 +18,6 @@ abstract class KalturaConversionProfileAssetParamsBaseFilter extends KalturaFilt
 		"originIn" => "_in_origin",
 		"systemNameEqual" => "_eq_system_name",
 		"systemNameIn" => "_in_system_name",
-		"priorityEqual" => "_eq_priority",
-		"priorityIn" => "_in_priority",
 	);
 
 	static private $order_by_map = array
@@ -85,14 +83,4 @@ abstract class KalturaConversionProfileAssetParamsBaseFilter extends KalturaFilt
 	 * @var string
 	 */
 	public $systemNameIn;
-
-	/**
-	 * @var int
-	 */
-	public $priorityEqual;
-
-	/**
-	 * @var string
-	 */
-	public $priorityIn;
 }

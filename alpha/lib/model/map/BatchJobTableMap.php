@@ -51,7 +51,6 @@ class BatchJobTableMap extends TableMap {
 		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', false, 1024, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('DELETED_AT', 'DeletedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('PRIORITY', 'Priority', 'TINYINT', false, null, null);
 		$this->addColumn('QUEUE_TIME', 'QueueTime', 'TIMESTAMP', false, null, null);
 		$this->addColumn('FINISH_TIME', 'FinishTime', 'TIMESTAMP', false, null, null);
@@ -60,7 +59,6 @@ class BatchJobTableMap extends TableMap {
 		$this->addColumn('BULK_JOB_ID', 'BulkJobId', 'INTEGER', false, null, null);
 		$this->addColumn('ROOT_JOB_ID', 'RootJobId', 'INTEGER', false, null, null);
 		$this->addColumn('PARENT_JOB_ID', 'ParentJobId', 'INTEGER', false, null, null);
-		$this->addColumn('BATCH_INDEX', 'BatchIndex', 'INTEGER', false, null, null);
 		$this->addColumn('LAST_SCHEDULER_ID', 'LastSchedulerId', 'INTEGER', false, null, null);
 		$this->addColumn('LAST_WORKER_ID', 'LastWorkerId', 'INTEGER', false, null, null);
 		$this->addColumn('DC', 'Dc', 'INTEGER', false, null, null);

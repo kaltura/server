@@ -87,7 +87,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('MetadataConditionType');
+			return array('MetadataConditionType', 'MetadataBatchJobObjectType');
 	
 		if($baseEnumName == 'ConditionType')
 			return array('MetadataConditionType');

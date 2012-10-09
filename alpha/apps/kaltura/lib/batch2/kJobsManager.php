@@ -80,7 +80,7 @@ class kJobsManager
 		// if not currently locked
 		$dbBatchJobLock = $dbBatchJob->getBatchJobLock();
 		
-		if(($dbBatchJobLock) && (!$dbBatchJobLock->getSchedulerId()))
+		if(!$dbBatchJobLock || !$dbBatchJobLock->getSchedulerId())
 		{
 			$dbBatchJob = self::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_ABORTED);
 		}
@@ -132,6 +132,7 @@ class kJobsManager
 		} elseif (!$dbBatchJobLock->getSchedulerId()) {
 			
 			// retry of non-scheduled entry
+			$dbBatchJobLock->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
 			$dbBatchJobLock->setExecutionAttempts(0);
 			$dbBatchJob->save();
 			
@@ -180,8 +181,6 @@ class kJobsManager
 			$batchJob->setPartnerId($partnerId);
 		}
 		
-		$batchJob->setObjectId($entryId);
-		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
 		return self::addJob($batchJob, $jobData, BatchJobType::MAIL, $mailType);
 	}
 	
@@ -508,6 +507,7 @@ class kJobsManager
 		$convertData->setMediaInfoId($mediaInfoId);
 		$convertData->setFlavorParamsOutputId($flavor->getId());
 		$convertData->setFlavorAssetId($flavorAssetId);
+		$convertData->setConversionProfileId($conversionProfileId);
 		
 		KalturaLog::log("Conversion engines string: '" . $flavor->getConversionEngines() . "'");
 		
@@ -616,21 +616,19 @@ class kJobsManager
 			$dbConvertFlavorJob->setPartnerId($flavor->getPartnerId());
 			$dbConvertFlavorJob->setJobType(BatchJobType::CONVERT);
 			$dbConvertFlavorJob->setJobSubType($dbCurrentConversionEngine);
-			$dbConvertFlavorJob->save();
 			KalturaLog::log("Created from flavor convert job with entry id [" . $dbConvertFlavorJob->getEntryId() . "]");
 		}
 		
 		$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
-		$estimatedEffort = kFile::fileSize($convertData->getSrcFileSyncLocalPath());
-		if($mediaInfo !== NULL) 
+		if($mediaInfo === NULL) {
+			// in case we don't know the estimatted info, we will set it to a big number.
+			$estimatedEffort = kJobData::MAX_ESTIMATED_EFFORT; 
+		} else {
 			$estimatedEffort = max($mediaInfo->getVideoDuration(),$mediaInfo->getAudioDuration(),$mediaInfo->getContainerDuration());
+		}
 		
 		$dbConvertFlavorJob->setObjectId($flavorAssetId);
 		$dbConvertFlavorJob->setObjectType(BatchJobObjectType::ASSET);
-		$lockInfo = new kLockInfoData($dbConvertFlavorJob);
-		$lockInfo->fillLockInfo($flavor, $conversionProfileId, $dbConvertFlavorJob, $estimatedEffort);
-		
-		$dbConvertFlavorJob->setLockInfo($lockInfo);
 		
 		if($conversionProfileId !== NULL) {
 			$fpcp = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorAsset->getFlavorParamsId(), $conversionProfileId);
@@ -1378,8 +1376,6 @@ class kJobsManager
 			$batchJob->setPartnerId($partnerId);
 		}
 			
-		$batchJob->setObjectId($entryId); 
-		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
 		$batchJob = self::addJob($batchJob, $jobData, BatchJobType::NOTIFICATION, $notificationType);
 		
 		if($sendType == kNotificationJobData::NOTIFICATION_MGR_NO_SEND || $sendType == kNotificationJobData::NOTIFICATION_MGR_SEND_SYNCH)
@@ -1401,6 +1397,11 @@ class kJobsManager
 		$batchJob->setJobType($type);
 		$batchJob->setJobSubType($subType);
 		$batchJob->setData($data);
+		
+		$lockInfo = new kLockInfoData($batchJob);
+		$lockInfo->setEstimatedEffort($data->calculateEstimatedEffort($batchJob));
+		$lockInfo->setUrgency($data->calculateUrgency($batchJob));
+		$batchJob->setLockInfo($lockInfo);
 		
 		if(!$batchJob->getParentJobId() && $batchJob->getEntryId())
 		{

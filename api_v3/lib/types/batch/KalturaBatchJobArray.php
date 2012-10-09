@@ -29,7 +29,7 @@ class KalturaBatchJobArray extends KalturaTypedArray
 			foreach ( $arr as $obj )
 			{
 				$nObj = new KalturaBatchJob();
-				$nObj->fromObject($obj);
+				$nObj->fromBatchJob($obj);
 				$newArr[] = $nObj;
 			}
 		}

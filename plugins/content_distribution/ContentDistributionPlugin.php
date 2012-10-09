@@ -91,7 +91,7 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('ContentDistributionBatchJobType', 'ContentDistributionFileSyncObjectType');
+			return array('ContentDistributionBatchJobType', 'ContentDistributionFileSyncObjectType', 'ContentDistributionBatchJobObjectType');
 	
 		if($baseEnumName == 'BatchJobType')
 			return array('ContentDistributionBatchJobType');

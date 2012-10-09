@@ -942,13 +942,11 @@
 						<th><?php echo $this->translate('entry-investigate history msg th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history info th'); ?></th>
 						<th title="<?php echo $this->translate('entry-investigate history create time tooltip'); ?>"><?php echo $this->translate('entry-investigate history create time th'); ?></th>
-						<th><?php echo $this->translate('entry-investigate history delete time th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history priority th'); ?></th>
 						<th title="<?php echo $this->translate('entry-investigate history start time tooltip'); ?>"><?php echo $this->translate('entry-investigate history start time th'); ?></th>
 						<th title="<?php echo $this->translate('entry-investigate history end time tooltip'); ?>"><?php echo $this->translate('entry-investigate history end time th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history scheduler th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history worker th'); ?></th>
-						<th><?php echo $this->translate('entry-investigate history batch index th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history expire th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history lock version th'); ?></th>
 						<th title="<?php echo $this->translate('entry-investigate history attempts tooltip'); ?>"><?php echo $this->translate('entry-investigate history attempts th'); ?></th>
@@ -989,9 +987,6 @@
 										
 										$status = $this->enumTranslate('Kaltura_Client_Enum_BatchJobStatus', $job->status);
 										echo "<font color=\"$color\">$status</font>";
-										
-										if($job->deletedAt)
-											echo ' (<font color="red">' . $this->translate('DELETED') . '</font>)';
 									?>
 								</td>
 								<td><?php echo $job->abort; ?></td>
@@ -999,13 +994,11 @@
 								<td><?php echo htmlspecialchars($job->message); ?></td>
 								<td><?php echo nl2br(htmlspecialchars(trim($job->description))); ?></td>
 								<td><?php echo date($this->translate('time format'), $job->createdAt); ?></td>
-								<td><?php echo ($job->deletedAt ? date($this->translate('time format'), $job->deletedAt) : ''); ?></td>
 								<td><?php echo $job->priority; ?></td>
 								<td><?php echo date($this->translate('time format'), $job->queueTime); ?></td>
 								<td><?php echo date($this->translate('time format'), $job->finishTime); ?></td>
 								<td><?php echo $job->schedulerId; ?></td>
 								<td><?php echo $job->workerId; ?></td>
-								<td><?php echo $job->batchIndex; ?></td>
 								<td><?php echo $job->lockExpiration; ?></td>
 								<td><?php echo $job->lockVersion; ?></td>
 								<td><?php echo $job->executionAttempts; ?></td>
@@ -1045,7 +1038,7 @@
 										<tbody>
 											<?php foreach($job->history as $historyRecord): ?>
 												<tr>
-													<td><?php echo $historyRecord->timeStamp; ?></td>
+													<td><?php echo date($this->translate('time format'), $historyRecord->timeStamp); ?></td>
 													<td><?php echo $historyRecord->schedulerId; ?></td>
 													<td><?php echo $historyRecord->workerId; ?></td>
 													<td><?php echo $historyRecord->batchIndex; ?></td>

@@ -26,7 +26,7 @@ abstract class BaseBatchJobPeer {
 	const TM_CLASS = 'BatchJobTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 30;
+	const NUM_COLUMNS = 28;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -73,9 +73,6 @@ abstract class BaseBatchJobPeer {
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'batch_job_sep.UPDATED_AT';
 
-	/** the column name for the DELETED_AT field */
-	const DELETED_AT = 'batch_job_sep.DELETED_AT';
-
 	/** the column name for the PRIORITY field */
 	const PRIORITY = 'batch_job_sep.PRIORITY';
 
@@ -99,9 +96,6 @@ abstract class BaseBatchJobPeer {
 
 	/** the column name for the PARENT_JOB_ID field */
 	const PARENT_JOB_ID = 'batch_job_sep.PARENT_JOB_ID';
-
-	/** the column name for the BATCH_INDEX field */
-	const BATCH_INDEX = 'batch_job_sep.BATCH_INDEX';
 
 	/** the column name for the LAST_SCHEDULER_ID field */
 	const LAST_SCHEDULER_ID = 'batch_job_sep.LAST_SCHEDULER_ID';
@@ -137,11 +131,11 @@ abstract class BaseBatchJobPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'JobType', 'JobSubType', 'ObjectId', 'ObjectType', 'Data', 'History', 'LockInfo', 'Status', 'ExecutionStatus', 'Message', 'Description', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'Priority', 'QueueTime', 'FinishTime', 'EntryId', 'PartnerId', 'BulkJobId', 'RootJobId', 'ParentJobId', 'BatchIndex', 'LastSchedulerId', 'LastWorkerId', 'Dc', 'ErrType', 'ErrNumber', 'BatchJobLockId', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'jobType', 'jobSubType', 'objectId', 'objectType', 'data', 'history', 'lockInfo', 'status', 'executionStatus', 'message', 'description', 'createdAt', 'updatedAt', 'deletedAt', 'priority', 'queueTime', 'finishTime', 'entryId', 'partnerId', 'bulkJobId', 'rootJobId', 'parentJobId', 'batchIndex', 'lastSchedulerId', 'lastWorkerId', 'dc', 'errType', 'errNumber', 'batchJobLockId', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::JOB_TYPE, self::JOB_SUB_TYPE, self::OBJECT_ID, self::OBJECT_TYPE, self::DATA, self::HISTORY, self::LOCK_INFO, self::STATUS, self::EXECUTION_STATUS, self::MESSAGE, self::DESCRIPTION, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::PRIORITY, self::QUEUE_TIME, self::FINISH_TIME, self::ENTRY_ID, self::PARTNER_ID, self::BULK_JOB_ID, self::ROOT_JOB_ID, self::PARENT_JOB_ID, self::BATCH_INDEX, self::LAST_SCHEDULER_ID, self::LAST_WORKER_ID, self::DC, self::ERR_TYPE, self::ERR_NUMBER, self::BATCH_JOB_LOCK_ID, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'job_type', 'job_sub_type', 'object_id', 'object_type', 'data', 'history', 'lock_info', 'status', 'execution_status', 'message', 'description', 'created_at', 'updated_at', 'deleted_at', 'priority', 'queue_time', 'finish_time', 'entry_id', 'partner_id', 'bulk_job_id', 'root_job_id', 'parent_job_id', 'batch_index', 'last_scheduler_id', 'last_worker_id', 'dc', 'err_type', 'err_number', 'batch_job_lock_id', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'JobType', 'JobSubType', 'ObjectId', 'ObjectType', 'Data', 'History', 'LockInfo', 'Status', 'ExecutionStatus', 'Message', 'Description', 'CreatedAt', 'UpdatedAt', 'Priority', 'QueueTime', 'FinishTime', 'EntryId', 'PartnerId', 'BulkJobId', 'RootJobId', 'ParentJobId', 'LastSchedulerId', 'LastWorkerId', 'Dc', 'ErrType', 'ErrNumber', 'BatchJobLockId', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'jobType', 'jobSubType', 'objectId', 'objectType', 'data', 'history', 'lockInfo', 'status', 'executionStatus', 'message', 'description', 'createdAt', 'updatedAt', 'priority', 'queueTime', 'finishTime', 'entryId', 'partnerId', 'bulkJobId', 'rootJobId', 'parentJobId', 'lastSchedulerId', 'lastWorkerId', 'dc', 'errType', 'errNumber', 'batchJobLockId', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::JOB_TYPE, self::JOB_SUB_TYPE, self::OBJECT_ID, self::OBJECT_TYPE, self::DATA, self::HISTORY, self::LOCK_INFO, self::STATUS, self::EXECUTION_STATUS, self::MESSAGE, self::DESCRIPTION, self::CREATED_AT, self::UPDATED_AT, self::PRIORITY, self::QUEUE_TIME, self::FINISH_TIME, self::ENTRY_ID, self::PARTNER_ID, self::BULK_JOB_ID, self::ROOT_JOB_ID, self::PARENT_JOB_ID, self::LAST_SCHEDULER_ID, self::LAST_WORKER_ID, self::DC, self::ERR_TYPE, self::ERR_NUMBER, self::BATCH_JOB_LOCK_ID, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'job_type', 'job_sub_type', 'object_id', 'object_type', 'data', 'history', 'lock_info', 'status', 'execution_status', 'message', 'description', 'created_at', 'updated_at', 'priority', 'queue_time', 'finish_time', 'entry_id', 'partner_id', 'bulk_job_id', 'root_job_id', 'parent_job_id', 'last_scheduler_id', 'last_worker_id', 'dc', 'err_type', 'err_number', 'batch_job_lock_id', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, )
 	);
 
 	/**
@@ -151,11 +145,11 @@ abstract class BaseBatchJobPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'JobType' => 1, 'JobSubType' => 2, 'ObjectId' => 3, 'ObjectType' => 4, 'Data' => 5, 'History' => 6, 'LockInfo' => 7, 'Status' => 8, 'ExecutionStatus' => 9, 'Message' => 10, 'Description' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, 'DeletedAt' => 14, 'Priority' => 15, 'QueueTime' => 16, 'FinishTime' => 17, 'EntryId' => 18, 'PartnerId' => 19, 'BulkJobId' => 20, 'RootJobId' => 21, 'ParentJobId' => 22, 'BatchIndex' => 23, 'LastSchedulerId' => 24, 'LastWorkerId' => 25, 'Dc' => 26, 'ErrType' => 27, 'ErrNumber' => 28, 'BatchJobLockId' => 29, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'jobType' => 1, 'jobSubType' => 2, 'objectId' => 3, 'objectType' => 4, 'data' => 5, 'history' => 6, 'lockInfo' => 7, 'status' => 8, 'executionStatus' => 9, 'message' => 10, 'description' => 11, 'createdAt' => 12, 'updatedAt' => 13, 'deletedAt' => 14, 'priority' => 15, 'queueTime' => 16, 'finishTime' => 17, 'entryId' => 18, 'partnerId' => 19, 'bulkJobId' => 20, 'rootJobId' => 21, 'parentJobId' => 22, 'batchIndex' => 23, 'lastSchedulerId' => 24, 'lastWorkerId' => 25, 'dc' => 26, 'errType' => 27, 'errNumber' => 28, 'batchJobLockId' => 29, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::JOB_TYPE => 1, self::JOB_SUB_TYPE => 2, self::OBJECT_ID => 3, self::OBJECT_TYPE => 4, self::DATA => 5, self::HISTORY => 6, self::LOCK_INFO => 7, self::STATUS => 8, self::EXECUTION_STATUS => 9, self::MESSAGE => 10, self::DESCRIPTION => 11, self::CREATED_AT => 12, self::UPDATED_AT => 13, self::DELETED_AT => 14, self::PRIORITY => 15, self::QUEUE_TIME => 16, self::FINISH_TIME => 17, self::ENTRY_ID => 18, self::PARTNER_ID => 19, self::BULK_JOB_ID => 20, self::ROOT_JOB_ID => 21, self::PARENT_JOB_ID => 22, self::BATCH_INDEX => 23, self::LAST_SCHEDULER_ID => 24, self::LAST_WORKER_ID => 25, self::DC => 26, self::ERR_TYPE => 27, self::ERR_NUMBER => 28, self::BATCH_JOB_LOCK_ID => 29, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'job_type' => 1, 'job_sub_type' => 2, 'object_id' => 3, 'object_type' => 4, 'data' => 5, 'history' => 6, 'lock_info' => 7, 'status' => 8, 'execution_status' => 9, 'message' => 10, 'description' => 11, 'created_at' => 12, 'updated_at' => 13, 'deleted_at' => 14, 'priority' => 15, 'queue_time' => 16, 'finish_time' => 17, 'entry_id' => 18, 'partner_id' => 19, 'bulk_job_id' => 20, 'root_job_id' => 21, 'parent_job_id' => 22, 'batch_index' => 23, 'last_scheduler_id' => 24, 'last_worker_id' => 25, 'dc' => 26, 'err_type' => 27, 'err_number' => 28, 'batch_job_lock_id' => 29, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'JobType' => 1, 'JobSubType' => 2, 'ObjectId' => 3, 'ObjectType' => 4, 'Data' => 5, 'History' => 6, 'LockInfo' => 7, 'Status' => 8, 'ExecutionStatus' => 9, 'Message' => 10, 'Description' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, 'Priority' => 14, 'QueueTime' => 15, 'FinishTime' => 16, 'EntryId' => 17, 'PartnerId' => 18, 'BulkJobId' => 19, 'RootJobId' => 20, 'ParentJobId' => 21, 'LastSchedulerId' => 22, 'LastWorkerId' => 23, 'Dc' => 24, 'ErrType' => 25, 'ErrNumber' => 26, 'BatchJobLockId' => 27, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'jobType' => 1, 'jobSubType' => 2, 'objectId' => 3, 'objectType' => 4, 'data' => 5, 'history' => 6, 'lockInfo' => 7, 'status' => 8, 'executionStatus' => 9, 'message' => 10, 'description' => 11, 'createdAt' => 12, 'updatedAt' => 13, 'priority' => 14, 'queueTime' => 15, 'finishTime' => 16, 'entryId' => 17, 'partnerId' => 18, 'bulkJobId' => 19, 'rootJobId' => 20, 'parentJobId' => 21, 'lastSchedulerId' => 22, 'lastWorkerId' => 23, 'dc' => 24, 'errType' => 25, 'errNumber' => 26, 'batchJobLockId' => 27, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::JOB_TYPE => 1, self::JOB_SUB_TYPE => 2, self::OBJECT_ID => 3, self::OBJECT_TYPE => 4, self::DATA => 5, self::HISTORY => 6, self::LOCK_INFO => 7, self::STATUS => 8, self::EXECUTION_STATUS => 9, self::MESSAGE => 10, self::DESCRIPTION => 11, self::CREATED_AT => 12, self::UPDATED_AT => 13, self::PRIORITY => 14, self::QUEUE_TIME => 15, self::FINISH_TIME => 16, self::ENTRY_ID => 17, self::PARTNER_ID => 18, self::BULK_JOB_ID => 19, self::ROOT_JOB_ID => 20, self::PARENT_JOB_ID => 21, self::LAST_SCHEDULER_ID => 22, self::LAST_WORKER_ID => 23, self::DC => 24, self::ERR_TYPE => 25, self::ERR_NUMBER => 26, self::BATCH_JOB_LOCK_ID => 27, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'job_type' => 1, 'job_sub_type' => 2, 'object_id' => 3, 'object_type' => 4, 'data' => 5, 'history' => 6, 'lock_info' => 7, 'status' => 8, 'execution_status' => 9, 'message' => 10, 'description' => 11, 'created_at' => 12, 'updated_at' => 13, 'priority' => 14, 'queue_time' => 15, 'finish_time' => 16, 'entry_id' => 17, 'partner_id' => 18, 'bulk_job_id' => 19, 'root_job_id' => 20, 'parent_job_id' => 21, 'last_scheduler_id' => 22, 'last_worker_id' => 23, 'dc' => 24, 'err_type' => 25, 'err_number' => 26, 'batch_job_lock_id' => 27, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, )
 	);
 
 	/**
@@ -239,7 +233,6 @@ abstract class BaseBatchJobPeer {
 		$criteria->addSelectColumn(BatchJobPeer::DESCRIPTION);
 		$criteria->addSelectColumn(BatchJobPeer::CREATED_AT);
 		$criteria->addSelectColumn(BatchJobPeer::UPDATED_AT);
-		$criteria->addSelectColumn(BatchJobPeer::DELETED_AT);
 		$criteria->addSelectColumn(BatchJobPeer::PRIORITY);
 		$criteria->addSelectColumn(BatchJobPeer::QUEUE_TIME);
 		$criteria->addSelectColumn(BatchJobPeer::FINISH_TIME);
@@ -248,7 +241,6 @@ abstract class BaseBatchJobPeer {
 		$criteria->addSelectColumn(BatchJobPeer::BULK_JOB_ID);
 		$criteria->addSelectColumn(BatchJobPeer::ROOT_JOB_ID);
 		$criteria->addSelectColumn(BatchJobPeer::PARENT_JOB_ID);
-		$criteria->addSelectColumn(BatchJobPeer::BATCH_INDEX);
 		$criteria->addSelectColumn(BatchJobPeer::LAST_SCHEDULER_ID);
 		$criteria->addSelectColumn(BatchJobPeer::LAST_WORKER_ID);
 		$criteria->addSelectColumn(BatchJobPeer::DC);

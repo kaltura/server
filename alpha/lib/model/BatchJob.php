@@ -162,11 +162,13 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	
 	public function preUpdate(PropelPDO $con = null) {
 		
+		if(!$this->alreadyInSave)
+			BatchJobPeer::preBatchJobUpdate($this);
+		
 		if(BatchJobLockPeer::shouldUpdateLockObject($this, $con)) {
 			BatchJobLockPeer::updateLockObject($this, $con);
 		}
 	
-		BatchJobPeer::postBatchJobUpdate($this);
 		return parent::preUpdate($con);
 	}
 	
@@ -189,7 +191,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	}
 	
 	public function postUpdate(PropelPDO $con = null) {
-		if(BatchJobLockPeer::shouldCreateLockObject($this,false, $con)) {
+		if(!$this->alreadyInSave && BatchJobLockPeer::shouldCreateLockObject($this,false, $con)) {
 			$batchJobLock = BatchJobLockPeer::createLockObject($this);
 			$this->setBatchJobLock($batchJobLock);
 			parent::save($con);
@@ -391,6 +393,8 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	
 	
 	/**
+	 * The type and the sub-type are constant in the batch job, therefore they must be proveided
+	 * when a new batch job is generated.
 	 * @return BatchJob
 	 */
 	public function createChild( $type, $subType = null, $same_root = true, $dc = null)
@@ -478,6 +482,11 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		return null;
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @param kLockInfoData
+	 * @see BaseBatchJob::setLockInfo()
+	 */
 	public function setLockInfo($v) {
 		if (! is_null ( $v )) 
 			parent::setLockInfo ( serialize ( $v ) );
@@ -486,7 +495,9 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	}
 	
 	/**
-	 * @return array
+	 * (non-PHPdoc)
+	 * @see BaseBatchJob::getHistory()
+	 * @return KalturaBatchHistoryDataArray
 	 */
 	public function getHistory()
 	{
@@ -496,6 +507,11 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		return null;
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @param KalturaBatchHistoryDataArray
+	 * @see BaseBatchJob::setHistory()
+	 */
 	public function setHistory($v) {
 		if (! is_null ( $v ))
 			parent::setHistory ( serialize ( $v ) );
@@ -503,7 +519,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 			parent::setHistory ( null );
 	}
 	
-	public function addHistoryRecord($v) {
+	public function addHistoryRecord(kBatchHistoryData $v) {
 		$historyArr = $this->getHistory();
 		if($historyArr === null)
 			$historyArr = array();
@@ -519,24 +535,11 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		$this->useNewRoot = $useNewRoot;
 	}
 	
-	public function setObjectType($v) {
-		$objectType = kPluginableEnumsManager::apiToCore('BatchJobObjectType', $v);
-		parent::setObjectType($objectType);
-	}
-	
 	/**
-	 * Get the [object_type] column value.
-	 * 
-	 * @return     int
+	 * The function fills the batch job log to contain all the information the
+	 * current batch job contains in it.
 	 */
-	public function getObjectType()
-	{
-		$objectType = parent::getObjectType();
-		return kPluginableEnumsManager::coreToApi('BatchJobObjectType', $objectType);
-	} 
-	
-	
-	public function copyInto($copyObj, $deepCopy = false)
+	public function copyIntoBatchLog(BatchJobLog $copyObj)
 	{
 		// Batch Job Fields
 		$copyObj->setJobType($this->job_type);

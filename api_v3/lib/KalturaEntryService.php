@@ -6,8 +6,6 @@
 class KalturaEntryService extends KalturaBaseService 
 {
 	
-	const NOTIFICATION_TYPE_ENTRY_REPORT = 8;
-	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::globalPartnerAllowed()
 	 */
@@ -1427,7 +1425,7 @@ class KalturaEntryService extends KalturaBaseService
 		$oldModerationObj->setObjectId( $dbEntry->getId() );
 		$oldModerationObj->setObjectType( moderation::MODERATION_OBJECT_TYPE_ENTRY );
 		$oldModerationObj->setReportCode( "" );
-		myNotificationMgr::createNotification( NOTIFICATION_TYPE_ENTRY_REPORT, $oldModerationObj ,$dbEntry->getPartnerId());
+		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_REPORT, $oldModerationObj ,$dbEntry->getPartnerId());
 				
 		return $moderationFlag;
 	}

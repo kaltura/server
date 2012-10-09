@@ -531,7 +531,6 @@ CREATE TABLE `batch_job_sep`
 	`description` VARCHAR(1024),
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
-	`deleted_at` DATETIME,
 	`priority` TINYINT,
 	`queue_time` DATETIME,
 	`finish_time` DATETIME,
@@ -540,7 +539,6 @@ CREATE TABLE `batch_job_sep`
 	`bulk_job_id` INTEGER,
 	`root_job_id` INTEGER,
 	`parent_job_id` INTEGER,
-	`batch_index` INTEGER,
 	`last_scheduler_id` INTEGER,
 	`last_worker_id` INTEGER,
 	`dc` INTEGER,
@@ -581,7 +579,6 @@ CREATE TABLE `batch_job_lock`
 	`object_type` INTEGER,
 	`estimated_effort` BIGINT,
 	`status` INTEGER,
-	`execution_status` INTEGER,
 	`start_at` DATETIME,
 	`created_at` DATETIME,
 	`priority` TINYINT,
@@ -624,11 +621,12 @@ DROP TABLE IF EXISTS `partner_load`;
 CREATE TABLE `partner_load`
 (
 	`job_type` INTEGER  NOT NULL,
+	`job_sub_type` INTEGER default 0 NOT NULL,
 	`partner_id` INTEGER  NOT NULL,
 	`partner_load` INTEGER,
 	`weighted_partner_load` INTEGER,
-	PRIMARY KEY (`job_type`,`partner_id`),
-	KEY `partner_index`(`partner_id`, `job_type`)
+	PRIMARY KEY (`job_type`,`job_sub_type`,`partner_id`),
+	KEY `partner_index`(`partner_id`, `job_type`, `job_sub_type`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------

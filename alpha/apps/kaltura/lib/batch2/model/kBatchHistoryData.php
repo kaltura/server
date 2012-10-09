@@ -48,21 +48,82 @@ class kBatchHistoryData
 	protected $errNumber;
 	
 	public function __construct() {
-		$this->timeStamp = time();
+		$this->timeStamp = date('Y-m-d H:i:s');
 	}	
 	
 	/**
-	 * @return the $timeStamp
+	 * Sets the value of [timestamp] column to a normalized version of the date/time value specified.
+	 * 
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
 	 */
-	public function getTimeStamp() {
-		return date('Y-m-d H:i:s', $this->timeStamp);
-	}
+	public function setTimeStamp($v)
+	{
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
 
-	/**
-	 * @param string $timeStamp
-	 */
-	public function setTimeStamp($v) {
-		$this->timeStamp = $v;
+		if ( $this->timeStamp !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->timeStamp !== null && $tmpDt = new DateTime($this->timeStamp)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->timeStamp = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+			}
+		} // if either are not null
+
+	} 
+	
+	public function getTimeStamp($format = 'Y-m-d H:i:s')
+	{
+		
+		if ($this->timeStamp === null) {
+			return null;
+		}
+	
+		if ($this->timeStamp === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->timeStamp);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->timeStamp, true), $x);
+			}
+		}
+	
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
 	}
 
 	/**

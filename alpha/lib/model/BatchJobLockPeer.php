@@ -23,6 +23,10 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 	const COUNT = 'COUNT(batch_job_lock.ID)';
 	
 	
+	/**
+	 * This function returns a list of all job statuses that still require scheduling
+	 * and therefore a lock object should appear for them in the lock table.
+	 */
 	public static function getSchedulingRequiredStatusList()
 	{
 		return array(
@@ -51,6 +55,13 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		return kConf::get('default_job_execution_attempt');
 	}
 	
+	/**
+	 * This function returns the 'Rate between schedulers' from the configuration files.
+	 * This value is a number in range [0-100] that represents the percentage of the 
+	 * Through-put schedulers when we come to choose a scheduler.
+	 * f.i. if the value is 60 then in 60% of the cases we will choose the through-put scheduler
+	 * and in the rest 40% we will use the fairness scheduler.
+	 */
 	public static function getRateBetweenSchedulers($job_type = null)
 	{
 		$jobRateBetweenSchedulers = kConf::get('rate_between_schedulers');
@@ -60,6 +71,11 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		return kConf::get('default_rate_between_schedulers');
 	}
 	
+	/**
+	 * This function returns the the maximal number of jobs of a given type a partner
+	 * can execute by using the fairness scheduler.
+	 * f.i if the value is 1 for type conversion, no partner can execute more than one conversion job.
+	 */
 	public static function getMaxJobsForPartner($job_type = null)
 	{
 		$maxJobsForPartner = kConf::get('max_jobs_for_partner');
@@ -126,6 +142,7 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 	{
 		$batchJobLock = $batchJob->getBatchJobLock();
 		if($batchJobLock === null) {
+			KalturaLog::info("Lock object wasn't found for Batch Job " . $batchJob->getId());
 			return;
 		}
 		
@@ -151,7 +168,6 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		$batchJobLock->setStatus($batchJob->getStatus());
 		$batchJobLock->setObjectId($batchJob->getObjectId());
 		$batchJobLock->setObjectType($batchJob->getObjectType());
-		$batchJobLock->setExecutionStatus($batchJob->getExecutionStatus());
 		$batchJobLock->setPriority($batchJob->getPriority());
 		
 		if(($batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_RETRY) || ($batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_ALMOST_DONE)) {
@@ -165,54 +181,5 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		}
 	}
 	
-	/**
-	 * This function returns the partner loads. 
-	 * key - partnerId#jobType 
-	 * value - partnerLoad
-	 */
-	public static function getPartnerLoads()
-	{
-		
-		$c = new Criteria();
-		$c->add(BatchJobLockPeer::WORKER_ID, null, Criteria::ISNOTNULL);
-		$c->addGroupByColumn(BatchJobLockPeer::PARTNER_ID);
-		$c->addGroupByColumn(BatchJobLockPeer::JOB_TYPE);
-		$c->addGroupByColumn(BatchJobLockPeer::URGENCY);
-		$c->addSelectColumn(BatchJobLockPeer::COUNT);
-
-		foreach($c->getGroupByColumns() as $column)
-			$c->addSelectColumn($column);
 	
-		$stmt = BatchJobLockPeer::doSelectStmt($c);
-		
-		$partnerLoads = array();
-		$rows= $stmt->fetchAll(PDO::FETCH_ASSOC);
-		
-		foreach ($rows as $row) {
-		
-			$partnerId = $row['PARTNER_ID'];
-			$jobType = $row['JOB_TYPE'];
-			$urgency =  $row['URGENCY'];
-			$jobCount = $row[BatchJobLockPeer::COUNT];
-		
-			$priorityFactor = PartnerPeer::getPartnerPriorityFactor($partnerId, $urgency);
-			$key = $partnerId . "#" . $jobType;
-				
-			if(array_key_exists($key, $partnerLoads)) {
-				$oldPartnerLoad = $partnerLoads[$key];
-				$oldPartnerLoad->setPartnerLoad($oldPartnerLoad->getPartnerLoad() + $jobCount);
-				$oldPartnerLoad->setWeightedPartnerLoad($oldPartnerLoad->getWeightedPartnerLoad() + $jobCount * $priorityFactor);
-			} else {
-				$partnerLoad = new PartnerLoad();
-				$partnerLoad->setPartnerId($partnerId);
-				$partnerLoad->setJobType($jobType);
-			
-				$partnerLoad->setPartnerLoad($jobCount);
-				$partnerLoad->setWeightedPartnerLoad($jobCount * $priorityFactor);
-				$partnerLoads[$key] = $partnerLoad;
-			}
-		}
-		
-		return $partnerLoads;
-	}
 } // BatchJobLockPeer

@@ -44,7 +44,6 @@ class BatchJobLockTableMap extends TableMap {
 		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'INTEGER', false, null, null);
 		$this->addColumn('ESTIMATED_EFFORT', 'EstimatedEffort', 'BIGINT', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
-		$this->addColumn('EXECUTION_STATUS', 'ExecutionStatus', 'INTEGER', false, null, null);
 		$this->addColumn('START_AT', 'StartAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('PRIORITY', 'Priority', 'TINYINT', false, null, null);

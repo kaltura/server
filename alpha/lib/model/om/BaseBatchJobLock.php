@@ -63,12 +63,6 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 	protected $status;
 
 	/**
-	 * The value for the execution_status field.
-	 * @var        int
-	 */
-	protected $execution_status;
-
-	/**
 	 * The value for the start_at field.
 	 * @var        string
 	 */
@@ -305,16 +299,6 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 	public function getStatus()
 	{
 		return $this->status;
-	}
-
-	/**
-	 * Get the [execution_status] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getExecutionStatus()
-	{
-		return $this->execution_status;
 	}
 
 	/**
@@ -707,29 +691,6 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setStatus()
-
-	/**
-	 * Set the value of [execution_status] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BatchJobLock The current object (for fluent API support)
-	 */
-	public function setExecutionStatus($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobLockPeer::EXECUTION_STATUS]))
-			$this->oldColumnsValues[BatchJobLockPeer::EXECUTION_STATUS] = $this->execution_status;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->execution_status !== $v) {
-			$this->execution_status = $v;
-			$this->modifiedColumns[] = BatchJobLockPeer::EXECUTION_STATUS;
-		}
-
-		return $this;
-	} // setExecutionStatus()
 
 	/**
 	 * Sets the value of [start_at] column to a normalized version of the date/time value specified.
@@ -1192,21 +1153,20 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 			$this->object_type = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->estimated_effort = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->execution_status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->start_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->created_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->priority = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->urgency = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
-			$this->entry_id = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->partner_id = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
-			$this->scheduler_id = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
-			$this->worker_id = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
-			$this->batch_index = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
-			$this->expiration = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-			$this->execution_attempts = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
-			$this->version = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
-			$this->dc = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
-			$this->batch_job_id = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
+			$this->start_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->priority = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->urgency = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->entry_id = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->partner_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+			$this->scheduler_id = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+			$this->worker_id = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->batch_index = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
+			$this->expiration = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->execution_attempts = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
+			$this->version = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->dc = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
+			$this->batch_job_id = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1216,7 +1176,7 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 22; // 22 = BatchJobLockPeer::NUM_COLUMNS - BatchJobLockPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 21; // 21 = BatchJobLockPeer::NUM_COLUMNS - BatchJobLockPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating BatchJobLock object", $e);
@@ -1662,48 +1622,45 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 				return $this->getStatus();
 				break;
 			case 7:
-				return $this->getExecutionStatus();
-				break;
-			case 8:
 				return $this->getStartAt();
 				break;
-			case 9:
+			case 8:
 				return $this->getCreatedAt();
 				break;
-			case 10:
+			case 9:
 				return $this->getPriority();
 				break;
-			case 11:
+			case 10:
 				return $this->getUrgency();
 				break;
-			case 12:
+			case 11:
 				return $this->getEntryId();
 				break;
-			case 13:
+			case 12:
 				return $this->getPartnerId();
 				break;
-			case 14:
+			case 13:
 				return $this->getSchedulerId();
 				break;
-			case 15:
+			case 14:
 				return $this->getWorkerId();
 				break;
-			case 16:
+			case 15:
 				return $this->getBatchIndex();
 				break;
-			case 17:
+			case 16:
 				return $this->getExpiration();
 				break;
-			case 18:
+			case 17:
 				return $this->getExecutionAttempts();
 				break;
-			case 19:
+			case 18:
 				return $this->getVersion();
 				break;
-			case 20:
+			case 19:
 				return $this->getDc();
 				break;
-			case 21:
+			case 20:
 				return $this->getBatchJobId();
 				break;
 			default:
@@ -1734,21 +1691,20 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 			$keys[4] => $this->getObjectType(),
 			$keys[5] => $this->getEstimatedEffort(),
 			$keys[6] => $this->getStatus(),
-			$keys[7] => $this->getExecutionStatus(),
-			$keys[8] => $this->getStartAt(),
-			$keys[9] => $this->getCreatedAt(),
-			$keys[10] => $this->getPriority(),
-			$keys[11] => $this->getUrgency(),
-			$keys[12] => $this->getEntryId(),
-			$keys[13] => $this->getPartnerId(),
-			$keys[14] => $this->getSchedulerId(),
-			$keys[15] => $this->getWorkerId(),
-			$keys[16] => $this->getBatchIndex(),
-			$keys[17] => $this->getExpiration(),
-			$keys[18] => $this->getExecutionAttempts(),
-			$keys[19] => $this->getVersion(),
-			$keys[20] => $this->getDc(),
-			$keys[21] => $this->getBatchJobId(),
+			$keys[7] => $this->getStartAt(),
+			$keys[8] => $this->getCreatedAt(),
+			$keys[9] => $this->getPriority(),
+			$keys[10] => $this->getUrgency(),
+			$keys[11] => $this->getEntryId(),
+			$keys[12] => $this->getPartnerId(),
+			$keys[13] => $this->getSchedulerId(),
+			$keys[14] => $this->getWorkerId(),
+			$keys[15] => $this->getBatchIndex(),
+			$keys[16] => $this->getExpiration(),
+			$keys[17] => $this->getExecutionAttempts(),
+			$keys[18] => $this->getVersion(),
+			$keys[19] => $this->getDc(),
+			$keys[20] => $this->getBatchJobId(),
 		);
 		return $result;
 	}
@@ -1802,48 +1758,45 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 				$this->setStatus($value);
 				break;
 			case 7:
-				$this->setExecutionStatus($value);
-				break;
-			case 8:
 				$this->setStartAt($value);
 				break;
-			case 9:
+			case 8:
 				$this->setCreatedAt($value);
 				break;
-			case 10:
+			case 9:
 				$this->setPriority($value);
 				break;
-			case 11:
+			case 10:
 				$this->setUrgency($value);
 				break;
-			case 12:
+			case 11:
 				$this->setEntryId($value);
 				break;
-			case 13:
+			case 12:
 				$this->setPartnerId($value);
 				break;
-			case 14:
+			case 13:
 				$this->setSchedulerId($value);
 				break;
-			case 15:
+			case 14:
 				$this->setWorkerId($value);
 				break;
-			case 16:
+			case 15:
 				$this->setBatchIndex($value);
 				break;
-			case 17:
+			case 16:
 				$this->setExpiration($value);
 				break;
-			case 18:
+			case 17:
 				$this->setExecutionAttempts($value);
 				break;
-			case 19:
+			case 18:
 				$this->setVersion($value);
 				break;
-			case 20:
+			case 19:
 				$this->setDc($value);
 				break;
-			case 21:
+			case 20:
 				$this->setBatchJobId($value);
 				break;
 		} // switch()
@@ -1877,21 +1830,20 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[4], $arr)) $this->setObjectType($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setEstimatedEffort($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setExecutionStatus($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setStartAt($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setPriority($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setUrgency($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setEntryId($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setPartnerId($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setSchedulerId($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setWorkerId($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setBatchIndex($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setExpiration($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setExecutionAttempts($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setVersion($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setDc($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setBatchJobId($arr[$keys[21]]);
+		if (array_key_exists($keys[7], $arr)) $this->setStartAt($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setPriority($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setUrgency($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setEntryId($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setPartnerId($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setSchedulerId($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setWorkerId($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setBatchIndex($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setExpiration($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setExecutionAttempts($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setVersion($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setDc($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setBatchJobId($arr[$keys[20]]);
 	}
 
 	/**
@@ -1910,7 +1862,6 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(BatchJobLockPeer::OBJECT_TYPE)) $criteria->add(BatchJobLockPeer::OBJECT_TYPE, $this->object_type);
 		if ($this->isColumnModified(BatchJobLockPeer::ESTIMATED_EFFORT)) $criteria->add(BatchJobLockPeer::ESTIMATED_EFFORT, $this->estimated_effort);
 		if ($this->isColumnModified(BatchJobLockPeer::STATUS)) $criteria->add(BatchJobLockPeer::STATUS, $this->status);
-		if ($this->isColumnModified(BatchJobLockPeer::EXECUTION_STATUS)) $criteria->add(BatchJobLockPeer::EXECUTION_STATUS, $this->execution_status);
 		if ($this->isColumnModified(BatchJobLockPeer::START_AT)) $criteria->add(BatchJobLockPeer::START_AT, $this->start_at);
 		if ($this->isColumnModified(BatchJobLockPeer::CREATED_AT)) $criteria->add(BatchJobLockPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(BatchJobLockPeer::PRIORITY)) $criteria->add(BatchJobLockPeer::PRIORITY, $this->priority);
@@ -1992,8 +1943,6 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 		$copyObj->setEstimatedEffort($this->estimated_effort);
 
 		$copyObj->setStatus($this->status);
-
-		$copyObj->setExecutionStatus($this->execution_status);
 
 		$copyObj->setStartAt($this->start_at);
 

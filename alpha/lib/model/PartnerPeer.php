@@ -65,9 +65,9 @@ class PartnerPeer extends BasePartnerPeer
 	
 	private static function getPriority($partner, $urgency)
 	{
-		// TODO : Bounded to kJobsManager::generateLockInfoData, when it changes - the next lines should be updated accordingly.
-		//  In the future the urgency will be a factor of the urgency. for the time being, we will treat it only as isbulk factor
-		$isBulk = BatchJobUrgencyType::isBulkUpload($urgency);
+		// TODO : Bounded to kLockInfoData constructor, when it changes - the next lines should be updated accordingly.
+		//  In the future the priority will be a factor of the urgency. for the time being, we will treat it only as isbulk factor
+		$isBulk = (($urgency % 2) == 0);
 		$priorityGroup = PriorityGroupPeer::retrieveByPK($partner->getPriorityGroupId());
 	
 		if(!$priorityGroup)

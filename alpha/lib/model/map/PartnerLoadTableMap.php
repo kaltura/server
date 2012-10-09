@@ -38,6 +38,7 @@ class PartnerLoadTableMap extends TableMap {
 		$this->setUseIdGenerator(false);
 		// columns
 		$this->addPrimaryKey('JOB_TYPE', 'JobType', 'INTEGER', true, null, null);
+		$this->addPrimaryKey('JOB_SUB_TYPE', 'JobSubType', 'INTEGER', true, null, 0);
 		$this->addPrimaryKey('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('PARTNER_LOAD', 'PartnerLoad', 'INTEGER', false, null, null);
 		$this->addColumn('WEIGHTED_PARTNER_LOAD', 'WeightedPartnerLoad', 'INTEGER', false, null, null);

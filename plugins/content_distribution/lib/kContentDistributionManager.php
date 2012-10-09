@@ -225,7 +225,7 @@ class kContentDistributionManager
 		$batchJob->setEntryId($entryDistribution->getEntryId());
 		$batchJob->setPartnerId($entryDistribution->getPartnerId());
 		$batchJob->setObjectId($entryDistribution->getId());
-		$batchJob->setObjectType(ContentDistributionBatchJobObjectType::ENTRY_DISTRIBUTION);
+		$batchJob->setObjectType(kPluginableEnumsManager::apiToCore('BatchJobObjectType',ContentDistributionBatchJobObjectType::ENTRY_DISTRIBUTION));
 		
 		$jobSubType = $distributionProfile->getProviderType();
 	
@@ -258,7 +258,7 @@ class kContentDistributionManager
 		$batchJob->setEntryId($entryDistribution->getEntryId());
 		$batchJob->setPartnerId($entryDistribution->getPartnerId());
 		$batchJob->setObjectId($entryDistribution->getId());
-		$batchJob->setObjectType(ContentDistributionBatchJobObjectType::ENTRY_DISTRIBUTION);
+		$batchJob->setObjectType(kPluginableEnumsManager::apiToCore('BatchJobObjectType',ContentDistributionBatchJobObjectType::ENTRY_DISTRIBUTION));
 		
 		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DISABLE);
 		$jobSubType = $distributionProfile->getProviderType();
@@ -292,7 +292,7 @@ class kContentDistributionManager
 		$batchJob->setEntryId($entryDistribution->getEntryId());
 		$batchJob->setPartnerId($entryDistribution->getPartnerId());
 		$batchJob->setObjectId($entryDistribution->getId());
-		$batchJob->setObjectType(ContentDistributionBatchJobObjectType::ENTRY_DISTRIBUTION);
+		$batchJob->setObjectType(kPluginableEnumsManager::apiToCore('BatchJobObjectType',ContentDistributionBatchJobObjectType::ENTRY_DISTRIBUTION));
 		
 		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_ENABLE);
 		$jobSubType = $distributionProfile->getProviderType();
@@ -347,7 +347,7 @@ class kContentDistributionManager
 		$batchJob->setEntryId($entryDistribution->getEntryId());
 		$batchJob->setPartnerId($entryDistribution->getPartnerId());
 		$batchJob->setObjectId($entryDistribution->getId());
-		$batchJob->setObjectType(ContentDistributionBatchJobObjectType::ENTRY_DISTRIBUTION);
+		$batchJob->setObjectType(kPluginableEnumsManager::apiToCore('BatchJobObjectType',ContentDistributionBatchJobObjectType::ENTRY_DISTRIBUTION));
 		
 		$jobSubType = $distributionProfile->getProviderType();
 	
@@ -371,7 +371,7 @@ class kContentDistributionManager
 		$batchJob->setEntryId($entryDistribution->getEntryId());
 		$batchJob->setPartnerId($entryDistribution->getPartnerId());
 		$batchJob->setObjectId($entryDistribution->getId());
-		$batchJob->setObjectType(ContentDistributionBatchJobObjectType::ENTRY_DISTRIBUTION);
+		$batchJob->setObjectType(kPluginableEnumsManager::apiToCore('BatchJobObjectType',ContentDistributionBatchJobObjectType::ENTRY_DISTRIBUTION));
 		
 		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
 		$jobSubType = $distributionProfile->getProviderType();
@@ -405,7 +405,7 @@ class kContentDistributionManager
 		$batchJob->setEntryId($entryDistribution->getEntryId());
 		$batchJob->setPartnerId($entryDistribution->getPartnerId());
 		$batchJob->setObjectId($entryDistribution->getId());
-		$batchJob->setObjectType(ContentDistributionBatchJobObjectType::ENTRY_DISTRIBUTION);
+		$batchJob->setObjectType(kPluginableEnumsManager::apiToCore('BatchJobObjectType',ContentDistributionBatchJobObjectType::ENTRY_DISTRIBUTION));
 		
 		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
 		$jobSubType = $distributionProfile->getProviderType();

@@ -105,12 +105,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	protected $updated_at;
 
 	/**
-	 * The value for the deleted_at field.
-	 * @var        string
-	 */
-	protected $deleted_at;
-
-	/**
 	 * The value for the priority field.
 	 * @var        int
 	 */
@@ -159,12 +153,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	 * @var        int
 	 */
 	protected $parent_job_id;
-
-	/**
-	 * The value for the batch_index field.
-	 * @var        int
-	 */
-	protected $batch_index;
 
 	/**
 	 * The value for the last_scheduler_id field.
@@ -486,46 +474,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [optionally formatted] temporal [deleted_at] column value.
-	 * 
-	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
-	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
-	 *
-	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
-	 *							If format is NULL, then the raw unix timestamp integer will be returned.
-	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-	 * @throws     PropelException - if unable to parse/validate the date/time value.
-	 */
-	public function getDeletedAt($format = 'Y-m-d H:i:s')
-	{
-		if ($this->deleted_at === null) {
-			return null;
-		}
-
-
-		if ($this->deleted_at === '0000-00-00 00:00:00') {
-			// while technically this is not a default value of NULL,
-			// this seems to be closest in meaning.
-			return null;
-		} else {
-			try {
-				$dt = new DateTime($this->deleted_at);
-			} catch (Exception $x) {
-				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->deleted_at, true), $x);
-			}
-		}
-
-		if ($format === null) {
-			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
-			return (int) $dt->format('U');
-		} elseif (strpos($format, '%') !== false) {
-			return strftime($format, $dt->format('U'));
-		} else {
-			return $dt->format($format);
-		}
-	}
-
-	/**
 	 * Get the [priority] column value.
 	 * 
 	 * @return     int
@@ -663,16 +611,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function getParentJobId()
 	{
 		return $this->parent_job_id;
-	}
-
-	/**
-	 * Get the [batch_index] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getBatchIndex()
-	{
-		return $this->batch_index;
 	}
 
 	/**
@@ -1110,58 +1048,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	} // setUpdatedAt()
 
 	/**
-	 * Sets the value of [deleted_at] column to a normalized version of the date/time value specified.
-	 * 
-	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setDeletedAt($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::DELETED_AT]))
-			$this->oldColumnsValues[BatchJobPeer::DELETED_AT] = $this->deleted_at;
-
-		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
-		// -- which is unexpected, to say the least.
-		if ($v === null || $v === '') {
-			$dt = null;
-		} elseif ($v instanceof DateTime) {
-			$dt = $v;
-		} else {
-			// some string/numeric value passed; we normalize that so that we can
-			// validate it.
-			try {
-				if (is_numeric($v)) { // if it's a unix timestamp
-					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
-					// We have to explicitly specify and then change the time zone because of a
-					// DateTime bug: http://bugs.php.net/bug.php?id=43003
-					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
-				} else {
-					$dt = new DateTime($v);
-				}
-			} catch (Exception $x) {
-				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
-			}
-		}
-
-		if ( $this->deleted_at !== null || $dt !== null ) {
-			// (nested ifs are a little easier to read in this case)
-
-			$currNorm = ($this->deleted_at !== null && $tmpDt = new DateTime($this->deleted_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
-			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
-
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
-			{
-				$this->deleted_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = BatchJobPeer::DELETED_AT;
-			}
-		} // if either are not null
-
-		return $this;
-	} // setDeletedAt()
-
-	/**
 	 * Set the value of [priority] column.
 	 * 
 	 * @param      int $v new value
@@ -1404,29 +1290,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	} // setParentJobId()
 
 	/**
-	 * Set the value of [batch_index] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     BatchJob The current object (for fluent API support)
-	 */
-	public function setBatchIndex($v)
-	{
-		if(!isset($this->oldColumnsValues[BatchJobPeer::BATCH_INDEX]))
-			$this->oldColumnsValues[BatchJobPeer::BATCH_INDEX] = $this->batch_index;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->batch_index !== $v) {
-			$this->batch_index = $v;
-			$this->modifiedColumns[] = BatchJobPeer::BATCH_INDEX;
-		}
-
-		return $this;
-	} // setBatchIndex()
-
-	/**
 	 * Set the value of [last_scheduler_id] column.
 	 * 
 	 * @param      int $v new value
@@ -1626,22 +1489,20 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			$this->description = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->created_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->updated_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->deleted_at = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->priority = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
-			$this->queue_time = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-			$this->finish_time = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-			$this->entry_id = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
-			$this->partner_id = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
-			$this->bulk_job_id = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
-			$this->root_job_id = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
-			$this->parent_job_id = ($row[$startcol + 22] !== null) ? (int) $row[$startcol + 22] : null;
-			$this->batch_index = ($row[$startcol + 23] !== null) ? (int) $row[$startcol + 23] : null;
-			$this->last_scheduler_id = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
-			$this->last_worker_id = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
-			$this->dc = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
-			$this->err_type = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
-			$this->err_number = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
-			$this->batch_job_lock_id = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
+			$this->priority = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->queue_time = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->finish_time = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->entry_id = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->partner_id = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->bulk_job_id = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
+			$this->root_job_id = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
+			$this->parent_job_id = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
+			$this->last_scheduler_id = ($row[$startcol + 22] !== null) ? (int) $row[$startcol + 22] : null;
+			$this->last_worker_id = ($row[$startcol + 23] !== null) ? (int) $row[$startcol + 23] : null;
+			$this->dc = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
+			$this->err_type = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
+			$this->err_number = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
+			$this->batch_job_lock_id = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1651,7 +1512,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 30; // 30 = BatchJobPeer::NUM_COLUMNS - BatchJobPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 28; // 28 = BatchJobPeer::NUM_COLUMNS - BatchJobPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating BatchJob object", $e);
@@ -2188,51 +2049,45 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 				return $this->getUpdatedAt();
 				break;
 			case 14:
-				return $this->getDeletedAt();
-				break;
-			case 15:
 				return $this->getPriority();
 				break;
-			case 16:
+			case 15:
 				return $this->getQueueTime();
 				break;
-			case 17:
+			case 16:
 				return $this->getFinishTime();
 				break;
-			case 18:
+			case 17:
 				return $this->getEntryId();
 				break;
-			case 19:
+			case 18:
 				return $this->getPartnerId();
 				break;
-			case 20:
+			case 19:
 				return $this->getBulkJobId();
 				break;
-			case 21:
+			case 20:
 				return $this->getRootJobId();
 				break;
-			case 22:
+			case 21:
 				return $this->getParentJobId();
 				break;
-			case 23:
-				return $this->getBatchIndex();
-				break;
-			case 24:
+			case 22:
 				return $this->getLastSchedulerId();
 				break;
-			case 25:
+			case 23:
 				return $this->getLastWorkerId();
 				break;
-			case 26:
+			case 24:
 				return $this->getDc();
 				break;
-			case 27:
+			case 25:
 				return $this->getErrType();
 				break;
-			case 28:
+			case 26:
 				return $this->getErrNumber();
 				break;
-			case 29:
+			case 27:
 				return $this->getBatchJobLockId();
 				break;
 			default:
@@ -2270,22 +2125,20 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			$keys[11] => $this->getDescription(),
 			$keys[12] => $this->getCreatedAt(),
 			$keys[13] => $this->getUpdatedAt(),
-			$keys[14] => $this->getDeletedAt(),
-			$keys[15] => $this->getPriority(),
-			$keys[16] => $this->getQueueTime(),
-			$keys[17] => $this->getFinishTime(),
-			$keys[18] => $this->getEntryId(),
-			$keys[19] => $this->getPartnerId(),
-			$keys[20] => $this->getBulkJobId(),
-			$keys[21] => $this->getRootJobId(),
-			$keys[22] => $this->getParentJobId(),
-			$keys[23] => $this->getBatchIndex(),
-			$keys[24] => $this->getLastSchedulerId(),
-			$keys[25] => $this->getLastWorkerId(),
-			$keys[26] => $this->getDc(),
-			$keys[27] => $this->getErrType(),
-			$keys[28] => $this->getErrNumber(),
-			$keys[29] => $this->getBatchJobLockId(),
+			$keys[14] => $this->getPriority(),
+			$keys[15] => $this->getQueueTime(),
+			$keys[16] => $this->getFinishTime(),
+			$keys[17] => $this->getEntryId(),
+			$keys[18] => $this->getPartnerId(),
+			$keys[19] => $this->getBulkJobId(),
+			$keys[20] => $this->getRootJobId(),
+			$keys[21] => $this->getParentJobId(),
+			$keys[22] => $this->getLastSchedulerId(),
+			$keys[23] => $this->getLastWorkerId(),
+			$keys[24] => $this->getDc(),
+			$keys[25] => $this->getErrType(),
+			$keys[26] => $this->getErrNumber(),
+			$keys[27] => $this->getBatchJobLockId(),
 		);
 		return $result;
 	}
@@ -2360,51 +2213,45 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 				$this->setUpdatedAt($value);
 				break;
 			case 14:
-				$this->setDeletedAt($value);
-				break;
-			case 15:
 				$this->setPriority($value);
 				break;
-			case 16:
+			case 15:
 				$this->setQueueTime($value);
 				break;
-			case 17:
+			case 16:
 				$this->setFinishTime($value);
 				break;
-			case 18:
+			case 17:
 				$this->setEntryId($value);
 				break;
-			case 19:
+			case 18:
 				$this->setPartnerId($value);
 				break;
-			case 20:
+			case 19:
 				$this->setBulkJobId($value);
 				break;
-			case 21:
+			case 20:
 				$this->setRootJobId($value);
 				break;
-			case 22:
+			case 21:
 				$this->setParentJobId($value);
 				break;
-			case 23:
-				$this->setBatchIndex($value);
-				break;
-			case 24:
+			case 22:
 				$this->setLastSchedulerId($value);
 				break;
-			case 25:
+			case 23:
 				$this->setLastWorkerId($value);
 				break;
-			case 26:
+			case 24:
 				$this->setDc($value);
 				break;
-			case 27:
+			case 25:
 				$this->setErrType($value);
 				break;
-			case 28:
+			case 26:
 				$this->setErrNumber($value);
 				break;
-			case 29:
+			case 27:
 				$this->setBatchJobLockId($value);
 				break;
 		} // switch()
@@ -2445,22 +2292,20 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[11], $arr)) $this->setDescription($arr[$keys[11]]);
 		if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
 		if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setDeletedAt($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setPriority($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setQueueTime($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setFinishTime($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setEntryId($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setPartnerId($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setBulkJobId($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setRootJobId($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setParentJobId($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setBatchIndex($arr[$keys[23]]);
-		if (array_key_exists($keys[24], $arr)) $this->setLastSchedulerId($arr[$keys[24]]);
-		if (array_key_exists($keys[25], $arr)) $this->setLastWorkerId($arr[$keys[25]]);
-		if (array_key_exists($keys[26], $arr)) $this->setDc($arr[$keys[26]]);
-		if (array_key_exists($keys[27], $arr)) $this->setErrType($arr[$keys[27]]);
-		if (array_key_exists($keys[28], $arr)) $this->setErrNumber($arr[$keys[28]]);
-		if (array_key_exists($keys[29], $arr)) $this->setBatchJobLockId($arr[$keys[29]]);
+		if (array_key_exists($keys[14], $arr)) $this->setPriority($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setQueueTime($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setFinishTime($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setEntryId($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setPartnerId($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setBulkJobId($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setRootJobId($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setParentJobId($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setLastSchedulerId($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setLastWorkerId($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setDc($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setErrType($arr[$keys[25]]);
+		if (array_key_exists($keys[26], $arr)) $this->setErrNumber($arr[$keys[26]]);
+		if (array_key_exists($keys[27], $arr)) $this->setBatchJobLockId($arr[$keys[27]]);
 	}
 
 	/**
@@ -2486,7 +2331,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(BatchJobPeer::DESCRIPTION)) $criteria->add(BatchJobPeer::DESCRIPTION, $this->description);
 		if ($this->isColumnModified(BatchJobPeer::CREATED_AT)) $criteria->add(BatchJobPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(BatchJobPeer::UPDATED_AT)) $criteria->add(BatchJobPeer::UPDATED_AT, $this->updated_at);
-		if ($this->isColumnModified(BatchJobPeer::DELETED_AT)) $criteria->add(BatchJobPeer::DELETED_AT, $this->deleted_at);
 		if ($this->isColumnModified(BatchJobPeer::PRIORITY)) $criteria->add(BatchJobPeer::PRIORITY, $this->priority);
 		if ($this->isColumnModified(BatchJobPeer::QUEUE_TIME)) $criteria->add(BatchJobPeer::QUEUE_TIME, $this->queue_time);
 		if ($this->isColumnModified(BatchJobPeer::FINISH_TIME)) $criteria->add(BatchJobPeer::FINISH_TIME, $this->finish_time);
@@ -2495,7 +2339,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(BatchJobPeer::BULK_JOB_ID)) $criteria->add(BatchJobPeer::BULK_JOB_ID, $this->bulk_job_id);
 		if ($this->isColumnModified(BatchJobPeer::ROOT_JOB_ID)) $criteria->add(BatchJobPeer::ROOT_JOB_ID, $this->root_job_id);
 		if ($this->isColumnModified(BatchJobPeer::PARENT_JOB_ID)) $criteria->add(BatchJobPeer::PARENT_JOB_ID, $this->parent_job_id);
-		if ($this->isColumnModified(BatchJobPeer::BATCH_INDEX)) $criteria->add(BatchJobPeer::BATCH_INDEX, $this->batch_index);
 		if ($this->isColumnModified(BatchJobPeer::LAST_SCHEDULER_ID)) $criteria->add(BatchJobPeer::LAST_SCHEDULER_ID, $this->last_scheduler_id);
 		if ($this->isColumnModified(BatchJobPeer::LAST_WORKER_ID)) $criteria->add(BatchJobPeer::LAST_WORKER_ID, $this->last_worker_id);
 		if ($this->isColumnModified(BatchJobPeer::DC)) $criteria->add(BatchJobPeer::DC, $this->dc);
@@ -2594,8 +2437,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 
 		$copyObj->setUpdatedAt($this->updated_at);
 
-		$copyObj->setDeletedAt($this->deleted_at);
-
 		$copyObj->setPriority($this->priority);
 
 		$copyObj->setQueueTime($this->queue_time);
@@ -2611,8 +2452,6 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 		$copyObj->setRootJobId($this->root_job_id);
 
 		$copyObj->setParentJobId($this->parent_job_id);
-
-		$copyObj->setBatchIndex($this->batch_index);
 
 		$copyObj->setLastSchedulerId($this->last_scheduler_id);
 

@@ -936,7 +936,7 @@ class JobsService extends KalturaBaseService
 		$dbBatchJobLock = BatchJobLockPeer::retrieveByPK($jobId);
 		
 		$job = new KalturaBatchJob();
-		$job->fromObject($dbBatchJob,$dbBatchJobLock);
+		$job->fromBatchJob($dbBatchJob,$dbBatchJobLock);
 		
 		$batchJobResponse = new KalturaBatchJobResponse();
 		$batchJobResponse->batchJob = $job;

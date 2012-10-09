@@ -558,7 +558,7 @@ class kMetadataManager
 	{
 		$job = new BatchJob();
 		$job->setPartnerId($partnerId);
-		$job->setObjectType(MetadataBatchJobObjectType::METADATA);
+		$job->setObjectType(kPluginableEnumsManager::apiToCore('BatchJobObjectType', MetadataBatchJobObjectType::METADATA));
 		$job->setObjectId($metadataId);
 		
 		$data = new kImportMetadataJobData();
@@ -590,7 +590,7 @@ class kMetadataManager
 		$job = new BatchJob();
 		$job->setPartnerId($partnerId);
 		$job->setObjectId($metadataProfileId);
-		$job->setObjectType(MetadataBatchJobObjectType::METADATA_PROFILE);
+		$job->setObjectType(kPluginableEnumsManager::apiToCore('BatchJobObjectType', MetadataBatchJobObjectType::METADATA_PROFILE));
 		$data = new kTransformMetadataJobData();
 		
 		if($xsl)

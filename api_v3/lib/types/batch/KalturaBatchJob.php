@@ -236,15 +236,16 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 	(
 		"id" ,
 		"partnerId" ,
-		"createdAt" , "updatedAt" , "deletedAt" ,
+		"createdAt" , "updatedAt" , 
 		"entryId" ,
 		"jobType" , 
 	 	"status" ,  
 		"message", "description" , "parentJobId" ,
 		"rootJobId", "bulkJobId" , "priority" ,
-		"queueTime" , "finishTime" , "errType", "errNumber", 
+		"queueTime" , "finishTime" ,  "errType", "errNumber", 
 		"dc",
-		"lastSchedulerId", "lastWorkerId" , "batchIndex", 
+		"lastSchedulerId", "lastWorkerId" , 
+		"history"
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -255,7 +256,7 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 	public function fromStatisticsObject($dbBatchJob, $dbLockObj = null)
 	{
 		$dbBatchJobLock = BatchJobLockPeer::retrieveByPK($dbBatchJob->getId());
-		$this->fromObject($dbBatchJob, $dbBatchJobLock);
+		$this->fromBatchJob($dbBatchJob, $dbBatchJobLock);
 		
 		if(!($dbBatchJob instanceof BatchJob))
 			return $this;
@@ -387,12 +388,17 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 		$this->workerId = $dbBatchJobLock->getWorkerId();
 	}
 	
-	public function fromObject($dbBatchJob, BatchJobLock $dbBatchJobLock = null) 
+	public function fromObject($dbBatchJob)
+	{
+		KalturaLog::err("From object (batch job) is unsupported without a batch job lock.");
+		throw new KalturaAPIException ( KalturaErrors::INTERNAL_SERVERL_ERROR);
+	}
+	
+	public function fromBatchJob($dbBatchJob, BatchJobLock $dbBatchJobLock = null) 
 	{
 		parent::fromObject( $dbBatchJob );
 		$this->queueTime = $dbBatchJob->getQueueTime(null); // to return the timestamp and not string
 		$this->finishTime = $dbBatchJob->getFinishTime(null); // to return the timestamp and not string
-		$this->abort = $dbBatchJob->getExecutionStatus();
 		
 		if(!($dbBatchJob instanceof BatchJob))
 			return $this;
@@ -408,9 +414,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 			$this->lockVersion = $dbBatchJob->getLockInfo()->getLockVersion();
 			$this->estimatedEffort = $dbBatchJob->getLockInfo()->getEstimatedEffort();
 		}
-		
-		if($dbBatchJob->getHistory() != null)
-			$this->history = KalturaBatchHistoryDataArray::fromDbArray($dbBatchJob->getHistory());
 		
 		return $this;
 	}
@@ -574,6 +577,8 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 			$dbBatchJob = new BatchJob();
 
 		$dbBatchJob = parent::toObject($dbBatchJob);
+		if($this->abort)
+			$dbBatchJob->setExecutionStatus(BatchJobExecutionStatus::ABORTED);
 		
 		if (!is_null($this->data))
 		    $this->toData($dbBatchJob);

@@ -149,7 +149,6 @@ class BatchJobPeer extends BaseBatchJobPeer
 			// Set fields
 			$batchJob->setLastWorkerId($lockKey->getWorkerId());
 			$batchJob->setLastSchedulerId($lockKey->getSchedulerId());
-			$batchJob->setBatchIndex($lockKey->getBatchIndex() );
 			
 			// Set fields from batch job lock
 			$lockInfo = $batchJob->getLockInfo();
@@ -162,7 +161,7 @@ class BatchJobPeer extends BaseBatchJobPeer
 		return $batchJobs;
 	}
 	
-	public static function postBatchJobUpdate(BatchJob $batchJob) {
+	public static function preBatchJobUpdate(BatchJob $batchJob) {
 		if($batchJob->isColumnModified(BatchJobPeer::ERR_NUMBER) || $batchJob->isColumnModified(BatchJobPeer::ERR_TYPE) || 
 				$batchJob->isColumnModified(BatchJobPeer::MESSAGE)) {
 			

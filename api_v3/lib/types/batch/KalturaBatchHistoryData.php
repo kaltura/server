@@ -21,7 +21,7 @@ class KalturaBatchHistoryData extends KalturaObject
 	public $batchIndex;
 	
 	/**
-	 * @var string
+	 * @var int
 	 */
 	public $timeStamp;
 	
@@ -45,7 +45,6 @@ class KalturaBatchHistoryData extends KalturaObject
 			'schedulerId',
 			'workerId',
 			'batchIndex',
-			'timeStamp',
 			'message',
 			'errType',
 			'errNumber',
@@ -56,4 +55,16 @@ class KalturaBatchHistoryData extends KalturaObject
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
 	}
 	
+	public function toObject($object_to_fill = null, $props_to_skip = array()) {
+		if(is_null($object_to_fill)) 
+			$object_to_fill = new kBatchHistoryData();
+		
+		return parent::toObject($object_to_fill, $props_to_skip);
+	}
+	
+	public function fromObject($historyData)
+	{
+		parent::fromObject( $historyData );
+		$this->timeStamp = $historyData->getTimeStamp(null); // to return the timestamp and not string
+	}
 }

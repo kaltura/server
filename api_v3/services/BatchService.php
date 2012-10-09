@@ -200,21 +200,7 @@ class BatchService extends KalturaBaseService
 		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
 				
 		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-	
-	/**
-	 * batch updateExclusiveConvertJobSubType action updates the sub type for a BatchJob of type CONVERT that was claimed using the getExclusiveConvertJobs
-	 * 
-	 * @action updateExclusiveConvertJobSubType
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $subType 
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveConvertJobSubTypeAction($id ,KalturaExclusiveLockKey $lockKey, $subType)
-	{
-		throw new KalturaAPIException("This function is no longer supported");
+		return $batchJob->fromBatchJob($dbBatchJob);
 	}
 	
 // --------------------------------- ConvertJob functions 	--------------------------------- //
@@ -308,55 +294,13 @@ class BatchService extends KalturaBaseService
 	
 // --------------------------------- generic functions 	--------------------------------- //
 	
-	private static function handleBefore($partnerLoadA, $partnerLoadB) {
-		if ($partnerLoadA->getPartnerId() < $partnerLoadB->getPartnerId())
-			return true;
-		if(($partnerLoadA->getPartnerId() == $partnerLoadB->getPartnerId()) && ($partnerLoadA->getJobType() < $partnerLoadB->getJobType()))
-			return true;
-		return false;
-	}
-	
 	/**
 	 * batch updatePartnerLoadTable action cleans the partner load table
 	 *
 	 * @action updatePartnerLoadTable
 	 */
 	function updatePartnerLoadTableAction() {
-		
-		try {
-			
-			KalturaLog::info(" --- updateing partner load table --- ");
-			$actualPartnerLoads = BatchJobLockPeer::getPartnerLoads();
-			
-			$c = new Criteria();
-			$currentPartnerLoads = PartnerLoadPeer::doSelect($c);
-			
-			foreach ($currentPartnerLoads as $partnerLoad) {
-				$key = $partnerLoad->getPartnerId() . "#" . $partnerLoad->getJobType();
-				if(array_key_exists($key, $actualPartnerLoads)) {
-					$actualLoad = $actualPartnerLoads[$key];
-					// Update
-					$partnerLoad->setPartnerLoad($actualLoad->getPartnerLoad());
-					$partnerLoad->setWeightedPartnerLoad($actualLoad->getWeightedPartnerLoad());
-					$partnerLoad->save();
-					
-					unset($actualPartnerLoads[$key]);
-				} else {
-					
-					// Delete
-					$partnerLoad->delete();
-				}
-			}
-			
-			foreach($actualPartnerLoads as $actualPartnerLoad) {
-				// Insert
-				$actualPartnerLoad->save();
-			}
-		    
-		    KalturaLog::info(" --- Done updateing partner load table --- ");
-		} catch (Exception $e) {
-			KalturaLog::err("Failed while updating partner load table with error : " . $e->getMessage());
-		}
+		PartnerLoadPeer::updatePartnerLoadTable();
 	}
 	
 	/**
@@ -414,7 +358,7 @@ class BatchService extends KalturaBaseService
 			
 		$job = kBatchManager::freeExclusiveBatchJob($id, $lockKey->toObject(), $resetExecutionAttempts);
 		$batchJob = new KalturaBatchJob(); // start from blank
-		$batchJob->fromObject($job);
+		$batchJob->fromBatchJob($job);
 		
 		// gets queues length
 		$c = new Criteria();
@@ -523,7 +467,7 @@ class BatchService extends KalturaBaseService
 		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
 				
 		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
+		return $batchJob->fromBatchJob($dbBatchJob);
 	}
 	
 	

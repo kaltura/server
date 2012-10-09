@@ -53,7 +53,7 @@ class kBatchExclusiveLock
 				$object->setExpiration ( $expiration );
 				
 				KalturaLog::log("Job id [" . $object->getId() . "] locked and returned");
-				PartnerLoadPeer::updatePartnerLoad($object->getJobType(), $object->getPartnerId(), $object->getUrgency(), $con);
+				PartnerLoadPeer::updatePartnerLoad($object->getPartnerId(), $object->getUrgency(), $object->getJobType(), $object->getJobSubType(), $con);
 			
 				$exclusive_objects_ids[] = $object->getId();
 			}
@@ -298,7 +298,8 @@ class kBatchExclusiveLock
 		} else {
 			// Fairness	
 			$c->addMultipleJoin(array(array(BatchJobLockPeer::PARTNER_ID, PartnerLoadPeer::PARTNER_ID  ),
-					array(BatchJobLockPeer::JOB_TYPE, PartnerLoadPeer::JOB_TYPE)), Criteria::LEFT_JOIN);
+					array(BatchJobLockPeer::JOB_TYPE, PartnerLoadPeer::JOB_TYPE),
+					array(BatchJobLockPeer::JOB_SUB_TYPE, PartnerLoadPeer::JOB_SUB_TYPE)), Criteria::LEFT_JOIN);
 			
 			$partnerLoadCnd1 = $c->getNewCriterion(PartnerLoadPeer::PARTNER_LOAD, $max_jobs_for_partner, Criteria::LESS_EQUAL);
 			$partnerLoadCnd1->addOr($c->getNewCriterion(PartnerLoadPeer::PARTNER_LOAD, null ,Criteria::EQUAL));
@@ -313,19 +314,31 @@ class kBatchExclusiveLock
 
 	public static function getExpiredJobs()
 	{
-		
 		$jobTypes = kPluginableEnumsManager::coreValues('BatchJobType');
+		$executionAttempts2jobTypes = array();
+		
+		// Map between max execution attempts and job types
+		foreach($jobTypes as $jobType)
+		{
+			$executionAttempts = BatchJobLockPeer::getMaxExecutionAttempts($jobType);
+			if(array_key_exists($executionAttempts, $executionAttempts2jobTypes))
+				$executionAttempts2jobTypes[$executionAttempts][] = $jobType;
+			else
+				$executionAttempts2jobTypes[$executionAttempts] = array($jobType);
+		}		
 				
+		// create query
 		$c = new Criteria();
 		$c->add(BatchJobLockPeer::STATUS, BatchJob::BATCHJOB_STATUS_FATAL, Criteria::NOT_EQUAL);
 		$c->add(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId()); // each DC should clean its own jobs
 		
+		// Query for each job type
 		$batchJobLocks = array();
-		foreach($jobTypes as $jobType)
+		foreach($executionAttempts2jobTypes as $execAttempts => $jobTypes) 
 		{
 			$typedCrit = clone $c;
-			$typedCrit->add(BatchJobLockPeer::EXECUTION_ATTEMPTS, BatchJobLockPeer::getMaxExecutionAttempts($jobType), Criteria::GREATER_THAN);
-			$typedCrit->add(BatchJobLockPeer::JOB_TYPE, $jobType);
+			$typedCrit->add(BatchJobLockPeer::EXECUTION_ATTEMPTS, $execAttempts, Criteria::GREATER_THAN);
+			$typedCrit->add(BatchJobLockPeer::JOB_TYPE, implode(",", $jobTypes), Criteria::IN);
 			
 			$typedJobs = BatchJobLockPeer::doSelect($typedCrit, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 			foreach($typedJobs as $typedJob) {
@@ -408,8 +421,8 @@ class kBatchExclusiveLock
 		$db_lock_object->save();
 	
 		
-		if(($db_lock_object->getStatus() != BatchJob::BATCHJOB_STATUS_ABORTED) && 
-				($db_lock_object->getExecutionStatus() == BatchJobExecutionStatus::ABORTED))
+		if(($db_object->getStatus() != BatchJob::BATCHJOB_STATUS_ABORTED) && 
+				($db_object->getExecutionStatus() == BatchJobExecutionStatus::ABORTED))
 			$db_object = kJobsManager::abortDbBatchJob($db_object);
 		
 		return $db_object;
