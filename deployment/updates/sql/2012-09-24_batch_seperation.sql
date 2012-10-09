@@ -22,9 +22,7 @@ CREATE TABLE `batch_job_sep` (
   `created_at` datetime DEFAULT NULL,
   `queue_time` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
-  `deleted_at` datetime DEFAULT NULL,
   `finish_time` datetime DEFAULT NULL,
-  `batch_index` int(11) DEFAULT NULL,
   `last_scheduler_id` int(11) DEFAULT NULL,
   `last_worker_id` int(11) DEFAULT NULL,
   `execution_status` int(4) DEFAULT NULL,
@@ -65,7 +63,6 @@ CREATE TABLE `batch_job_lock` (
   `batch_index` int(11) DEFAULT NULL,
   `expiration` datetime DEFAULT NULL,
   `start_at` datetime DEFAULT NULL,
-  `execution_status` int(4) DEFAULT NULL,
   `batch_job_id` int(20) NOT NULL,
   PRIMARY KEY (`id`),
   
@@ -80,11 +77,12 @@ CREATE TABLE `batch_job_lock` (
 DROP TABLE IF EXISTS `partner_load`;
 
 CREATE TABLE `partner_load` (
-  `partner_id` int(11) DEFAULT NULL,
-  `job_type` int(6) DEFAULT NULL,
-  `partner_load` int(11) DEFAULT 0,
+  `partner_id` int(11) NOT NULL,
+  `job_type` int(6) NOT NULL,
+  `job_sub_type` int(6) DEFAULT 0,
+  `partner_load` int(11) DEFAULT NULL,
   `weighted_partner_load` int(11) DEFAULT 0,
-  PRIMARY KEY (`partner_id`,`job_type`),
+  PRIMARY KEY (`partner_id`,`job_type`,`job_sub_type`),
   KEY `weight_index`(`weighted_partner_load`),
   KEY `load_index`(`partner_load`)
  ) ENGINE=innodb AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
