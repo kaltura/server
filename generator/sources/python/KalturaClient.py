@@ -43,6 +43,12 @@ from poster.streaminghttp import register_openers
 from poster.encode import multipart_encode
 import urllib2
 
+try:
+    from Crypto import Random
+    from Crypto.Cipher import AES
+except ImportError:
+    pass            # PyCrypto is required only for creating KS V2
+
 # Register the streaming http handlers with urllib2
 register_openers()
 
@@ -71,6 +77,12 @@ class PluginServicesProxy:
 class KalturaClient:
     METHOD_POST = 0
     METHOD_GET = 1
+
+    RANDOM_SIZE = 16
+
+    FIELD_EXPIRY =              '_e'
+    FIELD_TYPE =                '_t'
+    FIELD_USER =                '_u'
 
     def __init__(self, config):
         self.apiVersion = API_VERSION
@@ -377,17 +389,49 @@ class KalturaClient:
         fields = [partnerId, partnerId, expiry, type, rand, userId, privileges]
         fields = map(lambda x: str(x), fields)
         info = ';'.join(fields)
-        signature = KalturaClient.hash(adminSecretForSigning, info)
+        signature = KalturaClient.hash(adminSecretForSigning + info).encode('hex')
         decodedKS = signature + "|" + info
         KS = base64.b64encode(decodedKS)
         return KS
 
     @staticmethod
-    def hash(salt, msg):
+    def generateSessionV2(adminSecretForSigning, userId, type, partnerId, expiry = 86400, privileges = ''):
+        # build fields array
+        fields = {}
+        for privilege in privileges.split(','):
+            privilege = privilege.strip()
+            if len(privilege) == 0:
+                continue
+            if privilege == '*':
+                privilege = 'all:*'
+            splittedPrivilege = privilege.split(':', 1)
+            if len(splittedPrivilege) > 1:
+                fields[splittedPrivilege[0]] = splittedPrivilege[1]
+            else:
+                fields[splittedPrivilege[0]] = ''
+
+        fields[KalturaClient.FIELD_EXPIRY] = str(int(time.time()) + expiry)
+        fields[KalturaClient.FIELD_TYPE] = str(type)
+        fields[KalturaClient.FIELD_USER] = str(userId)
+
+        # build fields string
+        fieldsStr = urllib.urlencode(fields)
+        fieldsStr = Random.get_random_bytes(KalturaClient.RANDOM_SIZE) + fieldsStr
+        fieldsStr = KalturaClient.hash(fieldsStr) + fieldsStr
+
+        # encrypt and encode
+        cipher = AES.new(KalturaClient.hash(adminSecretForSigning)[:16], AES.MODE_CBC, '\0' * 16)
+        if len(fieldsStr) % cipher.block_size != 0:
+            fieldsStr += '\0' * (cipher.block_size - len(fieldsStr) % cipher.block_size)
+        encryptedFields = cipher.encrypt(fieldsStr)
+        decodedKs = "v2|%s|%s" % (partnerId, encryptedFields)
+        return base64.b64encode(decodedKs).replace('+', '-').replace('/', '_')
+
+    @staticmethod
+    def hash(msg):
         m = hashlib.sha1()
-        m.update(salt)
         m.update(msg)
-        return m.digest().encode('hex')
+        return m.digest()
 
 class KalturaServiceActionCall:
     def __init__(self, service, action, params = KalturaParams(), files = KalturaFiles()):
