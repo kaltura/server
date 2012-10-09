@@ -3,6 +3,7 @@
 (function(e,h,m){var n=/\+/g;function o(c){return c}function p(c){return decodeURIComponent(c.replace(n,' '))}var d=e.cookie=function(c,b,a){if(b!==m){a=e.extend({},d.defaults,a);if(b===null){a.expires=-1}if(typeof a.expires==='number'){var q=a.expires,i=a.expires=new Date();i.setDate(i.getDate()+q)}b=d.json?JSON.stringify(b):String(b);return(h.cookie=[encodeURIComponent(c),'=',d.raw?b:encodeURIComponent(b),a.expires?'; expires='+a.expires.toUTCString():'',a.path?'; path='+a.path:'',a.domain?'; domain='+a.domain:'',a.secure?'; secure':''].join(''))}var j=d.raw?o:p;var k=h.cookie.split('; ');for(var f=0,g;(g=k[f]&&k[f].split('='));f++){if(j(g.shift())===c){var l=j(g.join('='));return d.json?JSON.parse(l):l}}return null};d.defaults={};e.removeCookie=function(c,b){if(e.cookie(c,b)!==null){e.cookie(c,null,b);return true}return false}})(jQuery,document);
 
 // KMC Login page
+if( typeof $ == 'undefined' ) $ = jQuery;
 
 function empty( val ) {
 	if( val === null )
