@@ -425,8 +425,9 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		return $child;
 	}
 
-		/**
+	/**
 	 * @param boolean  $bypassSerialization enables PS2 support
+	 * @return kJobData
 	 */
 	public function getData($bypassSerialization = false)
 	{
