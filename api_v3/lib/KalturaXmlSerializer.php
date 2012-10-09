@@ -72,8 +72,8 @@ class KalturaXmlSerializer
 		if ($object instanceof Exception)
 		{
 			echo '<error>';
-			$this->writeTag('code', $object->getCode());
-			$this->writeTag('message', $object->getMessage());
+			$this->writeTag('code', kString::xmlEncode($object->getCode()));
+			$this->writeTag('message', kString::xmlEncode($object->getMessage()));
 			echo '</error>';
 		}
 		else
