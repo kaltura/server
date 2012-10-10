@@ -22,8 +22,6 @@ class Form_HuluProfileConfiguration extends Form_ConfigurableProfileConfiguratio
 		$upload = new Zend_File_Transfer_Adapter_Http();
         $files = $upload->getFileInfo();
 		
-		KalturaLog::debug(print_r($properties));
-		
 		if(isset($files['aspera_public_key']))
         	$object->asperaPublicKey = $this->getFileContent($files['aspera_public_key']);
         
