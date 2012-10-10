@@ -297,7 +297,7 @@ class uiConfDeployment
 	 */
 	public static function init($conf_file_path)
 	{
-		require_once(KALTURA_ROOT_PATH."server_infra".DIRECTORY_SEPARATOR."kConf.php");
+		require_once(KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."server_infra".DIRECTORY_SEPARATOR."kConf.php");
 		
 		
 		// Autoloader
