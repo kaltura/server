@@ -9,6 +9,8 @@ class HuluDistributionPlugin extends KalturaPlugin implements IKalturaPermission
 	const CONTENT_DSTRIBUTION_VERSION_MINOR = 0;
 	const CONTENT_DSTRIBUTION_VERSION_BUILD = 0;
 
+	const DEPENDENTS_ON_PLUGIN_NAME_CUE_POINT = 'cuePoint';
+
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
@@ -22,7 +24,7 @@ class HuluDistributionPlugin extends KalturaPlugin implements IKalturaPermission
 			self::CONTENT_DSTRIBUTION_VERSION_BUILD);
 			
 		$dependency1 = new KalturaDependency(ContentDistributionPlugin::getPluginName(), $contentDistributionVersion);
-		$dependency2 = new KalturaDependency(CuePointPlugin::getPluginName());
+		$dependency2 = new KalturaDependency(HuluDistributionPlugin::DEPENDENTS_ON_PLUGIN_NAME_CUE_POINT);
 		return array($dependency1, $dependency2);
 	}
 	
