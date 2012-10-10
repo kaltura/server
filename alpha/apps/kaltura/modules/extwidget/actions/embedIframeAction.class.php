@@ -137,11 +137,23 @@ class embedIframeAction extends sfAction
 
 		$use_cdn = $uiConf->getUseCdn();
 		$host = $use_cdn ?  $partner_cdnHost : $partner_host;
-		
-		$url =  $host;
-		$url .=  "/html5/html5lib/{$html5_version}/mwEmbedFrame.php";
+
+		$ui_conf_html5_url = $uiConf->getHtml5Url();
+		if($ui_conf_html5_url)
+		{
+			$url = str_replace('mwEmbedLoader.php', 'mwEmbedFrame.php', $ui_conf_html5_url);
+			if (!kString::beginsWith($ui_conf_html5_url , "http")) // absolute URL
+				$url = $host . $url;
+		}
+		else
+		{
+			$url =  $host;
+			$url .=  "/html5/html5lib/{$html5_version}/mwEmbedFrame.php";
+		}
+
 		$url .=  "/entry_id/{$entry_id}/wid/{$widget_id}/uiconf_id/{$uiconf_id}";
-		
+		$url .= '?' . http_build_query($_GET, '', '&'); // forward all GET parameters
+
 		if ($allowCache)
 			$cache->put($requestKey, $url);
 
