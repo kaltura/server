@@ -110,7 +110,7 @@ class kBatchExclusiveLock
 		
 		$c->add ( BatchJobLockPeer::JOB_TYPE, $jobType );
 		$max_exe_attempts = BatchJobLockPeer::getMaxExecutionAttempts($jobType);
-		$rate_between_schedulers = BatchJobLockPeer::getRateBetweenSchedulers($jobType);
+		$$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
 		$max_jobs_for_partner = BatchJobLockPeer::getMaxJobsForPartner($jobType);
 		
 		$query = "	(
@@ -141,7 +141,7 @@ class kBatchExclusiveLock
 		$c->addAnd($c->getNewCriterion($stat, $query, Criteria::CUSTOM));
 		$c->addAnd($c->getNewCriterion(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId()));
 		
-		self::addSchedulingCondition($c, $rate_between_schedulers, $max_jobs_for_partner);
+		self::addPrioritizersCondition($c, $prioritizers_ratio, $max_jobs_for_partner);
 		$c->setLimit($number_of_objects);
 		
 		$objects = BatchJobLockPeer::doSelect ( $c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
@@ -242,7 +242,7 @@ class kBatchExclusiveLock
 		$c->add ( BatchJobLockPeer::JOB_TYPE, $jobType );
 		
 		$max_exe_attempts = BatchJobLockPeer::getMaxExecutionAttempts($jobType);
-		$rate_between_schedulers = BatchJobLockPeer::getRateBetweenSchedulers($jobType);
+		$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
 		$max_jobs_for_partner = BatchJobLockPeer::getMaxJobsForPartner($jobType);
 		
 		$unClosedStatuses = implode(',', BatchJobPeer::getUnClosedStatusList());
@@ -281,16 +281,16 @@ class kBatchExclusiveLock
 		$c->add($stat, $query, Criteria::CUSTOM);
 		$c->add(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId());
 		
-		self::addSchedulingCondition($c, $rate_between_schedulers, $max_jobs_for_partner);
+		self::addPrioritizersCondition($c, $prioritizers_ratio, $max_jobs_for_partner);
 		$c->setLimit($number_of_objects);
 		
 		$objects = BatchJobLockPeer::doSelect ( $c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
 		return self::lockObjects($lockKey, $objects, $max_execution_time);
 	}
 	
-	private static function addSchedulingCondition(Criteria $c, $rate_between_schedulers, $max_jobs_for_partner) 
+	private static function addPrioritizersCondition(Criteria $c, $prioritizers_ratio, $max_jobs_for_partner) 
 	{
-		if(rand(0, 100) < $rate_between_schedulers) 
+		if(rand(0, 100) < $prioritizers_ratio) 
 		{	// Throughput
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::URGENCY);
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::ESTIMATED_EFFORT);

@@ -56,19 +56,19 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 	}
 	
 	/**
-	 * This function returns the 'Rate between schedulers' from the configuration files.
-	 * This value is a number in range [0-100] that represents the percentage of the 
-	 * Through-put schedulers when we come to choose a scheduler.
-	 * f.i. if the value is 60 then in 60% of the cases we will choose the through-put scheduler
-	 * and in the rest 40% we will use the fairness scheduler.
+	 * This function returns the 'prioritizers ratio' from the configuration files.
+	 * This value is a number in range [0-100] that represents the percentage of the  
+	 * times we will choose the Through-put prioritizer when we come to choose a prioritizer.
+	 * f.i. if the value is 60 then in 60% of the cases we will choose the through-put prioritizer
+	 * and in the rest 40% we will use the fairness prioritizer.
 	 */
-	public static function getRateBetweenSchedulers($job_type = null)
+	public static function getPrioritizersRatio($job_type = null)
 	{
-		$jobRateBetweenSchedulers = kConf::get('rate_between_schedulers');
+		$jobRateBetweenSchedulers = kConf::get('prioritizers_ratio');
 		if(isset($jobRateBetweenSchedulers[$job_type]))
 			return $jobRateBetweenSchedulers[$job_type];
 			
-		return kConf::get('default_rate_between_schedulers');
+		return kConf::get('default_prioritizers_ratio');
 	}
 	
 	/**
