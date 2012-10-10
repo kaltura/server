@@ -7,6 +7,11 @@ class HuluDistributionEngine extends DistributionEngine implements
 	IDistributionEngineSubmit,
 	IDistributionEngineCloseSubmit
 {
+	
+	
+	protected $tempFilePath;
+	
+	
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineSubmit::submit()
 	 * 
@@ -76,6 +81,17 @@ class HuluDistributionEngine extends DistributionEngine implements
 	 */
 	public function configure(KSchedularTaskConfig $taskConfig)
 	{
+		if($taskConfig->params->tempFilePath)
+		{
+			$this->tempFilePath = $taskConfig->params->tempFilePath;
+			if(!is_dir($this->tempFilePath))
+				kFile::fullMkfileDir($this->tempFilePath, 0777, true);
+		}
+		else
+		{
+			$this->tempFilePath = sys_get_temp_dir();
+			KalturaLog::info('params.tempFilePath configuration not supplied, using default system directory ['.$this->tempFilePath.']');
+		}
 	}
 	
 	/**
@@ -93,8 +109,8 @@ class HuluDistributionEngine extends DistributionEngine implements
 				$username = $distributionProfile->asperaLogin;
 				$password = $distributionProfile->asperaPass;
 				$publicKey = $distributionProfile->asperaPublicKey;
-	        	$privateKey = $distributionProfile->asperaPrivateKey;
-	        	$passphrase = $distributionProfile->passphrase;
+				$privateKey = $distributionProfile->asperaPrivateKey;
+				$passphrase = $distributionProfile->passphrase;
 				break;
 			case KalturaDistributionProtocol::SFTP_CMD:
 				$host = $distributionProfile->sftpHost;
@@ -103,32 +119,32 @@ class HuluDistributionEngine extends DistributionEngine implements
 				break;
 		}
 		$fileTransferManager = kFileTransferMgr::getInstance($protocol);
-        if (trim($privateKey))
-        {
-            $publicKeyTempPath = $this->tempFilePath . '/' . uniqid(null, true);
-            $privateKeyTempPath = $this->tempFilePath . '/' . uniqid(null, true);
-            try
-            {
-                file_put_contents($publicKeyTempPath, $publicKey);
-                file_put_contents($privateKeyTempPath, $privateKey);
-                $fileTransferManager->loginPubKey($host, $username, $publicKeyTempPath, $privateKeyTempPath, $passphrase, ($port) ? $port : null);
-                unlink($publicKeyTempPath);
-                unlink($privateKeyTempPath);
-            }
-            catch(Exception $ex)
-            {
-                if (file_exists($publicKeyTempPath))
-                    unlink($publicKeyTempPath);
-                if (file_exists($privateKeyTempPath))
-                    unlink($privateKeyTempPath);
-                throw $ex;
-            }
-        }
-        else
-        {
-            $fileTransferManager->login($host, $username, $password, ($port) ? $port : null);
-            KalturaLog::debug("here");
-        }
+		if (trim($privateKey))
+		{
+			$publicKeyTempPath = $this->tempFilePath . '/' . uniqid(null, true);
+			$privateKeyTempPath = $this->tempFilePath . '/' . uniqid(null, true);
+			try
+			{
+				file_put_contents($publicKeyTempPath, $publicKey);
+				file_put_contents($privateKeyTempPath, $privateKey);
+				$fileTransferManager->loginPubKey($host, $username, $publicKeyTempPath, $privateKeyTempPath, $passphrase, ($port) ? $port : null);
+				unlink($publicKeyTempPath);
+				unlink($privateKeyTempPath);
+			}
+			catch(Exception $ex)
+			{
+				if (file_exists($publicKeyTempPath))
+					unlink($publicKeyTempPath);
+				if (file_exists($privateKeyTempPath))
+					unlink($privateKeyTempPath);
+				throw $ex;
+			}
+		}
+		else
+		{
+			$fileTransferManager->login($host, $username, $password, ($port) ? $port : null);
+			KalturaLog::debug("here");
+		}
 		return $fileTransferManager;
 	}
 
