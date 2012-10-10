@@ -178,8 +178,10 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 			),
 			"top_contributors" => array (
 				"detail" => "",
+				"detail_by_user" => "detail_by_user",
 				"detail_no_text" => "!detail",	
 				"count" => "",
+				"count_by_user" => "count_by_user",
 				"count_no_text" => "!count",	
 				"graph" => "",
 				"graph_no_text" => "!graph",
@@ -512,8 +514,6 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 		}
 		if ( $for_objects )	
 				$flavor_str = $flavor_str . $for_objects;
-		
-			
 		
 			
 		if ( isset ( $report_type_mapping[$flavor_str ]))
