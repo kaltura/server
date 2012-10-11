@@ -10,6 +10,8 @@ class FtpDistributionEngine extends DistributionEngine implements
 {
 	protected $tempFilePath;
 	
+	const TEMP_DIRECTORY = 'ftp_distribution';
+	
 	/**
 	 * @see IDistributionEngine::configure()
 	 */
@@ -270,15 +272,11 @@ class FtpDistributionEngine extends DistributionEngine implements
 		$fileTransferManager = kFileTransferMgr::getInstance($protocol);
         if (trim($privateKey))
         {
-            $publicKeyTempPath = $this->tempFilePath . '/' . uniqid(null, true);
-            $privateKeyTempPath = $this->tempFilePath . '/' . uniqid(null, true);
             try
             {
-                file_put_contents($publicKeyTempPath, $publicKey);
-                file_put_contents($privateKeyTempPath, $privateKey);
+            	$publicKeyTempPath = $this->getFileLocationForSFTPKey($distributionProfile->id, $publicKey, 'publickey');
+            	$privateKeyTempPath = $this->getFileLocationForSFTPKey($distributionProfile->id, $privateKey, 'privatekey');
                 $fileTransferManager->loginPubKey($host, $username, $publicKeyTempPath, $privateKeyTempPath, $passphrase, ($port) ? $port : null);
-                unlink($publicKeyTempPath);
-                unlink($privateKeyTempPath);
             }
             catch(Exception $ex)
             {
@@ -310,4 +308,26 @@ class FtpDistributionEngine extends DistributionEngine implements
             }
         }
     }
+	
+	private function getFileLocationForSFTPKey($distributionProfileId, $keyContent, $fileName) 
+	{
+		$tempDirectory = $this->getTempDirectoryForProfile($distributionProfileId);
+		$fileLocation = $tempDirectory . $fileName;
+		if (!file_exists($fileLocation) || (file_get_contents($fileLocation) !== $keyContent))
+		{
+			file_put_contents($fileLocation, $keyContent);
+			chmod($fileLocation, 0600);
+		}
+		
+		return $fileLocation;
+	}
+    
+	private function getTempDirectoryForProfile($distributionProfileId)
+	{
+		$tempFilePath = kConf::get('temp_folder') . '/' . self::TEMP_DIRECTORY . '/' . $distributionProfileId . '/';
+		if (!file_exists($tempFilePath))
+			mkdir($tempFilePath, 0777, true);
+		return $tempFilePath;
+	}
+    
 }
