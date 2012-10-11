@@ -143,7 +143,6 @@ class HuluDistributionEngine extends DistributionEngine implements
 		else
 		{
 			$fileTransferManager->login($host, $username, $password, ($port) ? $port : null);
-			KalturaLog::debug("here");
 		}
 		return $fileTransferManager;
 	}
