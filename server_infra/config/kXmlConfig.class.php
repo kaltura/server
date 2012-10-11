@@ -4,8 +4,8 @@
  * This will lbe done by referencing elements from one xml to another.
  * The result can be stored on the disk so the relatively heavy merge will be done only when really required.
  * 
- * @package infra
- * @subpackage utils
+ * @package server-infra
+ * @subpackage config
  */
 class kXmlConfig
 {

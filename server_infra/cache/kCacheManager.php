@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package infra
+ * @package server-infra
  * @subpackage cache
  */
 class kCacheManager

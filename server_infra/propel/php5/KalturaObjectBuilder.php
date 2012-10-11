@@ -1,6 +1,6 @@
 <?php
 /**
- * @package infra
+ * @package server-infra
  * @subpackage propel
  */
 require_once 'propel/engine/builder/om/php5/PHP5ObjectBuilder.php';
@@ -11,7 +11,7 @@ require_once 'propel/engine/builder/om/php5/PHP5ObjectBuilder.php';
  * This class produces the base object class (e.g. BaseMyTable) which contains all
  * the custom-built accessor and setter methods.
  *
- * @package infra
+ * @package server-infra
  * @subpackage propel
  */
 class KalturaObjectBuilder extends PHP5ObjectBuilder

@@ -1,6 +1,6 @@
 <?php
 /**
- * @package infra
+ * @package server-infra
  * @subpackage Media
  */
 abstract class KBaseThumbnailMaker

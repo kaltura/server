@@ -30,8 +30,8 @@
  * Each line separated into columns by the table-delimiter.
  * In the column defined as the pk there should be no duplicates. 
  * 
- * @package infra
- * @subpackage utils
+ * @package server-infra
+ * @subpackage config
  */
 class kConfigTable 
 {

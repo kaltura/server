@@ -1,8 +1,8 @@
 <?php
 
 /** 
- * @package infra
- * @subpackage utils
+ * @package server-infra
+ * @subpackage content
  */
 class XSLTErrorCollector
 {

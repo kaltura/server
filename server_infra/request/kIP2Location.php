@@ -1,9 +1,12 @@
 <?php
-
+/**
+ * @package server-infra
+ * @subpackage request
+ */
 include(__DIR__ . "/IP2Location.inc.php");
 
 /**
- * @package infra
+ * @package server-infra
  * @subpackage request
  */
 class kIP2Location

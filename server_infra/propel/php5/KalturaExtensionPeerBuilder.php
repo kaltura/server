@@ -1,6 +1,6 @@
 <?php
 /**
- * @package infra
+ * @package server-infra
  * @subpackage propel
  */
 require_once 'propel/engine/builder/om/php5/PHP5ExtensionPeerBuilder.php';
@@ -14,7 +14,7 @@ require_once 'propel/engine/builder/om/php5/PHP5ExtensionPeerBuilder.php';
  * This class replaces the ExtensionPeer.tpl, with the intent of being easier for users
  * to customize (through extending & overriding).
  *
- * @package infra
+ * @package server-infra
  * @subpackage propel
  */
 class KalturaExtensionPeerBuilder extends PHP5ExtensionPeerBuilder

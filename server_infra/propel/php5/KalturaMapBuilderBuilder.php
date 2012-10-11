@@ -1,6 +1,6 @@
 <?php
 /**
- * @package infra
+ * @package server-infra
  * @subpackage propel
  */
 require_once 'propel/engine/builder/om/php5/PHP5TableMapBuilder.php';
@@ -8,7 +8,7 @@ require_once 'propel/engine/builder/om/php5/PHP5TableMapBuilder.php';
 /**
  * Generates the PHP5 table map class for user object model (OM).
  *
- * @package infra
+ * @package server-infra
  * @subpackage propel
  */
 class KalturaMapBuilderBuilder extends PHP5TableMapBuilder

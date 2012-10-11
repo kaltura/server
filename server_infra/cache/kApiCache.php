@@ -6,7 +6,7 @@ require_once(dirname(__FILE__) . '/kCacheManager.php');
 require_once(dirname(__FILE__) . '/../request/kSessionBase.class.php');
 
 /**
- * @package infra
+ * @package server-infra
  * @subpackage cache
  */
 class kApiCache

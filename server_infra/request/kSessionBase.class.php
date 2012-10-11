@@ -1,9 +1,17 @@
 <?php
-
+/**
+ * NOTE: this code runs before the API dispatcher - should not use Propel / autoloader
+ *  
+ * @package server-infra
+ * @subpackage request
+ */
 require_once(dirname(__FILE__) . '/infraRequestUtils.class.php');
 require_once(dirname(__FILE__) . '/../cache/kCacheManager.php');
 
-// NOTE: this code runs before the API dispatcher - should not use Propel / autoloader
+/** 
+ * @package server-infra
+ * @subpackage request
+ */
 class kSessionBase
 {
 	// Common constants

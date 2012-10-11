@@ -1,11 +1,15 @@
 <?php
+/**
+ * @package server-infra
+ * @subpackage config
+ */
 setlocale(LC_ALL, 'en_US.UTF-8');
 
 require_once __DIR__ . '/../infra/kEnvironment.php';
 
 /**
  * Manages all Kaltura configurations
- * @package infra
+ * @package server-infra
  * @subpackage Configuration
  */
 class kConf extends kEnvironment

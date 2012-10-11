@@ -7,7 +7,7 @@
  * 
  * The memcahe object is sttic and will be used for all of the cache requests of a single request.
  * 
- * @package infra
+ * @package server-infra
  * @subpackage cache
  */
 class myCache

@@ -1,7 +1,7 @@
 <?php
 /**
- * @package infra
- * @subpackage Security
+ * @package server-infra
+ * @subpackage License
  */
 class ActKeyUtils
 {

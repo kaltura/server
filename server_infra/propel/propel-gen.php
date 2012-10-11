@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package server-infra
+ * @subpackage propel
+ */
 function searchFolder($pluginsFolder, $level = 1)
 {
 	foreach(scandir($pluginsFolder) as $pluginDir)

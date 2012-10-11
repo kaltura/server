@@ -1,12 +1,11 @@
 <?php
-
-// IMPORTANT !!! This class should not depend on anything other than kConf (e.g. NOT KalturaLog)
-
 /**
+ * IMPORTANT !!! This class should not depend on anything other than kConf (e.g. NOT KalturaLog)
+ * 
  * Will hold helper functions and conventions for working with the HttpRequest object
  *
- * @package infra
- * @subpackage http
+ * @package server-infra
+ * @subpackage request
  */
 class infraRequestUtils
 {
