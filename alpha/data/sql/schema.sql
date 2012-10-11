@@ -545,6 +545,7 @@ CREATE TABLE `batch_job_sep`
 	`err_type` INTEGER,
 	`err_number` INTEGER,
 	`batch_job_lock_id` INTEGER,
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `status_job_type_index`(`status`, `job_type`),
 	KEY `entry_id_index_id`(`entry_id`, `id`),
@@ -593,6 +594,7 @@ CREATE TABLE `batch_job_lock`
 	`version` INTEGER,
 	`dc` INTEGER,
 	`batch_job_id` INTEGER,
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `status_job_type_index`(`status`, `job_type`),
 	KEY `entry_id_index_id`(`entry_id`, `id`),
@@ -625,6 +627,7 @@ CREATE TABLE `partner_load`
 	`partner_id` INTEGER  NOT NULL,
 	`partner_load` INTEGER,
 	`weighted_partner_load` INTEGER,
+	`custom_data` TEXT,
 	PRIMARY KEY (`job_type`,`job_sub_type`,`partner_id`),
 	KEY `partner_index`(`partner_id`, `job_type`, `job_sub_type`)
 )Type=InnoDB;

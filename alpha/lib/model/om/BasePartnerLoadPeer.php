@@ -26,7 +26,7 @@ abstract class BasePartnerLoadPeer {
 	const TM_CLASS = 'PartnerLoadTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 5;
+	const NUM_COLUMNS = 6;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -46,6 +46,9 @@ abstract class BasePartnerLoadPeer {
 	/** the column name for the WEIGHTED_PARTNER_LOAD field */
 	const WEIGHTED_PARTNER_LOAD = 'partner_load.WEIGHTED_PARTNER_LOAD';
 
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'partner_load.CUSTOM_DATA';
+
 	/**
 	 * An identiy map to hold any loaded instances of PartnerLoad objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -62,11 +65,11 @@ abstract class BasePartnerLoadPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('JobType', 'JobSubType', 'PartnerId', 'PartnerLoad', 'WeightedPartnerLoad', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('jobType', 'jobSubType', 'partnerId', 'partnerLoad', 'weightedPartnerLoad', ),
-		BasePeer::TYPE_COLNAME => array (self::JOB_TYPE, self::JOB_SUB_TYPE, self::PARTNER_ID, self::PARTNER_LOAD, self::WEIGHTED_PARTNER_LOAD, ),
-		BasePeer::TYPE_FIELDNAME => array ('job_type', 'job_sub_type', 'partner_id', 'partner_load', 'weighted_partner_load', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('JobType', 'JobSubType', 'PartnerId', 'PartnerLoad', 'WeightedPartnerLoad', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('jobType', 'jobSubType', 'partnerId', 'partnerLoad', 'weightedPartnerLoad', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::JOB_TYPE, self::JOB_SUB_TYPE, self::PARTNER_ID, self::PARTNER_LOAD, self::WEIGHTED_PARTNER_LOAD, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('job_type', 'job_sub_type', 'partner_id', 'partner_load', 'weighted_partner_load', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
 	);
 
 	/**
@@ -76,11 +79,11 @@ abstract class BasePartnerLoadPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('JobType' => 0, 'JobSubType' => 1, 'PartnerId' => 2, 'PartnerLoad' => 3, 'WeightedPartnerLoad' => 4, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('jobType' => 0, 'jobSubType' => 1, 'partnerId' => 2, 'partnerLoad' => 3, 'weightedPartnerLoad' => 4, ),
-		BasePeer::TYPE_COLNAME => array (self::JOB_TYPE => 0, self::JOB_SUB_TYPE => 1, self::PARTNER_ID => 2, self::PARTNER_LOAD => 3, self::WEIGHTED_PARTNER_LOAD => 4, ),
-		BasePeer::TYPE_FIELDNAME => array ('job_type' => 0, 'job_sub_type' => 1, 'partner_id' => 2, 'partner_load' => 3, 'weighted_partner_load' => 4, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('JobType' => 0, 'JobSubType' => 1, 'PartnerId' => 2, 'PartnerLoad' => 3, 'WeightedPartnerLoad' => 4, 'CustomData' => 5, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('jobType' => 0, 'jobSubType' => 1, 'partnerId' => 2, 'partnerLoad' => 3, 'weightedPartnerLoad' => 4, 'customData' => 5, ),
+		BasePeer::TYPE_COLNAME => array (self::JOB_TYPE => 0, self::JOB_SUB_TYPE => 1, self::PARTNER_ID => 2, self::PARTNER_LOAD => 3, self::WEIGHTED_PARTNER_LOAD => 4, self::CUSTOM_DATA => 5, ),
+		BasePeer::TYPE_FIELDNAME => array ('job_type' => 0, 'job_sub_type' => 1, 'partner_id' => 2, 'partner_load' => 3, 'weighted_partner_load' => 4, 'custom_data' => 5, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
 	);
 
 	/**
@@ -155,6 +158,7 @@ abstract class BasePartnerLoadPeer {
 		$criteria->addSelectColumn(PartnerLoadPeer::PARTNER_ID);
 		$criteria->addSelectColumn(PartnerLoadPeer::PARTNER_LOAD);
 		$criteria->addSelectColumn(PartnerLoadPeer::WEIGHTED_PARTNER_LOAD);
+		$criteria->addSelectColumn(PartnerLoadPeer::CUSTOM_DATA);
 	}
 
 	/**

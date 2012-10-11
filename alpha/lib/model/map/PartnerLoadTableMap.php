@@ -42,6 +42,7 @@ class PartnerLoadTableMap extends TableMap {
 		$this->addPrimaryKey('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('PARTNER_LOAD', 'PartnerLoad', 'INTEGER', false, null, null);
 		$this->addColumn('WEIGHTED_PARTNER_LOAD', 'WeightedPartnerLoad', 'INTEGER', false, null, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

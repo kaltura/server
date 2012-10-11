@@ -191,6 +191,12 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	protected $batch_job_lock_id;
 
 	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
+
+	/**
 	 * @var        BatchJobLock
 	 */
 	protected $aBatchJobLock;
@@ -671,6 +677,16 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function getBatchJobLockId()
 	{
 		return $this->batch_job_lock_id;
+	}
+
+	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
 	}
 
 	/**
@@ -1432,6 +1448,26 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	} // setBatchJobLockId()
 
 	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     BatchJob The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = BatchJobPeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1503,6 +1539,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			$this->err_type = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
 			$this->err_number = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
 			$this->batch_job_lock_id = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
+			$this->custom_data = ($row[$startcol + 28] !== null) ? (string) $row[$startcol + 28] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1512,7 +1549,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 28; // 28 = BatchJobPeer::NUM_COLUMNS - BatchJobPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 29; // 29 = BatchJobPeer::NUM_COLUMNS - BatchJobPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating BatchJob object", $e);
@@ -1771,6 +1808,8 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -1781,7 +1820,9 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function postSave(PropelPDO $con = null) 
 	{
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 		parent::postSave($con);
 	}
 	
@@ -2090,6 +2131,9 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			case 27:
 				return $this->getBatchJobLockId();
 				break;
+			case 28:
+				return $this->getCustomData();
+				break;
 			default:
 				return null;
 				break;
@@ -2139,6 +2183,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			$keys[25] => $this->getErrType(),
 			$keys[26] => $this->getErrNumber(),
 			$keys[27] => $this->getBatchJobLockId(),
+			$keys[28] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -2254,6 +2299,9 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			case 27:
 				$this->setBatchJobLockId($value);
 				break;
+			case 28:
+				$this->setCustomData($value);
+				break;
 		} // switch()
 	}
 
@@ -2306,6 +2354,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[25], $arr)) $this->setErrType($arr[$keys[25]]);
 		if (array_key_exists($keys[26], $arr)) $this->setErrNumber($arr[$keys[26]]);
 		if (array_key_exists($keys[27], $arr)) $this->setBatchJobLockId($arr[$keys[27]]);
+		if (array_key_exists($keys[28], $arr)) $this->setCustomData($arr[$keys[28]]);
 	}
 
 	/**
@@ -2345,6 +2394,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(BatchJobPeer::ERR_TYPE)) $criteria->add(BatchJobPeer::ERR_TYPE, $this->err_type);
 		if ($this->isColumnModified(BatchJobPeer::ERR_NUMBER)) $criteria->add(BatchJobPeer::ERR_NUMBER, $this->err_number);
 		if ($this->isColumnModified(BatchJobPeer::BATCH_JOB_LOCK_ID)) $criteria->add(BatchJobPeer::BATCH_JOB_LOCK_ID, $this->batch_job_lock_id);
+		if ($this->isColumnModified(BatchJobPeer::CUSTOM_DATA)) $criteria->add(BatchJobPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -2464,6 +2514,8 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 		$copyObj->setErrNumber($this->err_number);
 
 		$copyObj->setBatchJobLockId($this->batch_job_lock_id);
+
+		$copyObj->setCustomData($this->custom_data);
 
 
 		if ($deepCopy) {
@@ -2768,4 +2820,121 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			$this->aBatchJobLock = null;
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BaseBatchJob

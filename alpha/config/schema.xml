@@ -521,6 +521,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="err_type" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="err_number" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_job_lock_id" type="integer" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
         <foreign-key foreignTable="batch_job_lock">
             <reference local="batch_job_lock_id" foreign="id"/>
         </foreign-key>
@@ -591,6 +592,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="version" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_job_id" type="integer" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
         <foreign-key foreignTable="batch_job_sep">
             <reference local="batch_job_id" foreign="id"/>
         </foreign-key>
@@ -648,6 +650,7 @@
 		<column primaryKey="true" required="true" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_load" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="weighted_partner_load" type="integer" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<index name="partner_index">
 			<index-column name="partner_id" />
 			<index-column name="job_type" />

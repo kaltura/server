@@ -29,6 +29,7 @@ CREATE TABLE `batch_job_sep` (
   `batch_job_lock_id` int(20),
   `history` TEXT,
   `lock_info` TEXT,
+  `custom_data` TEXT,
   PRIMARY KEY (`id`),
   KEY `entry_id_index` (`entry_id`), 
   KEY `object_index` (`object_id`,`object_type`),
@@ -64,6 +65,7 @@ CREATE TABLE `batch_job_lock` (
   `expiration` datetime DEFAULT NULL,
   `start_at` datetime DEFAULT NULL,
   `batch_job_id` int(20) NOT NULL,
+  `custom_data` TEXT,
   PRIMARY KEY (`id`),
   
   KEY `lock_index` (`scheduler_id`, `worker_id`, `batch_index`),
@@ -82,6 +84,7 @@ CREATE TABLE `partner_load` (
   `job_sub_type` int(6) DEFAULT 0,
   `partner_load` int(11) DEFAULT NULL,
   `weighted_partner_load` int(11) DEFAULT 0,
+  `custom_data` TEXT,
   PRIMARY KEY (`partner_id`,`job_type`,`job_sub_type`),
   KEY `weight_index`(`weighted_partner_load`),
   KEY `load_index`(`partner_load`)
