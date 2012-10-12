@@ -105,6 +105,7 @@ class HuluDistributionEngine extends DistributionEngine implements
 	{
 		$port = $distributionProfile->port;
 		$protocol = $distributionProfile->protocol ?  $distributionProfile->protocol : KalturaDistributionProtocol::SFTP_CMD;
+		$privateKey = null;
 		switch ($protocol){
 			case KalturaDistributionProtocol::ASPERA:
 				$host = $distributionProfile->asperaHost;
@@ -121,7 +122,7 @@ class HuluDistributionEngine extends DistributionEngine implements
 				break;
 		}
 		$fileTransferManager = kFileTransferMgr::getInstance($protocol);
-		if (trim($privateKey))
+		if ($privateKey && trim($privateKey))
 		{
 			try
 			{
