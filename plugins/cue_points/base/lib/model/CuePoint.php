@@ -16,13 +16,17 @@
 abstract class CuePoint extends BaseCuePoint implements IIndexable 
 {
 	const CUSTOM_DATA_FIELD_FORCE_STOP = 'forceStop';
+	const CUSTOM_DATA_FIELD_DEPTH = 'depth';
+	const CUSTOM_DATA_FIELD_CHILDREN_COUNT = 'childrenCount';
+	const CUSTOM_DATA_FIELD_DIRECT_CHILDREN_COUNT = 'directChildrenCount';
+	const CUSTOM_DATA_FIELD_ROOT_PARENT_ID = 'rootParentId';
 	
 	public function getChildren()
 	{
 		if ($this->isNew())
 			return array();
 			
-		$c = new Criteria();
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$c->add(CuePointPeer::PARENT_ID, $this->getId());
 		
 		return CuePointPeer::doSelect($c);
@@ -120,6 +124,10 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		parent::postInsert($con);
 		
 		kEventsManager::raiseEvent(new kObjectAddedEvent($this));
+		
+		$parent = $this->getParent();
+		if($parent)
+			$parent->increaseChildrenCountAndSave();
 	}
 	
 	
@@ -139,7 +147,13 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		$ret = parent::postUpdate($con);
 		
 		if($objectDeleted)
+		{
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+			
+			$parent = $this->getParent();
+			if($parent)
+				$parent->decreaseChildrenCountAndSave();
+		}
 			
 		if($objectUpdated)
 			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
@@ -151,32 +165,15 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	{
 		$ret = array();
 		
-		$parent = null;
 		$roots = array($this->getId());
 		if($this->getParentId())
 		{
-			$ret[] = 'parent ' . $this->getParentId();
-			$parent = CuePointPeer::retrieveByPK($this->getParentId());
+			$ret[] = 'P' . $this->getParentId();
+			$ret[] = 'R' . $this->getRootParentId();
 		}
 		
-		while($parent)
-		{
-			$parentId = $parent->getId();
-			if(in_array($parentId, $roots))
-				break;
-				
-			$ret[] = "root $parentId";
-			$roots[] = $parentId;
-			
-			if($parent->getParentId())
-				$parent = CuePointPeer::retrieveByPK($parent->getParentId());
-			else
-				$parent = null;
-		}
-		
-			
 		if($this->getEntryId())
-			$ret[] = 'entry ' . $this->getEntryId();
+			$ret[] = 'E' . $this->getEntryId();
 		
 		return implode(',', $ret);
 	}
@@ -325,5 +322,139 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	public function getSearchIndexFieldsEscapeType($fieldName)
 	{
 		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
+	}
+	
+	/**
+	 * @return Annotation
+	 */
+	protected function getParent()
+	{
+		if(!$this->getParentId())
+			return null;
+			
+		return CuePointPeer::retrieveByPK($this->getParentId());
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getRootParentId()
+	{
+		$ret = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ROOT_PARENT_ID);
+		if(!is_null($ret))
+			return $ret;
+			
+		if(!$this->getParentId())
+			return $this->getId();
+			
+		return $this->getParent()->getRootParentId();
+	}
+	
+	/**
+	 * @return int
+	 */
+	public function getDepth()
+	{
+		$ret = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DEPTH);
+		if(!is_null($ret))
+			return $ret;
+			
+		if(!$this->getParentId())
+			return 0;
+			
+		return $this->getParent()->getDepth() + 1;
+	}
+	
+	protected function increaseChildrenCountAndSave()
+	{
+		$this->incInCustomData(self::CUSTOM_DATA_FIELD_DIRECT_CHILDREN_COUNT);
+		$this->incInCustomData(self::CUSTOM_DATA_FIELD_CHILDREN_COUNT);
+		$this->save();
+		
+		$parent = $this->getParent();
+		if($parent)
+			$parent->increaseChildrenCountAndSave();
+	}
+	
+	protected function decreaseChildrenCountAndSave()
+	{
+		$this->decInCustomData(self::CUSTOM_DATA_FIELD_DIRECT_CHILDREN_COUNT);
+		$this->decInCustomData(self::CUSTOM_DATA_FIELD_CHILDREN_COUNT);
+		$this->save();
+		
+		$parent = $this->getParent();
+		if($parent)
+			$parent->decreaseChildrenCountAndSave();
+	}
+	
+	
+	/**
+	 * @return int
+	 */
+	public function getDirectChildrenCount()
+	{			
+		if ($this->isNew())
+			return 0;
+			
+		$ret = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DIRECT_CHILDREN_COUNT);
+		if(!is_null($ret))
+			return $ret;
+			
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
+		$c->add(CuePointPeer::PARENT_ID, $this->getId());
+		$c->applyFilters();
+		
+		return $c->getRecordsCount();
+	}
+	
+	/**
+	 * @return int
+	 */
+	public function getChildrenCount()
+	{			
+		if ($this->isNew())
+			return 0;
+			
+		$ret = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CHILDREN_COUNT);
+		if(!is_null($ret))
+			return $ret;
+			
+		$ret = 0;
+		foreach($this->getChildren() as $child)
+		{
+			$ret ++;
+			$ret += $child->getChildrenCount();
+		}
+			
+		return $ret;
+	}
+	
+	/**
+	 * @param int
+	 */
+	protected function setDepth($depth)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_DEPTH, $depth);
+	}
+	
+	/**
+	 * @param int
+	 */
+	protected function setRootParentId($id)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_ROOT_PARENT_ID, $id);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseCuePoint::preInsert()
+	 */
+	public function preInsert(PropelPDO $con = null)
+	{
+		$this->setDepth($this->getDepth());
+		if($this->getParentId())
+			$this->setRootParentId($this->getRootParentId());
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_CHILDREN_COUNT, 0);
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_DIRECT_CHILDREN_COUNT, 0);
 	}
 } // CuePoint

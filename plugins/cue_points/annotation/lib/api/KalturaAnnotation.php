@@ -32,6 +32,30 @@ class KalturaAnnotation extends KalturaCuePoint
 	 * @readonly
 	 */
 	public $duration;
+	
+	/**
+	 * Depth in the tree
+	 * @var int
+	 * @todo add filters and order after adding this field to the sphinx 
+	 * @readonly
+	 */
+	public $depth;
+	
+	/**
+	 * Number of all descendants
+	 * @var int
+	 * @todo add filters and order after adding this field to the sphinx 
+	 * @readonly
+	 */
+	public $childrenCount;
+	
+	/**
+	 * Number of children, first generation only.
+	 * @var int
+	 * @todo add filters and order after adding this field to the sphinx 
+	 * @readonly
+	 */
+	public $directChildrenCount;
 
 	public function __construct()
 	{
@@ -44,6 +68,9 @@ class KalturaAnnotation extends KalturaCuePoint
 		"text",
 		"endTime",
 		"duration",
+		"depth",
+		"childrenCount",
+		"directChildrenCount",
 	);
 	
 	/* (non-PHPdoc)
