@@ -56,26 +56,50 @@ class HuluDistributionEngine extends DistributionEngine implements
 		$feed = new HuluFeedHelper('hulu_template.xml', $distributionProfile, $providerData);
 		$xml = $feed->getXml();
 		
-		$fileManager = $this->getFileTransferManager($distributionProfile);
-		
 		$videoFilePath = $providerData->videoAssetFilePath;
 		$thumbAssetFilePath = $providerData->thumbAssetFilePath;
+		$protocol = $distributionProfile->protocol ? $distributionProfile->protocol : KalturaDistributionProtocol::SFTP_CMD;
 		
-		$sftpBasePath = '/home/' . $distributionProfile->sftpLogin . '/upload';
-		$videoSFTPPath 	= $sftpBasePath.'/'.$providerData->fileBaseName.'.'.pathinfo($videoFilePath, PATHINFO_EXTENSION);
-		$thumbSFTPPath 	= $sftpBasePath.'/'.$providerData->fileBaseName.'.'.pathinfo($thumbAssetFilePath, PATHINFO_EXTENSION);
-		$xmlSFTPPath 	= $sftpBasePath.'/'.$providerData->fileBaseName.'.xml';
-		KalturaLog::info('$videoSFTPPath:' . $videoSFTPPath);
-		KalturaLog::info('$thumbSFTPPath:' . $thumbSFTPPath);
-		KalturaLog::info('$xmlSFTPPath:' . $xmlSFTPPath);
-		KalturaLog::info('XML:' . $xml);
-		
-		$fileManager->putFile($videoSFTPPath, $videoFilePath);
-		
-		if($thumbAssetFilePath && file_exists($thumbAssetFilePath))
-			$fileManager->putFile($thumbSFTPPath, $thumbAssetFilePath);
-			
-		$fileManager->filePutContents($xmlSFTPPath, $xml);
+		$remoteVideoFileName = $providerData->fileBaseName.'.'.pathinfo($videoFilePath, PATHINFO_EXTENSION);
+		$remoteThumbFileName = $providerData->fileBaseName.'.'.pathinfo($thumbAssetFilePath, PATHINFO_EXTENSION);
+		$remoteXmlFileName = $providerData->fileBaseName.'.xml';
+		switch ($protocol){
+			case KalturaDistributionProtocol::SFTP_CMD:
+				$sftpBasePath = '/home/' . $distributionProfile->sftpLogin . '/upload';
+				$videoSFTPPath = $sftpBasePath.'/'.$remoteVideoFileName;
+				$thumbSFTPPath = $sftpBasePath.'/'.$remoteThumbFileName;
+				$xmlSFTPPath = $sftpBasePath.'/'.$remoteXmlFileName;
+				KalturaLog::info('$videoSFTPPath:' . $videoSFTPPath);
+				KalturaLog::info('$thumbSFTPPath:' . $thumbSFTPPath);
+				KalturaLog::info('$xmlSFTPPath:' . $xmlSFTPPath);
+				KalturaLog::info('XML:' . $xml);
+				$fileManager = $this->getSFTPManager($distributionProfile);
+				$fileManager->putFile($videoSFTPPath, $videoFilePath);
+				if($thumbAssetFilePath && file_exists($thumbAssetFilePath))
+					$fileManager->putFile($thumbSFTPPath, $thumbAssetFilePath);
+				
+				$fileManager->filePutContents($xmlSFTPPath, $xml);
+				break;
+			case KalturaDistributionProtocol::ASPERA:
+				$xmlTempPath = $this->getFileLocation($distributionProfile->id, $xml, $providerData->fileBaseName.'.xml');
+				$host = $distributionProfile->asperaHost;
+				$username = $distributionProfile->asperaLogin;
+				$password = $distributionProfile->asperaPass;
+				$privateKey = $distributionProfile->asperaPrivateKey;
+				$passphrase = $distributionProfile->passphrase;
+				$port = $distributionProfile->port;
+				$privateKeyTempPath = null;
+				if (trim($privateKey)){
+					$privateKeyTempPath = $this->getFileLocation($distributionProfile->id, $privateKey, 'privatekey');
+				}
+				if ($videoFilePath && file_exists($videoFilePath))
+					$this->uploadFileWithAspera($host, $username, $videoFilePath, $password, $privateKeyTempPath, $passphrase, $port, $remoteVideoFileName);
+				if($thumbAssetFilePath && file_exists($thumbAssetFilePath))
+					$this->uploadFileWithAspera($host, $username, $thumbAssetFilePath, $password, $privateKeyTempPath, $passphrase, $port, $remoteThumbFileName );
+				if($xmlTempPath && file_exists($xmlTempPath))
+					$this->uploadFileWithAspera($host, $username, $xmlTempPath, $password, $privateKeyTempPath, $passphrase, $port, $remoteXmlFileName);
+				break;
+		}
 	}
 	
 	/* (non-PHPdoc)
@@ -83,76 +107,15 @@ class HuluDistributionEngine extends DistributionEngine implements
 	 */
 	public function configure(KSchedularTaskConfig $taskConfig)
 	{
-		if($taskConfig->params->tempFilePath)
-		{
-			$this->tempFilePath = $taskConfig->params->tempFilePath;
-			if(!is_dir($this->tempFilePath))
-				kFile::fullMkfileDir($this->tempFilePath, 0777, true);
-		}
-		else
-		{
-			$this->tempFilePath = sys_get_temp_dir();
-			KalturaLog::info('params.tempFilePath configuration not supplied, using default system directory ['.$this->tempFilePath.']');
-		}
 	}
 	
-	/**
-	 * 
-	 * @param KalturaHuluDistributionProfile $distributionProfile
-	 * @return kFileTransferMgr
-	 */
-	protected function getFileTransferManager(KalturaHuluDistributionProfile $distributionProfile)
-	{
-		$port = $distributionProfile->port;
-		$protocol = $distributionProfile->protocol ?  $distributionProfile->protocol : KalturaDistributionProtocol::SFTP_CMD;
-		$privateKey = null;
-		switch ($protocol){
-			case KalturaDistributionProtocol::ASPERA:
-				$host = $distributionProfile->asperaHost;
-				$username = $distributionProfile->asperaLogin;
-				$password = $distributionProfile->asperaPass;
-				$publicKey = $distributionProfile->asperaPublicKey;
-				$privateKey = $distributionProfile->asperaPrivateKey;
-				$passphrase = $distributionProfile->passphrase;
-				break;
-			case KalturaDistributionProtocol::SFTP_CMD:
-				$host = $distributionProfile->sftpHost;
-				$username = $distributionProfile->sftpLogin;
-				$password = $distributionProfile->sftpPass;
-				break;
-		}
-		$fileTransferManager = kFileTransferMgr::getInstance($protocol);
-		if ($privateKey && trim($privateKey))
-		{
-			try
-			{
-				$publicKeyTempPath = $this->getFileLocationForSFTPKey($distributionProfile->id, $publicKey, 'publickey');
-				$privateKeyTempPath = $this->getFileLocationForSFTPKey($distributionProfile->id, $privateKey, 'privatekey');
-				$fileTransferManager->loginPubKey($host, $username, $publicKeyTempPath, $privateKeyTempPath, $passphrase, ($port) ? $port : null);
-			}
-			catch(Exception $ex)
-			{
-				if (file_exists($publicKeyTempPath))
-					unlink($publicKeyTempPath);
-				if (file_exists($privateKeyTempPath))
-					unlink($privateKeyTempPath);
-				throw $ex;
-			}
-		}
-		else
-		{
-			$fileTransferManager->login($host, $username, $password, ($port) ? $port : null);
-		}
-		return $fileTransferManager;
-	}
-	
-	private function getFileLocationForSFTPKey($distributionProfileId, $keyContent, $fileName) 
+	private function getFileLocation($distributionProfileId, $content, $fileName) 
 	{
 		$tempDirectory = $this->getTempDirectoryForProfile($distributionProfileId);
 		$fileLocation = $tempDirectory . $fileName;
-		if (!file_exists($fileLocation) || (file_get_contents($fileLocation) !== $keyContent))
+		if (!file_exists($fileLocation) || (file_get_contents($fileLocation) !== $content))
 		{
-			file_put_contents($fileLocation, $keyContent);
+			file_put_contents($fileLocation, $content);
 			chmod($fileLocation, 0600);
 		}
 		
@@ -165,6 +128,61 @@ class HuluDistributionEngine extends DistributionEngine implements
 		if (!file_exists($tempFilePath))
 			mkdir($tempFilePath, 0777, true);
 		return $tempFilePath;
+	}
+	
+	/**
+	 * 
+	 * @param KalturaHuluDistributionProfile $distributionProfile
+	 * @return sftpMgr
+	 */
+	protected function getSFTPManager(KalturaHuluDistributionProfile $distributionProfile)
+	{
+		$serverUrl = $distributionProfile->sftpHost;
+		$loginName = $distributionProfile->sftpLogin;
+		$loginPass = $distributionProfile->sftpPass;
+		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP_CMD);
+		$sftpManager->login($serverUrl, $loginName, $loginPass);
+		return $sftpManager;
+	}
+	
+	private function uploadFileWithAspera($host, $username, $filePath, $password = null, $privateKeyTempPath = null, $passphrase = null, $port = 22, $remoteFilePath = ''){
+		$remoteFilePath = ltrim($remoteFilePath,'/');
+		$cmd= $this->getCmdPrefix($privateKeyTempPath, $passphrase, $password, $port);
+		$cmd.=" $filePath $username@$host:$remoteFilePath";
+		$res = $this->executeCmd($cmd);
+		if (!$res){
+			$last_error = error_get_last();
+			throw new kFileTransferMgrException("Can't put file [$remoteFilePath] - " . $last_error['message'], kFileTransferMgrException::otherError);
+		}
+	}
+	
+	private function getCmdPrefix($privateKeyTempPath, $passphrase, $password, $port){
+		$cmd = '';
+		if ($privateKeyTempPath){
+			if ($passphrase)
+				$cmd = "(echo $passphrase) | ascp ";
+			else  
+				$cmd = "ascp ";
+		}
+		else 
+			$cmd = "(echo $password) | ascp ";
+		$cmd.=" -P $port ";
+		if ($privateKeyTempPath)
+			$cmd.=" -i $privateKeyTempPath ";
+		return $cmd;
+		
+	}
+	
+	private function executeCmd($cmd){
+		KalturaLog::debug('Executing command: '.$cmd);
+		$return_value = null;
+		$beginTime = time();
+		system($cmd, $return_value);
+		$duration = (time() - $beginTime)/1000;
+		KalturaLog::debug("Execution took [$duration]sec with value [$return_value]");
+		if ($return_value == 0)
+			return true;
+		return false;
 	}
 
 }
