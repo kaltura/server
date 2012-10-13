@@ -94,6 +94,9 @@ class HuluDistributionEngine extends DistributionEngine implements
 				}
 				if ($videoFilePath && file_exists($videoFilePath))
 					$this->uploadFileWithAspera($host, $username, $videoFilePath, $password, $privateKeyTempPath, $passphrase, $port, $remoteVideoFileName);
+				else{
+					throw new kFileTransferMgrException("video file [$videoFilePath] not exists", kFileTransferMgrException::localFileNotExists);
+				}
 				if($thumbAssetFilePath && file_exists($thumbAssetFilePath))
 					$this->uploadFileWithAspera($host, $username, $thumbAssetFilePath, $password, $privateKeyTempPath, $passphrase, $port, $remoteThumbFileName );
 				if($xmlTempPath && file_exists($xmlTempPath))
