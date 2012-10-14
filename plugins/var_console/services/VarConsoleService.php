@@ -149,7 +149,7 @@ class VarConsoleService extends KalturaBaseService
     			}
 			}
 			
-			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTotal( 
+			list ( $reportHeader , $reportData) = myReportsMgr::getTotal( 
     				null , 
     				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
     				$inputFilter ,
