@@ -70,7 +70,7 @@ class Infra_ClientHelper
 		}
 
 		if (!class_exists('Kaltura_Client_Client'))
-			throw new Exception('Kaltura client not found, maybe it wasn\'t generated');
+			throw new Infra_Exception('Kaltura client not found, maybe it wasn\'t generated', Infra_Exception::ERROR_CODE_MISSING_CLIENT_LIB);
 			
 		$ks = self::getKs();
 		

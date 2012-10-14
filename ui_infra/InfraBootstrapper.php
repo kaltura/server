@@ -28,7 +28,7 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 	{
 		$this->bootstrap('autoloaders'); // "autoloaders" is the only bootstrap that is mandatory
 		if (!class_exists('Kaltura_Client_Client'))
-			throw new Exception('Kaltura client not found, maybe it wasn\'t generated');
+			throw new Infra_Exception('Kaltura client not found, maybe it wasn\'t generated', Infra_Exception::ERROR_CODE_MISSING_CLIENT_LIB);
 	}
 	
 	protected function _initLog()

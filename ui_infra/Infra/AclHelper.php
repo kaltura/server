@@ -92,7 +92,7 @@ class Infra_AclHelper
 	{
 		if(!self::isAllowed($resource, $privilege))
 		{
-			throw new Exception('Access denied ' . $resource . '-' . $privilege);
+			throw new Infra_Exception('Access denied ' . $resource . '-' . $privilege, Infra_Exception::ERROR_CODE_ACCESS_DENIED);
 		}
 	}
 }
