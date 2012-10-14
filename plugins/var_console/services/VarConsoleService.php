@@ -130,13 +130,13 @@ class VarConsoleService extends KalturaBaseService
 		else
 		{
 		    $totalCount = 0;
-		    
+		    $orderBy = ($inputFilter->interval == reportInterval::MONTHS ? "+month_id" : "+date_id") . ",+partner_id";
 		    list ( $reportHeader , $reportData , $totalCount ) = myReportsMgr::getTable( 
     				null , 
     				myReportsMgr::REPORT_TYPE_VAR_USAGE , 
     				$inputFilter ,
-    				$pager->pageSize , 0, // pageIndex is 0 because we are using specific ids 
-    				null  , // order by  
+    				$pager->pageSize , $pager->pageIndex, // pageIndex is 0 because we are using specific ids 
+    				$orderBy  , // order by  
     				implode(",", $partnerIds));
     				
 		    foreach ( $reportData as $line )
