@@ -555,7 +555,7 @@ $plannedDur = 0;
 		}
 		else if(isset($flavorVid->_isGopInSec) && $flavorVid->_isGopInSec>0) {
 			if(isset($targetVid->_frameRate)){
-				$targetVid->_gop = round($targetVid->_frameRate*$targetVid->_frameRate);
+				$targetVid->_gop = round($targetVid->_gop*$targetVid->_frameRate);
 			}
 			else {
 				$targetVid->_gop = KDLConstants::DefaultGOP;
