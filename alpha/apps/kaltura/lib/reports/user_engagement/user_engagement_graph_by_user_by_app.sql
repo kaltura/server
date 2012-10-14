@@ -23,6 +23,7 @@ WHERE
 	AND 
 		( count_time_viewed > 0 OR
 		  count_plays > 0 OR
-		  count_loads > 0 )
+		  count_loads > 0 OR 
+		  sum_time_viewed > 0 )
 GROUP BY DATE(DATE(date_id) + INTERVAL hour_id HOUR + INTERVAL {TIME_SHIFT} HOUR)*1
 ORDER BY DATE(DATE(date_id) + INTERVAL hour_id HOUR + INTERVAL {TIME_SHIFT} HOUR)*1

@@ -22,7 +22,8 @@ WHERE
 	AND 
 		( count_time_viewed > 0 OR
 		  count_plays > 0 OR
-		  count_loads > 0 )
+		  count_loads > 0 OR
+		  sum_time_viewed > 0 )
 GROUP BY ev.entry_id,en.entry_name
 ORDER BY {SORT_FIELD}
 LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */

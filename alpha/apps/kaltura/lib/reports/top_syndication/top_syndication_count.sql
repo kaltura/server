@@ -12,4 +12,5 @@ AND date_id BETWEEN IF({TIME_SHIFT}>0,(DATE({FROM_DATE_ID}) - INTERVAL 1 DAY)*1,
 	AND 
 ( count_time_viewed > 0 OR
   count_plays > 0 OR
-  count_loads > 0 )
+  count_loads > 0 OR 
+  sum_time_viewed > 0)
