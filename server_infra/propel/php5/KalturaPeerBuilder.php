@@ -76,7 +76,7 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
-	abstract public static function getOMClass(\$row, \$colnum);
+	public static function getOMClass(\$row, \$colnum);
 ";
 	}
 	
