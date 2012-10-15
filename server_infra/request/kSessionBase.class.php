@@ -43,6 +43,7 @@ class kSessionBase
 	// KS V2 constants
 	const SHA1_SIZE = 20;
 	const RANDOM_SIZE = 16;
+	const AES_IV = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";	// no need for an IV since we add a random string to the message anyway
 	
 	const FIELD_EXPIRY =              '_e';
 	const FIELD_TYPE =                '_t';
@@ -283,7 +284,7 @@ class kSessionBase
 			substr(sha1($key, true), 0, 16),
 			$message,
 			MCRYPT_MODE_CBC, 
-			str_repeat("\0", 16)	// no need for an IV since we add a random string to the message anyway
+			self::AES_IV
 		);
 	}
 
@@ -294,7 +295,7 @@ class kSessionBase
 			substr(sha1($key, true), 0, 16),
 			$message,
 			MCRYPT_MODE_CBC, 
-			str_repeat("\0", 16)	// no need for an IV since we add a random string to the message anyway
+			self::AES_IV
 		);
 	}
 
@@ -323,7 +324,10 @@ class kSessionBase
 
 		// build fields string
 		$fieldsStr = http_build_query($fields, '', '&');
-		$fieldsStr = mcrypt_create_iv(self::RANDOM_SIZE) . $fieldsStr;
+		$rand = '';
+		for ($i = 0; $i < self::RANDOM_SIZE; $i++)
+			$rand .= chr(rand(0, 0xff));
+		$fieldsStr = $rand . $fieldsStr;
 		$fieldsStr = sha1($fieldsStr, true) . $fieldsStr;
 		
 		// encrypt and encode
@@ -379,6 +383,7 @@ class kSessionBase
 		}
 		
 		$this->hash = bin2hex($hash);
+		$this->real_str = $fields;
 		$this->original_str = $ks;
 		$this->partner_id = $partnerId;
 		$this->rand = bin2hex($rand);
