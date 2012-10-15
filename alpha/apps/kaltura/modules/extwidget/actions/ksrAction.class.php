@@ -67,7 +67,14 @@ class ksrAction extends sfAction
 	}
         
         @libxml_use_internal_errors(true);
-        $this->uiconfXmlObj = new SimpleXMLElement($this->uiconfObj->getConfFile());
+        try
+        {
+            $this->uiconfXmlObj = new SimpleXMLElement(trim($this->uiconfObj->getConfFile()));
+        }
+        catch(Exception $e)
+        {
+            KalturaLog::debug("malformed uiconf XML - base64 encoded: [".base64_encode(trim($this->uiconfObj->getConfFile()))."]");
+        }
         if(!($this->uiconfXmlObj instanceof SimpleXMLElement))
         {
             // no xml or invalid XML, so throw exception
