@@ -350,9 +350,11 @@ class AttachmentAssetService extends KalturaAssetService
 		if (!$assetDb || !($assetDb instanceof AttachmentAsset))
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $id);
 
+		$this->validateEntryEntitlement($assetDb->getEntryId(), $id);
+		
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_IS_NOT_READY);
-
+		
 		if($storageId)
 			return $assetDb->getExternalUrl($storageId);
 			
@@ -521,5 +523,18 @@ class AttachmentAssetService extends KalturaAssetService
 		$attachmentAssetDb->setStatus(AttachmentAsset::ASSET_STATUS_DELETED);
 		$attachmentAssetDb->setDeletedAt(time());
 		$attachmentAssetDb->save();
+	}
+	
+	private function validateEntryEntitlement($entryId, $assetId)
+	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$entry = entryPeer::retrieveByPK($entryId);
+			if(!$entry)
+			{
+				//we will throw asset not found, as the user is not entitled, and should not know that the entry exists.
+				throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $assetId);
+			}	
+		}		
 	}
 }

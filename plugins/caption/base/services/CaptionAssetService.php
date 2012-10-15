@@ -430,6 +430,8 @@ class CaptionAssetService extends KalturaAssetService
 		if (!$assetDb || !($assetDb instanceof CaptionAsset))
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
 
+		$this->validateEntryEntitlement($assetDb->getEntryId(), $id);
+		
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_IS_NOT_READY);
 
@@ -643,5 +645,18 @@ class CaptionAssetService extends KalturaAssetService
 		$captionAssetDb->setStatus(CaptionAsset::ASSET_STATUS_DELETED);
 		$captionAssetDb->setDeletedAt(time());
 		$captionAssetDb->save();
+	}
+	
+	private function validateEntryEntitlement($entryId, $assetId)
+	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$entry = entryPeer::retrieveByPK($entryId);
+			if(!$entry)
+			{
+				//we will throw asset not found, as the user is not entitled, and should not know that the entry exists.
+				throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $assetId);
+			}	
+		}		
 	}
 }
