@@ -110,7 +110,7 @@ class kBatchExclusiveLock
 		
 		$c->add ( BatchJobLockPeer::JOB_TYPE, $jobType );
 		$max_exe_attempts = BatchJobLockPeer::getMaxExecutionAttempts($jobType);
-		$$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
+		$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
 		$max_jobs_for_partner = BatchJobLockPeer::getMaxJobsForPartner($jobType);
 		
 		$query = "	(
