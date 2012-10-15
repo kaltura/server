@@ -662,9 +662,11 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$assetDb || !($assetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 
+		$this->validateEntryEntitlement($assetDb->getEntryId(), $id);
+		
 		if (!$assetDb->isLocalReadyStatus())
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
-
+	
 		if($storageId)
 			return $assetDb->getExternalUrl($storageId);
 			
@@ -725,9 +727,12 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$flavorAssetDb || !($flavorAssetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 
+		$this->validateEntryEntitlement($flavorAssetDb->getEntryId(), $id);		
+			
 		if ($flavorAssetDb->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
 
+		
 		return $flavorAssetDb->getDownloadUrl($useCdn);
 	}
 	
@@ -857,4 +862,16 @@ class FlavorAssetService extends KalturaAssetService
 	    return parent::exportAction($assetId, $storageProfileId);
 	}
 	
+	private function validateEntryEntitlement($entryId, $assetId)
+	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$entry = entryPeer::retrieveByPK($entryId);
+			if(!$entry)
+			{
+				//we will throw asset not found, as the user is not entitled, and should not know that the entry exists.
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $assetId);
+			}	
+		}		
+	}
 }
