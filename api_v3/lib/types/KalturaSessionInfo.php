@@ -24,10 +24,10 @@ class KalturaSessionInfo extends KalturaObject
 	public $partnerId;
 
 	/**
-	 * @var KalturaUser
+	 * @var string
 	 * @readonly
 	 */
-	public $user;
+	public $userId;
 
 	/**
 	 * @var int expiry time in seconds (unix timestamp)
