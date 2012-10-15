@@ -302,7 +302,6 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		}
 		catch(kFileTransferMgrException $ex) // file is still missing
 		{
-			KalturaLog::debug($ex);
 			KalturaLog::info('File doesn\'t exist yet, retry later');
 			return false;
 		}
