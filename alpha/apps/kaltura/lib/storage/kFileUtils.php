@@ -35,7 +35,8 @@ class kFileUtils extends kFile
 		$total_length = $limit_file_size ? $limit_file_size : self::fileSize($file_name);
 		
 		$useXSendFile = false;
-		if (in_array('mod_xsendfile', apache_get_modules()))
+		if (!$limit_file_size && // if we limit the file size (e.g. preview small portion of a video) we can't use xsendfile module
+			in_array('mod_xsendfile', apache_get_modules()))
 		{
 			$xsendfile_uri = kConf::hasParam('xsendfile_uri') ? kConf::get('xsendfile_uri') : null;
 			if ($xsendfile_uri !== null && strpos($_SERVER["REQUEST_URI"], $xsendfile_uri) !== false)
