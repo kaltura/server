@@ -245,13 +245,6 @@ class SessionService extends KalturaBaseService
 		
 		$sessionInfo = new KalturaSessionInfo();
 		$sessionInfo->ks = $session;
-		
-		// getting the kuser from the db
-		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
-		$c->add(kuserPeer::PARTNER_ID, $ks->partner_id);
-		$c->add(kuserPeer::PUSER_ID, $ks->user);
-		$c->add(kuserPeer::STATUS, KuserStatus::DELETED, KalturaCriteria::NOT_EQUAL);
-		
 		$sessionInfo->partnerId = $ks->partner_id;
 		$sessionInfo->userId = $ks->user;
 		$sessionInfo->expiry = $ks->valid_until;
