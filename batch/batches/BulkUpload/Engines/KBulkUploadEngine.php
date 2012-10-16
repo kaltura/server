@@ -59,7 +59,7 @@ abstract class KBulkUploadEngine
 	/**
 	 * @var bool
 	 */
-	protected $exceededMaxRecordsEachRun = true;
+	protected $exceededMaxRecordsEachRun = false;
 
 	/**
 	 * 
