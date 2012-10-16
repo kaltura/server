@@ -1193,7 +1193,7 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function validateEntryScheduleDates(KalturaBaseEntry $entry, entry $dbEntry)
 	{
-		KalturaLog::debug("start date ".$entry->startDate." end date ".$entry->endDate);
+		KalturaLog::debug("start date ".print_r($entry->startDate)." end date ".print_r($entry->endDate));
 		if(is_null($entry->startDate) && is_null($entry->endDate))
 			return; // no update
 
@@ -1202,7 +1202,7 @@ class KalturaEntryService extends KalturaBaseService
 		$startDate = is_null($entry->startDate) ?  $dbEntry->getStartDate(null) : $entry->startDate;
 		$endDate = is_null($entry->endDate) ?  $dbEntry->getEndDate(null) : $entry->endDate;
 		
-		KalturaLog::debug("after comparison: start date ".$startDate." end date ".$endDate);
+		KalturaLog::debug("after comparison: start date ".print_r($startDate)." end date ".print_r($endDate));
 		// normalize values for valid comparison later 
 		if ($startDate < 0)
 			$startDate = null;
