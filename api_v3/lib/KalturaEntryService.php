@@ -1196,6 +1196,11 @@ class KalturaEntryService extends KalturaBaseService
 		if(is_null($entry->startDate) && is_null($entry->endDate))
 			return; // no update
 
+		if($entry->startDate instanceof KalturaNullField)
+			$entry->startDate = -1;
+		if($entry->endDate instanceof KalturaNullField)
+			$entry->endDate = -1;
+			
 		// if input is null and this is an update pick the current db value 
 		$startDate = is_null($entry->startDate) ?  $dbEntry->getStartDate(null) : $entry->startDate;
 		$endDate = is_null($entry->endDate) ?  $dbEntry->getEndDate(null) : $entry->endDate;
