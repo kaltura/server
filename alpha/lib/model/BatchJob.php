@@ -39,7 +39,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG = 3;
 	
 	const MAX_SERIALIZED_JOB_DATA_SIZE = 8192;
-	const BATCH_JOB_DEFAULT_PRIORITY = 3;
+	
 	private static $indicator = null;//= new myFileIndicator( "gogobatchjob" );
 	
 	private $aEntry = null;
@@ -147,16 +147,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 			//echo "sets the status to " . self::BATCHJOB_STATUS_PENDING . "\n";
 			$this->setStatus(self::BATCHJOB_STATUS_PENDING);
 		}
-	
-		if($this->getLockInfo() === null) {
-			$lockInfo = new kLockInfoData($this);
-			$this->setLockInfo($lockInfo);
-		}
-	
-		if($this->getPriority() == 0) {
-			$this->setPriority(self::BATCH_JOB_DEFAULT_PRIORITY);
-		}
-	
+		
 		return parent::preInsert($con);
 	}
 	

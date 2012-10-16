@@ -15,13 +15,13 @@
  */
 class PartnerLoadPeer extends BasePartnerLoadPeer {
 
-	public static function updatePartnerLoad($partnerId, $urgency, $jobType, $jobSubType = 0, PropelPDO $con = null) 
+	public static function updatePartnerLoad($partnerId, $jobType, $jobSubType = 0, PropelPDO $con = null) 
 	{
 		// Hack to avoid the not-null constaint on job sub type
 		if(is_null($jobSubType)) 
 			$jobSubType = 0;
 		
-		$priorityFactor = PartnerPeer::getPartnerPriorityFactor($partnerId, $urgency);
+		$priorityFactor = PartnerPeer::getPartnerPriorityFactor($partnerId);
 		
 		$c = new Criteria();
 		$c->add ( self::PARTNER_ID , $partnerId );
@@ -87,7 +87,6 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 		$c->addGroupByColumn(BatchJobLockPeer::PARTNER_ID);
 		$c->addGroupByColumn(BatchJobLockPeer::JOB_TYPE);
 		$c->addGroupByColumn(BatchJobLockPeer::JOB_SUB_TYPE);
-		$c->addGroupByColumn(BatchJobLockPeer::URGENCY);
 		$c->addSelectColumn(BatchJobLockPeer::COUNT);
 	
 		foreach($c->getGroupByColumns() as $column)
@@ -105,26 +104,19 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 			$jobSubType = $row['JOB_SUB_TYPE'];
 			if(is_null($jobSubType)) 
 				$jobSubType = 0;
-			$urgency =  $row['URGENCY'];
 			$jobCount = $row[BatchJobLockPeer::COUNT];
 	
-			$priorityFactor = PartnerPeer::getPartnerPriorityFactor($partnerId, $urgency);
+			$priorityFactor = PartnerPeer::getPartnerPriorityFactor($partnerId);
 			$key = $partnerId . "#" . $jobType . "#" . $jobSubType;
 	
-			if(array_key_exists($key, $partnerLoads)) {
-				$oldPartnerLoad = $partnerLoads[$key];
-				$oldPartnerLoad->setPartnerLoad($oldPartnerLoad->getPartnerLoad() + $jobCount);
-				$oldPartnerLoad->setWeightedPartnerLoad($oldPartnerLoad->getWeightedPartnerLoad() + $jobCount * $priorityFactor);
-			} else {
-				$partnerLoad = new PartnerLoad();
-				$partnerLoad->setPartnerId($partnerId);
-				$partnerLoad->setJobType($jobType);
-				$partnerLoad->setJobSubType($jobSubType);
-					
-				$partnerLoad->setPartnerLoad($jobCount);
-				$partnerLoad->setWeightedPartnerLoad($jobCount * $priorityFactor);
-				$partnerLoads[$key] = $partnerLoad;
-			}
+			$partnerLoad = new PartnerLoad();
+			$partnerLoad->setPartnerId($partnerId);
+			$partnerLoad->setJobType($jobType);
+			$partnerLoad->setJobSubType($jobSubType);
+				
+			$partnerLoad->setPartnerLoad($jobCount);
+			$partnerLoad->setWeightedPartnerLoad($jobCount * $priorityFactor);
+			$partnerLoads[$key] = $partnerLoad;
 		}
 	
 		return $partnerLoads;

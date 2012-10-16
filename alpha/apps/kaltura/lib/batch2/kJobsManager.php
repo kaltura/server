@@ -632,7 +632,7 @@ class kJobsManager
 		
 		if($conversionProfileId !== NULL) {
 			$fpcp = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorAsset->getFlavorParamsId(), $conversionProfileId);
-			if($fpcp->getPriority() != 0) {
+			if((!is_null($fpcp)) && ($fpcp->getPriority() != 0)) {
 				$dbConvertFlavorJob->setPriority($fpcp->getPriority());
 			}
 		}
@@ -1398,11 +1398,6 @@ class kJobsManager
 		$batchJob->setJobSubType($subType);
 		$batchJob->setData($data);
 		
-		$lockInfo = new kLockInfoData($batchJob);
-		$lockInfo->setEstimatedEffort($data->calculateEstimatedEffort($batchJob));
-		$lockInfo->setUrgency($data->calculateUrgency($batchJob));
-		$batchJob->setLockInfo($lockInfo);
-		
 		if(!$batchJob->getParentJobId() && $batchJob->getEntryId())
 		{
 			$currentJob = kBatchManager::getCurrentUpdatingJob();
@@ -1422,6 +1417,13 @@ class kJobsManager
 				}
 			}
 		}
+		
+		$lockInfo = new kLockInfoData($batchJob);
+		$lockInfo->setEstimatedEffort($data->calculateEstimatedEffort($batchJob));
+		$lockInfo->setUrgency($data->calculateUrgency($batchJob));
+		$batchJob->setLockInfo($lockInfo);
+		
+		BatchJobPeer::calculatePriority($batchJob);
 			
 		$batchJob = self::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
 

@@ -53,7 +53,7 @@ class kBatchExclusiveLock
 				$object->setExpiration ( $expiration );
 				
 				KalturaLog::log("Job id [" . $object->getId() . "] locked and returned");
-				PartnerLoadPeer::updatePartnerLoad($object->getPartnerId(), $object->getUrgency(), $object->getJobType(), $object->getJobSubType(), $con);
+				PartnerLoadPeer::updatePartnerLoad($object->getPartnerId(), $object->getJobType(), $object->getJobSubType(), $con);
 			
 				$exclusive_objects_ids[] = $object->getId();
 			}
