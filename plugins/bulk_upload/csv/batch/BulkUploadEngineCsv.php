@@ -138,7 +138,7 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 		}
 		$this->handledRecordsThisRun++;
 		
-	    $bulkUploadResult = new KalturaBulkUploadResultEntry();
+	    $bulkUploadResult = $this->getUploadResultInstance();
 		$bulkUploadResult->bulkUploadJobId = $this->job->id;
 		$bulkUploadResult->lineIndex = $this->lineNumber;
 		$bulkUploadResult->partnerId = $this->job->partnerId;
@@ -213,4 +213,6 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 	{
 		$item = trim($item);
 	}
+	
+	abstract protected function getUploadResultInstance ();
 }
