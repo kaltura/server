@@ -588,6 +588,7 @@ class kMetadataManager
 			return null;
 		
 		$job = new BatchJob();
+		$job->setJobType(BatchJobType::METADATA_TRANSFORM);
 		$job->setPartnerId($partnerId);
 		$job->setObjectId($metadataProfileId);
 		$job->setObjectType(kPluginableEnumsManager::apiToCore('BatchJobObjectType', MetadataBatchJobObjectType::METADATA_PROFILE));

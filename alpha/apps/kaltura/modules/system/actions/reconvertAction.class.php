@@ -91,6 +91,7 @@ class reconvertAction extends kalturaSystemAction
 		$dbBatchJob->setPriority ( $job_priority );
 		$dbBatchJob->setObjectId($entry_id);
 		$dbBatchJob->setObjectType(BatchJobObjectType::ENTRY);
+		$dbBatchJob->setJobType(BatchJobType::CONVERT_PROFILE);
 		$dbBatchJob->save();
 		
 		// creates a convert profile job
