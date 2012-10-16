@@ -13,6 +13,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	const DEFAULT_THUMB_TAG = 'default_thumb';
 	
+	const OBJECT_TYPE_TITLE = 'entries';
+	
 	/**
 	 * The default ingestion profile id
 	 * @var int
@@ -2148,5 +2150,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		
 		$this->kClient->doMultiRequest();
+	}
+	
+	public function getObjectTypeTitle()
+	{
+		return self::OBJECT_TYPE_TITLE;
 	}
 }

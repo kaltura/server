@@ -20,6 +20,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	 */
 	const VALUES_COUNT_V2 = 12;
 	
+	const OBJECT_TYPE_TITLE = 'entries';
 
 	/* (non-PHPdoc)
 	 * @see KBulkUploadEngine::addBulkUploadResult()
@@ -525,5 +526,10 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
         
         return $category;
 	    
+	}
+	
+	public function getObjectTypeTitle()
+	{
+		return self::OBJECT_TYPE_TITLE;
 	}
 }

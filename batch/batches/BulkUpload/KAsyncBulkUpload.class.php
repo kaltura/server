@@ -117,10 +117,9 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 		
 		if($engine->shouldRetry())
 		{
-			$handledObjectsTypeName = $this->getBulkUploadObectTypeName($job->data->bulkUploadObjectType);
 			KalturaLog::debug("Set the job to retry");
 			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
-			return $this->closeJob($job, null, null, "Retrying: [$countHandledObjects] $handledObjectsTypeName objects were handled untill now", KalturaBatchJobStatus::RETRY);
+			return $this->closeJob($job, null, null, "Retrying: ".$countHandledObjects." ".$engine->getObjectTypeTitle()." objects were handled untill now", KalturaBatchJobStatus::RETRY);
 		}
 			
 		return $this->closeJob($job, null, null, 'Waiting for objects closure', KalturaBatchJobStatus::ALMOST_DONE, $data);
@@ -136,31 +135,4 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 		return $this->kClient->batch->countBulkUploadEntries($jobId, $bulkuploadObjectType);
 	}
 	
-	/**
-	 * 
-	 * Extract bulkUploadObjectType name from enum according to it's id
-	 * @param int $bulkuploadObjectType
-	 * @return string
-	 */
-	private function getBulkUploadObectTypeName($bulkuploadObjectType)
-	{
-		$bulkuploadObjectTypeName = null;
-	    try 
-	    {
-        	$reflectedClass = new ReflectionClass('KalturaBulkUploadObjectType');
-        	$array = $reflectedClass->getConstants();
-        	$bulkuploadObjectTypeName = array_search($bulkuploadObjectType, $array);
-        	if(!$bulkuploadObjectTypeName)
-        	{
-         		KalturaLog::debug("Definition not found for type $bulkuploadObjectType in KalturaBulkUploadObjectType");
-         		$bulkuploadObjectTypeName = $bulkuploadObjectType;
-        	}
-    	} 
-    	catch (Exception $exception) 
-    	{
-        	KalturaLog::err($exception);
-        	$bulkuploadObjectTypeName = $bulkuploadObjectType;
-    	} 
-		return $bulkuploadObjectTypeName;
-	}
 }

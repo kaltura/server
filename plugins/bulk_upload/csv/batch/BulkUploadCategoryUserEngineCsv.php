@@ -8,6 +8,8 @@
  */
 class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 {
+	const OBJECT_TYPE_TITLE = 'entitlements';
+	
     private $categoryReferenceIdMap = array();
     
 	/**
@@ -365,5 +367,10 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 	      }
           	      
 	      return $bulkuploadResult;
+	}
+	
+	public function getObjectTypeTitle()
+	{
+		return self::OBJECT_TYPE_TITLE;
 	}
 }

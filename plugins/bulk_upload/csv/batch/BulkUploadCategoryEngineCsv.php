@@ -8,6 +8,7 @@
  */
 class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 {
+    const OBJECT_TYPE_TITLE = 'categories';
     
     protected $mapFullNameToId = array();
     
@@ -405,5 +406,10 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 		}
 		
 		$this->kClient->doMultiRequest();
+	}
+	
+	public function getObjectTypeTitle()
+	{
+		return self::OBJECT_TYPE_TITLE;
 	}
 }

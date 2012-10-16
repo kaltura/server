@@ -59,7 +59,7 @@ abstract class KBulkUploadEngine
 	/**
 	 * @var bool
 	 */
-	protected $exceededMaxRecordsEachRun = false;
+	protected $exceededMaxRecordsEachRun = true;
 
 	/**
 	 * 
@@ -409,4 +409,10 @@ abstract class KBulkUploadEngine
 		}
 		return false;
 	}
+	
+	/**
+	 * 
+	 * Get object type title for messaging purposes
+	 */
+	abstract public function getObjectTypeTitle();
 }

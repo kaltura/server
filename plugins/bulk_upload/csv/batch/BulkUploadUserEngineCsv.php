@@ -8,6 +8,7 @@
  */
 class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 {
+    const OBJECT_TYPE_TITLE = 'users';
     
     /**
      * (non-PHPdoc)
@@ -328,5 +329,10 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		}
 		
 		$this->kClient->doMultiRequest();
+	}
+	
+	public function getObjectTypeTitle()
+	{
+		return self::OBJECT_TYPE_TITLE;
 	}
 }
