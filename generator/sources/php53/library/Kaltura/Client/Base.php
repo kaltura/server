@@ -38,6 +38,13 @@ namespace Kaltura\Client;
  */
 class Base 
 {
+	// KS V2 constants
+	const RANDOM_SIZE = 16;
+	
+	const FIELD_EXPIRY =              '_e';
+	const FIELD_TYPE =                '_t';
+	const FIELD_USER =                '_u';
+
 	const KALTURA_SERVICE_FORMAT_JSON = 1;
 	const KALTURA_SERVICE_FORMAT_XML  = 2;
 	const KALTURA_SERVICE_FORMAT_PHP  = 3;
@@ -606,6 +613,38 @@ class Base
 		return $encoded_str;
 	}
 	
+	public static function generateSessionV2($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges)
+	{
+		// build fields array
+		$fields = array();
+		foreach (explode(',', $privileges) as $privilege)
+		{
+			$privilege = trim($privilege);
+			if (!$privilege)
+				continue;
+			if ($privilege == '*')
+				$privilege = 'all:*';
+			$splittedPrivilege = explode(':', $privilege, 2);
+			if (count($splittedPrivilege) > 1)
+				$fields[$splittedPrivilege[0]] = $splittedPrivilege[1];
+			else
+				$fields[$splittedPrivilege[0]] = '';
+		}
+		$fields[self::FIELD_EXPIRY] = time() + $expiry;
+		$fields[self::FIELD_TYPE] = $type;
+		$fields[self::FIELD_USER] = $userId;
+
+		// build fields string
+		$fieldsStr = http_build_query($fields, '', '&');
+		$fieldsStr = mcrypt_create_iv(self::RANDOM_SIZE) . $fieldsStr;
+		$fieldsStr = sha1($fieldsStr, true) . $fieldsStr;
+		
+		// encrypt and encode
+		$encryptedFields = self::aesEncrypt($adminSecretForSigning, $fieldsStr);
+		$decodedKs = "v2|{$partnerId}|" . $encryptedFields;
+		return str_replace(array('+', '/'), array('-', '_'), base64_encode($decodedKs));
+	}
+
 	private function hash ( $salt , $str )
 	{
 		return sha1($salt.$str);
