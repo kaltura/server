@@ -5,29 +5,7 @@
 // KMC Login page
 if( typeof $ == 'undefined' ) $ = jQuery;
 
-function empty( val ) {
-	if( val === null )
-		return true;
-	return false;
-}
-
 function loginF( remMe, partner_id, subp_id, uid, ks , screen_name, email ) {
-
-	var has_cookie = false;
-
-	if ( partner_id == null ) {
-		partner_id = $.cookie( "pid" );
-		subp_id = $.cookie( "subpid" );
-		uid = $.cookie( "uid" );
-		ks = $.cookie( "kmcks" );
-		screen_name = $.cookie( "screen_name" );
-		email = $.cookie( "email" );
-		// if any of the required params is null - return false and the login page will be displayed
-		if ( empty(partner_id) || empty(subp_id) || empty(uid) || empty(ks) )
-			return false;
-
-		has_cookie = true;
-	}
 
 	// Set cookie options
 	var options = {
@@ -35,22 +13,20 @@ function loginF( remMe, partner_id, subp_id, uid, ks , screen_name, email ) {
 		raw: true,
 		// Set path
 		path: "/",
-		// Set expiration time for cookie ( Number - days )
-		expires: ( remMe ) ? 30 : 1,
+		// Set expiration time to 1 day
+		expires: 1,
 		// Set secure cookie flag based on domain protocol
 		secure: ( window.location.protocol === "https:" ) ? true : false
 	};
 
-	if ( ! has_cookie ) {
-		$.cookie("kmcks", ks, options);
-		$.cookie("pid", partner_id, options);
-		$.cookie("subpid", subp_id, options);
-		/*
-		$.cookie("uid", uid , options);
-		$.cookie("screen_name", screen_name, options);
-		$.cookie("email", email, options);
-		*/
-	}
+	$.cookie("kmcks", ks, options);
+	$.cookie("pid", partner_id, options);
+	$.cookie("subpid", subp_id, options);
+	/*
+	$.cookie("uid", uid , options);
+	$.cookie("screen_name", screen_name, options);
+	$.cookie("email", email, options);
+	*/
 
 	var state = location.hash || "" ;
 	window.location = service_url + "/index.php/kmc/kmc2" + state;
@@ -58,8 +34,6 @@ function loginF( remMe, partner_id, subp_id, uid, ks , screen_name, email ) {
 	// TODO - send by post using form1
 	return true;			
 }
-
-function closeLoginF() {}
 
 function gotoSignup() {
 	window.location = service_url + "/index.php/kmc/signup";
