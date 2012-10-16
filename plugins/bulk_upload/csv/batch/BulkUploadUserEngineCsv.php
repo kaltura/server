@@ -331,6 +331,11 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		$this->kClient->doMultiRequest();
 	}
 	
+	protected function getUploadResultInstance ()
+	{
+	    return new KalturaBulkUploadResultUser();
+	}
+	
 	public function getObjectTypeTitle()
 	{
 		return self::OBJECT_TYPE_TITLE;
