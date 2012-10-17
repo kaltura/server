@@ -1,4 +1,13 @@
 <?php
+/**
+ * KSR - Kaltura Screencast Recorder
+ * This action is used for integrating the KSR widget into web pages, by returning a JS code that provides everything the integrator needs in order to load the widget
+ * the KSR widget is a JAVA applet that allows the user to record the screen, and then it uploads the recording to Kaltura.
+ * the JS code which is returned to the page is constructed from a template which is part of a version of the widget (e.g. flash/ksr/v1.0.32/js/*) and it is constructed with values stored in the uiconf XML.
+ *
+ * @package Core
+ * @subpackage externalWidgets
+ */
 
 class ksrAction extends sfAction 
 {
@@ -50,7 +59,8 @@ class ksrAction extends sfAction
     private $jsResult = '';
 
     /**
-     * Will forward to the regular swf player according to the widget_id
+     * Will return a JS library for integrating the KSR (similar to HTML5 in concept)
+     * uiconfId specifies from which uiconf to fetch different settings that should be replaced in the JS
      */
     public function execute()
     {
