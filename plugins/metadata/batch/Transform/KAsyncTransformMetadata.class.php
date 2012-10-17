@@ -79,9 +79,9 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 			$this->multiRequestSize = $this->taskConfig->params->multiRequestSize;
 		
 		$pager = new KalturaFilterPager();
-		$pager->maxPageSize = 40;
+		$pager->pageSize = 40;
 		if($this->taskConfig->params && $this->taskConfig->params->maxObjectsEachRun)
-			$pager->maxPageSize = $this->taskConfig->params->maxObjectsEachRun;
+			$pager->pageSize = $this->taskConfig->params->maxObjectsEachRun;
 		
 		$transformList = $this->kClient->metadataBatch->getTransformMetadataObjects(
 			$data->metadataProfileId,
