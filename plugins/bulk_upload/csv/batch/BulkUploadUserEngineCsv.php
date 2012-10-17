@@ -8,7 +8,7 @@
  */
 class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 {
-    const OBJECT_TYPE_TITLE = 'users';
+    const OBJECT_TYPE_TITLE = 'user';
     
     /**
      * (non-PHPdoc)

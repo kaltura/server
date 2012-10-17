@@ -8,7 +8,7 @@
  */
 class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 {
-	const OBJECT_TYPE_TITLE = 'entitlements';
+	const OBJECT_TYPE_TITLE = 'entitlement';
 	
     private $categoryReferenceIdMap = array();
     

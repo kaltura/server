@@ -20,7 +20,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	 */
 	const VALUES_COUNT_V2 = 12;
 	
-	const OBJECT_TYPE_TITLE = 'entries';
+	const OBJECT_TYPE_TITLE = 'entry';
 
 	/* (non-PHPdoc)
 	 * @see KBulkUploadEngine::addBulkUploadResult()

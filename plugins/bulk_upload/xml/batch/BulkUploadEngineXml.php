@@ -13,7 +13,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	const DEFAULT_THUMB_TAG = 'default_thumb';
 	
-	const OBJECT_TYPE_TITLE = 'entries';
+	const OBJECT_TYPE_TITLE = 'entry';
 	
 	/**
 	 * The default ingestion profile id

@@ -8,7 +8,7 @@
  */
 class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 {
-    const OBJECT_TYPE_TITLE = 'categories';
+    const OBJECT_TYPE_TITLE = 'category';
     
     protected $mapFullNameToId = array();
     
