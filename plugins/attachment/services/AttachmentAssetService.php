@@ -524,17 +524,4 @@ class AttachmentAssetService extends KalturaAssetService
 		$attachmentAssetDb->setDeletedAt(time());
 		$attachmentAssetDb->save();
 	}
-	
-	private function validateEntryEntitlement($entryId, $assetId)
-	{
-		if(kEntitlementUtils::getEntitlementEnforcement())
-		{
-			$entry = entryPeer::retrieveByPK($entryId);
-			if(!$entry)
-			{
-				//we will throw asset not found, as the user is not entitled, and should not know that the entry exists.
-				throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $assetId);
-			}	
-		}		
-	}
 }

@@ -123,4 +123,17 @@ abstract class KalturaAssetService extends KalturaBaseService
 	    
 	    return $this->getAction($assetId);
 	}
+	
+	protected function validateEntryEntitlement($entryId, $assetId)
+	{
+		if(kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$entry = entryPeer::retrieveByPK($entryId);
+			if(!$entry)
+			{
+				//we will throw asset not found, as the user is not entitled, and should not know that the entry exists.
+				throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $assetId);
+			}	
+		}		
+	}
 }
