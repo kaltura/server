@@ -225,7 +225,7 @@ class myReportsMgr
 				$data[] = $value;
 			}
 			$res = array ( $header , $data );
-			if ($input_filter instanceof endUserReportsInputFilter && in_array($report_type, $unique_total_reports)) 
+			if ($input_filter instanceof endUserReportsInputFilter && in_array($report_type, self::$unique_total_reports)) 
 			{
 				foreach ( $row as $name => $value )
 				{
