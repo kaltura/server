@@ -94,13 +94,6 @@ class extloginAction extends kalturaAction
 		$partner_id = $partner->getId();
 		$subp_id = $partner->getSubpId() ;
 		$admin_puser_id = $adminKuser->getPuserId();
-		$screen_name = $adminKuser->getScreenName();
-		
-		if (!$screen_name)
-		{
-			// for backward compatibility
-			$screen_name = $this->getP ( "screen_name" );
-		}
 		
 		$exp = (isset($expired) && is_numeric($expired)) ? time() + $expired: 0;
 		
@@ -114,12 +107,12 @@ class extloginAction extends kalturaAction
 		
 		
 		$path = "/";
+		$domain = null;
+		$secure = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? true : false;
 		
-		$this->getResponse()->setCookie("pid", $partner_id, $exp, $path);
-		$this->getResponse()->setCookie("subpid", $subp_id, $exp, $path);
-		$this->getResponse()->setCookie("uid", $admin_puser_id, $exp, $path);
-		$this->getResponse()->setCookie("kmcks", $ks, $exp, $path);
-		$this->getResponse()->setCookie("screen_name", $screen_name, $exp, $path);
+		$this->getResponse()->setCookie("pid", $partner_id, $exp, $path, $domain, $secure);
+		$this->getResponse()->setCookie("subpid", $subp_id, $exp, $path, $domain, $secure);
+		$this->getResponse()->setCookie("kmcks", $ks, $exp, $path, $domain, $secure);
 		$this->redirect('kmc/kmc2');
 	}
 	
