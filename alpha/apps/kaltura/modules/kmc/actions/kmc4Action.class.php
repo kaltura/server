@@ -86,6 +86,11 @@ class kmc4Action extends kalturaAction
 	/** set values for template **/
 	$this->service_url = myPartnerUtils::getHost($this->partner_id);
 	$this->host = $this->stripProtocol( $this->service_url );
+	$this->embed_host = $this->host;
+	if (kConf::hasParam('cdn_api_host') && kConf::hasParam('www_host') && $this->host == kConf::get('cdn_api_host')) {
+        $this->host = kConf::get('www_host');
+	}
+
 	$this->cdn_url = myPartnerUtils::getCdnHost($this->partner_id);
 	$this->cdn_host = $this->stripProtocol( $this->cdn_url );
 	$this->rtmp_host = myPartnerUtils::getRtmpUrl($this->partner_id);

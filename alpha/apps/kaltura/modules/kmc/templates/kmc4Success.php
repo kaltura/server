@@ -35,6 +35,7 @@ if( count($allowedPartners) > 1 ) {
 			host			: "<?php echo $host; ?>",
 			cdn_host		: "<?php echo $cdn_host; ?>",
 			rtmp_host		: "<?php echo $rtmp_host; ?>",
+			embed_host		: "<?php echo $embed_host; ?>",
 			flash_dir		: "<?php echo $flash_dir ?>",
 			getuiconfs_url	: "<?php echo url_for('kmc/getuiconfs'); ?>",
 			terms_of_use	: "<?php echo kConf::get('terms_of_use_uri'); ?>",
