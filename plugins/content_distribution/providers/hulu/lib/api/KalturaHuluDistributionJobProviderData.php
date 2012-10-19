@@ -25,6 +25,11 @@ class KalturaHuluDistributionJobProviderData extends KalturaConfigurableDistribu
 	 */
 	public $fileBaseName;
 	
+	/**
+	 * @var string
+	 */
+	public $captionLocalPaths;
+	
  
 	/**
 	 * Called on the server side and enables you to populate the object with any data from the DB
@@ -58,6 +63,24 @@ class KalturaHuluDistributionJobProviderData extends KalturaConfigurableDistribu
 			$thumbAsset = reset($thumbAssets);
 			$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
+		}
+		
+		$additionalAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->assetIds));
+		if(count($additionalAssets))
+		{
+			$captionAssetFilePathArray = array();
+			foreach ($additionalAssets as $additionalAsset)
+			{	
+				$assetType = $additionalAsset->getType();
+				$syncKey = $additionalAsset->getSyncKey(CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+				if(kFileSyncUtils::fileSync_exists($syncKey)){
+					if (($assetType == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))||
+						($assetType == AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT))){									
+						$captionAssetFilePathArray[] = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);				    
+					}
+				}
+			}
+			$this->captionLocalPaths = serialize($captionAssetFilePathArray);
 		}
 		
 		$tempFieldValues = unserialize($this->fieldValues);
