@@ -168,7 +168,15 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		{
 			unlink($videoFilePath);
 		}
+		
 		$data->remoteId = $remoteId;
+		$captionsInfo = $data->providerData->captionsInfo;
+		/* @var $captionInfo KalturaDailymotionDistributionCaptionInfo */
+		foreach ($captionsInfo as $captionInfo){
+			if ($captionInfo->action == KalturaDailymotionDistributionCaptionAction::SUBMIT_ACTION){
+				$data->mediaFiles[] = $this->submitCaption($dailyMotionImpl, $captionInfo, $data->remoteId);
+			}
+		}
 		return false;
 	}
 	
@@ -243,6 +251,24 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		$this->configureTimeouts($dailyMotionImpl);
 		$dailyMotionImpl->update($data->remoteId, $props);
 		
+		$captionsInfo = $data->providerData->captionsInfo;
+		/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
+		foreach ($captionsInfo as $captionInfo){
+			switch ($captionInfo->action){
+				case KalturaDailymotionDistributionCaptionAction::SUBMIT_ACTION:
+					$data->mediaFiles[] = $this->submitCaption($dailyMotionImpl,$captionInfo, $data->remoteId);
+					break;
+				case KalturaDailymotionDistributionCaptionAction::UPDATE_ACTION:
+					if (!file_exists($captionInfo->filePath ))
+						throw new KalturaDistributionException('The caption file ['.$captionInfo->filePath.'] was not found (probably not synced yet), the job will retry');
+					$dailyMotionImpl->updateSubtitle($captionInfo->remoteId, $captionInfo);
+					$this->updateRemoteMediaFileVersion($data,$captionInfo);
+					break;
+				case KalturaDailymotionDistributionCaptionAction::DELETE_ACTION:
+					$dailyMotionImpl->deleteSubtitle($captionInfo->remoteId);
+					break;
+			}
+		}
 //		$data->sentData = $dailymotionMediaService->request;
 //		$data->results = $dailymotionMediaService->response;
 		
@@ -298,7 +324,8 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		$geoBlocking = array();
 		if (is_null($distributionProfile))
 			return $geoBlocking;
-
+		$geoBlockingOperation = null;
+		$geoBlockingCountryList = null;
 		if ($distributionProfile->geoBlockingMapping == KalturaDailymotionGeoBlockingMapping::METADATA) {
 			$geoBlockingOperation = $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_GEO_BLOCKING_OPERATION);
 			$geoBlockingCountryList = $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_GEO_BLOCKING_COUNTRY_LIST);
@@ -315,5 +342,21 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		foreach($geoBlocking as &$tmpstr)
 			$tmpstr = strtolower($tmpstr);
 		return $geoBlocking;
+	}
+	
+	private function submitCaption(DailymotionImpl $dailymotionImpl, $captionInfo, $remoteId) {
+		if (!file_exists($captionInfo->filePath ))
+			throw new KalturaDistributionException('The caption file ['.$captionInfo->filePath.'] was not found (probably not synced yet), the job will retry');
+		KalturaLog::debug ( 'Submitting caption [' . $captionInfo->assetId . ']' );
+		$captionRemoteId = $dailymotionImpl->uploadSubtitle($remoteId, $captionInfo);
+		return $this->getNewRemoteMediaFile ( $captionRemoteId, $captionInfo );
+	}
+	
+	private function getNewRemoteMediaFile($captionRemoteId , $captionInfo) {
+		$remoteMediaFile = new KalturaDistributionRemoteMediaFile ();
+		$remoteMediaFile->remoteId = $captionRemoteId;
+		$remoteMediaFile->version = $captionInfo->version;
+		$remoteMediaFile->assetId = $captionInfo->assetId;
+		return $remoteMediaFile;
 	}
 }

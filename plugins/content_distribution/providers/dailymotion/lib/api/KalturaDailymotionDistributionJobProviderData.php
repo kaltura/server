@@ -20,6 +20,11 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 	 */
 	public $accessControlGeoBlockingCountryList;
 	
+	/**
+	 * @var KalturaDailymotionDistributionCaptionInfoArray
+	 */
+	public $captionsInfo;
+	
 	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
@@ -47,6 +52,8 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 		$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
 		if ($entry->getAccessControl())
 			$this->setGeoBlocking($entry->getAccessControl());
+			
+		$this->addCaptionsData($distributionJobData);
 	}
 
 
@@ -54,6 +61,7 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 	private static $map_between_objects = array
 	(
 		"videoAssetFilePath",
+		"captionsInfo",
 	);
 
 	public function getMapBetweenObjects ( )
@@ -112,5 +120,129 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 				}
 			}
 		}
+	}
+	
+	private function addCaptionsData(KalturaDistributionJobData $distributionJobData) {
+		/* @var $mediaFile KalturaDistributionRemoteMediaFile */
+		$assetIdsArray = explode ( ',', $distributionJobData->entryDistribution->assetIds );
+		if (empty($assetIdsArray)) return;
+		$assets = array ();
+		$this->captionsInfo = new KalturaDailymotionDistributionCaptionInfoArray();
+		
+		foreach ( $assetIdsArray as $assetId ) {
+			$asset = assetPeer::retrieveByIdNoFilter( $assetId );
+			if (!$asset){
+				KalturaLog::err("Asset [$assetId] not found");
+				continue;
+			}
+			if ($asset->getStatus() == asset::ASSET_STATUS_READY) {
+				$assets [] = $asset;
+			}
+			elseif($asset->getStatus()== asset::ASSET_STATUS_DELETED) {
+				$captionInfo = new KalturaDailymotionDistributionCaptionInfo ();
+				$captionInfo->action = KalturaDailymotionDistributionCaptionAction::DELETE_ACTION;
+				$captionInfo->assetId = $assetId;
+				//getting the asset's remote id
+				foreach ( $distributionJobData->mediaFiles as $mediaFile ) {
+					if ($mediaFile->assetId == $assetId) {
+						$captionInfo->remoteId = $mediaFile->remoteId;
+						$this->captionsInfo [] = $captionInfo;
+						break;
+					}
+				}
+			}
+			else{
+				KalturaLog::err("Asset [$assetId] has status [".$asset->getStatus()."]. not added to provider data");
+			}
+		}
+		
+		foreach ( $assets as $asset ) {
+			$assetType = $asset->getType ();
+			switch ($assetType) {
+				case CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION ):
+					$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
+					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
+						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
+						if ($captionInfo){
+							$captionInfo->language = $this->getLanguageCode($asset->getLanguage());
+							$captionInfo->format = $this->getCaptionFormat($asset);
+							if ($captionInfo->language)
+								$this->captionsInfo [] = $captionInfo;
+							else
+								KalturaLog::err('The caption ['.$asset->getId().'] has unrecognized language ['.$asset->getLanguage().']'); 
+						}
+					}
+					break;
+				case AttachmentPlugin::getAssetTypeCoreValue ( AttachmentAssetType::ATTACHMENT ) :
+					$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
+					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
+						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
+						if ($captionInfo){
+							//language code should be set in the attachments title
+							$captionInfo->language = $asset->getTitle();
+							$captionInfo->format = $this->getCaptionFormat($asset);
+							$languageCodeReflector = KalturaTypeReflectorCacher::get('KalturaLanguageCode');
+							//check if the language code exists 
+						    if($languageCodeReflector && $languageCodeReflector->getConstantName($captionInfo->language))
+								$this->captionsInfo [] = $captionInfo;
+							else
+								KalturaLog::err('The attachment ['.$asset->getId().'] has unrecognized language ['.$asset->getTitle().']'); 		    
+						}
+					}
+					break;
+			}
+		}
+	}
+	
+	private function getLanguageCode($language = null){
+		$languageReflector = KalturaTypeReflectorCacher::get('KalturaLanguage');
+		$languageCodeReflector = KalturaTypeReflectorCacher::get('KalturaLanguageCode');
+		if($languageReflector && $languageCodeReflector)
+		{
+			$languageCode = $languageReflector->getConstantName($language);
+			if($languageCode)
+				return $languageCodeReflector->getConstantValue($languageCode);
+		}
+		return null;
+	}
+	
+	private function getCaptionInfo($asset, $syncKey, KalturaDistributionJobData $distributionJobData) {
+		$captionInfo = new KalturaDailymotionDistributionCaptionInfo ();
+		$captionInfo->filePath = kFileSyncUtils::getLocalFilePathForKey ( $syncKey, false );
+		$captionInfo->assetId = $asset->getId();
+		$captionInfo->version = $asset->getVersion();
+		/* @var $mediaFile KalturaDistributionRemoteMediaFile */
+		$distributed = false;
+		foreach ( $distributionJobData->mediaFiles as $mediaFile ) {
+			if ($mediaFile->assetId == $asset->getId ()) {
+				$distributed = true;
+				if ($asset->getVersion () > $mediaFile->version) {
+					$captionInfo->action = KalturaDailymotionDistributionCaptionAction::UPDATE_ACTION;
+				}
+				break;
+			}
+		}
+		if (! $distributed)
+			$captionInfo->action = KalturaDailymotionDistributionCaptionAction::SUBMIT_ACTION;
+		elseif ($captionInfo->action != KalturaDailymotionDistributionCaptionAction::UPDATE_ACTION) {
+			return;
+		}
+		return $captionInfo;
+	}
+	
+	private function getCaptionFormat($asset){		
+		KalturaLog::debug("format:". $asset->getPartnerDescription());
+		if ($asset instanceof  AttachmentAsset && ($asset->getPartnerDescription() == 'smpte-tt'))
+			return KalturaDailymotionDistributionCaptionFormat::TT;
+			
+		if ($asset instanceof  captionAsset){
+			switch ($asset->getContainerFormat()){
+				case KalturaCaptionType::SRT:
+					return KalturaDailymotionDistributionCaptionFormat::SRT;
+				case KalturaCaptionType::DFXP:
+					return KalturaDailymotionDistributionCaptionFormat::TT;	
+			}
+		}
+		throw new KalturaAPIException("caption [$asset->id] has an unknow format.");
 	}
 }
