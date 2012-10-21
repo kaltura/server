@@ -299,8 +299,10 @@ class ks extends kSessionBase
 	
 	public function toSecureString()
 	{
+		list($ksVersion, $secret) = $this->getKSVersionAndSecret($this->partner_id);
 		return kSessionBase::generateSession(
-			$this->getAdminSecret($this->partner_id), 
+			$ksVersion,
+			$secret, 
 			$this->user, 
 			$this->type, 
 			$this->partner_id, 
@@ -647,20 +649,22 @@ class ks extends kSessionBase
 		return $this->user == $puser_id;
 	}
 
-	protected function getAdminSecret($partnerId)
+	protected function getKSVersionAndSecret($partnerId)
 	{
-		$adminSecret = parent::getAdminSecret($partnerId);
-		if ($adminSecret)
-			return $adminSecret;
+		$result = parent::getKSVersionAndSecret($partnerId);
+		if ($result)
+			return $result;
 		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$partner)
-			return null; // VERY big problem
-		
+			return array(1, null); // VERY big problem
+
+		$ksVersion = $partner->getKSVersion();
+
 		if (function_exists('apc_store'))
-			apc_store(self::SECRETS_CACHE_PREFIX . $partnerId, array($partner->getAdminSecret(), $partner->getSecret()));
+			apc_store(self::SECRETS_CACHE_PREFIX . $partnerId, array($partner->getAdminSecret(), $partner->getSecret(), $ksVersion));
 		
-		return $partner->getAdminSecret();
+		return array($ksVersion, $partner->getAdminSecret());
 	}
 		
 	public function kill()
