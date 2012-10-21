@@ -32,7 +32,7 @@ class kSessionBase
 	const PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY = "disableentitlementforentry";
 	const PRIVILEGE_PRIVACY_CONTEXT = "privacycontext";
 
-	const SECRETS_CACHE_PREFIX = 'partner_secrets_';
+	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
 
 	const INVALID_SESSION_KEY_PREFIX = 'invalid_session_';
 	const INVALID_SESSIONS_SYNCED_KEY = 'invalid_sessions_synched';
@@ -170,14 +170,23 @@ class kSessionBase
 		
 		return $secrets;
 	}
-	
-	protected function getAdminSecret($partnerId)
+
+	protected function getKSVersionAndSecret($partnerId)
 	{
 		$secrets = self::getSecretsFromCache($partnerId);
 		if (!$secrets)
 			return null;
 		
-		list($adminSecret, $userSecret) = $secrets;
+		list($adminSecret, $userSecret, $ksVersion) = $secrets;
+		return array($ksVersion, $adminSecret);
+	}
+	
+	protected function getAdminSecret($partnerId)
+	{
+		$versionAndSecret = $this->getKSVersionAndSecret($partnerId);
+		if (!$versionAndSecret)
+			return null;
+		list($ksVersion, $adminSecret) = $versionAndSecret;
 		return $adminSecret;
 	}
 	
@@ -247,9 +256,12 @@ class kSessionBase
 		return true;
 	}
 
-	public static function generateSession($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId = null, $additionalData = null)
+	public static function generateSession($ksVersion, $adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId = null, $additionalData = null)
 	{
-		return self::generateKsV2($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData);
+		if ($ksVersion == 2)
+			return self::generateKsV2($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData);
+
+		return self::generateKsV1($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData);
 	}
 	
 	public static function generateKsV1($adminSecret, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData)
