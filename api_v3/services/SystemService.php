@@ -28,4 +28,15 @@ class SystemService extends KalturaBaseService
 	{
 		return true;
 	}
+	
+	/**
+	 *
+	 * 
+	 * @action getServerTime
+	 * @return int Return current server timestamp
+	 */
+	function getServerTimeAction()
+	{
+		return time();
+	}
 }
