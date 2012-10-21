@@ -308,6 +308,7 @@ class kBatchExclusiveLock
 			
 			$c->addAscendingOrderByColumn(PartnerLoadPeer::WEIGHTED_PARTNER_LOAD);
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::PRIORITY);
+			$c->addAscendingOrderByColumn(BatchJobLockPeer::URGENCY);
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::ESTIMATED_EFFORT);
 		}
 	}

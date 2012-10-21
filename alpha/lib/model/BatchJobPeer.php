@@ -11,7 +11,6 @@
 class BatchJobPeer extends BaseBatchJobPeer
 {
 	const BATCH_JOB_DEFAULT_PRIORITY = 3;
-	const BATCH_JOB_DEFAULT_BULK_PRIORITY = 4;
 	
 	public static function getInProcStatus()
 	{
@@ -178,13 +177,7 @@ class BatchJobPeer extends BaseBatchJobPeer
 	}
 	
 	public static function calculatePriority(BatchJob $batchJob) {
-		if($batchJob->getPriority() == 0) {
-			// If priority isn't given it is decided by the urgency of the job.
-			$isBulk = (($batchJob->getLockInfo()->getUrgency() % 2) == 0);
-			if($isBulk)
-				$batchJob->setPriority(self::BATCH_JOB_DEFAULT_BULK_PRIORITY);
-			else
-				$batchJob->setPriority(self::BATCH_JOB_DEFAULT_PRIORITY);
-		}
+		if ($batchJob->getPriority () == 0)
+			$batchJob->setPriority ( self::BATCH_JOB_DEFAULT_PRIORITY );
 	}
 }
