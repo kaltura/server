@@ -1,7 +1,7 @@
 SELECT 
 	puser_id user_id,
 	screen_name user_screen_name,
-	full_name user_full_name
+	full_name user_full_name,
 	COUNT(DISTINCT entry_id) count_total,
 	COUNT(DISTINCT IF(entry_media_type_id = 1, entry_id,NULL)) count_video ,
 	COUNT(DISTINCT IF(entry_media_type_id = 5, entry_id,NULL)) count_audio ,
