@@ -12,7 +12,7 @@ class SystemService extends KalturaBaseService
 	
 	protected function partnerRequired($actionName)
 	{
-		if ($actionName === 'ping') {
+		if ($actionName == 'ping' || $actionName == 'getServerTime') {
 			return false;
 		}
 		return parent::partnerRequired($actionName);
