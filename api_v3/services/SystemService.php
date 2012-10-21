@@ -12,7 +12,7 @@ class SystemService extends KalturaBaseService
 	
 	protected function partnerRequired($actionName)
 	{
-		if ($actionName == 'ping' || $actionName == 'getServerTime') {
+		if ($actionName == 'ping' || $actionName == 'getTime') {
 			return false;
 		}
 		return parent::partnerRequired($actionName);
@@ -32,10 +32,10 @@ class SystemService extends KalturaBaseService
 	/**
 	 *
 	 * 
-	 * @action getServerTime
+	 * @action getTime
 	 * @return int Return current server timestamp
 	 */
-	function getServerTimeAction()
+	function getTimeAction()
 	{
 		return time();
 	}
