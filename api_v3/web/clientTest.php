@@ -9,4 +9,10 @@ if (array_key_exists('sleepTime', $_REQUEST))
 if (!array_key_exists('responseBuffer', $_REQUEST))
         die('responseBuffer parameter not specified !');
 
-echo $_REQUEST['responseBuffer'];
+$responseBuffer = $_REQUEST['responseBuffer'];
+if (strlen($responseBuffer) > 300)
+	die('responseBuffer too big !');
+
+if ($responseBuffer == '<xml>' || 
+	(substr($responseBuffer, 0, 13) == '<xml><result>' && substr($responseBuffer, -15) == '</result></xml>'))
+	echo $responseBuffer;
