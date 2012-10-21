@@ -27,22 +27,27 @@
 // ===================================================================================================
 package com.kaltura.client;
 
-import com.kaltura.client.enums.KalturaSessionType;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.URLEncoder;
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -59,7 +64,9 @@ import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.w3c.dom.Element;
 
-import com.kaltura.client.KalturaLogger;
+import sun.misc.BASE64Encoder;
+
+import com.kaltura.client.enums.KalturaSessionType;
 import com.kaltura.client.utils.XmlUtils;
 
 /**
@@ -73,14 +80,21 @@ abstract public class KalturaClientBase {
 	
 	private static final String UTF8_CHARSET = "UTF-8";
 
-	private static final String PARTNER_ID_PARAM_NAME = "partnerId";
+    private static final String PARTNER_ID_PARAM_NAME = "partnerId";
+    
+    // KS v2 constants
+    private static final int BLOCK_SIZE = 16;
+    private static final String FIELD_EXPIRY = "_e";
+    private static final String FIELD_USER = "_u";
+	private static final String FIELD_TYPE = "_t";
+	private static final int RANDOM_SIZE = 16; 
 
 	private static final int MAX_DEBUG_RESPONSE_STRING_LENGTH = 1024;
 	protected KalturaConfiguration kalturaConfiguration;
-	protected String sessionId;
-	protected List<KalturaServiceActionCall> callsQueue;
-	protected boolean isMultiRequest;
-	protected KalturaParams multiRequestParamsMap;
+    protected String sessionId;
+    protected List<KalturaServiceActionCall> callsQueue;
+    protected boolean isMultiRequest;
+    protected KalturaParams multiRequestParamsMap;
 
 	private static KalturaLogger logger = KalturaLogger.getLogger(KalturaClientBase.class);
 	
@@ -538,12 +552,7 @@ abstract public class KalturaClientBase {
 			sbInfo.append(userId).append(";"); // index 5 - user ID
 			sbInfo.append(privileges); // index 6 - privileges
 			
-			// sign info with SHA1 algorithm
-			MessageDigest algorithm = MessageDigest.getInstance("SHA1");
-			algorithm.reset();
-			algorithm.update(adminSecretForSigning.getBytes());
-			algorithm.update(sbInfo.toString().getBytes());
-			byte infoSignature[] = algorithm.digest();
+			byte[] infoSignature = signInfoWithSHA1(adminSecretForSigning + (sbInfo.toString()));
 			
 			// convert signature to hex:
 			String signature = this.convertToHex(infoSignature);
@@ -551,12 +560,14 @@ abstract public class KalturaClientBase {
 			// build final string to base64 encode
 			StringBuilder sbToEncode = new StringBuilder();
 			sbToEncode.append(signature.toString()).append("|").append(sbInfo.toString());
-
-			String hashedString = new String(Base64.encodeBase64(sbToEncode.toString().getBytes()));
+			BASE64Encoder encoder = new BASE64Encoder();
+			
+			// encode the signature and info with base64
+			String hashedString = encoder.encode(sbToEncode.toString().getBytes());
 			
 			// remove line breaks in the session string
 			String ks = hashedString.replace("\n", "");
-			ks = ks.replace("\r", "");
+			ks = hashedString.replace("\r", "");
 			
 			// return the generated session key (KS)
 			return ks;
@@ -564,6 +575,99 @@ abstract public class KalturaClientBase {
 		{
 			throw new Exception(ex);
 		}
+	}
+
+	public String generateSessionV2(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId, int expiry, String privileges) throws Exception
+	{
+		try {
+		// build fields array
+		KalturaParams fields = new KalturaParams();
+		String[] privilegesArr = privileges.split(",");
+		for (String curPriv : privilegesArr) {
+			String privilege = curPriv.trim();
+			if(privilege.isEmpty())
+				continue;
+			if(privilege.equals("*"))
+				privilege = "all:*";
+			
+			String[] splittedPriv = privilege.split(":");
+			if(splittedPriv.length>1) {
+				fields.add(splittedPriv[0], URLEncoder.encode(splittedPriv[1], UTF8_CHARSET));
+			} else {
+				fields.add(splittedPriv[0], "");
+			}
+		}
+		
+		Integer expiryInt = (int)(System.currentTimeMillis() / 1000) + expiry;
+		String expStr = expiryInt.toString();
+		fields.put(FIELD_EXPIRY,  expStr);
+		fields.put(FIELD_TYPE, Integer.toString(type.getHashCode()));
+		fields.put(FIELD_USER, userId);
+		
+		// build fields string
+		String fieldsStr = createRandomString(RANDOM_SIZE) + fields.toQueryString();
+		byte[] infoSignature = signInfoWithSHA1(fieldsStr);
+		byte[] input = new byte[infoSignature.length + fieldsStr.length()];
+		System.arraycopy(infoSignature, 0, input, 0, infoSignature.length);
+		System.arraycopy(fieldsStr.getBytes(),0,input,infoSignature.length, fieldsStr.length());
+		
+		// encrypt and encode
+		byte[] encryptedFields = aesEncrypt(adminSecretForSigning, input);
+		String prefix = "v2|" + partnerId + "|";
+		
+		byte[] output = new byte[encryptedFields.length + prefix.length()];
+		System.arraycopy(prefix.getBytes(), 0, output, 0, prefix.length());
+		System.arraycopy(encryptedFields,0,output,prefix.length(), encryptedFields.length);
+		
+		BASE64Encoder encoder = new BASE64Encoder();
+		String encodedKs = encoder.encode(output);
+		encodedKs = encodedKs.replaceAll("\\+", "-");
+		encodedKs = encodedKs.replaceAll("/", "_");
+		encodedKs = encodedKs.replace("\n", "");
+		encodedKs = encodedKs.replace("\r", "");
+		
+		return encodedKs;
+		} catch (GeneralSecurityException ex) {
+			logger.error("Failed to generate v2 session.");
+			throw new Exception(ex);
+		} 
+	}
+	
+	private byte[] signInfoWithSHA1(String text) throws GeneralSecurityException {
+		MessageDigest algorithm = MessageDigest.getInstance("SHA1");
+		algorithm.reset();
+		algorithm.update(text.getBytes());
+		byte infoSignature[] = algorithm.digest();
+		return infoSignature;
+	}
+	
+	private byte[] aesEncrypt(String secretForSigning, byte[] text) throws GeneralSecurityException, UnsupportedEncodingException {
+		// Key
+		byte[] hashedKey = signInfoWithSHA1(secretForSigning);
+		byte[] keyBytes = Arrays.copyOfRange(hashedKey, 0, 16);
+		SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");
+		
+		// IV
+		byte[] ivBytes = new byte[BLOCK_SIZE];
+		IvParameterSpec iv = new IvParameterSpec(ivBytes);
+		
+		// Text
+		int textSize = ((text.length + BLOCK_SIZE - 1) / BLOCK_SIZE) * BLOCK_SIZE;
+		byte[] textAsBytes = new byte[textSize];
+		Arrays.fill(textAsBytes, (byte)0);
+		System.arraycopy(text, 0, textAsBytes, 0, text.length);
+		
+		// Encrypt
+		Cipher cipher = Cipher.getInstance("AES/CBC/NOPADDING");
+	    cipher.init(Cipher.ENCRYPT_MODE, key, iv);
+        return cipher.doFinal(textAsBytes);
+	}
+	
+	
+	private String createRandomString(int size) {
+		byte[] b = new byte[size];
+		new Random().nextBytes(b);
+		return new String(b);
 	}
 
 	// new function to convert byte array to Hex
