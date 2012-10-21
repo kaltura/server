@@ -34,6 +34,7 @@ class myReportsMgr
 	const REPORT_TYPE_USER_USAGE = 17;
 	const REPORT_TYPE_SPECIFIC_USER_USAGE = 18;
 	const REPORT_TYPE_VAR_USAGE = 19;
+	const REPORT_TYPE_TOP_CREATORS = 20;
 	
 	const REPORTS_COUNT_CACHE = 60;
 	
@@ -712,6 +713,7 @@ class myReportsMgr
 		self::REPORT_TYPE_CONTENT_INTERACTIONS => "content_interactions" ,
 		self::REPORT_TYPE_MAP_OVERLAY => "map_overlay" ,
 		self::REPORT_TYPE_TOP_CONTRIBUTORS => "top_contributors" ,
+		self::REPORT_TYPE_TOP_CREATORS => "top_creators" ,
 		self::REPORT_TYPE_TOP_SYNDICATION => "top_syndication" ,
 		self::REPORT_TYPE_CONTENT_CONTRIBUTIONS => "content_contributions" ,
 		self::REPORT_TYPE_ADMIN_CONSOLE => "admin_console" ,
@@ -794,6 +796,14 @@ class myReportsMgr
 				"avg_view_drop_off",
 			),
 			"top_contributors" => array (
+#				"screen_name",			
+				"count_total" ,	
+				"count_video" ,
+				"count_audio" ,
+				"count_image" ,
+				"count_mix" ,
+			),		
+			"top_creators" => array (
 #				"screen_name",			
 				"count_total" ,	
 				"count_video" ,

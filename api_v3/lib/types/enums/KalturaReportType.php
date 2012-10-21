@@ -16,7 +16,7 @@ class KalturaReportType extends KalturaEnum
 	const TOP_CONTRIBUTORS = 5;
 	const TOP_SYNDICATION = 6;
 	const CONTENT_CONTRIBUTIONS = 7;
-	const WIDGETS_STATS = 8;
+//	const WIDGETS_STATS = 8;
 //	const ADMIN_CONSOLE = 10;		// shouldn't be accessable to users through the API
 	const USER_ENGAGEMENT = 11;
 	const SPEFICIC_USER_ENGAGEMENT = 12;
@@ -28,6 +28,6 @@ class KalturaReportType extends KalturaEnum
 	const SPECIFIC_USER_USAGE = 18;
 	const PARTNER_USAGE = 201; 
 	const VAR_USAGE = 19;
+	const TOP_CREATORS = 20;
 	
-
 }
