@@ -995,13 +995,6 @@ class KalturaBatchJobFilter extends KalturaBaseJobFilter
 	/**
 	 * 
 	 *
-	 * @var string
-	 */
-	public $onStressDivertToIn = null;
-
-	/**
-	 * 
-	 *
 	 * @var KalturaBatchJobStatus
 	 */
 	public $statusEqual = null;
