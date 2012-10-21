@@ -264,7 +264,7 @@ class KalturaResponseCacher extends kApiCache
 		{
 			return;			// can't find the secrets of the partner in the cache
 		}
-		list($adminSecret, $userSecret) = $secrets;				
+		list($adminSecret, $userSecret, $ksVersion) = $secrets;				
 		$secretToMatch = $type ? $adminSecret : $userSecret;
 		$paramSecret = $params['secret'];
 		if ($paramSecret != $secretToMatch)
@@ -276,7 +276,7 @@ class KalturaResponseCacher extends kApiCache
 		$expiry = isset($params['expiry']) ? $params['expiry'] : 86400;
 		$privileges = isset($params['privileges']) ? $params['privileges'] : null;
 		
-		$result = kSessionBase::generateSession($adminSecret, $userId, $type, $partnerId, $expiry, $privileges);
+		$result = kSessionBase::generateSession($ksVersion, $adminSecret, $userId, $type, $partnerId, $expiry, $privileges);
 		if ($format == self::RESPONSE_TYPE_XML)
 		{
 			header("Content-Type: text/xml");
