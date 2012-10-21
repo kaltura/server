@@ -638,6 +638,9 @@ class Partner extends BasePartner
 	public function getEnableBulkUploadNotificationsEmails() {return $this->getFromCustomData("enableBulkUploadNotificationsEmails", null, false); }
 	public function setEnableBulkUploadNotificationsEmails($v) { $this->putInCustomData("enableBulkUploadNotificationsEmails", $v); }
 	
+	public function getKSVersion() { return $this->getFromCustomData( "ksVersion" , null, 1  );	}
+	public function setKSVersion( $v ) { return $this->putInCustomData( "ksVersion", $v );	}
+	
 	public function getBulkUploadNotificationsEmail() 
 	{ 
 		$email = $this->getFromCustomData("bulkUploadNotificationsEmail", null, null);
