@@ -37,6 +37,7 @@ class SystemService extends KalturaBaseService
 	 */
 	function getTimeAction()
 	{
+		KalturaResponseCacher::disableCache();
 		return time();
 	}
 }
