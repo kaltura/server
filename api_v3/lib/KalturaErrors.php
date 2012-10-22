@@ -300,6 +300,8 @@ class KalturaErrors extends APIErrors
 	
 	const PARTNER_NOT_SET = "PARTNER_NOT_SET, Partner not set";
 	
+	const PARTNER_NOT_FOUND = "PARTNER_NOT_FOUND, Partner not found %s";
+	
 	/**
 	 * Upload Service
 	 */
