@@ -18,7 +18,7 @@ $page = 200;
 $dryRun = true;
 if(isset($argv[1]) && strtolower($argv[1]) == 'realrun')
 {
-	$dryRun = true;
+	$dryRun = false;
 }
 else 
 {
@@ -32,6 +32,8 @@ if(isset($argv[2]))
 if(isset($argv[3]))
 	$limit = $argv[3];
 	
+kEventsManager::enableDeferredEvents(false);
+
 $criteria = new Criteria();
 $criteria->add(CuePointPeer::TYPE, AnnotationPlugin::getCuePointTypeCoreValue(AnnotationCuePointType::ANNOTATION));
 if($startUpdatedAt)
@@ -46,10 +48,11 @@ else
 
 $annotations = CuePointPeer::doSelect($criteria);
 $migrated = 0;
-while(count($annotations) && (!$limit || $migrated < $limit))
+$checked = 0;
+while(count($annotations) && (!$limit || $checked < $limit))
 {
-	KalturaLog::info("Migrating [" . count($annotations) . "] partners.");
-	$migrated += count($annotations);
+	KalturaLog::info("Migrating [" . count($annotations) . "] annotations.");
+	$checked += count($annotations);
 	foreach($annotations as $annotation)
 	{
 		/* @var $annotation Annotation */
@@ -60,13 +63,21 @@ while(count($annotations) && (!$limit || $migrated < $limit))
 		if($annotation->getParentId())
 			$annotation->putInCustomData(Annotation::CUSTOM_DATA_FIELD_ROOT_PARENT_ID, $annotation->getRootParentId());
 		
-		$startUpdatedAt = $annotation->getUpdatedAt(null);
-		KalturaLog::info("Migrated annotation [" . $annotation->getId() . "] with updated at [$startUpdatedAt: " . $annotation->getUpdatedAt() . "].");
+		if($annotation->save())
+		{
+			$migrated++;
+			$startUpdatedAt = $annotation->getUpdatedAt(null);
+			KalturaLog::info("Migrated annotation [" . $annotation->getId() . "] with updated at [$startUpdatedAt: " . $annotation->getUpdatedAt() . "].");
+		}
 	}
 	kMemoryManager::clearMemory();
 
 	$nextCriteria = clone $criteria;
-	$nextCriteria->add(CuePointPeer::UPDATED_AT, $startUpdatedAt, Criteria::GREATER_THAN);
+	if($startUpdatedAt)
+		$nextCriteria->add(CuePointPeer::UPDATED_AT, $startUpdatedAt, Criteria::GREATER_THAN);
+	else
+		$nextCriteria->setOffset($checked);
+		
 	$annotations = CuePointPeer::doSelect($nextCriteria);
 }
 
