@@ -14,7 +14,6 @@ class KalturaEventNotificationEventType extends KalturaDynamicEnum implements Ev
 	public static function getAdditionalDescriptions()
 	{
 		return array(
-			EventNotificationEventType::BATCH_JOB_STATUS => 'Status of batch job changed.',
 			EventNotificationEventType::OBJECT_ADDED => 'Object with all its related files and sub objects added, defined by the developer.',
 			EventNotificationEventType::OBJECT_CHANGED => 'Object model changed, automatically raised from the database.',
 			EventNotificationEventType::OBJECT_COPIED => 'Object copied into a new object, automatically raised from the database.',
