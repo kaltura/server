@@ -83,13 +83,10 @@ class HuluFeedHelper
 		
 		$this->addFileNode('Mezzanine video', $this->_providerData->fileBaseName.'.'.pathinfo($this->_providerData->videoAssetFilePath, PATHINFO_EXTENSION));
 		$this->addFileNode('Mezzanine thumbnail', $this->_providerData->fileBaseName.'.'.pathinfo($this->_providerData->thumbAssetFilePath, PATHINFO_EXTENSION));
-		$captionsFilesPaths = unserialize($providerData->captionLocalPaths);
-		if (is_array($captionsFilesPaths)){
-			foreach ($captionsFilesPaths as $captionFilePath){
-				if(file_exists($captionFilePath)){
-					$remoteCaptionFileName = $providerData->fileBaseName.'.'.pathinfo($captionFilePath, PATHINFO_EXTENSION);
-					$this->addFileNode('Text',$remoteCaptionFileName);
-				}
+		foreach ($providerData->captionLocalPaths as $captionFilePath){
+			if(file_exists($captionFilePath->value)){
+				$remoteCaptionFileName = $providerData->fileBaseName.'.'.pathinfo($captionFilePath->value, PATHINFO_EXTENSION);
+				$this->addFileNode('Text',$remoteCaptionFileName->value);
 			}
 		}
 		

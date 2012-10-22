@@ -58,7 +58,7 @@ class HuluDistributionEngine extends DistributionEngine implements
 		
 		$videoFilePath = $providerData->videoAssetFilePath;
 		$thumbAssetFilePath = $providerData->thumbAssetFilePath;
-		$captionsFilesPaths = unserialize($providerData->captionLocalPaths);
+		$captionsFilesPaths = $providerData->captionLocalPaths;
 		$protocol = $distributionProfile->protocol ? $distributionProfile->protocol : KalturaDistributionProtocol::SFTP_CMD;
 		
 		$remoteVideoFileName = $providerData->fileBaseName.'.'.pathinfo($videoFilePath, PATHINFO_EXTENSION);
@@ -78,14 +78,13 @@ class HuluDistributionEngine extends DistributionEngine implements
 				$fileManager->putFile($videoSFTPPath, $videoFilePath);
 				if($thumbAssetFilePath && file_exists($thumbAssetFilePath))
 					$fileManager->putFile($thumbSFTPPath, $thumbAssetFilePath);
-				if (is_array($captionsFilesPaths)){
-					foreach ($captionsFilesPaths as $captionFilePath){
-						if(file_exists($captionFilePath)){
-							$remoteCaptionFileName = $providerData->fileBaseName.'.'.pathinfo($captionFilePath, PATHINFO_EXTENSION);
-							$captionSFTPPath = $sftpBasePath.'/'.$remoteCaptionFileName;
-							KalturaLog::info('$captionSFTPPath:' . $captionSFTPPath);
-							$fileManager->putFile($captionSFTPPath, $captionFilePath);
-						}
+					
+				foreach ($captionsFilesPaths as $captionFilePath){
+					if(file_exists($captionFilePath->value)){
+						$remoteCaptionFileName = $providerData->fileBaseName.'.'.pathinfo($captionFilePath->value, PATHINFO_EXTENSION);
+						$captionSFTPPath = $sftpBasePath.'/'.$remoteCaptionFileName;
+						KalturaLog::info('$captionSFTPPath:' . $captionSFTPPath);
+						$fileManager->putFile($captionSFTPPath, $captionFilePath->value);
 					}
 				}
 				$fileManager->filePutContents($xmlSFTPPath, $xml);
@@ -109,12 +108,10 @@ class HuluDistributionEngine extends DistributionEngine implements
 				}
 				if($thumbAssetFilePath && file_exists($thumbAssetFilePath))
 					$this->uploadFileWithAspera($host, $username, $thumbAssetFilePath, $password, $privateKeyTempPath, $passphrase, $port, $remoteThumbFileName );
-				if (is_array($captionsFilesPaths)){
-					foreach ($captionsFilesPaths as $captionFilePath){
-						if(file_exists($captionFilePath)){
-							$remoteCaptionFileName = $providerData->fileBaseName.'.'.pathinfo($captionFilePath, PATHINFO_EXTENSION);
-							$this->uploadFileWithAspera($host, $username, $captionFilePath, $password, $privateKeyTempPath, $passphrase, $port, $remoteCaptionFileName);
-						}
+				foreach ($captionsFilesPaths as $captionFilePath){
+					if(file_exists($captionFilePath->value)){
+						$remoteCaptionFileName = $providerData->fileBaseName.'.'.pathinfo($captionFilePath->value, PATHINFO_EXTENSION);
+						$this->uploadFileWithAspera($host, $username, $captionFilePath->value, $password, $privateKeyTempPath, $passphrase, $port, $remoteCaptionFileName);
 					}
 				}
 				if($xmlTempPath && file_exists($xmlTempPath))

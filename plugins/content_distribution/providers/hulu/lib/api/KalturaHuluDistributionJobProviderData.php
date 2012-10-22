@@ -26,7 +26,7 @@ class KalturaHuluDistributionJobProviderData extends KalturaConfigurableDistribu
 	public $fileBaseName;
 	
 	/**
-	 * @var string
+	 * @var KalturaStringArray
 	 */
 	public $captionLocalPaths;
 	
@@ -46,7 +46,6 @@ class KalturaHuluDistributionJobProviderData extends KalturaConfigurableDistribu
 		if(!($distributionJobData->distributionProfile instanceof KalturaHuluDistributionProfile))
 			return;
 			
-		$this->videoAssetFilePaths = new KalturaStringArray();
 		
 		// loads all the flavor assets that should be submitted to the remote destination site
 		$flavorAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
@@ -66,6 +65,7 @@ class KalturaHuluDistributionJobProviderData extends KalturaConfigurableDistribu
 		}
 		
 		$additionalAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->assetIds));
+		$this->captionLocalPaths = new KalturaStringArray();
 		if(count($additionalAssets))
 		{
 			$captionAssetFilePathArray = array();
@@ -75,12 +75,13 @@ class KalturaHuluDistributionJobProviderData extends KalturaConfigurableDistribu
 				$syncKey = $additionalAsset->getSyncKey(CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 				if(kFileSyncUtils::fileSync_exists($syncKey)){
 					if (($assetType == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))||
-						($assetType == AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT))){									
-						$captionAssetFilePathArray[] = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);				    
+						($assetType == AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT))){
+						$string = new KalturaString();
+						$string->value = kFileSyncUtils::getLocalFilePathForKey($syncKey, false); 
+						$this->captionLocalPaths[] =  $string;
 					}
 				}
 			}
-			$this->captionLocalPaths = serialize($captionAssetFilePathArray);
 		}
 		
 		$tempFieldValues = unserialize($this->fieldValues);
