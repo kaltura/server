@@ -58,11 +58,17 @@ class CuePointService extends KalturaBaseService
 			
 		$created = $dbCuePoint->save();
 		if(!$created)
+		{
+			KalturaLog::err("Cue point not created");
 			return null;
+		}
 		
 		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint->getType());
 		if(!$cuePoint)
+		{
+			KalturaLog::err("API Cue point not instantiated");
 			return null;
+		}
 			
 		$cuePoint->fromObject($dbCuePoint);
 		return $cuePoint;
