@@ -372,7 +372,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	protected function increaseChildrenCountAndSave()
 	{
 		$this->setDirectChildrenCount($this->getDirectChildrenCount() + 1);
-		$this->setChildrenCount($this->getChildren() + 1);
+		$this->setChildrenCount($this->getChildrenCount() + 1);
 		$this->save();
 		
 		$parent = $this->getParent();
@@ -383,7 +383,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	protected function decreaseChildrenCountAndSave()
 	{
 		$this->setDirectChildrenCount($this->getDirectChildrenCount() - 1);
-		$this->setChildrenCount($this->getChildren() - 1);
+		$this->setChildrenCount($this->getChildrenCount() - 1);
 		$this->save();
 		
 		$parent = $this->getParent();
