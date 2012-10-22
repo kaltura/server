@@ -422,7 +422,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		if ($this->isNew())
 			return 0;
 			
-		$ret = parent::getDirectChildrenCount();
+		$ret = parent::getChildrenCount();
 		if(!is_null($ret))
 			return $ret;
 			
