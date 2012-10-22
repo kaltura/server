@@ -609,7 +609,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		
 		if ($countUsers <= 0) {
 			$loginData = self::retrieveByPK($loginDataId);
-			$loginData->delete();
+			if($loginData)
+				$loginData->delete();
 		}
 		
 		
