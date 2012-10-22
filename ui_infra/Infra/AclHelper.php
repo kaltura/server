@@ -92,7 +92,9 @@ class Infra_AclHelper
 	{
 		if(!self::isAllowed($resource, $privilege))
 		{
-			throw new Infra_Exception('Access denied ' . $resource . '-' . $privilege, Infra_Exception::ERROR_CODE_ACCESS_DENIED);
+			$message = "Access denied to resource[$resource], needed privilege [$privilege]";
+			KalturaLog::err($message);
+			throw new Infra_Exception($message, Infra_Exception::ERROR_CODE_ACCESS_DENIED);
 		}
 	}
 }
