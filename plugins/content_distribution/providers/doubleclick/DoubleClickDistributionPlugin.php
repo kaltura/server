@@ -10,6 +10,8 @@ class DoubleClickDistributionPlugin extends KalturaPlugin implements IKalturaPer
 	const CONTENT_DSTRIBUTION_VERSION_MINOR = 0;
 	const CONTENT_DSTRIBUTION_VERSION_BUILD = 0;
 
+	const DEPENDENTS_ON_PLUGIN_NAME_CUE_POINT = 'cuePoint';
+
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
@@ -22,8 +24,9 @@ class DoubleClickDistributionPlugin extends KalturaPlugin implements IKalturaPer
 			self::CONTENT_DSTRIBUTION_VERSION_MINOR,
 			self::CONTENT_DSTRIBUTION_VERSION_BUILD);
 			
-		$dependency = new KalturaDependency(ContentDistributionPlugin::getPluginName(), $contentDistributionVersion);
-		return array($dependency);
+		$dependency1 = new KalturaDependency(ContentDistributionPlugin::getPluginName(), $contentDistributionVersion);
+		$dependency2 = new KalturaDependency(DoubleClickDistributionPlugin::DEPENDENTS_ON_PLUGIN_NAME_CUE_POINT);
+		return array($dependency1, $dependency2);
 	}
 	
 	public static function isAllowedPartner($partnerId)

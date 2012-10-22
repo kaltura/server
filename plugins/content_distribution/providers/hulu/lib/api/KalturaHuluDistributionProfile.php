@@ -156,4 +156,20 @@ class KalturaHuluDistributionProfile extends KalturaConfigurableDistributionProf
 		
 		$this->seriesAdditionalCategories = KalturaStringArray::fromStringArray($source_object->getSeriesAdditionalCategories());
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert($propertiesToSkip)
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if(!$partner)
+			throw new KalturaAPIException(KalturaErrors::PARTNER_NOT_FOUND, $partnerId);
+			
+		if(!$partner->getPluginEnabled(HuluDistributionPlugin::DEPENDENTS_ON_PLUGIN_NAME_CUE_POINT))
+			throw new KalturaAPIException(KalturaErrors::PLUGIN_NOT_AVAILABLE_FOR_PARTNER, HuluDistributionPlugin::DEPENDENTS_ON_PLUGIN_NAME_CUE_POINT, $partnerId);
+		
+		return parent::validateForInsert($propertiesToSkip);
+	}
 }

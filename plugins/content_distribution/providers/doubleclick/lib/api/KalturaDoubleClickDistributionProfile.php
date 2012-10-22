@@ -59,4 +59,20 @@ class KalturaDoubleClickDistributionProfile extends KalturaConfigurableDistribut
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert($propertiesToSkip)
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if(!$partner)
+			throw new KalturaAPIException(KalturaErrors::PARTNER_NOT_FOUND, $partnerId);
+			
+		if(!$partner->getPluginEnabled(DoubleClickDistributionPlugin::DEPENDENTS_ON_PLUGIN_NAME_CUE_POINT))
+			throw new KalturaAPIException(KalturaErrors::PLUGIN_NOT_AVAILABLE_FOR_PARTNER, DoubleClickDistributionPlugin::DEPENDENTS_ON_PLUGIN_NAME_CUE_POINT, $partnerId);
+		
+		return parent::validateForInsert($propertiesToSkip);
+	}
 }
