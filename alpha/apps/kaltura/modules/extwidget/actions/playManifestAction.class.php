@@ -398,13 +398,19 @@ class playManifestAction extends kalturaAction
 	{
 		$urlManager = $this->getUrlManagerByCdn($this->cdnHost);
 		if (!method_exists($urlManager, 'getManifestUrl'))
+		{
+			KalturaLog::debug('URL manager [' . get_class($urlManager) . '] does not support manifest URL for CDN [' . $this->cdnHost . ']');
 			return null;
+		}
 
 		$url = $this->getTokenizedManifestUrl('hdnetworksmil', 'a.smil');
 		
 		$flavor = $urlManager->getManifestUrl($url);
 		if (!$flavor)
+		{
+			KalturaLog::debug('URL manager [' . get_class($urlManager) . '] could not find lavor');
 			return null;
+		}
 		
 		if (strpos($flavor['urlPrefix'], '://') === false)
 			$flavor['urlPrefix'] = $this->protocol . '://' . $flavor['urlPrefix'];
@@ -1209,7 +1215,10 @@ class playManifestAction extends kalturaAction
 	{			
 		$flavor = $this->getSecureHdUrl();
 		if (!$flavor)
+		{
+			KalturaLog::debug('No flaovr found');
 			return null;
+		}
 			
 		$duration = $this->entry->getDurationInt();
 		
@@ -1476,6 +1485,7 @@ class playManifestAction extends kalturaAction
 			}
 		}
 
+		// TODO add protocol limitation action to access control
 		if (array_key_exists('enforce_encryption', $playbackParams) && $playbackParams['enforce_encryption'])
 		{
 			if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on')
