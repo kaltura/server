@@ -7,7 +7,6 @@ if (count($argv) == 1)
 }
 
 $partnerId = $argv[1];
-chdir('/opt/kaltura/app/scripts/');
 require_once 'bootstrap.php';
 $dbConf = kConf::getDB();
 DbManager::setConfig ( $dbConf );
