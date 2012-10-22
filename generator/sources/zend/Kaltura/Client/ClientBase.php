@@ -659,7 +659,10 @@ class Kaltura_Client_ClientBase
 
 		// build fields string
 		$fieldsStr = http_build_query($fields, '', '&');
-		$fieldsStr = mcrypt_create_iv(self::RANDOM_SIZE) . $fieldsStr;
+		$rand = '';
+		for ($i = 0; $i < self::RANDOM_SIZE; $i++)
+			$rand .= chr(rand(0, 0xff));
+		$fieldsStr = $rand . $fieldsStr;
 		$fieldsStr = sha1($fieldsStr, true) . $fieldsStr;
 		
 		// encrypt and encode
