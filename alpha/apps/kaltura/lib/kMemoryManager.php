@@ -4,6 +4,8 @@ class kMemoryManager
 {
 	public static function clearMemory()
 	{
+		kMrssManager::clearInstancePool();
+		
 		accessControlPeer::clearInstancePool();
 	    kuserPeer::clearInstancePool();
 	    kshowPeer::clearInstancePool();

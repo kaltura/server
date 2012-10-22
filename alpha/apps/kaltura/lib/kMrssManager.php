@@ -11,6 +11,74 @@ class kMrssManager
 	private static $addedIsmUrl = false;
 	
 	/**
+	 * Array of XML objects 
+	 * 
+	 * @var array<SimpleXMLElement>
+	 */
+	protected static $instancesPool = array();
+	
+	/**
+	 * Indicates that the static instances pool caching is enabled
+	 * 
+	 * @var bool
+	 */
+	protected static $instancesEnabled = true;
+
+	/**
+	 * Enables or disables the static instances pool caching
+	 * 
+	 * @param bool $enabled
+	 */
+	public static function setInstancePoolingEnabled($enabled = true)
+	{
+		self::$instancesEnabled = $enabled;
+	}
+
+	/**
+	 * Indicates if the static instances pool caching is enabled
+	 * 
+	 * @return boolean
+	 */
+	protected static function isInstancePoolingEnabled()
+	{
+		return self::$instancesEnabled;
+	}
+	
+	/**
+	 * Adds the supplied XML object to the instance pool.
+	 * 
+	 * @param string $entryId
+	 * @param SimpleXMLElement $xml
+	 */
+	protected static function addInstanceToPool($entryId, SimpleXMLElement $xml)
+	{
+		if (self::isInstancePoolingEnabled())
+			self::$instancesPool[$entryId] = $xml;
+	}
+
+	/**
+	 * Gets XML object from the instance pool according to the supplied entry id.
+	 * 
+	 * @param string $entryId
+	 * @return SimpleXMLElement
+	 */
+	protected static function getInstanceFromPool($entryId)
+	{
+		if (self::isInstancePoolingEnabled() && isset(self::$instancesPool[$entryId]))
+			return self::$instancesPool[$entryId]; 
+		
+		return null;
+	}
+
+	/**
+	 * Removes all XML objects from the instance pool.
+	 */
+	public static function clearInstancePool()
+	{
+		self::$instancesPool = array();
+	}
+	
+	/**
 	 * @param string $string
 	 * @return string
 	 */
@@ -368,8 +436,14 @@ class kMrssManager
 	 */
 	public static function getEntryMrssXml(entry $entry, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null)
 	{
-		if($mrss === null)
+		if(is_null($mrss))
+		{
+			$mrss = self::getInstanceFromPool($entry->getId());
+			if($mrss)
+				return $mrss;
+				
 			$mrss = new SimpleXMLElement('<item/>');
+		}
 		
 		$mrss->addChild('entryId', $entry->getId());
 		if($entry->getReferenceID())
@@ -487,6 +561,7 @@ class kMrssManager
 			$player->addAttribute('url', $playerUrl);
 		}
 				
+		self::addInstanceToPool($entry->getId(), $mrss);
 		return $mrss;
 	}
 }
