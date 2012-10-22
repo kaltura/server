@@ -450,5 +450,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 			$this->setRootParentId($this->getRootParentId());
 		$this->setChildrenCount(0);
 		$this->setDirectChildrenCount(0);
+		
+		return parent::preInsert($con);
 	}
 } // CuePoint
