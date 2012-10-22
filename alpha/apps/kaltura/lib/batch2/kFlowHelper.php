@@ -22,12 +22,7 @@ class kFlowHelper
 	{
 		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if($flavorAsset)
-		{
-			//			$flavorAsset->incrementVersion();
-			$flavorAsset->save();
-
 			return $flavorAsset;
-		}
 
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry)
