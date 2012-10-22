@@ -26,7 +26,7 @@ abstract class BaseCuePointPeer {
 	const TM_CLASS = 'CuePointTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 21;
+	const NUM_COLUMNS = 24;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -94,6 +94,15 @@ abstract class BaseCuePointPeer {
 	/** the column name for the THUMB_OFFSET field */
 	const THUMB_OFFSET = 'cue_point.THUMB_OFFSET';
 
+	/** the column name for the DEPTH field */
+	const DEPTH = 'cue_point.DEPTH';
+
+	/** the column name for the CHILDREN_COUNT field */
+	const CHILDREN_COUNT = 'cue_point.CHILDREN_COUNT';
+
+	/** the column name for the DIRECT_CHILDREN_COUNT field */
+	const DIRECT_CHILDREN_COUNT = 'cue_point.DIRECT_CHILDREN_COUNT';
+
 	/**
 	 * An identiy map to hold any loaded instances of CuePoint objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -110,11 +119,11 @@ abstract class BaseCuePointPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('IntId', 'Id', 'ParentId', 'EntryId', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'Name', 'SystemName', 'Text', 'Tags', 'StartTime', 'EndTime', 'Status', 'Type', 'SubType', 'KuserId', 'CustomData', 'PartnerData', 'PartnerSortValue', 'ThumbOffset', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('intId', 'id', 'parentId', 'entryId', 'partnerId', 'createdAt', 'updatedAt', 'name', 'systemName', 'text', 'tags', 'startTime', 'endTime', 'status', 'type', 'subType', 'kuserId', 'customData', 'partnerData', 'partnerSortValue', 'thumbOffset', ),
-		BasePeer::TYPE_COLNAME => array (self::INT_ID, self::ID, self::PARENT_ID, self::ENTRY_ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::NAME, self::SYSTEM_NAME, self::TEXT, self::TAGS, self::START_TIME, self::END_TIME, self::STATUS, self::TYPE, self::SUB_TYPE, self::KUSER_ID, self::CUSTOM_DATA, self::PARTNER_DATA, self::PARTNER_SORT_VALUE, self::THUMB_OFFSET, ),
-		BasePeer::TYPE_FIELDNAME => array ('int_id', 'id', 'parent_id', 'entry_id', 'partner_id', 'created_at', 'updated_at', 'name', 'system_name', 'text', 'tags', 'start_time', 'end_time', 'status', 'type', 'sub_type', 'kuser_id', 'custom_data', 'partner_data', 'partner_sort_value', 'thumb_offset', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
+		BasePeer::TYPE_PHPNAME => array ('IntId', 'Id', 'ParentId', 'EntryId', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'Name', 'SystemName', 'Text', 'Tags', 'StartTime', 'EndTime', 'Status', 'Type', 'SubType', 'KuserId', 'CustomData', 'PartnerData', 'PartnerSortValue', 'ThumbOffset', 'Depth', 'ChildrenCount', 'DirectChildrenCount', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('intId', 'id', 'parentId', 'entryId', 'partnerId', 'createdAt', 'updatedAt', 'name', 'systemName', 'text', 'tags', 'startTime', 'endTime', 'status', 'type', 'subType', 'kuserId', 'customData', 'partnerData', 'partnerSortValue', 'thumbOffset', 'depth', 'childrenCount', 'directChildrenCount', ),
+		BasePeer::TYPE_COLNAME => array (self::INT_ID, self::ID, self::PARENT_ID, self::ENTRY_ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::NAME, self::SYSTEM_NAME, self::TEXT, self::TAGS, self::START_TIME, self::END_TIME, self::STATUS, self::TYPE, self::SUB_TYPE, self::KUSER_ID, self::CUSTOM_DATA, self::PARTNER_DATA, self::PARTNER_SORT_VALUE, self::THUMB_OFFSET, self::DEPTH, self::CHILDREN_COUNT, self::DIRECT_CHILDREN_COUNT, ),
+		BasePeer::TYPE_FIELDNAME => array ('int_id', 'id', 'parent_id', 'entry_id', 'partner_id', 'created_at', 'updated_at', 'name', 'system_name', 'text', 'tags', 'start_time', 'end_time', 'status', 'type', 'sub_type', 'kuser_id', 'custom_data', 'partner_data', 'partner_sort_value', 'thumb_offset', 'depth', 'children_count', 'direct_children_count', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, )
 	);
 
 	/**
@@ -124,11 +133,11 @@ abstract class BaseCuePointPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('IntId' => 0, 'Id' => 1, 'ParentId' => 2, 'EntryId' => 3, 'PartnerId' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'Name' => 7, 'SystemName' => 8, 'Text' => 9, 'Tags' => 10, 'StartTime' => 11, 'EndTime' => 12, 'Status' => 13, 'Type' => 14, 'SubType' => 15, 'KuserId' => 16, 'CustomData' => 17, 'PartnerData' => 18, 'PartnerSortValue' => 19, 'ThumbOffset' => 20, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('intId' => 0, 'id' => 1, 'parentId' => 2, 'entryId' => 3, 'partnerId' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'name' => 7, 'systemName' => 8, 'text' => 9, 'tags' => 10, 'startTime' => 11, 'endTime' => 12, 'status' => 13, 'type' => 14, 'subType' => 15, 'kuserId' => 16, 'customData' => 17, 'partnerData' => 18, 'partnerSortValue' => 19, 'thumbOffset' => 20, ),
-		BasePeer::TYPE_COLNAME => array (self::INT_ID => 0, self::ID => 1, self::PARENT_ID => 2, self::ENTRY_ID => 3, self::PARTNER_ID => 4, self::CREATED_AT => 5, self::UPDATED_AT => 6, self::NAME => 7, self::SYSTEM_NAME => 8, self::TEXT => 9, self::TAGS => 10, self::START_TIME => 11, self::END_TIME => 12, self::STATUS => 13, self::TYPE => 14, self::SUB_TYPE => 15, self::KUSER_ID => 16, self::CUSTOM_DATA => 17, self::PARTNER_DATA => 18, self::PARTNER_SORT_VALUE => 19, self::THUMB_OFFSET => 20, ),
-		BasePeer::TYPE_FIELDNAME => array ('int_id' => 0, 'id' => 1, 'parent_id' => 2, 'entry_id' => 3, 'partner_id' => 4, 'created_at' => 5, 'updated_at' => 6, 'name' => 7, 'system_name' => 8, 'text' => 9, 'tags' => 10, 'start_time' => 11, 'end_time' => 12, 'status' => 13, 'type' => 14, 'sub_type' => 15, 'kuser_id' => 16, 'custom_data' => 17, 'partner_data' => 18, 'partner_sort_value' => 19, 'thumb_offset' => 20, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
+		BasePeer::TYPE_PHPNAME => array ('IntId' => 0, 'Id' => 1, 'ParentId' => 2, 'EntryId' => 3, 'PartnerId' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'Name' => 7, 'SystemName' => 8, 'Text' => 9, 'Tags' => 10, 'StartTime' => 11, 'EndTime' => 12, 'Status' => 13, 'Type' => 14, 'SubType' => 15, 'KuserId' => 16, 'CustomData' => 17, 'PartnerData' => 18, 'PartnerSortValue' => 19, 'ThumbOffset' => 20, 'Depth' => 21, 'ChildrenCount' => 22, 'DirectChildrenCount' => 23, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('intId' => 0, 'id' => 1, 'parentId' => 2, 'entryId' => 3, 'partnerId' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'name' => 7, 'systemName' => 8, 'text' => 9, 'tags' => 10, 'startTime' => 11, 'endTime' => 12, 'status' => 13, 'type' => 14, 'subType' => 15, 'kuserId' => 16, 'customData' => 17, 'partnerData' => 18, 'partnerSortValue' => 19, 'thumbOffset' => 20, 'depth' => 21, 'childrenCount' => 22, 'directChildrenCount' => 23, ),
+		BasePeer::TYPE_COLNAME => array (self::INT_ID => 0, self::ID => 1, self::PARENT_ID => 2, self::ENTRY_ID => 3, self::PARTNER_ID => 4, self::CREATED_AT => 5, self::UPDATED_AT => 6, self::NAME => 7, self::SYSTEM_NAME => 8, self::TEXT => 9, self::TAGS => 10, self::START_TIME => 11, self::END_TIME => 12, self::STATUS => 13, self::TYPE => 14, self::SUB_TYPE => 15, self::KUSER_ID => 16, self::CUSTOM_DATA => 17, self::PARTNER_DATA => 18, self::PARTNER_SORT_VALUE => 19, self::THUMB_OFFSET => 20, self::DEPTH => 21, self::CHILDREN_COUNT => 22, self::DIRECT_CHILDREN_COUNT => 23, ),
+		BasePeer::TYPE_FIELDNAME => array ('int_id' => 0, 'id' => 1, 'parent_id' => 2, 'entry_id' => 3, 'partner_id' => 4, 'created_at' => 5, 'updated_at' => 6, 'name' => 7, 'system_name' => 8, 'text' => 9, 'tags' => 10, 'start_time' => 11, 'end_time' => 12, 'status' => 13, 'type' => 14, 'sub_type' => 15, 'kuser_id' => 16, 'custom_data' => 17, 'partner_data' => 18, 'partner_sort_value' => 19, 'thumb_offset' => 20, 'depth' => 21, 'children_count' => 22, 'direct_children_count' => 23, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, )
 	);
 
 	/**
@@ -219,6 +228,9 @@ abstract class BaseCuePointPeer {
 		$criteria->addSelectColumn(CuePointPeer::PARTNER_DATA);
 		$criteria->addSelectColumn(CuePointPeer::PARTNER_SORT_VALUE);
 		$criteria->addSelectColumn(CuePointPeer::THUMB_OFFSET);
+		$criteria->addSelectColumn(CuePointPeer::DEPTH);
+		$criteria->addSelectColumn(CuePointPeer::CHILDREN_COUNT);
+		$criteria->addSelectColumn(CuePointPeer::DIRECT_CHILDREN_COUNT);
 	}
 
 	/**

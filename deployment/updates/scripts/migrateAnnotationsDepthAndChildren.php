@@ -54,9 +54,9 @@ while(count($annotations) && (!$limit || $migrated < $limit))
 	{
 		/* @var $annotation Annotation */
 
-		$annotation->putInCustomData(Annotation::CUSTOM_DATA_FIELD_DEPTH, $annotation->getDepth());
-		$annotation->putInCustomData(Annotation::CUSTOM_DATA_FIELD_CHILDREN_COUNT, $annotation->getChildrenCount());
-		$annotation->putInCustomData(Annotation::CUSTOM_DATA_FIELD_DIRECT_CHILDREN_COUNT, $annotation->getDirectChildrenCount());
+		$annotation->setDepth($annotation->getDepth());
+		$annotation->setChildrenCount($annotation->getChildrenCount());
+		$annotation->setDirectChildrenCount($annotation->getDirectChildrenCount());
 		if($annotation->getParentId())
 			$annotation->putInCustomData(Annotation::CUSTOM_DATA_FIELD_ROOT_PARENT_ID, $annotation->getRootParentId());
 		

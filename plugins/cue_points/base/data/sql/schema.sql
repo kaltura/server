@@ -33,6 +33,9 @@ CREATE TABLE `cue_point`
 	`partner_data` TEXT,
 	`partner_sort_value` INTEGER,
 	`thumb_offset` INTEGER,
+	`depth` INTEGER,
+	`children_count` INTEGER,
+	`direct_children_count` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `partner_entry_index`(`partner_id`, `entry_id`),
 	KEY `int_id_index`(`int_id`)

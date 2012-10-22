@@ -16,9 +16,6 @@
 abstract class CuePoint extends BaseCuePoint implements IIndexable 
 {
 	const CUSTOM_DATA_FIELD_FORCE_STOP = 'forceStop';
-	const CUSTOM_DATA_FIELD_DEPTH = 'depth';
-	const CUSTOM_DATA_FIELD_CHILDREN_COUNT = 'childrenCount';
-	const CUSTOM_DATA_FIELD_DIRECT_CHILDREN_COUNT = 'directChildrenCount';
 	const CUSTOM_DATA_FIELD_ROOT_PARENT_ID = 'rootParentId';
 	
 	public function getChildren()
@@ -210,6 +207,9 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 			'sub_type' => 'subType',
 			'kuser_id' => 'kuserId',
 			'partner_sort_value' => 'partnerSortValue',
+			'depth' => 'depth',
+			'children_count' => 'childrenCount',
+			'direct_children_count' => 'directChildrenCount',
 			'force_stop' => 'forceStop',
 			'created_at' => 'createdAt',
 			'updated_at' => 'updatedAt',
@@ -237,6 +237,9 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		'sub_type' => IIndexable::FIELD_TYPE_INTEGER,
 		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
+		'depth' => IIndexable::FIELD_TYPE_INTEGER,
+		'children_count' => IIndexable::FIELD_TYPE_INTEGER,
+		'direct_children_count' => IIndexable::FIELD_TYPE_INTEGER,
 		'force_stop' => IIndexable::FIELD_TYPE_INTEGER,
 		'created_at' => IIndexable::FIELD_TYPE_DATETIME,
 		'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
@@ -356,7 +359,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	 */
 	public function getDepth()
 	{
-		$ret = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DEPTH);
+		$ret = parent::getDepth();
 		if(!is_null($ret))
 			return $ret;
 			
@@ -368,8 +371,8 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	
 	protected function increaseChildrenCountAndSave()
 	{
-		$this->incInCustomData(self::CUSTOM_DATA_FIELD_DIRECT_CHILDREN_COUNT);
-		$this->incInCustomData(self::CUSTOM_DATA_FIELD_CHILDREN_COUNT);
+		$this->setDirectChildrenCount($this->getDirectChildrenCount() + 1);
+		$this->setChildrenCount($this->getChildren() + 1);
 		$this->save();
 		
 		$parent = $this->getParent();
@@ -379,15 +382,14 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	
 	protected function decreaseChildrenCountAndSave()
 	{
-		$this->decInCustomData(self::CUSTOM_DATA_FIELD_DIRECT_CHILDREN_COUNT);
-		$this->decInCustomData(self::CUSTOM_DATA_FIELD_CHILDREN_COUNT);
+		$this->setDirectChildrenCount($this->getDirectChildrenCount() - 1);
+		$this->setChildrenCount($this->getChildren() - 1);
 		$this->save();
 		
 		$parent = $this->getParent();
 		if($parent)
 			$parent->decreaseChildrenCountAndSave();
 	}
-	
 	
 	/**
 	 * @return int
@@ -397,7 +399,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		if ($this->isNew())
 			return 0;
 			
-		$ret = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DIRECT_CHILDREN_COUNT);
+		$ret = parent::getDirectChildrenCount();
 		if(!is_null($ret))
 			return $ret;
 			
@@ -416,7 +418,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		if ($this->isNew())
 			return 0;
 			
-		$ret = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CHILDREN_COUNT);
+		$ret = parent::getDirectChildrenCount();
 		if(!is_null($ret))
 			return $ret;
 			
@@ -431,19 +433,11 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	}
 	
 	/**
-	 * @param int
+	 * @param int $v
 	 */
-	protected function setDepth($depth)
+	protected function setRootParentId($v)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_FIELD_DEPTH, $depth);
-	}
-	
-	/**
-	 * @param int
-	 */
-	protected function setRootParentId($id)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_FIELD_ROOT_PARENT_ID, $id);
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_ROOT_PARENT_ID, $v);
 	}
 	
 	/* (non-PHPdoc)
@@ -454,7 +448,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		$this->setDepth($this->getDepth());
 		if($this->getParentId())
 			$this->setRootParentId($this->getRootParentId());
-		$this->putInCustomData(self::CUSTOM_DATA_FIELD_CHILDREN_COUNT, 0);
-		$this->putInCustomData(self::CUSTOM_DATA_FIELD_DIRECT_CHILDREN_COUNT, 0);
+		$this->setChildrenCount(0);
+		$this->setDirectChildrenCount(0);
 	}
 } // CuePoint

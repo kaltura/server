@@ -58,6 +58,9 @@ class CuePointTableMap extends TableMap {
 		$this->addColumn('PARTNER_DATA', 'PartnerData', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('PARTNER_SORT_VALUE', 'PartnerSortValue', 'INTEGER', false, null, null);
 		$this->addColumn('THUMB_OFFSET', 'ThumbOffset', 'INTEGER', false, null, null);
+		$this->addColumn('DEPTH', 'Depth', 'INTEGER', false, null, null);
+		$this->addColumn('CHILDREN_COUNT', 'ChildrenCount', 'INTEGER', false, null, null);
+		$this->addColumn('DIRECT_CHILDREN_COUNT', 'DirectChildrenCount', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 

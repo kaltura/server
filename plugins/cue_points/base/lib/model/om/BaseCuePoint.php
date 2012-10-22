@@ -146,6 +146,24 @@ abstract class BaseCuePoint extends BaseObject  implements Persistent {
 	protected $thumb_offset;
 
 	/**
+	 * The value for the depth field.
+	 * @var        int
+	 */
+	protected $depth;
+
+	/**
+	 * The value for the children_count field.
+	 * @var        int
+	 */
+	protected $children_count;
+
+	/**
+	 * The value for the direct_children_count field.
+	 * @var        int
+	 */
+	protected $direct_children_count;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -458,6 +476,36 @@ abstract class BaseCuePoint extends BaseObject  implements Persistent {
 	public function getThumbOffset()
 	{
 		return $this->thumb_offset;
+	}
+
+	/**
+	 * Get the [depth] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getDepth()
+	{
+		return $this->depth;
+	}
+
+	/**
+	 * Get the [children_count] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getChildrenCount()
+	{
+		return $this->children_count;
+	}
+
+	/**
+	 * Get the [direct_children_count] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getDirectChildrenCount()
+	{
+		return $this->direct_children_count;
 	}
 
 	/**
@@ -993,6 +1041,75 @@ abstract class BaseCuePoint extends BaseObject  implements Persistent {
 	} // setThumbOffset()
 
 	/**
+	 * Set the value of [depth] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     CuePoint The current object (for fluent API support)
+	 */
+	public function setDepth($v)
+	{
+		if(!isset($this->oldColumnsValues[CuePointPeer::DEPTH]))
+			$this->oldColumnsValues[CuePointPeer::DEPTH] = $this->depth;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->depth !== $v) {
+			$this->depth = $v;
+			$this->modifiedColumns[] = CuePointPeer::DEPTH;
+		}
+
+		return $this;
+	} // setDepth()
+
+	/**
+	 * Set the value of [children_count] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     CuePoint The current object (for fluent API support)
+	 */
+	public function setChildrenCount($v)
+	{
+		if(!isset($this->oldColumnsValues[CuePointPeer::CHILDREN_COUNT]))
+			$this->oldColumnsValues[CuePointPeer::CHILDREN_COUNT] = $this->children_count;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->children_count !== $v) {
+			$this->children_count = $v;
+			$this->modifiedColumns[] = CuePointPeer::CHILDREN_COUNT;
+		}
+
+		return $this;
+	} // setChildrenCount()
+
+	/**
+	 * Set the value of [direct_children_count] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     CuePoint The current object (for fluent API support)
+	 */
+	public function setDirectChildrenCount($v)
+	{
+		if(!isset($this->oldColumnsValues[CuePointPeer::DIRECT_CHILDREN_COUNT]))
+			$this->oldColumnsValues[CuePointPeer::DIRECT_CHILDREN_COUNT] = $this->direct_children_count;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->direct_children_count !== $v) {
+			$this->direct_children_count = $v;
+			$this->modifiedColumns[] = CuePointPeer::DIRECT_CHILDREN_COUNT;
+		}
+
+		return $this;
+	} // setDirectChildrenCount()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1045,6 +1162,9 @@ abstract class BaseCuePoint extends BaseObject  implements Persistent {
 			$this->partner_data = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
 			$this->partner_sort_value = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
 			$this->thumb_offset = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
+			$this->depth = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
+			$this->children_count = ($row[$startcol + 22] !== null) ? (int) $row[$startcol + 22] : null;
+			$this->direct_children_count = ($row[$startcol + 23] !== null) ? (int) $row[$startcol + 23] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1054,7 +1174,7 @@ abstract class BaseCuePoint extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 21; // 21 = CuePointPeer::NUM_COLUMNS - CuePointPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 24; // 24 = CuePointPeer::NUM_COLUMNS - CuePointPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating CuePoint object", $e);
@@ -1578,6 +1698,15 @@ abstract class BaseCuePoint extends BaseObject  implements Persistent {
 			case 20:
 				return $this->getThumbOffset();
 				break;
+			case 21:
+				return $this->getDepth();
+				break;
+			case 22:
+				return $this->getChildrenCount();
+				break;
+			case 23:
+				return $this->getDirectChildrenCount();
+				break;
 			default:
 				return null;
 				break;
@@ -1620,6 +1749,9 @@ abstract class BaseCuePoint extends BaseObject  implements Persistent {
 			$keys[18] => $this->getPartnerData(),
 			$keys[19] => $this->getPartnerSortValue(),
 			$keys[20] => $this->getThumbOffset(),
+			$keys[21] => $this->getDepth(),
+			$keys[22] => $this->getChildrenCount(),
+			$keys[23] => $this->getDirectChildrenCount(),
 		);
 		return $result;
 	}
@@ -1654,6 +1786,9 @@ abstract class BaseCuePoint extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(CuePointPeer::PARTNER_DATA)) $criteria->add(CuePointPeer::PARTNER_DATA, $this->partner_data);
 		if ($this->isColumnModified(CuePointPeer::PARTNER_SORT_VALUE)) $criteria->add(CuePointPeer::PARTNER_SORT_VALUE, $this->partner_sort_value);
 		if ($this->isColumnModified(CuePointPeer::THUMB_OFFSET)) $criteria->add(CuePointPeer::THUMB_OFFSET, $this->thumb_offset);
+		if ($this->isColumnModified(CuePointPeer::DEPTH)) $criteria->add(CuePointPeer::DEPTH, $this->depth);
+		if ($this->isColumnModified(CuePointPeer::CHILDREN_COUNT)) $criteria->add(CuePointPeer::CHILDREN_COUNT, $this->children_count);
+		if ($this->isColumnModified(CuePointPeer::DIRECT_CHILDREN_COUNT)) $criteria->add(CuePointPeer::DIRECT_CHILDREN_COUNT, $this->direct_children_count);
 
 		return $criteria;
 	}
@@ -1759,6 +1894,12 @@ abstract class BaseCuePoint extends BaseObject  implements Persistent {
 		$copyObj->setPartnerSortValue($this->partner_sort_value);
 
 		$copyObj->setThumbOffset($this->thumb_offset);
+
+		$copyObj->setDepth($this->depth);
+
+		$copyObj->setChildrenCount($this->children_count);
+
+		$copyObj->setDirectChildrenCount($this->direct_children_count);
 
 
 		$copyObj->setNew(true);
