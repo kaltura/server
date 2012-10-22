@@ -251,6 +251,14 @@ class kCurrentContext
 		return kCurrentContext::$ks_kuser;
 	}
 
+	public static function getCurrentPartnerId()
+	{
+		if(self::$partner_id)
+			return self::$partner_id;
+			
+		return self::$ks_partner_id;
+	}
+
 	public static function getCurrentKsKuserId()
 	{
 		if (!is_null(kCurrentContext::$ks_kuser_id))
