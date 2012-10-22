@@ -322,6 +322,9 @@ index kaltura_cue_point
 	rt_attr_uint	 = sub_type
 	rt_attr_uint	 = kuser_id
 	rt_attr_bigint	 = partner_sort_value
+	rt_attr_uint	 = depth
+	rt_attr_uint	 = children_count
+	rt_attr_uint	 = direct_children_count
 	rt_attr_uint	 = force_stop
 	rt_attr_timestamp	 = created_at
 	rt_attr_timestamp	 = updated_at
