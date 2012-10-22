@@ -369,26 +369,30 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		return $this->getParent()->getDepth() + 1;
 	}
 	
-	protected function increaseChildrenCountAndSave()
+	protected function increaseChildrenCountAndSave($direct = true)
 	{
-		$this->setDirectChildrenCount($this->getDirectChildrenCount() + 1);
+		if($direct)
+			$this->setDirectChildrenCount($this->getDirectChildrenCount() + 1);
+			
 		$this->setChildrenCount($this->getChildrenCount() + 1);
 		$this->save();
 		
 		$parent = $this->getParent();
 		if($parent)
-			$parent->increaseChildrenCountAndSave();
+			$parent->increaseChildrenCountAndSave(false);
 	}
 	
-	protected function decreaseChildrenCountAndSave()
+	protected function decreaseChildrenCountAndSave($direct = true)
 	{
-		$this->setDirectChildrenCount($this->getDirectChildrenCount() - 1);
+		if($direct)
+			$this->setDirectChildrenCount($this->getDirectChildrenCount() - 1);
+			
 		$this->setChildrenCount($this->getChildrenCount() - 1);
 		$this->save();
 		
 		$parent = $this->getParent();
 		if($parent)
-			$parent->decreaseChildrenCountAndSave();
+			$parent->decreaseChildrenCountAndSave(false);
 	}
 	
 	/**
