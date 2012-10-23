@@ -132,7 +132,7 @@ abstract class KalturaAssetService extends KalturaBaseService
 			if(!$entry)
 			{
 				//we will throw asset not found, as the user is not entitled, and should not know that the entry exists.
-				throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $assetId);
+				throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
 			}	
 		}		
 	}
