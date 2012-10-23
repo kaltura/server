@@ -180,15 +180,17 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$comment = $pdo->getComment();
 		$sphinxIdField = $this->getSphinxIdField();
 		$sql = "SELECT $sphinxIdField $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='$comment'";
+		if (kConf::hasParam('sphinx_extra_options'))
+			$sql .= ', ' . kConf::get('sphinx_extra_options');
 
 		$badSphinxQueries = kConf::hasParam("sphinx_bad_queries") ? kConf::get("sphinx_bad_queries") : array();
 
 		foreach($badSphinxQueries as $badQuery)
 		{
-			if (strpos($sql, $badQuery) !== false)
+			if (preg_match($badQuery, $sql))
 			{
 				KalturaLog::log("bad sphinx query: [$badQuery] $sql");
-				KExternalErrors::dieError(KExternalErrors::BAD_QUERY);
+				throw new kCoreException("Invalid sphinx query [$sql]\nMatched regular expression [$badQuery]", APIErrors::SEARCH_ENGINE_QUERY_FAILED);
 			}
 		}
 
@@ -680,7 +682,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		return $criterionFields;
 	}
-
+	
 	/**
 	 * This function returns a list of fields that indicates whether the query should skip sphinx and go
 	 * directly to the database. For example, if a query on 'entry' contains entry.ID IN (...) going
@@ -716,9 +718,23 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		foreach($this->getMap() as $criterion)
 			$fields = array_merge($fields, $this->getAllCriterionFields($criterion));
 		
-		$orderByColumns = $this->getOrderByColumns();		
-		$fields = array_unique(array_merge($fields, $orderByColumns));
-		
+		foreach ($this->getOrderByColumns() as $orderByColumn)
+		{
+			// strip asc / desc
+			$orderByColumn = str_replace(' ASC', '', str_replace(' DESC', '', $orderByColumn));
+			
+			// strip ()'s
+			if (preg_match('/^\(.*\)$/', $orderByColumn))
+				$orderByColumn = substr($orderByColumn, 1, -1);
+				
+			// strip <> operator (for PARTNER_ID<>1234 order by added by addPartnerToCriteria)
+			$explodedColumn = explode('<>', $orderByColumn);
+			$orderByColumn = $explodedColumn[0];
+			
+			$fields[] = $orderByColumn;
+		}
+		$fields = array_unique($fields);
+								
 		foreach($fields as $field)
 		{	
 			$fieldName = $this->getSphinxFieldName($field);
