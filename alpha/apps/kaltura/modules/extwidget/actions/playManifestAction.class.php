@@ -404,7 +404,8 @@ class playManifestAction extends kalturaAction
 		}
 
 		$originalFormat = $this->format;
-		$this->format = StorageProfile::PLAY_FORMAT_HTTP;			
+		$this->format = StorageProfile::PLAY_FORMAT_HTTP;	
+		$duration = null;		
 		$flavors = $this->buildHttpFlavorsArray($duration);
 		$this->format = $originalFormat;
 		
@@ -417,7 +418,7 @@ class playManifestAction extends kalturaAction
 		$flavor = $urlManager->getManifestUrl($flavors);
 		if (!$flavor)
 		{
-			KalturaLog::debug('URL manager [' . get_class($urlManager) . '] could not find lavor');
+			KalturaLog::debug('URL manager [' . get_class($urlManager) . '] could not find flavor');
 			return null;
 		}
 		
@@ -1005,6 +1006,7 @@ class playManifestAction extends kalturaAction
 		if($this->entry->getType() != entryType::MEDIA_CLIP)
 			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
 
+		$duration = null;
 		switch($this->entry->getType())
 		{
 			case entryType::MEDIA_CLIP:
@@ -1040,6 +1042,7 @@ class playManifestAction extends kalturaAction
 	private function serveRtmp()
 	{
 		$baseUrl = null;
+		$duration = null;
 		switch($this->entry->getType())
 		{
 			case entryType::MEDIA_CLIP:
@@ -1109,6 +1112,7 @@ class playManifestAction extends kalturaAction
 			return $renderer;
 		}
 		
+		$duration = null;
 		$flavors = $this->buildHttpFlavorsArray($duration);
 		
 		$flavors = $this->sortFlavors($flavors);
@@ -1125,6 +1129,7 @@ class playManifestAction extends kalturaAction
 	 */
 	private function serveHds()
 	{
+	    $duration = null;
 		$flavors = $this->buildHttpFlavorsArray($duration);
 		
 		$flavors = $this->sortFlavors($flavors);
@@ -1142,6 +1147,7 @@ class playManifestAction extends kalturaAction
 	 */
 	private function serveHDNetworkSmil()
 	{
+	    $duration = null;
 		$flavors = $this->buildHttpFlavorsArray($duration);
 		
 		$this->ensureUniqueBitrates($flavors);		// When playing HDS with Akamai HD the bitrates in the manifest must be unique 
