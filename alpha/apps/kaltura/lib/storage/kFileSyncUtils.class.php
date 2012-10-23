@@ -975,6 +975,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $source_key );
 		$file_sync_list = FileSyncPeer::doSelect( $c );
+		if (!$file_sync_list)
+		{
+			KalturaLog::log("Warning: no source. target_key [$target_key], source_key [$source_key] ");
+			return null;
+		}
+				
 		$source_file_syncs = array();
 		foreach($file_sync_list as $file_sync)
 		{
