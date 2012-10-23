@@ -347,8 +347,8 @@ class kUrlManager
 		$this->setContainerFormat($flavorAsset->getContainerFormat());
 	
 		$versionString = $this->getFlavorVersionString($flavorAsset);
-		$url = "$partnerPath/serveFlavor{$versionString}/flavorId/$flavorAssetId";
-		if($this->seekFromTime)
+		$url = "$partnerPath/serveFlavor/entryId/".$flavorAsset->getEntryId()."{$versionString}/flavorId/$flavorAssetId";
+		if($this->seekFromTime > 0)
 			$url .= "/seekFrom/$this->seekFromTime";
 			
 		if($this->clipTo)
@@ -360,11 +360,11 @@ class kUrlManager
 			if ($this->extention && strtolower($this->extention) != 'flv' ||
                         	$this->containerFormat && strtolower($this->containerFormat) != 'flash video')	
 			{
-				$url = "mp4:$url/name/$flavorAssetId.mp4";
+				$url = "mp4:$url/name/a.mp4";
 			}
 			else
 			{
-				$url .= "/name/$flavorAssetId.flv";
+				$url .= "/name/a.flv";
 			}
 			break;
 		case StorageProfile::PLAY_FORMAT_APPLE_HTTP:

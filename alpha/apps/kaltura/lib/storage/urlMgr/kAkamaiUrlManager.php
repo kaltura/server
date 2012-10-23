@@ -5,6 +5,8 @@
  */
 class kAkamaiUrlManager extends kUrlManager
 {
+	const SECURE_HD_AUTH_ACL_REGEX = '/^[^,]*/';
+	
 	/**
 	 * @return kUrlTokenizer
 	 */
@@ -58,7 +60,7 @@ class kAkamaiUrlManager extends kUrlManager
 				return new kAkamaiSecureHDUrlTokenizer(
 					$this->params['secure_hd_auth_seconds'],
 					$this->params['secure_hd_auth_param'],
-					$this->params['secure_hd_auth_acl_regex'],
+					self::SECURE_HD_AUTH_ACL_REGEX,
 					$this->params['secure_hd_auth_acl_postfix'],
 					$this->params['secure_hd_auth_salt']);
 			}
@@ -84,7 +86,7 @@ class kAkamaiUrlManager extends kUrlManager
 		$this->setContainerFormat($flavorAsset->getContainerFormat());	
 
 		$versionString = $this->getFlavorVersionString($flavorAsset);
-		$url = "$partnerPath/serveFlavor{$versionString}/flavorId/$flavorAssetId";
+		$url = "$partnerPath/serveFlavor/entryId/".$flavorAsset->getEntryId()."{$versionString}/flavorId/$flavorAssetId";
 		if($this->protocol==StorageProfile::PLAY_FORMAT_RTSP) {
 			return $url;
 		}
@@ -120,7 +122,7 @@ class kAkamaiUrlManager extends kUrlManager
 			else
 			{		
 				if($this->extention)
-					$url .= "/name/$flavorAssetId.$this->extention";
+					$url .= "/name/a.$this->extention";
 						
 				if($this->seekFromTime > 0)
 				{
@@ -250,8 +252,40 @@ class kAkamaiUrlManager extends kUrlManager
 		return $delivery;
 	}
 
-	public function getManifestUrl($url)
+	private function generateCsmilUrl(array $flavors)
 	{
+		$urls = array();
+		foreach ($flavors as $flavor)
+		{
+			$urls[] = $flavor['url'];
+		}
+		$urls = array_unique($urls);
+
+		if (count($urls) == 1)
+		{
+			$baseUrl = reset($urls);
+		}
+		else
+		{
+			$prefix = kString::getCommonPrefix($urls);
+			$prefixLen = strlen($prefix);
+			$postfix = kString::getCommonPostfix($urls);
+			$postfixLen = strlen($postfix);
+			$middlePart = ',';
+			foreach ($urls as $url)
+			{
+				$middlePart .= substr($url, $prefixLen, strlen($url) - $prefixLen - $postfixLen) . ',';
+			}
+			$baseUrl = $prefix . $middlePart . $postfix;
+		} 
+
+		return '/' . ltrim($baseUrl, '/') . '.csmil';
+	}
+	
+	public function getManifestUrl(array $flavors)
+	{
+		$url = $this->generateCsmilUrl($flavors);
+		
 		if ($this->protocol == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
 		{
 			if (!isset($this->params["hd_secure_ios"]))

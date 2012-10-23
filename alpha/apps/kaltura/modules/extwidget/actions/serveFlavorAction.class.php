@@ -26,7 +26,11 @@ class serveFlavorAction extends kalturaAction
 		$flavorAsset = assetPeer::retrieveById($flavorId);	
 		if (is_null($flavorAsset))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-	
+
+		$entryId = $this->getRequestParameter("entryId");
+		if (!is_null($entryId) && $flavorAsset->getEntryId() != $entryId)
+			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+		
 		$clipTo = null;
 //		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, accessControlContextType::PLAY);
 //		if ($securyEntryHelper->shouldPreview())

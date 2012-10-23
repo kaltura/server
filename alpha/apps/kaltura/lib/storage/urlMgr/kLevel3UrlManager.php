@@ -50,13 +50,13 @@ class kLevel3UrlManager extends kUrlManager
 		$this->setFileExtension($flavorAsset->getFileExt());
 
 		$versionString = $this->getFlavorVersionString($flavorAsset);
-		$url = "$partnerPath/serveFlavor{$versionString}/flavorId/$flavorAssetId";
+		$url = "$partnerPath/serveFlavor/entryId/".$flavorAsset->getEntryId()."{$versionString}/flavorId/$flavorAssetId";
 		
 		if($this->clipTo)
 			$url .= "/clipTo/$this->clipTo";
 
 		if($this->extention)
-			$url .= "/name/$flavorAssetId.$this->extention";
+			$url .= "/name/a.$this->extention";
 					
 		if($this->protocol != StorageProfile::PLAY_FORMAT_RTMP)
 		{	

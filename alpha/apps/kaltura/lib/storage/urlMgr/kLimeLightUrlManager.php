@@ -35,13 +35,13 @@ class kLimeLightUrlManager extends kUrlManager
 		
 		$this->setFileExtension($flavorAsset->getFileExt());
 		$versionString = $this->getFlavorVersionString($flavorAsset);
-		$url = "/s$partnerPath/serveFlavor{$versionString}/flavorId/$flavorAssetId";
+		$url = "/s$partnerPath/serveFlavor/entryId/".$flavorAsset->getEntryId()."{$versionString}/flavorId/$flavorAssetId";
 		
 		if($this->clipTo)
 			$url .= "/clipTo/$this->clipTo";
 
 		if($this->extention)
-			$url .= "/name/$flavorAssetId.$this->extention";
+			$url .= "/name/a.$this->extention";
 						
 		$url = str_replace('\\', '/', $url);
 		
