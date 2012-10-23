@@ -352,4 +352,65 @@ class kString
 		return $str;
 	}
 	
+	public static function getCommonPrefixBase($string1, $string2)
+	{
+		$left = 0;
+		$right = strlen($string1);
+		while ($left < $right)
+		{
+			$mid = ceil(($right + $left) / 2);
+			if (substr($string1, 0, $mid) == substr($string2, 0, $mid))
+				$left = $mid;
+			else
+				$right = $mid - 1;
+		}
+		return substr($string1, 0, $left);
+	}
+	
+	public static function getCommonPostfixBase($string1, $string2)
+	{
+		$left = 0;
+		$right = strlen($string1);
+		while ($left < $right)
+		{
+			$mid = ceil(($right + $left) / 2);
+			if (substr($string1, -$mid) == substr($string2, -$mid))
+				$left = $mid;
+			else
+				$right = $mid - 1;
+		}
+		if ($right <= 0)
+			return '';
+		return substr($string1, -$right);
+	}
+	
+	public static function getCommonPrefix(array $strings)
+	{
+		$prefix = self::getCommonPrefixBase(reset($strings), next($strings));
+		for (;;)
+		{
+			$curString = next($strings);
+			if ($curString === false)
+				return $prefix;
+			$curString = substr($curString, 0, strlen($prefix));
+			if ($curString == $prefix)
+				continue;
+			$prefix = self::getCommonPrefixBase($prefix, $curString);
+		}
+	}
+	
+	public static function getCommonPostfix(array $strings)
+	{
+		$postfix = self::getCommonPostfixBase(reset($strings), next($strings));
+		for (;;)
+		{
+			$curString = next($strings);
+			if ($curString === false)
+				return $postfix;
+			$curString = substr($curString, -strlen($postfix));
+			if ($curString == $postfix)
+				continue;
+			$postfix = self::getCommonPrefixBase($postfix, $curString);
+		}
+	}
 }
