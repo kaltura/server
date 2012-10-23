@@ -1203,13 +1203,12 @@ class Partner extends BasePartner
 	/**
 	 * Change the kuser set as the account owner to the one with puserId = $adminUserId
 	 * @param string $adminUserId puserId of the new kuser
-	 * @throws KalturaErrors::USER_NOT_FOUND
 	 */
 	public function setAdminUserId($adminUserId)
 	{
 		$adminKuser = kuserPeer::getKuserByPartnerAndUid($this->getId(), $adminUserId);
 		if (!$adminKuser) {
-			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND); // TODO - don't use API objects in core object
+			throw new kCoreException("User Id [$adminUserId] not found", kCoreException::INVALID_USER_ID); // TODO - don't use API objects in core object
 		}
 		$this->setAccountOwnerKuserId($adminKuser->getId());
 	}
