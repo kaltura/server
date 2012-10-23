@@ -219,10 +219,9 @@ define('MODULES' , SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF
 require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
 
 // Logger
-$loggerConfigPath = realpath(dirname(__FILE__) . "/../../configurations/logger.ini");
 try // we don't want to fail when logger is not configured right
 {
-	$config = new Zend_Config_Ini($loggerConfigPath);
+	$config = new Zend_Config(kConf::getMap('logger'));
 	$ps2 = $config->ps2;
 	KalturaLog::initLog($ps2);
 	KalturaLog::setContext('PS2');
