@@ -10,6 +10,39 @@
  */ 
 class StorageProfilePeer extends BaseStorageProfilePeer
 {
+	protected static $class_types_cache = array(
+	);
+	
+	/**
+	 * The returned Class will contain objects of the default type or
+	 * objects that inherit from the default.
+	 *
+	 * @param      array $row PropelPDO result row.
+	 * @param      int $colnum Column to examine for OM class information (first is 0).
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
+	 */
+	public static function getOMClass($row, $colnum)
+	{
+		if($row)
+		{
+			$protocolField = self::translateFieldName(StorageProfilePeer::PROTOCOL, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
+			$storageProfileProtocol = $row[$protocolField];
+			if(isset(self::$class_types_cache[$storageProfileProtocol]))
+				return self::$class_types_cache[$storageProfileProtocol];
+				
+			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $storageProfileProtocol);
+			if($extendedCls)
+			{
+				self::$class_types_cache[$storageProfileProtocol] = $extendedCls;
+				return $extendedCls;
+			}
+			self::$class_types_cache[$storageProfileProtocol] = parent::OM_CLASS;
+		}
+			
+		return parent::OM_CLASS;
+	}
+	
 	public static function alternativeCon($con, $queryDB = kQueryCache::QUERY_DB_UNDEFINED)
 	{
 		if($con === null)
