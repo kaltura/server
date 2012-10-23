@@ -197,7 +197,7 @@ class thumbnailAction extends sfAction
 				} else {
 					KalturaLog::debug ( "token_id [$upload_token_id] not found in DC [". kDataCenterMgr::getCurrentDcId ()."]. dump url to romote DC");
 					$remoteUrl = kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) .$_SERVER['REQUEST_URI'];
-					kFile::dumpUrl($remoteUrl);
+					kFileUtils::dumpUrl($remoteUrl);
 				}
 			}			
 		}
@@ -327,7 +327,7 @@ class thumbnailAction extends sfAction
 			}
 			
 			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl ( $file_sync , $_SERVER['REQUEST_URI'] );
-			kFile::dumpUrl($remoteUrl);
+			kFileUtils::dumpUrl($remoteUrl);
 		}
 		
 		// if we didnt return a template for the player die and dont return the original deleted thumb
@@ -380,7 +380,7 @@ class thumbnailAction extends sfAction
 				}
 
 				$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($remoteFileSync);
-				kFile::dumpUrl($remoteUrl);
+				kFileUtils::dumpUrl($remoteUrl);
 			}
 		}
 		
