@@ -3000,7 +3000,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 * @return the thumbnail path.
 	 */
 	public function getLocalThumbFilePath(entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null) {
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null) 
+	{
 		$contentPath = myContentStorage::getFSContentRootPath ();
 		// if entry type is audio - serve generic thumb:
 		if ($this->getMediaType () == entry::ENTRY_MEDIA_TYPE_AUDIO) {
@@ -3048,5 +3049,45 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				}
 			}
 		}
+	}
+	
+	public function getHlsStreamUrl ()
+	{
+	    return $this->getFromCustomData("hls_stream_url");
+	}
+	
+	public function setHlsStreamUrl ($v)
+	{
+	    $this->putInCustomData("hls_stream_url", $v);
+	}
+	
+	public function getExternalStreamId ()
+	{
+	    return $this->getFromCustomData("external_stream_id");
+	}
+
+	public function setExternalStreamId ($v)
+	{
+	     $this->putInCustomData("external_stream_id", $v);  
+	}
+	
+	public function getDvrStatus ()
+	{
+	    return $this->getFromCustomData("dvr_status");
+	}
+	
+	public function setDvrStatus ($v)
+	{
+	    $this->putInCustomData("dvr_status", $v);
+	}
+	
+    public function getDvrWindow ()
+	{
+	    return $this->getFromCustomData("dvr_window");
+	}
+	
+	public function setDvrWindow ($v)
+	{
+	    $this->putInCustomData("dvr_window", $v);
 	}
 }
