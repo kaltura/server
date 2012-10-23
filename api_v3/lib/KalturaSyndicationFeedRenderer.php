@@ -439,7 +439,7 @@ class KalturaSyndicationFeedRenderer
 		
 		call_user_func($renderer, self::STATE_HEADER);
 		
-		$cacheStore = kCacheManager::getCache(kCacheManager::FS_ENTRY);
+		$cacheStore = null;	// kCacheManager::getCache(kCacheManager::FS_ENTRY);
 		$cachePrefix = "feed_{$this->syndicationFeed->id}/entry-";
 		$feedUpdatedAt = $this->syndicationFeedDB->getUpdatedAt(null);
 
