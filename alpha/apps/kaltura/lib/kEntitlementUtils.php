@@ -187,7 +187,7 @@ class kEntitlementUtils
 			
 		$category = categoryPeer::retrieveByPK($categoryUser->categoryId);
 		if (!$category)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);
+			throw new kCoreException("Category ID [" . $categoryUser->categoryId ."] not found", kCoreException::ID_NOT_FOUND);
 
 		if ($category->getContributionPolicy() == ContributionPolicyType::ALL)
 			return true;
