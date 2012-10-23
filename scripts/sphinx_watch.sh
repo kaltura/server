@@ -1,90 +1,111 @@
-#!/bin/bash
-# Kaltura dedicated Sphinx     This shell script takes care of starting and stopping a Kaltura Batch Service
+#!/bin/sh
 #
-# chkconfig: 2345 13 87
-# description: Kaltura dedicated Sphinx
+# sphinx searchd Free open-source SQL full-text search engine
+#
+# chkconfig:   - 20 80
+# description: Starts and stops the sphinx searchd daemon that handles \
+#	       all search requests.
+
+### BEGIN INIT INFO
+# Provides: searchd
+# Required-Start: $local_fs $network
+# Required-Stop: $local_fs $network
+# Should-Start: $remote_fs
+# Should-Stop: $remote_fs
+# Default-Start: 
+# Default-Stop: 0 1 2 3 4 5 6
+# Short-Description: start and stop sphinx searchd daemon
+# Description: Sphinx is a free open-source SQL full-text search engine     
+### END INIT INFO
+
 
 if [ -L $0 ];then
 	REAL_SCRIPT=`readlink $0`
 else
 	REAL_SCRIPT=$0
 fi
-. `dirname $REAL_SCRIPT`/../configurations/system.ini
+. `dirname $REAL_SCRIPT`/../../../configurations/system.ini
+# Source function library.
+. $APP_DIR/scripts/functions
+exec="$BASE_DIR/bin/sphinx/searchd"
+prog="searchd"
+config="$APP_DIR/configurations/sphinx/kaltura.conf"
 
-COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.daemon.sh"
-POP_COMMAND="$APP_DIR/plugins/sphinx_search/scripts/watch.populate.sh"
-
-# Source function library
-. /etc/rc.d/init.d/functions
+lockfile=$BASE_DIR/sphinx/searchd.pid
 
 start() {
-        echo -n "Starting Sphinx Watch Daemon: "
-        pgrep watch.daemon.sh  2>&1>/dev/null
-        if [ $? -eq  0 ]; then
-                 echo_failure
-                 echo
-                 exit 2;
-        fi
-        setsid $COMMAND &
-        echo_success
+    [ -x $exec ] || exit 5
+    [ -f $config ] || exit 6
+    echo -n $"Starting $prog: "
+    # if not running, start it up here, usually something like "daemon $exec"
+    daemon $exec --config $config
+    retval=$?
     echo
-    
-    echo -n "Starting Sphinx populateFromLog watch: "
-        pgrep -f populateFromLog.php
-        if [ $? -eq  0 ]; then
-                 echo_failure
-                 echo
-                 exit 2;
-        fi
-        setsid $POP_COMMAND &
-        echo_success
-    echo
+    [ $retval -eq 0 ] && touch $lockfile
+    return $retval
 }
 
 stop() {
-		
-		echo -n "Stopping Sphinx Watch Daemon: "
-        #Kills the watch.dameon
-		KP=$(pgrep watch.daemon.sh)
-		if [ -n "$KP" ]
-		      then
-				kill -9 $KP
-		fi
-		echo
-		
-		echo -n "Stopping populateFromLog.php script: "
-		#kills the populate from log
-		KP=$(pgrep -f populateFromLog.php)
-		if [ -n "$KP" ]
-		      then
-				kill -9 $KP
-		fi
-		echo
-		
-		echo -n "Stopping searchd service: "
-		#kills the search service
-		KP=$(pgrep searchd)
-		if [ -n "$KP" ]
-		      then
-				kill -9 $KP
-		fi
-		echo
+    echo -n $"Stopping $prog: "
+    # stop it here, often "killproc $prog"
+    killproc $prog
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && rm -f $lockfile
+    return $retval
 }
 
-case "$1" in
-  start)
-        start
-        ;;
-  stop)
-        stop
-        ;;
-  restart)
-        stop
-        start
-        ;;
-  *)
-        echo "Usage: {start|stop|restart}"
-        exit 1
-esac
+restart() {
+    stop
+    start
+}
 
-exit 0
+reload() {
+    restart
+}
+
+force_reload() {
+    restart
+}
+
+rh_status() {
+    # run checks to determine if the service is running or use generic status
+    status $prog
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+
+case "$1" in
+    start)
+        rh_status_q && exit 0
+        $1
+        ;;
+    stop)
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    reload)
+        rh_status_q || exit 7
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+        restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+        exit 2
+esac
+exit $?
