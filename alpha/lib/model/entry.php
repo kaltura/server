@@ -3090,4 +3090,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 	    $this->putInCustomData("dvr_window", $v);
 	}
+	
+    public function getUrlManager ()
+	{
+	    return $this->getFromCustomData("url_manager");
+	}
+	
+	public function setUrlManager ($v)
+	{
+	    $this->putInCustomData("url_manager", $v);
+	}
 }
