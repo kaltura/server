@@ -18,7 +18,7 @@ class kEdgeCastUrlManager extends kUrlManager
 		if ($this->protocol == StorageProfile::PLAY_FORMAT_HTTP)
 		{
     		if ($this->extention) {
-    			$url .= "/name/$flavorAssetId.$this->extention";
+    			$url .= "/name/a.$this->extention";
     		}
     			
     		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
