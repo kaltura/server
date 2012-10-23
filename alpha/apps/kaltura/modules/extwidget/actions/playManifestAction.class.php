@@ -140,7 +140,7 @@ class playManifestAction extends kalturaAction
 	 */
 	static protected function calculateKalturaToken($url)
 	{
-		$token = sha1(kConf::get('url_token_secret') . $url);
+		$token = sha1(kConf::get('url_token_secret') . $url); 
 		return str_replace(self::KALTURA_TOKEN_MARKER, $token, $url);
 	}
 	
@@ -1102,6 +1102,12 @@ class playManifestAction extends kalturaAction
 	 */
 	private function serveAppleHttp()
 	{
+	    $entry = entryPeer::retrieveByPK($this->entryId);
+	    if ($entry->getType() == entryType::LIVE_STREAM)
+	    {
+	        kFileUtils::dumpUrl($entry->getHlsStreamUrl());
+	    }
+	    
 		$flavor = $this->getSecureHdUrl();
 		if ($flavor)
 		{
