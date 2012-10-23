@@ -971,42 +971,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		$dc = kDataCenterMgr::getCurrentDc();
 		$dc_id = $dc["id"];
 
-		list($sourceFile, $local) = self::getReadyFileSyncForKey($source_key, true, false);
-		if (!$sourceFile)
-		{
-			KalturaLog::log("Warning: no source. target_key [$target_key], source_key [$source_key] ");
-			return null;
-		}
-		
-		$sourceFile = self::resolve($sourceFile); // we only want to link to a source and not to a link.
-		
-		// create a FileSync for the current DC with status READY
-		$current_dc_file_sync = FileSync::createForFileSyncKey( $target_key );
-		$current_dc_file_sync->setPartnerId ( $target_key->partner_id);
-		$current_dc_file_sync->setFileSize ( -1 );
-		$current_dc_file_sync->setStatus( $sourceFile->getStatus() );
-		$current_dc_file_sync->setOriginal ( 1 );
-		
-		if($sourceFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
-		{
-			$current_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_URL );
-			$current_dc_file_sync->setDc( $sourceFile->getDc() );
-			$current_dc_file_sync->setFileRoot( $sourceFile->getFileRoot() );
-			$current_dc_file_sync->setFilePath( $sourceFile->getFilePath() );
-		}
-		else 
-		{
-			$current_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_LINK );
-			$current_dc_file_sync->setDc( $dc_id );
-			$current_dc_file_sync->setLinkedId( $sourceFile->getId() );
-		}
-		
-		$current_dc_file_sync->save();
-		
-		//increment link_count for this DC source]
-		if($sourceFile->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
-			self::incrementLinkCountForFileSync($sourceFile);
-		
+		// load all source file syncs
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $source_key );
 		$file_sync_list = FileSyncPeer::doSelect( $c );
@@ -1014,18 +979,27 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 		foreach($file_sync_list as $file_sync)
 		{
 			$file_sync = self::resolve($file_sync); // we only want to link to a source and not to a link.
-			$source_file_syncs[$file_sync->getDc()] = $file_sync;
+			$source_file_syncs[] = $file_sync;
 		}
 		
-		foreach ( $source_file_syncs as $remote_dc_id => $source_file_sync )
+		// find the current dc file sync
+		$current_dc_source_file = null;
+		foreach ( $source_file_syncs as $source_file_sync )
 		{
-			if($source_file_sync->getDc() == $current_dc_file_sync->getDc())
-				continue;
-				
+			if ($source_file_sync->getDc() == $dc_id)
+				$current_dc_source_file = $source_file_sync;
+		}
+		if (!$current_dc_source_file)
+			$current_dc_source_file = reset($source_file_syncs);
+		
+		// create the remote file syncs
+		foreach ( $source_file_syncs as $source_file_sync )
+		{
 			$remote_dc_file_sync = FileSync::createForFileSyncKey( $target_key );
-			$remote_dc_file_sync->setDc( $remote_dc_id );
+			$remote_dc_file_sync->setDc( $source_file_sync->getDc() );
 			$remote_dc_file_sync->setStatus( $source_file_sync->getStatus() );
-			$remote_dc_file_sync->setOriginal ( 0 );
+			$remote_dc_file_sync->setOriginal ( $current_dc_source_file == $source_file_sync );
+			$remote_dc_file_sync->setFileSize ( -1 );
 			
 			if($source_file_sync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 			{
@@ -1037,17 +1011,17 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 			{
 				$remote_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_LINK );
 				$remote_dc_file_sync->setLinkedId ( $source_file_sync->getId() );
+				self::incrementLinkCountForFileSync($source_file_sync);
 			}
 			$remote_dc_file_sync->setPartnerID ( $target_key->partner_id );
 			$remote_dc_file_sync->save();
 			
-			// increment link_cont for remote DCs sources
-			if($source_file_sync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
-				self::incrementLinkCountForFileSync($source_file_sync);
-			
-			kEventsManager::raiseEvent(new kObjectAddedEvent($remote_dc_file_sync));
+			if ($current_dc_source_file == $source_file_sync)
+				$current_dc_target_file = $remote_dc_file_sync;		// throw the added event for the current dc last
+			else
+				kEventsManager::raiseEvent(new kObjectAddedEvent($remote_dc_file_sync));
 		}
-		kEventsManager::raiseEvent(new kObjectAddedEvent($current_dc_file_sync));
+		kEventsManager::raiseEvent(new kObjectAddedEvent($current_dc_target_file));
 	}
 	
 	/**
