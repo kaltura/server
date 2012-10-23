@@ -86,7 +86,7 @@ class HuluFeedHelper
 		foreach ($providerData->captionLocalPaths as $captionFilePath){
 			if(file_exists($captionFilePath->value)){
 				$remoteCaptionFileName = $providerData->fileBaseName.'.'.pathinfo($captionFilePath->value, PATHINFO_EXTENSION);
-				$this->addFileNode('Text',$remoteCaptionFileName->value);
+				$this->addFileNode('Text',$remoteCaptionFileName);
 			}
 		}
 		
