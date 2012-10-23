@@ -715,8 +715,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if(is_array($requestResults))
 			foreach($requestResults as $requestResult)
+			{
+				if(is_array($requestResult) && isset($requestResult['code']))
+					throw new KalturaException($requestResult['message'], $requestResult['code']);
+				
 				if($requestResult instanceof Exception)
 					throw $requestResult;
+			}
 		
 		return $updatedEntry;
 	}
@@ -929,8 +934,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->unimpersonate();
 		
 		foreach($requestResults as $requestResult)
+		{
+			if(is_array($requestResult) && isset($requestResult['code']))
+				throw new KalturaException($requestResult['message'], $requestResult['code']);
+			
 			if($requestResult instanceof Exception)
 				throw $requestResult;
+		}
 		
 		$createdEntry = reset($requestResults);
 		if(is_null($createdEntry)) //checks that the entry was created
@@ -957,8 +967,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$result = $this->kClient->doMultiRequest();
 		
 		foreach($result as $requestResult)
+		{
+			if(is_array($requestResult) && isset($requestResult['code']))
+				throw new KalturaException($requestResult['message'], $requestResult['code']);
+			
 			if($requestResult instanceof Exception)
 				throw $requestResult;
+		}
 		
 		$createdFlavorAssets = $result[0]; 
 		$createdThumbAssets =  $result[1];
@@ -994,8 +1009,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 
 		if(is_array($requestResults))
 			foreach($requestResults as $requestResult)
+			{
+				if(is_array($requestResult) && isset($requestResult['code']))
+					throw new KalturaException($requestResult['message'], $requestResult['code']);
+				
 				if($requestResult instanceof Exception)
 					throw $requestResult;
+			}
 		
 		return $requestResults;
 	}
@@ -1021,8 +1041,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$result = $this->kClient->doMultiRequest();
 		
 		foreach($result as $requestResult)
+		{
+			if(is_array($requestResult) && isset($requestResult['code']))
+				throw new KalturaException($requestResult['message'], $requestResult['code']);
+			
 			if($requestResult instanceof Exception)
 				throw $requestResult;
+		}
 		
 		$createdFlavorAssets = $result[0]; 
 		$createdThumbAssets =  $result[1];
