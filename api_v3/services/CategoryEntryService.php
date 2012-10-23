@@ -205,7 +205,7 @@ class CategoryEntryService extends KalturaBaseService
 
 				if(count($categoriesIdsUnlisted))
 				{
-					$categoriesUnlistWithMembership = categoryKuserPeer::retrieveByCategoriesIdsAndActiveKuserId($categoriesIdsUnlisted, kCurrentContext::$kuser_id);
+					$categoriesUnlistWithMembership = categoryKuserPeer::retrieveByCategoriesIdsAndActiveKuserId($categoriesIdsUnlisted, kCurrentContext::getCurrentKsKuserId());
 
 					if(count($categoriesIdsUnlisted) != count($categoriesUnlistWithMembership))
 						throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdIn);
@@ -220,7 +220,7 @@ class CategoryEntryService extends KalturaBaseService
 					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdEqual);
 
 				if(($category->getDisplayInSearch() == DisplayInSearchType::CATEGORY_MEMBERS_ONLY) && 
-					!categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($category->getId(), kCurrentContext::$kuser_id))
+					!categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($category->getId(), kCurrentContext::getCurrentKsKuserId()))
 				{
 					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdEqual);
 				}

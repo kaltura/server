@@ -21,6 +21,9 @@ class kCurrentContext
 	public static $ks_hash;
 	
 	/**
+	 * This value is populated only in case of impersonation using partnerId in the request.
+	 * It's used by the batch abd the admin console only.
+	 * 
 	 * @var int
 	 */
 	public static $partner_id;
@@ -40,10 +43,6 @@ class kCurrentContext
 	 */
 	public static $uid;
 	
-	/**
-	 * @var string
-	 */
-	public static $kuser_id;
 	
 	/**
 	 * @var string
@@ -159,7 +158,6 @@ class kCurrentContext
 		kCurrentContext::$partner_id = $entry->getPartnerId();
 		kCurrentContext::$uid = null;
 		kCurrentContext::$is_admin_session = false;
-		kCurrentContext::$kuser_id = null;
 		
 		return $entry;
 	}
@@ -182,7 +180,6 @@ class kCurrentContext
 		kCurrentContext::$partner_id = $asset->getPartnerId();
 		kCurrentContext::$uid = null;
 		kCurrentContext::$is_admin_session = false;
-		kCurrentContext::$kuser_id = null;
 		
 		return $asset;
 	}
@@ -200,7 +197,6 @@ class kCurrentContext
 			kCurrentContext::$partner_id = $requestedPartnerId;
 			kCurrentContext::$uid = $requestedPuserId;
 			kCurrentContext::$is_admin_session = false;
-			kCurrentContext::$kuser_id = null;
 		}
 		else
 		{
@@ -222,7 +218,6 @@ class kCurrentContext
 			kCurrentContext::$is_admin_session = $ksObj->isAdmin();
 			kCurrentContext::$partner_id = $requestedPartnerId;
 			kCurrentContext::$uid = $requestedPuserId;
-			kCurrentContext::$kuser_id = null;
 		}
 
 		// set partner ID for logger
