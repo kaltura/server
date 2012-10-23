@@ -79,28 +79,30 @@ class CaptionAssetItemService extends KalturaBaseService
 			
 		if (!$captionAssetItemFilter)
 			$captionAssetItemFilter = new KalturaCaptionAssetItemFilter();
-			
+
+		$captionAssetItemFilter->validatePropertyNotNull(array("contentLike", "contentMultiLikeOr", "contentMultiLikeAnd"));
+		
 		$captionAssetItemCoreFilter = new CaptionAssetItemFilter();
 		$captionAssetItemFilter->toObject($captionAssetItemCoreFilter);
 		
-		if ($entryFilter)
+		if($entryFilter || kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$entryCoreFilter = new entryFilter();
-			$entryFilter->toObject($entryCoreFilter);		
-			
+			if($entryFilter)
+				$entryFilter->toObject($entryCoreFilter);		
+			$entryCoreFilter->setPartnerSearchScope($this->getPartnerId());
 			$this->addEntryAdvancedSearchFilter($captionAssetItemFilter, $entryCoreFilter);
-			
+				
 			$entryCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 			$entryCoreFilter->attachToCriteria($entryCriteria);
 			$entryCriteria->applyFilters();
-			
+				
 			$entryIds = $entryCriteria->getFetchedIds();
 			if(!$entryIds || !count($entryIds))
 				$entryIds = array('NOT_EXIST');
-			
+				
 			$captionAssetItemCoreFilter->setEntryIdIn($entryIds);
 		}
-		
 		$captionAssetItemCriteria = KalturaCriteria::create(CaptionAssetItemPeer::OM_CLASS);
 		
 		$captionAssetItemCoreFilter->attachToCriteria($captionAssetItemCriteria);
