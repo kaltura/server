@@ -70,6 +70,14 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		return $key;
 	}
 	
+	private static function getCacheKeyPrefix()
+	{
+		$result = self::GLOBAL_CACHE_KEY_PREFIX;
+		if (kConf::hasParam('permission_cache_version'))
+			$result .= kConf::get('permission_cache_version');
+		return $result;
+	}
+	
 	/**
 	 * Get value from cache for the given key
 	 * @param string $key
@@ -88,8 +96,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$cacheStore = kCacheManager::getCache($cacheLayer);
 			if (!$cacheStore)
 				continue;
-
-			$value = $cacheStore->get(self::GLOBAL_CACHE_KEY_PREFIX . $key); // try to fetch from cache			
+				
+			$value = $cacheStore->get(self::getCacheKeyPrefix() . $key); // try to fetch from cache			
 			if ( !$value || !isset($value['updatedAt']) || ( $value['updatedAt'] < $roleCacheDirtyAt ) )
 			{
 				self::$cacheStores[] = $cacheStore;
@@ -125,7 +133,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		foreach (self::$cacheStores as $cacheStore)
 		{
 			$success = $cacheStore->set(
-				self::GLOBAL_CACHE_KEY_PREFIX . $key, 
+				self::getCacheKeyPrefix() . $key, 
 				$value, 
 				kConf::get('apc_cache_ttl')); // try to store in cache
 			if ($success)
