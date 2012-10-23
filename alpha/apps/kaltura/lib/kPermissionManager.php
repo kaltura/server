@@ -480,7 +480,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 					$roleIds = $roleId->getId();
 				}else{
 					KalturaLog::debug("Role id [$ksSetRoleId] does not exists");
-					throw new KalturaAPIException ( APIErrors::UNKNOWN_ROLE_ID ,$ksSetRoleId);
+					throw new kCoreException("Unknown role Id [$ksSetRoleId]", kCoreException::ID_NOT_FOUND);
 				}
 			}
 			// if user is defined -> get his role IDs
@@ -549,7 +549,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			if (!$ksPartner)
 			{
 				KalturaLog::crit('Unknown partner id ['.self::$ksPartnerId.']');
-				throw new KalturaAPIException ( APIErrors::UNKNOWN_PARTNER_ID ,self::$ksPartnerId);
+				throw new kCoreException("Unknown partner Id [" . self::$ksPartnerId ."]", kCoreException::ID_NOT_FOUND);
 			}
 		}
 		
@@ -559,7 +559,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			if (!$requestedPartner)
 			{
 				KalturaLog::crit('Unknown partner id ['.self::$requestedPartnerId.']');
-				throw new KalturaAPIException ( APIErrors::UNKNOWN_PARTNER_ID ,self::$requestedPartnerId);
+				throw new kCoreException("Unknown partner Id [" . self::$requestedPartnerId ."]", kCoreException::ID_NOT_FOUND);
 			}
 		}
 		
@@ -658,7 +658,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 					KalturaLog::err('IP does not match KS restriction');
 					break;
 			}
-			throw new KalturaAPIException (APIErrors::INVALID_KS ,self::$ksString ,$res ,ks::getErrorStr($res));
+			
+			throw new kCoreException("Invalid KS", kCoreException::INVALID_KS);
 		}
 	}
 	
@@ -684,11 +685,11 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		if($partnerStatus == Partner::PARTNER_STATUS_CONTENT_BLOCK)
 		{
-			throw new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN_CONTENT_BLOCKED);
+		    throw new kCoreException("Partner blocked", kCoreException::PARTNER_BLOCKED);
 		}
 		if($partnerStatus == Partner::PARTNER_STATUS_FULL_BLOCK)
 		{
-			throw new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN_FULLY_BLOCKED);
+		    throw new kCoreException("Partner fully blocked", kCoreException::PARTNER_BLOCKED);
 		}
 	}
 	
