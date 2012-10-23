@@ -81,6 +81,12 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	 */
 	public $dvrWindow;
 	
+	/**
+	 * URL Manager to handle the live stream URL (for instance, add token)
+	 * @var string
+	 */
+	public $urlManager;
+	
 	
 	
 	private static $map_between_objects = array
@@ -96,6 +102,7 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	    "externalStreamId",
 	    "dvrStatus",
 	    "dvrWindow",
+	    "urlManager",
 	);
 
 	public function __construct()
