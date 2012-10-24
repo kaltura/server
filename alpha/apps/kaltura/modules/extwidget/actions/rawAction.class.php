@@ -398,7 +398,7 @@ class rawAction extends sfAction
 			KalturaLog::log ( __METHOD__ . ": redirecting to [$remote_url]" );
 			if($shouldProxy)
 			{
-				kFile::dumpUrl($remote_url);
+				kFileUtils::dumpUrl($remote_url);
 			}
 			else
 			{
