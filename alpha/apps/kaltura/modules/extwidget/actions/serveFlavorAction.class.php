@@ -61,7 +61,7 @@ class serveFlavorAction extends kalturaAction
 			
 			// always dump remote urls so they will be cached by the cdn transparently
 			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($fileSync);
-			kFile::dumpUrl($remoteUrl);
+			kFileUtils::dumpUrl($remoteUrl);
 		}
 		
 		$path = kFileSyncUtils::getReadyLocalFilePathForKey($syncKey);
