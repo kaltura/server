@@ -118,7 +118,7 @@ class DocumentEntry extends entry
 					KExternalErrors::dieError ( KExternalErrors::FILE_NOT_FOUND );
 				}
 				$remoteUrl = kDataCenterMgr::getRedirectExternalUrl ( $remoteFileSync );
-				kFile::dumpUrl ( $remoteUrl );
+				kFileUtils::dumpUrl ( $remoteUrl );
 			}
 		}			
 	}
