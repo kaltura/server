@@ -78,7 +78,7 @@ class serveIsmAction extends sfAction
 			}
 			
 			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($fileSync);
-			kFile::dumpUrl($remoteUrl);
+			kFileUtils::dumpUrl($remoteUrl);
 		}
 		
 		$path = kFileSyncUtils::getReadyLocalFilePathForKey($syncKey);
