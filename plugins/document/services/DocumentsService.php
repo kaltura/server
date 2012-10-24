@@ -521,7 +521,7 @@ class DocumentsService extends KalturaEntryService
 			KalturaLog::info("Redirecting to [$remoteUrl]");
 			if($forceProxy)
 			{
-				kFile::dumpUrl($remoteUrl);
+				kFileUtils::dumpUrl($remoteUrl);
 			}
 			else
 			{
