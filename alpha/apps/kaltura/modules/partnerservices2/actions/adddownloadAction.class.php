@@ -106,7 +106,7 @@ class adddownloadAction extends defPartnerservices2Action
 				$url = (strpos($remote_url, '?') === FALSE)? $remote_url.'?'.$get_query: $remote_url.'&'.$get_query;
 				// prxoy request to other DC
 				KalturaLog::log ( __METHOD__ . ": redirecting to [$url]" );
-				kFile::dumpUrl($url);
+				kFileUtils::dumpUrl($url);
 			}
 			KalturaLog::log("add download Action sync key doesn't exists");
 			$this->addError ( APIErrors::INVALID_ENTRY_VERSION, $this->getObjectPrefix(), $entry_id, $version );
