@@ -182,7 +182,7 @@ class ShortLinkService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 
 		if($proxy)
-			kFile::dumpUrl($dbShortLink->getFullUrl(), true, true);
+			kFileUtils::dumpUrl($dbShortLink->getFullUrl(), true, true);
 		
 		header('Location: ' . $dbShortLink->getFullUrl());
 		die;
