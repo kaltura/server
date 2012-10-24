@@ -1105,7 +1105,10 @@ class playManifestAction extends kalturaAction
 	    $entry = entryPeer::retrieveByPK($this->entryId);
 	    if ($entry->getType() == entryType::LIVE_STREAM)
 	    {
-	        kFileUtils::dumpUrl($entry->getHlsStreamUrl());
+	        $renderer = new kRedirectManifestRenderer();
+			$renderer->entryId = $this->entryId;
+			$renderer->flavor = array ("url" => $entry->getHlsStreamUrl());
+			return $renderer;
 	    }
 	    
 		$flavor = $this->getSecureHdUrl();
