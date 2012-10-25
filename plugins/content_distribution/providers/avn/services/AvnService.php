@@ -45,6 +45,7 @@ class AvnService extends KalturaBaseService
 		$entryFilter->setAdvancedSearch($distributionAdvancedSearch);
 		
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$baseCriteria->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		$entryFilter->attachToCriteria($baseCriteria);
 		$entries = entryPeer::doSelect($baseCriteria);
 		
