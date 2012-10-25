@@ -50,7 +50,7 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 
 		// look for krule with action block and condition of country
 		$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
-		if ($entry->getAccessControl())
+		if ($entry && $entry->getAccessControl())
 			$this->setGeoBlocking($entry->getAccessControl());
 			
 		$this->addCaptionsData($distributionJobData);
