@@ -167,7 +167,7 @@ class PodcastDistributionProfile extends DistributionProfile
 			
 		//Creates entry filter with advanced filter
 		$entryFilter = new entryFilter();
-		$entryFilter->setPartnerIdEquel($this->getPartnerId());
+		$entryFilter->setPartnerSearchScope($this->getPartnerId());
 		$entryFilter->setAdvancedSearch($distributionAdvancedSearch);
 		
 		// Creates playlist with entry filter

@@ -65,7 +65,7 @@ class DoubleClickService extends KalturaBaseService
 		$entryFilter = new entryFilter();
 		$entryFilter->setStatusEquel(entryStatus::READY);
 		$entryFilter->setModerationStatusNot(entry::ENTRY_MODERATION_STATUS_REJECTED);
-		$entryFilter->setPartnerIdEquel($this->getPartnerId());
+		$entryFilter->setPartnerSearchScope($this->getPartnerId());
 		$entryFilter->setAdvancedSearch($distributionAdvancedSearch);
 		$entryFilter->set('_order_by', '-created_at');
 		if ($period && $period > 0)

@@ -41,7 +41,7 @@ class AvnService extends KalturaBaseService
 		$entryFilter = new entryFilter();
 		$entryFilter->setStatusEquel(entryStatus::READY);
 		$entryFilter->setModerationStatusNot(entry::ENTRY_MODERATION_STATUS_REJECTED);
-		$entryFilter->setPartnerIdEquel($this->getPartnerId());
+		$entryFilter->setPartnerSearchScope($this->getPartnerId());
 		$entryFilter->setAdvancedSearch($distributionAdvancedSearch);
 		
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
