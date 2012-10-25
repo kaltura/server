@@ -956,6 +956,27 @@ class LogProcessorFeedList
 	}
 }
 
+class LogProcessorUriList
+{
+	function processLine($buffer)
+	{
+		$uri = trim($buffer);
+		
+		// TODO: call extendRequestKss
+		
+		$service = '';
+		if (preg_match('/service=([\w_]+)/', $uri, $matches))
+			$service = $matches[1];
+
+		$action = '';
+		if (preg_match('/action=([\w_]+)/', $uri, $matches))
+			$action = $matches[1];
+
+		$fullActionName = "$service.$action";
+		testAction($fullActionName, array(), $uri);
+	}
+}
+
 function processRegularFile($apiLogPath, $logProcessor)
 {
 	$handle = @fopen($apiLogPath, "r");
@@ -992,7 +1013,7 @@ function processGZipFile($apiLogPath, $logProcessor)
 
 // parse the command line
 if ($argc < 5)
-	die("Usage:\n\tphp compatCheck <old service url> <new service url> <api log> <api_v3/ps2/feedIds> [<start position> [<end position> [<max tests per action>]]]\n");
+	die("Usage:\n\tphp compatCheck <old service url> <new service url> <api log> <api_v3/ps2/feedIds/uris> [<start position> [<end position> [<max tests per action>]]]\n");
 
 $serviceUrlOld = $argv[1];
 $serviceUrlNew = $argv[2];
@@ -1009,8 +1030,8 @@ if (strpos($apiLogPath, ':') !== false)
 	$apiLogPath = $localLogPath;
 }
 
-if (!in_array($logFormat, array('api_v3', 'ps2', 'feedids')))
-	die("Log format should be one of: api_v3, ps2, feedids");
+if (!in_array($logFormat, array('api_v3', 'ps2', 'feedids', 'uris')))
+	die("Log format should be one of: api_v3, ps2, feedids, uris");
 
 if (!beginsWith(strtolower($serviceUrlOld), 'http://'))
 	$serviceUrlOld = 'http://' . $serviceUrlOld;
@@ -1043,6 +1064,9 @@ case 'ps2':
 	break;
 case 'feedids':
 	$logProcessor = new LogProcessorFeedList();
+	break;
+case 'uris':
+	$logProcessor = new LogProcessorUriList();
 	break;
 }
 
