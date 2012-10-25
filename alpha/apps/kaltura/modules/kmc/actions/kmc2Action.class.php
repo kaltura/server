@@ -198,7 +198,7 @@ class kmc2Action extends kalturaAction
 		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY ); 	//	display only ones that are ready - not deleted or in draft mode
 		
 		
-		$order_by = "(" . uiConfPeer::PARTNER_ID . "={$this->partner_id})";  // first take the templates  and then the rest
+		$order_by = "(" . uiConfPeer::PARTNER_ID . "=".intval($this->partner_id).")";  // first take the templates  and then the rest
 		$c->addAscendingOrderByColumn ( $order_by );//, Criteria::CUSTOM );
 
 		return $c;
@@ -225,7 +225,7 @@ class kmc2Action extends kalturaAction
 		
 		$c->addAnd ( uiConfPeer::ID, array(48120, 48121, 48130, 48131, 48132, 48133, 48134, 48135), Criteria::NOT_IN);
 		
-		$order_by = "(" . uiConfPeer::PARTNER_ID . "=".$this->partner_id.")";
+		$order_by = "(" . uiConfPeer::PARTNER_ID . "=".intval($this->partner_id).")";
 		$c->addAscendingOrderByColumn ( $order_by );
 		$c->addDescendingOrderByColumn(uiConfPeer::CREATED_AT);
 		
