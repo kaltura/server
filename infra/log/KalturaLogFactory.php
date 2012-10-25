@@ -70,16 +70,6 @@ class KalturaLogFactory
 			}
 		}
 		
-		if ($writer !== null && $config->formatters !== null)
-		{
-			foreach($config->formatters as $formatterConfig)
-			{
-				$formatter = self::getFormatter($formatterConfig);
-				if ($formatter !== null)
-					$writer->setFormatter($formatter);
-			}
-		}
-		
 		if ($writer !== null && $config->filters !== null)
 		{
 			foreach($config->filters as $filterConfig)
