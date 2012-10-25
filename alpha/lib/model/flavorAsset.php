@@ -166,7 +166,7 @@ class flavorAsset extends asset
 			return parent::postUpdate($con);
 		
 		if(	($this->isColumnModified(assetPeer::STATUS) && 
-			($this->getStatus() == self::FLAVOR_ASSET_STATUS_DELETED || $this->getStatus() == self::FLAVOR_ASSET_STATUS_READY)))
+			($this->getStatus() == self::ASSET_STATUS_DELETED || $this->getStatus() == self::ASSET_STATUS_READY)))
 		{
 			$entry = $this->getentry();
 	    	if (!$entry) {

@@ -2313,7 +2313,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function syncFlavorParamsIds()
 	{
-		$entryFlavors = assetPeer::retrieveFlavorsByEntryId($this->getId());
+		$entryFlavors = assetPeer::retrieveFlavorsByEntryIdAndStatus($this->getId(), null, array(flavorAsset::ASSET_STATUS_READY));
 		if (!$entryFlavors)
 		{
 			$this->setStatus(entryStatus::NO_CONTENT);
