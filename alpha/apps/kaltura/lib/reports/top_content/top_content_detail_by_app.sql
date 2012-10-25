@@ -31,7 +31,7 @@ FROM
 		AND 
 		( count_time_viewed > 0 OR
 		  count_plays > 0 OR
-		  count_loads > 0 
+		  count_loads > 0 OR
 		  sum_time_viewed > 0 )
 GROUP BY ev.entry_id) stats, kalturadw.dwh_dim_entries en
 WHERE en.entry_id=stats.object_id
