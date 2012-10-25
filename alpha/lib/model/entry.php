@@ -2311,41 +2311,25 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		parent::setAccessControlId($v);
 	}
 	
-	public function addFlavorParamsId($v)
+	public function syncFlavorParamsIds()
 	{
-		$flavorParamIds = $this->getFlavorParamsIds();
-		if (strlen($flavorParamIds) > 0)
-			$flavorParamIdsArray = explode(",", $flavorParamIds);
+		$entryFlavors = assetPeer::retrieveFlavorsByEntryId($this->getId());
+		if (!$entryFlavors)
+		{
+			$this->setStatus(entryStatus::NO_CONTENT);
+			$this->setFlavorParamsIds(null);
+		}
 		else
+		{
 			$flavorParamIdsArray = array();
-			
-		$flavorParamIdsArray[] = $v;
-		$flavorParamIdsArray = array_unique($flavorParamIdsArray);
-		$flavorParamIds = implode(",", $flavorParamIdsArray);
-		$this->setFlavorParamsIds($flavorParamIds);
-	}
-	
-	public function removeFlavorParamsId($v)
-	{
-		// get the ids
-		$flavorParamIds = $this->getFlavorParamsIds();
-		
-		// if empty, no need to remove
-		if(!strlen($flavorParamIds))
-			return;
-			
-		// build array with the ids as keys
-		$arrFlavorParamIds = array_flip(explode(',', $flavorParamIds));
-		
-		// if not in array, no need to remove
-		if(!isset($arrFlavorParamIds[$v]))
-			return;
-			
-		// remove from array
-		unset($arrFlavorParamIds[$v]);
-		
-		// save imploded string of the array keys (ids)
-		$this->setFlavorParamsIds(implode(',', array_keys($arrFlavorParamIds)));
+			/* @var $flavorAsset flavorAsset */
+			foreach ($entryFlavors as $flavorAsset) {
+				$flavorParamIdsArray[] = $flavorAsset->getFlavorParamsId();
+			}
+			asort($flavorParamIdsArray);
+			$flavorParamIds = implode(",", $flavorParamIdsArray);
+			$this->setFlavorParamsIds($flavorParamIds);
+		}
 	}
 	
 	public function getRawDownloadUrl()

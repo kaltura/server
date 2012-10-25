@@ -637,13 +637,7 @@ class FlavorAssetService extends KalturaAssetService
 			
 		$flavorAssetDb->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 		$flavorAssetDb->setDeletedAt(time());
-		$flavorAssetDb->save();
-		
-		$entry->removeFlavorParamsId($flavorAssetDb->getFlavorParamsId());
-		$entryFlavors = assetPeer::retrieveFlavorsByEntryId($entry->getId());
-		if (!$entryFlavors)
-			$entry->setStatus(entryStatus::NO_CONTENT);
-		$entry->save();
+		$flavorAssetDb->save();		
 	}
 	
 	/**

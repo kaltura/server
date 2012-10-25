@@ -159,39 +159,26 @@ class flavorAsset extends asset
         KalturaLog::debug('Setting status to ['.$newStatus.']');
 	    $this->setStatus($newStatus);
 	}
-	
-	
 
-    public function save(PropelPDO $con = null)
+	public function postUpdate(PropelPDO $con = null)
 	{
-	    // check if flavor asset is new before saving
-	    $isNew = $this->isNew();
-	    $statusModified = $this->isColumnModified(assetPeer::STATUS);
-	    $flavorParamsIdModified = $this->isColumnModified(assetPeer::FLAVOR_PARAMS_ID);
-	    
-	    // save the asset
-		$saveResult = parent::save();
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
 		
-		// update associated entry's flavorParamsId list
-		if ( $this->getStatus() == self::ASSET_STATUS_READY && ($isNew || $statusModified || $flavorParamsIdModified) )
+		if(	($this->isColumnModified(assetPeer::STATUS) && 
+			($this->getStatus() == self::FLAVOR_ASSET_STATUS_DELETED || $this->getStatus() == self::FLAVOR_ASSET_STATUS_READY)))
 		{
-		    $entry = $this->getentry();
-		    if (!$entry) {
-		        KalturaLog::err('Cannot get entry object for flavor asset id ['.$this->getId().']');
-		    }
-		    else {
-		        KalturaLog::debug('Adding flavor params id ['.$this->getFlavorParamsId().'] to entry id ['.$entry->getId().']');
-		        $entry->addFlavorParamsId($this->getFlavorParamsId());
-		        
-		        if($flavorParamsIdModified)
-		        	$entry->removeFlavorParamsId($this->getColumnsOldValue(assetPeer::FLAVOR_PARAMS_ID));
-		        
-		        $entry->save();
-		    }
-		}
-
-		// return the parent::save result
-		return $saveResult;
+			$entry = $this->getentry();
+	    	if (!$entry) {
+	        	KalturaLog::err('Cannot get entry object for flavor asset id ['.$this->getId().']');
+	    	}
+	    	else {
+	        	KalturaLog::debug('Synchronizing flavor params ids for entry id ['.$entry->getId().']');
+	        	$entry->syncFlavorParamsIds();
+	        
+	        	$entry->save();
+	    	}				
+		}			
+		return parent::postUpdate($con);
 	}
-	
 }

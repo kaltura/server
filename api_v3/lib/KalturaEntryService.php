@@ -144,7 +144,7 @@ class KalturaEntryService extends KalturaBaseService
 			
 			if ($dbAsset->getStatus() == Asset::ASSET_STATUS_READY)
 			{
-				$dbEntry->addFlavorParamsId($dbAsset->getFlavorParamsId());
+				$dbEntry->syncFlavorParamsIds();
 				$dbEntry->save();
 			}
 		}

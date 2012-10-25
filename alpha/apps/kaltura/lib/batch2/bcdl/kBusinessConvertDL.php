@@ -54,7 +54,6 @@ class kBusinessConvertDL
 			}
 		}
 		
-		$saveEntry = false;
 		$defaultThumbAssetNew = null;
 		foreach($oldAssets as $oldAsset)
 		{
@@ -115,10 +114,7 @@ class kBusinessConvertDL
 				
 				$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 				$oldAsset->setDeletedAt(time());
-				$oldAsset->save();
-				
-				$entry->removeFlavorParamsId($oldAsset->getFlavorParamsId());
-				$saveEntry = true;
+				$oldAsset->save();			
 			}
 		}
 		

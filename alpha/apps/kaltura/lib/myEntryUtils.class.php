@@ -1008,20 +1008,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		{
  			$newEntry->setPartnerId($toPartner->getId());
  			$newEntry->setSubpId($toPartner->getId() * 100);
-			$newEntry->setAccessControlId($toPartner->getDefaultAccessControlId());
-			
-			$flavorParamsStr = $entry->getFlavorParamsIds();
-			$flavorParams = explode(',', $flavorParamsStr);
-			$newFlavorParams = array();
-			foreach($flavorParams as $flavorParamsId)
-			{
-				$newFlavorParamsId = kObjectCopyHandler::getMappedId('flavorParams', $flavorParamsId);
-				if(is_null($newFlavorParamsId))
-					$newFlavorParamsId = $flavorParamsId;
-					
-				$newFlavorParams[] = $newFlavorParamsId;
-			}
-			$newEntry->setFlavorParamsIds(implode(',', $newFlavorParams));
+			$newEntry->setAccessControlId($toPartner->getDefaultAccessControlId());		
  		}
  		
  		$newKuser = null;
