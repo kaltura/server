@@ -37,6 +37,9 @@ class UserRole extends BaseUserRole
 	
 	public function setPermissionNames($permissionNames)
 	{
+		if(!$this->isNew() && parent::getPermissionNames() == '*')
+			return;
+			
 		$permissionNames = array_map('trim', explode(',', $permissionNames));
 		$permissionNames = implode(',', $permissionNames);
 		parent::setPermissionNames($permissionNames);
