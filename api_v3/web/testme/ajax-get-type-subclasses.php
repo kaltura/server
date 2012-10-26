@@ -1,9 +1,24 @@
 <?php
 require_once("../../bootstrap.php");
 KalturaLog::setContext("TESTME");
-$type = $_GET["type"];
+
+$type = null;
+if(isset($_GET["type"]))
+{
+	$type = $_GET["type"];
+}
+elseif(isset($argv[1]))
+{
+	$type = $argv[1];
+	KalturaLog::setLogger(new KalturaStdoutLogger());
+}
+else 
+{
+	exit;
+}
+
 $bench_start = microtime(true);
-KalturaLog::INFO ( ">------- api_v3 testme type [$type]-------");
+KalturaLog::info( ">------- api_v3 testme type [$type]-------");
 
 function toArrayRecursive(KalturaPropertyInfo $propInfo)
 {
@@ -35,6 +50,7 @@ try
 	}
 
 	$subClassesNames = KalturaTypeReflector::getSubClasses($type);
+	KalturaLog::info( "subClassesNames [" . print_r($subClassesNames, true) . "]");
 
 	foreach($subClassesNames as $subClassName)
 	{
@@ -44,12 +60,12 @@ try
 }
 catch ( Exception $ex )
 {
-	KalturaLog::ERR ( "<------- api_v3 testme [$type]\n" . 
+	KalturaLog::err ( "<------- api_v3 testme [$type]\n" . 
 		 $ex->__toString() .  " " ." -------");
 }
 //echo "<pre>";
 //echo print_r($actionInfo);
 echo json_encode($subClasses);
 $bench_end = microtime(true);
-KalturaLog::INFO ( "<------- api_v3 testme type [$type][" . ($bench_end - $bench_start) . "] -------");
+KalturaLog::info ( "<------- api_v3 testme type [$type][" . ($bench_end - $bench_start) . "] -------");
 

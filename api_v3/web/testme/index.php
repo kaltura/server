@@ -1,64 +1,89 @@
+<?php 
+require_once("../../bootstrap.php");
+ActKeyUtils::checkCurrent();
+KalturaLog::setContext("TESTME");
+
+$configSection = 'testme';
+if(isset($_REQUEST['config']))
+	$configSection = $_REQUEST['config'];
+	
+$config = new Zend_Config_Ini("../../config/testme.ini", null, array('allowModifications' => true));
+$config = KalturaPluginManager::mergeConfigs($config, 'testme');
+$indexConfig = $config->get($configSection);
+
+$include = $indexConfig->get("include");
+$exclude = $indexConfig->get("exclude");
+$excludePaths = $indexConfig->get("excludepaths");
+
+$cacheFileName = kConf::get("cache_root_path").'/testme/services-'.$configSection;
+
+if (file_exists($cacheFileName))
+{
+	$services = unserialize(file_get_contents($cacheFileName));
+}
+else 
+{
+	$clientGenerator = new DummyForDocsClientGenerator();
+	$clientGenerator->setIncludeOrExcludeList($include, $exclude, $excludePaths);
+	$clientGenerator->load();
+	
+	$serviceItems = $clientGenerator->getServices();
+		
+	$services = array();
+	foreach($serviceItems as $serviceId => $serviceActionItem)
+		$services[$serviceId] = $serviceActionItem;
+	
+	kFile::setFileContent($cacheFileName, serialize($services));
+}
+
+foreach($services as $serviceName => $serviceActionItem)
+{
+    /* @var $serviceActionItem KalturaServiceActionItem */
+	if($serviceActionItem->serviceInfo->serverOnly)
+		unset($services[$serviceName]);
+}
+ksort($services, SORT_STRING);
+
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <title>Kaltura - Test Me Console</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="css/main.css" />
 <link rel="stylesheet" type="text/css" href="css/code.example.css" />
+<link rel="stylesheet" type="text/css" href="css/http.spy.css" />
 <link rel="stylesheet" type="text/css" href="css/jquery.tooltip.css" />
 <script type="text/javascript" src="js/jquery-1.3.1.min.js"></script>
+<script type="text/javascript" src="js/jquery.tooltip.js"></script>
+<script type="text/javascript" src="js/jquery.scrollTo-min.js"></script>
+<!--  
 <script type="text/javascript" src="js/jquery.bgiframe.pack.js"></script>
 <script type="text/javascript" src="js/jquery.dimensions.pack.js"></script>
-<script type="text/javascript" src="js/jquery.tooltip.js"></script>
 <script type="text/javascript" src="js/jquery-ui-1.7.1.custom.min.js"></script>
 <script type="text/javascript" src="js/jquery.json.min.js"></script>
-<script type="text/javascript" src="js/code.example.js"></script>
-<script type="text/javascript" src="js/main.js?r35598"></script>
+-->
+<script type="text/javascript" src="js/KCodeExample.js?r=3"></script>
+<script type="text/javascript" src="js/kField.js?r=3"></script>
+<script type="text/javascript" src="js/kDialog.js?r=3"></script>
+<script type="text/javascript" src="js/kTestMe.js?r=3"></script>
+<!-- script type="text/javascript" src="js/kHttpSpy.js?r=3"></script -->
+<script type="text/javascript">
+<?php 
+	foreach($services as $serviceId => $serviceActionItem)
+	{
+		/* @var $serviceActionItem KalturaServiceActionItem */
+		$serviceId = $serviceActionItem->serviceId;
+		$serviceName = $serviceActionItem->serviceInfo->serviceName;
+		$pluginName = $serviceActionItem->serviceInfo->package;
+		$deprecated = ($serviceActionItem->serviceInfo->deprecated ? 'true' : 'false');
+		
+		echo "kTestMe.registerService(\"$serviceId\", \"$serviceName\", \"$pluginName\", $deprecated);\n";
+	}
+?>
+</script>
 </head> 
 	<?php 
-		require_once("../../bootstrap.php");
-		ActKeyUtils::checkCurrent();
-		KalturaLog::setContext("TESTME");
-		
-		$configSection = 'testme';
-		if(isset($_REQUEST['config']))
-			$configSection = $_REQUEST['config'];
-			
-		$config = new Zend_Config_Ini("../../config/testme.ini", null, array('allowModifications' => true));
-		$config = KalturaPluginManager::mergeConfigs($config, 'testme', false);
-		$indexConfig = $config->get($configSection);
-		
-		$include = $indexConfig->get("include");
-		$exclude = $indexConfig->get("exclude");
-		$excludePaths = $indexConfig->get("excludepaths");
-		
-		$cacheFileName = kConf::get("cache_root_path").'/testme/services-'.$configSection;
-		
-		if (file_exists($cacheFileName))
-		{
-			$services = unserialize(file_get_contents($cacheFileName));
-		}
-		else 
-		{
-			$clientGenerator = new DummyForDocsClientGenerator();
-			$clientGenerator->setIncludeOrExcludeList($include, $exclude, $excludePaths);
-			$clientGenerator->load();
-			
-			$serviceItems = $clientGenerator->getServices();
-				
-			$services = array();
-			foreach($serviceItems as $serviceId => $serviceActionItem)
-				$services[$serviceId] = $serviceActionItem;
-			
-			kFile::setFileContent($cacheFileName, serialize($services));
-		}
-		
-		foreach($services as $serviceName => $serviceActionItem)
-		{
-		    /* @var $serviceActionItem KalturaServiceActionItem */
-			if($serviceActionItem->serviceInfo->serverOnly)
-				unset($services[$serviceName]);
-		}
-		ksort($services, SORT_STRING);
 		
 		if(!isset($_REQUEST['hideMenu']) || !$_REQUEST['hideMenu'])
 		{
@@ -78,100 +103,141 @@
 			<body>
 			<?php
 		}
+		
 	?>
-   <div class="testme">
-<div class="left">
-<div class="left-content"><!--p>
-				<a href="../testmeDoc/index.php" target="_blank">Kaltura API V3 Documentation</a>
-			</p-->
-<div class="param"><label for="history">History: </label> <select
-	name="history"></select></div>
-
-<div class="param"><label for="ks">KS (string):</label><input
-	type="text" class="" name="ks" size="30" /> <input id="chk-ks"
-	type="checkbox" checked="checked" /></div>
-			
-			<?php if($indexConfig->noCache): ?>
-			<div class="param"><label for="ks">No Cache (bool):</label><input
-	type="text" class="" name="nocache" size="30" /> <input type="checkbox" />
-</div>
-			<?php endif; ?>
-
-			<?php if($indexConfig->format): ?>
-			<div class="param"><label for="ks">Format:</label> <select class=""
-	name="format">
-	<option value="<?php echo KalturaResponseType::RESPONSE_TYPE_XML; ?>">XML</option>
-	<option value="<?php echo KalturaResponseType::RESPONSE_TYPE_JSON; ?>">JSON</option>
-	<option value="<?php echo KalturaResponseType::RESPONSE_TYPE_JSONP; ?>">JSONP</option>
-	<option value="<?php echo KalturaResponseType::RESPONSE_TYPE_PHP; ?>">PHP</option>
-	<option
-		value="<?php echo KalturaResponseType::RESPONSE_TYPE_PHP_ARRAY; ?>">PHP
-	Array</option>
-	<option value="<?php echo KalturaResponseType::RESPONSE_TYPE_HTML; ?>">HTML</option>
-	<option value="<?php echo KalturaResponseType::RESPONSE_TYPE_MRSS; ?>">MRSS</option>
-</select> <input type="checkbox" /></div>
-			<?php endif; ?>
-
-			<div class="param"><label for="service">Select service:</label> <select
-	name="service">
-					<?php 
-						foreach($services as $serviceId => $serviceActionItem)
+	<div class="left">
+		<form id="request" action="../" method="post" target="response" enctype="multipart/form-data">
+			<div class="left-content">
+				<div class="attr">
+					<label for="history">History: </label> 
+					<select id="history">
+						<option>Select request</option>
+					</select>
+				</div>
+				
+				<div class="param">
+					<label for="ks">KS (string):</label>
+					<input type="text" class="" name="ks" size="30" /> 
+					<input id="chk-ks" type="checkbox" checked="checked" />
+				</div>	
+				<?php 
+					if($indexConfig->additionals)
+					{
+						foreach($indexConfig->additionals as $fieldName => $additionalField)
 						{
-							/* @var $serviceActionItem KalturaServiceActionItem */
-							$serviceId = $serviceActionItem->serviceId;
-							$serviceName = $serviceActionItem->serviceInfo->serviceName;
-							$serviceLabel = $serviceActionItem->serviceInfo->serviceName;
-
-							$package = $serviceActionItem->serviceInfo->package;
-							if (kString::beginsWith($package, 'plugins.'))
-							{
-								$package = explode('.', $package, 2);
-								$pluginName = $package[1];
-								$serviceName = "$pluginName.$serviceName";
-							}
-							
-							if ($serviceActionItem->serviceInfo->deprecated)
-								$serviceLabel .= ' (deprecated)';
-							
-							echo "<option value=\"$serviceId\" title=\"$serviceName\">$serviceLabel</option>";
+							?>
+								<div class="param">
+									<label for="<?php echo $fieldName; ?>"><?php echo $additionalField->title; ?> (<?php echo $additionalField->type; ?>):</label>
+									<?php if($additionalField->values): ?> 
+										<select name="<?php echo $fieldName; ?>">
+											<?php 
+												foreach($additionalField->values as $value)
+												{
+													echo "<option value=\"{$value->value}\">{$value->title}</option>";
+												} 
+											?> 
+										</select>
+									<?php else: ?>
+										<input type="text" name="<?php echo $fieldName; ?>" size="30" />
+									<?php endif; ?>
+									<input type="checkbox" />
+								</div>
+							<?php 
 						}
-					?>
-				</select></div>
-<div class="param"><label for="action">Select action:</label> <select
-	name="action">
-	<option>Select a service...</option>
-</select> <img id="actionHelp" src="images/help.png" class="help"
-	title="" /></div>
-
-<div>
-<div id="action-params"></div>
-<div id="objects-containter"></div>
-</div>
-<div>
-<button id="send" type="button">Send</button>
-</div>
-
-<form action="" method="post" target="result"></form>
-</div>
-</div>
-<div class="right"><iframe id="result" name="result" src=""></iframe></div>
-</div>
-<ul id="codeSubMenu">
-	<li class="code-menu code-menu-php active"><a href="#"
-		onclick="switchToPHP()">PHP</a></li>
-	<li class="code-menu code-menu-java"><a href="#"
-		onclick="switchToJava()">Java</a></li>
-	<li class="code-menu code-menu-csharp"><a href="#"
-		onclick="switchToCSharp()">C#</a></li>
-	<li class="code-menu code-menu-python"><a href="#"
-		onclick="switchToPython()">Python</a></li>
-	<li class="code-menu code-menu-javascript"><a href="#"
-		onclick="switchToJavascript()">Javascript</a></li>
-	<li class="code-menu"><a class="code-menu-toggle" href="#"
-		onclick="toggleCode()" id="codeToggle">Show Code Example</a></li>
-</ul>
-<div class="code" id="codeExample" style="display: none;">
-<div id="example"></div>
-</div>
+					} 
+				?>
+			
+				<div id="dvService">
+					<div class="attr">
+						<label for="service">Select service:</label> 
+						<select name="service">
+							<option value="">Select service</option>
+							<option value="multirequest">Multirequest</option>
+							<?php 
+								foreach($services as $serviceId => $serviceActionItem)
+								{
+									/* @var $serviceActionItem KalturaServiceActionItem */
+									$serviceId = $serviceActionItem->serviceId;
+									$serviceName = $serviceActionItem->serviceInfo->serviceName;
+									$serviceLabel = $serviceActionItem->serviceInfo->serviceName;
+									$pluginName = $serviceActionItem->serviceInfo->package;
+									
+									if ($pluginName)
+										$serviceName = "$pluginName.$serviceName";
+									
+									if ($serviceActionItem->serviceInfo->deprecated)
+										$serviceLabel .= ' (deprecated)';
+									
+									echo "<option value=\"$serviceId\" title=\"$serviceName\">$serviceLabel</option>";
+								}
+							?>
+						</select>
+						<img src="images/help.png" class="service-help help" />
+					</div>
+					<div class="attr" style="display: none">
+						<label for="action">Select action:</label>
+						<select name="action"></select> 
+						<img src="images/help.png" class="action-help help" title="" />
+					</div>
+					<div class="attr" style="display: none">
+						<input type="button" class="add-request-button button" value="Add Request" />
+					</div>
+					
+					<div class="action-params"></div>
+					<div class="objects-containter"></div>
+				</div>
+			
+				<div>
+					<button type="submit">Send</button>
+				</div>
+				
+				<?php 
+					
+					if($indexConfig->get("logParser"))
+					{
+						?>
+							<div id="dvLogParser">
+								<div class="attr">
+									<label for="action">HTTP Log:</label>
+									<input type="file" />
+									<img id="actionHelp" src="images/help.png" class="help" title="Supported format is HTTP Archive V1.1 (har file)" />
+								</div>
+								<div>
+									<button onclick="kLogParser.load()">Load</button>
+								</div>
+							</div>
+						<?php
+					}
+					
+				?>
+			</div>
+		</form>
+	</div>
+	<div class="right">
+		<iframe id="response" name="response" src=""></iframe>
+	</div>
+	<ul id="codeSubMenu">
+		<li class="code-menu code-menu-php active"><a href="#"
+			onclick="switchToPHP()">PHP</a></li>
+		<li class="code-menu code-menu-java"><a href="#"
+			onclick="switchToJava()">Java</a></li>
+		<li class="code-menu code-menu-csharp"><a href="#"
+			onclick="switchToCSharp()">C#</a></li>
+		<li class="code-menu code-menu-python"><a href="#"
+			onclick="switchToPython()">Python</a></li>
+		<li class="code-menu code-menu-javascript"><a href="#"
+			onclick="switchToJavascript()">Javascript</a></li>
+		<li class="code-menu"><a class="code-menu-toggle" href="#"
+			onclick="toggleCode()" id="codeToggle">Show Code Example</a></li>
+	</ul>
+	<div class="code" id="codeExample" style="display: none;">
+		<div id="example"></div>
+	</div>
+	<div id="httpSpy" style="display: none;">
+		<div id="httpSpyForm">
+			<input type="file" id="fileHttpSpy" />
+			<input type="button" id="parseHttpSpy" value="Parse"  />
+		</div>
+	</div>
 </body>
 </html>
