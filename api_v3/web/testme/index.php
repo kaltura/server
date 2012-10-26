@@ -63,11 +63,11 @@ ksort($services, SORT_STRING);
 <script type="text/javascript" src="js/jquery-ui-1.7.1.custom.min.js"></script>
 <script type="text/javascript" src="js/jquery.json.min.js"></script>
 -->
-<script type="text/javascript" src="js/KCodeExample.js?r=3"></script>
-<script type="text/javascript" src="js/kField.js?r=3"></script>
-<script type="text/javascript" src="js/kDialog.js?r=3"></script>
-<script type="text/javascript" src="js/kTestMe.js?r=3"></script>
-<!-- script type="text/javascript" src="js/kHttpSpy.js?r=3"></script -->
+<script type="text/javascript" src="js/kCodeExample.js"></script>
+<script type="text/javascript" src="js/kField.js"></script>
+<script type="text/javascript" src="js/kDialog.js"></script>
+<script type="text/javascript" src="js/kTestMe.js"></script>
+<!-- script type="text/javascript" src="js/kHttpSpy.js"></script -->
 <script type="text/javascript">
 <?php 
 	foreach($services as $serviceId => $serviceActionItem)
