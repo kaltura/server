@@ -627,7 +627,7 @@ kCall.prototype.onActionParamsLoad = function(data){
 	var serviceId = this.getLockedServiceId();
 	var actionId = this.getLockedActionId();
 	
-	this.jqActionHelp.attr('title', serviceId + '.' + actionId + ' - ' + data.description);
+	this.jqActionHelp.attr('title', serviceId + '.' + actionId + ' - ' + (data ? data.description : ''));
 	this.closeChildDialog(true);
 	
 	jQuery.each(data.actionParams, delegate(this, function (index, param) {
