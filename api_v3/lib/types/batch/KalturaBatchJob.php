@@ -365,12 +365,25 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				
 			default:			
 				if($dbData instanceof kBulkUploadJobData)
+				{
 					$this->data = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $dbBatchJob->getJobSubType());
+					if(is_null($this->data))
+						KalturaLog::err("Unable to init KalturaBulkUploadJobData for sub-type [" . $dbBatchJob->getJobSubType() . "]");
+				}
 				else if($dbData instanceof kImportJobData)
+				{
 					$this->data = KalturaPluginManager::loadObject('KalturaImportJobData', get_class($dbData));
+					if(is_null($this->data))
+						KalturaLog::err("Unable to init KalturaImportJobData for class [" . get_class($dbData) . "]");
+				}
 				else
+				{
 					$this->data = KalturaPluginManager::loadObject('KalturaJobData', $this->jobType, array('coreJobSubType' => $dbBatchJob->getJobSubType()));
+				}
 		}
+		
+		if(is_null($this->data))
+			KalturaLog::err("Unable to init KalturaJobData for job type [{$this->jobType}] sub-type [" . $dbBatchJob->getJobSubType() . "]");
 			
 		if($this->data)
 			$this->data->fromObject($dbData);
