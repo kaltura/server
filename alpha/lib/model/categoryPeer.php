@@ -333,7 +333,7 @@ class categoryPeer extends BasecategoryPeer
 	 * 
 	 * @param int $kuserId
 	 * @param int $limit
-	 * @return array<categories>
+	 * @return array<category>
 	 */
 	public static function retrieveEntitledAndNonIndexedByKuser($kuserId, $limit)
 	{
