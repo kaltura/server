@@ -52,15 +52,13 @@ if( $.cookie('kmcks') && $.cookie('pid') ) {
 
 	$.extend( flashVars, options.flashVars );
 
-	var swfUrl = options.flash_dir + "/kmc/login/" + options.kmc_login_version + "/login.swf";
-
 	var params = {
 		allowscriptaccess: "always",
 		allownetworking: "all",
 		bgcolor: "#272929",
 		quality: "high",
 		wmode: "window" ,
-		movie: swfUrl
+		movie: options.swf_url
 	};
-	swfobject.embedSWF(swfUrl, "login_swf", "384", "350", "10.0.0", options.service_url + "/expressInstall.swf", flashVars, params);
+	swfobject.embedSWF(options.swf_url, "login_swf", "384", "350", "10.0.0", options.service_url + "/expressInstall.swf", flashVars, params);
 }
