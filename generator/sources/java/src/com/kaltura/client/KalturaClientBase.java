@@ -48,6 +48,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -64,7 +65,6 @@ import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.w3c.dom.Element;
 
-import sun.misc.BASE64Encoder;
 
 import com.kaltura.client.enums.KalturaSessionType;
 import com.kaltura.client.utils.XmlUtils;
@@ -560,10 +560,9 @@ abstract public class KalturaClientBase {
 			// build final string to base64 encode
 			StringBuilder sbToEncode = new StringBuilder();
 			sbToEncode.append(signature.toString()).append("|").append(sbInfo.toString());
-			BASE64Encoder encoder = new BASE64Encoder();
 			
 			// encode the signature and info with base64
-			String hashedString = encoder.encode(sbToEncode.toString().getBytes());
+			String hashedString = Base64.encodeBase64String(sbToEncode.toString().getBytes());
 			
 			// remove line breaks in the session string
 			String ks = hashedString.replace("\n", "");
@@ -585,7 +584,7 @@ abstract public class KalturaClientBase {
 		String[] privilegesArr = privileges.split(",");
 		for (String curPriv : privilegesArr) {
 			String privilege = curPriv.trim();
-			if(privilege.isEmpty())
+			if(privilege.length() == 0)
 				continue;
 			if(privilege.equals("*"))
 				privilege = "all:*";
@@ -619,8 +618,7 @@ abstract public class KalturaClientBase {
 		System.arraycopy(prefix.getBytes(), 0, output, 0, prefix.length());
 		System.arraycopy(encryptedFields,0,output,prefix.length(), encryptedFields.length);
 		
-		BASE64Encoder encoder = new BASE64Encoder();
-		String encodedKs = encoder.encode(output);
+		String encodedKs = Base64.encodeBase64String(output);
 		encodedKs = encodedKs.replaceAll("\\+", "-");
 		encodedKs = encodedKs.replaceAll("/", "_");
 		encodedKs = encodedKs.replace("\n", "");
@@ -644,7 +642,8 @@ abstract public class KalturaClientBase {
 	private byte[] aesEncrypt(String secretForSigning, byte[] text) throws GeneralSecurityException, UnsupportedEncodingException {
 		// Key
 		byte[] hashedKey = signInfoWithSHA1(secretForSigning);
-		byte[] keyBytes = Arrays.copyOfRange(hashedKey, 0, 16);
+		byte[] keyBytes = new byte[BLOCK_SIZE];
+		System.arraycopy(hashedKey,0,keyBytes,0,BLOCK_SIZE);
 		SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");
 		
 		// IV
