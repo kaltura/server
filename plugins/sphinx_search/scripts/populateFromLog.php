@@ -6,7 +6,7 @@ if($argc <= 1)
 	echo "Usage: php populateFromLog.php {path to config php file}\n";
 	echo "For example\n";
 	echo "	php populateFromLog.php /opt/kaltua/app/scripts/sphinx/configs/pa-sphinx.php\n";
-	exit;
+	exit(1);
 }
 
 $configFile = $argv[1];
@@ -16,7 +16,7 @@ if(!file_exists($configFile))
 	echo "Usage: php populateFromLog.php {path to config php file}\n";
 	echo "For example\n";
 	echo "	php populateFromLog.php /opt/kaltua/app/scripts/sphinx/configs/pa-sphinx.php\n";
-	exit;
+	exit(1);
 }
 
 set_time_limit(0);
