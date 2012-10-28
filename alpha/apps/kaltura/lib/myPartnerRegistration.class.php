@@ -174,7 +174,7 @@ class myPartnerRegistration
 		$newPartner->setKsMaxExpiryInSeconds(86400);
 		$newPartner->setModerateContent(false);
 		$newPartner->setNotify(false);
-		$newPartner->setAppearInSearch(mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
+		$newPartner->setAppearInSearch(mySearchUtils::DISPLAY_IN_SEARCH_PARTNER_ONLY);
 		$newPartner->setIsFirstLogin(true);
 		/* fix drupal5 module partner type */
 		//var_dump($description);
