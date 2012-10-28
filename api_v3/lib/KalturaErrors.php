@@ -269,7 +269,7 @@ class KalturaErrors extends APIErrors
 	
 	const CANNOT_SET_INHERITANCE_TYPE_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_INHERITANCE_TYPE_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set inheritance field when privacy context is not set on the categroy";
 	
-	const CANNOT_SET_PRIVACY_FIELD_WITH_NO_PRIVACY_CONTEX = "CANNOT_SET_PRIVACY_FIELD_WITH_NO_PRIVACY_CONTEX, Cannot set privacy field when privacy context is not set on the categroy";
+	const CANNOT_SET_PRIVACY_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_PRIVACY_FIELD_WITH_NO_PRIVACY_CONTEX, Cannot set privacy field when privacy context is not set on the categroy";
 	
 	const CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set owner field when privacy context is not set on the categroy";
 	
