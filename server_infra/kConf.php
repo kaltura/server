@@ -15,6 +15,7 @@ require_once __DIR__ . '/../infra/kEnvironment.php';
 class kConf extends kEnvironment
 {
 	const APC_CACHE_MAP = 'kConf';
+	const CACHE_VERSION_KEY = '__config_cache_version';
 	
 	protected static $initialized = false;
 	
@@ -74,7 +75,8 @@ class kConf extends kEnvironment
 		self::$map = $config;
 		
 		if(function_exists('apc_store'))
-		{			
+		{
+			self::$map[self::CACHE_VERSION_KEY] = uniqid();
 			$res = apc_store(self::APC_CACHE_MAP, self::$map);
 			if($reloadFileExists && $res)
 			{
@@ -84,6 +86,14 @@ class kConf extends kEnvironment
 					error_log("Failed to delete base.reload file");
 			}
 		}			
+	}
+	
+	public static function getCachedVersionId()
+	{
+		if (!isset(self::$map[self::CACHE_VERSION_KEY]))
+			return null;
+		
+		return self::$map[self::CACHE_VERSION_KEY];
 	}
 
 	public static function get($paramName)
