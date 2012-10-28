@@ -623,7 +623,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				throw new KalturaBatchException("Action: {$contentAssetsAction} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 		}
 		//Creates new category associations between the entry and the categories
-		$updatedEntryBulkUploadResult = $this->createCategoryAssociations($entryId, $this->implodeChildElements($item->categories), $updatedEntryBulkUploadResult);
+		$updatedEntryBulkUploadResult = $this->createCategoryAssociations($entryId, $this->implodeChildElements($item->categories), $updatedEntryBulkUploadResult, true);
 		//Adds the additional data for the flavors and thumbs
 		$this->handleFlavorAndThumbsAdditionalData($entryId, $flavorAssets, $thumbAssets);
 				
@@ -1102,12 +1102,39 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		return $updatedEntry;
 	}
 	
-	private function createCategoryAssociations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult)
+	private function createCategoryAssociations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult, $replaceExisting = false)
 	{
 	    $this->impersonate();
+
+	    $categoriesArr = explode(",", $categories);	//Categories to be added
 	    
-	    $categoriesArr = explode(",", $categories);
-	    $ret = array();
+	    if ($replaceExisting) {	//Remove existing categories and associations	
+	    	try {
+	    		$categoriesToRemove = $this->kClient->baseEntry->get($entryId)->categories;
+	    	}
+	    	catch(KalturaException $ex) {	//Handling misuse
+	    		KalturaLog::alert("Could not retrieve categories from Entry ID. Accidentlal use of the 'replace existing categories' option ?");
+	    		throw $ex;	
+	    	}
+			$categoriesToRemove = explode(',',$categoriesToRemove);
+			$categoriesToRemove = array_diff($categoriesToRemove, $categoriesArr);	//do not remove cateogries you are about to add
+			KalturaLog::debug("Category names to be removed [".implode(',',$categoriesToRemove)."]");
+			foreach($categoriesToRemove as $categoryToRemove) {
+				$categoryToRemoveFilter = new KalturaCategoryFilter();
+				$categoryToRemoveFilter->fullNameEqual = $categoryToRemove;
+				$categoryIdToRemove = $this->kClient->category->listAction($categoryToRemoveFilter);
+				$categoryIdToRemove = $categoryIdToRemove->objects[0]->id;
+				KalturaLog::debug("Removing category ID [$categoryIdToRemove] from entry [$entryId]");
+				try {
+					$this->kClient->categoryEntry->delete($entryId,$categoryIdToRemove);	
+				}
+				catch (KalturaException $ex) {
+					KalturaLog::alert("Error removing category ID [$categoryIdToRemove] from Entry ID [$entryId] with message [".$ex->getMessage()."]");
+					continue;
+				}
+			}    	
+	    }
+	    
 	    foreach ($categoriesArr as $categoryName)
 	    {
 	        $categoryFilter = new KalturaCategoryFilter();
