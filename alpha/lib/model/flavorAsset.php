@@ -181,4 +181,62 @@ class flavorAsset extends asset
 		}			
 		return parent::postUpdate($con);
 	}
+	
+	public function getDownloadUrlWithExpiry($expiry, $useCdn = false)
+	{
+		$ksStr = "";
+				
+		$ksNeeded = true;
+		$partnerId = $this->getPartnerId();
+		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId))
+		{
+			$invalidModerationStatuses = array(
+				entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION, 
+				entry::ENTRY_MODERATION_STATUS_REJECTED
+			);
+			
+			$entry = $this->getentry();
+			if ($entry &&
+				!in_array($entry->getModerationStatus(), $invalidModerationStatuses) &&
+				($entry->getStartDate() === null || $entry->getStartDate(null) < time()) && 
+				($entry->getEndDate() === null || $entry->getEndDate(null) > time() + 86400))
+			{ 			
+				$accessControl = $entry->getaccessControl();			
+				if ($accessControl && !$accessControl->getRulesArray())
+					$ksNeeded = false;
+			}
+		}
+		
+		if ($ksNeeded)
+		{
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			$secret = $partner->getSecret();
+			$privilege = ks::PRIVILEGE_DOWNLOAD.":".$this->getEntryId();
+			$privilege .= ",".kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY .":". $this->getEntryId();
+			$result = kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege);
+	
+			if ($result < 0)
+				throw new Exception("Failed to generate session for asset [".$this->getId()."] of type ". $this->getType());
+		}
+		
+		$finalPath = $this->getFinalDownloadUrlPathWithoutKs();
+		
+		if ($ksStr)
+			$finalPath .= "/ks/".$ksStr;
+			
+		// Gonen May 12 2010 - removing CDN URLs. see ticket 5135 in internal mantis
+		// in order to avoid conflicts with access_control (geo-location restriction), we always return the requestHost (www_host from kConf)
+		// and not the CDN host relevant for the partner.
+		
+		// Tan-Tan January 27 2011 - in some places we do need the cdn, I added a paramter useCdn to force it.
+		if($useCdn)
+		{
+			// TODO in that case we should use the serve flavor and the url manager in order to support secured and signed urls
+			$downloadUrl = myPartnerUtils::getCdnHost($partnerId) . $finalPath;
+		}
+		else
+			$downloadUrl = requestUtils::getRequestHost() . $finalPath;
+		
+		return $downloadUrl;
+	}
 }
