@@ -219,17 +219,7 @@ define('MODULES' , SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF
 require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
 
 // Logger
-try // we don't want to fail when logger is not configured right
-{
-	$config = new Zend_Config(kConf::getMap('logger'));
-	$ps2 = $config->ps2;
-	KalturaLog::initLog($ps2);
-	KalturaLog::setContext('PS2');
-}
-catch(Zend_Config_Exception $ex)
-{
-	$config = null;
-}
+kLoggerCache::InitLogger('ps2', 'PS2');
 
 sfLogger::getInstance()->registerLogger(KalturaLog::getInstance());
 sfLogger::getInstance()->setLogLevel(7);
