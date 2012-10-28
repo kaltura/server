@@ -236,10 +236,14 @@ class PartnerController extends Zend_Controller_Action
 		$pager->pageSize = 500; 
 		if (!$editMode) //new
 		{
-			$flavorParamsResponse = $client->flavorParams->listAction(null, $pager);
-			$form->addFlavorParamsFields($flavorParamsResponse);
+			$partnerId = $request->getParam('new_partner_id');
 			$form->getElement('partnerId')->setAttrib('readonly',true);
-			$form->getElement('partnerId')->setValue($request->getParam('new_partner_id'));
+			$form->getElement('partnerId')->setValue($partnerId);
+			
+			Infra_ClientHelper::impersonate($partnerId);
+			$flavorParamsResponse = $client->flavorParams->listAction(null, $pager);
+			Infra_ClientHelper::unimpersonate();
+			$form->addFlavorParamsFields($flavorParamsResponse);
 		}
 		else  
 		{			
