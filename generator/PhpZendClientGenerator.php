@@ -85,12 +85,17 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		
 		$classNodes = $xpath->query("/xml/classes/class");
 		$this->appendLine('	private static $map = array(');
+		$typeMap = array();
 		foreach($classNodes as $classNode)
 		{
 			$kalturaType = $classNode->getAttribute('name');
 			$zendType = $this->getTypeClass($kalturaType);
-			$this->appendLine("		'$kalturaType' => '$zendType',");
+			$typeMap[$kalturaType] = $zendType;
 		}
+		ksort($typeMap);
+		foreach ($typeMap as $kalturaType => $zendType)
+			$this->appendLine("		'$kalturaType' => '$zendType',");
+		
 		$this->appendLine('	);');
 		$this->appendLine('	');
 		

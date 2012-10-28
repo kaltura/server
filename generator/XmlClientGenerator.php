@@ -241,15 +241,19 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$enumElement->setAttribute("plugin", $plugin);
 		}
 		
-		$contants = $typeReflector->getConstants();
-		foreach($contants as $contant)
+		$constants = array();
+		foreach($typeReflector->getConstants() as $contant)
 		{
 			$name = $contant->getName();
 			$value = $contant->getDefaultValue();
+			$constants[$name] = $value;
+		}
+		asort($constants);
+		foreach ($constants as $name => $value)
+		{
 			$const = $this->_doc->createElement("const");
 			$const->setAttribute("name", $name);
 			$const->setAttribute("value", $value);
-			
 			$enumElement->appendChild($const);
 		}
 		
