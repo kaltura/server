@@ -562,7 +562,7 @@ abstract public class KalturaClientBase {
 			sbToEncode.append(signature.toString()).append("|").append(sbInfo.toString());
 			
 			// encode the signature and info with base64
-			String hashedString = Base64.encodeBase64String(sbToEncode.toString().getBytes());
+			String hashedString = new String(Base64.encodeBase64(sbToEncode.toString().getBytes()));
 			
 			// remove line breaks in the session string
 			String ks = hashedString.replace("\n", "");
@@ -618,7 +618,7 @@ abstract public class KalturaClientBase {
 		System.arraycopy(prefix.getBytes(), 0, output, 0, prefix.length());
 		System.arraycopy(encryptedFields,0,output,prefix.length(), encryptedFields.length);
 		
-		String encodedKs = Base64.encodeBase64String(output);
+		String encodedKs = new String(Base64.encodeBase64(output));
 		encodedKs = encodedKs.replaceAll("\\+", "-");
 		encodedKs = encodedKs.replaceAll("/", "_");
 		encodedKs = encodedKs.replace("\n", "");
