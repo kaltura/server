@@ -6,15 +6,19 @@ else
 fi
 . `dirname $REAL_SCRIPT`/../../../configurations/system.ini
 
-POPLATE_FROM_LOG="populateFromLog.php"
+POPULATE_FROM_LOG="populateFromLog.php"
 SERVER=$1
+if [ -z "$SERVER" ];then
+        echo "No Sphinx conf. Exiting."
+        exit 1
+fi
 MAILTO="$ADMIN_CONSOLE_ADMIN_MAIL"
-KP=$(pgrep -f $POPLATE_FROM_LOG)
+KP=$(pgrep -f $POPULATE_FROM_LOG)
 MAINT=$BASE_DIR/maintenance
 if [[ "X$KP" = "X" && ! -f $MAINT ]]
       then
-          echo "$POPLATE_FROM_LOG `hostname` was restarted" | mail -s "$POPLATE_FROM_LOG script not found on `hostname`" $MAILTO
+          echo "$POPULATE_FROM_LOG `hostname` was restarted" | mail -s "$POPULATE_FROM_LOG script not found on `hostname`" $MAILTO
 	  cd $APP_DIR/plugins/sphinx_search/scripts
-	  php $POPLATE_FROM_LOG ${SERVER} >> $LOG_DIR/kaltura_sphinx_populate.log 2>&1 &
+	  php $POPULATE_FROM_LOG ${SERVER} >> $LOG_DIR/kaltura_sphinx_populate.log 2>&1 &
       fi
 
