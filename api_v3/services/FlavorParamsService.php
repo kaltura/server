@@ -20,9 +20,6 @@ class FlavorParamsService extends KalturaBaseService
 		parent::applyPartnerFilterForClass(new assetPeer());
 		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
 		
-		if($actionName == 'list')
-			assetParamsPeer::setIsDefaultInDefaultCriteria(false);
-			
 		$partnerGroup = null;
 		if(
 			$actionName == 'get' ||
