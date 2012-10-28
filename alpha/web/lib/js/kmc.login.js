@@ -23,13 +23,44 @@ function loginF( remMe, partner_id, subp_id, uid, ks , screen_name, email ) {
 	$.cookie("pid", partner_id, options);
 	$.cookie("subpid", subp_id, options);
 
-	var state = location.hash || "" ;
-	window.location = service_url + "/index.php/kmc/kmc2" + state;
+	loginSuccess();
 
 	// TODO - send by post using form1
 	return true;			
 }
 
 function gotoSignup() {
-	window.location = service_url + "/index.php/kmc/signup";
+	window.location = options.service_url + "/index.php/kmc/signup";
+}
+
+function loginSuccess() {
+	var state = location.hash || "" ;
+	window.location = options.service_url + "/index.php/kmc/kmc2" + state;	
+}
+
+// If we have ks & partner_id cookies, redirect to kmc
+if( $.cookie('kmcks') && $.cookie('pid') ) {
+	loginSuccess();
+} else {
+	// Show login form
+	var flashVars = {
+		loginF: "loginF",
+		closeF: "closeLoginF",
+		urchinNumber: "UA-12055206-1",
+		srvurl: "api_v3/index.php"
+	}
+
+	$.extend( flashVars, options.flashVars );
+
+	var swfUrl = options.flash_dir + "/kmc/login/" + options.kmc_login_version + "/login.swf";
+
+	var params = {
+		allowscriptaccess: "always",
+		allownetworking: "all",
+		bgcolor: "#272929",
+		quality: "high",
+		wmode: "window" ,
+		movie: swfUrl
+	};
+	swfobject.embedSWF(swfUrl, "login_swf", "384", "350", "10.0.0", options.service_url + "/expressInstall.swf", flashVars, params);
 }
