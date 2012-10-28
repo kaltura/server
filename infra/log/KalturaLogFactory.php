@@ -56,7 +56,7 @@ class KalturaLogFactory
 				if ($config->mode === null)
 					$mode = 'a';
 					
-				$writer = new Zend_Log_Writer_Stream($config->stream, $mode);
+				$writer = new KalturaSerializableStream($config->stream, $mode);
 				break;
 		}
 		

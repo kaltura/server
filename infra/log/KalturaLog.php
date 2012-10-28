@@ -40,6 +40,11 @@ class KalturaLog
 		self::$_initialized = true;
 	}
 	
+	public static function getLogger()
+	{
+		return self::$_logger;
+	}
+	
 	public static function setLogger($logger)
 	{
 		self::$_logger = $logger;
