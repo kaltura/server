@@ -1102,12 +1102,11 @@ class playManifestAction extends kalturaAction
 	 */
 	private function serveAppleHttp()
 	{
-	    $entry = entryPeer::retrieveByPK($this->entryId);
-	    if ($entry->getType() == entryType::LIVE_STREAM)
+	    if ($this->entry->getType() == entryType::LIVE_STREAM)
 	    {
 	        $renderer = new kRedirectManifestRenderer();
 			$renderer->entryId = $this->entryId;
-			$renderer->flavor = array ("url" => $entry->getHlsStreamUrl());
+			$renderer->flavor = array ("url" => $this->entry->getHlsStreamUrl());
 			return $renderer;
 	    }
 	    
