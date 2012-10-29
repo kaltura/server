@@ -174,5 +174,7 @@ class KalturaPDO extends PropelPDO
 			KalturaLog::debug("Transactions disabled");
 			return false;
 		}
+		
+		return parent::beginTransaction();
 	}
 }
