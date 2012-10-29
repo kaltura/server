@@ -15,7 +15,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		if (!EventNotificationPlugin::isAllowedPartner($partnerId))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, "{$this->serviceName}->{$this->actionName}");
 			
-		//if($partnerId != Partner::ADMIN_CONSOLE_PARTNER_ID && $partnerId != Partner::BATCH_PARTNER_ID)
+		if($partnerId != Partner::ADMIN_CONSOLE_PARTNER_ID && $partnerId != Partner::BATCH_PARTNER_ID)
 			myPartnerUtils::addPartnerToCriteria('EventNotificationTemplate', $partnerId, $this->private_partner_data, $this->partnerGroup());
 	}
 		
