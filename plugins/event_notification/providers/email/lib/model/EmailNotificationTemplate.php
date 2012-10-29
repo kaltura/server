@@ -2,10 +2,6 @@
 /**
  * @package plugins.emailNotification
  * @subpackage model
- * 
- * 
- * TODO
- * Find a nice way to use dynamic data in the subject and body
  */
 class EmailNotificationTemplate extends EventNotificationTemplate implements ISyncableFile
 {
