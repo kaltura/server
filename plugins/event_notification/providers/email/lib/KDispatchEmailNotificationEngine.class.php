@@ -271,7 +271,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 					$key = str_replace(array_keys($contentParameters), $contentParameters, $key);
 					$value = str_replace(array_keys($contentParameters), $contentParameters, $value);
 				}
-				$this::$mailer->AddCustomHeader("{key}: {$value}");
+				$this::$mailer->AddCustomHeader("$key: $value");
 			}
 		}
 		
