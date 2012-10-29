@@ -427,6 +427,12 @@ abstract class BaseMetadataProfilePeer {
 		if(self::$s_criteria_filter == null)
 			MetadataProfilePeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('MetadataProfile');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('MetadataProfilePeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

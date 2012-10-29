@@ -467,6 +467,12 @@ abstract class BaseEntryDistributionPeer {
 		if(self::$s_criteria_filter == null)
 			EntryDistributionPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('EntryDistribution');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('EntryDistributionPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

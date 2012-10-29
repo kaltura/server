@@ -423,6 +423,12 @@ abstract class BaseEventNotificationTemplatePeer {
 		if(self::$s_criteria_filter == null)
 			EventNotificationTemplatePeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('EventNotificationTemplate');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('EventNotificationTemplatePeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

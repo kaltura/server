@@ -439,6 +439,12 @@ abstract class BaseGenericDistributionProviderActionPeer {
 		if(self::$s_criteria_filter == null)
 			GenericDistributionProviderActionPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('GenericDistributionProviderAction');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('GenericDistributionProviderActionPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

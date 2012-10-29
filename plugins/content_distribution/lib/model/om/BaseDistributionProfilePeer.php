@@ -455,6 +455,12 @@ abstract class BaseDistributionProfilePeer {
 		if(self::$s_criteria_filter == null)
 			DistributionProfilePeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('DistributionProfile');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('DistributionProfilePeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

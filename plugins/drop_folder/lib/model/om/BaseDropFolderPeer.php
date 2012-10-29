@@ -443,6 +443,12 @@ abstract class BaseDropFolderPeer {
 		if(self::$s_criteria_filter == null)
 			DropFolderPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('DropFolder');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('DropFolderPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

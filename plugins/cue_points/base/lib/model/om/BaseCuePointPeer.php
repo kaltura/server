@@ -471,6 +471,12 @@ abstract class BaseCuePointPeer {
 		if(self::$s_criteria_filter == null)
 			CuePointPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('CuePoint');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('CuePointPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

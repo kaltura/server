@@ -411,6 +411,12 @@ abstract class BaseSphinxLogPeer {
 		if(self::$s_criteria_filter == null)
 			SphinxLogPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('SphinxLog');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('SphinxLogPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

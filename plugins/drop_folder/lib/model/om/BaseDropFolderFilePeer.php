@@ -431,6 +431,12 @@ abstract class BaseDropFolderFilePeer {
 		if(self::$s_criteria_filter == null)
 			DropFolderFilePeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('DropFolderFile');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('DropFolderFilePeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

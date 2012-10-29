@@ -118,7 +118,7 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 		// this is needed for related entries under kMetadataMrssManager which is using retrieveByPK without the correct partner id filter
 		$oldEntryCriteria = entryPeer::getCriteriaFilter()->getFilter();
 		entryPeer::setDefaultCriteriaFilter();
-		entryPeer::addPartnerToCriteria($this->getPartnerId(), true);
+		myPartnerUtils::addPartnerToCriteria('entry', $this->getPartnerId(), true);
 		
 		try
 		{

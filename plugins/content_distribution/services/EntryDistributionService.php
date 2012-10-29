@@ -12,7 +12,7 @@ class EntryDistributionService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		myPartnerUtils::addPartnerToCriteria(new EntryDistributionPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		myPartnerUtils::addPartnerToCriteria('EntryDistribution', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		
 		if(!ContentDistributionPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);

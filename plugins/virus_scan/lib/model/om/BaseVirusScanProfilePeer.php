@@ -415,6 +415,12 @@ abstract class BaseVirusScanProfilePeer {
 		if(self::$s_criteria_filter == null)
 			VirusScanProfilePeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('VirusScanProfile');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('VirusScanProfilePeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

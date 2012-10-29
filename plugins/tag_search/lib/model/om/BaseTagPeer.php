@@ -399,6 +399,12 @@ abstract class BaseTagPeer {
 		if(self::$s_criteria_filter == null)
 			TagPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('Tag');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('TagPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

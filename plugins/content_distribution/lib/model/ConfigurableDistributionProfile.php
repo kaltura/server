@@ -236,7 +236,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		// this is needed for related entries under kMetadataMrssManager which is using retrieveByPK without the correct partner id filter
 		$oldEntryCriteria = entryPeer::getCriteriaFilter()->getFilter();
 		entryPeer::setDefaultCriteriaFilter();
-		entryPeer::addPartnerToCriteria($entryDistribution->getPartnerId(), true);
+		myPartnerUtils::addPartnerToCriteria('entry', $entryDistribution->getPartnerId(), true);
 		
 		try
 		{

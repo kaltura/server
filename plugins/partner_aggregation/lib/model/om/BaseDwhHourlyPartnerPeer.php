@@ -619,6 +619,12 @@ abstract class BaseDwhHourlyPartnerPeer {
 		if(self::$s_criteria_filter == null)
 			DwhHourlyPartnerPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('DwhHourlyPartner');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('DwhHourlyPartnerPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

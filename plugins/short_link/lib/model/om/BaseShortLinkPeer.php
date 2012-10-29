@@ -419,6 +419,12 @@ abstract class BaseShortLinkPeer {
 		if(self::$s_criteria_filter == null)
 			ShortLinkPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('ShortLink');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('ShortLinkPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

@@ -22,8 +22,8 @@ class ShortLinkService extends KalturaBaseService
 
 		if($actionName != 'goto')
 		{
-			myPartnerUtils::addPartnerToCriteria(new ShortLinkPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-			myPartnerUtils::addPartnerToCriteria(new kuserPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+			myPartnerUtils::addPartnerToCriteria('ShortLink', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+			myPartnerUtils::addPartnerToCriteria('kuser', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		}
 	}
 	

@@ -471,6 +471,12 @@ abstract class BaseAuditTrailPeer {
 		if(self::$s_criteria_filter == null)
 			AuditTrailPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('AuditTrail');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('AuditTrailPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

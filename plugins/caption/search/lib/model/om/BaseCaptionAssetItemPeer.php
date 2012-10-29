@@ -407,6 +407,12 @@ abstract class BaseCaptionAssetItemPeer {
 		if(self::$s_criteria_filter == null)
 			CaptionAssetItemPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('CaptionAssetItem');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('CaptionAssetItemPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

@@ -399,6 +399,12 @@ abstract class BaseSphinxLogServerPeer {
 		if(self::$s_criteria_filter == null)
 			SphinxLogServerPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('SphinxLogServer');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('SphinxLogServerPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 
@@ -753,6 +759,10 @@ abstract class BaseSphinxLogServerPeer {
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
+		
+		if($criteria instanceof KalturaCriteria)
+			$criteria->applyResultsSort($results);
+		
 		return $results;
 	}
 

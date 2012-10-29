@@ -423,6 +423,12 @@ abstract class BaseMetadataProfileFieldPeer {
 		if(self::$s_criteria_filter == null)
 			MetadataProfileFieldPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('MetadataProfileField');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('MetadataProfileFieldPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 
