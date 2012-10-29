@@ -63,7 +63,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			    case KalturaBulkUploadObjectType::CATEGORY_USER:
 			        return new BulkUploadCategoryUserEngineCsv($taskConfig, $kClient, $job);
 			    default:
-			        throw new kCoreException('Bulk upload object type not recognized: ['.$job->data->bulkUploadObjectType .']', kCoreException::OBJECT_TYPE_NOT_FOUND);
+			        throw new KalturaAPIException();
 			        break;
 			}
 			
