@@ -68,6 +68,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 	 */
 	public static function getOMClass($row, $colnum)
 	{
+		$assetType = null;
 		if($row)
 		{
 			$colnum += self::translateFieldName(self::TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
@@ -83,7 +84,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 			}
 		}
 			
-		throw new Exception("Can't instantiate un-typed cue point [" . print_r($row, true) . "]");
+		throw new Exception("Can't instantiate un-typed [$assetType] cue point [" . print_r($row, true) . "]");
 	}
 	
 	/* (non-PHPdoc)
