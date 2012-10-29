@@ -423,6 +423,12 @@ abstract class BasePermissionItemPeer {
 		if(self::$s_criteria_filter == null)
 			PermissionItemPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('PermissionItem');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('PermissionItemPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

@@ -407,6 +407,12 @@ abstract class BasecommentPeer {
 		if(self::$s_criteria_filter == null)
 			commentPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('comment');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('commentPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

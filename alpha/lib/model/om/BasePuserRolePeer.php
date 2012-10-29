@@ -407,6 +407,12 @@ abstract class BasePuserRolePeer {
 		if(self::$s_criteria_filter == null)
 			PuserRolePeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('PuserRole');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('PuserRolePeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

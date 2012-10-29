@@ -431,6 +431,12 @@ abstract class BaseSystemUserPeer {
 		if(self::$s_criteria_filter == null)
 			SystemUserPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('SystemUser');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('SystemUserPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

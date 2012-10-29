@@ -439,6 +439,12 @@ abstract class BaseWidgetLogPeer {
 		if(self::$s_criteria_filter == null)
 			WidgetLogPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('WidgetLog');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('WidgetLogPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

@@ -411,6 +411,12 @@ abstract class BasecategoryEntryPeer {
 		if(self::$s_criteria_filter == null)
 			categoryEntryPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('categoryEntry');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('categoryEntryPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

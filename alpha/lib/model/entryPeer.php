@@ -402,7 +402,7 @@ class entryPeer extends BaseentryPeer
 	
 	public static function getDefaultCriteriaFilter()
 	{
-		return self::$s_criteria_filter->getFilter();
+		return entryPeer::getCriteriaFilter()->getFilter();
 	}
 	
 	public static function doCount(Criteria $criteria, $distinct = false, PropelPDO $con = null)

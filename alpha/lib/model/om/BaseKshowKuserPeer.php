@@ -395,6 +395,12 @@ abstract class BaseKshowKuserPeer {
 		if(self::$s_criteria_filter == null)
 			KshowKuserPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('KshowKuser');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('KshowKuserPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

@@ -479,6 +479,12 @@ abstract class BaseStorageProfilePeer {
 		if(self::$s_criteria_filter == null)
 			StorageProfilePeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('StorageProfile');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('StorageProfilePeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

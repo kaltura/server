@@ -427,6 +427,12 @@ abstract class BaseSchedulerWorkerPeer {
 		if(self::$s_criteria_filter == null)
 			SchedulerWorkerPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('SchedulerWorker');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('SchedulerWorkerPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

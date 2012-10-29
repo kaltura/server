@@ -419,6 +419,12 @@ abstract class BaseUserLoginDataPeer {
 		if(self::$s_criteria_filter == null)
 			UserLoginDataPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('UserLoginData');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('UserLoginDataPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

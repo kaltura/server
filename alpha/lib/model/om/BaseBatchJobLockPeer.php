@@ -463,6 +463,12 @@ abstract class BaseBatchJobLockPeer {
 		if(self::$s_criteria_filter == null)
 			BatchJobLockPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('BatchJobLock');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('BatchJobLockPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

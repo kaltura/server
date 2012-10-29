@@ -487,6 +487,12 @@ abstract class BasesyndicationFeedPeer {
 		if(self::$s_criteria_filter == null)
 			syndicationFeedPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('syndicationFeed');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('syndicationFeedPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

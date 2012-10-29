@@ -391,6 +391,12 @@ abstract class BaseDynamicEnumPeer {
 		if(self::$s_criteria_filter == null)
 			DynamicEnumPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('DynamicEnum');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('DynamicEnumPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

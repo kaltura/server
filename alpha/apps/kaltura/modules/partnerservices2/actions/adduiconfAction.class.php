@@ -40,7 +40,7 @@ class adduiconfAction extends defPartnerservices2Action
 	
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
-		$this->applyPartnerFilterForClass ( new uiConfPeer() , $partner_id );
+		$this->applyPartnerFilterForClass('uiConf', $partner_id );
 		
 		$detailed = $this->getDetailed() ; //$this->getP ( "detailed" , false );
 		$level = ( $detailed ? objectWrapperBase::DETAIL_LEVEL_DETAILED : objectWrapperBase::DETAIL_LEVEL_REGULAR );

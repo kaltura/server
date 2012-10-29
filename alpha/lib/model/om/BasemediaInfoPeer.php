@@ -515,6 +515,12 @@ abstract class BasemediaInfoPeer {
 		if(self::$s_criteria_filter == null)
 			mediaInfoPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('mediaInfo');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('mediaInfoPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

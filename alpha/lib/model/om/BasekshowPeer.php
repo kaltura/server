@@ -579,6 +579,12 @@ abstract class BasekshowPeer {
 		if(self::$s_criteria_filter == null)
 			kshowPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('kshow');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('kshowPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

@@ -431,6 +431,12 @@ abstract class BasePartnerActivityPeer {
 		if(self::$s_criteria_filter == null)
 			PartnerActivityPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('PartnerActivity');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('PartnerActivityPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

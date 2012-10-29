@@ -411,6 +411,12 @@ abstract class BaseReportPeer {
 		if(self::$s_criteria_filter == null)
 			ReportPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('Report');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('ReportPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

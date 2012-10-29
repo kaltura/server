@@ -35,7 +35,7 @@ class listconversionprofilesAction extends defPartnerservices2Action
 	// because it is used only for the KMC - it is tailed and does not act like a regular "list" service
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
-//		$this->applyPartnerFilterForClass( new ConversionProfilePeer() , $partner_id );
+//		$this->applyPartnerFilterForClass('ConversionProfile', $partner_id );
 		// TODO -  verify permissions for viewing lists 
 
 		$detailed = $this->getP ( "detailed" , false );

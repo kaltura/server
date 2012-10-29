@@ -463,6 +463,12 @@ abstract class BaseuiConfPeer {
 		if(self::$s_criteria_filter == null)
 			uiConfPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('uiConf');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('uiConfPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

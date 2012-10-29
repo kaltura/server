@@ -447,6 +447,12 @@ abstract class BaseaccessControlPeer {
 		if(self::$s_criteria_filter == null)
 			accessControlPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('accessControl');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('accessControlPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

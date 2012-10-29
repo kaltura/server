@@ -40,7 +40,7 @@ class listuiconfsAction extends defPartnerservices2Action
 
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
-		$this->applyPartnerFilterForClass( new uiConfPeer() , $partner_id );
+		$this->applyPartnerFilterForClass('uiConf', $partner_id );
 		
 		$detailed = $this->getP ( "detailed" , false );
 		$detailed_fields = $this->getP ( "detailed_fields" );

@@ -32,7 +32,7 @@ class cloneuiconfAction extends defPartnerservices2Action
 	
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
-		$this->applyPartnerFilterForClass ( new uiConfPeer() , $partner_id );
+		$this->applyPartnerFilterForClass('uiConf', $partner_id );
 		
 		$ui_conf_id = $this->getPM ( "uiconf_id" );
 		$detailed = $this->getP ( "detailed" , false );

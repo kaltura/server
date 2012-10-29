@@ -419,6 +419,12 @@ abstract class BasemoderationFlagPeer {
 		if(self::$s_criteria_filter == null)
 			moderationFlagPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('moderationFlag');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('moderationFlagPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

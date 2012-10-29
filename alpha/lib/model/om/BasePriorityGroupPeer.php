@@ -411,6 +411,12 @@ abstract class BasePriorityGroupPeer {
 		if(self::$s_criteria_filter == null)
 			PriorityGroupPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('PriorityGroup');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('PriorityGroupPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

@@ -415,6 +415,12 @@ abstract class BasekvotePeer {
 		if(self::$s_criteria_filter == null)
 			kvotePeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('kvote');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('kvotePeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

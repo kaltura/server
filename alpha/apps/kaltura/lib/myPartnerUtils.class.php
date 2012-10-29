@@ -16,6 +16,7 @@ class myPartnerUtils
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
 
 	private static $s_filterred_peer_list = array();
+	private static $partnerCriteriaParams = array();
 	 
 	public static function getUrlForPartner ( $partner_id , $subp_id  )
 	{
@@ -115,12 +116,13 @@ class myPartnerUtils
 	// will reset all the filters used in the applyPartnerFilters
 	public static function resetAllFilters()
 	{
-		foreach ( self::$s_filterred_peer_list as $peer )
+		foreach ( self::$s_filterred_peer_list as $peerName )
 		{
-			$peer->setDefaultCriteriaFilter();
+			call_user_func(array($peerName, 'setDefaultCriteriaFilter'));
 		}
 		
 		self::$s_filterred_peer_list = array();
+		self::$partnerCriteriaParams = array();
 	}
 	
 	/**
@@ -138,45 +140,37 @@ class myPartnerUtils
 			$partner_id = self::$s_current_partner_id;
 		}
 
-//echo __METHOD__ . ":" . "[$partner_id] , [$private_partner_data] , [$partner_group] , [$kaltura_network]" ;		
-		// TODO - set !
-		// make sure to pass the $partner_group &  $kaltura_network to objects where they are appropriate
-/*
-		self::addPartnerToCriteria ( kuserPeer::getCriteriaFilter() , kuserPeer::PARTNER_ID ,  $partner_id );
-		self::addPartnerToCriteria ( entryPeer::getCriteriaFilter() , entryPeer::PARTNER_ID ,  $partner_id );
-		self::addPartnerToCriteria ( kshowPeer::getCriteriaFilter() , kshowPeer::PARTNER_ID ,  $partner_id );
-		self::addPartnerToCriteria ( moderationPeer::getCriteriaFilter() , moderationPeer::PARTNER_ID ,  $partner_id );
-		self::addPartnerToCriteria ( notificationPeer::getCriteriaFilter() , notificationPeer::PARTNER_ID ,  $partner_id );
-*/
-		
 		//Category peer should be added before entry - since we select from category on entry->setDefaultCriteria.
-		self::addPartnerToCriteria ( new kuserPeer() , $partner_id , $private_partner_data, $partner_group);
-		self::addPartnerToCriteria ( new categoryPeer() , $partner_id , $private_partner_data , $partner_group);
-		self::addPartnerToCriteria ( new entryPeer() , $partner_id , $private_partner_data, $partner_group , $kaltura_network );
-		self::addPartnerToCriteria ( new kshowPeer() , $partner_id , $private_partner_data, $partner_group , $kaltura_network );
-		self::addPartnerToCriteria ( new moderationPeer() , $partner_id , $private_partner_data , $partner_group);
-		//self::addPartnerToCriteria ( new notificationPeer() , $partner_id , $private_partner_data , $partner_group);
-		self::addPartnerToCriteria ( new categoryEntryPeer() , $partner_id , $private_partner_data , $partner_group);
-		self::addPartnerToCriteria ( new categoryKuserPeer() , $partner_id , $private_partner_data , $partner_group);
-		
-		// TODO - due to very bad performance every time there is such a call, make sure this code is called from the uiConf services
-//		self::addPartnerToCriteria ( new uiConfPeer() , $partner_id );
-
-		//		self::addPartnerToCriteria ( new widgetPeer(), $partner_id );
-//		self::addPartnerToCriteria ( new PuserKuserPeer() , $partner_id );
-//		self::addPartnerToCriteria ( new BatchJobPeer(), $partner_id );
+		self::addPartnerToCriteria ( 'kuser', $partner_id , $private_partner_data, $partner_group);
+		self::addPartnerToCriteria ( 'category' , $partner_id , $private_partner_data , $partner_group);
+		self::addPartnerToCriteria ( 'entry' , $partner_id , $private_partner_data, $partner_group , $kaltura_network );
+		self::addPartnerToCriteria ( 'kshow' , $partner_id , $private_partner_data, $partner_group , $kaltura_network );
+		self::addPartnerToCriteria ( 'moderation' , $partner_id , $private_partner_data , $partner_group);
+		self::addPartnerToCriteria ( 'categoryEntry' , $partner_id , $private_partner_data , $partner_group);
+		self::addPartnerToCriteria ( 'categoryKuser', $partner_id , $private_partner_data , $partner_group);
 	}
 
+	public static function getPartnerCriteriaParams($peerName)
+	{		
+		$peerName = strtolower($peerName);
+		if (!isset(self::$partnerCriteriaParams[$peerName]))
+			return null;
+			
+		$result = self::$partnerCriteriaParams[$peerName];
+		unset(self::$partnerCriteriaParams[$peerName]);
+		self::$s_filterred_peer_list[] = $peerName;
+		
+		return $result;
+	}
 	
 	// if only partner_id exists - force it on the criteria
 	// if also $partner_group - allow or partner_id or the partner_group - use in ( partner_id ,  $partner_group ) - where partner_group is split by ','
 	// if partner_group == "*" - don't filter at all
 	// if $kaltura_network - add 'or  display_in_search >= 2'
-	public static function addPartnerToCriteria ( $peer , $partner_id , $private_partner_data = false , $partner_group=null , $kaltura_network=null )
+	public static function addPartnerToCriteria ( $peerName, $partner_id, $private_partner_data = false , $partner_group=null , $kaltura_network=null )
 	{
-		self::$s_filterred_peer_list[] = $peer;
-		
-		$peer->addPartnerToCriteria($partner_id, $private_partner_data, $partner_group, $kaltura_network);
+		$peerName = strtolower($peerName);
+		self::$partnerCriteriaParams[$peerName] = array($partner_id, $private_partner_data, $partner_group, $kaltura_network);
 	}
 
 

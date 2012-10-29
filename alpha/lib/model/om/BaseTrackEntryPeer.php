@@ -451,6 +451,12 @@ abstract class BaseTrackEntryPeer {
 		if(self::$s_criteria_filter == null)
 			TrackEntryPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('TrackEntry');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('TrackEntryPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

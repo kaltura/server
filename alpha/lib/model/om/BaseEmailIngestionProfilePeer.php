@@ -423,6 +423,12 @@ abstract class BaseEmailIngestionProfilePeer {
 		if(self::$s_criteria_filter == null)
 			EmailIngestionProfilePeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('EmailIngestionProfile');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('EmailIngestionProfilePeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

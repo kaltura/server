@@ -142,7 +142,7 @@ class kXslPathManager extends kPathManager
 		// this is needed for related entries under kMetadataMrssManager which is using retrieveByPK without the correct partner id filter
 		$oldEntryCriteria = entryPeer::getCriteriaFilter()->getFilter();
 		entryPeer::setDefaultCriteriaFilter();
-		entryPeer::addPartnerToCriteria($entry->getPartnerId(), true);
+		myPartnerUtils::addPartnerToCriteria('entry', $entry->getPartnerId(), true);
 		
 		$mrss = null;
 		$mrss = kMrssManager::getEntryMrssXml($entry, $mrss);

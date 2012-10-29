@@ -399,6 +399,12 @@ abstract class BasePartnerLoadPeer {
 		if(self::$s_criteria_filter == null)
 			PartnerLoadPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('PartnerLoad');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('PartnerLoadPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

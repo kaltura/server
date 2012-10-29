@@ -447,6 +447,12 @@ abstract class BaseControlPanelCommandPeer {
 		if(self::$s_criteria_filter == null)
 			ControlPanelCommandPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('ControlPanelCommand');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('ControlPanelCommandPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

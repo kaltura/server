@@ -435,6 +435,12 @@ abstract class BaseUploadTokenPeer {
 		if(self::$s_criteria_filter == null)
 			UploadTokenPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('UploadToken');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('UploadTokenPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

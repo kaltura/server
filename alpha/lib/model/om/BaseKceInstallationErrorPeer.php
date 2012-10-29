@@ -415,6 +415,12 @@ abstract class BaseKceInstallationErrorPeer {
 		if(self::$s_criteria_filter == null)
 			KceInstallationErrorPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('KceInstallationError');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('KceInstallationErrorPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

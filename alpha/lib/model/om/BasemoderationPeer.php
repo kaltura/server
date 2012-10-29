@@ -427,6 +427,12 @@ abstract class BasemoderationPeer {
 		if(self::$s_criteria_filter == null)
 			moderationPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('moderation');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('moderationPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

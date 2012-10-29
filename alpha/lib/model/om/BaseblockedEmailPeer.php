@@ -379,6 +379,12 @@ abstract class BaseblockedEmailPeer {
 		if(self::$s_criteria_filter == null)
 			blockedEmailPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('blockedEmail');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('blockedEmailPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

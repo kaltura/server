@@ -451,6 +451,12 @@ abstract class BaseFileSyncPeer {
 		if(self::$s_criteria_filter == null)
 			FileSyncPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('FileSync');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('FileSyncPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

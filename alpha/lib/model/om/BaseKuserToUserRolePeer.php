@@ -395,6 +395,12 @@ abstract class BaseKuserToUserRolePeer {
 		if(self::$s_criteria_filter == null)
 			KuserToUserRolePeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('KuserToUserRole');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('KuserToUserRolePeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

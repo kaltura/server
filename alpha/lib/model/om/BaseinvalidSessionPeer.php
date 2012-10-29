@@ -395,6 +395,12 @@ abstract class BaseinvalidSessionPeer {
 		if(self::$s_criteria_filter == null)
 			invalidSessionPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('invalidSession');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('invalidSessionPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

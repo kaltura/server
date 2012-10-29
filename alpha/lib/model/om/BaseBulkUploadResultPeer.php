@@ -503,6 +503,12 @@ abstract class BaseBulkUploadResultPeer {
 		if(self::$s_criteria_filter == null)
 			BulkUploadResultPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('BulkUploadResult');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('BulkUploadResultPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

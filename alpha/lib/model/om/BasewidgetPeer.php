@@ -435,6 +435,12 @@ abstract class BasewidgetPeer {
 		if(self::$s_criteria_filter == null)
 			widgetPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('widget');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('widgetPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

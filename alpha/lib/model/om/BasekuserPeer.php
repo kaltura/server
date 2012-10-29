@@ -559,6 +559,12 @@ abstract class BasekuserPeer {
 		if(self::$s_criteria_filter == null)
 			kuserPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('kuser');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('kuserPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

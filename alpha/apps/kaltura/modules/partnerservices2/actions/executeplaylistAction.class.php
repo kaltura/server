@@ -135,7 +135,7 @@ class executeplaylistAction extends defPartnerservices2Action
 			if (!$playlist)
 				throw new APIException(APIErrors::INVALID_ENTRY_ID, "Playlist", $playlist_id) ;
 				 
-			myPartnerUtils::addPartnerToCriteria ( new accessControlPeer() , $playlist->getPartnerId() , $this->getPrivatePartnerData(), $this->partnerGroup2(), null);
+			myPartnerUtils::addPartnerToCriteria('accessControl', $playlist->getPartnerId() , $this->getPrivatePartnerData(), $this->partnerGroup2(), null);
 			
 			$this->playlist = $playlist;
 		}

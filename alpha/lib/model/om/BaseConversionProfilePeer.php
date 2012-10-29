@@ -435,6 +435,12 @@ abstract class BaseConversionProfilePeer {
 		if(self::$s_criteria_filter == null)
 			ConversionProfilePeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('ConversionProfile');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('ConversionProfilePeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

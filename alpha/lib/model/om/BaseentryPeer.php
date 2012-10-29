@@ -583,6 +583,12 @@ abstract class BaseentryPeer {
 		if(self::$s_criteria_filter == null)
 			entryPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('entry');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('entryPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 

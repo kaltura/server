@@ -467,6 +467,12 @@ abstract class BaseassetPeer {
 		if(self::$s_criteria_filter == null)
 			assetPeer::setDefaultCriteriaFilter();
 		
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('asset');
+		if ($partnerCriteria)
+		{
+			call_user_func_array(array('assetPeer','addPartnerToCriteria'), $partnerCriteria);
+		}
+		
 		return self::$s_criteria_filter;
 	}
 	 
