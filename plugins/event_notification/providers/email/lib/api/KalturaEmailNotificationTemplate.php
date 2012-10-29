@@ -55,7 +55,7 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	public $bcc;
 	
 	/**
-	 * Email addresses that a reading confirmation will be sent to
+	 * Default email addresses to whom the reply should be sent. 
 	 * 
 	 * @var KalturaEmailNotificationRecipientArray
 	 */
