@@ -21,16 +21,19 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	
 	/**
 	 * @var string
+	 * @requiresPermission update
 	 */
 	public $name;
 	
 	/**
 	 * @var string
+	 * @requiresPermission update
 	 */
 	public $systemName;
 	
 	/**
 	 * @var string
+	 * @requiresPermission update
 	 */
 	public $description;
 	
@@ -82,6 +85,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	 * Define the event that should trigger this notification
 	 * 
 	 * @var KalturaEventNotificationEventType
+	 * @requiresPermission update
 	 */
 	public $eventType;
 
@@ -89,12 +93,14 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	 * Define the object that raied the event that should trigger this notification
 	 * 
 	 * @var KalturaEventNotificationEventObjectType
+	 * @requiresPermission update
 	 */
 	public $eventObjectType;
 
 	/**
 	 * Define the conditions that cause this notification to be triggered
 	 * @var KalturaEventConditionArray
+	 * @requiresPermission update
 	 */
 	public $eventConditions;
 	

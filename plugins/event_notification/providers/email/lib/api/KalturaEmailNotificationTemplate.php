@@ -8,6 +8,7 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	/**
 	 * Define the email body format
 	 * @var KalturaEmailNotificationFormat
+	 * @requiresPermission update
 	 */
 	public $format;
 	
@@ -63,6 +64,7 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	/**
 	 * Define the email priority
 	 * @var KalturaEmailNotificationTemplatePriority
+	 * @requiresPermission update
 	 */
 	public $priority;
 	
@@ -78,6 +80,7 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	 * If empty, the value returned by SERVER_NAME is used or 'localhost.localdomain'.
 	 * 
 	 * @var string
+	 * @requiresPermission update
 	 */
 	public $hostname;
 	
@@ -86,6 +89,7 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	 * If empty, a unique id will be generated.
 	 * 
 	 * @var string
+	 * @requiresPermission update
 	 */
 	public $messageID;
 	
@@ -93,12 +97,14 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	 * Adds a e-mail custom header
 	 * 
 	 * @var KalturaKeyValueArray
+	 * @requiresPermission update
 	 */
 	public $customHeaders;
 	
 	/**
 	 * Define the content dynamic parameters
 	 * @var KalturaEmailNotificationParameterArray
+	 * @requiresPermission update
 	 */
 	public $contentParameters;
 	
