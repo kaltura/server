@@ -12,9 +12,9 @@ class UserRoleService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		myPartnerUtils::addPartnerToCriteria(new UserRolePeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-		myPartnerUtils::addPartnerToCriteria(new PermissionPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-		myPartnerUtils::addPartnerToCriteria(new PermissionItemPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		myPartnerUtils::addPartnerToCriteria('UserRole', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		myPartnerUtils::addPartnerToCriteria('Permission', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		myPartnerUtils::addPartnerToCriteria('PermissionItem', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 	}
 	
 	protected function globalPartnerAllowed($actionName)

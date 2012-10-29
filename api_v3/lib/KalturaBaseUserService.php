@@ -28,7 +28,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService ($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClass ( new kuserPeer() );
+		parent::applyPartnerFilterForClass('kuser');
 	}	
 	
 	/**

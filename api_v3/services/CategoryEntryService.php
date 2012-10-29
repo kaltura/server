@@ -10,8 +10,8 @@ class CategoryEntryService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClass(new categoryPeer());
-		parent::applyPartnerFilterForClass(new entryPeer());	
+		parent::applyPartnerFilterForClass('category');
+		parent::applyPartnerFilterForClass('entry');	
 	}
 	
 	/**

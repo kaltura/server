@@ -16,9 +16,9 @@ class FlavorParamsService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-		parent::applyPartnerFilterForClass(new assetPeer());
-		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
+		parent::applyPartnerFilterForClass('conversionProfile2');
+		parent::applyPartnerFilterForClass('asset');
+		parent::applyPartnerFilterForClass('assetParamsOutput');
 		
 		$partnerGroup = null;
 		if(
@@ -27,7 +27,7 @@ class FlavorParamsService extends KalturaBaseService
 			)
 			$partnerGroup = $this->partnerGroup . ',0';
 			
-		parent::applyPartnerFilterForClass(new assetParamsPeer(), $partnerGroup);
+		parent::applyPartnerFilterForClass('assetParams', $partnerGroup);
 	}
 	
 	protected function globalPartnerAllowed($actionName)

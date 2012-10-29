@@ -12,7 +12,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClass ( new categoryPeer() );
+		parent::applyPartnerFilterForClass('category');
 	}
 
 	/**

@@ -12,11 +12,11 @@ class SyndicationFeedService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClass(new assetPeer());
-		parent::applyPartnerFilterForClass(new assetParamsPeer());
-		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
-		parent::applyPartnerFilterForClass(new entryPeer());
-		parent::applyPartnerFilterForClass(new syndicationFeedPeer());
+		parent::applyPartnerFilterForClass('asset');
+		parent::applyPartnerFilterForClass('assetParams');
+		parent::applyPartnerFilterForClass('assetParamsOutput');
+		parent::applyPartnerFilterForClass('entry');
+		parent::applyPartnerFilterForClass('syndicationFeed');
 	}
 	
 	protected function partnerGroup()

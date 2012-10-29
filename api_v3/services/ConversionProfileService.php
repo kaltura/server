@@ -12,9 +12,9 @@ class ConversionProfileService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClass(new assetPeer());
-		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
-		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
+		parent::applyPartnerFilterForClass('asset');
+		parent::applyPartnerFilterForClass('assetParamsOutput');
+		parent::applyPartnerFilterForClass('conversionProfile2');
 		
 		$partnerGroup = null;
 		if(
@@ -26,7 +26,7 @@ class ConversionProfileService extends KalturaBaseService
 			assetParamsPeer::setIsDefaultInDefaultCriteria(false);
 		}
 			
-		parent::applyPartnerFilterForClass(new assetParamsPeer(), $partnerGroup);
+		parent::applyPartnerFilterForClass('assetParams', $partnerGroup);
 	}
 	
 	/**

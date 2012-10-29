@@ -12,12 +12,12 @@ abstract class KalturaAssetService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
+		parent::applyPartnerFilterForClass('conversionProfile2');
+		parent::applyPartnerFilterForClass('assetParamsOutput');
 		$fullActionName = "$serviceName.$actionName";
 		if (!in_array($fullActionName, array('flavorAsset.getByEntryId', 'flavorAsset.getWebPlayableByEntryId', 'flavorAsset.list')))
-			parent::applyPartnerFilterForClass(new assetPeer());
-		parent::applyPartnerFilterForClass(new assetParamsPeer());
+			parent::applyPartnerFilterForClass('asset');
+		parent::applyPartnerFilterForClass('assetParams');
 	}
 	
 	/**

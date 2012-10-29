@@ -15,7 +15,7 @@ class ReportService extends KalturaBaseService
 		{
 			$partnerGroup = $this->partnerGroup . ',0';
 			
-			parent::applyPartnerFilterForClass(new ReportPeer(), $partnerGroup);
+			parent::applyPartnerFilterForClass('Report', $partnerGroup);
 		}
 	}
 		

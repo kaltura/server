@@ -119,8 +119,8 @@ class KalturaSyndicationFeedRenderer
 		
 		
 		// add partner to default criteria
-		categoryPeer::addPartnerToCriteria($this->syndicationFeed->partnerId, true);
-		assetPeer::addPartnerToCriteria($this->syndicationFeed->partnerId, true);
+		myPartnerUtils::addPartnerToCriteria('category', $this->syndicationFeed->partnerId, true);
+		myPartnerUtils::addPartnerToCriteria('asset', $this->syndicationFeed->partnerId, true);
 		
 		entryPeer::setDefaultCriteriaFilter();	
 
