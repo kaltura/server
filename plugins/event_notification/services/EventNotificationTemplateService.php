@@ -15,7 +15,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		if (!EventNotificationPlugin::isAllowedPartner($partnerId))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, "{$this->serviceName}->{$this->actionName}");
 			
-		if($partnerId != Partner::ADMIN_CONSOLE_PARTNER_ID && $partnerId != Partner::BATCH_PARTNER_ID)
+		//if($partnerId != Partner::ADMIN_CONSOLE_PARTNER_ID && $partnerId != Partner::BATCH_PARTNER_ID)
 			myPartnerUtils::addPartnerToCriteria('EventNotificationTemplate', $partnerId, $this->private_partner_data, $this->partnerGroup());
 	}
 		
@@ -55,7 +55,11 @@ class EventNotificationTemplateService extends KalturaBaseService
 		$dbEventNotificationTemplate = EventNotificationTemplatePeer::retrieveByPK($id);
 		if (!$dbEventNotificationTemplate)
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND, $id);
-			
+        //check that the event notification has not been cloned before
+        $systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($dbEventNotificationTemplate->getSystemName(), $this->getPartnerId());
+		if (count($systemNameTemplates) > 0)
+            throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME, $dbEventNotificationTemplate->getSystemName());		    
+		
 		// copy into new db object
 		$newDbEventNotificationTemplate = $dbEventNotificationTemplate->copy();
 		
