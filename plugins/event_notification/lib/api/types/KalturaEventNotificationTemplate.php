@@ -160,6 +160,9 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	{
 		if(is_null($dbObject))
 			throw new kCoreException("Event notification template type [" . $this->type . "] not found", kCoreException::OBJECT_TYPE_NOT_FOUND, $this->type);
+        $systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($this->systemName, $this->partnerId, $this->id ? $this->id : null);
+        if (count($systemNameTemplates))
+            throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME, $this->systemName);
 			
 		return parent::toObject($dbObject, $propertiesToSkip);
 	}
