@@ -42,7 +42,7 @@ class localMgr extends kFileTransferMgr
 
 
 	// upload a file to the server (ftp_mode is irrelevant
-	protected function doPutFile ($remote_file,  $local_file, $ftp_mode, $http_field_name = null, $http_file_name = null)
+	protected function doPutFile ($remote_file,  $local_file, $ftp_mode, $http_field_name = null, $http_file_name = null, $filesPermissionPublicInS3)
 	{
 		return @copy($remote_file, $local_file);
 	}

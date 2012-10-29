@@ -130,7 +130,7 @@ abstract class kFileTransferMgr
 	 *
 	 * @return true / false according to success
 	 */
-	abstract protected function doPutFile($remote_file, $local_file, $ftp_mode, $http_field_name = null, $http_file_name = null);
+	abstract protected function doPutFile($remote_file, $local_file, $ftp_mode, $http_field_name = null, $http_file_name = null, $filesPermissionPublicInS3);
 
 	/**
 	 * Should download the fiven 'remote_file' from the server as 'local_file'
@@ -363,7 +363,7 @@ abstract class kFileTransferMgr
 	 *
 	 * @return FILETRANSFERMGR_RES_OK / FILETRANSFERMGR_RES_ERR
 	 */
-	public function putFile ($remote_file, $local_file, $overwrite = false, $ftp_mode = FTP_BINARY, $http_field_name = null, $http_file_name = null, $overwrite_if_different = true)
+	public function putFile ($remote_file, $local_file, $overwrite = false, $ftp_mode = FTP_BINARY, $http_field_name = null, $http_file_name = null, $overwrite_if_different = true, $filesPermissionPublicInS3)
 	{
 		KalturaLog::debug("Puts file [$remote_file] from local [$local_file] overwrite [$overwrite]");
 		
@@ -410,7 +410,7 @@ abstract class kFileTransferMgr
 		}
 
 		// try to upload file
-		$res = @($this->doPutFile($remote_file, $local_file, $ftp_mode, $http_field_name, $http_file_name));
+		$res = @($this->doPutFile($remote_file, $local_file, $ftp_mode, $http_field_name, $http_file_name, $filesPermissionPublicInS3));
 
 		$this->results = $res;
 		

@@ -124,7 +124,7 @@ var dialogDiv;
 function newStorage(partnerId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'configure-storage')); ?>' + '/new_partner_id/' + partnerId;
 	
-	jQuery('#partner-configure-dialog').remove();
+	jQuery('#storage-configure-dialog').remove();
 	dialogDiv = jQuery('<div id="storage-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 	
 	dialogDiv.dialog({
@@ -171,7 +171,7 @@ function newStorageSuccess(html) {
 function configure(storageId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'configure-storage', 'storageId' => '')); ?>' + storageId;
 	
-	jQuery('#partner-configure-dialog').remove();
+	jQuery('#storage-configure-dialog').remove();
 	dialogDiv = jQuery('<div id="storage-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 	
 	dialogDiv.dialog({

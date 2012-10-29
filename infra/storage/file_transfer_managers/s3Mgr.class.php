@@ -63,11 +63,17 @@ class s3Mgr extends kFileTransferMgr
 
 
 	// upload a file to the server (ftp_mode is irrelevant
-	protected function doPutFile ($remote_file , $local_file , $ftp_mode, $http_field_name = null, $http_file_name = null)
+	protected function doPutFile ($remote_file , $local_file , $ftp_mode, $http_field_name = null, $http_file_name = null, $filesPermissionPublicInS3)
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		KalturaLog::debug("remote_file: ".$remote_file);
-		$res = $this->s3->putObjectFile($local_file, $bucket, $remote_file);
+		
+		if ($filesPermissionPublicInS3){
+			$res = $this->s3->putObjectFile($local_file, $bucket, $remote_file, S3::ACL_PUBLIC_READ);
+		}
+		else{
+			$res = $this->s3->putObjectFile($local_file, $bucket, $remote_file);
+		}
 
 		if ($res)
 		{

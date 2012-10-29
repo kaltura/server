@@ -37,6 +37,11 @@ class StorageProfileService extends KalturaBaseService
 		$dbStorageProfile->setPartnerId($this->impersonatedPartnerId);
 		$dbStorageProfile->save();
 		
+		if ($storageProfile->protocol == StorageProfile::STORAGE_PROTOCOL_S3)
+		{
+			$storageProfile = new KalturaAmazonS3StorageProfile();
+		}
+				
 		$storageProfile->fromObject($dbStorageProfile);
 		return $storageProfile;
 	}
@@ -68,8 +73,15 @@ class StorageProfileService extends KalturaBaseService
 		$dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
 		if (!$dbStorageProfile)
 			return null;
-			
-		$storageProfile = new KalturaStorageProfile();
+
+		$protocol = $dbStorageProfile->getProtocol();
+		if ($protocol == StorageProfile::STORAGE_PROTOCOL_S3){
+			$storageProfile = new KalturaAmazonS3StorageProfile();
+		}
+		else{
+			$storageProfile = new KalturaStorageProfile();
+		}
+		
 		$storageProfile->fromObject($dbStorageProfile);
 		return $storageProfile;
 	}
@@ -90,6 +102,11 @@ class StorageProfileService extends KalturaBaseService
 			
 		$dbStorageProfile = $storageProfile->toUpdatableObject($dbStorageProfile);
 		$dbStorageProfile->save();
+		
+		$protocol = $dbStorageProfile->getProtocol();
+		if ($protocol == StorageProfile::STORAGE_PROTOCOL_S3){
+			$storageProfile = new KalturaAmazonS3StorageProfile();
+		}
 		
 		$storageProfile->fromObject($dbStorageProfile);
 		return $storageProfile;

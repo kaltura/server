@@ -11,11 +11,15 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
 	 */   	
     public $force;
 	
-    
+     /**
+	 * @var bool
+	 */   	
+    public $filesPermissionPublicInS3;   
     
 	private static $map_between_objects = array
 	(
-	    "force" ,
+	    "force",
+		"filesPermissionPublicInS3",
 	);
 
 	public function getMapBetweenObjects ( )

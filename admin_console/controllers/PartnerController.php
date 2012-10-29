@@ -256,6 +256,11 @@ class PartnerController extends Zend_Controller_Action
 				$flavorParamsIds = explode(',', $storage->flavorParamsIds);
 			
 			$form->getElement('partnerId')->setAttrib('readonly',true);
+
+			//to avoid changing an inherit class to its father 
+			if ($storage->protocol == Kaltura_Client_Enum_StorageProfileProtocol::S3){
+				$form->getElement('protocol')->setAttrib('disabled',true);
+			}
 			
 			$form->addFlavorParamsFields($flavorParamsResponse, $flavorParamsIds);
 			
@@ -272,9 +277,22 @@ class PartnerController extends Zend_Controller_Action
 			if ($form->isValid($formData))
 			{
 				$this->view->formValid = true;
-				KalturaLog::log('Request: ' . print_r($request->getPost(), true));
-				$form->populate($request->getPost());
-				$storage = $form->getObject("Kaltura_Client_Type_StorageProfile", $request->getPost(), false, true);
+				$form->populate($formData);
+				
+				if (key_exists("protocol", $formData) && $formData["protocol"]){ //new storage
+					$protocol = $formData["protocol"];
+				}
+				
+				else if ($storage && $storage->protocol){ // edit mode
+					$protocol = $storage->protocol;
+				}		
+				
+				if( $protocol == Kaltura_Client_Enum_StorageProfileProtocol::S3){
+					$storage2 = $form->getObject("Kaltura_Client_Type_AmazonS3StorageProfile", $formData, false, true);
+				}	
+				else{			
+					$storage2 = $form->getObject("Kaltura_Client_Type_StorageProfile", $formData, false, true);
+				}
 				
 				$flavorParams = array();
 				foreach($flavorParamsResponse->objects as $flavorParamsItem)
@@ -282,22 +300,22 @@ class PartnerController extends Zend_Controller_Action
 						$flavorParams[] = $flavorParamsItem->id;
 				
 				if(count($flavorParams))
-					$storage->flavorParamsIds = implode(',', $flavorParams);
+					$storage2->flavorParamsIds = implode(',', $flavorParams);
 				else		
-					$storage->flavorParamsIds = '';
+					$storage2->flavorParamsIds = '';
 
-				KalturaLog::log('Storage: ' . print_r($storage, true));
+				KalturaLog::log('Storage: ' . print_r(2, true));
 				
-				Infra_ClientHelper::impersonate($storage->partnerId);
-				$storage->partnerId = null;
+				Infra_ClientHelper::impersonate($storage2->partnerId);
+				$storage2->partnerId = null;
 				
 				if (!$editMode)
 				{
-					$client->storageProfile->add($storage);
+					$client->storageProfile->add($storage2);
 				}
 				else
 				{
-					$client->storageProfile->update($storageId, $storage);
+					$client->storageProfile->update($storageId, $storage2);
 				}
 			}
 			else

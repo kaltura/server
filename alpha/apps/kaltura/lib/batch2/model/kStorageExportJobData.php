@@ -8,7 +8,12 @@ class kStorageExportJobData extends kStorageJobData
 	/**
 	 * @var bool
 	 */   	
-    private $force;
+    private $force; 
+        
+    /**
+	 * @var bool
+	 */   	
+    private $filesPermissionPublicInS3;
 	
 	/**
 	 * @return the $force
@@ -25,5 +30,21 @@ class kStorageExportJobData extends kStorageJobData
 	{
 		$this->force = $force;
 	}
-
+	
+	/**
+	 * @return the $filesPermissionPublicInS3
+	 */
+	public function getfilesPermissionPublicInS3()
+	{
+		return $this->filesPermissionPublicInS3;
+	}
+	
+	/**
+	 * @param $filesPermissionPublicInS3 the $filesPermissionPublicInS3 to set
+	 */
+	public function setFilesPermissionPublicInS3 ($filesPermissionPublicInS3)
+	{
+		$this->filesPermissionPublicInS3 = $filesPermissionPublicInS3;	
+	}
+	
 }
