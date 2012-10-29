@@ -17,22 +17,44 @@ class DbManager
 	/**
 	 * @var array
 	 */
+	protected static $kalturaConfig = array();
+	
+	/**
+	 * @var array
+	 */
 	protected static $sphinxConnection = null;
 	
 	public static function setConfig(array $config)
 	{
-		foreach ($config['datasources'] as $connectionName => $connectionConfig) 
+		$reflect = new ReflectionClass('KalturaPDO');
+		$optionAttributes = $reflect->getConstants();
+		
+		foreach ($config['datasources'] as $connectionName => & $connectionConfig) 
 		{
 			if(!is_array($connectionConfig) || !isset($connectionConfig['connection']))
 				continue;
 				
-			if(!isset($config['datasources'][$connectionName]['connection']['options']))
-				$config['datasources'][$connectionName]['connection']['options'] = array();
-				
-			$config['datasources'][$connectionName]['connection']['options']['KalturaPDO::KALTURA_ATTR_NAME'] = array('value' => $connectionName);
+			if(!isset($connectionConfig['connection']['options']))
+				$connectionConfig['connection']['options'] = array();
+			$connectionOptions = & $connectionConfig['connection']['options'];
+			$connectionOptions['KalturaPDO::KALTURA_ATTR_NAME'] = array('value' => $connectionName);
+		
+			if(isset($connectionOptions['kaltura']))
+			{
+				self::$kalturaConfig[$connectionName] = $connectionOptions['kaltura'];
+				unset($connectionOptions['kaltura']);
+			}
 		}
 		
 		self::$config = $config;
+	}
+	
+	public static function getKalturaConfig($connectionName)
+	{
+		if(isset(self::$kalturaConfig[$connectionName]))
+			return self::$kalturaConfig[$connectionName];
+			
+		return array();
 	}
 	
 	public static function getConfig($config)
@@ -187,8 +209,7 @@ class DbManager
 				throw new Exception("DB Config [$key] not found");
 
 			$dataSource = self::$config['datasources'][$key]['connection']['dsn'];
-			self::$sphinxConnection = new KalturaPDO($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout, KalturaPDO::KALTURA_ATTR_NAME => $key));
-					
+			self::$sphinxConnection = new KalturaPDO($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout, KalturaPDO::KALTURA_ATTR_NAME => $key));					
 			self::$sphinxConnection->setCommentsEnabled(false);
 			
 			KalturaLog::debug("getSphinxConnection: connected to $key");

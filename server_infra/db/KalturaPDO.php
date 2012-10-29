@@ -7,25 +7,30 @@
 class KalturaPDO extends PropelPDO
 {
 	/**
-	 * Attribute to use to set logged info for Kaltura logger
+	 * Use to set logged info for Kaltura logger
 	 */
 	const KALTURA_ATTR_NAME = -1001;
 	
-	protected static $comment = null;
+	/**
+	 * Use to disable transaction
+	 */
+	const KALTURA_ATTR_NO_TRANSACTION = 'noTransaction';
 	
+	protected static $comment = null;
+	protected $kalturaOptions = array();
 	protected $connectionName = null;
 	protected $hostName = null;
-	
 	protected $enableComments = true;
-	
+
 	/* (non-PHPdoc)
 	 * @see PDO::__construct()
 	 */
 	public function __construct($dsn, $username = null, $password = null, $driver_options = array())
-	{	
-		if(isset($driver_options[self::KALTURA_ATTR_NAME]))
+	{
+		if(isset($driver_options[KalturaPDO::KALTURA_ATTR_NAME]))
 		{
-			$this->connectionName = $driver_options[self::KALTURA_ATTR_NAME];
+			$this->connectionName = $driver_options[KalturaPDO::KALTURA_ATTR_NAME];
+			$this->kalturaOptions = DbManager::getKalturaConfig($this->connectionName);
 		}
 		
 		list($mysql, $connection) = explode(':', $dsn);
@@ -152,5 +157,22 @@ class KalturaPDO extends PropelPDO
 		KalturaLog::debug("Sql took - " . (microtime(true) - $sqlStart) . " seconds");
 		
 		return $result;
+	}
+	
+	public function getKalturaOption($option)
+	{
+		if(isset($this->kalturaOptions[$option]))
+			return $this->kalturaOptions[$option];
+			
+		return null;
+	}
+	
+	public function beginTransaction()
+	{
+		if($this->getKalturaOption(KalturaPDO::KALTURA_ATTR_NO_TRANSACTION))
+		{
+			KalturaLog::debug("Transactions disabled");
+			return false;
+		}
 	}
 }
