@@ -42,17 +42,13 @@ class requestUtils extends infraRequestUtils
 
 	public static function getHost ( )
 	{
-		$url = 'http';
-		$url .= isset ( $_SERVER['HTTPS'] ) ? ( @$_SERVER['HTTPS']=='on' ? 's' : '' ) : "";
-		$url .= '://' ;
-		// $url .= .$_SERVER['SERVER_PORT'];
-
-		$host =  @$_SERVER['HTTP_HOST'];
-		if ( ! $host )
-			$host = @$_SERVER['argv'][1];
-		$url .= $host;
+		$protocol = 'http';
+		if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+			$protocol .= 's';
+			
+		$host =  kConf::get("www_host");
 		
-		return $url;
+		return "$protocol://$host";
 	}
 	
 	public static function getCdnHost ($protocol = 'http')
