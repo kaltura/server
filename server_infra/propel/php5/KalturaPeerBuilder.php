@@ -416,6 +416,12 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 		if(self::\$s_criteria_filter == null)
 			".$this->getPeerClassname()."::setDefaultCriteriaFilter();
 		
+		\$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('".$this->getObjectClassname()."');
+		if (\$partnerCriteria)
+		{
+			call_user_func_array(array('".$this->getPeerClassname()."','addPartnerToCriteria'), \$partnerCriteria);
+		}
+		
 		return self::\$s_criteria_filter;
 	}
 	 
