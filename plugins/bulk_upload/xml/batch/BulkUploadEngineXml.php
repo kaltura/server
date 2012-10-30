@@ -1112,8 +1112,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		    $filter = new KalturaCategoryEntryFilter();		
 		    $filter->entryIdEqual = $entryId;
 		    $categoryEntryListResp = $this->kClient->categoryEntry->listAction($filter)->objects;
-			foreach($categoryEntryListResp as $t_ce) {
-				$categoryIdsExisting[] = $t_ce->categoryId;
+			foreach($categoryEntryListResp as $tempCategoryEntry) {
+				$categoryIdsExisting[] = $tempCategoryEntry->categoryId;
 			}
 		}
 		$categoryIdsToWork = array();					//create an array of all the REQUESTED categoryIds and create new ones if necessary
@@ -1121,20 +1121,21 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$filter->fullNameIn = $categories;
 		$categoryListRes = $this->kClient->category->listAction($filter)->objects;
 		$existingCategoryNames = array();
-		$this->kClient->startMultiRequest();
-		foreach($categoryListRes as $cat) {
-			$existingCategoryNames[] = $cat->fullName;
-			$categoryIdsToWork[] = $cat->id;
+		foreach($categoryListRes as $category) {
+			$existingCategoryNames[] = $category->fullName;
+			$categoryIdsToWork[] = $category->id;
 		}
-		foreach(explode(',',$categories) as $categoryName) {
+		$categoryNamesArr = explode(',',$categories);
+		$this->kClient->startMultiRequest();
+		foreach($categoryNamesArr as $categoryName) {
 			if(!in_array($categoryName,$existingCategoryNames)) {	//Category does not exis
 				$cat = $this->createCategoryByPath($categoryName);
 				KalturaLog::debug("Creating a new category by the Name [$categoryName]");
 			}
 		}
 		$newCategoriesAdd = $this->kClient->doMultiRequest();
-		foreach ($newCategoriesAdd as $newCat) {
-			$categoryIdsToWork[] = $newCat->id;		//Adding the newly created category IDs to the ToWork list
+		foreach ($newCategoriesAdd as $newCategory) {
+			$categoryIdsToWork[] = $newCategory->id;		//Adding the newly created category IDs to the ToWork list
 		}
 		
 		$this->kClient->startMultiRequest();
