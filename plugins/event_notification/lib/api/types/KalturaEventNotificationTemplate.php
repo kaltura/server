@@ -138,6 +138,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	{
 		$this->validatePropertyMinLength('name', 3, false);
 		$this->validatePropertyMinLength('systemName', 3, true);
+		$this->validateSystemNameUniqueness();
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -149,6 +150,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	{
 		$this->validatePropertyMinLength('name', 3, false);
 		$this->validatePropertyMinLength('systemName', 3, true);
+		$this->validateSystemNameUniqueness();
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
@@ -160,10 +162,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	{
 		if(is_null($dbObject))
 			throw new kCoreException("Event notification template type [" . $this->type . "] not found", kCoreException::OBJECT_TYPE_NOT_FOUND, $this->type);
-        $systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($this->systemName, $this->partnerId, $this->id ? $this->id : null);
-        if (count($systemNameTemplates))
-            throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME, $this->systemName);
-			
+        	
 		return parent::toObject($dbObject, $propertiesToSkip);
 	}
 	
@@ -190,5 +189,12 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	public static function getInstanceByType($type)
 	{
 		return KalturaPluginManager::loadObject('KalturaEventNotificationTemplate', $type);
+	}
+	
+	protected function validateSystemNameUniqueness ()
+	{
+		$systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($this->systemName, kCurrentContext::$partner_id, $this->id ? $this->id : null);
+        if (count($systemNameTemplates))
+            throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME, $this->systemName);
 	}
 }
