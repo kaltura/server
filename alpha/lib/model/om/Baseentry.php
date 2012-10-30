@@ -2595,7 +2595,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 * @param      string $v new value
 	 * @return     entry The current object (for fluent API support)
 	 */
-	protected function setFlavorParamsIds($v)
+	public function setFlavorParamsIds($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::FLAVOR_PARAMS_IDS]))
 			$this->oldColumnsValues[entryPeer::FLAVOR_PARAMS_IDS] = $this->flavor_params_ids;
