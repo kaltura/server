@@ -1102,53 +1102,64 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		return $updatedEntry;
 	}
 	
-	private function createCategoryAssociations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult, $replaceExisting = false)
+	private function createCategoryAssociations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult, $update = false)
 	{
 	    $this->impersonate();
 
-	    $filter = new KalturaCategoryEntryFilter();		//Create an array of all the EXISTING categoryIDs
-	    $filter->entryIdEqual = $entryId;
-		$categoryIds_existing = array();
-		foreach($this->kClient->categoryEntry->listAction($filter)->objects as $t_ce) {
-			$categoryIds_existing[] = $t_ce->categoryId;
-		}
-		$filter = new KalturaCategoryFilter();			//Create an array of all the REQUESTED categoryIDs
-		$categoryIds_toWork = array();	
-		foreach(explode(',',$categories) as $categoryName) {
-			$filter->fullNameEqual = $categoryName;
-			$categoryListRes = $this->kClient->category->listAction($filter);
-			if (!$categoryListRes->objects) {			//Category does not exist
-				$t_c = $this->createCategoryByPath($categoryName);
-				KalturaLog::debug("Created new category Name [".$t_c->fullName."] ID [".$t_c->id."]");
-			}
-			else {
-				$t_c = $categoryListRes->objects[0];
-			}
-			$categoryIds_toWork[] = $t_c->id;
-		}		
-				
-		$this->kClient->startMultiRequest();
-		if ($replaceExisting) {							//Remove existing categories and associations
+		$categoryIdsExisting = array();					//Create an array of all the EXISTING categoryIDs for this entry
+		if ($update) {
 			KalturaLog::debug("replaceExisting mode - ON");
-			foreach(array_diff($categoryIds_existing,$categoryIds_toWork) as $categoryIdToRemove) {		
+		    $filter = new KalturaCategoryEntryFilter();		
+		    $filter->entryIdEqual = $entryId;
+		    $categoryEntryListResp = $this->kClient->categoryEntry->listAction($filter)->objects;
+			foreach($categoryEntryListResp as $t_ce) {
+				$categoryIdsExisting[] = $t_ce->categoryId;
+			}
+		}
+		$categoryIdsToWork = array();					//create an array of all the REQUESTED categoryIds and create new ones if necessary
+		$filter = new KalturaCategoryFilter();
+		$filter->fullNameIn = $categories;
+		$categoryListRes = $this->kClient->category->listAction($filter)->objects;
+		$existingCategoryNames = array();
+		$this->kClient->startMultiRequest();
+		foreach($categoryListRes as $cat) {
+			$existingCategoryNames[] = $cat->fullName;
+			$categoryIdsToWork[] = $cat->id;
+		}
+		foreach(explode(',',$categories) as $categoryName) {
+			if(!in_array($categoryName,$existingCategoryNames)) {	//Category does not exis
+				$cat = $this->createCategoryByPath($categoryName);
+				KalturaLog::debug("Creating a new category by the Name [$categoryName]");
+			}
+		}
+		$newCategoriesAdd = $this->kClient->doMultiRequest();
+		foreach ($newCategoriesAdd as $newCat) {
+			$categoryIdsToWork[] = $newCat->id;		//Adding the newly created category IDs to the ToWork list
+		}
+		
+		$this->kClient->startMultiRequest();
+		if ($update) {									//Remove existing categories and associations
+			$categoryIdsToRemove = array_diff($categoryIdsExisting,$categoryIdsToWork);
+			foreach($categoryIdsToRemove as $categoryIdToRemove) {		
 				KalturaLog::debug("Removing category ID [$categoryIdToRemove] from entry [$entryId]");
 				$this->kClient->categoryEntry->delete($entryId,$categoryIdToRemove);
 			}
 		}												//Add new categories and associations
-		foreach(array_diff($categoryIds_toWork,$categoryIds_existing) as $categoryIdToAdd) {
+		$categoryIdsToAdd = array_diff($categoryIdsToWork,$categoryIdsExisting);	
+		foreach($categoryIdsToAdd as $categoryIdToAdd) {
 			$categoryEntryToAdd = new KalturaCategoryEntry();
 			$categoryEntryToAdd->categoryId = $categoryIdToAdd;
 			$categoryEntryToAdd->entryId = $entryId;
 			KalturaLog::debug("Adding category ID [$categoryIdToAdd] to entry [$entryId]");
 			$this->kClient->categoryEntry->add($categoryEntryToAdd);
 		}
-	
 		try {
 			$this->kClient->doMultiRequest();
 		}
 		catch(KalturaException $ex) {
 			$bulkuploadResult->errorDescription .= $ex->getMessage();
 		}
+		
 	    $this->unimpersonate();
 	    return $bulkuploadResult;
 	}
