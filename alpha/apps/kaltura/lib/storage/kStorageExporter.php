@@ -68,7 +68,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		
 		if ($externalStorage->getProtocol() == StorageProfile::STORAGE_PROTOCOL_S3)
 		{
-			KalturaLog::DEBUG("### exporting with ". $externalStorage->getFilesPermissionPublicInS3(). " --->> good?");
 			$exporting = self::export($flavor->getentry(), $externalStorage, $key, !$flavor->getIsOriginal(), $externalStorage->getFilesPermissionPublicInS3());
 		}
 		else{
