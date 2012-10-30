@@ -33,6 +33,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "distribution_profile", 			'keys' => array(array("'distributionProfile:id='", '@OBJ@.id')),																		'plugin' => 'content_distribution'),
 	array('table' => "drop_folder", 					'keys' => array(array("'dropFolder:id='", '@OBJ@.id'), array("'dropFolder:dc='", '@OBJ@.dc')),											'plugin' => 'drop_folder'),
 	array('table' => "category_entry", 					'keys' => array(array("'categoryEntry:entryId='", '@OBJ@.entry_id'))),
+	array('table' => "permission_to_permission_item", 	'keys' => array(array("'permissionToPermissionItem:permissionId='", '@OBJ@.permission_id'))),
 	);
 
 $TRIGGER_TYPES = array('INSERT', 'UPDATE', 'DELETE');
