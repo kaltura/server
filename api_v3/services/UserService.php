@@ -29,7 +29,7 @@ class UserService extends KalturaBaseUserService
 	 */
 	function addAction(KalturaUser $user)
 	{				
-		if(!kString::isEmailString($user->id)) {
+		if(!preg_match(kuser::PUSER_ID_REGEXP, $user->id)) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 		} 
 		
@@ -130,7 +130,7 @@ class UserService extends KalturaBaseUserService
 				}
 			}
 			if (!is_null($user->id) && $user->id != $userId) {
-				if(!kString::isEmailString($user->id)) {
+				if(!preg_match(kuser::PUSER_ID_REGEXP, $user->id)) {
 					throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 				} 
 				
