@@ -100,13 +100,14 @@ class Permission extends BasePermission
 		if (is_null($this->permissionItemIds))
 		{
 			$c = new Criteria();
-			$c->addSelectColumn(PermissionToPermissionItemPeer::PERMISSION_ITEM_ID);
 			$c->addAnd(PermissionToPermissionItemPeer::PERMISSION_ID, $this->getId(), Criteria::EQUAL);
-			$stmt = PermissionToPermissionItemPeer::doSelectStmt($c);
-			$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
-			if (!$ids) {
+			$results = PermissionToPermissionItemPeer::doSelect($c);
+			if (!$results) {
 				return null;
 			}
+			$ids = array();
+			foreach ($results as $result)
+				$ids[] = $result->getPermissionItemId();
 			$this->permissionItemIds = $ids;
 		}		
 		return $this->permissionItemIds;

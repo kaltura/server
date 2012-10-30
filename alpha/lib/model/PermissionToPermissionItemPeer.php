@@ -16,4 +16,8 @@
 class PermissionToPermissionItemPeer extends BasePermissionToPermissionItemPeer
 {
 	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("permissionToPermissionItem:permissionId=%s", self::PERMISSION_ID));		
+	}
 } // PermissionToPermissionItemPeer

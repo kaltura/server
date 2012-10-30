@@ -15,4 +15,8 @@
  */
 class PermissionToPermissionItem extends BasePermissionToPermissionItem {
 
+	public function getCacheInvalidationKeys()
+	{
+		return array("permissionToPermissionItem:permissionId=".$this->getPermissionId());
+	}
 } // PermissionToPermissionItem
