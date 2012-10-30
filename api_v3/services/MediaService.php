@@ -769,9 +769,7 @@ class MediaService extends KalturaEntryService
 				
 				//preventing race conditions of temp entry being ready just as you approve the replacement
 				$dbReplacingEntry = entryPeer::retrieveByPK($dbEntry->getReplacingEntryId());
-				if (!$dbReplacingEntry)
-					break;
-				if ($dbReplacingEntry->getStatus() == entryStatus::READY)
+				if ($dbReplacingEntry && $dbReplacingEntry->getStatus() == entryStatus::READY)
 					kBusinessConvertDL::replaceEntry($dbEntry);
 				break;
 			
