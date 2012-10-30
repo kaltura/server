@@ -72,7 +72,7 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	public $bulkUploadObjectType;
 	
 	/**
-	 * Name of the bulk upload file
+	 * Friendly name of the file, used to be recognized later in the logs.
 	 * @var string
 	 */
 	public $fileName;
