@@ -23,7 +23,7 @@ class BulkUploadService extends KalturaBaseService
 	 * @param file $csvFileData bulk upload file
 	 * @param KalturaBulkUploadType $bulkUploadType
 	 * @param string $uploadedBy
-	 * @param string $fileName
+	 * @param string $fileName Friendly name of the file, used to be recognized later in the logs.
 	 * @return KalturaBulkUpload
 	 */
 	public function addAction($conversionProfileId, $csvFileData, $bulkUploadType = null, $uploadedBy = null, $fileName = null)
