@@ -159,7 +159,7 @@ kmc.functions = {
 		
 		var iframe_url = kmc.vars.base_url + '/apps/clipapp/' + kmc.vars.clipapp.version;
 			iframe_url += '/?kdpUiconf=' + kmc.vars.clipapp.kdp + '&kclipUiconf=' + kmc.vars.clipapp.kclip;
-			iframe_url += '&partnerId=' + kmc.vars.partner_id + '&mode=' + mode + '&config=kmc&entryId=' + entry_id;
+			iframe_url += '&partnerId=' + kmc.vars.partner_id + '&host=' + kmc.vars.host + '&mode=' + mode + '&config=kmc&entryId=' + entry_id;
 
 		var title = ( mode == 'trim' ) ? 'Trimming Tool' : 'Clipping Tool';
 
@@ -1207,10 +1207,7 @@ kmc.user = {
 		expiry = expiry.toGMTString();
 		document.cookie = "pid=; expires=" + expiry + "; path=/";
 		document.cookie = "subpid=; expires=" + expiry + "; path=/";
-		document.cookie = "uid=; expires=" + expiry + "; path=/";
 		document.cookie = "kmcks=; expires=" + expiry + "; path=/";
-		document.cookie = "screen_name=; expires=" + expiry + "; path=/";
-		document.cookie = "email=; expires=" + expiry + "; path=/";
 		var state = kmc.mediator.readUrlHash();
 		$.ajax({
 			url: kmc.vars.base_url + "/index.php/kmc/logout",
