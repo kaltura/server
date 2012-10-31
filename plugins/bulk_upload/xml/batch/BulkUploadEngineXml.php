@@ -1104,6 +1104,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	private function createCategoryAssociations ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult, $update = false)
 	{
+		if (!$categories && !$update) {	//Nothing to add + nothing to remove = nothing to do
+			return $bulkuploadResult;
+		}
+			
 	    $this->impersonate();
 
 		$categoryIdsExisting = array();					//Create an array of all the EXISTING categoryIDs for this entry
@@ -1111,33 +1115,34 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			KalturaLog::debug("replaceExisting mode - ON");
 		    $filter = new KalturaCategoryEntryFilter();		
 		    $filter->entryIdEqual = $entryId;
-		    $categoryEntryListResp = $this->kClient->categoryEntry->listAction($filter)->objects;
-			foreach($categoryEntryListResp as $tempCategoryEntry) {
+		    $categoryEntryListResp = $this->kClient->categoryEntry->listAction($filter);
+			foreach($categoryEntryListResp->objects as $tempCategoryEntry) {
 				$categoryIdsExisting[] = $tempCategoryEntry->categoryId;
 			}
 		}
 		$categoryIdsToWork = array();					//create an array of all the REQUESTED categoryIds and create new ones if necessary
-		$filter = new KalturaCategoryFilter();
-		$filter->fullNameIn = $categories;
-		$categoryListRes = $this->kClient->category->listAction($filter)->objects;
-		$existingCategoryNames = array();
-		foreach($categoryListRes as $category) {
-			$existingCategoryNames[] = $category->fullName;
-			$categoryIdsToWork[] = $category->id;
-		}
-		$categoryNamesArr = explode(',',$categories);
-		$this->kClient->startMultiRequest();
-		foreach($categoryNamesArr as $categoryName) {
-			if(!in_array($categoryName,$existingCategoryNames)) {	//Category does not exis
-				$cat = $this->createCategoryByPath($categoryName);
-				KalturaLog::debug("Creating a new category by the Name [$categoryName]");
+		if ($categories != null) {
+			$filter = new KalturaCategoryFilter();
+			$filter->fullNameIn = $categories;
+			$categoryListRes = $this->kClient->category->listAction($filter)->objects;
+			$existingCategoryNames = array();
+			foreach($categoryListRes as $category) {
+				$existingCategoryNames[] = $category->fullName;
+				$categoryIdsToWork[] = $category->id;
+			}
+			$categoryNamesArr = explode(',',$categories);
+			$this->kClient->startMultiRequest();
+			foreach($categoryNamesArr as $categoryName) {
+				if(!in_array($categoryName,$existingCategoryNames)) {	//Category does not exis
+					$cat = $this->createCategoryByPath($categoryName);
+					KalturaLog::debug("Creating a new category by the Name [$categoryName]");
+				}
+			}
+			$newCategoriesAdd = $this->kClient->doMultiRequest();
+			foreach ($newCategoriesAdd as $newCategory) {
+				$categoryIdsToWork[] = $newCategory->id;		//Adding the newly created category IDs to the ToWork list
 			}
 		}
-		$newCategoriesAdd = $this->kClient->doMultiRequest();
-		foreach ($newCategoriesAdd as $newCategory) {
-			$categoryIdsToWork[] = $newCategory->id;		//Adding the newly created category IDs to the ToWork list
-		}
-		
 		$this->kClient->startMultiRequest();
 		if ($update) {									//Remove existing categories and associations
 			$categoryIdsToRemove = array_diff($categoryIdsExisting,$categoryIdsToWork);
