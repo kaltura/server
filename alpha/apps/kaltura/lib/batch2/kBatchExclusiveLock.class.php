@@ -101,6 +101,7 @@ class kBatchExclusiveLock
 		$atmp = BatchJobLockPeer::EXECUTION_ATTEMPTS;
 		$expr = BatchJobLockPeer::EXPIRATION;
 		$recheck = BatchJobLockPeer::START_AT;
+		$partnerLoad = PartnerLoadPeer::PARTNER_LOAD;
 		
 		$schd_id = $lockKey->getSchedulerId();
 		$work_id = $lockKey->getWorkerId();
@@ -109,39 +110,37 @@ class kBatchExclusiveLock
 		$now_str = date('Y-m-d H:i:s', $now);
 		
 		$c->add ( BatchJobLockPeer::JOB_TYPE, $jobType );
-		$max_exe_attempts = BatchJobLockPeer::getMaxExecutionAttempts($jobType);
-		$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
-		$max_jobs_for_partner = BatchJobLockPeer::getMaxJobsForPartner($jobType);
+		$c->addAnd($c->getNewCriterion(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId()));
 		
-		$query = "	(
-							batch_job_lock.STATUS = " . BatchJob::BATCHJOB_STATUS_ALMOST_DONE . "
-						AND (
-								$expr <= '$now_str'
-							OR	(
-									$schd = $schd_id 
-								AND $work = $work_id 
-								AND $btch = $btch_id 
-							)
-							OR	(
-									$schd IS NULL 
-								AND $work IS NULL 
-								AND $btch IS NULL 
-								AND (
-										$recheck <= '$now_str'
-									OR	$recheck IS NULL
-								)
-							)
+		$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
+		$useFairScheduler = self::addPrioritizersCondition($c, $prioritizers_ratio);
+		
+		// Query Parts
+		$statusCondition = "$stat = " . BatchJob::BATCHJOB_STATUS_ALMOST_DONE;
+		$lockExpiredCondition = "$expr <= '$now_str'";
+		
+		$recheckCondition = "( $recheck <= '$now_str' OR $recheck IS NULL)";
+		$unhandledJobCondition = "$schd IS NULL AND $work IS NULL AND $btch IS NULL ";
+		$jobAlreadyHandledByWorker = "$schd = $schd_id AND $work = $work_id AND $btch = $btch_id";
+		$max_jobs_for_partner = BatchJobLockPeer::getMaxJobsForPartner($jobType);
+		$partnerLoadCondition = "(($partnerLoad < $max_jobs_for_partner) OR ($partnerLoad is null))";
+		$newJobsCond = "($unhandledJobCondition AND ($recheckCondition))";
+		if($useFairScheduler)
+			$newJobsCond .= " AND $partnerLoadCondition";
+			
+		$max_exe_attempts = BatchJobLockPeer::getMaxExecutionAttempts($jobType);
+		$jobWasntExecutedTooMany = "$atmp <= $max_exe_attempts OR $atmp IS NULL";
+		
+		// Generate query
+		$query = "	($statusCondition							
+						AND ($lockExpiredCondition
+							OR	($recheckCondition)
+							OR	($jobAlreadyHandledByWorker)
 						) 
-						AND (
-								$atmp <= $max_exe_attempts
-							OR	$atmp IS NULL
-						)
+						AND ($jobWasntExecutedTooMany)
 					)";
 			
 		$c->addAnd($c->getNewCriterion($stat, $query, Criteria::CUSTOM));
-		$c->addAnd($c->getNewCriterion(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId()));
-		
-		self::addPrioritizersCondition($c, $prioritizers_ratio, $max_jobs_for_partner);
 		$c->setLimit($number_of_objects);
 		
 		$objects = BatchJobLockPeer::doSelect ( $c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
@@ -223,6 +222,7 @@ class kBatchExclusiveLock
 		$atmp = BatchJobLockPeer::EXECUTION_ATTEMPTS;
 		$expr = BatchJobLockPeer::EXPIRATION;
 		$recheck = BatchJobLockPeer::START_AT;
+		$partnerLoad = PartnerLoadPeer::PARTNER_LOAD;
 		
 		$schd_id = $lockKey->getSchedulerId();
 		$work_id = $lockKey->getWorkerId();
@@ -230,8 +230,6 @@ class kBatchExclusiveLock
 		$now = time();
 		$now_str = date('Y-m-d H:i:s', $now);
 		
-		
-		// added to support nfs delay
 		// added to support nfs delay
 		if($jobType == BatchJobType::EXTRACT_MEDIA || $jobType == BatchJobType::POSTCONVERT || $jobType == BatchJobType::STORAGE_EXPORT)
 		{
@@ -240,76 +238,71 @@ class kBatchExclusiveLock
 		}
 		
 		$c->add ( BatchJobLockPeer::JOB_TYPE, $jobType );
-		
-		$max_exe_attempts = BatchJobLockPeer::getMaxExecutionAttempts($jobType);
-		$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
-		$max_jobs_for_partner = BatchJobLockPeer::getMaxJobsForPartner($jobType);
-		
-		$unClosedStatuses = implode(',', BatchJobPeer::getUnClosedStatusList());
-		$inProgressStatuses = BatchJobPeer::getInProcStatusList();
-		
-		$query = "	
-						$stat IN ($unClosedStatuses)
-					AND	(
-							$expr <= '$now_str'
-						OR	(
-								(
-									$stat = " . BatchJob::BATCHJOB_STATUS_PENDING . " 
-								OR (
-										$stat = " . BatchJob::BATCHJOB_STATUS_RETRY . "
-									AND $recheck <= '$now_str'
-								)
-							) 
-							AND (
-									$schd IS NULL
-								AND $work IS NULL 
-								AND $btch IS NULL 
-							)
-						) 
-						OR (
-								$schd = $schd_id 
-							AND $work = $work_id 
-							AND $btch = $btch_id 
-							AND $stat IN ($inProgressStatuses) 
-						)
-					) 
-					AND (
-							$atmp <= $max_exe_attempts
-						OR	$atmp IS NULL
-					)";
-				
-		$c->add($stat, $query, Criteria::CUSTOM);
 		$c->add(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId());
 		
-		self::addPrioritizersCondition($c, $prioritizers_ratio, $max_jobs_for_partner);
+		$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
+		$useFairScheduler = self::addPrioritizersCondition($c, $prioritizers_ratio);
+		
+		// Query Parts
+		$unClosedStatuses = implode(',', BatchJobPeer::getUnClosedStatusList());
+		$statusCondition = "$stat IN ($unClosedStatuses)";
+		
+		$lockExpiredCondition = "$expr <= '$now_str'";
+		
+		$pendingJobsCondition = "( $stat = " . BatchJob::BATCHJOB_STATUS_PENDING .
+			" OR ( $stat = " . BatchJob::BATCHJOB_STATUS_RETRY . " AND $recheck <= '$now_str' ))";
+		$unhandledJobCondition = "$schd IS NULL AND $work IS NULL AND $btch IS NULL ";
+		$max_jobs_for_partner = BatchJobLockPeer::getMaxJobsForPartner($jobType);
+		$partnerLoadCondition = "(($partnerLoad < $max_jobs_for_partner) OR ($partnerLoad is null))";
+		$newJobsCond = "($pendingJobsCondition AND ($unhandledJobCondition))";
+		if($useFairScheduler)
+			$newJobsCond .= " AND $partnerLoadCondition";
+		
+		$jobAlreadyHandledByWorker = "$schd = $schd_id AND $work = $work_id AND $btch = $btch_id";
+			
+		$max_exe_attempts = BatchJobLockPeer::getMaxExecutionAttempts($jobType);
+		$jobWasntExecutedTooMany = "$atmp <= $max_exe_attempts OR $atmp IS NULL";
+		
+		// Generate query
+		$query = "	$statusCondition
+					AND	(
+						$lockExpiredCondition
+						OR	($newJobsCond) 
+						OR ($jobAlreadyHandledByWorker)
+					) 
+					AND ($jobWasntExecutedTooMany)";
+				
+		$c->add($stat, $query, Criteria::CUSTOM);
 		$c->setLimit($number_of_objects);
 		
 		$objects = BatchJobLockPeer::doSelect ( $c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
 		return self::lockObjects($lockKey, $objects, $max_execution_time);
 	}
 	
-	private static function addPrioritizersCondition(Criteria $c, $prioritizers_ratio, $max_jobs_for_partner) 
+	/**
+	 * Add the prioritizer specific condition.
+	 * @param Criteria $c The criteria to update
+	 * @param int $prioritizers_ratio the rate between the max throughput prioritizers to the fair one
+	 * @return bool whether we use the fair prioritizer
+	 */
+	private static function addPrioritizersCondition(Criteria $c, $prioritizers_ratio) 
 	{
 		if(rand(0, 100) < $prioritizers_ratio) 
 		{	// Throughput
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::URGENCY);
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::ESTIMATED_EFFORT);
-			
+			return false;
 		} else {
 			// Fairness	
 			$c->addMultipleJoin(array(array(BatchJobLockPeer::PARTNER_ID, PartnerLoadPeer::PARTNER_ID  ),
 					array(BatchJobLockPeer::JOB_TYPE, PartnerLoadPeer::JOB_TYPE),
 					array(BatchJobLockPeer::JOB_SUB_TYPE, PartnerLoadPeer::JOB_SUB_TYPE)), Criteria::LEFT_JOIN);
 			
-			$partnerLoadCnd1 = $c->getNewCriterion(PartnerLoadPeer::PARTNER_LOAD, $max_jobs_for_partner, Criteria::LESS_EQUAL);
-			$partnerLoadCnd1->addOr($c->getNewCriterion(PartnerLoadPeer::PARTNER_LOAD, null ,Criteria::EQUAL));
-			
-			$c->addAnd($partnerLoadCnd1);
-			
 			$c->addAscendingOrderByColumn(PartnerLoadPeer::WEIGHTED_PARTNER_LOAD);
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::PRIORITY);
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::URGENCY);
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::ESTIMATED_EFFORT);
+			return true;
 		}
 	}
 
