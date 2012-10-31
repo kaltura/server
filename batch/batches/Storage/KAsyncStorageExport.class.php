@@ -96,15 +96,18 @@ class KAsyncStorageExport extends KJobHandlerWorker
 		}
 	
 		try{
+			if ($engine instanceof s3Mgr)
+				$engine->setFilesPermissionPublicInS3($data->filesPermissionPublicInS3);
+				
 			if (is_file($srcFile)){
-				$engine->putFile($destFile, $srcFile, $data->force,null,null,null,true, $data->filesPermissionPublicInS3);
+				$engine->putFile($destFile, $srcFile, $data->force);
 			}
 			else if (is_dir($srcFile)){
 				$filesPaths = kFile::dirList($srcFile);
 				$destDir = $destFile;
 				foreach ($filesPaths as $filePath){
 					$destFile = $destDir.DIRECTORY_SEPARATOR.basename($filePath);
-					$engine->putFile($destFile, $filePath, $data->force,null,null,null,true, $data->filesPermissionPublicInS3);
+					$engine->putFile($destFile, $filePath, $data->force);
 				}
 			}
 		}

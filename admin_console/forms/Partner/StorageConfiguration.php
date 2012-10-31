@@ -86,7 +86,7 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append'))),			
 		));
 				
-		$this->addElement('checkbox', 'filesPermissionPublicInS3', array(
+		$this->addElement('select', 'filesPermissionPublicInS3', array(
 			'label'			=> 'Files Permission Public',
 			'filters'		=> array('StringTrim'),
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append'))),			

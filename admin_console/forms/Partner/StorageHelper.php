@@ -49,6 +49,15 @@ class Form_Partner_StorageHelper
 		);
 		$form->getElement('trigger')->setMultiOptions($arr);
 	}
+	
+	public static function addFilesPermissionLevelInAmazonToForm(Zend_Form $form)
+	{
+		$arr = array(
+			Kaltura_Client_Enum_AmazonS3StorageProfileFilesPermissionLevel::ACL_PRIVATE => 'Private',
+			Kaltura_Client_Enum_AmazonS3StorageProfileFilesPermissionLevel::ACL_PUBLIC_READ => 'Public Read',
+		);
+		$form->getElement('filesPermissionPublicInS3')->setMultiOptions($arr);
+	}
 
 	public static function addFlavorParamsToForm(Zend_Form $form, $flavorParams)
 	{

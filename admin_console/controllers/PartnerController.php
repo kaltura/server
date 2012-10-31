@@ -226,6 +226,7 @@ class PartnerController extends Zend_Controller_Action
 		$request = $this->getRequest();
 		$form->populate($request->getParams());
 		Form_Partner_StorageHelper::addProtocolsToForm($form);
+		Form_Partner_StorageHelper::addFilesPermissionLevelInAmazonToForm($form);
 		Form_Partner_StorageHelper::addPathManagersToForm($form);
 		Form_Partner_StorageHelper::addUrlManagersToForm($form);
 		Form_Partner_StorageHelper::addTriggersToForm($form);
@@ -288,10 +289,10 @@ class PartnerController extends Zend_Controller_Action
 				}		
 				
 				if( $protocol == Kaltura_Client_Enum_StorageProfileProtocol::S3){
-					$storage2 = $form->getObject("Kaltura_Client_Type_AmazonS3StorageProfile", $formData, false, true);
+					$storageFromForm = $form->getObject("Kaltura_Client_Type_AmazonS3StorageProfile", $formData, false, true);
 				}	
 				else{			
-					$storage2 = $form->getObject("Kaltura_Client_Type_StorageProfile", $formData, false, true);
+					$storageFromForm = $form->getObject("Kaltura_Client_Type_StorageProfile", $formData, false, true);
 				}
 				
 				$flavorParams = array();
@@ -300,22 +301,22 @@ class PartnerController extends Zend_Controller_Action
 						$flavorParams[] = $flavorParamsItem->id;
 				
 				if(count($flavorParams))
-					$storage2->flavorParamsIds = implode(',', $flavorParams);
+					$storageFromForm->flavorParamsIds = implode(',', $flavorParams);
 				else		
-					$storage2->flavorParamsIds = '';
+					$storageFromForm->flavorParamsIds = '';
 
-				KalturaLog::log('Storage: ' . print_r(2, true));
+				KalturaLog::log('Storage: ' . print_r($storageFromForm, true));
 				
-				Infra_ClientHelper::impersonate($storage2->partnerId);
-				$storage2->partnerId = null;
+				Infra_ClientHelper::impersonate($storageFromForm->partnerId);
+				$storageFromForm->partnerId = null;
 				
 				if (!$editMode)
 				{
-					$client->storageProfile->add($storage2);
+					$client->storageProfile->add($storageFromForm);
 				}
 				else
 				{
-					$client->storageProfile->update($storageId, $storage2);
+					$client->storageProfile->update($storageId, $storageFromForm);
 				}
 			}
 			else

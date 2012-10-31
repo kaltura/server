@@ -102,7 +102,7 @@ class sftpMgr extends kFileTransferMgr
 	
 	
 	// upload a file to the server (ftp_mode is irrelevant
-	protected function doPutFile ($remote_file , $local_file , $ftp_mode, $http_field_name = null, $http_file_name = null, $filesPermissionPublicInS3)
+	protected function doPutFile ($remote_file , $local_file , $ftp_mode, $http_field_name = null, $http_file_name = null)
 	{
 		$sftp = $this->getSftpConnection();
 		$remote_file = ltrim($remote_file,'/');

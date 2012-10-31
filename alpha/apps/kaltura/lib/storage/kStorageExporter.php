@@ -65,14 +65,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 			
 		$key = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		
-		if ($externalStorage->getProtocol() == StorageProfile::STORAGE_PROTOCOL_S3)
-		{
-			$exporting = self::export($flavor->getentry(), $externalStorage, $key, !$flavor->getIsOriginal(), $externalStorage->getFilesPermissionPublicInS3());
-		}
-		else{
-			$exporting = self::export($flavor->getentry(), $externalStorage, $key, !$flavor->getIsOriginal());
-		}
+		$exporting = self::export($flavor->getentry(), $externalStorage, $key, !$flavor->getIsOriginal());
 				
 		return $exporting;
 	}
@@ -120,7 +113,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param entry $entry
 	 * @param FileSyncKey $key
 	 */
-	static protected function export(entry $entry, StorageProfile $externalStorage, FileSyncKey $key, $force = false, $filesPermissionPublicInS3 = false)
+	static protected function export(entry $entry, StorageProfile $externalStorage, FileSyncKey $key, $force = false)
 	{			
 		$externalFileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $externalStorage);
 		/* @var $fileSync FileSync */
@@ -131,7 +124,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 		$parent_file_sync = kFileSyncUtils::resolve($fileSync);
 		$srcFileSyncPath = $parent_file_sync->getFileRoot() . $parent_file_sync->getFilePath();
-		kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(), $externalStorage, $externalFileSync, $srcFileSyncPath, $force, $fileSync->getDc(), $filesPermissionPublicInS3);
+		kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(), $externalStorage, $externalFileSync, $srcFileSyncPath, $force, $fileSync->getDc());
 		return true;
 	}
 	

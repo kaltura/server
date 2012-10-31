@@ -11,7 +11,7 @@ class kStorageExportJobData extends kStorageJobData
     private $force; 
         
     /**
-	 * @var bool
+	 * @var string
 	 */   	
     private $filesPermissionPublicInS3;
 	

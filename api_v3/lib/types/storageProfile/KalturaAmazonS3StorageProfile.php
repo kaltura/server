@@ -6,7 +6,7 @@
 class KalturaAmazonS3StorageProfile extends KalturaStorageProfile
 {
 	/**
-	 * @var bool
+	 * @var string
 	 */
 	public $filesPermissionPublicInS3;
 	
@@ -39,15 +39,13 @@ class KalturaAmazonS3StorageProfile extends KalturaStorageProfile
 	 */
 	public function fromObject ( $source_object  )
 	{
-		KalturaLog::DEBUG("WE ARE IN KalturaAmazonS3StorageProfile->fromObject ".get_class($source_object));
-	    parent::fromObject($source_object);
+		parent::fromObject($source_object);
 	    
 	    $this->filesPermissionPublicInS3 = $source_object->getFromCustomData(AmazonS3StorageProfile::CUSTOM_DATA_FILES_PERMISSION_PUBLIC_IN_S3);
 	}
 	
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		KalturaLog::DEBUG("I'm here!");
 		if(is_null($object_to_fill))
 			$object_to_fill = new AmazonS3StorageProfile();
 			

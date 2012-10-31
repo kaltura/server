@@ -1186,7 +1186,7 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var string
 	 */
 	public $filesPermissionPublicInS3 = null;
 
