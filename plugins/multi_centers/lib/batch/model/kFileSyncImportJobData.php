@@ -32,6 +32,11 @@ class kFileSyncImportJobData extends kJobData
 	 */
 	private $destFilePath;
 	
+	/**
+	 * File size
+	 * @var int
+	 */
+	private $fileSize;
 	
 	
 	/** GETTERS & SETTERS **/
@@ -102,5 +107,16 @@ class kFileSyncImportJobData extends kJobData
 		$this->destFilePath = $destFilePath;
 	}
 	
+	/**
+	 * @param int $fileSize the $fileSize to set
+	 */
+	public function setFileSize($fileSize)
+	{
+		$this->fileSize = $fileSize;
+	}
+	
+	public function calculateEstimatedEffort(BatchJob $batchJob) {
+		return $this->fileSize;
+	}
 	
 }

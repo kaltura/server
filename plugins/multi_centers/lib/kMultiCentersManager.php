@@ -24,6 +24,7 @@ class kMultiCentersManager
 		$fileSyncImportData = new kFileSyncImportJobData();
 		$fileSyncImportData->setSourceUrl($sourceFileUrl);
 		$fileSyncImportData->setFilesyncId($fileSyncId);
+		$fileSyncImportData->setFileSize($fileSize);
 		// tmpFilePath and destFilePath will be set later during get exlusive call on the target data center 
 		
 		$batchJob = null;
@@ -39,7 +40,6 @@ class kMultiCentersManager
 			$batchJob->setPartnerId($partnerId);
 		}
 
-		$batchJob->setFileSize($fileSize);
 		$batchJob->setObjectId($fileSyncId);
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		
