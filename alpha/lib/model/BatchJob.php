@@ -542,7 +542,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		$copyObj->setDescription($this->description);
 		$copyObj->setCreatedAt($this->created_at);
 		$copyObj->setUpdatedAt($this->updated_at);
-		$copyObj->setDeletedAt($this->deleted_at);
 		$copyObj->setPriority($this->priority);
 		$copyObj->setQueueTime($this->queue_time);
 		$copyObj->setFinishTime($this->finish_time);
