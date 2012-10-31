@@ -26,6 +26,8 @@ class AsperaService extends KalturaBaseService
 	 */
 	function getFaspUrlAction($flavorAssetId)
 	{
+		KalturaResponseCacher::disableCache();
+		
 		$assetDb = assetPeer::retrieveById($flavorAssetId);
 		if (!$assetDb || !($assetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $flavorAssetId);
