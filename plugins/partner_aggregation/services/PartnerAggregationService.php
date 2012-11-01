@@ -12,7 +12,7 @@ class PartnerAggregationService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		myPartnerUtils::addPartnerToCriteria('DwhHourlyPartner', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		$this->applyPartnerFilterForClass('DwhHourlyPartner');
 	}
 	
 	/**

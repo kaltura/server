@@ -13,9 +13,9 @@ class MetadataService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		myPartnerUtils::addPartnerToCriteria('MetadataProfile', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		$this->applyPartnerFilterForClass('MetadataProfile');
 		if ($actionName != 'list')
-			myPartnerUtils::addPartnerToCriteria('Metadata', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+			$this->applyPartnerFilterForClass('Metadata');
 		
 		if(!MetadataPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
@@ -346,7 +346,7 @@ class MetadataService extends KalturaBaseService
 		
 		if (is_null($entryIds))
 		{
-			myPartnerUtils::addPartnerToCriteria('Metadata', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+			$this->applyPartnerFilterForClass('Metadata');
 		}
 		else
 		{
