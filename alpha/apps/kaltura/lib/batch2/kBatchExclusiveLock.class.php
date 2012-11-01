@@ -122,8 +122,8 @@ class kBatchExclusiveLock
 		$recheckCondition = "( $recheck <= '$now_str' OR $recheck IS NULL)";
 		$unhandledJobCondition = "$schd IS NULL AND $work IS NULL AND $btch IS NULL ";
 		$jobAlreadyHandledByWorker = "$schd = $schd_id AND $work = $work_id AND $btch = $btch_id";
-		$max_jobs_for_partner = BatchJobLockPeer::getMaxJobsForPartner($jobType);
-		$partnerLoadCondition = "(($partnerLoad < $max_jobs_for_partner) OR ($partnerLoad is null))";
+		$maxJobsForPartner = BatchJobLockPeer::getMaxJobsForPartner($jobType);
+		$partnerLoadCondition = "($partnerLoad < $maxJobsForPartner OR $partnerLoad is null)";
 		$newJobsCond = "($unhandledJobCondition AND ($recheckCondition))";
 		if($useFairScheduler)
 			$newJobsCond .= " AND $partnerLoadCondition";
@@ -134,7 +134,7 @@ class kBatchExclusiveLock
 		// Generate query
 		$query = "	($statusCondition							
 						AND ($lockExpiredCondition
-							OR	($recheckCondition)
+							OR	($newJobsCond)
 							OR	($jobAlreadyHandledByWorker)
 						) 
 						AND ($jobWasntExecutedTooMany)
