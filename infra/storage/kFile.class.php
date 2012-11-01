@@ -333,7 +333,7 @@ class kFile
 	 * @param unknown_type $rights
 	 * @param unknown_type $recursive
 	 */
-	public static function fullMkdir($path, $rights = 0777, $recursive = true)
+	public static function fullMkdir($path, $rights = 0640, $recursive = true)
 	{
 		return self::fullMkfileDir(dirname($path), $rights, $recursive);
 	}
