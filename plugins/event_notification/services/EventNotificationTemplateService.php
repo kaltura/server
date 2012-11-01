@@ -55,20 +55,21 @@ class EventNotificationTemplateService extends KalturaBaseService
 		$dbEventNotificationTemplate = EventNotificationTemplatePeer::retrieveByPK($id);
 		if (!$dbEventNotificationTemplate)
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND, $id);
-        //check that the event notification has not been cloned before
-        $systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($dbEventNotificationTemplate->getSystemName(), $this->getPartnerId());
-		if (count($systemNameTemplates) > 0)
-            throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME, $dbEventNotificationTemplate->getSystemName());		    
-		
+			
 		// copy into new db object
 		$newDbEventNotificationTemplate = $dbEventNotificationTemplate->copy();
 		
 		// init new Kaltura object
 		$newEventNotificationTemplate = KalturaEventNotificationTemplate::getInstanceByType($newDbEventNotificationTemplate->getType());
+		$templateClass = get_class($newEventNotificationTemplate);
+		if(get_class($eventNotificationTemplate) != $templateClass && !is_subclass_of($eventNotificationTemplate, $templateClass))
+			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_WRONG_TYPE, $id, kPluginableEnumsManager::coreToApi('EventNotificationTemplateType', $dbEventNotificationTemplate->getType()));
+		
 		$newEventNotificationTemplate->fromObject($newDbEventNotificationTemplate);
 		
 		// update new db object with the overwrite configuration
-		$newDbEventNotificationTemplate = $newEventNotificationTemplate->toInsertableObject($newDbEventNotificationTemplate);
+		$newEventNotificationTemplate->toInsertableObject($newDbEventNotificationTemplate);
+		$eventNotificationTemplate->toUpdatableObject($newDbEventNotificationTemplate);
 		
 		// save the new db object
 		$newDbEventNotificationTemplate->setPartnerId($this->getPartnerId());
