@@ -83,8 +83,8 @@ class KalturaEntryService extends KalturaBaseService
 		}*/
 		
 		parent::initService($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClass('ConversionProfile');
-		parent::applyPartnerFilterForClass('conversionProfile2');
+		$this->applyPartnerFilterForClass('ConversionProfile');
+		$this->applyPartnerFilterForClass('conversionProfile2');
 	}
 	
 	/**
@@ -1179,7 +1179,7 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		if ($entry->accessControlId !== null) // trying to update
 		{
-			parent::applyPartnerFilterForClass('accessControl'); 
+			$this->applyPartnerFilterForClass('accessControl'); 
 			$accessControl = accessControlPeer::retrieveByPK($entry->accessControlId);
 			if (!$accessControl)
 				throw new KalturaAPIException(KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND, $entry->accessControlId);
