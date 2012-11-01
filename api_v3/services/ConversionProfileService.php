@@ -12,21 +12,28 @@ class ConversionProfileService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClass('asset');
-		parent::applyPartnerFilterForClass('assetParamsOutput');
-		parent::applyPartnerFilterForClass('conversionProfile2');
-		
-		$partnerGroup = null;
+		$this->applyPartnerFilterForClass('asset');
+		$this->applyPartnerFilterForClass('assetParamsOutput');
+		$this->applyPartnerFilterForClass('conversionProfile2');
+		$this->applyPartnerFilterForClass('assetParams');
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerGroup()
+	 */
+	protected function partnerGroup()
+	{
+		$partnerGroup = $this->actionName;
 		if(
-			$actionName == 'add' ||
-			$actionName == 'update'
+			$this->actionName == 'add' ||
+			$this->actionName == 'update'
 			)
 		{
 			$partnerGroup = $this->partnerGroup . ',0';
 			assetParamsPeer::setIsDefaultInDefaultCriteria(false);
 		}
-			
-		parent::applyPartnerFilterForClass('assetParams', $partnerGroup);
+		
+		return $partnerGroup;
 	}
 	
 	/**

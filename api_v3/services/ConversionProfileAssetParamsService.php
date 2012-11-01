@@ -13,14 +13,19 @@ class ConversionProfileAssetParamsService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		parent::applyPartnerFilterForClass('conversionProfile2');
-		
-		$partnerGroup = null;
-		if($actionName == 'list')
-			$partnerGroup = $this->partnerGroup . ',0';
+		$this->applyPartnerFilterForClass('conversionProfile2');
+		$this->applyPartnerFilterForClass('assetParams');
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerGroup()
+	 */
+	protected function partnerGroup() 	
+	{
+		if($this->actionName == 'list')
+			return $this->partnerGroup . ',0';
 			
-			
-		parent::applyPartnerFilterForClass('assetParams', $partnerGroup);
+		return $this->partnerGroup;
 	}
 	
 	/**

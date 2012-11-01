@@ -13,10 +13,19 @@ class ReportService extends KalturaBaseService
 		
 		if (in_array(strtolower($actionName), array('execute', 'getcsv'), true))
 		{
-			$partnerGroup = $this->partnerGroup . ',0';
-			
-			parent::applyPartnerFilterForClass('Report', $partnerGroup);
+			$this->applyPartnerFilterForClass('Report');
 		}
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerGroup()
+	 */
+	protected function partnerGroup()
+	{
+		if (in_array(strtolower($this->actionName), array('execute', 'getcsv'), true))
+			return $this->partnerGroup . ',0';
+			
+		return $this->partnerGroup;
 	}
 		
 	/**
