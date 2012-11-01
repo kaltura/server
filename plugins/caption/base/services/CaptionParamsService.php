@@ -13,18 +13,24 @@ class CaptionParamsService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		parent::applyPartnerFilterForClass('conversionProfile2');
-		parent::applyPartnerFilterForClass('asset');
-		parent::applyPartnerFilterForClass('assetParamsOutput');
-		
-		$partnerGroup = null;
+		$this->applyPartnerFilterForClass('conversionProfile2');
+		$this->applyPartnerFilterForClass('asset');
+		$this->applyPartnerFilterForClass('assetParamsOutput');
+		$this->applyPartnerFilterForClass('assetParams');
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerGroup()
+	 */
+	protected function partnerGroup()
+	{
 		if(
-			$actionName == 'get' ||
-			$actionName == 'list'
+			$this->actionName == 'get' ||
+			$this->actionName == 'list'
 			)
-			$partnerGroup = $this->partnerGroup . ',0';
+			return $this->partnerGroup . ',0';
 			
-		parent::applyPartnerFilterForClass('assetParams', $partnerGroup);
+		return $this->partnerGroup;
 	}
 	
 	protected function globalPartnerAllowed($actionName)
