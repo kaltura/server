@@ -12,11 +12,11 @@ class SyndicationFeedService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClass('asset');
-		parent::applyPartnerFilterForClass('assetParams');
-		parent::applyPartnerFilterForClass('assetParamsOutput');
-		parent::applyPartnerFilterForClass('entry');
-		parent::applyPartnerFilterForClass('syndicationFeed');
+		$this->applyPartnerFilterForClass('asset');
+		$this->applyPartnerFilterForClass('assetParams');
+		$this->applyPartnerFilterForClass('assetParamsOutput');
+		$this->applyPartnerFilterForClass('entry');
+		$this->applyPartnerFilterForClass('syndicationFeed');
 	}
 	
 	protected function partnerGroup()
@@ -71,7 +71,7 @@ class SyndicationFeedService extends KalturaBaseService
 			
 			$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
 		
-			$c = new Criteria;
+			$c = new Criteria();
 			$c->addAnd(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $partner->getDefaultConversionProfileId());
 			$c->addAnd(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, $syndicationFeed->flavorParamId);
 			$is_exist = flavorParamsConversionProfilePeer::doCount($c);
