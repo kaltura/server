@@ -12,8 +12,8 @@ class PermissionService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		myPartnerUtils::addPartnerToCriteria('Permission', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-		myPartnerUtils::addPartnerToCriteria('PermissionItem', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		self::applyPartnerFilterForClass('Permission');
+		self::applyPartnerFilterForClass('PermissionItem');
 	}
 	
 	protected function globalPartnerAllowed($actionName)
