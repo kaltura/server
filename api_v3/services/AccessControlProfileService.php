@@ -10,7 +10,7 @@ class AccessControlProfileService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClass('accessControl'); 	
+		$this->applyPartnerFilterForClass('accessControl'); 	
 	}
 	
 	/**

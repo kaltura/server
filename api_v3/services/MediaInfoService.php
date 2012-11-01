@@ -11,8 +11,8 @@ class MediaInfoService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClass('mediaInfo');
-		parent::applyPartnerFilterForClass('asset');
+		$this->applyPartnerFilterForClass('mediaInfo');
+		$this->applyPartnerFilterForClass('asset');
     }
 	
 	/**
