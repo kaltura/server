@@ -10,12 +10,6 @@
  */
 class PlaylistService extends KalturaEntryService
 {
-//	public function initService($serviceId, $serviceName, $actionName)
-//	{
-//		parent::initService($serviceId, $serviceName, $actionName);
-//		parent::applyPartnerFilterForClass('Entry');
-//	}
-
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::globalPartnerAllowed()
 	 */
