@@ -14,8 +14,8 @@ class VirusScanProfileService extends KalturaBaseService
 
 		if($this->getPartnerId() != Partner::ADMIN_CONSOLE_PARTNER_ID)
 		{
-			myPartnerUtils::addPartnerToCriteria('VirusScanProfile', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-			myPartnerUtils::addPartnerToCriteria('asset', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+			$this->applyPartnerFilterForClass('VirusScanProfile');
+			$this->applyPartnerFilterForClass('asset');
 		}
 		
 		if(!VirusScanPlugin::isAllowedPartner($this->getPartnerId()))
