@@ -297,6 +297,11 @@ class KAutoloader
 		
 		if (self::$_noCache === false && self::$_classMapFileLocation)
 		{
+			if (function_exists('apc_store'))
+			{
+				apc_store(self::$_classMapFileLocation, self::$_classMap);
+			}
+			
 			// save the cached map
 			$bytesWritten = self::safeFilePutContents(self::$_classMapFileLocation, serialize(self::$_classMap));
 			if(!$bytesWritten)
@@ -312,6 +317,13 @@ class KAutoloader
 	{
 		if (self::$_classMap)
 			return true;
+
+		if (function_exists('apc_fetch'))
+		{
+			self::$_classMap = apc_fetch(self::$_classMapFileLocation);
+			if (self::$_classMap)
+			        return true;
+		}
 			
 		if (!file_exists(self::$_classMapFileLocation))
 			return false;
