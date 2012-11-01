@@ -136,9 +136,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyMinLength('name', 3, false);
-		$this->validatePropertyMinLength('systemName', 3, true);
-		$this->validateSystemNameUniqueness();
+		$this->validate();
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -148,9 +146,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validatePropertyMinLength('name', 3, false);
-		$this->validatePropertyMinLength('systemName', 3, true);
-		$this->validateSystemNameUniqueness();
+		$this->validate();
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
@@ -191,9 +187,12 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 		return KalturaPluginManager::loadObject('KalturaEventNotificationTemplate', $type);
 	}
 	
-	protected function validateSystemNameUniqueness ()
+	protected function validate ()
 	{
-		$systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($this->systemName, kCurrentContext::$partner_id, $this->id ? $this->id : null);
+		$this->validatePropertyMinLength('name', 3, false);
+		$this->validatePropertyMinLength('systemName', 3, true);
+		
+		$systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($this->systemName, $this->id);
         if (count($systemNameTemplates))
             throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME, $this->systemName);
 	}
