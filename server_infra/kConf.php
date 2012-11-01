@@ -32,9 +32,12 @@ class kConf extends kEnvironment
 		
 		if (!$reloadFileExists && function_exists('apc_fetch'))
 		{
-			self::$map = apc_fetch(self::APC_CACHE_MAP);
-			if(self::$map)
+			$apcMap = apc_fetch(self::APC_CACHE_MAP);
+			if($apcMap)
+			{
+				self::$map = $apcMap;
 				return;
+			}
 		}
 		
 		$configDir = self::getConfigDir();
@@ -72,7 +75,7 @@ class kConf extends kEnvironment
 			$configDir->close();
 		}
 			
-		self::$map = $config;
+		self::$map = array_merge(self::$map, $config);
 		
 		if(function_exists('apc_store'))
 		{
