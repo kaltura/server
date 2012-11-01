@@ -12,9 +12,9 @@ class AuditTrailService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		myPartnerUtils::addPartnerToCriteria('AuditTrail', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-		myPartnerUtils::addPartnerToCriteria('AuditTrailData', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-		myPartnerUtils::addPartnerToCriteria('AuditTrailConfig', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		$this->applyPartnerFilterForClass('AuditTrail');
+		$this->applyPartnerFilterForClass('AuditTrailData');
+		$this->applyPartnerFilterForClass('AuditTrailConfig');
 		
 		if(!AuditPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
