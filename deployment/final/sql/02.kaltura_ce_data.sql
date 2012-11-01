@@ -3537,7 +3537,7 @@ insert  into `ui_conf`(`id`,`obj_type`,`partner_id`,`subp_id`,`conf_file_path`,`
 (7502731,8,0,0,'content/uiconf/special/7502731.xml','Sakai_edit_video_player','400','330',NULL,'/flash/kdp3/v3.5.6/kdp3.swf',now(),now(),'','0','','a:2:{s:8:\"autoplay\";b:0;s:9:\"automuted\";b:0;}','2',NULL,2,2,'1','/html5/html5lib/v1.6.8/mwEmbedLoader.php'),
 (8425401,0,0,0,'content/uiconf/special/8425401.xml','default kClip for Sakai','','',NULL,'/flash/kclip/v1.0.13/KClip.swf',now(),now(),'','1','kclip sakai',NULL,2,NULL,2,3,'1',NULL),
 (8464961,2,0,0,'content/uiconf/special/8464961.xml','moodle2 uploader regular - my media','640','480',NULL,'/flash/kcw/v2.1.6.7/ContributionWizard.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,'1',NULL),
-(8700151,8,0,0,'content/uiconf/special/8700151.xml','Share target','533','300',NULL,'/flash/kdp3/v3.6.9/kdp3.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,'1',NULL);
+(8700151,8,0,0,'content/uiconf/special/8700151.xml','Share target','533','300',NULL,'/flash/kdp3/v3.6.9/kdp3.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,'1',NULL),
 (8704822,8,0,0,'content/uiconf/special/8704822.xml','508 Player','500','500',NULL,'/flash/kdp3/v3.6.5/kdp3.swf',now(),now(),NULL,'1','kdp508',NULL,'2',NULL,'2','3','2',NULL);
 
 insert  into `user_login_data`(`id`,`login_email`,`first_name`,`last_name`,`sha1_password`,`salt`,`config_partner_id`,`login_blocked_until`,`created_at`,`updated_at`,`custom_data`) values 
