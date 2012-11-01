@@ -11,8 +11,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-
-		myPartnerUtils::addPartnerToCriteria('GenericDistributionProviderAction', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		$this->applyPartnerFilterForClass('GenericDistributionProviderAction');
 		
 		if(!ContentDistributionPlugin::isAllowedPartner(kCurrentContext::$master_partner_id))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);

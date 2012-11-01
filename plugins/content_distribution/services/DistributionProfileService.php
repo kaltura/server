@@ -12,7 +12,7 @@ class DistributionProfileService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		myPartnerUtils::addPartnerToCriteria('DistributionProfile', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		$this->applyPartnerFilterForClass('DistributionProfile');
 		
 		if(!ContentDistributionPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);

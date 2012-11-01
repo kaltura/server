@@ -11,8 +11,7 @@ class EntryDistributionService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-
-		myPartnerUtils::addPartnerToCriteria('EntryDistribution', $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		$this->applyPartnerFilterForClass('EntryDistribution');
 		
 		if(!ContentDistributionPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
