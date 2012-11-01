@@ -17,9 +17,6 @@ class KAutoloader
 	
 	static function register()
 	{
-		if (self::$_classPath === null)
-			self::setDefaultClassPath();
-			
 		if (self::$_includePath === null)
 			self::setDefaultIncludePath();
 		
@@ -276,48 +273,59 @@ class KAutoloader
 	 */
 	private static function loadClassMap()
 	{
-		if (!self::$_classMapFileLocation || !file_exists(self::$_classMapFileLocation) || self::$_noCache == true)
-		{
-			// cached map doesn't exists, rebuild the cache map
-			foreach(self::$_classPath as $dir)
-			{
-				if (strpos($dir, DIRECTORY_SEPARATOR."*") == strlen($dir) - 2)
-				{
-					$dir = substr($dir, 0, strlen($dir) - 2);
-					$recursive = true;
-				}
-				else 
-				{
-					$recursive = false;
-				}
-					
-				self::scanDirectory($dir, $recursive);
-			}
+		if (self::$_classMapFileLocation && !self::$_noCache && self::loadClassMapFromCache())
+			return;
 			
-			if (self::$_noCache === false && self::$_classMapFileLocation)
+		if (self::$_classPath === null)
+			self::setDefaultClassPath();
+			
+		// cached map doesn't exists, rebuild the cache map
+		foreach(self::$_classPath as $dir)
+		{
+			if (strpos($dir, DIRECTORY_SEPARATOR."*") == strlen($dir) - 2)
 			{
-				// save the cached map
-				$bytesWritten = self::safeFilePutContents(self::$_classMapFileLocation, serialize(self::$_classMap));
-				if(!$bytesWritten)
-				{
-					$folderPermission = substr(decoct(fileperms(dirname(self::$_classMapFileLocation))), 2);
-					error_log("PHP Class map could not be saved to path [" . self::$_classMapFileLocation . "] folder permisisons [$folderPermission]");
-					die("PHP Class map could not be saved");
-				}
+				$dir = substr($dir, 0, strlen($dir) - 2);
+				$recursive = true;
+			}
+			else 
+			{
+				$recursive = false;
+			}
+				
+			self::scanDirectory($dir, $recursive);
+		}
+		
+		if (self::$_noCache === false && self::$_classMapFileLocation)
+		{
+			// save the cached map
+			$bytesWritten = self::safeFilePutContents(self::$_classMapFileLocation, serialize(self::$_classMap));
+			if(!$bytesWritten)
+			{
+				$folderPermission = substr(decoct(fileperms(dirname(self::$_classMapFileLocation))), 2);
+				error_log("PHP Class map could not be saved to path [" . self::$_classMapFileLocation . "] folder permisisons [$folderPermission]");
+				die("PHP Class map could not be saved");
 			}
 		}
-		else if (count(self::$_classMap) == 0) 
-		{
-			// if cached map was not loaded but exists on the disk, load it
-			self::$_classMap = unserialize(file_get_contents(self::$_classMapFileLocation));
+	}
+
+	public static function loadClassMapFromCache()
+	{
+		if (self::$_classMap)
+			return true;
 			
-			if(!is_array(self::$_classMap))
-			{
-				$permission = substr(decoct(fileperms(self::$_classMapFileLocation)), 2);
-				error_log("PHP Class map could not be loaded from path [" . self::$_classMapFileLocation . "] file permisisons [$permission]");
-				die('PHP Class map could not be loaded');
-			}
+		if (!file_exists(self::$_classMapFileLocation))
+			return false;
+			
+		// if cached map was not loaded but exists on the disk, load it
+		self::$_classMap = unserialize(file_get_contents(self::$_classMapFileLocation));		
+		if(!is_array(self::$_classMap))
+		{
+			$permission = substr(decoct(fileperms(self::$_classMapFileLocation)), 2);
+			error_log("PHP Class map could not be loaded from path [" . self::$_classMapFileLocation . "] file permisisons [$permission]");
+			die('PHP Class map could not be loaded');
 		}
+		
+		return true;
 	}
 
 	// code copied from kFile, since we can't depend on other classes here
