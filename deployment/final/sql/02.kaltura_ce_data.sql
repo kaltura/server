@@ -187,7 +187,8 @@ insert  into `file_sync`(`id`,`partner_id`,`object_type`,`object_id`,`version`,`
 (160,0,2,'8425401',NULL,1,0,1,now(),now(),NULL,NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/special/8425401.xml',1081,NULL),
 (161,0,2,'8464961','2',1,0,1,now(),now(),NULL,NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/special/8464961.xml',2325,NULL),
 (162,0,1,'_KDP_RE_PL','100000',1,0,1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','/content/templates/entry/data/_KDP_RE_PL_100000.xml',257,NULL),
-(163,0,2,'8700151','1',1,0,1,now(),now(),NULL,NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/special/8700151.xml',12107,NULL);
+(163,0,2,'8700151','1',1,0,1,now(),now(),NULL,NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/special/8700151.xml',12107,NULL),
+(164,'0','2','8704822','1','1','0','1',now(),now(),now(),NULL,'2','1',NULL,NULL,'/web/','content/uiconf/special/8704822.xml','15466',NULL);
 
 insert  into `flavor_asset`(`id`,`int_id`,`partner_id`,`tags`,`created_at`,`updated_at`,`deleted_at`,`entry_id`,`flavor_params_id`,`status`,`version`,`description`,`width`,`height`,`bitrate`,`frame_rate`,`size`,`is_original`,`file_ext`,`container_format`,`video_codec_id`,`type`,`custom_data`,`partner_data`) values
 ('_KMCLOGO',1,0,'web,mbr',now(),now(),NULL,'_KMCLOGO',0,2,'1','',0,0,0,0,0,0,NULL,NULL,NULL,1,'a:3:{s:13:\"FlavorBitrate\";i:0;s:15:\"FlavorFrameRate\";d:0;s:18:\"FlavorVideoCodecId\";N;}',NULL),
@@ -437,7 +438,9 @@ insert  into `permission`(`id`,`type`,`name`,`friendly_name`,`description`,`part
 (192,1,'systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_PACKAGES_SERVICE_PAID','System admin config publisher paid package service','Permission to modify publishers packages service into paid package',-2,1,'','',now(),now(),'a:1:{s:13:\"partner_group\";s:0:\"\";}'),
 (193,1,'MANAGE_ADMIN_USERS','manage KMC users and roles','manage KMC users and roles',0,1,'','',now(),now(),'a:1:{s:13:\"partner_group\";s:0:\"\";}'),
 (194,1,'SYSTEM_ADMIN_MP_REDIRECT','Base system admin permission','',-2,1,'','',now(),now(),'a:1:{s:13:\"partner_group\";s:0:\"\";}'),
-(195,2,'FEATURE_END_USER_REPORTS',NULL,NULL,99,1,NULL,NULL,now(),now(),NULL);
+(195,2,'FEATURE_END_USER_REPORTS',NULL,NULL,99,1,NULL,NULL,now(),now(),NULL),
+(196,'1','HOSTED_PAGES_BASE','Hosted pages access','Hosted pages access','-3','1','','',now(),now(),'a:1:{s:13:\"partner_group\";s:0:\"\";}'),
+(197,'4','PARTNER_-3_GROUP_*_PERMISSION','Hosted pages permission for all partners','Hosted pages permission for all partners','-3','1','','',now(),now(),'a:1:{s:13:\"partner_group\";s:1:\"*\";}');
 
 insert  into `permission_item`(`id`,`type`,`partner_id`,`param_1`,`param_2`,`param_3`,`param_4`,`param_5`,`tags`,`created_at`,`updated_at`,`custom_data`) values 
 (1,'kApiActionPermissionItem',0,'metadata_metadataprofile','list','','','',NULL,now(),now(),NULL),
@@ -1277,7 +1280,9 @@ insert  into `permission_item`(`id`,`type`,`partner_id`,`param_1`,`param_2`,`par
 (835,'kApiActionPermissionItem',0,'varconsole_varconsole','checkuserlogindataexists','','','',NULL,now(),now(),NULL),
 (836,'kApiActionPermissionItem',0,'varconsole_varconsole','updatestatus','','','',NULL,now(),now(),NULL),
 (837,'kApiActionPermissionItem',0,'partner','count','','','',NULL,now(),now(),NULL),
-(838,'kApiParameterPermissionItem',0,'KalturaPartner','partnerGroupType','read','','',NULL,now(),now(),NULL);
+(838,'kApiParameterPermissionItem',0,'KalturaPartner','partnerGroupType','read','','',NULL,now(),now(),NULL),
+(839,'kApiActionPermissionItem','0','session','get','','','',NULL,now(),now(),NULL),
+(840,'kApiActionPermissionItem','-3','session','impersonatebyks','','','',NULL,now(),now(),NULL);
 
 insert  into `permission_to_permission_item`(`id`,`permission_id`,`permission_item_id`,`created_at`,`updated_at`) values 
 (10,67,2,now(),now()),
@@ -3367,7 +3372,12 @@ insert  into `permission_to_permission_item`(`id`,`permission_id`,`permission_it
 (119488,118,770,now(),now()),
 (119489,118,771,now(),now()),
 (119490,118,838,now(),now()),
-(119491,117,708,now(),now());
+(119491,117,708,now(),now()),
+(119492,5,839,now(),now()),
+(119493,196,839,now(),now()),
+(119494,197,839,now(),now()),
+(119495,196,840,now(),now()),
+(119496,197,840,now(),now());
 
 insert  into `storage_profile`(`id`,`created_at`,`updated_at`,`partner_id`,`name`,`system_name`,`desciption`,`status`,`protocol`,`storage_url`,`storage_base_dir`,`storage_username`,`storage_password`,`storage_ftp_passive_mode`,`delivery_http_base_url`,`delivery_rmp_base_url`,`delivery_iis_base_url`,`min_file_size`,`max_file_size`,`flavor_params_ids`,`max_concurrent_connections`,`custom_data`,`path_manager_class`,`url_manager_class`,`delivery_priority`,`delivery_status`) values 
 (0,now(),now(),0,'@DC_NAME@','','@DC_DESCRIPTION@',3,0,NULL,'@STORAGE_BASE_DIR@',NULL,NULL,NULL,'@DELIVERY_HTTP_BASE_URL@','@DELIVERY_RTMP_BASE_URL@','@DELIVERY_ISS_BASE_URL@',NULL,NULL,NULL,NULL,NULL,NULL,'',1,1);
@@ -3526,7 +3536,8 @@ insert  into `ui_conf`(`id`,`obj_type`,`partner_id`,`subp_id`,`conf_file_path`,`
 (7502731,8,0,0,'content/uiconf/special/7502731.xml','Sakai_edit_video_player','400','330',NULL,'/flash/kdp3/v3.5.6/kdp3.swf',now(),now(),'','0','','a:2:{s:8:\"autoplay\";b:0;s:9:\"automuted\";b:0;}','2',NULL,2,2,'1','/html5/html5lib/v1.6.8/mwEmbedLoader.php'),
 (8425401,0,0,0,'content/uiconf/special/8425401.xml','default kClip for Sakai','','',NULL,'/flash/kclip/v1.0.13/KClip.swf',now(),now(),'','1','kclip sakai',NULL,2,NULL,2,3,'1',NULL),
 (8464961,2,0,0,'content/uiconf/special/8464961.xml','moodle2 uploader regular - my media','640','480',NULL,'/flash/kcw/v2.1.6.7/ContributionWizard.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,'2',NULL),
-(8700151,8,0,0,'content/uiconf/special/8700151.xml','Share target','533','300',NULL,'/flash/kdp3/v3.6.5/kdp3.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,'1',NULL);
+(8700151,8,0,0,'content/uiconf/special/8700151.xml','Share target','533','300',NULL,'/flash/kdp3/v3.6.9/kdp3.swf',now(),now(),'',1,'',NULL,2,NULL,2,3,'1',NULL);
+(8704822,8,0,0,'content/uiconf/special/8704822.xml','508 Player','500','500',NULL,'/flash/kdp3/v3.6.5/kdp3.swf',now(),now(),NULL,'1','kdp508',NULL,'2',NULL,'2','3','2',NULL);
 
 insert  into `user_login_data`(`id`,`login_email`,`first_name`,`last_name`,`sha1_password`,`salt`,`config_partner_id`,`login_blocked_until`,`created_at`,`updated_at`,`custom_data`) values 
 (1,'@TEMPLATE_PARTNER_MAIL@','Template',NULL,'@TEMPLATE_ADMIN_KUSER_SHA1@','@TEMPLATE_ADMIN_KUSER_SALT@',99,NULL,now(),now(),'a:4:{s:14:\"login_attempts\";N;s:17:\"password_hash_key\";N;s:18:\"previous_passwords\";N;s:21:\"last_login_partner_id\";i:99;}'),
