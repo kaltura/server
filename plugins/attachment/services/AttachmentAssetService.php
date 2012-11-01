@@ -13,10 +13,10 @@ class AttachmentAssetService extends KalturaAssetService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		parent::applyPartnerFilterForClass('conversionProfile2');
-		parent::applyPartnerFilterForClass('assetParamsOutput');
-		parent::applyPartnerFilterForClass('asset');
-		parent::applyPartnerFilterForClass('assetParams');
+		$this->applyPartnerFilterForClass('conversionProfile2');
+		$this->applyPartnerFilterForClass('assetParamsOutput');
+		$this->applyPartnerFilterForClass('asset');
+		$this->applyPartnerFilterForClass('assetParams');
 	}
 
 	protected function kalturaNetworkAllowed($actionName)
