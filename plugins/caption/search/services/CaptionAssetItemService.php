@@ -15,8 +15,8 @@ class CaptionAssetItemService extends KalturaBaseService
 		
 		if($actionName != 'parse')
 		{
-			parent::applyPartnerFilterForClass('asset');
-			parent::applyPartnerFilterForClass('CaptionAssetItem');
+			$this->applyPartnerFilterForClass('asset');
+			$this->applyPartnerFilterForClass('CaptionAssetItem');
 		}
 		
 		if(!CaptionSearchPlugin::isAllowedPartner($this->getPartnerId()))
