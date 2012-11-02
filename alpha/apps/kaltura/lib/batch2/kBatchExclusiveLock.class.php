@@ -332,7 +332,7 @@ class kBatchExclusiveLock
 		{
 			$typedCrit = clone $c;
 			$typedCrit->add(BatchJobLockPeer::EXECUTION_ATTEMPTS, $execAttempts, Criteria::GREATER_THAN);
-			$typedCrit->add(BatchJobLockPeer::JOB_TYPE, implode(",", $jobTypes), Criteria::IN);
+			$typedCrit->add(BatchJobLockPeer::JOB_TYPE, implode("','", $jobTypes), Criteria::IN);
 			
 			$typedJobs = BatchJobLockPeer::doSelect($typedCrit, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 			foreach($typedJobs as $typedJob) {
