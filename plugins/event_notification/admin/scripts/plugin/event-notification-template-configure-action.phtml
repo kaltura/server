@@ -8,21 +8,107 @@
 
 var newConditionIndex = 0;
 
-function newCondition() {
-	var currentIndex = newConditionIndex;
-	var newConditionTemplate = jQuery("#frmCondition");
-	var newConditionForm = newConditionTemplate.clone();
-	newConditionForm.attr("id", "frmCondition_" + currentIndex);
-	newConditionForm.find('[name="condition"]').attr('name', 'condition[' + currentIndex + ']');
-	newConditionForm.find('[name="removeConditionButton"]').click(function(){removeCondition(currentIndex);});
-	newConditionTemplate.after(newConditionForm);
-	newConditionForm.show();
+<?php require_once __DIR__ . '/js/kConditions.js'; ?>
 
-	newConditionIndex++;
+function getVariables(kSelection, value, variables) {
+
+	var variable =  'value';
+	if(kSelection.variable)
+		variable = kSelection.variable;
+
+	variables[variable] = value;
+	return variables;
 }
 
-function removeCondition(index){
-	jQuery("#frmCondition_" + index).remove();
+function addSelections(jqSelectionText, label, kSelections, selectCallback) {
+	var jqSelection = jQuery('<select><option value="">' + label + '</option></select>');
+	var jqWrap = null;
+	
+	for(var value in kSelections){
+		var kSelection = kSelections[value];
+		jqSelection.append('<option value="' + value + '">' + kSelection.label + '</option>');
+	}
+
+	jqSelection.change(function(){
+
+		if(jqWrap){
+			jqWrap.empty();
+		}
+		else{
+			jqWrap = jQuery('<div/>');
+			jqSelection.after(jqWrap);
+		}
+
+		var value =  jqSelection.val();
+		var kSelection = kSelections[value];
+		if(!kSelection.subSelections && !kSelection.fieldType){
+
+			var variablesObject = getVariables(kSelection, value, {});
+			selectCallback.apply(jqSelection, [null, variablesObject]);
+			return;
+		}
+
+		var jqSubField = null;
+		switch(kSelection.fieldType)
+		{
+			case 'text':
+				jqSubField = jQuery('<input>');
+				jqSubField.keyup(function(){
+					selectCallback.apply(jqSelection, [null, {value: "'" + jqSubField.val() + "'"}]);
+				});
+				break;
+	
+			case 'checkbox':
+				jqSubField = jQuery('<input type="checkbox">');
+				jqSubField.change(function(){
+					selectCallback.apply(jqSelection, [null, {value: (jqSubField.attr('checked') ? 'true' : 'false')}]);
+				});
+				break;
+			
+			default:
+				jqSubField = addSelections(jqSelectionText, kSelection.subLabel, kSelection.subSelections, function(subCode, variables){
+					variables = getVariables(kSelection, jqSubField.val(), variables);
+		
+					var code = subCode;
+					if(kSelection.getCode)
+						var code = kSelection.getCode.apply(jqSelection, [subCode, variables]);
+					
+					if(selectCallback){
+						selectCallback.apply(jqSelection, [code, variables]);
+					}
+					else{
+						jqSelectionText.val(code);
+					}
+				});
+		}
+		jqWrap.append(jqSubField);
+	});
+	
+	return jqSelection;
+};
+
+function newCondition() {
+	var currentIndex = newConditionIndex;
+	var jqConditionTemplate = jQuery("#frmCondition");
+
+	var jqNewConditionForm = jqConditionTemplate.clone();
+	jqNewConditionForm.attr("id", "frmCondition_" + currentIndex);
+	
+	var jqConditionText = jqNewConditionForm.find('[name="condition"]');
+	jqConditionText.attr('name', 'condition[' + currentIndex + ']');
+	jqConditionText.attr('readonly', true);
+
+	var jqConditionRemoveButton = jqNewConditionForm.find('[name="removeConditionButton"]');
+	jqConditionRemoveButton.click(function(){
+		jqNewConditionForm.remove();
+	});
+
+	var jqSelection = addSelections(jqConditionText, 'Select Condition', kConditions);
+	jqConditionText.before(jqSelection);
+	
+	jqConditionTemplate.after(jqNewConditionForm);
+	jqNewConditionForm.show();
+	newConditionIndex++;
 }
 
 var newContentParameterIndex = 0;
@@ -65,7 +151,7 @@ jQuery(document).ready(function() {
 		jQuery('#partner-configure-dialog').dialog('close');
 		jQuery('#frmPaginator1').submit();
 	<?php else: ?>
-		jQuery('#frmPartnerConfigure').ajaxForm(configurePartnerSuccess);
+		//jQuery('#frmPartnerConfigure').ajaxForm(configurePartnerSuccess);
 	<?php endif; ?>
 });
 

@@ -240,6 +240,7 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 			$this->addElement('text', "condition_{$this->conditionsCount}", array(
 				'label'			=> 'Condition:',
 				'value'			=> $condition->field->code,
+				'readonly'		=> true,
 				'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
 			));
 			
