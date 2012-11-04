@@ -18,7 +18,21 @@ class AttachmentAssetService extends KalturaAssetService
 		$this->applyPartnerFilterForClass('asset');
 		$this->applyPartnerFilterForClass('assetParams');
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerRequired()
+	 */
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'serve') 
+			return false;
 
+		return parent::partnerRequired($actionName);
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::kalturaNetworkAllowed()
+	 */
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if(
