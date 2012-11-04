@@ -113,7 +113,7 @@ class kSessionBase
 		$parts = explode(self::SEPARATOR, $real_str);
 		if (count($parts) < 3)
 		{
-			// error_log("Couldn't find 3 seperated parts in the KS");
+			error_log("Couldn't find 3 seperated parts in the KS");
 			return false;
 		}
 		
@@ -372,10 +372,7 @@ class kSessionBase
 		
 		$explodedKs = explode('|', $decodedKs , 3);
 		if (count($explodedKs) != 3)
-		{
-			error_log("Couldn't find 3 separated KS parts.");
 			return false;						// not KS V2
-		}
 		
 		list($version, $partnerId, $encKs) = $explodedKs;
 		if ($version != 'v2')
