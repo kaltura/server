@@ -7,11 +7,12 @@
 class KScheduleHelperManager
 {
 	/**
-	 * @param string $commandsDir
 	 * @return array
 	 */
-	public static function loadCommands($commandsDir)
+	public static function loadCommands()
 	{
+		$commandsDir = self::getCommandsDir();
+		
 		if (!is_dir($commandsDir))
 			return array();
 
@@ -43,11 +44,11 @@ class KScheduleHelperManager
 	}
 	
 	/**
-	 * @param string $commandsFilePath
 	 * @return array
 	 */
-	public static function loadCommandsFile($commandsFilePath)
+	public static function loadCommandsFile()
 	{
+		$commandsFilePath = self::getCommandsResultsFilePath();
 		if(!file_exists($commandsFilePath))
 			return null;
 
@@ -69,12 +70,40 @@ class KScheduleHelperManager
 		return $commands;
 	}
 	
+	public static function clearFilters()
+	{
+		$dirPath = self::getQueueFiltersDir();
+		
+		if (!is_dir($dirPath))
+			return;
+
+		$dh = opendir($dirPath);
+	    if(!$dh) 
+			return;
+			
+        while (($file = readdir($dh)) !== false) 
+        {
+        	if($file == '.' || $file == '..')
+        		continue;
+        		
+        	if(!preg_match('/.\.flt$/', $file))
+        		continue;
+        		
+        	$filePath = "$dirPath/$file";
+        	if(filetype($filePath) == 'dir')
+        		continue;
+        		
+        	@unlink($filePath);
+        }
+        closedir($dh);
+	}
+	
 	/**
-	 * @param string $filtersDir
 	 * @return array<KalturaWorkerQueueFilter>
 	 */
-	public static function loadFilters($filtersDir)
+	public static function loadFilters()
 	{
+		$filtersDir = self::getQueueFiltersDir();
 		if (!is_dir($filtersDir))
 			return array();
 
@@ -108,8 +137,10 @@ class KScheduleHelperManager
 	 * @param string $statusDirPath
 	 * @return array
 	 */
-	public static function loadRunningBatches($statusDirPath)
+	public static function loadRunningBatches()
 	{
+		$statusDirPath = self::getCommandsDir();
+		
 		if (!is_dir($statusDirPath))
 			return array();
 
@@ -140,56 +171,118 @@ class KScheduleHelperManager
 	}
 
 	/**
-	 * @param string $statusDirPath
 	 * @param string $workerName
 	 * @param int $batchIndex
 	 */
-	public static function unlinkRunningBatch($statusDirPath, $workerName, $batchIndex)
+	public static function unlinkRunningBatch($workerName, $batchIndex)
 	{
+		$statusDirPath = self::getCommandsDir();
 		@unlink("$statusDirPath/$workerName.$batchIndex.run");
 	}
 
 
 	/**
-	 * @param string $statusDirPath
 	 * @param string $workerName
 	 * @param int $batchIndex
 	 */
-	public static function saveRunningBatch($statusDirPath, $workerName, $batchIndex)
+	public static function saveRunningBatch($workerName, $batchIndex)
 	{
+		$statusDirPath = self::getCommandsDir();
 		file_put_contents("$statusDirPath/$workerName.$batchIndex.run", getmypid(), FILE_APPEND);
 	}
 
 	/**
-	 * @param string $filtersFilePath
+	 * @param string $filtersFileName
 	 * @param KalturaWorkerQueueFilter $filter
 	 */
-	public static function saveFilter($filtersFilePath, KalturaWorkerQueueFilter $filter)
+	public static function saveFilter($filtersFileName, KalturaWorkerQueueFilter $filter)
 	{
 		$data = base64_encode(serialize($filter));
-			
+
+		$filtersFilePath = self::getQueueFiltersDir() . DIRECTORY_SEPARATOR . $filtersFileName;
 		file_put_contents($filtersFilePath, $data);
 	}
 
 	/**
-	 * @param string $commandsFilePath
+	 * @param string $file
 	 * @param array $commands
 	 */
-	public static function saveCommands($commandsFilePath, array $commands)
+	public static function saveCommands($file, array $commands)
 	{
 		$data = '';
 		foreach($commands as $command)
 			$data .= base64_encode(serialize($command)) . "\n";
 			
+		$commandsFilePath = self::getCommandsResultsFilePath() . $file;
 		file_put_contents($commandsFilePath, $data, FILE_APPEND);
 	}
 
 	/**
-	 * @param string $filePath
+	 * @return string
+	 */
+	protected static function getCachePath()
+	{
+		$path = kConf::get("cache_root_path") . DIRECTORY_SEPARATOR . 'batch';
+		if(!file_exists($path))
+			kFile::fullMkdir($path);
+			
+		return $path;
+	}
+
+	/**
+	 * @return string
+	 */
+	protected static function getConfigItemsFilePath()
+	{
+		return self::getCachePath() . DIRECTORY_SEPARATOR . 'config.log';
+	}
+
+	/**
+	 * @return string
+	 */
+	protected static function getStatusFilePath()
+	{
+		return self::getCachePath() . DIRECTORY_SEPARATOR . 'status.log';
+	}
+
+	/**
+	 * @return string
+	 */
+	protected static function getCommandsResultsFilePath()
+	{
+		return self::getCachePath() . DIRECTORY_SEPARATOR . 'control.arc';
+	}
+	
+	/**
+	 * @return string
+	 */
+	protected static function getCommandsDir()
+	{
+		$path = self::getCachePath() . DIRECTORY_SEPARATOR . 'controls';
+		if(!file_exists($path))
+			kFile::fullMkdir($path);
+			
+		return $path;
+	}
+	
+	/**
+	 * @return string
+	 */
+	protected static function getQueueFiltersDir()
+	{
+		$path = self::getCachePath() . DIRECTORY_SEPARATOR . 'filters';
+		if(!file_exists($path))
+			kFile::fullMkdir($path);
+			
+		return $path;
+	}
+
+	/**
 	 * @return array<KalturaSchedulerStatus>
 	 */
-	public static function loadStatuses($filePath)
+	public static function loadStatuses()
 	{
+		$filePath = self::getStatusFilePath();
 		if(!file_exists($filePath))
 			return array();
 
@@ -210,20 +303,20 @@ class KScheduleHelperManager
 	}
 
 	/**
-	 * @param string $filePath
 	 * @param array<KalturaSchedulerStatus> $statuses
 	 */
-	public static function saveStatuses($filePath, array $statuses)
+	public static function saveStatuses(array $statuses)
 	{
+		$filePath = self::getStatusFilePath();
 		file_put_contents($filePath, base64_encode(serialize($statuses)), LOCK_EX);
 	}
 
 	/**
-	 * @param string $filePath
 	 * @return array<KalturaSchedulerConfig>
 	 */
-	public static function loadConfigItems($filePath)
+	public static function loadConfigItems()
 	{
+		$filePath = self::getConfigItemsFilePath();
 		if(!file_exists($filePath))
 			return;
 
@@ -245,15 +338,15 @@ class KScheduleHelperManager
 	}
 
 	/**
-	 * @param string $filePath
 	 * @param array<KalturaSchedulerConfig> $configItems
 	 */
-	public static function saveConfigItems($filePath, array $configItems)
+	public static function saveConfigItems(array $configItems)
 	{
 		$data = '';
 		foreach($configItems as $configItem)
 			$data .= base64_encode(serialize($configItem)) . "\n";
 			
+		$filePath = self::getConfigItemsFilePath();
 		file_put_contents($filePath, $data, FILE_APPEND);
 	}
 }

@@ -233,6 +233,7 @@ class KAsyncMailer extends KJobHandlerWorker
 		$footer = ( isset($common_taxt_arr[$type . '_footer']) ) ? $common_taxt_arr[$type . '_footer'] : $common_taxt_arr['footer'];
 		$body = $cultureTexts['bodies'][$type];
 
+		// TODO - move to batch config
 		$forumsLink = kConf::get('forum_url');
 		$unsubscribeLink = kConf::get('unsubscribe_mail_url').self::createBlockEmailStr($recipientemail);
 		

@@ -61,15 +61,7 @@ class KProcessWrapper
 		$cmdLine .= "$taskConfig->scriptPath ";
 		$cmdLine .= "$taskConfigStr ";
 		$cmdLine .= "'[" . mt_rand() . "]' ";
-		
-		if($taskConfig->getUseSyslog())
-		{
-			$cmdLine .= "2>&1 | logger -t $sysLogFile";
-		}
-		else
-		{
-			$cmdLine .= ">> $logFile 2>&1";
-		}
+		$cmdLine .= ">> $logFile 2>&1";
 		
 		
 		$descriptorspec = array(); // stdin is a pipe that the child will read from

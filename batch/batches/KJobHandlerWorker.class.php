@@ -224,16 +224,11 @@ abstract class KJobHandlerWorker extends KBatchBase
 	{
 		$filter = $this->getQueueFilter($jobType);
 		
-		$dir = $this->taskConfig->getQueueFiltersDir();
 		$type = $this->taskConfig->name;
-		$res = self::createDir($dir);
-		if(! $res)
-			return;
+		$file = "$type.flt";
+		KalturaLog::debug("Saving filter to $file: " . print_r($filter, true));
 		
-		$path = "$dir/$type.flt";
-		KalturaLog::debug("Saving filter to $path: " . print_r($filter, true));
-		
-		KScheduleHelperManager::saveFilter($path, $filter);
+		KScheduleHelperManager::saveFilter($file, $filter);
 	}
 	
 	/**

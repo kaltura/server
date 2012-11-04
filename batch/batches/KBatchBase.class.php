@@ -243,7 +243,7 @@ abstract class KBatchBase implements IKalturaLogger
 		KDwhClient::setFileName($this->taskConfig->getDwhPath());
 		$this->onBatchUp();
 		
-		KScheduleHelperManager::saveRunningBatch($this->taskConfig->getCommandsDir(), $this->getName(), $this->getIndex());
+		KScheduleHelperManager::saveRunningBatch($this->getName(), $this->getIndex());
 	}
 	
 	protected function getParams($name)
@@ -253,7 +253,10 @@ abstract class KBatchBase implements IKalturaLogger
 	
 	protected function getAdditionalParams($name)
 	{
-		return  $this->taskConfig->params->$name;
+		if(isset($this->taskConfig->params) && isset($this->taskConfig->params->$name))
+			return $this->taskConfig->params->$name;
+			
+		return null;
 	}
 	
 	/**
@@ -411,7 +414,7 @@ abstract class KBatchBase implements IKalturaLogger
 	public function __destruct()
 	{
 		$this->onBatchDown();
-		KScheduleHelperManager::unlinkRunningBatch($this->taskConfig->getCommandsDir(), $this->getName(), $this->getIndex());
+		KScheduleHelperManager::unlinkRunningBatch($this->getName(), $this->getIndex());
 	}
 	
 	/**
@@ -419,14 +422,9 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	public function saveSchedulerCommands(array $commands)
 	{
-		$dir = $this->taskConfig->getCommandsDir();
 		$type = $this->taskConfig->type;
-		$res = self::createDir($dir);
-		if(! $res)
-			return;
-		
-		$path = "$dir/$type.cmd";
-		KScheduleHelperManager::saveCommands($path, $commands);
+		$file = "$type.cmd";
+		KScheduleHelperManager::saveCommands($file, $commands);
 	}
 	
 	/**

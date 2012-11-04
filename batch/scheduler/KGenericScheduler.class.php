@@ -7,6 +7,9 @@
  */
 class KGenericScheduler
 {
+	/**
+	 * @var bool
+	 */
 	private $enableDebug = true;
 	
 	/**
@@ -14,13 +17,13 @@ class KGenericScheduler
 	 */
 	private $schedulerConfig = null;
 	
-	private $configFileName = null;
-	
+	/**
+	 * @var bool
+	 */
 	private $keepRunning = true;
 	
 	private $logDir = "c:/web/kaltura/log";
 	private $phpPath = null;
-	private $maxExecutionTime;
 	private $statusInterval;
 	private $schedulerStatusInterval;
 	private $nextStatusTime = 0;
@@ -51,26 +54,13 @@ class KGenericScheduler
 	private $queueSizes = array();
 	
 	/**
-	 * Stores start commands that received from the control panel 
-	 * @var array
-	 */
-	private $startedRemotely = array();
-	
-	/**
-	 * Stores stop commands that received from the control panel 
-	 * @var array
-	 */
-	private $stoppedRemotely = array();
-	
-	/**
 	 * @param string $phpPath
 	 * @param string $configFileName
 	 */
 	public function __construct($phpPath, $configFileName)
 	{
 		$this->phpPath = $phpPath;
-		$this->configFileName = $configFileName;
-		$this->loadConfig();
+		$this->loadConfig($configFileName);
 	}
 	
 	public function __destruct()
@@ -87,9 +77,6 @@ class KGenericScheduler
 			if(!$taskConfig->type)
 				continue;
 			
-			if(!$taskConfig->enable)
-				$shouldRun = false;
-			
 			$tmpConfig = clone $taskConfig;
 			$tmpConfig->setInitOnly(true);
 			
@@ -100,66 +87,33 @@ class KGenericScheduler
 		}
 	}
 	
-	private function cleanQueueFiltersDir()
+	private function loadConfig($configFileName = null)
 	{
-		$dirPath = $this->schedulerConfig->getQueueFiltersDir();
-		
-		if (!is_dir($dirPath))
-			return;
-
-		$dh = opendir($dirPath);
-	    if(!$dh) 
-			return;
-			
-        while (($file = readdir($dh)) !== false) 
-        {
-        	if($file == '.' || $file == '..')
-        		continue;
-        		
-        	if(!preg_match('/.\.flt$/', $file))
-        		continue;
-        		
-        	$filePath = "$dirPath/$file";
-        	if(filetype($filePath) == 'dir')
-        		continue;
-        		
-        	@unlink($filePath);
-        }
-        closedir($dh);
-	}
-	
-	private function loadConfig()
-	{
-		$firstLoad = true;
-		if(!is_null($this->schedulerConfig))
+		$firstLoad = is_null($this->schedulerConfig);
+		if($firstLoad)
 		{
-			$firstLoad = false;
-			
-			// check if the helper updated the config file
-			clearstatcache();
-			$current_file_time = filemtime($this->configFileName);
-			if($current_file_time <= $this->schedulerConfig->getFileTimestamp())
+			$this->schedulerConfig = new KSchedulerConfig($configFileName);
+			date_default_timezone_set($this->schedulerConfig->getTimezone());
+			KalturaLog::info(file_get_contents('VERSION.txt'));
+		}
+		else
+		{	
+			if(!$this->schedulerConfig->reloadRequired())
 				return;
 				
 			sleep(2); // make sure the file finsied to be written
+			$this->schedulerConfig->load();
 		}
 		
-		$this->schedulerConfig = new KSchedulerConfig($this->configFileName);
-		date_default_timezone_set($this->schedulerConfig->getTimezone());
-		
-		$this->cleanQueueFiltersDir();
+		KScheduleHelperManager::clearFilters();
 		$this->queueSizes = array();
-		
-		if($firstLoad)
-			KalturaLog::info(file_get_contents('VERSION.txt'));
 			
 		KalturaLog::info("Loading configuration file at: " . date('Y-m-d H:i'));
 		
-		$configItems = $this->createConfigItem($this->schedulerConfig->getScheduler()->toArray());
+		$configItems = $this->createConfigItem($this->schedulerConfig->toArray());
 		$taskConfigs = $this->schedulerConfig->getTaskConfigList();
 		
 		$this->logDir = $this->schedulerConfig->getLogDir();
-		$this->maxExecutionTime = $this->schedulerConfig->getMaxExecutionTime();
 		$this->statusInterval = $this->schedulerConfig->getStatusInterval();
 		$this->schedulerStatusInterval = $this->schedulerConfig->getSchedulerStatusInterval();
 		KDwhClient::setEnabled($this->schedulerConfig->getDwhEnabled());
@@ -193,10 +147,8 @@ class KGenericScheduler
 			$configItems = array_merge($configItems, $subConfigItems);
 		}
 		KalturaLog::info("sending configuration to the server");
-		KScheduleHelperManager::saveConfigItems($this->schedulerConfig->getConfigItemsFilePath(), $configItems);
+		KScheduleHelperManager::saveConfigItems($configItems);
 					
-		set_time_limit($this->maxExecutionTime);
-		
 		$this->initAllWorkers();
 	}
 	
@@ -247,21 +199,10 @@ class KGenericScheduler
 				if($fullCycle)
 					$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_COUNT, $runningTasksCount);
 				
-				$shouldRun = true;
-				
-				if(!$taskConfig->enable)
-					$shouldRun = false;
-				
-				if(!$taskConfig->autoStart && !isset($this->startedRemotely[$taskConfig->name]))
-					$shouldRun = false;
-				
-				if(isset($this->stoppedRemotely[$taskConfig->name]))
-					$shouldRun = false;
-				
 				if($fullCycle)
-					$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_IS_RUNNING, ($shouldRun ? 1 : 0));
+					$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_IS_RUNNING, 1);
 					
-				if($shouldRun && $this->shouldExecute($taskConfig))
+				if($this->shouldExecute($taskConfig))
 					$this->spawn($taskConfig);
 			}
 			
@@ -269,9 +210,9 @@ class KGenericScheduler
 				$statuses[] = $this->createSchedulerStatus(KalturaSchedulerStatusType::RUNNING_BATCHES_IS_RUNNING, 1);
 				
 			if(count($statuses))
-				KScheduleHelperManager::saveStatuses($this->schedulerConfig->getStatusFilePath(), $statuses);
+				KScheduleHelperManager::saveStatuses($statuses);
 			
-			$runningBatches = KScheduleHelperManager::loadRunningBatches($this->schedulerConfig->getCommandsDir());
+			$runningBatches = KScheduleHelperManager::loadRunningBatches();
 			foreach($this->runningTasks as $taskName => &$tasks)
 			{
 				if(! count($tasks))
@@ -526,7 +467,7 @@ class KGenericScheduler
 	
 	private function loadCommands()
 	{
-		$commands = KScheduleHelperManager::loadCommands($this->schedulerConfig->getCommandsDir());
+		$commands = KScheduleHelperManager::loadCommands();
 		if(!$commands || !is_array($commands) || !count($commands))
 			return;
 			
@@ -539,10 +480,6 @@ class KGenericScheduler
 			{
 				$this->handleQueueStatus($command->workerId, $command->size);
 			}
-			elseif($command instanceof KalturaSchedulerConfig)
-			{
-				$command_results[] = $this->handleConfig($command);
-			}
 			elseif($command instanceof KalturaControlPanelCommand)
 			{
 				$command_results[] = $this->handleCommand($command);
@@ -550,15 +487,15 @@ class KGenericScheduler
 			else
 			{
 				KalturaLog::err("command of type " . get_class($command) . " could not be handled");
+				$command_results[] = KalturaControlPanelCommandStatus::FAILED;
 			}
 		}
 		
 		$cnt = count($command_results);
 		if($cnt)
 		{
-			$path = $this->schedulerConfig->getCommandResultsFilePath();
-			KalturaLog::info("Sending $cnt command results to the server [$path]");
-			KScheduleHelperManager::saveCommands($path, $command_results);
+			KalturaLog::info("Sending $cnt command results to the server");
+			KScheduleHelperManager::saveCommands($command_results);
 		}
 	}
 	
@@ -592,29 +529,6 @@ class KGenericScheduler
 	
 	/***
 	 * handleCommand
-	 * @param KalturaSchedulerConfig $command
-	 * @return KalturaSchedulerConfig
-	 */
-	private function handleConfig(KalturaSchedulerConfig $config)
-	{
-		KalturaLog::info("Save $config->variable [$config->variablePart] attribute to $config->value for worker $config->workerName");
-		$success = $this->schedulerConfig->saveConfig($config->variable, $config->value, $config->workerName, $config->variablePart);
-		
-		if($success)
-		{
-			$config->commandStatus = KalturaControlPanelCommandStatus::DONE;
-		}
-		else
-		{
-			KalturaLog::err("Failed to save $config->variable [$config->variablePart] attribute to $config->value for worker $config->workerName");
-			$config->commandStatus = KalturaControlPanelCommandStatus::FAILED;
-		}
-		
-		return $config;
-	}
-	
-	/***
-	 * handleCommand
 	 * @param KalturaControlPanelCommand $command
 	 * @return KalturaControlPanelCommand
 	 */
@@ -627,56 +541,20 @@ class KGenericScheduler
 		
 		switch($command->type)
 		{
-			case KalturaControlPanelCommandType::START:
-				
-				switch(intval($command->targetType))
-				{
-					case KalturaControlPanelCommandTargetType::JOB_TYPE:
-						$success = $this->startByType($command->workerName, $description);
-						break;
-						
-					case KalturaControlPanelCommandTargetType::JOB:
-						$success = $this->startById($command->workerConfiguredId, $description);
-						break;
-						
-					default:
-						$description = "Target type [$command->targetType] not supported for start command";
-						break;
-				}
-				break;
-				
-			case KalturaControlPanelCommandType::STOP:
-				
-				switch(intval($command->targetType))
-				{
-					case KalturaControlPanelCommandTargetType::SCHEDULER:
-						KalturaLog::info("Scheduler stopping...");
-						$this->keepRunning = false;
-						$success = true;
-						break;
-						
-					case KalturaControlPanelCommandTargetType::JOB_TYPE:
-						$success = $this->stopByType($command->workerName, $description);
-						break;
-						
-					case KalturaControlPanelCommandTargetType::JOB:
-						$success = $this->stopById($command->workerConfiguredId, $description);
-						break;
-						
-					default:
-						$description = "Target type [$command->targetType] not supported for stop command";
-						break;
-				}
-				break;
-				
 			case KalturaControlPanelCommandType::KILL:
 				
+				if(intval($command->targetType) != KalturaControlPanelCommandTargetType::SCHEDULER)
+				{
+					KalturaLog::info("Scheduler stopping...");
+					$this->keepRunning = false;
+					$success = true;
+				}
+						
 				if(intval($command->targetType) != KalturaControlPanelCommandTargetType::BATCH)
 				{
 					$description = 'Target type not supported for kill command';
-					break;
+					$success = $this->killBatch($command->workerName, $command->batchIndex, $description);
 				}
-				$success = $this->killBatch($command->workerName, $command->batchIndex, $description);
 				break;
 				
 			default:
@@ -698,34 +576,6 @@ class KGenericScheduler
 		
 		return $command;
 	}
-	
-	private function startById($id, &$description)
-	{
-		foreach($this->schedulerConfig->getTaskConfigList() as $taskConfig)
-			if($taskConfig->id == $id)
-				return $this->startByName($taskConfig->name, $description);
-	}
-	
-	private function startByName($name, &$description)
-	{
-		$this->startedRemotely[$name] = true;
-		if(isset($this->stoppedRemotely[$name]))
-			unset($this->stoppedRemotely[$name]);
-			
-		// check if the job exists on this scheduler
-		foreach($this->schedulerConfig->getTaskConfigList() as $taskConfig)
-		{
-			if($taskConfig->name == $name)
-			{
-				KalturaLog::info("$name started");
-				return true;
-			}
-		}
-				
-		$description = "Could not find a job named $name";
-		return false;
-	}
-	
 	
 	private function killBatch($name, $batchIndex, $description)
 	{
@@ -752,68 +602,6 @@ class KGenericScheduler
 		KalturaLog::info("$name [$batchIndex] killed");
 		
 		return true;
-	}
-	
-	private function stopById($id, &$description)
-	{
-		foreach($this->schedulerConfig->getTaskConfigList() as $taskConfig)
-			if($taskConfig->id == $id)
-				return $this->stopByName($taskConfig->name, $description);
-	}
-	
-	private function stopByName($name, &$description)
-	{
-		$this->stoppedRemotely[$name] = true;
-		if(isset($this->startedRemotely[$name]))
-			unset($this->startedRemotely[$name]);
-			
-		// check if the job is running on this scheduler
-		if(isset($this->runningTasks[$name]))
-		{
-			KalturaLog::info("$name stoped");
-			return true;
-		}
-			
-		$description = "Could not find a job named $name";
-		return false;
-	}
-	
-	private function startByType($type, &$description)
-	{
-		$found_any = false;
-		
-		foreach($this->schedulerConfig->getTaskConfigList() as $taskConfig)
-		{
-			if($taskConfig->type == $type)
-			{
-				$found_any = true;
-				$this->startByName($taskConfig->name);
-			}
-		}
-		
-		if(!$found_any)
-			$description = "Could not find any job of type $type";
-			
-		return $found_any;
-	}
-	
-	private function stopByType($type, &$description)
-	{
-		$found_any = false;
-		
-		foreach($this->schedulerConfig->getTaskConfigList() as $taskConfig)
-		{
-			if($taskConfig->type == $type)
-			{
-				$found_any = true;
-				$this->stopByName($taskConfig->name);
-			}
-		}
-		
-		if(!$found_any)
-			$description = "Could not find any job of type $type";
-		
-		return $found_any;
 	}
 	
 	protected function onQueueEvent(KSchedularTaskConfig $taskConfig, $queueSize)

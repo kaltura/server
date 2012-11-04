@@ -9,8 +9,19 @@
  */
 class KGenericDebuger
 {
+	/**
+	 * @var bool
+	 */
 	private $enableDebug = true;
+	
+	/**
+	 * @var KSchedulerConfig
+	 */
 	private $schedulerConfig = null;
+	
+	/**
+	 * @var string
+	 */
 	private $configFileName = null;
 	
 	private $logDir = "/web/kaltura/log";
@@ -30,16 +41,10 @@ class KGenericDebuger
 	private function loadConfig()
 	{
 		$this->debug(__LINE__, "loadConfig()");
-		if(!is_null($this->schedulerConfig))
-		{
-			// check if the helper updated the config file
-			$current_file_time = filemtime($this->configFileName);
-			if($current_file_time <= $this->schedulerConfig->getFileTimestamp())
-				return;
-		}
+		if(!is_null($this->schedulerConfig) && !$this->schedulerConfig->reloadRequired())
+			return;
 		
 		$this->schedulerConfig = new KSchedulerConfig($this->configFileName);
-		
 		$this->logDir = $this->schedulerConfig->getLogDir();
 	}
 	

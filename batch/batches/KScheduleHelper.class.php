@@ -56,47 +56,28 @@ class KScheduleHelper extends KPeriodicWorker
 		$scheduler = new KalturaScheduler();
 		$scheduler->configuredId = $this->getSchedulerId();
 		$scheduler->name = $this->getSchedulerName();
-		$scheduler->host = $this->getConfigHostName();
+		$scheduler->host = KSchedulerConfig::getHostname();
 		
-		// if the hostName is not set in the config - search the differnt env params 
-		if ( ! $scheduler->host )
-		{
-			if(isset($_SERVER['COMPUTERNAME']))
-				$scheduler->host = $_SERVER['COMPUTERNAME'];
-			elseif(isset($_SERVER['HOSTNAME']))
-				$scheduler->host = $_SERVER['HOSTNAME'];
-			elseif(function_exists('gethostname'))
-				$scheduler->host = gethostname();
-			else
-				$scheduler->host = 'unknown';
-		}
 		// get command results from the scheduler
-		$commandResults = KScheduleHelperManager::loadCommandsFile($this->taskConfig->params->commandResultsFilePath);
+		$commandResults = KScheduleHelperManager::loadCommandsFile();
 		KalturaLog::info(count($commandResults) . " command results returned from the scheduler");
 		if(count($commandResults))
 			$this->sendCommandResults($commandResults);
 		
-		if($this->taskConfig->params->configItemsFilePath)
+		// get config from the schduler
+		$configItems = KScheduleHelperManager::loadConfigItems();
+		if(count($configItems))
 		{
-			// get config from the schduler
-			$configItems = KScheduleHelperManager::loadConfigItems($this->taskConfig->params->configItemsFilePath);
-			if(count($configItems))
-			{
-				KalturaLog::info(count($configItems) . " config records sent from the scheduler");
-				$this->sendConfigItems($scheduler, $configItems);
-			}
+			KalturaLog::info(count($configItems) . " config records sent from the scheduler");
+			$this->sendConfigItems($scheduler, $configItems);
 		}
 		
-		$filters = KScheduleHelperManager::loadFilters($this->taskConfig->getQueueFiltersDir());
+		$filters = KScheduleHelperManager::loadFilters();
 		KalturaLog::info(count($filters) . " filter records found for the scheduler");
 		
-		$statuses = array();
-		if($this->taskConfig->params->statusFilePath)
-		{
-			// get status from the schduler
-			$statuses = KScheduleHelperManager::loadStatuses($this->taskConfig->params->statusFilePath);
-			KalturaLog::info(count($statuses) . " status records sent from the scheduler");
-		}
+		// get status from the schduler
+		$statuses = KScheduleHelperManager::loadStatuses();
+		KalturaLog::info(count($statuses) . " status records sent from the scheduler");
 		
 		// send status to the server
 		$statusResponse = $this->kClient->batchcontrol->reportStatus($scheduler, (array)$statuses, (array)$filters);
