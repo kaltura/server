@@ -4,7 +4,6 @@
  * @subpackage config
  */
 setlocale(LC_ALL, 'en_US.UTF-8');
-libxml_disable_entity_loader(true);
 
 require_once __DIR__ . '/../infra/kEnvironment.php';
 
