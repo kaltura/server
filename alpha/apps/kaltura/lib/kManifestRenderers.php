@@ -12,6 +12,11 @@ abstract class kManifestRenderer
 	public $entryId;
 
 	/**
+	 * @var int
+	 */
+	public $duration = null;
+	
+	/**
 	 * @var kUrlTokenizer
 	 */
 	public $tokenizer = null;
@@ -120,11 +125,6 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 	 * @var string
 	 */
 	public $baseUrl = '';
-
-	/**
-	 * @var int
-	 */
-	public $duration = null;
 	
 	protected function tokenizeUrls()
 	{
@@ -297,11 +297,6 @@ class kSilverLightManifestRenderer extends kSingleUrlManifestRenderer
 	 */
 	public $streamType = self::PLAY_STREAM_TYPE_RECORDED;
 
-	/**
-	 * @var int
-	 */
-	public $duration = null;
-	
 	/**
 	 * @return array<string>
 	 */

@@ -53,12 +53,7 @@ class playManifestAction extends kalturaAction
 	 * @var entry
 	 */
 	private $entry;
-	
-	/**
-	 * @var string
-	 */
-	private $flavorId;
-	
+		
 	/**
 	 * @var int
 	 */
@@ -110,14 +105,39 @@ class playManifestAction extends kalturaAction
 	private $deliveryCode = null;	
 
 	/**
-	 * @var kUrlTokenizer
+	 * @var kUrlManager
 	 */
-	private $tokenizer = null;
+	private $urlManager = null;
 	
 	/**
 	 * @var KSecureEntryHelper
 	 */
 	private $secureEntryHelper = null;
+	
+	/**
+	 * @var array
+	 */
+	private $flavorAssets = array();
+	
+	/**
+	 * @var array
+	 */
+	private $remoteFileSyncs = array();
+	
+	/**
+	 * @var FileSync
+	 */
+	private $manifestFileSync = null;
+		
+	/**
+	 * @var int
+	 */
+	private $duration = null;
+	
+	/**
+	 * @var StorageProfile
+	 */
+	private $storageProfile = null;
 	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	URL tokenization functions
@@ -144,1045 +164,6 @@ class playManifestAction extends kalturaAction
 		return str_replace(self::KALTURA_TOKEN_MARKER, $token, $url);
 	}
 	
-	///////////////////////////////////////////////////////////////////////////////////
-	//	URL building functions
-	
-	/**
-	 * @param string $url
-	 * @param string $urlPrefix
-	 * @param flavorAsset $flavorAsset
-	 * @return array
-	 */
-	private function getFlavorAssetInfo($url, $urlPrefix = '', flavorAsset $flavorAsset = null)
-	{
-		$ext = null;
-		if ($flavorAsset)
-		{
-			$ext = $flavorAsset->getFileExt();
-		}
-		if (!$ext)
-		{
-			$parsedUrl = parse_url($urlPrefix . $url);
-			$ext = pathinfo($parsedUrl['path'], PATHINFO_EXTENSION);
-		}
-
-		$bitrate = ($flavorAsset ? $flavorAsset->getBitrate() : 0);
-		$width =   ($flavorAsset ? $flavorAsset->getWidth()	  : 0);
-		$height =  ($flavorAsset ? $flavorAsset->getHeight()  : 0);
-		
-		return array(
-			'url' => $url,
-			'urlPrefix' => $urlPrefix,
-			'ext' => $ext,
-			'bitrate' => $bitrate,
-			'width' => $width,
-			'height' => $height);
-	}
-
-	/**
-	 * @param kUrlManager $urlManager
-	 * @param FileSync $fileSync
-	 * @param flavorAsset $flavorAsset
-	 * @param string $format
-	 */
-	private function setupUrlManager($urlManager, FileSync $fileSync = null, flavorAsset $flavorAsset = null, $format = null)
-	{
-		$urlManager->setClipTo($this->clipTo);
-		if ($flavorAsset)
-			$urlManager->setContainerFormat($flavorAsset->getContainerFormat());
-		
-		if($flavorAsset && $flavorAsset->getFileExt() !== null) // if the extension is missig use the one from the actual path
-			$urlManager->setFileExtension($flavorAsset->getFileExt());
-		else if ($fileSync)
-			$urlManager->setFileExtension(pathinfo($fileSync->getFilePath(), PATHINFO_EXTENSION));
-			
-		if (!$format)
-			$format = $this->format;
-			
-		$urlManager->setProtocol($format);
-	}
-
-	/**
-	 * @param int $storageProfileId
-	 * @param FileSync $fileSync
-	 * @param flavorAsset $flavorAsset
-	 * @param string $format
-	 * @return kUrlManager
-	 */
-	private function getUrlManagerByStorageProfile($storageProfileId, FileSync $fileSync = null, flavorAsset $flavorAsset = null, $format = null)
-	{
-		$urlManager = kUrlManager::getUrlManagerByStorageProfile($storageProfileId, $this->entryId);
-		$this->setupUrlManager($urlManager, $fileSync, $flavorAsset, $format);
-		return $urlManager;
-	}
-	
-	/**
-	 * @param string $cdnHost
-	 * @param FileSync $fileSync
-	 * @param flavorAsset $flavorAsset
-	 * @param string $format
-	 * @return kUrlManager
-	 */
-	private function getUrlManagerByCdn($cdnHost, FileSync $fileSync = null, flavorAsset $flavorAsset = null, $format = null)
-	{
-		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $this->entryId);
-		$this->setupUrlManager($urlManager, $fileSync, $flavorAsset, $format);
-		return $urlManager;
-	}	
-
-	/**
-	 * @param flavorAsset $flavorAsset
-	 * @param FileSyncKey $key
-	 * @return array
-	 */
-	private function getExternalStorageUrl(flavorAsset $flavorAsset, FileSyncKey $key)
-	{
-		$partner = $this->entry->getPartner();
-		if(!$partner || 
-			!$partner->getStorageServePriority() || 
-			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
-			return null;
-			
-		if(is_null($this->storageId) && 
-			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST)
-			if(kFileSyncUtils::getReadyInternalFileSyncForKey($key)) // check if having file sync on kaltura dcs
-				return null;
-				
-		$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key, $this->storageId);
-		if(!$fileSync)
-			return null;
-
-		$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
-		if(!$storage)
-			return null;
-			
-		$urlManager = $this->getUrlManagerByStorageProfile($fileSync->getDc(), $fileSync, $flavorAsset);
-		$urlManager->setSeekFromTime($this->seekFrom);
-		
-		$url = ltrim($urlManager->getFileSyncUrl($fileSync, false), "/");		
-        $urlPrefix = '';                    
-        if (strpos($url, "://") === false)
-         	$urlPrefix = rtrim($storage->getDeliveryHttpBaseUrl(), "/") . "/";
-         			
-		$this->tokenizer = $urlManager->getTokenizer();
-
-		return $this->getFlavorAssetInfo($url, $urlPrefix, $flavorAsset);
-	}
-
-	/**
-	 * @param flavorAsset $flavorAsset
-	 * @return array
-	 */
-	private function getFlavorHttpUrl(flavorAsset $flavorAsset)
-	{
-		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$externalStorageUrl = $this->getExternalStorageUrl($flavorAsset, $syncKey);
-		if($externalStorageUrl)
-			return $externalStorageUrl;
-			
-		if($this->storageId) // must be specific external storage
-			return null;
-			
-		$partner = $this->entry->getPartner();
-		if($partner && 
-			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
-			return null;
-
-		$urlManager = $this->getUrlManagerByCdn($this->cdnHost, null, $flavorAsset);
-		$urlManager->setSeekFromTime($this->seekFrom);
-		$urlManager->setDomain($this->cdnHost);
-
-	    $url = $urlManager->getAssetUrl($flavorAsset, false);
-	    
-		$this->tokenizer = $urlManager->getTokenizer();
-		
-		if ($this->format == StorageProfile::PLAY_FORMAT_RTSP)
-		{
-			// the host was already added by the url manager
-			return $this->getFlavorAssetInfo($url, '', $flavorAsset);
-		}
-		
-		$urlPrefix = '';
-		if (strpos($url, "/") === 0)
-		{
-			$flavorSizeKB = $flavorAsset->getSize();
-			if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
-				$urlPrefix = requestUtils::getRequestHost();
-			else
-				$urlPrefix = $this->cdnHost;
-		}
-
-		$urlPrefix = preg_replace('/^https?:\/\//', '', $urlPrefix);
-		$url = preg_replace('/^https?:\/\//', '', $url);
-		
-		if ($urlPrefix)
-		{
-			$urlPrefix = $this->protocol . '://' . $urlPrefix;
-			$urlPrefix = rtrim($urlPrefix, "/") . "/";
-		}
-		else
-		{
-			$url = $this->protocol . '://' . $url;
-		}
-		
-		$url = ltrim($url, "/");
-		
-		return $this->getFlavorAssetInfo($url, $urlPrefix, $flavorAsset);
-	}
-	
-	/**
-	 * @param FileSyncKey $key
-	 * @return array
-	 */
-	private function getSmoothStreamUrl(FileSyncKey $key)
-	{
-		$kalturaFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
-	
-		$urlPrefix = myPartnerUtils::getIisHost($this->entry->getPartnerId(), $this->protocol);
-		$iisHost = parse_url($urlPrefix, PHP_URL_HOST);
-		
-		$matches = null;
-		if(preg_match('/(https?:\/\/[^\/]+)(.*)/', $urlPrefix, $matches))
-		{
-			$urlPrefix = $matches[1];
-		}
-		$urlPrefix .= '/';
-		
-		$kalturaUrlManager = $this->getUrlManagerByCdn($iisHost, $kalturaFileSync);
-		
-		$partner = $this->entry->getPartner();
-		if(!$partner->getStorageServePriority() || 
-			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY ||
-			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST)
-		{
-			if($kalturaFileSync)
-			{
-				$this->tokenizer = $kalturaUrlManager->getTokenizer();
-				$url = $kalturaUrlManager->getFileSyncUrl($kalturaFileSync, false);
-				return $this->getFlavorAssetInfo($url, $urlPrefix);
-			}
-		}
-		
-		if(!$partner->getStorageServePriority() || 
-			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
-		{
-			return null;
-		}
-			
-		$externalFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);		
-		if($externalFileSync)
-		{
-			$externalUrlManager = $this->getUrlManagerByStorageProfile($externalFileSync->getDc(), $externalFileSync);
-			$this->tokenizer = $externalUrlManager->getTokenizer();
-			$url = $externalUrlManager->getFileSyncUrl($externalFileSync, false);
-			return $this->getFlavorAssetInfo($url, $urlPrefix);
-		}
-
-		if($partner->getStorageServePriority() != StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
-		{
-			if($kalturaFileSync)
-			{
-				$this->tokenizer = $kalturaUrlManager->getTokenizer();
-				$url = $kalturaUrlManager->getFileSyncUrl($kalturaFileSync, false);
-				return $this->getFlavorAssetInfo($url, $urlPrefix);
-			}
-		}
-					
-		return null;
-	}
-	
-	/**
-	 * @return array
-	 */
-	private function getSecureHdUrl()
-	{
-		$urlManager = $this->getUrlManagerByCdn($this->cdnHost);
-		if (!method_exists($urlManager, 'getManifestUrl'))
-		{
-			KalturaLog::debug('URL manager [' . get_class($urlManager) . '] does not support manifest URL for CDN [' . $this->cdnHost . ']');
-			return null;
-		}
-
-		$originalFormat = $this->format;
-		$this->format = StorageProfile::PLAY_FORMAT_HTTP;	
-		$duration = null;		
-		$flavors = $this->buildHttpFlavorsArray($duration);
-		$this->format = $originalFormat;
-		
-		if (!$flavors)
-			return null;
-
-		if ($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
-			$flavors = $this->sortFlavors($flavors);	
-
-		$flavor = $urlManager->getManifestUrl($flavors);
-		if (!$flavor)
-		{
-			KalturaLog::debug('URL manager [' . get_class($urlManager) . '] could not find flavor');
-			return null;
-		}
-		
-		if (strpos($flavor['urlPrefix'], '://') === false)
-			$flavor['urlPrefix'] = $this->protocol . '://' . $flavor['urlPrefix'];
-
-		$urlManager->setProtocol('hdnetworkmanifest');
-		$this->tokenizer = $urlManager->getTokenizer();
-		
-		return $flavor;
-	} 
-	
-	///////////////////////////////////////////////////////////////////////////////////
-	//	Flavor array utility functions
-
-	/**
-	 * @param array $flavorAssets
-	 * @return int
-	 */
-	private function getDurationFromFlavorAssets($flavorAssets)
-	{
-		foreach($flavorAssets as $flavorAsset)
-		{
-			/* @var $flavorAsset flavorAsset */
-			
-			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
-			if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
-			{
-				$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : 
-								($mediaInfo->getAudioDuration() ? $mediaInfo->getAudioDuration() : 
-									$mediaInfo->getContainerDuration()));
-				return $duration / 1000;
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * @param array $flavorAssets
-	 * @return array
-	 */
-	private function removeMaxBitrateFlavors($flavorAssets)
-	{
-		if (!$this->maxBitrate)			
-			return $flavorAssets;
-			
-		$returnedFlavors = array();		
-		foreach ($flavorAssets as $flavor)
-		{
-			if ($flavor->getBitrate() <= $this->maxBitrate)
-			{
-				$returnedFlavors[] = $flavor;
-			}
-		}
-	
-		return $returnedFlavors;
-	}
-	
-	/**
-	 * @param array $flavorAssets
-	 * @return array
-	 */
-	private function getLocalFlavors($flavorAssets)
-	{
-		$localFlavors = array();
-		foreach($flavorAssets as $flavorAsset)
-		{
-			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
-			if($fileSync)
-				$localFlavors[] = $flavorAsset;
-		}
-		
-		return $localFlavors;
-	}
-
-	/**
-	 * @param array $flavorAssets
-	 * @return array
-	 */
-	private function getRemoteFlavors($flavorAssets, $storageProfileId)
-	{
-		$remoteFlavors = array();
-		foreach($flavorAssets as $flavorAsset)
-		{
-			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key, $storageProfileId);
-			if($fileSync)
-				$remoteFlavors[] = $flavorAsset;
-		}
-		return $remoteFlavors;
-	}
-	
-	/**
-	 * @param array $flavors
-	 * @return string
-	 */
-	private function getMimeType($flavors)
-	{
-		if ($this->entry->getType() == entryType::MEDIA_CLIP && 
-			$this->entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO &&
-			count($flavors))
-		{
-			$isMp3 = true;
-			foreach($flavors as $flavor)
-			{
-				if (!isset($flavor['ext']) || strtolower($flavor['ext']) != 'mp3')
-					$isMp3 = false;
-			}
-			
-			if ($isMp3)
-				return 'audio/mpeg';
-		}
-		
-		return 'video/x-flv';
-	}
-	
-	/**
-	 * 
-	 * Private function which compares 2 flavors in order to sort an array.
-	 * If a flavor's width and height parameters are equal to 0, it is 
-	 * automatically moved down the list so the player will not start playing it by default.
-	 * @param array $flavor1
-	 * @param array $flavor2
-	 */
-    private function flavorCmpFunction ($flavor1, $flavor2)
-	{
-		// move the audio flavors to the end
-	    if ($flavor1['height'] == 0 && $flavor1['width'] == 0)
-	    {
-	        return 1;
-	    }
-	    if ($flavor2['height'] == 0 && $flavor2['width'] == 0)
-	    {
-	        return -1;
-	    }
-		
-		// if a preferred bitrate was defined place it first
-		if ($this->preferredFlavor == $flavor2)
-		{
-			return 1;
-		}
-		if ($this->preferredFlavor == $flavor1)
-		{
-			return -1;
-		}
-		
-		// sort the flavors in ascending bitrate order
-	    if ($flavor1['bitrate'] >= $flavor2['bitrate'])
-	    {
-	        return 1;
-	    }
-	    
-        return -1;
-	}
-	
-	/**
-	 * @param array $flavors
-	 * @return array
-	 */
-	private function sortFlavors($flavors)
-	{
-		$this->preferredFlavor = null;
-		
-		if ($this->preferredBitrate !== null)
-		{
-			foreach ($flavors as $flavor)
-			{
-				if ($flavor['height'] == 0 && $flavor['width'] == 0)
-					continue;		// audio flavor
-			
-				$bitrateDiff = abs($flavor['bitrate'] - $this->preferredBitrate);
-				if (!$this->preferredFlavor || $bitrateDiff < $minBitrateDiff)
-				{
-					$this->preferredFlavor = $flavor;
-					$minBitrateDiff = $bitrateDiff;
-				}
-			}
-		}
-		
-		uasort($flavors, array($this,'flavorCmpFunction'));
-		
-		return $flavors;
-	}
-
-	/**
-	 * @param asset $flavorAsset
-	 * @return boolean
-	 */
-	private function assetMatchesTags(asset $flavorAsset)
-	{
-		foreach ($this->tags as $tagsFallback)
-		{
-			foreach ($tagsFallback as $tagOption)
-			{
-				if ($flavorAsset->hasTag($tagOption))
-					return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * @return array
-	 */
-	private function getReadyFlavorsByTags()
-	{
-		$allFlavors = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
-		foreach ($this->tags as $tagsFallback)
-		{
-			$curFlavors = array();
-			
-			foreach ($allFlavors as $flavorAsset)
-			{
-				foreach ($tagsFallback as $tagOption)
-				{
-					if (!$flavorAsset->hasTag($tagOption))
-						continue;
-					$curFlavors[] = $flavorAsset;
-					break;
-				}
-			}
-			
-			if ($curFlavors)
-				return $curFlavors;
-		}
-		return array();
-	}
-	
-	///////////////////////////////////////////////////////////////////////////////////
-	//	Flavor array building functions
-
-	/**
-	 * @param bool $oneOnly
-	 * @return array
-	 */
-	private function buildHttpFlavorAssetArray($oneOnly)
-	{
-		$flavorAssets = array();
-		
-		if($this->flavorId && ($flavorAsset = assetPeer::retrieveById($this->flavorId)) != null)
-		{
-			if ($this->assetMatchesTags($flavorAsset) &&
-				$flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
-				$flavorAssets[] = $flavorAsset;
-		}
-		elseif($oneOnly)
-		{
-			$webFlavorAssets = $this->getReadyFlavorsByTags();
-			if(count($webFlavorAssets))
-				$flavorAssets[] = reset($webFlavorAssets);
-		}
-		else 
-		{
-			if ($this->flavorIds)
-			{
-				$tmpFlavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
-				foreach($tmpFlavorAssets as $flavorAsset)
-				{
-					if (in_array($flavorAsset->getId(), $this->flavorIds))
-						$flavorAssets[] = $flavorAsset;
-				}
-			}
-			else 
-			{
-				$flavorAssets = $this->getReadyFlavorsByTags();
-			}
-		}
-		
-		return $flavorAssets;
-	}
-	
-	/**
-	 * @param bool $oneOnly
-	 * @param int $duration
-	 * @return array
-	 */
-	private function buildHttpFlavorsArray(&$duration, $oneOnly = false)
-	{
-		$flavorAssets = $this->buildHttpFlavorAssetArray($oneOnly);
-		
-		$duration = $this->entry->getDurationInt();
-		$flavorDuration = $this->getDurationFromFlavorAssets($flavorAssets);
-		if ($flavorDuration)
-			$duration = $flavorDuration;
-	
-		$flavors = array();
-		foreach($flavorAssets as $flavorAsset)
-		{
-			/* @var $flavorAsset flavorAsset */			
-			$httpUrl = $this->getFlavorHttpUrl($flavorAsset);
-			if ($httpUrl)		
-				$flavors[] = $httpUrl;
-		}
-		return $flavors;
-	}
-	
-	/**
-	 * @return array
-	 */
-	private function buildRtmpFlavorAssetArray()
-	{
-		// get initial flavor list according to tags / specific flavor request
-		$flavorAssets = array();
-		
-		if($this->flavorId)
-		{
-			$flavorAsset = assetPeer::retrieveById($this->flavorId);
-			if(!$this->assetMatchesTags($flavorAsset))
-				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-				
-			if($flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
-				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-				
-			$flavorAssets[] = $flavorAsset;
-		}
-		else 
-		{
-			$flavorAssets = $this->getReadyFlavorsByTags(); 
-		}
-
-		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
-		
-		if ($this->storageId)
-		{
-			// no need to further check the flavors - caller will try this storageId and fall back to local flavors if needed
-			return $flavorAssets;
-		}
-		
-		$partner = $this->entry->getPartner();
-		
-		// try using local flavors if they have the higher priority
-		if(!$partner->getStorageServePriority() || 
-			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST ||
-			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
-		{
-			$localFlavors = $this->getLocalFlavors($flavorAssets);
-			
-			if (count($localFlavors) ||
-				!$partner->getStorageServePriority() || 
-				$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
-			{
-				return $localFlavors;
-			}
-		}
-		
-		// try using remote flavors
-		$storages = StorageProfilePeer::retrieveExternalByPartnerId($partner->getId());
-		if(count($storages) == 1)
-		{
-			// no need to further check the flavors - caller will try this storageId and fall back to local flavors if needed
-			$this->storageId = $storages[0]->getId();
-			return $flavorAssets;
-		}
-		
-		if(count($storages))
-		{
-			// use the storage profile with the highest number of flavors
-			$storagesFlavors = array();
-			foreach($storages as $storage)
-			{
-				$storagesFlavors[$storage->getId()] = $this->getRemoteFlavors($flavorAssets, $storage->getId());
-			}
-			
-			$remoteFlavors = array();
-			$maxCount = 0;
-			foreach($storagesFlavors as $storageId => $storageFlavors)
-			{
-				$count = count($storageFlavors);
-				if($count > $maxCount)
-				{
-					$this->storageId = $storageId;
-					$remoteFlavors = $storageFlavors;
-					$maxCount = $count;
-				}
-			}
-			
-			if (count($remoteFlavors))
-			{
-				return $remoteFlavors;
-			}
-		}
-		
-		if ($partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
-		{
-			// could not find any external flavors and the serve priority is external only
-			return array();
-		}
-		
-		// could not find any external flavors, try local flavors
-		return $this->getLocalFlavors($flavorAssets);
-	}
-	
-	/**
-	 * @param int $duration
-	 * @param string $baseUrl
-	 * @return array
-	 */
-	private function buildRtmpFlavorsArray(&$duration, &$baseUrl)
-	{
-		$flavorAssets = $this->buildRtmpFlavorAssetArray();
-	
-		$duration = $this->entry->getDurationInt();
-		$flavorDuration = $this->getDurationFromFlavorAssets($flavorAssets);
-		if ($flavorDuration)
-			$duration = $flavorDuration;
-			
-		$flavors = array();
-		if($this->storageId)
-		{
-			$storage = StorageProfilePeer::retrieveByPK($this->storageId);
-			if(!$storage)
-				die;
-					
-			$baseUrl = $storage->getDeliveryRmpBaseUrl();
-
-			$urlManager = $this->getUrlManagerByStorageProfile($this->storageId);
-
-			// get all flavors with external urls
-			foreach($flavorAssets as $flavorAsset)
-			{
-				$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key, $this->storageId);
-				if(!$fileSync)
-					continue;
-				
-				$this->setupUrlManager($urlManager, $fileSync, $flavorAsset);
-
-				$url = $urlManager->getFileSyncUrl($fileSync, false);
-				$url = ltrim($url, "/");
-				
-				$flavors[] = $this->getFlavorAssetInfo($url, '', $flavorAsset);
-			}
-		}
-		
-		$partner = $this->entry->getPartner();
-		if (!$this->storageId || 
-			(!count($flavors) && $partner->getStorageServePriority() != StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)) 
-		{
-			$partnerId = $this->entry->getPartnerId();
-			$subpId = $this->entry->getSubpId();
-			$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
-			$baseUrl = myPartnerUtils::getRtmpUrl($partnerId);
-			
-			// allow to replace {deliveryCode} place holder with the deliveryCode parameter passed to the action
-			// a publisher with a rtmpUrl set to {deliveryCode}.example.com/ondemand will be able to use different
-			// cdn configuration for different sub publishers by passing a different deliveryCode to the KDP
-
-			if ($this->deliveryCode)
-				$baseUrl = str_replace("{deliveryCode}", $this->deliveryCode, $baseUrl);
-		
-			$rtmpHost = parse_url($baseUrl, PHP_URL_HOST);
-
-			$urlManager = $this->getUrlManagerByCdn($rtmpHost);
-
-			// get all flavors with kaltura urls
-			foreach($flavorAssets as $flavorAsset)
-			{
-				/* @var $flavorAsset flavorAsset */
-				
-				$this->setupUrlManager($urlManager, null, $flavorAsset);
-
-				$url = $urlManager->getAssetUrl($flavorAsset, false);
-				$url = ltrim($url, "/");
-				
-				$flavors[] = $this->getFlavorAssetInfo($url, '', $flavorAsset);
-			}
-		}
-		
-		if (strpos($this->protocol, "rtmp") === 0)
-			$baseUrl = $this->protocol . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
-			
-		$urlManager->finalizeUrls($baseUrl, $flavors);
-		
-		$this->tokenizer = $urlManager->getTokenizer();
-		
-		return $flavors;
-	}
-	
-	/**
-	 * @param string $baseUrl
-	 * @return array
-	 */
-	private function buildRtmpLiveStreamFlavorsArray(&$baseUrl)
-	{
-		$streamId = $this->entry->getStreamRemoteId();
-		$streamUsername = $this->entry->getStreamUsername();
-		
-		$baseUrl = $this->entry->getStreamUrl();
-		$baseUrl = rtrim($baseUrl, '/');
-
-		$rtmpHost = parse_url($baseUrl, PHP_URL_HOST);
-		$urlManager = $this->getUrlManagerByCdn($rtmpHost);
-		
-		$flavors = $this->entry->getStreamBitrates();
-		if(count($flavors))
-		{
-			foreach($flavors as $index => $flavor)
-			{
-				$brIndex = $index + 1;
-				$flavors[$index]['url'] = str_replace('%i', $brIndex, $this->entry->getStreamName());
-			}
-		}
-		else
-		{
-			$flavors[0]['url'] = str_replace('%i', '1', $this->entry->getStreamName());
-		}
-		
-		if (strpos($this->protocol, "rtmp") === 0)
-			$baseUrl = $this->protocol . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
-		
-		$urlManager->finalizeUrls($baseUrl, $flavors);
-
-		$this->tokenizer = $urlManager->getTokenizer();
-
-		return $flavors;
-	}
-
-	private function ensureUniqueBitrates(array &$flavors)
-	{
-		$seenBitrates = array();
-		foreach ($flavors as &$flavor)
-		{
-			while (in_array($flavor['bitrate'], $seenBitrates))
-			{
-				$flavor['bitrate']++;
-			}
-			$seenBitrates[] = $flavor['bitrate'];
-		}
-	}
-	
-	/**
-	 * @return flavorAsset
-	 */
-	private function getFlavorAsset()
-	{
-		if($this->entry->getType() != entryType::MEDIA_CLIP)
-			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-
-		switch($this->entry->getType())
-		{
-			case entryType::MEDIA_CLIP:
-				switch($this->entry->getMediaType())
-				{					
-					case entry::ENTRY_MEDIA_TYPE_VIDEO:
-					case entry::ENTRY_MEDIA_TYPE_AUDIO:	
-						if($this->flavorId && ($flavorAsset = assetPeer::retrieveById($this->flavorId)) != null)
-						{
-							return $flavorAsset;
-						}
-						KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-				}
-				
-			default:
-				break;
-		}
-		
-		KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-	}
-	
-	///////////////////////////////////////////////////////////////////////////////////
-	//	Serve functions
-	
-	/**
-	 * @return kManifestRenderer
-	 */
-	private function serveUrl()
-	{
-		$flavorAsset = $this->getFlavorAsset();
-		$flavorInfo = $this->getFlavorHttpUrl($flavorAsset);
-
-		$renderer = new kRedirectManifestRenderer();
-		$renderer->entryId = $this->entryId;
-		$renderer->tokenizer = $this->tokenizer;
-		$renderer->flavor = $flavorInfo;
-		return $renderer;
-	}
-	
-	/**
-	 * @return kManifestRenderer
-	 */
-	private function serveHttp()
-	{
-		if($this->entry->getType() != entryType::MEDIA_CLIP)
-			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-
-		$duration = null;
-		switch($this->entry->getType())
-		{
-			case entryType::MEDIA_CLIP:
-				switch($this->entry->getMediaType())
-				{					
-					case entry::ENTRY_MEDIA_TYPE_IMAGE:
-						// TODO - create sequence manifest
-						break;
-						
-					case entry::ENTRY_MEDIA_TYPE_VIDEO:
-					case entry::ENTRY_MEDIA_TYPE_AUDIO:	
-						$flavors = $this->buildHttpFlavorsArray($duration, true);
-						
-						$renderer = new kF4MManifestRenderer();
-						$renderer->entryId = $this->entryId;
-						$renderer->tokenizer = $this->tokenizer;						
-						$renderer->flavors = $flavors;
-						$renderer->duration = $duration;
-						$renderer->mimeType = $this->getMimeType($flavors);						
-						return $renderer;
-				}
-				
-			default:
-				break;
-		}
-		
-		KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-	}
-	
-	/**
-	 * @return kManifestRenderer
-	 */
-	private function serveRtmp()
-	{
-		$baseUrl = null;
-		$duration = null;
-		switch($this->entry->getType())
-		{
-			case entryType::MEDIA_CLIP:
-				
-				$flavors = $this->buildRtmpFlavorsArray($duration, $baseUrl);
-				
-				if(!count($flavors))
-					KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-
-				$renderer = new kF4MManifestRenderer();
-				$renderer->entryId = $this->entryId;
-				$renderer->tokenizer = $this->tokenizer;
-				$renderer->flavors = $flavors;
-				$renderer->baseUrl = $baseUrl;
-				$renderer->duration = $duration;
-				$renderer->mimeType = $this->getMimeType($flavors);
-				return $renderer;
-
-			case entryType::LIVE_STREAM:
-				
-				$flavors = $this->buildRtmpLiveStreamFlavorsArray($baseUrl);
-
-				$renderer = new kF4MManifestRenderer();
-				$renderer->entryId = $this->entryId;
-				$renderer->tokenizer = $this->tokenizer;
-				$renderer->flavors = $flavors;
-				$renderer->baseUrl = $baseUrl;
-				$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
-				$renderer->mimeType = $this->getMimeType($flavors);
-				$renderer->deliveryCode = $this->deliveryCode;
-				return $renderer;
-				
-		}
-		
-		KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-	}
-
-	/**
-	 * @return kManifestRenderer
-	 */
-	private function serveSilverLight()
-	{
-		$duration = $this->entry->getDurationInt();		
-		$syncKey = $this->entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
-		$manifestInfo = $this->getSmoothStreamUrl($syncKey);
-
-		$renderer = new kSilverLightManifestRenderer();
-		$renderer->entryId = $this->entryId;
-		$renderer->tokenizer = $this->tokenizer;
-		$renderer->flavor = $manifestInfo;
-		$renderer->duration = $duration;
-		return $renderer;
-	}
-	
-	/**
-	 * @return kManifestRenderer
-	 */
-	private function serveAppleHttp()
-	{
-	    if ($this->entry->getType() == entryType::LIVE_STREAM)
-	    {
-	        $renderer = new kRedirectManifestRenderer();
-			$renderer->entryId = $this->entryId;
-			$renderer->flavor = array ("url" => $this->entry->getHlsStreamUrl());
-			return $renderer;
-	    }
-	    
-		$flavor = $this->getSecureHdUrl();
-		if ($flavor)
-		{
-			$renderer = new kRedirectManifestRenderer();
-			$renderer->entryId = $this->entryId;
-			$renderer->tokenizer = $this->tokenizer;
-			$renderer->flavor = $flavor;
-			return $renderer;
-		}
-		
-		$duration = null;
-		$flavors = $this->buildHttpFlavorsArray($duration);
-		
-		$flavors = $this->sortFlavors($flavors);
-
-		$renderer = new kM3U8ManifestRenderer();
-		$renderer->entryId = $this->entryId;
-		$renderer->tokenizer = $this->tokenizer;
-		$renderer->flavors = $flavors;
-		return $renderer;
-	}
-
-	/**
-	 * @return kManifestRenderer
-	 */
-	private function serveHds()
-	{
-	    $duration = null;
-		$flavors = $this->buildHttpFlavorsArray($duration);
-		
-		$flavors = $this->sortFlavors($flavors);
-
-		$renderer = new kF4Mv2ManifestRenderer();
-		$renderer->entryId = $this->entryId;
-		$renderer->tokenizer = $this->tokenizer;						
-		$renderer->flavors = $flavors;
-		$renderer->duration = $duration;
-		return $renderer;		
-	}
-	
-	/**
-	 * @return kManifestRenderer
-	 */
-	private function serveHDNetworkSmil()
-	{
-	    $duration = null;
-		$flavors = $this->buildHttpFlavorsArray($duration);
-		
-		$this->ensureUniqueBitrates($flavors);		// When playing HDS with Akamai HD the bitrates in the manifest must be unique 
-
-		$renderer = new kSmilManifestRenderer();
-		$renderer->entryId = $this->entryId;
-		$renderer->tokenizer = $this->tokenizer;
-		$renderer->flavors = $flavors;
-		$renderer->duration = $duration;
-		return $renderer;
-	}
-	
-	/**
-	 * @return kManifestRenderer
-	 */
-	private function serveHDNetwork()
-	{
-		$duration = $this->entry->getDurationInt();
-		$mediaUrl = requestUtils::getHost().str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"])); 
-
-		$renderer = new kF4MManifestRenderer();
-		$renderer->entryId = $this->entryId;
-		$renderer->duration = $duration;
-		$renderer->mediaUrl = $mediaUrl;
-		return $renderer;
-	}
-
 	/**
 	 * @param array $params
 	 * @return array
@@ -1232,122 +213,9 @@ class playManifestAction extends kalturaAction
 
 		return self::calculateKalturaToken($url);
 	}
-		
-	/**
-	 * @return kManifestRenderer
-	 */
-	private function serveHDNetworkManifest()
-	{			
-		$flavor = $this->getSecureHdUrl();
-		if (!$flavor)
-		{
-			KalturaLog::debug('No flaovr found');
-			return null;
-		}
-			
-		$duration = $this->entry->getDurationInt();
-		
-		$renderer = new kF4MManifestRenderer();
-		$renderer->entryId = $this->entryId;
-		$renderer->duration = $duration;
-		$renderer->flavors = array($flavor);
-		$renderer->tokenizer = $this->tokenizer;
-		return $renderer;
-	}	
 
-	/**
-	 * @return kManifestRenderer
-	 */
-	private function serveRtsp()
-	{
-		$flavorAsset = $this->getFlavorAsset();
-		$flavorInfo = $this->getFlavorHttpUrl($flavorAsset);
-
-		$renderer = new kRtspManifestRenderer();
-		$renderer->entryId = $this->entryId;
-		$renderer->tokenizer = $this->tokenizer;
-		$renderer->flavor = $flavorInfo;
-		return $renderer;
-	}
-	
 	///////////////////////////////////////////////////////////////////////////////////
-	//	Main functions
-
-	/* (non-PHPdoc)
-	 * @see /symfony/action/sfComponent#getRequestParameter()
-	 */
-	public function getRequestParameter($name, $default = null)
-	{
-		$val = parent::getRequestParameter($name, null);
-		if (!is_null($val))
-			return $val;
-
-		if (isset(self::$shortNames[$name]))
-		{
-			$val = parent::getRequestParameter(self::$shortNames[$name], null);
-			if (!is_null($val))
-				return $val;
-		}
-
-		return $default;
-	}
-  
-	public function validateStorageId()
-	{
-		if(!$this->storageId)
-			return true;
-			
-		$storage = StorageProfilePeer::retrieveByPK($this->storageId);
-		
-		// no storage found
-		if(!$storage)
-			die;
-		
-		$partner = $this->entry->getPartner();
-		
-		// partner configured to use kaltura data centers only
-		if($partner->getStorageServePriority() ==  StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
-			die;
-		
-		// storage doesn't belong to the partner
-		if($storage->getPartnerId() != $partner->getId())
-			die;
-	}
-	
-	protected function initFlavorIds()
-	{
-		$flavorIdsStr = $this->getRequestParameter ( "flavorIds", null );
-		if ($flavorIdsStr)
-			$this->flavorIds = explode(",", $flavorIdsStr);
-		
-		$this->flavorId = $this->getRequestParameter ( "flavorId", null );
-		if (!$this->flavorId) // in case a flavorId wasnt specified checking for a flavorParamId 
-		{ 
-			$flavorParamIds = $this->getRequestParameter ( "flavorParamIds", null );
-			if ($flavorParamIds !== null)
-			{
-				$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entry->getId(), explode(",", $flavorParamIds));
-				if (!$this->flavorIds || count($this->flavorIds) == 0)
-				{
-					KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-				}
-			}
-			else
-			{
-				$flavorParamId = $this->getRequestParameter ( "flavorParamId", null );
-				if ($flavorParamId || $flavorParamId === "0")
-				{
-					$flavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entry->getId(), $flavorParamId);
-					if(!$flavorAsset)
-					{
-						KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-					}
-				
-					$this->flavorId = $flavorAsset->getId();
-				}
-			}
-		}	
-	}
+	//	Initialization functions
 
 	protected function initEntry()  
 	{
@@ -1427,10 +295,1006 @@ class playManifestAction extends kalturaAction
 		{
 			$this->secureEntryHelper->validateForPlay();
 		}
+		
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $this->entry->getPartnerId()) || 
+			$this->secureEntryHelper->hasRules())
+			$this->forceUrlTokenization = true;
+	}
+	
+	protected function initFlavorIds()
+	{
+		$flavorIds = $this->getRequestParameter ( "flavorIds", null );
+		if (!is_null($flavorIds))
+			$this->flavorIds = explode(',', $flavorIds);
+		
+		$flavorId = $this->getRequestParameter ( "flavorId", null );
+		if (!is_null($flavorId))
+			$this->flavorIds = array($flavorId);
+			
+		if (!is_null($this->flavorIds))
+			return;
+
+		$flavorParamIds = $this->getRequestParameter ( "flavorParamIds", null );
+		if (!is_null($flavorParamIds))
+			$flavorParamIds = explode(',', $flavorParamIds);
+		
+		$flavorParamId = $this->getRequestParameter ( "flavorParamId", null );
+		if (!is_null($flavorParamId))
+			$flavorParamIds = array($flavorParamId);
+			
+		if (is_null($flavorParamIds))
+			return;
+			
+		$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entryId, $flavorParamIds);
+	}
+
+	protected function enforceEncryption()
+	{
+		$playbackParams = array();
+		if (kConf::hasMap("optimized_playback"))
+		{
+			$partnerId = $this->entry->getPartnerId();
+			$optimizedPlayback = kConf::getMap("optimized_playback");
+			if (array_key_exists($partnerId, $optimizedPlayback))
+			{
+				$playbackParams = $optimizedPlayback[$partnerId];
+			}
+		}
+
+		// TODO add protocol limitation action to access control
+		if (array_key_exists('enforce_encryption', $playbackParams) && $playbackParams['enforce_encryption'])
+		{
+			if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on')
+				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED, 'unencrypted manifest request - forbidden');
+			if (strtolower($this->protocol) != 'https')
+				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED, 'unencrypted playback protocol - forbidden');
+		}
+	}
+	
+	private function enforceAudioVideoEntry()
+	{
+		if($this->entry->getType() != entryType::MEDIA_CLIP)
+			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+
+		if(!in_array($this->entry->getMediaType(), array(
+			entry::ENTRY_MEDIA_TYPE_VIDEO,
+			entry::ENTRY_MEDIA_TYPE_AUDIO)))
+			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+	}
+	
+	protected function shouldUseLocalFlavors($hasLocalFlavors, $hasRemoteFlavors)
+	{
+		switch ($this->entry->getPartner()->getStorageServePriority())
+		{
+		case 0:
+		case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
+			return true;
+			
+		case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
+			if ($hasLocalFlavors)
+				return true;
+			break;
+
+		case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
+			if (!$hasRemoteFlavors)
+				return true;
+			break;
+		}
+		return false;
+	}
+	
+	protected function initSilverLightManifest()
+	{
+		$key = $this->entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+		$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
+		$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
+		if ($this->shouldUseLocalFlavors($localFileSync, $remoteFileSync))
+		{
+			$this->storageId = null;
+			$this->manifestFileSync = $localFileSync;
+		}
+		else
+		{
+			$this->storageId = $remoteFileSync->getDc();
+			$this->manifestFileSync = $remoteFileSync;
+		}
+		
+		if (!$this->manifestFileSync)
+			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+	}
+	
+	/**
+	 * @return array
+	 */
+	private function getReadyFlavorsByTags()
+	{
+		$allFlavors = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
+		foreach ($this->tags as $tagsFallback)
+		{
+			$curFlavors = array();
+			
+			foreach ($allFlavors as $flavorAsset)
+			{
+				foreach ($tagsFallback as $tagOption)
+				{
+					if (!$flavorAsset->hasTag($tagOption))
+						continue;
+					$curFlavors[] = $flavorAsset;
+					break;
+				}
+			}
+			
+			if ($curFlavors)
+				return $curFlavors;
+		}
+		return array();
+	}
+	
+	/**
+	 * @param array $flavorAssets
+	 * @return array
+	 */
+	private function removeMaxBitrateFlavors($flavorAssets)
+	{
+		if (!$this->maxBitrate)			
+			return $flavorAssets;
+			
+		$returnedFlavors = array();		
+		foreach ($flavorAssets as $flavor)
+		{
+			if ($flavor->getBitrate() <= $this->maxBitrate)
+			{
+				$returnedFlavors[] = $flavor;
+			}
+		}
+	
+		return $returnedFlavors;
+	}
+	
+	protected function initFlavorAssetArray()
+	{
+		// check whether the flavor asset list is needed
+		if ($this->entry->getType() == entryType::LIVE_STREAM)
+			return;			// live stream entries don't have flavors
+		
+		$oneOnly = false;
+		switch($this->format)
+		{
+			case StorageProfile::PLAY_FORMAT_HTTP:
+			case "url":
+			case "rtsp":
+				$oneOnly = true;	// single flavor delivery formats
+				break;
+				
+			case StorageProfile::PLAY_FORMAT_SILVER_LIGHT:
+				$this->initSilverLightManifest();
+				// no break here
+			case "hdnetwork":
+				return;				// manifest-based delivery formats
+		}
+				
+		// get initial flavor list by input
+		$flavorAssets = array();		
+		if ($this->flavorIds)
+		{
+			$flavorAssets = assetPeer::retrieveReadyByEntryId($this->entryId, $this->flavorIds);			
+		}
+
+		// if flavor list empty use the tags
+		if (!$flavorAssets)
+		{
+			$flavorAssets = $this->getReadyFlavorsByTags(); 
+		}
+
+		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+				
+		// get flavors availability
+		$servePriority = $this->entry->getPartner()->getStorageServePriority();
+		
+		$localFlavors = array();
+		$remoteFlavorsByDc = array();
+		$remoteFileSyncs = array();
+		
+		foreach($flavorAssets as $flavorAsset)
+		{
+			$flavorId = $flavorAsset->getId();
+			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+
+			$c = new Criteria();
+			$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
+			$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
+			
+			switch ($servePriority)
+			{
+			case 0:
+			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
+				$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+				break;
+				
+			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
+				$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+				break;
+			}
+			
+			if ($this->storageId)
+				$c->addAnd ( FileSyncPeer::DC , $this->storageId );
+			
+			$fileSyncs = FileSyncPeer::doSelect($c);
+			foreach ($fileSyncs as $fileSync)
+			{
+				if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+				{
+					$dc = $fileSync->getDc();
+					$remoteFlavorsByDc[$dc][$flavorId] = $flavorAsset;
+					$remoteFileSyncs[$dc][$flavorId] = $fileSync;
+				}
+				else
+				{
+					$localFlavors[$flavorId] = $flavorAsset;
+				}
+			}
+		}
+		
+		// filter out any invalid / disabled storage profiles
+		if ($remoteFileSyncs)
+		{
+			$storageProfileIds = array_keys($remoteFileSyncs);
+			$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId(
+				$this->entry->getPartnerId(), 
+				$storageProfileIds);
+
+			$activeStorageProfileIds = array();
+			foreach ($storageProfiles as $storageProfile)
+			{
+				$activeStorageProfileIds[] = $storageProfile->getId();
+			}
+			
+			foreach ($storageProfileIds as $storageProfileId)
+			{
+				if (in_array($storageProfileId, $activeStorageProfileIds))
+					continue;
+				
+				unset($remoteFlavorsByDc[$storageProfileId]);
+				unset($remoteFileSyncs[$storageProfileId]);
+			}
+		}
+		
+		// choose the storage profile with the highest number of flavors
+		$maxDc = null;
+		$maxDcFlavorCount = 0;
+		$remoteFlavors = array();
+		foreach ($remoteFlavorsByDc as $dc => $curDcFlavors)
+		{
+			$curDcFlavorCount = count($curDcFlavors);
+			if ($curDcFlavorCount <= $maxDcFlavorCount)
+				continue;
+			$maxDc = $dc;
+			$maxDcFlavorCount = $curDcFlavorCount;
+			$remoteFlavors = $curDcFlavors;
+		}
+				
+		// choose the flavor set according to the serve priority
+		if ($this->shouldUseLocalFlavors($localFlavors, $remoteFlavors))
+		{
+			$this->storageId = null;
+			$this->flavorAssets = $localFlavors;
+		}
+		else if ($maxDc)
+		{
+			$this->storageId = $maxDc;
+			$this->flavorAssets = $remoteFlavors;
+			$this->remoteFileSyncs = $remoteFileSyncs[$maxDc];
+		}
+	
+		if (!$this->flavorAssets)
+			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+	
+		if ($oneOnly)
+			$this->flavorAssets = array(reset($this->flavorAssets));
+	}
+
+	/**
+	 * @return int
+	 */
+	private function initEntryDuration()
+	{
+		$this->duration = $this->entry->getDurationInt();
+		foreach($this->flavorAssets as $flavorAsset)
+		{
+			/* @var $flavorAsset flavorAsset */
+			
+			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
+			if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
+			{
+				$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : 
+								($mediaInfo->getAudioDuration() ? $mediaInfo->getAudioDuration() : 
+									$mediaInfo->getContainerDuration()));
+				$this->duration = $duration / 1000;
+				break;
+			}
+		}
+	}
+
+	public function initStorageProfile()
+	{
+		if(!$this->storageId)
+			return;
+			
+		$this->storageProfile = StorageProfilePeer::retrieveByPK($this->storageId);
+		if(!$this->storageProfile)
+			die;			// TODO use a dieError
+				
+		// storage doesn't belong to the partner
+		if($this->storageProfile->getPartnerId() != $this->entry->getPartnerId())
+			die;			// TODO use a dieError
+	}
+	
+	protected function initUrlManager()
+	{
+		if ($this->storageId)
+		{
+			$this->urlManager = kUrlManager::getUrlManagerByStorageProfile($this->storageId, $this->entryId);
+			return;
+		}
+		
+		$baseUrl = null;
+		switch($this->format)
+		{
+			case StorageProfile::PLAY_FORMAT_RTMP:
+				if ($this->entry->getType() == entryType::LIVE_STREAM)
+				{
+					$baseUrl = $this->entry->getStreamUrl();
+				}
+				else
+				{
+					$baseUrl = myPartnerUtils::getRtmpUrl($this->entry->getPartnerId());
+				}
+				break;
+				
+			case StorageProfile::PLAY_FORMAT_SILVER_LIGHT:
+				$baseUrl = myPartnerUtils::getIisHost($this->entry->getPartnerId(), $this->protocol);
+				break;				
+		}
+		
+		$cdnHost = $this->cdnHost;
+		if ($baseUrl)
+			$cdnHost = parse_url($baseUrl, PHP_URL_HOST);
+
+		$this->urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $this->entryId);
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////
+	//	Flavor array utility functions
+
+		/**
+	 * @param array $flavors
+	 * @return string
+	 */
+	private function getMimeType($flavors)
+	{
+		if ($this->entry->getType() == entryType::MEDIA_CLIP && 
+			$this->entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO &&
+			count($flavors))
+		{
+			$isMp3 = true;
+			foreach($flavors as $flavor)
+			{
+				if (!isset($flavor['ext']) || strtolower($flavor['ext']) != 'mp3')
+					$isMp3 = false;
+			}
+			
+			if ($isMp3)
+				return 'audio/mpeg';
+		}
+		
+		return 'video/x-flv';
+	}
+	
+	/**
+	 * 
+	 * Private function which compares 2 flavors in order to sort an array.
+	 * If a flavor's width and height parameters are equal to 0, it is 
+	 * automatically moved down the list so the player will not start playing it by default.
+	 * @param array $flavor1
+	 * @param array $flavor2
+	 */
+	private function flavorCmpFunction ($flavor1, $flavor2)
+	{
+		// move the audio flavors to the end
+		if ($flavor1['height'] == 0 && $flavor1['width'] == 0)
+		{
+			return 1;
+		}
+		if ($flavor2['height'] == 0 && $flavor2['width'] == 0)
+		{
+			return -1;
+		}
+		
+		// if a preferred bitrate was defined place it first
+		if ($this->preferredFlavor == $flavor2)
+		{
+			return 1;
+		}
+		if ($this->preferredFlavor == $flavor1)
+		{
+			return -1;
+		}
+		
+		// sort the flavors in ascending bitrate order
+		if ($flavor1['bitrate'] >= $flavor2['bitrate'])
+		{
+			return 1;
+		}
+		
+		return -1;
+	}
+	
+	/**
+	 * @param array $flavors
+	 * @return array
+	 */
+	private function sortFlavors($flavors)
+	{
+		$this->preferredFlavor = null;
+		
+		if ($this->preferredBitrate !== null)
+		{
+			foreach ($flavors as $flavor)
+			{
+				if ($flavor['height'] == 0 && $flavor['width'] == 0)
+					continue;		// audio flavor
+			
+				$bitrateDiff = abs($flavor['bitrate'] - $this->preferredBitrate);
+				if (!$this->preferredFlavor || $bitrateDiff < $minBitrateDiff)
+				{
+					$this->preferredFlavor = $flavor;
+					$minBitrateDiff = $bitrateDiff;
+				}
+			}
+		}
+		
+		uasort($flavors, array($this,'flavorCmpFunction'));
+		
+		return $flavors;
+	}
+	
+	private function ensureUniqueBitrates(array &$flavors)
+	{
+		$seenBitrates = array();
+		foreach ($flavors as &$flavor)
+		{
+			while (in_array($flavor['bitrate'], $seenBitrates))
+			{
+				$flavor['bitrate']++;
+			}
+			$seenBitrates[] = $flavor['bitrate'];
+		}
+	}
+	
+	///////////////////////////////////////////////////////////////////////////////////
+	//	URL building functions
+	
+	/**
+	 * @param string $url
+	 * @param string $urlPrefix
+	 * @param flavorAsset $flavorAsset
+	 * @return array
+	 */
+	private function getFlavorAssetInfo($url, $urlPrefix = '', flavorAsset $flavorAsset = null)
+	{
+		$ext = null;
+		if ($flavorAsset)
+		{
+			$ext = $flavorAsset->getFileExt();
+		}
+		if (!$ext)
+		{
+			$urlPath = parse_url($urlPrefix . $url, PHP_URL_PATH);
+			$ext = pathinfo($urlPath, PATHINFO_EXTENSION);
+		}
+
+		$bitrate = ($flavorAsset ? $flavorAsset->getBitrate() : 0);
+		$width =   ($flavorAsset ? $flavorAsset->getWidth()   : 0);
+		$height =  ($flavorAsset ? $flavorAsset->getHeight()  : 0);
+		
+		return array(
+			'url' => $url,
+			'urlPrefix' => $urlPrefix,
+			'ext' => $ext,
+			'bitrate' => $bitrate,
+			'width' => $width,
+			'height' => $height);
+	}
+
+	/**
+	 * @param FileSync $fileSync
+	 * @param flavorAsset $flavorAsset
+	 * @param string $format
+	 */
+	private function setupUrlManager(FileSync $fileSync = null, flavorAsset $flavorAsset = null, $format = null)
+	{
+		$this->urlManager->setClipTo($this->clipTo);
+		if ($flavorAsset)
+			$this->urlManager->setContainerFormat($flavorAsset->getContainerFormat());
+		
+		if($flavorAsset && $flavorAsset->getFileExt() !== null) // if the extension is missing use the one from the actual path
+			$this->urlManager->setFileExtension($flavorAsset->getFileExt());
+		else if ($fileSync)
+			$this->urlManager->setFileExtension(pathinfo($fileSync->getFilePath(), PATHINFO_EXTENSION));
+			
+		if (!$format)
+			$format = $this->format;
+			
+		$this->urlManager->setProtocol($format);
+	}
+
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param FileSyncKey $key
+	 * @return array
+	 */
+	private function getExternalStorageUrl(flavorAsset $flavorAsset)
+	{
+		$fileSync = $this->remoteFileSyncs[$flavorAsset->getId()];
+
+		$this->setupUrlManager($fileSync, $flavorAsset);
+		$this->urlManager->setSeekFromTime($this->seekFrom);
+		
+		$url = ltrim($this->urlManager->getFileSyncUrl($fileSync, false), "/");
+		
+		$urlPrefix = '';					
+		if (strpos($url, "://") === false)
+			$urlPrefix = rtrim($this->storageProfile->getDeliveryHttpBaseUrl(), "/") . "/";
+		 			
+		return $this->getFlavorAssetInfo($url, $urlPrefix, $flavorAsset);
+	}
+
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @return array
+	 */
+	private function getFlavorHttpUrl(flavorAsset $flavorAsset)
+	{
+		if ($this->storageId)		
+			return $this->getExternalStorageUrl($flavorAsset);
+			
+		$this->setupUrlManager(null, $flavorAsset);
+		$this->urlManager->setSeekFromTime($this->seekFrom);
+		$this->urlManager->setDomain($this->cdnHost);
+
+		$url = $this->urlManager->getAssetUrl($flavorAsset, false);
+		
+		if ($this->format == StorageProfile::PLAY_FORMAT_RTSP)
+		{
+			// the host was already added by the url manager
+			return $this->getFlavorAssetInfo($url, '', $flavorAsset);
+		}
+		
+		$urlPrefix = '';
+		if (strpos($url, "/") === 0)
+		{
+			$flavorSizeKB = $flavorAsset->getSize();
+			if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
+				$urlPrefix = requestUtils::getRequestHost();
+			else
+				$urlPrefix = $this->cdnHost;
+		}
+
+		$urlPrefix = preg_replace('/^https?:\/\//', '', $urlPrefix);
+		$url = preg_replace('/^https?:\/\//', '', $url);
+		
+		if ($urlPrefix)
+		{
+			$urlPrefix = $this->protocol . '://' . $urlPrefix;
+			$urlPrefix = rtrim($urlPrefix, "/") . "/";
+		}
+		else
+		{
+			$url = $this->protocol . '://' . $url;
+		}
+		
+		$url = ltrim($url, "/");
+		
+		return $this->getFlavorAssetInfo($url, $urlPrefix, $flavorAsset);
+	}
+	
+	/**
+	 * @return array
+	 */
+	private function getSmoothStreamUrl()
+	{
+		$urlPrefix = myPartnerUtils::getIisHost($this->entry->getPartnerId(), $this->protocol);
+		
+		$matches = null;
+		if(preg_match('/(https?:\/\/[^\/]+)(.*)/', $urlPrefix, $matches))
+		{
+			$urlPrefix = $matches[1];
+		}
+		$urlPrefix .= '/';
+
+		$this->setupUrlManager($this->manifestFileSync);
+		$url = $this->urlManager->getFileSyncUrl($this->manifestFileSync, false);
+		return $this->getFlavorAssetInfo($url, $urlPrefix);
+	}
+	
+	/**
+	 * @return array
+	 */
+	private function getSecureHdUrl()
+	{
+		if (!method_exists($this->urlManager, 'getManifestUrl'))
+		{
+			KalturaLog::debug('URL manager [' . get_class($this->urlManager) . '] does not support manifest URL');
+			return null;
+		}
+
+		$originalFormat = $this->format;
+		$this->format = StorageProfile::PLAY_FORMAT_HTTP;	
+		$flavors = $this->buildHttpFlavorsArray();
+		$this->format = $originalFormat;
+
+		if ($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+			$flavors = $this->sortFlavors($flavors);	
+
+		$this->setupUrlManager();
+		
+		$flavor = $this->urlManager->getManifestUrl($flavors);
+		if (!$flavor)
+		{
+			KalturaLog::debug('URL manager [' . get_class($this->urlManager) . '] could not find flavor');
+			return null;
+		}
+		
+		if (strpos($flavor['urlPrefix'], '://') === false)
+			$flavor['urlPrefix'] = $this->protocol . '://' . $flavor['urlPrefix'];
+
+		$this->urlManager->setProtocol('hdnetworkmanifest');		// for tokenizer
+		
+		return $flavor;
+	} 
+	
+	///////////////////////////////////////////////////////////////////////////////////
+	//	Flavor array building functions
+		
+	/**
+	 * @param bool $oneOnly
+	 * @return array
+	 */
+	private function buildHttpFlavorsArray()
+	{
+		$flavors = array();
+		foreach($this->flavorAssets as $flavorAsset)
+		{
+			/* @var $flavorAsset flavorAsset */			
+			$httpUrl = $this->getFlavorHttpUrl($flavorAsset);
+			if ($httpUrl)		
+				$flavors[] = $httpUrl;
+		}
+		return $flavors;
+	}
+		
+	/**
+	 * @param string $baseUrl
+	 * @return array
+	 */
+	private function buildRtmpFlavorsArray(&$baseUrl)
+	{
+		$flavors = array();
+		if($this->storageId)
+		{
+			$baseUrl = $this->storageProfile->getDeliveryRmpBaseUrl();
+
+			// get all flavors with external urls
+			foreach($this->flavorAssets as $flavorAsset)
+			{
+				$fileSync = $this->remoteFileSyncs[$flavorAsset->getId()];
+				
+				$this->setupUrlManager($fileSync, $flavorAsset);
+
+				$url = $this->urlManager->getFileSyncUrl($fileSync, false);
+				$url = ltrim($url, "/");
+				
+				$flavors[] = $this->getFlavorAssetInfo($url, '', $flavorAsset);
+			}
+		}
+		else
+		{
+			$partnerId = $this->entry->getPartnerId();
+			$baseUrl = myPartnerUtils::getRtmpUrl($partnerId);
+			
+			// allow to replace {deliveryCode} place holder with the deliveryCode parameter passed to the action
+			// a publisher with a rtmpUrl set to {deliveryCode}.example.com/ondemand will be able to use different
+			// cdn configuration for different sub publishers by passing a different deliveryCode to the KDP
+
+			if ($this->deliveryCode)
+				$baseUrl = str_replace("{deliveryCode}", $this->deliveryCode, $baseUrl);
+
+			// get all flavors with kaltura urls
+			foreach($this->flavorAssets as $flavorAsset)
+			{
+				/* @var $flavorAsset flavorAsset */
+				
+				$this->setupUrlManager(null, $flavorAsset);
+
+				$url = $this->urlManager->getAssetUrl($flavorAsset, false);
+				$url = ltrim($url, "/");
+				
+				$flavors[] = $this->getFlavorAssetInfo($url, '', $flavorAsset);
+			}
+		}
+		
+		if (strpos($this->protocol, "rtmp") === 0)
+			$baseUrl = $this->protocol . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
+			
+		$this->urlManager->finalizeUrls($baseUrl, $flavors);
+		
+		return $flavors;
+	}
+	
+	/**
+	 * @param string $baseUrl
+	 * @return array
+	 */
+	private function buildRtmpLiveStreamFlavorsArray(&$baseUrl)
+	{		
+		$baseUrl = $this->entry->getStreamUrl();
+		$baseUrl = rtrim($baseUrl, '/');
+
+		$flavors = $this->entry->getStreamBitrates();
+		if(count($flavors))
+		{
+			foreach($flavors as $index => $flavor)
+			{
+				$brIndex = $index + 1;
+				$flavors[$index]['url'] = str_replace('%i', $brIndex, $this->entry->getStreamName());
+			}
+		}
+		else
+		{
+			$flavors[0]['url'] = str_replace('%i', '1', $this->entry->getStreamName());
+		}
+		
+		if (strpos($this->protocol, "rtmp") === 0)
+			$baseUrl = $this->protocol . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
+		
+		$this->urlManager->finalizeUrls($baseUrl, $flavors);
+
+		return $flavors;
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////
+	//	Serve functions
+	
+	/**
+	 * @return kManifestRenderer
+	 */
+	private function serveUrl()
+	{
+		$this->enforceAudioVideoEntry();
+		
+		$flavorInfo = $this->getFlavorHttpUrl(reset($this->flavorAssets));
+
+		$renderer = new kRedirectManifestRenderer();
+		$renderer->flavor = $flavorInfo;
+		return $renderer;
+	}
+	
+	/**
+	 * @return kManifestRenderer
+	 */
+	private function serveHttp()
+	{
+		$this->enforceAudioVideoEntry();
+		
+		$flavors = $this->buildHttpFlavorsArray();
+		
+		$renderer = new kF4MManifestRenderer();
+		$renderer->flavors = $flavors;
+		$renderer->mimeType = $this->getMimeType($flavors);						
+		return $renderer;
+	}
+	
+	/**
+	 * @return kManifestRenderer
+	 */
+	private function serveRtmp()
+	{
+		$baseUrl = null;
+		switch($this->entry->getType())
+		{
+			case entryType::MEDIA_CLIP:
+				
+				$flavors = $this->buildRtmpFlavorsArray($baseUrl);
+				
+				if(!count($flavors))
+					KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+
+				$renderer = new kF4MManifestRenderer();
+				$renderer->flavors = $flavors;
+				$renderer->baseUrl = $baseUrl;
+				$renderer->mimeType = $this->getMimeType($flavors);
+				return $renderer;
+
+			case entryType::LIVE_STREAM:
+				
+				$flavors = $this->buildRtmpLiveStreamFlavorsArray($baseUrl);
+
+				$renderer = new kF4MManifestRenderer();
+				$renderer->flavors = $flavors;
+				$renderer->baseUrl = $baseUrl;
+				$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
+				$renderer->mimeType = $this->getMimeType($flavors);
+				$renderer->deliveryCode = $this->deliveryCode;
+				return $renderer;
+				
+		}
+		
+		KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+	}
+
+	/**
+	 * @return kManifestRenderer
+	 */
+	private function serveSilverLight()
+	{
+		$manifestInfo = $this->getSmoothStreamUrl();
+
+		$renderer = new kSilverLightManifestRenderer();
+		$renderer->flavor = $manifestInfo;
+		return $renderer;
+	}
+	
+	/**
+	 * @return kManifestRenderer
+	 */
+	private function serveAppleHttp()
+	{
+		if ($this->entry->getType() == entryType::LIVE_STREAM)
+		{
+			$renderer = new kRedirectManifestRenderer();
+			$renderer->flavor = $this->getFlavorAssetInfo($this->entry->getHlsStreamUrl());
+			return $renderer;
+		}
+		
+		$flavor = $this->getSecureHdUrl();
+		if ($flavor)
+		{
+			$renderer = new kRedirectManifestRenderer();
+			$renderer->flavor = $flavor;
+			return $renderer;
+		}
+		
+		$flavors = $this->buildHttpFlavorsArray();
+		
+		$flavors = $this->sortFlavors($flavors);
+
+		$renderer = new kM3U8ManifestRenderer();
+		$renderer->flavors = $flavors;
+		return $renderer;
+	}
+
+	/**
+	 * @return kManifestRenderer
+	 */
+	private function serveHds()
+	{
+		$flavors = $this->buildHttpFlavorsArray();
+		
+		$flavors = $this->sortFlavors($flavors);
+
+		$renderer = new kF4Mv2ManifestRenderer();
+		$renderer->flavors = $flavors;
+		return $renderer;		
+	}
+	
+	/**
+	 * @return kManifestRenderer
+	 */
+	private function serveHDNetworkSmil()
+	{
+		$flavors = $this->buildHttpFlavorsArray();
+		
+		// When playing HDS with Akamai HD the bitrates in the manifest must be unique
+		$this->ensureUniqueBitrates($flavors); 
+
+		$renderer = new kSmilManifestRenderer();
+		$renderer->flavors = $flavors;
+		return $renderer;
+	}
+	
+	/**
+	 * @return kManifestRenderer
+	 */
+	private function serveHDNetwork()
+	{
+		$mediaUrl = requestUtils::getHost().str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"])); 
+
+		$renderer = new kF4MManifestRenderer();
+		$renderer->mediaUrl = $mediaUrl;
+		return $renderer;
+	}
+		
+	/**
+	 * @return kManifestRenderer
+	 */
+	private function serveHDNetworkManifest()
+	{			
+		$flavor = $this->getSecureHdUrl();
+		if (!$flavor)
+		{
+			KalturaLog::debug('No flavor found');
+			return null;
+		}
+		
+		$renderer = new kF4MManifestRenderer();
+		$renderer->flavors = array($flavor);
+		return $renderer;
+	}	
+
+	/**
+	 * @return kManifestRenderer
+	 */
+	private function serveRtsp()
+	{
+		$this->enforceAudioVideoEntry();
+		
+		$flavorInfo = $this->getFlavorHttpUrl(reset($this->flavorAssets));
+
+		$renderer = new kRtspManifestRenderer();
+		$renderer->flavor = $flavorInfo;
+		return $renderer;
+	}
+	
+	///////////////////////////////////////////////////////////////////////////////////
+	//	Main functions
+
+	/* (non-PHPdoc)
+	 * @see /symfony/action/sfComponent#getRequestParameter()
+	 */
+	public function getRequestParameter($name, $default = null)
+	{
+		$val = parent::getRequestParameter($name, null);
+		if (!is_null($val))
+			return $val;
+
+		if (isset(self::$shortNames[$name]))
+		{
+			$val = parent::getRequestParameter(self::$shortNames[$name], null);
+			if (!is_null($val))
+				return $val;
+		}
+
+		return $default;
+	}
+  
+	static protected function getDefaultTagsByFormat($format)
+	{
+		switch ($format)
+		{
+		case StorageProfile::PLAY_FORMAT_SILVER_LIGHT:
+			return array(
+				array(assetParams::TAG_SLWEB),
+			);
+			
+		case StorageProfile::PLAY_FORMAT_APPLE_HTTP:
+		case StorageProfile::PLAY_FORMAT_HDS:
+			return array(
+				array(assetParams::TAG_APPLEMBR),
+				array('ipadnew', 'iphonenew'),
+				array('ipad', 'iphone'),
+			);
+			
+		default:
+			return array(
+				array(assetParams::TAG_MBR),
+				array(assetParams::TAG_WEB),
+			);
+		}
 	}
 	
 	public function execute()
 	{
+		// Parse input parameters
 		$this->seekFrom = $this->getRequestParameter ( "seekFrom" , -1);
 		if ($this->seekFrom <= 0)
 			$this->seekFrom = -1;
@@ -1451,74 +1315,35 @@ class playManifestAction extends kalturaAction
 		$this->tags = $this->getRequestParameter ( "tags", null );
 		if (!$this->tags)
 		{
-			switch ($this->format)
-			{
-			case StorageProfile::PLAY_FORMAT_SILVER_LIGHT:
-				$this->tags = array(
-					array(assetParams::TAG_SLWEB),
-				);
-				break;
-				
-			case StorageProfile::PLAY_FORMAT_APPLE_HTTP:
-			case StorageProfile::PLAY_FORMAT_HDS:
-				$this->tags = array(
-					array(assetParams::TAG_APPLEMBR),
-				 	array('ipadnew', 'iphonenew'),
-				 	array('ipad', 'iphone'),
-				);
-				break;
-				
-			default:
-				$this->tags = array(
-					array(assetParams::TAG_MBR),
-					array(assetParams::TAG_WEB),
-				);
-			}
+			$this->tags = self::getDefaultTagsByFormat($this->format);
 		}
 		else
 		{
 			$this->tags = array(array($this->tags));
 		}
-		
-		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
-		
+				
 		$this->preferredBitrate = $this->getRequestParameter ( "preferredBitrate", null );
 		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
 		if(($this->maxBitrate) && ((!is_numeric($this->maxBitrate)) || ($this->maxBitrate <= 0)))
 			KExternalErrors::dieError(KExternalErrors::INVALID_MAX_BITRATE);
-			
-		$this->initEntry();
-		
-		$this->initFlavorIds();
-		
+
 		$this->storageId = $this->getRequestParameter ( "storageId", null );
-		$this->validateStorageId();		
+		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
 		
-		$partner = $this->entry->getPartner();
-		
-		if(!$this->cdnHost || $partner->getForceCdnHost())
+		// Initialize
+		$this->initEntry();
+		$this->initFlavorIds();
+				
+		if(!$this->cdnHost || $this->entry->getPartner()->getForceCdnHost())
 			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
 
-		$playbackParams = array();
-		if (kConf::hasMap("optimized_playback"))
-		{
-			$partnerId = $this->entry->getPartnerId();
-			$optimizedPlayback = kConf::getMap("optimized_playback");
-			if (array_key_exists($partnerId, $optimizedPlayback))
-			{
-				$playbackParams = $optimizedPlayback[$partnerId];
-			}
-		}
-
-		// TODO add protocol limitation action to access control
-		if (array_key_exists('enforce_encryption', $playbackParams) && $playbackParams['enforce_encryption'])
-		{
-			if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on')
-				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED, 'unencrypted manifest request - forbidden');
-			if (strtolower($this->protocol) != 'https')
-				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED, 'unencrypted playback protocol - forbidden');
-		}
-			
+		$this->enforceEncryption();
+		$this->initFlavorAssetArray();
+		$this->initEntryDuration();
+		$this->initStorageProfile();
+		$this->initUrlManager();
+		
+		// Build the renderer
 		$renderer = null;
 	
 		switch($this->format)
@@ -1567,7 +1392,12 @@ class playManifestAction extends kalturaAction
 		
 		if (!$renderer)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'This format is unsupported');
-		
+
+		$renderer->entryId = $this->entryId;
+		$renderer->duration = $this->duration;
+		$renderer->tokenizer = $this->urlManager->getTokenizer();
+			
+		// Handle caching
 		$canCacheAccessControl = false;
 		if (!$this->secureEntryHelper)
 		{
@@ -1591,6 +1421,7 @@ class playManifestAction extends kalturaAction
 			$cache->storeRendererToCache($renderer);
 		}
 
+		// Output the response
 		$renderer->output($playbackContext);
 	}
 }
