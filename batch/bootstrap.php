@@ -15,8 +15,7 @@ require_once(KALTURA_ROOT_PATH . "/infra/KAutoloader.php");
 KAutoloader::setClassPath(array(
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "infra", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "server_infra", "*"),
-	KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "PHPMailer", "*"),
-	KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "phpseclib", "*"),
+	KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"),
 	KAutoloader::buildPath(KALTURA_BATCH_PATH, "*"),
 ));
