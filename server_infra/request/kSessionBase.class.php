@@ -104,7 +104,7 @@ class kSessionBase
 		$str = base64_decode($encoded_str, true);
 		if (strpos($str, "|") === false)
 		{
-			KalturaLog::err("Couldn't find | seperator in the KS");
+			error_log("Couldn't find | seperator in the KS");
 			return false;
 		}
 			
@@ -113,7 +113,7 @@ class kSessionBase
 		$parts = explode(self::SEPARATOR, $real_str);
 		if (count($parts) < 3)
 		{
-			KalturaLog::err("Couldn't find 3 seperated parts in the KS");
+			error_log("Couldn't find 3 seperated parts in the KS");
 			return false;
 		}
 		
@@ -121,13 +121,13 @@ class kSessionBase
 		$salt = $this->getAdminSecret($partnerId);
 		if (!$salt)
 		{
-			KalturaLog::err("Couldn't get admin secret for partner [$partnerId]");
+			error_log("Couldn't get admin secret for partner [$partnerId]");
 			return false;
 		}
 
 		if (sha1($salt . $real_str) != $hash)
 		{
-			KalturaLog::err("Hash [$hash] doesn't match the sha1 on the salt.");
+			error_log("Hash [$hash] doesn't match the sha1 on the salt.");
 			return false;
 		}
 		
@@ -366,28 +366,28 @@ class kSessionBase
 		$decodedKs = base64_decode(str_replace(array('-', '_'), array('+', '/'), $ks), true);
 		if (!$decodedKs)
 		{
-			KalturaLog::err("Couldn't base 64 decode the KS.");
+			error_log("Couldn't base 64 decode the KS.");
 			return false;
 		}
 		
 		$explodedKs = explode('|', $decodedKs , 3);
 		if (count($explodedKs) != 3)
 		{
-			KalturaLog::err("Couldn't find 3 separated KS parts.");
+			error_log("Couldn't find 3 separated KS parts.");
 			return false;						// not KS V2
 		}
 		
 		list($version, $partnerId, $encKs) = $explodedKs;
 		if ($version != 'v2')
 		{
-			KalturaLog::err("KS version [$version] is not [v2].");
+			error_log("KS version [$version] is not [v2].");
 			return false;						// not KS V2
 		}
 		
 		$adminSecret = $this->getAdminSecret($partnerId);
 		if (!$adminSecret)
 		{
-			KalturaLog::err("Couldn't get secret for partner [$partnerId].");
+			error_log("Couldn't get secret for partner [$partnerId].");
 			return false;						// admin secret not found, can't decrypt the KS
 		}
 				
@@ -398,7 +398,7 @@ class kSessionBase
 		$fields = substr($decKs, self::SHA1_SIZE);
 		if ($hash != sha1($fields, true))
 		{
-			KalturaLog::err("Hash [$hash] doesn't match sha1.");
+			error_log("Hash [$hash] doesn't match sha1.");
 			return false;						// invalid signature
 		}
 		
