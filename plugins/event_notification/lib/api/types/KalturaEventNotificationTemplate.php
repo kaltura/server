@@ -136,6 +136,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
+		$this->validatePropertyMinLength('name', 3, false);
 		$this->validate();
 		
 		return parent::validateForInsert($propertiesToSkip);
@@ -146,6 +147,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
+		$this->validatePropertyMinLength('name', 3, true);
 		$this->validate();
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
@@ -189,7 +191,6 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	
 	protected function validate ()
 	{
-		$this->validatePropertyMinLength('name', 3, false);
 		$this->validatePropertyMinLength('systemName', 3, true);
 		
 		$systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($this->systemName, $this->id);
