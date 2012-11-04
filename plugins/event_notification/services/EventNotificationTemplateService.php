@@ -174,11 +174,6 @@ class EventNotificationTemplateService extends KalturaBaseService
 		// set the object status to deleted
 		$dbEventNotificationTemplate->setStatus(EventNotificationTemplateStatus::DELETED);
 		$dbEventNotificationTemplate->save();
-			
-		// return the saved object
-		$eventNotificationTemplate = KalturaEventNotificationTemplate::getInstanceByType($dbEventNotificationTemplate->getType());
-		$eventNotificationTemplate->fromObject($dbEventNotificationTemplate);
-		return $eventNotificationTemplate;
 	}
 	
 	/**
