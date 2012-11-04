@@ -66,12 +66,12 @@ class EventNotificationTemplateService extends KalturaBaseService
 		
 		$newEventNotificationTemplate->fromObject($newDbEventNotificationTemplate);
 		
-		$newDbEventNotificationTemplate->setPartnerId($this->getPartnerId());
 		// update new db object with the overwrite configuration
 		$newEventNotificationTemplate->toInsertableObject($newDbEventNotificationTemplate);
 		$eventNotificationTemplate->toUpdatableObject($newDbEventNotificationTemplate);
 		
 		// save the new db object
+		$newDbEventNotificationTemplate->setPartnerId($this->getPartnerId());
 		$newDbEventNotificationTemplate->save();
 		
 		// return the saved object
