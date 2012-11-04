@@ -290,4 +290,17 @@ class EventNotificationTemplateService extends KalturaBaseService
 			
 		return $job->getId();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerGroup()
+	 */
+	protected function partnerGroup()
+	{
+		if(
+			$this->actionName == 'clone' 
+			)
+			return $this->partnerGroup . ',0';
+			
+		return $this->partnerGroup;
+	}
 }
