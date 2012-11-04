@@ -1,5 +1,7 @@
 <?php
 
+require_once(dirname(__FILE__) . '/../server_infra/request/kSessionBase.class.php');
+
 ini_set("memory_limit", "2048M");
 
 define('PS2_START_MARKER', '[sfWebRequest->loadParameters] INFO: {sfRequest} request parameters ');
@@ -89,41 +91,32 @@ class PartnerSecretPool
 	}
 }
 
+class ks extends kSessionBase
+{
+	protected function getKSVersionAndSecret($partnerId)
+	{
+		global $partnerSecretPool;
+
+		$adminSecret = $partnerSecretPool->getPartnerSecret($partnerId);
+		if (!$adminSecret)
+			return null;
+		return array(1, $adminSecret);
+	}
+}
+
 function extendKsExpiry($ks)
 {
 	global $partnerSecretPool;
-
-	$decodedKs = base64_decode($ks);
-	if (strpos($decodedKs, "|") === false)
-		return null;
-
-	list($hash , $ksStr) = explode( "|" , $decodedKs , 2 );
-	$splittedStr = explode(';', $ksStr);
-	if (count($splittedStr) < 3)
+	
+	$ksObj = new ks();
+	if (!$ksObj->parseKS($ks))
 		return null;
 	
-	$partnerId = $splittedStr[0];
-	$splittedStr[2] = time() + 86400;
-	$ksStr = implode(';', $splittedStr);
-	$adminSecret = $partnerSecretPool->getPartnerSecret($partnerId);
+	$adminSecret = $partnerSecretPool->getPartnerSecret($ksObj->partner_id);
 	if (!$adminSecret)
 		return null;
-	$ks = base64_encode(sha1($adminSecret . $ksStr) . '|' . $ksStr);
-	return $ks;
-}
-
-function isKsParsable($ks)
-{
-	$ks = base64_decode($ks, true);
-	if (strpos($ks, "|") === false)
-		return false;
-
-	list($hash, $ks) = @explode ("|", $ks, 2);
-	$ksParts = explode(";", $ks);
-	if (count($ksParts) < 3)
-		return false;
-	
-	return true;
+		
+	return kSessionBase::generateKsV1($adminSecret, $ksObj->user, $ksObj->type, $ksObj->partner_id, 86400, $ksObj->privileges, $ksObj->master_partner_id, $ksObj->additional_data);
 }
 
 function print_r_reverse($in) {
@@ -263,15 +256,22 @@ function xmlToArray($xmlstring)
 
 function normalizeKS($value, $ks)
 {
-	$decodedKs = base64_decode($ks);
-	$explodedKs = explode('|', $decodedKs);
-	if (count($explodedKs) < 2)
+	$ksObj = new ks();
+	if (!$ksObj->parseKS($ks))
 		return $value;
-	
-	list($sig, $ksFields) = $explodedKs;
-	$ksFields = explode(';', $ksFields);
-	unset($ksFields[2]);		// valid until
-	unset($ksFields[4]);		// rand
+		
+	$ksFields = array(
+		$ksObj->partner_id,
+		$ksObj->partner_id,
+		0,		// expiry
+		$ksObj->type,
+		0,		// rand
+		$ksObj->user,
+		$ksObj->privileges,
+		$ksObj->master_partner_id,
+		$ksObj->additional_data,
+	);
+
 	$ksFields = implode(';', $ksFields);
 	return str_replace($ks, $ksFields, $value);
 }
@@ -614,13 +614,10 @@ function extendRequestKss(&$parsedParams)
 	if (array_key_exists('ks', $parsedParams))
 	{
 		$ks = $parsedParams['ks'];
-		if (isKsParsable($ks))
-		{
-			$ks = extendKsExpiry($ks);
-			if (is_null($ks))
-				return false;
-			$parsedParams['ks'] = $ks;
-		}
+		$ks = extendKsExpiry($ks);
+		if (is_null($ks))
+			return false;
+		$parsedParams['ks'] = $ks;
 	}
 	
 	for ($i = 1; ; $i++)
@@ -630,13 +627,10 @@ function extendRequestKss(&$parsedParams)
 			break;
 		
 		$ks = $parsedParams[$ksKey];
-		if (isKsParsable($ks))
-		{
-			$ks = extendKsExpiry($ks);
-			if (is_null($ks))
-				return false;
-			$parsedParams[$ksKey] = $ks;
-		}
+		$ks = extendKsExpiry($ks);
+		if (is_null($ks))
+			return false;
+		$parsedParams[$ksKey] = $ks;
 	}
 	
 	return true;
