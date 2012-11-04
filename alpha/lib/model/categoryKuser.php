@@ -227,6 +227,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 			'category_full_ids' => 'categoryFullIds',
 			'permission_names' => 'permissionNames',
 			'created_at' => 'createdAt',
+			'updated_at' => 'updatedAt',
 		);
 	}
 
@@ -240,7 +241,8 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 			'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
 			'category_full_ids' => IIndexable::FIELD_TYPE_STRING,
 			'permission_names' => IIndexable::FIELD_TYPE_STRING,
-			'created_at' => IIndexable::FIELD_TYPE_DATETIME
+			'created_at' => IIndexable::FIELD_TYPE_DATETIME,
+			'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
 		);
 	}
 
