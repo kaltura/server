@@ -113,7 +113,7 @@ class kSessionBase
 		$parts = explode(self::SEPARATOR, $real_str);
 		if (count($parts) < 3)
 		{
-			error_log("Couldn't find 3 seperated parts in the KS");
+			// error_log("Couldn't find 3 seperated parts in the KS");
 			return false;
 		}
 		
