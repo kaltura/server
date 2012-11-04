@@ -157,7 +157,6 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$propertiesToSkip[] = 'type';
-		$this->validatePropertyNotNull('format');
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
