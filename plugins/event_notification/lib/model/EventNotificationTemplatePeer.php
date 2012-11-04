@@ -151,6 +151,8 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 		$criteria->add ( EventNotificationTemplatePeer::SYSTEM_NAME, $systemName );
 		if ($excludeId)
 		    $criteria->add( EventNotificationTemplatePeer::ID, $excludeId, Criteria::NOT_EQUAL);
+		    
+		$criteria->add(EventNotificationTemplatePeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
 		
 		return EventNotificationTemplatePeer::doSelect($criteria);
 	}
