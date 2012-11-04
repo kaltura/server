@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class categoryKuser extends BasecategoryKuser {
+class categoryKuser extends BasecategoryKuser implements IIndexable{
 	
 	private $old_status = null;
 	
@@ -196,4 +196,68 @@ class categoryKuser extends BasecategoryKuser {
 	
     public function setBulkUploadId ($bulkUploadId){$this->putInCustomData (self::BULK_UPLOAD_ID, $bulkUploadId);}
 	public function getBulkUploadId (){return $this->getFromCustomData(self::BULK_UPLOAD_ID);}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIntId()
+	 */
+	public function getIntId() {
+		return $this->getId();		
+	}
+
+	/* (non-PHPdoc)
+	 * @see IIndexable::getEntryId()
+	 */
+	public function getEntryId() {}
+
+	/* (non-PHPdoc)
+	 * @see IIndexable::getObjectIndexName()
+	 */
+	public function getObjectIndexName() {
+		return categoryKuserPeer::getOMClass(false);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIndexFieldsMap()
+	 */
+	public function getIndexFieldsMap() {
+		return array (
+			'int_id' => 'intId',
+			'category_id' => 'categoryId',
+			'kuser_id' => 'kuserId',
+			'category_full_ids' => 'categoryFullIds',
+			'permission_names' => 'permissionNames',
+			'created_at' => 'createdAt',
+		);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIndexFieldType()
+	 */
+	public function getIndexFieldType($field) {
+		return array (
+			'int_id' => IIndexable::FIELD_TYPE_INTEGER,
+			'category_id' => IIndexable::FIELD_TYPE_INTEGER,
+			'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
+			'category_full_ids' => IIndexable::FIELD_TYPE_STRING,
+			'permission_names' => IIndexable::FIELD_TYPE_STRING,
+			'created_at' => IIndexable::FIELD_TYPE_DATETIME
+		);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IIndexable::getSearchIndexFieldsEscapeType()
+	 */
+	public function getSearchIndexFieldsEscapeType($field) {
+		
+		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IIndexable::indexToSearchIndex()
+	 */
+	public function indexToSearchIndex() {
+		
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
+
 } // categoryKuser
