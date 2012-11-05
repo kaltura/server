@@ -6,6 +6,8 @@ else
 fi
 . `dirname $REAL_SCRIPT`/../../../configurations/system.ini
 
+echo `date`
+
 find $WEB_DIR/content/uploads -ctime +7 -delete
 find $WEB_DIR/content/webcam -ctime +7 -delete
 find $WEB_DIR/content/preconvert -ctime +7 -delete

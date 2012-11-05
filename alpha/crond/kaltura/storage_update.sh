@@ -6,6 +6,8 @@ else
 fi
 . `dirname $REAL_SCRIPT`/../../../configurations/system.ini
 
+echo `date`
+
 WHEN=$(date -d "yesterday" +%Y-%m-%d)
 
 php $APP_DIR/scripts/findEntriesSizes.php $WHEN >> $LOG_DIR/`hostname`-findEntriesSizes.log
