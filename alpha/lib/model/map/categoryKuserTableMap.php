@@ -51,6 +51,7 @@ class categoryKuserTableMap extends TableMap {
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('CATEGORY_FULL_IDS', 'CategoryFullIds', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('PERMISSION_NAMES', 'PermissionNames', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 
