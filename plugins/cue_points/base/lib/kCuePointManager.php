@@ -84,11 +84,16 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 	{
 		$cuePoint = null;
 		
+		$entryId = $scene['entryId'];
+		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
+			throw new kCoreException("Entry [$entryId] not found", kCoreException::INVALID_ENTRY_ID);
+		
 		if(isset($scene['sceneId']) && $scene['sceneId'])
 			$cuePoint = CuePointPeer::retrieveByPK($scene['sceneId']);
 			
 		if(!$cuePoint && isset($scene['systemName']) && $scene['systemName'])
-			$cuePoint = CuePointPeer::retrieveBySystemName($scene['entryId'], $scene['systemName']);
+			$cuePoint = CuePointPeer::retrieveBySystemName($entryId, $scene['systemName']);
 			
 		if(!$cuePoint)
 			$cuePoint = $newCuePoint;
@@ -105,7 +110,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		}
 		$cuePoint->setTags(implode(',', $tags));
 		
-		$cuePoint->setEntryId($scene['entryId']);
+		$cuePoint->setEntryId($entryId);
 		if(isset($scene['systemName']))
 			$cuePoint->setSystemName($scene['systemName']);
 			
