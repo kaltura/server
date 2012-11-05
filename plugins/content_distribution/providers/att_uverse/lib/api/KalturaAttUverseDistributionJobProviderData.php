@@ -103,7 +103,7 @@ class KalturaAttUverseDistributionJobProviderData extends KalturaConfigurableDis
 			foreach ($additionalAssets as $additionalAsset)
 			{	
 				$file = new KalturaAttUverseDistributionFile();
-				$assetType = $additionalAsset->getType();
+				$assetType = kPluginableEnumsManager::coreToApi(KalturaAssetType::getEnumClass(),$additionalAsset->getType());
 				$file->assetType = $assetType;	
 				$syncKey = $additionalAsset->getSyncKey(CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 				$id = $additionalAsset->getId();
