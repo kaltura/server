@@ -304,7 +304,7 @@ index kaltura_kuser
 index kaltura_category_kuser
 {
 	type	 = rt
-	path	 = @BASE_DIR@/sphinx/kaltura_kuser_rt
+	path	 = @BASE_DIR@/sphinx/kaltura_category_kuser_rt
 	rt_attr_uint	 = category_id
 	rt_attr_uint	 = kuser_id
 	rt_attr_uint	 = int_id
