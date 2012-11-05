@@ -103,13 +103,12 @@ class KalturaAttUverseDistributionJobProviderData extends KalturaConfigurableDis
 			foreach ($additionalAssets as $additionalAsset)
 			{	
 				$file = new KalturaAttUverseDistributionFile();
-				$assetType = kPluginableEnumsManager::coreToApi(KalturaAssetType::getEnumClass(),$additionalAsset->getType());
-				$file->assetType = $assetType;	
+				$file->assetType = kPluginableEnumsManager::coreToApi(KalturaAssetType::getEnumClass(),$additionalAsset->getType());
 				$syncKey = $additionalAsset->getSyncKey(CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 				$id = $additionalAsset->getId();
 				if(kFileSyncUtils::fileSync_exists($syncKey)){
-					if (($assetType == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))||
-						($assetType == AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT))){									
+					if (($file->assetType == CaptionPlugin::getApiValue(CaptionAssetType::CAPTION))||
+						($file->assetType == AttachmentPlugin::getApiValue(AttachmentAssetType::ATTACHMENT))){									
 						$captionLocalIds[] = $additionalAsset->getId();
 						$file->assetId = $additionalAsset->getId();
 						$file->localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
