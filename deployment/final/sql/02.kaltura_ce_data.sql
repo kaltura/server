@@ -188,8 +188,8 @@ insert  into `file_sync`(`id`,`partner_id`,`object_type`,`object_id`,`version`,`
 (161,0,2,'8464961','1',1,0,1,now(),now(),NULL,NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/special/8464961.xml',2325,NULL),
 (162,0,1,'_KDP_RE_PL','100000',1,0,1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','/content/templates/entry/data/_KDP_RE_PL_100000.xml',257,NULL),
 (163,0,2,'8700151','1',1,0,1,now(),now(),NULL,NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/special/8700151.xml',12107,NULL),
-(164,'0','2','8704822','1','1','0','1',now(),now(),now(),NULL,'2','1',NULL,NULL,'/web/','content/uiconf/special/8704822.xml','15466',NULL),
-(165,'0','2','9780751','1','1','0','0',now(),now(),now(),NULL,'2','1',NULL,NULL,'/web/','content/uiconf/special/9780751.xml','1616',NULL);
+(164,'0','2','8704822','1','1','0','1',now(),now(),now(),NULL,'2','1',NULL,NULL,'@WEB_DIR@/','content/uiconf/special/8704822.xml','15466',NULL),
+(165,'0','2','9780751','1','1','0','0',now(),now(),now(),NULL,'2','1',NULL,NULL,'@WEB_DIR@/','content/uiconf/special/9780751.xml','1616',NULL);
 
 insert  into `flavor_asset`(`id`,`int_id`,`partner_id`,`tags`,`created_at`,`updated_at`,`deleted_at`,`entry_id`,`flavor_params_id`,`status`,`version`,`description`,`width`,`height`,`bitrate`,`frame_rate`,`size`,`is_original`,`file_ext`,`container_format`,`video_codec_id`,`type`,`custom_data`,`partner_data`) values
 ('_KMCLOGO',1,0,'web,mbr',now(),now(),NULL,'_KMCLOGO',0,2,'1','',0,0,0,0,0,0,NULL,NULL,NULL,1,'a:3:{s:13:\"FlavorBitrate\";i:0;s:15:\"FlavorFrameRate\";d:0;s:18:\"FlavorVideoCodecId\";N;}',NULL),
