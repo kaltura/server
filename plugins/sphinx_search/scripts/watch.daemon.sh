@@ -36,7 +36,7 @@ while /bin/true ; do
       then
           if [ -f $BASE_DIR/searchd_is_not_running_email ]
              then 
-                 echo "searchd on  `hostname` is not running" | mail -r kaltura@`hostname` -s "searchd service not found on `hostname`" $MAILTO
+                 echo "searchd on  `hostname` is not running" | mail -s "searchd service not found on `hostname`" $ADMIN_CONSOLE_ADMIN_MAIL
 		 rm -f $BASE_DIR/searchd_is_not_running_email
           fi
 	  touch $BASE_DIR/searchd_is_running_email
@@ -49,7 +49,7 @@ while /bin/true ; do
     fi
     if [ -f $BASE_DIR/searchd_is_running_email ]
        then
-           echo "searchd on  `hostname` is running" | mail -r kaltura@`hostname` -s "searchd service is found on `hostname`" $MAILTO
+           echo "searchd on  `hostname` is running" | mail -s "searchd service is found on `hostname`" $ADMIN_CONSOLE_ADMIN_MAIL
 	   rm -f $BASE_DIR/searchd_is_running_email
     fi
     touch $BASE_DIR/searchd_is_not_running_email
