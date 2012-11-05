@@ -225,11 +225,6 @@ class PartnerController extends Zend_Controller_Action
 		$form = new Form_Partner_StorageConfiguration();
 		$request = $this->getRequest();
 		$form->populate($request->getParams());
-		Form_Partner_StorageHelper::addProtocolsToForm($form);
-		Form_Partner_StorageHelper::addFilesPermissionLevelInAmazonToForm($form);
-		Form_Partner_StorageHelper::addPathManagersToForm($form);
-		Form_Partner_StorageHelper::addUrlManagersToForm($form);
-		Form_Partner_StorageHelper::addTriggersToForm($form);
 		
 		$request = $this->getRequest();
 		

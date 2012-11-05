@@ -51,6 +51,11 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 		$this->addElement('select', 'protocol', array(
 			'label'			=> 'Transfer Protocol:',
 			'filters'		=> array('StringTrim'),
+			'multiOptions'  => array(Kaltura_Client_Enum_StorageProfileProtocol::FTP => 'FTP',
+									Kaltura_Client_Enum_StorageProfileProtocol::SFTP => 'SFTP',
+									Kaltura_Client_Enum_StorageProfileProtocol::SCP => 'SCP',
+									Kaltura_Client_Enum_StorageProfileProtocol::S3 => 'Amazon S3'
+									),
 		
 		));
 		 
@@ -87,9 +92,11 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 		));
 				
 		$this->addElement('select', 'filesPermissionPublicInS3', array(
-			'label'			=> 'Files Permission Public',
+			'label'			=> 'Files Permission Public:',
 			'filters'		=> array('StringTrim'),
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append'))),			
+			'multiOptions'  => array(Kaltura_Client_Enum_AmazonS3StorageProfileFilesPermissionLevel::ACL_PRIVATE => 'Private',
+									 Kaltura_Client_Enum_AmazonS3StorageProfileFilesPermissionLevel::ACL_PUBLIC_READ => 'Public Read',
+									),										
 		));
 		
 		$this->addElement('text', 'deliveryHttpBaseUrl', array(
@@ -131,20 +138,35 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 		$this->addElement('select', 'pathManagerClass', array(
 			'label'			=> 'Path Manager:',
 			'filters'		=> array('StringTrim'),
-			
+			'multiOptions'  => array('kPathManager' => 'Kaltura Path',
+									'kExternalPathManager' => 'External Path',
+		    						'kXslPathManager' => 'XSL Path',
+									),					
 		));
 		$this->getElement('pathManagerClass')->setRegisterInArrayValidator(false);
 		 
+		
 		$this->addElement('select', 'urlManagerClass', array(
 			'label'			=> 'Delivery URL format :',
 			'filters'		=> array('StringTrim'),
+			'multiOptions'  => array('' => 'Kaltura Delivery URL Format',
+									'kLocalPathUrlManager' => 'QA FMS Server',
+									'kLimeLightUrlManager' => 'Lime Light CDN',
+									'kAkamaiUrlManager' => 'Akamai CDN',
+									'kLevel3UrlManager' => 'Level 3 CDN',
+		    						'kMirrorImageUrlManager' => 'Mirror Image CDN',
+									),		
 			
 		));
 		$this->getElement('urlManagerClass')->setRegisterInArrayValidator(false);
 		 
+		
 		$this->addElement('select', 'trigger', array(
 			'label'			=> 'Trigger:',
 			'filters'		=> array('StringTrim'),
+			'multiOptions'  => array(3 => 'Flavor Ready',
+									2 => 'Moderation Approved',
+							  ),	
 		));
 		
 		$readyBehavior = new Kaltura_Form_Element_EnumSelect('readyBehavior', array('enum' => 'Kaltura_Client_Enum_StorageProfileReadyBehavior'));

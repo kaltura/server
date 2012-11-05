@@ -175,5 +175,9 @@ class s3Mgr extends kFileTransferMgr
 	{
 		return false;
 	}
+	
+	public function setFilesPermissionPublicInS3($filesPermissionPublicInS3){
+		$this->filesPermissionPublicInS3 = $filesPermissionPublicInS3;
+	}
 
 }
