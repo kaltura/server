@@ -8,11 +8,11 @@ class KalturaAmazonS3StorageProfile extends KalturaStorageProfile
 	/**
 	 * @var KalturaAmazonS3StorageProfileFilesPermissionLevel
 	 */
-	public $filesPermissionPublicInS3;
+	public $filesPermissionInS3;
 	
 	private static $map_between_objects = array
 	(
-		"filesPermissionPublicInS3",
+		"filesPermissionInS3",
 	);
 	
 	public function getMapBetweenObjects()

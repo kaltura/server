@@ -1188,7 +1188,7 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
 	 *
 	 * @var KalturaAmazonS3StorageProfileFilesPermissionLevel
 	 */
-	public $filesPermissionPublicInS3 = null;
+	public $filesPermissionInS3 = null;
 
 }
 

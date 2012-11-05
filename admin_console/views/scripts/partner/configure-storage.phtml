@@ -38,7 +38,7 @@
 			<?php echo $this->form->storageFtpPassiveMode;?>
 		</div>
 		<div style="visibility: hidden;">
-			<?php echo $this->form->filesPermissionPublicInS3;?>
+			<?php echo $this->form->filesPermissionInS3;?>
 		</div>
 		<?php echo $this->form->storageUsername;?>
 		<?php echo $this->form->storagePassword;?>
@@ -95,18 +95,18 @@ jQuery(document).ready(function() {
 		switch ( protocol )
 		{
 		case "<?php echo Kaltura_Client_Enum_StorageProfileProtocol::S3?>":				
-			jQuery('#filesPermissionPublicInS3-label').parent().css('visibility', 'visible');
-			jQuery('#filesPermissionPublicInS3').parent().css('visibility', 'visible');
+			jQuery('#filesPermissionInS3-label').parent().css('visibility', 'visible');
+			jQuery('#filesPermissionInS3').parent().css('visibility', 'visible');
 			jQuery('#storageFtpPassiveMode').parent().css('visibility', 'hidden');
 			break;
 		case "<?php echo Kaltura_Client_Enum_StorageProfileProtocol::FTP?>":
 			jQuery('#storageFtpPassiveMode').parent().css('visibility', 'visible');
-			jQuery('#filesPermissionPublicInS3-label').parent().css('visibility', 'hidden');
-			jQuery('#filesPermissionPublicInS3').parent().css('visibility', 'hidden');			
+			jQuery('#filesPermissionInS3-label').parent().css('visibility', 'hidden');
+			jQuery('#filesPermissionInS3').parent().css('visibility', 'hidden');			
 			break;
 		default:
-			jQuery('#filesPermissionPublicInS3').parent().css('visibility', 'hidden');
-			jQuery('#filesPermissionPublicInS3-label').parent().css('visibility', 'hidden');
+			jQuery('#filesPermissionInS3').parent().css('visibility', 'hidden');
+			jQuery('#filesPermissionInS3-label').parent().css('visibility', 'hidden');
 			jQuery('#storageFtpPassiveMode').parent().css('visibility', 'hidden');
 			break;
 		}

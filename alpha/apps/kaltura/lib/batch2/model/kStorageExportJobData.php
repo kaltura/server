@@ -13,7 +13,7 @@ class kStorageExportJobData extends kStorageJobData
     /**
 	 * @var KalturaAmazonS3StorageProfileFilesPermissionLevel
 	 */   	
-    private $filesPermissionPublicInS3;
+    private $filesPermissionInS3;
 	
 	/**
 	 * @return the $force
@@ -32,19 +32,19 @@ class kStorageExportJobData extends kStorageJobData
 	}
 	
 	/**
-	 * @return the $filesPermissionPublicInS3
+	 * @return the $filesPermissionInS3
 	 */
-	public function getFilesPermissionPublicInS3()
+	public function getFilesPermissionInS3()
 	{
-		return $this->filesPermissionPublicInS3;
+		return $this->filesPermissionInS3;
 	}
 	
 	/**
-	 * @param $filesPermissionPublicInS3 the $filesPermissionPublicInS3 to set
+	 * @param $filesPermissionInS3 the $filesPermissionInS3 to set
 	 */
-	public function setFilesPermissionPublicInS3 ($filesPermissionPublicInS3)
+	public function setFilesPermissionInS3 ($filesPermissionInS3)
 	{
-		$this->filesPermissionPublicInS3 = $filesPermissionPublicInS3;	
+		$this->filesPermissionInS3 = $filesPermissionInS3;	
 	}
 	
 }

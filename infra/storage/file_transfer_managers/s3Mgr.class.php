@@ -10,7 +10,7 @@ class s3Mgr extends kFileTransferMgr
 {
 	private $s3;
 		
-	protected $filesPermissionPublicInS3;
+	protected $filesPermissionInS3;
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct()
@@ -71,7 +71,7 @@ class s3Mgr extends kFileTransferMgr
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		KalturaLog::debug("remote_file: ".$remote_file);
 		
-		$res = $this->s3->putObjectFile($local_file, $bucket, $remote_file, $this->filesPermissionPublicInS3);
+		$res = $this->s3->putObjectFile($local_file, $bucket, $remote_file, $this->filesPermissionInS3);
 
 		if ($res)
 		{
@@ -176,8 +176,8 @@ class s3Mgr extends kFileTransferMgr
 		return false;
 	}
 	
-	public function setFilesPermissionPublicInS3($filesPermissionPublicInS3){
-		$this->filesPermissionPublicInS3 = $filesPermissionPublicInS3;
+	public function setFilesPermissionInS3($filesPermissionInS3){
+		$this->filesPermissionInS3 = $filesPermissionInS3;
 	}
 
 }

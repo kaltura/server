@@ -12,7 +12,7 @@
 class AmazonS3StorageProfile extends StorageProfile
 {
 	
-	const CUSTOM_DATA_FILES_PERMISSION_PUBLIC_IN_S3 = 'files_permission_public_in_s3';
+	const CUSTOM_DATA_FILES_PERMISSION_IN_S3 = 'files_permission_in_s3';
 	
 	public function getKalturaObjectType()
 	{
@@ -21,16 +21,16 @@ class AmazonS3StorageProfile extends StorageProfile
 	
 	/* Files Permission Public */
 	
-	public function setFilesPermissionPublicInS3($v)
+	public function setFilesPermissionInS3($v)
 	{
 		if (!is_null($v)){
-	    	$this->putInCustomData(self::CUSTOM_DATA_FILES_PERMISSION_PUBLIC_IN_S3, $v);
+	    	$this->putInCustomData(self::CUSTOM_DATA_FILES_PERMISSION_IN_S3, $v);
 		}
 	}
 	
-	public function getFilesPermissionPublicInS3()
+	public function getFilesPermissionInS3()
 	{
-	    $v = $this->getFromCustomData(self::CUSTOM_DATA_FILES_PERMISSION_PUBLIC_IN_S3);
+	    $v = $this->getFromCustomData(self::CUSTOM_DATA_FILES_PERMISSION_IN_S3);
 	    return $v;
 	}
 }

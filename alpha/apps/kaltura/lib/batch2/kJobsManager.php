@@ -1206,9 +1206,9 @@ class kJobsManager
 	 * 
 	 * @return BatchJob
 	 */
-	public static function addStorageExportJob(BatchJob $parentJob = null, $entryId, $partnerId, StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false, $dc = null, $filesPermissionPublicInS3 = false)
+	public static function addStorageExportJob(BatchJob $parentJob = null, $entryId, $partnerId, StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false, $dc = null)
 	{
-		KalturaLog::debug("entryId[$entryId], partnerId[$partnerId], externalStorage id[" . $externalStorage->getId() . "], fileSync id[" . $fileSync->getId() . "], srcFileSyncLocalPath[$srcFileSyncLocalPath], filesPermissionPublicInS3[$filesPermissionPublicInS3]");
+		KalturaLog::debug("entryId[$entryId], partnerId[$partnerId], externalStorage id[" . $externalStorage->getId() . "], fileSync id[" . $fileSync->getId() . "], srcFileSyncLocalPath[$srcFileSyncLocalPath]");
 		
 		$netStorageExportData = new kStorageExportJobData();
 	    $netStorageExportData->setServerUrl($externalStorage->getStorageUrl()); 
@@ -1220,7 +1220,7 @@ class kJobsManager
 		$netStorageExportData->setForce($force);
 		$netStorageExportData->setDestFileSyncStoredPath($externalStorage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
 		if ($externalStorage->getProtocol() == StorageProfile::STORAGE_PROTOCOL_S3){
-			$netStorageExportData->setFilesPermissionPublicInS3($filesPermissionPublicInS3);
+			$netStorageExportData->setFilesPermissionInS3($externalStorage->getFilesPermissionInS3());
 		}
 				
 		$batchJob = null;

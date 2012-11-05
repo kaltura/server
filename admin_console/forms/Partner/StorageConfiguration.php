@@ -91,8 +91,8 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append'))),			
 		));
 				
-		$this->addElement('select', 'filesPermissionPublicInS3', array(
-			'label'			=> 'Files Permission Public:',
+		$this->addElement('select', 'filesPermissionInS3', array(
+			'label'			=> 'Files Permission In S3:',
 			'filters'		=> array('StringTrim'),
 			'multiOptions'  => array(Kaltura_Client_Enum_AmazonS3StorageProfileFilesPermissionLevel::ACL_PRIVATE => 'Private',
 									 Kaltura_Client_Enum_AmazonS3StorageProfileFilesPermissionLevel::ACL_PUBLIC_READ => 'Public Read',
