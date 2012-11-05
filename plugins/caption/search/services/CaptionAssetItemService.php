@@ -11,6 +11,15 @@ class CaptionAssetItemService extends KalturaBaseService
 {
 	public function initService($serviceId, $serviceName, $actionName)
 	{
+		$ks = kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null;
+		
+		if (($actionName == 'search') &&
+		  (!$ks || (!$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))))
+		{			
+			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
+			entryPeer::setUserContentOnly(true);
+		}
+		
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 		if($actionName != 'parse')
