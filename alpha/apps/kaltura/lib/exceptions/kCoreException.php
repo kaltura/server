@@ -60,6 +60,8 @@ class kCoreException extends Exception
 	
 	const INVALID_USER_ID = "INVALID_USER_ID";
 	
+	const INVALID_ENTRY_ID = "INVALID_ENTRY_ID";
+	
 	const SEARCH_TOO_GENERAL = "SEARCH_TOO_GENERAL";
 	
 	const ID_NOT_FOUND = 'ID_NOT_FOUND';
