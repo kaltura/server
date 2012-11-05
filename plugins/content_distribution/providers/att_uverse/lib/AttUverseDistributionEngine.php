@@ -69,48 +69,28 @@ class AttUverseDistributionEngine extends DistributionEngine implements
 			
 		//upload video to FTP
 		$remoteAssetFileUrls = array();
-		$assetLocalPathsArray = unserialize($providerData->assetLocalPaths);
-		if ($assetLocalPathsArray)
-		{
-			foreach ($assetLocalPathsArray as $assetId => $assetLocalPath)
-			{
-				$videoDestFilePath = $this->getRemoteFilePath($assetLocalPath, $distributionProfile->ftpPath);			
-				$this->uploadAssetsFiles($ftpManager, $videoDestFilePath, $assetLocalPath);			
-				$remoteAssetFileUrls[$assetId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$videoDestFilePath;			
-			}
+		$remoteThumbnailFileUrls = array();
+		$remoteCaptionFileUrls = array();
+		/* @var $file KalturaAttUverseDistributionFile */
+		foreach ($providerData->filesForDistribution as $file){
+			$ftpPath = $distributionProfile->ftpPath;
+			$destFilePath = $ftpPath ?  $ftpPath.DIRECTORY_SEPARATOR.$file->remoteFilename: $file->remoteFilename;	
+			$this->uploadAssetsFiles($ftpManager, $destFilePath, $file->localFilePath);
+			if ($file->assetType == KalturaAssetType::FLAVOR)
+				$remoteAssetFileUrls[$file->assetId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$destFilePath;
+			if ( $file->assetType == KalturaAssetType::THUMBNAIL)
+				$remoteThumbnailFileUrls[$file->assetId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$destFilePath;
+			if ( ($file->assetType == KalturaAssetType::ATTACHMENT) ||($file->assetType == KalturaAssetType::CAPTION))
+				$remoteCaptionFileUrls[$file->assetId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$destFilePath;
 		}
+		
 		//save flavor assets on provider data to use in the service				
 		$providerData->remoteAssetFileUrls = serialize($remoteAssetFileUrls);
-						
-		//upload thumbnail to FTP
-		$remoteThumbnailFileUrls = array();
-		$thumbLocalPathsArray = unserialize($providerData->thumbLocalPaths);
-		if ($thumbLocalPathsArray)
-		{
-			foreach ($thumbLocalPathsArray as $assetId => $thumbLocalPath)
-			{
-				$thumbnailDestFilePath = $this->getRemoteFilePath($thumbLocalPath, $distributionProfile->ftpPath);
-				$this->uploadAssetsFiles($ftpManager, $thumbnailDestFilePath, $thumbLocalPath);				
-				$remoteThumbnailFileUrls[$assetId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$thumbnailDestFilePath;			
-			}
-		}
 		//save thumnail assets on provider data to use in the service
 		$providerData->remoteThumbnailFileUrls = serialize($remoteThumbnailFileUrls);
-		
-		//upload captions to FTP
-		$remoteCaptionFileUrls = array();
-		$captionLocalPathsArray = unserialize($providerData->captionLocalPaths);
-		if ($captionLocalPathsArray)
-		{
-			foreach ($captionLocalPathsArray as $captionId => $captionLocalPath)
-			{
-				$captionDestFilePath = $this->getRemoteFilePath($captionLocalPath, $distributionProfile->ftpPath);
-				$this->uploadAssetsFiles($ftpManager, $captionDestFilePath, $captionLocalPath);				
-				$remoteCaptionFileUrls[$captionId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$captionDestFilePath;			
-			}
-		}
 		//save caption assets on provider data to use in the service
 		$providerData->remoteCaptionFileUrls = serialize($remoteCaptionFileUrls);
+		
 
 	}	
 	
@@ -127,20 +107,6 @@ class AttUverseDistributionEngine extends DistributionEngine implements
 		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
 		$ftpManager->login($host, $login, $password);
 		return $ftpManager;
-	}
-	
-	/**
-	 * @param string $providerDataPath
-	 * @return string
-	 */
-	protected function getRemoteFilePath($localFilePath, $ftpBasePath)
-	{
-		$remoteFilePath = pathinfo($localFilePath, PATHINFO_BASENAME);
-		if ($ftpBasePath)
-		{
-			$remoteFilePath = $ftpBasePath.'/'.$remoteFilePath;
-		}
-		return $remoteFilePath;
 	}
 	
 	

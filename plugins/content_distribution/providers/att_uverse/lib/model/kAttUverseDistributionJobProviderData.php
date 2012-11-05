@@ -5,21 +5,7 @@
  */
 class kAttUverseDistributionJobProviderData extends kDistributionJobProviderData
 {
-		
-	/**
-	 * @var string
-	 */
-	public $assetLocalPaths;
-	
-	/**
-	 * @var string
-	 */
-	public $thumbLocalPaths;
-	
-	/**
-	 * @var string
-	 */
-	public $captionLocalPaths;
+
 	
 	/**
 	 * The remote URL of the video asset that was distributed
@@ -50,34 +36,6 @@ class kAttUverseDistributionJobProviderData extends kDistributionJobProviderData
 	
 	
 	/**
-	 * @return the $assetLocalPaths
-	 */
-	public function getAssetLocalPaths() {
-		return $this->assetLocalPaths;
-	}
-
-	/**
-	 * @param string $assetLocalPaths
-	 */
-	public function setAssetLocalPaths($assetLocalPaths) {
-		$this->assetLocalPaths = $assetLocalPaths;
-	}
-
-	/**
-	 * @return the $thumbLocalPaths
-	 */
-	public function getThumbLocalPaths() {
-		return $this->thumbLocalPaths;
-	}
-
-	/**
-	 * @param string $thumbLocalPaths
-	 */
-	public function setThumbLocalPaths($thumbLocalPaths) {
-		$this->thumbLocalPaths = $thumbLocalPaths;
-	}
-
-	/**
 	 * @return the $remoteAssetFileUrls
 	 */
 	public function getRemoteAssetFileUrls() {
@@ -103,20 +61,6 @@ class kAttUverseDistributionJobProviderData extends kDistributionJobProviderData
 	 */
 	public function setRemoteThumbnailFileUrls($remoteThumbnailFileUrls) {
 		$this->remoteThumbnailFileUrls = $remoteThumbnailFileUrls;
-	}
-	
-	/**
-	 * @return the $captionLocalPaths
-	 */
-	public function getCaptionLocalPaths() {
-		return $this->captionLocalPaths;
-	}
-
-	/**
-	 * @param string $captionLocalPaths
-	 */
-	public function setCaptionLocalPaths($captionLocalPaths) {
-		$this->captionLocalPaths = $captionLocalPaths;
 	}
 	
 	/**

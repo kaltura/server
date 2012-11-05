@@ -12,6 +12,9 @@ class AttUverseDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_FTP_PASSWORD = 'ftpPassword';
 	const CUSTOM_DATA_FTP_PATH = 'ftpPath';
 	const CUSTOM_DATA_CHANNEL_TITLE = 'channelTitle';
+	const CUSTOM_DATA_FLAVOR_ASSET_FILENAME_XSLT = 'flavorAssetFilenameXslt';
+	const CUSTOM_DATA_THUMBNAIL_ASSET_FILENAME_XSLT = 'thumbnailAssetFilenameXslt';
+	const CUSTOM_DATA_ASSET_FILENAME_XSLT = 'assetFilenameXslt';
 
 			
 	// validations
@@ -87,6 +90,9 @@ class AttUverseDistributionProfile extends ConfigurableDistributionProfile
 	public function getFtpPassword()			 	{return $this->getFromCustomData(self::CUSTOM_DATA_FTP_PASSWORD);}
 	public function getFtpHost()			 		{return $this->getFromCustomData(self::CUSTOM_DATA_FTP_HOST);}
 	public function getChannelTitle()		 		{return $this->getFromCustomData(self::CUSTOM_DATA_CHANNEL_TITLE);}
+	public function getFlavorAssetFilenameXslt()	{return $this->getFromCustomData(self::CUSTOM_DATA_FLAVOR_ASSET_FILENAME_XSLT);}
+	public function getThumbnailAssetFilenameXslt()	{return $this->getFromCustomData(self::CUSTOM_DATA_THUMBNAIL_ASSET_FILENAME_XSLT);}
+	public function getAssetFilenameXslt()			{return $this->getFromCustomData(self::CUSTOM_DATA_ASSET_FILENAME_XSLT);}
 	
 	public function setUniqueHashForFeedUrl($v)		{$this->putInCustomData(self::CUSTOM_DATA_UNIQUE_HASH_FOR_FEED_URL, $v);}
 	public function setFtpPath($v)			 		{$this->putInCustomData(self::CUSTOM_DATA_FTP_PATH, $v);}
@@ -94,6 +100,9 @@ class AttUverseDistributionProfile extends ConfigurableDistributionProfile
 	public function setFtpPassword($v)				{$this->putInCustomData(self::CUSTOM_DATA_FTP_PASSWORD, $v);}	
 	public function setFtpHost($v)					{$this->putInCustomData(self::CUSTOM_DATA_FTP_HOST, $v);}
 	public function setChannelTitle($v)				{$this->putInCustomData(self::CUSTOM_DATA_CHANNEL_TITLE, $v);}
+	public function setFlavorAssetFilenameXslt($v)	{$this->putInCustomData(self::CUSTOM_DATA_FLAVOR_ASSET_FILENAME_XSLT, $v);}
+	public function setThumbnailAssetFilenameXslt($v){$this->putInCustomData(self::CUSTOM_DATA_THUMBNAIL_ASSET_FILENAME_XSLT, $v);}
+	public function setAssetFilenameXslt($v)		{$this->putInCustomData(self::CUSTOM_DATA_ASSET_FILENAME_XSLT, $v);}
 	
 	
 	
@@ -241,6 +250,84 @@ class AttUverseDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    return $fieldConfigArray;
+	}
+	
+	public function getFlavorAssetFilename(EntryDistribution $entryDistribution, $defaultFilename, $flavorAssetId)
+	{
+		if ($this->getFlavorAssetFilenameXslt())
+			return trim($this->transformXslForEntry($entryDistribution, $this->getFlavorAssetFilenameXslt(), array('flavorAssetId' => $flavorAssetId)));
+		else
+			return $defaultFilename;
+	}
+	
+	public function getThumbnailAssetFilename(EntryDistribution $entryDistribution, $defaultFilename, $thumbnailAssetId)
+	{
+		if ($this->getThumbnailAssetFilenameXslt())
+			return trim($this->transformXslForEntry($entryDistribution, $this->getThumbnailAssetFilenameXslt(), array('thumbnailAssetId' => $thumbnailAssetId)));
+		else
+			return $defaultFilename;
+	}
+	
+	public function getAssetFilename(EntryDistribution $entryDistribution, $defaultFilename, $thumbnailAssetId)
+	{
+		if ($this->getAssetFilenameXslt())
+			return trim($this->transformXslForEntry($entryDistribution, $this->getAssetFilenameXslt(), array('assetId' => $thumbnailAssetId)));
+		else
+			return $defaultFilename;
+	}
+	
+	public function transformXslForEntry(EntryDistribution $entryDistribution, $xsl, $xslParams = array())
+	{
+		$xslParams['entryDistributionId'] = $entryDistribution->getId();
+		$xslParams['distributionProfileId'] = $entryDistribution->getDistributionProfileId();
+		
+		$mrssDoc = $this->getEntryMrssDoc($entryDistribution);
+		
+		$xslDoc = new DOMDocument();
+		$xslDoc->loadXML($xsl);
+		
+		$xslt = new XSLTProcessor;
+		$xslt->registerPHPFunctions(); // it is safe to register all php fuctions here
+		$xslt->setParameter('', $xslParams);
+		$xslt->importStyleSheet($xslDoc);
+		
+		return $xslt->transformToXml($mrssDoc);
+	}
+	
+	public function getEntryMrssDoc(EntryDistribution $entryDistribution)
+	{
+		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
+				
+		// set the default criteria to use the current entry distribution partner id (it is restored later)
+		// this is needed for related entries under kMetadataMrssManager which is using retrieveByPK without the correct partner id filter
+		$oldEntryCriteria = entryPeer::getCriteriaFilter()->getFilter();
+		entryPeer::setDefaultCriteriaFilter();
+		entryPeer::addPartnerToCriteria($this->getPartnerId(), true);
+		
+		try
+		{
+    		$mrss = null;
+    		$mrssParams = new kMrssParameters();
+    		if ($this->getItemXpathsToExtend())
+    			$mrssParams->setItemXpathsToExtend($this->getItemXpathsToExtend());
+    		$mrss = kMrssManager::getEntryMrssXml($entry, $mrss, $mrssParams);
+    		$mrssStr = $mrss->asXML();
+		}
+		catch (Exception $e)
+		{
+		    // restore the original criteria so it will not get stuck due to the exception
+		    entryPeer::getCriteriaFilter()->setFilter($oldEntryCriteria);
+		    throw $e;
+		}
+		
+		// restore the original criteria
+		entryPeer::getCriteriaFilter()->setFilter($oldEntryCriteria);
+		
+		$mrssObj = new DOMDocument();
+        if(!$mrssObj->loadXML($mrssStr))
+		    throw new Exception('Entry mrss xml is not valid');
+		    
+		return $mrssObj;
 	}
 	
 	

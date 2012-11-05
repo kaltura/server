@@ -36,7 +36,22 @@ class KalturaAttUverseDistributionProfile extends KalturaConfigurableDistributio
 	/**
 	 * @var string
 	 */			
-	public $channelTitle;	
+	public $channelTitle;
+	
+	/**
+	 * @var string
+	 */
+	 public $flavorAssetFilenameXslt;
+
+	/**
+	 * @var string
+	 */
+	 public $thumbnailAssetFilenameXslt;
+	 
+	 /**
+	  * @var string
+	  */
+	 public $assetFilenameXslt;
 	
 	
 	/*
@@ -50,6 +65,9 @@ class KalturaAttUverseDistributionProfile extends KalturaConfigurableDistributio
 		'ftpPassword',
 		'ftpPath',	
 		'channelTitle',
+		'flavorAssetFilenameXslt',
+		'thumbnailAssetFilenameXslt',
+		'assetFilenameXslt',
 	 );
 		 
 	public function getMapBetweenObjects()

@@ -7,19 +7,9 @@ class KalturaAttUverseDistributionJobProviderData extends KalturaConfigurableDis
 {
 		
 	/**
-	 * @var string
+	 * @var KalturaAttUverseDistributionFileArray
 	 */
-	public $assetLocalPaths;
-	
-	/**
-	 * @var string
-	 */
-	public $thumbLocalPaths;
-	
-	/**
-	 * @var string
-	 */
-	public $captionLocalPaths;
+	public $filesForDistribution;
 	
 	/**
 	 * The remote URL of the video asset that was distributed
@@ -52,29 +42,34 @@ class KalturaAttUverseDistributionJobProviderData extends KalturaConfigurableDis
 			
 		if(!($distributionJobData->distributionProfile instanceof KalturaAttUverseDistributionProfile))
 			return;
-			
+		
+		/* @var $distributionProfileDb AttUverseDistributionProfile */
+		
+		$distributionProfileDb = DistributionProfilePeer::retrieveByPK($distributionJobData->distributionProfileId);
 		$distributedFlavorIds = null;
 		$distributedThumbIds = null;
-			
+		$this->filesForDistribution = new KalturaAttUverseDistributionFileArray();
+		$entryDistributionDb = EntryDistributionPeer::retrieveByPK($distributionJobData->entryDistributionId);
 		//Flavor Assets
 		$flavorAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
 		if(count($flavorAssets)) {
-			$videoAssetFilePathArray = array();
+			$assetLocalIds = array();
 			foreach ($flavorAssets as $flavorAsset)
 			{
-				if($flavorAsset) 
-				{
-					/* @var $flavorAsset flavorAsset */
-					$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-					if(kFileSyncUtils::fileSync_exists($syncKey)){
-						$id = $flavorAsset->getId();
-						$videoAssetFilePathArray[$id] = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
-					}
+				$file = new KalturaAttUverseDistributionFile();
+				$file->assetType = KalturaAssetType::FLAVOR;
+				/* @var $flavorAsset flavorAsset */
+				$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+				if(kFileSyncUtils::fileSync_exists($syncKey)){
+					$assetLocalIds[] = $flavorAsset->getId();
+					$file->assetId = $flavorAsset->getId();
+					$file->localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
+					$defaultFilename = pathinfo($file->localFilePath, PATHINFO_BASENAME);
+					$file->remoteFilename = $distributionProfileDb->getFlavorAssetFilename($entryDistributionDb,$defaultFilename,$flavorAsset->getId() );
+					$this->filesForDistribution[] = $file;
 				}
 			}
-			$assetLocalIds = array_keys($videoAssetFilePathArray);
 			$distributedFlavorIds = implode(',', $assetLocalIds);			
-			$this->assetLocalPaths = serialize($videoAssetFilePathArray);	
 		}
 		
 		//Thumbnail		
@@ -82,44 +77,52 @@ class KalturaAttUverseDistributionJobProviderData extends KalturaConfigurableDis
 				
 		if(count($thumbAssets))
 		{	
-			$thumbAssetFilePathArray = array();
+			$thumbLocalIds = array();
 			foreach ($thumbAssets as $thumbAsset)
-			{														
+			{							
+				$file = new KalturaAttUverseDistributionFile();
+				$file->assetType = KalturaAssetType::THUMBNAIL;	
 				$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 				if(kFileSyncUtils::fileSync_exists($syncKey)){
-					$id = $thumbAsset->getId();
-					$thumbAssetFilePathArray[$id] = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);				    
+					$thumbLocalIds[] = $thumbAsset->getId();
+					$file->assetId = $thumbAsset->getId();
+					$file->localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
+					$defaultFilename = pathinfo($file->localFilePath, PATHINFO_BASENAME);
+					$file->remoteFilename = $distributionProfileDb->getThumbnailAssetFilename($entryDistributionDb, $defaultFilename, $thumbAsset->getId());
+					$this->filesForDistribution[] = $file;
 				}
 			}
-			$thumbLocalIds = array_keys($thumbAssetFilePathArray);
 			$distributedThumbIds = implode(',', $thumbLocalIds);
-			$this->thumbLocalPaths = serialize($thumbAssetFilePathArray);
 		}	
 		
 		//additional assets
 		$additionalAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->assetIds));
 		if(count($additionalAssets))
 		{	
-			$captionAssetFilePathArray = array();
+			$captionLocalIds = array();
 			foreach ($additionalAssets as $additionalAsset)
 			{	
+				$file = new KalturaAttUverseDistributionFile();
 				$assetType = $additionalAsset->getType();
+				$file->assetType = $assetType;	
 				$syncKey = $additionalAsset->getSyncKey(CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 				$id = $additionalAsset->getId();
 				if(kFileSyncUtils::fileSync_exists($syncKey)){
 					if (($assetType == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))||
 						($assetType == AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT))){									
-						$captionAssetFilePathArray[$id] = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);				    
+						$captionLocalIds[] = $additionalAsset->getId();
+						$file->assetId = $additionalAsset->getId();
+						$file->localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
+						$defaultFilename = pathinfo($file->localFilePath, PATHINFO_BASENAME);
+						$file->remoteFilename = $distributionProfileDb->getAssetFilename($entryDistributionDb, $defaultFilename, $additionalAsset->getId());
+						$this->filesForDistribution[] = $file;
 					}
 				}
 			}
-			$captionLocalIds = array_keys($captionAssetFilePathArray);
 			$distributedCaptionIds = implode(',', $captionLocalIds);
-			$this->captionLocalPaths = serialize($captionAssetFilePathArray);
 		}	
 		
 		//putting distributed flavors ids and distributed thumbnail ids in entry distribution custom data		
-		$entryDistributionDb = EntryDistributionPeer::retrieveByPK($distributionJobData->entryDistributionId);
 		if ($entryDistributionDb)
 		{
 			$entryDistributionDb->putInCustomData(AttUverseEntryDistributionCustomDataField::DISTRIBUTED_FLAVOR_IDS, $distributedFlavorIds);
@@ -133,8 +136,6 @@ class KalturaAttUverseDistributionJobProviderData extends KalturaConfigurableDis
 		
 	private static $map_between_objects = array
 	(
-		"assetLocalPaths",
-		"thumbLocalPaths",
 		"remoteAssetFileUrls",
 		"remoteThumbnailFileUrls",
 	);
