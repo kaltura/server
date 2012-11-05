@@ -100,11 +100,6 @@ class playManifestAction extends kalturaAction
 	private $flavorIds = null;
 	
 	/**
-	 * @var string
-	 */
-	private $deliveryCode = null;	
-
-	/**
 	 * @var kUrlManager
 	 */
 	private $urlManager = null;
@@ -1002,13 +997,6 @@ class playManifestAction extends kalturaAction
 			$partnerId = $this->entry->getPartnerId();
 			$baseUrl = myPartnerUtils::getRtmpUrl($partnerId);
 			
-			// allow to replace {deliveryCode} place holder with the deliveryCode parameter passed to the action
-			// a publisher with a rtmpUrl set to {deliveryCode}.example.com/ondemand will be able to use different
-			// cdn configuration for different sub publishers by passing a different deliveryCode to the KDP
-
-			if ($this->deliveryCode)
-				$baseUrl = str_replace("{deliveryCode}", $this->deliveryCode, $baseUrl);
-
 			// get all flavors with kaltura urls
 			foreach($this->flavorAssets as $flavorAsset)
 			{
@@ -1124,7 +1112,6 @@ class playManifestAction extends kalturaAction
 				$renderer->baseUrl = $baseUrl;
 				$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
 				$renderer->mimeType = $this->getMimeType($flavors);
-				$renderer->deliveryCode = $this->deliveryCode;
 				return $renderer;
 				
 		}
@@ -1301,7 +1288,7 @@ class playManifestAction extends kalturaAction
 
 		$this->clipTo = $this->getRequestParameter ( "clipTo" , 0);
 		
-		$this->deliveryCode = $this->getRequestParameter( "deliveryCode", null );
+		$deliveryCode = $this->getRequestParameter( "deliveryCode", null );
 		$playbackContext = $this->getRequestParameter( "playbackContext", null );
 		
 		$this->protocol = $this->getRequestParameter ( "protocol", null );
@@ -1422,6 +1409,6 @@ class playManifestAction extends kalturaAction
 		}
 
 		// Output the response
-		$renderer->output($playbackContext);
+		$renderer->output($deliveryCode, $playbackContext);
 	}
 }

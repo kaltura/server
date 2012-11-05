@@ -27,6 +27,11 @@ abstract class kManifestRenderer
 	public $cachingHeadersAge = 0;
 	
 	/**
+	 * @var string
+	 */
+	public $deliveryCode = '';
+	
+	/**
 	 * @return array<string>
 	 */
 	public function getHeaders()
@@ -42,16 +47,27 @@ abstract class kManifestRenderer
 		return '';
 	}
 
+	// allow to replace {deliveryCode} place holder with the deliveryCode parameter passed to the action
+	// a publisher with a rtmpUrl set to {deliveryCode}.example.com/ondemand will be able to use different
+	// cdn configuration for different sub publishers by passing a different deliveryCode to the KDP
+	abstract protected function replaceDeliveryCode();
+	
+	abstract protected function tokenizeUrls();
+		
 	/**
 	 * @param string $playbackContext
 	 */
-	public function output($playbackContext)
+	public function output($deliveryCode, $playbackContext)
 	{
+		$this->deliveryCode = $deliveryCode;		
+		if ($this->deliveryCode)
+			$this->replaceDeliveryCode();
+	
 		if ($this->tokenizer)
 		{
 			$this->tokenizer->setPlaybackContext($playbackContext);
 		}
-	
+		
 		$this->tokenizeUrls();
 	
 		$headers = $this->getHeaders();
@@ -78,8 +94,6 @@ abstract class kManifestRenderer
 		return $result;
 	}
 	
-	abstract protected function tokenizeUrls();
-	
 	/**
 	 * @param string $part1
 	 * @param string $part2
@@ -101,6 +115,11 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 	 * @var array
 	 */
 	public $flavor = null;
+	
+	protected function replaceDeliveryCode()
+	{
+		$this->flavor['url'] = str_replace("{deliveryCode}", $this->deliveryCode, $this->flavor['url']);
+	}
 	
 	protected function tokenizeUrls()
 	{
@@ -125,6 +144,16 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 	 * @var string
 	 */
 	public $baseUrl = '';
+	
+	protected function replaceDeliveryCode()
+	{
+		$this->baseUrl = str_replace("{deliveryCode}", $this->deliveryCode, $this->baseUrl);
+		
+		foreach ($this->flavors as &$flavor)
+		{
+			$flavor['url'] = str_replace("{deliveryCode}", $this->deliveryCode, $flavor['url']);
+		}
+	}
 	
 	protected function tokenizeUrls()
 	{
@@ -167,11 +196,6 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 	 */
 	public $mimeType = 'video/x-flv';
 	
-	/**
-	 * @var string
-	 */
-	public $deliveryCode = '';
-
 	/**
 	 * @return array<string>
 	 */

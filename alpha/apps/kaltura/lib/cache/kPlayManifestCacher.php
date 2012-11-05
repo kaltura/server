@@ -4,6 +4,8 @@ require_once(dirname(__FILE__) . '/../../../../../server_infra/cache/kApiCache.p
 
 class kPlayManifestCacher extends kApiCache
 {
+	protected $_deliveryCode = null;
+	
 	protected $_playbackContext = null;
 	
 	static protected $_instance = null;
@@ -22,6 +24,9 @@ class kPlayManifestCacher extends kApiCache
 	{
 		$this->_playbackContext = isset($this->_params['playbackContext']) ? $this->_params['playbackContext'] : null;
 		unset($this->_params['playbackContext']);
+
+		$this->_deliveryCode = isset($this->_params['deliveryCode']) ? $this->_params['deliveryCode'] : null;
+		unset($this->_params['deliveryCode']);
 		
 		// take only the hostname part of the referrer parameter of baseEntry.getContextData
 		if (isset($this->_params['referrer']))
@@ -67,7 +72,7 @@ class kPlayManifestCacher extends kApiCache
 			require_once($requiredFile);
 		}
 		$renderer = unserialize($serializedRenderer);
-		$renderer->output($this->_playbackContext);
+		$renderer->output($this->_deliveryCode, $this->_playbackContext);
 		die;
 	}
 	
