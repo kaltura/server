@@ -6,6 +6,8 @@ else
 fi
 . `dirname $REAL_SCRIPT`/../configurations/system.ini
 
+echo `date`
+
 KP=$(pgrep -P 1 -f KGenericBatchMgr.class.php)
 MAINT=$BASE_DIR/maintenance
 if [ "X$KP" = "X" ]

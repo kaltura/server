@@ -6,6 +6,8 @@ else
 fi
 . `dirname $REAL_SCRIPT`/../configurations/system.ini
 
+echo `date`
+
 #
 # serviceBatchMgr      This shell script takes care of starting and stopping a Kaltura Batch Service
 #
