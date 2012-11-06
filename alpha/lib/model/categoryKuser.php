@@ -213,7 +213,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	 * @see IIndexable::getObjectIndexName()
 	 */
 	public function getObjectIndexName() {
-		return categoryKuserPeer::getOMClass(false);
+		return categoryKuserPeer::TABLE_NAME;
 	}
 
 	/* (non-PHPdoc)
@@ -242,12 +242,12 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	 */
 	public function getIndexFieldType($field) {
 		return array (
-			'int_id' => IIndexable::FIELD_TYPE_INTEGER,
+			'id' => IIndexable::FIELD_TYPE_INTEGER,
 			'category_id' => IIndexable::FIELD_TYPE_INTEGER,
 			'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
 			'category_full_ids' => IIndexable::FIELD_TYPE_STRING,
 			'permission_names' => IIndexable::FIELD_TYPE_STRING,
-			'inherit_from_category' => IIndexable::INT,
+			'inherit_from_category' => IIndexable::FIELD_TYPE_INTEGER,
 			'puser_id' => IIndexable::FIELD_TYPE_STRING,
 			'screen_name' => IIndexable::FIELD_TYPE_STRING,
 			'status' => IIndexable::FIELD_TYPE_INTEGER,
