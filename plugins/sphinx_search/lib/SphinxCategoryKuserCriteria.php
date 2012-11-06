@@ -51,7 +51,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 	 * @see SphinxCriteria::getSphinxIndexName()
 	 */
 	protected function getSphinxIndexName() {
-		return kSphinxSearchManager::getSphinxIndexName(categoryKuserPeer::getOMClass(false));
+		return kSphinxSearchManager::getSphinxIndexName(categoryKuserPeer::TABLE_NAME);
 	}
 
 	/* (non-PHPdoc)
