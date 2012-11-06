@@ -40,7 +40,7 @@
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $partner->id; ?>)">
 						<option value="" ><?php echo $this->translate('Select Action'); ?></option>
-						<?php if (Infra_AclHelper::isAllowedPartner($partner->id, $partner->partnerPackage)): ?>
+						<?php if (Kaltura_AdminUserIdentity::isAllowedPartner($partner->id, $partner->partnerPackage)): ?>
 							<?php if ($partner->status != Kaltura_Client_Enum_PartnerStatus::FULL_BLOCK): ?>
 								<?php if (Infra_AclHelper::isAllowed('widget','list')): ?>
 									<option value="widgets" ><?php echo $this->translate('Widgets'); ?></option>
@@ -68,7 +68,7 @@
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $partner->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
-						<?php if (Infra_AclHelper::isAllowedPartner($partner->id, $partner->partnerPackage)): ?>
+						<?php if (Kaltura_AdminUserIdentity::isAllowedPartner($partner->id, $partner->partnerPackage)): ?>
 							<?php if ($partner->status != Kaltura_Client_Enum_PartnerStatus::FULL_BLOCK): ?>
 								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect') && $partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
 									<option value="manage" ><?php echo $this->translate('Manage'); ?></option>

@@ -52,36 +52,6 @@ class Infra_AclHelper
 		return $allowed;
 	}
 	
-	public static function isAllowedPartner($partnerId, $partnerPackage)
-	{
-		if(Infra_AuthHelper::getAuthInstance()->hasIdentity())
-		{
-			$partners = Infra_AuthHelper::getAuthInstance()->getIdentity()->getAllowedPartners();
-			if(in_array('*', $partners))
-			{
-				return true;
-			}
-			$packages = Infra_AuthHelper::getAuthInstance()->getIdentity()->getAllowedPartnerPackages();
-			if(in_array($partnerPackage, $packages))
-			{
-				return true;
-			}
-			return in_array((string)$partnerId, $partners);
-		}
-		return false;
-	}
-	
-	/**
-	 * Refresh the list of partners the user is allowed to access.
-	 */
-	public static function refreshCurrentUserAllowedPartners()
-	{
-		if(Infra_AuthHelper::getAuthInstance()->hasIdentity())
-		{
-			Infra_AuthHelper::getAuthInstance()->getIdentity()->refreshAllowedPartners();
-		}
-	}
-	
 	/**
 	 * 
 	 * @param  Zend_Acl_Resource_Interface|string $resource

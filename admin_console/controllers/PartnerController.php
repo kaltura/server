@@ -75,7 +75,7 @@ class PartnerController extends Zend_Controller_Action
 				}
 				else
 				{
-					Infra_AclHelper::refreshCurrentUserAllowedPartners();
+					Kaltura_AdminUserIdentity::refreshCurrentUserAllowedPartners();
 					$this->_helper->redirector('list');
 				}
 			}
