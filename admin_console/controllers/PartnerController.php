@@ -500,16 +500,14 @@ class PartnerController extends Zend_Controller_Action
 		$action = $this->view->url(array('controller' => 'partner', 'action' => 'external-storages'), null, true);
 		$form->setAction($action);
 		
-		// init filter
-		$filter = new Kaltura_Client_Type_StorageProfileFilter();
-		
+		$partnerId = null;
 		if ($request->getParam('filter_input') != '') {
-			$filter->partnerIdEqual = $request->getParam('filter_input');
-			$newForm->getElement('newPartnerId')->setValue($request->getParam('filter_input'));
+			$partnerId = $request->getParam('filter_input');
+			$newForm->getElement('newPartnerId')->setValue($partnerId);
 		}
 		
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($client->storageProfile, "listAction", null, $filter);
+		$paginatorAdapter = new Infra_FilterPaginator($client->storageProfile, "listAction", $partnerId);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
