@@ -172,6 +172,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		
 		$this->addElement('text', 'contentParameterValue', array(
 			'label'			=> 'Value:',
+			'readonly'		=> true,
 			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
 		));
 		
@@ -203,6 +204,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		
 			$this->addElement('text', "contentParameterValue_{$this->contentParametersCount}", array(
 				'label'			=> 'Value:',
+				'readonly'		=> true,
 				'value'			=> $parameter->value->code,
 				'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
 			));
