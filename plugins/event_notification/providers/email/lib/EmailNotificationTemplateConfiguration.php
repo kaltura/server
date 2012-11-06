@@ -58,7 +58,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 				}
 			}
 			
-			if(isset($properties['contentParameterKey']))
+			if(isset($properties['contentParameterKey']) && is_array($properties['contentParameterKey']))
 			{
 				foreach($properties['contentParameterKey'] as $index => $value)
 				{
