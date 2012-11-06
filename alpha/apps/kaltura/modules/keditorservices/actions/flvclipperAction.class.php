@@ -204,7 +204,7 @@ class flvclipperAction extends kalturaAction
 		{
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 			
-			if (is_null($fileSync))
+			if (is_null($fileSync) || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 			{
 				KalturaLog::log("Error - no FileSync for flavor [".$flavorAsset->getId()."]");
 				KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
