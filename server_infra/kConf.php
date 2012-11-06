@@ -81,7 +81,7 @@ class kConf extends kEnvironment
 		{
 			self::$map[self::CACHE_VERSION_KEY] = uniqid();
 			$res = apc_store(self::APC_CACHE_MAP, self::$map);
-			if($reloadFileExists && $res)
+			if($reloadFileExists && $res && PHP_SAPI != 'cli')
 			{
 				$deleted = @unlink("$cacheDir/base.reload");
 				error_log("Base configuration reloaded");
