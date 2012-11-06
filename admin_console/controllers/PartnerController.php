@@ -505,9 +505,10 @@ class PartnerController extends Zend_Controller_Action
 			$partnerId = $request->getParam('filter_input');
 			$newForm->getElement('newPartnerId')->setValue($partnerId);
 		}
+		$filter = new Kaltura_Client_Type_StorageProfileFilter();
 		
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($client->storageProfile, "listAction", $partnerId);
+		$paginatorAdapter = new Infra_FilterPaginator($client->storageProfile, "listAction", $partnerId, $filter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
