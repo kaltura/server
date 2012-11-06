@@ -7,6 +7,7 @@
  */ 
 interface EventNotificationEventType extends BaseEnum
 {
+	const BATCH_JOB_STATUS = 1;
 	const OBJECT_ADDED = 2;
 	const OBJECT_CHANGED = 3;
 	const OBJECT_COPIED = 4;
