@@ -9,6 +9,7 @@
 var newConditionIndex = 0;
 
 <?php require_once __DIR__ . '/js/kConditions.js'; ?>
+<?php require_once __DIR__ . '/js/kParameters.js'; ?>
 
 function getVariables(kSelection, value, variables) {
 
@@ -115,14 +116,27 @@ var newContentParameterIndex = 0;
 
 function newContentParameter() {
 	var currentIndex = newContentParameterIndex;
-	var newContentParameterTemplate = jQuery("#frmContentParameter");
-	var newContentParameterForm = newContentParameterTemplate.clone();
-	newContentParameterForm.attr("id", "frmContentParameter_" + currentIndex);
-	newContentParameterForm.find('[name="contentParameterKey"]').attr('name', 'contentParameterKey[' + currentIndex + ']');
-	newContentParameterForm.find('[name="contentParameterValue"]').attr('name', 'contentParameterValue[' + currentIndex + ']');
-	newContentParameterForm.find('[name="removeContentParameterButton"]').click(function(){removeContentParameter(currentIndex);});
-	newContentParameterTemplate.after(newContentParameterForm);
-	newContentParameterForm.show();
+	var jqNewContentParameterTemplate = jQuery("#frmContentParameter");
+	
+	var jqNewContentParameterForm = jqNewContentParameterTemplate.clone();
+	jqNewContentParameterForm.attr("id", "frmContentParameter_" + currentIndex);
+
+	var jqContentParameterKey = jqNewContentParameterForm.find('[name="contentParameterKey"]');
+	jqContentParameterKey.attr('name', 'contentParameterKey[' + currentIndex + ']');
+
+	var jqContentParameterValue = jqNewContentParameterForm.find('[name="contentParameterValue"]');
+	jqContentParameterValue.attr('name', 'contentParameterValue[' + currentIndex + ']');
+
+	var jqSelection = addSelections(jqContentParameterValue, 'Select Parameter', kParameters);
+	jqContentParameterKey.before(jqSelection);
+	
+	var jqContentParameterButton = jqNewContentParameterForm.find('[name="removeContentParameterButton"]');
+	jqContentParameterButton.click(function(){
+		removeContentParameter(currentIndex);
+	});
+	
+	jqNewContentParameterTemplate.after(jqNewContentParameterForm);
+	jqNewContentParameterForm.show();
 
 	newContentParameterIndex++;
 }
