@@ -37,9 +37,10 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 					$entryId = $object->getEntryId();
 			}
 			
+			$scope = $event->getScope();
 			$type = $notificationTemplate->getType();
-			$jobData = $notificationTemplate->getJobData($event->getScope());
-			self::addEventNotificationDispatchJob($type, $jobData, null, $entryId, $parentJob);
+			$jobData = $notificationTemplate->getJobData($scope);
+			self::addEventNotificationDispatchJob($type, $jobData, $scope->getPartnerId(), $entryId, $parentJob);
 		}
 	}
 
@@ -65,10 +66,9 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 			$batchJob = new BatchJob();
 			$batchJob->setEntryId($entryId);
 			if (!$partnerId)
-			{
-			    $partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-			}
-			$batchJob->setPartnerId($partnerId ? $partnerId : kCurrentContext::$partner_id);
+				$partnerId = kCurrentContext::getCurrentPartnerId();
+				
+			$batchJob->setPartnerId($partnerId);
 		}
 		
 		KalturaLog::log("Creating event notification dispatch job on template id [" . $jobData->getTemplateId() . "] engine[$eventNotificationType]");
@@ -162,14 +162,26 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		foreach(self::$allNotificationTemplates as $notificationTemplate)
 		{
 			/* @var $notificationTemplate EventNotificationTemplate */
+			if(!$notificationTemplate->getAutomaticDispatchEnabled())
+			{
+				KalturaLog::debug("Template [" . $notificationTemplate->getId() . "] is not automatic");
+				continue;				
+			}
+		
+			if($notificationTemplate->getEventType() != $eventType)
+			{
+				KalturaLog::debug("Template [" . $notificationTemplate->getId() . "] event type [" . $notificationTemplate->getEventType() . "] does't match the event type [$eventType]");
+				continue;				
+			}
 			
 			$templateObjectClassName = KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $notificationTemplate->getObjectType());
-		
-			if(	$notificationTemplate->getEventType() == $eventType && 
-				is_subclass_of($eventObjectClassName, $templateObjectClassName) &&
-				$notificationTemplate->getAutomaticDispatchEnabled()
-				)
-					$notificationTemplates[] = $notificationTemplate;
+			if($eventObjectClassName != $templateObjectClassName && !is_subclass_of($eventObjectClassName, $templateObjectClassName))
+			{
+				KalturaLog::debug("Template [" . $notificationTemplate->getId() . "] object type [$templateObjectClassName] is not sub-class of event object type [$templateObjectClassName]");
+				continue;				
+			}
+			
+			$notificationTemplates[] = $notificationTemplate;
 		}
 		return $notificationTemplates;
 	}
