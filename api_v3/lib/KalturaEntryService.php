@@ -210,9 +210,6 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$resource->attachCreatedObject($dbAsset);
 		
-		if($isNewAsset)
-			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
-			
 		return $dbAsset;
 	}
 	
