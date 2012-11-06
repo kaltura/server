@@ -139,7 +139,7 @@ class s3Mgr extends kFileTransferMgr
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		KalturaLog::debug("remote_file: ".$remote_file);
-		return $this->s3->getObject($bucket, $remote_file);
+		return $this->s3->deleteObject($bucket, $remote_file);
 	}
 
 	// delete a directory and return true/false according to success
