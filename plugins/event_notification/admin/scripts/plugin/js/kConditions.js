@@ -60,7 +60,7 @@ var kConditions = {
 			}
 		},
 		getCode:			function(subCode, variables){
-								return '($scope->getEvent()->getObject() instanceof ' + variables.objectType + ') && in_array(' + variables.value + ', $scope->getEvent()->getObject()->getModifiedColumns())';
+								return '($scope->getEvent()->getObject() instanceof ' + variables.objectType + ') && in_array(' + variables.value + ', $scope->getEvent()->getModifiedColumns())';
 		}
 	},
 	coreObjectValueEqual: {
