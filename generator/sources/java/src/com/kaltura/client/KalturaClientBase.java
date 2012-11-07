@@ -604,11 +604,17 @@ abstract public class KalturaClientBase {
 		fields.put(FIELD_USER, userId);
 		
 		// build fields string
-		String fieldsStr = createRandomString(RANDOM_SIZE) + fields.toQueryString();
-		byte[] infoSignature = signInfoWithSHA1(fieldsStr);
-		byte[] input = new byte[infoSignature.length + fieldsStr.length()];
+		byte[] randomBytes = createRandomByteArray(RANDOM_SIZE);
+		byte[] fieldsByteArray = fields.toQueryString().getBytes();
+		int totalLength = randomBytes.length + fieldsByteArray.length;
+		byte[] fieldsAndRandomBytes = new byte[totalLength];
+		System.arraycopy(randomBytes, 0, fieldsAndRandomBytes, 0, randomBytes.length);
+		System.arraycopy(fieldsByteArray, 0, fieldsAndRandomBytes, randomBytes.length, fieldsByteArray.length);
+
+		byte[] infoSignature = signInfoWithSHA1(fieldsAndRandomBytes);
+		byte[] input = new byte[infoSignature.length + fieldsAndRandomBytes.length];
 		System.arraycopy(infoSignature, 0, input, 0, infoSignature.length);
-		System.arraycopy(fieldsStr.getBytes(),0,input,infoSignature.length, fieldsStr.length());
+		System.arraycopy(fieldsAndRandomBytes,0,input,infoSignature.length, fieldsAndRandomBytes.length);
 		
 		// encrypt and encode
 		byte[] encryptedFields = aesEncrypt(adminSecretForSigning, input);
@@ -632,9 +638,13 @@ abstract public class KalturaClientBase {
 	}
 	
 	private byte[] signInfoWithSHA1(String text) throws GeneralSecurityException {
+		return signInfoWithSHA1(text.getBytes());
+	}
+	
+	private byte[] signInfoWithSHA1(byte[] data) throws GeneralSecurityException {
 		MessageDigest algorithm = MessageDigest.getInstance("SHA1");
 		algorithm.reset();
-		algorithm.update(text.getBytes());
+		algorithm.update(data);
 		byte infoSignature[] = algorithm.digest();
 		return infoSignature;
 	}
@@ -663,10 +673,10 @@ abstract public class KalturaClientBase {
 	}
 	
 	
-	private String createRandomString(int size) {
+	private byte[] createRandomByteArray(int size)	{
 		byte[] b = new byte[size];
 		new Random().nextBytes(b);
-		return new String(b);
+		return b;
 	}
 
 	// new function to convert byte array to Hex
