@@ -1500,7 +1500,6 @@ class kFlowHelper
 							"abort" => ($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED),
 							"message" => $dbBatchJob->getMessage(),
 							"description" => $dbBatchJob->getDescription(),
-							"updates_count" => $dbBatchJob->getUpdatesCount(),
 							"job_type" => BatchJobType::DOWNLOAD,
 							"status" => BatchJob::BATCHJOB_STATUS_FINISHED,
 							"progress" => 100,
