@@ -7,6 +7,7 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 {
 	/**
 	 * @var KalturaDistributionProtocol
+	 * @insertonly 
 	 */
 	 public $protocol;
 

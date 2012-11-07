@@ -91,6 +91,10 @@ class DistributionProfileConfigureAction extends KalturaApplicationPlugin
 			
 			if($profileId) // update
 			{
+				$protocolElement = $form->getElement('protocol');
+				if ($protocolElement)
+					$protocolElement->setAttrib('disabled',true);
+					
 				if ($request->isPost())
 				{
 					if ($form->isValid($request->getPost()))
