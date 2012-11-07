@@ -30,12 +30,12 @@ class kXmlConfig
 	public function  kXmlConfig ( $base_file , $referrer_file )
 	{
 		$this->referrer_file = $referrer_file;
-		$this->referrer_xml = simplexml_load_file ( $referrer_file ,null,LIBXML_NOERROR );
+		$this->referrer_xml = simplexml_load_string (file_get_contents( $referrer_file ),null,LIBXML_NOERROR );
 		
 		if ( $base_file != null )
 		{
 			$this->base_file = $base_file;
-			$this->base_xml = simplexml_load_file ( $base_file );
+			$this->base_xml = simplexml_load_string (file_get_contents( $base_file ));
 		}
 		else
 		{
@@ -59,7 +59,7 @@ class kXmlConfig
 				}
 			
 				$this->base_file = realpath( $path );
-				$this->base_xml = simplexml_load_file ( $this->base_file );
+				$this->base_xml = simplexml_load_string (file_get_contents( $this->base_file ));
 			}
 		}
 		

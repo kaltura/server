@@ -51,7 +51,7 @@ class DoubleClickFeed
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/' . $templateName;
 		$this->distributionProfile = $profile;
 		
-		$this->doc = new DOMDocument('1.0', 'UTF-8');
+		$this->doc = new KDOMDocument('1.0', 'UTF-8');
 		$this->doc->formatOutput = true;
 		$this->doc->preserveWhiteSpace = false;
 		$this->doc->load($xmlTemplate);
@@ -105,7 +105,7 @@ class DoubleClickFeed
 
 	public function addItemXml($xml)
 	{
-		$tempDoc = new DOMDocument('1.0', 'UTF-8');
+		$tempDoc = new KDOMDocument('1.0', 'UTF-8');
 		$tempDoc->loadXML($xml);
 
 		$importedItem = $this->doc->importNode($tempDoc->firstChild, true);

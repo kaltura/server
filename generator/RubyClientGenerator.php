@@ -6,7 +6,7 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	function RubyClientGenerator($xmlPath)
 	{
 		parent::ClientGeneratorFromXml($xmlPath, realpath("sources/ruby"));
-		$this->_doc = new DOMDocument();
+		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	

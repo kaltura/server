@@ -27,7 +27,7 @@ class SchemaServiceTestValidate extends KalturaApiTestCase
 			
 			$xsdPath = "$serviceUrl/api_v3/index.php/service/schema/action/serve/type/$type";
 			
-			$xsd = new DOMDocument();
+			$xsd = new KDOMDocument();
 			$xsd->load($xsdPath);
 			$xsd->schemaValidate('http://www.w3.org/2001/XMLSchema.xsd');
 		}
@@ -64,7 +64,7 @@ class SchemaServiceTestValidate extends KalturaApiTestCase
 //		libxml_use_internal_errors(true);
 //		libxml_clear_errors();
 			
-		$doc = new DOMDocument();
+		$doc = new KDOMDocument();
 		$doc->Load($xmlPath);
 		//Validate the XML file against the schema
 		if(!$doc->schemaValidate($xsdPath)) 

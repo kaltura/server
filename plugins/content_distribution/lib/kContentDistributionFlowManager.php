@@ -1163,7 +1163,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::log("Entry metadata xml not found");
 			return true;
 		}
-		$xml = new DOMDocument();
+		$xml = new KDOMDocument();
 		$xml->load($xmlPath);
 		
 		$previousXml = null;
@@ -1173,7 +1173,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			$xmlPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			if($xmlPath)
 			{
-				$previousXml = new DOMDocument();
+				$previousXml = new KDOMDocument();
 				$previousXml->load($xmlPath);
 			}
 			else 

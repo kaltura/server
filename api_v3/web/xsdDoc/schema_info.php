@@ -8,13 +8,13 @@ $schemaPath = SchemaService::getSchemaPath($schemaType);
 $xslPath = dirname(__FILE__) . '/xsl/type.xsl';
 
 // Load the XML source
-$xml = new DOMDocument;
+$xml = new KDOMDocument;
 $xml->load($schemaPath);
 
 if($xml->firstChild->hasAttribute('version'))
 	echo "Version: " . $xml->firstChild->getAttribute('version') . "<br/>\n";
 
-$xsl = new DOMDocument;
+$xsl = new KDOMDocument;
 $xsl->load($xslPath);
 
 // Configure the transformer

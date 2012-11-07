@@ -74,7 +74,7 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 			return false;
 		}
 		
-		$xmlDoc = new DOMDocument();
+		$xmlDoc = new KDOMDocument();
 		$xmlDoc->load($xmlPath);
 
 		if (!$xmlDoc) {

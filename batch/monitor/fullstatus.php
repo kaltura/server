@@ -57,7 +57,7 @@ function check(&$msg, $url)
 	// Load the XML source
 	if(class_exists('DOMDocument') && class_exists('XSLTProcessor'))
 	{
-		$xml = new DOMDocument;
+		$xml = new KDOMDocument;
 		$xml->load($getStatus);
 		
 		//file_put_contents('fullStatus.xml', $xml->saveXML());
@@ -66,7 +66,7 @@ function check(&$msg, $url)
 		$resultElement = $resultElements->item(0);
 		$resultElement->setAttribute('timestamp', time());
 		
-		$xsl = new DOMDocument;
+		$xsl = new KDOMDocument;
 		$xsl->load(dirname(__FILE__) . '/fullstatus.xsl');
 		
 		// Configure the transformer

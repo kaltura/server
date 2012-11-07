@@ -14,7 +14,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			$sourcePath = realpath("sources/zend");
 			
 		parent::ClientGeneratorFromXml($xmlPath, $sourcePath);
-		$this->_doc = new DOMDocument();
+		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	

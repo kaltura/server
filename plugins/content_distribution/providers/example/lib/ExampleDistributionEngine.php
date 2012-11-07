@@ -172,7 +172,7 @@ class ExampleDistributionEngine extends DistributionEngine implements
 		$partnerId = $distributionProfile->partnerId;
 		$entry = $this->getEntry($partnerId, $entryId);
 		
-		$feed = new DOMDocument();
+		$feed = new KDOMDocument();
 		$feed->load($this->updateXmlTemplate);
 		$feed->documentElement->setAttribute('mediaId', $data->remoteId);
 		

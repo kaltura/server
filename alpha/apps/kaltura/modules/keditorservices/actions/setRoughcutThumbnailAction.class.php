@@ -95,7 +95,7 @@ class setRoughcutThumbnailAction extends defKeditorservicesAction
 		myFileConverter::createImageThumbnail( $bigThumbPath , $path );
 		
 		$roughcutPath = myContentStorage::getFSContentRootPath() . $entry->getDataPath();
-		$xml_doc = new DOMDocument();
+		$xml_doc = new KDOMDocument();
 		$xml_doc->load( $roughcutPath );
 		
 		if (myMetadataUtils::updateThumbUrl($xml_doc, $entry->getBigThumbnailUrl()))

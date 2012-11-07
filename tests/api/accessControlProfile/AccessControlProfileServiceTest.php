@@ -205,7 +205,7 @@ class AccessControlProfileServiceTest extends AccessControlProfileServiceTestBas
 		$this->assertNotNull($addedFeed->id);
 		$this->assertNotNull($addedFeed->feedUrl);
 		
-		$xml = new DOMDocument();
+		$xml = new KDOMDocument();
 		$xml->load($addedFeed->feedUrl);
 		KalturaLog::debug($xml->saveXML());
 		
@@ -354,7 +354,7 @@ class AccessControlProfileServiceTest extends AccessControlProfileServiceTestBas
 			$this->assertGreaterThan(0, filesize($playManifestPath), "File [$playManifestPath] is empty");	
 			$this->assertArrayNotHasKey('x-kaltura', $headers, "Should not raise Kaltura error, ");
 			
-			$xml = new DOMDocument();
+			$xml = new KDOMDocument();
 			$xml->load($playManifestPath);
 			KalturaLog::debug($xml->saveXML());
 			

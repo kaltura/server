@@ -49,7 +49,7 @@ class AttUverseDistributionFeedHelper
 	{
 		$this->distributionProfile = $distributionProfile;
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml_templates/' . $templateName;
-		$this->doc = new DOMDocument();
+		$this->doc = new KDOMDocument();
 		$this->doc->formatOutput = true;
 		$this->doc->preserveWhiteSpace = false;
 		$this->doc->load($xmlTemplate);				

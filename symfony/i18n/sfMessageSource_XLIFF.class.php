@@ -68,7 +68,7 @@ class sfMessageSource_XLIFF extends sfMessageSource
   {
     //load it.
 
-    $XML = simplexml_load_file($filename);
+    $XML = simplexml_load_string(file_get_contents($filename));
 
     if (!$XML)
     {

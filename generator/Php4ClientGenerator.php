@@ -9,7 +9,7 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	function Php4ClientGenerator($xmlPath)
 	{
 		parent::ClientGeneratorFromXml($xmlPath, realpath("sources/php4"));
-		$this->_doc = new DOMDocument();
+		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	

@@ -58,7 +58,7 @@ class QuickPlayFeed
 		$this->_distributionProfile = $distributionJobData->distributionProfile;
 		$this->_providerData = $providerData;
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/' . self::TEMPLATE_XML;
-		$this->_doc = new DOMDocument();
+		$this->_doc = new KDOMDocument();
 		$this->_doc->load($xmlTemplate);
 		$this->_xpath = new DOMXPath($this->_doc);
 		$this->_xpath->registerNamespace('qpm', 'http://www.quickplaymedia.com');
@@ -294,7 +294,7 @@ class QuickPlayFeed
 		 * We cannot set a namespace that was already defined with a prefix because DOMDocument will add the element
 		 * as "qpm:enclosure" and won't set the namespace explicitly.
 		 * 
-		 * The hack is to create a new DOMDocument with default namespace "http://www.quickplaymedia.com" and then
+		 * The hack is to create a new KDOMDocument with default namespace "http://www.quickplaymedia.com" and then
 		 * add it to the xml manually (see getXml() method)
 		 * 
 		 */
@@ -306,7 +306,7 @@ class QuickPlayFeed
 		$url = $this->getAssetUrl($asset);
 		$mimeType = $this->getContentTypeFromUrl($url);
 			
-		$enclosureDoc = new DOMDocument();
+		$enclosureDoc = new KDOMDocument();
 		$enclosureElement = $enclosureDoc->createElementNS('http://www.quickplaymedia.com', 'enclosure');
 		$xmlElement = $enclosureDoc->createElement('xml');
 		$enclosureDoc->appendChild($xmlElement);

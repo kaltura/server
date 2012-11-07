@@ -40,7 +40,7 @@ class UverseClickToOrderFeed
 	public function __construct($templateName)
 	{
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml_templates/' . $templateName;
-		$this->doc = new DOMDocument('1.0', 'UTF-8');
+		$this->doc = new KDOMDocument('1.0', 'UTF-8');
 		$this->doc->formatOutput = true;
 		$this->doc->preserveWhiteSpace = false;
 		$this->doc->load($xmlTemplate);

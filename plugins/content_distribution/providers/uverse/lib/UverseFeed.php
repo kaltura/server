@@ -43,7 +43,7 @@ class UverseFeed
 	public function __construct($templateName)
 	{
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/' . $templateName;
-		$this->doc = new DOMDocument();
+		$this->doc = new KDOMDocument();
 		$this->doc->formatOutput = true;
 		$this->doc->preserveWhiteSpace = false;
 		$this->doc->load($xmlTemplate);

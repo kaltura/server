@@ -35,7 +35,7 @@ class JsClientGenerator extends ClientGeneratorFromXml
 	{	
 		parent::generate();
 	
-		$this->schemaXml = new SimpleXMLElement( $this->_xmlFile , NULL, TRUE);
+		$this->schemaXml = new SimpleXMLElement(file_get_contents( $this->_xmlFile ));
 		
 		//parse object types
 		foreach ($this->schemaXml->children() as $reflectionType) 

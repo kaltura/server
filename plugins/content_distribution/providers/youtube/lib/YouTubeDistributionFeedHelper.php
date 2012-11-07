@@ -62,7 +62,7 @@ class YouTubeDistributionFeedHelper
 		}
 		
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml_templates/' . $templateName;
-		$this->doc = new DOMDocument();
+		$this->doc = new KDOMDocument();
 		$this->doc->load($xmlTemplate);
 		
 		$this->xpath = new DOMXPath($this->doc);

@@ -72,14 +72,14 @@ class updateentrythumbnailAction extends defPartnerservices2Action
 		{
 /*			
 			$roughcutPath = myContentStorage::getFSContentRootPath() . $entry->getDataPath(); // replaced__getDataPath
-			$xml_doc = new DOMDocument();
+			$xml_doc = new KDOMDocument();
 			$xml_doc->load( $roughcutPath );
 		
 			if (myMetadataUtils::updateThumbUrl($xml_doc, $entry->getThumbnailUrl()))
 				$xml_doc->save($roughcutPath);
 	*/
 			$sync_key = $entry->getSyncKey ( entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
-			$xml_doc = new DOMDocument();
+			$xml_doc = new KDOMDocument();
 			$xml_doc->loadXML( kFileSyncUtils::file_get_contents( $sync_key ) );
 			if (myMetadataUtils::updateThumbUrl($xml_doc, $entry->getThumbnailUrl()))
 			{

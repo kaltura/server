@@ -88,7 +88,7 @@ class Zend_Config_Xml extends Zend_Config
         if (strstr($xml, '<?xml')) {
             $config = simplexml_load_string($xml);
         } else {
-            $config = simplexml_load_file($xml);
+            $config = simplexml_load_string(file_get_contents($xml));
         }
 
         restore_error_handler();

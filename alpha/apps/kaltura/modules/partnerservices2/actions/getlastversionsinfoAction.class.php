@@ -59,7 +59,7 @@ class getlastversionsinfoAction extends defPartnerservices2Action
 		
 		$versionsInfoFilePath 	= $showEntryDataPath.'.info';
 		
-		$lastVersionDoc = new DOMDocument();
+		$lastVersionDoc = new KDOMDocument();
 		$lastVersionDoc->loadXML(kFileSyncUtils::file_get_contents( $sync_key , true , false ));
 		$lastVersion = myContentStorage::getVersion($showEntryDataPath);
 
@@ -67,7 +67,7 @@ class getlastversionsinfoAction extends defPartnerservices2Action
 		$refreshInfoFile = true;
 		if (file_exists($versionsInfoFilePath))
 		{
-			$versionsInfoDoc = new DOMDocument();
+			$versionsInfoDoc = new KDOMDocument();
 			$versionsInfoDoc->load($versionsInfoFilePath);
 			$lastVersionInInfoFile = kXml::getLastElementAsText($versionsInfoDoc, "ShowVersion");
 
@@ -84,7 +84,7 @@ class getlastversionsinfoAction extends defPartnerservices2Action
 		// refresh or create the data in the info file
 		if ($refreshInfoFile)
 		{
-			$versionsInfoDoc = new DOMDocument();
+			$versionsInfoDoc = new KDOMDocument();
 			$xmlElement = $versionsInfoDoc->createElement("xml");
 			
 			// start from the first edited version (100001) and don't use 100000
@@ -96,7 +96,7 @@ class getlastversionsinfoAction extends defPartnerservices2Action
 				{
 					$xmlContent = kFileSyncUtils::file_get_contents($version_sync_key);
 //echo "[" . htmlspecialchars( $xmlContent ) . "]<br>";					
-					$xmlDoc = new DOMDocument();
+					$xmlDoc = new KDOMDocument();
 					$xmlDoc->loadXML($xmlContent);
 					$elementToCopy = kXml::getFirstElement($xmlDoc, "MetaData");
 //echo "[$i]";				

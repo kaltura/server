@@ -20,7 +20,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 	
 		$this->base_client_dir = $this->getParam("type");
 		
-		$this->xml = new SimpleXMLElement( $this->_xmlFile , NULL, TRUE);
+		$this->xml = new SimpleXMLElement(file_get_contents( $this->_xmlFile ));
 		
 		foreach ($this->xml->children() as $second_gen) 
 		{

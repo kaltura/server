@@ -237,7 +237,7 @@ class kXml
 	{
 		try 
 		{
-			$simpleXML = simplexml_load_file($xmlFilePath);
+			$simpleXML = simplexml_load_string(file_get_contents($xmlFilePath));
 		}
 		catch(Exception $e)
 		{
@@ -331,14 +331,14 @@ class kXml
 	public static function transformXmlUsingXslt($xmlStr, $xslt, $xsltParams = array(), &$xsltErrors = array())
 	{
 					
-		$xml = new DOMDocument();
+		$xml = new KDOMDocument();
 		if(!$xml->loadXML($xmlStr))
 		{
 			KalturaLog::debug("Could not load xmlStr");
 			return null;
 		}
 		
-		$xsl = new DOMDocument();
+		$xsl = new KDOMDocument();
 		if(!$xsl->loadXML($xslt))
 		{
 			KalturaLog::debug("Could not load xslt");

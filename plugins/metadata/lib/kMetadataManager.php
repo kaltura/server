@@ -72,7 +72,7 @@ class kMetadataManager
 		if(!$source)
 			return null;
 		
-		$xml = new DOMDocument();
+		$xml = new KDOMDocument();
 		$xml->loadXML($source);
 		
 		if(preg_match('/^\w[\w\d]*$/', $xPathPattern))
@@ -312,7 +312,7 @@ class kMetadataManager
 		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($key);
 		
 		try{
-			$xml = new DOMDocument();
+			$xml = new KDOMDocument();
 			$xml->load($xmlPath);
 			$xPath = new DOMXPath($xml);
 		}
@@ -485,7 +485,7 @@ class kMetadataManager
 			
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
-		$xml = new DOMDocument();
+		$xml = new KDOMDocument();
 		$xml->loadXML($metadata);
 		if($xml->schemaValidateSource($xsdData))
 		{

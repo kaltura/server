@@ -9,7 +9,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 	function CSharpClientGenerator($xmlPath)
 	{
 		parent::ClientGeneratorFromXml($xmlPath, realpath("sources/csharp"));
-		$this->_doc = new DOMDocument();
+		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	
@@ -434,7 +434,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 	
 	function writeCsproj()
 	{
-		$csprojDoc = new DOMDocument();
+		$csprojDoc = new KDOMDocument();
 		$csprojDoc->formatOutput = true;
 		$csprojDoc->load($this->_sourcePath."/KalturaClient/KalturaClient.csproj");
 		$csprojXPath = new DOMXPath($csprojDoc);

@@ -141,7 +141,7 @@ class IdeticDistributionProvider extends ConfigurableDistributionProvider
 			return null;
 		}
 			
-		$xml = new DOMDocument();
+		$xml = new KDOMDocument();
 		if(!$xml->loadXML($mrss))
 		{
 			KalturaLog::err("Could not load MRSS as XML for entry [$entryId]");
@@ -154,7 +154,7 @@ class IdeticDistributionProvider extends ConfigurableDistributionProvider
 			KalturaLog::err("XSL file not found [$xslPath]");
 			return null;
 		}
-		$xsl = new DOMDocument();
+		$xsl = new KDOMDocument();
 		$xsl->load($xslPath);
 			
 		// set variables in the xsl

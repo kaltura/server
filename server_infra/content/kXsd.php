@@ -414,13 +414,13 @@ class kXsd
 	 */
 	public static function compareXsd($fromXsd, $toXsd)
 	{
-		$from = new DOMDocument();
+		$from = new KDOMDocument();
 		$from->load($fromXsd);
 		
 		if(!$from || !$from->documentElement)
 			return false;
 			
-		$to = new DOMDocument();
+		$to = new KDOMDocument();
 		$to->load($toXsd);
 		
 		if(!$to || !$to->documentElement)
@@ -456,10 +456,10 @@ class kXsd
 	 */
 	public static function transformXmlFile($xmlPath, $xsdPath, $xslPath)
 	{
-		$from = new DOMDocument();
+		$from = new KDOMDocument();
 		$from->load($xmlPath);
 		
-		$xsl = new DOMDocument();
+		$xsl = new KDOMDocument();
 		$xsl->load($xslPath);
 		
 		$proc = new XSLTProcessor;
@@ -467,7 +467,7 @@ class kXsd
 		
 		$output = $proc->transformToXML($from);
 		
-		$to = new DOMDocument();
+		$to = new KDOMDocument();
 		$to->loadXML($output);
 		if(!$to->schemaValidate($xsdPath))
 			return false;
@@ -483,10 +483,10 @@ class kXsd
 	 */
 	public static function transformXmlData($xml, $xsdPath, $xslPath)
 	{
-		$from = new DOMDocument();
+		$from = new KDOMDocument();
 		$from->loadXML($xml);
 		
-		$xsl = new DOMDocument();
+		$xsl = new KDOMDocument();
 		$xsl->load($xslPath);
 		
 		$proc = new XSLTProcessor;
@@ -494,7 +494,7 @@ class kXsd
 		
 		$output = $proc->transformToXML($from);
 		
-		$to = new DOMDocument();
+		$to = new KDOMDocument();
 		$to->loadXML($output);
 		if(!$to->schemaValidate($xsdPath))
 			return false;
@@ -575,7 +575,7 @@ class kXsd
 	 */
 	public static function findXpathsByAppInfo($xsdPath, $appInfoField, $appInfoValue, $isPath = true)
 	{
-		$xsd = new DOMDocument();
+		$xsd = new KDOMDocument();
 		
 		if ($isPath){
 			$xsd->load($xsdPath);

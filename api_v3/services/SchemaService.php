@@ -58,7 +58,7 @@ class SchemaService extends KalturaBaseService
 		$baseXsdElement = new SimpleXMLElement('<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
 		if($type == SchemaType::SYNDICATION)
 		{
-			$baseXsdElement = new SimpleXMLElement(kConf::get("syndication_core_xsd_path"), null, true);
+			$baseXsdElement = new SimpleXMLElement(file_get_contents(kConf::get("syndication_core_xsd_path")));
 		}
 		else
 		{

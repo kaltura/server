@@ -47,7 +47,7 @@ class AvnFeed
 	public function __construct($templateName)
 	{
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/' . $templateName;
-		$this->doc = new DOMDocument();
+		$this->doc = new KDOMDocument();
 		$this->doc->load($xmlTemplate);
 		
 		$this->xpath = new DOMXPath($this->doc);
@@ -259,7 +259,7 @@ class AvnFeed
 	protected function getAvnCategoriesFromXsd($xsd)
 	{
 		$categories = array();
-		$doc = new DOMDocument();
+		$doc = new KDOMDocument();
 		$doc->loadXML($xsd);
 		$xpath = new DOMXPath($doc);
 		$xpath->registerNamespace('xsd', 'http://www.w3.org/2001/XMLSchema');

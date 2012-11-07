@@ -15,7 +15,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			$sourcePath = realpath("sources/php53");
 			
 		parent::ClientGeneratorFromXml($xmlPath, $sourcePath);
-		$this->_doc = new DOMDocument();
+		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
 	

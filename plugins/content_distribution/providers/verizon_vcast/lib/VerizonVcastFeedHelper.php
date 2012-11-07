@@ -57,7 +57,7 @@ class VerizonVcastFeedHelper
 		$this->_distributionProfile = $distributionJobData->distributionProfile;
 		$this->_providerData = $providerData;
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/' . $templateName;
-		$this->_doc = new DOMDocument();
+		$this->_doc = new KDOMDocument();
 		$this->_doc->load($xmlTemplate);
 		$this->_xpath = new DOMXPath($this->_doc);
 		

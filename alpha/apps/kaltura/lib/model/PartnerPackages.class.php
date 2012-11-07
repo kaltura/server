@@ -31,7 +31,7 @@ class PartnerPackages
 	
 	public function PartnerPackages ()
 	{
-		$package_config = simplexml_load_file(dirname(__FILE__).'/../../config/partnerPackages.xml');
+		$package_config = simplexml_load_string(file_get_contents(dirname(__FILE__).'/../../config/partnerPackages.xml'));
 		$package_nodes = $package_config->xpath('/packages/package');
 		foreach ($package_nodes as $package)
 		{
@@ -39,7 +39,7 @@ class PartnerPackages
 			$this->packages[$arrPackage['id']] = $arrPackage;
 		}
 		
-		$package_class_of_service_config = simplexml_load_file(dirname(__FILE__).'/../../config/partnerPackagesClassOfService.xml');
+		$package_class_of_service_config = simplexml_load_string(file_get_contents(dirname(__FILE__).'/../../config/partnerPackagesClassOfService.xml'));
 		$package_nodes = $package_class_of_service_config->xpath('/packages/package');
 		foreach ($package_nodes as $package)
 		{
@@ -47,7 +47,7 @@ class PartnerPackages
 			$this->packagesClassOfService[$arrPackage['id']] = $arrPackage;
 		}
 		
-		$package_vertical = simplexml_load_file(dirname(__FILE__).'/../../config/partnerVertical.xml');
+		$package_vertical = simplexml_load_string(file_get_contents(dirname(__FILE__).'/../../config/partnerVertical.xml'));
 		$package_nodes = $package_vertical->xpath('/packages/package');
 		foreach ($package_nodes as $package)
 		{

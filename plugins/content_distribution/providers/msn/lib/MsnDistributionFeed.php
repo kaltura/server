@@ -48,7 +48,7 @@ class MsnDistributionFeed
 		$this->_distributionProfile = $distributionJobData->distributionProfile;
 		$this->_providerData = $providerData;
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/' . self::TEMPLATE_XML;
-		$this->_doc = new DOMDocument();
+		$this->_doc = new KDOMDocument();
 		$this->_doc->load($xmlTemplate);
 		$this->_xpath = new DOMXPath($this->_doc);
 		$this->_xpath->registerNamespace('msn', 'urn:schemas-microsoft-com:msnvideo:catalog');

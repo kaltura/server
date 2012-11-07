@@ -429,7 +429,7 @@ $client->setKs('YjQ2ZjFlY2FkNzJiMTRlYWZhZjhjZGVhY2ZkNjFjMmVlZDBhODZmY3wxMDA7MTAw
 	doIt($client, $xmlFileName, "k:\media\join\avidemuxTest.scp");
 	return;
 		kLog::Log($xmlFileName);
-		$xml = simplexml_load_file(realpath($xmlFileName));
+		$xml = simplexml_load_string(file_get_contents(realpath($xmlFileName)));
 		print_r($xml);
 		
 		foreach ($xml->VideoAssets->vidAsset as $vidAsset) {
@@ -450,7 +450,7 @@ print_r($results[0]->videoCodecId);
 	function doIt($clientObj, $mixFileName, $aviDemuxScp)
 	{
 		kLog::Log($mixFileName);
-		$xml = simplexml_load_file(realpath($mixFileName));
+		$xml = simplexml_load_string(file_get_contents(realpath($mixFileName)));
 //		print_r($xml);
 		$jnDataArr = array();
 		foreach ($xml->VideoAssets->vidAsset as $vidAsset) {

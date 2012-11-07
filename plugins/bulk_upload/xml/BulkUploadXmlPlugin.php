@@ -198,9 +198,9 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if($coreType == self::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
-			return new SimpleXMLElement(dirname(__FILE__) . '/xml/ingestion.xsd', null, true);
+			return new SimpleXMLElement(file_get_contents(dirname(__FILE__) . '/xml/ingestion.xsd'));
 		if($coreType == self::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_RESULT_XML))
-			return new SimpleXMLElement(dirname(__FILE__) . '/xml/bulkUploadResult.xsd.xml', null, true);
+			return new SimpleXMLElement(file_get_contents(dirname(__FILE__) . '/xml/bulkUploadResult.xsd.xml'));
 			
 		return null;
 			

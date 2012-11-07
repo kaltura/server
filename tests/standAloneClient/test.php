@@ -44,7 +44,7 @@ $xmlFormat = '<xml>
 	</request>
 </xml>';
 
-$inXml = new SimpleXMLElement($inFile, null, true);
+$inXml = new SimpleXMLElement(file_get_contents($inFile));
 if($inXml->getName() != 'xml' || !isset($inXml->request))
 {
 	echo "Input file must match xml format [$xmlFormat]\n";

@@ -187,7 +187,7 @@ foreach($config as $name => $item)
 			$contents = file_get_contents($useReadySchema);
 			file_put_contents('temp.xml', $contents);
 			//Get the schema version and last generated date -
-			$schemaXml = new SimpleXMLElement( realpath('temp.xml') , NULL, TRUE);
+			$schemaXml = new SimpleXMLElement(file_get_contents( realpath('temp.xml') ));
 			$apiVersionOverride = $schemaXml->attributes()->apiVersion;
 			$schemaGenDate = (int)$schemaXml->attributes()->generatedDate;
 			$schemaGenDateOverride = date('d-m-Y', $schemaGenDate);

@@ -116,7 +116,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$this->loadXslt();
 			
-		$xdoc = new DomDocument();
+		$xdoc = new KDOMDocument();
 		
 		$xmlContent = $this->xslTransform($this->data->filePath);
 		libxml_clear_errors();
@@ -170,7 +170,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			return $xdoc;
 		
 		libxml_clear_errors();
-		$xml = new DOMDocument();
+		$xml = new KDOMDocument();
 		if(!$xml->loadXML($xdoc)){
 			KalturaLog::debug("Could not load xml");
 			$errorMessage = kXml::getLibXmlErrorDescription($xdoc);
@@ -179,7 +179,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		libxml_clear_errors();
 		$proc = new XSLTProcessor;
-		$xsl = new DOMDocument();
+		$xsl = new KDOMDocument();
 		if(!$xsl->loadXML($this->conversionProfileXsl)){
 			KalturaLog::debug("Could not load xsl".$this->conversionProfileXsl);
 			$errorMessage = kXml::getLibXmlErrorDescription($this->conversionProfileXsl);

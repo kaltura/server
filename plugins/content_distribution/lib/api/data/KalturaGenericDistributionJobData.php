@@ -97,7 +97,7 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 			return;
 		}
 			
-		$xml = new DOMDocument();
+		$xml = new KDOMDocument();
 		if(!$xml->loadXML($mrss))
 		{
 			KalturaLog::err("MRSS not is not valid XML:\n$mrss\n");
@@ -110,7 +110,7 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 			$xslPath = kFileSyncUtils::getLocalFilePathForKey($key);
 			if($xslPath)
 			{
-				$xsl = new DOMDocument();
+				$xsl = new KDOMDocument();
 				$xsl->load($xslPath);
 			
 				// set variables in the xsl

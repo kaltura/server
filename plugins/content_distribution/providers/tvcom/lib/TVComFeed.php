@@ -33,7 +33,7 @@ class TVComFeed
 	public function __construct($templateName)
 	{
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/' . $templateName;
-		$this->doc = new DOMDocument();
+		$this->doc = new KDOMDocument();
 		$this->doc->load($xmlTemplate);
 		
 		$this->xpath = new DOMXPath($this->doc);
