@@ -451,6 +451,10 @@ class uiConfDeployment
 		
 		$uiconf->setName($widget->name);
 		$uiconf->setSwfUrl($baseSwfUrl.$widget->version.'/'.$swfName);
+
+		if ($widget->html5_version)
+			$uiconf->setHtml5Url("/html5/html5lib/".$widget->html5_version."/mwEmbedLoader.php");
+
 		$uiconf->setTags(uiConfDeployment::$defaultTags.', '.uiConfDeployment::$baseTag.'_'.$widget->usage);
 		
 		$uiconf->setWidth(@$widget->width);
