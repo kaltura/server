@@ -104,7 +104,7 @@ class kSessionBase
 		$str = base64_decode($encoded_str, true);
 		if (strpos($str, "|") === false)
 		{
-			error_log("Couldn't find | seperator in the KS");
+			$this->logError("Couldn't find | seperator in the KS");
 			return false;
 		}
 			
@@ -113,7 +113,7 @@ class kSessionBase
 		$parts = explode(self::SEPARATOR, $real_str);
 		if (count($parts) < 3)
 		{
-			error_log("Couldn't find 3 seperated parts in the KS");
+			$this->logError("Couldn't find 3 seperated parts in the KS");
 			return false;
 		}
 		
@@ -121,13 +121,13 @@ class kSessionBase
 		$salt = $this->getAdminSecret($partnerId);
 		if (!$salt)
 		{
-			error_log("Couldn't get admin secret for partner [$partnerId]");
+			$this->logError("Couldn't get admin secret for partner [$partnerId]");
 			return false;
 		}
 
 		if (sha1($salt . $real_str) != $hash)
 		{
-			error_log("Hash [$hash] doesn't match the sha1 on the salt on partner [$partnerId].");
+			$this->logError("Hash [$hash] doesn't match the sha1 on the salt on partner [$partnerId].");
 			return false;
 		}
 		
@@ -172,6 +172,11 @@ class kSessionBase
 		return ($this->type == self::TYPE_KS) && ($this->user == 0) && (strstr($this->privileges,'widget:1') !== false);
 	}
 	
+	// overridable
+	protected function logError($msg)
+	{
+	}
+	
 	static public function getSecretsFromCache($partnerId)
 	{
 		if (!function_exists('apc_fetch'))
@@ -184,6 +189,7 @@ class kSessionBase
 		return $secrets;
 	}
 
+	// overridable
 	protected function getKSVersionAndSecret($partnerId)
 	{
 		$secrets = self::getSecretsFromCache($partnerId);
@@ -366,7 +372,7 @@ class kSessionBase
 		$decodedKs = base64_decode(str_replace(array('-', '_'), array('+', '/'), $ks), true);
 		if (!$decodedKs)
 		{
-			error_log("Couldn't base 64 decode the KS.");
+			$this->logError("Couldn't base 64 decode the KS.");
 			return false;
 		}
 		
@@ -377,14 +383,14 @@ class kSessionBase
 		list($version, $partnerId, $encKs) = $explodedKs;
 		if ($version != 'v2')
 		{
-			error_log("KS version [$version] is not [v2].");
+			$this->logError("KS version [$version] is not [v2].");
 			return false;						// not KS V2
 		}
 		
 		$adminSecret = $this->getAdminSecret($partnerId);
 		if (!$adminSecret)
 		{
-			error_log("Couldn't get secret for partner [$partnerId].");
+			$this->logError("Couldn't get secret for partner [$partnerId].");
 			return false;						// admin secret not found, can't decrypt the KS
 		}
 				
@@ -395,7 +401,7 @@ class kSessionBase
 		$fields = substr($decKs, self::SHA1_SIZE);
 		if ($hash != sha1($fields, true))
 		{
-			error_log("Hash [$hash] doesn't match sha1 on partner [$partnerId].");
+			$this->logError("Hash [$hash] doesn't match sha1 on partner [$partnerId].");
 			return false;						// invalid signature
 		}
 		
