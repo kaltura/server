@@ -169,7 +169,8 @@ function newStorageSuccess(html) {
 	jQuery('#frmStorageConfig').ajaxForm(newStorageSuccess);
 }
 function configure(partnerId, storageId) {
-	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'configure-storage', 'storageId' => '')); ?>' + storageId;
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'configure-storage', 'partnerId' => 'PARTNER_ID', 'storageId' => '')); ?>' + storageId;
+	url = url.replace('PARTNER_ID', partnerId);
 	
 	jQuery('#storage-configure-dialog').remove();
 	dialogDiv = jQuery('<div id="storage-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
