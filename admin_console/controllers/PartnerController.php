@@ -160,10 +160,22 @@ class PartnerController extends Zend_Controller_Action
 	public function updateStorageStatusAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
+		$partnerId = $this->_getParam('partnerId');
 		$storageId = $this->_getParam('storageId');
 		$status = $this->_getParam('status');
 		$client = Infra_ClientHelper::getClient();
-		$client->storageProfile->updateStatus($storageId, $status);
+		Infra_ClientHelper::impersonate($partnerId);
+		try
+		{
+			$client->storageProfile->updateStatus($storageId, $status);
+		}
+		catch (Exception $e)
+		{
+			Infra_ClientHelper::unimpersonate();
+			throw $e;
+		}
+		Infra_ClientHelper::unimpersonate();
+		
 		echo $this->_helper->json('ok', false);
 	}
 	
@@ -214,6 +226,7 @@ class PartnerController extends Zend_Controller_Action
 	public function configureStorageAction()
 	{
 		$this->_helper->layout->disableLayout();
+		$partnerId = $this->_getParam('partnerId');
 		$storageId = $this->_getParam('storageId');
 		
 		$editMode = false;
@@ -243,10 +256,21 @@ class PartnerController extends Zend_Controller_Action
 		}
 		else  
 		{			
-			$storage = $client->storageProfile->get($storageId);	
-			Infra_ClientHelper::impersonate($storage->partnerId);
-			$flavorParamsResponse = $client->flavorParams->listAction(null, $pager);
+			$storage = null;
+			$flavorParamsResponse = null;
+			Infra_ClientHelper::impersonate($partnerId);
+			try
+			{
+				$storage = $client->storageProfile->get($storageId);
+				$flavorParamsResponse = $client->flavorParams->listAction(null, $pager);
+			}
+			catch (Exception $e)
+			{
+				Infra_ClientHelper::unimpersonate();
+				throw $e;
+			}
 			Infra_ClientHelper::unimpersonate();
+			
 			$flavorParamsIds = array();
 			if($storage->flavorParamsIds)
 				$flavorParamsIds = explode(',', $storage->flavorParamsIds);
