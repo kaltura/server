@@ -312,11 +312,6 @@ class ks extends kSessionBase
 			$this->additional_data);
 	}
 	
-	public function isWidgetSession()
-	{
-		return ($this->type == ks::TYPE_KS) && ($this->user == 0) && (strstr($this->privileges,'widget:1') !== false);
-	}
-	
 	public function isValid( $partner_id , $puser_id , $type = false)
 	{
 		
@@ -665,6 +660,11 @@ class ks extends kSessionBase
 			apc_store(self::SECRETS_CACHE_PREFIX . $partnerId, array($partner->getAdminSecret(), $partner->getSecret(), $ksVersion));
 		
 		return array($ksVersion, $partner->getAdminSecret());
+	}
+	
+	protected function logError($msg)
+	{
+		KalturaLog::err($msg);
 	}
 		
 	public function kill()
