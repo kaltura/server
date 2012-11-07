@@ -305,11 +305,17 @@ index kaltura_category_kuser
 {
 	type	 = rt
 	path	 = @BASE_DIR@/sphinx/kaltura_category_kuser_rt
-	rt_attr_uint	 = category_id
-	rt_attr_uint	 = kuser_id
+	rt_field	 = category_id
+	rt_field	 = kuser_id
 	rt_attr_uint	 = int_id
 	rt_field	 	 = permission_names
 	rt_field		 = category_full_ids
+	rt_attr_uint	 = inherit_from_category
+	rt_field		 = puser_id
+	rt_field		 = screen_name
+	rt_attr_uint		 = status
+	rt_attr_uint		= partner_id
+	rt_attr_uint		= update_method
 	rt_attr_timestamp	 = created_at
 	rt_attr_timestamp	 = updated_at
 	blend_chars		 = `, ~, U+23, (, ), -, =, [, ], {, }, ', \, |, /, <, *, ^, $, !, :, ;
