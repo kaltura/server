@@ -86,6 +86,22 @@ class Infra_Paginator extends Zend_Paginator
     	$this->getCurrentItems(); // this will actually get the required page
     	return $this->_adapter->getTotalCount();
     }
+	
+	/**
+	 * @return bool
+	 */
+	public function hasError()
+	{
+		return $this->_adapter->hasError();
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getErrorDescription()
+	{
+		return $this->_adapter->getErrorDescription();
+	}
     
 	/**
      * Sets the number of items per page.
