@@ -94,7 +94,7 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('checkbox', 'allowAutoDelete', array(
-			'label'			=> 'Auto-delete entry-related files upon enry deletion',
+			'label'			=> 'Allow auto-deletion of files',
 			'filters'		=> array('StringTrim'),
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append'))),			
 		));
