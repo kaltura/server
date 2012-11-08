@@ -173,6 +173,13 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 */
 	public $readyBehavior;
 	
+	/**
+	 * Flag sugnifying that the storage exported content should be deleted when soure entry is deleted
+	 * @var int
+	 * @requiresPermission write
+	 */
+	public $allowAutoDelete;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -204,6 +211,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		"deliveryStatus",
 		"rtmpPrefix",
 		"readyBehavior",
+		"allowAutoDelete",
 	);
 	
 	/* (non-PHPdoc)
