@@ -13,7 +13,7 @@ while($s = trim(fgets($f))){
         $sep = strpos($s, "\t") ? "\t" : " ";
         list($entryId, $plays, $views) = explode($sep, $s);
         myPartnerUtils::resetAllFilters();
-        entryPeer::setDefaultCriteriaFilter();
+        myPartnerUtils::resetPartnerFilter('entry');
         $entry = entryPeer::retrieveByPK ( $entryId);
         if (is_null ( $entry )) {
                 KalturaLog::err ('Couldn\'t find entry [' . $entryId . ']' );
