@@ -60,7 +60,7 @@ class KalturaStatement extends PDOStatement
 		KalturaLog::debug($sql);
 		
 		$sqlStart = microtime(true);
-		if(self::$dryRun && stripos($sql, 'select') === false)
+		if(self::$dryRun && stripos($sql, 'select') !== 0)
 		{
 			KalturaLog::debug("Sql dry run - " . (microtime(true) - $sqlStart) . " seconds");
 		}
