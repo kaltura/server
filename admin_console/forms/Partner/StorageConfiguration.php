@@ -92,6 +92,13 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append'))),			
 		));
+		
+		$this->addElement('checkbox', 'allowAutoDelete', array(
+			'label'			=> 'Auto-delete entry-related files upon enry deletion',
+			'filters'		=> array('StringTrim'),
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append'))),			
+		));
+		 
 				
 		$this->addElement('select', 'filesPermissionInS3', array(
 			'label'			=> 'Files Permission In S3:',
