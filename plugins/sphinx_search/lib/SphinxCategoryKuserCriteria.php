@@ -109,19 +109,10 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 	 */
 	public function hasMatchableField($fieldName) {
 		return in_array($fieldName, array(
-			"category_id",
-			"kuser_id",
 			"screen_name",
 			"puser_id",
 			"category_full_ids",
-			"inherit_from_category".
 			"permission_names",
-			"update_method",
-			"partner_id",
-			"status",
-			"update_method",
-			"created_at",
-			"updated_at",
 		));
 		
 	}
