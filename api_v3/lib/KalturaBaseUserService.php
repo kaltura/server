@@ -157,7 +157,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	protected function loginImpl($puserId, $loginEmail, $password, $partnerId = null, $expiry = 86400, $privileges = '*')
 	{
 		KalturaResponseCacher::disableCache();
-		kuserPeer::setDefaultCriteriaFilter();
+		myPartnerUtils::resetPartnerFilter('kuser');
 		kuserPeer::setUseCriteriaFilter(true);
 		
 		// if a KS of a specific partner is used, don't allow logging in to a different partner

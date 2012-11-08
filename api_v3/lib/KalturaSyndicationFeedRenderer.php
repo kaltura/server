@@ -122,7 +122,7 @@ class KalturaSyndicationFeedRenderer
 		myPartnerUtils::addPartnerToCriteria('category', $this->syndicationFeed->partnerId, true);
 		myPartnerUtils::addPartnerToCriteria('asset', $this->syndicationFeed->partnerId, true);
 		
-		entryPeer::setDefaultCriteriaFilter();	
+		myPartnerUtils::resetPartnerFilter('entry');
 
 		$this->baseCriteria = entryPeer::getDefaultCriteriaFilter();
 		
