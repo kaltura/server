@@ -176,7 +176,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	/**
 	 * Flag sugnifying that the storage exported content should be deleted when soure entry is deleted
 	 * @var int
-	 * @requiresPermission write
+	 * @requiresPermission update
 	 */
 	public $allowAutoDelete;
 	
