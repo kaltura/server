@@ -1194,6 +1194,8 @@ class playManifestAction extends kalturaAction
 	 */
 	private function serveHDNetwork()
 	{
+		kApiCache::setConditionalCacheExpiry(600);		// the result contains a KS so we shouldn't cache it for a long time
+		
 		$mediaUrl = requestUtils::getHost().str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"])); 
 
 		$renderer = new kF4MManifestRenderer();
