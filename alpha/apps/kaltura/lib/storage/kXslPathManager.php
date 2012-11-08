@@ -141,7 +141,7 @@ class kXslPathManager extends kPathManager
 		// set the default criteria to use the current entry distribution partner id (it is restored later)
 		// this is needed for related entries under kMetadataMrssManager which is using retrieveByPK without the correct partner id filter
 		$oldEntryCriteria = entryPeer::getCriteriaFilter()->getFilter();
-		entryPeer::setDefaultCriteriaFilter();
+		myPartnerUtils::resetPartnerFilter('entry');
 		myPartnerUtils::addPartnerToCriteria('entry', $entry->getPartnerId(), true);
 		
 		$mrss = null;

@@ -23,7 +23,7 @@ class myConversionProfileUtils
 		$c->addAnd ( assetParamsPeer::PARTNER_ID , array ( $partnerId , 0 ) , Criteria::IN );
 //		$c->add (  assetParamsPeer::FORMAT , $fileFormat );
 		$possible_flavor_params = assetParamsPeer::doSelect( $c );
-		assetParamsPeer::setDefaultCriteriaFilter();
+		myPartnerUtils::resetPartnerFilter('assetParams');
 		
 		$best_fp = null;
 		

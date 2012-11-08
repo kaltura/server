@@ -111,7 +111,16 @@ class myPartnerUtils
 		self::$s_current_partner_id = $partner_id;
 	}
 
-
+	public static function resetPartnerFilter($objectName)
+	{
+		$peerName = $objectName . 'Peer';
+		
+		$objectName = strtolower($objectName);
+				
+		call_user_func(array($peerName, 'setDefaultCriteriaFilter'));
+		unset(self::$s_filterred_peer_list[$peerName]); 
+		unset(self::$partnerCriteriaParams[$objectName]);
+	}
 
 	// will reset all the filters used in the applyPartnerFilters
 	public static function resetAllFilters()
@@ -150,14 +159,16 @@ class myPartnerUtils
 		self::addPartnerToCriteria ( 'categoryKuser', $partner_id , $private_partner_data , $partner_group);
 	}
 
-	public static function getPartnerCriteriaParams($peerName)
-	{		
-		$peerName = strtolower($peerName);
-		if (!isset(self::$partnerCriteriaParams[$peerName]))
+	public static function getPartnerCriteriaParams($objectName)
+	{
+		$peerName = $objectName . 'Peer';
+		
+		$objectName = strtolower($objectName);
+		if (!isset(self::$partnerCriteriaParams[$objectName]))
 			return null;
 			
-		$result = self::$partnerCriteriaParams[$peerName];
-		unset(self::$partnerCriteriaParams[$peerName]);
+		$result = self::$partnerCriteriaParams[$objectName];
+		unset(self::$partnerCriteriaParams[$objectName]);
 		self::$s_filterred_peer_list[] = $peerName;
 		
 		return $result;
@@ -167,10 +178,10 @@ class myPartnerUtils
 	// if also $partner_group - allow or partner_id or the partner_group - use in ( partner_id ,  $partner_group ) - where partner_group is split by ','
 	// if partner_group == "*" - don't filter at all
 	// if $kaltura_network - add 'or  display_in_search >= 2'
-	public static function addPartnerToCriteria ( $peerName, $partner_id, $private_partner_data = false , $partner_group=null , $kaltura_network=null )
+	public static function addPartnerToCriteria ( $objectName, $partner_id, $private_partner_data = false , $partner_group=null , $kaltura_network=null )
 	{
-		$peerName = strtolower($peerName);
-		self::$partnerCriteriaParams[$peerName] = array($partner_id, $private_partner_data, $partner_group, $kaltura_network);
+		$objectName = strtolower($objectName);
+		self::$partnerCriteriaParams[$objectName] = array($partner_id, $private_partner_data, $partner_group, $kaltura_network);
 	}
 
 
