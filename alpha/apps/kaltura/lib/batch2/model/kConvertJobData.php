@@ -188,7 +188,7 @@ class kConvertJobData extends kConvartableJobData
 		// Case 2
 		if((!$hasRequired) && ($readiness == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL)) {
 			$flvParamsMinBitrate = assetParamsPeer::retrieveMinimalBitrate($allFlavorParamsIds);
-			if($flvParamsMinBitrate->getId() == $flavorParamsId)
+			if(!is_null($flvParamsMinBitrate) && $flvParamsMinBitrate->getId() == $flavorParamsId)
 				$readiness = flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED;
 		}
 		
