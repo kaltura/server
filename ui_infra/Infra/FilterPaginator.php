@@ -31,6 +31,11 @@ class Infra_FilterPaginator implements Zend_Paginator_Adapter_Interface
 	protected $totalCount;
 	
 	/**
+	 * @var string
+	 */
+	protected $errorDescription;
+	
+	/**
 	 * Constructor.
 	 *
 	 * @param Zend_Db_Select $select The select query
@@ -84,7 +89,19 @@ class Infra_FilterPaginator implements Zend_Paginator_Adapter_Interface
 		$action = $this->action;
 		$params = $this->args;
 		$params[] = $pager;
-		$response = call_user_func_array(array($this->service, $action), $params);
+		try
+		{
+			$this->errorDescription = null;
+			$response = call_user_func_array(array($this->service, $action), $params);
+		}
+		catch(Exception $e)
+		{
+			Infra_ClientHelper::unimpersonate();
+			$this->errorDescription = $e->getMessage();
+			$this->totalCount = 0;
+			return array();
+		}
+		Infra_ClientHelper::unimpersonate();
 		$this->totalCount = $response->totalCount;
 		
 		if(!$response->objects)
@@ -99,5 +116,21 @@ class Infra_FilterPaginator implements Zend_Paginator_Adapter_Interface
 	public function getTotalCount()
 	{
 		return $this->totalCount;
+	}
+	
+	/**
+	 * @return bool
+	 */
+	public function hasError()
+	{
+		return !is_null($this->errorDescription);
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getErrorDescription()
+	{
+		return $this->errorDescription;
 	}
 }

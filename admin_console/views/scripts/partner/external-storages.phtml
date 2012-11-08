@@ -26,6 +26,14 @@
    <?php echo $this->form; ?>
    <?php echo $this->newForm; ?>
 
+<?php if ($this->paginator->hasError()): ?>
+	<div class="error">
+		<ul>
+			<li><?php echo $this->translate($this->paginator->getErrorDescription()); ?></li>
+		</ul>
+	</div>
+<?php endif; ?>
+
 <div id="results" class="clear">
 	<h2><?php echo $this->translate('external-storages results count', $this->paginator->getItemsCount()); ?></h2>
 	<table class="clear">
