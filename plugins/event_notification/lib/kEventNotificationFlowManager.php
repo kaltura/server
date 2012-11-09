@@ -126,7 +126,6 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 */
 	protected function notificationTemplatesConditionsFulfilled(EventNotificationTemplate $notificationTemplate, kEventScope $scope) 
 	{
-	    KalturaLog::info("Checking conditions for notification template ID [". $notificationTemplate->getId() ."] and scope: ". print_r($scope, true));
 		$eventConditions = $notificationTemplate->getEventConditions();
 		if(!$eventConditions || !count($eventConditions))
 			return true;
@@ -135,10 +134,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		{
 			/* @var $eventCondition kEventCondition */
 			if(!$eventCondition->fulfilled($scope))
-			{
-				KalturaLog::debug("Template [" . $notificationTemplate->getId() . "] condition not fulfilled");
 				return false;
-			}
 		}
 		
 		return true;
@@ -163,23 +159,14 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		{
 			/* @var $notificationTemplate EventNotificationTemplate */
 			if(!$notificationTemplate->getAutomaticDispatchEnabled())
-			{
-				KalturaLog::debug("Template [" . $notificationTemplate->getId() . "] is not automatic");
 				continue;				
-			}
 		
 			if($notificationTemplate->getEventType() != $eventType)
-			{
-				KalturaLog::debug("Template [" . $notificationTemplate->getId() . "] event type [" . $notificationTemplate->getEventType() . "] does't match the event type [$eventType]");
 				continue;				
-			}
 			
 			$templateObjectClassName = KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $notificationTemplate->getObjectType());
 			if(strcmp($eventObjectClassName, $templateObjectClassName) && !is_subclass_of($eventObjectClassName, $templateObjectClassName))
-			{
-				KalturaLog::debug("Template [" . $notificationTemplate->getId() . "] object type [$eventObjectClassName] is not sub-class of event object type [$templateObjectClassName]");
 				continue;				
-			}
 			
 			$notificationTemplates[] = $notificationTemplate;
 		}
