@@ -222,7 +222,7 @@ class KScheduleHelperManager
 	 */
 	protected static function getCachePath()
 	{
-		$path = kConf::get("cache_root_path") . DIRECTORY_SEPARATOR . 'batch';
+		$path = kEnvironment::get("cache_root_path") . DIRECTORY_SEPARATOR . 'batch';
 		if(!file_exists($path))
 			kFile::fullMkdir($path);
 			
