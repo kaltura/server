@@ -37,6 +37,7 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 		$partnerId = null;
 		$eventNotificationTemplate = null;
 		
+		$action->view->templateId = $templateId;
 		$action->view->errMessage = null;
 		$action->view->form = '';
 		$form = null;
@@ -132,6 +133,22 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 			}
 		}
 		$action->view->form = $form;
+	
+			
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaApplicationPartialView');
+		KalturaLog::debug("plugin instances [" . count($pluginInstances) . "]");
+		foreach($pluginInstances as $pluginInstance)
+		{
+			$entryInvestigatePlugins = $pluginInstance->getApplicationPartialViews('plugin', get_class($this));
+			if(!$entryInvestigatePlugins)
+				continue;
+			
+			foreach($entryInvestigatePlugins as $plugin)
+			{
+				/* @var $plugin Kaltura_View_Helper_PartialViewPlugin */
+	    		$plugin->plug($action->view);
+			}
+		}
 	}
 }
 
