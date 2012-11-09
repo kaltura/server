@@ -3,12 +3,26 @@
  * @package plugins.caption
  * @subpackage admin
  */
-class Kaltura_View_Helper_EntryInvestigateCaptionAssets extends Kaltura_View_Helper_EntryInvestigatePlugin
+class Kaltura_View_Helper_EntryInvestigateCaptionAssets extends Kaltura_View_Helper_PartialViewPlugin
 {
+	private $entryId;
+	private $partnerId;
+	
 	/* (non-PHPdoc)
-	 * @see Kaltura_View_Helper_EntryInvestigatePlugin::getDataArray()
+	 * @see Kaltura_View_Helper_PartialViewPlugin::plug()
 	 */
-	public function getDataArray($entryId, $partnerId)
+	public function plug(Zend_View_Interface $view)
+	{
+		$entry = $view->investigateData->entry;
+		$this->entryId = $entry->id;
+		$this->partnerId = $entry->partnerId;
+		parent::plug($view);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see Kaltura_View_Helper_PartialViewPlugin::getDataArray()
+	 */
+	protected function getDataArray()
 	{
 		$client = Infra_ClientHelper::getClient();
 		if(!$client)
@@ -21,14 +35,14 @@ class Kaltura_View_Helper_EntryInvestigateCaptionAssets extends Kaltura_View_Hel
 		$fileSyncPlugin = Kaltura_Client_FileSync_Plugin::get($client);
 		
 		$filter = new Kaltura_Client_Caption_Type_CaptionAssetFilter();
-		$filter->entryIdEqual = $entryId;
+		$filter->entryIdEqual = $this->entryId;
 		
 		$captionAssets = array();
 		$captionAssetsFileSyncs = array();
 		$errDescription = null;
 		try
 		{
-			Infra_ClientHelper::impersonate($partnerId);
+			Infra_ClientHelper::impersonate($this->partnerId);
 			$captionAssetsList = $captionPlugin->captionAsset->listAction($filter);
 			Infra_ClientHelper::unimpersonate();
 			$captionAssets = $captionAssetsList->objects;
@@ -78,17 +92,17 @@ class Kaltura_View_Helper_EntryInvestigateCaptionAssets extends Kaltura_View_Hel
 	}
 	
 	/* (non-PHPdoc)
-	 * @see Kaltura_View_Helper_EntryInvestigatePlugin::getTemplatePath()
+	 * @see Kaltura_View_Helper_PartialViewPlugin::getTemplatePath()
 	 */
-	public function getTemplatePath()
+	protected function getTemplatePath()
 	{
 		return realpath(dirname(__FILE__));
 	}
 	
 	/* (non-PHPdoc)
-	 * @see Kaltura_View_Helper_EntryInvestigatePlugin::getPHTML()
+	 * @see Kaltura_View_Helper_PartialViewPlugin::getPHTML()
 	 */
-	public function getPHTML()
+	protected function getPHTML()
 	{
 		return 'entry-investigate-caption-assets.phtml';
 	}

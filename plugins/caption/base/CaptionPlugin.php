@@ -3,7 +3,7 @@
  * Enable caption assets management for entry objects
  * @package plugins.caption
  */
-class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaAdminConsoleEntryInvestigate, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor
+class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor
 {
 	const PLUGIN_NAME = 'caption';
 	
@@ -79,13 +79,18 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaAdminConsoleEntryInvestigate::getEntryInvestigatePlugins()
+	 * @see IKalturaApplicationPartialView::getApplicationPartialViews()
 	 */
-	public static function getEntryInvestigatePlugins()
+	public static function getApplicationPartialViews($controller, $action)
 	{
-		return array(
-			new Kaltura_View_Helper_EntryInvestigateCaptionAssets(),
-		);
+		if($controller == 'batch' && $action == 'entryInvestigation')
+		{
+			return array(
+				new Kaltura_View_Helper_EntryInvestigateCaptionAssets(),
+			);
+		}
+		
+		return array();
 	}
 	
 	/* (non-PHPdoc)

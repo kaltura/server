@@ -3,7 +3,7 @@
  * Enable attachment assets management for entry objects
  * @package plugins.attachment
  */
-class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaAdminConsoleEntryInvestigate, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor
+class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor
 {
 	const PLUGIN_NAME = 'attachment';
 	
@@ -72,13 +72,18 @@ class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaAdminConsoleEntryInvestigate::getEntryInvestigatePlugins()
+	 * @see IKalturaApplicationPartialView::getApplicationPartialViews()
 	 */
-	public static function getEntryInvestigatePlugins()
+	public static function getApplicationPartialViews($controller, $action)
 	{
-		return array(
-			new Kaltura_View_Helper_EntryInvestigateAttachmentAssets(),
-		);
+		if($controller == 'batch' && $action == 'entryInvestigation')
+		{
+			return array(
+				new Kaltura_View_Helper_EntryInvestigateAttachmentAssets(),
+			);
+		}
+		
+		return array();
 	}
 	
 	/* (non-PHPdoc)

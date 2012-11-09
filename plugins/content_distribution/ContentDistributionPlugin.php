@@ -2,7 +2,7 @@
 /**
  * @package plugins.contentDistribution
  */
-class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaAdminConsoleEntryInvestigate, IKalturaPending, IKalturaMemoryCleaner, IKalturaConfigurator, IKalturaSchemaContributor
+class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaApplicationPartialView, IKalturaPending, IKalturaMemoryCleaner, IKalturaConfigurator, IKalturaSchemaContributor
 {
 	const PLUGIN_NAME = 'contentDistribution';
 	const PLUGIN_VERSION_MAJOR = 2;
@@ -290,13 +290,18 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaAdminConsoleEntryInvestigate::getEntryInvestigatePlugins()
+	 * @see IKalturaApplicationPartialView::getApplicationPartialViews()
 	 */
-	public static function getEntryInvestigatePlugins()
+	public static function getApplicationPartialViews($controller, $action)
 	{
-		return array(
-			new Kaltura_View_Helper_EntryInvestigateDistribution(),
-		);
+		if($controller == 'batch' && $action == 'entryInvestigation')
+		{
+			return array(
+				new Kaltura_View_Helper_EntryInvestigateDistribution(),
+			);
+		}
+		
+		return array();
 	}
 	
 	/**

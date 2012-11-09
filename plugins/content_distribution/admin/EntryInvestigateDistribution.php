@@ -3,12 +3,26 @@
  * @package plugins.contentDistribution 
  * @subpackage admin
  */
-class Kaltura_View_Helper_EntryInvestigateDistribution extends Kaltura_View_Helper_EntryInvestigatePlugin
+class Kaltura_View_Helper_EntryInvestigateDistribution extends Kaltura_View_Helper_PartialViewPlugin
 {
+	private $entryId;
+	private $partnerId;
+	
 	/* (non-PHPdoc)
-	 * @see Kaltura_View_Helper_EntryInvestigatePlugin::getDataArray()
+	 * @see Kaltura_View_Helper_PartialViewPlugin::plug()
 	 */
-	public function getDataArray($entryId, $partnerId)
+	public function plug(Zend_View_Interface $view)
+	{
+		$entry = $view->investigateData->entry;
+		$this->entryId = $entry->id;
+		$this->partnerId = $entry->partnerId;
+		parent::plug($view);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see Kaltura_View_Helper_PartialViewPlugin::getDataArray()
+	 */
+	protected function getDataArray()
 	{
 		$client = Infra_ClientHelper::getClient();
 		$contentDistributionPlugin = Kaltura_Client_ContentDistribution_Plugin::get($client);
@@ -21,14 +35,14 @@ class Kaltura_View_Helper_EntryInvestigateDistribution extends Kaltura_View_Help
 		}
 		
 		$filter = new Kaltura_Client_ContentDistribution_Type_EntryDistributionFilter();
-		$filter->entryIdEqual = $entryId;
+		$filter->entryIdEqual = $this->entryId;
 		
 		$distributions = array();
 		$distributionFileSyncs = array();
 		$errDescription = null;
 		try
 		{
-			Infra_ClientHelper::impersonate($partnerId);
+			Infra_ClientHelper::impersonate($this->partnerId);
 			$entryDistributionList = $contentDistributionPlugin->entryDistribution->listAction($filter);
 			Infra_ClientHelper::unimpersonate();
 			$distributions = $entryDistributionList->objects;
@@ -78,17 +92,17 @@ class Kaltura_View_Helper_EntryInvestigateDistribution extends Kaltura_View_Help
 	}
 	
 	/* (non-PHPdoc)
-	 * @see Kaltura_View_Helper_EntryInvestigatePlugin::getTemplatePath()
+	 * @see Kaltura_View_Helper_PartialViewPlugin::getTemplatePath()
 	 */
-	public function getTemplatePath()
+	protected function getTemplatePath()
 	{
 		return realpath(dirname(__FILE__));
 	}
 	
 	/* (non-PHPdoc)
-	 * @see Kaltura_View_Helper_EntryInvestigatePlugin::getPHTML()
+	 * @see Kaltura_View_Helper_PartialViewPlugin::getPHTML()
 	 */
-	public function getPHTML()
+	protected function getPHTML()
 	{
 		return 'entry-investigate-distribution.phtml';
 	}
