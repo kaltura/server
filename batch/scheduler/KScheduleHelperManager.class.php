@@ -207,13 +207,31 @@ class KScheduleHelperManager
 	 * @param string $file
 	 * @param array $commands
 	 */
-	public static function saveCommands($file, array $commands)
+	public static function saveCommandsResults(array $commands)
+	{
+		return self::saveCommands(self::getCommandsResultsFilePath(), $commands);
+	}
+
+	/**
+	 * @param string $file
+	 * @param array $commands
+	 */
+	public static function saveCommand($file, array $commands)
+	{
+		$commandsFilePath = self::getCommandsDir() . DIRECTORY_SEPARATOR . $file;
+		return self::saveCommands($commandsFilePath, $commands);
+	}
+
+	/**
+	 * @param string $file
+	 * @param array $commands
+	 */
+	public static function saveCommands($commandsFilePath, array $commands)
 	{
 		$data = '';
 		foreach($commands as $command)
 			$data .= base64_encode(serialize($command)) . "\n";
 			
-		$commandsFilePath = self::getCommandsResultsFilePath() . $file;
 		file_put_contents($commandsFilePath, $data, FILE_APPEND);
 	}
 

@@ -495,7 +495,7 @@ class KGenericScheduler
 		if($cnt)
 		{
 			KalturaLog::info("Sending $cnt command results to the server");
-			KScheduleHelperManager::saveCommands($command_results);
+			KScheduleHelperManager::saveCommandsResults($command_results);
 		}
 	}
 	

@@ -424,7 +424,7 @@ abstract class KBatchBase implements IKalturaLogger
 	{
 		$type = $this->taskConfig->type;
 		$file = "$type.cmd";
-		KScheduleHelperManager::saveCommands($file, $commands);
+		KScheduleHelperManager::saveCommand($file, $commands);
 	}
 	
 	/**
