@@ -46,9 +46,17 @@ class KScheduleHelperManager
 	/**
 	 * @return array
 	 */
-	public static function loadCommandsFile()
+	public static function loadResultsCommandsFile()
 	{
 		$commandsFilePath = self::getCommandsResultsFilePath();
+		return self::loadCommandsFile($commandsFilePath);
+	}
+	
+	/**
+	 * @return array
+	 */
+	public static function loadCommandsFile($commandsFilePath)
+	{
 		if(!file_exists($commandsFilePath))
 			return null;
 

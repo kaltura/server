@@ -59,7 +59,7 @@ class KScheduleHelper extends KPeriodicWorker
 		$scheduler->host = KSchedulerConfig::getHostname();
 		
 		// get command results from the scheduler
-		$commandResults = KScheduleHelperManager::loadCommandsFile();
+		$commandResults = KScheduleHelperManager::loadResultsCommandsFile();
 		KalturaLog::info(count($commandResults) . " command results returned from the scheduler");
 		if(count($commandResults))
 			$this->sendCommandResults($commandResults);
