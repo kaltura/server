@@ -371,7 +371,9 @@ class kEntitlementUtils
 		$privacyContextSearch = array();
 			
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
-		$ksPrivacyContexts = $ks->getPrivacyContext();
+		$ksPrivacyContexts = null;
+		if ($ks)
+			$ksPrivacyContexts = $ks->getPrivacyContext();
 		
 		if(is_null($ksPrivacyContexts) || $ksPrivacyContexts == '')
 			$ksPrivacyContexts = self::DEFAULT_CONTEXT . $partnerId;
