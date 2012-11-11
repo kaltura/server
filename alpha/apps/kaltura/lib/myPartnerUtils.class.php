@@ -250,7 +250,7 @@ class myPartnerUtils
 		$pos = imagettftext($im, $fontSize, 0, $pos[2], $bottom, $white, $font, " powered by ");
 		imagettftext($im, $fontSize, 0, $pos[2], $bottom, $green, $font, "Kaltura");
 
-		myContentStorage::fullMkdir($path);
+		kFile::fullMkdir($path);
 
 		imagegif($im, $path);
 		imagedestroy($im);

@@ -246,7 +246,7 @@ class myEntryUtils
 
 		imagettftext($im, 12, 0, 10, 21, $color, $font, $entry->getName());
 
-		myContentStorage::fullMkdir($path);
+		kFile::fullMkdir($path);
 
 		imagegif($im, $path);
 		imagedestroy($im);

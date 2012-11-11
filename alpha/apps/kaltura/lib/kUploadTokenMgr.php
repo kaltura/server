@@ -219,9 +219,9 @@ class kUploadTokenMgr
 		$extension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
 		$uploadFilePath = $this->getUploadPath($this->_uploadToken->getId(), $extension);
 		$this->_uploadToken->setUploadTempPath($uploadFilePath);
-		myContentStorage::fullMkdir($uploadFilePath);
+		kFile::fullMkdir($uploadFilePath);
 		
-		$moveFileSuccess = move_uploaded_file($fileData['tmp_name'], $uploadFilePath);
+		$moveFileSuccess = kFile::moveFile($fileData['tmp_name'], $uploadFilePath);
 		if (!$moveFileSuccess)
 		{
 			$msg = "Failed to move uploaded file for token id [{$this->_uploadToken->getId()}]";

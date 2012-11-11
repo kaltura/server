@@ -22,7 +22,7 @@ class myUploadUtils
 			// add the file extension after the "." character
 			$fullPath = myContentStorage::getFSUploadsPath().$filename . ( $extra_id ? "_" . $extra_id : "" ) .".".$extension;
 
-			myContentStorage::fullMkdir($fullPath);
+			kFile::fullMkdir($fullPath);
 			if ( ! move_uploaded_file($file_data['tmp_name'], $fullPath) )
 			{
 				KalturaLog::log ( "Error while uploading [$id] [$filename] [$hash] [$extra_id] " . print_r ( $file_data ,true ) ."\n->[$fullPath]" );
@@ -67,7 +67,7 @@ class myUploadUtils
 		$te->setDescription(  __METHOD__ . ":" . __LINE__ );
 		TrackEntry::addTrackEntry( $te );
 		
-		myContentStorage::fullMkdir($fullPath);
+		kFile::fullMkdir($fullPath);
 		if ( ! move_uploaded_file($file_data['tmp_name'], $fullPath) )
 		{
 			$err =  array ( 	"token" => $token , 

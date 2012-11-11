@@ -534,7 +534,7 @@ return array($genericWidget, $myspaceWidget);
 
 			$path = kFile::fixPath( $contentPath.$kshow->getTeamPicturePath() );
 
-			myContentStorage::fullMkdir($path);
+			kFile::fullMkdir($path);
 
 			imagepng($im, $path);
 			imagedestroy($im);
@@ -600,7 +600,7 @@ return array($genericWidget, $myspaceWidget);
 
 			$path = kFile::fixPath( $contentPath.$kshow->getTeam2PicturePath() );
 
-			myContentStorage::fullMkdir($path);
+			kFile::fullMkdir($path);
 
 			imagepng($im, $path);
 			imagedestroy($im);
