@@ -39,7 +39,7 @@ class webcamdummyAction extends defPartnerservices2Action
 		// add the file extension after the "." character
 		$fullPath = myContentStorage::getFSContentRootPath(). "content/webcam/my_recorded_stream_" . $file_alias . ( $extra_id ? "_" . $extra_id : "" ) .".".$extension;
 		
-		myContentStorage::fullMkdir($fullPath);
+		kFile::fullMkdir($fullPath);
 		move_uploaded_file($_FILES['Filedata']['tmp_name'], $fullPath);
 		chmod ( $fullPath , 0777 );
 		

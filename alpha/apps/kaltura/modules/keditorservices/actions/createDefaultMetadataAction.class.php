@@ -60,7 +60,7 @@ class createDefaultMetadataAction extends defKeditorservicesAction
 
 			$entry->save();
 
-			myContentStorage::fullMkdir ( $file_path );
+			kFile::fullMkdir($file_path);
 			kFile::setFileContent( $file_path , $this->show_metadata );
 			
 			$this->xml_content = $this->show_metadata;

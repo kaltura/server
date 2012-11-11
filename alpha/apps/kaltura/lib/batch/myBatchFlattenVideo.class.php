@@ -130,7 +130,7 @@ class myBatchFlattenServer extends myBatchBase
 					$fullFinalPath = kFileSyncUtils::getLocalFilePathForKey($fileSyncKey);
 					$finalPathNoExt = substr($fullFinalPath, 0 , strlen($fullFinalPath)-strlen($file_format));
 
-					myContentStorage::fullMkdir($fullFinalPath);
+					kFile::fullMkdir($fullFinalPath);
 					
 					$wildcardFinalPath = $finalPathNoExt."*";
 					$older_files = glob($wildcardFinalPath);
