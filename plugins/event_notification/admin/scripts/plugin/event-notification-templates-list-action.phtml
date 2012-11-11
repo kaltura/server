@@ -30,7 +30,7 @@
 				<td><?php echo $template->name; ?></td>
 				<td><?php $d = (new Zend_Date($template->createdAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
 				<td>
-					<select class="options" onchange="doAction(this.value, <?php echo $template->id; ?>)">
+					<select class="options" onchange="doAction(this.value, <?php echo $template->partnerId; ?>, <?php echo $template->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="configure"><?php echo $this->translate('Configure'); ?></option>
 						<?php if($template->status == Kaltura_Client_EventNotification_Enum_EventNotificationTemplateStatus::ACTIVE): ?>
@@ -71,7 +71,7 @@ jQuery('#filter_type').change(function() {
 
 jQuery('#filter_type').change();
 
-function doAction(action, templateId) {
+function doAction(action, partnerId, templateId) {
 	if (action && eval('typeof ' + action) == 'function')
 	{
 		f = eval(action);
@@ -81,8 +81,9 @@ function doAction(action, templateId) {
 	jQuery('select.options').val('');
 }
 
-function configure(templateId) {
-	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'EventNotificationTemplateConfigureAction', 'template_id' => '')); ?>' + templateId;
+function configure(partnerId, templateId) {
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'EventNotificationTemplateConfigureAction', 'partner_id' => 'PARTNER_ID', 'template_id' => '')); ?>' + templateId;
+	url = url.replace('PARTNER_ID', partnerId);
 	
 	jQuery('#configure-dialog').remove();
 	dialogDiv = jQuery('<div id="configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
@@ -116,8 +117,9 @@ function configure(templateId) {
 	);
 }
 
-function disableTemplate(templateId){
+function disableTemplate(partnerId, templateId){
 	updateStatus(
+			partnerId, 
 			templateId, 
 		<?php echo Kaltura_Client_EventNotification_Enum_EventNotificationTemplateStatus::DISABLED; ?>, 
 		function() {
@@ -126,8 +128,9 @@ function disableTemplate(templateId){
 	);
 }
 
-function enableTemplate(templateId){
+function enableTemplate(partnerId, templateId){
 	updateStatus(
+		partnerId, 
 		templateId, 
 		<?php echo Kaltura_Client_EventNotification_Enum_EventNotificationTemplateStatus::ACTIVE; ?>, 
 		function() {
@@ -136,13 +139,14 @@ function enableTemplate(templateId){
 	);
 }
 
-function remove(templateId)
+function remove(partnerId, templateId)
 {
 	var ok = confirm('<?php echo $this->translate('Are you sure delete the template?'); ?>');
 	if (!ok)
 		return;
 
 	updateStatus(
+		partnerId, 
 		templateId, 
 		<?php echo Kaltura_Client_EventNotification_Enum_EventNotificationTemplateStatus::DELETED; ?>, 
 		function() {
@@ -151,9 +155,10 @@ function remove(templateId)
 	);
 }
 
-function updateStatus(templateId, status, callback)
+function updateStatus(partnerId, templateId, status, callback)
 {
-	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'EventNotificationTemplateUpdateStatusAction', 'template_id' => 'TEMPLATE_ID', 'status' => 'STATUS')); ?>';
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'EventNotificationTemplateUpdateStatusAction', 'partner_id' => 'PARTNER_ID', 'template_id' => 'TEMPLATE_ID', 'status' => 'STATUS')); ?>';
+	url = url.replace('PARTNER_ID', partnerId);
 	url = url.replace('TEMPLATE_ID', templateId);
 	url = url.replace('STATUS', status);
 	
