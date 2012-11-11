@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage events
  */
-class kObjectCopiedEvent extends KalturaEvent implements IKalturaDatabaseEvent
+class kObjectCopiedEvent extends KalturaEvent implements IKalturaDatabaseEvent, IKalturaObjectRelatedEvent
 {
 	const EVENT_CONSUMER = 'kObjectCopiedEventConsumer';
 	
@@ -97,4 +97,13 @@ class kObjectCopiedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 			
 		return $scope;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectRelatedEvent::getObject()
+	 */
+	public function getObject() 
+	{
+		return $this->getToObject();
+	}
+
 }

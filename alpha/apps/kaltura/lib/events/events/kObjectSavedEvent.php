@@ -5,7 +5,7 @@
  * @package Core
  * @subpackage events
  */
-class kObjectSavedEvent extends KalturaEvent implements IKalturaDatabaseEvent
+class kObjectSavedEvent extends KalturaEvent implements IKalturaDatabaseEvent, IKalturaObjectRelatedEvent
 {
 	const EVENT_CONSUMER = 'kObjectSavedEventConsumer';
 	

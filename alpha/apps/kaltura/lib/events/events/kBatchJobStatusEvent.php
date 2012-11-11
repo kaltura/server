@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage events
  */
-class kBatchJobStatusEvent extends KalturaEvent implements IKalturaContinualEvent
+class kBatchJobStatusEvent extends KalturaEvent implements IKalturaContinualEvent, IKalturaObjectRelatedEvent
 {
 	const EVENT_CONSUMER = 'kBatchJobStatusEventConsumer';
 	
@@ -59,4 +59,13 @@ class kBatchJobStatusEvent extends KalturaEvent implements IKalturaContinualEven
 		$scope->setParentRaisedJob($this->dbBatchJob);
 		return $scope;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectBasedEvent::getObject()
+	 */
+	public function getObject() 
+	{
+		return $this->getBatchJob();
+	}
+
 }

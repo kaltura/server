@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage events
  */
-class kObjectErasedEvent extends KalturaEvent implements IKalturaDatabaseEvent
+class kObjectErasedEvent extends KalturaEvent implements IKalturaDatabaseEvent, IKalturaObjectRelatedEvent
 {
     const EVENT_CONSUMER = 'kObjectErasedEventConsumer';
 	
