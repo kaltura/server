@@ -78,7 +78,7 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 				}
 			}
 			
-			if(isset($properties['condition']))
+			if(isset($properties['condition']) && is_array($properties['condition']))
 			{
 				foreach($properties['condition'] as $value)
 				{
