@@ -148,7 +148,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$this->validatePropertyMinLength('name', 3, true);
-		$this->validate();
+		$this->validate($sourceObject);
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
@@ -189,11 +189,15 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 		return KalturaPluginManager::loadObject('KalturaEventNotificationTemplate', $type);
 	}
 	
-	protected function validate ()
+	protected function validate (EventNotificationTemplate $sourceObject = null)
 	{
 		$this->validatePropertyMinLength('systemName', 3, true);
 		
-		$systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($this->systemName, $this->id);
+		$id = null;
+		if($sourceObject)
+			$id = $sourceObject->getId();
+			
+		$systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($this->systemName, $id);
         if (count($systemNameTemplates))
             throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME, $this->systemName);
 	}
