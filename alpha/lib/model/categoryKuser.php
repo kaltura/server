@@ -19,20 +19,9 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	
 	const BULK_UPLOAD_ID = "bulk_upload_id";
 	
-	public static $indexFieldTypes = array (
-			'id' => IIndexable::FIELD_TYPE_INTEGER,
-			'category_id' => IIndexable::FIELD_TYPE_STRING,
-			'kuser_id' => IIndexable::FIELD_TYPE_STRING,
-			'category_full_ids' => IIndexable::FIELD_TYPE_STRING,
-			'permission_names' => IIndexable::FIELD_TYPE_STRING,
-			'puser_id' => IIndexable::FIELD_TYPE_STRING,
-			'screen_name' => IIndexable::FIELD_TYPE_STRING,
-			'status' => IIndexable::FIELD_TYPE_STRING,
-			'partner_id' => IIndexable::FIELD_TYPE_STRING,
-			'update_method' => IIndexable::FIELD_TYPE_STRING,
-			'created_at' => IIndexable::FIELD_TYPE_DATETIME,
-			'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
-		);
+	private static $indexFieldTypes = null;
+		
+	private static $indexFieldsMap = null;
 	
 	/**
 	 * Applies default values to this object.
@@ -234,8 +223,11 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	/* (non-PHPdoc)
 	 * @see IIndexable::getIndexFieldsMap()
 	 */
-	public function getIndexFieldsMap() {
-		return array (
+	public function getIndexFieldsMap() 
+	{
+		if (! self::$indexFieldsMap)
+		{
+			self::$indexFieldsMap = array (
 			'int_id' => 'intId',
 			'category_id' => 'categoryId',
 			'kuser_id' => 'kuserId',
@@ -248,14 +240,34 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 			'update_method' => 'searchIndexUpdateMethod',
 			'created_at' => 'createdAt',
 			'updated_at' => 'updatedAt',
-		);
+			);
+		}
+		
+		return self::$indexFieldsMap;
 	}
 
 	/* (non-PHPdoc)
 	 * @see IIndexable::getIndexFieldType()
 	 */
-	public function getIndexFieldType($field) {
-		
+	public function getIndexFieldType($field) 
+	{
+		if (! self::$indexFieldTypes)
+		{
+			self::$indexFieldTypes = array (
+			'id' => IIndexable::FIELD_TYPE_INTEGER,
+			'category_id' => IIndexable::FIELD_TYPE_STRING,
+			'kuser_id' => IIndexable::FIELD_TYPE_STRING,
+			'category_full_ids' => IIndexable::FIELD_TYPE_STRING,
+			'permission_names' => IIndexable::FIELD_TYPE_STRING,
+			'puser_id' => IIndexable::FIELD_TYPE_STRING,
+			'screen_name' => IIndexable::FIELD_TYPE_STRING,
+			'status' => IIndexable::FIELD_TYPE_STRING,
+			'partner_id' => IIndexable::FIELD_TYPE_STRING,
+			'update_method' => IIndexable::FIELD_TYPE_STRING,
+			'created_at' => IIndexable::FIELD_TYPE_DATETIME,
+			'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
+			);
+		}	
 		if(isset(self::$indexFieldTypes[$field]))
 			return self::$indexFieldTypes[$field];
 			
