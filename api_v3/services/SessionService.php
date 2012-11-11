@@ -238,13 +238,17 @@ class SessionService extends KalturaBaseService
 	 */
 	function getAction($session = null)
 	{
+		KalturaResponseCacher::disableCache();
+		
 		if(!$session)
 			$session = kCurrentContext::$ks;
 		
 		$ks = ks::fromSecureString($session);
 		
+		if (!myPartnerUtils::allowPartnerAccessPartner($this->getPartnerId(), $this->partnerGroup(), $ks->partner_id))
+			throw new KalturaAPIException(APIErrors::PARTNER_ACCESS_FORBIDDEN, $this->getPartnerId(), $ks->partner_id);
+		
 		$sessionInfo = new KalturaSessionInfo();
-		$sessionInfo->ks = $session;
 		$sessionInfo->partnerId = $ks->partner_id;
 		$sessionInfo->userId = $ks->user;
 		$sessionInfo->expiry = $ks->valid_until;
