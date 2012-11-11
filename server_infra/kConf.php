@@ -15,10 +15,20 @@ require_once __DIR__ . '/../infra/kEnvironment.php';
  */
 class kConf extends kEnvironment
 {
-	const APC_CACHE_MAP = 'kConf';
+	const APC_CACHE_MAP = 'kConf-';
 	const CACHE_VERSION_KEY = '__config_cache_version';
 	
 	protected static $initialized = false;
+	
+	protected static $cacheKey = null;
+	
+	protected static function getCacheKey()
+	{
+		if (self::$cacheKey)
+			return self::$cacheKey;
+		self::$cacheKey = self::APC_CACHE_MAP . md5(realpath(__file__));
+		return self::$cacheKey;
+	}
 	
 	protected static function init()
 	{
@@ -33,7 +43,7 @@ class kConf extends kEnvironment
 		
 		if (!$reloadFileExists && function_exists('apc_fetch'))
 		{
-			$apcMap = apc_fetch(self::APC_CACHE_MAP);
+			$apcMap = apc_fetch(self::getCacheKey());
 			if($apcMap)
 			{
 				self::$map = $apcMap;
@@ -81,7 +91,7 @@ class kConf extends kEnvironment
 		if(function_exists('apc_store'))
 		{
 			self::$map[self::CACHE_VERSION_KEY] = uniqid();
-			$res = apc_store(self::APC_CACHE_MAP, self::$map);
+			$res = apc_store(self::getCacheKey(), self::$map);
 			if($reloadFileExists && $res && PHP_SAPI != 'cli')
 			{
 				$deleted = @unlink("$cacheDir/base.reload");
@@ -165,7 +175,7 @@ class kConf extends kEnvironment
 		}
 		
 		if(function_exists('apc_store'))
-			apc_store(self::APC_CACHE_MAP, self::$map);
+			apc_store(self::getCacheKey(), self::$map);
 		
 		return self::$map[$mapName];
 	}
