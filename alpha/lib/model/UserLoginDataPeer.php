@@ -422,10 +422,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			// if a specific partner was requested - throw error
 			if ($requestedPartner) {
 				if ($partner && $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE) {
-					throw new kUserException('', kUserException::USER_IS_BLOCKED);
+					throw new kUserException('Partner is blocked', kUserException::USER_IS_BLOCKED);
 				}
 				else if ($kuser && $kuser->getStatus() == KuserStatus::BLOCKED) {
-					throw new kUserException('', kUserException::USER_IS_BLOCKED);
+					throw new kUserException('User is blocked', kUserException::USER_IS_BLOCKED);
 				}
 				else {
 					throw new kUserException('', kUserException::USER_NOT_FOUND);
