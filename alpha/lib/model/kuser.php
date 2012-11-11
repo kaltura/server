@@ -47,6 +47,10 @@ class kuser extends Basekuser implements IIndexable
 	
 	private $roughcut_count = -1;
 	
+	private static $indexFieldTypes = null;
+	
+	private static $indexFieldsMap = null;
+	
 	public static function getColumnNames()	{	return array ( 
 		"screen_name" , "full_name" , "url_list" , "tags" , 
 		"about_me" , "network_highschool" , "network_college" ,"network_other") ; 
@@ -1128,7 +1132,9 @@ class kuser extends Basekuser implements IIndexable
      */
     public function getIndexFieldsMap ()
     {
-        return array ( 
+    	if (!self::$indexFieldsMap)
+    	{
+    		self::$indexFieldsMap = array ( 
         		"login_data_id" => "loginDataId",
                 "is_admin" => "isAdmin",
                 "screen_name" => "screenName",
@@ -1174,11 +1180,20 @@ class kuser extends Basekuser implements IIndexable
                 "indexed_partner_data_int" => "indexedPartnerDataInt",
                 "indexed_partner_data_string" => "indexedPartnerDataString",
                 "custom_data" => "customData",
-        );
+       		 );
+    	}
         
+    	return self::$indexFieldsMap; 
     }
 
-         private static $indexFieldTypes = array (
+	/* (non-PHPdoc)
+     * @see IIndexable::getIndexFieldType()
+     */
+    public function getIndexFieldType ($field)
+    {
+    	if (!self::$indexFieldTypes)
+    	{
+    		self::$indexFieldTypes = array (
         		"login_data_id" => IIndexable::FIELD_TYPE_INTEGER,
                 "is_admin" => IIndexable::FIELD_TYPE_INTEGER,
                 "screen_name" => IIndexable::FIELD_TYPE_STRING,
@@ -1223,14 +1238,8 @@ class kuser extends Basekuser implements IIndexable
                 "admin_tags" => IIndexable::FIELD_TYPE_STRING,
                 "indexed_partner_data_int" => IIndexable::FIELD_TYPE_INTEGER,
                 "indexed_partner_data_string" => IIndexable::FIELD_TYPE_STRING,
-        );
-        
-        
-	/* (non-PHPdoc)
-     * @see IIndexable::getIndexFieldType()
-     */
-    public function getIndexFieldType ($field)
-    {
+       		 );
+    	}
         if(isset(self::$indexFieldTypes[$field]))
 			return self::$indexFieldTypes[$field];
 			
