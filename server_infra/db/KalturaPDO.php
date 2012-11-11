@@ -170,10 +170,7 @@ class KalturaPDO extends PropelPDO
 	public function beginTransaction()
 	{
 		if($this->getKalturaOption(KalturaPDO::KALTURA_ATTR_NO_TRANSACTION))
-		{
-			KalturaLog::debug("Transactions disabled");
-			return false;
-		}
+			return true;
 		
 		return parent::beginTransaction();
 	}
