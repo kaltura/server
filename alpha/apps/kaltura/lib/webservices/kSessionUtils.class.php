@@ -275,7 +275,8 @@ class ks extends kSessionBase
 	 */
 	public static function fromSecureString ( $encoded_str )
 	{
-		if ( empty ( $encoded_str ) ) return null;
+		if(empty($encoded_str))
+			return null;
 
 		$ks = new ks();		
 		if (!$ks->parseKS($encoded_str))
