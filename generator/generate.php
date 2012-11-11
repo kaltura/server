@@ -43,6 +43,8 @@ ini_set( "memory_limit","512M" );
 
 //the name of the output folder for the generators -
 
+chdir(__DIR__);
+
 //bootstrap connects the generator to the rest of Kaltura system
 require_once("bootstrap.php");
 
