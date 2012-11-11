@@ -310,12 +310,11 @@ index kaltura_category_kuser
 	rt_attr_uint	 = int_id
 	rt_field	 	 = permission_names
 	rt_field		 = category_full_ids
-	rt_attr_uint	 = inherit_from_category
 	rt_field		 = puser_id
 	rt_field		 = screen_name
-	rt_attr_uint		 = status
-	rt_attr_uint		= partner_id
-	rt_attr_uint		= update_method
+	rt_field		 = status
+	rt_field		= partner_id
+	rt_field		= update_method
 	rt_attr_timestamp	 = created_at
 	rt_attr_timestamp	 = updated_at
 	blend_chars		 = `, ~, U+23, (, ), -, =, [, ], {, }, ', \, |, /, <, *, ^, $, !, :, ;
