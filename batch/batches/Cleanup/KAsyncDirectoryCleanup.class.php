@@ -35,15 +35,38 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 	{
 		KalturaLog::info("Directory Cleanup is running");
 		
-		$path = $this->getAdditionalParams( "path" );
-		$pattern = $this->getAdditionalParams( "pattern" );
-		$simulateOnly = $this->getAdditionalParams( "simulateOnly" );
-		$minutesOld = $this->getAdditionalParams( "minutesOld" );
+		$path = $this->getAdditionalParams("path");
+		$pattern = $this->getAdditionalParams("pattern");
+		$simulateOnly = $this->getAdditionalParams("simulateOnly");
+		$minutesOld = $this->getAdditionalParams("minutesOld");
+		$searchPath = $path . $pattern;
+		KalturaLog::debug("Searching [$searchPath]");
+		
+		if($this->getAdditionalParams("usePHP"))
+		{
+			$this->deleteFilePHP($searchPath, $minutesOld, $simulateOnly);
+		}
+		else
+		{
+			$this->deleteFilesLinux($searchPath, $minutesOld, $simulateOnly);
+		}
+	}
+	
+	public function deleteFilesLinux($searchPath, $minutesOld, $simulateOnly)
+	{
+		$command = "find $searchPath -mmin +$minutesOld -exec rm -rf {} \;";
+		KalturaLog::info("Executing command: $command");
+		
+		$returnedValue = null;
+		passthru($command, $returnedValue);
+		KalturaLog::info("Returned value [$returnedValue]");
+	}
+	
+	public function deleteFilesPHP($searchPath, $minutesOld, $simulateOnly)
+	{
 		$secondsOld = $minutesOld * 60;
 		
-		$path_to_search = $path . $pattern ;
-		KalturaLog::debug("Searching [$path_to_search]");
-		$files = glob ( $path_to_search);
+		$files = glob ( $searchPath);
 		KalturaLog::debug("Found [" . count ( $files ) . "] to scan");
 		
 		$now = time();
