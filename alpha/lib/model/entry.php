@@ -16,6 +16,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	protected $is_categories_names_modified = false;
 	protected $creator_kuser_id = null;
 	
+	private static $indexFieldsMap = null;
+	
+	private static $indexFieldTypes = null;
 	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 	
@@ -2678,64 +2681,78 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function getIndexFieldsMap()
 	{
-		return array(
-			'entry_id' => 'id',
-			'str_entry_id' => 'id',
-			'int_entry_id' => 'indexedId',
+		if (!self::$indexFieldsMap)
+		{
+			self::$indexFieldsMap = array(
+				'entry_id' => 'id',
+				'str_entry_id' => 'id',
+				'int_entry_id' => 'indexedId',
+			
+				'name' => 'name',
+				'sort_name' => 'sortName',
+			
+				'tags' => 'tags',
+				'categories' => 'categoriesEntryIds',
+				'flavor_params' => 'flavorParamsIds',
+				'source_link' => 'sourceLink',
+				'kshow_id' => 'kshowId',
+				'group_id' => 'groupId',
+				'description' => 'description',
+				'admin_tags' => 'adminTags',
+				'duration_type' => 'durationType',
+				'reference_id' => 'referenceId',
+				'replacing_entry_id' => 'replacingEntryId',
+				'replaced_entry_id' => 'replacedEntryId',
+				'roots' => 'roots',
+			
+				'kuser_id' => 'kuserId',
+				'puser_id' => 'puserId',
+				'entry_status' => 'status',
+				'type' => 'type',
+				'media_type' => 'mediaType',
+				'views' => 'views',
+				'partner_id' => 'partnerId',
+				'moderation_status' => 'moderationStatus',
+				'display_in_search' => 'displayInSearch',
+				'duration' => 'durationInt',
+				'access_control_id' => 'accessControlId',
+				'moderation_count' => 'moderationCount',
+				'rank' => 'rank',
+				'total_rank' => 'totalRank',
+				'plays' => 'plays',
+				'partner_sort_value' => 'partnerSortValue',
+				'replacement_status' => 'replacementStatus',
+			
+				'created_at' => 'createdAt',
+				'updated_at' => 'updatedAt',
+				'modified_at' => 'modifiedAt',
+				'media_date' => 'mediaDate',
+				'start_date' => 'startDate',
+				'end_date' => 'endDate',
+				'available_from' => 'availableFrom',
+			
+				'entitled_kusers_publish' => 'entitledKusersPublish',
+				'entitled_kusers_edit' => 'entitledKusersEdit',
+				'entitled_kusers' => 'entitledKusers',
+				'privacy_by_contexts' => 'privacyByContexts',
+				'creator_kuser_id' => 'creatorKuserId',
+				'creator_puser_id' => 'creatorPuserId',		
+			);
+		}
 		
-			'name' => 'name',
-			'sort_name' => 'sortName',
-		
-			'tags' => 'tags',
-			'categories' => 'categoriesEntryIds',
-			'flavor_params' => 'flavorParamsIds',
-			'source_link' => 'sourceLink',
-			'kshow_id' => 'kshowId',
-			'group_id' => 'groupId',
-			'description' => 'description',
-			'admin_tags' => 'adminTags',
-			'duration_type' => 'durationType',
-			'reference_id' => 'referenceId',
-			'replacing_entry_id' => 'replacingEntryId',
-			'replaced_entry_id' => 'replacedEntryId',
-			'roots' => 'roots',
-		
-			'kuser_id' => 'kuserId',
-			'puser_id' => 'puserId',
-			'entry_status' => 'status',
-			'type' => 'type',
-			'media_type' => 'mediaType',
-			'views' => 'views',
-			'partner_id' => 'partnerId',
-			'moderation_status' => 'moderationStatus',
-			'display_in_search' => 'displayInSearch',
-			'duration' => 'durationInt',
-			'access_control_id' => 'accessControlId',
-			'moderation_count' => 'moderationCount',
-			'rank' => 'rank',
-			'total_rank' => 'totalRank',
-			'plays' => 'plays',
-			'partner_sort_value' => 'partnerSortValue',
-			'replacement_status' => 'replacementStatus',
-		
-			'created_at' => 'createdAt',
-			'updated_at' => 'updatedAt',
-			'modified_at' => 'modifiedAt',
-			'media_date' => 'mediaDate',
-			'start_date' => 'startDate',
-			'end_date' => 'endDate',
-			'available_from' => 'availableFrom',
-		
-			'entitled_kusers_publish' => 'entitledKusersPublish',
-			'entitled_kusers_edit' => 'entitledKusersEdit',
-			'entitled_kusers' => 'entitledKusers',
-			'privacy_by_contexts' => 'privacyByContexts',
-			'creator_kuser_id' => 'creatorKuserId',
-			'creator_puser_id' => 'creatorPuserId',		
-		);
+		return self::$indexFieldsMap;
 	}
 	
-	private static $indexFieldTypes = array(
+	
+	
+	/**
+	 * @return string field type, string, int or timestamp
+	 */
+	public function getIndexFieldType($field)
+	{
+		if (!self::$indexFieldTypes)
+		{
+			self::$indexFieldTypes = array(
 			'entry_id' => IIndexable::FIELD_TYPE_STRING,
 			'str_entry_id' => IIndexable::FIELD_TYPE_STRING,
 			'name' => IIndexable::FIELD_TYPE_STRING,
@@ -2787,13 +2804,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			'privacy_by_contexts' => IIndexable::FIELD_TYPE_STRING,
 			'creator_kuser_id' => IIndexable::FIELD_TYPE_STRING,
 			'creator_puser_id' => IIndexable::FIELD_TYPE_STRING,
-	);
-	
-	/**
-	 * @return string field type, string, int or timestamp
-	 */
-	public function getIndexFieldType($field)
-	{
+			);
+		}
+		
 		if(isset(self::$indexFieldTypes[$field]))
 			return self::$indexFieldTypes[$field];
 			
