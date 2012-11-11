@@ -19,6 +19,21 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	
 	const BULK_UPLOAD_ID = "bulk_upload_id";
 	
+	public static $indexFieldTypes = array (
+			'id' => IIndexable::FIELD_TYPE_INTEGER,
+			'category_id' => IIndexable::FIELD_TYPE_STRING,
+			'kuser_id' => IIndexable::FIELD_TYPE_STRING,
+			'category_full_ids' => IIndexable::FIELD_TYPE_STRING,
+			'permission_names' => IIndexable::FIELD_TYPE_STRING,
+			'puser_id' => IIndexable::FIELD_TYPE_STRING,
+			'screen_name' => IIndexable::FIELD_TYPE_STRING,
+			'status' => IIndexable::FIELD_TYPE_STRING,
+			'partner_id' => IIndexable::FIELD_TYPE_STRING,
+			'update_method' => IIndexable::FIELD_TYPE_STRING,
+			'created_at' => IIndexable::FIELD_TYPE_DATETIME,
+			'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
+		);
+	
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
@@ -224,14 +239,13 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 			'int_id' => 'intId',
 			'category_id' => 'categoryId',
 			'kuser_id' => 'kuserId',
-			'category_full_ids' => 'categoryFullIds',
-			'permission_names' => 'permissionNames',
-			'inherit_from_category' => 'inheritFromCategory',
+			'category_full_ids' => 'searchIndexCategoryFullIds',
+			'permission_names' => 'searchIndexPermissionNames',
 			'puser_id' => 'puserId',
 			'screen_name' => 'screenName',
-			'status' => 'status',
+			'status' => 'searcIndexStatus',
 			'partner_id' => 'partnerId',
-			'update_method' => 'updateMethod',
+			'update_method' => 'searchIndexUpdateMethod',
 			'created_at' => 'createdAt',
 			'updated_at' => 'updatedAt',
 		);
@@ -241,21 +255,11 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	 * @see IIndexable::getIndexFieldType()
 	 */
 	public function getIndexFieldType($field) {
-		return array (
-			'id' => IIndexable::FIELD_TYPE_INTEGER,
-			'category_id' => IIndexable::FIELD_TYPE_INTEGER,
-			'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
-			'category_full_ids' => IIndexable::FIELD_TYPE_STRING,
-			'permission_names' => IIndexable::FIELD_TYPE_STRING,
-			'inherit_from_category' => IIndexable::FIELD_TYPE_INTEGER,
-			'puser_id' => IIndexable::FIELD_TYPE_STRING,
-			'screen_name' => IIndexable::FIELD_TYPE_STRING,
-			'status' => IIndexable::FIELD_TYPE_INTEGER,
-			'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
-			'update_method' => IIndexable::FIELD_TYPE_INTEGER,
-			'created_at' => IIndexable::FIELD_TYPE_DATETIME,
-			'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
-		);
+		
+		if(isset(self::$indexFieldTypes[$field]))
+			return self::$indexFieldTypes[$field];
+			
+		return null;
 	}
 
 	/* (non-PHPdoc)
@@ -272,6 +276,68 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	public function indexToSearchIndex() {
 		
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
+	
+	/**
+	 * Return permission_names property value for index
+	 * @return string
+	 */
+	public function getSearchIndexPermissionNames ()
+	{
+		$permissionNames = explode(",", $this->getPermissionNames());
+		foreach ($permissionNames as &$permissionName)
+			$permissionName = $this->getPartnerId()."_".$permissionName;
+		
+		return implode(",", $permissionNames);
+	}
+	
+	/**
+	 * Return status property value for index
+	 * @return string
+	 */
+	public function getSearchIndexStatus ()
+	{
+		return $this->getPartnerId() . '_' . $this->getStatus();
+	}
+	
+	/**
+	 * Return update_method property value for index
+	 * @return string
+	 */
+	public function getSearchIndexUpdateMethod ()
+	{
+		return $this->getPartnerId() . '_' . $this->getUpdateMethod();
+	}
+	
+	/**
+	 * Return category_full_ids property value for index
+	 * @return string
+	 */
+	public function getSearchIndexCategoryFullIds ()
+	{
+		$fullIds = $this->getCategoryFullIds();
+		$fullIdsArr = explode(categoryPeer::CATEGORY_SEPARATOR, $fullIds);
+		
+		$parsedFullId = '';
+		$fullIds = '';
+		foreach ($fullIdsArr as $categoryId)
+		{
+			if($fullIds == '')
+			{
+				$fullIds = $categoryId;
+			}
+			else
+			{
+				$parsedFullId .= md5($fullIds . categoryPeer::CATEGORY_SEPARATOR) . ' ';
+				$fullIds .= '>' . $categoryId;
+			}
+			
+			$parsedFullId .= md5($fullIds) . ' ';
+		}
+		
+		$parsedFullId .= md5($fullIds . category::FULL_IDS_EQUAL_MATCH_STRING);
+		
+		return $parsedFullId ;
 	}
 
 } // categoryKuser
