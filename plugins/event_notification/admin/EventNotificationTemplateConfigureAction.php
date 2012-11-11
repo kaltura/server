@@ -32,9 +32,12 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 		$eventNotificationPlugin = Kaltura_Client_EventNotification_Plugin::get($this->client);
 		$request = $action->getRequest();
 		
+		$partnerId = $this->_getParam('partner_id');
+		if(!$partnerId)
+			$partnerId = 0;
+			
 		$templateId = $this->_getParam('template_id');
 		$type = null;
-		$partnerId = null;
 		$eventNotificationTemplate = null;
 		
 		$action->view->templateId = $templateId;
@@ -44,16 +47,15 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 		
 		try
 		{
+			Infra_ClientHelper::impersonate($partnerId);
 			if ($templateId)
 			{
 				$eventNotificationTemplate = $eventNotificationPlugin->eventNotificationTemplate->get($templateId);
 				$type = $eventNotificationTemplate->type;
-				$partnerId = $eventNotificationTemplate->partnerId;
 			}
 			else
 			{
 				$type = $this->_getParam('type');
-				$partnerId = $this->_getParam('partner_id');
 			}
 			
 			$form = KalturaPluginManager::loadObject('Form_EventNotificationTemplateConfiguration', $type, array($partnerId, $type));
@@ -103,13 +105,8 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 				{
 					$form->populate($request->getPost());
 					$eventNotificationTemplate = $form->getObject($templateClass, $request->getPost());
-				
-					if(!$eventNotificationTemplate->partnerId)
-						$eventNotificationTemplate->partnerId = 0;
-					Infra_ClientHelper::impersonate($eventNotificationTemplate->partnerId);
 					$eventNotificationTemplate->partnerId = null;
 					$eventNotificationTemplate = $eventNotificationPlugin->eventNotificationTemplate->add($eventNotificationTemplate);
-					Infra_ClientHelper::unimpersonate();
 					$form->setAttrib('class', 'valid');
 					$action->view->formValid = true;
 				}
@@ -132,6 +129,7 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 				$eventNotificationTemplate = $form->getObject($templateClass, $request->getPost());
 			}
 		}
+		Infra_ClientHelper::unimpersonate();
 		$action->view->form = $form;
 	
 			
