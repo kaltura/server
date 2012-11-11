@@ -249,7 +249,7 @@ class infraRequestUtils
 		{
 			list($remote_addr, $time, $uniqueId, $hash) = @explode(",", $_SERVER['HTTP_X_KALTURA_REMOTE_ADDR']);
 			
-			if (kConf::hasParam('remote_addr_header_salt'))
+			if (kConf::hasParam('remote_addr_header_salt') && kConf::hasParam("remote_addr_header_timeout"))
 			{
 				$salt = kConf::get('remote_addr_header_salt');
 				$timeout = kConf::get("remote_addr_header_timeout");
