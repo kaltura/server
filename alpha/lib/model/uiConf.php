@@ -30,6 +30,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	const UI_CONF_KMC_ROLES_AND_PERMISSIONS = 17;
 	const UI_CONF_CLIPPER = 18;
 	const UI_CONF_TYPE_KSR = 19;
+	const UI_CONF_TYPE_KUPLOAD = 20;
 
 
 	const UI_CONF_CREATION_MODE_MANUAL = 1;
