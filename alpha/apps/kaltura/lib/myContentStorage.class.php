@@ -222,39 +222,6 @@ class myContentStorage
 		return "";
 	}
 
-	// TODO - maybe move generic file functions to infra/kFile !?!?
-	public static function fullMkdir($path, $rights = 0777)
-	{
-		$folder_path = array(strstr($path, '.') ? dirname($path) : $path);
-		$folder_path = str_replace( "\\" , "/" , $folder_path);
-		while(!@is_dir(dirname(end($folder_path)))
-		&& dirname(end($folder_path)) != '/'
-		&& dirname(end($folder_path)) != '.'
-		&& dirname(end($folder_path)) != '')
-		array_push($folder_path, dirname(end($folder_path)));
-
-		while($parent_folder_path = array_pop($folder_path))
-		{
-			if ( ! file_exists( $parent_folder_path ))
-			{
-				if(!@mkdir($parent_folder_path, $rights))
-				{
-					//user_error("Can't create folder \"$parent_folder_path\".");
-				}
-				else
-				{
-					@chmod($parent_folder_path, $rights);
-				}
-			}
-			else
-			{
-				@chmod($parent_folder_path, $rights);
-			}
-			
-		}
-	}
-
-
 	// TODO - verify changes !!
 	public static function moveFile($from, $to, $override_if_exists = false, $copy = false )
 	{
@@ -268,7 +235,7 @@ class myContentStorage
 		
 		if ( !is_dir ( dirname ( $to )) )
 		{
-			myContentStorage::fullMkdir($to);
+			kFile::fullMkdir($to);
 		}
 
 		KalturaLog::log("myContentStorage::moveFile ($copy): $from to $to");
@@ -347,7 +314,7 @@ class myContentStorage
 		$deleted_path = self::getFSDeletedContentRootPath ( $original_path );
 		if ( $deleted_path  == null ) return ""; 
 		if ( ! file_exists( $original_path )) return "";
-		self::fullMkdir( $deleted_path );
+		kFile::fullMkdir( $deleted_path );
 		self::moveFile( $original_path , $deleted_path , true , $copy );
 		return $deleted_path;
 	}
