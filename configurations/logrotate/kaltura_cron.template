@@ -1,0 +1,12 @@
+@LOG_DIR@/cron.log {
+ rotate 5
+ daily
+ missingok
+ compress
+ dateext
+ notifempty
+ sharedscripts
+ postrotate
+ @APACHE_RESTART_COMMAND@
+ endscript
+}

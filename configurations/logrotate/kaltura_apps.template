@@ -1,0 +1,17 @@
+@LOG_DIR@/admin_console.log {
+ rotate 5
+ daily
+ missingok
+ compress
+ dateext
+ notifempty
+}
+
+@LOG_DIR@/kaltura_multi_publishers.log {
+ rotate 5
+ daily
+ missingok
+ compress
+ dateext
+ notifempty
+}
