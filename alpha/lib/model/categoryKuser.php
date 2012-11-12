@@ -228,7 +228,6 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		if (! self::$indexFieldsMap)
 		{
 			self::$indexFieldsMap = array (
-			'int_id' => 'intId',
 			'category_id' => 'categoryId',
 			'kuser_id' => 'kuserId',
 			'category_full_ids' => 'searchIndexCategoryFullIds',
@@ -254,7 +253,6 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		if (! self::$indexFieldTypes)
 		{
 			self::$indexFieldTypes = array (
-			'id' => IIndexable::FIELD_TYPE_INTEGER,
 			'category_id' => IIndexable::FIELD_TYPE_STRING,
 			'kuser_id' => IIndexable::FIELD_TYPE_STRING,
 			'category_full_ids' => IIndexable::FIELD_TYPE_STRING,
