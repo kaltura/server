@@ -141,13 +141,13 @@ class myMediaSourceFactory
 	{
 		$result = array ();
 		$media_source = null;
-		if (preg_match("/youtube\.[a-zA-Z0-9\.]+\/watch\?v=(.*)/", $url, $objectId))
+		if (preg_match('/youtube\.[a-zA-Z0-9\.]+\/watch\?v=(.*)/', $url, $objectId))
 		{
 			$media_source = self::getMediaSource ( entry::ENTRY_MEDIA_SOURCE_YOUTUBE );
 			$obj_id = $objectId[1];
 		}
 		//http://www.flickr.com/photos/k_soggie/338990574/
-		elseif (preg_match("/http:\/\/www.flickr.com\/photos\/.*?\/(\d+)/", $url, $objectId))
+		elseif (preg_match('/http:\/\/www.flickr.com\/photos\/.*?\/(\d+)/', $url, $objectId))
 		{
 			$media_source = self::getMediaSource ( entry::ENTRY_MEDIA_SOURCE_FLICKR );
 			$obj_id = $objectId[1];
