@@ -42,7 +42,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 	 * @see SphinxCriteria::getDefaultCriteriaFilter()
 	 */
 	protected function getDefaultCriteriaFilter() {
-		return kuserPeer::getCriteriaFilter();
+		return categoryKuserPeer::getCriteriaFilter();
 	}
 
 	/* (non-PHPdoc)
@@ -69,7 +69,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 		if(strpos($fieldName, '.') === false)
 		{
 			$fieldName = strtoupper($fieldName);
-			$fieldName = kuserPeer::TABLE_NAME.".$fieldName";
+			$fieldName = categoryKuserPeer::TABLE_NAME.".$fieldName";
 		}
 			
 		return isset(self::$sphinxFields[$fieldName]);
