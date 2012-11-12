@@ -679,7 +679,7 @@ return array($genericWidget, $myspaceWidget);
 		$kuser = kuserPeer::retrieveByPK($kuser_id);
 		if (!$kuser)
 		{
-			$message = "User $user_id doesn't exist";
+			$message = "User $kuser_id doesn't exist";
 			return false;
 		}
 
@@ -715,7 +715,7 @@ return array($genericWidget, $myspaceWidget);
 				$kuser = kuserPeer::retrieveByPK($kuser_id);
 				if (!$kuser)
 				{
-					$message = "User $user_id doesn't exist.";
+					$message = "User $kuser_id doesn't exist.";
 				}
 				else
 				$message = "Error - You are not subscribed to this Kaltura.";
@@ -802,98 +802,6 @@ return array($genericWidget, $myspaceWidget);
 		}
 
 		return $viewerType;
-	}
-
-	public static function deepCloneById ( $source_kshow_id , $new_entries = NULL )
-	{
-		$kshow = kshowPeer::retrieveByPK( $source_kshow_id );
-		if ( $kshow ) return self::deepClone( $kshow , $new_entries );
-		else NULL;
-	}
-
-	public static function deepClone ( kshow $source_kshow , &$new_entries )
-	{
-		$target_kshow = $source_kshow->copy();
-		// will have to save to retrieve the id from the DB.
-		$target_kshow->save();
-
-		$target_id = $target_kshow->getId();
-
-		echo "Creating new kshow $target_id\n";
-
-		$special_entries = array ();
-		$special_entries [] = $source_kshow->getShowEntryId();
-		$special_entries [] = $source_kshow->getIntroId();
-
-		$skin = $source_kshow->getSkinObj();
-		///bg_entry_id=2171&bg_entry_path=/content/entry/data/0/2/2171_100000.jpg
-		$bg_entry_id = $skin->get ( "bg_entry_id" );
-		$special_entries [] = $bg_entry_id;
-
-		echo "special entry_ids: " . print_r ( $special_entries , true );
-
-		// clone the show_entry and intro
-		$entries = entryPeer::retrieveByPKs ( $special_entries );
-
-		echo "special entries count " . count ($entries ) ."\n";
-
-		// it's hard to assume the order - if a PK was not found, there is no placeholder
-		foreach ( $entries as $entry )
-		{
-			$new_entry = myEntryUtils::deepClone( $entry , $target_id , NULL );
-			$new_entries[] = $new_entry;
-
-			if ( $entry->getId() == $source_kshow->getShowEntryId() )
-			{
-				echo "ShowEntry:\n";
-				$target_kshow->setShowEntryId ( $new_entry->getId() );
-			}
-			elseif ( $entry->getId() == $source_kshow->getIntroId() )
-			{
-				echo "Intro:\n";
-				$target_kshow->setIntroId ( $new_entry->getId() );
-			}
-			elseif ( $entry->getId() == $bg_entry_id )
-			{
-				echo "Background:\n";
-				$skin->set ( "bg_entry_id" , $new_entry->getId() );
-				$skin->set ( "bg_entry_path" , $new_entry->getDataPath() ); // replaced__getDataPath
-			}
-			else
-			{
-				// ERROR !
-			}
-		}
-
-		$source_thumbnail_path = $source_kshow->getThumbnailPath();
-		$target_kshow->setThumbnail ( $source_kshow->getThumbnail() );
-		$target_thumbnail_path = $target_kshow->getThumbnailPath();
-
-		// TODO - don't copy files if poiting to templates !
-		$content = myContentStorage::getFSContentRootPath();
-
-//		echo ( "Background - copying file: " . $content . $source_thumbnail_path . " -> " .  $content . $target_thumbnail_path ."\n");
-//		myContentStorage::moveFile( $content . $source_thumbnail_path , $content . $target_thumbnail_path , false , true );
-
-		self::resetKshowStats( $target_kshow );
-
-		$target_kshow->save();
-
-		$c = new Criteria();
-		$c->add ( entryPeer::KSHOW_ID , $source_kshow->getId() );
-		// don't clope the entries that were alredt cloned
-		$c->add ( entryPeer::ID , $special_entries , Criteria::NOT_IN );
-		$entries = entryPeer::doSelect ( $c );
-
-		foreach ( $entries as $entry )
-		{
-			$new_entry = myEntryUtils::deepClone( $entry , $target_id , NULL );
-			$new_entries[] = $new_entry;
-		}
-
-		echo "Ended creating new kshow $target_id. " . count ( $new_entries ) . " entries copied\n";
-
-		return $target_kshow;
 	}
 
 	private static function resetKshowStats ( $target_kshow , $reset_entry_stats = false )
