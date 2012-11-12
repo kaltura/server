@@ -235,7 +235,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 			'permission_names' => 'searchIndexPermissionNames',
 			'puser_id' => 'puserId',
 			'screen_name' => 'screenName',
-			'status' => 'searcIndexStatus',
+			'status' => 'searchIndexStatus',
 			'partner_id' => 'partnerId',
 			'update_method' => 'searchIndexUpdateMethod',
 			'created_at' => 'createdAt',
