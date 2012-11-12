@@ -123,7 +123,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 	 * @see SphinxCriteria::getSphinxIdField()
 	 */
 	protected function getSphinxIdField() {
-		return 'int_id';
+		return 'id';
 		
 	}
 
