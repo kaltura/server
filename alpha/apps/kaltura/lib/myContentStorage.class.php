@@ -116,7 +116,7 @@ class myContentStorage
 		// TODO - use glob rather than  dirListExtended
 		//$pattern = "|" . self::getFSContentRootPath(). "/" . $dir . "/^{$file_base}.*\.xml$";
 		
-		$files = kFile::dirListExtended( self::getFSContentRootPath() . "/" . $dir , false , false , '/^' . $file_base . ".*\.xml$/" ) ;
+		$files = kFile::dirListExtended( self::getFSContentRootPath() . "/" . $dir , false , false , '/^' . $file_base . '.*\.xml$/' ) ;
 		
 		if ( $files == null ) return null;
 				

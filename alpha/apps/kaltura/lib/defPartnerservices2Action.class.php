@@ -957,14 +957,14 @@ $this->benchmarkStart( "beforeImpl" );
 
 	protected function  benchmarkStart ( $name )
 	{
-		$name = preg_replace ( "/[^a-zA-Z0-9\-_]/" , "" , $name );
+		$name = preg_replace ( '/[^a-zA-Z0-9\-_]/' , "" , $name );
 		$this->benchmarks_names[] = $name;
 		$this->benchmarks[$name] = microtime(true);
 	}
 
 	protected function  benchmarkEnd ( $name )
 	{
-		$name = preg_replace ( "/[^a-zA-Z0-9\-_]/" , "" , $name );
+		$name = preg_replace ( '/[^a-zA-Z0-9\-_]/' , "" , $name );
 		$this->benchmarks["_end_{$name}"] = microtime(true);
 	}
 	
