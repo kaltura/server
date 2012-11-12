@@ -113,7 +113,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			"puser_id",
 			"category_full_ids",
 			"permission_names",
-			"status",
+			"category_kuser_status",
 			"update_method",
 		));
 		
@@ -145,44 +145,39 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria::applyFilterFields()
 	 */
-	protected function applyFilterFields($filter)
+	protected function applyFilterFields(baseObjectFilter $filter)
 	{
-		if ($filter->get('_like_permission_names'))
-		{
-			
-		}
-		
-		if ($filter->get('_in_permission_names'))
-		{
-			
-		}
-		
 		if ($filter->get('_in_status'))
 		{
-			
+			$statusList = explode(',', $filter->get('_in_status'));
+			foreach ($statusList as &$status)
+			{
+				$status .= 'p' . kCurrentContext::$partner_id . 'st' . $status;
+			}
+			$filter->get('_in_status') = implode(',', $statusList);
 		}
 		
 		if ($filter->get('_eq_status'))
 		{
-			
+			$filter->get('_eq_status') = 'p' . kCurrentContext::$partner_id . 'st' . $filter->get('_eq_status');
 		}
 		
 		if ($filter->get('_in_update_method'))
 		{
-			
+			$updateMethodList = explode(',', $filter->get('_in_update_method'));
+			foreach ($updateMethodList as &$updateMethod)
+			{
+				$updateMethod .= 'p' . kCurrentContext::$partner_id . 'um' . $updateMethod;
+			}
+			$filter->get('_in_update_method') = implode(',', $updateMethodList);
 		}
 		
 		if ($filter->get('_eq_update_method'))
 		{
-			
+			$filter->get('_eq_update_method') = 'p' . kCurrentContext::$partner_id . 'um' . $filter->get('_eq_update_method');
 		}
 		
 		return parent::applyFilterFields($filter);
 	}
-	
-	public static function getIndexFieldPrefix ()
-	{
-		
-	}
-	
+
 }
