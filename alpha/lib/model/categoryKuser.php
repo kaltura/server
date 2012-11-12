@@ -298,7 +298,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	{
 		$permissionNames = explode(",", $this->getPermissionNames());
 		foreach ($permissionNames as &$permissionName)
-			$permissionName = $this->getPartnerId()."_".$permissionName;
+			$permissionName = 'p'.$this->getPartnerId()."pn".$permissionName;
 		
 		return implode(",", $permissionNames);
 	}
@@ -309,7 +309,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	 */
 	public function getSearchIndexStatus ()
 	{
-		return $this->getPartnerId() . '_' . $this->getStatus();
+		return 'p'.$this->getPartnerId() . 'st' . $this->getStatus();
 	}
 	
 	/**
@@ -318,7 +318,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	 */
 	public function getSearchIndexUpdateMethod ()
 	{
-		return $this->getPartnerId() . '_' . $this->getUpdateMethod();
+		return 'p'.$this->getPartnerId() . 'um' . $this->getUpdateMethod();
 	}
 	
 	/**
