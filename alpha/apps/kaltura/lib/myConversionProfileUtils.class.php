@@ -370,12 +370,4 @@ class myConversionProfileUtils
 		}
 		return null;
 	}
-	
-	// TODO - attempt to create profile from $partner_convrsion_string and $partner_flv_conversion_string ??
-	public static function getConversionProfileForPartner ( $partner_id , $partner_convrsion_string = null ,  $partner_flv_conversion_string = mull )
-	{
-		$conv_prof = ConversionProfilePeer::retrieveByPK( $conversion_profile_id );
-	}
 }
-
-?>
