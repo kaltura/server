@@ -20,17 +20,6 @@ class categoryKuserFilter extends baseObjectFilter
 				"_lte_updated_at",
 				"_eq_parent_id",
 				"_in_parent_id",
-				"_eq_depth",
-				"_eq_full_name",
-				"_likex_full_name",
-				"_like_tags",
-				"_mlikeor_tags",
-				"_mlikeand_tags",
-				"_eq_appear_in_list",
-				"_eq_privacy",
-				"_in_privacy",
-				"_eq_membership_setting",
-				"_in_membership_setting",
 				"_eq_status",
 				"_in_status",
 				"_eq_permission_level",
@@ -41,6 +30,8 @@ class categoryKuserFilter extends baseObjectFilter
 				"_eq_category_full_ids",
 				"_category_direct_members",
 				"_mlikeor_screen_name-puser_id",
+				"_like_permission_names",
+				"_eq_permission_names",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name");
