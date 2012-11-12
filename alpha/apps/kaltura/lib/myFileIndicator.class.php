@@ -14,7 +14,7 @@ class myFileIndicator
 		}
 		
 		$this->file_name = $file_name;
-		$this->pattern = "/". $this->file_name . "\..*/";
+		$this->pattern = "/". $this->file_name . '\..*/';
 	}
 	
 	public function isIndicatorSet ()

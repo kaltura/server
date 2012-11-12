@@ -185,7 +185,7 @@ class myMultiRequest extends defPartnerservices2Action
 		{
 			$original_value = $value;
 			// we need the PREG_PATTERN_ORDER
-			$m = preg_match_all ( "/\{([^\}].*?)\}/" , $value , $matchs , PREG_SET_ORDER );
+			$m = preg_match_all ( '/\{([^\}].*?)\}/' , $value , $matchs , PREG_SET_ORDER );
 			if ( $m )
 			{
 //				echo "Replacing [$value]<br>" . print_r ( $matchs , true );
