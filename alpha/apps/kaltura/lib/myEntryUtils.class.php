@@ -44,6 +44,12 @@ class myEntryUtils
 		$target->setFavorites ( 0 );
 		$target->save(); 
 
+		$content = null;
+		$source_thumbnail_path = null;
+		$target_thumbnail_path = null;
+		$source_data_path = null;
+		$target_data_path = null;
+		
 		if ($echo)
 			echo "Copied " . $source->getId() . " (from kshow [" . $source->getKshowId() . "]) -> " . $target->getId() . "\n";
 
@@ -83,77 +89,6 @@ class myEntryUtils
 		//$target->save();
 
 		return $target;
-
-	}
-
-	// same as the deepCopy only modifies the content of the XML according to the $entry_map
-	// all relevant entries can be fetched from the entry_cache rather than hit the DB
-	// does not return any value - work on the $target_show_entry  which is assumed to already exist
-	// DEPRECATED NO NEED TO CHECK AGAIN - ONLY CALLED FROM SYSTEM / CLONEKSHOW
-	public static function old_deepCloneShowEntry ( entry $source_show_entry , entry $target_show_entry , array $entry_map , array $entry_cache )
-	{
-		$target_show_entry->setComments ( 0 );
-		$target_show_entry->setTotalRank ( 0 );
-		$target_show_entry->setRank ( 0 );
-		$target_show_entry->setViews ( 0 );
-		$target_show_entry->setVotes ( 0 );
-		$target_show_entry->setFavorites ( 0 );
-		$target_show_entry->save();
-
-		if ( myContentStorage::isTemplate($source_entry->getData()))
-		{
-			if ($echo)
-				echo ( "source thumbnail same as target. skipping file: " . $content . $source_thumbnail_path . "\n");
-		}
-		else
-		{
-			if ($echo)
-				echo ( "Copying file: " . $content . $source_thumbnail_path . " -> " .  $content . $target_thumbnail_path ."\n");
-
-			$sourceThumbFileKey = $source_show_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-			if(kFileSyncUtils::file_exists($sourceThumbFileKey))
-			{
-				$targetThumbFileKey = $target_show_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-				kFileSyncUtils::softCopy($sourceThumbFileKey, $targetThumbFileKey);
-			}
-			//myContentStorage::moveFile( $content . $source_thumbnail_path , $content . $target_thumbnail_path , false , true );
-		}
-
-		if ( myContentStorage::isTemplate($source_entry->getData()))
-		{
-			if ($echo)
-				echo ( "source same as target. skipping file: " . $content . $source_data_path . "\n");
-		}
-		else
-		{
-			// fix metadata
-
-			$source_show_entry_content = kFileSyncUtils::file_get_contents( $sourceDataFileKey  );
-			// fix the ShowVersion
-			$source_show_version = $source_show_entry->getData();
-			$target_show_version = $target_show_entry->getData();
-			// <ShowVersion>100016</ShowVersion>
-			$source_show_entry_content = str_replace( "<ShowVersion>$source_show_version</ShowVersion>" , "<ShowVersion>$target_show_version</ShowVersion>" , $source_show_entry_content );
-
-			// now replace entries
-			foreach ( $entry_map as $source_entry_id => $target_entry_id )
-			{
-				$source_entry = $entry_cache [$source_entry_id];
-				$target_entry = $entry_cache [$target_entry_id];
-				$source_file_name = $source_entry->getDataPath(); // replaced__getDataPath
-				$target_file_name = $target_entry->getDataPath(); // replaced__getDataPath
-
-				// k_id="11758"
-				$source_show_entry_content = str_replace( "k_id=\"$source_entry_id\"" , "k_id=\"$target_entry_id\"" , $source_show_entry_content );
-				// file_name="/content/entry/data/0/11/11787_100000.jpg"
-				//$source_show_entry_content = str_replace( "file_name=\"$source_file_name\"" , "file_name=\"$target_file_name\"" , $source_show_entry_content );
-				// a more general search - will fix file_name= & url=
-				$source_show_entry_content = str_replace( "$source_file_name\"" , "$target_file_name\"" , $source_show_entry_content );
-			}
-			$sourceDataFileKey = $source_show_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-			$targetDataFileKey = $target_show_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-			kFileSyncUtils::file_put_contents($targetDataFileKey, $source_show_entry_content);
-		}
 
 	}
 
