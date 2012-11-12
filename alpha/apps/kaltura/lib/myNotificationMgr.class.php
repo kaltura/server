@@ -18,7 +18,7 @@ class myNotificationMgr
 		$index = 1 + count ( $this->m_not_list );
 		$prefix = "not{$index}_";
 		
-		@list ( $temp_not_id  ,  $temp_not , $temp_url , $temp_params , $temp_serialized_params )= myNotificationMgr::createNotification ( $notification_type , $entry , $partner_id , $puser_id , $prefix );
+		@list ( $temp_not_id  ,  $temp_not , $temp_url , $temp_params , $temp_serialized_params )= myNotificationMgr::createNotification ( $notification_type , $object_data , $partner_id , $puser_id , $prefix );
 		@list ( $not_id  ,  $not , $url , $params , $serialized_params )= array ( $temp_not_id  ,  $temp_not , $temp_url , $temp_params , $temp_serialized_params );
 		
 		$this->m_not_list[] = $not;
@@ -27,7 +27,7 @@ class myNotificationMgr
 		{ // ERROR ! 
 		}
 		$this->m_url = $url; // assume all URLs are the same
-		array_merge ( $m_params , $params ); // accumulate the params
+		array_merge ( $this->m_params , $params ); // accumulate the params
 		$this->m_serialized_params = $serialized_params;
 	}
 	
@@ -46,6 +46,7 @@ class myNotificationMgr
 	public static function splitMultiNotifications ( $map , $desired_notification_prefix = null )
 	{
 		$debug ="";
+		$res = array();
 		$signature = $map ["sig"]; // must always exist
 		if ( isset ( $map["multi_notification"] ) &&   $map["multi_notification"] === "true" )
 		{
@@ -62,6 +63,7 @@ class myNotificationMgr
 				//	$not_property = @$not_name_parts[1];
 $debug .= "name: $name\n";				
 				$prefix = $not_name_parts;
+				$not_prefix = null;
 				if ( $desired_notification_prefix != null && $prefix == $not_prefix )
 				{
 					$not_data[$not_property] = $value;
@@ -70,7 +72,7 @@ $debug .= "name: $name\n";
 				{
 					$not_data = @$res[$prefix];
 //$debug .= "3(" . print_r ( $not_data , true ) . ")";					
-					if ( $nota_data == null )
+					if ( $not_data == null )
 					{
 						$res[$prefix] = array();
 						$not_data = &$res[$prefix]; 
@@ -370,7 +372,7 @@ $debug .= "property: $not_property = [$value]\n";
 		}
 		catch(Exception $ex)
 		{
-			KalturaLog::log("could not crack KS ['.kCurrentContext::$ks.'] for adding to notification param");
+			KalturaLog::log('could not crack KS ['.kCurrentContext::$ks.'] for adding to notification param');
 		}
 		
 		return serialize( $params );
