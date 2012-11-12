@@ -40,7 +40,7 @@ while(count($categoryKusers))
 	
 	$c->setOffset($c->getOffset() + count($categoryKusers));
 	kMemoryManager::clearMemory();
-	$entries = categoryKuserPeer::doSelect($c, $con);
+	$categoryKusers = categoryKuserPeer::doSelect($c, $con);
 }
 
 KalturaLog::log('Done. Current time: ' . time());
