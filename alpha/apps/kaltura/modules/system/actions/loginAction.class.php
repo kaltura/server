@@ -43,7 +43,7 @@ class loginAction extends kalturaSystemAction
 		}
 		else
 		{
-			if ( sha1($password) == kConf::get ( "system_pages_login_password" ) ) //self::$PASSWORD )
+			if ( kConf::hasParam ( "system_pages_login_password" ) && sha1($password) == kConf::get ( "system_pages_login_password" ) ) //self::$PASSWORD )
 			{
 				$this->systemAuthenticated();
 				

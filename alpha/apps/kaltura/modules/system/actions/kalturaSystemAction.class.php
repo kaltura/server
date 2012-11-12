@@ -50,7 +50,7 @@ abstract class kalturaSystemAction extends kalturaAction
 	protected function authKey ()
 	{
 		$ip = requestUtils::getRemoteAddress();
-		$hash = kConf::get ( "system_pages_login_password" );
+		$hash = kConf::hasParam ( "system_pages_login_password" ) ? kConf::get ( "system_pages_login_password" ) : uniqid();
 		return sha1($hash.$ip);
 	}
 }
