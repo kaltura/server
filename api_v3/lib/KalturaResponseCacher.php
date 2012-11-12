@@ -107,6 +107,8 @@ class KalturaResponseCacher extends kApiCache
 	
 	protected function sendCachingHeaders($usingCache)
 	{
+		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
+
 		// we should never return caching headers for non widget sessions since the KS can be ended and the CDN won't know
 		$isAnonymous = !$this->_ks || ($this->_ksObj && $this->_ksObj->isWidgetSession());
 		
