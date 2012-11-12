@@ -407,7 +407,7 @@ abstract class myBaseObject implements Iterator
 			}
 			else
 			{
-				throw Exception ( "encode/decode didn't work well - there are '=' characters within the name or the value of a serialized field" );
+				throw new Exception ( "encode/decode didn't work well - there are '=' characters within the name or the value of a serialized field" );
 			}
 
 			//		echo $name . "=" . $value ."<br>";

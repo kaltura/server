@@ -214,7 +214,8 @@ class myKshowMetadataCreator
 		$len_time = 8;
 		$start_time = 2;
 		$volume = 0.5;
-
+		$name = null;
+		
 		$asset .= self::createEntryComment( $entry );
 		$asset .= '<AudAsset seqPlayTime="' . $this->m_seq_play_time . '" type="' . $extended_type->type . '" name="' . $url_name->name . '" url="' . $url_name->url . '">' . "\n" .
 		'<StreamInfo file_name="' . $name . '"  start_time="' .$start_time . '" len_time="'. $len_time. '" volume="'. $volume .'" pan="0" />' . "\n" .

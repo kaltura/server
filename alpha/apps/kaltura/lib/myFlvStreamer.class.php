@@ -453,7 +453,7 @@ class myFlvStreamer
 
 	public static function modifiedByKeditor ( $content )
 	{
-		$xml_doc = new DOMDocument();
+		$xml_doc = new KDOMDocument();
 		$xml_doc->loadXML( $content );
 
 		$xpath = new DOMXPath($xml_doc);
@@ -469,7 +469,7 @@ class myFlvStreamer
 		}
 		else
 		{
-			$newTextNode = $doc ->createTextNode("keditor");
+			$newTextNode = $xml_doc ->createTextNode("keditor");
 			$modified = $xml_doc->createElement( "Modified" ) ;//, "keditor" );
 			$modified->appendChild ( $newTextNode );
 			$metadata_elem->appendChild ( $modified );
@@ -511,7 +511,7 @@ class myFlvStreamer
 		{
 			$value = $list->item(0)->nodeValue ;
 			// fix the value - leave only valid characters 
-			$editor_type = preg_replace ( "/[^a-zA-Z0-9\-_]/" , "" , $value  );
+			$editor_type = preg_replace ( '/[^a-zA-Z0-9\-_]/' , "" , $value  );
 			return;
 		}
 
@@ -872,4 +872,3 @@ self::log ( __METHOD__ , "after findBytesFromTimestamps" , $flv_file_name );
 		KalturaLog::log ( $s ); 
 	}
 }
-?>

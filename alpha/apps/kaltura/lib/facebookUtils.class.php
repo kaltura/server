@@ -210,7 +210,6 @@ class facebookUtils
 		$overlays = '';
 		$totalTime = 0;
 		
-		$soundtrackEntry = null;
 		$soundTimes = array();
 		$lastSoundTime = 0;
 		$isPrevVideo = null;
@@ -262,11 +261,6 @@ class facebookUtils
 							'</arguments>'.
 						'</EndTransition>'.
 					'</vidAsset>';
-			}
-			else if ( $type == "soundtrack")
-			{
-				$soundtrackEntry = $entry;
-	  			continue;
 			}
 			
 			if ($isPrevVideo === null)
