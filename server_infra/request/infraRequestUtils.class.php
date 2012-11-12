@@ -293,7 +293,7 @@ class infraRequestUtils
 			$headerIPs = explode(',', $headerIPs);
 			foreach ($headerIPs as $ip)
 			{
-				preg_match("/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/", trim($ip), $matches); // ignore any string after the ip address
+				preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', trim($ip), $matches); // ignore any string after the ip address
 				if (!isset($matches[0]))
 					continue;
 					
