@@ -19,6 +19,9 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
     protected function createUploadResult($values, $columns)
 	{
 	    $bulkUploadResult = parent::createUploadResult($values, $columns);
+	    if (!$bulkUploadResult)
+	    	return;
+	    
 		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadResultObjectType::CATEGORY_USER;
 				
 		// trim the values

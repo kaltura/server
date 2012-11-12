@@ -134,7 +134,7 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 	    if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
 		{
 			$this->exceededMaxRecordsEachRun = true;
-			return;
+			return null;
 		}
 		$this->handledRecordsThisRun++;
 		
