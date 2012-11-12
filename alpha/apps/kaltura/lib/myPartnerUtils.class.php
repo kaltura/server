@@ -446,23 +446,6 @@ class myPartnerUtils
 		return myConversionProfileUtils::getConversionProfile( $partner_id , $conversion_profile_id );
 	}
 	
-	/**
-	 * sets the current ConversionProfile for the partner
-	 */
-	public static function setCurrentConversionProfile ( $partner_id , $conversion_profile )
-	{
-		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ( ! $partner ) return null ; // VERY BAD !!	
-
-		$partner_current_conversion_profile = $partner->getCurrentConversionProfileType();
-
-		if ( $conversion_profile->getId() != $partner_current_conversion_profile )
-		{
-			$partner->setCurrentConversionProfileType( $partner_conv_profile->getId() );
-			$partner->save();
-		}	
-	}
-	
 	// TODO - cleanup !!
 		/**
 	 * return the ConversionProfile for this entry is specified on the entry or for the partner
@@ -1457,6 +1440,7 @@ class myPartnerUtils
 		if ($blockContries)
 		{
 			// check if request is coming from the blocked country - and block if it is
+			$currentCountry = null;
 			$blockedCountry = requestUtils::matchIpCountry( $blockContries , $currentCountry );
 			if ($blockedCountry)
 			{
