@@ -71,9 +71,11 @@ class kBatchJobLogManager implements kObjectCreatedEventConsumer, kObjectChanged
 	
 	protected function copyModifiedColumns (BatchJobLog $batchJobLog, BatchJob $batchJob, array $modifiedColumns)
 	{
-		$shouldSkipInTranslation = array(BatchJobPeer::LOCK_INFO, BatchJobPeer::HISTORY, BatchJobPeer::BATCH_JOB_LOCK_ID);
+		$shouldSkipInTranslation = array(BatchJobPeer::LOCK_INFO, BatchJobPeer::HISTORY, BatchJobPeer::BATCH_JOB_LOCK_ID,
+				BatchJobPeer::EXECUTION_STATUS);
 	    foreach ($modifiedColumns as $modifiedColumn)
 	    {
+	    	$fieldPosLog = -1;
 	        try 
 	        {
 	        	if(in_array($modifiedColumn, $shouldSkipInTranslation))
@@ -88,7 +90,9 @@ class kBatchJobLogManager implements kObjectCreatedEventConsumer, kObjectChanged
 	        {
 	            KalturaLog::err("Could not set value for BatchJobLog field $fieldName, exception thrown: ".$e->getMessage());
 	        }
-	        $batchJobLog->setByPosition($fieldPosLog, $batchJob->getByPosition($fieldPosJob));
+	        
+	        if($fieldPosLog != -1)
+	        	$batchJobLog->setByPosition($fieldPosLog, $batchJob->getByPosition($fieldPosJob));
 	        if ($modifiedColumn == BatchJobPeer::DATA)
 	        {
 	            //set param_1 for the $batchJobLog
