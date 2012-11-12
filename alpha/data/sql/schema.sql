@@ -625,11 +625,12 @@ CREATE TABLE `partner_load`
 	`job_type` INTEGER  NOT NULL,
 	`job_sub_type` INTEGER default 0 NOT NULL,
 	`partner_id` INTEGER  NOT NULL,
+	`dc` INTEGER  NOT NULL,
 	`partner_load` INTEGER,
 	`weighted_partner_load` INTEGER,
 	`custom_data` TEXT,
-	PRIMARY KEY (`job_type`,`job_sub_type`,`partner_id`),
-	KEY `partner_index`(`partner_id`, `job_type`, `job_sub_type`)
+	PRIMARY KEY (`job_type`,`job_sub_type`,`partner_id`,`dc`),
+	KEY `partner_index`(`partner_id`, `job_type`, `job_sub_type`, `dc`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
@@ -1662,6 +1663,7 @@ CREATE TABLE `category_kuser`
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	`category_full_ids` TEXT,
+	`permission_names` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_category_index`(`category_id`, `status`),
 	KEY `partner_id_kuser_index`(`kuser_id`, `status`, `category_id`),

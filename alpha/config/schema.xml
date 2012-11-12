@@ -648,6 +648,7 @@
 		<column primaryKey="true" required="true" autoIncrement="false" lazyLoad="false" name="job_type" type="integer" />
         <column primaryKey="true" required="false" autoIncrement="false" lazyLoad="false" name="job_sub_type" type="integer" default="0"/>
 		<column primaryKey="true" required="true" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
+        <column primaryKey="true" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_load" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="weighted_partner_load" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
@@ -655,6 +656,7 @@
 			<index-column name="partner_id" />
 			<index-column name="job_type" />
 			<index-column name="job_sub_type" />
+            <index-column name="dc" />
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="priority_group" raiseEvents="false">

@@ -22,11 +22,13 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 			$jobSubType = 0;
 		
 		$priorityFactor = PartnerPeer::getPartnerPriorityFactor($partnerId);
+		$dcId = kDataCenterMgr::getCurrentDcId();
 		
 		$c = new Criteria();
 		$c->add ( self::PARTNER_ID , $partnerId );
 		$c->add ( self::JOB_TYPE , $jobType );
 		$c->add ( self::JOB_SUB_TYPE, $jobSubType); 
+		$c->add ( self::DC, $dcId);
 		
 		$oldPartnerLoad = self::doSelectOne( $c );
 		
@@ -38,6 +40,7 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 				$partnerLoad->setJobType($jobType);
 				$partnerLoad->setJobSubType($jobSubType);
 				$partnerLoad->setPartnerLoad(1);
+				$partnerLoad->setDc($dcId);
 				$partnerLoad->setWeightedPartnerLoad($priorityFactor);
 				
 				$res = $partnerLoad->save();
@@ -55,6 +58,7 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 		$colJobType = PartnerLoadPeer::JOB_TYPE;
 		$colJobSubType = PartnerLoadPeer::JOB_SUB_TYPE;
 		$colPartnerId = PartnerLoadPeer::PARTNER_ID;
+		$colDC = PartnerLoadPeer::DC;
 		
 		$sql = "UPDATE $table ";
 		$sql .= "SET $colPartnerLoad = ($colPartnerLoad + 1)";
@@ -62,6 +66,7 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 		$sql .= "WHERE $colJobType = $jobType ";
 		$sql .= "AND $colJobSubType = $jobSubType ";
 		$sql .= "AND $colPartnerId = $partnerId ";
+		$sql .= "AND $colDC = $dcId ";
 		
 		$sql .= "LIMIT 1";
 			
@@ -81,9 +86,10 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 	 */
 	public static function getPartnerLoads()
 	{
-	
+		$dcId = kDataCenterMgr::getCurrentDcId();
 		$c = new Criteria();
 		$c->add(BatchJobLockPeer::WORKER_ID, null, Criteria::ISNOTNULL);
+		$c->add(BatchJobLockPeer::DC, $dcId);
 		$c->addGroupByColumn(BatchJobLockPeer::PARTNER_ID);
 		$c->addGroupByColumn(BatchJobLockPeer::JOB_TYPE);
 		$c->addGroupByColumn(BatchJobLockPeer::JOB_SUB_TYPE);
@@ -113,6 +119,7 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 			$partnerLoad->setPartnerId($partnerId);
 			$partnerLoad->setJobType($jobType);
 			$partnerLoad->setJobSubType($jobSubType);
+			$partnerLoad->setDc($dcId);
 				
 			$partnerLoad->setPartnerLoad($jobCount);
 			$partnerLoad->setWeightedPartnerLoad($jobCount * $priorityFactor);
@@ -128,6 +135,7 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 				
 			$actualPartnerLoads = PartnerLoadPeer::getPartnerLoads();
 			$c = new Criteria();
+			$c->add(PartnerLoadPeer::DC, kDataCenterMgr::getCurrentDcId());
 			$currentPartnerLoads = PartnerLoadPeer::doSelect($c);
 				
 			
