@@ -15,7 +15,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
         categoryKuserPeer::UPDATE_METHOD => "update_method" ,
         categoryKuserPeer::PERMISSION_NAMES => "permission_names" ,
         categoryKuserPeer::PARTNER_ID => "partner_id" ,
-        categoryKuserPeer::STATUS => "status" ,
+        categoryKuserPeer::STATUS => "category_kuser_status" ,
         categoryKuserPeer::CREATED_AT => "created_at" ,
         categoryKuserPeer::UPDATED_AT => "updated_at" ,
 	);
@@ -34,7 +34,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 				"update_method" => IIndexable::FIELD_TYPE_STRING,
 				"permission_names" => IIndexable::FIELD_TYPE_STRING,
 				"partner_id" => IIndexable::FIELD_TYPE_STRING,
-				"status" => IIndexable::FIELD_TYPE_STRING,
+				"category_kuser_status" => IIndexable::FIELD_TYPE_STRING,
 				"created_at" => IIndexable::FIELD_TYPE_DATETIME,
 				"updated_at" => IIndexable::FIELD_TYPE_DATETIME,
         );
