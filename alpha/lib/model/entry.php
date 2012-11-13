@@ -927,7 +927,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				$strict = false ;
 			}
 			
-			if ( $v == null ) $v = $this->data_content;
+			if ( $v === null ) $v = $this->data_content;
 			else $this->data_content = $v;  // store it so it can be used with getDataContent(true) is called
 
 			if ( $v !== null )
