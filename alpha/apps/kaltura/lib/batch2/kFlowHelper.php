@@ -1296,6 +1296,12 @@ class kFlowHelper
 		KalturaLog::debug("Export to storage finished for sync file[" . $data->getSrcFileSyncId() . "]");
 
 		$fileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
+		if(!$fileSync)
+		{
+			KalturaLog::err("FileSync [" . $data->getSrcFileSyncId() . "] not found");
+			return $dbBatchJob;
+		}
+			
 		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
 		$fileSync->save();
 
@@ -1339,6 +1345,12 @@ class kFlowHelper
 			return $dbBatchJob;
 		}
 		$fileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
+		if(!$fileSync)
+		{
+			KalturaLog::err("FileSync [" . $data->getSrcFileSyncId() . "] not found");
+			return $dbBatchJob;
+		}
+		
 		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
 		$fileSync->save();
 		
@@ -1368,6 +1380,12 @@ class kFlowHelper
 	    KalturaLog::debug("Remote storage file deletion finished for fileysnc ID:[ ". $data->getSrcFileSyncId() ."]");
 	    
 	    $fileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
+		if(!$fileSync)
+		{
+			KalturaLog::err("FileSync [" . $data->getSrcFileSyncId() . "] not found");
+			return $dbBatchJob;
+		}
+		
 		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_DELETED);
 		$fileSync->save();
 		
