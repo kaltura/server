@@ -145,6 +145,8 @@ class PlaylistService extends KalturaEntryService
 		
 		$playlist->playlistType = $dbPlaylist->getMediaType();
 		
+		
+		
 		// Added the following 2 lines in order to make the permission verifications in toUpdatableObject work on the actual db object
 		// TODO: the following use of autoFillObjectFromObject should be replaced by a normal toUpdatableObject
 		$tmpDbPlaylist = clone $dbPlaylist;
@@ -152,8 +154,8 @@ class PlaylistService extends KalturaEntryService
 		
 		$playlistUpdate = null;
 		$playlistUpdate = $playlist->toUpdatableObject($playlistUpdate);
-
 		
+		$emptyContent = false;
 		
 		$this->checkAndSetValidUserUpdate($playlist, $playlistUpdate);
 		$this->checkAdminOnlyUpdateProperties($playlist);
@@ -173,7 +175,7 @@ class PlaylistService extends KalturaEntryService
 		// copy properties from the playlistUpdate to the $dbPlaylist
 		baseObjectUtils::autoFillObjectFromObject ( $playlistUpdate , $dbPlaylist , $allowEmpty );
 		// after filling the $dbPlaylist from  $playlist - make sure the data content is set properly
-		if ( $playlistUpdate->getDataContent(true) ) $dbPlaylist->setDataContent ( $playlistUpdate->getDataContent(true)  );
+		if ( !is_null($playlistUpdate->getDataContent(true))) $dbPlaylist->setDataContent ( $playlistUpdate->getDataContent(true)  );
 
 		myPlaylistUtils::validatePlaylist( $dbPlaylist );
 		
