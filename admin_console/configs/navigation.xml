@@ -94,24 +94,6 @@
 			</entry-investigation>
 		</pages>
 	</batch-proccess-control>
-	<monitoring>
-		<label>Monitoring</label>
-		<controller>monitoring</controller>
-		<action>dynamic_action</action>
-
-		<pages>
-			<xymon>
-				<label>Status</label>
-				<controller>monitoring</controller>
-				<action>xymon</action>
-			</xymon>
-			<ack-alerts>
-				<label>Acknowledge Alerts</label>
-				<controller>monitoring</controller>
-				<action>ack-alerts</action>
-			</ack-alerts>
-		</pages>
-	</monitoring>
 	<developer>
 		<label>Developer</label>
 		<controller>index</controller>

@@ -1216,52 +1216,6 @@ body#batch-entry-lifecycle #frmSearch {
 	clear: both;
 }
 
-/*
-  body#monitoring-xymon #wrapper { padding-left:22px;}
-  body#monitoring-xymon table td { min-width:60px; text-align:center;}
-   body#monitoring-xymon table td img { vertical-align:middle;}
-  body#monitoring-xymon table caption { text-align:left; font-weight:bold;}
-  body#monitoring-xymon table colgroup { text-align:left;}
-  body#monitoring-xymon table th { text-align:center;}
-  body#monitoring-xymon fieldset { margin: 0 0 15px; font-weight:bold;}
-  body#monitoring-xymon p { margin: 20px auto; text-align:center;}
-  table { clear:both;}
-*/
-body#monitoring-xymon {
-	
-}
-
-body#monitoring-xymon #wrapper {
-	margin: 0 auto;
-}
-
-body#monitoring-xymon table {
-	min-width: 99px;
-	margin: 10px 0 20px;
-}
-
-body#monitoring-xymon table,body#monitoring-xymon td,body#monitoring-xymon th
-	{
-	border: 0
-}
-
-body#monitoring-xymon tbody td {
-	max-width: 1450px;
-	overflow: visible;
-}
-
-body#monitoring-xymon tbody tr:hover td {
-	background: transparent;
-}
-
-body#monitoring-xymon th {
-	background: transparent;
-}
-
-body#monitoring-xymon hr {
-	margin: 0 0 10px;
-}
-
 body#batch-in-progress-tasks table {
 	
 }  /* 975 */
@@ -1662,30 +1616,6 @@ a.investigate:hover,a.taskinfo:hover,a.lifecycle:hover {
 
 .nowrap {
 	white-space: nowrap;
-}
-
-body#monitoring-enable-disable table table,body#monitoring-enable-disable table table td
-	{
-	border: none;
-}
-
-body#monitoring-enable-disable tr,body#monitoring-enable-disable tr:hover td
-	{
-	background: #fff;
-}
-
-body#monitoring-enable-disable table,body#monitoring-enable-disable td {
-	min-width: 1% !important;
-	max-width: none !important;
-}
-
-body#monitoring-enable-disable select {
-	width: auto !important;
-	height: auto !important;
-}
-
-body#monitoring-enable-disable input[type="checkbox"] {
-	margin: 0;
 }
 
 body#index-apc #wrapper {
