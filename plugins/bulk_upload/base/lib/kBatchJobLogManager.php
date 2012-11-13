@@ -78,8 +78,12 @@ class kBatchJobLogManager implements kObjectCreatedEventConsumer, kObjectChanged
 	    	$fieldPosLog = -1;
 	        try 
 	        {
-	        	if(in_array($modifiedColumn, $shouldSkipInTranslation))
+	        	if(in_array($modifiedColumn, $shouldSkipInTranslation)) {
+	        		if($modifiedColumn == BatchJobPeer::EXECUTION_STATUS) 
+	        			$batchJobLog->setAbort($batchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED);
+	        			
 	        		continue;
+	        	}
 	        	
     	        $fieldName = BatchJobPeer::translateFieldName($modifiedColumn, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME);
     	        
