@@ -136,7 +136,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			}
 			
 			$uniqid = uniqid('thumb_');
-			$thumbPath = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
+			$thumbPath = $rootPath . DIRECTORY_SEPARATOR . $uniqid;
 			
 			$quality = $thumbParamsOutput->quality;
 			$cropType = $thumbParamsOutput->cropType;

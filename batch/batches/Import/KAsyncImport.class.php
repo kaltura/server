@@ -334,7 +334,7 @@ class KAsyncImport extends KJobHandlerWorker
 				die(); 
 			}
 			$uniqid = uniqid('import_');
-			$sharedFile = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
+			$sharedFile = $rootPath . DIRECTORY_SEPARATOR . $uniqid;
 			
 			$ext = pathinfo($destFile, PATHINFO_EXTENSION);
 			if(strlen($ext))

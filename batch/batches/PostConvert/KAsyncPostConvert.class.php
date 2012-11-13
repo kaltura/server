@@ -112,6 +112,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		{
 			$mediaInfo->flavorAssetId = $data->flavorAssetId;
 			$createdMediaInfo = $this->getClient()->batch->addMediaInfo($mediaInfo);
+			/* @var $createdMediaInfo KalturaMediaInfo */
 			
 			// must save the mediaInfoId before reporting that the task is finished
 			$this->updateJob($job, "Saving media info id $createdMediaInfo->id", KalturaBatchJobStatus::PROCESSED, $data);
@@ -126,7 +127,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 				
 			// creates the path
 			$uniqid = uniqid('thumb_');
-			$thumbPath = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
+			$thumbPath = $rootPath . DIRECTORY_SEPARATOR . $uniqid;
 			
 			$videoDurationSec = floor($mediaInfo->videoDuration / 1000);
 			$data->thumbOffset = max(0 ,min($data->thumbOffset, $videoDurationSec));

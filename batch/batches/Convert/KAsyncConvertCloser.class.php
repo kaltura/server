@@ -172,8 +172,6 @@ class KAsyncConvertCloser extends KJobCloserWorker
 			die();
 		}
 		
-		@chmod($sharedFile, 0777);
-		@chmod("$sharedFile.log", 0777);
 		$data->destFileSyncLocalPath = $sharedFile;
 		$data->logFileSyncLocalPath = "$sharedFile.log";
 		

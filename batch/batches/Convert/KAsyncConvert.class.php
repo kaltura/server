@@ -262,7 +262,6 @@ class KAsyncConvert extends KJobHandlerWorker
 				die();
 			}
 			
-			@chmod($sharedFile, 0777);
 			$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
 			
 			if($this->taskConfig->params->isRemoteOutput) // for remote conversion
