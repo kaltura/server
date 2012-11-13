@@ -10,10 +10,10 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 	 */
 	public function parse($content)
 	{
-		$xml = new DOMDocument();
+		$xml = new KDOMDocument();
 		try
 		{
-			$xml->loadXML($content);
+			$xml->loadXML(trim($content, " \r\n\t"));
 		}
 		catch(Exception $e)
 		{
