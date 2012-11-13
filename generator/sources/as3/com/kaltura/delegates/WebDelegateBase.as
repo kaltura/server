@@ -30,11 +30,11 @@ package com.kaltura.delegates {
 	import com.kaltura.config.IKalturaConfig;
 	import com.kaltura.config.KalturaConfig;
 	import com.kaltura.core.KClassFactory;
+	import com.kaltura.encryption.MD5;
 	import com.kaltura.errors.KalturaError;
 	import com.kaltura.events.KalturaEvent;
 	import com.kaltura.net.KalturaCall;
-	import com.kaltura.encryption.MD5;
-
+	
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -262,6 +262,12 @@ package com.kaltura.delegates {
 
 
 		// Event Handlers
+		
+		/**
+		 * try to process received data. 
+		 * if procesing failed, let call handle the processing error
+		 * @param event load complete event
+		 */
 		protected function onDataComplete(event:Event):void {
 			try {
 				handleResult(XML(event.target.data));
@@ -275,13 +281,19 @@ package com.kaltura.delegates {
 		}
 
 
+		/**
+		 * handle io or security error events from the loader.
+		 * create relevant KalturaError, let the call process it. 
+		 * @param event
+		 */
 		protected function onError(event:ErrorEvent):void {
 			clean();
 			var kError:KalturaError = createKalturaError(event, loader.data);
 
 			if (!kError) {
+				kError = new KalturaError();
 				kError.errorMsg = event.text;
-					//kError.errorCode;
+				//kError.errorCode;
 			}
 
 			call.handleError(kError);
@@ -291,9 +303,9 @@ package com.kaltura.delegates {
 
 
 		/**
-		* parse the server's response and let the call process it.
+		 * parse the server's response and let the call process it.
 		 * @param result  server's response
-		*/
+		 */
 		protected function handleResult(result:XML):void {
 			clean();
 
@@ -351,16 +363,19 @@ package com.kaltura.delegates {
 
 
 		/**
-		* If the result string holds an error, return a KalturaError object with
+		 * If the result string holds an error, return a KalturaError object with
 		 * relevant values. <br/>
-		* Overide this to create validation object and fill it.
-		* @param result  the string returned from the server.
-		* @return  matching error object
+		 * Overide this to create validation object and fill it.
+		 * @param result  the string returned from the server.
+		 * @return  matching error object
 		 */
 		protected function validateKalturaResponse(result:String):KalturaError {
 			var kError:KalturaError = null;
 			var xml:XML = XML(result);
-			if (xml.result.hasOwnProperty('error')) {
+			if (xml.result.hasOwnProperty('error') 
+				&& xml.result.error.hasOwnProperty('code')
+				&& xml.result.error.hasOwnProperty('message')) {
+				
 				kError = new KalturaError();
 				kError.errorCode = String(xml.result.error.code);
 				kError.errorMsg = xml.result.error.message;
@@ -371,7 +386,12 @@ package com.kaltura.delegates {
 		}
 
 
-		//Overide this to create error object and fill it
+		/**
+		 * create error object and fill it with relevant details
+		 * @param event
+		 * @param loaderData
+		 * @return detailed KalturaError to be processed
+		 */
 		protected function createKalturaError(event:ErrorEvent, loaderData:*):KalturaError {
 			var ke:KalturaError = new KalturaError();
 			return ke;
