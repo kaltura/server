@@ -12,4 +12,5 @@ interface ConditionType extends BaseEnum
 	const USER_AGENT = 5;
 	const FIELD_MATCH = 6;
 	const FIELD_COMPARE = 7;
+	const ASSET_PROPERTIES_COMPARE = 8;
 }
