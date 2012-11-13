@@ -5,7 +5,7 @@
  * @package plugins.eventNotification
  * @subpackage model.data
  */
-class KalturaEmailNotificationCategoryRecipientsProvider extends KalturaEmailNotificationRecipientsProvider
+class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNotificationRecipientProvider
 {
 	/**
 	 * The ID of the category whose subscribers should receive the email notification.

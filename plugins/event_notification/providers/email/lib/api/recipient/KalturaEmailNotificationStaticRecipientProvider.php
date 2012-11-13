@@ -5,7 +5,7 @@
  * @package plugins.eventNotification
  * @subpackage model.data
  */
-class KalturaEmailNotificationStaticRecipientsProvider extends KalturaEmailNotificationRecipientsProvider
+class KalturaEmailNotificationStaticRecipientProvider extends KalturaEmailNotificationRecipientProvider
 {
 	/**
 	 * Email to emails and names
