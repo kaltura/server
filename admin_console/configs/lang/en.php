@@ -1016,9 +1016,9 @@ return array(
 	'provider-list intro text'	=>	'Here you can define and manage generic distribution settings to be used in several Distribution Profiles. To have these settings available for all publisher accounts, define the setting to publisher ID: 0',
 	'distribution-profiles intro text' =>	'Here you can manage the Distribution profiles on your Kaltura video platform deployment',
     'are you sure delete the profile?' => 'Are you sure you want to delete this profile?',   
-    'profile was removed' => 'Storage profile was removed.' ,
-    'profile was disabled' => 'Profile disabled.',
-    'profile was enabled' => 'Profile enabled.',
+    'distribution-profile was removed' => 'Distribution profile was removed.' ,
+    'distribution-profile was disabled' => 'Distribution profile disabled.',
+    'distribution-profile was enabled' => 'Distribution profile enabled.',
 
 	// Drop Folder
 	'drop folder list intro text' => 'Here you can manage the Drop Folder profiles on your Kaltura video platform deployment',

@@ -123,7 +123,7 @@ function disableProfile(profileId){
 		profileId, 
 		<?php echo Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus::DISABLED; ?>, 
 		function() {
-			alert('<?php echo $this->translate('profile was disabled');?>');
+			alert('<?php echo $this->translate('distribution-profile was disabled');?>');
 		}
 	);
 }
@@ -133,7 +133,7 @@ function enableProfile(profileId){
 		profileId, 
 		<?php echo Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus::ENABLED; ?>, 
 		function() {
-			alert('<?php echo $this->translate('profile was enabled');?>');
+			alert('<?php echo $this->translate('distribution-profile was enabled');?>');
 		}
 	);
 }
@@ -148,7 +148,7 @@ function remove(profileId)
 		profileId, 
 		<?php echo Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus::DELETED; ?>, 
 		function() {
-			alert('<?php echo $this->translate('profile was removed');?>');
+			alert('<?php echo $this->translate('distribution-profile was removed');?>');
 		}
 	);
 }
