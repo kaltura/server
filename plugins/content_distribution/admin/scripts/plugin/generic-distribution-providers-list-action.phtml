@@ -145,8 +145,8 @@ var dialogDiv;
 function newGenericProvider() {
 	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'GenericDistributionProviderConfigureAction')); ?>';
 	
-	jQuery('#partner-configure-dialog').remove();
-	dialogDiv = jQuery('<div id="storage-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	jQuery('#provider-configure-dialog').remove();
+	dialogDiv = jQuery('<div id="provider-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 	
 	dialogDiv.dialog({
 		bgiframe: true,
