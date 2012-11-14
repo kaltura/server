@@ -509,4 +509,40 @@ class MetadataService extends KalturaBaseService
         KalturaLog::err('Failed XML [$xmlData] transformation for metadata with XSL [$xsltString]');
 	    return null;
 	}
+	
+	/**
+	 * Action transforms current metadata object XML using a provided XSL.
+	 * @action updateFromXSL
+	 * 
+	 * @param int $id
+	 * @param file $xsl
+	 * @throws MetadataError::XSLT_VALIDATION_ERROR
+	 * @throws MetadataErrors::METADATA_FILE_NOT_FOUND
+	 * @throws MetadataErrors::METADATA_NOT_FOUND
+	 */
+	public function updateFromXSLAction ($id, $xslFile)
+	{
+		$dbMetadataObject = MetadataPeer::retrieveByPK($id);
+		if (!$dbMetadataObject)
+			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND);
+		
+		$xslFilePath = $xslFile['tmp_name'];
+		if(!file_exists($xslFilePath))
+			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xslFile['name']);
+		
+		$xslData = file_get_contents($xslFilePath);
+		@unlink($xslFilePath);
+		
+		$dbMetadataObjectFileSyncKey = $dbMetadataObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+		
+		$xsltErrors = array();
+		$transformMetadataObjectData = kXml::transformXmlUsingXslt(kFileSyncUtils::file_get_contents($dbMetadataObjectFileSyncKey), $xslData, null, $xsltErrors);
+		
+		if ( count($xsltErrors))
+		{
+			throw new KalturaAPIException(MetadataErrors::XSLT_VALIDATION_ERROR, implode(',', $xsltErrors));
+		}
+		
+		return $this->updateAction($id, $transformMetadataObjectData);
+	}
 }
