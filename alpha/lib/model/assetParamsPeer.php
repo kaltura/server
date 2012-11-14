@@ -300,15 +300,12 @@ class assetParamsPeer extends BaseassetParamsPeer
 
 	public static function getIds(Criteria $criteria, $con = null)
 	{
-		$result = array();
-		$objects = assetParamsPeer::doSelect($criteria, $con);
-		foreach ($objects as $object)
-		{
-			$result[] = $object->getId();
-		}
-		
-		return $result;		
+		$criteria->addSelectColumn(assetParamsPeer::ID);
+
+		$stmt = assetParamsPeer::doSelectStmt($criteria, $con);
+		return $stmt->fetchAll(PDO::FETCH_COLUMN);
 	}
+	
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("flavorParams:id=%s", self::ID), array("flavorParams:partnerId=%s", self::PARTNER_ID));		
