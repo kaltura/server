@@ -515,7 +515,7 @@ class MetadataService extends KalturaBaseService
 	 * @action updateFromXSL
 	 * 
 	 * @param int $id
-	 * @param file $xsl
+	 * @param file $xslFile
 	 * @throws MetadataErrors::XSLT_VALIDATION_ERROR
 	 * @throws MetadataErrors::METADATA_FILE_NOT_FOUND
 	 * @throws MetadataErrors::METADATA_NOT_FOUND
