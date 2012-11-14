@@ -387,7 +387,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	protected static function addMetadataWithProfileId (BaseObject $object, array $data)
 	{
 	    $metadataProfileId = $data[self::BULK_UPLOAD_COLUMN_PROFILE_ID];
-		$metadataProfile = MetadataProfilePeer::retrieveById($metadataProfileId);
+		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
 		if(!$metadataProfile)
 		{
 			$errorMessage = "Metadata profile [$metadataProfileId] not found";

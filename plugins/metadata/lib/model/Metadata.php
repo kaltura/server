@@ -150,7 +150,7 @@ class Metadata extends BaseMetadata implements ISyncableFile
 	public function getMetadataProfile()
 	{
 		if ($this->aMetadataProfile === null && $this->metadata_profile_id) 
-			$this->aMetadataProfile = MetadataProfilePeer::retrieveById($this->metadata_profile_id);
+			$this->aMetadataProfile = MetadataProfilePeer::retrieveByPK($this->metadata_profile_id);
 			
 		return $this->aMetadataProfile;
 	}

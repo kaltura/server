@@ -71,7 +71,7 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer
 			$metadataProfileId = kObjectCopyHandler::getMappedId('MetadataProfile', $metadata->getMetadataProfileId());
 			if($metadataProfileId)
 			{
-				$metadataProfile = MetadataProfilePeer::retrieveById($metadataProfileId);
+				$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
 				
 				if($metadataProfile)
 				{

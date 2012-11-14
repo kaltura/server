@@ -26,25 +26,6 @@ class MetadataProfilePeer extends BaseMetadataProfilePeer
 	}
 	
 	/**
-	 * Retrieve a single object by pkey.
-	 *
-	 * @param      int $id the primary key.
-	 * @param      int $version the version number.
-	 * @param      PropelPDO $con the connection to use
-	 * @return     MetadataProfile
-	 */
-	public static function retrieveById($id, $version = null, PropelPDO $con = null)
-	{
-		$criteria = new Criteria();
-		$criteria->add(MetadataProfilePeer::ID, $id);
-		
-		if($version)
-			$criteria->add(MetadataProfilePeer::VERSION, $version);
-		
-		return MetadataProfilePeer::doSelectOne($criteria, $con);
-	}
-	
-	/**
 	 * Retrieve a single object by system name (object is retrieved for the current partner).
 	 *
 	 * @param      int $systemName the system name
