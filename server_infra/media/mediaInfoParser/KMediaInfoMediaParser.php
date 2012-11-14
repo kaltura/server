@@ -185,6 +185,7 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				if ($mediaInfo->audioSamplingRate < 1000)
 					$mediaInfo->audioSamplingRate *= 1000;
 				break;
+			case "bit depth":
 			case "resolution":
 				$mediaInfo->audioResolution = (int)self::trima($val);
 				break;
