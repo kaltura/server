@@ -29,6 +29,16 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 	{
 		$output = $this->getRawMediaInfo();
 		$kMi = $this->parseOutput($output);
+			/*
+			 * Following code patching mediainfo 0.7.61 misbehaviour with interlaced mjpa sources - the height value is halved.
+			 * This behavior did not appear on the older 0.7.28
+			 */
+		if(isset($kMi) && isset($kMi->videoHeightTmp) 
+		&& isset($kMi->videoCodecId) && $kMi->videoCodecId=="mjpa"
+		&& isset($kMi->scanType) && $kMi->scanType==1){
+			$kMi->videoHeight = $kMi->videoHeightTmp;
+		}
+
 		$durLimit=3600000;
 		if(get_class($this)=='KMediaInfoMediaParser'
 		&& ((isset($kMi->containerDuration) && $kMi->containerDuration>$durLimit) 
@@ -206,9 +216,24 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				$mediaInfo->videoBitRateMode; // FIXME
 				break; 
 			case "width":
+					/*
+					 * 0.7.61 fixes- prefer 'original width'.
+					 */
+				if(isset($mediaInfo->videoWidth) && $mediaInfo->videoWidth>0){
+					break;
+				}
+			case "original width":
 				$mediaInfo->videoWidth = (int)self::trima($val);
 				break;
 			case "height":
+					/*
+					 * 0.7.61 fixes- prefer 'original height'.
+					 */
+				$mediaInfo->videoHeightTmp=(int)self::trima($val);
+				if(isset($mediaInfo->videoHeight) && $mediaInfo->videoHeight>0){
+					break;
+				}
+			case "original height":
 				$mediaInfo->videoHeight = (int)self::trima($val);
 				break;
 			case "frame rate":
@@ -223,26 +248,11 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				}
 				break;
 			case "display aspect ratio":
-				$val = self::trima($val);
-				if(strstr($val, ":")==true){
-					$darW = trim(substr($val, 0, strpos($val, ":")));
-					$darH = trim(substr(strstr($val, ":"),1));
-					if($darW>0)
-						$mediaInfo->videoDar = $darW / $darH;
-					else
-						$mediaInfo->videoDar = null;
+				if(isset($mediaInfo->videoDar) && $mediaInfo->videoDar>0){
+					break;
 				}
-				else if(strstr($val, "/")==true){
-					$darW = trim(substr($val, 0, strpos($val, "/")));
-					$darH = trim(substr(strstr($val, "/"),1));
-					if($darW>0)
-						$mediaInfo->videoDar = $darW / $darH;
-					else
-						$mediaInfo->videoDar = null;
-				}
-				else if($val) {
-					$mediaInfo->videoDar = (float)$val;
-				}
+			case "original display aspect ratio":
+				$mediaInfo->videoDar = self::calcDar($val);
 				break;
 			case "rotation":
 				$mediaInfo->videoRotation = (int)self::trima($val);
@@ -323,4 +333,29 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 			
 		return (float)$kbps;
 	}
+	
+	private static function calcDar($val)
+	{
+		$val = self::trima($val);
+		if(strstr($val, ":")==true){
+			$darW = trim(substr($val, 0, strpos($val, ":")));
+			$darH = trim(substr(strstr($val, ":"),1));
+			if($darW>0)
+				return $darW / $darH;
+			else
+				return null;
+		}
+		else if(strstr($val, "/")==true){
+			$darW = trim(substr($val, 0, strpos($val, "/")));
+			$darH = trim(substr(strstr($val, "/"),1));
+			if($darW>0)
+				return $darW / $darH;
+			else
+				return null;
+		}
+		else if($val) {
+			return (float)$val;
+		}
+	}
+
 }
