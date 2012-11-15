@@ -344,7 +344,7 @@ class KAutoloader
 	public static function safeFilePutContents($filePath, $var)
 	{
 		// write to a temp file and then rename, so that the write will be atomic
-		$tempFilePath = tempnam(dirname($filePath), basename($filePath));
+		$tempFilePath = "$filePath.tmp";
 		if (file_put_contents($tempFilePath, $var) === false)
 			return false;
 		if (rename($tempFilePath, $filePath) === false)
