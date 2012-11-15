@@ -13,7 +13,7 @@ class previewAction extends kalturaAction
 {
 	public function execute ( ) 
 	{
-		$this->uiconf_id = $this->getRequestParameter('uiconf_id');
+		$this->uiconf_id = intval($this->getRequestParameter('uiconf_id'));
 		if(!$this->uiconf_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'uiconf_id');
 
@@ -21,12 +21,12 @@ class previewAction extends kalturaAction
 		if(!$this->uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
 
-		$this->partner_id = $this->getRequestParameter('partner_id', $this->uiConf->getPartnerId());
+		$this->partner_id = intval($this->getRequestParameter('partner_id', $this->uiConf->getPartnerId()));
 		if(!$this->partner_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'partner_id');
 
 		// Single Player parameters
-		$this->entry_id = $this->getRequestParameter('entry_id');
+		$this->entry_id = htmlspecialchars($this->getRequestParameter('entry_id'));
 		if( $this->entry_id ) {
 			$entry = entryPeer::retrieveByPK($this->entry_id);
 			if( $entry ) {
@@ -51,7 +51,7 @@ class previewAction extends kalturaAction
 
 		// Playlist Parameters
 		$this->playlist_id = $this->getRequestParameter('playlist_id');
-		$this->playlist_name = $this->getRequestParameter('playlist_name');
+		$this->playlist_name = htmlspecialchars($this->getRequestParameter('playlist_name'));
 
 		$this->partner_host = myPartnerUtils::getHost($this->partner_id);
 		$this->partner_cdnHost = myPartnerUtils::getCdnHost($this->partner_id);
