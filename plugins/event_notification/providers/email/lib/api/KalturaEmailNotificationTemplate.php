@@ -38,26 +38,26 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	
 	/**
 	 * Email recipient emails and names
-	 * @var KalturaEmailNotificationRecipientArray
+	 * @var KalturaEmailNotificationRecipientProvider
 	 */
 	public $to;
 	
 	/**
-	 * Email cc emails and names
-	 * @var KalturaEmailNotificationRecipientArray
+	 * Email recipient emails and names
+	 * @var KalturaEmailNotificationRecipientProvider
 	 */
 	public $cc;
 	
 	/**
-	 * Email bcc emails and names
-	 * @var KalturaEmailNotificationRecipientArray
+	 * Email recipient emails and names
+	 * @var KalturaEmailNotificationRecipientProvider
 	 */
 	public $bcc;
 	
 	/**
 	 * Default email addresses to whom the reply should be sent. 
 	 * 
-	 * @var KalturaEmailNotificationRecipientArray
+	 * @var KalturaEmailNotificationRecipientProvider
 	 */
 	public $replyTo;
 	
@@ -76,7 +76,7 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	public $confirmReadingTo;
 	
 	/**
-	 * Hostname to use in Message-Id and Received headers and as default HELO string. 
+	 * Hostname to use in Message-Id and Received headers and as default HELLO string. 
 	 * If empty, the value returned by SERVER_NAME is used or 'localhost.localdomain'.
 	 * 
 	 * @var string
