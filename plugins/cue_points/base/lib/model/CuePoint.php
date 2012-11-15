@@ -48,16 +48,10 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		if(!$this->getPartnerId())
 			throw new Exception("Partner id must be set in order to load puser [$puserId]");
 			
-		$this->puserId = $puserId;
 		$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $puserId, true);
 		if(!$kuser)
-		{
-			$isAdmin = false;
-//			if($puserId == kCurrentContext::$uid)
-//				$isAdmin = kCurrentContext::$is_admin_session;
-				
-			$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $puserId, $isAdmin);
-		}
+			$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $puserId);
+			
 		$this->setKuserId($kuser->getId());
 	} 
 	
@@ -93,7 +87,8 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		$children = $this->getChildren();
 		foreach($children as $child)
 		{
-			if ($children->isDescendant($cuePointId))
+			/* @var $child CuePoint */
+			if ($child->isDescendant($cuePointId))
 				return true;
 		}
 		
