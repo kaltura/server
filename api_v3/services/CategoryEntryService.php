@@ -46,8 +46,16 @@ class CategoryEntryService extends KalturaBaseService
 		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)
 		{
 			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
-			if(!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
+			if(!$categoryKuser)
+			{
+				KalturaLog::err("User [" . kCurrentContext::getCurrentKsKuserId() . "] is not a member of the category [{$categoryEntry->categoryId}]");
 				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+			}
+			if($categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
+			{
+				KalturaLog::err("User [" . kCurrentContext::getCurrentKsKuserId() . "] permission level [" . $categoryKuser->getPermissionLevel() . "] on category [{$categoryEntry->categoryId}] is not member [" . CategoryKuserPermissionLevel::MEMBER . "]");
+				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+			}
 				
 			if($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&
 				$entry->getKuserId() != kCurrentContext::getCurrentKsKuserId() && 
