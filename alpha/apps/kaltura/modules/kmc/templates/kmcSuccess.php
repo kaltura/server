@@ -33,6 +33,7 @@ $flash_dir .= $www_host .'/'. myContentStorage::getFSFlashRootPath ();
 <script type="text/javascript">
 var options = {
 	service_url: "<?php echo $service_url ?>",
+	secure_login: <?php echo (kConf::get('kmc_secured_login') || $https_enabled) ? 'true' : 'false'; ?>,
 	swf_url: "<?php echo $flash_dir ?>/kmc/login/<?php echo $kmc_login_version ?>/login.swf",
 	flashVars: {
 		host: "<?php echo $www_host; ?>",
