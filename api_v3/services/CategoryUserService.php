@@ -261,7 +261,7 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	function listAction(KalturaCategoryUserFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if(!($filter->categoryIdEqual || $filter->categoryIdIn || $filter->userIdIn || $filter->userIdEqual))
+		if(!($filter->categoryIdEqual || $filter->categoryIdIn || $filter->categoryFullIdsStartsWith || $filter->categoryFullIdsEqual || $filter->userIdIn || $filter->userIdEqual))
 			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_USERS_OR_CATEGORY);			
 		
 		if (!$filter)
@@ -282,7 +282,10 @@ class CategoryUserService extends KalturaBaseService
 			
 			$usersIds = array();
 			foreach($kusers as $kuser)
+			{
+				/* @var $kuser kuser */
 				$usersIds[] = $kuser->getId();
+			}
 				
 			$filter->userIdIn = implode(',', $usersIds);
 		}
