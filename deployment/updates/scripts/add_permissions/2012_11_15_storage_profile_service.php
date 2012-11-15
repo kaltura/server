@@ -9,5 +9,5 @@
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/scripts/utils/permissions/addPermissionsAndItems.php';
-$config = realpath(dirname(__FILE__)) . '/configs/storage_profile_list_imersonate.ini';
+$config = realpath(dirname(__FILE__)) . '/configs/storage_profile_service.ini';
 passthru("php $script $config");
