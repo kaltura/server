@@ -1136,10 +1136,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->kClient->category->listAction($categoryFilter);
 			}
 			$responses = $this->kClient->doMultiRequest();
-			
 			if($update)
 			{
-				$categoryEntryListResponse = each($responses);
+				$categoryEntryListResponse = array_shift($responses);
 				/* @var $categoryEntryListResponse KalturaCategoryEntryListResponse */
 				
 				foreach($categoryEntryListResponse->objects as $categoryEntry)
@@ -1151,7 +1150,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 			if($categories)
 			{
-				$categoryListResponse = each($responses);
+				$categoryListResponse = array_shift($responses);
 				/* @var $categoryEntryListResponse KalturaCategoryEntryListResponse */
 				
 				$existingCategoryNames = array();
