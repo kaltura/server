@@ -427,7 +427,7 @@ class kJobsManager
 	 * @return BatchJob 
 	 */
 	public static function addFlavorConvertJob(FileSyncKey $srcSyncKey, flavorParamsOutput $flavor, $flavorAssetId, $conversionProfileId = null,
-			$mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, $sameRoot = true)
+			$mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, $sameRoot = true, $priority = 0)
 	{
 		$localPath = null;
 		$remoteUrl = null;
@@ -508,6 +508,7 @@ class kJobsManager
 		$convertData->setFlavorParamsOutputId($flavor->getId());
 		$convertData->setFlavorAssetId($flavorAssetId);
 		$convertData->setConversionProfileId($conversionProfileId);
+		$convertData->setPriority($priority);
 		
 		KalturaLog::log("Conversion engines string: '" . $flavor->getConversionEngines() . "'");
 		
@@ -629,13 +630,6 @@ class kJobsManager
 		
 		$dbConvertFlavorJob->setObjectId($flavorAssetId);
 		$dbConvertFlavorJob->setObjectType(BatchJobObjectType::ASSET);
-		
-		if($conversionProfileId !== NULL) {
-			$fpcp = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorAsset->getFlavorParamsId(), $conversionProfileId);
-			if((!is_null($fpcp)) && ($fpcp->getPriority() != 0)) {
-				$dbConvertFlavorJob->setPriority($fpcp->getPriority());
-			}
-		}
 		
 		/*
 			// Remarked by Dor until Tantan's return.
@@ -1423,11 +1417,10 @@ class kJobsManager
 		
 		$lockInfo = new kLockInfoData($batchJob);
 		$lockInfo->setEstimatedEffort($data->calculateEstimatedEffort($batchJob));
+		$lockInfo->setPriority($data->calculatePriority($batchJob));
 		$lockInfo->setUrgency($data->calculateUrgency($batchJob));
 		$batchJob->setLockInfo($lockInfo);
 		
-		BatchJobPeer::calculatePriority($batchJob);
-			
 		$batchJob = self::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
 
 		return $batchJob;		

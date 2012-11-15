@@ -7,7 +7,7 @@ class kConvertJobData extends kConvartableJobData
 {
 	const CONVERSION_MILTI_COMMAND_LINE_SEPERATOR = ';';
 	const CONVERSION_FAST_START_SIGN = 'FS';
-
+	const MIGRATION_FLAVOR_PRIORITY = 10;
 
 	/**
 	 * @var string
@@ -43,6 +43,11 @@ class kConvertJobData extends kConvartableJobData
 	 * @var string
 	 */
 	private $conversionProfileId;
+	
+	/**
+	 * @var int
+	 */
+	private $priority;
 
 	/**
 	 * @return the $destFileSyncLocalPath
@@ -150,6 +155,14 @@ class kConvertJobData extends kConvartableJobData
 	}
 	
 	/**
+	 * @param int $priority
+	 */
+	public function setPriority($priority)
+	{
+		$this->priority = $priority;
+	}
+	
+	/**
 	 * @return the $conversionProfileId
 	 */
 	public function getConversionProfileId()
@@ -163,7 +176,15 @@ class kConvertJobData extends kConvartableJobData
 		$isBulkupload = ($batchJob->getBulkJobId() !== null);
 		$readiness = null;
 		
-		$fpcps = flavorParamsConversionProfilePeer::retrieveByConversionProfile($this->conversionProfileId);
+		if($this->priority == 0)
+			self::calculatePriority($batchJob);
+		
+		if($this->priority == self::MIGRATION_FLAVOR_PRIORITY) 
+			return BatchJobUrgencyType::MIGRATION_URGENCY;
+		
+		// If you have no conversion profile, there is no poinr in this calculation
+		if(is_null($this->conversionProfileId)) 
+			return BatchJobUrgencyType::DEFAULT_URGENCY;
 		
 		// a conversion job will be considered as required in one of the following cases:
 		// 1. The flavor is required
@@ -175,6 +196,7 @@ class kConvertJobData extends kConvartableJobData
 		$allNoImpact = true;
 		
 		// Go over all flavors and decide on cases 1-3
+		$fpcps = flavorParamsConversionProfilePeer::retrieveByConversionProfile($this->conversionProfileId);
 		foreach($fpcps as $fpcp) {
 			$allFlavorParamsIds[] = $fpcp->getFlavorParamsId();
 			if($fpcp->getFlavorParamsId() == $flavorParamsId)	// Case 1
@@ -214,4 +236,16 @@ class kConvertJobData extends kConvartableJobData
 		}
 	}
 	
+	public function calculatePriority(BatchJob $batchJob) {
+		
+		if($this->priority == 0) {
+			$flavorParamsId = $this->getFlavorParamsOutput()->getFlavorParamsId();
+			$fpcp = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorParamsId, $this->conversionProfileId);
+			if((!is_null($fpcp) && (($fpcp->getPriority() != 0)))) {
+				$this->priority = $fpcp->getPriority();
+			} else 
+				$this->priority = parent::calculatePriority($batchJob);
+		}
+		return $this->priority;
+	}
 }

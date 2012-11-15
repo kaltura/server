@@ -88,7 +88,7 @@ class reconvertAction extends kalturaSystemAction
 		$dbBatchJob->setPartnerId( $entry->getPartnerId() );
 		$dbBatchJob->setStatus(BatchJob::BATCHJOB_STATUS_PENDING);
 		$dbBatchJob->setDc( kDataCenterMgr::getCurrentDcId() );
-		$dbBatchJob->setPriority ( $job_priority );
+		//$dbBatchJob->setPriority ( $job_priority ); Not supported anymore
 		$dbBatchJob->setObjectId($entry_id);
 		$dbBatchJob->setObjectType(BatchJobObjectType::ENTRY);
 		$dbBatchJob->setJobType(BatchJobType::CONVERT_PROFILE);

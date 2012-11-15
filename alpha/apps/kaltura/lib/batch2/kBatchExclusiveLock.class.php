@@ -101,7 +101,7 @@ class kBatchExclusiveLock
 		$atmp = BatchJobLockPeer::EXECUTION_ATTEMPTS;
 		$expr = BatchJobLockPeer::EXPIRATION;
 		$recheck = BatchJobLockPeer::START_AT;
-		$partnerLoad = PartnerLoadPeer::PARTNER_LOAD;
+		$partnerLoadQuota = PartnerLoadPeer::QUOTA;
 		
 		$schd_id = $lockKey->getSchedulerId();
 		$work_id = $lockKey->getWorkerId();
@@ -113,7 +113,7 @@ class kBatchExclusiveLock
 		$c->addAnd($c->getNewCriterion(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId()));
 		
 		$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
-		$useFairScheduler = self::addPrioritizersCondition($c, $prioritizers_ratio);
+		self::addPrioritizersCondition($c, $prioritizers_ratio);
 		
 		// Query Parts
 		$statusCondition = "$stat = " . BatchJob::BATCHJOB_STATUS_ALMOST_DONE;
@@ -122,11 +122,8 @@ class kBatchExclusiveLock
 		$recheckCondition = "( $recheck <= '$now_str' OR $recheck IS NULL)";
 		$unhandledJobCondition = "$schd IS NULL AND $work IS NULL AND $btch IS NULL ";
 		$jobAlreadyHandledByWorker = "$schd = $schd_id AND $work = $work_id AND $btch = $btch_id";
-		$maxJobsForPartner = BatchJobLockPeer::getMaxJobsForPartner($jobType);
-		$partnerLoadCondition = "($partnerLoad < $maxJobsForPartner OR $partnerLoad is null)";
-		$newJobsCond = "($unhandledJobCondition AND ($recheckCondition))";
-		if($useFairScheduler)
-			$newJobsCond .= " AND $partnerLoadCondition";
+		$partnerLoadCondition = "(($partnerLoadQuota > 0) OR ($partnerLoadQuota is null))";
+		$newJobsCond = "($unhandledJobCondition AND ($recheckCondition)) AND $partnerLoadCondition";
 			
 		$max_exe_attempts = BatchJobLockPeer::getMaxExecutionAttempts($jobType);
 		$jobWasntExecutedTooMany = "$atmp <= $max_exe_attempts OR $atmp IS NULL";
@@ -222,7 +219,7 @@ class kBatchExclusiveLock
 		$atmp = BatchJobLockPeer::EXECUTION_ATTEMPTS;
 		$expr = BatchJobLockPeer::EXPIRATION;
 		$recheck = BatchJobLockPeer::START_AT;
-		$partnerLoad = PartnerLoadPeer::PARTNER_LOAD;
+		$partnerLoadQuota = PartnerLoadPeer::QUOTA;
 		
 		$schd_id = $lockKey->getSchedulerId();
 		$work_id = $lockKey->getWorkerId();
@@ -241,7 +238,7 @@ class kBatchExclusiveLock
 		$c->add(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId());
 		
 		$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
-		$useFairScheduler = self::addPrioritizersCondition($c, $prioritizers_ratio);
+		self::addPrioritizersCondition($c, $prioritizers_ratio);
 		
 		// Query Parts
 		$unClosedStatuses = implode(',', BatchJobPeer::getUnClosedStatusList());
@@ -252,11 +249,8 @@ class kBatchExclusiveLock
 		$pendingJobsCondition = "( $stat = " . BatchJob::BATCHJOB_STATUS_PENDING .
 			" OR ( $stat = " . BatchJob::BATCHJOB_STATUS_RETRY . " AND $recheck <= '$now_str' ))";
 		$unhandledJobCondition = "$schd IS NULL AND $work IS NULL AND $btch IS NULL ";
-		$max_jobs_for_partner = BatchJobLockPeer::getMaxJobsForPartner($jobType);
-		$partnerLoadCondition = "(($partnerLoad < $max_jobs_for_partner) OR ($partnerLoad is null))";
-		$newJobsCond = "($pendingJobsCondition AND ($unhandledJobCondition))";
-		if($useFairScheduler)
-			$newJobsCond .= " AND $partnerLoadCondition";
+		$partnerLoadCondition = "(($partnerLoadQuota > 0) OR ($partnerLoadQuota is null))";
+		$newJobsCond = "($pendingJobsCondition AND ($unhandledJobCondition)) AND $partnerLoadCondition";
 		
 		$jobAlreadyHandledByWorker = "$schd = $schd_id AND $work = $work_id AND $btch = $btch_id";
 			
@@ -287,18 +281,18 @@ class kBatchExclusiveLock
 	 */
 	private static function addPrioritizersCondition(Criteria $c, $prioritizers_ratio) 
 	{
+		// Fairness
+		$c->addMultipleJoin(array(array(BatchJobLockPeer::PARTNER_ID, PartnerLoadPeer::PARTNER_ID  ),
+				array(BatchJobLockPeer::JOB_TYPE, PartnerLoadPeer::JOB_TYPE),
+				array(BatchJobLockPeer::JOB_SUB_TYPE, PartnerLoadPeer::JOB_SUB_TYPE),
+				array(BatchJobLockPeer::DC, PartnerLoadPeer::DC)), Criteria::LEFT_JOIN);
+		
 		if(rand(0, 100) < $prioritizers_ratio) 
 		{	// Throughput
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::URGENCY);
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::ESTIMATED_EFFORT);
 			return false;
 		} else {
-			// Fairness	
-			$c->addMultipleJoin(array(array(BatchJobLockPeer::PARTNER_ID, PartnerLoadPeer::PARTNER_ID  ),
-					array(BatchJobLockPeer::JOB_TYPE, PartnerLoadPeer::JOB_TYPE),
-					array(BatchJobLockPeer::JOB_SUB_TYPE, PartnerLoadPeer::JOB_SUB_TYPE),
-					array(BatchJobLockPeer::DC, PartnerLoadPeer::DC)), Criteria::LEFT_JOIN);
-			
 			$c->addAscendingOrderByColumn(PartnerLoadPeer::WEIGHTED_PARTNER_LOAD);
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::PRIORITY);
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::URGENCY);

@@ -15,14 +15,19 @@
  */
 class PartnerLoadPeer extends BasePartnerLoadPeer {
 
-	public static function updatePartnerLoad($partnerId, $jobType, $jobSubType = 0, PropelPDO $con = null) 
+	public static function updatePartnerLoad($partnerId, $jobType, $jobSubType = null, PropelPDO $con = null) 
 	{
-		// Hack to avoid the not-null constaint on job sub type
-		if(is_null($jobSubType)) 
-			$jobSubType = 0;
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$priorityFactor = PartnerPeer::getPartnerPriorityFactorByPartner($partner);
+		$maxQuota		= $partner->getJobTypeQuota($jobType, $jobSubType);
+		if(!$maxQuota)
+			$maxQuota = BatchJobLockPeer::getMaxJobsForPartner($jobType);
 		
-		$priorityFactor = PartnerPeer::getPartnerPriorityFactor($partnerId);
 		$dcId = kDataCenterMgr::getCurrentDcId();
+		
+		// Hack to avoid the not-null constaint on job sub type
+		if(is_null($jobSubType))
+			$jobSubType = 0;
 		
 		$c = new Criteria();
 		$c->add ( self::PARTNER_ID , $partnerId );
@@ -42,6 +47,7 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 				$partnerLoad->setPartnerLoad(1);
 				$partnerLoad->setDc($dcId);
 				$partnerLoad->setWeightedPartnerLoad($priorityFactor);
+				$partnerLoad->setQuota($maxQuota - 1);
 				
 				$res = $partnerLoad->save();
 				if($res == 1) {
@@ -59,10 +65,12 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 		$colJobSubType = PartnerLoadPeer::JOB_SUB_TYPE;
 		$colPartnerId = PartnerLoadPeer::PARTNER_ID;
 		$colDC = PartnerLoadPeer::DC;
+		$colQuota = PartnerLoadPeer::QUOTA;
 		
 		$sql = "UPDATE $table ";
 		$sql .= "SET $colPartnerLoad = ($colPartnerLoad + 1)";
 		$sql .= ", $colWeightedPartnerLoad = ($colWeightedPartnerLoad + $priorityFactor)";
+		$sql .= ", $colQuota = ($colQuota - 1)";
 		$sql .= "WHERE $colJobType = $jobType ";
 		$sql .= "AND $colJobSubType = $jobSubType ";
 		$sql .= "AND $colPartnerId = $partnerId ";
@@ -142,6 +150,8 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 			// This loop updates the partner load table contents according to the 
 			// accurate information gathered from the batch job table
 			foreach ($currentPartnerLoads as $partnerLoad) {
+				
+				$maxQuota = self::getMaxQuotaForPartner ($partnerLoad);
 				$key = $partnerLoad->getPartnerId() . "#" . $partnerLoad->getJobType() . "#" . $partnerLoad->getJobSubType();
 				
 				if(array_key_exists($key, $actualPartnerLoads)) {
@@ -149,6 +159,7 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 					// Update
 					$partnerLoad->setPartnerLoad($actualLoad->getPartnerLoad());
 					$partnerLoad->setWeightedPartnerLoad($actualLoad->getWeightedPartnerLoad());
+					$partnerLoad->setQuota($maxQuota - $actualLoad->getPartnerLoad());
 					$partnerLoad->save();
 						
 					unset($actualPartnerLoads[$key]);
@@ -160,7 +171,9 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 			}
 				
 			foreach($actualPartnerLoads as $actualPartnerLoad) {
-				// Insert
+				$maxQuota = self::getMaxQuotaForPartner ($actualPartnerLoad);
+
+				$actualPartnerLoad->setQuota($maxQuota - $actualPartnerLoad->getPartnerLoad());
 				$actualPartnerLoad->save();
 			}
 		
@@ -168,5 +181,16 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 			KalturaLog::err("Failed while updating partner load table with error : " . $e->getMessage());
 		}
 	}
+	
+	
+	private static function getMaxQuotaForPartner($partnerLoadRecord) {
+		// Insert
+		$partner = PartnerPeer::retrieveByPK($partnerLoadRecord->getPartnerId());
+		$maxQuota = $partner->getJobTypeQuota($partnerLoadRecord->getJobType(), $partnerLoadRecord->getJobSubType());
+		if(!$maxQuota)
+			$maxQuota = BatchJobLockPeer::getMaxJobsForPartner($partnerLoadRecord->getJobType());
+		return $maxQuota;
+	}
+
 	
 } // PartnerLoadPeer

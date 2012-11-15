@@ -400,7 +400,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		$child->setParentJobId($this->id);
 		$child->setPartnerId($this->partner_id);
 		$child->setEntryId($this->entry_id);
-		$child->setPriority($this->priority);
 		$child->setBulkJobId($this->bulk_job_id);
 		
 		// the condition is required in the special case of file_sync import jobs which are created on one dc but run from the other

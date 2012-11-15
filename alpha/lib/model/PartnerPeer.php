@@ -57,6 +57,11 @@ class PartnerPeer extends BasePartnerPeer
 	public static function getPartnerPriorityFactor($partnerId)
 	{
 		$partner = PartnerPeer::retrieveByPK($partnerId);
+		return getPartnerPriorityFactorByPartner($partner);
+	}
+	
+	public static function getPartnerPriorityFactorByPartner($partner)
+	{
 		$priority = self::getPriority($partner);
 		$priority2Factor = kConf::get('priority_factor');
 		$priorityFactor = $priority2Factor[$priority];

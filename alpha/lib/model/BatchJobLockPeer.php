@@ -17,7 +17,6 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 			BatchJobPeer::EXECUTION_STATUS,
 			BatchJobPeer::OBJECT_ID,
 			BatchJobPeer::OBJECT_TYPE,
-			BatchJobPeer::PRIORITY
 	);
 	
 	const COUNT = 'COUNT(batch_job_lock.ID)';
@@ -132,7 +131,6 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		$batchJobLock->setCreatedAt($batchJob->getCreatedAt());
 		$batchJobLock->setJobType($batchJob->getJobType());
 		$batchJobLock->setJobSubType($batchJob->getJobSubType());
-		$batchJobLock->setPriority($batchJob->getPriority());
 		$batchJobLock->setExecutionAttempts(0);
 		
 		self::commonLockObjectUpdate($batchJob, $batchJobLock);
@@ -171,13 +169,13 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		$batchJobLock->setStatus($batchJob->getStatus());
 		$batchJobLock->setObjectId($batchJob->getObjectId());
 		$batchJobLock->setObjectType($batchJob->getObjectType());
-		$batchJobLock->setPriority($batchJob->getPriority());
 		
 		if(($batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_RETRY) || ($batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_ALMOST_DONE)) {
 			$batchJobLock->setStartAt(time() + BatchJobLockPeer::getRetryInterval($jobType));
 		}
 		
 		if($batchJob->getLockInfo() != null) {
+			$batchJobLock->setPriority($batchJob->getLockInfo()->getPriority());
 			$batchJobLock->setUrgency($batchJob->getLockInfo()->getUrgency());
 			$batchJobLock->setEstimatedEffort($batchJob->getLockInfo()->getEstimatedEffort());
 			$batchJobLock->setVersion($batchJob->getLockInfo()->getLockVersion());

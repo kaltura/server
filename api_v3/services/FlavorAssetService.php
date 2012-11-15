@@ -544,9 +544,10 @@ class FlavorAssetService extends KalturaAssetService
 	 * @action convert
 	 * @param string $entryId
 	 * @param int $flavorParamsId
+	 * @param int $priority
 	 * @validateUser entry entryId edit
 	 */
-	public function convertAction($entryId, $flavorParamsId)
+	public function convertAction($entryId, $flavorParamsId, $priority = 0)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
@@ -593,7 +594,7 @@ class FlavorAssetService extends KalturaAssetService
 		
 		$dynamicFlavorAttributes = $dbEntry->getDynamicFlavorAttributesForAssetParams($flavorParamsDb->getId());
 		
-		kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $flavorParamsId, $err, null, $dynamicFlavorAttributes);
+		kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $flavorParamsId, $err, null, $dynamicFlavorAttributes, $priority);
 	}
 	
 	/**

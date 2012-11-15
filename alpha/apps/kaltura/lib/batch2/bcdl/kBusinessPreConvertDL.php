@@ -353,7 +353,8 @@ class kBusinessPreConvertDL
 	 * @param array<kOperationAttributes> $dynamicAttributes
 	 * @return BatchJob 
 	 */
-	public static function decideAddEntryFlavor(BatchJob $parentJob = null, $entryId, $flavorParamsId, &$errDescription, $flavorAssetId = null, array $dynamicAttributes = array())
+	public static function decideAddEntryFlavor(BatchJob $parentJob = null, $entryId, $flavorParamsId, &$errDescription, $flavorAssetId = null, 
+			array $dynamicAttributes = array(), $priority = 0)
 	{
 		KalturaLog::log("entryId [$entryId], flavorParamsId [$flavorParamsId]");
 		
@@ -482,7 +483,7 @@ class kBusinessPreConvertDL
 			}
 		}
 
-		return kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAsset->getId(), $conversionProfile->getId(), $mediaInfoId, $parentJob, null, false);
+		return kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAsset->getId(), $conversionProfile->getId(), $mediaInfoId, $parentJob, null, false, $priority);
 	}
 	
 	/**

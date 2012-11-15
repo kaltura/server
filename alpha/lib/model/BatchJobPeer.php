@@ -10,8 +10,6 @@
  */ 
 class BatchJobPeer extends BaseBatchJobPeer
 {
-	const BATCH_JOB_DEFAULT_PRIORITY = 3;
-	
 	public static function getInProcStatus()
 	{
 		return BatchJob::BATCHJOB_STATUS_QUEUED;
@@ -174,10 +172,5 @@ class BatchJobPeer extends BaseBatchJobPeer
 				
 			$batchJob->addHistoryRecord($historyRecord);
 		}
-	}
-	
-	public static function calculatePriority(BatchJob $batchJob) {
-		if ($batchJob->getPriority () == 0)
-			$batchJob->setPriority ( self::BATCH_JOB_DEFAULT_PRIORITY );
 	}
 }

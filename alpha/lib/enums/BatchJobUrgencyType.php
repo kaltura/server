@@ -10,5 +10,6 @@ interface BatchJobUrgencyType extends BaseEnum
 	const REQUIRED_BULK_UPLOAD 		= 2;
 	const OPTIONAL_REGULAR_UPLOAD	= 3;
 	const OPTIONAL_BULK_UPLOAD		= 4;
-	const DEFAULT_URGENCY			= 5;		
+	const DEFAULT_URGENCY			= 5;	
+	const MIGRATION_URGENCY			= 10;	
 }

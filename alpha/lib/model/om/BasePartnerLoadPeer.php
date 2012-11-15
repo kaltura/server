@@ -26,7 +26,7 @@ abstract class BasePartnerLoadPeer {
 	const TM_CLASS = 'PartnerLoadTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 7;
+	const NUM_COLUMNS = 8;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -49,6 +49,9 @@ abstract class BasePartnerLoadPeer {
 	/** the column name for the WEIGHTED_PARTNER_LOAD field */
 	const WEIGHTED_PARTNER_LOAD = 'partner_load.WEIGHTED_PARTNER_LOAD';
 
+	/** the column name for the QUOTA field */
+	const QUOTA = 'partner_load.QUOTA';
+
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'partner_load.CUSTOM_DATA';
 
@@ -68,11 +71,11 @@ abstract class BasePartnerLoadPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('JobType', 'JobSubType', 'PartnerId', 'Dc', 'PartnerLoad', 'WeightedPartnerLoad', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('jobType', 'jobSubType', 'partnerId', 'dc', 'partnerLoad', 'weightedPartnerLoad', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::JOB_TYPE, self::JOB_SUB_TYPE, self::PARTNER_ID, self::DC, self::PARTNER_LOAD, self::WEIGHTED_PARTNER_LOAD, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('job_type', 'job_sub_type', 'partner_id', 'dc', 'partner_load', 'weighted_partner_load', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+		BasePeer::TYPE_PHPNAME => array ('JobType', 'JobSubType', 'PartnerId', 'Dc', 'PartnerLoad', 'WeightedPartnerLoad', 'Quota', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('jobType', 'jobSubType', 'partnerId', 'dc', 'partnerLoad', 'weightedPartnerLoad', 'quota', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::JOB_TYPE, self::JOB_SUB_TYPE, self::PARTNER_ID, self::DC, self::PARTNER_LOAD, self::WEIGHTED_PARTNER_LOAD, self::QUOTA, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('job_type', 'job_sub_type', 'partner_id', 'dc', 'partner_load', 'weighted_partner_load', 'quota', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
 	);
 
 	/**
@@ -82,11 +85,11 @@ abstract class BasePartnerLoadPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('JobType' => 0, 'JobSubType' => 1, 'PartnerId' => 2, 'Dc' => 3, 'PartnerLoad' => 4, 'WeightedPartnerLoad' => 5, 'CustomData' => 6, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('jobType' => 0, 'jobSubType' => 1, 'partnerId' => 2, 'dc' => 3, 'partnerLoad' => 4, 'weightedPartnerLoad' => 5, 'customData' => 6, ),
-		BasePeer::TYPE_COLNAME => array (self::JOB_TYPE => 0, self::JOB_SUB_TYPE => 1, self::PARTNER_ID => 2, self::DC => 3, self::PARTNER_LOAD => 4, self::WEIGHTED_PARTNER_LOAD => 5, self::CUSTOM_DATA => 6, ),
-		BasePeer::TYPE_FIELDNAME => array ('job_type' => 0, 'job_sub_type' => 1, 'partner_id' => 2, 'dc' => 3, 'partner_load' => 4, 'weighted_partner_load' => 5, 'custom_data' => 6, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+		BasePeer::TYPE_PHPNAME => array ('JobType' => 0, 'JobSubType' => 1, 'PartnerId' => 2, 'Dc' => 3, 'PartnerLoad' => 4, 'WeightedPartnerLoad' => 5, 'Quota' => 6, 'CustomData' => 7, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('jobType' => 0, 'jobSubType' => 1, 'partnerId' => 2, 'dc' => 3, 'partnerLoad' => 4, 'weightedPartnerLoad' => 5, 'quota' => 6, 'customData' => 7, ),
+		BasePeer::TYPE_COLNAME => array (self::JOB_TYPE => 0, self::JOB_SUB_TYPE => 1, self::PARTNER_ID => 2, self::DC => 3, self::PARTNER_LOAD => 4, self::WEIGHTED_PARTNER_LOAD => 5, self::QUOTA => 6, self::CUSTOM_DATA => 7, ),
+		BasePeer::TYPE_FIELDNAME => array ('job_type' => 0, 'job_sub_type' => 1, 'partner_id' => 2, 'dc' => 3, 'partner_load' => 4, 'weighted_partner_load' => 5, 'quota' => 6, 'custom_data' => 7, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
 	);
 
 	/**
@@ -162,6 +165,7 @@ abstract class BasePartnerLoadPeer {
 		$criteria->addSelectColumn(PartnerLoadPeer::DC);
 		$criteria->addSelectColumn(PartnerLoadPeer::PARTNER_LOAD);
 		$criteria->addSelectColumn(PartnerLoadPeer::WEIGHTED_PARTNER_LOAD);
+		$criteria->addSelectColumn(PartnerLoadPeer::QUOTA);
 		$criteria->addSelectColumn(PartnerLoadPeer::CUSTOM_DATA);
 	}
 

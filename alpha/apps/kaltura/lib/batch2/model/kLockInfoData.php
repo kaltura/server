@@ -11,6 +11,8 @@ class kLockInfoData
 	
 	protected $estimatedEffort;
 	
+	protected $priority;
+	
 	/**
 	 * @return the $lockVersion
 	 */
@@ -51,6 +53,20 @@ class kLockInfoData
 	 */
 	public function setEstimatedEffort($estimatedEffort) {
 		$this->estimatedEffort = $estimatedEffort;
+	}
+	
+	/**
+	 * @return the $priority
+	 */
+	public function getPriority() {
+		return $this->priority;
+	}
+	
+	/**
+	 * @param field_type $priority
+	 */
+	public function setPriority($priority) {
+		$this->priority = $priority;
 	}
 	
 }

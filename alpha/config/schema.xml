@@ -651,6 +651,7 @@
         <column primaryKey="true" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_load" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="weighted_partner_load" type="integer" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="quota" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<index name="partner_index">
 			<index-column name="partner_id" />

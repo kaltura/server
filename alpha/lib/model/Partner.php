@@ -454,6 +454,24 @@ class Partner extends BasePartner
 	
 	public function setFeaturesStatus(array $v ) {		return $this->putInCustomData("featuresStatus", serialize($v) );	}	
 	
+	public function getJobTypeQuota($jobType, $jobSubType) {
+		$jobTypeQuota = $this->getFromCustomData("jobTypeQuota");
+		if(!$jobTypeQuota) 
+			return null;
+		
+		if(isset($jobTypeQuota[$jobType . '-' . $jobSubType]))
+			return $jobTypeQuota[$jobType . '-' . $jobSubType];
+		if(isset($jobTypeQuota[$jobType . '-*']))
+			return $jobTypeQuota[$jobType . '-*'];
+		if(isset($jobTypeQuota['*']))
+			return $jobTypeQuota['*'];
+		
+		return null;
+	
+	}
+	
+	public function setJobTypeQuota(array $v) { return $this->putInCustomData("jobTypeQuota", $v ); }
+		
 	public function addFeaturesStatus($type, $value = 1)
 	{
 		$newFeatureStatus = new kFeatureStatus();
