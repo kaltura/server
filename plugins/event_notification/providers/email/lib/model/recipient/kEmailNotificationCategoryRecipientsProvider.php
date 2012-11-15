@@ -5,7 +5,7 @@
  * @package plugins.emailNotification
  * @subpackage model.data
  */
-class EmailNotificationCategoryRecipientsProvider extends EmailNotificationRecipientProvider
+class kEmailNotificationCategoryRecipientsProvider extends kEmailNotificationRecipientProvider
 {
 	/**
 	 * ID of the category to whose subscribers the email should be sent
