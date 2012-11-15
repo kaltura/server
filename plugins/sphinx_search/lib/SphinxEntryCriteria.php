@@ -17,7 +17,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		entryPeer::GROUP_ID => 'group_id',
 		entryPeer::DESCRIPTION => 'description',
 		entryPeer::ADMIN_TAGS => 'admin_tags',
-		'plugins_data',
+		'entry.PLUGINS_DATA' => 'plugins_data',
 		'entry.DURATION_TYPE' => 'duration_type',
 		'entry.REFERENCE_ID' => 'reference_id',
 		'entry.REPLACING_ENTRY_ID' => 'replacing_entry_id',
@@ -107,6 +107,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'roots' => IIndexable::FIELD_TYPE_STRING,
 		'description' => IIndexable::FIELD_TYPE_STRING,
 		'admin_tags' => IIndexable::FIELD_TYPE_STRING,
+		'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 		
 		'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'kuser_id' => IIndexable::FIELD_TYPE_STRING,
@@ -486,6 +487,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 			"replacing_entry_id",
 			"replaced_entry_id",
 			"roots",
+			"plugins_data",
 		));
 	}
 
