@@ -7,26 +7,39 @@ if( typeof $ == 'undefined' ) $ = jQuery;
 
 function loginF( remMe, partner_id, subp_id, uid, ks , screen_name, email ) {
 
-	// Set cookie options
-	var options = {
-		// Save data as raw
-		raw: true,
-		// Set path
-		path: "/",
-		// Set expiration time to 1 day
-		expires: 1,
-		// Set secure cookie flag based on domain protocol
-		secure: ( window.location.protocol === "https:" ) ? true : false
-	};
+	// Extlogin URL
+	var url = options.service_url + '/index.php/kmc/extlogin';
+	// URL Protocol
+	var service_url_protocol = options.service_url.split("://")[0];
 
-	$.cookie("kmcks", ks, options);
-	$.cookie("pid", partner_id, options);
-	$.cookie("subpid", subp_id, options);
+	// If login needs to be secured, change extlogin url to https	
+	if( options.secure_login && service_url_protocol == 'http' ) {
+		url = url.replace(/http:/g, "https:");
+	}
 
-	loginSuccess();
+	// Setup input fields
+	var ks_input = $('<input />').attr({
+		'type': 'hidden',
+		'name': 'ks',
+		'value': ks
+	});
+	var partner_id_input = $('<input />').attr({
+		'type': 'hidden',
+		'name': 'partner_id',
+		'value': partner_id // grab the selected partner id
+	});
 
-	// TODO - send by post using form1
-	return true;			
+	var $form = $('<form />')
+				.attr({
+					'action': url, 
+					'method': 'post',
+					'style': 'display: none'
+				})
+				.append( ks_input, partner_id_input );
+
+	// Submit the form
+	$('body').append( $form );
+	$form[0].submit();	
 }
 
 function gotoSignup() {
