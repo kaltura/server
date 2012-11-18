@@ -9,4 +9,5 @@ interface CategoryKuserPermissionLevel extends BaseEnum
 	const MODERATOR = 1;
 	const CONTRIBUTOR = 2;
 	const MEMBER = 3;
+	const NONE = 4;
 }
