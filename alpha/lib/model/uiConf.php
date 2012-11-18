@@ -678,8 +678,6 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	{
 		$cloned = new uiConf();
 
-		$obj_wrapper = objectWrapperBase::getWrapperClass( $cloned  , 0 );
-		
 		$all_fields = uiConfPeer::getFieldNames (); 
 		$ignore_list = array ( "Id" , "ConfFilePath" );
 		// clone from current

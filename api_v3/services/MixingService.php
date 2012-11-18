@@ -119,6 +119,7 @@ class MixingService extends KalturaEntryService
 		$this->validateEntryScheduleDates($mixEntry, $dbEntry);
 		
 		$dbEntry = $mixEntry->toUpdatableObject($dbEntry);
+		/* @var $dbEntry entry */
 		
 		if ($mixEntry->dataContent !== null) // dataContent need special handling
 			$dbEntry->setDataContent($mixEntry->dataContent, true, true);
@@ -126,8 +127,15 @@ class MixingService extends KalturaEntryService
 		$dbEntry->save();
 		$mixEntry->fromObject($dbEntry);
 		
-		$wrapper = objectWrapperBase::getWrapperClass($dbEntry);
-		$wrapper->removeFromCache("entry", $dbEntry->getId());
+		try
+		{
+			$wrapper = objectWrapperBase::getWrapperClass($dbEntry);
+			$wrapper->removeFromCache("entry", $dbEntry->getId());
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e);
+		}
 		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $dbEntry);
 		

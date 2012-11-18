@@ -1252,12 +1252,20 @@ class KalturaEntryService extends KalturaBaseService
 		$this->validateEntryScheduleDates($entry, $dbEntry); 
 		
 		$dbEntry = $entry->toUpdatableObject($dbEntry);
+		/* @var $dbEntry entry */
 		
 		$dbEntry->save();
 		$entry->fromObject($dbEntry);
 		
-		$wrapper = objectWrapperBase::getWrapperClass($dbEntry);
-		$wrapper->removeFromCache("entry", $dbEntry->getId());
+		try 
+		{
+			$wrapper = objectWrapperBase::getWrapperClass($dbEntry);
+			$wrapper->removeFromCache("entry", $dbEntry->getId());
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e);
+		}
 		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $dbEntry);
 		
@@ -1275,22 +1283,15 @@ class KalturaEntryService extends KalturaBaseService
 		
 		myEntryUtils::deleteEntry($entryToDelete);
 		
-		/*
-			All move into myEntryUtils::deleteEntry
-		
-			$entryToDelete->setStatus(entryStatus::DELETED); 
-			KalturaLog::log("KalturaEntryService::delete Entry [$entryId] Partner [" . $entryToDelete->getPartnerId() . "]");
-			
-			// make sure the moderation_status is set to moderation::MODERATION_STATUS_DELETE
-			$entryToDelete->setModerationStatus(moderation::MODERATION_STATUS_DELETE); 
-			$entryToDelete->setModifiedAt(time());
-			$entryToDelete->save();
-			
-			myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_DELETE, $entryToDelete);
-		*/
-		
-		$wrapper = objectWrapperBase::getWrapperClass($entryToDelete);
-		$wrapper->removeFromCache("entry", $entryToDelete->getId());
+		try
+		{
+			$wrapper = objectWrapperBase::getWrapperClass($entryToDelete);
+			$wrapper->removeFromCache("entry", $entryToDelete->getId());
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e);
+		}
 	}
 	
 	protected function updateThumbnailForEntryFromUrl($entryId, $url, $entryType = null, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
@@ -1371,8 +1372,15 @@ class KalturaEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
 		
-		$wrapper = objectWrapperBase::getWrapperClass($dbEntry);
-		$wrapper->removeFromCache("entry", $dbEntry->getId());
+		try
+		{
+			$wrapper = objectWrapperBase::getWrapperClass($dbEntry);
+			$wrapper->removeFromCache("entry", $dbEntry->getId());
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e);
+		}
 		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_THUMBNAIL, $dbEntry, $dbEntry->getPartnerId(), $dbEntry->getPuserId(), null, null, $entryId);
 

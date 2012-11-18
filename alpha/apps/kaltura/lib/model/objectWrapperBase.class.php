@@ -90,28 +90,25 @@ abstract class objectWrapperBase implements Iterator
 			return array ( $obj_arr , $obj );
 		}
 
-		$wrapper_clazz = get_class($obj). "Wrapper";
-
-//				echo $wrapper_clazz . "[$detail_level]\n";
+		$clazz = get_class($obj);
+		$wrapper_clazz = $clazz . "Wrapper";
+		while(!class_exists($wrapper_clazz))
+		{
+			$clazz = get_parent_class($clazz);
+			if(!$clazz)
+				throw new Exception("Wrapper class not fount for object [" . get_class($obj) . "]");
+				
+			$wrapper_clazz = $clazz . "Wrapper";
+		}
 
 		try
 		{
-			//echo $wrapper_clazz . " [$detail_level/$detail_policy_velocity]<br>";
-
-			// for all wrappers - class file is local
-			// for plugin backward-compatibility support in PS2 actions - file can be elsewhere
-			// if file does not exist - simply try to instantiate object (through autoloader)
-			// this is fully backward compatible - if file didn't exist before plugin - FATAL would happen
-			// if we try to instantiate a non-existing class - FATAL would happen
-			if(file_exists($wrapper_clazz . ".class.php"))
-				require_once  ( $wrapper_clazz . ".class.php" );
-
-			// try envoking the ctor of the wrapper class
 			$wrapper = new $wrapper_clazz( $obj ,
 				true , /*$recursive_wrapping ,*/
 				$detail_level + $detail_policy_velocity ,
 				++$recursion_depth ,
 				$detail_policy_velocity ) ;
+			/* @var $wrapper objectWrapperBase */
 
 			$wrapper->fields = null;
 

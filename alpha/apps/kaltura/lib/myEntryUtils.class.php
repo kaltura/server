@@ -12,8 +12,15 @@ class myEntryUtils
 		$fileSyncKey = $dbEntry->getSyncKey($fileSyncType);
 		kFileSyncUtils::file_put_contents($fileSyncKey, file_get_contents($filePath));
 		
-		$wrapper = objectWrapperBase::getWrapperClass($dbEntry);
-		$wrapper->removeFromCache("entry", $dbEntry->getId());
+		try 
+		{
+			$wrapper = objectWrapperBase::getWrapperClass($dbEntry);
+			$wrapper->removeFromCache("entry", $dbEntry->getId());
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e);
+		}
 		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_THUMBNAIL, $dbEntry);
 	}
@@ -119,8 +126,6 @@ class myEntryUtils
 		baseObjectUtils::fillObjectFromObject ( entryPeer::getFieldNames(BasePeer::TYPE_FIELDNAME) ,
 				$source_entry , $target , baseObjectUtils::CLONE_POLICY_PREFER_EXISTING , $exclude_fields );
 
-		$wrapper = objectWrapperBase::getWrapperClass( $target , objectWrapperBase::DETAIL_LEVEL_REGULAR );
-		
 		$target->setDimensions ( $source_entry->getWidth() , $source_entry->getHeight() );
 
 		$target->getCustomDataObj ( );	
