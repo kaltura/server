@@ -662,8 +662,13 @@ class KalturaEntryService extends KalturaBaseService
 		// first copy all the properties to the db entry, then we'll check for security stuff
 		if(!$dbEntry)
 		{
-			KalturaLog::debug("Creating new entry");
-			$dbEntry = new entry();
+			$coreType = kPluginableEnumsManager::apiToCore('entryType', $entry->type);
+			$class = KalturaPluginManager::getObjectClass(entryPeer::OM_CLASS, $coreType);
+			if(!$class)
+				$class = entryPeer::OM_CLASS;
+				
+			KalturaLog::debug("Creating new entry of API type [$entry->type] core type [$coreType] class [$class]");
+			$dbEntry = new $class();
 		}
 			
 		$dbEntry = $entry->toInsertableObject($dbEntry);
