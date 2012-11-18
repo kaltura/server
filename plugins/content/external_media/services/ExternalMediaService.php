@@ -95,7 +95,6 @@ class ExternalMediaService extends KalturaEntryService
 		if(!$filter)
 			$filter = new KalturaExternalMediaEntryFilter();
 		
-		$filter->typeEqual = ExternalMediaPlugin::getEntryTypeCoreValue(ExternalMediaEntryType::EXTERNAL_MEDIA);
 		list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 		
 		$response = new KalturaExternalMediaEntryListResponse();
@@ -116,7 +115,6 @@ class ExternalMediaService extends KalturaEntryService
 		if(!$filter)
 			$filter = new KalturaExternalMediaEntryFilter();
 		
-		$filter->typeEqual = ExternalMediaPlugin::getEntryTypeCoreValue(ExternalMediaEntryType::EXTERNAL_MEDIA);
 		return parent::countEntriesByFilter($filter);
 	}
 }
