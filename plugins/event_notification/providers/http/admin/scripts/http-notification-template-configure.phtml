@@ -1,0 +1,36 @@
+
+<script type="text/javascript">
+
+<?php require_once __DIR__ . '/js/kObjects.js'; ?>
+
+
+jQuery(document).ready(function() {
+	jQuery('#dataType').change(function(){
+
+		jQuery('#frmObject').hide();
+		jQuery('#frmParameters').hide();
+		jQuery('#frmFreeText').hide();
+		jQuery('.content-parameter').hide();
+		
+		switch(jQuery(this).val()){
+			case 'object':
+				jQuery('#frmObject').show();
+				break;
+
+			case 'text':
+				jQuery('#frmFreeText').show();
+			case 'map':
+				jQuery('#frmParameters').show();
+				jQuery('.content-parameter').show();
+				break;
+		}
+	});
+	jQuery('#dataType').change();
+
+	var jqObject = jQuery('#object')
+	var jqSelection = addSelections(jqObject, 'Select Object', kObjects);
+	jqObject.before(jqSelection);
+});
+
+
+</script>
