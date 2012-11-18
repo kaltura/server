@@ -24,15 +24,15 @@ class ExternalMediaEntry extends entry
 	}
 	
 	/**
-	 * @return int external source, of enum ExternalMediaSourceType
+	 * @return string external source, of enum ExternalMediaSourceType
 	 */
 	public function getExternalSourceType()
 	{
-		return (int) $this->getFromCustomData(self::CUSTOM_DATA_FIELD_EXTERNAL_SOURCE);
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_EXTERNAL_SOURCE);
 	}
 	
 	/**
-	 * @param int $v external source, of enum ExternalMediaSourceType
+	 * @param string $v external source, of enum ExternalMediaSourceType
 	 */
 	public function setExternalSourceType($v)
 	{
