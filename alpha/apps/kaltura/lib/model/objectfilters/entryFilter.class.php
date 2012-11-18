@@ -229,6 +229,7 @@ class entryFilter extends baseObjectFilter
 			{
 				foreach($categories as $category)
 				{
+					/* @var $category category */
 					$catsIds[mySearchUtils::ENTRY_CATEGORY_ID_PREFIX . $category->getId()] = null;
 				}
 			}
