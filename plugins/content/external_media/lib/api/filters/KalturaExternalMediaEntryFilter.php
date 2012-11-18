@@ -5,14 +5,36 @@
  */
 class KalturaExternalMediaEntryFilter extends KalturaExternalMediaEntryBaseFilter
 {
-	static private $map_between_objects = array
-	(
-		"externalSourceTypeEqual" => "_like_plugins_data",
-		"externalSourceTypeIn" => "_mlikeor_plugins_data",
-	);
-
-	public function getMapBetweenObjects()
+	public function __construct()
 	{
-		return array_merge(parent::getMapBetweenObjects(), KalturaExternalMediaEntryFilter::$map_between_objects);
+		$this->typeEqual = ExternalMediaPlugin::getEntryTypeCoreValue(ExternalMediaEntryType::EXTERNAL_MEDIA);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::toObject()
+	 */
+	public function toObject($coreFilter = null, $skip = array())
+	{
+		/* @var $coreFilter entryFilter */
+		
+		if($this->externalSourceTypeEqual)
+		{
+			$coreFilter->fields['_like_plugins_data'] = ExternalMediaPlugin::getExternalSourceSearchData($this->externalSourceTypeEqual);
+			$this->externalSourceTypeEqual = null;
+		}
+	
+		if($this->externalSourceTypeIn)
+		{
+			$coreExternalSourceTypes = array();
+			$apiExternalSourceTypes = explode(',', $this->externalSourceTypeIn);
+			foreach($apiExternalSourceTypes as $apiExternalSourceType)
+				$coreExternalSourceTypes[] = kPluginableEnumsManager::apiToCore('ExternalMediaSourceType', $apiExternalSourceType);
+			$externalSourceTypeIn = implode(',', $coreExternalSourceTypes);
+			
+			$coreFilter->fields['_mlikeor_plugins_data'] = ExternalMediaPlugin::getExternalSourceSearchData($externalSourceTypeIn);
+			$this->externalSourceTypeIn = null;
+		}
+		
+		return parent::toObject($coreFilter, $skip);
 	}
 }
