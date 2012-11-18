@@ -88,7 +88,7 @@ class ExternalMediaService extends KalturaEntryService
 	 * @action list
 	 * @param KalturaExternalMediaEntryFilter $filter External media entry filter
 	 * @param KalturaFilterPager $pager Pager
-	 * @return KalturaMediaListResponse Wrapper for array of media entries and total count
+	 * @return KalturaExternalMediaEntryListResponse Wrapper for array of media entries and total count
 	 */
 	function listAction(KalturaExternalMediaEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
@@ -98,7 +98,7 @@ class ExternalMediaService extends KalturaEntryService
 		$filter->typeEqual = ExternalMediaPlugin::getEntryTypeCoreValue(ExternalMediaEntryType::EXTERNAL_MEDIA);
 		list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 		
-		$response = new KalturaMediaListResponse();
+		$response = new KalturaExternalMediaEntryListResponse();
 		$response->objects = KalturaExternalMediaEntryArray::fromDbArray($list);
 		$response->totalCount = $totalCount;
 		return $response;
