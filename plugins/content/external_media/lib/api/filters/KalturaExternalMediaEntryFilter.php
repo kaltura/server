@@ -28,10 +28,13 @@ class KalturaExternalMediaEntryFilter extends KalturaExternalMediaEntryBaseFilte
 			$coreExternalSourceTypes = array();
 			$apiExternalSourceTypes = explode(',', $this->externalSourceTypeIn);
 			foreach($apiExternalSourceTypes as $apiExternalSourceType)
-				$coreExternalSourceTypes[] = kPluginableEnumsManager::apiToCore('ExternalMediaSourceType', $apiExternalSourceType);
+			{
+				$coreExternalSourceType = kPluginableEnumsManager::apiToCore('ExternalMediaSourceType', $apiExternalSourceType);
+				$coreExternalSourceTypes[] = ExternalMediaPlugin::getExternalSourceSearchData($coreExternalSourceType);
+			}
 			$externalSourceTypeIn = implode(',', $coreExternalSourceTypes);
 			
-			$coreFilter->fields['_mlikeor_plugins_data'] = ExternalMediaPlugin::getExternalSourceSearchData($externalSourceTypeIn);
+			$coreFilter->fields['_mlikeor_plugins_data'] = $externalSourceTypeIn;
 			$this->externalSourceTypeIn = null;
 		}
 		
