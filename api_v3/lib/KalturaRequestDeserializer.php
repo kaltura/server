@@ -214,6 +214,7 @@ class KalturaRequestDeserializer
 			}
 			
 			$property = $properties[$name];
+			/* @var $property KalturaPropertyInfo */
 			$type = $property->getType();
 			
 			if ($isNull && ($property->isSimpleType() || $property->isEnum() || $property->isStringEnum()))

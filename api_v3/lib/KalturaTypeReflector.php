@@ -335,14 +335,17 @@ class KalturaTypeReflector
 		if($this->isDynamicEnum())
 		{
 			$type = $this->getType();
+			/* @var $type KalturaDynamicEnum */
 			$baseEnumName = $type::getEnumClass();
 			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
 			foreach($pluginInstances as $pluginInstance)
 			{
+				/* @var $pluginInstance IKalturaEnumerator */
 				$pluginName = $pluginInstance->getPluginName();
 				$enums = $pluginInstance->getEnums($baseEnumName);
 				foreach($enums as $enum)
 				{
+					/* @var $enum IKalturaPluginEnum */
 					$enumConstans = $enum::getAdditionalValues();
 					foreach($enumConstans as $name => $value)
 						$this->_constantsValues[$name] = $pluginName . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value;
