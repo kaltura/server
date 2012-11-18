@@ -1092,6 +1092,7 @@ return array(
 	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateStatus::DELETED' => 'Deleted',
 
 	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::EMAIL' => 'Email',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::HTTP' => 'HTTP',
 
 	// user role
 	'user role intro text' => '',
