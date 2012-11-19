@@ -22,6 +22,9 @@ class Kaltura_Form_Element_EnumSelect extends Zend_Form_Element_Select
 		
 		foreach($constants as $constName => $constValue)
 		{
+			if(isset($options['excludes']) && in_array($constValue, $options['excludes']))
+				continue;
+				
 			$this->addMultiOption($constValue, "$enumName::$constName");
 		}
 	}
