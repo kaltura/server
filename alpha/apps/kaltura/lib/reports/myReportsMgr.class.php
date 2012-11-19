@@ -1022,8 +1022,8 @@ class myReportsMgr
 				$partner_id ,
 				self::intToDateTime($input_filter->from_date), 
 				self::intToDateTime($input_filter->to_date ),
-				self::intToDateId($input_filter->from_date), 
-				self::intToDateId($input_filter->to_date ),
+				self::$input_filter->from_day, 
+				self::$input_filter->to_day,
 				self::intToDateId($input_filter->to_date , -7 ),
 				self::intToDateId($input_filter->to_date , -30 ),
 				self::intToDateId($input_filter->to_date , -180 ),
@@ -1199,6 +1199,8 @@ class reportsInputFilter
 {
 	public $from_date;
 	public $to_date;
+	public $from_day;
+	public $to_day;
 	public $keywords;
 	public $search_in_tags;
 	public $search_in_admin_tags;
