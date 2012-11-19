@@ -206,5 +206,7 @@ interface PermissionName extends BaseEnum
 	
 	// not valid yet
 	
-	const ADMIN_WHITE_BRANDING = 'ADMIN_WHITE_BRANDING';		
+	const ADMIN_WHITE_BRANDING = 'ADMIN_WHITE_BRANDING';	
+
+	const CATEGORY_PERMISSION_SUBSCRIBE = 'CATEGORY_PERMISSION_SUBSCRIBE';
 }
