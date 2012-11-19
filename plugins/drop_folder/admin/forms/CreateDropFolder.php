@@ -20,7 +20,13 @@ class Form_CreateDropFolder extends Zend_Form
 			'filters'		=> array('StringTrim'),
 		));	
 
-		$newDropFolderType = new Kaltura_Form_Element_EnumSelect('newDropFolderType', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderType'));
+		$newDropFolderType = new Kaltura_Form_Element_EnumSelect('newDropFolderType', array(
+			'enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderType',
+			'excludes' => array(
+				Kaltura_Client_DropFolder_Enum_DropFolderType::S3,
+			)
+		));
+		
 		$newDropFolderType->setLabel('Type:');
 		$newDropFolderType->setRequired(true);
 		$this->addElement($newDropFolderType);
