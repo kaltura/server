@@ -13,7 +13,7 @@ class KalturaObjectIdField extends KalturaStringField
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kObjectIdStringField();
+			$dbObject = new kObjectIdField();
 			
 		return parent::toObject($dbObject, $skip);
 	}
