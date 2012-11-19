@@ -288,7 +288,7 @@ class kBatchExclusiveLock
 		$c->addMultipleJoin(array(array(BatchJobLockPeer::PARTNER_ID, PartnerLoadPeer::PARTNER_ID  ),
 				array(BatchJobLockPeer::JOB_TYPE, PartnerLoadPeer::JOB_TYPE),
 				array(BatchJobLockPeer::DC, PartnerLoadPeer::DC)), Criteria::LEFT_JOIN);
-		$c->add($jobSubTypeBatch, $jobSubTypeCondition, Criteria::CUSTOM);
+		$c->addAnd(BatchJobLockPeer::JOB_SUB_TYPE, $jobSubTypeCondition, Criteria::CUSTOM);
 		
 		if(rand(0, 100) < $prioritizers_ratio) 
 		{	// Throughput
