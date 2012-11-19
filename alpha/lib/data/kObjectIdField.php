@@ -43,7 +43,7 @@ class kObjectIdField extends kStringValue
 			return;
 		}
 			
-		return $scope->getEvent()->getObjct()->getId();
+		return $scope->getEvent()->getObject()->getId();
 	}
 
 	
