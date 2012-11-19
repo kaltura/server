@@ -39,6 +39,21 @@ $PS2_TESTED_BIN_ACTIONS = array(
 		'extwidget.raw',	
 		);
 
+$APIV3_TESTED_SERVICES = array(
+		'*',
+
+		// Entries services:
+//		'baseEntry',
+//		'data',
+//		'document',
+//		'liveStream',
+//		'media',
+//		'mixing',
+//		'playlist',
+//		'document_documents',
+//		'externalMedia_externalMedia',
+);
+
 $APIV3_TESTED_ACTIONS = array(
 		'syndicationFeed.execute',			// api_v3/getFeed.php
 		'playlist.execute',
@@ -60,6 +75,11 @@ $ID_FIELDS = array('id', 'guid', 'loc', 'title', 'link');
 class PartnerSecretPool
 {
 	protected $secrets = array();
+	
+	/**
+	 * @var resource
+	 */
+	protected $link;
 
 	public function __construct()
 	{
@@ -96,6 +116,7 @@ class ks extends kSessionBase
 	protected function getKSVersionAndSecret($partnerId)
 	{
 		global $partnerSecretPool;
+		/* @var $partnerSecretPool PartnerSecretPool */
 
 		$adminSecret = $partnerSecretPool->getPartnerSecret($partnerId);
 		if (!$adminSecret)
@@ -107,6 +128,7 @@ class ks extends kSessionBase
 function extendKsExpiry($ks)
 {
 	global $partnerSecretPool;
+	/* @var $partnerSecretPool PartnerSecretPool */
 	
 	$ksObj = new ks();
 	if (!$ksObj->parseKS($ks))
@@ -636,6 +658,23 @@ function extendRequestKss(&$parsedParams)
 	return true;
 }
 
+function isServiceApproved($service)
+{
+	global $APIV3_TESTED_SERVICES;
+	
+	if(in_array('*', $APIV3_TESTED_SERVICES))
+		return true;
+		
+	foreach ($APIV3_TESTED_SERVICES as $approvedService)
+	{
+		if (strcmp(strtolower($approvedService), strtolower($service)) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 function isActionApproved($fullActionName, $action)
 {
 	global $APIV3_TESTED_ACTIONS;
@@ -693,8 +732,9 @@ function processMultiRequest($parsedParams)
 		
 		$service = $paramsByRequest[$reqIndex]['service'];
 		$action = $paramsByRequest[$reqIndex]['action'];
+		
 		$curFullActionName = strtolower("$service.$action");		
-		if (!isActionApproved($curFullActionName, $action))
+		if (!isServiceApproved($service) || !isActionApproved($curFullActionName, $action))
 		{
 			return;
 		}
@@ -755,7 +795,8 @@ function processRequest($parsedParams)
 	$fullActionName = strtolower("$service.$action");
 	$parsedParams['format'] = '2';		# XML
 	
-	if (!isActionApproved($fullActionName, $action) ||
+	if (!isServiceApproved($service) || 
+		!isActionApproved($fullActionName, $action) ||
 		!extendRequestKss($parsedParams))
 	{
 		return;
@@ -779,7 +820,8 @@ function processFeedRequest($parsedParams)
 {
 	$fullActionName = "getfeed";
 
-	if (!isActionApproved('syndicationFeed.execute', 'execute') ||
+	if (!isServiceApproved('syndicationFeed') ||
+		!isActionApproved('syndicationFeed.execute', 'execute') ||
 		!extendRequestKss($parsedParams))
 	{
 		return;
@@ -801,7 +843,12 @@ function processFeedRequest($parsedParams)
 	testAction($fullActionName, $parsedParams, $uri);
 }
 
-class LogProcessorApiV3
+interface LogProcessor
+{
+	function processLine($buffer);
+}
+
+class LogProcessorApiV3 implements LogProcessor
 {
 	protected $inParams = false;
 	protected $isFeed = false;
@@ -919,7 +966,7 @@ function processPS2Request($parsedParams)
 	testAction($fullActionName, $parsedParams, $uri, array(), $compareMode);
 }
 
-class LogProcessorPS2
+class LogProcessorPS2 implements LogProcessor
 {	
 	function processLine($buffer)
 	{
@@ -940,7 +987,7 @@ class LogProcessorPS2
 	}
 }
 
-class LogProcessorFeedList
+class LogProcessorFeedList implements LogProcessor
 {
 	function processLine($buffer)
 	{
@@ -950,7 +997,7 @@ class LogProcessorFeedList
 	}
 }
 
-class LogProcessorUriList
+class LogProcessorUriList implements LogProcessor
 {
 	function processLine($buffer)
 	{
@@ -971,7 +1018,7 @@ class LogProcessorUriList
 	}
 }
 
-function processRegularFile($apiLogPath, $logProcessor)
+function processRegularFile($apiLogPath, LogProcessor $logProcessor)
 {
 	$handle = @fopen($apiLogPath, "r");
 	if (!$handle)
@@ -989,7 +1036,7 @@ function processRegularFile($apiLogPath, $logProcessor)
 	fclose($handle);
 }
 
-function processGZipFile($apiLogPath, $logProcessor)
+function processGZipFile($apiLogPath, LogProcessor $logProcessor)
 {
 	$handle = @gzopen($apiLogPath, "r");
 	if (!$handle)
