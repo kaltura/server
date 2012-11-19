@@ -81,6 +81,13 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	 */
 	public $categoryFullIds;
 	
+	/**
+	 * Permission names for the category kuser
+	 * @var string
+	 * @filter matchand,matchor
+	 */
+	public $permissionNames;
+	
 	private static $mapBetweenObjects = array
 	(
 		"categoryId",
@@ -92,6 +99,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 		"updatedAt",
 		"updateMethod",
 		"categoryFullIds",
+		"permissionNames",
 	);
 	
 	public function toObject($dbObject = null, $skip = array()) {
