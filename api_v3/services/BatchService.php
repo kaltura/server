@@ -300,6 +300,7 @@ class BatchService extends KalturaBaseService
 	 * @action updatePartnerLoadTable
 	 */
 	function updatePartnerLoadTableAction() {
+		KalturaResponseCacher::disableCache();
 		PartnerLoadPeer::updatePartnerLoadTable();
 	}
 	
