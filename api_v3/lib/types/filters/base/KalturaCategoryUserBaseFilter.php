@@ -24,6 +24,8 @@ abstract class KalturaCategoryUserBaseFilter extends KalturaFilter
 		"updateMethodIn" => "_in_update_method",
 		"categoryFullIdsStartsWith" => "_likex_category_full_ids",
 		"categoryFullIdsEqual" => "_eq_category_full_ids",
+		"permissionNamesMatchAnd" => "_matchand_permission_names",
+		"permissionNamesMatchOr" => "_matchor_permission_names",
 	);
 
 	static private $order_by_map = array
@@ -123,4 +125,14 @@ abstract class KalturaCategoryUserBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $categoryFullIdsEqual;
+
+	/**
+	 * @var string
+	 */
+	public $permissionNamesMatchAnd;
+
+	/**
+	 * @var string
+	 */
+	public $permissionNamesMatchOr;
 }
