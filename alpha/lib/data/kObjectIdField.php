@@ -6,7 +6,7 @@
  * @subpackage model.data
  *
  */
-class kObjectIdStringField extends kStringValue
+class kObjectIdField extends kStringValue
 {
 	/* (non-PHPdoc)
 	 * @see kIntegerField::getFieldValue()
