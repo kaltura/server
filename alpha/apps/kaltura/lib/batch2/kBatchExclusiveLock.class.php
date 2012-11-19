@@ -281,14 +281,10 @@ class kBatchExclusiveLock
 	 */
 	private static function addPrioritizersCondition(Criteria $c, $prioritizers_ratio) 
 	{
-		$jobSubTypeBatch = BatchJobLockPeer::JOB_SUB_TYPE;
-		$jobSubTypePartner = PartnerLoadPeer::JOB_SUB_TYPE;
-		$jobSubTypeCondition = "(($jobSubTypeBatch = $jobSubTypePartner) OR ($jobSubTypeBatch is null AND $jobSubTypePartner = 0) OR ($jobSubTypePartner is null))";
-		
 		$c->addMultipleJoin(array(array(BatchJobLockPeer::PARTNER_ID, PartnerLoadPeer::PARTNER_ID  ),
 				array(BatchJobLockPeer::JOB_TYPE, PartnerLoadPeer::JOB_TYPE),
+				array(BatchJobLockPeer::JOB_SUB_TYPE, PartnerLoadPeer::JOB_SUB_TYPE),
 				array(BatchJobLockPeer::DC, PartnerLoadPeer::DC)), Criteria::LEFT_JOIN);
-		$c->addAnd(BatchJobLockPeer::JOB_SUB_TYPE, $jobSubTypeCondition, Criteria::CUSTOM);
 		
 		if(rand(0, 100) < $prioritizers_ratio) 
 		{	// Throughput
