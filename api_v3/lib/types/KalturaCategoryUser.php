@@ -82,7 +82,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	public $categoryFullIds;
 	
 	/**
-	 * Permission names for the category kuser
+	 * Set of category-related permissions for the current category user.
 	 * @var string
 	 * @filter matchand,matchor
 	 */
