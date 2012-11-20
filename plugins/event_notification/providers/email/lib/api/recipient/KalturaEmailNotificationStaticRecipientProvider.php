@@ -6,22 +6,11 @@
  * @subpackage model.data
  */
 class KalturaEmailNotificationStaticRecipientProvider extends KalturaEmailNotificationRecipientProvider
-{
+{	
 	/**
 	 * Email to emails and names
 	 * @var KalturaEmailNotificationRecipientArray
 	 */
-	public $to;
+	public $emailRecipients;
 	
-	/**
-	 * Email cc emails and names
-	 * @var KalturaEmailNotificationRecipientArray
-	 */
-	public $cc;
-	
-	/**
-	 * Email bcc emails and names
-	 * @var KalturaEmailNotificationRecipientArray
-	 */
-	public $bcc;
 }
