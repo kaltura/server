@@ -29,7 +29,7 @@ class KalturaReportInputBaseFilter extends KalturaObject
 	/**
 	 * End date as string (YYYYMMDD)
 	 *
-	 * @var int
+	 * @var string
 	 */
 	public $toDay;
 	
