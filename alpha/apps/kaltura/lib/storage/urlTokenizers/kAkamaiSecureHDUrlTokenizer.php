@@ -271,7 +271,15 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 		if (!preg_match($this->aclRegex, $url, $matches))
 			return $url;
 			
-		$acl = $matches[0] . $this->aclPostfix;		
+		$acl = $matches[0];
+		
+		// strip manifest postfixes that should not be signed from the acl
+		$postfixes = array('/master.m3u8', '/manifest.f4m');
+		foreach ($postfixes as $postfix)
+			if (substr($acl, -strlen($postfix)) == $postfix)
+				$acl = substr($acl, 0, -strlen($postfix));		
+		
+		$acl .= $this->aclPostfix;		
 		
 		$c = new Akamai_EdgeAuth_Config();
 		$c->set_acl($acl);

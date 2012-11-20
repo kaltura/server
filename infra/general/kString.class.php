@@ -410,7 +410,7 @@ class kString
 			$curString = substr($curString, -strlen($postfix));
 			if ($curString == $postfix)
 				continue;
-			$postfix = self::getCommonPrefixBase($postfix, $curString);
+			$postfix = self::getCommonPostfixBase($postfix, $curString);
 		}
 	}
 }
