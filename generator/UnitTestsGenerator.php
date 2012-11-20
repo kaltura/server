@@ -7,12 +7,6 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	private $_txtBase = "";
 	private $_txtTest = "";
 	private $_txtIni = "";
-	
-	/**
-	 * Counts the actions that dependent on add action
-	 * @var int
-	 */
-	private $dependencyIndex = 0;
 
 	/**
 	 *
@@ -55,8 +49,6 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	 */
 	protected function writeBeforeService(KalturaServiceActionItem $serviceActionItem)
 	{
-		$this->dependencyIndex = 0;
-		
 		$serviceName = $serviceActionItem->serviceInfo->serviceName;
 		$serviceClass = $serviceActionItem->serviceClass;
 
@@ -329,10 +321,9 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	 * @param array $testParams - passed by reference
 	 * @param array $testValues - passed by reference
 	 * @param array $validateValues - passed by reference
-	 * @param boolean $addId - sets if the given action depends on the id from the add action
 	 * @param boolean $isBase
 	 */
-	protected function setTestParamsAndValues(KalturaParamInfo $actionParam, &$testParams, &$testValues, &$validateValues = null, $addId = false, $isBase = false)
+	protected function setTestParamsAndValues(KalturaParamInfo $actionParam, &$testParams, &$testValues, &$validateValues, $isBase)
 	{
 		$paramType = $actionParam->getType();
 		$paramName = $actionParam->getName();
@@ -479,20 +470,23 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 
 		$isBase = false;
 		$testReturnedType = null;
-		$addId = false;
+		$dependency = null;
 
 		//Set the tests to be the regression tests
 		if($action == 'add' || $action == 'update' || $action == 'get' || $action == 'listAction' || $action == 'delete')
 			$isBase = true;
 
 		//Createds the dependency between the tests to the add tests
-		if($action == 'update' || $action == 'get' || $action == 'delete' )
-			$addId = true;
+		if($action == 'update')
+			$dependency = 'testAdd';
+		if($action == 'get')
+			$dependency = 'testUpdate';
+		if($action == 'delete')
+			$dependency = 'testGet';
 
 		//Special care for add method as it needs to return the id to the other tests
-		if($action == 'add')
+		if($action == 'add' || $action == 'update' || $action == 'get')
 		{
-			//TODO: support return type of int
 			$outputType = $outputTypeReflector->getType();
 			$testReturnedType = "$outputType"; // for the dependency (CRUD)
 		}
@@ -511,7 +505,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$validateValues = array();
 
 		foreach($actionParams as $actionParam)
-			$this->setTestParamsAndValues($actionParam, $testParams, $testValues, $validateValues, $addId, $isBase);
+			$this->setTestParamsAndValues($actionParam, $testParams, $testValues, $validateValues, $isBase);
 
 		if($outputTypeReflector)
 			$this->setOutputData($outputTypeReflector, $testParams, $testValues, $isBase, $validateValues);
@@ -529,11 +523,8 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$this->lastDependencyTest = "test{$actionName}";
 			$this->write("	 * @return $testReturnedType", $isBase); //will always be for the base
 		}
-		if($addId)
-		{
-			$this->write("	 * @depends testAdd with data set #$this->dependencyIndex", $isBase);
-			$this->dependencyIndex++;
-		}
+		if($dependency)
+			$this->write("	 * @depends $dependency with data set #0", $isBase);
 
 		if(count($testValues))
 			$this->write("	 * @dataProvider provideData", $isBase);
