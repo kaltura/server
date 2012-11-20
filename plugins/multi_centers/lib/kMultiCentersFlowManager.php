@@ -71,18 +71,9 @@ class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 			KalturaLog::err("Invalid filesync record with id [$fileSyncId]");
 			throw new KalturaAPIException(MultiCentersErrors::INVALID_FILESYNC_RECORD, $fileSyncId);
 		}
-		$actualSize = kFile::fileSize(kFileSyncUtils::getLocalFilePathForKey(kFileSyncUtils::getKeyForFileSync($fileSync)));
-		$sizeInDB = $fileSync->getFileSize();
-		if ($sizeInDB && ($actualSize > $sizeInDB)) {
-			// caused by failure in previous attempts to import a fileSync - the next attempt appends itself to the reamins of the failed one.
-			KalturaLog::debug("FileSync ID [$fileSyncId]'s size on disk is larger than anticipated [$actualSize] instaed of [$sizeInDB]. Failing the FileSync.");
-			$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
-		}
-		else {
-			// all is well
-			$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
-			$fileSync->setFileSize($actualSize);
-		}
+		
+		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
+		$fileSync->setFileSizeFromPath(kFileSyncUtils::getLocalFilePathForKey(kFileSyncUtils::getKeyForFileSync($fileSync)));
 		$fileSync->save();
 		return $dbBatchJob;
 	}
