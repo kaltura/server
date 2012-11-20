@@ -39,15 +39,15 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 		 //Gets the right job for the engine	
-		if($baseClass == 'kBulkUploadJobData' && (is_null($enumValue) || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)))
+		if($baseClass == 'kBulkUploadJobData' && (!$enumValue || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)))
 			return new kBulkUploadCsvJobData();
 		
 		 //Gets the right job for the engine	
-		if($baseClass == 'KalturaBulkUploadJobData' && (is_null($enumValue) || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)))
+		if($baseClass == 'KalturaBulkUploadJobData' && (!$enumValue || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)))
 			return new KalturaBulkUploadCsvJobData();
 		
 		//Gets the engine (only for clients)
-		if($baseClass == 'KBulkUploadEngine' && class_exists('KalturaClient') && (is_null($enumValue) || $enumValue == KalturaBulkUploadType::CSV))
+		if($baseClass == 'KBulkUploadEngine' && class_exists('KalturaClient') && (!$enumValue || $enumValue == KalturaBulkUploadType::CSV))
 		{
 			list($taskConfig, $kClient, $job) = $constructorArgs;
 			/* @var $job KalturaBatchJob */
@@ -63,7 +63,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			    case KalturaBulkUploadObjectType::CATEGORY_USER:
 			        return new BulkUploadCategoryUserEngineCsv($taskConfig, $kClient, $job);
 			    default:
-			        throw new KalturaAPIException();
+			        throw new KalturaException("Bulk upload object type [{$job->data->bulkUploadObjectType}] not found", KalturaBatchJobAppErrors::ENGINE_NOT_FOUND);
 			        break;
 			}
 			
@@ -88,7 +88,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	 */
 	public static function getFileExtension($enumValue)
 	{
-		if(is_null($enumValue) || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV))
+		if(!$enumValue || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV))
 			return 'csv';
 	}
 	
@@ -99,7 +99,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	 */
 	public static function writeBulkUploadLogFile($batchJob)
 	{
-		if(($batchJob->getJobSubType() != null) && ($batchJob->getJobSubType() != self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV))){
+		if($batchJob->getJobSubType() && ($batchJob->getJobSubType() != self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV))){
 			return;
 		}
 		
