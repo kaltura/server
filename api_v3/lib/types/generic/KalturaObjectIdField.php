@@ -1,6 +1,6 @@
 <?php
 /**
- * Evaluates PHP statement, depends on the execution context
+ * Evaluates object ID according to given context
  * 
  * @package api
  * @subpackage objects
