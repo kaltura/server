@@ -22,28 +22,28 @@ class kEmailNotificationDispatchJobData extends kEventNotificationDispatchJobDat
 	/**
 	 * Email recipient emails and names, key is mail address and value is the name
 	 * 
-	 * @var array<email,name>
+	 * @var kEmailNotificationRecipientJobData
 	 */
 	private $to;
 	
 	/**
 	 * Email cc emails and names, key is mail address and value is the name
 	 * 
-	 * @var array<email,name>
+	 * @var kEmailNotificationRecipientJobData
 	 */
 	private $cc;
 	
 	/**
 	 * Email bcc emails and names, key is mail address and value is the name
 	 * 
-	 * @var array<email,name>
+	 * @var kEmailNotificationRecipientJobData
 	 */
 	private $bcc;
 	
 	/**
 	 * Email addresses that a reading confirmation will be sent to
 	 * 
-	 * @var array<email,name>
+	 * @var kEmailNotificationRecipientJobData
 	 */
 	private $replyTo;
 	
