@@ -57,7 +57,22 @@ class EmailNotificationPlugin extends KalturaPlugin implements IKalturaPermissio
 	{
 		if($baseClass == 'ISyncableFile' && $enumValue == self::getEmailNotificationFileSyncObjectTypeCoreValue(EmailNotificationFileSyncObjectType::EMAIL_NOTIFICATION_TEMPLATE) && isset($constructorArgs['objectId']))
 			return EventNotificationTemplatePeer::retrieveTypeByPK(self::getEmailNotificationTemplateTypeCoreValue(EmailNotificationTemplateType::EMAIL), $constructorArgs['objectId']);
-	
+		
+			
+		if ($baseClass == 'KEmailNotificationRecipientEngine')
+		{
+			list($recipientJobData, $kClient) = $constructorArgs;
+			switch ($enumValue)	
+			{
+				case KalturaEmailNotificationRecipientProviderType::CATEGORY:
+					return new KEmailNotificationCategoryRecipientEngine($recipientJobData, $kClient);
+					break;
+				case KalturaEmailNotificationRecipientProviderType::STATIC_LIST:
+					return new KEmailNotificationStaticRecipientEngine($recipientJobData, $kClient);
+					break;
+			}
+		}
+		
 		$class = self::getObjectClass($baseClass, $enumValue);
 		if($class)
 		{
