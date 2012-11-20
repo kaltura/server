@@ -20,26 +20,26 @@ class KalturaEmailNotificationDispatchJobData extends KalturaEventNotificationDi
 	
 	/**
 	 * Email recipient emails and names, key is mail address and value is the name
-	 * @var KalturaKeyValueArray
+	 * @var KalturaEmailNotificationRecipientJobData
 	 */
 	public $to;
 	
 	/**
 	 * Email cc emails and names, key is mail address and value is the name
-	 * @var KalturaKeyValueArray
+	 * @var KalturaEmailNotificationRecipientJobData
 	 */
 	public $cc;
 	
 	/**
 	 * Email bcc emails and names, key is mail address and value is the name
-	 * @var KalturaKeyValueArray
+	 * @var KalturaEmailNotificationRecipientJobData
 	 */
 	public $bcc;
 	
 	/**
 	 * Email addresses that a replies should be sent to, key is mail address and value is the name
 	 * 
-	 * @var KalturaKeyValueArray
+	 * @var KalturaEmailNotificationRecipientJobData
 	 */
 	public $replyTo;
 	
@@ -114,10 +114,10 @@ class KalturaEmailNotificationDispatchJobData extends KalturaEventNotificationDi
 		/* @var $dbObject kEmailNotificationDispatchJobData */
 		parent::fromObject($dbObject);
 		
-		$this->to = KalturaKeyValueArray::fromKeyValueArray($dbObject->getTo());
-		$this->cc = KalturaKeyValueArray::fromKeyValueArray($dbObject->getCc());
-		$this->bcc = KalturaKeyValueArray::fromKeyValueArray($dbObject->getBcc());
-		$this->replyTo = KalturaKeyValueArray::fromKeyValueArray($dbObject->getReplyTo());
+		$this->to = KalturaEmailNotificationRecipientJobData::getDataInstance($dbObject->getTo());
+		$this->cc = KalturaEmailNotificationRecipientJobData::getDataInstance($dbObject->getCc());
+		$this->bcc = KalturaEmailNotificationRecipientJobData::getDataInstance($dbObject->getBcc());
+		$this->replyTo = KalturaEmailNotificationRecipientJobData::getDataInstance($dbObject->getReplyTo());
 		$this->customHeaders = KalturaKeyValueArray::fromKeyValueArray($dbObject->getCustomHeaders());
 		$this->contentParameters = KalturaKeyValueArray::fromKeyValueArray($dbObject->getContentParameters());
 	}
