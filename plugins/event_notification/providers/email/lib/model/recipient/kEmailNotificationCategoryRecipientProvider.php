@@ -11,21 +11,21 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 	 * ID of the category to whose subscribers the email should be sent
 	 * @var kStringValue
 	 */
-	protected $category_id;
+	protected $categoryId;
 
 
 	/**
-	 * @return the $category_id
+	 * @return kStringValue
 	 */
 	public function getCategoryId() {
-		return $this->category_id;
+		return $this->categoryId;
 	}
 
 	/**
-	 * @param field_type $category_id
+	 * @param kStringValue $category_id
 	 */
 	public function setCategoryId($category_id) {
-		$this->category_id = $category_id;
+		$this->categoryId = $category_id;
 	}
 	
 	/* (non-PHPdoc)
@@ -36,7 +36,7 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 		$ret = new kEmailNotificationCategoryRecipientJobData();
 		if ($this->getCategoryId() instanceof kObjectIdField)
 		{
-			$ret->setCategoryId($this->category_id->getValue());
+			$ret->setCategoryId($this->categoryId->getValue());
 		}
 		
 		return $ret;
