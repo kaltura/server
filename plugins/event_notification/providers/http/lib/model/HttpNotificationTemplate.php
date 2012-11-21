@@ -68,7 +68,7 @@ class HttpNotificationTemplate extends EventNotificationTemplate implements ISyn
 		$contentParameters = $this->getContentParameters();
 		foreach($contentParameters as $contentParameter)
 		{
-			/* @var $contentParameter kHttpNotificationParameter */
+			/* @var $contentParameter kEventNotificationParameter */
 			$value = $contentParameter->getValue();
 			if($scope && $value instanceof kStringField)
 				$value->setScope($scope);

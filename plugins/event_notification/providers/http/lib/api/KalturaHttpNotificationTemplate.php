@@ -133,7 +133,7 @@ class KalturaHttpNotificationTemplate extends KalturaEventNotificationTemplate
 	
 	/**
 	 * Define the content dynamic parameters
-	 * @var KalturaHttpNotificationParameterArray
+	 * @var KalturaEventNotificationParameterArray
 	 */
 	public $contentParameters;
 	
