@@ -152,14 +152,14 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			$statusList = explode(',', $filter->get('_in_status'));
 			foreach ($statusList as &$status)
 			{
-				$status = 'p' . kCurrentContext::getCurrentPartnerId() . 'st' . $status;
+				$status = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::STATUS, $status, kCurrentContext::getCurrentPartnerId());
 			}
 			$filter->set('_in_status', implode(',', $statusList));
 		}
 		
 		if ($filter->get('_eq_status'))
 		{
-			$filter->set('_eq_status', 'p' . kCurrentContext::getCurrentPartnerId() . 'st' . $filter->get('_eq_status'));
+			$filter->set('_eq_status', categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::STATUS, $filter->get('_eq_status'), kCurrentContext::getCurrentPartnerId()));
 		}
 		
 		if ($filter->get('_in_update_method'))
@@ -167,14 +167,14 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			$updateMethodList = explode(',', $filter->get('_in_update_method'));
 			foreach ($updateMethodList as &$updateMethod)
 			{
-				$updateMethod = 'p' . kCurrentContext::getCurrentPartnerId() . 'um' . $updateMethod;
+				$updateMethod = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::UPDATE_METHOD, $updateMethod, kCurrentContext::getCurrentPartnerId());
 			}
 			$filter->set('_in_update_method', implode(',', $updateMethodList));
 		}
 		
 		if ($filter->get('_eq_update_method'))
 		{
-			$filter->set('_eq_update_method', 'p' . kCurrentContext::getCurrentPartnerId() . 'um' . $filter->get('_eq_update_method'));
+			$filter->set('_eq_update_method', categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::UPDATE_METHOD, $filter->get('_eq_update_method'), kCurrentContext::getCurrentPartnerId()));
 		}
 		
 		return parent::applyFilterFields($filter);
