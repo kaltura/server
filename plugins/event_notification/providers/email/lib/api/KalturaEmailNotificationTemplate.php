@@ -170,4 +170,18 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 			
 		return parent::toObject($dbObject, $propertiesToSkip);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject($source_object)
+	 */
+	public function fromObject($dbObject)
+	{
+		/* @var $dbObject EmailNotificationTemplate */
+		parent::fromObject($dbObject);
+		
+		$this->to = KalturaEmailNotificationRecipientProvider::getProviderInstance($dbObject->getTo());
+		$this->cc = KalturaEmailNotificationRecipientProvider::getProviderInstance($dbObject->getCc());
+		$this->bcc = KalturaEmailNotificationRecipientProvider::getProviderInstance($dbObject->getBcc());
+		$this->replyTo = KalturaEmailNotificationRecipientProvider::getProviderInstance($dbObject->getReplyTo());
+	}
 }

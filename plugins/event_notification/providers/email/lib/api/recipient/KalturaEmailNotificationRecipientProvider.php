@@ -6,6 +6,23 @@
  */
 abstract class KalturaEmailNotificationRecipientProvider extends KalturaObject
 {
-
-
+	public static function getProviderInstance ($dbObject)
+	{
+		switch (get_class($dbObject))
+		{
+			case 'kEmailNotificationStaticRecipientProvider':
+				$instance = new KalturaEmailNotificationStaticRecipientProvider();
+			case 'kEmailNotificationCategoryRecipientProvider':
+				$instance = new KalturaEmailNotificationCategoryRecipientProvider();
+				break;
+			default:
+				$instance = KalturaPluginManager::loadObject('kEmailNotificationRecipientProvider', get_class($dbObject));
+				break;
+		}
+		
+		if ($instance)
+			$instance->fromObject($dbObject);
+		
+		return $instance;
+	}
 }
