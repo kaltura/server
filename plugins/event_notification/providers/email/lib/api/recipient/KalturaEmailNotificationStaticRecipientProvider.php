@@ -28,7 +28,7 @@ class KalturaEmailNotificationStaticRecipientProvider extends KalturaEmailNotifi
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */
-	public function toObject($dbObject, $propertiesToSkip = array())
+	public function toObject($dbObject = null, $propertiesToSkip = array())
 	{
 		if (is_null($dbObject))
 			$dbObject = new kEmailNotificationStaticRecipientProvider();

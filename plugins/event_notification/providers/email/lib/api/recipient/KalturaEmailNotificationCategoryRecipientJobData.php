@@ -41,4 +41,15 @@ class KalturaEmailNotificationCategoryRecipientJobData extends KalturaEmailNotif
 		parent::fromObject($source_object);
 		$this->setProviderType();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+	 */
+	public function toObject($dbObject = null, $propertiesToSkip = array())
+	{
+		if (is_null($dbObject))
+			$dbObject = new kEmailNotificationCategoryRecipientJobData();
+		
+		return parent::toObject($dbObject, $propertiesToSkip);
+	}
 }
