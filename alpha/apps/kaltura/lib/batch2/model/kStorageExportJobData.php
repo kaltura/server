@@ -9,12 +9,30 @@ class kStorageExportJobData extends kStorageJobData
 	 * @var bool
 	 */   	
     private $force; 
-        
-    /**
-	 * @var KalturaAmazonS3StorageProfileFilesPermissionLevel
-	 */   	
-    private $filesPermissionInS3;
+    
+	public static function getInstance($protocol)
+	{
+		switch($protocol)
+		{
+			case StorageProfile::STORAGE_PROTOCOL_S3:
+				return new kAmazonS3StorageExportJobData();
+			default:
+				return new kStorageExportJobData();
+		}
+	}
 	
+	public function setStorageExportJobData(StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false)
+	{
+		$this->setServerUrl($externalStorage->getStorageUrl()); 
+	    $this->setServerUsername($externalStorage->getStorageUsername()); 
+	    $this->setServerPassword($externalStorage->getStoragePassword());
+	    $this->setFtpPassiveMode($externalStorage->getStorageFtpPassiveMode());
+	    $this->setSrcFileSyncLocalPath($srcFileSyncLocalPath);
+		$this->setSrcFileSyncId($fileSync->getId());
+		$this->setForce($force);
+		$this->setDestFileSyncStoredPath($externalStorage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
+	}
+        
 	/**
 	 * @return the $force
 	 */
@@ -31,20 +49,5 @@ class kStorageExportJobData extends kStorageJobData
 		$this->force = $force;
 	}
 	
-	/**
-	 * @return the $filesPermissionInS3
-	 */
-	public function getFilesPermissionInS3()
-	{
-		return $this->filesPermissionInS3;
-	}
-	
-	/**
-	 * @param $filesPermissionInS3 the $filesPermissionInS3 to set
-	 */
-	public function setFilesPermissionInS3 ($filesPermissionInS3)
-	{
-		$this->filesPermissionInS3 = $filesPermissionInS3;	
-	}
 	
 }
