@@ -34,7 +34,11 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 				$recipient->email = $email; 
 				$recipient->name = $name; 
 				
-				$object->to = array($recipient);
+				$recipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
+				$recipientProvider->emailRecipients = array();
+				$recipientProvider->emailRecipients[] = $recipient;
+				
+				$object->to = $recipientProvider;
 			}
 			
 			$contentParameters = $object->contentParameters;
