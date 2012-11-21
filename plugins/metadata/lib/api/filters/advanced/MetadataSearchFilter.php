@@ -311,6 +311,9 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		parent::addToXml($xmlElement);
 		
 		$xmlElement->addAttribute('metadataProfileId', $this->metadataProfileId);
+
+		if (!is_null($this->orderBy))
+			$xmlElement->addAttribute('orderBy', $this->orderBy);
 	}
 	
 	public function fillObjectFromXml(SimpleXMLElement $xmlElement)
@@ -322,7 +325,10 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		$attr = $xmlElement->attributes();
 		if(isset($attr['metadataProfileId']))
 			$this->metadataProfileId = (int) $attr['metadataProfileId'];
-			
+
+		if(isset($attr['orderBy']))
+			$this->orderBy = (string) $attr['orderBy'];
+		
 		if(isset($attr['operatorType']))
 			$this->type = (int) $attr['operatorType'];
 			
