@@ -2,7 +2,7 @@
 /**
  * API object which provides the recipients of category related notifications.
  *
- * @package plugins.eventNotification
+ * @package plugins.emailNotification
  * @subpackage model.data
  */
 class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNotificationRecipientProvider

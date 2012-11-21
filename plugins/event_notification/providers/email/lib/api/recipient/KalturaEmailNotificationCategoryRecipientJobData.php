@@ -2,7 +2,7 @@
 /**
  * Job Data representing the provider of recipients for a single categoryId
  *
- * @package plugins.eventNotification
+ * @package plugins.emailNotification
  * @subpackage model.data
  */
 class KalturaEmailNotificationCategoryRecipientJobData extends KalturaEmailNotificationRecipientJobData

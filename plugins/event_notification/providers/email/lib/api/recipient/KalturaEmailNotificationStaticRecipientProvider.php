@@ -2,7 +2,7 @@
 /**
  * API class for recipient provider containing a static list of email recipients.
  *
- * @package plugins.eventNotification
+ * @package plugins.emailNotification
  * @subpackage model.data
  */
 class KalturaEmailNotificationStaticRecipientProvider extends KalturaEmailNotificationRecipientProvider

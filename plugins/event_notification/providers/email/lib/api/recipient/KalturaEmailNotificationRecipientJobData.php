@@ -1,7 +1,7 @@
 <?php
 /**
  * Abstract class representing the final output recipients going into the batch mechanism
- * @package plugins.eventNotification
+ * @package plugins.emailNotification
  * @subpackage model.data
  */
 abstract class KalturaEmailNotificationRecipientJobData extends KalturaObject

@@ -2,7 +2,7 @@
 /**
  * JobData representing the static receipient array
  *
- * @package plugins.eventNotification
+ * @package plugins.emailNotification
  * @subpackage model.data
  */
 class KalturaEmailNotificationStaticRecipientJobData extends KalturaEmailNotificationRecipientJobData
