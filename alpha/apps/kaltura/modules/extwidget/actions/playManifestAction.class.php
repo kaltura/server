@@ -1329,6 +1329,14 @@ class playManifestAction extends kalturaAction
 		$this->enforceEncryption();
 		$this->initFlavorAssetArray();
 		$this->initEntryDuration();
+		
+		if ($this->duration && $this->duration < 10 && $this->format == 'hdnetworkmanifest')
+		{
+			// videos shorter than 10 seconds cannot be played with HDS, fall back to HTTP
+			$this->format = StorageProfile::PLAY_FORMAT_HTTP;
+			$this->flavorAssets = array(reset($this->flavorAssets));
+		}
+		
 		$this->initStorageProfile();
 		$this->initUrlManager();
 		
