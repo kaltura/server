@@ -98,12 +98,12 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		foreach($object->contentParameters as $parameter)
 			$this->addContentParameter($parameter);
 			
-		if(count($object->to) > 1)
+		if(count($object->to->emailRecipients) > 1)
 			$this->addError("Multiple recipients is not supported in admin console, saving the configuration will remove the existing recipients list.");
 			
-		if(count($object->to))
+		if(count($object->to->emailRecipients))
 		{
-			$to = reset($object->to);
+			$to = reset($object->to->emailRecipients);
 			/* @var $to KalturaEmailNotificationRecipient */
 			
 			$this->setDefault('to_email', $to->email->value);
