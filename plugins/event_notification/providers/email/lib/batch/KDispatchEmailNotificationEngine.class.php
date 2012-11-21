@@ -158,22 +158,42 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			
 		if($data->to)
 		{
-			$this->addRecipientArray($data->to, $contentParameters, self::TO_RECIPIENT_TYPE);
+			$recipients = $this->getRecipientArray($data->to, $contentParameters);
+			foreach ($recipients as $email=>$name)
+			{
+				KalturaLog::info("Adding recipient to TO recipients $name<$email>");
+				self::$mailer->AddAddress($email, $name);
+			}
 		}
 		
 		if($data->cc)
 		{
-			$this->addRecipientArray($data->to, $contentParameters, self::CC_RECIPIENT_TYPE);
+			$recipients = $this->getRecipientArray($data->cc, $contentParameters);
+			foreach ($recipients as $email=>$name)
+			{
+				KalturaLog::info("Adding recipient to CC recipients $name<$email>");
+				self::$mailer->AddCC($email, $name);
+			}
 		}
 		
 		if($data->bcc)
 		{
-			$this->addRecipientArray($data->to, $contentParameters, self::BCC_RECIPIENT_TYPE);
+			$recipients = $this->getRecipientArray($data->bcc, $contentParameters);
+			foreach ($recipients as $email=>$name)
+			{
+				KalturaLog::info("Adding recipient to BCC recipients $name<$email>");
+				self::$mailer->AddBCC($email, $name);
+			}
 		}
 		
 		if($data->replyTo)
 		{
-			$this->addRecipientArray($data->to, $contentParameters, self::REPLYTO_RECIPIENT_TYPE);
+			$recipients = $this->getRecipientArray($data->replyTo, $contentParameters);
+			foreach ($recipients as $email=>$name)
+			{
+				KalturaLog::info("Adding recipient to ReplyTo recipients $name<$email>");
+				self::$mailer->AddReplyTo($email, $name);
+			}
 		}
 			
 		if(!is_null($data->fromEmail)) 
@@ -223,6 +243,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		{
 			foreach($data->customHeaders as $customHeader)
 			{
+				/* @var $customHeader KalturaKeyValue */
 				$key = $customHeader->key;
 				$value = $customHeader->value;
 				/* @var $customHeader KalturaKeyValue */
@@ -264,23 +285,19 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		
 		$footer = vsprintf( self::$emailFooterTemplate, array( $forumsLink) );	
 		return $footer;
-	}
+	} 
 	
 	/**
 	 * Function to retrieve array of recipients for the email notifiation based on the data.
 	 * @param KalturaEmailNotificationRecipientJobData $recipientJobData
 	 * @param array $contentParameters
-	 * @param KalturaClient $kClient
+	 * @return array;
 	 */
-	protected function addRecipientArray (KalturaEmailNotificationRecipientJobData $recipientJobData, array $contentParameters, $recipientType)
+	protected function getRecipientArray (KalturaEmailNotificationRecipientJobData $recipientJobData, array $contentParameters)
 	{
 		$recipientEngine = KEmailNotificationRecipientEngine::getEmailNotificationRecipientEngine($recipientJobData, $this->client);
 		$recipients = $recipientEngine->getRecipients();
-		foreach ($recipients as $email=>$name)
-		{
-			KalturaLog::info("Add $recipientType recipient [$email<$name>]");
-			$recipientAdder = "Add{$recipientType}";
-			$this::$mailer->$recipientAdder($email, $name);
-		}
+		
+		return $recipients;
 	}
 }
