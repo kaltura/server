@@ -13,4 +13,26 @@ class KalturaEmailNotificationStaticRecipientProvider extends KalturaEmailNotifi
 	 */
 	public $emailRecipients;
 	
+	private static $map_between_objects = array(
+		'emailRecipients',
+	);
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+	 */
+	public function toObject($dbObject, $propertiesToSkip = array())
+	{
+		if (is_null($dbObject))
+			$dbObject = new kEmailNotificationStaticRecipientProvider();
+			
+		return parent::toObject($dbObject, $propertiesToSkip);
+	}	
 }
