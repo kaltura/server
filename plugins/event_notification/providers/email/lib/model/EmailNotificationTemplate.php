@@ -44,10 +44,14 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 		$jobData->setMessageID($this->getMessageID());
 		$jobData->setCustomHeaders($this->getCustomHeaders());
 		
-		$jobData->setTo($this->getTo()->getScopedProviderJobData($scope));
-		$jobData->setCc($this->getCc()->getScopedProviderJobData($scope));
-		$jobData->setBcc($this->getBcc()->getScopedProviderJobData($scope));
-		$jobData->setReplyTo($this->getReplyTo()->getScopedProviderJobData($scope));
+		if ($this->getTo())
+			$jobData->setTo($this->getTo()->getScopedProviderJobData($scope));
+		if ($this->getCc())
+			$jobData->setCc($this->getCc()->getScopedProviderJobData($scope));
+		if ($this->getBcc())
+			$jobData->setBcc($this->getBcc()->getScopedProviderJobData($scope));
+		if ($this->getReplyTo())
+			$jobData->setReplyTo($this->getReplyTo()->getScopedProviderJobData($scope));
 		
 		$contentParametersValues = array();
 		$contentParameters = $this->getContentParameters();
