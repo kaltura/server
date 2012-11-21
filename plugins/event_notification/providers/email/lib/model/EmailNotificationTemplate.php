@@ -286,9 +286,9 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	public function setHostname($v)								{return $this->putInCustomData(self::CUSTOM_DATA_HOSTNAME, $v);}
 	public function setMessageID($v)							{return $this->putInCustomData(self::CUSTOM_DATA_MESSAGE_ID, $v);}
 	public function setCustomHeaders($v)						{return $this->putInCustomData(self::CUSTOM_DATA_CUSTOM_HEADERS, $v);}
-	public function setTo(array $v)								{return $this->putInCustomData(self::CUSTOM_DATA_TO, $v);}
-	public function setCc(array $v)								{return $this->putInCustomData(self::CUSTOM_DATA_CC, $v);}
-	public function setBcc(array $v)							{return $this->putInCustomData(self::CUSTOM_DATA_BCC, $v);}
-	public function setReplyTo(array $v)						{return $this->putInCustomData(self::CUSTOM_DATA_REPLY_TO, $v);}
+	public function setTo(kEmailNotificationRecipientProvider $v)								{return $this->putInCustomData(self::CUSTOM_DATA_TO, $v);}
+	public function setCc(kEmailNotificationRecipientProvider $v)								{return $this->putInCustomData(self::CUSTOM_DATA_CC, $v);}
+	public function setBcc(kEmailNotificationRecipientProvider $v)							{return $this->putInCustomData(self::CUSTOM_DATA_BCC, $v);}
+	public function setReplyTo(kEmailNotificationRecipientProvider $v)						{return $this->putInCustomData(self::CUSTOM_DATA_REPLY_TO, $v);}
 	public function setContentParameters(array $v)				{return $this->putInCustomData(self::CUSTOM_DATA_CONTENT_PARAMETERS, $v);}
 }
