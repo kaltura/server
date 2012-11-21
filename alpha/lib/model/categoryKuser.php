@@ -19,9 +19,19 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	
 	const BULK_UPLOAD_ID = "bulk_upload_id";
 	
+	const PARTNER_INDEX_PREFIX = 'p';
+	
+	const UPDATE_METHOD_INDEX_PREFIX = 'um';
+	
+	const STATUS_INDEX_PREFIX = 'st';
+	
+	const PERMISSION_NAME_INDEX_PREFIX = "pn";
+	
 	private static $indexFieldTypes = null;
 		
 	private static $indexFieldsMap = null;
+	
+	
 	
 	/**
 	 * Applies default values to this object.
@@ -296,7 +306,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	{
 		$permissionNames = explode(",", $this->getPermissionNames());
 		foreach ($permissionNames as &$permissionName)
-			$permissionName = 'p'.$this->getPartnerId()."pn".$permissionName;
+			$permissionName = self::getSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionName, $this->getPartnerId());
 		
 		return implode(",", $permissionNames);
 	}
@@ -307,7 +317,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	 */
 	public function getSearchIndexStatus ()
 	{
-		return 'p'.$this->getPartnerId() . 'st' . $this->getStatus();
+		return self::getSearchIndexFieldValue(categoryKuserPeer::STATUS, $this->getStatus(), $this->getPartnerId());
 	}
 	
 	/**
@@ -316,7 +326,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	 */
 	public function getSearchIndexUpdateMethod ()
 	{
-		return 'p'.$this->getPartnerId() . 'um' . $this->getUpdateMethod();
+		return self::getSearchIndexFieldValue(categoryKuserPeer::UPDATE_METHOD, $this->getUpdateMethod(), $this->getPartnerId());
 	}
 	
 	/**
@@ -348,6 +358,25 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		$parsedFullId .= md5($fullIds . category::FULL_IDS_EQUAL_MATCH_STRING);
 		
 		return $parsedFullId ;
+	}
+	
+	public static function getSearchIndexFieldValue ($fieldName, $fieldValue, $partnerId)
+	{
+		switch ($fieldName)
+		{
+			case categoryKuserPeer::STATUS:
+				return self::PARTNER_INDEX_PREFIX . $partnerId . self::STATUS_INDEX_PREFIX . $fieldValue;
+				break;
+			case categoryKuserPeer::UPDATE_METHOD:
+				return self::PARTNER_INDEX_PREFIX . $partnerId . self::UPDATE_METHOD_INDEX_PREFIX . $fieldValue;
+				break;
+			case categoryKuserPeer::PERMISSION_NAMES:
+				return self::PARTNER_INDEX_PREFIX . $partnerId . self::PERMISSION_NAME_INDEX_PREFIX . $fieldValue;
+				break;
+			default:
+				return $fieldValue;
+			
+		}
 	}
 
 } // categoryKuser
