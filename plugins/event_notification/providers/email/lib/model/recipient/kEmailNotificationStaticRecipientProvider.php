@@ -31,7 +31,7 @@ class kEmailNotificationStaticRecipientProvider extends kEmailNotificationRecipi
 	/* (non-PHPdoc)
 	 * @see kEmailNotificationRecipientProvider::getScopedProviderJobData()
 	 */
-	public function getScopedProviderJobData(kScope $scope) 
+	public function getScopedProviderJobData(kScope $scope = null) 
 	{
 		$implicitEmailRecipients = array();
 		foreach($this->emailRecipients as &$emailRecipient)

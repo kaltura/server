@@ -13,5 +13,5 @@ abstract class kEmailNotificationRecipientProvider
 	 * @param kContext $context
 	 * @return kEmailNotificationRecipientJobData
 	 */
-	abstract public function getScopedProviderJobData (kScope $scope);
+	abstract public function getScopedProviderJobData (kScope $scope = null);
 }
