@@ -156,7 +156,7 @@ class kEmailNotificationDispatchJobData extends kEventNotificationDispatchJobDat
 	}
 	
 	/**
-	 * @return array $to
+	 * @return kEmailNotificationRecipientJobData $to
 	 */
 	public function getTo()
 	{
@@ -164,7 +164,7 @@ class kEmailNotificationDispatchJobData extends kEventNotificationDispatchJobDat
 	}
 
 	/**
-	 * @return array $cc
+	 * @return kEmailNotificationRecipientJobData $cc
 	 */
 	public function getCc()
 	{
@@ -172,7 +172,7 @@ class kEmailNotificationDispatchJobData extends kEventNotificationDispatchJobDat
 	}
 
 	/**
-	 * @return array $bcc
+	 * @return kEmailNotificationRecipientJobData $bcc
 	 */
 	public function getBcc()
 	{
@@ -180,7 +180,7 @@ class kEmailNotificationDispatchJobData extends kEventNotificationDispatchJobDat
 	}
 
 	/**
-	 * @param array<email,name> $to
+	 * @param kEmailNotificationRecipientJobData $to
 	 */
 	public function setTo(array $to)
 	{
@@ -188,7 +188,7 @@ class kEmailNotificationDispatchJobData extends kEventNotificationDispatchJobDat
 	}
 
 	/**
-	 * @param array<email,name> $cc
+	 * @param kEmailNotificationRecipientJobData $cc
 	 */
 	public function setCc(array $cc)
 	{
@@ -196,7 +196,7 @@ class kEmailNotificationDispatchJobData extends kEventNotificationDispatchJobDat
 	}
 
 	/**
-	 * @param array<email,name> $bcc
+	 * @param kEmailNotificationRecipientJobData $bcc
 	 */
 	public function setBcc(array $bcc)
 	{
@@ -212,7 +212,7 @@ class kEmailNotificationDispatchJobData extends kEventNotificationDispatchJobDat
 	}
 
 	/**
-	 * @return array<key,value> $replyTo
+	 * @return kEmailNotificationRecipientJobData $replyTo
 	 */
 	public function getReplyTo()
 	{
