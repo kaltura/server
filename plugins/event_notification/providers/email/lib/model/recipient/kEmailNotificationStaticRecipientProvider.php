@@ -2,10 +2,10 @@
 /**
  * Core class for recipient provider containing a static list of email recipients.
  *
- * @package plugins.eventNotification
+ * @package plugins.emailNotification
  * @subpackage model.data
  */
-class kEmailNotificationStaticRecipientsProvider extends kEmailNotificationRecipientProvider
+class kEmailNotificationStaticRecipientProvider extends kEmailNotificationRecipientProvider
 {
 	/**
 	 * Email notification "to" sendees
@@ -14,23 +14,24 @@ class kEmailNotificationStaticRecipientsProvider extends kEmailNotificationRecip
 	protected $emailRecipients;
 
 	/**
-	 * @return the $to
+	 * @return array
 	 */
 	public function getEmailRecipients() {
 		return $this->emailRecipients;
 	}
 
 	/**
-	 * @param field_type $to
+	 * @param array $to
 	 */
 	public function setEmailRecipients($v) {
 		$this->emailRecipients = $v;
 	}
 	
+
 	/* (non-PHPdoc)
-	 * @see kEmailNotificationRecipientProvider::applyScope()
+	 * @see kEmailNotificationRecipientProvider::getScopedProviderJobData()
 	 */
-	public function applyScope(kScope $scope) 
+	public function getScopedProviderJobData(kScope $scope) 
 	{
 		$implicitEmailRecipients = array();
 		foreach($this->emailRecipients as &$emailRecipient)
