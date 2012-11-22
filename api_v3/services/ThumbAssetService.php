@@ -62,10 +62,8 @@ class ThumbAssetService extends KalturaAssetService
     function addAction($entryId, KalturaThumbAsset $thumbAsset)
     {
     	$dbEntry = entryPeer::retrieveByPK($entryId);
-    	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->mediaTypes) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-    	
-		
 		
     	if($thumbAsset->thumbParamsId)
     	{
@@ -76,6 +74,7 @@ class ThumbAssetService extends KalturaAssetService
     	
     	$dbThumbAsset = new thumbAsset();
     	$dbThumbAsset = $thumbAsset->toInsertableObject($dbThumbAsset);
+    	/* @var $dbThumbAsset thumbAsset */
     	
 		$dbThumbAsset->setEntryId($entryId);
 		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
@@ -515,7 +514,7 @@ class ThumbAssetService extends KalturaAssetService
 		if(!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
-		if ($entry->getType() != entryType::MEDIA_CLIP)
+		if (!in_array($entry->getType(), $this->mediaTypes))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $entry->getType());
 		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED, $entry->getMediaType());
@@ -565,7 +564,7 @@ class ThumbAssetService extends KalturaAssetService
 		if(!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
-		if ($entry->getType() != entryType::MEDIA_CLIP)
+		if (!in_array($entry->getType(), $this->mediaTypes))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $entry->getType());
 			
 		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
@@ -643,7 +642,7 @@ class ThumbAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, $thumbAsset->getFlavorParamsId());
 			
 		$entry = $thumbAsset->getentry();
-		if ($entry->getType() != entryType::MEDIA_CLIP)
+		if (!in_array($entry->getType(), $this->mediaTypes))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $entry->getType());
 		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED, $entry->getMediaType());

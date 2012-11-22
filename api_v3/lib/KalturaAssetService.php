@@ -8,6 +8,11 @@
  */
 abstract class KalturaAssetService extends KalturaBaseService
 {
+	/**
+	 * @var array of all entry types that extend from media
+	 */
+	protected $mediaTypes;
+	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -18,6 +23,8 @@ abstract class KalturaAssetService extends KalturaBaseService
 		if (!in_array($fullActionName, array('flavorAsset.getByEntryId', 'flavorAsset.getWebPlayableByEntryId', 'flavorAsset.list')))
 			$this->applyPartnerFilterForClass('asset');
 		$this->applyPartnerFilterForClass('assetParams');
+		
+    	$this->mediaTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::MEDIA_CLIP);
 	}
 	
 	/**
