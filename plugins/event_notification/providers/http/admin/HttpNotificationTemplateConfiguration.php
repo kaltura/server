@@ -35,7 +35,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 					$field = new Kaltura_Client_Type_EvalStringField();
 					$field->code = $properties["contentParameterValue_{$index}"];
 					
-					$contentParameter = new Kaltura_Client_HttpNotification_Type_HttpNotificationParameter();
+					$contentParameter = new Kaltura_Client_EventNotification_Type_EventNotificationParameter();
 					$contentParameter->key = $value;
 					$contentParameter->value = $field;
 					
@@ -50,7 +50,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 					$field = new Kaltura_Client_Type_EvalStringField();
 					$field->code = $properties['contentParameterValue'][$index];
 					
-					$contentParameter = new Kaltura_Client_HttpNotification_Type_HttpNotificationParameter();
+					$contentParameter = new Kaltura_Client_EventNotification_Type_EventNotificationParameter();
 					$contentParameter->key = $value;
 					$contentParameter->value = $field;
 					
