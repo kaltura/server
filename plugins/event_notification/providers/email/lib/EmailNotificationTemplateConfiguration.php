@@ -54,7 +54,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 					$field = new Kaltura_Client_Type_EvalStringField();
 					$field->code = $properties["contentParameterValue_{$index}"];
 					
-					$contentParameter = new Kaltura_Client_EmailNotification_Type_EmailNotificationParameter();
+					$contentParameter = new Kaltura_Client_EventNotification_Type_EventNotificationParameter();
 					$contentParameter->key = $value;
 					$contentParameter->value = $field;
 					
