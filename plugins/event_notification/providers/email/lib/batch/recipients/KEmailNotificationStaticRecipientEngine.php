@@ -13,7 +13,7 @@ class KEmailNotificationStaticRecipientEngine extends KEmailNotificationRecipien
 	function getRecipients(array $contentParameters) 
 	{
 		$recipients = array();
-		foreach ($this->recipientProvider->emailRecipients as $emailRecipient)
+		foreach ($this->recipientJobData->emailRecipients as $emailRecipient)
 		{
 			/* var $emailRecipient KalturaKeyValue */
 			$email = $emailRecipient->key;

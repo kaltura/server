@@ -15,7 +15,7 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 		//List categoryKusers
 		//TODO add paging logic
 		$categoryUserFilter = new KalturaCategoryUserFilter();
-		$categoryUserFilter->categoryIdEqual = $this->recipientProvider->categoryId;
+		$categoryUserFilter->categoryIdEqual = $this->recipientJobData->categoryId;
 		$categoryUserFilter->permissionNamesMatchOr = 'CATEGORY_PERMISSION_SUBSCRIBE';
 		$categoryUserList = $this->client->categoryUser->listAction($categoryUserFilter, new KalturaFilterPager());
 		

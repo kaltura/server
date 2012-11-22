@@ -13,7 +13,6 @@ abstract class KEmailNotificationRecipientEngine
 	 */
 	protected $client;
 	
-	protected $clientConfig;
 	
 	
 	/**
@@ -26,7 +25,6 @@ abstract class KEmailNotificationRecipientEngine
 	{
 		$this->client = $kClient;
 		$this->recipientJobData = $recipientJobData;
-		$this->clientConfig = $this->client->getConfig();
 		
 	}
 	
