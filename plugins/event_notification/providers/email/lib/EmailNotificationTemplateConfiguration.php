@@ -196,7 +196,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 	/**
 	 * @param Kaltura_Client_EmailNotification_Type_EmailNotificationParameter $parameter
 	 */
-	protected function addContentParameter(Kaltura_Client_EmailNotification_Type_EmailNotificationParameter $parameter)
+	protected function addContentParameter(Kaltura_Client_EventNotification_Type_EventNotificationParameter $parameter)
 	{
 		if($parameter->value instanceof Kaltura_Client_Type_EvalStringField)
 		{

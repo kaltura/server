@@ -247,7 +247,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 	/**
 	 * @param Kaltura_Client_HttpNotification_Type_HttpNotificationParameter $parameter
 	 */
-	protected function addContentParameter(Kaltura_Client_HttpNotification_Type_HttpNotificationParameter $parameter)
+	protected function addContentParameter(Kaltura_Client_EventNotification_Type_EventNotificationParameter $parameter)
 	{
 		if($parameter->value instanceof Kaltura_Client_Type_EvalStringField)
 		{
