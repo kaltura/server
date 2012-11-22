@@ -296,7 +296,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 	protected function getRecipientArray (KalturaEmailNotificationRecipientJobData $recipientJobData, array $contentParameters)
 	{
 		$recipientEngine = KEmailNotificationRecipientEngine::getEmailNotificationRecipientEngine($recipientJobData, $this->client);
-		$recipients = $recipientEngine->getRecipients();
+		$recipients = $recipientEngine->getRecipients($contentParameters);
 		
 		return $recipients;
 	}
