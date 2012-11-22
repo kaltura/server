@@ -1,12 +1,12 @@
 
 [config]
 source                                            = ini
-serviceUrl                                        = http://www.kaltura.co.cc/
-partnerId                                         = 3241
+serviceUrl                                        = http://devtests.kaltura.co.cc/
+partnerId                                         = 496158
 clientTag                                         = unitTest
 curlTimeout                                       = 90
 startSession                                      = 1
-secret                                            = 5791093781b8802700c9b95c4618f6f5
+secret                                            = e7d6178d552f399324645cee60d31414
 userId                                            = tan-tan
 sessionType                                       = 2
 expiry                                            = 86400
