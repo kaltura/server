@@ -2,9 +2,10 @@
 /**
  * @package plugins.externalMedia
  */
-class ExternalMediaPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEnumerator, IKalturaTypeExtender, IKalturaSearchDataContributor, IKalturaPermissions
+class ExternalMediaPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEnumerator, IKalturaTypeExtender, IKalturaSearchDataContributor, IKalturaPermissions, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'externalMedia';
+	const EXTERNAL_MEDIA_CREATED_HANDLER = 'ExternalMediaCreatedHandler';
 	const SEARCH_DATA_SUFFIX = 's';
 	
 	public static function getPluginName()
@@ -18,6 +19,16 @@ class ExternalMediaPlugin extends KalturaPlugin implements IKalturaPlugin, IKalt
 			return $this;
 			
 		return null;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaEventConsumers::getEventConsumers()
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::EXTERNAL_MEDIA_CREATED_HANDLER,
+		);
 	}
 	
 	/* (non-PHPdoc)
