@@ -165,9 +165,10 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 	 * 
 	 * sort array orderby from this criteria
 	 * @param array $queryResult
+	 * @return array
 	 */
-	public function applyResultsSort(array &$queryResult){
-		return;
+	public function applyResultsSort(array $queryResult){
+		return $queryResult;
 	}
 
 	/* (non-PHPdoc)
