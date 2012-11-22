@@ -644,7 +644,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 * (non-PHPdoc)
 	 * @see KalturaCriteria::applyResultsSort()
 	 */
-	public function applyResultsSort(array &$objects)
+	public function applyResultsSort(array $objects)
 	{
 		if (!$this->applySortRequired)
 			return;
@@ -658,6 +658,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		foreach ($this->fetchedIds as $fetchedId)
 			if(isset($sortedResult[$fetchedId]))
 				$objects[] = $sortedResult[$fetchedId];
+		
+		return $objects;
+		
 	}
 	
 	/* (non-PHPdoc)
