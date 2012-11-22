@@ -54,6 +54,7 @@ class Tag extends BaseTag implements IIndexable
            'partner_id' => 'partnerId',
            'object_type' => 'objectType',
            'created_at' => 'createdAt',
+           'instance_count' => 'instanceCount',
        );
         
     }
@@ -64,6 +65,7 @@ class Tag extends BaseTag implements IIndexable
         'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
         'object_type' => IIndexable::FIELD_TYPE_INTEGER,
         'created_at' => IIndexable::FIELD_TYPE_DATETIME,
+    	'instance_count' => IIndexable::FIELD_TYPE_INTEGER
 	);
 
 	
