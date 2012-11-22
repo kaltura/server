@@ -455,7 +455,7 @@ class DocumentsService extends KalturaEntryService
 
 		KalturaResponseCacher::disableCache();
 		
-		entryPeer::setDefaultCriteriaFilter();
+		myPartnerUtils::resetPartnerFilter('entry');
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
 		if (!$dbEntry || ($dbEntry->getType() != entryType::DOCUMENT))

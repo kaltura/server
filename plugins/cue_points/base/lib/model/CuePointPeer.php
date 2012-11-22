@@ -48,7 +48,10 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		
 		$c = self::$s_criteria_filter->getFilter();
 		if(!$c)
+		{
 			$c = new Criteria();
+			$c->addAnd(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::NOT_EQUAL);
+		}
 			
 		$puserId = kCurrentContext::$ks_uid;
 		$partnerId = kCurrentContext::$ks_partner_id;
