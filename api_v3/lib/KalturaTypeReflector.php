@@ -8,7 +8,7 @@
  */
 class KalturaTypeReflector
 {
-	static private $properyReservedWords = array(
+	static private $propertyReservedWords = array(
 		'objectType',
 	);
 	
@@ -170,7 +170,7 @@ class KalturaTypeReflector
 						if ($property->getDeclaringClass() == $currentReflectClass) // only properties defined in the current class, ignore the inherited
 						{
 							$name = $property->name;
-							if(in_array($name, self::$properyReservedWords))
+							if(in_array($name, self::$propertyReservedWords))
 								throw new Exception("Property name [$name] is a reserved word in type [$currentReflectClass]");
 								
 							$docComment = $property->getDocComment();
@@ -248,7 +248,7 @@ class KalturaTypeReflector
 	    $reflectClass = new ReflectionClass($this->_type);
 	    $parentClass = $reflectClass->getParentClass();
 	    if (!$parentClass)
-	    	throw new Exception("API object [$this->_type] must have parent type");
+	    	throw new Exception("API object [$this->_type] must have parent type, package: [$this->_package] subpackage [$this->_subpackage]");
 	    	
 	    $parentClassName = $parentClass->getName();
 	    if (!in_array($parentClassName, array("KalturaObject", "KalturaEnum", "KalturaStringEnum", "KalturaTypedArray"))) // from the api point of view, those objects are ignored
@@ -687,7 +687,7 @@ class KalturaTypeReflector
 		}
 	}
 	
-	public static function getSubClasses($class)
+	public static function getSubClasses($class) 
 	{
 		if(!count(self::$_classInheritMap))
 			self::loadSubClassesMap();
