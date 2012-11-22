@@ -64,7 +64,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		if(get_class($eventNotificationTemplate) != $templateClass && !is_subclass_of($eventNotificationTemplate, $templateClass))
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_WRONG_TYPE, $id, kPluginableEnumsManager::coreToApi('EventNotificationTemplateType', $dbEventNotificationTemplate->getType()));
 		//translate propel $newDbEventNotificationTemplate to API form
-		$newEventNotificationTemplate->fromObject($newDbEventNotificationTemplate);
+		$eventNotificationTemplate->fromObject($newDbEventNotificationTemplate);
 			
 		// update new db object with the overwrite configuration
 		$eventNotificationTemplate->toInsertableObject();
@@ -74,7 +74,6 @@ class EventNotificationTemplateService extends KalturaBaseService
 		$newDbEventNotificationTemplate->save();
 		
 		// return the saved object
-		$newEventNotificationTemplate = KalturaEventNotificationTemplate::getInstanceByType($newDbEventNotificationTemplate->getType());
 		$newEventNotificationTemplate->fromObject($newDbEventNotificationTemplate);
 		return $newEventNotificationTemplate;
 		
