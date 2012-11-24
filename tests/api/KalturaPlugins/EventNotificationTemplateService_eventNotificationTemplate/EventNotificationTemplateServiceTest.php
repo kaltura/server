@@ -22,16 +22,29 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	 * @param KalturaEventNotificationTemplate $reference
 	 * @dataProvider provideData
 	 */
-	public function testCloneAction($id, KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationTemplate $reference)
+	public function testCloneAction($id, KalturaEventNotificationTemplate $eventNotificationTemplate = null, KalturaEventNotificationTemplate $reference)
 	{
-		$resultObject = $this->client->eventNotificationTemplate->cloneAction($id, $eventNotificationTemplate, $reference);
-		if(method_exists($this, 'assertInstanceOf'))
-			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
-		else
-			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
-		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		// TODO - add here your own validations
-		$this->validateCloneAction($resultObject);
+		try 
+		{
+			$resultObject = $this->client->eventNotificationTemplate->cloneAction($id, $eventNotificationTemplate, $reference);
+			
+			if(method_exists($this, 'assertInstanceOf'))
+				$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
+			else
+				$this->assertType('KalturaEventNotificationTemplate', $resultObject);
+			$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		}
+		catch (KalturaException $e)
+		{
+			if ($e->getCode() == "EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME")
+			{
+				
+			}
+			else
+			{
+				$this->fail('Unexpected error occured.');
+			}
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -59,14 +72,23 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	 */
 	public function testUpdatestatus($id, $status, KalturaEventNotificationTemplate $reference)
 	{
-		$resultObject = $this->client->eventNotificationTemplate->updatestatus($id, $status, $reference);
-		if(method_exists($this, 'assertInstanceOf'))
-			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
-		else
-			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
-		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		// TODO - add here your own validations
-		$this->validateUpdatestatus($resultObject);
+		try
+		{
+			$resultObject = $this->client->eventNotificationTemplate->updatestatus($id, $status, $reference);
+			$this->fail('Method should not be allowed for non-admin partner.');
+		}
+		catch (KalturaException $e)
+		{
+			if ($e->getCode() == 'SERVICE_FORBIDDEN')
+			{
+				
+			}
+			else
+			{
+				$this->fail('Wrong error type thrown');
+			}
+		}
+		
 	}
 	
 	/**
@@ -133,14 +155,28 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	 */
 	public function testDispatch($id, KalturaEventNotificationDispatchJobData $data, $reference)
 	{
-		$resultObject = $this->client->eventNotificationTemplate->dispatch($id, $data, $reference);
-		if(method_exists($this, 'assertInstanceOf'))
-			$this->assertInstanceOf('int', $resultObject);
-		else
-			$this->assertType('int', $resultObject);
-		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		// TODO - add here your own validations
-		$this->validateDispatch($resultObject);
+		try 
+		{
+			$resultObject = $this->client->eventNotificationTemplate->dispatch($id, $data, $reference);
+			if(method_exists($this, 'assertInstanceOf'))
+				$this->assertInstanceOf('int', $resultObject);
+			else
+				$this->assertType('int', $resultObject);
+			$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+			// TODO - add here your own validations
+			$this->validateDispatch($resultObject);
+		}
+		catch (KalturaException $e)
+		{
+			if ($e->getCode() == 'EVENT_NOTIFICATION_DISPATCH_DISABLED' || $e->getCode() == 'SERVICE_FORBIDDEN')
+			{
+				
+			}
+			else
+			{
+				$this->fail('Unexpected error type thrown');
+			}
+		}
 	}
 
 }
