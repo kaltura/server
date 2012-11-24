@@ -378,5 +378,27 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 			
 		}
 	}
+	
+	/* (non-PHPdoc)
+	 * @see lib/model/om/Baseentry#postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+	
+		if (!$this->alreadyInSave)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
+	}
+	
+	/* (non-PHPdoc)
+	 * @see BasecategoryKuser::postUpdate()
+	 */
+	public function postUpdate(PropelPDO $con = null)
+	{
+		parent::postUpdate($con);
+		
+		if (!$this->alreadyInSave)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
+	}
 
 } // categoryKuser
