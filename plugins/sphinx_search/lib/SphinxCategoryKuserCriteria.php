@@ -177,6 +177,26 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			$filter->set('_eq_update_method', categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::UPDATE_METHOD, $filter->get('_eq_update_method'), kCurrentContext::getCurrentPartnerId()));
 		}
 		
+		if ($filter->get('_matchor_permission_names'))
+		{
+			$permissionNamesList = explode(',', $filter->get('_matchor_permission_names'));
+			foreach ($permissionNamesList as &$permissionName)
+			{
+				$permissionName = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionName, kCurrentContext::getCurrentPartnerId());
+			}
+			$filter->set('_matchor_permission_names', implode(',', $permissionNamesList));
+		}
+
+		if ($filter->get('_matchand_permission_names'))
+		{
+			$permissionNamesList = explode(',', $filter->get('_matchand_permission_names'));
+			foreach ($permissionNamesList as &$permissionName)
+			{
+				$permissionName = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionName, kCurrentContext::getCurrentPartnerId());
+			}
+			$filter->set('_matchand_permission_names', implode(',', $permissionNamesList));
+		}
+		
 		return parent::applyFilterFields($filter);
 	}
 
