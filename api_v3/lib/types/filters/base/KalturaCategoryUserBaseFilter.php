@@ -12,8 +12,8 @@ abstract class KalturaCategoryUserBaseFilter extends KalturaFilter
 		"categoryIdIn" => "_in_category_id",
 		"userIdEqual" => "_eq_user_id",
 		"userIdIn" => "_in_user_id",
-		"permissionLevelEqual" => "_eq_permission_level",
-		"permissionLevelIn" => "_in_permission_level",
+		"permissionLevelMatchAnd" => "_matchand_permission_level",
+		"permissionLevelMatchOr" => "_matchor_permission_level",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
@@ -67,14 +67,14 @@ abstract class KalturaCategoryUserBaseFilter extends KalturaFilter
 	public $userIdIn;
 
 	/**
-	 * @var KalturaCategoryUserPermissionLevel
+	 * @var string
 	 */
-	public $permissionLevelEqual;
+	public $permissionLevelMatchAnd;
 
 	/**
 	 * @var string
 	 */
-	public $permissionLevelIn;
+	public $permissionLevelMatchOr;
 
 	/**
 	 * @var KalturaCategoryUserStatus
