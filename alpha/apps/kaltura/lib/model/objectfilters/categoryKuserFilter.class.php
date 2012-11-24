@@ -18,8 +18,6 @@ class categoryKuserFilter extends baseObjectFilter
 				"_lte_created_at",
 				"_gte_updated_at",
 				"_lte_updated_at",
-				"_eq_parent_id",
-				"_in_parent_id",
 				"_eq_status",
 				"_in_status",
 				"_eq_permission_level",
@@ -30,8 +28,8 @@ class categoryKuserFilter extends baseObjectFilter
 				"_eq_category_full_ids",
 				"_category_direct_members",
 				"_mlikeor_screen_name-puser_id",
-				"_like_permission_names",
-				"_eq_permission_names",
+				"_matchor_permission_names",
+				"_matchand_permission_names",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name");
@@ -51,7 +49,7 @@ class categoryKuserFilter extends baseObjectFilter
 	}
 	
 	// TODO - move to base class, all that should stay here is the peer class, not the logic of the field translation !
-	// The base class should invoke $peek_class::translateFieldName( $field_name , BasePeer::TYPE_FIELDNAME , BasePeer::TYPE_COLNAME );
+	// The base class should invoke $peer_class::translateFieldName( $field_name , BasePeer::TYPE_FIELDNAME , BasePeer::TYPE_COLNAME );
 	public function getFieldNameFromPeer ( $field_name )
 	{
 		$res = categoryKuserPeer::translateFieldName( $field_name , $this->field_name_translation_type , BasePeer::TYPE_COLNAME );
