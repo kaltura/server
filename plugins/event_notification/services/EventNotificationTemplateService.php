@@ -46,7 +46,9 @@ class EventNotificationTemplateService extends KalturaBaseService
 	 * @action clone
 	 * @param int $id source template to clone
 	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate overwrite configuration object
-	 * @throws KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND,KalturaEventNotificationErrors::EVENT_NOTIFICATION_WRONG_TYPE,KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME
+	 * @throws KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND
+	 * @throws KalturaEventNotificationErrors::EVENT_NOTIFICATION_WRONG_TYPE
+	 * @throws KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME
 	 * @return KalturaEventNotificationTemplate
 	 */
 	public function cloneAction($id, KalturaEventNotificationTemplate $eventNotificationTemplate = null)
@@ -269,9 +271,10 @@ class EventNotificationTemplateService extends KalturaBaseService
 	 * @action dispatch
 	 * @param int $id 
 	 * @param KalturaEventNotificationDispatchJobData $jobData 
-	 * @return int
-	 * 
 	 * @throws KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND
+	 * @throws KalturaEventNotificationErrors::EVENT_NOTIFICATION_DISPATCH_DISABLED
+	 * @throws KalturaEventNotificationErrors::EVENT_NOTIFICATION_DISPATCH_FAILED
+	 * @return int
 	 */		
 	public function dispatchAction($id, KalturaEventNotificationDispatchJobData $data)
 	{
