@@ -37,7 +37,8 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 		$ret = new kEmailNotificationCategoryRecipientJobData();
 		if ($this->getCategoryId() instanceof kObjectIdField)
 		{
-			$categoryId = $this->categoryId->getFieldValue($scope);
+			$this->categoryId->setScope($scope);
+			$categoryId = $this->categoryId->getValue();
 			KalturaLog::info("Implicit categoryId value: $categoryId");
 			$ret->setCategoryId($categoryId);
 		}
