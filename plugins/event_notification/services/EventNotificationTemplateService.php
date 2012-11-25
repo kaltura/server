@@ -68,7 +68,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		if ($eventNotificationTemplate)
 		{
 			// update new db object with the overwrite configuration
-			$eventNotificationTemplate->toUpdatableObject($newDbEventNotificationTemplate);
+			$newDbEventNotificationTemplate = $eventNotificationTemplate->toUpdatableObject($newDbEventNotificationTemplate);
 		}
 		//Check uniqueness of new object's system name
 		$systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($newDbEventNotificationTemplate->getSystemName());
@@ -77,15 +77,8 @@ class EventNotificationTemplateService extends KalturaBaseService
 		
 		// save the new db object
 		$newDbEventNotificationTemplate->setPartnerId($this->getPartnerId());
-		try {
-			$newDbEventNotificationTemplate->save();
-		}
-		catch (kCoreException $e)
-		{
-			
-		}	
+		$newDbEventNotificationTemplate->save();
 	
-		
 		// return the saved object
 		$newEventNotificationTemplate = KalturaEventNotificationTemplate::getInstanceByType($newDbEventNotificationTemplate->getType());
 		$newEventNotificationTemplate->fromObject($newDbEventNotificationTemplate);
