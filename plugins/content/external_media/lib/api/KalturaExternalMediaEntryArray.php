@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.document
+ * @package plugins.externalMedia
  * @subpackage api.objects
  */
 class KalturaExternalMediaEntryArray extends KalturaTypedArray
