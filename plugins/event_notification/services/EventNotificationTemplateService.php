@@ -46,6 +46,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 	 * @action clone
 	 * @param int $id source template to clone
 	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate overwrite configuration object
+	 * @throws KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND,KalturaEventNotificationErrors::EVENT_NOTIFICATION_WRONG_TYPE,KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME
 	 * @return KalturaEventNotificationTemplate
 	 */
 	public function cloneAction($id, KalturaEventNotificationTemplate $eventNotificationTemplate = null)
@@ -72,7 +73,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		//Check uniqueness of new object's system name
 		$systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($newDbEventNotificationTemplate->getSystemName());
 		if (count($systemNameTemplates))
-			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME);
+			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME, $newDbEventNotificationTemplate->getSystemName());
 		
 		// save the new db object
 		$newDbEventNotificationTemplate->setPartnerId($this->getPartnerId());
