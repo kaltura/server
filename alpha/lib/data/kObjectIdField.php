@@ -48,6 +48,7 @@ class kObjectIdField extends kStringField
 			KalturaLog::info('Getter method for object id not found');
 			return;
 		}
+		
 		return $scope->getEvent()->getObject()->getId();
 	}
 
