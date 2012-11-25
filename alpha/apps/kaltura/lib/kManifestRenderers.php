@@ -34,7 +34,7 @@ abstract class kManifestRenderer
 	/**
 	 * @return array<string>
 	 */
-	public function getHeaders()
+	protected function getHeaders()
 	{
 		return array();
 	}
@@ -42,7 +42,7 @@ abstract class kManifestRenderer
 	/**
 	 * @return string
 	 */
-	public function getBody()
+	protected function getBody()
 	{
 		return '';
 	}
@@ -199,7 +199,7 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 	/**
 	 * @return array<string>
 	 */
-	public function getHeaders()
+	protected function getHeaders()
 	{
 		return array(
 			"Content-Type: text/xml; charset=UTF-8",
@@ -237,7 +237,7 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 	/**
 	 * @return string
 	 */
-	public function getBody()
+	protected function getBody()
 	{		
 		$durationXml = ($this->duration ? "<duration>{$this->duration}</duration>" : '');
 		$baseUrlXml = ($this->baseUrl ? "<baseURL>".htmlspecialchars($this->baseUrl)."</baseURL>" : '');
@@ -267,7 +267,7 @@ class kF4Mv2ManifestRenderer extends kMultiFlavorManifestRenderer
 	/**
 	 * @return array<string>
 	 */
-	public function getHeaders()
+	protected function getHeaders()
 	{
 		return array(
 			"Content-Type: text/xml; charset=UTF-8",
@@ -298,7 +298,7 @@ class kF4Mv2ManifestRenderer extends kMultiFlavorManifestRenderer
 	/**
 	 * @return string
 	 */
-	public function getBody()
+	protected function getBody()
 	{		
 		$durationXml = ($this->duration ? "<duration>{$this->duration}</duration>" : '');
 		$flavorsXml = $this->buildFlavorsXml();
@@ -324,7 +324,7 @@ class kSilverLightManifestRenderer extends kSingleUrlManifestRenderer
 	/**
 	 * @return array<string>
 	 */
-	public function getHeaders()
+	protected function getHeaders()
 	{
 		return array(
 			"Content-Type: text/xml; charset=UTF-8",
@@ -335,7 +335,7 @@ class kSilverLightManifestRenderer extends kSingleUrlManifestRenderer
 	/**
 	 * @return string
 	 */
-	public function getBody()
+	protected function getBody()
 	{
 		$manifestUrl = htmlspecialchars($this->flavor['url']);		
 		$durationXml = ($this->duration ? "<duration>{$this->duration}</duration>" : '');
@@ -355,7 +355,7 @@ class kSmilManifestRenderer extends kMultiFlavorManifestRenderer
 	/**
 	 * @return array<string>
 	 */
-	public function getHeaders()
+	protected function getHeaders()
 	{
 		return array(
 			"Content-Type: text/xml; charset=UTF-8",
@@ -366,7 +366,7 @@ class kSmilManifestRenderer extends kMultiFlavorManifestRenderer
 	/**
 	 * @return string
 	 */
-	public function getBody()
+	protected function getBody()
 	{
 		$durationXml = ($this->duration ? "<duration>{$this->duration}</duration>" : '');
 		$flavorsXml = '';
@@ -404,7 +404,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	/**
 	 * @return array<string>
 	 */
-	public function getHeaders()
+	protected function getHeaders()
 	{
 		return array("Content-Type: application/x-mpegurl");
 	}
@@ -412,7 +412,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	/**
 	 * @return string
 	 */
-	public function getBody()
+	protected function getBody()
 	{
 		$content = "#EXTM3U\n";
 		foreach($this->flavors as $flavor)
@@ -434,7 +434,7 @@ class kRtspManifestRenderer extends kSingleUrlManifestRenderer
 	/**
 	 * @return array<string>
 	 */
-	public function getHeaders()
+	protected function getHeaders()
 	{
 		return array("Content-Type: text/html; charset=UTF-8");
 	}
@@ -442,7 +442,7 @@ class kRtspManifestRenderer extends kSingleUrlManifestRenderer
 	/**
 	 * @return string
 	 */
-	public function getBody()
+	protected function getBody()
 	{
 		return '<html><head><meta http-equiv="refresh" content="0;url=' . htmlspecialchars($this->flavor['url']) . '"></head></html>';
 	}
@@ -453,7 +453,7 @@ class kRedirectManifestRenderer extends kSingleUrlManifestRenderer
 	/**
 	 * @return array<string>
 	 */
-	public function getHeaders()
+	protected function getHeaders()
 	{
 		$url = str_replace(" ", "%20", $this->flavor['url']);
 		return array("location:{$url}");
