@@ -42,7 +42,12 @@ class kObjectIdField extends kStringField
 			KalturaLog::info('Object not found on scope event');
 			return;
 		}
-		//TODO add check for method_exist(getId)	
+		
+		if (!method_exists($scope->getEvent()->getObject(), 'getId'))
+		{
+			KalturaLog::info('Getter method for object id not found');
+			return;
+		}
 		return $scope->getEvent()->getObject()->getId();
 	}
 
