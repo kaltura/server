@@ -31,7 +31,7 @@ class kObjectIdField extends kStringField
 			return;
 		}
 		
-		if ($scope->getEvent() && !($scope instanceof IKalturaObjectRelatedEvent))
+		if ($scope->getEvent() && !($scope->getEvent() instanceof  IKalturaObjectRelatedEvent))
 		{
 			KalturaLog::info('Scope event must realize interface IKalturaObjectRelatedEvent');
 			return;
