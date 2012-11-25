@@ -42,6 +42,7 @@ class MetadataService extends KalturaBaseService
 	 * @param string $xmlData XML metadata
 	 * @return KalturaMetadata
 	 * @throws MetadataErrors::METADATA_PROFILE_NOT_FOUND
+	 * @throws MetadataErrors::INCOMPATIBLE_METADATA_PROFILE_OBJECT_TYPE
 	 * @throws MetadataErrors::METADATA_ALREADY_EXISTS
 	 * @throws MetadataErrors::INVALID_METADATA_DATA
 	 */
@@ -99,6 +100,7 @@ class MetadataService extends KalturaBaseService
 	 * @return Metadata
 	 * @throws MetadataErrors::METADATA_ALREADY_EXISTS
 	 * @throws MetadataErrors::INVALID_METADATA_PROFILE
+	 * @throws MetadataErrors::INVALID_METADATA_PROFILE_TYPE
 	 * @throws MetadataErrors::INVALID_METADATA_OBJECT
 	 */
 	protected function addMetadata($metadataProfileId, $objectType, $objectId)
@@ -230,6 +232,7 @@ class MetadataService extends KalturaBaseService
 	 * @throws MetadataErrors::METADATA_NOT_FOUND
 	 * @throws MetadataErrors::INVALID_METADATA_DATA
 	 * @throws MetadataErrors::INVALID_METADATA_VERSION
+	 * @throws MetadataErrors::XSLT_VALIDATION_ERROR
 	 */	
 	function updateAction($id, $xmlData = null, $version = null)
 	{
