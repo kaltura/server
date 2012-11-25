@@ -33,7 +33,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	 * Permission level
 	 * 
 	 * @var KalturaCategoryUserPermissionLevel
-	 * @filter matchand,matchor
+	 * @filter eq,in
 	 */
 	public $permissionLevel;
 	
