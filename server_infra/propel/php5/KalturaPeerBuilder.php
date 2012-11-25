@@ -287,7 +287,7 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 		\$queryResult = ".$this->getPeerClassname()."::populateObjects(".$this->basePeerClassname."::doSelect(\$criteriaForSelect, \$con));
 		
 		if(\$criteriaForSelect instanceof KalturaCriteria)
-			\$queryResult = \$criteriaForSelect->applyResultsSort(\$queryResult);
+			\$criteriaForSelect->applyResultsSort(\$queryResult);
 		
 		if (\$cacheKey !== null)
 		{
