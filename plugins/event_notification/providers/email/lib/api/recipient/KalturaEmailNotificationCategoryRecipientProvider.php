@@ -9,7 +9,7 @@ class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNoti
 {
 	/**
 	 * The ID of the category whose subscribers should receive the email notification.
-	 * @var KalturaStringValue
+	 * @var KalturaStringField
 	 */
 	public $categoryId;
 
