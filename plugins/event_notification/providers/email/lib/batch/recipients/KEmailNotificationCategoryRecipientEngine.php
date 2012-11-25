@@ -21,7 +21,7 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 		
 		$categoryUserIds = array();
 		foreach ($categoryUserList->objects as $categoryUser)
-			$categoryUserIds[] = $categoryUser->id;
+			$categoryUserIds[] = $categoryUser->userId;
 		$userFilter = new KalturaUserFilter();
 		$userFilter->idIn = implode(',', $categoryUserIds);
 		$userList = $this->client->user->listAction($userFilter, new KalturaFilterPager);
