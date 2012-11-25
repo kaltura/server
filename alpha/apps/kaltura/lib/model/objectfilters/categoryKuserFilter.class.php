@@ -26,7 +26,6 @@ class categoryKuserFilter extends baseObjectFilter
 				"_in_update_method",
 				"_likex_category_full_ids",
 				"_eq_category_full_ids",
-				"_category_direct_members",
 				"_mlikeor_screen_name-puser_id",
 				"_matchor_permission_names",
 				"_matchand_permission_names",
@@ -69,10 +68,5 @@ class categoryKuserFilter extends baseObjectFilter
 	public function setUserIdEqual($v)
 	{
 		$this->set('_eq_user_id', $v);
-	}
-	
-	public function setCategoryDirectMembers($v)
-	{
-		$this->set('_category_direct_members', $v);
 	}
 }
