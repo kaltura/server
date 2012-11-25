@@ -6,10 +6,10 @@
  * @subpackage model.data
  *
  */
-class kObjectIdField extends kStringValue
+class kObjectIdField extends kStringField
 {
 	/* (non-PHPdoc)
-	 * @see kIntegerField::getFieldValue()
+	 * @see kStringField::getFieldValue()
 	 */
 	protected function getFieldValue(kScope $scope = null)
 	{
@@ -42,7 +42,7 @@ class kObjectIdField extends kStringValue
 			KalturaLog::info('Object not found on scope event');
 			return;
 		}
-			
+		//TODO add check for method_exist(getId)	
 		return $scope->getEvent()->getObject()->getId();
 	}
 
