@@ -48,7 +48,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate overwrite configuration object
 	 * @return KalturaEventNotificationTemplate
 	 */
-	public function cloneAction($id, KalturaEventNotificationTemplate $eventNotificationTemplate)
+	public function cloneAction($id, KalturaEventNotificationTemplate $eventNotificationTemplate = null)
 	{
 		// get the source object
 		$dbEventNotificationTemplate = EventNotificationTemplatePeer::retrieveByPK($id);
@@ -63,17 +63,30 @@ class EventNotificationTemplateService extends KalturaBaseService
 		$templateClass = get_class($newEventNotificationTemplate);
 		if(get_class($eventNotificationTemplate) != $templateClass && !is_subclass_of($eventNotificationTemplate, $templateClass))
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_WRONG_TYPE, $id, kPluginableEnumsManager::coreToApi('EventNotificationTemplateType', $dbEventNotificationTemplate->getType()));
-		//translate propel $newDbEventNotificationTemplate to API form
-		$eventNotificationTemplate->fromObject($newDbEventNotificationTemplate);
-			
-		// update new db object with the overwrite configuration
-		$eventNotificationTemplate->toInsertableObject();
+		
+		if ($eventNotificationTemplate)
+		{
+			// update new db object with the overwrite configuration
+			$eventNotificationTemplate->toUpdatableObject($newDbEventNotificationTemplate);
+		}
+		//Check uniqueness of new object's system name
+		$systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($newDbEventNotificationTemplate->getSystemName());
+		if (count($systemNameTemplates))
+			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME);
 		
 		// save the new db object
 		$newDbEventNotificationTemplate->setPartnerId($this->getPartnerId());
-		$newDbEventNotificationTemplate->save();
+		try {
+			$newDbEventNotificationTemplate->save();
+		}
+		catch (kCoreException $e)
+		{
+			
+		}	
+	
 		
 		// return the saved object
+		$newEventNotificationTemplate = KalturaEventNotificationTemplate::getInstanceByType($newDbEventNotificationTemplate->getType());
 		$newEventNotificationTemplate->fromObject($newDbEventNotificationTemplate);
 		return $newEventNotificationTemplate;
 		
