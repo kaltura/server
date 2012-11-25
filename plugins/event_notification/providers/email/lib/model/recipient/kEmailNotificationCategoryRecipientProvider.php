@@ -9,13 +9,13 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 {
 	/**
 	 * ID of the category to whose subscribers the email should be sent
-	 * @var kStringField
+	 * @var kStringValue
 	 */
 	protected $categoryId;
 
 
 	/**
-	 * @return kStringField
+	 * @return kStringValue
 	 */
 	public function getCategoryId() {
 		return $this->categoryId;
@@ -35,7 +35,7 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 	public function getScopedProviderJobData(kScope $scope = null) 
 	{
 		$ret = new kEmailNotificationCategoryRecipientJobData();
-		if ($this->getCategoryId() instanceof kObjectIdField)
+		if ($this->getCategoryId() instanceof kStringField)
 		{
 			$this->categoryId->setScope($scope);
 			$categoryId = $this->categoryId->getValue();
