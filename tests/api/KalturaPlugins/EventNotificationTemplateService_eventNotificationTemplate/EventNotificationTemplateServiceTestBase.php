@@ -90,28 +90,13 @@ abstract class EventNotificationTemplateServiceTestBase extends KalturaApiTestCa
 	/**
 	 * Tests eventNotificationTemplate->delete action
 	 * @param int $id 
-	 * @param KalturaEventNotificationTemplate $reference
 	 * @depends testAdd with data set #2
 	 * @dataProvider provideData
 	 */
-	public function testDelete($id, KalturaEventNotificationTemplate $reference)
+	public function testDelete($id)
 	{
 		$resultObject = $this->client->eventNotificationTemplate->delete($id);
-		if(method_exists($this, 'assertInstanceOf'))
-			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
-		else
-			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
-		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->validateDelete($resultObject);
 	}
-
-	/**
-	 * Validates testDelete results
-	 * Hook to be overriden by the extending class
-	 * 
-	 * @param KalturaEventNotificationTemplate $resultObject
-	 */
-	protected function validateDelete(KalturaEventNotificationTemplate $resultObject){}
 
 	/**
 	 * Tests eventNotificationTemplate->listAction action
