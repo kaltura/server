@@ -19,6 +19,7 @@ class EventNotificationTemplateServiceAdminTest extends EventNotificationTemplat
 		//Impersonate partner
 		$this->impersonate($impersonatedPartnerId);
 		//Perform action
+		$eventNotificationTemplate->systemName = uniqid('unit_test');
 		$resultObject = $this->client->eventNotificationTemplate->add($eventNotificationTemplate);
 		if(method_exists($this, 'assertInstanceOf'))
 			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
