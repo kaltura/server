@@ -170,7 +170,6 @@ class EventNotificationTemplateService extends KalturaBaseService
 	 * 
 	 * @action delete
 	 * @param int $id 
-	 * @return KalturaEventNotificationTemplate
 	 *
 	 * @throws KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND
 	 */		
