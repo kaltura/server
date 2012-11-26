@@ -7,6 +7,27 @@ require_once(dirname(__FILE__) . '/../../../bootstrap.php');
  */
 class EventNotificationTemplateServiceTest extends EventNotificationTemplateServiceTestBase
 {
+	/**
+	 * Tests eventNotificationTemplate->add action
+	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate 
+	 * @param KalturaEventNotificationTemplate $reference
+	 * @return KalturaEventNotificationTemplate
+	 * @dataProvider provideData
+	 */
+	public function testAdd(KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationTemplate $reference)
+	{
+		$eventNotificationTemplate->systemName = uniqid('unit_test');
+		$resultObject = $this->client->eventNotificationTemplate->add($eventNotificationTemplate);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
+		else
+			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		$this->assertNotNull($resultObject->id);
+		$this->validateAdd($resultObject);
+		
+		return $resultObject->id;
+	}
 	/* (non-PHPdoc)
 	 * @see EventNotificationTemplateServiceTestBase::validateAdd()
 	 */
@@ -26,6 +47,7 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	{
 		try 
 		{
+			$eventNotificationTemplate->systemName = uniqid('unit_test');
 			$resultObject = $this->client->eventNotificationTemplate->cloneAction($id, $eventNotificationTemplate, $reference);
 			
 			if(method_exists($this, 'assertInstanceOf'))
