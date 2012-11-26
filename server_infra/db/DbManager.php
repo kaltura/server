@@ -82,7 +82,10 @@ class DbManager
 		$dbConfigs = array();
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDatabaseConfig');
 		foreach($pluginInstances as $pluginInstance)
+		{
+			/* @var $pluginInstance IKalturaDatabaseConfig */
 			$dbConfigs[] = $pluginInstance->getDatabaseConfig();
+		}
 
 		if (function_exists('apc_store'))
 		{
