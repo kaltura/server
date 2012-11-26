@@ -45,23 +45,22 @@ class EventNotificationTemplateServiceAdminTest extends EventNotificationTemplat
 	}
 
 	/**
-	 * Tests eventNotificationTemplate->listAction action
-	 * @param KalturaEventNotificationTemplateFilter $filter 
+	 * Tests eventNotificationTemplate->listbypartner action
+	 * @param KalturaPartnerFilter $filter 
 	 * @param KalturaFilterPager $pager 
-	 * @param int $impersonatedPartnerId
 	 * @param KalturaEventNotificationTemplateListResponse $reference
 	 * @dataProvider provideData
 	 */
-	public function testAdminListAction(KalturaEventNotificationTemplateFilter $filter = null, KalturaFilterPager $pager = null,$impersonatedPartnerId, KalturaEventNotificationTemplateListResponse $reference)
+	public function testAdminListbypartner(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null, KalturaEventNotificationTemplateListResponse $reference)
 	{
-		$this->impersonate($impersonatedPartnerId);
-		$resultObject = $this->client->eventNotificationTemplate->listAction($filter, $pager);
+		$resultObject = $this->client->eventNotificationTemplate->listbypartner($filter, $pager, $reference);
 		if(method_exists($this, 'assertInstanceOf'))
 			$this->assertInstanceOf('KalturaEventNotificationTemplateListResponse', $resultObject);
 		else
 			$this->assertType('KalturaEventNotificationTemplateListResponse', $resultObject);
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->validateListAction($resultObject);
+		// TODO - add here your own validations
+		$this->validateListbypartner($resultObject);
 	}
 
 	/**
