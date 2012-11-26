@@ -98,7 +98,7 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	 * @depends testAdd with data set #2
 	 * @dataProvider provideData
 	 */
-	public function testDelete($id)
+	public function testDelete($id, KalturaEventNotificationTemplate $reference)
 	{
 		$resultObject = $this->client->eventNotificationTemplate->delete($id);
 		try
