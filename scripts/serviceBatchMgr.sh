@@ -93,12 +93,12 @@ start() {
 }
 
 start_scheduler() {
-		echo "$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> ${LOGDIR}/KGenericBatchMgr.log 2>&1 &"
+		echo "$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> ${LOGDIR}/kaltura_batch.log 2>&1 &"
                 if [ $default_config -eq 1 ]; then
                    echo "Warning : using default batch_config.ini !"
                 fi
                 cd $BATCHDIR
-		$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> ${LOGDIR}/KGenericBatchMgr.log 2>&1 &
+		$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> ${LOGDIR}/kaltura_batch.log 2>&1 &
                 if [ "$?" -eq 0 ]; then
                         echo_success
                         echo
