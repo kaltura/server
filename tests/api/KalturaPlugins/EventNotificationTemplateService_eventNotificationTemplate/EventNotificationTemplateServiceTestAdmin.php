@@ -44,6 +44,25 @@ class EventNotificationTemplateServiceAdminTest extends EventNotificationTemplat
 		
 	}
 
+	/**
+	 * Tests eventNotificationTemplate->listAction action
+	 * @param KalturaEventNotificationTemplateFilter $filter 
+	 * @param KalturaFilterPager $pager 
+	 * @param int $impersonatedPartnerId
+	 * @param KalturaEventNotificationTemplateListResponse $reference
+	 * @dataProvider provideData
+	 */
+	public function testAdminListAction(KalturaEventNotificationTemplateFilter $filter = null, KalturaFilterPager $pager = null,$impersonatedPartnerId, KalturaEventNotificationTemplateListResponse $reference)
+	{
+		$this->impersonate($impersonatedPartnerId);
+		$resultObject = $this->client->eventNotificationTemplate->listAction($filter, $pager);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaEventNotificationTemplateListResponse', $resultObject);
+		else
+			$this->assertType('KalturaEventNotificationTemplateListResponse', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		$this->validateListAction($resultObject);
+	}
 
 	/**
 	 * Set different partner ID for client config
