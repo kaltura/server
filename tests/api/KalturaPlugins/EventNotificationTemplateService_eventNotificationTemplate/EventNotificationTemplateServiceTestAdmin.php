@@ -60,7 +60,6 @@ class EventNotificationTemplateServiceAdminTest extends EventNotificationTemplat
 			$this->assertType('KalturaEventNotificationTemplateListResponse', $resultObject);
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
 		// TODO - add here your own validations
-		$this->validateListbypartner($resultObject);
 	}
 
 	/**
