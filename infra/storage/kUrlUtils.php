@@ -30,4 +30,27 @@ class kUrlUtils
 	    else 
 	        return false;  
 	}	
+	
+	public static function urlExistsRecursive ($url)
+	{
+		$data = self::urlExists($url);
+		if ($data)
+		{
+			preg_match_all("/http.*/", $data, $matches);
+			$lastMatch = array_pop($matches[0]);
+			if (!$lastMatch)
+			{
+				return true;
+			}
+			else 
+			{
+				return self::urlExistsRecursive($lastMatch);
+			}
+			
+		}
+		else
+		{
+			return false;
+		}
+	}
 }
