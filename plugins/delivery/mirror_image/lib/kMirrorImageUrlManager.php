@@ -15,7 +15,7 @@ class kMirrorImageUrlManager extends kUrlManager
 		$secret = null;
 		switch ($this->protocol)
 		{
-		case StorageProfile::PLAY_FORMAT_HTTP:			
+		case PlaybackProtocol::HTTP:			
 			if (@$this->params['http_auth_salt'])
 			{
 			   $storageProfile = StorageProfilePeer::retrieveByPK($this->storageProfileId);
@@ -30,7 +30,7 @@ class kMirrorImageUrlManager extends kUrlManager
 			}
 			break;
 
-		case StorageProfile::PLAY_FORMAT_RTMP:
+		case PlaybackProtocol::RTMP:
 			if (@$this->params['rtmp_auth_salt'])
 			{
 				$window = $this->params['rtmp_auth_seconds'];
