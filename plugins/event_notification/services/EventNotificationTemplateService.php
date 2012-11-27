@@ -193,12 +193,12 @@ class EventNotificationTemplateService extends KalturaBaseService
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaEventNotificationTemplateListResponse
 	 */
-	public function listAction(KalturaEventNotificationTemplateFilter  $filter = null, KalturaFilterPager $pager = null)
+	public function listAction(KalturaEventNotificationTemplateFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
 			$filter = new KalturaEventNotificationTemplateFilter();
 			
-		if (! $pager)
+		if (!$pager)
 			$pager = new KalturaFilterPager ();
 
 		$eventNotificationTemplateFilter = new EventNotificationTemplateFilter();
