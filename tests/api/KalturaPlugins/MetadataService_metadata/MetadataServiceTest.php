@@ -138,10 +138,11 @@ class MetadataServiceTest extends MetadataServiceTestBase
 	 * @param file $xslFile 
 	 * @param string $schemaFilePath
 	 * @param string $metadataFilePath
+	 * @param string $reference
 	 * @param KalturaMetadata $reference
 	 * @dataProvider provideData
 	 */
-	public function testUpdatefromxsl($xslFile, $schemaFilePath, $metadataFilePath)
+	public function testUpdatefromxsl($xslFile, $schemaFilePath, $metadataFilePath, $reference)
 	{
 		//add new entry
 		$entry = new KalturaBaseEntry();
@@ -153,6 +154,7 @@ class MetadataServiceTest extends MetadataServiceTestBase
 		$metadataProfile = new KalturaMetadataProfile();
 		$metadataProfile->name = uniqid('metadata_unittest');
 		$metadataProfile->systemName = uniqid('metadata_unittest');
+		$metadataProfile->metadataObjectType = KalturaMetadataObjectType::ENTRY;
 		$metadataProfile = $this->client->metadataProfile->add ($metadataProfile, $metadataProfileSchema);
 		
 		//add metadata to entry
@@ -165,8 +167,9 @@ class MetadataServiceTest extends MetadataServiceTestBase
 			$this->assertInstanceOf('KalturaMetadata', $resultObject);
 		else
 			$this->assertType('KalturaMetadata', $resultObject);
-		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
 		
+		$referenceXml = file_get_contents($reference);
+		$this->assertXmlStringEqualsXmlString($referenceXml, $resultObject->xml);
 		// TODO - add here your own validations
 	}
 
