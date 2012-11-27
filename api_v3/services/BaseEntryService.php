@@ -768,10 +768,10 @@ class BaseEntryService extends KalturaEntryService
 				$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
 				
 				if ( !$storageProfile->getDeliveryRmpBaseUrl()
-					&& (!$contextDataParams->streamerType || $contextDataParams->streamerType == StorageProfile::PLAY_FORMAT_AUTO))
+					&& (!$contextDataParams->streamerType || $contextDataParams->streamerType == PlaybackProtocol::AUTO))
 				{
-					$contextDataParams->streamerType = StorageProfile::PLAY_FORMAT_HTTP;
-					$contextDataParams->mediaProtocol = StorageProfile::PLAY_FORMAT_HTTP;
+					$contextDataParams->streamerType = PlaybackProtocol::HTTP;
+					$contextDataParams->mediaProtocol = PlaybackProtocol::HTTP;
 
 				}
 				$storageProfileXML = $storageProfilesXML->addChild("StorageProfile");
@@ -786,7 +786,7 @@ class BaseEntryService extends KalturaEntryService
 			
 		}
 		
-		if($contextDataParams->streamerType && $contextDataParams->streamerType != StorageProfile::PLAY_FORMAT_AUTO)
+		if($contextDataParams->streamerType && $contextDataParams->streamerType != PlaybackProtocol::AUTO)
 		{
 			$result->streamerType = $contextDataParams->streamerType;
 			$result->mediaProtocol = $contextDataParams->mediaProtocol ? $contextDataParams->mediaProtocol : $contextDataParams->streamerType;
@@ -795,10 +795,10 @@ class BaseEntryService extends KalturaEntryService
 		{
 			$result->streamerType = $this->getPartner()->getStreamerType();
 			if (!$result->streamerType)
-				$result->streamerType = StorageProfile::PLAY_FORMAT_HTTP;
+				$result->streamerType = PlaybackProtocol::HTTP;
 			$result->mediaProtocol = $this->getPartner()->getMediaProtocol();
 			if (!$result->mediaProtocol)
-				$result->mediaProtocol = StorageProfile::PLAY_FORMAT_HTTP;
+				$result->mediaProtocol = PlaybackProtocol::HTTP;
 		}		
 		return $result;
 	}
