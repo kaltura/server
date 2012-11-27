@@ -12,6 +12,7 @@ class LiveStreamService extends KalturaEntryService
 	const DEFAULT_BITRATE = 300;
 	const DEFAULT_WIDTH = 320;
 	const DEFAULT_HEIGHT = 240;
+	const ISLIVE_ACTION_CACHE_EXPIRY = 30;
 	
 	/**
 	 * Adds new live stream entry.
@@ -237,6 +238,7 @@ class LiveStreamService extends KalturaEntryService
 	 */
 	public function isLiveAction ($id, $protocol)
 	{
+		KalturaResponseCacher::setExpiry(self::ISLIVE_ACTION_CACHE_EXPIRY);
 		$liveStreamEntry = entryPeer::retrieveByPK($id);
 		if (!$liveStreamEntry)
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
