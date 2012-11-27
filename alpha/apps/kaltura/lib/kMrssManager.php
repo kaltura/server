@@ -369,7 +369,7 @@ class kMrssManager
 		
 		$kalturaFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 	
-		$urlPrefix = myPartnerUtils::getIisHost($entry->getPartnerId(), StorageProfile::PLAY_FORMAT_HTTP);
+		$urlPrefix = myPartnerUtils::getIisHost($entry->getPartnerId(), PlaybackProtocol::HTTP);
 		$iisHost = parse_url($urlPrefix, PHP_URL_HOST);
 		
 		$matches = null;
@@ -381,7 +381,7 @@ class kMrssManager
 		$urlManager = kUrlManager::getUrlManagerByCdn($iisHost, $entry->getId());
 		if ($kalturaFileSync)
 			$urlManager->setFileExtension(pathinfo($kalturaFileSync->getFilePath(), PATHINFO_EXTENSION));
-		$urlManager->setProtocol(StorageProfile::PLAY_FORMAT_SILVER_LIGHT);
+		$urlManager->setProtocol(PlaybackProtocol::SILVER_LIGHT);
 		
 		
 		$partner = $entry->getPartner();
@@ -408,7 +408,7 @@ class kMrssManager
 		{
 			$urlManager = kUrlManager::getUrlManagerByStorageProfile($externalFileSync->getDc(), $entry->getId());
 			$urlManager->setFileExtension(pathinfo($externalFileSync->getFilePath(), PATHINFO_EXTENSION));
-			$urlManager->setProtocol(StorageProfile::PLAY_FORMAT_SILVER_LIGHT);
+			$urlManager->setProtocol(PlaybackProtocol::SILVER_LIGHT);
 			$url = $urlManager->getFileSyncUrl($externalFileSync, false);
 			$url = ltrim($url,'/');
         	if (strpos($url, "://") !== false)
