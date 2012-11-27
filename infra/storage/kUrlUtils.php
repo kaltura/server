@@ -25,8 +25,10 @@ class kUrlUtils
 	    $data = curl_exec($ch);  
 	    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);  
 	    curl_close($ch);  
-	    if($httpcode>=200 && $httpcode<300)
-	        return $data ? $data : true;  
+	    if($data && $httpcode>=200 && $httpcode<300)
+	    {
+	        return is_string($data) ? $data : true;
+	    }  
 	    else 
 	        return false;  
 	}	
@@ -34,23 +36,15 @@ class kUrlUtils
 	public static function urlExistsRecursive ($url)
 	{
 		$data = self::urlExists($url);
+		if(is_bool($data))
+			return $data;
+		
 		if ($data)
 		{
 			preg_match_all("/http.*/", $data, $matches);
 			$lastMatch = array_pop($matches[0]);
-			if (!$lastMatch)
-			{
-				return true;
-			}
-			else 
-			{
-				return self::urlExistsRecursive($lastMatch);
-			}
+			return self::urlExistsRecursive($lastMatch);
 			
-		}
-		else
-		{
-			return false;
 		}
 	}
 }
