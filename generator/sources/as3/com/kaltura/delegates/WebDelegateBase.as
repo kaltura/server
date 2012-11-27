@@ -394,6 +394,7 @@ package com.kaltura.delegates {
 		 */
 		protected function createKalturaError(event:ErrorEvent, loaderData:*):KalturaError {
 			var ke:KalturaError = new KalturaError();
+			ke.errorMsg = event.text;
 			return ke;
 		}
 
