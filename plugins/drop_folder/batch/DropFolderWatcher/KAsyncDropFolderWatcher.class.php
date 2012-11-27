@@ -50,15 +50,9 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		//TODO: use getFilter instead of taskConfig->params
 		// get drop folder tags to work on from configuration
 		$folderTags = $this->taskConfig->params->tags;
-		$currentDc  = $this->taskConfig->params->dc;
 		
 		if (strlen($folderTags) == 0) {
 			KalturaLog::err('Tags configuration is empty - cannot continue');
-			return;
-		}
-		
-		if (strlen($currentDc) == 0) {
-			KalturaLog::err('DC configuration is empty - cannot continue');
 			return;
 		}
 		
@@ -69,7 +63,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			$filter->tagsMultiLikeOr = $folderTags;
 		}
 			
-		$filter->dcEqual = $currentDc;
+		$filter->currentDc = KalturaNullableBoolean::TRUE_VALUE;
 		$filter->statusEqual = KalturaDropFolderStatus::ENABLED;
 		
 		try {
