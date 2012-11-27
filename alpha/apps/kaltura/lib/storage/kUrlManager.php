@@ -33,7 +33,7 @@ class kUrlManager
 	/**
 	 * @var string
 	 */
-	protected $protocol = StorageProfile::PLAY_FORMAT_HTTP;
+	protected $protocol = PlaybackProtocol::HTTP;
 	
 	/**
 	 * @var string
@@ -241,7 +241,7 @@ class kUrlManager
 		$url = $fileSync->getFilePath();
 		$url = str_replace('\\', '/', $url);
 	
-		if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
+		if($this->protocol == PlaybackProtocol::RTMP)
 		{
 		    $storageProfile = StorageProfilePeer::retrieveByPK($this->storageProfileId);
 		    if ($storageProfile->getRTMPPrefix())
@@ -355,7 +355,7 @@ class kUrlManager
 			$url .= "/clipTo/$this->clipTo";
 			
 		switch($this->protocol){
-		case StorageProfile::PLAY_FORMAT_RTMP:
+		case PlaybackProtocol::RTMP:
 			$url .= '/forceproxy/true';
 			if ($this->extention && strtolower($this->extention) != 'flv' ||
                         	$this->containerFormat && strtolower($this->containerFormat) != 'flash video')	
@@ -367,7 +367,7 @@ class kUrlManager
 				$url .= "/name/a.flv";
 			}
 			break;
-		case StorageProfile::PLAY_FORMAT_APPLE_HTTP:
+		case PlaybackProtocol::APPLE_HTTP:
 			$url .= "/file/playlist.m3u8";
 			break;
 		}
