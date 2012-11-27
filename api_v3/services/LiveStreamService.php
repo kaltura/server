@@ -234,7 +234,7 @@ class LiveStreamService extends KalturaEntryService
 	 * @throws KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED
 	 * @return bool
 	 */
-	public function isLiveAction ($id, KalturaPlaybackProtocol $protocol)
+	public function isLiveAction ($id, $protocol)
 	{
 		$liveStreamEntry = entryPeer::retrieveByPK($id);
 		if ($liveStreamEntry)
