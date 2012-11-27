@@ -232,11 +232,15 @@ class LiveStreamService extends KalturaEntryService
 	 * @param string $id ID of the live stream
 	 * @param KalturaPlaybackProtocol $protocol protocol of the stream to test.
 	 * @throws KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
 	 * @return bool
 	 */
 	public function isLiveAction ($id, $protocol)
 	{
 		$liveStreamEntry = entryPeer::retrieveByPK($id);
+		if (!$liveStreamEntry)
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
+		
 		if ($liveStreamEntry)
 		{
 			switch ($protocol)
