@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class KalturaPlaybackProtocol extends KalturaEnum implements PlaybackProtocol
+class KalturaPlaybackProtocol extends KalturaStringEnum implements PlaybackProtocol
 {
 	
 }
