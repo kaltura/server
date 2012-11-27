@@ -39,12 +39,11 @@ class kUrlUtils
 		if(is_bool($data))
 			return $data;
 		
-		if ($data)
-		{
-			preg_match_all("/http.*/", $data, $matches);
-			$lastMatch = array_pop($matches[0]);
-			return self::urlExistsRecursive($lastMatch);
+		$lines = explode("\n", $data);
+		if(!preg_match("/http.*/", array_pop($lines), $matches))
+			return false;
 			
-		}
+		$lastMatch = $matches[0];
+		return self::urlExistsRecursive($lastMatch);
 	}
 }
