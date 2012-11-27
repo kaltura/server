@@ -248,7 +248,7 @@ class LiveStreamService extends KalturaEntryService
 			switch ($protocol)
 			{
 				case KalturaPlaybackProtocol::HLS:
-					return kUrlUtils::urlExists($liveStreamEntry->getHlsStreamUrl());
+					return kUrlUtils::urlExistsRecursive($liveStreamEntry->getHlsStreamUrl());
 					break;
 			}
 		}
