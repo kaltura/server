@@ -63,7 +63,7 @@ class FileSync extends BaseFileSync
 		return (isset($this->statusMap[$this->getStatus()])) ? $this->statusMap[$this->getStatus()] : "Unknown";
 	}
 	
-	public function getExternalUrl($entryId, $format = StorageProfile::PLAY_FORMAT_HTTP)
+	public function getExternalUrl($entryId, $format = PlaybackProtocol::HTTP)
 	{
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
 		if(!$storage || $storage->getProtocol() == StorageProfile::STORAGE_KALTURA_DC)
@@ -72,7 +72,7 @@ class FileSync extends BaseFileSync
 		$urlManager = kUrlManager::getUrlManagerByStorageProfile($this->getDc(), $entryId);
 		$url = $urlManager->getFileSyncUrl($this);
 		
-		if ($format == StorageProfile::PLAY_FORMAT_RTMP)
+		if ($format == PlaybackProtocol::RTMP)
 			return $storage->getDeliveryRmpBaseUrl() . '/' . $url;
 			
 		return $storage->getDeliveryHttpBaseUrl() . '/' . $url;
