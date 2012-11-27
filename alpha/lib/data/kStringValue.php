@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Base abstraction for string value, constant or calculated that retreived from the API 
+ * Base abstraction for string value, constant or calculated that retrieved from the API 
  * @package Core
  * @subpackage model.data
  */
