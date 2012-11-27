@@ -1,64 +1,174 @@
 <?php
 
 require_once(dirname(__FILE__) . '/../../../bootstrap.php');
-require_once(dirname(__FILE__) . '/MetadataServiceTestBase.php');
 
 /**
  * metadata service test case.
  */
 class MetadataServiceTest extends MetadataServiceTestBase
 {
-	/**
-	 * Set up the test initial data
+	/* (non-PHPdoc)
+	 * @see MetadataServiceTestBase::validateAdd()
 	 */
-	protected function setUp()
+	protected function validateAdd(KalturaMetadata $resultObject)
 	{
-		parent::setUp();
-	}
-
-	/**
-	 * Validates testListAction results
-	 */
-	protected function validateListAction(KalturaMetadataFilter $filter = null, KalturaFilterPager $pager = null, KalturaMetadataListResponse $reference)
-	{
-		parent::validateListAction($filter, $pager, $reference);
 		// TODO - add your own validations here
 	}
 
 	/**
-	 * Validates testAdd results
+	 * Tests metadata->addfromfile action
+	 * @param int $metadataProfileId 
+	 * @param KalturaMetadataObjectType $objectType 
+	 * @param string $objectId 
+	 * @param file $xmlFile XML metadata
+	 * @param KalturaMetadata $reference
+	 * @dataProvider provideData
 	 */
-	protected function validateAdd($metadataProfileId, $objectType, $objectId, $xmlData, KalturaMetadata $reference)
+	public function testAddfromfile($metadataProfileId, $objectType, $objectId, $xmlFile, KalturaMetadata $reference)
 	{
-		parent::validateAdd($metadataProfileId, $objectType, $objectId, $xmlData, $reference);
+		$resultObject = $this->client->metadata->addfromfile($metadataProfileId, $objectType, $objectId, $xmlFile, $reference);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaMetadata', $resultObject);
+		else
+			$this->assertType('KalturaMetadata', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		// TODO - add here your own validations
+		$this->validateAddfromfile($resultObject);
+	}
+
+	/**
+	 * Tests metadata->addfromurl action
+	 * @param int $metadataProfileId 
+	 * @param KalturaMetadataObjectType $objectType 
+	 * @param string $objectId 
+	 * @param string $url XML metadata remote url
+	 * @param KalturaMetadata $reference
+	 * @dataProvider provideData
+	 */
+	public function testAddfromurl($metadataProfileId, $objectType, $objectId, $url, KalturaMetadata $reference)
+	{
+		$resultObject = $this->client->metadata->addfromurl($metadataProfileId, $objectType, $objectId, $url, $reference);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaMetadata', $resultObject);
+		else
+			$this->assertType('KalturaMetadata', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		// TODO - add here your own validations
+		$this->validateAddfromurl($resultObject);
+	}
+
+	/**
+	 * Tests metadata->addfrombulk action
+	 * @param int $metadataProfileId 
+	 * @param KalturaMetadataObjectType $objectType 
+	 * @param string $objectId 
+	 * @param string $url XML metadata remote url
+	 * @param KalturaMetadata $reference
+	 * @dataProvider provideData
+	 */
+	public function testAddfrombulk($metadataProfileId, $objectType, $objectId, $url, KalturaMetadata $reference)
+	{
+		$resultObject = $this->client->metadata->addfrombulk($metadataProfileId, $objectType, $objectId, $url, $reference);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaMetadata', $resultObject);
+		else
+			$this->assertType('KalturaMetadata', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		// TODO - add here your own validations
+		$this->validateAddfrombulk($resultObject);
+	}
+
+	/* (non-PHPdoc)
+	 * @see MetadataServiceTestBase::validateGet()
+	 */
+	protected function validateGet(KalturaMetadata $resultObject)
+	{
+		// TODO - add your own validations here
+	}
+
+	/* (non-PHPdoc)
+	 * @see MetadataServiceTestBase::validateUpdate()
+	 */
+	protected function validateUpdate(KalturaMetadata $resultObject)
+	{
 		// TODO - add your own validations here
 	}
 
 	/**
-	 * Validates testDelete results
+	 * Tests metadata->updatefromfile action
+	 * @param int $id 
+	 * @param file $xmlFile XML metadata
+	 * @param KalturaMetadata $reference
+	 * @dataProvider provideData
 	 */
-	protected function validateDelete($id)
+	public function testUpdatefromfile($id, $xmlFile = null, KalturaMetadata $reference)
 	{
-		parent::validateDelete($id);
+		$resultObject = $this->client->metadata->updatefromfile($id, $xmlFile, $reference);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaMetadata', $resultObject);
+		else
+			$this->assertType('KalturaMetadata', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		// TODO - add here your own validations
+		$this->validateUpdatefromfile($resultObject);
+	}
+
+	/* (non-PHPdoc)
+	 * @see MetadataServiceTestBase::validateListAction()
+	 */
+	protected function validateListAction(KalturaMetadataListResponse $resultObject)
+	{
 		// TODO - add your own validations here
 	}
 
 	/**
-	 * Validates testGet results
+	 * Tests metadata->invalidate action
+	 * @param int $id 
+	 * @param int $version Enable update only if the metadata object version did not change by other process
+	 * @dataProvider provideData
 	 */
-	protected function validateGet($id, KalturaMetadata $reference)
+	public function testInvalidate($id, $version = "")
 	{
-		parent::validateGet($id, $reference);
-		// TODO - add your own validations here
+		$resultObject = $this->client->metadata->invalidate($id, $version);
+		// TODO - add here your own validations
 	}
 
 	/**
-	 * Validates testUpdate results
+	 * Tests metadata->updatefromxsl action
+	 * @param file $xslFile 
+	 * @param string $schemaFilePath
+	 * @param string $metadataFilePath
+	 * @param KalturaMetadata $reference
+	 * @dataProvider provideData
 	 */
-	protected function validateUpdate($id, $xmlData = "", KalturaMetadata $reference)
+	public function testUpdatefromxsl($xslFile, $schemaFilePath, $metadataFilePath)
 	{
-		parent::validateUpdate($id, $xmlData, $reference);
-		// TODO - add your own validations here
+		//add new entry
+		$entry = new KalturaBaseEntry();
+		$entry->name = uniqid('metadata_unit_test');
+		$entry = $this->client->baseEntry->add($entry);
+		
+		//Add new metadata profile
+		$metadataProfileSchema = file_get_contents($schemaFilePath);	
+		$metadataProfile = new KalturaMetadataProfile();
+		$metadataProfile->name = uniqid('metadata_unittest');
+		$metadataProfile->systemName = uniqid('metadata_unittest');
+		$metadataProfile->xsd = $metadataProfileSchema;
+		$metadataProfile = $this->client->metadataProfile->add ($metadataProfile);
+		
+		//add metadata to entry
+		$metadataXml = file_get_contents($metadataFilePath);
+		$metadata = $this->client->metadata->add ($metadataProfile->id, KalturaMetadataObjectType::ENTRY, $entry->id, $metadataXml);
+		//transform metaddata with xsl
+		$resultObject = $this->client->metadata->updatefromxsl($id, $xslFile);
+		
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaMetadata', $resultObject);
+		else
+			$this->assertType('KalturaMetadata', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		
+		// TODO - add here your own validations
 	}
 
 }
