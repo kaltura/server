@@ -153,8 +153,7 @@ class MetadataServiceTest extends MetadataServiceTestBase
 		$metadataProfile = new KalturaMetadataProfile();
 		$metadataProfile->name = uniqid('metadata_unittest');
 		$metadataProfile->systemName = uniqid('metadata_unittest');
-		$metadataProfile->xsd = $metadataProfileSchema;
-		$metadataProfile = $this->client->metadataProfile->add ($metadataProfile);
+		$metadataProfile = $this->client->metadataProfile->add ($metadataProfile, $metadataProfileSchema);
 		
 		//add metadata to entry
 		$metadataXml = file_get_contents($metadataFilePath);
