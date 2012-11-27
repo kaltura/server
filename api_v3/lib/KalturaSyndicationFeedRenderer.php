@@ -658,7 +658,7 @@ class KalturaSyndicationFeedRenderer
 		if($partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
 			return null;
 		
-		$this->protocol = StorageProfile::PLAY_FORMAT_HTTP;
+		$this->protocol = PlaybackProtocol::HTTP;
 		$this->cdnHost = myPartnerUtils::getCdnHost($this->syndicationFeed->partnerId, $this->protocol);
 		
 		$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost, $flavorAsset->getEntryId());
