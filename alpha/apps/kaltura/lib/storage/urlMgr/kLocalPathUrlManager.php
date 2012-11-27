@@ -18,10 +18,10 @@ class kLocalPathUrlManager extends kUrlManager
 		$url = $fileSync->getFilePath();
 		$url = str_replace('\\', '/', $url);
 		
-		if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
+		if($this->protocol == PlaybackProtocol::RTMP)
 			$url = preg_replace('/\.[\w]+$/', '', $url);
 		
-		if ($this->protocol == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+		if ($this->protocol == PlaybackProtocol::APPLE_HTTP)
 			return $fileSync->getFilePath()."/playlist.m3u8";
 		
 		return $url;
@@ -35,7 +35,7 @@ class kLocalPathUrlManager extends kUrlManager
 	 */
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
-		if($this->protocol != StorageProfile::PLAY_FORMAT_RTMP)
+		if($this->protocol != PlaybackProtocol::RTMP)
 			return parent::doGetFlavorAssetUrl($flavorAsset);
                 	
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);

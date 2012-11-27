@@ -14,7 +14,7 @@ class kAkamaiUrlManager extends kUrlManager
 	{
 		switch ($this->protocol)
 		{
-		case StorageProfile::PLAY_FORMAT_HTTP:
+		case PlaybackProtocol::HTTP:
 			if (isset($this->params['http_auth_salt']) && $this->params['http_auth_salt'])
 			{
 				return new kAkamaiHttpUrlTokenizer(
@@ -25,7 +25,7 @@ class kAkamaiUrlManager extends kUrlManager
 			}
 			break;
 			
-		case StorageProfile::PLAY_FORMAT_RTMP:
+		case PlaybackProtocol::RTMP:
 			if (isset($this->params['rtmp_auth_salt']) && $this->params['rtmp_auth_salt'])
 			{
 				return new kAkamaiRtmpUrlTokenizer(
@@ -38,12 +38,12 @@ class kAkamaiUrlManager extends kUrlManager
 			}
 			break;
 		
-		case StorageProfile::PLAY_FORMAT_RTSP:
+		case PlaybackProtocol::RTSP:
 			return new kAkamaiRtspUrlTokenizer(
 				$this->params["rtsp_host"],
 				$this->params["rtsp_cpcode"]);
 
-		case StorageProfile::PLAY_FORMAT_SILVER_LIGHT:
+		case PlaybackProtocol::SILVER_LIGHT:
 			if (isset($this->params['smooth_auth_salt']) && $this->params['smooth_auth_salt'])
 			{
 				return new kAkamaiHttpUrlTokenizer(
@@ -87,11 +87,11 @@ class kAkamaiUrlManager extends kUrlManager
 
 		$versionString = $this->getFlavorVersionString($flavorAsset);
 		$url = "$partnerPath/serveFlavor/entryId/".$flavorAsset->getEntryId()."{$versionString}/flavorId/$flavorAssetId";
-		if($this->protocol==StorageProfile::PLAY_FORMAT_RTSP) {
+		if($this->protocol==PlaybackProtocol::RTSP) {
 			return $url;
 		}
 	
-		if($this->protocol==StorageProfile::PLAY_FORMAT_APPLE_HTTP) {
+		if($this->protocol==PlaybackProtocol::APPLE_HTTP) {
 			if (strpos($flavorAsset->getTags(), flavorParams::TAG_APPLEMBR) === FALSE)
 			{
 				// we use index_0_av.m3u8 instead of master.m3u8 as temporary solution to overcome
@@ -111,7 +111,7 @@ class kAkamaiUrlManager extends kUrlManager
 			{
 				$url = "http://".$this->params["hd_flash"].$url.'/forceproxy/true';
 			}
-			else if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
+			else if($this->protocol == PlaybackProtocol::RTMP)
 			{
 				$url .= '/forceproxy/true';
 				$url = trim($url, "/");
@@ -199,7 +199,7 @@ class kAkamaiUrlManager extends kUrlManager
 		$serverUrl = $storage->getDeliveryIisBaseUrl();
 		$partnerPath = myPartnerUtils::getUrlForPartner($fileSync->getPartnerId(), $fileSync->getPartnerId() * 100);
 		
-		if ($this->protocol == StorageProfile::PLAY_FORMAT_APPLE_HTTP && isset($this->params["hd_ios"])){
+		if ($this->protocol == PlaybackProtocol::APPLE_HTTP && isset($this->params["hd_ios"])){
 			$path = $fileSync->getFilePath();
 			$urlSuffix = str_replace('\\', '/', $path)."/index_0_av.m3u8";
 			$urlPrefix = "http://".$this->params["hd_ios"].'/i/';
@@ -285,7 +285,7 @@ class kAkamaiUrlManager extends kUrlManager
 	{
 		$url = $this->generateCsmilUrl($flavors);
 		
-		if ($this->protocol == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+		if ($this->protocol == PlaybackProtocol::APPLE_HTTP)
 		{
 			if (!isset($this->params["hd_secure_ios"]))
 				return null;

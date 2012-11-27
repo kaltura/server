@@ -12,7 +12,7 @@ class kLevel3UrlManager extends kUrlManager
 	{
 		switch ($this->protocol)
 		{
-		case StorageProfile::PLAY_FORMAT_HTTP:
+		case PlaybackProtocol::HTTP:
    		    $name = isset($this->params['http_auth_param_name']) ? $this->params['http_auth_param_name'] : "h";
 			$key = isset($this->params['http_auth_key']) ? $this->params['http_auth_key'] : false;
 			$gen = isset($this->params['http_auth_gen']) ? $this->params['http_auth_gen'] : false;
@@ -24,7 +24,7 @@ class kLevel3UrlManager extends kUrlManager
 				return new kLevel3UrlTokenizer($name, $key, $gen, false, $window);
 			break;
 
-		case StorageProfile::PLAY_FORMAT_RTMP:
+		case PlaybackProtocol::RTMP:
 		    $name = isset($this->params['rtmp_auth_param_name']) ? $this->params['rtmp_auth_param_name'] : "h";
 		    $key = isset($this->params['rtmp_auth_key']) ? $this->params['rtmp_auth_key'] : false;
 		    $gen = isset($this->params['rtmp_auth_gen']) ? $this->params['rtmp_auth_gen'] : false;
@@ -58,7 +58,7 @@ class kLevel3UrlManager extends kUrlManager
 		if($this->extention)
 			$url .= "/name/a.$this->extention";
 					
-		if($this->protocol != StorageProfile::PLAY_FORMAT_RTMP)
+		if($this->protocol != PlaybackProtocol::RTMP)
 		{	
 			$url .= '?novar=0';
 				

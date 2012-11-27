@@ -18,10 +18,10 @@ class kFmsUrlManager extends kUrlManager
 
 		switch ($this->protocol)
 		{
-		case StorageProfile::PLAY_FORMAT_APPLE_HTTP:
+		case PlaybackProtocol::APPLE_HTTP:
 			return "/hls-vod/{$url}.m3u8";
 		
-		case StorageProfile::PLAY_FORMAT_HDS:
+		case PlaybackProtocol::HDS:
 			return "/hds-vod/{$url}.f4m";
 		
 		default:
