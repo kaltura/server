@@ -225,4 +225,28 @@ class LiveStreamService extends KalturaEntryService
  			
 		return $dbEntry;
 	}	
+	
+	/**
+	 * New action delivering the status of a live stream (on-air/offline) if it is possible
+	 * @action isLive
+	 * @param string $id ID of the live stream
+	 * @param KalturaPlaybackProtocol $protocol protocol of the stream to test.
+	 * @throws 
+	 * @return bool
+	 */
+	public function isLiveAction ($id, KalturaPlaybackProtocol $protocol)
+	{
+		$liveStreamEntry = entryPeer::retrieveByPK($id);
+		if ($liveStreamEntry)
+		{
+			switch ($protocol)
+			{
+				case KalturaPlaybackProtocol::HLS:
+					return kUrlUtils::urlExists($liveStreamEntry->getHlsStreamUrl());
+					break;
+			}
+		}
+		
+		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
+	}
 }
