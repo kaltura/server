@@ -35,10 +35,15 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 	public function getScopedProviderJobData(kScope $scope = null) 
 	{
 		$ret = new kEmailNotificationCategoryRecipientJobData();
-		if ($this->getCategoryId() instanceof kStringField)
+		
+		if(!$this->categoryId)
+			return $ret;
+		
+		if ($this->categoryId instanceof kStringField)
 			$this->categoryId->setScope($scope);
 		
 		$ret->setCategoryId($this->categoryId->getValue());
+		
 		return $ret;
 	}
 
