@@ -94,6 +94,105 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 		// TODO - add your own validations here
 	}
 
+	
+	/**
+	 * Tests eventNotificationTemplate->get action
+	 * @param int $id 
+	 * @param KalturaEventNotificationTemplate $reference
+	 * @depends testCloneAction with data set #1
+	 * @dataProvider provideData
+	 */
+	public function testGet($id, KalturaEventNotificationTemplate $reference)
+	{
+		$resultObject = $this->client->eventNotificationTemplate->get($id);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
+		else
+			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		$this->validateGet($resultObject);
+		
+		return $resultObject->id;
+	}
+	
+	/**
+	 * Tests eventNotificationTemplate->update action
+	 * @param int $id 
+	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate 
+	 * @param KalturaEventNotificationTemplate $reference
+	 * @depends testGet with data set #1
+	 * @dataProvider provideData
+	 */
+	public function testUpdate($id, KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationTemplate $reference)
+	{
+		$resultObject = $this->client->eventNotificationTemplate->update($id, $eventNotificationTemplate);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
+		else
+			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		$this->validateUpdate($resultObject);
+		
+		return $resultObject->id;
+	}
+	
+
+	/**
+	 * Tests eventNotificationTemplate->dispatch action
+	 * @param int $id 
+	 * @param KalturaEventNotificationDispatchJobData $data
+	 * @param int $reference
+	 * @depends testUpdate with data set #1
+	 * @dataProvider provideData
+	 */
+	public function testDispatch($id, KalturaEventNotificationDispatchJobData $data, $reference)
+	{
+		try 
+		{
+			$resultObject = $this->client->eventNotificationTemplate->dispatch($id, $data, $reference);
+			if(method_exists($this, 'assertInstanceOf'))
+				$this->assertInstanceOf('int', $resultObject);
+			else
+				$this->assertType('int', $resultObject);
+			$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+			// TODO - add here your own validations
+			$this->validateDispatch($resultObject);
+			
+			return $resultObject->id;
+		}
+		catch (KalturaException $e)
+		{
+			if ($e->getCode() == 'EVENT_NOTIFICATION_DISPATCH_DISABLED' || $e->getCode() == 'SERVICE_FORBIDDEN')
+			{
+				
+			}
+			else
+			{
+				$this->fail('Unexpected error type thrown');
+			}
+		}
+	}
+	
+	/**
+	 * Tests eventNotificationTemplate->delete action
+	 * @param int $id 
+	 * @depends testDispatch with data set #1
+	 * @dataProvider provideData
+	 */
+	public function testDelete($id)
+	{
+		$resultObject = $this->client->eventNotificationTemplate->delete($id);
+		try
+		{
+			$this->client->eventNotificationTemplate->get ($id);
+			$this->fail("Template not deleted");
+		}
+		catch (Exception $e)
+		{
+		}
+	}
+	
+	
 	/**
 	 * Tests eventNotificationTemplate->updatestatus action
 	 * @param int $id 
@@ -121,44 +220,6 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 		}
 		
 	}
-	
-	/**
-	 * Tests eventNotificationTemplate->get action
-	 * @param int $id 
-	 * @param KalturaEventNotificationTemplate $reference
-	 * @depends testCloneAction with data set #1
-	 * @dataProvider provideData
-	 */
-	public function testGet($id, KalturaEventNotificationTemplate $reference)
-	{
-		$resultObject = $this->client->eventNotificationTemplate->get($id);
-		if(method_exists($this, 'assertInstanceOf'))
-			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
-		else
-			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
-		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->validateGet($resultObject);
-	}
-	
-	/**
-	 * Tests eventNotificationTemplate->update action
-	 * @param int $id 
-	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate 
-	 * @param KalturaEventNotificationTemplate $reference
-	 * @depends testCloneAction with data set #1
-	 * @dataProvider provideData
-	 */
-	public function testUpdate($id, KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationTemplate $reference)
-	{
-		$resultObject = $this->client->eventNotificationTemplate->update($id, $eventNotificationTemplate);
-		if(method_exists($this, 'assertInstanceOf'))
-			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
-		else
-			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
-		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->validateUpdate($resultObject);
-	}
-	
 	/* (non-PHPdoc)
 	 * @see EventNotificationTemplateServiceTestBase::validateDelete()
 	 */
@@ -202,59 +263,5 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 		}
 		
 	}
-
-	/**
-	 * Tests eventNotificationTemplate->dispatch action
-	 * @param int $id 
-	 * @param KalturaEventNotificationDispatchJobData $data
-	 * @param int $reference
-	 * @depends testCloneAction with data set #1
-	 * @dataProvider provideData
-	 */
-	public function testDispatch($id, KalturaEventNotificationDispatchJobData $data, $reference)
-	{
-		try 
-		{
-			$resultObject = $this->client->eventNotificationTemplate->dispatch($id, $data, $reference);
-			if(method_exists($this, 'assertInstanceOf'))
-				$this->assertInstanceOf('int', $resultObject);
-			else
-				$this->assertType('int', $resultObject);
-			$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-			// TODO - add here your own validations
-			$this->validateDispatch($resultObject);
-		}
-		catch (KalturaException $e)
-		{
-			if ($e->getCode() == 'EVENT_NOTIFICATION_DISPATCH_DISABLED' || $e->getCode() == 'SERVICE_FORBIDDEN')
-			{
-				
-			}
-			else
-			{
-				$this->fail('Unexpected error type thrown');
-			}
-		}
-	}
-	
-	/**
-	 * Tests eventNotificationTemplate->delete action
-	 * @param int $id 
-	 * @depends testCloneAction with data set #1
-	 * @dataProvider provideData
-	 */
-	public function testDelete($id)
-	{
-		$resultObject = $this->client->eventNotificationTemplate->delete($id);
-		try
-		{
-			$this->client->eventNotificationTemplate->get ($id);
-			$this->fail("Template not deleted");
-		}
-		catch (Exception $e)
-		{
-		}
-	}
-
 }
 
