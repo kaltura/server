@@ -61,6 +61,7 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 			else
 				$this->assertType('KalturaEventNotificationTemplate', $resultObject);
 			$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+			return $resultObject->id;
 		}
 		catch (KalturaException $e)
 		{
@@ -73,6 +74,8 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 				$this->fail('Unexpected error occured.');
 			}
 		}
+		
+		
 	}
 
 	/* (non-PHPdoc)
