@@ -35,27 +35,10 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 	public function getScopedProviderJobData(kScope $scope = null) 
 	{
 		$ret = new kEmailNotificationCategoryRecipientJobData();
+		if ($this->getCategoryId() instanceof kStringField)
+			$this->categoryId->setScope($scope);
 		
-		$categoryIdFieldType = get_class($this->getCategoryId());
-		KalturaLog::debug("Converting categoryId value for categoryId of type [$categoryIdFieldType]");
-		switch ($categoryIdFieldType)
-		{
-			case 'kObjectIdField':
-			case 'kStringField':
-				$this->categoryId->setScope($scope);
-				$categoryId = $this->categoryId->getValue();
-				KalturaLog::info("Implicit categoryId value: $categoryId");
-				$ret->setCategoryId($categoryId);
-				break;
-			case 'kStringValue':
-				$categoryId = $this->categoryId->getValue();
-				KalturaLog::info("Implicit categoryId value: $categoryId");
-				$ret->setCategoryId($categoryId);
-				break;
-			default:
-				$this->categoryId = KalturaPluginManager::loadObject('kStringValue', $categoryIdFieldType);
-				break;
-		}
+		$ret->setCategoryId($this->categoryId->getValue());
 		return $ret;
 	}
 
