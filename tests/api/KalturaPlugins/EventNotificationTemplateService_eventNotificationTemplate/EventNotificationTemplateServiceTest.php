@@ -123,6 +123,7 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	 * Tests eventNotificationTemplate->get action
 	 * @param int $id 
 	 * @param KalturaEventNotificationTemplate $reference
+	 * @depends testCloneAction with data set #1
 	 * @dataProvider provideData
 	 */
 	public function testGet($id, KalturaEventNotificationTemplate $reference)
@@ -141,6 +142,7 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	 * @param int $id 
 	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate 
 	 * @param KalturaEventNotificationTemplate $reference
+	 * @depends testCloneAction with data set #1
 	 * @dataProvider provideData
 	 */
 	public function testUpdate($id, KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationTemplate $reference)
@@ -154,24 +156,6 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 		$this->validateUpdate($resultObject);
 	}
 	
-	/**
-	 * Tests eventNotificationTemplate->delete action
-	 * @param int $id 
-	 * @dataProvider provideData
-	 */
-	public function testDelete($id)
-	{
-		$resultObject = $this->client->eventNotificationTemplate->delete($id);
-		try
-		{
-			$this->client->eventNotificationTemplate->get ($id);
-			$this->fail("Template not deleted");
-		}
-		catch (Exception $e)
-		{
-		}
-	}
-
 	/* (non-PHPdoc)
 	 * @see EventNotificationTemplateServiceTestBase::validateDelete()
 	 */
@@ -221,6 +205,7 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	 * @param int $id 
 	 * @param KalturaEventNotificationDispatchJobData $data
 	 * @param int $reference
+	 * @depends testCloneAction with data set #1
 	 * @dataProvider provideData
 	 */
 	public function testDispatch($id, KalturaEventNotificationDispatchJobData $data, $reference)
@@ -246,6 +231,25 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 			{
 				$this->fail('Unexpected error type thrown');
 			}
+		}
+	}
+	
+	/**
+	 * Tests eventNotificationTemplate->delete action
+	 * @param int $id 
+	 * @depends testCloneAction with data set #1
+	 * @dataProvider provideData
+	 */
+	public function testDelete($id)
+	{
+		$resultObject = $this->client->eventNotificationTemplate->delete($id);
+		try
+		{
+			$this->client->eventNotificationTemplate->get ($id);
+			$this->fail("Template not deleted");
+		}
+		catch (Exception $e)
+		{
 		}
 	}
 
