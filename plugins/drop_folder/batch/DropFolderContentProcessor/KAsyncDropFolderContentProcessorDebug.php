@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package plugins.dropFolder
+ * @package plugins.dropFolder 
  * @subpackage Scheduler.Debug
  */
 
@@ -13,4 +13,4 @@ require_once("bootstrap.php");
 $iniFile = "../configurations/batch.ini";		// should be the full file path
 
 $kdebuger = new KGenericDebuger($iniFile);
-$kdebuger->run('KAsyncDropFolderHandler');
+$kdebuger->run('KAsyncDropFolderContentProcessor');

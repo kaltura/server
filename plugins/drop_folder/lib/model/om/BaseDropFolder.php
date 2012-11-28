@@ -104,6 +104,18 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	protected $tags;
 
 	/**
+	 * The value for the error_code field.
+	 * @var        int
+	 */
+	protected $error_code;
+
+	/**
+	 * The value for the error_description field.
+	 * @var        string
+	 */
+	protected $error_description;
+
+	/**
 	 * The value for the created_at field.
 	 * @var        string
 	 */
@@ -304,6 +316,26 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	public function getTags()
 	{
 		return $this->tags;
+	}
+
+	/**
+	 * Get the [error_code] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getErrorCode()
+	{
+		return $this->error_code;
+	}
+
+	/**
+	 * Get the [error_description] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getErrorDescription()
+	{
+		return $this->error_description;
 	}
 
 	/**
@@ -719,6 +751,52 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	} // setTags()
 
 	/**
+	 * Set the value of [error_code] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     DropFolder The current object (for fluent API support)
+	 */
+	public function setErrorCode($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderPeer::ERROR_CODE]))
+			$this->oldColumnsValues[DropFolderPeer::ERROR_CODE] = $this->error_code;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->error_code !== $v) {
+			$this->error_code = $v;
+			$this->modifiedColumns[] = DropFolderPeer::ERROR_CODE;
+		}
+
+		return $this;
+	} // setErrorCode()
+
+	/**
+	 * Set the value of [error_description] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     DropFolder The current object (for fluent API support)
+	 */
+	public function setErrorDescription($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderPeer::ERROR_DESCRIPTION]))
+			$this->oldColumnsValues[DropFolderPeer::ERROR_DESCRIPTION] = $this->error_description;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->error_description !== $v) {
+			$this->error_description = $v;
+			$this->modifiedColumns[] = DropFolderPeer::ERROR_DESCRIPTION;
+		}
+
+		return $this;
+	} // setErrorDescription()
+
+	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
@@ -882,9 +960,11 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			$this->file_name_patterns = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->file_handler_config = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->tags = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->created_at = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->updated_at = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-			$this->custom_data = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->error_code = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->error_description = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->created_at = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->updated_at = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->custom_data = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -894,7 +974,7 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 17; // 17 = DropFolderPeer::NUM_COLUMNS - DropFolderPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 19; // 19 = DropFolderPeer::NUM_COLUMNS - DropFolderPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DropFolder object", $e);
@@ -1388,12 +1468,18 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 				return $this->getTags();
 				break;
 			case 14:
-				return $this->getCreatedAt();
+				return $this->getErrorCode();
 				break;
 			case 15:
-				return $this->getUpdatedAt();
+				return $this->getErrorDescription();
 				break;
 			case 16:
+				return $this->getCreatedAt();
+				break;
+			case 17:
+				return $this->getUpdatedAt();
+				break;
+			case 18:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1431,9 +1517,11 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			$keys[11] => $this->getFileNamePatterns(),
 			$keys[12] => $this->getFileHandlerConfig(),
 			$keys[13] => $this->getTags(),
-			$keys[14] => $this->getCreatedAt(),
-			$keys[15] => $this->getUpdatedAt(),
-			$keys[16] => $this->getCustomData(),
+			$keys[14] => $this->getErrorCode(),
+			$keys[15] => $this->getErrorDescription(),
+			$keys[16] => $this->getCreatedAt(),
+			$keys[17] => $this->getUpdatedAt(),
+			$keys[18] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1508,12 +1596,18 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 				$this->setTags($value);
 				break;
 			case 14:
-				$this->setCreatedAt($value);
+				$this->setErrorCode($value);
 				break;
 			case 15:
-				$this->setUpdatedAt($value);
+				$this->setErrorDescription($value);
 				break;
 			case 16:
+				$this->setCreatedAt($value);
+				break;
+			case 17:
+				$this->setUpdatedAt($value);
+				break;
+			case 18:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1554,9 +1648,11 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[11], $arr)) $this->setFileNamePatterns($arr[$keys[11]]);
 		if (array_key_exists($keys[12], $arr)) $this->setFileHandlerConfig($arr[$keys[12]]);
 		if (array_key_exists($keys[13], $arr)) $this->setTags($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setCreatedAt($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setUpdatedAt($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setCustomData($arr[$keys[16]]);
+		if (array_key_exists($keys[14], $arr)) $this->setErrorCode($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setErrorDescription($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setCreatedAt($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setUpdatedAt($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setCustomData($arr[$keys[18]]);
 	}
 
 	/**
@@ -1582,6 +1678,8 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DropFolderPeer::FILE_NAME_PATTERNS)) $criteria->add(DropFolderPeer::FILE_NAME_PATTERNS, $this->file_name_patterns);
 		if ($this->isColumnModified(DropFolderPeer::FILE_HANDLER_CONFIG)) $criteria->add(DropFolderPeer::FILE_HANDLER_CONFIG, $this->file_handler_config);
 		if ($this->isColumnModified(DropFolderPeer::TAGS)) $criteria->add(DropFolderPeer::TAGS, $this->tags);
+		if ($this->isColumnModified(DropFolderPeer::ERROR_CODE)) $criteria->add(DropFolderPeer::ERROR_CODE, $this->error_code);
+		if ($this->isColumnModified(DropFolderPeer::ERROR_DESCRIPTION)) $criteria->add(DropFolderPeer::ERROR_DESCRIPTION, $this->error_description);
 		if ($this->isColumnModified(DropFolderPeer::CREATED_AT)) $criteria->add(DropFolderPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(DropFolderPeer::UPDATED_AT)) $criteria->add(DropFolderPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(DropFolderPeer::CUSTOM_DATA)) $criteria->add(DropFolderPeer::CUSTOM_DATA, $this->custom_data);
@@ -1676,6 +1774,10 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		$copyObj->setFileHandlerConfig($this->file_handler_config);
 
 		$copyObj->setTags($this->tags);
+
+		$copyObj->setErrorCode($this->error_code);
+
+		$copyObj->setErrorDescription($this->error_description);
 
 		$copyObj->setCreatedAt($this->created_at);
 

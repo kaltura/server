@@ -48,9 +48,33 @@ class DropFolderFilePeer extends BaseDropFolderFilePeer
 		return $dropFolderFiles;		
 	}
 	
+	public static function retrieveByDropFolderIdStatusesAndSlug($dropFolderId, $statuses, $parsedSlug)
+	{
+		$c = new Criteria();
+		$c->addAnd(DropFolderFilePeer::DROP_FOLDER_ID, $dropFolderId, Criteria::EQUAL);
+		$c->addAnd(DropFolderFilePeer::STATUS, $statuses, Criteria::IN);
+		$c->addAnd(DropFolderFilePeer::PARSED_SLUG, $parsedSlug, Criteria::EQUAL);
+		$dropFolderFiles = DropFolderFilePeer::doSelect($c);
+		return $dropFolderFiles;		
+	}
+	
+	public static function retrieveByLeadIdAndStatuses($leadId, $statuses)
+	{
+		$c = new Criteria();
+		$c->addAnd(DropFolderFilePeer::LEAD_DROP_FOLDER_FILE_ID, $leadId, Criteria::EQUAL);
+		$c->addAnd(DropFolderFilePeer::STATUS, $statuses, Criteria::IN);
+		$dropFolderFiles = DropFolderFilePeer::doSelect($c);
+		return $dropFolderFiles;		
+	}
+	
 	
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("dropFolderFile:id=%s", self::ID), array("dropFolderFile:fileName=%s", self::FILE_NAME), array("dropFolderFile:dropFolderId=%s", self::DROP_FOLDER_ID));		
+	}
+	
+	public static function getAtomicColumns()
+	{
+		return array(DropFolderFilePeer::STATUS);
 	}
 } // DropFolderFilePeer

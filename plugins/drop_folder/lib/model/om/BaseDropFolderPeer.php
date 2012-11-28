@@ -26,7 +26,7 @@ abstract class BaseDropFolderPeer {
 	const TM_CLASS = 'DropFolderTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 17;
+	const NUM_COLUMNS = 19;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -73,6 +73,12 @@ abstract class BaseDropFolderPeer {
 	/** the column name for the TAGS field */
 	const TAGS = 'drop_folder.TAGS';
 
+	/** the column name for the ERROR_CODE field */
+	const ERROR_CODE = 'drop_folder.ERROR_CODE';
+
+	/** the column name for the ERROR_DESCRIPTION field */
+	const ERROR_DESCRIPTION = 'drop_folder.ERROR_DESCRIPTION';
+
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'drop_folder.CREATED_AT';
 
@@ -98,11 +104,11 @@ abstract class BaseDropFolderPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'Name', 'Description', 'Type', 'Status', 'Dc', 'Path', 'ConversionProfileId', 'FileDeletePolicy', 'FileHandlerType', 'FileNamePatterns', 'FileHandlerConfig', 'Tags', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'name', 'description', 'type', 'status', 'dc', 'path', 'conversionProfileId', 'fileDeletePolicy', 'fileHandlerType', 'fileNamePatterns', 'fileHandlerConfig', 'tags', 'createdAt', 'updatedAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::NAME, self::DESCRIPTION, self::TYPE, self::STATUS, self::DC, self::PATH, self::CONVERSION_PROFILE_ID, self::FILE_DELETE_POLICY, self::FILE_HANDLER_TYPE, self::FILE_NAME_PATTERNS, self::FILE_HANDLER_CONFIG, self::TAGS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'name', 'description', 'type', 'status', 'dc', 'path', 'conversion_profile_id', 'file_delete_policy', 'file_handler_type', 'file_name_patterns', 'file_handler_config', 'tags', 'created_at', 'updated_at', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'Name', 'Description', 'Type', 'Status', 'Dc', 'Path', 'ConversionProfileId', 'FileDeletePolicy', 'FileHandlerType', 'FileNamePatterns', 'FileHandlerConfig', 'Tags', 'ErrorCode', 'ErrorDescription', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'name', 'description', 'type', 'status', 'dc', 'path', 'conversionProfileId', 'fileDeletePolicy', 'fileHandlerType', 'fileNamePatterns', 'fileHandlerConfig', 'tags', 'errorCode', 'errorDescription', 'createdAt', 'updatedAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::NAME, self::DESCRIPTION, self::TYPE, self::STATUS, self::DC, self::PATH, self::CONVERSION_PROFILE_ID, self::FILE_DELETE_POLICY, self::FILE_HANDLER_TYPE, self::FILE_NAME_PATTERNS, self::FILE_HANDLER_CONFIG, self::TAGS, self::ERROR_CODE, self::ERROR_DESCRIPTION, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'name', 'description', 'type', 'status', 'dc', 'path', 'conversion_profile_id', 'file_delete_policy', 'file_handler_type', 'file_name_patterns', 'file_handler_config', 'tags', 'error_code', 'error_description', 'created_at', 'updated_at', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, )
 	);
 
 	/**
@@ -112,11 +118,11 @@ abstract class BaseDropFolderPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'Name' => 2, 'Description' => 3, 'Type' => 4, 'Status' => 5, 'Dc' => 6, 'Path' => 7, 'ConversionProfileId' => 8, 'FileDeletePolicy' => 9, 'FileHandlerType' => 10, 'FileNamePatterns' => 11, 'FileHandlerConfig' => 12, 'Tags' => 13, 'CreatedAt' => 14, 'UpdatedAt' => 15, 'CustomData' => 16, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'name' => 2, 'description' => 3, 'type' => 4, 'status' => 5, 'dc' => 6, 'path' => 7, 'conversionProfileId' => 8, 'fileDeletePolicy' => 9, 'fileHandlerType' => 10, 'fileNamePatterns' => 11, 'fileHandlerConfig' => 12, 'tags' => 13, 'createdAt' => 14, 'updatedAt' => 15, 'customData' => 16, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::NAME => 2, self::DESCRIPTION => 3, self::TYPE => 4, self::STATUS => 5, self::DC => 6, self::PATH => 7, self::CONVERSION_PROFILE_ID => 8, self::FILE_DELETE_POLICY => 9, self::FILE_HANDLER_TYPE => 10, self::FILE_NAME_PATTERNS => 11, self::FILE_HANDLER_CONFIG => 12, self::TAGS => 13, self::CREATED_AT => 14, self::UPDATED_AT => 15, self::CUSTOM_DATA => 16, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'name' => 2, 'description' => 3, 'type' => 4, 'status' => 5, 'dc' => 6, 'path' => 7, 'conversion_profile_id' => 8, 'file_delete_policy' => 9, 'file_handler_type' => 10, 'file_name_patterns' => 11, 'file_handler_config' => 12, 'tags' => 13, 'created_at' => 14, 'updated_at' => 15, 'custom_data' => 16, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'Name' => 2, 'Description' => 3, 'Type' => 4, 'Status' => 5, 'Dc' => 6, 'Path' => 7, 'ConversionProfileId' => 8, 'FileDeletePolicy' => 9, 'FileHandlerType' => 10, 'FileNamePatterns' => 11, 'FileHandlerConfig' => 12, 'Tags' => 13, 'ErrorCode' => 14, 'ErrorDescription' => 15, 'CreatedAt' => 16, 'UpdatedAt' => 17, 'CustomData' => 18, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'name' => 2, 'description' => 3, 'type' => 4, 'status' => 5, 'dc' => 6, 'path' => 7, 'conversionProfileId' => 8, 'fileDeletePolicy' => 9, 'fileHandlerType' => 10, 'fileNamePatterns' => 11, 'fileHandlerConfig' => 12, 'tags' => 13, 'errorCode' => 14, 'errorDescription' => 15, 'createdAt' => 16, 'updatedAt' => 17, 'customData' => 18, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::NAME => 2, self::DESCRIPTION => 3, self::TYPE => 4, self::STATUS => 5, self::DC => 6, self::PATH => 7, self::CONVERSION_PROFILE_ID => 8, self::FILE_DELETE_POLICY => 9, self::FILE_HANDLER_TYPE => 10, self::FILE_NAME_PATTERNS => 11, self::FILE_HANDLER_CONFIG => 12, self::TAGS => 13, self::ERROR_CODE => 14, self::ERROR_DESCRIPTION => 15, self::CREATED_AT => 16, self::UPDATED_AT => 17, self::CUSTOM_DATA => 18, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'name' => 2, 'description' => 3, 'type' => 4, 'status' => 5, 'dc' => 6, 'path' => 7, 'conversion_profile_id' => 8, 'file_delete_policy' => 9, 'file_handler_type' => 10, 'file_name_patterns' => 11, 'file_handler_config' => 12, 'tags' => 13, 'error_code' => 14, 'error_description' => 15, 'created_at' => 16, 'updated_at' => 17, 'custom_data' => 18, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, )
 	);
 
 	/**
@@ -200,6 +206,8 @@ abstract class BaseDropFolderPeer {
 		$criteria->addSelectColumn(DropFolderPeer::FILE_NAME_PATTERNS);
 		$criteria->addSelectColumn(DropFolderPeer::FILE_HANDLER_CONFIG);
 		$criteria->addSelectColumn(DropFolderPeer::TAGS);
+		$criteria->addSelectColumn(DropFolderPeer::ERROR_CODE);
+		$criteria->addSelectColumn(DropFolderPeer::ERROR_DESCRIPTION);
 		$criteria->addSelectColumn(DropFolderPeer::CREATED_AT);
 		$criteria->addSelectColumn(DropFolderPeer::UPDATED_AT);
 		$criteria->addSelectColumn(DropFolderPeer::CUSTOM_DATA);

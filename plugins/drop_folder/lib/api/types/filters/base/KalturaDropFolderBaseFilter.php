@@ -30,6 +30,8 @@ abstract class KalturaDropFolderBaseFilter extends KalturaFilter
 		"tagsLike" => "_like_tags",
 		"tagsMultiLikeOr" => "_mlikeor_tags",
 		"tagsMultiLikeAnd" => "_mlikeand_tags",
+		"errorCodeEqual" => "_eq_error_code",
+		"errorCodeIn" => "_in_error_code",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -169,6 +171,17 @@ abstract class KalturaDropFolderBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $tagsMultiLikeAnd;
+
+	/**
+	 * @var KalturaDropFolderErrorCode
+	 */
+	public $errorCodeEqual;
+
+	/**
+	 * @dynamicType KalturaDropFolderErrorCode
+	 * @var string
+	 */
+	public $errorCodeIn;
 
 	/**
 	 * @var int

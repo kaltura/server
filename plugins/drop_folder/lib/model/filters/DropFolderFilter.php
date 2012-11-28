@@ -34,6 +34,8 @@ class DropFolderFilter extends baseObjectFilter
 			"_lte_created_at",
 			"_gte_updated_at",
 			"_lte_updated_at",
+			"_eq_error_code",
+			"_in_error_code",
 			) , null );
 
 		$this->allowed_order_fields = array ("created_at", "updated_at", "id", "name");

@@ -1,20 +1,28 @@
 <?php
 class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObjectChangedEventConsumer
 {
+	const UPLOADED_BY = 'Drop Folder';
+	
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::objectChanged()
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns) 
 	{
-		$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
-		if($object->getStatus() == DropFolderFileStatus::PENDING)
+		if($object instanceof DropFolderFile)
 		{
-			$this->onContentDropFolderFileStatusChangedToPending($folder, $object);
-		}
-		else
-		{
-			$this->onDropFolderFileStatusChangedToHandled($folder, $object);
-		}
+			$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
+			if($object->getStatus() == DropFolderFileStatus::PENDING)
+			{
+				if($folder->getFileHandlerType() == DropFolderFileHandlerType::CONTENT)
+					$this->onContentDropFolderFileStatusChangedToPending($folder, $object);
+				else
+					$this->onXmlDropFolderFileStatusChangedToPending($folder, $object);
+			}
+			else
+			{
+				$this->onDropFolderFileStatusChangedToHandled($folder, $object);
+			}
+		}		
 	}
 
 	/* (non-PHPdoc)
@@ -22,21 +30,12 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns) 
 	{
-		if(	$object instanceof DropFolderFile && in_array(DropFolderFilePeer::STATUS, $modifiedColumns)) 
-		{
-			if($object->getStatus() == DropFolderFileStatus::PENDING)
-			{
-				$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
-				if($folder->getFileHandlerType() == DropFolderFileHandlerType::CONTENT)
-					return true;
-			}
-			else if ($object->getStatus() == DropFolderFileStatus::HANDLED) 
-			{
-				return true;
-			}
-		}
-		
-		return false;
+		if(	$object instanceof DropFolderFile && 
+			($object->getStatus() == DropFolderFileStatus::PENDING || $object->getStatus() == DropFolderFileStatus::HANDLED) && 
+			in_array(DropFolderFilePeer::STATUS, $modifiedColumns))
+			return true;
+		else
+			return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -44,7 +43,9 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
-		if($this->isImportMatch($dbBatchJob))
+	    if($this->isBulkUploadMatch($dbBatchJob))
+	    	return true;
+	    else if($this->isImportMatch($dbBatchJob))
 	    	return true;
 	    else if($this->isContentProcessorMatch($dbBatchJob))
 	    	return true;
@@ -59,7 +60,11 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	{
 		$contentProcessorBatchJobType = DropFolderPlugin::getCoreValue('BatchJobType', DropFolderBatchType::DROP_FOLDER_CONTENT_PROCESSOR);
 		
-		if ($dbBatchJob->getJobType() == BatchJobType::IMPORT)
+		if($dbBatchJob->getJobType() == BatchJobType::BULKUPLOAD)
+		{
+			$this->onBulkUploadJobStatusUpdated($dbBatchJob);
+		}
+		else if ($dbBatchJob->getJobType() == BatchJobType::IMPORT)
 		{
 			$this->onImportJobStatusUpdated($dbBatchJob, $dbBatchJob->getData());
 		}
@@ -69,7 +74,20 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		}
 		return true;
 	}
+	
+	private function isBulkUploadMatch(BatchJob $dbBatchJob)
+	{
+		$coreBulkUploadType = kPluginableEnumsManager::apiToCore('BulkUploadType', DropFolderXmlBulkUploadType::DROP_FOLDER_XML);
 		
+		$isMatch =  $dbBatchJob->getJobType() == BatchJobType::BULKUPLOAD && 
+					$dbBatchJob->getJobSubType() == $coreBulkUploadType &&
+					($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED ||
+					$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY ||
+					$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED ||
+					$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FATAL);
+		return $isMatch;
+	}
+	
 	private function isImportMatch(BatchJob $dbBatchJob)
 	{	
 		$isMatch =  $dbBatchJob->getJobType() == BatchJobType::IMPORT && 
@@ -105,7 +123,27 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 				break;				
 		}
 	}
-		
+	
+	private function onBulkUploadJobStatusUpdated(BatchJob $dbBatchJob)
+	{
+		$xmlDropFolderFile = DropFolderFilePeer::retrieveByPK($dbBatchJob->getObjectId());
+		switch($dbBatchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+				$xmlDropFolderFile->setStatus(DropFolderFileStatus::HANDLED);
+				$xmlDropFolderFile->save();
+				break;
+			case BatchJob::BATCHJOB_STATUS_FAILED:
+			case BatchJob::BATCHJOB_STATUS_FATAL:
+				$relatedFiles = DropFolderFilePeer::retrieveByLeadIdAndStatuses($xmlDropFolderFile->getId(), DropFolderFileStatus::PROCESSING);
+				foreach ($relatedFiles as $relatedFile) 
+				{
+					$this->setFileError($relatedFile, DropFolderFileStatus::ERROR_HANDLING, DropFolderFileErrorCode::ERROR_IN_BULK_UPLOAD, 'Error while executing BulkUpload job');
+				}			
+				break;				
+		}		
+	}
+	
 	private function onContentProcessorJobStatusUpdated(BatchJob $dbBatchJob, kDropFolderContentProcessorJobData $data)
 	{
 		$idsArray = explode(',', $data->getDropFolderFileIds());
@@ -276,7 +314,75 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		$file->save();				
 		
 	}
+	
+	private function onXmlDropFolderFileStatusChangedToPending(DropFolder $folder, DropFolderFile $file)
+	{
+		KalturaLog::debug('in onXmlDropFolderFileStatusChangedToPending file id ['.$file->getId().'] folder id ['.$folder->getId().']');
 		
+		$statuses = array(DropFolderFileStatus::PARSED, DropFolderFileStatus::UPLOADING);
+		$nonReadyFiles = DropFolderFilePeer::retrieveByLeadIdAndStatuses($file->getLeadDropFolderFileId(), $statuses);
+		
+		if($nonReadyFiles && count($nonReadyFiles) > 0)
+		{
+			KalturaLog::debug('Not all the files finished uploading - changing status to WAITING');
+			$file->setStatus(DropFolderFileStatus::WAITING);
+			$file->save();						
+		}
+		else
+		{
+			KalturaLog::debug('All files finished uploading');
+			$xmlFile = null;
+			if($file->getId() == $file->getLeadDropFolderFileId())
+				$xmlFile = $file;
+			else
+				$xmlFile = DropFolderFilePeer::retrieveByPK($file->getLeadDropFolderFileId());
+
+			$statuses = array(DropFolderFileStatus::PENDING, DropFolderFileStatus::WAITING);
+			$relatedFiles = DropFolderFilePeer::retrieveByLeadIdAndStatuses($file->getLeadDropFolderFileId(), $statuses);
+			if($this->setFileProcessing($xmlFile, $relatedFiles))
+			{
+				try 
+				{
+					$job = $this->addDropFolderXmlBulkUploadJob($folder, $xmlFile);
+					$xmlFile->setBatchJobId($job->getId());
+					$xmlFile->save();
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::err("Error adding BulkUpload job -".$e->getMessage());
+					foreach ($relatedFiles as $relatedFile) 
+					{
+						$this->setFileError($relatedFile, DropFolderFileStatus::ERROR_HANDLING, DropFolderFileErrorCode::ERROR_ADDING_BULK_UPLOAD, 
+										'Failed to add BulkUpload job for drop folder file XML ['. $xmlFile->getId().']');
+					}
+				}
+			}
+		}
+	}
+
+	private function addDropFolderXmlBulkUploadJob(DropFolder $folder, DropFolderFile $leadDropFolderFile)
+	{	
+		KalturaLog::debug('Adding BulkUpload job');
+		
+		$coreBulkUploadType = kPluginableEnumsManager::apiToCore('BulkUploadType', DropFolderXmlBulkUploadType::DROP_FOLDER_XML);
+		
+		$objectId = $leadDropFolderFile->getId();
+		$objectType = kPluginableEnumsManager::apiToCore('BatchJobObjectType',DropFolderBatchJobObjectType::DROP_FOLDER_FILE);
+		
+		$partner = PartnerPeer::retrieveByPK($folder->getPartnerId());
+		
+		$data = KalturaPluginManager::loadObject('kBulkUploadJobData', DropFolderXmlBulkUploadType::DROP_FOLDER_XML);
+		$data->setUserId($partner->getkuser()->getPuserId());
+		$data->setUploadedBy(self::UPLOADED_BY);
+		$data->setFileName($leadDropFolderFile->getFileName());
+					
+		$objectData = new kBulkUploadEntryData();
+		$objectData->setConversionProfileId($folder->getConversionProfileId());
+		$data->setObjectData($objectData);
+				
+		return kJobsManager::addBulkUploadJob($partner, $data, $coreBulkUploadType, $objectId, $objectType);		
+	}
+	
 	private function onDropFolderFileStatusChangedToHandled(DropFolder $folder, DropFolderFile $file)
 	{
 		if($folder->getType() == DropFolderType::LOCAL)

@@ -1424,37 +1424,46 @@ class kJobsManager
 	 * @throws APIException
 	 * @return BatchJob
 	 */
-	public static function addBulkUploadJob(Partner $partner, kBulkUploadJobData $jobData, $bulkUploadType = null)
+	public static function addBulkUploadJob(Partner $partner, kBulkUploadJobData $jobData, $bulkUploadType = null, $objectId = null, $objectType = null)
 	{
+		KalturaLog::debug("adding BulkUpload job");
 		$job = new BatchJob();
 		$job->setPartnerId($partner->getId());
 		$job->setJobType(BatchJobType::BULKUPLOAD);
 		$job->setJobSubType($bulkUploadType);
-		$job->save();
-
-		$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
-//		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
-		try{
-			kFileSyncUtils::moveFromFile($jobData->getFilePath(), $syncKey, true);
-		}
-		catch(Exception $e)
+		if(!is_null($objectId) && !is_null($objectType))
 		{
-			throw new APIException(APIErrors::BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR);
+			$job->setObjectId($objectId);
+			$job->setObjectType($objectType);
 		}
-		
-		$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+		$job->save();
 		
 		if(is_null($jobData))
 		{
 			throw new APIException(APIErrors::BULK_UPLOAD_BULK_UPLOAD_TYPE_NOT_VALID, $bulkUploadType);
 		}
+		
+		if(!is_null($jobData->getFilePath()))
+		{
+			$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
+	//		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
+			try{
+				kFileSyncUtils::moveFromFile($jobData->getFilePath(), $syncKey, true);
+			}
+			catch(Exception $e)
+			{
+				throw new APIException(APIErrors::BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR);
+			}
+			
+			$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+			$jobData->setFilePath($filePath);
+		}
+		
 		if (!$jobData->getBulkUploadObjectType())
 		{
 		    $jobData->setBulkUploadObjectType(BulkUploadObjectType::ENTRY);
 		}
-		
-		$jobData->setFilePath($filePath);
-		
+			
 		if ($jobData->getBulkUploadObjectType() == BulkUploadObjectType::ENTRY && !$jobData->getObjectData()->getConversionProfileId())
 		{
 			$jobData->setConversionProfileId($partner->getDefaultConversionProfileId());

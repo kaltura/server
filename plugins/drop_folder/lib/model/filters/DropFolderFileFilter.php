@@ -31,6 +31,8 @@ class DropFolderFileFilter extends baseObjectFilter
 			"_lte_created_at",
 			"_gte_updated_at",
 			"_lte_updated_at",
+			"_eq_lead_drop_folder_file_id",
+			"_eq_deleted_drop_folder_file_id",
 			) , null );
 
 		$this->allowed_order_fields = array (

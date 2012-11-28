@@ -9,6 +9,8 @@ class DropFolderXmlBulkUploadErrorCode implements IKalturaPluginEnum, DropFolder
 	const LOCAL_FILE_WRONG_CHECKSUM = 'LOCAL_FILE_WRONG_CHECKSUM';
 	const ERROR_WRITING_TEMP_FILE = 'ERROR_WRITING_TEMP_FILE';
 	const ERROR_ADDING_BULK_UPLOAD = 'ERROR_ADDING_BULK_UPLOAD';
+	const ERROR_IN_BULK_UPLOAD = 'ERROR_IN_BULK_UPLOAD';
+	
 	
 	/**
 	 * Returns the dynamic enum additional values
@@ -20,6 +22,7 @@ class DropFolderXmlBulkUploadErrorCode implements IKalturaPluginEnum, DropFolder
 			'LOCAL_FILE_WRONG_CHECKSUM' => self::LOCAL_FILE_WRONG_CHECKSUM,
 			'ERROR_WRITING_TEMP_FILE' => self::ERROR_WRITING_TEMP_FILE,
 			'ERROR_ADDING_BULK_UPLOAD' => self::ERROR_ADDING_BULK_UPLOAD,
+			'ERROR_IN_BULK_UPLOAD' => self::ERROR_IN_BULK_UPLOAD,
 		);
 	}
 	

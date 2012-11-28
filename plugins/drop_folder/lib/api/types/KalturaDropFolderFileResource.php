@@ -58,6 +58,8 @@ class KalturaDropFolderFileResource extends KalturaDataCenterContentResource
         	if(!file_exists($filePath))
         	{
         		$dropFolderFile->setStatus(DropFolderFileStatus::ERROR_HANDLING);
+        		$dropFolderFile->setErrorCode(DropFolderFileErrorCode::ERROR_READING_FILE);
+        		$dropFolderFile->setErrorDescription('Cannot read file or file details at path ['.$filePath.']');
         		$dropFolderFile->save();
         		
         		throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST, $filePath);
@@ -117,7 +119,8 @@ class KalturaDropFolderFileResource extends KalturaDataCenterContentResource
 		if ($dropFolderFile->getStatus() != DropFolderFileStatus::DOWNLOADING)
 		{
     		$dropFolderFile->setStatus(DropFolderFileStatus::HANDLED);
-    		$dropFolderFile->save();
 		}
+		$dropFolderFile->setEntryId($dbEntry->getId());
+		$dropFolderFile->save();		
 	}
 }

@@ -1,13 +1,14 @@
 <?php
+
 require_once("bootstrap.php");
 
 /**
- * Executes the KAsyncDropFolderHandler
+ * Executes the KAsyncDropFolderContentProcessor
  * 
  * @package plugins.dropFolder
  * @subpackage Scheduler
  */
 
-$instance = new KAsyncDropFolderHandler();
+$instance = new KAsyncDropFolderContentProcessor();
 $instance->run(); 
 $instance->done();

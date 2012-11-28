@@ -69,12 +69,14 @@ class DropFolderService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::PLUGIN_NOT_AVAILABLE_FOR_PARTNER, DropFolderPlugin::getPluginName(), $dropFolder->partnerId);
 		}
-				
-		$existingDropFolder = DropFolderPeer::retrieveByPathDefaultFilter($dropFolder->path);
-		if ($existingDropFolder) {
-			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_ALREADY_EXISTS, $dropFolder->path);
+
+		if($dropFolder->type == KalturaDropFolderType::LOCAL)
+		{
+			$existingDropFolder = DropFolderPeer::retrieveByPathDefaultFilter($dropFolder->path);
+			if ($existingDropFolder) {
+				throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_ALREADY_EXISTS, $dropFolder->path);
+			}
 		}
-		
 		
 		if (!is_null($dropFolder->conversionProfileId)) {
 			$conversionProfileDb = conversionProfile2Peer::retrieveByPK($dropFolder->conversionProfileId);

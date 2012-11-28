@@ -86,6 +86,24 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	protected $parsed_flavor;
 
 	/**
+	 * The value for the lead_drop_folder_file_id field.
+	 * @var        int
+	 */
+	protected $lead_drop_folder_file_id;
+
+	/**
+	 * The value for the deleted_drop_folder_file_id field.
+	 * @var        int
+	 */
+	protected $deleted_drop_folder_file_id;
+
+	/**
+	 * The value for the entry_id field.
+	 * @var        string
+	 */
+	protected $entry_id;
+
+	/**
 	 * The value for the created_at field.
 	 * @var        string
 	 */
@@ -96,6 +114,24 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	 * @var        string
 	 */
 	protected $updated_at;
+
+	/**
+	 * The value for the upload_end_detected_at field.
+	 * @var        string
+	 */
+	protected $upload_end_detected_at;
+
+	/**
+	 * The value for the import_started_at field.
+	 * @var        string
+	 */
+	protected $import_started_at;
+
+	/**
+	 * The value for the import_ended_at field.
+	 * @var        string
+	 */
+	protected $import_ended_at;
 
 	/**
 	 * The value for the custom_data field.
@@ -289,6 +325,36 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Get the [lead_drop_folder_file_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getLeadDropFolderFileId()
+	{
+		return $this->lead_drop_folder_file_id;
+	}
+
+	/**
+	 * Get the [deleted_drop_folder_file_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getDeletedDropFolderFileId()
+	{
+		return $this->deleted_drop_folder_file_id;
+	}
+
+	/**
+	 * Get the [entry_id] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getEntryId()
+	{
+		return $this->entry_id;
+	}
+
+	/**
 	 * Get the [optionally formatted] temporal [created_at] column value.
 	 * 
 	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
@@ -355,6 +421,126 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 				$dt = new DateTime($this->updated_at);
 			} catch (Exception $x) {
 				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
+	}
+
+	/**
+	 * Get the [optionally formatted] temporal [upload_end_detected_at] column value.
+	 * 
+	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
+	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
+	 *
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw unix timestamp integer will be returned.
+	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 */
+	public function getUploadEndDetectedAt($format = 'Y-m-d H:i:s')
+	{
+		if ($this->upload_end_detected_at === null) {
+			return null;
+		}
+
+
+		if ($this->upload_end_detected_at === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->upload_end_detected_at);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->upload_end_detected_at, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
+	}
+
+	/**
+	 * Get the [optionally formatted] temporal [import_started_at] column value.
+	 * 
+	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
+	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
+	 *
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw unix timestamp integer will be returned.
+	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 */
+	public function getImportStartedAt($format = 'Y-m-d H:i:s')
+	{
+		if ($this->import_started_at === null) {
+			return null;
+		}
+
+
+		if ($this->import_started_at === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->import_started_at);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->import_started_at, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
+	}
+
+	/**
+	 * Get the [optionally formatted] temporal [import_ended_at] column value.
+	 * 
+	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
+	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
+	 *
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw unix timestamp integer will be returned.
+	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 */
+	public function getImportEndedAt($format = 'Y-m-d H:i:s')
+	{
+		if ($this->import_ended_at === null) {
+			return null;
+		}
+
+
+		if ($this->import_ended_at === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->import_ended_at);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->import_ended_at, true), $x);
 			}
 		}
 
@@ -661,6 +847,75 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	} // setParsedFlavor()
 
 	/**
+	 * Set the value of [lead_drop_folder_file_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     DropFolderFile The current object (for fluent API support)
+	 */
+	public function setLeadDropFolderFileId($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderFilePeer::LEAD_DROP_FOLDER_FILE_ID]))
+			$this->oldColumnsValues[DropFolderFilePeer::LEAD_DROP_FOLDER_FILE_ID] = $this->lead_drop_folder_file_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->lead_drop_folder_file_id !== $v) {
+			$this->lead_drop_folder_file_id = $v;
+			$this->modifiedColumns[] = DropFolderFilePeer::LEAD_DROP_FOLDER_FILE_ID;
+		}
+
+		return $this;
+	} // setLeadDropFolderFileId()
+
+	/**
+	 * Set the value of [deleted_drop_folder_file_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     DropFolderFile The current object (for fluent API support)
+	 */
+	public function setDeletedDropFolderFileId($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderFilePeer::DELETED_DROP_FOLDER_FILE_ID]))
+			$this->oldColumnsValues[DropFolderFilePeer::DELETED_DROP_FOLDER_FILE_ID] = $this->deleted_drop_folder_file_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->deleted_drop_folder_file_id !== $v) {
+			$this->deleted_drop_folder_file_id = $v;
+			$this->modifiedColumns[] = DropFolderFilePeer::DELETED_DROP_FOLDER_FILE_ID;
+		}
+
+		return $this;
+	} // setDeletedDropFolderFileId()
+
+	/**
+	 * Set the value of [entry_id] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     DropFolderFile The current object (for fluent API support)
+	 */
+	public function setEntryId($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderFilePeer::ENTRY_ID]))
+			$this->oldColumnsValues[DropFolderFilePeer::ENTRY_ID] = $this->entry_id;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->entry_id !== $v) {
+			$this->entry_id = $v;
+			$this->modifiedColumns[] = DropFolderFilePeer::ENTRY_ID;
+		}
+
+		return $this;
+	} // setEntryId()
+
+	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
@@ -759,6 +1014,162 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	} // setUpdatedAt()
 
 	/**
+	 * Sets the value of [upload_end_detected_at] column to a normalized version of the date/time value specified.
+	 * 
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     DropFolderFile The current object (for fluent API support)
+	 */
+	public function setUploadEndDetectedAt($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderFilePeer::UPLOAD_END_DETECTED_AT]))
+			$this->oldColumnsValues[DropFolderFilePeer::UPLOAD_END_DETECTED_AT] = $this->upload_end_detected_at;
+
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		if ( $this->upload_end_detected_at !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->upload_end_detected_at !== null && $tmpDt = new DateTime($this->upload_end_detected_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->upload_end_detected_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = DropFolderFilePeer::UPLOAD_END_DETECTED_AT;
+			}
+		} // if either are not null
+
+		return $this;
+	} // setUploadEndDetectedAt()
+
+	/**
+	 * Sets the value of [import_started_at] column to a normalized version of the date/time value specified.
+	 * 
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     DropFolderFile The current object (for fluent API support)
+	 */
+	public function setImportStartedAt($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderFilePeer::IMPORT_STARTED_AT]))
+			$this->oldColumnsValues[DropFolderFilePeer::IMPORT_STARTED_AT] = $this->import_started_at;
+
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		if ( $this->import_started_at !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->import_started_at !== null && $tmpDt = new DateTime($this->import_started_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->import_started_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = DropFolderFilePeer::IMPORT_STARTED_AT;
+			}
+		} // if either are not null
+
+		return $this;
+	} // setImportStartedAt()
+
+	/**
+	 * Sets the value of [import_ended_at] column to a normalized version of the date/time value specified.
+	 * 
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     DropFolderFile The current object (for fluent API support)
+	 */
+	public function setImportEndedAt($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderFilePeer::IMPORT_ENDED_AT]))
+			$this->oldColumnsValues[DropFolderFilePeer::IMPORT_ENDED_AT] = $this->import_ended_at;
+
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		if ( $this->import_ended_at !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->import_ended_at !== null && $tmpDt = new DateTime($this->import_ended_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->import_ended_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = DropFolderFilePeer::IMPORT_ENDED_AT;
+			}
+		} // if either are not null
+
+		return $this;
+	} // setImportEndedAt()
+
+	/**
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
@@ -821,9 +1232,15 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			$this->error_description = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->parsed_slug = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->parsed_flavor = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->created_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->updated_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->custom_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->lead_drop_folder_file_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->deleted_drop_folder_file_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+			$this->entry_id = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->created_at = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->updated_at = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->upload_end_detected_at = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->import_started_at = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->import_ended_at = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
+			$this->custom_data = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -833,7 +1250,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 14; // 14 = DropFolderFilePeer::NUM_COLUMNS - DropFolderFilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 20; // 20 = DropFolderFilePeer::NUM_COLUMNS - DropFolderFilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DropFolderFile object", $e);
@@ -1318,12 +1735,30 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 				return $this->getParsedFlavor();
 				break;
 			case 11:
-				return $this->getCreatedAt();
+				return $this->getLeadDropFolderFileId();
 				break;
 			case 12:
-				return $this->getUpdatedAt();
+				return $this->getDeletedDropFolderFileId();
 				break;
 			case 13:
+				return $this->getEntryId();
+				break;
+			case 14:
+				return $this->getCreatedAt();
+				break;
+			case 15:
+				return $this->getUpdatedAt();
+				break;
+			case 16:
+				return $this->getUploadEndDetectedAt();
+				break;
+			case 17:
+				return $this->getImportStartedAt();
+				break;
+			case 18:
+				return $this->getImportEndedAt();
+				break;
+			case 19:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1358,9 +1793,15 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			$keys[8] => $this->getErrorDescription(),
 			$keys[9] => $this->getParsedSlug(),
 			$keys[10] => $this->getParsedFlavor(),
-			$keys[11] => $this->getCreatedAt(),
-			$keys[12] => $this->getUpdatedAt(),
-			$keys[13] => $this->getCustomData(),
+			$keys[11] => $this->getLeadDropFolderFileId(),
+			$keys[12] => $this->getDeletedDropFolderFileId(),
+			$keys[13] => $this->getEntryId(),
+			$keys[14] => $this->getCreatedAt(),
+			$keys[15] => $this->getUpdatedAt(),
+			$keys[16] => $this->getUploadEndDetectedAt(),
+			$keys[17] => $this->getImportStartedAt(),
+			$keys[18] => $this->getImportEndedAt(),
+			$keys[19] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1426,12 +1867,30 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 				$this->setParsedFlavor($value);
 				break;
 			case 11:
-				$this->setCreatedAt($value);
+				$this->setLeadDropFolderFileId($value);
 				break;
 			case 12:
-				$this->setUpdatedAt($value);
+				$this->setDeletedDropFolderFileId($value);
 				break;
 			case 13:
+				$this->setEntryId($value);
+				break;
+			case 14:
+				$this->setCreatedAt($value);
+				break;
+			case 15:
+				$this->setUpdatedAt($value);
+				break;
+			case 16:
+				$this->setUploadEndDetectedAt($value);
+				break;
+			case 17:
+				$this->setImportStartedAt($value);
+				break;
+			case 18:
+				$this->setImportEndedAt($value);
+				break;
+			case 19:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1469,9 +1928,15 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[8], $arr)) $this->setErrorDescription($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setParsedSlug($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setParsedFlavor($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setCustomData($arr[$keys[13]]);
+		if (array_key_exists($keys[11], $arr)) $this->setLeadDropFolderFileId($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setDeletedDropFolderFileId($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setEntryId($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setCreatedAt($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setUpdatedAt($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setUploadEndDetectedAt($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setImportStartedAt($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setImportEndedAt($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setCustomData($arr[$keys[19]]);
 	}
 
 	/**
@@ -1494,8 +1959,14 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DropFolderFilePeer::ERROR_DESCRIPTION)) $criteria->add(DropFolderFilePeer::ERROR_DESCRIPTION, $this->error_description);
 		if ($this->isColumnModified(DropFolderFilePeer::PARSED_SLUG)) $criteria->add(DropFolderFilePeer::PARSED_SLUG, $this->parsed_slug);
 		if ($this->isColumnModified(DropFolderFilePeer::PARSED_FLAVOR)) $criteria->add(DropFolderFilePeer::PARSED_FLAVOR, $this->parsed_flavor);
+		if ($this->isColumnModified(DropFolderFilePeer::LEAD_DROP_FOLDER_FILE_ID)) $criteria->add(DropFolderFilePeer::LEAD_DROP_FOLDER_FILE_ID, $this->lead_drop_folder_file_id);
+		if ($this->isColumnModified(DropFolderFilePeer::DELETED_DROP_FOLDER_FILE_ID)) $criteria->add(DropFolderFilePeer::DELETED_DROP_FOLDER_FILE_ID, $this->deleted_drop_folder_file_id);
+		if ($this->isColumnModified(DropFolderFilePeer::ENTRY_ID)) $criteria->add(DropFolderFilePeer::ENTRY_ID, $this->entry_id);
 		if ($this->isColumnModified(DropFolderFilePeer::CREATED_AT)) $criteria->add(DropFolderFilePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(DropFolderFilePeer::UPDATED_AT)) $criteria->add(DropFolderFilePeer::UPDATED_AT, $this->updated_at);
+		if ($this->isColumnModified(DropFolderFilePeer::UPLOAD_END_DETECTED_AT)) $criteria->add(DropFolderFilePeer::UPLOAD_END_DETECTED_AT, $this->upload_end_detected_at);
+		if ($this->isColumnModified(DropFolderFilePeer::IMPORT_STARTED_AT)) $criteria->add(DropFolderFilePeer::IMPORT_STARTED_AT, $this->import_started_at);
+		if ($this->isColumnModified(DropFolderFilePeer::IMPORT_ENDED_AT)) $criteria->add(DropFolderFilePeer::IMPORT_ENDED_AT, $this->import_ended_at);
 		if ($this->isColumnModified(DropFolderFilePeer::CUSTOM_DATA)) $criteria->add(DropFolderFilePeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
@@ -1583,9 +2054,21 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 
 		$copyObj->setParsedFlavor($this->parsed_flavor);
 
+		$copyObj->setLeadDropFolderFileId($this->lead_drop_folder_file_id);
+
+		$copyObj->setDeletedDropFolderFileId($this->deleted_drop_folder_file_id);
+
+		$copyObj->setEntryId($this->entry_id);
+
 		$copyObj->setCreatedAt($this->created_at);
 
 		$copyObj->setUpdatedAt($this->updated_at);
+
+		$copyObj->setUploadEndDetectedAt($this->upload_end_detected_at);
+
+		$copyObj->setImportStartedAt($this->import_started_at);
+
+		$copyObj->setImportEndedAt($this->import_ended_at);
 
 		$copyObj->setCustomData($this->custom_data);
 

@@ -53,7 +53,7 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			return null;
 		}
 		
-		if (!is_null($constructorArgs))
+		if (!is_null($constructorArgs) && $objectClass != 'KalturaDropFolderContentProcessorJobData')
 		{
 			$reflect = new ReflectionClass($objectClass);
 			return $reflect->newInstanceArgs($constructorArgs);
@@ -70,15 +70,7 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	 * @return string
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
-	{			
-		if ($baseClass == 'DropFolderFileHandler')
-		{
-			if ($enumValue == KalturaDropFolderFileHandlerType::CONTENT)
-			{
-				return 'DropFolderContentFileHandler';
-			}
-		}
-		
+	{	
 		if ($baseClass == 'DropFolder')
 		{
 		    if ($enumValue == DropFolderType::LOCAL)
@@ -127,6 +119,14 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
     			{
     				return 'Kaltura_Client_DropFolder_Type_SftpDropFolder';
     			}
+    			if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP_CMD)
+    			{
+    				return 'Kaltura_Client_DropFolder_Type_SftpDropFolder';
+    			}
+    			if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP_SEC_LIB)
+    			{
+    				return 'Kaltura_Client_DropFolder_Type_SftpDropFolder';
+    			}  			
     		}
     		
     		if ($baseClass == 'Form_DropFolderConfigureExtend_SubForm')
@@ -140,6 +140,14 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
     				return 'Form_ScpDropFolderConfigureExtend_SubForm';
     			}
     			if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP)
+    			{
+    				return 'Form_SftpDropFolderConfigureExtend_SubForm';
+    			}
+    			if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP_CMD)
+    			{
+    				return 'Form_SftpDropFolderConfigureExtend_SubForm';
+    			}
+    			if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP_SEC_LIB)
     			{
     				return 'Form_SftpDropFolderConfigureExtend_SubForm';
     			}
@@ -172,6 +180,14 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			{
 				return 'KalturaSftpDropFolder';
 			}
+			if ($enumValue == KalturaDropFolderType::SFTP_CMD)
+			{
+				return 'KalturaSftpDropFolder';
+			}
+			if ($enumValue == KalturaDropFolderType::SFTP_SEC_LIB)
+			{
+				return 'KalturaSftpDropFolder';
+			}
 		}
 		
 		if ($baseClass == 'KalturaImportJobData')
@@ -180,6 +196,24 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			{
 				return 'KalturaDropFolderImportJobData';
 			}
+		}
+		
+		if ($baseClass == 'KalturaJobData')
+		{
+			KalturaLog::debug("in KalturaJobData checking for enum");
+		    if ($enumValue == DropFolderPlugin::getApiValue(DropFolderBatchType::DROP_FOLDER_CONTENT_PROCESSOR))
+			{
+				return 'KalturaDropFolderContentProcessorJobData';
+			}
+		}
+			
+		if ($baseClass == 'KDropFolderFileHandler')
+		{
+			if ($enumValue == KalturaDropFolderFileHandlerType::CONTENT)
+			{
+				return 'KDropFolderContentFileHandler';
+			}
+			
 		}
 		
 		return null;
@@ -192,13 +226,17 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('DropFolderBatchType','DropFolderPermissionName');
+			return array('DropFolderBatchType','DropFolderPermissionName', 'DropFolderBatchJobObjectType');
 			
 		if($baseEnumName == 'BatchJobType')
 			return array('DropFolderBatchType');
 			
 		if($baseEnumName == 'PermissionName')
 			return array('DropFolderPermissionName');
+			
+		if($baseEnumName == 'BatchJobObjectType')
+			return array('DropFolderBatchJobObjectType');
+			
 			
 		return array();
 	}
@@ -238,4 +276,22 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			self::DROP_FOLDER_EVENTS_CONSUMER,
 		);
 	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getCoreValue($type, $valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore($type, $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
 }

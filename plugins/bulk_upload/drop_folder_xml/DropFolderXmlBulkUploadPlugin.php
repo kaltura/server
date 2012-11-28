@@ -2,12 +2,13 @@
 /**
  * @package plugins.dropFolderXmlBulkUpload
  */
-class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaPending, IKalturaSchemaDefiner
+class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaPending, IKalturaSchemaDefiner, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'dropFolderXmlBulkUpload';
 	const XML_BULK_UPLOAD_PLUGIN_VERSION_MAJOR = 1;
 	const XML_BULK_UPLOAD_PLUGIN_VERSION_MINOR = 1;
-	const XML_BULK_UPLOAD_PLUGIN_VERSION_BUILD = 0;
+	const XML_BULK_UPLOAD_PLUGIN_VERSION_BUILD = 0;	
+	const DROP_FOLDER_XML_EVENTS_CONSUMER = 'kDropFolderXmlEventsConsumer';
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -39,7 +40,7 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('DropFolderXmlBulkUploadType', 'DropFolderXmlFileHandlerType', 'DropFolderXmlBulkUploadErrorCode', 'DropFolderXmlSchemaType');
+			return array('DropFolderXmlBulkUploadType', 'DropFolderXmlFileHandlerType', 'DropFolderXmlBulkUploadErrorCode', 'DropFolderXmlSchemaType', 'DropFolderBatchJobObjectType');
 		
 		if($baseEnumName == 'BulkUploadType')
 			return array('DropFolderXmlBulkUploadType');
@@ -52,6 +53,9 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 			
 		if($baseEnumName == 'SchemaType')
 			return array('DropFolderXmlSchemaType');
+
+		if($baseEnumName == 'BatchJobObjectType')
+			return array('DropFolderBatchJobObjectType');
 			
 		return array();
 	}
@@ -76,8 +80,8 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 			return new DropFolderXmlBulkUploadEngine($taskConfig, $kClient, $job);
 		}
 		
-		if ($baseClass == 'DropFolderFileHandler' && $enumValue == KalturaDropFolderFileHandlerType::XML)
-				return new DropFolderXmlBulkUploadFileHandler();
+		if ($baseClass == 'KDropFolderFileHandler' && $enumValue == KalturaDropFolderFileHandlerType::XML)
+				return new KDropFolderXmlFileHandler();
 		
 		
 		if ($baseClass == 'KalturaDropFolderFileHandlerConfig' && $enumValue == self::getFileHandlerTypeCoreValue(DropFolderXmlFileHandlerType::XML))
@@ -148,7 +152,7 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 				
 	<xs:complexType name="T_dropFolderFileContentResource">
 		<xs:choice minOccurs="0" maxOccurs="1">
-			<xs:element name="fileSize" type="xs:int" minOccurs="1" maxOccurs="1">
+			<xs:element name="fileSize" type="xs:long" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>
 						The expected size of the file<br/>
@@ -285,5 +289,12 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	public static function getEventConsumers()
+	{
+		return array(
+			self::DROP_FOLDER_XML_EVENTS_CONSUMER,
+		);
 	}
 }

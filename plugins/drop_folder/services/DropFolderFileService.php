@@ -43,18 +43,29 @@ class DropFolderFileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_NOT_FOUND, $dropFolderFile->dropFolderId);
 		}
 				
-		// check that the file doesn't already exist in the drop folder
-		if (DropFolderFilePeer::retrieveByDropFolderIdAndFileName($dropFolderFile->dropFolderId, $dropFolderFile->fileName)) {
-			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_FILE_ALREADY_EXISTS, $dropFolderFile->dropFolderId, $dropFolderFile->fileName);
-		}
-		
 		// save in database
+		$status = $dropFolderFile->status;
+		$dropFolderFile->status = null;		
 		$dbDropFolderFile = $dropFolderFile->toInsertableObject();
 		/* @var $dbDropFolderFile DropFolderFile */
 		$dbDropFolderFile->setPartnerId($dropFolder->getPartnerId());
-		$dbDropFolderFile->setStatus(DropFolderFileStatus::UPLOADING);
-		$dbDropFolderFile->save();
+		if($status == KalturaDropFolderFileStatus::PARSED)
+			$dbDropFolderFile->setStatus(DropFolderFileStatus::PARSED);
+		else
+			$dbDropFolderFile->setStatus(DropFolderFileStatus::UPLOADING);
 		
+		try 
+		{
+			$dbDropFolderFile->save();	
+		}
+		catch(PropelException $e)
+		{
+			if($e->getCause()->getCode() == 23000) //unique constraint
+			{
+				KalturaLog::debug('unique constraint exception');
+				throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_FILE_UNIQUE_CONSTRAINT_VIOLATION);
+			}
+		}	
 		// return the saved object
 		$dropFolderFile = new KalturaDropFolderFile();
 		$dropFolderFile->fromObject($dbDropFolderFile);

@@ -17,6 +17,7 @@ class DropFolderFile extends BaseDropFolderFile
 {
 
 	const CUSTOM_DATA_LAST_MODIFICATION_TIME = 'last_modification_time';
+	const CUSTOM_DATA_BATCH_JOB_ID = 'batch_job_id';
 	
 	public function setFileSize($size)
 	{
@@ -42,10 +43,31 @@ class DropFolderFile extends BaseDropFolderFile
 	    $this->putInCustomData(self::CUSTOM_DATA_LAST_MODIFICATION_TIME, $time);
 	}
 	
+	public function getBatchJobId()
+	{
+	    return $this->getFromCustomData(self::CUSTOM_DATA_BATCH_JOB_ID);
+	}
 	
+	public function setBatchJobId($id)
+	{
+	    $this->putInCustomData(self::CUSTOM_DATA_BATCH_JOB_ID, $id);
+	}
 		
 	public function getCacheInvalidationKeys()
 	{
 		return array("dropFolderFile:id=".$this->getId(), "dropFolderFile:fileName=".$this->getFileName(), "dropFolderFile:dropFolderId=".$this->getDropFolderId());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseDropFolderFile::preUpdate()
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if($this->isColumnModified(DropFolderFilePeer::STATUS) && $this->getStatus() == DropFolderFileStatus::PURGED)
+		{
+			$this->setDeletedDropFolderFileId($this->getId());
+		}
+		
+		return parent::preUpdate($con);
 	}
 } // DropFolderFile

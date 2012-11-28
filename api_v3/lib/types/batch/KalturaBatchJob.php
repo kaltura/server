@@ -230,7 +230,16 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 	 * @filter eq,in,notin
 	 */    
     public $dc;
+    
+    /**
+     * @var string
+     */
+    public $jobObjectId;
 
+    /**
+     * @var int
+     */
+	public $jobObjectType;
 	
 	private static $map_between_objects = array
 	(
@@ -245,7 +254,8 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 		"queueTime" , "finishTime" ,  "errType", "errNumber", 
 		"dc",
 		"lastSchedulerId", "lastWorkerId" , 
-		"history"
+		"history",
+		"jobObjectId" => "objectId", "jobObjectType" => "objectType"
 	);
 	
 	public function getMapBetweenObjects ( )

@@ -51,6 +51,8 @@ class DropFolderTableMap extends TableMap {
 		$this->addColumn('FILE_NAME_PATTERNS', 'FileNamePatterns', 'LONGVARCHAR', true, null, null);
 		$this->addColumn('FILE_HANDLER_CONFIG', 'FileHandlerConfig', 'LONGVARCHAR', true, null, null);
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('ERROR_CODE', 'ErrorCode', 'INTEGER', false, null, null);
+		$this->addColumn('ERROR_DESCRIPTION', 'ErrorDescription', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);

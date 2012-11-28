@@ -48,8 +48,14 @@ class DropFolderFileTableMap extends TableMap {
 		$this->addColumn('ERROR_DESCRIPTION', 'ErrorDescription', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('PARSED_SLUG', 'ParsedSlug', 'VARCHAR', false, 500, null);
 		$this->addColumn('PARSED_FLAVOR', 'ParsedFlavor', 'VARCHAR', false, 500, null);
+		$this->addColumn('LEAD_DROP_FOLDER_FILE_ID', 'LeadDropFolderFileId', 'INTEGER', false, null, null);
+		$this->addColumn('DELETED_DROP_FOLDER_FILE_ID', 'DeletedDropFolderFileId', 'INTEGER', false, null, null);
+		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', false, 20, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('UPLOAD_END_DETECTED_AT', 'UploadEndDetectedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('IMPORT_STARTED_AT', 'ImportStartedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('IMPORT_ENDED_AT', 'ImportEndedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()

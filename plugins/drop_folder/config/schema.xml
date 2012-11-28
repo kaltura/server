@@ -15,6 +15,8 @@
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="file_name_patterns" type="longvarchar" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="file_handler_config" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="error_code" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="error_description" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />		
@@ -40,9 +42,20 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="error_description" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parsed_slug" type="varchar" size="500" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parsed_flavor" type="varchar" size="500" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="lead_drop_folder_file_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="deleted_drop_folder_file_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="upload_end_detected_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="import_started_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="import_ended_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<unique name="file_name_in_drop_folder_unique">
+			<unique-column name="file_name" />
+			<unique-column name="drop_folder_id" />
+			<unique-column name="deleted_drop_folder_file_id" />
+		</unique>
 		<index name="partner_id_index">
 			<index-column name="partner_id" />
 		</index>

@@ -101,6 +101,17 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	public $tags;
 	
 	/**
+	 * @var KalturaDropFolderErrorCode
+	 * @filter eq,in
+	 */
+	public $errorCode;
+	
+	/**
+	 * @var string
+	 */
+	public $errorDescription;
+	
+	/**
 	 * @var string
 	 */
 	public $ignoreFileNamePatterns;
@@ -141,6 +152,8 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		'createdAt',
 		'updatedAt',
 		'tags',
+		'errorCode',
+		'errorDescription',
 		'ignoreFileNamePatterns',
 	 );
 		 
