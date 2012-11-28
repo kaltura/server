@@ -157,14 +157,23 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	 */
 	public function testListbypartner(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null, KalturaEventNotificationTemplateListResponse $reference)
 	{
-		$resultObject = $this->client->eventNotificationTemplate->listbypartner($filter, $pager, $reference);
-		if(method_exists($this, 'assertInstanceOf'))
-			$this->assertInstanceOf('KalturaEventNotificationTemplateListResponse', $resultObject);
-		else
-			$this->assertType('KalturaEventNotificationTemplateListResponse', $resultObject);
-		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		// TODO - add here your own validations
-		$this->validateListbypartner($resultObject);
+		try 
+		{
+			$resultObject = $this->client->eventNotificationTemplate->listbypartner($filter, $pager, $reference);
+			$this->fail('listByPartner for partnerId <> -2 should fail');
+		}
+		catch (KalturaException $e)
+		{
+			if ($e->getCode() == 'SERVICE_FORBIDDEN')
+			{
+				
+			}
+			else
+			{
+				$this->fail('Wrong error type thrown');
+			}
+		}
+		
 	}
 
 	/**
