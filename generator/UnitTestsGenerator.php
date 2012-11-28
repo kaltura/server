@@ -603,7 +603,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		if($testReturnedType)
 		{
 			$this->write("		", $isBase);
-			$this->write("		return \$resultObject->id;", $isBase);
+			$this->write("		return \$resultObject;", $isBase);
 		}
 			
 		$this->write("	}", $isBase);
