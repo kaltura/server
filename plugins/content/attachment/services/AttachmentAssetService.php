@@ -429,6 +429,7 @@ class AttachmentAssetService extends KalturaAssetService
 				throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
 				
 			// enforce entitlement
+			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
 			kEntitlementUtils::initEntitlementEnforcement();
 		}
 		else 

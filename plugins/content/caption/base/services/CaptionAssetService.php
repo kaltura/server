@@ -372,6 +372,7 @@ class CaptionAssetService extends KalturaAssetService
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 				
 			// enforce entitlement
+			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
 			kEntitlementUtils::initEntitlementEnforcement();
 			
 			if(!kEntitlementUtils::isEntryEntitled($entry))
@@ -495,6 +496,7 @@ class CaptionAssetService extends KalturaAssetService
 				throw new KalturaAPIException(KalturaErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 				
 			// enforce entitlement
+			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
 			kEntitlementUtils::initEntitlementEnforcement();
 		}
 		else 

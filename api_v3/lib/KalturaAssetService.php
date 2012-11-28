@@ -17,14 +17,22 @@ abstract class KalturaAssetService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
+    	$this->mediaTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::MEDIA_CLIP);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::setPartnerFilters()
+	 */
+	protected function setPartnerFilters($partnerId)
+	{
+		parent::setPartnerFilters($partnerId);
+		
 		$this->applyPartnerFilterForClass('conversionProfile2');
 		$this->applyPartnerFilterForClass('assetParamsOutput');
-		$fullActionName = "$serviceName.$actionName";
+		$fullActionName = "{$this->serviceName}.$this->actionName";
 		if (!in_array($fullActionName, array('flavorAsset.getByEntryId', 'flavorAsset.getWebPlayableByEntryId', 'flavorAsset.list')))
 			$this->applyPartnerFilterForClass('asset');
 		$this->applyPartnerFilterForClass('assetParams');
-		
-    	$this->mediaTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::MEDIA_CLIP);
 	}
 	
 	/**

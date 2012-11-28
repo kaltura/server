@@ -398,6 +398,7 @@ class ThumbAssetService extends KalturaAssetService
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 				
 			// enforce entitlement
+			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
 			kEntitlementUtils::initEntitlementEnforcement();
 			
 			if(!kEntitlementUtils::isEntryEntitled($entry))
@@ -432,12 +433,13 @@ class ThumbAssetService extends KalturaAssetService
 	 * @action serve
 	 * @param string $thumbAssetId
 	 * @param int $version
+	 * @param KalturaThumbParams $thumbParams
 	 * @return file
 	 *  
 	 * @throws KalturaErrors::THUMB_ASSET_IS_NOT_READY
 	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 */
-	public function serveAction($thumbAssetId, $version = null)
+	public function serveAction($thumbAssetId, $version = null, KalturaThumbParams $thumbParams = null)
 	{
 		if (!kCurrentContext::$ks)
 		{
@@ -447,6 +449,7 @@ class ThumbAssetService extends KalturaAssetService
 				throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 				
 			// enforce entitlement
+			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
 			kEntitlementUtils::initEntitlementEnforcement();
 		}
 		else 
@@ -472,8 +475,53 @@ class ThumbAssetService extends KalturaAssetService
 			$ext = 'jpg';
 			
 		$fileName = $thumbAsset->getEntryId()."_" . $thumbAsset->getId() . ".$ext";
+		if(!$thumbParams)
+			return $this->serveAsset($thumbAsset, $fileName, $version);
+			
+		$thumbParams->validate();
 		
-		return $this->serveAsset($thumbAsset, $fileName, $version);
+		$syncKey = $thumbAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $version);
+		if(!kFileSyncUtils::fileSync_exists($syncKey))
+			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
+			
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+		/* @var $fileSync FileSync */
+		
+		if(!$local)
+		{
+			if ( !in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()) )
+				throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
+				
+			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($fileSync);
+			KalturaLog::info("Redirecting to [$remoteUrl]");
+			header("Location: $remoteUrl");
+			die;
+		}
+		
+		header("Content-Disposition: attachment; filename=\"$fileName\"");
+		
+		$filePath = $fileSync->getFullPath();
+		
+		$thumbVersion = $thumbAsset->getId() . '_' . $version;
+		$tempThumbPath = myEntryUtils::resizeEntryImage($entry, $thumbVersion, 
+			$thumbParams->width, 
+			$thumbParams->height, 
+			$thumbParams->cropType, 
+			$thumbParams->backgroundColor, 
+			null, 
+			$thumbParams->quality,
+			$thumbParams->cropX, 
+			$thumbParams->cropY, 
+			$thumbParams->cropWidth, 
+			$thumbParams->cropHeight, 
+			-1, 0, -1, 
+			$filePath, 
+			$thumbParams->density, 
+			$thumbParams->stripProfiles, 
+			null);
+		
+		$mimeType = kFile::mimeType($tempThumbPath);
+		kFileUtils::dumpFile($tempThumbPath, $mimeType); 
 	}
 	
 	/**

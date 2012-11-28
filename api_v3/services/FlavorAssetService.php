@@ -60,6 +60,7 @@ class FlavorAssetService extends KalturaAssetService
     	
     	$dbFlavorAsset = new flavorAsset();
     	$dbFlavorAsset = $flavorAsset->toInsertableObject($dbFlavorAsset);
+    	/* @var $dbFlavorAsset flavorAsset */
     	
     	if(!is_null($flavorAsset->flavorParamsId))
     	{
