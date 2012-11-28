@@ -120,6 +120,41 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	}
 	
 	/**
+	 * Tests eventNotificationTemplate->get action
+	 * @param int $id 
+	 * @param KalturaEventNotificationTemplate $reference
+	 * @dataProvider provideData
+	 */
+	public function testGet($id, KalturaEventNotificationTemplate $reference)
+	{
+		$resultObject = $this->client->eventNotificationTemplate->get($id);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
+		else
+			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		$this->validateGet($resultObject);
+	}
+	
+	/**
+	 * Tests eventNotificationTemplate->update action
+	 * @param int $id 
+	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate 
+	 * @param KalturaEventNotificationTemplate $reference
+	 * @dataProvider provideData
+	 */
+	public function testUpdate($id, KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationTemplate $reference)
+	{
+		$resultObject = $this->client->eventNotificationTemplate->update($id, $eventNotificationTemplate);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
+		else
+			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		$this->validateUpdate($resultObject);
+	}
+	
+	/**
 	 * Tests eventNotificationTemplate->delete action
 	 * @param int $id 
 	 * @dataProvider provideData
