@@ -17,16 +17,22 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	public function testAdd(KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationTemplate $reference)
 	{
 		$eventNotificationTemplate->systemName = uniqid('unit_test');
-		$resultObject = $this->client->eventNotificationTemplate->add($eventNotificationTemplate);
-		if(method_exists($this, 'assertInstanceOf'))
-			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
-		else
-			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
-		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->assertNotNull($resultObject->id);
-		$this->validateAdd($resultObject);
+		try 
+		{
+			$resultObject = $this->client->eventNotificationTemplate->add($eventNotificationTemplate);
+		}
+		catch (KalturaException $e)
+		{
+			if ($e->getCode() == 'SERVICE_FORBIDDEN')
+			{
+				
+			}
+			else
+			{
+				$this->fail('Wrong exception type thrown');
+			}
+		}
 		
-		return $resultObject->id;
 	}
 	/* (non-PHPdoc)
 	 * @see EventNotificationTemplateServiceTestBase::validateAdd()
