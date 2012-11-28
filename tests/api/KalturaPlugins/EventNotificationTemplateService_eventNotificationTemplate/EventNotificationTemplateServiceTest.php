@@ -51,50 +51,19 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	 */
 	public function testCloneAction($id, KalturaEventNotificationTemplate $eventNotificationTemplate = null, KalturaEventNotificationTemplate $reference)
 	{
-		try 
-		{
-			$eventNotificationTemplate->systemName = uniqid('unit_test');
-			$resultObject = $this->client->eventNotificationTemplate->cloneAction($id, $eventNotificationTemplate, $reference);
-			
-			if(method_exists($this, 'assertInstanceOf'))
-				$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
-			else
-				$this->assertType('KalturaEventNotificationTemplate', $resultObject);
-			$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-			return $resultObject->id;
-		}
-		catch (KalturaException $e)
-		{
-			if ($e->getCode() == "EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME")
-			{
-				
-			}
-			else
-			{
-				$this->fail('Unexpected error occured.');
-			}
-		}
+		$eventNotificationTemplate->systemName = uniqid('unit_test');
+		$resultObject = $this->client->eventNotificationTemplate->cloneAction($id, $eventNotificationTemplate, $reference);
 		
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
+		else
+			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
 		
+		return $resultObject->id;
 	}
 
-	/* (non-PHPdoc)
-	 * @see EventNotificationTemplateServiceTestBase::validateGet()
-	 */
-	protected function validateGet(KalturaEventNotificationTemplate $resultObject)
-	{
-		// TODO - add your own validations here
-	}
 
-	/* (non-PHPdoc)
-	 * @see EventNotificationTemplateServiceTestBase::validateUpdate()
-	 */
-	protected function validateUpdate(KalturaEventNotificationTemplate $resultObject)
-	{
-		// TODO - add your own validations here
-	}
-
-	
 	/**
 	 * Tests eventNotificationTemplate->get action
 	 * @param int $id 
@@ -115,6 +84,13 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 		return $resultObject->id;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see EventNotificationTemplateServiceTestBase::validateGet()
+	 */
+	protected function validateGet(KalturaEventNotificationTemplate $resultObject)
+	{
+		// TODO - add your own validations here
+	}
 	/**
 	 * Tests eventNotificationTemplate->update action
 	 * @param int $id 
@@ -134,6 +110,14 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 		$this->validateUpdate($resultObject);
 		
 		return $resultObject->id;
+	}
+	
+		/* (non-PHPdoc)
+	 * @see EventNotificationTemplateServiceTestBase::validateUpdate()
+	 */
+	protected function validateUpdate(KalturaEventNotificationTemplate $resultObject)
+	{
+		// TODO - add your own validations here
 	}
 	
 
