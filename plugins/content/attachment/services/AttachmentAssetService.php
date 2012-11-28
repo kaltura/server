@@ -458,6 +458,7 @@ class AttachmentAssetService extends KalturaAssetService
 		if (!$fileName)	
 			$fileName = $attachmentAsset->getEntryId()."_" . $attachmentAsset->getId() . ".$ext";
 		
+		header("Content-Disposition: attachment; filename=\"$fileName\"");
 		return $this->serveAsset($attachmentAsset, $fileName);
 	}
 

@@ -302,9 +302,6 @@ abstract class KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
 
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
-		
-		header("Content-Disposition: attachment; filename=\"$fileName\"");
-		
 		if($local)
 		{
 			$filePath = $fileSync->getFullPath();

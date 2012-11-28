@@ -498,8 +498,6 @@ class ThumbAssetService extends KalturaAssetService
 			die;
 		}
 		
-		header("Content-Disposition: attachment; filename=\"$fileName\"");
-		
 		$filePath = $fileSync->getFullPath();
 		
 		$thumbVersion = $thumbAsset->getId() . '_' . $version;

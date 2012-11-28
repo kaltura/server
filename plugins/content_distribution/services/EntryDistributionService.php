@@ -448,6 +448,7 @@ class EntryDistributionService extends KalturaBaseService
 		if(!$fileSubType)
 			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_MISSING_LOG, $id);
 		
+		header("Content-Disposition: attachment; filename=\"$fileName\"");
 		return $this->serveFile($dbEntryDistribution, $fileSubType, $fileName, $dbEntryDistribution->getEntryId());
 	}
 
@@ -486,6 +487,7 @@ class EntryDistributionService extends KalturaBaseService
 		if(!$fileSubType)
 			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_MISSING_LOG, $id);
 		
+		header("Content-Disposition: attachment; filename=\"$fileName\"");
 		return $this->serveFile($dbEntryDistribution, $fileSubType, $fileName, $dbEntryDistribution->getEntryId());
 	}
 }
