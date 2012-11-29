@@ -69,9 +69,15 @@ class BaseEntryService extends KalturaEntryService
      */
     function addAction(KalturaBaseEntry $entry, $type = -1)
     {
+    	if($type != KalturaEntryType::AUTOMATIC)
+    		$entry->type = $type;
+    	
     	$dbEntry = parent::add($entry, $entry->conversionProfileId);
-   		$dbEntry->setStatus(entryStatus::NO_CONTENT);
-    	$dbEntry->save();
+    	if($dbEntry->getStatus() != entryStatus::READY)
+    	{
+	   		$dbEntry->setStatus(entryStatus::NO_CONTENT);
+	    	$dbEntry->save();
+    	}
     	
 		$trackEntry = new TrackEntry();
 		$trackEntry->setEntryId($dbEntry->getId());
