@@ -866,6 +866,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 			$other_dcs = kDataCenterMgr::getAllDcs( );
 			foreach ( $other_dcs as $remote_dc )
 			{
+				if($key->getObjectSubType() == flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG)
+					continue; // We don't want to copy the convert log to the other DCs.
+				
 				$remote_dc_file_sync = FileSync::createForFileSyncKey( $key );
 				$remote_dc_file_sync->setDc( $remote_dc["id"] );
 				$remote_dc_file_sync->setStatus( FileSync::FILE_SYNC_STATUS_PENDING );
