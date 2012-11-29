@@ -2,7 +2,7 @@
 /**
  * @package plugins.externalMedia
  */
-class ExternalMediaPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEnumerator, IKalturaTypeExtender, IKalturaSearchDataContributor, IKalturaPermissions, IKalturaEventConsumers
+class ExternalMediaPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEnumerator, IKalturaTypeExtender, IKalturaSearchDataContributor, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'externalMedia';
 	const EXTERNAL_MEDIA_CREATED_HANDLER = 'ExternalMediaCreatedHandler';
@@ -29,18 +29,6 @@ class ExternalMediaPlugin extends KalturaPlugin implements IKalturaPlugin, IKalt
 		return array(
 			self::EXTERNAL_MEDIA_CREATED_HANDLER,
 		);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaPermissions::isAllowedPartner()
-	 */
-	public static function isAllowedPartner($partnerId)
-	{
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if(!$partner)
-			return false;
-			
-		return $partner->getPluginEnabled(self::PLUGIN_NAME);
 	}
 
 	/* (non-PHPdoc)
@@ -142,8 +130,7 @@ class ExternalMediaPlugin extends KalturaPlugin implements IKalturaPlugin, IKalt
 	{
 		if($object instanceof ExternalMediaEntry)
 		{
-			if(self::isAllowedPartner($object->getPartnerId()))
-				return array('plugins_data' => self::getExternalSourceSearchData($object->getExternalSourceType()));
+			return array('plugins_data' => self::getExternalSourceSearchData($object->getExternalSourceType()));
 		}
 			
 		return null;
