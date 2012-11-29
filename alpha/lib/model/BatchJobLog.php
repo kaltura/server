@@ -35,18 +35,8 @@ class BatchJobLog extends BaseBatchJobLog {
 			return parent::getData();
 		$data = parent::getData();
 		if(!is_null($data))
-		{
-			try {
-				$unserializedData = unserialize ( $data );
-				if ($unserializedData instanceof kJobCompressedData) {
-					$serializedJobData = $unserializedData->getSerializedJobData ();
-					$unserializedData = unserialize ( $serializedJobData );
-				}
-				return $unserializedData;
-			} catch(Exception $e){
-				return null;
-			}
-		}
+				return unserialize ( $data );
+		
 		return null;
 	}
 	
@@ -58,10 +48,6 @@ class BatchJobLog extends BaseBatchJobLog {
 			return parent::setData ( $v );
 		if (! is_null ( $v )) {
 			$sereializedValue = serialize ( $v );
-			if (strlen ( ( string ) $sereializedValue ) > BatchJob::MAX_SERIALIZED_JOB_DATA_SIZE ) { 
-				$v = new kJobCompressedData ( $sereializedValue );
-				$sereializedValue = serialize ( $v );
-			}
 			parent::setData ( $sereializedValue );	
 		} else
 			parent::setData ( null );

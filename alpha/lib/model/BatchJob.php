@@ -38,8 +38,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD = 1;
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG = 3;
 	
-	const MAX_SERIALIZED_JOB_DATA_SIZE = 8192;
-	
 	private static $indicator = null;//= new myFileIndicator( "gogobatchjob" );
 	
 	private $aEntry = null;
@@ -429,18 +427,8 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 			return parent::getData();
 		$data = parent::getData();
 		if(!is_null($data))
-		{
-			try {
-				$unserializedData = unserialize ( $data );
-				if ($unserializedData instanceof kJobCompressedData) {
-					$serializedJobData = $unserializedData->getSerializedJobData ();
-					$unserializedData = unserialize ( $serializedJobData );
-				}
-				return $unserializedData;
-			} catch(Exception $e){
-				return null;
-			}
-		}
+			return unserialize ( $data );
+		
 		return null;
 	}
 	
@@ -452,10 +440,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 			return parent::setData ( $v );
 		if (! is_null ( $v )) {
 			$sereializedValue = serialize ( $v );
-			if (strlen ( ( string ) $sereializedValue ) > self::MAX_SERIALIZED_JOB_DATA_SIZE ) { 
-				$v = new kJobCompressedData ( $sereializedValue );
-				$sereializedValue = serialize ( $v );
-			}
 			parent::setData ( $sereializedValue );	
 		} else
 			parent::setData ( null );
