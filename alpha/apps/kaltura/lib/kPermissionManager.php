@@ -659,7 +659,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 					break;
 			}
 			
-			throw new kCoreException("Invalid KS", kCoreException::INVALID_KS);
+			throw new kCoreException("Invalid KS", kCoreException::INVALID_KS, ks::getErrorStr($res));
 		}
 	}
 	
