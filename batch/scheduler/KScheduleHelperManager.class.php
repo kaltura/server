@@ -285,8 +285,9 @@ class KScheduleHelperManager
 	protected static function getCommandsDir()
 	{
 		$path = self::getCachePath() . DIRECTORY_SEPARATOR . 'controls';
-		if(!file_exists($path))
-			kFile::fullMkdir($path);
+		if(!file_exists($path)) {
+			kFile::fullMkfileDir($path);
+		}
 			
 		return $path;
 	}
@@ -298,7 +299,7 @@ class KScheduleHelperManager
 	{
 		$path = self::getCachePath() . DIRECTORY_SEPARATOR . 'filters';
 		if(!file_exists($path))
-			kFile::fullMkdir($path);
+			kFile::fullMkfileDir($path);
 			
 		return $path;
 	}
