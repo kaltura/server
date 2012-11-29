@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>KMC</title>
+	<link rel="stylesheet" type="text/css" href="/lib/css/kmc5.css" media="screen" />
+	<script type="text/javascript" src="/lib/js/jquery_v1.4.2.min.js"></script>
+	<script type="text/javascript" src="/lib/js/swfobject_v2.2.js"></script>
+</head>
+<body>
+ <div id="wrap">
+ <?php echo $this->layout()->content ?>
+ </div>
+<?php if( ! Infra_Config::get('settings.disable_analytics') ){ ?>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+try {
+var pageTracker = _gat._getTracker("<?php echo Infra_Config::get('settings.ga_account'); ?>");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+<?php } ?>
+</body>
+</html>

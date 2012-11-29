@@ -1,0 +1,30 @@
+<style>
+ body { background-color:#272929 !important; background-image:none !important;}
+  div#login { width:500px; margin: 0 auto; text-align:center;}
+</style>
+
+<div id="kmcHeader">
+	<img src="/lib/images/kmc/logo_kmc.png" alt="Kaltura CMS" />
+	<div id="user_links">
+    	<a href="/content/docs/pdf/KMC_User_Manual.pdf" target="_blank">User Manual</a>
+	</div> 
+</div><!-- end kmcHeader -->
+    
+<div id="login">
+    <div id="login_swf"><img src="/lib/images/kmc/flash.jpg" alt="Install Flash Player" /><span>You must have flash installed. <a href="http://get.adobe.com/flashplayer/" target="_blank">click here to download</a></span></div>
+</div>
+
+<script type="text/javascript">
+var options = {
+	service_url: "//<?php echo Infra_Config::get('settings.service_host'); ?>",
+	swf_url: "//<?php echo Infra_Config::get('settings.service_host'); ?>/flash/kmc/login/<?php echo Infra_Config::get('settings.kmc_login_version') ?>/login.swf",
+	flashVars: {
+		host: "<?php echo Infra_Config::get('settings.service_host'); ?>",
+		displayErrorFromServer: "<?php echo ($this->displayErrorFromServer)? 'true': 'false'; ?>",
+		visibleSignup: "<?php echo (Infra_Config::get('settings.show_signup_link'))? 'true': 'false'; ?>",
+		hashKey: "<?php echo (isset($this->setPassHashKey) && $this->setPassHashKey) ? $this->setPassHashKey : ''; ?>",
+		errorCode: "<?php echo (isset($this->hashKeyErrorCode) && $this->hashKeyErrorCode) ? $this->hashKeyErrorCode : ''; ?>"
+	}
+};
+</script>
+<script type="text/javascript" src="<?php echo '//' . $this->getHelper('ServerUrl')->getHost() . $this->baseUrl('js/login.js'); ?>"></script>

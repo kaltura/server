@@ -1,0 +1,16 @@
+<!doctype html>
+<html> 
+<head>  
+	<meta charset="utf-8" />
+	<title>KMC Error</title>
+</head> 
+<body>
+<div id="wrapper">
+
+<?php echo $this->translate('general-error'); ?>
+<?php echo (isset($this->code) ? "(error code: $this->code)" : (isset($this->exception) ? '(error code: ' . $this->exception->getCode() . ')' : '')); ?>
+
+</div>
+
+</body>
+</html>
