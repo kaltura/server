@@ -90,6 +90,15 @@ class kBatchManager
 					$flavorAsset->save();	
 					return null;
 				}
+
+				$vidCodec=$flavor->getVideoCodec();
+				if(($flavor->_isRedundant) && !isset($vidCodec))
+				{
+					KalturaLog::log("Flavor [" . $flavor->getFlavorParamsId() . "] is redandant audio-only");
+					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE);
+					$flavorAsset->save();
+					return null;
+				}
 				
 				KalturaLog::log("Flavor [" . $flavor->getFlavorParamsId() . "] is valid");
 			}
