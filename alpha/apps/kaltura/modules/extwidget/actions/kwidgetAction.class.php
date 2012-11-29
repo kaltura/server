@@ -16,13 +16,6 @@ class kwidgetAction extends sfAction
 	 */
 	public function execute()
 	{
-		$uv_cookie = @$_COOKIE['uv'];
-		if (strlen($uv_cookie) != 35)
-		{
-			$uv_cookie = "uv_".md5(uniqid(rand(), true));
-		}
-		setrawcookie( 'uv', $uv_cookie, time() + 3600 * 24 * 365, '/' );
-
 		// check if this is a request for the kdp without a wrapper
 		// in case of an application loading the kdp (e.g. kmc)
 		$nowrapper = $this->getRequestParameter( "nowrapper", false);

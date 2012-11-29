@@ -18,7 +18,7 @@ function checkCache()
 		if ($url)
 		{
 			$max_age = 60;
-			header("Cache-Control: private, max-age=$max_age, max-stale=0");
+			header("Cache-Control: private, max-age=$max_age");
 			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . ' GMT');
 			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
 
@@ -105,7 +105,7 @@ function checkCache()
 				$max_age = 60 * 10;
 				header("X-Kaltura:cached-dispatcher");
 				header("Content-Type: application/x-shockwave-flash");
-				header("Cache-Control: private, max-age=$max_age max-stale=0");
+				header("Cache-Control: private, max-age=$max_age, max-stale=0");
 				header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
 				header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
 				header("Content-Length: ".strlen($cachedResponse));
@@ -116,14 +116,6 @@ function checkCache()
 			$cachedResponse = $cache->get("kwidget$uri");
 			if ($cachedResponse)
 			{
-				// set our uv cookie
-				$uv_cookie = @$_COOKIE['uv'];
-				if (strlen($uv_cookie) != 35)
-				{
-					$uv_cookie = "uv_".md5(uniqid(rand(), true));
-				}
-				setrawcookie( 'uv', $uv_cookie, time() + 3600 * 24 * 365, '/' );
-		
 				header("X-Kaltura:cached-dispatcher");
 				header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
 				header("Cache-Control" , "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
@@ -179,7 +171,7 @@ function checkCache()
 				$max_age = 8640000;
 				
 				header("X-Kaltura:cached-dispatcher-thumb");
-				header("Cache-Control: public, max-age=$max_age max-stale=0");
+				header("Cache-Control: public, max-age=$max_age, max-stale=0");
 				header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
 				header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
 				header("Content-Length: $total_length ");
