@@ -22,7 +22,7 @@ class ExternalMediaCreatedHandler implements kObjectAddedEventConsumer
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		/* @var $object ExternalMediaEntry */
-		$object->setStatusReady();
+		$object->setStatus(entryStatus::READY);
 		$object->save();
 		
 		return true;
