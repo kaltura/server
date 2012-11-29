@@ -95,6 +95,34 @@ test2.reference.description                       = test2 desc
 test2.reference.categories                        = cat1
 test2.reference.externalSourceType                = InterCall
 test2.reference.status                            = 2
+test3.entry.objectType                            = KalturaMediaEntry
+test3.entry.mediaType                             = 2
+test3.entry.name                                  = test3
+test3.entry.description                           = test3 desc
+test3.entry.endDate                               = 1353801600
+test3.entry.tags                                  = test3, external
+test3.entry.categories                            = cat1
+test3.reference.objectType                        = KalturaExternalMediaEntry
+test3.reference.name                              = test3
+test3.reference.endDate                           = 1353801600
+test3.reference.tags                              = test3, external
+test3.reference.description                       = test3 desc
+test3.reference.categories                        = cat1
+test3.reference.status                            = 2
+test4.entry.objectType                            = KalturaBaseEntry
+test4.entry.mediaType                             = 2
+test4.entry.name                                  = test4
+test4.entry.description                           = test4 desc
+test4.entry.endDate                               = 1353801600
+test4.entry.tags                                  = test4, external
+test4.entry.categories                            = cat1
+test4.reference.objectType                        = KalturaExternalMediaEntry
+test4.reference.name                              = test4
+test4.reference.endDate                           = 1353801600
+test4.reference.tags                              = test4, external
+test4.reference.description                       = test4 desc
+test4.reference.categories                        = cat1
+test4.reference.status                            = 2
 
 [testGet]
 test0.id                                          = 
@@ -183,3 +211,18 @@ test0.entry.objectType                            = KalturaExternalMediaEntry
 
 [testBaseEntryApprove]
 test0.entry.objectType                            = KalturaExternalMediaEntry
+
+
+[testFailBaseEntryAdd]
+test0.entry.objectType                            = KalturaExternalMediaEntry
+test0.entry.mediaType                             = 1
+test0.entry.name                                  = test0
+test0.entry.description                           = test0 desc
+test0.entry.categories                            = cat1
+test0.code                                        = PROPERTY_VALIDATION_CANNOT_BE_NULL
+test1.entry.objectType                            = KalturaExternalMediaEntry
+test1.entry.name                                  = test1
+test1.entry.description                           = test1 desc
+test1.entry.categories                            = cat1
+test1.entry.externalSourceType                    = YouTube
+test1.code                                        = PROPERTY_VALIDATION_CANNOT_BE_NULL

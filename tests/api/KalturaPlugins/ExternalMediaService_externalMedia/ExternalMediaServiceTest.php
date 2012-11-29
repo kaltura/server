@@ -11,24 +11,42 @@ class ExternalMediaServiceTest extends ExternalMediaServiceTestBase
 	 * Tests baseEntry->add action
 	 * @param KalturaExternalMediaEntry $entry 
 	 * @param KalturaExternalMediaEntry $reference
-	 * @return KalturaExternalMediaEntry
+	 * @return string
 	 * @dataProvider provideData
 	 */
-	public function testBaseEntryAdd(KalturaExternalMediaEntry $entry, KalturaExternalMediaEntry $reference)
+	public function testBaseEntryAdd(KalturaBaseEntry $entry, KalturaExternalMediaEntry $reference)
 	{
 		$entry->referenceId = uniqid('ref');
 		$reference->referenceId = $entry->referenceId;
 		
-		$resultObject = $this->client->baseEntry->add($entry);
+		$resultObject = $this->client->baseEntry->add($entry, KalturaEntryType::EXTERNAL_MEDIA);
 		if(method_exists($this, 'assertInstanceOf'))
-			$this->assertInstanceOf('KalturaExternalMediaEntry', $resultObject);
+			$this->assertInstanceOf(get_class($entry), $resultObject);
 		else
-			$this->assertType('KalturaExternalMediaEntry', $resultObject);
+			$this->assertType(get_class($entry), $resultObject);
 		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
 		$this->assertNotNull($resultObject->id);
-		$this->validateAdd($resultObject);
+		$this->assertEquals($resultObject->status, KalturaEntryStatus::READY);
 		
 		return $resultObject;
+	}
+	
+	/**
+	 * Tests baseEntry->add action
+	 * @param KalturaExternalMediaEntry $entry 
+	 * @param string $code
+	 * @dataProvider provideData
+	 */
+	public function testFailBaseEntryAdd(KalturaExternalMediaEntry $entry, $code)
+	{
+		try
+		{
+			$this->client->baseEntry->add($entry, KalturaEntryType::EXTERNAL_MEDIA);
+		}
+		catch(KalturaException $e)
+		{
+			$this->assertEquals($code, $e->getCode());
+		}
 	}
 
 	/* (non-PHPdoc)
