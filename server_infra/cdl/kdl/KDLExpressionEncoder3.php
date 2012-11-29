@@ -250,16 +250,21 @@ $audObj = $target->_audio;
 				$br = self::lookForClosest($audObj->_bitRate, $codecBitrates);
 			else
 				$br = 96;
+			
+			if(isset($audObj->_channels) && $audObj->_channels>0)
+				$audioCodec['Channels']=(string)$audObj->_channels;
+	
+			if(($audioCodec['Channels'] == '1')&&($audioCodec['Codec'] == 'Wma')&&($br > 32))
+				$br = 32;			//Fix a bug in EE3 where WMA mono files don't support br > 32
+				
 			if(isset($audObj->_sampleRate))
 				$sr = self::lookForClosest($audObj->_sampleRate, $codecSampleRates);
 			else
 				$sr = 44100;
 			$audioBitrateElem->ConstantBitrate['Bitrate'] = (string)$br;
+			
 			KDLUtils::AddXMLElement($audioCodec, $audioBitrateElem);
-			if(isset($audObj->_channels) && $audObj->_channels>0)
-				$audioCodec['Channels']=(string)$audObj->_channels;
-//			else
-//				$audioCodec['Channels']="2";
+
             $audioCodec['BitsPerSample']="16";
             $audioCodec['SamplesPerSecond']=(string)$sr;
 		}
