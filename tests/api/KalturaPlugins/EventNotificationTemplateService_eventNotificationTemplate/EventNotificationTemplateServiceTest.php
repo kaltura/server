@@ -47,6 +47,7 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	 * @param int $id source template to clone
 	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate overwrite configuration object
 	 * @param KalturaEventNotificationTemplate $reference
+	 * @return int
 	 * @dataProvider provideData
 	 */
 	public function testCloneAction($id, KalturaEventNotificationTemplate $eventNotificationTemplate = null, KalturaEventNotificationTemplate $reference)
@@ -68,7 +69,7 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	 * Tests eventNotificationTemplate->get action
 	 * @param int $id 
 	 * @param KalturaEventNotificationTemplate $reference
-	 * @depends testCloneAction with data set #1
+	 * @depends testCloneAction with data set #0
 	 * @dataProvider provideData
 	 */
 	public function testGet($id, KalturaEventNotificationTemplate $reference)
@@ -96,7 +97,7 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	 * @param int $id 
 	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate 
 	 * @param KalturaEventNotificationTemplate $reference
-	 * @depends testGet with data set #1
+	 * @depends testGet with data set #0
 	 * @dataProvider provideData
 	 */
 	public function testUpdate($id, KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationTemplate $reference)
@@ -126,7 +127,7 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	 * @param int $id 
 	 * @param KalturaEventNotificationDispatchJobData $data
 	 * @param int $reference
-	 * @depends testUpdate with data set #1
+	 * @depends testUpdate with data set #0
 	 * @dataProvider provideData
 	 */
 	public function testDispatch($id, KalturaEventNotificationDispatchJobData $data, $reference)
@@ -160,7 +161,7 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	/**
 	 * Tests eventNotificationTemplate->delete action
 	 * @param int $id 
-	 * @depends testDispatch with data set #1
+	 * @depends testUpdate with data set #0
 	 * @dataProvider provideData
 	 */
 	public function testDelete($id)
