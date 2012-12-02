@@ -571,10 +571,8 @@ class kFile
 	
 	public static function closeDbConnections()
 	{
-		// close all opened db connetion while we are dumping the file.
-		// this will limit the number of concurrent connections as the dumpFile make take
-		// a long time
-		
+		// close all opened db connetion while we end an action with a long executing operation such as dumping a file.
+		// this will limit the number of concurrent db connections as dumping a file make take a long time
 
 		try
 		{
@@ -582,7 +580,7 @@ class kFile
 		}
 		catch(Exception $e)
 		{
-			$this->logMessage("dumpFile: error closing db $e");
+			$this->logMessage("closeDbConnections: error closing db $e");
 		}
 	}
 	
@@ -590,11 +588,6 @@ class kFile
 	{
 		if(! function_exists('mime_content_type'))
 		{
-			//            ob_start();
-			//            system('file -i -b ' . realpath($file_name));
-			//           $type = ob_get_clean();
-			
-
 			$type = null;
 			exec('file -i -b ' . realpath($file_name), $type);
 			
