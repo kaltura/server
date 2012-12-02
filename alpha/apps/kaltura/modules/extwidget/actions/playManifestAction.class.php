@@ -455,13 +455,13 @@ class playManifestAction extends kalturaAction
 		$oneOnly = false;
 		switch($this->format)
 		{
-			case StorageProfile::PLAY_FORMAT_HTTP:
+			case PlaybackProtocol::HTTP:
 			case "url":
 			case "rtsp":
 				$oneOnly = true;	// single flavor delivery formats
 				break;
 				
-			case StorageProfile::PLAY_FORMAT_SILVER_LIGHT:
+			case PlaybackProtocol::SILVER_LIGHT:
 				$this->initSilverLightManifest();
 				// no break here
 			case "hdnetwork":
@@ -635,7 +635,7 @@ class playManifestAction extends kalturaAction
 		$baseUrl = null;
 		switch($this->format)
 		{
-			case StorageProfile::PLAY_FORMAT_RTMP:
+			case PlaybackProtocol::RTMP:
 				if ($this->entry->getType() == entryType::LIVE_STREAM)
 				{
 					$baseUrl = $this->entry->getStreamUrl();
@@ -646,7 +646,7 @@ class playManifestAction extends kalturaAction
 				}
 				break;
 				
-			case StorageProfile::PLAY_FORMAT_SILVER_LIGHT:
+			case PlaybackProtocol::SILVER_LIGHT:
 				$baseUrl = myPartnerUtils::getIisHost($this->entry->getPartnerId(), $this->protocol);
 				break;				
 		}
@@ -859,7 +859,7 @@ class playManifestAction extends kalturaAction
 
 		$url = $this->urlManager->getAssetUrl($flavorAsset, false);
 		
-		if ($this->format == StorageProfile::PLAY_FORMAT_RTSP)
+		if ($this->format == PlaybackProtocol::RTSP)
 		{
 			// the host was already added by the url manager
 			return $this->getFlavorAssetInfo($url, '', $flavorAsset);
@@ -924,11 +924,11 @@ class playManifestAction extends kalturaAction
 		}
 
 		$originalFormat = $this->format;
-		$this->format = StorageProfile::PLAY_FORMAT_HTTP;	
+		$this->format = PlaybackProtocol::HTTP;	
 		$flavors = $this->buildHttpFlavorsArray();
 		$this->format = $originalFormat;
 
-		if ($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+		if ($this->format == PlaybackProtocol::APPLE_HTTP)
 			$flavors = $this->sortFlavors($flavors);	
 
 		$this->setupUrlManager();
@@ -1260,13 +1260,13 @@ class playManifestAction extends kalturaAction
 	{
 		switch ($format)
 		{
-		case StorageProfile::PLAY_FORMAT_SILVER_LIGHT:
+		case PlaybackProtocol::SILVER_LIGHT:
 			return array(
 				array(assetParams::TAG_SLWEB),
 			);
 			
-		case StorageProfile::PLAY_FORMAT_APPLE_HTTP:
-		case StorageProfile::PLAY_FORMAT_HDS:
+		case PlaybackProtocol::APPLE_HTTP:
+		case PlaybackProtocol::HDS:
 			return array(
 				array(assetParams::TAG_APPLEMBR),
 				array('ipadnew', 'iphonenew'),
@@ -1295,11 +1295,11 @@ class playManifestAction extends kalturaAction
 		
 		$this->protocol = $this->getRequestParameter ( "protocol", null );
 		if(!$this->protocol || $this->protocol === "null")
-			$this->protocol = StorageProfile::PLAY_FORMAT_HTTP;
+			$this->protocol = PlaybackProtocol::HTTP;
 		
 		$this->format = $this->getRequestParameter ( "format" );
 		if(!$this->format)
-			$this->format = StorageProfile::PLAY_FORMAT_HTTP;
+			$this->format = PlaybackProtocol::HTTP;
 			
 		$this->tags = $this->getRequestParameter ( "tags", null );
 		if (!$this->tags)
@@ -1333,7 +1333,7 @@ class playManifestAction extends kalturaAction
 		if ($this->duration && $this->duration < 10 && $this->format == 'hdnetworkmanifest')
 		{
 			// videos shorter than 10 seconds cannot be played with HDS, fall back to HTTP
-			$this->format = StorageProfile::PLAY_FORMAT_HTTP;
+			$this->format = PlaybackProtocol::HTTP;
 			$this->flavorAssets = array(reset($this->flavorAssets));
 		}
 		
@@ -1345,23 +1345,23 @@ class playManifestAction extends kalturaAction
 	
 		switch($this->format)
 		{
-			case StorageProfile::PLAY_FORMAT_HTTP:
+			case PlaybackProtocol::HTTP:
 				$renderer = $this->serveHttp();
 				break;
 				
-			case StorageProfile::PLAY_FORMAT_RTMP:
+			case PlaybackProtocol::RTMP:
 				$renderer = $this->serveRtmp();
 				break;
 				
-			case StorageProfile::PLAY_FORMAT_SILVER_LIGHT:
+			case PlaybackProtocol::SILVER_LIGHT:
 				$renderer = $this->serveSilverLight();
 				break;
 				
-			case StorageProfile::PLAY_FORMAT_APPLE_HTTP:
+			case PlaybackProtocol::APPLE_HTTP:
 				$renderer = $this->serveAppleHttp();
 				break;
 
-			case StorageProfile::PLAY_FORMAT_HDS:
+			case PlaybackProtocol::HDS:
 				$renderer = $this->serveHds();
 				break;
 				
