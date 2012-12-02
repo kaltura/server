@@ -9,8 +9,10 @@ class Infra_Config {
 	/**
 	 * Simplfies getting application configuration values
 	 * Usage: Infra_Config::get('settings.serviceUrl')
+	 * 
+	 * @param string $str
+	 * @return Zend_Config
 	 */
-	  
 	public static function get( $str = null )
 	{
 		if( $str ) {
