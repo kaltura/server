@@ -78,7 +78,7 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 		$addedEntry = $this->kClient->baseEntry->addContent($addedEntry->id, $resource);	
 	}
 
-	private function isEntryMatch(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
+	private function isEntryMatch(KalturaDropFolderContentProcessorJobData $data)
 	{
 		try 
 		{
