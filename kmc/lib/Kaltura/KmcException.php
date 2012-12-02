@@ -21,7 +21,7 @@ class Kaltura_KmcException extends Infra_Exception
 	
 	public static function getErrorCode(Exception $e)
 	{
-		if($e instanceof Kaltura_HostedException)
+		if($e instanceof Kaltura_KmcException)
 			return $e->getPrefix() . ':' . $e->getCode();
 			
 		if($e instanceof Kaltura_Client_Exception)
