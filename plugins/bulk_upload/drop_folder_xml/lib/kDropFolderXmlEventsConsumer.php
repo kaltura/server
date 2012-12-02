@@ -8,8 +8,15 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns) 
 	{
-		$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
-		$this->onXmlDropFolderFileStatusChangedToPending($folder, $object);
+		try 
+		{
+			$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
+			$this->onXmlDropFolderFileStatusChangedToPending($folder, $object);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err('Failed to process objectChangedEvent for drop folder file ['.$object->getDropFolderId().'] - '.$e->getMessage());
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -17,12 +24,19 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns) 
 	{
-		if(	$object instanceof DropFolderFile && $object->getStatus() == DropFolderFileStatus::PENDING && 
-			in_array(DropFolderFilePeer::STATUS, $modifiedColumns))
+		try 
 		{
-			$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
-			if($folder->getFileHandlerType() == DropFolderXmlBulkUploadPlugin::getFileHandlerTypeCoreValue(DropFolderXmlFileHandlerType::XML))
-				return true;
+			if(	$object instanceof DropFolderFile && $object->getStatus() == DropFolderFileStatus::PENDING && 
+				in_array(DropFolderFilePeer::STATUS, $modifiedColumns))
+			{
+				$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
+				if($folder->getFileHandlerType() == DropFolderXmlBulkUploadPlugin::getFileHandlerTypeCoreValue(DropFolderXmlFileHandlerType::XML))
+					return true;
+			}
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err('Failed to process shouldConsumeChangedEvent - '.$e->getMessage());
 		} 		
 		
 		return false;
@@ -33,14 +47,22 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
-		$coreBulkUploadType = kPluginableEnumsManager::apiToCore('BulkUploadType', DropFolderXmlBulkUploadPlugin::getApiValue(DropFolderXmlBulkUploadType::DROP_FOLDER_XML));
-		$isMatch =  $dbBatchJob->getJobType() == BatchJobType::BULKUPLOAD && 
-					$dbBatchJob->getJobSubType() == $coreBulkUploadType &&
-					($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED ||
-					$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY ||
-					$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED ||
-					$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FATAL);
-		return $isMatch;		
+		try 
+		{
+			$coreBulkUploadType = kPluginableEnumsManager::apiToCore('BulkUploadType', DropFolderXmlBulkUploadPlugin::getApiValue(DropFolderXmlBulkUploadType::DROP_FOLDER_XML));
+			$isMatch =  $dbBatchJob->getJobType() == BatchJobType::BULKUPLOAD && 
+						$dbBatchJob->getJobSubType() == $coreBulkUploadType &&
+						($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED ||
+						$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY ||
+						$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED ||
+						$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FATAL);
+			return $isMatch;	
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err('Failed to process shouldConsumeJobStatusEvent - '.$e->getMessage());
+		}
+		return false;	
 	}
 	
 	/* (non-PHPdoc)
@@ -48,22 +70,32 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 	 */
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		$this->onBulkUploadJobStatusUpdated($dbBatchJob);
-		return true;
+		try 
+		{
+			$this->onBulkUploadJobStatusUpdated($dbBatchJob);
+			return true;
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err('Failed to process updatedJob - '.$e->getMessage());
+		}
+		return false;
 	}
 				
 	private function onBulkUploadJobStatusUpdated(BatchJob $dbBatchJob)
 	{
 		$xmlDropFolderFile = DropFolderFilePeer::retrieveByPK($dbBatchJob->getObjectId());
+		KalturaLog::debug('object id '.$dbBatchJob->getObjectId());
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
+			case BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY:
 				$xmlDropFolderFile->setStatus(DropFolderFileStatus::HANDLED);
 				$xmlDropFolderFile->save();
 				break;
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				$relatedFiles = DropFolderFilePeer::retrieveByLeadIdAndStatuses($xmlDropFolderFile->getId(), DropFolderFileStatus::PROCESSING);
+				$relatedFiles = DropFolderFilePeer::retrieveByLeadIdAndStatuses($xmlDropFolderFile->getId(), array(DropFolderFileStatus::PROCESSING));
 				foreach ($relatedFiles as $relatedFile) 
 				{
 					$this->setFileError($relatedFile, DropFolderFileStatus::ERROR_HANDLING, 

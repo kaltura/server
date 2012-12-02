@@ -114,6 +114,11 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
+
+	/**
+	 * @var int
+	 */
+	public $uploadStartDetectedAt;
 	
 	/**
 	 * @var int
@@ -157,6 +162,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	    'lastModificationTime',
 		'createdAt',
 		'updatedAt',
+		'uploadStartDetectedAt',
 		'uploadEndDetectedAt',
 		'importStartedAt',
 		'importEndedAt',
@@ -182,6 +188,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	{
 		parent::fromObject($source_object);
 		
+		$this->uploadStartDetectedAt = $source_object->getUploadStartDetectedAt(null);
 		$this->uploadEndDetectedAt = $source_object->getUploadEndDetectedAt(null);
 		$this->importStartedAt = $source_object->getImportStartedAt(null);
 		$this->importEndedAt = $source_object->getImportEndedAt(null);		

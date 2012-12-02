@@ -70,4 +70,16 @@ class DropFolderFile extends BaseDropFolderFile
 		
 		return parent::preUpdate($con);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseDropFolderFile::preInsert()
+	 */
+	public function preInsert(PropelPDO $con = null) 
+	{
+		$this->setMd5FileName(md5($this->getFileName()));		
+		return parent::preInsert($con);
+	}
+
+	
+	
 } // DropFolderFile

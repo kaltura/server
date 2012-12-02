@@ -203,7 +203,6 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		$pager->pageSize = 500;
 		if($this->taskConfig->params->pageSize)
 			$pager->pageSize = $this->taskConfig->params->pageSize;		
-			
 		return $pager;
 	}
 		
@@ -306,6 +305,8 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			 		break;
 			 	case KalturaDropFolderFileStatus::HANDLED:
 			 		if($dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::AUTO_DELETE)
+			 			break;
+			 		if(time() <= $dropFolderFile->updatedAt + $dropFolder->autoFileDeleteDays*86400)
 			 			break;
 			 	case KalturaDropFolderFileStatus::DELETED:
 			 		$this->purgeFile($folder, $dropFolderFile);

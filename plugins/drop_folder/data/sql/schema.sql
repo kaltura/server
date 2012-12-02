@@ -59,15 +59,17 @@ CREATE TABLE `drop_folder_file`
 	`parsed_flavor` VARCHAR(500),
 	`lead_drop_folder_file_id` INTEGER,
 	`deleted_drop_folder_file_id` INTEGER,
+	`md5_file_name` VARCHAR(32),
 	`entry_id` VARCHAR(20),
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
+	`upload_start_detected_at` DATETIME,
 	`upload_end_detected_at` DATETIME,
 	`import_started_at` DATETIME,
 	`import_ended_at` DATETIME,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	UNIQUE KEY `file_name_in_drop_folder_unique` (`file_name`, `drop_folder_id`, `deleted_drop_folder_file_id`),
+	UNIQUE KEY `file_name_in_drop_folder_unique` (`md5_file_name`, `drop_folder_id`, `deleted_drop_folder_file_id`),
 	KEY `partner_id_index`(`partner_id`),
 	KEY `status_index`(`status`)
 )Type=InnoDB;

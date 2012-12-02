@@ -80,7 +80,7 @@ abstract class KDropFolderFileHandler
 		}
 	}	
 	
-	public function handleFileUploading($dropFolderFileId, $fileSize, $lastModificationTime)
+	public function handleFileUploading($dropFolderFileId, $fileSize, $lastModificationTime, $uploadStartDetectedAt = null)
 	{
 		KalturaLog::debug('Handling drop folder file uploading id ['.$dropFolderFileId.'] fileSize ['.$fileSize.'] last modification time ['.$lastModificationTime.']');
 		try 
@@ -88,6 +88,10 @@ abstract class KDropFolderFileHandler
 			$updateDropFolderFile = new KalturaDropFolderFile();
 			$updateDropFolderFile->fileSize = $fileSize;
 			$updateDropFolderFile->lastModificationTime = $lastModificationTime;
+			if($uploadStartDetectedAt)
+			{
+				$updateDropFolderFile->uploadStartDetectedAt = $uploadStartDetectedAt;
+			}
 			return $this->dropFolderFileService->update($dropFolderFileId, $updateDropFolderFile);
 		}
 		catch (Exception $e) 

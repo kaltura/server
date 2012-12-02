@@ -20,6 +20,7 @@ class KDropFolderContentFileHandler extends KDropFolderFileHandler
     		$newDropFolderFile->fileName = $fileName;
     		$newDropFolderFile->fileSize = $fileSize;
     		$newDropFolderFile->lastModificationTime = $lastModificationTime; 
+    		$newDropFolderFile->uploadStartDetectedAt = time();
     		
     		$parsedSlug = null;
     		$parsedFlavor = null;

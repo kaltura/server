@@ -32,6 +32,8 @@ class KDropFolderXmlFileHandler extends KDropFolderFileHandler
     		$newDropFolderFile->fileName = $fileName;
     		$newDropFolderFile->fileSize = $fileSize;
     		$newDropFolderFile->lastModificationTime = $lastModificationTime;
+    		$uploadStartDetectedAt = time();
+    		$newDropFolderFile->uploadStartDetectedAt = $uploadStartDetectedAt;
 			$this->dropFolderFileService->add($newDropFolderFile);
 		}
 		catch (Exception $e) 
@@ -44,7 +46,7 @@ class KDropFolderXmlFileHandler extends KDropFolderFileHandler
 				{
 					if($existingFile->status == KalturaDropFolderFileStatus::PARSED)
 					{
-						$this->handleFileUploading($existingFile->id, $fileSize, $lastModificationTime);
+						$this->handleFileUploading($existingFile->id, $fileSize, $lastModificationTime, $uploadStartDetectedAt);
 						try 
 						{
 							$this->dropFolderFileService->updateStatus($existingFile->id, KalturaDropFolderFileStatus::UPLOADING);

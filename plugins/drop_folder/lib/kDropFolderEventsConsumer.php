@@ -6,14 +6,17 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns) 
 	{
-		$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
-		if($object->getStatus() == DropFolderFileStatus::PENDING)
+		try 
 		{
-			$this->onContentDropFolderFileStatusChangedToPending($folder, $object);
+			$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
+			if($object->getStatus() == DropFolderFileStatus::PENDING)
+			{
+				$this->onContentDropFolderFileStatusChangedToPending($folder, $object);
+			}
 		}
-		else
+		catch(Exception $e)
 		{
-			$this->onDropFolderFileStatusChangedToHandled($folder, $object);
+			KalturaLog::err('Failed to process objectChangedEvent for drop folder file ['.$object->getDropFolderId().'] - '.$e->getMessage());
 		}
 	}
 
@@ -22,18 +25,21 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns) 
 	{
-		if(	$object instanceof DropFolderFile && in_array(DropFolderFilePeer::STATUS, $modifiedColumns)) 
+		try 
 		{
-			if($object->getStatus() == DropFolderFileStatus::PENDING)
+			if(	$object instanceof DropFolderFile && in_array(DropFolderFilePeer::STATUS, $modifiedColumns)) 
 			{
-				$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
-				if($folder->getFileHandlerType() == DropFolderFileHandlerType::CONTENT)
-					return true;
-			}
-			else if ($object->getStatus() == DropFolderFileStatus::HANDLED) 
-			{
-				return true;
-			}
+				if($object->getStatus() == DropFolderFileStatus::PENDING)
+				{
+					$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
+					if($folder->getFileHandlerType() == DropFolderFileHandlerType::CONTENT)
+						return true;
+				}
+			}			
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err('Failed to process shouldConsumeChangedEvent - '.$e->getMessage());
 		}
 		
 		return false;
@@ -44,12 +50,18 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
-		if($this->isImportMatch($dbBatchJob))
-	    	return true;
-	    else if($this->isContentProcessorMatch($dbBatchJob))
-	    	return true;
-	    else 
-	    	return false;
+		try 
+		{
+			if($this->isImportMatch($dbBatchJob))
+		    	return true;
+		    else if($this->isContentProcessorMatch($dbBatchJob))
+		    	return true;			
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err('Failed to process shouldConsumeJobStatusEvent - '.$e->getMessage());
+		}
+		return false;		
 	}
 	
 	/* (non-PHPdoc)
@@ -57,17 +69,25 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	 */
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		$contentProcessorBatchJobType = DropFolderPlugin::getCoreValue('BatchJobType', DropFolderBatchType::DROP_FOLDER_CONTENT_PROCESSOR);
-		
-		if ($dbBatchJob->getJobType() == BatchJobType::IMPORT)
+		try 
 		{
-			$this->onImportJobStatusUpdated($dbBatchJob, $dbBatchJob->getData());
+			$contentProcessorBatchJobType = DropFolderPlugin::getCoreValue('BatchJobType', DropFolderBatchType::DROP_FOLDER_CONTENT_PROCESSOR);
+			
+			if ($dbBatchJob->getJobType() == BatchJobType::IMPORT)
+			{
+				$this->onImportJobStatusUpdated($dbBatchJob, $dbBatchJob->getData());
+			}
+			else if($dbBatchJob->getJobType() == $contentProcessorBatchJobType)
+			{
+				$this->onContentProcessorJobStatusUpdated($dbBatchJob, $dbBatchJob->getData());
+			}
+			return true;
 		}
-		else if($dbBatchJob->getJobType() == $contentProcessorBatchJobType)
+		catch(Exception $e)
 		{
-			$this->onContentProcessorJobStatusUpdated($dbBatchJob, $dbBatchJob->getData());
+			KalturaLog::err('Failed to process updatedJob - '.$e->getMessage());
 		}
-		return true;
+		return false;					
 	}
 		
 	private function isImportMatch(BatchJob $dbBatchJob)
@@ -275,17 +295,5 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		$file->setErrorDescription($errorDescription);
 		$file->save();				
 		
-	}
-		
-	private function onDropFolderFileStatusChangedToHandled(DropFolder $folder, DropFolderFile $file)
-	{
-		if($folder->getType() == DropFolderType::LOCAL)
-		{
-			if(($folder->getFileDeletePolicy() == DropFolderFileDeletePolicy::AUTO_DELETE && $folder->getAutoFileDeleteDays() == 0))
-			{
-				$file->setStatus(DropFolderFileStatus::PURGED);
-				$file->save();										
-			}			
-		}
-	}
+	}		
 }
