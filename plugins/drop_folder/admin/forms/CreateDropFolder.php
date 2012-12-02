@@ -24,6 +24,8 @@ class Form_CreateDropFolder extends Zend_Form
 			'enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderType',
 			'excludes' => array(
 				Kaltura_Client_DropFolder_Enum_DropFolderType::S3,
+				Kaltura_Client_DropFolder_Enum_DropFolderType::SCP,
+				Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP_CMD,
 			)
 		));
 		

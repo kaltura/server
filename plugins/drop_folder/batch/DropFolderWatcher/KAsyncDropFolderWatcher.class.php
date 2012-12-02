@@ -433,6 +433,8 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		{
 			$updateDropFolder = new KalturaDropFolder();
 			$updateDropFolder->status = KalturaDropFolderStatus::ENABLED;
+			$updateDropFolder->errorCode__null = '';
+			$updateDropFolder->errorDescription__null = '';
 				
 	    	$this->dropFolderPlugin->dropFolder->update($folder->id, $updateDropFolder);
 		}

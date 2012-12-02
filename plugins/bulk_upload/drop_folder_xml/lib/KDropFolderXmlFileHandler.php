@@ -217,7 +217,7 @@ class KDropFolderXmlFileHandler extends KDropFolderFileHandler
 		{
 			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 
 									'Cannot read file or file details at path ['.$this->folder->path.'/'.$dropFolderFile->fileName.']', $e);
-			return null;
+			return array();
 			
 		}
 	}
@@ -240,7 +240,7 @@ class KDropFolderXmlFileHandler extends KDropFolderFileHandler
 		{
 			KalturaLog::err('Failed to get drop folder files by lead id with name ['.$leadFileId.'] - '.$e->getMessage());
 		}
-		return null;
+		return array();
 		
 	}
 }

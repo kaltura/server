@@ -113,6 +113,9 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	private function onImportJobStatusUpdated(BatchJob $dbBatchJob, kDropFolderImportJobData $data)
 	{
 		$dropFolderFile = DropFolderFilePeer::retrieveByPK($data->getDropFolderFileId());
+		if(!$dropFolderFile)
+			return;
+			
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
@@ -130,6 +133,9 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	{
 		$idsArray = explode(',', $data->getDropFolderFileIds());
 		$dropFolderFiles = DropFolderFilePeer::retrieveByPKs($idsArray);
+		if(!$dropFolderFiles)
+			return;
+			
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_RETRY:
