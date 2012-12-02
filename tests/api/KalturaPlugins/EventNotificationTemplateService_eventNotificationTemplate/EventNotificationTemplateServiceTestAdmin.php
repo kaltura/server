@@ -5,13 +5,15 @@ require_once(dirname(__FILE__) . '/../../../bootstrap.php');
 /**
  * eventNotificationTemplate service test case.
  */
-class EventNotificationTemplateServiceAdminTest extends EventNotificationTemplateServiceTestBase
+class EventNotificationTemplateServiceAdminTest extends KalturaApiTestCase
 {
 	/**
-	 * Tests eventNotificationTemplate->cloneAction action
+	 * Tests eventNotificationTemplate->add action for admin partner
 	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate overwrite configuration object
 	 * @param int $impersonatedPartnerId
 	 * @param KalturaEventNotificationTemplate $reference
+	 * 
+	 * @return int
 	 * @dataProvider provideData
 	 */	
 	public function testAdminAdd($eventNotificationTemplate, $impersonatedPartnerId , $reference)
@@ -33,16 +35,89 @@ class EventNotificationTemplateServiceAdminTest extends EventNotificationTemplat
 	}
 	
 	/**
-	 * Tests eventNotificationTemplate->add action
-	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate 
+	 * Validates testAdd results
+	 * Hook to be overriden by the extending class
+	 * 
+	 * @param KalturaEventNotificationTemplate $resultObject
+	 */
+	protected function validateAdd(KalturaEventNotificationTemplate $resultObject){}
+	
+	/**
+	 * Tests eventNotificationTemplate->get action for admin partner
+	 * @param int $id
+	 * @param int $impersonatedPartnerId
 	 * @param KalturaEventNotificationTemplate $reference
-	 * @return KalturaEventNotificationTemplate
+	 * @return int
+	 * @depends testAdminAdd with data set #1
 	 * @dataProvider provideData
 	 */
-	public function testAdd(KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationTemplate $reference)
+	public function testAdminGet($id, $impersonatedPartnerId, KalturaEventNotificationTemplate $reference)
 	{
+		$this->impersonate($impersonatedPartnerId);
+		$resultObject = $this->client->eventNotificationTemplate->get($id);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
+		else
+			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		$this->validateGet($resultObject);
 		
+		return $resultObject->id;
 	}
+	
+	/**
+	 * Validates testGet results
+	 * Hook to be overriden by the extending class
+	 * 
+	 * @param KalturaEventNotificationTemplate $resultObject
+	 */
+	protected function validateGet(KalturaEventNotificationTemplate $resultObject){}
+	
+	/**
+	 * Tests eventNotificationTemplate->update action for admin partner
+	 * @param int $id
+	 * @param KalturaEventNotificationTemplate $eventNotificationTemplate
+	 * @param int $impersonatedPartnerId
+	 * @param KalturaEventNotificationTemplate $reference
+	 * @return int
+	 * @depends testAdminGet with data set #0
+	 * @dataProvider provideData
+	 */
+	public function testAdminUpdate ($id, KalturaEventNotificationTemplate $eventNotificationTemplate, $impersonatedPartnerId, KalturaEventNotificationTemplate $reference)
+	{
+		$this->impersonate($impersonatedPartnerId);
+		$resultObject = $this->client->eventNotificationTemplate->update($id, $eventNotificationTemplate);
+		if(method_exists($this, 'assertInstanceOf'))
+			$this->assertInstanceOf('KalturaEventNotificationTemplate', $resultObject);
+		else
+			$this->assertType('KalturaEventNotificationTemplate', $resultObject);
+		$this->assertAPIObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
+		$this->validateUpdate($resultObject);
+		
+		return $resultObject->id;
+	}
+	
+	/**
+	 * Validates testUpdate results
+	 * Hook to be overriden by the extending class
+	 * 
+	 * @param KalturaEventNotificationTemplate $resultObject
+	 */
+	protected function validateUpdate(KalturaEventNotificationTemplate $resultObject){}
+	
+	/**
+	 * Tests eventNotificationTemplate->delete action
+	 * @param int $id 
+	 * @param int $impersonatedPartnerId
+	 * @depends testAdminGet with data set #0
+	 * @dataProvider provideData
+	 */
+	public function testAdminDelete($id, $impersonatedPartnerId)
+	{
+		$this->impersonate($impersonatedPartnerId);
+		$resultObject = $this->client->eventNotificationTemplate->delete($id);
+	}
+	
 
 	/**
 	 * Tests eventNotificationTemplate->listbypartner action
