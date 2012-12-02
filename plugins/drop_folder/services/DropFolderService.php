@@ -143,7 +143,8 @@ class DropFolderService extends KalturaBaseService
 		$dropFolder->validatePropertyMinValue('fileSizeCheckInterval', 0, true);
 		$dropFolder->validatePropertyMinValue('autoFileDeleteDays', 0, true);
 		
-		if (!is_null($dropFolder->path) && $dropFolder->path != $dbDropFolder->getPath()) {
+		if (!is_null($dropFolder->path) && $dropFolder->path != $dbDropFolder->getPath() && $dropFolder->type == KalturaDropFolderType::LOCAL) 
+		{
 			$existingDropFolder = DropFolderPeer::retrieveByPathDefaultFilter($dropFolder->path);
 			if ($existingDropFolder) {
 				throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_ALREADY_EXISTS, $dropFolder->path);
