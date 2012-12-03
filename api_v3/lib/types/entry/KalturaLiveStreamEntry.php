@@ -134,6 +134,9 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 		$bitrates = $source_object->getStreamBitrates();
 		if(is_array($bitrates))
 			$this->bitrates = KalturaLiveStreamBitrateArray::fromLiveStreamBitrateArray($bitrates);
+		$protocolToUrlMap = $source_object->getProtocolToStreamMap();
+		if (is_array($protocolToUrlMap))
+			$this->protocolToStreamMap = KalturaLiveStreamKeyValueArray::fromKeyValueArray($protocolToUrlMap);
 	}
 	
 	public function toObject ( $dbObject = null , $props_to_skip = array() )
@@ -142,6 +145,9 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 		
 		if($this->bitrates)
 			$dbObject->setStreamBitrates($this->bitrates->toArray());
+			
+		if ($this->protocolToStreamMap)
+			$dbObject->setProtocolToStreamMap($this->protocolToStreamMap->toArray());
 			
 		return $dbObject;
 	}
