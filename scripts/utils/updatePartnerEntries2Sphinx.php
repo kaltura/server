@@ -17,6 +17,7 @@ KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/scripts/' . b
 KAutoloader::register();
 
 error_reporting ( E_ALL );
+kCurrentContext::$ps_vesion = 'ps3';
 
 $availModes = array('gensqls', 'execute');
 
@@ -66,7 +67,7 @@ for (;;)
 		if ($mode == 'execute')
 		{
 			$sphinx->saveToSphinx($item, false, true);
-			echo $item->getId() . "Saved\n";
+			echo $item->getId() . " Saved\n";
 		}
 		else
 		{
