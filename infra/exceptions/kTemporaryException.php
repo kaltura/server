@@ -8,6 +8,7 @@
  */
 class kTemporaryException extends kException
 {
+	public $resetJobExecutionAttempts = false;
 	
 	public function __construct($message, $code = 0)
 	{

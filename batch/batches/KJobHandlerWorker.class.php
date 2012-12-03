@@ -76,6 +76,10 @@ abstract class KJobHandlerWorker extends KBatchBase
 			catch(kTemporaryException $ktex)
 			{
 				$this->unimpersonate();
+				if($ktex->resetJobExecutionAttempts)
+				{
+					$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
+				}
 				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ktex->getCode(), "Error: " . $ktex->getMessage(), KalturaBatchJobStatus::RETRY);
 			}
 			catch(KalturaClientException $kcex)

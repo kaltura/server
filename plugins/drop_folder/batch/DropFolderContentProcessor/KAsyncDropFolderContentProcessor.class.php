@@ -119,7 +119,14 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 		{
 			$matchedEntry = $this->isEntryMatch($data);
 			if(!$matchedEntry)
-				throw new kTemporaryException('No matching entry found');
+			{
+				$e = new kTemporaryException('No matching entry found');
+				if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) >= time())	
+				{
+					$e->resetJobExecutionAttempts = true;
+				}	
+				throw $e;		
+			}
 		}	
 		$resource = $this->getIngestionResource($job, $data);	
 		$updatedEntry = $this->kClient->baseEntry->updateContent($matchedEntry->id, $resource, $data->conversionProfileId);
