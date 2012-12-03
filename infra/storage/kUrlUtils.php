@@ -24,10 +24,11 @@ class kUrlUtils
 	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);  
 	    $data = curl_exec($ch);  
 	    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);  
+	    $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 	    curl_close($ch);  
 	    if($data && $httpcode>=200 && $httpcode<300)
 	    {
-	        return is_string($data) ? $data : true;
+	        return $contentType == 'text/html' ? $data : true;
 	    }  
 	    else 
 	        return false;  
@@ -39,7 +40,7 @@ class kUrlUtils
 		if(is_bool($data))
 			return $data;
 		
-		$lines = explode("\n", $data);
+		$lines = explode("\n", trim($data));
 		if(!preg_match("/http.*/", array_pop($lines), $matches))
 			return false;
 			
