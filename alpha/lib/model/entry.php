@@ -3097,4 +3097,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 	    $this->putInCustomData("url_manager", $v);
 	}
+	
+	public function setProtocolToStreamMap (array $v)
+	{
+		$this->putInCustomData('protocol_to_stream_map', $v);
+	}
+	
+	public function getProtocolToStreamMap ()
+	{
+		$this->getFromCustomData('protocol_to_stream_map', null, array());
+	}
 }
