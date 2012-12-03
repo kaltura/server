@@ -28,7 +28,7 @@ class kUrlUtils
 	    curl_close($ch);  
 	    if($data && $httpcode>=200 && $httpcode<300)
 	    {
-	        return $contentType == 'text/html' ? $data : true;
+	        return $contentType == 'application/vnd.apple.mpegurl' ? $data : true;
 	    }  
 	    else 
 	        return false;  
