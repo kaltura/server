@@ -87,6 +87,12 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	 */
 	public $urlManager;
 	
+	/**
+	 * Array of key value protocol->live stream url objects
+	 * @var KalturaLiveStreamKeyValueArray
+	 */
+	public $protocolToStreamMap;
+	
 	
 	
 	private static $map_between_objects = array
@@ -103,6 +109,7 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	    "dvrStatus",
 	    "dvrWindow",
 	    "urlManager",
+		"protocolToStreamMap",
 	);
 
 	public function __construct()
