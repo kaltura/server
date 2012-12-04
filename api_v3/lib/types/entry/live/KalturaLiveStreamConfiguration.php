@@ -27,14 +27,14 @@ class KalturaLiveStreamConfiguration extends KalturaObject
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
 	}
 	
-	public function toObject($dbObject, $propsToSkip)
+	public function toObject($dbObject = null, $propsToSkip = null)
 	{
 		if (!$dbObject)
 		{
 			$dbObject = new KLiveStreamConfiguration();
 		}
 		
-		parent::toObject($dbObject, $propsToSkip);
+		return parent::toObject($dbObject, $propsToSkip);
 	}
 	
 	public function fromObject($dbObject)
@@ -42,6 +42,8 @@ class KalturaLiveStreamConfiguration extends KalturaObject
 		/* @var $dbObject KLiveStreamConfiguration */
 		$this->protocol = $dbObject->getProtocol();
 		$this->url = $dbObject->getUrl();
+		
+		parent::fromObject($source_object);
 	}
 	
 }
