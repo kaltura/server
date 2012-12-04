@@ -1,5 +1,4 @@
 /* Unique Known Users |  Unique Videos |  Plays | Minutes Viewed | Avg. View time | player impressions  | Impression to play ratio */
-SELECT
 SELECT COUNT(DISTINCT user_id) unique_known_users,
 COUNT(DISTINCT entry_id) unique_videos,
 SUM(count_plays) count_plays,
