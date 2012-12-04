@@ -1379,7 +1379,7 @@ class kJobsManager
 	 * @param int $subType
 	 * @return BatchJob
 	 */
-	public static function addJob(BatchJob $batchJob, $data, $type, $subType = null)
+	public static function addJob(BatchJob $batchJob, kJobData $data, $type, $subType = null)
 	{
 		$batchJob->setJobType($type);
 		$batchJob->setJobSubType($subType);
@@ -1481,6 +1481,6 @@ class kJobsManager
     			throw new APIException(APIErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $jobData->getConversionProfileId());
     	}
 
-		return kJobsManager::addJob($job, $jobData, BatchJobType::BULKUPLOAD, kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadType));
+		return kJobsManager::addJob($job, $jobData, BatchJobType::BULKUPLOAD, $bulkUploadType);
 	}
 }
