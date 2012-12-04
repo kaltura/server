@@ -252,17 +252,44 @@ class LiveStreamService extends KalturaEntryService
 					return $this->hlsUrlExistsRecursive($liveStreamEntry->getHlsStreamUrl());
 					break;
 				case KalturaPlaybackProtocol::HDS:
-					$protocolMap = $liveStreamEntry->getProtocolToStreamMap();
-					if (isset($protocolMap[KalturaPlaybackProtocol::HDS]))
+					$protocolMap = $liveStreamEntry->getLiveStreamConfigurations();
+					$config = $this->returnSingleItemByPropertyValue($protocolMap, "protocol", KalturaPlaybackProtocol::HDS);
+					if ($config)
 					{
-						KalturaLog::info('Determining status of live stream URL [' .$protocolMap[KalturaPlaybackProtocol::HDS] . ']');
-						return $this->hdsUrlExists($protocolMap[KalturaPlaybackProtocol::HDS]);
+						KalturaLog::info('Determining status of live stream URL [' .$config->getUrl() . ']');
+						return $this->hdsUrlExists($config->getUrl());
 					}
 					break;
 			}
 		}
 		
 		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
+	}
+	
+	/**
+	 * Function extracts the first item in the array where the property $propertyName has the value $propertyValue
+	 * @param array $array
+	 * @param string $propertyName
+	 * @param string $propertyValue
+	 * @return KalturaLiveStreamConfiguration
+	 */
+	private function returnSingleItemByPropertyValue (array $array, $propertyName, $propertyValue)
+	{
+		foreach ($array as $config)
+		{
+			/* @var $config KLiveStreamConfiguration */
+			if (property_exists("KalturaLiveStreamConfiguration", $propertyName))
+			{
+				$getter = "get{$propertyName}";
+				if ($config->$getter() == $propertyValue)
+				{
+					return $config;
+				}
+			}
+				
+		}
+
+		return null;
 	}
 	
 	/**
