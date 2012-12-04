@@ -3098,13 +3098,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	    $this->putInCustomData("url_manager", $v);
 	}
 	
-	public function setProtocolToStreamMap (array $v)
+	public function setLiveStreamConfigurations (array $v)
 	{
-		$this->putInCustomData('protocol_to_stream_map', $v);
+		$this->putInCustomData('live_stream_configurations', $v);
 	}
 	
-	public function getProtocolToStreamMap ()
+	public function getLiveStreamConfigurations ()
 	{
-		return $this->getFromCustomData('protocol_to_stream_map', null, array());
+		return $this->getFromCustomData('live_stream_configurations', null, array());
 	}
 }

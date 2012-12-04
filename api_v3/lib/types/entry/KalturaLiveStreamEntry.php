@@ -91,7 +91,7 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	 * Array of key value protocol->live stream url objects
 	 * @var KalturaLiveStreamConfigurationArray
 	 */
-	public $protocolToStreamMap;
+	public $liveStreamConfigurations;
 	
 	
 	
@@ -109,7 +109,7 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	    "dvrStatus",
 	    "dvrWindow",
 	    "urlManager",
-		"protocolToStreamMap",
+		"liveStreamConfigurations",
 	);
 
 	public function __construct()
@@ -134,9 +134,9 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 		$bitrates = $dbObject->getStreamBitrates();
 		if(is_array($bitrates))
 			$this->bitrates = KalturaLiveStreamBitrateArray::fromLiveStreamBitrateArray($bitrates);
-		$protocolToUrlMap = $dbObject->getProtocolToStreamMap();
-		if (is_array($protocolToUrlMap))
-			$this->protocolToStreamMap = KalturaLiveStreamConfigurationArray::fromDbArray($dbObject->getProtocolToStreamMap());
+		$liveStreamConfigurations = $dbObject->getLiveStreamConfigurations();
+		if (is_array(liveStreamConfigurations))
+			$this->liveStreamConfigurations = KalturaLiveStreamConfigurationArray::fromDbArray($liveStreamConfigurations);
 	}
 	
 	public function toObject ( $dbObject = null , $props_to_skip = array() )
@@ -146,8 +146,8 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 		if($this->bitrates)
 			$dbObject->setStreamBitrates($this->bitrates->toArray());
 			
-		if ($this->protocolToStreamMap)
-			$dbObject->setProtocolToStreamMap($this->protocolToStreamMap->toObjectsArray());
+		if ($this->liveStreamConfigurations)
+			$dbObject->setLiveStreamConfigurations($this->liveStreamConfigurations->toObjectsArray());
 			
 		return $dbObject;
 	}
