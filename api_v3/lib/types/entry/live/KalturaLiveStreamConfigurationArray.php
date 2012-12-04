@@ -6,12 +6,12 @@
  */
 class KalturaLiveStreamConfigurationArray extends KalturaTypedArray
 {
-	public static function fromDbArray(array $pairs = null)
+	public static function fromDbArray(array $dbArray = null)
 	{
 		$array = new KalturaLiveStreamConfigurationArray();
-		if($array && is_array($array))
+		if($dbArray && is_array($dbArray))
 		{
-			foreach($array as $object)
+			foreach($dbArray as $object)
 			{
 				/* @var $object KLiveStreamConfiguration */
 				$configObject = new KalturaLiveStreamConfiguration();
