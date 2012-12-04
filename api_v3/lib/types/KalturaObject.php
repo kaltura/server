@@ -172,7 +172,7 @@ abstract class KalturaObject
 			if (is_null($value)) 
 				continue;
 				
-			if (in_array($this_prop, $props_to_skip)) 
+			if ($props_to_skip && is_array($props_to_skip) && in_array($this_prop, $props_to_skip)) 
 				continue;
 				
 			$propertyInfo = $typeReflector->getProperty($this_prop);
@@ -476,7 +476,7 @@ abstract class KalturaObject
 			/* @var $property KalturaPropertyInfo */
 			$propertyName = $property->getName();
 			
-			if (in_array($propertyName, $propertiesToSkip)) 
+			if ($propertiesToSkip && is_array($propertiesToSkip) && in_array($propertyName, $propertiesToSkip)) 
 				continue;
 			
 			if ($this->$propertyName !== null)
