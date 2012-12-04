@@ -6,6 +6,11 @@
  */
 class KalturaLiveStreamConfigurationArray extends KalturaTypedArray
 {
+	/**
+	 * Returns API array object from regular array of database objects.
+	 * @param array $dbArray
+	 * @return KalturaLiveStreamConfiguration
+	 */
 	public static function fromDbArray(array $dbArray = null)
 	{
 		$array = new KalturaLiveStreamConfigurationArray();
@@ -26,30 +31,9 @@ class KalturaLiveStreamConfigurationArray extends KalturaTypedArray
 		return parent::__construct("KalturaLiveStreamConfiguration");
 	}
 	
-	/**
-	 * Function extracts the first item in the array where the property $propertyName has the value $propertyValue
-	 * @param string $propertyName
-	 * @param string $propertyValue
-	 * @return KalturaLiveStreamConfiguration
+	/* (non-PHPdoc)
+	 * @see KalturaTypedArray::toObjectsArray()
 	 */
-	public function returnSingleItemByPropertyValue ($propertyName, $propertyValue)
-	{
-		foreach ($this->toArray() as $config)
-		{
-			/* @var $config KalturaLiveStreamConfiguration */
-			if (property_exists("KalturaLiveStreamConfiguration", $propertyName))
-			{
-				if ($config->$propertyName == $propertyValue)
-				{
-					return $config;
-				}
-			}
-				
-		}
-
-		return null;
-	}
-	
 	public function toObjectsArray()
 	{
 		$objects = $this->toArray();
