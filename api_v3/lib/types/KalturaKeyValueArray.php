@@ -28,8 +28,11 @@ class KalturaKeyValueArray extends KalturaTypedArray
 		return $pairsArray;
 	}
 	
-	public function __construct()
+	public function __construct($className = null)
 	{
+		if ($className)
+			return parent::__construct($className);
+		
 		return parent::__construct("KalturaKeyValue");
 	}
 }
