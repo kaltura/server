@@ -832,6 +832,14 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	{
 		return self::$map[self::PERMISSION_NAMES_ARRAY];
 	}
+	
+	/**
+	 * @return boolean
+	 */
+	public static function isPermitted($permissionName)
+	{
+		return isset(self::$map[self::PERMISSION_NAMES_ARRAY][$permissionName]);
+	}
 		
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
