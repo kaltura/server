@@ -3105,6 +3105,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function getProtocolToStreamMap ()
 	{
-		$this->getFromCustomData('protocol_to_stream_map', null, array());
+		return $this->getFromCustomData('protocol_to_stream_map', null, array());
 	}
 }
