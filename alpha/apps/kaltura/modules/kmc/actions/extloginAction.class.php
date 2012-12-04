@@ -110,10 +110,11 @@ class extloginAction extends kalturaAction
 		$domain = null;
 		$force_ssl = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ENFORCE_HTTPS, $partner_id);
 		$secure = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' && $force_ssl) ? true : false;
+		$http_only = true;
 		
-		$this->getResponse()->setCookie("pid", $partner_id, $exp, $path, $domain, $secure);
-		$this->getResponse()->setCookie("subpid", $subp_id, $exp, $path, $domain, $secure);
-		$this->getResponse()->setCookie("kmcks", $ks, $exp, $path, $domain, $secure);
+		$this->getResponse()->setCookie("pid", $partner_id, $exp, $path, $domain, $secure, $http_only);
+		$this->getResponse()->setCookie("subpid", $subp_id, $exp, $path, $domain, $secure, $http_only);
+		$this->getResponse()->setCookie("kmcks", $ks, $exp, $path, $domain, $secure, $http_only);
 
 		$redirect_url =  ($force_ssl) ? 'https' : 'http';
 		$redirect_url .= '://' . $_SERVER["HTTP_HOST"] . '/index.php/kmc/kmc2';

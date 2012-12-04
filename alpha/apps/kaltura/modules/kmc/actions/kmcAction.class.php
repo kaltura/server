@@ -15,6 +15,11 @@ class kmcAction extends kalturaAction
 	{
 		// Prevent the page fron being embeded in an iframe
 		header( 'X-Frame-Options: DENY' );
+
+		// Check if user already logged in and redirect to kmc2
+		if( $this->getRequest()->getCookie('kmcks') ) {
+			$this->redirect('kmc/kmc2');
+		}
 		
 		$this->beta = $this->getRequestParameter( "beta" );
 		$this->kmc_login_version 	= kConf::get('kmc_login_version');
