@@ -799,12 +799,30 @@ class BaseEntryService extends KalturaEntryService
 		}
 		else
 		{
-			$result->streamerType = $this->getPartner()->getStreamerType();
-			if (!$result->streamerType)
-				$result->streamerType = PlaybackProtocol::HTTP;
-			$result->mediaProtocol = $this->getPartner()->getMediaProtocol();
-			if (!$result->mediaProtocol)
-				$result->mediaProtocol = PlaybackProtocol::HTTP;
+			if ($dbEntry->getType() == entryType::LIVE_STREAM)
+			{
+				$availableConfigurations = $dbEntry->getLiveStreamConfigurations();
+				foreach ($availableConfigurations as $config)
+				{
+					/* @var $config KLiveStreamConfiguration */
+					if ($config->getProtocol() == PlaybackProtocol::HDS)
+					{
+						$result->streamerType = KalturaPlaybackProtocol::HDS;
+					}
+				}
+				
+				if (!$result->streamerType)
+					$result->streamerType = KalturaPlaybackProtocol::RTMP;
+			}
+			else 
+			{
+				$result->streamerType = $this->getPartner()->getStreamerType();
+				if (!$result->streamerType)
+					$result->streamerType = PlaybackProtocol::HTTP;
+				$result->mediaProtocol = $this->getPartner()->getMediaProtocol();
+				if (!$result->mediaProtocol)
+					$result->mediaProtocol = PlaybackProtocol::HTTP;
+			}
 		}		
 		return $result;
 	}
