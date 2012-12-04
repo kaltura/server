@@ -30,9 +30,18 @@ class KalturaKeyValueArray extends KalturaTypedArray
 	
 	public function __construct($className = null)
 	{
-		if ($className)
-			return parent::__construct($className);
-		
 		return parent::__construct("KalturaKeyValue");
+	}
+	
+	public function toObjectsArray()
+	{
+		$ret = array();
+		foreach ($this->toArray() as $keyValueObject)
+		{
+			/* @var $keyValueObject KalturaKeyValue */
+			$ret[$keyValueObject->key] = $keyValueObject->value;
+		}
+		
+		return $ret;
 	}
 }
