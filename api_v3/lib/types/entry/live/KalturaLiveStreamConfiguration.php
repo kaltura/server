@@ -36,14 +36,6 @@ class KalturaLiveStreamConfiguration extends KalturaObject
 		
 		return parent::toObject($dbObject, $propsToSkip);
 	}
-	
-	public function fromObject($dbObject)
-	{
-		/* @var $dbObject KLiveStreamConfiguration */
-		$this->protocol = $dbObject->getProtocol();
-		$this->url = $dbObject->getUrl();
-		
-		parent::fromObject($source_object);
-	}
+
 	
 }
