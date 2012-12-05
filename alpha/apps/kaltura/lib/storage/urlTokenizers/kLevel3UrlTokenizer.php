@@ -27,18 +27,24 @@ class kLevel3UrlTokenizer extends kUrlTokenizer
 	public $window = 0;
 	
 	/**
+	 * @var string
+	 */
+	public $expiryName = false;
+	
+	/**
 	 * @param string $name
 	 * @param string $key
 	 * @param string $gen
 	 * @param bool $includeExtension
 	 * @param int $window
 	 */
-	public function __construct($name, $key, $gen, $includeExtension, $window = 0)
+	public function __construct($name, $key, $gen, $includeExtension, $expiryName = null, $window = 0)
 	{
 		$this->name = $name;
 		$this->key = $key;
 		$this->gen = $gen;
 		$this->includeExtension = $includeExtension;
+		$this->expiryName = $expiryName;
 		$this->window = $window;
 	}
 	
@@ -86,17 +92,28 @@ class kLevel3UrlTokenizer extends kUrlTokenizer
 	
 	/**
 	 * @param string $url
+	 * @param string $param
+	 * @return string
+	 */
+	protected function addQueryStringParameter($url, $param)
+	{
+		$parsedUrl = parse_url($url);
+		if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
+			$url .= '&';
+		else
+			$url .= '?';
+		$url .= $param;
+		return $url;
+	}
+	
+	/**
+	 * @param string $url
 	 * @param string $baseUrl
 	 * @param string $fileExtension
 	 * @return string
 	 */
 	public function tokenizeUrl($url, $baseUrl = null, $fileExtension = null)
 	{
-		if ($this->window)
-		{
-			// set expire time in GMT hence the date("Z") offset
-			$url .= "&nva=" . strftime("%Y%m%d%H%M%S", time() - date("Z") + $this->window);
-		}
 		$url = preg_replace('/([^:])\/\//','$1/', $url);
 		$fullUrl = trim(str_replace('mp4:', '', $url), '/');
 		if (!is_null($baseUrl)) 
@@ -108,18 +125,22 @@ class kLevel3UrlTokenizer extends kUrlTokenizer
 		{
 			$fullUrl .= '.' . $fileExtension;
 		}
+
+		if ($this->window)
+		{
+			$expiry = "{$this->expiryName}=" . strftime("%Y%m%d%H%M%S", time() - date("Z") + $this->window);
+			$url = $this->addQueryStringParameter($url, $expiry);
+			$fullUrl = $this->addQueryStringParameter($fullUrl, $expiry);
+		}
 		
 		$parsedUrl = parse_url($fullUrl);
 		$pathString = '/'.ltrim($parsedUrl['path'],'/');
-
+		if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
+			$pathString .= '?'.$parsedUrl['query'];
+		
 		$token = substr(self::hmac('sha1', $this->key, $pathString), 0, 20);
 		
-		if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0) {
-			$url .= "&{$this->name}={$this->gen}".$token;
-		}
-		else {
-			$url .= "?{$this->name}={$this->gen}".$token;
-		}
+		$url = $this->addQueryStringParameter($url, "{$this->name}={$this->gen}".$token);
 		return $url;
 	}	
 }

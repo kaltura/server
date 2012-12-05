@@ -16,20 +16,23 @@ class kLevel3UrlManager extends kUrlManager
    		    $name = isset($this->params['http_auth_param_name']) ? $this->params['http_auth_param_name'] : "h";
 			$key = isset($this->params['http_auth_key']) ? $this->params['http_auth_key'] : false;
 			$gen = isset($this->params['http_auth_gen']) ? $this->params['http_auth_gen'] : false;
-			$window = 0;
+   		    $expiryName = isset($this->params['http_auth_expiry_name']) ? $this->params['http_auth_expiry_name'] : "etime";
+			$window = isset($this->params['http_auth_window']) ? $this->params['http_auth_window'] : 0;
 			$entry = entryPeer::retrieveByPK($this->entryId);
 			if ($entry && $entry->getSecurityPolicy())
 				$window = 30;
 			if ($name && $key !== false && $gen !== false)
-				return new kLevel3UrlTokenizer($name, $key, $gen, false, $window);
+				return new kLevel3UrlTokenizer($name, $key, $gen, false, $expiryName, $window);
 			break;
 
 		case PlaybackProtocol::RTMP:
 		    $name = isset($this->params['rtmp_auth_param_name']) ? $this->params['rtmp_auth_param_name'] : "h";
 		    $key = isset($this->params['rtmp_auth_key']) ? $this->params['rtmp_auth_key'] : false;
 		    $gen = isset($this->params['rtmp_auth_gen']) ? $this->params['rtmp_auth_gen'] : false;
-			if ($name && $key !== false && $gen !== false)
-				return new kLevel3UrlTokenizer($name, $key, $gen, true);
+   		    $expiryName = isset($this->params['rtmp_auth_expiry_name']) ? $this->params['rtmp_auth_expiry_name'] : "etime";
+		    $window = isset($this->params['rtmp_auth_window']) ? $this->params['rtmp_auth_window'] : 0;
+		    if ($name && $key !== false && $gen !== false)
+				return new kLevel3UrlTokenizer($name, $key, $gen, true, $expiryName, $window);
 			break;
 		}
 		return null;
