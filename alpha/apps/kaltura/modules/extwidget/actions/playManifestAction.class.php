@@ -1173,8 +1173,8 @@ class playManifestAction extends kalturaAction
 				if ($liveStreamConfig->getProtocol() == PlaybackProtocol::HDS)
 					$hdsUrl = $liveStreamConfig->getUrl();
 			}
-			$renderer = new kRedirectManifestRenderer();
-			$renderer->flavor = $this->getFlavorAssetInfo($hdsUrl);
+			$renderer = new kF4MManifestRenderer();
+			$renderer->flavors[]= $this->getFlavorAssetInfo($hdsUrl);
 			return $renderer;
 		}
 		
