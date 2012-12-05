@@ -1165,6 +1165,19 @@ class playManifestAction extends kalturaAction
 	 */
 	private function serveHds()
 	{
+		if ($this->entry->getType() == entryType::LIVE_STREAM)
+		{
+			foreach ($this->entry->getLiveStreamConfigurations() as $liveStreamConfig)
+			{
+				/* @var $liveStreamConfig KLiveStreamConfiguration */
+				if ($liveStreamConfig->getProtocol() == PlaybackProtocol::HDS)
+					$hdsUrl = $liveStreamConfig->getUrl();
+			}
+			$renderer = new kRedirectManifestRenderer();
+			$renderer->flavor = $this->getFlavorAssetInfo($hdsUrl);
+			return $renderer;
+		}
+		
 		$flavors = $this->buildHttpFlavorsArray();
 		
 		$flavors = $this->sortFlavors($flavors);
