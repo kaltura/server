@@ -13,7 +13,7 @@ abstract class KalturaConfigurableDistributionProfile extends KalturaDistributio
 	public $fieldConfigArray;
 	
 	/**
-	 * @var KalturaStringArray
+	 * @var KalturaExtendingItemMrssParameterArray
 	 */
 	public $itemXpathsToExtend;
 	
@@ -50,9 +50,7 @@ abstract class KalturaConfigurableDistributionProfile extends KalturaDistributio
 		
 		if (!is_null($this->itemXpathsToExtend))
 		{
-			$itemXpathsToExtendArray = array();
-			foreach($this->itemXpathsToExtend as $stringObj)
-				$itemXpathsToExtendArray[] = $stringObj->value;
+			$itemXpathsToExtendArray = $this->itemXpathsToExtend->toObjectsArray();
 				
 			$dbObject->setItemXpathsToExtend($itemXpathsToExtendArray);
 		}
@@ -65,7 +63,7 @@ abstract class KalturaConfigurableDistributionProfile extends KalturaDistributio
 		parent::fromObject($source_object);
 		
 		$this->fieldConfigArray = KalturaDistributionFieldConfigArray::fromDbArray($source_object->getFieldConfigArray());
-		$this->itemXpathsToExtend = KalturaStringArray::fromStringArray($source_object->getItemXpathsToExtend());
+		$this->itemXpathsToExtend = KalturaExtendingItemMrssParameterArray::fromExtendingItemMrssParameterArray($source_object->getItemXpathsToExtend());
 	}
 	
 	

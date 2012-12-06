@@ -139,4 +139,12 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 		return null;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IKalturaMrssContributor::getObjectFeatureType()
+	 */
+	public function getObjectFeatureType()
+	{
+		return ContentDistributionPlugin::getObjectFeatureTypeCoreValue(ContentDistributionObjectFeatureType::CONTENT_DISTRIBUTION);
+	}
+	
 }
