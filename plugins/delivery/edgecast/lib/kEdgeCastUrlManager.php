@@ -15,7 +15,7 @@ class kEdgeCastUrlManager extends kUrlManager
 		$url = str_replace($flavorIdStr, '', $url);
 		$url = str_replace('serveFlavor', 'serveFlavor'.$flavorIdStr, $url);
 		
-		if ($this->protocol == StorageProfile::PLAY_FORMAT_HTTP)
+		if ($this->protocol == PlaybackProtocol::HTTP)
 		{
     		if ($this->extention) {
     			$url .= "/name/a.$this->extention";
@@ -35,7 +35,7 @@ class kEdgeCastUrlManager extends kUrlManager
 	{
 		$url = parent::doGetFileSyncUrl($fileSync);
 		$url = preg_replace('/^mp4:(\/)*/', 'mp4:', $url);
-		if ($this->protocol == StorageProfile::PLAY_FORMAT_HTTP)
+		if ($this->protocol == PlaybackProtocol::HTTP)
 		{
     		$syncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
     		$url = $this->addEcSeek($url, $syncKey);
