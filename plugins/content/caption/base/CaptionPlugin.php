@@ -42,10 +42,13 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('CaptionAssetType');
+			return array('CaptionAssetType', 'CaptionObjectFeatureType');
 	
 		if($baseEnumName == 'assetType')
 			return array('CaptionAssetType');
+		
+		if($baseEnumName == 'ObjectFeatureType')
+			return array('CaptionObjectFeatureType');
 			
 		return array();
 	}
@@ -232,10 +235,27 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	}
 	
 	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getObjectFeatureTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('ObjectFeatureType', $value);
+	}
+	
+	/**
 	 * @return string external API value of dynamic enum.
 	 */
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaMrssContributor::getObjectFeatureType()
+	 */
+	public function getObjectFeatureType()
+	{
+		return self::getObjectFeatureTypeCoreValue(CaptionObjectFeatureType::CAPTIONS);
 	}
 }
