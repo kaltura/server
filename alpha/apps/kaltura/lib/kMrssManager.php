@@ -666,7 +666,7 @@ class kMrssManager
 			for ($i = 0; $i < count($featuresArr); $i++)
 			{
 				if ($featuresArr[$i] == ObjectFeatureType::ANCESTOR_RECURSIVE)
-					unset $featuresArr[$i];
+					unset($featuresArr[$i]);
 			}
 			$features = implode(",", $featuresArr);
 			//retrieve mrss for each ancestor category
