@@ -39,7 +39,7 @@ class KalturaLiveStreamConfigurationArray extends KalturaTypedArray
 		$objects = $this->toArray();
 		for ($i = 0; $i < count($objects); $i++)
 		{
-			for ($j = $i; $j <count($objects); $j++ )
+			for ($j = $i+1; $j <count($objects); $j++ )
 			{
 				if ($objects[$i]->protocol == $objects[$j]->protocol)
 				{
