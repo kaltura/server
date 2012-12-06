@@ -17,7 +17,7 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 	 * included in this list will contain only the related entry id.
 	 * This property contains a list xPaths in the Kaltura MRSS.
 	 * 
-	 * @var KalturaStringArray
+	 * @var KalturaExtendingItemMrssParameterArray
 	 */
 	public $itemXpathsToExtend;
 	
@@ -46,11 +46,11 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		$mrssParams = $source_object->getMrssParameters();
 		if ($mrssParams)
 		{
-			$this->itemXpathsToExtend = KalturaStringArray::fromStringArray($mrssParams->getItemXpathsToExtend());
+			$this->itemXpathsToExtend = KalturaExtendingItemMrssParameterArray::fromExtendingItemMrssParameterArray($mrssParams);
 		}
 		else
 		{
-			$this->itemXpathsToExtend = new KalturaStringArray();
+			$this->itemXpathsToExtend = new KalturaExtendingItemMrssParameterArray();
 		}
 	}
 	
@@ -66,11 +66,7 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		
 		if ($this->itemXpathsToExtend)
 		{
-			$itemXpathsToExtend = array();
-			foreach($this->itemXpathsToExtend as $curXpath)
-			{
-				$itemXpathsToExtend[] = $curXpath->value;
-			}
+			$itemXpathsToExtend = $this->itemXpathsToExtend->toObjectsArray();
 
 			$mrssParams->setItemXpathsToExtend($itemXpathsToExtend);
 		}
