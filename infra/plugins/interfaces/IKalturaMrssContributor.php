@@ -13,4 +13,11 @@ interface IKalturaMrssContributor extends IKalturaBase
 	 * @return SimpleXMLElement
 	 */
 	public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null);	
+
+	/**
+	 * Function returns the object feature type for the use of the KmrssManager
+	 * 
+	 * @return int
+	 */
+	public function getObjectFeatureType ();
 }
