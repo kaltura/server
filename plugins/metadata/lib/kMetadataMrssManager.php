@@ -84,24 +84,6 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 			else
 			{
 				$metadataObject->addChild($metadataField, kString::stringToSafeXml($metadataValue));
-				
-				$itemXPath = $currentXPath . "/*[local-name()='$metadataField']";
-				if ($mrssParams && is_array($mrssParams->getItemXpathsToExtend()) &&
-					in_array($itemXPath, $mrssParams->getItemXpathsToExtend()))
-				{
-					$relatedEntry = entryPeer::retrieveByPK((string)$metadataValue);
-					if ($relatedEntry)
-					{
-						$relatedItemField = $metadataObject->addChild($metadataField.'_item');
-						$recursionMrssParams = null;
-						if ($mrssParams)
-						{
-							$recursionMrssParams = clone $mrssParams;
-							$recursionMrssParams->setItemXpathsToExtend(array());			// stop the recursion
-						}
-						$relatedEntryMrss = kMrssManager::getEntryMrssXml($relatedEntry, $relatedItemField, $recursionMrssParams);
-					}			
-				}
 			}					
 		}				
 	}
@@ -120,5 +102,14 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 		
 		return null;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaMrssContributor::returnObjectFeatureType()
+	 */
+	public function getObjectFeatureType() 
+	{
+		return MetadataPlugin::getObjectFeaturetTypeCoreValue(MetadataObjectFeatureType::CUSTOM_DATA);
+	}
+
 	
 }
