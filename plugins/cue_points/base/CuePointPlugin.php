@@ -75,10 +75,13 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('CuePointSchemaType');
+			return array('CuePointSchemaType', 'CuePointObjectFeatureType');
 		
 		if($baseEnumName == 'SchemaType')
 			return array('CuePointSchemaType');
+			
+		if($baseEnumName == 'ObjectFeatureType')
+			return array('CuePointObjectFeatureType');
 			
 		return array();
 	}
@@ -244,10 +247,27 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	}
 	
 	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getObjectFeatureTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('ObjectFeatureType', $value);
+	}
+	
+	/**
 	 * @return string external API value of dynamic enum.
 	 */
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaMrssContributor::getObjectFeatureType()
+	 */
+	public function getObjectFeatureType ()
+	{
+		return self::getObjectFeatureTypeCoreValue(CuePointObjectFeatureType::CUE_POINT);
 	}
 }
