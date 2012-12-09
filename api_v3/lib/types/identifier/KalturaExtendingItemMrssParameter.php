@@ -40,4 +40,27 @@ class KalturaExtendingItemMrssParameter extends KalturaObject
 			
 		return parent::toObject($dbObject, $propsToSkip);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject($source_object)
+	 */
+	public function fromObject ($dbObject)
+	{
+		parent::fromObject($dbObject);
+		
+		/* @var $dbObject kExtendingItemMrssParameter */
+		$identifierType = get_class($dbObject->getIdentifier());
+		KaluraLog::debug("Creating identifier for DB idenifier type $identifierType");
+		switch ($identifierType)
+		{
+			case 'kEntryIdentifier':
+				$this->identifier = new KalturaEntryIdentifier();
+				break;
+			case 'kCategoryIdentifier':
+				$this->identifier = new KalturaCategoryIdentifier();
+		}
+		
+		$this->identifier->fromObject($dbObject->getIdentifier());
+		
+	}
 }
