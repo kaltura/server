@@ -609,7 +609,7 @@ class kMrssManager
 		switch (get_class($object))
 		{
 			case 'category':
-				$mrss = new SimpleXMLElement("<category_item/>")
+				$mrss = new SimpleXMLElement("<category_item/>");
 				return self::getCategoryMrssXml($object, $mrss , $mrssParams, $features);
 			case 'entry':
 				$mrss = new SimpleXMLElement("<" . $mrssName ? $mrssName : 'entry') . "_item/>");
