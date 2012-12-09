@@ -446,6 +446,10 @@ class kMrssManager
 			$mrss = new SimpleXMLElement('<item/>');
 		}
 		
+		$featuresArr = array();
+		if ($features)
+			$featuresArr = explode(',', $features);
+		
 		$mrss->addChild('entryId', $entry->getId());
 		if($entry->getReferenceID())
 			$mrss->addChild('referenceID', $entry->getReferenceID());
@@ -543,7 +547,8 @@ class kMrssManager
 			{
 				try
 				{
-					$mrssContributor->contribute($entry, $mrss, $mrssParams);
+					if (count($featuresArr) && in_array($mrssContributor->getObjectFeatureType(), $featuresArr))
+						$mrssContributor->contribute($entry, $mrss, $mrssParams);
 				}
 				catch(kCoreException $ex)
 				{
@@ -573,9 +578,13 @@ class kMrssManager
 				/* @var $xmlNodeToExtend SimpleXMLElement */
 				$xmlDomNodeToExtend = dom_import_simplexml($xmlNodeToExtend);
 				$nodeToExtendValue = $xmlDomNodeToExtend->nodeValue;
-				$extendingObject = $itemXPathToExtend->getIdentifier()->retrieveByIdentifier($nodeToExtendValue);			
-				$extendingNode = self::getExtendingItemNode($extendingObject, $xmlNodeToExtend, $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
-				KalturaLog::debug("extending node: ". $extendingNode->asXML());
+				$extendingObject = $itemXPathToExtend->getIdentifier()->retrieveByIdentifier($nodeToExtendValue);
+				if ($extendingObject)		
+				{
+					$mrssParams->setItemXpathsToExtend(array());
+					$extendingNode = self::addExtendingItemNode($extendingObject, $xmlNodeToExtend, $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
+					KalturaLog::info("extending node: ". $extendingNode->asXML());
+				}
 			}
 		}
 		self::addInstanceToPool($entry->getId(), $mrss);
@@ -591,7 +600,7 @@ class kMrssManager
 	 * @param string $features
 	 * @return SimpleXMLElement
 	 */
-	public function getExtendingItemNode (BaseObject $object, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null, $features = null)
+	public function addExtendingItemNode (BaseObject $object, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null, $features = null)
 	{
 		$featuresArr = explode(",", $features);
 		switch (get_class($object))
