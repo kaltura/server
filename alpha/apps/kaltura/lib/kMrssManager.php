@@ -582,8 +582,11 @@ class kMrssManager
 				if ($extendingObject)		
 				{
 					$mrssParams->setItemXpathsToExtend(array());
-					$extendingNode = self::addExtendingItemNode($extendingObject, $xmlNodeToExtend, $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
+					$extendingNode = self::getExtendingItemNode($extendingObject, $xmlNodeToExtend, $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
 					KalturaLog::info("extending node: ". $extendingNode->asXML());
+					$domExtendingElement = dom_import_simplexml($extendingNode);
+					$xmlDomNodeToExtend->ownerDocument->importNode($domExtendingElement);
+					$xmlDomNodeToExtend->parentNode->insertBefore($domExtendingElement,$xmlDomNodeToExtend->previousSibling );
 				}
 			}
 		}
@@ -595,21 +598,21 @@ class kMrssManager
 	/**
 	 * Function returns MRSS XML for the object based on its identifier
 	 * @param BaseObject $object
-	 * @param SimpleXMLElement $mrss
+	 * @param string $mrssName
 	 * @param kMrssParameters $mrssParams
 	 * @param string $features
 	 * @return SimpleXMLElement
 	 */
-	public function addExtendingItemNode (BaseObject $object, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null, $features = null)
+	public function getExtendingItemNode (BaseObject $object, $mrssName = null, kMrssParameters $mrssParams = null, $features = null)
 	{
 		$featuresArr = explode(",", $features);
 		switch (get_class($object))
 		{
 			case 'category':
-				$mrss = $mrss->addChild('category_item');
-				return self::getCategoryMrssXml($object, $mrss, $mrssParams, $features);
+				$mrss = new SimpleXMLElement("<category_item/>")
+				return self::getCategoryMrssXml($object, $mrss , $mrssParams, $features);
 			case 'entry':
-				$mrss = $mrss->addChild(($mrss ? $mrss->getName() : 'entry') . "_item");
+				$mrss = new SimpleXMLElement("<" . $mrssName ? $mrssName : 'entry') . "_item/>");
 				return self::getEntryMrssXml($object, $mrss, $mrssParams, $features);
 		}
 		
