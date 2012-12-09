@@ -21,4 +21,16 @@ class KalturaCategoryIdentifier extends KalturaObjectIdentifier
 
 		return parent::toObject($dbObject, $propsToSkip);
 	}
+	
+	private static $map_between_objects = array(
+			"identifier",
+		);
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
 }

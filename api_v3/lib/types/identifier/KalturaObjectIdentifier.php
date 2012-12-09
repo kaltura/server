@@ -7,7 +7,6 @@
  */
 class KalturaObjectIdentifier extends KalturaObject
 {
-	
 	/**
 	 * Comma separated string of enum values denoting which features of the item need to be included in the MRSS 
 	 * @dynamicType KalturaObjectFeatureType
@@ -17,7 +16,6 @@ class KalturaObjectIdentifier extends KalturaObject
 	
 	
 	private static $map_between_objects = array(
-			"identifier",
 			"extendedFeatures",
 		);
 	
