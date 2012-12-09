@@ -36,7 +36,7 @@ class KalturaExtendingItemMrssParameter extends KalturaObject
 	public function toObject($dbObject = null, $propsToSkip = null)
 	{
 		if (!$dbObject)
-			$dbObject = new KExtendingItemMrssParameter();
+			$dbObject = new kExtendingItemMrssParameter();
 			
 		return parent::toObject($dbObject, $propsToSkip);
 	}
