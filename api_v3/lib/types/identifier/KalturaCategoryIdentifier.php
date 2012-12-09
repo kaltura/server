@@ -5,6 +5,12 @@
  */
 class KalturaCategoryIdentifier extends KalturaObjectIdentifier
 {
+	/**
+	 * Identifier of the object
+	 * @var KalturaCategoryIdentifierField
+	 */
+	public $identifier;
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObjectIdentifier::toObject()
 	 */

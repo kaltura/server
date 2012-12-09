@@ -50,7 +50,7 @@ class KalturaExtendingItemMrssParameter extends KalturaObject
 		
 		/* @var $dbObject kExtendingItemMrssParameter */
 		$identifierType = get_class($dbObject->getIdentifier());
-		KalturaLog::info("Creating identifier for DB idenifier type $identifierType");
+		KalturaLog::info("Creating identifier for DB identifier type $identifierType");
 		switch ($identifierType)
 		{
 			case 'kEntryIdentifier':

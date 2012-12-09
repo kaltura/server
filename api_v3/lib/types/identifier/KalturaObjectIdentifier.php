@@ -7,11 +7,6 @@
  */
 class KalturaObjectIdentifier extends KalturaObject
 {
-	/**
-	 * Identifier of the object
-	 * @var KalturaObjectIdentifierField
-	 */
-	public $identifier;
 	
 	/**
 	 * Comma separated string of enum values denoting which features of the item need to be included in the MRSS 
