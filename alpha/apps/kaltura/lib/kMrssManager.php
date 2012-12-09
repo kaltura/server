@@ -622,7 +622,7 @@ class kMrssManager
 			if($mrss)
 				return $mrss;
 				
-			$mrss = new SimpleXMLElement('<category/>');
+			$mrss = new SimpleXMLElement('<item/>');
 		}
 		
 		$featuresArr = array();
@@ -661,7 +661,7 @@ class kMrssManager
 		{
 			$ancestorIds = explode(">", $category->getFullIds());
 			$ancestorCategories = categoryPeer::retrieveByPKs($ancestorIds);
-			array_shift($ancestorCategories);
+			array_pop($ancestorCategories);
 			//find and delete the ANCESTOR_RECURSIVE from the features array
 			for ($i = 0; $i < count($featuresArr); $i++)
 			{
