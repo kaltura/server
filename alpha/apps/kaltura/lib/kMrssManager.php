@@ -653,7 +653,7 @@ class kMrssManager
 			$featuresArr = explode(",", $features);
 		}
 		
-		if (in_array(ObjectFeatureType::METADATA, $featuresArr))
+		if (!$features || in_array(ObjectFeatureType::METADATA, $featuresArr))
 		{
 			$mrss->addChild("id", $category->getId());
 			$mrss->addChild("name", $category->getName());
@@ -669,7 +669,7 @@ class kMrssManager
 				/* @var $mrssContributor IKalturaMrssContributor */
 				try 
 				{
-					if (in_array($mrssContributor->getObjectFeatureType(), $featuresArr))
+					if (!$features || in_array($mrssContributor->getObjectFeatureType(), $featuresArr))
 						$mrssContributor->contribute($category, $mrss, $mrssParams);
 				}
 				catch(kCoreException $ex)
@@ -692,11 +692,11 @@ class kMrssManager
 			}
 			$features = implode(",", $featuresArr);
 			//retrieve mrss for each ancestor category
+			$parentCategories = $mrss->addChild('parent_categories');
 			foreach ($ancestorCategories as $ancestorCategory )
 			{
-				$mrss = $mrss->addChild('parent_categories');
-				$ancestorMrss = $mrss->addChild('category_item');
-				self::getCategoryMrssXml($ancestorCategory, $ancestorMrss, $mrssParams, $features);
+				$ancestorMrss = $parentCategories->addChild('category_item');
+				$ancestorMrss = self::getCategoryMrssXml($ancestorCategory, $ancestorMrss, $mrssParams, $features);
 			}
 		}
 		
