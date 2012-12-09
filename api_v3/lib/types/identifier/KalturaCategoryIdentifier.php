@@ -17,7 +17,7 @@ class KalturaCategoryIdentifier extends KalturaObjectIdentifier
 	public function toObject ($dbObject = null, $propsToSkip = null)
 	{
 		if (!$dbObject)
-			$dbObject = new kCategoryIdentifiers();
+			$dbObject = new kCategoryIdentifier();
 
 		return parent::toObject($dbObject, $propsToSkip);
 	}
