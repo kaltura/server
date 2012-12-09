@@ -569,7 +569,7 @@ class kMrssManager
 			$player->addAttribute('url', $playerUrl);
 		}
 				
-		foreach($mrssParams->getItemXpathsToExtend() as $itemXPathToExtend)
+		foreach($mrssParams && $mrssParams->getItemXpathsToExtend() as $itemXPathToExtend)
 		{
 			/* @var $itemXPathToExtend KExtendingItemMrssParameter */
 			$xmlNodesToExtend = $mrss->xpath($itemXPathToExtend->getXpath()); //metdata/entryIdX   /entry/customMetadata/metadata/entryIdY
@@ -584,9 +584,12 @@ class kMrssManager
 					$mrssParams->setItemXpathsToExtend(array());
 					$extendingNode = self::getExtendingItemNode($extendingObject, $xmlNodeToExtend->getName(), $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
 					KalturaLog::info("extending node: ". $extendingNode->asXML());
-					$domExtendingElement = dom_import_simplexml($extendingNode);
-					$xmlDomNodeToExtend->ownerDocument->importNode($domExtendingElement);
-					$xmlDomNodeToExtend->parentNode->insertBefore($domExtendingElement,$xmlDomNodeToExtend->previousSibling );
+					//Append new node after current one using DOMXML functionality.
+					$domExtendingElement = $xmlDomNodeToExtend->ownerDocument->importNode(dom_import_simplexml($extendingNode), true);
+					if ($xmlDomNodeToExtend->nextSibling)
+						$xmlDomNodeToExtend->parentNode->insertBefore($domExtendingElement,$xmlDomNodeToExtend->nextSibling );
+					else
+						$xmlDomNodeToExtend->parentNode->appendChild($domExtendingElement);
 				}
 			}
 		}
