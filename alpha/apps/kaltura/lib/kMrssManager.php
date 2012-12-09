@@ -574,7 +574,8 @@ class kMrssManager
 				$xmlDomNodeToExtend = dom_import_simplexml($xmlNodeToExtend);
 				$nodeToExtendValue = $xmlDomNodeToExtend->nodeValue;
 				$extendingObject = $itemXPathToExtend->getIdentifier()->retrieveByIdentifier($nodeToExtendValue);			
-				$xmlDomNodeToExtend->appendChild(self::getExtendingItemNode($extendingObject, null, $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures()));
+				$extendingNode = self::getExtendingItemNode($extendingObject, $xmlNodeToExtend, $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
+				KalturaLog::debug("extending node: ". $extendingNode->asXML());
 			}
 		}
 		self::addInstanceToPool($entry->getId(), $mrss);
@@ -592,13 +593,11 @@ class kMrssManager
 	 */
 	public function getExtendingItemNode (BaseObject $object, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null, $features = null)
 	{
+		$featuresArr = explode(",", $features);
 		switch (get_class($object))
 		{
 			case 'category':
-				if (in_array(ObjectFeatureType::ANCESTOR_RECURSIVE, $featuresArr))
-				{
-					$mrss = new SimpleXMLElement("<parent_category_item/>");
-				}
+				$mrss->addChild('category_item');
 				return self::getCategoryMrssXml($object, $mrss, $mrssParams, $features);
 			case 'entry':
 				return self::getEntryMrssXml($object, $mrss, $mrssParams, $features);
@@ -622,7 +621,7 @@ class kMrssManager
 			if($mrss)
 				return $mrss;
 				
-			$mrss = new SimpleXMLElement('<category_item/>');
+			$mrss = new SimpleXMLElement('<category/>');
 		}
 		
 		$featuresArr = array();
@@ -672,9 +671,9 @@ class kMrssManager
 			//retrieve mrss for each ancestor category
 			foreach ($ancestorCategories as $ancestorCategory )
 			{
-				$ancestorMrss = self::getCategoryMrssXml($ancestorCategory, null, $mrssParams, $features);
-				$domMrss = dom_import_simplexml($mrss);
-				$domMrss->appendChild(dom_import_simplexml($ancestorMrss));
+				$mrss = $mrss->addChild('parent_categories');
+				$ancestorMrss = $mrss->addChild('category_item');
+				self::getCategoryMrssXml($ancestorCategory, $ancestorMrss, $mrssParams, $features);
 			}
 		}
 		
