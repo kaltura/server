@@ -597,9 +597,10 @@ class kMrssManager
 		switch (get_class($object))
 		{
 			case 'category':
-				$mrss->addChild('category_item');
+				$mrss = $mrss->addChild('category_item');
 				return self::getCategoryMrssXml($object, $mrss, $mrssParams, $features);
 			case 'entry':
+				$mrss = $mrss->addChild(($mrss ? $mrss->getName() : 'entry') . "_item");
 				return self::getEntryMrssXml($object, $mrss, $mrssParams, $features);
 		}
 		
