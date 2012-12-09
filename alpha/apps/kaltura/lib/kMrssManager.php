@@ -582,7 +582,7 @@ class kMrssManager
 				if ($extendingObject)		
 				{
 					$mrssParams->setItemXpathsToExtend(array());
-					$extendingNode = self::getExtendingItemNode($extendingObject, $xmlNodeToExtend, $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
+					$extendingNode = self::getExtendingItemNode($extendingObject, $xmlNodeToExtend->getName(), $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
 					KalturaLog::info("extending node: ". $extendingNode->asXML());
 					$domExtendingElement = dom_import_simplexml($extendingNode);
 					$xmlDomNodeToExtend->ownerDocument->importNode($domExtendingElement);
@@ -603,7 +603,7 @@ class kMrssManager
 	 * @param string $features
 	 * @return SimpleXMLElement
 	 */
-	public function getExtendingItemNode (BaseObject $object, $mrssName = null, kMrssParameters $mrssParams = null, $features = null)
+	public static function getExtendingItemNode (BaseObject $object, $mrssName = null, kMrssParameters $mrssParams = null, $features = null)
 	{
 		$featuresArr = explode(",", $features);
 		switch (get_class($object))
@@ -612,7 +612,11 @@ class kMrssManager
 				$mrss = new SimpleXMLElement("<category_item/>");
 				return self::getCategoryMrssXml($object, $mrss , $mrssParams, $features);
 			case 'entry':
-				$mrss = new SimpleXMLElement("<" . $mrssName ? $mrssName : 'entry') . "_item/>");
+				if (!$mrssName)
+				{
+					$mrssName = $entry;
+				}
+				$mrss = new SimpleXMLElement("<{$mrssName}_item/>");
 				return self::getEntryMrssXml($object, $mrss, $mrssParams, $features);
 		}
 		
