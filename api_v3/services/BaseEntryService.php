@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Base Entry Service
  *
@@ -807,7 +806,7 @@ class BaseEntryService extends KalturaEntryService
 					/* @var $config KLiveStreamConfiguration */
 					if ($config->getProtocol() == PlaybackProtocol::HDS)
 					{
-						$result->streamerType = KalturaPlaybackProtocol::HDS;
+						$result->streamerType = KalturaPlaybackProtocol::AKAMAI_HDS;
 					}
 				}
 				
