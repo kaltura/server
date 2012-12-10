@@ -10,8 +10,6 @@
 # Provides: searchd
 # Required-Start: $local_fs $network
 # Required-Stop: $local_fs $network
-# Should-Start: $remote_fs
-# Should-Stop: $remote_fs
 # Default-Start: 
 # Default-Stop: 0 1 2 3 4 5 6
 # Short-Description: start and stop sphinx searchd daemon
