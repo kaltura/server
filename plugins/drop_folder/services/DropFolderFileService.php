@@ -280,11 +280,12 @@ class DropFolderFileService extends KalturaBaseService
 						KalturaLog::debug('Setting current file to PURGED ['.$existingDropFolderFile->getId().']');
 						$existingDropFolderFile->setStatus(DropFolderFileStatus::PURGED);				
 						$existingDropFolderFile->save();
+						
+						$newDropFolderFile = $dbDropFolderFile->copy();
 						if(	$existingDropFolderFile->getLeadDropFolderFileId() && 
 							$existingDropFolderFile->getLeadDropFolderFileId() != $existingDropFolderFile->getId())
 						{
-							KalturaLog::debug('Updating lead id ['.$existingDropFolderFile->getLeadDropFolderFileId().']');
-							$newDropFolderFile = $dbDropFolderFile->copy();
+							KalturaLog::debug('Updating lead id ['.$existingDropFolderFile->getLeadDropFolderFileId().']');							
 							$newDropFolderFile->setLeadDropFolderFileId($existingDropFolderFile->getLeadDropFolderFileId());	
 						}
 						KalturaLog::debug('Creating new drop folder file');

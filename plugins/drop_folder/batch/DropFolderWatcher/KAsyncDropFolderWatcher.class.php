@@ -119,9 +119,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			if($this->validatePhysicalFile($folder, $physicalFileName, $ignorePatterns))
 			{	
 				KalturaLog::debug('Watch file ['.$physicalFileName.']');
-				
-				$dropFolderFile = $dropFolderFilesMap[$physicalFileName];		
-				if(!$dropFolderFile)
+				if(!array_key_exists($physicalFileName, $dropFolderFilesMap))
 				{
 					try 
 					{
@@ -135,11 +133,13 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 					{
 						KalturaLog::err("Error handling drop folder file [$physicalFileName] " . $e->getMessage());
 					}						
+					
 				}
 				else //drop folder file entry found
 				{
+					$dropFolderFile = $dropFolderFilesMap[$physicalFileName];
 					//if file exist in the folder remove it from the map
-					//all the files that are left in a map will be marked as PURGED
+					//all the files that are left in a map will be marked as PURGED					
 					unset($dropFolderFilesMap[$physicalFileName]);
 					$this->handleExisitingDropFolderFile($folder, $dropFolderFile);
 				}					
