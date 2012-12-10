@@ -251,9 +251,9 @@ class LiveStreamService extends KalturaEntryService
 					KalturaLog::info('Determining status of live stream URL [' .$liveStreamEntry->getHlsStreamUrl(). ']');
 					return $this->hlsUrlExistsRecursive($liveStreamEntry->getHlsStreamUrl());
 					break;
-				case KalturaPlaybackProtocol::HDS:
+				case KalturaPlaybackProtocol::AKAMAI_HDS:
 					$protocolMap = $liveStreamEntry->getLiveStreamConfigurations();
-					$config = $this->returnSingleItemByPropertyValue($protocolMap, "protocol", KalturaPlaybackProtocol::HDS);
+					$config = self::returnSingleItemByPropertyValue($protocolMap, "protocol", KalturaPlaybackProtocol::HDS);
 					if ($config)
 					{
 						KalturaLog::info('Determining status of live stream URL [' .$config->getUrl() . ']');
@@ -271,9 +271,9 @@ class LiveStreamService extends KalturaEntryService
 	 * @param array $array
 	 * @param string $propertyName
 	 * @param string $propertyValue
-	 * @return KalturaLiveStreamConfiguration
+	 * @return KLiveStreamConfiguration
 	 */
-	private function returnSingleItemByPropertyValue (array $array, $propertyName, $propertyValue)
+	public static function returnSingleItemByPropertyValue (array $array, $propertyName, $propertyValue)
 	{
 		foreach ($array as $config)
 		{
