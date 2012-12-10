@@ -59,7 +59,7 @@ class KalturaDropFolderFileResource extends KalturaDataCenterContentResource
         	{
         		$dropFolderFile->setStatus(DropFolderFileStatus::ERROR_HANDLING);
         		$dropFolderFile->setErrorCode(DropFolderFileErrorCode::ERROR_READING_FILE);
-        		$dropFolderFile->setErrorDescription('Cannot read file or file details at path ['.$filePath.']');
+        		$dropFolderFile->setErrorDescription(DropFolderPlugin::ERROR_READING_FILE_MESSAGE.$filePath);
         		$dropFolderFile->save();
         		
         		throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST, $filePath);

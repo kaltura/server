@@ -21,6 +21,7 @@ abstract class KalturaDropFolderBaseFilter extends KalturaFilter
 		"conversionProfileIdIn" => "_in_conversion_profile_id",
 		"dcEqual" => "_eq_dc",
 		"dcIn" => "_in_dc",
+		"pathEqual" => "_eq_path",
 		"pathLike" => "_like_path",
 		"fileHandlerTypeEqual" => "_eq_file_handler_type",
 		"fileHandlerTypeIn" => "_in_file_handler_type",
@@ -125,6 +126,11 @@ abstract class KalturaDropFolderBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $dcIn;
+
+	/**
+	 * @var string
+	 */
+	public $pathEqual;
 
 	/**
 	 * @var string

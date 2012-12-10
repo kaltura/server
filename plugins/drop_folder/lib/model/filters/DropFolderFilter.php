@@ -22,6 +22,7 @@ class DropFolderFilter extends baseObjectFilter
 			"_eq_dc",
 			"_in_dc",
 			"_like_path",
+			"_eq_path",
 			"_like_file_name_patterns",
 			"_mlikeor_file_name_patterns" ,			
 			"_mlikeand_file_name_patterns" ,

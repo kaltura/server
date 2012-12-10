@@ -56,7 +56,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var string
-	 * @filter like
+	 * @filter eq, like
 	 */
 	public $path;
 	

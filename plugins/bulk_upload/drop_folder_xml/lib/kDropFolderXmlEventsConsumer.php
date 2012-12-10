@@ -403,7 +403,6 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 			$partner = PartnerPeer::retrieveByPK($folder->getPartnerId());
 			
 			$data = KalturaPluginManager::loadObject('kBulkUploadJobData', $coreBulkUploadType);
-			//$data->setUserId($partner->getkuser()->getPuserId());
 			$data->setUploadedBy(self::UPLOADED_BY);
 			$data->setFileName($leadDropFolderFile->getFileName());
 						
