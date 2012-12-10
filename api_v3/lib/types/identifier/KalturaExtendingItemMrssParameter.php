@@ -27,7 +27,7 @@ class KalturaExtendingItemMrssParameter extends KalturaObject
 	private static $map_between_objects = array(
 			"xpath",
 			"identifier",
-			"replaceXPathContent"
+			"extensionMode"
 		);
 		
 	/* (non-PHPdoc)
