@@ -13,4 +13,7 @@ interface PlaybackProtocol extends BaseEnum
 	const AUTO = 'auto';
 	const HDS = 'hds';
 	const HLS = 'hls';	
+	const AKAMAI_HDS = 'hdnetworkmanifest';
+	const AKAMAI_HD = 'hdnetwork';
+	
 }
