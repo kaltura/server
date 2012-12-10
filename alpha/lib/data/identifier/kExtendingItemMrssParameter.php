@@ -16,6 +16,11 @@ class kExtendingItemMrssParameter
 	protected $identifier;
 	
 	/**
+	 * @var int
+	 */
+	protected $extensionMode;
+	
+	/**
 	 * @return the $xpath
 	 */
 	public function getXpath() {
@@ -42,6 +47,21 @@ class kExtendingItemMrssParameter
 	public function setIdentifier($identifier) {
 		$this->identifier = $identifier;
 	}
+	
+	/**
+	 * @return int
+	 */
+	public function getExtensionMode() {
+		return $this->extensionMode;
+	}
+
+	/**
+	 * @param int $extensionMode
+	 */
+	public function setExtensionMode($extensionMode) {
+		$this->extensionMode = $extensionMode;
+	}
+
 
 
 }
