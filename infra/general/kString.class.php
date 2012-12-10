@@ -324,7 +324,7 @@ class kString
 	{
 		if (preg_match("/^[^@]{1,64}@[^@]{1,255}$/", $string)){ //we check that there's one @ symbol, and that the lengths are right.
 			$validChars = '_a-z0-9,!#\$%&\'\*\+\?\^_`\{\|}~-';
- 			return preg_match("/^[$validChars]+(\.[$validChars]+)*@([\w\d]+([\w\d-]*[\w\d]+)*[\.])+([\.]*[\w\d]+)*$/i", $string);
+ 			return preg_match("/^[$validChars]+(\.[$validChars]+)*@([\w\d]+([\w\d-]*[\w\d]+)*[\.])+[\w\d]+$/i", $string);
 		}
 		else 
 			return false;
