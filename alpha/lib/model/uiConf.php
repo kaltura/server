@@ -659,8 +659,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 			$version = "_" . ($version ? $version : $this->getVersion());
 		else
 			$version = "";
-		$file_name = "content/generatedUiConf/{$this->getPartnerId()}/{$this->getCreationModeAsStr()}/{$this->getId()}/ui_conf{$version}.xml";
-		//$file_name = $this->getUiConfRootDirectory() . "generatedUiConf/{$this->getPartnerId()}/{$this->getCreationModeAsStr()}/{$this->getId()}/ui_conf.xml";
+
+		$dir = (intval($this->getId() / 1000000)).'/'.	(intval($this->getId() / 1000) % 1000);		
+		$file_name = "/content/generatedUiConf/$dir/ui_conf_{$this->getId()}_{$version}.xml";
 		return $file_name;
 	}
 	
