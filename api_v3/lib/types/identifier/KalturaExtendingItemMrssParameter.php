@@ -17,9 +17,17 @@ class KalturaExtendingItemMrssParameter extends KalturaObject
 	 */
 	public $identifier;
 	
+	/**
+	 * Mode of extension - append to MRSS or replace the xpath content.
+	 * @var KalturaMrssExtensionMode
+	 */
+	public $extensionMode;
+	
+	
 	private static $map_between_objects = array(
 			"xpath",
 			"identifier",
+			"replaceXPathContent"
 		);
 		
 	/* (non-PHPdoc)
@@ -35,9 +43,10 @@ class KalturaExtendingItemMrssParameter extends KalturaObject
 	 */
 	public function toObject($dbObject = null, $propsToSkip = null)
 	{
+		$this->validate();
 		if (!$dbObject)
 			$dbObject = new kExtendingItemMrssParameter();
-			
+
 		return parent::toObject($dbObject, $propsToSkip);
 	}
 	
@@ -61,6 +70,14 @@ class KalturaExtendingItemMrssParameter extends KalturaObject
 		}
 		
 		$this->identifier->fromObject($dbObject->getIdentifier());
-		
+	}
+	
+	protected function validate ()
+	{
+		//Should not allow any extending object but entries to be added in APPEND mode
+		if (!$this->extensionMode == KalturaMrssExtensionMode::APPEND && get_class($this->identifier) !== 'KalturaEntryIdentifier')
+		{
+			throw new KalturaAPIException(KalturaErrors::EXTENDING_ITEM_INCOMPATIBLE_COMBINATION);
+		}
 	}
 }
