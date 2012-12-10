@@ -927,7 +927,7 @@ class playManifestAction extends kalturaAction
 			foreach ($this->entry->getLiveStreamConfigurations() as $liveStreamConfig)
 			{
 				/* @var $liveStreamConfig KLiveStreamConfiguration */
-				if ($liveStreamConfig->getProtocol() == PlaybackProtocol::HDS)
+				if ($liveStreamConfig->getProtocol() == PlaybackProtocol::AKAMAI_HDS)
 				{
 					$flavor = $this->getFlavorAssetInfo($liveStreamConfig->getUrl());
 					break;
