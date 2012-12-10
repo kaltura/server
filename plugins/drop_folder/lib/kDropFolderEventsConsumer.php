@@ -1,6 +1,10 @@
 <?php
 class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObjectChangedEventConsumer
 {
+	const REFERENCE_ID_WILDCARD = 'referenceId';
+	const FLAVOR_NAME_WILDCARD  = 'flavorName';
+	const DEFAULT_SLUG_REGEX = '/(?P<referenceId>.+)[.]\w{3,}/';
+	
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::objectChanged()
 	 */
@@ -92,21 +96,18 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		
 	private function isImportMatch(BatchJob $dbBatchJob)
 	{	
+		$jobStatuses = array(BatchJob::BATCHJOB_STATUS_FINISHED, BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_FATAL);
 		$isMatch =  $dbBatchJob->getJobType() == BatchJobType::IMPORT && 
 					$dbBatchJob->getData() instanceof kDropFolderImportJobData &&
-					($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED ||
-					$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED ||
-					$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FATAL);
+					in_array($dbBatchJob->getStatus(), $jobStatuses);
 		return $isMatch;
 	}
 	
 	private function isContentProcessorMatch(BatchJob $dbBatchJob)
 	{	
 		$batchJobType = DropFolderPlugin::getCoreValue('BatchJobType', DropFolderBatchType::DROP_FOLDER_CONTENT_PROCESSOR);
-		$isMatch =  $dbBatchJob->getJobType() == $batchJobType && 
-					($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED ||
-					$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_RETRY ||
-					$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FATAL);
+		$jobStatuses = array(BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_RETRY, BatchJob::BATCHJOB_STATUS_FATAL);
+		$isMatch =  $dbBatchJob->getJobType() == $batchJobType && in_array($dbBatchJob->getStatus(), $jobStatuses);
 		return $isMatch;
 	}
 	
@@ -124,11 +125,18 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 				break;
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				$this->setFileError($dropFolderFile, DropFolderFileStatus::ERROR_DOWNLOADING, DropFolderFileErrorCode::ERROR_DOWNLOADING_FILE, 'Error while downloading file');
+				$this->setFileError($dropFolderFile, DropFolderFileStatus::ERROR_DOWNLOADING, DropFolderFileErrorCode::ERROR_DOWNLOADING_FILE, DropFolderPlugin::ERROR_DOWNLOADING_FILE_MESSAGE);
 				break;				
 		}
 	}
-		
+
+	/**
+	 * Update all the drop folder files processed by the batch job according to batch job status:
+	 * 1. Retry - set files status to NO_MATCH
+	 * 2. Failure - set to ERROR_HANDLING
+	 * @param BatchJob $dbBatchJob
+	 * @param kDropFolderContentProcessorJobData $data
+	 */
 	private function onContentProcessorJobStatusUpdated(BatchJob $dbBatchJob, kDropFolderContentProcessorJobData $data)
 	{
 		$idsArray = explode(',', $data->getDropFolderFileIds());
@@ -138,7 +146,8 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 			
 		switch($dbBatchJob->getStatus())
 		{
-			case BatchJob::BATCHJOB_STATUS_RETRY:
+			case BatchJob::BATCHJOB_STATUS_RETRY: //TODO: check  error code
+				KalturaLog::debug('Batch job status RETRY => set files ['.$data->getDropFolderFileIds().'] to NO_MATCH');
 				foreach ($dropFolderFiles as $dropFolderFile) 
 				{
 					$dropFolderFile->setStatus(DropFolderFileStatus::NO_MATCH);
@@ -146,54 +155,92 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 				}			
 				break;
 			case BatchJob::BATCHJOB_STATUS_FAILED:
-			case BatchJob::BATCHJOB_STATUS_FATAL:				
+			case BatchJob::BATCHJOB_STATUS_FATAL:	
+				KalturaLog::debug('Batch job FAILED => set files ['.$data->getDropFolderFileIds().'] to ERROR_HANDLING');			
 				foreach ($dropFolderFiles as $dropFolderFile) 
 				{
-					$this->setFileError($dropFolderFile, DropFolderFileStatus::ERROR_HANDLING, DropFolderFileErrorCode::ERROR_IN_CONTENT_PROCESSOR, 'Error while executing DropFolderContentProcessor job');
+					$this->setFileError($dropFolderFile, DropFolderFileStatus::ERROR_HANDLING, DropFolderFileErrorCode::ERROR_IN_CONTENT_PROCESSOR, DropFolderPlugin::ERROR_IN_CONTENT_PROCESSOR_MESSAGE);
 				}			
 				break;				
 		}				
 	}
-			
+
+	/**
+	 * Handles drop folder file status change to PENDING
+	 * 1. set parsed slug and flavor
+	 * 2. in case there is no parsed flavor (no related files) - add ContentProcessor job
+	 * 3. otherwise
+	 * 	a. verify all required flavors are ready 
+	 *	b. if yes - add content processor 
+	 *	c. else - change files status to WAITING
+	 * @param DropFolder $folder
+	 * @param DropFolderFile $file
+	 */
 	private function onContentDropFolderFileStatusChangedToPending(DropFolder $folder, DropFolderFile $file)
 	{
-		if(is_null($file->getParsedFlavor()))
+		KalturaLog::debug('start onContentDropFolderFileStatusChangedToPending ['.$file->getId().']');
+		$updatedFile = $this->setParsedSlugFlavor($folder, $file);
+		if($updatedFile)
 		{
-			$this->triggerContentDropFolderFileProcessing($folder, $file);
-		}
-		else
-		{
-			$statuses = array(DropFolderFileStatus::PENDING, DropFolderFileStatus::WAITING, DropFolderFileStatus::NO_MATCH);					
-			$relatedFiles = DropFolderFilePeer::retrieveByDropFolderIdStatusesAndSlug($folder->getId(), $statuses, $file->getParsedSlug());				
-			$isReady = $this->isAllContentDropFolderIngestedFilesReady($folder, $relatedFiles);
-			if ($isReady) 
-			{				
-				$this->triggerContentDropFolderFileProcessing($folder, $file, $relatedFiles);
+			$file = $updatedFile;
+			if(is_null($file->getParsedFlavor()))
+			{
+				KalturaLog::debug('Parsed flavor is null, triggering ContentProcessing job for source');
+				$this->triggerContentDropFolderFileProcessing($folder, $file);
 			}
 			else
 			{
-				KalturaLog::debug('Some required flavors do not exist in the drop folder - changing status to WAITING');
-				$file->setStatus(DropFolderFileStatus::WAITING);
-				$file->save();						
-			}				
+				$assetParamsList = flavorParamsConversionProfilePeer::retrieveByConversionProfile($folder->getConversionProfileId());
+				$this->validateFlavorName($file, $assetParamsList);
+				
+				KalturaLog::debug('Parsed flavor is set, verifying if all files ready');
+				$statuses = array(DropFolderFileStatus::PENDING, DropFolderFileStatus::WAITING, DropFolderFileStatus::NO_MATCH);					
+				$relatedFiles = DropFolderFilePeer::retrieveByDropFolderIdStatusesAndSlug($folder->getId(), $statuses, $file->getParsedSlug());				
+				$isReady = $this->isAllContentDropFolderIngestedFilesReady($folder, $relatedFiles, $assetParamsList);
+				if ($isReady) 
+				{				
+					$this->triggerContentDropFolderFileProcessing($folder, $file, $relatedFiles);
+				}
+				else
+				{
+					KalturaLog::debug('Some required flavors do not exist in the drop folder - changing status to WAITING');
+					$file->setStatus(DropFolderFileStatus::WAITING);
+					$file->save();						
+				}				
+			}			
 		}
+		else 
+		{
+			$this->setFileError($file, DropFolderFileStatus::ERROR_HANDLING, DropFolderFileErrorCode::SLUG_REGEX_NO_MATCH, DropFolderPlugin::SLUG_REGEX_NO_MATCH_MESSAGE); 
+ 		}
+ 		KalturaLog::debug('end onContentDropFolderFileStatusChangedToPending');
+	}
+	
+	private function validateFlavorName(DropFolderFile $file, $assetParamsList)
+	{
+		foreach ($assetParamsList as $assetParams)
+		{
+			if($assetParams->getSystemName() == $file->getParsedFlavor())
+				return true;
+		}
+		KalturaLog::debug('Flavor name not found ['.$file->getParsedFlavor().']');
+		$this->setFileError($file, DropFolderFileStatus::ERROR_HANDLING, DropFolderFileErrorCode::FLAVOR_NOT_FOUND, DropFolderPlugin::FLAVOR_NOT_FOUND_MESSAGE);
 	}
 	
 	/**
 	 * Check if all required files for the given ingestion profile are in the drop folder.
 	 */
-	private function isAllContentDropFolderIngestedFilesReady(DropFolder $folder, $relatedFiles)
+	private function isAllContentDropFolderIngestedFilesReady(DropFolder $folder, $relatedFiles, $assetParamsList)
 	{
 		KalturaLog::debug('Ingest files according to conversion profile ['.$folder->getConversionProfileId().']');
 				
-		$existingFlavors = array();
+		$existingFlavors = array();		
 		foreach ($relatedFiles as $relatedFile)
 		{
 			KalturaLog::debug('flavor ['.$relatedFile->getParsedFlavor().'] file id ['.$relatedFile->getId().']');
 			$existingFlavors[$relatedFile->getParsedFlavor()] = $relatedFile->getId();
 		}
 		
-		$assetParamsList = flavorParamsConversionProfilePeer::retrieveByConversionProfile($folder->getConversionProfileId());
 		foreach ($assetParamsList as $assetParams)
 		{
 			if($assetParams->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED && $assetParams->getOrigin() == assetParamsOrigin::INGEST)
@@ -204,15 +251,23 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 					return false;
 				}			
 			}			
-		}
-		
+		}		
 		return true;
 	}
-	
+
+	/**
+	 * Change drop folder file status to PROCESSING using atomic update
+	 * Id status was updated in the database by the current call add ContentProcessor job
+	 * @param DropFolder $folder
+	 * @param DropFolderFile $file
+	 * @param array $relatedFiles
+	 */
 	private function triggerContentDropFolderFileProcessing(DropFolder $folder, DropFolderFile $file, $relatedFiles = null)
 	{
+		KalturaLog::debug('in triggerContentDropFolderFileProcessing');
 		if($relatedFiles)
 		{
+			//looking for drop folder file with minimal id to set status to PROCESSING
 			$fileWithMinId = null;
 			foreach ($relatedFiles as $relatedFile) 
 			{
@@ -233,9 +288,12 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		}
 		if($this->setFileProcessing($fileWithMinId, $relatedFiles))
 		{
+			//If atomic status update succeeded add DropFolderContentProcessor job,
+			//otherwise the job was added by another event
 			try 
 			{
 				$job = $this->addDropFolderContentProcessorJob($folder, $file, $dropFolderFileIds);
+				KalturaLog::debug('DropFolderContent processor job id ['.$job->getId().']');
 				foreach ($relatedFiles as $relatedFile) 
 				{
 					$relatedFile->setBatchJobId($job->getId());
@@ -249,13 +307,13 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 					$this->setFileError($relatedFile, DropFolderFileStatus::ERROR_HANDLING, DropFolderFileErrorCode::ERROR_ADDING_CONTENT_PROCESSOR, 
 								'Failed to add DropFolderContentProcessor job');
 				}
-			}							
-			
+			}										
 		}	
 	}			
 	
 	private function addDropFolderContentProcessorJob(DropFolder $folder, DropFolderFile $dropFolderFileForObject, $dropFolderFileIds)
-	{			
+	{	
+		KalturaLog::debug('adding  DropFolderContentProcessor job');		
  		$batchJobType = DropFolderPlugin::getCoreValue('BatchJobType', DropFolderBatchType::DROP_FOLDER_CONTENT_PROCESSOR);
  		
 		$batchJob = new BatchJob();
@@ -301,5 +359,52 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		$file->setErrorDescription($errorDescription);
 		$file->save();				
 		
-	}		
+	}	
+
+	private function setParsedSlugFlavor(DropFolder $folder, DropFolderFile $file)
+	{
+		$parsedSlug = null;
+		$parsedFlavor = null;
+		$isMatch = $this->parseRegex($folder->getFileHandlerConfig(), $file->getFileName(), $parsedSlug, $parsedFlavor);
+ 		if($isMatch)
+ 		{
+ 			$file->setParsedSlug($parsedSlug);
+ 			$file->setParsedFlavor($parsedFlavor);	
+ 			$file->save();	
+ 			return $file;		
+  		}    		
+		else 		
+		{
+			return null;
+		} 			
+	}
+	
+	/**
+	 * Parse file name according to defined slugRegex and set the extracted parsedSlug and parsedFlavor.
+	 * The following expressions are currently recognized and used:
+	 * 	- (?P<referenceId>\w+) - will be used as the drop folder file's parsed slug.
+	 *  - (?P<flavorName>\w+)  - will be used as the drop folder file's parsed flavor. 
+	 * 
+	 * @return bool true if file name matches the slugRegex or false otherwise
+	 */
+	private function parseRegex(DropFolderContentFileHandlerConfig $fileHandlerConfig, $fileName, &$parsedSlug, &$parsedFlavor)
+	{
+		$matches = null;
+		$slugRegex = $fileHandlerConfig->getSlugRegex();
+		if(is_null($slugRegex) || empty($slugRegex))
+		{
+			$slugRegex = self::DEFAULT_SLUG_REGEX;
+		}
+		$matchFound = @preg_match($slugRegex, $fileName, $matches);
+		
+		if ($matchFound) 
+		{
+			$parsedSlug   = isset($matches[self::REFERENCE_ID_WILDCARD]) ? $matches[self::REFERENCE_ID_WILDCARD] : null;
+			$parsedFlavor = isset($matches[self::FLAVOR_NAME_WILDCARD])  ? $matches[self::FLAVOR_NAME_WILDCARD]  : null;
+				
+			KalturaLog::debug('Parsed slug ['.$parsedSlug.'], Parsed flavor ['.$parsedFlavor.']');
+		}
+		
+		return $matchFound;
+	}
 }

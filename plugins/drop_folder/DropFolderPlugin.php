@@ -7,6 +7,22 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	const PLUGIN_NAME = 'dropFolder';
 	const DROP_FOLDER_EVENTS_CONSUMER = 'kDropFolderEventsConsumer';
 	
+	//Error Messages
+	const ERROR_CONNECT_MESSAGE = 'Failed to connect to the drop folder. Please verify host and port information and/or actual access to the drop folder';
+	const ERROR_AUTENTICATE_MESSAGE = 'Failed to authenticate drop folder credentials or keys. Please verify credential settings';
+	const ERROR_GET_PHISICAL_FILE_LIST_MESSAGE = 'Failed to list files located in the  drop folder. Please verify drop folder path and/or listing permissions in physical drop folder path';
+	const ERROR_GET_DB_FILE_LIST_MESSAGE = 'Failed to list drop folder records in Kaltura DB.  Please verify that Kaltura\'s services and batch system is running properly';
+	const DROP_FOLDER_APP_ERROR_MESSAGE = 'Drop folder applicative error. Please verify that Kaltura\'s services and batch system is running properly. Log Description: ';
+	const ERROR_READING_FILE_MESSAGE = 'Failed to read file or file details at: ';
+	const ERROR_DELETING_FILE_MESSAGE = 'Failed to delete the file at: ';
+	const ERROR_UPDATE_FILE_MESSAGE = 'Failed to update the drop folder file record in Kaltura.';
+	const SLUG_REGEX_NO_MATCH_MESSAGE = 'Failed to parse filename according to drop folder naming convention definition';
+	const ERROR_ADDING_CONTENT_PROCESSOR_MESSAGE = 'Failed to activate the drop folder engine processing for this file';
+	const ERROR_IN_CONTENT_PROCESSOR_MESSAGE = 'Drop folder engine processing failure';
+	const ERROR_DOWNLOADING_FILE_MESSAGE = 'Failed in file transferring from the drop folder to Kaltura';
+	const FLAVOR_NOT_FOUND_MESSAGE = 'Parsed flavor system name could not be found';
+	
+	
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
@@ -205,17 +221,7 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			{
 				return 'KalturaDropFolderContentProcessorJobData';
 			}
-		}
-			
-		if ($baseClass == 'KDropFolderFileHandler')
-		{
-			if ($enumValue == KalturaDropFolderFileHandlerType::CONTENT)
-			{
-				return 'KDropFolderContentFileHandler';
-			}
-			
-		}
-		
+		}		
 		return null;
 	}
 	

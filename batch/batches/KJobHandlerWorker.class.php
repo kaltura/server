@@ -76,7 +76,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 			catch(kTemporaryException $ktex)
 			{
 				$this->unimpersonate();
-				if($ktex->resetJobExecutionAttempts)
+				if($ktex->getResetJobExecutionAttempts())
 				{
 					$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 				}

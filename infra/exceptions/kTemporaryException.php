@@ -8,11 +8,25 @@
  */
 class kTemporaryException extends kException
 {
-	public $resetJobExecutionAttempts = false;
+	protected $resetJobExecutionAttempts = false;
 	
 	public function __construct($message, $code = 0)
 	{
 		parent::__construct($code, $message);
+	}
+	
+	/**
+	 * @return the $resetJobExecutionAttempts
+	 */
+	public function getResetJobExecutionAttempts() {
+		return $this->resetJobExecutionAttempts;
+	}
+
+	/**
+	 * @param bool $resetJobExecutionAttempts
+	 */
+	public function setResetJobExecutionAttempts($resetJobExecutionAttempts) {
+		$this->resetJobExecutionAttempts = $resetJobExecutionAttempts;
 	}
 	
 }

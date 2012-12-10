@@ -12,7 +12,7 @@ class kDropFolderContentProcessorJobData extends kJobData
     private $parsedSlug;
     
    	/**
-	 * @var DropFolderContentFileHandlerMatchPolicy
+	 * @var int
 	 */
 	private $contentMatchPolicy;
 	

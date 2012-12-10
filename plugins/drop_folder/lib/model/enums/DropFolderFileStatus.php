@@ -19,5 +19,5 @@ interface DropFolderFileStatus extends BaseEnum
 	const ERROR_DOWNLOADING = 12; // error while downloading file to local storage
 	const PROCESSING        = 13; //in process by batch job
 	const PARSED			= 14; //XML content resource parsed from the XML but wasn't added yet to the drop folder
-	const DETECTED			= 15;
+	const DETECTED			= 15; //Resource was detected by FTP or Aspera servers as started upload
 }

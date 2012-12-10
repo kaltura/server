@@ -12,6 +12,4 @@ class KalturaDropFolderErrors extends KalturaErrors
 	const DROP_FOLDER_NOT_FOUND = "DROP_FOLDER_NOT_FOUND,Drop folder id [%s] not found";
 	
 	const DROP_FOLDER_ALREADY_EXISTS = "DROP_FOLDER_ALREADY_EXISTS,Drop folder with path [%s] already exists";
-	
-	const DROP_FOLDER_FILE_UNIQUE_CONSTRAINT_VIOLATION = "23000,Drop folder file already exists";
 }

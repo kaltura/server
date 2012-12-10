@@ -21,7 +21,7 @@ class ScpDropFolder extends SshDropFolder
 	    return $url;
 	}
 	
-	public function getFileTransferMgrType()
+	protected function getRemoteFileTransferMgrType()
 	{
 	    return kFileTransferMgrType::SCP;
 	}

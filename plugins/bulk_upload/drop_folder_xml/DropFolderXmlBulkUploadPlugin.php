@@ -10,6 +10,14 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	const XML_BULK_UPLOAD_PLUGIN_VERSION_BUILD = 0;	
 	const DROP_FOLDER_XML_EVENTS_CONSUMER = 'kDropFolderXmlEventsConsumer';
 	
+	//Error Messages
+	const ERROR_ADDING_BULK_UPLOAD_MESSAGE = 'Failed to create bulk upload job in Kaltura';
+	const ERROR_IN_BULK_UPLOAD_MESSAGE = 'Failed  to execute the bulk upload job in Kaltura';
+	const ERROR_ADD_CONTENT_RESOURCE_MESSAGE = 'Failed to add drop folder content resource files';
+	const MALFORMED_XML_FILE_MESSAGE = 'Malformed XML file';
+	const XML_FILE_SIZE_EXCEED_LIMIT_MESSAGE = 'Failed to handle XML, file size exceeds the 10MB limit';
+	
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
@@ -79,10 +87,6 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 			list($taskConfig, $kClient, $job) = $constructorArgs;
 			return new DropFolderXmlBulkUploadEngine($taskConfig, $kClient, $job);
 		}
-		
-		if ($baseClass == 'KDropFolderFileHandler' && $enumValue == KalturaDropFolderFileHandlerType::XML)
-				return new KDropFolderXmlFileHandler();
-		
 		
 		if ($baseClass == 'KalturaDropFolderFileHandlerConfig' && $enumValue == self::getFileHandlerTypeCoreValue(DropFolderXmlFileHandlerType::XML))
 			return new KalturaDropFolderXmlBulkUploadFileHandlerConfig();
@@ -283,6 +287,18 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 		return kPluginableEnumsManager::apiToCore('DropFolderFileHandlerType', $value);
 	}
 	
+	public static function getErrorCodeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('DropFolderFileErrorCode', $value);
+	}
+	
+	public static function getBatchJobObjectTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BatchJobObjectType', $value);
+	}
+		
 	/**
 	 * @return string external API value of dynamic enum.
 	 */

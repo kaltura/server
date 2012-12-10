@@ -13,9 +13,9 @@ interface DropFolderFileErrorCode extends BaseEnum
 	const ERROR_READING_FILE = 6;
 	const ERROR_DOWNLOADING_FILE = 7;
 	const ERROR_UPDATE_FILE = 8;
-	const ERROR_ADD_CONTENT_RESOURCE = 9;
 	const ERROR_ADDING_CONTENT_PROCESSOR = 10;
 	const ERROR_IN_CONTENT_PROCESSOR = 11;
 	const ERROR_DELETING_FILE = 12;
+	const FILE_NO_MATCH = 13;
 }
 

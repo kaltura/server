@@ -22,7 +22,14 @@ class KPhysicalDropFolderUtils
 		$this->folder = $folder;
 		$this->fileTransferMgr = self::getFileTransferManager($folder);
 	}
-		
+
+	/**
+	 * Local drop folder - constract full path
+	 * Remote drop folder - download file to a local temp directory and return the temp file path
+	 * @param string $fileName
+	 * @param int $fileId
+	 * @throws Exception
+	 */
 	public function getLocalFilePath($fileName, $fileId)
 	{
 		$dropFolderFilePath = $this->folder->path.'/'.$fileName;
@@ -110,6 +117,10 @@ class KPhysicalDropFolderUtils
 		return $fileLocation;
 	}
 	
+	/**
+	 * This mapping is required since the Enum values of the drop folder and file transfer manager are not the same
+	 * @param int $dropFolderType
+	 */
 	private static function getFileTransferMgrType($dropFolderType)
 	{
 		switch ($dropFolderType)

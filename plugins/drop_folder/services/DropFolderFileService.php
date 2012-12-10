@@ -8,6 +8,8 @@
  */
 class DropFolderFileService extends KalturaBaseService
 {
+	const MYSQL_CODE_DUPLICATE_KEY = 23000;
+	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -28,48 +30,10 @@ class DropFolderFileService extends KalturaBaseService
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 * @throws KalturaDropFolderErrors::DROP_FOLDER_NOT_FOUND
-	 * @throws KalturaDropFolderErrors::DROP_FOLDER_FILE_ALREADY_EXISTS
 	 */
 	public function addAction(KalturaDropFolderFile $dropFolderFile)
 	{
-		// check for required parameters
-		$dropFolderFile->validatePropertyNotNull('dropFolderId');
-		$dropFolderFile->validatePropertyNotNull('fileName');
-		$dropFolderFile->validatePropertyMinValue('fileSize', 0);
-		
-		// check that drop folder id exists in the system
-		$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->dropFolderId);
-		if (!$dropFolder) {
-			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_NOT_FOUND, $dropFolderFile->dropFolderId);
-		}
-				
-		// save in database
-		$status = $dropFolderFile->status;
-		$dropFolderFile->status = null;		
-		$dbDropFolderFile = $dropFolderFile->toInsertableObject();
-		/* @var $dbDropFolderFile DropFolderFile */
-		$dbDropFolderFile->setPartnerId($dropFolder->getPartnerId());
-		if($status == KalturaDropFolderFileStatus::PARSED)
-			$dbDropFolderFile->setStatus(DropFolderFileStatus::PARSED);
-		else
-			$dbDropFolderFile->setStatus(DropFolderFileStatus::UPLOADING);
-		
-		try 
-		{
-			$dbDropFolderFile->save();	
-		}
-		catch(PropelException $e)
-		{
-			if($e->getCause()->getCode() == 23000) //unique constraint
-			{
-				KalturaLog::debug('unique constraint exception');
-				throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_FILE_UNIQUE_CONSTRAINT_VIOLATION);
-			}
-		}	
-		// return the saved object
-		$dropFolderFile = new KalturaDropFolderFile();
-		$dropFolderFile->fromObject($dbDropFolderFile);
-		return $dropFolderFile;
+		return $this->newFileAddedOrDetected($dropFolderFile, DropFolderFileStatus::UPLOADING);
 	}
 	
 	/**
@@ -239,6 +203,105 @@ class DropFolderFileService extends KalturaBaseService
 		
 		return $dropFolderFile;
 	}
+
+	/**
+	 * Allows you to add a new KalturaDropFolderFile object in status DETECTED
+	 * 
+	 * @action detected
+	 * @param KalturaDropFolderFile $dropFolderFile
+	 * @return KalturaDropFolderFile
+	 * 
+	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
+	 * @throws KalturaDropFolderErrors::DROP_FOLDER_NOT_FOUND
+	 */
 	
+	public function detectedAction(KalturaDropFolderFile $dropFolderFile)
+	{
+		return $this->newFileAddedOrDetected($dropFolderFile, DropFolderFileStatus::DETECTED);
+	}
+	
+	private function newFileAddedOrDetected(KalturaDropFolderFile $dropFolderFile, $fileStatus)
+	{
+		// check for required parameters
+		$dropFolderFile->validatePropertyNotNull('dropFolderId');
+		$dropFolderFile->validatePropertyNotNull('fileName');
+		$dropFolderFile->validatePropertyMinValue('fileSize', 0);
 		
+		// check that drop folder id exists in the system
+		$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->dropFolderId);
+		if (!$dropFolder) {
+			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_NOT_FOUND, $dropFolderFile->dropFolderId);
+		}
+				
+		// save in database
+		$dropFolderFile->status = null;		
+		$dbDropFolderFile = $dropFolderFile->toInsertableObject();
+		/* @var $dbDropFolderFile DropFolderFile */
+		$dbDropFolderFile->setPartnerId($dropFolder->getPartnerId());
+		$dbDropFolderFile->setStatus($fileStatus);
+		
+		try 
+		{
+			$dbDropFolderFile->save();	
+		}
+		catch(PropelException $e)
+		{
+			if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
+			{
+				$existingDropFolderFile = DropFolderFilePeer::retrieveByDropFolderIdAndFileName($dropFolderFile->dropFolderId, $dropFolderFile->fileName);
+				KalturaLog::debug('drop folder file exists ['.$existingDropFolderFile->getId().']');
+				switch($existingDropFolderFile->getStatus())
+				{					
+					case DropFolderFileStatus::PARSED:
+						KalturaLog::debug('Exisiting file status is PARSED, updating status to ['.$fileStatus.']');
+						$existingDropFolderFile = $dropFolderFile->toUpdatableObject($existingDropFolderFile);
+						$existingDropFolderFile->setStatus($fileStatus);						
+						$existingDropFolderFile->save();
+						$dbDropFolderFile = $existingDropFolderFile;
+						break;
+					case DropFolderFileStatus::DETECTED:
+						KalturaLog::debug('Exisiting file status is DETECTED, updating status to ['.$fileStatus.']');
+						$existingDropFolderFile = $dropFolderFile->toUpdatableObject($existingDropFolderFile);
+						if($existingDropFolderFile->getStatus() != $fileStatus)
+							$existingDropFolderFile->setStatus($fileStatus);
+						$existingDropFolderFile->save();
+						$dbDropFolderFile = $existingDropFolderFile;
+						break;
+					case DropFolderFileStatus::UPLOADING:
+						if($fileStatus == DropFolderFileStatus::UPLOADING)
+						{
+							KalturaLog::debug('Exisiting file status is UPLOADING, updating properties');
+							$existingDropFolderFile = $dropFolderFile->toUpdatableObject($existingDropFolderFile);
+							$existingDropFolderFile->save();
+							$dbDropFolderFile = $existingDropFolderFile;
+							break;							
+						}
+					default:
+						KalturaLog::debug('Setting current file to PURGED ['.$existingDropFolderFile->getId().']');
+						$existingDropFolderFile->setStatus(DropFolderFileStatus::PURGED);				
+						$existingDropFolderFile->save();
+						if(	$existingDropFolderFile->getLeadDropFolderFileId() && 
+							$existingDropFolderFile->getLeadDropFolderFileId() != $existingDropFolderFile->getId())
+						{
+							KalturaLog::debug('Updating lead id ['.$existingDropFolderFile->getLeadDropFolderFileId().']');
+							$newDropFolderFile = $dbDropFolderFile->copy();
+							$newDropFolderFile->setLeadDropFolderFileId($existingDropFolderFile->getLeadDropFolderFileId());	
+						}
+						KalturaLog::debug('Creating new drop folder file');
+						$newDropFolderFile->save();
+						$dbDropFolderFile = $newDropFolderFile;
+				}
+			}
+			else 
+			{
+				throw $e;
+			}
+		}	
+		// return the saved object
+		$dropFolderFile = new KalturaDropFolderFile();
+		$dropFolderFile->fromObject($dbDropFolderFile);
+		return $dropFolderFile;		
+		
+	}
+	
 }

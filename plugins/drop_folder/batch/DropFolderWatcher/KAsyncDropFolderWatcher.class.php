@@ -7,8 +7,6 @@
  */
 class KAsyncDropFolderWatcher extends KPeriodicWorker
 {
-	const NEW_FILE = -1;
-	
 	/**
 	 * @var KalturaDropFolderClientPlugin
 	 */
@@ -20,12 +18,10 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	private $physicalDropFolderUtils = null;
 	
 	/**
-	 * @var KDropFolderFileHandler
+	 * @var KDropFolderServicesHelper
 	 */
-	private $dropFolderFileHandler = null;
-	
-	private $purgedFiles = null;
-		
+	private $dropFolderServicesHelper = null;
+			
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -50,6 +46,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		KalturaLog::info("Drop folder watcher batch is running");
 		
 		$this->dropFolderPlugin = KalturaDropFolderClientPlugin::get($this->kClient);
+		$this->dropFolderServicesHelper = new KDropFolderServicesHelper($this->kClient);	
 		
 		if($this->taskConfig->isInitOnly())
 			return $this->init();
@@ -69,27 +66,35 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			    catch (kFileTransferMgrException $e)
 			    {
 			    	if($e->getCode() == kFileTransferMgrException::cantConnect)
-			    		$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_CONNECT, 'Failed to connect to the drop folder', $e);
+			    		$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_CONNECT, DropFolderPlugin::ERROR_CONNECT_MESSAGE, $e);
 			    	if($e->getCode() == kFileTransferMgrException::cantAuthenticate)
-			    		$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_AUTENTICATE, 'Failed to autenticate', $e);
+			    		$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_AUTENTICATE, DropFolderPlugin::ERROR_AUTENTICATE_MESSAGE, $e);
 			    	else
-			    		$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_GET_PHISICAL_FILE_LIST, 'Failed to retrieve files from the drop folder', $e);
+			    		$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_GET_PHISICAL_FILE_LIST, DropFolderPlugin::ERROR_GET_PHISICAL_FILE_LIST_MESSAGE, $e);
 			    	$this->unimpersonate();
 			    }
 			    catch (KalturaException $e)
 			    {
-			    	$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_GET_DB_FILE_LIST, 'Failed to get a list of drop folder files from the Database', $e);
+			    	$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_GET_DB_FILE_LIST, DropFolderPlugin::ERROR_GET_DB_FILE_LIST_MESSAGE, $e);
 			    	$this->unimpersonate();
 			    }
 			    catch (Exception $e) 
 			    {			        
-			        $this->setDropFolderError($folder, KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, 'Applicative error with the drop folder', $e);	
+			        $this->setDropFolderError($folder, KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, DropFolderPlugin::DROP_FOLDER_APP_ERROR_MESSAGE.$e->getMessage(), $e);	
 			        $this->unimpersonate();
 			    }
 			}
 		}
 	}
 	
+	/**
+	 * Handle specific folder:
+	 * 1. detect new files and invoke add API
+	 * 2. monitor files uploading and change status to PENDING based on the file size change interval
+	 * 3. purge files marked as autodelete or in status deleted
+	 * 4. mark files that do not exist in a drop folder as purged
+	 * @param KalturaDropFolder $folder
+	 */
 	private function watchFolder(KalturaDropFolder $folder)
 	{
 		KalturaLog::debug('Watching folder ['.$folder->id.']');
@@ -100,17 +105,14 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		if($folder->status == KalturaDropFolderStatus::ERROR)
 			$folder->status = KalturaDropFolderStatus::ENABLED;
 			    										
-		$this->physicalDropFolderUtils = new KPhysicalDropFolderUtils($folder);
-		$this->dropFolderFileHandler = KDropFolderFileHandler::getHandler($folder->fileHandlerType, $this->kClient, $folder);					
-		$physicalFiles = $this->getSortedDropFolderFilesFromPhysicalFolder($folder);
+		$this->physicalDropFolderUtils = new KPhysicalDropFolderUtils($folder);		
+		$physicalFiles = $this->getDropFolderFilesFromPhysicalFolder($folder);
+		if(count($physicalFiles) > 0)
+			$dropFolderFilesMap = $this->loadDropFolderFiles($folder);
+		else 
+			$dropFolderFilesMap = array();
 			
-		$filter = $this->createDropFolderFileFilter($folder->id);
-		$pager = $this->createDropFolderFilterPager();
-		$dropFolderFiles = null;
 		$ignorePatterns = array_map('trim', explode(',', $folder->ignoreFileNamePatterns));	
-		$lastDropFolderFileIndex = 0;
-		$eol = false;
-		$this->purgedFiles = array();
 		
 		foreach ($physicalFiles as $physicalFileName) 
 		{	
@@ -118,16 +120,15 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			{	
 				KalturaLog::debug('Watch file ['.$physicalFileName.']');
 				
-				$currentDropFolderFileIndex = $this->findDropFolderFileByPhisicalName($physicalFileName, $dropFolderFiles, 
-																					  $filter, $pager, $lastDropFolderFileIndex, $eol);				
-				if($currentDropFolderFileIndex == self::NEW_FILE)
+				$dropFolderFile = $dropFolderFilesMap[$physicalFileName];		
+				if(!$dropFolderFile)
 				{
 					try 
 					{
 						$fullPath = $folder->path.'/'.$physicalFileName;
 						$lastModificationTime = $this->physicalDropFolderUtils->fileTransferMgr->modificationTime($fullPath);
 						$fileSize = $this->physicalDropFolderUtils->fileTransferMgr->fileSize($fullPath);
-						$this->dropFolderFileHandler->handleFileAdded($physicalFileName, $fileSize, $lastModificationTime);
+						$this->dropFolderServicesHelper->handleFileAdded($physicalFileName, $folder->id, $fileSize, $lastModificationTime);
 							
 					}
 					catch (Exception $e)
@@ -137,11 +138,18 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 				}
 				else //drop folder file entry found
 				{
-					$this->handleExisitingDropFolderFile($folder, $dropFolderFiles[$currentDropFolderFileIndex]);
+					//if file exist in the folder remove it from the map
+					//all the files that are left in a map will be marked as PURGED
+					unset($dropFolderFilesMap[$physicalFileName]);
+					$this->handleExisitingDropFolderFile($folder, $dropFolderFile);
 				}					
 			}					
 		}
-		$this->markFilesAsPurged($dropFolderFiles, $lastDropFolderFileIndex);
+		foreach ($dropFolderFilesMap as $dropFolderFile) 
+		{
+			$this->dropFolderServicesHelper->handleFilePurged($dropFolderFile->id);
+		}
+				
 		if($originalDropFolderStatus == KalturaDropFolderStatus::ERROR)
 		   	$this->setDropFolderOK($folder);
 		
@@ -186,132 +194,121 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		}
 		return $isValid;
 	}
-	
-	
-	private function createDropFolderFileFilter($dropFolderId)
-	{
-		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
-		$dropFolderFileFilter->dropFolderIdEqual = $dropFolderId;
-		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::FILE_NAME_ASC;
-		
-		return $dropFolderFileFilter;
-	}
-	
-	private function createDropFolderFilterPager()
-	{
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 500;
-		if($this->taskConfig->params->pageSize)
-			$pager->pageSize = $this->taskConfig->params->pageSize;		
-		return $pager;
-	}
-		
-	private function getSortedDropFolderFilesFromPhysicalFolder($folder)
+			
+	private function getDropFolderFilesFromPhysicalFolder($folder)
 	{
 		KalturaLog::debug('Retrieving physical files list');
 		
-		$physicalFiles = $this->physicalDropFolderUtils->fileTransferMgr->listDir($folder->path);
-		if ($physicalFiles) 
-			usort($physicalFiles, 'strcasecmp');			
-		else
-			KalturaLog::info('No physical files found for drop folder id ['.$folder->id.'] with path ['.$folder->path.']');
-		
-		KalturaLog::log('Found ['.count($physicalFiles).'] in the folder');
-		
+		if($this->physicalDropFolderUtils->fileTransferMgr->fileExists($folder->path))
+		{
+			$physicalFiles = $this->physicalDropFolderUtils->fileTransferMgr->listDir($folder->path);
+			if ($physicalFiles) 
+			{
+				KalturaLog::log('Found ['.count($physicalFiles).'] in the folder');			
+			}		
+			else
+			{
+				KalturaLog::info('No physical files found for drop folder id ['.$folder->id.'] with path ['.$folder->path.']');
+				$physicalFiles = array();
+			}
+		}
+		else 
+		{
+			throw new kFileTransferMgrException('Drop folder path not valid ['.$folder->path.']', kFileTransferMgrException::remotePathNotValid);
+		}
+				
 		return $physicalFiles;
 	}
 	
-	private function findDropFolderFileByPhisicalName($physicalFileName, &$dropFolderFiles, KalturaDropFolderFileFilter $filter, KalturaFilterPager &$pager, &$lastDropFolderFileIndex, &$eol)
+	/**
+	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
+	 * @param KalturaDropFolder $folder
+	 */
+	private function loadDropFolderFiles(KalturaDropFolder $folder)
 	{
+		$dropFolderFilesMap = array();
+		$count = 0;
+		$dropFolderFiles =null;
+		$eol = false;
+		
+		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
+		$dropFolderFileFilter->dropFolderIdEqual = $folder->id;
+		
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		if($this->taskConfig->params->pageSize)
+			$pager->pageSize = $this->taskConfig->params->pageSize;	
+
 		while(!$eol)
 		{
-			if($dropFolderFiles == null || $lastDropFolderFileIndex > count($dropFolderFiles))
-				$getNextPage = true;
-			else
-				$getNextPage = false;
-			
-			if($getNextPage)
+			$pager->pageIndex++;
+			KalturaLog::debug('getting page ['.$pager->pageIndex. '] from Drop Folder File ');
+			$dropFolderFiles = $this->dropFolderPlugin->dropFolderFile->listAction($dropFolderFileFilter, $pager);
+			$totalCount = $dropFolderFiles->totalCount;
+			$dropFolderFiles = $dropFolderFiles->objects;
+			KalturaLog::debug('Total files count ['.$totalCount.']');
+			foreach ($dropFolderFiles as $dropFolderFile) 
 			{
-				$getNextPage = false;
-				$pager->pageIndex++;
-				$dropFolderFiles = $this->dropFolderPlugin->dropFolderFile->listAction($filter, $pager);
-				$dropFolderFiles = $dropFolderFiles->objects;
-				$lastDropFolderFileIndex = 0;
+				if($dropFolderFile->status != KalturaDropFolderFileStatus::PARSED && $dropFolderFile->status != KalturaDropFolderFileStatus::DETECTED)
+				{
+					$dropFolderFilesMap[$dropFolderFile->fileName] = $dropFolderFile;
+				}
+				$count++;				
+				
 			}
-			
-			for ($i = $lastDropFolderFileIndex; $i < count($dropFolderFiles); $i++) 
-			{
-				$dropFolderFile = $dropFolderFiles[$i];
-				KalturaLog::debug('comparing files: '.$dropFolderFile->fileName. ' '.$physicalFileName);
-				$res = strcasecmp($dropFolderFile->fileName, $physicalFileName);
-				if($res == 0)
-				{
-					$res = strcmp($dropFolderFile->fileName, $physicalFileName);
-				}
-				if($res == 0)
-				{
-					$lastDropFolderFileIndex = $i+1;
-					return $i;
-				}
-				else if($res > 0)
-				{
-					$lastDropFolderFileIndex = $i;
-					return self::NEW_FILE;
-				}
-				if($dropFolderFile->status != KalturaDropFolderFileStatus::PARSED)
-					$this->purgedFiles[] = $dropFolderFile;
-			}
-			$lastDropFolderFileIndex = $i;
-			if($lastDropFolderFileIndex >= count($dropFolderFiles) && count($dropFolderFiles) < $pager->pageSize)
+			KalturaLog::debug('Current count ['.$count.']');
+			if($count >= $totalCount)
 				$eol = true;
-			else 
-				$lastDropFolderFileIndex++;
-		}
-		
-		return self::NEW_FILE;
+		}	
+		return $dropFolderFilesMap;
 	}
 	
-	
+	/**
+	 * 1. If file in status UPLOADING check if upload finished
+	 * 2. otherwise check if file was replaced based on the last modification time, if yes add new file to the drop folder file table
+	 * 3. purge files their autodelete time had arrived and files with status DELETED
+	 * @param KalturaDropFolder $folder
+	 * @param KalturaDropFolderFile $dropFolderFile
+	 */
 	private function handleExisitingDropFolderFile(KalturaDropFolder $folder, KalturaDropFolderFile $dropFolderFile)
 	{
 		KalturaLog::debug('Handling existing drop folder file with id ['.$dropFolderFile->id.']');
 		try 
 		{
-			$knownLastModificationTime = $dropFolderFile->lastModificationTime;
 			$fullPath = $folder->path.'/'.$dropFolderFile->fileName;
 			$lastModificationTime = $this->physicalDropFolderUtils->fileTransferMgr->modificationTime($fullPath);
 			$fileSize = $this->physicalDropFolderUtils->fileTransferMgr->fileSize($fullPath);
 		}
 		catch (Exception $e)
 		{
-			$this->dropFolderFileHandler->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 
-															'Cannot read file or file details at path ['.$fullPath.']', $e);	
+			KalturaLog::err('Failed to get modification time and file size for file ['.$fullPath.']');
+			$this->dropFolderServicesHelper->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 
+															DropFolderPlugin::ERROR_READING_FILE_MESSAGE. '['.$fullPath.']', $e);	
 			return false;		
 		}				 
-		
-		if ($knownLastModificationTime && ($lastModificationTime > $knownLastModificationTime))
-		{						 					 			
-			$this->dropFolderFileHandler->handleFileReplaced($dropFolderFile->id, $dropFolderFile->fileName, $fileSize, $lastModificationTime);
-		}		 	
-		else 
-		{	
-			switch ($dropFolderFile->status)
-			 {
-			 	case KalturaDropFolderFileStatus::PARSED:
-			 		$this->dropFolderFileHandler->handleFileAdded($dropFolderFile->fileName, $fileSize, $lastModificationTime);
-			 		break;
-			 	case KalturaDropFolderFileStatus::UPLOADING:
-			 		$this->handleUploadingDropFolderFile($folder, $dropFolderFile, $fileSize, $lastModificationTime);
-			 		break;
-			 	case KalturaDropFolderFileStatus::HANDLED:
-			 		if($dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::AUTO_DELETE)
-			 			break;
-			 		if(time() <= $dropFolderFile->updatedAt + $dropFolder->autoFileDeleteDays*86400)
-			 			break;
-			 	case KalturaDropFolderFileStatus::DELETED:
-			 		$this->purgeFile($folder, $dropFolderFile);
-			 		break;
-			 }	
+				
+		if($dropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING)
+		{
+			$this->handleUploadingDropFolderFile($folder, $dropFolderFile, $fileSize, $lastModificationTime);
+		}
+		else
+		{
+			KalturaLog::debug('Last modification time ['.$lastModificationTime.'] known last modification time ['.$dropFolderFile->lastModificationTime.']');
+			$isLastModificationTimeUpdated = $dropFolderFile->lastModificationTime && $dropFolderFile->lastModificationTime != '' && ($lastModificationTime > $dropFolderFile->lastModificationTime);
+			
+			if($isLastModificationTimeUpdated) //file is replaced, add new entry
+		 	{
+		 		$this->dropFolderServicesHelper->handleFileAdded($dropFolderFile->fileName, $folder->id, $fileSize, $lastModificationTime);
+		 	}
+		 	else
+		 	{
+		 		$deleteTime = $dropFolderFile->updatedAt + $folder->autoFileDeleteDays*86400;
+		 		if(($dropFolderFile->status == KalturaDropFolderFileStatus::HANDLED && $folder->fileDeletePolicy == KalturaDropFolderFileDeletePolicy::AUTO_DELETE && time() > $deleteTime) ||
+		 			$dropFolderFile->status == KalturaDropFolderFileStatus::DELETED)
+		 		{
+		 			$this->purgeFile($folder, $dropFolderFile);
+		 		}
+		 	}
 		}
 	}
 	
@@ -319,12 +316,12 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	{		
 		if (!$currentFileSize) 
 		{
-			$this->dropFolderFileHandler->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 
-															'Cannot read file or file details at path ['.$dropFolder->partnerId.'/'.$dropFolderFile->fileName);
+			$this->dropFolderServicesHelper->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 
+															DropFolderPlugin::ERROR_READING_FILE_MESSAGE.'['.$dropFolder->partnerId.'/'.$dropFolderFile->fileName);
 		}		
 		else if ($currentFileSize != $dropFolderFile->fileSize)
 		{
-			$this->dropFolderFileHandler->handleFileUploading($dropFolderFile->id, $currentFileSize, $lastModificationTime);
+			$this->dropFolderServicesHelper->handleFileUploading($dropFolderFile->id, $currentFileSize, $lastModificationTime);
 		}
 		else // file sizes are equal
 		{
@@ -336,7 +333,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			// check if fileSizeCheckInterval time has passed since the last file size update	
 			if ($time > $fileSizeLastSetAt)
 			{
-				$this->dropFolderFileHandler->handleFileUploaded($dropFolderFile->id, $lastModificationTime);
+				$this->dropFolderServicesHelper->handleFileUploaded($dropFolderFile->id, $lastModificationTime);
 			}
 		}
 	}
@@ -356,24 +353,12 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		    $delResult = null;
 		}
 		if (!$delResult) 
-			$this->dropFolderFileHandler->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_DELETING, KalturaDropFolderFileErrorCode::ERROR_DELETING_FILE, 
-														 'Cannot delete physical file at path ['.$fullPath.']');
+			$this->dropFolderServicesHelper->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_DELETING, KalturaDropFolderFileErrorCode::ERROR_DELETING_FILE, 
+														 DropFolderPlugin::ERROR_DELETING_FILE_MESSAGE. '['.$fullPath.']');
 		else
-		 	$this->dropFolderFileHandler->handleFilePurged($dropFolderFile->id);
+		 	$this->dropFolderServicesHelper->handleFilePurged($dropFolderFile->id);
 	}
-	
-	private function markFilesAsPurged($dropFolderFiles, $index)
-	{
-		foreach ($this->purgedFiles as $purgedFile) 
-		{
-			$this->dropFolderFileHandler->handleFilePurged($purgedFile->id);
-		}
-		for ($i=$index; $i < count ($dropFolderFiles); $i++)
-		{
-			$this->dropFolderFileHandler->handleFilePurged($dropFolderFiles[$i]->id);
-		}
-	}
-	
+		
 	private function getDropFoldersList() 
 	{
 		$folderTags = $this->taskConfig->params->tags;
@@ -393,9 +378,15 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		$filter->currentDc = KalturaNullableBoolean::TRUE_VALUE;
 		$filter->statusIn = KalturaDropFolderStatus::ENABLED. ','. KalturaDropFolderStatus::ERROR;
 		
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		if($this->taskConfig->params->pageSize)
+			$pager->pageSize = $this->taskConfig->params->pageSize;	
+		
+		
 		try 
 		{
-			$dropFolders = $this->dropFolderPlugin->dropFolder->listAction($filter, $this->createDropFolderFilterPager());
+			$dropFolders = $this->dropFolderPlugin->dropFolder->listAction($filter, $pager);
 			return $dropFolders;
 		}
 		catch (Exception $e) 

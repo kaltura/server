@@ -4,7 +4,7 @@
  * @package plugins.dropFolder
  * @subpackage Scheduler
  */
-abstract class KDropFolderFileHandler
+class KDropFolderServicesHelper
 {	
 	/**
 	 * @var KalturaClient
@@ -16,48 +16,23 @@ abstract class KDropFolderFileHandler
 	*/
 	protected $dropFolderFileService = null;
 	
-	/**
-	* @var KalturaDropFolder
-	*/
-	protected $folder = null;
 	
-	/**
-	 * @var KalturaDropFolderFileHandlerConfig
-	 */
-	protected $config;
-	
-	
-	/**
-	 * Return a new instance of a class extending KalturaDropFolderFileHandler, according to a given $type
-	 * @param KalturaDropFolderFileHandlerType $type
-	 * @return KalturaDropFolderFileHandler
-	 */
-	public static function getHandler($type, KalturaClient $client, KalturaDropFolder $dropFolder)
-	{
-		$handler = null;
-		switch ($type)
-		{
-			case KalturaDropFolderFileHandlerType::CONTENT:
-				$handler = new KDropFolderContentFileHandler();		
-						
-			default:
-				$handler = KalturaPluginManager::loadObject('KDropFolderFileHandler', $type);
-				if(!$handler)
-					throw new Exception("Unknown type [$type] of KDropFolderFileHandler");
-		}
-		$handler->initHandler($client, $dropFolder);
-		return $handler;
-	}
-	
-	protected function initHandler(KalturaClient $client, KalturaDropFolder $dropFolder)
+	public function __construct(KalturaClient $client)
 	{
 		$this->kClient = $client;
 		$dropFolderPlugin = KalturaDropFolderClientPlugin::get($this->kClient);
 		$this->dropFolderFileService = $dropFolderPlugin->dropFolderFile;
-		$this->folder = $dropFolder;
-		$this->config = $dropFolder->fileHandlerConfig;
 	}
 	
+	/**
+	 * Update drop folder entity with error
+	 * Enter description here ...
+	 * @param int $dropFolderFileId
+	 * @param int $errorStatus
+	 * @param int $errorCode
+	 * @param string $errorMessage
+	 * @param Exception $e
+	 */
 	public function handleFileError($dropFolderFileId, $errorStatus, $errorCode, $errorMessage, Exception $e = null)
 	{
 		try 
@@ -80,6 +55,13 @@ abstract class KDropFolderFileHandler
 		}
 	}	
 	
+	/**
+	 * Update uploading details
+	 * @param int $dropFolderFileId
+	 * @param int $fileSize
+	 * @param int $lastModificationTime
+	 * @param int $uploadStartDetectedAt
+	 */
 	public function handleFileUploading($dropFolderFileId, $fileSize, $lastModificationTime, $uploadStartDetectedAt = null)
 	{
 		KalturaLog::debug('Handling drop folder file uploading id ['.$dropFolderFileId.'] fileSize ['.$fileSize.'] last modification time ['.$lastModificationTime.']');
@@ -97,11 +79,15 @@ abstract class KDropFolderFileHandler
 		catch (Exception $e) 
 		{
 			$this->handleFileError($dropFolderFileId, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_UPDATE_FILE, 
-									'Cannot update drop folder file', $e);
+									DropFolderPlugin::ERROR_UPDATE_FILE_MESSAGE, $e);
 			return null;
 		}						
 	}
 	
+	/**
+	 * Mark file status as PURGED
+	 * @param int $dropFolderFileId
+	 */
 	public function handleFilePurged($dropFolderFileId)
 	{
 		KalturaLog::debug('Handling drop folder file purged id ['.$dropFolderFileId.']');
@@ -112,12 +98,17 @@ abstract class KDropFolderFileHandler
 		catch(Exception $e)
 		{
 			$this->handleFileError($dropFolderFileId, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_UPDATE_FILE, 
-									'Cannot update drop folder file', $e);
+									DropFolderPlugin::ERROR_UPDATE_FILE_MESSAGE, $e);
 			
 			return null;
 		}		
 	}
 	
+	/**
+	 * Update upload details and set file status to PENDING
+	 * @param int $dropFolderFileId
+	 * @param int $lastModificationTime
+	 */
 	public function handleFileUploaded($dropFolderFileId, $lastModificationTime)
 	{
 		KalturaLog::debug('Handling drop folder file uploaded id ['.$dropFolderFileId.'] last modification time ['.$lastModificationTime.']');
@@ -132,18 +123,36 @@ abstract class KDropFolderFileHandler
 		catch(KalturaException $e)
 		{
 			$this->handleFileError($dropFolderFileId, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_UPDATE_FILE, 
-									'Cannot update drop folder file', $e);
+									DropFolderPlugin::ERROR_UPDATE_FILE_MESSAGE, $e);
 			return null;
 		}
 	}
 	
-	public abstract function handleFileAdded($fileName, $fileSize, $lastModificationTime);
-
-	public function handleFileReplaced($dropFolderFileId, $fileName, $fileSize, $lastModificationTime)
+	/**
+	 * Add new drop folder file
+	 * @param string $fileName
+	 * @param int $dropFolderId
+	 * @param int $fileSize
+	 * @param int $lastModificationTime
+	 */
+	public function handleFileAdded($fileName, $dropFolderId, $fileSize, $lastModificationTime)
 	{
-		KalturaLog::debug('Handling drop folder file replaced id ['.$dropFolderFileId.'] name ['.$fileName.']');
-		$this->handleFilePurged($dropFolderFileId);
-		return $this->handleFileAdded($fileName, $fileSize, $lastModificationTime);		
+		KalturaLog::debug('Add drop folder file ['.$fileName.'] last modification time ['.$lastModificationTime.'] file size '.$fileSize.']');
+		try 
+		{
+			$newDropFolderFile = new KalturaDropFolderFile();
+	    	$newDropFolderFile->dropFolderId = $dropFolderId;
+	    	$newDropFolderFile->fileName = $fileName;
+	    	$newDropFolderFile->fileSize = $fileSize;
+	    	$newDropFolderFile->lastModificationTime = $lastModificationTime; 
+	    	$newDropFolderFile->uploadStartDetectedAt = time();
+			$dropFolderFile = $this->dropFolderFileService->add($newDropFolderFile);
+			return $dropFolderFile;
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err('Cannot add new drop folder file with name ['.$fileName.'] - '.$e->getMessage());
+			return null;
+		}
 	}
-
 }

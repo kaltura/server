@@ -120,10 +120,10 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 			$matchedEntry = $this->isEntryMatch($data);
 			if(!$matchedEntry)
 			{
-				$e = new kTemporaryException('No matching entry found');
+				$e = new kTemporaryException('No matching entry found', KalturaDropFolderFileErrorCode::FILE_NO_MATCH);
 				if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) >= time())	
 				{
-					$e->resetJobExecutionAttempts = true;
+					$e->setResetJobExecutionAttempts(true);
 				}	
 				throw $e;		
 			}
@@ -132,6 +132,12 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 		$updatedEntry = $this->kClient->baseEntry->updateContent($matchedEntry->id, $resource, $data->conversionProfileId);
 	}
 	
+	/**
+	 * Retrieve all the relevant drop folder files according to the list of id's passed on the job data.
+	 * Create resource object based on the conversion profile as an input to the ingestion API
+	 * @param KalturaBatchJob $job
+	 * @param KalturaDropFolderContentProcessorJobData $data
+	 */
 	private function getIngestionResource(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
 	{
 		$filter = new KalturaDropFolderFileFilter();
@@ -139,12 +145,12 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 		$dropFolderFiles = $this->dropFolderPlugin->dropFolderFile->listAction($filter); 
 		
 		$resource = null;
-		if($dropFolderFiles->totalCount == 1 && is_null($dropFolderFiles->objects[0]->parsedFlavor))
+		if($dropFolderFiles->totalCount == 1 && is_null($dropFolderFiles->objects[0]->parsedFlavor)) //only source is ingested
 		{
 			$resource = new KalturaDropFolderFileResource();
 			$resource->dropFolderFileId = $dropFolderFiles->objects[0]->id;			
 		}
-		else
+		else //ingest all the required flavors
 		{			
 			$fileToFlavorMap = array();
 			foreach ($dropFolderFiles->objects as $dropFolderFile) 
