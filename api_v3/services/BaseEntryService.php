@@ -804,7 +804,7 @@ class BaseEntryService extends KalturaEntryService
 				foreach ($availableConfigurations as $config)
 				{
 					/* @var $config KLiveStreamConfiguration */
-					if ($config->getProtocol() == PlaybackProtocol::HDS)
+					if ($config->getProtocol() == PlaybackProtocol::AKAMAI_HDS)
 					{
 						$result->streamerType = KalturaPlaybackProtocol::AKAMAI_HDS;
 					}
