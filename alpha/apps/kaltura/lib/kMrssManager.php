@@ -571,30 +571,7 @@ class kMrssManager
 
 		if ($mrssParams && $mrssParams->getItemXpathsToExtend())
 		{
-			foreach($mrssParams->getItemXpathsToExtend() as $itemXPathToExtend)
-			{
-				/* @var $itemXPathToExtend KExtendingItemMrssParameter */
-				$xmlNodesToExtend = $mrss->xpath($itemXPathToExtend->getXpath()); //metdata/entryIdX   /entry/customMetadata/metadata/entryIdY
-				foreach ($xmlNodesToExtend as $xmlNodeToExtend)
-				{
-					/* @var $xmlNodeToExtend SimpleXMLElement */
-					$xmlDomNodeToExtend = dom_import_simplexml($xmlNodeToExtend);
-					$nodeToExtendValue = $xmlDomNodeToExtend->nodeValue;
-					$extendingObject = $itemXPathToExtend->getIdentifier()->retrieveByIdentifier($nodeToExtendValue);
-					if ($extendingObject)		
-					{
-						$mrssParams->setItemXpathsToExtend(array());
-						$extendingNode = self::getExtendingItemNode($extendingObject, $xmlNodeToExtend->getName(), $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
-						KalturaLog::info("extending node: ". $extendingNode->asXML());
-						//Append new node after current one using DOMXML functionality.
-						$domExtendingElement = $xmlDomNodeToExtend->ownerDocument->importNode(dom_import_simplexml($extendingNode), true);
-						if ($xmlDomNodeToExtend->nextSibling)
-							$xmlDomNodeToExtend->parentNode->insertBefore($domExtendingElement,$xmlDomNodeToExtend->nextSibling );
-						else
-							$xmlDomNodeToExtend->parentNode->appendChild($domExtendingElement);
-					}
-				}
-			}
+			self::addExtendingItemsToMrss($mrss, $mrssParams);
 		}
 		self::addInstanceToPool($entry->getId(), $mrss);
 		return $mrss;
@@ -604,25 +581,29 @@ class kMrssManager
 	/**
 	 * Function returns MRSS XML for the object based on its identifier
 	 * @param BaseObject $object
-	 * @param string $mrssName
+	 * @param string $identifierValue 
+	 * @param SimpleXMLElement $mrss
+	 * @param string $nodeName
 	 * @param kMrssParameters $mrssParams
 	 * @param string $features
 	 * @return SimpleXMLElement
 	 */
-	public static function getExtendingItemNode (BaseObject $object, $mrssName = null, kMrssParameters $mrssParams = null, $features = null)
+	protected static function addExtendingItemNode (BaseObject $object, $identifierValue, SimpleXMLElement $mrss, $nodeName = null, kMrssParameters $mrssParams = null, $features = null)
 	{
 		$featuresArr = explode(",", $features);
 		switch (get_class($object))
 		{
 			case 'category':
-				$mrss = new SimpleXMLElement("<category_item/>");
-				return self::getCategoryMrssXml($object, $mrss , $mrssParams, $features);
+				$categoryItem = $mrss->addChild("category_item");
+				$categoryItem->addAttribute('identifier', $identifierValue);
+				return self::getCategoryMrssXml($object, $categoryItem , $mrssParams, $features);
 			case 'entry':
-				if (!$mrssName)
+				if (!$nodeName)
 				{
-					$mrssName = $entry;
+					$nodeName = 'entry';
 				}
-				$mrss = new SimpleXMLElement("<{$mrssName}_item/>");
+				$entryItem = new SimpleXMLElement("{$nodeName}_item");
+				$mrss->addAttribute('identifier', $identifierValue);
 				return self::getEntryMrssXml($object, $mrss, $mrssParams, $features);
 		}
 		
@@ -700,7 +681,51 @@ class kMrssManager
 			}
 		}
 		
+		if ($mrssParams && $mrssParams->getItemXpathsToExtend())
+		{
+			self::addExtendingItemsToMrss($mrss, $mrssParams);
+		}
+		
 		
 		return $mrss;
 	}
+	
+	/**
+	 * Function goes over finished MRSS XML and adds the required extending items in the appropriate slots
+	 * @param SimpleXMLElement $mrss
+	 * @param kMrssParameters $mrssParams
+	 * @return SimpleXMLElement
+	 */
+	protected static function addExtendingItemsToMrss (SimpleXMLElement $mrss, kMrssParameters $mrssParams)
+	{
+		foreach($mrssParams->getItemXpathsToExtend() as $itemXPathToExtend)
+		{
+			/* @var $itemXPathToExtend KExtendingItemMrssParameter */
+			$xmlNodesToExtend = $mrss->xpath($itemXPathToExtend->getXpath()); //metdata/entryIdX   /entry/customMetadata/metadata/entryIdY
+			foreach ($xmlNodesToExtend as $xmlNodeToExtend)
+			{
+				/* @var $xmlNodeToExtend SimpleXMLElement */
+				$identifierValue = $xmlNodeToExtend[0];
+				$extendingObject = $itemXPathToExtend->getIdentifier()->retrieveByIdentifier($identifierValue);
+				if ($extendingObject)		
+				{
+					$mrssParams->setItemXpathsToExtend(array());
+					if ($itemXPathToExtend->getExtensionMode() == MrssExtensionMode::APPEND)
+					{
+						$parents = $xmlNodeToExtend->xpath("parent::*");
+						self::addExtendingItemNode($extendingObject, $identifierValue, $parents[0], $xmlNodeToExtend->getName(), $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
+					}
+					else 
+					{
+						$xmlNodeToExtend[0] = null;
+						self::addExtendingItemNode($extendingObject, $identifierValue, $xmlNodeToExtend, $xmlNodeToExtend->getName(), $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
+					}
+					
+				}
+			}
+		}
+		
+		return $mrss;
+	}
+	
 }
