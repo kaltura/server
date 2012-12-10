@@ -5,6 +5,10 @@
  */
 class playManifestAction extends kalturaAction
 {
+	const URL = 'url';
+	
+	const HDNETWORKSMIL = 'hdnetworksmil';
+	
 	/**
 	 * Short names for action arguments
 	 * @var array
@@ -917,6 +921,22 @@ class playManifestAction extends kalturaAction
 	 */
 	private function getSecureHdUrl()
 	{
+		if ($this->entry->getType() == entryType::LIVE_STREAM)
+		{
+			$flavor = null;
+			foreach ($this->entry->getLiveStreamConfigurations() as $liveStreamConfig)
+			{
+				/* @var $liveStreamConfig KLiveStreamConfiguration */
+				if ($liveStreamConfig->getProtocol() == PlaybackProtocol::HDS)
+				{
+					$flavor = $this->getFlavorAssetInfo($liveStreamConfig->getUrl());
+					break;
+				}
+			}
+			
+			return $flavor;
+		}
+		
 		if (!method_exists($this->urlManager, 'getManifestUrl'))
 		{
 			KalturaLog::debug('URL manager [' . get_class($this->urlManager) . '] does not support manifest URL');
@@ -1165,19 +1185,6 @@ class playManifestAction extends kalturaAction
 	 */
 	private function serveHds()
 	{
-		if ($this->entry->getType() == entryType::LIVE_STREAM)
-		{
-			foreach ($this->entry->getLiveStreamConfigurations() as $liveStreamConfig)
-			{
-				/* @var $liveStreamConfig KLiveStreamConfiguration */
-				if ($liveStreamConfig->getProtocol() == PlaybackProtocol::HDS)
-					$hdsUrl = $liveStreamConfig->getUrl();
-			}
-			$renderer = new kF4MManifestRenderer();
-			$renderer->flavors[]= $this->getFlavorAssetInfo($hdsUrl);
-			return $renderer;
-		}
-		
 		$flavors = $this->buildHttpFlavorsArray();
 		
 		$flavors = $this->sortFlavors($flavors);
@@ -1378,24 +1385,24 @@ class playManifestAction extends kalturaAction
 				$renderer = $this->serveHds();
 				break;
 				
-			case "url":
+			case self::URL:
 				$this->format = "http"; // build url for an http delivery
 				$renderer = $this->serveUrl();
 				break;
 				
-			case "rtsp":
+			case PlaybackProtocol::RTSP:
 				$renderer = $this->serveRtsp();
 				break;				
 				
-			case "hdnetworksmil":
+			case self::HDNETWORKSMIL:
 				$renderer = $this->serveHDNetworkSmil();
 				break;
 				
-			case "hdnetwork":
+			case PlaybackProtocol::AKAMAI_HD:
 				$renderer = $this->serveHDNetwork();
 				break;
 
-			case "hdnetworkmanifest":
+			case PlaybackProtocol::AKAMAI_HDS:
 				$renderer = $this->serveHDNetworkManifest();
 				break;
 		}
