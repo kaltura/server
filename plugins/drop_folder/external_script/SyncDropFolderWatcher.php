@@ -24,12 +24,13 @@ echo 'folder path:'.$folderPath."\n";
 echo 'file name:'.$fileName."\n";
 echo 'file size:'.$fileSize."\n";
 
-require_once 'lib/KalturaClient.php';
-require_once 'lib/KalturaPlugins/KalturaDropFolderClientPlugin.php';
-
 $config = parse_ini_file("config.ini");
-$serviceUrl = $config['serviceUrl'];
+$serviceUrl = $config['service_url'];
 echo 'Service URL '.$serviceUrl."\n";
+
+require_once '/lib/KalturaClient.php';
+require_once '/lib/KalturaPlugins/KalturaDropFolderClientPlugin.php';
+
 
 $kClientConfig = new KalturaConfiguration(-1);
 $kClientConfig->serviceUrl = $serviceUrl;
@@ -65,7 +66,7 @@ try
 	    	$detectedDropFolderFile->lastModificationTime = time(); 
 	    	$detectedDropFolderFile->uploadStartDetectedAt = time();
 			
-			$file = $dropFolderPlugin->dropFolderFile->detected($detectedDropFolderFile);
+			$file = $dropFolderPlugin->dropFolderFile->add($detectedDropFolderFile);
 			echo 'created file with id '.$file->id."\n";
 		}
 		else if($action == UPLOADED)
