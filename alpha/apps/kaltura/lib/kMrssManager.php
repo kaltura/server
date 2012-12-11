@@ -717,8 +717,8 @@ class kMrssManager
 					}
 					else 
 					{
-						$xmlNodeToExtend[0] = null;
 						self::addExtendingItemNode($extendingObject, $identifierValue, $xmlNodeToExtend, $xmlNodeToExtend->getName(), $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
+						$xmlNodeToExtend[0] = null;
 					}
 					
 				}
