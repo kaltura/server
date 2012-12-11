@@ -32,7 +32,7 @@ class TrackEntry extends BaseTrackEntry
 			if ( ! $te->getUid() ) $te->setUid(  kCurrentContext::$uid );
 			if ( ! $te->getUserIp() ) $te->setUserIp( kCurrentContext::$user_ip );
 			$te->setContext( kCurrentContext::$client_version . "|" .  kCurrentContext::$client_lang . "|" . kCurrentContext::$service . "|" . kCurrentContext::$action );
-			$te->setSessionId(new UniqueId());
+			$te->setSessionId((string)(new UniqueId()));
 			$te->save();
 		}
 	}
