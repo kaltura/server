@@ -705,7 +705,7 @@ class kMrssManager
 			foreach ($xmlNodesToExtend as $xmlNodeToExtend)
 			{
 				/* @var $xmlNodeToExtend SimpleXMLElement */
-				$identifierValue = $xmlNodeToExtend[0];
+				$identifierValue = strval($xmlNodeToExtend[0]);
 				$extendingObject = $itemXPathToExtend->getIdentifier()->retrieveByIdentifier($identifierValue);
 				if ($extendingObject)		
 				{
@@ -717,8 +717,8 @@ class kMrssManager
 					}
 					else 
 					{
-						self::addExtendingItemNode($extendingObject, $identifierValue, $xmlNodeToExtend, $xmlNodeToExtend->getName(), $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
 						$xmlNodeToExtend[0] = null;
+						self::addExtendingItemNode($extendingObject, $identifierValue, $xmlNodeToExtend, $xmlNodeToExtend->getName(), $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
 					}
 					
 				}
