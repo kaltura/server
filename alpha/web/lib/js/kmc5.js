@@ -411,8 +411,10 @@ kmc.mediator =  {
 		document.title = "KMC > " + module + ((subtab && subtab != "") ? " > " + subtab + " |" : "");
 	},
 	readUrlHash : function() {
-		var module = "dashboard", // @todo: change to kmc.vars.default_state.module ?
-		subtab = "";
+		var module = "dashboard", 
+		subtab = "",
+		extra = {};
+
 		try {
 			var hash = location.hash.split("#")[1].split("|");
 		}
@@ -422,7 +424,7 @@ kmc.mediator =  {
 		if(!nohash && hash[0]!="") {
 			module = hash[0];
 			subtab = hash[1];
-			extra = {};
+			
 			if (hash[2])
 			{
 				var tmp = hash[2].split("&");
@@ -1203,12 +1205,8 @@ kmc.user = {
 	logout: function() {
 		var message = kmc.functions.checkForOngoingProcess();
 		if( message ) {alert( message );return false;}
-		var expiry = new Date("January 1, 1970"); // "Thu, 01-Jan-70 00:00:01 GMT";
-		expiry = expiry.toGMTString();
-		document.cookie = "pid=; expires=" + expiry + "; path=/";
-		document.cookie = "subpid=; expires=" + expiry + "; path=/";
-		document.cookie = "kmcks=; expires=" + expiry + "; path=/";
 		var state = kmc.mediator.readUrlHash();
+		// Cookies are HTTP only, we delete them using logoutAction
 		$.ajax({
 			url: kmc.vars.base_url + "/index.php/kmc/logout",
 			type: "POST",
