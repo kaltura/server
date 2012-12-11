@@ -4,7 +4,8 @@ if( typeof $ == 'undefined' ) $ = jQuery;
 function loginF( remMe, partner_id, subp_id, uid, ks , screen_name, email ) {
 
 	// Extlogin URL
-	var url = options.service_url + '/index.php/kmc/extlogin';
+	var hash = window.location.hash || ''; 
+	var url = options.service_url + '/index.php/kmc/extlogin' + hash;
 	// URL Protocol
 	var service_url_protocol = options.service_url.split("://")[0];
 
