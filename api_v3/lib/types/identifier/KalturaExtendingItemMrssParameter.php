@@ -75,7 +75,7 @@ class KalturaExtendingItemMrssParameter extends KalturaObject
 	protected function validate ()
 	{
 		//Should not allow any extending object but entries to be added in APPEND mode
-		if (!$this->extensionMode == KalturaMrssExtensionMode::APPEND && get_class($this->identifier) !== 'KalturaEntryIdentifier')
+		if ($this->extensionMode == KalturaMrssExtensionMode::APPEND && get_class($this->identifier) !== 'KalturaEntryIdentifier')
 		{
 			throw new KalturaAPIException(KalturaErrors::EXTENDING_ITEM_INCOMPATIBLE_COMBINATION);
 		}
