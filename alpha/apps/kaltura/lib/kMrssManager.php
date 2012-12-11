@@ -602,9 +602,9 @@ class kMrssManager
 				{
 					$nodeName = 'entry';
 				}
-				$entryItem = new SimpleXMLElement("{$nodeName}_item");
-				$mrss->addAttribute('identifier', $identifierValue);
-				return self::getEntryMrssXml($object, $mrss, $mrssParams, $features);
+				$newNode = $mrss->addChild("{$nodeName}_item");
+				$newNode->addAttribute('identifier', $identifierValue);
+				return self::getEntryMrssXml($object, $newNode, $mrssParams, $features);
 		}
 		
 	}
