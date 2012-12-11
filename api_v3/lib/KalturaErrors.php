@@ -466,5 +466,6 @@ class KalturaErrors extends APIErrors
 	
 	// live stream
 	const LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED = 'LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED,Status cannot be determined for live stream protocol [%s]';
-
+	
+	const EXTENDING_ITEM_INCOMPATIBLE_COMBINATION = 'EXTENDING_ITEM_INCOMPATIBLE_COMBINATION,This extending object MRSS must replace the XPath contents';
 }
