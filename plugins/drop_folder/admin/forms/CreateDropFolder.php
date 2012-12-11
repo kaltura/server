@@ -26,6 +26,7 @@ class Form_CreateDropFolder extends Zend_Form
 				Kaltura_Client_DropFolder_Enum_DropFolderType::S3,
 				Kaltura_Client_DropFolder_Enum_DropFolderType::SCP,
 				Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP_CMD,
+				Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP_SEC_LIB,
 			)
 		));
 		
