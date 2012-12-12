@@ -27,21 +27,24 @@ abstract class KalturaEmailNotificationRecipientJobData extends KalturaObject
 	public static function getDataInstance ($dbData)
 	{
 		$instance = null;
-		switch (get_class($dbData))
+		if ($dbData)
 		{
-			case 'kEmailNotificationCategoryRecipientJobData':
-				$instance = new KalturaEmailNotificationCategoryRecipientJobData();
-				break;
-			case 'kEmailNotificationStaticRecipientJobData':
-				$instance = new KalturaEmailNotificationStaticRecipientJobData();
-				break;
-			default:
-				$instance = KalturaPluginManager::loadObject('kEmailNotificationRecipientJobData', $this->providerType);
-				break;
+			switch (get_class($dbData))
+			{
+				case 'kEmailNotificationCategoryRecipientJobData':
+					$instance = new KalturaEmailNotificationCategoryRecipientJobData();
+					break;
+				case 'kEmailNotificationStaticRecipientJobData':
+					$instance = new KalturaEmailNotificationStaticRecipientJobData();
+					break;
+				default:
+					$instance = KalturaPluginManager::loadObject('kEmailNotificationRecipientJobData', $this->providerType);
+					break;
+			}
+			
+			if ($instance)
+				$instance->fromObject($dbData);
 		}
-		
-		if ($instance)
-			$instance->fromObject($dbData);
 			
 		return $instance;
 		
