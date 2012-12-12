@@ -133,13 +133,6 @@ class VerizonVcastDistributionEngine extends DistributionEngine implements
 		$data->sentData = $providerData->xml;
 	}
 	
-	/* (non-PHPdoc)
-	 * @see DistributionEngine::configure()
-	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
-	{
-	}
-	
 	/**
 	 * 
 	 * @param KalturaVerizonVcastDistributionProfile $distributionProfile
@@ -150,7 +143,8 @@ class VerizonVcastDistributionEngine extends DistributionEngine implements
 		$host = $distributionProfile->ftpHost;
 		$login = $distributionProfile->ftpLogin;
 		$pass = $distributionProfile->ftpPass;
-		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		$ftpManager->login($host, $login, $pass);
 		return $ftpManager;
 	}
@@ -191,7 +185,8 @@ class VerizonVcastDistributionEngine extends DistributionEngine implements
 		$login = $distributionProfile->ftpLogin;
 		$pass = $distributionProfile->ftpPass;
 		
-		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		if(!$fileTransferMgr)
 			throw new Exception("FTP manager not loaded");
 			

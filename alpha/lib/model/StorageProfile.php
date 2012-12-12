@@ -24,8 +24,6 @@ class StorageProfile extends BaseStorageProfile
 	const STORAGE_PROTOCOL_SCP = 2;
 	const STORAGE_PROTOCOL_SFTP = 3;
 	const STORAGE_PROTOCOL_S3 = 6;
-	const STORAGE_PROTOCOL_SFTP_CMD = 8;
-	const STORAGE_PROTOCOL_SFTP_SEC_LIB = 9;
 	
 	const STORAGE_DEFAULT_KALTURA_PATH_MANAGER = 'kPathManager';
 	const STORAGE_DEFAULT_EXTERNAL_PATH_MANAGER = 'kExternalPathManager';

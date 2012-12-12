@@ -14,13 +14,6 @@ class PodcastDistributionEngine extends DistributionEngine implements
 {
 	
 	/* (non-PHPdoc)
-	 * @see DistributionEngine::configure()
-	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
-	{
-	}
-
-	/* (non-PHPdoc)
 	 * @see IDistributionEngineSubmit::submit()
 	 */
 	public function submit(KalturaDistributionSubmitJobData $data)

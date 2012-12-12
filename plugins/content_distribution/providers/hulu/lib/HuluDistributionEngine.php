@@ -59,13 +59,13 @@ class HuluDistributionEngine extends DistributionEngine implements
 		$videoFilePath = $providerData->videoAssetFilePath;
 		$thumbAssetFilePath = $providerData->thumbAssetFilePath;
 		$captionsFilesPaths = $providerData->captionLocalPaths;
-		$protocol = $distributionProfile->protocol ? $distributionProfile->protocol : KalturaDistributionProtocol::SFTP_CMD;
+		$protocol = $distributionProfile->protocol ? $distributionProfile->protocol : KalturaDistributionProtocol::SFTP;
 		
 		$remoteVideoFileName = $providerData->fileBaseName.'.'.pathinfo($videoFilePath, PATHINFO_EXTENSION);
 		$remoteThumbFileName = $providerData->fileBaseName.'.'.pathinfo($thumbAssetFilePath, PATHINFO_EXTENSION);
 		$remoteXmlFileName = $providerData->fileBaseName.'.xml';
 		switch ($protocol){
-			case KalturaDistributionProtocol::SFTP_CMD:
+			case KalturaDistributionProtocol::SFTP:
 				$sftpBasePath = '/home/' . $distributionProfile->sftpLogin . '/upload';
 				$videoSFTPPath = $sftpBasePath.'/'.$remoteVideoFileName;
 				$thumbSFTPPath = $sftpBasePath.'/'.$remoteThumbFileName;
@@ -120,13 +120,6 @@ class HuluDistributionEngine extends DistributionEngine implements
 		}
 	}
 	
-	/* (non-PHPdoc)
-	 * @see DistributionEngine::configure()
-	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
-	{
-	}
-	
 	private function getFileLocation($distributionProfileId, $content, $fileName) 
 	{
 		$tempDirectory = $this->getTempDirectoryForProfile($distributionProfileId);
@@ -158,7 +151,8 @@ class HuluDistributionEngine extends DistributionEngine implements
 		$serverUrl = $distributionProfile->sftpHost;
 		$loginName = $distributionProfile->sftpLogin;
 		$loginPass = $distributionProfile->sftpPass;
-		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP_CMD);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP, $engineOptions);
 		$sftpManager->login($serverUrl, $loginName, $loginPass);
 		return $sftpManager;
 	}

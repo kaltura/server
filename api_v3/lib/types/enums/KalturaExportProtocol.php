@@ -10,6 +10,4 @@ class KalturaExportProtocol extends KalturaEnum
 	const SCP = 2;
 	const SFTP = 3;
 	const S3 = 6;
-	const SFTP_CMD = 8;
-	const SFTP_SEC_LIB = 9;
 }

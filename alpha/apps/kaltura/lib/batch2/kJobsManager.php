@@ -873,8 +873,7 @@ class kJobsManager
 		{
     		if (stripos($entryUrl, 'sftp:') === 0) 
     		{
-    			$partner = PartnerPeer::retrieveByPK($partnerId);
-    		    $subType = $partner->getDefaultSftpEngine();
+    		    $subType = kFileTransferMgrType::SFTP;
     		}
     		elseif (stripos($entryUrl, 'scp:') === 0) 
     		{

@@ -62,8 +62,6 @@ class KAsyncImport extends KJobHandlerWorker
 		$sshProtocols = array(
 			kFileTransferMgrType::SCP, 
 			kFileTransferMgrType::SFTP,
-			kFileTransferMgrType::SFTP_CMD,
-			kFileTransferMgrType::SFTP_SEC_LIB,
 		);
 		
 		if (in_array($jobSubType, $sshProtocols))
@@ -243,7 +241,8 @@ class KAsyncImport extends KJobHandlerWorker
 			
 			// create suitable file transfer manager object
 			$subType = $job->jobSubType;
-			$fileTransferMgr = kFileTransferMgr::getInstance($subType);
+			$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+			$fileTransferMgr = kFileTransferMgr::getInstance($subType, $engineOptions);
 			
 			if (!$fileTransferMgr) {
 			    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, "Error: file transfer manager not found for type [$subType]", KalturaBatchJobStatus::FAILED);

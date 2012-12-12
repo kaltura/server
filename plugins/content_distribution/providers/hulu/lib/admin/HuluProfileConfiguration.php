@@ -75,7 +75,7 @@ class Form_HuluProfileConfiguration extends Form_ConfigurableProfileConfiguratio
 			'label'			=> 'Protocol:',
 			'filters'		=> array('StringTrim'),
 			'multiOptions' 		=> array(
-				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SFTP_CMD => 'SFTP Command line',
+				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SFTP=> 'SFTP',
 				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::ASPERA => 'ASPERA',
 			),
 			'required'		=> true,

@@ -104,13 +104,6 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 		$data->sentData = $providerData->xml;
 	}
 	
-	/* (non-PHPdoc)
-	 * @see DistributionEngine::configure()
-	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
-	{
-	}
-	
 	/**
 	 * 
 	 * @param KalturaQuickPlayDistributionProfile $distributionProfile
@@ -121,7 +114,8 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 		$host = $distributionProfile->sftpHost;
 		$login = $distributionProfile->sftpLogin;
 		$pass = $distributionProfile->sftpPass;
-		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP, $engineOptions);
 		$sftpManager->login($host, $login, $pass);
 		return $sftpManager;
 	}

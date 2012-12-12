@@ -10,11 +10,16 @@ class s3Mgr extends kFileTransferMgr
 {
 	private $s3;
 		
-	protected $filesPermissionInS3;
+	protected $filesAcl = S3::ACL_PRIVATE;
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
-	protected function __construct()
+	protected function __construct(array $options = null)
 	{
+		parent::__construct($options);
+	
+		if($options && isset($options['filesAcl']))
+			$this->filesAcl = $options['filesAcl'];
+			
 		// do nothing
 		$this->connection_id = 1; //SIMULATING!
 	}
@@ -38,7 +43,7 @@ class s3Mgr extends kFileTransferMgr
 
 
 	// login to an existing connection with given user/pass (ftp_passive_mode is irrelevant)
-	protected function doLogin($sftp_user, $sftp_pass, $ftp_passive_mode = true)
+	protected function doLogin($sftp_user, $sftp_pass)
 	{
 		//KalturaLog::debug("doLogin is active");
 		if(!class_exists("S3")) {
@@ -66,12 +71,12 @@ class s3Mgr extends kFileTransferMgr
 
 
 	// upload a file to the server (ftp_mode is irrelevant
-	protected function doPutFile ($remote_file , $local_file , $ftp_mode, $http_field_name = null, $http_file_name = null)
+	protected function doPutFile ($remote_file , $local_file)
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		KalturaLog::debug("remote_file: ".$remote_file);
 		
-		$res = $this->s3->putObjectFile($local_file, $bucket, $remote_file, $this->filesPermissionInS3);
+		$res = $this->s3->putObjectFile($local_file, $bucket, $remote_file, $this->filesAcl);
 
 		if ($res)
 		{
@@ -90,13 +95,24 @@ class s3Mgr extends kFileTransferMgr
 	}
 
 	// download a file from the server (ftp_mode is irrelevant)
-	protected function doGetFile ($remote_file, $local_file, $ftp_mode)
+	protected function doGetFile ($remote_file, $local_file = null)
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		KalturaLog::debug("remote_file: ".$remote_file);
-		$saveTo = fopen($local_file,"w");
-		if(!$saveTo) return false;
-		return $this->s3->getObject($bucket, $remote_file, $saveTo);
+
+		$saveTo = false;
+		if($local_file)
+		{
+			$saveTo = fopen($local_file,"w");
+			if(!$saveTo) 
+				return false;
+		}
+			
+		$response = $this->s3->getObject($bucket, $remote_file, $saveTo);
+		if($response && !$local_file)
+			return $response->body;
+			
+		return $response;
 	}
 
 	// create a new directory
@@ -158,26 +174,9 @@ class s3Mgr extends kFileTransferMgr
 		return false;
 	}
 
-	// download a file from the server
-	public function fileGetContents ($remote_file)
-	{
-		return false;
-	}
-
-	// upload a file to the server
-	public function filePutContents ($remote_file, $contents)
-	{
-		return false;
-	}
-
 	// execute the given command on the server
 	private function execCommand($command_str)
 	{
 		return false;
 	}
-	
-	public function setFilesPermissionInS3($filesPermissionInS3){
-		$this->filesPermissionInS3 = $filesPermissionInS3;
-	}
-
 }

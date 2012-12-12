@@ -10,7 +10,6 @@ require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
 $include_path = 
 	realpath(dirname(__FILE__).'/../vendor/ZendFramework/library') . PATH_SEPARATOR . 
-	realpath(dirname(__FILE__).'/../vendor/phpseclib') . PATH_SEPARATOR .
 	get_include_path();
 	
 set_include_path($include_path);

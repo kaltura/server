@@ -10,7 +10,7 @@ class asperaMgr extends sftpMgr
 {
 	
 	// upload a file to the server ising Aspera connection (ftp_mode is irrelevant)
-	protected function doPutFile ($remote_file , $local_file , $ftp_mode, $http_field_name = null, $http_file_name = null)
+	protected function doPutFile ($remote_file , $local_file)
 	{
 		$remote_file = ltrim($remote_file,'/');
 		$cmd= $this->getCmdPrefix();
@@ -19,7 +19,7 @@ class asperaMgr extends sftpMgr
 	}
 		
 	// upload a file to the server ising Aspera connection (ftp_mode is irrelevant)
-	protected function doGetFile ($remote_file, $local_file, $ftp_mode)
+	protected function doGetFile ($remote_file, $local_file = null)
 	{	
 		$remote_file = ltrim($remote_file,'/');
 		$cmd= $this->getCmdPrefix();

@@ -20,6 +20,8 @@ class GenericDistributionEngine extends DistributionEngine implements
 	 */
 	public function configure(KSchedularTaskConfig $taskConfig)
 	{
+		parent::configure($taskConfig);
+		
 		if($taskConfig->params->tempXmlPath)
 		{
 			$this->tempXmlPath = $taskConfig->params->tempXmlPath;
@@ -72,12 +74,16 @@ class GenericDistributionEngine extends DistributionEngine implements
 		file_put_contents($srcFile, $providerData->xml);
 		KalturaLog::log("XML written to file [$srcFile]");
 		
-		$fileTransferMgr = kFileTransferMgr::getInstance($distributionProfileAction->protocol);
+		$engineOptions = array(); // Should be passed from worker configuration
+		$engineOptions['passiveMode'] = $distributionProfileAction->ftpPassiveMode;
+		$engineOptions['fieldName'] = $distributionProfileAction->httpFieldName;
+		$engineOptions['fileName'] = $distributionProfileAction->httpFileName;
+		$fileTransferMgr = kFileTransferMgr::getInstance($distributionProfileAction->protocol, $engineOptions);
 		if(!$fileTransferMgr)
 			throw new Exception("File transfer manager type [$distributionProfileAction->protocol] not supported");
 			
-		$fileTransferMgr->login($distributionProfileAction->serverUrl, $distributionProfileAction->username, $distributionProfileAction->password, null, $distributionProfileAction->ftpPassiveMode);
-		$fileTransferMgr->putFile($destFile, $srcFile, true, FTP_BINARY, $distributionProfileAction->httpFieldName, $distributionProfileAction->httpFileName);
+		$fileTransferMgr->login($distributionProfileAction->serverUrl, $distributionProfileAction->username, $distributionProfileAction->password);
+		$fileTransferMgr->putFile($destFile, $srcFile, true);
 		$results = $fileTransferMgr->getResults();
 		
 		if($results && is_string($results))

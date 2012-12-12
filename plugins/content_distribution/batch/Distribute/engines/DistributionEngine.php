@@ -11,6 +11,11 @@ abstract class DistributionEngine implements IDistributionEngine
 	protected $kalturaClient = null;
 	
 	/**
+	 * @var KSchedularTaskConfig
+	 */
+	protected $taskConfig = null;
+	
+	/**
 	 * @var int
 	 */
 	protected $partnerId;
@@ -52,6 +57,14 @@ abstract class DistributionEngine implements IDistributionEngine
 		
 		$config = $this->kalturaClient->getConfig();
 		$this->partnerId = $config->partnerId;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionEngine::setClient()
+	 */
+	public function configure(KSchedularTaskConfig $taskConfig)
+	{
+		$this->taskConfig = $taskConfig;
 	}
 	
 	public function unimpersonate()

@@ -136,8 +136,6 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 			'multiOptions' 		=> array(
 				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::FTP => 'FTP',
 				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SFTP => 'SFTP',
-				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SFTP_CMD => 'SFTP Command line',
-				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SFTP_SEC_LIB => 'SFTP SecLib',
 				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::ASPERA => 'ASPERA',
 			),
 			'required'		=> true,

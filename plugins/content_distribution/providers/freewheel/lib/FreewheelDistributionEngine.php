@@ -42,7 +42,8 @@ class FreewheelDistributionEngine extends DistributionEngine implements
 	{
 		$loginName = $distributionProfile->sftpLogin;
 		$loginPass = $distributionProfile->sftpPass;
-		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP, $engineOptions);
 		$sftpManager->login(self::FREEWHEEL_SFTP_SERVER, $loginName, $loginPass);
 		return $sftpManager;
 	}
@@ -300,12 +301,4 @@ class FreewheelDistributionEngine extends DistributionEngine implements
 	{
 		// TODO
 	}
-
-	/* (non-PHPdoc)
-	 * @see DistributionEngine::configure()
-	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
-	{
-	}
-
 }

@@ -18,8 +18,6 @@ class kFileTransferMgrType
 	const HTTPS = 5;
 	const S3 = 6;
 	const LOCAL = 7;
-	const SFTP_CMD = 8; // SFTP Protocol
-	const SFTP_SEC_LIB = 9; // SFTP Protocol
 	const ASPERA = 10;
 }
 // path where the classes extending kFileTransferMgr are stored relative to this file
@@ -75,6 +73,11 @@ abstract class kFileTransferMgr
 	 */
 	protected $results;
 
+	/**
+	 * @var boolean
+	 */
+	protected $verbose = true;
+
 
 	/**
 	 * @return the $results
@@ -103,11 +106,10 @@ abstract class kFileTransferMgr
 	 *
 	 * @param $user username
 	 * @param $pass passwrod
-	 * @param $ftp_passive_mode passive mode true/false - relevant for FTP only
 	 *
 	 * @return true / false according to success
 	 */
-	abstract protected function doLogin($user, $pass, $ftp_passive_mode = TRUE);
+	abstract protected function doLogin($user, $pass);
 
 	/**
 	 * Should login to a previous initiatied connection with the given public key
@@ -126,22 +128,20 @@ abstract class kFileTransferMgr
 	 *
 	 * @param $remote_file remote file's name
 	 * @param $local_file local file's name
-	 * @param $ftp_mode ftp transfer mode (FTP_BINARY / FTP_ASCII) - relevant for FTP only
 	 *
 	 * @return true / false according to success
 	 */
-	abstract protected function doPutFile($remote_file, $local_file, $ftp_mode, $http_field_name = null, $http_file_name = null);
+	abstract protected function doPutFile($remote_file, $local_file);
 
 	/**
 	 * Should download the fiven 'remote_file' from the server as 'local_file'
 	 *
 	 * @param $remote_file remote file's name
 	 * @param $local_file local file's name
-	 * @param $ftp_mode ftp transfer mode (FTP_BINARY / FTP_ASCII) - relevant for FTP only
 	 *
 	 * @return true / false according to success
 	 */
-	abstract protected function doGetFile ($remote_file, $local_file, $ftp_mode);
+	abstract protected function doGetFile ($remote_file, $local_file = null);
 
 	/**
 	 * Should create a new directory on the server.
@@ -226,39 +226,35 @@ abstract class kFileTransferMgr
 	 * Create a new class instance according to the given type.
 	 *
 	 * @param fileTransferMgrTypes $type Class type from the list under 'kFileTransferMgrType' class.
+	 * @param array $options
 	 *
 	 * @return kFileTransferMgr a new instance
 	 */
-	public static function getInstance($type)
+	public static function getInstance($type, array $options = null)
 	{
 		switch($type)
 		{
 			case kFileTransferMgrType::FTP:
-				return new ftpMgr();
+				return new ftpMgr($options);
 
 			case kFileTransferMgrType::SCP:
-				return new scpMgr();
+				return new scpMgr($options);
 
 			case kFileTransferMgrType::SFTP:
-				return new sftpMgr();
-
-			case kFileTransferMgrType::SFTP_CMD:
-				return new sftpMgr(true);
-
-			case kFileTransferMgrType::SFTP_SEC_LIB:
-				return new sftpSecLibMgr();
+				return new sftpMgr($options);
 
 			case kFileTransferMgrType::HTTP:
 			case kFileTransferMgrType::HTTPS:
-				return new httpMgr();
+				return new httpMgr($options);
 
 			case kFileTransferMgrType::S3:
-				return new s3Mgr();
+				return new s3Mgr($options);
 				
 			case kFileTransferMgrType::LOCAL:
-			    return new localMgr();
+			    return new localMgr($options);
+			    
 			case kFileTransferMgrType::ASPERA:
-				return new asperaMgr();
+				return new asperaMgr($options);
 		}
 
 		return null;
@@ -281,18 +277,14 @@ abstract class kFileTransferMgr
 	 * @param $user User's name
 	 * @param $pass Password
 	 * @param $port Server's listening port
-	 * @param $ftp_passive_mode Used for FTP only
 	 *
 	 * @throws kFileTransferMgrException
 	 *
 	 * @return FILETRANSFERMGR_RES_OK / FILETRANSFERMGR_RES_ERR
 	 */
-	public function login ( $server, $user, $pass, $port = null, $ftp_passive_mode = true)
+	public function login ( $server, $user, $pass, $port = null)
 	{
-		KalturaLog::debug("Login to server [$server] port [$port] username/password [$user/$pass] passive [$ftp_passive_mode]");
-		
-		$ftp_passive_mode = true;
-		KalturaLog::debug("FTP passive mode changed to [true] because of a bug with ftp_put on fedora");
+		KalturaLog::debug("Login to server [$server] port [$port] username/password [$user/$pass]");
 		
 		$this->connection_id = @($this->doConnect($server, $port));
 		if (!$this->connection_id) {
@@ -300,7 +292,7 @@ abstract class kFileTransferMgr
 			throw new kFileTransferMgrException ("Can't connect [$server:$port] - " . $last_error['message'], kFileTransferMgrException::cantConnect);
 		}
 		
-		if(@($this->doLogin($user, $pass, $ftp_passive_mode)))
+		if(@($this->doLogin($user, $pass)))
 		{
 			KalturaLog::debug("Logged in successfully");
 		}
@@ -356,14 +348,13 @@ abstract class kFileTransferMgr
 	 * @param string $remote_file Remote file name
 	 * @param string $local_file Local file name
 	 * @param bool $overwrite true if should overwrite an existing remote file, or false otherwise
-	 * @param int $ftp_mode FTP_BINARY or FTP_ASCII - used for FTP only
 	 * @param bool $overwrite_if_different put will be ignored if file already exists with the same size
 	 *
 	 * @throws kFileTransferMgrException
 	 *
 	 * @return FILETRANSFERMGR_RES_OK / FILETRANSFERMGR_RES_ERR
 	 */
-	public function putFile ($remote_file, $local_file, $overwrite = false, $ftp_mode = FTP_BINARY, $http_field_name = null, $http_file_name = null, $overwrite_if_different = true)
+	public function putFile ($remote_file, $local_file, $overwrite = false, $overwrite_if_different = true)
 	{
 		KalturaLog::debug("Puts file [$remote_file] from local [$local_file] overwrite [$overwrite]");
 		
@@ -373,9 +364,6 @@ abstract class kFileTransferMgr
 		}
 		if (!file_exists($local_file)) {
 			throw new kFileTransferMgrException("Can't find local file [$local_file]", kFileTransferMgrException::localFileNotExists);
-		}
-		if ($ftp_mode != FTP_ASCII)	{
-			$ftp_mode = FTP_BINARY;
 		}
 
 		$remote_file = $this->fixPathString($remote_file);
@@ -410,7 +398,7 @@ abstract class kFileTransferMgr
 		}
 
 		// try to upload file
-		$res = @($this->doPutFile($remote_file, $local_file, $ftp_mode, $http_field_name, $http_file_name));
+		$res = @($this->doPutFile($remote_file, $local_file));
 
 		$this->results = $res;
 		
@@ -429,13 +417,12 @@ abstract class kFileTransferMgr
 	 *
 	 * @param $remote_file Remote file name
 	 * @param $local_file Local file name
-	 * @param $ftp_mode FTP_BINARY or FTP_ASCII - used for FTP only
 	 *
 	 * @throws kFileTransferMgrException
 	 *
 	 * @return FILETRANSFERMGR_RES_OK / FILETRANSFERMGR_RES_ERR
 	 */
-	public function getFile ( $remote_file, $local_file, $ftp_mode = FTP_BINARY)
+	public function getFile ( $remote_file, $local_file = null)
 	{
 		KalturaLog::debug("Gets file [$remote_file] to local [$local_file]");
 		
@@ -443,14 +430,11 @@ abstract class kFileTransferMgr
 		if (!$this->connection_id) {
 			throw new kFileTransferMgrException("No connection established yet.", kFileTransferMgrException::notYetConnected);
 		}
-		if ($ftp_mode != FTP_ASCII)	{
-			$ftp_mode = FTP_BINARY;
-		}
 
 		$remote_file = $this->fixPathString($remote_file);
 
 		// try to download file
-		$res = @($this->doGetFile($remote_file, $local_file, $ftp_mode));
+		$res = @($this->doGetFile($remote_file, $local_file));
 
 		$this->results = $res;
 		
@@ -768,9 +752,10 @@ abstract class kFileTransferMgr
 	 * Empty PROTECTED constructor - should never be used.
 	 * To get a new class instance use 'getInstance($type)'.
 	 */
-	protected function __construct()
+	protected function __construct(array $options = null)
 	{
-		// do nothing
+		if($options && isset($options['verbose']))
+			$this->verbose = $options['verbose'];
 	}
 
 	/**
@@ -793,15 +778,14 @@ abstract class kFileTransferMgr
 	 * @param FileHandle $fileHandle - use fopen to open the file
 	 * @return - the file content (using fread)
 	 */
-	protected function writeFileInChunks($fileToReadHandle, $fileToWriteHandle)
+	protected function writeFileInChunks($fileToReadHandle, $fileToWriteHandle = null)
 	{
 		$content = null;
 		$chunkSize = 1024 * 1024; // how many bytes per chunk 
-		if (is_null($fileToReadHandle) || is_null($fileToWriteHandle)) 
-		{ 
+		if (is_null($fileToReadHandle)) 
 			return false;
-		} 
 		
+		$allContent = '';
 		$keepReading = true;
 		while (!feof($fileToReadHandle) && $keepReading) 
 		{ 
@@ -812,13 +796,20 @@ abstract class kFileTransferMgr
 				return false;
 			}
 			
-			if(fwrite($fileToWriteHandle, $content) === false)
+			if(!$fileToWriteHandle)
+			{
+				$allContent .= $content;
+			}
+			elseif(fwrite($fileToWriteHandle, $content) === false)
 			{
 				return false;
 			}
-		} 
+		}
 		
-		return true;		
+		if($fileToWriteHandle)
+			return true;
+			
+		return $allContent;
 	}
 }
 

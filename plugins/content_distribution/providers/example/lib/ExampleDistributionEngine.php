@@ -24,6 +24,8 @@ class ExampleDistributionEngine extends DistributionEngine implements
 	 */
 	public function configure(KSchedularTaskConfig $taskConfig)
 	{
+		parent::configure($taskConfig);
+		
 		// set default value
 		$this->updateXmlTemplate = dirname(__FILE__) . '/../xml/update.template.xml';
 		
@@ -129,7 +131,8 @@ class ExampleDistributionEngine extends DistributionEngine implements
 		$exampleExternalApiMediaItem->height = $entry->height;
 				
 		// loads ftp manager
-		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		$ftpManager->login(self::FTP_SERVER_URL, $distributionProfile->username, $distributionProfile->password);
 		
 		// put the thumbnail on the FTP with the entry id as naming convention
@@ -216,7 +219,8 @@ class ExampleDistributionEngine extends DistributionEngine implements
 		$feed->save($localFile);
 		
 		// loads ftp manager
-		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		$ftpManager->login(self::FTP_SERVER_URL, $distributionProfile->username, $distributionProfile->password);
 		
 		// put the XML file on the FTP

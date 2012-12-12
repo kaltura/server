@@ -239,8 +239,6 @@ return array(
 	'Kaltura_Client_Enum_StorageProfileProtocol::SCP' => 'SCP',
 	'Kaltura_Client_Enum_StorageProfileProtocol::SFTP' => 'SFTP',
 	'Kaltura_Client_Enum_StorageProfileProtocol::S3' => 'Amazon S3',
-	'Kaltura_Client_Enum_StorageProfileProtocol::SFTP_CMD' => 'SFTP - CLI',
-	'Kaltura_Client_Enum_StorageProfileProtocol::SFTP_SEC_LIB' => 'SFTP - Sec lib',
 
 	'Kaltura_Client_Enum_StorageProfileDeliveryStatus::ACTIVE' => 'Active',
 	'Kaltura_Client_Enum_StorageProfileDeliveryStatus::BLOCKED' => 'Blocked',
@@ -1030,8 +1028,6 @@ return array(
     'Kaltura_Client_DropFolder_Enum_DropFolderType::FTP' => 'Remote FTP',
     'Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP' => 'Remote SFTP',
     'Kaltura_Client_DropFolder_Enum_DropFolderType::SCP' => 'Remote SCP',
-	'Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP_CMD' => 'Remote SFTP - CLI',
-	'Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP_SEC_LIB' => 'Remote SFTP - Sec lib',
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT' => 'Content',
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML' => 'XML',

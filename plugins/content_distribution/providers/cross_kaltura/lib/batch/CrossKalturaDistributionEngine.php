@@ -86,14 +86,6 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
         $this->sourceObjects = null;
     }
     
-	/* (non-PHPdoc)
-     * @see IDistributionEngine::configure()
-     */
-    public function configure (KSchedularTaskConfig $taskConfig)
-    {
-        // nothing special
-    }
-    
 	/**
 	 * Initialize
 	 * @param KalturaDistributionJobData $data

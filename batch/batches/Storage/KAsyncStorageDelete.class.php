@@ -70,10 +70,12 @@ class KAsyncStorageDelete extends KJobHandlerWorker
 		$destFile = str_replace('//', '/', trim($data->destFileSyncStoredPath));
 		$this->updateJob($job, "Deleting $srcFile to $destFile", KalturaBatchJobStatus::QUEUED);
 
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$engineOptions['passiveMode'] = $data->ftpPassiveMode;
 		$engine = kFileTransferMgr::getInstance($job->jobSubType);
 		
 		try{
-			$engine->login($data->serverUrl, $data->serverUsername, $data->serverPassword, null, $data->ftpPassiveMode);
+			$engine->login($data->serverUrl, $data->serverUsername, $data->serverPassword);
 			$engine->delFile($destFile);
 		}
 		catch(kFileTransferMgrException $ke)

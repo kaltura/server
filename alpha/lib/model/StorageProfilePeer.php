@@ -18,8 +18,6 @@ class StorageProfilePeer extends BaseStorageProfilePeer
 		StorageProfile::STORAGE_PROTOCOL_FTP => self::STORAGE_DEFAULT_OM_CLASS,
 		StorageProfile::STORAGE_PROTOCOL_SCP => self::STORAGE_DEFAULT_OM_CLASS,
 		StorageProfile::STORAGE_PROTOCOL_SFTP => self::STORAGE_DEFAULT_OM_CLASS,
-		StorageProfile::STORAGE_PROTOCOL_SFTP_CMD => self::STORAGE_DEFAULT_OM_CLASS,
-		StorageProfile::STORAGE_PROTOCOL_SFTP_SEC_LIB => self::STORAGE_DEFAULT_OM_CLASS,
 		StorageProfile::STORAGE_PROTOCOL_S3 => self::STORAGE_AMAZON_S3_OM_CLASS,
 	);
 	

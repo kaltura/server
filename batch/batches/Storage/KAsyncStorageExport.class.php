@@ -82,10 +82,15 @@ class KAsyncStorageExport extends KJobHandlerWorker
 		$destFile = str_replace('//', '/', trim($data->destFileSyncStoredPath));
 		$this->updateJob($job, "Exporting $srcFile to $destFile", KalturaBatchJobStatus::QUEUED);
 
-		$engine = kFileTransferMgr::getInstance($job->jobSubType);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$engineOptions['passiveMode'] = $data->ftpPassiveMode;
+		if($data instanceof KalturaAmazonS3StorageExportJobData)
+			$engineOptions['filesAcl'] = $data->filesPermissionInS3;
+			
+		$engine = kFileTransferMgr::getInstance($job->jobSubType, $engineOptions);
 		
 		try{
-			$engine->login($data->serverUrl, $data->serverUsername, $data->serverPassword, null, $data->ftpPassiveMode);
+			$engine->login($data->serverUrl, $data->serverUsername, $data->serverPassword);
 		}
 		catch(Exception $e)
 		{
@@ -93,9 +98,6 @@ class KAsyncStorageExport extends KJobHandlerWorker
 		}
 	
 		try{
-			if ($engine instanceof s3Mgr)
-				$engine->setFilesPermissionInS3($data->filesPermissionInS3);
-				
 			if (is_file($srcFile)){
 				$engine->putFile($destFile, $srcFile, $data->force);
 			}

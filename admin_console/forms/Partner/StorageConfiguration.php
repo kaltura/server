@@ -53,8 +53,6 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			'multiOptions'  => array(Kaltura_Client_Enum_StorageProfileProtocol::FTP => 'FTP',
 									Kaltura_Client_Enum_StorageProfileProtocol::SFTP => 'SFTP',
-									Kaltura_Client_Enum_StorageProfileProtocol::SFTP_CMD => 'SFTP CMD',
-									Kaltura_Client_Enum_StorageProfileProtocol::SFTP_SEC_LIB => 'SFTP secLib',
 									Kaltura_Client_Enum_StorageProfileProtocol::SCP => 'SCP',
 									Kaltura_Client_Enum_StorageProfileProtocol::S3 => 'Amazon S3'
 									),

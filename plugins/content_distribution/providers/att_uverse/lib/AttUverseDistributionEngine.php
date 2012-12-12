@@ -9,13 +9,6 @@ class AttUverseDistributionEngine extends DistributionEngine implements
 {
 	
 	const FEED_TEMPLATE = 'feed_template.xml';
-	
-	/* (non-PHPdoc)
-	 * @see DistributionEngine::configure()
-	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
-	{
-	}
 
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineSubmit::submit()
@@ -104,7 +97,8 @@ class AttUverseDistributionEngine extends DistributionEngine implements
 		$host = $distributionProfile->ftpHost;
 		$login = $distributionProfile->ftpUsername;
 		$password = $distributionProfile->ftpPassword;
-		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		$ftpManager->login($host, $login, $password);
 		return $ftpManager;
 	}

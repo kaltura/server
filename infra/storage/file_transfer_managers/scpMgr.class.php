@@ -10,9 +10,9 @@ class scpMgr extends kFileTransferMgr
 {
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
-	protected function __construct()
+	protected function __construct(array $options = null)
 	{
-		// do nothing
+		parent::__construct($options);
 	}
 	
 	
@@ -32,7 +32,7 @@ class scpMgr extends kFileTransferMgr
 	
 	
 	// login to an existing connection with given user/pass (ftp_passive_mode is irrelevant)
-	protected function doLogin($scp_user, $scp_pass, $ftp_passive_mode = TRUE)
+	protected function doLogin($scp_user, $scp_pass)
 	{
 		// try to login
 		return ssh2_auth_password($this->getConnection(), $scp_user, $scp_pass);
@@ -47,7 +47,7 @@ class scpMgr extends kFileTransferMgr
 	
 	
 	// upload a file to the server (ftp_mode is irrelevant
-	protected function doPutFile ($remote_file , $local_file , $ftp_mode, $http_field_name = null, $http_file_name = null)
+	protected function doPutFile ($remote_file , $local_file)
 	{
 		// try to upload file
 		$remote_file = ltrim($remote_file, '/');
@@ -56,11 +56,11 @@ class scpMgr extends kFileTransferMgr
 	
 	
 	// download a file from the server (ftp_mode is irrelevant)
-	protected function doGetFile ($remote_file, $local_file, $ftp_mode)
+	protected function doGetFile ($remote_file, $local_file = null)
 	{	
 		// try to download file
 		$remote_file = ltrim($remote_file, '/');
-		return ssh2_scp_recv($this->getConnection(), $remote_file, $local_file);
+		$ret = ssh2_scp_recv($this->getConnection(), $remote_file, $local_file);
 	}
 	
 	// create a new directory

@@ -21,13 +21,6 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	protected $_sftpManager;
 
 	/* (non-PHPdoc)
-	 * @see DistributionEngine::configure()
-	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
-	{
-	}
-
-	/* (non-PHPdoc)
 	 * @see IDistributionEngineSubmit::submit()
 	 */
 	public function submit(KalturaDistributionSubmitJobData $data)
@@ -298,7 +291,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		try
 		{
 			KalturaLog::info('Trying to get the following status file: ['.$statusFilePath.']');
-			$statusXml = $sftpManager->fileGetContents($statusFilePath);
+			$statusXml = $sftpManager->getFile($statusFilePath);
 		}
 		catch(kFileTransferMgrException $ex) // file is still missing
 		{
@@ -326,7 +319,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		try
 		{
 			KalturaLog::info('Trying to get the following status file: ['.$statusFilePath.']');
-			$statusXml = $sftpManager->fileGetContents($statusFilePath);
+			$statusXml = $sftpManager->getFile($statusFilePath);
 			KalturaLog::info('Status file was found');
 			return $statusXml;
 		}
@@ -354,7 +347,8 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$port = 22;
 		if ($distributionProfile->sftpPort)
 			$port = $distributionProfile->sftpPort;
-		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP_CMD);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP, $engineOptions);
 		$sftpManager->loginPubKey($serverUrl, $loginName, $publicKeyFile, $privateKeyFile, null, $port);
 		$this->_sftpManager = $sftpManager;
 		return $this->_sftpManager;

@@ -8,11 +8,26 @@
  */
 class ftpMgr extends kFileTransferMgr
 {
+	protected $passiveMode = true;
+	
+	protected $mode = FTP_BINARY;
 
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
-	protected function __construct()
+	protected function __construct(array $options = null)
 	{
-		// do nothing
+		parent::__construct($options);
+	
+		if($options)
+		{
+			if(isset($options['mode']))
+				$this->mode = $options['mode'];
+				
+			if(isset($options['passiveMode']))
+				$this->passiveMode = $options['passiveMode'];
+		}
+	
+		if ($this->mode != FTP_ASCII)
+			$this->mode = FTP_BINARY;
 	}
 
 
@@ -32,13 +47,13 @@ class ftpMgr extends kFileTransferMgr
 
 
 	// login to an existing connection with given user/pass
-	protected function doLogin($ftp_user, $ftp_pass, $ftp_passive_mode = TRUE)
+	protected function doLogin($ftp_user, $ftp_pass)
 	{
 		// try to login
 		$res = ftp_login($this->getConnection(), $ftp_user, $ftp_pass);
 		if ($res) {
 			// set FTP passive mode
-			ftp_pasv($this->getConnection() , $ftp_passive_mode);
+			ftp_pasv($this->getConnection(), $this->passiveMode);
 		}
 		return $res;
 	}
@@ -52,20 +67,20 @@ class ftpMgr extends kFileTransferMgr
 
 
 	// upload a file to the server (ftp_mode is irrelevant
-	protected function doPutFile ($remote_file,  $local_file, $ftp_mode, $http_field_name = null, $http_file_name = null)
+	protected function doPutFile ($remote_file,  $local_file)
 	{
 		$remote_file = ltrim($remote_file,'/');
 		// try to upload file
-		return ftp_put( $this->connection_id ,  $remote_file ,  $local_file ,  $ftp_mode);
+		return ftp_put( $this->connection_id ,  $remote_file ,  $local_file ,  $this->mode);
 	}
 
 
 	// download a file from the server (ftp_mode is irrelevant)
-	protected function doGetFile ($remote_file, $local_file, $ftp_mode)
+	protected function doGetFile ($remote_file, $local_file = null)
 	{
 		// try to download file
 		$remote_file = ltrim($remote_file,'/');
-		return ftp_get($this->getConnection(), $local_file, $remote_file, $ftp_mode);
+		return ftp_get($this->getConnection(), $local_file, $remote_file, $this->mode);
 	}
 
 

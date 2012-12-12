@@ -834,9 +834,6 @@ class Partner extends BasePartner
 	{
 		$this->putInCustomData('password_replace_freq', $replaceFreq, null);
 	}
-
-	public function setDefaultSftpEngine($v)			{$this->putInCustomData('default_sftp_engine', $v);}
-	public function getDefaultSftpEngine()				{return $this->getFromCustomData('default_sftp_engine', null, kFileTransferMgrType::SFTP);}
 	
 	public function setLoginUsersQuota($v)				{$this->putInCustomData('login_users_quota', $v);}
 	public function setAdminLoginUsersQuota($v)			{$this->putInCustomData('admin_login_users_quota', $v);}

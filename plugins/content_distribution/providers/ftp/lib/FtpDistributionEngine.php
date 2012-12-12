@@ -17,6 +17,8 @@ class FtpDistributionEngine extends DistributionEngine implements
 	 */
 	public function configure(KSchedularTaskConfig $taskConfig)
 	{
+		parent::configure($taskConfig);
+		
 		if($taskConfig->params->tempFilePath)
 		{
 			$this->tempFilePath = $taskConfig->params->tempFilePath;
@@ -269,7 +271,8 @@ class FtpDistributionEngine extends DistributionEngine implements
 		}
         
         $passphrase = $distributionProfile->passphrase ? $distributionProfile->passphrase : null;
-		$fileTransferManager = kFileTransferMgr::getInstance($protocol);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$fileTransferManager = kFileTransferMgr::getInstance($protocol, $engineOptions);
         if (trim($privateKey))
         {
             try

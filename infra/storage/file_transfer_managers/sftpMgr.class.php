@@ -8,318 +8,504 @@
  */
 class sftpMgr extends kFileTransferMgr
 {
+	/**
+	 * @var resource
+	 */
+	private $sftpId = false;
 	
-	private $sftp_id = false;
+	/**
+	 * @var string
+	 */
+	protected $host;
 	
-	protected $pass = null;
-
-	protected $server;
-	
+	/**
+	 * @var int
+	 */
 	protected $port;
-	 
-	protected $user;
 	
+	/**
+	 * @var string
+	 */
+	protected $username;
+	
+	/**
+	 * @var string
+	 */
+	protected $password = null;
+	
+	/**
+	 * @var string
+	 */
 	protected $privKeyFile;
 	
-	private $useCmd;
-	
+	/**
+	 * @var string
+	 */
 	protected $passphrase;
 	
-	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
-	protected function __construct($useCmd = false)
+	/**
+	 * @var boolean
+	 */
+	private $useCmd = true;
+	
+	/**
+	 * @var boolean
+	 */
+	private $useCmdChmod = true;
+	
+	/**
+	 * @var float
+	 */
+	private $cmdPutMinimumFileSize = 1048576; // 1024 * 1024
+	
+	/**
+	 * Instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
+	 * Supported options:
+	 * - useCmd - indicates that sftp CLI should be used for GET and PUT actions.
+	 * - cmdPutMinimumFileSize - CLI will be used for PUT aactions on files larger than this option.
+	 * 
+	 * @param array $options
+	 */
+	protected function __construct(array $options = null)
 	{
-		$this->useCmd = $useCmd;
+		parent::__construct($options);
+		
+		if($options)
+		{
+			if(isset($options['useCmd']))
+				$this->useCmd = $options['useCmd'];
+			
+			if(isset($options['useCmdChmod']))
+				$this->useCmdChmod = $options['useCmdChmod'];
+			
+			if(isset($options['cmdPutMinimumFileSize']))
+				$this->cmdPutMinimumFileSize = $options['cmdPutMinimumFileSize'];
+		}
 	}
-
 	
-	
+	/* (non-PHPdoc)
+	 * @see kFileTransferMgr::getConnection()
+	 */
 	public function getConnection()
 	{
-		if ($this->sftp_id != null && $this->sftp_id != false) {
-			return $this->sftp_id;
+		if($this->sftpId != null && $this->sftpId != false)
+		{
+			return $this->sftpId;
 		}
-		else {
+		else
+		{
 			return $this->connection_id;
 		}
 	}
 	
-	private function getSsh2Connection() {
+	/**
+	 * @return resource
+	 */
+	private function getSsh2Connection()
+	{
 		return $this->connection_id;
 	}
 	
-	private function getSftpConnection() {
-		return $this->sftp_id;
+	/**
+	 * @return resource
+	 */
+	private function getSftpConnection()
+	{
+		return $this->sftpId;
 	}
 	
 	/**********************************************************************/
 	/* Implementation of abstract functions from class 'kFileTransferMgr' */
 	/**********************************************************************/
 	
-	// sftp connect to server:port
-	protected function doConnect($sftp_server, &$sftp_port)
+	/**
+	 * sftp connect to server:port.
+	 * Wrapping ssh2_connect
+	 * 
+	 * (non-PHPdoc)
+	 * @see kFileTransferMgr::doConnect()
+	 */
+	protected function doConnect($host, &$port)
 	{
-		// try connecting to server
-		if (!$sftp_port || $sftp_port == 0) {
-                	$sftp_port = 22;
-		}
-		$this->port = $sftp_port;
-		$this->server = $sftp_server;
-		return ssh2_connect($sftp_server, $sftp_port);
-	}
-	
-	
-	// login to an existing connection with given user/pass (ftp_passive_mode is irrelevant)
-	protected function doLogin($sftp_user, $sftp_pass, $ftp_passive_mode = TRUE)
-	{
-		$this->user = $sftp_user;
-		$this->pass = $sftp_pass;
-		// try to login
-		if (ssh2_auth_password($this->getSsh2Connection(), $sftp_user, $sftp_pass)) {
-			$this->sftp_id = ssh2_sftp($this->getSsh2Connection());
-			return ($this->sftp_id != false && $this->sftp_id != null);
-		}
-		else {
-			return false;
-		}
-	}
-	
-	
-	// login using a public key
-	protected function doLoginPubKey($user, $pubKeyFile, $privKeyFile, $passphrase = null)
-	{
-		$this->user = $user;
-		$this->privKeyFile = $privKeyFile;
-		$this->passphrase = $passphrase;
-		// try to login
-		if (ssh2_auth_pubkey_file($this->getSsh2Connection(), $user, $pubKeyFile, $privKeyFile, $passphrase)) {
-			$this->sftp_id = ssh2_sftp($this->getSsh2Connection());
-			return ($this->sftp_id != false && $this->sftp_id != null);
-		}
-		else {
-			return false;
-		}
-	}
-	
-	
-	// upload a file to the server (ftp_mode is irrelevant
-	protected function doPutFile ($remote_file , $local_file , $ftp_mode, $http_field_name = null, $http_file_name = null)
-	{
-		$sftp = $this->getSftpConnection();
-		$remote_file = ltrim($remote_file,'/');
-		$absolute_path = trim($this->start_dir,'/').'/'.$remote_file;
-		$absolute_path = trim($absolute_path, '/');
+		if(!$port)
+			$port = 22;
+			
+		$this->host = $host;
+		$this->port = $port;
 		
-		if ($this->privKeyFile == null || !$this->useCmd)
+		return ssh2_connect($host, $port);
+	}
+	
+	/**
+	 * Login to an existing connection with given user/pass.
+	 * Wrapping ssh2_auth_password
+	 * 
+	 * (non-PHPdoc)
+	 * @see kFileTransferMgr::doLogin()
+	 */
+	protected function doLogin($username, $password)
+	{
+		$methods = ssh2_auth_none($this->getSsh2Connection(), $username);
+		if($methods === true)
+			return true;
+		
+		if(!in_array('password', $methods))
+			throw new kFileTransferMgrException("Password authentication is not supported by the server.", kFileTransferMgrException::cantAuthenticate);
+			
+		$this->username = $username;
+		$this->password = $password;
+		// try to login
+		if(ssh2_auth_password($this->getSsh2Connection(), $username, $password))
 		{
-			$stream = @fopen("ssh2.sftp://$sftp/$absolute_path", 'w');
-        	if (!$stream)
-        		return false;
-
-        	//Writes the file in chunks (for large files bug)
-        	$fileToReadHandle = fopen($local_file, "r");
-        	$ret = $this->writeFileInChunks($fileToReadHandle, $stream);
-        	@fclose($fileToReadHandle);
-			@fclose($stream);
-			return $ret;
+			$this->sftpId = ssh2_sftp($this->getSsh2Connection());
+			return ($this->sftpId != false && $this->sftpId != null);
 		}
 		else
 		{
-			//else the authentication is by private key
-			$sftpPutCommand = "put $local_file $remote_file";
-			$cmd = "(echo '$sftpPutCommand' && echo 'quit') | sftp -oPort=$this->port -o IdentityFile=$this->privKeyFile -o 'StrictHostKeyChecking=no'  $this->user@$this->server";
-			KalturaLog::debug('Put file using command: ' . $cmd);
-			system($cmd, $return_value);		
-						
-			return true;
+			return false;
 		}
 	}
+	
+	/**
+	 * Login using a public key.
+	 * Wrapping ssh2_auth_pubkey_file and ssh2_sftp
+	 * 
+	 * (non-PHPdoc)
+	 * @see kFileTransferMgr::doLoginPubKey()
+	 */
+	protected function doLoginPubKey($username, $pubKeyFile, $privKeyFile, $passphrase = null)
+	{
+		$methods = ssh2_auth_none($this->getSsh2Connection(), $username);
+		if($methods === true)
+			return true;
 		
-	// download a file from the server (ftp_mode is irrelevant)
-	protected function doGetFile ($remote_file, $local_file, $ftp_mode)
-	{	
+		if(!in_array('publickey', $methods))
+			throw new kFileTransferMgrException("Public key authentication is not supported by the server.", kFileTransferMgrException::cantAuthenticate);
+			
+		$this->username = $username;
+		$this->privKeyFile = $privKeyFile;
+		$this->passphrase = $passphrase;
+		// try to login
+		if(ssh2_auth_pubkey_file($this->getSsh2Connection(), $username, $pubKeyFile, $privKeyFile, $passphrase))
+		{
+			$this->sftpId = ssh2_sftp($this->getSsh2Connection());
+			return ($this->sftpId != false && $this->sftpId != null);
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * Upload a file to the server
+	 * Uses fopen and fwrite or sftp CLI, according to config and file size
+	 * 
+	 * (non-PHPdoc)
+	 * @see kFileTransferMgr::doPutFile()
+	 */
+	protected function doPutFile($remoteFile, $localFile)
+	{
 		$sftp = $this->getSftpConnection();
-		$remote_file = ltrim($remote_file,'/');
-		$absolute_path = trim($this->start_dir,'/').'/'.$remote_file;
-		$absolute_path = trim($absolute_path, '/');
-        $stream = @fopen("ssh2.sftp://$sftp/$absolute_path", 'r');
-        if (!$stream) {
-        	return false;
-        }
-        
-        //Writes the file in chunks (for large files bug)
-        $fileToWriteHandle = fopen($local_file, "w+");
-        $ret = $this->writeFileInChunks($stream, $fileToWriteHandle);
-        @fclose($fileToWriteHandle);
-        @fclose($stream);
-
-        return $ret;
+		
+		if(!$this->useCmd || kFile::fileSize($localFile) < $this->cmdPutMinimumFileSize)
+		{
+			$absolutePath = trim($remoteFile, '/');
+			$stream = @fopen("ssh2.sftp://$sftp/$absolutePath", 'w');
+			if($stream)
+			{
+				// Writes the file in chunks (for large files bug)
+				$fileToReadHandle = fopen($localFile, "r");
+				$ret = $this->writeFileInChunks($fileToReadHandle, $stream);
+				@fclose($fileToReadHandle);
+				@fclose($stream);
+				return $ret;
+			}
+		}
+		
+		if($this->useCmd)
+			return $this->execSftpCommand("put $localFile $remoteFile");
+			
+		return false;
 	}
 	
-	// create a new directory
-	protected function doMkDir ($remote_path)
+	/** 
+	 * Download a file from the server
+	 * Uses fopen and fread or sftp CLI, according to config
+	 * 
+	 * (non-PHPdoc)
+	 * @see kFileTransferMgr::doGetFile()
+	 */
+	protected function doGetFile($remoteFile, $localFile = null)
 	{
-	    $remote_path = ltrim($remote_path,'/');
-		return ssh2_sftp_mkdir($this->getSftpConnection(), $remote_path);
+		if($this->useCmd)
+			return $this->execSftpCommand("get $remoteFile $localFile");
+			
+		$sftp = $this->getSftpConnection();
+		$absolutePath = trim($remoteFile, '/');
+		$stream = @fopen("ssh2.sftp://$sftp/$absolutePath", 'r');
+		if(!$stream)
+			return false;
+			
+		if(is_null($localFile))
+		{
+			$content = $this->writeFileInChunks($stream);
+			fclose($stream);
+			
+			if($content === false)
+				throw new kFileTransferMgrException("Failed to read file from [" . $uri . "]");
+			
+			return $content;
+		}
+		
+		// Writes the file in chunks (for large files bug)
+		$fileToWriteHandle = fopen($localFile, "w+");
+		$ret = $this->writeFileInChunks($stream, $fileToWriteHandle);
+		@fclose($fileToWriteHandle);
+		@fclose($stream);
+		
+		return $ret;
 	}
 	
-	// chmod the given remote file
-	protected function doChmod ($remote_file, $chmod_code)
+	/** 
+	 * Create a new directory.
+	 * Wrapping ssh2_sftp_mkdir
+	 * 
+	 * (non-PHPdoc)
+	 * @see kFileTransferMgr::doMkDir()
+	 */
+	protected function doMkDir($remotePath)
 	{
-	    $remote_file = ltrim($remote_file,'/');
-		$chmod_cmd = 'chmod ' . $chmod_code . ' ' . $remote_file;
+		return ssh2_sftp_mkdir($this->getSftpConnection(), $remotePath);
+	}
+	
+	/** 
+	 * Changes file permissions on the given remote file
+	 * Wrapping ssh2_exec.
+	 * 
+	 * (non-PHPdoc)
+	 * @see kFileTransferMgr::doChmod()
+	 */
+	protected function doChmod($remoteFile, $mode)
+	{
+		if($this->useCmdChmod)
+			return $this->execSftpCommand("chmod $mode $remoteFile");
+			
+		$chmod_cmd = "chmod $mode $remoteFile";
 		$exec_output = $this->execCommand($chmod_cmd);
 		return (trim($exec_output) == ''); // empty output means the command passed ok
 	}
 	
-	// return true/false according to existence of file on the server
-	protected function doFileExists($remote_file)
+	/** 
+	 * Return true/false according to existence of file on the server
+	 * Wrapping ssh2_sftp_stat
+	 * 
+	 * (non-PHPdoc)
+	 * @see kFileTransferMgr::doFileExists()
+	 */
+	protected function doFileExists($remoteFile)
 	{
-	    $remote_file = ltrim($remote_file,'/');
 		$sftp = $this->getSftpConnection();
-		$stats = @ssh2_sftp_stat($sftp, $remote_file);
+		$stats = @ssh2_sftp_stat($sftp, $remoteFile);
 		return ($stats !== false);
 	}
-
-    // return the current working directory
-	protected function doPwd ()
-	{
-		$pwd_cmd = 'pwd';
-		$result = $this->execCommand($pwd_cmd);
-		if (strstr($result, '/') === false) {
-		    return '';
-		}
-		return $result;
-	}
-
-    // delete a file and return true/false according to success
-    protected function doDelFile ($remote_file)
-    {
-        $remote_file = ltrim($remote_file,'/');
-    	return ssh2_sftp_unlink($this->getSftpConnection(), $remote_file); 
-    }
-
-     // delete a directory and return true/false according to success
-    protected function doDelDir ($remote_path)
-    {
-        //return ssh2_sftp_rmdir($this->getSftpConnection(), $remote_path);
-        $remote_path = ltrim($remote_path,'/'); 
-        $deldir_cmd = 'rm -r ' . $remote_path;
-        $exec_output = $this->execCommand($deldir_cmd);
-        return (trim($exec_output) == ''); // empty output means the command passed ok
-    }
-
-	protected function doList ($remote_path)
-	{
-	    $remote_path = ltrim($remote_path,'/');
-        $lsdir_cmd = 'ls ' . $remote_path;
-        $exec_output = $this->execCommand($lsdir_cmd);
-		KalturaLog::info("sftp rawlist [$exec_output]");
-        return array_filter(array_map('trim', explode("\n", $exec_output)), 'strlen');
-	}	
 	
-	// download a file from the server
-	public function fileGetContents ($remote_file)
+	/** 
+	 * Return the current working directory.
+	 * Wrapping ssh2_exec
+	 * 
+	 * (non-PHPdoc)
+	 * @see kFileTransferMgr::doPwd()
+	 */
+	protected function doPwd()
 	{
-	    $sftp = $this->getSftpConnection();
-	    $remote_file = ltrim($remote_file,'/');
-	    $absolute_path = trim($this->start_dir,'/').'/'.$remote_file;
-		$absolute_path = trim($absolute_path, '/');
-		$uri = "ssh2.sftp://$sftp/$absolute_path";
-        $stream = @fopen($uri, 'r');
-        if (!$stream)
-        	throw new kFileTransferMgrException("Failed to open stream [".$uri."]");
+		return '/';
+	}
+	
+	/** 
+	 * Delete a file and return true/false according to success.
+	 * Wrapping ssh2_sftp_unlink;
+	 * 
+	 * (non-PHPdoc)
+	 * @see kFileTransferMgr::doDelFile()
+	 */
+	protected function doDelFile($remoteFile)
+	{
+		return ssh2_sftp_unlink($this->getSftpConnection(), $remoteFile);
+	}
+	
+	/** 
+	 * Delete a directory and return true/false according to success.
+	 * Wrapping ssh2_exec
+	 * 
+	 * (non-PHPdoc)
+	 * @see kFileTransferMgr::doDelDir()
+	 */
+	protected function doDelDir($remotePath)
+	{
+		return ssh2_sftp_rmdir($this->getSftpConnection(), $remotePath);
+	}
+	
+	/** 
+	 * Return list of files in the given directory
+	 * Wrapping ssh2_exec
+	 * 
+	 * (non-PHPdoc)
+	 * @see kFileTransferMgr::doList()
+	 */
+	protected function doList($remotePath)
+	{
+		$sftp = $this->getSftpConnection();
+		$absolutePath = trim($remotePath, '/');
+		$handle = opendir("ssh2.sftp://{$sftp}/{$absolutePath}");
+	   	if($handle !== false)
+	   	{
+	   		$ls = array();
+			while (false !== ($file = readdir($handle))) 
+			{
+				if ($file == '.' || $file == '..')
+					continue;
+					
+				$ls[] = $file;
+			}
+			closedir($handle);
+			return $ls; 
+	   	}
         	
-        $contents = fread($stream, filesize($uri));
-        if ($contents === false)
-            throw new kFileTransferMgrException("Failed to read file from [".$uri."]");
-                   
-        return $contents;
+		$lsDirCmd = "ls $remotePath";
+		$execOutput = $this->execCommand($lsDirCmd);
+		KalturaLog::info("sftp rawlist [$execOutput]");
+		return array_filter(array_map('trim', explode("\n", $execOutput)), 'strlen');
 	}
 	
-	// upload a file to the server
-	public function filePutContents ($remote_file, $contents)
-	{	
-		if (!$this->fileExists(dirname($remote_file))) {
-			$this->mkDir(dirname($remote_file));
+	/**
+	 * Upload content to the server
+	 * Uses fopen and fwrite
+	 * 
+	 * @param string $remoteFile
+	 * @param string $contents
+	 * @throws kFileTransferMgrException
+	 */
+	public function filePutContents($remoteFile, $contents)
+	{
+		if(!$this->fileExists(dirname($remoteFile)))
+			$this->mkDir(dirname($remoteFile));
+		
+		$sftp = $this->getSftpConnection();
+		$absolutePath = trim($remoteFile, '/');
+		$uri = "ssh2.sftp://$sftp/$absolutePath";
+		$stream = @fopen($uri, 'w');
+		if(!$stream)
+			throw new kFileTransferMgrException("Failed to open stream [" . $uri . "]");
+		
+		if(@fwrite($stream, $contents) === false)
+		{
+			@fclose($stream);
+			throw new kFileTransferMgrException("Failed to upload file to [" . $uri . "]");
+		}
+		return @fclose($stream);
+	}
+	
+	/** 
+	 * Return the size of a given remote file
+	 * 
+	 * (non-PHPdoc)
+	 * @see kFileTransferMgr::doFileSize()
+	 */
+	protected function doFileSize($remoteFile)
+	{
+		if(PHP_INT_SIZE >= 8)
+		{
+			$stat = ssh2_sftp_stat($this->getSftpConnection(), $remoteFile);
+			if(isset($stat['size']))
+				return $stat['size'];
 		}
 		
-        $sftp = $this->getSftpConnection();
-        $remote_file = ltrim($remote_file,'/');
-        $absolute_path = trim($this->start_dir,'/').'/'.$remote_file;
-		$absolute_path = trim($absolute_path, '/');
-		$uri = "ssh2.sftp://$sftp/$absolute_path";
-        $stream = @fopen($uri, 'w');
-        if (!$stream)
-        	throw new kFileTransferMgrException("Failed to open stream [".$uri."]");
-        	
-        if (@fwrite($stream, $contents) === false) {
-            @fclose($stream);
-        	throw new kFileTransferMgrException("Failed to upload file to [".$uri."]");
-		}
-        return @fclose($stream);
-	}
-	
-	protected function doFileSize($remote_file)
-	{
-	    $remote_file = ltrim($remote_file,'/');
-	    
-//	    Misses files that larger than 2MB by returning a negativ value
-//	    Misses files that larger than 4MB by returning again a positive value after overflowing the int
-//		Just use ls -l instead and return the size as string
-//		
-//	    $statinfo = ssh2_sftp_stat($this->getSftpConnection(), $remote_file);
-//	    $filesize = isset($statinfo['size']) ? $statinfo['size'] : null;
-	    
-    	$remote_folder = dirname($remote_file);
-        $lsdir_cmd = "ls -l $remote_folder/*";
-        $exec_output = $this->execCommand($lsdir_cmd);
-        
-		KalturaLog::info("sftp rawlist [$exec_output]");
+		$remoteFolder = dirname($remoteFile);
+		$lsdirCmd = "ls -l $remoteFolder/*";
+		$execOutput = $this->execCommand($lsdirCmd);
 		
-		$filesInfo = array_filter(array_map('trim', explode("\n", $exec_output)), 'strlen');
-			    
-		$escapedRemoteFolder = str_replace('/', '\/', $remote_folder);
+		KalturaLog::info("sftp rawlist [$execOutput]");
+		
+		$filesInfo = array_filter(array_map('trim', explode("\n", $execOutput)), 'strlen');
+		
+		$escapedRemoteFolder = str_replace('/', '\/', $remoteFolder);
 		// drwxrwxrwx 10 root root 4096 2010-11-24 23:45 file.ext
 		// -rw-r--r--+ 1 mikew Domain Users 7270248766 Feb  9 11:16 Kaltura/LegislativeBriefing2012.mov
 		$regexUnix = "^(?P<permissions>[-drwx]{10})\+?\s+(?P<number>\d{1,2})\s+(?P<owner>[\d\w]+)\s+(?P<group>[\d\w\s]+)\s+(?P<fileSize>\d*)\s+((?P<year1>\w{4})-(?P<month1>\d{2})-(?P<day1>\d{2})\s+(?P<hour1>\d{2}):(?P<minute1>\d{2})|(?P<month2>\w{3})\s+(?P<day2>\d{1,2})\s+((?P<hour2>\d{2}):(?P<minute2>\d{2})|(?P<year2>\d{4})))\s+$escapedRemoteFolder\/(?P<file>.+)\s*$";
-	    
-	    foreach($filesInfo as $fileInfo)
-	    {
-	    	$matches = null;
-	    	if(!preg_match("/$regexUnix/", $fileInfo, $matches))
-	    	{
-	    		KalturaLog::err("Unix regex does not match ftp rawlist output [$fileInfo]");
-				continue;
-	    	}
-	    	
-	    	if($matches['file'] == basename($remote_file))
-	    		return $matches['fileSize'];
-	    }
-	    return null;
-	}
-	
-	protected function doModificationTime($remote_file)
-	{
-	    $remote_file = ltrim($remote_file,'/');
-	    $statinfo = ssh2_sftp_stat($this->getSftpConnection(), $remote_file);
-	    $modificationTime = isset($statinfo['mtime']) ? $statinfo['mtime'] : null;
-	    return $modificationTime;
-	}
-	
-	
-	// execute the given command on the server
-	private function execCommand($command_str)
-	{
-		KalturaLog::info($command_str);
 		
-		$stream = ssh2_exec($this->getSsh2Connection(), $command_str);
+		foreach($filesInfo as $fileInfo)
+		{
+			$matches = null;
+			if(!preg_match("/$regexUnix/", $fileInfo, $matches))
+			{
+				KalturaLog::err("Unix regex does not match ftp rawlist output [$fileInfo]");
+				continue;
+			}
+			
+			if($matches['file'] == basename($remoteFile))
+				return $matches['fileSize'];
+		}
+		return null;
+	}
+	
+	/**
+	 * Return unix timestamp of given file last modification time.
+	 * Wrapping ssh2_sftp_stat
+	 * 
+	 * @param string $remoteFile
+	 * @return int
+	 */
+	protected function doModificationTime($remoteFile)
+	{
+		$remoteFile = ltrim($remoteFile, '/');
+		$statinfo = ssh2_sftp_stat($this->getSftpConnection(), $remoteFile);
+		$modificationTime = isset($statinfo['mtime']) ? $statinfo['mtime'] : null;
+		return $modificationTime;
+	}
+	
+	/**
+	 * Execute the given command on the server
+	 * 
+	 * @param string $command
+	 * @return string
+	 */
+	private function execSftpCommand($command)
+	{
+		$cliCommand = "sftp -oPort={$this->port} -oStrictHostKeyChecking=no";
+		
+		if($this->verbose)
+			$cliCommand .= " -v";
+			
+		if($this->privKeyFile)
+			$cliCommand .= " -oIdentityFile={$this->privKeyFile}";
+		else
+			$cliCommand = "sshpass -p '{$this->password}' $cliCommand";
+			
+		$cliCommand .= " {$this->username}@{$this->host}";
+		
+		$cmd = "(echo '$command' && echo 'quit') | $cliCommand";
+		KalturaLog::info("Command [$cmd]");
+		return system($cmd, $returnValue);
+	}
+	
+	/**
+	 * Execute the given command on the server
+	 * 
+	 * @param string $command
+	 * @return string
+	 */
+	private function execCommand($command)
+	{
+		KalturaLog::info($command);
+		
+		$stream = ssh2_exec($this->getSsh2Connection(), $command);
 		if(!$stream || !is_resource($stream))
 			return null;
 		
-  		stream_set_blocking($stream, true);
-   		$output = stream_get_contents($stream);
-   		fclose($stream);
-   		return $output;
+		stream_set_blocking($stream, true);
+		$output = stream_get_contents($stream);
+		fclose($stream);
+		return $output;
 	}
-	
 }

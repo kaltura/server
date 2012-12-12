@@ -133,13 +133,6 @@ class FreewheelGenericDistributionEngine extends DistributionEngine implements
 		return true;
 	}
 	
-	/* (non-PHPdoc)
-	 * @see DistributionEngine::configure()
-	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
-	{
-	}
-	
 	/**
 	 * @param string $filename
 	 * @param string $data

@@ -36,6 +36,8 @@ class IdeticDistributionEngine extends DistributionEngine implements
 	 */
 	public function configure(KSchedularTaskConfig $taskConfig)
 	{
+		parent::configure($taskConfig);
+		
 		$this->tempXmlPath = sys_get_temp_dir();
 		if($taskConfig->params->ideticFetchReportPath)
 			$this->fetchReportPath = $taskConfig->params->ideticFetchReportPath;
@@ -85,7 +87,8 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		$destFile = "{$path}/{$fileName}";
 			
 		
-		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		if(!$fileTransferMgr)
 			throw new Exception("FTP manager not loaded");
 			
@@ -145,7 +148,8 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		file_put_contents($srcFile, $feedHelper->getXmlString());
 		KalturaLog::debug("XML written to file [$srcFile]");
 		
-		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		if(!$fileTransferMgr)
 			throw new Exception("FTP manager not loaded");
 			
@@ -257,7 +261,8 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		
 		KalturaLog::debug("Listing content for [$this->path]");
 		
-		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		if(!$fileTransferMgr)
 			throw new Exception("FTP manager not loaded");
 			
@@ -419,7 +424,8 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		$loginName = $distributionProfile->sftpLogin;
 		$publicKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPublicKey, 'publickey');
 		$privateKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPrivateKey, 'privatekey');
-		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP, $engineOptions);
 		$sftpManager->loginPubKey($serverUrl, $loginName, $publicKeyFile, $privateKeyFile);
 		return $sftpManager;
 	}
@@ -462,7 +468,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		try 
 		{
 			KalturaLog::info('Trying to get the following status file: ['.$statusFilePath.']');
-			$statusXml = $sftpManager->fileGetContents($statusFilePath);
+			$statusXml = $sftpManager->getFile($statusFilePath);
 		}
 		catch(kFileTransferMgrException $ex) // file is still missing
 		{

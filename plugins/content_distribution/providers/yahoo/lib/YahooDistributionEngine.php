@@ -24,6 +24,8 @@ class YahooDistributionEngine extends DistributionEngine implements
 	 */
 	public function configure(KSchedularTaskConfig $taskConfig)
 	{
+		parent::configure($taskConfig);
+		
 		$this->tempXmlPath = sys_get_temp_dir();
 	}
 
@@ -216,11 +218,13 @@ class YahooDistributionEngine extends DistributionEngine implements
 		$ftpHost = $distributionProfile->ftpHost;
 		$ftpUsername = $distributionProfile->ftpUsername;
 		$ftpPassword = $distributionProfile->ftpPassword;
-		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$engineOptions['passiveMode'] = true;
+		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		if(!$ftpManager){
 			throw new Exception("FTP manager not loaded");
 		}
-		$ftpManager->login($ftpHost, $ftpUsername, $ftpPassword, null, true);
+		$ftpManager->login($ftpHost, $ftpUsername, $ftpPassword);
 		return $ftpManager;
 	}
 	

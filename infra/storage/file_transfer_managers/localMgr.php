@@ -10,9 +10,9 @@ class localMgr extends kFileTransferMgr
 {
 
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
-	protected function __construct()
+	protected function __construct(array $options = null)
 	{
-		// do nothing
+		parent::__construct($options);
 	}
 
 
@@ -28,7 +28,7 @@ class localMgr extends kFileTransferMgr
 
 
 	// login to an existing connection with given user/pass
-	protected function doLogin($local_user, $local_pass, $ftp_passive_mode = TRUE)
+	protected function doLogin($local_user, $local_pass)
 	{
 		return true;
 	}
@@ -42,16 +42,19 @@ class localMgr extends kFileTransferMgr
 
 
 	// upload a file to the server (ftp_mode is irrelevant
-	protected function doPutFile ($remote_file,  $local_file, $ftp_mode, $http_field_name = null, $http_file_name = null)
+	protected function doPutFile ($remote_file,  $local_file)
 	{
 		return @copy($remote_file, $local_file);
 	}
 
 
 	// download a file from the server (ftp_mode is irrelevant)
-	protected function doGetFile ($remote_file, $local_file, $ftp_mode)
+	protected function doGetFile ($remote_file, $local_file = null)
 	{
-		return @copy($remote_file, $local_file);
+		if($local_file)
+			return @copy($remote_file, $local_file);
+			
+		return file_get_contents($remote_file);
 	}
 
 

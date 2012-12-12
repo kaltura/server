@@ -8,7 +8,10 @@
  */
 class httpMgr extends kFileTransferMgr
 {
-	const HTTP_USER_AGENT = "\"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6\"";
+	/**
+	 * @var string
+	 */
+	protected $userAgent = "\"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6\"";
 	
 	/**
 	 * @var resource
@@ -19,11 +22,33 @@ class httpMgr extends kFileTransferMgr
 	 * @var string
 	 */
 	protected $server;
+	
+	/**
+	 * @var string
+	 */
+	protected $fieldName = null;
+	
+	/**
+	 * @var string
+	 */
+	protected $fileName = null;
 
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
-	protected function __construct()
+	protected function __construct(array $options = null)
 	{
-		// do nothing
+		parent::__construct($options);
+	
+		if($options)
+		{
+			if(isset($options['userAgent']))
+				$this->userAgent = $options['userAgent'];
+				
+			if(isset($options['fieldName']))
+				$this->fieldName = $options['fieldName'];
+				
+			if(isset($options['fileName']))
+				$this->fileName = $options['fileName'];
+		}
 	}
 
 	
@@ -73,7 +98,7 @@ class httpMgr extends kFileTransferMgr
 
 		$this->ch = curl_init();
 
-		curl_setopt($this->ch, CURLOPT_USERAGENT, self::HTTP_USER_AGENT);
+		curl_setopt($this->ch, CURLOPT_USERAGENT, $this->userAgent);
 		curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
 		
 		curl_setopt($this->ch, CURLOPT_NOSIGNAL, true);
@@ -88,7 +113,7 @@ class httpMgr extends kFileTransferMgr
 
 
 	// login to an existing connection with given user/pass
-	protected function doLogin($http_user, $http_pass, $ftp_passive_mode = true)
+	protected function doLogin($http_user, $http_pass)
 	{
 		if(is_null($http_user) && is_null($http_pass))
 			return true;
@@ -108,7 +133,7 @@ class httpMgr extends kFileTransferMgr
 
 
 	// upload a file to the server (ftp_mode is irrelevant
-	protected function doPutFile ($remote_file,  $local_file, $ftp_mode, $http_field_name = null, $http_file_name = null)
+	protected function doPutFile ($remote_file,  $local_file)
 	{		
 		$url = $this->server . '/' . $remote_file;
 		$url = self::encodeUrl($url);
@@ -119,13 +144,13 @@ class httpMgr extends kFileTransferMgr
 		curl_setopt($this->ch, CURLOPT_HEADER, false);
 		
 		$params = null;
-		if($http_field_name)
+		if($this->fieldName)
 		{
-			$params = array($http_field_name => file_get_contents($local_file));
+			$params = array($this->fieldName => file_get_contents($local_file));
 		}
-		elseif($http_file_name)
+		elseif($this->fileName)
 		{
-			$params = array($http_file_name => '@' . $local_file);
+			$params = array($this->fileName => '@' . $local_file);
 		}
 		else
 		{
@@ -148,7 +173,7 @@ class httpMgr extends kFileTransferMgr
 
 
 	// download a file from the server (ftp_mode is irrelevant)
-	protected function doGetFile ($remote_file, $local_file, $ftp_mode)
+	protected function doGetFile ($remote_file, $local_file = null)
 	{
 		$url = $this->server . '/' . $remote_file;
 		$url = self::encodeUrl($url);

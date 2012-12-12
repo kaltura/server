@@ -133,10 +133,6 @@ class KPhysicalDropFolderUtils
 				return kFileTransferMgrType::SCP;
 			case KalturaDropFolderType::SFTP:
 				return kFileTransferMgrType::SFTP;
-			case KalturaDropFolderType::SFTP_CMD:
-				return kFileTransferMgrType::SFTP_CMD;
-			case KalturaDropFolderType::SFTP_SEC_LIB:
-				return kFileTransferMgrType::SFTP_SEC_LIB;
 			case KalturaDropFolderType::S3:
 				return kFileTransferMgrType::S3;
 			default:

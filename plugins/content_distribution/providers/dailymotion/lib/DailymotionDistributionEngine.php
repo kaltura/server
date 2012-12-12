@@ -31,6 +31,8 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	 */
 	public function configure(KSchedularTaskConfig $taskConfig)
 	{
+		parent::configure($taskConfig);
+		
 		if($taskConfig->params->tempXmlPath)
 		{
 			$this->tempXmlPath = $taskConfig->params->tempXmlPath;
