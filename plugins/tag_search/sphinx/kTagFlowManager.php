@@ -19,7 +19,8 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         {
             $tagToRemove->delete();
         }
-        
+    
+        return true;
     }
 
 	/* (non-PHPdoc)
