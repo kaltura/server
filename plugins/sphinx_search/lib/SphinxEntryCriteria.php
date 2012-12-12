@@ -42,6 +42,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		entryPeer::PLAYS => 'plays',
 		'entry.PARTNER_SORT_VALUE' => 'partner_sort_value',
 		'entry.REPLACEMENT_STATUS' => 'replacement_status',
+		'entry.PARTNER_STATUS_VALUE' =>'partner_status_idx',
 		
 		entryPeer::CREATED_AT => 'created_at',
 		entryPeer::UPDATED_AT => 'updated_at',
@@ -57,7 +58,6 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'entry.PRIVACY_BY_CONTEXTS' => 'privacy_by_contexts',
 		'entry.CREATOR_KUSER_ID' => 'creator_kuser_id',
 		'entry.CREATOR_PUSER_ID' => 'creator_puser_id',
-		
 	);
 	
 	public static $sphinxOrderFields = array(
@@ -108,6 +108,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'description' => IIndexable::FIELD_TYPE_STRING,
 		'admin_tags' => IIndexable::FIELD_TYPE_STRING,
 		'plugins_data' => IIndexable::FIELD_TYPE_STRING,
+		'sphinx_match_optimizations'=> IIndexable::FIELD_TYPE_STRING,
 		
 		'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'kuser_id' => IIndexable::FIELD_TYPE_STRING,
@@ -141,6 +142,12 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'privacy_by_contexts' => IIndexable::FIELD_TYPE_STRING,
 		'creator_kuser_id' => IIndexable::FIELD_TYPE_STRING,
 		'creator_puser_id' => IIndexable::FIELD_TYPE_STRING,
+	);
+	
+	public static $sphinxOptimizationMap = array(
+		// array(format, 'field1', 'field2',...)
+		array(entry::PARTNER_STATUS_FORMAT, entryPeer::PARTNER_ID , entryPeer::STATUS),
+		array("%s", entryPeer::ID),
 	);
 
 	/**
@@ -331,7 +338,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$advancedSearch = $filter->getAdvancedSearch();
 			if($advancedSearch)
 			{
-				$additionalConditions = $advancedSearch->getFreeTextConditions($freeTexts);
+				$additionalConditions = $advancedSearch->getFreeTextConditions($filter->getPartnerSearchScope(), $freeTexts);
 			}
 			
 			if(preg_match('/^"[^"]+"$/', $freeTexts))
@@ -401,9 +408,11 @@ class SphinxEntryCriteria extends SphinxCriteria
 	{
 		// depending on the partner_search_scope - alter the against_str 
 		$partner_search_scope = $filter->getPartnerSearchScope();
+		
 		if ( baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE == $partner_search_scope )
 		{
-			// add nothing the the match
+			// add nothing the the partner match
+			
 		}
 		elseif ( $partner_search_scope == null  )
 		{
@@ -411,7 +420,10 @@ class SphinxEntryCriteria extends SphinxCriteria
 		}
 		else
 		{
-			$this->add(entryPeer::PARTNER_ID, $partner_search_scope, Criteria::IN);
+			if(count($partner_search_scope) == 1)
+				$this->add(entryPeer::PARTNER_ID, $partner_search_scope, Criteria::EQUAL);
+			else
+				$this->add(entryPeer::PARTNER_ID, $partner_search_scope, Criteria::IN);
 		}
 	}
 	
@@ -440,6 +452,11 @@ class SphinxEntryCriteria extends SphinxCriteria
 	public function getSphinxOrderFields()
 	{			
 		return self::$sphinxOrderFields;
+	}
+	
+	public function getSphinxOptimizationMap() 
+	{
+		return self::$sphinxOptimizationMap;
 	}
 	
 	public function getSphinxFieldName($fieldName)
@@ -499,6 +516,10 @@ class SphinxEntryCriteria extends SphinxCriteria
 	public function getSkipFields()
 	{
 		return array(entryPeer::ID);
+	}
+	
+	public function getShinxConditionsToKeep() {
+		return array(entryPeer::PARTNER_ID);
 	}
 		
 	public function hasPeerFieldName($fieldName)

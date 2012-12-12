@@ -16,7 +16,7 @@ class AdvancedSearchFilterItem
 			$this->applyCondition($query);
 	}
 	
-	public function getFreeTextConditions($freeTexts)
+	public function getFreeTextConditions($partnerScope, $freeTexts)
 	{
 		return array();	
 	}

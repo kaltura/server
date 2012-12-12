@@ -277,6 +277,117 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		return ($priorityB - $priorityA);
 	}
 	
+	
+	protected static function cartesian($input) {
+		$result = array();
+	
+		while (list($key, $values) = each($input)) {
+			// If a sub-array is empty, it doesn't affect the cartesian product
+			if (empty($values)) {
+				continue;
+			}
+	
+			// Special case: seeding the product array with the values from the first sub-array
+			if (empty($result)) {
+				foreach($values as $value) {
+					$result[] = array($key => $value);
+				}
+			}
+			else {
+				// Second and subsequent input sub-arrays work like this:
+				//   1. In each existing array inside $product, add an item with
+				//      key == $key and value == first item in input sub-array
+				//   2. Then, for each remaining item in current input sub-array,
+				//      add a copy of each existing array inside $product with
+				//      key == $key and value == first item in current input sub-array
+	
+				// Store all items to be added to $product here; adding them on the spot
+				// inside the foreach will result in an infinite loop
+				$append = array();
+				foreach($result as &$product) {
+					// Do step 1 above. array_shift is not the most efficient, but it
+					// allows us to iterate over the rest of the items with a simple
+					// foreach, making the code short and familiar.
+					$product[$key] = array_shift($values);
+	
+					// $product is by reference (that's why the key we added above
+					// will appear in the end result), so make a copy of it here
+					$copy = $product;
+	
+					// Do step 2 above.
+					foreach($values as $item) {
+						$copy[$key] = $item;
+						$append[] = $copy;
+					}
+	
+					// Undo the side effecst of array_shift
+					array_unshift($values, $product[$key]);
+				}
+	
+				// Out of the foreach, we can add to $results now
+				$result = array_merge($result, $append);
+			}
+		}
+	
+		return $result;
+	}
+	
+	protected function getFieldPossibleValues(array $criterionsMap, $fieldName) {
+		if(!array_key_exists($fieldName, $criterionsMap))
+			return null;
+		
+		$criterion = $criterionsMap[$fieldName];
+		
+		// In case we have an or inside the criterion - we can't handle it.
+		if($criterion->getConjunction() ==  Criterion::ODER)
+			return;
+		
+		if($criterion->getComparison() == Criteria::EQUAL) {
+			$res = array();
+			$res[] = $criterion->getValue();
+			return $res;
+		}
+			
+		if ($criterion->getComparison() == Criteria::IN) 
+			return $criterion->getValue();
+		
+		return null;
+	}
+	
+	protected function addSphinxOptimizationMatches(array $criterionsMap) 
+	{
+		$optimizationField = $this->getSphinxOptimizationMap();
+		
+		foreach($optimizationField as $formatParams) {
+			$hasEmptryField = false;
+			$values = array();
+			
+			// Get values
+			for($i = 1 ; $i < count($formatParams) ; $i++) {
+				$value = $this->getFieldPossibleValues($criterionsMap,  $formatParams[$i]);
+				if($value === null) {
+					$hasEmptryField = true;
+					break;
+				}
+				$values[] = $value;
+			}
+			
+			if($hasEmptryField)
+				continue;
+			
+			// Generate all possible combinations 
+			$cartesianOptions = $this::cartesian($values);
+			$format = $formatParams[0];
+			$formatedStr = array();
+			foreach($cartesianOptions as $option) {
+				$formatedStr[] = vsprintf($format, $option);
+			}
+			
+			// Add condition
+			$this->matchClause[] = "( @sphinx_match_optimizations " . implode(" | ", $formatedStr) . ")";
+		}
+	}
+	
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria#applyFilters()
 	 */
@@ -306,6 +417,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			return;
 		}
 		
+		$fieldsToKeep = $this->getShinxConditionsToKeep();
 		$criterionsMap = $this->getMap();
 		uksort($criterionsMap, array('SphinxCriteria','sortFieldsByPriority'));
 		// go over all criterions and try to move them to the sphinx
@@ -321,7 +433,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			if($criterion->apply($this))
 			{
 				KalturaLog::debug("Criterion [" . $criterion->getColumn() . "] attached");
-				$this->keyToRemove[] = $field;
+				if(!in_array($field, $fieldsToKeep))
+					$this->keyToRemove[] = $field;
 			}
 			else
 			{
@@ -331,6 +444,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 		
 		KalturaLog::debug("Applied " . count($this->matchClause) . " matches, " . count($this->whereClause) . " clauses, " . count($this->keyToRemove) . " keys removed, $this->criteriasLeft keys left");
+		
+		// Adds special sphinx optimizations matches
+		$this->addSphinxOptimizationMatches($criterionsMap);
 		
 		if(count($this->matchClause))
 		{
@@ -684,6 +800,13 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	}
 	
 	/**
+	 * @return array
+	 */
+	public function getSphinxOptimizationMap() {
+		return array();
+	}
+	
+	/**
 	 * This function returns a list of fields that indicates whether the query should skip sphinx and go
 	 * directly to the database. For example, if a query on 'entry' contains entry.ID IN (...) going
 	 * through sphinx does not help (unless there is some textual match as well). In this case the function
@@ -692,6 +815,17 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 */
 	public function getSkipFields()
 	{
+		return array();
+	}
+	
+	/**
+	 * This function returns a list of fields that indicates whether the query should keep the sphinx qeury condition
+	 * but use it as well when querying from the database. For example, if a query on 'entry' contains entry.partner_id,
+	 * we'd like to use the same condition on the database as well.
+	 * 
+	 * @return array
+	 */
+	public function getShinxConditionsToKeep() {
 		return array();
 	}
 		

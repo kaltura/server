@@ -41,7 +41,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 			return false;
 			
 		if($parentCriterion instanceof KalturaCriterion)
-			return ($parentCriterion->getSelfConjunction() == Criterion::ODER);
+			return ($parentCriterion->getConjunction() == Criterion::ODER);
 			
 		return false;
 	}
@@ -371,7 +371,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 		
 		if (count($this->conditionClause))
 		{
-			$attributesClause = implode($this->getSelfConjunction(), array_unique($this->conditionClause));
+			$attributesClause = implode($this->getConjunction(), array_unique($this->conditionClause));
 			if(!strlen(trim($attributesClause)))
 				return true;
 				

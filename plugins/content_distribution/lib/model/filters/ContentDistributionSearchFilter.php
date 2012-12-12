@@ -155,25 +155,25 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionProfile($this->distributionProfileId) . '"';
 		
 		if(!is_null($this->distributionSunStatus))
-			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionSunStatus($this->distributionSunStatus, $this->distributionProfileId) . '"';
+			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionSunStatus($this->distributionSunStatus, $this->distributionProfileId, false) . '"';
 		
 		if(!is_null($this->entryDistributionFlag))
-			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionFlag($this->entryDistributionFlag, $this->distributionProfileId) . '"';
+			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionFlag($this->entryDistributionFlag, $this->distributionProfileId, false) . '"';
 		
 		if(!is_null($this->entryDistributionStatus))
-			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionStatus($this->entryDistributionStatus, $this->distributionProfileId) . '"';
+			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionStatus($this->entryDistributionStatus, $this->distributionProfileId, false) . '"';
 			
 		if(!is_null($this->hasEntryDistributionValidationErrors))
 		{
 			if($this->hasEntryDistributionValidationErrors)
-				$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionHasValidationError($this->distributionProfileId) . '"';
+				$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionHasValidationError($this->distributionProfileId, false) . '"';
 			else
-				$conditions[] = kContentDistributionManager::getSearchStringDistributionHasNoValidationError($this->distributionProfileId);
+				$conditions[] = kContentDistributionManager::getSearchStringDistributionHasNoValidationError($this->distributionProfileId, false);
 		}
 
 		if(!is_null($this->entryDistributionValidationErrors))
 			foreach($this->entryDistributionValidationErrors as $validationError)
-				$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionValidationError($validationError, $this->distributionProfileId) . '"';
+				$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionValidationError($validationError, $this->distributionProfileId, false) . '"';
 			
 		if(!count($conditions))
 			return null;

@@ -172,7 +172,7 @@ abstract class KalturaCriterion extends Criterion implements IKalturaDbQuery
 	/**
 	 * @return string $selfConjunction
 	 */
-	protected function getSelfConjunction()
+	public function getConjunction()
 	{
 		return $this->selfConjunction;
 	}
@@ -192,7 +192,7 @@ abstract class KalturaCriterion extends Criterion implements IKalturaDbQuery
 	{
 		$criterion = $this->criteria->getNewCriterion($column, $value, $comparison);
 		
-		if($this->getSelfConjunction() == self::ODER)
+		if($this->getConjunction() == self::ODER)
 			$this->addOr($criterion);
 		else
 			$this->addAnd($criterion);

@@ -95,11 +95,17 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
 		'deleted_at' => IIndexable::FIELD_TYPE_DATETIME,
 		'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
+		'sphinx_match_optimizations'=> IIndexable::FIELD_TYPE_STRING,
 	);
 	
 	public static $sphinxFieldsEscapeType = array(
 		'category.FULL_NAME' => SearchIndexFieldEscapeType::MD5_LOWER_CASE,
 		'category.FULL_IDS' => SearchIndexFieldEscapeType::MD5_LOWER_CASE,
+	);
+	
+	public static $sphinxOptimizationMap = array(
+			// array(format, 'field1', 'field2',...)
+			array("%s", categoryPeer::ID),
 	);
 
 	/**
@@ -152,6 +158,9 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	 */
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{				
+		
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		
 		$categories = $filter->get( "_matchor_likex_full_name");
 		if ($categories !== null)
 		{
@@ -183,7 +192,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$advancedSearch = $filter->getAdvancedSearch();
 			if($advancedSearch)
 			{
-				$additionalConditions = $advancedSearch->getFreeTextConditions($freeTexts);
+				$additionalConditions = $advancedSearch->getFreeTextConditions($filter->getPartnerSearchScope(), $freeTexts);
 			}
 			
 			if(preg_match('/^"[^"]+"$/', $freeTexts))
@@ -249,8 +258,6 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		
 		if($filter->get('_eq_manager'))
 		{
-			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id; 
-			
 			$puserId = $filter->get('_eq_manager');
 			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 			if($kuser)
@@ -263,9 +270,6 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		
 		if($filter->get('_eq_member'))
 		{
-			//memeber but not a menager
-			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id; 
-			
 			$puserId = $filter->get('_eq_member');
 			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 			if($kuser)
@@ -392,6 +396,21 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		}
 		$filter->unsetByName('_likex_name_or_reference_id');
 		
+		
+		if($filter->get('_eq_privacy')) {
+			$filter->set('_eq_privacy', $filter->get('_eq_privacy') . "P" . $partnerId);
+		}
+		
+		if($filter->get('_in_privacy'))  {
+			$privacyIn = explode(',', $filter->get('_in_privacy'));
+				
+			$newPrivacyIn = array();
+			foreach($privacyIn as $privacy)
+				$newPrivacyIn[] =  $privacy . "P" . $partnerId;
+				
+			$filter->set('_in_privacy', implode(",", $newPrivacyIn));
+		}
+		
 		return parent::applyFilterFields($filter);
 	}
 
@@ -409,6 +428,11 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	public function getSphinxOrderFields()
 	{			
 		return self::$sphinxOrderFields;
+	}
+	
+	public function getSphinxOptimizationMap()
+	{
+		return self::$sphinxOptimizationMap;
 	}
 	
 	public function getSphinxFieldName($fieldName)

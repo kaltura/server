@@ -962,60 +962,79 @@ class kContentDistributionManager
 	public static function getSearchStringDistributionProfile($distributionProfileId = null)
 	{
 		if($distributionProfileId)
-			return "contentDistProfile $distributionProfileId";
+			return "contentDistProfile{$distributionProfileId}";
 			
-		return "contentDistProfile $distributionProfileId";
+		return "contentDistProfile{$distributionProfileId}";
 	}
 	
-	public static function getSearchStringDistributionSunStatus($distributionSunStatus, $distributionProfileId = null)
+	public static function getSearchStringDistributionSunStatus($distributionSunStatus, $distributionProfileId = null, $isIndex = true)
 	{
 		if($distributionProfileId)
-			return "entryDistSun $distributionSunStatus $distributionProfileId";
+			if($isIndex)
+				return "entryDistSun{$distributionSunStatus}P{$distributionProfileId} entryDistSun{$distributionSunStatus}";
+			else
+				return "entryDistSun{$distributionSunStatus}P{$distributionProfileId}";
 			
-		return "entryDistSun $distributionSunStatus";
+		
+		return "entryDistSun{$distributionSunStatus}";
 	}
 	
-	public static function getSearchStringDistributionFlag($entryDistributionFlag, $distributionProfileId = null)
+	public static function getSearchStringDistributionFlag($entryDistributionFlag, $distributionProfileId = null, $isIndex = true)
 	{
 		if(is_null($entryDistributionFlag))
 			$entryDistributionFlag = EntryDistributionDirtyStatus::NONE;
 			
 		if($distributionProfileId)
-			return "entryDistFlag $entryDistributionFlag $distributionProfileId";
+			if($isIndex)
+				return "entryDistFlag{$entryDistributionFlag}P{$distributionProfileId} entryDistFlag{$entryDistributionFlag}";
+			else
+				return "entryDistFlag{$entryDistributionFlag}P{$distributionProfileId}";
 			
-		return "entryDistFlag $entryDistributionFlag";
+		return "entryDistFlag{$entryDistributionFlag}";
 	}
 	
-	public static function getSearchStringDistributionStatus($entryDistributionStatus, $distributionProfileId = null)
+	public static function getSearchStringDistributionStatus($entryDistributionStatus, $distributionProfileId = null, $isIndex = true)
 	{
 		if($distributionProfileId)
-			return "entryDistStatus $entryDistributionStatus $distributionProfileId";
+			if($isIndex)
+				return "entryDistStatus{$entryDistributionStatus}P{$distributionProfileId} entryDistStatus{$entryDistributionStatus}";
+			else
+				return "entryDistStatus{$entryDistributionStatus}P{$distributionProfileId}";
 			
-		return "entryDistStatus $entryDistributionStatus";
+		return "entryDistStatus{$entryDistributionStatus}";
 	}
 	
-	public static function getSearchStringDistributionValidationError($validationErrorType = null, $distributionProfileId = null)
+	public static function getSearchStringDistributionValidationError($validationErrorType = null, $distributionProfileId = null, $isIndex = true)
 	{
 		if($distributionProfileId)
-			return "entryDistErr $validationErrorType $distributionProfileId";
+			if($isIndex)
+				return "entryDistErr{$validationErrorType}P{$distributionProfileId} entryDistErr{$validationErrorType}";
+			else
+				return "entryDistErr{$validationErrorType}P{$distributionProfileId}";
 			
-		return "entryDistErr $validationErrorType";
+		return "entryDistErr{$validationErrorType}";
 	}
 	
-	public static function getSearchStringDistributionHasValidationError($distributionProfileId = null)
+	public static function getSearchStringDistributionHasValidationError($distributionProfileId = null, $isIndex = true)
 	{
 		if($distributionProfileId)
-			return "entryDistHasErr $distributionProfileId";
+			if($isIndex)
+				return "entryDistHasErr{$distributionProfileId} entryDistHasErr";
+			else
+				return "entryDistHasErr{$distributionProfileId}";
 			
 		return "entryDistHasErr";
 	}
 	
-	public static function getSearchStringDistributionHasNoValidationError($distributionProfileId = null)
+	public static function getSearchStringDistributionHasNoValidationError($distributionProfileId = null, $isIndex = true)
 	{
 		if($distributionProfileId)
-			return "contentDistProfile -\"entryDistHasErr $distributionProfileId\"";
+			if($isIndex)
+				return "contentDistProfile-\"entryDistHasErr{$distributionProfileId}\" contentDistProfile-entryDistHasErr";
+			else
+				return "contentDistProfile-\"entryDistHasErr{$distributionProfileId}\"";
 			
-		return "contentDistProfile -entryDistHasErr";
+		return "contentDistProfile-entryDistHasErr";
 	}
 	
 	public static function getEntrySearchValues(entry $entry)
@@ -1032,16 +1051,16 @@ class kContentDistributionManager
 		{
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
 			$searchValues[] = self::getSearchStringDistributionProfile($distributionProfileId);
-			$searchValues[] = self::getSearchStringDistributionStatus($entryDistribution->getStatus(), $distributionProfileId);
-			$searchValues[] = self::getSearchStringDistributionFlag($entryDistribution->getDirtyStatus(), $distributionProfileId);
-			$searchValues[] = self::getSearchStringDistributionSunStatus($entryDistribution->getSunStatus(), $distributionProfileId);
+			$searchValues[] = self::getSearchStringDistributionStatus($entryDistribution->getStatus(), $distributionProfileId, true);
+			$searchValues[] = self::getSearchStringDistributionFlag($entryDistribution->getDirtyStatus(), $distributionProfileId, true);
+			$searchValues[] = self::getSearchStringDistributionSunStatus($entryDistribution->getSunStatus(), $distributionProfileId, true);
 			
 			$validationErrors = $entryDistribution->getValidationErrors();
 			if(count($validationErrors))
-				$searchValues[] = self::getSearchStringDistributionHasValidationError($distributionProfileId);
+				$searchValues[] = self::getSearchStringDistributionHasValidationError($distributionProfileId, true);
 				
 			foreach($validationErrors as $validationError)
-				$searchValues[] = self::getSearchStringDistributionValidationError($validationError->getErrorType(), $distributionProfileId);
+				$searchValues[] = self::getSearchStringDistributionValidationError($validationError->getErrorType(), $distributionProfileId, true);
 		}
 		return implode(' ', $searchValues);
 	}

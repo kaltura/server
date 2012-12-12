@@ -126,6 +126,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const CATEGORY_PARENT_SEARCH_PERFIX = 'p';
 	const CATEGORY_OR_PARENT_SEARCH_PERFIX = 'pc';
 	const CATEGORY_SEARCH_STATUS = 's'; 
+	const PARTNER_STATUS_FORMAT = 'P%sST%s';
+	
 	
 	private $appears_in = null;
 
@@ -1656,6 +1658,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setRootEntryId($v)	{	$this->putInCustomData("rootEntryId", $v); }
 	
+	public function getSphinxMatchOptimizations() {
+		// Please add all you sphinx specific optimizations here. 
+		// Should be equivalant to $sphinxOptimizationMap
+		$matches = array();
+		$matches[] = sprintf(self::PARTNER_STATUS_FORMAT, $this->getPartnerId(), $this->getStatus());
+		$matches[] = $this->getId();
+		
+		return implode(" ", $matches);
+	}
+	
 	public function setCreatorPuserId( $v )		{	$this->putInCustomData ( "creatorPuserId" , $v );	}
 	
 	public function getCreatorPuserId ( )  	
@@ -2722,6 +2734,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				'plays' => 'plays',
 				'partner_sort_value' => 'partnerSortValue',
 				'replacement_status' => 'replacementStatus',
+				'sphinx_match_optimizations' => 'sphinxMatchOptimizations',
 			
 				'created_at' => 'createdAt',
 				'updated_at' => 'updatedAt',
@@ -2769,6 +2782,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			'replacing_entry_id' => IIndexable::FIELD_TYPE_STRING,
 			'replaced_entry_id' => IIndexable::FIELD_TYPE_STRING,
 			'roots' => IIndexable::FIELD_TYPE_STRING,
+			'sphinx_match_optimizations' => IIndexable::FIELD_TYPE_STRING,
 			
 			'sort_name' => IIndexable::FIELD_TYPE_INTEGER,
 			'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,

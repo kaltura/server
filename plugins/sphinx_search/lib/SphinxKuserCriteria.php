@@ -273,7 +273,7 @@ class SphinxKuserCriteria extends SphinxCriteria
 			$advancedSearch = $filter->getAdvancedSearch();
 			if($advancedSearch)
 			{
-				$additionalConditions = $advancedSearch->getFreeTextConditions($freeTexts);
+				$additionalConditions = $advancedSearch->getFreeTextConditions($filter->getPartnerSearchScope(), $freeTexts);
 			}
 			
 			if(preg_match('/^"[^"]+"$/', $freeTexts))

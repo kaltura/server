@@ -110,7 +110,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 			$query->addMatch($this->condition);
 	}
 	
-	public function getFreeTextConditions($freeTexts)
+	public function getFreeTextConditions($partnerScope, $freeTexts)
 	{
 		$additionalConditions = array();
 		if(count($this->items))
@@ -119,7 +119,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 			{
 				if($item instanceof AdvancedSearchFilterItem)
 				{
-					$itemAdditionalConditions = $item->getFreeTextConditions($freeTexts);
+					$itemAdditionalConditions = $item->getFreeTextConditions($partnerScope, $freeTexts);
 					foreach($itemAdditionalConditions as $itemAdditionalCondition)
 					{
 						KalturaLog::debug("Append free text item [" . get_class($item) . "] condition [$itemAdditionalCondition]");

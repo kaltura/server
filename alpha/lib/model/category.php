@@ -954,7 +954,7 @@ class category extends Basecategory implements IIndexable
 			'entries_count' => 'entriesCount',
 			'direct_entries_count' => 'directEntriesCount',
 			'direct_sub_categories_count' => 'directSubCategoriesCount',
-			'privacy' => 'privacy',
+			'privacy' => 'privacyPartnerIdx',
 			'inheritance_type' => 'inheritanceType',
 			'user_join_policy' => 'userJoinPolicy',
 			'default_permission_level' => 'defaultPermissionLevel',
@@ -964,6 +964,8 @@ class category extends Basecategory implements IIndexable
 			'updated_at' => 'updatedAt',
 			'deleted_at' => 'deletedAt',
 			'partner_sort_value' => 'partnerSortValue',
+			'sphinx_match_optimizations' => 'sphinxMatchOptimizations',
+			
 			);		
 		}
 		
@@ -1011,6 +1013,7 @@ class category extends Basecategory implements IIndexable
 				'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'deleted_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
+				'sphinx_match_optimizations' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		
@@ -1153,6 +1156,19 @@ class category extends Basecategory implements IIndexable
 		return parent::getUserJoinPolicy();
 	}
 	
+	public function getPrivacyPartnerIdx() {
+		return $this->getPrivacy() . "P" . $this->getParentId(); 
+	}
+	
+	public function getSphinxMatchOptimizations() {
+		// Please add all you sphinx specific optimizations here.
+		// Should be equivalant to $sphinxOptimizationMap
+		$matches = array();
+		$matches[] = $this->getId();
+	
+		return implode(" ", $matches);
+	}
+	
 	/**
 	 * inherited values are not synced in the DB to child category that inherit from them - but should be returned on the object.
 	 * (values are copied upon update inhertance from inherited to manual)
@@ -1290,7 +1306,6 @@ class category extends Basecategory implements IIndexable
 		$this->setPrivacyContexts(trim(implode(',', $privacyContextsTrimed)));
 		parent::setPrivacyContext($v);
 	}
-
 	
 	/**
 	 * @param int $v
