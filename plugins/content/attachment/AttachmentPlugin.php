@@ -47,7 +47,7 @@ class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			return array('AttachmentAssetType');
 			
 		if ($baseEnumName == 'ObjectFeatureType')
-			return array ('AttachmentAssetType');
+			return array ('AttachmentObjectFeatureType');
 			
 		return array();
 	}
