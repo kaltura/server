@@ -253,7 +253,7 @@ class LiveStreamService extends KalturaEntryService
 					break;
 				case KalturaPlaybackProtocol::AKAMAI_HDS:
 					$protocolMap = $liveStreamEntry->getLiveStreamConfigurations();
-					$config = self::returnSingleItemByPropertyValue($protocolMap, "protocol", KalturaPlaybackProtocol::HDS);
+					$config = self::returnSingleItemByPropertyValue($protocolMap, "protocol", $protocol);
 					if ($config)
 					{
 						KalturaLog::info('Determining status of live stream URL [' .$config->getUrl() . ']');
