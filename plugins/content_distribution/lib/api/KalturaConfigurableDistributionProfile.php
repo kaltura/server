@@ -23,50 +23,12 @@ abstract class KalturaConfigurableDistributionProfile extends KalturaDistributio
 	 */
 	private static $map_between_objects = array 
 	 (
-		//'fieldConfigArray',
+		'fieldConfigArray',
+	 	'itemXpathsToExtend',
 	 );
 	 
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
-	}
-	
-	
-    public function toObject($dbObject = null, $skip = array())
-	{
-		if (is_null($dbObject))
-			return null;
-			
-		parent::toObject($dbObject, $skip);
-		
-		if (!is_null($this->fieldConfigArray))
-		{
-			$dbFieldConfigArray = array();
-		    foreach ($this->fieldConfigArray as $fieldConfig)
-		        $dbFieldConfigArray[] = $fieldConfig->toObject();
-		        
-			$dbObject->setFieldConfigArray($dbFieldConfigArray);
-		}
-		
-		if (!is_null($this->itemXpathsToExtend))
-		{
-			$itemXpathsToExtendArray = $this->itemXpathsToExtend->toObjectsArray();
-				
-			$dbObject->setItemXpathsToExtend($itemXpathsToExtendArray);
-		}
-					
-		return $dbObject;
-	}
-	
-	public function fromObject ($source_object)
-	{
-		parent::fromObject($source_object);
-		
-		$this->fieldConfigArray = KalturaDistributionFieldConfigArray::fromDbArray($source_object->getFieldConfigArray());
-		$this->itemXpathsToExtend = KalturaExtendingItemMrssParameterArray::fromExtendingItemMrssParameterArray($source_object->getItemXpathsToExtend());
-	}
-	
-	
-	
-		 
+	}	
 }
