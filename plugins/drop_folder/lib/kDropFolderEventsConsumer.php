@@ -191,22 +191,25 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 			else
 			{
 				$assetParamsList = flavorParamsConversionProfilePeer::retrieveByConversionProfile($folder->getConversionProfileId());
-				$this->validateFlavorName($file, $assetParamsList);
+				$flavorNameValid = $this->validateFlavorName($file, $assetParamsList);
 				
-				KalturaLog::debug('Parsed flavor is set, verifying if all files ready');
-				$statuses = array(DropFolderFileStatus::PENDING, DropFolderFileStatus::WAITING, DropFolderFileStatus::NO_MATCH);					
-				$relatedFiles = DropFolderFilePeer::retrieveByDropFolderIdStatusesAndSlug($folder->getId(), $statuses, $file->getParsedSlug());				
-				$isReady = $this->isAllContentDropFolderIngestedFilesReady($folder, $relatedFiles, $assetParamsList);
-				if ($isReady) 
-				{				
-					$this->triggerContentDropFolderFileProcessing($folder, $file, $relatedFiles);
-				}
-				else
+				if($flavorNameValid)
 				{
-					KalturaLog::debug('Some required flavors do not exist in the drop folder - changing status to WAITING');
-					$file->setStatus(DropFolderFileStatus::WAITING);
-					$file->save();						
-				}				
+					KalturaLog::debug('Parsed flavor is set, verifying if all files ready');
+					$statuses = array(DropFolderFileStatus::PENDING, DropFolderFileStatus::WAITING, DropFolderFileStatus::NO_MATCH);					
+					$relatedFiles = DropFolderFilePeer::retrieveByDropFolderIdStatusesAndSlug($folder->getId(), $statuses, $file->getParsedSlug());				
+					$isReady = $this->isAllContentDropFolderIngestedFilesReady($folder, $relatedFiles, $assetParamsList);
+					if ($isReady) 
+					{				
+						$this->triggerContentDropFolderFileProcessing($folder, $file, $relatedFiles);
+					}
+					else
+					{
+						KalturaLog::debug('Some required flavors do not exist in the drop folder - changing status to WAITING');
+						$file->setStatus(DropFolderFileStatus::WAITING);
+						$file->save();
+					}	
+				}			
 			}			
 		}
 		else 
@@ -225,6 +228,8 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		}
 		KalturaLog::debug('Flavor name not found ['.$file->getParsedFlavor().']');
 		$this->setFileError($file, DropFolderFileStatus::ERROR_HANDLING, DropFolderFileErrorCode::FLAVOR_NOT_FOUND, DropFolderPlugin::FLAVOR_NOT_FOUND_MESSAGE);
+		
+		return false;
 	}
 	
 	/**
