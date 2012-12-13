@@ -1247,7 +1247,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
                 }
                 else
                 {
-                    return $e->getMessage();
+                    throw $e;
                 }
             }
             
