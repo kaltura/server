@@ -44,14 +44,6 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
 
 		$mrssParams = $source_object->getMrssParameters();
-		if ($mrssParams)
-		{
-			$this->itemXpathsToExtend = KalturaExtendingItemMrssParameterArray::fromExtendingItemMrssParameterArray($mrssParams);
-		}
-		else
-		{
-			$this->itemXpathsToExtend = new KalturaExtendingItemMrssParameterArray();
-		}
 	}
 	
 	public function toObject($dbObject = null, $skip = array())
@@ -62,13 +54,6 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		if (!$mrssParams)
 		{
 			$mrssParams = new kMrssParameters;
-		}
-		
-		if ($this->itemXpathsToExtend)
-		{
-			$itemXpathsToExtend = $this->itemXpathsToExtend->toObjectsArray();
-
-			$mrssParams->setItemXpathsToExtend($itemXpathsToExtend);
 		}
 		
 		$dbObject->setMrssParameters($mrssParams);
