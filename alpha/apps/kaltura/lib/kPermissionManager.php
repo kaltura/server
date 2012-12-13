@@ -264,7 +264,6 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		if (kConf::hasParam('internal_ip_range'))
 		{
 			$range = kConf::get('internal_ip_range');
-			KalturaLog::debug('internal IP range in kConf ['.$range.'] user IP ['.kCurrentContext::$user_ip.']');
 			if(kIpAddressUtils::isIpInRange(kCurrentContext::$user_ip, $range))
 			{	
 				KalturaLog::debug('IP in range, adding ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS permission');		
