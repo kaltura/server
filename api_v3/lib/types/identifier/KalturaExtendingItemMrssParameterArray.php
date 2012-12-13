@@ -6,7 +6,7 @@
 class KalturaExtendingItemMrssParameterArray extends KalturaTypedArray
 {
 	
-	public static function fromExtendingItemMrssParameterArray($arr)
+	public static function fromDbArray($arr)
 	{
 		$newArr = new KalturaExtendingItemMrssParameterArray();
 		foreach($arr as $obj)
