@@ -1161,20 +1161,22 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				}
 				
 				$categoryNamesArr = explode(',', $categories);
-				$this->kClient->startMultiRequest();
+				
 				foreach($categoryNamesArr as $categoryName)
 				{
-					if(in_array($categoryName, $existingCategoryNames)) //Category does not exis 
+					if(!in_array($categoryName, $existingCategoryNames)) //Category does not exis 
 					{
 						KalturaLog::debug("Creating a new category by the name [$categoryName]");
-						$this->createCategoryByPath($categoryName);
+						$createdCategories[] = $this->createCategoryByPath($categoryName);
 					}
 				}
-				$createdCategories = $this->kClient->doMultiRequest();
-				foreach($createdCategories as $createdCategory)
-				{
-					/* @var $createdCategory KalturaCategory */
-					$requiredCategoryIds[] = $createdCategory->id; //Adding the newly created category IDs to the ToWork list
+				
+				if ($createdCategories) {
+					foreach($createdCategories as $createdCategory)
+					{
+						/* @var $createdCategory KalturaCategory */
+						$requiredCategoryIds[] = $createdCategory->id; //Adding the newly created category IDs to the ToWork list
+					}
 				}
 			}
 			
@@ -1237,6 +1239,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
             {
                 if ($e->getCode() == DUPLICATE_CATEGORY)
                 {
+                	KalturaLog::debug("Categroy [$fullNameEq] already exist");
                     $catFilter = new KalturaCategoryFilter();
                     $catFilter->fullNameEqual = $fullNameEq;
                     $res = $this->kClient->category->listAction($catFilter);
