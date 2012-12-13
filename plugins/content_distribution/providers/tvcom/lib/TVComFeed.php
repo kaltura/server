@@ -97,14 +97,35 @@ class TVComFeed
 		$this->setNodeValue('/rss/channel/image/height', $profile->getFeedImageHeight());
 	}
 	
+	public function addItemXml($xml)
+	{
+		$tempDoc = new DOMDocument('1.0', 'UTF-8');
+		$tempDoc->loadXML($xml);
+
+		$importedItem = $this->doc->importNode($tempDoc->firstChild, true);
+		$channelNode = $this->xpath->query('/rss/channel')->item(0);
+		$channelNode->appendChild($importedItem);
+	}
+
+	public function getItemXml(array $values, flavorAsset $flavorAsset = null, thumbAsset $thumbAsset = null , array $additionalAssets = null)
+	{
+		$item = $this->getItem($values, $flavorAsset,$thumbAsset, $additionalAssets);
+		return $this->doc->saveXML($item);
+	}
+	
+	public function addItem(array $values, flavorAsset $flavorAsset = null, thumbAsset $thumbAsset = null , array $additionalAssets = null)
+	{
+		$item = $this->getItem($values, $flavorAsset,$thumbAsset, $additionalAssets);
+		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
+		$channelNode->appendChild($item);
+	}
+	
 	/**
 	 * @param array $values
 	 */
-	public function addItem(array $values, flavorAsset $flavorAsset = null, thumbAsset $thumbAsset = null , array $additionalAssets = null)
+	public function getItem(array $values, flavorAsset $flavorAsset = null, thumbAsset $thumbAsset = null , array $additionalAssets = null)
 	{
 		$item = $this->item->cloneNode(true);
-		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
-		$channelNode->appendChild($item);
 		
 		$pubDate = date('c', $values[TVComDistributionField::ITEM_PUB_DATE]);
 		$expDate = date('c', $values[TVComDistributionField::ITEM_EXP_DATE]);
@@ -185,6 +206,7 @@ class TVComFeed
 				}			
 			}
 		}
+		return $item;
 	}
 	
 	public function getAssetUrl(asset $asset)

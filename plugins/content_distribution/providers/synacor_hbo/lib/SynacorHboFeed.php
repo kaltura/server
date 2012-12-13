@@ -94,16 +94,38 @@ class SynacorHboFeed
 		}
 	}
 	
+	public function addItemXml($xml)
+	{
+		$tempDoc = new DOMDocument('1.0', 'UTF-8');
+		$tempDoc->loadXML($xml);
+
+		$importedItem = $this->doc->importNode($tempDoc->firstChild, true);
+		$channelNode = $this->xpath->query('/rss/channel')->item(0);
+		$channelNode->appendChild($importedItem);
+	}
+
+	public function getItemXml(array $values, entry $entry, array $flavorAssets = null, array $thumbAssets = null,array $additionalAssets = null)
+	{
+		$item = $this->getItem($values, $entry, $flavorAssets, $thumbAssets, $additionalAssets);
+		return $this->doc->saveXML($item);
+	}
+	
+
+	public function addItem(array $values, entry $entry, array $flavorAssets = null, array $thumbAssets = null,array $additionalAssets = null)
+	{
+		$item = $this->getItem($values, $entry, $flavorAssets, $thumbAssets, $additionalAssets);
+		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
+		$channelNode->appendChild($item);
+	}
+	
 	/**
 	 * @param array $values
 	 * @param array $flavorAssets
 	 * @param array $thumbAssets
 	 */
-	public function addItem(array $values, entry $entry, array $flavorAssets = null, array $thumbAssets = null,array $additionalAssets = null)
+	public function getItem(array $values, entry $entry, array $flavorAssets = null, array $thumbAssets = null,array $additionalAssets = null)
 	{
 		$item = $this->item->cloneNode(true);
-		$feedNode = $this->xpath->query('/atom:feed', $item)->item(0);
-		$feedNode->appendChild($item);
 		
 		$this->setNodeValue('atom:title', $values[SynacorHboDistributionField::ENTRY_TITLE], $item);
 		$this->setNodeValue('atom:summary', $values[SynacorHboDistributionField::ENTRY_SUMMARY], $item);
@@ -220,6 +242,7 @@ class SynacorHboFeed
 				}			
 			}
 		}
+		return $item;
 	}
 	
 	public function getAssetUrl(asset $asset)

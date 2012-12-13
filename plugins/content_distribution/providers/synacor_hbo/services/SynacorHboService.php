@@ -54,27 +54,42 @@ class SynacorHboService extends KalturaBaseService
 		$feed->setDistributionProfile($profile);
 
 		$counter = 0;
+		$profileUpdatedAt = $profile->getUpdatedAt(null);
+		$cacheDir = kConf::get("global_cache_dir")."feeds/dist_$distributionProfileId/";	
 		foreach($entries as $entry)
 		{
-			/* @var $entry entry */
-			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $profile->getId());
-			if (!$entryDistribution)
+			// check cache
+			$cacheFileName = $cacheDir.myContentStorage::dirForId($entry->getIntId(), $entry->getId().".xml");
+			$updatedAt = max($profileUpdatedAt,  $entry->getUpdatedAt(null));
+			if (file_exists($cacheFileName) && $updatedAt < filemtime($cacheFileName))
 			{
-				KalturaLog::err('Entry distribution was not found for entry ['.$entry->getId().'] and profile [' . $profile->getId() . ']');
-				continue;
+				$xml = file_get_contents($cacheFileName);
 			}
-			$fields = $profile->getAllFieldValues($entryDistribution);
-			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
-			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
-			$additionalAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getAssetIds()));
-			$feed->addItem($fields, $entry, $flavorAssets, $thumbAssets,$additionalAssets);
-			
+			else
+			{
+				/* @var $entry entry */
+				$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $profile->getId());
+				if (!$entryDistribution)
+				{
+					KalturaLog::err('Entry distribution was not found for entry ['.$entry->getId().'] and profile [' . $profile->getId() . ']');
+					continue;
+				}
+				$fields = $profile->getAllFieldValues($entryDistribution);
+				$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
+				$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
+				$additionalAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getAssetIds()));
+				$xml = $feed->getItemXml($fields, $entry, $flavorAssets, $thumbAssets,$additionalAssets);
+				mkdir(dirname($cacheFileName), 0777, true);
+				file_put_contents($cacheFileName, $xml);
+			}
+			$feed->addItemXml($xml);
 			$counter++;
 			//to avoid the cache exceeding the memory size 
 			if ($counter >= 100){
 				kMemoryManager::clearMemory();
 				$counter = 0;
 			}
+			
 		}
 		
 		header('Content-Type: text/xml');

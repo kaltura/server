@@ -52,19 +52,34 @@ class ComcastMrssService extends KalturaBaseService
 		
 		$feed = new ComcastMrssFeed('comcast_mrss_template.xml');
 		$feed->setDistributionProfile($profile);
+		$profileUpdatedAt = $profile->getUpdatedAt(null);
+		$cacheDir = kConf::get("global_cache_dir")."feeds/dist_$distributionProfileId/";
 		foreach($entries as $entry)
 		{
-			/* @var $entry entry */
-			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $profile->getId());
-			if (!$entryDistribution)
+			// check cache
+			$cacheFileName = $cacheDir.myContentStorage::dirForId($entry->getIntId(), $entry->getId().".xml");
+			$updatedAt = max($profileUpdatedAt,  $entry->getUpdatedAt(null));
+			if (file_exists($cacheFileName) && $updatedAt < filemtime($cacheFileName))
 			{
-				KalturaLog::err('Entry distribution was not found for entry ['.$entry->getId().'] and profile [' . $profile->getId() . ']');
-				continue;
+				$xml = file_get_contents($cacheFileName);
 			}
-			$fields = $profile->getAllFieldValues($entryDistribution);
-			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
-			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
-			$feed->addItem($fields, $flavorAssets, $thumbAssets);
+			else
+			{
+				/* @var $entry entry */
+				$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $profile->getId());
+				if (!$entryDistribution)
+				{
+					KalturaLog::err('Entry distribution was not found for entry ['.$entry->getId().'] and profile [' . $profile->getId() . ']');
+					continue;
+				}
+				$fields = $profile->getAllFieldValues($entryDistribution);
+				$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
+				$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
+				$xml = $feed->getItemXml($fields, $flavorAssets, $thumbAssets);
+				mkdir(dirname($cacheFileName), 0777, true);
+				file_put_contents($cacheFileName, $xml);
+			}
+			$feed->addItemXml($xml);
 		}
 		
 		header('Content-Type: text/xml');

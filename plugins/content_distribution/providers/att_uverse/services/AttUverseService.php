@@ -53,30 +53,44 @@ class AttUverseService extends KalturaBaseService
 		$feed = new AttUverseDistributionFeedHelper('feed_template.xml',$profile );
 		$channelTitle = $profile->getChannelTitle();	
 		$counter = 0;
+		$profileUpdatedAt = $profile->getUpdatedAt(null);
+		$cacheDir = kConf::get("global_cache_dir")."feeds/dist_$distributionProfileId/";	
 		foreach($entries as $entry)
 		{
-			/* @var $entry entry */
-			/* @var $entryDistribution Entrydistribution */
-			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $profile->getId());
-			if (!$entryDistribution)
+			// check cache
+			$cacheFileName = $cacheDir.myContentStorage::dirForId($entry->getIntId(), $entry->getId().".xml");
+			$updatedAt = max($profileUpdatedAt,  $entry->getUpdatedAt(null));
+			if (file_exists($cacheFileName) && $updatedAt < filemtime($cacheFileName))
 			{
-				KalturaLog::err('Entry distribution was not found for entry ['.$entry->getId().'] and profile [' . $profile->getId() . ']');
-				continue;
+				$xml = file_get_contents($cacheFileName);
 			}
-			$fields = $profile->getAllFieldValues($entryDistribution);
-			
-			//flavors assets and remote flavor asset file urls			
-			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFromCustomData(AttUverseEntryDistributionCustomDataField::DISTRIBUTED_FLAVOR_IDS)));
-			$remoteAssetFileUrls = unserialize($entryDistribution->getFromCustomData(AttUverseEntryDistributionCustomDataField::REMOTE_ASSET_FILE_URLS));
-			
-			//thumb assets and remote thumb asset file urls			
-			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFromCustomData(AttUverseEntryDistributionCustomDataField::DISTRIBUTED_THUMBNAIL_IDS)));
-			$remoteThumbailFileUrls = unserialize($entryDistribution->getFromCustomData(AttUverseEntryDistributionCustomDataField::REMOTE_THUMBNAIL_FILE_URLS));
-			
-			//thumb assets and remote thumb asset file urls			
-			$captionAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFromCustomData(AttUverseEntryDistributionCustomDataField::DISTRIBUTED_CAPTION_IDS)));
-			
-			$feed->addItem($fields, $flavorAssets, $remoteAssetFileUrls, $thumbAssets, $remoteThumbailFileUrls, $captionAssets);
+			else
+			{
+				/* @var $entry entry */
+				/* @var $entryDistribution Entrydistribution */
+				$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $profile->getId());
+				if (!$entryDistribution)
+				{
+					KalturaLog::err('Entry distribution was not found for entry ['.$entry->getId().'] and profile [' . $profile->getId() . ']');
+					continue;
+				}
+				$fields = $profile->getAllFieldValues($entryDistribution);
+				
+				//flavors assets and remote flavor asset file urls			
+				$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFromCustomData(AttUverseEntryDistributionCustomDataField::DISTRIBUTED_FLAVOR_IDS)));
+				$remoteAssetFileUrls = unserialize($entryDistribution->getFromCustomData(AttUverseEntryDistributionCustomDataField::REMOTE_ASSET_FILE_URLS));
+				
+				//thumb assets and remote thumb asset file urls			
+				$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFromCustomData(AttUverseEntryDistributionCustomDataField::DISTRIBUTED_THUMBNAIL_IDS)));
+				$remoteThumbailFileUrls = unserialize($entryDistribution->getFromCustomData(AttUverseEntryDistributionCustomDataField::REMOTE_THUMBNAIL_FILE_URLS));
+				
+				//thumb assets and remote thumb asset file urls			
+				$captionAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFromCustomData(AttUverseEntryDistributionCustomDataField::DISTRIBUTED_CAPTION_IDS)));
+				$xml = $feed->getItemXml($fields, $flavorAssets, $remoteAssetFileUrls, $thumbAssets, $remoteThumbailFileUrls, $captionAssets);
+				mkdir(dirname($cacheFileName), 0777, true);
+				file_put_contents($cacheFileName, $xml);
+			}
+			$feed->addItemXml($xml);
 			$counter++;
 			//to avoid the cache exceeding the memory size 
 			if ($counter >= 100){

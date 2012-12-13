@@ -51,21 +51,36 @@ class TVComService extends KalturaBaseService
 		
 		$feed = new TVComFeed('tvcom_template.xml');
 		$feed->setDistributionProfile($profile);
+		$profileUpdatedAt = $profile->getUpdatedAt(null);
+		$cacheDir = kConf::get("global_cache_dir")."feeds/dist_$distributionProfileId/";
 		foreach($entries as $entry)
 		{
-			/* @var $entry entry */
-			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $profile->getId());
-			if (!$entryDistribution)
+			// check cache
+			$cacheFileName = $cacheDir.myContentStorage::dirForId($entry->getIntId(), $entry->getId().".xml");
+			$updatedAt = max($profileUpdatedAt,  $entry->getUpdatedAt(null));
+			if (file_exists($cacheFileName) && $updatedAt < filemtime($cacheFileName))
 			{
-				KalturaLog::err('Entry distribution was not found for entry ['.$entry->getId().'] and profile [' . $profile->getId() . ']');
-				continue;
+				$xml = file_get_contents($cacheFileName);
 			}
-			
-			$fields = $profile->getAllFieldValues($entryDistribution);
-			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
-			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
-			$additionalAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getAssetIds()));
-			$feed->addItem($fields, count($flavorAssets) ? $flavorAssets[0] : null, count($thumbAssets) ? $thumbAssets[0] : null,$additionalAssets);
+			else
+			{
+				/* @var $entry entry */
+				$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $profile->getId());
+				if (!$entryDistribution)
+				{
+					KalturaLog::err('Entry distribution was not found for entry ['.$entry->getId().'] and profile [' . $profile->getId() . ']');
+					continue;
+				}
+				
+				$fields = $profile->getAllFieldValues($entryDistribution);
+				$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
+				$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
+				$additionalAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getAssetIds()));
+				$xml = $feed->getItemXml($fields, count($flavorAssets) ? $flavorAssets[0] : null, count($thumbAssets) ? $thumbAssets[0] : null,$additionalAssets);
+				mkdir(dirname($cacheFileName), 0777, true);
+				file_put_contents($cacheFileName, $xml);
+			}
+			$feed->addItemXml($xml);
 		}
 		
 		echo $feed->getXml();

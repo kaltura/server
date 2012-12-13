@@ -124,18 +124,48 @@ class AttUverseDistributionFeedHelper
 			return null;
 	}
 	
+	public function addItemXml($xml)
+	{
+		$tempDoc = new DOMDocument('1.0', 'UTF-8');
+		$tempDoc->loadXML($xml);
+
+		$importedItem = $this->doc->importNode($tempDoc->firstChild, true);
+		$channelNode = $this->xpath->query('/rss/channel')->item(0);
+		$channelNode->appendChild($importedItem);
+	}
+
+	public function getItemXml(array $values, array $flavorAssets = null, $remoteAssetFileUrls = null, array $thumbAssets = null, $remoteThumbailFileUrls = null, $captionAssets = null)
+	{
+		$item = $this->getItem($values, $flavorAssets, $remoteAssetFileUrls, $thumbAssets, $remoteThumbailFileUrls, $captionAssets);
+		return $this->doc->saveXML($item);
+	}
+	
+	/**
+	 * @param array $values
+	 * @param array $flavorAssets
+	 * @param array $remoteAssetFileUrls
+	 * @param array $thumbAssets
+	 * @param array $remoteThumbailFileUrls
+	 * @param array $captionAssets
+	 */
+	public function addItem(array $values, array $flavorAssets = null, $remoteAssetFileUrls = null, array $thumbAssets = null, $remoteThumbailFileUrls = null, $captionAssets = null)
+	{
+		$item = $this->getItem($values, $flavorAssets, $remoteAssetFileUrls, $thumbAssets, $remoteThumbailFileUrls, $captionAssets);
+		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
+		$channelNode->appendChild($item);
+	}
+	
 	/**	 
 	 * @param array $values
 	 * @param array $flavorAssets
 	 * @param array $remoteAssetFileUrls
 	 * @param array $thumbAssets
 	 * @param array $remoteThumbailFileUrls
+	 * @param array $captionAssets
 	 */
-	public function addItem(array $values, array $flavorAssets = null, $remoteAssetFileUrls = null, array $thumbAssets = null, $remoteThumbailFileUrls = null, $captionAssets = null)
+	public function getItem(array $values, array $flavorAssets = null, $remoteAssetFileUrls = null, array $thumbAssets = null, $remoteThumbailFileUrls = null, $captionAssets = null)
 	{		
 		$item = $this->item->cloneNode(true);
-		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
-		$channelNode->appendChild($item);
 		
 		$this->setNodeValue('entryId', $values[AttUverseDistributionField::ITEM_ENTRY_ID], $item);
 		
@@ -185,6 +215,7 @@ class AttUverseDistributionFeedHelper
 		$this->setNodeValue('customData/metadata/ContentRating', $values[AttUverseDistributionField::ITEM_METADATA_CONTENT_RATING], $item);
 		$this->setNodeValue('customData/metadata/LegalDisclaimer', $values[AttUverseDistributionField::ITEM_METADATA_LEGAL_DISCLAIMER], $item);
 		$this->setNodeValue('customData/metadata/Genre', $values[AttUverseDistributionField::ITEM_METADATA_GENRE], $item);				
+		return $item;
 	}
 	
 	public function setChannelTitle($value)

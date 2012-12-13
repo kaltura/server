@@ -109,16 +109,38 @@ class TimeWarnerFeed
 		$this->distributionProfile = $profile;
 	}
 	
+	public function addItemXml($xml)
+	{
+		$tempDoc = new DOMDocument('1.0', 'UTF-8');
+		$tempDoc->loadXML($xml);
+
+		$importedItem = $this->doc->importNode($tempDoc->firstChild, true);
+		$channelNode = $this->xpath->query('/rss/channel')->item(0);
+		$channelNode->appendChild($importedItem);
+	}
+
+	public function getItemXml(array $values, array $flavorAssets = null, array $thumbAssets = null , array $additionalAssets = null)
+	{
+		$item = $this->getItem($values, $flavorAssets, $thumbAssets, $additionalAssets);
+		return $this->doc->saveXML($item);
+	}
+	
+
+	public function addItem(array $values, array $flavorAssets = null, array $thumbAssets = null , array $additionalAssets = null)
+	{
+		$item = $this->getItem($values, $flavorAssets, $thumbAssets, $additionalAssets);
+		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
+		$channelNode->appendChild($item);
+	}
+	
 	/**
 	 * @param array $values
 	 * @param array $flavorAssets
 	 * @param array $thumbAssets
 	 */
-	public function addItem(array $values, array $flavorAssets = null, array $thumbAssets = null , array $additionalAssets = null)
+	public function getItem(array $values, array $flavorAssets = null, array $thumbAssets = null , array $additionalAssets = null)
 	{
 		$item = $this->item->cloneNode(true);
-		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
-		$channelNode->appendChild($item);
 		
 		$this->setNodeValue('guid', $values[TimeWarnerDistributionField::GUID], $item);
 		$this->setNodeValue('title', $values[TimeWarnerDistributionField::TITLE], $item);
@@ -199,6 +221,7 @@ class TimeWarnerFeed
 				}			
 			}
 		}
+		return $item;
 	}
 	
 	public function getAssetUrl(asset $asset)

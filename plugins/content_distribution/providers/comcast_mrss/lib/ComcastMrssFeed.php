@@ -144,16 +144,38 @@ class ComcastMrssFeed
 		$this->setNodeValue('/rss/channel/lastBuildDate', $profile->getFeedLastBuildDate());
 	}
 	
+	
+	public function addItemXml($xml)
+	{
+		$tempDoc = new DOMDocument('1.0', 'UTF-8');
+		$tempDoc->loadXML($xml);
+
+		$importedItem = $this->doc->importNode($tempDoc->firstChild, true);
+		$channelNode = $this->xpath->query('/rss/channel')->item(0);
+		$channelNode->appendChild($importedItem);
+	}
+
+	public function getItemXml(array $values, array $flavorAssets = null, array $thumbAssets = null)
+	{
+		$item = $this->getItem($values, $flavorAssets, $thumbAssets);
+		return $this->doc->saveXML($item);
+	}
+	
+	public function addItem(array $values, array $flavorAssets = null, array $thumbAssets = null)
+	{
+		$item = $this->getItem($values, $flavorAssets, $thumbAssets);
+		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
+		$channelNode->appendChild($item);
+	}
+	
 	/**
 	 * @param array $values
 	 * @param array $flavorAssets
 	 * @param array $thumbAssets
 	 */
-	public function addItem(array $values, array $flavorAssets = null, array $thumbAssets = null)
+	public function getItem(array $values, array $flavorAssets = null, array $thumbAssets = null)
 	{
 		$item = $this->item->cloneNode(true);
-		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
-		$channelNode->appendChild($item);
 		
 		$this->setNodeValue('title', $values[ComcastMrssDistributionField::TITLE], $item);
 		$this->setNodeValue('description', $values[ComcastMrssDistributionField::DESCRIPTION], $item);
@@ -196,6 +218,8 @@ class ComcastMrssFeed
 			
 		if (is_array($thumbAssets))
 			$this->setThumbAssets($item, $thumbAssets);
+			
+		return $item;
 	}
 	
 	public function getAssetUrl(asset $asset)
