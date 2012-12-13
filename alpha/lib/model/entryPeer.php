@@ -298,6 +298,18 @@ class entryPeer extends BaseentryPeer
 	}
 	
 	/**
+	 * Retrieves array of entries with referenceId $v
+	 * @param string $v
+	 * @return array
+	 */
+	public static function retrieveByReferenceId ($v)
+	{
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$c->addAnd("referenceID", $v);
+		return entryPeer::doSelect($v);
+	} 
+	
+	/**
 	 * find all the entries from a list of ids that have the proper status to be considered non-pending
 	 */
 	public static function retrievePendingEntries ($pks, $con = null)
@@ -701,6 +713,7 @@ class entryPeer extends BaseentryPeer
 		
 		return $entryIds;
 	}
+
 }
 
 class entryPool
