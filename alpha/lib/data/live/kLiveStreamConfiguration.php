@@ -45,6 +45,31 @@ class kLiveStreamConfiguration
 	public function setUrl($url) {
 		$this->url = $url;
 	}
+	
+	/**
+	 * Function extracts the first item in the array where the property $propertyName has the value $propertyValue
+	 * @param entry $liveStreamEntry
+	 * @param string $propertyName
+	 * @param string $propertyValue
+	 * @return KLiveStreamConfiguration
+	 */
+	public static function getSingleItemByPropertyValue ($liveStreamEntry, $propertyName, $propertyValue)
+	{
+		foreach ($liveStreamEntry->getLiveStreamConfigurations() as $config)
+		{
+			/* @var $config kLiveStreamConfiguration */
+			if (property_exists("kLiveStreamConfiguration", $propertyName))
+			{
+				$getter = "get{$propertyName}";
+				if ($config->$getter() == $propertyValue)
+				{
+					return $config;
+				}
+			}
+		}
+
+		return null;
+	}
 
 
 }
