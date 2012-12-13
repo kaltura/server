@@ -800,15 +800,10 @@ class BaseEntryService extends KalturaEntryService
 		{
 			if ($dbEntry->getType() == entryType::LIVE_STREAM)
 			{
-				$availableConfigurations = $dbEntry->getLiveStreamConfigurations();
-				foreach ($availableConfigurations as $config)
-				{
-					/* @var $config KLiveStreamConfiguration */
-					if ($config->getProtocol() == PlaybackProtocol::AKAMAI_HDS)
-					{
-						$result->streamerType = KalturaPlaybackProtocol::AKAMAI_HDS;
-					}
-				}
+				$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($dbEntry, 'protocol', PlaybackProtocol::AKAMAI_HDS);
+				if ($config)	
+					$result->streamerType = KalturaPlaybackProtocol::AKAMAI_HDS;
+
 				
 				if (!$result->streamerType)
 					$result->streamerType = KalturaPlaybackProtocol::RTMP;
