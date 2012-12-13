@@ -31,7 +31,7 @@ class KalturaLiveStreamConfiguration extends KalturaObject
 	{
 		if (!$dbObject)
 		{
-			$dbObject = new KLiveStreamConfiguration();
+			$dbObject = new kLiveStreamConfiguration();
 		}
 		
 		return parent::toObject($dbObject, $propsToSkip);
