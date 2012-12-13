@@ -518,7 +518,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		return array(entryPeer::ID);
 	}
 	
-	public function getShinxConditionsToKeep() {
+	public function getSphinxConditionsToKeep() {
 		return array(entryPeer::PARTNER_ID);
 	}
 		

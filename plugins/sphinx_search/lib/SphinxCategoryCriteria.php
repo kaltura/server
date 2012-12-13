@@ -159,7 +159,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{				
 		
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$partnerId = kCurrentContext::getCurrentPartnerId();
 		
 		$categories = $filter->get( "_matchor_likex_full_name");
 		if ($categories !== null)

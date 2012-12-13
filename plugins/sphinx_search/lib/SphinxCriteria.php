@@ -417,7 +417,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			return;
 		}
 		
-		$fieldsToKeep = $this->getShinxConditionsToKeep();
+		$fieldsToKeep = $this->getSphinxConditionsToKeep();
 		$criterionsMap = $this->getMap();
 		uksort($criterionsMap, array('SphinxCriteria','sortFieldsByPriority'));
 		// go over all criterions and try to move them to the sphinx
@@ -825,7 +825,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 * 
 	 * @return array
 	 */
-	public function getShinxConditionsToKeep() {
+	public function getSphinxConditionsToKeep() {
 		return array();
 	}
 		
