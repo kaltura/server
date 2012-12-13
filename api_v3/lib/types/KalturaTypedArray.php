@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator, Countable
+abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator, Countable
 {
 	private $array = array();
 	private $class = "";
