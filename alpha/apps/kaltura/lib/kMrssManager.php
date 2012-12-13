@@ -591,20 +591,21 @@ class kMrssManager
 	protected static function addExtendingItemNode (BaseObject $object, $identifierValue, SimpleXMLElement $mrss, $nodeName = null, kMrssParameters $mrssParams = null, $features = null)
 	{
 		$featuresArr = explode(",", $features);
-		switch (get_class($object))
+		if ($object instanceof category)
 		{
-			case 'category':
-				$categoryItem = $mrss->addChild("category_item");
-				$categoryItem->addAttribute('identifier', $identifierValue);
-				return self::getCategoryMrssXml($object, $categoryItem , $mrssParams, $features);
-			case 'entry':
-				if (!$nodeName)
-				{
-					$nodeName = 'entry';
-				}
-				$newNode = $mrss->addChild("{$nodeName}_item");
-				$newNode->addAttribute('identifier', $identifierValue);
-				return self::getEntryMrssXml($object, $newNode, $mrssParams, $features);
+			$categoryItem = $mrss->addChild("category_item");
+			$categoryItem->addAttribute('identifier', $identifierValue);
+			return self::getCategoryMrssXml($object, $categoryItem , $mrssParams, $features);
+		}
+		if ($object instanceof entry)
+		{
+			if (!$nodeName)
+			{
+				$nodeName = 'entry';
+			}
+			$newNode = $mrss->addChild("{$nodeName}_item");
+			$newNode->addAttribute('identifier', $identifierValue);
+			return self::getEntryMrssXml($object, $newNode, $mrssParams, $features);
 		}
 		
 	}
