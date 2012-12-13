@@ -1,7 +1,7 @@
 <?php
 /**
  * Usage:
- * php migrateAnnotationsDepthAndChildren.php [realrun/dryrun] [startUpdatedAt] [limit]
+ * php migrateAnnotationsDepthAndChildren.php [realrun/dryrun][id][limit]
  * 
  * Defaults are: dryrun, startUpdatedAt is zero, no limit
  * 
@@ -12,7 +12,7 @@
 require_once(dirname(__FILE__).'/../../bootstrap.php');
 
 $startUpdatedAt = null;
-$page = 200;
+$page = 500;
 
 $dryRun = true;
 if(isset($argv[1]) && strtolower($argv[1]) == 'realrun')
@@ -25,21 +25,30 @@ else
 }
 KalturaStatement::setDryRun($dryRun);
 
-$partnerId = null;
+$lastId = null;
 if(isset($argv[2]))
 {
-	$partnerId = $argv[2];
+	$lastId = $argv[2];
+}
+
+$partnerId = null;
+if(isset($argv[3]))
+{
+	$partnerId = $argv[3];
 }
 
 $limit = null;
-if(isset($argv[3]))
+if(isset($argv[4]))
 {
-	$limit = $argv[3];
+	$limit = $argv[4];
 }
 
 $criteria = new Criteria();
-$criteria->addAscendingOrderByColumn(DistributionProfilePeer::UPDATED_AT);
-
+$criteria->addAscendingOrderByColumn(DistributionProfilePeer::ID);
+if ($lastId)
+	$criteria->add(DistributionProfilePeer::ID, $lastId);
+if ($partnerId)
+	$criteria->add(DistributionProfilePeer::PARTNER_ID, $partnerId);
 if($limit)
 	$criteria->setLimit(min($page, $limit));
 else
@@ -52,8 +61,7 @@ while (count($results) && (!$limit || $migrated < $limit))
 	$migrated += count($results);
 	foreach ($results as $result)
 	{
-		/* @var $result ConfigurableDistributionProfile */
-		if (method_exists($result, 'getItemXpathsToExtend')&& $result->getItemXpathsToExtend() && is_array($result->getItemXpathsToExtend()))
+		if ($result instanceof ConfigurableDistributionProfile && $result->getItemXpathsToExtend() && is_array($result->getItemXpathsToExtend()))
 		{
 			$migrationArray = array();
 			foreach ($result->getItemXpathsToExtend() as $itemXPath)
@@ -73,6 +81,8 @@ while (count($results) && (!$limit || $migrated < $limit))
 			}
 			$result->setItemXpathsToExtend($migrationArray);
 			$result->save();
+			$lastId = $result->getId();
+			KalturaLog::debug("Last handled ID: $lastId");
 		}
 	}
 	

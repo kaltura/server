@@ -1,7 +1,7 @@
 <?php
 /**
  * Usage:
- * php migrateAnnotationsDepthAndChildren.php [realrun/dryrun] [startUpdatedAt] [limit]
+ * php migrateAnnotationsDepthAndChildren.php [realrun/dryrun] [feed IntId] [partnerId][limit]
  * 
  * Defaults are: dryrun, startUpdatedAt is zero, no limit
  * 
@@ -13,7 +13,7 @@ require_once(dirname(__FILE__).'/../../bootstrap.php');
 
 $startUpdatedAt = null;
 $limit = null;
-$page = 200;
+$page = 500;
 
 $dryRun = true;
 if(isset($argv[1]) && strtolower($argv[1]) == 'realrun')
@@ -26,21 +26,30 @@ else
 }
 KalturaStatement::setDryRun($dryRun);
 
-$partnerId = null;
-if(isset($argv[2]))
+$lastFeedId = null;
+if (isset($argv[2]))
 {
-	$partnerId = $argv[2];
+	$lastFeedId = $argv[2];
 }
 
+$partnerId = null;
 if(isset($argv[3]))
 {
-	$limit = $argv[3];
+	$partnerId = $argv[3];
+}
+
+if(isset($argv[4]))
+{
+	$limit = $argv[4];
 }
 
 $criteria = new Criteria();
-$criteria->addAscendingOrderByColumn(syndicationFeedPeer::UPDATED_AT);
+$criteria->add(syndicationFeedPeer::TYPE, syndicationFeedType::KALTURA_XSLT);
+$criteria->addAscendingOrderByColumn(syndicationFeedPeer::INT_ID);
 if ($partnerId)
 	$criteria->add(syndicationFeedPeer::PARTNER_ID, $partnerId);
+if ($lastFeedId)
+	$criteria->add(syndicationFeedPeer::INT_ID, $lastFeedId, Criteria::GREATER_THAN);
 
 if($limit)
 	$criteria->setLimit(min($page, $limit));
@@ -81,6 +90,8 @@ while (count($results) && (!$limit || $migrated < $limit))
 			$mrssParams->setItemXpathsToExtend($migrationArray);
 			$result->setMrssParameters($mrssParams);
 			$result->save();
+			$lastFeedId = $result->getIntId();
+			KalturaLog::debug("last int id handled: $lastFeedId");
 		}
 	}
 	
