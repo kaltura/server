@@ -40,7 +40,7 @@ if(isset($argv[3]))
 $criteria = new Criteria();
 $criteria->addAscendingOrderByColumn(syndicationFeedPeer::UPDATED_AT);
 if ($partnerId)
-	$criteria->addAscendingOrderByColumn(syndicationFeedPeer::PARTNER_ID, $partnerId);
+	$criteria->add(syndicationFeedPeer::PARTNER_ID, $partnerId);
 
 if($limit)
 	$criteria->setLimit(min($page, $limit));
