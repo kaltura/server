@@ -923,16 +923,9 @@ class playManifestAction extends kalturaAction
 	{
 		if ($this->entry->getType() == entryType::LIVE_STREAM)
 		{
-			$flavor = null;
-			foreach ($this->entry->getLiveStreamConfigurations() as $liveStreamConfig)
-			{
-				/* @var $liveStreamConfig KLiveStreamConfiguration */
-				if ($liveStreamConfig->getProtocol() == PlaybackProtocol::AKAMAI_HDS)
-				{
-					$flavor = $this->getFlavorAssetInfo($liveStreamConfig->getUrl());
-					break;
-				}
-			}
+			$liveStreamConfig = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', PlaybackProtocol::AKAMAI_HDS);
+			$flavor = $this->getFlavorAssetInfo($liveStreamConfig->getUrl());
+			break;
 			
 			return $flavor;
 		}
