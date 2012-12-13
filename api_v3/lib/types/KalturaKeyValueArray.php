@@ -28,7 +28,7 @@ class KalturaKeyValueArray extends KalturaTypedArray
 		return $pairsArray;
 	}
 	
-	public function __construct($className = null)
+	public function __construct()
 	{
 		return parent::__construct("KalturaKeyValue");
 	}
