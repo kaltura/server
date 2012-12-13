@@ -439,4 +439,20 @@ class categoryPeer extends BasecategoryPeer
 		return $objs;
 	}
 	
+	/**
+	 * Retrieve category(ies) by referenceId
+	 * @param string $v
+	 * @return array
+	 */
+	public static function getByReferenceId ($v)
+	{
+		$c = KalturaCriteria::create(self::OM_CLASS);
+		$c->addAnd(categoryPeer::REFERENCE_ID, $v);
+		$objects = self::doSelect($c);
+		
+		return $objects;
+		
+	}
+	
+	
 }
