@@ -14,6 +14,9 @@ class kEntryIdentifier extends kObjectIdentifier
 		{
 			case EntryIdentifierField::ID:
 				return entryPeer::retrieveByPK($value);
+			case EntryIdentifierField::REFERENCE_ID:
+				return entryPeer::retrieveByReferenceId($value);
+				
 		}
 		
 	}
