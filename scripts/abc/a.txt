@@ -1,2 +1,0 @@
-cp sysname: GMA_full_noBug_
-Setting metadata profile 2 entryid 0_9mawfw3c XMl <metadata><Title>GMA</Title><FormatType>Long Form</FormatType><SourceType>HD</SourceType><SourceVideoFile>GMA_full_HD_noBug_testing.mxf</SourceVideoFile></metadata>
