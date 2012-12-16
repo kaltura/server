@@ -19,6 +19,13 @@ class accessControlScope extends kScope
 	protected $contexts = array(accessControlContextType::PLAY);
 	
 	/**
+	 * Key-value pairs of hashes  passed to the access control as part of the scope
+	 * @var array
+	 */
+	protected $hashes;
+	
+
+	/**
 	 * @param string $v
 	 */
 	public function setEntryId($v)
@@ -60,5 +67,19 @@ class accessControlScope extends kScope
 			return true;
 			
 		return in_array($context, $this->contexts);
+	}
+	
+	/**
+	 * @return the $hashes
+	 */
+	public function getHashes() {
+		return $this->hashes;
+	}
+
+	/**
+	 * @param array $hashes
+	 */
+	public function setHashes($hashes) {
+		$this->hashes = $hashes;
 	}
 }
