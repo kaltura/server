@@ -45,6 +45,10 @@ class KSecureEntryHelper
 	 */
 	private $disableCache;
 	
+	/**
+	 * @var accessControlScope
+	 */
+	private $accessControlScope;
 	
 	/**
 	 * 
@@ -300,13 +304,20 @@ class KSecureEntryHelper
 	
 	private function getAccessControlScope()
 	{
-		$scope = new accessControlScope();
-		if ($this->referrer)
-			$scope->setReferrer($this->referrer);
-		$scope->setKs($this->ks);
-		$scope->setEntryId($this->entry->getId());
-		$scope->setContexts($this->contexts);
-		return $scope;
+		if (!$this->accessControlScope)
+		{
+			$this->accessControlScope = new accessControlScope();
+			if ($this->referrer)
+				$this->accessControlScope->setReferrer($this->referrer);
+			$this->accessControlScope->setKs($this->ks);
+			$this->accessControlScope->setEntryId($this->entry->getId());
+			$this->accessControlScope->setContexts($this->contexts);
+		}
+		return $this->accessControlScope;
 	}
 
+	public function setAccessControlScope (accessControlScope $accessControlScope)
+	{
+		return $this->accessControlScope;
+	}
 }
