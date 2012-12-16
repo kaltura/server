@@ -100,7 +100,7 @@ class SynacorHboFeed
 		$tempDoc->loadXML($xml);
 
 		$importedItem = $this->doc->importNode($tempDoc->firstChild, true);
-		$channelNode = $this->xpath->query('/rss/channel')->item(0);
+		$channelNode = $this->xpath->query('/atom:feed')->item(0);
 		$channelNode->appendChild($importedItem);
 	}
 
