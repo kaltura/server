@@ -30,15 +30,26 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		$output = $this->getRawMediaInfo();
 		$kMi = $this->parseOutput($output);
 			/*
-			 * Following code patching mediainfo 0.7.61 misbehaviour with interlaced mjpa sources - the height value is halved.
-			 * This behavior did not appear on the older 0.7.28
+			 * Following code patching mediainfo 0.7.61 misbehaviours, 
+			 * those behaviors do not appear on the older 0.7.28.
 			 */
-		if(isset($kMi) && isset($kMi->videoHeightTmp) 
-		&& isset($kMi->videoCodecId) && $kMi->videoCodecId=="mjpa"
-		&& isset($kMi->scanType) && $kMi->scanType==1){
-			$kMi->videoHeight = $kMi->videoHeightTmp;
+		if(isset($kMi)) {
+			/*
+			 * Interlaced mjpa sources - the height value is halved.
+			 */
+			if(isset($kMi->videoHeightTmp) 
+			&& isset($kMi->videoCodecId) && $kMi->videoCodecId=="mjpa"
+			&& isset($kMi->scanType) && $kMi->scanType==1){
+				$kMi->videoHeight = $kMi->videoHeightTmp;
+			}
+			/*
+			 * WebM/VP8 misses video duration
+			 */
+			if(isset($kMi->videoFormat) && $kMi->videoFormat=="vp8" // isset($kMi->videoCodecId) && $kMi->videoCodecId=="v_vp8"
+			&& (!isset($kMi->videoDuration) || $kMi->videoDuration==0)){
+				$kMi->videoDuration = $kMi->containerDuration;
+			}
 		}
-
 		$durLimit=3600000;
 		if(get_class($this)=='KMediaInfoMediaParser'
 		&& ((isset($kMi->containerDuration) && $kMi->containerDuration>$durLimit) 
