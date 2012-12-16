@@ -2,8 +2,8 @@
 //script call:
 // php SyncDropFolderWatcher.php action folder_path file_name file_size >> /var/log/SyncDropFolderWatcher.log
 //example:
-// php SyncDropFolderWatcher.php 1 /web/content/drop_folder1 file1.flv 0 >> /var/log/SyncDropFolderWatcher.log
-// php SyncDropFolderWatcher.php 2 /web/content/drop_folder1 file1.flv 1595 >> /var/log/SyncDropFolderWatcher.log
+// php SyncDropFolderWatcher.php 1 /web/content/drop_folder1/file1.flv 0 >> /var/log/SyncDropFolderWatcher.log
+// php SyncDropFolderWatcher.php 2 /web/content/drop_folder1/file1.flv 1595 >> /var/log/SyncDropFolderWatcher.log
 
 const DETECTED = 1;
 const UPLOADED = 2;
@@ -55,6 +55,16 @@ try
 	{
 		$folder = $dropFolders->objects[0];
 		echo 'drop folder id '.$folder->id."\n";
+		
+		$ignorePatterns = array_map('trim', explode(',', $folder->ignoreFileNamePatterns));
+		foreach ($ignorePatterns as $ignorePattern)
+		{
+			if (!is_null($ignorePattern) && ($ignorePattern != '') && fnmatch($ignorePattern, $fileName)) 
+			{
+				echo 'Ignoring file matching ignore pattern ['.$ignorePattern.']'."\n";
+				return;
+			}
+		}
 		
 		//impersonate
 		$kClientConfig->partnerId = $folder->partnerId;
