@@ -44,8 +44,10 @@ class kJobsManager
 	{
 		$dbBatchJobs = BatchJobPeer::retrieveByEntryId($entryId);
 		
-		foreach($dbBatchJobs as $dbBatchJob)
+		foreach($dbBatchJobs as $dbBatchJob) {
+			$dbBatchJob->setMessage("Aborted entry");
 			self::abortDbBatchJob($dbBatchJob);
+		}
 	}
 	
 	public static function abortJob($jobId, $jobType, $force = false)
@@ -102,9 +104,11 @@ class kJobsManager
 	{
 		// aborts all child jobs
 		$dbChildJobs = $dbBatchJob->getChildJobs();
-		foreach($dbChildJobs as $dbChildJob)
+		foreach($dbChildJobs as $dbChildJob) {
+			$dbChildJob->setMessage("Parent job was aborted.");
 			if($dbChildJob->getId() != $dbBatchJob->getId())
 				self::abortDbBatchJob($dbChildJob);
+		}
 	}
 	
 	/**
