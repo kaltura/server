@@ -203,22 +203,6 @@ class DropFolderFileService extends KalturaBaseService
 		
 		return $dropFolderFile;
 	}
-
-	/**
-	 * Allows you to add a new KalturaDropFolderFile object in status DETECTED
-	 * 
-	 * @action detected
-	 * @param KalturaDropFolderFile $dropFolderFile
-	 * @return KalturaDropFolderFile
-	 * 
-	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
-	 * @throws KalturaDropFolderErrors::DROP_FOLDER_NOT_FOUND
-	 */
-	
-	public function detectedAction(KalturaDropFolderFile $dropFolderFile)
-	{
-		return $this->newFileAddedOrDetected($dropFolderFile, DropFolderFileStatus::DETECTED);
-	}
 	
 	private function newFileAddedOrDetected(KalturaDropFolderFile $dropFolderFile, $fileStatus)
 	{
