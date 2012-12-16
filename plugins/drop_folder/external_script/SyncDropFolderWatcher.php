@@ -8,18 +8,22 @@
 const DETECTED = 1;
 const UPLOADED = 2;
 
-if($argc < 4)
+if($argc < 3)
 {
 	echo 'Wrong number of arguments';
 	return;
 }
 $action = $argv[1];
-$folderPath = $argv[2];
-$fileName = $argv[3];
-$fileSize = $argv[4];
+$filePath = $argv[2];
+$fileSize = $argv[3];
+
+$fileName=basename($filePath);
+$folderPath = dirname($filePath);
+
 
 echo '---------------------------- Start handling --------------------------'."\n";
 echo 'action:'.$action."\n";
+echo 'file path:'.$filePath."\n";
 echo 'folder path:'.$folderPath."\n";
 echo 'file name:'.$fileName."\n";
 echo 'file size:'.$fileSize."\n";
