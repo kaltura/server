@@ -38,6 +38,7 @@ class getuiconfsAction extends kalturaAction
 			$uiconf_array["height"] = $uiconf->getHeight();
 			$uiconf_array["swfUrlVersion"] = $uiconf->getSwfUrlVersion();
 			$uiconf_array["swf_version"] = "v" . $uiconf->getSwfUrlVersion();
+			$uiconf_array["html5Url"] = $uiconf->getHtml5Url();
 
 			$partner_uiconfs_array[] = $uiconf_array;
 		}
@@ -65,6 +66,7 @@ class getuiconfsAction extends kalturaAction
 			$uiconf_array["height"] = $uiconf->getHeight();
 			//$uiconf_array["swfUrlVersion"] = $uiconf->getSwfUrlVersion();
 			$uiconf_array["swf_version"] = "v" . $uiconf->getSwfUrlVersion();
+			$uiconf_array["html5Url"] = $uiconf->getHtml5Url();
 
 			$default_uiconfs_array[] = $uiconf_array;
 		}

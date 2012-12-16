@@ -190,6 +190,7 @@ class kmcUtils
 				'width' => (($conf->getWidth())? $conf->getWidth(): 470),
 				'height' => (($conf->getHeight())? $conf->getHeight(): 600),
 				'swfUrlVersion' => $conf->getSwfUrlVersion(),
+				'html5Url'	=>	$conf->getHtml5Url(),
 			);
 		}
 		return $conf_players;
