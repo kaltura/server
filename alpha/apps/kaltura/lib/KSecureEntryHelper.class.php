@@ -318,6 +318,6 @@ class KSecureEntryHelper
 
 	public function setAccessControlScope (accessControlScope $accessControlScope)
 	{
-		return $this->accessControlScope;
+		$this->accessControlScope = $accessControlScope;
 	}
 }
