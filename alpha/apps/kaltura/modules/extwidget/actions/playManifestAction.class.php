@@ -261,7 +261,7 @@ class playManifestAction extends kalturaAction
 		
 		// enforce entitlement
 		kEntitlementUtils::initEntitlementEnforcement();
-
+		
 		if(!$this->entry)
 		{
 			$this->entry = entryPeer::retrieveByPKNoFilter( $this->entryId );
@@ -276,16 +276,33 @@ class playManifestAction extends kalturaAction
 		
 		// enforce access control
 		$base64Referrer = $this->getRequestParameter("referrer");
+		$hashes = $this->getRequestParameter("hashes");
+		$hashes = urldecode($hashes);
+		$hashes = explode(",", $hashes);
+		$keyValueHashes = array(); 
+		foreach ($hashes as $keyValueHashString)
+		{
+			list ($key, $value) = explode('=', $keyValueHashString);
+			$keyValueHashes[$key] = $value;
+		}
 		
 		// replace space in the base64 string with + as space is invalid in base64 strings and caused
 		// by symfony calling str_parse to replace + with spaces.
 		// this happens only with params passed in the url path and not the query strings. specifically the ~ char at
 		// a columns divided by 3 causes this issue (e.g. http://www.xyzw.com/~xxx)
 		$referrer = base64_decode(str_replace(" ", "+", $base64Referrer));
-		if (!is_string($referrer)) 
+		if (!is_string($referrer))
 			$referrer = ""; // base64_decode can return binary data
 			
 		$this->secureEntryHelper = new KSecureEntryHelper($this->entry, $ksStr, $referrer, accessControlContextType::PLAY);
+		$accessControlScope = new accessControlScope();
+		$accessControlScope->setEntryId($this->entry->getId());
+		$accessControlScope->setKs($ksStr);
+		$accessControlScope->setReferrer($referrer);
+		$accessControlScope->setContexts(array(accessControlContextType::PLAY));
+		$accessControlScope->setHashes($keyValueHashes);
+		$this->secureEntryHelper->setAccessControlScope($accessControlScope);
+		
 		if ($this->secureEntryHelper->shouldPreview())
 		{
 			$this->clipTo = $this->secureEntryHelper->getPreviewLength() * 1000;
@@ -1305,7 +1322,6 @@ class playManifestAction extends kalturaAction
 		
 		$deliveryCode = $this->getRequestParameter( "deliveryCode", null );
 		$playbackContext = $this->getRequestParameter( "playbackContext", null );
-		
 		$this->protocol = $this->getRequestParameter ( "protocol", null );
 		if(!$this->protocol || $this->protocol === "null")
 			$this->protocol = PlaybackProtocol::HTTP;
