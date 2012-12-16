@@ -408,7 +408,7 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 		$this->lockExpiration = $dbBatchJobLock->getExpiration();
 		$this->executionAttempts = $dbBatchJobLock->getExecutionAttempts();
 		$this->lockVersion = $dbBatchJobLock->getVersion();
-		$this->checkAgainTimeout = $dbBatchJobLock->getStartAt();
+		$this->checkAgainTimeout = $dbBatchJobLock->getStartAt(null);
 		$this->estimatedEffort = $dbBatchJobLock->getEstimatedEffort();
 		
 		$this->schedulerId = $dbBatchJobLock->getSchedulerId();
