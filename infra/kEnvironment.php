@@ -20,7 +20,7 @@ class kEnvironment
 		$cacheDir = "$appDir/cache";
 		
 		self::$map = array(
-			'cache_root_path' =>  $cacheDir,
+			'cache_root_path' =>  "$cacheDir/",
 			'general_cache_dir' => "$cacheDir/general/",
 			'response_cache_dir' => "$cacheDir/response/",
 			'syndication_core_xsd_path' => "$appDir/alpha/config/syndication.core.xsd",
