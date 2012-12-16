@@ -41,6 +41,12 @@ class KalturaAccessControlScope extends KalturaObject
 	 * @var KalturaAccessControlContextTypeHolderArray
 	 */
 	public $contexts;
+	
+	/**
+	 * Array of hashes to pass to the access control profile scope
+	 * @var KalturaKeyValueArray
+	 */
+	public $hashes;
 
 	private static $mapBetweenObjects = array
 	(
@@ -50,6 +56,7 @@ class KalturaAccessControlScope extends KalturaObject
 		'userAgent',
 		'time',
 		'contexts',
+		'hashes',
 	);
 	
 	/* (non-PHPdoc)
