@@ -543,13 +543,6 @@ class kFile
 		return $length;
 	}
 	
-	public static function read_header($ch, $string)
-	{
-		$length = strlen($string);
-		header($string);
-		return $length;
-	}
-	
 	public static function read_body($ch, $string)
 	{
 		$length = strlen($string);
