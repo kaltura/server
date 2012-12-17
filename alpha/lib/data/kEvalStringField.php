@@ -18,7 +18,7 @@ class kEvalStringField extends kStringField
 	 */
 	protected function getFieldValue(kScope $scope = null) 
 	{
-		if(!$scope)
+		if(!$scope || !$this->code)
 			return null;
 		
 		if(strpos($this->code, ';') !== false)
