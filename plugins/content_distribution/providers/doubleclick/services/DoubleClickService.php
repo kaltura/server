@@ -121,7 +121,7 @@ class DoubleClickService extends KalturaBaseService
 			$feed->setNextLink($this->getUrl($distributionProfileId, $hash, $page + 1, $period, $nextPageStateLastEntryCreatedAt, $nextPageStateLastEntryIds));
 
 		$profileUpdatedAt = $profile->getUpdatedAt(null);
-		$cacheDir = kConf::get("global_cache_dir")."feeds/dist_$distributionProfileId/";	
+		$cacheDir = kConf::get("global_cache_dir")."/feeds/dist_$distributionProfileId/";	
 		foreach($entries as $entry)
 		{
 			// check cache
@@ -146,7 +146,7 @@ class DoubleClickService extends KalturaBaseService
 			
 			$cuePoints = $this->getCuePoints($entry->getPartnerId(), $entry->getId());
 			$xml = $feed->getItemXml($fields, $flavorAssets, $thumbAssets, $cuePoints);
-			mkdir(dirname($cacheFileName), 0777, true);
+			mkdir(dirname($cacheFileName), 0750, true);
 			file_put_contents($cacheFileName, $xml);
 			}
             $feed->addItemXml($xml);
