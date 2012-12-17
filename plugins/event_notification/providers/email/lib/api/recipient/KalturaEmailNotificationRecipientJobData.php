@@ -38,7 +38,7 @@ abstract class KalturaEmailNotificationRecipientJobData extends KalturaObject
 					$instance = new KalturaEmailNotificationStaticRecipientJobData();
 					break;
 				default:
-					$instance = KalturaPluginManager::loadObject('kEmailNotificationRecipientJobData', $this->providerType);
+					$instance = KalturaPluginManager::loadObject('KalturaEmailNotificationRecipientJobData', $dbData->getProviderType());
 					break;
 			}
 			
