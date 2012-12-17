@@ -53,7 +53,7 @@ class ComcastMrssService extends KalturaBaseService
 		$feed = new ComcastMrssFeed('comcast_mrss_template.xml');
 		$feed->setDistributionProfile($profile);
 		$profileUpdatedAt = $profile->getUpdatedAt(null);
-		$cacheDir = kConf::get("global_cache_dir")."feeds/dist_$distributionProfileId/";
+		$cacheDir = kConf::get("global_cache_dir")."/feeds/dist_$distributionProfileId/";
 		foreach($entries as $entry)
 		{
 			// check cache
@@ -76,7 +76,7 @@ class ComcastMrssService extends KalturaBaseService
 				$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
 				$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
 				$xml = $feed->getItemXml($fields, $flavorAssets, $thumbAssets);
-				mkdir(dirname($cacheFileName), 0777, true);
+				mkdir(dirname($cacheFileName), 0750, true);
 				file_put_contents($cacheFileName, $xml);
 			}
 			$feed->addItemXml($xml);

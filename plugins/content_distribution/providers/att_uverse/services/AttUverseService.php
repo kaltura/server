@@ -54,7 +54,7 @@ class AttUverseService extends KalturaBaseService
 		$channelTitle = $profile->getChannelTitle();	
 		$counter = 0;
 		$profileUpdatedAt = $profile->getUpdatedAt(null);
-		$cacheDir = kConf::get("global_cache_dir")."feeds/dist_$distributionProfileId/";	
+		$cacheDir = kConf::get("global_cache_dir")."/feeds/dist_$distributionProfileId/";	
 		foreach($entries as $entry)
 		{
 			// check cache
@@ -87,7 +87,7 @@ class AttUverseService extends KalturaBaseService
 				//thumb assets and remote thumb asset file urls			
 				$captionAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFromCustomData(AttUverseEntryDistributionCustomDataField::DISTRIBUTED_CAPTION_IDS)));
 				$xml = $feed->getItemXml($fields, $flavorAssets, $remoteAssetFileUrls, $thumbAssets, $remoteThumbailFileUrls, $captionAssets);
-				mkdir(dirname($cacheFileName), 0777, true);
+				mkdir(dirname($cacheFileName), 0750, true);
 				file_put_contents($cacheFileName, $xml);
 			}
 			$feed->addItemXml($xml);

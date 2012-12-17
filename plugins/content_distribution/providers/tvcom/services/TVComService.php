@@ -52,7 +52,7 @@ class TVComService extends KalturaBaseService
 		$feed = new TVComFeed('tvcom_template.xml');
 		$feed->setDistributionProfile($profile);
 		$profileUpdatedAt = $profile->getUpdatedAt(null);
-		$cacheDir = kConf::get("global_cache_dir")."feeds/dist_$distributionProfileId/";
+		$cacheDir = kConf::get("global_cache_dir")."/feeds/dist_$distributionProfileId/";
 		foreach($entries as $entry)
 		{
 			// check cache
@@ -77,7 +77,7 @@ class TVComService extends KalturaBaseService
 				$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
 				$additionalAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getAssetIds()));
 				$xml = $feed->getItemXml($fields, count($flavorAssets) ? $flavorAssets[0] : null, count($thumbAssets) ? $thumbAssets[0] : null,$additionalAssets);
-				mkdir(dirname($cacheFileName), 0777, true);
+				mkdir(dirname($cacheFileName), 0750, true);
 				file_put_contents($cacheFileName, $xml);
 			}
 			$feed->addItemXml($xml);

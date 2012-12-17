@@ -55,7 +55,7 @@ class SynacorHboService extends KalturaBaseService
 
 		$counter = 0;
 		$profileUpdatedAt = $profile->getUpdatedAt(null);
-		$cacheDir = kConf::get("global_cache_dir")."feeds/dist_$distributionProfileId/";	
+		$cacheDir = kConf::get("global_cache_dir")."/feeds/dist_$distributionProfileId/";	
 		foreach($entries as $entry)
 		{
 			// check cache
@@ -79,7 +79,7 @@ class SynacorHboService extends KalturaBaseService
 				$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
 				$additionalAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getAssetIds()));
 				$xml = $feed->getItemXml($fields, $entry, $flavorAssets, $thumbAssets,$additionalAssets);
-				mkdir(dirname($cacheFileName), 0777, true);
+				mkdir(dirname($cacheFileName), 0750, true);
 				file_put_contents($cacheFileName, $xml);
 			}
 			$feed->addItemXml($xml);
