@@ -32,8 +32,8 @@ $config = parse_ini_file("config.ini");
 $serviceUrl = $config['service_url'];
 echo 'Service URL '.$serviceUrl."\n";
 
-require_once '/lib/KalturaClient.php';
-require_once '/lib/KalturaPlugins/KalturaDropFolderClientPlugin.php';
+require_once(dirname(__file__).'/lib/KalturaClient.php');
+require_once(dirname(__file__).'/lib/KalturaPlugins/KalturaDropFolderClientPlugin.php');
 
 
 $kClientConfig = new KalturaConfiguration(-1);
