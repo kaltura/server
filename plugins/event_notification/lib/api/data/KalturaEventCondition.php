@@ -12,7 +12,7 @@ abstract class KalturaEventCondition extends KalturaObject
 	 */
 	public static function getInstanceByClass($class)
 	{
-		if($class == kEventFieldCondition)
+		if($class == 'kEventFieldCondition')
 			return new KalturaEventFieldCondition();
 			
 		return KalturaPluginManager::loadObject('KalturaEventCondition', $class);
