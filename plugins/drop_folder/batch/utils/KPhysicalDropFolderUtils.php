@@ -67,7 +67,7 @@ class KPhysicalDropFolderUtils
      */
 	private static function getFileTransferManager(KalturaDropFolder $folder)
 	{
-	    $fileTransferMgr = kFileTransferMgr::getInstance(self::getFileTransferMgrType($folder->type)); //TODO
+	    $fileTransferMgr = kFileTransferMgr::getInstance(self::getFileTransferMgrType($folder->type));
 	    
 	    $host =null; $username=null; $password=null; $port=null;
 	    $privateKey = null; $publicKey = null;
