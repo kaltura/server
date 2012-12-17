@@ -51,7 +51,7 @@ class kLiveStreamConfiguration
 	 * @param entry $liveStreamEntry
 	 * @param string $propertyName
 	 * @param string $propertyValue
-	 * @return KLiveStreamConfiguration
+	 * @return kLiveStreamConfiguration
 	 */
 	public static function getSingleItemByPropertyValue ($liveStreamEntry, $propertyName, $propertyValue)
 	{
