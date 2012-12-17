@@ -81,7 +81,7 @@ kmc.vars.DeliveryTypeStorage = [
 		id: 'hds',
 		label: 'HTTP Streaming (HDS)',
 		flashvars: {
-			
+			"streamerType": "hds"
 		}
 	},
 	{
@@ -719,7 +719,7 @@ kmc.preview_embed = {
 			kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, is_video);
 		});
 		$('#embed_types').change(function(){
-			kmc.vars.embed_code_type = this.value;
+			kmc.vars.last_embed_code_type = this.value;
 			kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, is_video);
 		});
 		$("#player_select").change(function(){
@@ -760,22 +760,47 @@ kmc.preview_embed = {
 		var validArray = [];
 
 		$.each(kmc.vars.DeliveryTypeStorage, function() {
-			if( (this.id == 'akamai' || this.id == 'akamai2' ) && kmc.vars.hide_akamai_hd_network ) {
+			if( (this.id == 'akamai' || this.id == 'akamai_v2' ) && kmc.vars.hide_akamai_hd_network ) {
 				return true;
 			}
 			if( this.id == 'akamai' && kmc.vars.has_v2_flavors ) {
 				return true;
 			}
+			if( this.id == 'akamai_v2' && ! kmc.vars.has_v2_flavors ) {
+				return true;
+			}
+			validArray.push(this);
 		});
 
 		return validArray;
 	},
 
+	getDefaultEmbedType: function(uiconf, is_playlist) {
+		var types = kmc.preview_embed.getValidEmbedTypes(uiconf, is_playlist);
+
+		var defaultType = 'legacy';
+		if( kmc.vars.last_embed_code_type ) {
+			return kmc.vars.last_embed_code_type;
+		} else {
+			$.each(types, function() {
+				if(this.id == kmc.vars.default_embed_code_type){
+					defaultType = this.id;
+					return false;
+				}
+			});
+		}
+		return defaultType;
+	},
+
 	getValidEmbedTypes: function( uiconf, is_playlist ) {
+		// Get uiConf by Id
+		if( typeof uiconf !== 'object' ) {
+			uiconf = kmc.preview_embed.getUiconfDetails(uiconf,is_playlist);
+		}
 		var validArray = [];
 		var clearLastEmbedType = function( id ) {
-			if( kmc.vars.embed_code_type == id ) { 
-				kmc.vars.embed_code_type = null;
+			if( kmc.vars.last_embed_code_type == id ) { 
+				kmc.vars.last_embed_code_type = null;
 			}
 		};
 		// Go over embed code types
@@ -844,7 +869,7 @@ kmc.preview_embed = {
 	},
 
 	buildEmbedOptions: function(uiconf, is_playlist) {
-		var embed_type = kmc.vars.embed_code_type || 'legacy';
+		var embed_type = kmc.preview_embed.getDefaultEmbedType(uiconf, is_playlist);
 		var html = '<div class="clearfix"><div id="embedtypes" class="label">Select Embed Code Type:</div> <select id="embed_types">';
 		var options = '';
 		// Go over embed code types
@@ -852,7 +877,7 @@ kmc.preview_embed = {
 			var selected = (embed_type == this.id) ? 'selected="selected"' : '';
 			options += '<option value="' + this.id + '"' + selected + '>' + this.label + '</option>';
 		});
-		html += options + '</select></div><div class="note">All embed options supports HTML5 fallback for mobile devices. <a href="javascript:kmc.utils.openHelp(\'section_pne_ipad\');">Read more</a></div>';
+		html += options + '</select></div><div class="note">Auto embed is the default embed code type and is best to get a player quickly on a page without any runtime customizations. <a href="javascript:kmc.utils.openHelp(\'section_pne_ipad\');">Read more</a> about the different embed code types.</div>';
 		return '<div class="item">' + html + '</div>';
 	},
 		
@@ -885,7 +910,7 @@ kmc.preview_embed = {
 	},
 	
 	previewUrl: function(entry_id, name, is_playlist, partner_id, uiconf_id){
-		var embed_type = kmc.vars.embed_code_type || 'legacy';
+		var embed_type = kmc.preview_embed.getDefaultEmbedType(uiconf_id, is_playlist);
 		var update_html = '<img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...';
 		if( $(".preview_url").length ) {
 			$(".preview_url").html( update_html );
@@ -964,7 +989,7 @@ kmc.preview_embed = {
 		var https_support = ($("#https_support").attr("checked")) ? true : false;
 
 		name = kmc.utils.escapeQuotes(name); 
-		var uiconf_id = uiconf.uiconf_id || uiconf,
+		var uiconf_id = uiconf.id || uiconf,
 		uiconf_details = (typeof uiconf == "object") ? uiconf : kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist),  // getUiconfDetails returns json
 		cache_st = kmc.preview_embed.setCacheStartTime(),
 		embed_code, flashVars = {};
@@ -1038,9 +1063,8 @@ kmc.preview_embed = {
 	},
 
 	getEmbedCode: function( id, name, description, is_playlist, uiconf ) {
-		var embedTypes = kmc.preview_embed.getValidEmbedTypes(uiconf, is_playlist);
-		var embed_type = kmc.vars.embed_code_type || 'legacy', 
-			uiconf_id = uiconf.uiconf_id || uiconf,
+		var embed_type = kmc.preview_embed.getDefaultEmbedType(uiconf, is_playlist), 
+			uiconf_id = uiconf.id || uiconf,
 			code = '';
 		switch( embed_type ) {
 			case 'auto':
