@@ -13,7 +13,12 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 	 */
 	protected $categoryId;
 
-
+	/**
+	 * Additional filter
+	 * @var categoryKuserFilter
+	 */
+	protected $categoryUserFilter;
+	
 	/**
 	 * @return kStringValue
 	 */
@@ -46,8 +51,17 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 		
 		return $ret;
 	}
+	/**
+	 * @return categoryKuserFilter
+	 */
+	public function getCategoryUserFilter() {
+		return $this->categoryUserFilter;
+	}
 
-
-	
-	
+	/**
+	 * @param categoryKuserFilter $categoryUserFilter
+	 */
+	public function setCategoryUserFilter($categoryUserFilter) {
+		$this->categoryUserFilter = $categoryUserFilter;
+	}
 }

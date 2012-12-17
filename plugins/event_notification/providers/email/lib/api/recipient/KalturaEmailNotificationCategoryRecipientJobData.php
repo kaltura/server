@@ -13,8 +13,14 @@ class KalturaEmailNotificationCategoryRecipientJobData extends KalturaEmailNotif
 	 */
 	public $categoryId;
 	
+	/**
+	 * @var KalturaCategoryUserProviderFilter
+	 */
+	public $categoryUserFilter;
+	
 	private static $map_between_objects = array(
 		'categoryId',
+		'categoryUserFilter',
 	);
 	
 	/* (non-PHPdoc)

@@ -14,6 +14,11 @@ class kEmailNotificationCategoryRecipientJobData extends kEmailNotificationRecip
 	protected $categoryId;
 	
 	/**
+	 * @var categoryKuserFilter
+	 */
+	protected $categoryUserFilter;
+	
+	/**
 	 * @return the $categoryId
 	 */
 	public function getCategoryId() {
@@ -26,5 +31,19 @@ class kEmailNotificationCategoryRecipientJobData extends kEmailNotificationRecip
 	public function setCategoryId($categoryId) {
 		$this->categoryId = $categoryId;
 	}
+	/**
+	 * @return categoryKuserFilter
+	 */
+	public function getCategoryUserFilter() {
+		return $this->categoryUserFilter;
+	}
+
+	/**
+	 * @param categoryKuserFilter $categoryUserFilter
+	 */
+	public function setCategoryUserFilter($categoryUserFilter) {
+		$this->categoryUserFilter = $categoryUserFilter;
+	}
+
 
 }
