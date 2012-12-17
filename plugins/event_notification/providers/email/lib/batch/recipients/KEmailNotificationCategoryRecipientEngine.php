@@ -13,18 +13,14 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 	function getRecipients(array $contentParameters)
 	{
 		//List categoryKusers
-		//TODO add paging logic
-		$categoryUserFilter = new KalturaCategoryUserFilter();
-		$categoryUserFilter->categoryIdEqual = $this->recipientJobData->categoryId;
-		$categoryUserFilter->permissionNamesMatchOr = KalturaPermissionName::CATEGORY_SUBSCRIBE;
-		$categoryUserList = $this->client->categoryUser->listAction($categoryUserFilter, new KalturaFilterPager());
+		$categoryUserList = $this->client->categoryUser->listAction($this->recipientJobData->categoryUserFilter, new KalturaFilterPager());
 		
 		$categoryUserIds = array();
 		foreach ($categoryUserList->objects as $categoryUser)
 			$categoryUserIds[] = $categoryUser->userId;
 		$userFilter = new KalturaUserFilter();
 		$userFilter->idIn = implode(',', $categoryUserIds);
-		$userList = $this->client->user->listAction($userFilter, new KalturaFilterPager);
+		$userList = $this->client->user->listAction($userFilter, new KalturaFilterPager());
 		
 		$recipients = array();
 		foreach ($userList->objects as $user)
