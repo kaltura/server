@@ -51,7 +51,7 @@ if( count($allowedPartners) > 1 ) {
 			embed_code_protocol_https: <?php echo ($useEmbedCodeProtocolHttps) ? "true" : "false"; ?>,
 			default_embed_code_type: 'auto',
 			has_v2_flavors: <?php echo ($v2Flavors) ? "true" : "false"; ?>,
-			<?php if($v2Flavors) { ?>embed_code_delivery_type: 'akamai_v2',<?php } ?>
+			<?php if($v2Flavors) { ?>embed_code_delivery_type: 'auto',<?php } ?>
 			kcw_webcam_uiconf : "<?php echo $content_uiconfs_upload_webcam->getId(); ?>",
 			kcw_import_uiconf : "<?php echo $content_uiconfs_upload_import->getId(); ?>",
 			default_kdp		: {
