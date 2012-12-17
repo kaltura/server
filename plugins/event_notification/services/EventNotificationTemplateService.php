@@ -299,11 +299,47 @@ class EventNotificationTemplateService extends KalturaBaseService
 	 */
 	protected function partnerGroup()
 	{
-		if(
-			$this->actionName == 'clone' 
-			)
-			return $this->partnerGroup . ',0';
+		
+		switch ($this->actionName)
+		{
+			case 'clone':
+				return $this->partnerGroup . ',0';
+			case 'listTemplates':
+				return '0';
+		}
 			
 		return $this->partnerGroup;
+	}
+	
+	/**
+	 * Action lists the template partner event notification templates.
+	 * @action listTemplates
+	 * 
+	 * @param KalturaEventNotificationTemplateFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaEventNotificationTemplateListResponse
+	 */
+	public function listTemplatesAction (KalturaEventNotificationTemplateFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		if (!$filter)
+			$filter = new KalturaEventNotificationTemplateFilter();
+			
+		if (!$pager)
+			$pager = new KalturaFilterPager();
+		
+		$coreFilter = new EventNotificationTemplateFilter();
+		$filter->toObject($coreFilter);
+		
+		$criteria = new Criteria();
+		$coreFilter->attachToCriteria($criteria);
+		$pager->attachToCriteria($criteria);
+		$results = EventNotificationTemplatePeer::doSelect($criteria);
+		$count = EventNotificationTemplatePeer::doCount($criteria);
+		
+		$response = new KalturaEventNotificationTemplateListResponse();
+		$response->objects = KalturaEventNotificationTemplateArray::fromDbArray($results);
+		$response->totalCount = $count;
+		
+		return $response;
 	}
 }
