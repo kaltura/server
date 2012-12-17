@@ -58,7 +58,7 @@ class kLiveStreamConfiguration
 		foreach ($liveStreamEntry->getLiveStreamConfigurations() as $config)
 		{
 			/* @var $config kLiveStreamConfiguration */
-			if (property_exists("kLiveStreamConfiguration", $propertyName))
+			if (property_exists(get_class($config), $propertyName))
 			{
 				$getter = "get{$propertyName}";
 				if ($config->$getter() == $propertyValue)
