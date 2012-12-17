@@ -86,14 +86,32 @@ class previewAction extends kalturaAction
 		// Set the current flash vars for delivery type
 		switch($this->getRequestParameter('delivery')) {
 
+			case "auto": 
+				$flashVars["streamerType"] = "auto";
+				break;
+
+			case "akamai":
+				$flashVars["streamerType"] = "hdnetwork";
+				$flashVars["akamaiHD.loadingPolicy"] = "preInitialize";
+				$flashVars["akamaiHD.asyncInit"] = "true";
+				break;
+
+			case 'akamai_v2':
+				$flashVars["streamerType"] = "hdnetwork";
+				$flashVars["akamaiHD.loadingPolicy"] = "preInitialize";
+				$flashVars["akamaiHD.asyncInit"] = "true";
+				$flashVars["twoPhaseManifest"] = "true";
+				break;	
+			case 'hds':
+				$flashVars["streamerType"] = "hds";
+				break;
 		    case "rtmp":
 				$flashVars["streamerType"] = "rtmp";
 				break;
 
-		    case "akamai":
-				$flashVars["streamerType"] = "hdnetwork";
-				$flashVars["akamaiHD.loadingPolicy"] = "preInitialize";
-				$flashVars["akamaiHD.asyncInit"] = "true";
+		    case "rtmpe":
+		    	$flashVars["streamerType"] = "rtmp";
+		    	$flashVars["mediaProtocol"] = "rtmpe";
 				break;
 		}
 
