@@ -59,10 +59,10 @@ class previewAction extends kalturaAction
 
 		// Check if HTTPS enabled and set protocol
 		$https_enabled = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? true : false;
-		$protocol = ($https_enabled) ? 'https://' : 'http://';		
+		$protocol = ($https_enabled) ? 'https' : 'http';		
 
 		// Set base URL for script tags
-		$baseUrl = $protocol . (($https_enabled) ? $embed_host_https : $embed_host);
+		$baseUrl = $protocol . '://' . (($https_enabled) ? $embed_host_https : $embed_host);
 
 		// Script URL
 		$this->scriptUrl = $baseUrl . "/p/". $this->partner_id ."/sp/". $this->partner_id ."00/embedIframeJs/uiconf_id/". $this->uiconf_id ."/partner_id/". $this->partner_id;
@@ -76,7 +76,7 @@ class previewAction extends kalturaAction
 			$swfPath .= "/entry_id/" . $this->entry_id;
 		}
 		// Set SWF URLs
-		$this->swfUrl = $partner_host . $swfPath;
+		$this->swfUrl = $this->partner_host . $swfPath;
 		$this->swfSecureUrl = 'https://' . kConf::get('cdn_host_https') . $swfPath;
 
 
@@ -118,11 +118,11 @@ class previewAction extends kalturaAction
 
 		// URL to this page
 		$port = ($_SERVER["SERVER_PORT"] != "80") ? ":".$_SERVER["SERVER_PORT"] : '';
-		$this->pageURL = $protocol . $_SERVER["SERVER_NAME"] . $port . $_SERVER["REQUEST_URI"];
+		$this->pageURL = $protocol . '://' . $_SERVER["SERVER_NAME"] . $port . $_SERVER["REQUEST_URI"];
 
 		 //$_SERVER['PATH_INFO']
 		if( isset($this->flavor_asset_id) ) {
-			$this->flavorUrl = $partner_host . '/p/'. $partner_id .'/sp/' . $partner_id . '00/playManifest/entryId/' . $entry_id . '/flavorId/' . $flavor_asset_id . '/format/url/protocol/' . $protocol . '/a.mp4';
+			$this->flavorUrl = $this->partner_host . '/p/'. $this->partner_id .'/sp/' . $this->partner_id . '00/playManifest/entryId/' . $this->entry_id . '/flavorId/' . $this->flavor_asset_id . '/format/url/protocol/' . $protocol . '/a.mp4';
 		}
 
 		$this->embed = ($this->getRequestParameter('embed')) ? $this->getRequestParameter('embed') : 'legacy';

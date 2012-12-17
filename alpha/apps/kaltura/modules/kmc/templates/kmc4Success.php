@@ -27,7 +27,7 @@ if( count($allowedPartners) > 1 ) {
 			kmc_general_uiconf		: "<?php echo $kmc_general->getId(); ?>",
 			kmc_permissions_uiconf	: "<?php echo $kmc_permissions->getId(); ?>", 
 			allowed_partners		: <?php echo json_encode($allowedPartners); ?>,
-			hide_akamai_hd_network	: "<?php echo $hideAkamaiHDNetwork; ?>",
+			hide_akamai_hd_network	: "<?php echo ($hideAkamaiHDNetwork) ? "true" : "false"; ?>",
 			kmc_secured				: <?php echo (kConf::get("kmc_secured_login"))? "true" : "false"; ?>,
 		  /* END new vars KMC4 */
 		
