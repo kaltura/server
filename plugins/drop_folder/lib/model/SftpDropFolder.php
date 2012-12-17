@@ -7,6 +7,8 @@
 class SftpDropFolder extends SshDropFolder
 {
     
+    const DEFAULT_SFTP_PORT = 22;
+    
 	public function getFolderUrl()
 	{
 	    $url = 'sftp://';
@@ -18,18 +20,15 @@ class SftpDropFolder extends SshDropFolder
 	        $url .= '@';
 	    }
 	    $url .= $this->getSshHost();
+	    if($this->getSshPort() && $this->getSshPort() != self::DEFAULT_SFTP_PORT)
+	    	$url.=':'.$this->getSshPort();
 	    $url .= '/'.$this->getPath();
 	    return $url;
 	}
-	
+		
 	protected function getRemoteFileTransferMgrType()
 	{
-		if($this->getType() == DropFolderType::SFTP)
-	    	return kFileTransferMgrType::SFTP;
-	    if($this->getType() == DropFolderType::SFTP_CMD)
-	    	return kFileTransferMgrType::SFTP_CMD;
-		if($this->getType() == DropFolderType::SFTP_SEC_LIB)
-	    	return kFileTransferMgrType::SFTP_SEC_LIB;	    	
+	    return kFileTransferMgrType::SFTP;
 	}
         
 }
