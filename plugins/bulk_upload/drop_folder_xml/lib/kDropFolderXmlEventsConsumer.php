@@ -30,6 +30,7 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 		{
 			KalturaLog::err('Failed to process objectChangedEvent for drop folder file ['.$object->getDropFolderId().'] - '.$e->getMessage());
 		}
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -85,13 +86,12 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 		try 
 		{
 			$this->onBulkUploadJobStatusUpdated($dbBatchJob);
-			return true;
 		}
 		catch(Exception $e)
 		{
 			KalturaLog::err('Failed to process updatedJob - '.$e->getMessage());
 		}
-		return false;
+		return true;
 	}
 				
 	private function onBulkUploadJobStatusUpdated(BatchJob $dbBatchJob)

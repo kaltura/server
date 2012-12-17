@@ -14,8 +14,8 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	const ERROR_ADDING_BULK_UPLOAD_MESSAGE = 'Failed to create bulk upload job in Kaltura';
 	const ERROR_IN_BULK_UPLOAD_MESSAGE = 'Failed  to execute the bulk upload job in Kaltura';
 	const ERROR_ADD_CONTENT_RESOURCE_MESSAGE = 'Failed to add drop folder content resource files';
-	const MALFORMED_XML_FILE_MESSAGE = 'Malformed XML file';
-	const XML_FILE_SIZE_EXCEED_LIMIT_MESSAGE = 'Failed to handle XML, file size exceeds the 10MB limit';
+	const MALFORMED_XML_FILE_MESSAGE = 'Failed to handle  XML File.  Invalid XML format.';
+	const XML_FILE_SIZE_EXCEED_LIMIT_MESSAGE = 'Failed to handle XML file. XML file size exceeds the supported 10 MB limit';
 	
 	
 	/* (non-PHPdoc)

@@ -20,7 +20,7 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	const ERROR_ADDING_CONTENT_PROCESSOR_MESSAGE = 'Failed to activate the drop folder engine processing for this file';
 	const ERROR_IN_CONTENT_PROCESSOR_MESSAGE = 'Drop folder engine processing failure';
 	const ERROR_DOWNLOADING_FILE_MESSAGE = 'Failed in file transferring from the drop folder to Kaltura';
-	const FLAVOR_NOT_FOUND_MESSAGE = 'Parsed flavor system name could not be found';
+	const FLAVOR_NOT_FOUND_MESSAGE = 'Failed to handle file. Could not find a matched transcoding flavor setting with system name: ';
 	
 	
 	public static function getPluginName()
