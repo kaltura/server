@@ -62,7 +62,7 @@ class previewAction extends kalturaAction
 		$protocol = ($https_enabled) ? 'https://' : 'http://';		
 
 		// Set base URL for script tags
-		$baseUrl = $protocol . ($https_enabled) ? $embed_host_https : $embed_host;
+		$baseUrl = $protocol . (($https_enabled) ? $embed_host_https : $embed_host);
 
 		// Script URL
 		$this->scriptUrl = $baseUrl . "/p/". $this->partner_id ."/sp/". $this->partner_id ."00/embedIframeJs/uiconf_id/". $this->uiconf_id ."/partner_id/". $this->partner_id;
