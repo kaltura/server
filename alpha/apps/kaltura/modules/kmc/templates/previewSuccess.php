@@ -42,7 +42,7 @@
 				<?php if($embed == 'dynamic' || $embed == 'thumb') { ?>
 				<div id="kaltura_player" style="width: <?php echo $uiConf->getWidth();?>px; height: <?php echo $uiConf->getHeight();?>px"></div>
 				<script type="text/javascript">
-				kWidget.<?php echo $functionName; ?>(<?php json_encode($kwidgetObj); ?>);
+				kWidget.<?php echo $functionName; ?>(<?php echo json_encode($kwidgetObj); ?>);
 				</script>
 				<?php } ?>
 				<?php if($embed == 'legacy') { ?>
