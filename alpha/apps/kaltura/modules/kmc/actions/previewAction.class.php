@@ -118,7 +118,7 @@ class previewAction extends kalturaAction
 
 		// URL to this page
 		$port = ($_SERVER["SERVER_PORT"] != "80") ? ":".$_SERVER["SERVER_PORT"] : '';
-		$this->pageURL = $protocol . $_SERVER["SERVER_NAME"] . $port . .$_SERVER["REQUEST_URI"];
+		$this->pageURL = $protocol . $_SERVER["SERVER_NAME"] . $port . $_SERVER["REQUEST_URI"];
 
 		 //$_SERVER['PATH_INFO']
 		if( isset($this->flavor_asset_id) ) {
