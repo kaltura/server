@@ -45,6 +45,62 @@ kmc.vars.EmbedCodeStorage = [
 	}
 ];
 
+kmc.vars.DeliveryTypeStorage = [
+	{
+		id: 'auto',
+		label: 'Kaltura Auto',
+		flashvars: {
+			"streamerType": "auto"
+		}
+	},
+	{
+		id: 'http',
+		label: 'HTTP Progressive Download',
+		flashvars: {}
+	},
+	{
+		id: 'akamai',
+		label: 'HTTP Streaming (Akamai)',
+		flashvars: {
+			"streamerType": "hdnetwork",
+			"akamaiHD.loadingPolicy": "preInitialize",
+			"akamaiHD.asyncInit": "true"
+		}
+	},
+	{
+		id: 'akamai_v2',
+		label: 'HTTP Streaming (Akamai)',
+		flashvars: {
+			"streamerType": "hdnetwork",
+			"akamaiHD.loadingPolicy": "preInitialize",
+			"akamaiHD.asyncInit": "true",
+			"twoPhaseManifest": "true"
+		}
+	},			
+	{
+		id: 'hds',
+		label: 'HTTP Streaming (HDS)',
+		flashvars: {
+			
+		}
+	},
+	{
+		id: 'rtmp',
+		label: 'RTMP Streaming',
+		flashvars: {
+			"streamerType": "rtmp"
+		}
+	},
+	{
+		id: 'rtmpe',
+		label: 'Secure Transport (RTMPE)',
+		flashvars: {
+			"streamerType": "rtmp",
+			"mediaProtocol": "rtmpe"
+		}
+	}
+];
+
 kmc.functions = {
 
 	loadSwf : function() {
@@ -689,6 +745,32 @@ kmc.preview_embed = {
 		}
 	}, // doPreviewEmbed
 
+	getDeliveryTypeFlashvars: function( id ) {
+		var fv = {};
+		$.each(kmc.preview_embed.getValidDeliveryTypes(), function() {
+			if( this.id == id ) {
+				fv = this.flashvars;
+				return false;
+			}
+		});
+		return fv;
+	},
+
+	getValidDeliveryTypes: function() {
+		var validArray = [];
+
+		$.each(kmc.vars.DeliveryTypeStorage, function() {
+			if( (this.id == 'akamai' || this.id == 'akamai2' ) && kmc.vars.hide_akamai_hd_network ) {
+				return true;
+			}
+			if( this.id == 'akamai' && kmc.vars.has_v2_flavors ) {
+				return true;
+			}
+		});
+
+		return validArray;
+	},
+
 	getValidEmbedTypes: function( uiconf, is_playlist ) {
 		var validArray = [];
 		var clearLastEmbedType = function( id ) {
@@ -749,14 +831,13 @@ kmc.preview_embed = {
 		var selected = ' selected="selected"';
 		var delivery_type = kmc.vars.embed_code_delivery_type || "http";
 		var html = '<div class="clearfix"><div id="rtmp" class="label">Select Delivery Type:</div> <select id="delivery_type">';
-		var options = '<option value="auto"' + ((delivery_type == "auto") ? selected : "") + '>Kaltura Auto</option>' + 
-		'<option value="http"' + ((delivery_type == "http") ? selected : "") + '>HTTP Progressive Download</option>' +
-		'<option value="rtmp"' + ((delivery_type == "rtmp") ? selected : "") + '>RTMP Streaming</option>' + 
-		'<option value="rtmpe"' + ((delivery_type == "rtmpe") ? selected : "") + '>Secure Transport  (RTMPE)</option>' + 
-		'<option value="hds"' + ((delivery_type == "hds") ? selected : "") + '>HTTP Streaming (HDS)</option>'; 
-		if(!kmc.vars.hide_akamai_hd_network) {
-			options += '<option value="akamai"' + ((delivery_type == "akamai") ? selected : "") + '>HTTP Streaming (Akamai)</option>';
-		}
+		var options = '';
+
+		$.each(kmc.preview_embed.getValidDeliveryTypes(), function(){
+			var selected = (delivery_type == this.id) ? 'selected="selected"' : '';
+			options += '<option value="' + this.id + '"' + selected + '>' + this.label + '</option>';
+		});
+
 		html += options + '</select></div><div class="note">Adaptive Streaming automatically adjusts to the viewer\'s bandwidth,' +
 		'while Progressive Download allows buffering of the content. <a href="javascript:kmc.utils.openHelp(\'section_pne_stream\');">Read more</a></div>';
 		return '<div class="item">' + html + '</div>';
@@ -897,30 +978,7 @@ kmc.preview_embed = {
 		embed_code = embed_code.replace("{SEO_ATTS}", (kmc.vars.ignore_entry_seo ? "" : kmc.preview_embed.embed_code_template.media_seo_atts));
 
 		kmc.vars.embed_code_delivery_type = kmc.vars.embed_code_delivery_type || "http";
-		switch( kmc.vars.embed_code_delivery_type ) {
-			case "rtmp":
-				flashVars['streamerType'] = 'rtmp';
-				break;
-			case "rtmpe":
-				flashVars['streamerType'] = 'rtmp';
-				flashVars['mediaProtocol'] = 'rtmpe';
-				break;					
-			case "akamai":
-				if(kmc.vars.has_v2_flavors) {
-					flashVars['twoPhaseManifest'] = 'true';
-				}
-				flashVars['streamerType'] = 'hdnetwork';
-				flashVars['akamaiHD.loadingPolicy'] = 'preInitialize';
-				flashVars['akamaiHD.asyncInit'] = 'true';
-				break;
-			case 'hds': 
-				flashVars['streamerType'] = 'hds';
-				flashVars['twoPhaseManifest'] = 'true';
-				break;
-			case 'auto':
-				flashVars['streamerType'] = 'auto';
-				break;
-		}
+		$.extend(flashVars, kmc.preview_embed.getDeliveryTypeFlashvars( kmc.vars.embed_code_delivery_type ));
 
 		if(is_playlist && id != "multitab_playlist") {	// playlist (not multitab)
 			embed_code = embed_code.replace(/{ENTRY_ID}/g,"");
