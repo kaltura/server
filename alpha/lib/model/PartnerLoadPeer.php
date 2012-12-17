@@ -139,46 +139,40 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 	
 	
 	public static function updatePartnerLoadTable() {
-		try {
-				
-			$actualPartnerLoads = PartnerLoadPeer::getPartnerLoads();
-			$c = new Criteria();
-			$c->add(PartnerLoadPeer::DC, kDataCenterMgr::getCurrentDcId());
-			$currentPartnerLoads = PartnerLoadPeer::doSelect($c);
-				
+		$actualPartnerLoads = PartnerLoadPeer::getPartnerLoads();
+		$c = new Criteria();
+		$c->add(PartnerLoadPeer::DC, kDataCenterMgr::getCurrentDcId());
+		$currentPartnerLoads = PartnerLoadPeer::doSelect($c);
 			
-			// This loop updates the partner load table contents according to the 
-			// accurate information gathered from the batch job table
-			foreach ($currentPartnerLoads as $partnerLoad) {
-				
-				$maxQuota = self::getMaxQuotaForPartner ($partnerLoad);
-				$key = $partnerLoad->getPartnerId() . "#" . $partnerLoad->getJobType() . "#" . $partnerLoad->getJobSubType();
-				
-				if(array_key_exists($key, $actualPartnerLoads)) {
-					$actualLoad = $actualPartnerLoads[$key];
-					// Update
-					$partnerLoad->setPartnerLoad($actualLoad->getPartnerLoad());
-					$partnerLoad->setWeightedPartnerLoad($actualLoad->getWeightedPartnerLoad());
-					$partnerLoad->setQuota($maxQuota - $actualLoad->getPartnerLoad());
-					$partnerLoad->save();
-						
-					unset($actualPartnerLoads[$key]);
-				} else {
-						
-					// Delete
-					$partnerLoad->delete();
-				}
-			}
-				
-			foreach($actualPartnerLoads as $actualPartnerLoad) {
-				$maxQuota = self::getMaxQuotaForPartner ($actualPartnerLoad);
-
-				$actualPartnerLoad->setQuota($maxQuota - $actualPartnerLoad->getPartnerLoad());
-				$actualPartnerLoad->save();
-			}
 		
-		} catch (Exception $e) {
-			KalturaLog::err("Failed while updating partner load table with error : " . $e->getMessage());
+		// This loop updates the partner load table contents according to the 
+		// accurate information gathered from the batch job table
+		foreach ($currentPartnerLoads as $partnerLoad) {
+			
+			$maxQuota = self::getMaxQuotaForPartner ($partnerLoad);
+			$key = $partnerLoad->getPartnerId() . "#" . $partnerLoad->getJobType() . "#" . $partnerLoad->getJobSubType();
+			
+			if(array_key_exists($key, $actualPartnerLoads)) {
+				$actualLoad = $actualPartnerLoads[$key];
+				// Update
+				$partnerLoad->setPartnerLoad($actualLoad->getPartnerLoad());
+				$partnerLoad->setWeightedPartnerLoad($actualLoad->getWeightedPartnerLoad());
+				$partnerLoad->setQuota($maxQuota - $actualLoad->getPartnerLoad());
+				$partnerLoad->save();
+					
+				unset($actualPartnerLoads[$key]);
+			} else {
+					
+				// Delete
+				$partnerLoad->delete();
+			}
+		}
+			
+		foreach($actualPartnerLoads as $actualPartnerLoad) {
+			$maxQuota = self::getMaxQuotaForPartner ($actualPartnerLoad);
+
+			$actualPartnerLoad->setQuota($maxQuota - $actualPartnerLoad->getPartnerLoad());
+			$actualPartnerLoad->save();
 		}
 	}
 	
