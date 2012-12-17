@@ -46,15 +46,110 @@ class previewAction extends kalturaAction
 				$this->entry_id = null;
 			}
 		}
-		
-		$this->delivery_type = $this->getRequestParameter('delivery');
 
 		// Playlist Parameters
-		$this->playlist_id = $this->getRequestParameter('playlist_id');
+		$this->playlist_id = htmlspecialchars($this->getRequestParameter('playlist_id'));
 		$this->playlist_name = htmlspecialchars($this->getRequestParameter('playlist_name'));
 
 		$this->partner_host = myPartnerUtils::getHost($this->partner_id);
 		$this->partner_cdnHost = myPartnerUtils::getCdnHost($this->partner_id);
-		$this->secure_host = kConf::get('cdn_host_https');
+
+		$embed_host = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
+		$embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
+
+		// Check if HTTPS enabled and set protocol
+		$https_enabled = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? true : false;
+		$protocol = ($https_enabled) ? 'https://' : 'http://';		
+
+		// Set base URL for script tags
+		$baseUrl = $protocol . ($https_enabled) ? $embed_host_https : $embed_host;
+
+		// Script URL
+		$this->scriptUrl = $baseUrl . "/p/". $this->partner_id ."/sp/". $this->partner_id ."00/embedIframeJs/uiconf_id/". $this->uiconf_id ."/partner_id/". $this->partner_id;
+
+		// Build SWF Path
+		$swfPath = "/index.php/kwidget";
+		$swfPath .= "/cache_st/" . (time()+(60*15));
+		$swfPath .= "/wid/_" . $this->partner_id;
+		$swfPath .= "/uiconf_id/" . $this->uiconf_id;
+		if( $this->entry_id ) {
+			$swfPath .= "/entry_id/" . $this->entry_id;
+		}
+		// Set SWF URLs
+		$this->swfUrl = $partner_host . $swfPath;
+		$this->swfSecureUrl = 'https://' . kConf::get('cdn_host_https') . $swfPath;
+
+
+		// Array to contain flash vars
+		$flashVars = array();
+
+		// Set the current flash vars for delivery type
+		switch($this->getRequestParameter('delivery')) {
+
+		    case "rtmp":
+				$flashVars["streamerType"] = "rtmp";
+				break;
+
+		    case "akamai":
+				$flashVars["streamerType"] = "hdnetwork";
+				$flashVars["akamaiHD.loadingPolicy"] = "preInitialize";
+				$flashVars["akamaiHD.asyncInit"] = "true";
+				break;
+		}
+
+		if( $this->playlist_id || ! $this->entry_id ) {
+			$this->entry_name = 'Kaltura Player';
+			$this->entry_description = '';
+		}
+
+		if( $this->playlist_id && $this->playlist_id != 'multitab_playlist') {
+			// build playlist url
+			$playlist_url = $this->partner_host ."/index.php/partnerservices2/executeplaylist?";
+			$playlist_url .= "partner_id=" . $this->partner_id . "&subp_id=" . $this->partner_id . "00&format=8&ks={ks}playlist_id=" . $this->playlist_id;
+
+			// Add playlist flashVars
+			$flashVars["playlistAPI.autoInsert"] = "true";
+			$flashVars["playlistAPI.kpl0Name"] = $this->playlist_name;
+			$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
+		}
+
+		// Transform flashvars array to string
+		$this->flashVarsString = http_build_query($flashVars, '', '&amp;');
+
+		// URL to this page
+		$port = ($_SERVER["SERVER_PORT"] != "80") ? ":".$_SERVER["SERVER_PORT"] : '';
+		$this->pageURL = $protocol . $_SERVER["SERVER_NAME"] . $port . .$_SERVER["REQUEST_URI"];
+
+		 //$_SERVER['PATH_INFO']
+		if( isset($this->flavor_asset_id) ) {
+			$this->flavorUrl = $partner_host . '/p/'. $partner_id .'/sp/' . $partner_id . '00/playManifest/entryId/' . $entry_id . '/flavorId/' . $flavor_asset_id . '/format/url/protocol/' . $protocol . '/a.mp4';
+		}
+
+		$this->embed = ($this->getRequestParameter('embed')) ? $this->getRequestParameter('embed') : 'legacy';
+
+		// If case of auto embed, append extra params to script url
+		if( $this->embed == 'auto' ) {
+			$append = '?autoembed=true&playerId=kaltura_player';
+			$append .= ($this->entry_id) ? '&entry_id=' . $this->entry_id : '';
+			$append .= '&' . http_build_query(array('flashvars' => $flashVars), '', '&amp;');
+			$this->scriptUrl .= $append;
+		}
+
+		// In case of dynamic or thumb embed, create kwidget object
+		if( $this->embed == 'dynamic' || $this->embed == 'thumb' ) {
+			$this->functionName = ($this->embed == 'dynamic') ? 'embed' : 'thumbEmbed';
+			$this->kwidgetObj = array(
+				'targetId' 	=> 'kaltura_player',
+				'cache_st'	=> (time()+(60*15)),
+				'wid' 		=> '_' . $this->partner_id,
+				'uiconf_id'	=> $this->uiconf_id,
+				'flashvars' => $flashVars,
+			);
+
+			if( $this->entry_id ) {
+				$this->kwidgetObj[ 'entry_id' ] = $this->entry_id;
+			}
+		}
+
 	}
 }

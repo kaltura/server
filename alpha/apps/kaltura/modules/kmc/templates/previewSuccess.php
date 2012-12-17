@@ -1,79 +1,4 @@
-﻿<?php 
-
-/*
- * TODO!!!
- * Move all this code to previewAction.
- */
-
-//Build Script URL
-$scriptUrl = $partner_host . "/p/". $partner_id ."/sp/". $partner_id ."00/embedIframeJs/uiconf_id/". $uiconf_id ."/partner_id/". $partner_id;
-
-// Build SWF URL
-$swfPath = "/index.php/kwidget";
-$swfPath .= "/cache_st/" . (time()+(60*15));
-$swfPath .= "/wid/_" . $partner_id;
-$swfPath .= "/uiconf_id/" . $uiconf_id;
-if( $entry_id ) {
-	$swfPath .= "/entry_id/" . $entry_id;
-}
-
-$swfUrl = $partner_host . $swfPath;
-$swfSecureUrl = 'https://' . $secure_host . $swfPath;
-
-// Array to contain flash vars
-$flashVars = array();
-
-// Set the current flash vars for delivery type
-switch($delivery_type) {
-
-    case "rtmp":
-		$flashVars["streamerType"] = "rtmp";
-		break;
-
-    case "akamai":
-		$flashVars["streamerType"] = "hdnetwork";
-		$flashVars["akamaiHD.loadingPolicy"] = "preInitialize";
-		$flashVars["akamaiHD.asyncInit"] = "true";
-		break;
-}
-
-if( $playlist_id || ! $entry_id ) {
-	$entry_name = 'Kaltura Player';
-	$entry_description = '';
-}
-
-if( $playlist_id && $playlist_id != 'multitab_playlist') {
-	// build playlist url
-	$playlist_url = $partner_host ."/index.php/partnerservices2/executeplaylist?";
-	$playlist_url .= "partner_id=" . $partner_id . "&subp_id=" . $partner_id . "00&format=8&playlist_id=" . $playlist_id;
-
-	// Add playlist flashVars
-	$flashVars["playlistAPI.autoInsert"] = "true";
-	$flashVars["playlistAPI.kpl0Name"] = $playlist_name;
-	$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
-}
-
-// Transform flashvars array to string
-$flashVars = http_build_query($flashVars, '', '&amp;');
-
-// URL to this page
-$protocol = 'http';
-if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {$protocol .= "s";}
-$pageURL = $protocol . "://";
-if ($_SERVER["SERVER_PORT"] != "80") {
-	$pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
-} else {
-	$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-}
- //$_SERVER['PATH_INFO']
-if( isset($flavor_asset_id) ) {
-	$flavorUrl = $partner_host . '/p/'. $partner_id .'/sp/' . $partner_id . '00/playManifest/entryId/' . $entry_id . '/flavorId/' . $flavor_asset_id . '/format/url/protocol/' . $protocol . '/a.mp4';
-}
-
-// <meta property="og:image:secure_url" content="/p/27017/sp/2701700/thumbnail/entry_id/1_elwxyx1c/version/0" />
-// <meta property="fb:app_id" content="351010711616984">
-?>
-<!doctype html>
+﻿<!doctype html>
 <html>
 <head>
 	<meta charset="utf-8">
@@ -97,8 +22,6 @@ if( isset($flavor_asset_id) ) {
 	<?php } ?>
 	
 	<title><?php echo htmlspecialchars($entry_name); ?></title>
-	<script src="<?php echo $scriptUrl; ?>"></script>
-	<script>mw.setConfig('Kaltura.NoApiCache', true);</script>
 	<style>
 		#main .content .title h1 { font-size: 24px; font-weight: bold; }
 		#main p { margin-bottom: 20px; font-size: 18px; }
@@ -114,6 +37,15 @@ if( isset($flavor_asset_id) ) {
 			<div class="contwrap">
 			<p><?php echo htmlspecialchars($entry_description); ?></p>
 			<div id="videoContainer">
+				<script src="<?php echo $scriptUrl; ?>"></script>
+				<script>mw.setConfig('Kaltura.NoApiCache', true);</script>
+				<?php if($embed == 'dynamic' || $embed == 'thumb') { ?>
+				<div id="kaltura_player" style="width: <?php echo $uiConf->getWidth();?>px; height: <?php echo $uiConf->getHeight();?>px"></div>
+				<script type="text/javascript">
+				kWidget.<?php echo $functionName; ?>(<?php json_encode($kwidgetObj); ?>);
+				</script>
+				<?php } ?>
+				<?php if($embed == 'legacy') { ?>
 			    <object id="kaltura_player" name="kaltura_player" type="application/x-shockwave-flash" 
 				    allowFullScreen="true" allowNetworking="all" allowScriptAccess="always" height="<?php echo $uiConf->getHeight();?>" width="<?php echo $uiConf->getWidth();?>"
 				    xmlns:dc="http://purl.org/dc/terms/" 
@@ -125,7 +57,7 @@ if( isset($flavor_asset_id) ) {
 				<param name="allowNetworking" value="all" />
 				<param name="allowScriptAccess" value="always" />
 				<param name="bgcolor" value="#000000" />
-				<param name="flashVars" value="<?php echo $flashVars; ?>" />
+				<param name="flashVars" value="<?php echo $flashVarsString; ?>" />
 				<param name="movie" value="<?php echo $swfUrl; ?>" />
 				<a href="http://corp.kaltura.com">video platform</a> 
 				<a href="http://corp.kaltura.com/video_platform/video_management">video management</a> 
@@ -137,6 +69,7 @@ if( isset($flavor_asset_id) ) {
 				<span property="media:height" content="<?php echo $uiConf->getHeight();?>"></span>
 				<span property="media:type" content="application/x-shockwave-flash"></span> 
 			   </object>
+			   <?php } ?>
 			</div>
 
 			</div><!-- end contwrap -->
