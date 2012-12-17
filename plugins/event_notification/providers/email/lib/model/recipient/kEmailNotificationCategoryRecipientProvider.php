@@ -47,7 +47,7 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 		if ($this->categoryId instanceof kStringField)
 			$this->categoryId->setScope($scope);
 		
-		$ret->setCategoryId($this->categoryId->getValue());
+		$implicitCategoryId = $this->categoryId->getValue();
 		
 		$categoryUserFilter = new categoryKuserFilter();
 		$categoryUserFilter->set('_matchor_permission_names', PermissionName::CATEGORY_SUBSCRIBE);
@@ -55,7 +55,7 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 		{
 			$categoryUserFilter = $this->categoryUserFilter;
 		}
-		$categoryUserFilter->setCategoryIdEqual($ret->getCategoryId());
+		$categoryUserFilter->setCategoryIdEqual($implicitCategoryId);
 		$ret->setCategoryUserFilter($categoryUserFilter);
 		
 		return $ret;

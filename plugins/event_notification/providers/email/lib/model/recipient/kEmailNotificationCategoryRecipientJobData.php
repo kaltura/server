@@ -8,29 +8,10 @@
 class kEmailNotificationCategoryRecipientJobData extends kEmailNotificationRecipientJobData
 {
 	/**
-	 * CategoryId
-	 * @var int
-	 */
-	protected $categoryId;
-	
-	/**
 	 * @var categoryKuserFilter
 	 */
 	protected $categoryUserFilter;
-	
-	/**
-	 * @return the $categoryId
-	 */
-	public function getCategoryId() {
-		return $this->categoryId;
-	}
 
-	/**
-	 * @param field_type $categoryId
-	 */
-	public function setCategoryId($categoryId) {
-		$this->categoryId = $categoryId;
-	}
 	/**
 	 * @return categoryKuserFilter
 	 */

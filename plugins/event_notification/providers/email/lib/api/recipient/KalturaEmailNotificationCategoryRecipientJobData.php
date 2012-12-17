@@ -8,18 +8,11 @@
 class KalturaEmailNotificationCategoryRecipientJobData extends KalturaEmailNotificationRecipientJobData
 {
 	/**
-	 * The ID of the category whose subscribers should receive the email notification.
-	 * @var int
-	 */
-	public $categoryId;
-	
-	/**
 	 * @var KalturaCategoryUserFilter
 	 */
 	public $categoryUserFilter;
 	
 	private static $map_between_objects = array(
-		'categoryId',
 		'categoryUserFilter',
 	);
 	
