@@ -206,12 +206,12 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		
 		$this->appendLine("	public function getMapBetweenObjects()");
 		$this->appendLine("	{");
-		$this->appendLine("		return array_merge(parent::getMapBetweenObjects(), {$filterClassName}::\$map_between_objects);");
+		$this->appendLine("		return array_merge(parent::getMapBetweenObjects(), self::\$map_between_objects);");
 		$this->appendLine("	}");
 		$this->appendLine();
 		$this->appendLine("	public function getOrderByMap()");
 		$this->appendLine("	{");
-		$this->appendLine("		return array_merge(parent::getOrderByMap(), {$filterClassName}::\$order_by_map);");
+		$this->appendLine("		return array_merge(parent::getOrderByMap(), self::\$order_by_map);");
 		$this->appendLine("	}");
 		
 		// class properties
