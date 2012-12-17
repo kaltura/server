@@ -37,11 +37,27 @@ class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNoti
 	 */
 	public function toObject($dbObject = null, $propertiesToSkip = array())
 	{
+		$this->validate();
 		if (is_null($dbObject))
 			$dbObject = new kEmailNotificationCategoryRecipientProvider();
 			
 		return parent::toObject($dbObject, $propertiesToSkip);
 	}	
+	
+	/**
+	 * Validation function
+	 * @throws KalturaEmailNotificationErrors::INVALID_FILTER_PROPERTY
+	 */
+	protected function validate ()
+	{
+		if ($this->categoryUserFilter)
+		{
+			if (isset ($this->categoryUserFilter->categoryIdEqual))
+			{
+				throw new KalturaAPIException(KalturaEmailNotificationErrors::INVALID_FILTER_PROPERTY, 'categoryIdEqual');
+			}
+		}
+	}
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($source_object)
