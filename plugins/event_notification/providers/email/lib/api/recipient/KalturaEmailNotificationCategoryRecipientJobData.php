@@ -14,7 +14,7 @@ class KalturaEmailNotificationCategoryRecipientJobData extends KalturaEmailNotif
 	public $categoryId;
 	
 	/**
-	 * @var KalturaCategoryUserProviderFilter
+	 * @var KalturaCategoryUserFilter
 	 */
 	public $categoryUserFilter;
 	
