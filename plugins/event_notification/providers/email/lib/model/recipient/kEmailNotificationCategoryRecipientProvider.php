@@ -49,6 +49,15 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 		
 		$ret->setCategoryId($this->categoryId->getValue());
 		
+		$categoryUserFilter = new categoryKuserFilter();
+		$categoryUserFilter->set('_matchor_permission_names', PermissionName::CATEGORY_SUBSCRIBE);
+		if ($this->categoryUserFilter)
+		{
+			$categoryUserFilter = $this->categoryUserFilter;
+		}
+		$categoryUserFilter->setCategoryIdEqual($ret->getCategoryId());
+		$ret->setCategoryUserFilter($categoryUserFilter);
+		
 		return $ret;
 	}
 	/**
