@@ -332,11 +332,11 @@ class EventNotificationTemplateService extends KalturaBaseService
 		
 		$criteria = new Criteria();
 		$coreFilter->attachToCriteria($criteria);
-		$pager->attachToCriteria($criteria);
-		
 		$criteria->add(EventNotificationTemplatePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
-		$results = EventNotificationTemplatePeer::doSelect($criteria);
 		$count = EventNotificationTemplatePeer::doCount($criteria);
+		
+		$pager->attachToCriteria($criteria);
+		$results = EventNotificationTemplatePeer::doSelect($criteria);
 		
 		$response = new KalturaEventNotificationTemplateListResponse();
 		$response->objects = KalturaEventNotificationTemplateArray::fromDbArray($results);
