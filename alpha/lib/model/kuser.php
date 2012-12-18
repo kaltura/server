@@ -49,6 +49,8 @@ class kuser extends Basekuser implements IIndexable
 	const PERMISSION_NAMES_INDEX_PREFIX = 'pn';
 	const ROLE_IDS_INDEX_PREFIX = 'ri';
 	
+	const UNIVERSAL_PERMISSION = '__ALL__';
+	
 	private $roughcut_count = -1;
 	
 	private static $indexFieldTypes = null;
@@ -1265,7 +1267,9 @@ class kuser extends Basekuser implements IIndexable
 			foreach($roleIds as $roleId)
 			{
 				$role = UserRolePeer::retrieveByPK($roleId);
-				$permissionNames .= $role->getPermissionNames();
+				$permissionNames = $role->getPermissionNames();
+				$permissionNames = str_replace("*", self::UNIVERSAL_PERMISSION, $permissionNames);
+				$permissionNames .= $permissionNames;
 			}			
 		}		
 		
