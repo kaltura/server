@@ -43,7 +43,7 @@
 						<option value="configureDropFolder" ><?php echo $this->translate('Configure'); ?></option>
 						<?php if ($dropFolder->status === Kaltura_Client_DropFolder_Enum_DropFolderStatus::DISABLED): ?>
 							<option value="enable" ><?php echo $this->translate('Enable'); ?></option>
-						<?php elseif ($dropFolder->status === Kaltura_Client_DropFolder_Enum_DropFolderStatus::ENABLED): ?>
+						<?php elseif ($dropFolder->status === Kaltura_Client_DropFolder_Enum_DropFolderStatus::ENABLED || $dropFolder->status === Kaltura_Client_DropFolder_Enum_DropFolderStatus::ERROR): ?>
 							<option value="disable" ><?php echo $this->translate('Disable'); ?></option>
 						<?php endif; ?>
 						<option value="remove" ><?php echo $this->translate('Remove'); ?></option>
