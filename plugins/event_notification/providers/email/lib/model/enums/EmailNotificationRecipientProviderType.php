@@ -5,4 +5,6 @@ interface EmailNotificationRecipientProviderType extends BaseEnum
 	
 	const CATEGORY = 2;
 	
+	const USER = 3;
+	
 }
