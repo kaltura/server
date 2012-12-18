@@ -7,6 +7,8 @@
  */
 class KAsyncDropFolderWatcher extends KPeriodicWorker
 {
+	const IGNORE_PATTERNS_DEFAULT_VALUE  = '*.cache,*.aspx,*.filepart';
+	
 	/**
 	 * @var KalturaDropFolderClientPlugin
 	 */
@@ -111,8 +113,12 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			$dropFolderFilesMap = $this->loadDropFolderFiles($folder);
 		else 
 			$dropFolderFilesMap = array();
-			
-		$ignorePatterns = array_map('trim', explode(',', $folder->ignoreFileNamePatterns));	
+
+		if($folder->ignoreFileNamePatterns)
+			$ignorePatterns = self::IGNORE_PATTERNS_DEFAULT_VALUE.','.$ignorePatterns;
+		else
+			$ignorePatterns = self::IGNORE_PATTERNS_DEFAULT_VALUE;			
+		$ignorePatterns = array_map('trim', explode(',', $ignorePatterns));	
 		
 		foreach ($physicalFiles as $physicalFileName) 
 		{	
