@@ -13,7 +13,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 		"idEqual" => "_eq_puser_id",
 		"idIn" => "_in_puser_id",
 		"roleIdsEqual"	=> "_eq_role_ids",
-		"roleIdsIn"	=>'_in_role_ids',
+		"roleIdsIn"	=>	"in_role_ids",
 		"permissionNamesMultiLikeAnd" => "_mlikeand_permission_names",
 		"permissionNamesMultiLikeOr" => "_mlikeor_permission_names",
 	);
@@ -83,6 +83,11 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	 * @var KalturaNullableBoolean
 	 */
 	public $loginEnabledEqual;
+	
+	/**
+	 * @var string
+	 */
+	public $roleIdEqual;
 	
 	/**
 	 * @var string
