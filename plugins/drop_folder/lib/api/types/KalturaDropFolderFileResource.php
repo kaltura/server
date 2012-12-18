@@ -118,7 +118,14 @@ class KalturaDropFolderFileResource extends KalturaDataCenterContentResource
 		
 		if ($dropFolderFile->getStatus() != DropFolderFileStatus::DOWNLOADING)
 		{
-    		$dropFolderFile->setStatus(DropFolderFileStatus::HANDLED);
+			$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->getDropFolderId());
+			if(!$dropFolder) {
+				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderFile->getDropFolderId());
+			}
+			if($dropFolder->getFileDeletePolicy() == DropFolderFileDeletePolicy::AUTO_DELETE && $dropFolder->getAutoFileDeleteDays() == 0)
+    			$dropFolderFile->setStatus(DropFolderFileStatus::PURGED);
+    		else
+    			$dropFolderFile->setStatus(DropFolderFileStatus::HANDLED);
 		}
 		$dropFolderFile->setEntryId($dbEntry->getId());
 		$dropFolderFile->save();		
