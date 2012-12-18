@@ -238,7 +238,7 @@ class sftpMgr extends kFileTransferMgr
 	 */
 	protected function doGetFile($remoteFile, $localFile = null)
 	{
-		if($this->useCmd)
+		if($this->useCmd && !$this->passphrase)
 			return $this->execSftpCommand("get $remoteFile $localFile");
 			
 		$sftp = $this->getSftpConnection();
@@ -253,7 +253,7 @@ class sftpMgr extends kFileTransferMgr
 			fclose($stream);
 			
 			if($content === false)
-				throw new kFileTransferMgrException("Failed to read file from [" . $uri . "]");
+				throw new kFileTransferMgrException("Failed to read file from [$remoteFile]");
 			
 			return $content;
 		}
