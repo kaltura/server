@@ -458,7 +458,6 @@ class sftpMgr extends kFileTransferMgr
 	 */
 	protected function doModificationTime($remoteFile)
 	{
-		$remoteFile = ltrim($remoteFile, '/');
 		$statinfo = ssh2_sftp_stat($this->getSftpConnection(), $remoteFile);
 		$modificationTime = isset($statinfo['mtime']) ? $statinfo['mtime'] : null;
 		return $modificationTime;
