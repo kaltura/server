@@ -96,4 +96,7 @@ if( count($allowedPartners) > 1 ) {
          <iframe frameborder="0" id="server_frame" height="100%" width="100%"></iframe>
         </div> <!-- server_wrap -->
 	</div><!-- main -->
+<!--[if lte IE 7]>
+<script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/json2.min.js"></script>
+<![endif]-->	
 <script type="text/javascript" src="/lib/js/kmc5.js?v=<?php echo $kmc_swf_version; ?>"></script>
