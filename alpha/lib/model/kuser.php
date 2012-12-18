@@ -45,6 +45,10 @@ class kuser extends Basekuser implements IIndexable
 	
 	const PUSER_ID_REGEXP = '/^[A-Za-z0-9,!#\$%&\'\*\+\?\^_`\{\|}~.@-]{1,320}$/';
 	
+	const PARTNER_INDEX_PREFIX  = 'p';
+	const PERMISSION_NAMES_INDEX_PREFIX = 'pn';
+	const ROLE_IDS_INDEX_PREFIX = 'ri';
+	
 	private $roughcut_count = -1;
 	
 	private static $indexFieldTypes = null;
@@ -1142,33 +1146,10 @@ class kuser extends Basekuser implements IIndexable
                 "first_name" => "firstName",
                 "last_name" => "lastName",
                 "email" => "email",
-                "sha1_password" => "sha1Password",
-                "salt" => "salt",
-                "date_of_birth" => "dateOfBirth",
-                "country" => "country",
-                "state" => "state",
-                "city" => "city",
-                "zip" => "zip",
-                "url_list" => "urlList",
-                "picture" => "picture",
-                "icon" => "icon",
-                "about_me" => "aboutMe",
+                "about_me" => "aboutMe", 
                 "tags" => "tags",
-                "tagline" => "tagline",
-                "network_highschool" => "networkHighschool",
-                "network_college" => "networkCollege",
-                "network_other" => "networkOther",
-                "mobile_num" => "mobileNum",
-                "mature_content" => "matureContent",
-                "gender" => "gender",
-                "registration_ip" => "registrationIp",
-                "registration_cookie" => "registrationCookie",
-                "im_list" => "imList",
-                "views" => "views",
-                "fans" => "fans",
                 "entries" => "entries",
                 "storage_size" => "storageSize",
-                "produced_kshows" => "producedKshows",
                 "kuser_status" => "status",
                 "created_at" => "createdAt",
                 "updated_at" => "updatedAt",
@@ -1176,10 +1157,10 @@ class kuser extends Basekuser implements IIndexable
                 "display_in_search" => "displayInSearch",
                 "partner_data" => "partnerData",
                 "puser_id" => "puserId",
-                "admin_tags" => "adminTags",
                 "indexed_partner_data_int" => "indexedPartnerDataInt",
                 "indexed_partner_data_string" => "indexedPartnerDataString",
-                "custom_data" => "customData",
+    			"permission_names"	=> "permissionNames",
+    			"role_ids"	=> "role_ids",
        		 );
     	}
         
@@ -1201,33 +1182,10 @@ class kuser extends Basekuser implements IIndexable
                 "first_name" => IIndexable::FIELD_TYPE_STRING,
                 "last_name" => IIndexable::FIELD_TYPE_STRING,
                 "email" => IIndexable::FIELD_TYPE_STRING,
-                "sha1_password" => IIndexable::FIELD_TYPE_STRING,
-                "salt" => IIndexable::FIELD_TYPE_STRING,
-                "date_of_birth" => IIndexable::FIELD_TYPE_DATETIME,
-                "country" => IIndexable::FIELD_TYPE_STRING,
-                "state" => IIndexable::FIELD_TYPE_STRING,
-                "city" => IIndexable::FIELD_TYPE_STRING,
-                "zip" => IIndexable::FIELD_TYPE_STRING,
-                "url_list" => IIndexable::FIELD_TYPE_STRING,
-                "picture" => IIndexable::FIELD_TYPE_STRING,
-                "icon" => IIndexable::FIELD_TYPE_STRING,
                 "about_me" => IIndexable::FIELD_TYPE_STRING,
                 "tags" => IIndexable::FIELD_TYPE_STRING,
-                "tagline" => IIndexable::FIELD_TYPE_STRING,
-                "network_highschool" => IIndexable::FIELD_TYPE_STRING,
-                "network_college" => IIndexable::FIELD_TYPE_STRING,
-                "network_other" => IIndexable::FIELD_TYPE_STRING,
-                "mobile_num" => IIndexable::FIELD_TYPE_STRING,
-                "mature_content" => IIndexable::FIELD_TYPE_INTEGER,
-                "gender" => IIndexable::FIELD_TYPE_INTEGER,
-                "registration_ip" => IIndexable::FIELD_TYPE_STRING,
-                "registration_cookie" => IIndexable::FIELD_TYPE_STRING,
-                "im_list" => IIndexable::FIELD_TYPE_STRING,
-                "views" => IIndexable::FIELD_TYPE_INTEGER,
-                "fans" => IIndexable::FIELD_TYPE_INTEGER,
                 "entries" => IIndexable::FIELD_TYPE_INTEGER,
                 "storage_size" => IIndexable::FIELD_TYPE_INTEGER,
-                "produced_kshows" => IIndexable::FIELD_TYPE_INTEGER,
                 "kuser_status" => IIndexable::FIELD_TYPE_INTEGER,
                 "created_at" => IIndexable::FIELD_TYPE_DATETIME,
                 "updated_at" => IIndexable::FIELD_TYPE_DATETIME,
@@ -1235,9 +1193,10 @@ class kuser extends Basekuser implements IIndexable
                 "display_in_search" => IIndexable::FIELD_TYPE_INTEGER,
                 "partner_data" => IIndexable::FIELD_TYPE_STRING,
                 "puser_id" => IIndexable::FIELD_TYPE_STRING,
-                "admin_tags" => IIndexable::FIELD_TYPE_STRING,
                 "indexed_partner_data_int" => IIndexable::FIELD_TYPE_INTEGER,
                 "indexed_partner_data_string" => IIndexable::FIELD_TYPE_STRING,
+    			"permission_names" => IIndexable::FIELD_TYPE_STRING,
+    			"role_ids" => IIndexable::FIELD_TYPE_STRING,
        		 );
     	}
         if(isset(self::$indexFieldTypes[$field]))
@@ -1291,5 +1250,61 @@ class kuser extends Basekuser implements IIndexable
 	public function getSearchIndexFieldsEscapeType($fieldName)
 	{
 		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
+	}
+	
+	/**
+	 * Getter returns the indexed version of the permission names on the role of the kuser separated by commas
+	 * @return string
+	 */
+	public function getPermissionNames ()
+	{
+		$permissionNames  = "";
+		if ($this->getRoleIds())
+		{
+			$roleIds = explode(",", $this->getRoleIds());
+			foreach($roleIds as $roleId)
+			{
+				$role = UserRolePeer::retrieveByPK($roleId);
+				$permissionNames .= $role->getPermissionNames();
+			}			
+		}		
+		
+		return self::getIndexedFieldValue('kuserPeer::PERMISSION_NAMES', $permissionNames, $this->getPartnerId());
+	}	
+	
+	/**
+	 * Get the indexed value for the role ids to index to the search engine
+	 * @param string $roleIds
+	 * @return string
+	 */
+	public function getIndexedRoleIds ()
+	{
+		return self::getIndexedFieldValue('kuserPeer::ROLE_IDS', $this->getRoleIds(), $this->getPartnerId());
+	}
+	
+	/**
+	 * Returns indexed value for field
+	 * @param string $fieldName
+	 * @param string $fieldValue
+	 * @param string $partnerId
+	 * @return string
+	 */
+	public static function getIndexedFieldValue ($fieldName, $fieldValue, $partnerId)
+	{
+		if ($fieldName == "kuserPeer::ROLE_IDS")
+		{
+			$prefix = self::ROLE_IDS_INDEX_PREFIX;
+		}
+		else if($fieldName == 'kuserPeer::PERMISSION_NAMES')
+		{
+			$prefix = self::PERMISSION_NAMES_INDEX_PREFIX;
+		}
+
+		$fieldValuesArr = explode(',', $fieldValue);
+		foreach ($fieldValuesArr as &$singleValue)
+		{
+			$singleValue = self::PARTNER_INDEX_PREFIX . $partnerId . self::ROLE_IDS_INDEX_PREFIX . $singleValue;
+		}
+		return implode(',', $fieldValuesArr);				
 	}
 }
