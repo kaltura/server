@@ -14,6 +14,8 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 		"idIn" => "_in_puser_id",
 		"roleIdsEqual"	=> "_eq_role_ids",
 		"roleIdsIn"	=>'_in_role_ids',
+		"permissionNamesMultiLikeAnd" => "_mlikeand_permission_names",
+		"permissionNamesMultiLikeOr" => "_mlikeor_permission_names",
 	);
 
 	private $order_by_map = array
