@@ -1160,7 +1160,7 @@ class kuser extends Basekuser implements IIndexable
                 "indexed_partner_data_int" => "indexedPartnerDataInt",
                 "indexed_partner_data_string" => "indexedPartnerDataString",
     			"permission_names"	=> "permissionNames",
-    			"role_ids"	=> "role_ids",
+    			"role_ids"	=> "indexedRoleIds",
        		 );
     	}
         
