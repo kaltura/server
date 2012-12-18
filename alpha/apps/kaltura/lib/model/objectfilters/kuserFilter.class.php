@@ -42,7 +42,11 @@ class kuserFilter extends baseObjectFilter
 				"_ltornull_login_data_id",
 				"_eq_is_admin",
 				"_likex_puser_id_or_screen_name",
-				'_likex_first_name_or_last_name',			
+				'_likex_first_name_or_last_name',	
+				'_mlikeand_permission_names',
+				'_mlikeor_permission_names',
+				'_eq_role_ids',		
+				'_in_role_ids',
 			) ,
 			NULL
 		);
