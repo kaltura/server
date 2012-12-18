@@ -33,8 +33,8 @@ class SphinxKuserCriteria extends SphinxCriteria
         kuserPeer::INDEXED_PARTNER_DATA_STRING => "indexed_partner_data_string" ,
         'kuserPeer.PUSER_ID_OR_SCREEN_NAME' => '(puser_id,screen_name)',
         'kuserPeer.FIRST_NAME_OR_LAST_NAME' => '(full_name,last_name)',
-        'kuserPeer.PERMISSION_NAMES' => 'permission_names',
-        'kuserPeer.ROLE_IDS' => 'role_ids',
+        'kuser.PERMISSION_NAMES' => 'permission_names',
+        'kuser.ROLE_IDS' => 'role_ids',
 		
 	);
 	
