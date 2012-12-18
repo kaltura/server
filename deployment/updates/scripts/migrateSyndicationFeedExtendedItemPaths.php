@@ -80,7 +80,7 @@ while (count($results) && (!$limit || $migrated < $limit))
 					$itemXPathItem->setXpath($itemXPath);
 					$identifier = new kEntryIdentifier();
 					$identifier->setIdentifier(EntryIdentifierField::ID);
-					$identifier->setExtendedFeatures(1,10175);
+					$identifier->setExtendedFeatures($identifier->setExtendedFeatures('1,'.MetadataPlugin::getObjectFeaturetTypeCoreValue(MetadataObjectFeatureType::CUSTOM_DATA)));
 					$itemXPathItem->setExtensionMode(MrssExtensionMode::APPEND);
 					$itemXPathItem->setIdentifier($identifier);
 					$migrationArray[] = $itemXPathItem;
