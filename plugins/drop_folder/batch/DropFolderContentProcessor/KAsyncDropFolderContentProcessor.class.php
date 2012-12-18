@@ -33,7 +33,7 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 
 	protected function process(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
 	{
-		$this->updateJob($job, "Start processing drop folder files [$data->dropFolderFileIds]", KalturaBatchJobStatus::QUEUED);
+		$job = $this->updateJob($job, "Start processing drop folder files [$data->dropFolderFileIds]", KalturaBatchJobStatus::QUEUED);
 		$this->dropFolderPlugin = KalturaDropFolderClientPlugin::get($this->kClient);
 		
 		$this->impersonate($job->partnerId);
