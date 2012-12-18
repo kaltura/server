@@ -1303,7 +1303,7 @@ class kuser extends Basekuser implements IIndexable
 		$fieldValuesArr = explode(',', $fieldValue);
 		foreach ($fieldValuesArr as &$singleValue)
 		{
-			$singleValue = self::PARTNER_INDEX_PREFIX . $partnerId . self::ROLE_IDS_INDEX_PREFIX . $singleValue;
+			$singleValue = self::PARTNER_INDEX_PREFIX . $partnerId . $prefix . $singleValue;
 		}
 		return implode(',', $fieldValuesArr);				
 	}
