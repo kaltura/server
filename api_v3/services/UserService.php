@@ -599,13 +599,6 @@ class UserService extends KalturaBaseUserService
 		
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
-
-		if (!$shouldUpdate)
-		{
-			$kuser->setUpdatedAt(time());
-			$kuser->save();
-			return $kuser->getPuserId();
-		}
 		
 		$kuser->indexToSearchIndex();
 			
