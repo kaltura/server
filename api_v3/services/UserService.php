@@ -590,7 +590,7 @@ class UserService extends KalturaBaseUserService
 	 * @action index
 	 * @param string $id
 	 * @param bool $shouldUpdate
-	 * @return int entry int id
+	 * @return string 
 	 * @throws KalturaErrors::USER_NOT_FOUND
 	 */
 	function indexAction($id, $shouldUpdate = true)
