@@ -39,12 +39,12 @@ class embedIframeAction extends sfAction
 		{
 			$entry_id = $widget->getEntryId();
 
-			if(!$entry_id)
-				KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'entry_id');
-				
-			$entry = entryPeer::retrieveByPK($entry_id);
-			if(!$entry)
-				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+			if($entry_id)
+			{		
+				$entry = entryPeer::retrieveByPK($entry_id);
+				if(!$entry)
+					KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+			}
 		}
 			
 		$allowCache = true;
@@ -151,7 +151,9 @@ class embedIframeAction extends sfAction
 			$url .=  "/html5/html5lib/{$html5_version}/mwEmbedFrame.php";
 		}
 
-		$url .=  "/entry_id/{$entry_id}/wid/{$widget_id}/uiconf_id/{$uiconf_id}";
+		if ($entry_id)
+			$url .=  "/entry_id/{$entry_id}";
+		$url .=  "/wid/{$widget_id}/uiconf_id/{$uiconf_id}";
 		$url .= '?' . http_build_query($_GET, '', '&'); // forward all GET parameters
 
 		if ($allowCache)
