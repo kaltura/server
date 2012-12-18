@@ -1267,7 +1267,7 @@ class kuser extends Basekuser implements IIndexable
 			foreach($roleIds as $roleId)
 			{
 				$role = UserRolePeer::retrieveByPK($roleId);
-				$permissionNames = $role->getPermissionNames();
+				$permissionNames = $role->getPermissionNames(null, true);
 				$permissionNames = str_replace("*", self::UNIVERSAL_PERMISSION, $permissionNames);
 				$permissionNames .= $permissionNames;
 			}			
