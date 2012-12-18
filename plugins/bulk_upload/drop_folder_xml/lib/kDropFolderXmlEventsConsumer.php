@@ -255,7 +255,7 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 					$e->getCode() != DropFolderXmlBulkUploadPlugin::getErrorCodeCoreValue(DropFolderXmlBulkUploadErrorCode::MALFORMED_XML_FILE))
 					{
 						KalturaLog::err("Error in setContentResources - ".$e->getMessage());
-						$e = new Exception(DropFolderPlugin::ERROR_READING_FILE_MESSAGE.'['.$folder->path.'/'.$file->getFileName().']', DropFolderFileErrorCode::ERROR_READING_FILE, $e);
+						$e = new Exception(DropFolderPlugin::ERROR_READING_FILE_MESSAGE.'['.$folder->getPath().'/'.$file->getFileName().']', DropFolderFileErrorCode::ERROR_READING_FILE, $e);
 					}
 				throw $e;
 			}
