@@ -406,6 +406,10 @@ class categoryPeer extends BasecategoryPeer
 	 */
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
+		if (!strlen(trim(($pk)))) {
+        	return null;
+        }
+        
 		if (null !== ($obj = categoryPeer::getInstanceFromPool((string) $pk))) {
 			return $obj;
 		}
