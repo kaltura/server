@@ -1260,7 +1260,7 @@ class kuser extends Basekuser implements IIndexable
 	 */
 	public function getPermissionNames ()
 	{
-		$permissionNames  = "";
+		$permissionNamesArray  = array();
 		if ($this->getRoleIds())
 		{
 			$roleIds = explode(",", $this->getRoleIds());
@@ -1269,11 +1269,11 @@ class kuser extends Basekuser implements IIndexable
 				$role = UserRolePeer::retrieveByPK($roleId);
 				$permissionNames = $role->getPermissionNames(null, true);
 				$permissionNames = str_replace("*", self::UNIVERSAL_PERMISSION, $permissionNames);
-				$permissionNames .= $permissionNames;
+				array_merge($permissionNamesArray, explode(",", $permissionNames));
 			}			
 		}		
 		
-		return self::getIndexedFieldValue('kuserPeer::PERMISSION_NAMES', $permissionNames, $this->getPartnerId());
+		return self::getIndexedFieldValue('kuserPeer::PERMISSION_NAMES', implode(',', $permissionNamesArray), $this->getPartnerId());
 	}	
 	
 	/**
