@@ -16,9 +16,10 @@
 class DropFolder extends BaseDropFolder
 {
 	
-	const AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE = 3;
+	const AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE = 0;
 	const FILE_SIZE_CHECK_INTERVAL_DEFAULT_VALUE = '600'; // 600 seconds = 10 minutes
 	const FILE_NAME_PATTERNS_DEFAULT_VALUE = '*';
+	const IGNORE_PATTERNS_DEFAULT_VALUE  = '*.cache,*.aspx';
 	
 	
 	// -------------------------------------
@@ -140,7 +141,12 @@ class DropFolder extends BaseDropFolder
 	 */
 	public function getIgnoreFileNamePatterns()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_IGNORE_FILE_NAME_PATTERNS);
+		$ignorePatterns = $this->getFromCustomData(self::CUSTOM_DATA_IGNORE_FILE_NAME_PATTERNS);
+		if($ignorePatterns)
+			$ignorePatterns = self::IGNORE_PATTERNS_DEFAULT_VALUE.','.$ignorePatterns;
+		else
+			$ignorePatterns = self::IGNORE_PATTERNS_DEFAULT_VALUE;
+		return $ignorePatterns;
 	}
 	
 	public function setIgnoreFileNamePatterns($patterns)
