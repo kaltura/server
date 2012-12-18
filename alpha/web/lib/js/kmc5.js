@@ -1051,7 +1051,7 @@ kmc.preview_embed = {
 		embed_code = embed_code.replace("{NAME}", name);
 		embed_code = embed_code.replace("{DESCRIPTION}", description);
 		embed_code = embed_code.replace("{SCRIPT_URL}", script_url); 
-		embed_code = embed_code.replace("{EMBED_OBJECT}", JSON.stringify(embedObject));
+		embed_code = embed_code.replace("{EMBED_OBJECT}", JSON.stringify(embedObject, null, 2));
 		
 		if( https_support ) {
 			embed_code = embed_code.replace(/http:/g, "https:");
