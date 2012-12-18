@@ -461,6 +461,8 @@ class KalturaClientBase
 			throw new KalturaClientException("Uploading files is not supported with stream context http request, please use curl", KalturaClientException::ERROR_UPLOAD_NOT_SUPPORTED);
 			
 		$formattedData = http_build_query($params , "", "&");
+		$this->log("post: $url&$formattedData");
+		
 		$params = array('http' => array(
 					"method" => "POST",
 					"User-Agent: " . $this->config->userAgent . "\r\n".
