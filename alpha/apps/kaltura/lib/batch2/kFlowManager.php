@@ -549,6 +549,13 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		)
 			return true;
 			
+			
+		if ($object instanceof UserRole
+			&& in_array(UserRolePeer::PERMISSION_NAMES, $modifiedColumns))
+			{
+				return true;
+			}
+			
 		return false;
 	}
 
@@ -627,6 +634,14 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				$entry->setStatus(entryStatus::PENDING); // we change the entry to pending
 				$entry->save();
 			}
+		}
+		
+		if ($object instanceof UserRole
+			&& in_array(UserRolePeer::PERMISSION_NAMES, $modifiedColumns))
+		{
+			$filter = new kuserFilter();
+			$filter->set('_eq_role_ids', $object->getId());
+			kJobsManager::addIndexJob($object->getPartnerId(), IndexObjectType::USER, $filter, false);
 		}
 		
 		return true;
