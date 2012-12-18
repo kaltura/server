@@ -14,8 +14,11 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 		$itemXpathsToExtend = isset($properties['itemXpathsToExtend']) && is_array($properties['itemXpathsToExtend']) ? $properties['itemXpathsToExtend'] : array();
 		foreach($itemXpathsToExtend as &$val)
 		{
-			$temp = new Kaltura_Client_Type_String();
-			$temp->value = $val;
+			$temp = new Kaltura_Client_Type_ExtendingItemMrssParameter();
+			$temp->xpath = $val;
+			$temp->identifier = new Kaltura_Client_Type_EntryIdentifier();
+			$temp->identifier->extendedFeatures = "";
+			$temp->extensionMode = Kaltura_Client_Enum_MrssExtensionMode::APPEND;
 			$val = $temp;
 		}
 		$object->itemXpathsToExtend = $itemXpathsToExtend;
@@ -48,7 +51,7 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 	protected function addItemXpathsToExtend($itemXpathsToExtend)
 	{
 		if (count($itemXpathsToExtend) == 0)
-			$itemXpathsToExtend = array(new Kaltura_Client_Type_String());
+			$itemXpathsToExtend = array(new Kaltura_Client_Type_ExtendingItemMrssParameter());
 			
 		$mainSubForm = new Zend_Form_SubForm();
 		$mainSubForm->setLegend('Item XPaths To Extend');
@@ -62,8 +65,9 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 		));
 		
 		$i = 1;
-		foreach($itemXpathsToExtend as $stringObject)
+		foreach($itemXpathsToExtend as $itemXPath)
 		{
+			/* @var $itemXPath Kaltura_Client_Type_ExtendingItemMrssParameter */
 			$subForm = new Zend_Form_SubForm(array('disableLoadDefaultDecorators' => true));
 			$subForm->setDecorators(array(
 				'FormElements',
@@ -71,7 +75,7 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 			$subForm->addElement('text', 'itemXpathsToExtend', array(
 				'decorators' => array('ViewHelper', array('HtmlTag', array('tag' => 'div'))),
 				'isArray' => true,
-				'value' => $stringObject->value
+				'value' => $itemXPath->xpath
 			));
 			
 			$mainSubForm->addSubForm($subForm, 'itemXpathsToExtend_subform_'.$i++);
