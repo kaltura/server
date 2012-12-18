@@ -583,5 +583,34 @@ class UserService extends KalturaBaseUserService
 		$apiUser->fromObject($user);
 		return $apiUser;
 	}
+	
+	/**
+	 * Index an entry by id.
+	 * 
+	 * @action index
+	 * @param string $id
+	 * @param bool $shouldUpdate
+	 * @return int entry int id
+	 * @throws KalturaErrors::USER_NOT_FOUND
+	 */
+	function indexAction($id, $shouldUpdate = true)
+	{
+		$kuser = kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $id);
+		
+		if (!$kuser)
+			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+
+		if (!$shouldUpdate)
+		{
+			$kuser->setUpdatedAt(time());
+			$kuser->save();
+			return $kuser->getPuserId();
+		}
+		
+		$kuser->indexToSearchIndex();
+			
+		return $kuser->getPuserId();
+	}
+
 
 }
