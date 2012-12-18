@@ -10,4 +10,5 @@ interface IndexObjectType extends BaseEnum
 	const CATEGORY_ENTRY = 3;
 	const ENTRY = 4;
 	const CATEGORY_USER = 5;
+	const USER = 6;
 }
