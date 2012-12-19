@@ -97,6 +97,8 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 	private function onBulkUploadJobStatusUpdated(BatchJob $dbBatchJob)
 	{
 		$xmlDropFolderFile = DropFolderFilePeer::retrieveByPK($dbBatchJob->getObjectId());
+		if(!$xmlDropFolderFile)
+			return;		
 		KalturaLog::debug('object id '.$dbBatchJob->getObjectId());
 		switch($dbBatchJob->getStatus())
 		{
@@ -407,6 +409,7 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 			$data->setFileName($leadDropFolderFile->getFileName());
 						
 			$objectData = new kBulkUploadEntryData();
+			KalturaLog::debug('conversion profile id: '.$folder->getConversionProfileId());
 			$objectData->setConversionProfileId($folder->getConversionProfileId());
 			$data->setObjectData($objectData);
 	
