@@ -554,10 +554,15 @@ class kBusinessPreConvertDL
 		$hasInvalidRequired = false;
 		foreach($cdl->_targetList as $flavor)
 		{
-			// overwrite ready behavior from the conversion profile
+				// Get conv.prof data for that flavor
 			$flavorParamsConversionProfile = $conversionProfileFlavorParams[$flavor->getFlavorParamsId()];
-			$flavor->_force = $flavorParamsConversionProfile->getForceNoneComplied();
-			
+
+				// Update force-transcode flag. 
+				// This flag might be set by the DL, therefore overide only if it is not set.
+			if(!$flavor->_force) {
+				$flavor->_force = $flavorParamsConversionProfile->getForceNoneComplied();
+			}
+				// Overwrite ready behavior from the conversion profile
 			if($flavorParamsConversionProfile->getReadyBehavior() != flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT)
 				$flavor->setReadyBehavior($flavorParamsConversionProfile->getReadyBehavior());	
 
