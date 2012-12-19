@@ -70,7 +70,7 @@ class kEmailNotificationCategoryRecipientProvider extends kEmailNotificationReci
 	/**
 	 * @param categoryKuserFilter $categoryUserFilter
 	 */
-	public function setCategoryUserFilter($categoryUserFilter) {
+	public function setCategoryUserFilter(categoryKuserFilter $categoryUserFilter) {
 		$this->categoryUserFilter = $categoryUserFilter;
 	}
 }
