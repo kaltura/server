@@ -12,6 +12,7 @@ class KDLFlavor extends KDLMediaDataSet {
 	const BitrateNonComplyFlagBit = 2;
 	const MissingContentNonComplyFlagBit = 4;
 	const ForceCommandLineFlagBit = 8;
+	const ForceTranscodingFlagBit = 16;
 
 	/* ---------------------
 	 * Data
@@ -335,6 +336,14 @@ $plannedDur = 0;
 	}
 
 	/* ------------------------------
+	 * IsForceTranscoding
+	 */
+	public function IsForceTranscoding()
+	{
+		return ( ($this->_flags & KDLFlavor::ForceTranscodingFlagBit));
+	}
+
+	/* ------------------------------
 	 * IsInArray
 	 */
 	public function IsInArray(array $arr)
@@ -445,11 +454,6 @@ $plannedDur = 0;
 						KDLWarnings::ToString(KDLWarnings::ChangingFormt, $target->_container->_id, KDLContainerTarget::WMA);
 					$target->_container->_id=KDLContainerTarget::WMA;
 				}
-			/*
-			 	$target->_flags = $this->_flags | self::MissingContentNonComplyFlagBit;
-				$target->_warnings[KDLConstants::VideoIndex][] = // "The target flavor bitrate {".$target->_video->_bitRate."} does not comply with the requested bitrate (".$this->_video->_bitRate.").";
-				KDLWarnings::ToString(KDLWarnings::MissingMediaStream);
-			*/
 			}
 		}
 
@@ -458,14 +462,8 @@ $plannedDur = 0;
 			if($source->_audio!=""){
 				$target->_audio = $this->evaluateTargetAudio($source->_audio, $target);
 			}
-			/*
-			 else {
-				$target->_flags = $this->_flags | self::MissingContentNonComplyFlagBit;
-				$target->_warnings[KDLConstants::AudioIndex][] = // "The target flavor bitrate {".$target->_video->_bitRate."} does not comply with the requested bitrate (".$this->_video->_bitRate.").";
-				KDLWarnings::ToString(KDLWarnings::MissingMediaStream);
-				}
-				*/
 		}
+		
 		return $target;
 	}
 
@@ -676,7 +674,7 @@ $plannedDur = 0;
 		 * - if the frame size is an 'industry-standard', skip x16 constraint 
 		 */
 		if((isset($target->_forceMult16) && $target->_forceMult16==0)
-		|| ($target->_width==640 && $target->_height==360)){
+		|| (($target->_width == 640 || $target->_width == 480) && $target->_height==360)){
 			;
 		}
 		else {
