@@ -22,7 +22,7 @@ class kEmailNotificationUserRecipientProvider extends kEmailNotificationRecipien
 	/**
 	 * @param kuserFilter $filter
 	 */
-	public function setFilter($filter) {
+	public function setFilter(kuserFilter $filter) {
 		$this->filter = $filter;
 	}
 	
