@@ -59,6 +59,11 @@ class sftpMgr extends kFileTransferMgr
 	private $cmdPutMinimumFileSize = 1048576; // 1024 * 1024
 	
 	/**
+	 * @var string
+	 */
+	private $tmpDir = null;
+	
+	/**
 	 * Instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	 * Supported options:
 	 * - useCmd - indicates that sftp CLI should be used for GET and PUT actions.
@@ -70,6 +75,8 @@ class sftpMgr extends kFileTransferMgr
 	{
 		parent::__construct($options);
 		
+		$this->tmpDir = sys_get_temp_dir();
+		
 		if($options)
 		{
 			if(isset($options['useCmd']))
@@ -80,6 +87,9 @@ class sftpMgr extends kFileTransferMgr
 			
 			if(isset($options['cmdPutMinimumFileSize']))
 				$this->cmdPutMinimumFileSize = $options['cmdPutMinimumFileSize'];
+			
+			if(isset($options['tmpDir']))
+				$this->tmpDir = $options['tmpDir'];
 		}
 	}
 	
@@ -239,7 +249,14 @@ class sftpMgr extends kFileTransferMgr
 	protected function doGetFile($remoteFile, $localFile = null)
 	{
 		if($this->useCmd && !$this->passphrase)
-			return $this->execSftpCommand("get $remoteFile $localFile");
+		{
+			if($localFile)
+				return $this->execSftpCommand("get $remoteFile $localFile");
+				
+			$localFile = tempnam($this->tmpDir, 'sftp.download.');
+			if($this->execSftpCommand("get $remoteFile $localFile"))
+				return file_get_contents($localFile);
+		}
 			
 		$sftp = $this->getSftpConnection();
 		$absolutePath = trim($remoteFile, '/');

@@ -447,6 +447,9 @@ abstract class kFileTransferMgr
 		else
 		{
 			KalturaLog::debug("File retrieved successfully");
+			if(is_null($local_file))
+				return $res;
+				
 			return self::FILETRANSFERMGR_RES_OK;
 		}
 	}
