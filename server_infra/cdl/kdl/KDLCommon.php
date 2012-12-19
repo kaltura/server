@@ -21,7 +21,7 @@
 		const BitrateH263Factor = 1.0;
 		const BitrateVP6Factor = 1.5;
 		const BitrateH264Factor = 2.0;
-		const BitrateScreencastFactor = 3.0;
+		const BitrateScreencastFactor = 8.0;
 		const BitrateOthersRatio = 1.3;
 		
 		static $BitrateFactorCategory1 = array(KDLVideoTarget::H263,KDLVideoTarget::FLV, "h263", "h.263", "s263", "flv1", "theora");
@@ -32,7 +32,8 @@
 											   KDLVideoTarget::VP8,
 											   "h264", "h.264", "x264", "avc1", "wvc1",
 											   "avc", "wmv3", "wmva", "rv40", "realvideo4", "rv30", "realvideo3");
-		static $BitrateFactorCategory4 = array("g2m3", "g2m4", "gotomeeting3", "gotomeeting4", "gotomeeting", "tsc2", "tscc", "techsmith");
+		static $BitrateFactorCategory4 = array("g2m3", "g2m4", "gotomeeting3", "gotomeeting4", "gotomeeting", 
+												"tsc2", "tscc", "techsmith", "mss1", "mss2");
 		
 		public static function NormalizeSourceToTarget($sourceCodec, $sourceBitrate, $targetCodec)
 		{
