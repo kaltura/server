@@ -196,6 +196,9 @@ class KDLWrap
 		else {
 			$flavor->_isNonComply = false;
 		}
+		
+		$flavor->_force = $target->IsForceTranscoding()? true: false;
+		
 		if($target->_clipStart)
 			$flavor->setClipOffset($target->_clipStart);
 		if($target->_clipDur)
