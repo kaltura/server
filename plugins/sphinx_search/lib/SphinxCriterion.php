@@ -394,7 +394,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				KalturaLog::debug("Simplifying expression [$attributesClause] => [{$expSimplifications[$attributesClause]}]");
 				
 				// We move it to the 'where' since where is allegedly faster than in the condition.
-				$where = $this->getSelfConjunction() . $expSimplifications[$attributesClause];
+				$where = $this->getConjunction() . $expSimplifications[$attributesClause];
 				KalturaLog::debug("Add where criterion[$field] as sphinx field[$sphinxField] of type [$type] where [$where] line [" . __LINE__ . "]");
 				$query->addWhere($where);
 			}
@@ -403,7 +403,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				if($this->needsBrackets())
 					$attributesClause = "($attributesClause)";
 					
-				$condition = $this->getSelfConjunction() . $attributesClause;
+				$condition = $this->getConjunction() . $attributesClause;
 				KalturaLog::debug("Add condition criterion[$field] as sphinx field[$sphinxField] of type [$type] condition [$condition] line [" . __LINE__ . "]");
 				$query->addCondition($condition);
 			}
