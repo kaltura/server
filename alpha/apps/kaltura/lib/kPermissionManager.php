@@ -269,6 +269,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				KalturaLog::debug('IP in range, adding ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS permission');		
 				$alwaysAllowedInternal = array(PermissionName::ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS);
 				$tmpPermissionNames = array_merge($tmpPermissionNames, $alwaysAllowedInternal);
+				kApiCache::disableCache();
 			}		
 		}			
 		
