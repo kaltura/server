@@ -9,6 +9,7 @@ kmc.vars.help_url = kmc.vars.service_url + '/kmc5help.html';
 
 // Set base URL
 kmc.vars.base_url = window.location.protocol + '//' + window.location.hostname;
+kmc.vars.api_url = window.location.protocol + '//' + kmc.vars.host;
 
 // Log function
 kmc.log = function() {
@@ -51,7 +52,8 @@ kmc.vars.DeliveryTypeStorage = [
 		label: 'Kaltura Auto',
 		flashvars: {
 			"streamerType": "auto"
-		}
+		},
+		minVersion: 'v3.6.14'
 	},
 	{
 		id: 'http',
@@ -82,7 +84,8 @@ kmc.vars.DeliveryTypeStorage = [
 		label: 'HTTP Streaming (HDS)',
 		flashvars: {
 			"streamerType": "hds"
-		}
+		},
+		minVersion: 'v3.6.14'
 	},
 	{
 		id: 'rtmp',
@@ -674,7 +677,7 @@ kmc.preview_embed = {
 		id_type = is_playlist ? "Playlist " + (id == "multitab_playlist" ? "Name" : "ID") : "Embedding",
 		uiconf_details = kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist);
 
-		if( live_bitrates ) {kmc.vars.embed_code_delivery_type = "http";} // Reset delivery type to http
+		if( live_bitrates ) {kmc.vars.last_delivery_type = "auto";} // Reset delivery type to http
 
 		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id, true);
 		preview_player = embed_code.replace('{FLAVOR}','ks=' + kmc.vars.ks + '&');
@@ -690,7 +693,7 @@ kmc.preview_embed = {
 		var modal_content = ((live_bitrates) ? kmc.preview_embed.buildLiveBitrates(name,live_bitrates) : '') +
 		'<div id="player_wrap">' + preview_player + '</div><div id="preview_embed">' +
 		((id == "multitab_playlist") ? '' : kmc.preview_embed.buildSelect(is_playlist, uiconf_id)) +
-		((live_bitrates) ? '' : kmc.preview_embed.buildRtmpOptions()) + embedOptions + 
+		((live_bitrates) ? '' : kmc.preview_embed.buildRtmpOptions(uiconf_details, is_playlist)) + embedOptions + 
 		kmc.preview_embed.previewUrl(id, name, is_playlist, kmc.vars.partner_id, uiconf_id) + 
 		'<div class="item embed_code clearfix"><div class="label">Embed Code</div> <textarea id="embed_code" readonly="true">' + embed_code + '</textarea></div>' +
 		'</div><div id="embed_code_button"><div id="copy_msg">Press Ctrl+C to copy embed code (Command+C on Mac)</div>' +
@@ -715,7 +718,7 @@ kmc.preview_embed = {
 		});
 
 		$("#delivery_type").change(function(){
-			kmc.vars.embed_code_delivery_type = this.value;
+			kmc.vars.last_delivery_type = this.value;
 			kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, is_video);
 		});
 		$('#embed_types').change(function(){
@@ -747,7 +750,7 @@ kmc.preview_embed = {
 
 	getDeliveryTypeFlashvars: function( id ) {
 		var fv = {};
-		$.each(kmc.preview_embed.getValidDeliveryTypes(), function() {
+		$.each(kmc.vars.DeliveryTypeStorage, function() {
 			if( this.id == id ) {
 				fv = this.flashvars;
 				return false;
@@ -756,22 +759,59 @@ kmc.preview_embed = {
 		return fv;
 	},
 
-	getValidDeliveryTypes: function() {
+	getDefaultDeliveryType: function( uiconf, is_playlist ) {
+		var types = kmc.preview_embed.getValidDeliveryTypes(uiconf, is_playlist);
+
+		var defaultType = 'http';
+		if( kmc.vars.last_delivery_type ) {
+			return kmc.vars.last_delivery_type;
+		} else {
+			$.each(types, function() {
+				if(this.id == kmc.vars.default_delivery_type){
+					defaultType = this.id;
+					return false;
+				}
+			});
+		}
+		return defaultType;
+	},
+
+	getValidDeliveryTypes: function( uiconf, is_playlist ) {
+		// Get uiConf by Id
+		if( typeof uiconf !== 'object' ) {
+			uiconf = kmc.preview_embed.getUiconfDetails(uiconf,is_playlist);
+		}
+
+		var clearLastDeliveryType = function( id ) {
+			if( kmc.vars.last_delivery_type == id ) { 
+				kmc.vars.last_delivery_type = null;
+			}
+		};
+
 		var validArray = [];
 
 		$.each(kmc.vars.DeliveryTypeStorage, function() {
 			if( (this.id == 'akamai' || this.id == 'akamai_v2' ) && kmc.vars.hide_akamai_hd_network ) {
+				clearLastDeliveryType(this.id);
 				return true;
 			}
 			if( this.id == 'akamai' && kmc.vars.has_v2_flavors ) {
+				clearLastDeliveryType(this.id);
 				return true;
 			}
 			if( this.id == 'akamai_v2' && ! kmc.vars.has_v2_flavors ) {
+				clearLastDeliveryType(this.id);
 				return true;
 			}
+
+			var swfVersion = uiconf.swf_version;
+			if( this.minVersion && ! kmc.functions.versionIsAtLeast(this.minVersion, swfVersion) ) {
+				clearLastDeliveryType(this.id);
+				return true;
+			}
+
 			validArray.push(this);
 		});
-
 		return validArray;
 	},
 
@@ -852,13 +892,13 @@ kmc.preview_embed = {
 		return lbr_data;
 	},
 
-	buildRtmpOptions : function() {
+	buildRtmpOptions : function(uiconf, is_playlist) {
 		var selected = ' selected="selected"';
-		var delivery_type = kmc.vars.embed_code_delivery_type || "http";
+		var delivery_type = kmc.preview_embed.getDefaultDeliveryType(uiconf, is_playlist);
 		var html = '<div class="clearfix"><div id="rtmp" class="label">Select Delivery Type:</div> <select id="delivery_type">';
 		var options = '';
 
-		$.each(kmc.preview_embed.getValidDeliveryTypes(), function(){
+		$.each(kmc.preview_embed.getValidDeliveryTypes(uiconf, is_playlist), function(){
 			var selected = (delivery_type == this.id) ? 'selected="selected"' : '';
 			options += '<option value="' + this.id + '"' + selected + '>' + this.label + '</option>';
 		});
@@ -911,6 +951,7 @@ kmc.preview_embed = {
 	
 	previewUrl: function(entry_id, name, is_playlist, partner_id, uiconf_id){
 		var embed_type = kmc.preview_embed.getDefaultEmbedType(uiconf_id, is_playlist);
+		var delivery_type = kmc.preview_embed.getDefaultDeliveryType(uiconf_id, is_playlist);
 		var update_html = '<img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...';
 		if( $(".preview_url").length ) {
 			$(".preview_url").html( update_html );
@@ -923,7 +964,7 @@ kmc.preview_embed = {
 		} else {
 			long_url += '/entry_id/' + entry_id;
 		}
-		long_url += '/delivery/' + kmc.vars.embed_code_delivery_type + '/embed/' + embed_type;
+		long_url += '/delivery/' + delivery_type + '/embed/' + embed_type;
 		kmc.client.setShortURL(long_url);
 		
 		return '<div class="item preview_link"><div class="label_text">View a standalone page with this player: &nbsp;<span class="preview_url">' + update_html + '</span></div></div>';
@@ -1002,8 +1043,8 @@ kmc.preview_embed = {
 		// Add SEO Atts
 		embed_code = embed_code.replace("{SEO_ATTS}", (kmc.vars.ignore_entry_seo ? "" : kmc.preview_embed.embed_code_template.media_seo_atts));
 
-		kmc.vars.embed_code_delivery_type = kmc.vars.embed_code_delivery_type || "http";
-		$.extend(flashVars, kmc.preview_embed.getDeliveryTypeFlashvars( kmc.vars.embed_code_delivery_type ));
+		var delivery_type = kmc.preview_embed.getDefaultDeliveryType(uiconf_details, is_playlist);
+		$.extend(flashVars, kmc.preview_embed.getDeliveryTypeFlashvars( delivery_type ));
 
 		if(is_playlist && id != "multitab_playlist") {	// playlist (not multitab)
 			embed_code = embed_code.replace(/{ENTRY_ID}/g,"");
@@ -1167,7 +1208,7 @@ kmc.preview_embed = {
 
 kmc.client = {
 	makeRequest: function( service, action, params, callback ) {
-		var serviceUrl = kmc.vars.base_url + '/api_v3/index.php?service='+service+'&action='+action;
+		var serviceUrl = kmc.vars.api_url + '/api_v3/index.php?service='+service+'&action='+action;
 		var defaultParams = {
 			"ks"		: kmc.vars.ks,
 			"format"	: 1			
