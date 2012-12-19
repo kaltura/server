@@ -105,14 +105,14 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 		if(!($object instanceof KalturaBaseEntry))
 			return;
 			
-		if(empty($item->distribution))
+		if(empty($item->distributions))
 			return;
 			
-		foreach($item->distribution as $distribution)
+		foreach($item->distributions->distribution as $distribution)
 			$this->handleDistribution($object->id, $distribution);
 	}
 	
-	public function handleDistribution($entryId, SimpleXMLElement $distribution)
+	protected function handleDistribution($entryId, SimpleXMLElement $distribution)
 	{
 		$distributionProfileId = null;
 		if(!empty($distribution->distributionProfileId))
@@ -122,7 +122,7 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 			$distributionProfileId = $this->getDistributionProfileId($distribution->distributionProfile, $distribution->distributionProvider);
 				
 		if(!$distributionProfileId)
-			throw new KalturaBatchException("Missing custom data distributionProfile attribute", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
+			throw new KalturaBatchException("Unable to retrieve distributionProfileId value", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		
 		$distributionPlugin = KalturaContentDistributionClientPlugin::get($this->xmlBulkUploadEngine->getClient());
 		
