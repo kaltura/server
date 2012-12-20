@@ -412,8 +412,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 			$child->setRootJobId($this->id);
 		}
 		
-		$child->save();
-		
 		return $child;
 	}
 
