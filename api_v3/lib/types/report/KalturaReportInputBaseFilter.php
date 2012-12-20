@@ -45,8 +45,8 @@ class KalturaReportInputBaseFilter extends KalturaObject
 			$reportInputFilter = new reportsInputFilter();
 		
 		if ($this->fromDay && $this->toDay) {
-			$reportInputFilter->from_date = date('Y-m-d 00:00:00', strtotime($this->fromDay));
-			$reportInputFilter->to_date = date('Y-m-d 23:59:59', strtotime($this->toDay));
+			$reportInputFilter->from_date = strtotime(date('Y-m-d 00:00:00', strtotime($this->fromDay)));
+			$reportInputFilter->to_date = strtotime(date('Y-m-d 23:59:59', strtotime($this->toDay)));
 			$reportInputFilter->from_day = $this->fromDay;
 			$reportInputFilter->to_day = $this->toDay;
 		} else if ($this->fromDate && $this->toDate) {
