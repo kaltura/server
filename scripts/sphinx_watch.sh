@@ -22,14 +22,13 @@ if [ -L $0 ];then
 else
 	REAL_SCRIPT=$0
 fi
-. `dirname $REAL_SCRIPT`/../../../configurations/system.ini
+. `dirname $REAL_SCRIPT`/../configurations/system.ini
 # Source function library.
 . $APP_DIR/scripts/functions
-exec="$BASE_DIR/bin/sphinx/searchd"
 prog="searchd"
 config="$APP_DIR/configurations/sphinx/kaltura.conf"
+exec="$BASE_DIR/bin/sphinx/searchd"
 
-lockfile=$BASE_DIR/sphinx/searchd.pid
 
 start() {
     [ -x $exec ] || exit 5
@@ -39,17 +38,16 @@ start() {
     daemon $exec --config $config
     retval=$?
     echo
-    [ $retval -eq 0 ] && touch $lockfile
     return $retval
 }
 
 stop() {
     echo -n $"Stopping $prog: "
     # stop it here, often "killproc $prog"
-    killproc $prog
+    $exec --config $config --stopwait 
     retval=$?
     echo
-    [ $retval -eq 0 ] && rm -f $lockfile
+    [ $retval -eq 0 ]
     return $retval
 }
 
