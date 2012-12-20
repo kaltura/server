@@ -275,7 +275,7 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 		KalturaLog::debug('Parsing content resources from Xml');
 		
 		$contentResources = array();
-		$fileTransferManager = kFileTransferMgr::getInstance($folder->getFileTransferMgrType());
+		$fileTransferManager = kFileTransferMgr::getInstance($folder->getFileTransferMgrType(), array('useCmd' => false));
 		$loginStatus = $folder->loginByCredentialsType($fileTransferManager);
 		
 		if($fileTransferManager->fileSize($folder->getPath().'/'.$file->getFileName()) > self::MAX_XML_FILE_SIZE)
