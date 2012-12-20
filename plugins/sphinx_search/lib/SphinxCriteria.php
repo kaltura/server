@@ -278,6 +278,14 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	}
 	
 	
+	/**
+	 * This function gets as input an array of arrays, and returns Cartesian product 
+	 * (all possible conmbinations between the different arrays)
+	 * For example, if the input is {(1,2,3) , (a,b) , (Apple)}
+	 * the output will be {(1,a,Apple), (1,b,Apple),(2,a,Apple), (2,b,Apple),(3,a,Apple), (3,b,Apple)}
+	 * 
+	 * @param array $input
+	 */
 	protected static function cartesian($input) {
 		$result = array();
 	

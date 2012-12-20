@@ -373,15 +373,8 @@ class kMetadataManager
 			foreach($searchItem as $searchPhrase)
 				$searchTexts[] = MetadataPlugin::PLUGIN_NAME . '_' . "$key $searchPhrase " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_' . $key;
 				
-		if(count($textItems))
-		{ 
-			$searchTexts['text'] = MetadataPlugin::PLUGIN_NAME . '_text';
-			$searchTexts['text'] .= ' ' . MetadataPlugin::PLUGIN_NAME . '_text_' + $metadata->getPartnerId();
-			$searchTexts['text'] .= ' ' . implode(' ', $textItems);
-			$searchTexts['text'] .= ' ' . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text_' +  + $metadata->getPartnerId();
-			$searchTexts['text'] .= ' ' . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
-		}
-		
+	 	if(count($textItems)) 
+	 		$searchTexts['text'] = MetadataSearchFilter::createSphinxSearchCondition($metadata->getPartnerId(), implode(' ', $textItems) , true);
 		
 		$ret = array();
 		foreach($searchTexts as $index => $value)

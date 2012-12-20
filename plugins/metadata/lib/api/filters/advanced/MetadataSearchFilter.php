@@ -260,19 +260,34 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		return $metadataField;
 	}
 	
-	protected function createSphinxExpanderCond($partnerScope = null, $text) {
+	public static function createSphinxSearchCondition($partnerId, $text, $isIndex = false) {
+		
+		 if($isIndex) {
+		 	$result = MetadataPlugin::PLUGIN_NAME . '_text' . ' ' . MetadataPlugin::PLUGIN_NAME . '_text_' . $partnerId
+		 			. ' ' . $text . ' ' 
+		 		. kMetadataManager::SEARCH_TEXT_SUFFIX . '_text_' . $partnerId . ' ' . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
+		 	return $result;
+		 } 
+		 
+		 if(is_null($partnerId))
+		 	return MetadataPlugin::PLUGIN_NAME . "_text << ( $text ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
+		 else
+		 	return MetadataPlugin::PLUGIN_NAME . "_text_{$partnerId} << ( $text ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_text_{$partnerId}";
+	}
+	
+	protected function createSphinxSearchPhrase($partnerScope = null, $text) {
+		
+		$prefix = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ';
 		
 		if(is_null($partnerScope) || (count($partnerScope) != 1)) {
-			return '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME .
-			"_text << ( $text ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
+			return $prefix . MetadataSearchFilter::createSphinxSearchCondition(null, $text, false);
 		}
 		
 		if($partnerScope == baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE) 
 			$partnerScope = kCurrentContext::getCurrentPartnerId();
 			
 			
-		return '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . 
-			"_text_{$partnerScope} << ( $text ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_text_{$partnerScope}";
+		return $prefix . MetadataSearchFilter::createSphinxSearchCondition($partnerScope, $text, false);
 	}
 	
 	
@@ -287,7 +302,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			$freeText = SphinxUtils::escapeString($freeText);
 			$freeText = "^$freeText$";
 			
-			$additionalConditions[] = $this->createSphinxExpanderCond($partnerScope, $freeTexts);
+			$additionalConditions[] = $this->createSphinxSearchPhrase($partnerScope, $freeTexts);
 			
 			return $additionalConditions;
 		}
@@ -304,7 +319,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			foreach($freeTextsArr as $freeText)
 			{
 				$freeText = SphinxUtils::escapeString($freeText);
-				$additionalConditions[] = $this->createSphinxExpanderCond($partnerScope, $freeText);
+				$additionalConditions[] = $this->createSphinxSearchPhrase($partnerScope, $freeText);
 			}
 			
 			return $additionalConditions;
@@ -318,7 +333,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		$freeTextsArr = array_unique($freeTextsArr);
 		$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
 		$freeTextExpr = SphinxUtils::escapeString($freeTextExpr);
-		$additionalConditions[] =  $this->createSphinxExpanderCond($partnerScope, $freeTextExpr);
+		$additionalConditions[] =  $this->createSphinxSearchPhrase($partnerScope, $freeTextExpr);
 		return $additionalConditions;
 	}
 	
