@@ -16,7 +16,6 @@ abstract class KalturaObjectIdentifier extends KalturaObject
 	
 	
 	private static $map_between_objects = array(
-			"extendedFeatures",
 		);
 	
 	/* (non-PHPdoc)
@@ -26,6 +25,20 @@ abstract class KalturaObjectIdentifier extends KalturaObject
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+	 */
+	public function toObject ($dbObject = null, $propsToSkip = null)
+	{
+		if (!$dbObject)
+		{
+			return null;
+		}
+		/* @var $dbObject kObjectIdentifier */		
+		$dbObject->setExtendedFeatures(explode(",", $this->extendedFeatures));
+		
+		return parent::toObject($dbObject, $propsToSkip);
+	}
 
 }
