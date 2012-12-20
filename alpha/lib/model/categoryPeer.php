@@ -406,7 +406,7 @@ class categoryPeer extends BasecategoryPeer
 	 */
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
-		if (!strlen(trim(($pk)))) {
+		if (!strlen(trim($pk))) {
         	return null;
         }
         
