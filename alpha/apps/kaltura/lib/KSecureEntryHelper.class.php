@@ -46,9 +46,9 @@ class KSecureEntryHelper
 	private $disableCache;
 	
 	/**
-	 * @var accessControlScope
+	 * @var array
 	 */
-	private $accessControlScope;
+	private $hashes;
 	
 	/**
 	 * 
@@ -304,20 +304,19 @@ class KSecureEntryHelper
 	
 	private function getAccessControlScope()
 	{
-		if (!$this->accessControlScope)
-		{
-			$this->accessControlScope = new accessControlScope();
-			if ($this->referrer)
-				$this->accessControlScope->setReferrer($this->referrer);
-			$this->accessControlScope->setKs($this->ks);
-			$this->accessControlScope->setEntryId($this->entry->getId());
-			$this->accessControlScope->setContexts($this->contexts);
-		}
-		return $this->accessControlScope;
+		$accessControlScope = new accessControlScope();
+		if ($this->referrer)
+			$accessControlScope->setReferrer($this->referrer);
+		$accessControlScope->setKs($this->ks);
+		$$accessControlScope->setEntryId($this->entry->getId());
+		$accessControlScope->setContexts($this->contexts);
+		$accessControlScope->setHashes($this->hashes);
+		
+		return $accessControlScope;
 	}
 
-	public function setAccessControlScope (accessControlScope $accessControlScope)
+	public function setHashes (array $hashes)
 	{
-		$this->accessControlScope = $accessControlScope;
+		$this->hashes = $hashes;
 	}
 }
