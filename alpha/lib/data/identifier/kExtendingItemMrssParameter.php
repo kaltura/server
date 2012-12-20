@@ -11,7 +11,7 @@ class kExtendingItemMrssParameter
 	protected $xpath;
 	
 	/**
-	 * @var KObject
+	 * @var kObjectIdentifier
 	 */
 	protected $identifier;
 	

@@ -9,8 +9,7 @@ abstract class KalturaObjectIdentifier extends KalturaObject
 {
 	/**
 	 * Comma separated string of enum values denoting which features of the item need to be included in the MRSS 
-	 * @dynamicType KalturaObjectFeatureType
-	 * @var string
+	 * @var KalturaExtendedFeaturesArray
 	 */
 	public $extendedFeatures;
 	

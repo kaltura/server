@@ -11,7 +11,7 @@ abstract class kObjectIdentifier
 	protected $identifier;
 	
 	/**
-	 * @var string
+	 * @var array
 	 */
 	protected $extendedFeatures;
 	
