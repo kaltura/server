@@ -171,7 +171,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	protected function handleSubmit(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
 	{
 		$entryId = $data->entryDistribution->entryId;
-		$entry = $this->kalturaClient->media->get($entryId);
+		$entry = $this->getEntry($data->entryDistribution->partnerId, $entryId);
 
 		$videoFilePath = $providerData->videoAssetFilePath;
 		if (!$videoFilePath)
@@ -246,7 +246,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	protected function handleUpdate(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
 	{
 		$entryId = $data->entryDistribution->entryId;
-		$entry = $this->kalturaClient->media->get($entryId);
+		$entry = $this->getEntry($data->entryDistribution->partnerId, $entryId);
 
 		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $providerData);
 		$feed->setAction('Update');
