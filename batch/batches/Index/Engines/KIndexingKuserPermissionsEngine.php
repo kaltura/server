@@ -16,6 +16,7 @@ class KIndexingKuserPermissionsEngine extends KIndexingEngine
 	{
 		$filter->orderBy = KalturaBaseEntryOrderBy::CREATED_AT_ASC;
 		
+		$this->impersonate();
 		$usersList = $this->client->user->listAction($filter, $this->pager);
 		if(!count($usersList->objects))
 			return 0;
@@ -26,6 +27,7 @@ class KIndexingKuserPermissionsEngine extends KIndexingEngine
 			$this->client->user->index($user->id, $shouldUpdate);
 		}
 		$results = $this->client->doMultiRequest();
+		$this->unimpersonate();
 		foreach($results as $index => $result)
 			if(!is_int($result))
 				unset($results[$index]);
