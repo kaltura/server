@@ -8,8 +8,9 @@ class KIndexingKuserPermissionsEngine extends KIndexingEngine
 	/* (non-PHPdoc)
 	 * @see KIndexingEngine::index()
 	 */
-	protected function index(KalturaFilter $filter, $shouldUpdate) {
-		$this->indexPermissionsForUsers ();
+	protected function index(KalturaFilter $filter, $shouldUpdate) 
+	{
+		$this->indexPermissionsForUsers ($filter, $shouldUpdate);
 	}
 
 	protected function indexPermissionsForUsers (KalturaFilter $filter, $shouldUpdate)
