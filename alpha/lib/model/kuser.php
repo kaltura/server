@@ -1161,7 +1161,7 @@ class kuser extends Basekuser implements IIndexable
                 "puser_id" => "puserId",
                 "indexed_partner_data_int" => "indexedPartnerDataInt",
                 "indexed_partner_data_string" => "indexedPartnerDataString",
-    			"permission_names"	=> "permissionNames",
+    			"permission_names"	=> "indexedPermissionNames",
     			"role_ids"	=> "indexedRoleIds",
        		 );
     	}
@@ -1258,7 +1258,7 @@ class kuser extends Basekuser implements IIndexable
 	 * Getter returns the indexed version of the permission names on the role of the kuser separated by commas
 	 * @return string
 	 */
-	public function getPermissionNames ()
+	public function getIndexedPermissionNames ()
 	{
 		$permissionNamesArray  = array();
 		if ($this->getRoleIds())
