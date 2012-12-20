@@ -64,6 +64,10 @@ class KalturaIndexJobData extends KalturaJobData
 			case 'categoryKuserFilter':
 				$this->filter = new KalturaCategoryUserFilter();
 				break;
+			
+			case 'kuserFilter':
+				$this->filter = new KalturaUserFilter();
+				break;
 				
 			default:
 				$this->filter = KalturaPluginManager::loadObject('KalturaFilter', $filterType);
