@@ -203,11 +203,16 @@ class SphinxKuserCriteria extends SphinxCriteria
 		}
 		if ($filter->get('_mlikeand_permission_names'))
 		{
-			$filter->set('_mlikeand_permission_names', kuser::getIndexedFieldValue('kuserPeer::PERMISSION_NAMES', $filter->get('_mlikeand_permission_names'), kCurrentContext::getCurrentPartnerId()));
+			$permissionNames = kuser::getIndexedFieldValue('kuserPeer::PERMISSION_NAMES', $filter->get('_mlikeand_permission_names'), kCurrentContext::getCurrentPartnerId());
+			$permissionNames = implode(' ', explode(',', $permissionNames));
+			$universalPermissionName = kuser::getIndexedFieldValue('kuserPeer::PERMISSION_NAMES', kuser::UNIVERSAL_PERMISSION, kCurrentContext::getCurrentPartnerId());
+			$value = "($universalPermissionName | ($permissionNames))";
+			$this->addMatch("@permission_names $value");
+			$filter->unsetByName('_mlikeand_permission_names');
 		}
 		if ($filter->get('_mlikeor_permission_names'))
 		{
-			$filter->set('_mlikeor_permission_names', kuser::getIndexedFieldValue('kuserPeer::PERMISSION_NAMES', $filter->get('_mlikeor_permission_names'), kCurrentContext::getCurrentPartnerId()));
+			$filter->set('_mlikeor_permission_names', kuser::getIndexedFieldValue('kuserPeer::PERMISSION_NAMES', $filter->get('_mlikeor_permission_names').','.kuser::UNIVERSAL_PERMISSION, kCurrentContext::getCurrentPartnerId()));
 		}
 		
 		if($filter->get('_likex_puser_id_or_screen_name'))
