@@ -70,6 +70,38 @@ class kFlowHelper
 	 * @param kImportJobData $data
 	 * @return BatchJob
 	 */
+	public static function handleImportRetried(BatchJob $dbBatchJob, kImportJobData $data)
+	{
+		KalturaLog::debug("Import retried, with file: " . $data->getDestFileLocalPath());
+
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
+			return $dbBatchJob;
+			
+		if(!$data->getFlavorAssetId())
+			return $dbBatchJob;
+			
+		$dbFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+		if($dbFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_ERROR)
+		{
+			$dbFlavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
+			$dbFlavorAsset->save();
+		}
+		
+		$dbEntry = $dbFlavorAsset->getentry();
+		if($dbEntry->getStatus() == entryStatus::ERROR_IMPORTING)
+		{
+			$dbEntry->setStatus(entryStatus::IMPORT);
+			$dbEntry->save();
+		}
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kImportJobData $data
+	 * @return BatchJob
+	 */
 	public static function handleImportFinished(BatchJob $dbBatchJob, kImportJobData $data)
 	{
 		KalturaLog::debug("Import finished, with file: " . $data->getDestFileLocalPath());
