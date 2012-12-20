@@ -35,6 +35,8 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 				$partnerId = $this->_getParam('partnerId');
 				$dropFolderType = $this->_getParam('type');
 				$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
+				$dropFolderForm->getElement('fileHandlerType')->setOptions(array('disabled'	=> 'disabled'));
+				$dropFolderForm->getElement('fileHandlerType')->setOptions(array('required'	=> false));
 				$action->view->formValid = $this->processForm($dropFolderForm, $request->getPost(), $dropFolderId);
 			}
 			else
@@ -48,6 +50,7 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 					$dropFolderType = $dropFolder->type;
 					$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
 					$dropFolderForm->populateFromObject($dropFolder, false);
+					$dropFolderForm->getElement('fileHandlerType')->setOptions(array('disabled'	=> 'disabled'));
 				}
 				else
 				{
