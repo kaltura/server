@@ -1269,7 +1269,7 @@ class kuser extends Basekuser implements IIndexable
 				$role = UserRolePeer::retrieveByPK($roleId);
 				$permissionNames = $role->getPermissionNames(null, true);
 				$permissionNames = str_replace("*", self::UNIVERSAL_PERMISSION, $permissionNames);
-				array_merge($permissionNamesArray, explode(",", $permissionNames));
+				$permissionNamesArray = array_merge($permissionNamesArray, explode(",", $permissionNames));
 			}			
 		}		
 		
@@ -1307,7 +1307,7 @@ class kuser extends Basekuser implements IIndexable
 		$fieldValuesArr = explode(',', $fieldValue);
 		foreach ($fieldValuesArr as &$singleValue)
 		{
-			$singleValue = self::PARTNER_INDEX_PREFIX . $partnerId . $prefix . $singleValue;
+			$singleValue = $partnerId . $prefix . $singleValue;
 		}
 		return implode(',', $fieldValuesArr);				
 	}

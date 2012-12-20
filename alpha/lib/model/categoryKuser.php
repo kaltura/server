@@ -365,13 +365,13 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		switch ($fieldName)
 		{
 			case categoryKuserPeer::STATUS:
-				return self::PARTNER_INDEX_PREFIX . $partnerId . self::STATUS_INDEX_PREFIX . $fieldValue;
+				return $partnerId . self::STATUS_INDEX_PREFIX . $fieldValue;
 				break;
 			case categoryKuserPeer::UPDATE_METHOD:
-				return self::PARTNER_INDEX_PREFIX . $partnerId . self::UPDATE_METHOD_INDEX_PREFIX . $fieldValue;
+				return $partnerId . self::UPDATE_METHOD_INDEX_PREFIX . $fieldValue;
 				break;
 			case categoryKuserPeer::PERMISSION_NAMES:
-				return self::PARTNER_INDEX_PREFIX . $partnerId . self::PERMISSION_NAME_INDEX_PREFIX . $fieldValue;
+				return $partnerId . self::PERMISSION_NAME_INDEX_PREFIX . $fieldValue;
 				break;
 			default:
 				return $fieldValue;
