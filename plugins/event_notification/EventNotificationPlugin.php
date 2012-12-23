@@ -231,6 +231,8 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 				case EventNotificationEventObjectType::WIDGET:
 					return 'widget';
 
+				case EventNotificationEventObjectType::CATEGORYENTRY:
+					return 'categoryEntry';
 			}
 		}
 			

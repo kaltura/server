@@ -37,4 +37,5 @@ interface EventNotificationEventObjectType extends BaseEnum
 	const USERLOGINDATA = 34;
 	const USERROLE = 35;
 	const WIDGET = 36;
+	const CATEGORYENTRY = 37;
 }
