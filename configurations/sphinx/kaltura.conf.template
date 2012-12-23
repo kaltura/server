@@ -55,6 +55,7 @@ index kaltura_entry
 	rt_field	 = entitled_kusers_edit
 	rt_field	 = entitled_kusers
 	rt_field	 = privacy_by_contexts
+    rt_field     = sphinx_match_optimizations
 	blend_chars	 = `, ~, !, @, U+23, $, %, ^, &, *, (, ), -, _, =, +, [, ], {, }, ;, :, ', \, |, /, ?, <, >
 	charset_type	 = utf-8
 	rt_mem_limit	 = 1024M
@@ -129,6 +130,7 @@ index kaltura_category
 	rt_field	 = privacy_context
 	rt_field	 = privacy_contexts
 	rt_field	 = privacy
+    rt_field     = sphinx_match_optimizations
 	rt_attr_bigint	 = sort_name
 	rt_attr_uint	 = members_count
 	rt_attr_uint	 = pending_members_count
