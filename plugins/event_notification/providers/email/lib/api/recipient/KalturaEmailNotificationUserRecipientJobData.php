@@ -40,6 +40,11 @@ class KalturaEmailNotificationUserRecipientJobData extends KalturaEmailNotificat
 		/* @var $dbObject kEmailNotificationStaticRecipientJobData */
 		parent::fromObject($dbObject);
 		$this->setProviderType();
+		if ($dbObject->getFilter())
+		{
+			$this->filter = new KaltruaUserFilter();
+			$this->filter->fromObject($dbObject->getFilter());
+		}
 	}
 
 	/* (non-PHPdoc)
