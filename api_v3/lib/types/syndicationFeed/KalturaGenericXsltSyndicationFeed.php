@@ -76,10 +76,16 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 			$itemXpaths = array();
 			foreach ($itemXpathsToExtend as $itemXPathToExtend)
 			{
-				/* @var $itemXPathToExtend kExtendingItemMrssParameter */
-				$itemXpaths[] = $itemXPathToExtend->getXpath();
+				$itemXPath = new kExtendingItemMrssParameter();
+				$itemXPath->setXpath($itemXPathToExtend);
+				$itemXPath->setExtensionMode(MrssExtensionMode::APPEND);
+				$identifier = new kEntryIdentifier();
+				$identifier->setExtendedFeatures("");
+				$identifier->setIdentifier(EntryIdentifierField::ID);
+				$itemXPath->setIdentifier($identifier);
+				$itemXpaths[] = $itemXPath;
 			}
-			$mrssParams->setItemXpathsToExtend($itemXPathToExtend);
+			$mrssParams->setItemXpathsToExtend($itemXpaths);
 		}
 		
 		$dbObject->setMrssParameters($mrssParams);
