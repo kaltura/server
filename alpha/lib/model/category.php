@@ -544,7 +544,6 @@ class category extends Basecategory implements IIndexable
 	{
 		$filter = new categoryKuserFilter();
 		$filter->setCategoryIdEqual($categoryId);
-		$filter->setCategoryDirectMembers(true);
 
 		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 	}
