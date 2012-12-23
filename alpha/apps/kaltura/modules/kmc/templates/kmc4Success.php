@@ -55,9 +55,9 @@ if( count($allowedPartners) > 1 ) {
 			kcw_webcam_uiconf : "<?php echo $content_uiconfs_upload_webcam->getId(); ?>",
 			kcw_import_uiconf : "<?php echo $content_uiconfs_upload_import->getId(); ?>",
 			default_kdp		: {
+					id	: "<?php echo $content_uiconfs_flavorpreview->getId(); ?>",				
 					height		: "<?php echo $content_uiconfs_flavorpreview->getHeight(); ?>",
 					width		: "<?php echo $content_uiconfs_flavorpreview->getWidth(); ?>",
-					uiconf_id	: "<?php echo $content_uiconfs_flavorpreview->getId(); ?>",
 					swf_version	: "<?php echo $content_uiconfs_flavorpreview->getswfUrlVersion(); ?>"
 			},
 			clipapp : {

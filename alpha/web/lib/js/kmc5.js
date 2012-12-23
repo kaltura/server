@@ -841,6 +841,10 @@ kmc.preview_embed = {
 		};
 		// Go over embed code types
 		$.each(kmc.vars.EmbedCodeStorage, function(){
+			if( this.id == 'thumb' ) {
+				clearLastEmbedType(this.id);
+				return true;
+			}
 			// Don't add embed code that are entry only for playlists
 			if(is_playlist && this.entryOnly) {
 				clearLastEmbedType(this.id);
@@ -1203,8 +1207,9 @@ kmc.preview_embed = {
 };
 
 kmc.client = {
+	counter: 0,
 	makeRequest: function( service, action, params, callback ) {
-		var serviceUrl = kmc.vars.api_url + '/api_v3/index.php?service='+service+'&action='+action;
+		var serviceUrl = kmc.vars.base_url + '/api_v3/index.php?service='+service+'&action='+action;
 		var defaultParams = {
 			"ks"		: kmc.vars.ks,
 			"format"	: 1			
@@ -1239,7 +1244,7 @@ kmc.client = {
 		
 		var kalsig = getSignature( params );
 		serviceUrl += '&kalsig=' + kalsig;
-	
+
 		// Make request
 		$.ajax({
 			type: 'POST',
@@ -1264,7 +1269,7 @@ kmc.client = {
 		};
 		
 		kmc.client.makeRequest("shortlink_shortlink", "list", filter, function( res ) {
-			if(res.totalCount == 0) {
+			if(res && res.totalCount == 0) {
 				// if no url were found, create a new one
 				kmc.client.createShortURL(url);
 			} else {
