@@ -308,7 +308,7 @@ class KSecureEntryHelper
 		if ($this->referrer)
 			$accessControlScope->setReferrer($this->referrer);
 		$accessControlScope->setKs($this->ks);
-		$$accessControlScope->setEntryId($this->entry->getId());
+		$accessControlScope->setEntryId($this->entry->getId());
 		$accessControlScope->setContexts($this->contexts);
 		$accessControlScope->setHashes($this->hashes);
 		
