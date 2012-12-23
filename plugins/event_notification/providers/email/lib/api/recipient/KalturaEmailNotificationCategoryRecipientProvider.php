@@ -88,6 +88,12 @@ class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNoti
 		{
 			$this->categoryId->fromObject($dbObject->getCategoryId());
 		}
+		
+		if ($dbObject->getCategoryUserFilter())
+		{
+			$this->categoryUserFilter = new KalturaCategoryUserProviderFilter();
+			$this->categoryUserFilter->fromObject($dbObject->getCategoryUserFilter());
+		}
 
 	}
 } 
