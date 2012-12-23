@@ -37,7 +37,14 @@ $action = $argv[1];
 $filePath = $argv[2];
 $fileSize = $argv[3];
 
+$config = parse_ini_file("config.ini");
+$serviceUrl = $config['service_url'];
+writeLog($logPrefix, 'Service URL '.$serviceUrl);
+$tempFileExtentions = $config['temp_file_extentions'];
+writeLog($logPrefix, 'Temp file extentions '.$tempFileExtentions);
+
 $fileName=basename($filePath);
+$fileName = getDropFolderFileName($fileName, $tempFileExtentions);
 $folderPath = dirname($filePath);
 
 
@@ -48,9 +55,6 @@ writeLog($logPrefix, 'folder path:'.$folderPath);
 writeLog($logPrefix, 'file name:'.$fileName);
 writeLog($logPrefix, 'file size:'.$fileSize);
 
-$config = parse_ini_file("config.ini");
-$serviceUrl = $config['service_url'];
-writeLog($logPrefix, 'Service URL '.$serviceUrl);
 
 $kClientConfig = new KalturaConfiguration(-1);
 $kClientConfig->serviceUrl = $serviceUrl;
@@ -166,4 +170,21 @@ function updateFile($fileId, $fileSize, $dropFolderPlugin)
 	$updateDropFolderFile->fileSize = $fileSize;
 	$dropFolderPlugin->dropFolderFile->update($fileId, $updateDropFolderFile);
 	$dropFolderPlugin->dropFolderFile->updateStatus($fileId, KalturaDropFolderFileStatus::PENDING);	
+}
+
+function getDropFolderFileName($physicalFileName, $tempFileExtentions)
+{
+	if(!$tempFileExtentions)
+		return $physicalFileName;
+	$tempExtentionsArr = explode(',', $tempFileExtentions);
+	$dropFolderFileName = $physicalFileName;
+	foreach ($tempExtentionsArr as $extention) 
+	{
+		if(substr_compare($physicalFileName, $extention, -strlen($extention), strlen($extention)) === 0)
+		{
+			$dropFolderFileName = basename($dropFolderFileName, $extention);
+			return $dropFolderFileName;
+		}
+	}
+	return $dropFolderFileName;
 }
