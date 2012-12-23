@@ -6,8 +6,8 @@
 
 if(strtoupper(PHP_SAPI) != 'CLI' && strtoupper(PHP_SAPI) != 'CGI-FCGI')
 {
-	echo 'This script must be executed using CLI';
-	exit;
+	echo 'This script must be executed using CLI.';
+	exit 1;
 }
 
 $phpPath = 'php';
