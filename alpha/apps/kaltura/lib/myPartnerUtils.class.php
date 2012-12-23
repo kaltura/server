@@ -801,8 +801,7 @@ class myPartnerUtils
         $totalUsage = 0;
 
 		$reportFilter = new reportsInputFilter();
-		list($year, $month, $day) = explode('-', $report_date);
-		$reportFilter->from_date = gmmktime(0,0,0,$month, $day, $year);
+		$reportFilter->from_day = str_replace('_','',$report_date);
 
 		$reportFilter->extra_map[self::IS_FREE_PACKAGE_PLACE_HOLDER] = "FALSE";
 		if ($partnerPackage['id'] == 1) // free package
@@ -834,8 +833,7 @@ class myPartnerUtils
         $totalUsage = 0;
 
 		$reportFilter = new reportsInputFilter();
-		list($year, $month, $day) = explode('-', $report_date);
-		$reportFilter->from_date = gmmktime(0,0,0,$month, $day, $year);
+		$reportFilter->from_day = str_replace('_','',$report_date);
 
 		list($header, $data) = myReportsMgr::getTable( $partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE ,
 		 $reportFilter, 10000 , 1 , "", null);

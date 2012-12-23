@@ -329,7 +329,7 @@ class PartnerService extends KalturaBaseService
 		
 		$report_date = date("Y-m-d", time());
 		
-		list($totalStorage, $totalUsage, $totalTraffic) = myPartnerUtils::collectPartnerUsageFromDWH($dbPartner, $partnerPackage, $report_date);
+		list($totalStorage, $totalUsage, $totalTraffic) = myPartnerUtils::collectPartnerStatisticsFromDWH($dbPartner, $partnerPackage, $report_date);
 		
 		$partnerUsage->hosting = round($totalStorage / 1024, 2); // from MB to GB
 		$totalUsageGB = round($totalUsage / 1024 / 1024, 2); // from KB to GB
