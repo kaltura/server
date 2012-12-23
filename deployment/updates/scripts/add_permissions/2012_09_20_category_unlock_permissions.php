@@ -9,5 +9,5 @@
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/scripts/utils/permissions/addPermissionsAndItems.php';
-$config = realpath(dirname(__FILE__)) . '/configs/admin_console_unblock_categories.ini';
+$config = realpath(dirname(__FILE__)) . '/configs/category_unlock_permissions.ini';
 passthru("php $script $config");
