@@ -114,7 +114,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 			if ($permissionNames)
 			{
 				$permissionNamesArr = explode(',', $permissionNames);
-				$permissionNamesArr = $this->removeCategoryPermissions($permissionNamesArr);
+				$permissionNamesArr = categoryKuser::removeCategoryPermissions($permissionNamesArr);
 			}
 			else 
 			{
@@ -148,23 +148,6 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 		return $dbObject;
 	}
 	
-	/**
-	 * @param array $permissionNames
-	 * @return array
-	 */
-	private function removeCategoryPermissions (array $permissionNames)
-	{
-		foreach ($permissionNames as &$permissionName)
-		{
-			if ($permissionName == PermissionName::CATEGORY_CONTRIBUTE || $permissionName == PermissionName::CATEGORY_EDIT ||
-				$permissionName == PermissionName::CATEGORY_MODERATE || $permissionName == PermissionName::CATEGORY_SUBSCRIBE || $permissionName == PermissionName::CATEGORY_VIEW)
-				{
-					unset($permissionName);
-				}
-		}
-		
-		return $permissionNames;
-	}
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the CategoryKuser object (on the right)  
