@@ -56,7 +56,7 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		}
 		else
 		{
-			$this->itemXpathsToExtend = new KalturaExtendingItemMrssParameterArray();
+			$this->itemXpathsToExtend = new KalturaStringArray();
 		}
 	}
 	
