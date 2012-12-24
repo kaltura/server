@@ -184,6 +184,17 @@ class category extends Basecategory implements IIndexable
 			}
 			
 			$categoryKuser->setPermissionLevel(CategoryKuserPermissionLevel::MANAGER);
+			$permissionNamesArr = array();
+			if ($categoryKuser->getPermissionNames())
+			{
+					$permissionNamesArr = explode(",", $categoryKuser->getPermissionNames());
+			}
+			$permissionNamesArr = categoryKuser::removeCategoryPermissions($permissionNamesArr);
+			$permissionNamesArr[] = PermissionName::CATEGORY_CONTRIBUTE;
+			$permissionNamesArr[] = PermissionName::CATEGORY_EDIT;
+			$permissionNamesArr[] = PermissionName::CATEGORY_MODERATE;
+			$permissionNamesArr[] = PermissionName::CATEGORY_SUBSCRIBE;
+			$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
 			$categoryKuser->setStatus(CategoryKuserStatus::ACTIVE);
 			$categoryKuser->setPartnerId($this->getPartnerId());
 			$categoryKuser->setUpdateMethod(UpdateMethodType::MANUAL);
