@@ -34,6 +34,7 @@ class DropFolderListAction extends KalturaApplicationPlugin implements IKalturaA
 		
 		// init filter
 		$dropFolderFilter = $this->getDropFolderFilterFromRequest($request);
+		$dropFolderFilter->orderBy = "-createdAt";
 		
 		$client = Infra_ClientHelper::getClient();
 		$dropFolderPluginClient = Kaltura_Client_DropFolder_Plugin::get($client);
