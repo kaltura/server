@@ -234,7 +234,7 @@ class sftpMgr extends kFileTransferMgr
 		}
 		
 		if($this->useCmd && !$this->passphrase)
-			return $this->execSftpCommand("put $localFile $remoteFile");
+			return $this->execSftpCommand("put '$localFile' '$remoteFile'");
 			
 		return false;
 	}
@@ -251,10 +251,10 @@ class sftpMgr extends kFileTransferMgr
 		if($this->useCmd && !$this->passphrase)
 		{
 			if($localFile)
-				return $this->execSftpCommand("get $remoteFile $localFile");
+				return $this->execSftpCommand("get '$remoteFile' '$localFile'");
 				
 			$localFile = tempnam($this->tmpDir, 'sftp.download.');
-			if($this->execSftpCommand("get $remoteFile $localFile"))
+			if($this->execSftpCommand("get '$remoteFile' '$localFile'"))
 				return file_get_contents($localFile);
 		}
 			
@@ -306,7 +306,7 @@ class sftpMgr extends kFileTransferMgr
 	protected function doChmod($remoteFile, $mode)
 	{
 		if($this->useCmdChmod && !$this->passphrase)
-			return $this->execSftpCommand("chmod $mode $remoteFile");
+			return $this->execSftpCommand("chmod $mode '$remoteFile'");
 			
 		$chmod_cmd = "chmod $mode $remoteFile";
 		$exec_output = $this->execCommand($chmod_cmd);
