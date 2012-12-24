@@ -179,6 +179,10 @@ class Form_DropFolderConfigure extends Infra_Form
             ));
 		    $this->addSubForm($extendTypeSubForm, self::EXTENSION_SUBFORM_NAME);
 		}
+    	
+		//------------------------------------
+		$troubleshootForm = new Form_TroubleshootConfig();
+		$this->addSubForm($troubleshootForm, 'troubleshootConfig');
 	}
 	
 	
@@ -190,6 +194,11 @@ class Form_DropFolderConfigure extends Infra_Form
 		if ($object->fileHandlerType === Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT) {
 			$this->getSubForm('contentHandlerConfig')->populateFromObject($object->fileHandlerConfig, false);
 		}
+		
+		if ($object->status === Kaltura_Client_DropFolder_Enum_DropFolderStatus::ERROR) {
+			$this->getSubForm('troubleshootConfig')->populateFromObject($object, false);
+		}
+		
 				
 		$props = $object;
 		if(is_object($object))
@@ -212,7 +221,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		$extendTypeSubForm = $this->getSubForm(self::EXTENSION_SUBFORM_NAME);
 		if ($extendTypeSubForm) {
 		    $extendTypeSubForm->populateFromObject($object, $add_underscore);
-		}
+		}		
 	}
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
@@ -233,7 +242,6 @@ class Form_DropFolderConfigure extends Infra_Form
 		if ($extendTypeSubForm) {
 		    $object =  $extendTypeSubForm->getObject($object, $objectType, $properties, $add_underscore, $include_empty_fields);
 		}
-		
 		return $object;
 	}
 	

@@ -15,6 +15,7 @@
 jQuery(document).ready(function() {
 	handlerTypeChanged();
 	fileDeletePolicy();
+	troubleshootInit();
 });
 
 function fileDeletePolicy() {
@@ -59,6 +60,17 @@ function handlerTypeChanged()
 	}
 	else {
 		jQuery('#frmDropFolderConfigure #frmContentFileHandlerConfig').css("display","none");
+	}	
+}
+
+function troubleshootInit()
+{
+	curValue = jQuery('#frmTroubleshootConfig #status').val();
+	if (curValue == <?php echo Kaltura_Client_DropFolder_Enum_DropFolderStatus::ERROR; ?>) {
+		jQuery('#frmDropFolderConfigure #frmTroubleshootConfig').css("display","inline");
+	}
+	else {
+		jQuery('#frmDropFolderConfigure #frmTroubleshootConfig').css("display","none");
 	}	
 }
 
