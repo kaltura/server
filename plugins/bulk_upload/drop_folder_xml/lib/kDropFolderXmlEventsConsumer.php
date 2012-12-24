@@ -286,7 +286,7 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 		$xmlDoc = new KDOMDocument();
 		$res = $xmlDoc->load($xmlPath);
 		
-		if(!res)
+		if(!$res)
 			throw new Exception(DropFolderXmlBulkUploadPlugin::MALFORMED_XML_FILE_MESSAGE, DropFolderXmlBulkUploadPlugin::getErrorCodeCoreValue(DropFolderXmlBulkUploadErrorCode::MALFORMED_XML_FILE));
 			
 		$localResourceNodes = $xmlDoc->getElementsByTagName(self::DROP_FOLDER_RESOURCE_NODE_NAME);						
