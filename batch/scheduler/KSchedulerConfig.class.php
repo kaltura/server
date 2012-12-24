@@ -52,12 +52,19 @@ class KSchedulerConfig extends Zend_Config_Ini
 			$configFileName = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'config.ini';
 			$this->implodeDirectoryFiles($configFileName);
 		}
-		parent::__construct($configFileName, self::getHostname());
-	
+		
+		$hostname = self::getHostname();
+		parent::__construct($configFileName, $hostname);
+		$this->name = $hostname;
+		$this->hostName = $hostname;
+		
 		$this->taskConfigList = array();
-		foreach($this->enabledWorkers as $workerName)
+		foreach($this->enabledWorkers as $workerName => $maxInstances)
 		{
-			$task = new KSchedularTaskConfig($configFileName, $workerName);
+			if(!$maxInstances)
+				continue;
+				
+			$task = new KSchedularTaskConfig($configFileName, $workerName, $maxInstances);
 			$task->setPartnerId($this->getPartnerId());
 			$task->setSecret($this->getSecret());
 			$task->setCurlTimeout($this->getCurlTimeout());
@@ -73,14 +80,6 @@ class KSchedulerConfig extends Zend_Config_Ini
 			$this->taskConfigList[$workerName] = $task;
 	  	}
 	}
-	
-    protected function _processKey($config, $key, $value)
-    {
-		if(is_array($value) && isset($config[$key]))
-			$value = $config[$key] + $value;
-			
-		return parent::_processKey($config, $key, $value);
-    }
 	
 	static public function getHostname()
 	{

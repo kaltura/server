@@ -4,10 +4,13 @@
  */
 class KSchedularTaskConfig extends Zend_Config_Ini
 {
-	public function __construct($configFileName, $workerName)
+	public function __construct($configFileName, $workerName, $maxInstances)
 	{
 		parent::__construct($configFileName, $workerName, true);
 	
+		$this->name = $workerName;
+		$this->maxInstances = $maxInstances;
+		
 		if($this->filter)
 		{
 			$filter = new KalturaBatchJobFilter();
