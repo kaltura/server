@@ -400,5 +400,24 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		if (!$this->alreadyInSave)
 			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
 	}
+	
+	/**
+	 * @param array $permissionNames
+	 * @return array
+	 */
+	public static function removeCategoryPermissions (array $permissionNames)
+	{
+		foreach ($permissionNames as &$permissionName)
+		{
+			if ($permissionName == PermissionName::CATEGORY_CONTRIBUTE || $permissionName == PermissionName::CATEGORY_EDIT ||
+				$permissionName == PermissionName::CATEGORY_MODERATE || $permissionName == PermissionName::CATEGORY_SUBSCRIBE || $permissionName == PermissionName::CATEGORY_VIEW)
+				{
+					unset($permissionName);
+				}
+		}
+		
+		return $permissionNames;
+	}
+
 
 } // categoryKuser
