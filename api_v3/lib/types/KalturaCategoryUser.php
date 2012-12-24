@@ -31,7 +31,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	
 	/**
 	 * Permission level
-	 * 
+	 * @deprecated
 	 * @var KalturaCategoryUserPermissionLevel
 	 * @filter eq,in
 	 */
@@ -106,10 +106,64 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	    
 		if (is_null ( $dbObject ))
 			$dbObject = new categoryKuser ();
-		
+		/* @var $dbObject categoryKuser */
 		parent::toObject ( $dbObject, $skip );
+		if (!is_null($dbObject->getPermissionLevel()))
+		{
+			$permissionNames = $dbObject->getPermissionNames();
+			if ($permissionNames)
+			{
+				$permissionNamesArr = explode(',', $permissionNames);
+				$permissionNamesArr = $this->removeCategoryPermissions($permissionNamesArr);
+			}
+			else 
+			{
+				$permissionNamesArr = array();
+			}
+			switch ($dbObject->getPermissionLevel())
+			{
+				case CategoryKuserPermissionLevel::MEMBER:
+					$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
+					break;
+				case CategoryKuserPermissionLevel::CONTRIBUTOR:
+					$permissionNamesArr[] = PermissionName::CATEGORY_CONTRIBUTE;
+					$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
+					break;
+				case CategoryKuserPermissionLevel::MANAGER:
+					$permissionNamesArr[] = PermissionName::CATEGORY_EDIT;
+					$permissionNamesArr[] = PermissionName::CATEGORY_MODERATE;
+					$permissionNamesArr[] = PermissionName::CATEGORY_CONTRIBUTE;
+					$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
+					break;
+				case CategoryKuserPermissionLevel::MODERATOR:
+					$permissionNamesArr[] = PermissionName::CATEGORY_MODERATE;
+					$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
+					break;
+			}
+			$permissionNamesArr[] = PermissionName::CATEGORY_SUBSCRIBE;
+			
+			$dbObject->setPermissionNames(implode(',', $permissionNamesArr));
+		}
 		
 		return $dbObject;
+	}
+	
+	/**
+	 * @param array $permissionNames
+	 * @return array
+	 */
+	private function removeCategoryPermissions (array $permissionNames)
+	{
+		foreach ($permissionNames as &$permissionName)
+		{
+			if ($permissionName == PermissionName::CATEGORY_CONTRIBUTE || $permissionName == PermissionName::CATEGORY_EDIT ||
+				$permissionName == PermissionName::CATEGORY_MODERATE || $permissionName == PermissionName::CATEGORY_SUBSCRIBE || $permissionName == PermissionName::CATEGORY_VIEW)
+				{
+					unset($permissionName);
+				}
+		}
+		
+		return $permissionNames;
 	}
 	
 	/*
