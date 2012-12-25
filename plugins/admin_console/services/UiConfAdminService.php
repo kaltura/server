@@ -8,6 +8,8 @@
  */
 class UiConfAdminService extends KalturaBaseService
 {
+	const PERMISSION_GLOBAL_PARTNER_UI_CONF_UPDTAE = 'GLOBAL_PARTNER_UI_CONF_UPDTAE';
+	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -51,8 +53,10 @@ class UiConfAdminService extends KalturaBaseService
 	function updateAction($id, KalturaUiConfAdmin $uiConf)
 	{
 		$dbUiConf = uiConfPeer::retrieveByPK( $id );
+		if (!$dbUiConf)
+			throw new KalturaAPIException ( APIErrors::INVALID_UI_CONF_ID , $id );
 		
-		if (!$dbUiConf || $dbUiConf->getPartnerId() == PartnerPeer::GLOBAL_PARTNER)
+		if ($dbUiConf->getPartnerId() == PartnerPeer::GLOBAL_PARTNER && !kPermissionManager::isPermitted(self::PERMISSION_GLOBAL_PARTNER_UI_CONF_UPDTAE))
 			throw new KalturaAPIException ( APIErrors::INVALID_UI_CONF_ID , $id );
 		
 		$dbUiConf = $uiConf->toObject($dbUiConf);
