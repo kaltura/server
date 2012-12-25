@@ -386,6 +386,10 @@ class KalturaFrontController
 					$object = new KalturaAPIException(APIErrors::SEARCH_ENGINE_QUERY_FAILED);
 					break;
 					
+				case kCoreException::FILE_NOT_FOUND:
+					$object = new KalturaAPIException(KalturaErrors::FILE_NOT_FOUND);
+					break;
+					
 				default:
 		    		KalturaLog::crit($ex);
 					$object = new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);

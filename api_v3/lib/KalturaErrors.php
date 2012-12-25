@@ -387,6 +387,8 @@ class KalturaErrors extends APIErrors
 	 */
 	const FILE_DOESNT_EXIST = "FILE_DOESNT_EXIST,File doesnt exist";
 	
+	const FILE_NOT_FOUND = "FILE_NOT_FOUND,File not found";
+	
 	const STORAGE_PROFILE_ID_NOT_FOUND = "STORAGE_PROFILE_ID_NOT_FOUND,Storage profile id %s not found";
 	
 	/*
