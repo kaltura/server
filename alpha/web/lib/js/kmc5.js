@@ -675,7 +675,7 @@ kmc.preview_embed = {
 		preview_player = embed_code.replace('{FLAVOR}','ks=' + kmc.vars.ks + '&');
 		// Change preview player protocol if kmc was loaded in https
 		if( location.protocol == 'https:' ) {
-			preview_player = preview_player.replace(/http:/g, "https:");
+			preview_player = preview_player.replace(/http/g, "https");
 		}
 		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id);
 		embed_code = embed_code.replace('{FLAVOR}','');
@@ -788,14 +788,6 @@ kmc.preview_embed = {
 				return true;
 			}
 			if( (this.id == 'akamai' || this.id == 'hds' ) && kmc.vars.hide_akamai_hd_network ) {
-				clearLastDeliveryType(this.id);
-				return true;
-			}
-			if( this.id == 'akamai' && kmc.vars.has_v2_flavors ) {
-				clearLastDeliveryType(this.id);
-				return true;
-			}
-			if( this.id == 'hds' && ! kmc.vars.has_v2_flavors ) {
 				clearLastDeliveryType(this.id);
 				return true;
 			}
@@ -976,7 +968,11 @@ kmc.preview_embed = {
 
 		var player_code = kmc.preview_embed.buildKalturaEmbed(entry_id,entry_name,null,false,kmc.vars.default_kdp, true);
 		player_code = player_code.replace('&{FLAVOR}', '&flavorId=' + flavor_details.asset_id + '&ks=' + kmc.vars.ks);
-		
+		// Change preview player protocol if kmc was loaded in https
+		if( location.protocol == 'https:' ) {
+			player_code = player_code.replace(/http/g, "https");
+		}
+
 		var modal_content = '<div class="center">' + player_code + '</div><dl>' +
 		'<dt>Entry Name:</dt><dd>&nbsp;' + entry_name + '</dd>' +
 		'<dt>Entry Id:</dt><dd>&nbsp;' + entry_id + '</dd>' +
@@ -1095,9 +1091,9 @@ kmc.preview_embed = {
 		embed_code = embed_code.replace("{EMBED_OBJECT}", JSON.stringify(embedObject, null, 2));
 		
 		if( https_support ) {
-			embed_code = embed_code.replace(/http:/g, "https:");
+			embed_code = embed_code.replace(/http/g, "https");
 		} else {			
-			embed_code = embed_code.replace(/https:/g, "http:");
+			embed_code = embed_code.replace(/https/g, "http");
 		}
 
 		return embed_code;
