@@ -659,6 +659,18 @@ class Partner extends BasePartner
 	public function getKSVersion() { return $this->getFromCustomData( "ksVersion" , null, 1  );	}
 	public function setKSVersion( $v ) { return $this->putInCustomData( "ksVersion", $v );	}
 	
+	public function getDeliveryTypes()
+	{
+		$map = kConf::getMap('players');
+		return $map['delivery_types'];
+	} 
+	
+	public function getEmbedCodeTypes()
+	{
+		$map = kConf::getMap('players');
+		return $map['embed_code_types'];
+	} 
+	
 	public function getBulkUploadNotificationsEmail() 
 	{ 
 		$email = $this->getFromCustomData("bulkUploadNotificationsEmail", null, null);

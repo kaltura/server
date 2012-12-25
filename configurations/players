@@ -1,0 +1,38 @@
+
+[embed_code_types]
+auto.label = Auto Embed
+auto.minVersion = v1.7.0
+
+dynamic.label = Dynamic Embed
+dynamic.minVersion = v1.7.0
+
+thumb.label = Thumbnail Embed
+thumb.minVersion = v1.7.0
+thumb.entryOnly = true
+
+legacy.label = Legacy Flash Embed
+
+[delivery_types]
+auto.label = Kaltura Auto
+auto.flashvars.streamerType = auto
+auto.minVersion = v3.6.14
+
+http.label = HTTP Progressive Download
+
+akamai.label = HTTP Streaming (Akamai)
+akamai.flashvars.streamerType = hdnetwork
+akamai.flashvars.akamaiHD.loadingPolicy = preInitialize
+akamai.flashvars.akamaiHD.asyncInit = true
+
+hds.label = HTTP Streaming (HDS)
+hds.flashvars.streamerType = hdnetwork
+akamai.flashvars.akamaiHD.loadingPolicy = preInitialize
+akamai.flashvars.akamaiHD.asyncInit = true
+akamai.flashvars.twoPhaseManifest = true
+
+rtmp.label = RTMP Streaming
+rtmp.flashvars.streamerType = rtmp
+
+rtmpe.label = Secure Transport (RTMPE)
+rtmpe.flashvars.streamerType = rtmp
+rtmpe.flashvars.mediaProtocol = rtmpe
