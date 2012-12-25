@@ -13,6 +13,11 @@ class Form_PartnerConfiguration extends Infra_Form
    	
     protected $limitSubForms = array();
     
+    /**
+     * @var array<Kaltura_Type_PlayerDeliveryType>
+     */
+    protected $playerDeliveryTypes = array();
+    
 	public function init()
 	{
 		$permissionNames = array();
@@ -138,13 +143,29 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Apply access control rule on thumbnail',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
 		));
-
+		
 		$this->addElement('checkbox', 'support_animated_thumbnails', array(
 			'label'	  => 'Support animated (gif) thumbnails',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
 		));
-
+		
+		$this->addElement('select', 'default_delivery_type', array(
+			'label'	  => 'Default Delivery Type:',
+			'decorators' => array('ViewHelper', array('HtmlTag',  array('tag' => 'dt', 'id' => 'default_delivery_type')))
+		));
+		
+		$this->addElement('select', 'default_embed_code_type', array(
+			'label'	  => 'Default Embed Code Type:',
+			'decorators' => array('ViewHelper', array('HtmlTag',  array('tag' => 'dt', 'id' => 'default_embed_code_type')))
+		));
+		
+		$this->addElement('checkbox', 'use_default_streamers', array(
+			'label'	  => 'Enable system streamer types',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
+		));
+		
 		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS]['Apply access control rule on thumbnail'] = 'restrict_thumbnail_by_ks';
+		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS]['Enable system streamer types'] = 'use_default_streamers';
 				
 
 //--------------------------- Remote Storage Account policy ---------------------------				

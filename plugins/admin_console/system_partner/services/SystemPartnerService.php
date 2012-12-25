@@ -281,6 +281,26 @@ class SystemPartnerService extends KalturaBaseService
 		$partnerPackages->fromArray($packages);
 		return $partnerPackages;
 	}
+	
+	/**
+	 * @action getPlayerEmbedCodeTypes
+	 * @return KalturaPlayerEmbedCodeTypesArray
+	 */
+	public function getPlayerEmbedCodeTypesAction()
+	{
+		$map = kConf::getMap('players');
+		return KalturaPlayerEmbedCodeTypesArray::fromDbArray($map['embed_code_types']);
+	}
+	
+	/**
+	 * @action getPlayerDeliveryTypes
+	 * @return KalturaPlayerDeliveryTypesArray
+	 */
+	public function getPlayerDeliveryTypesAction()
+	{
+		$map = kConf::getMap('players');
+		return KalturaPlayerDeliveryTypesArray::fromDbArray($map['delivery_types']);
+	}
 
 	/**
 	 * 

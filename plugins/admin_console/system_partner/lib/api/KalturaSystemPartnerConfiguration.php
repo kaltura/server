@@ -285,6 +285,21 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $apiAccessControlId;
 	
+	/**
+	 * @var string
+	 */
+	public $defaultDeliveryType;
+	
+	/**
+	 * @var string
+	 */
+	public $defaultEmbedCodeType;
+	
+	/**
+	 * @var KalturaStringArray
+	 */
+	public $disabledDeliveryTypes;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -341,6 +356,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	    "defaultEntitlementEnforcement",
 		"cacheFlavorVersion",
 		"apiAccessControlId",
+		"defaultDeliveryType",
+		"defaultEmbedCodeType",
+		"disabledDeliveryTypes",
 	);
 
 	public function getMapBetweenObjects()

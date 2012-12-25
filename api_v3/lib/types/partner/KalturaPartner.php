@@ -240,13 +240,38 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $defaultEntitlementEnforcement;
 	
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $defaultDeliveryType;
+	
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $defaultEmbedCodeType;
+	
+	/**
+	 * @var KalturaPlayerDeliveryTypesArray
+	 * @readonly
+	 */
+	public $deliveryTypes;
+	
+	/**
+	 * @var KalturaPlayerEmbedCodeTypesArray
+	 * @readonly
+	 */
+	public $embedCodeTypes;
+	
 	private static $map_between_objects = array
 	(
-		"id" , "name", "website" => "url1" , "notificationUrl" => "url2" , "appearInSearch" , "createdAt" , "adminName" , "adminEmail" ,
-		"description" , "commercialUse" , "landingPage" , "userLandingPage" , "contentCategories" , "type" , "phone" , "describeYourself" ,
-		"adultContent" , "defConversionProfileType" , "notify" , "status" , "allowQuickEdit" , "mergeEntryLists" , "notificationsConfig" ,
-		"maxUploadSize" , "partnerPackage" , "secret" , "adminSecret" , "allowMultiNotification", "adminLoginUsersQuota", "adminUserId",
-		"firstName" , "lastName" , "country" , "state" , "publishersQuota", "partnerGroupType", "defaultEntitlementEnforcement", 
+		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' ,
+		'description' , 'commercialUse' , 'landingPage' , 'userLandingPage' , 'contentCategories' , 'type' , 'phone' , 'describeYourself' ,
+		'adultContent' , 'defConversionProfileType' , 'notify' , 'status' , 'allowQuickEdit' , 'mergeEntryLists' , 'notificationsConfig' ,
+		'maxUploadSize' , 'partnerPackage' , 'secret' , 'adminSecret' , 'allowMultiNotification', 'adminLoginUsersQuota', 'adminUserId',
+		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
+		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes', 
 	);
 	
 	public function getMapBetweenObjects ( )

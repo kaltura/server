@@ -22,7 +22,12 @@ class PartnerController extends Zend_Controller_Action
 		$partner = Zend_Registry::get('config')->partner;
 		$allowNonePackage = isset($partner->enableNonePackage) ? $partner->enableNonePackage : false;
 		
-		$packages = $systemPartnerPlugin->systemPartner->getPackages();
+		$client->startMultiRequest();
+		$systemPartnerPlugin->systemPartner->getPackages();
+		$systemPartnerPlugin->systemPartner->getPackagesVertical();
+		$systemPartnerPlugin->systemPartner->getPackagesClassOfService();
+		list($packages, $packagesVertical, $packagesClassOfService) = $client->doMultiRequest();
+		
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-packages-service-paid')))
 		{
 			foreach($packages as $index => $package)
@@ -30,10 +35,9 @@ class PartnerController extends Zend_Controller_Action
 					unset($packages[$index]);
 		}
 		
-		Form_PackageHelper::addPackagesToForm($form, $packages, 'partner_package', $allowNonePackage);
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackagesClassOfService(), 'partner_package_class_of_service');
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackagesVertical(), 'vertical_clasiffication');
-		
+		Form_PackageHelper::addPackagesToForm($form, $packages,					'partner_package', $allowNonePackage);
+		Form_PackageHelper::addPackagesToForm($form, $packagesVertical,			'vertical_clasiffication');
+		Form_PackageHelper::addPackagesToForm($form, $packagesClassOfService,	'partner_package_class_of_service');
 		
 		if ($request->isPost())
 		{
@@ -353,15 +357,25 @@ class PartnerController extends Zend_Controller_Action
 		$this->_helper->layout->disableLayout();
 		$partnerId = $this->_getParam('partner_id');
 		$client = Infra_ClientHelper::getClient();
-		$form = new Form_PartnerConfiguration();
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		
 		$partner = Zend_Registry::get('config')->partner;
 		$allowNonePackage = isset($partner->enableNonePackage) ? $partner->enableNonePackage : false;
 		
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package', $allowNonePackage);
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackagesClassOfService(), 'partner_package_class_of_service');
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackagesVertical(), 'vertical_clasiffication');
+		$client->startMultiRequest();
+		$systemPartnerPlugin->systemPartner->getPackages();
+		$systemPartnerPlugin->systemPartner->getPackagesVertical();
+		$systemPartnerPlugin->systemPartner->getPackagesClassOfService();
+		$systemPartnerPlugin->systemPartner->getPlayerEmbedCodeTypes();
+		$systemPartnerPlugin->systemPartner->getPlayerDeliveryTypes();
+		list($packages, $packagesVertical, $packagesClassOfService, $playerEmbedCodeTypes, $playerDeliveryTypes) = $client->doMultiRequest();
+		
+		$form = new Form_PartnerConfiguration($playerDeliveryTypes);
+		Form_PackageHelper::addPackagesToForm($form, $packages,					'partner_package', $allowNonePackage);
+		Form_PackageHelper::addPackagesToForm($form, $packagesVertical,			'vertical_clasiffication');
+		Form_PackageHelper::addPackagesToForm($form, $packagesClassOfService,	'partner_package_class_of_service');
+		Form_PackageHelper::addOptionsToForm ($form, $playerEmbedCodeTypes,		'default_embed_code_type');
+		Form_PackageHelper::addOptionsToForm ($form, $playerDeliveryTypes,		'default_delivery_type');
 		
 		$request = $this->getRequest();
 		

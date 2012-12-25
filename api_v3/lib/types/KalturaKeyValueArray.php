@@ -12,6 +12,23 @@ class KalturaKeyValueArray extends KalturaTypedArray
 		return self::fromKeyValueArray($pairs);
 	}
 	
+	protected function appendFromArray(array $pairs, $prefix = '')
+	{
+		foreach($pairs as $key => $value)
+		{
+			if(is_array($value))
+			{
+				$this->appendFromArray($value, "$key.");
+				continue;
+			}
+			
+			$pairObject = new KalturaKeyValue();
+			$pairObject->key = $prefix . $key;
+			$pairObject->value = $value;
+			$this[] = $pairObject;
+		}
+	}
+	
 	public static function fromKeyValueArray(array $pairs = null)
 	{
 		$pairsArray = new KalturaKeyValueArray();
@@ -19,6 +36,12 @@ class KalturaKeyValueArray extends KalturaTypedArray
 		{
 			foreach($pairs as $key => $value)
 			{
+				if(is_array($value))
+				{
+					$pairsArray->appendFromArray($value, "$key.");
+					continue;
+				}
+				
 				$pairObject = new KalturaKeyValue();
 				$pairObject->key = $key;
 				$pairObject->value = $value;
