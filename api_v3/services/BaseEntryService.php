@@ -690,7 +690,8 @@ class BaseEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
 		$ks = $this->getKs();
-		$isAdmin = false; 
+		$isAdmin = false;
+		$isSecured = false; // access control or entitlement enabled
 		if($ks)
 			$isAdmin = $ks->isAdmin();
 			
@@ -708,6 +709,7 @@ class BaseEntryService extends KalturaEntryService
 
 		if ($accessControl && $accessControl->hasRules())
 		{
+			$isSecured = true;
 			$disableCache = true;
 			if (kConf::hasMap("optimized_playback"))
 			{
@@ -811,10 +813,14 @@ class BaseEntryService extends KalturaEntryService
 			return $result;
 		}
 		
+		$isSecured = $isSecured || PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $dbEntry->getPartnerId());
+		
 		$result->streamerType = $this->getPartner()->getStreamerType();
 		if (!$result->streamerType)
 		{
-			if($dbEntry->getDuration() <= kConf::get('short_entries_max_duration'))
+			if($isSecured)
+				$result->streamerType = kConf::get('secured_default_streamer_type');
+			elseif($dbEntry->getDuration() <= kConf::get('short_entries_max_duration'))
 				$result->streamerType = kConf::get('short_entries_default_streamer_type');
 			else
 				$result->streamerType = kConf::get('default_streamer_type');
@@ -823,7 +829,9 @@ class BaseEntryService extends KalturaEntryService
 		$result->mediaProtocol = $this->getPartner()->getMediaProtocol();
 		if (!$result->mediaProtocol)
 		{
-			if($dbEntry->getDuration() <= kConf::get('short_entries_max_duration'))
+			if($isSecured)
+				$result->mediaProtocol = kConf::get('secured_default_media_protocol');
+			elseif($dbEntry->getDuration() <= kConf::get('short_entries_max_duration'))
 				$result->mediaProtocol = kConf::get('short_entries_default_media_protocol');
 			else
 				$result->mediaProtocol = kConf::get('default_media_protocol');
