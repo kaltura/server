@@ -92,10 +92,33 @@ class kLevel3UrlManager extends kUrlManager
 	 */
 	protected function doGetFileSyncUrl(FileSync $fileSync)
 	{
-		$url = parent::doGetFileSyncUrl($fileSync);
-		if (in_array($fileSync->getPartnerId(), array(666132,628012,357521,560751)) && kString::beginsWith($url, "mp4:"))
-			$url .= ".mp4";
-						
+		$fileSync = kFileSyncUtils::resolve($fileSync);
+		
+		if($fileSync->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
+			return $fileSync->getSmoothStreamUrl();
+		
+		$url = $fileSync->getFilePath();
+		$url = str_replace('\\', '/', $url);
+		
+		if($this->protocol == PlaybackProtocol::RTMP)
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($this->storageProfileId);
+			if ($storageProfile->getRTMPPrefix())
+			{
+				if (strpos($url, '/') !== 0)
+				{
+					$url = '/'.$url;
+				}
+				$url = $storageProfile->getRTMPPrefix(). $url;
+			}
+			if (($this->extention && strtolower($this->extention) != 'flv' ||
+					$this->containerFormat && strtolower($this->containerFormat) != 'flash video'))
+				$url = "mp4:$url";
+		
+			// when serving files directly via RTMP fms doesnt expect to get the file extension
+			$url = str_replace('.flv','',$url);
+		}
+		
 		return $url;
 	}
 }
