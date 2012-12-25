@@ -12,7 +12,7 @@
 		<password>admin</password>
 	</session>
 	<!-- New Item Pending Moderation -->
-	<request service="eventNotificationTemplate" action="add" plugin="eventNotification">
+	<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 		<template objectType="KalturaEmailNotificationTemplate">
 			<name>New Item Pending Moderation</name>
 			<systemName>New_Item_Pending_Moderation</systemName>
@@ -28,8 +28,8 @@
 				</item>
 			</eventConditions>
 			<format>1</format>
-			<subject>[AppTitle] New Item Pending Moderation</subject>
-			<body>A new item is pending your approval: [ChannelSettingsPendingURL]</body>
+			<subject>[AppTitle] - New Item Pending Moderation</subject>
+			<body>A new item is pending your approval: [ChannelSettingsPendingURL]{category_name_encoded}</body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
 			<to objectType="KalturaEmailNotificationCategoryRecipientProvider">
@@ -60,16 +60,28 @@
 					</value>
 				</item>
 				<item objectType="KalturaEventNotificationParameter">
+					<key>category_id</key>
+					<value objectType="KalturaEvalStringField">
+						<code>$scope->getEvent()->getObject()->getCategoryId()</code>
+					</value>
+				</item>
+				<item objectType="KalturaEventNotificationParameter">
 					<key>category_name</key>
 					<value objectType="KalturaEvalStringField">
 						<code>!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : ''</code>
+					</value>
+				</item>
+				<item objectType="KalturaEventNotificationParameter">
+					<key>category_name_encoded</key>
+					<value objectType="KalturaEvalStringField">
+						<code>urlencode(!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : '')</code>
 					</value>
 				</item>
 			</contentParameters>
 		</template>
 	</request>
 	<!-- Entry Approved In Category -->
-	<request service="eventNotificationTemplate" action="add" plugin="eventNotification">
+	<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 		<template objectType="KalturaEmailNotificationTemplate">
 			<name>Entry Approved In Category</name>
 			<systemName>Entry_Approved_In_Category</systemName>
@@ -85,7 +97,7 @@
 				</item>
 			</eventConditions>
 			<format>1</format>
-			<subject>[AppTitle] Your Media has been approved</subject>
+			<subject>[AppTitle] - Your Media has been approved</subject>
 			<body>Your media {entry_name} has been approved to be published in {category_name}</body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
@@ -130,7 +142,7 @@
 		</template>
 	</request>
 	<!-- Entry Rejected In Category -->
-	<request service="eventNotificationTemplate" action="add" plugin="eventNotification">
+	<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 		<template objectType="KalturaEmailNotificationTemplate">
 			<name>Entry Rejected In Category</name>
 			<systemName>Entry_Rejected_In_Category</systemName>
@@ -146,7 +158,7 @@
 				</item>
 			</eventConditions>
 			<format>1</format>
-			<subject>[AppTitle] Your Media has been rejected</subject>
+			<subject>[AppTitle] - Your Media has been rejected</subject>
 			<body>Your media {entry_name} has been rejected to be published in {category_name}</body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
@@ -191,7 +203,7 @@
 		</template>
 	</request>
 	<!-- Entry Rejected -->
-	<request service="eventNotificationTemplate" action="add" plugin="eventNotification">
+	<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 		<template objectType="KalturaEmailNotificationTemplate">
 			<name>Entry Rejected</name>
 			<systemName>Entry_Rejected</systemName>
@@ -207,7 +219,7 @@
 				</item>
 			</eventConditions>
 			<format>1</format>
-			<subject>[AppTitle] Your Media has been rejected</subject>
+			<subject>[AppTitle] - Your Media has been rejected</subject>
 			<body>Your media {entry_name} has been rejected</body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
@@ -246,7 +258,7 @@
 		</template>
 	</request>
 	<!-- Entry Approved -->
-	<request service="eventNotificationTemplate" action="add" plugin="eventNotification">
+	<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 		<template objectType="KalturaEmailNotificationTemplate">
 			<name>Entry Approved</name>
 			<systemName>Entry_Approved</systemName>
@@ -262,7 +274,7 @@
 				</item>
 			</eventConditions>
 			<format>1</format>
-			<subject>[AppTitle] Your Media has been approved</subject>
+			<subject>[AppTitle] - Your Media has been approved</subject>
 			<body>Your media {entry_name} has been approved</body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
@@ -301,7 +313,7 @@
 		</template>
 	</request>
 	<!-- Entry Ready -->
-	<request service="eventNotificationTemplate" action="add" plugin="eventNotification">
+	<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 		<template objectType="KalturaEmailNotificationTemplate">
 			<name>Entry Ready</name>
 			<systemName>Entry_Ready</systemName>
@@ -317,7 +329,7 @@
 				</item>
 			</eventConditions>
 			<format>1</format>
-			<subject>[AppTitle] Your video is ready to be played</subject>
+			<subject>[AppTitle] - Your video is ready to be played</subject>
 			<body>Your recently uploaded media: {entry_name} is ready to play: [AppEntryUrl]{entry_id}</body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
@@ -362,7 +374,7 @@
 		</template>
 	</request>
 	<!-- User was added to category as [role] -->
-	<request service="eventNotificationTemplate" action="add" plugin="eventNotification">
+	<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 		<template objectType="KalturaEmailNotificationTemplate">
 			<name>User was added to category as [role]</name>
 			<systemName>User_Added_To_Category_As_Role</systemName>
@@ -378,7 +390,7 @@
 				</item>
 			</eventConditions>
 			<format>1</format>
-			<subject>[AppTitle] You have been added to {category_name}</subject>
+			<subject>[AppTitle] - You have been added to {category_name}</subject>
 			<body>You have been added as {role} to {category_name}</body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
@@ -423,7 +435,7 @@
 		</template>
 	</request>
 	<!-- User's role was changed in category -->
-	<request service="eventNotificationTemplate" action="add" plugin="eventNotification">
+	<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 		<template objectType="KalturaEmailNotificationTemplate">
 			<name>User's role was changed in category</name>
 			<systemName>User_Role_Was_Changed_In_Category</systemName>
@@ -439,7 +451,7 @@
 				</item>
 			</eventConditions>
 			<format>1</format>
-			<subject>[AppTitle] Your {category_name} role has changed</subject>
+			<subject>[AppTitle] - Your {category_name} role has changed</subject>
 			<body>Your role in {category_name} has changed and is now {role}</body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
@@ -484,7 +496,7 @@
 		</template>
 	</request>
 	<!-- User was removed from category -->
-	<request service="eventNotificationTemplate" action="add" plugin="eventNotification">
+	<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 		<template objectType="KalturaEmailNotificationTemplate">
 			<name>User was removed from category</name>
 			<systemName>User_Was_Removed_From_Category</systemName>
@@ -500,7 +512,7 @@
 				</item>
 			</eventConditions>
 			<format>1</format>
-			<subject>[AppTitle] You have been removed from {category_name}</subject>
+			<subject>[AppTitle] - You have been removed from {category_name}</subject>
 			<body>You have been removed from {category_name}</body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
@@ -539,7 +551,7 @@
 		</template>
 	</request>
 	<!-- Entry was added to channel -->
-	<request service="eventNotificationTemplate" action="add" plugin="eventNotification">
+	<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 		<template objectType="KalturaEmailNotificationTemplate">
 			<name>Entry was added to channel</name>
 			<systemName>Entry_Was_Added_To_Channel</systemName>
@@ -555,7 +567,7 @@
 				</item>
 			</eventConditions>
 			<format>1</format>
-			<subject>[AppTitle] A new media was added to {category_name}</subject>
+			<subject>[AppTitle] - A new media was added to {category_name}</subject>
 			<body>Media {entry_name} was added to {category_name}. You can see the media here: [AppEntryUrl]{entry_id}</body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
@@ -602,7 +614,7 @@
 		</template>
 	</request>
 	<!-- Comment was added to entry -->
-	<request service="eventNotificationTemplate" action="add" plugin="eventNotification">
+	<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 		<template objectType="KalturaEmailNotificationTemplate">
 			<name>Comment was added to entry</name>
 			<systemName>Comment_Was_Added_To_Entry</systemName>
@@ -618,7 +630,7 @@
 				</item>
 			</eventConditions>
 			<format>1</format>
-			<subject>[AppTitle] A new media was added to {category_name}</subject>
+			<subject>[AppTitle] - A new media was added to {category_name}</subject>
 			<body>Media {entry_name} was added to {category_name}. You can see the media here: [AppEntryUrl]{entry_id}</body>
 			<fromEmail>{from_email}</fromEmail>
 			<fromName>{from_name}</fromName>
