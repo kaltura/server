@@ -958,7 +958,7 @@ kmc.preview_embed = {
 		}
 		// Base preview url
 		var protocol = ($("#https_support").attr("checked")) ? 'https://' : 'http://';		
-		var long_url = protocol + kmc.vars.host + '/index.php/kmc/preview/partner_id/' + partner_id + '/uiconf_id/' + uiconf_id;
+		var long_url = protocol + window.location.hostname + '/index.php/kmc/preview/partner_id/' + partner_id + '/uiconf_id/' + uiconf_id;
 		if( is_playlist ) {
 			long_url += '/playlist_id/' + entry_id + '/playlist_name/' + name;
 		} else {
