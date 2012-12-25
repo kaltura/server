@@ -631,6 +631,16 @@ class kApiCache
 	// cache write functions
 	protected function isAnonymous($ks)					// overridable
 	{
+		if (kConf::hasParam('internal_ip_range'))
+		{
+			$range = kConf::get('internal_ip_range');
+			
+			if(kIpAddressUtils::isIpInRange(infraRequestUtils::getRemoteAddress(), $range))
+			{
+				KalturaLog::debug('internal IP, setting isAnonymous to false');
+				return false;
+			}
+		}			
 		return (!$ks || (!$ks->isAdmin() && ($ks->user === "0" || $ks->user === null)));
 	}
 	
