@@ -1350,6 +1350,10 @@ class playManifestAction extends kalturaAction
 		if(!$this->cdnHost || $this->entry->getPartner()->getForceCdnHost())
 			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
 
+		$playbackCdnHost = $this->entry->getPartner()->getPlaybackCdnHost();
+		if($playbackCdnHost)
+			$this->cdnHost = preg_replace('/^https?/', $this->protocol, $playbackCdnHost);
+		
 		$this->enforceEncryption();
 		$this->initFlavorAssetArray();
 		$this->initEntryDuration();

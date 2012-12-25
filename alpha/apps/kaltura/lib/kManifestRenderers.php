@@ -119,7 +119,8 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 	protected function replaceDeliveryCode()
 	{
 		$this->flavor['url'] = str_replace("{deliveryCode}", $this->deliveryCode, $this->flavor['url']);
-	}
+		$this->flavor['urlPrefix'] = str_replace("{deliveryCode}", $this->deliveryCode, $this->flavor['urlPrefix']);
+ 	}
 	
 	protected function tokenizeUrls()
 	{
@@ -152,6 +153,8 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 		foreach ($this->flavors as &$flavor)
 		{
 			$flavor['url'] = str_replace("{deliveryCode}", $this->deliveryCode, $flavor['url']);
+			if (isset($flavor['urlPrefix']))
+				$flavor['urlPrefix'] = str_replace("{deliveryCode}", $this->deliveryCode, $flavor['urlPrefix']);
 		}
 	}
 	
