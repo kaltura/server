@@ -658,11 +658,29 @@ class Partner extends BasePartner
 	
 	public function getKSVersion() { return $this->getFromCustomData( "ksVersion" , null, 1  );	}
 	public function setKSVersion( $v ) { return $this->putInCustomData( "ksVersion", $v );	}
+
+	public function getDefaultDeliveryType() { return $this->getFromCustomData("defaultDeliveryType", null); }
+	public function setDefaultDeliveryType( $v ) { $this->putInCustomData("defaultDeliveryType", $v); }
+
+	public function getDefaultEmbedCodeType() { return $this->getFromCustomData("defaultEmbedCodeType", null); }
+	public function setDefaultEmbedCodeType( $v ) { $this->putInCustomData("defaultEmbedCodeType", $v); }
+	
+	public function getDisabledDeliveryTypes() { return $this->getFromCustomData("disabledDeliveryTypes", array()); }
+	public function setDisabledDeliveryTypes(array $v ) { $this->putInCustomData("disabledDeliveryTypes", $v); }
 	
 	public function getDeliveryTypes()
 	{
 		$map = kConf::getMap('players');
-		return $map['delivery_types'];
+		$deliveryTypes = $map['delivery_types'];
+		
+		$disabledDeliveryTypes = $this->getDisabledDeliveryTypes();
+		foreach($disabledDeliveryTypes as $disabledDeliveryType)
+		{
+			if(isset($deliveryTypes[$disabledDeliveryType]))
+				unset($deliveryTypes[$disabledDeliveryType]);
+		}
+			
+		return $deliveryTypes;
 	} 
 	
 	public function getEmbedCodeTypes()
