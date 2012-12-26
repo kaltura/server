@@ -64,6 +64,10 @@ class kmc4Action extends kalturaAction
 		$this->ignoreEntrySeoLinks = false;
 		$this->useEmbedCodeProtocolHttps = false;
 		$this->v2Flavors = false;
+		$this->deliveryTypes = null;
+		$this->embedCodeTypes = null;
+		$this->defaultDeliveryType = 'http';
+		$this->defaultEmbedCodeType = 'legacy';
 		
 		if ($this->partner_id !== NULL)
 		{
@@ -74,6 +78,10 @@ class kmc4Action extends kalturaAction
 			$this->ignoreEntrySeoLinks = PermissionPeer::isValidForPartner(PermissionName::FEATURE_IGNORE_ENTRY_SEO_LINKS, $this->partner_id);
 			$this->useEmbedCodeProtocolHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EMBED_CODE_DEFAULT_PROTOCOL_HTTPS, $this->partner_id);
 			$this->v2Flavors = PermissionPeer::isValidForPartner(PermissionName::FEATURE_V2_FLAVORS, $this->partner_id);
+			$this->deliveryTypes = $partner->getDeliveryTypes();
+			$this->embedCodeTypes = $partner->getEmbedCodeTypes();
+			$this->defaultDeliveryType = $partner->getDefaultDeliveryType();
+			$this->defaultEmbedCodeType = $partner->getDefaultEmbedCodeType();
 		}
 	/** END - load partner from DB, and set templatePartnerId **/
 
