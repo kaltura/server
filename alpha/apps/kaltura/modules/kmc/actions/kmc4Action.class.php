@@ -63,7 +63,6 @@ class kmc4Action extends kalturaAction
 		$this->ignoreSeoLinks = false;
 		$this->ignoreEntrySeoLinks = false;
 		$this->useEmbedCodeProtocolHttps = false;
-		$this->v2Flavors = false;
 		$this->deliveryTypes = null;
 		$this->embedCodeTypes = null;
 		$this->defaultDeliveryType = 'http';
@@ -77,7 +76,6 @@ class kmc4Action extends kalturaAction
 			$this->ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
 			$this->ignoreEntrySeoLinks = PermissionPeer::isValidForPartner(PermissionName::FEATURE_IGNORE_ENTRY_SEO_LINKS, $this->partner_id);
 			$this->useEmbedCodeProtocolHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EMBED_CODE_DEFAULT_PROTOCOL_HTTPS, $this->partner_id);
-			$this->v2Flavors = PermissionPeer::isValidForPartner(PermissionName::FEATURE_V2_FLAVORS, $this->partner_id);
 			$this->deliveryTypes = $partner->getDeliveryTypes();
 			$this->embedCodeTypes = $partner->getEmbedCodeTypes();
 			$this->defaultDeliveryType = $partner->getDefaultDeliveryType();
@@ -104,10 +102,6 @@ class kmc4Action extends kalturaAction
 	$this->cdn_host = $this->stripProtocol( $this->cdn_url );
 	$this->rtmp_host = myPartnerUtils::getRtmpUrl($this->partner_id);
 	$this->flash_dir = $this->cdn_url . myContentStorage::getFSFlashRootPath ();
-	
-	// Decide if to hide akamai delivery type
-	$this->hideAkamaiHDNetwork = $partner->getDisableAkamaiHDNetwork();
-		
 
 	/** set payingPartner flag **/
 		if($partner && $partner->getPartnerPackage() != PartnerPackages::PARTNER_PACKAGE_FREE)
