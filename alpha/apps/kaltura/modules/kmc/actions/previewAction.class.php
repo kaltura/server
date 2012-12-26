@@ -79,40 +79,13 @@ class previewAction extends kalturaAction
 		$this->swfUrl = $this->partner_host . $swfPath;
 		$this->swfSecureUrl = 'https://' . kConf::get('cdn_host_https') . $swfPath;
 
+		// Get delivery types from player.ini
+		$map = kConf::getMap('players');
+		$deliveryTypes = $map['delivery_types'];
 
-		// Array to contain flash vars
 		$flashVars = array();
-
-		// Set the current flash vars for delivery type
-		switch($this->getRequestParameter('delivery')) {
-
-			case "auto": 
-				$flashVars["streamerType"] = "auto";
-				break;
-
-			case "akamai":
-				$flashVars["streamerType"] = "hdnetwork";
-				$flashVars["akamaiHD.loadingPolicy"] = "preInitialize";
-				$flashVars["akamaiHD.asyncInit"] = "true";
-				break;
-
-			case 'akamai_v2':
-				$flashVars["streamerType"] = "hdnetwork";
-				$flashVars["akamaiHD.loadingPolicy"] = "preInitialize";
-				$flashVars["akamaiHD.asyncInit"] = "true";
-				$flashVars["twoPhaseManifest"] = "true";
-				break;	
-			case 'hds':
-				$flashVars["streamerType"] = "hds";
-				break;
-		    case "rtmp":
-				$flashVars["streamerType"] = "rtmp";
-				break;
-
-		    case "rtmpe":
-		    	$flashVars["streamerType"] = "rtmp";
-		    	$flashVars["mediaProtocol"] = "rtmpe";
-				break;
+		if( isset($deliveryTypes[$this->getRequestParameter('delivery')]) ) {
+			$flashVars = $deliveryTypes[$this->getRequestParameter('delivery')]['flashvars'];
 		}
 
 		if( $this->playlist_id || ! $this->entry_id ) {
@@ -132,7 +105,7 @@ class previewAction extends kalturaAction
 		}
 
 		// Transform flashvars array to string
-		$this->flashVarsString = http_build_query($flashVars, '', '&amp;');
+		$this->flashVarsString = $this->flashVarsToString($flashVars);
 
 		// URL to this page
 		$port = ($_SERVER["SERVER_PORT"] != "80") ? ":".$_SERVER["SERVER_PORT"] : '';
@@ -149,7 +122,7 @@ class previewAction extends kalturaAction
 		if( $this->embed == 'auto' ) {
 			$append = '?autoembed=true&playerId=kaltura_player';
 			$append .= ($this->entry_id) ? '&entry_id=' . $this->entry_id : '';
-			$append .= '&' . http_build_query(array('flashvars' => $flashVars), '', '&amp;');
+			$append .= '&' . $this->flashVarsToString($flashVars, 'flashvars');
 			$this->scriptUrl .= $append;
 		}
 
@@ -169,5 +142,23 @@ class previewAction extends kalturaAction
 			}
 		}
 
+	}
+
+	private function flashVarsToString( $fv, $paramName ) 
+	{
+		$result = '';
+		foreach( $fv as $key=>$value ) {
+			$prefix = '&' . ($paramName) ? $paramName . '[' : '';
+			$suffix = ($paramName) ? ']=' : '=';
+			if( is_array($value) ) {
+				$pluginName = $key;
+				foreach($value as $k=>$v) {
+					$result .= $prefix . $pluginName . '.' . $k . $suffix . $v;
+				}
+			} else {
+				$result .= $prefix . $key . $suffix . $value;
+			}
+		}
+		return $result;
 	}
 }
