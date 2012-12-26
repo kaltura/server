@@ -3,7 +3,7 @@
  * Enable caption assets management for entry objects
  * @package plugins.caption
  */
-class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor
+class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor, IKalturaPlayManifestContributor
 {
 	const PLUGIN_NAME = 'caption';
 	
@@ -258,4 +258,43 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	{
 		return self::getObjectFeatureTypeCoreValue(CaptionObjectFeatureType::CAPTIONS);
 	}
+	
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaPlayManifestContributor::getManifestEditors()
+	 */
+	public static function getManifestEditors (kManifestContributorConfig $config)
+	{
+		$contributors = array ();
+		
+		switch ($config->format)
+		{
+			case PlaybackProtocol::APPLE_HTTP:
+				$contributor = new WebVttCaptionsManifestEditor();
+				$contributor->captions = array();
+				//retrieve the current working partner's captions according to the entryId
+				$c = new Criteria();
+				$c->addAnd(assetPeer::ENTRY_ID, $config->entryId);
+				$c->addAnd(assetPeer::TYPE, CaptionAssetType::CAPTION);
+				$c->addAnd(assetPeer::CONTAINER_FORMAT, CaptionType::WEBVTT);
+				$captionAssets = assetPeer::doSelect($c);
+				foreach ($captionAssets as $captionAsset)
+				{
+					/* @var $captionAsset CaptionAsset */
+					$captionsAssetObj = array();
+					$captionAssetObj['label'] =  $captionAsset->getLabel();
+					$captionAssetObj['default'] =  $captionAsset->getDefault();
+					$captionAssetObj['language'] =  $captionAsset->getLanguageCode();
+					$captionAssetObj['url'] =  $captionAsset->getExternalUrl($config->storageId);
+				}
+				
+				$contributors[] = $contributor;
+				
+				break;
+		}
+		
+		return $contributors;
+	}
+	
+	
 }
