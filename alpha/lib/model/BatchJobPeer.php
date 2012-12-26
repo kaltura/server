@@ -137,6 +137,8 @@ class BatchJobPeer extends BaseBatchJobPeer
 		$batchJobs = BatchJobPeer::retrieveByPKs($exclusive_objects_ids);
 		
 		foreach($batchJobs as $batchJob) {
+			
+			/* @var $batchJob BatchJob */
 
 			// Set history
 			$historyRecord = new kBatchHistoryData();
