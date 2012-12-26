@@ -19,13 +19,13 @@ class Form_TroubleshootConfig extends Infra_Form
 		$this->addElement($titleElement);
 		
 		$status = new Kaltura_Form_Element_EnumSelect('status', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderStatus'));
-		$status->setLabel('Last Drop Folder Access Status:');
+		$status->setLabel('Status:');
 		$status->setAttrib('readonly', true);
 		$status->setAttrib('disabled', 'disabled');
 		$this->addElement($status);
 		
-		$this->addElement('text', 'updatedAt', array(
-			'label'			=> 'Time/Date',
+		$this->addElement('text', 'lastAccessedAt', array(
+			'label'			=> 'Last Drop Folder Access Time/Date:',
 			'disabled'		=>true,
 			'filters'		=> array('StringTrim'),
 		));
@@ -48,9 +48,20 @@ class Form_TroubleshootConfig extends Infra_Form
 	{
 		parent::populateFromObject($object, $add_underscore);
 				
-		$updatedAtElm = $this->getElement('updatedAt');		
-		$formattedDate = date($this->getView()->translate('time format'), $updatedAtElm->getValue());
-		$updatedAtElm->setValue($formattedDate);
+		$lastAccessedAtElm = $this->getElement('lastAccessedAt');	
+		KalturaLog::debug('last accessed: '.$lastAccessedAtElm->getValue());	
+		if($lastAccessedAtElm->getValue())
+			$formattedDate = date($this->getView()->translate('time format'), $lastAccessedAtElm->getValue());
+		else
+			$formattedDate = 'N/A';
+		$lastAccessedAtElm->setValue($formattedDate);
+		
+		if($object->status !== Kaltura_Client_DropFolder_Enum_DropFolderStatus::ERROR)
+		{
+			$descElm = $this->getElement('errorDescription');		
+			$descElm->setAttrib('hidden', true);
+			$descElm->setLabel('');
+		}
 	}
 	
  }

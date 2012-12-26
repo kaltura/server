@@ -63,7 +63,10 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			{
 			    try 
 			    {	
-				    $this->watchFolder($folder);				    
+			    	$this->impersonate($folder->partnerId);				    	
+				    $this->watchFolder($folder);					    
+				    $this->setDropFolderOK($folder);		
+					$this->unimpersonate();					    
 			    }
 			    catch (kFileTransferMgrException $e)
 			    {
@@ -100,13 +103,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	private function watchFolder(KalturaDropFolder $folder)
 	{
 		KalturaLog::debug('Watching folder ['.$folder->id.']');
-		
-		$this->impersonate($folder->partnerId);	
-		
-		$originalDropFolderStatus = $folder->status;		
-		if($folder->status == KalturaDropFolderStatus::ERROR)
-			$folder->status = KalturaDropFolderStatus::ENABLED;
-			    										
+						    										
 		$this->physicalDropFolderUtils = new KPhysicalDropFolderUtils($folder);		
 		$physicalFiles = $this->getDropFolderFilesFromPhysicalFolder($folder);
 		if(count($physicalFiles) > 0)
@@ -157,11 +154,6 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		{
 			$this->dropFolderServicesHelper->handleFilePurged($dropFolderFile->id);
 		}
-				
-		if($originalDropFolderStatus == KalturaDropFolderStatus::ERROR)
-		   	$this->setDropFolderOK($folder);
-		
-		$this->unimpersonate();		
 	}
 
 		
@@ -409,16 +401,14 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		KalturaLog::err('Error with folder id ['.$folder->id.'] - '.$e->getMessage());
 		try 
 		{
-			if($folder->status != KalturaDropFolderStatus::ERROR)
-			{				
-				$folder->status = KalturaDropFolderStatus::ERROR;
-				$updateDropFolder = new KalturaDropFolder();
-				$updateDropFolder->status = KalturaDropFolderStatus::ERROR;
-				$updateDropFolder->errorCode = $errorCode;
-				$updateDropFolder->errorDescription = $errorDescirption;
-				
-	    		$this->dropFolderPlugin->dropFolder->update($folder->id, $updateDropFolder);
-			}	
+			$folder->status = KalturaDropFolderStatus::ERROR;
+			$updateDropFolder = new KalturaDropFolder();
+			$updateDropFolder->status = KalturaDropFolderStatus::ERROR;
+			$updateDropFolder->errorCode = $errorCode;
+			$updateDropFolder->errorDescription = $errorDescirption;
+			$updateDropFolder->lastAccessedAt = time();
+			
+    		$this->dropFolderPlugin->dropFolder->update($folder->id, $updateDropFolder);
 		}
 		catch(Exception $e)
 		{
@@ -434,6 +424,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			$updateDropFolder->status = KalturaDropFolderStatus::ENABLED;
 			$updateDropFolder->errorCode__null = '';
 			$updateDropFolder->errorDescription__null = '';
+			$updateDropFolder->lastAccessedAt = time();
 				
 	    	$this->dropFolderPlugin->dropFolder->update($folder->id, $updateDropFolder);
 		}

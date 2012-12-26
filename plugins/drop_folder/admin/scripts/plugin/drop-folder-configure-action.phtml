@@ -15,7 +15,6 @@
 jQuery(document).ready(function() {
 	handlerTypeChanged();
 	fileDeletePolicy();
-	troubleshootInit();
 });
 
 function fileDeletePolicy() {
@@ -50,8 +49,6 @@ function fileDeletePolicy() {
 		}
 	});}
 
-
-
 function handlerTypeChanged()
 {
 	curValue = jQuery('#frmDropFolderConfigure #fileHandlerType').val();
@@ -59,18 +56,7 @@ function handlerTypeChanged()
 		jQuery('#frmDropFolderConfigure #frmContentFileHandlerConfig').css("display","inline");
 	}
 	else {
-		jQuery('#frmDropFolderConfigure #frmContentFileHandlerConfig').css("display","none");
-	}	
-}
-
-function troubleshootInit()
-{
-	curValue = jQuery('#frmTroubleshootConfig #status').val();
-	if (curValue == <?php echo Kaltura_Client_DropFolder_Enum_DropFolderStatus::ERROR; ?>) {
-		jQuery('#frmDropFolderConfigure #frmTroubleshootConfig').css("display","inline");
-	}
-	else {
-		jQuery('#frmDropFolderConfigure #frmTroubleshootConfig').css("display","none");
+		jQuery('#frmDropFolderConfigure #frmContentFileHandlerConfig').css("display","none");			
 	}	
 }
 

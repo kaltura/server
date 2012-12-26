@@ -92,7 +92,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		$this->addElement('text', 'fileNamePatterns', array(
 			'label' 		=> 'Source File Name Patterns (to handle):',
 			'required'		=> true,
-		    'value'			=> '*.*',
+		    'value'			=> '*.xml',
 			'filters'		=> array('StringTrim'),
 		));
 		
@@ -181,8 +181,6 @@ class Form_DropFolderConfigure extends Infra_Form
 		}
     	
 		//------------------------------------
-		$troubleshootForm = new Form_TroubleshootConfig();
-		$this->addSubForm($troubleshootForm, 'troubleshootConfig');
 	}
 	
 	
@@ -195,11 +193,11 @@ class Form_DropFolderConfigure extends Infra_Form
 			$this->getSubForm('contentHandlerConfig')->populateFromObject($object->fileHandlerConfig, false);
 		}
 		
-		if ($object->status === Kaltura_Client_DropFolder_Enum_DropFolderStatus::ERROR) {
-			$this->getSubForm('troubleshootConfig')->populateFromObject($object, false);
-		}
-		
-				
+		//add troubleshoot form only to existing object
+		$troubleshootForm = new Form_TroubleshootConfig();
+		$this->addSubForm($troubleshootForm, 'troubleshootConfig');		
+		$troubleshootForm->populateFromObject($object, false);
+						
 		$props = $object;
 		if(is_object($object))
 			$props = get_object_vars($object);

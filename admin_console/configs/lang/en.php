@@ -44,7 +44,7 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::DISTRIBUTION_DISABLE' => 'Distribution Disable',
 	'Kaltura_Client_Enum_BatchJobType::DISTRIBUTION_SYNC' => 'Distribution Sync',
 	'Kaltura_Client_Enum_BatchJobType::DROP_FOLDER_WATCHER' => 'Drop Folder Watcher',
-	'Kaltura_Client_Enum_BatchJobType::DROP_FOLDER_HANDLER' => 'Drop Folder Handler',
+	'Kaltura_Client_Enum_BatchJobType::DROP_FOLDER_CONTENT_PROCESSOR' => 'Drop Folder Content Processor',
 	'Kaltura_Client_Enum_BatchJobType::EVENT_NOTIFICATION_HANDLER' => 'Event Notification',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
@@ -1023,6 +1023,7 @@ return array(
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderStatus::DISABLED' => 'Disabled',
 	'Kaltura_Client_DropFolder_Enum_DropFolderStatus::ENABLED' => 'Enabled',
+	'Kaltura_Client_DropFolder_Enum_DropFolderStatus::ERROR' => 'Enabled (Access Error)',
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderType::LOCAL' => 'Local',
     'Kaltura_Client_DropFolder_Enum_DropFolderType::FTP' => 'Remote FTP',
