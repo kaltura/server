@@ -671,12 +671,10 @@ kmc.preview_embed = {
 
 		if( live_bitrates ) {kmc.vars.last_delivery_type = "http";} // Reset delivery type to http
 
-		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id, true);
+		var https_embed_code = (window.location.protocol == 'https:') ? true : false;
+		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id, true, https_embed_code);
 		preview_player = embed_code.replace('{FLAVOR}','ks=' + kmc.vars.ks + '&');
-		// Change preview player protocol if kmc was loaded in https
-		if( location.protocol == 'https:' ) {
-			preview_player = preview_player.replace(/http/g, "https");
-		}
+
 		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id);
 		embed_code = embed_code.replace('{FLAVOR}','');
 
@@ -740,11 +738,11 @@ kmc.preview_embed = {
 		}
 	}, // doPreviewEmbed
 
-	getDeliveryTypeFlashvars: function( id ) {
+	getDeliveryTypeFlashvars: function( typeId ) {
 		var fv = {};
-		$.each(kmc.vars.DeliveryTypeStorage, function() {
-			if( this.id == id ) {
-				fv = this.flashvars;
+		$.each(kmc.vars.delivery_types, function(id, item) {
+			if( typeId == id ) {
+				fv = item.flashvars;
 				return false;
 			}
 		});
@@ -758,9 +756,9 @@ kmc.preview_embed = {
 		if( kmc.vars.last_delivery_type ) {
 			return kmc.vars.last_delivery_type;
 		} else {
-			$.each(types, function() {
-				if(this.id == kmc.vars.default_delivery_type){
-					defaultType = this.id;
+			$.each(types, function(id, item) {
+				if(id == kmc.vars.default_delivery_type){
+					defaultType = id;
 					return false;
 				}
 			});
@@ -780,27 +778,17 @@ kmc.preview_embed = {
 			}
 		};
 
-		var validArray = [];
+		var validated = {};
 
-		$.each(kmc.vars.DeliveryTypeStorage, function() {
-			if( this.id == 'auto' ) {
-				clearLastDeliveryType(this.id);
-				return true;
-			}
-			if( (this.id == 'akamai' || this.id == 'hds' ) && kmc.vars.hide_akamai_hd_network ) {
-				clearLastDeliveryType(this.id);
-				return true;
-			}
-
+		$.each(kmc.vars.delivery_types, function(id, item) {
 			var swfVersion = uiconf.swf_version;
-			if( this.minVersion && ! kmc.functions.versionIsAtLeast(this.minVersion, swfVersion) ) {
-				clearLastDeliveryType(this.id);
+			if( item.minVersion && ! kmc.functions.versionIsAtLeast(item.minVersion, swfVersion) ) {
+				clearLastDeliveryType(id);
 				return true;
 			}
-
-			validArray.push(this);
+			validated[ id ] = item;
 		});
-		return validArray;
+		return validated;
 	},
 
 	getDefaultEmbedType: function(uiconf, is_playlist) {
@@ -810,9 +798,9 @@ kmc.preview_embed = {
 		if( kmc.vars.last_embed_code_type ) {
 			return kmc.vars.last_embed_code_type;
 		} else {
-			$.each(types, function() {
-				if(this.id == kmc.vars.default_embed_code_type){
-					defaultType = this.id;
+			$.each(types, function(id, item) {
+				if(id == kmc.vars.default_embed_code_type){
+					defaultType = id;
 					return false;
 				}
 			});
@@ -825,32 +813,35 @@ kmc.preview_embed = {
 		if( typeof uiconf !== 'object' ) {
 			uiconf = kmc.preview_embed.getUiconfDetails(uiconf,is_playlist);
 		}
-		var validArray = [];
+
 		var clearLastEmbedType = function( id ) {
 			if( kmc.vars.last_embed_code_type == id ) { 
 				kmc.vars.last_embed_code_type = null;
 			}
 		};
+
+		var validated = {};
+
 		// Go over embed code types
-		$.each(kmc.vars.EmbedCodeStorage, function(){
-			if( this.id == 'thumb' ) {
-				clearLastEmbedType(this.id);
+		$.each(kmc.vars.embed_code_types, function(id, item){
+			if( id == 'thumb' ) {
+				clearLastEmbedType(id);
 				return true;
 			}
 			// Don't add embed code that are entry only for playlists
 			if(is_playlist && this.entryOnly) {
-				clearLastEmbedType(this.id);
+				clearLastEmbedType(id);
 				return true;
 			}
 			// Check for library minimum version to eanble embed type
 			var libVersion = kmc.functions.getVersionFromPath(uiconf.html5Url);
-			if( this.minVersion && ! kmc.functions.versionIsAtLeast(this.minVersion, libVersion) ) {
-				clearLastEmbedType(this.id);
+			if( item.minVersion && ! kmc.functions.versionIsAtLeast(item.minVersion, libVersion) ) {
+				clearLastEmbedType(id);
 				return true;
 			}
-			validArray.push(this);
+			validated[ id ] = item;
 		});
-		return validArray;
+		return validated;
 	},
 
 	buildSelect : function(is_playlist, uiconf_id) {
@@ -890,9 +881,9 @@ kmc.preview_embed = {
 		var html = '<div class="clearfix"><div id="rtmp" class="label">Select Delivery Type:</div> <select id="delivery_type">';
 		var options = '';
 
-		$.each(kmc.preview_embed.getValidDeliveryTypes(uiconf, is_playlist), function(){
-			var selected = (delivery_type == this.id) ? 'selected="selected"' : '';
-			options += '<option value="' + this.id + '"' + selected + '>' + this.label + '</option>';
+		$.each(kmc.preview_embed.getValidDeliveryTypes(uiconf, is_playlist), function(id, item){
+			var selected = (delivery_type == id) ? 'selected="selected"' : '';
+			options += '<option value="' + id + '"' + selected + '>' + item.label + '</option>';
 		});
 
 		html += options + '</select></div><div class="note">Adaptive Streaming automatically adjusts to the viewer\'s bandwidth,' +
@@ -905,9 +896,9 @@ kmc.preview_embed = {
 		var html = '<div class="clearfix"><div id="embedtypes" class="label">Select Embed Code Type:</div> <select id="embed_types">';
 		var options = '';
 		// Go over embed code types
-		$.each(kmc.preview_embed.getValidEmbedTypes(uiconf, is_playlist), function(){
-			var selected = (embed_type == this.id) ? 'selected="selected"' : '';
-			options += '<option value="' + this.id + '"' + selected + '>' + this.label + '</option>';
+		$.each(kmc.preview_embed.getValidEmbedTypes(uiconf, is_playlist), function(id, item){
+			var selected = (embed_type == id) ? 'selected="selected"' : '';
+			options += '<option value="' + id + '"' + selected + '>' + item.label + '</option>';
 		});
 		html += options + '</select></div><div class="note">Auto embed is the default embed code type and is best to get a player quickly on a page without any runtime customizations. <a href="javascript:kmc.utils.openHelp(\'section_pne_ipad\');">Read more</a> about the different embed code types.</div>';
 		return '<div class="item">' + html + '</div>';
@@ -966,12 +957,9 @@ kmc.preview_embed = {
 	// flavor_details = json:
 	doFlavorPreview : function(entry_id, entry_name, flavor_details) {
 
-		var player_code = kmc.preview_embed.buildKalturaEmbed(entry_id,entry_name,null,false,kmc.vars.default_kdp, true);
+		var https_embed_code = (window.location.protocol == 'https:') ? true : false;
+		var player_code = kmc.preview_embed.buildKalturaEmbed(entry_id,entry_name,null,false,kmc.vars.default_kdp, true, https_embed_code);
 		player_code = player_code.replace('&{FLAVOR}', '&flavorId=' + flavor_details.asset_id + '&ks=' + kmc.vars.ks);
-		// Change preview player protocol if kmc was loaded in https
-		if( location.protocol == 'https:' ) {
-			player_code = player_code.replace(/http/g, "https");
-		}
 
 		var modal_content = '<div class="center">' + player_code + '</div><dl>' +
 		'<dt>Entry Name:</dt><dd>&nbsp;' + entry_name + '</dd>' +
@@ -1021,9 +1009,10 @@ kmc.preview_embed = {
 
 	// id = entry id, asset id or playlist id; name = entry name or playlist name;
 	// uiconf = uiconfid (normal scenario) or uiconf details json (for #content|Manage->drill down->flavors->preview)
-	buildKalturaEmbed : function(id, name, description, is_playlist, uiconf, previewPlayer ) {
+	buildKalturaEmbed : function(id, name, description, is_playlist, uiconf, previewPlayer, secured ) {
 		
 		var https_support = ($("#https_support").attr("checked")) ? true : false;
+		https_support = (secured) ? secured : https_support;
 
 		name = kmc.utils.escapeQuotes(name); 
 		var uiconf_id = uiconf.id || uiconf,
