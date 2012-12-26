@@ -127,6 +127,7 @@ class AttUverseDistributionFeedHelper
 	public function addItemXml($xml)
 	{
 		$tempDoc = new DOMDocument('1.0', 'UTF-8');
+		$xml = html_entity_decode($xml,ENT_QUOTES,'UTF-8');
 		$tempDoc->loadXML($xml);
 
 		$importedItem = $this->doc->importNode($tempDoc->firstChild, true);
