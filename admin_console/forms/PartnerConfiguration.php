@@ -14,9 +14,19 @@ class Form_PartnerConfiguration extends Infra_Form
     protected $limitSubForms = array();
     
     /**
-     * @var array<Kaltura_Type_PlayerDeliveryType>
+     * @var array<Kaltura_Client_Type_PlayerDeliveryType>
      */
     protected $playerDeliveryTypes = array();
+    
+    public function __construct($options = null)
+    {
+    	if(isset($options['playerDeliveryTypes']))
+    	{
+    		$this->playerDeliveryTypes = $options['playerDeliveryTypes'];
+    		unset($options['playerDeliveryTypes']);
+    	}
+    	parent::__construct($options);
+    }
     
 	public function init()
 	{
@@ -151,22 +161,39 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addElement('select', 'default_delivery_type', array(
 			'label'	  => 'Default Delivery Type:',
-			'decorators' => array('ViewHelper', array('HtmlTag',  array('tag' => 'dt', 'id' => 'default_delivery_type')))
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'prepend')), array('HtmlTag',  array('tag' => 'dt')))
 		));
 		
 		$this->addElement('select', 'default_embed_code_type', array(
 			'label'	  => 'Default Embed Code Type:',
-			'decorators' => array('ViewHelper', array('HtmlTag',  array('tag' => 'dt', 'id' => 'default_embed_code_type')))
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'prepend')), array('HtmlTag',  array('tag' => 'dt')))
 		));
 		
 		$this->addElement('checkbox', 'use_default_streamers', array(
-			'label'	  => 'Enable system streamer types',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
+			'label'		=> 'Enable system streamer types',
+			'decorators'=> array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
 		));
 		
 		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS]['Apply access control rule on thumbnail'] = 'restrict_thumbnail_by_ks';
+		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS]['Default Delivery Type'] = 'default_delivery_type';
+		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS]['Default Embed Code Type'] = 'default_embed_code_type';
 		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS]['Enable system streamer types'] = 'use_default_streamers';
 				
+		foreach($this->playerDeliveryTypes as $playerDeliveryType)
+		{
+			/* @var $playerDeliveryType Kaltura_Client_Type_PlayerDeliveryType */
+			$this->addElement('checkbox', 'delivery_type_' . $playerDeliveryType->id, array(
+				'label'		=> "Enable $playerDeliveryType->label",
+				'data-checked' => true,
+				'disabled'	=> true,
+				'checked'	=> true,
+				'class'		=> 'delivery_type',
+				'decorators'=> array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
+			));
+		
+			$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS][$playerDeliveryType->label] = 'delivery_type_' . $playerDeliveryType->id;
+		}
+		
 
 //--------------------------- Remote Storage Account policy ---------------------------				
 		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_Enum_StorageServePriority'));
@@ -299,8 +326,6 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addElement('button', 'monitor_usage_history', array(
 			'label'	  => 'View History',
-			
-			//'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('class' => 'partner_configuration_checkbox_field')))
 		));	
 		
 		
@@ -329,9 +354,6 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 	//--------------- Live Stream Params ----------------------------
 		$sourceTypes = array(Kaltura_Client_Enum_SourceType::AKAMAI_LIVE => 'Akamai Live');
-//		if (defined('Kaltura_Client_Enum_SourceType::LIMELIGHT_LIVE')) {
-//		    $sourceTypes[Kaltura_Client_Enum_SourceType::LIMELIGHT_LIVE] = 'Lime Light Live';
-//		}
 
 		$this->addElement('select', 'default_live_stream_entry_source_type', array(
 		   'label'   => 'Live Stream source type:',
@@ -371,25 +393,12 @@ class Form_PartnerConfiguration extends Infra_Form
 					//check permission to access the link's page
 					$indexLinkArray = explode('/', $modul->indexLink);
 					
-	//				Commented by Tan-Tan
-	//				The system admin user is never allowed to use these features, the features are allowed to the partner
-	//						
-	//				$linkAllowed= false;
-	//				if (($indexLinkArray[0])=='plugin'){
-	//				 	$linkAllowed = Infra_AclHelper::isAllowed($indexLinkArray[1], null);
-	//				}
-	//				else{
-	//					$linkAllowed = Infra_AclHelper::isAllowed($indexLinkArray[0], $indexLinkArray[1]);
-	//				}
-	//				if ($linkAllowed)
-	//				{
-						$element = $this->getElement($modul->permissionName);
-						$element->setDescription('<a class=linkToPage href="../'.$modul->indexLink.'">(config)</a>');
-						$element->addDecorators(array('ViewHelper',		      
-					        array('Label', array('placement' => 'append')),
-					        array('Description', array('escape' => false, 'tag' => false)),
-					      ));
-	//				}		      
+					$element = $this->getElement($modul->permissionName);
+					$element->setDescription('<a class=linkToPage href="../'.$modul->indexLink.'">(config)</a>');
+					$element->addDecorators(array('ViewHelper',		      
+				        array('Label', array('placement' => 'append')),
+				        array('Description', array('escape' => false, 'tag' => false)),
+				      ));
 				}
 				$permissionNames[$modul->group][$modul->label] = $modul->permissionName;
 			}
@@ -555,6 +564,20 @@ class Form_PartnerConfiguration extends Infra_Form
 				}
 			}			
 		}
+		
+        $element = $this->getElement('use_default_streamers');
+        $element->setAttrib('checked', is_null($object->disabledDeliveryTypes) || !count($object->disabledDeliveryTypes));
+		if(!is_null($object->disabledDeliveryTypes))
+		{
+			foreach($object->disabledDeliveryTypes as $disabledDeliveryType)
+			{
+				/* @var $disabledDeliveryType Kaltura_Client_Type_String */
+		        $element = $this->getElement('delivery_type_' . $disabledDeliveryType->value);
+		        $element->setAttrib('data-checked', false);
+        		KalturaLog::debug("delivery_type_{$disabledDeliveryType->value} checked [false]");
+			}
+		}
+		
 		if(!$object->permissions || !count($object->permissions))
 			return;
 			
@@ -579,6 +602,7 @@ class Form_PartnerConfiguration extends Infra_Form
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$systemPartnerConfiguration = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
+		/* @var $systemPartnerConfiguration Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration */
 		
 		$moduls = Zend_Registry::get('config')->moduls;
 		if ($moduls)
@@ -633,8 +657,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			}	
 		}
 			
-
-			
 		foreach ($this->limitSubForms as $subForm)
 		{
 			if ($subForm instanceof Form_PartnerConfigurationLimitSubForm)
@@ -643,7 +665,22 @@ class Form_PartnerConfiguration extends Infra_Form
 				$limit = $subForm->getObject('Kaltura_Client_SystemPartner_Type_SystemPartnerLimit', $properties[$limitType], false, $include_empty_fields);
 				$systemPartnerConfiguration->limits[] = $limit;			
 			}
-		}		
+		}
+
+		$systemPartnerConfiguration->disabledDeliveryTypes = array();
+		if(!isset($properties['use_default_streamers']) || !$properties['use_default_streamers'])
+		{
+			foreach($this->playerDeliveryTypes as $playerDeliveryType)
+			{
+				if(!isset($properties["delivery_type_{$playerDeliveryType->id}"]) || !$properties["delivery_type_{$playerDeliveryType->id}"])
+				{
+					$disabledDeliveryType = new Kaltura_Client_Type_String();
+					$disabledDeliveryType->value = $playerDeliveryType->id;
+					$systemPartnerConfiguration->disabledDeliveryTypes[] = $disabledDeliveryType;
+				}
+			}
+		}
+		
 		return $systemPartnerConfiguration;
 	}
 		
@@ -694,7 +731,6 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addDisplayGroup(array_merge(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert'), $permissionNames[self::GROUP_REMOTE_STORAGE] ,array('crossLine')), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));
 
-		// TODO
 		$this->addDisplayGroup(array_merge(array('notifications_config', 'allow_multi_notification'), $permissionNames[self::GROUP_NOTIFICATION_CONFIG] ,array('crossLine')), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
 		$this->addDisplayGroup(array_merge(array('def_thumb_offset','def_thumb_density') , $permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS], array('enable_bulk_upload_notifications_emails', 'bulk_upload_notifications_email', 'crossLine')), 'publisherSpecificIngestionSettings', array('legend' => 'Content Ingestion Options'));
 		$this->addDisplayGroup(array('logout_url', 'crossLine'), 'signSignOn', array('legend' => 'Sign Sign On'));

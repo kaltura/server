@@ -677,10 +677,13 @@ class Partner extends BasePartner
 		$deliveryTypes = $map['delivery_types'];
 		
 		$disabledDeliveryTypes = $this->getDisabledDeliveryTypes();
-		foreach($disabledDeliveryTypes as $disabledDeliveryType)
+		if($disabledDeliveryTypes)
 		{
-			if(isset($deliveryTypes[$disabledDeliveryType]))
-				unset($deliveryTypes[$disabledDeliveryType]);
+			foreach($disabledDeliveryTypes as $disabledDeliveryType)
+			{
+				if(isset($deliveryTypes[$disabledDeliveryType]))
+					unset($deliveryTypes[$disabledDeliveryType]);
+			}
 		}
 			
 		return $deliveryTypes;

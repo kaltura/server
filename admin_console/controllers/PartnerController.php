@@ -369,13 +369,20 @@ class PartnerController extends Zend_Controller_Action
 		$systemPartnerPlugin->systemPartner->getPlayerEmbedCodeTypes();
 		$systemPartnerPlugin->systemPartner->getPlayerDeliveryTypes();
 		list($packages, $packagesVertical, $packagesClassOfService, $playerEmbedCodeTypes, $playerDeliveryTypes) = $client->doMultiRequest();
+
+		$systemDefaults = new stdClass();
+		$systemDefaults->id = '';
+		$systemDefaults->label = 'Use System Defaults';
 		
-		$form = new Form_PartnerConfiguration($playerDeliveryTypes);
+		$playerEmbedCodeTypes[] = $systemDefaults;
+		$playerDeliveryTypes[] = $systemDefaults;
+		
+		$form = new Form_PartnerConfiguration(array('playerDeliveryTypes' => $playerDeliveryTypes));
 		Form_PackageHelper::addPackagesToForm($form, $packages,					'partner_package', $allowNonePackage);
 		Form_PackageHelper::addPackagesToForm($form, $packagesVertical,			'vertical_clasiffication');
 		Form_PackageHelper::addPackagesToForm($form, $packagesClassOfService,	'partner_package_class_of_service');
-		Form_PackageHelper::addOptionsToForm ($form, $playerEmbedCodeTypes,		'default_embed_code_type');
-		Form_PackageHelper::addOptionsToForm ($form, $playerDeliveryTypes,		'default_delivery_type');
+		Form_PackageHelper::addOptionsToForm ($form, $playerEmbedCodeTypes,		'default_embed_code_type', 'label');
+		Form_PackageHelper::addOptionsToForm ($form, $playerDeliveryTypes,		'default_delivery_type', 'label');
 		
 		$request = $this->getRequest();
 		

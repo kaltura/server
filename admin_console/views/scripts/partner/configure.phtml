@@ -302,6 +302,28 @@ function openViewHistory(partner_id){
 		);
 }
 
+function useDefaultStreamersChanged() {
+	var disable = jQuery('#use_default_streamers').attr('checked');
+	var deliveryTypes = jQuery('.delivery_type');
+
+	if(disable){
+		deliveryTypes.attr('checked', true);
+		deliveryTypes.attr('disabled', true);
+	}
+	else{
+		deliveryTypes.attr('disabled', false);
+		deliveryTypes.each(function(){
+
+			if($(this).data('checked')){
+				$(this).attr('checked', true);
+			}
+			else{
+				$(this).attr('checked', false);
+			}
+		});
+	}
+}
+
 jQuery(document).ready(function() {
 	<?php if ($this->formValid): ?>
 		jQuery('#partner-configure-dialog').dialog('close');
@@ -309,6 +331,9 @@ jQuery(document).ready(function() {
 	<?php else: ?>
 		jQuery('#frmPartnerConfigure').ajaxForm(configurePartnerSuccess);
 	<?php endif; ?>
+
+	jQuery('#use_default_streamers').change(useDefaultStreamersChanged);
+	useDefaultStreamersChanged();
 });
 
 </script>
