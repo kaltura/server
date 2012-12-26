@@ -1417,7 +1417,19 @@ class playManifestAction extends kalturaAction
 		
 		if (!$renderer)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'This format is unsupported');
-
+		
+		$renderer->contributors = array();
+		$config = new kManifestContributorConfig();
+		$config->format = $this->format;
+		$config->deliveryCode = $deliveryCode;
+		$config->storageId = $this->storageId;
+		$contributors = KalturaPluginManager::getPluginInstances('IKalturaPlayManifestContributor');
+		foreach ($contributors as $contributor)
+		{
+			/* @var $contributor IKalturaPlayManifestContributor */
+			$renderer->contributors = array_merge($renderer->contributors, $contributor->getManifestEditors($config));
+		}
+			
 		$renderer->entryId = $this->entryId;
 		$renderer->duration = $this->duration;
 		$renderer->tokenizer = $this->urlManager->getTokenizer();
