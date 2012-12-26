@@ -18,11 +18,22 @@
 	}
 
 	class KDLVideoBitrateNormalize {
+					/*
+					 * Ratios that represent quaility/efficency diffrences beween various 
+					 * codecs/codec groups per given bitrate. 
+					 * For example - H264 assumed to be twice more efficient than H263, and so on. 
+					 */
 		const BitrateH263Factor = 1.0;
 		const BitrateVP6Factor = 1.5;
 		const BitrateH264Factor = 2.0;
-		const BitrateScreencastFactor = 8.0;
+		const BitrateScreencastFactor = 6.0;
 		const BitrateOthersRatio = 1.3;
+		
+					/*
+					 * Following the codec-vs-codec normalization, this factor gives additional 20%
+					 * to the bitarate to cope with the built-in transcoding quality reduction  
+					 */
+		const TranscodingFactor = 1.2;	
 		
 		static $BitrateFactorCategory1 = array(KDLVideoTarget::H263,KDLVideoTarget::FLV, "h263", "h.263", "s263", "flv1", "theora");
 		static $BitrateFactorCategory2 = array(KDLVideoTarget::VP6, "vp6", "vp6e", "vp6s", "flv4");
@@ -37,27 +48,27 @@
 		
 		public static function NormalizeSourceToTarget($sourceCodec, $sourceBitrate, $targetCodec)
 		{
-		$ratioTrg = self::BitrateVP6Factor;
-		if(in_array($targetCodec, self::$BitrateFactorCategory1))
-			$ratioTrg = self::BitrateH263Factor;
-		else if(in_array($targetCodec, self::$BitrateFactorCategory2))
 			$ratioTrg = self::BitrateVP6Factor;
-		else if(in_array($targetCodec, self::$BitrateFactorCategory3))
-			$ratioTrg = self::BitrateH264Factor;
-
-		$ratioSrc = self::BitrateOthersRatio;
-		if(in_array($sourceCodec, self::$BitrateFactorCategory1))
-			$ratioSrc = self::BitrateH263Factor;
-		else if(in_array($sourceCodec, self::$BitrateFactorCategory2))
-			$ratioSrc = self::BitrateVP6Factor;
-		else if(in_array($sourceCodec, self::$BitrateFactorCategory3))
-			$ratioSrc = self::BitrateH264Factor;
-		else if(in_array($sourceCodec, self::$BitrateFactorCategory4))
-			$ratioSrc = self::BitrateScreencastFactor;
-
-		$brSrcNorm = $sourceBitrate*($ratioSrc/$ratioTrg);
-		return round($brSrcNorm, 0);								   		}
-	}
+			if(in_array($targetCodec, self::$BitrateFactorCategory1))
+				$ratioTrg = self::BitrateH263Factor;
+			else if(in_array($targetCodec, self::$BitrateFactorCategory2))
+				$ratioTrg = self::BitrateVP6Factor;
+			else if(in_array($targetCodec, self::$BitrateFactorCategory3))
+				$ratioTrg = self::BitrateH264Factor;
+	
+			$ratioSrc = self::BitrateOthersRatio;
+			if(in_array($sourceCodec, self::$BitrateFactorCategory1))
+				$ratioSrc = self::BitrateH263Factor;
+			else if(in_array($sourceCodec, self::$BitrateFactorCategory2))
+				$ratioSrc = self::BitrateVP6Factor;
+			else if(in_array($sourceCodec, self::$BitrateFactorCategory3))
+				$ratioSrc = self::BitrateH264Factor;
+			else if(in_array($sourceCodec, self::$BitrateFactorCategory4))
+				$ratioSrc = self::BitrateScreencastFactor;
+	
+			$brSrcNorm = $sourceBitrate*($ratioSrc/$ratioTrg)*self::TranscodingFactor;
+			return round($brSrcNorm, 0);								   		}
+		}
 	
 	class KDLConstants {
 				/* FlavorBitrateRedundencyFactor - 
