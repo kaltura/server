@@ -18,6 +18,7 @@
 			<systemName>New_Item_Pending_Moderation</systemName>
 			<description>Email notification template to be sent when a new item is pending moderation in a specific category (channel).</description>
 			<automaticDispatchEnabled>1</automaticDispatchEnabled>
+			<status>1</status> <!-- EventNotificationTemplateStatus::DISABLED -->
 			<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
 			<eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
 			<eventConditions objectType="array">
@@ -87,6 +88,7 @@
 			<systemName>Entry_Approved_In_Category</systemName>
 			<description>Email notification template to be sent when a new entry is approved in a category.</description>
 			<automaticDispatchEnabled>1</automaticDispatchEnabled>
+			<status>1</status> <!-- EventNotificationTemplateStatus::DISABLED -->
 			<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
 			<eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
 			<eventConditions objectType="array">
@@ -148,6 +150,7 @@
 			<systemName>Entry_Rejected_In_Category</systemName>
 			<description>Email notification template to be sent when a new entry is rejected in a category.</description>
 			<automaticDispatchEnabled>1</automaticDispatchEnabled>
+			<status>1</status> <!-- EventNotificationTemplateStatus::DISABLED -->
 			<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
 			<eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
 			<eventConditions objectType="array">
@@ -209,6 +212,7 @@
 			<systemName>Entry_Rejected</systemName>
 			<description>Email notification template to be sent when a new entry is rejected.</description>
 			<automaticDispatchEnabled>1</automaticDispatchEnabled>
+			<status>1</status> <!-- EventNotificationTemplateStatus::DISABLED -->
 			<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
 			<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
 			<eventConditions objectType="array">
@@ -264,6 +268,7 @@
 			<systemName>Entry_Approved</systemName>
 			<description>Email notification template to be sent when a new entry is approved.</description>
 			<automaticDispatchEnabled>1</automaticDispatchEnabled>
+			<status>1</status> <!-- EventNotificationTemplateStatus::DISABLED -->
 			<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
 			<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
 			<eventConditions objectType="array">
@@ -319,6 +324,7 @@
 			<systemName>Entry_Ready</systemName>
 			<description>Email notification template to be sent when a new entry is ready.</description>
 			<automaticDispatchEnabled>1</automaticDispatchEnabled>
+			<status>1</status> <!-- EventNotificationTemplateStatus::DISABLED -->
 			<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
 			<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
 			<eventConditions objectType="array">
@@ -380,6 +386,7 @@
 			<systemName>User_Added_To_Category_As_Role</systemName>
 			<description>Email notification template to be sent when a used is added to a category with a specific role.</description>
 			<automaticDispatchEnabled>1</automaticDispatchEnabled>
+			<status>1</status> <!-- EventNotificationTemplateStatus::DISABLED -->
 			<eventType>2</eventType> <!-- EventNotificationEventType::OBJECT_ADDED -->
 			<eventObjectType>12</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYKUSER -->
 			<eventConditions objectType="array">
@@ -441,6 +448,7 @@
 			<systemName>User_Role_Was_Changed_In_Category</systemName>
 			<description>Email notification template to be sent when user's role is changed in category.</description>
 			<automaticDispatchEnabled>1</automaticDispatchEnabled>
+			<status>1</status> <!-- EventNotificationTemplateStatus::DISABLED -->
 			<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
 			<eventObjectType>12</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYKUSER -->
 			<eventConditions objectType="array">
@@ -502,6 +510,7 @@
 			<systemName>User_Was_Removed_From_Category</systemName>
 			<description>Email notification template to be sent when user was removed from category.</description>
 			<automaticDispatchEnabled>1</automaticDispatchEnabled>
+			<status>1</status> <!-- EventNotificationTemplateStatus::DISABLED -->
 			<eventType>8</eventType> <!-- EventNotificationEventType::OBJECT_DELETED -->
 			<eventObjectType>12</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYKUSER -->
 			<eventConditions objectType="array">
@@ -557,6 +566,7 @@
 			<systemName>Entry_Was_Added_To_Channel</systemName>
 			<description>Email notification template to be sent when entry is added to channel.</description>
 			<automaticDispatchEnabled>1</automaticDispatchEnabled>
+			<status>1</status> <!-- EventNotificationTemplateStatus::DISABLED -->
 			<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
 			<eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
 			<eventConditions objectType="array">
@@ -620,6 +630,7 @@
 			<systemName>Comment_Was_Added_To_Entry</systemName>
 			<description>Email notification template to be sent to entry creator when a comment is added to entry.</description>
 			<automaticDispatchEnabled>1</automaticDispatchEnabled>
+			<status>1</status> <!-- EventNotificationTemplateStatus::DISABLED -->
 			<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
 			<eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
 			<eventConditions objectType="array">
