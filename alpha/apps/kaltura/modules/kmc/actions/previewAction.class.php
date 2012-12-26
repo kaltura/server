@@ -148,7 +148,10 @@ class previewAction extends kalturaAction
 	{
 		$result = '';
 		foreach( $fv as $key=>$value ) {
-			$prefix = '&' . ($paramName) ? $paramName . '[' : '';
+			$prefix = '&';
+			if($paramName) {
+				$prefix .= $paramName . '[';
+			}			
 			$suffix = ($paramName) ? ']=' : '=';
 			if( is_array($value) ) {
 				$pluginName = $key;
