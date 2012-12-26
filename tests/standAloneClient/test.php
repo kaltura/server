@@ -200,6 +200,15 @@ function executeRequest(KalturaClient $client, SimpleXMLElement $request)
 	return $result;
 }
 
+function askForUserParameter($message)
+{
+	echo $message." ";
+	$handle = fopen("php://stdin","r");
+	$line = fgets($handle);
+	fclose($handle);
+	return trim($line);
+}
+
 require_once 'lib/KalturaClient.php';
 
 $config = new KalturaConfiguration();
@@ -225,17 +234,21 @@ if(isset($inXml->session))
 	$email = isset($inXml->session->email) ? $inXml->session->email : null;
 	$password = isset($inXml->session->password) ? $inXml->session->password : null;
 
-	if ($email)
+	if ($secret)
 	{
-		if (!$password) // ask for password interactively
-		{
-			throw new Exception('Implement ask for password interactively');
-		}
-		$ks = $client->user->loginByLoginId($email, $password);
+		$ks = generateSession($secret, $userId, $sessionType, $partnerId, $expiry, $privileges);
 	}
 	else
 	{
-		$ks = generateSession($secret, $userId, $sessionType, $partnerId, $expiry, $privileges);
+		if (!$email)
+		{
+			$email = askForUserParameter('Partner email address:');
+		}
+		if (!$password)
+		{
+			$password = askForUserParameter('Partner password:');
+		}
+		$ks = $client->user->loginByLoginId($email, $password);
 	}
 	$client->setKs($ks);
 }
