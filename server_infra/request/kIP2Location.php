@@ -19,7 +19,11 @@ class kIP2Location
 			$ip2Location = IP2Location_open($ip2LocationBinFilePath, IP2LOCATION_STANDARD);
 			$record = IP2Location_get_country_short($ip2Location, $ip);
 			IP2Location_close($ip2Location);
-			return $record ? $record->country_short : "";
+			$result = $record ? $record->country_short : "";
+			if ($result == "GB") // retain the old UK country code till all components are adjusted to list GB
+				$result = "UK";
+
+			return $result;
 		}
 		
 		ini_set('memory_limit', '128M'); // ip_files are large array files, sometimes it might break if doesn't have enough memory
