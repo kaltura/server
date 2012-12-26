@@ -284,7 +284,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					$captionsAssetObj = array();
 					$captionAssetObj['label'] =  $captionAsset->getLabel();
 					$captionAssetObj['default'] =  $captionAsset->getDefault();
-					$captionAssetObj['language'] =  $captionAsset->getLanguageCode();
+					$captionAssetObj['language'] =  $captionAsset->getLanguage();
 					$captionAssetObj['url'] =  $captionAsset->getExternalUrl($config->storageId);
 				}
 				
