@@ -96,7 +96,7 @@ class previewAction extends kalturaAction
 		if( $this->playlist_id && $this->playlist_id != 'multitab_playlist') {
 			// build playlist url
 			$playlist_url = $this->partner_host ."/index.php/partnerservices2/executeplaylist?";
-			$playlist_url .= "partner_id=" . $this->partner_id . "&subp_id=" . $this->partner_id . "00&format=8&ks={ks}playlist_id=" . $this->playlist_id;
+			$playlist_url .= "partner_id=" . $this->partner_id . "&subp_id=" . $this->partner_id . "00&format=8&ks={ks}&playlist_id=" . $this->playlist_id;
 
 			// Add playlist flashVars
 			$flashVars["playlistAPI.autoInsert"] = "true";
