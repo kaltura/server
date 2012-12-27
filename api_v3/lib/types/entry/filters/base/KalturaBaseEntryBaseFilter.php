@@ -235,6 +235,8 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	public $categoriesMatchAnd;
 
 	/**
+	 * All entries within these categories or their child categories.
+	 * 
 	 * @var string
 	 */
 	public $categoriesMatchOr;
@@ -245,6 +247,9 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	public $categoriesIdsMatchAnd;
 
 	/**
+	 * All entries of the categories, excluding their child categories.
+	 * To include entries of the child categories, use categoryAncestorIdIn, or categoriesMatchOr.
+	 * 
 	 * @var string
 	 */
 	public $categoriesIdsMatchOr;

@@ -482,7 +482,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	}
 		
 	/**
-	 * To validate if user is entitled to the category – all needed is to select from the db.
+	 * To validate if user is entitled to the category ï¿½ all needed is to select from the db.
 	 * 
 	 * @throws KalturaErrors::ENTRY_CATEGORY_FIELD_IS_DEPRECATED
 	 */
@@ -654,6 +654,9 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			
 			"searchTextMatchAnd" => "This filter should be in use for retrieving specific entries while search match the input string within all of the following metadata attributes: name, description, tags, adminTags.",
 			"searchTextMatchOr" => "This filter should be in use for retrieving specific entries while search match the input string within at least one of the following metadata attributes: name, description, tags, adminTags.",
+		
+			"categoriesMatchOr" => "All entries within these categories or their child categories.",
+			"categoriesIdsMatchOr" => "All entries of the categories, excluding their child categories.\nTo include entries of the child categories, use categoryAncestorIdIn, or categoriesMatchOr.",
 		);
 	}
 }

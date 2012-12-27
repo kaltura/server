@@ -44,7 +44,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	public $categoriesFullNameIn;
 	
 	/**
-	 * all entries within this categoy or in child categories 
+	 * All entries within this categoy or in child categories  
 	 * @var string
 	 */
 	public $categoryAncestorIdIn;
