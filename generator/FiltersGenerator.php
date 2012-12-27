@@ -245,9 +245,10 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 						$filterDocs = $filterableObject->getFilterDocs();
 						if (isset($filterDocs[$filterProp]))
 						{
-							$filterDoc = $filterDocs[$filterProp];
-							
-							$this->appendLine("	 * $filterDoc");
+							$filterDocs = explode("\n", $filterDocs[$filterProp]);
+							foreach($filterDocs as $filterDoc)
+								$this->appendLine("	 * $filterDoc");
+								
 							$this->appendLine("	 * ");
 						}
 					}
