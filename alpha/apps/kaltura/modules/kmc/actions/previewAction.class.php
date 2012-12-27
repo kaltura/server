@@ -121,6 +121,7 @@ class previewAction extends kalturaAction
 		// If case of auto embed, append extra params to script url
 		if( $this->embed == 'auto' ) {
 			$append = '?autoembed=true&playerId=kaltura_player';
+			$append .= '&width=' . $this->uiConf->getWidth() . '&height=' . $this->uiConf->getHeight();
 			$append .= ($this->entry_id) ? '&entry_id=' . $this->entry_id : '';
 			$append .= '&' . $this->flashVarsToString($flashVars, 'flashvars');
 			$this->scriptUrl .= $append;

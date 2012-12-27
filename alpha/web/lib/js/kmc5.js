@@ -23,79 +23,6 @@ kmc.log = function() {
 	}	
 };
 
-kmc.vars.EmbedCodeStorage = [
-	{
-		id: 'auto',
-		label: 'Auto Embed',
-		minVersion: 'v1.7.0'
-	},
-	{
-		id: 'dynamic',
-		label: 'Dynamic Embed',
-		minVersion: 'v1.7.0'
-	},
-	{
-		id: 'thumb',
-		label: 'Thumbnail Embed',
-		minVersion: 'v1.7.0',
-		entryOnly: true
-	},		
-	{
-		id: 'legacy',
-		label: 'Legacy Flash Embed'
-	}
-];
-
-kmc.vars.DeliveryTypeStorage = [
-	{
-		id: 'auto',
-		label: 'Kaltura Auto',
-		flashvars: {
-			"streamerType": "auto"
-		},
-		minVersion: 'v3.6.14'
-	},
-	{
-		id: 'http',
-		label: 'HTTP Progressive Download',
-		flashvars: {}
-	},
-	{
-		id: 'akamai',
-		label: 'HTTP Streaming (Akamai)',
-		flashvars: {
-			"streamerType": "hdnetwork",
-			"akamaiHD.loadingPolicy": "preInitialize",
-			"akamaiHD.asyncInit": "true"
-		}
-	},
-	{
-		id: 'hds',
-		label: 'HTTP Streaming (HDS)',
-		flashvars: {
-			"streamerType": "hdnetwork",
-			"akamaiHD.loadingPolicy": "preInitialize",
-			"akamaiHD.asyncInit": "true",
-			"twoPhaseManifest": "true"
-		}
-	},
-	{
-		id: 'rtmp',
-		label: 'RTMP Streaming',
-		flashvars: {
-			"streamerType": "rtmp"
-		}
-	},
-	{
-		id: 'rtmpe',
-		label: 'Secure Transport (RTMPE)',
-		flashvars: {
-			"streamerType": "rtmp",
-			"mediaProtocol": "rtmpe"
-		}
-	}
-];
-
 kmc.functions = {
 
 	loadSwf : function() {
@@ -900,31 +827,8 @@ kmc.preview_embed = {
 			var selected = (embed_type == id) ? 'selected="selected"' : '';
 			options += '<option value="' + id + '"' + selected + '>' + item.label + '</option>';
 		});
-		html += options + '</select></div><div class="note">Auto embed is the default embed code type and is best to get a player quickly on a page without any runtime customizations. <a href="javascript:kmc.utils.openHelp(\'section_pne_ipad\');">Read more</a> about the different embed code types.</div>';
+		html += options + '</select></div><div class="note">Auto embed is the default embed code type and is best to get a player quickly on a page without any runtime customizations. <a href="javascript:kmc.utils.openHelp(\'section_pne_embed\');">Read more</a> about the different embed code types.</div>';
 		return '<div class="item">' + html + '</div>';
-	},
-		
-	buildHTML5Option : function(entry_id, name, is_playlist, previewOnly, partner_id, uiconf_id, has_mobile_flavors, is_video) {
-		
-		kmc.log( 'buildHTML5Option' );
-
-		// If preview, return nothing
-		if( previewOnly ) {
-			return '';
-		}
-
-		var description = "<div class=\"note\">If you enable the HTML5 player, the viewer device will be automatically detected." +
-		" <a href=\"javascript:kmc.utils.openHelp('section_pne_ipad');\">Read more</a></div>";
-
-		if( is_video && ! has_mobile_flavors) {
-			description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a href="javascript:kmc.utils.openHelp(\'section_pne_ipad\');">Read more</a></div>';
-		}
-
-		var html = '<div class="checkbox clearfix"><input id="html5_support" type="checkbox" /> <label class="label_text" for="html5_support">Support Mobile' +
-		' devices by fall-forward to HTML5</label></div>' + description;
-		html = '<div class="html5_support">' + html + '</div>' + kmc.preview_embed.buildHTTPSOption();
-
-		return '<div class="item clearfix">' + html + '</div>';
 	},
 	
 	buildHTTPSOption: function() {
@@ -1097,8 +1001,9 @@ kmc.preview_embed = {
 				code = '<script type="text/javascript" src="' + kmc.vars.service_url + 
 						'/p/'+ kmc.vars.partner_id + '/sp/' + kmc.vars.partner_id + 
 						'00/embedIframeJs/uiconf_id/' + uiconf_id + '/partner_id/' + 
-						kmc.vars.partner_id + '?entry_id=' + id + '&playerId=kaltura_player_' + 
-						kmc.preview_embed.setCacheStartTime() + '&autoembed=true{FLASHVARS_URL}"></script>';
+						kmc.vars.partner_id + '?entry_id=' + id + 
+						'&playerId=kaltura_player_' + kmc.preview_embed.setCacheStartTime() + 
+						'&autoembed=true&width={WIDTH}&height={HEIGHT}&{FLASHVARS_URL}"></script>';
 			break;
 			case 'dynamic':
 				code = kmc.preview_embed.embed_code_template.div_tag + '\n' + 
