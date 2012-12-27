@@ -263,7 +263,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	/* (non-PHPdoc)
 	 * @see IKalturaPlayManifestContributor::getManifestEditors()
 	 */
-	public static function getManifestEditors (kManifestContributorConfig $config)
+	public static function getManifestEditors ($config)
 	{
 		$contributors = array ();
 		
@@ -275,7 +275,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				//retrieve the current working partner's captions according to the entryId
 				$c = new Criteria();
 				$c->addAnd(assetPeer::ENTRY_ID, $config->entryId);
-				$c->addAnd(assetPeer::TYPE, CaptionAssetType::CAPTION);
+				$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
 				$c->addAnd(assetPeer::CONTAINER_FORMAT, CaptionType::WEBVTT);
 				$captionAssets = assetPeer::doSelect($c);
 				foreach ($captionAssets as $captionAsset)
@@ -285,7 +285,9 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					$captionAssetObj['label'] =  $captionAsset->getLabel();
 					$captionAssetObj['default'] =  $captionAsset->getDefault();
 					$captionAssetObj['language'] =  $captionAsset->getLanguage();
+					//Currently, this feature is only supported from remote storage
 					$captionAssetObj['url'] =  $captionAsset->getExternalUrl($config->storageId);
+					$contributor->captions[] = $captionsAssetObj;
 				}
 				
 				$contributors[] = $contributor;
