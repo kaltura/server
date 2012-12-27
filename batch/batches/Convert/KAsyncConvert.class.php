@@ -100,7 +100,8 @@ class KAsyncConvert extends KJobHandlerWorker
 			return null;
 		}
 		
-		$this->distributedFileManager = new KDistributedFileManager($this->taskConfig->params->localFileRoot, $this->taskConfig->params->remoteFileRoot, $this->taskConfig->params->fileCacheExpire);
+		$remoteFileRoot = $this->taskConfig->getRemoteServerUrl() . $this->taskConfig->params->remoteUrlDirectory;
+		$this->distributedFileManager = new KDistributedFileManager($this->taskConfig->params->localFileRoot, $remoteFileRoot, $this->taskConfig->params->fileCacheExpire);
 		
 		return parent::run($jobs);
 	}

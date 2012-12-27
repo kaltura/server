@@ -75,6 +75,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 			$task->setDwhEnabled($this->getDwhEnabled());
 			$task->setTimezone($this->getTimezone());
 			$task->setInitOnly(false);
+			$task->setRemoteServerUrl($this->getRemoteServerUrl());
 			$task->setMaxIdleTime($this->getMaxIdleTime());
 			
 			$this->taskConfigList[$workerName] = $task;
@@ -188,6 +189,11 @@ class KSchedulerConfig extends Zend_Config_Ini
 	public function getTasksetPath()
 	{
 		return $this->tasksetPath;
+	}
+	
+	public function getRemoteServerUrl()
+	{
+		return $this->remoteServerUrl;
 	}
 	
 	public function getMaxIdleTime()

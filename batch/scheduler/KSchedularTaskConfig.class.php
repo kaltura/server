@@ -27,11 +27,27 @@ class KSchedularTaskConfig extends Zend_Config_Ini
 	}
 	
 	/**
+	 * @param $remoteServerUrl the $remoteServerUrl to set
+	 */
+	public function setRemoteServerUrl($remoteServerUrl)
+	{
+		$this->remoteServerUrl = $remoteServerUrl;
+	}
+	
+	/**
 	 * @param $maxIdleTime the $maxIdleTime to set
 	 */
 	public function setMaxIdleTime($maxIdleTime)
 	{
 		$this->maxIdleTime = $maxIdleTime;
+	}
+
+	/**
+	 * @return the $remoteServerUrl
+	 */
+	public function getRemoteServerUrl()
+	{
+		return $this->remoteServerUrl;
 	}
 
 	/**
