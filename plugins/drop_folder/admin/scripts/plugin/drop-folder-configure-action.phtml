@@ -52,11 +52,17 @@ function fileDeletePolicy() {
 function handlerTypeChanged()
 {
 	curValue = jQuery('#frmDropFolderConfigure #fileHandlerType').val();
+	patterns = jQuery('#fileNamePatterns');
+	patternsLbl = jQuery('#fileNamePatterns-label');
 	if (curValue == <?php echo Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT; ?>) {
 		jQuery('#frmDropFolderConfigure #frmContentFileHandlerConfig').css("display","inline");
+		patterns.hide();
+		patternsLbl.hide();
 	}
 	else {
-		jQuery('#frmDropFolderConfigure #frmContentFileHandlerConfig').css("display","none");			
+		jQuery('#frmDropFolderConfigure #frmContentFileHandlerConfig').css("display","none");
+		patterns.show();
+		patternsLbl.show();
 	}	
 }
 
