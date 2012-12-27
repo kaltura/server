@@ -165,9 +165,10 @@ class WebVttCaptionsManifestEditor extends BaseManifestEditor
 	{
 		foreach ($this->captions as $captionItem)
 		{
+			$manifestHeader .= "\n";
 			$manifestHeader .= '#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="' . 
 				$captionItem["label"] . ',DEFAULT='.$captionItem["default"] . 
-				',AUTOSELECT=YES,FORCED=NO,LANGUAGE=' . self::$captionsFormatMap[$captionItem["language"]] . ',URI=' . $captionItem["url"] . '\n';
+				',AUTOSELECT=YES,FORCED=NO,LANGUAGE=' . self::$captionsFormatMap[$captionItem["language"]] . ',URI=' . $captionItem["url"];
 		}
 		
 		return $manifestHeader;
@@ -186,9 +187,14 @@ class WebVttCaptionsManifestEditor extends BaseManifestEditor
 	 */
 	public function editManifestFlavors (array $manifestFlavors)
 	{
-		foreach ($manifestFlavors as &$flavor)
+		if ($this->captions)
 		{
-			$flavor .= ',SUBTITLES="subs"';
+			foreach ($manifestFlavors as &$flavor)
+			{
+				$flavorParts = explode("\n", $flavor);
+				$flavorParts[0] .= ',SUBTITLES="subs"';
+				$flavor = implode("\n", $flavorParts);
+			}
 		}
 		
 		return $manifestFlavors;
