@@ -282,8 +282,8 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				{
 					/* @var $captionAsset CaptionAsset */
 					$captionsAssetObj = array();
-					$captionAssetObj['label'] =  $captionAsset->getLabel();
-					$captionAssetObj['default'] =  $captionAsset->getDefault();
+					$captionAssetObj['label'] =  $captionAsset->getLabel() ? $captionAsset->getLabel() : $captionAsset->getLanguage();
+					$captionAssetObj['default'] =  $captionAsset->getDefault() ? "YES" : "NO";
 					$captionAssetObj['language'] =  $captionAsset->getLanguage();
 					//Currently, this feature is only supported from remote storage
 					$captionAssetObj['url'] =  $captionAsset->getExternalUrl($config->storageId);
