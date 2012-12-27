@@ -1350,10 +1350,6 @@ class playManifestAction extends kalturaAction
 		if(!$this->cdnHost || $this->entry->getPartner()->getForceCdnHost())
 			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
 
-		$playbackCdnHost = $this->entry->getPartner()->getPlaybackCdnHost();
-		if($playbackCdnHost)
-			$this->cdnHost = preg_replace('/^https?/', $this->protocol, $playbackCdnHost);
-		
 		$this->enforceEncryption();
 		$this->initFlavorAssetArray();
 		$this->initEntryDuration();
@@ -1423,6 +1419,7 @@ class playManifestAction extends kalturaAction
 		$config->format = $this->format;
 		$config->deliveryCode = $deliveryCode;
 		$config->storageId = $this->storageId;
+		$config->entryId = $this->entryId;
 		$contributors = KalturaPluginManager::getPluginInstances('IKalturaPlayManifestContributor');
 		foreach ($contributors as $contributor)
 		{
