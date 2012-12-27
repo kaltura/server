@@ -112,7 +112,7 @@ abstract class kManifestRenderer
 		{
 			/* @var $contributorInstance BaseManifestEditor */
 			$header = $contributorInstance->editManifestHeader($header);
-			$footer = $contributorInstance->editManifestFooter ($header);
+			$footer = $contributorInstance->editManifestFooter ($footer);
 			$flavors = $contributorInstance->editManifestFlavors($flavors);
 		}
 		$content = $header;
@@ -537,7 +537,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			if ($bitrate && $bitrate <= 64000)
 				$codecs = ',CODECS="mp4a.40.2"';
 			$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$codecs}\n";
-			$content .= $flavor['url']."\n";
+			$content .= $flavor['url'];
 			$flavorsArr[] = $content;
 		}
 		
@@ -549,7 +549,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	 */
 	protected function getManifestHeader()
 	{
-		return "#EXTM3U\n";
+		return "#EXTM3U";
 	}
 
 }
