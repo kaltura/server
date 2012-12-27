@@ -37,6 +37,8 @@ class asperaMgr extends sftpMgr
 		}
 		else 
 			$cmd = "(echo $this->pass) | ascp ";
+		//creating folders on remote server
+		$cmd.= " -d ";
 		$cmd.=" -P $this->port ";
 		if ($this->privKeyFile)
 			$cmd.=" -i $this->privKeyFile ";
