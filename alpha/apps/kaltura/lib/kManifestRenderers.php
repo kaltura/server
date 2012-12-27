@@ -324,31 +324,7 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 		return $this->buildFlavorsArray();
 	}
 	
-	/**
-	 * @return string
-	 */
-	protected function getBody()
-	{		
-		
-		$flavorsXml = $this->buildFlavorsXml();
-		$mediaUrl = '';
-		if ($this->mediaUrl)
-		{
-			$mediaUrl = "<media url=\"".htmlspecialchars($this->mediaUrl)."\"/>";
-		}
-				
-		return 
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<manifest xmlns=\"http://ns.adobe.com/f4m/1.0\">
-	<id>{$this->entryId}</id>
-	<mimeType>{$this->mimeType}</mimeType>
-	<streamType>{$this->streamType}</streamType>					
-	{$durationXml}
-	{$baseUrlXml}
-	{$flavorsXml}
-	{$mediaUrl}
-</manifest>";
-	}
+	
 }
 	
 class kF4Mv2ManifestRenderer extends kMultiFlavorManifestRenderer
@@ -569,7 +545,7 @@ class kRtspManifestRenderer extends kSingleUrlManifestRenderer
 	 */
 	protected function getManifestHeader()
 	{
-		'<html><head><meta http-equiv="refresh" content="0;url=' . htmlspecialchars($this->flavor['url']) . '"></head></html>';
+		return '<html><head><meta http-equiv="refresh" content="0;url=' . htmlspecialchars($this->flavor['url']) . '"></head></html>';
 	}
 
 }
