@@ -88,7 +88,16 @@ class Form_DropFolderConfigure extends Infra_Form
 		$this->addElement($titleElement);
 		
 		$this->addConversionProfiles();
+				
+		$fileHandlerTypes = new Kaltura_Form_Element_EnumSelect('fileHandlerType', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType'));
+		$fileHandlerTypes->setLabel('Ingestion Workflow:');
+		$fileHandlerTypes->setRequired(true);
+		$fileHandlerTypes->setAttrib('onchange', 'handlerTypeChanged()');
+		$this->addElement($fileHandlerTypes);
 		
+		$handlerConfigForm = new Form_ContentFileHandlerConfig();
+		$this->addSubForm($handlerConfigForm, 'contentHandlerConfig'); 
+
 		$this->addElement('text', 'fileNamePatterns', array(
 			'label' 		=> 'Source File Name Patterns (to handle):',
 			'required'		=> true,
@@ -101,15 +110,6 @@ class Form_DropFolderConfigure extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$fileHandlerTypes = new Kaltura_Form_Element_EnumSelect('fileHandlerType', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType'));
-		$fileHandlerTypes->setLabel('Ingestion Workflow:');
-		$fileHandlerTypes->setRequired(true);
-		$fileHandlerTypes->setAttrib('onchange', 'handlerTypeChanged()');
-		$this->addElement($fileHandlerTypes);
-		
-		$handlerConfigForm = new Form_ContentFileHandlerConfig();
-		$this->addSubForm($handlerConfigForm, 'contentHandlerConfig'); 
-
 		$this->addElement('hidden', 'crossLine2', array(
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));		
