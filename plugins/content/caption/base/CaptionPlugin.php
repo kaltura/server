@@ -270,6 +270,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		switch ($config->format)
 		{
 			case PlaybackProtocol::APPLE_HTTP:
+				KalturaLog::debug("creating contributors");
 				$contributor = new WebVttCaptionsManifestEditor();
 				$contributor->captions = array();
 				//retrieve the current working partner's captions according to the entryId
@@ -278,19 +279,25 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
 				$c->addAnd(assetPeer::CONTAINER_FORMAT, CaptionType::WEBVTT);
 				$captionAssets = assetPeer::doSelect($c);
+				KalturaLog::debug("Found  " . count($captionAssets) ." caption assets");
 				foreach ($captionAssets as $captionAsset)
 				{
 					/* @var $captionAsset CaptionAsset */
 					$captionsAssetObj = array();
-					$captionAssetObj['label'] =  $captionAsset->getLabel() ? $captionAsset->getLabel() : $captionAsset->getLanguage();
+					$captionAssetObj['label'] =  $captionAsset->getLabel();
 					$captionAssetObj['default'] =  $captionAsset->getDefault() ? "YES" : "NO";
 					$captionAssetObj['language'] =  $captionAsset->getLanguage();
-					//Currently, this feature is only supported from remote storage
+					//Currently only external caption assets are supported
 					$captionAssetObj['url'] =  $captionAsset->getExternalUrl($config->storageId);
-					$contributor->captions[] = $captionsAssetObj;
+					KalturaLog::info("Object passed into editor: " . print_r($captionAssetObj, true));
+					$contributor->captions[] = $captionAssetObj;
 				}
 				
+				KalturaLog::debug("contributor captions :" . print_r($contributor->captions, true));
 				$contributors[] = $contributor;
+				
+				break;
+			
 				
 				break;
 		}

@@ -167,8 +167,8 @@ class WebVttCaptionsManifestEditor extends BaseManifestEditor
 		{
 			$manifestHeader .= "\n";
 			$manifestHeader .= '#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="' . 
-				$captionItem["label"] . ',DEFAULT='.$captionItem["default"] . 
-				',AUTOSELECT=YES,FORCED=NO,LANGUAGE=' . self::$captionsFormatMap[$captionItem["language"]] . ',URI=' . $captionItem["url"];
+				$captionItem["label"] . '",DEFAULT='.$captionItem["default"] . 
+				',AUTOSELECT=YES,FORCED=NO,LANGUAGE="' . self::$captionsFormatMap[$captionItem["language"]] . '",URI="' . $captionItem["url"] . '"';
 		}
 		
 		return $manifestHeader;
