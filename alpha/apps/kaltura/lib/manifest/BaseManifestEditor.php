@@ -23,5 +23,5 @@ abstract class BaseManifestEditor
 	 * @param array $flavors
 	 * @return array
 	 */
-	abstract public function editManifestFlavors ($flavors);
+	abstract public function editManifestFlavors (array $flavors);
 }
