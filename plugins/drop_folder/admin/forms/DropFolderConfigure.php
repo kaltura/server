@@ -102,7 +102,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		));
 		
 		$fileHandlerTypes = new Kaltura_Form_Element_EnumSelect('fileHandlerType', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType'));
-		$fileHandlerTypes->setLabel('Ingestion Source:');
+		$fileHandlerTypes->setLabel('Ingestion Workflow:');
 		$fileHandlerTypes->setRequired(true);
 		$fileHandlerTypes->setAttrib('onchange', 'handlerTypeChanged()');
 		$this->addElement($fileHandlerTypes);
