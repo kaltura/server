@@ -16,7 +16,6 @@ class WebVttCaptionsManifestEditor extends BaseManifestEditor
 	 * Static map between language format used by the whole system and the captions format used by the M3U8 file
 	 * @var array
 	 */
-	//TODO fill this map
 	public static $captionsFormatMap = array (
 				'Abkhazian' =>	'abk',
 				'Afar' =>	'aar',
