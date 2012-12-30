@@ -1,25 +1,34 @@
 <?php
 /**
- * Extends the 'sftpMgr' class and implementing doPutFile doGetFile using Aspera.
- * For additional comments please look at the 'sftpMgr' class.
  * 
  * @package infra
  * @subpackage Storage
  */
-class asperaMgr extends sftpMgr
+class asperaMgr extends kFileTransferMgr
 {
 	
-	// upload a file to the server ising Aspera connection (ftp_mode is irrelevant)
-	protected function doPutFile ($remote_file , $local_file)
-	{
+	private $privKeyFile;
+	private $pubKeyFile;
+	private $passphrase;
+	private $user;
+	private $server;
+	private $pass;
+	private $port;
+	
+	public function putFile($remote_file, $local_file){
 		$remote_file = ltrim($remote_file,'/');
 		$cmd= $this->getCmdPrefix();
 		$cmd.=" $local_file $this->user@$this->server:$remote_file";
 		return $this->executeCmd($cmd);
 	}
+	// upload a file to the server ising Aspera connection (ftp_mode is irrelevant)
+	protected function doPutFile ($remote_file , $local_file)
+	{
+		return true;
+	}
 		
 	// upload a file to the server ising Aspera connection (ftp_mode is irrelevant)
-	protected function doGetFile ($remote_file, $local_file = null)
+	public function getFile($remote_file, $local_file = null)
 	{	
 		$remote_file = ltrim($remote_file,'/');
 		$cmd= $this->getCmdPrefix();
@@ -56,5 +65,115 @@ class asperaMgr extends sftpMgr
 		if ($return_value == 0)
 			return true;
 		return false;
+	}
+	
+	public function login($server, $user, $pass, $port = null){
+		$this->server = $server;
+		$this->user = $user;
+		$this->pass = $pass;
+		$this->port = $port;
+	}
+
+	public function loginPubKey($server, $user, $pubKeyFile, $privKeyFile, $passphrase = null, $port = null){
+		$this->server = $server;
+		$this->user = $user;
+		$this->privKeyFile = $privKeyFile;
+		$this->pubKeyFile = $pubKeyFile;
+		$this->passphrase = $passphrase;
+		$this->port = $port;
+	}
+	
+/* (non-PHPdoc)
+	 * @see kFileTransferMgr::doConnect()
+	 */
+	protected function doConnect($server, $port) {
+		
+	}
+
+/* (non-PHPdoc)
+	 * @see kFileTransferMgr::doLogin()
+	 */
+	protected function doLogin($user, $pass) {
+		// TODO Auto-generated method stub
+		
+	}
+
+/* (non-PHPdoc)
+	 * @see kFileTransferMgr::doLoginPubKey()
+	 */
+	protected function doLoginPubKey($user, $pubKeyFile, $privKeyFile, $passphrase = null) {
+		// TODO Auto-generated method stub
+		
+	}
+
+/* (non-PHPdoc)
+	 * @see kFileTransferMgr::doMkDir()
+	 */
+	protected function doMkDir($remote_path) {
+		// TODO Auto-generated method stub
+		
+	}
+
+/* (non-PHPdoc)
+	 * @see kFileTransferMgr::doDelFile()
+	 */
+	protected function doDelFile($remote_file) {
+		// TODO Auto-generated method stub
+		
+	}
+
+/* (non-PHPdoc)
+	 * @see kFileTransferMgr::doDelDir()
+	 */
+	protected function doDelDir($remote_path) {
+		// TODO Auto-generated method stub
+		
+	}
+
+/* (non-PHPdoc)
+	 * @see kFileTransferMgr::doChmod()
+	 */
+	protected function doChmod($remote_file, $chmod_code) {
+		// TODO Auto-generated method stub
+		
+	}
+
+/* (non-PHPdoc)
+	 * @see kFileTransferMgr::doFileExists()
+	 */
+	protected function doFileExists($remote_file) {
+		// TODO Auto-generated method stub
+		
+	}
+
+/* (non-PHPdoc)
+	 * @see kFileTransferMgr::doPwd()
+	 */
+	protected function doPwd() {
+		// TODO Auto-generated method stub
+		
+	}
+
+/* (non-PHPdoc)
+	 * @see kFileTransferMgr::doList()
+	 */
+	protected function doList($remote_path) {
+		// TODO Auto-generated method stub
+		
+	}
+
+/* (non-PHPdoc)
+	 * @see kFileTransferMgr::doFileSize()
+	 */
+	protected function doFileSize($remote_file) {
+		// TODO Auto-generated method stub
+		
+	}
+/* (non-PHPdoc)
+	 * @see kFileTransferMgr::doGetFile()
+	 */
+	protected function doGetFile($remote_file, $local_file = null) {
+		// TODO Auto-generated method stub
+		
 	}
 }
