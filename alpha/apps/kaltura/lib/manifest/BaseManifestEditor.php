@@ -11,17 +11,26 @@ abstract class BaseManifestEditor
 	 * @param string $header
 	 * @return string
 	 */
-	abstract public function editManifestHeader ($header);
+	public function editManifestHeader ($header)
+	{
+		return $header;
+	}
 	
 	/**
 	 * @param string $footer
 	 * @return string
 	 */
-	abstract public function editManifestFooter ($footer);
+	public function editManifestFooter ($footer)
+	{
+		return $footer;
+	}
 	
 	/**
 	 * @param array $flavors
 	 * @return array
 	 */
-	abstract public function editManifestFlavors (array $flavors);
+	public function editManifestFlavors (array $flavors)
+	{
+		return $flavors;
+	}
 }
