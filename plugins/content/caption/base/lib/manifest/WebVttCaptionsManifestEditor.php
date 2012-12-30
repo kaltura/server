@@ -8,6 +8,7 @@ class WebVttCaptionsManifestEditor extends BaseManifestEditor
 {
 	/**
 	 * Structured array containing captions information
+	 * Structure: "label" => {caption asset label}, "default" => {caption asset default behavior}, "language" => {caption asset language}, "url"=> {caption asset external URL}
 	 * @var array
 	 */
 	public $captions;
