@@ -173,13 +173,6 @@ class WebVttCaptionsManifestEditor extends BaseManifestEditor
 		return $manifestHeader;
 	}
 	
-	/* (non-PHPdoc)
-	 * @see BaseManifestEditor::editManifestFooter()
-	 */
-	public function editManifestFooter ($manifestFooter)
-	{
-		return $manifestFooter;
-	}
 	
 	/* (non-PHPdoc)
 	 * @see BaseManifestEditor::editManifestFlavors()
