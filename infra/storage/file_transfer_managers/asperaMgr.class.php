@@ -18,7 +18,7 @@ class asperaMgr extends kFileTransferMgr
 	public function putFile($remote_file, $local_file){
 		$remote_file = ltrim($remote_file,'/');
 		$cmd= $this->getCmdPrefix();
-		$cmd.=" $local_file $this->user@$this->server:$remote_file";
+		$cmd.=" $local_file \"$this->user@$this->server:$remote_file\"";
 		return $this->executeCmd($cmd);
 	}
 	// upload a file to the server ising Aspera connection (ftp_mode is irrelevant)
@@ -86,7 +86,7 @@ class asperaMgr extends kFileTransferMgr
 /* (non-PHPdoc)
 	 * @see kFileTransferMgr::doConnect()
 	 */
-	protected function doConnect($server, $port) {
+	protected function doConnect($server, &$port) {
 		
 	}
 
