@@ -21,7 +21,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "metadata_profile_field", 			'keys' => array(array("'metadataProfileField:metadataProfileId='", '@OBJ@.metadata_profile_id')),										'plugin' => 'metadata'),
 	array('table' => "partner", 						'keys' => array(array("'partner:id='", '@OBJ@.id'))),
 	array('table' => "cue_point", 						'keys' => array(array("'cuePoint:id='", '@OBJ@.id'), array("'cuePoint:entryId='", '@OBJ@.entry_id')),									'plugin' => 'cue_points/base'),
-	array('table' => "drop_folder_file", 				'keys' => array(array("'dropFolderFile:id='", '@OBJ@.id'), array("'dropFolderFile:fileName='", '@OBJ@.file_name'), array("'dropFolderFile:dropFolderId='", '@OBJ@.drop_folder_id')),			'plugin' => 'drop_folder'),
+	array('table' => "drop_folder_file", 				'keys' => array(array("'dropFolderFile:id='", '@OBJ@.id'), array("'dropFolderFile:fileName='", '@OBJ@.file_name'), array("'dropFolderFile:dropFolderId='", '@OBJ@.drop_folder_id')),			'plugin' => 'drop_folder', 'flags' => 'replace_spaces'),
 	array('table' => "flavor_params_output", 			'keys' => array(array("'flavorParamsOutput:id='", '@OBJ@.id'), array("'flavorParamsOutput:flavorAssetId='", '@OBJ@.flavor_asset_id')),	'class' => 'assetParamsOutput'),
 	array('table' => "entry_distribution", 				'keys' => array(array("'entryDistribution:entryId='", '@OBJ@.entry_id')),																'plugin' => 'content_distribution'),
 	array('table' => "flavor_params", 					'keys' => array(array("'flavorParams:id='", '@OBJ@.id'), array("'flavorParams:partnerId='", '@OBJ@.partner_id')),						'class' => 'assetParams'),
