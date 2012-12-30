@@ -286,14 +286,21 @@ class PlaylistService extends KalturaEntryService
 	 * @param string $id 
 	 * @param string $detailed
 	 * @param KalturaContext $playlistContext
+	 * @param KalturaMediaEntryFilterForPlaylist $filter
 	 * @return KalturaBaseEntryArray
 	 */
-	function executeAction( $id , $detailed = false, KalturaContext $playlistContext = null )
+	function executeAction( $id , $detailed = false, KalturaContext $playlistContext = null, $filter = null )
 	{
-		
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
-	
+		
 		$extraFilters = array();
+		if ($filter)
+		{
+			$coreFilter = new entryFilter();
+			$filter->toObject($coreFilter);
+			$extraFilters[1] = $coreFilter;
+		}
+		
 			
 		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
 			myPlaylistUtils::setIsAdminKs(true);
