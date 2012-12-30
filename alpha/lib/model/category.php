@@ -193,7 +193,6 @@ class category extends Basecategory implements IIndexable
 			$permissionNamesArr[] = PermissionName::CATEGORY_CONTRIBUTE;
 			$permissionNamesArr[] = PermissionName::CATEGORY_EDIT;
 			$permissionNamesArr[] = PermissionName::CATEGORY_MODERATE;
-			$permissionNamesArr[] = PermissionName::CATEGORY_SUBSCRIBE;
 			$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
 			$categoryKuser->setStatus(CategoryKuserStatus::ACTIVE);
 			$categoryKuser->setPartnerId($this->getPartnerId());
