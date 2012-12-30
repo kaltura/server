@@ -128,7 +128,8 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 				throw $e;		
 			}
 		}	
-		$resource = $this->getIngestionResource($job, $data);	
+		$resource = $this->getIngestionResource($job, $data);
+		$this->kClient->media->cancelReplace($matchedEntry->id);
 		$updatedEntry = $this->kClient->baseEntry->updateContent($matchedEntry->id, $resource, $data->conversionProfileId);
 	}
 	
