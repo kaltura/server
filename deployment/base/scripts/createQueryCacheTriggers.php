@@ -5,7 +5,7 @@ $dryRun = true;
 // Invalidation keys table
 $INVALIDATION_KEYS = array(
 	array('table' => "flavor_asset", 					'keys' => array(array("'flavorAsset:id='", '@OBJ@.id'), array("'flavorAsset:entryId='", '@OBJ@.entry_id')), 							'class' => 'asset'),
-	array('table' => "kuser", 							'keys' => array(array("'kuser:id='", '@OBJ@.id'), array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id')),	'flags' => 'replace_spaces'),
+	array('table' => "kuser", 							'keys' => array(array("'kuser:id='", '@OBJ@.id'), array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id'))),
 	array('table' => "entry", 							'keys' => array(array("'entry:id='", '@OBJ@.id'), array("'entry:partnerId='", '@OBJ@.partner_id'))),
 	array('table' => "access_control", 					'keys' => array(array("'accessControl:id='", '@OBJ@.id'))),
 	array('table' => "permission", 						'keys' => array(array("'permission:partnerId='", '@OBJ@.partner_id'))),
@@ -21,7 +21,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "metadata_profile_field", 			'keys' => array(array("'metadataProfileField:metadataProfileId='", '@OBJ@.metadata_profile_id')),										'plugin' => 'metadata'),
 	array('table' => "partner", 						'keys' => array(array("'partner:id='", '@OBJ@.id'))),
 	array('table' => "cue_point", 						'keys' => array(array("'cuePoint:id='", '@OBJ@.id'), array("'cuePoint:entryId='", '@OBJ@.entry_id')),									'plugin' => 'cue_points/base'),
-	array('table' => "drop_folder_file", 				'keys' => array(array("'dropFolderFile:id='", '@OBJ@.id'), array("'dropFolderFile:fileName='", '@OBJ@.file_name'), array("'dropFolderFile:dropFolderId='", '@OBJ@.drop_folder_id')),			'plugin' => 'drop_folder', 'flags' => 'replace_spaces'),
+	array('table' => "drop_folder_file", 				'keys' => array(array("'dropFolderFile:id='", '@OBJ@.id'), array("'dropFolderFile:fileName='", '@OBJ@.file_name'), array("'dropFolderFile:dropFolderId='", '@OBJ@.drop_folder_id')),			'plugin' => 'drop_folder'),
 	array('table' => "flavor_params_output", 			'keys' => array(array("'flavorParamsOutput:id='", '@OBJ@.id'), array("'flavorParamsOutput:flavorAssetId='", '@OBJ@.flavor_asset_id')),	'class' => 'assetParamsOutput'),
 	array('table' => "entry_distribution", 				'keys' => array(array("'entryDistribution:entryId='", '@OBJ@.entry_id')),																'plugin' => 'content_distribution'),
 	array('table' => "flavor_params", 					'keys' => array(array("'flavorParams:id='", '@OBJ@.id'), array("'flavorParams:partnerId='", '@OBJ@.partner_id')),						'class' => 'assetParams'),
@@ -205,9 +205,7 @@ function buildTriggerBody($invalidationKey, $triggerType)
 				$curKey[] = $curStr;
 			else 
 			{
-				$curStrValue = $curStr;
-				if (isset($invalidationKey['flags']) && strpos($invalidationKey['flags'], 'replace_spaces') !== false)
-					$curStrValue = "REPLACE($curStr,' ','_')";
+				$curStrValue = "REPLACE($curStr,' ','_')";
 				$curKey[] = "IF($curStr IS NULL,'',$curStrValue)";
 			}
 		}
