@@ -607,6 +607,19 @@ class kBusinessPreConvertDL
 		if($hasInvalidRequired)
 			return null;
 		
+				/*
+				 * For 'playset' collections (MBR & ISM) make sure that the flavor that 
+				 * matches in the best way the source framee size, will be generated.
+				 * Optimally this procedure should be executed for EVERY tag. But this 
+				 * might cause generation of unrequired flavors that might potentially 
+				 * harm the entry playback.
+				 * Furthermore - we have duplicate iOS tagging (iphonenew and ipadnew), 
+				 * therefore anyhow at least one ipad flavor will be always generated. 
+				 * The other tags are less relevant for the framesize adjustment cases.
+				 */
+		if(array_key_exists(flavorParams::TAG_MBR, $tagedFlavors)) self::adjustToFramesize($mediaInfo, $tagedFlavors[flavorParams::TAG_MBR]);
+		if(array_key_exists(flavorParams::TAG_ISM, $tagedFlavors)) self::adjustToFramesize($mediaInfo, $tagedFlavors[flavorParams::TAG_ISM]);
+
 		// filter out all not forced, none complied, and invalid flavors
 		$finalTagedFlavors = array();
 		foreach($tagedFlavors as $tag => $tagedFlavorsArray)
@@ -627,6 +640,55 @@ class kBusinessPreConvertDL
 		KalturaLog::log(count($finalFlavors) . " flavors sorted for execution");
 	
 		return $finalFlavors;
+	}
+
+	/**
+	 * batch adjustToFramesize - verify that in the given set of target flvors, 
+	 * there is at least one flavor that matches (or as close as possible) 
+	 * to the source frame size. If there is no such flavor - set '_create_anyway' for the best matching.
+	 * The screencast sources are main cases for such adjustments, but there are other cases as well
+	 *
+	 * @param mediaInfo $source
+	 * @param array $targetFlavorArr is array of flavorOutputParams
+	 */
+	protected static function adjustToFramesize(mediaInfo $source, array $targetFlavorArr)
+	{
+			/* 
+			 * Evaluate the 'adjusted' source height, to use as a for best matching flavor.
+			 */
+		$srcHgt = 0;
+		if(isset($source)){
+			$srcHgt = $source->getVideoHeight();
+			$srcHgt = $srcHgt - ($srcHgt%16);
+		}
+		
+		$matchSourceHeightIdx = null;	// index of the smallest flavor that matches the source height
+		$prev=null;
+		foreach($targetFlavorArr as $key=>$target){
+
+				/*
+				 * If the video height is set, then look for the largest compliant flavor 
+				 * and for the smallest to match the source height
+				 */
+			if(!isset($matchSourceHeightIdx)||($targetFlavorArr[$matchSourceHeightIdx]->getHeight()<$srcHgt)){
+					$matchSourceHeightIdx = $key;
+			}
+		}
+		
+				/*
+				 * If samllest-source-height-matching is found and it is 'non-compliant' (therefore it willnot be generated),
+				 * set '_create_anyway' flag for the 'matchSourceHeightIdx' flavor.
+				 */
+		if(isset($matchSourceHeightIdx) && $targetFlavorArr[$matchSourceHeightIdx]->_isNonComply) {
+			$targetFlavorArr[$matchSourceHeightIdx]->_create_anyway = true;
+			/*
+			$first = reset($targetFlavorArr);
+			if($first->_isNonComply) {
+				$first->_force = true; // _create_anyway
+			}
+			*/
+		}
+
 	}
 	
 	/**
