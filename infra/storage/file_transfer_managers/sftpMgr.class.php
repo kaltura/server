@@ -49,6 +49,16 @@ class sftpMgr extends kFileTransferMgr
 	private $useCmd = true;
 	
 	/**
+	 * @var string
+	 */
+	private $sshpassCmd = 'sshpass';
+	
+	/**
+	 * @var string
+	 */
+	private $sftpCmd = 'sftp';
+	
+	/**
 	 * @var boolean
 	 */
 	private $useCmdChmod = true;
@@ -81,6 +91,12 @@ class sftpMgr extends kFileTransferMgr
 		{
 			if(isset($options['useCmd']))
 				$this->useCmd = $options['useCmd'];
+			
+			if(isset($options['sftpCmd']))
+				$this->sftpCmd = $options['sftpCmd'];
+			
+			if(isset($options['sshpassCmd']))
+				$this->sshpassCmd = $options['sshpassCmd'];
 			
 			if(isset($options['useCmdChmod']))
 				$this->useCmdChmod = $options['useCmdChmod'];
@@ -488,7 +504,7 @@ class sftpMgr extends kFileTransferMgr
 	 */
 	private function execSftpCommand($command)
 	{
-		$cliCommand = "sftp -oPort={$this->port} -oStrictHostKeyChecking=no";
+		$cliCommand = "{$this->sftpCmd} -oPort={$this->port} -oStrictHostKeyChecking=no";
 		
 		if($this->verbose)
 			$cliCommand .= " -v";
@@ -496,7 +512,7 @@ class sftpMgr extends kFileTransferMgr
 		if($this->privKeyFile)
 			$cliCommand .= " -oIdentityFile={$this->privKeyFile}";
 		else
-			$cliCommand = "sshpass -p '{$this->password}' $cliCommand";
+			$cliCommand = "{$this->sshpassCmd} -p '{$this->password}' $cliCommand";
 			
 		$cliCommand .= " {$this->username}@{$this->host}";
 		
