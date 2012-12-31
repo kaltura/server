@@ -22,7 +22,13 @@ if [ -L $0 ];then
 else
 	REAL_SCRIPT=$0
 fi
-. `dirname $REAL_SCRIPT`/../configurations/system.ini
+SYSTEM_INI_FILE=`dirname $REAL_SCRIPT`/../configurations/system.ini``
+if [ -r "$SYSTEM_INI_FILE" ];then
+    . $SYSTEM_INI_FILE
+else
+    echo "I could not source $SYSTEM_INI_FILE. Exiting."
+    exit 1
+fi
 # Source function library.
 . $APP_DIR/scripts/functions
 prog="searchd"
