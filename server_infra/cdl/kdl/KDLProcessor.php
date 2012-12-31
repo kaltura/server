@@ -107,7 +107,7 @@ KalturaLog::log("An invalid source RealMedia file thatfails to provide valid med
 					if(isset($target))
 						$targetList[] = $target;
 				}
-				$this->validateProfileTarget($this->_srcDataSet, $targetList);
+				$this->validateProfileTarget($targetList);
 //print_r($this->ProceessFlavorsForCollection($targetList));
 			}
 /*			else{
@@ -150,35 +150,10 @@ KalturaLog::log("An invalid source RealMedia file thatfails to provide valid med
 		/* ------------------------------
 		 * validateProfileTarget
 		 */
-		private function validateProfileTarget($source, array &$targetList)
+		private function validateProfileTarget(array &$targetList)
 		{
-				/* 
-				 * Evaluate the 'adjusted' source height, to use as a for best matching flavor.
-			 	 */
-			$srcHgt = 0;
-			if(isset($source->_video) && isset($source->_video->_height)){
-				$srcHgt = $source->_video->_height;
-				$srcHgt = $srcHgt - ($srcHgt%16);
-			}
-			
-//			$largestCompliantIdx  = null; 	// index of the largest compliant flavor
-			$matchSourceHeightIdx = null;	// index of the smallest flavor that matches the source height
 			$prev=null;
 			foreach ($targetList as $key => $target){
-
-					/*
-					 * If the video height is set, then look for the largest compliant flavor 
-					 * and for the smallest to match the source height
-					 */
-				if(isset($target->_video) && isset($target->_video->_height)) {
-/*					if((!isset($largestCompliantIdx)||($target->_video->_height>$targetList[$largestCompliantIdx]->_video->_height))
-					&&  !$target->IsNonComply()){
-						$largestCompliantIdx = $key;
-					}*/
-					if(!isset($matchSourceHeightIdx)||($targetList[$matchSourceHeightIdx]->_video->_height<$srcHgt)){
-						$matchSourceHeightIdx = $key;
-					}
-				}
 				
 					/*
 					 * Redundency checking 
@@ -190,19 +165,6 @@ KalturaLog::log("An invalid source RealMedia file thatfails to provide valid med
 				
 				if($target->ProcessRedundancy($prev)==false){
 					$prev=$target;
-				}
-			}
-
-				/*
-				 * If samllest-source-height-matching is found and it is 'non-compliant' (therefore it willnot be generated),
-				 * set 'forceTranscode' flag for the 'matchSourceHeightIdx' flavor.
-				 * If the smallest flavor is non-comply as well - 'force' it too - otherwise only the 'matchSourceHeightIdx' 
-				 * will be produced
-				 */
-			if(isset($matchSourceHeightIdx) && $targetList[$matchSourceHeightIdx]->IsNonComply()) {
-				$targetList[$matchSourceHeightIdx]->_flags = $targetList[$matchSourceHeightIdx]->_flags | (KDLFlavor::ForceTranscodingFlagBit);
-				if($targetList[0]->IsNonComply()) {
-					$targetList[0]->_flags = $targetList[0]->_flags | (KDLFlavor::ForceTranscodingFlagBit);
 				}
 			}
 		}
