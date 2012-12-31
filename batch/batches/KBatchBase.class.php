@@ -54,6 +54,25 @@ abstract class KBatchBase implements IKalturaLogger
 	
 	protected function init()
 	{
+		set_error_handler(array(&$this, "errorHandler"));
+	}
+	
+	public function errorHandler($errNo, $errStr, $errFile, $errLine)
+	{
+	    
+		$errorFormat = "%s line %d - %s";
+		switch ($errNo)
+		{
+			case E_NOTICE:
+			case E_STRICT:
+			case E_USER_NOTICE:
+				KalturaLog::log(sprintf($errorFormat, $errFile, $errLine, $errStr), KalturaLog::NOTICE);
+				break;
+			case E_USER_WARNING:
+			case E_WARNING:
+				KalturaLog::log(sprintf($errorFormat, $errFile, $errLine, $errStr), KalturaLog::WARN);
+				break; 
+		}
 	}
 	
 	public function done()
