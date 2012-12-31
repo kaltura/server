@@ -95,6 +95,9 @@ class SystemPartnerService extends KalturaBaseService
 			$inputFilter = new reportsInputFilter (); 
 			$inputFilter->from_date = ( $usageFilter->fromDate );
 			$inputFilter->to_date = ( $usageFilter->toDate );
+			$inputFilter->from_day = date ( "Ymd" , $usageFilter->fromDate );
+			$inputFilter->to_day = date ( "Ymd" , $usageFilter->toDate );
+		
 			$inputFilter->timeZoneOffset = $usageFilter->timezoneOffset;
 	
 			list ( $reportHeader , $reportData , $totalCountNoNeeded ) = myReportsMgr::getTable( 

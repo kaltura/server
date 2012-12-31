@@ -1064,8 +1064,10 @@ class myPartnerUtils
 		// use gmmktime to avoid server timezone offset - this is for backward compatibility while the KMC is not sending TZ info
 		list($year, $month, $day) = explode('-', $startDate);
 		$reportFilter->from_date = gmmktime(0, 0, 0, $month, $day, $year);
+		$reportFilter->from_day = str_replace('-','',$startDate);
 		list($year, $month, $day) = explode('-', $endDate);
 		$reportFilter->to_date = gmmktime(0, 0, 0, $month, $day, $year);
+		$reportFilter->to_day = str_replace('-','',$endDate);
 		$res = myReportsMgr::getGraph ( $partnerId , myReportsMgr::REPORT_TYPE_WIDGETS_STATS , $reportFilter , null , null );
 		return $res;
 	}
@@ -1084,6 +1086,9 @@ class myPartnerUtils
 		
 		$reportFilter->from_date = $startDate;
 		$reportFilter->to_date = $endDate;
+		$reportFilter->from_day = date ( "Ymd" , $startDate );
+		$reportFilter->to_day = date ( "Ymd" , $endDate );	
+		
 		$reportFilter->interval = $resolution;
 		
 		// if TZ offset provided, add TZ offset to the UTC time created above to reflect the user's timezone
