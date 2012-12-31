@@ -72,7 +72,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			    {
 			    	if($e->getCode() == kFileTransferMgrException::cantConnect)
 			    		$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_CONNECT, DropFolderPlugin::ERROR_CONNECT_MESSAGE, $e);
-			    	if($e->getCode() == kFileTransferMgrException::cantAuthenticate)
+			    	else if($e->getCode() == kFileTransferMgrException::cantAuthenticate)
 			    		$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_AUTENTICATE, DropFolderPlugin::ERROR_AUTENTICATE_MESSAGE, $e);
 			    	else
 			    		$this->setDropFolderError($folder, KalturaDropFolderErrorCode::ERROR_GET_PHISICAL_FILE_LIST, DropFolderPlugin::ERROR_GET_PHISICAL_FILE_LIST_MESSAGE, $e);
