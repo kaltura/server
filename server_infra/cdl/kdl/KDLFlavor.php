@@ -12,7 +12,6 @@ class KDLFlavor extends KDLMediaDataSet {
 	const BitrateNonComplyFlagBit = 2;
 	const MissingContentNonComplyFlagBit = 4;
 	const ForceCommandLineFlagBit = 8;
-	const ForceTranscodingFlagBit = 16;
 
 	/* ---------------------
 	 * Data
@@ -73,6 +72,7 @@ class KDLFlavor extends KDLMediaDataSet {
 		if(!is_null($this->_audio)) $this->_audio = clone $this->_audio;
 		if(!is_null($this->_cdlObject)) $this->_cdlObject = clone $this->_cdlObject;
 	}
+	
 	/* ----------------------
 	 * ProcessRedundancy
 	 */
@@ -86,7 +86,9 @@ class KDLFlavor extends KDLMediaDataSet {
 			 * The previous flavor should be atleast FlavorBitrateRedundencyFactor
 			 * away, else - remove the current flavor.
 			 */
-			if($this->_video->_bitRate/$prevFlavor->_video->_bitRate>KDLConstants::FlavorBitrateRedundencyFactor) {
+			$redundRatio = $this->_video->_bitRate/$prevFlavor->_video->_bitRate;
+			if($redundRatio>1) $redundRatio = 1/$redundRatio;
+			if($redundRatio>KDLConstants::FlavorBitrateRedundencyFactor) {
 				$this->_flags = $this->_flags | KDLFlavor::RedundantFlagBit;
 
 				$this->_warnings[KDLConstants::VideoIndex][]= //"Redundant bitrate";
@@ -333,14 +335,6 @@ $plannedDur = 0;
 	{
 		return ( ($this->_flags & KDLFlavor::BitrateNonComplyFlagBit)
 		||($this->_flags & KDLFlavor::MissingContentNonComplyFlagBit));
-	}
-
-	/* ------------------------------
-	 * IsForceTranscoding
-	 */
-	public function IsForceTranscoding()
-	{
-		return ( ($this->_flags & KDLFlavor::ForceTranscodingFlagBit));
 	}
 
 	/* ------------------------------
