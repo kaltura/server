@@ -1,0 +1,1 @@
+* * * * * kaltura @APP_DIR@/plugins/sphinx_search/scripts/watch.populate.sh @APP_DIR@/plugins/sphinx_search/scripts/configs/server-sphinx.php >> @LOG_DIR@/kaltura_log_populate.log  2>&1
