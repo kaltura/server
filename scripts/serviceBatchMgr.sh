@@ -66,6 +66,11 @@ echo_failure() {
 
 
 start() {
+	if [ -f $BASE_DIR/maintenance ]; then
+		echo "Server is on maintenance mode - BatchMgr will not start!"
+		exit 1
+	fi
+	
 	echo -n $"Starting:"
 	KP=$(pgrep -P 1 -f $FILE_NAME.php)
 	if [ -f $LOCKFILE ]; then
