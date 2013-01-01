@@ -135,8 +135,7 @@ function changeStatus(folderId, status, callback)
 			if (callback && (typeof callback == 'function'))
 			{
 				callback.apply(this);
-			}
-
+			}			
 			jQuery('#frmPaginator1').submit();
 		},
 		error: function() {
@@ -204,7 +203,10 @@ function loadDropFolder(paramStr)
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmDropFolderConfigure').ajaxForm(loadDropFolderSuccess);
+			jQuery(this).find('#frmDropFolderConfigure').ajaxForm({
+				success: loadDropFolderSuccess,
+				iframe: true
+			});
 		}
 	);
 }
@@ -222,7 +224,10 @@ function loadDropFolderSuccess(html) {
 		}
 	}
 	jQuery('#frmDropFolderConfigure').replaceWith(html);
-	jQuery('#frmDropFolderConfigure').ajaxForm(loadDropFolderSuccess);
+	jQuery('#frmDropFolderConfigure').ajaxForm({
+		success: loadDropFolderSuccess,
+		iframe: true
+	});
 }
 
 

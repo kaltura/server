@@ -7,15 +7,7 @@
 	echo $this->form;
 ?>
 
-
-
-
 <script type="text/javascript">
-
-jQuery(document).ready(function() {
-	handlerTypeChanged();
-	fileDeletePolicy();
-});
 
 function fileDeletePolicy() {
 	$("select#fileDeletePolicy").each(function(inx, value){
@@ -66,7 +58,10 @@ function handlerTypeChanged()
 	}	
 }
 
-jQuery(document).ready(function() {
+jQuery(function() {
+	handlerTypeChanged();
+	fileDeletePolicy();
+	
 	<?php if ($this->formValid): ?>
 		dialogDiv.dialog('close');
 		jQuery('#frmPaginator1').submit();
