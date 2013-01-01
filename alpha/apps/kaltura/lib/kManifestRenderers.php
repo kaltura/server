@@ -448,12 +448,10 @@ class kSmilManifestRenderer extends kMultiFlavorManifestRenderer
 		$flavorsArr = array();
 		foreach ($this->flavors as $flavor)
 		{
-			$url = $flavor['url'];
 			$bitrate = isset($flavor['bitrate'])	? $flavor['bitrate']	: 0;
 
-			$domain = parse_url($url, PHP_URL_SCHEME)."://".parse_url($url, PHP_URL_HOST);
+			$url = $flavor['url'];
 			$url = parse_url($url, PHP_URL_PATH);
-			
 			$url = htmlspecialchars($url);
 			$flavorsArr[] = "<video src=\"{$url}\" system-bitrate=\"".($bitrate * 1000)."\"/>"; 
 		}
@@ -466,6 +464,13 @@ class kSmilManifestRenderer extends kMultiFlavorManifestRenderer
 	 */
 	protected function getManifestHeader()
 	{
+		$domain = '';
+		foreach ($this->flavors as $flavor)
+		{
+			$url = $flavor['url'];
+			$domain = parse_url($url, PHP_URL_SCHEME)."://".parse_url($url, PHP_URL_HOST);
+		}
+		
 		return '<?xml version="1.0"?>
 				<!DOCTYPE smil PUBLIC "-//W3C//DTD SMIL 2.0//EN" "http://www.w3.org/2001/SMIL20/SMIL20.dtd">
 				<smil xmlns="http://www.w3.org/2001/SMIL20/Language">
