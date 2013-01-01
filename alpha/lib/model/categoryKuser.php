@@ -387,11 +387,13 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		parent::postInsert($con);
 	
 		if (!$this->alreadyInSave)
+		{
 			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 			
-		$category = $this->getcategory();
-		if($category && $category->getPrivacyContexts())
-			kPermissionManager::sePermissionForPartner($category->getPartner(), PermissionName::FEATURE_ENTITLEMENT_USED);
+			$category = $this->getcategory();
+			if($category && $category->getPrivacyContexts() && !PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT_USED, $category->getPartnerId()))
+				PermissionPeer::enableForPartner(PermissionName::FEATURE_ENTITLEMENT_USED, PermissionType::SPECIAL_FEATURE, $category->getPartnerId());
+		}
 	}
 	
 	/* (non-PHPdoc)
