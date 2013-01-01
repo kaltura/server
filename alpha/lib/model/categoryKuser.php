@@ -388,6 +388,10 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	
 		if (!$this->alreadyInSave)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
+			
+		$category = $this->getcategory();
+		if($category && $category->getPrivacyContexts())
+			kPermissionManager::sePermissionForPartner($category->getPartner(), PermissionName::FEATURE_ENTITLEMENT_USED);
 	}
 	
 	/* (non-PHPdoc)

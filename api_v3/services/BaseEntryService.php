@@ -813,7 +813,7 @@ class BaseEntryService extends KalturaEntryService
 			return $result;
 		}
 		
-		$isSecured = $isSecured || PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $dbEntry->getPartnerId());
+		$isSecured = $isSecured || PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT_USED, $dbEntry->getPartnerId());
 		
 		$result->streamerType = $this->getPartner()->getStreamerType();
 		if (!$result->streamerType)
