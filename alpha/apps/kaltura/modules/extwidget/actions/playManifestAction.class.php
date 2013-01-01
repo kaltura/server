@@ -1411,6 +1411,7 @@ class playManifestAction extends kalturaAction
 				break;
 
 			case PlaybackProtocol::AKAMAI_HDS:
+				$this->protocol = PlaybackProtocol::HTTP; // Akamai HDS doesn't support https 
 				$renderer = $this->serveHDNetworkManifest();
 				break;
 		}
