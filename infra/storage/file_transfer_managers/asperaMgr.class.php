@@ -21,8 +21,8 @@ class asperaMgr extends kFileTransferMgr
 	protected function __construct(array $options = null)
 	{
 		parent::__construct($options);
-		if($options && isset($options['command']))
-			$this->ascpCmd = $options['command'];
+		if($options && isset($options['ascpCmd']))
+			$this->ascpCmd = $options['ascpCmd'];
 	}
 	
 	public function putFile($remote_file, $local_file){
