@@ -137,7 +137,7 @@ class KDropFolderServicesHelper
 	 */
 	public function handleFileAdded($fileName, $dropFolderId, $fileSize, $lastModificationTime)
 	{
-		KalturaLog::debug('Add drop folder file ['.$fileName.'] last modification time ['.$lastModificationTime.'] file size '.$fileSize.']');
+		KalturaLog::debug('Add drop folder file ['.$fileName.'] last modification time ['.$lastModificationTime.'] file size ['.$fileSize.']');
 		try 
 		{
 			$newDropFolderFile = new KalturaDropFolderFile();
