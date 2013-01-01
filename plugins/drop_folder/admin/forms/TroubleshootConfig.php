@@ -49,7 +49,6 @@ class Form_TroubleshootConfig extends Infra_Form
 		parent::populateFromObject($object, $add_underscore);
 				
 		$lastAccessedAtElm = $this->getElement('lastAccessedAt');	
-		KalturaLog::debug('last accessed: '.$lastAccessedAtElm->getValue());	
 		if($lastAccessedAtElm->getValue())
 			$formattedDate = date($this->getView()->translate('time format'), $lastAccessedAtElm->getValue());
 		else
@@ -59,7 +58,7 @@ class Form_TroubleshootConfig extends Infra_Form
 		if($object->status !== Kaltura_Client_DropFolder_Enum_DropFolderStatus::ERROR)
 		{
 			$descElm = $this->getElement('errorDescription');		
-			$descElm->setAttrib('hidden', true);
+			$descElm->setAttrib('style', 'display:none');
 			$descElm->setLabel('');
 		}
 	}
