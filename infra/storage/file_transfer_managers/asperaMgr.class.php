@@ -22,6 +22,8 @@ class asperaMgr extends kFileTransferMgr
 		$remoteFileName = basename ( $remote_file ) ;
 		$remotePath = dirname ( $remote_file );
 		$linkPath =  kConf::get('temp_folder') . '/' . self::TEMP_DIRECTORY . '/' .$remoteFileName;
+		if (!file_exists(dirname( $linkPath )))
+			mkdir(dirname( $linkPath ), 0750, true);
 		symlink($local_file, $linkPath);
 		$cmd= $this->getCmdPrefix();
 		$cmd.=" $linkPath \"$this->user@$this->server:$remotePath\"";
