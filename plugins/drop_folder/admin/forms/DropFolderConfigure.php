@@ -143,7 +143,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		$titleElement->setLabel('Folder Policies');
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElement($titleElement);
-		
+			
 		$this->addElement('text', 'fileSizeCheckInterval', array(
 			'label' 		=> 'Check file size every (seconds):',
 			'required'		=> true,
@@ -213,7 +213,7 @@ class Form_DropFolderConfigure extends Infra_Form
 				}
 			}
 		}
-		
+				
 		$this->setDefault('typeForView', $object->type);
 		
 		$extendTypeSubForm = $this->getSubForm(self::EXTENSION_SUBFORM_NAME);

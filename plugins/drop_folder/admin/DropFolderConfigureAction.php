@@ -35,8 +35,11 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 				$partnerId = $this->_getParam('partnerId');
 				$dropFolderType = $this->_getParam('type');
 				$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
-				$dropFolderForm->getElement('fileHandlerType')->setOptions(array('disabled'	=> 'disabled'));
-				$dropFolderForm->getElement('fileHandlerType')->setOptions(array('required'	=> false));
+				if(!is_null($dropFolderId))
+				{
+					$dropFolderForm->getElement('fileHandlerType')->setOptions(array('disabled'	=> 'disabled'));
+					$dropFolderForm->getElement('fileHandlerType')->setOptions(array('required'	=> false));
+				}
 				$action->view->formValid = $this->processForm($dropFolderForm, $request->getPost(), $dropFolderId);
 			}
 			else
@@ -56,6 +59,17 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 				{
 					$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
 					$dropFolderForm->getElement('partnerId')->setValue($partnerId);
+					
+					$settings = Zend_Registry::get('config')->dropFolder;
+					if($dropFolderType ===Kaltura_Client_DropFolder_Enum_DropFolderType::LOCAL)
+					{
+						$dropFolderForm->getElement('fileSizeCheckInterval')->setValue($settings->fileSizeCheckIntervalLocal);
+					}
+					else 
+					{
+						$dropFolderForm->getElement('fileSizeCheckInterval')->setValue($settings->fileSizeCheckIntervalRemote);
+					}
+					
 				}
 			}
 		}
