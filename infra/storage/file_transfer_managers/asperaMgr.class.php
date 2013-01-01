@@ -15,11 +15,19 @@ class asperaMgr extends kFileTransferMgr
 	private $pass;
 	private $port;
 	
+	const TEMP_DIRECTORY = 'aspera_upload';
+	
 	public function putFile($remote_file, $local_file){
 		$remote_file = ltrim($remote_file,'/');
+		$remoteFileName = basename ( $remote_file ) ;
+		$remotePath = dirname ( $remote_file );
+		$linkPath =  kConf::get('temp_folder') . '/' . self::TEMP_DIRECTORY . '/' .$remoteFileName;
+		symlink($local_file, $linkPath);
 		$cmd= $this->getCmdPrefix();
-		$cmd.=" $local_file \"$this->user@$this->server:$remote_file\"";
-		return $this->executeCmd($cmd);
+		$cmd.=" $linkPath \"$this->user@$this->server:$remotePath\"";
+		$res = $this->executeCmd($cmd);
+		unlink($linkPath);
+		return $res;
 	}
 	// upload a file to the server ising Aspera connection (ftp_mode is irrelevant)
 	protected function doPutFile ($remote_file , $local_file)
@@ -47,7 +55,7 @@ class asperaMgr extends kFileTransferMgr
 		else 
 			$cmd = "(echo $this->pass) | ascp ";
 		//creating folders on remote server
-//		$cmd.= " -d ";
+		$cmd.= " -d ";
 		$cmd.=" -P $this->port ";
 		if ($this->privKeyFile)
 			$cmd.=" -i $this->privKeyFile ";
