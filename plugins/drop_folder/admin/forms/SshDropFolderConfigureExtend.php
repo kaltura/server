@@ -29,7 +29,7 @@ abstract class Form_SshDropFolderConfigureExtend_SubForm extends Form_DropFolder
 		));
 		
 		$this->addElement('file', 'sshPublicKey', array(
-			'label' => 'SSH Public Key:'
+			'label' => 'SSH Public Key:',
 		));
 		
 		$this->addElement('textarea', 'publicKey', array(
@@ -40,7 +40,7 @@ abstract class Form_SshDropFolderConfigureExtend_SubForm extends Form_DropFolder
 		));
 		
 		$this->addElement('file', 'sshPrivateKey', array(
-			'label' => 'SSH Private Key:'
+			'label' => 'SSH Private Key:',
 		));
 		
 		$this->addElement('textarea', 'privateKey', array(
@@ -85,6 +85,5 @@ abstract class Form_SshDropFolderConfigureExtend_SubForm extends Form_DropFolder
 			}
 		}
 		return $object;
-	}
-	
+	}		
 }
