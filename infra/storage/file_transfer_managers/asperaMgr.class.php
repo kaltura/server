@@ -14,8 +14,16 @@ class asperaMgr extends kFileTransferMgr
 	private $server;
 	private $pass;
 	private $port;
-	
+	private $ascpCmd = 'ascp'; 
 	const TEMP_DIRECTORY = 'aspera_upload';
+	
+	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
+	protected function __construct(array $options = null)
+	{
+		parent::__construct($options);
+		if($options && isset($options['command']))
+			$this->ascpCmd = $options['command'];
+	}
 	
 	public function putFile($remote_file, $local_file){
 		$remote_file = ltrim($remote_file,'/');
@@ -50,12 +58,12 @@ class asperaMgr extends kFileTransferMgr
 		$cmd = '';
 		if ($this->privKeyFile){
 			if ($this->passphrase)
-				$cmd = "(echo $this->passphrase) | ascp ";
+				$cmd = "(echo $this->passphrase) | $this->ascpCmd ";
 			else  
-				$cmd = "ascp ";
+				$cmd = "$this->ascpCmd ";
 		}
 		else 
-			$cmd = "(echo $this->pass) | ascp ";
+			$cmd = "(echo $this->pass) | $this->ascpCmd ";
 		//creating folders on remote server
 		$cmd.= " -d ";
 		$cmd.=" -P $this->port ";
