@@ -370,7 +370,6 @@ class kApiCache
 		case self::COND_IP_RANGE:
 			if (!count($refValue))
 				return null;
-			require_once(dirname(__FILE__) . '/../../server_infra/request/kIpAddressUtils.php');
 			foreach($refValue as $curRefValue)
 			{
 				if (kIpAddressUtils::isIpInRange($fieldValue, $curRefValue))
