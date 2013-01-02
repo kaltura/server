@@ -31,16 +31,21 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 		$exeCmd =  parent::getCmdLine();
 
 		if(strstr($exeCmd, KDLOperatorMp4box::ACTION_EMBED_SUBTITLES)!==FALSE) {
-			$captionsStr = self::buildSubTitleCommandParam($this->data, $this->client);
-			$exeCmd = str_replace(
+			$captionsStr = $this->buildSubTitleCommandParam($this->data, $this->client);
+			if(isset($captionsStr)){
+				$exeCmd = str_replace(
 						array(KDLOperatorMp4box::ACTION_EMBED_SUBTITLES, KDLOperatorMp4box::SUBTITLE_PLACEHOLDER), 
 						array("", $captionsStr), 
 						$exeCmd);
+			}
+			else if(!(isset($this->operator) && isset($this->operator->isOptional) && $this->operator->isOptional>0)){
+				$this->message.=".".print_r($this->operator,1);
+				throw new KOperationEngineException($this->message);
+			}
 		}
 		else if(strstr($exeCmd, KDLOperatorMp4box::ACTION_HINT)!==FALSE) {
 			$exeCmd = str_replace (KDLOperatorMp4box::ACTION_HINT,"", $exeCmd);
 		}
-//		KalturaLog::info(print_r($this,true));
 		return $exeCmd; 
 	}
 
@@ -65,7 +70,7 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 	 * @param KalturaClient $client
 	 * @return 
 	 */
-	private static function buildSubTitleCommandParam(KalturaConvartableJobData $data, KalturaClient $client)
+	private function buildSubTitleCommandParam(KalturaConvartableJobData $data, KalturaClient $client)
 	{//		$cmdStr.= " -add ".KDLCmdlinePlaceholders::OutFileName.".temp.srt:hdlr=sbtl:lang=$lang:group=0:layer=-1";
 	
 			// impersonite
@@ -74,13 +79,15 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 		
 		$flrAsst = $client->flavorAsset->get($data->flavorAssetId);
 		if(!isset($flrAsst)){
-			throw new KOperationEngineException("Failed to retrieve the flavor asset object (".$data->flavorAssetId.")");
+			$this->message = ("Failed to retrieve the flavor asset object (".$data->flavorAssetId.")");
+			return null;
 		}
 		$filter = new KalturaAssetFilter();
 		$filter->entryIdEqual = $flrAsst->entryId;
 		$captionsList = $client->captionAsset->listAction($filter, null); 
 		if(!isset($captionsList) || count($captionsList->objects)==0){
-			throw new KOperationEngineException("No caption assets for entry (".$flrAsst->entryId.")");
+			$this->message = ("No caption assets for entry (".$flrAsst->entryId.")");
+			return null;
 		}
 
 		$captionsStr = null;
@@ -125,7 +132,8 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 		
 		if(!isset($captionsStr))
 		{
-			throw new KOperationEngineException("Error: missing caption data or files.");
+			$this->message = ("Error: missing caption data or files.");
+			return null;
 		}
 		return $captionsStr;
 	}
