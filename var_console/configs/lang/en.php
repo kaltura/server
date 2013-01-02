@@ -397,7 +397,7 @@ return array(
 	'entry-investigate info entry source type label' => 'Source Type',
 	'entry-investigate info entry thumb label' => 'Thumbnail',
 	'entry-investigate info entry data label' => 'Data',
-	'entry-investigate info entry size label' => 'Size (in Bytes)',
+	'entry-investigate info entry size label' => 'Frame Size',
 	'entry-investigate info entry custom label' => 'Custom Data',
 	'entry-investigate info entry cq label' => 'Conversion Profile',
 	'entry-investigate info entry duration label' => 'Duration (in Sec)',
