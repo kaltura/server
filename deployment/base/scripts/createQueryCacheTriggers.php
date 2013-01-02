@@ -198,6 +198,7 @@ function buildTriggerBody($invalidationKey, $triggerType)
 	$triggerBody = array();
 	foreach ($invalidationKey['keys'] as $curKeyStrings)
 	{
+		$keyChangeCondition = array();
 		$curKey = array("'QCI-'");
 		foreach ($curKeyStrings as $curStr)
 		{
@@ -207,11 +208,31 @@ function buildTriggerBody($invalidationKey, $triggerType)
 			{
 				$curStrValue = "REPLACE($curStr,' ','_')";
 				$curKey[] = "IF($curStr IS NULL,'',$curStrValue)";
+				$keyChangeCondition[] = str_replace('@OBJ@', 'OLD', $curStr) . ' <> ' . str_replace('@OBJ@', 'NEW', $curStr);
 			}
 		}
 		$curKey = 'concat(' . implode(', ', $curKey) . ')';
 		
-		$triggerBody[] = "DO memc_set($curKey, UNIX_TIMESTAMP(SYSDATE()), 90000);";		// 90000 = slightly more than the cache expiry (1 day)
+		$memSetCmd = "memc_set($curKey, UNIX_TIMESTAMP(SYSDATE()), 90000)";
+		$memSetCmdOld = str_replace('@OBJ@', 'OLD', $memSetCmd);
+		$memSetCmdNew = str_replace('@OBJ@', 'NEW', $memSetCmd);
+		
+		switch ($triggerType)
+		{
+		case 'DELETE':
+			$curStatement = $memSetCmdOld;
+			break;
+			
+		case 'INSERT':
+			$curStatement = $memSetCmdNew;
+			break;
+			
+		case 'UPDATE':
+			$keyChangeCondition = implode(' || ', $keyChangeCondition);
+			$curStatement = "IF($keyChangeCondition, $memSetCmdNew && $memSetCmdOld, $memSetCmdNew)";
+			break;
+		}
+		$triggerBody[] = "DO $curStatement;";
 	}
 	
 	$specialTriggerKey = "{$tableName}/{$triggerType}";
@@ -229,14 +250,6 @@ function buildTriggerBody($invalidationKey, $triggerType)
 		$triggerBody = implode(' ', $triggerBody);
 	}
 
-	if ($triggerType == 'DELETE')
-	{
-		$triggerBody = str_replace('@OBJ@', 'OLD', $triggerBody);
-	}
-	else
-	{
-		$triggerBody = str_replace('@OBJ@', 'NEW', $triggerBody);
-	}
 	return $triggerBody;
 }
 	
@@ -328,14 +341,9 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 	$tableName = $invalidationKey['table'];
 		
 	$sqlCommands = array();
-	foreach ($TRIGGER_TYPES as $triggerType)
-	{
-		$sqlCommands[] = "DROP TRIGGER IF EXISTS {$tableName}_".strtolower($triggerType)."_memcache";
-	}
 	
 	if ($ACTION == 'create')
 	{		
-		$foundDiff = false;
 		foreach ($TRIGGER_TYPES as $triggerType)
 		{
 			$triggerBody = buildTriggerBody($invalidationKey, $triggerType);
@@ -344,13 +352,12 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 			if (!array_key_exists($triggerName, $triggers) || 
 				!compareTriggerBodies($triggerBody, $triggers[$triggerName]))
 			{
-				$foundDiff = true;
+				$sqlCommands[] = "DROP TRIGGER IF EXISTS {$tableName}_".strtolower($triggerType)."_memcache";
+				$sqlCommands[] = "CREATE TRIGGER {$triggerName} AFTER {$triggerType} ON {$tableName} FOR EACH ROW {$triggerBody}";
 			}
-
-			$sqlCommands[] = "CREATE TRIGGER {$triggerName} AFTER {$triggerType} ON {$tableName} FOR EACH ROW {$triggerBody}";
 		}
 		
-		if (!$foundDiff)
+		if (!$sqlCommands)
 		{
 			print "Skipping {$tableName} - no changes detected...\n";
 			continue;
@@ -360,6 +367,10 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 	}
 	else
 	{
+		foreach ($TRIGGER_TYPES as $triggerType)
+		{
+			$sqlCommands[] = "DROP TRIGGER IF EXISTS {$tableName}_".strtolower($triggerType)."_memcache";
+		}
 		print "Removing triggers on {$tableName}...\n";
 	}
 	
