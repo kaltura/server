@@ -1,7 +1,7 @@
 <?php
-include_once("KDLMediaInfoLoader.php");
-include_once('KDLProcessor.php');
-include_once 'KDLUtils.php';
+//include_once("KDLMediaInfoLoader.php");
+//include_once('KDLProcessor.php');
+//include_once 'KDLUtils.php';
 
 	/* ===========================
 	 * KDLWrap
@@ -570,6 +570,8 @@ class KDLWrap
 		$opr->extra = $kdlOperator->_extra;
 		$opr->command = $kdlOperator->_cmd;
 		$opr->config = $kdlOperator->_cfg;
+		$opr->params = $kdlOperator->_params;
+		$opr->isOptional = $kdlOperator->_isOptional;
 		return $opr;
 	}
 	
