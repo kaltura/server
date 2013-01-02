@@ -14,7 +14,8 @@ class Form_PartnerFilter extends Form_PartnerBaseFilter
 				'none' => 'None', 
 				'byid' => 'Publisher ID',
 				'byname' => 'Publisher Name',
-				'free' => 'Free-form text'
+				'free' => 'Free-form text',
+				'byEntryId' => 'Entry ID'
 		));
 		
 		// active status
