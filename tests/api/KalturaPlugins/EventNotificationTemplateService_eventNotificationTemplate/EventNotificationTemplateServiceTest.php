@@ -158,6 +158,21 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 		}
 	}
 	
+/**
+	 * Tests eventNotificationTemplate->updatestatus action
+	 * @param int $id 
+	 * @param KalturaEventNotificationTemplateStatus $status 
+	 * @param KalturaEventNotificationTemplate $reference
+	 * @depends testGet with data set #0
+	 * @dataProvider provideData
+	 */
+	public function testUpdatestatus($id, $status, KalturaEventNotificationTemplate $reference)
+	{
+		$resultObject = $this->client->eventNotificationTemplate->updatestatus($id, $status, $reference);
+		$this->assertEquals($resultObject->status, $reference->status);
+	}
+	
+	
 	/**
 	 * Tests eventNotificationTemplate->delete action
 	 * @param int $id 
@@ -178,33 +193,7 @@ class EventNotificationTemplateServiceTest extends EventNotificationTemplateServ
 	}
 	
 	
-	/**
-	 * Tests eventNotificationTemplate->updatestatus action
-	 * @param int $id 
-	 * @param KalturaEventNotificationTemplateStatus $status 
-	 * @param KalturaEventNotificationTemplate $reference
-	 * @dataProvider provideData
-	 */
-	public function testUpdatestatus($id, $status, KalturaEventNotificationTemplate $reference)
-	{
-		try
-		{
-			$resultObject = $this->client->eventNotificationTemplate->updatestatus($id, $status, $reference);
-			$this->fail('Method should not be allowed for non-admin partner.');
-		}
-		catch (KalturaException $e)
-		{
-			if ($e->getCode() == 'SERVICE_FORBIDDEN')
-			{
-				
-			}
-			else
-			{
-				$this->fail('Wrong error type thrown');
-			}
-		}
-		
-	}
+	
 	/* (non-PHPdoc)
 	 * @see EventNotificationTemplateServiceTestBase::validateDelete()
 	 */
