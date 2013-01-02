@@ -18,6 +18,7 @@ class kOperator
 		$this->config = isset($opr->config) ? $opr->config : null;
 		$this->params = isset($opr->params) ? $opr->params : null;
 		$this->className = isset($opr->className) ? $opr->className : null;
+		$this->isOptional = isset($opr->isOptional) ? $opr->isOptional : null;
 	}
 	
 	/**
@@ -61,4 +62,9 @@ class kOperator
 	 * @var string
 	 */
 	public $className;
+	
+	/**
+	 * @var int - when set to 1, the operator will not cause a failure even when the actual activation fails.
+	 */
+	public $isOptional=0;
 }
