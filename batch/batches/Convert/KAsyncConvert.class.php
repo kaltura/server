@@ -220,14 +220,17 @@ class KAsyncConvert extends KJobHandlerWorker
 		}
 		$this->stopMonitor();
 		
+		$operEngMsg = $this->operationEngine->getMessage();
 		if($job->jobSubType == KalturaConversionEngineType::ENCODING_COM || $job->jobSubType == KalturaConversionEngineType::KALTURA_COM)
 		{
-			$msg = $this->operationEngine->getMessage();
-			$msg = "engine [" . get_class($this->operationEngine) . "] converted successfully: $msg";
-			return $this->closeJob($job, null, null, $msg, KalturaBatchJobStatus::ALMOST_DONE, $data);
+			$operEngMsg = "engine [" . get_class($this->operationEngine) . "] converted successfully: $operEngMsg";
+			return $this->closeJob($job, null, null, $operEngMsg, KalturaBatchJobStatus::ALMOST_DONE, $data);
 		}
 		
-		$job = $this->updateJob($job, "engine [" . get_class($this->operationEngine) . "] converted successfully", KalturaBatchJobStatus::MOVEFILE, $data);
+		if(isset($operEngMsg))
+			$job = $this->updateJob($job, "engine [" . get_class($this->operationEngine) . "] converted successfully.$operEngMsg", KalturaBatchJobStatus::MOVEFILE, $data);
+		else
+			$job = $this->updateJob($job, "engine [" . get_class($this->operationEngine) . "] converted successfully", KalturaBatchJobStatus::MOVEFILE, $data);
 		return $this->moveFile($job, $data);
 	}
 
