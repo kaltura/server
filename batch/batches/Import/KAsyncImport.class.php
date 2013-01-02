@@ -219,12 +219,13 @@ class KAsyncImport extends KJobHandlerWorker
 			$remotePath = isset($parsedUrl['path']) ? $parsedUrl['path'] : null;
 			$username = isset($parsedUrl['user']) ? $parsedUrl['user'] : null;
 			$password = isset($parsedUrl['pass']) ? $parsedUrl['pass'] : null;
+			$port = isset($parsedUrl['port']) ? $parsedUrl['port'] : null;
 			
 			$privateKey = isset($data->privateKey) ? $data->privateKey : null;
 			$publicKey  = isset($data->publicKey) ? $data->publicKey : null;
 			$passPhrase = isset($data->passPhrase) ? $data->passPhrase : null;
 			
-			KalturaLog::debug("host [$host] remotePath [$remotePath] username [$username] password [$password]");
+			KalturaLog::debug("host [$host] remotePath [$remotePath] username [$username] password [$password] port [$port]");
 			if ($privateKey || $publicKey) {
 			    KalturaLog::debug("Private Key: $privateKey");
 			    KalturaLog::debug("Public Key: $publicKey");
@@ -251,7 +252,7 @@ class KAsyncImport extends KJobHandlerWorker
 			
 			// login to server
 			if (!$privateKey || !$publicKey) {
-			    $fileTransferMgr->login($host, $username, $password);
+			    $fileTransferMgr->login($host, $username, $password, $port);
 			}
 			else {
 			    $privateKeyFile = $this->getFileLocationForSshKey($privateKey, 'privateKey');
