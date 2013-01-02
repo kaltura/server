@@ -4,6 +4,7 @@ require_once(dirname(__FILE__) . '/../kConf.php');
 require_once(dirname(__FILE__) . '/../request/infraRequestUtils.class.php');
 require_once(dirname(__FILE__) . '/kCacheManager.php');
 require_once(dirname(__FILE__) . '/../request/kSessionBase.class.php');
+require_once(dirname(__FILE__) . '/../request/kIpAddressUtils.php');
 
 /**
  * @package server-infra
@@ -178,6 +179,7 @@ class kApiCache
 		$this->_params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 		$this->_params['___cache___host'] = @$_SERVER['HTTP_HOST'];
 		$this->_params['___cache___version'] = self::CACHE_VERSION;
+		$this->_params['___internal'] = intval(kIpAddressUtils::isInternalIp());
 	}
 
 	protected function isCacheDisabled()
@@ -631,15 +633,10 @@ class kApiCache
 	// cache write functions
 	protected function isAnonymous($ks)					// overridable
 	{
-		if (kConf::hasParam('internal_ip_range'))
+		if(kIpAddressUtils::isInternalIp())
 		{
-			$range = kConf::get('internal_ip_range');
-			
-			if(kIpAddressUtils::isIpInRange(infraRequestUtils::getRemoteAddress(), $range))
-			{
-				KalturaLog::debug('internal IP, setting isAnonymous to false');
-				return false;
-			}
+			KalturaLog::debug('internal IP, setting isAnonymous to false');
+			return false;
 		}			
 		return (!$ks || (!$ks->isAdmin() && ($ks->user === "0" || $ks->user === null)));
 	}

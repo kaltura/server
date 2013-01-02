@@ -93,6 +93,20 @@ class kIpAddressUtils
 		return false;		
 	}
 	
+	public static function isInternalIp()
+	{
+		if (kConf::hasParam('internal_ip_range'))
+		{
+			$range = kConf::get('internal_ip_range');
+					
+			if(self::isIpInRange(infraRequestUtils::getRemoteAddress(), $range))
+			{
+				return true;
+			}
+		}	
+		return false;				
+	}
+	
 	
 	
 }

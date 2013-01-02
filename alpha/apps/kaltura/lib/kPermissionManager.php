@@ -65,8 +65,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 		if (is_null($partnerId)) {
 			$partnerId = 'null';
-		}
-		$key = 'role_'.$roleId.'_partner_'.$partnerId;
+		}		
+		$key = 'role_'.$roleId.'_partner_'.$partnerId.'_internal_'.intval(kIpAddressUtils::isInternalIp());
 		return $key;
 	}
 	
@@ -261,15 +261,11 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		// if the request sent from the internal server set additional permission allowing access without KS 
 		// from internal servers  
-		if (kConf::hasParam('internal_ip_range'))
+		if (kIpAddressUtils::isInternalIp())
 		{
-			$range = kConf::get('internal_ip_range');
-			if(kIpAddressUtils::isIpInRange(kCurrentContext::$user_ip, $range))
-			{	
-				KalturaLog::debug('IP in range, adding ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS permission');		
-				$alwaysAllowedInternal = array(PermissionName::ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS);
-				$tmpPermissionNames = array_merge($tmpPermissionNames, $alwaysAllowedInternal);
-			}		
+			KalturaLog::debug('IP in range, adding ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS permission');		
+			$alwaysAllowedInternal = array(PermissionName::ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS);
+			$tmpPermissionNames = array_merge($tmpPermissionNames, $alwaysAllowedInternal);
 		}			
 		
 		$permissionNames = array();
@@ -986,8 +982,5 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
  		$ps2Permission->setType(PermissionType::SPECIAL_FEATURE);
  		$ps2Permission->save();
  	}
- 	
 	
- 	
-		
 }
