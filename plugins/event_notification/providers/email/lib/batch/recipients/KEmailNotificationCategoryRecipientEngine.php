@@ -25,6 +25,7 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 		$recipients = array();
 		foreach ($userList->objects as $user)
 		{
+			/* @var $user KalturaUser */
 			$recipients[$user->email] = $user->firstName. ' ' . $user->lastName;
 		}
 		
