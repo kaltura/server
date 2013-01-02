@@ -190,6 +190,7 @@ class KDLOperationParams {
 		$this->_cfg = isset($opr->config) ? $opr->config : null;
 		$this->_params = isset($opr->params) ? $opr->params : null;
 		$this->_className = isset($opr->className) ? $opr->className : null;
+		$this->_isOptional = isset($opr->isOptional) ? $opr->isOptional : null;
 	}
 	public $_id=null;
 	public $_extra=null;
@@ -199,6 +200,8 @@ class KDLOperationParams {
 	public $_extractmediaEnabled=null;
 	public $_thumbEnabled=null;
 	public $_params = null;
+	public $_className = null;
+	public $_isOptional = null;
 	
 		/* ---------------------------
 		 * ToString
