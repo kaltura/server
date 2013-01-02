@@ -239,6 +239,7 @@ class LiveStreamService extends KalturaEntryService
 	public function isLiveAction ($id, $protocol)
 	{
 		KalturaResponseCacher::setExpiry(self::ISLIVE_ACTION_CACHE_EXPIRY);
+		kApiCache::disableConditionalCache();
 		$liveStreamEntry = entryPeer::retrieveByPK($id);
 		if (!$liveStreamEntry)
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
@@ -256,7 +257,7 @@ class LiveStreamService extends KalturaEntryService
 					if ($config)
 					{
 						KalturaLog::info('Determining status of live stream URL [' .$config->getUrl() . ']');
-						return $this->hdsUrlExists($config->getUrl());
+						return $this->hdsUrlExists($config->getUrl(). '?hdCore=2.7.4');
 					}
 					break;
 			}
