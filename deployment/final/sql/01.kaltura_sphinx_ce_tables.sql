@@ -1,11 +1,6 @@
-CREATE DATABASE IF NOT EXISTS `kaltura_sphinx_log`;
-
-USE `kaltura_sphinx_log`;
 
 /*Table structure for table `sphinx_log` */
-DROP TABLE IF EXISTS `sphinx_log`;
-
-CREATE TABLE `sphinx_log` (
+CREATE TABLE IF NOT EXISTS `sphinx_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `executed_server_id` int(11) NOT NULL,
   `object_type` varchar(255) NOT NULL,
@@ -22,9 +17,7 @@ CREATE TABLE `sphinx_log` (
 ) ENGINE=MYISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `sphinx_log_server` */
-DROP TABLE IF EXISTS `sphinx_log_server`;
-
-CREATE TABLE `sphinx_log_server` (
+CREATE TABLE IF NOT EXISTS `sphinx_log_server` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `server` varchar(63) DEFAULT NULL,
   `dc` int(11) DEFAULT NULL,

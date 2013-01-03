@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<KUploadConfiguration conversionProfile="2">
+
+  <fileFilters default="Any">
+    <fileFilter id="image" description="images" extensions="*.jpg;*.jpeg;*.bmp;*.png;*.gif;*.tif;*.tiff" entryType="1" mediaType="2"/>
+
+    <fileFilter id="video" description="videos" extensions="*.flv;*.asf;*.qt;*.mov;*.mpg;*.mpeg;*.avi;*.wmv;*.mp4;*.m4v;*.3gp" type="1" entryType="1" mediaType="1"/>
+
+    <fileFilter id="audio" description="audio" extensions="*.flv;*.asf;*.wmv;*.qt;*.mov;*.mpg;*.avi;*.mp3;*.wav;*.mp4;*.wma;*.3gp" entryType="1" mediaType="5"/>
+
+    <fileFilter id="media" description="images/videos/audio" extensions="*.qt;*.mov;*.mpg;*.avi;*.mp3;*.wav;*.mp4;*.wma;*.flv;*.asf;*.qt;*.mov;*.mpeg;*.avi;*.wmv;*.m4v;*.3gp;*.jpg;*.jpeg;*.bmp;*.png;*.gif;*.tif;*.tiff" entryType="1" mediaType="-1"/>
+
+    <fileFilter id="documents" description="documents" extensions="*.csv;*.doc;*.docx;*.txt;*.xls;*.xlsx;*.ppt;*.pptx;*.pdf;*.rtf;*.tab;*.gif;*.jpg;*.jpeg;*.art;*.bmp;*.tif" entryType="10" mediaType="-1"/>
+
+    <fileFilter id="swfdocuments" description="swf" extensions="*.swf" entryType="10" mediaType="12"/>
+
+    <fileFilter id="Any" description="documents/images/videos/audio/swfdocuments" extensions="*.swf;*.csv;*.doc;*.docx;*.txt;*.xls;*.xlsx;*.ppt;*.pptx;*.pdf;*.rtf;*.tab;*.mov;*.mpg;*.avi;*.mp3;*.wav;*.mp4;*.wma;*.flv;*.asf;*.qt;*.mov;*.mpg;*.mpeg;*.avi;*.wmv;*.m4v;*.3gp;*.wav;*.mp4;*.jpg;*.jpeg;*.art;*.bmp;*.png;*.gif;*.tif;*.tiff" entryType="-1" mediaType="-1"/>
+  </fileFilters>
+
+  <limits maxUploads="60" maxFileSize="200" maxTotalSize="9999999999"/>
+</KUploadConfiguration>

@@ -1,0 +1,35 @@
+<Clipper>
+	<cssUrl>/flash/kclip/v1.1.4/assets/clipper_skin.swf</cssUrl>
+	<locale>
+		<path>/flash/kclip/v1.1.4/locale/en_US/clipper_en_US.swf</path>
+		<language>en_US</language>
+	</locale>
+	<components>
+		<maxAllowedRows>5</maxAllowedRows>
+		<showControlBar>true</showControlBar>
+		<showAddDeleteButtons>true</showAddDeleteButtons>
+		<showMessageBox>false</showMessageBox>
+		<zoomBoxValues default="min">
+			<zoomBoxValue>
+				<valueLabel>100%</valueLabel>
+				<valueLocaleKey>oneHundred</valueLocaleKey>
+				<valueInMS>max</valueInMS>
+			</zoomBoxValue>
+			<zoomBoxValue>
+				<valueLabel>5 sec</valueLabel>
+				<valueLocaleKey>fiveSec</valueLocaleKey>
+				<valueInMS>5000</valueInMS>
+			</zoomBoxValue>
+			<zoomBoxValue>
+				<valueLabel>1 sec</valueLabel>
+				<valueLocaleKey>oneSec</valueLocaleKey>
+				<valueInMS>1000</valueInMS>
+			</zoomBoxValue>
+			<zoomBoxValue>
+				<valueLabel>Frames</valueLabel>
+				<valueLocaleKey>frames</valueLocaleKey>
+				<valueInMS>min</valueInMS>
+			</zoomBoxValue>
+		</zoomBoxValues>
+	</components>
+</Clipper>

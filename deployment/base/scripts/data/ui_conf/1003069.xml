@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layouts>
+<layout layoutId="" skinPath="/content/uiconf/2tor/new_kdp/kdp_skin_aps_v2.swf">
+	<VBox id="player" height="100%" styleName="topLevelLayout" width="100%">
+		<HBox height="30" id="TopTitleScreen" styleName="controllerBoxDark" k_theme_change="true" width="100%">
+			<SlideControls id="SlideControls" width="100%" k_path="sync/SlideControls.swf"/>
+		</HBox>
+		<Canvas width="100%" height="100%">
+			<HBox height="100%" styleName="playerContainer" id="playerContainer" width="100%">
+				<HBox height="100%" id="playerContainer" width="100%" styleName="centered2">
+					<Canvas height="100%" id="PlayerHolder" styleName="PlayerBackground" width="100%">
+						<KplayerModule height="100%" id="myKplayer" k_path="kplayer/KplayerModule.swf" styleName="centered" width="100%"/>
+						<screens height="100%" id="screens" styleName="centered" width="100%" k_path="screens/Screens.swf" k_end_screen_id="endScreen" k_end_screen_over_id="endScreen" k_pause_screen_id="pauseScreen" k_pause_screen_over_id="pauseScreen" k_play_screen_id="emptyScreen" k_play_screen_over_id="playScreen" k_start_screen_id="startScreen" k_start_screen_over_id="startScreen"/>
+						
+						<Button x="20" y="20" id="playerFullScreenButton" visible="{false}" styleName="sinblePlayerView" command="singlePlayerView"/>										
+											
+					</Canvas>
+					<Canvas id="SlideHolder" width="100%" height="100%">
+						<SlideWrapper height="100%" width="100%" id="SlideWrapper" k_path="sync/SlideWrapper.swf" styleName="centered"/>
+					</Canvas>
+				</HBox>	
+			</HBox>
+			
+			<CarouselPictures height="100%" width="100%" id="CarouselPictures" k_path="sync/CarouselPictures.swf"/>
+		</Canvas>
+		
+		<HBox id="ControllerScreen" width="100%" height="35" styleName="controllerBoxDark" k_theme_change="true">
+			<HBox id="ControllerScreenInner" width="100%" height="35" styleName="transparentContainer">
+				<Button id="playBtnControllerScreen" command="play" width="25" height="25" k_buttonType="buttonIconControllerArea" styleName="play" tooltip=""/>
+				<Button id="NextSlideButton" command="NextSlide" width="25" height="25" k_buttonType="buttonIconControllerArea" styleName="NextSlideButtonStyle" tooltip="Jump to next synced point" label="stam"/>
+				<VBox id="scrubberContainerControllerScreen" width="100%" height="100%">
+					<Spacer height="1"/>
+					<Scrubber id="scrubberControllerScreen" styleName="scrubberLight" width="100%" k_color_change="true" height="12"/>
+				</VBox>
+				<TimerCountdown id="timerControllerScreen" width="30" height="10" styleName="timer" k_path="timertext/TimerCountdown.swf" timerType="forwards"/>
+				<VolumeModule width="20" height="15" id="volumeBarControllerScreen" k_path="VolumeBars/VolumeBarB.swf" styleName="volumeBarLight" tooltip="change volume"/>
+				<Spacer width="5"/>
+				<Button id="fullScreenBtnControllerScreen" command="fullScreen" k_buttonType="buttonIconControllerArea" width="autoSize" height="autoSize" label="fullscreen" styleName="fullScreenBtn" tooltip="Toggle fullscreen"/>
+				<Spacer width="5"/>
+				<RemoveSyncButton id="RemoveSyncButton" k_path="sync/RemoveSyncButton"/>
+				<Spacer width="5"/>
+				<AddSyncButton id="AddSyncButton" k_path="sync/AddSyncButton"/>			
+			</HBox>
+			<Spacer width="10"/>
+			<Button id="poweredByControllerScreen" width="40" height="20" k_click="navigate('http://www.kaltura.com')" styleName="kalturaLogoDark" k_theme_change="true"/>
+			<Spacer width="10"/>
+		</HBox>
+	</VBox>
+	<popups>
+		<module height="100%" id="report" k_path="popups/Report.swf" width="100%"/>
+		<module height="100%" id="credits" k_path="credits/CreditsWindow.swf" width="100%"/>
+	</popups>
+	<screens>
+		<screen id="startScreen">
+			<VBox height="100%" id="screenContainer" styleName="screenContainer" width="100%">
+				<Tile styleName="TileContainer">
+					<Button id="onVideoPlayBtnStartScreen" command="play" minWidth="75" minHeight="75" width="autoSize" height="autoSize" label="Play" labelPlacement="top" styleName="statesPlayBtn" tooltip="Play video"/>
+				</Tile>
+			</VBox>
+		</screen>
+		<screen id="pauseScreen">
+			<VBox height="100%" id="screenContainer" styleName="screenContainer" width="100%">
+				<Spacer height="100%"/>
+				<Tile styleName="TileContainer">
+					<Button id="onVideoPlayBtnPauseScreen" command="play" minWidth="75" minHeight="75" width="autoSize" height="autoSize" label="Play" labelPlacement="top" styleName="statesPlayBtn" tooltip="Play video"/>
+				</Tile>
+				<Spacer height="100%"/>
+			</VBox>
+		</screen>
+		<screen id="playScreen">
+			<VBox height="100%" id="screenContainer" styleName="screenContainer" width="100%">
+				<Spacer height="100%"/>
+				<Tile styleName="TileContainer">
+				</Tile>
+				<Spacer height="100%"/>
+			</VBox>
+		</screen>
+		<screen id="endScreen">
+			<VBox height="100%" id="screenContainer" styleName="screenContainer" width="100%">
+				<Spacer height="100%"/>
+				<Tile styleName="TileContainer">
+					<Button id="replayBtnEndScreen" command="replay" minWidth="75" minHeight="75" width="autoSize" labelPlacement="top" height="autoSize" label="replay" styleName="replayBtn" tooltip="replay"/>
+				</Tile>
+				<Spacer height="100%"/>
+			</VBox>
+		</screen>
+	</screens>
+	<visual>
+		<theme id="currentTheme">
+			<primaryColor>0x000000</primaryColor>
+			<secondaryColor>0xFFFFFF</secondaryColor>
+			<tertiaryColor>0xFFFFFF</tertiaryColor>
+			<cssSelector componentId="TopTitleScreen" newClass="controllerBoxLight"/>
+			<cssSelector componentId="ControllerScreen" newClass="controllerBoxLight"/>
+			<cssSelector componentId="poweredByControllerScreen" newClass="kalturaLogoLight"/>
+			<font>Arial</font>
+		</theme>
+		<theme id="dark">
+			<primaryColor>0xFFFFFF</primaryColor>
+			<secondaryColor>0x000000</secondaryColor>
+			<tertiaryColor>0x000000</tertiaryColor>
+			<cssSelector componentId="TopTitleScreen" newClass="controllerBoxDark"/>
+			<cssSelector componentId="ControllerScreen" newClass="controllerBoxDark"/>
+			<cssSelector componentId="poweredByControllerScreen" newClass="kalturaLogoDark"/>
+			<font>Arial</font>
+		</theme>
+		<theme id="light">
+			<primaryColor>0x000000</primaryColor>
+			<secondaryColor>0xFFFFFF</secondaryColor>
+			<tertiaryColor>0xFFFFFF</tertiaryColor>
+			<cssSelector componentId="TopTitleScreen" newClass="controllerBoxLight"/>
+			<cssSelector componentId="ControllerScreen" newClass="controllerBoxLight"/>
+			<cssSelector componentId="poweredByControllerScreen" newClass="kalturaLogoLight"/>
+			<font>Arial</font>
+		</theme>
+	</visual>
+	<javaScript>
+			<jsBlock id="myNavigate">
+				function myNavigate(staticUrl,dynamicData){
+					alert('navigating to :'+staticUrl+dynamicData);	
+				}
+			</jsBlock> 
+	</javaScript>
+	<extraData>
+
+	</extraData>
+		<uiVars>
+			
+		</uiVars>
+	</layout>
+</layouts>

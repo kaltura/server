@@ -1,0 +1,82 @@
+<kcw>
+  <UIConfigList>
+    <UIConfig>
+      <target>ContributionWizard.swf</target>
+      <cssUrl id="light" name="Default Light">/content/uiconf/kcweditor/styles/light/default.swf?R=13838.332279385946</cssUrl>
+      <localeUrl id="en_US_mysite" name="English US MySite">/content/uiconf/kcweditor/locales/en_US/en_US_locales_mysite.swf?R=13838.332279385946</localeUrl>
+    </UIConfig>
+  </UIConfigList>
+  <ImportTypesConfig>
+    <taggingConfig>
+      <minTitleLen>1</minTitleLen>
+      <maxTitleLen>2000</maxTitleLen>
+      <minTagsLen>0</minTagsLen>
+      <maxTagsLen>2000</maxTagsLen>
+    </taggingConfig>
+  </ImportTypesConfig>
+  <webcamParams>
+    <keyFrameInterval/>
+    <width/>
+    <height/>
+    <framerate/>
+    <favorArea/>
+    <bandwidth/>
+    <quality/>
+  </webcamParams>
+  <mediaTypes>
+    <media type="video">
+      <provider id="upload" name="upload" code="1">
+        <authMethodList>
+          <authMethod type="1"/>
+        </authMethodList>
+        <moduleUrl>UploadView.swf</moduleUrl>
+        <fileFilters>
+          <filter type="video">
+            <allowedTypes>flv,asf,qt,mov,mpg,avi,wmv,mp4,3gp</allowedTypes>
+          </filter>
+        </fileFilters>
+      </provider>
+      <provider id="thissite" name="thissite" code="21" addsearch="true">
+        <moduleUrl>SearchView.swf</moduleUrl>
+        <authMethodList>
+          <authMethod type="1"/>
+        </authMethodList>
+      </provider>
+      <provider id="webcam" name="webcam" code="2">
+        <authMethodList>
+          <authMethod type="1"/>
+        </authMethodList>
+        <moduleUrl>WebcamView.swf</moduleUrl>
+        <customData>
+          <serverUrl>rtmp://{HOST_NAME}/oflaDemo</serverUrl>
+        </customData>
+      </provider>
+    </media>
+  </mediaTypes>
+  <limitations>
+    <upload>
+      <singleFileSize min="-1" max="-1"/>
+      <numFiles min="-1" max="1"/>
+      <totalFileSize min="-1" max="-1"/>
+    </upload>
+    <search>
+      <numFiles min="1" max="1"/>
+    </search>
+  </limitations>
+  <StartupDefaults>
+    <SingleContribution>true</SingleContribution>
+    <autoTOUConfirmation>false</autoTOUConfirmation>
+    <showLogoImage>true</showLogoImage>
+    <alwaysShowPermission>true</alwaysShowPermission>
+    <NavigationProperties>
+      <showConfirmButtons>true</showConfirmButtons>
+      <showCloseButton>false</showCloseButton>
+      <enableIntroScreen>false</enableIntroScreen>
+      <enableTagging>true</enableTagging>
+    </NavigationProperties>
+    <gotoScreen>
+      <mediaType>video</mediaType>
+      <mediaProviderName>upload</mediaProviderName>
+    </gotoScreen>
+  </StartupDefaults>
+</kcw>

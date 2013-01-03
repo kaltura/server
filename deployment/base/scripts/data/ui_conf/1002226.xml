@@ -1,0 +1,26 @@
+<SimpleEditor>
+
+	<ContributionWizard>
+		<UIConfigId>1002225</UIConfigId>
+	</ContributionWizard>
+
+	<Welcome>/content/uiconf/kaltura/generic/kse_2.1.5/light/welcome.swf</Welcome>
+
+	<DefaultTransition>None</DefaultTransition>
+
+	<KPaint>
+		<target>/flash/kpaint/v1.0.4/Painter.swf</target>
+		<shapes>/flash/kpaint/v1.0.1/shapes</shapes>
+		<fonts>/flash/kpaint/v1.0.1/fonts</fonts>
+		<config>/flash/kpaint/v1.0.1/kpaint_config.xml</config>
+	</KPaint>
+
+	<UIConfigList>
+    	<UIConfig>
+			<target>simpleeditor.swf</target>
+		    <cssUrl>/content/uiconf/kaltura/generic/kse_2.1.5/light/styles_kse.swf</cssUrl>
+		    <localeUrl>/content/uiconf/kaltura/generic/kse_2.1.5/light/en_US_SimpleEditor.swf</localeUrl>
+		</UIConfig>
+	</UIConfigList>
+
+</SimpleEditor>

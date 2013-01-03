@@ -1,11 +1,10 @@
-USE `kaltura`;
 
 DELIMITER $$
 
 /* Procedure structure for procedure `update_entries` */
 DROP PROCEDURE IF EXISTS `update_entries`$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `update_entries`()
+CREATE PROCEDURE `update_entries`()
 BEGIN
     DECLARE done INT DEFAULT 0;
     DECLARE entry_id CHAR(50);
@@ -21,13 +20,13 @@ BEGIN
     UNTIL done END REPEAT;
     SET SESSION sql_log_bin = 0;
     CLOSE updated_entries;
-    END$$
+END$$
 
 
 /* Procedure structure for procedure `update_kusers` */
 DROP PROCEDURE IF EXISTS `update_kusers`$$
 
-CREATE DEFINER=`etl`@`localhost` PROCEDURE `update_kusers`()
+CREATE PROCEDURE `update_kusers`()
 BEGIN
     DECLARE done INT DEFAULT 0;
     DECLARE new_kuser_id CHAR(50);
@@ -43,6 +42,6 @@ BEGIN
     UNTIL done END REPEAT;
     SET SESSION sql_log_bin = 0;
     CLOSE updated_kusers;
-    END$$
+END$$
 
 DELIMITER ;
