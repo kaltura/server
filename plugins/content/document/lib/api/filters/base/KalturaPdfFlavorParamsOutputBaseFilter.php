@@ -16,11 +16,11 @@ abstract class KalturaPdfFlavorParamsOutputBaseFilter extends KalturaFlavorParam
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), KalturaPdfFlavorParamsOutputBaseFilter::$map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), KalturaPdfFlavorParamsOutputBaseFilter::$order_by_map);
+		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
 }
