@@ -71,7 +71,6 @@ jQuery('#filter_type').change(function() {
 	else {
 		$("#filter_text").css("display","inline");
 		$("#filter_text input").focus();
-		$("#filter_text input").val(<?php echo isset($_SESSION['partnerLastSearchValue']) ? $_SESSION['partnerLastSearchValue'] : '' ?>);
 		if(this.value == "free")
 			$("div.help").show();
 		else
