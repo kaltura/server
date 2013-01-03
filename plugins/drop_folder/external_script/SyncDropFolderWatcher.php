@@ -70,6 +70,7 @@ try
 	$filter = new KalturaDropFolderFilter();
 	$filter->pathEqual = $folderPath;
 	$filter->typeEqual = KalturaDropFolderType::LOCAL;
+	$filter->statusIn = KalturaDropFolderStatus::ENABLED. ','. KalturaDropFolderStatus::ERROR;
 	$dropFolders = $dropFolderPlugin->dropFolder->listAction($filter);	
 	writeLog($logPrefix, 'found '.$dropFolders->totalCount.' folders');
 	if($dropFolders->totalCount == 1)
