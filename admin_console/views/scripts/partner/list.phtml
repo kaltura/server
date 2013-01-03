@@ -117,36 +117,7 @@ jQuery('#filter_type').change(function() {
 	else {
 		$("#filter_text").css("display","inline");
 		$("#filter_text input").focus();
-		if(this.value == "free")
-			$("div.help").show();
-		else
-			$("div.help").hide();
-	}
-});
-// <div class="help" title="<?php //echo this_tooltip_text ?>"></div>
-
-jQuery('#filter_type').change();
-
-function doAction(action, partnerId) {
-	if (action && eval('typeof ' + action) == 'function')
-	{
-		f = eval(action);
-		Array.prototype.shift.apply(arguments);
-		f.apply(this, arguments);
-	}
-	jQuery('select.options').val('');
-}
-</script>
-
-<script type="text/javascript">
-jQuery('#filter_type').change(function() {
-	if(this.value == "none") {
-		$("#filter_text").css("display","none");
-		$("div.help").hide();
-	}
-	else {
-		$("#filter_text").css("display","inline");
-		$("#filter_text input").focus();
+		$("#filter_text input").val(<?php echo isset($_SESSION['partnerLastSearchValue']) ? $_SESSION['partnerLastSearchValue'] : '' ?>);
 		if(this.value == "free")
 			$("div.help").show();
 		else
