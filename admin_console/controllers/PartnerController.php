@@ -498,17 +498,23 @@ class PartnerController extends Zend_Controller_Action
 		$filterPackage = $request->getParam('partner_package');
 		
 		if (!in_array($filterType,array('','none'))) {
-			session_start();
 			$_SESSION['partnerLastSearchValue'] = $filterInput;
 		}
 		
 		if($filterType == 'byEntryId') {
 			$client = Infra_ClientHelper::getClient();
 			$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
-			/* @var $entry Kaltura_Client_Type_MediaEntry */
-			$entry = $adminConsolePlugin->entryAdmin->get($filterInput);
+			
+			try {
+				$entry = $adminConsolePlugin->entryAdmin->get($filterInput);
+				/* @var $entry Kaltura_Client_Type_MediaEntry */
+				$filterInput = $entry->partnerId;
+			}
+			catch(Exception $ex) {
+				$filterInput = "-99";
+			}
 			$filterType = 'byid';
-			$filterInput = $entry->partnerId;
+			
 		}
 		if ($filterType == 'byid')
 		{
