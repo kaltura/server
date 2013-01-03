@@ -264,7 +264,7 @@ class BulkService extends KalturaBaseService
 	
 	
 	/**
-	 * serve action returan the original file.
+	 * serve action returns the original file.
 	 * 
 	 * @action serve
 	 * @param int $id job id
@@ -306,7 +306,7 @@ class BulkService extends KalturaBaseService
 	
 	
 	/**
-	 * serveLog action returan the original file.
+	 * serveLog action returns the log file for the bulk-upload job.
 	 * 
 	 * @action serveLog
 	 * @param int $id job id
@@ -316,9 +316,9 @@ class BulkService extends KalturaBaseService
 	function serveLogAction($id)
 	{
 		$c = new Criteria();
-		$c->addAnd(BatchJobLogPeer::JOB_ID, $id);
-		$c->addAnd(BatchJobLogPeer::PARTNER_ID, $this->getPartnerId());
-		$c->addAnd(BatchJobLogPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
+		$c->addAnd(BatchJobPeer::ID, $id);
+		$c->addAnd(BatchJobPeer::PARTNER_ID, $this->getPartnerId());
+		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
 		$batchJob = BatchJobPeer::doSelectOne($c);
 		
 		if (!$batchJob)
