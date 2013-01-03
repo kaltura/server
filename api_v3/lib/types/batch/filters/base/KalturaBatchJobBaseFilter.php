@@ -110,12 +110,12 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), KalturaBatchJobBaseFilter::$map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), KalturaBatchJobBaseFilter::$order_by_map);
+		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
 
 	/**

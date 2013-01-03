@@ -34,12 +34,12 @@ abstract class KalturaPermissionItemBaseFilter extends KalturaFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), KalturaPermissionItemBaseFilter::$map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), KalturaPermissionItemBaseFilter::$order_by_map);
+		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
 
 	/**
