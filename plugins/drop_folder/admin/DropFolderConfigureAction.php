@@ -35,12 +35,12 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 				$partnerId = $this->_getParam('partnerId');
 				$dropFolderType = $this->_getParam('type');
 				$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
+				$action->view->formValid = $this->processForm($dropFolderForm, $request->getPost(), $dropFolderId);
 				if(!is_null($dropFolderId))
 				{
-					$dropFolderForm->getElement('fileHandlerType')->setOptions(array('disabled'	=> 'disabled'));
-					$dropFolderForm->getElement('fileHandlerType')->setOptions(array('required'	=> false));
+					$dropFolder = $dropFolderForm->getObject("Kaltura_Client_DropFolder_Type_DropFolder", $request->getPost(), false, true);
+					$this->disableFileHandlerType($dropFolderForm, $dropFolder->fileHandlerType);									
 				}
-				$action->view->formValid = $this->processForm($dropFolderForm, $request->getPost(), $dropFolderId);
 			}
 			else
 			{
@@ -53,7 +53,7 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 					$dropFolderType = $dropFolder->type;
 					$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
 					$dropFolderForm->populateFromObject($dropFolder, false);
-					$dropFolderForm->getElement('fileHandlerType')->setOptions(array('disabled'	=> 'disabled'));
+					$this->disableFileHandlerType($dropFolderForm, $dropFolder->fileHandlerType);
 				}
 				else
 				{
@@ -110,6 +110,17 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 			$form->populate($formData);
 			return false;
 		}
+	}
+	
+	private function disableFileHandlerType(Form_DropFolderConfigure $dropFolderForm, $fileHandlerTypeValue)
+	{
+		$fileHandlerType = $dropFolderForm->getElement('fileHandlerType');
+		$fileHandlerType->setAttrib('style', 'display:none');
+		$fileHandlerType->setLabel('');
+		$fileHandlerTypeForView = $dropFolderForm->getElement('fileHandlerTypeForView');
+		$fileHandlerTypeForView->setLabel('Ingestion Workflow:');
+		$fileHandlerTypeForView->setAttrib('style', 'display:inline');
+		$fileHandlerTypeForView->setValue($fileHandlerTypeValue);
 	}
 }
 

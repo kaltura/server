@@ -94,6 +94,11 @@ class Form_DropFolderConfigure extends Infra_Form
 		$fileHandlerTypes->setRequired(true);
 		$fileHandlerTypes->setAttrib('onchange', 'handlerTypeChanged()');
 		$this->addElement($fileHandlerTypes);
+
+		$fileHandlerTypeForView = new Kaltura_Form_Element_EnumSelect('fileHandlerTypeForView', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType'));
+		$fileHandlerTypeForView->setAttrib('disabled', 'disabled');
+		$fileHandlerTypeForView->setAttrib('style', 'display:none');
+		$this->addElement($fileHandlerTypeForView);
 		
 		$handlerConfigForm = new Form_ContentFileHandlerConfig();
 		$this->addSubForm($handlerConfigForm, 'contentHandlerConfig'); 
