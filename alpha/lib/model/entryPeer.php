@@ -636,6 +636,37 @@ class entryPeer extends BaseentryPeer
 	 */
 	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{		
+		if(empty($selectResults))
+			return;
+		
+		$removedRecordsCount = 0;
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		
+		if($partner && $partner->getShouldApplyAccessControlOnEntryMetadata() && !kCurrentContext::$is_admin_session) {
+			
+			foreach ($selectResults as $key => $entry) {
+				
+				$scope = new accessControlScope();
+				$scope->setEntryId($entry->getId());
+				
+				$context = new kEntryContextDataResult();
+				$accessControl = $entry->getAccessControl();
+				$accessControl->applyContext($context, $scope);
+				
+				$actions = $context->getAccessControlActions();
+				foreach($actions as $action)
+				{
+					/* @var $action kAccessControlAction */
+					if($action->getType() == accessControlActionType::BLOCK) {
+						unset($selectResults[$key]);
+						$removedRecordsCount++;
+						break;
+					}
+				}
+			}
+		}
+		
 		if ((!kEntitlementUtils::getEntitlementEnforcement() && !is_null(kCurrentContext::$ks))|| 
 			!self::$filerResults ||
 			!kEntitlementUtils::getInitialized()) // if initEntitlement hasn't run - skip filters.
@@ -654,8 +685,6 @@ class entryPeer extends BaseentryPeer
 			if(!$partner->getDefaultEntitlementEnforcement() || !PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partner->getId()))
 				return parent::filterSelectResults($selectResults, $criteria);			
 		}
-		
-		$removedRecordsCount = 0;
 		
 		foreach ($selectResults as $key => $entry)
 		{

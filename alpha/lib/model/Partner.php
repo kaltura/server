@@ -661,6 +661,9 @@ class Partner extends BasePartner
 	
 	public function getKSVersion() { return $this->getFromCustomData( "ksVersion" , null, 1  );	}
 	public function setKSVersion( $v ) { return $this->putInCustomData( "ksVersion", $v );	}
+	
+	public function getShouldApplyAccessControlOnEntryMetadata() { return $this->getFromCustomData( "shouldApplyAccessControlOnEntryMetadata" , null, false ); }
+	public function setShouldApplyAccessControlOnEntryMetadata( $v ) { return $this->putInCustomData( "shouldApplyAccessControlOnEntryMetadata", $v ); }
 
 	public function getDefaultDeliveryType() { return $this->getFromCustomData("defaultDeliveryType", null); }
 	public function setDefaultDeliveryType( $v ) { $this->putInCustomData("defaultDeliveryType", $v); }

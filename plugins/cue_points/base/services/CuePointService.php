@@ -169,12 +169,27 @@ class CuePointService extends KalturaBaseService
 	 */
 	function listAction(KalturaCuePointFilter $filter = null, KalturaFilterPager $pager = null)
 	{
+		
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
-			
+		
 		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($this->getCuePointType())
 			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
+
+		$entryIds = null;
+		if ($filter->entryIdEqual) {
+			$entryIds = array($filter->entryIdEqual);
+		} else if ($filter->entryIdIn) {
+			$entryIds = explode(',', $filter->entryIdIn);
+		}
+		
+		if(!is_null($entryIds)) {
+			$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, $this->getPartnerId());
+			$filter->entryIdEqual = null;
+			$filter->entryIdIn = implode(',', $entryIds);
+		}
+		
 		
 		$cuePointFilter = $filter->toObject();
 		

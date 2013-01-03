@@ -15,6 +15,14 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	{
 		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
 	}
+	
+	protected function validateEntryIdFiltered()
+	{
+		if(!$this->idEqual && !$this->idIn && !$this->entryIdEqual && !$this->entryIdIn)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL,
+					$this->getFormattedPropertyNameWithClassName('idEqual') . '/' . $this->getFormattedPropertyNameWithClassName('idIn') . '/' .
+					$this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));
+	}
 
 	/**
 	 * @param CuePointFilter $cuePointFilter
@@ -23,6 +31,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	 */
 	public function toObject($cuePointFilter = null, $propsToSkip = array())
 	{
+		$this->validateEntryIdFiltered();
 		if(!$cuePointFilter)
 			$cuePointFilter = new CuePointFilter();
 			
