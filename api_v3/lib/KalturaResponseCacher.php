@@ -210,6 +210,8 @@ class KalturaResponseCacher extends kApiCache
 	{
 		if (parent::isAnonymous($ks))
 			return true;
+		else if(!$ks)
+			return false;
         
 		// force caching of actions listed in kConf even if admin ks is used
 		if(!kConf::hasMap('v3cache_ignore_admin_ks'))
