@@ -302,6 +302,15 @@ class kBatchManager
 			kJobsManager::updateBatchJob($job, BatchJob::BATCHJOB_STATUS_FATAL);
 		}
 		
+		$jobs = kBatchExclusiveLock::getStatusInconsistentJob();
+		foreach($jobs as $job) {
+			KalturaLog::log("Fixing batch job Inconsistency [" . $job->getId() . "]");
+			$job->delete();
+			// The job shouldhave been deleted. The reason it got here is since the update
+			// process has failed fataly. Therefore there is no point in retrying to save it.
+		}
+		
+		
 		return 0;
 	}
 	

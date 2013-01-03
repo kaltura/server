@@ -301,6 +301,22 @@ class kBatchExclusiveLock
 		}
 	}
 
+	/**
+	 * This function returns all batch jobs in which the batch_job_lock status is RETRY
+	 * and the batch_job_sep status is fatal. 
+	 * Those kind of cases can happen when a fatal error occured - Those cases must be investigated
+	 */
+	public static function getStatusInconsistentJob()
+	{
+		$c = new Criteria();
+		$c->add(BatchJobLockPeer::STATUS, BatchJob::BATCHJOB_STATUS_RETRY, Criteria::EQUAL);
+		$c->addJoin(BatchJobLockPeer::BATCH_JOB_ID, BatchJobPeer::ID, Criteria::JOIN);
+		$c->add(BatchJobPeer::STATUS, BatchJob::BATCHJOB_STATUS_FATAL, Criteria::EQUAL);
+		
+		$jobs = BatchJobLockPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+		return $jobs;
+	}
+	
 	public static function getExpiredJobs()
 	{
 		$jobTypes = kPluginableEnumsManager::coreValues('BatchJobType');
