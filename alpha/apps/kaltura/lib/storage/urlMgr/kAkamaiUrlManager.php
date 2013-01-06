@@ -136,7 +136,9 @@ class kAkamaiUrlManager extends kUrlManager
 					if($entry && $fromTime > ($entry->getDurationInt() - 1))
 						$fromTime -= 1;
 						
-					$url .= "?aktimeoffset=$fromTime";
+					// add offset only of intelliseek option is enabled
+					if(isset($this->params['enable_intelliseek']))
+						$url .= "?aktimeoffset=$fromTime";
 				}
 			}
 		}
