@@ -17,6 +17,7 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 			$temp = new Kaltura_Client_Type_ExtendingItemMrssParameter();
 			$temp->xpath = $val;
 			$temp->identifier = new Kaltura_Client_Type_EntryIdentifier();
+			$temp->identifier->identifier = Kaltura_Client_Enum_EntryIdentifierField::ID;
 			$temp->identifier->extendedFeatures = "";
 			$temp->extensionMode = Kaltura_Client_Enum_MrssExtensionMode::APPEND;
 			$val = $temp;
