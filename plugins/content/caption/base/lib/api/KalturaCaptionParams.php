@@ -55,4 +55,15 @@ class KalturaCaptionParams extends KalturaAssetParams
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
+	public function toObject($object = null, $skip = array())
+	{
+		if(is_null($object))
+			$object = new CaptionParams();
+			
+		return parent::toObject($object, $skip);
+	}
 }

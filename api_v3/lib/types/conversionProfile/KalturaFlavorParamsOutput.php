@@ -80,4 +80,15 @@ class KalturaFlavorParamsOutput extends KalturaFlavorParams
 	{
 		return array();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
+	public function toObject($object = null, $skip = array())
+	{
+		if(is_null($object))
+			$object = new flavorParamsOutput();
+			
+		return parent::toObject($object, $skip);
+	}
 }

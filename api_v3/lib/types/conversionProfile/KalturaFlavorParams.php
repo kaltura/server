@@ -218,4 +218,15 @@ class KalturaFlavorParams extends KalturaAssetParams
 	{
 		return array();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
+	public function toObject($object = null, $skip = array())
+	{
+		if(is_null($object))
+			$object = new flavorParams();
+			
+		return parent::toObject($object, $skip);
+	}
 }

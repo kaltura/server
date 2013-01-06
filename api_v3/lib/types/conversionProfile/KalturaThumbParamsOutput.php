@@ -72,4 +72,15 @@ class KalturaThumbParamsOutput extends KalturaThumbParams
 	{
 		return array();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
+	public function toObject($object = null, $skip = array())
+	{
+		if(is_null($object))
+			$object = new thumbParamsOutput();
+			
+		return parent::toObject($object, $skip);
+	}
 }
