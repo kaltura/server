@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.eventNotification
- * @subpackage model
+ * @subpackage model.data
  */
 class kEventNotificationParameter
 {
