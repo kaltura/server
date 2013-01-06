@@ -270,7 +270,6 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		switch ($config->format)
 		{
 			case PlaybackProtocol::APPLE_HTTP:
-				KalturaLog::debug("creating contributors");
 				$contributor = new WebVttCaptionsManifestEditor();
 				$contributor->captions = array();
 				//retrieve the current working partner's captions according to the entryId
@@ -279,7 +278,9 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
 				$c->addAnd(assetPeer::CONTAINER_FORMAT, CaptionType::WEBVTT);
 				$captionAssets = assetPeer::doSelect($c);
-				KalturaLog::debug("Found  " . count($captionAssets) ." caption assets");
+				if (!count($captionAssets))
+					return array();
+					
 				foreach ($captionAssets as $captionAsset)
 				{
 					/* @var $captionAsset CaptionAsset */
@@ -295,9 +296,6 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				
 				KalturaLog::debug("contributor captions :" . print_r($contributor->captions, true));
 				$contributors[] = $contributor;
-				
-				break;
-			
 				
 				break;
 		}
