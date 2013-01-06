@@ -117,10 +117,9 @@ abstract class kManifestRenderer
 		}
 		$content = $header;
 		$separator = $this->getSeparator();
-		foreach ($flavors as $flavorString)
-		{
-			$content .= $separator.$flavorString;
-		}
+		
+		$flavorsString = implode($separator, $flavors);
+		$content .= $separator.$flavorsString;
 		
 		$content.=$separator.$footer;
 		echo $content;
