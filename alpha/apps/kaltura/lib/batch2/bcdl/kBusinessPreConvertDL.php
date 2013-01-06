@@ -617,9 +617,10 @@ class kBusinessPreConvertDL
 				 * therefore anyhow at least one ipad flavor will be always generated. 
 				 * The other tags are less relevant for the framesize adjustment cases.
 				 */
-		if(array_key_exists(flavorParams::TAG_MBR, $tagedFlavors)) self::adjustToFramesize($mediaInfo, $tagedFlavors[flavorParams::TAG_MBR]);
-		if(array_key_exists(flavorParams::TAG_ISM, $tagedFlavors)) self::adjustToFramesize($mediaInfo, $tagedFlavors[flavorParams::TAG_ISM]);
-
+		if(isset($mediaInfo)) {
+			if(array_key_exists(flavorParams::TAG_MBR, $tagedFlavors)) self::adjustToFramesize($mediaInfo, $tagedFlavors[flavorParams::TAG_MBR]);
+			if(array_key_exists(flavorParams::TAG_ISM, $tagedFlavors)) self::adjustToFramesize($mediaInfo, $tagedFlavors[flavorParams::TAG_ISM]);
+		}
 		// filter out all not forced, none complied, and invalid flavors
 		$finalTagedFlavors = array();
 		foreach($tagedFlavors as $tag => $tagedFlavorsArray)
