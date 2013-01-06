@@ -36,7 +36,8 @@ abstract class KalturaObjectIdentifier extends KalturaObject
 			return null;
 		}
 		/* @var $dbObject kObjectIdentifier */		
-		$dbObject->setExtendedFeatures(explode(",", $this->extendedFeatures));
+		if ($this->extendedFeatures)
+			$dbObject->setExtendedFeatures(explode(",", $this->extendedFeatures));
 		
 		return parent::toObject($dbObject, $propsToSkip);
 	}
