@@ -65,7 +65,7 @@ class kwidgetAction extends sfAction
 		if ($allowCache && $cachedResponse) // dont use cache if we want to force no caching
 		{
 			header("X-Kaltura:cached-action");
-			requestUtils::sendCdnHeaders("swf", strlen($cachedResponse), 60 * 10, null, false, time());
+			requestUtils::sendCdnHeaders("swf", strlen($cachedResponse), 60 * 10, null, true, time());
 			echo $cachedResponse;
 			die;
 		}
@@ -400,7 +400,7 @@ class kwidgetAction extends sfAction
 					$wrapper_data = ob_get_contents();
 					ob_end_clean();
 	
-					requestUtils::sendCdnHeaders("swf", strlen($wrapper_data), $allowCache ? 60 * 10 : 0, null, false, time());
+					requestUtils::sendCdnHeaders("swf", strlen($wrapper_data), $allowCache ? 60 * 10 : 0, null, true, time());
 					echo $wrapper_data;
 					
 					if ($allowCache)
