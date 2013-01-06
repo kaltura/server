@@ -372,12 +372,16 @@ class kwidgetAction extends sfAction
 				$stats_host = ($protocol == "https") ? kConf::get("stats_host_https") : kConf::get("stats_host");	
 				$wrapper_stats = kConf::get('kdp3_wrapper_stats_url') ? "&wrapper_stats_url=$protocol://$stats_host".
 					urlencode(str_replace("{partnerId}", $partner_id, kConf::get('kdp3_wrapper_stats_url'))) : "";
+
+				$partner_host = str_replace("http://", "", str_replace("https://", "", $partner_host));
+				if ($protocol == "https" && $partner_host = kConf::get("cdn_api_host"))
+					$partner_host = kConf::get("cdn_api_host_https");
 	
 				$dynamic_date = $widgetIdStr .
 					$track_wrapper.
 					$wrapper_stats.
 					"&kdpUrl=".urlencode($swf_url).
-					"&host=" . str_replace("http://", "", str_replace("https://", "", $partner_host)).
+					"&host=" . $partner_host .
 					"&cdnHost=" . str_replace("http://", "", str_replace("https://", "", $partner_cdnHost)).
 					(($protocol == "https") ? "&statistics.statsDomain=$stats_host" : "").
 					( $show_version ? "&entryVersion=$show_version" : "" ) .
