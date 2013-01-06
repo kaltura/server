@@ -1,10 +1,16 @@
 <?php
 if($argc < 2)
-	die("Please specify defaults configuration files directory path");
+{
+	echo("Please specify defaults configuration files directory path");
+	exit(-2);
+}
 	
 $dirName = $argv[1];
 if(!file_exists($dirName) || !is_dir($dirName))
-	die("Defaults configuration files directory [$dirName] is a valid directory");
+{
+	echo("Defaults configuration files directory [$dirName] is a valid directory");
+	exit(-2);
+}
 $dirName = realpath($dirName);
 
 chdir(__DIR__);
@@ -37,7 +43,10 @@ while (false !== ($fileName = $dir->read()))
 }
 $dir->close();
 if(count($errors))
-	die(implode("\n\n", $errors));
+{
+	KalturaLog::err(implode("\n\n", $errors));
+	exit(-3);
+}
 	
 sort($fileNames);
 	
@@ -108,3 +117,4 @@ foreach($fileNames as $fileName)
 }
 
 KalturaLog::log('Done.');
+exit(0);
