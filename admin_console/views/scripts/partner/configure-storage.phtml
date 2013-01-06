@@ -121,9 +121,6 @@ jQuery(document).ready(function() {
 	<?php if ($this->formValid): ?>
 		dialogDiv.dialog('close');
 		jQuery('#frmPartnerFilter').submit();
-	<?php else: ?>
-		jQuery('#frmStorageConfig').replaceWith(html);
-		jQuery('#frmStorageConfig').ajaxForm(newStorageSuccess);
 	<?php endif; ?>
 });
 

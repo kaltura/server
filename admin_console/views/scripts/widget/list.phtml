@@ -121,7 +121,10 @@ function editForm(id) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('form').ajaxForm(formSubmit); 
+			jQuery(this).find('form').ajaxForm({
+				success: formSubmit,
+				iframe: true
+			}); 
 		}
 	);
 }
@@ -157,7 +160,10 @@ function newForm(partnerId) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('form').ajaxForm(formSubmit); 
+			jQuery(this).find('form').ajaxForm({
+				success: formSubmit,
+				iframe: true
+			}); 
 		}
 	);
 }
@@ -204,7 +210,10 @@ function duplicateWidget(id) {
 
 function formSubmit(html) {
 	jQuery('#widget-dialog').find('form').replaceWith(html);
-	jQuery('#widget-dialog').find('form').ajaxForm(formSubmit);
+	jQuery('#widget-dialog').find('form').ajaxForm({
+		success: formSubmit,
+		iframe: true
+	});
 }
 
 </script>

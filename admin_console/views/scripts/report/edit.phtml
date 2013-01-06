@@ -29,9 +29,6 @@ jQuery(document).ready(function() {
 		dialogDiv.dialog('close');
 		jQuery('#report-dialog').dialog('close')
 		jQuery('#frmPaginator1').submit();
-	<?php else: ?>
-		jQuery('#report-dialog').find('form').replaceWith(html);
-		jQuery('#report-dialog').find('form').ajaxForm(formSubmit);
 	<?php endif; ?>
 });
 

@@ -65,8 +65,6 @@ jQuery(function() {
 	<?php if ($this->formValid): ?>
 		dialogDiv.dialog('close');
 		jQuery('#frmPaginator1').submit();
-	<?php else: ?>
-		jQuery('#frmDropFolderConfigure').ajaxForm(loadDropFolderSuccess);
 	<?php endif; ?>
 });
 

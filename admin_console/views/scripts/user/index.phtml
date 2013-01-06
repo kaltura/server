@@ -119,9 +119,12 @@ function changeRole(userId) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('form').ajaxForm(function() { 
-				dialogDiv.dialog('close');
-			}); 
+			jQuery(this).find('form').ajaxForm({
+				success: function() { 
+					dialogDiv.dialog('close');
+				},
+				iframe: true
+			});
 		}
 	);
 }
@@ -157,9 +160,12 @@ function assignPartners(userId) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('form').ajaxForm(function() { 
-				dialogDiv.dialog('close');
-			}); 
+			jQuery(this).find('form').ajaxForm({
+				success: function() { 
+					dialogDiv.dialog('close');
+				},
+				iframe: true
+			});
 		}
 	);
 }

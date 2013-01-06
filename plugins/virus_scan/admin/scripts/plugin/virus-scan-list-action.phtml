@@ -162,9 +162,10 @@ function configure(profileId) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmVirusScanProfileConfig').ajaxForm(
-					configureVirusScanProfileSuccess
-			);
+			jQuery(this).find('#frmVirusScanProfileConfig').ajaxForm({
+				success: configureVirusScanProfileSuccess,
+				iframe: true
+			});
 		}
 	);
 }
@@ -199,9 +200,10 @@ function addNew(partnerId) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmVirusScanProfileConfig').ajaxForm(
-					configureVirusScanProfileSuccess
-			);
+			jQuery(this).find('#frmVirusScanProfileConfig').ajaxForm({
+				success: configureVirusScanProfileSuccess,
+				iframe: true
+			});
 		}
 	);
 }
@@ -209,7 +211,10 @@ function addNew(partnerId) {
 function configureVirusScanProfileSuccess(html)
 {
 	jQuery('#frmVirusScanProfileConfig').replaceWith(html);
-	jQuery('#frmVirusScanProfileConfig').ajaxForm(configureVirusScanProfileSuccess);
+	jQuery('#frmVirusScanProfileConfig').ajaxForm({
+		success: configureVirusScanProfileSuccess,
+		iframe: true
+	});
 }
 
 function deleteProfile(profileId)

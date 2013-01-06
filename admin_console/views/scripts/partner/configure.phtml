@@ -328,8 +328,6 @@ jQuery(document).ready(function() {
 	<?php if ($this->formValid): ?>
 		jQuery('#partner-configure-dialog').dialog('close');
 		jQuery('#frmPaginator1').submit();
-	<?php else: ?>
-		jQuery('#frmPartnerConfigure').ajaxForm(configurePartnerSuccess);
 	<?php endif; ?>
 
 	jQuery('#use_default_streamers').change(useDefaultStreamersChanged);

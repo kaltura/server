@@ -112,7 +112,10 @@ function configure(partnerId, templateId) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmEventNotificationTemplateConfig').ajaxForm(newEventNotificationTemplateSuccess);
+			jQuery(this).find('#frmEventNotificationTemplateConfig').ajaxForm({
+				success: newEventNotificationTemplateSuccess,
+				iframe: true
+			});
 		}
 	);
 }
@@ -221,7 +224,10 @@ function newEventNotificationTemplate(partnerId, type) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmEventNotificationTemplateConfig').ajaxForm(newEventNotificationTemplateSuccess); 
+			jQuery(this).find('#frmEventNotificationTemplateConfig').ajaxForm({
+				success: newEventNotificationTemplateSuccess,
+				iframe: true
+			});
 		}
 	);
 }
@@ -235,7 +241,10 @@ function newEventNotificationTemplateSuccess(html) {
 	else
 	{
 		jQuery('#frmEventNotificationTemplateConfig').parent().empty().append(html);
-		jQuery('#frmEventNotificationTemplateConfig').ajaxForm(newEventNotificationTemplateSuccess);
+		jQuery('#frmEventNotificationTemplateConfig').ajaxForm({
+			success: newEventNotificationTemplateSuccess,
+			iframe: true
+		});
 	}
 }
 

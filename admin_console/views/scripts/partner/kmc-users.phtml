@@ -108,7 +108,10 @@ function resetUserPassword(partnerId, userId) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmKmcUsersResetPassword').ajaxForm(resetUserPasswordSuccess);
+			jQuery(this).find('#frmKmcUsersResetPassword').ajaxForm({
+				success: resetUserPasswordSuccess,
+				iframe: true
+			});
 		}
 	);
 
@@ -123,7 +126,10 @@ function resetUserPasswordSuccess(html) {
 	}
 	else
 	{
-		jQuery('#frmKmcUsersResetPassword').ajaxForm(resetUserPasswordSuccess);
+		jQuery(this).find('#frmKmcUsersResetPassword').ajaxForm({
+			success: resetUserPasswordSuccess,
+			iframe: true
+		});
 	}
 }
 

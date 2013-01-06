@@ -188,7 +188,10 @@ function configurePartnerSuccess(html) {
 	jQuery('.ui-widget-overlay').css('z-index', 1000 );
 	jQuery('#loader').hide();	
 	jQuery('#frmPartnerConfigure').replaceWith(html);
-	jQuery('#frmPartnerConfigure').ajaxForm(configurePartnerSuccess);
+	jQuery('#frmPartnerConfigure').ajaxForm({
+		success: configurePartnerSuccess,
+		iframe: true
+	});
 	onPageLoad();
 }
 
@@ -223,7 +226,10 @@ function configure(partnerId)
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmPartnerConfigure').ajaxForm(configurePartnerSuccess); 
+			jQuery('#frmPartnerConfigure').ajaxForm({
+				success: configurePartnerSuccess,
+				iframe: true
+			}); 
 		}
 	);
 }

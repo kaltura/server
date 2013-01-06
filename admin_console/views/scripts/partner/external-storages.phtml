@@ -157,7 +157,10 @@ function newStorage(partnerId) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmStorageConfig').ajaxForm(newStorageSuccess); 
+			jQuery(this).find('#frmStorageConfig').ajaxForm({
+				success: newStorageSuccess,
+				iframe: true
+			});
 		}
 	);
 }
@@ -174,7 +177,10 @@ function newStorageSuccess(html) {
 		}
 	}
 	jQuery('#frmStorageConfig').replaceWith(html);
-	jQuery('#frmStorageConfig').ajaxForm(newStorageSuccess);
+	jQuery(this).find('#frmStorageConfig').ajaxForm({
+		success: newStorageSuccess,
+		iframe: true
+	});
 }
 function configure(partnerId, storageId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'configure-storage', 'partnerId' => 'PARTNER_ID', 'storageId' => '')); ?>' + storageId;
@@ -206,7 +212,10 @@ function configure(partnerId, storageId) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmStorageConfig').ajaxForm(newStorageSuccess);
+			jQuery(this).find('#frmStorageConfig').ajaxForm({
+				success: newStorageSuccess,
+				iframe: true
+			});
 		}
 	);
 }

@@ -138,7 +138,7 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SFTP => 'SFTP',
 				Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::ASPERA => 'ASPERA',
 			),
-			'required'		=> true,
+//			'required'		=> true,
 		));
 		
 		$this->addElement('text', 'host', array(

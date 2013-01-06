@@ -105,7 +105,10 @@ function configure(providerId) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmGenericProviderConfig').ajaxForm(newGenericProviderSuccess);
+			jQuery(this).find('#frmGenericProviderConfig').ajaxForm({
+				success: newGenericProviderSuccess,
+				iframe: true
+			});
 		}
 	);
 }
@@ -172,7 +175,10 @@ function newGenericProvider() {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmGenericProviderConfig').ajaxForm(newGenericProviderSuccess); 
+			jQuery(this).find('#frmGenericProviderConfig').ajaxForm({
+				success: newGenericProviderSuccess,
+				iframe: true
+			});
 		}
 	);
 }
@@ -185,7 +191,10 @@ function newGenericProviderSuccess(html) {
 	else
 	{
 		jQuery('#frmGenericProviderConfig').replaceWith(html);
-		jQuery('#frmGenericProviderConfig').ajaxForm(newGenericProviderSuccess);
+		jQuery(this).find('#frmGenericProviderConfig').ajaxForm({
+			success: newGenericProviderSuccess,
+			iframe: true
+		});
 	}
 }
 jQuery(function() {

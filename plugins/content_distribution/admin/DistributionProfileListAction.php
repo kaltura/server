@@ -92,7 +92,9 @@ class DistributionProfileListAction extends KalturaApplicationPlugin implements 
 			}
 		}
 		$newForm->setProviders($providers);
-		$newForm->getElement('newPartnerId')->setValue($partnerFilter->idIn);
+		$newPartnerElement = $newForm->getElement('newPartnerId');
+		if($newPartnerElement)
+			$newPartnerElement->setValue($partnerFilter->idIn);
 		
 		// set view
 		$action->view->form = $form;

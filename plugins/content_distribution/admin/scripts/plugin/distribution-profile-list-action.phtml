@@ -113,7 +113,10 @@ function configure(profileId) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmDistributionProfileConfig').ajaxForm(newDistributionProfileSuccess);
+			jQuery(this).find('#frmDistributionProfileConfig').ajaxForm({
+				success: newDistributionProfileSuccess,
+				iframe: true
+			});
 		}
 	);
 }
@@ -218,7 +221,10 @@ function newDistributionProfile(partnerId, providerType) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmDistributionProfileConfig').ajaxForm(newDistributionProfileSuccess); 
+			jQuery(this).find('#frmDistributionProfileConfig').ajaxForm({
+				success: newDistributionProfileSuccess,
+				iframe: true
+			});
 		}
 	);
 }
@@ -237,7 +243,10 @@ function newDistributionProfileSuccess(html) {
 	else
 	{
 		jQuery('#frmDistributionProfileConfig').parent().empty().append(html);
-		jQuery('#frmDistributionProfileConfig').ajaxForm(newDistributionProfileSuccess);
+		jQuery('#frmDistributionProfileConfig').ajaxForm({
+			success: newDistributionProfileSuccess,
+			iframe: true
+		});
 	}
 }
 

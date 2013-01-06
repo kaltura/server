@@ -141,11 +141,6 @@ jQuery(document).ready(function() {
 		dialogDiv.dialog('close');
 		jQuery('#widget-dialog').dialog('close')
 		jQuery('#frmPaginator1').submit();
-		
-	<?php else: ?>
-		jQuery('#widget-dialog').find('form').replaceWith(html);
-		jQuery('#widget-dialog').find('form').ajaxForm(formSubmit);
-		
 	<?php endif; ?>
 });
 
