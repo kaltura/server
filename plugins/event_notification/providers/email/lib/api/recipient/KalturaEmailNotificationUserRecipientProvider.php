@@ -43,7 +43,7 @@ class KalturaEmailNotificationUserRecipientProvider extends KalturaEmailNotifica
 		parent::fromObject($dbObject);
 		if ($dbObject->getFilter())
 		{
-			$this->filter = new KaltruaUserFilter();
+			$this->filter = new KalturaUserFilter();
 			$this->filter->fromObject($dbObject->getFilter());
 		}
 	}
