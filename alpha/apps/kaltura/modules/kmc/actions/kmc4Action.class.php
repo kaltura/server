@@ -92,10 +92,13 @@ class kmc4Action extends kalturaAction
 	/** set values for template **/
 	$this->service_url = myPartnerUtils::getHost($this->partner_id);
 	$this->host = $this->stripProtocol( $this->service_url );
+	$this->embed_host = $this->host;
 	if (kConf::hasParam('cdn_api_host') && kConf::hasParam('www_host') && $this->host == kConf::get('cdn_api_host')) {
         $this->host = kConf::get('www_host');
 	}
-	$this->embed_host = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
+	if($this->embed_host == kConf::get("www_host") && kConf::hasParam('cdn_api_host')) {
+		$this->embed_host = kConf::get('cdn_api_host');
+	}
 	$this->embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');	
 
 	$this->cdn_url = myPartnerUtils::getCdnHost($this->partner_id);
@@ -179,7 +182,7 @@ class kmc4Action extends kalturaAction
 	{
 		$url_data = parse_url( $url );
 		if( $url_data !== false ){
-			return $url_data['host'];
+			return $url_data['host'] . ':' . $url_data['port'];
 		} else {
 			return $url;
 		}
