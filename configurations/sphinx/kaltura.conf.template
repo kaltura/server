@@ -286,7 +286,6 @@ index kaltura_category_kuser
 	path	 = @BASE_DIR@/sphinx/kaltura_category_kuser_rt
 	rt_field	 = category_id
 	rt_field	 = kuser_id
-	rt_attr_uint	 = int_id
 	rt_field	 	 = permission_names
 	rt_field		 = category_full_ids
 	rt_field		 = puser_id
