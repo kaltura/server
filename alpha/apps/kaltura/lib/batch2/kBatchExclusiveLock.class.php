@@ -312,6 +312,7 @@ class kBatchExclusiveLock
 		$c->add(BatchJobLockPeer::STATUS, BatchJob::BATCHJOB_STATUS_RETRY, Criteria::EQUAL);
 		$c->addJoin(BatchJobLockPeer::BATCH_JOB_ID, BatchJobPeer::ID, Criteria::JOIN);
 		$c->add(BatchJobPeer::STATUS, BatchJob::BATCHJOB_STATUS_FATAL, Criteria::EQUAL);
+		$c->add(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId());
 		
 		$jobs = BatchJobLockPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		return $jobs;

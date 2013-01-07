@@ -365,6 +365,7 @@ class BatchService extends KalturaBaseService
 		$c = new Criteria();
 		$c->add(BatchJobLockPeer::STATUS, array(KalturaBatchJobStatus::PENDING, KalturaBatchJobStatus::RETRY, KalturaBatchJobStatus::ALMOST_DONE), Criteria::IN);
 		$c->add(BatchJobLockPeer::JOB_TYPE, $jobType);
+		$c->add(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId());
 		$queueSize = BatchJobLockPeer::doCount($c, false, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
 		
 		if(!$queueSize)
@@ -374,6 +375,7 @@ class BatchService extends KalturaBaseService
 			$c->add(BatchJobLockPeer::BATCH_INDEX, null, Criteria::ISNOTNULL);
 			$c->add(BatchJobLockPeer::EXPIRATION, time(), Criteria::GREATER_THAN);
 			$c->add(BatchJobLockPeer::EXECUTION_ATTEMPTS, BatchJobLockPeer::getMaxExecutionAttempts($jobType), Criteria::LESS_THAN);
+			$c->add(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId());
 			$c->add(BatchJobLockPeer::JOB_TYPE, $jobType);
 			$queueSize = BatchJobLockPeer::doCount($c, false, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
 		}
