@@ -118,8 +118,8 @@ var kHttpSpy = {
 					actionRequest.action = array[i].value;
 					break;
 
-				case 'action':
-					actionRequest.inputs[fieldName] = array[i].value;
+				default:
+					actionRequest.inputs[fieldName] = array[i].value; // TODO support internal objects airarchy
 					break;
 			}
 		}
