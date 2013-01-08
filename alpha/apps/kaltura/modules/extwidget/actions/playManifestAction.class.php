@@ -970,7 +970,7 @@ class playManifestAction extends kalturaAction
 		if (strpos($flavor['urlPrefix'], '://') === false)
 			$flavor['urlPrefix'] = $this->protocol . '://' . $flavor['urlPrefix'];
 
-		$this->urlManager->setProtocol('hdnetworkmanifest');		// for tokenizer
+		$this->urlManager->setProtocol(PlaybackProtocol::AKAMAI_HDS);		// for tokenizer
 		
 		return $flavor;
 	} 
@@ -1327,6 +1327,9 @@ class playManifestAction extends kalturaAction
 		if(!$this->format)
 			$this->format = PlaybackProtocol::HTTP;
 			
+		if ($this->format == PlaybackProtocol::AKAMAI_HD || $this->format == PlaybackProtocol::AKAMAI_HDS)
+			$this->protocol = PlaybackProtocol::HTTP; // Akamai HD doesn't support any other protocol
+			
 		$this->tags = $this->getRequestParameter ( "tags", null );
 		if (!$this->tags)
 		{
@@ -1360,7 +1363,8 @@ class playManifestAction extends kalturaAction
 		$this->initFlavorAssetArray();
 		$this->initEntryDuration();
 		
-		if ($this->duration && $this->duration < 10 && $this->format == 'hdnetworkmanifest')
+		
+		if ($this->duration && $this->duration < 10 && $this->format == PlaybackProtocol::AKAMAI_HDS)
 		{
 			// videos shorter than 10 seconds cannot be played with HDS, fall back to HTTP
 			$this->format = PlaybackProtocol::HTTP;
@@ -1413,7 +1417,6 @@ class playManifestAction extends kalturaAction
 				break;
 
 			case PlaybackProtocol::AKAMAI_HDS:
-				$this->protocol = PlaybackProtocol::HTTP; // Akamai HDS doesn't support https 
 				$renderer = $this->serveHDNetworkManifest();
 				break;
 		}
