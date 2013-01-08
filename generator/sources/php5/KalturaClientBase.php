@@ -943,6 +943,14 @@ abstract class KalturaServiceBase
  */
 abstract class KalturaObjectBase
 {
+	public function __construct($params = array())
+	{
+		foreach ($params as $key => $value)
+		{
+			$this->$key = $value;
+		}
+	}
+
 	protected function addIfNotNull(&$params, $paramName, $paramValue)
 	{
 		if ($paramValue !== null)
