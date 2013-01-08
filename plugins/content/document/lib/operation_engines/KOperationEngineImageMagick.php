@@ -60,7 +60,7 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 			throw new KOperationEngineException('failed to create ['.$this->outFilePath.'] directory');
 		}
 		
-		$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+		$ext = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
 		$inputFormat = $this->getInputFormat();
 		
 		if($inputFormat == self::PDF_FORMAT && $ext != 'pdf' && kFile::moveFile($inFilePath, "$inFilePath.pdf"))
