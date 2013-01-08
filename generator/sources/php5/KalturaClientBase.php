@@ -947,6 +947,8 @@ abstract class KalturaObjectBase
 	{
 		foreach ($params as $key => $value)
 		{
+			if (!property_exists($this, $key))
+				throw new KalturaClientException("property [{$key}] does not exist on object [".get_class($this)."]", KalturaClientException::ERROR_INVALID_OBJECT_FIELD);
 			$this->$key = $value;
 		}
 	}
@@ -1005,6 +1007,7 @@ class KalturaClientException extends Exception
 	const ERROR_READ_FAILED = -6;
 	const ERROR_INVALID_PARTNER_ID = -7;
 	const ERROR_INVALID_OBJECT_TYPE = -8;
+	const ERROR_INVALID_OBJECT_FIELD = -9;
 }
 
 /**
