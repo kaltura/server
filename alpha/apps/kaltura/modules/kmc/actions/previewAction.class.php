@@ -84,7 +84,8 @@ class previewAction extends kalturaAction
 		$deliveryTypes = $map['delivery_types'];
 
 		$flashVars = array();
-		if( isset($deliveryTypes[$this->getRequestParameter('delivery')]) ) {
+		if( isset($deliveryTypes[$this->getRequestParameter('delivery')]) && 
+				isset($deliveryTypes[$this->getRequestParameter('delivery')]['flashvars']) ) {
 			$flashVars = $deliveryTypes[$this->getRequestParameter('delivery')]['flashvars'];
 		}
 
@@ -145,7 +146,7 @@ class previewAction extends kalturaAction
 
 	}
 
-	private function flashVarsToString( $fv, $paramName ) 
+	private function flashVarsToString( $fv = array(), $paramName = false ) 
 	{
 		$result = '';
 		foreach( $fv as $key=>$value ) {
