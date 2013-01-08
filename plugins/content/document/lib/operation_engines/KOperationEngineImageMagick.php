@@ -63,10 +63,10 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 		$ext = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
 		$inputFormat = $this->getInputFormat();
 		
-		if($inputFormat == self::PDF_FORMAT && $ext != 'pdf' && kFile::moveFile($inFilePath, "$inFilePath.pdf"))
+		if($inputFormat == self::PDF_FORMAT && $ext != 'pdf' && kFile::linkFile($inFilePath, "$inFilePath.pdf"))
 			$inFilePath = "$inFilePath.pdf";
 		
-		if($inputFormat == self::JPG_FORMAT && $ext != 'jpg' && kFile::moveFile($inFilePath, "$inFilePath.jpg"))
+		if($inputFormat == self::JPG_FORMAT && $ext != 'jpg' && kFile::linkFile($inFilePath, "$inFilePath.jpg"))
 			$inFilePath = "$inFilePath.jpg";
 			
 		parent::operate($operator, $inFilePath, $configFilePath);

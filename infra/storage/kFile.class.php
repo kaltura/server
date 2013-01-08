@@ -382,6 +382,43 @@ class kFile
 			return self::rename_wrap($from, $to);
 	}
 	
+	public static function linkFile($from, $to, $overrideIfExists = false, $copyIfLinkFailed = true)
+	{
+		$from = str_replace("\\", "/", $from);
+		$to = str_replace("\\", "/", $to);
+		
+		if($overrideIfExists && (is_file($to) || is_link($to)))
+		{
+			self::deleteFile($to);
+		}
+		
+		if(! is_dir(dirname($to)))
+		{
+			self::fullMkdir($to);
+		}
+		
+		if(!file_exists($from))
+		{
+			KalturaLog::err("Source file doesn't exist [$from]");
+			return false;
+		}
+			
+		if(symlink($from, $to)) 
+			return true;
+		
+		$out_arr = array();
+		$rv = 0;
+		exec("ln -s \"$from\" \"$to\"", $out_arr, $rv);
+//			echo "RV($rv)\n";
+		if($rv==0)
+			return true;
+			
+		if(!$copyIfLinkFailed)
+			return false;
+			
+		return self::moveFile($from, $to, $overrideIfExists, true);
+	}
+	
 	// make sure the file is closed , then remove it
 	public static function deleteFile($file_name)
 	{
