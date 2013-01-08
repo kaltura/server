@@ -31,13 +31,7 @@ if [ $# != 1 ]; then
    exit 0 	
 fi
 
-CONFIG_FILE=$APP_DIR/configurations/hosts/batch/`hostname`.ini
-
-default_config=0
-if [ ! -f $CONFIG_FILE ]; then
-     CONFIG_FILE=$APP_DIR/configurations/batch.ini
-     default_config=1
-fi
+CONFIG_FILE=$APP_DIR/configurations/batch.ini
 
 LOCKFILE="$BATCHDIR/$FILE_NAME"
 
@@ -99,9 +93,6 @@ start() {
 
 start_scheduler() {
 		echo "$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> ${LOGDIR}/kaltura_batch.log 2>&1 &"
-                if [ $default_config -eq 1 ]; then
-                   echo "Warning : using default batch_config.ini !"
-                fi
                 cd $BATCHDIR
 		$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> ${LOGDIR}/kaltura_batch.log 2>&1 &
                 if [ "$?" -eq 0 ]; then
