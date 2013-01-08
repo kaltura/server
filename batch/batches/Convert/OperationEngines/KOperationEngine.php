@@ -188,6 +188,37 @@ abstract class KOperationEngine
 		KalturaLog::log($str, $priority);
 		file_put_contents($this->logFilePath, $str, FILE_APPEND);
 	}
+	
+	/**
+	 * @throws KOperationEngineException
+	 */
+	protected function validateFormat($expectedFormat)
+	{
+		$inputFormat = $this->getInputFormat();
+		if($inputFormat != $expectedFormat)
+			throw new KOperationEngineException("File [$this->inFilePath] is of wrong format [$inputFormat], expecting [$expectedFormat]");
+	}
+	
+	/**
+	 * Executing file on the input path
+	 * @return string
+	 */
+	protected function getInputFormat()
+	{
+		$returnValue = null;
+		$output = null;
+		$matches = null;
+		$command = "file '{$this->inFilePath}'";
+		KalturaLog::debug("Executing: $command");
+		exec($command, $output, $returnValue);
+		if($returnValue == 0 && preg_match("/^[^:]+: ([^,]+),/", reset($output), $matches))
+		{
+			$type = $matches[1];
+			KalturaLog::debug("file [{$this->inFilePath}] type [$type]");
+			return $type;
+		}
+		return null;
+	}
 
 }
 

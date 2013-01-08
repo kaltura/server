@@ -5,6 +5,8 @@
  */
 class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 {
+	const PDF_FORMAT = 'PDF document';
+	const JPG_FORMAT = 'JPEG image data';
 
 	/**
 	 * @var KalturaPdfFlavorParamsOutput
@@ -57,6 +59,16 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 			KalturaLog::debug('failed to create ['.$this->outFilePath.'] directory');
 			throw new KOperationEngineException('failed to create ['.$this->outFilePath.'] directory');
 		}
+		
+		$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+		$inputFormat = $this->getInputFormat();
+		
+		if($inputFormat == self::PDF_FORMAT && $ext != 'pdf' && kFile::moveFile($inFilePath, "$inFilePath.pdf"))
+			$inFilePath = "$inFilePath.pdf";
+		
+		if($inputFormat == self::JPG_FORMAT && $ext != 'jpg' && kFile::moveFile($inFilePath, "$inFilePath.jpg"))
+			$inFilePath = "$inFilePath.jpg";
+			
 		parent::operate($operator, $inFilePath, $configFilePath);
 		$imagesListXML = $this->createImagesListXML($outDirPath);
 	    kFile::setFileContent($outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME, $imagesListXML->asXML());
