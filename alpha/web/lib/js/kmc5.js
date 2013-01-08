@@ -8,8 +8,9 @@ kmc.vars.quickstart_guide = "/content/docs/pdf/KMC_User_Manual.pdf";
 kmc.vars.help_url = kmc.vars.service_url + '/kmc5help.html';
 
 // Set base URL
-kmc.vars.base_url = window.location.protocol + '//' + window.location.hostname;
-kmc.vars.api_url = window.location.protocol + '//' + kmc.vars.host;
+kmc.vars.port = (window.location.port) ? ":" + window.location.port : "";
+kmc.vars.base_url = window.location.protocol + '//' + window.location.hostname + kmc.vars.port;
+kmc.vars.api_url = window.location.protocol + '//' + kmc.vars.host + kmc.vars.port;
 
 // Log function
 kmc.log = function() {
@@ -751,10 +752,6 @@ kmc.preview_embed = {
 
 		// Go over embed code types
 		$.each(kmc.vars.embed_code_types, function(id, item){
-			if( id == 'thumb' ) {
-				clearLastEmbedType(id);
-				return true;
-			}
 			// Don't add embed code that are entry only for playlists
 			if(is_playlist && this.entryOnly) {
 				clearLastEmbedType(id);
@@ -960,6 +957,7 @@ kmc.preview_embed = {
 		// Used by kWidget.embed
 		var embedObject = {
 			targetId: 'kaltura_player_' + cache_st,
+			cache_st: cache_st,			
 			wid: '_' + kmc.vars.partner_id,
 			uiconf_id: uiconf_id,
 			flashvars: flashVars
@@ -1002,7 +1000,7 @@ kmc.preview_embed = {
 						'/p/'+ kmc.vars.partner_id + '/sp/' + kmc.vars.partner_id + 
 						'00/embedIframeJs/uiconf_id/' + uiconf_id + '/partner_id/' + 
 						kmc.vars.partner_id + '?entry_id=' + id + 
-						'&playerId=kaltura_player_' + kmc.preview_embed.setCacheStartTime() + 
+						'&playerId=kaltura_player_{CACHE_ST}&cache_st={CACHE_ST}' + 
 						'&autoembed=true&width={WIDTH}&height={HEIGHT}&{FLASHVARS_URL}"></script>';
 			break;
 			case 'dynamic':
