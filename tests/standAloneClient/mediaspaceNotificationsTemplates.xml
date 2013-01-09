@@ -29,7 +29,7 @@
 				</eventConditions>
 				<format>1</format>
 				<subject>[AppTitle] - New Item Pending Moderation</subject>
-				<body>A new item is pending your approval: [ChannelSettingsPendingURL]{category_name_encoded}</body>
+				<body>A new item is pending your approval: [ChannelSettingsPendingURLPrefix]{category_name_encoded}[ChannelSettingsPendingURLSuffix]</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<to objectType="KalturaEmailNotificationCategoryRecipientProvider">
