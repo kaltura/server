@@ -22,15 +22,17 @@ class KSingleOutputOperationEngine extends KOperationEngine
 					$xml);
 			file_put_contents($this->configFilePath, $xml);
 		}
-		$exec_cmd = $this->cmd . " " . 
-			str_replace ( 
+		
+		$command = '';
+		if($this->operator && $this->operator->command)
+		{
+			$command = str_replace ( 
 				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName), 
 				array($this->inFilePath, $this->outFilePath, $this->configFilePath, $this->cmd),
 				$this->operator->command);
+		}
 				
-		$exec_cmd .= " >> \"{$this->logFilePath}\" 2>&1";
-		
-		return $exec_cmd;
+		return "{$this->cmd} $command >> \"{$this->logFilePath}\" 2>&1";
 	}
 
 	public function __construct($cmd, $outFilePath)
