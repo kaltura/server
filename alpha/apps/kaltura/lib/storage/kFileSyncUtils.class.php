@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage storage
  */
-class kFileSyncUtils implements kObjectChangedEventConsumer
+class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventConsumer
 {
 	const MAX_CACHED_FILE_SIZE = 2097152;		// 2MB
 	const CACHE_KEY_PREFIX = 'fileSyncContent_';
@@ -1228,5 +1228,57 @@ class kFileSyncUtils implements kObjectChangedEventConsumer
 			return true;
 			
 		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::objectAdded()
+	 */
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null) 
+	{
+		$this->deleteOldFileSyncVersions($object);
+		return true;
+	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
+	 */
+	public function shouldConsumeAddedEvent(BaseObject $object) {
+		if(	$object instanceof FileSync && $this->hasOldVersionsForDelete($object) )
+			return true;
+		else 
+			return false;		
+	}
+
+	private function hasOldVersionsForDelete(FileSync $fileSync)
+	{
+		if(!is_numeric($fileSync->getVersion()))
+			return false;
+		if (kConf::hasParam('num_of_file_sync_version_to_keep'))
+		{
+			$keepCount = kConf::get('num_of_file_sync_version_to_keep');
+			$intVersion = intval($fileSync->getVersion());
+			if($intVersion - $keepCount > 0)
+				return true;
+		}		
+		return false;
+	}
+	
+	private function deleteOldFileSyncVersions(FileSync $newFileSync)
+	{
+		if (kConf::hasParam('num_of_file_sync_version_to_keep'))
+		{
+			$keepCount = kConf::get('num_of_file_sync_version_to_keep');
+			$intVersion = intval($newFileSync->getVersion());
+			$c = new Criteria();
+			$c->add ( FileSyncPeer::OBJECT_ID , $newFileSync->getObjectId() );
+			$c->add ( FileSyncPeer::OBJECT_TYPE , $newFileSync->getObjectType() );
+			$c->add ( FileSyncPeer::OBJECT_SUB_TYPE , $newFileSync->getObjectSubType() );
+			$c->add ( FileSyncPeer::STATUS, array(FileSync::FILE_SYNC_STATUS_PURGED, FileSync::FILE_SYNC_STATUS_DELETED), Criteria::NOT_IN);
+			$c->add ( FileSyncPeer::VERSION, ($intVersion - $keepCount), Criteria::LESS_THAN);
+								
+			$fileSyncs = FileSyncPeer::doSelect($c);
+			foreach ($fileSyncs as $fileSync)
+				self::deleteSyncFileForKey($fileSync);
+		}		
 	}
 }
