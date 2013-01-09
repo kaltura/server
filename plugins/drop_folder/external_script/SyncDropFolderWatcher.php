@@ -100,6 +100,8 @@ try
 		}
 		else if($action == UPLOADED)
 		{
+			sleep(60);
+			writeLog($logPrefix, 'Sleeping for 60 seconds ...');
 			writeLog($logPrefix, 'Handle file uploaded');
 			$filter = new KalturaDropFolderFileFilter();
 			$filter->dropFolderIdEqual = $folder->id;
