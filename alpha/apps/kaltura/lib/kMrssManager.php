@@ -586,7 +586,6 @@ class kMrssManager
 	 */
 	protected static function addExtendingItemNode (BaseObject $object, $identifierValue, SimpleXMLElement $mrss, $nodeName = null, kMrssParameters $mrssParams = null, $features = null)
 	{
-		$featuresArr = explode(",", $features);
 		if ($object instanceof category)
 		{
 			$categoryItem = $mrss->addChild("category_item");
