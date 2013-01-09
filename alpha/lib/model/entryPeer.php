@@ -20,6 +20,8 @@ class entryPeer extends BaseentryPeer
 	private static $userContentOnly = false;
 	private static $filteredCategoriesIds = array();
 	
+	private static $accessControlScope;
+	
 	private static $kuserBlongToMoreThanMaxCategoriesForSearch = false;
 	
 	// cache classes by their type
@@ -628,6 +630,25 @@ class entryPeer extends BaseentryPeer
 		return array(entryPeer::STATUS);
 	}
 	
+	private static function filterByAccessControl($entry) {
+		
+		self::$accessControlScope->setEntryId($entry->getId());
+		
+		$context = new kEntryContextDataResult();
+		$accessControl = $entry->getAccessControl();
+		$accessControl->applyContext($context, self::$accessControlScope);
+		
+		$actions = $context->getAccessControlActions();
+		foreach($actions as $action) {
+			/* @var $action kAccessControlAction */
+			if($action->getType() == accessControlActionType::BLOCK) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
 	/**
 	 * Override in order to filter objects returned from doSelect.
 	 *  
@@ -639,34 +660,21 @@ class entryPeer extends BaseentryPeer
 		if(empty($selectResults))
 			return;
 		
-		$removedRecordsCount = 0;
+		
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		
 		if($partner && $partner->getShouldApplyAccessControlOnEntryMetadata() && !kCurrentContext::$is_admin_session) {
-			
-			foreach ($selectResults as $key => $entry) {
-				
-				$scope = new accessControlScope();
-				$scope->setEntryId($entry->getId());
-				
-				$context = new kEntryContextDataResult();
-				$accessControl = $entry->getAccessControl();
-				$accessControl->applyContext($context, $scope);
-				
-				$actions = $context->getAccessControlActions();
-				foreach($actions as $action)
-				{
-					/* @var $action kAccessControlAction */
-					if($action->getType() == accessControlActionType::BLOCK) {
-						unset($selectResults[$key]);
-						$removedRecordsCount++;
-						break;
-					}
-				}
+			if(is_null(self::$accessControlScope)) {
+				self::$accessControlScope = new accessControlScope();
+				self::$accessControlScope->setContexts(array(accessControlContextType::METADATA));
 			}
+			
+			$selectResults = array_filter($selectResults, array('entryPeer', 'filterByAccessControl'));
+			$criteria->setRecordsCount(count($selectResults));
 		}
 		
+		$removedRecordsCount = 0;
 		if ((!kEntitlementUtils::getEntitlementEnforcement() && !is_null(kCurrentContext::$ks))|| 
 			!self::$filerResults ||
 			!kEntitlementUtils::getInitialized()) // if initEntitlement hasn't run - skip filters.

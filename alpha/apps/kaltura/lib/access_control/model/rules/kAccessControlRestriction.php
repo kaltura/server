@@ -3,6 +3,7 @@
  * @package Core
  * @subpackage model.data
  * @abstract
+ * @deprecated
  * 
  * Old restriction for backward compatibility
  */
@@ -23,8 +24,12 @@ abstract class kAccessControlRestriction extends kRule
 		);
 		$partnerId = $accessControl ? $accessControl->getPartnerId() : kCurrentContext::$ks_partner_id;
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if($partner && $partner->getRestrictThumbnailByKs())
-			$contexts[] = accessControlContextType::THUMBNAIL;
+		if($partner) {
+			if($partner->getRestrictThumbnailByKs())
+				$contexts[] = accessControlContextType::THUMBNAIL;
+			if($partner->getShouldApplyAccessControlOnEntryMetadata())
+				$contexts[] = accessControlContextType::METADATA;
+		}
 			
 		$this->setContexts($contexts);
 	}

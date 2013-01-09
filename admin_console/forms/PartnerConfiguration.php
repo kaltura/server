@@ -267,6 +267,12 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'API Access Control ID:',
 			'filters'		=> array('StringTrim'),
 		));
+		
+		$this->addElement('checkbox', 'restrict_entry_by_metadata', array(
+				'label'	  => 'Apply access control on entry metadata',
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+		));
+		
 
 //--------------------------- Group Association ---------------------------			
 		$partnerGroupTypes = new Kaltura_Form_Element_EnumSelect('partner_group_type', array('enum' => 'Kaltura_Client_Enum_PartnerGroupType'));
@@ -734,7 +740,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array_merge(array('notifications_config', 'allow_multi_notification'), $permissionNames[self::GROUP_NOTIFICATION_CONFIG] ,array('crossLine')), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
 		$this->addDisplayGroup(array_merge(array('def_thumb_offset','def_thumb_density') , $permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS], array('enable_bulk_upload_notifications_emails', 'bulk_upload_notifications_email', 'crossLine')), 'publisherSpecificIngestionSettings', array('legend' => 'Content Ingestion Options'));
 		$this->addDisplayGroup(array('logout_url', 'crossLine'), 'signSignOn', array('legend' => 'Sign Sign On'));
-		$this->addDisplayGroup(array('api_access_control_id', 'crossLine'), 'apiAccessControlIdGroup', array('legend' => 'Access Control'));
+		$this->addDisplayGroup(array('api_access_control_id', 'restrict_entry_by_metadata', 'crossLine'), 'apiAccessControlIdGroup', array('legend' => 'Access Control'));
 		$this->addDisplayGroup(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_max',
 									// Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_overagePrice',
 									 'login_block_period',
