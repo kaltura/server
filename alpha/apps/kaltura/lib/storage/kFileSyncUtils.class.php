@@ -1253,9 +1253,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	{
 		if(!is_numeric($fileSync->getVersion()))
 			return false;
-		if (kConf::hasParam('num_of_file_sync_version_to_keep'))
+		if (kConf::hasParam('num_of_old_file_sync_versions_to_keep'))
 		{
-			$keepCount = kConf::get('num_of_file_sync_version_to_keep');
+			$keepCount = kConf::get('num_of_old_file_sync_versions_to_keep');
 			$intVersion = intval($fileSync->getVersion());
 			if($intVersion - $keepCount > 0)
 				return true;
@@ -1266,9 +1266,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	private function deleteOldFileSyncVersions(FileSync $newFileSync)
 	{
 		KalturaLog::debug('Deleting old file_sync versions for ['.$newFileSync->getId().']');
-		if (kConf::hasParam('num_of_file_sync_version_to_keep'))
+		if (kConf::hasParam('num_of_old_file_sync_versions_to_keep'))
 		{
-			$keepCount = kConf::get('num_of_file_sync_version_to_keep');
+			$keepCount = kConf::get('num_of_old_file_sync_versions_to_keep');
 			$intVersion = intval($newFileSync->getVersion());
 			$c = new Criteria();
 			$c->add ( FileSyncPeer::OBJECT_ID , $newFileSync->getObjectId() );
