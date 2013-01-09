@@ -48,12 +48,12 @@ class categoryEntryFilter extends baseObjectFilter
 		return categoryEntryPeer::ID;
 	}
 	
-	public function setCategoryIdEqaul($v)
+	public function setCategoryIdEqual($v)
 	{
 		$this->set('_eq_category_id', $v);
 	}
 	
-	public function setEntryIdEqaul($v)
+	public function setEntryIdEqual($v)
 	{
 		$this->set('_eq_entry_id', $v);
 	}
