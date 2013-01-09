@@ -300,6 +300,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $disabledDeliveryTypes;
 	
+	/**
+	 * @var bool
+	 */
+	public $restrictEntryByMetadata;
 	
 	private static $map_between_objects = array
 	(
@@ -373,6 +377,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$permissions = PermissionPeer::retrievePartnerLevelPermissions($source_object->getId());
 		$this->permissions = KalturaPermissionArray::fromDbArray($permissions);
 		$this->limits = KalturaSystemPartnerLimitArray::fromPartner($source_object);
+		
+		$this->restrictEntryByMetadata = $source_object->getShouldApplyAccessControlOnEntryMetadata();
 		
 		$dbAutoModerationEntryFilter = $source_object->getAutoModerateEntryFilter();
 		if ($dbAutoModerationEntryFilter)
@@ -448,6 +454,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$this->autoModerateEntryFilter->toObject($dbAutoModerationEntryFilter);
 			$object_to_fill->setAutoModerateEntryFilter($dbAutoModerationEntryFilter);
 		}
+		
+		$object_to_fill->setShouldApplyAccessControlOnEntryMetadata($this->restrictEntryByMetadata);
 		
 		return $object_to_fill;
 	}
