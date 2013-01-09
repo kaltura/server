@@ -290,7 +290,7 @@ index kaltura_category_kuser
 	rt_field		 = category_full_ids
 	rt_field		 = puser_id
 	rt_field		 = screen_name
-	rt_field		 = status
+	rt_field		 = category_kuser_status
 	rt_field		= partner_id
 	rt_field		= update_method
 	rt_attr_timestamp	 = created_at
