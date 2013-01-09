@@ -1265,6 +1265,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	
 	private function deleteOldFileSyncVersions(FileSync $newFileSync)
 	{
+		KalturaLog::debug('Deleting old file_sync versions for ['.$newFileSync->getId().']');
 		if (kConf::hasParam('num_of_file_sync_version_to_keep'))
 		{
 			$keepCount = kConf::get('num_of_file_sync_version_to_keep');
@@ -1278,7 +1279,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 								
 			$fileSyncs = FileSyncPeer::doSelect($c);
 			foreach ($fileSyncs as $fileSync)
-				self::deleteSyncFileForKey($fileSync);
+			{
+				$key = kFileSyncUtils::getKeyForFileSync($fileSync);
+				KalturaLog::debug('Deleting file_sync key ['.$key.']');
+				self::deleteSyncFileForKey($key);
+			}
 		}		
 	}
 }
