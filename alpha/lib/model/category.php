@@ -572,7 +572,7 @@ class category extends Basecategory implements IIndexable
 	protected function addDeleteCategoryEntryJob($categoryId)
 	{
 		$filter = new categoryEntryFilter();
-		$filter->setCategoryIdEqaul($categoryId);
+		$filter->setCategoryIdEqual($categoryId);
 
 		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
 	}
@@ -652,7 +652,7 @@ class category extends Basecategory implements IIndexable
 		$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
 		
 		$filter = new categoryEntryFilter();
-		$filter->setCategoryIdEqaul($categoryId);
+		$filter->setCategoryIdEqual($categoryId);
 
 		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_ENTRY, $filter, $shouldUpdate, $featureStatusesToRemove);
 		
