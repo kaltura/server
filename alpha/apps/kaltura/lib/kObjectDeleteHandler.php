@@ -117,7 +117,7 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		}
 		
 		$filter = new categoryEntryFilter();
-		$filter->setEntryIdEqaul($entry->getId());
+		$filter->setEntryIdEqual($entry->getId());
 
 		kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
 	}
