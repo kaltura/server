@@ -105,6 +105,25 @@ class KSchedularTaskConfig extends Zend_Config_Ini
 	 */
 	public function getDwhPath()
 	{
+		if(is_null($this->dwhPath))
+			return null;
+			
+		$pathInfo = parse_url($this->dwhPath);
+		if(isset($pathInfo['host']) && $pathInfo['port'])
+		{
+			$host = $pathInfo['host'];
+			if(isset($pathInfo['scheme']))
+				$host = $pathInfo['scheme'] . "://$host";
+				
+			$errno = null;
+			$errstr = null;
+			$socket = fsockopen($host, $pathInfo['port'], $errno, $errstr, 10);
+			if($socket)
+				return $socket;
+			
+			KalturaLog::err("Open socket failed: $errstr");
+		}
+		
 		return $this->dwhPath;
 	}
 		
