@@ -6,6 +6,11 @@
 class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionProfile
 {
 	/**
+	 * @var KalturaYouTubeDistributionFeedSpecVersion
+	 */
+	public $feedSpecVersion;
+
+	/**
 	 * @var string
 	 */
 	public $username;
@@ -122,12 +127,87 @@ class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionP
 	 */
 	public $allowPostRollAds;
 
-	
-	/*
-	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
+	/**
+	 * @var string
 	 */
+	public $strict;
+
+	/**
+	 * @var string
+	 */
+	public $overrideManualEdits;
+
+	/**
+	 * @var string
+	 */
+	public $urgentReference;
+
+	/**
+	 * @var string
+	 */
+	public $allowSyndication;
+
+	/**
+	 * @var string
+	 */
+	public $hideViewCount;
+
+	/**
+	 * @var string
+	 */
+	public $allowAdsenseForVideo;
+
+	/**
+	 * @var string
+	 */
+	public $allowInvideo;
+
+	/**
+	 * @var bool
+	 */
+	public $allowMidRollAds;
+
+	/**
+	 * @var string
+	 */
+	public $instreamStandard;
+
+	/**
+	 * @var string
+	 */
+	public $instreamTrueview;
+
+	/**
+	 * @var string
+	 */
+	public $claimType;
+
+	/**
+	 * @var string
+	 */
+	public $blockOutsideOwnership;
+
+	/**
+	 * @var string
+	 */
+	public $captionAutosync;
+
+	/**
+	 * @var bool
+	 */
+	public $deleteReference;
+
+	/**
+	 * @var bool
+	 */
+	public $releaseClaims;
+
+	/*
+		 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)
+		 */
 	private static $map_between_objects = array 
 	(
+		'feedSpecVersion',
 		'username',
 		'notificationEmail',
 		'sftpHost',
@@ -149,6 +229,21 @@ class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionP
 	    'enableAdServer',
 	    'allowPreRollAds',
 	    'allowPostRollAds',
+		'strict',
+		'overrideManualEdits',
+		'urgentReference',
+		'allowSyndication',
+		'hideViewCount',
+		'allowAdsenseForVideo',
+		'allowInvideo',
+		'allowMidRollAds',
+		'instreamStandard',
+		'instreamTrueview',
+		'claimType',
+		'blockOutsideOwnership',
+		'captionAutosync',
+		'deleteReference',
+		'releaseClaims',
 	 );
 		 
 	public function getMapBetweenObjects()

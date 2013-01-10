@@ -62,25 +62,25 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::YOUTUBE)
 		{
 			if($baseClass == 'IDistributionEngineCloseDelete')
-				return new YouTubeDistributionEngine();
+				return new YouTubeDistributionEngineSelector();
 					
 			if($baseClass == 'IDistributionEngineCloseSubmit')
-				return new YouTubeDistributionEngine();
+				return new YouTubeDistributionEngineSelector();
 					
 			if($baseClass == 'IDistributionEngineCloseUpdate')
-				return new YouTubeDistributionEngine();
+				return new YouTubeDistributionEngineSelector();
 					
 			if($baseClass == 'IDistributionEngineDelete')
-				return new YouTubeDistributionEngine();
+				return new YouTubeDistributionEngineSelector();
 					
 			if($baseClass == 'IDistributionEngineReport')
-				return new YouTubeDistributionEngine();
+				return new YouTubeDistributionEngineSelector();
 					
 			if($baseClass == 'IDistributionEngineSubmit')
-				return new YouTubeDistributionEngine();
+				return new YouTubeDistributionEngineSelector();
 					
 			if($baseClass == 'IDistributionEngineUpdate')
-				return new YouTubeDistributionEngine();
+				return new YouTubeDistributionEngineSelector();
 		
 			if($baseClass == 'KalturaDistributionProfile')
 				return new KalturaYouTubeDistributionProfile();
@@ -130,25 +130,25 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::YOUTUBE)
 		{
 			if($baseClass == 'IDistributionEngineCloseDelete')
-				return 'YouTubeDistributionEngine';
+				return 'YouTubeDistributionEngineSelector';
 					
 			if($baseClass == 'IDistributionEngineCloseSubmit')
-				return 'YouTubeDistributionEngine';
+				return 'YouTubeDistributionEngineSelector';
 					
 			if($baseClass == 'IDistributionEngineCloseUpdate')
-				return 'YouTubeDistributionEngine';
+				return 'YouTubeDistributionEngineSelector';
 					
 			if($baseClass == 'IDistributionEngineDelete')
-				return 'YouTubeDistributionEngine';
+				return 'YouTubeDistributionEngineSelector';
 					
 			if($baseClass == 'IDistributionEngineReport')
-				return 'YouTubeDistributionEngine';
+				return 'YouTubeDistributionEngineSelector';
 					
 			if($baseClass == 'IDistributionEngineSubmit')
-				return 'YouTubeDistributionEngine';
+				return 'YouTubeDistributionEngineSelector';
 					
 			if($baseClass == 'IDistributionEngineUpdate')
-				return 'YouTubeDistributionEngine';
+				return 'YouTubeDistributionEngineSelector';
 		
 			if($baseClass == 'KalturaDistributionProfile')
 				return 'KalturaYouTubeDistributionProfile';

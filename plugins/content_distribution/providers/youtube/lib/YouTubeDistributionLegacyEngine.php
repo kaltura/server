@@ -3,7 +3,7 @@
  * @package plugins.youTubeDistribution
  * @subpackage lib
  */
-class YouTubeDistributionEngine extends DistributionEngine implements 
+class YouTubeDistributionLegacyEngine extends DistributionEngine implements
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,
 	IDistributionEngineReport,
@@ -53,13 +53,13 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 			return false;
 		}
 			
-		$statusParser = new YouTubeDistributionStatusParser($statusXml);
-		$status = $statusParser->getStatusForCommand('Insert');
+		$statusParser = new YouTubeDistributionLegacyStatusParser($statusXml);
+		$status = $statusParser->getStatusForAction('Insert');
 		$statusDetail = $statusParser->getStatusDetailForCommand('Insert');
 		if (is_null($status))
 		{
 			// try to get the status of Parse command
-			$status = $statusParser->getStatusForCommand('Parse');
+			$status = $statusParser->getStatusForAction('Parse');
 			$statusDetail = $statusParser->getStatusDetailForCommand('Parse');
 			if (!is_null($status))
 				throw new Exception('Distribution failed on parsing command with status ['.$status.'] and error ['.$statusDetail.']');
@@ -105,8 +105,8 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		if ($statusXml === false) // no status yet
 			return false;
 			
-		$statusParser = new YouTubeDistributionStatusParser($statusXml);
-		$status = $statusParser->getStatusForCommand('Delete');
+		$statusParser = new YouTubeDistributionLegacyStatusParser($statusXml);
+		$status = $statusParser->getStatusForAction('Delete');
 		$statusDetail = $statusParser->getStatusDetailForCommand('Delete');
 		if (is_null($status))
 			throw new Exception('Status could not be found after deletion request');
@@ -143,8 +143,8 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		if ($statusXml === false) // no status yet
 			return false;
 			
-		$statusParser = new YouTubeDistributionStatusParser($statusXml);
-		$status = $statusParser->getStatusForCommand('Update');
+		$statusParser = new YouTubeDistributionLegacyStatusParser($statusXml);
+		$status = $statusParser->getStatusForAction('Update');
 		$statusDetail = $statusParser->getStatusDetailForCommand('Update');
 		if (is_null($status))
 			throw new Exception('Status could not be found after distribution update');
@@ -182,7 +182,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 			
 		$thumbnailFilePath = $providerData->thumbAssetFilePath;
 		
-		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $providerData);
+		$feed = new YouTubeDistributionLegacyFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $providerData);
 		$feed->setAction('Insert');
 		$feed->setMetadataFromEntry();
 		$newPlaylists = $feed->setPlaylists($providerData->currentPlaylists);
@@ -222,7 +222,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	 */
 	protected function handleDelete(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
 	{
-		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $providerData);
+		$feed = new YouTubeDistributionLegacyFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $providerData);
 		$feed->setAction('Delete');
 		$feed->setVideoId($data->remoteId);
 		$feed->setDistributionRestrictionRule(""); //to update <yt:distribution_restriction> field 
@@ -248,7 +248,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$entryId = $data->entryDistribution->entryId;
 		$entry = $this->getEntry($data->entryDistribution->partnerId, $entryId);
 
-		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $providerData);
+		$feed = new YouTubeDistributionLegacyFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $providerData);
 		$feed->setAction('Update');
 		$feed->setVideoId($data->remoteId);
 		$feed->setMetadataFromEntry();
