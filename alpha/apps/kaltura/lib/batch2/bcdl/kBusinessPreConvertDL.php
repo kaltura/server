@@ -411,8 +411,6 @@ class kBusinessPreConvertDL
 		
 		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$flavor->_force = true; // force to convert the flavor, even if none complied
-		if(!$flavorAsset->getIsOriginal())
-			$flavor->setReadyBehavior(flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE); // should not be taken in completion rules check
 		
 		$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
 		if($conversionProfile)
@@ -428,6 +426,10 @@ class kBusinessPreConvertDL
 			KalturaLog::err("Failed to create flavor asset");
 			return null;
 		}
+		
+		if(!$flavorAsset->getIsOriginal())
+			$flavor->setReadyBehavior(flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE); // should not be taken in completion rules check
+		
 		$flavorAssetId = $flavorAsset->getId();
 	
 		$collectionTag = $flavor->getCollectionTag();
