@@ -20,8 +20,8 @@ class KalturaFrontController
         
         $this->params = requestUtils::getRequestParams();
         
-        $this->service = isset($this->params["service"]) ? $this->params["service"] : null;
-		$this->action = isset($this->params["action"]) ? $this->params["action"] : null;
+        $this->service = isset($this->params["service"]) ? (string)$this->params["service"] : null;
+		$this->action = isset($this->params["action"]) ? (string)$this->params["action"] : null;
     }
         
 	/**

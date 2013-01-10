@@ -3,11 +3,20 @@ ini_set("memory_limit","256M");
 require_once("../../bootstrap.php"); 
 require_once("helpers.php");
 
+$INPUT_PATTERN = "/^[a-zA-Z0-9_]*$/";
+
 // get inputs
 $inputPage = @$_GET["page"];
 $inputService = @$_GET["service"];
 $inputAction = @$_GET["action"];
 $inputObject = @$_GET["object"];
+
+if ((preg_match ($INPUT_PATTERN, $inputPage) !== 1) || (preg_match ($INPUT_PATTERN, $inputService) !== 1) 
+ 	|| (preg_match ($INPUT_PATTERN, $inputAction) !== 1) || (preg_match ($INPUT_PATTERN, $inputObject) !== 1)) {
+	
+	print "Illegal input. Page, Service, Action and Object must be alpha-numeric";
+	die;
+}
 
 // get cache file name
 $cachePath = kConf::get("cache_root_path").'/testmeDoc';
