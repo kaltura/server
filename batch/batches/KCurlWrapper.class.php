@@ -338,16 +338,15 @@ class KCurlWrapper
 	 */
 	public function exec($destFile = null)
 	{
-	    if( is_null($destFile)){
 		$returnTransfer = is_null($destFile);
-	    }else{
-		$destFd = fopen($destFile, "ab");
-		curl_setopt($this->ch, CURLOPT_FILE, $destFd);
-	    }
+		if (!is_null($destFile))
+			$destFd = fopen($destFile, "ab");
 		
 		curl_setopt($this->ch, CURLOPT_HEADER, false);
 		curl_setopt($this->ch, CURLOPT_NOBODY, false);
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, $returnTransfer);
+		if (!is_null($destFile))
+			curl_setopt($this->ch, CURLOPT_FILE, $destFd);
 		
 		$ret = curl_exec($this->ch);
 		
