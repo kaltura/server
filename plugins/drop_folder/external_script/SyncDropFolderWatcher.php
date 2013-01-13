@@ -25,6 +25,7 @@ class SyncDropFolderWatcherLogger implements IKalturaLogger
 
 const DETECTED = 1;
 const UPLOADED = 2;
+const RENAMED = 3;
 
 $logPrefix = rand();
 
@@ -40,11 +41,9 @@ $fileSize = $argv[3];
 $config = parse_ini_file("config.ini");
 $serviceUrl = $config['service_url'];
 writeLog($logPrefix, 'Service URL '.$serviceUrl);
-$tempFileExtentions = $config['temp_file_extentions'];
-writeLog($logPrefix, 'Temp file extentions '.$tempFileExtentions);
+$sleepSec = $config['sleep_time'];
 
 $fileName=basename($filePath);
-$fileName = getDropFolderFileName($fileName, $tempFileExtentions);
 $folderPath = dirname($filePath);
 
 
@@ -97,34 +96,49 @@ try
 			writeLog($logPrefix, 'Handle file detected');
 			$file = addFile($folder->id, $fileName, $fileSize, $dropFolderPlugin);			
 			writeLog($logPrefix, 'created file with id '.$file->id);
+			
 		}
 		else if($action == UPLOADED)
 		{
-			sleep(60);
-			writeLog($logPrefix, 'Sleeping for 60 seconds ...');
+			writeLog($logPrefix, 'Sleeping for '.$sleepSec.' seconds ...');
+			sleep($sleepSec);
 			writeLog($logPrefix, 'Handle file uploaded');
-			$filter = new KalturaDropFolderFileFilter();
-			$filter->dropFolderIdEqual = $folder->id;
-			$filter->fileNameEqual = $fileName;
-			$filter->statusIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::UPLOADING;
-			$dropFolderFiles = $dropFolderPlugin->dropFolderFile->listAction($filter);
-			writeLog($logPrefix, 'found '.$dropFolderFiles->totalCount.' files');
-			if($dropFolderFiles->totalCount == 1)
+			
+			$file = getFile($folder->id, $fileName, $dropFolderPlugin);
+			writeLog($logPrefix, 'drop folder file id '.$file->id);		
+					
+			writeLog($logPrefix, 'Check if file exists on the file system...');
+			$fileExists = file_exists($filePath);
+			if($fileExists)
+				writeLog($logPrefix, 'file exists on the file system');
+			else 
+				writeLog($logPrefix, 'file does not exists on the file system');
+				
+			if($fileExists && $file) //file exists on the file system and in database
 			{
-				$file = $dropFolderFiles->objects[0];
-				writeLog($logPrefix, 'drop folder file id '.$file->id);
 				updateFile($file->id, $fileSize, $dropFolderPlugin);				
-				writeLog($logPrefix, 'file updated ');					
+				writeLog($logPrefix, 'file updated ');
 			}
-			else
+			else if ($fileExists && !$file) //file exisit on the file system, but not in database
 			{
 				writeLog($logPrefix, 'No file exists with status UPLOADING or PARSED, adding new file');
-				$file = addFile($folder->id, $fileName, $fileSize, $dropFolderPlugin);
+				addPendingFile($folder->id, $fileName, $fileSize, $dropFolderPlugin);
 				writeLog($logPrefix, 'created file with id '.$file->id);
-				$dropFolderPlugin->dropFolderFile->updateStatus($file->id, KalturaDropFolderFileStatus::PENDING);	
-				writeLog($logPrefix, 'file status updated to PENDING');			
+				writeLog($logPrefix, 'file status updated to PENDING');											
 			}
+			else if(!$fileExists && $file) //file does not exist on file system (temporary file), but exists in database
+			{
+				$dropFolderPlugin->dropFolderFile->updateStatus($file->id, KalturaDropFolderFileStatus::PURGED);
+				writeLog($logPrefix, 'file deleted from the file system, status updated to PURGED');
+			}				
 		}
+		else if($action == RENAMED)
+		{
+			writeLog($logPrefix, 'Handle file renamed');
+			$file = addPendingFile($folder->id, $fileName, $fileSize, $dropFolderPlugin);			
+			writeLog($logPrefix, 'created file with id '.$file->id);
+			writeLog($logPrefix, 'file status updated to PENDING');	
+		}		
 		else 
 		{
 			writeLog($logPrefix, 'Error - invalid action');
@@ -145,7 +159,7 @@ catch (Exception $e)
 $kClientConfig->partnerId = -1;
 $kClient->setConfig($kClientConfig);
 
-echo '---------------------------- Finish handling --------------------------'."\n";
+writeLog($logPrefix, '---------------------------- Finish handling --------------------------');
 
 function writeLog($prefix, $message)
 {
@@ -175,19 +189,22 @@ function updateFile($fileId, $fileSize, $dropFolderPlugin)
 	$dropFolderPlugin->dropFolderFile->updateStatus($fileId, KalturaDropFolderFileStatus::PENDING);	
 }
 
-function getDropFolderFileName($physicalFileName, $tempFileExtentions)
+function addPendingFile($folderId, $fileName, $fileSize, $dropFolderPlugin)
 {
-	if(!$tempFileExtentions)
-		return $physicalFileName;
-	$tempExtentionsArr = explode(',', $tempFileExtentions);
-	$dropFolderFileName = $physicalFileName;
-	foreach ($tempExtentionsArr as $extention) 
-	{
-		if(substr_compare($physicalFileName, $extention, -strlen($extention), strlen($extention)) === 0)
-		{
-			$dropFolderFileName = basename($dropFolderFileName, $extention);
-			return $dropFolderFileName;
-		}
-	}
-	return $dropFolderFileName;
+	$file = addFile($folderId, $fileName, $fileSize, $dropFolderPlugin);
+	$dropFolderPlugin->dropFolderFile->updateStatus($file->id, KalturaDropFolderFileStatus::PENDING);
+	return $file;
+}
+
+function getFile($folderId, $fileName, $dropFolderPlugin)
+{
+	$filter = new KalturaDropFolderFileFilter();
+	$filter->dropFolderIdEqual = $folderId;
+	$filter->fileNameEqual = $fileName;
+	$filter->statusIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::UPLOADING;
+	$dropFolderFiles = $dropFolderPlugin->dropFolderFile->listAction($filter);
+	if($dropFolderFiles->totalCount == 1)
+		return $dropFolderFiles->objects[0];
+	else 
+		return null;	
 }
