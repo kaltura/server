@@ -137,6 +137,8 @@ kDialog.prototype.loadFields = function(){
 		for(var i = 0; i < this.params.length; i++){
 			var param = this.params[i];
 			var field;
+			if (param.isReadOnly)
+				continue;
 			if (param.isComplexType)
 			{
 				if (param.isEnum || param.isStringEnum)
