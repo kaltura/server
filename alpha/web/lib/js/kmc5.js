@@ -921,6 +921,8 @@ kmc.preview_embed = {
 		cache_st = kmc.preview_embed.setCacheStartTime(),
 		embed_code, flashVars = {};
 
+		var embed_host = (https_support) ? kmc.vars.embed_host_https : kmc.vars.embed_host;
+
 		if( previewPlayer ) {
 			embed_code = kmc.preview_embed.embed_code_template.object_tag;
 		} else {
@@ -937,7 +939,7 @@ kmc.preview_embed = {
 
 			flashVars['playlistAPI.autoInsert'] = 'true';
 			flashVars['playlistAPI.kpl0Name'] = name;
-			flashVars['playlistAPI.kpl0Url'] = 'http://' + kmc.vars.embed_host + '/index.php/partnerservices2/executeplaylist?' + 
+			flashVars['playlistAPI.kpl0Url'] = 'http://' + embed_host + '/index.php/partnerservices2/executeplaylist?' + 
 												'partner_id=' + kmc.vars.partner_id + '&subp_id=' + kmc.vars.partner_id + '00' + 
 												'&format=8&ks={ks}&playlist_id=' + id;
 
@@ -951,7 +953,6 @@ kmc.preview_embed = {
 		embed_code = embed_code.replace('{FLASHVARS}', kmc.functions.flashVarsToString(flashVars));	
 		embed_code = embed_code.replace('{FLASHVARS_URL}', kmc.functions.flashVarsToUrl(flashVars));	
 
-		var embed_host = (https_support) ? kmc.vars.embed_host_https : kmc.vars.embed_host;
 		var script_url = 'http://' + embed_host + '/p/'+ kmc.vars.partner_id + '/sp/' + kmc.vars.partner_id + '00/embedIframeJs/uiconf_id/' + uiconf_id + '/partner_id/' + kmc.vars.partner_id;
 
 		// Used by kWidget.embed
