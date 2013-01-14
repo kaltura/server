@@ -112,7 +112,7 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 
 		$countHandledObjects = $this->countCreatedObjects($job->id, $job->data->bulkUploadObjectType);
 				
-		if(!$countHandledObjects)
+		if(!$countHandledObjects && !$engine->shouldRetry())
 			throw new KalturaBatchException("None of the uploaded items were processed succsessfuly", KalturaBatchJobAppErrors::BULK_NO_ENTRIES_HANDLED);
 		
 		if($engine->shouldRetry())
