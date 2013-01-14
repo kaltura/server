@@ -12,6 +12,10 @@ kmc.vars.port = (window.location.port) ? ":" + window.location.port : "";
 kmc.vars.base_url = window.location.protocol + '//' + window.location.hostname + kmc.vars.port;
 kmc.vars.api_url = window.location.protocol + '//' + kmc.vars.host + kmc.vars.port;
 
+// Holds the minimum version for html5 & kdp with the api_v3 for playlists
+kmc.vars.min_kdp_version_for_playlist_api_v3 = '3.6.15';
+kmc.vars.min_html5_version_for_playlist_api_v3 = '1.7.1.2';
+
 // Log function
 kmc.log = function() {
 	if( kmc.vars.debug && typeof console !='undefined' && console.log ){
@@ -937,11 +941,18 @@ kmc.preview_embed = {
 		if(is_playlist && id != "multitab_playlist") {	// playlist (not multitab)
 			embed_code = embed_code.replace(/{ENTRY_ID}/g,"");
 
-			flashVars['playlistAPI.autoInsert'] = 'true';
-			flashVars['playlistAPI.kpl0Name'] = name;
-			flashVars['playlistAPI.kpl0Url'] = 'http://' + embed_host + '/index.php/partnerservices2/executeplaylist?' + 
-												'partner_id=' + kmc.vars.partner_id + '&subp_id=' + kmc.vars.partner_id + '00' + 
-												'&format=8&ks={ks}&playlist_id=' + id;
+			// Use new kpl0Id flashvar for new players only
+			var html5_version = kmc.functions.getVersionFromPath(uiconf_details.html5Url);
+			//if( kmc.functions.versionIsAtLeast(kmc.vars.min_kdp_version_for_playlist_api_v3, uiconf_details.swf_version) && 
+			//	kmc.functions.versionIsAtLeast(kmc.vars.min_html5_version_for_playlist_api_v3, html5_version) ) {
+			//	flashVars['playlistAPI.kpl0Id'] = id;
+			//} else {
+				flashVars['playlistAPI.autoInsert'] = 'true';
+				flashVars['playlistAPI.kpl0Name'] = name;
+				flashVars['playlistAPI.kpl0Url'] = 'http://' + embed_host + '/index.php/partnerservices2/executeplaylist?' + 
+													'partner_id=' + kmc.vars.partner_id + '&subp_id=' + kmc.vars.partner_id + '00' + 
+													'&format=8&ks={ks}&playlist_id=' + id;
+			//}
 
 			embed_code = embed_code.replace("{SEO}", "");
 		}
@@ -997,10 +1008,7 @@ kmc.preview_embed = {
 			code = '';
 		switch( embed_type ) {
 			case 'auto':
-				code = '<script type="text/javascript" src="' + kmc.vars.service_url + 
-						'/p/'+ kmc.vars.partner_id + '/sp/' + kmc.vars.partner_id + 
-						'00/embedIframeJs/uiconf_id/' + uiconf_id + '/partner_id/' + 
-						kmc.vars.partner_id + '?entry_id=' + id + 
+				code = '<script type="text/javascript" src="{SCRIPT_URL}?entry_id=' + id + 
 						'&playerId=kaltura_player_{CACHE_ST}&cache_st={CACHE_ST}' + 
 						'&autoembed=true&width={WIDTH}&height={HEIGHT}&{FLASHVARS_URL}"></script>';
 			break;
