@@ -1,5 +1,5 @@
 <?php
-chdir('/opt/kaltura/app/scripts/');
+chdir(__DIR__.'/../');
 require_once 'bootstrap.php';
 
 if ( $argc == 3)
