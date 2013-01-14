@@ -1026,15 +1026,12 @@ class kContentDistributionManager
 		return "entryDistHasErr";
 	}
 	
-	public static function getSearchStringDistributionHasNoValidationError($distributionProfileId = null, $isIndex = true)
+	public static function getSearchStringDistributionHasNoValidationError($distributionProfileId = null)
 	{
 		if($distributionProfileId)
-			if($isIndex)
-				return "contentDistProfile-\"entryDistHasErr{$distributionProfileId}\" contentDistProfile-entryDistHasErr";
-			else
-				return "contentDistProfile-\"entryDistHasErr{$distributionProfileId}\"";
+			return "contentDistProfile{$distributionProfileId} -\"entryDistHasErr{$distributionProfileId}\"";
 			
-		return "contentDistProfile-entryDistHasErr";
+		return "contentDistProfile -\"entryDistHasErr\"";
 	}
 	
 	public static function getEntrySearchValues(entry $entry)

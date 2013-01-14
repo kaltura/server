@@ -147,12 +147,13 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 		{
 			if($this->noDistributionProfiles)
 				return kContentDistributionManager::getSearchStringNoDistributionProfiles();
-			else
-				$conditions[] = kContentDistributionManager::getSearchStringDistributionProfile();
 		}
 		
 		if(!is_null($this->distributionProfileId))
 			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionProfile($this->distributionProfileId) . '"';
+		else 
+			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionProfile() . '"';;
+			
 		
 		if(!is_null($this->distributionSunStatus))
 			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionSunStatus($this->distributionSunStatus, $this->distributionProfileId, false) . '"';
@@ -168,7 +169,7 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 			if($this->hasEntryDistributionValidationErrors)
 				$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionHasValidationError($this->distributionProfileId, false) . '"';
 			else
-				$conditions[] = kContentDistributionManager::getSearchStringDistributionHasNoValidationError($this->distributionProfileId, false);
+				$conditions[] = kContentDistributionManager::getSearchStringDistributionHasNoValidationError($this->distributionProfileId);
 		}
 
 		if(!is_null($this->entryDistributionValidationErrors))
