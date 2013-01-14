@@ -44,7 +44,7 @@ class rawAction extends sfAction
 		{
 			$entry = kCurrentContext::initPartnerByEntryId($entry_id);
 			if(!$entry)
-				die();
+				KExternalErrors::dieGracefully();
 		}
 		
 		kEntitlementUtils::initEntitlementEnforcement();
@@ -54,12 +54,12 @@ class rawAction extends sfAction
 			$entry = entryPeer::retrieveByPK( $entry_id );
 			
 			if(!$entry)
-				die();
+				KExternalErrors::dieGracefully();
 		}
 		else
 		{
 			if(!kEntitlementUtils::isEntryEntitled($entry))
-				die();
+				KExternalErrors::dieGracefully();
 		}
 
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
@@ -119,7 +119,7 @@ class rawAction extends sfAction
 			{
 				header('KalturaRaw: no flavor asset for extension');
 				header("HTTP/1.0 404 Not Found");
-				die;
+				KExternalErrors::dieGracefully();
 			}
 
 			$archive_file = $file_sync->getFullPath();
@@ -149,7 +149,7 @@ class rawAction extends sfAction
 			{
 				header('KalturaRaw: no flavor asset for extension');
 				header("HTTP/1.0 404 Not Found");
-				die;
+				KExternalErrors::dieGracefully();
 			}
 			// Gonen 2010-08-05 workaround to make sure file name includes correct extension
 			// make sure a file extension is added to the downloaded file so browser will identify and
@@ -212,7 +212,7 @@ class rawAction extends sfAction
 				else
 				{
 					header('KalturaRaw: no flavor asset for extension');
-					die;
+					KExternalErrors::dieGracefully();
 				}				
 				
 				$archive_file = $file_sync->getFullPath();
@@ -238,7 +238,7 @@ class rawAction extends sfAction
 					if(!$flavor_asset)
 					{
 						header('KalturaRaw: no original flavor asset for entry, no best play asset for entry');
-						die;
+						KExternalErrors::dieGracefully();
 					}
 					$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , false ); // NOT strict - if there is no archive, get the data version
 					$archive_file = $file_sync->getFullPath();
@@ -292,7 +292,7 @@ class rawAction extends sfAction
 		{
 			// no archive for this file
 			header("HTTP/1.0 404 Not Found");
-			die();
+			KExternalErrors::dieGracefully();
 		}
 
 //		echo "[$archive_file][" . file_exists ( $archive_file ) . "]";
@@ -305,7 +305,7 @@ class rawAction extends sfAction
 		{
 			// dump the file
 			kFileUtils::dumpFile($archive_file , $mime_type );
-			die();
+			KExternalErrors::dieGracefully();
 		}
 		
 		// use new Location to add the best extension we can find for the file
@@ -350,7 +350,7 @@ class rawAction extends sfAction
 		
 		// or redirect if no proxy
 		header ( "Location: {$url}" );
-		die();
+		KExternalErrors::dieGracefully();
 	}
 	
 	/**
@@ -373,7 +373,7 @@ class rawAction extends sfAction
 
 				KalturaLog::log( "Error - no FileSync for object [{$obj->getId()}]");
 				header("HTTP/1.0 404 Not Found");
-				die;
+				KExternalErrors::dieGracefully();
 			}
 			else
 				return null;

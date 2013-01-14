@@ -634,11 +634,11 @@ class playManifestAction extends kalturaAction
 			
 		$this->storageProfile = StorageProfilePeer::retrieveByPK($this->storageId);
 		if(!$this->storageProfile)
-			die;			// TODO use a dieError
+			KExternalErrors::dieGracefully();			// TODO use a dieError
 				
 		// storage doesn't belong to the partner
 		if($this->storageProfile->getPartnerId() != $this->entry->getPartnerId())
-			die;			// TODO use a dieError
+			KExternalErrors::dieGracefully();			// TODO use a dieError
 	}
 	
 	protected function initUrlManager()
@@ -1466,6 +1466,7 @@ class playManifestAction extends kalturaAction
 		}
 
 		// Output the response
+		KExternalErrors::terminateDispatch();
 		$renderer->output($deliveryCode, $playbackContext);
 	}
 }

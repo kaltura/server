@@ -84,7 +84,7 @@ class serveFlavorAction extends kalturaAction
 		if($fileParam && is_dir($path)) {
 			$path .= "/$fileParam";
 			kFileUtils::dumpFile($path, null, null);
-			die;
+			KExternalErrors::dieGracefully();
 		}
 		else if (!$isFlv) // dump as regular file if the forceproxy parameter was specified or the file isn't an flv
 		{
@@ -100,7 +100,7 @@ class serveFlavorAction extends kalturaAction
 				}
 			}
 			kFileUtils::dumpFile($path, null, null, $limit_file_size);
-			die;
+			KExternalErrors::dieGracefully();
 		}
 		
 		$audioOnly = $this->getRequestParameter ( "audioOnly" ); // milliseconds
@@ -162,6 +162,6 @@ class serveFlavorAction extends kalturaAction
 		
 		header("Content-Type: video/x-flv");
 		$flvWrapper->dump(self::CHUNK_SIZE, $fromByte, $toByte, $audioOnly, $seekFromBytes, $rangeFrom, $rangeTo, $cuepointTime, $cuepointPos);
-		die;
+		KExternalErrors::dieGracefully();
 	}
 }

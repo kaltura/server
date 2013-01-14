@@ -80,6 +80,6 @@ class embedIframeJsAction extends sfAction
 		
 		kFile::cacheRedirect($url);
 		header("Location:$url");
-		die;
+		KExternalErrors::dieGracefully();
 	}
 }

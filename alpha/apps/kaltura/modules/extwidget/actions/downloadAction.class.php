@@ -113,7 +113,7 @@ class downloadAction extends sfAction
 			$filePath = $filePath.DIRECTORY_SEPARATOR.$fileName;
 		$this->dumpFile($filePath, $fileName);
 		
-		die(); // no view
+		KExternalErrors::dieGracefully(); // no view
 	}
 	
 	private function getFileName(entry $entry, flavorAsset $flavorAsset = null)
@@ -192,7 +192,7 @@ class downloadAction extends sfAction
 			kFile::cacheRedirect($url);
 
 			header("Location: {$url}");
-			die;
+			KExternalErrors::dieGracefully();
 		}
 		else
 		{

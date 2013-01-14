@@ -56,7 +56,7 @@ class kwidgetAction extends sfAction
 			
 			header("Location:$cachedResponse".$noncached_params);
 				
-			die;
+			KExternalErrors::dieGracefully();
 		}
 		
 		// check if we cached the patched swf with flashvars
@@ -67,7 +67,7 @@ class kwidgetAction extends sfAction
 			header("X-Kaltura:cached-action");
 			requestUtils::sendCdnHeaders("swf", strlen($cachedResponse), 60 * 10, null, true, time());
 			echo $cachedResponse;
-			die;
+			KExternalErrors::dieGracefully();
 		}
 		
 		$widget_id = $this->getRequestParameter( "wid" );
@@ -78,7 +78,7 @@ class kwidgetAction extends sfAction
 
 		if ( !$widget )
 		{
-			die();
+			KExternalErrors::dieGracefully();
 		}
 
 		// because of the routing rule - the entry_id & kmedia_type WILL exist. be sure to ignore them if smaller than 0
@@ -175,7 +175,7 @@ class kwidgetAction extends sfAction
 		// new ui_confs which are deleted should stop the script
 		// the check for >100000 is for supporting very old mediawiki and such players
 		if (!$uiConf && $widget_type>100000)
-	        die;
+	        KExternalErrors::dieGracefully();
 	        
 		if ($uiConf)
 		{
@@ -309,11 +309,11 @@ class kwidgetAction extends sfAction
 						}
 						catch(Exception $ex)
 						{
-							die;
+							KExternalErrors::dieGracefully();
 						}
 						
 						if (!$ui_conf_result->confFile)
-							die;
+							KExternalErrors::dieGracefully();
 							
 						ob_start();
 						$serializer = new KalturaXmlSerializer(false);
@@ -411,7 +411,7 @@ class kwidgetAction extends sfAction
 					{
 						$cache_swfdata->put($requestKey, $wrapper_data);
 					}
-					die;
+					KExternalErrors::dieGracefully();
 				}
 			}
 		}
@@ -445,6 +445,7 @@ class kwidgetAction extends sfAction
 		else
 			$url .= $noncached_params;
 
+		KExternalErrors::terminateDispatch();
 		$this->redirect( $url );
 	}
 }

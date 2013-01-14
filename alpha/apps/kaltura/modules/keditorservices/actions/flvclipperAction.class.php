@@ -91,7 +91,7 @@ class flvclipperAction extends kalturaAction
 		if ( $entry->getType() == entryType::MIX && $entry->getStatus() == entryStatus::DELETED )
 		{
 			// because the fiter was turned off - a manual check for deleted entries must be done.
-			die;
+			KExternalErrors::dieGracefully();
 		}
 		else if ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE )
 		{
@@ -252,7 +252,7 @@ class flvclipperAction extends kalturaAction
 			$akamai_url .= $seek_from_bytes == -1 ? "" : "?aktimeoffset=".floor($seek_from_timestamp / 1000);
 
 			header("Location: $akamai_url");
-			die;
+			KExternalErrors::dieGracefully();
 		}
 		elseif($extStorageUrl)
 		{
@@ -263,7 +263,7 @@ class flvclipperAction extends kalturaAction
 			$extStorageUrl .= $seek_from_bytes == -1 ? "" : "?aktimeoffset=".floor($seek_from_timestamp / 1000);
 			
 			header("Location: $extStorageUrl");
-			die;
+			KExternalErrors::dieGracefully();
 		}
 		
 		// use headers to detect cdn
@@ -331,14 +331,14 @@ class flvclipperAction extends kalturaAction
 					if (!$ks_str)
 					{
 						$this->logMessage( "flvclipper - no KS" );
-						die;
+						KExternalErrors::dieGracefully();
 					}
 					
 					$ks = kSessionUtils::crackKs($ks_str);
 					if (!$ks)
 					{
 						$this->logMessage( "flvclipper - invalid ks [$ks_str]" );		
-						die;
+						KExternalErrors::dieGracefully();
 					}
 				
 					$matched_privs = $ks->verifyPrivileges ( "sview" , $entry_id );
@@ -347,7 +347,7 @@ class flvclipperAction extends kalturaAction
 					if ( ! $matched_privs )
 					{
 						$this->logMessage( "flvclipper - doesnt not match required privlieges [$ks_str]" );		
-						die;
+						KExternalErrors::dieGracefully();
 					}
 				}
 				
@@ -383,7 +383,7 @@ class flvclipperAction extends kalturaAction
 					$level3_url .= $seek_from_bytes == -1 ? "" : "&start=$seek_from_bytes";
 		        	
 					header("Location: $level3_url");
-		        	die;
+					KExternalErrors::dieGracefully();
 		        }
 		        else if ($cdn_name == "akamai")
 		        {
@@ -396,7 +396,7 @@ class flvclipperAction extends kalturaAction
 					$akamai_url .= $seek_from_bytes == -1 ? "" : "&aktimeoffset=".floor($seek_from_timestamp / 1000);
 		        	
 		        	header("Location: $akamai_url");
-		        	die;
+		        	KExternalErrors::dieGracefully();
 		        }
 		        
 		        // a seek request without a supporting cdn - we need to send the answer from our server
@@ -421,7 +421,7 @@ class flvclipperAction extends kalturaAction
 				
 			requestUtils::sendCdnHeaders("flv", 0);
 			header("Location: $request".$flv_extension);
-			die;
+			KExternalErrors::dieGracefully();
 		}
 
 		// mp4
@@ -486,6 +486,7 @@ class flvclipperAction extends kalturaAction
 			$this->logMessage( "flvclipperAction: error closing db $e");
 		}
 		
+		KExternalErrors::terminateDispatch();
 		return sfView::SUCCESS;
 	}
 	
@@ -500,7 +501,7 @@ class flvclipperAction extends kalturaAction
 				if ($preview_length_msec === 0) // don't preview length 0, it will cause infinite loop because clip_to defaults to 2147483647
 				{
 					header("Content-Type: video/x-flv");
-					die;
+					KExternalErrors::dieGracefully();
 				}
 					
 				$request = str_replace('/clip_to/'.$clip_to, '/clip_to/'.$preview_length_msec, $request);
@@ -519,7 +520,7 @@ class flvclipperAction extends kalturaAction
 					header("Location: $request/clip_to/$preview_length_msec");
 				}
 			}
-			die;
+			KExternalErrors::dieGracefully();
 		}
 	}
 }

@@ -29,7 +29,7 @@ class kFileUtils extends kFile
 		
 		// if by now there is no file - die !
 		if(! file_exists($file_name))
-			die();
+			KExternalErrors::dieGracefully();
 		
 		$ext = pathinfo($file_name, PATHINFO_EXTENSION);
 		$total_length = $limit_file_size ? $limit_file_size : self::fileSize($file_name);
@@ -79,7 +79,7 @@ class kFileUtils extends kFile
 			if (isset($GLOBALS["start"]))
 				header("X-Kaltura:dumpFile:".(microtime(true) - $GLOBALS["start"]));
 			header("X-Sendfile: $file_name");
-			die;
+			KExternalErrors::dieGracefully();
 		}
 
 		$chunk_size = 100000;
@@ -97,7 +97,7 @@ class kFileUtils extends kFile
 			fclose($fh);
 		}
 		
-		die();
+		KExternalErrors::dieGracefully();
 	}
 
 	public static function dumpApiRequest($host)
@@ -147,7 +147,7 @@ class kFileUtils extends kFile
 		
 		// close curl resource, and free up system resources
 		curl_close($ch);
-		die();
+		KExternalErrors::dieGracefully();
 	}
 	
     public static function dumpUrl($url, $allowRange = true, $passHeaders = false)
@@ -224,6 +224,6 @@ class kFileUtils extends kFile
 		// close curl resource, and free up system resources
 		curl_close($ch);
 		
-		die();
+		KExternalErrors::dieGracefully();
 	}
 }

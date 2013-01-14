@@ -79,6 +79,8 @@ class KExternalErrors
 			$description .= ", $message";
 			
 		KalturaLog::err("exiting on error $errorCode - $description");
+		self::terminateDispatch();
+		
 		
 		header("X-Kaltura:error-$errorCode");
 		header("X-Kaltura-App: exiting on error $errorCode - $description");
@@ -88,5 +90,20 @@ class KExternalErrors
 			requestUtils::sendCachingHeaders(60);
 		
 		die();
+	}
+	
+	public static function dieGracefully($message = null)
+	{
+		if (class_exists('KalturaLog') && !is_null($message)) 
+			KalturaLog::err($message);
+		
+		self::terminateDispatch();
+		die();
+	}
+	
+	public static function terminateDispatch() 
+	{
+		if (class_exists('KalturaLog') && isset($GLOBALS["start"])) 
+			KalturaLog::debug("Disptach took - " . (microtime(true) - $GLOBALS["start"]) . " seconds");
 	}
 }	
