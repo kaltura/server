@@ -671,7 +671,8 @@ class entryPeer extends BaseentryPeer
 			}
 			
 			$selectResults = array_filter($selectResults, array('entryPeer', 'filterByAccessControl'));
-			$criteria->setRecordsCount(count($selectResults));
+			if($criteria instanceof KalturaCriteria) 
+				$criteria->setRecordsCount(count($selectResults));
 		}
 		
 		$removedRecordsCount = 0;
