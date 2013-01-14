@@ -41,8 +41,9 @@ class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeSingleUrl($url)
 	{
+		$url = '/' . ltrim($url, '/');
 		if ($this->root_dir)
-			$url = rtrim($this->root_dir, '/') . '/' . ltrim($url, '/');
+			$url = rtrim($this->root_dir, '/') . $url;
 		return self::urlauth_gen_url($url, $this->param, $this->window, $this->salt, null, null);
 	}
 	/**
