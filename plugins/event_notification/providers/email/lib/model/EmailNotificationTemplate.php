@@ -28,6 +28,16 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 		$this->setType(EmailNotificationPlugin::getEmailNotificationTemplateTypeCoreValue(EmailNotificationTemplateType::EMAIL));
 		parent::__construct();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseEventNotificationTemplate::copy()
+	 */
+	public function copy($deepCopy = false)
+	{
+		$returnObj = parent::copy($deepCopy);
+		$returnObj->setBody($this->getBody());
+		return $returnObj;
+	}
 
 	/* (non-PHPdoc)
 	 * @see EventNotificationTemplate::getJobData()
