@@ -36,8 +36,8 @@ class PartnerService extends KalturaBaseService
 		
 		$c = new Criteria();
 		$c->addAnd(UserLoginDataPeer::LOGIN_EMAIL, $partner->adminEmail, Criteria::EQUAL);
-		$c->setLimit(1);
-		$existingUser = UserLoginDataPeer::doCount($c) > 0;
+		$existingUser = UserLoginDataPeer::doSelectOne($c);
+		/*@var $exisitingUser UserLoginData */
 
 		try
 		{
@@ -75,9 +75,13 @@ class PartnerService extends KalturaBaseService
 			$partner_registration = new myPartnerRegistration ( $parentPartnerId );
 			
 			$ignorePassword = false;
-			if ($existingUser && $this->getKs()->partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID &&
-				 kuserPeer::getKuserByEmail($partner->adminEmail, Partner::ADMIN_CONSOLE_PARTNER_ID) != null) {
-				$ignorePassword = true;
+			if ($existingUser && $this->getKs()->partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID){
+				kuserPeer::setUseCriteriaFilter(false);
+				$kuserOfLoginData = kuserPeer::getKuserByEmail($partner->adminEmail, $existingUser->getConfigPartnerId());
+				kuserPeer::setUseCriteriaFilter(true);
+				if ($kuserOfLoginData){
+					$ignorePassword = true;
+				}
 			}
 			
 			list($pid, $subpid, $pass, $hashKey) = $partner_registration->initNewPartner( $dbPartner->getName() , $dbPartner->getAdminName() , $dbPartner->getAdminEmail() ,
