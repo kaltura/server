@@ -124,6 +124,9 @@ jQuery('#filter_type').change(function() {
 			$("div.help").hide();
 	}
 });
+jQuery('#filter_text input').click(function() {
+	$('#filter_text input').select();
+});
 // <div class="help" title="<?php //echo this_tooltip_text ?>"></div>
 
 jQuery('#filter_type').change();
