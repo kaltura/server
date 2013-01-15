@@ -1269,21 +1269,28 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if (kConf::hasParam('num_of_old_file_sync_versions_to_keep'))
 		{
 			$keepCount = kConf::get('num_of_old_file_sync_versions_to_keep');
+			if(!is_numeric($newFileSync->getVersion()))
+				return;
 			$intVersion = intval($newFileSync->getVersion());
 			$c = new Criteria();
 			$c->add ( FileSyncPeer::OBJECT_ID , $newFileSync->getObjectId() );
 			$c->add ( FileSyncPeer::OBJECT_TYPE , $newFileSync->getObjectType() );
 			$c->add ( FileSyncPeer::OBJECT_SUB_TYPE , $newFileSync->getObjectSubType() );
-			$c->add ( FileSyncPeer::STATUS, array(FileSync::FILE_SYNC_STATUS_PURGED, FileSync::FILE_SYNC_STATUS_DELETED), Criteria::NOT_IN);
-			$c->add ( FileSyncPeer::VERSION, ($intVersion - $keepCount), Criteria::LESS_THAN);
-			$c->setLimit(20); //we limit the number of files to delete in one run so there will be no out of memory issues
-								
+			$c->add ( FileSyncPeer::STATUS, array(FileSync::FILE_SYNC_STATUS_PURGED, FileSync::FILE_SYNC_STATUS_DELETED), Criteria::NOT_IN);			
+			$c->setLimit(20); //we limit the number of files to delete in one run so there will be no out of memory issues								
 			$fileSyncs = FileSyncPeer::doSelect($c);
 			foreach ($fileSyncs as $fileSync)
 			{
-				$key = kFileSyncUtils::getKeyForFileSync($fileSync);
-				KalturaLog::debug('Deleting file_sync key ['.$key.']');
-				self::deleteSyncFileForKey($key);
+				if(is_numeric($fileSync->getVersion()))
+				{
+					$currentIntVersion = intval($fileSync->getVersion());
+					if($intVersion - $keepCount > $currentIntVersion)
+					{
+						$key = kFileSyncUtils::getKeyForFileSync($fileSync);
+						KalturaLog::debug('Deleting file_sync key ['.$key.']');
+						self::deleteSyncFileForKey($key);
+					}
+				}
 			}
 		}		
 	}
