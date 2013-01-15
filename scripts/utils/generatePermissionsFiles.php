@@ -1,7 +1,8 @@
 <?php
 
 $dir = __DIR__ . '/permissions';
-chdir(__DIR__ . '/../');
+chdir('/opt/kaltura/app/scripts');
+//chdir(__DIR__ . '/../');
 require_once 'bootstrap.php';
 
 if(!file_exists($dir))
@@ -15,7 +16,7 @@ $permissions = PermissionPeer::doSelect($criteria);
 KalturaLog::debug("Found [" . count($permissions) . "] permissions");
 
 $files = array();
-$permissionNames = array();
+$permissionArray = array();
 foreach($permissions as $index => $permission)
 {
 	/* @var $permission Permission */
@@ -29,7 +30,7 @@ foreach($permissions as $index => $permission)
 	$tags = $permission->getTags();
 	$partnerGroup = $permission->getPartnerGroup();
 	
-	$permissionNames[$permission->getId()] = $name;
+	$permissionArray[$permission->getId()] = $permission;
 	
 	if(!isset($files[$partnerId]))
 	{
@@ -81,21 +82,47 @@ foreach($permissionItems as $actionPermissionItem)
 		if($file)
 			fclose($file);
 			
-		$file = fopen("$dir/service.$service.ini", 'w');
-		fputs($files[$partnerId], "[parameter_permission_items]\n");
+		$fileName = "service.$service.ini";
+		$fileName = str_replace('_', '.', $fileName);			
+		$file = fopen("$dir/$fileName", 'w');
+		fputs($file, "[action_permission_items]\n");
 		$currentIndex = 0;
 		$currentService = $service;
 	}
 	$currentIndex++;
 	
-	fputs($files[$partnerId], "permissionItem{$index}.service = $service\n");
-	fputs($files[$partnerId], "permissionItem{$index}.action = $action\n");
-	fputs($files[$partnerId], "permissionItem{$index}.partnerId = $partnerId\n");
-	fputs($files[$partnerId], "permissionItem{$index}.param3 = $param3\n");
-	fputs($files[$partnerId], "permissionItem{$index}.param4 = $param4\n");
-	fputs($files[$partnerId], "permissionItem{$index}.param5 = $param5\n");
-	fputs($files[$partnerId], "permissionItem{$index}.tags = $tags\n");
-	fputs($files[$partnerId], "\n");
+	fputs($file, "permissionItem{$currentIndex}.service = $service\n");
+	fputs($file, "permissionItem{$currentIndex}.action = $action\n");
+	fputs($file, "permissionItem{$currentIndex}.partnerId = $partnerId\n");
+	fputs($file, "permissionItem{$currentIndex}.param3 = $param3\n");
+	fputs($file, "permissionItem{$currentIndex}.param4 = $param4\n");
+	fputs($file, "permissionItem{$currentIndex}.param5 = $param5\n");
+	fputs($file, "permissionItem{$currentIndex}.tags = $tags\n");
+	
+	$criteria = new Criteria();
+	$criteria->add(PermissionToPermissionItemPeer::PERMISSION_ITEM_ID, $actionPermissionItem->getId());
+	$permissionToPermissionItems = PermissionToPermissionItemPeer::doSelect($criteria);
+	$permissions = array();
+	foreach($permissionToPermissionItems as $permissionToPermissionItem)
+	{
+		/* @var $permissionToPermissionItem PermissionToPermissionItem */
+		if(!isset($permissionArray[$permissionToPermissionItem->getPermissionId()]))
+			continue;
+			
+		$permission = $permissionArray[$permissionToPermissionItem->getPermissionId()];
+		/* @var $permission Permission */
+		
+		$permissionName = $permission->getName();
+		$permissionPartnerId = $permission->getPartnerId();
+		if($permissionPartnerId != $partnerId)
+			$permissionName = "{$permissionPartnerId}>{$permissionName}";
+			
+		$permissions[] = $permissionName;
+	}
+	$permissions = implode(', ', $permissions);
+	fputs($file, "permissionItem{$currentIndex}.permissions = $permissions\n");
+	
+	fputs($file, "\n");
 }
 if($file)
 	fclose($file);
@@ -132,20 +159,44 @@ foreach($permissionItems as $parameterPermissionItem)
 			fclose($file);
 			
 		$file = fopen("$dir/object.$object.ini", 'w');
-		fputs($files[$partnerId], "[parameter_permission_items]\n");
+		fputs($file, "[parameter_permission_items]\n");
 		$currentIndex = 0;
 		$currentObject = $object;
 	}
 	$currentIndex++;
 	
-	fputs($files[$partnerId], "permissionItem{$index}.object = $object\n");
-	fputs($files[$partnerId], "permissionItem{$index}.parameter = $parameter\n");
-	fputs($files[$partnerId], "permissionItem{$index}.action = $action\n");
-	fputs($files[$partnerId], "permissionItem{$index}.partnerId = $partnerId\n");
-	fputs($files[$partnerId], "permissionItem{$index}.param4 = $param4\n");
-	fputs($files[$partnerId], "permissionItem{$index}.param5 = $param5\n");
-	fputs($files[$partnerId], "permissionItem{$index}.tags = $tags\n");
-	fputs($files[$partnerId], "\n");
+	fputs($file, "permissionItem{$currentIndex}.object = $object\n");
+	fputs($file, "permissionItem{$currentIndex}.parameter = $parameter\n");
+	fputs($file, "permissionItem{$currentIndex}.action = $action\n");
+	fputs($file, "permissionItem{$currentIndex}.partnerId = $partnerId\n");
+	fputs($file, "permissionItem{$currentIndex}.param4 = $param4\n");
+	fputs($file, "permissionItem{$currentIndex}.param5 = $param5\n");
+	fputs($file, "permissionItem{$currentIndex}.tags = $tags\n");
+	
+	$criteria = new Criteria();
+	$criteria->add(PermissionToPermissionItemPeer::PERMISSION_ITEM_ID, $parameterPermissionItem->getId());
+	$permissionToPermissionItems = PermissionToPermissionItemPeer::doSelect($criteria);
+	$permissions = array();
+	foreach($permissionToPermissionItems as $permissionToPermissionItem)
+	{
+		/* @var $permissionToPermissionItem PermissionToPermissionItem */
+		if(!isset($permissionArray[$permissionToPermissionItem->getPermissionId()]))
+			continue;
+			
+		$permission = $permissionArray[$permissionToPermissionItem->getPermissionId()];
+		/* @var $permission Permission */
+		
+		$permissionName = $permission->getName();
+		$permissionPartnerId = $permission->getPartnerId();
+		if($permissionPartnerId != $partnerId)
+			$permissionName = "{$permissionPartnerId}>{$permissionName}";
+			
+		$permissions[] = $permissionName;
+	}
+	$permissions = implode(', ', $permissions);
+	fputs($file, "permissionItem{$currentIndex}.permissions = $permissions\n");
+	
+	fputs($file, "\n");
 }
 if($file)
 	fclose($file);
