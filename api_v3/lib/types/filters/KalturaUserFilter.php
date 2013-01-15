@@ -36,6 +36,9 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	
 	public function toObject ( $object_to_fill = null, $props_to_skip = array() )
 	{
+		if (!$object_to_fill)
+			$object_to_fill = new kuserFilter();
+		
 		$object_to_fill =  parent::toObject($object_to_fill, $props_to_skip);
 		
 		if (!is_null($this->loginEnabledEqual)) {
