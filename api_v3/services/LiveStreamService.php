@@ -257,7 +257,7 @@ class LiveStreamService extends KalturaEntryService
 					if ($config)
 					{
 						KalturaLog::info('Determining status of live stream URL [' .$config->getUrl() . ']');
-						return $this->hdsUrlExists($config->getUrl(). '?hdCore=' . kConf::get('hd_core_version'));
+						return $this->hdsUrlExists($config->getUrl(). '?hdcore=' . kConf::get('hd_core_version'));
 					}
 					break;
 			}
