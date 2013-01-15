@@ -5,6 +5,11 @@
  */ 
 interface ISyncableFile extends IBaseObject
 {
+	/**
+	 * @param int $sub_type
+	 * @param unknown_type $version
+	 * @return FileSyncKey
+	 */
 	public function getSyncKey( $sub_type , $version=null);
 	
 	/**
