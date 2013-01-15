@@ -32,6 +32,11 @@ abstract class kManifestRenderer
 	public $deliveryCode = '';
 	
 	/**
+	 * @var string
+	 */
+	public $defaultDeliveryCode = '';
+	
+	/**
 	 * Array of classes required for load into the renderer scope in order to expand the manifest
 	 * @var array
 	 */
@@ -86,7 +91,10 @@ abstract class kManifestRenderer
 	 */
 	final public function output($deliveryCode, $playbackContext)
 	{
-		$this->deliveryCode = $deliveryCode;		
+		$this->deliveryCode = $this->defaultDeliveryCode;
+		if ($deliveryCode)
+			$this->deliveryCode = $deliveryCode;
+				
 		if ($this->deliveryCode)
 			$this->replaceDeliveryCode();
 	

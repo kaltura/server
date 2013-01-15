@@ -1358,7 +1358,7 @@ class playManifestAction extends kalturaAction
 		$playbackCdnHost = $this->entry->getPartner()->getPlaybackCdnHost();
 		if($playbackCdnHost)
 			$this->cdnHost = preg_replace('/^https?/', $this->protocol, $playbackCdnHost);
-		
+				
 		$this->enforceEncryption();
 		$this->initFlavorAssetArray();
 		$this->initEntryDuration();
@@ -1440,7 +1440,8 @@ class playManifestAction extends kalturaAction
 		$renderer->entryId = $this->entryId;
 		$renderer->duration = $this->duration;
 		$renderer->tokenizer = $this->urlManager->getTokenizer();
-			
+		$renderer->defaultDeliveryCode = $this->entry->getPartner()->getDefaultDeliveryCode();
+		
 		// Handle caching
 		$canCacheAccessControl = false;
 		if (!$this->secureEntryHelper)
