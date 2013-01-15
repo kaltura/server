@@ -3,14 +3,18 @@
 error_reporting(E_ALL);
 
 // check for required arguments
-if ($argc < 2) {
-	die('Configuration file must be set. Please use '.basename(__FILE__).' config_file_name.ini');
+if ($argc < 2) 
+{
+	echo "Configuration file must be set.\n";
+	exit(-1);
 }
 
 // verify given ini file exists
 $iniFile = $argv[1];
-if (!file_exists($iniFile)) {
-	die('Cannot find file ['.$iniFile.']');
+if (!file_exists($iniFile)) 
+{
+	echo "Cannot find file [$iniFile]\n";
+	exit(-1);
 }
 
 // bootstrap
