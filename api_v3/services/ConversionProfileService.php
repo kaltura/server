@@ -23,17 +23,16 @@ class ConversionProfileService extends KalturaBaseService
 	 */
 	protected function partnerGroup()
 	{
-		$partnerGroup = $this->actionName;
 		if(
 			$this->actionName == 'add' ||
 			$this->actionName == 'update'
 			)
 		{
-			$partnerGroup = $this->partnerGroup . ',0';
 			assetParamsPeer::setIsDefaultInDefaultCriteria(false);
+			return $this->partnerGroup . ',0';
 		}
 		
-		return $partnerGroup;
+		return parent::partnerGroup();
 	}
 	
 	/**
