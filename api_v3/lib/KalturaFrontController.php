@@ -346,6 +346,10 @@ class KalturaFrontController
 		{
 			switch($ex->getCode())
 			{	
+				case kCoreException::PARTNER_BLOCKED:
+					$object = new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN_CONTENT_BLOCKED);
+					break;
+					
 				case kCoreException::INVALID_KS:
 					$object = new KalturaAPIException(KalturaErrors::INVALID_KS, $ex->getData(), ks::INVALID_STR, 'INVALID_STR');
 					break;
