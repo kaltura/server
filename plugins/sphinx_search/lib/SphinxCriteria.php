@@ -348,7 +348,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		// In case we have an or inside the criterion - we can't handle it.
 		if($criterion->getConjunction() ==  Criterion::ODER)
-			return;
+			return null;
 		
 		if($criterion->getComparison() == Criteria::EQUAL) {
 			$res = array();
