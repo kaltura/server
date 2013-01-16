@@ -392,7 +392,10 @@ abstract class KBatchBase implements IKalturaLogger
 	protected function checkFileExists($file, $size = null)
 	{
 		if($this->isUnitTest)
+		{
+			KalturaLog::debug("Is in unit test");
 			return true;
+		}
 
 			// If this is not a file but a directory, certain operations should be done diffrently:
 			// - size calcultions
@@ -407,7 +410,10 @@ abstract class KBatchBase implements IKalturaLogger
 			else
 				$size = kFile::fileSize($file);
 			if(! $size)
+			{
+				KalturaLog::debug("Size not found on file [$file]");
 				return false;
+			}
 		}
 		
 		$retries = ($this->taskConfig->fileExistReties ? $this->taskConfig->fileExistReties : 1);
@@ -427,6 +433,8 @@ abstract class KBatchBase implements IKalturaLogger
 			sleep($interval);
 			$retries --;
 		}
+		
+		KalturaLog::debug("Passed max retries");
 		return false;
 	}
 	
