@@ -356,8 +356,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			return $res;
 		}
 			
-		if ($criterion->getComparison() == Criteria::IN) 
-			return $criterion->getValue();
+		if ($criterion->getComparison() == Criteria::IN) {
+			$value = $criterion->getValue();
+			if(is_string($value))
+				return explode(",", $value);
+			return $value;
+		}
 		
 		return null;
 	}
