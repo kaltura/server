@@ -78,8 +78,8 @@ class kmc4Action extends kalturaAction
 			$this->useEmbedCodeProtocolHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EMBED_CODE_DEFAULT_PROTOCOL_HTTPS, $this->partner_id);
 			$this->deliveryTypes = $partner->getDeliveryTypes();
 			$this->embedCodeTypes = $partner->getEmbedCodeTypes();
-			$this->defaultDeliveryType = $partner->getDefaultDeliveryType();
-			$this->defaultEmbedCodeType = $partner->getDefaultEmbedCodeType();
+			$this->defaultDeliveryType = ($partner->getDefaultDeliveryType()) ? $partner->getDefaultDeliveryType() : 'http';
+			$this->defaultEmbedCodeType = ($partner->getDefaultEmbedCodeType()) ? $partner->getDefaultEmbedCodeType() : 'auto';
 		}
 	/** END - load partner from DB, and set templatePartnerId **/
 
