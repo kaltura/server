@@ -83,9 +83,9 @@ class DoubleClickFeed
 		$node->parentNode->removeChild($node);
 		
 		// set profile properties
-		$this->setNodeValue('/rss/channel/title', $profile->getChannelTitle());
-		$this->setNodeValue('/rss/channel/description', $profile->getChannelDescription());
-		$this->setNodeValue('/rss/channel/link', $profile->getChannelLink());
+		kXml::setNodeValue($this->xpath,'/rss/channel/title', $profile->getChannelTitle());
+		kXml::setNodeValue($this->xpath,'/rss/channel/description', $profile->getChannelDescription());
+		kXml::setNodeValue($this->xpath,'/rss/channel/link', $profile->getChannelLink());
 		
 		$this->setItemsPerPage($profile->getItemsPerPage());
 	}
@@ -123,15 +123,15 @@ class DoubleClickFeed
 	{
 		$item = $this->item->cloneNode(true);
 
-		$this->setNodeValue('guid', $values[DoubleClickDistributionField::GUID], $item);
-		$this->setNodeValue('pubDate', date('r', $values[DoubleClickDistributionField::PUB_DATE]), $item);
-		$this->setNodeValue('title', $values[DoubleClickDistributionField::TITLE], $item);
-		$this->setNodeValue('description', $values[DoubleClickDistributionField::DESCRIPTION], $item);
-		$this->setNodeValue('link', $values[DoubleClickDistributionField::LINK], $item);
-		$this->setNodeValue('author', $values[DoubleClickDistributionField::AUTHOR], $item);
-		$this->setNodeValue('media:title', $values[DoubleClickDistributionField::TITLE], $item);
-		$this->setNodeValue('media:description', $values[DoubleClickDistributionField::DESCRIPTION], $item);
-		$this->setNodeValue('media:keywords', $values[DoubleClickDistributionField::KEYWORDS], $item);
+		kXml::setNodeValue($this->xpath,'guid', $values[DoubleClickDistributionField::GUID], $item);
+		kXml::setNodeValue($this->xpath,'pubDate', date('r', $values[DoubleClickDistributionField::PUB_DATE]), $item);
+		kXml::setNodeValue($this->xpath,'title', $values[DoubleClickDistributionField::TITLE], $item);
+		kXml::setNodeValue($this->xpath,'description', $values[DoubleClickDistributionField::DESCRIPTION], $item);
+		kXml::setNodeValue($this->xpath,'link', $values[DoubleClickDistributionField::LINK], $item);
+		kXml::setNodeValue($this->xpath,'author', $values[DoubleClickDistributionField::AUTHOR], $item);
+		kXml::setNodeValue($this->xpath,'media:title', $values[DoubleClickDistributionField::TITLE], $item);
+		kXml::setNodeValue($this->xpath,'media:description', $values[DoubleClickDistributionField::DESCRIPTION], $item);
+		kXml::setNodeValue($this->xpath,'media:keywords', $values[DoubleClickDistributionField::KEYWORDS], $item);
 
 		$categories = explode(',', $values[DoubleClickDistributionField::CATEGORIES]);
 		foreach($categories as $category)
@@ -146,8 +146,8 @@ class DoubleClickFeed
 				$mediaGroupNode->appendChild($categoryNode);
 		}
 
-		$this->setNodeValue('dfpvideo:contentID', $values[DoubleClickDistributionField::GUID], $item);
-		$this->setNodeValue('dfpvideo:monetizable', $values[DoubleClickDistributionField::MONETIZABLE], $item);
+		kXml::setNodeValue($this->xpath,'dfpvideo:contentID', $values[DoubleClickDistributionField::GUID], $item);
+		kXml::setNodeValue($this->xpath,'dfpvideo:monetizable', $values[DoubleClickDistributionField::MONETIZABLE], $item);
 
 		$statsNode = $this->xpath->query('dfpvideo:stats', $item)->item(0);
 		$this->setOptionalAttribute($statsNode, 'totalViewCount', $values[DoubleClickDistributionField::TOTAL_VIEW_COUNT]);
@@ -236,7 +236,7 @@ class DoubleClickFeed
 			$times[] = floor($cuePoint->getStartTime() / 1000);
 		}
 		
-		$this->setNodeValue('dfpvideo:cuepoints', implode(',', $times), $item);
+		kXml::setNodeValue($this->xpath,'dfpvideo:cuepoints', implode(',', $times), $item);
 	}
 	
 	/**
@@ -276,14 +276,14 @@ class DoubleClickFeed
 					break;
 			} 
 			
-			$this->setNodeValue('@url', $url, $content);
-			$this->setNodeValue('@type', $type, $content);
-			$this->setNodeValue('@fileSize', (int)$flavorAsset->getSize(), $content);
-			$this->setNodeValue('@duration', (int)$flavorAsset->getentry()->getDuration(), $content);
-			$this->setNodeValue('@width', $flavorAsset->getWidth(), $content);
-			$this->setNodeValue('@height', $flavorAsset->getHeight(), $content);
-			$this->setNodeValue('@bitrate', $flavorAsset->getBitrate(), $content);
-			$this->setNodeValue('@isDefault', ($first) ? 'true' : 'false', $content);
+			kXml::setNodeValue($this->xpath,'@url', $url, $content);
+			kXml::setNodeValue($this->xpath,'@type', $type, $content);
+			kXml::setNodeValue($this->xpath,'@fileSize', (int)$flavorAsset->getSize(), $content);
+			kXml::setNodeValue($this->xpath,'@duration', (int)$flavorAsset->getentry()->getDuration(), $content);
+			kXml::setNodeValue($this->xpath,'@width', $flavorAsset->getWidth(), $content);
+			kXml::setNodeValue($this->xpath,'@height', $flavorAsset->getHeight(), $content);
+			kXml::setNodeValue($this->xpath,'@bitrate', $flavorAsset->getBitrate(), $content);
+			kXml::setNodeValue($this->xpath,'@isDefault', ($first) ? 'true' : 'false', $content);
 			$first = false;
 		}
 	}
@@ -301,25 +301,25 @@ class DoubleClickFeed
 			$mediaGroup->appendChild($content);
 			$url = $this->getAssetUrl($thumbAsset);
 			
-			$this->setNodeValue('@url', $url, $content);
-			$this->setNodeValue('@width', $thumbAsset->getWidth(), $content);
-			$this->setNodeValue('@height', $thumbAsset->getHeight(), $content);
+			kXml::setNodeValue($this->xpath,'@url', $url, $content);
+			kXml::setNodeValue($this->xpath,'@width', $thumbAsset->getWidth(), $content);
+			kXml::setNodeValue($this->xpath,'@height', $thumbAsset->getHeight(), $content);
 		}
 	}
 	
 	public function setTotalResult($v)
 	{
-		$this->setNodeValue('/rss/channel/openSearch:totalResults', $v);
+		kXml::setNodeValue($this->xpath,'/rss/channel/openSearch:totalResults', $v);
 	}
 	
 	public function setStartIndex($v)
 	{
-		$this->setNodeValue('/rss/channel/openSearch:startIndex', $v);
+		kXml::setNodeValue($this->xpath,'/rss/channel/openSearch:startIndex', $v);
 	}
 	
 	public function setItemsPerPage($v)
 	{
-		$this->setNodeValue('/rss/channel/openSearch:itemsPerPage', $v);
+		kXml::setNodeValue($this->xpath,'/rss/channel/openSearch:itemsPerPage', $v);
 	}
 	
 	public function setSelfLink($href)

@@ -85,16 +85,16 @@ class TVComFeed
 	{
 		$this->distributionProfile = $profile;
 		
-		$this->setNodeValue('/rss/channel/title', $profile->getFeedTitle());
-		$this->setNodeValue('/rss/channel/link', htmlentities($profile->getFeedLink()));
-		$this->setNodeValue('/rss/channel/description', $profile->getFeedDescription());
-		$this->setNodeValue('/rss/channel/language', $profile->getFeedLanguage());
-		$this->setNodeValue('/rss/channel/copyright', $profile->getFeedCopyright());
-		$this->setNodeValue('/rss/channel/image/title', $profile->getFeedImageTitle());
-		$this->setNodeValue('/rss/channel/image/url', $profile->getFeedImageUrl());
-		$this->setNodeValue('/rss/channel/image/link', $profile->getFeedImageLink());
-		$this->setNodeValue('/rss/channel/image/width', $profile->getFeedImageWidth());
-		$this->setNodeValue('/rss/channel/image/height', $profile->getFeedImageHeight());
+		kXml::setNodeValue($this->xpath,'/rss/channel/title', $profile->getFeedTitle());
+		kXml::setNodeValue($this->xpath,'/rss/channel/link', htmlentities($profile->getFeedLink()));
+		kXml::setNodeValue($this->xpath,'/rss/channel/description', $profile->getFeedDescription());
+		kXml::setNodeValue($this->xpath,'/rss/channel/language', $profile->getFeedLanguage());
+		kXml::setNodeValue($this->xpath,'/rss/channel/copyright', $profile->getFeedCopyright());
+		kXml::setNodeValue($this->xpath,'/rss/channel/image/title', $profile->getFeedImageTitle());
+		kXml::setNodeValue($this->xpath,'/rss/channel/image/url', $profile->getFeedImageUrl());
+		kXml::setNodeValue($this->xpath,'/rss/channel/image/link', $profile->getFeedImageLink());
+		kXml::setNodeValue($this->xpath,'/rss/channel/image/width', $profile->getFeedImageWidth());
+		kXml::setNodeValue($this->xpath,'/rss/channel/image/height', $profile->getFeedImageHeight());
 	}
 	
 	public function addItemXml($xml)
@@ -129,33 +129,33 @@ class TVComFeed
 		
 		$pubDate = date('c', $values[TVComDistributionField::ITEM_PUB_DATE]);
 		$expDate = date('c', $values[TVComDistributionField::ITEM_EXP_DATE]);
-		$node = $this->setNodeValue('guid', $values[TVComDistributionField::GUID_ID], $item);
-		$node = $this->setNodeValue('pubDate', $pubDate, $item);
-		$node = $this->setNodeValue('expDate', $expDate, $item);
-		$node = $this->setNodeValue('link', $values[TVComDistributionField::ITEM_LINK], $item);
-		$node = $this->setNodeValue('media:group/media:title', $values[TVComDistributionField::MEDIA_TITLE], $item);
-		$node = $this->setNodeValue('media:group/media:description', $values[TVComDistributionField::MEDIA_DESCRIPTION], $item);
-		$node = $this->setNodeValue('media:group/media:keywords', $values[TVComDistributionField::MEDIA_KEYWORDS], $item);
-		$node = $this->setNodeValue('media:group/media:copyright', $values[TVComDistributionField::MEDIA_COPYRIGHT], $item);
-		$node = $this->setNodeValue('media:group/media:rating', $values[TVComDistributionField::MEDIA_RATING], $item);
-		$node = $this->setNodeValue('media:group/media:restriction/@relationship', $values[TVComDistributionField::MEDIA_RESTRICTION_TYPE], $item);
-		$node = $this->setNodeValue('media:group/media:restriction', $values[TVComDistributionField::MEDIA_RESTRICTION_COUNTRIES], $item);
-		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:show-tmsid\']', $values[TVComDistributionField::MEDIA_CATEGORY_SHOW_TMSID], $item);
-		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:show-tmsid\']/@label', $values[TVComDistributionField::MEDIA_CATEGORY_SHOW_TMSID_LABEL], $item);
-		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:episode-tmsid\']', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_TMSID], $item);
-		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:episode-tmsid\']/@label', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_TMSID_LABEL], $item);
-		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:episodetype\']', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_TYPE], $item);
-		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:original_air_date\']', $values[TVComDistributionField::MEDIA_CATEGORY_ORIGINAL_AIR_DATE], $item);
-		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:video_format\']', $values[TVComDistributionField::MEDIA_CATEGORY_VIDEO_FORMAT], $item);
-		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:season_number\']', $values[TVComDistributionField::MEDIA_CATEGORY_SEASON_NUMBER], $item);
-		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:episode_number\']', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_NUMBER], $item);
+		$node = kXml::setNodeValue($this->xpath,'guid', $values[TVComDistributionField::GUID_ID], $item);
+		$node = kXml::setNodeValue($this->xpath,'pubDate', $pubDate, $item);
+		$node = kXml::setNodeValue($this->xpath,'expDate', $expDate, $item);
+		$node = kXml::setNodeValue($this->xpath,'link', $values[TVComDistributionField::ITEM_LINK], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:title', $values[TVComDistributionField::MEDIA_TITLE], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:description', $values[TVComDistributionField::MEDIA_DESCRIPTION], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:keywords', $values[TVComDistributionField::MEDIA_KEYWORDS], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:copyright', $values[TVComDistributionField::MEDIA_COPYRIGHT], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:rating', $values[TVComDistributionField::MEDIA_RATING], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:restriction/@relationship', $values[TVComDistributionField::MEDIA_RESTRICTION_TYPE], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:restriction', $values[TVComDistributionField::MEDIA_RESTRICTION_COUNTRIES], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:category[@scheme=\'urn:tvcom:show-tmsid\']', $values[TVComDistributionField::MEDIA_CATEGORY_SHOW_TMSID], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:category[@scheme=\'urn:tvcom:show-tmsid\']/@label', $values[TVComDistributionField::MEDIA_CATEGORY_SHOW_TMSID_LABEL], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:category[@scheme=\'urn:tvcom:episode-tmsid\']', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_TMSID], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:category[@scheme=\'urn:tvcom:episode-tmsid\']/@label', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_TMSID_LABEL], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:category[@scheme=\'urn:tvcom:episodetype\']', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_TYPE], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:category[@scheme=\'urn:tvcom:original_air_date\']', $values[TVComDistributionField::MEDIA_CATEGORY_ORIGINAL_AIR_DATE], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:category[@scheme=\'urn:tvcom:video_format\']', $values[TVComDistributionField::MEDIA_CATEGORY_VIDEO_FORMAT], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:category[@scheme=\'urn:tvcom:season_number\']', $values[TVComDistributionField::MEDIA_CATEGORY_SEASON_NUMBER], $item);
+		$node = kXml::setNodeValue($this->xpath,'media:group/media:category[@scheme=\'urn:tvcom:episode_number\']', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_NUMBER], $item);
 		
 		$dcTerms = "start=$pubDate; end=$expDate; scheme=W3C-DTF";
-		$node = $this->setNodeValue('dcterms:valid', $dcTerms, $item);
+		$node = kXml::setNodeValue($this->xpath,'dcterms:valid', $dcTerms, $item);
 
 		if ($flavorAsset)
 		{
-			$node = $this->setNodeValue('media:group/media:content/@url', $this->getAssetUrl($flavorAsset), $item);
+			$node = kXml::setNodeValue($this->xpath,'media:group/media:content/@url', $this->getAssetUrl($flavorAsset), $item);
 			$type = '';
 			switch ($flavorAsset->getFileExt())
 			{
@@ -166,17 +166,17 @@ class TVComFeed
 					$type = 'video/x-flv';
 					break;
 			} 
-			$node = $this->setNodeValue('media:group/media:content/@type', $type, $item);
-			$node = $this->setNodeValue('media:group/media:content/@fileSize', $flavorAsset->getSize(), $item);
-			$node = $this->setNodeValue('media:group/media:content/@expression', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_TYPE], $item);
-			$node = $this->setNodeValue('media:group/media:content/@duration', floor($flavorAsset->getentry()->getDuration()), $item);
+			$node = kXml::setNodeValue($this->xpath,'media:group/media:content/@type', $type, $item);
+			$node = kXml::setNodeValue($this->xpath,'media:group/media:content/@fileSize', $flavorAsset->getSize(), $item);
+			$node = kXml::setNodeValue($this->xpath,'media:group/media:content/@expression', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_TYPE], $item);
+			$node = kXml::setNodeValue($this->xpath,'media:group/media:content/@duration', floor($flavorAsset->getentry()->getDuration()), $item);
 		}
 		
 		if ($thumbAsset)
 		{
-			$node = $this->setNodeValue('media:group/media:thumbnail/@url', $this->getAssetUrl($thumbAsset), $item);
-			$node = $this->setNodeValue('media:group/media:thumbnail/@width', $thumbAsset->getWidth(), $item);
-			$node = $this->setNodeValue('media:group/media:thumbnail/@height', $thumbAsset->getHeight(), $item);
+			$node = kXml::setNodeValue($this->xpath,'media:group/media:thumbnail/@url', $this->getAssetUrl($thumbAsset), $item);
+			$node = kXml::setNodeValue($this->xpath,'media:group/media:thumbnail/@width', $thumbAsset->getWidth(), $item);
+			$node = kXml::setNodeValue($this->xpath,'media:group/media:thumbnail/@height', $thumbAsset->getHeight(), $item);
 		}
 		if(is_array($additionalAssets)){
 			foreach ($additionalAssets as $additionalAsset){

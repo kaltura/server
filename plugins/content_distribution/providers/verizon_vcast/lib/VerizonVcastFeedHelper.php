@@ -102,7 +102,7 @@ class VerizonVcastFeedHelper
 		{
 			$imageNode = $this->_imageNode->cloneNode(true);
 			$url = $this->getAssetUrl($thumbnailAsset);
-			$this->setNodeValue('ns2:url', $url, $imageNode);
+			kXml::setNodeValue($this->xpath,'ns2:url', $url, $imageNode);
 			$priorityNode = $this->_xpath->query('//ns2:priority')->item(0);
 			$channelNode = $this->_xpath->query('//ns2:channel')->item(0);
 			$channelNode->insertBefore($imageNode, $priorityNode);
@@ -112,11 +112,11 @@ class VerizonVcastFeedHelper
 		{
 			$itemNode = $this->_itemNode->cloneNode(true);
 			$url = $this->getAssetUrl($flavorAsset);
-			$this->setNodeValue('ns2:enclosure/@url', $url, $itemNode);
+			kXml::setNodeValue($this->xpath,'ns2:enclosure/@url', $url, $itemNode);
 			if ($this->shouldIngestFlavor($flavorAsset))
 			{
-				$this->setNodeValue('ns2:encode', 'Y', $itemNode);
-				$this->setNodeValue('ns2:move', 'Y', $itemNode);
+				kXml::setNodeValue($this->xpath,'ns2:encode', 'Y', $itemNode);
+				kXml::setNodeValue($this->xpath,'ns2:move', 'Y', $itemNode);
 			}
 			$channelNode = $this->_xpath->query('//ns2:channel')->item(0);
 			$channelNode->appendChild($itemNode);
@@ -207,14 +207,14 @@ class VerizonVcastFeedHelper
 			// force time zone to EST
 			$dateTime->setTimezone(new DateTimeZone('EST'));
 			$date = $dateTime->format('c');
-			$this->setNodeValue($xpath, $date);
+			kXml::setNodeValue($this->xpath,$xpath, $date);
 		}
 	}
 	
 	protected function setNodeValueShortDateFieldConfigId($xpath, $fieldConfigId)
 	{
 		if (isset($this->_fieldValues[$fieldConfigId]))
-			$this->setNodeValue($xpath, date('Y-m-d', $this->_fieldValues[$fieldConfigId]));
+			kXml::setNodeValue($this->xpath,$xpath, date('Y-m-d', $this->_fieldValues[$fieldConfigId]));
 	}
 	
 	/**
@@ -224,7 +224,7 @@ class VerizonVcastFeedHelper
 	public function setNodeValueFieldConfigId($xpath, $fieldConfigId)
 	{
 		if (isset($this->_fieldValues[$fieldConfigId]))
-			$this->setNodeValue($xpath, $this->_fieldValues[$fieldConfigId]);
+			kXml::setNodeValue($this->xpath,$xpath, $this->_fieldValues[$fieldConfigId]);
 	}
 	
 	/**
@@ -235,7 +235,7 @@ class VerizonVcastFeedHelper
 	{
 		if (isset($this->_fieldValues[$fieldConfigId]) && $this->_fieldValues[$fieldConfigId])
 		{
-			$this->setNodeValue($xpath, $this->_fieldValues[$fieldConfigId]);
+			kXml::setNodeValue($this->xpath,$xpath, $this->_fieldValues[$fieldConfigId]);
 		}
 		else 
 		{

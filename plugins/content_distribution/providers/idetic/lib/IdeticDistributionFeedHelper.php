@@ -66,63 +66,63 @@ class IdeticDistributionFeedHelper
 	
 	public function setStartTime($value)
 	{
-		$this->setNodeValue('/ProgramDescription/ProgramLocationTable/ProgramLocation/OnDemandProgram/StartOfAvailability', $value);
+		kXml::setNodeValue($this->xpath,'/ProgramDescription/ProgramLocationTable/ProgramLocation/OnDemandProgram/StartOfAvailability', $value);
 	}
 	
 	public function setEndTime($value)
 	{
-		$this->setNodeValue('/ProgramDescription/ProgramLocationTable/ProgramLocation/OnDemandProgram/EndOfAvailability', $value);
+		kXml::setNodeValue($this->xpath,'/ProgramDescription/ProgramLocationTable/ProgramLocation/OnDemandProgram/EndOfAvailability', $value);
 	}
 	
 	public function setTitle($value)
 	{
-		$this->setNodeValue('/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/Title', $value);
+		kXml::setNodeValue($this->xpath,'/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/Title', $value);
 	}
 	
 	public function setShortTitle($value)
 	{
-		$this->setNodeValue('/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/ShortTitle', $value);
+		kXml::setNodeValue($this->xpath,'/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/ShortTitle', $value);
 	}
 	
 	public function setSynopsis($value)
 	{
-		$this->setNodeValue('/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/Synopsis', $value);
+		kXml::setNodeValue($this->xpath,'/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/Synopsis', $value);
 	}
 	
 	public function setKeyword($value)
 	{
-		$this->setNodeValue('/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/Keyword', $value);
+		kXml::setNodeValue($this->xpath,'/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/Keyword', $value);
 	}
 	
 	public function setGenre($value)
 	{
-		$this->setNodeValue('/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/Genre', $value);
+		kXml::setNodeValue($this->xpath,'/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/Genre', $value);
 	}
 	
 	public function setSlot($value)
 	{
-		$this->setNodeValue('/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/Slot', $value);
+		kXml::setNodeValue($this->xpath,'/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/Slot', $value);
 	}
 	
 	public function setFolder($value)
 	{
-		$this->setNodeValue('/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/Folder', $value);
+		kXml::setNodeValue($this->xpath,'/ProgramDescription/ProgramInformationTable/ProgramInformation/BasicDescription/Folder', $value);
 	}
 		
 	public function setIndirectUploadUrl($value)
 	{
-		$this->setNodeValue('/ProgramDescription/ProgramLocationTable/ProgramLocation/OnDemandProgram/IndirectUploadURL', $value);
+		kXml::setNodeValue($this->xpath,'/ProgramDescription/ProgramLocationTable/ProgramLocation/OnDemandProgram/IndirectUploadURL', $value);
 	}
 	
 	public function setThumbnail($value)
 	{
-		$this->setNodeValue('/ProgramDescription/ProgramLocationTable/ProgramLocation/OnDemandProgram/thumbnail', $value);
+		kXml::setNodeValue($this->xpath,'/ProgramDescription/ProgramLocationTable/ProgramLocation/OnDemandProgram/thumbnail', $value);
 	}
 	
 	public function setChecksum($value)
 	{
 		//TODO: veirfy that make sense
-		$this->setNodeValue('/ProgramDescription/ProgramLocationTable/ProgramLocation/OnDemandProgram/Checksum', $value);
+		kXml::setNodeValue($this->xpath,'/ProgramDescription/ProgramLocationTable/ProgramLocation/OnDemandProgram/Checksum', $value);
 	}
 			
 }

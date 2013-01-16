@@ -114,21 +114,21 @@ class UverseFeed
 	
 	public function setChannelFields ()
 	{
-		$this->setNodeValue('/rss/channel/title', $this->distributionProfile->getChannelTitle());
-		$this->setNodeValue('/rss/channel/link', $this->distributionProfile->getChannelLink());
-		$this->setNodeValue('/rss/channel/description', $this->distributionProfile->getChannelDescription());
-		$this->setNodeValue('/rss/channel/language', $this->distributionProfile->getChannelLanguage());
-		$this->setNodeValue('/rss/channel/copyright', $this->distributionProfile->getChannelCopyright());
-		$this->setNodeValue('/rss/channel/image/title', $this->distributionProfile->getChannelImageTitle());
-		$this->setNodeValue('/rss/channel/image/url', $this->distributionProfile->getChannelImageUrl());
-		$this->setNodeValue('/rss/channel/image/link', $this->distributionProfile->getChannelImageLink());				
-		$this->setNodeValue('/rss/channel/pubDate', date('r',$this->distributionProfile->getCreatedAt(null)));
+		kXml::setNodeValue($this->xpath,'/rss/channel/title', $this->distributionProfile->getChannelTitle());
+		kXml::setNodeValue($this->xpath,'/rss/channel/link', $this->distributionProfile->getChannelLink());
+		kXml::setNodeValue($this->xpath,'/rss/channel/description', $this->distributionProfile->getChannelDescription());
+		kXml::setNodeValue($this->xpath,'/rss/channel/language', $this->distributionProfile->getChannelLanguage());
+		kXml::setNodeValue($this->xpath,'/rss/channel/copyright', $this->distributionProfile->getChannelCopyright());
+		kXml::setNodeValue($this->xpath,'/rss/channel/image/title', $this->distributionProfile->getChannelImageTitle());
+		kXml::setNodeValue($this->xpath,'/rss/channel/image/url', $this->distributionProfile->getChannelImageUrl());
+		kXml::setNodeValue($this->xpath,'/rss/channel/image/link', $this->distributionProfile->getChannelImageLink());				
+		kXml::setNodeValue($this->xpath,'/rss/channel/pubDate', date('r',$this->distributionProfile->getCreatedAt(null)));
 		
 	}
 	
 	public function setChannelLastBuildDate($lastBuildDate)
 	{
-		$this->setNodeValue('/rss/channel/lastBuildDate', date('r', $lastBuildDate));
+		kXml::setNodeValue($this->xpath,'/rss/channel/lastBuildDate', date('r', $lastBuildDate));
 	}
 	
 	/**
@@ -142,20 +142,20 @@ class UverseFeed
 		$item = $this->item->cloneNode(true);
 		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
 		$channelNode->appendChild($item);
-		$this->setNodeValue('guid', $values[UverseDistributionField::ITEM_GUID], $item);
-		$this->setNodeValue('title', $values[UverseDistributionField::ITEM_TITLE], $item);
-		$this->setNodeValue('link', $values[UverseDistributionField::ITEM_LINK], $item);
-		$this->setNodeValue('description', $values[UverseDistributionField::ITEM_DESCRIPTION], $item);
+		kXml::setNodeValue($this->xpath,'guid', $values[UverseDistributionField::ITEM_GUID], $item);
+		kXml::setNodeValue($this->xpath,'title', $values[UverseDistributionField::ITEM_TITLE], $item);
+		kXml::setNodeValue($this->xpath,'link', $values[UverseDistributionField::ITEM_LINK], $item);
+		kXml::setNodeValue($this->xpath,'description', $values[UverseDistributionField::ITEM_DESCRIPTION], $item);
 		$pubDate = date('r', $values[UverseDistributionField::ITEM_PUB_DATE]);
-		$this->setNodeValue('pubDate', $pubDate, $item);
+		kXml::setNodeValue($this->xpath,'pubDate', $pubDate, $item);
 		$endTime = date('r', $values[UverseDistributionField::ITEM_EXPIRATION_DATE]);
-		$this->setNodeValue('expirationDate', $endTime, $item);
+		kXml::setNodeValue($this->xpath,'expirationDate', $endTime, $item);
 		$origReleaseDate = date('r', $values[UverseDistributionField::ITEM_LIVE_ORIGINAL_RELEASE_DATE]);
-		$this->setNodeValue('live:origReleaseDate',$origReleaseDate, $item);
-		$this->setNodeValue('media:title', $values[UverseDistributionField::ITEM_MEDIA_TITLE], $item);
-		$this->setNodeValue('media:description', $values[UverseDistributionField::ITEM_MEDIA_DESCRIPTION], $item);
-		$this->setNodeValue('media:keywords', $values[UverseDistributionField::ITEM_MEDIA_KEYWORDS], $item);
-		$this->setNodeValue('media:rating', $values[UverseDistributionField::ITEM_MEDIA_RATING], $item);		
+		kXml::setNodeValue($this->xpath,'live:origReleaseDate',$origReleaseDate, $item);
+		kXml::setNodeValue($this->xpath,'media:title', $values[UverseDistributionField::ITEM_MEDIA_TITLE], $item);
+		kXml::setNodeValue($this->xpath,'media:description', $values[UverseDistributionField::ITEM_MEDIA_DESCRIPTION], $item);
+		kXml::setNodeValue($this->xpath,'media:keywords', $values[UverseDistributionField::ITEM_MEDIA_KEYWORDS], $item);
+		kXml::setNodeValue($this->xpath,'media:rating', $values[UverseDistributionField::ITEM_MEDIA_RATING], $item);		
 		if (!is_null($flavorAsset))
 			$this->setFlavorAsset($item, $flavorAsset, $flavorAssetRemoteUrl, $values[UverseDistributionField::ITEM_CONTENT_LANG]);
 			
@@ -164,8 +164,8 @@ class UverseFeed
 				$this->addThumbAsset($item, $thumbAsset, $values[UverseDistributionField::ITEM_THUMBNAIL_CREDIT]);
 							
 		$this->addCategory($item,$values[UverseDistributionField::ITEM_MEDIA_CATEGORY]);
-		$this->setNodeValue('media:copyright', $values[UverseDistributionField::ITEM_MEDIA_COPYRIGHT], $item);	
-		$this->setNodeValue('media:copyright/@url', $values[UverseDistributionField::ITEM_MEDIA_COPYRIGHT_URL], $item);			
+		kXml::setNodeValue($this->xpath,'media:copyright', $values[UverseDistributionField::ITEM_MEDIA_COPYRIGHT], $item);	
+		kXml::setNodeValue($this->xpath,'media:copyright/@url', $values[UverseDistributionField::ITEM_MEDIA_COPYRIGHT_URL], $item);			
 	}
 	
 	public function getAssetUrl(asset $asset)
@@ -204,12 +204,12 @@ class UverseFeed
 	
 	public function setFlavorAsset(DOMElement $item, asset $flavorAsset, $flavorAssetRemoteUrl, $lang)
 	{
-		$this->setNodeValue('media:content/@url', $flavorAssetRemoteUrl, $item);
-		$this->setNodeValue('media:content/@width', $flavorAsset->getWidth(), $item);
-		$this->setNodeValue('media:content/@height', $flavorAsset->getHeight(), $item);
-		$this->setNodeValue('media:content/@type', $this->getContentType($flavorAssetRemoteUrl), $item);
+		kXml::setNodeValue($this->xpath,'media:content/@url', $flavorAssetRemoteUrl, $item);
+		kXml::setNodeValue($this->xpath,'media:content/@width', $flavorAsset->getWidth(), $item);
+		kXml::setNodeValue($this->xpath,'media:content/@height', $flavorAsset->getHeight(), $item);
+		kXml::setNodeValue($this->xpath,'media:content/@type', $this->getContentType($flavorAssetRemoteUrl), $item);
 		if ($lang)
-			$this->setNodeValue('media:content/@lang', $lang, $item);
+			kXml::setNodeValue($this->xpath,'media:content/@lang', $lang, $item);
 	}
 	
 	protected function getContentType($url)
@@ -230,11 +230,11 @@ class UverseFeed
 		$item->appendChild($thumbnailNode);
 		$url = $this->getAssetUrl($thumbAsset);
 		
-		$this->setNodeValue('@url', $url, $thumbnailNode);
-		$this->setNodeValue('@width', $thumbAsset->getWidth(), $thumbnailNode);
-		$this->setNodeValue('@height', $thumbAsset->getHeight(), $thumbnailNode);
+		kXml::setNodeValue($this->xpath,'@url', $url, $thumbnailNode);
+		kXml::setNodeValue($this->xpath,'@width', $thumbAsset->getWidth(), $thumbnailNode);
+		kXml::setNodeValue($this->xpath,'@height', $thumbAsset->getHeight(), $thumbnailNode);
 		
 		if ($thumbnailCredit)
-			$this->setNodeValue('@credit', $thumbnailCredit, $thumbnailNode);
+			kXml::setNodeValue($this->xpath,'@credit', $thumbnailCredit, $thumbnailNode);
 	}
 }

@@ -142,15 +142,15 @@ class TimeWarnerFeed
 	{
 		$item = $this->item->cloneNode(true);
 		
-		$this->setNodeValue('guid', $values[TimeWarnerDistributionField::GUID], $item);
-		$this->setNodeValue('title', $values[TimeWarnerDistributionField::TITLE], $item);
-		$this->setNodeValue('description', $values[TimeWarnerDistributionField::DESCRIPTION], $item);
-		$this->setNodeValue('author', $values[TimeWarnerDistributionField::AUTHOR], $item);
-		$this->setNodeValue('pubDate', $this->formatTimeWarnerDate($values[TimeWarnerDistributionField::PUB_DATE]), $item);
+		kXml::setNodeValue($this->xpath,'guid', $values[TimeWarnerDistributionField::GUID], $item);
+		kXml::setNodeValue($this->xpath,'title', $values[TimeWarnerDistributionField::TITLE], $item);
+		kXml::setNodeValue($this->xpath,'description', $values[TimeWarnerDistributionField::DESCRIPTION], $item);
+		kXml::setNodeValue($this->xpath,'author', $values[TimeWarnerDistributionField::AUTHOR], $item);
+		kXml::setNodeValue($this->xpath,'pubDate', $this->formatTimeWarnerDate($values[TimeWarnerDistributionField::PUB_DATE]), $item);
 		
-		$this->setNodeValue('media:copyright', $values[TimeWarnerDistributionField::MEDIA_COPYRIGHT], $item);
-		$this->setNodeValue('media:keywords', $values[TimeWarnerDistributionField::MEDIA_KEYWORDS], $item);
-		$this->setNodeValue('media:rating', $values[TimeWarnerDistributionField::MEDIA_RATING], $item);
+		kXml::setNodeValue($this->xpath,'media:copyright', $values[TimeWarnerDistributionField::MEDIA_COPYRIGHT], $item);
+		kXml::setNodeValue($this->xpath,'media:keywords', $values[TimeWarnerDistributionField::MEDIA_KEYWORDS], $item);
+		kXml::setNodeValue($this->xpath,'media:rating', $values[TimeWarnerDistributionField::MEDIA_RATING], $item);
 
 		//handle category
 		$this->addCategory($item,'CT-'.$values[TimeWarnerDistributionField::MEDIA_CATEGORY_CT]);
@@ -169,21 +169,21 @@ class TimeWarnerFeed
 		}				
 		
 		
-		$this->setNodeValue('plmedia:approved', $values[TimeWarnerDistributionField::PLMEDIA_APPROVED], $item);
+		kXml::setNodeValue($this->xpath,'plmedia:approved', $values[TimeWarnerDistributionField::PLMEDIA_APPROVED], $item);
 		
-		$this->setNodeValue('twcable:episodeNumber', $values[TimeWarnerDistributionField::CABLE_EPISODE_NUMBER], $item);
-		$this->setNodeValue('twcable:externalID', $values[TimeWarnerDistributionField::CABLE_EXTERNAL_ID], $item);
-		$this->setNodeValue('twcable:productionDate', $values[TimeWarnerDistributionField::CABLE_PRODUCTION_DATE], $item);
-		$this->setNodeValue('twcable:network', $values[TimeWarnerDistributionField::CABLE_NETWORK], $item);
-		$this->setNodeValue('twcable:provider', $values[TimeWarnerDistributionField::CABLE_PROVIDER], $item);
-		$this->setNodeValue('twcable:shortDescription', $values[TimeWarnerDistributionField::CABLE_SHORT_DESCRIPTION], $item);
-		$this->setNodeValue('twcable:shortTitle', $values[TimeWarnerDistributionField::CABLE_SHORT_TITLE], $item);
-		$this->setNodeValue('twcable:showName', $values[TimeWarnerDistributionField::CABLE_SHOW_NAME], $item);
+		kXml::setNodeValue($this->xpath,'twcable:episodeNumber', $values[TimeWarnerDistributionField::CABLE_EPISODE_NUMBER], $item);
+		kXml::setNodeValue($this->xpath,'twcable:externalID', $values[TimeWarnerDistributionField::CABLE_EXTERNAL_ID], $item);
+		kXml::setNodeValue($this->xpath,'twcable:productionDate', $values[TimeWarnerDistributionField::CABLE_PRODUCTION_DATE], $item);
+		kXml::setNodeValue($this->xpath,'twcable:network', $values[TimeWarnerDistributionField::CABLE_NETWORK], $item);
+		kXml::setNodeValue($this->xpath,'twcable:provider', $values[TimeWarnerDistributionField::CABLE_PROVIDER], $item);
+		kXml::setNodeValue($this->xpath,'twcable:shortDescription', $values[TimeWarnerDistributionField::CABLE_SHORT_DESCRIPTION], $item);
+		kXml::setNodeValue($this->xpath,'twcable:shortTitle', $values[TimeWarnerDistributionField::CABLE_SHORT_TITLE], $item);
+		kXml::setNodeValue($this->xpath,'twcable:showName', $values[TimeWarnerDistributionField::CABLE_SHOW_NAME], $item);
 		
 		$startTime = date('c', $values[TimeWarnerDistributionField::START_TIME]);
 		$endTime = date('c', $values[TimeWarnerDistributionField::END_TIME]);
 		$dcTerms = "start=$startTime; end=$endTime;";
-		$this->setNodeValue('dcterms:valid', $dcTerms, $item);
+		kXml::setNodeValue($this->xpath,'dcterms:valid', $dcTerms, $item);
 
 		if (!is_null($flavorAssets) && is_array($flavorAssets) && count($flavorAssets)>0)
 			$this->setFlavorAsset($item, $flavorAssets);
@@ -260,7 +260,7 @@ class TimeWarnerFeed
 		$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
 		$mediaGroup->appendChild($content);
 		$url = $this->getAssetUrl($flavorAsset);
-		$this->setNodeValue('@url', $url, $content);
+		kXml::setNodeValue($this->xpath,'@url', $url, $content);
 		
 	}
 	
@@ -272,9 +272,9 @@ class TimeWarnerFeed
 		/** @var $thumbAsset thumbAsset */ 
 		$thumbAsset = $thumbAssets[0];
 		$url = $this->getAssetUrl($thumbAsset);
-		$this->setNodeValue('media:thumbnail/@url', $url, $item);
-		$this->setNodeValue('media:thumbnail/@width', $thumbAsset->getWidth(), $item);
-		$this->setNodeValue('media:thumbnail/@height', $thumbAsset->getHeight(), $item);	
+		kXml::setNodeValue($this->xpath,'media:thumbnail/@url', $url, $item);
+		kXml::setNodeValue($this->xpath,'media:thumbnail/@width', $thumbAsset->getWidth(), $item);
+		kXml::setNodeValue($this->xpath,'media:thumbnail/@height', $thumbAsset->getHeight(), $item);	
 	}
 	
 	protected function getContentTypeFromUrl($url)

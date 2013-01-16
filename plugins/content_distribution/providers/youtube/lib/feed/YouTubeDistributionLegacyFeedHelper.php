@@ -210,19 +210,19 @@ class YouTubeDistributionLegacyFeedHelper
 	public function setNodeValueOrRemove($xpath, $value)
 	{
 		if ($value)
-			$this->setNodeValue($xpath, $value);
+			kXml::setNodeValue($this->xpath,$xpath, $value);
 		else
 			$this->removeNode($xpath);
 	}
 
 	public function setAction($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:action', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:action', $value);
 	}
 
 	public function setTarget($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:target', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:target', $value);
 	}
 
 
@@ -233,12 +233,12 @@ class YouTubeDistributionLegacyFeedHelper
 
 	public function setNotificationEmail($value)
 	{
-		$this->setNodeValue('/rss/channel/yt:notification_email', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/yt:notification_email', $value);
 	}
 
 	public function setUsername($value)
 	{
-		$this->setNodeValue('/rss/channel/yt:account/yt:username', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/yt:account/yt:username', $value);
 	}
 
 	public function setPassword($value)
@@ -248,32 +248,32 @@ class YouTubeDistributionLegacyFeedHelper
 
 	public function setOwnerName($value)
 	{
-		$this->setNodeValue('/rss/channel/yt:owner_name', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/yt:owner_name', $value);
 	}
 
 	public function setStartTime($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:start_time', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:start_time', $value);
 	}
 
 	public function setEndTime($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:end_time', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:end_time', $value);
 	}
 
 	public function setTitle($value)
 	{
-		$this->setNodeValue('/rss/channel/item/media:title', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/media:title', $value);
 	}
 
 	public function setDescription($value)
 	{
-		$this->setNodeValue('/rss/channel/item/media:content/media:description', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/media:content/media:description', $value);
 	}
 
 	public function setKeywords($value)
 	{
-		$this->setNodeValue('/rss/channel/item/media:content/media:keywords', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/media:content/media:keywords', $value);
 	}
 
 	public function setDateRecorded($value)
@@ -286,117 +286,117 @@ class YouTubeDistributionLegacyFeedHelper
 
 	public function setCategory($value)
 	{
-		$this->setNodeValue('/rss/channel/item/media:content/media:category', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/media:content/media:category', $value);
 	}
 
 	public function setContentUrl($value)
 	{
-		$this->setNodeValue('/rss/channel/item/media:content/@url', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/media:content/@url', $value);
 	}
 
 	public function setThumbnailUrl($value)
 	{
-		$this->setNodeValue('/rss/channel/item/media:thumbnail/@url', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/media:thumbnail/@url', $value);
 	}
 
 	public function setWebCustomId($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:web_metadata/yt:custom_id', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:web_metadata/yt:custom_id', $value);
 	}
 
 	public function setWebNotes($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:web_metadata/yt:notes', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:web_metadata/yt:notes', $value);
 	}
 
 	public function setAllowComments($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:community/yt:allow_comments', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:community/yt:allow_comments', $value);
 	}
 
 	public function setAllowResponses($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:community/yt:allow_responses', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:community/yt:allow_responses', $value);
 	}
 
 	public function setAllowRatings($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:community/yt:allow_ratings', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:community/yt:allow_ratings', $value);
 	}
 
 	public function setAllowEmbedding($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:community/yt:allow_embedding', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:community/yt:allow_embedding', $value);
 	}
 
 	public function setLanguage($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:language', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:language', $value);
 	}
 
 	public function setRating($value)
 	{
-		$this->setNodeValue('/rss/channel/item/media:content/media:rating', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/media:content/media:rating', $value);
 	}
 
 	public function setTvCustomId($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:tv_metadata/yt:custom_id', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:tv_metadata/yt:custom_id', $value);
 	}
 
 	public function setTvEpisode($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:tv_metadata/yt:episode', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:tv_metadata/yt:episode', $value);
 	}
 
 	public function setTvEpisodeTitle($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:tv_metadata/yt:episode_title', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:tv_metadata/yt:episode_title', $value);
 	}
 
 	public function setTvShowTitle($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:tv_metadata/yt:show_title', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:tv_metadata/yt:show_title', $value);
 	}
 
 	public function setTvSeason($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:tv_metadata/yt:season', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:tv_metadata/yt:season', $value);
 	}
 
 	public function setTvNotes($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:tv_metadata/yt:notes', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:tv_metadata/yt:notes', $value);
 	}
 
 	public function setTvTmsId($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:tv_metadata/yt:tms_id', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:tv_metadata/yt:tms_id', $value);
 	}
 
 	public function setMovieCustomId($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:movie_metadata/yt:custom_id', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:movie_metadata/yt:custom_id', $value);
 	}
 
 	public function setMovieDirector($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:movie_metadata/yt:director', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:movie_metadata/yt:director', $value);
 	}
 
 	public function setMovieNotes($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:movie_metadata/yt:notes', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:movie_metadata/yt:notes', $value);
 	}
 
 	public function setMovieTitle($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:movie_metadata/yt:title', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:movie_metadata/yt:title', $value);
 	}
 
 	public function setMovieTmsId($value)
 	{
-		$this->setNodeValue('/rss/channel/item/yt:movie_metadata/yt:tms_id', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/item/yt:movie_metadata/yt:tms_id', $value);
 	}
 
 	public function setCommercialPolicy($value)

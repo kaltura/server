@@ -93,8 +93,8 @@ class UverseClickToOrderFeed
 		$parentNode = $this->xpath->query('/root')->item(0);
 		$categoryNode = $this->category->cloneNode(true);
 		$parentNode->appendChild($categoryNode);
-		$this->setNodeValue('@name', $categoryName, $categoryNode);	
-		$this->setNodeValue('@file', $categoryFile, $categoryNode);
+		kXml::setNodeValue($this->xpath,'@name', $categoryName, $categoryNode);	
+		kXml::setNodeValue($this->xpath,'@file', $categoryFile, $categoryNode);
 		
 		return $categoryNode;
 	}
@@ -104,30 +104,30 @@ class UverseClickToOrderFeed
 		$item = $this->item->cloneNode(true);
 		$categoryNode->appendChild($item);
 		
-		$this->setNodeValue('@title', $values[UverseClickToOrderDistributionField::ITEM_TITLE], $item);
-		$this->setNodeValue('@content_type', $values[UverseClickToOrderDistributionField::ITEM_CONTENT_TYPE], $item);
-		$this->setNodeValue('@file', $thumbnailFile, $item);
-		$this->setNodeValue('@destination', $values[UverseClickToOrderDistributionField::ITEM_DESTINATION], $item);
+		kXml::setNodeValue($this->xpath,'@title', $values[UverseClickToOrderDistributionField::ITEM_TITLE], $item);
+		kXml::setNodeValue($this->xpath,'@content_type', $values[UverseClickToOrderDistributionField::ITEM_CONTENT_TYPE], $item);
+		kXml::setNodeValue($this->xpath,'@file', $thumbnailFile, $item);
+		kXml::setNodeValue($this->xpath,'@destination', $values[UverseClickToOrderDistributionField::ITEM_DESTINATION], $item);
 		if (strtolower($values[UverseClickToOrderDistributionField::ITEM_CONTENT_TYPE]) == self::VIDFILE_CONTENT_TYPE) {
-		    $this->setNodeValue('@vidfile', $flavorFile, $item);
+		    kXml::setNodeValue($this->xpath,'@vidfile', $flavorFile, $item);
 		}
 		else {
 		    $item->removeAttribute('vidfile');
 		}		
-		$this->setNodeValue('@ccvidfile', $values[UverseClickToOrderDistributionField::ITEM_CCVIDFILE], $item);
-		$this->setNodeValue('content', $values[UverseClickToOrderDistributionField::ITEM_CONTENT], $item);
-		$this->setNodeValue('directions', $values[UverseClickToOrderDistributionField::ITEM_DIRECTIONS], $item);
+		kXml::setNodeValue($this->xpath,'@ccvidfile', $values[UverseClickToOrderDistributionField::ITEM_CCVIDFILE], $item);
+		kXml::setNodeValue($this->xpath,'content', $values[UverseClickToOrderDistributionField::ITEM_CONTENT], $item);
+		kXml::setNodeValue($this->xpath,'directions', $values[UverseClickToOrderDistributionField::ITEM_DIRECTIONS], $item);
 	}
 	
 	public function setBackgroudImage($widedBackgroundImageUrl = null, $standardBackgroundImageUrl = null)
 	{				
 		if ($widedBackgroundImageUrl)
 		{
-			$this->setNodeValue('background_image/@wide', $widedBackgroundImageUrl);
+			kXml::setNodeValue($this->xpath,'background_image/@wide', $widedBackgroundImageUrl);
 		}
 		if ($standardBackgroundImageUrl)
 		{	
-			$this->setNodeValue('background_image/@standard', $standardBackgroundImageUrl);
+			kXml::setNodeValue($this->xpath,'background_image/@standard', $standardBackgroundImageUrl);
 		}
 	}
 	

@@ -99,7 +99,7 @@ class AvnFeed
 	{
 		$this->distributionProfile = $profile;
 		
-		$this->setNodeValue('/rss/channel/title', $profile->getFeedTitle());
+		kXml::setNodeValue($this->xpath,'/rss/channel/title', $profile->getFeedTitle());
 		
 		$this->loadAvnCategories($profile->getPartnerId());
 	}
@@ -129,31 +129,31 @@ class AvnFeed
 		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
 		$channelNode->appendChild($item);
 		
-		$this->setNodeValue('guid', $values[AvnDistributionField::GUID], $item);
-		$this->setNodeValue('pubDate', $values[AvnDistributionField::PUB_DATE], $item);
-		$this->setNodeValue('title', $values[AvnDistributionField::TITLE], $item);
-		$this->setNodeValue('description', $values[AvnDistributionField::DESCRIPTION], $item);
-		$this->setNodeValue('link', $values[AvnDistributionField::LINK], $item);
-		$this->setNodeValue('category', $values[AvnDistributionField::CATEGORY], $item);
+		kXml::setNodeValue($this->xpath,'guid', $values[AvnDistributionField::GUID], $item);
+		kXml::setNodeValue($this->xpath,'pubDate', $values[AvnDistributionField::PUB_DATE], $item);
+		kXml::setNodeValue($this->xpath,'title', $values[AvnDistributionField::TITLE], $item);
+		kXml::setNodeValue($this->xpath,'description', $values[AvnDistributionField::DESCRIPTION], $item);
+		kXml::setNodeValue($this->xpath,'link', $values[AvnDistributionField::LINK], $item);
+		kXml::setNodeValue($this->xpath,'category', $values[AvnDistributionField::CATEGORY], $item);
 		
-		$this->setNodeValue('amg:passthru', $this->getPassthruJsonObj($values), $item);
+		kXml::setNodeValue($this->xpath,'amg:passthru', $this->getPassthruJsonObj($values), $item);
 		
 		if ($flavorAsset)
 		{
 			$url = $this->getAssetUrl($flavorAsset);
 			$type = $this->getContentTypeFromUrl($url);
 			
-			$this->setNodeValue('media:content/@url', $url, $item);
-			$this->setNodeValue('media:content/@type', $type, $item);
+			kXml::setNodeValue($this->xpath,'media:content/@url', $url, $item);
+			kXml::setNodeValue($this->xpath,'media:content/@type', $type, $item);
 			if ($values[AvnDistributionField::ORDER_SUB] == '1')
-				$this->setNodeValue('media:content/@isDefault', 'true', $item);
+				kXml::setNodeValue($this->xpath,'media:content/@isDefault', 'true', $item);
 			else
-				$this->setNodeValue('media:content/@isDefault', 'false', $item);
+				kXml::setNodeValue($this->xpath,'media:content/@isDefault', 'false', $item);
 		}
 		
 		if ($thumbAsset)
 		{
-			$this->setNodeValue('media:thumbnail/@url', $this->getAssetUrl($thumbAsset), $item);
+			kXml::setNodeValue($this->xpath,'media:thumbnail/@url', $this->getAssetUrl($thumbAsset), $item);
 		}
 	}
 	

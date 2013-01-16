@@ -135,13 +135,13 @@ class ComcastMrssFeed
 	{
 		$this->distributionProfile = $profile;
 		
-		$this->setNodeValue('/rss/channel/title', $profile->getFeedTitle());
+		kXml::setNodeValue($this->xpath,'/rss/channel/title', $profile->getFeedTitle());
 		if ($profile->getFeedLink())
-			$this->setNodeValue('/rss/channel/link', $profile->getFeedLink());
+			kXml::setNodeValue($this->xpath,'/rss/channel/link', $profile->getFeedLink());
 		else
 			$this->removeNode('/rss/channel/link');
-		$this->setNodeValue('/rss/channel/description', $profile->getFeedDescription());
-		$this->setNodeValue('/rss/channel/lastBuildDate', $profile->getFeedLastBuildDate());
+		kXml::setNodeValue($this->xpath,'/rss/channel/description', $profile->getFeedDescription());
+		kXml::setNodeValue($this->xpath,'/rss/channel/lastBuildDate', $profile->getFeedLastBuildDate());
 	}
 	
 	
@@ -177,20 +177,20 @@ class ComcastMrssFeed
 	{
 		$item = $this->item->cloneNode(true);
 		
-		$this->setNodeValue('title', $values[ComcastMrssDistributionField::TITLE], $item);
-		$this->setNodeValue('description', $values[ComcastMrssDistributionField::DESCRIPTION], $item);
+		kXml::setNodeValue($this->xpath,'title', $values[ComcastMrssDistributionField::TITLE], $item);
+		kXml::setNodeValue($this->xpath,'description', $values[ComcastMrssDistributionField::DESCRIPTION], $item);
 		if ($values[ComcastMrssDistributionField::LINK])
-			$this->setNodeValue('link', $values[ComcastMrssDistributionField::LINK], $item);
+			kXml::setNodeValue($this->xpath,'link', $values[ComcastMrssDistributionField::LINK], $item);
 		else
 			$this->removeNode('link', $item);
-		$this->setNodeValue('pubDate', $this->formatComcastDate($values[ComcastMrssDistributionField::PUB_DATE]), $item);
-		$this->setNodeValue('lastBuildDate', $this->formatComcastDate($values[ComcastMrssDistributionField::LAST_BUILD_DATE]), $item);
-		$this->setNodeValue('guid', $values[ComcastMrssDistributionField::GUID_ID], $item);
-		$this->setNodeValue('media:group/media:rating', $values[ComcastMrssDistributionField::MEDIA_RATING], $item);
-		$this->setNodeValue('media:group/media:keywords', $values[ComcastMrssDistributionField::MEDIA_KEYWORDS], $item);
-		$this->setNodeValue('cim:link', $values[ComcastMrssDistributionField::COMCAST_LINK], $item);
-		$this->setNodeValue('cim:brand', $values[ComcastMrssDistributionField::COMCAST_BRAND], $item);
-		$this->setNodeValue('cim:videoContentType', $values[ComcastMrssDistributionField::COMCAST_VIDEO_CONTENT_TYPE], $item);
+		kXml::setNodeValue($this->xpath,'pubDate', $this->formatComcastDate($values[ComcastMrssDistributionField::PUB_DATE]), $item);
+		kXml::setNodeValue($this->xpath,'lastBuildDate', $this->formatComcastDate($values[ComcastMrssDistributionField::LAST_BUILD_DATE]), $item);
+		kXml::setNodeValue($this->xpath,'guid', $values[ComcastMrssDistributionField::GUID_ID], $item);
+		kXml::setNodeValue($this->xpath,'media:group/media:rating', $values[ComcastMrssDistributionField::MEDIA_RATING], $item);
+		kXml::setNodeValue($this->xpath,'media:group/media:keywords', $values[ComcastMrssDistributionField::MEDIA_KEYWORDS], $item);
+		kXml::setNodeValue($this->xpath,'cim:link', $values[ComcastMrssDistributionField::COMCAST_LINK], $item);
+		kXml::setNodeValue($this->xpath,'cim:brand', $values[ComcastMrssDistributionField::COMCAST_BRAND], $item);
+		kXml::setNodeValue($this->xpath,'cim:videoContentType', $values[ComcastMrssDistributionField::COMCAST_VIDEO_CONTENT_TYPE], $item);
 		
 		/*
 		$categories = explode(',', $values[ComcastMrssDistributionField::MEDIA_CATEGORIES]);
@@ -205,13 +205,13 @@ class ComcastMrssFeed
 		$categoryNode->nodeValue = $values[ComcastMrssDistributionField::MEDIA_CATEGORY];
 		$item->appendChild($categoryNode);
 		
-		$this->setNodeValue('cim:tvSeries/@name', $values[ComcastMrssDistributionField::COMCAST_TV_SERIES], $item);
-		$this->setNodeValue('cim:tvSeries/@id', $this->getTvSeriesId($values[ComcastMrssDistributionField::COMCAST_TV_SERIES]), $item);
+		kXml::setNodeValue($this->xpath,'cim:tvSeries/@name', $values[ComcastMrssDistributionField::COMCAST_TV_SERIES], $item);
+		kXml::setNodeValue($this->xpath,'cim:tvSeries/@id', $this->getTvSeriesId($values[ComcastMrssDistributionField::COMCAST_TV_SERIES]), $item);
 		
 		$startTime = date('c', $values[ComcastMrssDistributionField::START_TIME]);
 		$endTime = date('c', $values[ComcastMrssDistributionField::END_TIME]);
 		$dcTerms = "start=$startTime; end=$endTime; scheme=W3C-DTF";
-		$this->setNodeValue('dcterms:valid', $dcTerms, $item);
+		kXml::setNodeValue($this->xpath,'dcterms:valid', $dcTerms, $item);
 
 		if (is_array($flavorAssets))
 			$this->setFlavorAssets($item, $flavorAssets);
@@ -271,13 +271,13 @@ class ComcastMrssFeed
 					$mimeType = '';
 			}
 			
-			$this->setNodeValue('@url', $url, $content);
-			$this->setNodeValue('@type', $mimeType, $content);
-			$this->setNodeValue('@fileSize', (int)$flavorAsset->getSize(), $content);
-			$this->setNodeValue('@duration', (int)$flavorAsset->getentry()->getDuration(), $content);
-			$this->setNodeValue('@width', $flavorAsset->getWidth(), $content);
-			$this->setNodeValue('@height', $flavorAsset->getHeight(), $content);
-			$this->setNodeValue('@bitrate', $flavorAsset->getBitrate(), $content);
+			kXml::setNodeValue($this->xpath,'@url', $url, $content);
+			kXml::setNodeValue($this->xpath,'@type', $mimeType, $content);
+			kXml::setNodeValue($this->xpath,'@fileSize', (int)$flavorAsset->getSize(), $content);
+			kXml::setNodeValue($this->xpath,'@duration', (int)$flavorAsset->getentry()->getDuration(), $content);
+			kXml::setNodeValue($this->xpath,'@width', $flavorAsset->getWidth(), $content);
+			kXml::setNodeValue($this->xpath,'@height', $flavorAsset->getHeight(), $content);
+			kXml::setNodeValue($this->xpath,'@bitrate', $flavorAsset->getBitrate(), $content);
 		}
 	}
 	
@@ -294,9 +294,9 @@ class ComcastMrssFeed
 			$mediaGroup->appendChild($content);
 			$url = $this->getAssetUrl($thumbAsset);
 			
-			$this->setNodeValue('@url', $url, $content);
-			$this->setNodeValue('@width', $thumbAsset->getWidth(), $content);
-			$this->setNodeValue('@height', $thumbAsset->getHeight(), $content);
+			kXml::setNodeValue($this->xpath,'@url', $url, $content);
+			kXml::setNodeValue($this->xpath,'@width', $thumbAsset->getWidth(), $content);
+			kXml::setNodeValue($this->xpath,'@height', $thumbAsset->getHeight(), $content);
 		}
 	}
 	

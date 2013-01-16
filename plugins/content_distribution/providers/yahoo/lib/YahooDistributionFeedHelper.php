@@ -155,17 +155,17 @@ class YahooDistributionFeedHelper
 	
 	public function setContactTelephone($value)
 	{
-		$this->setNodeValue('/CMSFEED/CONTACT/@TELEPHONE', $value);
+		kXml::setNodeValue($this->xpath,'/CMSFEED/CONTACT/@TELEPHONE', $value);
 	}
 	
 	public function setContactEmail($value)
 	{
-		$this->setNodeValue('/CMSFEED/CONTACT/@EMAIL', $value);
+		kXml::setNodeValue($this->xpath,'/CMSFEED/CONTACT/@EMAIL', $value);
 	}
 		
 	public function setVideoType($value)
 	{
-		$this->setNodeValue('/CMSFEED/VIDEO/@TYPE', $value);
+		kXml::setNodeValue($this->xpath,'/CMSFEED/VIDEO/@TYPE', $value);
 	}
 	
 	public function setVideoModifiedDate($value)
@@ -173,23 +173,23 @@ class YahooDistributionFeedHelper
 		$dateTime = new DateTime('@'.$value);
 		$dateTime->setTimezone(new DateTimeZone(self::VIDEO_TIME_ZONE));
 		$date = $dateTime->format(self::VIDEO_TIME_FORMAT);
-		$this->setNodeValue('/CMSFEED/FEEDITEM/MODIFIEDDATE', $date);
-		$this->setNodeValue('/CMSFEED/FEEDITEM/MODIFIEDDATE/@TZ', self::VIDEO_TIME_ZONE_CODE);	
+		kXml::setNodeValue($this->xpath,'/CMSFEED/FEEDITEM/MODIFIEDDATE', $date);
+		kXml::setNodeValue($this->xpath,'/CMSFEED/FEEDITEM/MODIFIEDDATE/@TZ', self::VIDEO_TIME_ZONE_CODE);	
 	}
 		
 	public function setVideoFeedItemId($value)
 	{		
-		$this->setNodeValue('/CMSFEED/FEEDITEM/@ID', $value);
+		kXml::setNodeValue($this->xpath,'/CMSFEED/FEEDITEM/@ID', $value);
 	}
 	
 	public function setVideoTitle($value)
 	{
-		$this->setNodeValue('/CMSFEED/FEEDITEM/TITLE', $value);
+		kXml::setNodeValue($this->xpath,'/CMSFEED/FEEDITEM/TITLE', $value);
 	}
 	
 	public function setVideoDescription($value)
 	{
-		$this->setNodeValue('/CMSFEED/FEEDITEM/DESCRIPTION', $value);
+		kXml::setNodeValue($this->xpath,'/CMSFEED/FEEDITEM/DESCRIPTION', $value);
 	}
 	
 	public function setVideoCategories($value)
@@ -204,7 +204,7 @@ class YahooDistributionFeedHelper
 			{
 				if ($category){
 					$routingContentNode = $node->cloneNode(true);									
-					$this->setNodeValue('.', $category, $routingContentNode);					
+					kXml::setNodeValue($this->xpath,'.', $category, $routingContentNode);					
 					$parentNode->insertBefore($routingContentNode,$node);
 				}
 			}
@@ -214,7 +214,7 @@ class YahooDistributionFeedHelper
 	
 	public function setVideoKeywords($value)
 	{
-		$this->setNodeValue('/CMSFEED/FEEDITEM/KEYWORDS', $value);
+		kXml::setNodeValue($this->xpath,'/CMSFEED/FEEDITEM/KEYWORDS', $value);
 	}
 	
 	
@@ -230,11 +230,11 @@ class YahooDistributionFeedHelper
 			{
 				$titleContentNode = $node->cloneNode(true);		
 				//set attribute as title
-				$this->setNodeValue('./@TITLE', $value, $titleContentNode);
+				kXml::setNodeValue($this->xpath,'./@TITLE', $value, $titleContentNode);
 				//set value as url			
 				if (isset($urlValues[$key]))
 				{			
-					$this->setNodeValue('.', $urlValues[$key], $titleContentNode);
+					kXml::setNodeValue($this->xpath,'.', $urlValues[$key], $titleContentNode);
 				}					
 				$parentNode->insertBefore($titleContentNode,$node);
 			}
@@ -244,7 +244,7 @@ class YahooDistributionFeedHelper
 				for ($i=count($titleValues); $i<count($urlValues) ; $i++ )
 				{
 					$titleContentNode = $node->cloneNode(true);	
-					$this->setNodeValue('.', $urlValues[$i], $titleContentNode);
+					kXml::setNodeValue($this->xpath,'.', $urlValues[$i], $titleContentNode);
 					$parentNode->insertBefore($titleContentNode,$node);				
 				}
 			}
@@ -257,8 +257,8 @@ class YahooDistributionFeedHelper
 		$dateTime = new DateTime('@'.$value);
 		$dateTime->setTimezone(new DateTimeZone(self::VIDEO_TIME_ZONE));
 		$date = $dateTime->format(self::VIDEO_TIME_FORMAT);
-		$this->setNodeValue('/CMSFEED/FEEDITEM/VALIDTIME', $date);
-		$this->setNodeValue('/CMSFEED/FEEDITEM/VALIDTIME/@TZ', self::VIDEO_TIME_ZONE_CODE);	
+		kXml::setNodeValue($this->xpath,'/CMSFEED/FEEDITEM/VALIDTIME', $date);
+		kXml::setNodeValue($this->xpath,'/CMSFEED/FEEDITEM/VALIDTIME/@TZ', self::VIDEO_TIME_ZONE_CODE);	
 	}
 	
 	public function setVideoExpirationTime($value)
@@ -266,8 +266,8 @@ class YahooDistributionFeedHelper
 		$dateTime = new DateTime('@'.$value);
 		$dateTime->setTimezone(new DateTimeZone(self::VIDEO_TIME_ZONE));
 		$date = $dateTime->format(self::VIDEO_TIME_FORMAT);
-		$this->setNodeValue('/CMSFEED/FEEDITEM/EXPIRATIONTIME', $date);
-		$this->setNodeValue('/CMSFEED/FEEDITEM/EXPIRATIONTIME/@TZ', self::VIDEO_TIME_ZONE_CODE);	
+		kXml::setNodeValue($this->xpath,'/CMSFEED/FEEDITEM/EXPIRATIONTIME', $date);
+		kXml::setNodeValue($this->xpath,'/CMSFEED/FEEDITEM/EXPIRATIONTIME/@TZ', self::VIDEO_TIME_ZONE_CODE);	
 	}
 		
 	public function deleteVideoExpirtaionTimeTag()
@@ -279,7 +279,7 @@ class YahooDistributionFeedHelper
 	public function setVideoDuration($value)
 	{
 		$value = gmdate('H:i:s', $value/1000);
-		$this->setNodeValue('/CMSFEED/FEEDITEM/DURATION', $value);
+		kXml::setNodeValue($this->xpath,'/CMSFEED/FEEDITEM/DURATION', $value);
 	}
 
 	public function getXmlString()
@@ -307,12 +307,12 @@ class YahooDistributionFeedHelper
 				$streamContentNode = $node->cloneNode(true);					
 				$fileExt = $flavorAsset->fileExt;			
 				$videoBitrate = $flavorAsset->bitrate;
-				$this->setNodeValue('@FORMAT', strtoupper($fileExt), $streamContentNode);
-				$this->setNodeValue('@BITRATE', $videoBitrate, $streamContentNode);				
+				kXml::setNodeValue($this->xpath,'@FORMAT', strtoupper($fileExt), $streamContentNode);
+				kXml::setNodeValue($this->xpath,'@BITRATE', $videoBitrate, $streamContentNode);				
 								
 				$uniqueName = $this->flavorAssetUniqueName($flavorAsset, $currentTime);
-				$this->setNodeValue('.', $uniqueName, $streamContentNode);
-				//$this->setNodeValue('.', providerData->flavorAsset[id]);						
+				kXml::setNodeValue($this->xpath,'.', $uniqueName, $streamContentNode);
+				//kXml::setNodeValue($this->xpath,'.', providerData->flavorAsset[id]);						
 				$streamParentNode->insertBefore($streamContentNode,$beforeNode);
 			}		
 		}
@@ -331,8 +331,8 @@ class YahooDistributionFeedHelper
 	
 	public function setThumbnailsPath($smallThumbPath, $largeThumbPath)
 	{
-		$this->setNodeValue("/CMSFEED/FEEDITEM/IMAGE[@USE='SMALLTHUMB']", $smallThumbPath);
-		$this->setNodeValue("/CMSFEED/FEEDITEM/IMAGE[@USE='LARGETHUMB']", $largeThumbPath);		
+		kXml::setNodeValue($this->xpath,"/CMSFEED/FEEDITEM/IMAGE[@USE='SMALLTHUMB']", $smallThumbPath);
+		kXml::setNodeValue($this->xpath,"/CMSFEED/FEEDITEM/IMAGE[@USE='LARGETHUMB']", $largeThumbPath);		
 	}
 	
 	

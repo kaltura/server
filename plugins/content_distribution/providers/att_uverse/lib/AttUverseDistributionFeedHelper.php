@@ -168,25 +168,25 @@ class AttUverseDistributionFeedHelper
 	{		
 		$item = $this->item->cloneNode(true);
 		
-		$this->setNodeValue('entryId', $values[AttUverseDistributionField::ITEM_ENTRY_ID], $item);
+		kXml::setNodeValue($this->xpath,'entryId', $values[AttUverseDistributionField::ITEM_ENTRY_ID], $item);
 		
 		//date fields
 		$createdAt = date('c', $values[AttUverseDistributionField::ITEM_CREATED_AT]);
-		$this->setNodeValue('createdAt', $createdAt, $item);
+		kXml::setNodeValue($this->xpath,'createdAt', $createdAt, $item);
 		
 		$updatedAt = date('c', $values[AttUverseDistributionField::ITEM_UPDATED_AT]);
-		$this->setNodeValue('updatedAt', $updatedAt, $item);
+		kXml::setNodeValue($this->xpath,'updatedAt', $updatedAt, $item);
 		
 		$startDate = date('c', $values[AttUverseDistributionField::ITEM_START_DATE]);
-		$this->setNodeValue('startDate', $startDate, $item);
+		kXml::setNodeValue($this->xpath,'startDate', $startDate, $item);
 		
 		$endDate = date('c', $values[AttUverseDistributionField::ITEM_END_DATE]);
-		$this->setNodeValue('endDate', $endDate, $item);
+		kXml::setNodeValue($this->xpath,'endDate', $endDate, $item);
 		
-		$this->setNodeValue('title', $values[AttUverseDistributionField::ITEM_TITLE], $item);
-		$this->setNodeValue('description', $values[AttUverseDistributionField::ITEM_DESCRIPTION], $item);
+		kXml::setNodeValue($this->xpath,'title', $values[AttUverseDistributionField::ITEM_TITLE], $item);
+		kXml::setNodeValue($this->xpath,'description', $values[AttUverseDistributionField::ITEM_DESCRIPTION], $item);
 		
-		$this->setNodeValue('tags',  $values[AttUverseDistributionField::ITEM_TAGS], $item);
+		kXml::setNodeValue($this->xpath,'tags',  $values[AttUverseDistributionField::ITEM_TAGS], $item);
 		
 		//categories
 		$this->addCategories($item, $values[AttUverseDistributionField::ITEM_CATEGORIES]);
@@ -211,17 +211,17 @@ class AttUverseDistributionFeedHelper
 	
 		
 		//metadata fields
-		$this->setNodeValue('customData/metadata/ShortTitle', $values[AttUverseDistributionField::ITEM_METADATA_SHORT_TITLE], $item);
-		$this->setNodeValue('customData/metadata/TuneIn', $values[AttUverseDistributionField::ITEM_METADATA_TUNEIN], $item);
-		$this->setNodeValue('customData/metadata/ContentRating', $values[AttUverseDistributionField::ITEM_METADATA_CONTENT_RATING], $item);
-		$this->setNodeValue('customData/metadata/LegalDisclaimer', $values[AttUverseDistributionField::ITEM_METADATA_LEGAL_DISCLAIMER], $item);
-		$this->setNodeValue('customData/metadata/Genre', $values[AttUverseDistributionField::ITEM_METADATA_GENRE], $item);				
+		kXml::setNodeValue($this->xpath,'customData/metadata/ShortTitle', $values[AttUverseDistributionField::ITEM_METADATA_SHORT_TITLE], $item);
+		kXml::setNodeValue($this->xpath,'customData/metadata/TuneIn', $values[AttUverseDistributionField::ITEM_METADATA_TUNEIN], $item);
+		kXml::setNodeValue($this->xpath,'customData/metadata/ContentRating', $values[AttUverseDistributionField::ITEM_METADATA_CONTENT_RATING], $item);
+		kXml::setNodeValue($this->xpath,'customData/metadata/LegalDisclaimer', $values[AttUverseDistributionField::ITEM_METADATA_LEGAL_DISCLAIMER], $item);
+		kXml::setNodeValue($this->xpath,'customData/metadata/Genre', $values[AttUverseDistributionField::ITEM_METADATA_GENRE], $item);				
 		return $item;
 	}
 	
 	public function setChannelTitle($value)
 	{
-		$this->setNodeValue('/rss/channel/title', $value);
+		kXml::setNodeValue($this->xpath,'/rss/channel/title', $value);
 	}
 	
 	public function addCategories($item, $categoryValue)
@@ -235,8 +235,8 @@ class AttUverseDistributionFeedHelper
 				if ($category){	
 					$categoryNode = $this->category->cloneNode(true);						
 					$item->insertBefore($categoryNode, $node);		
-					$this->setNodeValue('.', $category, $categoryNode);
-					$this->setNodeValue('@name', $category, $categoryNode);													
+					kXml::setNodeValue($this->xpath,'.', $category, $categoryNode);
+					kXml::setNodeValue($this->xpath,'@name', $category, $categoryNode);													
 				}
 			}		
 			$node->parentNode->removeChild($node);				
@@ -265,10 +265,10 @@ class AttUverseDistributionFeedHelper
 				}
 				$contentNode = $this->content->cloneNode(true);											
 				$item->insertBefore($contentNode, $node);		
-				$this->setNodeValue('@containerFormat', $flavorAsset->getContainerFormat(), $contentNode);
-				$this->setNodeValue('@url', $url, $contentNode);
-				$this->setNodeValue('@height', $flavorAsset->getHeight(), $contentNode);
-				$this->setNodeValue('@width',$flavorAsset->getWidth() ,$contentNode);
+				kXml::setNodeValue($this->xpath,'@containerFormat', $flavorAsset->getContainerFormat(), $contentNode);
+				kXml::setNodeValue($this->xpath,'@url', $url, $contentNode);
+				kXml::setNodeValue($this->xpath,'@height', $flavorAsset->getHeight(), $contentNode);
+				kXml::setNodeValue($this->xpath,'@width',$flavorAsset->getWidth() ,$contentNode);
 			}			
 		}
 		$node->parentNode->removeChild($node);
@@ -295,9 +295,9 @@ class AttUverseDistributionFeedHelper
 				}
 				$thumbnailNode = $this->thumbnail->cloneNode(true);												
 				$item->insertBefore($thumbnailNode, $node);		
-				$this->setNodeValue('@url', $url, $thumbnailNode);
-				$this->setNodeValue('@height', $thumbAsset->getHeight(), $thumbnailNode);
-				$this->setNodeValue('@width',$thumbAsset->getWidth() ,$thumbnailNode);
+				kXml::setNodeValue($this->xpath,'@url', $url, $thumbnailNode);
+				kXml::setNodeValue($this->xpath,'@height', $thumbAsset->getHeight(), $thumbnailNode);
+				kXml::setNodeValue($this->xpath,'@width',$thumbAsset->getWidth() ,$thumbnailNode);
 			}			
 		}
 		$node->parentNode->removeChild($node);		
