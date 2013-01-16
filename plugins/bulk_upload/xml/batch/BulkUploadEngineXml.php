@@ -1121,7 +1121,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$existingCategoryIds = array(); // category ids that already associated with the entry - current list
 		$requiredCategoryIds = array(); // category ids that should be associated with the entry - final list
-		
+		$createdCategories = array();
 
 		try
 		{
@@ -1164,7 +1164,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				}
 				
 				$categoryNamesArr = explode(',', $categories);
-				
 				foreach($categoryNamesArr as $categoryName)
 				{
 					if(!in_array($categoryName, $existingCategoryNames)) //Category does not exis 
