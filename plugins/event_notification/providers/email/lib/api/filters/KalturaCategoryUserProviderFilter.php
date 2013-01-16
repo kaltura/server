@@ -7,7 +7,6 @@ class KalturaCategoryUserProviderFilter extends KalturaFilter
 {
 	static private $map_between_objects = array
 	(
-		"categoryIdEqual" => '_eq_category_id',
 		"userIdEqual" => "_eq_user_id",
 		"userIdIn" => "_in_user_id",
 		"statusEqual" => "_eq_status",
@@ -50,12 +49,6 @@ class KalturaCategoryUserProviderFilter extends KalturaFilter
 			
 		return parent::toObject($coreFilter, $props_to_skip);
 	}
-
-	/**
-	 * Id of the category to list by - not settable
-	 * @var int
-	 */
-	public $categoryIdEqual;
 	
 	/**
 	 * @var string
@@ -66,16 +59,6 @@ class KalturaCategoryUserProviderFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $userIdIn;
-
-	/**
-	 * @var KalturaCategoryUserPermissionLevel
-	 */
-	public $permissionLevelEqual;
-
-	/**
-	 * @var string
-	 */
-	public $permissionLevelIn;
 
 	/**
 	 * @var KalturaCategoryUserStatus
