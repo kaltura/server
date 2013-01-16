@@ -1166,7 +1166,11 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	public function getPrivacyPartnerIdx() {
-		return $this->getPrivacy() . "P" . $this->getPartnerId(); 
+		return self::formatPrivacy($this->getPrivacy(), $this->getPartnerId());
+	}
+	
+	public static function formatPrivacy($privacy, $partnerId) {
+		return sprintf("%sP%s", $privacy, $partnerId);
 	}
 	
 	public function getSphinxMatchOptimizations() {

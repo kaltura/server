@@ -81,9 +81,9 @@ class kEntitlementUtils
 		$c->add(categoryPeer::ID, $categories, Criteria::IN);
 		
 				
-		$privacy = array(PrivacyType::ALL);
+		$privacy = array(category::formatPrivacy(PrivacyType::ALL, $partner->getId()));
 		if($ks && !$ks->isWidgetSession())
-			$privacy[] = PrivacyType::AUTHENTICATED_USERS;
+			$privacy[] = category::formatPrivacy(PrivacyType::AUTHENTICATED_USERS, $partner->getId());
 			
 		$crit = $c->getNewCriterion (categoryPeer::PRIVACY, $privacy, Criteria::IN);
 		
