@@ -21,9 +21,10 @@ class KalturaLiveStreamConfigurationArray extends KalturaTypedArray
 				/* @var $object kLiveStreamConfiguration */
 				$configObject = new KalturaLiveStreamConfiguration();
 				$configObject->fromObject($object);
+				$array[] = $configObject;
 			}
 		}
-		return $configObject;
+		return $array;
 	}
 	
 	public function __construct()
