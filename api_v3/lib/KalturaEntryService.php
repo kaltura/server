@@ -21,7 +21,7 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		$ks = kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null;
 		
-		if (($actionName == 'list' || $actionName == 'count') &&
+		if (($actionName == 'list' || $actionName == 'count' || $actionName == 'listByReferenceId') &&
 		  (!$ks || (!$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))))
 		{			
 			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
