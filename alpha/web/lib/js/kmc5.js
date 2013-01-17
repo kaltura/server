@@ -14,7 +14,7 @@ kmc.vars.api_url = window.location.protocol + '//' + kmc.vars.host + kmc.vars.po
 
 // Holds the minimum version for html5 & kdp with the api_v3 for playlists
 kmc.vars.min_kdp_version_for_playlist_api_v3 = '3.6.15';
-kmc.vars.min_html5_version_for_playlist_api_v3 = '1.7.1.2';
+kmc.vars.min_html5_version_for_playlist_api_v3 = '1.7.1.3';
 
 // Log function
 kmc.log = function() {
@@ -601,7 +601,7 @@ kmc.preview_embed = {
 		id_type = is_playlist ? "Playlist " + (id == "multitab_playlist" ? "Name" : "ID") : "Embedding",
 		uiconf_details = kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist);
 
-		if( live_bitrates ) {kmc.vars.last_delivery_type = "http";} // Reset delivery type to http
+		if( live_bitrates ) {kmc.vars.last_delivery_type = "auto";} // Reset delivery type to http
 
 		var https_embed_code = (window.location.protocol == 'https:') ? true : false;
 		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id, true, https_embed_code);
@@ -943,16 +943,16 @@ kmc.preview_embed = {
 
 			// Use new kpl0Id flashvar for new players only
 			var html5_version = kmc.functions.getVersionFromPath(uiconf_details.html5Url);
-			//if( kmc.functions.versionIsAtLeast(kmc.vars.min_kdp_version_for_playlist_api_v3, uiconf_details.swf_version) && 
-			//	kmc.functions.versionIsAtLeast(kmc.vars.min_html5_version_for_playlist_api_v3, html5_version) ) {
-			//	flashVars['playlistAPI.kpl0Id'] = id;
-			//} else {
+			if( kmc.functions.versionIsAtLeast(kmc.vars.min_kdp_version_for_playlist_api_v3, uiconf_details.swf_version) && 
+				kmc.functions.versionIsAtLeast(kmc.vars.min_html5_version_for_playlist_api_v3, html5_version) ) {
+				flashVars['playlistAPI.kpl0Id'] = id;
+			} else {
 				flashVars['playlistAPI.autoInsert'] = 'true';
 				flashVars['playlistAPI.kpl0Name'] = name;
 				flashVars['playlistAPI.kpl0Url'] = 'http://' + embed_host + '/index.php/partnerservices2/executeplaylist?' + 
 													'partner_id=' + kmc.vars.partner_id + '&subp_id=' + kmc.vars.partner_id + '00' + 
 													'&format=8&ks={ks}&playlist_id=' + id;
-			//}
+			}
 
 			embed_code = embed_code.replace("{SEO}", "");
 		}
@@ -994,9 +994,9 @@ kmc.preview_embed = {
 		embed_code = embed_code.replace("{EMBED_OBJECT}", JSON.stringify(embedObject, null, 2));
 		
 		if( https_support ) {
-			embed_code = embed_code.replace(/http/g, "https");
+			embed_code = embed_code.replace(/http:/g, "https:");
 		} else {			
-			embed_code = embed_code.replace(/https/g, "http");
+			embed_code = embed_code.replace(/https:/g, "http:");
 		}
 
 		return embed_code;
