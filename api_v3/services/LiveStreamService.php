@@ -13,6 +13,7 @@ class LiveStreamService extends KalturaEntryService
 	const DEFAULT_WIDTH = 320;
 	const DEFAULT_HEIGHT = 240;
 	const ISLIVE_ACTION_CACHE_EXPIRY = 30;
+	const HLS_LIVE_STREAM_CONTENT_TYPE = 'application/vnd.apple.mpegurl';
 	
 	/**
 	 * Adds new live stream entry.
@@ -305,16 +306,34 @@ class LiveStreamService extends KalturaEntryService
 	 */
 	private function hlsUrlExistsRecursive ($url)
 	{
-		$data = $this->urlExists($url, 'application/vnd.apple.mpegurl');
+		$data = $this->urlExists($url, self::HLS_LIVE_STREAM_CONTENT_TYPE);
 		if(is_bool($data))
 			return $data;
 		
-		$lines = explode("\n", trim($data));
-		if(!preg_match("/http.*/", array_pop($lines), $matches))
-			return false;
+		$lines = explode("#EXT-X-STREAM-INF:", trim($data));
+		var_dump($lines);
+		
+		$result = false;
+		foreach ($lines as $line)
+		{
+			if(!preg_match("/http.*/", array_shift($lines), $matches))
+				continue;
+			$streamUrl = $matches[0];
 			
-		$lastMatch = $matches[0];
-		return $this->hlsUrlExistsRecursive($lastMatch);
+			$data = $this->urlExists($streamUrl, self::HLS_LIVE_STREAM_CONTENT_TYPE);
+			if (!$data)
+				continue;
+				
+			$segs = explode("#EXTINF:", $data);
+			if(!preg_match("/http.*/", array_pop($segs), $matches))
+				continue;
+			
+			$tsUrl = $matches[0];
+			if ($this->urlExists($tsUrl ,self::HLS_LIVE_STREAM_CONTENT_TYPE))
+				return true;
+		}
+			
+		return false;
 	}
 	
 	/**
