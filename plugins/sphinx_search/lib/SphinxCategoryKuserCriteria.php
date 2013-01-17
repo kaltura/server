@@ -114,7 +114,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 		if(strpos($fieldName, '.') === false)
 		{
 			$fieldName = strtoupper($fieldName);
-			$fieldName = "categoryKuserPeer.$fieldName";
+			$fieldName = "category_kuser.$fieldName";
 		}
 		
 		if(!isset(self::$sphinxFieldsEscapeType[$fieldName]))
