@@ -287,6 +287,7 @@ class LiveStreamService extends KalturaEntryService
 	    curl_setopt($ch, CURLOPT_TIMEOUT, 5);  
 	    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);  
 	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);  
+	    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);  
 	    $data = curl_exec($ch);  
 	    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);  
 	    $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
@@ -307,13 +308,14 @@ class LiveStreamService extends KalturaEntryService
 	private function hlsUrlExistsRecursive ($url)
 	{
 		$data = $this->urlExists($url, self::HLS_LIVE_STREAM_CONTENT_TYPE);
-		if(is_bool($data))
+		if(!$data)
+		{
+			KalturaLog::Info("URL [$url] returned no valid data. Exiting.");
 			return $data;
+		}
 		
 		$lines = explode("#EXT-X-STREAM-INF:", trim($data));
-		var_dump($lines);
 		
-		$result = false;
 		foreach ($lines as $line)
 		{
 			if(!preg_match("/http.*/", array_shift($lines), $matches))
@@ -324,8 +326,8 @@ class LiveStreamService extends KalturaEntryService
 			if (!$data)
 				continue;
 				
-			$segs = explode("#EXTINF:", $data);
-			if(!preg_match("/http.*/", array_pop($segs), $matches))
+			$segments = explode("#EXTINF:", $data);
+			if(!preg_match("/http.*/", array_pop($segments), $matches))
 				continue;
 			
 			$tsUrl = $matches[0];
