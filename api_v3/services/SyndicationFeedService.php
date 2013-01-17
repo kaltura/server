@@ -19,7 +19,7 @@ class SyndicationFeedService extends KalturaBaseService
 		$this->applyPartnerFilterForClass('syndicationFeed');
 	}
 	
-	protected function partnerGroup()
+	protected function partnerGroup($peer = null)
 	{
 		// required in order to load flavor params of partner zero
 		if ($this->actionName == 'requestConversion')

@@ -22,7 +22,7 @@ class ThumbParamsService extends KalturaBaseService
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::partnerGroup()
 	 */
-	protected function partnerGroup()
+	protected function partnerGroup($peer = null)
 	{
 		if(
 			$this->actionName == 'get' ||

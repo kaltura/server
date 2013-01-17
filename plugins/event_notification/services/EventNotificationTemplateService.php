@@ -297,7 +297,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::partnerGroup()
 	 */
-	protected function partnerGroup()
+	protected function partnerGroup($peer = null)
 	{
 		
 		switch ($this->actionName)

@@ -20,7 +20,7 @@ class UiConfService extends KalturaBaseService
 			$this->applyPartnerFilterForClass('uiConf'); 	
 	}
 	
-	protected function partnerGroup()
+	protected function partnerGroup($peer = null)
 	{
 		if ($this->actionName === 'get' || $this->actionName === 'clone')
 			return '0';

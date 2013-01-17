@@ -420,9 +420,7 @@ class FlavorAssetService extends KalturaAssetService
 		$c->addAnd($criterionPartnerOrKn);
 		// there could only be one entry because the query is by primary key.
 		// so using doSelectOne is safe.
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		$dbEntry = entryPeer::doSelectOne($c);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 					
@@ -468,9 +466,7 @@ class FlavorAssetService extends KalturaAssetService
 		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $this->getPartnerId());
 		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
 		$c->addAnd($criterionPartnerOrKn);
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		$dbEntries = entryPeer::doSelect($c);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		
 		if (!$dbEntries)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, implode(',', $entryIds));
@@ -524,9 +520,7 @@ class FlavorAssetService extends KalturaAssetService
 		$c->addAnd($criterionPartnerOrKn);
 		// there could only be one entry because the query is by primary key.
 		// so using doSelectOne is safe.
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		$dbEntry = entryPeer::doSelectOne($c);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		

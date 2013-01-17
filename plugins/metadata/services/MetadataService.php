@@ -334,7 +334,7 @@ class MetadataService extends KalturaBaseService
 		if (kEntitlementUtils::getEntitlementEnforcement() && (is_null($filter->objectIdIn) && is_null($filter->objectIdEqual)))
 			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
 			
-		$entryIds = null;
+		$applyPartnerFilter = true;
 		if ($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
 		{
 			if ($filter->objectIdEqual)
@@ -345,17 +345,57 @@ class MetadataService extends KalturaBaseService
 			{
 				$entryIds = explode(',', $filter->objectIdIn);
 			}
+			
+			if($entryIds)
+			{
+				$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, $this->getPartnerId());
+				if(!count($entryIds))
+				{
+					KalturaLog::debug("No entries found");
+					$response = new KalturaMetadataListResponse();
+					$response->objects = new KalturaMetadataArray();
+					$response->totalCount = 0;
+					return $response;
+				}
+				
+				$filter->objectIdEqual = null;
+				$filter->objectIdIn = implode(',', $entryIds);
+				$applyPartnerFilter = false;
+			}
 		}
-		
-		if (is_null($entryIds))
-		{
+		if ($applyPartnerFilter)
 			$this->applyPartnerFilterForClass('Metadata');
-		}
-		else
+	
+		if ($filter->metadataObjectTypeEqual == MetadataObjectType::CATEGORY)
 		{
-			$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, $this->getPartnerId());
-			$filter->objectIdEqual = null;
-			$filter->objectIdIn = implode(',', $entryIds);
+			if ($filter->objectIdEqual)
+			{
+				$categoryIds = array($filter->objectIdEqual);
+			}
+			else if ($filter->objectIdIn)
+			{
+				$categoryIds = explode(',', $filter->objectIdIn);
+			}
+			
+			if($categoryIds)
+			{
+				$categories = categoryPeer::retrieveByPKs($categoryIds);
+				if(!count($categories))
+				{
+					KalturaLog::debug("No categories found");
+					$response = new KalturaMetadataListResponse();
+					$response->objects = new KalturaMetadataArray();
+					$response->totalCount = 0;
+					return $response;
+				}
+				
+				$categoryIds = array();
+				foreach($categories as $category)
+					$categoryIds[] = $category->getId();
+				
+				$filter->objectIdEqual = null;
+				$filter->objectIdIn = implode(',', $categoryIds);
+			}
 		}
 		
 		$metadataFilter = new MetadataFilter();
@@ -363,8 +403,6 @@ class MetadataService extends KalturaBaseService
 		
 		$c = new Criteria();
 		$metadataFilter->attachToCriteria($c);
-		if ($entryIds === array())
-			$c->addAnd(MetadataPeer::OBJECT_ID, array(), Criteria::IN);
 		$count = MetadataPeer::doCount($c);
 		
 		if (! $pager)

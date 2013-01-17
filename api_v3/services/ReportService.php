@@ -20,7 +20,7 @@ class ReportService extends KalturaBaseService
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::partnerGroup()
 	 */
-	protected function partnerGroup()
+	protected function partnerGroup($peer = null)
 	{
 		if (in_array(strtolower($this->actionName), array('execute', 'getcsv'), true))
 			return $this->partnerGroup . ',0';

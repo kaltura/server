@@ -200,7 +200,7 @@ abstract class KalturaBaseService
 		else
 			$partner_id = Partner::PARTNER_THAT_DOWS_NOT_EXIST;
 			
-		myPartnerUtils::addPartnerToCriteria ( $peer , $partner_id , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetworkAllowed($this->actionName)  );
+		myPartnerUtils::addPartnerToCriteria ( $peer , $partner_id , $this->private_partner_data , $this->partnerGroup($peer) , $this->kalturaNetworkAllowed($this->actionName)  );
 	}	
 	
 	
@@ -210,14 +210,14 @@ abstract class KalturaBaseService
 			$partner_id = $this->getPartner()->getId();
 		else
 			$partner_id = -1; 
-		myPartnerUtils::addPartnerToCriteria ( $peer , $partner_id , $this->private_partner_data , $this->partnerGroup() , null );
+		myPartnerUtils::addPartnerToCriteria ( $peer , $partner_id , $this->private_partner_data , $this->partnerGroup($peer) , null );
 	}
 /* <--------------------- Security and config settings ----------------------- */	
 	
 	/**
 	 * @return A comma seperated string of partner ids to which current context is allowed to access
 	 */
-	protected function partnerGroup() 		
+	protected function partnerGroup($peer = null) 		
 	{ 		
 		return $this->partnerGroup;
 	}

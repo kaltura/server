@@ -20,9 +20,9 @@ class ConversionProfileAssetParamsService extends KalturaBaseService
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::partnerGroup()
 	 */
-	protected function partnerGroup() 	
+	protected function partnerGroup($peer = null) 	
 	{
-		if($this->actionName == 'list')
+		if($this->actionName == 'list' && $peer == 'assetParams')
 			return $this->partnerGroup . ',0';
 			
 		return $this->partnerGroup;
