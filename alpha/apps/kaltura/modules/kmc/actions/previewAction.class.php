@@ -90,7 +90,7 @@ class previewAction extends kalturaAction
 		}
 
 		if( $this->playlist_id || ! $this->entry_id ) {
-			$this->entry_name = 'Kaltura Player';
+			$this->entry_name = ($this->playlist_name) ? $this->playlist_name : 'Kaltura Player';
 			$this->entry_description = '';
 		}
 
