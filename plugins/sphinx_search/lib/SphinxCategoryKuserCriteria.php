@@ -20,6 +20,10 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
         categoryKuserPeer::UPDATED_AT => "updated_at" ,
 	);
 	
+	public static $sphinxFieldsEscapeType = array(
+		categoryKuserPeer::CATEGORY_FULL_IDS => SearchIndexFieldEscapeType::MD5_LOWER_CASE,
+	);
+	
 	public static $sphinxOrderFields = array(
 		categoryKuserPeer::CREATED_AT => 'created_at',
 		categoryKuserPeer::UPDATED_AT => 'updated_at',
@@ -102,6 +106,23 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 		return self::$sphinxTypes[$fieldName];
 	}
 
+	/* (non-PHPdoc)
+	 * @see SphinxCriteria::getSearchIndexFieldsEscapeType()
+	 */
+	public function getSearchIndexFieldsEscapeType($fieldName)
+	{
+		if(strpos($fieldName, '.') === false)
+		{
+			$fieldName = strtoupper($fieldName);
+			$fieldName = "categoryKuserPeer.$fieldName";
+		}
+		
+		if(!isset(self::$sphinxFieldsEscapeType[$fieldName]))
+			return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
+			
+		return self::$sphinxFieldsEscapeType[$fieldName];
+	}
+	
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria::hasMatchableField()
 	 */
