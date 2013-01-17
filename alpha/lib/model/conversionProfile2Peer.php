@@ -20,18 +20,6 @@ class conversionProfile2Peer extends BaseconversionProfile2Peer
 		
 		return $con;
 	}
-	
-	/**
-	 * @param int $partnerId
-	 * @param boolean $privatePartnerData
-	 * @param string $partnerGroup
-	 * @param boolean $kalturaNetwork
-	 */
-	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
-	{
-		$partnerGroup = implode(',', array_filter(explode(',', $partnerGroup), 'intval'));
-		return parent::addPartnerToCriteria($partnerId, $privatePartnerData, $partnerGroup, $kalturaNetwork);
-	}
 
 	public static function setDefaultCriteriaFilter ()
 	{
