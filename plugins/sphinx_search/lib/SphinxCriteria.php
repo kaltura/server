@@ -733,7 +733,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			        if(strlen($val))
 					{
 						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
-						$this->addMatch('@' .  $sphinxField . ' "' .$val . '\\\*"');
+						if ($fieldsEscapeType != SearchIndexFieldEscapeType::MD5_LOWER_CASE)
+						{
+							$this->addMatch('@' .  $sphinxField . ' "' .$val . '\\\*"');
+						}
 						$filter->unsetByName($field);
 					}
 				    break;	
