@@ -396,7 +396,6 @@ class entryPeer extends BaseentryPeer
 		if($ks && count($ks->getDisableEntitlementForEntry()))
 		{
 			$entryCrit = $c->getNewCriterion(entryPeer::ENTRY_ID, $ks->getDisableEntitlementForEntry(), Criteria::IN);
-			$entryCrit->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 			
 			if($critEntitled)
 			{
@@ -739,9 +738,7 @@ class entryPeer extends BaseentryPeer
 		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
 		$c->addAnd($criterionPartnerOrKn);
 
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		$dbEntries = self::doSelect($c);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		
 		$entryIds = array();
 		foreach ($dbEntries as $dbEntry)

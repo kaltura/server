@@ -142,10 +142,7 @@ class kCurrentContext
 	
 	public static function initPartnerByEntryId($entryId)
 	{		
-		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
 		$entry = entryPeer::retrieveByPKNoFilter($entryId);
-		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
-		
 		if(!$entry)
 			return null;
 			
