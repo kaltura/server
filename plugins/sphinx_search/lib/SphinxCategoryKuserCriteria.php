@@ -218,6 +218,11 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			$filter->set('_matchand_permission_names', implode(',', $permissionNamesList));
 		}
 		
+		if ($filter->get('_eq_category_full_ids'))
+		{
+			$filter->set('_eq_category_full_ids', $filter->get('_eq_category_full_ids').category::FULL_IDS_EQUAL_MATCH_STRING);
+		}
+		
 		return parent::applyFilterFields($filter);
 	}
 
