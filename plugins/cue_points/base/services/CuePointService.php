@@ -184,11 +184,19 @@ class CuePointService extends KalturaBaseService
 			$entryIds = explode(',', $filter->entryIdIn);
 		}
 		
-		if(!is_null($entryIds)) {
-			$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, $this->getPartnerId());
+		if (! is_null ( $entryIds )) {
+			$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork ( $entryIds, $this->getPartnerId () );
+			if (! $entryIds) {
+				$response = new KalturaCuePointListResponse ();
+				$response->objects = array ();
+				$response->totalCount = 0;
+				return $response;
+			}
+			
 			$filter->entryIdEqual = null;
-			$filter->entryIdIn = implode(',', $entryIds);
+			$filter->entryIdIn = implode ( ',', $entryIds );
 		}
+			
 		
 		
 		$cuePointFilter = $filter->toObject();
