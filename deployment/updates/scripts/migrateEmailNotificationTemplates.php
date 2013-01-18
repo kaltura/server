@@ -54,6 +54,7 @@ if($limit)
 else
 	$criteria->setLimit($page);
 	
+$criteria->add(EventNotificationTemplatePeer::TYPE, EmailNotificationPlugin::getEmailNotificationTemplateTypeCoreValue(EmailNotificationTemplateType::EMAIL));
 $results = EventNotificationTemplatePeer::doSelect($criteria);
 $migrated = 0;
 while (count($results) && (!$limit || $migrated < $limit))
@@ -86,6 +87,26 @@ while (count($results) && (!$limit || $migrated < $limit))
 				$migrateTo = new kEmailNotificationStaticRecipientProvider();
 				$migrateTo->setEmailRecipients($result->getTo());
 				$result->setTo($migrateTo);
+			}
+			
+			if ($result->getContentParameters() && is_array($result->getContentParameters()) && count($result->getContentParameters()))
+			{
+				$migrationContentParams = array();
+				foreach ($result->getContentParameters() as $contentParameter)
+				{
+					if ($contentParameter instanceof kEmailNotificationParameter)
+					{
+						$temp = new kEventNotificationParameter();
+						$temp->setKey($contentParameter->getKey());
+						$temp->setValue($contentParameter->getValue());
+						$migrationContentParams[] = $temp;
+					}
+					else
+					{
+						$migrationContentParams[] = $contentParameter;
+					}
+				}
+				$result->setContentParameters($migrationContentParams);
 			}
 			
 			$result->save();
