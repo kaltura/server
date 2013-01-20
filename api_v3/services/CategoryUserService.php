@@ -17,7 +17,7 @@ class CategoryUserService extends KalturaBaseService
 	function addAction(KalturaCategoryUser $categoryUser)
 	{
 		$dbCategoryKuser = $categoryUser->toInsertableObject();
-		
+		/* @var $dbCategoryKuser categoryKuser */
 		$category = categoryPeer::retrieveByPK($categoryUser->categoryId);
 		if (!$category)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);						
@@ -69,7 +69,7 @@ class CategoryUserService extends KalturaBaseService
 			
 		$category = categoryPeer::retrieveByPK($categoryId);
 		if (!$category)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);						
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);						
 
 		if($category->getInheritanceType() == InheritanceType::INHERIT)
 			$categoryId = $category->getInheritedParentId();
@@ -330,7 +330,7 @@ class CategoryUserService extends KalturaBaseService
 		$categoriesInheritanceRoot = array();
 		foreach ($categories as $category)
 		{
-			
+			/* @var $category category */
 			if(is_null($category))
 				continue;
 				
