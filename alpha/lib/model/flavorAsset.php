@@ -169,13 +169,14 @@ class flavorAsset extends asset
 			($this->getStatus() == self::ASSET_STATUS_DELETED || $this->getStatus() == self::ASSET_STATUS_READY)))
 		{
 			$entry = $this->getentry();
-	    	if (!$entry) {
+	    	if (!$entry) 
+	    	{
 	        	KalturaLog::err('Cannot get entry object for flavor asset id ['.$this->getId().']');
 	    	}
-	    	else {
+	    	elseif ($entry->getStatus() != entryStatus::DELETED) 
+	    	{
 	        	KalturaLog::debug('Synchronizing flavor params ids for entry id ['.$entry->getId().']');
 	        	$entry->syncFlavorParamsIds();
-	        
 	        	$entry->save();
 	    	}				
 		}			

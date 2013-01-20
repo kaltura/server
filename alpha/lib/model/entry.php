@@ -2328,6 +2328,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function syncFlavorParamsIds()
 	{
+		if($this->getStatus() == entryStatus::DELETED)
+		{
+			KalturaLog::debug("Entry [" . $this->getId() . "] is deleted, no need to sync it");
+			return;
+		}
+			
 		$entryFlavors = assetPeer::retrieveFlavorsByEntryIdAndStatus($this->getId(), null, array(flavorAsset::ASSET_STATUS_READY));
 		if (!$entryFlavors)
 		{
