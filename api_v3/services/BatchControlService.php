@@ -806,7 +806,7 @@ class BatchControlService extends KalturaBaseService
 	 * batch getFullStatus action returns the status of all schedulers and queues
 	 * 
 	 * @action getFullStatus
-	 * @return KalturaControlPanelCommand
+	 * @return KalturaFullStatusResponse
 	 */
 	function getFullStatusAction()
 	{
