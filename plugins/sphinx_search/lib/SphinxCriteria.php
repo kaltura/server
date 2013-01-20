@@ -391,8 +391,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$cartesianOptions = $this::cartesian($values);
 			$format = $formatParams[0];
 			$formatedStr = array();
-			foreach($cartesianOptions as $option) {
-				$formatedStr[] = vsprintf($format, $option);
+			foreach ($cartesianOptions as $option ) {
+				$curValue = trim ( vsprintf ( $format, $option ) );
+				if (! $curValue)
+					continue;
+				$formatedStr[] = $curValue;
 			}
 			
 			// Add condition
