@@ -124,28 +124,9 @@ class categoryEntry extends BasecategoryEntry {
 		
 				if($entry && !categoryEntryPeer::getSkipSave()) //entry might be deleted - and delete job remove the categoryEntry object
 				{
-					$fullName = $category->getFullName();
-					
-					$entryCategories = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategories());
-					$newCategories = array();
-					foreach($entryCategories as $entryCategory) 
-					{
-						if (!preg_match("/^".$fullName."/", $entryCategory))
-							$newCategories[] = $entryCategory;
-					}
-
-					$categoryId = $category->getId();
-					
-					$entryCategoriesIds = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategoriesIds());
-					$newCategoriesIds = array();
-					foreach($entryCategoriesIds as $entryCategoryIds) 
-					{
-						if (!preg_match("/^".$categoryId."/", $entryCategoryIds))
-							$newCategoriesIds[] = $entryCategoryIds;
-					}
-					
-					$entry->parentSetCategories(implode(entry::ENTRY_CATEGORY_SEPARATOR, $newCategories));
-					$entry->parentSetCategoriesIds(implode(entry::ENTRY_CATEGORY_SEPARATOR, $newCategoriesIds));
+					$categoryIds = array_unique ($this->entryCategoriesRemovedIds);
+					$leftCategories = array_diff($categoryIds, array($category->getId()));
+					$entry->setCategoriesIds(implode(entry::ENTRY_CATEGORY_SEPARATOR, $leftCategories));
 					
 					$entry->save();
 				}
