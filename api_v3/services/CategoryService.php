@@ -97,22 +97,21 @@ class CategoryService extends KalturaBaseService
 			
 		$categoryDb = categoryPeer::retrieveByPK($id);
 		if (!$categoryDb)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id );
+		
+		if ($category->privacyContext != null && $category->privacyContext != '') 
+		{
+			$privacyContexts = explode ( ',', $category->privacyContext );
 			
-		if($category->privacyContext != null && 
-		   $category->privacyContext != '')
-		   {
-			  $privacyContexts = explode(',', $category->privacyContext);  
-			  
-			  foreach($privacyContexts as $privacyContext)
-			  {
-			  	if(!preg_match('/^[a-zA-Z\d]+$/', $privacyContext) || strlen($privacyContext) < 4)
-			  	{
-			  		KalturaLog::err('Invalid privacy context: ' . print_r($privacyContext, true));
-			   		throw new KalturaAPIException(KalturaErrors::PRIVACY_CONTEXT_INVALID_STRING, $privacyContext);
-			  	}
-			  }
-		   }
+			foreach ( $privacyContexts as $privacyContext )
+			{
+				if (! preg_match ( '/^[a-zA-Z\d]+$/', $privacyContext ) || strlen ( $privacyContext ) < 4) 
+				{
+					KalturaLog::err ( 'Invalid privacy context: ' . print_r ( $privacyContext, true ) );
+					throw new KalturaAPIException ( KalturaErrors::PRIVACY_CONTEXT_INVALID_STRING, $privacyContext );
+				}
+			}
+		}
 			
 		//it is possible to not all of the sub tree is updated, 
 		//and updateing fileds that will add batch job to reindex categories - might not update all sub categories.
@@ -121,8 +120,6 @@ class CategoryService extends KalturaBaseService
 			$this->getPartner()->getFeaturesStatusByType(IndexObjectType::LOCK_CATEGORY))
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
 
-		$category->id = $id; // for KalturaCategory->ValidateForUpdate
-		
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId());
