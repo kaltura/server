@@ -91,30 +91,6 @@ class category extends Basecategory implements IIndexable
 			$this->addIndexCategoryKuserJob($this->getId());
 		}
 		
-		//index + update category
-		if (!$this->isNew() &&
-			($this->isColumnModified(categoryPeer::PARENT_ID) || 
-			 $this->isColumnModified(categoryPeer::INHERITANCE_TYPE) ||
-			 $this->isColumnModified(categoryPeer::NAME) ||
-			 $this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS) || 
-			 $this->isColumnModified(categoryPeer::MEMBERS) ||
-			 $this->isColumnModified(categoryPeer::MEMBERS_COUNT)))
-		{
-			$lock = false;
-			
-			if ($this->isColumnModified(categoryPeer::PARENT_ID))
-				$lock = true;
-			
-			if ($this->isColumnModified(categoryPeer::PARENT_ID) && $this->isColumnModified(categoryPeer::FULL_IDS))
-			    $fullIds = $this->oldColumnsValues[categoryPeer::FULL_IDS];	
-			else 
-			    $fullIds = $this->getFullIds();	
-
-			$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id; 			
-			if($partnerId != Partner::BATCH_PARTNER_ID)
-				$this->addIndexCategoryJob($fullIds . categoryPeer::CATEGORY_SEPARATOR, null, $lock);
-		}
-		
 		if (!$this->isNew() && 
 			$this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS) && 
 			$this->getPrivacyContexts() == '')
@@ -263,6 +239,26 @@ class category extends Basecategory implements IIndexable
 			
 			$oldParentCategoryToResetSubCategories = categoryPeer::retrieveByPK($this->old_parent_id);;
 			$parentCategoryToResetSubCategories = $this->getParentCategory();
+		}
+		
+		if (kCurrentContext::getCurrentPartnerId() != Partner::BATCH_PARTNER_ID &&
+			($this->isColumnModified(categoryPeer::PARENT_ID) || 
+			 $this->isColumnModified(categoryPeer::INHERITANCE_TYPE) ||
+			 $this->isColumnModified(categoryPeer::NAME) ||
+			 $this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS) || 
+			 $this->isColumnModified(categoryPeer::MEMBERS) ||
+			 $this->isColumnModified(categoryPeer::MEMBERS_COUNT)))
+		{
+			$lock = false;
+			if ($this->isColumnModified(categoryPeer::PARENT_ID))
+				$lock = true;
+			
+			$fullIds = $this->getFullIds();
+			if($this->isColumnModified(categoryPeer::FULL_IDS))
+				$fullIds = $this->getColumnsOldValue(categoryPeer::FULL_IDS);
+			$fullIds .= categoryPeer::CATEGORY_SEPARATOR;
+			
+			$this->addIndexCategoryJob($fullIds, null, $lock);
 		}
 		
 		if ($this->isColumnModified(categoryPeer::STATUS) && 
