@@ -142,8 +142,7 @@ class KGenericScheduler
 			}
 			
 			$taskConfigsValidations[$taskConfig->id] = $taskConfig->name;
-			$vars = get_object_vars($taskConfig);
-			$subConfigItems = $this->createConfigItem($vars, $taskConfig->id, $taskConfig->name);
+			$subConfigItems = $this->createConfigItem($taskConfig->toArray(), $taskConfig->id, $taskConfig->name);
 			$configItems = array_merge($configItems, $subConfigItems);
 		}
 		KalturaLog::info("sending configuration to the server");
