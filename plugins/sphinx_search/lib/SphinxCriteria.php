@@ -399,6 +399,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			}
 			
 			// Add condition
+			if(empty($formatedStr))
+				continue;
+			
 			$this->matchClause[] = "( @sphinx_match_optimizations " . implode(" | ", $formatedStr) . ")";
 		}
 	}
