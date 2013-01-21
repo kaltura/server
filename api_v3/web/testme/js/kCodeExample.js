@@ -35,7 +35,7 @@ KCodeExampleBase.prototype.jqActionPlugins = null;
 
 // (Hagay Onn) If using port 80, the location object's port member is ""
 KCodeExampleBase.getServiceUrl = function (){
-	var serviceFullUrl = "http://" + location.hostname;
+	var serviceFullUrl = location.protocol + "//" + location.hostname;
 	if(location.port != ""){	// not port 80 (default)
 		serviceFullUrl += ":" + location.port;
 	}
