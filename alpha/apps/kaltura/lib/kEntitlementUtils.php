@@ -173,40 +173,6 @@ class kEntitlementUtils
 		KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] not entitled');
 		return false;
 	} 	
-
-	/**
-	 * Returns true if kuser or current kuser is entitled to assign entry to categoryId
-	 * @param int $categoryId
-	 * @param int $kuser
-	 * @return bool
-	 */
-	public static function validateEntryAssignToCategory($categoryId, $kuserId = null)
-	{ 
-		if(!self::getEntitlementEnforcement())
-			return true;
-			
-		$category = categoryPeer::retrieveByPK($categoryUser->categoryId);
-		if (!$category)
-			throw new kCoreException("Category ID [" . $categoryUser->categoryId ."] not found", kCoreException::ID_NOT_FOUND);
-
-		if ($category->getContributionPolicy() == ContributionPolicyType::ALL)
-			return true;
-		
-		if($kuserId)
-		{
-			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid);
-			$kuserId = $kuser->getId();
-		}
-			
-		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryUser->categoryId, $kuserId);
-		if($currentKuserCategoryKuser && ($currentKuserCategoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MANAGER ||
-										  $currentKuserCategoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MODERATOR ||
-										  $currentKuserCategoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::CONTRIBUTOR))
-			return true;
-			
-		return false;
-	}
 	
 	/**
 	 * Set Entitlement Enforcement - if entitelement is enabled \ disabled in this session
