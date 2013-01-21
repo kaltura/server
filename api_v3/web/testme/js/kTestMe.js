@@ -36,9 +36,12 @@ var kTestMe = {
 		format: function(message){
 
 			var err = new Error();
-			var caller_line = err.stack.split("\n")[2];
-			caller_line = caller_line.substr(caller_line.indexOf('/') + 2); // remove at http://
-			caller_line = caller_line.substr(caller_line.indexOf('/')); // remove domain
+			var caller_line = '';
+			if(err.stack){
+				caller_line = err.stack.split("\n")[2];
+				caller_line = caller_line.substr(caller_line.indexOf('/') + 2); // remove at http://
+				caller_line = caller_line.substr(caller_line.indexOf('/')); // remove domain
+			}
 			
 			var time = '';
 			var d = new Date();
