@@ -310,9 +310,9 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			//if the category exist or the category name is an empty string
 			$categoriesParsed = $filter->categoryIdsToAllSubCategoriesIdsParsed ( $categories );
 			if ( $categoriesParsed !=='' || $categories =='')
-				$filter->set ( "_likex_full_ids", $categoriesParsed);
+				$filter->set ( "_matchor_full_ids", $categoriesParsed);
 			else
-		  		$filter->set ( "_likex_full_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+		  		$filter->set ( "_matchor_full_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 		}
 		$filter->unsetByName('_in_ancestor_id');
 		
