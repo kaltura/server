@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 if [ -L $0 ];then
 	REAL_SCRIPT=`readlink $0`
 else
