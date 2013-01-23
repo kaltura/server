@@ -11,7 +11,7 @@ const jobXml = '<?xml version="1.0"?>
   Version="3.0">
   <Job
     OutputDirectory="C:\Tmp\Prod"
-    DefaultMediaOutputFileName="{OriginalFilename}" />
+    DefaultMediaOutputFileName="{OriginalFilename}" CreateSubfolder="False" />
   <MediaFile
     VideoResizeMode="Letterbox"
 	ThumbnailCodec="Jpeg" 
