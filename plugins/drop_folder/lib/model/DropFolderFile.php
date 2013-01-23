@@ -58,6 +58,14 @@ class DropFolderFile extends BaseDropFolderFile
 		return array("dropFolderFile:id=".$this->getId(), "dropFolderFile:fileName=".$this->getFileName(), "dropFolderFile:dropFolderId=".$this->getDropFolderId());
 	}
 	
+	public function setStatus($v)
+	{
+		if($this->getColumnsOldValue(DropFolderFilePeer::STATUS) != DropFolderFileStatus::PURGED)
+			return parent::setStatus($v);
+			
+		return $this;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see BaseDropFolderFile::preUpdate()
 	 */
