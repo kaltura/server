@@ -379,8 +379,6 @@ class kJobsManager
 				$dbConvertCollectionJob->setPartnerId($entry->getPartnerId());
 				$dbConvertCollectionJob->setJobType(BatchJobType::CONVERT_COLLECTION);
 				$dbConvertCollectionJob->setJobSubType($currentConversionEngine);
-				$dbConvertCollectionJob->save();
-				KalturaLog::log("Created from convert collection job with entry id [" . $dbConvertCollectionJob->getEntryId() . "]");
 			}
 		} else {
 			$dbConvertCollectionJob = $parentJob->createChild(BatchJobType::CONVERT_COLLECTION, $currentConversionEngine, false);
@@ -388,6 +386,10 @@ class kJobsManager
 		
 		$dbConvertCollectionJob->setObjectId($entry->getId());
 		$dbConvertCollectionJob->setObjectType(BatchJobObjectType::ENTRY);
+		$dbConvertCollectionJob->setStatus(BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
+		
+		$dbConvertCollectionJob = kJobsManager::addJob($dbConvertCollectionJob, $convertCollectionData, 
+				BatchJobType::CONVERT_COLLECTION, $currentConversionEngine);
 		
 		KalturaLog::log("Calling CDLProceessFlavorsForCollection with [" . count($finalFlavorParamsOutputs) . "] flavor params");
 		$xml = KDLWrap::CDLProceessFlavorsForCollection($finalFlavorParamsOutputs);
@@ -401,7 +403,7 @@ class kJobsManager
 		$localPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		
 		$commandLines = array(
-			conversionEngineType::EXPRESSION_ENCODER3 => KDLCmdlinePlaceholders::InFileName . ' ' . KDLCmdlinePlaceholders::ConfigFileName,
+				conversionEngineType::EXPRESSION_ENCODER3 => KDLCmdlinePlaceholders::InFileName . ' ' . KDLCmdlinePlaceholders::ConfigFileName,
 		);
 		$commandLinesStr = flavorParamsOutput::buildCommandLinesStr($commandLines);
 		
@@ -409,11 +411,8 @@ class kJobsManager
 		$convertCollectionData->setInputXmlRemoteUrl($remoteUrl);
 		$convertCollectionData->setCommandLinesStr($commandLinesStr);
 		
-		$lockJobInfo = new kLockInfoData($dbConvertCollectionJob);
-		$lockJobInfo->setEstimatedEffort(kFile::fileSize());
-		$dbConvertCollectionJob->setLockInfo($lockJobInfo);
-		
-		return kJobsManager::addJob($dbConvertCollectionJob, $convertCollectionData, BatchJobType::CONVERT_COLLECTION, $currentConversionEngine);
+		$dbConvertCollectionJob->setData($convertCollectionData);
+		return kJobsManager::updateBatchJob($dbConvertCollectionJob, BatchJob::BATCHJOB_STATUS_PENDING);
 	}
 	
 	
@@ -1290,9 +1289,7 @@ class kJobsManager
 	public static function addFutureDeletionJob(BatchJob $parentJob = null, $entryId = null, Partner $partner, $syncKey, $localFileSyncPath, $dc)
 	{
 		$deleteFileData = new kDeleteFileJobData();
-		
 		$deleteFileData->setLocalFileSyncPath($localFileSyncPath);
-		
 		$deleteFileData->setSyncKey($syncKey);
 		
 		if ($parentJob)
@@ -1312,7 +1309,6 @@ class kJobsManager
 		
 		KalturaLog::log("Creating File Delete job, from data center id: ". $deleteFileData->getDC() ." with source file: " . $deleteFileData->getLocalFileSyncPath()); 
 		return self::addJob($batchJob, $deleteFileData, BatchJobType::DELETE_FILE );
-		
 	}
 	
 	
@@ -1352,7 +1348,6 @@ class kJobsManager
 		$jobData->setUserId($puserId);
 		$jobData->setObjectId($objectId);
 		$jobData->setData($notificationData);
-			
  		
 		$batchJob = null;
 		if($parentJob)
@@ -1366,12 +1361,10 @@ class kJobsManager
 			$batchJob->setPartnerId($partnerId);
 		}
 			
-		$batchJob = self::addJob($batchJob, $jobData, BatchJobType::NOTIFICATION, $notificationType);
-		
 		if($sendType == kNotificationJobData::NOTIFICATION_MGR_NO_SEND || $sendType == kNotificationJobData::NOTIFICATION_MGR_SEND_SYNCH)
-			$batchJob = self::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
-			
-		return $batchJob;
+			$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
+		
+		return self::addJob($batchJob, $jobData, BatchJobType::NOTIFICATION, $notificationType);
 	}
 	
 	
@@ -1414,7 +1407,11 @@ class kJobsManager
 		$lockInfo->setUrgency($data->calculateUrgency($batchJob));
 		$batchJob->setLockInfo($lockInfo);
 		
-		$batchJob = self::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
+		if(is_null($batchJob->getStatus())) {
+			$batchJob = self::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
+		} else {
+			$batchJob = self::updateBatchJob($batchJob, $batchJob->getStatus());
+		}
 
 		return $batchJob;		
 	}
@@ -1439,12 +1436,14 @@ class kJobsManager
 			$job->setObjectId($objectId);
 			$job->setObjectType($objectType);
 		}
-		$job->save();
 		
 		if(is_null($jobData))
 		{
 			throw new APIException(APIErrors::BULK_UPLOAD_BULK_UPLOAD_TYPE_NOT_VALID, $bulkUploadType);
 		}
+		
+		$job->setStatus(BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
+		$job = kJobsManager::addJob($job, $jobData, BatchJobType::BULKUPLOAD, $bulkUploadType);
 		
 		if(!is_null($jobData->getFilePath()))
 		{
@@ -1484,6 +1483,7 @@ class kJobsManager
     			throw new APIException(APIErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $jobData->getConversionProfileId());
     	}
 
-		return kJobsManager::addJob($job, $jobData, BatchJobType::BULKUPLOAD, $bulkUploadType);
+		$job->setData($jobData);
+		return kJobsManager::updateBatchJob($job, BatchJob::BATCHJOB_STATUS_PENDING);
 	}
 }

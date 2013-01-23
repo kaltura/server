@@ -93,9 +93,16 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		if($isNew)
 			return true;
 		
+		$oldStatus = $batchJob->getColumnsOldValue(BatchJobPeer::STATUS);
+		$oldValueInClosed = is_null($oldStatus) ? false : in_array($oldStatus, BatchJobPeer::getClosedStatusList());
+		
+		$newValue = $batchJob->getStatus();
+		$newValueInOpen = in_array($newValue, BatchJobPeer::getUnClosedStatusList());
+		
 		// if the object is not a new object, a batch_job_lock object should exist.
-		// an exception is retry request of an entry that was in closed status and we now restarted it. 
-		if($batchJob->getStatus() != BatchJob::BATCHJOB_STATUS_RETRY)
+		// an exception is when we move from a closed state to a open open. 
+		// f.i. retry request of an entry that was in closed status and we now restarted it. 
+		if(!($oldValueInClosed && $newValueInOpen))
 			return false;
 		
 		$lockEntry = BatchJobLockPeer::retrieveByPK($batchJob->getId());

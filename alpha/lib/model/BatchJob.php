@@ -390,7 +390,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	{
 		$child = new BatchJob();
 		
-		$child->setStatus(self::BATCHJOB_STATUS_PENDING);
 		$child->setJobType($type);
 		if($subType !== null)
 			$child->setJobSubType($subType);
