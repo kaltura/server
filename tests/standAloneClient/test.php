@@ -3,31 +3,27 @@
 
 /* --------  Validates arguments -------- */
 
-$exampleMessage = "\tphp " . basename(__FILE__) . " input output\n";
+$exampleMessage = "\tphp " . basename(__FILE__) . " input [output]\n";
 $exampleMessage .= 	"For example\n";
 $exampleMessage .= 	"\tphp " . basename(__FILE__) . " in.xml out.xml\n";
 
-if($argc < 3)
+if($argc < 2)
 {
 	echo "Missing attributes, see usage:\n";
 	echo $exampleMessage;
-	exit;
+	exit(-1);
 }
 
 $inFile = $argv[1];
-$outFile = $argv[2];
+$outFile = null;
+if(isset($argv[2]))
+	$outFile = $argv[2];
 
 if(!file_exists($inFile))
 {
 	echo "Input file is missing [$inFile]\n";
-	exit;
+	exit(-1);
 }
-
-//if(file_exists($outFile))
-//{
-//	echo "Output file already exists [$outFile]\n";
-//	exit;
-//}
 
 /* --------  Parse input XML -------- */
 
@@ -60,7 +56,7 @@ $inXml = new SimpleXMLElement(file_get_contents($inFile));
 if($inXml->getName() != 'xml' || (!isset($inXml->request) && !isset($inXml->multirequest)))
 {
 	echo "Input file must match xml format [$xmlFormat]\n";
-	exit;
+	exit(-1);
 }
 
 function parseInputArray(SimpleXMLElement $items)
@@ -74,20 +70,38 @@ function parseInputArray(SimpleXMLElement $items)
 
 function parseInputObject(SimpleXMLElement $input)
 {
+	global $inFile;
+	
 	$type = 'string';
 	if(isset($input['objectType']))
 		$type = strval($input['objectType']);
-
+	
+	$value = strval($input);
+	if(isset($input['path']))
+	{
+		$path = $input['path'];
+		if(!file_exists($path))
+		{
+			$path = dirname($inFile) . '/' . $path;
+			if(!file_exists($path))
+			{
+				echo "File [$path] could not be found\n";
+				exit(-1);
+			}
+		}
+		$value = file_get_contents($path);
+	}
+		
 	switch($type)
 	{
 		case 'string':
-			return strval($input);
+			return $value;
 			
 		case 'int':
-			return intval(strval($input));
+			return intval($value);
 			
 		case 'bool':
-			return (bool)(strval($input));
+			return (bool)($value);
 			
 		case 'array':
 			return parseInputArray($input->item);
@@ -96,7 +110,7 @@ function parseInputObject(SimpleXMLElement $input)
 	if(!class_exists($type))
 	{
 		echo "Type [$type] could not be found\n";
-		exit;
+		exit(-1);
 	}
 	
 	$object = new $type();
@@ -159,7 +173,7 @@ function executeRequest(KalturaClient $client, SimpleXMLElement $request)
 		if(!isset($services[$serviceName]))
 		{
 			echo "Service [$serviceName] not found\n";
-			exit;
+			exit(-1);
 		}
 
 		$service = $services[$serviceName];
@@ -168,7 +182,7 @@ function executeRequest(KalturaClient $client, SimpleXMLElement $request)
 	if(!method_exists($service, $actionName))
 	{
 		echo "Action [$actionName] not found on service [$serviceName]\n";
-		exit;
+		exit(-1);
 	}
 
 	$result = null;
@@ -312,6 +326,9 @@ function appandObject(SimpleXMLElement $outXml, $object, $name)
 	}
 }
 
+if(!$outFile)
+	exit(0);
+	
 $outXml = new SimpleXMLElement('<xml/>');
 $outXmlResult = $outXml->addChild('output');
 
@@ -319,3 +336,5 @@ foreach($results as $result)
 	appandObject($outXmlResult, $result, 'response');
 
 $outXml->saveXML($outFile);
+
+exit(0);

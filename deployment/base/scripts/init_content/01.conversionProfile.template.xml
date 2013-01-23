@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>@SERVICE_URL@</serviceUrl>
+		<partnerId>99</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session>
+		<partnerId>99</partnerId>
+		<secret>@TEMPLATE_PARTNER_ADMIN_SECRET@</secret>
+		<userId></userId>
+		<sessionType>2</sessionType>
+		<expiry>86400</expiry>
+		<privileges></privileges> 
+	</session>
+	<request service="conversionProfile" action="add">
+		<conversionProfile objectType="KalturaConversionProfile">
+			<name>Default</name>
+			<systemName>Default</systemName>
+			<description>The default set of flavors. If not specified otherwise all media uploaded will be converted based on the definition in this profile</description>
+			<isDefault>1</isDefault>
+			<flavorParamsIds>0,5,7,9,10,11,12</flavorParamsIds>
+		</conversionProfile>
+	</request>
+</xml>
