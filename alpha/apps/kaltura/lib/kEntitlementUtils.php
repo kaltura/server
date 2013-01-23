@@ -233,13 +233,14 @@ class kEntitlementUtils
 		}
 	}
 	
-	public static function getPrivacyForKs()
+	public static function getPrivacyForKs($partnerId)
 	{
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		if(!$ks || $ks->isWidgetSession())
-			return array(PrivacyType::ALL);
+			return array(category::formatPrivacy(PrivacyType::ALL, $partnerId));
 			
-		return array(PrivacyType::ALL, PrivacyType::AUTHENTICATED_USERS);
+		return array(category::formatPrivacy(PrivacyType::ALL, $partnerId), 
+				category::formatPrivacy(PrivacyType::AUTHENTICATED_USERS, $partnerId));
 	}
 	
 	public static function getPrivacyContextSearch()

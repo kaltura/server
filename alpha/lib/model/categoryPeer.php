@@ -372,7 +372,7 @@ class categoryPeer extends BasecategoryPeer
 		$c->addAnd($privacyContextCrit);
 
 		//set privacy by ks and type
-		$crit = $c->getNewCriterion ( self::PRIVACY, kEntitlementUtils::getPrivacyForKs(), Criteria::IN);
+		$crit = $c->getNewCriterion ( self::PRIVACY, kEntitlementUtils::getPrivacyForKs($partnerId), Criteria::IN);
 		$crit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
 		//user is entitled to view all cantent that belong to categoires he is a membr of
