@@ -30,6 +30,16 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	    $this->_xmlElement = $this->_doc->createElement("xml");
 	    $this->_xmlElement->setAttribute('apiVersion', KALTURA_API_VERSION);
 	    $this->_xmlElement->setAttribute('generatedDate', time());
+	    exec("which svnversion 2>/dev/null",$out,$rc);
+	    if ($rc === 0){
+			$svnVersion = shell_exec('svnversion ' . $apiV3Path);
+			if ($svnVersion === null){
+			    KalturaLog::warning("Failed to get svn revision number");
+			}else{
+			    $this->_xmlElement->setAttribute('revision', trim($svnVersion));
+			}
+				
+	    }
 	    
 	    $apiV3Path = realpath(dirname(__FILE__) . '/../api_v3');
 	    $this->_doc->appendChild($this->_xmlElement);
