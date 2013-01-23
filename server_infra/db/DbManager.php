@@ -154,7 +154,7 @@ class DbManager
 		$stickySessionExpiry = isset(self::$config['sphinx_datasources']['sticky_session_timeout']) ? self::$config['sphinx_datasources']['sticky_session_timeout'] : 600;
 		
 		$stickySessionKey = 'StickySession:'.infraRequestUtils::getRemoteAddress();
-		$cache = kCacheManager::getCache(kCacheManager::MC_GLOBAL_QUERIES);
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_STICKY_SESSIONS);
 		if ($cache)
 		{
 			$key = $cache->get($stickySessionKey);

@@ -8,10 +8,10 @@ require_once(dirname(__FILE__) . '/kBaseCacheWrapper.php');
  */
 class kApcCacheWrapper extends kBaseCacheWrapper
 {
-	/**
-	 * @return bool false on error
+	/* (non-PHPdoc)
+	 * @see kBaseCacheWrapper::init()
 	 */
-	public function init()
+	public function init($config)
 	{
 		if (!function_exists('apc_fetch'))
 			return false;

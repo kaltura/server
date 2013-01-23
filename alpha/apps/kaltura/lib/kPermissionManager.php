@@ -26,7 +26,6 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	private static $roleIds = null;
 	private static $operatingPartnerId = null;
 	
-	private static $cacheLayers = array(kCacheManager::APC, kCacheManager::MC_GLOBAL_QUERIES);
 	private static $cacheStores = array();
 	
 	/**
@@ -91,7 +90,9 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		self::$cacheStores = array();
 		
-		foreach (self::$cacheLayers as $cacheLayer)
+		$cacheLayers = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PERMISSION_MANAGER);
+		
+		foreach ($cacheLayers as $cacheLayer)
 		{
 			$cacheStore = kCacheManager::getCache($cacheLayer);
 			if (!$cacheStore)

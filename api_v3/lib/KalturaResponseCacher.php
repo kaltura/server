@@ -18,14 +18,14 @@ class KalturaResponseCacher extends kApiCache
 	protected $_defaultExpiry = 600;
 	protected $_cacheHeadersExpiry = 60; // cache headers for CDN & browser - used  for GET request with kalsig param
 		
-	public function __construct($params = null, $cacheTypes = array(kCacheManager::FS_API_V3), $expiry = 0)
+	public function __construct($params = null, $cacheType = kCacheManager::CACHE_TYPE_API_V3, $expiry = 0)
 	{
 		if ($expiry)
 			$this->_defaultExpiry = $this->_expiry = $expiry;
 		
 		$this->_cacheKeyPrefix = 'cache_v3-';
 		
-		parent::__construct($cacheTypes, $params);
+		parent::__construct($cacheType, $params);
 	}
 
 	protected function init()
@@ -116,7 +116,7 @@ class KalturaResponseCacher extends kApiCache
 		if ($usingCache && $isAnonymous && $_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]) && !self::hasExtraFields())
 		{
 			$max_age = $this->_cacheHeadersExpiry;
-			header("Cache-Control: private, max-age=$max_age max-stale=0");
+			header("Cache-Control: private, max-age=$max_age, max-stale=0");
 			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT');
 			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
 		}

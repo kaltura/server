@@ -17,7 +17,7 @@ class kPlayManifestCacher extends kApiCache
 	{		
 		$this->_cacheKeyPrefix = 'playManifest-';
 		
-		parent::__construct(array(kCacheManager::FS_PLAY_MANIFEST));
+		parent::__construct(kCacheManager::CACHE_TYPE_PLAY_MANIFEST);
 	}
 	
 	protected function init()

@@ -214,7 +214,7 @@ class kSessionBase
 		if (strpos($this->privileges, self::PRIVILEGE_ACTIONS_LIMIT) !== false)
 			return null;			// cannot validate action limited KS at this level
 		
-		$memcache = kCacheManager::getCache(kCacheManager::MC_GLOBAL_KEYS);
+		$memcache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
 		if (!$memcache)
 			return null;			// failed to connect to memcache or memcache not enabled
 

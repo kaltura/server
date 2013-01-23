@@ -7,6 +7,12 @@
 abstract class kBaseCacheWrapper
 {	
 	/**
+	 * @param array $config
+	 * @return boolean
+	 */
+	abstract public function init($config);
+	
+	/**
 	 * @param string $key
 	 * @return mixed or false on error
 	 */

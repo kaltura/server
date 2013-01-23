@@ -14,28 +14,26 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 
 	protected $hostName;
 	protected $port;
-	protected $flags;
+	protected $flags = 0;
 
 	protected $memcache = null;
 	protected $gotError = false;
 	protected $connectAttempts = 0;
 	
-	/**
-	 * @param string $hostName
-	 * @param int $port
-	 * @param int $flags
-	 * @return bool false on error
+	/* (non-PHPdoc)
+	 * @see kBaseCacheWrapper::init()
 	 */
-	public function init($hostName, $port, $flags)
+	public function init($config)
 	{
 		if (!class_exists('Memcache'))
 		{
 			return false;
 		}
 		
-		$this->hostName = $hostName;
-		$this->port = $port;
-		$this->flags = ($flags == self::COMPRESSED ? MEMCACHE_COMPRESSED : 0);
+		$this->hostName = $config['host'];
+		$this->port = $config['port'];
+		if (isset($config['flags']) && $config['flags'] == self::COMPRESSED)
+			$this->flags = MEMCACHE_COMPRESSED;
 		
 		return $this->reconnect();
 	}

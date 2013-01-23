@@ -108,12 +108,12 @@ class kApiCache
 	protected static $_usesHttpReferrer = false;	// enabled if the request is dependent on the http referrer field (opposed to an API parameter referrer)
 	protected static $_hasExtraFields = false;		// set to true if the response depends on http headers and should not return caching headers to the user / cdn
 	
-	protected function __construct($cacheTypes, $params = null)
+	protected function __construct($cacheType, $params = null)
 	{
 		$this->_instanceId = self::$_nextInstanceId;  
 		self::$_nextInstanceId++;
 
-		$this->_cacheStoreTypes = $cacheTypes; 
+		$this->_cacheStoreTypes = kCacheManager::getCacheSectionNames($cacheType); 
 		
 		if ($params)
 			$this->_params = $params;
@@ -317,7 +317,7 @@ class kApiCache
 			// a request can theoritically have more than one referrer, in case of several baseEntry.getContextData calls in a single multirequest
 			foreach ($this->_referrers as $referrer)
 			{
-				$values[] = infraRequestUtils::parseUrlHost($referrer);
+				$values[] = $referrer;
 			}
 			return $values;
 
@@ -336,7 +336,7 @@ class kApiCache
 		return array();
 	}
 	
-	protected function applyCondition($fieldValue, $condition, $refValue)
+	protected function applyCondition($fieldValue, $condition, $refValue, $strippedFieldValue)
 	{
 		switch ($condition)
 		{			
@@ -357,15 +357,16 @@ class kApiCache
 			return false;	
 
 		case self::COND_SITE_MATCH:
+			$result = (strpos($fieldValue, "kwidget") === false ? '0' : '1');
 			if (!count($refValue))
-				return null;
+				return $result;
 			foreach($refValue as $curRefValue)
 			{
-				if ($fieldValue === $curRefValue || 
-					strpos($fieldValue, "." . $curRefValue) !== false)
-					return true;
+				if ($strippedFieldValue === $curRefValue || 
+					strpos($strippedFieldValue, "." . $curRefValue) !== false)
+					return $result . '1';
 			}
-			return false;
+			return $result . '0';
 
 		case self::COND_IP_RANGE:
 			if (!count($refValue))
@@ -377,7 +378,7 @@ class kApiCache
 			}
 			return false;
 		}
-		return $fieldValue;
+		return $strippedFieldValue;
 	}
 	
 	protected function getConditionKey($condition, $refValue)
@@ -405,7 +406,11 @@ class kApiCache
 		
 		foreach ($this->getFieldValues($extraField) as $valueIndex => $fieldValue)
 		{
-			$conditionResult = $this->applyCondition($fieldValue, $condition, $refValue);
+			if ($extraField == self::ECF_REFERRER)
+				$strippedFieldValue = infraRequestUtils::parseUrlHost($fieldValue);
+			else
+				$strippedFieldValue = $fieldValue;
+			$conditionResult = $this->applyCondition($fieldValue, $condition, $refValue, $strippedFieldValue);
 			$key = "___cache___{$extraField}_{$valueIndex}" . $this->getConditionKey($condition, $refValue);
 			$this->_params[$key] = $conditionResult;
 		}
@@ -415,7 +420,7 @@ class kApiCache
 
 	protected function addExtraFields()
 	{
-		$extraFieldsCache = kCacheManager::getCache(kCacheManager::APC);
+		$extraFieldsCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_API_EXTRA_FIELDS);
 		if (!$extraFieldsCache)
 			return;
 		
@@ -437,7 +442,7 @@ class kApiCache
 		if (!$this->_cacheKeyDirty)
 			return;			// no extra fields were added to the cache
 
-		$extraFieldsCache = kCacheManager::getCache(kCacheManager::APC);
+		$extraFieldsCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_API_EXTRA_FIELDS);
 		if (!$extraFieldsCache)
 		{
 			self::disableCache();
@@ -468,7 +473,7 @@ class kApiCache
 	// cache read functions
 	protected static function getMaxInvalidationTime($invalidationKeys)
 	{
-		$memcache = kCacheManager::getCache(kCacheManager::MC_GLOBAL_KEYS);
+		$memcache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
 		if (!$memcache)
 			return null;
 

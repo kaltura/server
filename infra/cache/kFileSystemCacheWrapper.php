@@ -16,22 +16,16 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	protected $defaultExpiry;
 	protected $supportExpiry;
 
-	/**
-	 * @param string $rootFolder
-	 * @param string $baseFolder
-	 * @param int $keyFolderChars
-	 * @param bool $serializeData
-	 * @param int $defaultExpiry
-	 * @param bool $supportExpiry
-	 * @return bool false on error
+	/* (non-PHPdoc)
+	 * @see kBaseCacheWrapper::init()
 	 */
-	public function init($rootFolder, $baseFolder, $keyFolderChars, $serializeData, $defaultExpiry, $supportExpiry)
-	{
-		$this->baseFolder = rtrim($rootFolder, '/') . '/' . rtrim($baseFolder, '/') . '/';
-		$this->keyFolderChars = $keyFolderChars;
-		$this->serializeData = $serializeData;
-		$this->defaultExpiry = $defaultExpiry;
-		$this->supportExpiry = $supportExpiry;
+	public function init($config)
+	{		
+		$this->baseFolder = rtrim($config['rootFolder'], '/') . '/' . rtrim($config['baseFolder'], '/') . '/';
+		$this->keyFolderChars = $config['keyFolderChars'];
+		$this->serializeData = isset($config['serializeData']) ? $config['serializeData'] : false;
+		$this->defaultExpiry = $config['defaultExpiry'];
+		$this->supportExpiry = isset($config['supportExpiry']) ? $config['supportExpiry'] : false;
 		return true;
 	}
 	

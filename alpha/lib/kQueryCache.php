@@ -43,14 +43,14 @@ class kQueryCache
 		
 		self::$s_memcacheInited = true;
 		
-		self::$s_memcacheKeys = kCacheManager::getCache(kCacheManager::MC_GLOBAL_KEYS);
+		self::$s_memcacheKeys = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
 		if (self::$s_memcacheKeys === null)
 		{
 			// no reason to init the queries server, the query cache won't be used anyway
 			return;
 		}
 
-		self::$s_memcacheQueries = kCacheManager::getCache(kCacheManager::MC_GLOBAL_QUERIES);
+		self::$s_memcacheQueries = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_QUERIES);
 	}
 	
 	protected static function replaceVariable($formatString, $variableValue)
