@@ -275,8 +275,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		}
 		// check password structure
 		if (!self::isPasswordStructureValid($newPassword, $loginData->getConfigPartnerId())   ||
-			stripos($newPassword, $loginData->getFirstName() !== false)   ||
-			stripos($newPassword, $loginData->getLastName() !== false)    ||
+			stripos($newPassword, $loginData->getFirstName()) !== false   ||
+			stripos($newPassword, $loginData->getLastName()) !== false    ||
 			$newPassword == $loginData->getLoginEmail()  ) {
 			throw new kUserException ('', kUserException::PASSWORD_STRUCTURE_INVALID);
 		}
