@@ -61,6 +61,16 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		parent::setScreenName($kuser->getScreenName());
 	}
 	
+	/**
+	 * @param string $permissionName
+	 * @return boolean
+	 */
+	public function hasPermission($permissionName)
+	{
+		$permissions = explode(',', $this->getPermissionNames());
+		return in_array($permissionName, $permissions);
+	}
+	
 	public function setKuserId($kuserId)
 	{
 		if ( self::getKuserId() == $kuserId )  // same value - don't set for nothing 

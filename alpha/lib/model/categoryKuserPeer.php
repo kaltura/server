@@ -56,38 +56,85 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 	 * 
 	 * @param int $categoryId
 	 * @param int $kuserId
+	 * @param array $requiredPermissions
 	 * @param $con
 	 * 
 	 * @return categoryKuser
 	 */
-	public static function retrieveByCategoryIdAndActiveKuserId($categoryId, $kuserId, $con = null)
+	public static function retrieveByCategoryIdAndActiveKuserId($categoryId, $kuserId = null, $requiredPermissions = null, $con = null)
 	{
+		if(is_null($kuserId))
+			$kuserId = kCurrentContext::getCurrentKsKuserId();
+			
+		if(is_null($requiredPermissions))
+			$requiredPermissions = array(PermissionName::CATEGORY_VIEW);
+			
+		$category = categoryPeer::retrieveByPK($categoryId);
+		if(!$category)
+			return null;
+		
+		if($category->getInheritedParentId())
+			$categoryId = $category->getInheritedParentId();
+			
 		$criteria = new Criteria();
-
 		$criteria->add(categoryKuserPeer::CATEGORY_ID, $categoryId);
 		$criteria->add(categoryKuserPeer::KUSER_ID, $kuserId);
 		$criteria->add(categoryKuserPeer::STATUS, CategoryKuserStatus::ACTIVE);
 
-		return categoryKuserPeer::doSelectOne($criteria, $con);
+		$categoryKuser = categoryKuserPeer::doSelectOne($criteria, $con);
+		foreach($requiredPermissions as $requiredPermission)
+			if(!$categoryKuser->hasPermission($requiredPermission))
+				return null;
+				
+		return $categoryKuser;
 	}
 	
 	/**
 	 * 
 	 * @param array $categoriesIds
 	 * @param int $kuserId
+	 * @param array $requiredPermissions
 	 * @param $con
 	 * 
 	 * @return categoryKuser
 	 */
-	public static function retrieveByCategoriesIdsAndActiveKuserId($categoriesIds, $kuserId, $con = null)
+	public static function areCategoriesAllowed(array $categoriesIds, $kuserId = null, $requiredPermissions = null, $con = null)
 	{
+		if(is_null($kuserId))
+			$kuserId = kCurrentContext::getCurrentKsKuserId();
+			
+		if(is_null($requiredPermissions))
+			$requiredPermissions = array(PermissionName::CATEGORY_VIEW);
+			
+		$categories = categoryPeer::retrieveByPKs($categoriesIds);
+		if(count($categories) < count($categoriesIds))
+			return false;
+		
+		$categoriesIds = array();
+		foreach($categories as $category)
+		{
+			/* @var $category category */
+			$categoriesIds[] = $category->getInheritedParentId() ? $category->getInheritedParentId() : $category->getId();
+		}
+		$categoriesIds = array_unique($categoriesIds);
+		
 		$criteria = new Criteria();
-
 		$criteria->add(categoryKuserPeer::CATEGORY_ID, $categoriesIds, Criteria::IN);
 		$criteria->add(categoryKuserPeer::KUSER_ID, $kuserId);
 		$criteria->add(categoryKuserPeer::STATUS, CategoryKuserStatus::ACTIVE);
 
-		return categoryKuserPeer::doSelectOne($criteria, $con);
+		$categoryKusers = categoryKuserPeer::doSelectOne($criteria, $con);
+		if(count($categoryKusers) < count($categoriesIds))
+			return false;
+			
+		foreach($categoryKusers as $categoryKuser)
+		{
+			$permissions = explode(',', $categoryKuser->getPermissionNames());
+			foreach($requiredPermissions as $requiredPermission)
+				if(!in_array($requiredPermission, $permissions))
+					return false;
+		}
+		return true;
 	}
 	
 	/**

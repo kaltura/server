@@ -43,6 +43,10 @@ class CategoryUserService extends KalturaBaseService
 			$dbCategoryKuser->setPermissionLevel($category->getDefaultPermissionLevel());
 			$dbCategoryKuser->setStatus(CategoryKuserStatus::PENDING);
 		}
+		else
+		{
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_USER_JOIN_NOT_ALLOWED, $categoryUser->categoryId);	
+		}
 				
 		$dbCategoryKuser->setCategoryFullIds($category->getFullIds());
 		$dbCategoryKuser->setPartnerId($this->getPartnerId());
@@ -168,7 +172,7 @@ class CategoryUserService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS, $categoryId);		
 		
 		// only manager can remove memnger or users remove himself
-		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($dbCategoryKuser->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
+		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($dbCategoryKuser->getCategoryId());
 		if((!$currentKuserCategoryKuser || 
 			($currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&
 			 kCurrentContext::$ks_uid != $userId)) &&
