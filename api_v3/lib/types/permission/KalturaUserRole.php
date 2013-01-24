@@ -22,6 +22,13 @@ class KalturaUserRole extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var string
+	 * @filter eq,in
+	 */
+	public $systemName;
+	
+	
+	/**
+	 * @var string
 	 * @filter like
 	 */
 	public $description;
@@ -75,6 +82,7 @@ class KalturaUserRole extends KalturaObject implements IFilterable
 	private static $map_between_objects = array(
 		'id',
 		'name',
+		'systemName',
 		'description',
 		'status',
 		'partnerId',
@@ -99,6 +107,42 @@ class KalturaUserRole extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate()
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validatePropertyMinLength("name", 1, true);
+	
+		if($this->systemName)
+		{
+			$c = KalturaCriteria::create(UserRolePeer::OM_CLASS);
+			$c->add(UserRolePeer::ID, $sourceObject->getId(), Criteria::NOT_EQUAL);
+			$c->add(UserRolePeer::SYSTEM_NAME, $this->systemName);
+			if(UserRolePeer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+		}
+		
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validatePropertyMinLength("name", 1);
+		
+		if($this->systemName)
+		{
+			$c = KalturaCriteria::create(UserRolePeer::OM_CLASS);
+			$c->add(UserRolePeer::SYSTEM_NAME, $this->systemName);
+			if(UserRolePeer::doCount($c))
+				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
+		}
+		
+		return parent::validateForInsert($propertiesToSkip);
+	}
 	
 	public function getExtraFilters()
 	{
