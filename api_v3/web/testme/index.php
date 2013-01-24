@@ -117,7 +117,7 @@ ksort($services, SORT_STRING);
 				
 				<div class="param">
 					<label for="ks">KS (string):</label>
-					<input type="text" class="" name="ks" size="30" /> 
+					<input id="ks" type="text" class="" name="ks" size="30" /> 
 					<input id="chk-ks" type="checkbox" checked="checked" />
 				</div>	
 				<?php 

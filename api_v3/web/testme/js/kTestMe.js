@@ -153,12 +153,16 @@ var kTestMe = {
 			var iframeDoc = jQuery('#response')[0].contentWindow.document;
 			var xmlDoc = (iframeDoc.XMLDocument) ? iframeDoc.XMLDocument : iframeDoc.documentElement;
 			var response = jQuery(xmlDoc).find('result');
-			var field = this.call.getField('ks');
+			var field = jQuery('#ks');
 			if(!field)
+			{
+				this.log.debug("ks field not found");
 				return;
-			
+			}
 			if (response.size() && !response.find('error').size()){
-				field.setValue(response.text());
+				this.log.debug(response.text());
+				field.val(response.text());
+				field.click();
 			}
 			// if not empty, empty it
 			else if (field.getValue()){
