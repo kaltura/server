@@ -103,6 +103,17 @@ function parseInputObject(SimpleXMLElement $input)
 		case 'bool':
 			return (bool)($value);
 			
+		case 'file':
+			if(file_exists($value))
+				return realpath($value);
+				
+			$value = dirname($inFile) . '/' . $value;
+			if(file_exists($value))
+				return realpath($value);
+				
+			echo "File [$value] could not be found\n";
+			exit(-1);
+			
 		case 'array':
 			return parseInputArray($input->item);
 	}
