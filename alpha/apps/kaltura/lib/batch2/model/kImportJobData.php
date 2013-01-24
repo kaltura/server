@@ -21,6 +21,11 @@ class kImportJobData extends kJobData
 	private $flavorAssetId;
 	
 	/**
+	 * @var int
+	 */
+	private $fileSize;
+	
+	/**
 	 * @var bool
 	 */
 	private $cacheOnly = false;
@@ -87,5 +92,19 @@ class kImportJobData extends kJobData
 	public function setDestFileLocalPath($destFileLocalPath)
 	{
 		$this->destFileLocalPath = $destFileLocalPath;
+	}
+	
+	/**
+	 * @return the $fileSize
+	 */
+	public function getFileSize() {
+		return $this->fileSize;
+	}
+	
+	/**
+	 * @param number $fileSize
+	 */
+	public function setFileSize($fileSize) {
+		$this->fileSize = $fileSize;
 	}
 }

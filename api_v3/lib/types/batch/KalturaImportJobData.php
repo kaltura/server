@@ -19,12 +19,18 @@ class KalturaImportJobData extends KalturaJobData
 	 * @var string
 	 */
 	public $flavorAssetId;
+	
+	/**
+	 * @var int
+	 */
+	public $fileSize;
     
 	private static $map_between_objects = array
 	(
 		"srcFileUrl" ,
 		"destFileLocalPath" ,
 		"flavorAssetId" ,
+		"fileSize",
 	);
 
 	public function getMapBetweenObjects ( )
