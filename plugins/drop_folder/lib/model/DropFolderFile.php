@@ -60,7 +60,7 @@ class DropFolderFile extends BaseDropFolderFile
 	
 	public function setStatus($v)
 	{
-		if($this->getColumnsOldValue(DropFolderFilePeer::STATUS) != DropFolderFileStatus::PURGED)
+		if($this->getStatus() != DropFolderFileStatus::PURGED)
 			return parent::setStatus($v);
 			
 		return $this;
