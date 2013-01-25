@@ -74,6 +74,10 @@ class kSessionBase
 	public $master_partner_id = null;
 	public $additional_data = null;
 	
+	/**
+	 * @param string $encoded_str
+	 * @return kSessionBase
+	 */
 	public static function getKSObject($encoded_str)
 	{
 		if (empty($encoded_str))
@@ -86,6 +90,10 @@ class kSessionBase
 		return $ks;
 	}
 	
+	/**
+	 * @param string $encoded_str
+	 * @return boolean
+	 */
 	public function parseKS($encoded_str)
 	{
 		// try V2
