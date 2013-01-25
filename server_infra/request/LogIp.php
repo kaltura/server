@@ -6,7 +6,13 @@
 class LogIp
 {
 	static $_ip = null;
+	
 	public function __toString()
+	{
+		return self::get();
+	}
+	
+	public static function get()
 	{
 		if (self::$_ip === null)
 		{
