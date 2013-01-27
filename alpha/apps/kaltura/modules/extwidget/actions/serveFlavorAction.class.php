@@ -96,7 +96,7 @@ class serveFlavorAction extends kalturaAction
 				{
 					$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : ($mediaInfo->getAudioDuration() ?
 					$mediaInfo->getAudioDuration() : $mediaInfo->getContainerDuration()));
-					$limit_file_size = floor(@kFile::fileSize($path) * ($clipTo / $duration));
+					$limit_file_size = floor((@kFile::fileSize($path) * ($clipTo / $duration))*1.2);
 				}
 			}
 			kFileUtils::dumpFile($path, null, null, $limit_file_size);
