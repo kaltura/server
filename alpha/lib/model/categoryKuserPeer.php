@@ -82,6 +82,9 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 		$criteria->add(categoryKuserPeer::STATUS, CategoryKuserStatus::ACTIVE);
 
 		$categoryKuser = categoryKuserPeer::doSelectOne($criteria, $con);
+		if(!$categoryKuser)
+			return null;
+			
 		foreach($requiredPermissions as $requiredPermission)
 			if(!$categoryKuser->hasPermission($requiredPermission))
 				return null;
