@@ -20,7 +20,7 @@ $returnValue = null;
 while (false !== ($fileName = $dir->read()))
 {
 	$filePath = realpath("$dirPath/$fileName");
-	if($fileName[0] == '.' || is_dir($filePath))
+	if($fileName[0] == '.' || is_dir($filePath) || preg_match('/template.xml$/', $fileName))
 		continue;
 
 	KalturaLog::info("Adding content from file [$filePath]");
