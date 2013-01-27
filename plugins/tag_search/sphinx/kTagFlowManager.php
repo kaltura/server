@@ -44,10 +44,16 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public function objectCreated (BaseObject $object)
     {
-        $tagsToAdd = $this->checkExistsForAdd($object);
-        if (count($tagsToAdd))
-            $this->addTags($tagsToAdd, $this->getObjectIdByClassName(get_class($object)), $object->getPartnerId());
-        
+    	try
+    	{
+	        $tagsToAdd = $this->checkExistsForAdd($object);
+	        if (count($tagsToAdd))
+	            $this->addTags($tagsToAdd, $this->getObjectIdByClassName(get_class($object)), $object->getPartnerId());
+    	}
+    	catch(Exception $e)
+    	{
+    		KalturaLog::err($e);
+    	}
     }
 
 	/* (non-PHPdoc)
