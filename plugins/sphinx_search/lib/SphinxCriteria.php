@@ -359,8 +359,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		if ($criterion->getComparison() == Criteria::IN) {
 			$value = $criterion->getValue();
 			if(is_string($value))
-				return explode(",", $value);
-			return $value;
+				$value = explode(",", $value);
+			return array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
 		}
 		
 		return null;
@@ -399,7 +399,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			}
 			
 			// Add condition
-			if(empty($formatedStr))
+			if(empty($formatedStr) || (count($formatedStr) > SphinxCriterion::MAX_IN_VALUES))
 				continue;
 			
 			$this->matchClause[] = "( @sphinx_match_optimizations " . implode(" | ", $formatedStr) . ")";
