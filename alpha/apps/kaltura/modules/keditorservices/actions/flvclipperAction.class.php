@@ -427,7 +427,19 @@ class flvclipperAction extends kalturaAction
 		// mp4
 		if (!$isFlv)
 		{
-			kFileUtils::dumpFile($path);
+			$limit_file_size = 0;
+			if ($clip_to != 2147483647)
+			{
+				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
+				if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
+				{
+					$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : ($mediaInfo->getAudioDuration() ?
+					$mediaInfo->getAudioDuration() : $mediaInfo->getContainerDuration()));
+					$limit_file_size = floor(@kFile::fileSize($path) * ($clip_to / $duration));
+				}
+			}
+			KalturaLog::DEBUG("serving file [$path] entry id [$entry_id] limit file size [$limit_file_size] clip_to [$clip_to]");
+			kFileUtils::dumpFile($path, null, null, $limit_file_size);
 		}
 		
 		$this->logMessage( "flvclipperAction: serving file [$path] entry_id [$entry_id] clip_from [$clip_from] clip_to [$clip_to]" , "warning" );
