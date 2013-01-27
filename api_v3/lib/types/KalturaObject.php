@@ -5,7 +5,8 @@
  */
 abstract class KalturaObject 
 {
-	static protected $fromObjectMap = array();
+	static protected $sourceFilesCache = array();
+	static protected $classPrivatesCache = array();
 	
 	protected function getReadOnly ()
 	{
@@ -46,98 +47,240 @@ abstract class KalturaObject
 		return $className;
 	}
 		
-
-	public function getFromObjectMap ()
+	static protected function getFunctionBody($func)
 	{
-		$className = get_class($this);
-		$cacheKey = kCurrentContext::$ks_hash . '_' . $className;
-		if (isset(self::$fromObjectMap[$cacheKey]))
-			return self::$fromObjectMap[$cacheKey];
-
-		$reflector = KalturaTypeReflectorCacher::get($className);
-		if(!$reflector)
-			return array();
-			
-		$properties = $reflector->getProperties();
+		$filename = $func->getFileName();
+		$startLine = $func->getStartLine() - 1;
+		$endLine = $func->getEndLine();
+		$length = $endLine - $startLine;
+	
+		if (!isset(self::$sourceFilesCache[$filename]))
+			self::$sourceFilesCache[$filename] = file($filename);
 		
-		if ($reflector->requiresReadPermission() && !kPermissionManager::getReadPermitted($className, kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
-			return array(); // current user has no permission for accessing this object class
-		}
+		$body = implode("", array_slice(self::$sourceFilesCache[$filename], $startLine, $length));
+		return $body;
+	}
+	
+	static protected function getClassPrivates($className)
+	{
+		if (isset(self::$classPrivatesCache[$className]))
+			return self::$classPrivatesCache[$className];
 		
-		$result = array(); 
-		foreach ( $this->getMapBetweenObjects() as $this_prop => $object_prop )
+		$refClass = new ReflectionClass($className);
+		$result = array();
+		
+		// properties
+		$privateProps = $refClass->getProperties(ReflectionProperty::IS_PRIVATE);
+		foreach ($privateProps as $privateProp)
 		{
-			if ( is_numeric( $this_prop) ) 
-			    $this_prop = $object_prop;
-			    
-			if(!isset($properties[$this_prop]) || $properties[$this_prop]->isWriteOnly())
-				continue;
-				
-			// ignore property if it requires a read permission which the current user does not have
-			if ($properties[$this_prop]->requiresReadPermission() && !kPermissionManager::getReadPermitted($this->getDeclaringClassName($this_prop), $this_prop))
-			{
-			    KalturaLog::debug("Missing read permission for property $this_prop");
-				continue;
-			}
-				
-            $getter_name = "get{$object_prop}";
-            
-            $getter_params = array();
-            if (in_array($this_prop, array("createdAt", "updatedAt", "deletedAt")))
-				$getter_params = array(null);            
-            
-			$arrayClass = null;
-			if ($properties[$this_prop]->isArray())
-			{
-				$class = $properties[$this_prop]->getType();
-				if(method_exists($class, 'fromDbArray'))
-					$arrayClass = $class;
-			}
-			
-			$enumMap = null;
-			if ($properties[$this_prop]->isDynamicEnum())
-            {
-            	$propertyType = $properties[$this_prop]->getType();
-            	$enumClass = call_user_func(array($propertyType, 'getEnumClass'));
-            	if ($enumClass)
-            		$enumMap = kPluginableEnumsManager::getCoreMap($enumClass);
-            }
-            
-            $result[] = array($this_prop, $getter_name, $getter_params, $arrayClass, $enumMap);
+			$result[] = strtolower($privateProp->name);
 		}
-
-		self::$fromObjectMap[$cacheKey] = $result;
+		
+		// methods
+		$privateMethods = $refClass->getMethods(ReflectionMethod::IS_PRIVATE);
+		foreach ($privateMethods as $privateMethod)
+		{
+			$result[] = strtolower($privateMethod->name);
+		}
+		
+		self::$classPrivatesCache[$className] = $result;
+		
 		return $result;
 	}
 	
-	public function fromObject ( $source_object  )
+	protected function generateFromObjectClass($srcObj, $fromObjectClass)
 	{
-		$map = $this->getFromObjectMap();
-		foreach ($map as $curProp)
+		// initialize reflection data
+		$srcObjClass = get_class($srcObj);
+		$srcObjRef = new ReflectionClass($srcObj);
+	
+		$thisClass = get_class($this);
+		$thisRef = KalturaTypeReflectorCacher::get($thisClass);
+		if(!$thisRef)
+			return false;
+		$thisProps = $thisRef->getProperties();
+	
+		// generate file header
+		$result = "<?php\nclass {$fromObjectClass} extends {$srcObjClass}\n{\n\tstatic function fromObject(\$apiObj, \$srcObj)\n\t{\n";
+	
+		if ($thisRef->requiresReadPermission())
 		{
-			list($this_prop, $getter_name, $getter_params, $arrayClass, $enumMap) = $curProp;
-
-			$getter_callback = array($source_object, $getter_name);
-			
-            if (!is_callable($getter_callback))
-            {
-            	KalturaLog::alert("getter for property [$this_prop] was not found on object class [" . get_class($source_object) . "]");
-            	continue;
-            }
-            
-            $value = call_user_func_array($getter_callback, $getter_params);
-                
-            if($arrayClass && is_array($value))
-            {
-             	$value = call_user_func(array($arrayClass, 'fromDbArray'), $value);
-            }
-            elseif($enumMap && isset($enumMap[$value]))
-            {
-              	$value = $enumMap[$value];
-            }
-               	
-            $this->$this_prop = $value;
+			$result .= "\t\tif (!kPermissionManager::getReadPermitted('{$thisClass}', kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER))\n";
+			$result .= "\t\t\treturn;\n";
 		}
+	
+		// generate properties copy code
+		$mappingFuncCode = array();
+		$usesCustomData = false;
+	
+		foreach ( $this->getMapBetweenObjects() as $apiPropName => $dbPropName )
+		{
+			if (is_numeric($apiPropName))
+				$apiPropName = $dbPropName;
+				
+			if(!isset($thisProps[$apiPropName]))
+			{
+				KalturaLog::alert("property {$apiPropName} defined in map, does not exist on object {$thisClass}");
+				continue;
+			}
+			
+			if ($thisProps[$apiPropName]->isWriteOnly())
+				continue;
+	
+			// get getter function body
+			$getterName = "get{$dbPropName}";
+			if (!is_callable(array($srcObj, $getterName)))
+			{
+				KalturaLog::alert("getter for property {$dbPropName} was not found on object {$srcObjClass}");
+				continue;
+			}
+			
+			$curGetter = $srcObjRef->getMethod($getterName);
+			$getterFunc = self::getFunctionBody($curGetter);
+	
+			$startBracePos = strpos($getterFunc, '{');
+			$endBracePos = strrpos($getterFunc, '}');
+	
+			$getterBody = trim(substr($getterFunc, $startBracePos + 1, $endBracePos - $startBracePos - 1));
+	
+			// calculate field value
+			$fieldValue = null;
+	
+			if (strrpos($getterBody, 'return ') === 0)
+			{
+				// simple getter
+				$fieldValue = trim(rtrim(trim(substr($getterBody, 7)), ';'));
+	
+				$matches = array();
+				$matchCount = preg_match_all('/\$this\->getFromCustomData\s*\(\s*([\'"]?[\w:_]+[\'"]?)\s*\)/', $fieldValue, $matches);
+				for ($curIndex = 0; $curIndex < $matchCount; $curIndex++)
+				{				
+					$customDataKey = $matches[1][$curIndex];
+					$customDataValue = "(isset(\$customData[{$customDataKey}]) ? \$customData[{$customDataKey}] : null)";
+					$fieldValue = str_replace($matches[0][$curIndex], $customDataValue, $fieldValue);
+					$usesCustomData = true;
+				}
+	
+				$fieldValue = str_replace('$this->', '$srcObj->', $fieldValue);
+				$fieldValue = str_replace('self::', "{$curGetter->class}::", $fieldValue);
+				
+				// check whether we are going to access any private properties
+				$matches = array();
+				$matchCount = preg_match_all('/\$srcObj\->([\w_]+)/', $fieldValue, $matches);
+				$privates = self::getClassPrivates($curGetter->class);
+				foreach ($matches[1] as $curProperty)
+				{
+					if (in_array(strtolower($curProperty), $privates))
+					{
+						KalturaLog::log("{$curGetter->class}::{$curGetter->name} uses private property/method {$curProperty}");
+						$fieldValue = null;		// we have to use the getter since it uses a private property
+					}
+				}
+				
+				// check for use of parent::
+				if (strpos($fieldValue, 'parent::') !== false)
+				{
+					KalturaLog::log("{$curGetter->class}::{$curGetter->name} uses parent");
+					$fieldValue = null;		// we have to use the getter since it uses a private property
+				}
+			}
+			else if (strpos($curGetter->class, 'Base') === 0)
+			{
+				$params = $curGetter->getParameters();
+				if (count($params) == 1 && $params[0]->getDefaultValue() == "Y-m-d H:i:s")
+				{
+					// date field getter
+					$matches = array();
+					if (preg_match('/^if \(\$this\->([\w_]+) === null\)/', $getterBody, $matches))
+					{
+						$memberName = '$srcObj->' . $matches[1];
+						$fieldValue = "({$memberName} === null ? null : (int) date_create({$memberName})->format('U'))";
+					}
+				}
+			}
+			
+			if (!$fieldValue)
+			{
+				// complex getter - call original function
+				$fieldValue = "\$srcObj->".$curGetter->name."()";
+			}
+	
+			// add support for arrays and dynamic enums
+			$curCode = '';
+	
+			if ($thisProps[$apiPropName]->isArray())
+			{
+				$arrayClass = $thisProps[$apiPropName]->getType();
+				if(method_exists($arrayClass, 'fromDbArray'))
+				{
+					$curCode = "\$value = {$fieldValue};\n\t\t" .
+					"if(is_array(\$value))\n\t\t" .
+					"{\n\t\t\t" .
+					"\$value = {$arrayClass}::fromDbArray(\$value);\n\t\t" .
+					"}\n\t\t";
+					$fieldValue = '$value';
+				}
+			}
+			else if ($thisProps[$apiPropName]->isDynamicEnum())
+			{
+				$propertyType = $thisProps[$apiPropName]->getType();
+				$enumClass = call_user_func(array($propertyType, 'getEnumClass'));
+				if ($enumClass)
+				{
+					$fieldValue = "kPluginableEnumsManager::coreToApi('{$enumClass}', {$fieldValue})";
+				}
+			}
+	
+			// add field copy code
+			$curCode .= "\$apiObj->{$apiPropName} = {$fieldValue};";
+	
+			if ($thisProps[$apiPropName]->requiresReadPermission())
+			{
+				$declaringClass = $this->getDeclaringClassName($apiPropName);
+				$curCode = "if (kPermissionManager::getReadPermitted('{$declaringClass}', '{$apiPropName}'))\n\t\t{\n\t\t\t{$curCode}\n\t\t}";
+			}
+	
+			$mappingFuncCode[$apiPropName] = $curCode;
+		}
+	
+		ksort($mappingFuncCode);
+	
+		// generate final code
+		if ($usesCustomData)
+		{
+			array_unshift($mappingFuncCode, '$customData = unserialize($srcObj->custom_data);');
+		}
+	
+		return $result . "\t\t" . implode("\n\t\t", $mappingFuncCode) . "\n\t}\n}";
+	}
+	
+	public function fromObject($srcObj)
+	{
+		$thisClass = get_class($this);
+		$srcObjClass = get_class($srcObj);
+		$fromObjectClass = "Map_{$thisClass}_{$srcObjClass}";
+		if (!class_exists($fromObjectClass))
+		{
+			$cacheFileName = kConf::get("cache_root_path") . "/api_v3/fromObject/{$fromObjectClass}.php";
+			if (!file_exists($cacheFileName))
+			{
+				$cacheDir = dirname($cacheFileName);
+				if (!is_dir($cacheDir))
+				{
+					mkdir($cacheDir);
+					chmod($cacheDir, 0755);
+				}
+	
+				$fromObjectClassCode = $this->generateFromObjectClass($srcObj, $fromObjectClass);
+				if (!$fromObjectClassCode)
+					return;
+				file_put_contents($cacheFileName, $fromObjectClassCode);
+			}
+	
+			require_once($cacheFileName);
+		}
+	
+		$fromObjectClass::fromObject($this, $srcObj);
 	}
 	
 	public function fromArray ( $source_array )
