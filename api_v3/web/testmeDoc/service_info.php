@@ -1,11 +1,12 @@
 <?php
 $serviceMap = KalturaServicesMap::getMap();
-$serviceReflector = $serviceMap[strtolower($service)];
 
-if (!$serviceReflector)
+if (!array_key_exists(strtolower($service), $serviceMap))
 {
     die('Service "'.$service.'" not found');
 }
+
+$serviceReflector = $serviceMap[strtolower($service)];
 /* @var $serviceReflector KalturaServiceActionItem */
 $actions = $serviceReflector->actionMap;
 $serviceInfo = $serviceReflector->serviceInfo;

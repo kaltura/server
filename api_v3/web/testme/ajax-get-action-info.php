@@ -13,8 +13,17 @@ function toArrayRecursive(KalturaPropertyInfo $propInfo)
 
 $serviceMap = KalturaServicesMap::getMap();
 $actionInfo = null;
+
+if (!array_key_exists(strtolower($service), $serviceMap))
+{
+	$msg = "<------- api_v3 testme [$service][$action] not found -------";
+	KalturaLog::ERR ($msg);
+	die($msg);
+}
+
 try
 {
+	
 	$serviceReflector = $serviceMap[strtolower($service)];
 	/* @var $serviceReflector KalturaServiceActionItem */
 	$actionReflector = new KalturaActionReflector($service, $action, $serviceReflector->actionMap[$action]);
@@ -33,8 +42,9 @@ try
 }
 catch ( Exception $ex )
 {
-	KalturaLog::ERR ( "<------- api_v3 testme [$service][$action\n" . 
-		 $ex->__toString() .  " " ." -------");
+	$msg = "<------- api_v3 testme [$service][$action\n" . $ex->__toString() .  " " ." -------";
+	KalturaLog::ERR ($msg);
+	die($msg);
 }
 //echo "<pre>";
 //echo print_r($actionInfo);
