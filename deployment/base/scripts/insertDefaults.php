@@ -101,20 +101,20 @@ foreach($fileNames as $fileName)
 			$setters[$setter] = $value;
 		}
 		
-		$existingObjects = $peer->doSelect($pkCriteria, $con);
-		if(count($existingObjects))
-		{
-			$object = reset($existingObjects);
-			$pkCriteria = null;
-		}
-			
 		foreach($setters as $setter => $value)
 			$object->$setter($value);
 			
-		$object->save();
+		if(count($pkCriteria->keys()))
+		{
+			$existingObjects = $peer->doSelect($pkCriteria, $con);
+			if(count($existingObjects))
+			{
+				BasePeer::doUpdate($object->buildPkeyCriteria(), $pkCriteria, $con);
+				continue;
+			}
+		}
 		
-		if($pkCriteria && count($pkCriteria->keys()))
-			BasePeer::doUpdate($object->buildPkeyCriteria(), $pkCriteria, $con);
+		$object->save();
 	}
 }
 
