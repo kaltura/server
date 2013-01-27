@@ -49,10 +49,12 @@ if(count($errors))
 }
 	
 sort($fileNames);
+KalturaLog::info("Handling files [" . print_r($fileNames, true) . "]");
 	
 foreach($fileNames as $fileName)
 {
 	list($order, $objectType, $fileExtension) = explode('.', $fileName, 3);
+	KalturaLog::info("Handling file [$dirName/$fileName]");
 	$filePath = realpath("$dirName/$fileName");
 	$objectConfigurations = parse_ini_file($filePath, true);
 
