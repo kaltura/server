@@ -66,8 +66,9 @@ for (;;)
 		usleep(100);
 		if ($mode == 'execute')
 		{
+			echo "Updating [". $item->getId() ."] ... "; 
 			$sphinx->saveToSphinx($item, false, true);
-			echo $item->getId() . " Saved\n";
+			echo "Done\n";
 		}
 		else
 		{
@@ -87,5 +88,5 @@ for (;;)
 
 if ($mode == 'execute')
 {
-	echo "Done\n";
+	echo "\nScript Done\n";
 }
