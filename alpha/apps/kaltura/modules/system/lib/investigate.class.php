@@ -717,15 +717,21 @@ file_sizeint(11)
 		return  "(" . floor(100 * $f1 / $f2 ) . "%)"; 	
 	}
 	
+	private static $batchJobsParams = array (
+			"root_job_id", 
+			"parent_job_id", 
+			"priority", 
+			"queue_time", 
+			"finish_time", 
+			"entry_id", 
+			"partner_id", 
+			"last_scheduler_id", 
+			"last_worker_id", 
+			"bulk_job_id", 
+			"dc", 
+			"err_type", 
+			"err_number", );
 	
-	private static $batchJobsParams =  array ( 
-	"root_job_id","parent_job_id",
-"deleted_at", "priority", "work_group_id","queue_time","finish_time","entry_id",
-"partner_id","subp_id","scheduler_id","worker_id","batch_index","last_scheduler_id",
-"last_worker_id","last_worker_remote",/*"processor_name",*/"processor_expiration",
-/*"processor_location",*/"execution_attempts","lock_version","bulk_job_id",
-"dc","err_type","err_number",
-	);
 	public static function printBatchjobHeader ()
 	{
 /*
@@ -761,13 +767,11 @@ file_sizeint(11)
 		"<td>Abort</td>".
 		"<td style='width:120px' >Message</td>".
 		"<td style='width:120px' >Description</td>".
-		"<td>Updates Count</td>".
 		"<td>Created</td>".
 		"<td>Updated</td>";
 		
 		$str .=  self::printFieldNames( self::$batchJobsParams , false );
 		
-		$str .= 		"<td>Check Again Timeout</td>"; // move to end
 		$str .= "</tr>"; 
 		return $str;
 	}
@@ -832,15 +836,13 @@ file_sizeint(11)
 		'</div>'.
 		'</td>'.
 		'<td title="' . $title . '" style="background-color:' . $status_bg . '">' . $bj->status .'</td>'.
-		'<td>'. $bj->abort .'</td>'.
+		'<td>'. $bj->executionstatus .'</td>'.
 		
 		'<td>'. $bj->message .'</td>'.
 		'<td>'. $bj->description  .'</td>'.
-		'<td>'. $bj->updatesCount .'</td>'.
 		'<td title="' . $title . '" style="background-color:' . $created_at_bg . '">' . $bj->createdAt .'</td>'.
 		'<td>'. $bj->updatedAt .'</td>';
-		$str .=  self::printFields( $orig , self::$batchJobsParams , null , false ) . 
-		'<td>'. $bj->checkAgainTimeout .'</td>';
+		$str .=  self::printFields( $orig , self::$batchJobsParams , null , false, null ) ; 
 		$str .= '</tr>';
 		
 		// add a new row for the data
