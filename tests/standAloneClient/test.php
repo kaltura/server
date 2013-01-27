@@ -236,7 +236,16 @@ function askForUserParameter($message)
 
 require_once __DIR__ . '/lib/KalturaClient.php';
 
+class KalturaStandAloneTestLogger implements IKalturaLogger
+{
+	function log($msg)
+	{
+		echo "$msg\n";
+	}
+}
+
 $config = new KalturaConfiguration();
+$config->setLogger(new KalturaStandAloneTestLogger());
 if(isset($inXml->config))
 {
 	$configs = $inXml->config->children();
