@@ -68,7 +68,7 @@ class BaseEntryService extends KalturaEntryService
      */
     function addAction(KalturaBaseEntry $entry, $type = -1)
     {
-    	if($type != KalturaEntryType::AUTOMATIC)
+    	if($type && $type != KalturaEntryType::AUTOMATIC)
     		$entry->type = $type;
     	
     	$dbEntry = parent::add($entry, $entry->conversionProfileId);
