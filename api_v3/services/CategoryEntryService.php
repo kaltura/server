@@ -197,6 +197,7 @@ class CategoryEntryService extends KalturaBaseService
 			if($filter->categoryIdIn != null)
 			{
 				$categoryIdInArr = explode(',', $filter->categoryIdIn);
+				if(!categoryKuserPeer::areCategoriesAllowed($categoryIdInArr))
 				$categoryIdInArr = array_unique($categoryIdInArr);
 				
 				$entitledCategories = categoryPeer::retrieveByPKs($categoryIdInArr);
@@ -213,9 +214,7 @@ class CategoryEntryService extends KalturaBaseService
 
 				if(count($categoriesIdsUnlisted))
 				{
-					$categoriesUnlistWithMembership = categoryKuserPeer::retrieveByCategoriesIdsAndActiveKuserId($categoriesIdsUnlisted, kCurrentContext::getCurrentKsKuserId());
-
-					if(count($categoriesIdsUnlisted) != count($categoriesUnlistWithMembership))
+					if(!categoryKuserPeer::areCategoriesAllowed($categoriesIdsUnlisted))
 						throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdIn);
 				}
 			}
