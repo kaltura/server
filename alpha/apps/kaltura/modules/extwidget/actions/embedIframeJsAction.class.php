@@ -48,9 +48,11 @@ class embedIframeJsAction extends sfAction
 		if ($autoEmbed)
 			$host = "http://localhost/";
 
+		$relativeUrl = true; // true if ui_conf html5_url is relative (doesnt start with an http prefix)
+
 		if( kString::beginsWith( $ui_conf_html5_url , "http") )
 		{
-			$autoEmbed = false;
+			$relativeUrl = false;
 			$url = $ui_conf_html5_url; // absolute URL
 		}
 		else if ($ui_conf_html5_url)
@@ -67,16 +69,22 @@ class embedIframeJsAction extends sfAction
 		if (kString::endsWith($url, "mwEmbedLoader.php"))
 			$url .= "/p/$partner_id/uiconf_id/$uiconf_id";
 		
+		header("pragma:");
+
 		if ($autoEmbed)
 		{
-			//die($url."?".$_SERVER["QUERY_STRING"]);
-			header("pragma:");
 			$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-			kFileUtils::dumpUrl($url."?protocol=$protocol&".$_SERVER["QUERY_STRING"]);
+			$params = "protocol=$protocol&".$_SERVER["QUERY_STRING"];
+
+			$url .= ((strpos($url, "?") === false) ? "?" : "&") . $params;
+
+			if ($relativeUrl)
+			{
+				kFileUtils::dumpUrl($url."?".$params);
+			}
 		}
 
 		requestUtils::sendCachingHeaders(60);
-		header("Pragma:");
 		
 		kFile::cacheRedirect($url);
 		header("Location:$url");
