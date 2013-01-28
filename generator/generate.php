@@ -50,7 +50,7 @@ require_once("bootstrap.php");
 
 //the name of the summary file that will be used by the UI -
 $summaryFileName = 'summary.kinf';
-$tmpXmlFileName = tempnam(sys_get_temp_dir());
+$tmpXmlFileName = tempnam(sys_get_temp_dir(), 'kaltura.generator.');
 
 //pass the name of the generator as the first argument of the command line to
 //generate a single library. if this argument is empty or 'all', generator will create all libs.
