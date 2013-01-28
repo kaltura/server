@@ -38,6 +38,9 @@ class kApiCache
 	
 	const CONDITIONAL_CACHE_EXPIRY = 86400;		// 1 day, must not be greater than the expiry of the query cache keys
 
+	const EXTRA_FIELDS_EXPIRY = 604800;			// when using a cache shared between servers it makes sense to have EXTRA_FIELDS_EXPIRY > CONDITIONAL_CACHE_EXPIRY
+												// since the extra fields are stored locally on each server
+	
 	const SUFFIX_DATA =  '.cache';
 	const SUFFIX_RULES = '.rules';
 	const SUFFIX_LOG = '.log';
@@ -449,7 +452,7 @@ class kApiCache
 			return;
 		}
 		
-		if ($extraFieldsCache->set(self::EXTRA_KEYS_PREFIX . $this->_originalCacheKey, $this->_extraFields, self::CONDITIONAL_CACHE_EXPIRY) === false)
+		if ($extraFieldsCache->set(self::EXTRA_KEYS_PREFIX . $this->_originalCacheKey, $this->_extraFields, self::EXTRA_FIELDS_EXPIRY) === false)
 		{
 			self::disableCache();
 			return;
