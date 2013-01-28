@@ -363,7 +363,7 @@ class ks extends kSessionBase
 			PermissionPeer::isValidForPartner(PermissionName::FEATURE_END_USER_REPORTS, $partner_id))
 		{
 			$this->kuser = kuserPeer::createKuserForPartner($partner_id, $puser_id);
-			if(!$puser_id)
+			if(!$puser_id & $this->kuser->getScreenName() != 'Unknown')
 			{
 				$this->kuser->setScreenName('Unknown');
 				$this->kuser->save();
