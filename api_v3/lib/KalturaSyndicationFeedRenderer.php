@@ -6,7 +6,7 @@
 class KalturaSyndicationFeedRenderer
 {
 	const MAX_RETUREND_ENTRIES = 10000;
-	const ENTRY_PEER_LIMIT_QUERY = 500;
+	const ENTRY_PEER_LIMIT_QUERY = 100;
 	const LEVEL_INDENTATION = '  ';
 	const CACHE_CREATION_TIME_SUFFIX = ".time";
 	const CACHE_CREATION_MARGIN = 30;
@@ -93,8 +93,20 @@ class KalturaSyndicationFeedRenderer
 	 */
 	private $staticPlaylistEntriesIdsOrder = '';
 	
-	public function __construct($feedId)
+	/**
+	 * @var string
+	 */
+	private $feedProcessingKey = null;
+	
+	/**
+	 * @var int
+	 */
+	private $nextProcessingSetTime = null;
+	
+	public function __construct($feedId, $feedProcessingKey = null)
 	{
+		$this->feedProcessingKey = $feedProcessingKey;
+		
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
 		$microTimeStart = microtime(true);
@@ -449,6 +461,14 @@ class KalturaSyndicationFeedRenderer
 		$nextEntry = $this->getNextEntry();
 		while($nextEntry)
 		{
+			// enable the processing flag in APC to prevent additional requests for this feed
+			$currentTime = time();
+			if ($this->feedProcessingKey && function_exists('apc_store') && $currentTime > $this->nextProcessingSetTime)
+			{
+				apc_store($this->feedProcessingKey, true, 60);
+				$this->nextProcessingSetTime = $currentTime + 30;
+			}
+			
 			$entry = $nextEntry;
 			$nextEntry = $this->getNextEntry();
 
@@ -503,6 +523,9 @@ class KalturaSyndicationFeedRenderer
 		
 		call_user_func($renderer, self::STATE_FOOTER);
 		
+		if ($this->feedProcessingKey && function_exists('apc_delete'))
+			apc_delete($this->feedProcessingKey);
+				
 		$microTimeEnd = microtime(true);
 		KalturaLog::info("syndicationFeedRenderer- render time for ({$this->syndicationFeed->type}) is " . ($microTimeEnd - $microTimeStart));
 	}

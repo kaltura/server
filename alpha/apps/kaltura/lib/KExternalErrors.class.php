@@ -33,6 +33,7 @@ class KExternalErrors
 	const INVALID_FLAVOR_ASSET_TYPE = 26;
 	const INVALID_TOKEN = 27;
 	const EXPIRED_TOKEN = 28;
+	const PROCESSING_FEED_REQUEST = 29;
 	
 	private static $errorDescriptionMap = array(
 			self::ENTRY_NOT_FOUND => "requested entry not found",
@@ -63,6 +64,7 @@ class KExternalErrors
 			self::INVALID_FLAVOR_ASSET_TYPE => "requested flavor asset type is invalid",
 			self::INVALID_TOKEN => "the supplied token is invalid",
 			self::EXPIRED_TOKEN => "the supplied token is expired",
+			self::PROCESSING_FEED_REQUEST => "the supplied feed is already being processed",
 			);
 	
 	public static function dieError($errorCode, $message = null)
