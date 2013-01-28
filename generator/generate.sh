@@ -8,7 +8,7 @@ BASEDIR=`dirname $REAL_SCRIPT`
 cd $BASEDIR
 . ../configurations/system.ini
 
-output_path=$WEB_DIR/content/clientlibs
+output_path=$WEB_DIR/content/clientlibs/*
 
 rm -fr $output_path/$@
 rm -fr ../cache/api_v3/*
