@@ -50,6 +50,7 @@ require_once("bootstrap.php");
 
 //the name of the summary file that will be used by the UI -
 $summaryFileName = 'summary.kinf';
+$tmpXmlFileName = tempnam(sys_get_temp_dir());
 
 //pass the name of the generator as the first argument of the command line to
 //generate a single library. if this argument is empty or 'all', generator will create all libs.
@@ -183,20 +184,20 @@ foreach($config as $name => $item)
 
 			$files = $xmlGenerator->getOutputFiles();
 			//save a temp schema to the disk to be used by the xml generator
-			file_put_contents("temp.xml", $files["KalturaClient.xml"]);
+			file_put_contents($tmpXmlFileName, $files["KalturaClient.xml"]);
 		} else {
 			KalturaLog::info("Downloading ready-made schema from: ".$useReadySchema);
 			$contents = file_get_contents($useReadySchema);
-			file_put_contents('temp.xml', $contents);
+			file_put_contents($tmpXmlFileName, $contents);
 			//Get the schema version and last generated date -
-			$schemaXml = new SimpleXMLElement(file_get_contents( realpath('temp.xml') ));
+			$schemaXml = new SimpleXMLElement(file_get_contents($tmpXmlFileName));
 			$apiVersionOverride = $schemaXml->attributes()->apiVersion;
 			$schemaGenDate = (int)$schemaXml->attributes()->generatedDate;
 			$schemaGenDateOverride = date('d-m-Y', $schemaGenDate);
 			KalturaLog::info('Generating from api version: '.$apiVersionOverride.', generated at: '.strftime("%a %d %b %H:%M:%S %Y", $schemaGenDate));
 		}
 		
-		$instance = $reflectionClass->newInstance("temp.xml");
+		$instance = $reflectionClass->newInstance($tmpXmlFileName);
 		
 		if($item->get("generateDocs"))
 			$instance->setGenerateDocs($item->get("generateDocs"));
@@ -275,7 +276,7 @@ foreach($config as $name => $item)
 	
 	//delete the api services xml schema file
 	if ($fromXml)
-		unlink("temp.xml");
+		unlink($tmpXmlFileName);
 		
 
 	if (count($files) == 0)
