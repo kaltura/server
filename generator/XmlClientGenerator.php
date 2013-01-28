@@ -32,18 +32,15 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	    $this->_xmlElement->setAttribute('generatedDate', time());
 	    exec("which svnversion 2>/dev/null",$out,$rc);
 	    if ($rc === 0){
-			$svnVersion = shell_exec('svnversion ' . $apiV3Path);
-			if ($svnVersion === null){
+	    	$apiV3Path = realpath(dirname(__FILE__) . '/../api_v3');
+			$svnVersion = shell_exec("svnversion $apiV3Path");
+			if ($svnVersion === null)
 			    KalturaLog::warning("Failed to get svn revision number");
-			}else{
+			else
 			    $this->_xmlElement->setAttribute('revision', trim($svnVersion));
-			}
-				
 	    }
 	    
-	    $apiV3Path = realpath(dirname(__FILE__) . '/../api_v3');
 	    $this->_doc->appendChild($this->_xmlElement);
-	    
         $this->_xmlElement->appendChild(new DOMComment(" Generated on date " . strftime("%d/%m/%y %H:%M:%S" , time()) . " "));
         
 	    $enumsElement = $this->_doc->createElement("enums");
