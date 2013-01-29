@@ -143,31 +143,31 @@ var kTestMe = {
 			return;
 		}
 		
-		if(this.call != null){
-			var title = (this.history.length + 1) + '.' + this.call.getTitle();
-			this.jqHistory.append('<option value="' + this.history.length + '">' + title + '</option>');
-			this.history.push(this.call.getRequest(this.history.length));
-		}
-		
 		if ((this.call.getServiceId() == 'session') && (this.call.getActionId() == 'start')) {
 			var iframeDoc = jQuery('#response')[0].contentWindow.document;
 			var xmlDoc = (iframeDoc.XMLDocument) ? iframeDoc.XMLDocument : iframeDoc.documentElement;
 			var response = jQuery(xmlDoc).find('result');
 			var field = jQuery('#ks');
-			if(!field)
-			{
-				this.log.debug("ks field not found");
+			if(!field || !field.size()){
+				kTestMe.log.error('KS field not found.');
 				return;
 			}
+			
 			if (response.size() && !response.find('error').size()){
-				this.log.debug(response.text());
 				field.val(response.text());
-				field.click();
 			}
 			// if not empty, empty it
-			else if (field.getValue()){
-				field.unsetValue();
+			else if (field.val()){
+				field.val('');
 			}
+			field.click();
+		}
+		
+		if(this.call != null){
+			var historyLength = this.history.length;
+			this.history.push(this.call.getRequest(historyLength));
+			var title = this.history.length + '. ' + this.call.getTitle();
+			this.jqHistory.append('<option value="' + historyLength + '">' + title + '</option>');
 		}
 	},
 	

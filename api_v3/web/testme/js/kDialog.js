@@ -336,41 +336,43 @@ kCall.prototype.getTitle = function(){
  * Returns the current request data
  */
 kCall.prototype.getRequest = function(requestIndex){
-	
-	// removing names from field to make sure they won't be submitted
-	kTestMe.jqObjectsContainer.find('input,select').each(function(){
-		var field = jQuery(this);
-		if(!field.attr('name').length)
-			return;
-			
-		field.attr('id', field.attr('name'));
-		field.removeAttr('name');
-		field.addClass('history-field' + requestIndex);
-	});
-	
-	this.jqParamsContainer.find('input,select').each(function(){
-		var field = jQuery(this);
-		if(!field.attr('name').length)
-			return;
-			
-		field.attr('id', field.attr('name'));
-		field.removeAttr('name');
-		field.addClass('history-field' + requestIndex);
-	});
-	
+
 	var ret = {
 			index: requestIndex,
 			serviceId: this.getServiceId(),
 			actionId: this.getActionId(),
-			jqParamsContainer: this.jqParamsContainer 
+			jqParamsContainer: this.jqParamsContainer.clone(true)
 	};
 	
+	// removing names from field to make sure they won't be submitted
+	kTestMe.jqObjectsContainer.find('input,select').each(function(){
+		var field = jQuery(this);
+		if(!field.attr('name').length || field.hasClass('history'))
+			return;
+			
+		field.attr('id', field.attr('name'));
+		field.removeAttr('name');
+		field.addClass('history history-field' + requestIndex);
+	});
+	
+	ret.jqParamsContainer.find('input,select').each(function(){
+		var field = jQuery(this);
+		if(!field.attr('name').length)
+			return;
+			
+		field.attr('id', field.attr('name'));
+		field.removeAttr('name');
+		field.addClass('history-field' + requestIndex);
+	});
+	
 	this.close();
+	/*
 	this.jqParamsContainer.hide();
 
 	this.jqParamsContainer = jQuery('<div class="action-params"></div>');
 	this.jqElement.append(this.jqParamsContainer);
 	this.onActionChange();
+	*/
 	
 	return ret;
 };
@@ -389,20 +391,23 @@ kCall.prototype.getValue = function(){
  */
 kCall.prototype.setRequest = function(request){
 	this.close();
-	this.jqParamsContainer.remove();
 	
 	// restore input names from their ids
 	kTestMe.jqObjectsContainer.find('.history-field' + request.index).each(function(){
 		var field = jQuery(this);
 		field.attr('name', field.attr('id'));
+		field.removeClass('history');
 	});
-	request.jqParamsContainer.find('.history-field' + request.index).each(function(){
+	var jqRequestParamsContainer = request.jqParamsContainer.clone(true);
+	jqRequestParamsContainer.find('.history-field' + request.index).each(function(){
 		var field = jQuery(this);
 		field.attr('name', field.attr('id'));
 	});
 	
 	this.setAction(request.serviceId, request.actionId);
-	this.jqParamsContainer = request.jqParamsContainer;
+	this.jqParamsContainer.remove();
+	this.jqParamsContainer = jqRequestParamsContainer;
+	this.jqElement.append(this.jqParamsContainer);
 	this.jqParamsContainer.show();
 };
 
@@ -463,7 +468,7 @@ kCall.prototype.getPlugin = function(){
 /**
  * Set the service and action
  */
-kCall.prototype.setAction = function(serviceId, actionId, loadParams){
+kCall.prototype.setAction = function(serviceId, actionId){
 	kTestMe.log.debug("[kCall.setAction] service [' + serviceId + '] action [' + actionId + ']");
 	
 	if(serviceId == null){
@@ -472,14 +477,7 @@ kCall.prototype.setAction = function(serviceId, actionId, loadParams){
 	}
 	
 	this.jqServiceInput.val(serviceId);
-	this.onServiceChange();
-
-	// TODO support case that the actions list is not loaded yet
-	if(actionId != null)
-		this.jqActionInput.val(actionId);
-	
-	if(loadParams)
-		this.onActionChange();
+	this.onServiceChange(actionId);
 };
 
 /**
@@ -535,7 +533,7 @@ kCall.prototype.ready = function(callback){
 	this.readyCallback = callback;
 };
 
-kCall.prototype.onServiceChange = function(){
+kCall.prototype.onServiceChange = function(actionId){
 	var serviceId = this.getLockedServiceId();
 	
 	if(serviceId == ""){
@@ -543,6 +541,7 @@ kCall.prototype.onServiceChange = function(){
 		return;
 	}
 
+	this.loadActionId = actionId;
 	this.jqActionInput.attr('disabled', true);
 	if(kTestMe.serviceActionsLoaded(serviceId)){
 		this.loadActionsList();
@@ -558,7 +557,7 @@ kCall.prototype.onServiceChange = function(){
 		data: {
 			service: serviceId 
 		}, 
-		success: delegate(this, this.onActionsListLoad), 
+		success: delegate(this, this.onActionsListLoad),
 		error: delegate(this, this.onActionsListFail)
 	});
 };
@@ -594,6 +593,11 @@ kCall.prototype.loadActionsList = function(){
 		this.jqActionInput.append('<option value="' + action.id + '" title="' + action.name + '">' + action.label + '</option>');
 	}
 	this.jqActionInput.attr('disabled', false);
+	
+	if(this.loadActionId){
+		this.setActionId(this.loadActionId);
+		this.loadActionId = null;
+	}
 	
 	if(actions.length)
 		this.onActionChange();
@@ -720,7 +724,7 @@ kMainCall.prototype.onChildDialogOpen = function(dialog){
 	this.childDialog = dialog;
 };
 
-kMainCall.prototype.onServiceChange = function(){
+kMainCall.prototype.onServiceChange = function(actionId){
 	var serviceId = this.getLockedServiceId();
 	
 	if(serviceId == 'multirequest'){
