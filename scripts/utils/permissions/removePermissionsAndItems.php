@@ -14,13 +14,7 @@ if (!file_exists($iniFile)) {
 }
 
 // bootstrap
-require_once(dirname(__FILE__).'/../../../alpha/config/sfrootdir.php');
-require_once(dirname(__FILE__).'/../../../api_v3/bootstrap.php');
-KalturaLog::setLogger(new KalturaStdoutLogger());
-
-DbManager::setConfig(kConf::getDB());
-DbManager::initialize();
-
+require_once(dirname(__FILE__).'/../../bootstrap.php');
 
 // load configurations from ini file
 $ini = new Zend_Config_Ini($iniFile);
