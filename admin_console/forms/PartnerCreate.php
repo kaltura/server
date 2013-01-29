@@ -28,6 +28,7 @@ class Form_PartnerCreate extends Infra_Form
 		$this->addElement('text', 'admin_email', array(
 			'label' => 'partner-create form admin email',
 			'required' => true,
+			'validators' => array('EmailAddress'),
 			'filters'		=> array('StringTrim'),
 		));
 		
