@@ -57,12 +57,6 @@ ksort($services, SORT_STRING);
 <script type="text/javascript" src="js/jquery-1.3.1.min.js"></script>
 <script type="text/javascript" src="js/jquery.tooltip.js"></script>
 <script type="text/javascript" src="js/jquery.scrollTo-min.js"></script>
-<!--  
-<script type="text/javascript" src="js/jquery.bgiframe.pack.js"></script>
-<script type="text/javascript" src="js/jquery.dimensions.pack.js"></script>
-<script type="text/javascript" src="js/jquery-ui-1.7.1.custom.min.js"></script>
-<script type="text/javascript" src="js/jquery.json.min.js"></script>
--->
 <script type="text/javascript" src="js/kCodeExample.js"></script>
 <script type="text/javascript" src="js/kField.js"></script>
 <script type="text/javascript" src="js/kDialog.js"></script>
