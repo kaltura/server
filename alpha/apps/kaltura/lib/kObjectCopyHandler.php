@@ -89,6 +89,28 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 				$toObject->setAccessControlId($accessControlId);
 				$toObject->save();
 			}
+			
+			if ($toObject->getPartnerId() == $fromObject->getPartnerId()){  
+				$categoryEntriesObjects = categoryEntryPeer::retrieveActiveByEntryId($fromObject->getId());
+				$categoryIds = array();
+				foreach ($categoryEntriesObjects as $categoryEntryObject)
+				{
+					/* @var $categoryEntry categoryEntry */ 
+					$categoryIds[] = $categoryEntryObject->getCategoryId();
+				}
+				if (count($categoryIds)){
+			  		$categories = categoryPeer::retrieveByPKs($categoryIds); //which will return only the entiteled ones
+			  		foreach ($categories as $category){
+			  			/* @var $category category */
+			  			$categoryEntry = new categoryEntry();
+		                $categoryEntry->setEntryId($toObject->getId());
+		                $categoryEntry->setCategoryId($category->getId());
+		                $categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
+		                $categoryEntry->setPartnerId($toObject->getPartnerId());
+		                $categoryEntry->save();	  			
+			  		}
+				}
+			}
 		}
 		
 		return true;
