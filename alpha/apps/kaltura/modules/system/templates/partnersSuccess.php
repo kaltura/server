@@ -62,7 +62,7 @@ function createSelect ( $id , $name , $default_value , $list_name )
 
 	$boolean_type = array ( "" => "" , "true" => "true" , "false" => "false"  );
 	$boolean_int_type = array ( "" => "" , "1" => "true" , "0" => "false"  );
-	$partner_status_int_type = array ( "1" => "Normal" , "2" => "Content Blocked" , "3" => "Fully Blocked", "0" => "Deleted" );
+	$partner_status_int_type = array ( "1" => "Active" , "2" => "Blocked" , "3" => "Removed" );
 	$partner_group_int_type = array ( "1" => "Publisher" , "2" => "VAR" , "3" => "Group" );
 	
 	$arrays = array ( "format_list" => $format_list , "media_type" => $media_type_list , "media_source" => $media_source_list ,
