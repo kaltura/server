@@ -1104,12 +1104,11 @@ kmc.preview_embed = {
 };
 
 kmc.client = {
-	counter: 0,
 	makeRequest: function( service, action, params, callback ) {
-		var serviceUrl = kmc.vars.base_url + '/api_v3/index.php?service='+service+'&action='+action;
+		var serviceUrl = kmc.vars.api_url + '/api_v3/index.php?service='+service+'&action='+action;
 		var defaultParams = {
 			"ks"		: kmc.vars.ks,
-			"format"	: 1			
+			"format"	: 9
 		};
 		// Merge params and defaults
 		$.extend( params, defaultParams);
@@ -1139,20 +1138,19 @@ kmc.client = {
 			return md5(str);
 		};
 		
+		// Add kaltura signature param
 		var kalsig = getSignature( params );
 		serviceUrl += '&kalsig=' + kalsig;
 
 		// Make request
 		$.ajax({
-			type: 'POST',
+			type: 'GET',
 			url: serviceUrl, 
-			dataType: 'json',
+			dataType: 'jsonp',
 			data: params, 
 			cache: false,
-			success: function(res) {
-				callback( res );
-			}
-		});		
+			success: callback
+		});	
 	},
 		
 	// Get the Short URL code
