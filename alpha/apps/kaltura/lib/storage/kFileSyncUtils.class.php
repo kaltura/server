@@ -160,12 +160,13 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if ( !file_exists( dirname( $fullPath ))) 
 		{
 			KalturaLog::log("creating directory for file");
-			kFile::fullMkdir ( $fullPath );
+			kFile::fullMkdir ( $fullPath, 0770 );
 		}
 		
 		// create a file path for the current key - the fileSyncKey should already include the file path 
 		// place the content there
 		file_put_contents ( $fullPath , $content );
+		chmod($fullPath, 0640);
 
 		self::createSyncFileForKey( $key , $strict , !is_null($res));
 	}
@@ -207,11 +208,13 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 		
 		// make sure folder exists
-		kFile::fullMkdir($target_file_path);
+		kFile::fullMkdir($target_file_path, 0770);
 
 		$copyResult = copy($file_path, $target_file_path);
 		if($copyResult)
 		{
+			chmod($target_file_path, 0640);
+			
 			// if root in original fileSync also exists in new path (common root)
 			// remove it from the new path
 			if(substr_count($target_file_path, $fileSync->getFileRoot()))
@@ -271,7 +274,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if ( !file_exists( dirname( $targetFullPath )))
 		{
 			KalturaLog::log("creating directory for file");
-			kFile::fullMkdir ( $targetFullPath );
+			kFile::fullMkdir ( $targetFullPath, 0770 );
 		}
 		
 		if ( file_exists( $temp_file_path ))
@@ -294,6 +297,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		
 		if($success)
 		{
+			chmod($targetFullPath, 0640);
 			if(!$existsFileSync)
 				self::createSyncFileForKey($target_key, $strict, false, $cacheOnly);
 		}
