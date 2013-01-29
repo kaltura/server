@@ -1,25 +1,18 @@
 #!/bin/bash -e
-if [ -L $0 ];then
-	REAL_SCRIPT=`readlink $0`
-else
-	REAL_SCRIPT=$0
-fi
-BASEDIR=`dirname $REAL_SCRIPT`
-cd $BASEDIR
-. ../configurations/system.ini
+. /etc/kaltura.d/system.ini
 
 output_path=$WEB_DIR/content/clientlibs
 
 rm -fr $output_path/$@*
-rm -fr ../cache/api_v3/*
-rm -fr ../cache/generator/*
+rm -fr $APP_DIR/cache/api_v3/*
+rm -fr $APP_DIR/cache/generator/*
 
-php generate.php "$@"
+php $APP_DIR/generator/generate.php "$@"
 
-rsync -avC $output_path/php5ZendClientAdminConsole/Kaltura/Client/ ../admin_console/lib/Kaltura/Client
-rsync -avC $output_path/php5ZendVarConsole/Kaltura/Client/ ../var_console/lib/Kaltura/Client
-rsync -avC $output_path/batchClient/ ../batch/client
-rsync -avC  $output_path/php5/ ../tests/standAloneClient/lib
-rsync -avC  $output_path/php5 ../clients
+rsync -avC $output_path/php5ZendClientAdminConsole/Kaltura/Client/ $APP_DIR/admin_console/lib/Kaltura/Client
+rsync -avC $output_path/php5ZendVarConsole/Kaltura/Client/ $APP_DIR/var_console/lib/Kaltura/Client
+rsync -avC $output_path/batchClient/ $APP_DIR/batch/client
+rsync -avC  $output_path/php5/ $APP_DIR/tests/standAloneClient/lib
+rsync -avC  $output_path/php5 $APP_DIR/clients
 
-rm -fr ../cache/batch/*
+rm -fr $APP_DIR/cache/batch/*

@@ -16,19 +16,8 @@
 # Description: Sphinx is a free open-source SQL full-text search engine     
 ### END INIT INFO
 
+. /etc/kaltura.d/system.ini
 
-if [ -L $0 ];then
-	REAL_SCRIPT=`readlink $0`
-else
-	REAL_SCRIPT=$0
-fi
-SYSTEM_INI_FILE=`dirname $REAL_SCRIPT`/../configurations/system.ini``
-if [ -r "$SYSTEM_INI_FILE" ];then
-    . $SYSTEM_INI_FILE
-else
-    echo "I could not source $SYSTEM_INI_FILE. Exiting."
-    exit 1
-fi
 # Source function library.
 . $APP_DIR/scripts/functions
 prog="searchd"

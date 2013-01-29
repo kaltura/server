@@ -1,10 +1,5 @@
 #!/bin/bash
-if [ -L $0 ];then
-	REAL_SCRIPT=`readlink $0`
-else
-	REAL_SCRIPT=$0
-fi
-. `dirname $REAL_SCRIPT`/../../configurations/system.ini
+. /etc/kaltura.d/system.ini
 
 #
 # serviceBatchSingle      This shell script takes care of starting and stopping a Kaltura Batch Service (singleton mode)
