@@ -52,6 +52,9 @@ class CaptionAssetItemService extends KalturaBaseService
 			$captionAssetItem->delete();
 		}
 		
+		// make sure that all old items are deleted from the sphinx before creating the new ones
+		kEventsManager::flushEvents();
+		
 		$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$content = kFileSyncUtils::file_get_contents($syncKey, true, false);
 		if(!$content)
