@@ -7,6 +7,7 @@ class KalturaSyndicationFeedRenderer
 {
 	const MAX_RETUREND_ENTRIES = 10000;
 	const ENTRY_PEER_LIMIT_QUERY = 100;
+	const STATIC_PLAYLIST_ENTRY_PEER_LIMIT_QUERY = 500;
 	const LEVEL_INDENTATION = '  ';
 	const CACHE_CREATION_TIME_SUFFIX = ".time";
 	const CACHE_CREATION_MARGIN = 30;
@@ -397,7 +398,15 @@ class KalturaSyndicationFeedRenderer
 		$this->executed = true;
 		
 		$c = clone $this->baseCriteria;
-		$c->setLimit(self::ENTRY_PEER_LIMIT_QUERY);
+		
+		if($this->staticPlaylist)
+		{
+			$c->setLimit(self::STATIC_PLAYLIST_ENTRY_PEER_LIMIT_QUERY);
+		}
+		else 
+		{
+			$c->setLimit(self::ENTRY_PEER_LIMIT_QUERY);
+		}
 
 		if(!count($this->entryFilters))
 		{
