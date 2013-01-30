@@ -206,6 +206,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 	
 	public static function isPasswordStructureValid($pass,$partnerId = null)
 	{
+		if(kCurrentContext::getCurrentPartnerId() == Partner::ADMIN_CONSOLE_PARTNER_ID)
+			return true;
+			
 		$regexps = kConf::get('user_login_password_structure');
 		if($partnerId){
 			$partner = PartnerPeer::retrieveByPK($partnerId);
