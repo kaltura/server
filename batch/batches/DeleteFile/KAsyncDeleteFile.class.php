@@ -1,9 +1,9 @@
 <?php
-
 /**
- * Enter description here ...
- * @author Hila
+ * This worker deletes physical files from disk
  *
+ * @package Scheduler
+ * @subpackage Delete
  */
 class KAsyncDeleteFile extends KJobHandlerWorker
 {

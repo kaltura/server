@@ -1,10 +1,5 @@
 <?php
 /**
- * @package Scheduler
- * @subpackage Delete
- */
-
-/**
  * Will delete objects in the deleting server
  * according to the suppolied engine type and filter 
  *
