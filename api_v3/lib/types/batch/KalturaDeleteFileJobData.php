@@ -5,6 +5,9 @@
  */
 class KalturaDeleteFileJobData extends KalturaJobData
 {
+	/**
+	 * @var string
+	 */
 	public $localFileSyncPath;
 	
 }
