@@ -12,29 +12,16 @@ require_once(KALTURA_API_PATH . DIRECTORY_SEPARATOR . 'VERSION.php'); //defines 
 // Autoloader
 require_once(KALTURA_ROOT_PATH . DIRECTORY_SEPARATOR . "infra" . DIRECTORY_SEPARATOR . "KAutoloader.php");
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "server_infra", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "lib", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "services", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "generator"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "alpha", "plugins", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_PLUGIN_PATH, "*"));
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/generator/classMap.cache');
 KAutoloader::register();
 
-
 // Timezone
 date_default_timezone_set(kConf::get("date_default_timezone")); // America/New_York
 
-
 // Logger
-$loggerConfigPath = KALTURA_ROOT_PATH . DIRECTORY_SEPARATOR . 'configurations' . DIRECTORY_SEPARATOR . "logger.ini";
-
-try // we don't want to fail when logger is not configured right
-{
-	$config = new Zend_Config_Ini($loggerConfigPath);
-	KalturaLog::initLog($config->generator);
-	KalturaLog::setContext("GENERATOR");
-}
-catch(Zend_Config_Exception $ex)
-{
-}
-
+kLoggerCache::InitLogger('generator');
