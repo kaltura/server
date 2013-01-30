@@ -27,14 +27,14 @@
 			</userRole>
 		</request>
 		<request service="user" action="add">
-			<userRole objectType="KalturaUserRole">
+			<user objectType="KalturaUser">
 				<id>@ADMIN_CONSOLE_ADMIN_MAIL@</id>
 				<email>@ADMIN_CONSOLE_ADMIN_MAIL@</email>
 				<password>@ADMIN_CONSOLE_PASSWORD@</password>
 				<status>1</status>
 				<isAdmin>1</isAdmin>
 				<roleIds>{1:result:id}</roleIds>
-			</userRole>
+			</user>
 		</request>
 	</multirequest>
 	<request service="userRole" action="add">
