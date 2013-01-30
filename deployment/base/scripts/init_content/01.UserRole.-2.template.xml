@@ -15,22 +15,34 @@
 		<expiry>86400</expiry>
 		<privileges></privileges> 
 	</session>
+	<multirequest>
+		<request service="userRole" action="add">
+			<userRole objectType="KalturaUserRole">
+				<name>System Administrator</name>
+				<systemName>System Administrator</systemName>
+				<description>System Administrator</description>
+				<permissionNames>*</permissionNames>
+				<status>1</status>
+				<tags>admin_console</tags>
+			</userRole>
+		</request>
+		<request service="user" action="add">
+			<userRole objectType="KalturaUserRole">
+				<id>@ADMIN_CONSOLE_ADMIN_MAIL@</id>
+				<email>@ADMIN_CONSOLE_ADMIN_MAIL@</email>
+				<password>@ADMIN_CONSOLE_PASSWORD@</password>
+				<status>1</status>
+				<isAdmin>1</isAdmin>
+				<roleIds>{1:result:id}</roleIds>
+			</userRole>
+		</request>
+	</multirequest>
 	<request service="userRole" action="add">
 		<userRole objectType="KalturaUserRole">
 			<name>Support Manager</name>
 			<systemName>Support Manager</systemName>
 			<description>Support manager</description>
 			<permissionNames>SYSTEM_ADMIN_BASE,SYSTEM_ADMIN_PUBLISHER_BASE,SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS,SYSTEM_ADMIN_PUBLISHER_CONFIG,SYSTEM_ADMIN_PUBLISHER_BLOCK,SYSTEM_ADMIN_PUBLISHER_ADD,SYSTEM_ADMIN_PUBLISHER_USAGE,SYSTEM_ADMIN_DEVELOPERS_TAB,SYSTEM_ADMIN_BATCH_CONTROL,SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE,SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY,SYSTEM_ADMIN_PUBLISHER_RESET_USER_PASSWORD,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_ACCOUNT_INFO,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_GROUP_OPTIONS,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_TECH_DATA,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_GENERAL_INFORMATION,SYSTEM_ADMIN_PARTNER_CONFIGURATION_VIEW,SYSTEM_ADMIN_WIDGET,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_ADMIN_KMC_USERS,AUDIT_TRAIL_BASE</permissionNames>
-			<status>1</status>
-			<tags>admin_console</tags>
-		</userRole>
-	</request>
-	<request service="userRole" action="add">
-		<userRole objectType="KalturaUserRole">
-			<name>Publisher Administrator</name>
-			<systemName>Publisher Administrator</systemName>
-			<description>Publishers Administrator</description>
-			<permissionNames>SYSTEM_ADMIN_BASE,SYSTEM_ADMIN_PUBLISHER_BASE,SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS,SYSTEM_ADMIN_PUBLISHER_CONFIG,SYSTEM_ADMIN_PUBLISHER_BLOCK,SYSTEM_ADMIN_PUBLISHER_ADD,SYSTEM_ADMIN_PUBLISHER_USAGE,SYSTEM_ADMIN_DEVELOPERS_TAB,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_TECH_DATA,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_ACCOUNT_INFO,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_GENERAL_INFORMATION,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_GROUP_OPTIONS,SYSTEM_ADMIN_PARTNER_CONFIGURATION_VIEW,SYSTEM_ADMIN_WIDGET,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_ADMIN_KMC_USERS,SYSTEM_ADMIN_PUBLISHER_RESET_USER_PASSWORD,AUDIT_TRAIL_BASE</permissionNames>
 			<status>1</status>
 			<tags>admin_console</tags>
 		</userRole>
