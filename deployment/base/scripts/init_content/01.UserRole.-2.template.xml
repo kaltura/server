@@ -29,10 +29,12 @@
 		<request service="user" action="add">
 			<user objectType="KalturaUser">
 				<id>@ADMIN_CONSOLE_ADMIN_MAIL@</id>
+				<screenName>@ADMIN_CONSOLE_ADMIN_MAIL@</screenName>
 				<email>@ADMIN_CONSOLE_ADMIN_MAIL@</email>
 				<password>@ADMIN_CONSOLE_PASSWORD@</password>
 				<status>1</status>
 				<isAdmin>1</isAdmin>
+				<allowedPartnerIds>*</allowedPartnerIds>
 				<roleIds>{1:result:id}</roleIds>
 			</user>
 		</request>
