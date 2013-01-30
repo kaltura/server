@@ -243,6 +243,20 @@ class kCurrentContext
 		return kCurrentContext::$ks_kuser;
 	}
 
+	public static function getCurrentSessionType()
+	{
+		if(!self::$ks_object)
+			return kSessionBase::SESSION_TYPE_NONE;
+			
+		if(self::$ks_object->isAdmin())
+			return kSessionBase::SESSION_TYPE_ADMIN;
+			
+		if(self::$ks_object->isWidgetSession())
+			return kSessionBase::SESSION_TYPE_WIDGET;
+			
+		return kSessionBase::SESSION_TYPE_USER;
+	}
+
 	public static function getCurrentPartnerId()
 	{
 		if(self::$partner_id)
