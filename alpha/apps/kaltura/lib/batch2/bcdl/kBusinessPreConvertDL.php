@@ -666,16 +666,54 @@ class kBusinessPreConvertDL
 		}
 		
 		$matchSourceHeightIdx = null;	// index of the smallest flavor that matches the source height
-		$prev=null;
+		$matchSourceOriginalFlavorBR = 0;
 		foreach($targetFlavorArr as $key=>$target){
 
 				/*
-				 * If the video height is set, then look for the largest compliant flavor 
-				 * and for the smallest to match the source height
+				 * Ignore flavors that are smaller than the source -
+				 * they are not in the scope of 'adjustToFramesize'
 				 */
-			if(!isset($matchSourceHeightIdx)||($targetFlavorArr[$matchSourceHeightIdx]->getHeight()<$srcHgt)){
-					$matchSourceHeightIdx = $key;
+			if($target->getHeight()<$srcHgt){
+KalturaLog::log("Source is larger than the target, skipping - key:$key, srcHgt:$srcHgt, trgHgt:".$target->getHeight());
+				continue;
 			}
+			
+				/*
+				 * Stop searcing if there is a flavor, in that set, that matches the source frame size -
+				 * no need to activate another flavor conversion
+				 */
+			if(!$target->_isNonComply || $target->_force || $target->_create_anyway) {
+				$matchSourceHeightIdx = null;
+KalturaLog::log("Found COMPLY/forced/create_anyway, leaving - key:$key, srcHgt:$srcHgt, trgHgt:".$target->getHeight());
+				break;
+			}
+			
+				/*
+				 * If 'matching-target' is unset 
+				 * - set it to the current target  
+				 */
+			if(!isset($matchSourceHeightIdx)){
+				$matchSourceHeightIdx = $key;
+				$flPrm = assetParamsPeer::retrieveByPKs(array($key));
+				$matchSourceOriginalFlavorBR = $flPrm[0]->getVideoBitrate();
+KalturaLog::log("Set matchSourceHeightIdx:$key, matchSourceOriginalFlavorBR:$matchSourceOriginalFlavorBR, srcHgt:$srcHgt");
+				continue;
+			}
+
+				/*
+				 * If current target is smaller than 'matching-target'  
+				 * - set it to the current target  
+				 */
+			$flPrm = assetParamsPeer::retrieveByPKs(array($key));
+			$flPrmBR = $flPrm[0]->getVideoBitrate();
+			if($matchSourceOriginalFlavorBR>$flPrmBR){
+				$matchSourceOriginalFlavorBR = $flPrmBR;
+				$matchSourceHeightIdx = $key;
+KalturaLog::log("Switch to matchSourceHeightIdx:$matchSourceHeightIdx, matchSourceOriginalFlavorBR:$matchSourceOriginalFlavorBR srcHgt:$srcHgt");
+			}
+//			if($target->getHeight()<$targetFlavorArr[$matchSourceHeightIdx]->getHeight()){
+//			}
+
 		}
 		
 				/*
@@ -684,6 +722,7 @@ class kBusinessPreConvertDL
 				 */
 		if(isset($matchSourceHeightIdx) && $targetFlavorArr[$matchSourceHeightIdx]->_isNonComply) {
 			$targetFlavorArr[$matchSourceHeightIdx]->_create_anyway = true;
+KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			/*
 			$first = reset($targetFlavorArr);
 			if($first->_isNonComply) {

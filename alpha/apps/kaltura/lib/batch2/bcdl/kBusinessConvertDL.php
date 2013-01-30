@@ -240,6 +240,7 @@ class kBusinessConvertDL
 		// check if there is a complete flavor
 		$hasComplied = false;
 		$hasForced = false;
+		$hasCreateAnyway = false;
 		$originalFlavorParamsIds = array();
 		foreach($flavors as $flavorParamsId => $flavor)
 		{
@@ -249,6 +250,9 @@ class kBusinessConvertDL
 				
 			if($flavor->_force)
 				$hasForced = true;
+				
+			if($flavor->_create_anyway)
+				$hasCreateAnyway = true;
 		}
 		
 		$originalFlavorParams = array();
@@ -261,7 +265,9 @@ class kBusinessConvertDL
 			KalturaLog::log("Has complied flavors");
 		if($hasForced)
 			KalturaLog::log("Has forced flavors");
-		if($hasComplied || $hasForced)
+		if($hasCreateAnyway)
+			KalturaLog::log("Has createAnyway flavors");
+		if($hasComplied || $hasForced || $hasCreateAnyway)
 			return $flavors;
 		
 		// find the lowest flavor
