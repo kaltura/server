@@ -577,6 +577,24 @@ class kApiCache
 	}	
 
 	/**
+	 * Enter description here ...
+	 * @return string
+	 */
+	protected function getCurrentSessionType()
+	{
+		if(!$this->_ksObj)
+			return kSessionBase::SESSION_TYPE_NONE;
+			
+		if($this->_ksObj->isAdmin())
+			return kSessionBase::SESSION_TYPE_ADMIN;
+			
+		if($this->_ksObj->isWidgetSession())
+			return kSessionBase::SESSION_TYPE_WIDGET;
+			
+		return kSessionBase::SESSION_TYPE_USER;
+	}
+	
+	/**
 	 * This functions checks if a certain response resides in cache.
 	 * In case it does, the response is returned from cache and a response header is added.
 	 * There are two possibilities on which this function is called:
@@ -615,6 +633,13 @@ class kApiCache
 			return false;
 		}
 
+		$isInMultiRequest = isset($this->_params['multirequest']);
+		$action = $this->_params['service'];
+		if ($action != 'multirequest')
+			$action = $this->_params['service'] . '.' . $this->_params['action'];
+		
+		KalturaMonitorClient::monitor(true, $action, $this->_ksPartnerId, $this->getCurrentSessionType(), $isInMultiRequest);
+		
 		$this->_responseMetadata = $responseMetadata;
 		
 		if ($this->_cacheRulesDirty)
