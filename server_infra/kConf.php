@@ -150,11 +150,14 @@ class kConf extends kEnvironment
 		if(!file_exists("$configDir/$mapName.ini"))
 			throw new Exception("Cannot find map [$mapName] in config folder");
 		
-		$oldIncludePath = get_include_path();
-		set_include_path(dirname(__file__) . '/../vendor/ZendFramework/library');
-		require_once 'Zend/Config/Exception.php';
-		require_once('Zend/Config/Ini.php');
-		set_include_path($oldIncludePath);
+		if(!class_exists('Zend_Config_Ini'))
+		{
+			$oldIncludePath = get_include_path();
+			set_include_path(dirname(__file__) . '/../vendor/ZendFramework/library');
+			require_once 'Zend/Config/Exception.php';
+			require_once 'Zend/Config/Ini.php';
+			set_include_path($oldIncludePath);
+		}
 		
 		$config = new Zend_Config_Ini("$configDir/$mapName.ini");
 		self::$map[$mapName] = $config->toArray();
