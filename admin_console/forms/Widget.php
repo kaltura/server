@@ -79,6 +79,13 @@ class Form_Widget extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			'validators' 	=> array()
 		));
+
+		$this->addElement('text', 'html5_url', array(
+			'label'			=> 'HTML5 URL:',
+			'required'		=> false,
+			'filters'		=> array('StringTrim'),
+			'validators' 	=> array()
+		));
 		
 		$this->addElement('text', 'conf_vars', array(
 			'label'			=> 'Additional flashvars:',
