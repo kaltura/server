@@ -15,10 +15,10 @@ class kCoreException extends Exception
 	
 	public function __construct($message, $code = null, $data = null)
 	{
-		KalturaLog::err("Code: [$code] Message: [$message]");
 		$this->message = $message;
 		$this->code = $code;
 		$this->data = $data;
+		KalturaLog::err($this);
 	}
 	
 	/**
