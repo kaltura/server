@@ -14,6 +14,11 @@ require_once(dirname(__FILE__) . '/../cache/kCacheManager.php');
  */
 class kSessionBase
 {
+	const SESSION_TYPE_NONE		= -1;
+	const SESSION_TYPE_USER		= 0;
+	const SESSION_TYPE_WIDGET	= 1;
+	const SESSION_TYPE_ADMIN	= 2;
+	
 	// Common constants
 	const TYPE_KS =  0; // change to be 1
 	const TYPE_KAS = 1; // change to be 2
