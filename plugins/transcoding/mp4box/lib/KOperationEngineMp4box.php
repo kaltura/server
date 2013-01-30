@@ -31,7 +31,15 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 		$exeCmd =  parent::getCmdLine();
 
 		if(strstr($exeCmd, KDLOperatorMp4box::ACTION_EMBED_SUBTITLES)!==FALSE) {
-			$captionsStr = $this->buildSubTitleCommandParam($this->data, $this->client);
+			$captionsStr = null;
+			{
+					// impersonite
+				$preImpersoniteId = $this->client->getConfig()->partnerId;
+				
+				$captionsStr = $this->buildSubTitleCommandParam($this->data, $this->client);
+					// un-impersonite
+				$this->client->getConfig()->partnerId = $preImpersoniteId;
+			}
 			if(isset($captionsStr)){
 				$exeCmd = str_replace(
 						array(KDLOperatorMp4box::ACTION_EMBED_SUBTITLES, KDLOperatorMp4box::SUBTITLE_PLACEHOLDER), 
@@ -73,23 +81,28 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 	private function buildSubTitleCommandParam(KalturaConvartableJobData $data, KalturaClient $client)
 	{//		$cmdStr.= " -add ".KDLCmdlinePlaceholders::OutFileName.".temp.srt:hdlr=sbtl:lang=$lang:group=0:layer=-1";
 	
-			// impersonite
-		$preImpersoniteId = $client->getConfig()->partnerId;
-		$client->getConfig()->partnerId = $data->flavorParamsOutput->partnerId;
-		
-		$flrAsst = $client->flavorAsset->get($data->flavorAssetId);
-		if(!isset($flrAsst)){
-			$this->message = ("Failed to retrieve the flavor asset object (".$data->flavorAssetId.")");
+		try {
+			$client->getConfig()->partnerId = $data->flavorParamsOutput->partnerId;
+			
+			$flrAsst = $client->flavorAsset->get($data->flavorAssetId);
+			if(!isset($flrAsst)){
+				$this->message = ("Failed to retrieve the flavor asset object (".$data->flavorAssetId.")");
+KalturaLog::log("ERROR:".$this->message);
+				return null;
+			}
+			$filter = new KalturaAssetFilter();
+			$filter->entryIdEqual = $flrAsst->entryId;
+			$captionsList = $client->captionAsset->listAction($filter, null); 
+			if(!isset($captionsList) || count($captionsList->objects)==0){
+				$this->message = ("No caption assets for entry (".$flrAsst->entryId.")");
+KalturaLog::log("ERROR:".$this->message);
+				return null;
+			}
+		}
+		catch( Exception $ex ){
+			$this->message = ("Exception on captions list retrieval  (".print_r($ex,1).")");
 			return null;
 		}
-		$filter = new KalturaAssetFilter();
-		$filter->entryIdEqual = $flrAsst->entryId;
-		$captionsList = $client->captionAsset->listAction($filter, null); 
-		if(!isset($captionsList) || count($captionsList->objects)==0){
-			$this->message = ("No caption assets for entry (".$flrAsst->entryId.")");
-			return null;
-		}
-
 		$captionsStr = null;
 		$addedSubs=0;
 		foreach($captionsList->objects as $captionObj) {
@@ -98,7 +111,7 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 			}
 			catch ( Exception $ex ) {
 				$cptUrl = null;
-				KalturaLog::err("Exception on etrieve caption asset url retrieval (".$captionObj->id."),\nexception:".print_r($ex,1));
+				KalturaLog::err("Exception on retrieve caption asset url retrieval (".$captionObj->id."),\nexception:".print_r($ex,1));
 			}		
 			if(!isset($cptUrl)){
 				KalturaLog::err("Failed to retrieve caption asset url (".$captionObj->id.")");
@@ -127,9 +140,7 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 			}
 			$addedSubs++;
 		}
-			// un-impersonite
-		$client->getConfig()->partnerId = $preImpersoniteId;
-		
+
 		if(!isset($captionsStr))
 		{
 			$this->message = ("Error: missing caption data or files.");
