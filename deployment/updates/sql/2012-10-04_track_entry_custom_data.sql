@@ -1,1 +1,0 @@
-ALTER TABLE  `track_entry` ADD  `custom_data` TEXT NULL AFTER  `user_ip`;

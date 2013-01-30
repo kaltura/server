@@ -250,7 +250,11 @@ CREATE TABLE IF NOT EXISTS `batch_job_lock` (
   KEY `partner+type_status_index` (`job_type`,`status`,`dc`,`partner_id`),
   KEY `urgency_type_status_index` (`job_type`,`status`,`dc`,`urgency`),
   KEY `execution_attempts_index` (`job_type`,`execution_attempts`,`dc`),
-  KEY `processor_expiration_index` (`job_type`,`execution_attempts`,`expiration`)
+  KEY `processor_expiration_index` (`job_type`,`execution_attempts`,`expiration`),
+  KEY `dc_job_type_status_job_sub_type` (`dc`,`job_type`,`status`,`job_sub_type`),
+  KEY `dc_job_type_status_attempts_job_sub_type` (`dc`,`job_type`,`status`,`execution_attempts`,`job_sub_type`),
+  KEY `dc_job_type_status_attempts_created` (`dc`,`job_type`,`status`,`execution_attempts`,`created_at`),
+  KEY `dc_status` (`dc`,`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `batch_job_log` */
@@ -531,6 +535,7 @@ CREATE TABLE IF NOT EXISTS `category_kuser` (
   `custom_data` text,
   `category_full_ids` text,
   `screen_name` varchar(100) NOT NULL,
+  `permission_names` text,
   PRIMARY KEY (`id`),
   KEY `partner_id_index` (`partner_id`),
   KEY `category_index` (`category_id`,`status`),

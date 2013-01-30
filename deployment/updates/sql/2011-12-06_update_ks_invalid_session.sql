@@ -1,1 +1,0 @@
-UPDATE invalid_session SET ks = SUBSTRING_INDEX(ks,'|',1);
