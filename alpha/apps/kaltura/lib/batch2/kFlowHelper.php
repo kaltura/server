@@ -816,14 +816,19 @@ class kFlowHelper
 		KalturaLog::debug("File delete finished for file path: ". $data->getLocalFileSyncPath().", data center: ".$dbBatchJob->getDc());
 		
 		//Change status of the filesync to "purged"
-		
 		$fileSyncFroDeletedFile = kFileSyncUtils::retrieveObjectForSyncKey($data->getSyncKey());
-		
 		$fileSyncFroDeletedFile->setStatus(FileSync::FILE_SYNC_STATUS_PURGED);
-		
 		$fileSyncFroDeletedFile->save();
 		
 		return $dbBatchJob;
+	}
+	
+	public function handleDeleteFileProcessing (kDeleteFileJobData $data)
+	{
+		KalturaLog::info("Delete started for file path " . $data->getLocalFileSyncPath());
+		$fileSyncFroDeletedFile = kFileSyncUtils::retrieveObjectForSyncKey($data->getSyncKey());
+		$fileSyncFroDeletedFile->setStatus(FileSync::FILE_SYNC_STATUS_DELETED);
+		$fileSyncFroDeletedFile->save();
 	}
 
 	/**

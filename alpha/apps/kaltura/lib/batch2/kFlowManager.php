@@ -147,10 +147,13 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	{
 		switch ($dbBatchJob->getStatus())
 		{
+			case BatchJob::BATCHJOB_STATUS_PROCESSING:
+				kFlowHelper::handleDeleteFileProcessing($data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 				return kFlowHelper::handleDeleteFileFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
+				KalturaLog::info("File deletion job failed.");
 			default:
 				return $dbBatchJob;
 		}	
