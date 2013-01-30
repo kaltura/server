@@ -219,7 +219,7 @@ class kUploadTokenMgr
 		$extension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
 		$uploadFilePath = $this->getUploadPath($this->_uploadToken->getId(), $extension);
 		$this->_uploadToken->setUploadTempPath($uploadFilePath);
-		kFile::fullMkdir($uploadFilePath);
+		kFile::fullMkdir($uploadFilePath, 0700);
 		
 		$moveFileSuccess = kFile::moveFile($fileData['tmp_name'], $uploadFilePath);
 		if (!$moveFileSuccess)
@@ -233,7 +233,7 @@ class kUploadTokenMgr
 			KalturaLog::info("The file was moved successfully");
 		}
 		
-		chmod($uploadFilePath, 0777);
+		chmod($uploadFilePath, 0600);
 	}
 	
 	/**
