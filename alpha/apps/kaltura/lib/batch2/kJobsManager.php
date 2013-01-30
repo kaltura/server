@@ -1286,10 +1286,11 @@ class kJobsManager
 		return self::addJob($batchJob, $netStorageDeleteData, BatchJobType::STORAGE_DELETE, $storage->getProtocol());
 	}
 	
-	public static function addFutureDeletionJob(BatchJob $parentJob = null, $entryId = null, Partner $partner, $localFileSyncPath, $dc)
+	public static function addFutureDeletionJob(BatchJob $parentJob = null, $entryId = null, Partner $partner, $syncKey, $localFileSyncPath, $dc)
 	{
 		$deleteFileData = new kDeleteFileJobData();
 		$deleteFileData->setLocalFileSyncPath($localFileSyncPath);
+		$deleteFileData->setSyncKey($syncKey);
 		
 		if ($parentJob)
 		{
@@ -1301,7 +1302,7 @@ class kJobsManager
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partner->getId());
 		}
-		 
+		
 		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
 		$batchJob->setCheckAgainTimeout(12*60*60);
 		$batchJob->setDc($dc);
