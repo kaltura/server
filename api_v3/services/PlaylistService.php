@@ -171,9 +171,11 @@ class PlaylistService extends KalturaEntryService
 		// copy properties from the playlistUpdate to the $dbPlaylist
 		baseObjectUtils::autoFillObjectFromObject ( $playlistUpdate , $dbPlaylist , $allowEmpty );
 		// after filling the $dbPlaylist from  $playlist - make sure the data content is set properly
-		if ( !is_null($playlistUpdate->getDataContent(true))) $dbPlaylist->setDataContent ( $playlistUpdate->getDataContent(true)  );
-
-		myPlaylistUtils::validatePlaylist( $dbPlaylist );
+		if(!is_null($playlistUpdate->getDataContent(true)) && $playlistUpdate->getDataContent(true) != $dbPlaylist->getDataContent())
+		{
+			$dbPlaylist->setDataContent ( $playlistUpdate->getDataContent(true)  );
+			myPlaylistUtils::validatePlaylist( $dbPlaylist );
+		}
 		
 		if ( $updateStats )
 			myPlaylistUtils::updatePlaylistStatistics ( $this->getPartnerId() , $dbPlaylist );//, $extra_filters , $detailed );
