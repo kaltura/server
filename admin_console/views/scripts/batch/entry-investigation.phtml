@@ -1027,6 +1027,8 @@
 										<thead>
 											<tr>
 												<th><?php echo $this->translate('entry-investigate history_records timeStamp th'); ?></th>
+												<th><?php echo $this->translate('entry-investigate history_records hostName th'); ?></th>
+												<th><?php echo $this->translate('entry-investigate history_records sessionId th'); ?></th>
 												<th><?php echo $this->translate('entry-investigate history_records schedulerId th'); ?></th>
 												<th><?php echo $this->translate('entry-investigate history_records workerId th'); ?></th>
 												<th><?php echo $this->translate('entry-investigate history_records batchIndex th'); ?></th>
@@ -1039,6 +1041,8 @@
 											<?php foreach($job->history as $historyRecord): ?>
 												<tr>
 													<td><?php echo date($this->translate('time format'), $historyRecord->timeStamp); ?></td>
+													<td><?php echo $historyRecord->hostName; ?></td>
+													<td><?php echo $historyRecord->sessionId; ?></td>
 													<td><?php echo $historyRecord->schedulerId; ?></td>
 													<td><?php echo $historyRecord->workerId; ?></td>
 													<td><?php echo $historyRecord->batchIndex; ?></td>

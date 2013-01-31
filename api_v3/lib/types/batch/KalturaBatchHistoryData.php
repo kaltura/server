@@ -40,6 +40,16 @@ class KalturaBatchHistoryData extends KalturaObject
 	 */
 	public $errNumber;
 	
+	/**
+	 * @var string
+	 */
+	public $hostName;
+	
+	/**
+	 * @var string
+	 */
+	public $sessionId;
+	
 	private static $mapBetweenObjects = array
 	(
 			'schedulerId',
@@ -48,6 +58,8 @@ class KalturaBatchHistoryData extends KalturaObject
 			'message',
 			'errType',
 			'errNumber',
+			'hostName',
+			'sessionId',
 	);
 	
 	public function getMapBetweenObjects()

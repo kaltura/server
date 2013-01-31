@@ -47,6 +47,18 @@ class kBatchHistoryData
 	 */
 	protected $errNumber;
 	
+	/**
+	 * The host name 
+	 * @var        string
+	 */
+	protected $hostName;
+	
+	/**
+	 * Unique session ID
+	 * @var        string
+	 */
+	protected $sessionId;
+	
 	public function __construct() {
 		$this->timeStamp = date('Y-m-d H:i:s');
 	}	
@@ -208,5 +220,33 @@ class kBatchHistoryData
 	 */
 	public function setErrNumber($errNumber) {
 		$this->errNumber = $errNumber;
+	}
+	
+	/**
+	 * @return the $hostName
+	 */
+	public function getHostName() {
+		return $this->hostName;
+	}
+	
+	/**
+	 * @return the $sessionId
+	 */
+	public function getSessionId() {
+		return $this->sessionId;
+	}
+	
+	/**
+	 * @param string $hostName
+	 */
+	public function setHostName($hostName) {
+		$this->hostName = $hostName;
+	}
+	
+	/**
+	 * @param string $sessionId
+	 */
+	public function setSessionId($sessionId) {
+		$this->sessionId = $sessionId;
 	}
 }

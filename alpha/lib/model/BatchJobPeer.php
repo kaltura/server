@@ -141,10 +141,13 @@ class BatchJobPeer extends BaseBatchJobPeer
 			/* @var $batchJob BatchJob */
 
 			// Set history
+			$uniqueId = new UniqueId();
 			$historyRecord = new kBatchHistoryData();
 			$historyRecord->setWorkerId($lockKey->getWorkerId());
 			$historyRecord->setSchedulerId($lockKey->getSchedulerId());
 			$historyRecord->setBatchIndex($lockKey->getBatchIndex());
+			$historyRecord->setHostName((isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname()));
+			$historyRecord->setSessionId((string)$uniqueId);
 			
 			$batchJob->addHistoryRecord($historyRecord);
 			

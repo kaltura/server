@@ -606,6 +606,8 @@ return array(
 	'entry-investigate history_records message th' => 'Message',
 	'entry-investigate history_records errType th' => 'Error type',
 	'entry-investigate history_records errNumber th' => 'Error number',
+	'entry-investigate history_records hostName th' => 'Host name',
+	'entry-investigate history_records sessionId th' => 'Session Id',
 
 
 	// entries gallery
