@@ -823,7 +823,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 	
-	public function handleDeleteFileProcessing (kDeleteFileJobData $data)
+	public static function handleDeleteFileProcessing (kDeleteFileJobData $data)
 	{
 		KalturaLog::info("Delete started for file path " . $data->getLocalFileSyncPath());
 		$fileSyncFroDeletedFile = kFileSyncUtils::retrieveObjectForSyncKey($data->getSyncKey());
