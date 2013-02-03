@@ -4,7 +4,7 @@
  */
 class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaPending, IKalturaBulkUploadXmlHandler, IKalturaConfigurator
 {
-	const PLUGIN_NAME = 'contentDistributionBulkUploadXml';
+	const PLUGIN_NAME = 'contentDistributionBulkUploadXmlEngine';
 	
 	const BULK_UPLOAD_XML_VERSION_MAJOR = 1;
 	const BULK_UPLOAD_XML_VERSION_MINOR = 0;
