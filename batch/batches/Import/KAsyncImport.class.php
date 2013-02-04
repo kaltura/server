@@ -172,7 +172,7 @@ class KAsyncImport extends KJobHandlerWorker
 					}
 					if(!$fileSize)
 					{
-						$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "Received timeout, but no filesize available." . $curlWrapper->getError(), KalturaBatchJobStatus::RETRY);
+						$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "Received timeout, but no filesize available. Completed size [$actualFileSize]" . $curlWrapper->getError(), KalturaBatchJobStatus::RETRY);
 						$curlWrapper->close();
 						return $job;
 					}
