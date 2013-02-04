@@ -28,7 +28,21 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		return $this->process($job, $job->data);
+		try 
+		{
+			return $this->process($job, $job->data);
+		}
+		catch(kTemporaryException $e)
+		{
+			if($e->getResetJobExecutionAttempts())
+				throw $e;
+				
+			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $e->getCode(), "Error: " . $e->getMessage(), KalturaBatchJobStatus::FAILED);
+		}
+		catch(KalturaClientException $e)
+		{
+			$this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $e->getCode(), "Error: " . $e->getMessage(), KalturaBatchJobStatus::FAILED);
+		}
 	}
 
 	protected function process(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
