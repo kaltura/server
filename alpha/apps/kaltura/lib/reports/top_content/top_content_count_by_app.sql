@@ -22,4 +22,4 @@ FROM (
 				  count_loads > 0 OR
 				  sum_time_viewed > 0)) ev_en, dwh_dim_entries e
 	WHERE
-		en.entry_id=ev.entry_id) a
+		ev_en.entry_id=e.entry_id) a
