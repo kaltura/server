@@ -36,12 +36,11 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 		{
 			if($e->getResetJobExecutionAttempts())
 				throw $e;
-				
-			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $e->getCode(), "Error: " . $e->getMessage(), KalturaBatchJobStatus::FAILED);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $e->getCode(), "Error: " . $e->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		catch(KalturaClientException $e)
 		{
-			$this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $e->getCode(), "Error: " . $e->getMessage(), KalturaBatchJobStatus::FAILED);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $e->getCode(), "Error: " . $e->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 	}
 
