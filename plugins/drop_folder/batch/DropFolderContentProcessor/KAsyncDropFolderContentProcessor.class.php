@@ -77,7 +77,7 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 		
 		$this->unimpersonate();		
 				
-		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);;
+		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
 	}
 		
 	private function addAsNewContent(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
