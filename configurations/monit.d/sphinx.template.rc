@@ -1,7 +1,7 @@
         check process sphinx 
            with pidfile "@APP_DIR@/sphinx/searchd.pid"
-           start program = "/etc/init.d/sphinx_watch.sh start" with timeout 60 seconds
-           stop program = "/etc/init.d/sphinx_watch.sh stop"
+           start program = "/etc/init.d/kaltura_sphinx start" with timeout 60 seconds
+           stop program = "/etc/init.d/kaltura_sphinx stop"
            if 2 restarts within 3 cycles then timeout
            #if failed port 9312 protocol telnet then restart
            group kaltura
@@ -11,7 +11,25 @@
             with path @APP_DIR@/configurations/sphinx/kaltura.conf
             # Reload Sphinx if the kaltura.conf file was changed
             if changed checksum
-               then exec "/etc/init.d/sphinx_watch.sh restart"
+               then exec "/etc/init.d/kaltura_sphinx restart"
 
         check file searchd
             with path @BIN_DIR@/sphinx/searchd
+            
+        check process sphinx_populate 
+           with pidfile "@LOG_DIR@/populate.pid"
+           start program = "/etc/init.d/kaltura_populate start" with timeout 60 seconds
+           stop program = "/etc/init.d/kaltura_populate stop"
+           if 2 restarts within 3 cycles then timeout
+           group kaltura
+           depends on sphinx_populate.conf, sphinx_populate_script
+
+        check file sphinx_populate.conf
+            with path @APP_DIR@/plugins/sphinx_search/scripts/configs/server-sphinx.php
+            # Reload populate if the server-sphinx.php file was changed
+            if changed checksum
+               then exec "/etc/init.d/kaltura_populate restart"
+
+        check file sphinx_populate_script
+            with path @APP_DIR@/plugins/sphinx_search/scripts/populateFromLog.php
+            

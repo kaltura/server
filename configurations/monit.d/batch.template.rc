@@ -1,0 +1,17 @@
+        check process batch 
+           with pidfile "@LOG_DIR@/batch.pid"
+           start program = "/etc/init.d/kaltura_batch start" with timeout 60 seconds
+           stop program = "/etc/init.d/kaltura_batch stop"
+           if 2 restarts within 3 cycles then timeout
+           group kaltura
+           depends on batch.ini, batch_script
+
+        check file batch.ini
+            with path @APP_DIR@/configurations/batch.ini
+            # Reload batch if the batch.ini file was changed
+            if changed checksum
+               then exec "/etc/init.d/kaltura_batch restart"
+
+        check file batch_script
+            with path @APP_DIR@/batch/KGenericBatchMgr.class.php
+            

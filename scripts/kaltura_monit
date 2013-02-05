@@ -11,24 +11,20 @@
 # pidfile:      /var/run/monit.pid
 # config:       /etc/monit.conf
 
-# Source function library.
-. /etc/rc.d/init.d/functions
-
 # Source networking configuration.
 . /etc/sysconfig/network
 
-if [ -L $0 ];then
-	REAL_SCRIPT=`readlink $0`
-else
-	REAL_SCRIPT=$0
-fi
-SYSTEM_INI_FILE=`dirname $REAL_SCRIPT`/../configurations/system.ini``
+SYSTEM_INI_FILE=/etc/kaltura.d/system.ini
 if [ -r "$SYSTEM_INI_FILE" ];then
     . $SYSTEM_INI_FILE
 else
     echo "I could not source $SYSTEM_INI_FILE. Exiting."
     exit 1
 fi
+
+# Source function library.
+. $APP_DIR/scripts/functions.rc
+
 MONIT=/usr/bin/monit -c $APP_DIR/configuration/monit.rc
 
 # Source monit configuration.

@@ -4,21 +4,20 @@
 echo `date`
 
 #
-# serviceBatchMgr      This shell script takes care of starting and stopping a Kaltura Batch Service
+# populateMgr      This shell script takes care of starting and stopping a Kaltura Sphinx Populate Service
 #
 # chkconfig: 2345 13 87
-# description: Kaltura Batch
+# description: Kaltura Sphinx Populate
 
 # Source function library.
 #. /etc/rc.d/init.d/functions
 
-# Directory containing the batchers' php files
-BATCHDIR=$APP_DIR/batch
-LOGDIR="$LOG_DIR" 
+# Directory containing the populate php files
+SCRIPTDIR=$APP_DIR/plugins/sphinx_search/scripts
 
-BATCHEXE=KGenericBatchMgr.class.php
-# The batch service filename without extensions
-FILE_NAME=${BATCHEXE%.*}
+SCRIPTEXE=populateFromLog.php
+# The populate service filename without extensions
+FILE_NAME=${SCRIPTEXE%.*}
 
 if [ $# != 1 ]; then
    echo "Usage: $0 [start|stop|restart|status]"
@@ -26,9 +25,9 @@ if [ $# != 1 ]; then
    exit 0 	
 fi
 
-CONFIG_FILE=$APP_DIR/configurations/batch.ini
+CONFIG_FILE=$APP_DIR/plugins/sphinx_search/scripts/configs/server-sphinx.php
 
-LOCKFILE="$BATCHDIR/$FILE_NAME"
+LOCKFILE="$LOG_DIR/populate.pid"
 
 echo_success() {
   [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
@@ -56,12 +55,12 @@ echo_failure() {
 
 start() {
 	if [ -f $BASE_DIR/maintenance ]; then
-		echo "Server is on maintenance mode - BatchMgr will not start!"
+		echo "Server is on maintenance mode - populateMgr will not start!"
 		exit 1
 	fi
 	
 	echo -n $"Starting:"
-	KP=$(pgrep -P 1 -f $FILE_NAME.php)
+	KP=$(pgrep -P 1 -f $SCRIPTEXE)
 	if [ -f $LOCKFILE ]; then
 		echo_failure
 		echo
@@ -78,7 +77,7 @@ start() {
                 fi
 	else
 		if [ "X$KP" != "X"  ]; then
-          	    echo "$FILE_NAME.php is running as $KP without a $LOCKFILE"
+          	    echo "$FILE_NAME is running as $KP without a $LOCKFILE"
           	    exit 0
 		fi		
 		start_scheduler
@@ -87,13 +86,13 @@ start() {
 }
 
 start_scheduler() {
-		echo "$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> ${LOGDIR}/kaltura_batch.log 2>&1 &"
-                cd $BATCHDIR
-		$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> ${LOGDIR}/kaltura_batch.log 2>&1 &
+		echo "$PHP_BIN $SCRIPTEXE $CONFIG_FILE >> $LOG_DIR/kaltura_populate.log 2>&1 &"
+                cd $SCRIPTDIR
+		$PHP_BIN $SCRIPTEXE $CONFIG_FILE >> $LOG_DIR/kaltura_populate.log 2>&1 &
                 if [ "$?" -eq 0 ]; then
                         echo_success
                         echo
-                        touch $LOCKFILE
+                        echo $$ > $LOCKFILE
                 else
                         echo_failure
                         echo
@@ -101,9 +100,9 @@ start_scheduler() {
 }
 
 show_status() {
-      KP=$(pgrep -P 1 -f $FILE_NAME.php) 
+      KP=$(pgrep -P 1 -f $SCRIPTEXE) 
       if [ "X$KP" != "X"  ]; then
-	  echo "$FILE_NAME.php is running as $KP ..."
+	  echo "$FILE_NAME is running as $KP ..."
 	  return 0
       else
           echo "Service $FILE_NAME isn't running"
@@ -114,7 +113,7 @@ show_status() {
 
 stop() {
 	echo -n $"Shutting down:"
-	KP=$(pgrep -P 1 -f $FILE_NAME.php)
+	KP=$(pgrep -P 1 -f $SCRIPTEXE)
 	if [ -n "$KP" ]; then
 		PIDS=$(pstree -p $KP | grep -o '[0-9]\{2,5\}')
 		# hack, returnds the PIDS as string and tells kill to kill all at once

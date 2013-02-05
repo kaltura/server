@@ -1,1 +1,0 @@
-*/30 * * * * kaltura @APP_DIR@/scripts/watch.batchMgr.sh 2>&1 >> @LOG_DIR@/cron.log

@@ -4,7 +4,7 @@
 
         set daemon 120 # Poll at 2-minute intervals
         set logfile syslog facility log_daemon
-        set alert jess.portnoy@kaltura.com 
+        set alert $MAILTO 
         set httpd port 2812 and use address localhost
             allow localhost   # Allow localhost to connect
             allow admin:Monit # Allow Basic Auth
