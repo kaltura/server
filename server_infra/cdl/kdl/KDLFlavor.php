@@ -227,6 +227,13 @@ KalturaLog::log("==>\n");
 		}
 		
 		/*
+		 * ARF (webex) sources don't have proper mediaInfo - thus can not validate the product, skip it
+		 */
+		if(isset($srcCont) && $srcCont->GetIdOrFormat()=='arf') {
+			KalturaLog::log("ARF (webex) sources don't have proper mediaInfo - thus can not validate the product");
+			return true;
+		}
+		/*
 		 * Evaluate source duration, to be used to check the product duration validity 
 		 */
 $plannedDur = 0;
