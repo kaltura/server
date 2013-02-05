@@ -12,7 +12,7 @@ SSLCryptoDevice builtin
 #SSLCertificateKeyFile /etc/onprem-falcon2.private.key
 SSLCertificateFile /etc/pki/tls/certs/localhost.crt
 SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
-<VirtualHost onprem-falcon2.kaltura.dev:443>
+<VirtualHost @KALTURA_VIRTUAL_HOST_NAME@>
 SSLEngine on
 SSLProtocol all -SSLv2
 SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW
