@@ -61,6 +61,15 @@
 							KDLWarnings::ToString(KDLWarnings::RealMediaMissingContent);
 KalturaLog::log("An invalid source RealMedia file thatfails to provide valid mediaInfodata. Set up a flavor with 'default' params.");
 					}
+					/*
+					 * ARF (Webex) sources don't have proper mediaInfo, therefore turn on the Force flag to carry on with conversion processing
+					 */
+					else if(isset($mediaSet->_container) && $mediaSet->_container->_format=="arf"){
+						foreach($profile->_flavors as $fl)
+							$fl->_flags=$fl->_flags|KDLFlavor::ForceCommandLineFlagBit;
+						$mediaSet->_errors = array();
+KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn on the Force flag to carry on with conversion processing.");
+					}
 					else {
 						return false;
 					}
