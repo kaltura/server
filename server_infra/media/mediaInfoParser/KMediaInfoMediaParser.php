@@ -29,12 +29,16 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 	{
 		$output = $this->getRawMediaInfo();
 		$kMi = $this->parseOutput($output);
+
+		if(!isset($kMi)) {
+			return null;
+		}
 			/*
-			 * Following code patching mediainfo 0.7.61 misbehaviours, 
+			 * Following code patches mediainfo 0.7.61 misbehaviours, 
 			 * those behaviors do not appear on the older 0.7.28.
 			 */
-		if(isset($kMi)) {
-			/*
+		{
+			 /*
 			 * Interlaced mjpa sources - the height value is halved.
 			 */
 			if(isset($kMi->videoHeightTmp) 
@@ -50,6 +54,7 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				$kMi->videoDuration = $kMi->containerDuration;
 			}
 		}
+		
 		$durLimit=3600000;
 		if(get_class($this)=='KMediaInfoMediaParser'
 		&& ((isset($kMi->containerDuration) && $kMi->containerDuration>$durLimit) 
@@ -134,11 +139,20 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		if(isset($streamMediaInfo))
 			$mediaInfo->streamArray[$section][]=$streamMediaInfo;
 		
-			// On no-content return null
-		if($fieldCnt<5)
-			return null; 
-		else 
+			/*
+			 * For ARF (webex) files - simulate container ID and format.
+			 * On no-content return null
+			 */
+		if($fieldCnt>=5) 
 			return $mediaInfo;
+		else if(strstr($this->filePath,".arf")){
+			$mediaInfo->containerFormat = "arf";
+			$mediaInfo->containerId = "arf";
+			return $mediaInfo;
+		}
+		else
+			return null; 
+		 
 	}
 
 	/**
