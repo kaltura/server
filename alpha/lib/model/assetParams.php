@@ -152,7 +152,14 @@ class assetParams extends BaseassetParams
 	
 	public function getRequiredPermissions()
 	{
-		return $this->getFromCustomData('requiredPermissions');
+		$requiredPermissions = $this->getFromCustomData('requiredPermissions');
+		if(!$requiredPermissions)
+			return null;
+			
+		if(is_array($requiredPermissions))
+			return $requiredPermissions;
+			
+		return array($requiredPermissions);
 	}
 	
 	public function setSourceRemoteStorageProfileId($sourceRemoteStorageProfileId)
