@@ -26,5 +26,20 @@ class PartnerLoad extends BasePartnerLoad {
 			$v = 0;
 		parent::setJobSubType($v);
 	}
+	
+	/**
+	 * Constructor
+	 * @param int $dc
+	 * @param int $partnerId
+	 * @param int $jobType
+	 * @param int $jobSubType
+	 */
+	public function __construct($dc, $partnerId, $jobType, $jobSubType)
+	{
+		$this->setPartnerId($partnerId);
+		$this->setJobType($jobType);
+		$this->setJobSubType($jobSubType);
+		$this->setDc($dc);
+	} 
 
 } // PartnerLoad

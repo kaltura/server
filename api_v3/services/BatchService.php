@@ -305,6 +305,16 @@ class BatchService extends KalturaBaseService
 	}
 	
 	/**
+	 * batch suspendJobs action suspends jobs from running.
+	 * 
+	 * @action suspendJobs
+	 */
+	function suspendJobsAction() {
+		KalturaResponseCacher::disableCache();
+		kJobsSuspender::balanceJobsload();
+	}
+	
+	/**
 	 * batch resetJobExecutionAttempts action resets the execution attempts of the job 
 	 * 
 	 * @action resetJobExecutionAttempts

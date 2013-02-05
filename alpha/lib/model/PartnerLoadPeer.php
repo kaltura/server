@@ -123,11 +123,7 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 			$priorityFactor = PartnerPeer::getPartnerPriorityFactor($partnerId);
 			$key = $partnerId . "#" . $jobType . "#" . $jobSubType;
 	
-			$partnerLoad = new PartnerLoad();
-			$partnerLoad->setPartnerId($partnerId);
-			$partnerLoad->setJobType($jobType);
-			$partnerLoad->setJobSubType($jobSubType);
-			$partnerLoad->setDc($dcId);
+			$partnerLoad = new PartnerLoad($dcId, $partnerId, $jobType, $jobSubType);
 				
 			$partnerLoad->setPartnerLoad($jobCount);
 			$partnerLoad->setWeightedPartnerLoad($jobCount * $priorityFactor);
