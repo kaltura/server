@@ -1505,11 +1505,6 @@ class KalturaMixEntryFilter extends KalturaPlayableEntryFilter
 
 }
 
-class KalturaNotificationFilter extends KalturaBaseJobFilter
-{
-
-}
-
 class KalturaPartnerFilter extends KalturaFilter
 {
 	/**

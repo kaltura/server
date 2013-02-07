@@ -208,9 +208,9 @@ class CategoryService extends KalturaBaseService
 			//and since we added a pager – and remove the limit for partners categories, 
 			//for backward compatibility this will be the page size. 
 			$pager->pageIndex = 1;
-			$pager->pageSize = partner::MAX_NUMBER_OF_CATEGORIES;
-			KalturaCriteria::setMaxRecords(partner::MAX_NUMBER_OF_CATEGORIES);
-			baseObjectFilter::setMaxInValues(partner::MAX_NUMBER_OF_CATEGORIES);
+			$pager->pageSize = Partner::MAX_NUMBER_OF_CATEGORIES;
+			KalturaCriteria::setMaxRecords(Partner::MAX_NUMBER_OF_CATEGORIES);
+			baseObjectFilter::setMaxInValues(Partner::MAX_NUMBER_OF_CATEGORIES);
 		}
 
 		if ($filter->orderBy === null)

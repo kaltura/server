@@ -24,13 +24,13 @@ class fixUiConfFileSyncAction extends kalturaSystemAction
 		
 		$uiConf = uiConfPeer::retrieveByPK($uiConfId);
 		
-		$subTypes = array (uiconf::FILE_SYNC_UICONF_SUB_TYPE_DATA, uiconf::FILE_SYNC_UICONF_SUB_TYPE_FEATURES);
+		$subTypes = array (uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA, uiConf::FILE_SYNC_UICONF_SUB_TYPE_FEATURES);
 		
 		foreach($subTypes as $subType)
 		{
-			if ($subType == uiconf::FILE_SYNC_UICONF_SUB_TYPE_DATA)
+			if ($subType == uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA)
 				echo ("Data:".PHP_EOL);
-			else if ($subType == uiconf::FILE_SYNC_UICONF_SUB_TYPE_FEATURES)
+			else if ($subType == uiConf::FILE_SYNC_UICONF_SUB_TYPE_FEATURES)
 				echo ("Features:".PHP_EOL);
 				
 			$syncKey = $uiConf->getSyncKey($subType);

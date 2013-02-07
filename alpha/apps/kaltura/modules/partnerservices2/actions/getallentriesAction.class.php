@@ -179,7 +179,7 @@ $this->benchmarkStart( "list_type_kuser" );
 				$strEntries = "";
 				if($puser_kuser)
 				{	
-					$kuser = KuserPeer::retrieveByPk($puser_kuser->getKuserId());
+					$kuser = kuserPeer::retrieveByPk($puser_kuser->getKuserId());
 					if ($kuser)
 					{
 						$strEntriesTemp = @unserialize($kuser->getPartnerData());

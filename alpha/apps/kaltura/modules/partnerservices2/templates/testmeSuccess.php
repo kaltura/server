@@ -451,12 +451,6 @@ $limited = getLimited();
 		<option value="handlemoderation">handle moderation</option>
 	</optgroup>
 
-	<optgroup label="notification">
-		<option value="updatenotification">update notification</option>
-		<option value="listnotifications">list notifications</option>
-		<option value="checknotifications">check notifications</option>
-	</optgroup>
-
 	<optgroup label="widget">
 		<option value="viewwidget">view widget</option>
 		<option value="addwidget">add widget</option>
@@ -1148,22 +1142,6 @@ require_once ( "testme_dataentries.php" );
 
 		),
 
-		"listnotifications|2" => array (
-//			array ( "detailed" , "" , "1" ), // no detailed for notification
-			array ( "page" , "" , "2" , "1"),
-			array ( "page_size" , "" , "2" , "10" ),
-			array ( "filter__eq_id", null , "6" , null , null , "Match this id exactly"),
-			array ( "filter__gte_id", null , "6" , null , null , "Start from this id"),
-			array ( "filter__eq_status", "select" , "2" , "1" , "notification_status" ) ,
-			array ( "filter__eq_type", "select" , "2" , " " , "notification_type" ) ,
-		) ,
-
-		"checknotifications|1" => array (
-			array ( "notification_ids" ),
-			array ( "detailed" , "" , "1" ),
-			array ( "seaparator" , "" , "," ),
-		),
-		
 		"addwidget|1" => array (
 			array ( "widget_sourceWidgetId" ),
 			array ( "widget_kshowId" ),

@@ -12,6 +12,8 @@ abstract class KalturaUserRoleBaseFilter extends KalturaFilter
 		"idIn" => "_in_id",
 		"nameEqual" => "_eq_name",
 		"nameIn" => "_in_name",
+		"systemNameEqual" => "_eq_system_name",
+		"systemNameIn" => "_in_system_name",
 		"descriptionLike" => "_like_description",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
@@ -66,6 +68,16 @@ abstract class KalturaUserRoleBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $nameIn;
+
+	/**
+	 * @var string
+	 */
+	public $systemNameEqual;
+
+	/**
+	 * @var string
+	 */
+	public $systemNameIn;
 
 	/**
 	 * @var string

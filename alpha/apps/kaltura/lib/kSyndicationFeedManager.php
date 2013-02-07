@@ -201,7 +201,7 @@ class kSyndicationFeedManager
 			return null;
 		}
 		
-		$xpath = new DOMXpath($xsl);
+		$xpath = new DOMXPath($xsl);
 		$xslStylesheet = $xpath->query("//xsl:stylesheet");		
 		$rss = $xpath->query("//xsl:template[@name='rss']");		
 		$xslStylesheet->item(0)->removeChild($rss->item(0));	
@@ -223,7 +223,7 @@ class kSyndicationFeedManager
 			return null;
 		}
 		
-		$xpath = new DOMXpath($xsl);
+		$xpath = new DOMXPath($xsl);
 		
 		//remove items template
 		$xslStylesheet = $xpath->query("//xsl:stylesheet");
@@ -263,7 +263,7 @@ class kSyndicationFeedManager
 			throw new kCoreException("Invalid XSLT", kCoreException::INVALID_XSLT);
 		}
 		
-		$xpath = new DOMXpath($xsl);
+		$xpath = new DOMXPath($xsl);
 		
 		$xslStylesheet = $xpath->query("//xsl:stylesheet");
 		$rss = $xpath->query("//xsl:template[@name='rss']");

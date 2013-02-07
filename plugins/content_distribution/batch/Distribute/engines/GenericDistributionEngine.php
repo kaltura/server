@@ -131,7 +131,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 				if(!$xml->loadXML($results))
 					return false;
 		
-				$xpath = new DOMXpath($xml);
+				$xpath = new DOMXPath($xml);
 				$elements = $xpath->query($resultParseData);
 				if(is_null($elements))
 					return false;

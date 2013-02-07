@@ -573,7 +573,7 @@ return array($genericWidget, $myspaceWidget);
 			$c->setLimit( 14 ); // we'll need 14 images of contributers
 			$c->addGroupByColumn(entryPeer::KUSER_ID);
 			$c->addDescendingOrderByColumn ( entryPeer::CREATED_AT );
-			$entries = baseentryPeer::doSelectJoinkuser( $c );
+			$entries = BaseentryPeer::doSelectJoinkuser( $c );
 
 			if ( $entries == NULL || count ( $entries ) == 0 )
 			{
@@ -983,58 +983,6 @@ return array($genericWidget, $myspaceWidget);
 		}
 	}
 
-	// TODO -  find a better place to put this method, this is not a good one !
-	public static function sendAlertsForNewRoughcut ( $kshow , $likuser_id , $user_screenname )
-	{
-		$kshow_id = $kshow->getId();
-		// Send an email alert to producer
-			if( $kshow->getProducerId() != $likuser_id ) // don't send producer alerts when the producer is the editor
-				alertPeer::sendEmailIfNeeded(  $kshow->getProducerId(),
-									alert::KALTURAS_PRODUCED_ALERT_TYPE_ROUGHCUT_CREATED,
-									array ( 'screenname' => $user_screenname,
-											'kshow_name' => $kshow->getName(),
-											'kshow_id' => $kshow->getId() ) );
-
-			// TODO:  efficiency: see if there is a wa to search for contributors based on some other method than full entry table scan
-			// Send email alerts to contributors
-			$c = new Criteria();
-			$c->add(entryPeer::KSHOW_ID, $kshow_id);
-			$c->add(entryPeer::KUSER_ID, $likuser_id, Criteria::NOT_EQUAL ); // the current user knows they just edited
-			$c->addAnd(entryPeer::KUSER_ID, $kshow->getProducerId(), Criteria::NOT_EQUAL ); // the producer knows they just edited
-			$c->add(entryPeer::TYPE, entryType::MEDIA_CLIP);
-			$c->addGroupByColumn(entryPeer::KUSER_ID);
-			$entries = entryPeer::doSelect( $c );
-			$already_received_alert_array = array();
-			foreach ( $entries as $entry )
-			{
-				alertPeer::sendEmailIfNeeded(  $entry->getKuserId(),
-									alert::KALTURAS_PARTOF_ALERT_TYPE_ROUGHCUT_CREATED,
-									array ( 'screenname' => $user_screenname,
-											'kshow_name' => $kshow->getName(),
-											'kshow_id' => $kshow->getId() ) );
-				$already_received_alert_array[ $entry->getKuserId() ] = true;
-
-			}
-
-
-			// send email alert to subscribers
-			$c = new Criteria();
-			$c->add(KshowKuserPeer::KSHOW_ID, $kshow_id); //only subsribers of this show
-			$c->add(KshowKuserPeer::KUSER_ID, $likuser_id, Criteria::NOT_EQUAL ); // the current user knows they just edited
-			$c->add(KshowKuserPeer::SUBSCRIPTION_TYPE, KshowKuser::KSHOW_SUBSCRIPTION_NORMAL); // this table stores other relations too
-			$subscriptions = KshowKuserPeer::doSelect( $c );
-			foreach ( $subscriptions as $subscription )
-			{
-					if( !isset($already_received_alert_array[ $subscription->getKuserId() ]) ) // don't send emails to subscribed users who are also contributors
-						alertPeer::sendEmailIfNeeded(  $subscription->getKuserId(),
-									alert::KALTURAS_SUBSCRIBEDTO_ALERT_TYPE_ROUGHCUT_CREATED,
-									array ( 'screenname' => $user_screenname,
-											'kshow_name' => $kshow->getName(),
-											'kshow_id' => $kshow->getId()  ) );
-			}
-
-	}
-	
 	/**
 	 * Will search for a kshow for the specific partner & key.
 	 * The key can be combined from the kuser_id and the group_id

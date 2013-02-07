@@ -396,7 +396,7 @@ class KDLWrap
 		}
 		
 		if($cdlFlavor instanceof SwfFlavorParams || $cdlFlavor instanceof SwfFlavorParamsOutput) {
-			$kdlFlavor->_swf = new KDLSWFData();
+			$kdlFlavor->_swf = new KDLSwfData();
 			$kdlFlavor->_swf->_flashVersion = $cdlFlavor->getFlashVersion();
 			$kdlFlavor->_swf->_zoom         = $cdlFlavor->getZoom();
 			$kdlFlavor->_swf->_zlib         = $cdlFlavor->getZlib();
@@ -409,7 +409,7 @@ class KDLWrap
 		}
 		
 		if($cdlFlavor instanceof PdfFlavorParams || $cdlFlavor instanceof PdfFlavorParamsOutput) {
-			$kdlFlavor->_pdf = new KDLPDFData();
+			$kdlFlavor->_pdf = new KDLPdfData();
 			$kdlFlavor->_pdf->_resolution  = $cdlFlavor->getResolution();
 			$kdlFlavor->_pdf->_paperHeight = $cdlFlavor->getPaperHeight();
 			$kdlFlavor->_pdf->_paperWidth  = $cdlFlavor->getPaperWidth();

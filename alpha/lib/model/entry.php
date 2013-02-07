@@ -2399,11 +2399,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	} 
 	
 // ----------- Extra object connections ----------------	
-	public function getNotifications()
-	{
-		return notificationPeer::retrieveByEntryId( $this->getId() );
-	}
-	
 	public function getBatchJobs()
 	{
 		return BatchJobPeer::retrieveByEntryId( $this->getId() );

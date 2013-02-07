@@ -114,7 +114,7 @@ class kXsd
 	
 	public static function getElementById(DOMDocument $doc, $id)
 	{
-		$xpath = new DOMXpath($doc);
+		$xpath = new DOMXPath($doc);
 
 		$path = "//*[@id='$id']";
 		KalturaLog::debug("Query xpath [$path]");

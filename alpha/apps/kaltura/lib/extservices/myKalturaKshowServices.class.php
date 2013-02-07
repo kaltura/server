@@ -94,7 +94,7 @@ class myKalturaKshowServices extends myBaseMediaSource implements IMediaSource
 		
 		if( $search_mechanism == self::KALTURA_SERVICE_CRITERIA_FROM_KSHOW )
 		{
-			$kshow_crit->add ( kshowPeer::ENTRIES , 1 , criteria::GREATER_EQUAL ) ;
+			$kshow_crit->add ( kshowPeer::ENTRIES , 1 , Criteria::GREATER_EQUAL ) ;
 		}						
 		
 		$rs = kshowPeer::doSelectStmt( $kshow_crit );

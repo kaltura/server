@@ -188,7 +188,7 @@ class kshowPeer extends BasekshowPeer
 		$c->addJoin(self::PRODUCER_ID, kuserPeer::ID, Criteria::INNER_JOIN);
 		$c->add(self::PRODUCER_ID, $kuserId);
 		if ($currentKshowId)
-			$c->add(self::ID, $currentKshowId, criteria::NOT_EQUAL);
+			$c->add(self::ID, $currentKshowId, Criteria::NOT_EQUAL);
 
 		self::setOrder($c, $order);
 

@@ -263,7 +263,7 @@ $debug .= "property: $not_property = [$value]\n";
 		if ( $retrun_notification )
 		{
 			// return the notification id, notification object , url & the serialized data
-			$partner = partnerPeer::retrieveByPK ( $partner_id );
+			$partner = PartnerPeer::retrieveByPK ( $partner_id );
 			list ( $url , $signature_key ) = self::getPartnerNotificationInfo ($partner );
 			list ( $params , $raw_signature ) = self::prepareNotificationData ( $url , $signature_key , $job , $prefix);	
 			$serialized_params = http_build_query( $params , "" , "&" );

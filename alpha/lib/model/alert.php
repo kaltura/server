@@ -48,8 +48,8 @@ class alert extends Basealert
 				$this->kuser->getPartnerId(), 
 				$this->getAlertType(), 
 				kMailJobData::MAIL_PRIORITY_NORMAL, 
-				kconf::get ( "batch_notification_sender_email" ), 
-				kconf::get ( "batch_notification_sender_name" ), 
+				kConf::get ( "batch_notification_sender_email" ), 
+				kConf::get ( "batch_notification_sender_name" ), 
 				$this->kuser->getEmail(), 
 				$this->getBodyParamsArray(), 
 				$this->getSubjectParamsArray());

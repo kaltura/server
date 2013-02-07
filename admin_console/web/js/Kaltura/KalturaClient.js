@@ -4558,12 +4558,6 @@ KalturaNotification.prototype.notificationResult = null;
  */
 KalturaNotification.prototype.objType = null;
 
-
-function KalturaNotificationFilter()
-{
-}
-KalturaNotificationFilter.prototype = new KalturaBaseJobFilter();
-
 function KalturaNotificationJobData()
 {
 }

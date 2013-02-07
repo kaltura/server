@@ -319,7 +319,7 @@ class myFlvHandler
 		if ($res == null)
 			return -1;
 		else
-			return $res[FLVInfoVideo::VTAG_FIELD_TIMESTAMP];
+			return $res[FlvInfoVideo::VTAG_FIELD_TIMESTAMP];
 	}
 	
 	// DONT OPTIMIZED - get last timestamp by reading backwards from the end of the file
@@ -460,7 +460,7 @@ class myFlvHandler
 		
 		$from_tag = $info->findTag($from_msecs);
 		
-		$timestamp = $from_tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP];
+		$timestamp = $from_tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP];
 		
 		if ($only_audio)
 		{
@@ -469,7 +469,7 @@ class myFlvHandler
 			// requires us to go back to the previous tag;
 			if ($timestamp > $from_msecs)
 			{
-				$from_tag = $info->readTag($from_tag[FLVInfoVideo::VTAG_FIELD_INDEX] - 1);
+				$from_tag = $info->readTag($from_tag[FlvInfoVideo::VTAG_FIELD_INDEX] - 1);
 			}
 		}
 		else // for video we must start from a keyframe
@@ -477,43 +477,43 @@ class myFlvHandler
 			// our findTag returns a tag which is GREATER or EQUAL (timestamp wise),
 			// finding a tag which is not a keyframe exactly on the requested clip_from time
 			// requires us to go back to the previous keyframe;
-			if ($timestamp > $from_msecs || !$from_tag[FLVInfoVideo::VTAG_FIELD_KEYFRAME])
+			if ($timestamp > $from_msecs || !$from_tag[FlvInfoVideo::VTAG_FIELD_KEYFRAME])
 			{
-				$from_tag = $info->readTag($from_tag[FLVInfoVideo::VTAG_FIELD_PREV_KF]);
+				$from_tag = $info->readTag($from_tag[FlvInfoVideo::VTAG_FIELD_PREV_KF]);
 			}
 		}
 		
 		$to_tag = $info->findTag($to_msecs);
-		if (!$only_audio && $to_tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP] < $to_msecs) // maybe we have better audio tag
+		if (!$only_audio && $to_tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP] < $to_msecs) // maybe we have better audio tag
 		{
 			$to_audio_tag = $ainfo->findTag($to_msecs);
 			if ($to_audio_tag)
 			{
 				// we found an audio tag greater or equal than to_msecs. we need to read the previous one
 				// and make sure it comes after the video tag (we want to get closer to to_msecs)
-				if ($to_audio_tag[FLVInfoVideo::VTAG_FIELD_POS] > $to_tag[FLVInfoVideo::VTAG_FIELD_POS])
+				if ($to_audio_tag[FlvInfoVideo::VTAG_FIELD_POS] > $to_tag[FlvInfoVideo::VTAG_FIELD_POS])
 				{
 					$to_tag = $to_audio_tag;
 				}
 			}
 		}
 		
-		$duration = $to_tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP] - $from_tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP];
+		$duration = $to_tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP] - $from_tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP];
 		
 		if ($only_audio) // for audio use the helper's total size field to pick up only audio tags
 		{
-			$total_bytes = $to_tag[FlvInfoAudio::ATAG_FIELD_TOT_SIZE] - $from_tag[FlvInfoAudio::ATAG_FIELD_TOT_SIZE] + $to_tag[FLVInfoVideo::VTAG_FIELD_SIZE];
+			$total_bytes = $to_tag[FlvInfoAudio::ATAG_FIELD_TOT_SIZE] - $from_tag[FlvInfoAudio::ATAG_FIELD_TOT_SIZE] + $to_tag[FlvInfoVideo::VTAG_FIELD_SIZE];
 		}
 		else // for video just substract offset
 		{
-			$total_bytes = $to_tag[FLVInfoVideo::VTAG_FIELD_POS] - $from_tag[FLVInfoVideo::VTAG_FIELD_POS] + $to_tag[FLVInfoVideo::VTAG_FIELD_SIZE];
+			$total_bytes = $to_tag[FlvInfoVideo::VTAG_FIELD_POS] - $from_tag[FlvInfoVideo::VTAG_FIELD_POS] + $to_tag[FlvInfoVideo::VTAG_FIELD_SIZE];
 		}
 		
 		//$et1 = microtime(true);
 		//echo "time: ".($et1 - $st1)."\n";
 		
-		return array($total_bytes, $duration, $from_tag[FLVInfoVideo::VTAG_FIELD_POS], $to_tag[FLVInfoVideo::VTAG_FIELD_POS] + $to_tag[FLVInfoVideo::VTAG_FIELD_SIZE],
-			$from_tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP], $to_tag[FLVInfoVideo::VTAG_FIELD_POS]);
+		return array($total_bytes, $duration, $from_tag[FlvInfoVideo::VTAG_FIELD_POS], $to_tag[FlvInfoVideo::VTAG_FIELD_POS] + $to_tag[FlvInfoVideo::VTAG_FIELD_SIZE],
+			$from_tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP], $to_tag[FlvInfoVideo::VTAG_FIELD_POS]);
 	}
 
 	//
@@ -559,10 +559,10 @@ class myFlvHandler
 		{
 			if ($using_flavors == 1) // we're looking at the play flavor and searching for a starting keyframe
 			{
-				if (!$from_tag[FLVInfoVideo::VTAG_FIELD_KEYFRAME]) // we didnt land on a keyframe, grab the next one
+				if (!$from_tag[FlvInfoVideo::VTAG_FIELD_KEYFRAME]) // we didnt land on a keyframe, grab the next one
 				{
-					$next_kf = $from_tag[FLVInfoVideo::VTAG_FIELD_NEXT_KF];
-					if ($next_kf != $from_tag[FLVInfoVideo::VTAG_FIELD_INDEX]) // do we have anymore keyframes?
+					$next_kf = $from_tag[FlvInfoVideo::VTAG_FIELD_NEXT_KF];
+					if ($next_kf != $from_tag[FlvInfoVideo::VTAG_FIELD_INDEX]) // do we have anymore keyframes?
 					{
 						$from_tag = $info->readTag($next_kf);
 					}
@@ -573,27 +573,27 @@ class myFlvHandler
 				}
 				
 				if ($from_tag)
-					$from_msecs = $from_tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP];
+					$from_msecs = $from_tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP];
 			}
 			else if (!$only_audio) // we're looking at the edit flavor or at a play without edit
 			{
 				// if we didnt land on a keyframe or this isn't exactly the from_msecs time find the previous keyframe
-				if (!$from_tag[FLVInfoVideo::VTAG_FIELD_KEYFRAME] || $from_tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP] != $from_msecs)
+				if (!$from_tag[FlvInfoVideo::VTAG_FIELD_KEYFRAME] || $from_tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP] != $from_msecs)
 				{
-					$from_tag = $info->readTag($from_tag[FLVInfoVideo::VTAG_FIELD_PREV_KF]);
+					$from_tag = $info->readTag($from_tag[FlvInfoVideo::VTAG_FIELD_PREV_KF]);
 				}
 			}
 			else // we're looking at audio tags
 			{
 				// if this isn't exactly the from_msecs time find the previous tag
-				if ($from_tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP] != $from_msecs)
+				if ($from_tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP] != $from_msecs)
 				{
-					$from_tag = $info->readTag($from_tag[FLVInfoVideo::VTAG_FIELD_INDEX] - 1);
+					$from_tag = $info->readTag($from_tag[FlvInfoVideo::VTAG_FIELD_INDEX] - 1);
 				}
 			}
 		}
 		
-		if (!$from_tag || $from_tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP] > $to_msecs) // if from is invalid or from > to abort
+		if (!$from_tag || $from_tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP] > $to_msecs) // if from is invalid or from > to abort
 		{
 			$from_msecs = $to_msecs;
 			$from_byte = $to_byte = 0;
@@ -602,7 +602,7 @@ class myFlvHandler
 		}
 		
 		$to_tag = $info->findTag($to_msecs);
-		$to_tag_ts = $to_tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP];
+		$to_tag_ts = $to_tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP];
 
 		if ($using_flavors == 2) // play+edit flavors exist and we're working on the edit flavor 
 		{
@@ -610,7 +610,7 @@ class myFlvHandler
 			// if we found a frame greater then play flavor start frame go one frame back
 			if ($to_tag_ts > $to_msecs)
 			{
-				$to_tag = $info->readTag($to_tag[FLVInfoVideo::VTAG_FIELD_INDEX] - 1);
+				$to_tag = $info->readTag($to_tag[FlvInfoVideo::VTAG_FIELD_INDEX] - 1);
 				
 				// maybe there is an audio frame closer to the to_msecs
 				$to_audio_tag = $ainfo->findTag($to_msecs);
@@ -618,8 +618,8 @@ class myFlvHandler
 				{
 					// we found an audio tag greater or equal than to_msecs. we need to read the previous one
 					// and make sure it comes after the video tag (we want to get closer to to_msecs)
-					$to_audio_tag = $ainfo->readTag($to_audio_tag[FLVInfoVideo::VTAG_FIELD_INDEX] - 1);
-					if ($to_audio_tag[FLVInfoVideo::VTAG_FIELD_POS] > $to_tag[FLVInfoVideo::VTAG_FIELD_POS])
+					$to_audio_tag = $ainfo->readTag($to_audio_tag[FlvInfoVideo::VTAG_FIELD_INDEX] - 1);
+					if ($to_audio_tag[FlvInfoVideo::VTAG_FIELD_POS] > $to_tag[FlvInfoVideo::VTAG_FIELD_POS])
 					{
 						$to_tag = $to_audio_tag;
 					}
@@ -632,15 +632,15 @@ class myFlvHandler
 			// which defines the length of the last tag we got
 
 			if ($to_tag_ts == $to_msecs)
-				$to_tag = $info->readTag($to_tag[FLVInfoVideo::VTAG_FIELD_INDEX] + 1);
+				$to_tag = $info->readTag($to_tag[FlvInfoVideo::VTAG_FIELD_INDEX] + 1);
 				
 			if (!$only_audio) // maybe there is a closer audio frame 
 			{
 				$to_audio_tag = $ainfo->findTag($to_tag_ts);
 				// we want to use the tag which follows to_msecs, but only if it doenst preceeds our found video tag
 				// (e.g. the video ends with multiple video tags without audio tags in between)
-				if ($to_audio_tag[FLVInfoVideo::VTAG_FIELD_POS] < $to_tag[FLVInfoVideo::VTAG_FIELD_POS] &&
-					$to_audio_tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP] > $to_tag_ts)
+				if ($to_audio_tag[FlvInfoVideo::VTAG_FIELD_POS] < $to_tag[FlvInfoVideo::VTAG_FIELD_POS] &&
+					$to_audio_tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP] > $to_tag_ts)
 				{
 					$to_tag = $to_audio_tag;
 				}
@@ -650,14 +650,14 @@ class myFlvHandler
 		{
 			// we are at the last video tag but there may be a further (and better) audio tag
 			$to_audio_tag = $ainfo->findTag($to_msecs);
-			if ($to_audio_tag[FLVInfoVideo::VTAG_FIELD_POS] > $to_tag[FLVInfoVideo::VTAG_FIELD_POS])
+			if ($to_audio_tag[FlvInfoVideo::VTAG_FIELD_POS] > $to_tag[FlvInfoVideo::VTAG_FIELD_POS])
 			{
 				$to_tag = $to_audio_tag;
 			}
 		}
 
-		$from_byte = $from_tag[FLVInfoVideo::VTAG_FIELD_POS];
-		$to_byte = $to_tag[FLVInfoVideo::VTAG_FIELD_POS] - 1;
+		$from_byte = $from_tag[FlvInfoVideo::VTAG_FIELD_POS];
+		$to_byte = $to_tag[FlvInfoVideo::VTAG_FIELD_POS] - 1;
 		
 		if ($only_audio) // for audio use the helper's total size field to pick up only audio tags
 		{
@@ -665,10 +665,10 @@ class myFlvHandler
 		}
 		else // for video just substract offsets
 		{
-			$total_bytes = $to_tag[FLVInfoVideo::VTAG_FIELD_POS] - $from_tag[FLVInfoVideo::VTAG_FIELD_POS];
+			$total_bytes = $to_tag[FlvInfoVideo::VTAG_FIELD_POS] - $from_tag[FlvInfoVideo::VTAG_FIELD_POS];
 		}
 		
-		$last_timestamp += $to_tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP] - $from_tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP];
+		$last_timestamp += $to_tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP] - $from_tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP];
 		
 		return true;
 	}
@@ -1153,7 +1153,7 @@ class FlvInfoVideo extends FlvInfo
 	    while (($first <= $last))
 	    {
 			$tag = $this->readTag($mid);
-			$mid_timestamp = $tag[FLVInfoVideo::VTAG_FIELD_TIMESTAMP];
+			$mid_timestamp = $tag[FlvInfoVideo::VTAG_FIELD_TIMESTAMP];
 			
 			if ($mid_timestamp == $timestamp)
 				break;
@@ -1171,7 +1171,7 @@ class FlvInfoVideo extends FlvInfo
 	    
 		$res = $this->readTag($mid);
 		
-		if ($res[FLVInfoVideo::VTAG_FIELD_TIMESTAMP] < $timestamp && $mid < $this->last_index)
+		if ($res[FlvInfoVideo::VTAG_FIELD_TIMESTAMP] < $timestamp && $mid < $this->last_index)
 			$res = $this->readTag($mid + 1);
 
 		//$et1 = microtime(true);

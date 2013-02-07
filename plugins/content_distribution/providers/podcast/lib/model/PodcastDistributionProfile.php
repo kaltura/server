@@ -131,7 +131,7 @@ class PodcastDistributionProfile extends DistributionProfile
 		// Creating podcast feed
 		$podcastFeed = new genericSyndicationFeed();
 		$podcastFeed->setPartnerId($this->getPartnerId());
-		$podcastFeed->setStatus(SyndicationFeed::SYNDICATION_ACTIVE);
+		$podcastFeed->setStatus(syndicationFeed::SYNDICATION_ACTIVE);
 		$podcastFeed->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$podcastFeed->setAllowEmbed(false);
 		$podcastFeed->setType(syndicationFeedType::KALTURA);

@@ -292,7 +292,7 @@ class kUploadTokenMgr
 	 */
 	public static function getRemoteHostForUploadToken($uploadTokenId, $localDcId = null)
 	{
-		$uploadToken = uploadTokenPeer::retrieveByPK($uploadTokenId);
+		$uploadToken = UploadTokenPeer::retrieveByPK($uploadTokenId);
 		if(!$uploadToken)
 		{
 			return FALSE;

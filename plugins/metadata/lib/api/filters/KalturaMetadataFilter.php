@@ -33,7 +33,7 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 	public function toObject($object_to_fill = null, $props_to_skip = array()) 
 	{
 		if(is_null($object_to_fill))
-			$object_to_fill = new metadataFilter();
+			$object_to_fill = new MetadataFilter();
 
 		if($this->metadataObjectTypeEqual == KalturaMetadataObjectType::USER)
 		{

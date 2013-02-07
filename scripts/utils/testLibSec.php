@@ -489,7 +489,7 @@ $batchJobCriteria->add(BatchJobPeer::JOB_TYPE, BatchJobType::IMPORT);
 $batchJobCriteria->add(BatchJobPeer::DATA, '%sftp%', Criteria::LIKE);
 $batchJobCriteria->addDescendingOrderByColumn(BatchJobPeer::ID);
 $batchJobCriteria->setLimit(20);
-$batchJobs = batchJobPeer::doSelect($batchJobCriteria);
+$batchJobs = BatchJobPeer::doSelect($batchJobCriteria);
 
 while(count($batchJobs))
 {

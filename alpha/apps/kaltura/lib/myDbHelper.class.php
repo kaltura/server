@@ -44,7 +44,7 @@ class myDbHelper
 	{
 		$databaseManager = new sfDatabaseManager();
 		$databaseManager->shutdown();
-		propel::close();
+		Propel::close();
 	}
 }
 ?>

@@ -110,7 +110,7 @@ class kFlowHelper
 			return $dbBatchJob;
 			
 		if(!file_exists($data->getDestFileLocalPath()))
-			throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFileLocalPath());
+			throw new ApiException(APIErrors::INVALID_FILE_NAME, $data->getDestFileLocalPath());
 
 		// get entry
 		$entryId = $dbBatchJob->getEntryId();
@@ -270,7 +270,7 @@ class kFlowHelper
 		if(!$flavorAsset)
 		{
 			KalturaLog::err("Error: Flavor asset not found [" . $data->getFlavorAssetId() . "]");
-			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			throw new ApiException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 		}
 
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
@@ -296,7 +296,7 @@ class kFlowHelper
 			if(!$flavorAsset)
 			{
 				KalturaLog::err("Error: Flavor asset not found [" . $flavor->getFlavorAssetId() . "]");
-				throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $flavor->getFlavorAssetId());
+				throw new ApiException(APIErrors::INVALID_FLAVOR_ASSET_ID, $flavor->getFlavorAssetId());
 			}
 
 			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
@@ -320,12 +320,12 @@ class kFlowHelper
 
 		// verifies that flavor asset created
 		if(!$data->getFlavorAssetId())
-			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			throw new ApiException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 
 		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
-			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			throw new ApiException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 
 		$flavorAsset->incrementVersion();
 		$flavorAsset->save();
@@ -376,7 +376,7 @@ class kFlowHelper
 
 		$entry = $dbBatchJob->getEntry();
 		if(!$entry)
-			throw new APIException(APIErrors::INVALID_ENTRY, $dbBatchJob, $dbBatchJob->getEntryId());
+			throw new ApiException(APIErrors::INVALID_ENTRY, $dbBatchJob, $dbBatchJob->getEntryId());
 			
 
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
@@ -520,12 +520,12 @@ class kFlowHelper
 
 		// verifies that thumb asset created
 		if(!$data->getThumbAssetId())
-			throw new APIException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
+			throw new ApiException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
 
 		$thumbAsset = assetPeer::retrieveById($data->getThumbAssetId());
 		// verifies that thumb asset exists
 		if(!$thumbAsset)
-			throw new APIException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
+			throw new ApiException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
 
 		$thumbAsset->incrementVersion();
 		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
@@ -578,7 +578,7 @@ class kFlowHelper
 		{
 			$entry = $dbBatchJob->getEntry(false, false);
 			if(!$entry)
-				throw new APIException(APIErrors::INVALID_ENTRY, $dbBatchJob, $dbBatchJob->getEntryId());
+				throw new ApiException(APIErrors::INVALID_ENTRY, $dbBatchJob, $dbBatchJob->getEntryId());
 
 			// increment thumbnail version
 			$entry->setThumbnail(".jpg");
@@ -673,12 +673,12 @@ class kFlowHelper
 
 		// verifies that flavor asset created
 		if(!$data->getFlavorAssetId())
-			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			throw new ApiException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 
 		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
-			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			throw new ApiException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 
 		// creats the file sync
 		if(file_exists($data->getLogFileSyncLocalPath()))
@@ -766,12 +766,12 @@ class kFlowHelper
 
 		// verifies that thumb asset created
 		if(!$data->getThumbAssetId())
-			throw new APIException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
+			throw new ApiException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
 
 		$thumbAsset = assetPeer::retrieveById($data->getThumbAssetId());
 		// verifies that thumb asset exists
 		if(!$thumbAsset)
-			throw new APIException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
+			throw new ApiException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
 
 		$thumbAsset->incrementVersion();
 		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
@@ -846,7 +846,7 @@ class kFlowHelper
 
 		$entry = $dbBatchJob->getEntry();
 		if(!$entry)
-			throw new APIException(APIErrors::INVALID_ENTRY, $dbBatchJob, $dbBatchJob->getEntryId());
+			throw new ApiException(APIErrors::INVALID_ENTRY, $dbBatchJob, $dbBatchJob->getEntryId());
 
 		$ismPath = $data->getDestDirLocalPath() . DIRECTORY_SEPARATOR . $data->getDestFileName() . '.ism';
 		$ismcPath = $data->getDestDirLocalPath() . DIRECTORY_SEPARATOR . $data->getDestFileName() . '.ismc';
@@ -862,12 +862,12 @@ class kFlowHelper
 		{
 			// verifies that flavor asset created
 			if(!$flavor->getFlavorAssetId())
-				throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+				throw new ApiException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 
 			$flavorAsset = assetPeer::retrieveById($flavor->getFlavorAssetId());
 			// verifies that flavor asset exists
 			if(!$flavorAsset)
-				throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $flavor->getFlavorAssetId());
+				throw new ApiException(APIErrors::INVALID_FLAVOR_ASSET_ID, $flavor->getFlavorAssetId());
 
 			// increment flavor asset version (for file sync)
 			$flavorAsset->incrementVersion();

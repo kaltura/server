@@ -1236,13 +1236,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 				foreach($updateRequiredMetadataXPaths as $updateRequiredMetadataXPath)
 				{
-					$xPath = new DOMXpath($xml);
+					$xPath = new DOMXPath($xml);
 					$newElements = $xPath->query($updateRequiredMetadataXPath);
 					
 					$oldElements = null;
 					if($previousXml)
 					{
-						$xPath = new DOMXpath($previousXml);
+						$xPath = new DOMXPath($previousXml);
 						$oldElements = $xPath->query($updateRequiredMetadataXPath);
 					}
 					
@@ -1410,7 +1410,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				continue;
 			}
 			
-			if (in_array(entrypeer::START_DATE, $modifiedColumns) || in_array(entrypeer::END_DATE, $modifiedColumns))
+			if (in_array(entryPeer::START_DATE, $modifiedColumns) || in_array(entryPeer::END_DATE, $modifiedColumns))
 			{
 				$entryDistribution->setUpdatedAt(time());
 				$entryDistribution->save();

@@ -41,12 +41,6 @@ function reconvert ( url )
 		document.location = url;
 }
 
-function resendNotification(url)
-{
-	if (confirm("Resend Notification?"))
-		document.location = url;
-}
-
 function update ( val , id , property_name )
 {
 //	val = elem.innerHTML; 

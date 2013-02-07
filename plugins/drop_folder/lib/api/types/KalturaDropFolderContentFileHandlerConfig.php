@@ -59,7 +59,7 @@ class KalturaDropFolderContentFileHandlerConfig extends KalturaDropFolderFileHan
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		if (is_null($this->slugRegex)) {
-			$this->slugRegex = DropFolderContentFileHandler::DEFAULT_SLUG_REGEX;
+			$this->slugRegex = kDropFolderEventsConsumer::DEFAULT_SLUG_REGEX;
 		}
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);

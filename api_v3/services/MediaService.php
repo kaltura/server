@@ -692,7 +692,7 @@ class MediaService extends KalturaEntryService
 			$dcIndex = kDataCenterMgr::getDCByObjectId($entryId, true);
 			if ($dcIndex != kDataCenterMgr::getCurrentDcId())
 			{
-				kalturaLog::debug("EntryID [$entryId] wasn't found on current DC. dumping the request to DC id [$dcIndex]");
+				KalturaLog::debug("EntryID [$entryId] wasn't found on current DC. dumping the request to DC id [$dcIndex]");
 				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ($dcIndex ) );
 			}
 		}

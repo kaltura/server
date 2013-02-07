@@ -64,7 +64,7 @@ class createWidgetsAction extends kalturaSystemAction
 			$c->addAscendingOrderByColumn( kshowPeer::CREATED_AT );
 			// start at a specific int_id
 			// TODO
-			$kshows = KshowPeer::doSelect( $c );
+			$kshows = kshowPeer::doSelect( $c );
 			$kshow_id_list = $this->getIdList ( $kshows , $partner_id , $errors );
 			
 			$fixed_kshows = array();

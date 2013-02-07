@@ -36,7 +36,7 @@ class SyndicationDistributionProfile extends DistributionProfile
 		// Creating syndication feed
 		$syndicationFeed = new genericSyndicationFeed();
 		$syndicationFeed->setPartnerId($this->getPartnerId());
-		$syndicationFeed->setStatus(SyndicationFeed::SYNDICATION_ACTIVE);
+		$syndicationFeed->setStatus(syndicationFeed::SYNDICATION_ACTIVE);
 		$syndicationFeed->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$syndicationFeed->setAllowEmbed(false);
 		$syndicationFeed->setType(syndicationFeedType::KALTURA);

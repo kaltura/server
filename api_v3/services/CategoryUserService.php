@@ -272,7 +272,7 @@ class CategoryUserService extends KalturaBaseService
 			$filter = new KalturaCategoryUserFilter();
 
 		if (!$pager)
-			$pager = new kalturaFilterPager();
+			$pager = new KalturaFilterPager();
 
 		if($filter->userIdIn)
 		{

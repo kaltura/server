@@ -75,26 +75,6 @@ class serviceDescriber
 			"errors" => array()
 		),
 		
-		"listnotifications" => array(
-			"desc" => "blablabla",
-			"in"   => array(
-				"madatory" => array(
-					
-				),
-				"optional" => array(
-					"page_size" => array("type" => "integer", "default" => 10),
-					"page" => array("type" => "integer", "default" => 1),
-					"filter" => array("type" => "notificationFilter")
-				)
-			),
-			"out" => array(
-				"count" => array("type" => "integer"),
-				"page_size" => array("type" => "integer"),
-				"page" => array("type" => "integer"),
-				"notifications" => array("type" => "*notification", "detail_level" => objectWrapperBase::DETAIL_LEVEL_REGULAR, "desc" => "balbalba")
-			),
-			"errors" => array()
-		),
 	);
 }
 ?>

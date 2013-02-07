@@ -134,7 +134,7 @@ class AuditTrail extends BaseAuditTrail
 	{
 		if(!$this->puserId)
 		{
-			$kuser = KuserPeer::retrieveByPK($this->getKuserId());
+			$kuser = kuserPeer::retrieveByPK($this->getKuserId());
 			if($kuser)
 				$this->puserId = $kuser->getPuserId(); 
 		}
@@ -145,9 +145,9 @@ class AuditTrail extends BaseAuditTrail
 	public function setPuserId($v)
 	{
 		$this->puserId = $v;
-		KuserPeer::setUseCriteriaFilter(false);
-		$kuser = KuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $this->puserId, true);
-		KuserPeer::setUseCriteriaFilter(true);
+		kuserPeer::setUseCriteriaFilter(false);
+		$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $this->puserId, true);
+		kuserPeer::setUseCriteriaFilter(true);
 		if($kuser)
 			return $this->setKuserId($kuser->getId());
 	}

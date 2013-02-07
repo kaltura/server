@@ -1156,7 +1156,7 @@ final class S3Request {
 		}
 		$this->headers['Date'] = gmdate('D, d M Y H:i:s T');
 
-		$this->response = new STDClass;
+		$this->response = new stdClass;
 		$this->response->error = false;
 	}
 

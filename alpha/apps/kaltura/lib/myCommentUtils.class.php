@@ -25,7 +25,7 @@ class myCommentUtils
 	{
 		$commentsData = array(); // this array will hold the comments data
 		$subjectid =  $kshowId > 0 ? $kshowId : $kuserId;
-		$subjecttype = $kshowId > 0 ? comment::COMMENT_TYPE_KSHOW : comment::COMMENT_TYPE_USER;
+		$subjecttype = $kshowId > 0 ? Comment::COMMENT_TYPE_KSHOW : Comment::COMMENT_TYPE_USER;
 	    
 		$pager = commentPeer::getOrderedPager( $subjecttype , $subjectid, $pageSize, $page);
 	    

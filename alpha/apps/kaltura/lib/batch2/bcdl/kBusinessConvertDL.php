@@ -136,11 +136,11 @@ class kBusinessConvertDL
 		if ($defaultThumbAssetNew)
 		{
 			kBusinessConvertDL::setAsDefaultThumbAsset($defaultThumbAssetNew);
-			kalturalog::debug("Setting ThumbAsset [". $defaultThumbAssetNew->getId() ."] as the default ThumbAsset");
+			KalturaLog::debug("Setting ThumbAsset [". $defaultThumbAssetNew->getId() ."] as the default ThumbAsset");
 		}
 		else 
 		{		
-			kalturalog::debug("No default ThumbAsset found for replacing entry [". $tempEntry->getId() ."]");
+			KalturaLog::debug("No default ThumbAsset found for replacing entry [". $tempEntry->getId() ."]");
 			$entry->setThumbnail(".jpg"); // thumbnailversion++
 			$entry->save();
 			$tempEntrySyncKey = $tempEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);

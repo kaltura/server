@@ -927,7 +927,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if($mediaInfoId)
 			$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
 		
-		if($profile->getCreationMode() == ConversionProfile2::CONVERSION_PROFILE_2_CREATION_MODE_AUTOMATIC_BYPASS_FLV)
+		if($profile->getCreationMode() == conversionProfile2::CONVERSION_PROFILE_2_CREATION_MODE_AUTOMATIC_BYPASS_FLV)
 		{
 			KalturaLog::log("The profile created from old conversion profile with bypass flv");
 			$isFlv = false;

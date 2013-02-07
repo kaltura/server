@@ -28,7 +28,7 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 		if($categoriesTocategoryEntryStatus == '')
 			$categoriesTocategoryEntryStatus = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
 		
-		$query->addColumnWhere(entryPeer::CATEGORIES_IDS, explode(',', $categoriesTocategoryEntryStatus), kalturaCriteria::IN_LIKE);
+		$query->addColumnWhere(entryPeer::CATEGORIES_IDS, explode(',', $categoriesTocategoryEntryStatus), KalturaCriteria::IN_LIKE);
 	}
 	
 	/**

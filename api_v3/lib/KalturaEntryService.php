@@ -142,7 +142,7 @@ class KalturaEntryService extends KalturaBaseService
 				$newMediaInfo->save();
 			}
 			
-			if ($dbAsset->getStatus() == Asset::ASSET_STATUS_READY)
+			if ($dbAsset->getStatus() == asset::ASSET_STATUS_READY)
 			{
 				$dbEntry->syncFlavorParamsIds();
 				$dbEntry->save();

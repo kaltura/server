@@ -19,12 +19,12 @@ class myModerationMgr
 		}
 		elseif ( $object instanceof kshow)
 		{
-			throw new exception ( "TO BE IMPLEMENTED addToModerationList - for type kshow");
+			throw new Exception ( "TO BE IMPLEMENTED addToModerationList - for type kshow");
 		}
 		else
 		{
 			// ERROR !
-			throw new exception ( "TO BE IMPLEMENTED addToModerationList - for type unknown type");
+			throw new Exception ( "TO BE IMPLEMENTED addToModerationList - for type unknown type");
 		}
 	}
 	
@@ -59,12 +59,12 @@ class myModerationMgr
 		}
 		elseif ( $object instanceof kshow)
 		{
-			throw new exception ( "TO BE IMPLEMENTED addToModerationList - for type kshow");
+			throw new Exception ( "TO BE IMPLEMENTED addToModerationList - for type kshow");
 		}
 		else
 		{
 			// ERROR !
-			throw new exception ( "TO BE IMPLEMENTED addToModerationList - for type unknown type");
+			throw new Exception ( "TO BE IMPLEMENTED addToModerationList - for type unknown type");
 		}		 
 	}
 }
