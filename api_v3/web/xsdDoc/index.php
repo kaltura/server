@@ -1,7 +1,7 @@
 <?php 
 require_once("../../bootstrap.php");
 ActKeyUtils::checkCurrent();
-KalturaLog::setContext("TESTME");
+KalturaLog::setContext("XSD-DOC");
 
 // get inputs
 $inputPage = @$_GET["page"];
