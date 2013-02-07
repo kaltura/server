@@ -571,15 +571,9 @@ kmc.preview_embed = {
 		logMsg += 'is_playlist: ' + is_playlist + '\n';
 		logMsg += 'uiconf_id: ' + uiconf_id + '\n';
 		logMsg += 'live_bitrates: ' + live_bitrates + '\n';
-		logMsg += 'entry_flavors: ' + entry_flavors + '\n';
-		logMsg += 'is_video: ' + is_video + '\n';
 		kmc.log( logMsg );
 		
 		description = description || '';
-
-		var has_mobile_flavors = kmc.preview_embed.hasMobileFlavors( entry_flavors );
-		// default value for is_video
-		is_video = (is_video) ? is_video : false;
 
 		if(id != "multitab_playlist") {
 			//name = (name) ? $('<div />').text( name ).html() : '';
@@ -1081,25 +1075,6 @@ kmc.preview_embed = {
 			
 		var html = '<a href="' + url + '" target="_blank">' + url_text + '</a>';
 		$(".preview_url").html(html);
-	},
-	hasMobileFlavors : function( entry_flavors ) {
-		if( !entry_flavors ) {return false;}
-		for(var i=0; i<entry_flavors.length; i++) {
-			var asset = entry_flavors[i];
-			
-			if( asset.tags.indexOf('applembr') != -1 ){
-				return true;
-			}
-
-			if( asset.tags.indexOf('ipad') != -1 ){
-				return true;
-			}
-
-			if( asset.tags.indexOf('iphone') != -1 ){
-				return true;
-			}
-		}
-		return false;
 	}
 };
 
@@ -1433,7 +1408,7 @@ kmc.user = {
 		// setup url
 		var http_protocol = (kmc.vars.kmc_secured || location.protocol == 'https:') ? 'https' : 'http';
 		var from_domain = http_protocol + '://' + window.location.hostname;
-		var url = from_domain + "/secure_form.php?action=" + action;
+		var url = from_domain + kmc.vars.port + "/secure_form.php?action=" + action;
 		// pass in the fields
 		for(var i in fields) {
 			var fld = (fields[i]) ? fields[i] : '';
