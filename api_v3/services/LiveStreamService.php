@@ -182,25 +182,20 @@ class LiveStreamService extends KalturaEntryService
 	
 	private function insertLiveStreamEntry(KalturaLiveStreamAdminEntry $liveStreamEntry)
 	{
-		// first validate the input object
-		$liveStreamEntry->validatePropertyNotNull("mediaType");
-		$liveStreamEntry->validatePropertyNotNull("sourceType");
-		$liveStreamEntry->validatePropertyNotNull("encodingIP1");
-		$liveStreamEntry->validatePropertyNotNull("encodingIP2");
-		$liveStreamEntry->validatePropertyNotNull("streamPassword");
+		
 		
 		// create a default name if none was given
 		if (!$liveStreamEntry->name)
 			$liveStreamEntry->name = $this->getPartnerId().'_'.time();
 		
 		// first copy all the properties to the db entry, then we'll check for security stuff
-		$dbEntry = $liveStreamEntry->toObject(new entry());
+		$dbEntry = $liveStreamEntry->toInsertableObject(new entry());
 
 		$this->checkAndSetValidUserInsert($liveStreamEntry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($liveStreamEntry);
 		$this->validateAccessControlId($liveStreamEntry);
 		$this->validateEntryScheduleDates($liveStreamEntry, $dbEntry);
-		
+		/* @var $dbEntry entry */
 		$dbEntry->setPartnerId($this->getPartnerId());
 		$dbEntry->setSubpId($this->getPartnerId() * 100);
 		$dbEntry->setKuserId($this->getKuser()->getId());

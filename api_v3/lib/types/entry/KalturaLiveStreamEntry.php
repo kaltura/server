@@ -119,11 +119,17 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 		$this->type = KalturaEntryType::LIVE_STREAM;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaMediaEntry::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 
+	/* (non-PHPdoc)
+	 * @see KalturaMediaEntry::fromObject()
+	 */
 	public function fromObject ( $dbObject )
 	{
 		if(!($dbObject instanceof entry))
@@ -136,6 +142,9 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 			$this->bitrates = KalturaLiveStreamBitrateArray::fromLiveStreamBitrateArray($bitrates);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaMediaEntry::toObject()
+	 */
 	public function toObject ( $dbObject = null , $props_to_skip = array() )
 	{
 		parent::toObject($dbObject, $props_to_skip);
@@ -145,5 +154,21 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 				
 		return $dbObject;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseEntry::validateForInsert()
+	 */
+	protected function validateForInsert()
+	{
+		$this->validatePropertyNotNull("mediaType");
+		$this->validatePropertyNotNull("sourceType");
+		$this->validatePropertyNotNull("streamPassword");
+		if ($this->sourceType != KalturaSourceType::MANUAL_LIVE_STREAM)
+		{
+			$this->validatePropertyNotNull("encodingIP1");
+			$this->validatePropertyNotNull("encodingIP2");
+		}
+	}
+	
 }
 ?>
