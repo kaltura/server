@@ -158,7 +158,7 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	/* (non-PHPdoc)
 	 * @see KalturaBaseEntry::validateForInsert()
 	 */
-	protected function validateForInsert()
+	public function validateForInsert()
 	{
 		$this->validatePropertyNotNull("mediaType");
 		$this->validatePropertyNotNull("sourceType");
