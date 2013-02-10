@@ -684,8 +684,7 @@ class playManifestAction extends kalturaAction
 	 */
 	private function getMimeType($flavors)
 	{
-		if ($this->entry->getType() == entryType::MEDIA_CLIP && 
-			$this->entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO &&
+		if ($this->entry->getType() == entryType::MEDIA_CLIP &&
 			count($flavors))
 		{
 			$isMp3 = true;
@@ -1468,6 +1467,9 @@ class playManifestAction extends kalturaAction
 
 		// Output the response
 		KExternalErrors::terminateDispatch();
+		print_r(array('flavorCount'=>(count($renderer->flavors) == 1),'flavorExt'=>(strtolower($renderer->flavors[1]['ext']))));
+		if((count($renderer->flavors) == 1) && (strtolower($renderer->flavors[0]['ext']) == 'mp3'))
+			$renderer->mimeType = 'audio/mpeg';
 		$renderer->output($deliveryCode, $playbackContext);
 	}
 }
