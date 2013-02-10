@@ -1,11 +1,19 @@
 <?php 
 require_once("../../bootstrap.php");
+$INPUT_PATTERN = "/^[a-zA-Z0-9_]*$/";
+$SCHEME_PATTERN = "/^[a-zA-Z0-9_.]*$/";
+
 ActKeyUtils::checkCurrent();
 KalturaLog::setContext("XSD-DOC");
 
 // get inputs
 $inputPage = @$_GET["page"];
 $schemaType = @$_GET["type"];
+
+if ((preg_match ($INPUT_PATTERN, $inputPage) !== 1) || (preg_match ($SCHEME_PATTERN, $schemaType) !== 1)) {
+	print "Illegal input. Page & schemaType must be alpha-numeric";
+	die;
+}
 
 // get cache file name
 $cachePath = kConf::get("cache_root_path").'/xsdDoc';
