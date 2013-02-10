@@ -107,7 +107,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 		if (is_null ( $dbObject ))
 			$dbObject = new categoryKuser ();
 		/* @var $dbObject categoryKuser */
-		if (!$this->permissionNames && $this->permissionLevel && $this->permissionLevel != $dbObject->getPermissionLevel())
+		if (!$this->permissionNames && !is_null($this->permissionLevel) && $this->permissionLevel !== $dbObject->getPermissionLevel())
 		{
 			$permissionNames = $dbObject->getPermissionNames();
 			if ($permissionNames)
