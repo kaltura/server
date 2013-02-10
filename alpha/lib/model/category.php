@@ -170,6 +170,7 @@ class category extends Basecategory implements IIndexable
 			$permissionNamesArr[] = PermissionName::CATEGORY_EDIT;
 			$permissionNamesArr[] = PermissionName::CATEGORY_MODERATE;
 			$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
+			$categoryKuser->setPermissionNames(implode(",", $permissionNamesArr));
 			$categoryKuser->setStatus(CategoryKuserStatus::ACTIVE);
 			$categoryKuser->setPartnerId($this->getPartnerId());
 			$categoryKuser->setUpdateMethod(UpdateMethodType::MANUAL);
