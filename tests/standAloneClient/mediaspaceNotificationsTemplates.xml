@@ -104,7 +104,7 @@
 				</eventConditions>
 				<format>1</format>
 				<subject>[AppTitle] - Your Media has been approved</subject>
-				<body>Your media {entry_name} has been approved to be published in {category_name}</body>
+				<body>Your media {entry_name} [AppEntryUrl]{entry_id} has been approved to be published in {category_name}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
@@ -142,6 +142,12 @@
 						<key>category_name</key>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getEntryId()</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -171,7 +177,7 @@
 				</eventConditions>
 				<format>1</format>
 				<subject>[AppTitle] - Your Media has been rejected</subject>
-				<body>Your media {entry_name} has been rejected to be published in {category_name}</body>
+				<body>Your media {entry_name} [AppEntryUrl]{entry_id} has been rejected to be published in {category_name}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
@@ -209,6 +215,12 @@
 						<key>category_name</key>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getEntryId()</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -422,6 +434,11 @@
 					<item objectType="KalturaEventFieldCondition">
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof categoryKuser &amp;&amp; $scope->getEvent()->getObject()->getStatus() == CategoryKuserStatus::ACTIVE</code>
+						</field>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getEvent()->getObject() instanceof categoryKuser &amp;&amp; category::getPermissionLevelName($scope->getEvent()->getObject()->getPermissionLevel())</code>
 						</field>
 					</item>
 				</eventConditions>
