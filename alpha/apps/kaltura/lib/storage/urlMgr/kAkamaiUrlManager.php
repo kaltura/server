@@ -21,7 +21,7 @@ class kAkamaiUrlManager extends kUrlManager
 					$this->params['http_auth_seconds'],
 					$this->params['http_auth_param'],
 					$this->params['http_auth_salt'],
-					$this->params['http_auth_root_dir']);
+					isset($this->params['http_auth_root_dir']) ? $this->params['http_auth_root_dir'] : '');
 			}
 			break;
 			
