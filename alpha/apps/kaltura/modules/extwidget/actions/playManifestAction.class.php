@@ -1467,9 +1467,6 @@ class playManifestAction extends kalturaAction
 
 		// Output the response
 		KExternalErrors::terminateDispatch();
-		print_r(array('flavorCount'=>(count($renderer->flavors) == 1),'flavorExt'=>(strtolower($renderer->flavors[1]['ext']))));
-		if((count($renderer->flavors) == 1) && (strtolower($renderer->flavors[0]['ext']) == 'mp3'))
-			$renderer->mimeType = 'audio/mpeg';
 		$renderer->output($deliveryCode, $playbackContext);
 	}
 }
