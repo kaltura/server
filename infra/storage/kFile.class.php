@@ -353,6 +353,7 @@ class kFile
 //	KalturaLog::log("failed rename");
 		$out_arr = array();
 		$rv = 0;
+		// We use this case for folders
 		exec("mv \"$src\" \"$trg\"", $out_arr, $rv);
 //			echo "RV($rv)\n";
 		if($rv==0)
