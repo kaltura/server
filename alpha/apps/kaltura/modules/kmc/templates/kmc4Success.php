@@ -98,5 +98,61 @@ if( count($allowedPartners) > 1 ) {
 	</div><!-- main -->
 <!--[if lte IE 7]>
 <script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/json2.min.js"></script>
-<![endif]-->	
+<![endif]-->
+<?php if( $previewEmbedV2 ) { ?>
+<script type="text/javascript" src="/lib/js/kmc6.js?v=<?php echo $kmc_swf_version; ?>"></script>
+<script src="/lib/js/angular-1.0.4.min.js"></script>
+<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.2.min.js"></script>
+<script src="/lib/js/jquery.qrcode.min.js"></script>
+<script src="/lib/js/preview.js"></script>
+<div id="previewModal" class="modal preview_embed">
+	<div class="title">
+		<h2></h2>
+		<span class="close icon"></span>		
+		<a class="help icon" href="javascript:kmc.utils.openHelp('section_pne');"></a>
+	</div>
+	<div class="content">
+		<div class="row-fluid" ng-controller="PreviewCtrl">
+			<div class="span4 options">
+				<label>Select Player: </label>
+				<select id="player" ng-model="player" ng-options="p.id as p.name for p in players"></select>
+				<small class="help-block">Kaltura player includes both layout and functionality (advertising, subtitles, etc)</small>
+				<div class="hr"></div>
+				<div class="padBottom advance">
+					<a ng-hide="showAdvancedOptions" ng-click="showAdvancedOptions = true" href="#">Show Advanced Options<i class="pull-right icon-chevron-down"></i></a>
+					<a ng-show="showAdvancedOptions" ng-click="showAdvancedOptions = false" href="#">Hide Advanced Options<i class="pull-right icon-chevron-up"></i></a>
+				</div>
+				<div class="hr"></div>
+				<div class="padBottom" show-slide="showAdvancedOptions">
+					<label>Delivery Types: </label>
+					<select ng-model="deliveryType" ng-options="d.id as d.label for d in deliveryTypes"></select>
+					<small class="help-block">Adaptive Streaming automatically adjusts to the viewer's bandwidth,while Progressive Download allows buffering of the content. <a href="javascript:kmc.utils.openHelp('section_pne_stream');">Read more</a></small>
+					<label>Embed Types: </label>
+					<select ng-model="embedType" ng-options="e.id as e.label for e in embedTypes"></select>
+					<small class="help-block">Auto embed is the default embed code type and is best to get a player quickly on a page without any runtime customizations. <a href="javascript:kmc.utils.openHelp('section_pne_embed');">Read more</a> about the different embed code types.</small>
+					<label><input type="checkbox" ng-model="includeSeo"> Include Search Engine Optimazation data</label>
+					<label><input type="checkbox" ng-model="secureEmbed"> Support for HTTPS embed code</label>
+					<div class="hr"></div>
+				</div>
+				<div>
+					<h3>Preview:</h3>
+					<small class="help-block">Scan the QR code the preview in your mobile device</small>
+					<div id="qrcode"></div>
+					<div class="hr"></div>
+					<small class="help-block">View a standalone page with this player</small>
+					<div class="urlBox"><a href="{{previewUrl}}" target="_blank">{{previewUrl}}</a></div>
+				</div>
+				<div class="hr"></div>
+				<h3>Embed Code:</h3>
+				<textarea class="embedcode">{{embedCode}}</textarea>
+				<button class="btn">Copy</button>
+			</div>
+			<div class="span8">
+				<div id="previewIframe"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<?php } else { ?> 
 <script type="text/javascript" src="/lib/js/kmc5.js?v=<?php echo $kmc_swf_version; ?>"></script>
+<?php } ?>

@@ -73,6 +73,7 @@ class kmc4Action extends kalturaAction
 		$this->embedCodeTypes = null;
 		$this->defaultDeliveryType = 'http';
 		$this->defaultEmbedCodeType = 'legacy';
+		$this->previewEmbedV2 = false;
 		
 		if ($this->partner_id !== NULL)
 		{
@@ -86,6 +87,7 @@ class kmc4Action extends kalturaAction
 			$this->embedCodeTypes = $partner->getEmbedCodeTypes();
 			$this->defaultDeliveryType = ($partner->getDefaultDeliveryType()) ? $partner->getDefaultDeliveryType() : 'http';
 			$this->defaultEmbedCodeType = ($partner->getDefaultEmbedCodeType()) ? $partner->getDefaultEmbedCodeType() : 'auto';
+			$this->previewEmbedV2 = PermissionPeer::isValidForPartner(PermissionName::FEATURE_PREVIEW_AND_EMBED_V2, $this->partner_id);
 		}
 	/** END - load partner from DB, and set templatePartnerId **/
 
