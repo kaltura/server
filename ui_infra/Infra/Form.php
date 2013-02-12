@@ -5,7 +5,22 @@
  */
 class Infra_Form extends Zend_Form
 {
-	public function init(){
+    /**
+     * @param array $options
+     * @see Zend_Form::__construct()
+     */
+    public function __construct($options = null)
+    {
+    	parent::__construct($options);
+        $this->initKey();
+    }
+    
+	/**
+	 * Add hidden key field to the form, the key is validated against saved session.
+	 * The key validation should prevent form submission from external sites.
+	 */
+	protected function initKey()
+	{
 		$this->addElementPrefixPath('Kaltura', APPLICATION_PATH . '/lib/Kaltura');
 		
 		$validator = new Infra_SecurityKey();
@@ -17,6 +32,10 @@ class Infra_Form extends Zend_Form
 		$kElement->addValidator($validator);
 	}
 	
+	/**
+	 * @param Kaltura_Client_ObjectBase $object
+	 * @param boolean $add_underscore
+	 */
 	public function populateFromObject($object, $add_underscore = true)
 	{
 		$props = $object;
@@ -35,6 +54,13 @@ class Infra_Form extends Zend_Form
 		}
 	}
 	
+	/**
+	 * @param string $objectType Kaltura client class name
+	 * @param array $properties
+	 * @param boolean $add_underscore
+	 * @param boolean $include_empty_fields
+	 * @return Kaltura_Client_ObjectBase
+	 */
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = new $objectType;
