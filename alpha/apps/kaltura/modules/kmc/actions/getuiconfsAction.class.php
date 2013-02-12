@@ -13,6 +13,8 @@ class getuiconfsAction extends kalturaAction
 {
 	public function execute ( ) 
 	{
+		header('Access-Control-Allow-Origin: *');
+
 		$this->partner_id = $this->getP ( "partner_id" );
 		$this->ks = $this->getP ( "ks" );
 		$type = $this->getP("type");
