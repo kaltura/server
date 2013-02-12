@@ -4,6 +4,12 @@ default:
   javascripts:  [ -* ]
   stylesheets:  [ /lib/css/modal, /lib/css/kmc ]
 
+kmcSuccess: 
+  has_layout:   on
+  layout:       kmclayout
+  javascripts:  [ -* ]
+  stylesheets:  [ /lib/css/kmc ]
+
 kmc1Success:
   has_layout:     on
   layout:         kmc1layout
