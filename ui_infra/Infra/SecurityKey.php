@@ -43,10 +43,11 @@ class Infra_SecurityKey extends Zend_Validate_Abstract
 	 */
 	public function getKey()
 	{
-		$key = uniqid('k');
 		$session = self::getSession();
-		$session->key = $key;
-		return $key;
+		if(!isset($session->key))
+			$session->key = uniqid('k');
+			
+		return $session->key;
 	}
 	
 	/* (non-PHPdoc)
@@ -60,6 +61,7 @@ class Infra_SecurityKey extends Zend_Validate_Abstract
 		if($value == $session->key)
 			return true;
 			
+		KalturaLog::err("Expected security key [$session->key] actual key [$value]");
 		throw new Infra_Exception('Form could not be generated and submitted from different sessions', Infra_Exception::ERROR_CODE_WRONG_FORM_KEY);
 	}
 }
