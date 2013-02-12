@@ -23,7 +23,7 @@ class Infra_Form extends Zend_Form
 	{
 		$this->addElementPrefixPath('Kaltura', APPLICATION_PATH . '/lib/Kaltura');
 		
-		$validator = new Infra_SecurityKey();
+		$validator = new Infra_SecurityKey(get_class($this));
 		$this->addElement('hidden', 'k', array(
 			'required' => true,
 			'value' => $validator->getKey(),
