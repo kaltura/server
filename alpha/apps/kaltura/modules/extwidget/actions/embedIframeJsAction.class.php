@@ -70,6 +70,7 @@ class embedIframeJsAction extends sfAction
 			$url .= "/p/$partner_id/uiconf_id/$uiconf_id";
 		
 		header("pragma:");
+		header('Content-Type: application/javascript');
 
 		if ($autoEmbed)
 		{
