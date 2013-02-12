@@ -25,10 +25,12 @@ class Infra_Form extends Zend_Form
 		
 		$validator = new Infra_SecurityKey(get_class($this));
 		$this->addElement('hidden', 'k', array(
+			'decorators' => array('ViewHelper'),
 			'required' => true,
 			'value' => $validator->getKey(),
 		));
 		$kElement = $this->getElement('k');
+		$kElement->setAutoInsertNotEmptyValidator(false);
 		$kElement->addValidator($validator);
 	}
 	
