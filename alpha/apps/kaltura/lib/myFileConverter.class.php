@@ -176,6 +176,18 @@ class myFileConverter
 		$text_output_file = self::createLogFileName ($source_file , $plain_log_file_name );
 		// hq - activate high quality settings
 		// deinterlace - deinterlace pictures
+		$cmd = kConversionEngineFfmpeg::getCmd();
+		
+		// Test parameters
+		$validInput = TRUE;
+		$validInput &= is_numeric($width);
+		$validInput &= is_numeric($height);
+		$validInput &= is_numeric($frame_count);
+		$validInput &= is_numeric($position);
+		$validInput &= (realpath($source_file) !== FALSE);
+		
+		if(!$validInput)
+			throw new Exception("Illegal input was given");
 		
 		// The '-ss 0.01' is  'dummy' seek-to setting is done to ensure preciseness of the main seek
 		// command that is done at the beginning of the command line
@@ -184,9 +196,10 @@ class myFileConverter
 		$position_str = $position ? " -ss $position " : "";
 		$position_str_suffix = $position ? " -ss 0.01 " : "";
 		$dimensions = ($width == -1 || $height == -1) ? "" : ("-s ". $width ."x" . $height);
-		$exec_cmd = kConversionEngineFfmpeg::getCmd() . $position_str . " -i " . "\"$source_file\"" . " -an -y -r 1 " . $dimensions .
+		
+		$exec_cmd = $cmd . $position_str . " -i " . "\"$source_file\"" . " -an -y -r 1 " . $dimensions .
 			" " . " -vframes $frame_count -f \"" . $target_type . "\" " . $position_str_suffix . "\"$target_file\"" . " 2>&1";
-
+		
 		KalturaLog::log("ffmpeg cmd [$exec_cmd]");
 		$output = array ();
 		$return_value = "";
@@ -291,8 +304,16 @@ class myFileConverter
 		if( !$srcIm )
 		{
 			$output = array();
+			$cmd = kConf::get ( "bin_path_imagemagick");
 			$jpeg_file = myContentStorage::getFSUploadsPath(true).pathinfo($source_file, PATHINFO_FILENAME).".jpg";
-			exec( kConf::get ( "bin_path_imagemagick") . " \"$source_file\" \"$jpeg_file\"", $output);
+			
+			$validInput = true;
+			$validInput &= (realpath($source_file) !== FALSE);
+			
+			if(!$validInput)
+				throw new Exception("Illegal input was given");
+			
+			exec($cmd . " \"$source_file\" \"$jpeg_file\"", $output);
 			if (file_exists($jpeg_file))
 			{
 				list($sourcewidth, $sourceheight, $type, $attr) = getimagesize($jpeg_file);
