@@ -226,8 +226,10 @@ class myReportsMgr
 	*/				
 					$first = false;
 				}
-				else if ($column === $multiline_column)
-					$multiline_val = $val
+				elseif ($column === $multiline_column)
+				{
+					$multiline_val = $val;
+				}
 				else
 				{
 					$graph = $graphs[$column];
@@ -802,10 +804,10 @@ class myReportsMgr
 		self::REPORT_TYPE_APPLICATIONS => 'applications',
 		self::REPORT_TYPE_USER_USAGE => 'user_usage',
 		self::REPORT_TYPE_SPECIFIC_USER_USAGE => 'specific_user_usage',
-		self::REPORT_TYPE_VAR_USAGE => 'var_usage'
+		self::REPORT_TYPE_VAR_USAGE => 'var_usage',
 		self::REPORT_TYPE_PLATFORMS => 'platforms',
 		self::REPORT_TYPE_OPERATION_SYSTEM => 'os',
-		self::REPORT_TYPE_BROWSERS = 'browsers',
+		self::REPORT_TYPE_BROWSERS => 'browsers',
 	
 	);
 	
