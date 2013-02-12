@@ -509,20 +509,21 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 			"platforms" => array (
 				"graph" => "graph",
 				"graph_without_filter" => "graph",
-				"graph_for_objects" => "graph_for_objects",	
+				"graph_no_text_for_objects" => "graph_for_objects",	
 				"graph_by_app" => "graph_by_app",
 				"graph_by_app_for_objects" => "graph_by_app_for_objects",
 				"total" => "total",
 				"total_without_filter" => "total",
 				"total_by_app" => "total_by_app",
+				"total_no_text" => "total",
 				"detail" => "detail",
 				"detail_without_filter" => "detail",
-				"detail_for_objects" => "detail_for_objects",	
+				"detail_no_text_for_objects" => "detail_for_objects",	
 				"detail_by_app" => "detail_by_app",
 				"detail_by_app_for_objects" => "detail_by_app_for_objects",
 				"count" => "count",
 				"count_without_filter" => "count",
-				"count_for_objects" => "count_for_objects",	
+				"count_no_text_for_objects" => "count_for_objects",	
 				"count_by_app" => "count_by_app",
 				"count_by_app_for_objects" => "count_by_app_for_objects",
 			),
@@ -575,7 +576,7 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 		if ( $for_objects )	
 				$flavor_str = $flavor_str . $for_objects;
 		
-			
+		
 		if ( isset ( $report_type_mapping[$flavor_str ]))
 			return $report_type_mapping[$flavor_str];
 		else

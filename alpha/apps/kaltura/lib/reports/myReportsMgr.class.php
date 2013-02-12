@@ -116,10 +116,12 @@ class myReportsMgr
 
 		if ( $report_type == self::REPORT_TYPE_PLATFORMS)
 		{
-			$res = self::getMultiGraphsByDateId ( $result , "device", $report_type);
+			if ($object_ids != NULL && count($object_ids) > 0)
+				$res = self::getGraphsByDateId ( $result , $report_type);
+			else
+				$res = self::getMultiGraphsByDateId ( $result , "device", $report_type); 
 		}
-		else if ( $report_type == self::REPORT_TYPE_CONTENT_DROPOFF || $report_type == self::REPORT_TYPE_USER_CONTENT_DROPOFF || 
-			$report_type == self::REPORT_TYPE_OS || $report_type == self::REPORT_TYPE_BROWSERS)
+		else if ( $report_type == self::REPORT_TYPE_CONTENT_DROPOFF || $report_type == self::REPORT_TYPE_USER_CONTENT_DROPOFF)
 		{
 			$res = self::getGraphsByColumnName ( $result , $report_type);
 		}
