@@ -2,6 +2,9 @@
 /**
  * @package UI-infra
  * @subpackage forms
+ * 
+ * The generated key is sent as hidden element in all forms, the key is validated against saved session.
+ * The key validation should prevent form submission from external sites.
  */
 class Infra_SecurityKey extends Zend_Validate_Abstract 
 {
@@ -13,12 +16,15 @@ class Infra_SecurityKey extends Zend_Validate_Abstract
 	protected $_messageTemplates = array(self::WRONG_KEY => "Form could not be submitted from external servers");
 	
 	/**
-	 * Class name of the calling form, used for the session name space
+	 * Class name of the calling form, used for the session namespace
 	 * 
 	 * @var string
 	 */
 	protected $formType;
 	
+	/**
+	 * @param string $formType class name of the calling form, used for the session namespace
+	 */
 	public function __construct($formType)
 	{
 		$this->formType = $formType;
