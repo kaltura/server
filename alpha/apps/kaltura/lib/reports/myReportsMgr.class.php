@@ -35,6 +35,10 @@ class myReportsMgr
 	const REPORT_TYPE_SPECIFIC_USER_USAGE = 18;
 	const REPORT_TYPE_VAR_USAGE = 19;
 	const REPORT_TYPE_TOP_CREATORS = 20;
+	const REPORT_TYPE_PLATFORMS = 21;
+	const REPORT_TYPE_OPERATION_SYSTEM = 22;
+	const REPORT_TYPE_BROWSERS = 23;
+	
 	
 	const REPORTS_COUNT_CACHE = 60;
 	
@@ -110,7 +114,12 @@ class myReportsMgr
 		$start = microtime(true);
 		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_GRAPH , $input_filter , null , null , null , $object_ids );
 
-		if ( $report_type == self::REPORT_TYPE_CONTENT_DROPOFF || $report_type == self::REPORT_TYPE_USER_CONTENT_DROPOFF)
+		if ( $report_type == self::REPORT_TYPE_PLATFORMS)
+		{
+			$res = self::getMultiGraphsByDateId ( $result , "device", $report_type);
+		}
+		else if ( $report_type == self::REPORT_TYPE_CONTENT_DROPOFF || $report_type == self::REPORT_TYPE_USER_CONTENT_DROPOFF || 
+			$report_type == self::REPORT_TYPE_OS || $report_type == self::REPORT_TYPE_BROWSERS)
 		{
 			$res = self::getGraphsByColumnName ( $result , $report_type);
 		}
@@ -178,6 +187,60 @@ class myReportsMgr
 		return $graphs;		
 	}
 	
+	private static function getMultiGraphsByDateId ( $result , $multiline_column, $report_type )
+	{
+		$graphs = array();
+		$should_create_graphs = true;		
+		foreach ( $result as $row )
+		{
+			$row_size = count($row);
+//print_r ( $row );			
+			if ( $should_create_graphs )
+			{
+				$first = true;
+				foreach ( $row as $column => $val )
+				{
+					if ( $first )
+					{
+						$first = false;
+						continue;
+					}
+					if ($column != $multiline_column)
+						$graphs[$column] = array();
+				}
+				$should_create_graphs = false;
+			}
+			// index 0 is always the date
+			// the rest of the indexes are the dimensions
+			$first = true;
+			foreach ( $row as $column => $val )
+			{
+				if ( $first )
+				{
+					$date = $val;
+/*	no formatting should be done on the server side
+ * 				if ( $val )
+					{
+						$date = self::formatDateFromDateId ( $val );
+					}
+	*/				
+					$first = false;
+				}
+				else if ($column === $multiline_column)
+					$multiline_val = $val
+				else
+				{
+					$graph = $graphs[$column];
+					$graph[$date] = $multiline_val . ":" . $val; // the value for graph 1 will be column #1 in the row 
+					$graphs[$column] = $graph;
+				}
+			}
+		}
+//echo "<br>";		
+//print_r ( $graphs );
+//die();		
+		return $graphs;		
+	}
 	
 	private static function getGraphsByColumnName ( $result , $report_type )
 	{
@@ -642,6 +705,10 @@ class myReportsMgr
 				{
 					$obj_ids_clause = "partner_id in ($object_ids_str)";
 				}		
+				else if ( $report_type == self::REPORT_TYPE_PLATFORMS)
+				{
+					$obj_ids_clause = "device in ($object_ids_str)";
+				}
 				else
 				{
 					$objectIds = explode(',', $object_ids);
@@ -736,7 +803,10 @@ class myReportsMgr
 		self::REPORT_TYPE_USER_USAGE => 'user_usage',
 		self::REPORT_TYPE_SPECIFIC_USER_USAGE => 'specific_user_usage',
 		self::REPORT_TYPE_VAR_USAGE => 'var_usage'
-		
+		self::REPORT_TYPE_PLATFORMS => 'platforms',
+		self::REPORT_TYPE_OPERATION_SYSTEM => 'os',
+		self::REPORT_TYPE_BROWSERS = 'browsers',
+	
 	);
 	
 	
@@ -903,6 +973,30 @@ class myReportsMgr
 				"deleted_storage_mb",
 				"added_msecs",
 				"deleted_msecs",
+			),
+			"platforms" => array (	
+				"count_plays" ,	
+				"sum_time_viewed" ,
+				"avg_time_viewed" ,
+				"count_loads" ,
+				"load_play_ratio" ,	
+				"avg_view_drop_off",
+			),
+			"os" => array (	
+				"count_plays" ,	
+				"sum_time_viewed" ,
+				"avg_time_viewed" ,
+				"count_loads" ,
+				"load_play_ratio" ,	
+				"avg_view_drop_off",
+			),
+			"browsers" => array (	
+				"count_plays" ,	
+				"sum_time_viewed" ,
+				"avg_time_viewed" ,
+				"count_loads" ,
+				"load_play_ratio" ,	
+				"avg_view_drop_off",
 			)
 		);
 		
