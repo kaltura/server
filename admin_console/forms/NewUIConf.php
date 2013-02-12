@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Widgets
  */
-class Form_NewUIConf extends Zend_Form
+class Form_NewUIConf extends Infra_Form
 {
 	public function init()
 	{

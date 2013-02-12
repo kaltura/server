@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution 
  * @subpackage admin
  */
-class Form_NewDistributionProfile extends Zend_Form
+class Form_NewDistributionProfile extends Infra_Form
 {
 	public function init()
 	{

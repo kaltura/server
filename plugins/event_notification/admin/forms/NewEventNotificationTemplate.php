@@ -3,7 +3,7 @@
  * @package plugins.eventNotification
  * @subpackage admin
  */
-class Form_NewEventNotificationTemplate extends Zend_Form
+class Form_NewEventNotificationTemplate extends Infra_Form
 {
 	public function init()
 	{

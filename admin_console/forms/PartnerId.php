@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Partners
  */
-class Form_PartnerId extends Zend_Form
+class Form_PartnerId extends Infra_Form
 {
 	public function init()
 	{

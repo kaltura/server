@@ -3,7 +3,7 @@
  * @package Var
  * @subpackage Partners
  */
-class Form_PartnerUsageFilter extends Zend_Form
+class Form_PartnerUsageFilter extends Infra_Form
 {
 	public function init()
 	{

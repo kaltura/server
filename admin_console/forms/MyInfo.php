@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Auth
  */
-class Form_MyInfo extends Zend_Form
+class Form_MyInfo extends Infra_Form
 {
 	public function init()
 	{

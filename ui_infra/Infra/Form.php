@@ -7,6 +7,14 @@ class Infra_Form extends Zend_Form
 {
 	public function init(){
 		$this->addElementPrefixPath('Kaltura', APPLICATION_PATH . '/lib/Kaltura');
+		
+		$validator = new Infra_SecurityKey();
+		$this->addElement('hidden', 'k', array(
+			'required' => true,
+			'value' => $validator->getKey(),
+		));
+		$kElement = $this->getElement('k');
+		$kElement->addValidator($validator);
 	}
 	
 	public function populateFromObject($object, $add_underscore = true)

@@ -3,7 +3,7 @@
  * @package Var
  * @subpackage Users
  */
-class Form_UserFilter extends Zend_Form
+class Form_UserFilter extends Infra_Form
 {
 	public function init()
 	{

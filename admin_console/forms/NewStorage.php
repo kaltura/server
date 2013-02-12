@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Partners
  */
-class Form_NewStorage extends Zend_Form
+class Form_NewStorage extends Infra_Form
 {
 	public function init()
 	{

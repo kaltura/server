@@ -3,7 +3,7 @@
  * @package Var
  * @subpackage Auth
  */
-class Form_Login extends Zend_Form
+class Form_Login extends Infra_Form
 {
 	public function init()
 	{

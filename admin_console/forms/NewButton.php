@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Partners
  */
-class Form_NewButton extends Zend_Form
+class Form_NewButton extends Infra_Form
 {
 	public function init()
 	{

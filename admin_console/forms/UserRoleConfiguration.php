@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Users
  */
-class Form_UserRoleConfiguration extends Zend_Form
+class Form_UserRoleConfiguration extends Infra_Form
 {
 	public function init()
 	{

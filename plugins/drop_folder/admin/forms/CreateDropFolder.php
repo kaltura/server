@@ -3,7 +3,7 @@
  * @package plugins.dropFolder
  * @subpackage Admin
  */
-class Form_CreateDropFolder extends Zend_Form
+class Form_CreateDropFolder extends Infra_Form
 {
 	public function init()
 	{

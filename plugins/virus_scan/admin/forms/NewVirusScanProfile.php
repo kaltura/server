@@ -3,7 +3,7 @@
  * @package plugins.virusScan
  * @subpackage Admin
  */
-class Form_NewVirusScanProfile extends Zend_Form
+class Form_NewVirusScanProfile extends Infra_Form
 {
 	public function init()
 	{

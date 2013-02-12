@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution 
  * @subpackage admin
  */
-class Form_NewGenericProvider extends Zend_Form
+class Form_NewGenericProvider extends Infra_Form
 {
 	public function init()
 	{

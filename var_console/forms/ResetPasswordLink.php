@@ -3,7 +3,7 @@
  * @package Var
  * @subpackage Auth
  */
-class Form_ResetPasswordLink extends Zend_Form
+class Form_ResetPasswordLink extends Infra_Form
 {
 	public function init()
 	{

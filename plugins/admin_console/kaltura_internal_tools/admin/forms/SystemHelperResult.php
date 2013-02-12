@@ -3,7 +3,7 @@
  * @package plugins.KalturaInternalTools
  * @subpackage admin
  */
-class Form_SystemHelperResult extends Zend_Form
+class Form_SystemHelperResult extends Infra_Form
 {
 	public function init()
 	{

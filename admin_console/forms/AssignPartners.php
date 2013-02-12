@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Auth
  */
-class Form_AssignPartners extends Zend_Form
+class Form_AssignPartners extends Infra_Form
 {
 	public function init()
 	{

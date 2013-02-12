@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Users
  */
-class Form_NewUser extends Zend_Form
+class Form_NewUser extends Infra_Form
 {
 	public function init()
 	{
