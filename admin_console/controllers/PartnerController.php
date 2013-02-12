@@ -109,6 +109,9 @@ class PartnerController extends Zend_Controller_Action
 		$partnerPackages = $systemPartnerPlugin->systemPartner->getPackages();
 		Form_PackageHelper::addPackagesToForm($form, $partnerPackages, 'partner_package', true, 'All Service Editions');
 		
+		if($request->isPost() && $request->getParam('filter_type'))
+			$form->isValid($request->getPost());
+			
 		$this->view->partnerPackages = array();
 		foreach($partnerPackages as $package)
 		{

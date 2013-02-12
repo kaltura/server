@@ -56,6 +56,8 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
+			$loginForm->isValid($request->getPost());
+			
 			$adapter = new Kaltura_VarAuthAdapter();
 			$adapter->setCredentials($request->getPost('email'), $request->getPost('password'));
 			$adapter->setTimezoneOffset($request->getPost('timezone_offset'));
@@ -104,6 +106,7 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
+			$form->isValid($request->getPost());
 			$client = Infra_ClientHelper::getClient();
 			$userEmail = $request->getPost('email');
             try 
@@ -131,6 +134,7 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
+			$form->isValid($request->getPost());
 			$this->proccessResetPasswordLinkForm($form, $token);
 		}
 		

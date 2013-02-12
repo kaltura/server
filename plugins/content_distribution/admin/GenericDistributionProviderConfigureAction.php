@@ -138,6 +138,7 @@ class GenericDistributionProviderConfigureAction extends KalturaApplicationPlugi
 			{
 				if ($request->isPost())
 				{
+					$form->isValid($request->getPost());
 					$form->populate($request->getPost());
 					$genericDistributionProvider = $form->getObject("Kaltura_Client_ContentDistribution_Type_GenericDistributionProvider", $request->getPost());
 					$genericDistributionProvider->partnerId = null;
@@ -176,6 +177,7 @@ class GenericDistributionProviderConfigureAction extends KalturaApplicationPlugi
 			{
 				if ($request->isPost())
 				{
+					$form->isValid($request->getPost());
 					$form->populate($request->getPost());
 					$genericDistributionProvider = $form->getObject("Kaltura_Client_ContentDistribution_Type_GenericDistributionProvider", $request->getPost());
 					

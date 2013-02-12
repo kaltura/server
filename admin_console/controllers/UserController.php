@@ -78,6 +78,7 @@ class UserController extends Zend_Controller_Action
 		$newUserForm = new Form_NewUser();
 		if ($request->isPost())
 		{
+			$newUserForm->isValid($request->getPost());
 			$this->proccessNewUserForm($newUserForm);
 		}
 		$this->view->newUserForm = $newUserForm;
@@ -89,6 +90,7 @@ class UserController extends Zend_Controller_Action
 		$myInfoForm = new Form_MyInfo();
 		if ($request->isPost())
 		{
+			$myInfoForm->isValid($request->getPost());
 			$this->proccessMyInfoForm($myInfoForm);
 		}
 		$this->view->myInfoForm = $myInfoForm;
@@ -101,6 +103,8 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
+			$form->isValid($request->getPost());
+			
 			$client = Infra_ClientHelper::getClient();
 			$userEmail = $request->getPost('email');
 
@@ -124,6 +128,7 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
+			$form->isValid($request->getPost());
 			$this->proccessResetPasswordLinkForm($form, $token);
 		}
 		
@@ -143,6 +148,8 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
+			$loginForm->isValid($request->getPost());
+			
 			$adapter = new Kaltura_AdminAuthAdapter();
 			$adapter->setCredentials($request->getPost('email'), $request->getPost('password'));
 			$adapter->setTimezoneOffset($request->getPost('timezone_offset'));
@@ -229,6 +236,7 @@ class UserController extends Zend_Controller_Action
 				
 		if ($request->isPost())
 		{
+			$form->isValid($request->getPost());
 			$this->proccessChangeRoleForm($form);
 		}
 		$this->view->form = $form;
@@ -255,6 +263,7 @@ class UserController extends Zend_Controller_Action
 		$form->getElement('partner_package')->setValue(explode(",",$user->allowedPartnerPackages));		
 		if ($request->isPost())
 		{
+			$form->isValid($request->getPost());
 			$this->proccessAssignPartnersForm($form);
 		}
 		$this->view->form = $form;
@@ -480,6 +489,7 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
+			$form->isValid($request->getPost());
 			$form->populate($request->getPost());
 			$userRole = new Kaltura_Client_Type_UserRole();
 			$userRole->permissionNames = $form->getPermissionNames();
