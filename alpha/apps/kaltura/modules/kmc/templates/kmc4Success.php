@@ -119,11 +119,11 @@ if( count($allowedPartners) > 1 ) {
 				<small class="help-block">Kaltura player includes both layout and functionality (advertising, subtitles, etc)</small>
 				<div class="hr"></div>
 				<div class="padBottom advance">
-					<a ng-hide="showAdvancedOptions" ng-click="showAdvancedOptions = true" href="#">Show Advanced Options<i class="pull-right icon-chevron-down"></i></a>
-					<a ng-show="showAdvancedOptions" ng-click="showAdvancedOptions = false" href="#">Hide Advanced Options<i class="pull-right icon-chevron-up"></i></a>
+					<a ng-hide="showAdvancedOptionsStatus" ng-click="showAdvancedOptions($event, true)" href="#">Show Advanced Options<i class="pull-right icon-chevron-down"></i></a>
+					<a ng-show="showAdvancedOptionsStatus" ng-click="showAdvancedOptions($event, false)" href="#">Hide Advanced Options<i class="pull-right icon-chevron-up"></i></a>
 				</div>
 				<div class="hr"></div>
-				<div class="padBottom" show-slide="showAdvancedOptions">
+				<div class="padBottom" show-slide="showAdvancedOptionsStatus">
 					<label>Delivery Types: </label>
 					<select ng-model="deliveryType" ng-options="d.id as d.label for d in deliveryTypes"></select>
 					<small class="help-block">Adaptive Streaming automatically adjusts to the viewer's bandwidth,while Progressive Download allows buffering of the content. <a href="javascript:kmc.utils.openHelp('section_pne_stream');">Read more</a></small>

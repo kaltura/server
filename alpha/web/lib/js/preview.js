@@ -239,7 +239,11 @@ kmcApp.controller('PreviewCtrl', function($scope, previewService) {
 	$scope.secureEmbed = false;
 	$scope.includeSeo = false;
 
-	$scope.showAdvancedOptions = false;
+	$scope.showAdvancedOptionsStatus = false;
+	$scope.showAdvancedOptions = function( $event, show ) {
+		$event.preventDefault();
+		$scope.showAdvancedOptionsStatus = show;
+	};
 
   	// Listen to player change
   	$scope.$watch('player', function() {
