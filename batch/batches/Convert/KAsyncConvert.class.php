@@ -126,7 +126,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		$uniqid = "convert_{$job->entryId}_".substr($uniqid,-5);
 		$data->destFileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid;
 		
-		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $this->taskConfig, $data, $this->kClient);
+		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $this->taskConfig, $data, $job, $this->kClient);
 		
 		if ( $this->operationEngine == null )
 		{
@@ -156,14 +156,14 @@ class KAsyncConvert extends KJobHandlerWorker
 		// 2. full output log path
 		// 3. in case of remote engine (almost done) - id/url to query result
  
-	
-		if($job->executionAttempts > 1) // is a retry
-		{
-			if(strlen($data->destFileSyncLocalPath) && file_exists($data->destFileSyncLocalPath))
-			{
-				return $this->moveFile($job, $data);
-			}
-		}
+// TODO: need to verify that this part can be removed	
+//		if($job->executionAttempts > 1) // is a retry
+//		{
+//			if(strlen($data->destFileSyncLocalPath) && file_exists($data->destFileSyncLocalPath))
+//			{
+//				return $this->moveFile($job, $data);
+//			}
+//		}
 		
 		if($this->taskConfig->params->isRemoteInput || !strlen(trim($data->actualSrcFileSyncLocalPath))) // for distributed conversion
 		{
@@ -197,7 +197,23 @@ class KAsyncConvert extends KJobHandlerWorker
 		$operator = $this->getOperator($data);
 		try
 		{
-			$this->operationEngine->operate($operator, $data->actualSrcFileSyncLocalPath);
+			$isDone = $this->operationEngine->operate($operator, $data->actualSrcFileSyncLocalPath);
+			
+			$this->stopMonitor();	
+				
+			$jobMessage = "engine [" . get_class($this->operationEngine) . "] converted successfully. ";
+			if($this->operationEngine->getMessage())
+				$jobMessage = $jobMessage.$this->operationEngine->getMessage();
+				
+			if(!$isDone)
+			{
+				return $this->closeJob($job, null, null, $jobMessage, KalturaBatchJobStatus::ALMOST_DONE, $data);
+			}
+			else 
+			{
+				$job = $this->updateJob($job, $jobMessage, KalturaBatchJobStatus::MOVEFILE, $data);
+				return $this->moveFile($job, $data);				
+			}			
 		}
 		catch(KOperationEngineException $e)
 		{
@@ -218,20 +234,6 @@ class KAsyncConvert extends KJobHandlerWorker
 			$err = "engine [" . get_class($this->operationEngine) . "] converted failed: " . $e->getMessage();
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CONVERSION_FAILED, $err, KalturaBatchJobStatus::FAILED);
 		}
-		$this->stopMonitor();
-		
-		$operEngMsg = $this->operationEngine->getMessage();
-		if($job->jobSubType == KalturaConversionEngineType::ENCODING_COM || $job->jobSubType == KalturaConversionEngineType::KALTURA_COM)
-		{
-			$operEngMsg = "engine [" . get_class($this->operationEngine) . "] converted successfully: $operEngMsg";
-			return $this->closeJob($job, null, null, $operEngMsg, KalturaBatchJobStatus::ALMOST_DONE, $data);
-		}
-		
-		if(isset($operEngMsg))
-			$job = $this->updateJob($job, "engine [" . get_class($this->operationEngine) . "] converted successfully.$operEngMsg", KalturaBatchJobStatus::MOVEFILE, $data);
-		else
-			$job = $this->updateJob($job, "engine [" . get_class($this->operationEngine) . "] converted successfully", KalturaBatchJobStatus::MOVEFILE, $data);
-		return $this->moveFile($job, $data);
 	}
 
 	protected function getOperator(KalturaConvartableJobData $data)

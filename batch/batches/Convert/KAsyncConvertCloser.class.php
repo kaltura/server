@@ -89,42 +89,34 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 		
-		if($job->jobSubType == KalturaConversionEngineType::ENCODING_COM)
+		$operationEngine = KOperationManager::getEngine($job->jobSubType, $this->taskConfig, $data, $job, $this->kClient);
+		try 
 		{
-			$parseEngine = new KParseEngineEncodingCom($this->taskConfig);
-			$errMessage = null;
-			$status = $parseEngine->parse($data, $errMessage);
-					
-			if($errMessage == $job->message)
-				$errMessage = null;
-				
-			$log = $parseEngine->getLogData();
-			//removing unsuported XML chars 
-			$log  = preg_replace('/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u','',$log);
-			if($log && strlen($log))
+			$isDone = $operationEngine->closeOperation();
+			if(!$isDone)
 			{
-				try
-				{
-					$this->kClient->batch->logConversion($data->flavorAssetId, $log);
-				}
-				catch(Exception $e)
-				{
-					KalturaLog::err("Log conversion: " . $e->getMessage());
-				}
-			}
-				
-			if($status == KalturaBatchJobStatus::FINISHED)
-			{
-				$updateData = new KalturaConvertJobData();
-				$updateData->destFileSyncRemoteUrl = $data->destFileSyncRemoteUrl;
-				$this->updateJob($job, $errMessage, KalturaBatchJobStatus::ALMOST_DONE, $updateData);
-			}
-			else
-			{
-				return $this->closeJob($job, null, null, $errMessage, $status);
+				$message = "Conversion close in process. ";
+				if($this->operationEngine->getMessage())
+					$message = $message.$this->operationEngine->getMessage();
+				return $this->closeJob($job, null, null, $message, KalturaBatchJobStatus::ALMOST_DONE, $data);
 			}
 		}
+		catch(KOperationEngineException $e)
+		{
+			$err = "engine [" . get_class($this->operationEngine) . "] convert closer failed: " . $e->getMessage();
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CONVERSION_FAILED, $err, KalturaBatchJobStatus::FAILED);			
+		}
+			
+		if($this->taskConfig->params->isRemoteOutput)
+		{
+			return $this->handleRemoteOutput($job, $data);
+		}
+		else
+			return $this->closeJob($job, null, null, "Conversion finished", KalturaBatchJobStatus::FINISHED, $data);
+	}
 	
+	private function handleRemoteOutput(KalturaBatchJob $job, KalturaConvertJobData $data)
+	{
 		if($job->executionAttempts > 1) // is a retry
 		{
 			if(strlen($data->destFileSyncLocalPath) && file_exists($data->destFileSyncLocalPath))
@@ -132,11 +124,9 @@ class KAsyncConvertCloser extends KJobCloserWorker
 				return $this->moveFile($job, $data);
 			}
 		}
-		
 		// creates a temp file path
 		$uniqid = uniqid('convert_');
 		$data->destFileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid;
-	
 		$err = null;
 		if(!$this->fetchFile($data->destFileSyncRemoteUrl, $data->destFileSyncLocalPath, $err))
 		{
@@ -145,6 +135,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		$this->fetchFile($data->logFileSyncRemoteUrl, $data->logFileSyncLocalPath);
 		
 		return $this->moveFile($job, $data);
+		
 	}
 	
 	private function moveFile(KalturaBatchJob $job, KalturaConvertJobData $data)

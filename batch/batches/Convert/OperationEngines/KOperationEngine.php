@@ -51,6 +51,16 @@ abstract class KOperationEngine
 	 * @var KalturaClient
 	 */
 	protected $client;
+
+	/**
+	 * @var KalturaConvartableJobData
+	 */
+	protected $data = null;
+
+	/**
+	 * @var KalturaBatchJob
+	 */
+	protected $job = null;
 	
 	protected function __construct($cmd = null)
 	{
@@ -59,8 +69,10 @@ abstract class KOperationEngine
 	
 	abstract protected function getCmdLine();
 	
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
+	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaBatchJob $job, KalturaClient $client)
 	{
+		$this->data = $data;
+		$this->job = $job;
 		$this->client = $client;
 		$this->setMediaInfoEnabled($taskConfig->params->mediaInfoEnabled);
 	}
@@ -71,8 +83,15 @@ abstract class KOperationEngine
 		$this->inFilePath = $inFilePath;
 		$this->configFilePath = $configFilePath;
 		
-		$this->doOperation();
+		$status = $this->doOperation();
+		if($status === false) 	return false; //return false if the engine has a closer
+		else 					return true;
 	}	
+	
+	public function closeOperation()
+	{
+		return $this->doCloseOperation();
+	}
 	
 	protected function doOperation()
 	{
@@ -111,6 +130,11 @@ abstract class KOperationEngine
 				throw new KOperationEngineException("return value: [$return_value]");
 		}
 		$this->logMediaInfo($this->outFilesPath);
+	}
+	
+	protected function doCloseOperation()
+	{
+		return true;
 	}
 	
 	/**

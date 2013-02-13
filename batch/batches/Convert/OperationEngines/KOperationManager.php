@@ -9,16 +9,17 @@ class KOperationManager
 	 * @param int $type
 	 * @param KSchedularTaskConfig $taskConfig
 	 * @param KalturaConvartableJobData $data
+	 * @param KalturaBatchJob $job
 	 * @param KalturaClient $client
 	 * @return KOperationEngine
 	 */
-	public static function getEngine($type, KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
+	public static function getEngine($type, KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaBatchJob $job, KalturaClient $client)
 	{
 		$engine = self::createNewEngine($type, $taskConfig, $data);
 		if(!$engine)
 			return null;
 			
-		$engine->configure($taskConfig, $data, $client);
+		$engine->configure($taskConfig, $data, $job, $client);
 		return $engine;
 	}
 	
@@ -33,7 +34,7 @@ class KOperationManager
 		// TODO - remove after old version deprecated
 		/*
 		 * The 'flavorParamsOutput' is not set only for SL/ISM collections - that is definently old engine' flow
-		 */
+		 */		
 		if(!isset($data->flavorParamsOutput) || !$data->flavorParamsOutput->engineVersion)
 		{
 			return new KOperationEngineOldVersionWrapper($type, $taskConfig, $data);
@@ -69,7 +70,6 @@ class KOperationManager
 			if($engine)
 				return $engine;
 		}
-		
 		$engine = KalturaPluginManager::loadObject('KOperationEngine', $type, array('params' => $taskConfig->params, 'outFilePath' => $data->destFileSyncLocalPath));
 		
 		return $engine;
