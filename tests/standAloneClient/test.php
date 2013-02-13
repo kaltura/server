@@ -173,7 +173,7 @@ function executeRequest(KalturaClient $client, SimpleXMLElement $request)
 	if(isset($pluginName) && $pluginName != '') //get plugin service
 	{
 		$pluginClass = "Kaltura{$pluginName}ClientPlugin";
-		require_once __DIR__ . "/lib/KalturaPlugins/$pluginClass.php";
+		require_once realpath(__DIR__ . '/../') . "/lib/KalturaPlugins/$pluginClass.php";
 
 		$plugin = call_user_func(array($pluginClass, 'get'), $client);
 		$service = $plugin->$serviceName;
@@ -234,7 +234,7 @@ function askForUserParameter($message)
 	return trim($line);
 }
 
-require_once __DIR__ . '/lib/KalturaClient.php';
+require_once realpath(__DIR__ . '/../') . '/lib/KalturaClient.php';
 
 class KalturaStandAloneTestLogger implements IKalturaLogger
 {
