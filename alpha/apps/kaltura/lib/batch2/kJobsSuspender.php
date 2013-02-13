@@ -20,8 +20,6 @@ class kJobsSuspender {
 		$minPendingJobs = self::getSuspenderMinPendingJobs();
 		$maxPendingJobs = self::getSuspenderMaxPendingJobs();
 		
-		$con = Propel::getConnection();
-	
 		$dcId = kDataCenterMgr::getCurrentDcId();
 		$loadedKeys = array();
 	
@@ -39,7 +37,7 @@ class kJobsSuspender {
 			$jobCount = $row[BatchJobLockPeer::COUNT];
 				
 			if($jobCount > $maxPendingJobs)
-				self::suspendJobs($con, ($jobCount - $maxPendingJobs), $dcId, $partnerId, $jobType, $jobSubType);
+				self::suspendJobs(($jobCount - $maxPendingJobs), $dcId, $partnerId, $jobType, $jobSubType);
 		}
 	
 		// Unsuspend jobs
@@ -54,7 +52,7 @@ class kJobsSuspender {
 			$key = $partnerId . "#" . $jobType . "#" . $jobSubType;
 				
 			if(!in_array($key, $loadedKeys))
-				self::unsuspendJobs($con, ($maxPendingJobs - $minPendingJobs), $dcId, $partnerId, $jobType, $jobSubType);
+				self::unsuspendJobs(($maxPendingJobs - $minPendingJobs), $dcId, $partnerId, $jobType, $jobSubType);
 		}
 	}
 	
@@ -104,7 +102,7 @@ class kJobsSuspender {
 	/**
 	 * This function suspends up to ($limit) jobs of a given ($dc, $partnerId, $jobType, $jobSubType) 
 	 */
-	private static function suspendJobs($con, $limit, $dc, $partnerId, $jobType, $jobSubType) {
+	private static function suspendJobs($limit, $dc, $partnerId, $jobType, $jobSubType) {
 	
 		// Find IDs
 		$c = new Criteria();
@@ -136,7 +134,7 @@ class kJobsSuspender {
 	/**
 	 * This function unsuspends up to ($limit) jobs of a given ($dc, $partnerId, $jobType, $jobSubType)
 	 */
-	private static function unsuspendJobs($con, $limit, $dc, $partnerId, $jobType, $jobSubType) {
+	private static function unsuspendJobs($limit, $dc, $partnerId, $jobType, $jobSubType) {
 	
 		// Find IDs
 		$c = new Criteria();
