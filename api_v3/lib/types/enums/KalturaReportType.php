@@ -29,8 +29,8 @@ class KalturaReportType extends KalturaEnum
 	const PARTNER_USAGE = 201; 
 	const VAR_USAGE = 19;
 	const TOP_CREATORS = 20;
-	const REPORT_TYPE_PLATFORMS = 21;
-	const REPORT_TYPE_OPERATION_SYSTEM = 22;
-	const REPORT_TYPE_BROWSERS = 23;
+	const PLATFORMS = 21;
+	const OPERATION_SYSTEM = 22;
+	const BROWSERS = 23;
 	
 }
