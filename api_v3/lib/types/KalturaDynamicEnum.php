@@ -14,9 +14,7 @@ abstract class KalturaDynamicEnum extends KalturaStringEnum implements IKalturaD
 			$enums = $pluginInstance->getEnums($baseEnumName);
 			foreach($enums as $enum)
 			{
-				// TODO remove call_user_func after moving to php 5.3
-				$additionalDescriptions = call_user_func(array($enum, 'getAdditionalDescriptions'));
-				// $additionalDescriptions = $enum::getAdditionalDescriptions();
+				$additionalDescriptions = $enum::getAdditionalDescriptions();
 				foreach($additionalDescriptions as $key => $description)
 					$descriptions[$key] = $description;
 			}
