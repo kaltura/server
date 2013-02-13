@@ -4,6 +4,8 @@ var Preview = kmc.Preview || {};
 
 // Set generator
 Preview.generator = new kEmbedCodeGenerator({
+	host: kmc.vars.embed_host,
+	securedHost: kmc.vars.embed_host_https,
 	partnerId: kmc.vars.partner_id
 });
 
