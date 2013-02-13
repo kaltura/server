@@ -6,6 +6,11 @@
 class KalturaAkamaiUniversalProvisionJobData extends KalturaProvisionJobData
 {
 	/**
+	 * @var int
+	 */
+	public $streamId;
+	
+	/**
 	 * @var string
 	 */
 	public $systemUserName;
@@ -52,6 +57,7 @@ class KalturaAkamaiUniversalProvisionJobData extends KalturaProvisionJobData
 	
 	private static $map_between_objects = array
 	(
+		"streamId",
 		"systemUserName",
 		"systemPassword",
 		"domainName",

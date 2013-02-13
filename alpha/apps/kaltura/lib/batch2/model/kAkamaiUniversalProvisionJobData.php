@@ -4,6 +4,11 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 	/**
 	 * @var string
 	 */
+	protected $streamId;
+	
+	/**
+	 * @var string
+	 */
 	protected $systemUserName;
 	
 	/**
@@ -46,6 +51,20 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 	 */
 	protected $notificationEmail;
 	
+	/**
+	 * @return the $streamId
+	 */
+	public function getStreamId() {
+		return $this->streamId;
+	}
+
+	/**
+	 * @param string $streamId
+	 */
+	public function setStreamId($streamId) {
+		$this->streamId = $streamId;
+	}
+
 	/**
 	 * @return the $notificationEmail
 	 */
