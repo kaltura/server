@@ -9,8 +9,8 @@ if ($argc < 2)
 $entriesFilePath = $argv[1];
 $entries = file ( $entriesFilePath ) or die ( 'Could not read file!' );
 
-chdir('/opt/kaltura/app/scripts/');
-require_once '../bootstrap.php';
+chdir(__DIR__.'/../');
+require_once 'bootstrap.php';
 
 foreach ($entries as $deletedEntryId){
 	$deletedEntryId = trim($deletedEntryId);
