@@ -74,8 +74,11 @@ class secForm {
 		try {		
 			$conf = new KalturaConfiguration( null );
 			$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? "https://" : "http://";
-			$port=(isset($_SERVER["SERVER_PORT"]))?$_SERVER["SERVER_PORT"]:80;
-			$conf->serviceUrl = $protocol . $kConf->get('www_host').':'.$port;
+			$port = null;
+			if (is_null(parse_url($kConf->get('www_host'), PHP_URL_PORT)))
+				$port=(isset($_SERVER["SERVER_PORT"]))?$_SERVER["SERVER_PORT"]:80;
+				
+			$conf->serviceUrl = $protocol . $kConf->get('www_host'). ($port ? ':'.$port : "");
 
 			$client = new KalturaClient( $conf );
 			$client->setKS( $this->Ks );
