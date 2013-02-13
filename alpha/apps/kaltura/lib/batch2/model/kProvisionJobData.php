@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.data
  */
-class kProvisionJobData extends kJobData
+abstract class kProvisionJobData extends kJobData
 {
 	/**
 	 * @var string
@@ -277,6 +277,38 @@ class kProvisionJobData extends kJobData
 	public function setStreamName($streamName)
 	{
 		$this->streamName = $streamName;
-	}	
+	}
+
+	/**
+	 * Get instance of provision job data based on the live stream entry's source type
+	 * @param int $sourceType
+	 * @return kProvisionJobData
+	 */
+	public static function getInstance($sourceType)
+	{
+		switch ($sourceType)
+		{
+			case EntrySourceType::AKAMAI_LIVE:
+				return new kAkamaiProvisionJobData();
+				break;
+			case EntrySourceType::AKAMAI_UNIVERSAL_LIVE:
+				return new kAkamaiUniversalProvisionJobData();
+				break;
+			default:
+				return KalturaPluginManager::loadObject('kProvisionJobData', $sourceType);
+				break;
+		}
+	}
 	
+	/**
+	 * Populate the data on the ProvisionJobData from the partner
+	 * @param Partner $partner
+	 */
+	abstract public function populateFromPartner (Partner $partner);
+	
+	/**
+	 * Populate relevant entry fields on the livestream entry from the job data.
+	 * @param entry $entry
+	 */
+	abstract public function populateEntryFromData (entry $entry);
 }

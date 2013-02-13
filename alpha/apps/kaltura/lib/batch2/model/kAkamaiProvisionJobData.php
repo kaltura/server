@@ -1,5 +1,5 @@
 <?php
-class kAkamaiProvisionJobData extends kProvisionJobData
+class kAkamaiProvisionJobData extends kProvisionJobData 
 {
 	/**
 	 * @var string
@@ -125,6 +125,38 @@ class kAkamaiProvisionJobData extends kProvisionJobData
 	public function setSecondaryContact($secondaryContact)
 	{
 		$this->secondaryContact = $secondaryContact;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kProvisionJobData::populateFromPartner()
+	 */
+	public function populateFromPartner(Partner $partner) 
+	{
+		$akamaiLiveParams = $partner->getAkamaiLiveParams();
+		if ($akamaiLiveParams)
+		{
+			$this->setWsdlUsername($akamaiLiveParams->getAkamaiLiveWsdlUsername());
+			$this->setWsdlPassword($akamaiLiveParams->getAkamaiLiveWsdlPassword());
+			$this->setCpcode($akamaiLiveParams->getAkamaiLiveCpcode());
+			$this->setEmailId($akamaiLiveParams->getAkamaiLiveEmailId());
+			$this->setPrimaryContact($akamaiLiveParams->getAkamaiLivePrimaryContact());
+			$this->setSecondaryContact($akamaiLiveParams->getAkamaiLiveSecondaryContact());		
+		}	
+		
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kProvisionJobData::populateEntryFromData()
+	 */
+	public function populateEntryFromData (entry $entry)
+	{
+		$entry->setStreamUsername($this->getEncoderUsername());
+		$entry->setStreamUrl($this->getRtmp());
+		$entry->setStreamRemoteId($this->getStreamID());
+		$entry->setStreamRemoteBackupId($this->getBackupStreamID());
+		$entry->setPrimaryBroadcastingUrl($this->getPrimaryBroadcastingUrl());
+		$entry->setSecondaryBroadcastingUrl($this->getSecondaryBroadcastingUrl());
+		$entry->setStreamName($this->getStreamName());
 	}
 	
 }
