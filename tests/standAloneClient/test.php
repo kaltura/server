@@ -305,7 +305,7 @@ foreach($inXml->children() as $element)
 			if ($client->isError($response))
 			{
 				echo "Executing failed for request #".($index+1)." with error [" . $response['message'] . "]\n";
-				$response = new KalturaException($response["message"], $response["code"]); // regular request will also put exception object into the result
+				throw new KalturaException($response["message"], $response["code"]);
 			}
 
 			$results[] = $response;
