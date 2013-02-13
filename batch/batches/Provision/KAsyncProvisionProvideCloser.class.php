@@ -20,8 +20,14 @@ class KAsyncProvisionProvideCloser extends KJobCloserWorker
 	 * @see KBatchBase::getJobType()
 	 */
 	protected function getJobType() {
-		return KalturaBatchJobType::PROVISION_PROVIDE;
+		return self::getType();
 		
+	}
+	
+
+	public static function getType()
+	{
+		return KalturaBatchJobType::PROVISION_PROVIDE;
 	}
 
 	protected function closeProvisionProvide (KalturaBatchJob $job)
