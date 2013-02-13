@@ -85,7 +85,7 @@ Preview.closeModal = function(el) {
 
 Preview.generateIframe = function(embedCode, container) {
 
-	var style = '<style>html, body {margin: 0; padding: 0; width: 100%; height: 100%; } #framePlayerContainer {margin: 0 auto; padding-top: 20px;} object, div { margin: 0 auto; }</style>';
+	var style = '<style>html, body {margin: 0; padding: 0; width: 100%; height: 100%; } #framePlayerContainer {margin: 0 auto; padding-top: 20px; text-align: center; } object, div { margin: 0 auto; }</style>';
 	var container = document.getElementById(container);	
 	container.innerHTML = '';	
 	var iframe = container.appendChild(document.createElement('iframe'));
