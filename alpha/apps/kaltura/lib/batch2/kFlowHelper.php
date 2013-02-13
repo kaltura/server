@@ -1587,17 +1587,16 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	public static function handleProvisionProvideFinished(BatchJob $dbBatchJob, kProvisionJobData $data)
+	public static function handleProvisionProvideAlmostFinished(BatchJob $dbBatchJob, kProvisionJobData $data)
 	{
 		$entry = $dbBatchJob->getEntry();
-		$entry->setStreamUsername($data->getEncoderUsername());
-		$entry->setStreamUrl($data->getRtmp());
-		$entry->setStreamRemoteId($data->getStreamID());
-		$entry->setStreamRemoteBackupId($data->getBackupStreamID());
-		$entry->setPrimaryBroadcastingUrl($data->getPrimaryBroadcastingUrl());
-		$entry->setSecondaryBroadcastingUrl($data->getSecondaryBroadcastingUrl());
-		$entry->setStreamName($data->getStreamName());
-
+		$data->populateEntryFromData($entry);
+		$entry->save();
+		return $dbBatchJob;
+	}
+	
+	public static function handleProvisionProvideFinished(BatchJob $dbBatchJob, kProvisionJobData $data)
+	{
 		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::READY);
 		return $dbBatchJob;
 	}

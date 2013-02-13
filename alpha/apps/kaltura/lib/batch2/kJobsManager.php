@@ -213,29 +213,11 @@ class kJobsManager
 	
 	public static function addProvisionProvideJob(BatchJob $parentJob = null, entry $entry)
 	{
-		$subType = $entry->getSource();
-		if ($subType == entry::ENTRY_MEDIA_SOURCE_AKAMAI_LIVE)
-		{
-			$partner = $entry->getPartner();
-			if (!is_null($partner))
-			{
-				$jobData = new kAkamaiProvisionJobData();
-				$akamaiLiveParams = $partner->getAkamaiLiveParams();
-				if ($akamaiLiveParams)
-				{
-					$jobData->setWsdlUsername($akamaiLiveParams->getAkamaiLiveWsdlUsername());
-					$jobData->setWsdlPassword($akamaiLiveParams->getAkamaiLiveWsdlPassword());
-					$jobData->setCpcode($akamaiLiveParams->getAkamaiLiveCpcode());
-					$jobData->setEmailId($akamaiLiveParams->getAkamaiLiveEmailId());
-					$jobData->setPrimaryContact($akamaiLiveParams->getAkamaiLivePrimaryContact());
-					$jobData->setSecondaryContact($akamaiLiveParams->getAkamaiLiveSecondaryContact());		
-				}		
-			}
-		}
-		else
-		{
-			$jobData = new kProvisionJobData();
-		}
+		$sourceType = $entry->getSource();
+		$jobData = kProvisionJobData::getInstance($sourceType);
+		$partner = $entry->getPartner();
+		$jobData->populateFromPartner($partner);
+		
  		$jobData->setEncoderIP($entry->getEncodingIP1());
  		$jobData->setBackupEncoderIP($entry->getEncodingIP2());
  		$jobData->setEncoderPassword($entry->getStreamPassword());
@@ -246,7 +228,7 @@ class kJobsManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild(BatchJobType::PROVISION_PROVIDE, $subType);
+			$batchJob = $parentJob->createChild(BatchJobType::PROVISION_PROVIDE, $sourceType);
 		}
 		else
 		{
@@ -257,8 +239,9 @@ class kJobsManager
 				
 		$batchJob->setObjectId($entry->getId());
 		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
-		return self::addJob($batchJob, $jobData, BatchJobType::PROVISION_PROVIDE, $subType);
+		return self::addJob($batchJob, $jobData, BatchJobType::PROVISION_PROVIDE, $sourceType);
 	}
+
 
 	/**
 	 * addConvertIsmCollectionJob creates a convert collection job 
