@@ -1,6 +1,6 @@
-<?php
+ <?php
 /**
- * Will provision new live stram.
+ * Will provision new live stream.
  *
  * 
  * @package Scheduler
@@ -59,7 +59,7 @@ class KAsyncProvisionProvide extends KJobHandlerWorker
 		$results = $engine->provide($job, $data);
 
 		if($results->status == KalturaBatchJobStatus::FINISHED)
-			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $results->data);
+			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ALMOST_DONE, $results->data);
 			
 		return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, $results->errMessage, $results->status, $results->data);
 	}
