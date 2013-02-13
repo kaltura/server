@@ -269,6 +269,7 @@ fieldset{ border:0 none; position:relative; }
 .modal .flash_only object { }
 .label_text { font-size: 12px; font-weight: bold; color: #2C2C2C; }
 .modal.preview_embed .content { padding: 0; }
+.modal .footer { text-align: center; padding: 15px; border-top: 1px solid #D4D4D4; }
 #preview_embed { padding: 0; margin: 10px auto 0; width: 500px; }
 #preview_embed a { color: #009ACC; }
 #preview_embed .hr { line-height: 1px; background: #d9d9d9; height: 1px; margin: 5px 0; }
@@ -307,26 +308,21 @@ fieldset{ border:0 none; position:relative; }
 	top:1px;
 }
 
-#previewModal { width: 95%; min-height: 600px; top: 50px; margin: 0 auto; }
+#previewModal { width: 95%; min-height: 600px; top: 60px; left: 50%; margin-left: -47.5%; margin-top: 0; margin-bottom: 0; }
 #previewModal a { color: #009ACC; }
-#previewModal .hr { border-bottom: 1px solid #e5e5e5; margin: 10px 0; }
-#previewModal .title { height: 18px; }
-#previewModal .options { 
-	background-color: #F6F6F6;
-	padding: 25px 30px 25px 20px;
-	border-right: 1px solid #D4D4D4;
-	min-height: 533px;
-}
-#previewModal .options label { display: block; }
-#previewModal .options .advance a { font-weight: bold; }
-#previewModal .options h3 { font-size: 12px; color: #454545; margin-bottom: 5px; }
 #previewModal input { width: auto; }
 #previewModal select { max-width: 100%; }
-#previewModal .help-block { font-size: 11px; }
+#previewIframe iframe { width: 100%; height: 100%; min-height: 530px; border: 0; }
+#previewModal .hr { border-top: 1px solid #ddd; border-bottom: 1px solid #fff; margin: 10px 0; }
+#previewModal .title { height: 18px; }
+#previewModal .options { background-color: #F6F6F6; padding: 30px 30px 30px 26px; border-right: 1px solid #D4D4D4; min-height: 533px; overflow-y: scroll; }
+#previewModal .options label { display: block; }
+#previewModal .options .advance a { font-weight: bold; }
+#previewModal .options h3 { font-size: 12px; color: #444; margin-bottom: 5px; }
+#previewModal .help-block { font-size: 11px; color: #999;}
 #previewModal .padBottom { margin-bottom: 10px; }
 #previewModal .modal-body { max-height: 100%; }
-#previewIframe iframe { width: 100%; height: 100%; min-height: 530px; border: 0; }
-#previewModal .embedcode { }
+#previewModal .embedcode { width: 80%; height: 14px; border-radius: 2px; }
 
 /* Twitter Bootstrap */
 .help-block {
