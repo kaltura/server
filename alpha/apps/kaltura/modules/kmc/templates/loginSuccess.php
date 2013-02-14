@@ -155,6 +155,8 @@
 </div>
 
 <script>
+// Prevent the page to be framed
+if(top != window) { top.location = window.location; }
 
 /******************************
  * 

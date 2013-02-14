@@ -1411,11 +1411,7 @@ kmc.user = {
 		var http_protocol = (kmc.vars.kmc_secured || location.protocol == 'https:') ? 'https' : 'http';
 		var from_domain = http_protocol + '://' + window.location.hostname;
 		var url = from_domain + kmc.vars.port + "/secure_form.php?action=" + action;
-		// pass in the fields
-		for(var i in fields) {
-			var fld = (fields[i]) ? fields[i] : '';
-			url += '&' + i + '=' + encodeURIComponent(fld);
-		}
+
 		// pass the parent url for the postMessage to work
 		url = url + '&parent=' + encodeURIComponent(document.location.href);
 

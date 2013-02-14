@@ -31,6 +31,9 @@ $flash_dir .= $www_host .'/'. myContentStorage::getFSFlashRootPath ();
 </div>
 
 <script type="text/javascript">
+// Prevent the page to be framed
+if(top != window) { top.location = window.location; }
+// Options
 var options = {
 	service_url: "<?php echo $service_url ?>",
 	secure_login: <?php echo (kConf::get('kmc_secured_login') || $https_enabled) ? 'true' : 'false'; ?>,

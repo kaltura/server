@@ -22,10 +22,14 @@ class secForm {
 		// Get data from cookies
 		$this->Ks = $_COOKIE['kmcks'];
 
+		// Get client
+		$client = $this->getClient();
+		$user = $client->user->get("");
+
 		// Get data from url parameters
-		$this->email = isset($_GET['email']) ? $this->clean($_GET['email']) : "";
-		$this->fname = isset($_GET['fname']) ? $this->clean($_GET['fname']) : "";
-		$this->lname = isset($_GET['lname']) ? $this->clean($_GET['lname']) : "";
+		$this->email = $user->email;
+		$this->fname = $user->firstName;
+		$this->lname = $user->lastName;
 						
 		// select which action to do
 		if( isset($_POST['do']) ) {
