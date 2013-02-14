@@ -521,18 +521,10 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 			case KalturaBatchJobType::PROVISION_PROVIDE:
 			case KalturaBatchJobType::PROVISION_DELETE:
 				$jobSubType = $dbBatchJob->getJobSubType();
-				if  ($jobSubType == KalturaSourceType::AKAMAI_LIVE)
-				{
-					$dbData = new kAkamaiProvisionJobData();
-					if(is_null($this->data))
-						$this->data = new KalturaAkamaiProvisionJobData();
-				}
-				else
-				{
-					$dbData = new kProvisionJobData();
-					if(is_null($this->data))
-						$this->data = new KalturaProvisionJobData();
-				}
+				$dbData = kAkamaiProvisionJobData::getInstance($jobSubType);
+				if(is_null($this->data))
+					$this->data = KalturaProvisionJobData::getJobDataInstance($jobSubType);
+
 				break;
 				
 			case KalturaBatchJobType::CONVERT_COLLECTION:
