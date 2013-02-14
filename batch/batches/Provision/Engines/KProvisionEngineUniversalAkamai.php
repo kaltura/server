@@ -39,9 +39,9 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 			$username = $taskConfig->params->restapi->systemUserName;
 			$password = $taskConfig->params->restapi->systemPassword;
 			$domainName = $taskConfig->params->restapi->domainName;
-			$data->primaryContact = $taskConfig->restapi->primaryContact;
-			$data->secondaryContact = $taskConfig->restapi->secondaryContact;
-			$data->notificationEmail = $taskConfig->restapi->notificationEmail;
+			$data->primaryContact = $taskConfig->params->restapi->primaryContact;
+			$data->secondaryContact = $taskConfig->params->restapi->secondaryContact;
+			$data->notificationEmail = $taskConfig->params->restapi->notificationEmail;
 		}
 		
 		KalturaLog::debug("Connecting to Akamai(username: $username, password: $password, domain: $domainName)");
