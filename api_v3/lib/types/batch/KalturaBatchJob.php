@@ -335,7 +335,11 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				
 			case 'kAkamaiProvisionJobData':
 				$this->data = new KalturaAkamaiProvisionJobData();
-				break;				
+				break;	
+
+			case 'kAkamaiUniversalProvisionJobData':
+				$this->data = new KalturaAkamaiUniversalProvisionJobData();
+				break;
 				
 			case 'kConvertCollectionJobData':
 				$this->data = new KalturaConvertCollectionJobData();
