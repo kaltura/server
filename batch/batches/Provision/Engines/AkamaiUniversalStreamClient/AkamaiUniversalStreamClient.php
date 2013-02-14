@@ -28,6 +28,7 @@ class AkamaiUniversalStreamClient
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $streamConfiguration->getXML());
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
 		curl_setopt($ch, CURLOPT_USERPWD, "{$this->systemUser}:{$this->systemPassword}");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/xml'));
 		return curl_exec($ch);
 	}
 	
