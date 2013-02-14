@@ -46,7 +46,7 @@ class KAsyncProvisionProvideCloser extends KJobCloserWorker
 		@exec("ping -w 1 $primaryEntryPoint", $output, $return);
 		if ($return)
 		{
-			return $this->updateJob($job, "No reponse from primary entry point - retry in 5 mins", KalturaBatchJobStatus::ALMOST_DONE);
+			return $this->closeJob($job, "No reponse from primary entry point - retry in 5 mins", KalturaBatchJobStatus::ALMOST_DONE);
 		}
 		
 		return $this->closeJob($job, null, null, 'Success', KalturaBatchJobStatus::FINISHED);
