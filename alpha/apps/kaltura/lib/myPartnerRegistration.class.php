@@ -85,6 +85,8 @@ class myPartnerRegistration
 		$contactPhone = kConf::get('contact_phone_number');		
 		$beginnersGuideLink = kConf::get('beginners_tutorial_url');
 		$quickStartGuideLink = kConf::get('quick_start_guide_url');
+		$uploadMediaVideoLink = kConf::get('upload_media_video_url');
+		$howToPublishVideoLink = kConf::get('how_to_publish_video_url');
 		if ( $recipient_email == null ) $recipient_email = $loginEmail;
 
 		
@@ -94,14 +96,14 @@ class myPartnerRegistration
 		}
 		
 		switch($partner_type) { // send different email for different partner types
-			case 1: // KMC signup
+			case Partner::PARTNER_TYPE_KMC: // KMC signup
 				if ($existingUser) {
 					$mailType = self::KALTURAS_EXISTING_USER_REGISTRATION_CONFIRMATION;
 					$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
 				}
 				else {
 					$mailType = self::KALTURAS_CMS_REGISTRATION_CONFIRMATION;
-					$bodyParams = array($userName, $loginEmail, $partnerId, $resetPasswordLink, $kmcLink, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+					$bodyParams = array($userName, $loginEmail, $resetPasswordLink, $partnerId, $kmcLink, $quickStartGuideLink, $uploadMediaVideoLink, $howToPublishVideoLink, $contactLink, $contactPhone);
 				}
 				break;
 			//blackboard
