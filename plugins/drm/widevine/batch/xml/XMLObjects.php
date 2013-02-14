@@ -3,13 +3,14 @@ class PackageNotifyRequest
 {
 	const FILE_URL_PREFIX = 'file://';
 	const KALTURA_PROVIDER = 'kaltura';
+	const DEFAULT_POLICY = 'default';
 	
 	private $packageName;
 	private $sourceUrl; 
 	private $targetUrl;
 	private $outputFileName;
 	private $files; 
-	private $policy = null;
+	private $policy = self::DEFAULT_POLICY;
 	private $licenseStartDate = null;
 	private $licenseEndDate = null;
 	
