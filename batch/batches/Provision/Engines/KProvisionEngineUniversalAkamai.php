@@ -66,6 +66,14 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		//Construct stream configuration
 		$streamConfiguration->streamName = $data->streamName;
 		$streamConfiguration->streamType = $data->streamType;
+		$streamConfiguration->primaryContact = $data->primaryContact;
+		$streamConfiguration->secondaryContact = $data->secondaryContact;
+		$streamConfiguration->dvrEnabled = $data->dvrEnabled;
+		$streamConfiguration->dvrWindow = $data->dvrWindow;
+		$streamConfiguration->encoderPassword = $data->encoderPassword;
+		$streamConfiguration->primaryEncodingIP = $data->encoderIP;
+		$streamConfiguration->secondaryEncodingIP = $data->backupEncoderIP;
+		$streamConfiguration->notificationEmail = $data->notificationEmail;
 		
 		$res = $this->streamClient->provisionStream($streamConfiguration);
 		if (!$res)
