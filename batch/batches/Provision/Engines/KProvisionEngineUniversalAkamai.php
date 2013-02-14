@@ -14,10 +14,10 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 	
 	protected function __construct($taskConfig, KalturaAkamaiUniversalProvisionJobData $data)
 	{
-		if (!$this->taskConfig->params->restapi->akamaiRestApiBaseServiceUrl)
+		if (!$taskConfig->params->restapi->akamaiRestApiBaseServiceUrl)
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: akamaiRestApiBaseServiceUrl is missing from worker configuration. Cannot provision stream"); 
 		
-		AkamaiUniversalStreamClient::$baseServiceUrl = $this->taskConfig->params->akamaiRestApiBaseServiceUrl;
+		AkamaiUniversalStreamClient::$baseServiceUrl = $taskConfig->params->akamaiRestApiBaseServiceUrl;
 		parent::__construct($taskConfig);
 		
 		$username = null;
@@ -36,12 +36,12 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		//if one of the params was not set, use the taskConfig data	
 		if (!$username || !$password )
 		{
-			$username = $this->taskConfig->params->restapi->systemUserName;
-			$password = $this->taskConfig->params->restapi->systemPassword;
-			$domainName = $this->taskConfig->params->restapi->domainName;
-			$data->primaryContact = $this->taskConfig->restapi->primaryContact;
-			$data->secondaryContact = $this->taskConfig->restapi->secondaryContact;
-			$data->notificationEmail = $this->taskConfig->restapi->notificationEmail;
+			$username = $taskConfig->params->restapi->systemUserName;
+			$password = $taskConfig->params->restapi->systemPassword;
+			$domainName = $taskConfig->params->restapi->domainName;
+			$data->primaryContact = $taskConfig->restapi->primaryContact;
+			$data->secondaryContact = $taskConfig->restapi->secondaryContact;
+			$data->notificationEmail = $taskConfig->restapi->notificationEmail;
 		}
 		
 		KalturaLog::debug("Connecting to Akamai(username: $username, password: $password, domain: $domainName)");
