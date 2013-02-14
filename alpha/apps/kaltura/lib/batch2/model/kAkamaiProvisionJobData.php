@@ -1,6 +1,6 @@
 <?php
 class kAkamaiProvisionJobData extends kProvisionJobData 
-{
+{ 
 	/**
 	 * @var string
 	 */
@@ -158,5 +158,20 @@ class kAkamaiProvisionJobData extends kProvisionJobData
 		$entry->setSecondaryBroadcastingUrl($this->getSecondaryBroadcastingUrl());
 		$entry->setStreamName($this->getStreamName());
 	}
+	
+	/* (non-PHPdoc)
+	 * @see kProvisionJobData::populateFromEntry()
+	 */
+	public function populateFromEntry(entry $entry) 
+	{
+		$this->setEncoderIP($entry->getEncodingIP1());
+ 		$this->setBackupEncoderIP($entry->getEncodingIP2());
+ 		$this->setEncoderPassword($entry->getStreamPassword());
+ 		$this->setEncoderUsername($entry->getStreamUsername());
+ 		$this->setEndDate($entry->getEndDate(null));
+ 		$this->setMediaType($entry->getMediaType()); 
+		
+	}
+
 	
 }

@@ -307,6 +307,12 @@ abstract class kProvisionJobData extends kJobData
 	abstract public function populateFromPartner (Partner $partner);
 	
 	/**
+	 * Populate job data from entry objects
+	 * @param entry $entry
+	 */
+	abstract public function populateFromEntry (entry $entry);
+	
+	/**
 	 * Populate relevant entry fields on the livestream entry from the job data.
 	 * @param entry $entry
 	 */

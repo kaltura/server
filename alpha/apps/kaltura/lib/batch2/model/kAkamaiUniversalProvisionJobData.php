@@ -4,11 +4,6 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 	/**
 	 * @var string
 	 */
-	protected $streamId;
-	
-	/**
-	 * @var string
-	 */
 	protected $systemUserName;
 	
 	/**
@@ -50,20 +45,6 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 	 * @var string
 	 */
 	protected $notificationEmail;
-	
-	/**
-	 * @return the $streamId
-	 */
-	public function getStreamId() {
-		return $this->streamId;
-	}
-
-	/**
-	 * @param string $streamId
-	 */
-	public function setStreamId($streamId) {
-		$this->streamId = $streamId;
-	}
 
 	/**
 	 * @return the $notificationEmail
@@ -203,7 +184,7 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 			$this->systemPassword = $liveParams["systemPassword"];
 			$this->dvrEnabled = $liveParams["dvrEnabled"];
 			$this->dvrWindow = $liveParams["dvrWindow"];
-			$this->domainName = $liveParams["domainName"];
+			$this->domainName = $liveParams["domainName"]; 
 			$this->streamType = $liveParams["streamType"];
 			$this->primaryContact = $liveParams["primaryContact"];
 			$this->secondaryContact = $liveParams["secondaryContact"];
@@ -219,5 +200,20 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 		$entry->setSecondaryBroadcastingUrl($this->getSecondaryBroadcastingUrl());
 		$entry->setStreamName($this->getStreamName());
 	}
+	/* (non-PHPdoc)
+	 * @see kProvisionJobData::populateFromEntry()
+	 */
+	public function populateFromEntry(entry $entry) 
+	{
+		$this->setEncoderIP($entry->getEncodingIP1());
+ 		$this->setBackupEncoderIP($entry->getEncodingIP2());
+ 		$this->setEncoderPassword($entry->getStreamPassword());
+ 		$this->setEncoderUsername($entry->getStreamUsername());
+ 		$this->setDvrEnabled($entry->getDvrStatus());
+ 		$this->setDvrWindow($entry->getDvrWindow());
+ 		$this->setStreamType(AkamaiUniversalStreamType::UNIVERSAL_STREAMING_LIVE);
+		
+	}
+
 	
 }

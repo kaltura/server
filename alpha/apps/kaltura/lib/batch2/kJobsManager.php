@@ -218,12 +218,7 @@ class kJobsManager
 		$partner = $entry->getPartner();
 		$jobData->populateFromPartner($partner);
 		
- 		$jobData->setEncoderIP($entry->getEncodingIP1());
- 		$jobData->setBackupEncoderIP($entry->getEncodingIP2());
- 		$jobData->setEncoderPassword($entry->getStreamPassword());
- 		$jobData->setEncoderUsername($entry->getStreamUsername());
- 		$jobData->setEndDate($entry->getEndDate(null));
- 		$jobData->setMediaType($entry->getMediaType()); 		
+ 		$jobData->populateFromEntry($entry);		
  		
 		$batchJob = null;
 		if($parentJob)
