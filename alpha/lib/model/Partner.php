@@ -974,6 +974,26 @@ class Partner extends BasePartner
 		$this->putInCustomData('akamai_live_params', $content);
 	}
 	
+	/**
+	 * @return array
+	 */
+	public function getAkamaiUniversalStreamingLiveParams ()
+	{
+		$akamaiUniversalStreamingLiveParams = $this->getFromCustomData('akamai_universal_streaming_live_params');
+		if (!$akamaiUniversalStreamingLiveParams)
+			return null;
+		
+		return $akamaiUniversalStreamingLiveParams;
+	}
+	
+	/**
+	 * @param array $v
+	 */
+	public function setAkamaiUniversalStreamingLiveParams ($v)
+	{
+		$this->putInCustomData('akamai_universal_streaming_live_params', $v);
+	}
+	
 	
 	const CUSTOM_DATA_DEFAULT_LIVE_STREAM_ENTRY_SOURCE_TYPE = 'default_live_stream_entry_source_type';
 	
