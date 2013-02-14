@@ -27,16 +27,13 @@ $entry = new KalturaMediaEntry();
 $entry->name = 'sanity-test';
 $entry->description = 'sanity-test';
 $entry->mediaType = KalturaMediaType::VIDEO;
-$fileData = __DIR__ . '/media/kaltura_logo_animated_black.flv';
+
+$resource = new KalturaUrlResource();
+$resource->url = $clientConfig->serviceUrl . 'content/templates/entry/data/kaltura_logo_animated_blue.flv';
 
 $client->startMultiRequest();
 $requestEntry = $client->media->add($entry);
 /* @var $requestEntry KalturaMediaEntry */
-$requestUploadToken = $client->uploadToken->add();
-/* @var $requestUploadToken KalturaUploadToken */
-$client->uploadToken->upload($requestUploadToken->id, $fileData);
-$resource = new KalturaUploadedFileTokenResource();
-$resource->token = $requestUploadToken->id;
 $client->media->addContent($requestEntry->id, $resource);
 $client->media->get($requestEntry->id);
 
