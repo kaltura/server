@@ -17,7 +17,7 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		if (!$taskConfig->params->restapi->akamaiRestApiBaseServiceUrl)
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: akamaiRestApiBaseServiceUrl is missing from worker configuration. Cannot provision stream"); 
 		
-		AkamaiUniversalStreamClient::$baseServiceUrl = $taskConfig->params->akamaiRestApiBaseServiceUrl;
+		AkamaiUniversalStreamClient::$baseServiceUrl = $taskConfig->params->restapi->akamaiRestApiBaseServiceUrl;
 		parent::__construct($taskConfig);
 		
 		$username = null;
