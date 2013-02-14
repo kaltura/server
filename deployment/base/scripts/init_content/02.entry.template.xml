@@ -128,34 +128,15 @@
 				<fileName>SampleKalturaLogo.png</fileName>
 			</uploadToken>
 		</request>
-		<request service="uploadToken" action="add">
-			<uploadToken objectType="KalturaUploadToken">
-				<fileName>SampleKalturaLogoThumb.jpg</fileName>
-			</uploadToken>
-		</request>
-		<request service="thumbAsset" action="add">
-			<entryId>{1:result:id}</entryId>
-			<thumbAsset objectType="KalturaThumbAsset" />
-		</request>
 		<request service="uploadToken" action="upload">
 			<uploadTokenId>{2:result:id}</uploadTokenId>
 			<fileData objectType="file">media/SampleKalturaLogo.png</fileData>
-		</request>
-		<request service="uploadToken" action="upload">
-			<uploadTokenId>{3:result:id}</uploadTokenId>
-			<fileData objectType="file">media/SampleKalturaLogoThumb.jpg</fileData>
 		</request>
 		<request service="media" action="addContent">
 			<entryId>{1:result:id}</entryId>
 			<resource objectType="KalturaUploadedFileTokenResource">
 				<token>{2:result:id}</token>
 			</resource>
-		</request>
-		<request service="thumbAsset" action="setContent">
-			<id>{4:result:id}</id>
-			<contentResource objectType="KalturaUploadedFileTokenResource">
-				<token>{3:result:id}</token>
-			</contentResource>
 		</request>
 	</multirequest>
 
