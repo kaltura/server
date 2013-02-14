@@ -750,6 +750,10 @@ kmc.preview_embed = {
 
 		// Go over embed code types
 		$.each(kmc.vars.embed_code_types, function(id, item){
+			// Ignore iframe embed
+			if( id == 'iframe' ) {
+				return true;
+			}
 			// Don't add embed code that are entry only for playlists
 			if(is_playlist && this.entryOnly) {
 				clearLastEmbedType(id);
