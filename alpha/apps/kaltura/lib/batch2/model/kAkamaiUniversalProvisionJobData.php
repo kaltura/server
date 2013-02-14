@@ -212,7 +212,7 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
  		$this->setDvrEnabled($entry->getDvrStatus());
  		$this->setDvrWindow($entry->getDvrWindow());
  		$this->setStreamType(AkamaiUniversalStreamType::UNIVERSAL_STREAMING_LIVE);
- 		$this->setStreamName($entry->getStreamName());
+ 		$this->setStreamName($entry->getName());
 		
 	}
 
