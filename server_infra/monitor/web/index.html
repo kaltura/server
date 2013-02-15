@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Kaltura API Dashboard</title>
+<style type="text/css">
+
+	.dashboard{
+		width: 100%;
+	}
+	
+	.bar{
+		height: 30px;
+		background-color: green;
+	}
+	TD.field{
+		width: 200px;
+	}	
+	TD.value{
+		width: 80px;		
+	}	
+
+</style>
+<script src="js/jquery-1.8.3.js"></script>
+<script src="js/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+
+	var socket = null;
+	var percentWidth = {
+		chart1: 0,
+		chart2: 0,
+	};
+	
+	function handleCalls(chart, calls){
+
+		var percent100 = 0;
+		var sortedCalls = [];
+		for(var sentField in calls){
+			sortedCalls.push(calls[sentField]);
+		}
+		sortedCalls.sort();
+		sortedCalls.reverse();
+		
+		$('#' + chart).empty();
+		for(var i = 0; i < sortedCalls.length; i++){
+			var sentValue = sortedCalls[i];
+			var sentField;
+			for(sentField in calls){
+				if(sentValue == calls[sentField])
+					break;
+			}
+			var sentFieldId = sentField.replace(/./g, '-');
+			percent100 = Math.max(percent100, sentValue);
+			if($('#bar-tr-' + sentFieldId).size() == 0){
+				var tr = $('<tr id="bar-tr-' + sentFieldId + '"/>');
+				$('#' + chart).append(tr);
+				tr.append('<td class="field">' + sentField + '</td>');
+				tr.append('<td class="value" id="value-' + sentFieldId + '"></td>');
+				tr.append('<td><div class="bar" id="bar-' + sentFieldId + '" title="' + sentFieldId + '"/></td>');
+			}
+		}
+		var percent = percent100 / 100;
+		
+		for(var sentField in calls){
+			var sentValue = calls[sentField];
+			var sentFieldId = sentField.replace(/./g, '-');
+			var value = sentValue / percent;
+			$('#bar-' + sentFieldId).width(value * percentWidth[chart]);
+			$('#value-' + sentFieldId).text(calls[sentField]);
+		}
+	}
+	
+	function query(formId)
+	{
+		$form = $('#' + formId);
+		var name = $form.find('.name').val();
+		$('#' + name).empty();
+		
+		socket.on(name, function (calls) {
+			handleCalls(name, calls);
+		});
+		
+		var filter = $form.find('.filterField').val();
+		var filters = {};
+		if(filter.length){
+			filters[filter] = $form.find('.filterValue').val();
+			if(filter == 'partner' || filter == 'cached' || filter == 'sessionType' || filter == 'inMultiRequest')
+				filters[filter] = filters[filter] * 1;
+		}
+		
+		var query = {
+			name: name,
+			groupBy: $form.find('.groupBy').val(),
+			order: $form.find('.order').val(),
+			limit: $form.find('.limit').val() * 1,
+			units: $form.find('.units').val() * 1,
+			filters: filters
+		};
+		socket.emit('applyQuery', {query: query});
+	}
+	
+	$(function(){
+
+		percentWidth = {
+			chart1: ($('#dashboard1').width() - 300) / 100,
+			chart2: ($('#dashboard2').width() - 300) / 100,
+		};
+		
+		socket = io.connect('http://' + location.hostname + ':8001');
+		socket.on('connect', function () {
+			$('.report').attr('disabled', false);
+		});
+	});
+	
+</script>
+</head>
+<body>
+<h1>Kaltura API Dashboard</h1>
+<form id="form1">
+	<input type="hidden" class="name" value="chart1"/>
+	Group by:
+	<select class="groupBy">
+		<option value="server">server</option>
+		<option value="address">address</option>
+		<option value="partner">partner</option>
+		<option value="action">action</option>
+		<option value="cached">cached</option>
+		<option value="sessionType">session type</option>
+		<option value="inMultiRequest">in multi-request</option>
+	</select>
+	Limit:
+	<input type="text" class="limit" value="6"/>
+	Units:
+	<input type="text" class="units" value="100"/>
+	Filter field:
+	<select class="filterField">
+		<option value="">None</option>
+		<option value="server">server</option>
+		<option value="address">address</option>
+		<option value="partner">partner</option>
+		<option value="action">action</option>
+		<option value="cached">cached</option>
+		<option value="sessionType">session type</option>
+		<option value="inMultiRequest">in multi-request</option>
+	</select>
+	Filter value:
+	<input type="text" class="filterValue" value=""/>
+	<input type="checkbox" class="order" checked="checked" />Descending
+	<input type="button" value="Report" class="report" disabled="disabled" onclick="query('form1')" />
+</form>
+<table id="dashboard1" class="dashboard">
+	<tbody id="chart1">
+	</tbody>
+</table>
+<form id="form2">
+	<input type="hidden" class="name" value="chart2"/>
+	Group by:
+	<select class="groupBy">
+		<option value="server">server</option>
+		<option value="address">address</option>
+		<option value="partner">partner</option>
+		<option value="action">action</option>
+		<option value="cached">cached</option>
+		<option value="sessionType">session type</option>
+		<option value="inMultiRequest">in multi-request</option>
+	</select>
+	Limit:
+	<input type="text" class="limit" value="6"/>
+	Units:
+	<input type="text" class="units" value="100"/>
+	Filter field:
+	<select class="filterField">
+		<option value="">None</option>
+		<option value="server">server</option>
+		<option value="address">address</option>
+		<option value="partner">partner</option>
+		<option value="action">action</option>
+		<option value="cached">cached</option>
+		<option value="sessionType">session type</option>
+		<option value="inMultiRequest">in multi-request</option>
+	</select>
+	Filter value:
+	<input type="text" class="filterValue" value=""/>
+	<input type="checkbox" class="order" checked="checked" />Descending
+	<input type="button" value="Report" class="report" disabled="disabled" onclick="query('form2')" />
+</form>
+<table id="dashboard2" class="dashboard">
+	<tbody id="chart2">
+	</tbody>
+</table>
+</body>
+</html>
