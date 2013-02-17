@@ -64,12 +64,6 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	public $hlsStreamUrl;
 	
 	/**
-	 * Unique idenitifier for the string opposite the provider
-	 * @var string
-	 */
-	public $externalStreamId;
-	
-	/**
 	 * DVR Status Enabled/Disabled
 	 * @var KalturaDVRStatus
 	 */
@@ -105,7 +99,6 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 		"streamName",
 		"streamUrl",
 	    "hlsStreamUrl",
-	    "externalStreamId",
 	    "dvrStatus",
 	    "dvrWindow",
 	    "urlManager",
@@ -140,6 +133,7 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 		$bitrates = $dbObject->getStreamBitrates();
 		if(is_array($bitrates))
 			$this->bitrates = KalturaLiveStreamBitrateArray::fromLiveStreamBitrateArray($bitrates);
+		
 	}
 	
 	/* (non-PHPdoc)
@@ -158,7 +152,7 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	/* (non-PHPdoc)
 	 * @see KalturaBaseEntry::validateForInsert()
 	 */
-	public function validateForInsert()
+	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull("mediaType");
 		$this->validatePropertyNotNull("sourceType");
