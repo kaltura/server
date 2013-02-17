@@ -199,6 +199,10 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 		$entry->setPrimaryBroadcastingUrl($this->getPrimaryBroadcastingUrl());
 		$entry->setSecondaryBroadcastingUrl($this->getSecondaryBroadcastingUrl());
 		$entry->setStreamName($this->getStreamName());
+		$entry->setHlsStreamUrl("http://urtmpkal-f.akamaihd.net/i/".$this->getStreamName()."_1@".$this->getStreamID()."/master.m3u8");
+		$configs = $entry->getLiveStreamConfigurations();
+		$configs[PlaybackProtocol::AKAMAI_HDS] = "http://urtmpkal-f.akamaihd.net/z/".$this->getStreamName()."_1@".$this->getStreamID()."/manifest.f4m";
+		$entry->setLiveStreamConfigurations($configs);
 	}
 	/* (non-PHPdoc)
 	 * @see kProvisionJobData::populateFromEntry()
