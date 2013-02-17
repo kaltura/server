@@ -68,21 +68,7 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 	 */
 	public function provide(KalturaBatchJob $job, KalturaProvisionJobData $data) 
 	{
-		/* @var $data KalturaAkamaiUniversalProvisionJobData */
-		$streamConfiguration = new KalturaAkamaiUniversalStreamConfiguration();
-		//Construct stream configuration
-		$streamConfiguration->streamName = $data->streamName;
-		$streamConfiguration->streamType = $data->streamType;
-		$streamConfiguration->primaryContact = $data->primaryContact;
-		$streamConfiguration->secondaryContact = $data->secondaryContact;
-		$streamConfiguration->dvrEnabled = $data->dvrEnabled;
-		$streamConfiguration->dvrWindow = $data->dvrWindow;
-		$streamConfiguration->encoderPassword = $data->encoderPassword;
-		$streamConfiguration->primaryEncodingIP = $data->encoderIP;
-		$streamConfiguration->secondaryEncodingIP = $data->backupEncoderIP;
-		$streamConfiguration->notificationEmail = $data->notificationEmail;
-		
-		$res = $this->streamClient->provisionStream($streamConfiguration);
+		$res = $this->provisionStream($data);
 		if (!$res)
 		{
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: no result received for connection"); 
@@ -106,12 +92,7 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		{
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: ". $e->getMessage());
 		}
-		
-		$data->streamID = $streamConfiguration->id;
-		$data->primaryBroadcastingUrl = "rtmp://{$streamConfiguration->primaryEntryPoint}/EntryPoint";
-		$data->secondaryBroadcastingUrl = "rtmp://{$streamConfiguration->secondaryEntryPoint}/EntryPoint";
-		$data->encoderUsername = $streamConfiguration->encoderUserName;
-		
+
 		return new KProvisionEngineResult(KalturaBatchJobStatus::FINISHED, 'Succesfully provisioned entry', $data);
 		
 	}
@@ -159,19 +140,19 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		return $result->saveXML();
 	}
 	
-	private function fromStreamXML (SimpleXMLElement $streamXML, KalturaAkamaiUniversalProvisionJobData $data)
+	private function fromStreamXML (SimpleXMLElement $xml, KalturaAkamaiUniversalProvisionJobData $data)
 	{
-		$this->id = $this->getXMLNodeValue('stream-id', $xml);
-		if (!$this->id)
+		$data->streamID = $this->getXMLNodeValue('stream-id', $xml);
+		if (!$data->streamID)
 		{
 			throw new Exception("Necessary parameter stream-id missing from returned result");
 		}
 		
-		$this->streamName = $this->getXMLNodeValue('stream-name', $xml);
+		$data->streamName = $this->getXMLNodeValue('stream-name', $xml);
 		$encoderSettingsNodeName = 'encoder-settings';
 		$encoderSettings = $xml->$encoderSettingsNodeName;
-		$this->encoderUserName = strval($encoderSettings->username);
-		if (!$this->encoderUserName)
+		$data->encoderUserName = strval($encoderSettings->username);
+		if (!$data->encoderUserName)
 		{
 			throw new Exception("Necessary parameter [username] missing from returned result");
 		}		
@@ -191,11 +172,11 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 			}
 			if (strval($entryPoint->type) == 'Backup')
 			{
-				$this->secondaryEntryPoint = $domainName;
+				$data->secondaryBroadcastingUrl = "rtmp://".$domainName . "/EntryPoint";
 			}
 			else
 			{
-				$this->primaryEntryPoint = $domainName;
+				$data->primaryBroadcastingUrl = "rtmp://". $domainName . "/EntryPoint";
 			}
 		}
 	}
