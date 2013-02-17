@@ -179,6 +179,8 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 				$data->primaryBroadcastingUrl = "rtmp://". $domainName . "/EntryPoint";
 			}
 		}
+		
+		return $data;
 	}
 	
 	/**
@@ -196,14 +198,28 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 	 */
 	public function delete(KalturaBatchJob $job, KalturaProvisionJobData $data) 
 	{
+		KalturaLog::info("Deleting stream with ID [". $data->streamID ."]" );
+		
 		$url = self::$baseServiceUrl . "/{$this->domainName}/stream/".$data->streamID;
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION , true);
 		curl_setopt($ch, CURLOPT_USERPWD, "{$this->systemUser}:{$this->systemPassword}");
-		return curl_exec($ch);
+		$result = curl_exec($ch);
 		
+		if (!$result)
+		{
+			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: failed to call RestAPI");
+		}
+		
+		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		if($httpCode<=200 && $httpCode>300)
+		{
+			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: delete failed");
+		}
+		
+		return new KProvisionEngineResult(KalturaBatchJobStatus::FINISHED, 'Succesfully deleted stream', $data);
 	}
 
-	
 }
