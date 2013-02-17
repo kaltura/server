@@ -7,6 +7,16 @@
  */
 class KProvisionEngineUniversalAkamai extends KProvisionEngine
 {
+	public $taskConfig;
+	
+	public $systemUser;
+	
+	public $systemPassword;
+	
+	public $domainName;
+	
+	public static $baseServiceUrl;
+	
 	/**
 	 * @var AkamaiUniversalStreamClient
 	 */
@@ -17,7 +27,7 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		if (!$taskConfig->params->restapi->akamaiRestApiBaseServiceUrl)
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: akamaiRestApiBaseServiceUrl is missing from worker configuration. Cannot provision stream"); 
 		
-		AkamaiUniversalStreamClient::$baseServiceUrl = $taskConfig->params->restapi->akamaiRestApiBaseServiceUrl;
+		self::$baseServiceUrl = $taskConfig->params->restapi->akamaiRestApiBaseServiceUrl;
 		parent::__construct($taskConfig);
 		
 		$username = null;
@@ -27,25 +37,22 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		{
 			//all fields are set and are not empty string
 			if ($data->systemUserName && $data->systemPassword && $data->domainName)
-			{
-				$username = $data->systemUserName;
-				$password = $data->systemPassword;
-				$domainName = $data->domainName;
+			{ 
+				$this->systemUser = $data->systemUserName;
+				$this->systemPassword = $data->systemPassword;
+				$this->domainName = $data->domainName;
 			}
 		}
 		//if one of the params was not set, use the taskConfig data	
 		if (!$username || !$password )
 		{
-			$username = $taskConfig->params->restapi->systemUserName;
-			$password = $taskConfig->params->restapi->systemPassword;
-			$domainName = $taskConfig->params->restapi->domainName;
+			$this->systemUser = $taskConfig->params->restapi->systemUserName;
+			$this->systemPassword = $taskConfig->params->restapi->systemPassword;
+			$this->domainName = $taskConfig->params->restapi->domainName;
 			$data->primaryContact = $taskConfig->params->restapi->primaryContact;
 			$data->secondaryContact = $taskConfig->params->restapi->secondaryContact;
 			$data->notificationEmail = $taskConfig->params->restapi->notificationEmail;
 		}
-		
-		KalturaLog::debug("Connecting to Akamai(username: $username, password: $password, domain: $domainName)");
-		$this->streamClient = new AkamaiUniversalStreamClient($username, $password, $domainName);
 	}
 	
 	/* (non-PHPdoc)
@@ -93,7 +100,7 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		}
 		//Otherwise, the stream provision request probably returned OK, attempt to parse it as a new stream XML
 		try {
-			$streamConfiguration->fromXML($resultXML);
+			$data = $this->fromStreamXML($resultXML, $data);
 		}
 		catch (Exception $e)
 		{
@@ -108,12 +115,112 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		return new KProvisionEngineResult(KalturaBatchJobStatus::FINISHED, 'Succesfully provisioned entry', $data);
 		
 	}
-
+	
+	/**
+	 * Function to provision the stream using the Akamai RestAPI
+	 * @param KalturaAkamaiUniversalProvisionJobData $data
+	 * @return mixed
+	 */
+	private function provisionStream (KalturaAkamaiUniversalProvisionJobData $data)
+	{
+		$url = self::$baseServiceUrl . "/{$this->domainName}/stream";
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $this->getStreamXML($data));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
+		curl_setopt($ch, CURLOPT_USERPWD, "{$this->systemUser}:{$this->systemPassword}");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/xml'));
+		return curl_exec($ch);
+	}
+	
+	/**
+	 * Construct stream using the job data
+	 * @param KalturaAkamaiUniversalProvisionJobData $data
+	 * @return string
+	 */
+	private function getStreamXML (KalturaAkamaiUniversalProvisionJobData $data)
+	{
+		$result = new SimpleXMLElement("<stream/>");
+		$result->addChild("stream-type", $data->streamType);
+		$result->addChild("stream-name", $data->streamName);
+		$result->addChild("primary-contact-name", $data->primaryContact);
+		$result->addChild("secondary-contact-name", $data->secondaryContact);
+		$result->addChild("notification-email", $data->notificationEmail);
+		
+		$encoderSettings = $result->addChild("encoder-settings");
+		$encoderSettings->addChild("primary-encoder-ip", $data->encoderIP);
+		$encoderSettings->addChild("backup-encoder-ip", $data->backupEncoderIP);
+		$encoderSettings->addChild("password", $data->encoderPassword);
+		
+		$dvrSettings = $result->addChild("dvr-settings");
+		$dvrSettings->addChild("dvr", $data->dvrEnabled ? "Enabled" : "Disabled");
+		$dvrSettings->addChild("dvr-window", $data->dvrWindow);
+		
+		return $result->saveXML();
+	}
+	
+	private function fromStreamXML (SimpleXMLElement $streamXML, KalturaAkamaiUniversalProvisionJobData $data)
+	{
+		$this->id = $this->getXMLNodeValue('stream-id', $xml);
+		if (!$this->id)
+		{
+			throw new Exception("Necessary parameter stream-id missing from returned result");
+		}
+		
+		$this->streamName = $this->getXMLNodeValue('stream-name', $xml);
+		$encoderSettingsNodeName = 'encoder-settings';
+		$encoderSettings = $xml->$encoderSettingsNodeName;
+		$this->encoderUserName = strval($encoderSettings->username);
+		if (!$this->encoderUserName)
+		{
+			throw new Exception("Necessary parameter [username] missing from returned result");
+		}		
+		//Parse encoding primary and secondary entry points
+		$entryPoints = $xml->xpath('/stream/entrypoints/entrypoint');
+		if (!$entryPoints || !count($entryPoints))
+			throw new Exception('Necessary configurations for entry points missing from the returned result');
+			
+		foreach ($entryPoints as $entryPoint)
+		{
+			/* @var $entryPoint SimpleXMLElement */
+			$domainNodeName = 'domain-name';
+			$domainName = $entryPoint->$domainNodeName;
+			if (!$domainName)
+			{
+				throw new Exception('Necessary URL for entry point missing from the returned result');
+			}
+			if (strval($entryPoint->type) == 'Backup')
+			{
+				$this->secondaryEntryPoint = $domainName;
+			}
+			else
+			{
+				$this->primaryEntryPoint = $domainName;
+			}
+		}
+	}
+	
+	/**
+	 * @param string $nodeName
+	 * @param SimpleXMLElement $xml
+	 * @return string
+	 */
+	private function getXMLNodeValue ($nodeName, SimpleXMLElement $xml)
+	{
+		return strval($xml->$nodeName);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KProvisionEngine::delete()
 	 */
-	public function delete(KalturaBatchJob $job, KalturaProvisionJobData $data) {
-		// TODO Auto-generated method stub
+	public function delete(KalturaBatchJob $job, KalturaProvisionJobData $data) 
+	{
+		$url = self::$baseServiceUrl . "/{$this->domainName}/stream/".$data->streamID;
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
+		curl_setopt($ch, CURLOPT_USERPWD, "{$this->systemUser}:{$this->systemPassword}");
+		return curl_exec($ch);
 		
 	}
 
