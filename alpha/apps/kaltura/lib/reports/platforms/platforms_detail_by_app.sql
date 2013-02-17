@@ -1,5 +1,5 @@
 SELECT 
-	device NAME,
+	device,
 	SUM(count_plays) count_plays,
 	SUM(sum_time_viewed) sum_time_viewed,
 	SUM(avg_time_viewed) avg_time_viewed,

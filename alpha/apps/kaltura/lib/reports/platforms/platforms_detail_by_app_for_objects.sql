@@ -1,5 +1,5 @@
 SELECT 
-	os name,
+	os,
 	count_plays,
 	sum_time_viewed,
 	avg_time_viewed,

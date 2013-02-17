@@ -1,5 +1,5 @@
 SELECT 
-	b.browser name,
+	b.browser browser,
 	SUM(count_plays) count_plays,
 #	AVG(distinct_plays) distinct_plays, /* Because we don't know the real number, we use avarage instead*/
 	SUM(sum_time_viewed) sum_time_viewed,
