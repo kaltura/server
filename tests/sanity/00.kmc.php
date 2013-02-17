@@ -22,7 +22,8 @@ foreach($swfPaths as $swfPath)
 {
 	$url = $clientConfig->serviceUrl . $swfPath;
 	$ch = curl_init($url); 
-	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);   
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 	curl_setopt($ch, CURLOPT_HEADER, true);  
 	curl_setopt($ch, CURLOPT_NOBODY, true); 
 	$content = curl_exec($ch); 
