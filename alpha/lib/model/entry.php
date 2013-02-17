@@ -3066,16 +3066,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	    $this->putInCustomData("hls_stream_url", $v);
 	}
 	
-	public function getExternalStreamId ()
-	{
-	    return $this->getFromCustomData("external_stream_id");
-	}
-
-	public function setExternalStreamId ($v)
-	{
-	     $this->putInCustomData("external_stream_id", $v);  
-	}
-	
 	public function getDvrStatus ()
 	{
 	    return $this->getFromCustomData("dvr_status");
@@ -3115,4 +3105,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		return $this->getFromCustomData('live_stream_configurations', null, array());
 	}
+	
+	
 }
