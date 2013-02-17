@@ -151,8 +151,8 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		$data->streamName = $this->getXMLNodeValue('stream-name', $xml);
 		$encoderSettingsNodeName = 'encoder-settings';
 		$encoderSettings = $xml->$encoderSettingsNodeName;
-		$data->encoderUserName = strval($encoderSettings->username);
-		if (!$data->encoderUserName)
+		$data->encoderUsername = strval($encoderSettings->username);
+		if (!$data->encoderUsername)
 		{
 			throw new Exception("Necessary parameter [username] missing from returned result");
 		}		
