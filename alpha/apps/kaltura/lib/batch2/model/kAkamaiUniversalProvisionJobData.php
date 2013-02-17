@@ -195,7 +195,7 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 	public function populateEntryFromData (entry $entry)
 	{
 		$entry->setStreamUsername($this->getEncoderUsername());
-		$entry->setExternalStreamId($this->getStreamID());
+		$entry->setStreamRemoteId($this->getStreamID());
 		$entry->setPrimaryBroadcastingUrl($this->getPrimaryBroadcastingUrl());
 		$entry->setSecondaryBroadcastingUrl($this->getSecondaryBroadcastingUrl());
 		$entry->setStreamName($this->getStreamName());
