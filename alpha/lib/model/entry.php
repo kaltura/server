@@ -2535,21 +2535,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function createDownloadAsset(BatchJob $parentJob = null, $flavorParamsId, $puserId = null)
 	{
 		$job = null;
-		if ($this->getType() == entryType::MIX)
-		{
-			// if flavor params == SOURCE, or no format defined for flavor params, default to 'flv'
-			$flattenFormat = null;
-			if($flavorParamsId != 0)
-				$flattenFormat = assetParamsPeer::retrieveByPK($flavorParamsId)->getFormat();
-			if(!$flattenFormat)
-				$flattenFormat = 'flv';
-			
-			$job = myBatchFlattenClient::addJob($puserId, $this, $this->getVersion(), $flattenFormat);
-		}
-		else
+		if ($this->getType() != entryType::MIX)
 		{
 			$err = '';
 			$job = kBusinessPreConvertDL::decideAddEntryFlavor($parentJob, $this->getId(), $flavorParamsId, $err);
+		}
+		else
+		{
+			KalturaLog::err("Entry ID [".$this->getId()."] is of type mix. The batch job for flattening a mix is no longer supported");
 		}
 		
 		if($job)

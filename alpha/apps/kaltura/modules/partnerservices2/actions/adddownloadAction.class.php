@@ -115,14 +115,8 @@ class adddownloadAction extends defPartnerservices2Action
 		
 		if ( $entry->getType() == entryType::MIX  )
 		{
-			// TODO - should return the job ??
-			// the original flavor should be considered as flv in case this is a roughcut
-			if ( $file_format == "original" )	
-				$file_format = "flv";
-				
-			$job = myBatchFlattenClient::addJob($puser_id, $entry, $version, $file_format);
-			KalturaLog::log("add download Action flatten job [" . $job->getId() . "] created");
-			
+			KalturaLog::log("The Batch job for flattening a mix is no longer supported");
+			$this->addError(APIErrors::INVALID_ENTRY_TYPE, $this->getObjectPrefix(), $entry_id, $version );
 			return;
 		}
 		
