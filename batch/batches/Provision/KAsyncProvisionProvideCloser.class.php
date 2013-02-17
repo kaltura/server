@@ -35,9 +35,10 @@ class KAsyncProvisionProvideCloser extends KJobCloserWorker
 		$data = $job->data;
 		/* @var $data KalturaAkamaiUniversalProvisionJobData */
 		$primaryEntryPoint = parse_url($data->primaryBroadcastingUrl, PHP_URL_HOST);
-		if (!$primaryEntryPoint)
+		$backupEntryPoint = parse_url($data->secondaryBroadcastingUrl, PHP_URL_HOST);
+		if (!$primaryEntryPoint || !$backupEntryPoint)
 		{
-			return $this->closeJob($job, null, null, "Missing primary entry point", KalturaBatchJobStatus::FATAL);
+			return $this->closeJob($job, null, null, "Missing one or both entry points", KalturaBatchJobStatus::FATAL);
 		}
 		
 		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
@@ -47,6 +48,12 @@ class KAsyncProvisionProvideCloser extends KJobCloserWorker
 		if ($return)
 		{
 			return $this->closeJob($job, "No reponse from primary entry point - retry in 5 mins", KalturaBatchJobStatus::ALMOST_DONE);
+		}
+		
+		@exec("ping -w 1 $backupEntryPoint", $output, $return);
+		if ($return)
+		{
+			return $this->closeJob($job, "No reponse from backup entry point - retry in 5 mins", KalturaBatchJobStatus::ALMOST_DONE);
 		}
 		
 		return $this->closeJob($job, null, null, 'Success', KalturaBatchJobStatus::FINISHED);
