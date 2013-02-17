@@ -190,7 +190,7 @@ class kJobsManager
 	
 	public static function addProvisionDeleteJob(BatchJob $parentJob = null, entry $entry)
 	{
- 		$jobData = new kProvisionJobData();
+ 		$jobData = kProvisionJobData::getInstance($entry->getSource());
  		$jobData->setStreamID($entry->getStreamRemoteId());
  		$subType = $entry->getSource();
  		
