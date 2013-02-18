@@ -90,8 +90,7 @@ while($bulkUpload)
 	}
 	if($bulkUpload->status == KalturaBatchJobStatus::DONT_PROCESS)
 	{
-		echo "Bulk upload [$bulkUpload->id] weird status [DONT_PROCESS]\n";
-		exit(-1);
+		echo "Bulk upload [$bulkUpload->id] removed temporarily from the batch queue \n";
 	}
 	
 	sleep(15);
