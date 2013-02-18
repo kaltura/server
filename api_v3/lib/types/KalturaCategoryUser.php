@@ -223,4 +223,26 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	    
 	    return parent::toInsertableObject($dbObject, $skip);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate($sourceObject, $propertiesToSkip)
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = null)
+	{
+		/* @var $sourceObject categoryKuser */
+		$category = categoryPeer::retrieveByPK($sourceObject->getCategoryId());
+		if (!$category)
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $sourceObject->getCategoryId());
+			
+		if ($this->permissionNames && $this->permissionNames != $sourceObject->getPermissionNames())
+		{
+			if($sourceObject->getKuserId() == $category->getKuserId())
+			{
+				if (strpos($this->permissionNames, PermissionName::CATEGORY_EDIT))
+				{
+					throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER_OWNER);
+				}
+			}
+		}
+	}
 }
