@@ -7,7 +7,6 @@
  notifempty
  sharedscripts
  postrotate
- mv @LOG_DIR@/kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz @LOG_DIR@/`hostname`-kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz
  @APACHE_RESTART_COMMAND@
  endscript
 }
