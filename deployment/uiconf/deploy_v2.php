@@ -382,18 +382,24 @@ class uiConfDeployment
 		global $skipAddUiconf;
 		if($skipAddUiconf) return rand(1000,1200); // return just any number if the no-create flag is on 
 		
-		try
+		$pe_conf->save();
+		
+		$sync_key = $pe_conf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA);
+		$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
+		
+		$ret = null;
+		passthru("chmod 640 $localPath", $ret);
+		if($ret !== 0)
 		{
-			$pe_conf->save();
-			
-			// chmod parent directory to 777 to allow changes by the apache user
-			$sync_key = $pe_conf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA);
-			$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
-			@system('chmod 777 -R '.dirname($localPath));
+			echo "chmod [640] failed on path [$localPath]" . PHP_EOL;
+			exit(1);
 		}
-		catch(Exception $ex)
+	
+		$user_group = uiConfDeployment::$arguments['user'] . ':' . uiConfDeployment::$arguments['group'];
+		passthru("chown $user_group $localPath", $ret);
+		if($ret !== 0)
 		{
-			echo 'Exiting on ERROR: '.$ex->getMessage().PHP_EOL;
+			echo "chown [$user_group] failed on path [$localPath]" . PHP_EOL;
 			exit(1);
 		}
 
@@ -480,6 +486,25 @@ class uiConfDeployment
 		
 		$uiconf->setConfFile($conf_file);
 		$uiconf->save();
+		
+		$sync_key = $uiconf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA);
+		$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
+	
+		$ret = null;
+		passthru("chmod 640 $localPath", $ret);
+		if($ret !== 0)
+		{
+			echo "chmod [640] failed on path [$localPath]" . PHP_EOL;
+			exit(1);
+		}
+	
+		$user_group = uiConfDeployment::$arguments['user'] . ':' . uiConfDeployment::$arguments['group'];
+		passthru("chown $user_group $localPath", $ret);
+		if($ret !== 0)
+		{
+			echo "chown [$user_group] failed on path [$localPath]" . PHP_EOL;
+			exit(1);
+		}
 	}
 
 	/**
@@ -530,6 +555,8 @@ class uiConfDeployment
 		$arguments['ini']     = '';
 		$arguments['disableUrlHashing'] = false;
 		$arguments['partner'] = 0;
+		$arguments['user'] = 'apache';
+		$arguments['group'] = 'kaltura';
 	
 		/** get inputs from arguments **/
 		foreach($argv as $num => $value)
