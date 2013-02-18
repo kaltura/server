@@ -238,7 +238,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 		{
 			if($sourceObject->getKuserId() == $category->getKuserId())
 			{
-				if (!strpos($this->permissionNames, PermissionName::CATEGORY_EDIT))
+				if (strpos($this->permissionNames, PermissionName::CATEGORY_EDIT) === null)
 				{
 					throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER_OWNER);
 				}
