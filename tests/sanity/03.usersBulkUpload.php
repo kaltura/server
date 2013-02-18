@@ -60,6 +60,7 @@ $csvData = array(
 );
 
 $f = fopen($csvPath, 'w');
+fputcsv($f, array_keys(reset($csvData)));
 foreach ($csvData as $csvLine)
 	fputcsv($f, $csvLine);
 fclose($f);

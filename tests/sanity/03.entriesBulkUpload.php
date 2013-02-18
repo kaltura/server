@@ -26,7 +26,7 @@ $client->setKs($client->generateSessionV2($adminSecretForSigning, 'sanity-user',
 $csvPath = tempnam(sys_get_temp_dir(), 'csv');
 $csvData = array(
 	array(
-		'title' => 'bulk-sanity-test1',
+		'*title' => 'bulk-sanity-test1',
 		'description' => 'bulk-sanity-test1',
 		'tags' => 'sanity,test1',
 		'url' => $clientConfig->serviceUrl . 'content/templates/entry/data/kaltura_logo_animated_black.flv',
@@ -48,7 +48,7 @@ $csvData = array(
 //		'entitledUsersPublish' => '',
 	),
 	array(
-		'title' => 'bulk-sanity-test2',
+		'*title' => 'bulk-sanity-test2',
 		'description' => 'bulk-sanity-test2',
 		'tags' => 'sanity,test2',
 		'url' => $clientConfig->serviceUrl . 'content/templates/entry/data/kaltura_logo_animated_blue.flv',
@@ -72,6 +72,7 @@ $csvData = array(
 );
 
 $f = fopen($csvPath, 'w');
+fputcsv($f, array_keys(reset($csvData)));
 foreach ($csvData as $csvLine)
 	fputcsv($f, $csvLine);
 fclose($f);
