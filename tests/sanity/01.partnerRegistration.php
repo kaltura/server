@@ -13,7 +13,7 @@ $partner->adminName = 'sanity-test';
 $partner->adminEmail = 'sanity@test.com';
 $partner->description = 'sanity-test';
 $cmsPassword = uniqid('pW@4');
-$registeredPartner = $client->partner->register($partner);
+$registeredPartner = $client->partner->register($partner, $cmsPassword);
 /* @var $registeredPartner KalturaPartner */
 
 if(!$registeredPartner || !$registeredPartner->id)
