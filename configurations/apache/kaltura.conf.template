@@ -7,20 +7,7 @@
 	LogFormat "%h %l %u %t \"%r\" %>s %b %T/%D \"%{Referer}i\" \"%{User-Agent}i\" \"%{uv}C\" %a \"%{X-Kaltura}o\" \"%{HOST}i\"" vhost_kalt
 	DirectoryIndex index.html
 	
-	## Load filter module
-	LoadModule filter_module modules/mod_filter.so
-	
 	## PHP directives #################
-	php_value display_errors 0
-	php_value memory_limit 128M
-	php_value max_execution_time 60
-	php_value post_max_size 2024M
-	php_value upload_max_filesize 2000M
-	php_value variables_order EGPCS
-	php_value request_order EGPCS
-	php_value max_input_vars 10000
-	php_value upload_tmp_dir @WEB_DIR@/tmp/uploads/@KALTURA_VIRTUAL_HOST_NAME@
-	
 	php_flag magic_quotes_gpc off
 	###################################
 	
