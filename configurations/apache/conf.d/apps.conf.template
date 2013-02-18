@@ -1,0 +1,37 @@
+
+Alias /kmc "@APP_DIR@/kmc/web"
+<Directory "@APP_DIR@/kmc/web">
+    DirectoryIndex index.php
+    Options Indexes FollowSymLinks Includes
+    AllowOverride All
+    Order allow,deny
+    Allow from all
+</Directory>
+
+Alias /hosted_pages "@APP_DIR@/hosted_pages/web"
+<Directory "@APP_DIR@/hosted_pages/web">
+	DirectoryIndex index.php
+	Options Indexes FollowSymLinks Includes
+	AllowOverride All
+	Order allow,deny
+	Allow from all
+</Directory>
+
+Alias /html5 "@BASE_DIR@/html5"
+<Directory "@BASE_DIR@/html5">
+        DirectoryIndex index.php
+        Options ExecCGI -Indexes FollowSymLinks Includes
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+</Directory>
+
+Alias /apps "@BASE_DIR@/apps"
+<Directory "@BASE_DIR@/apps">
+        DirectoryIndex index.php
+        Options ExecCGI -Indexes FollowSymLinks Includes
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+</Directory>
+
