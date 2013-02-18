@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution
  * @subpackage model.data
  */
-class kDistributionRemoteMediaFile extends KalturaObject
+class kDistributionRemoteMediaFile
 {
 	/**
 	 * @var string
