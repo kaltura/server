@@ -24,9 +24,12 @@ class secForm {
 
 		// Get client
 		$client = $this->getClient();
-		$user = $client->user->get("");
+		try {
+			$user = $client->user->get("");
+		} catch( Exception $e ) {
+			die( $e->getMessage() );
+		}
 
-		// Get data from url parameters
 		$this->email = $user->email;
 		$this->fname = $user->firstName;
 		$this->lname = $user->lastName;
