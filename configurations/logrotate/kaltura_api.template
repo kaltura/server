@@ -1,29 +1,3 @@
-@LOG_DIR@/kaltura_apache_errors.log {
- rotate 5
- daily
- missingok
- compress
- dateext
- notifempty
- sharedscripts
- postrotate
- @APACHE_RESTART_COMMAND@
- endscript
-}
-
-@LOG_DIR@/kaltura_apache_access.log {
- rotate 5
- daily
- missingok
- compress
- dateext
- notifempty
- sharedscripts
- postrotate
- mv @LOG_DIR@/kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz @LOG_DIR@/`hostname`-kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz
- @APACHE_RESTART_COMMAND@
- endscript
-}
 
 @LOG_DIR@/kaltura_api_v3.log {
  rotate 5
