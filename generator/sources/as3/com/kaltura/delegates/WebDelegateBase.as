@@ -52,7 +52,7 @@ package com.kaltura.delegates {
 
 	public class WebDelegateBase extends EventDispatcher implements IKalturaCallDelegate {
 
-		public static var CONNECT_TIME:int = 60000; //60 secs
+		public static var CONNECT_TIME:int = 120000; //120 secs
 		public static var LOAD_TIME:int = 120000; //120 secs
 
 		protected var connectTimer:Timer;
