@@ -94,6 +94,7 @@ function cUrl($url, $localFilePath, &$headers, $followLocation = true)
 require_once realpath(__DIR__ . '/../../') . '/lib/KalturaClient.php';
 
 $clientConfig = new KalturaConfiguration();
+$clientConfig->partnerId = null;
 foreach($config['client'] as $field => $value)
 	$clientConfig->$field = $value;
 	
