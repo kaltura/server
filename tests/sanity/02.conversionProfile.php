@@ -13,7 +13,7 @@ require_once __DIR__ . '/lib/init.php';
  */
 $partnerId = $config['session']['partnerId'];
 $adminSecretForSigning = $config['session']['adminSecret'];
-$client->setKs($client->generateSessionV2($adminSecretForSigning, 'sanity-user', KalturaSessionType::USER, $partnerId, 86400, ''));
+$client->setKs($client->generateSessionV2($adminSecretForSigning, 'sanity-user', KalturaSessionType::ADMIN, $partnerId, 86400, ''));
 
 
 
