@@ -244,5 +244,10 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 				}
 			}
 		}
+		
+		$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($sourceObject->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
+		if(kEntitlementUtils::getEntitlementEnforcement() && 
+		(!$currentKuserCategoryKuser || !$currentKuserCategoryKuser->hasPermission(PermissionName::CATEGORY_EDIT)))
+			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER, $sourceObject->getCategoryId());
 	}
 }
