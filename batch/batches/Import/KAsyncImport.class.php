@@ -185,7 +185,7 @@ class KAsyncImport extends KJobHandlerWorker
 				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, "Error: output file doesn't exist", KalturaBatchJobStatus::RETRY);
 				return $job;
 			}
-				
+			
 			// check the file size only if its first or second retry
 			// in case it failed few times, taks the file as is
 			if($fileSize)
@@ -288,6 +288,7 @@ class KAsyncImport extends KJobHandlerWorker
             // create a temp file path 				
 			$destFile = $this->getTempFilePath($remotePath);				
 			$data->destFileLocalPath = $destFile;
+			$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 			KalturaLog::debug("destFile [$destFile]");
 			
 			// download file - overwrite local if exists
