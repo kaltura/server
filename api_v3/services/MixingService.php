@@ -309,36 +309,6 @@ class MixingService extends KalturaEntryService
 	}
 	
 	/**
-	 * Request a new flattening job, flattening is used to convert a video mix to a video file. 
-	 * 
-	 * @action requestFlattening
-	 * @param string $entryId Mix entry id
-	 * @param string $fileFormat Format to convert
-	 * @param int $version Version to flatten (If not set, latest will be used)
-	 * @return int The queued job id
-	 */
-	public function requestFlatteningAction($entryId, $fileFormat, $version = -1)
-	{
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-
-		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MIX)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-
-		// sending -1 to the flatten job causes problems
-		if ( $version <= 0 ) $version = null;
-		
-		$syncKey = $dbEntry->getSyncKey ( entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version );
-		
-		$fileSync = kFileSyncUtils::getReadyFileSyncForKey( $syncKey ,false , false); 		
-		if (!$fileSync)
-			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_VERSION, "entry", $entryId, $version);
-		
-		$job = myBatchFlattenClient::addJob($this->getKuser()->getPuserId(), $dbEntry, $version, $fileFormat);
-		
-		return $job->getId();
-	}
-	
-	/**
 	 * Get the mixes in which the media entry is included
 	 *
 	 * @action getMixesByMediaId
