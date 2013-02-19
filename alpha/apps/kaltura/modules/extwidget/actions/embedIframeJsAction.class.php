@@ -67,7 +67,16 @@ class embedIframeJsAction extends sfAction
 
 		// append uiconf_id and partner id for optimizing loading of html5 library. append them only for "standard" urls by looking for the mwEmbedLoader.php suffix
 		if (kString::endsWith($url, "mwEmbedLoader.php"))
+		{
 			$url .= "/p/$partner_id/uiconf_id/$uiconf_id";
+
+			if (!$autoEmbed) // auto embed will include any query string parameter anyway
+			{
+				$entry_id = $this->getRequestParameter('entry_id');
+				if ($entry_id)
+					$url .= "/entry_id/$entry_id";
+			}
+		}
 		
 		header("pragma:");
 		header('Content-Type: application/javascript');
