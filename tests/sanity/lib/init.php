@@ -42,7 +42,7 @@ function write_ini_file(array $config)
 
 function cUrl($url, $localFilePath, &$headers, $followLocation = true)
 {
-	KalturaLog::debug("Downloading [$url]");
+	echo "Downloading [$url]";
 	$headerFilePath = "$localFilePath.header";
 	$verboseFilePath = "$localFilePath.log";
 	
@@ -67,7 +67,7 @@ function cUrl($url, $localFilePath, &$headers, $followLocation = true)
 	fclose($chWriteHeader);
 	fclose($chStdErr);
 	
-	KalturaLog::debug(file_get_contents($verboseFilePath));
+	echo file_get_contents($verboseFilePath);
 	
 	$errCode = null;
 	$headers = array();
