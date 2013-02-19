@@ -8,5 +8,5 @@
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/scripts/utils/permissions/addPermissionsAndItems.php';
-$config = realpath(dirname(__FILE__)) . '/../../../../plugins/admin_console/config/report_service_permissions.ini';
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.adminconsole.reportadmin.ini';
 passthru("php $script $config");
