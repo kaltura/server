@@ -27,6 +27,8 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	
 	const PERMISSION_NAME_INDEX_PREFIX = "pn";
 	
+	const PERMISSION_NAME_FIELD_INDEX_PREFIX = "per";
+	
 	private static $indexFieldTypes = null;
 		
 	private static $indexFieldsMap = null;
@@ -99,10 +101,9 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		parent::setStatus($v);
 	}
 	
-	/**
-	 * Code to be run before persisting the object
-	 * @param PropelPDO $con
-	 * @return bloolean
+	
+	/* (non-PHPdoc)
+	 * @see BasecategoryKuser::preUpdate()
 	 */
 	public function preUpdate(PropelPDO $con = null)
 	{
@@ -111,6 +112,9 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		return parent::preUpdate($con);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see BaseObject::preDelete()
+	 */
 	public function preDelete(PropelPDO $con = null)
 	{
 		$this->updateCategroy(true);
@@ -118,10 +122,9 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		return parent::preDelete();	
 	}	
 	
-	/**
-	 * Code to be run before persisting the object
-	 * @param PropelPDO $con
-	 * @return bloolean
+	
+	/* (non-PHPdoc)
+	 * @see BasecategoryKuser::preInsert()
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
@@ -331,7 +334,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		foreach ($permissionNames as &$permissionName)
 			$permissionName = self::getSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionName, $this->getPartnerId());
 		
-		return implode(",", $permissionNames);
+		return self::PERMISSION_NAME_FIELD_INDEX_PREFIX.$this->getPartnerId()." ". implode(" ", $permissionNames);
 	}
 	
 	/**
