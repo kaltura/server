@@ -103,7 +103,7 @@ if(!$entryContextDataResult->isScheduledNow)
  * Gets the entry play manifest
  */
 $manifestLocalPath = tempnam(sys_get_temp_dir(), 'download');
-$manifestUrl = "{$clientConfig->serviceUrl}/p/{$createdEntry->partnerId}/sp/{$createdEntry->partnerId}00/playManifest/entryId/{$createdEntry->id}/a/a.f4m";
+$manifestUrl = "{$clientConfig->serviceUrl}p/{$createdEntry->partnerId}/sp/{$createdEntry->partnerId}00/playManifest/entryId/{$createdEntry->id}/a/a.f4m";
 $errCode = cUrl($manifestUrl, $manifestLocalPath, $headers, false);
 if($errCode != 200)
 {
@@ -146,7 +146,7 @@ if($elementsList->length != 1)
  * Gets the entry download URL
  */
 $mediaLocalPath = tempnam(sys_get_temp_dir(), 'download');
-$downloadUrl = "{$clientConfig->serviceUrl}/p/{$createdEntry->partnerId}/sp/{$createdEntry->partnerId}00/download/entry_id/{$createdEntry->id}";
+$downloadUrl = "{$clientConfig->serviceUrl}p/{$createdEntry->partnerId}/sp/{$createdEntry->partnerId}00/download/entry_id/{$createdEntry->id}";
 $errCode = cUrl($downloadUrl, $mediaLocalPath, $headers, false);
 if($errCode != 302)
 {
