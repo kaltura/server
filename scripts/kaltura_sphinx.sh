@@ -29,7 +29,7 @@ start() {
 	[ -f $config ] || exit 6
 	echo -n $"Starting $prog: "
 	# if not running, start it up here, usually something like "daemon $exec"
-	su $OS_APACHE_USER -c "$exec --config $config"
+	su $OS_KALTURA_USER -c "$exec --config $config"
 	retval=$?
 	echo
 	return $retval
