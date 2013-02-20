@@ -753,13 +753,14 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				case baseObjectFilter::NOT_CONTAINS:
 				if(strlen($val))
 					{
-						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
+						$val = is_array($val) ? $val : explode(",", $val);
+						foreach ($val as &$singleVal)
+						{
+							$singleVal = SphinxUtils::escapeString($singleVal, $fieldsEscapeType);
+						}
 						if (self::getFieldPrefix ($sphinxField))
 						{
-							if(!is_array($val))
-								$this->addMatch('@' .  $sphinxField .  ' ' . $this->getFieldPrefix ($sphinxField) . ' -' .$val);
-							else 
-								$this->addMatch('@' .  $sphinxField .  ' ' . $this->getFieldPrefix ($sphinxField) . ' -(' .implode(' | ', $val) . ')');
+							$this->addMatch('@' .  $sphinxField .  ' ' . $this->getFieldPrefix ($sphinxField) . ' -(' .implode(' | ', $val) . ')');
 						}
 						$filter->unsetByName($field);
 					}
