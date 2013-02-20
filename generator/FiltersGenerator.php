@@ -376,7 +376,8 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 			baseObjectFilter::BIT_AND => "BitAnd",
 			baseObjectFilter::BIT_OR => "BitOr",
 			baseObjectFilter::MATCH_OR => "MatchOr",
-			baseObjectFilter::MATCH_AND => "MatchAnd"
+			baseObjectFilter::MATCH_AND => "MatchAnd",
+			baseObjectFilter::NOT_CONTAINS => "NotContains",
 		);
 		
 		
