@@ -124,6 +124,20 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 	}
 	
 	/* (non-PHPdoc)
+	 * @see SphinxCriteria::getFieldPrefix()
+	 */
+	public function getFieldPrefix ($fieldName)
+	{
+		switch ($fieldName)
+		{
+			case 'permission_names':
+				return categoryKuser::PERMISSION_NAME_FIELD_INDEX_PREFIX. kCurrentContext::getCurrentPartnerId();
+		}
+
+		return null;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see SphinxCriteria::hasMatchableField()
 	 */
 	public function hasMatchableField($fieldName) {

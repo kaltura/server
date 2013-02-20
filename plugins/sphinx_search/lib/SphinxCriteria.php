@@ -750,6 +750,16 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						$filter->unsetByName($field);
 					}
 				    break;	
+				case baseObjectFilter::NOT_CONTAINS:
+				if(strlen($val))
+					{
+						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
+						if (self::getFieldPrefix ($sphinxField))
+							$this->addMatch('@' .  $sphinxField .  ' ' . $this->getFieldPrefix ($sphinxField) . ' -' .$val);
+						
+						$filter->unsetByName($field);
+					}
+					break;
 				default:
 					KalturaLog::debug("Skip field[$field] has no opertaor[$operator]");
 			}
@@ -992,5 +1002,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			KalturaLog::debug("Added [$column]");
 			$this->orderByClause[] = "$column $orderByType";
 		}
+	}
+	
+	public function getFieldPrefix ($fieldName)
+	{
+		return null;	
 	}
 }
