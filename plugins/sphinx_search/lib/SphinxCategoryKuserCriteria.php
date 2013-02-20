@@ -232,6 +232,12 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			$filter->set('_matchand_permission_names', implode(',', $permissionNamesList));
 		}
 		
+		if ($filter->get('_notcontains_permission_names'))
+		{
+			$permissionName = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $filter->get('_notcontains_permission_names'), kCurrentContext::getCurrentPartnerId());
+			$filter->set('_notcontains_permission_names', $permissionName);
+		}
+		
 		if ($filter->get('_eq_category_full_ids'))
 		{
 			$filter->set('_eq_category_full_ids', $filter->get('_eq_category_full_ids').category::FULL_IDS_EQUAL_MATCH_STRING);
