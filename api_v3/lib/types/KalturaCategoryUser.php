@@ -84,7 +84,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	/**
 	 * Set of category-related permissions for the current category user.
 	 * @var string
-	 * @filter matchand,matchor
+	 * @filter matchand,matchor,notcontains
 	 */
 	public $permissionNames;
 	

@@ -22,6 +22,7 @@ class KalturaFilter extends KalturaObject
 	const MULTI_LIKE_AND = "mlikeand";
 	const MATCH_OR = "matchor";
 	const MATCH_AND = "matchand";
+	const NOT_CONTAINS = "notcontains";
 
 	private $operator_map = array ( 
 		);

@@ -26,6 +26,7 @@ abstract class KalturaCategoryUserBaseFilter extends KalturaFilter
 		"categoryFullIdsEqual" => "_eq_category_full_ids",
 		"permissionNamesMatchAnd" => "_matchand_permission_names",
 		"permissionNamesMatchOr" => "_matchor_permission_names",
+		"permissionNamesNotContains" => "_notcontains_permission_names",
 	);
 
 	static private $order_by_map = array
@@ -135,4 +136,9 @@ abstract class KalturaCategoryUserBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $permissionNamesMatchOr;
+
+	/**
+	 * @var string
+	 */
+	public $permissionNamesNotContains;
 }
