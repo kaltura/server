@@ -29,6 +29,7 @@ class categoryKuserFilter extends baseObjectFilter
 				"_mlikeor_screen_name-puser_id",
 				"_matchor_permission_names",
 				"_matchand_permission_names",
+				"_notcontains_permission_names",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name");
