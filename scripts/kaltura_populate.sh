@@ -4,7 +4,7 @@
 echo `date`
 
 #
-# populateMgr      This shell script takes care of starting and stopping a Kaltura Sphinx Populate Service
+# populateMgr		This shell script takes care of starting and stopping a Kaltura Sphinx Populate Service
 #
 # chkconfig: 2345 13 87
 # description: Kaltura Sphinx Populate
@@ -20,9 +20,9 @@ SCRIPTEXE=populateFromLog.php
 FILE_NAME=${SCRIPTEXE%.*}
 
 if [ $# != 1 ]; then
-   echo "Usage: $0 [start|stop|restart|status]"
-   #exit 1 chages the return code because this fails the build
-   exit 0 	
+	echo "Usage: $0 [start|stop|restart|status]"
+	#exit 1 chages the return code because this fails the build
+	exit 0 	
 fi
 
 CONFIG_FILE=$APP_DIR/plugins/sphinx_search/scripts/configs/server-sphinx.php
@@ -30,26 +30,26 @@ CONFIG_FILE=$APP_DIR/plugins/sphinx_search/scripts/configs/server-sphinx.php
 LOCKFILE="$LOG_DIR/populate.pid"
 
 echo_success() {
-  [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
-  echo -n "["
-  [ "$BOOTUP" = "color" ] && $SETCOLOR_SUCCESS
-  echo -n $"  OK  "
-  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
-  echo -n "]"
-  echo -ne "\r"
-  return 0
+	[ "$BOOTUP" = "color" ] && $MOVE_TO_COL
+	echo -n "["
+	[ "$BOOTUP" = "color" ] && $SETCOLOR_SUCCESS
+	echo -n $"	OK	"
+	[ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+	echo -n "]"
+	echo -ne "\r"
+	return 0
 }
 
 echo_failure() {
-  [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
-  echo -n "["
-  [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
-  echo -n $"FAILED"
-  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
-  echo -n "]"
-  echo -ne "\r"
-  #return 1
-  return 0
+	[ "$BOOTUP" = "color" ] && $MOVE_TO_COL
+	echo -n "["
+	[ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
+	echo -n $"FAILED"
+	[ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+	echo -n "]"
+	echo -ne "\r"
+	#return 1
+	return 0
 }
 
 
@@ -64,21 +64,21 @@ start() {
 	if [ -f $LOCKFILE ]; then
 		echo_failure
 		echo
-		if [ "X$KP" != "X"  ]; then
-		   echo "Service $FILE_NAME already running"
-		   #return 1
-		   return 0
-                else
-		   echo "Service $FILE_NAME isn't running but stale lock file exists"
-	           echo "Removing stale lock file at $LOCKFILE"
-                   rm -f $LOCKFILE
-		   start_scheduler
-	           return 0
-                fi
+		if [ "X$KP" != "X" ]; then
+			echo "Service $FILE_NAME already running"
+			#return 1
+			return 0
+		else
+			echo "Service $FILE_NAME isn't running but stale lock file exists"
+			echo "Removing stale lock file at $LOCKFILE"
+			rm -f $LOCKFILE
+			start_scheduler
+			return 0
+		fi
 	else
-		if [ "X$KP" != "X"  ]; then
-          	    echo "$FILE_NAME is running as $KP without a $LOCKFILE"
-          	    exit 0
+		if [ "X$KP" != "X" ]; then
+			echo "$FILE_NAME is running as $KP without a $LOCKFILE"
+			exit 0
 		fi		
 		start_scheduler
 		return 0
@@ -86,29 +86,29 @@ start() {
 }
 
 start_scheduler() {
-		echo "$PHP_BIN $SCRIPTEXE $CONFIG_FILE >> $LOG_DIR/kaltura_populate.log 2>&1 &"
-                cd $SCRIPTDIR
-		$PHP_BIN $SCRIPTEXE $CONFIG_FILE >> $LOG_DIR/kaltura_populate.log 2>&1 &
-                if [ "$?" -eq 0 ]; then
-                        echo_success
-                        echo
-                        echo $$ > $LOCKFILE
-                else
-                        echo_failure
-                        echo
-                fi
+	echo "$PHP_BIN $SCRIPTEXE $CONFIG_FILE >> $LOG_DIR/kaltura_populate.log 2>&1 &"
+	cd $SCRIPTDIR
+	su $OS_APACHE_USER -c "$PHP_BIN $SCRIPTEXE $CONFIG_FILE >> $LOG_DIR/kaltura_populate.log 2>&1 &"
+	if [ "$?" -eq 0 ]; then
+		echo_success
+		echo
+		echo $$ > $LOCKFILE
+	else
+		echo_failure
+		echo
+	fi
 }
 
 show_status() {
-      KP=$(pgrep -P 1 -f $SCRIPTEXE) 
-      if [ "X$KP" != "X"  ]; then
-	  echo "$FILE_NAME is running as $KP ..."
-	  return 0
-      else
-          echo "Service $FILE_NAME isn't running"
-          #return 1
-          return 0
-      fi
+	KP=$(pgrep -P 1 -f $SCRIPTEXE) 
+	if [ "X$KP" != "X" ]; then
+	echo "$FILE_NAME is running as $KP ..."
+	return 0
+	else
+		echo "Service $FILE_NAME isn't running"
+		#return 1
+		return 0
+	fi
 }
 
 stop() {
@@ -136,23 +136,23 @@ stop() {
 }
 
 case "$1" in
-    start)
-        start
-        ;;
-    stop)
-        stop
-        ;;
-    status)
-        show_status
-        ;;
-    restart)
-        stop
-        start
-        ;;
-    *)
-        echo "Usage:  [start|stop|restart|status]"
-        #exit 1
-        exit 0
-        ;;
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	status)
+		show_status
+		;;
+	restart)
+		stop
+		start
+		;;
+	*)
+		echo "Usage: [start|stop|restart|status]"
+		#exit 1
+		exit 0
+		;;
 esac
 exit $?
