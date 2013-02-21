@@ -24,34 +24,34 @@ if(!$config)
 function write_ini_file(array $config)
 {
 	global $configPath;
-	
+
 	$content = array();
 	foreach($config as $section => $data)
 	{
 		if(!is_array($data) || !count($data))
 			continue;
-		
+
 		$content[] = "[$section]";
 		foreach($data as $field => $value)
 			$content[] = "$field = \"$value\"";
 		$content[] = "";
 	}
-	
+
 	file_put_contents($configPath, implode("\n", $content));
 }
 
 function cUrl($url, $localFilePath, &$headers, $followLocation = true)
 {
-	echo "Downloading [$url]";
+	echo "Downloading [$url] ";
 	$headerFilePath = "$localFilePath.header";
 	$verboseFilePath = "$localFilePath.log";
-	
+
 	$ch = curl_init();
 
 	$chFile = fopen($localFilePath, 'w');
 	$chWriteHeader = fopen($headerFilePath, 'w');
 	$chStdErr = fopen($verboseFilePath, 'w');
-	
+
 	curl_setopt($ch, CURLOPT_URL, $url);
 	//curl_setopt($ch, CURLOPT_HEADER, true);
 	curl_setopt($ch, CURLOPT_FILE, $chFile);
@@ -59,16 +59,16 @@ function cUrl($url, $localFilePath, &$headers, $followLocation = true)
 	curl_setopt($ch, CURLOPT_STDERR, $chStdErr);
 	curl_setopt($ch, CURLOPT_VERBOSE, true);
 	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $followLocation);
-	
+
 	$ret = curl_exec($ch);
 	curl_close($ch);
-	
+
 	fclose($chFile);
 	fclose($chWriteHeader);
 	fclose($chStdErr);
-	
+
 	echo file_get_contents($verboseFilePath);
-	
+
 	$errCode = null;
 	$headers = array();
 	$headerLines = file($headerFilePath);
@@ -79,15 +79,15 @@ function cUrl($url, $localFilePath, &$headers, $followLocation = true)
 			$errCode = $matches[1];
 			continue;
 		}
-		
+
 		$parts = explode(':', $header, 2);
 		if(count($parts) != 2)
 			continue;
-			
+
 		list($name, $value) = $parts;
 		$headers[trim(strtolower($name))] = trim($value);
 	}
-	
+
 	return $errCode;
 }
 
@@ -97,5 +97,5 @@ $clientConfig = new KalturaConfiguration();
 $clientConfig->partnerId = null;
 foreach($config['client'] as $field => $value)
 	$clientConfig->$field = $value;
-	
+
 $client = new KalturaClient($clientConfig);
