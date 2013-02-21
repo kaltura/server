@@ -60,13 +60,13 @@ while ($createdEntry)
 {
 	if($createdEntry->status == KalturaEntryStatus::READY)
 		break;
-		
+
 	if($createdEntry->status != KalturaEntryStatus::IMPORT && $createdEntry->status != KalturaEntryStatus::PRECONVERT)
 	{
 		echo "Entry status failed [$createdEntry->status]\n";
 		exit(-1);
 	}
-	
+
 	sleep(15);
 	$createdEntry = $client->media->get($createdEntry->id);
 }
@@ -115,7 +115,7 @@ if(!file_exists($manifestLocalPath) || !filesize($manifestLocalPath))
 	echo "Entry [$createdEntry->id] no manifest file\n";
 	exit(-1);
 }
-if(isset($headers['x-kaltura']))
+if(isset($headers['x-kaltura']) && strpos($headers['x-kaltura'], 'error-') === 0)
 {
 	echo "Entry [$createdEntry->id] manifest error: " . $headers['x-kaltura'] . "\n";
 	exit(-1);
@@ -130,7 +130,7 @@ $xml = new DOMDocument();
 $xml->loadXML(file_get_contents($manifestLocalPath));
 $context = $xml->documentElement;
 $xPath = new DOMXPath($xml);
-$xPath->registerNamespace('f4m', $context->namespaceURI); 
+$xPath->registerNamespace('f4m', $context->namespaceURI);
 $elementsList = $xPath->query("//f4m:manifest/f4m:id[string() = '{$createdEntry->id}']");
 if($elementsList->length != 1)
 {
@@ -153,7 +153,7 @@ if($errCode != 302)
 	echo "Entry [$createdEntry->id] download failed\n";
 	exit(-1);
 }
-if(isset($headers['x-kaltura']))
+if(isset($headers['x-kaltura']) && strpos($headers['x-kaltura'], 'error-') === 0)
 {
 	echo "Entry [$createdEntry->id] download error: " . $headers['x-kaltura'] . "\n";
 	exit(-1);
@@ -177,7 +177,7 @@ if(!file_exists($mediaLocalPath) || !filesize($mediaLocalPath))
 	echo "Entry [$createdEntry->id] no raw file\n";
 	exit(-1);
 }
-if(isset($headers['x-kaltura']))
+if(isset($headers['x-kaltura']) && strpos($headers['x-kaltura'], 'error-') === 0)
 {
 	echo "Entry [$createdEntry->id] raw error: " . $headers['x-kaltura'] . "\n";
 	exit(-1);
@@ -202,7 +202,7 @@ if(!file_exists($mediaLocalPath) || !filesize($mediaLocalPath))
 	echo "Entry [$createdEntry->id] no thumbnail file\n";
 	exit(-1);
 }
-if(isset($headers['x-kaltura']))
+if(isset($headers['x-kaltura']) && strpos($headers['x-kaltura'], 'error-') === 0)
 {
 	echo "Entry [$createdEntry->id] thumbnail error: " . $headers['x-kaltura'] . "\n";
 	exit(-1);
