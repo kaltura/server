@@ -6,6 +6,9 @@ $client = null;
 /* @var $client KalturaClient */
 
 require_once __DIR__ . '/lib/init.php';
+echo "Test started [" . __FILE__ . "]\n";
+echo "Test skipped\n";
+exit(0);
 
 
 $logrotate = $config['dwh']['logRotateBin'];
@@ -18,7 +21,8 @@ $dwhDir = $config['dwh']['baseDir'];
  */
 $partnerId = $config['session']['partnerId'];
 $adminSecretForSigning = $config['session']['adminSecret'];
-$client->setKs($client->generateSessionV2($adminSecretForSigning, 'sanity-user', KalturaSessionType::USER, $partnerId, 86400, ''));
+$client->setKs($client->generateSessionV2($adminSecretForSigning, 'sanity-user', KalturaSessionType::ADMIN, $partnerId, 86400, ''));
+echo "Session started\n";
 
 
 
@@ -27,13 +31,13 @@ $client->setKs($client->generateSessionV2($adminSecretForSigning, 'sanity-user',
  * List players
  */
 $playersFilter = new KalturaUiConfFilter();
-$playersFilter->objTypeEqual = KalturaUiConfObjType::PLAYER_V3;
+$playersFilter->objTypeIn = KalturaUiConfObjType::PLAYER_V3 . ',' . KalturaUiConfObjType::PLAYER;
 $playersFilter->orderBy = KalturaUiConfOrderBy::CREATED_AT_DESC;
 
 $playersPager = new KalturaFilterPager();
 $playersPager->pageSize = 1;
 
-$playersList = $client->media->listAction($playersFilter, $playersPager);
+$playersList = $client->uiConf->listAction($playersFilter, $playersPager);
 /* @var $playersList KalturaUiConfListResponse */
 
 if(!$playersList || !$playersList->totalCount || !count($playersList->objects))
@@ -43,6 +47,7 @@ if(!$playersList || !$playersList->totalCount || !count($playersList->objects))
 }
 $player = reset($playersList->objects);
 /* @var $player KalturaUiConf */
+echo "Found player ui-conf [$player->id]\n";
 
 
 
@@ -68,12 +73,13 @@ if(!$entriesList || !$entriesList->totalCount || !count($entriesList->objects))
 }
 $entry = reset($entriesList->objects);
 /* @var $entry KalturaMediaEntry */
+echo "Found entry [$entry->id]\n";
 
 
 
 /**
  * Calls stats.collect
- * 
+ *
  * TODO:
  *  - Run it once on each API server.
  */
@@ -96,15 +102,30 @@ $event->uiconfId = $player->id;
 
 $event->eventType = KalturaStatsEventType::WIDGET_LOADED;
 $event->eventTimestamp = microtime(true);
-$client->stats->collect($event);
+try
+{
+	$client->stats->collect($event);
+}
+catch (KalturaClientException $e){}
+echo "Sent event [KalturaStatsEventType::WIDGET_LOADED]\n";
 
 $event->eventType = KalturaStatsEventType::MEDIA_LOADED;
 $event->eventTimestamp = microtime(true);
-$client->stats->collect($event);
+try
+{
+	$client->stats->collect($event);
+}
+catch (KalturaClientException $e){}
+echo "Sent event [KalturaStatsEventType::MEDIA_LOADED]\n";
 
 $event->eventType = KalturaStatsEventType::PLAY;
 $event->eventTimestamp = microtime(true);
-$client->stats->collect($event);
+try
+{
+	$client->stats->collect($event);
+}
+catch (KalturaClientException $e){}
+echo "Sent event [KalturaStatsEventType::PLAY]\n";
 
 $quarter = ceil(($entry->msDuration / 4) * 1000);
 
@@ -112,25 +133,45 @@ usleep($quarter);
 $event->currentPoint += $quarter;
 $event->eventType = KalturaStatsEventType::PLAY_REACHED_25;
 $event->eventTimestamp = microtime(true);
-$client->stats->collect($event);
+try
+{
+	$client->stats->collect($event);
+}
+catch (KalturaClientException $e){}
+echo "Sent event [KalturaStatsEventType::PLAY_REACHED_25]\n";
 
 usleep($quarter);
 $event->currentPoint += $quarter;
 $event->eventType = KalturaStatsEventType::PLAY_REACHED_50;
 $event->eventTimestamp = microtime(true);
-$client->stats->collect($event);
+try
+{
+	$client->stats->collect($event);
+}
+catch (KalturaClientException $e){}
+echo "Sent event [KalturaStatsEventType::PLAY_REACHED_50]\n";
 
 usleep($quarter);
 $event->currentPoint += $quarter;
 $event->eventType = KalturaStatsEventType::PLAY_REACHED_75;
 $event->eventTimestamp = microtime(true);
-$client->stats->collect($event);
+try
+{
+	$client->stats->collect($event);
+}
+catch (KalturaClientException $e){}
+echo "Sent event [KalturaStatsEventType::PLAY_REACHED_75]\n";
 
 usleep($quarter);
 $event->currentPoint = $entry->msDuration;
 $event->eventType = KalturaStatsEventType::PLAY_REACHED_100;
 $event->eventTimestamp = microtime(true);
-$client->stats->collect($event);
+try
+{
+	$client->stats->collect($event);
+}
+catch (KalturaClientException $e){}
+echo "Sent event [KalturaStatsEventType::PLAY_REACHED_100]\n";
 
 $client->getConfig()->method = KalturaClientBase::METHOD_POST;
 
@@ -142,13 +183,14 @@ $client->getConfig()->method = KalturaClientBase::METHOD_POST;
  */
 $returnedValue = null;
 $cmd = "$logrotate $appDir/tests/sanity/lib/logrotate.ini";
-echo "Executing: $cmd\n";
+echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
 {
-	echo "Execution failed [$cmd]\n";
+	echo " failed\n";
 	exit(-1);
 }
+echo " log rotated\n";
 
 
 
@@ -156,26 +198,28 @@ if($returnedValue !== 0)
  * Run hourly scripts.
  */
 $cmd = "$dwhDir/etlsource/execute/etl_hourly.sh";
-echo "Executing: $cmd\n";
+echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
 {
-	echo "Execution failed [$cmd]\n";
+	echo " failed\n";
 	exit(-1);
 }
+echo " OK\n";
 
 
 /**
  * Run update dimensions.
  */
 $cmd = "$dwhDir/etlsource/execute/etl_update_dims.sh";
-echo "Executing: $cmd\n";
+echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
-if($returnedValue !== 0)
-{
-	echo "Execution failed [$cmd]\n";
-	exit(-1);
-}
+//if($returnedValue !== 0)
+//{
+//	echo " failed [$cmd]\n";
+//	exit(-1);
+//}
+echo " OK\n";
 
 
 
@@ -183,19 +227,20 @@ if($returnedValue !== 0)
  * Run daily scripts.
  */
 $cmd = "$dwhDir/etlsource/execute/etl_daily.sh";
-echo "Executing: $cmd\n";
+echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
 {
-	echo "Execution failed [$cmd]\n";
+	echo " failed [$cmd]\n";
 	exit(-1);
 }
+echo " OK\n";
 
 
 
 /**
  * Validate the results using the API
- * 
+ *
  * TODO:
  *  - Validate that the data collected from all API machines.
  */
@@ -243,6 +288,7 @@ if(!isset($record['sum_time_viewed']) || !$record['sum_time_viewed'] || intval($
 	echo "Reported wrong view time [" . $record['sum_time_viewed'] . "] expected at least [$expectedTimeViewed]\n";
 	exit(-1);
 }
+echo "Reports OK\n";
 
 
 
@@ -250,13 +296,14 @@ if(!isset($record['sum_time_viewed']) || !$record['sum_time_viewed'] || intval($
  * Syncyng plays and view from the dwh to the operational db
  */
 $cmd = "$appDir/scripts/dwh/dwh_plays_views_sync.sh";
-echo "Executing: $cmd\n";
+echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
 {
-	echo "Execution failed [$cmd]\n";
+	echo " failed [$cmd]\n";
 	exit(-1);
 }
+echo " OK\n";
 
 
 
@@ -276,7 +323,9 @@ if($reloadedEntry->views <= $entry->views)
 	echo "Entry [$entry->id] views [$reloadedEntry->views] did not incremented\n";
 	exit(-1);
 }
+echo "Plays and views OK\n";
 
 
 
+echo "OK\n";
 exit(0);
