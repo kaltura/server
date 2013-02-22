@@ -6,7 +6,7 @@ $client = null;
 /* @var $client KalturaClient */
 
 require_once __DIR__ . '/lib/init.php';
-
+echo "Test started [" . __FILE__ . "]\n";
 
 
 /**
@@ -15,7 +15,7 @@ require_once __DIR__ . '/lib/init.php';
 $partnerId = $config['session']['partnerId'];
 $adminSecretForSigning = $config['session']['adminSecret'];
 $client->setKs($client->generateSessionV2($adminSecretForSigning, 'sanity-user', KalturaSessionType::USER, $partnerId, 86400, ''));
-
+echo "Session started\n";
 
 
 
@@ -46,6 +46,7 @@ foreach($results as $index => $result)
 		throw new KalturaException($result["message"], $result["code"]);
 	}
 }
+echo "Entry ingested\n";
 
 
 
@@ -75,6 +76,7 @@ if(!$createdEntry)
 	echo "Entry not found\n";
 	exit(-1);
 }
+echo "Session ready\n";
 
 
 
@@ -95,6 +97,7 @@ if(!$entryContextDataResult->isScheduledNow)
 	echo "Entry [$createdEntry->id] not scheduled\n";
 	exit(-1);
 }
+echo "Context data is valid\n";
 
 
 
@@ -120,6 +123,7 @@ if(isset($headers['x-kaltura']) && strpos($headers['x-kaltura'], 'error-') === 0
 	echo "Entry [$createdEntry->id] manifest error: " . $headers['x-kaltura'] . "\n";
 	exit(-1);
 }
+echo "OK\n";
 
 
 
@@ -150,7 +154,7 @@ $downloadUrl = "{$clientConfig->serviceUrl}p/{$createdEntry->partnerId}/sp/{$cre
 $errCode = cUrl($downloadUrl, $mediaLocalPath, $headers, false);
 if($errCode != 302)
 {
-	echo "Entry [$createdEntry->id] download failed\n";
+	echo "Entry [$createdEntry->id] download redirect failed\n";
 	exit(-1);
 }
 if(isset($headers['x-kaltura']) && strpos($headers['x-kaltura'], 'error-') === 0)
@@ -158,6 +162,20 @@ if(isset($headers['x-kaltura']) && strpos($headers['x-kaltura'], 'error-') === 0
 	echo "Entry [$createdEntry->id] download error: " . $headers['x-kaltura'] . "\n";
 	exit(-1);
 }
+echo "OK\n";
+
+$errCode = cUrl($downloadUrl, $mediaLocalPath, $headers, true);
+if($errCode != 200)
+{
+	echo "Entry [$createdEntry->id] download failed\n";
+	exit(-1);
+}
+if(!file_exists($mediaLocalPath) || !filesize($mediaLocalPath))
+{
+	echo "Entry [$createdEntry->id] no download file\n";
+	exit(-1);
+}
+echo "OK\n";
 
 
 
@@ -167,6 +185,19 @@ if(isset($headers['x-kaltura']) && strpos($headers['x-kaltura'], 'error-') === 0
  */
 $mediaLocalPath = tempnam(sys_get_temp_dir(), 'raw');
 $errCode = cUrl($createdEntry->downloadUrl, $mediaLocalPath, $headers, false);
+if($errCode != 302)
+{
+	echo "Entry [$createdEntry->id] raw redirect failed\n";
+	exit(-1);
+}
+if(isset($headers['x-kaltura']) && strpos($headers['x-kaltura'], 'error-') === 0)
+{
+	echo "Entry [$createdEntry->id] raw error: " . $headers['x-kaltura'] . "\n";
+	exit(-1);
+}
+echo "OK\n";
+
+$errCode = cUrl($createdEntry->downloadUrl, $mediaLocalPath, $headers, true);
 if($errCode != 200)
 {
 	echo "Entry [$createdEntry->id] raw failed\n";
@@ -177,12 +208,7 @@ if(!file_exists($mediaLocalPath) || !filesize($mediaLocalPath))
 	echo "Entry [$createdEntry->id] no raw file\n";
 	exit(-1);
 }
-if(isset($headers['x-kaltura']) && strpos($headers['x-kaltura'], 'error-') === 0)
-{
-	echo "Entry [$createdEntry->id] raw error: " . $headers['x-kaltura'] . "\n";
-	exit(-1);
-}
-
+echo "OK\n";
 
 
 
@@ -207,10 +233,12 @@ if(isset($headers['x-kaltura']) && strpos($headers['x-kaltura'], 'error-') === 0
 	echo "Entry [$createdEntry->id] thumbnail error: " . $headers['x-kaltura'] . "\n";
 	exit(-1);
 }
+echo "OK\n";
 
 
 
 /**
  * All is SABABA
  */
+echo "OK\n";
 exit(0);
