@@ -6,6 +6,7 @@ $client = null;
 /* @var $client KalturaClient */
 
 require_once __DIR__ . '/lib/init.php';
+echo "Test started [" . __FILE__ . "]\n";
 
 
 
@@ -15,6 +16,7 @@ require_once __DIR__ . '/lib/init.php';
 $partnerId = $config['session']['partnerId'];
 $adminSecretForSigning = $config['session']['adminSecret'];
 $client->setKs($client->generateSessionV2($adminSecretForSigning, 'sanity-user', KalturaSessionType::USER, $partnerId, 86400, ''));
+echo "Session started\n";
 
 
 
@@ -79,6 +81,7 @@ fclose($f);
 
 $bulkUpload = $client->media->bulkUploadAdd($csvPath);
 /* @var $bulkUpload KalturaBulkUpload */
+echo "Bulk upload added [$bulkUpload->id]\n";
 
 $bulkUploadPlugin = KalturaBulkUploadClientPlugin::get($client);
 while($bulkUpload)
@@ -105,7 +108,7 @@ while($bulkUpload)
 	{
 		echo "Bulk upload [$bulkUpload->id] removed temporarily from the batch queue \n";
 	}
-	
+
 	sleep(15);
 	$bulkUpload = $bulkUploadPlugin->bulk->get($bulkUpload->id);
 }
@@ -119,4 +122,5 @@ if(!$bulkUpload)
 /**
  * All is SABABA
  */
+echo "OK\n";
 exit(0);
