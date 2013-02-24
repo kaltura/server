@@ -42,11 +42,14 @@ class myPartnerRegistration
 	const KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION = 56;
 	const KALTURAS_BLACKBOARD_DEFAULT_REGISTRATION_CONFIRMATION = 57;
 	
-	public function sendRegistrationInformationForPartner ($partner, $skip_emails, $existingUser )
+	public function sendRegistrationInformationForPartner ($partner, $skip_emails, $existingUser, $silent = false )
 	{
 		// email the client with this info
 		$adminKuser = kuserPeer::retrieveByPK($partner->getAccountOwnerKuserId());
-		$this->sendRegistrationInformation($partner, $adminKuser, $existingUser, null, $partner->getType());
+		if(!$silent)
+		{
+			$this->sendRegistrationInformation($partner, $adminKuser, $existingUser, null, $partner->getType());
+		}
 											
 		if ( !$skip_emails && kConf::hasParam("report_partner_registration") && kConf::get("report_partner_registration")) 
 		{											
