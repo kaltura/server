@@ -17,16 +17,6 @@ kmc.vars.api_url = window.location.protocol + '//' + kmc.vars.api_host;
 kmc.vars.min_kdp_version_for_playlist_api_v3 = '3.6.15';
 kmc.vars.min_html5_version_for_playlist_api_v3 = '1.7.1.3';
 
-// Preview Partner Defaults
-kmc.vars.previewDefaults = {
-	showAdvancedOptions: false,
-	includeKalturaLinks: kmc.vars.ignore_seo_links,
-	includeSeoMetadata: kmc.vars.ignore_entry_seo,
-	deliveryType: kmc.vars.default_delivery_type,
-	embedType: kmc.vars.default_embed_code_type,
-	secureEmbed: kmc.vars.embed_code_protocol_https
-};
-
 // Log function
 kmc.log = function() {
 	if( kmc.vars.debug && typeof console !='undefined' && console.log ){

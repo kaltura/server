@@ -2,6 +2,16 @@
 
 	var Preview = kmc.Preview || {};
 
+	// Preview Partner Defaults
+	kmc.vars.previewDefaults = {
+		showAdvancedOptions: false,
+		includeKalturaLinks: (!kmc.vars.ignore_seo_links),
+		includeSeoMetadata: (!kmc.vars.ignore_entry_seo),
+		deliveryType: kmc.vars.default_delivery_type,
+		embedType: kmc.vars.default_embed_code_type,
+		secureEmbed: kmc.vars.embed_code_protocol_https
+	};	
+
 	Preview.storageName = 'previewDefaults';
 	Preview.el = '#previewModal';
 
