@@ -98,61 +98,95 @@ if( count($allowedPartners) > 1 ) {
 	</div><!-- main -->
 <!--[if lte IE 7]>
 <script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/json2.min.js"></script>
+<script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/localStorage.min.js"></script>
 <![endif]-->
 <?php if( $previewEmbedV2 ) { ?>
-<script type="text/javascript" src="/lib/js/kmc6.js?v=<?php echo $kmc_swf_version; ?>"></script>
-<script src="/lib/js/angular-1.0.4.min.js"></script>
-<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.2.min.js"></script>
-<script src="/lib/js/jquery.qrcode.min.js"></script>
-<script src="/lib/js/preview.js"></script>
-<div id="previewModal" class="modal preview_embed">
+<div id="previewModal" class="modal preview_embed" ng-controller="PreviewCtrl">
 	<div class="title">
 		<h2></h2>
 		<span class="close icon"></span>		
 		<a class="help icon" href="javascript:kmc.utils.openHelp('section_pne');"></a>
 	</div>
-	<div class="content">
-		<div class="row-fluid" ng-controller="PreviewCtrl">
-			<div class="span4 options">
-				<label>Select Player: </label>
-				<select id="player" ng-model="player" ng-options="p.id as p.name for p in players"></select>
+	<div class="content row-fluid">
+		<div class="span4 options form-horizontal">
+			<div ng-show="liveBitrates">
+				<div class="control-group">
+					<label class="control-label">Live Bitrates: </label>
+				</div>
+				<ul ng-repeat="bitrate in liveBitrates">
+					<li>{{bitrate.bitrate}} kbps, {{bitrate.width}}x{{bitrate.height}}</li>
+				</ul>
+				<div class="hr"></div>
+			</div>
+			<div class="control-group" ng-hide="playerOnly">
+				<label class="control-label">Select Player: </label>
+				<div class="controls">
+					<select id="player" ng-model="player" ng-options="p.id as p.name for p in players"></select>
+				</div>
 				<small class="help-block">Kaltura player includes both layout and functionality (advertising, subtitles, etc)</small>
 				<div class="hr"></div>
-				<div class="padBottom advance">
-					<a ng-hide="showAdvancedOptionsStatus" ng-click="showAdvancedOptions($event, true)" href="#">Show Advanced Options<i class="pull-right icon-chevron-down"></i></a>
-					<a ng-show="showAdvancedOptionsStatus" ng-click="showAdvancedOptions($event, false)" href="#">Hide Advanced Options<i class="pull-right icon-chevron-up"></i></a>
+			</div>
+			<div class="control-group advance">
+				<div class="arrow-down pull-left" ng-hide="showAdvancedOptionsStatus"></div>
+				<a ng-hide="showAdvancedOptionsStatus" ng-click="showAdvancedOptions($event, true)" href="#">Show Advanced Options</a>
+				<div class="arrow-right pull-left" ng-show="showAdvancedOptionsStatus"></div>
+				<a ng-show="showAdvancedOptionsStatus" ng-click="showAdvancedOptions($event, false)" href="#">Hide Advanced Options</a>
+			</div>
+			<div class="hr"></div>
+			<div show-slide="showAdvancedOptionsStatus">
+				<div class="control-group" ng-hide="liveBitrates">
+					<label class="control-label">Delivery Types: </label>
+					<div class="controls"><select ng-model="deliveryType" ng-options="d.id as d.label for d in deliveryTypes"></select></div>
+					<small class="help-block">Adaptive Streaming automatically adjusts to the viewer's bandwidth,while Progressive Download allows buffering of the content. <a href="javascript:kmc.utils.openHelp('section_pne_stream');">Read more</a></small>
+					<div class="hr"></div>					
+				</div>
+				<div class="control-group">
+					<label class="control-label">Embed Types: </label>
+					<div class="controls"><select ng-model="embedType" ng-options="e.id as e.label for e in embedTypes"></select></div>
+					<small class="help-block">Auto embed is the default embed code type and is best to get a player quickly on a page without any runtime customizations. <a href="javascript:kmc.utils.openHelp('section_pne_embed');">Read more</a> about the different embed code types.</small>
 				</div>
 				<div class="hr"></div>
-				<div class="padBottom" show-slide="showAdvancedOptionsStatus">
-					<label>Delivery Types: </label>
-					<select ng-model="deliveryType" ng-options="d.id as d.label for d in deliveryTypes"></select>
-					<small class="help-block">Adaptive Streaming automatically adjusts to the viewer's bandwidth,while Progressive Download allows buffering of the content. <a href="javascript:kmc.utils.openHelp('section_pne_stream');">Read more</a></small>
-					<label>Embed Types: </label>
-					<select ng-model="embedType" ng-options="e.id as e.label for e in embedTypes"></select>
-					<small class="help-block">Auto embed is the default embed code type and is best to get a player quickly on a page without any runtime customizations. <a href="javascript:kmc.utils.openHelp('section_pne_embed');">Read more</a> about the different embed code types.</small>
-					<label><input type="checkbox" ng-model="includeSeo"> Include Search Engine Optimazation data</label>
-					<label><input type="checkbox" ng-model="secureEmbed"> Support for HTTPS embed code</label>
-					<div class="hr"></div>
+				<div class="control-group">
+					<label class="checkbox"><input type="checkbox" ng-model="includeSeo"> Include Search Engine Optimazation data</label>
+					<label class="checkbox"><input type="checkbox" ng-model="secureEmbed"> Support for HTTPS embed code</label>
 				</div>
-				<div>
-					<h3>Preview:</h3>
+				<div class="hr"></div>
+			</div>
+			<div>
+				<div class="control-group clearfix">
+					<label class="control-label">Preview: </label>
+				</div>
+				<div class="qr-block">
 					<small class="help-block">Scan the QR code the preview in your mobile device</small>
 					<div id="qrcode"></div>
 					<div class="hr"></div>
-					<small class="help-block">View a standalone page with this player</small>
-					<div class="urlBox"><a href="{{previewUrl}}" target="_blank">{{previewUrl}}</a></div>
 				</div>
-				<div class="hr"></div>
-				<h3>Embed Code:</h3>
-				<textarea class="embedcode">{{embedCode}}</textarea>
-				<button class="btn">Copy</button>
+				<small class="help-block">View a standalone page with this player</small>
+				<div class="urlBox"><a href="{{previewUrl}}" target="_blank">{{previewUrl}}</a></div>
 			</div>
-			<div class="span8">
-				<div id="previewIframe"></div>
+			<div ng-hide="previewOnly">
+				<div class="hr"></div>
+				<div class="control-group">
+					<label class="control-label">Embed Code: </label>
+				</div>
+				<div class="input-append">
+				  <input class="span2" id="embedCode" type="text" value="{{embedCode}}">
+				  <button class="btn copy-code" data-clipboard-target="embedCode">Copy</button>
+				</div>
 			</div>
 		</div>
+		<div class="span8" id="previewIframe"></div>
+	</div>
+	<div class="footer">
+		<button class="btn btn-info copy-code" data-close="true" data-clipboard-target="embedCode">{{closeButtonText}}</button>
 	</div>
 </div>
+<script src="/lib/js/angular-1.0.4.min.js"></script>
+<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.3.min.js"></script>
+<script src="/lib/js/jquery.qrcode-0.2.min.js"></script>
+<script src="/lib/js/ZeroClipboard.min.js"></script>
+<script src="/lib/js/preview.js"></script>
+<script src="/lib/js/kmc6.js?v=<?php echo $kmc_swf_version; ?>"></script>
 <?php } else { ?> 
 <script type="text/javascript" src="/lib/js/kmc5.js?v=<?php echo $kmc_swf_version; ?>"></script>
 <?php } ?>
