@@ -24,11 +24,12 @@ class PartnerService extends KalturaBaseService
 	 * @param KalturaPartner $partner
 	 * @param string $cmsPassword
 	 * @param int $templatePartnerId
+	 * @param bool $silent
 	 * @return KalturaPartner
 	 *
 	 * @throws APIErrors::PARTNER_REGISTRATION_ERROR
 	 */
-	public function registerAction( KalturaPartner $partner , $cmsPassword = "" , $templatePartnerId = null)
+	public function registerAction( KalturaPartner $partner , $cmsPassword = "" , $templatePartnerId = null, $silent = false)
 	{
 		KalturaResponseCacher::disableCache();
 		
@@ -90,7 +91,7 @@ class PartnerService extends KalturaBaseService
 			$dbPartner = PartnerPeer::retrieveByPK( $pid );
 
 			// send a confirmation email as well as the result of the service
-			$partner_registration->sendRegistrationInformationForPartner( $dbPartner , false, $existingUser );
+			$partner_registration->sendRegistrationInformationForPartner( $dbPartner , false, $existingUser, $silent );
 
 		}
 		catch ( SignupException $se )
