@@ -707,6 +707,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$thumbResource = $noParamsThumbResources[$index];
 			$thumb = $this->kClient->thumbAsset->add($updatedEntryId, $thumbAsset);
 			$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbResource);		// TODO: use thumb instead of getMultiRequestResult
+			if (strpos($thumbAsset->tags, self::DEFAULT_THUMB_TAG) !== false)
+				$this->kClient->thumbAsset->setAsDefault($thumb->id);
 		}
 		
 		$requestResults = $this->kClient->doMultiRequest();
@@ -931,9 +933,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$thumbResource = $noParamsThumbResources[$index];
 			$thumb = $this->kClient->thumbAsset->add($newEntryId, $thumbAsset, $thumbResource);
 			$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbResource);			// TODO: use thumb instead of getMultiRequestResult
+			if (strpos($thumbAsset->tags, self::DEFAULT_THUMB_TAG) !== false)
+				$this->kClient->thumbAsset->setAsDefault($thumb->id);
 		}
 							
-		$requestResults = $this->kClient->doMultiRequest();;
+		$requestResults = $this->kClient->doMultiRequest();
 		$this->unimpersonate();
 		
 		foreach($requestResults as $requestResult)
@@ -1091,12 +1095,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			if(!isset($existingthumbAssets[$thumbParamsId]))
 			{
-				$this->kClient->thumbAsset->add($entryId, $thumbAssets[$thumbParamsId]);
+				$thumbsAsset = $this->kClient->thumbAsset->add($entryId, $thumbAssets[$thumbParamsId]);
 				$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbAssetsResource);				
 			}else{
-				$this->kClient->thumbAsset->update($existingthumbAssets[$thumbParamsId], $thumbAssets[$thumbParamsId]);
+				$thumbsAsset = $this->kClient->thumbAsset->update($existingthumbAssets[$thumbParamsId], $thumbAssets[$thumbParamsId]);
 				$this->kClient->thumbAsset->setContent($existingthumbAssets[$thumbParamsId], $thumbAssetsResource);
 			}	
+			if (strpos($thumbAssetsResource->tags, self::DEFAULT_THUMB_TAG) !== false)
+				$this->kClient->thumbAsset->setAsDefault($thumAsset->id);
 		}
 		
 		$requestResults = $this->kClient->doMultiRequest();
