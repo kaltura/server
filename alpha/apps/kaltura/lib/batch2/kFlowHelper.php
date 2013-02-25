@@ -1587,11 +1587,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	public static function handleProvisionProvideAlmostFinished(BatchJob $dbBatchJob, kProvisionJobData $data)
-	{
-		return $dbBatchJob;
-	}
-	
+
 	public static function handleProvisionProvideFinished(BatchJob $dbBatchJob, kProvisionJobData $data)
 	{
 		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::READY);
