@@ -127,7 +127,7 @@ class kJobsSuspender {
 			$jobIds[] = $row['ID'];
 	
 		// Suspend chosen ids
-		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
+		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_DONT_PROCESS, BatchJob::BATCHJOB_STATUS_PENDING, false);
 		KalturaLog::info("$res jobs of partner ($partnerId) job type ($jobType / $jobSubType) on DC ($dc) were suspended");
 	}
 	
@@ -158,7 +158,7 @@ class kJobsSuspender {
 			$jobIds[] = $row['ID'];
 	
 		// Do update
-		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_PENDING);
+		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_PENDING, BatchJob::BATCHJOB_STATUS_DONT_PROCESS, true);
 		KalturaLog::info("$res jobs of partner ($partnerId) job type ($jobType / $jobSubType) on DC ($dc) were unsuspended");
 	}
 	
@@ -168,7 +168,7 @@ class kJobsSuspender {
 	 * No callbacks are called.
 	 * Returns the number of the affected rows.
 	 */
-	private static function setJobsStatus($jobIds, $status) {
+	private static function setJobsStatus($jobIds, $status, $oldStatus, $addSchedulerCond) {
 	
 		$suspenderUpdateChunk = self::getSuspenderUpdateChunk();
 		
@@ -182,6 +182,10 @@ class kJobsSuspender {
 		while($start < $end) {
 			$updateCond = new Criteria();
 			$updateCond->add(BatchJobLockPeer::ID, array_slice($jobIds, $start, min($suspenderUpdateChunk, $end - $start)), Criteria::IN);
+			$updateCond->add(BatchJobLockPeer::STATUS, $oldStatus, Criteria::EQUAL);
+			if($addSchedulerCond)
+				$updateCond->add(BatchJobLockPeer::SCHEDULER_ID, null, Criteria::ISNULL);
+			
 			$affectedRows += BasePeer::doUpdate($updateCond, $update, $con);
 			$start += $suspenderUpdateChunk;
 		}
