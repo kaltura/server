@@ -174,13 +174,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	protected static function setPermissions($filePath)
 	{
 		chmod($filePath, 0640);
-
-		$rootDir = myContentStorage::getFSContentRootPath();
-		if(strpos($filePath, $rootDir) === 0)
-		{
-			$gid = filegroup($rootDir);
-			exec("chown :$gid $filePath");
-		}
+		chgrp($filePath, kConf::get('content_group'));
 	}
 
 	protected static function fullMkdir($filePath)
@@ -189,20 +183,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if(!kFile::fullMkfileDir($dir, 0750))
 			return false;
 
-		$rootDir = myContentStorage::getFSContentRootPath();
-		if(strpos($dir, $rootDir) === 0)
-		{
-			$gid = filegroup($rootDir);
-			$leftPath = str_replace($rootDir, '', $dir);
-			$leftDirs = explode(DIRECTORY_SEPARATOR, trim($leftPath, DIRECTORY_SEPARATOR));
-			foreach($leftDirs as $leftDir)
-			{
-				$rootDir .= DIRECTORY_SEPARATOR . $leftDir;
-				if(filegroup($rootDir) != $gid)
-					exec("chown :$gid $rootDir");
-			}
-		}
-		return true;
+		return chgrp($dir, kConf::get('content_group'));
 	}
 
 	public static function moveToFile ( FileSyncKey $source_key , $target_file_path, $delete_source = true , $overwrite = true)
