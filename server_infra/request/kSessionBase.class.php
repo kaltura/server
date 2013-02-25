@@ -435,7 +435,7 @@ class kSessionBase
 				$this->$fieldMember = $fieldValue;
 				continue;
 			}
-			if ($fieldValue)
+			if (strlen($fieldValue))
 				$privileges[] = "{$fieldName}:{$fieldValue}";
 			else 
 				$privileges[] = "{$fieldName}";
