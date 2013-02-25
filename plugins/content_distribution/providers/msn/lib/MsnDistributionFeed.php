@@ -104,7 +104,7 @@ class MsnDistributionFeed
 	
 	public function setUUID($uuid)
 	{
-		kXml::setNodeValue($this->xpath,'/msn:video/msn:uuid', $uuid);
+		kXml::setNodeValue($this->_xpath,'/msn:video/msn:uuid', $uuid);
 	}
 	
 	public function addFlavorAssetsByMsnId(array $flavorAssetsByMsnId)
@@ -219,7 +219,7 @@ class MsnDistributionFeed
 	public function setNodeValueFieldConfigId($xpath, $fieldConfigId, DOMNode $contextnode = null)
 	{
 		if (isset($this->_fieldValues[$fieldConfigId]))
-			kXml::setNodeValue($this->xpath,$xpath, $this->_fieldValues[$fieldConfigId], $contextnode);
+			kXml::setNodeValue($this->_xpath,$xpath, $this->_fieldValues[$fieldConfigId], $contextnode);
 	}
 	
 	/**
@@ -283,7 +283,7 @@ class MsnDistributionFeed
 		$dateTime->setTimezone(new DateTimeZone('GMT'));
 		$date = $dateTime->format('c');
 		$date = str_replace('+00:00', 'Z', $date);
-		kXml::setNodeValue($this->xpath,$xpath, $date, $contextnode);
+		kXml::setNodeValue($this->_xpath,$xpath, $date, $contextnode);
 	}
 	
 	/**

@@ -115,7 +115,7 @@ class HuluFeedHelper
 			$segments[] = $hours.':'.$minutes.':'.$seconds.';'.$frames;
 		}
 		
-		kXml::setNodeValue($this->xpath,'/content/metadata/video/segments', implode(',', $segments));
+		kXml::setNodeValue($this->_xpath,'/content/metadata/video/segments', implode(',', $segments));
 	}
 	
 	protected function addFileNode($type, $name)
@@ -174,14 +174,14 @@ class HuluFeedHelper
 		{
 			$date = new DateTime('@'.$this->_fieldValues[$fieldConfigId], new DateTimeZone('UTC'));
 			$date = str_replace('+0000', '', $date->format(DateTime::ISO8601)); 
-			kXml::setNodeValue($this->xpath,$xpath, $date);
+			kXml::setNodeValue($this->_xpath,$xpath, $date);
 		}
 	}
 	
 	protected function setNodeValueShortDateFieldConfigId($xpath, $fieldConfigId)
 	{
 		if (isset($this->_fieldValues[$fieldConfigId]))
-			kXml::setNodeValue($this->xpath,$xpath, date('Y-m-d', $this->_fieldValues[$fieldConfigId]));
+			kXml::setNodeValue($this->_xpath,$xpath, date('Y-m-d', $this->_fieldValues[$fieldConfigId]));
 	}
 	
 	/**
@@ -191,7 +191,7 @@ class HuluFeedHelper
 	public function setNodeValueFieldConfigId($xpath, $fieldConfigId)
 	{
 		if (isset($this->_fieldValues[$fieldConfigId]))
-			kXml::setNodeValue($this->xpath,$xpath, $this->_fieldValues[$fieldConfigId]);
+			kXml::setNodeValue($this->_xpath,$xpath, $this->_fieldValues[$fieldConfigId]);
 	}
 	
 	/**

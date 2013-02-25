@@ -72,23 +72,23 @@ class QuickPlayFeed
 		if (!$this->_fieldValues) 
 			$this->_fieldValues = array();
 		
-		kXml::setNodeValue($this->xpath,'/rss/channel/title', $this->_distributionProfile->channelTitle);
-		kXml::setNodeValue($this->xpath,'/rss/channel/link', $this->_distributionProfile->channelLink);
-		kXml::setNodeValue($this->xpath,'/rss/channel/description', $this->_distributionProfile->channelDescription);
-		kXml::setNodeValue($this->xpath,'/rss/channel/managingEditor', $this->_distributionProfile->channelManagingEditor);
-		kXml::setNodeValue($this->xpath,'/rss/channel/language', $this->_distributionProfile->channelLanguage);
-		kXml::setNodeValue($this->xpath,'/rss/channel/image/title', $this->_distributionProfile->channelImageTitle);
-		kXml::setNodeValue($this->xpath,'/rss/channel/image/width', $this->_distributionProfile->channelImageWidth);
-		kXml::setNodeValue($this->xpath,'/rss/channel/image/height', $this->_distributionProfile->channelImageHeight);
-		kXml::setNodeValue($this->xpath,'/rss/channel/image/link', $this->_distributionProfile->channelImageLink);
-		kXml::setNodeValue($this->xpath,'/rss/channel/image/url', $this->_distributionProfile->channelImageUrl);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/title', $this->_distributionProfile->channelTitle);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/link', $this->_distributionProfile->channelLink);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/description', $this->_distributionProfile->channelDescription);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/managingEditor', $this->_distributionProfile->channelManagingEditor);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/language', $this->_distributionProfile->channelLanguage);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/image/title', $this->_distributionProfile->channelImageTitle);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/image/width', $this->_distributionProfile->channelImageWidth);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/image/height', $this->_distributionProfile->channelImageHeight);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/image/link', $this->_distributionProfile->channelImageLink);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/image/url', $this->_distributionProfile->channelImageUrl);
 		
-		kXml::setNodeValue($this->xpath,'/rss/channel/copyright', $this->_distributionProfile->channelCopyright);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/copyright', $this->_distributionProfile->channelCopyright);
 		$this->setNodeValueDateFieldConfigId('/rss/channel/pubDate', KalturaQuickPlayDistributionField::PUB_DATE);
 		$this->setNodeValueDate('/rss/channel/lastBuildDate', time());
-		kXml::setNodeValue($this->xpath,'/rss/channel/generator', $this->_distributionProfile->channelGenerator);
-		kXml::setNodeValue($this->xpath,'/rss/channel/rating', $this->_distributionProfile->channelRating);
-		kXml::setNodeValue($this->xpath,'/rss/channel/language', $this->_distributionProfile->channelLanguage);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/generator', $this->_distributionProfile->channelGenerator);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/rating', $this->_distributionProfile->channelRating);
+		kXml::setNodeValue($this->_xpath,'/rss/channel/language', $this->_distributionProfile->channelLanguage);
 		
 
 		$this->setNodeValueFieldConfigId('/rss/channel/item/title', KalturaQuickPlayDistributionField::TITLE);
@@ -159,7 +159,7 @@ class QuickPlayFeed
 	public function setNodeValueFieldConfigId($xpath, $fieldConfigId, DOMNode $contextnode = null)
 	{
 		if (isset($this->_fieldValues[$fieldConfigId]))
-			kXml::setNodeValue($this->xpath,$xpath, $this->_fieldValues[$fieldConfigId], $contextnode);
+			kXml::setNodeValue($this->_xpath,$xpath, $this->_fieldValues[$fieldConfigId], $contextnode);
 	}
 	
 	/**
@@ -201,7 +201,7 @@ class QuickPlayFeed
 		// force time zone to GMT
 		$dateTime->setTimezone(new DateTimeZone('GMT'));
 		$date = $dateTime->format('r');
-		kXml::setNodeValue($this->xpath,$xpath, $date, $contextnode);
+		kXml::setNodeValue($this->_xpath,$xpath, $date, $contextnode);
 	}
 
 	public function removeNodeIfEmpty($xpath)
@@ -302,7 +302,7 @@ class QuickPlayFeed
 		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
 			
 		$contentNode = $this->_enclosureNode->cloneNode(true);
-		kXml::setNodeValue($this->xpath,'@encodingProfile', $encodingProfile, $contentNode);
+		kXml::setNodeValue($this->_xpath,'@encodingProfile', $encodingProfile, $contentNode);
 		$url = $this->getAssetUrl($asset);
 		$mimeType = $this->getContentTypeFromUrl($url);
 			

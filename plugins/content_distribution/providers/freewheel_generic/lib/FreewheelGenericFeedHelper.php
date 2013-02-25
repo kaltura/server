@@ -76,8 +76,8 @@ class FreewheelGenericFeedHelper
 		}
 		$this->appendElement('/FWCoreContainer/FWVideoDocument/fwContentOwner', $contentOwner);
 		
-		kXml::setNodeValue($this->xpath,'/FWCoreContainer/@contact_email', $this->_distributionProfile->email);
-		kXml::setNodeValue($this->xpath,'/FWCoreContainer/FWVideoDocument/@video_id', $this->_fieldValues[KalturaFreewheelGenericDistributionField::VIDEO_ID]);
+		kXml::setNodeValue($this->_xpath,'/FWCoreContainer/@contact_email', $this->_distributionProfile->email);
+		kXml::setNodeValue($this->_xpath,'/FWCoreContainer/FWVideoDocument/@video_id', $this->_fieldValues[KalturaFreewheelGenericDistributionField::VIDEO_ID]);
 		
 		$this->addTitleItem('Episode Title1', KalturaFreewheelGenericDistributionField::FWTITLES_EPISODE_TITLE1);
 		$this->addTitleItem('Episode Title2', KalturaFreewheelGenericDistributionField::FWTITLES_EPISODE_TITLE2);
@@ -106,7 +106,7 @@ class FreewheelGenericFeedHelper
 		
 		$this->createAndSetByXPath('/FWCoreContainer/FWVideoDocument', 'fwRating', KalturaFreewheelGenericDistributionField::RATING);
 		
-		kXml::setNodeValue($this->xpath,'/FWCoreContainer/FWVideoDocument/fwDuration', $this->_fieldValues[KalturaFreewheelGenericDistributionField::DURATION]);
+		kXml::setNodeValue($this->_xpath,'/FWCoreContainer/FWVideoDocument/fwDuration', $this->_fieldValues[KalturaFreewheelGenericDistributionField::DURATION]);
 		$this->addDynamicMetadata();
 		
 		$this->addCuePoints($this->_providerData->cuePoints, $this->_fieldValues[KalturaFreewheelGenericDistributionField::DURATION]);
@@ -155,17 +155,17 @@ class FreewheelGenericFeedHelper
 	protected function setReplaceGroup()
 	{
 		if ($this->_distributionProfile->replaceGroup === false)
-			kXml::setNodeValue($this->xpath,'/FWCoreContainer/FWVideoDocument/fwReplaceGroup', 'false');
+			kXml::setNodeValue($this->_xpath,'/FWCoreContainer/FWVideoDocument/fwReplaceGroup', 'false');
 		else
-			kXml::setNodeValue($this->xpath,'/FWCoreContainer/FWVideoDocument/fwReplaceGroup', 'true');
+			kXml::setNodeValue($this->_xpath,'/FWCoreContainer/FWVideoDocument/fwReplaceGroup', 'true');
 	}
 	
 	protected function setReplaceAirDates()
 	{
 		if ($this->_distributionProfile->replaceAirDates === false)
-			kXml::setNodeValue($this->xpath,'/FWCoreContainer/FWVideoDocument/fwReplaceAirDates', 'false');
+			kXml::setNodeValue($this->_xpath,'/FWCoreContainer/FWVideoDocument/fwReplaceAirDates', 'false');
 		else
-			kXml::setNodeValue($this->xpath,'/FWCoreContainer/FWVideoDocument/fwReplaceAirDates', 'true');
+			kXml::setNodeValue($this->_xpath,'/FWCoreContainer/FWVideoDocument/fwReplaceAirDates', 'true');
 	}
 	
 	protected function addTitleItem($titleType, $fieldConfigId)
