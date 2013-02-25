@@ -405,7 +405,7 @@ class kXml
 		// if CDATA inside, set the value of CDATA
 		if ($node->childNodes->length > 0 && $node->childNodes->item(0)->nodeType == XML_CDATA_SECTION_NODE)
 		{
-			$node->childNodes->item(0)->nodeValue = htmlspecialchars($value,'UTF-8');
+			$node->childNodes->item(0)->nodeValue = $value;
 		}
 		else
 		{
