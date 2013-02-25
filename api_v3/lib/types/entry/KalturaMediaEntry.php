@@ -3,8 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaMediaEntry extends KalturaPlayableEntry
-{
+class KalturaMediaEntry extends KalturaPlayableEntry {
 	/**
 	 * The media type of the entry
 	 * 
@@ -22,7 +21,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * @deprecated use conversionProfileId instead
 	 */
 	public $conversionQuality;
-
+	
 	/**
 	 * The source type of the entry 
 	 *
@@ -38,7 +37,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * @insertonly
 	 */
 	public $searchProviderType;
-
+	
 	/**
 	 * The ID of the media in the importing site
 	 *
@@ -46,21 +45,21 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * @insertonly
 	 */
 	public $searchProviderId;
-
+	
 	/**
 	 * The user name used for credits
 	 *
 	 * @var string
 	 */
 	public $creditUserName;
-
+	
 	/**
 	 * The URL for credits
 	 *
 	 * @var string
 	 */
 	public $creditUrl;
-
+	
 	/**
 	 * The media date extracted from EXIF data (For images) as Unix timestamp (In seconds)
 	 *
@@ -69,7 +68,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * @filter gte,lte
 	 */
 	public $mediaDate;
-
+	
 	/**
 	 * The URL used for playback. This is not the download URL.
 	 *
@@ -87,79 +86,71 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 */
 	public $flavorParamsIds;
 	
-	private static $map_between_objects = array
-	(
-		"mediaType",
-		"conversionQuality",
-		//"sourceType", // see special logic for this field below
-		//"searchProviderType", // see special logic for this field below
-		"searchProviderId" => "sourceId",
-		"creditUserName" => "credit",
-		"creditUrl" => "siteUrl",
-	 	"partnerId",
-	 	"mediaDate",
-	 	"dataUrl", 
-		"flavorParamsIds",
-	);
-
-	public function __construct()
-	{
+	private static $map_between_objects = array ("mediaType", "conversionQuality", //"sourceType", // see special logic for this field below
+	//"searchProviderType", // see special logic for this field below
+	"searchProviderId" => "sourceId", "creditUserName" => "credit", "creditUrl" => "siteUrl", "partnerId", "mediaDate", "dataUrl", "flavorParamsIds" );
+	
+	public function __construct() {
 		$this->type = KalturaEntryType::MEDIA_CLIP;
 	}
 	
-	public function getMapBetweenObjects()
-	{
-		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	public function getMapBetweenObjects() {
+		return array_merge ( parent::getMapBetweenObjects (), self::$map_between_objects );
 	}
-
-	public function fromObject($entry)
-	{
-		parent::fromObject($entry);
-
-		$this->mediaDate = $entry->getMediaDate(null);
+	
+	public function fromObject($entry) {
+		parent::fromObject ( $entry );
 		
-		$reflect = KalturaTypeReflectorCacher::get('KalturaSourceType');
-		$constants = $reflect->getConstantsValues();
-		$sourceApi = kPluginableEnumsManager::coreToApi('EntrySourceType', $entry->getSource());
-		if(!in_array($sourceApi, $constants) || $sourceApi == EntrySourceType::SEARCH_PROVIDER)
-		{
+		$this->mediaDate = $entry->getMediaDate ( null );
+		
+		$reflect = KalturaTypeReflectorCacher::get ( 'KalturaSourceType' );
+		$constants = $reflect->getConstantsValues ();
+		$sourceApi = kPluginableEnumsManager::coreToApi ( 'EntrySourceType', $entry->getSource () );
+		if (! in_array ( $sourceApi, $constants ) || $sourceApi == EntrySourceType::SEARCH_PROVIDER) {
 			$this->sourceType = KalturaSourceType::SEARCH_PROVIDER;
 			$this->searchProviderType = $sourceApi;
-		}
-		else
-		{
+		} else {
 			$this->sourceType = $sourceApi;
 			$this->searchProviderType = null;
 		}
 	}
 	
-	public function toObject($entry = null, $a = array())
-	{
-		if(is_null($entry))
-		{
-			KalturaLog::debug("Creating new entry");
-			$entry = new entry();
+	/* (non-PHPdoc)
+	 * @see KalturaBaseEntry::toObject()
+	 */
+	public function toObject($entry = null, $a = array()) {
+		if (is_null ( $entry )) {
+			KalturaLog::debug ( "Creating new entry" );
+			$entry = new entry ();
 		}
 		
-		KalturaLog::debug("type: {$this->mediaType} , duration: {$this->msDuration}");
+		KalturaLog::debug ( "type: {$this->mediaType} , duration: {$this->msDuration}" );
 		
-		$entry = parent::toObject($entry);
+		$entry = parent::toObject ( $entry );
 		
-		if (($entry->getMediaType() == KalturaMediaType::IMAGE && $entry->msDuration) ||
-			($this->mediaType == KalturaMediaType::IMAGE && $this->msDuration))
-		{
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE, "msDuration");
-		}
-		
-		if ($this->sourceType === KalturaSourceType::SEARCH_PROVIDER)
-		{
-			$entry->setSource($this->searchProviderType);
-		}
-		else
-		{
-			$entry->setSource(kPluginableEnumsManager::apiToCore('EntrySourceType', $this->sourceType));
+		/* @var $entry entry */
+		if ($this->msDuration && ($entry->getMediaType () == KalturaMediaType::IMAGE || $this->mediaType == KalturaMediaType::IMAGE && $this->msDuration)) {
+			throw new KalturaAPIException ( KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE, "msDuration" );
 		}
 		
 		return $entry;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toInsertableObject($object_to_fill, $props_to_skip)
+	 */
+	public function toInsertableObject($sourceObject = null, $propsToSkip = null) 
+	{
+		/* @var $sourceObject entry */
+		if ($this->sourceType === KalturaSourceType::SEARCH_PROVIDER)
+		{
+			$sourceObject->setSource($this->searchProviderType);
+		}
+		else
+		{
+			$sourceObject->setSource(kPluginableEnumsManager::apiToCore('EntrySourceType', $this->sourceType));
+		}
+		
+		return parent::toInsertableObject($sourceObject, $propsToSkip);
 	}
 }
