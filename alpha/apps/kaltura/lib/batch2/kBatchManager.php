@@ -51,7 +51,7 @@ class kBatchManager
 		else
 		{
 			// creates the flavor asset 
-			$flavorAsset = new flavorAsset();
+			$flavorAsset = flavorAsset::getInstance($flavor->getType());
 			$flavorAsset->setPartnerId($partnerId);
 			$flavorAsset->setEntryId($entryId);
 			$flavorAsset->setDescription($description);
@@ -137,7 +137,7 @@ class kBatchManager
 		else
 		{
 			// creates the flavor asset 
-			$flavorAsset = new flavorAsset();
+			$flavorAsset = flavorAsset::getInstance($flavor->getType());
 			$flavorAsset->setPartnerId($partnerId);
 			$flavorAsset->setEntryId($entryId);
 			$flavorAsset->setDescription($description);

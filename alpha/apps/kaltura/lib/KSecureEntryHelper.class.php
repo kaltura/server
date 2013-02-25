@@ -199,6 +199,22 @@ class KSecureEntryHelper
 		}
 	}
 	
+	public function applyContext()
+	{
+		$accessControl = $this->entry->getAccessControl();
+		if(!$accessControl)
+			return;
+			
+		$context = new kEntryContextDataResult();
+		$scope = $this->getAccessControlScope();
+		if (!$this->isKsAdmin())
+			$this->disableCache = $accessControl->applyContext($context, $scope);
+		else
+			$this->disableCache = false;
+
+		return $context;
+	}
+	
 	protected function validateScheduling()
 	{
 		if (!$this->entry->isScheduledNow() && !$this->isKsAdmin())
@@ -275,7 +291,7 @@ class KSecureEntryHelper
 	 * Indicates that the entry is not approved
 	 * @return bool
 	 */
-	protected function isEntryInModeration()
+	public function isEntryInModeration()
 	{
 		$entry = $this->entry;
 		$moderationStatus = $entry->getModerationStatus();

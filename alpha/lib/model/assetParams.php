@@ -34,6 +34,8 @@ class assetParams extends BaseassetParams
 	const CONTAINER_FORMAT_BMP = 'bmp';
 	const CONTAINER_FORMAT_PNG = 'png';
 	
+	const CONTAINER_FORMAT_WIDEVINE = 'wvm';
+	
 	const TAG_SOURCE = "source";
 	const TAG_WEB = "web";
 	const TAG_MBR = "mbr";

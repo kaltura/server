@@ -233,6 +233,15 @@ KalturaLog::log("==>\n");
 			KalturaLog::log("ARF (webex) sources don't have proper mediaInfo - thus can not validate the product");
 			return true;
 		}
+				
+		/*
+		 * WVM (DRM Widevine) sources don't have proper mediaInfo - thus can not validate the product, skip it
+		 */
+		if(isset($this->_container) && $this->_container->GetIdOrFormat()=='wvm') {
+			KalturaLog::log("WVM (DRM Widevine) sources don't have proper mediaInfo - thus can not validate the product");
+			return true;
+		}
+		
 		/*
 		 * Evaluate source duration, to be used to check the product duration validity 
 		 */

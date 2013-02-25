@@ -1,6 +1,23 @@
 <?php
-class PackageNotifyRequest
+class WidevinePackageNotifyRequest
 {
+	/*	Example:
+	"<PackageNotify 
+	name='file5_2_package' 
+	owner='kaltura' 
+	provider='kaltura' 
+	sourceUrl='file:///home/packages/package5/' 
+	targetUrl='file:///home/packages/completed' 
+	policy='default' 
+	outputFile='file5_2.wvm'
+	licenseStartDate=''
+	licenseEndDate=''> 
+		<SourceFiles>
+			<File name='file.mp4'/>
+		</SourceFiles>
+	</PackageNotify>"
+	*/
+	
 	const FILE_URL_PREFIX = 'file://';
 	const KALTURA_PROVIDER = 'kaltura';
 	const DEFAULT_POLICY = 'default';
@@ -11,6 +28,7 @@ class PackageNotifyRequest
 	private $outputFileName;
 	private $files; 
 	private $policy = self::DEFAULT_POLICY;
+	private $portal;
 	private $licenseStartDate = null;
 	private $licenseEndDate = null;
 	
@@ -21,6 +39,9 @@ class PackageNotifyRequest
 		$this->setTargetUrl($targetFolder);
 		$this->setOutputFileName($outputFileName);
 		$this->setFiles($files);
+		$this->portal = WidevinePlugin::getWidevineConfigParam('portal');
+		if(!$this->portal)
+			$this->portal = self::KALTURA_PROVIDER;
 	}
 	
 	/**
@@ -80,11 +101,11 @@ class PackageNotifyRequest
 	}
 	
 	public function getOwner(){
-		return self::KALTURA_PROVIDER;
+		return $this->portal;
 	}
 
 	public function getProvider(){
-		return self::KALTURA_PROVIDER;
+		return $this->portal;
 	}
 	
 	/**
@@ -142,115 +163,29 @@ class PackageNotifyRequest
 	public function setLicenseEndDate($licenseEndDate) {
 		$this->licenseEndDate = $licenseEndDate;
 	}	
-}
-
-class PackagerResponse
-{
-	private $name;
-	private $status; 
-	private $errorText;
-	private $requestId;
-	private $id;
-	private $assetId;
 	
-	/**
-	 * @return the $assetId
-	 */
-	public function getAssetId() {
-		return $this->assetId;
-	}
-
-	/**
-	 * @param field_type $assetId
-	 */
-	public function setAssetId($assetId) {
-		$this->assetId = $assetId;
-	}
-
-	/**
-	 * @return the $name
-	 */
-	public function getName() {
-		return $this->name;
-	}
-
-	/**
-	 * @return the $status
-	 */
-	public function getStatus() {
-		return $this->status;
-	}
-
-	/**
-	 * @return the $errorText
-	 */
-	public function getErrorText() {
-		return $this->errorText;
-	}
-
-	/**
-	 * @return the $requestId
-	 */
-	public function getRequestId() {
-		return $this->requestId;
-	}
-
-	/**
-	 * @return the $id
-	 */
-	public function getId() {
-		return $this->id;
-	}
-
-	/**
-	 * @param field_type $name
-	 */
-	public function setName($name) {
-		$this->name = $name;
-	}
-
-	/**
-	 * @param field_type $status
-	 */
-	public function setStatus($status) {
-		$this->status = $status;
-	}
-
-	/**
-	 * @param field_type $errorText
-	 */
-	public function setErrorText($errorText) {
-		$this->errorText = $errorText;
-	}
-
-	/**
-	 * @param field_type $requestId
-	 */
-	public function setRequestId($requestId) {
-		$this->requestId = $requestId;
-	}
-
-	/**
-	 * @param field_type $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
- 
-
-	public function setAttribute($attrName, $attrValue)
+	public function createPackageNotifyRequestXml()
 	{
-		if($attrName == XmlHelper::NAME_ATTR)
-			$this->setName($attrValue);
-		if($attrName == XmlHelper::ID_ATTR)
-			$this->setId($attrValue);
-		if($attrName == XmlHelper::STATUS_ATTR)
-			$this->setStatus($attrValue);
-		if($attrName == XmlHelper::ERROR_TEXT_ATTR)
-			$this->setErrorText($attrValue);
-		if($attrName == XmlHelper::REQUEST_ID_ATTR)
-			$this->setRequestId($attrValue);
-		if($attrName == XmlHelper::ASSET_ID_ATTR)
-			$this->setAssetId($attrValue);
+		$packageNotifyXml = new SimpleXMLElement('<PackageNotify/>');
+		$sourceFilesNode = $packageNotifyXml->addChild('SourceFiles');
+		foreach ($this->getFiles() as $file) 
+		{
+    		$fileNode = $sourceFilesNode->addChild('File');
+    		$fileNode->addAttribute('name', $file);
+		}
+		$packageNotifyXml->addAttribute('name', $this->getPackageName());
+		$packageNotifyXml->addAttribute('owner', $this->getOwner());
+		$packageNotifyXml->addAttribute('provider', $this->getProvider());
+		$packageNotifyXml->addAttribute('sourceUrl', $this->getSourceUrl());
+		$packageNotifyXml->addAttribute('targetUrl', $this->getTargetUrl());
+		$packageNotifyXml->addAttribute('outputFile', $this->getOutputFileName());
+		if($this->getPolicy())
+			$packageNotifyXml->addAttribute('policy', $this->getPolicy());
+		if($this->getLicenseStartDate() && $this->getLicenseEndDate())
+		{		
+			$packageNotifyXml->addAttribute('licenseStartDate', $this->getLicenseStartDate());
+			$packageNotifyXml->addAttribute('licenseEndDate', $this->getLicenseEndDate());
+		}
+		return $packageNotifyXml->asXML();
 	}
 }

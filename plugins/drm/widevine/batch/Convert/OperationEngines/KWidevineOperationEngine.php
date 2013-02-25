@@ -2,9 +2,6 @@
 
 class KWidevineOperationEngine extends KOperationEngine
 {
-	const PACKAGE_NOTIFY_URL = "/widevine/voddealer/cgi-bin/packagenotify.cgi";
-	const PACKAGE_QUERY_URL = "/widevine/voddealer/cgi-bin/packagequery.cgi";
-	
 	const PACKAGE_FILE_EXT = '.wvm';
 		
 	/**
@@ -31,9 +28,6 @@ class KWidevineOperationEngine extends KOperationEngine
 	 */
 	private $packageName;
 	
-	private $PACKAGE_ERROR_STATUSES = array('error' => 'error', 'importFailed' => 'importFailed', 'processingFailed' => 'processingFailed', 'exportFailed' => 'exportFailed', 'unknown' => 'unknown', 'packageDeleteFailed' => 'packageDeleteFailed');
-	
-	
 	public function __construct($params, $outFilePath)
 	{
 		$this->params = $params;
@@ -53,13 +47,12 @@ class KWidevineOperationEngine extends KOperationEngine
 	protected function doOperation()
 	{
 		$this->packageName = $this->job->entryId.'_'.$this->data->flavorAssetId;
+		
 		KalturaLog::debug('start Widevine packaging: '.$this->packageName);
 		
 		$this->preparePackageFolders();
 		$requestXml = $this->preparePackageNotifyRequestXml();
-		$responseXml = $this->sendPostRequest(self::PACKAGE_NOTIFY_URL, $requestXml);
-		KalturaLog::debug("response xml ".$responseXml);
-		$response = XmlHelper::parsePackagerResponse($responseXml);
+		$response = $this->sendPostRequest(WidevinePlugin::getWidevineConfigParam('package_notify_cgi'), $requestXml);
 		$this->handleResponseError($response);
 		
 		return false;
@@ -71,51 +64,76 @@ class KWidevineOperationEngine extends KOperationEngine
 	 */
 	protected function doCloseOperation()
 	{
-		$requestXml = $this->preparePackageQueryRequestXml();
-		$responseXml = $this->sendPostRequest(self::PACKAGE_QUERY_URL, $requestXml);
-		$response = XmlHelper::parsePackagerResponse($responseXml);
-		return $this->handleResponseStatus($response);
+		$this->packageName = $this->job->entryId.'_'.$this->data->flavorAssetId;
+		
+		KalturaLog::debug('start Widevine package closer: '.$this->packageName);
+		$requestXml = "<PackageQuery name='".$this->packageName."'</PackageQuery>";
+		$response = $this->sendPostRequest(WidevinePlugin::getWidevineConfigParam('package_query_cgi'), $requestXml);		
+		$this->message = "Package status: ".$response->getStatus();
+		if($response->isSuccess())
+		{
+			$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
+			$updatedFlavorAsset->widevineAssetId = $response->getAssetId();
+			$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);
+			return true;
+		}
+		else 
+		{
+			$this->handleResponseError($response);
+			return false;
+		}		
 	}
 	
 	private function preparePackageFolders()
 	{
 		$this->sourceFolder = $this->params->sourceRootPath . DIRECTORY_SEPARATOR . basename($this->data->destFileSyncLocalPath);
-		KalturaLog::debug('source folder path: '.$this->sourceFolder);
+		
+		KalturaLog::debug('Creating sources directory: '.$this->sourceFolder);
 		mkdir($this->sourceFolder);
 		
-		$fileName = basename($this->data->actualSrcFileSyncLocalPath);	//this should be the converted flavor file sync	
+		$fileName = basename($this->data->actualSrcFileSyncLocalPath);		
+		KalturaLog::debug('Creating symlink in the source folder: '.$fileName);
 		symlink($this->data->actualSrcFileSyncLocalPath, $this->sourceFolder . DIRECTORY_SEPARATOR . $fileName);
 		$this->packageFiles[] = $fileName;
 		
 		$this->data->destFileSyncLocalPath = $this->data->destFileSyncLocalPath . self::PACKAGE_FILE_EXT;
 		
-		KalturaLog::debug('source files folder: '.$this->sourceFolder);
-		KalturaLog::debug('source file: '.$fileName);
-		KalturaLog::debug('target file: '.$this->data->destFileSyncLocalPath);
+		KalturaLog::debug('Target package file name: '.$this->data->destFileSyncLocalPath);
 	}
 	
 	private function preparePackageNotifyRequestXml()
 	{
-		$files = array();		
 		$outputFileName = basename($this->data->destFileSyncLocalPath);
 		$targetFolder = dirname($this->data->destFileSyncLocalPath);
 		
-		KalturaLog::debug("package name: ".$this->packageName." source folder:".$this->sourceFolder." target folder:".$targetFolder." output file: ".$outputFileName);
-		$requestInput = new PackageNotifyRequest($this->packageName, $this->sourceFolder, $targetFolder, $outputFileName, $this->packageFiles);
+		$requestInput = new WidevinePackageNotifyRequest($this->packageName, $this->sourceFolder, $targetFolder, $outputFileName, $this->packageFiles);
 		
-		$params = explode(',', $this->operator->params);
-		if(isset($params->policy) && $params->policy)
+		if($this->operator->params)
 		{
-			$requestInput->setPolicy($params->policy);
+			$params = explode(',', $this->operator->params);
+			if(isset($params->policy) && $params->policy)
+			{
+				$requestInput->setPolicy($params->policy);
+			}
 		}
 		
-		$requestXml = XmlHelper::constructPackageNotifyRequestXml($requestInput);
-																  
-		return $requestXml->asXML();
+		$entry = $this->client->baseEntry->get($this->job->entryId);
+		/* @var $entry KalturaBaseEntry */
+		$requestInput->setLicenseStartDate($entry->startDate);
+		$requestInput->setLicenseEndDate($entry->endDate);
+		
+		$requestXml = $requestInput->createPackageNotifyRequestXml();
+			
+		KalturaLog::debug('Package notify request: '.$requestXml);	
+													  
+		return $requestXml;
 	}
 	
 	private function sendPostRequest($url, $requestXml)
 	{
+		if(!$url)
+			throw new KOperationEngineException('CGI URL is not set');
+			
 		$full_url = $this->params->vodPackagerHost . $url;
 		KalturaLog::debug('send Package Notify request, url: '.$full_url);		
 		KalturaLog::debug('request params: '.$requestXml);
@@ -129,40 +147,20 @@ class KWidevineOperationEngine extends KOperationEngine
 		$response = curl_exec($ch);
 		curl_close($ch);
 		
-		return $response;
+		KalturaLog::debug('Package Notify response: '.$response);
+		$responseObject = WidevinePackagerResponse::createWidevinePackagerResponse($response);
+		
+		return $responseObject;
 	}
 	
-	private function handleResponseError(PackagerResponse $response)
+	private function handleResponseError(WidevinePackagerResponse $response)
 	{
-		KalturaLog::debug('response status: '. $response->getStatus());
-		if(array_key_exists($response->getStatus(), $this->PACKAGE_ERROR_STATUSES))
+		KalturaLog::debug('Response status: '. $response->getStatus());
+		if($response->isError())
 		{
 			$logMessage = 'Package Notify request failed, package name: '.$response->getName().' error: '.$response->getErrorText();
 			KalturaLog::err($logMessage);
-			//$this->addToLogFile($logMessage);
 			throw new KOperationEngineException($logMessage);
 		}
-	}
-	
-	private function preparePackageQueryRequestXml()
-	{
-		$this->packageName = $this->job->entryId.'_'.$this->data->flavorAssetId;
-		
-		$requestXml = XmlHelper::constructPackageQueryRequestXml($this->packageName);
-		return $requestXml->asXML();
-	}
-	
-	private function handleResponseStatus(PackagerResponse $response)
-	{
-		$this->handleResponseError($response);
-		if($response->getStatus() == 'successful')
-		{	
-			return true;	
-		}
-		else 
-		{
-			$this->message = "Package status: ".$response->getStatus();
-			return false;
-		}		
-	}
+	}	
 }

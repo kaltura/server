@@ -32,7 +32,7 @@ class kFlowHelper
 		}
 
 		// creates the flavor asset
-		$flavorAsset = new flavorAsset();
+		$flavorAsset = flavorAsset::getInstance();
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$flavorAsset->incrementVersion();
 		$flavorAsset->setIsOriginal(true);

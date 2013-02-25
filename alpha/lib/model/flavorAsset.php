@@ -240,4 +240,21 @@ class flavorAsset extends asset
 		
 		return $downloadUrl;
 	}
+	
+	/**
+	 * @param int $type
+	 * @return flavorAsset
+	 */
+	public static function getInstance($type = null)
+	{
+		if(!$type || $type == assetType::FLAVOR)
+			$obj = new flavorAsset();
+		else 
+		{
+			$obj = KalturaPluginManager::loadObject('flavorAsset', $type);	
+			if(!$obj)
+				$obj = new flavorAsset();	
+		}
+		return $obj;
+	}
 }

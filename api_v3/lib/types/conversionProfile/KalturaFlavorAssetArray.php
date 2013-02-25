@@ -13,7 +13,7 @@ class KalturaFlavorAssetArray extends KalturaTypedArray
 
 		foreach ($arr as $obj)
 		{
-    		$nObj = new KalturaFlavorAsset();
+    		$nObj = KalturaFlavorAsset::getInstanceByType($obj->getType());
 			$nObj->fromObject($obj);
 			$newArr[] = $nObj;
 		}

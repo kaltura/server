@@ -48,8 +48,6 @@ class FlavorAssetService extends KalturaAssetService
     	$dbEntry = entryPeer::retrieveByPK($entryId);
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-    	
-		
 		
     	if(!is_null($flavorAsset->flavorParamsId))
     	{
@@ -58,15 +56,22 @@ class FlavorAssetService extends KalturaAssetService
     			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ALREADY_EXISTS, $dbFlavorAsset->getId(), $flavorAsset->flavorParamsId);
     	}
     	
-    	$dbFlavorAsset = new flavorAsset();
-    	$dbFlavorAsset = $flavorAsset->toInsertableObject($dbFlavorAsset);
-    	/* @var $dbFlavorAsset flavorAsset */
-    	
     	if(!is_null($flavorAsset->flavorParamsId))
     	{
     		$flavorParams = assetParamsPeer::retrieveByPK($flavorAsset->flavorParamsId);
-    		if($flavorParams && $flavorParams->hasTag(flavorParams::TAG_SOURCE))
-    			$dbFlavorAsset->setIsOriginal(true);
+    	}
+    	
+    	$type = null;
+    	if($flavorParams)
+    		$type = $flavorParams->getType();
+    		
+    	$dbFlavorAsset = flavorAsset::getInstance($type);
+    	$dbFlavorAsset = $flavorAsset->toInsertableObject($dbFlavorAsset);
+    	/* @var $dbFlavorAsset flavorAsset */
+    	
+    	if($flavorParams && $flavorParams->hasTag(flavorParams::TAG_SOURCE))
+    	{
+     		$dbFlavorAsset->setIsOriginal(true);
     	}
     	
 		$dbFlavorAsset->setEntryId($entryId);
@@ -74,8 +79,8 @@ class FlavorAssetService extends KalturaAssetService
 		$dbFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$dbFlavorAsset->save();
     	
-		$flavorAsset = new KalturaFlavorAsset();
-		$flavorAsset->fromObject($dbFlavorAsset);
+		$flavorAsset = KalturaFlavorAsset::getInstanceByType($type);
+ 		$flavorAsset->fromObject($dbFlavorAsset);
 		return $flavorAsset;
     }
     
@@ -104,7 +109,7 @@ class FlavorAssetService extends KalturaAssetService
     	$dbFlavorAsset = $flavorAsset->toUpdatableObject($dbFlavorAsset);
    		$dbFlavorAsset->save();
 		
-		$flavorAsset = new KalturaFlavorAsset();
+		$flavorAsset = KalturaFlavorAsset::getInstanceByType($dbFlavorAsset->getType());
 		$flavorAsset->fromObject($dbFlavorAsset);
 		return $flavorAsset;
     }
@@ -154,7 +159,7 @@ class FlavorAssetService extends KalturaAssetService
     	if(in_array($dbFlavorAsset->getStatus(), $newStatuses))
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbFlavorAsset));
    		
-		$flavorAsset = new KalturaFlavorAsset();
+		$flavorAsset = KalturaFlavorAsset::getInstanceByType($dbFlavorAsset->getType());
 		$flavorAsset->fromObject($dbFlavorAsset);
 		return $flavorAsset;
     }
@@ -397,7 +402,7 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$flavorAssetDb || !($flavorAssetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 			
-		$flavorAsset = new KalturaFlavorAsset();
+		$flavorAsset = KalturaFlavorAsset::getInstanceByType($flavorAssetDb->getType());
 		$flavorAsset->fromObject($flavorAssetDb);
 		return $flavorAsset;
 	}
@@ -789,7 +794,7 @@ class FlavorAssetService extends KalturaAssetService
 			$flavorParamsId = $flavorAssetDb->getFlavorParamsId();
 			$flavorAssetWithParams = new KalturaFlavorAssetWithParams();
 			$flavorAssetWithParams->entryId = $entryId;
-			$flavorAsset = new KalturaFlavorAsset();
+			$flavorAsset = KalturaFlavorAsset::getInstanceByType($flavorAssetDb->getType());
 			$flavorAsset->fromObject($flavorAssetDb);
 			$flavorAssetWithParams->flavorAsset = $flavorAsset;
 			if (isset($flavorParamsArray[$flavorParamsId]))

@@ -89,6 +89,9 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 		
+		if(isset($data->flavorParamsOutputId))
+			$data->flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
+			
 		$operationEngine = KOperationManager::getEngine($job->jobSubType, $this->taskConfig, $data, $job, $this->kClient);
 		try 
 		{

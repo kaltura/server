@@ -28,4 +28,6 @@ class KalturaContainerFormat extends KalturaStringEnum
 	const BMP = 'bmp';
 	const PNG = 'png';
 	const JPG = 'jpg';
+	
+	const WVM = 'wvm';
 }
