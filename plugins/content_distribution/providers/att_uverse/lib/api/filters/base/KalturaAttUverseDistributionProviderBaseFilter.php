@@ -16,11 +16,11 @@ abstract class KalturaAttUverseDistributionProviderBaseFilter extends KalturaDis
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), KalturaAttUverseDistributionProviderBaseFilter::$map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), KalturaAttUverseDistributionProviderBaseFilter::$order_by_map);
+		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
 }

@@ -16,11 +16,11 @@ abstract class KalturaHttpNotificationTemplateBaseFilter extends KalturaEventNot
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), KalturaHttpNotificationTemplateBaseFilter::$map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), KalturaHttpNotificationTemplateBaseFilter::$order_by_map);
+		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
 }
