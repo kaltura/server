@@ -18,6 +18,10 @@ FilterProvider COMPRESS DEFLATE resp=Content-Type $application/.*xml.*
 FilterProvider COMPRESS DEFLATE resp=Content-Type $image/svg+xml
 FilterChain COMPRESS
 
+<IfModule !filter_module>
+    LoadModule filter_module modules/mod_filter.so
+</IfModule>
+
 <IfModule mod_rewrite.c>
         RewriteEngine on
         RewriteCond   %{DOCUMENT_ROOT}%{REQUEST_FILENAME}  !-d
