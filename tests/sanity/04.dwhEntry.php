@@ -7,8 +7,6 @@ $client = null;
 
 require_once __DIR__ . '/lib/init.php';
 echo "Test started [" . __FILE__ . "]\n";
-echo "Test skipped\n";
-exit(0);
 
 
 $logrotate = $config['dwh']['logRotateBin'];
@@ -182,7 +180,7 @@ $client->getConfig()->method = KalturaClientBase::METHOD_POST;
  * Rotate logs.
  */
 $returnedValue = null;
-$cmd = "$logrotate $appDir/tests/sanity/lib/logrotate.ini";
+$cmd = "$logrotate -f -vv $appDir/tests/sanity/lib/logrotate.ini";
 echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
@@ -260,13 +258,14 @@ if($reportTable->totalCount != 1)
 
 $titles = explode(',', $reportTable->header);
 $data = explode(';', $reportTable->data);
-if(!$reportTable->data || count($data) != 1)
+if(!$reportTable->data || count($data) != 2)
 {
 	echo "Reported wrong data count\n";
 	exit(-1);
 }
 
-$record = array_combine($titles, reset($data));
+$recordData = explode(',', reset($data));
+$record = array_combine($titles, $recordData);
 if($record['object_id'] != $entry->id)
 {
 	echo "Reported data of wrong entry [" . $record['object_id'] . "]\n";
@@ -283,7 +282,7 @@ if(!isset($record['count_loads']) || !$record['count_loads'] || !intval($record[
 	exit(-1);
 }
 $expectedTimeViewed = $entry->duration / 60;
-if(!isset($record['sum_time_viewed']) || !$record['sum_time_viewed'] || intval($record['sum_time_viewed']) < $expectedTimeViewed)
+if(!isset($record['sum_time_viewed']) || !$record['sum_time_viewed'] || floatval($record['sum_time_viewed']) < $expectedTimeViewed)
 {
 	echo "Reported wrong view time [" . $record['sum_time_viewed'] . "] expected at least [$expectedTimeViewed]\n";
 	exit(-1);
