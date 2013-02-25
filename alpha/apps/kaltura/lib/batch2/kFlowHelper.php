@@ -270,7 +270,7 @@ class kFlowHelper
 		if(!$flavorAsset)
 		{
 			KalturaLog::err("Error: Flavor asset not found [" . $data->getFlavorAssetId() . "]");
-			throw new ApiException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 		}
 
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
@@ -1589,15 +1589,15 @@ class kFlowHelper
 
 	public static function handleProvisionProvideAlmostFinished(BatchJob $dbBatchJob, kProvisionJobData $data)
 	{
-		$entry = $dbBatchJob->getEntry();
-		$data->populateEntryFromData($entry);
-		$entry->save();
 		return $dbBatchJob;
 	}
 	
 	public static function handleProvisionProvideFinished(BatchJob $dbBatchJob, kProvisionJobData $data)
 	{
 		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::READY);
+		$entry = $dbBatchJob->getEntry();
+		$data->populateEntryFromData($entry);
+		$entry->save();
 		return $dbBatchJob;
 	}
 
