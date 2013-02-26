@@ -38,22 +38,22 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($baseClass == 'KalturaFlavorParams' && WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+		if($baseClass == 'KalturaFlavorParams' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return new KalturaWidevineFlavorParams();
 	
-		if($baseClass == 'KalturaFlavorParamsOutput' && WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+		if($baseClass == 'KalturaFlavorParamsOutput' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return new KalturaWidevineFlavorParamsOutput();
 		
-		if($baseClass == 'KalturaFlavorAsset' && WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+		if($baseClass == 'KalturaFlavorAsset' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return new KalturaWidevineFlavorAsset();
 			
-		if($baseClass == 'assetParams' && WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+		if($baseClass == 'assetParams' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return new WidevineFlavorParams();
 	
-		if($baseClass == 'assetParamsOutput' && WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+		if($baseClass == 'assetParamsOutput' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return new WidevineFlavorParamsOutput();
 			
-		if($baseClass == 'asset' && WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+		if($baseClass == 'asset' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return new WidevineFlavorAsset();
 		
 		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::WIDEVINE)
@@ -70,22 +70,22 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{			
-		if($baseClass == 'KalturaFlavorParams' && WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+		if($baseClass == 'KalturaFlavorParams' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return 'KalturaWidevineFlavorParams';
 	
-		if($baseClass == 'KalturaFlavorParamsOutput' && WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+		if($baseClass == 'KalturaFlavorParamsOutput' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return 'KalturaWidevineFlavorParamsOutput';
 		
-		if($baseClass == 'KalturaFlavorAsset' && WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+		if($baseClass == 'KalturaFlavorAsset' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return 'KalturaWidevineFlavorAsset';
 
-		if($baseClass == 'assetParams' && WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+		if($baseClass == 'assetParams' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return 'WidevineFlavorParams';
 	
-		if($baseClass == 'assetParamsOutput' && WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+		if($baseClass == 'assetParamsOutput' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return 'WidevineFlavorParamsOutput';
 			
-		if($baseClass == 'asset' && WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+		if($baseClass == 'asset' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return 'WidevineFlavorAsset';
 		
 		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::WIDEVINE)
