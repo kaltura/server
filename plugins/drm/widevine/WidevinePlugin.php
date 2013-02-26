@@ -21,11 +21,14 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	public static function getEnums($baseEnumName = null)
 	{	
 		if(is_null($baseEnumName))
-			return array('WidevineConversionEngineType', 'WidevineAssetType');		
+			return array('WidevineConversionEngineType', 'WidevineAssetType', 'WidevinePermissionName');		
 		if($baseEnumName == 'conversionEngineType')
 			return array('WidevineConversionEngineType');
 		if($baseEnumName == 'assetType')
 			return array('WidevineAssetType');
+		if($baseEnumName == 'PermissionName')
+			return array('WidevinePermissionName');
+			
 			
 		return array();
 	}
