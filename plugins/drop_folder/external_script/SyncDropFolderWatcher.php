@@ -112,7 +112,7 @@ try
 			if($fileExists)
 				writeLog($logPrefix, 'file exists on the file system');
 			else 
-				writeLog($logPrefix, 'file does not exists on the file system');
+				writeLog($logPrefix, 'file does not exist on the file system');
 				
 			if($fileExists && $file) //file exists on the file system and in database
 			{

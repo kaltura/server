@@ -489,7 +489,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				if ($roleId){
 					$roleIds = $roleId->getId();
 				}else{
-					KalturaLog::debug("Role id [$ksSetRoleId] does not exists");
+					KalturaLog::debug("Role id [$ksSetRoleId] does not exist");
 					throw new kCoreException("Unknown role Id [$ksSetRoleId]", kCoreException::ID_NOT_FOUND);
 				}
 			}

@@ -74,7 +74,7 @@ class updatekshowAction extends defPartnerservices2Action
 			$kshow_from_db = kshowPeer::retrieveByPK( $kshow_id );
 			if ( ! $kshow_from_db )
 			{
-				// kshow with this id does not exists in the DB
+				// kshow with this id does not exist in the DB
 				$this->addError ( APIErrors::INVALID_KSHOW_ID ,  $kshow_id );
 
 				return;

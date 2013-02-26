@@ -146,7 +146,7 @@ class sfCultureInfo
     }
     else
     {
-      throw new sfException('Property '.$name.' does not exists.');
+      throw new sfException('Property '.$name.' does not exist.');
     }
   }
 

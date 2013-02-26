@@ -614,7 +614,7 @@ class ks extends kSessionBase
 				if ($roleId){
 					$roleIds = $roleId->getId();
 				}else{
-					KalturaLog::debug("Role id [$exPrivileges[1]] does not exists");
+					KalturaLog::debug("Role id [$exPrivileges[1]] does not exist");
 					throw new kCoreException(kCoreException::INTERNAL_SERVER_ERROR, APIErrors::UNKNOWN_ROLE_ID ,$exPrivileges[1]);
 				}
 			}

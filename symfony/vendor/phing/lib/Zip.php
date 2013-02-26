@@ -311,7 +311,7 @@ class Archive_Zip
     *              newer_exist : the file was not extracted because a newer
 	*                            file already exists
     *              path_creation_fail : the file is not extracted because the
-	*                                   folder does not exists and can't be
+	*                                   folder does not exist and can't be
 	*                                   created
     *              write_error : the file was not extracted because there was a
     *                            error while writing the file
@@ -1160,7 +1160,7 @@ class Archive_Zip
       if (!file_exists($p_filename))
       {
         $this->_errorLog(ARCHIVE_ZIP_ERR_MISSING_FILE,
-		                 "File '$p_filename' does not exists");
+		                 "File '$p_filename' does not exist");
         return Archive_Zip::errorCode();
       }
 

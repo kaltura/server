@@ -41,7 +41,7 @@ class ClamAVScanEngine extends VirusScanEngine
 		}
 		
 		if (!file_exists($filePath)) {
-			$errorDescription = 'Source file does not exists ['.$filePath.']';
+			$errorDescription = 'Source file does not exist ['.$filePath.']';
 			return KalturaVirusScanJobResult::SCAN_ERROR;
 		}
 		
