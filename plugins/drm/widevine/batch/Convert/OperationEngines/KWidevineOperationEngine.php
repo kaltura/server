@@ -67,7 +67,11 @@ class KWidevineOperationEngine extends KOperationEngine
 		$this->packageName = $this->job->entryId.'_'.$this->data->flavorAssetId;
 		
 		KalturaLog::debug('start Widevine package closer: '.$this->packageName);
-		$requestXml = "<PackageQuery name='".$this->packageName."'</PackageQuery>";
+		
+		$requestXmlObj = new SimpleXMLElement('<PackageQuery/>');
+		$requestXmlObj->addAttribute('name', $this->packageName);		
+		$requestXml = $requestXmlObj->asXML();
+		
 		$response = $this->sendPostRequest(WidevinePlugin::getWidevineConfigParam('package_query_cgi'), $requestXml);		
 		$this->message = "Package status: ".$response->getStatus();
 		if($response->isSuccess())
