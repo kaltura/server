@@ -25,14 +25,14 @@ fi
 # Source function library.
 . $APP_DIR/scripts/functions.rc
 
-MONIT=$BASE_DIR/bin/monit -c $APP_DIR/configurations/monit/monit.rc
+MONIT="$BASE_DIR/bin/monit -c $APP_DIR/configurations/monit/monit.rc"
 
 # Source monit configuration.
 if [ -f /etc/sysconfig/monit ] ; then
         . /etc/sysconfig/monit
 fi
 
-[ -f $MONIT ] || exit 0
+[ -f $BASE_DIR/bin/monit ] || exit 0
 
 RETVAL=0
 
