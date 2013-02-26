@@ -34,11 +34,7 @@ class LicenseProxyUtils
 					 $requestParams[self::MK].
 					 $requestParams[self::MD].
 					 $ptime;
-		$sign = self::createRequestSignature($signInput);
-		//TODO: remove this
-		$sign = '97ireitYTsd43RNtjNvak1zQa0J4aJZNrB7JrTTGd24=';
-		$ptime='1361722074';
-		
+		$sign = self::createRequestSignature($signInput);		
 		$requestParams[self::PTIME] = $ptime;
 		$requestParams[self::SIGN] = $sign;
 				
@@ -100,7 +96,7 @@ class LicenseProxyUtils
 			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::LICENSE_KEY_NOT_SET);
 		$iv = pack("H*", substr($key_bytes, 0, 32));
     	$key = pack("H*", substr($key_bytes, 32));
-	   	return openssl_encrypt($digest,'aes-256-cbc',$key, false/*, $iv*/); //TODO: uncomment
+	   	return openssl_encrypt($digest,'aes-256-cbc',$key, false, $iv);
 	}
 	
 	protected static function getLicenseOverrideParams($overrideParamsStr)
