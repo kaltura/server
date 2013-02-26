@@ -51,7 +51,7 @@ class kFlowHelper
 	public static function handleImportFailed(BatchJob $dbBatchJob, kImportJobData $data)
 	{
 		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_IMPORTING);
-		
+
 		if($data->getFlavorAssetId())
 		{
 			$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
@@ -76,24 +76,24 @@ class kFlowHelper
 
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
-			
+
 		if(!$data->getFlavorAssetId())
 			return $dbBatchJob;
-			
+
 		$dbFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		if($dbFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_ERROR)
 		{
 			$dbFlavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
 			$dbFlavorAsset->save();
 		}
-		
+
 		$dbEntry = $dbFlavorAsset->getentry();
 		if($dbEntry->getStatus() == entryStatus::ERROR_IMPORTING)
 		{
 			$dbEntry->setStatus(entryStatus::IMPORT);
 			$dbEntry->save();
 		}
-		
+
 		return $dbBatchJob;
 	}
 
@@ -108,7 +108,7 @@ class kFlowHelper
 
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
-			
+
 		if(!file_exists($data->getDestFileLocalPath()))
 			throw new ApiException(APIErrors::INVALID_FILE_NAME, $data->getDestFileLocalPath());
 
@@ -171,7 +171,7 @@ class kFlowHelper
 		$flavorAsset->save();
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());
-		
+
 
 		// set the path in the job data
 		$localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
@@ -181,9 +181,9 @@ class kFlowHelper
 		$dbBatchJob->save();
 
 		if($isNewContent || $dbEntry->getStatus() == entryStatus::IMPORT)
-			// check if status == import for importing file of type url (filesync exists, and we want to raise event for conversion profile to start) 
-			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob)); 
-		
+			// check if status == import for importing file of type url (filesync exists, and we want to raise event for conversion profile to start)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
+
 		if(!$isNewFlavor && $flavorAsset->getIsOriginal())
 		{
 			$entryFlavors = assetPeer::retrieveFlavorsByEntryId($flavorAsset->getEntryId());
@@ -247,7 +247,7 @@ class kFlowHelper
 			if($currentFlavorAsset && $currentFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
 				$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
 		}
-		
+
 		return $dbBatchJob;
 	}
 
@@ -302,7 +302,7 @@ class kFlowHelper
 			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
 			$flavorAsset->save();
 		}
-			
+
 		return $dbBatchJob;
 	}
 
@@ -377,7 +377,7 @@ class kFlowHelper
 		$entry = $dbBatchJob->getEntry();
 		if(!$entry)
 			throw new ApiException(APIErrors::INVALID_ENTRY, $dbBatchJob, $dbBatchJob->getEntryId());
-			
+
 
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
 
@@ -386,7 +386,7 @@ class kFlowHelper
 
 		if($entry->getType() != entryType::MEDIA_CLIP) // e.g. document
 			$extractMedia = false;
-			
+
 		$rootBatchJob = $dbBatchJob->getRootJob();
 		if($extractMedia && $rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 		{
@@ -430,7 +430,7 @@ class kFlowHelper
 				$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_FLAVOR;
 				if($flavorAsset->getIsOriginal())
 					$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_SOURCE;
-					
+
 				kJobsManager::addPostConvertJob($dbBatchJob, $postConvertAssetType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset, $data->getCustomData());
 			}
 			else // no need to run post convert
@@ -607,7 +607,7 @@ class kFlowHelper
 
 		if(!is_null($thumbAsset->getFlavorParamsId()))
 			kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob, $thumbAsset->getFlavorParamsId());
-			
+
 		return $dbBatchJob;
 	}
 
@@ -622,6 +622,8 @@ class kFlowHelper
 		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
 			$entry = $dbBatchJob->getEntry();
+			if(!$entry)
+				return $dbBatchJob;
 
 			$notificationData = array(
 				"puserId" => $entry->getPuserId(),
@@ -712,7 +714,9 @@ class kFlowHelper
 				$fileFormat = $flavorParamsOutput->getFileExt();
 
 				$entry = $dbBatchJob->getEntry();
-					
+				if(!$entry)
+					return $dbBatchJob;
+
 				$notificationData = array(
 					"puserId" => $entry->getPuserId(),
 					"entryId" => $entry->getId(),
@@ -805,7 +809,7 @@ class kFlowHelper
 
 		return $dbBatchJob;
 	}
-	
+
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertCollectionJobData $data
@@ -814,15 +818,15 @@ class kFlowHelper
 	public static function handleDeleteFileFinished(BatchJob $dbBatchJob, kDeleteFileJobData $data)
 	{
 		KalturaLog::debug("File delete finished for file path: ". $data->getLocalFileSyncPath().", data center: ".$dbBatchJob->getDc());
-		
+
 		//Change status of the filesync to "purged"
 		$fileSyncFroDeletedFile = kFileSyncUtils::retrieveObjectForSyncKey($data->getSyncKey());
 		$fileSyncFroDeletedFile->setStatus(FileSync::FILE_SYNC_STATUS_PURGED);
 		$fileSyncFroDeletedFile->save();
-		
+
 		return $dbBatchJob;
 	}
-	
+
 	public static function handleDeleteFileProcessing (kDeleteFileJobData $data)
 	{
 		KalturaLog::info("Delete started for file path " . $data->getLocalFileSyncPath());
@@ -921,7 +925,7 @@ class kFlowHelper
 		// syncing ism and lig files
 		if(file_exists($ismPath))
 			kFileSyncUtils::moveFromFile($ismPath, $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, $ismVersion));
-			
+
 		if(file_exists($logPath))
 			kFileSyncUtils::moveFromFile($logPath, $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG, $ismVersion));
 
@@ -1017,7 +1021,7 @@ class kFlowHelper
 			KalturaLog::notice("Cupture thumbnail is not supported for entry [$entryId] of type [" . $entry->getType() . "] and media type [" . $entry->getMediaType() . "]");
 			return;
 		}
-			
+
 		$profile = null;
 		try
 		{
@@ -1033,7 +1037,7 @@ class kFlowHelper
 			KalturaLog::notice("Profile not found for entry id [$entryId]");
 			return;
 		}
-			
+
 		$assetParamsIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($profile->getId());
 		if(!count($assetParamsIds))
 		{
@@ -1109,51 +1113,51 @@ class kFlowHelper
 
 		// this logic decide when this thumbnail should be used
 		$entry = $dbBatchJob->getEntry();
-		if($entry)
-		{
-			/*
-			 * Retrieve data describing the new thumb
-			 */
-			$thisFlavorHeight = $data->getThumbHeight();
-			$thisFlavorBitrate = $data->getThumbBitrate();
-			$thisFlavorId = $data->getFlavorAssetId();
-			
-			/*
-			 * If there is already a thumb assigned to that entry, get the asset id that was used to grab the thumb.
-			 * For older entries (w/out grabbedFromAssetId), the original logic would be used.
-			 * For newer entries - retrieve mediaInfo's for th new and grabbed assest.
-			 * Use KDL logic to normalize the 'grabbed' and 'new' video bitrates.
-			 * Set ignoreThumbnail if the new br is lower than the normalized.
-			 */
-			if($entry->getCreateThumb()) {
-				$grabbedFromAssetId=$entry->getThumbGrabbedFromAssetId();
-				if(isset($grabbedFromAssetId)){
-					$thisMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($thisFlavorId);
-					$grabMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($grabbedFromAssetId);
-					if(isset($thisMediaInfo) && isset($grabMediaInfo)){
-						$normalizedBr=KDLVideoBitrateNormalize::NormalizeSourceToTarget($grabMediaInfo->getVideoFormat(), $grabMediaInfo->getVideoBitrate(), $thisMediaInfo->getVideoFormat());
-						$ignoreThumbnail = ($normalizedBr>=$thisMediaInfo->getVideoBitrate()? true: false);
-					}
-					else
-						$grabbedFromAssetId=null;
-				}
+		if(!$entry)
+			return $dbBatchJob;
 
-				/*
-				 * Nulled 'grabbedFromAssetId' notifies - there is no grabbed asset data available,
-				 * ==> use the older logic - w/out br normalizing 
-				 */
-				if(!isset($grabbedFromAssetId)){
-					if($entry->getThumbBitrate() > $thisFlavorBitrate) {
-				$ignoreThumbnail = true;
+		/*
+		 * Retrieve data describing the new thumb
+		 */
+		$thisFlavorHeight = $data->getThumbHeight();
+		$thisFlavorBitrate = $data->getThumbBitrate();
+		$thisFlavorId = $data->getFlavorAssetId();
+
+		/*
+		 * If there is already a thumb assigned to that entry, get the asset id that was used to grab the thumb.
+		 * For older entries (w/out grabbedFromAssetId), the original logic would be used.
+		 * For newer entries - retrieve mediaInfo's for th new and grabbed assest.
+		 * Use KDL logic to normalize the 'grabbed' and 'new' video bitrates.
+		 * Set ignoreThumbnail if the new br is lower than the normalized.
+		 */
+		if($entry->getCreateThumb()) {
+			$grabbedFromAssetId=$entry->getThumbGrabbedFromAssetId();
+			if(isset($grabbedFromAssetId)){
+				$thisMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($thisFlavorId);
+				$grabMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($grabbedFromAssetId);
+				if(isset($thisMediaInfo) && isset($grabMediaInfo)){
+					$normalizedBr=KDLVideoBitrateNormalize::NormalizeSourceToTarget($grabMediaInfo->getVideoFormat(), $grabMediaInfo->getVideoBitrate(), $thisMediaInfo->getVideoFormat());
+					$ignoreThumbnail = ($normalizedBr>=$thisMediaInfo->getVideoBitrate()? true: false);
+				}
+				else
+					$grabbedFromAssetId=null;
 			}
-			elseif($entry->getThumbBitrate() == $thisFlavorBitrate && $entry->getThumbHeight() > $thisFlavorHeight)	{
-				$ignoreThumbnail = true;
-					}
+
+			/*
+			 * Nulled 'grabbedFromAssetId' notifies - there is no grabbed asset data available,
+			 * ==> use the older logic - w/out br normalizing
+			 */
+			if(!isset($grabbedFromAssetId)){
+				if($entry->getThumbBitrate() > $thisFlavorBitrate) {
+			$ignoreThumbnail = true;
+		}
+		elseif($entry->getThumbBitrate() == $thisFlavorBitrate && $entry->getThumbHeight() > $thisFlavorHeight)	{
+			$ignoreThumbnail = true;
 				}
 			}
-			else {
-				$ignoreThumbnail = true;
-			}
+		}
+		else {
+			$ignoreThumbnail = true;
 		}
 
 		if(!$ignoreThumbnail)
@@ -1249,7 +1253,10 @@ class kFlowHelper
 				{
 					KalturaLog::debug("Start conversion");
 					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-					kJobsManager::addConvertProfileJob(null, $dbBatchJob->getEntry(), $currentFlavorAsset->getId(), $path);
+
+					$entry = $dbBatchJob->getEntry();
+					if($entry)
+						kJobsManager::addConvertProfileJob(null, $entry, $currentFlavorAsset->getId(), $path);
 				}
 				else
 				{
@@ -1268,7 +1275,7 @@ class kFlowHelper
 	public static function createBulkUploadLogUrl(BatchJob $dbBatchJob)
 	{
 		$ks = new ks();
-		$ks->valid_until = time() + 86400 ; 
+		$ks->valid_until = time() + 86400 ;
 		$ks->type = ks::TYPE_KS;
 		$ks->partner_id = $dbBatchJob->getPartnerId();
 		$ks->master_partner_id = null;
@@ -1279,7 +1286,7 @@ class kFlowHelper
 		$ks->privileges = 'setrole:BULK_LOG_VIEWER';
 		$ks->additional_data = null;
 		$ks_str = $ks->toSecureString();
-		
+
 		$logFileUrl = "http://".kConf::get("www_host") . "/api_v3/service/bulkUpload/action/serveLog/id/{$dbBatchJob->getId()}/ks/" . $ks_str;
 		return $logFileUrl;
 	}
@@ -1338,7 +1345,7 @@ class kFlowHelper
 			KalturaLog::err("FileSync [" . $data->getSrcFileSyncId() . "] not found");
 			return $dbBatchJob;
 		}
-			
+
 		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
 		$fileSync->save();
 
@@ -1348,13 +1355,13 @@ class kFlowHelper
 		{
             $asset->setStatusLocalReady();
             $asset->save();
-            
+
             if ( ($asset instanceof flavorAsset) && ($asset->getStatus() == asset::ASSET_STATUS_READY) )
             {
                 kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $asset);
             }
 		}
-		
+
 		// check if all exports finished and delete local file sync according to configuration
 		if($asset && $asset->getStatus() == asset::ASSET_STATUS_READY && $dbBatchJob->getJobSubType() != StorageProfile::STORAGE_KALTURA_DC)
 		{
@@ -1365,7 +1372,7 @@ class kFlowHelper
 				kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
 			}
 		}
-		
+
 		return $dbBatchJob;
 	}
 
@@ -1387,17 +1394,17 @@ class kFlowHelper
 			KalturaLog::err("FileSync [" . $data->getSrcFileSyncId() . "] not found");
 			return $dbBatchJob;
 		}
-		
+
 		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
 		$fileSync->save();
-		
+
 		// if an asset was exported - check if should set its status to ERROR
 		$asset = assetPeer::retrieveByFileSync($fileSync);
 		if ($asset && $asset->getStatus() == asset::ASSET_STATUS_EXPORTING) // meaning that export is required for asset readiness
 		{
             $asset->setStatus(asset::ASSET_STATUS_ERROR);
             $asset->save();
-            
+
 		    if ($asset instanceof flavorAsset)
             {
                 $flavorParamsOutput = $asset->getFlavorParamsOutput();
@@ -1407,25 +1414,25 @@ class kFlowHelper
                 kBusinessPostConvertDL::handleConvertFailed($dbBatchJob, null, $asset->getId(), $flavorParamsOutputId, $mediaInfoId);
             }
 		}
-		
+
 
 		return $dbBatchJob;
 	}
-	
+
     public static function handleStorageDeleteFinished (BatchJob $dbBatchJob, kStorageDeleteJobData $data)
 	{
 	    KalturaLog::debug("Remote storage file deletion finished for fileysnc ID:[ ". $data->getSrcFileSyncId() ."]");
-	    
+
 	    $fileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
 		if(!$fileSync)
 		{
 			KalturaLog::err("FileSync [" . $data->getSrcFileSyncId() . "] not found");
 			return $dbBatchJob;
 		}
-		
+
 		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_DELETED);
 		$fileSync->save();
-		
+
 		return $dbBatchJob;
 	}
 
@@ -1455,10 +1462,10 @@ class kFlowHelper
 					$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
 			}
 		}
-			
+
 		// mark the job as almost done
 		$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
-			
+
 		return $dbBatchJob;
 	}
 
@@ -1492,7 +1499,7 @@ class kFlowHelper
 		}
 
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob);
-			
+
 		return $dbBatchJob;
 	}
 
@@ -1592,6 +1599,9 @@ class kFlowHelper
 	{
 		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::READY);
 		$entry = $dbBatchJob->getEntry();
+		if(!$entry)
+			return $dbBatchJob;
+
 		$data->populateEntryFromData($entry);
 		$entry->save();
 		return $dbBatchJob;
@@ -1607,7 +1617,7 @@ class kFlowHelper
 	{
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
-			
+
 		$partner = PartnerPeer::retrieveByPK($dbBatchJob->getPartnerId());
 		if (!$partner)
 		{
@@ -1644,10 +1654,10 @@ class kFlowHelper
 			$jobData->setMailType(62);
 		else
 			$jobData->setMailType(63);
-			
+
 		$jobData->setFromEmail(kConf::get("batch_download_video_sender_email"));
 		$jobData->setFromName(kConf::get("batch_download_video_sender_name"));
-			
+
 		$adminName = $partner->getAdminName();
 		$recipientEmail = $partner->getAdminEmail();
 
@@ -1657,10 +1667,10 @@ class kFlowHelper
 			$recipientEmail = $kuser->getEmail();
 			$adminName = $kuser->getFullName();
 		}
-			
+
 		if(!$adminName)
 			$adminName = $recipientEmail;
-			
+
 		$jobData->setBodyParamsArray(array($adminName, $linksHtml));
 		$jobData->setRecipientEmail($recipientEmail);
 		$jobData->setSubjectParamsArray(array());
@@ -1677,7 +1687,7 @@ class kFlowHelper
 	{
 		$uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_DELETED);
 		$uploadToken->save();
-		
+
 		if(is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS))
 		{
 			$dbAsset = assetPeer::retrieveById($uploadToken->getObjectId());
@@ -1703,14 +1713,14 @@ class kFlowHelper
 				KalturaLog::err($e->getMessage());
 				return;
 			}
-				
+
 			$currentReadyBehavior = kBusinessPostConvertDL::getReadyBehavior($dbAsset, $profile);
 			if($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 				kBatchManager::updateEntry($dbAsset->getEntryId(), entryStatus::ERROR_IMPORTING);
-			
+
 			return;
 		}
-				
+
 		if($uploadToken->getObjectType() == entryPeer::OM_CLASS)
 		{
 			$dbEntry = entryPeer::retrieveByPK($uploadToken->getObjectId());
@@ -1777,7 +1787,7 @@ class kFlowHelper
 	{
 		if(!is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS) && $uploadToken->getObjectType() != entryPeer::OM_CLASS)
 			return;
-			
+
 		$fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadToken->getId());
 
 		if(!file_exists($fullPath))
@@ -1788,7 +1798,7 @@ class kFlowHelper
 
 			kFileUtils::dumpApiRequest($remoteDCHost);
 		}
-			
+
 		if(is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS))
 		{
 			$dbAsset = assetPeer::retrieveById($uploadToken->getObjectId());
@@ -1821,7 +1831,7 @@ class kFlowHelper
 			{
 				$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 				$dbAsset->setSize(kFile::fileSize($finalPath));
-					
+
 				if($dbAsset instanceof flavorAsset)
 				{
 					if($dbAsset->getIsOriginal())
@@ -1857,7 +1867,7 @@ class kFlowHelper
 				KalturaLog::err("Entry id [" . $uploadToken->getObjectId() . "] not found");
 				return;
 			}
-			
+
 			// increments version
 			$dbEntry->setData('100000.jpg');
 			$dbEntry->save();
@@ -1871,7 +1881,7 @@ class kFlowHelper
 
 				if($dbAsset instanceof flavorAsset)
 					kBatchManager::updateEntry($dbEntry->getId(), entryStatus::ERROR_IMPORTING);
-					
+
 				throw $e;
 			}
 			$dbEntry->setStatus(entryStatus::READY);
@@ -1910,7 +1920,7 @@ class kFlowHelper
 				$entry->setReplacementStatus(entryReplacementStatus::READY_BUT_NOT_APPROVED);
 				$entry->save();
 				break;
-					
+
 			case entryReplacementStatus::NONE:
 			default:
 				KalturaLog::err("Real entry id [" . $tempEntry->getReplacedEntryId() . "] replacement canceled");
@@ -1918,21 +1928,21 @@ class kFlowHelper
 				break;
 		}
 	}
-	
+
 	public static function handleIndexPending(BatchJob $dbBatchJob, kIndexJobData $data)
 	{
 		$featureStatusesToRemove = $data->getFeatureStatusesToRemove();
-		
+
 		foreach($featureStatusesToRemove as $featureStatusToRemove)
 		{
 			if(!($featureStatusToRemove instanceof kFeatureStatus))
 				continue;
-			
+
 			$dbBatchJob->getPartner()->resetFeaturesStatusByType($featureStatusToRemove->getType());
 		}
 		return $dbBatchJob;
 	}
-	
+
 	public static function handleIndexFinished(BatchJob $dbBatchJob, kIndexJobData $data)
 	{
 		$featureStatusesToRemove = $data->getFeatureStatusesToRemove();
@@ -1940,13 +1950,13 @@ class kFlowHelper
 		{
 			if(!($featureStatusToRemove instanceof kFeatureStatus))
 				continue;
-			
+
 			$dbBatchJob->getPartner()->resetFeaturesStatusByType($featureStatusToRemove->getType());
 		}
-		
+
 		return $dbBatchJob;
 	}
-		
+
 	public static function handleIndexFailed(BatchJob $dbBatchJob, kIndexJobData $data)
 	{
 		$featureStatusesToRemove = $data->getFeatureStatusesToRemove();
@@ -1954,10 +1964,10 @@ class kFlowHelper
 		{
 			if(!($featureStatusToRemove instanceof kFeatureStatus))
 				continue;
-				
+
 			$dbBatchJob->getPartner()->resetFeaturesStatusByType($featureStatusToRemove->getType());
 		}
-		
+
 		return $dbBatchJob;
 	}
 }
