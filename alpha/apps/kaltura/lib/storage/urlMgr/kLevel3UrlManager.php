@@ -34,6 +34,16 @@ class kLevel3UrlManager extends kUrlManager
 		    if ($name && $key !== false && $gen !== false)
 				return new kLevel3UrlTokenizer($name, $key, $gen, true, $expiryName, $window);
 			break;
+
+		case PlaybackProtocol::APPLE_HTTP:
+			$name = isset($this->params['applehttp_auth_param_name']) ? $this->params['applehttp_auth_param_name'] : "h";
+			$key = isset($this->params['applehttp_auth_key']) ? $this->params['applehttp_auth_key'] : false;
+			$gen = isset($this->params['applehttp_auth_gen']) ? $this->params['applehttp_auth_gen'] : false;
+			$expiryName = isset($this->params['applehttp_auth_expiry_name']) ? $this->params['applehttp_auth_expiry_name'] : "etime";
+			$window = isset($this->params['applehttp_auth_window']) ? $this->params['applehttp_auth_window'] : 0;
+			if ($name && $key !== false && $gen !== false)
+				return new kLevel3UrlTokenizer($name, $key, $gen, true, $expiryName, $window);
+			break;
 		}
 		return null;
 	}

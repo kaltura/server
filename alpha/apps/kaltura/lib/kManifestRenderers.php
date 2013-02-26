@@ -168,6 +168,23 @@ abstract class kManifestRenderer
 			return $part1;
 		return rtrim($part1, '/') . '/' . ltrim($part2, '/');
 	}
+
+	/**
+	 * @param array $flavor
+	 */
+	static protected function normalizeUrlPrefix(&$flavor)
+	{
+		$urlPrefix = $flavor['urlPrefix'];
+		if (!$urlPrefix)
+			return;
+		
+		$urlPrefixPath = parse_url($urlPrefix, PHP_URL_PATH);
+		if (!$urlPrefixPath || substr($urlPrefix, -strlen($urlPrefixPath)) != $urlPrefixPath)
+			return;
+
+		$flavor['urlPrefix'] = substr($urlPrefix, 0, -strlen($urlPrefixPath));
+		$flavor['url'] = self::urlJoin($urlPrefixPath, $flavor['url']);
+	}
 }
 
 class kSingleUrlManifestRenderer extends kManifestRenderer
@@ -185,6 +202,7 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 	
 	protected function tokenizeUrls()
 	{
+		self::normalizeUrlPrefix($this->flavor);
 		$url = $this->flavor['url'];
 		if ($this->tokenizer)
 		{
@@ -232,6 +250,7 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 		{
 			foreach ($this->flavors as &$flavor)
 			{
+				self::normalizeUrlPrefix($flavor);
 				$url = $flavor['url'];
 				if ($this->tokenizer)
 				{
