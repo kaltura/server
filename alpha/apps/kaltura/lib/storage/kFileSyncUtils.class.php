@@ -179,11 +179,20 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	protected static function fullMkdir($filePath)
 	{
-		$dir = dirname($filePath);
-		if(!kFile::fullMkfileDir($dir, 0750))
-			return false;
-
-		return chgrp($dir, kConf::get('content_group'));
+	    $dirs = explode(DIRECTORY_SEPARATOR , dirname($filePath));
+	    $path = '';
+	    foreach ($dirs as $dir) 
+	    {
+	        $path .= DIRECTORY_SEPARATOR . $dir;
+	        if (is_dir($path))
+	        	continue;
+	        	
+	        if(!kFile::fullMkfileDir($path, 0750))
+	        	return false;
+	        	
+	        chgrp($path, kConf::get('content_group'));
+	    }
+	    return true;
 	}
 
 	public static function moveToFile ( FileSyncKey $source_key , $target_file_path, $delete_source = true , $overwrite = true)
