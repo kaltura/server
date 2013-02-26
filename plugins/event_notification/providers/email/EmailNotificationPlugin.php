@@ -30,7 +30,10 @@ class EmailNotificationPlugin extends KalturaPlugin implements IKalturaPermissio
 	public static function isAllowedPartner($partnerId)
 	{
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		return $partner->getPluginEnabled(self::PLUGIN_NAME);		
+		if ($partner)
+			return $partner->getPluginEnabled(self::PLUGIN_NAME);
+
+		return false;
 	}
 			
 	/* (non-PHPdoc)

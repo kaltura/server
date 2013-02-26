@@ -40,7 +40,10 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 			return true;
 			
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		return $partner->getPluginEnabled(self::PLUGIN_NAME);		
+		if ($partner)
+			return $partner->getPluginEnabled(self::PLUGIN_NAME);
+
+		return false;
 	}
 			
 	/* (non-PHPdoc)
