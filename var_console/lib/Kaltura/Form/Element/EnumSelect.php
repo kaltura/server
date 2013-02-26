@@ -13,7 +13,7 @@ class Kaltura_Form_Element_EnumSelect extends Zend_Form_Element_Select
 			throw new Zend_Form_Exception('Please specify the enum type');
 		 
 		if(!class_exists($options['enum']))
-			throw new Zend_Form_Exception('Enum type does not exist');
+			throw new Zend_Form_Exception('Enum type does not exists');
 			
 		$enumName = $options['enum'];
 		

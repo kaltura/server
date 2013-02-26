@@ -93,7 +93,7 @@ class SymantecScanDirectEngine extends SymantecScanEngine
 	{
 		if (!file_exists($filePath))
 		{
-			$errorDescription = 'Source file does not exist ['.$filePath.']';
+			$errorDescription = 'Source file does not exists ['.$filePath.']';
 			return KalturaVirusScanJobResult::SCAN_ERROR;
 		}
 		

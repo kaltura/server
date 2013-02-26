@@ -342,8 +342,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$srcRes = FileSyncPeer::doSelectOne( $c );
 		if ( !$srcRes )
 		{
-			KalturaLog::log("file does not exist");
-			throw new Exception ( "key [" . $source_key . "] does not exist");
+			KalturaLog::log("file does not exists");
+			throw new Exception ( "key [" . $source_key . "] does not exists");
 		}
 
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $target_key );

@@ -26,7 +26,7 @@ class KalturaErrors extends APIErrors
 	const SERVICE_NOT_SPECIFIED = "SERVICE_NOT_SPECIFIED,Service name was not specified, please specify one";
 	
 	// %s - service name
-	const SERVICE_DOES_NOT_EXISTS = "SERVICE_DOES_NOT_EXISTS,Service \"%s\" does not exist";
+	const SERVICE_DOES_NOT_EXISTS = "SERVICE_DOES_NOT_EXISTS,Service \"%s\" does not exists";
 	
 	// %s - xml field  
 	const INVALID_PARAMETER_CHAR= "INVALID_PARAMETER_CHAR,Invalid char in \"%s\" field";
@@ -35,7 +35,7 @@ class KalturaErrors extends APIErrors
 	const ACTION_NOT_SPECIFIED = "ACTION_NOT_SPECIFIED,Action name was not specified, please specify one";
 	
 	// %s - action name, %s - service name
-	const ACTION_DOES_NOT_EXISTS = "ACTION_DOES_NOT_EXISTS,Action \"%s\" does not exist for service \"%s\"";
+	const ACTION_DOES_NOT_EXISTS = "ACTION_DOES_NOT_EXISTS,Action \"%s\" does not exists for service \"%s\"";
 	
 	// %s - action name
 	const ACTION_FORBIDDEN = "ACTION_FORBIDDEN,Action \"%s\" is forbidden for use";
@@ -363,7 +363,7 @@ class KalturaErrors extends APIErrors
 	
 	const ROLE_NAME_ALREADY_EXISTS = "ROLE_NAME_ALREADY_EXISTS,A role with the same name already exists";
 	
-	const PERMISSION_ITEM_NOT_FOUND = "PERMISSION_ITEM_NOT_FOUND,Permission item does not exist";
+	const PERMISSION_ITEM_NOT_FOUND = "PERMISSION_ITEM_NOT_FOUND,Permission item does not exists";
 	
 	const PROPERTY_DEPRECATED = "PROPERTY_DEPRECTAED,The property \"%s\" is deprecated and should not be used";
 	

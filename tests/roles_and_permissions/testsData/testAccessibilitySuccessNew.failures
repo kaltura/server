@@ -15,7 +15,7 @@
           <OutputReference>SERVICE_FORBIDDEN</OutputReference>
           <ActualOutput>ACTION_DOES_NOT_EXISTS</ActualOutput>
           <Assert>assertEquals</Assert>
-          <Message>Action "getAvailableTypes" does not exist for service "uiconf"</Message>
+          <Message>Action "getAvailableTypes" does not exists for service "uiconf"</Message>
         </Failure>
         <Failure>
           <Field>metadata::addfromfile</Field>

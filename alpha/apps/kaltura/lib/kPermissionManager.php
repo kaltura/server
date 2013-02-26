@@ -288,12 +288,12 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$permission = $lookup->getPermission();
 			
 			if (!$item)	{
-				KalturaLog::err('PermissionToPermissionItem id ['.$lookup->getId().'] is defined with PermissionItem id ['.$lookup->getPermissionItemId().'] which does not exist!');
+				KalturaLog::err('PermissionToPermissionItem id ['.$lookup->getId().'] is defined with PermissionItem id ['.$lookup->getPermissionItemId().'] which does not exists!');
 				continue;
 			}
 			
 			if (!$permission) {
-				KalturaLog::err('PermissionToPermissionItem id ['.$lookup->getId().'] is defined with Permission name ['.$lookup->getPermissionName().'] which does not exist!');
+				KalturaLog::err('PermissionToPermissionItem id ['.$lookup->getId().'] is defined with Permission name ['.$lookup->getPermissionName().'] which does not exists!');
 				continue;
 			}
 				
@@ -489,7 +489,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				if ($roleId){
 					$roleIds = $roleId->getId();
 				}else{
-					KalturaLog::debug("Role id [$ksSetRoleId] does not exist");
+					KalturaLog::debug("Role id [$ksSetRoleId] does not exists");
 					throw new kCoreException("Unknown role Id [$ksSetRoleId]", kCoreException::ID_NOT_FOUND);
 				}
 			}

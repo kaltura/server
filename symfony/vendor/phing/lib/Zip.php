@@ -209,7 +209,7 @@ class Archive_Zip
     // {{{ add()
     /**
     * This method add files or directory in an existing Zip Archive.
-    * If the Zip Archive does not exist it is created.
+    * If the Zip Archive does not exists it is created.
 	* The files and directories to add are indicated in $p_filelist.
 	* When a directory is in the list, the directory and its content is added
     * in the archive.
@@ -311,7 +311,7 @@ class Archive_Zip
     *              newer_exist : the file was not extracted because a newer
 	*                            file already exists
     *              path_creation_fail : the file is not extracted because the
-	*                                   folder does not exist and can't be
+	*                                   folder does not exists and can't be
 	*                                   created
     *              write_error : the file was not extracted because there was a
     *                            error while writing the file
@@ -592,8 +592,8 @@ class Archive_Zip
     /**
     *  This method merge a valid zip archive at the end of the
 	*  archive identified by the Archive_Zip object.
-    *  If the archive ($this) does not exist, the merge becomes a duplicate.
-    *  If the archive to add does not exist, the merge is a success.
+    *  If the archive ($this) does not exists, the merge becomes a duplicate.
+    *  If the archive to add does not exists, the merge is a success.
     *
     * @access public
     * @param mixed $p_archive_to_add  It can be a valid Archive_Zip object or
@@ -1160,7 +1160,7 @@ class Archive_Zip
       if (!file_exists($p_filename))
       {
         $this->_errorLog(ARCHIVE_ZIP_ERR_MISSING_FILE,
-		                 "File '$p_filename' does not exist");
+		                 "File '$p_filename' does not exists");
         return Archive_Zip::errorCode();
       }
 
@@ -2972,7 +2972,7 @@ class Archive_Zip
   // ---------------------------------------------------------------------------
   // Function : _merge()
   // Description :
-  //   If $p_archive_to_add does not exist, the function exit with a success result.
+  //   If $p_archive_to_add does not exists, the function exit with a success result.
   // Parameters :
   // Return Values :
   // ---------------------------------------------------------------------------

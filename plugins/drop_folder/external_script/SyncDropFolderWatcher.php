@@ -112,7 +112,7 @@ try
 			if($fileExists)
 				writeLog($logPrefix, 'file exists on the file system');
 			else 
-				writeLog($logPrefix, 'file does not exist on the file system');
+				writeLog($logPrefix, 'file does not exists on the file system');
 				
 			if($fileExists && $file) //file exists on the file system and in database
 			{
@@ -126,7 +126,7 @@ try
 				writeLog($logPrefix, 'created file with id '.$file->id);
 				writeLog($logPrefix, 'file status updated to PENDING');											
 			}
-			else if(!$fileExists && $file) //file does not exist on file system (temporary file), but exists in database
+			else if(!$fileExists && $file) //file does not exists on file system (temporary file), but exists in database
 			{
 				$dropFolderPlugin->dropFolderFile->updateStatus($file->id, KalturaDropFolderFileStatus::PURGED);
 				writeLog($logPrefix, 'file deleted from the file system, status updated to PURGED');
@@ -146,7 +146,7 @@ try
 	}
 	else
 	{
-		writeLog($logPrefix, 'Error - folder does not exist');
+		writeLog($logPrefix, 'Error - folder does not exists');
 	}
 }
 catch (Exception $e)

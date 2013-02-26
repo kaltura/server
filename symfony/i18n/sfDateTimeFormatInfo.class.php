@@ -99,7 +99,7 @@ class sfDateTimeFormatInfo
     }
     else
     {
-      throw new sfException('Property '.$name.' does not exist.');
+      throw new sfException('Property '.$name.' does not exists.');
     }
   }
 

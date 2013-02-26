@@ -62,14 +62,14 @@ class KalturaServiceReflector extends KalturaReflector
 		$newInstance->_servicesMap = KalturaServicesMap::getMap();
 		
 		if (!$newInstance->isServiceExists($newInstance->_serviceId))
-			throw new Exception("Service [$service] does not exist in service list [" . print_r(array_keys($newInstance->_servicesMap), true) . "]");
+			throw new Exception("Service [$service] does not exists in service list [" . print_r(array_keys($newInstance->_servicesMap), true) . "]");
 			
 		$serviceActionItem = $newInstance->_servicesMap[$newInstance->_serviceId];
 		/* @var $serviceActionItem KalturaServiceActionItem */
 		$newInstance->_serviceClass = $serviceActionItem->serviceClass;
 		
 		if (!class_exists($newInstance->_serviceClass))
-			throw new Exception("Service class [$newInstance->_serviceClass] for service [$service] does not exist");
+			throw new Exception("Service class [$newInstance->_serviceClass] for service [$service] does not exists");
 		
 		$reflectionClass = new ReflectionClass($newInstance->_serviceClass);
 		$newInstance->_serviceInfo = new KalturaDocCommentParser($reflectionClass->getDocComment());
@@ -88,7 +88,7 @@ class KalturaServiceReflector extends KalturaReflector
 	   $newInstance = new KalturaServiceReflector();
 	   if ( !class_exists( $serviceClass ) || !in_array("KalturaBaseService", class_parents($serviceClass)))
         {
-            throw new Exception("Service class [$serviceClass] does not exist, or is not an instance of KalturaBaseService");
+            throw new Exception("Service class [$serviceClass] does not exists, or is not an instance of KalturaBaseService");
         }
         
         $newInstance->_serviceClass = $serviceClass;
@@ -264,7 +264,7 @@ class KalturaServiceReflector extends KalturaReflector
 	public function getActionInfo($actionName, $ignoreAliasActions = true)
 	{
 		if (!$this->isActionExists($actionName, $ignoreAliasActions))
-			throw new Exception("Action [$actionName] does not exist for service [$this->_serviceId]");
+			throw new Exception("Action [$actionName] does not exists for service [$this->_serviceId]");
 		
 		$methodName = $this->getActionMethodName($actionName, $ignoreAliasActions);
 		// reflect the service 
@@ -279,7 +279,7 @@ class KalturaServiceReflector extends KalturaReflector
 	public function getActionParams($actionName)
 	{
 		if (!$this->isActionExists($actionName))
-			throw new Exception("Action [$actionName] does not exist for service [$this->_serviceId]");
+			throw new Exception("Action [$actionName] does not exists for service [$this->_serviceId]");
 			
 		$methodName = $this->getActionMethodName($actionName);
 		
@@ -340,7 +340,7 @@ class KalturaServiceReflector extends KalturaReflector
 	public function getActionOutputType($actionName)
 	{
 		if (!$this->isActionExists($actionName))
-			throw new Exception("Action [$actionName] does not exist for service [$this->_serviceId]");
+			throw new Exception("Action [$actionName] does not exists for service [$this->_serviceId]");
 
 		$methodName = $this->getActionMethodName($actionName);
 		
