@@ -65,6 +65,7 @@ class KalturaJsonSerializer
 				"message" => $object->getMessage()
 			);
 			$object = $error;
+			$object->objectType = get_class($object);
     	}
     	else if (is_array($object))
     	{
@@ -74,9 +75,8 @@ class KalturaJsonSerializer
     			$array[] = $this->convertExceptionsToArrays($item);					
     		}
     		$object = $array;
-    	}
-    	
-		$object->objectType = get_class($object);
+    		$object->objectType = get_class($object);
+    	}		
     	return $object;
 	}
 	
