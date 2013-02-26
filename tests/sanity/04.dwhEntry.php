@@ -242,7 +242,13 @@ echo " OK\n";
  * TODO:
  *  - Validate that the data collected from all API machines.
  */
+$dateTimeZoneServer = new DateTimeZone(date_default_timezone_get());
+$dateTimeZoneUTC = new DateTimeZone("UTC");
+$dateTimeUTC = new DateTime("now", $dateTimeZoneUTC);
+$timeOffsetSeconds = $dateTimeZoneServer->getOffset($dateTimeUTC);
+
 $reportInputFilter = new KalturaReportInputFilter();
+$reportInputFilter->timeZoneOffset = ($timeOffsetSeconds / -60);
 $reportInputFilter->fromDay = date('Ymd', time() - (60 * 60 * 24));
 $reportInputFilter->toDay = date('Ymd');
 
@@ -281,7 +287,7 @@ if(!isset($record['count_loads']) || !$record['count_loads'] || !intval($record[
 	echo "Reported wrong loads count [" . $record['count_loads'] . "]\n";
 	exit(-1);
 }
-$expectedTimeViewed = $entry->duration / 60;
+$expectedTimeViewed = round($entry->duration / 60, 2);
 if(!isset($record['sum_time_viewed']) || !$record['sum_time_viewed'] || floatval($record['sum_time_viewed']) < $expectedTimeViewed)
 {
 	echo "Reported wrong view time [" . $record['sum_time_viewed'] . "] expected at least [$expectedTimeViewed]\n";
