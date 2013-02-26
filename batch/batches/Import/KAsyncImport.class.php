@@ -382,6 +382,7 @@ class KAsyncImport extends KJobHandlerWorker
 			
 			$data = $job->data;
 			$data->destFileLocalPath = $sharedFile;
+			$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 			
 			if($this->checkFileExists($sharedFile, $fileSize))
 			{
