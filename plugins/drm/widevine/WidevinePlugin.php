@@ -55,6 +55,9 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 			
 		if($baseClass == 'asset' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return new WidevineFlavorAsset();
+			
+		if($baseClass == 'flavorAsset' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+			return new WidevineFlavorAsset();
 		
 		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::WIDEVINE)
 			return new KWidevineOperationEngine($constructorArgs['params'], $constructorArgs['outFilePath']);
@@ -87,6 +90,9 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 			
 		if($baseClass == 'asset' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return 'WidevineFlavorAsset';
+			
+		if($baseClass == 'flavorAsset' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
+			return 'WidevineFlavorAsset';			
 		
 		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::WIDEVINE)
 			return 'KWidevineOperationEngine';
