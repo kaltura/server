@@ -70,7 +70,7 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	public $dvrStatus;
 	
 	/**
-	 * Window of time which the DVR allows for backwards scrubbing (in seconds)
+	 * Window of time which the DVR allows for backwards scrubbing (in minutes)
 	 * @var int
 	 */
 	public $dvrWindow;
