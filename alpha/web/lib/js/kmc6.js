@@ -9,7 +9,8 @@ kmc.vars.help_url = kmc.vars.service_url + '/kmc5help.html';
 
 // Set base URL
 kmc.vars.port = (window.location.port) ? ":" + window.location.port : "";
-kmc.vars.base_url = window.location.protocol + '//' + window.location.hostname + kmc.vars.port;
+kmc.vars.base_host = window.location.hostname + kmc.vars.port;
+kmc.vars.base_url = window.location.protocol + '//' + kmc.vars.base_host;
 kmc.vars.api_host = kmc.vars.host + kmc.vars.port;
 kmc.vars.api_url = window.location.protocol + '//' + kmc.vars.api_host;
 
@@ -176,22 +177,6 @@ kmc.functions = {
 			}
 		} );
 	},
-	flashVarsToString: function( flashVarsObject ) {
-		 var params = '';
-		 for( var i in flashVarsObject ){
-			 // check for object representation of plugin config:
-			 if( typeof flashVarsObject[i] == 'object' ){
-				 for( var j in flashVarsObject[i] ){
-					 params+= '&' + '' + encodeURIComponent( i ) +
-					 	'.' + encodeURIComponent( j ) +
-					 	'=' + encodeURIComponent( flashVarsObject[i][j] );
-				 }
-			 } else {
-				 params+= '&' + '' + encodeURIComponent( i ) + '=' + encodeURIComponent( flashVarsObject[i] );
-			 }
-		 }
-		 return params;
-	 },
 	flashVarsToUrl: function( flashVarsObject ){
 		 var params = '';
 		 for( var i in flashVarsObject ){
@@ -321,12 +306,6 @@ kmc.utils = {
 		$("#flash_wrap").height(doc_height + "px");
 		$("#server_wrap iframe").height(doc_height + "px");
 		$("#server_wrap").css("margin-top", "-"+ (doc_height + 2) +"px");
-	},
-	escapeQuotes : function(string) {
-		if( typeof string !== 'string' ) {return ;}
-		string = string.replace(/"/g,"&Prime;");
-		string = string.replace(/'/g,"&prime;");
-		return string;
 	},
 	isModuleLoaded : function() {
 		if($("#flash_wrap object").length || $("#flash_wrap embed").length) {
@@ -580,51 +559,44 @@ kmc.preview_embed = {
 	}, // doPreviewEmbed
 
 	// for content|Manage->drilldown->flavors->preview
-	// flavor_details = json:
-	doFlavorPreview : function(entry_id, entry_name, flavor_details) {
+	doFlavorPreview : function(entryId, entryName, flavorDetails) {
+		
+		var player = kmc.vars.default_kdp;
+		var code = kmc.Preview.getGenerator().getCode({
+			protocol: location.protocol.substring(0, location.protocol.length - 1),
+			embedType: 'legacy',
+			entryId: entryId,
+			uiConfId: parseInt(player.id),
+			width: player.width,
+			height: player.height,
+			includeSeoMetadata: false,
+			includeHtml5Library: false,
+			flashVars: {
+				'ks': kmc.vars.ks,
+				'flavorId': flavorDetails.asset_id
+			}
+		});
 
-		var https_embed_code = (window.location.protocol == 'https:') ? true : false;
-		var player_code = kmc.preview_embed.buildKalturaEmbed(entry_id,entry_name,null,false,kmc.vars.default_kdp, true, https_embed_code);
-		player_code = player_code.replace('&{FLAVOR}', '&flavorId=' + flavor_details.asset_id + '&ks=' + kmc.vars.ks);
-
-		var modal_content = '<div class="center">' + player_code + '</div><dl>' +
-		'<dt>Entry Name:</dt><dd>&nbsp;' + entry_name + '</dd>' +
-		'<dt>Entry Id:</dt><dd>&nbsp;' + entry_id + '</dd>' +
-		'<dt>Flavor Name:</dt><dd>&nbsp;' + flavor_details.flavor_name + '</dd>' +
-		'<dt>Flavor Asset Id:</dt><dd>&nbsp;' + flavor_details.asset_id + '</dd>' +
-		'<dt>Bitrate:</dt><dd>&nbsp;' + flavor_details.bitrate + '</dd>' +
-		'<dt>Codec:</dt><dd>&nbsp;' + flavor_details.codec + '</dd>' +
-		'<dt>Dimensions:</dt><dd>&nbsp;' + flavor_details.dimensions.width + ' x ' + flavor_details.dimensions.height + '</dd>' +
-		'<dt>Format:</dt><dd>&nbsp;' + flavor_details.format + '</dd>' +
-		'<dt>Size (KB):</dt><dd>&nbsp;' + flavor_details.sizeKB + '</dd>' +
-		'<dt>Status:</dt><dd>&nbsp;' + flavor_details.status + '</dd>' +
+		var modal_content = '<div class="center">' + code + '</div><dl>' +
+		'<dt>Entry Name:</dt><dd>&nbsp;' + entryName + '</dd>' +
+		'<dt>Entry Id:</dt><dd>&nbsp;' + entryId + '</dd>' +
+		'<dt>Flavor Name:</dt><dd>&nbsp;' + flavorDetails.flavor_name + '</dd>' +
+		'<dt>Flavor Asset Id:</dt><dd>&nbsp;' + flavorDetails.asset_id + '</dd>' +
+		'<dt>Bitrate:</dt><dd>&nbsp;' + flavorDetails.bitrate + '</dd>' +
+		'<dt>Codec:</dt><dd>&nbsp;' + flavorDetails.codec + '</dd>' +
+		'<dt>Dimensions:</dt><dd>&nbsp;' + flavorDetails.dimensions.width + ' x ' + flavorDetails.dimensions.height + '</dd>' +
+		'<dt>Format:</dt><dd>&nbsp;' + flavorDetails.format + '</dd>' +
+		'<dt>Size (KB):</dt><dd>&nbsp;' + flavorDetails.sizeKB + '</dd>' +
+		'<dt>Status:</dt><dd>&nbsp;' + flavorDetails.status + '</dd>' +
 		'</dl>';
 
 		kmc.layout.modal.open( {
-			'width' : parseInt(kmc.vars.default_kdp.width) + 120,
-			'height' : parseInt(kmc.vars.default_kdp.height) + 300,
+			'width' : parseInt(player.width) + 120,
+			'height' : parseInt(player.height) + 300,
 			'title' : 'Flavor Preview',
 			'content' : '<div id="preview_embed">' + modal_content + '</div>'
 		} );
 
-	},
-
-	getUiconfDetails : function(uiconf_id,is_playlist) {
-
-		var i,
-		uiconfs_array = is_playlist ? kmc.vars.playlists_list : kmc.vars.players_list;
-		for(i in uiconfs_array) {
-			if(uiconfs_array[i].id == uiconf_id) {
-				return uiconfs_array[i];
-			}
-		}
-		$("#kcms")[0].alert("getUiconfDetails error: uiconf_id "+uiconf_id+" not found in " + ((is_playlist) ? "kmc.vars.playlists_list" : "kmc.vars.players_list"));
-		return false;
-	},
-	setCacheStartTime : function() {
-		var d = new Date();
-		cache_st = Math.floor(d.getTime() / 1000) + (15 * 60); // start caching in 15 minutes
-		return cache_st;
 	},
 	updateList : function(is_playlist) {
 		var type = is_playlist ? "playlist" : "player";
@@ -649,16 +621,6 @@ kmc.preview_embed = {
 				}
 			}
 		});
-	},
-		
-	setShortURL : function(id) {
-		kmc.log('PreviewEmbed: setShortURL');
-		var url = kmc.vars.service_url + '/tiny/' + id;
-		//var url_text = url.replace(/http:\/\/|www./ig, '');
-		var url_text = url.replace(/http:\/\//ig, '');
-			
-		var html = '<a href="' + url + '" target="_blank">' + url_text + '</a>';
-		$(".preview_url").html(html);
 	}
 };
 
@@ -712,33 +674,6 @@ kmc.client = {
 		});	
 	},
 		
-	// Get the Short URL code
-	setShortURL : function(url) {
-		kmc.log( 'setShortURL' );
-		
-		var filter = {
-			"filter:objectType"		: "KalturaShortLinkFilter",
-			"filter:statusEqual"	: 2,
-			"filter:systemNameEqual": "KMC-PREVIEW"
-		};
-		
-		kmc.client.makeRequest("shortlink_shortlink", "list", filter, function( res ) {
-			if(res && res.totalCount === 0) {
-				// if no url were found, create a new one
-				kmc.client.createShortURL(url);
-			} else {
-				// update the url
-				var id = res.objects[0].id;
-				var res_url = res.objects[0].fullUrl;
-				if(url == res_url) {
-					kmc.preview_embed.setShortURL(id);
-				} else {
-					kmc.client.updateShortURL(url, id);
-				}
-			}			
-		});
-	},
-		
 	createShortURL : function(url, callback) {
 		kmc.log('createShortURL');
 			
@@ -755,60 +690,8 @@ kmc.client = {
 				kmc.preview_embed.setShortURL(res.id);
 			}
 		});
-	},
-		
-	updateShortURL : function(url, id) {
-		kmc.log('updateShortURL');
-			
-		var data = {
-			"id"					: id,
-			"shortLink:objectType"	: "KalturaShortLink",
-			"shortLink:fullUrl"		: url
-		};
-			
-		kmc.client.makeRequest("shortlink_shortlink", "update", data, function( res ) {
-			kmc.preview_embed.setShortURL(res.id);
-		});
-			
 	}
 };
-
-// Maintain support for old kmc2 functions:
-function openPlayer(title, width, height, uiconf_id, previewOnly) {
-	if (previewOnly===true) $("#kcms")[0].alert('previewOnly from studio');
-	kmc.preview_embed.doPreviewEmbed("multitab_playlist", title, null, previewOnly, true, uiconf_id, false, false, false);
-}
-function playlistAdded() {kmc.preview_embed.updateList(true);}
-function playerAdded() {kmc.preview_embed.updateList(false);}
-/*** end old functions ***/
-
-// When page ready initilize KMC
-$(function() {
-	kmc.layout.init();
-	kmc.utils.handleMenu();
-	kmc.functions.loadSwf();
-
-	// Load kdp player & playlists for preview & embed
-	kmc.preview_embed.updateList(); // Load players
-	kmc.preview_embed.updateList(true); // Load playlists
-});
-
-// When flash finished loading, resize the page
-$(window).load(function(){
-	$(window).wresize(kmc.utils.resize);
-	kmc.vars.isLoadedInterval = setInterval(kmc.utils.isModuleLoaded,200);
-});
-
-// Auto resize modal windows
-$(window).resize(function() {
-		// Exit if not open
-	if( kmc.layout.modal.isOpen() ) {
-		kmc.layout.modal.position();
-	}
-});
-
-// If we have ongoing process, we show a warning message when the user try to leaves the page
-window.onbeforeunload = kmc.functions.checkForOngoingProcess;
 
 kmc.layout = {
 	init: function() {
@@ -1092,6 +975,43 @@ kmc.user = {
 		return false;
 	}
 };
+
+// Maintain support for old kmc2 functions:
+function openPlayer(title, width, height, uiconf_id, previewOnly) {
+	if (previewOnly===true) $("#kcms")[0].alert('previewOnly from studio');
+	kmc.preview_embed.doPreviewEmbed("multitab_playlist", title, null, previewOnly, true, uiconf_id, false, false, false);
+}
+function playlistAdded() {kmc.preview_embed.updateList(true);}
+function playerAdded() {kmc.preview_embed.updateList(false);}
+/*** end old functions ***/
+
+// When page ready initilize KMC
+$(function() {
+	kmc.layout.init();
+	kmc.utils.handleMenu();
+	kmc.functions.loadSwf();
+
+	// Load kdp player & playlists for preview & embed
+	kmc.preview_embed.updateList(); // Load players
+	kmc.preview_embed.updateList(true); // Load playlists
+});
+
+// When flash finished loading, resize the page
+$(window).load(function(){
+	$(window).wresize(kmc.utils.resize);
+	kmc.vars.isLoadedInterval = setInterval(kmc.utils.isModuleLoaded,200);
+});
+
+// Auto resize modal windows
+$(window).resize(function() {
+	// Exit if not open
+	if( kmc.layout.modal.isOpen() ) {
+		kmc.layout.modal.position();
+	}
+});
+
+// If we have ongoing process, we show a warning message when the user try to leaves the page
+window.onbeforeunload = kmc.functions.checkForOngoingProcess;
 
 /* WResize: plugin for fixing the IE window resize bug (http://noteslog.com/) */
 (function($){$.fn.wresize=function(f){version='1.1';wresize={fired:false,width:0};function resizeOnce(){if($.browser.msie){if(!wresize.fired){wresize.fired=true}else{var version=parseInt($.browser.version,10);wresize.fired=false;if(version<7){return false}else if(version==7){var width=$(window).width();if(width!=wresize.width){wresize.width=width;return false}}}}return true}function handleWResize(e){if(resizeOnce()){return f.apply(this,[e])}}this.each(function(){if(this==window){$(this).resize(handleWResize)}else{$(this).resize(f)}});return this}})(jQuery);
