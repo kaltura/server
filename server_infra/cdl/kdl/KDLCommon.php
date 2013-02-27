@@ -84,6 +84,8 @@
 		const ProductBitrateFactor = 0.7;
 		const LowBitrateThresHold = 200;		// Video clips below that value will get special quantization/quality issue
 		
+		const IsmvMinimalFlavorRatio = 1.02; 	// Minimal BR difference between ISMV collection flavors. EE4 constraint
+		const IsmvPeakBitrateRatio   = 1.3;
 				/*
 				 * TranscodersSourceBlackList
 				 */
