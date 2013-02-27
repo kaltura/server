@@ -1,5 +1,9 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html ng-app="kmcApp" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html ng-app="kmcApp" class="no-js lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html ng-app="kmcApp" class="no-js lt-ie10 lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html ng-app="kmcApp" class="no-js lt-ie10 lt-ie9"> <![endif]-->
+<!--[if lt IE 10]>     <html ng-app="kmcApp" class="no-js lt-ie10"> <![endif]-->
+<!--[if gt IE 8]><!--> <html ng-app="kmcApp" class="no-js"> <!--<![endif]-->
 <head>
 <base href="<?php echo requestUtils::getRequestHost() ?>/" />
 
