@@ -101,6 +101,7 @@ if( count($allowedPartners) > 1 ) {
 <script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/localStorage.min.js"></script>
 <![endif]-->
 <?php if( $previewEmbedV2 ) { ?>
+<!-- Preview & Embed Modal -->
 <div id="previewModal" class="modal preview_embed" ng-controller="PreviewCtrl">
 	<div class="title">
 		<h2></h2>
@@ -127,27 +128,27 @@ if( count($allowedPartners) > 1 ) {
 				<div class="hr"></div>
 			</div>
 			<div class="control-group advance">
-				<div class="arrow-down pull-left" ng-hide="showAdvancedOptionsStatus"></div>
+				<div class="arrow-right pull-left" ng-hide="showAdvancedOptionsStatus"></div>
 				<a ng-hide="showAdvancedOptionsStatus" ng-click="showAdvancedOptions($event, true)" href="#">Show Advanced Options</a>
-				<div class="arrow-right pull-left" ng-show="showAdvancedOptionsStatus"></div>
+				<div class="arrow-down pull-left" ng-show="showAdvancedOptionsStatus"></div>
 				<a ng-show="showAdvancedOptionsStatus" ng-click="showAdvancedOptions($event, false)" href="#">Hide Advanced Options</a>
 			</div>
 			<div class="hr"></div>
 			<div show-slide="showAdvancedOptionsStatus">
 				<div class="control-group" ng-hide="liveBitrates">
-					<label class="control-label">Delivery Types: </label>
+					<label class="control-label">Delivery Type: </label>
 					<div class="controls"><select ng-model="deliveryType" ng-options="d.id as d.label for d in deliveryTypes"></select></div>
-					<small class="help-block">Adaptive Streaming automatically adjusts to the viewer's bandwidth,while Progressive Download allows buffering of the content. <a href="javascript:kmc.utils.openHelp('section_pne_stream');">Read more</a></small>
+					<small class="help-block">Adaptive Streaming automatically adjusts to the viewer's bandwidth, while Progressive Download allows buffering of the content. <a href="javascript:kmc.utils.openHelp('section_pne_stream');">Read more</a></small>
 					<div class="hr"></div>					
 				</div>
 				<div class="control-group">
-					<label class="control-label">Embed Types: </label>
+					<label class="control-label">Embed Type: </label>
 					<div class="controls"><select ng-model="embedType" ng-options="e.id as e.label for e in embedTypes"></select></div>
 					<small class="help-block">Auto embed is the default embed code type and is best to get a player quickly on a page without any runtime customizations. <a href="javascript:kmc.utils.openHelp('section_pne_embed');">Read more</a> about the different embed code types.</small>
 				</div>
 				<div class="hr"></div>
 				<div class="control-group">
-					<label class="checkbox"><input type="checkbox" ng-model="includeSeo"> Include Search Engine Optimazation data</label>
+					<label class="checkbox"><input type="checkbox" ng-model="includeSeo"> Include Search Engine Optimization data</label>
 					<label class="checkbox"><input type="checkbox" ng-model="secureEmbed"> Support for HTTPS embed code</label>
 				</div>
 				<div class="hr"></div>
@@ -157,7 +158,7 @@ if( count($allowedPartners) > 1 ) {
 					<label class="control-label">Preview: </label>
 				</div>
 				<div class="qr-block">
-					<small class="help-block">Scan the QR code the preview in your mobile device</small>
+					<small class="help-block">Scan the QR code to preview in your mobile device</small>
 					<div id="qrcode"></div>
 					<div class="hr"></div>
 				</div>
@@ -182,7 +183,7 @@ if( count($allowedPartners) > 1 ) {
 	</div>
 </div>
 <script src="/lib/js/angular-1.0.4.min.js"></script>
-<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.3.min.js"></script>
+<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.4.min.js"></script>
 <script src="/lib/js/jquery.qrcode-0.2.min.js"></script>
 <script src="/lib/js/ZeroClipboard.min.js"></script>
 <script src="/lib/js/preview.js"></script>
