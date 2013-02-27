@@ -16,8 +16,6 @@ echo `date`
 SCRIPTDIR=$APP_DIR/plugins/sphinx_search/scripts
 
 SCRIPTEXE=populateFromLog.php
-# The populate service filename without extensions
-FILE_NAME=${SCRIPTEXE%.*}
 
 if [ $# != 1 ]; then
 	echo "Usage: $0 [start|stop|restart|status]"
@@ -61,15 +59,15 @@ start() {
 	
 	echo -n $"Starting:"
 	KP=$(pgrep -P 1 -f $SCRIPTEXE)
-	if [ -f $LOCKFILE ]; then
+	if ! kill -0 `cat $LOCKFILE 2>/dev/null` 2>/dev/null; then 
 		echo_failure
 		echo
 		if [ "X$KP" != "X" ]; then
-			echo "Service $FILE_NAME already running"
+			echo "Service populate already running"
 			#return 1
 			return 0
 		else
-			echo "Service $FILE_NAME isn't running but stale lock file exists"
+			echo "Service populate isn't running but stale lock file exists"
 			echo "Removing stale lock file at $LOCKFILE"
 			rm -f $LOCKFILE
 			start_scheduler
@@ -77,7 +75,7 @@ start() {
 		fi
 	else
 		if [ "X$KP" != "X" ]; then
-			echo "$FILE_NAME is running as $KP without a $LOCKFILE"
+			echo "Populate is running as $KP without a $LOCKFILE"
 			exit 0
 		fi		
 		start_scheduler
@@ -102,10 +100,10 @@ start_scheduler() {
 show_status() {
 	KP=$(pgrep -P 1 -f $SCRIPTEXE) 
 	if [ "X$KP" != "X" ]; then
-	echo "$FILE_NAME is running as $KP ..."
+	echo "Populate is running as $KP ..."
 	return 0
 	else
-		echo "Service $FILE_NAME isn't running"
+		echo "Service populate isn't running"
 		#return 1
 		return 0
 	fi
@@ -127,7 +125,7 @@ stop() {
 	else
 		echo_failure
 		echo
-		echo "Service $FILE_NAME not running"
+		echo "Service populate not running"
 		#RC=2
 		RC=0
 	fi
