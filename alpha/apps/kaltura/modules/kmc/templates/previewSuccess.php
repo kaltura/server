@@ -1,5 +1,9 @@
-﻿<!doctype html>
-<html>
+﻿<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="lt-ie10 lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="lt-ie10 lt-ie9"> <![endif]-->
+<!--[if lt IE 10]>     <html class="lt-ie10"> <![endif]-->
+<!--[if gt IE 8]><!--> <html> <!--<![endif]-->
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -20,14 +24,27 @@
 	<?php } ?>
 	<meta property="og:site_name" content="Kaltura" />
 	<?php } ?>
-	
 	<title><?php echo htmlspecialchars($entry_name); ?></title>
+	<?php if($framed)  { ?>
 	<style>
-		#main .content .title h1 { font-size: 24px; font-weight: bold; }
-		#main p { margin-bottom: 20px; font-size: 18px; }
+	html, body {margin: 0; padding: 0; width: 100%; height: 100%; } 
+	#framePlayerContainer {margin: 0 auto; padding-top: 20px; text-align: center; } 
+	object, div { margin: 0 auto; }
 	</style>
+	<!--[if lte IE 7]>
+	<script src="/lib/js/json2.min.js"></script>
+	<![endif]-->
+	<script src="/lib/js/jquery-1.8.3.min.js"></script>
+	<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.4.min.js"></script>
+	<?php } else { ?>
+	<style>
+	#main .content .title h1 { font-size: 24px; font-weight: bold; }
+	#main p { margin-bottom: 20px; font-size: 18px; }
+	</style>
+	<?php } ?>
 </head>
 <body>
+	<?php if(!$framed) { ?>
 	<div id="main" style="position: static;">
 
 		<div class="content">
@@ -37,43 +54,43 @@
 			<div class="contwrap">
 			<p><?php echo htmlspecialchars($entry_description); ?></p>
 			<div id="videoContainer">
-				<script src="<?php echo $scriptUrl; ?>"></script>
-				<script>mw.setConfig('Kaltura.NoApiCache', true);</script>
-				<?php if($embed == 'dynamic' || $embed == 'thumb') { ?>
-				<div id="kaltura_player" style="width: <?php echo $uiConf->getWidth();?>px; height: <?php echo $uiConf->getHeight();?>px"></div>
-				<script type="text/javascript">
-				kWidget.<?php echo $functionName; ?>(<?php echo json_encode($kwidgetObj); ?>);
-				</script>
-				<?php } ?>
-				<?php if($embed == 'legacy') { ?>
-			    <object id="kaltura_player" name="kaltura_player" type="application/x-shockwave-flash" 
-				    allowFullScreen="true" allowNetworking="all" allowScriptAccess="always" height="<?php echo $uiConf->getHeight();?>" width="<?php echo $uiConf->getWidth();?>"
-				    xmlns:dc="http://purl.org/dc/terms/" 
-				    xmlns:media="http://search.yahoo.com/searchmonkey/media/" 
-				    rel="media:video" 
-				    resource="<?php echo $swfUrl; ?>" 
-				    data="<?php echo $swfUrl; ?>">
-				<param name="allowFullScreen" value="true" />
-				<param name="allowNetworking" value="all" />
-				<param name="allowScriptAccess" value="always" />
-				<param name="bgcolor" value="#000000" />
-				<param name="flashVars" value="<?php echo $flashVarsString; ?>" />
-				<param name="movie" value="<?php echo $swfUrl; ?>" />
-				<a href="http://corp.kaltura.com">video platform</a> 
-				<a href="http://corp.kaltura.com/video_platform/video_management">video management</a> 
-				<a href="http://corp.kaltura.com/solutions/video_solution">video solutions</a> 
-				<a href="http://corp.kaltura.com/video_platform/video_publishing">video player</a> 
-				<span property="dc:description" content=""></span>
-				<span property="media:title" content="Kaltura Video"></span>
-				<span property="media:width" content="<?php echo $uiConf->getWidth();?>"></span>
-				<span property="media:height" content="<?php echo $uiConf->getHeight();?>"></span>
-				<span property="media:type" content="application/x-shockwave-flash"></span> 
-			   </object>
-			   <?php } ?>
+	<?php } ?>
+				<div id="framePlayerContainer">
+<script>
+var scriptToEval = '';
+var code = new kEmbedCodeGenerator(<?php echo json_encode($embedParams); ?>).getCode();
+var embedType = '<?php echo $embedType;?>';
+var ltIE10 = $('html').hasClass('lt-ie10');
+
+// IE9 and below has issue with document.write script tag
+if( ltIE10 && (embedType == 'dynamic' || embedType == 'thumb') ) {
+	$(code).each(function() {
+		if( ! this.outerHTML ) return true;
+		if( this.nodeName === 'SCRIPT' ) {
+			// If we have external script, append to head
+			if( this.src ) {
+				$.getScript(this.src, function() {
+					$.globalEval(scriptToEval);
+				});
+			} else {
+				scriptToEval += this.innerHTML;
+			}
+		} else {
+			// Write any other elements
+			document.write(this.outerHTML);
+		}
+	});
+} else {
+	document.write(code);
+}
+</script>
+				</div>
+<?php if(!$framed) { ?>				
 			</div>
 
 			</div><!-- end contwrap -->
 		</div><!-- end content -->
 	</div><!-- end #main -->
+<?php } ?>
 </body>
 </html>
