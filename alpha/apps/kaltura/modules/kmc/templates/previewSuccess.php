@@ -31,17 +31,17 @@
 	#framePlayerContainer {margin: 0 auto; padding-top: 20px; text-align: center; } 
 	object, div { margin: 0 auto; }
 	</style>
-	<!--[if lte IE 7]>
-	<script src="/lib/js/json2.min.js"></script>
-	<![endif]-->
-	<script src="/lib/js/jquery-1.8.3.min.js"></script>
-	<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.4.min.js"></script>
 	<?php } else { ?>
 	<style>
 	#main .content .title h1 { font-size: 24px; font-weight: bold; }
 	#main p { margin-bottom: 20px; font-size: 18px; }
 	</style>
 	<?php } ?>
+	<!--[if lte IE 7]>
+	<script src="/lib/js/json2.min.js"></script>
+	<![endif]-->
+	<script src="/lib/js/jquery-1.8.3.min.js"></script>
+	<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.4.min.js"></script>	
 </head>
 <body>
 	<?php if(!$framed) { ?>
