@@ -125,8 +125,5 @@ class previewAction extends kalturaAction
 			$this->entry_description = '';
 		}
 
-		// Send IE Edge header
-		header('X-UA-Compatible: IE=edge,chrome=1');
-
 	}
 }

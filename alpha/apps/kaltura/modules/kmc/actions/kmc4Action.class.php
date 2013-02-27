@@ -91,11 +91,6 @@ class kmc4Action extends kalturaAction
 		}
 	/** END - load partner from DB, and set templatePartnerId **/
 
-		if( $this->previewEmbedV2 ) {
-			// Send IE-edge header
-			header('X-UA-Compatible: IE=edge,chrome=1');
-		}
-
 	/** set default flags **/
 		$this->payingPartner = 'false';
 		$this->kdp508_players = array();
