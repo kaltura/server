@@ -18,7 +18,6 @@ if( count($allowedPartners) > 1 ) {
 	$currentAccount = ' &nbsp;<span class="sep">|</span>&nbsp; Account: '.  $partner->getName() .' &nbsp;( <a id="ChangePartner" href="#change_partner">Change Account</a> ) &nbsp;';
 }
 ?>
-
 <script type="text/javascript">
 	var kmc = {
 		vars : {
@@ -183,7 +182,7 @@ if( count($allowedPartners) > 1 ) {
 	</div>
 </div>
 <script src="/lib/js/angular-1.0.4.min.js"></script>
-<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.4.min.js"></script>
+<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.5.min.js"></script>
 <script src="/lib/js/jquery.qrcode-0.2.min.js"></script>
 <script src="/lib/js/ZeroClipboard.min.js"></script>
 <script src="/lib/js/preview.js"></script>
