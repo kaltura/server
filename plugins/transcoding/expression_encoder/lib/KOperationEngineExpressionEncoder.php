@@ -71,24 +71,18 @@ class KOperationEngineExpressionEncoder  extends KSingleOutputOperationEngine
 			}
 			catch(Exception $e) {
 				$ex=$e;
-					/* 
-					 * If there is no log file (to check the error type) 
-					 * - halt retries and re-through the same exception
-					 */ 
-				if(file_exists($this->logFilePath)==false){
-					break;
-				}
-//				$usedMsg="Cannot access the file because it is being used by another process";
-				$usedMsg="Cannot access the file because it is being used";
+
 				$logStr = $this->getLogData();
 					/* 
-					 * If the log does not contain the 'being used' error 
-					 * - halt retries and re-through the same exception
+					 * 'Progress:100' in the log means that the conversion was completed successfully, 
+					 * and got hang on exit. An external script will hopefully kill the EE task.
+					 * If the log contains the 'Progress:100' string, wait 10 sec and retry (up to 3 retries). 
+					 * Otherwise - halt retries and re-through the same exception
 					 */ 
-				if(strstr($logStr,$usedMsg)==false)
+				if(strstr($logStr,"Progress:100")==false)
 					break;
 				$secsToSleep=10;
-				KalturaLog::info("EE3 failed with 'Cannot access the file because it is being used by another process'. Waiting $secsToSleep sec. Attempt:$iEx");
+				KalturaLog::info("EE got hang up. Waiting $secsToSleep sec for next attempt. Attempt:$iEx");
 				sleep($secsToSleep);
 			}
 		}
