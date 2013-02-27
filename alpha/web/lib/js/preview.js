@@ -14,6 +14,7 @@
 
 	Preview.storageName = 'previewDefaults';
 	Preview.el = '#previewModal';
+	Preview.iframeContainer = 'previewIframe';
 
 	// We use this flag to ignore all change evnets when we initilize the preview ( on page start up )
 	// We will set that to true once Preview is opened.
@@ -126,7 +127,7 @@
 		};
 
 		options = $.extend({}, defaults, options);
-
+		console.log('openPreviewEmbed:: uiConfId: ' + options.uiConfId);
 		// Set options
 		previewService.set(options);
 
@@ -146,28 +147,38 @@
 
 	Preview.closeModal = function(el) {
 		this.savePreviewState();
+		this.emptyDiv(this.iframeContainer);
 		$(el).fadeOut(300, function() {
 			kmc.layout.overlay.hide();
 			kmc.utils.hideFlash();
 		});
 	};
 
-	Preview.generateIframe = function(embedCode, previewUrl, containerId) {
+	Preview.emptyDiv = function(divId) {
+		var container = document.getElementById(divId);
+		container.innerHTML = '';
+		return container;
+	};
 
-		if( ! previewUrl ) return ;
+	Preview.hasIframe = function() {
+		return $('#' + this.iframeContainer + ' iframe').length;
+	};
+
+	Preview.getCacheSt = function() {
+		var d = new Date();
+		return Math.floor(d.getTime() / 1000) + (15 * 60); // start caching in 15 minutes
+	};
+
+	Preview.generateIframe = function(embedCode) {
 
 		var ltIE10 = $('html').hasClass('lt-ie10');
 		var style = '<style>html, body {margin: 0; padding: 0; width: 100%; height: 100%; } #framePlayerContainer {margin: 0 auto; padding-top: 20px; text-align: center; } object, div { margin: 0 auto; }</style>';
-		container = document.getElementById(containerId);
-		container.innerHTML = '';
+		var container = this.emptyDiv(this.iframeContainer);
 		var iframe = container.appendChild(document.createElement('iframe'));
 		iframe.frameborder = 0;
 
-		// Append framed and KS params
-		previewUrl += '/framed/true/ks/' + kmc.vars.ks;
-
 		if(ltIE10) {
-			iframe.src = previewUrl;
+			iframe.src = this.getPreviewUrl(this.Service, true);
 		} else {
 			var newDoc = iframe.contentDocument;
 			newDoc.open();
@@ -176,25 +187,28 @@
 		}
 	};
 
-
-	Preview.getEmbedCode = function(previewService, previewPlayer) {
-		var player = previewService.get('player');
-		if(!player || !previewService.get('embedType')) {
-			return '';
-		}
-
-		var flashVars = this.getDeliveryTypeFlashVars(previewService.get('deliveryType'));
+	Preview.getEmbedProtocol = function(previewService, previewPlayer) {
 		var protocol = (previewService.get('secureEmbed')) ? 'https' : 'http';
 		if(previewPlayer === true) {
-			flashVars.ks = kmc.vars.ks;
 			protocol = location.protocol.substring(0, location.protocol.length - 1); // Get host protocol
+		}
+		return protocol;
+	};
+
+	Preview.getEmbedFlashVars = function(previewService, addKs) {
+		var protocol = this.getEmbedProtocol(previewService, addKs);
+		var player = previewService.get('player');
+		var flashVars = this.getDeliveryTypeFlashVars(previewService.get('deliveryType'));
+		if(addKs === true) {
+			flashVars.ks = kmc.vars.ks;
 		}
 
 		var playlistId = previewService.get('playlistId');
 		if(playlistId) {
 			// Use new kpl0Id flashvar for new players only
 			var html5_version = kmc.functions.getVersionFromPath(player.html5Url);
-			if(kmc.functions.versionIsAtLeast(kmc.vars.min_kdp_version_for_playlist_api_v3, player.swf_version) && kmc.functions.versionIsAtLeast(kmc.vars.min_html5_version_for_playlist_api_v3, html5_version)) {
+			if(kmc.functions.versionIsAtLeast(kmc.vars.min_kdp_version_for_playlist_api_v3, player.swf_version) 
+				&& kmc.functions.versionIsAtLeast(kmc.vars.min_html5_version_for_playlist_api_v3, html5_version)) {
 				flashVars['playlistAPI.kpl0Id'] = playlistId;
 			} else {
 				flashVars['playlistAPI.autoInsert'] = 'true';
@@ -202,15 +216,25 @@
 				flashVars['playlistAPI.kpl0Url'] = protocol + '://' + kmc.vars.api_host + '/index.php/partnerservices2/executeplaylist?' + 'partner_id=' + kmc.vars.partner_id + '&subp_id=' + kmc.vars.partner_id + '00' + '&format=8&ks={ks}&playlist_id=' + playlistId;
 			}
 		}
+		return flashVars;	
+	};
+
+	Preview.getEmbedCode = function(previewService, previewPlayer) {
+		var player = previewService.get('player');
+		if(!player || !previewService.get('embedType')) {
+			return '';
+		}
 
 		var params = {
-			protocol: protocol,
+			protocol: this.getEmbedProtocol(previewService, previewPlayer),
 			embedType: previewService.get('embedType'),
 			uiConfId: player.id,
 			width: player.width,
 			height: player.height,
+			entryMeta: previewService.get('entryMeta'),
 			includeSeoMetadata: previewService.get('includeSeo'),
-			flashVars: flashVars
+			cacheSt: this.getCacheSt(),
+			flashVars: this.getEmbedFlashVars(previewService, previewPlayer)
 		};
 
 		if(previewService.get('entryId')) {
@@ -221,27 +245,25 @@
 		return code;
 	};
 
-	Preview.getPreviewUrl = function(previewService) {
+	Preview.getPreviewUrl = function(previewService, framed) {
 		var player = previewService.get('player');
 		if(!player || !previewService.get('embedType')) {
 			return '';
 		}
 		var protocol = (previewService.get('secureEmbed')) ? 'https' : 'http';
-		var url = protocol + '://' + kmc.vars.host + '/index.php/kmc/preview';
-		//var url = protocol + '://localhost/KMC_V2/preview.php';
+		var url = protocol + '://' + kmc.vars.base_host + '/index.php/kmc/preview';
+		//var url = protocol + '://' + window.location.host + '/KMC_V2/preview.php';
 		url += '/partner_id/' + kmc.vars.partner_id;
 		url += '/uiconf_id/' + player.id;
-		// Add playlist data
-		if(previewService.get('playlistId')) {
-			url += '/playlist_id/' + previewService.get('playlistId') + '/playlist_name/' + previewService.get('playlistName');
-		}
 		// Add entry Id
 		if(previewService.get('entryId')) {
 			url += '/entry_id/' + previewService.get('entryId');
 		}
-		url += '/delivery/' + previewService.get('deliveryType').id;
 		url += '/embed/' + previewService.get('embedType');
-
+		url += '?' + kmc.functions.flashVarsToUrl(this.getEmbedFlashVars(previewService, framed));
+		if( framed === true ) {
+			url += '&framed=true';
+		}
 		return url;
 	};
 
@@ -255,6 +277,7 @@
 	};
 
 	Preview.generateShortUrl = function(url, callback) {
+		if(!url) return ;
 		kmc.client.createShortURL(url, callback);
 	};
 
@@ -267,6 +290,7 @@ kmcApp.factory('previewService', ['$rootScope', function($rootScope) {
 	var previewProps = {};
 	return {
 		get: function(key) {
+			if(key === undefined) return previewProps;
 			return previewProps[key];
 		},
 		set: function(key, value, quiet) {
@@ -328,14 +352,17 @@ kmcApp.controller('PreviewCtrl', function($scope, previewService) {
 			}
 		};
 
-	var updatePlayers = function() {
+	var updatePlayers = function(currentPlayerId) {
+			console.log('updatePlayers:: currentPlayerId: ' + currentPlayerId);
+			console.log('updatePlayers:: previewService: ', previewService.get());
 			if(kmc.vars.playlists_list && kmc.vars.players_list) {
 				// List of players
 				if(previewService.get('playlistId') || previewService.get('playerOnly')) {
 					$scope.players = kmc.vars.playlists_list;
-					if(!Preview.playlistMode) {
+					var uiConfId = previewService.get('uiConfId');
+					if(!Preview.playlistMode || uiConfId !== currentPlayerId) {
 						Preview.playlistMode = true;
-						setPlayer(previewService.get('uiConfId'));
+						setPlayer(uiConfId);
 					}
 				} else {
 					$scope.players = kmc.vars.players_list;
@@ -413,7 +440,6 @@ kmcApp.controller('PreviewCtrl', function($scope, previewService) {
 	$scope.playerOnly = false;
 	$scope.liveBitrates = false;
 	$scope.showAdvancedOptionsStatus = Preview.getDefault('showAdvancedOptions');
-	$scope.iframeUrl = null;
 
 	// Set players on update
 	$scope.$on('playersUpdated', function() {
@@ -433,10 +459,12 @@ kmcApp.controller('PreviewCtrl', function($scope, previewService) {
 	// Listen to player change
 	$scope.$watch('player', function() {
 		var player = Preview.getObjectById($scope.player, $scope.players);
-		if( ! player ) return ;
+		console.log('player changed', player);
+		if(!player) return ;
 		setDeliveryTypes(player);
 		setEmbedTypes(player);
 		previewService.set('player', player);
+		previewService.set('uiConfId', player.id);
 	});
 	$scope.$watch('deliveryType', function() {
 		previewService.set('deliveryType', Preview.getObjectById($scope.deliveryType, $scope.deliveryTypes));
@@ -451,7 +479,7 @@ kmcApp.controller('PreviewCtrl', function($scope, previewService) {
 		previewService.set('includeSeo', $scope.includeSeo);
 	});
 	$scope.$watch('embedCodePreview', function() {
-		Preview.generateIframe($scope.embedCodePreview, $scope.iframeUrl, 'previewIframe');
+		Preview.generateIframe($scope.embedCodePreview);
 	});
 	$scope.$watch('previewOnly', function() {
 		if($scope.previewOnly) {
@@ -463,19 +491,24 @@ kmcApp.controller('PreviewCtrl', function($scope, previewService) {
 	});
 	$scope.$on('previewChanged', function(e) {
 		if(Preview.ignoreChangeEvents) return;
-		updatePlayers();
-		$scope.iframeUrl = Preview.getPreviewUrl(previewService);
+		console.log('previewChanged', e);
+		updatePlayers($scope.player);
+		var previewUrl = Preview.getPreviewUrl(previewService);
 		$scope.embedCode = Preview.getEmbedCode(previewService);
 		$scope.embedCodePreview = Preview.getEmbedCode(previewService, true);
 		$scope.previewOnly = previewService.get('previewOnly');
 		$scope.playerOnly = previewService.get('playerOnly');
 		$scope.liveBitrates = previewService.get('liveBitrates');
 		draw();
+		// Generate Iframe if not exist
+		if(!Preview.hasIframe()) {
+			Preview.generateIframe($scope.embedCodePreview);
+		}
 		// Generate QR Code
-		Preview.generateQrCode($scope.iframeUrl);
+		Preview.generateQrCode(previewUrl);
 		// Update Short url
 		$scope.previewUrl = 'Updating...';
-		Preview.generateShortUrl($scope.iframeUrl, function(tinyUrl) {
+		Preview.generateShortUrl(previewUrl, function(tinyUrl) {
 			$scope.previewUrl = tinyUrl;
 			draw();
 		});
