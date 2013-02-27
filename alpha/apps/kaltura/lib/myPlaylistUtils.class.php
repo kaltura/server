@@ -226,7 +226,12 @@ class myPlaylistUtils
 	{
 		// if exists extra_filters - use the first one to filter the entry_id_list
 		$c= KalturaCriteria::create(entryPeer::OM_CLASS);
-		$c->add ( entryPeer::ID , $entry_id_list , Criteria::IN ); 
+		
+		$filter = new entryFilter();
+		$filter->setIdIn($entry_id_list);
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		$filter->attachToCriteria($c);
+		
 		
 		if (!self::$isAdminKs)
 		{
