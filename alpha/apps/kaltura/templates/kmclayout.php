@@ -6,7 +6,7 @@
 <!--[if gt IE 8]><!--> <html ng-app="kmcApp" class="no-js"> <!--<![endif]-->
 <head>
 <base href="<?php echo requestUtils::getRequestHost() ?>/" />
-
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <?php echo include_http_metas() ?>
 <?php echo include_metas() ?>
 
