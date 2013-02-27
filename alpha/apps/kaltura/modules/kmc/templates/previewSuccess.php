@@ -28,6 +28,7 @@
 	<?php if($framed)  { ?>
 	<style>
 	html, body {margin: 0; padding: 0; width: 100%; height: 100%; } 
+	body { background-color: #fff !important; }
 	#framePlayerContainer {margin: 0 auto; padding-top: 20px; text-align: center; } 
 	object, div { margin: 0 auto; }
 	</style>
