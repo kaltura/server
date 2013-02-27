@@ -40,6 +40,7 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 
 	protected function getCmdLine()
 	{
+		putenv("MAGICK_THREAD_LIMIT=1");
 		$exeCmd =  parent::getCmdLine();
 		KalturaLog::info("command line: [$exeCmd]");
 		return $exeCmd;
@@ -72,7 +73,7 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 		parent::operate($operator, $inFilePath, $configFilePath);
 		$imagesListXML = $this->createImagesListXML($outDirPath);
 	    kFile::setFileContent($outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME, $imagesListXML->asXML());
-	    KalturaLog::info('images list xml ['.$outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME.'] created');
+	    kalturalog::info('images list xml ['.$outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME.'] created');
 	}
 	
 
