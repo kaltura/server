@@ -11,7 +11,7 @@
            depends on httpd.conf, httpd
 
         check file httpd.conf
-            with path @APP_DIR@/configurations/apache/my_kaltura.conf
+            with path @APP_DIR@/configurations/apache/kaltura.conf
             # Reload apache if the httpd.conf file was changed
             if changed checksum
                then exec "/usr/sbin/apachectl graceful"
