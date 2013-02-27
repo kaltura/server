@@ -354,85 +354,140 @@ KalturaLog::log($jobElem->asXML());
 	 */
 	public static function GenerateSmoothStreamingPresetFile($flavors)
 	{
-		$rootFlavor=null;
-		$rootStreams=null;
+			/*
+		 	* Filter in the flavors with EE operator
+		 	*/
+		$flavorInColl = array();
 		foreach ($flavors as $flavor){
-			$ee3Id = KDLOperationParams::SearchInArray(KDLTranscoders::EE3, $flavor->_transcoders);
-			if(is_null($ee3Id)) {
+			$eeId = KDLOperationParams::SearchInArray(KDLTranscoders::EE3, $flavor->_transcoders);
+			if(is_null($eeId)) {
 				continue;
 			}
-			
-$transcoderParams = $flavor->_transcoders[$ee3Id];
+		$transcoderParams = $flavor->_transcoders[$eeId];
 KalturaLog::log("transcoder==>\n".print_r($transcoderParams,true)."\n<--");
 			if(is_null($transcoderParams->_cmd)){
 				KalturaLog::log("ee3 cmd is null");
 				continue;
 			}
+			/*
+			 * The key if this array will be combination of bitrate,hight and counter, 
+			 * in order to solve possible duplication issues and easy the flavor sorting from low to high - 
+			 * - vBr*100000+height*10+counter
+			 * The counter meant to solve cases (forced) were two (or more) flavors have both the same vr and height 
+			 */
+			$k = ($flavor->_video->_bitRate*100000+$flavor->_video->_height*10);
+			while(array_key_exists(strval($k),$flavorInColl)){
+				$k++;
+			}
+			$flavorInColl[$k] = $flavor;
+		}
+			/*
+			 * Sort the flavors that participate in collection 
+			 */
+		$rv=ksort($flavorInColl);
+		
+			/*
+			 * Buidl a combined SmoothSteaming preset XML
+			 */
+		$rootFlavorXml=null;
+		$rootStreamsXml=null;
+		$prevK = null;
+		foreach ($flavorInColl as $k=>$flavor){
+			$eeId = KDLOperationParams::SearchInArray(KDLTranscoders::EE3, $flavor->_transcoders);
 			
-			$ee3 = new SimpleXMLElement($transcoderParams->_cmd);
-			if(isset($ee3->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile))
-				$videoProfile = $ee3->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile;
-			else if(isset($ee3->MediaFile->OutputFormat->MP4OutputFormat->VideoProfile))
-				$videoProfile = $ee3->MediaFile->OutputFormat->MP4OutputFormat->VideoProfile;
-			if(!isset($videoProfile)){
-				continue;
+			/*
+			 * Check for IsmvMinimalFlavorRatio compliance,
+			 * fix if required.
+			 */
+			if(isset($prevK)) {
+				$ratio = $flavor->_video->_bitRate/$flavorInColl[$prevK]->_video->_bitRate;
+				if($ratio<KDLConstants::IsmvMinimalFlavorRatio){
+					$flavor->_video->_bitRate = $flavorInColl[$prevK]->_video->_bitRate*KDLConstants::IsmvMinimalFlavorRatio;
+					$flavor->_video->_peakBitRate = round($flavor->_video->_bitRate * KDLConstants::IsmvPeakBitrateRatio * 1.1);
+				}
 			}
-			switch($flavor->_video->_id){
-				case KDLVideoTarget::WVC1A:
-					$videoCodec = $videoProfile->AdvancedVC1VideoProfile;
-					break;
-				case KDLVideoTarget::H264:
-				case KDLVideoTarget::H264M:
-				case KDLVideoTarget::H264H:
-					$videoCodec = $videoProfile->MainH264VideoProfile;
-					break;
-				case KDLVideoTarget::H264B:
-//					$videoCodec = $videoProfile->BaselineH264VideoProfile;
-					$videoCodec = $videoProfile->MainH264VideoProfile;
-					break;
-				default:
-					continue;
-			}
-			if(!isset($videoCodec) || !isset($videoCodec['SmoothStreaming']) 
-			|| ($videoCodec['SmoothStreaming']!='true' && $videoCodec['SmoothStreaming']!='True'))
-				continue;
-			$streams = $videoCodec->Streams;
-			if(!(isset($streams) && isset($streams->StreamInfo))) {
-				continue;
-			}
+			$prevK = $k;
+			$transcoderParams = $flavor->_transcoders[$eeId];
+			$presetXml = new SimpleXMLElement($transcoderParams->_cmd);
+			$streamsXml = self::updateToCollectionPreset($flavor, $presetXml);
 
-			$flavorVideoBr = $flavor->_video->_bitRate;
-			$br = $streams->StreamInfo->Bitrate;
-			if(isset($br->ConstantBitrate)) {
-				if($br->ConstantBitrate['Bitrate']!=$flavorVideoBr){
-KalturaLog::log("-->xmlBR=".$br->ConstantBitrate['Bitrate'].", flavorBR=".$flavorVideoBr);
-					$br->ConstantBitrate['Bitrate']=$flavorVideoBr;
-				}
+			if($rootFlavorXml==null) {
+				$rootFlavorXml  = $presetXml;
+				$rootStreamsXml = $streamsXml;
 			}
-			else if(isset($br->VariableConstrainedBitrate)) {
-				if($br->VariableConstrainedBitrate['AverageBitrate']!=$flavorVideoBr){
-KalturaLog::log("-->xmlBR=".$br->VariableConstrainedBitrate['AverageBitrate'].", flavorBR=".$flavorVideoBr);
-					$br->VariableConstrainedBitrate['AverageBitrate']=$flavorVideoBr;
-					$br->VariableConstrainedBitrate['PeakBitrate']=round($flavorVideoBr*1.3);
-				}
+			else if($streamsXml && isset($streamsXml->StreamInfo) && $rootStreamsXml/*&& is_array($streams->StreamInfo)*/) {
+				KDLUtils::AddXMLElement($rootStreamsXml, $streamsXml->StreamInfo);
 			}
-			
-			if($rootFlavor==null) {
-				$rootFlavor = $ee3;
-				$rootStreams = $streams;						
-			}
-			else if($streams && isset($streams->StreamInfo) && $rootStreams/*&& is_array($streams->StreamInfo)*/) {
-				KDLUtils::AddXMLElement($rootStreams, $streams->StreamInfo);
-			}
-			$br = null;
 		}
 		
-		if($rootFlavor){
-			$rootFlavor->Job['DefaultMediaOutputFileName']=KDLCmdlinePlaceholders::OutFileName.".{DefaultExtension}";
-			return $rootFlavor->asXML();
+		if($rootFlavorXml){
+			$rootFlavorXml->Job['DefaultMediaOutputFileName']=KDLCmdlinePlaceholders::OutFileName.".{DefaultExtension}";
+			return $rootFlavorXml->asXML();
 		}
 		else
 			return null;
+	}
+	
+	/* ------------------------------
+	 * updateToCollectionPreset
+	 */
+	private static function updateToCollectionPreset($flavor, $presetXml)
+	{
+//		$transcoderParams = $flavor->_transcoders[$eeId];
+//		$presetXml = new SimpleXMLElement($transcoderParams->_cmd);
+		if(isset($presetXml->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile))
+			$videoProfile = $presetXml->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile;
+		else if(isset($presetXml->MediaFile->OutputFormat->MP4OutputFormat->VideoProfile))
+			$videoProfile = $presetXml->MediaFile->OutputFormat->MP4OutputFormat->VideoProfile;
+		if(!isset($videoProfile)){
+			continue;
+		}
+		switch($flavor->_video->_id){
+			case KDLVideoTarget::WVC1A:
+				$videoCodec = $videoProfile->AdvancedVC1VideoProfile;
+				break;
+			case KDLVideoTarget::H264:
+			case KDLVideoTarget::H264M:
+			case KDLVideoTarget::H264H:
+				$videoCodec = $videoProfile->MainH264VideoProfile;
+				break;
+			case KDLVideoTarget::H264B:
+				//					$videoCodec = $videoProfile->BaselineH264VideoProfile;
+				$videoCodec = $videoProfile->MainH264VideoProfile;
+				break;
+			default:
+				continue;
+		}
+		if(!isset($videoCodec) || !isset($videoCodec['SmoothStreaming'])
+				|| ($videoCodec['SmoothStreaming']!='true' && $videoCodec['SmoothStreaming']!='True'))
+			continue;
+		$streams = $videoCodec->Streams;
+		if(!(isset($streams) && isset($streams->StreamInfo))) {
+			return null;
+		}
+		
+		$flavorVideoBr = round($flavor->_video->_bitRate);
+		$br = $streams->StreamInfo->Bitrate;
+		if(isset($br->ConstantBitrate)) {
+			if($br->ConstantBitrate['Bitrate']!=$flavorVideoBr){
+				KalturaLog::log("-->xmlBR=".$br->ConstantBitrate['Bitrate'].", flavorBR=".$flavorVideoBr);
+				$br->ConstantBitrate['Bitrate']=$flavorVideoBr;
+			}
+		}
+		else if(isset($br->VariableConstrainedBitrate)) {
+			if($br->VariableConstrainedBitrate['AverageBitrate']!=$flavorVideoBr){
+				KalturaLog::log("-->xmlBR=".$br->VariableConstrainedBitrate['AverageBitrate'].", flavorBR=".$flavorVideoBr);
+				$br->VariableConstrainedBitrate['AverageBitrate']=$flavorVideoBr;
+				if(isset($flavor->_video->_peakBitRate)){
+					$br->VariableConstrainedBitrate['PeakBitrate']=round($flavor->_video->_peakBitRate);
+				}
+				else {
+					$br->VariableConstrainedBitrate['PeakBitrate']=round($flavorVideoBr*KDLConstants::IsmvPeakBitrateRatio);
+				}
+			}
+		}
+			
+		return $streams;
 	}
 	
 	/* ------------------------------
