@@ -61,7 +61,7 @@ start() {
 	
 	echo -n $"Starting:"
 	KP=$(pgrep -P 1 -f $FILE_NAME.php)
-	if [ -f $LOCKFILE ]; then
+	if ! kill -0 `cat $LOCKFILE 2>/dev/null` 2>/dev/null; then 
 		echo_failure
 		echo
 		if [ "X$KP" != "X" ]; then
