@@ -74,7 +74,7 @@ class kmcUtils
 		return $conf_playlist;
 	}
 
-	public static function redirectPartnerToCorrectKmc(Partner $partner, $ks, $uid, $screenName, $email, $validatingKmc)
+	public static function redirectPartnerToCorrectKmc(Partner $partner, $ks, $uid=null, $screenName=null, $email=null, $validatingKmc)
 	{
 		if($validatingKmc == $partner->getKmcVersion())
 		{
