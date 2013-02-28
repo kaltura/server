@@ -1,5 +1,5 @@
         check process sphinx 
-           with pidfile "@APP_DIR@/sphinx/searchd.pid"
+           with pidfile "@BASE_DIR@/sphinx/searchd.pid"
            start program = "/etc/init.d/kaltura_sphinx start" with timeout 60 seconds
            stop program = "/etc/init.d/kaltura_sphinx stop"
            #if 10 restarts within 10 cycles then timeout
