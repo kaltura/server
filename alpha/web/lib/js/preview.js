@@ -225,7 +225,7 @@
 		if(!player || !previewService.get('embedType')) {
 			return '';
 		}
-
+		var cacheSt = this.getCacheSt();
 		var params = {
 			protocol: this.getEmbedProtocol(previewService, previewPlayer),
 			embedType: previewService.get('embedType'),
@@ -234,7 +234,8 @@
 			height: player.height,
 			entryMeta: previewService.get('entryMeta'),
 			includeSeoMetadata: previewService.get('includeSeo'),
-			cacheSt: this.getCacheSt(),
+			playerId: 'kaltura_player_' + cacheSt,
+			cacheSt: cacheSt,
 			flashVars: this.getEmbedFlashVars(previewService, previewPlayer)
 		};
 
