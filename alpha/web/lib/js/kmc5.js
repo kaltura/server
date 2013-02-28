@@ -915,7 +915,7 @@ kmc.preview_embed = {
 		var protocol = (secured) ? 'https' : 'http';
 		var embed_host = (secured) ? kmc.vars.embed_host_https : kmc.vars.embed_host;
 
-		var flashVars = $.extend({}, kmc.preview_embed.getDeliveryTypeFlashvars( deliveryType ));
+		var flashVars = $.extend({}, kmc.preview_embed.getDeliveryTypeFlashvars( delivery_type ));
 		if(is_playlist && id != "multitab_playlist") {
 			// Use new kpl0Id flashvar for new players only
 			var html5_version = kmc.functions.getVersionFromPath(uiconf_details.html5Url);
