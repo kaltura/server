@@ -325,13 +325,6 @@ class myEntryUtils
 				$need_to_fix_roughcut = true;
 				break;
 				
-			case entry::ENTRY_MEDIA_TYPE_LIVE_STREAM_FLASH:
-			case entry::ENTRY_MEDIA_TYPE_LIVE_STREAM_WINDOWS_MEDIA:
-			case entry::ENTRY_MEDIA_TYPE_LIVE_STREAM_REAL_MEDIA:
-			case entry::ENTRY_MEDIA_TYPE_LIVE_STREAM_QUICKTIME:
-				kJobsManager::addProvisionDeleteJob(null, $entry);
-				break;
-				
 			case entry::ENTRY_MEDIA_TYPE_SHOW:				
 			default:
 				$template_file = "&deleted_rc.xml";
@@ -339,6 +332,10 @@ class myEntryUtils
 				break;
 		}
 
+		$sourceType = $entry->getSource();
+		if ($sourceType == EntrySourceType::AKAMAI_LIVE || $sourceType == EntrySourceType::AKAMAI_UNIVERSAL_LIVE)
+			kJobsManager::addProvisionDeleteJob(null, $entry);
+			
 		// in this case we'll need some batch job to fix all related roughcuts for this entry
 		// use the batch_job mechanism to indicate there is a deleted entry to handle
 		if ( $need_to_fix_roughcut )
