@@ -19,13 +19,12 @@ BATCHEXE=KGenericBatchMgr.class.php
 
 if [ $# != 1 ]; then
 	echo "Usage: $0 [start|stop|restart|status]"
-	#exit 1 chages the return code because this fails the build
 	exit 0 	
 fi
 
 CONFIG_FILE=$APP_DIR/configurations/batch.ini
 
-LOCKFILE="$LOG_DIR/batch.pid"
+LOCKFILE="$LOG_DIR/batch/batch.pid"
 
 echo_success() {
 	[ "$BOOTUP" = "color" ] && $MOVE_TO_COL
@@ -46,7 +45,6 @@ echo_failure() {
 	[ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
 	echo -n "]"
 	echo -ne "\r"
-	#return 1
 	return 0
 }
 
@@ -54,7 +52,7 @@ echo_failure() {
 start() {
 	if [ -f $BASE_DIR/maintenance ]; then
 		echo "Server is on maintenance mode - batchMgr will not start!"
-		exit 1
+		return 1
 	fi
 	
 	echo -n $"Starting:"
@@ -64,7 +62,6 @@ start() {
 		echo
 		if [ "X$KP" != "X" ]; then
 			echo "Service batch already running"
-			#return 1
 			return 0
 		else
 			echo "Service batch isn't running but stale lock file exists"
@@ -76,7 +73,7 @@ start() {
 	else
 		if [ "X$KP" != "X" ]; then
 			echo "Batch is running as $KP without a $LOCKFILE"
-			exit 0
+			return 0
 		fi		
 		start_scheduler
 		return 0
@@ -90,7 +87,6 @@ start_scheduler() {
 	if [ "$?" -eq 0 ]; then
 		echo_success
 		echo
-		echo $$ > $LOCKFILE
 	else
 		echo_failure
 		echo
@@ -104,7 +100,6 @@ show_status() {
 		return 0
 		else
 			echo "Service Batch isn't running"
-			#return 1
 			return 0
 		fi
 }
@@ -149,8 +144,7 @@ case "$1" in
 		;;
 	*)
 		echo "Usage: [start|stop|restart|status]"
-		#exit 1
 		exit 0
 		;;
 esac
-exit $?
+exit 0
