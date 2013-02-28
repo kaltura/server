@@ -22,19 +22,15 @@ class kmc4Action extends kalturaAction
 		
 		sfView::SUCCESS;
 
-	/** check parameters and verify user is logged-in **/
+		/** check parameters and verify user is logged-in **/
 		$this->partner_id = $this->getP ( "pid" );
 		$this->subp_id = $this->getP ( "subpid", ((int)$this->partner_id)*100 );
-		$this->uid = $this->getP ( "uid" );
 		$this->ks = $this->getP ( "kmcks" );
 		if(!$this->ks)
 		{
 			// if kmcks from cookie doesn't exist, try ks from REQUEST
 			$this->ks = $this->getP('ks');
 		}
-		$this->screen_name = $this->getP ( "screen_name" );
-		$this->email = $this->getP ( "email" );
-
 		
 		/** if no KS found, redirect to login page **/
 		if (!$this->ks)
@@ -62,6 +58,7 @@ class kmc4Action extends kalturaAction
 				
 			$this->full_name = $currentUser->getFullName();
 		}
+		$this->showChangeAccount = (count($allowedPartners) > 1 ) ? true : false;
 
 	/** load partner from DB, and set templatePartnerId **/
 		$this->partner = $partner = null;
@@ -78,7 +75,7 @@ class kmc4Action extends kalturaAction
 		if ($this->partner_id !== NULL)
 		{
 			$this->partner = $partner = PartnerPeer::retrieveByPK($this->partner_id);
-			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, $this->uid, $this->screen_name, $this->email, self::CURRENT_KMC_VERSION);
+			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, null, null, null, self::CURRENT_KMC_VERSION);
 			$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
 			$this->ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
 			$this->ignoreEntrySeoLinks = PermissionPeer::isValidForPartner(PermissionName::FEATURE_IGNORE_ENTRY_SEO_LINKS, $this->partner_id);
@@ -142,16 +139,6 @@ class kmc4Action extends kalturaAction
 			$this->logoutUrl = $partner->getLogoutUrl();
 	/** END - get logout url**/	
 		
-	/** partner-specific: change KDP version for partners working with auto-moderaion **/
-		// set content kdp version according to partner id
-		$moderated_partners = array( 31079, 28575, 32774 );
-		$this->content_kdp_version = 'v2.7.0';
-		if(in_array($this->partner_id, $moderated_partners))
-		{
-			$this->content_kdp_version = 'v2.1.2.29057';
-		}
-	/** END - partner-specific: change KDP version for partners working with auto-moderaion **/
-		
 		$this->kmc_swf_version = kConf::get('kmc_version');
 		
 	/** uiconf listing work **/
@@ -174,16 +161,6 @@ class kmc4Action extends kalturaAction
 
 		$this->content_uiconds_clipapp_kdp = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kdpClipApp", false, $kmcGeneralUiConf);
 		$this->content_uiconds_clipapp_kclip = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kClipClipApp", false, $kmcGeneralUiConf);
-
-		/** content KCW,KSE,KAE **/
-		//$this->content_uiconfs_upload = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_upload", false, $kmcGeneralUiConf);
-		//$this->simple_editor = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_simpleedit", false, $kmcGeneralUiConf);
-		//$this->advanced_editor = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_advanceedit", false, $kmcGeneralUiConf);
-		
-	/** END - uiconf listing work **/
-		
-		/** get templateXmlUrl for whitelabeled partners **/
-		//$this->appstudio_templatesXmlUrl = $this->getAppStudioTemplatePath();
 	}
 
 	private function stripProtocol( $url )
@@ -195,36 +172,6 @@ class kmc4Action extends kalturaAction
 		} else {
 			return $url;
 		}
-	}
-
-	private function getAppStudioTemplatePath()
-	{
-		$template_partner_id = (isset($this->templatePartnerId))? $this->templatePartnerId: self::SYSTEM_DEFAULT_PARTNER;
-		if (!$template_partner_id)
-			return false;
-	
-		$c = new Criteria();
-		$c->addAnd(uiConfPeer::PARTNER_ID, $template_partner_id );
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_KMC_APP_STUDIO );
-		$c->addAnd(uiConfPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
-	
-		$uiConf = uiConfPeer::doSelectOne($c);
-		if ($uiConf)
-		{
-			$sync_key = $uiConf->getSyncKey( uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA );
-			if ($sync_key)
-			{
-				$file_sync = kFileSyncUtils::getLocalFileSyncForKey( $sync_key , true );
-				if ($file_sync)
-				{
-					return "/".$file_sync->getFilePath();
-				}
-			}
-	
-		}
-	
-		return false;
 	}
     
 }

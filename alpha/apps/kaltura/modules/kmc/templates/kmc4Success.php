@@ -1,23 +1,3 @@
-<?php
-
-//$first_login = ( !$allow_reports ) ? true : false;
-
-if ( kConf::get('kmc_display_server_tab') )
-{
-	$support_url = '#support';
-	$_SESSION['api_v3_login'] = true;
-}
-else
-{
-	$support_url = '/index.php/kmc/support?type=' . md5($payingPartner) . '&pid=' . $partner_id . '&email=' . $email;
-}
-
-// Multi Account User
-$currentAccount = '';
-if( count($allowedPartners) > 1 ) {
-	$currentAccount = ' &nbsp;<span class="sep">|</span>&nbsp; Account: '.  $partner->getName() .' &nbsp;( <a id="ChangePartner" href="#change_partner">Change Account</a> ) &nbsp;';
-}
-?>
 <script type="text/javascript">
 	var kmc = {
 		vars : {
@@ -41,10 +21,9 @@ if( count($allowedPartners) > 1 ) {
 			ks				: "<?php echo $ks; ?>",
 			partner_id		: "<?php echo $partner_id; ?>",
 			subp_id			: "<?php echo $subp_id; ?>",
-			user_id			: "<?php echo $uid; ?>",
 			first_login		: <?php echo ($first_login) ? "true" : "false"; ?>,
 			whitelabel		: <?php echo $templatePartnerId; ?>,
-			ignore_seo_links: <?php echo $ignoreSeoLinks; ?>,
+			ignore_seo_links: <?php echo ($ignoreSeoLinks) ? "true" : "false"; ?>,
 			ignore_entry_seo: <?php echo ($ignoreEntrySeoLinks) ? "true" : "false"; ?>,
 			embed_code_protocol_https: <?php echo ($useEmbedCodeProtocolHttps) ? "true" : "false"; ?>,
 			delivery_types	: <?php echo ($deliveryTypes) ? json_encode($deliveryTypes) : "{}"; ?>,
@@ -79,10 +58,19 @@ if( count($allowedPartners) > 1 ) {
 	 </ul>
 	 <div id="user"><span class="left-arrow"></span><?php echo $full_name; ?></div>
 	 <div id="user_links">
-	  <span id="closeMenu"></span> &nbsp;&nbsp;<span><?php echo $full_name; ?>&nbsp;&nbsp; <a id="Logout" href="#logout">( Logout )</a>&nbsp;&nbsp; <?php echo $currentAccount; ?> </span>
+	  <span id="closeMenu"></span> &nbsp;&nbsp;
+	  <span>
+	  	<?php echo $full_name; ?>&nbsp;&nbsp; 
+	  	<a id="Logout" href="#logout">( Logout )</a>&nbsp;&nbsp; 
+	  	<?php if($showChangeAccount) { ?>
+	  	&nbsp;<span class="sep">|</span>&nbsp; 
+	  	Account: <?php echo $partner->getName(); ?> &nbsp;
+	  	( <a id="ChangePartner" href="#change_partner">Change Account</a> ) &nbsp;
+	  	<?php } ?>
+	  </span>
 	    <?php if (!$templatePartnerId) { ?>
 	    <span> <span class="sep">|</span> &nbsp; <a id="Quickstart Guide" href="<?php echo $service_url ?>/content/docs/pdf/KMC_User_Manual.pdf" target="_blank">User Manual</a> &nbsp; <span class="sep">|</span> &nbsp;
-	      <a id="Support" href="<?php echo $support_url; ?>" target="_blank">Support</a></span>
+	      <a id="Support" href="/index.php/kmc/support?type=<?php echo md5($payingPartner); ?>&pid=<?php echo $partner_id; ?>" target="_blank">Support</a></span>
 	    <?php } ?>
 	 </div>
 	</div><!-- kmcHeader -->
