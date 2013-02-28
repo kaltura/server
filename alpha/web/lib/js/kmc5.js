@@ -913,7 +913,7 @@ kmc.preview_embed = {
 	getEmbedFlashVars: function(id, name, is_playlist, uiconf_id, delivery_type, secured) {
 		var uiconf_details = (typeof uiconf_id == "object") ? uiconf_id : kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist);
 		var protocol = (secured) ? 'https' : 'http';
-		var embed_host = (https_support) ? kmc.vars.embed_host_https : kmc.vars.embed_host;
+		var embed_host = (secured) ? kmc.vars.embed_host_https : kmc.vars.embed_host;
 
 		var flashVars = $.extend({}, kmc.preview_embed.getDeliveryTypeFlashvars( deliveryType ));
 		if(is_playlist && id != "multitab_playlist") {
