@@ -42,7 +42,7 @@
 	<script src="/lib/js/json2.min.js"></script>
 	<![endif]-->
 	<script src="/lib/js/jquery-1.8.3.min.js"></script>
-	<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.5.min.js"></script>	
+	<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.6.min.js"></script>	
 </head>
 <body>
 	<?php if(!$framed) { ?>

@@ -170,7 +170,7 @@
 	</div>
 </div>
 <script src="/lib/js/angular-1.0.4.min.js"></script>
-<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.5.min.js"></script>
+<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.6.min.js"></script>
 <script src="/lib/js/jquery.qrcode-0.2.min.js"></script>
 <script src="/lib/js/ZeroClipboard.min.js"></script>
 <script src="/lib/js/preview.js"></script>
