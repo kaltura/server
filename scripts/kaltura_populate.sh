@@ -19,7 +19,6 @@ SCRIPTEXE=populateFromLog.php
 
 if [ $# != 1 ]; then
 	echo "Usage: $0 [start|stop|restart|status]"
-	#exit 1 chages the return code because this fails the build
 	exit 0 	
 fi
 
@@ -46,7 +45,6 @@ echo_failure() {
 	[ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
 	echo -n "]"
 	echo -ne "\r"
-	#return 1
 	return 0
 }
 
@@ -64,7 +62,6 @@ start() {
 		echo
 		if [ "X$KP" != "X" ]; then
 			echo "Service populate already running"
-			#return 1
 			return 0
 		else
 			echo "Service populate isn't running but stale lock file exists"
@@ -104,7 +101,6 @@ show_status() {
 	return 0
 	else
 		echo "Service populate isn't running"
-		#return 1
 		return 0
 	fi
 }
@@ -126,7 +122,6 @@ stop() {
 		echo_failure
 		echo
 		echo "Service populate not running"
-		#RC=2
 		RC=0
 	fi
 	rm -f $LOCKFILE
@@ -149,8 +144,7 @@ case "$1" in
 		;;
 	*)
 		echo "Usage: [start|stop|restart|status]"
-		#exit 1
 		exit 0
 		;;
 esac
-exit $?
+exit 0
