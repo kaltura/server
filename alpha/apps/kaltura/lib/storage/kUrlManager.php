@@ -374,9 +374,12 @@ class kUrlManager
 			if(kConf::hasParam('url_mgr_http_add_ext'))
 			{
 				$requiredExt = kConf::get('url_mgr_http_add_ext');
-				if(array_key_exists($this->extention, $requiredExt))
-					$url .= "/name/a.".$this->extention;
-			}
+                if(is_array($requiredExt) && array_key_exists($this->extention, $requiredExt))
+                {
+					if($this->extention == 'wvm')
+                    	$url .= "/name/a.".$this->extention;
+				}
+ 			}
 			break;
 		}
 		
