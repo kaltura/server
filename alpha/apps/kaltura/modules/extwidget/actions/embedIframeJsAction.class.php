@@ -88,7 +88,7 @@ class embedIframeJsAction extends sfAction
 		
 		header("pragma:");
 		if($iframeEmbed) {
-			$url .= ((strpos($url, "?") === false) ? "?" : "&") . $_SERVER["QUERY_STRING"];
+			$url .= ((strpos($url, "?") === false) ? "?" : "&") . 'wid=' . $widget_id . '&' . $_SERVER["QUERY_STRING"];
 		} else {
 			header('Content-Type: application/javascript');
 		}
