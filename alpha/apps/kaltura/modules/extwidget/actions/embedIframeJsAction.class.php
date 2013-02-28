@@ -21,6 +21,8 @@ class embedIframeJsAction extends sfAction
 		$partner_id = $this->getRequestParameter('partner_id', $uiConf->getPartnerId());
 		if(!$partner_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'partner_id');
+
+		$widget_id = $this->getRequestParameter("widget_id", '_' . $partner_id);
 		
 		$partner_host = myPartnerUtils::getHost($partner_id);
 		$partner_cdnHost = myPartnerUtils::getCdnHost($partner_id);
@@ -48,6 +50,12 @@ class embedIframeJsAction extends sfAction
 		if ($autoEmbed)
 			$host = "http://localhost/";
 
+		$iframeEmbed = $this->getRequestParameter('iframeembed');
+		$scriptName = ($iframeEmbed) ? 'mwEmbedFrame.php' : 'mwEmbedLoader.php';
+		if($ui_conf_html5_url && $iframeEmbed) {
+			$ui_conf_html5_url = str_replace('mwEmbedLoader.php', 'mwEmbedFrame.php', $ui_conf_html5_url);
+		}
+
 		$relativeUrl = true; // true if ui_conf html5_url is relative (doesnt start with an http prefix)
 
 		if( kString::beginsWith( $ui_conf_html5_url , "http") )
@@ -62,11 +70,11 @@ class embedIframeJsAction extends sfAction
 		else
 		{
 			$html5_version = kConf::get('html5_version');
-			$url =  "$host/html5/html5lib/{$html5_version}/mwEmbedLoader.php";
+			$url =  "$host/html5/html5lib/{$html5_version}/" . $scriptName;
 		}
 
-		// append uiconf_id and partner id for optimizing loading of html5 library. append them only for "standard" urls by looking for the mwEmbedLoader.php suffix
-		if (kString::endsWith($url, "mwEmbedLoader.php"))
+		// append uiconf_id and partner id for optimizing loading of html5 library. append them only for "standard" urls by looking for the mwEmbedLoader.php/mwEmbedFrame.php suffix
+		if (kString::endsWith($url, $scriptName))
 		{
 			$url .= "/p/$partner_id/uiconf_id/$uiconf_id";
 
@@ -79,7 +87,11 @@ class embedIframeJsAction extends sfAction
 		}
 		
 		header("pragma:");
-		header('Content-Type: application/javascript');
+		if($iframeEmbed) {
+			$url .= ((strpos($url, "?") === false) ? "?" : "&") . $_SERVER["QUERY_STRING"];
+		} else {
+			header('Content-Type: application/javascript');
+		}
 
 		if ($autoEmbed)
 		{
