@@ -39,6 +39,20 @@ KAutoloader::register();
 error_reporting(E_ALL);
 KalturaLog::setLogger(new KalturaStdoutLogger());
 
+$systemSettings = kConf::getMap('system');
+if(!$systemSettings || !$systemSettings['LOG_DIR'])
+{
+	KalturaLog::err("LOG_DIR not found in system configuration.");
+	exit(-1);
+}
+$pid = $systemSettings['LOG_DIR'] . '/populate.pid';
+if(file_exists($pid))
+{
+	KalturaLog::err("Scheduler already running - pid[" . file_get_contents($pid) . "]");
+	exit(1);
+}
+file_put_contents($pid, getmypid());
+
 $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
 DbManager::initialize();
@@ -48,7 +62,7 @@ $lastLogs = array();
 foreach($serverLastLogs as $serverLastLog)
 	$lastLogs[$serverLastLog->getDc()] = $serverLastLog;
 
-$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs);	
+$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs);
 while(true)
 {
 	while(!count($sphinxLogs))
@@ -56,7 +70,7 @@ while(true)
 		sleep(1);
 		$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs);
 	}
-	
+
 	$sphinxCon = null;
 	try
 	{
@@ -68,20 +82,20 @@ while(true)
 		sleep(5);
 		continue;
 	}
-	
+
 	foreach($sphinxLogs as $sphinxLog)
 	{
 		/* @var $sphinxLog SphinxLog */
-		
+
 		$dc = $sphinxLog->getDc();
 		$executedServerId = $sphinxLog->getExecutedServerId();
 		KalturaLog::log('Sphinx log id ' . $sphinxLog->getId() . " dc [$dc] executed server id [$executedServerId] Memory: [" . memory_get_usage() . "]");
-		
+
 		$serverLastLog = null;
 		if(isset($lastLogs[$dc]))
 		{
 			$serverLastLog = $lastLogs[$dc];
-			
+
 			if($serverLastLog->getLastLogId() >= $sphinxLog->getId())
 			{
 				KalturaLog::debug('Last log id [' . $serverLastLog->getLastLogId() . "] dc [$dc] is larger than id [" . $sphinxLog->getId() . "]");
@@ -93,10 +107,10 @@ while(true)
 			$serverLastLog = new SphinxLogServer();
 			$serverLastLog->setServer($sphinxServer);
 			$serverLastLog->setDc($dc);
-			
+
 			$lastLogs[$dc] = $serverLastLog;
 		}
-		
+
 		try
 		{
 //			if($serverLastLog->getId() == $executedServerId)
@@ -108,14 +122,14 @@ while(true)
 				$sql = $sphinxLog->getSql();
 				$affected = $sphinxCon->exec($sql);
 //			}
-			
+
 			if(!$affected)
 			{
 				$errorInfo = $sphinxCon->errorInfo();
 //				if(!preg_match('/^duplicate id/', $errorInfo[2]))
 //					die("No affected records [" . $sphinxCon->errorCode() . "]\n" . print_r($sphinxCon->errorInfo(), true));
 			}
-			
+
 			$serverLastLog->setLastLogId($sphinxLog->getId());
 			$serverLastLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 		}

@@ -87,7 +87,6 @@ start_scheduler() {
 	if [ "$?" -eq 0 ]; then
 		echo_success
 		echo
-		echo $$ > $LOCKFILE
 	else
 		echo_failure
 		echo
