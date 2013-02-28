@@ -2,7 +2,7 @@
            with pidfile "@APP_DIR@/sphinx/searchd.pid"
            start program = "/etc/init.d/kaltura_sphinx start" with timeout 60 seconds
            stop program = "/etc/init.d/kaltura_sphinx stop"
-           if 2 restarts within 3 cycles then timeout
+           #if 10 restarts within 10 cycles then timeout
            #if failed port 9312 protocol telnet then restart
            group kaltura
            depends on kaltura.conf, searchd
@@ -20,7 +20,7 @@
            with pidfile "@LOG_DIR@/populate.pid"
            start program = "/etc/init.d/kaltura_populate start" with timeout 60 seconds
            stop program = "/etc/init.d/kaltura_populate stop"
-           if 2 restarts within 3 cycles then timeout
+           #if 10 restarts within 10 cycles then timeout
            group kaltura
            depends on sphinx_populate.conf, sphinx_populate_script
 

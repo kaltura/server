@@ -2,7 +2,7 @@
            with pidfile "/var/run/httpd/httpd.pid"
            start program = "/etc/init.d/httpd start" with timeout 60 seconds
            stop program = "/etc/init.d/httpd stop"
-           if 2 restarts within 3 cycles then timeout
+           #if 10 restarts within 10 cycles then timeout
            #if totalmem > 100 Mb then alert
            #if children > 255 for 5 cycles then stop
            #if cpu usage > 95% for 3 cycles then restart

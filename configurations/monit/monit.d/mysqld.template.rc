@@ -2,7 +2,7 @@
            with pidfile "/var/run/mysqld/mysqld.pid"
            start program = "/etc/init.d/mysqld start" with timeout 60 seconds
            stop program = "/etc/init.d/mysqld stop"
-           if 2 restarts within 3 cycles then timeout
+           #if 10 restarts within 10 cycles then timeout
            group kaltura
            depends on my.cnf, mysqld
 
