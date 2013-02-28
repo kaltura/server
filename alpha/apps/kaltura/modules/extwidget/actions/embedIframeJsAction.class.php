@@ -87,14 +87,11 @@ class embedIframeJsAction extends sfAction
 		}
 		
 		header("pragma:");
+
 		if($iframeEmbed) {
 			$url .= ((strpos($url, "?") === false) ? "?" : "&") . 'wid=' . $widget_id . '&' . $_SERVER["QUERY_STRING"];
-		} else {
+		} else if ($autoEmbed) {
 			header('Content-Type: application/javascript');
-		}
-
-		if ($autoEmbed)
-		{
 			$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 			$params = "protocol=$protocol&".$_SERVER["QUERY_STRING"];
 
