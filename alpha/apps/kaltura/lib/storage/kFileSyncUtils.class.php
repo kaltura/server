@@ -283,7 +283,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$existsFileSync = FileSyncPeer::doSelectOne( $c );
 		if($existsFileSync)
 		{
-			KalturaLog::log("file already exists");
+			KalturaLog::err("file already exists");
 			if($strict)
 				throw new Exception ( "key [" . $target_key . "] already exists");
 		}
