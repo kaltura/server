@@ -524,15 +524,14 @@ kmc.preview_embed = {
 	// Should be changed to accept object with parameters
 	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, is_video) {
 
-		// get default uiconf_id (first one in list)
-		if(!uiconf_id) { 
-			uiconf_id = (is_playlist) ? kmc.vars.playlists_list[0].id : kmc.vars.players_list[0].id;
-		}
-
 		var embedOptions = {
 			'previewOnly': previewOnly,
-			'uiConfId': parseInt(uiconf_id)
 		};
+
+		// Add uiConfId
+		if( uiconf_id ) {
+			embedOptions.uiConfId = parseInt(uiconf_id);
+		}
 
 		// Single entry
 		if( ! is_playlist ) {
@@ -560,7 +559,7 @@ kmc.preview_embed = {
 
 	// for content|Manage->drilldown->flavors->preview
 	doFlavorPreview : function(entryId, entryName, flavorDetails) {
-		
+
 		var player = kmc.vars.default_kdp;
 		var code = kmc.Preview.getGenerator().getCode({
 			protocol: location.protocol.substring(0, location.protocol.length - 1),
