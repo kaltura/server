@@ -84,8 +84,19 @@ public class ErrorTest extends BaseTest {
 			resultToReturn = res;
 		}
 		
+		@Override
 		protected String executeMethod(HttpClient client, PostMethod method) {
 			return resultToReturn;
+		}
+
+		@Override
+		protected HttpClient createHttpClient() {
+			return null;
+		}
+		
+		@Override
+		protected void closeHttpClient(HttpClient client) {
+			return;
 		}
 	}
 

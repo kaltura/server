@@ -52,9 +52,12 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.ProxyHost;
+import org.apache.commons.httpclient.SimpleHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
@@ -172,17 +175,19 @@ abstract public class KalturaClientBase {
 			logger.debug("full reqeust url: [" + url + "?" + kparams.toQueryString() + "]");
 
 		HttpClient client = createHttpClient();
-		PostMethod method = createPostMethod(kparams, kfiles, url);
-		String responseString = executeMethod(client, method);			
+		String responseString = null;
+		try {
+			PostMethod method = createPostMethod(kparams, kfiles, url);
+			responseString = executeMethod(client, method);	
+		} finally {
+			closeHttpClient(client);
+		}
+		
 		Element responseXml = XmlUtils.parseXml(responseString);
-		
 		this.validateXmlResult(responseXml);
-	  
-		Element resultXml = null;
-	   	resultXml = getElementByXPath(responseXml, "/xml/result");
-		
+	  	Element resultXml = getElementByXPath(responseXml, "/xml/result");
 		this.throwExceptionOnAPIError(resultXml);
-		
+				
 		return resultXml;
 	}
 
@@ -249,7 +254,7 @@ abstract public class KalturaClientBase {
 		return method;
 	}
 
-	private HttpClient createHttpClient() {
+	protected HttpClient createHttpClient() {
 		HttpClient client = new HttpClient();
 
 		// added by Unicon to handle proxy hosts
@@ -280,6 +285,27 @@ abstract public class KalturaClientBase {
 		}
 		client.getHttpConnectionManager().setParams(connParams);
 		return client;
+	}
+	
+	/**
+	 * We need to make sure that we shut down the connection.
+	 * The possible connection manager types are taken from here:
+	 * http://hc.apache.org/httpclient-legacy/apidocs/org/apache/commons/httpclient/HttpConnectionManager.html
+	 * 
+	 * The issue details is described here:
+	 * http://fuyun.org/2009/09/connection-close-in-httpclient/
+	 * 
+	 * @param client The client we wish to close
+	 */
+	protected void closeHttpClient(HttpClient client) {
+		HttpConnectionManager mgr = client.getHttpConnectionManager();
+		if (mgr instanceof SimpleHttpConnectionManager) {
+		    ((SimpleHttpConnectionManager)mgr).shutdown();
+		}
+		
+		if(mgr instanceof MultiThreadedHttpConnectionManager) {
+			((MultiThreadedHttpConnectionManager)mgr).shutdown();
+		}
 	}
 
 	private String extractParamsFromCallQueue(KalturaParams kparams, KalturaFiles kfiles) {
