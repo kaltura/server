@@ -41,6 +41,7 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 	
 	public static function getRetryInterval($job_type = null)
 	{
+		$job_type = kPluginableEnumsManager::coreToApi('BatchJobType', $job_type);
 		$jobCheckAgainTimeouts = kConf::get('job_retry_intervals');
 		if(isset($jobCheckAgainTimeouts[$job_type]))
 			return $jobCheckAgainTimeouts[$job_type];
