@@ -58,7 +58,7 @@ class kmc4Action extends kalturaAction
 				
 			$this->full_name = $currentUser->getFullName();
 		}
-		$this->showChangeAccount = (count($allowedPartners) > 1 ) ? true : false;
+		$this->showChangeAccount = (count($this->allowedPartners) > 1 ) ? true : false;
 
 	/** load partner from DB, and set templatePartnerId **/
 		$this->partner = $partner = null;
