@@ -1,4 +1,4 @@
-#Listen 443
+Listen @KALTURA_VIRTUAL_HOST_PORT@
 LogLevel debug
 SSLPassPhraseDialog  builtin
 SSLSessionCache         shmcb:/var/cache/mod_ssl/scache(512000)
