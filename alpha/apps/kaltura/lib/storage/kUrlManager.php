@@ -370,6 +370,14 @@ class kUrlManager
 		case PlaybackProtocol::APPLE_HTTP:
 			$url .= "/file/playlist.m3u8";
 			break;
+		case PlaybackProtocol::HTTP:
+			if(kConf::hasParam('url_mgr_http_add_ext'))
+			{
+				$requiredExt = kConf::get('url_mgr_http_add_ext');
+				if(array_key_exists($this->extention, $requiredExt))
+					$url .= "/name/a.".$this->extention;
+			}
+			break;
 		}
 		
 		$url = str_replace('\\', '/', $url);
