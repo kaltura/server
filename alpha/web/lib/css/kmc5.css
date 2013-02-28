@@ -186,7 +186,7 @@ fieldset{ border:0 none; position:relative; }
 	  
 	#modal div.right { float: left; margin: 0 18px 6px 0; }
 	#modal div.center { text-align: center; }
-	#modal input#html5_support, #modal input#https_support { width: auto;  }
+	#modal input#html5_support, #modal input#https_support { width: auto; float: left; margin-right: 5px; margin-top: 3px;  }
 	#modal input, textarea { color: #777; }
 	#modal div.note { clear: both; font-size: 11px; color: #333 }
 	#modal div.note a { color: #009ACC; }
@@ -282,7 +282,7 @@ fieldset{ border:0 none; position:relative; }
 #preview_embed .html5_support { width: 302px; float: left; }
 #preview_embed .html5_support .note { margin-left: 22px; margin-bottom: 0; }
 #preview_embed .https_support { width: 155px; float: right; }
-#preview_embed .preview_link .label, #preview_embed .item .label.checkbox { width: auto; min-width: auto; }
+#preview_embed .preview_link .label, #preview_embed .item .label.checkbox { width: 100%; min-width: auto; }
 #preview_embed .embed_code .label { width: 100px; min-width: 100px; }
 #embed_code_button { display: none; border-top: 1px solid #d9d9d9; padding: 15px 0; }
 .blue_button {
