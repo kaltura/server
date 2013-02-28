@@ -17,10 +17,8 @@ class LicenseProxyUtils
 	protected static $allowedOverrideParams = array(self::SETDURATION => self::SETDURATION, self::SETPOLICY =>self::SETPOLICY, 
 													self::SETPURDURATION => self::SETPURDURATION, self::DENYHD => self::DENYHD);
 		
-	public static function sendLicenseRequest($overrideParamsStr)
+	public static function sendLicenseRequest($requestParams, $overrideParamsStr)
 	{
-		$requestParams = self::extractRequestParameters();
-				
 		if(	!array_key_exists(self::CLIENTID, $requestParams) ||
 			!array_key_exists(self::MK, $requestParams) ||
 			!array_key_exists(self::MD, $requestParams) ||
@@ -131,22 +129,5 @@ class LicenseProxyUtils
 		KalturaLog::debug("License request URL: ".$requestUrl);
 		
 		return $requestUrl;
-	}
-	
-	protected static function extractRequestParameters()
-	{
-		$requestParams = array();
-		if(array_key_exists(self::CLIENTID, $_GET))
-			$requestParams[self::CLIENTID] = $_GET[self::CLIENTID]; 
-		if(array_key_exists(self::MK, $_GET))
-			$requestParams[self::MK] = $_GET[self::MK]; 
-		if(array_key_exists(self::MD, $_GET))
-			$requestParams[self::MD] = $_GET[self::MD]; 
-		if(array_key_exists(self::VER, $_GET))
-			$requestParams[self::VER] = $_GET[self::VER]; 
-		if(array_key_exists(self::ASSETID, $_GET))
-			$requestParams[self::ASSETID] = $_GET[self::ASSETID]; 
-			
-		return $requestParams;
 	}
 }

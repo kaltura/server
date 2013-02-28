@@ -26,12 +26,21 @@ class WidevineDrmService extends KalturaBaseService
 	 */
 	public function getLicenseAction($flavorAssetId)
 	{
+		KalturaResponseCacher::disableCache();
+		
 		KalturaLog::debug('get license for flavor asset: '.$flavorAssetId);
 		try 
 		{
-			$wvAssetId = $_GET[LicenseProxyUtils::ASSETID];
+			$requestParams = requestUtils::getRequestParams();
+			if(!array_key_exists(LicenseProxyUtils::ASSETID, $requestParams))
+			{
+				KalturaLog::err('assetid is missing on the request');
+				return LicenseProxyUtils::createErrorResponse(KalturaWidevineErrorCodes::WIDEVINE_ASSET_ID_CANNOT_BE_NULL, 0);
+			}
+			$wvAssetId = $requestParams[LicenseProxyUtils::ASSETID];
+			
 			$this->validateLicenseRequest($flavorAssetId, $wvAssetId);
-			$response = LicenseProxyUtils::sendLicenseRequest(kCurrentContext::$ks_object->getPrivileges());
+			$response = LicenseProxyUtils::sendLicenseRequest($requestParams, kCurrentContext::$ks_object->getPrivileges());
 		}
 		catch(KalturaWidevineLicenseProxyException $e)
 		{
@@ -52,9 +61,7 @@ class WidevineDrmService extends KalturaBaseService
 	{
 		if(!$flavorAssetId)
 			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::FLAVOR_ASSET_ID_CANNOT_BE_NULL);
-		if(!$wvAssetId)
-			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::WIDEVINE_ASSET_ID_CANNOT_BE_NULL);
-		
+				
 		$flavorAsset = $this->getFlavorAssetObject($flavorAssetId);
 
 		if($flavorAsset->getType() != WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
