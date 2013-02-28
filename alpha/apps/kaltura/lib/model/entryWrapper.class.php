@@ -26,7 +26,7 @@ class entryWrapper extends objectWrapperBase
 	protected $updateable_fields = array ( "name"  , "tags" , "type" , "mediaType" , "source" ,  "sourceId" , "sourceLink" , 
 			"licenseType" , "credit"  , "groupId" , "partnerData", "conversionQuality", "permissions" , "dataContent" , "desiredVersion" ,
 			"url" , "thumbUrl" , "filename" , "realFilename" , "indexedCustomData1" ,
-			"thumbOffset" ,
+			"thumbOffset" , "puserId",
 			"mediaId", "screenName", "siteUrl" , "description", "mediaDate" , "conversionQuality", "securityPolicy", "partnerSortValue");
 	
 	// allow to set some other field in some cases - logic should be set in the caller funtion
