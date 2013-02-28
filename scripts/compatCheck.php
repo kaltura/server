@@ -415,12 +415,15 @@ function normalizeResultBuffer($result)
 	$result = preg_replace('/<server_time>[0-9\.]+<\/server_time>/', '', $result);
 	$result = preg_replace('/server_time="[0-9\.]+"/', '', $result);
 	$result = preg_replace('/kaltura_player_\d+/', 'KP', $result);
+	$result = preg_replace('&ts=[0-9\.]+&', '&ts=0&', $result);
+	$result = preg_replace('/<\/result><\/xml>...\x01\0\0\x02\0\0\0/', '</result></xml>\x01\0\0\x02\0\0\0', $result);	// for kwidget
+	
 	if (strlen($serviceUrlOld) < strlen($serviceUrlNew))		// this if is for case where one of the url is a prefix of the other
 		$result = str_replace($serviceUrlNew, $serviceUrlOld, $result);
 	else
 		$result = str_replace($serviceUrlOld, $serviceUrlNew, $result);
 	
-	$patterns = array('/\/ks\/([a-zA-Z0-9+]+=*)/', '/&ks=([a-zA-Z0-9+\/]+=*)/', '/\?ks=([a-zA-Z0-9+\/]+=*)/');
+	$patterns = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/');
 	foreach ($patterns as $pattern)
 	{
 		preg_match_all($pattern, $result, $matches);
@@ -495,6 +498,7 @@ function getRequestHash($fullActionName, $paramsForHash)
 	{
 		unset($paramsForHash[$paramToUnset]);
 	}
+	ksort($paramsForHash);
 	return md5($fullActionName . serialize($paramsForHash));
 }
 
