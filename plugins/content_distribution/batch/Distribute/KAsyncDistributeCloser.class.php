@@ -33,6 +33,10 @@ abstract class KAsyncDistributeCloser extends KJobCloserWorker
 	
 	protected function distribute(KalturaBatchJob $job, KalturaDistributionJobData $data)
 	{
+		
+		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
+		
 		try
 		{
 			$this->engine = $this->getDistributionEngine($job->jobSubType, $data);
