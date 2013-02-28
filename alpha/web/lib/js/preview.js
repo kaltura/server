@@ -127,7 +127,8 @@
 		};
 
 		options = $.extend({}, defaults, options);
-		console.log('openPreviewEmbed:: uiConfId: ' + options.uiConfId);
+		// Update our players
+		previewService.updatePlayers(options);
 		// Set options
 		previewService.set(options);
 
@@ -303,8 +304,11 @@ kmcApp.factory('previewService', ['$rootScope', function($rootScope) {
 				$rootScope.$broadcast('previewChanged');
 			}
 		},
-		updatePlayers: function() {
-			$rootScope.$broadcast('playersUpdated');
+		updatePlayers: function(options) {
+			$rootScope.$broadcast('playersUpdated', options);
+		},
+		changePlayer: function(playerId) {
+			$rootScope.$broadcast('changePlayer', playerId);
 		}
 	};
 }]);
@@ -344,33 +348,29 @@ kmcApp.controller('PreviewCtrl', function($scope, previewService) {
 
 	Preview.Service = previewService;
 
-	var setPlayer = function(uiConfId) {
-			if($scope.players.length) {
-				// Set default player to the first
-				uiConfId = uiConfId || $scope.players[0].id;
-				$scope.player = uiConfId;
+	var updatePlayers = function(options) {
+			options = options || {};
+			var playerId = (options.uiConfId) ? options.uiConfId : undefined;
+			// Exit if player not loaded
+			if(!kmc.vars.playlists_list || !kmc.vars.players_list) {
+				return ;
 			}
-		};
-
-	var updatePlayers = function(currentPlayerId) {
-			console.log('updatePlayers:: currentPlayerId: ' + currentPlayerId);
-			console.log('updatePlayers:: previewService: ', previewService.get());
-			if(kmc.vars.playlists_list && kmc.vars.players_list) {
-				// List of players
-				if(previewService.get('playlistId') || previewService.get('playerOnly')) {
-					$scope.players = kmc.vars.playlists_list;
-					var uiConfId = previewService.get('uiConfId');
-					if(!Preview.playlistMode || uiConfId !== currentPlayerId) {
-						Preview.playlistMode = true;
-						setPlayer(uiConfId);
-					}
-				} else {
-					$scope.players = kmc.vars.players_list;
-					if(Preview.playlistMode || !$scope.player) {
-						Preview.playlistMode = false;
-						setPlayer(previewService.get('uiConfId'));
-					}
+			// List of players
+			if(options.playlistId || options.playerOnly) {
+				$scope.players = kmc.vars.playlists_list;
+				if(!Preview.playlistMode) {
+					Preview.playlistMode = true;
+					$scope.$broadcast('changePlayer', playerId);
 				}
+			} else {
+				$scope.players = kmc.vars.players_list;
+				if(Preview.playlistMode || !$scope.player) {
+					Preview.playlistMode = false;
+					$scope.$broadcast('changePlayer', playerId);
+				}
+			}
+			if(playerId){
+				$scope.$broadcast('changePlayer', playerId);
 			}
 		};
 
@@ -442,8 +442,13 @@ kmcApp.controller('PreviewCtrl', function($scope, previewService) {
 	$scope.showAdvancedOptionsStatus = Preview.getDefault('showAdvancedOptions');
 
 	// Set players on update
-	$scope.$on('playersUpdated', function() {
-		updatePlayers();
+	$scope.$on('playersUpdated', function(e, options) {
+		updatePlayers(options);
+	});
+
+	$scope.$on('changePlayer', function(e, playerId) {
+		playerId = ( playerId ) ? playerId : $scope.players[0].id;
+		$scope.player = playerId;
 	});
 
 	$scope.showAdvancedOptions = function($event, show) {
@@ -459,12 +464,10 @@ kmcApp.controller('PreviewCtrl', function($scope, previewService) {
 	// Listen to player change
 	$scope.$watch('player', function() {
 		var player = Preview.getObjectById($scope.player, $scope.players);
-		console.log('player changed', player);
 		if(!player) return ;
 		setDeliveryTypes(player);
 		setEmbedTypes(player);
 		previewService.set('player', player);
-		previewService.set('uiConfId', player.id);
 	});
 	$scope.$watch('deliveryType', function() {
 		previewService.set('deliveryType', Preview.getObjectById($scope.deliveryType, $scope.deliveryTypes));
@@ -491,8 +494,6 @@ kmcApp.controller('PreviewCtrl', function($scope, previewService) {
 	});
 	$scope.$on('previewChanged', function(e) {
 		if(Preview.ignoreChangeEvents) return;
-		console.log('previewChanged', e);
-		updatePlayers($scope.player);
 		var previewUrl = Preview.getPreviewUrl(previewService);
 		$scope.embedCode = Preview.getEmbedCode(previewService);
 		$scope.embedCodePreview = Preview.getEmbedCode(previewService, true);
