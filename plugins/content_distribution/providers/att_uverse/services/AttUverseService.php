@@ -106,6 +106,7 @@ class AttUverseService extends KalturaBaseService
 		}
 		$feed->setChannelTitle($channelTitle);
 		header('Content-Type: text/xml');
+		echo $feed->getXml();
 		die;
 	}
 }
