@@ -1,5 +1,5 @@
 <?php
-class LicenseProxyUtils
+class WidevineLicenseProxyUtils
 {
 	const SETDURATION = 'setduration';
 	const SETPURDURATION = 'setpurduration';

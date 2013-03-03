@@ -32,28 +32,28 @@ class WidevineDrmService extends KalturaBaseService
 		try 
 		{
 			$requestParams = requestUtils::getRequestParams();
-			if(!array_key_exists(LicenseProxyUtils::ASSETID, $requestParams))
+			if(!array_key_exists(WidevineLicenseProxyUtils::ASSETID, $requestParams))
 			{
 				KalturaLog::err('assetid is missing on the request');
-				return LicenseProxyUtils::createErrorResponse(KalturaWidevineErrorCodes::WIDEVINE_ASSET_ID_CANNOT_BE_NULL, 0);
+				return WidevineLicenseProxyUtils::createErrorResponse(KalturaWidevineErrorCodes::WIDEVINE_ASSET_ID_CANNOT_BE_NULL, 0);
 			}
-			$wvAssetId = $requestParams[LicenseProxyUtils::ASSETID];
+			$wvAssetId = $requestParams[WidevineLicenseProxyUtils::ASSETID];
 			
 			$this->validateLicenseRequest($flavorAssetId, $wvAssetId);
-			$response = LicenseProxyUtils::sendLicenseRequest($requestParams, kCurrentContext::$ks_object->getPrivileges());
+			$response = WidevineLicenseProxyUtils::sendLicenseRequest($requestParams, kCurrentContext::$ks_object->getPrivileges());
 		}
 		catch(KalturaWidevineLicenseProxyException $e)
 		{
-			KalturaLog::err($e->getTraceAsString());
-			$response = LicenseProxyUtils::createErrorResponse($e->getWvErrorCode(), $wvAssetId);
+			KalturaLog::err($e);
+			$response = WidevineLicenseProxyUtils::createErrorResponse($e->getWvErrorCode(), $wvAssetId);
 		}
 		catch (Exception $e)
 		{
-			KalturaLog::err($e->getTraceAsString());
-			$response = LicenseProxyUtils::createErrorResponse(KalturaWidevineErrorCodes::UNKNOWN_ERROR, $wvAssetId);
+			KalturaLog::err($e);
+			$response = WidevineLicenseProxyUtils::createErrorResponse(KalturaWidevineErrorCodes::UNKNOWN_ERROR, $wvAssetId);
 		}	
 		
-		LicenseProxyUtils::printLicenseResponseStatus($response);
+		WidevineLicenseProxyUtils::printLicenseResponseStatus($response);
 		return $response;
 	}
 	

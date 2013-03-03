@@ -178,7 +178,7 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	
 	public static function getWidevineConfigParam($key)
 	{
-		$widevineConfig = kConf::get('widevine');
+		$widevineConfig = kConf::getMap('widevine');
 		if (!is_array($widevineConfig))
 		{
 			KalturaLog::err('Widevine config section is not defined');
