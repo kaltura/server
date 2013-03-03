@@ -12,4 +12,5 @@ class KalturaResponseType extends KalturaEnum
 	const RESPONSE_TYPE_HTML = 7;
 	const RESPONSE_TYPE_MRSS = 8;
 	const RESPONSE_TYPE_JSONP = 9;
+	const RESPONSE_TYPE_PLAIN = 10;
 }
