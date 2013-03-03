@@ -19,8 +19,8 @@ class KalturaWidevineFlavorAsset extends KalturaFlavorAsset
 	 */
 	public $widevineDistributionEndDate;
 	
-		/**
-	 * License distribution window end date
+	/**
+	 * Widevine unique asset id
 	 * 
 	 * @var int
 	 */
