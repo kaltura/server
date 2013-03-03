@@ -713,8 +713,6 @@ $plannedDur = 0;
 	/* ---------------------------
 	 * evaluateTargetVideoFramerate
 	 */
-	//bitrate calc should take in account source frame size(heightXwidth), relativly to the flavor/target frame size.
-	//therefore the Evaluate frame sze should be called before this func
 	private static function evaluateTargetVideoFramerate(KDLVideoData $source, KDLVideoData $target) 
 	{
 		/*
@@ -729,7 +727,7 @@ $plannedDur = 0;
 				$target->_frameRate=$target->_frameRate==50?25:KDLConstants::MaxFramerate;
 			}
 			// For webcam/h263 - if FR==0, set FR=24
-			else if($target->_frameRate==0 && $source->IsFormatOf(array("h.263")) ){
+			else if($target->_frameRate==0 && $source->IsFormatOf(array("h.263","h263","sorenson spark","vp6")) ){
 				$target->_frameRate=24;
 			}
 			
