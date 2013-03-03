@@ -1273,7 +1273,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function getFlavorAsset(SimpleXMLElement $contentElement, $conversionProfileId)
 	{
-		$flavorAsset = new KalturaFlavorAsset(); //we create a new asset (for add)
+		$flavorAsset = KalturaFlavorAsset::getInstanceByType(KalturaAssetType::FLAVOR); //we create a new asset (for add)
 		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($contentElement, $conversionProfileId, true);
 		$flavorAsset->tags = $this->implodeChildElements($contentElement->tags);
 			
