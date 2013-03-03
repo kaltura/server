@@ -34,7 +34,9 @@
 	};
 
 	Preview.clipboard = new ZeroClipboard($('.copy-code'), {
-		moviePath: "lib/flash/ZeroClipboard.swf"
+		moviePath: "lib/flash/ZeroClipboard.swf",
+		trustedDomains: ['*'],
+		allowScriptAccess: "always"
 	});
 
 	Preview.clipboard.on('complete', function() {
