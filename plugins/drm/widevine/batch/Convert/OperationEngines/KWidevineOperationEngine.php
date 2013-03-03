@@ -46,12 +46,14 @@ class KWidevineOperationEngine extends KOperationEngine
 	 */
 	protected function doOperation()
 	{
-		$this->packageName = $this->job->entryId.'_'.$this->data->flavorAssetId;
-		
+		$this->impersonate($this->job->partnerId);
+		$entry = $this->client->baseEntry->get($this->job->entryId);
+		$this->buildPackageName($entry);
+		$this->unimpersonate();		
 		KalturaLog::debug('start Widevine packaging: '.$this->packageName);
 		
 		$this->preparePackageFolders();
-		$requestXml = $this->preparePackageNotifyRequestXml();
+		$requestXml = $this->preparePackageNotifyRequestXml($entry);
 		$response = $this->sendPostRequest(WidevinePlugin::getWidevineConfigParam('package_notify_cgi'), $requestXml);
 		$this->handleResponseError($response);
 		
@@ -64,7 +66,9 @@ class KWidevineOperationEngine extends KOperationEngine
 	 */
 	protected function doCloseOperation()
 	{
-		$this->packageName = $this->job->entryId.'_'.$this->data->flavorAssetId;
+		$this->impersonate($this->job->partnerId);
+		$entry = $this->client->baseEntry->get($this->job->entryId);
+		$this->buildPackageName($entry);
 		
 		KalturaLog::debug('start Widevine package closer: '.$this->packageName);
 		
@@ -76,15 +80,21 @@ class KWidevineOperationEngine extends KOperationEngine
 		$this->message = "Package status: ".$response->getStatus();
 		if($response->isSuccess())
 		{
-			$this->impersonate($this->job->partnerId);
+			
 			$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
 			$updatedFlavorAsset->widevineAssetId = $response->getAssetId();
+			if($entry->startDate && $entry->endDate)
+			{
+				$updatedFlavorAsset->widevineDistributionStartDate = $entry->startDate;
+				$updatedFlavorAsset->widevineDistributionEndDate = $entry->endDate;
+			}
 			$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);
 			$this->unimpersonate();
 			return true;
 		}
 		else 
 		{
+			$this->unimpersonate();
 			$this->handleResponseError($response);
 			return false;
 		}		
@@ -107,7 +117,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		KalturaLog::debug('Target package file name: '.$this->data->destFileSyncLocalPath);
 	}
 	
-	private function preparePackageNotifyRequestXml()
+	private function preparePackageNotifyRequestXml(KalturaBaseEntry $entry)
 	{
 		$outputFileName = basename($this->data->destFileSyncLocalPath);
 		$targetFolder = dirname($this->data->destFileSyncLocalPath);
@@ -123,10 +133,6 @@ class KWidevineOperationEngine extends KOperationEngine
 			}
 		}
 		
-		$this->impersonate($this->job->partnerId);
-		$entry = $this->client->baseEntry->get($this->job->entryId);
-		$this->unimpersonate();
-		/* @var $entry KalturaBaseEntry */
 		$requestInput->setLicenseStartDate($entry->startDate);
 		$requestInput->setLicenseEndDate($entry->endDate);
 		
@@ -171,4 +177,35 @@ class KWidevineOperationEngine extends KOperationEngine
 			throw new KOperationEngineException($logMessage);
 		}
 	}	
+	
+	private function buildPackageName($entry)
+	{	
+		$flavorAssetId = $this->data->flavorAssetId;
+		$entryId = $this->job->entryId;
+			
+		if($entry->replacedEntryId)
+		{
+			$entryId = $entry->replacedEntryId;
+			$filter = new KalturaAssetFilter();
+			$filter->entryIdEqual = $entry->replacedEntryId;
+			$filter->tagsLike = 'widevine'; 
+			$flavorAssetList = $this->client->flavorAsset->listAction();
+			
+			if($flavorAssetList->totalCount > 0)
+			{
+				$replacedFlavorParamsId = $this->data->flavorParamsOutput->flavorParamsId;
+				foreach ($flavorAssetList->objects as $flavorAsset) 
+				{
+					/* @var $flavorAsset KalturaFlavorAsset */
+					if($flavorAsset->flavorParamsId == $replacedFlavorParamsId)
+					{
+						$flavorAssetId = $flavorAsset->id;
+						break;
+					}
+				}
+			}
+		}
+		
+		$this->packageName = $entryId.'_'.$flavorAssetId;
+	}
 }

@@ -154,14 +154,15 @@ class WidevinePackageNotifyRequest
 	 * @param field_type $licenseStartDate
 	 */
 	public function setLicenseStartDate($licenseStartDate) {
-		$this->licenseStartDate = $licenseStartDate;
+		
+		$this->licenseStartDate = date('c', $licenseStartDate);
 	}
 
 	/**
 	 * @param field_type $licenseEndDate
 	 */
 	public function setLicenseEndDate($licenseEndDate) {
-		$this->licenseEndDate = $licenseEndDate;
+		$this->licenseEndDate = date('c', $licenseEndDate);
 	}	
 	
 	public function createPackageNotifyRequestXml()
