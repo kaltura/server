@@ -6,7 +6,7 @@
            #if totalmem > 100 Mb then alert
            #if children > 255 for 5 cycles then stop
            #if cpu usage > 95% for 3 cycles then restart
-           if failed port 80 protocol http then restart
+           #if failed port 80 protocol http then restart
            group kaltura
            depends on httpd.conf, httpd
 
