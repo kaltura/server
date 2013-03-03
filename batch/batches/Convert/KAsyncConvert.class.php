@@ -126,7 +126,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		$uniqid = "convert_{$job->entryId}_".substr($uniqid,-5);
 		$data->destFileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid;
 		
-		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $this->taskConfig, $data, $job, $this->kClient);
+		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $this->taskConfig, $data, $job, $this->kClient, $this->kClientConfig);
 		
 		if ( $this->operationEngine == null )
 		{
