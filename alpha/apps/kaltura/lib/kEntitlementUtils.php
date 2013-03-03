@@ -82,7 +82,7 @@ class kEntitlementUtils
 		
 				
 		$privacy = array(category::formatPrivacy(PrivacyType::ALL, $partner->getId()));
-		if($ks && !$ks->isWidgetSession())
+		if($ks && !$ks->isAnonymousSession())
 			$privacy[] = category::formatPrivacy(PrivacyType::AUTHENTICATED_USERS, $partner->getId());
 			
 		$crit = $c->getNewCriterion (categoryPeer::PRIVACY, $privacy, Criteria::IN);
@@ -236,7 +236,7 @@ class kEntitlementUtils
 	public static function getPrivacyForKs($partnerId)
 	{
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
-		if(!$ks || $ks->isWidgetSession())
+		if(!$ks || $ks->isAnonymousSession())
 			return array(category::formatPrivacy(PrivacyType::ALL, $partnerId));
 			
 		return array(category::formatPrivacy(PrivacyType::ALL, $partnerId), 
@@ -267,7 +267,7 @@ class kEntitlementUtils
 		{
 			$privacyContextSearch[] = $ksPrivacyContext . '_' . PrivacyType::ALL;
 			
-			if (!$ks->isWidgetSession())
+			if (!$ks->isAnonymousSession())
 				$privacyContextSearch[] = $ksPrivacyContext . '_' . PrivacyType::AUTHENTICATED_USERS;
 		}
 		
