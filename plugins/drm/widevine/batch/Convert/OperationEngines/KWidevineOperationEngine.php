@@ -189,7 +189,7 @@ class KWidevineOperationEngine extends KOperationEngine
 			$filter = new KalturaAssetFilter();
 			$filter->entryIdEqual = $entry->replacedEntryId;
 			$filter->tagsLike = 'widevine'; 
-			$flavorAssetList = $this->client->flavorAsset->listAction();
+			$flavorAssetList = $this->client->flavorAsset->listAction($filter);
 			
 			if($flavorAssetList->totalCount > 0)
 			{
