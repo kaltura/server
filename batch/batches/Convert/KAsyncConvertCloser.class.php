@@ -92,7 +92,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		if(isset($data->flavorParamsOutputId))
 			$data->flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
 			
-		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $this->taskConfig, $data, $job, $this->kClient);
+		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $this->taskConfig, $data, $job, $this->kClient, $this->kClientConfig);
 		try 
 		{
 			$isDone = $this->operationEngine->closeOperation();

@@ -76,9 +76,11 @@ class KWidevineOperationEngine extends KOperationEngine
 		$this->message = "Package status: ".$response->getStatus();
 		if($response->isSuccess())
 		{
+			$this->impersonate($this->job->partnerId);
 			$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
 			$updatedFlavorAsset->widevineAssetId = $response->getAssetId();
 			$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);
+			$this->unimpersonate();
 			return true;
 		}
 		else 
@@ -121,7 +123,9 @@ class KWidevineOperationEngine extends KOperationEngine
 			}
 		}
 		
+		$this->impersonate($this->job->partnerId);
 		$entry = $this->client->baseEntry->get($this->job->entryId);
+		$this->unimpersonate();
 		/* @var $entry KalturaBaseEntry */
 		$requestInput->setLicenseStartDate($entry->startDate);
 		$requestInput->setLicenseEndDate($entry->endDate);

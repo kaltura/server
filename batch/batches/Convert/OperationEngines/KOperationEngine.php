@@ -51,6 +51,16 @@ abstract class KOperationEngine
 	 * @var KalturaClient
 	 */
 	protected $client;
+	
+	/**
+	 * @var KalturaConfiguration
+	 */
+	protected $clientConfig;
+	
+	/**
+	 * @var KSchedularTaskConfig
+	 */
+	protected $taskConfig;
 
 	/**
 	 * @var KalturaConvartableJobData
@@ -69,12 +79,16 @@ abstract class KOperationEngine
 	
 	abstract protected function getCmdLine();
 	
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaBatchJob $job, KalturaClient $client)
+	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaBatchJob $job, KalturaClient $client, KalturaConfiguration $clientConfig)
 	{
 		$this->data = $data;
 		$this->job = $job;
 		$this->client = $client;
+		$this->taskConfig = $taskConfig;
+		$this->clientConfig = $clientConfig;
 		$this->setMediaInfoEnabled($taskConfig->params->mediaInfoEnabled);
+		
+		KalturaLog::info("taskConfig-->".print_r($taskConfig,true)."\ndata->".print_r($data,true));
 	}
 	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
@@ -242,6 +256,18 @@ abstract class KOperationEngine
 			return $type;
 		}
 		return null;
+	}
+	
+	protected function impersonate($partnerId)
+	{
+		$this->clientConfig->partnerId = $partnerId;
+		$this->client->setConfig($this->clientConfig);
+	}
+	
+	protected function unimpersonate()
+	{
+		$this->clientConfig->partnerId = $this->taskConfig->getPartnerId();
+		$this->client->setConfig($this->clientConfig);
 	}
 
 }

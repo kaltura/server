@@ -34,12 +34,6 @@ class KOperationEngineSegmenter  extends KSingleOutputOperationEngine
 //		KalturaLog::info("operator($operator), inFilePath($inFilePath), configFilePath($configFilePath)");
 	}
 
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
-	{
-		parent::configure($taskConfig, $data, $client);
-		KalturaLog::info("taskConfig-->".print_r($taskConfig,true)."\ndata->".print_r($data,true));
-	}
-
 	private function parsePlayList($fileIn, $fileOut)
 	{
 		$fdIn = fopen($fileIn, 'r');

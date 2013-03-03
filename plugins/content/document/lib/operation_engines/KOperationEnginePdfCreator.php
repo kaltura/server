@@ -11,16 +11,6 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	 */
 	private $orgInFilePath = '';
 	
-	/**
-	 * @var KalturaPdfFlavorParamsOutput
-	 */
-	private $flavorParamsOutput;
-	
-	/**
-	 * The task's configuration.
-	 * @var KSchedularTaskConfig
-	 */
-	private $taskConfiguration;
 	
 	//old office files prefix
 	const OLD_OFFICE_SIGNATURE = "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1";
@@ -37,13 +27,6 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	//this will be the default value if it not set in the task's configuration
 	const DEFAULT_SLEEP_SECONDS = 2;
 	
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
-	{
-		parent::configure($taskConfig, $data, $client);
-		$this->taskConfiguration = $taskConfig;
-		$this->flavorParamsOutput = $data->flavorParamsOutput;
-	}
-	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
 		KalturaLog::debug("document : operator [". print_r($operator, true)."] inFilePath [$inFilePath]"); 
@@ -53,7 +36,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		
 		// bypassing PDF Creator for source PDF files
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
-		if (($inputExtension == 'pdf') && (!$this->flavorParamsOutput->readonly)) {
+		if (($inputExtension == 'pdf') && (!$this->data->flavorParamsOutput->readonly)) {
 			KalturaLog::notice('Bypassing PDF Creator for source PDF files');
 			if (!@copy($inFilePath, $this->outFilePath)) {
 				$error = '';
@@ -98,7 +81,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		
 		$finalOutputPath = $this->outFilePath;
 		
-		if (($inputExtension == 'pdf') && ($this->flavorParamsOutput->readonly == true)){
+		if (($inputExtension == 'pdf') && ($this->data->flavorParamsOutput->readonly == true)){
 			$tmpFile = $this->outFilePath.'.pdf';
 		}else{
 			$tmpFile = kFile::replaceExt(basename($realInFilePath), 'pdf');
@@ -114,12 +97,12 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			@unlink($tmpUniqInFilePath);
 		}
 		
-		$sleepTimes = $this->taskConfiguration->fileExistReties;
+		$sleepTimes = $this->taskConfig->fileExistReties;
 		if (!$sleepTimes){
 			$sleepTimes = self::DEFAULT_SLEEP_TIMES;
 		}
 		
-		$sleepSeconds = $this->taskConfiguration->fileExistInterval;
+		$sleepSeconds = $this->taskConfig->fileExistInterval;
 		if (!$sleepSeconds){
 			$sleepSeconds = self::DEFAULT_SLEEP_SECONDS;
 		}
@@ -138,11 +121,11 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		}
 		
 		
-		$fileUnlockRetries = $this->taskConfiguration->params->fileUnlockRetries ;
+		$fileUnlockRetries = $this->taskConfig->params->fileUnlockRetries ;
 		if(!$fileUnlockRetries){
 			$fileUnlockRetries = self::DEFAULT_FILE_UNLOCK_RETRIES;
 		}
-		$fileUnlockInterval = $this->taskConfiguration->params->fileUnlockInterval;
+		$fileUnlockInterval = $this->taskConfig->params->fileUnlockInterval;
 		if(!$fileUnlockInterval){
 			$fileUnlockInterval = self::DEFAULT_FILE_UNLOCK_INTERVAL; 
 		}

@@ -7,7 +7,6 @@
  */
 class KOperationEngineInletArmada  extends KSingleOutputOperationEngine
 {
-	protected $taskConfig = null;
 /*
 	protected $url=null;
 	protected $login=null;
@@ -165,11 +164,9 @@ $trgPrefixWindows = null;
 	/*************************************
 	 * 
 	 */
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
+	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaBatchJob $job, KalturaClient $client, KalturaConfiguration $clientConfig)
 	{
-		parent::configure($taskConfig, $data, $client);
-		
-		$this->taskConfig = $taskConfig;
+		parent::configure($taskConfig, $data, $job, $client, $clientConfig);
 		
 		$errStr=null;
 		if(!$taskConfig->params->InletArmadaUrl)
@@ -198,7 +195,6 @@ $trgPrefixWindows = null;
 		else
 			$this->prio = 5;
 */
-		KalturaLog::info("taskConfig-->".print_r($taskConfig,true)."\ndata->".print_r($data,true));
 	}
 
 	/*************************************

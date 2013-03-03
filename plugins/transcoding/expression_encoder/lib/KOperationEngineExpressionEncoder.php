@@ -42,12 +42,6 @@ class KOperationEngineExpressionEncoder  extends KSingleOutputOperationEngine
 		return $exeCmd;
 	}
 
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
-	{
-		parent::configure($taskConfig, $data, $client);
-		KalturaLog::info("taskConfig-->".print_r($taskConfig,true)."\ndata->".print_r($data,true));
-	}
-	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{	
 			/*

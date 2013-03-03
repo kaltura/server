@@ -18,11 +18,4 @@ class KOperationEngineVlc  extends KSingleOutputOperationEngine
 		KalturaLog::info(print_r($this,true));
 		return $exeCmd;
 	}
-
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
-	{
-		parent::configure($taskConfig, $data, $client);
-		KalturaLog::info("taskConfig-->".print_r($taskConfig,true)."\ndata->".print_r($data,true));
-	}
-
 }

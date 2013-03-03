@@ -7,9 +7,9 @@ class KOperationEngineQtTools  extends KSingleOutputOperationEngine
 {
 	protected $tmpFolder;
 	
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
+	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaBatchJob $job, KalturaClient $client, KalturaConfiguration $clientConfig)
 	{
-		parent::configure($taskConfig, $data, $client);
+		parent::configure($taskConfig, $data, $job, $client, $clientConfig);
 		$this->tmpFolder = $taskConfig->params->localTempPath;
 	}
 	

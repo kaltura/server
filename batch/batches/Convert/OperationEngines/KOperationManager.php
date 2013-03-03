@@ -11,15 +11,16 @@ class KOperationManager
 	 * @param KalturaConvartableJobData $data
 	 * @param KalturaBatchJob $job
 	 * @param KalturaClient $client
+	 * @param KalturaConfiguration $clientConfig
 	 * @return KOperationEngine
 	 */
-	public static function getEngine($type, KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaBatchJob $job, KalturaClient $client)
+	public static function getEngine($type, KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaBatchJob $job, KalturaClient $client, KalturaConfiguration $clientConfig)
 	{
 		$engine = self::createNewEngine($type, $taskConfig, $data);
 		if(!$engine)
 			return null;
 			
-		$engine->configure($taskConfig, $data, $job, $client);
+		$engine->configure($taskConfig, $data, $job, $client, $clientConfig);
 		return $engine;
 	}
 	

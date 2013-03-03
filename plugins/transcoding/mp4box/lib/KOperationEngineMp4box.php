@@ -5,17 +5,6 @@
  */
 class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 {
-
-	/***************************
-	* @var KalturaConvertJobData
-	*/
-	protected $data = null;
-
-	/**
-	* @var KalturaClient
-	*/
-	protected $client = null;
-
 	public function __construct($cmd, $outFilePath)
 	{
 		parent::__construct($cmd,$outFilePath);
@@ -55,20 +44,6 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 			$exeCmd = str_replace (KDLOperatorMp4box::ACTION_HINT,"", $exeCmd);
 		}
 		return $exeCmd; 
-	}
-
-	/***************************
-	 * @param KSchedularTaskConfig $taskConfig
-	 * @param KalturaConvartableJobData $data
-	 * @param KalturaClient $client
-	 * @return 
-	 */
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
-	{
-		parent::configure($taskConfig, $data, $client);
-		$this->data = $data;
-		$this->client = $client;
-
 	}
 
 	/***************************

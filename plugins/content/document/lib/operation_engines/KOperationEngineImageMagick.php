@@ -7,11 +7,6 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 {
 	const PDF_FORMAT = 'PDF document';
 	const JPG_FORMAT = 'JPEG image data';
-
-	/**
-	 * @var KalturaPdfFlavorParamsOutput
-	 */
-	private $flavorParamsOutput;
 	
 	const IMAGES_LIST_XML_NAME = 'imagesList.xml';
 	
@@ -24,13 +19,6 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 	const IMAGES_LIST_XML_ATTRIBUTE_COUNT = 'count';
 	
 	const LEADING_ZEROS_PADDING = '-%03d';
-	
-	
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
-	{
-		parent::configure($taskConfig, $data, $client);
-		$this->flavorParamsOutput = $data->flavorParamsOutput;
-	}
 	
 	public function __construct($cmd, $outFilePath)
 	{
@@ -53,7 +41,7 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 			//outFilePath will be the path to the directory in which the images will be saved.
 			$outDirPath = $this->outFilePath;
 			//imageMagick decides the format of the output file according to the outFilePath's extension.so the format need to be added.
-			$this->outFilePath = $this->outFilePath.DIRECTORY_SEPARATOR.basename($this->outFilePath).self::LEADING_ZEROS_PADDING.'.'.$this->flavorParamsOutput->format;
+			$this->outFilePath = $this->outFilePath.DIRECTORY_SEPARATOR.basename($this->outFilePath).self::LEADING_ZEROS_PADDING.'.'.$this->data->flavorParamsOutput->format;
 		}
 		else
 		{
