@@ -2,7 +2,7 @@
 class WidevinePackageNotifyRequest
 {
 	/*	Example:
-	"<PackageNotify 
+	<PackageNotify 
 	name='file5_2_package' 
 	owner='kaltura' 
 	provider='kaltura' 
@@ -15,12 +15,13 @@ class WidevinePackageNotifyRequest
 		<SourceFiles>
 			<File name='file.mp4'/>
 		</SourceFiles>
-	</PackageNotify>"
+	</PackageNotify>
 	*/
 	
 	const FILE_URL_PREFIX = 'file://';
 	const KALTURA_PROVIDER = 'kaltura';
 	const DEFAULT_POLICY = 'default';
+	const WV_DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
 	
 	private $packageName;
 	private $sourceUrl; 
@@ -155,14 +156,14 @@ class WidevinePackageNotifyRequest
 	 */
 	public function setLicenseStartDate($licenseStartDate) {
 		
-		$this->licenseStartDate = date('c', $licenseStartDate);
+		$this->licenseStartDate = date(self::WV_DATE_FORMAT, $licenseStartDate);
 	}
 
 	/**
 	 * @param field_type $licenseEndDate
 	 */
 	public function setLicenseEndDate($licenseEndDate) {
-		$this->licenseEndDate = date('c', $licenseEndDate);
+		$this->licenseEndDate = date(self::WV_DATE_FORMAT, $licenseEndDate);
 	}	
 	
 	public function createPackageNotifyRequestXml()
