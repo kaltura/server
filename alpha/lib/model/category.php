@@ -144,7 +144,12 @@ class category extends Basecategory implements IIndexable
 		
 		$kuserChanged = false;
 		if ($this->isColumnModified(categoryPeer::KUSER_ID))
-			$kuserChanged = true; 
+			$kuserChanged = true;
+
+		if ($this->isColumnModified(categoryPeer::PRIVACY) && $this->getPrivacy() == PrivacyType::MEMBERS_ONLY)
+		{
+			$this->removeNonMemberKusers ();
+		}
 
 		parent::save($con);
 		
@@ -179,6 +184,15 @@ class category extends Basecategory implements IIndexable
 			$this->indexToSearchIndex();
 		}
 	}
+	
+	private function removeNonMemberKusers ()
+	{
+		$filter = new categoryKuserFilter();
+		$filter->setCategoryIdEqual($this->getId());
+		$filter->set('_notcontains_permission_names', PermissionName::CATEGORY_CONTRIBUTE.",".PermissionName::CATEGORY_EDIT.",".PermissionName::CATEGORY_MODERATE.",".PermissionName::CATEGORY_VIEW);
+		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
+	}
+	
 	
 	/* (non-PHPdoc)
 	 * @see IIndexable::indexToSearchIndex()
