@@ -11,6 +11,8 @@ class kpreloaderAction extends sfAction
 	public function execute()
 	{
 		$ui_conf_id = $this->getRequestParameter( "ui_conf_id" );
+		if(!is_numeric($ui_conf_id))
+			throw new Exception("Illegal Input was supplied");
 
 		$preloader_path = myContentStorage::getFSContentRootPath()."/content" . myContentStorage::getFSUiconfRootPath() . "/preloader_$ui_conf_id.swf";
 		

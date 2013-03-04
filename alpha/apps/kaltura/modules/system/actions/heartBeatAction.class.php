@@ -76,7 +76,8 @@ class heartBeatAction extends kalturaSystemAction
 		}
 	}
 	
-	public static function isProcessRunning ( $proc_name )
+	// If you call this function from outside this file, please add input validation
+	private static function isProcessRunning ( $proc_name )
 	{
 		// using ps & grep - see if the process is running 
 		$output = array ();

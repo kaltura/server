@@ -52,7 +52,9 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 		}
 	}
 	
-	public function deleteFilesLinux($searchPath, $minutesOld, $simulateOnly)
+	// XXX - If this function forces deletion of files in the given directory. If it is used with params
+	// given from the user - Please add input validation.
+	protected function deleteFilesLinux($searchPath, $minutesOld, $simulateOnly)
 	{
 		$command = "find $searchPath -mmin +$minutesOld -exec rm -rf {} \;";
 		KalturaLog::info("Executing command: $command");
@@ -62,7 +64,7 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 		KalturaLog::info("Returned value [$returnedValue]");
 	}
 	
-	public function deleteFilesPHP($searchPath, $minutesOld, $simulateOnly)
+	protected function deleteFilesPHP($searchPath, $minutesOld, $simulateOnly)
 	{
 		$secondsOld = $minutesOld * 60;
 		

@@ -29,6 +29,9 @@ function searchFolder($pluginsFolder, $level = 1)
 			continue;
 		}
 
+		if(!is_dir($pluginConfig))
+			throw new Exception("Illegal input was supplied.");
+		
 		chdir($pluginConfig);	
 		print $pluginConfig;
 		passthru("propel-gen $pluginConfig");
@@ -41,6 +44,9 @@ $rootFolder = realpath(dirname(__FILE__)."/../..");
 
 // Core
 $alphaConfigFolder = "$rootFolder/alpha/config";
+if(!is_dir($alphaConfigFolder))
+	throw new Exception("Illegal input was supplied.");
+
 chdir($alphaConfigFolder);
 passthru("propel-gen $alphaConfigFolder");
 

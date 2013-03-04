@@ -89,6 +89,9 @@ class batchStatus
 	
 	public function getProcessStatusByPid($pid)
 	{
+		if(!is_numeric($pid))
+			throw new Exception("Illegal Input was supplied.");
+		
 		if ($this->running_os == 'win')
 		{
 		    $command = 'tasklist /FI "PID eq '.$pid.'"';

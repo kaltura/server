@@ -171,7 +171,7 @@ abstract class KOperationEngine
 		try
 		{
 			$filePath = realpath($filePath);
-			if(file_exists($filePath))
+			if(($filePath !== FALSE) && (file_exists($filePath)))
 			{
 				system("mediainfo $filePath >> \"{$this->logFilePath}\" 2>&1");
 			}
@@ -246,6 +246,10 @@ abstract class KOperationEngine
 		$returnValue = null;
 		$output = null;
 		$matches = null;
+		
+		if(realpath($this->inFilePath) === FALSE)
+			throw new KOperationEngineException("Illegal input file was supplied.");
+		
 		$command = "file '{$this->inFilePath}'";
 		KalturaLog::debug("Executing: $command");
 		exec($command, $output, $returnValue);

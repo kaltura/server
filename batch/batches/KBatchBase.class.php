@@ -542,6 +542,8 @@ abstract class KBatchBase implements IKalturaLogger
 			proc_close($this->monitorHandle);
 			
 			$pid = $status['pid'];
+			if(!is_numeric($pid))
+				throw new Exception("Non numeric PID was supplied. " . $pid);
 			
 			if(function_exists('posix_kill'))
 			{
