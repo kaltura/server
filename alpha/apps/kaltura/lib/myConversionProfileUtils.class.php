@@ -178,7 +178,7 @@ class myConversionProfileUtils
 		$new_profile->setInputTagsMap($map);
 		
 		// use the OLD code to simulate what was performed on the old_conversion_profile to retrieve the old_conversion_params list		
-		$conv_client = new kConversionClient ( "" , "" , "" , "" ); 
+		$conv_client = new kConversionClientBase ( "" , "" , "" , "" ); 
  
 		$old_conversion_command = $conv_client->createConversionCommandFromConverionProfile ( "src" , "target" , $old_conversion_profile );
 		$description = ''; 

@@ -176,7 +176,7 @@ class myFileConverter
 		$text_output_file = self::createLogFileName ($source_file , $plain_log_file_name );
 		// hq - activate high quality settings
 		// deinterlace - deinterlace pictures
-		$cmd = kConversionEngineFfmpeg::getCmd();
+		$cmd = kConf::get ( "bin_path_ffmpeg" );
 		
 		// Test parameters
 		$validInput = TRUE;
@@ -214,7 +214,7 @@ class myFileConverter
 
 				KalturaLog::log("FFMpeg response - \n".print_r(implode($output),1));
 				KalturaLog::log("The ffmpeg responded with 'first-frame-not-a-keyframe'. The fast-seek mode failed to properly get the right frame. Switching to the 'slow-mode' that is limited to th3 first 30sec only ".print_r(implode($output),1));
-				$exec_cmd = kConversionEngineFfmpeg::getCmd() . " -i \"$source_file\"". $position_str  . " -an -y -r 1 " . $dimensions .
+				$exec_cmd = kConf::get ( "bin_path_ffmpeg" ) . " -i \"$source_file\"". $position_str  . " -an -y -r 1 " . $dimensions .
 					" " . " -vframes $frame_count -f \"" . $target_type . "\" " . "\"$target_file\"" . " 2>&1";
 				KalturaLog::log("fmpeg cmd [$exec_cmd]");
 				$output = array ();
@@ -245,9 +245,11 @@ class myFileConverter
 	public static function getVideoDimensions (  $source_file )
 	{
 		$source_file = kFile::fixPath( $source_file ) ;
+		if (realpath($source_file) === FALSE)
+			throw new Exception("Illegal input was supplied");
 	
 		ob_start();
-		$cmd_line = kConversionEngineFfmpeg::getCmd() . " -i \"". $source_file . "\" 2>&1";
+		$cmd_line = kConf::get ( "bin_path_ffmpeg" ) . " -i \"". $source_file . "\" 2>&1";
 		passthru( $cmd_line );
 		echo $cmd_line;
 		$size = ob_get_contents();
@@ -595,8 +597,11 @@ class conversionInfo
 			}
 		}
 
+		if (realpath($source_file) === FALSE)
+			throw new Exception("Illegal input was supplied");
+		
 		ob_start();
-		$cmd_line = kConversionEngineFfmpeg::getCmd() . " -i \"". $source_file . "\" 2>&1";
+		$cmd_line = kConf::get ( "bin_path_ffmpeg" ) . " -i \"". $source_file . "\" 2>&1";
 		passthru( $cmd_line );
 		$content = ob_get_contents();
 		ob_end_clean();
