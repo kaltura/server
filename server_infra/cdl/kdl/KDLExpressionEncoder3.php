@@ -20,7 +20,10 @@ const jobXml = '<?xml version="1.0"?>
     </OutputFormat>
   </MediaFile>
 </Preset>';
-		
+
+		/*
+		 * Switched the AutoSize to "True" to match EE4 constraints.
+		 */
 const vc1CodecXml = '<?xml version="1.0"?>
 <AdvancedVC1VideoProfile
 	SmoothStreaming="True"
@@ -45,7 +48,7 @@ const vc1CodecXml = '<?xml version="1.0"?>
 	SeparateFilesPerStream="True"
 	NumberOfEncoderThreads="0">
 	<Streams
-		AutoSize="False"
+		AutoSize="True"
 		FreezeSort="False">
 		<StreamInfo
 			Size="640, 480">
@@ -71,7 +74,7 @@ const h264CodecXml = '<?xml version="1.0"?>
 	SeparateFilesPerStream="True"
 	NumberOfEncoderThreads="0">
 	<Streams
-		AutoSize="False"
+		AutoSize="True"
 		FreezeSort="False">
 		<StreamInfo
 			Size="640, 480">
@@ -389,12 +392,8 @@ KalturaLog::log("transcoder==>\n".print_r($transcoderParams,true)."\n<--");
 			/*
 			 * Buidl a combined SmoothSteaming preset XML
 			 */
-		$rootFlavorXml=null;
-		$rootStreamsXml=null;
 		$prevK = null;
 		foreach ($flavorInColl as $k=>$flavor){
-			$eeId = KDLOperationParams::SearchInArray(KDLTranscoders::EE3, $flavor->_transcoders);
-			
 			/*
 			 * Check for IsmvMinimalFlavorRatio compliance,
 			 * fix if required.
@@ -407,10 +406,25 @@ KalturaLog::log("transcoder==>\n".print_r($transcoderParams,true)."\n<--");
 				}
 			}
 			$prevK = $k;
+		}
+		
+			/*
+			 * Sort the flavors that participate in collection - from high to low, to match EE4 constraints
+			 */
+		$rv=krsort($flavorInColl);
+		
+			/*
+			 * Update the preset XML's and build combined XML
+			 */
+		$rootFlavorXml=null;
+		$rootStreamsXml=null;
+		foreach ($flavorInColl as $k=>$flavor){
+			$eeId = KDLOperationParams::SearchInArray(KDLTranscoders::EE3, $flavor->_transcoders);
+				
 			$transcoderParams = $flavor->_transcoders[$eeId];
 			$presetXml = new SimpleXMLElement($transcoderParams->_cmd);
 			$streamsXml = self::updateToCollectionPreset($flavor, $presetXml);
-
+		
 			if($rootFlavorXml==null) {
 				$rootFlavorXml  = $presetXml;
 				$rootStreamsXml = $streamsXml;
@@ -419,6 +433,7 @@ KalturaLog::log("transcoder==>\n".print_r($transcoderParams,true)."\n<--");
 				KDLUtils::AddXMLElement($rootStreamsXml, $streamsXml->StreamInfo);
 			}
 		}
+		
 		
 		if($rootFlavorXml){
 			$rootFlavorXml->Job['DefaultMediaOutputFileName']=KDLCmdlinePlaceholders::OutFileName.".{DefaultExtension}";
@@ -484,6 +499,14 @@ KalturaLog::log("transcoder==>\n".print_r($transcoderParams,true)."\n<--");
 				else {
 					$br->VariableConstrainedBitrate['PeakBitrate']=round($flavorVideoBr*KDLConstants::IsmvPeakBitrateRatio);
 				}
+			}
+				/*
+				 * EE4 constraint - no PeakBufferWindow for high flavors.
+				 * The PeakBufferWindow is probably required for mobile/low-hw 
+				 * devices that does not run HD content
+				 */
+			if($flavorVideoBr>1500){
+				$br->VariableConstrainedBitrate['PeakBufferWindow'] = "00:00:00";
 			}
 		}
 			
