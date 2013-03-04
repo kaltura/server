@@ -1,4 +1,11 @@
 <?php
+/**
+ * Integration utilities with Widevine license server
+ * 
+ * @package plugins.widevine
+ * @subpackage lib
+ * 
+ */
 class WidevineLicenseProxyUtils
 {
 	const SETDURATION = 'setduration';
@@ -16,15 +23,22 @@ class WidevineLicenseProxyUtils
 	
 	protected static $allowedOverrideParams = array(self::SETDURATION => self::SETDURATION, self::SETPOLICY =>self::SETPOLICY, 
 													self::SETPURDURATION => self::SETPURDURATION, self::DENYHD => self::DENYHD);
-		
-	public static function sendLicenseRequest($requestParams, $overrideParamsStr)
+
+	/**
+	* Signs the input and forwards license request to Widevine license server
+	* @param $requestParams - original parameters
+	* @param $overrideParamsStr - additional parameters passed on KS
+	* @param $isAdmin - true/false, identifies if called with admin KS
+	* @return byte sequence
+	*/
+	public static function sendLicenseRequest($requestParams, $overrideParamsStr, $isAdmin)
 	{
 		if(	!array_key_exists(self::CLIENTID, $requestParams) ||
 			!array_key_exists(self::MK, $requestParams) ||
 			!array_key_exists(self::MD, $requestParams) ||
 			!array_key_exists(self::ASSETID, $requestParams) 
 			)
-			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::MISSING_MANDATORY_PARAMETER);
+			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::MISSING_MANDATORY_SIGN_PARAMETER);
 		
 		$ptime = time();
 		$signInput = $requestParams[self::ASSETID].
@@ -36,7 +50,7 @@ class WidevineLicenseProxyUtils
 		$requestParams[self::PTIME] = $ptime;
 		$requestParams[self::SIGN] = $sign;
 				
-		$overrideParams = self::getLicenseOverrideParams($overrideParamsStr);
+		$overrideParams = self::getLicenseOverrideParams($overrideParamsStr, $isAdmin);
 		
 		$requestParams = array_merge($requestParams, $overrideParams);
 		$url = self::buildLicenseServerUrl($requestParams);
@@ -97,7 +111,7 @@ class WidevineLicenseProxyUtils
 	   	return openssl_encrypt($digest,'aes-256-cbc',$key, false, $iv);
 	}
 	
-	protected static function getLicenseOverrideParams($overrideParamsStr)
+	protected static function getLicenseOverrideParams($overrideParamsStr, $isAdmin)
 	{
 		$overrideParams = array();
 		$allParams = explode(',', $overrideParamsStr);
@@ -108,7 +122,13 @@ class WidevineLicenseProxyUtils
 			{
 				$overrideParams[$exParam[0]] = $exParam[1];
 			}
-		}		
+		}	
+		if($isAdmin)
+		{
+			$kmcPolicy = WidevinePlugin::getWidevineConfigParam('kmc_policy');
+			if($kmcPolicy)
+				$overrideParams[self::SETPOLICY] = $kmcPolicy;
+		}	
 		return $overrideParams;
 	}
 	
@@ -120,7 +140,7 @@ class WidevineLicenseProxyUtils
 			
 		$portal = WidevinePlugin::getWidevineConfigParam('portal');
 		if(!$portal)
-			$portal = 'kaltura';
+			$portal = WidevinePlugin::KALTURA_PROVIDER;
 			
 		$urlParams[self::PORTAL] = $portal;
 		$requestUrl = $baseUrl.'?';

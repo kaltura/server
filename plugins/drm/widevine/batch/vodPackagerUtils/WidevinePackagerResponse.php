@@ -10,7 +10,7 @@ class WidevinePackagerResponse
 	</PackageNotifyResponse>
 	
 	<PackageQuery
-		name=”package_name”
+		name='package_name'
 	</PackageQuery>
 	
 	<PackageQueryResponse
@@ -27,7 +27,7 @@ class WidevinePackagerResponse
 	private $errorText;
 	private $requestId;
 	private $id;
-	private $assetId;
+	private $assetid;
 	
 	private static $PACKAGE_ERROR_STATUSES = array('error' => 'error', 'importFailed' => 'importFailed', 'processingFailed' => 'processingFailed', 
 											'exportFailed' => 'exportFailed', 'unknown' => 'unknown', 'packageDeleteFailed' => 'packageDeleteFailed');
@@ -37,15 +37,15 @@ class WidevinePackagerResponse
 	/**
 	 * @return the $assetId
 	 */
-	public function getAssetId() {
-		return $this->assetId;
+	public function getAssetid() {
+		return $this->assetid;
 	}
 
 	/**
 	 * @param field_type $assetId
 	 */
-	public function setAssetId($assetId) {
-		$this->assetId = $assetId;
+	public function setAssetid($assetId) {
+		$this->assetid = $assetId;
 	}
 
 	/**
@@ -137,18 +137,8 @@ class WidevinePackagerResponse
 	
 	protected function setAttribute($attrName, $attrValue)
 	{
-		if($attrName == 'name')
-			$this->setName($attrValue);
-		if($attrName == 'id')
-			$this->setId($attrValue);
-		if($attrName == 'status')
-			$this->setStatus($attrValue);
-		if($attrName == 'errorText')
-			$this->setErrorText($attrValue);
-		if($attrName == 'requestId')
-			$this->setRequestId($attrValue);
-		if($attrName == 'assetid')
-			$this->setAssetId($attrValue);
+		$method = 'set'.ucfirst($attrName); 
+		$this->$method($attrValue);
 	}
 	
 	public static function createWidevinePackagerResponse($responseStr)

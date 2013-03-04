@@ -19,8 +19,6 @@ class WidevinePackageNotifyRequest
 	*/
 	
 	const FILE_URL_PREFIX = 'file://';
-	const KALTURA_PROVIDER = 'kaltura';
-	const DEFAULT_POLICY = 'default';
 	const WV_DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
 	
 	private $packageName;
@@ -28,7 +26,7 @@ class WidevinePackageNotifyRequest
 	private $targetUrl;
 	private $outputFileName;
 	private $files; 
-	private $policy = self::DEFAULT_POLICY;
+	private $policy;
 	private $portal;
 	private $licenseStartDate = null;
 	private $licenseEndDate = null;
@@ -40,9 +38,10 @@ class WidevinePackageNotifyRequest
 		$this->setTargetUrl($targetFolder);
 		$this->setOutputFileName($outputFileName);
 		$this->setFiles($files);
+		$this->policy = WidevinePlugin::DEFAULT_POLICY;
 		$this->portal = WidevinePlugin::getWidevineConfigParam('portal');
 		if(!$this->portal)
-			$this->portal = self::KALTURA_PROVIDER;
+			$this->portal = WidevinePlugin::KALTURA_PROVIDER;
 	}
 	
 	/**

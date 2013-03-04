@@ -40,7 +40,7 @@ class WidevineDrmService extends KalturaBaseService
 			$wvAssetId = $requestParams[WidevineLicenseProxyUtils::ASSETID];
 			
 			$this->validateLicenseRequest($flavorAssetId, $wvAssetId);
-			$response = WidevineLicenseProxyUtils::sendLicenseRequest($requestParams, kCurrentContext::$ks_object->getPrivileges());
+			$response = WidevineLicenseProxyUtils::sendLicenseRequest($requestParams, kCurrentContext::$ks_object->getPrivileges(), kCurrentContext::$ks_object->isAdmin());
 		}
 		catch(KalturaWidevineLicenseProxyException $e)
 		{

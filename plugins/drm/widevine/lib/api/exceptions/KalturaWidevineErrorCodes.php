@@ -29,7 +29,7 @@ class KalturaWidevineErrorCodes
 	
 	const WRONG_ASSET_TYPE = 527;
 	
-	const MISSING_MANDATORY_PARAMETER = 528;
+	const MISSING_MANDATORY_SIGN_PARAMETER = 528;
 	
 	const LICENSE_SERVER_URL_NOT_SET = 529;
 	

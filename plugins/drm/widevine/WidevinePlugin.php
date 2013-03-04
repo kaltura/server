@@ -6,6 +6,10 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 {
 	const PLUGIN_NAME = 'widevine';
 	
+	const KALTURA_PROVIDER = 'kaltura';
+	const DEFAULT_POLICY = 'default';
+	
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */

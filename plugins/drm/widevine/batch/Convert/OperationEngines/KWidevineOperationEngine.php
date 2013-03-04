@@ -82,7 +82,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		{
 			
 			$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
-			$updatedFlavorAsset->widevineAssetId = $response->getAssetId();
+			$updatedFlavorAsset->widevineAssetId = $response->getAssetid();
 			if($entry->startDate && $entry->endDate)
 			{
 				$updatedFlavorAsset->widevineDistributionStartDate = $entry->startDate;
