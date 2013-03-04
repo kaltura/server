@@ -691,7 +691,8 @@ return array($genericWidget, $myspaceWidget);
 		$kshowKuser->setKshowId($kshow_id);
 		$kshowKuser->setKuserId($kuser_id);
 		$kshowKuser->setSubscriptionType(KshowKuser::KSHOW_SUBSCRIPTION_NORMAL);
-		$kshowKuser->setAlertType(alert:: KALTURAS_PRODUCED_ALERT_TYPE_SUBSCRIBER_ADDED);
+		// alert:: KALTURAS_PRODUCED_ALERT_TYPE_SUBSCRIBER_ADDED
+		$kshowKuser->setAlertType(21);
 		$kshowKuser->save();
 
 		$message = "You are now subscribed to $showname. You can receive updates and join the discussion.";
