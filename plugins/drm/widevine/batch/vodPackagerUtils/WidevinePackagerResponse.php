@@ -3,10 +3,10 @@ class WidevinePackagerResponse
 {
 /*	Examples:
 	<PackageNotifyResponse 
-		name=’entry1_asset1’ 
-		owner=’kaltura’ 
-		provider=’kaltura’ 
-		id=’1234’> 
+		name='entry1_asset1' 
+		owner='kaltura' 
+		provider='kaltura' 
+		id='1234'> 
 	</PackageNotifyResponse>
 	
 	<PackageQuery
@@ -14,12 +14,12 @@ class WidevinePackagerResponse
 	</PackageQuery>
 	
 	<PackageQueryResponse
-		name=’package1’
-		owner=’widevine’
-		provider=’widevine’
-		assetid=’1000421’
-		id=’1234’
-		status=’processing’>
+		name='package1'
+		owner='widevine'
+		provider='widevine'
+		assetid='1000421'
+		id='1234'
+		status='processing'>
 	</PackageQueryResponse>
 */	
 	private $name;
