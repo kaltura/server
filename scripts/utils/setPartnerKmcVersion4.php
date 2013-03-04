@@ -16,11 +16,17 @@ if (!$partner){
 if ($partner->getKmcVersion() == '4'){
 	KalturaLog::err("Partner already have KMC V4");
 	die;
-} else if ($partner->getKmcVersion() == '3') {
-	$partner->setKmcVersion('4');
-	$partner->save();
-	KalturaLog::debug("Partner was modified to KMC V4");
-	die;
+} else if ($partner->getKmcVersion() == '3'){
+	if (DEBUG){
+		KalturaLog::debug("This was a dry-run, Partner have KMC V3");
+		die;
+	}
+	else{
+		$partner->setKmcVersion('4');
+		$partner->save();
+		KalturaLog::debug("Partner was modified to KMC V4");
+		die;
+	}
 }
 
 handleFlvSrcAssetsWithMbrTag($partner, $should_do_flavors_to_web, $force_upgrade);
@@ -29,10 +35,16 @@ $defaultConversionProfileId = $partner->getDefaultConversionProfileId();
 if($defaultConversionProfileId)
 {
 	KalturaLog::debug("Partner already have Default Conversion Profile id: $defaultConversionProfileId");
-    $partner->setKmcVersion('4');
-    $partner->save();
-	KalturaLog::debug("Partner was modified to KMC V4");
-	die;
+	if(DEBUG){
+		KalturaLog::debug("This was dry-run, exiting");
+		die;
+	}
+	else{
+		$partner->setKmcVersion('4');
+    	$partner->save();
+		KalturaLog::debug("Partner was modified to KMC V4");
+		die;
+	}    
 }
 
 $currentConversionProfileType = $partner->getCurrentConversionProfileType();
@@ -40,18 +52,31 @@ if($currentConversionProfileType){
 	// convert old conversion profile to new (or check if has new)
 	$criteria = new Criteria();
 	$criteria->add(ConversionProfilePeer::PARTNER_ID, $partner_id);
-	$oldCp = ConversionProfilePeer::doSelect($criteria);
-	if(!$oldCp->getConversionProfile2Id())
+	$criteria->addDescendingOrderByColumn(ConversionProfilePeer::UPDATED_AT);
+	$oldCp = ConversionProfilePeer::doSelectOne($criteria);
+	if($oldCp && !$oldCp->getConversionProfile2Id())
 	{
-		KalturaLog::debug("Converting old conversion profile to new");
-		myConversionProfileUtils::createConversionProfile2FromConversionProfile($oldCp);
+		if (DEBUG){
+			KalturaLog::debug("This was dry-run, going to convert old conversion profile to new, existing");
+			die;
+		}
+		else{
+			KalturaLog::debug("Converting old conversion profile to new");
+			myConversionProfileUtils::createConversionProfile2FromConversionProfile($oldCp);
+		}
 	}
-	// set new id as defaultConversionProfileId
-	$partner->setDefaultConversionProfileId($oldCp->getConversionProfile2Id());
-	KalturaLog::debug("Partner was set with DefaultConversionProfileId: ". $partner->getDefaultConversionProfileId());
-	$partner->setKmcVersion('4');
-	$partner->save();
-	die;
+	if (DEBUG){
+		KalturaLog::debug("This was dry-run, going to set partner with DefaultConversionProfileId: ". $partner->getDefaultConversionProfileId());
+		die;
+	}
+	else{
+		// set new id as defaultConversionProfileId
+		$partner->setDefaultConversionProfileId($oldCp->getConversionProfile2Id());
+		KalturaLog::debug("Partner was set with DefaultConversionProfileId: ". $partner->getDefaultConversionProfileId());
+		$partner->setKmcVersion('4');
+		$partner->save();
+		die;
+	}
 }
 else{
 	// no currentConversionProfileType, lets see what on default
@@ -61,24 +86,36 @@ else{
 		$oldCp = myConversionProfileUtils::getConversionProfile($partner->getId(), $defConversionProfileType);
 		if(!$oldCp->getConversionProfile2Id() && $oldCp->getPartnerId() == $partner->getId())
 		{
-			myConversionProfileUtils::createConversionProfile2FromConversionProfile($oldCp);
-			// set new id on defaultConversionProfileId
-			$partner->setDefaultConversionProfileId($oldCp->getConversionProfile2Id());
-			$partner->setKmcVersion('4');
-			$partner->save();
-			KalturaLog::debug("converted old default conversion profile. new DefaultConversionProfileId is: ".$partner->getDefaultConversionProfileId());
-			die;
+			if (DEBUG){
+				KalturaLog::debug("This was dry-run, going to convert old default conversion profile according to defConversionProfileType");
+				die;
+			}
+			else{
+				myConversionProfileUtils::createConversionProfile2FromConversionProfile($oldCp);
+				// set new id on defaultConversionProfileId
+				$partner->setDefaultConversionProfileId($oldCp->getConversionProfile2Id());
+				$partner->setKmcVersion('4');
+				$partner->save();
+				KalturaLog::debug("converted old default conversion profile. new DefaultConversionProfileId is: ".$partner->getDefaultConversionProfileId());
+				die;
+			}
 		}
 	}
 }
 
 // if we didn't exit so far, copy from template
-$sourcePartner = PartnerPeer::retrieveByPK(kConf::get('template_partner_id'));
-myPartnerUtils::copyConversionProfiles($sourcePartner, $partner);
-KalturaLog::debug("copied from template partner. DefaultConversionProfileId: ".$partner->getDefaultConversionProfileId());
-$partner->setKmcVersion('4');
-$partner->save();
-die;
+if (DEBUG){
+	KalturaLog::debug("This was dry-run, going to copy from template_partner_id");
+	die;
+}
+else{
+	$sourcePartner = PartnerPeer::retrieveByPK(kConf::get('template_partner_id'));
+	myPartnerUtils::copyConversionProfiles($sourcePartner, $partner);
+	KalturaLog::debug("copied from template partner. DefaultConversionProfileId: ".$partner->getDefaultConversionProfileId());
+	$partner->setKmcVersion('4');
+	$partner->save();
+	die;
+}
 
 function handleFlvSrcAssetsWithMbrTag(Partner $partner, $should_do_flavors_to_web = NULL, $force_upgrade = NULL){
 	$c = new Criteria();
