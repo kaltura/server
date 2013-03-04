@@ -1,0 +1,83 @@
+
+Overview
+=========
+The Kaltura CLI client is a bundle of command line utilities that can be used to interface with the 
+Kaltura API. The client is intended mostly for experimentation / small tasks, not for full-fledged
+applications.
+
+The following utilities are included in the package:
+1. kalcli - responsible for issuing Kaltura API calls, it builds the request URL and parses the 
+	response to a format that can be easily processed by command line utilities such as grep / awk.
+	The client library contains an additional script (kalcliAutoComplete) that provides bash-autocompletion 
+	functionality to the kalcli utility, for example:
+	kalcli med[TAB]
+	kalcli media l[TAB]
+	kalcli media list f[TAB]
+	kalcli media list filter:objectType=KalturaM[TAB]
+	kalcli media list filter:objectType=KalturaMediaEntryFilter
+	...
+2. extractKs - parses a Kaltura session (KS) to its different fields.
+2. generateKs - generates a KS.
+4. renewKs - useful to renew expired Kaltura sessions, generates a KS identical to the input KS with
+	a 1 day expiry.
+5. genIpHeader - generates a signed HTTP header that can be used to simulate access to the Kaltura API
+	from a different source IP.
+
+All the utilities display usage information incl. all available switches when executed without parameters.
+
+Installation instructions
+==========================
+1. Unzip the package contents
+2. Replace the @BASEDIR@ token in kalcliAutoComplete with the path to kalcliAutoComplete.php
+	(e.g. if kalcliAutoComplete was copied to /a/b/kalcliAutoComplete @BASEDIR@ should be set to /a/b)
+3. Create a link to kalcliAutoComplete in /etc/bash_completion.d/
+	cd /etc/bash_completion.d/
+	ln -s @BASEDIR@/kalcliAutoComplete kalcliAutoComplete
+4. Register the auto completion: 
+	source /etc/bash_completion.d/kalcliAutoComplete
+4. Create aliases in ~/.bashrc to the different utilities, e.g.:
+	alias kalcli='php @BASEDIR@/kalcli.php'
+	alias extks='php @BASEDIR@/extractKs.php'
+	alias genks='php @BASEDIR@/generateKs.php'
+	alias renewks='php @BASEDIR@/renewKs.php'
+	alias genipheader='php @BASEDIR@/genIpHeader.php'
+5. Copy config/config.template.ini to config/config.ini and fill out the parameters:
+	a. Secret repositories - required for the extractKs / generateKs / renewKs utilities.
+		Two types of repositories can be configured:
+		1. Preset repositories - contain a fixed list of (partner id, admin secret) pairs
+		2. Database repositories - contain the connection details for a Kaltura server database,
+			that can be used to pull the secrets of partner accounts.
+	b. IP address salt - required for the genIpHeader utility.
+		The salt has to match the parameter 'remote_addr_header_salt' that is configured in
+		configuration/local.ini on the Kaltura server.
+
+Examples
+=========
+(1234 denotes the partner id)
+
+1. Getting the ids of 30 entries:
+> genks 1234 | kalcli media list | awk '$1 == "id"'
+
+2. Diffing access control profiles:
+> (genks 1234 | kalcli accesscontrol get id=7003 > /tmp/a1) ; (genks 1234 | kalcli accesscontrol get id=8005 > /tmp/a2) ; diff /tmp/a1 /tmp/a2
+
+3. Getting the number of distinct entries in a playlist
+> genks 1234 | kalcli playlist execute id=1_1a2b3c | grep -P 'id\t' | sort | uniq | wc -l
+
+4. Using a precreated session
+> kalcli media list ks=MDQ2ZThjOTI0MTJmZGIxYTVlMWVhNDJlZDZhNDAyMDkyMWJhNzE0OXw0Mzc0ODE7NDM3NDgxOzEzNjI0OTI3Njc7MDsxMzYyNDA2MzY3Ljc3NzM7MDt3aWRnZXQ6MSx2aWV3Oio7Ow== -x
+
+5. Using an expired session
+> renewks MDQ2ZThjOTI0MTJmZGIxYTVlMWVhNDJlZDZhNDAyMDkyMWJhNzE0OXw0Mzc0ODE7NDM3NDgxOzEzNjI0OTI3Njc7MDsxMzYyNDA2MzY3Ljc3NzM7MDt3aWRnZXQ6MSx2aWV3Oio7Ow== | kalcli media list
+
+6. Parsing a KS:
+> extks MDQ2ZThjOTI0MTJmZGIxYTVlMWVhNDJlZDZhNDAyMDkyMWJhNzE0OXw0Mzc0ODE7NDM3NDgxOzEzNjI0OTI3Njc7MDsxMzYyNDA2MzY3Ljc3NzM7MDt3aWRnZXQ6MSx2aWV3Oio7Ow==
+
+7. Executing an API with a different source IP address:
+> i=`genipheader 9.8.7.6` ; genks 1234 | kalcli -H$i baseentry getContextData entryId=0_abcd56
+
+8. Using a serve action:
+> genks 1234 | kalcli -r document_documents serve entryId=0_abcdef > \temp\test.doc
+
+9. Nesting requests
+> kalcli -x session start partnerId=1234 secret=abcdef type=2 | awk '{print "ks "$1}' | kalcli media list
