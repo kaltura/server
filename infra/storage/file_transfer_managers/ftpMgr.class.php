@@ -187,7 +187,7 @@ class ftpMgr extends kFileTransferMgr
 		// 08/08/2011  08:52 PM               174 .buildpath
 		// 08/08/2011  08:52 PM               706 .project
 		// 08/08/2011  08:52 PM    <DIR>          .settings
-	    $regexWindows = '^(?P<month>\d{2})-(?P<day>\d{2})-(?P<year>\d{2})\s+(?P<hour>\d{2}):(?P<minute>\d{2})(?P<apm>AM|PM)\s+(?P<size>\d+|<DIR>)\s+(?P<file>.+)\s*$';
+	    $regexWindows = '^(?P<month>\d{2})-(?P<day>\d{2})-(?P<year>\d{2})\s+(?P<hour>\d{2}):(?P<minute>\d{2})(?P<apm>AM|PM)\s+(?P<fileSize>\d+|<DIR>)\s+(?P<file>.+)\s*$';
 	    foreach($filesInfo as $fileInfo)
 	    {
 	    	$matches = null;
