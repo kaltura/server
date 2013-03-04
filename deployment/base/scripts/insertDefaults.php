@@ -4,7 +4,7 @@ if($argc < 2)
 	echo("Please specify defaults configuration files directory path");
 	exit(-2);
 }
-	
+
 $dirName = $argv[1];
 if(!file_exists($dirName) || !is_dir($dirName))
 {
@@ -16,27 +16,33 @@ $dirName = realpath($dirName);
 chdir(__DIR__);
 require_once('../../bootstrap.php');
 $con = Propel::getConnection(PartnerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+$sharedPartner = PartnerPeer::retrieveByPK(0);
+if($sharedPartner)
+{
+	KalturaLog::info("Defaults already exists.");
+	exit(0);
+}
 
 $dir = dir($dirName);
 /* @var $dir Directory */
 
 $fileNames = array();
 $errors = array();
-while (false !== ($fileName = $dir->read())) 
+while (false !== ($fileName = $dir->read()))
 {
 	$filePath = realpath("$dirName/$fileName");
 	if($fileName[0] == '.' || is_dir($filePath) || !preg_match('/^\d+\.\w+\.ini$/', $fileName))
 		continue;
-	
+
 	KalturaLog::debug("Validate file [$filePath]");
 	$objectConfigurations = parse_ini_file($filePath, true);
 	if(!is_array($objectConfigurations))
 		$errors[] = "Content file [$filePath] is not a valid ini file";
-	
+
 	$matches = null;
 	if(preg_match_all('/@[A-Z_0-9]+@/', file_get_contents($filePath), $matches) > 0)
 		$errors[] = "Content file [$filePath] contains place holders: " . implode("\n\t", $matches[0]);
-		
+
 	list($order, $objectType, $fileExtension) = explode('.', $fileName, 3);
 	if($fileExtension == 'ini')
 		$fileNames[] = $fileName;
@@ -47,10 +53,10 @@ if(count($errors))
 	KalturaLog::err(implode("\n\n", $errors));
 	exit(-3);
 }
-	
+
 sort($fileNames);
 KalturaLog::info("Handling files [" . print_r($fileNames, true) . "]");
-	
+
 foreach($fileNames as $fileName)
 {
 	list($order, $objectType, $fileExtension) = explode('.', $fileName, 3);
@@ -60,11 +66,11 @@ foreach($fileNames as $fileName)
 
 	$object = new $objectType();
 	/* @var $object BaseObject */
-	
+
 	$peer = $object->getPeer();
 	$map = $peer->getTableMap();
 	$primaryKeys = $map->getPrimaryKeys();
-	
+
 	foreach($objectConfigurations as $objectConfiguration)
 	{
 		$object = new $objectType();
@@ -84,7 +90,7 @@ foreach($fileNames as $fileName)
 				}
 			}
 			catch(PropelException $pe){}
-			
+
 			$setter = "set{$attributeName}";
 			if(!is_callable(array($object, $setter)))
 				throw new Exception("Attribute [$attributeName] not defined on object type [$objectType]");
@@ -94,25 +100,25 @@ foreach($fileNames as $fileName)
 				$valueFilePath = realpath(dirname($filePath) . '/' . substr($value, 1));
 				if(!$valueFilePath || !is_file($valueFilePath))
 					throw new Exception("Attribute [$attributeName] file path [$value] not found");
-					
+
 				$value = file_get_contents($valueFilePath);
 			}
-				
+
 			$setters[$setter] = $value;
 		}
-		
+
 		$existingObjects = $peer->doSelect($pkCriteria, $con);
 		if(count($existingObjects))
 		{
 			$object = reset($existingObjects);
 			$pkCriteria = null;
 		}
-			
+
 		foreach($setters as $setter => $value)
 			$object->$setter($value);
-			
+
 		$object->save();
-		
+
 		if($pkCriteria && count($pkCriteria->keys()))
 			BasePeer::doUpdate($object->buildPkeyCriteria(), $pkCriteria, $con);
 	}
