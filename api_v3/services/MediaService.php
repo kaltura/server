@@ -493,10 +493,15 @@ class MediaService extends KalturaEntryService
 	    // check that the webcam file exists
 	    $content = myContentStorage::getFSContentRootPath();
 	    $webcamBasePath = $content."/content/webcam/".$webcamTokenId; // filesync ok
-		$entryFullPath = $webcamBasePath.'.flv';
-		if (! file_exists ( $entryFullPath )) {
-			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
-			throw new KalturaAPIException ( KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND );
+		$entryFullPathFlv = $webcamBasePath.'.flv';
+		$entryFullPathF4v = $webcamBasePath.'.f4v';
+		if (! file_exists ( $entryFullPathFlv ))
+		{
+			if (!file_exists($entryFullPathF4v))
+			{
+				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
+				throw new KalturaAPIException ( KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND );
+			}
 		}
 			
 		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
