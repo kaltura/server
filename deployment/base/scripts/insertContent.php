@@ -2,12 +2,21 @@
 /**
  * @package deployment
  * @subpackage base.permissions
- * 
+ *
  * Adds all system default permissions
  */
 
 chdir(__DIR__);
 require_once('../../bootstrap.php');
+
+$criteria = new Criteria();
+$criteria->add(entryPeer::PARTNER_ID, 99);
+$templateEntries = entryPeer::doCount($criteria);
+if($templateEntries)
+{
+	KalturaLog::info("Content already ingested.");
+	exit(0);
+}
 
 $dirPath = __DIR__ . '/init_content';
 $scriptPath = realpath(__DIR__ . '/../../../') . '/tests/standAloneClient/test.php';
