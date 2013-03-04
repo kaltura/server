@@ -137,8 +137,9 @@ class WidevinePackagerResponse
 	
 	protected function setAttribute($attrName, $attrValue)
 	{
-		$method = 'set'.ucfirst($attrName); 
-		$this->$method($attrValue);
+		$method = "set{$attrName}"; 
+		if(method_exists($this, $method))
+			$this->$method($attrValue);
 	}
 	
 	public static function createWidevinePackagerResponse($responseStr)
