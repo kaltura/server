@@ -751,19 +751,16 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					}
 				    break;	
 				case baseObjectFilter::NOT_CONTAINS:
-				if(strlen($val))
+					$val = is_array($val) ? $val : explode(",", $val);
+					foreach ($val as &$singleVal)
 					{
-						$val = is_array($val) ? $val : explode(",", $val);
-						foreach ($val as &$singleVal)
-						{
-							$singleVal = SphinxUtils::escapeString($singleVal, $fieldsEscapeType);
-						}
-						if (self::getFieldPrefix ($sphinxField))
-						{
-							$this->addMatch('@' .  $sphinxField .  ' ' . $this->getFieldPrefix ($sphinxField) . ' -(' .implode(' | ', $val) . ')');
-						}
-						$filter->unsetByName($field);
+						$singleVal = SphinxUtils::escapeString($singleVal, $fieldsEscapeType);
 					}
+					if ($this->getFieldPrefix ($sphinxField))
+					{
+						$this->addMatch('@' .  $sphinxField .  ' ' . $this->getFieldPrefix ($sphinxField) . ' -(' .implode(' | ', $val) . ')');
+					}
+					$filter->unsetByName($field);
 					break;
 				default:
 					KalturaLog::debug("Skip field[$field] has no opertaor[$operator]");
