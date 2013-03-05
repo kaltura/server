@@ -16,8 +16,8 @@
 	.error { color: #ff0000; font-weight: bold; font-size: 12px; margin-bottom: -10px; }
 	input { font-size: 13px; width: 170px; }
 	.truncated { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-	button { margin: 0 auto 5px; padding: 0 28px 0 0; height: 25px; border: 0; font: normal 11px arial,sans-serif; color:#2B2B2B; line-height: normal; overflow: visible; background: url(lib/images/kmc/kmc_sprite.png) no-repeat -72px -152px; cursor: pointer; }
-	button span { height:20px; padding: 4px 0 0 28px; margin: 1px 1px 0 0; float:left; white-space:nowrap; background:transparent url(lib/images/kmc/kmc_sprite.png) no-repeat scroll 0 -153px;}
+	button { margin: 0 auto 5px; padding: 0 28px 0 0; height: 25px; border: 0; font: normal 11px arial,sans-serif; color:#2B2B2B; line-height: normal; overflow: visible; background: url(/lib/images/kmc/kmc_sprite.png) no-repeat -72px -152px; cursor: pointer; }
+	button span { height:20px; padding: 4px 0 0 28px; margin: 1px 1px 0 0; float:left; white-space:nowrap; background:transparent url(/lib/images/kmc/kmc_sprite.png) no-repeat scroll 0 -153px;}
 	button:hover span { background-position: 0 -178px;}
 	@-moz-document url-prefix() {
    		button span { margin: -2px 2px 0 -3px; }
@@ -54,7 +54,6 @@
 			<div class="right"><input type="password" name="retry_new_password" /></div>
 			<br class="clear" /><br />
 			<div class="center"><button type="submit" id="submit"><span>Save</span></button></div><br />
-			{$this->errorDiv()}
 		</form>
 		<?php } elseif($type == 'email'){ ?>
 		<form method="post" autocomplete="off">
@@ -69,8 +68,7 @@
 			<div class="right"><input type="password" name="password" /></div>
 			<br class="clear" />
 			<div class="note">* Password is required for editing your email address.</div><br />
-			<div class="center"><button type="submit" id="submit"><span>Save</span></button></div><br />
-			{$this->errorDiv()}			
+			<div class="center"><button type="submit" id="submit"><span>Save</span></button></div><br />			
 		</form>
 		<?php } elseif($type == 'name') { ?>
 		<form method="post" autocomplete="off">
@@ -88,9 +86,18 @@
 			<div class="right"><input type="password" name="password" /></div>
 			<br class="clear" />
 			<div class="note">* Password is required for editing your name.</div><br />
-			<div class="center"><button type="submit" id="submit"><span>Save</span></button></div><br />
-			{$this->errorDiv()}			
+			<div class="center"><button type="submit" id="submit"><span>Save</span></button></div><br />		
 		</form>
 		<?php } ?>
  	</div>
+<?php if(isset($error)) { ?><script>alert("<?php echo json_encode($error); ?>");</script><?php } ?>
+<?php if($success) { ?>
+<script type="text/javascript" src="/lib/js/postmessage.js"></script>
+<script type="text/javascript">
+function send() {
+	XD.postMessage("<?php echo $msg; ?>", decodeURIComponent("<?php echo $parent_url; ?>"), parent);
+}
+window.onload = send; 
+</script>
+<?php } ?>
  </body></html>

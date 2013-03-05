@@ -15,7 +15,8 @@ class changeSettingAction extends kalturaAction
 	{
 		// Disable layout
 		$this->setLayout(false);
-		
+		$this->success = false;
+
 		$this->type = $this->getRequestParameter('type');
 		if(!$this->type)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'type');
@@ -82,7 +83,36 @@ class changeSettingAction extends kalturaAction
 
 	private function changePassword() 
 	{
-
+		// Checks if we have empty fields
+		$required = array('cur_password', 'new_password', 'retry_new_password');
+		foreach($required as $req) {
+			if( empty(trim($_POST[$req])) ) {
+				$this->setError('You must fill all the fields.');
+				return;
+			}
+		}
+		
+		if( $_POST['new_password'] !== $_POST['retry_new_password'] ) {
+			$this->setError('The passwords does not match!');
+			return;
+		}
+		
+		/*
+		$client = $this->getClient();
+		try {
+			//updateLoginData accepts [oldUserID, oldPassword, newUserID, newPassword, newFirstName, newLastName)
+			$client->user->updateLoginData($this->email, $_POST['cur_password'], null, $_POST['new_password'], null, null);
+			
+			// Show success message
+			$this->showSuccess();
+			exit();
+						
+		} catch( Exception $e ){
+			$this->error = $e->getMessage();
+			$this->showChangePassword();
+			exit();
+		}
+		*/
 	}
 
 	private function changeEmail()
@@ -93,5 +123,34 @@ class changeSettingAction extends kalturaAction
 	private function changeName()
 	{
 
+	}
+
+	private function setSuccess() 
+	{
+		$this->success = true;
+		$this->parent_url = $this->clean($_GET['parent']);
+		if($this->type == 'password') {
+			$this->msg = "close";
+		} else {
+			$this->msg = "reload";			
+		}
+	}
+
+	private function setError($error) 
+	{
+		$error = str_replace("&lt;", "<", $error);
+		$error = str_replace("&gt;", ">", $error);
+		$this->error = $error;
+	}
+
+	private function clean($str) 
+	{ 
+		$str = str_replace("javascript:", "", $str);
+		$str = str_replace("eval", "", $str);
+		$str = str_replace("document", "", $str);
+		$str = htmlspecialchars($str);
+		$str = addslashes($str);
+		
+		return $str;
 	}
 }
