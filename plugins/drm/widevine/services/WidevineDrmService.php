@@ -50,7 +50,7 @@ class WidevineDrmService extends KalturaBaseService
 		catch (Exception $e)
 		{
 			KalturaLog::err($e);
-			$response = WidevineLicenseProxyUtils::createErrorResponse(KalturaWidevineErrorCodes::UNKNOWN_ERROR, $wvAssetId);
+			$response = WidevineLicenseProxyUtils::createErrorResponse(KalturaWidevineErrorCodes::GENERAL_ERROR, $wvAssetId);
 		}	
 		
 		WidevineLicenseProxyUtils::printLicenseResponseStatus($response);

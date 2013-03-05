@@ -35,5 +35,5 @@ class KalturaWidevineErrorCodes
 	
 	const LICENSE_KEY_NOT_SET = 530;
 	
-	const UNKNOWN_ERROR = 768;
+	const GENERAL_ERROR = 768;
 }

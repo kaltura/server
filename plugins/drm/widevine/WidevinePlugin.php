@@ -6,6 +6,8 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 {
 	const PLUGIN_NAME = 'widevine';
 	
+	const WIDEVINE_RESPONSE_TYPE = 'widevine';
+	
 	const KALTURA_PROVIDER = 'kaltura';
 	const DEFAULT_POLICY = 'default';
 	
@@ -69,6 +71,9 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(WidevineConversionEngineType::WIDEVINE))
 			return new KDLOperatorWidevine($enumValue);
 
+		if($baseClass == 'KalturaSerializer' && $enumValue == self::WIDEVINE_RESPONSE_TYPE)
+			return new KalturaWidevineSerializer();
+			
 		return null;
 	}
 	
@@ -103,6 +108,10 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 			
 		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(WidevineConversionEngineType::WIDEVINE))
 			return 'KDLOperatorWidevine';
+			
+		if($baseClass == 'KalturaSerializer' && $enumValue == self::WIDEVINE_RESPONSE_TYPE)
+			return 'KalturaWidevineSerializer';
+			
 		
 		return null;
 	}

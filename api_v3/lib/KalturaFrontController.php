@@ -460,9 +460,6 @@ class KalturaFrontController
 				case KalturaResponseType::RESPONSE_TYPE_JSONP:
 					header("Content-Type: application/javascript");
 					break;
-				case KalturaResponseType::RESPONSE_TYPE_PLAIN:
-					header("Content-Type: text/plain");
-					break;
 			}
 		}
 		
@@ -500,9 +497,14 @@ class KalturaFrontController
 				$serializer->serialize($object);
 				$response = array();
 				echo $callback, "(", $serializer->getSerializedData(), ");";
-				break;				
-			case KalturaResponseType::RESPONSE_TYPE_PLAIN:
-				echo $object;
+				break;	
+							
+			default:
+				$serializer = KalturaPluginManager::loadObject('KalturaSerializer', $format);
+				$serializer->serialize($object);
+				$serializer->setHeaders();
+				echo $serializer->getSerializedData();
+				break;
 		}
 		
 		KalturaLog::debug("Serialize took - " . (microtime(true) - $start));
