@@ -49,6 +49,8 @@
 			logoutUrl	 : "<?php echo (isset($logoutUrl) ? $logoutUrl : '') ?>"
 		}
 	};
+
+	var kmcVars = <?php echo json_encode($kmcVars, JSON_PRETTY_PRINT);?>;
 </script>
 
 	<div id="kmcHeader"<?php if($templatePartnerId) echo ' class="whiteLabel"'; ?>>

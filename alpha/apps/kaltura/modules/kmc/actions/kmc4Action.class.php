@@ -161,6 +161,54 @@ class kmc4Action extends kalturaAction
 
 		$this->content_uiconds_clipapp_kdp = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kdpClipApp", false, $kmcGeneralUiConf);
 		$this->content_uiconds_clipapp_kclip = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kClipClipApp", false, $kmcGeneralUiConf);
+
+		$kmcVars = array(
+			'kmc_version'				=> kConf::get('kmc_version'),
+			'kmc_general_uiconf'		=> $this->kmc_general->getId(),
+			'kmc_permissions_uiconf'	=> $this->kmc_permissions->getId(),
+			'allowed_partners'			=> $this->allowedPartners,
+			'kmc_secured'				=> (bool) kConf::get("kmc_secured_login"),
+			'service_url'				=> $this->service_url,
+			'host'						=> $this->host,
+			'cdn_host'					=> $this->cdn_host,
+			'rtmp_host'					=> $this->rtmp_host,
+			'embed_host'				=> $this->embed_host,
+			'embed_host_https'			=> $this->embed_host_https,
+			'flash_dir'					=> $this->flash_dir,
+			'getuiconfs_url'			=> url_for('kmc/getuiconfs'),
+			'terms_of_use'				=> kConf::get('terms_of_use_uri'),
+			'ks'						=> $this->ks,
+			'partner_id'				=> $this->partner_id,
+			'subp_id'					=> $this->subp_id,
+			'first_login'				=> (bool) $this->first_login,
+			'whitelabel'				=> $this->templatePartnerId,
+			'ignore_seo_links'			=> (bool) $this->ignoreSeoLinks,
+			'ignore_entry_seo'			=> (bool) $this->ignoreEntrySeoLinks,
+			'embed_code_protocol_https'	=> (bool) $this->useEmbedCodeProtocolHttps,
+			'delivery_types'			=> $deliveryTypes,
+			'embed_code_types'			=> $embedCodeTypes,
+			'default_delivery_type'		=> $defaultDeliveryType,
+			'default_embed_code_type'	=> $defaultEmbedCodeType,
+			'kcw_webcam_uiconf'			=> $this->content_uiconfs_upload_webcam->getId(),
+			'kcw_import_uiconf'			=> $this->content_uiconfs_upload_import->getId(),
+			'default_kdp'				=> array(
+				'id'					=> $this->content_uiconfs_flavorpreview->getId(),
+				'height'				=> $this->content_uiconfs_flavorpreview->getHeight(),
+				'width'					=> $this->content_uiconfs_flavorpreview->getWidth(),
+				'swf_version'			=> $this->content_uiconfs_flavorpreview->getswfUrlVersion(),
+			),
+			'clipapp'					=> array(
+				'version'				=> kConf::get("clipapp_version"),
+				'kdp'					=> $this->content_uiconds_clipapp_kdp->getId(),
+				'kclip'					=> $this->content_uiconds_clipapp_kclip->getId(),
+			),
+			'disable_analytics'			=> (bool) kConf::get("kmc_disable_analytics"),
+			'google_analytics_account'	=> kConf::get("ga_account"),
+			'language'					=> $this->language,
+			'logoutUrl'					=> $this->logoutUrl,
+		);
+		
+		$this->kmcVars = $kmcVars;
 	}
 
 	private function stripProtocol( $url )
