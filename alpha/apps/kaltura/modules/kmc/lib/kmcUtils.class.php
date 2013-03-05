@@ -189,7 +189,7 @@ class kmcUtils
 				'name' => $conf->getName(),
 				'width' => (($conf->getWidth())? $conf->getWidth(): 470),
 				'height' => (($conf->getHeight())? $conf->getHeight(): 600),
-				'swfUrlVersion' => $conf->getSwfUrlVersion(),
+				'swf_version' => $conf->getSwfUrlVersion(),
 				'html5Url'	=>	$conf->getHtml5Url(),
 			);
 		}

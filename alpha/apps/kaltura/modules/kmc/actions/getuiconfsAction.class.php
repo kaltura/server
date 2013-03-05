@@ -38,7 +38,7 @@ class getuiconfsAction extends kalturaAction
 			$uiconf_array["name"] = $uiconf->getName();
 			$uiconf_array["width"] = $uiconf->getWidth();
 			$uiconf_array["height"] = $uiconf->getHeight();
-			$uiconf_array["swfUrlVersion"] = $uiconf->getSwfUrlVersion();
+			//$uiconf_array["swfUrlVersion"] = $uiconf->getSwfUrlVersion();
 			$uiconf_array["swf_version"] = "v" . $uiconf->getSwfUrlVersion();
 			$uiconf_array["html5Url"] = $uiconf->getHtml5Url();
 
