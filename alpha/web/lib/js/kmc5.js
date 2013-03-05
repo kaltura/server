@@ -59,7 +59,7 @@ kmc.functions = {
 			openPlayer			: "kmc.preview_embed.doPreviewEmbed", // @todo: remove for 2.0.9 ?
 			openPlaylist		: "kmc.preview_embed.doPreviewEmbed",
 			openCw				: "kmc.functions.openKcw",
-			language			: kmc.vars.language
+			language			: (kmc.vars.language || "")
 		};
 		// Disable analytics
 		if( kmc.vars.disable_analytics ) {

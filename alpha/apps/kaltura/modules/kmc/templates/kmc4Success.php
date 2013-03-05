@@ -1,6 +1,6 @@
 <script type="text/javascript">
 var kmc = {
-	vars : <?php echo json_encode($kmcVars);?>;
+	vars : <?php echo json_encode($kmcVars);?>
 };
 </script>
 	<div id="kmcHeader"<?php if($templatePartnerId) echo ' class="whiteLabel"'; ?>>
