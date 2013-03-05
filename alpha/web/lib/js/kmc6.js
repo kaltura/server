@@ -35,7 +35,6 @@ kmc.functions = {
 	loadSwf : function() {
 
 		var kmc_swf_url = window.location.protocol + '//' + kmc.vars.cdn_host + '/flash/kmc/' + kmc.vars.kmc_version + '/kmc.swf';
-
 		var flashvars = {
 			// kmc configuration
 			kmc_uiconf			: kmc.vars.kmc_general_uiconf,
@@ -56,12 +55,10 @@ kmc.functions = {
 			widget_id			: "_" + kmc.vars.partner_id,
 			urchinNumber		: kmc.vars.google_analytics_account, // "UA-12055206-1""
 			firstLogin			: kmc.vars.first_login,
-			refreshPlayerList	: "refreshPlayerList", // @todo: ???!!!
-			refreshPlaylistList : "refreshPlaylistList", // @todo: ???!!!
 			openPlayer			: "kmc.preview_embed.doPreviewEmbed", // @todo: remove for 2.0.9 ?
 			openPlaylist		: "kmc.preview_embed.doPreviewEmbed",
 			openCw				: "kmc.functions.openKcw",
-			language			: kmc.vars.language
+			language			: (kmc.vars.language || "")
 		};
 		// Disable analytics
 		if( kmc.vars.disable_analytics ) {
