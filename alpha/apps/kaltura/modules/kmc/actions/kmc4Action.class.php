@@ -45,10 +45,9 @@ class kmc4Action extends kalturaAction
 		}
 		
 		$ksObj = kSessionUtils::crackKs($this->ks);
+		/** END - check parameters and verify user is logged-in **/
 		
-	/** END - check parameters and verify user is logged-in **/
-		
-	/** Get array of allowed partners for the current user **/
+		/** Get array of allowed partners for the current user **/
 		$allowedPartners = array();
 		$currentUser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $ksObj->user, true);
 		if($currentUser) {
@@ -60,7 +59,6 @@ class kmc4Action extends kalturaAction
 		}
 		$this->showChangeAccount = (count($allowedPartners) > 1 ) ? true : false;
 
-	/** load partner from DB, and set templatePartnerId **/
 		$this->partner = $partner = null;
 		$templatePartnerId = self::SYSTEM_DEFAULT_PARTNER;
 		$ignoreSeoLinks = false;
@@ -86,29 +84,28 @@ class kmc4Action extends kalturaAction
 			$defaultEmbedCodeType = ($partner->getDefaultEmbedCodeType()) ? $partner->getDefaultEmbedCodeType() : 'auto';
 			$this->previewEmbedV2 = PermissionPeer::isValidForPartner(PermissionName::FEATURE_PREVIEW_AND_EMBED_V2, $this->partner_id);
 		}
-	/** END - load partner from DB, and set templatePartnerId **/
 
-	/** set default flags **/
-	$this->payingPartner = 'false';
-	$this->first_login = false;
-	/** END - set default flags **/
-	
-	/** set values for template **/
-	$this->service_url = requestUtils::getRequestHost();
-	$this->host = $this->stripProtocol( $this->service_url );
-	$this->embed_host = $this->stripProtocol( myPartnerUtils::getHost($this->partner_id) );
-	if (kConf::hasParam('cdn_api_host') && kConf::hasParam('www_host') && $this->host == kConf::get('cdn_api_host')) {
-        $this->host = kConf::get('www_host');
-	}
-	if($this->embed_host == kConf::get("www_host") && kConf::hasParam('cdn_api_host')) {
-		$this->embed_host = kConf::get('cdn_api_host');
-	}
-	$this->embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');	
+		/** set default flags **/
+		$this->payingPartner = 'false';
+		$this->first_login = false;
+		/** END - set default flags **/
+		
+		/** set values for template **/
+		$this->service_url = requestUtils::getRequestHost();
+		$this->host = $this->stripProtocol( $this->service_url );
+		$this->embed_host = $this->stripProtocol( myPartnerUtils::getHost($this->partner_id) );
+		if (kConf::hasParam('cdn_api_host') && kConf::hasParam('www_host') && $this->host == kConf::get('cdn_api_host')) {
+	        $this->host = kConf::get('www_host');
+		}
+		if($this->embed_host == kConf::get("www_host") && kConf::hasParam('cdn_api_host')) {
+			$this->embed_host = kConf::get('cdn_api_host');
+		}
+		$this->embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');	
 
-	$this->cdn_url = myPartnerUtils::getCdnHost($this->partner_id);
-	$this->cdn_host = $this->stripProtocol( $this->cdn_url );
-	$this->rtmp_host = myPartnerUtils::getRtmpUrl($this->partner_id);
-	$this->flash_dir = $this->cdn_url . myContentStorage::getFSFlashRootPath ();
+		$this->cdn_url = myPartnerUtils::getCdnHost($this->partner_id);
+		$this->cdn_host = $this->stripProtocol( $this->cdn_url );
+		$this->rtmp_host = myPartnerUtils::getRtmpUrl($this->partner_id);
+		$this->flash_dir = $this->cdn_url . myContentStorage::getFSFlashRootPath ();
 
 	/** set payingPartner flag **/
 		if($partner && $partner->getPartnerPackage() != PartnerPackages::PARTNER_PACKAGE_FREE)
