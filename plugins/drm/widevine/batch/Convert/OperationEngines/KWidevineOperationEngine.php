@@ -132,9 +132,11 @@ class KWidevineOperationEngine extends KOperationEngine
 				$requestInput->setPolicy($params->policy);
 			}
 		}
-		
-		$requestInput->setLicenseStartDate($entry->startDate);
-		$requestInput->setLicenseEndDate($entry->endDate);
+		if($entry->startDate && $entry->endDate)
+		{
+			$requestInput->setLicenseStartDate($entry->startDate);
+			$requestInput->setLicenseEndDate($entry->endDate);
+		}
 		
 		$requestXml = $requestInput->createPackageNotifyRequestXml();
 			
