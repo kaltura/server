@@ -141,7 +141,7 @@ try
 	updateUrl ( url );
 	form.attr ("action" , url );
 
-	if ( service_elem == "upload" || service_elem == "webcamdummy" || service_elem == "addbulkupload" )
+	if ( service_elem == "upload" || service_elem == "addbulkupload" )
 	{
 		form.attr ("enctype" , "multipart/form-data" );
 	}

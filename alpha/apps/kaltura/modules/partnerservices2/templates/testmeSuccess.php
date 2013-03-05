@@ -389,7 +389,6 @@ $limited = getLimited();
 	<optgroup label="file/webcam">
 		<option value="upload">upload</option>
 		<option value="uploadjpeg">upload jpeg</option>
-		<option value="webcamdummy">webcam DUMMY</option>
 	</optgroup>
 
 	<optgroup label="entry">
@@ -943,11 +942,6 @@ require_once ( "testme_dataentries.php" );
 			array ( "data" , "" , null , "" , null , "This should contain the binary data" ),
 			array ( "filename" , "" , null , "data" , null , "Same as addentry:filename1" ),
 		),
-
-		"webcamdummy" => array (
-			array ( "Filedata", "file" ),
-			array ( "filename" , "" , null , "data" , null , "Same as addentry:filename1" ),
-		) ,
 
 		"listkshows|2" => array (
 			array ( "detailed" , "" , "1" ),
