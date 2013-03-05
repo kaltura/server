@@ -175,7 +175,7 @@ class kmc4Action extends kalturaAction
 			'embed_host'				=> $this->embed_host,
 			'embed_host_https'			=> $this->embed_host_https,
 			'flash_dir'					=> $this->flash_dir,
-			'getuiconfs_url'			=> url_for('kmc/getuiconfs'),
+			'getuiconfs_url'			=> '/index.php/kmc/getuiconfs',
 			'terms_of_use'				=> kConf::get('terms_of_use_uri'),
 			'ks'						=> $this->ks,
 			'partner_id'				=> $this->partner_id,
