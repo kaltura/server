@@ -39,6 +39,11 @@ supportSuccess:
   javascripts:    [ -* ]
   stylesheets:    [ -* ]
 
+changeAccountSuccess:
+  has_layout:     off
+  javascripts:    [ -* ]
+  stylesheets:    [ -* ]
+
 helpSuccess:
   has_layout:     on
   layout:         helplayout
