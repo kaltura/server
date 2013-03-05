@@ -125,7 +125,7 @@ var kmc = {
 <script src="/lib/js/KalturaEmbedCodeGenerator-1.0.6.min.js"></script>
 <script src="/lib/js/jquery.qrcode-0.2.min.js"></script>
 <script src="/lib/js/ZeroClipboard.min.js"></script>
-<script src="/lib/js/preview.js"></script>
+<script src="/lib/js/preview.js?v=<?php echo $kmc_swf_version; ?>"></script>
 <script src="/lib/js/kmc6.js?v=<?php echo $kmc_swf_version; ?>"></script>
 <?php } else { ?> 
 <script type="text/javascript" src="/lib/js/kmc5.js?v=<?php echo $kmc_swf_version; ?>"></script>

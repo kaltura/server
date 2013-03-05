@@ -136,12 +136,12 @@ class kmc4Action extends kalturaAction
 			$logoutUrl = $partner->getLogoutUrl();
 	/** END - get logout url**/	
 		
-		$kmc_swf_version = kConf::get('kmc_version');
+		$this->kmc_swf_version = kConf::get('kmc_version');
 		
 	/** uiconf listing work **/
 		/** fill $confs with all uiconf objects for all modules **/
-		$kmcGeneralUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $kmc_swf_version, self::SYSTEM_DEFAULT_PARTNER);
-		$kmcGeneralTemplateUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $kmc_swf_version, $templatePartnerId);
+		$kmcGeneralUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, self::SYSTEM_DEFAULT_PARTNER);
+		$kmcGeneralTemplateUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $templatePartnerId);
 		
 		/** for each module, create separated lists of its uiconf, for each need **/
 		/** kmc general uiconfs **/
@@ -160,7 +160,7 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconds_clipapp_kclip = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kClipClipApp", false, $kmcGeneralUiConf);
 
 		$kmcVars = array(
-			'kmc_version'				=> $kmc_swf_version,
+			'kmc_version'				=> $this->kmc_swf_version,
 			'kmc_general_uiconf'		=> $this->kmc_general->getId(),
 			'kmc_permissions_uiconf'	=> $this->kmc_permissions->getId(),
 			'allowed_partners'			=> $allowedPartners,
