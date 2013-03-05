@@ -1,58 +1,8 @@
 <script type="text/javascript">
-	var kmc = {
-		vars : {
-		  /* --- new vars KMC4 */
-			kmc_version				: "<?php echo $kmc_swf_version; ?>",
-			kmc_general_uiconf		: "<?php echo $kmc_general->getId(); ?>",
-			kmc_permissions_uiconf	: "<?php echo $kmc_permissions->getId(); ?>", 
-			allowed_partners		: <?php echo json_encode($allowedPartners); ?>,
-			kmc_secured				: <?php echo (kConf::get("kmc_secured_login"))? "true" : "false"; ?>,
-		  /* END new vars KMC4 */
-		
-			service_url		: "<?php echo $service_url; ?>",
-			host			: "<?php echo $host; ?>",
-			cdn_host		: "<?php echo $cdn_host; ?>",
-			rtmp_host		: "<?php echo $rtmp_host; ?>",
-			embed_host		: "<?php echo $embed_host; ?>",
-			embed_host_https: "<?php echo $embed_host_https; ?>",
-			flash_dir		: "<?php echo $flash_dir ?>",
-			getuiconfs_url	: "<?php echo url_for('kmc/getuiconfs'); ?>",
-			terms_of_use	: "<?php echo kConf::get('terms_of_use_uri'); ?>",
-			ks				: "<?php echo $ks; ?>",
-			partner_id		: "<?php echo $partner_id; ?>",
-			subp_id			: "<?php echo $subp_id; ?>",
-			first_login		: <?php echo ($first_login) ? "true" : "false"; ?>,
-			whitelabel		: <?php echo $templatePartnerId; ?>,
-			ignore_seo_links: <?php echo ($ignoreSeoLinks) ? "true" : "false"; ?>,
-			ignore_entry_seo: <?php echo ($ignoreEntrySeoLinks) ? "true" : "false"; ?>,
-			embed_code_protocol_https: <?php echo ($useEmbedCodeProtocolHttps) ? "true" : "false"; ?>,
-			delivery_types	: <?php echo ($deliveryTypes) ? json_encode($deliveryTypes) : "{}"; ?>,
-			embed_code_types: <?php echo ($embedCodeTypes) ? json_encode($embedCodeTypes) : "{}"; ?>,
-			default_delivery_type: "<?php echo $defaultDeliveryType; ?>",
-			default_embed_code_type: "<?php echo $defaultEmbedCodeType; ?>",			
-			kcw_webcam_uiconf : "<?php echo $content_uiconfs_upload_webcam->getId(); ?>",
-			kcw_import_uiconf : "<?php echo $content_uiconfs_upload_import->getId(); ?>",
-			default_kdp		: {
-					id	: "<?php echo $content_uiconfs_flavorpreview->getId(); ?>",				
-					height		: "<?php echo $content_uiconfs_flavorpreview->getHeight(); ?>",
-					width		: "<?php echo $content_uiconfs_flavorpreview->getWidth(); ?>",
-					swf_version	: "<?php echo $content_uiconfs_flavorpreview->getswfUrlVersion(); ?>"
-			},
-			clipapp : {
-				version	: "<?php echo kConf::get("clipapp_version"); ?>",
-				kdp		: "<?php echo $content_uiconds_clipapp_kdp->getId(); ?>",
-				kclip	: "<?php echo $content_uiconds_clipapp_kclip->getId(); ?>"
-			},
-			disable_analytics : <?php echo (kConf::get("kmc_disable_analytics"))? "true" : "false"; ?>,
-			google_analytics_account : "<?php echo kConf::get("ga_account"); ?>",
-			language	 : "<?php echo (isset($language) ? $language : '') ?>",
-			logoutUrl	 : "<?php echo (isset($logoutUrl) ? $logoutUrl : '') ?>"
-		}
-	};
-
-	var kmcVars = <?php echo json_encode($kmcVars, JSON_PRETTY_PRINT);?>;
+var kmc = {
+	vars : <?php echo json_encode($kmcVars);?>;
+};
 </script>
-
 	<div id="kmcHeader"<?php if($templatePartnerId) echo ' class="whiteLabel"'; ?>>
 	 <div id="logo"></div>
 	 <ul id="hTabs">

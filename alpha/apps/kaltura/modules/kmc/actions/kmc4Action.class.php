@@ -49,49 +49,48 @@ class kmc4Action extends kalturaAction
 	/** END - check parameters and verify user is logged-in **/
 		
 	/** Get array of allowed partners for the current user **/
-		$this->allowedPartners = array();
+		$allowedPartners = array();
 		$currentUser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $ksObj->user, true);
 		if($currentUser) {
 			$partners = myPartnerUtils::getPartnersArray($currentUser->getAllowedPartnerIds());
 			foreach ($partners as $partner)
-				$this->allowedPartners[] = array('id' => $partner->getId(), 'name' => $partner->getName());
+				$allowedPartners[] = array('id' => $partner->getId(), 'name' => $partner->getName());
 				
 			$this->full_name = $currentUser->getFullName();
 		}
-		$this->showChangeAccount = (count($this->allowedPartners) > 1 ) ? true : false;
+		$this->showChangeAccount = (count($allowedPartners) > 1 ) ? true : false;
 
 	/** load partner from DB, and set templatePartnerId **/
 		$this->partner = $partner = null;
-		$this->templatePartnerId = self::SYSTEM_DEFAULT_PARTNER;
-		$this->ignoreSeoLinks = false;
-		$this->ignoreEntrySeoLinks = false;
-		$this->useEmbedCodeProtocolHttps = false;
-		$this->deliveryTypes = null;
-		$this->embedCodeTypes = null;
-		$this->defaultDeliveryType = 'http';
-		$this->defaultEmbedCodeType = 'legacy';
+		$templatePartnerId = self::SYSTEM_DEFAULT_PARTNER;
+		$ignoreSeoLinks = false;
+		$ignoreEntrySeoLinks = false;
+		$useEmbedCodeProtocolHttps = false;
+		$deliveryTypes = null;
+		$embedCodeTypes = null;
+		$defaultDeliveryType = 'http';
+		$defaultEmbedCodeType = 'legacy';
 		$this->previewEmbedV2 = false;
 		
 		if ($this->partner_id !== NULL)
 		{
 			$this->partner = $partner = PartnerPeer::retrieveByPK($this->partner_id);
 			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, null, null, null, self::CURRENT_KMC_VERSION);
-			$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
-			$this->ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
-			$this->ignoreEntrySeoLinks = PermissionPeer::isValidForPartner(PermissionName::FEATURE_IGNORE_ENTRY_SEO_LINKS, $this->partner_id);
-			$this->useEmbedCodeProtocolHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EMBED_CODE_DEFAULT_PROTOCOL_HTTPS, $this->partner_id);
-			$this->deliveryTypes = $partner->getDeliveryTypes();
-			$this->embedCodeTypes = $partner->getEmbedCodeTypes();
-			$this->defaultDeliveryType = ($partner->getDefaultDeliveryType()) ? $partner->getDefaultDeliveryType() : 'http';
-			$this->defaultEmbedCodeType = ($partner->getDefaultEmbedCodeType()) ? $partner->getDefaultEmbedCodeType() : 'auto';
+			$templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
+			$ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
+			$ignoreEntrySeoLinks = PermissionPeer::isValidForPartner(PermissionName::FEATURE_IGNORE_ENTRY_SEO_LINKS, $this->partner_id);
+			$useEmbedCodeProtocolHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EMBED_CODE_DEFAULT_PROTOCOL_HTTPS, $this->partner_id);
+			$deliveryTypes = $partner->getDeliveryTypes();
+			$embedCodeTypes = $partner->getEmbedCodeTypes();
+			$defaultDeliveryType = ($partner->getDefaultDeliveryType()) ? $partner->getDefaultDeliveryType() : 'http';
+			$defaultEmbedCodeType = ($partner->getDefaultEmbedCodeType()) ? $partner->getDefaultEmbedCodeType() : 'auto';
 			$this->previewEmbedV2 = PermissionPeer::isValidForPartner(PermissionName::FEATURE_PREVIEW_AND_EMBED_V2, $this->partner_id);
 		}
 	/** END - load partner from DB, and set templatePartnerId **/
 
 	/** set default flags **/
-		$this->payingPartner = 'false';
-		$this->kdp508_players = array();
-		$this->first_login = false;
+	$this->payingPartner = 'false';
+	$this->first_login = false;
 	/** END - set default flags **/
 	
 	/** set values for template **/
@@ -119,32 +118,30 @@ class kmc4Action extends kalturaAction
 	/** END - set payingPartner flag **/
 
 	/** get partner languae **/
-		$this->language = null; 
+		$language = null; 
 		if ($partner->getKMCLanguage())
-			$this->language = $partner->getKMCLanguage();
+			$language = $partner->getKMCLanguage();
 	/** END - get partner languae **/		
 	
-	/** set first_login flag **/
-		$this->first_login = $partner->getIsFirstLogin();
-		if ($this->first_login === true)
+		$first_login = $partner->getIsFirstLogin();
+		if ($first_login === true)
 		{
 			$partner->setIsFirstLogin(false);
 			$partner->save();
 		}
-	/** END - set first_login flag **/
 		
 	/** get logout url **/
-		$this->logoutUrl = null; 
+		$logoutUrl = null; 
 		if ($partner->getLogoutUrl())
-			$this->logoutUrl = $partner->getLogoutUrl();
+			$logoutUrl = $partner->getLogoutUrl();
 	/** END - get logout url**/	
 		
-		$this->kmc_swf_version = kConf::get('kmc_version');
+		$kmc_swf_version = kConf::get('kmc_version');
 		
 	/** uiconf listing work **/
-		/** fill $this->confs with all uiconf objects for all modules **/
-		$kmcGeneralUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, self::SYSTEM_DEFAULT_PARTNER);
-		$kmcGeneralTemplateUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $this->templatePartnerId);
+		/** fill $confs with all uiconf objects for all modules **/
+		$kmcGeneralUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $kmc_swf_version, self::SYSTEM_DEFAULT_PARTNER);
+		$kmcGeneralTemplateUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $kmc_swf_version, $templatePartnerId);
 		
 		/** for each module, create separated lists of its uiconf, for each need **/
 		/** kmc general uiconfs **/
@@ -163,10 +160,10 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconds_clipapp_kclip = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kClipClipApp", false, $kmcGeneralUiConf);
 
 		$kmcVars = array(
-			'kmc_version'				=> kConf::get('kmc_version'),
+			'kmc_version'				=> $kmc_swf_version,
 			'kmc_general_uiconf'		=> $this->kmc_general->getId(),
 			'kmc_permissions_uiconf'	=> $this->kmc_permissions->getId(),
-			'allowed_partners'			=> $this->allowedPartners,
+			'allowed_partners'			=> $allowedPartners,
 			'kmc_secured'				=> (bool) kConf::get("kmc_secured_login"),
 			'service_url'				=> $this->service_url,
 			'host'						=> $this->host,
@@ -180,11 +177,11 @@ class kmc4Action extends kalturaAction
 			'ks'						=> $this->ks,
 			'partner_id'				=> $this->partner_id,
 			'subp_id'					=> $this->subp_id,
-			'first_login'				=> (bool) $this->first_login,
-			'whitelabel'				=> $this->templatePartnerId,
-			'ignore_seo_links'			=> (bool) $this->ignoreSeoLinks,
-			'ignore_entry_seo'			=> (bool) $this->ignoreEntrySeoLinks,
-			'embed_code_protocol_https'	=> (bool) $this->useEmbedCodeProtocolHttps,
+			'first_login'				=> (bool) $first_login,
+			'whitelabel'				=> $templatePartnerId,
+			'ignore_seo_links'			=> (bool) $ignoreSeoLinks,
+			'ignore_entry_seo'			=> (bool) $ignoreEntrySeoLinks,
+			'embed_code_protocol_https'	=> (bool) $useEmbedCodeProtocolHttps,
 			'delivery_types'			=> $deliveryTypes,
 			'embed_code_types'			=> $embedCodeTypes,
 			'default_delivery_type'		=> $defaultDeliveryType,
@@ -204,8 +201,8 @@ class kmc4Action extends kalturaAction
 			),
 			'disable_analytics'			=> (bool) kConf::get("kmc_disable_analytics"),
 			'google_analytics_account'	=> kConf::get("ga_account"),
-			'language'					=> $this->language,
-			'logoutUrl'					=> $this->logoutUrl,
+			'language'					=> $language,
+			'logoutUrl'					=> $logoutUrl,
 		);
 		
 		$this->kmcVars = $kmcVars;
