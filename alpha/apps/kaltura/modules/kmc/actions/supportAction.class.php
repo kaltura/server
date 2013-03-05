@@ -16,6 +16,16 @@ class supportAction extends kalturaAction
     public function execute ( ) 
     {
         $this->sent_request = false;
+
+        if(isset($_GET['style']) && $_GET['style'] == 'v') {    // kmc virgo
+            $this->closeFunction = 'parent.kmcCloseModal()';
+            $this->bodyBgColor = 'E1E1E1';
+        }
+        else {
+            $this->closeFunction = 'parent.kmc.utils.closeModal()';
+            $this->bodyBgColor = 'F8F8F8';
+        }
+
         if(isset($_POST['partner_id']))
         {
             // do mail
@@ -39,6 +49,19 @@ class supportAction extends kalturaAction
                     'support@kaltura.com',
                     $body_params,
                     $subject_params);
+
+            // Send support ticket to salesforce
+            $post_items = array();
+            foreach ($_POST as $key => $value) {
+                $post_items[] = $key . '=' . $value;
+            }
+            $post_string = implode ('&', $post_items);
+            $ch = curl_init("https://www.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8");
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_string);
+            $this->curlResult = curl_exec($ch);
+            curl_close($ch); 
+
             $this->sent_request = true;
         }
         sfView::SUCCESS;
