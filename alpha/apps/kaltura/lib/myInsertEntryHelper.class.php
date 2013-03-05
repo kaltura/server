@@ -135,7 +135,7 @@ class myInsertEntryHelper
 			// set $entry_fileName to webcam output file and flag that conversion is not needed
 			$webcam_basePath = $content.'/content/webcam/'.($webcam_suffix ? $webcam_suffix : 'my_recorded_stream_'.$kuser_id);
 			$entry_fullPath = $webcam_basePath.'.flv';
-			
+			$entry_fullPathF4v = $webcam_basePath.'.f4v';
 			if(file_exists($entry_fullPath))
 			{
 				// webcam should be preconvert until REALLY ready
@@ -162,6 +162,15 @@ class myInsertEntryHelper
 				$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_WEBCAM" );
 							
 				$duration = myFlvStaticHandler::getLastTimestamp($entry_fullPath);
+			}
+			else if (file_exists($entry_fullPathF4v))
+			{
+				$entry_status = entryStatus::PRECONVERT;
+				$ext = 'f4v';
+				$entry_fullPath = $entry_fullPathF4v;
+				// continue tracking the webcam 
+				$te->setParam3Str( $entry_fullPath );
+				$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_WEBCAM" );
 			}
 			else 
 			{
