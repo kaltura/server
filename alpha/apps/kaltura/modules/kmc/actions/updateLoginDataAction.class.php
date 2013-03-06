@@ -11,6 +11,7 @@ require_once ( "kalturaAction.class.php" );
  */
 class updateLoginDataAction extends kalturaAction
 {
+
 	public function execute() 
 	{
 		// Disable layout
@@ -179,7 +180,7 @@ class updateLoginDataAction extends kalturaAction
 		if ($newEmail != "")
 		{
 			if(!kString::isEmailString($newEmail))
-				throw new Exception ( KalturaErrors::INVALID_FIELD_VALUE, "newEmail" );
+				throw new Exception ( APIErrors::INVALID_FIELD_VALUE, "newEmail" );
 		}
 
 		try {
@@ -188,29 +189,29 @@ class updateLoginDataAction extends kalturaAction
 		catch (kUserException $e) {
 			$code = $e->getCode();
 			if ($code == kUserException::LOGIN_DATA_NOT_FOUND) {
-				throw new Exception(KalturaErrors::LOGIN_DATA_NOT_FOUND);
+				throw new Exception(APIErrors::LOGIN_DATA_NOT_FOUND);
 			}
 			else if ($code == kUserException::WRONG_PASSWORD) {
 				if($password == $newPassword)
-					throw new Exception(KalturaErrors::USER_WRONG_PASSWORD);
+					throw new Exception(APIErrors::USER_WRONG_PASSWORD);
 				else
-					throw new Exception(KalturaErrors::WRONG_OLD_PASSWORD);
+					throw new Exception(APIErrors::WRONG_OLD_PASSWORD);
 			}
 			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
 				$c = new Criteria(); 
 				$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
 				$loginData = UserLoginDataPeer::doSelectOne($c);
 				$invalidPasswordStructureMessage = $loginData->getInvalidPasswordStructureMessage();
-				throw new Exception(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$invalidPasswordStructureMessage);
+				throw new Exception(APIErrors::PASSWORD_STRUCTURE_INVALID,$invalidPasswordStructureMessage);
 			}
 			else if ($code == kUserException::PASSWORD_ALREADY_USED) {
-				throw new Exception(KalturaErrors::PASSWORD_ALREADY_USED);
+				throw new Exception(APIErrors::PASSWORD_ALREADY_USED);
 			}
 			else if ($code == kUserException::INVALID_EMAIL) {
-				throw new Exception(KalturaErrors::INVALID_FIELD_VALUE, 'email');
+				throw new Exception(APIErrors::INVALID_FIELD_VALUE, 'email');
 			}
 			else if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
-				throw new Exception(KalturaErrors::LOGIN_ID_ALREADY_USED);
+				throw new Exception(APIErrors::LOGIN_ID_ALREADY_USED);
 			}
 			throw $e;			
 		}		
