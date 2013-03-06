@@ -78,7 +78,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 				$this->contentResourceNameToIdMap[$dropFolderFile->fileName] = $dropFolderFile->id;
 			}
 			
-			if($dropFolderFiles->totalCount < $pager->pageSize)
+			if(count($dropFolderFiles->objects) < $pager->pageSize)
 				$getNextPage = false;
 			else 
 				$pager->pageIndex++;			
