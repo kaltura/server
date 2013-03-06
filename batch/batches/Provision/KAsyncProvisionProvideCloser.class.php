@@ -44,13 +44,14 @@ class KAsyncProvisionProvideCloser extends KJobCloserWorker
 		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 		
-		@exec("ping -w 1 $primaryEntryPoint", $output, $return);
+		$pingTimeout = $this->taskConfig->params->pingTimeout;
+		@exec("ping -w $pingTimeout $primaryEntryPoint", $output, $return);
 		if ($return)
 		{
 			return $this->closeJob($job, "No reponse from primary entry point - retry in 5 mins", KalturaBatchJobStatus::ALMOST_DONE);
 		}
 		
-		@exec("ping -w 1 $backupEntryPoint", $output, $return);
+		@exec("ping -w $pingTimeout $backupEntryPoint", $output, $return);
 		if ($return)
 		{
 			return $this->closeJob($job, "No reponse from backup entry point - retry in 5 mins", KalturaBatchJobStatus::ALMOST_DONE);
