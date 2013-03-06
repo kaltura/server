@@ -60,7 +60,7 @@ class kmc4Action extends kalturaAction
 		$this->showChangeAccount = (count($allowedPartners) > 1 ) ? true : false;
 
 		$this->partner = $partner = null;
-		$templatePartnerId = self::SYSTEM_DEFAULT_PARTNER;
+		$this->templatePartnerId = self::SYSTEM_DEFAULT_PARTNER;
 		$ignoreSeoLinks = false;
 		$ignoreEntrySeoLinks = false;
 		$useEmbedCodeProtocolHttps = false;
@@ -74,7 +74,7 @@ class kmc4Action extends kalturaAction
 		{
 			$this->partner = $partner = PartnerPeer::retrieveByPK($this->partner_id);
 			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, null, null, null, self::CURRENT_KMC_VERSION);
-			$templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
+			$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
 			$ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
 			$ignoreEntrySeoLinks = PermissionPeer::isValidForPartner(PermissionName::FEATURE_IGNORE_ENTRY_SEO_LINKS, $this->partner_id);
 			$useEmbedCodeProtocolHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EMBED_CODE_DEFAULT_PROTOCOL_HTTPS, $this->partner_id);
@@ -138,7 +138,7 @@ class kmc4Action extends kalturaAction
 	/** uiconf listing work **/
 		/** fill $confs with all uiconf objects for all modules **/
 		$kmcGeneralUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, self::SYSTEM_DEFAULT_PARTNER);
-		$kmcGeneralTemplateUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $templatePartnerId);
+		$kmcGeneralTemplateUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $this->templatePartnerId);
 		
 		/** for each module, create separated lists of its uiconf, for each need **/
 		/** kmc general uiconfs **/
@@ -175,7 +175,7 @@ class kmc4Action extends kalturaAction
 			'partner_id'				=> $this->partner_id,
 			'subp_id'					=> $this->subp_id,
 			'first_login'				=> (bool) $first_login,
-			'whitelabel'				=> $templatePartnerId,
+			'whitelabel'				=> $this->templatePartnerId,
 			'ignore_seo_links'			=> (bool) $ignoreSeoLinks,
 			'ignore_entry_seo'			=> (bool) $ignoreEntrySeoLinks,
 			'embed_code_protocol_https'	=> (bool) $useEmbedCodeProtocolHttps,
