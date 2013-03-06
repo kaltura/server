@@ -98,7 +98,7 @@ class updateLoginDataAction extends kalturaAction
 			$this->updateLoginData($this->email, $_POST['cur_password'], null, $_POST['new_password'], null, null);
 			$this->setSuccess();
 						
-		} catch( Exception $e ){
+		} catch( KalturaLoginDataException $e ){
 			$this->setError($e->getMessage());
 		}
 	}
@@ -114,7 +114,7 @@ class updateLoginDataAction extends kalturaAction
 			$this->updateLoginData($this->email, $_POST['password'], $_POST['email'], null, null, null);
 			$this->setSuccess();
 						
-		} catch( Exception $e ){
+		} catch( KalturaLoginDataException $e ){
 			$this->setError($e->getMessage());
 		}	
 	}
@@ -130,7 +130,7 @@ class updateLoginDataAction extends kalturaAction
 			$this->updateLoginData($this->email, $_POST['password'], null, null, $_POST['fname'], $_POST['lname']);
 			$this->setSuccess();
 
-		} catch( Exception $e ){
+		} catch( KalturaLoginDataException $e ){
 			$this->setError($e->getMessage());
 		}
 	}
@@ -180,7 +180,7 @@ class updateLoginDataAction extends kalturaAction
 		if ($newEmail != "")
 		{
 			if(!kString::isEmailString($newEmail))
-				throw new Exception ( APIErrors::INVALID_FIELD_VALUE, "newEmail" );
+				throw new KalturaLoginDataException ( APIErrors::INVALID_FIELD_VALUE, "newEmail" );
 		}
 
 		try {
@@ -189,31 +189,58 @@ class updateLoginDataAction extends kalturaAction
 		catch (kUserException $e) {
 			$code = $e->getCode();
 			if ($code == kUserException::LOGIN_DATA_NOT_FOUND) {
-				throw new Exception(APIErrors::LOGIN_DATA_NOT_FOUND);
+				throw new KalturaLoginDataException(APIErrors::LOGIN_DATA_NOT_FOUND);
 			}
 			else if ($code == kUserException::WRONG_PASSWORD) {
 				if($password == $newPassword)
-					throw new Exception(APIErrors::USER_WRONG_PASSWORD);
+					throw new KalturaLoginDataException(APIErrors::USER_WRONG_PASSWORD);
 				else
-					throw new Exception(APIErrors::WRONG_OLD_PASSWORD);
+					throw new KalturaLoginDataException(APIErrors::WRONG_OLD_PASSWORD);
 			}
 			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
 				$c = new Criteria(); 
 				$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
 				$loginData = UserLoginDataPeer::doSelectOne($c);
 				$invalidPasswordStructureMessage = $loginData->getInvalidPasswordStructureMessage();
-				throw new Exception(APIErrors::PASSWORD_STRUCTURE_INVALID,$invalidPasswordStructureMessage);
+				throw new KalturaLoginDataException(APIErrors::PASSWORD_STRUCTURE_INVALID,$invalidPasswordStructureMessage);
 			}
 			else if ($code == kUserException::PASSWORD_ALREADY_USED) {
-				throw new Exception(APIErrors::PASSWORD_ALREADY_USED);
+				throw new KalturaLoginDataException(APIErrors::PASSWORD_ALREADY_USED);
 			}
 			else if ($code == kUserException::INVALID_EMAIL) {
-				throw new Exception(APIErrors::INVALID_FIELD_VALUE, 'email');
+				throw new KalturaLoginDataException(APIErrors::INVALID_FIELD_VALUE, 'email');
 			}
 			else if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
-				throw new Exception(APIErrors::LOGIN_ID_ALREADY_USED);
+				throw new KalturaLoginDataException(APIErrors::LOGIN_ID_ALREADY_USED);
 			}
 			throw $e;			
 		}		
+	}
+}
+
+class KalturaLoginDataException extends Exception 
+{
+	protected $code;
+	
+	
+	public function KalturaLoginDataException($errorString)
+	{
+		$pos = strpos($errorString, ",");
+		if ($pos === false)
+		{
+			$errorString = APIErrors::INTERNAL_SERVERL_ERROR;
+			$pos = strpos($errorString, ",");
+		}
+		$this->code = substr($errorString, 0, $pos);
+		$message = substr($errorString, $pos + 1);
+		
+		$args = func_get_args();
+		array_shift($args);
+		$this->message = @call_user_func_array('sprintf', array_merge(array($message), $args)); 
+	}
+	
+	public function __sleep()
+	{
+		return array('code', 'message');
 	}
 }
