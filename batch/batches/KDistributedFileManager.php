@@ -39,7 +39,16 @@ class KDistributedFileManager
 			@unlink($localPath);
 		}
 		
-		return $this->fetchFile($remotePath, $localPath, $errDescription);
+		$res = $this->fetchFile($remotePath, $localPath, $errDescription);
+		if(!$res) {
+			if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+				KalturaLog::warning("Going to flush DNS: ");
+				$output = system( "ipconfig /flushdns" , $rc);
+				KalturaLog::warning($output);
+			}
+		}
+		
+		return $res;
 	}
 	
 	/**
@@ -70,15 +79,17 @@ class KDistributedFileManager
 			
 			$curlWrapper = new KCurlWrapper($remotePath);
 			$curlHeaderResponse = $curlWrapper->getHeader(true);
+			$removeServer = isset($curlHeaderResponse->headers['X-Me']) ? $curlHeaderResponse->headers['X-Me'] : "unknown";
+			
 			if(!$curlHeaderResponse || $curlWrapper->getError())
 			{
-				$errDescription = "Error: " . $curlWrapper->getError();
+				$errDescription = "Error: ($removeServer) " . $curlWrapper->getError();
 				return false;
 			}
 			
 			if(!$curlHeaderResponse->isGoodCode())
 			{
-				$errDescription = "HTTP Error: " . $curlHeaderResponse->code . " " . $curlHeaderResponse->codeName;
+				$errDescription = "HTTP Error: ($removeServer) " . $curlHeaderResponse->code . " " . $curlHeaderResponse->codeName;
 				return false;
 			}
 			$fileSize = null;
@@ -104,7 +115,7 @@ class KDistributedFileManager
 			
 				if(!$res || $curlWrapper->getError())
 				{
-					$errDescription = "Error: " . $curlWrapper->getError();
+					$errDescription = "Error: ($removeServer) " . $curlWrapper->getError();
 					$curlWrapper->close();
 					return false;
 				}
