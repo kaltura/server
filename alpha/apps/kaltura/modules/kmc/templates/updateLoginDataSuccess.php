@@ -90,7 +90,7 @@
 		</form>
 		<?php } ?>
  	</div>
-<?php if(isset($error)) { ?><script>alert("<?php echo json_encode($error); ?>");</script><?php } ?>
+<?php if(isset($error)) { ?><script>alert(<?php echo json_encode($error); ?>);</script><?php } ?>
 <?php if($success) { ?>
 <script type="text/javascript" src="/lib/js/postmessage.js"></script>
 <script type="text/javascript">
