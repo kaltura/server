@@ -890,7 +890,7 @@ kmc.user = {
 		var from_domain = http_protocol + '://' + window.location.hostname;
 		var url = from_domain + kmc.vars.port + "/index.php/kmc/updateLoginData/type/" + action;
 		// pass the parent url for the postMessage to work
-		url = url + '&parent=' + encodeURIComponent(document.location.href);
+		url = url + '?parent=' + encodeURIComponent(document.location.href);
 
 		var modal_content = '<iframe src="' + url + '" width="100%" height="' + iframe_height + '" scrolling="no" frameborder="0"></iframe>';
 
