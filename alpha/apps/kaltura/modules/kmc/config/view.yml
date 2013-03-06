@@ -15,19 +15,19 @@ kmc1Success:
   layout:         kmc1layout
   javascripts:    [ -*, jqkaltura.js, /lib/js/kmc1modal , /lib/js/common , /lib/js/functions.js , http://ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js ]
   stylesheets:  [ -*, /lib/css/kmc1modal, /lib/css/kmc1 ]
-  
+
 kmc4Success:
   has_layout:     on
   layout:       kmclayout
   javascripts:  [ -* ]
   stylesheets:  [ -*, /lib/css/kmc5 ]
- 
+
 varpartnerlistSuccess:
   has_layout:     on
   layout:         kmc1layout
   javascripts:    [ -*, jqkaltura.js, /lib/js/kmc1modal , /lib/js/common , /lib/js/functions.js , http://ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js ]
   stylesheets:  [ -*, /lib/css/kmc1modal, /lib/css/kmc1 ]
-  
+
 
 #	jqkaltura.js:
 #  * jQuery 1.2.1 + Macromedia(r) Flash(r) JavaScript Integration Kit
@@ -39,7 +39,7 @@ supportSuccess:
   javascripts:    [ -* ]
   stylesheets:    [ -* ]
 
-changeAccountSuccess:
+updateLoginDataSuccess:
   has_layout:     off
   javascripts:    [ -* ]
   stylesheets:    [ -* ]
@@ -55,9 +55,9 @@ kmc2helpSuccess:
   layout:         helplayout
   javascripts:    [ -*, /lib/js/jquery.v1.4.2.min.js ]
   stylesheets:    [ -*, /lib/css/kmc ]
-  
+
 previewSuccess:
   has_layout:     off
   layout:         helplayout
   javascripts:    [ -* ]
-  stylesheets:    [ -*, /lib/css/kmc ]  
+  stylesheets:    [ -*, /lib/css/kmc ]
