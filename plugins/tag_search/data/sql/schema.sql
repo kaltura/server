@@ -18,6 +18,7 @@ CREATE TABLE `tag`
 	`object_type` INTEGER  NOT NULL,
 	`instance_count` INTEGER default 1 NOT NULL,
 	`created_at` DATETIME,
+	`privacy_context` VARCHAR(255)  NOT NULL,
 	PRIMARY KEY (`id`),
 	KEY `partner_tag`(`partner_id`),
 	KEY `partner_object_tag`(`partner_id`, `object_type`)

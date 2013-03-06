@@ -26,7 +26,7 @@ abstract class BaseTagPeer {
 	const TM_CLASS = 'TagTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 6;
+	const NUM_COLUMNS = 7;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -49,6 +49,9 @@ abstract class BaseTagPeer {
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'tag.CREATED_AT';
 
+	/** the column name for the PRIVACY_CONTEXT field */
+	const PRIVACY_CONTEXT = 'tag.PRIVACY_CONTEXT';
+
 	/**
 	 * An identiy map to hold any loaded instances of Tag objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -65,11 +68,11 @@ abstract class BaseTagPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Tag', 'PartnerId', 'ObjectType', 'InstanceCount', 'CreatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'tag', 'partnerId', 'objectType', 'instanceCount', 'createdAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::TAG, self::PARTNER_ID, self::OBJECT_TYPE, self::INSTANCE_COUNT, self::CREATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'tag', 'partner_id', 'object_type', 'instance_count', 'created_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Tag', 'PartnerId', 'ObjectType', 'InstanceCount', 'CreatedAt', 'PrivacyContext', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'tag', 'partnerId', 'objectType', 'instanceCount', 'createdAt', 'privacyContext', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::TAG, self::PARTNER_ID, self::OBJECT_TYPE, self::INSTANCE_COUNT, self::CREATED_AT, self::PRIVACY_CONTEXT, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'tag', 'partner_id', 'object_type', 'instance_count', 'created_at', 'privacy_context', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
 	);
 
 	/**
@@ -79,11 +82,11 @@ abstract class BaseTagPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Tag' => 1, 'PartnerId' => 2, 'ObjectType' => 3, 'InstanceCount' => 4, 'CreatedAt' => 5, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'tag' => 1, 'partnerId' => 2, 'objectType' => 3, 'instanceCount' => 4, 'createdAt' => 5, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::TAG => 1, self::PARTNER_ID => 2, self::OBJECT_TYPE => 3, self::INSTANCE_COUNT => 4, self::CREATED_AT => 5, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tag' => 1, 'partner_id' => 2, 'object_type' => 3, 'instance_count' => 4, 'created_at' => 5, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Tag' => 1, 'PartnerId' => 2, 'ObjectType' => 3, 'InstanceCount' => 4, 'CreatedAt' => 5, 'PrivacyContext' => 6, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'tag' => 1, 'partnerId' => 2, 'objectType' => 3, 'instanceCount' => 4, 'createdAt' => 5, 'privacyContext' => 6, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::TAG => 1, self::PARTNER_ID => 2, self::OBJECT_TYPE => 3, self::INSTANCE_COUNT => 4, self::CREATED_AT => 5, self::PRIVACY_CONTEXT => 6, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tag' => 1, 'partner_id' => 2, 'object_type' => 3, 'instance_count' => 4, 'created_at' => 5, 'privacy_context' => 6, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
 	);
 
 	/**
@@ -159,6 +162,7 @@ abstract class BaseTagPeer {
 		$criteria->addSelectColumn(TagPeer::OBJECT_TYPE);
 		$criteria->addSelectColumn(TagPeer::INSTANCE_COUNT);
 		$criteria->addSelectColumn(TagPeer::CREATED_AT);
+		$criteria->addSelectColumn(TagPeer::PRIVACY_CONTEXT);
 	}
 
 	/**

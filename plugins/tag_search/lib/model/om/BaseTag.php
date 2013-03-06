@@ -57,6 +57,12 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	protected $created_at;
 
 	/**
+	 * The value for the privacy_context field.
+	 * @var        string
+	 */
+	protected $privacy_context;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -210,6 +216,16 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [privacy_context] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getPrivacyContext()
+	{
+		return $this->privacy_context;
 	}
 
 	/**
@@ -377,6 +393,29 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	} // setCreatedAt()
 
 	/**
+	 * Set the value of [privacy_context] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     Tag The current object (for fluent API support)
+	 */
+	public function setPrivacyContext($v)
+	{
+		if(!isset($this->oldColumnsValues[TagPeer::PRIVACY_CONTEXT]))
+			$this->oldColumnsValues[TagPeer::PRIVACY_CONTEXT] = $this->privacy_context;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->privacy_context !== $v) {
+			$this->privacy_context = $v;
+			$this->modifiedColumns[] = TagPeer::PRIVACY_CONTEXT;
+		}
+
+		return $this;
+	} // setPrivacyContext()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -418,6 +457,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 			$this->object_type = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
 			$this->instance_count = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->privacy_context = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -427,7 +467,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 6; // 6 = TagPeer::NUM_COLUMNS - TagPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 7; // 7 = TagPeer::NUM_COLUMNS - TagPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating Tag object", $e);
@@ -899,6 +939,9 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 			case 5:
 				return $this->getCreatedAt();
 				break;
+			case 6:
+				return $this->getPrivacyContext();
+				break;
 			default:
 				return null;
 				break;
@@ -926,6 +969,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 			$keys[3] => $this->getObjectType(),
 			$keys[4] => $this->getInstanceCount(),
 			$keys[5] => $this->getCreatedAt(),
+			$keys[6] => $this->getPrivacyContext(),
 		);
 		return $result;
 	}
@@ -975,6 +1019,9 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 			case 5:
 				$this->setCreatedAt($value);
 				break;
+			case 6:
+				$this->setPrivacyContext($value);
+				break;
 		} // switch()
 	}
 
@@ -1005,6 +1052,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[3], $arr)) $this->setObjectType($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setInstanceCount($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setPrivacyContext($arr[$keys[6]]);
 	}
 
 	/**
@@ -1022,6 +1070,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(TagPeer::OBJECT_TYPE)) $criteria->add(TagPeer::OBJECT_TYPE, $this->object_type);
 		if ($this->isColumnModified(TagPeer::INSTANCE_COUNT)) $criteria->add(TagPeer::INSTANCE_COUNT, $this->instance_count);
 		if ($this->isColumnModified(TagPeer::CREATED_AT)) $criteria->add(TagPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(TagPeer::PRIVACY_CONTEXT)) $criteria->add(TagPeer::PRIVACY_CONTEXT, $this->privacy_context);
 
 		return $criteria;
 	}
@@ -1085,6 +1134,8 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 		$copyObj->setInstanceCount($this->instance_count);
 
 		$copyObj->setCreatedAt($this->created_at);
+
+		$copyObj->setPrivacyContext($this->privacy_context);
 
 
 		$copyObj->setNew(true);
