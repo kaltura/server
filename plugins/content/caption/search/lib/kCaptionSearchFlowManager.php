@@ -3,8 +3,30 @@
  * @package plugins.captionSearch
  * @subpackage lib
  */
-class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObjectDeletedEventConsumer
+class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObjectDeletedEventConsumer, kObjectCreatedEventConsumer
 {
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::shouldConsumeCreatedEvent
+	 */
+	public function shouldConsumeCreatedEvent(BaseObject $object)
+	{
+		if(class_exists('CaptionAsset') && $object instanceof CaptionAsset 
+				&& CaptionSearchPlugin::isAllowedPartner($object->getPartnerId()
+					&& $object->getStatus() == CaptionAsset::ASSET_STATUS_READY)){
+						return true;
+					}
+					
+		return false;
+	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::objectCreated
+	 */
+	public function objectCreated(BaseObject $object)
+	{
+		return self::objectDataChanged($object);
+	}
+
 	/* (non-PHPdoc)
 	 * @see kObjectDataChangedEventConsumer::shouldConsumeDataChangedEvent()
 	 */
