@@ -9,7 +9,7 @@ require_once ( "kalturaAction.class.php" );
  * @package    Core
  * @subpackage KMC
  */
-class changeSettingAction extends kalturaAction
+class updateLoginDataAction extends kalturaAction
 {
 	public function execute() 
 	{
