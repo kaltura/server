@@ -888,7 +888,7 @@ kmc.user = {
 		// setup url
 		var http_protocol = (kmc.vars.kmc_secured || location.protocol == 'https:') ? 'https' : 'http';
 		var from_domain = http_protocol + '://' + window.location.hostname;
-		var url = from_domain + kmc.vars.port + "/secure_form.php?action=" + action;
+		var url = from_domain + kmc.vars.port + "/index.php/kmc/updateLoginData/type/" + action;
 		// pass the parent url for the postMessage to work
 		url = url + '&parent=' + encodeURIComponent(document.location.href);
 

@@ -175,7 +175,7 @@ class updateLoginDataAction extends kalturaAction
 		return true;
 	}
 
-	private function updateLoginData( $oldLoginId , $password , $newLoginId = "" , $newPassword = "", $newFirstName = null, $newLastName = null)
+	private function updateLoginData( $email , $password , $newEmail = "" , $newPassword = "", $newFirstName = null, $newLastName = null)
 	{
 		if ($newEmail != "")
 		{
