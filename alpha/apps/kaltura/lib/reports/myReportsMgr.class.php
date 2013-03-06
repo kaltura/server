@@ -235,7 +235,10 @@ class myReportsMgr
 				else
 				{
 					$graph = $graphs[$column];
-					$graph[$date] = $multiline_val . ":" . $val; // the value for graph 1 will be column #1 in the row 
+					if ($graph[$date] != null)
+						$graph[$date] =  $graph[$date] . "," . $multiline_val . ":" . $val; // the value for graph 1 will be column #1 in the row 
+					else
+						 $graph[$date] = $multiline_val . ":" . $val;
 					$graphs[$column] = $graph;
 				}
 			}
