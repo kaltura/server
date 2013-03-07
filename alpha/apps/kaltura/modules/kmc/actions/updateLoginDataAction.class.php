@@ -14,6 +14,9 @@ class updateLoginDataAction extends kalturaAction
 
 	public function execute() 
 	{
+		// Prevent the page fron being embeded in an iframe
+		header( 'X-Frame-Options: SAMEORIGIN' );
+
 		// Disable layout
 		$this->setLayout(false);
 		$this->success = false;

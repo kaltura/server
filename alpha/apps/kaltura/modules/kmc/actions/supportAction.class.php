@@ -15,6 +15,9 @@ class supportAction extends kalturaAction
     
     public function execute ( ) 
     {
+        // Prevent the page fron being embeded in an iframe
+        header( 'X-Frame-Options: SAMEORIGIN' );
+        
         $this->sent_request = false;
 
         if(isset($_GET['style']) && $_GET['style'] == 'v') {    // kmc virgo

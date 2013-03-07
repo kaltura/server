@@ -22,6 +22,9 @@ class kmc4Action extends kalturaAction
 		
 		sfView::SUCCESS;
 
+		// Prevent the page fron being embeded in an iframe
+		header( 'X-Frame-Options: DENY' );
+
 		/** check parameters and verify user is logged-in **/
 		$this->partner_id = $this->getP ( "pid" );
 		$this->subp_id = $this->getP ( "subpid", ((int)$this->partner_id)*100 );
