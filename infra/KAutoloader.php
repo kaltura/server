@@ -6,7 +6,7 @@ defined('KALTURA_ROOT_PATH') ||  define('KALTURA_ROOT_PATH', realpath(__DIR__ . 
  * @package infra
  * @subpackage autoloader
  */
-class KAutoloader 
+class KAutoloader
 {
 	static private $_oldIncludePath = "";
 	static private $_classPath = null;
@@ -14,26 +14,26 @@ class KAutoloader
 	static private $_classMap = array();
 	static private $_classMapFileLocation = false;
 	static private $_noCache = false;
-	
+
 	static function register()
 	{
 		if (self::$_includePath === null)
 			self::setDefaultIncludePath();
-		
+
 		// register the autoload
 		spl_autoload_register(array("KAutoloader", "autoload"));
-		
+
 		// set include path
 		self::$_oldIncludePath = get_include_path();
 		set_include_path(get_include_path() . PATH_SEPARATOR . implode(PATH_SEPARATOR, self::$_includePath));
 	}
-	
+
 	static function unregister()
 	{
 		spl_autoload_unregister(array("KAutoloader", "autoload"));
 		set_include_path(self::$_oldIncludePath);
 	}
-	
+
 	static function autoload($class)
 	{
 		// if the class is part of Zend Framework, use Zend's loader
@@ -44,17 +44,17 @@ class KAutoloader
 			Zend_Loader::loadClass($class);
 			return;
 		}
-		
+
 		if (!self::$_classMap)
 			self::loadClassMap();
-		
+
 		if (array_key_exists($class, self::$_classMap))
 		{
 			require_once(self::$_classMap[$class]);
 			return;
 		}
 	}
-	
+
 	static function scanDirectory($directory, $recursive)
 	{
 		if (!is_dir($directory))
@@ -73,7 +73,7 @@ class KAutoloader
 					if ($found)
 						return true;
 				}
-				else if (is_file($path) && pathinfo($path, PATHINFO_EXTENSION) == "php") 
+				else if (is_file($path) && pathinfo($path, PATHINFO_EXTENSION) == "php")
 				{
 					$classes = array();
 					if (preg_match_all('~^\s*(?:abstract\s+|final\s+)?(?:class|interface)\s+(\w+)~mi', file_get_contents($path), $classes))
@@ -88,18 +88,18 @@ class KAutoloader
 		}
 		return false;
 	}
-	
+
 	static function setNoCache($noCache)
 	{
 		self::$_noCache = $noCache;
 	}
-	
+
 	static function buildPath()
 	{
 		$args = func_get_args();
 		return implode(DIRECTORY_SEPARATOR, $args);
 	}
-	
+
 	/**
 	 * Get the class map cache file path
 	 */
@@ -107,10 +107,10 @@ class KAutoloader
 	{
 		return self::$_classMapFileLocation;
 	}
-	
+
 	/**
 	 * Set the class map cache file path
-	 * 
+	 *
 	 * @param string $path
 	 */
 	static function setClassMapFilePath($path)
@@ -122,30 +122,30 @@ class KAutoloader
 			chmod($dirName, 0755);
 		}
 	}
-	
+
 	/**
 	 * Returns the array of include paths
-	 * 
+	 *
 	 * @return array
 	 */
 	static function getIncludePath()
 	{
 		if (self::$_includePath === null)
 			self::setDefaultIncludePath();
-			
+
 		return self::$_includePath;
 	}
-	
+
 	/**
 	 * Set the array of include paths
-	 * 
+	 *
 	 * @param $array
 	 */
 	static function setIncludePath($array)
 	{
 		self::$_includePath = $array;
 	}
-	
+
 	/**
 	 * Adds another include path to the list of include paths
 	 * @param $path
@@ -154,33 +154,33 @@ class KAutoloader
 	{
 		if (self::$_includePath === null)
 			self::setDefaultIncludePath();
-			
+
 		self::$_includePath[] = $path;
 	}
-	
+
 	/**
 	 * Returns the array of class paths
-	 * 
+	 *
 	 * @return array
 	 */
 	static function getClassPath()
 	{
 		if (self::$_classPath === null)
 			self::setDefaultClassPath();
-			
+
 		return self::$_classPath;
 	}
-	
+
 	/**
 	 * Set the array of class paths
-	 * 
+	 *
 	 * @param $array
 	 */
 	static function setClassPath($array)
 	{
 		self::$_classPath = $array;
 	}
-	
+
 	/**
 	 * Adds another class path to the list of class paths
 	 * @param $path
@@ -189,7 +189,7 @@ class KAutoloader
 	{
 		if (self::$_classPath === null)
 			self::setDefaultClassPath();
-			
+
 		if(strpos($path, DIRECTORY_SEPARATOR . '*') > 0)
 		{
 			list($base, $rest) = explode(DIRECTORY_SEPARATOR . '*', $path, 2);
@@ -199,7 +199,7 @@ class KAutoloader
 				{
 					if ($sub_folder[0] == "." || $sub_folder[0] == "..") // ignore linux hidden files
 						continue;
-						
+
 					$path = realpath($base . DIRECTORY_SEPARATOR . $sub_folder);
 					if (is_dir($path))
 						self::addClassPath($path . $rest);
@@ -209,7 +209,7 @@ class KAutoloader
 		}
 		self::$_classPath[] = $path;
 	}
-	
+
 	/**
 	 * Get the class map array
 	 * @return array
@@ -218,10 +218,10 @@ class KAutoloader
 	{
 		if(!count(self::$_classMap))
 			self::loadClassMap();
-			
+
 		return self::$_classMap;
 	}
-	
+
 	/**
 	 * Get the class file path
 	 * @param string $class
@@ -231,13 +231,13 @@ class KAutoloader
 	{
 		if(!count(self::$_classMap))
 			self::loadClassMap();
-			
+
 		if(isset(self::$_classMap[$class]))
 			return self::$_classMap[$class];
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * Sets the default class paths
 	 */
@@ -249,9 +249,9 @@ class KAutoloader
 	   		self::buildPath(KALTURA_ROOT_PATH, 'alpha', 'lib', '*'),
 	   		self::buildPath(KALTURA_ROOT_PATH, 'alpha', 'config'),
 	   		self::buildPath(KALTURA_ROOT_PATH, 'alpha', 'apps', 'kaltura', 'lib', '*'),
-		);	
+		);
 	}
-	
+
 	/**
 	 * Sets the default include paths
 	 */
@@ -267,7 +267,7 @@ class KAutoloader
 			self::buildPath(KALTURA_ROOT_PATH, 'alpha', 'apps', 'kaltura', 'lib'),
 		);
 	}
-	
+
 	/**
 	 * Load and cache the class map
 	 */
@@ -275,10 +275,10 @@ class KAutoloader
 	{
 		if (self::$_classMapFileLocation && !self::$_noCache && self::loadClassMapFromCache())
 			return;
-			
+
 		if (self::$_classPath === null)
 			self::setDefaultClassPath();
-			
+
 		// cached map doesn't exists, rebuild the cache map
 		foreach(self::$_classPath as $dir)
 		{
@@ -287,21 +287,21 @@ class KAutoloader
 				$dir = substr($dir, 0, strlen($dir) - 2);
 				$recursive = true;
 			}
-			else 
+			else
 			{
 				$recursive = false;
 			}
-				
+
 			self::scanDirectory($dir, $recursive);
 		}
-		
+
 		if (self::$_noCache === false && self::$_classMapFileLocation)
 		{
 			if (function_exists('apc_store'))
 			{
 				apc_store(self::$_classMapFileLocation, self::$_classMap);
 			}
-			
+
 			// save the cached map
 			$bytesWritten = self::safeFilePutContents(self::$_classMapFileLocation, serialize(self::$_classMap));
 			if(!$bytesWritten)
@@ -324,19 +324,24 @@ class KAutoloader
 			if (self::$_classMap)
 			        return true;
 		}
-			
+
 		if (!file_exists(self::$_classMapFileLocation))
 			return false;
-			
+
 		// if cached map was not loaded but exists on the disk, load it
-		self::$_classMap = unserialize(file_get_contents(self::$_classMapFileLocation));		
+		self::$_classMap = unserialize(file_get_contents(self::$_classMapFileLocation));
 		if(!is_array(self::$_classMap))
 		{
 			$permission = substr(decoct(fileperms(self::$_classMapFileLocation)), 2);
 			error_log("PHP Class map could not be loaded from path [" . self::$_classMapFileLocation . "] file permisisons [$permission]");
 			die('PHP Class map could not be loaded');
 		}
-		
+
+		if (function_exists('apc_store'))
+		{
+			apc_store(self::$_classMapFileLocation, self::$_classMap);
+		}
+
 		return true;
 	}
 
