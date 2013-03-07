@@ -320,28 +320,34 @@ $compLine = array_slice($argv, $delimPos + 1);
 
 // translate the comp words index into a compline index
 $compWordsIndex = $argv[1];
-$compLineIndex = 0;
+$compLineIndex = 1;
 $compLinePos = 0;
 $compWordsCount = count($compWords);
-for ($curIndex = 0; $curIndex < $compWordsIndex; $curIndex++)
+
+for ($curIndex = 1; $curIndex <= $compWordsIndex; $curIndex++)
 {
-	if ($curIndex + 1 < $compWordsCount)
-	{
-		$compLinePos = strpos($compLine[$compLineIndex], $compWords[$curIndex + 1], $compLinePos);
-	}
-	else
-	{
-		$compLinePos = false;
-	}
-	
-	if ($compLinePos === false)
+	if ($curIndex >= $compWordsCount)
 	{
 		$compLineIndex++;
 		$compLinePos = 0;
+		break;
 	}
-	else if ($curIndex + 1 < $compWordsIndex || in_array($compWords[$curIndex + 1], array(':', '=')))
+	
+	for (;;)
 	{
-		$compLinePos += strlen($compWords[$curIndex + 1]);
+		$compLinePos = strpos($compLine[$compLineIndex], $compWords[$curIndex], $compLinePos);
+		if ($compLinePos === false)
+		{
+			$compLineIndex++;
+			$compLinePos = 0;
+			continue;
+		}
+		
+		if ($curIndex < $compWordsIndex || in_array($compWords[$curIndex], array(':', '=')))	// if comp words ends with :/= we shouldn't output the :/=
+		{
+			$compLinePos += strlen($compWords[$curIndex]);
+		}
+		break;
 	}
 }
 
@@ -349,7 +355,7 @@ for ($curIndex = 0; $curIndex < $compWordsIndex; $curIndex++)
 $autoCompWord = '';
 if (isset($compLine[$compLineIndex]))
 	$autoCompWord = trim($compLine[$compLineIndex]);
-
+	
 // build a dictionary of previously assigned parameters
 $paramValues = array();
 $compLineCount = count($compLine);
@@ -362,7 +368,7 @@ for ($curIndex = 3; $curIndex < $compLineCount; $curIndex++)
 
 // adjust compLineIndex according to number of previous switches
 $previousArgs = array_slice($compLine, 0, $compLineIndex);
-$compLine = KalturaCommandLineParser::stripCommandLineSwitches($commandLineSwitches, $compLine);
+$compLine = array_merge(KalturaCommandLineParser::stripCommandLineSwitches($commandLineSwitches, $previousArgs), array_slice($compLine, $compLineIndex));
 $compLineIndex = count(KalturaCommandLineParser::stripCommandLineSwitches($commandLineSwitches, $previousArgs)) + 1;
 
 switch ($compLineIndex)

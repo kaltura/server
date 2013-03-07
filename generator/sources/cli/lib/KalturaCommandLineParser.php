@@ -105,7 +105,7 @@ class KalturaCommandLineParser
 		for ($curIndex = 1; $curIndex < $inputArgCount; $curIndex++)
 		{
 			$curArg = $inputArgs[$curIndex];
-			if ($curArg[0] != '-')
+			if (strlen($curArg) < 2 || $curArg[0] != '-' || is_numeric($curArg[1]))
 			{
 				$arguments[] = $curArg;
 				continue;
