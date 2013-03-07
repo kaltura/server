@@ -11,16 +11,18 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <!-- Open Graph meta tags -->
+
 <meta property="og:type" content="video.movie"> 
 <meta property="og:title" content="<?php echo $entry->getName(); ?>" />
 <meta property="og:description" content="<?php echo $entry->getDescription(); ?>"  />
-<meta property="og:image" content="<?php echo $entryThumbUrl; ?>"/>
-<meta property="og:image:secure_url" content="<?php echo $entryThumbSecureUrl; ?>" />
+<meta property="og:image" content="<?php echo $entryThumbUrl; ?>/width/<?php echo $uiConf->getWidth();?>" />
+<meta property="og:image:secure_url" content="<?php echo $entryThumbSecureUrl; ?>/width/<?php echo $uiConf->getWidth();?>" />
 <meta property="og:video" content="<?php echo $widgetUrl; ?>" />
 <meta property="og:video:secure_url" content="<?php echo $widgetSecureUrl; ?>" />
-<meta property="og:height" content="<?php echo $uiConf->getHeight(); ?>" />
-<meta property="og:width" content="<?php echo $uiConf->getWidth(); ?>" />
+<meta property="og:video:height" content="<?php echo $uiConf->getHeight(); ?>" />
+<meta property="og:video:width" content="<?php echo $uiConf->getWidth(); ?>" />
 <meta property="og:video:type" content="application/x-shockwave-flash" />
+<meta property="og:url" content="<?php echo $pageURL; ?>" />
 
     </head>
 	<body>

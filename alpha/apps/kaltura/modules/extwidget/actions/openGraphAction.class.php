@@ -42,5 +42,10 @@ class openGraphAction extends sfAction
 		$this->entryThumbSecureUrl = $entry->getThumbnailUrl(null, 'https');
 		$this->widgetUrl = 'http://'.kConf::get('www_host') . $widgetPath;
 		$this->widgetSecureUrl = 'https://'.kConf::get('www_host') . $widgetPath;
+
+		$https_enabled = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? true : false;
+		$protocol = ($https_enabled) ? 'https' : 'http';
+		$port = ($_SERVER["SERVER_PORT"] != "80") ? ":".$_SERVER["SERVER_PORT"] : '';
+		$this->pageURL = $protocol . '://' . $_SERVER["SERVER_NAME"] . $port . $_SERVER["REQUEST_URI"];
 	}
 }
