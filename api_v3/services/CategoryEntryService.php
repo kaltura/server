@@ -306,6 +306,8 @@ class CategoryEntryService extends KalturaBaseService
 			return $dbCategoryEntry->getIntId();
 		}
 		
+		$category = categoryPeer::retrieveByPK($categoryId);
+		$dbCategoryEntry->setPrivacyContexts($category->getPrivacyContexts());
 		$dbCategoryEntry->reSetCategoryFullIds();
 		$dbCategoryEntry->save();
 		
