@@ -45,36 +45,4 @@ class Form_ContentFileHandlerConfig extends Zend_Form_SubForm
 			$this->setDefault($prop, $value);
 		}
 	}
-
-	/**
-	 * @param string $objectType Kaltura client class name
-	 * @param array $properties
-	 * @param boolean $add_underscore
-	 * @param boolean $include_empty_fields
-	 * @return Kaltura_Client_ObjectBase
-	 */
-	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
-	{
-		$object = new $objectType;
-		foreach($properties as $prop => $value)
-		{
-			if($add_underscore)
-			{
-				$parts = explode('_', strtolower($prop));
-				$prop = '';
-				foreach ($parts as $part)
-					$prop .= ucfirst(trim($part));
-				$prop[0] = strtolower($prop[0]);
-			}
-
-			if ($value !== '' || $include_empty_fields)
-			{
-				try{
-					$object->$prop = $value;
-				}catch(Exception $e){}
-			}
-		}
-
-		return $object;
-	}
 }
