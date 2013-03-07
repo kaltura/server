@@ -572,8 +572,9 @@ index kaltura_tag
 	path	 = @BASE_DIR@/sphinx/kaltura_tag_rt
 	rt_attr_uint	 = int_id
 	rt_field	 = tag
-	rt_attr_uint	 = object_type
-	rt_attr_bigint	 = partner_id
+	rt_field	 = object_type
+	rt_field	 = partner_id
+	rt_field	 = privacy_context
 	rt_attr_uint	 = instance_count
 	rt_attr_timestamp	 = created_at
 	dict	 = keywords
