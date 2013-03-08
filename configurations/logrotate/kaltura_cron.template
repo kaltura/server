@@ -7,6 +7,6 @@
  notifempty
  sharedscripts
  postrotate
- @APACHE_RESTART_COMMAND@
+ service @APACHE_SERVICE@ restart
  endscript
 }
