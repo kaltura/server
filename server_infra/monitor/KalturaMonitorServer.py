@@ -1,6 +1,6 @@
 from socket import *
 
-import datetime
+import time
 import operator
 import sys
 import select
@@ -23,11 +23,6 @@ class IndexHandler(tornado.web.RequestHandler):
 #        print "Served path[%s]" % path
 
 class kMonitorQuery:
-	SESSION_TYPE_NONE		= -1
-	SESSION_TYPE_USER		= 0
-	SESSION_TYPE_WIDGET		= 1
-	SESSION_TYPE_ADMIN		= 2
-	
 	def __init__(self, data):
 			
 		# Unique identifier per TCP client
@@ -56,13 +51,16 @@ class kMonitorQuery:
 		self.filters = data['filters']
 	
 	
-class kMonitorQueryHandler:
+class kMonitorQueryHandler(threading.Thread):
 	
 	def __init__(self,
 			name			= NotImplemented,
 			query			= NotImplemented,
 			connection		= NotImplemented):
 			
+		threading.Thread.__init__(self, target = self.digest)
+		self.setDaemon(True)
+		
 		# The last second that handled
 		# @var int
 		self.lastSecond = -1
@@ -98,30 +96,24 @@ class kMonitorQueryHandler:
 		# Indicates that the thread should keep running
 		# @var boolean
 		self.keepRunning = True
-			
-		# The data that sent and will be sent again if changed
-		# @var Thread
-		self.thread = threading.Thread(target = self.digest)
-		self.thread.setDaemon(True)
-		self.thread.start()
 		
 	def stop(self):
 		self.keepRunning = False
 		
 	def increment(self, id, count = 1):
-		if id not in self.realData:
-			self.realData[id] = count
-		else:
-			self.realData[id] += count
+		self.realData.setdefault(id, 0)
+		self.realData[id] += count
 		
 	def decrement(self, id, count = 1):
 		if id in self.realData:
 			self.realData[id] -= count
+		if self.realData[id] <= 0:
+			del self.realData[id]
 		
 	def handle(self, apiRequest):
 #		print "Digesting server[%s], address[%s], partner[%s], action[%s], cached[%s], sessionType[%s]" % (apiRequest['server'], apiRequest['address'], apiRequest['partner'], apiRequest['action'], apiRequest['cached'], apiRequest['sessionType'])
         
-		now = datetime.datetime.now()
+		now = int(time.time())
 		currentSecond = now.second % 60
 		
 		while currentSecond != self.lastSecond:
@@ -137,17 +129,14 @@ class kMonitorQueryHandler:
 
 		
 		id = apiRequest[self.query.groupBy]
-		if id in self.cachedData[currentSecond]:
-			self.cachedData[currentSecond][id] += 1
-		else:
-			self.cachedData[currentSecond][id] = 1
-		
+		self.cachedData[currentSecond].setdefault(id, 0)
+		self.cachedData[currentSecond][id] += 1		
 			
 		self.increment(id)
 		
 		if (id not in self.sentData and self.realData[id] >= self.query.units) or (id in self.sentData and abs(self.realData[id] - self.sentData[id]) >= self.query.units):
 			sendData = sorted(self.realData.iteritems(), key = operator.itemgetter(1), reverse = (self.query.order < 0))
-			self.connection.sendCalls(self.query.name, dict(sendData[0:self.query.limit]))
+			self.connection.sendCalls(self.query.name, dict(sendData[:self.query.limit]))
 			self.sentData = dict(sendData)
 		
 	def digest(self):
@@ -191,6 +180,7 @@ class kMonitorClient(tornadio2.SocketConnection):
 		
 		# self.request is the TCP socket connected to the client
 		self.handlers[name] = kMonitorQueryHandler(name = name, query = monitorQuery, connection = self);
+		self.handlers[name].start();
 		
 	def sendCalls(self, name, calls):
 		self.emit(name, calls);
@@ -221,7 +211,12 @@ def collectRequests():
 
 	while(1):
 		requestData, addr = server_socket.recvfrom(2048)
-		apiRequest = json.loads(requestData);
+		
+		try:
+			apiRequest = json.loads(requestData);
+		except ValueError:
+			continue
+		
 #		print "Received API request %s" % apiRequest
 
 		# use cloned list in order to overcome changes in the list during the iterations
