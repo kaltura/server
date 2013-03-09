@@ -13,7 +13,7 @@ SSLCryptoDevice builtin
 SSLCertificateFile /etc/pki/tls/certs/localhost.crt
 SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
 
-<VirtualHost @KALTURA_VIRTUAL_HOST_NAME@>
+<VirtualHost @KALTURA_FULL_VIRTUAL_HOST_NAME@>
 	SSLEngine on
 	SSLProtocol all -SSLv2
 	SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW
@@ -22,7 +22,7 @@ SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
 	CustomLog @LOG_DIR@/kaltura_apache_access_ssl.log vhost_kalt
 		
 	# redirect root to start page
-	RewriteRule ^$ https://@KALTURA_VIRTUAL_HOST_NAME@/start/index.php
+	RewriteRule ^$ https://@KALTURA_FULL_VIRTUAL_HOST_NAME@/start/index.php
 	
 	Include "@APP_DIR@/configurations/apache/conf.d/enabled.*.conf"
 </VirtualHost>

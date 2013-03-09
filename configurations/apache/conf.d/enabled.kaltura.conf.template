@@ -50,7 +50,7 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 	RewriteEngine on
 	
 	# redirect kmc.kaltura.com to kaltura's kmc
-	RewriteCond %{HTTP_HOST} kmc.@KALTURA_VIRTUAL_HOST_NAME@
+	RewriteCond %{HTTP_HOST} kmc.@KALTURA_FULL_VIRTUAL_HOST_NAME@
 	RewriteRule .*  @SERVICE_URL@/index.php/kmc
 	
 	# redirect flash file with swfparams parameters to the bare flash file
