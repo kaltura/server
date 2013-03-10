@@ -26,7 +26,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 	function getExclusiveFileSyncImportJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$coreJobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::FILESYNC_IMPORT);
-		$jobs = KalturaBatchJobArray::fromBatchJobArray($jobs);
+		$jobs = KalturaBatchJobArray::fromBatchJobArray($coreJobs);
 
 		if($jobs)
 		{
