@@ -131,7 +131,7 @@ class asset extends Baseasset implements ISyncableFile
 		if(kFileSyncUtils::fileSync_exists($convertLogSyncKey))
 			kFileSyncUtils::softCopy($convertLogSyncKey, $newConvertLogSyncKey);
 		
-		kEventsManager::raiseEvent(new kObjectCreatedEvent($newFlavorAsset));
+		kEventsManager::raiseEvent(new kObjectAddedEvent($newFlavorAsset));
 		
 		return $newFlavorAsset;
 	}

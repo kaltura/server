@@ -3,12 +3,12 @@
  * @package plugins.captionSearch
  * @subpackage lib
  */
-class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObjectDeletedEventConsumer, kObjectCreatedEventConsumer
+class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObjectDeletedEventConsumer, kObjectAddedEventConsumer
 {
 	/* (non-PHPdoc)
-	 * @see kObjectCreatedEventConsumer::shouldConsumeCreatedEvent
+	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent
 	 */
-	public function shouldConsumeCreatedEvent(BaseObject $object)
+	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
 		if(class_exists('CaptionAsset') && $object instanceof CaptionAsset 
 				&& CaptionSearchPlugin::isAllowedPartner($object->getPartnerId()
@@ -20,11 +20,11 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	}
 
 	/* (non-PHPdoc)
-	 * @see kObjectCreatedEventConsumer::objectCreated
+	 * @see kObjectAddedEventConsumer::objectAdded
 	 */
-	public function objectCreated(BaseObject $object)
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		return self::objectDataChanged($object);
+		return self::addParseJobAndIndexEntry($object, $raisedJob);
 	}
 
 	/* (non-PHPdoc)
@@ -43,8 +43,12 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	 */
 	public function objectDataChanged(BaseObject $object, $previousVersion = null, BatchJob $raisedJob = null)
 	{
-		/* @var $object CaptionAsset */
-		
+		return self::addParseJobAndIndexEntry($object, $raisedJob);
+	}
+	
+	private function addParseJobAndIndexEntry(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		/* @var $object CaptionAsset */		
 		try
 		{
 			self::addParseCaptionAssetJob($object, $raisedJob);
@@ -58,8 +62,7 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 		$entry = $object->getentry();
 		if($entry)
 		{
-			$entry->setUpdatedAt(time());
-			$entry->save();
+			$entry->indexToSearchIndex();
 		}
 		
 		return true;

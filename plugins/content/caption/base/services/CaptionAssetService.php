@@ -116,8 +116,7 @@ class CaptionAssetService extends KalturaAssetService
 		$kContentResource = $contentResource->toObject();
     	$this->attachContentResource($dbCaptionAsset, $kContentResource);
 		$contentResource->entryHandled($dbCaptionAsset->getentry());
-		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbCaptionAsset));
-		
+				
     	$newStatuses = array(
     		CaptionAsset::ASSET_STATUS_READY,
     		CaptionAsset::ASSET_STATUS_VALIDATING,
@@ -126,6 +125,8 @@ class CaptionAssetService extends KalturaAssetService
     	
     	if($previousStatus == CaptionAsset::ASSET_STATUS_QUEUED && in_array($dbCaptionAsset->getStatus(), $newStatuses))
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbCaptionAsset));
+   		else
+   			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbCaptionAsset));
    		
 		$captionAsset = new KalturaCaptionAsset();
 		$captionAsset->fromObject($dbCaptionAsset);
