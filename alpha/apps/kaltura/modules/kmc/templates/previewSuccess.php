@@ -13,6 +13,7 @@
 	<meta property="og:description" content="<?php echo htmlspecialchars($entry_description); ?>" />
 	<meta property="og:type" content="video.other" />
 	<meta property="og:image" content="<?php echo $entry_thumbnail_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
+	<meta property="og:image:seucre_url" content="<?php echo $entry_thumbnail_secure_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:video" content="<?php echo $swfUrl; ?>" />
 	<meta property="og:video:secure_url" content="<?php echo $swfSecureUrl; ?>" />
 	<meta property="og:video:width" content="<?php echo $uiConf->getWidth();?>" />
@@ -58,6 +59,11 @@
 	<?php } ?>
 				<div id="framePlayerContainer">
 <script>
+// Prevent the page to be framed
+if(top != window && top.location.hostname != window.location.hostname ) { 
+	top.location = window.location; 
+}
+
 var scriptToEval = '';
 var code = new kEmbedCodeGenerator(<?php echo json_encode($embedParams); ?>).getCode();
 var embedType = '<?php echo $embedType;?>';

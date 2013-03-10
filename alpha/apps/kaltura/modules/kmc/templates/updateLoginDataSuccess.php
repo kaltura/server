@@ -25,6 +25,22 @@
    	}
 	</style>
 	<script>
+	var getLocation = function(href) {
+	    var l = document.createElement("a");
+	    l.href = href;
+	    return l;
+	};
+
+	var parentUrl = "<?php echo $parent_url; ?>";
+	var parentLocation = getLocation(parentUrl);
+	// Check if our parent has the same protocol and host name and then check
+	// for top / window objects
+	if( parentLocation.protocol === window.location.protocol && 
+		parentLocation.hostname === window.location.hostname && 
+		top != window && top.location.hostname != window.location.hostname ) { 
+		top.location = window.location;
+	}
+
 	function focusFirstInput() {
 		// check all the input in the form
 		for(i=0; i < document.forms[0].length; i++)
@@ -95,7 +111,7 @@
 <script type="text/javascript" src="/lib/js/postmessage.js"></script>
 <script type="text/javascript">
 function send() {
-	XD.postMessage("<?php echo $msg; ?>", decodeURIComponent("<?php echo $parent_url; ?>"), parent);
+	XD.postMessage("<?php echo $msg; ?>", decodeURIComponent(parentUrl), parent);
 }
 window.onload = send; 
 </script>
