@@ -492,7 +492,8 @@ class assetPeer extends BaseassetPeer
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
-		$c->add(assetPeer::TYPE, assetType::FLAVOR);
+		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
+		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		
 		$flavorAssets = self::doSelect($c);
 		if(!count($flavorAssets))
