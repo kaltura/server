@@ -127,9 +127,13 @@ class KWidevineOperationEngine extends KOperationEngine
 		if($this->operator->params)
 		{
 			$params = explode(',', $this->operator->params);
-			if(isset($params->policy) && $params->policy)
+			foreach ($params as $paramStr) 
 			{
-				$requestInput->setPolicy($params->policy);
+				$param = explode('=', $paramStr);
+				if(isset($param[0]) && $param[0] == 'policy')
+				{
+					$requestInput->setPolicy($param[1]);
+				}
 			}
 		}
 		if($entry->startDate && $entry->endDate)
