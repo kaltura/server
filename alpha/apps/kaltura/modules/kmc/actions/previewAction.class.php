@@ -97,6 +97,29 @@ class previewAction extends kalturaAction
 			if( isset($_GET['flashvars']['kpl0Name']) ) {
 				$playlist_name = htmlspecialchars($_GET['flashvars']['kpl0Name']);
 			}
+		} else {
+			$this->partner_host = myPartnerUtils::getHost($this->partner_id);
+			$this->playlist_id = htmlspecialchars($this->getRequestParameter('playlist_id'));
+			// Get delivery types from player.ini
+			$map = kConf::getMap('players');
+			$deliveryTypes = $map['delivery_types'];
+
+			$flashVars = array();
+			if( isset($deliveryTypes[$this->getRequestParameter('delivery')]) && 
+					isset($deliveryTypes[$this->getRequestParameter('delivery')]['flashvars']) ) {
+				$flashVars = $deliveryTypes[$this->getRequestParameter('delivery')]['flashvars'];
+			}
+
+			if( $this->playlist_id && $this->playlist_id != 'multitab_playlist') {
+				// build playlist url
+				$playlist_url = $this->partner_host ."/index.php/partnerservices2/executeplaylist?";
+				$playlist_url .= "partner_id=" . $this->partner_id . "&subp_id=" . $this->partner_id . "00&format=8&ks={ks}&playlist_id=" . $this->playlist_id;
+
+				// Add playlist flashVars
+				$flashVars["playlistAPI.kpl0Name"] = htmlspecialchars($this->getRequestParameter('playlist_name'));
+				$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
+			}
+			$embedParams['flashVars'] = $flashVars;
 		}
 
 		// Export embedParams to our view
