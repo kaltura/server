@@ -13,7 +13,7 @@ SSLCryptoDevice builtin
 SSLCertificateFile /etc/pki/tls/certs/localhost.crt
 SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
 
-<VirtualHost @KALTURA_FULL_VIRTUAL_HOST_NAME@>
+<VirtualHost *:@KALTURA_VIRTUAL_HOST_PORT@>
 	SSLEngine on
 	SSLProtocol all -SSLv2
 	SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW
