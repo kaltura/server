@@ -6,6 +6,7 @@
 		<clientTag>Stand alone php 1.0.0</clientTag>
 		<curlTimeout>30</curlTimeout>
 		<userAgent>Stand alone php 1.0.0</userAgent>
+		<verifySSL objectType="bool">0</verifySSL>
 	</config>
 	<session>
 		<partnerId>99</partnerId>
