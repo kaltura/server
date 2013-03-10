@@ -64,18 +64,18 @@ function parseInputArray(SimpleXMLElement $items)
 	$array = array();
 	foreach($items as $item)
 		$array[] = parseInputObject($item);
-		
+
 	return $array;
 }
 
 function parseInputObject(SimpleXMLElement $input)
 {
 	global $inFile;
-	
+
 	$type = 'string';
 	if(isset($input['objectType']))
 		$type = strval($input['objectType']);
-	
+
 	$value = strval($input);
 	if(isset($input['path']))
 	{
@@ -91,39 +91,39 @@ function parseInputObject(SimpleXMLElement $input)
 		}
 		$value = file_get_contents($path);
 	}
-		
+
 	switch($type)
 	{
 		case 'string':
 			return $value;
-			
+
 		case 'int':
 			return intval($value);
-			
+
 		case 'bool':
 			return (bool)($value);
-			
+
 		case 'file':
 			if(file_exists($value))
 				return realpath($value);
-				
+
 			$value = dirname($inFile) . '/' . $value;
 			if(file_exists($value))
 				return realpath($value);
-				
+
 			echo "File [$value] could not be found\n";
 			exit(-1);
-			
+
 		case 'array':
 			return parseInputArray($input->item);
 	}
-	
+
 	if(!class_exists($type))
 	{
 		echo "Type [$type] could not be found\n";
 		exit(-1);
 	}
-	
+
 	$object = new $type();
 	$properties = $input->children();
 	foreach($properties as $property)
@@ -140,18 +140,18 @@ function generateSession($adminSecretForSigning, $userId, $type, $partnerId, $ex
 {
 	$rand = rand(0, 32000);
 	$expiry = time()+$expiry;
-	$fields = array ( 
-		$partnerId , 
-		$partnerId , 
-		$expiry , 
-		$type, 
-		$rand , 
-		$userId , 
-		$privileges 
+	$fields = array (
+		$partnerId ,
+		$partnerId ,
+		$expiry ,
+		$type,
+		$rand ,
+		$userId ,
+		$privileges
 	);
 	$info = implode ( ";" , $fields );
 
-	$signature = sha1($adminSecretForSigning . $info);	 
+	$signature = sha1($adminSecretForSigning . $info);
 	$strToHash =  $signature . "|" . $info ;
 	$encoded_str = base64_encode( $strToHash );
 
@@ -252,7 +252,7 @@ if(isset($inXml->config))
 	foreach($configs as $configItem)
 	{
 		$configItemName = $configItem->getName();
-		$config->$configItemName = strval($configItem);
+		$config->$configItemName = parseInputObject($configItem);
 	}
 }
 
@@ -323,7 +323,7 @@ foreach($inXml->children() as $element)
 function appandObject(SimpleXMLElement $outXml, $object, $name)
 {
 	$objectXml = null;
-	
+
 	$type = gettype($object);
 	if($type == 'array')
 	{
@@ -348,7 +348,7 @@ function appandObject(SimpleXMLElement $outXml, $object, $name)
 
 if(!$outFile)
 	exit(0);
-	
+
 $outXml = new SimpleXMLElement('<xml/>');
 $outXmlResult = $outXml->addChild('output');
 
