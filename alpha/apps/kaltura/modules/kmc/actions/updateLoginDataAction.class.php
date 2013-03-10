@@ -46,7 +46,9 @@ class updateLoginDataAction extends kalturaAction
 
 		$this->email = $dbUser->getEmail();
 		$this->fname = $dbUser->getFirstName();
-		$this->lname = $dbUser->getLastName();	
+		$this->lname = $dbUser->getLastName();
+		
+		$this->parent_url = $this->clean($_GET['parent']);
 
 		// Set page title
 		switch($this->type) {
@@ -141,7 +143,6 @@ class updateLoginDataAction extends kalturaAction
 	private function setSuccess() 
 	{
 		$this->success = true;
-		$this->parent_url = $this->clean($_GET['parent']);
 		if($this->type == 'password') {
 			$this->msg = "close";
 		} else {
