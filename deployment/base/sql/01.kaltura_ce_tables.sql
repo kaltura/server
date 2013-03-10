@@ -2183,6 +2183,8 @@ CREATE TABLE IF NOT EXISTS `tag` (
   `object_type` int(11) NOT NULL,
   `instance_count` int(11) NOT NULL DEFAULT '1',
   `created_at` datetime DEFAULT NULL,
+  `privacy_context` varchar(255) DEFAULT NULL,
+  `custom_data` text DEFAULT NULL;
   PRIMARY KEY (`id`),
   KEY `partner_tag` (`partner_id`),
   KEY `partner_object_tag` (`partner_id`,`object_type`)
