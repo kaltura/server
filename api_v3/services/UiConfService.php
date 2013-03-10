@@ -179,30 +179,30 @@ class UiConfService extends KalturaBaseService
 		$templatePartnerId = 0;
 		if ($this->getPartnerId() !== NULL)
 		{
-			$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
-			$templatePartnerId = $partner ? $partner->getTemplatePartnerId() : 0;
+		        $partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		        $templatePartnerId = $partner ? $partner->getTemplatePartnerId() : 0;
 		}
 		
 		$templateCriteria = new Criteria();
 		$templateCriteria->add(uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL);
 		$templateCriteria->addAnd(uiConfPeer::PARTNER_ID, $templatePartnerId);
-		$templateCriteria->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_WIDGET ); // can be later overridden from filter
-		$templateCriteria->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$templateCriteria->addAnd ( uiConfPeer::TAGS, "%player%" , Criteria::LIKE ); //
-		$templateCriteria->addAnd ( uiConfPeer::TAGS, "%jwplayer%" , Criteria::NOT_LIKE ); //
 		
-		if ( $pager )	$pager->attachToCriteria( $templateCriteria );
+		if (!$filter)
+		        $filter = new KalturaUiConfFilter;
+		$uiConfFilter = new uiConfFilter ();
+		$filter->toObject( $uiConfFilter );
+		$uiConfFilter->attachToCriteria( $templateCriteria);
 		
-		$uiconfs = uiConfPeer::doSelect($templateCriteria);
 		$count = uiConfPeer::doCount( $templateCriteria );
-		
-		$newList = KalturaUiConfArray::fromUiConfArray( $uiconfs );
-		
+		if (!$pager)
+		        $pager = new kalturaFilterPager ();
+		$pager->attachToCriteria( $templateCriteria );
+		$list = uiConfPeer::doSelect( $templateCriteria );
+		$newList = KalturaUiConfArray::fromUiConfArray( $list );
 		$response = new KalturaUiConfListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $count;
-		
-		return $response;		
+		return $response;	
 	}
 	
 	/**
