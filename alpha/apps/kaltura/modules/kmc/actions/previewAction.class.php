@@ -15,7 +15,7 @@ class previewAction extends kalturaAction
 	{
 		// Prevent the page fron being embeded in an iframe
 		header( 'X-Frame-Options: SAMEORIGIN' );
-		
+
 		$this->uiconf_id = intval($this->getRequestParameter('uiconf_id'));
 		if(!$this->uiconf_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'uiconf_id');
@@ -36,6 +36,7 @@ class previewAction extends kalturaAction
 				$this->entry_name = $entry->getName();
 				$this->entry_description = $entry->getDescription();
 				$this->entry_thumbnail_url = $entry->getThumbnailUrl();
+				$this->entry_thumbnail_secure_url = $entry->getThumbnailUrl(null, 'https');
 				$this->entry_duration = $entry->getDuration();
 
 				$flavor_tag = $this->getRequestParameter('flavor_tag', 'iphone');
