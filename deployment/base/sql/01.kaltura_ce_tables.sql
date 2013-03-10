@@ -511,6 +511,7 @@ CREATE TABLE IF NOT EXISTS `category_entry` (
   `updated_at` datetime DEFAULT NULL,
   `category_full_ids` text NOT NULL,
   `status` int(11) DEFAULT '2',
+  `privacy_contexts` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `partner_id_index` (`partner_id`),
   KEY `category_id_index` (`category_id`),
