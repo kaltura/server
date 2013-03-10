@@ -56,6 +56,9 @@ class KalturaCategoryEntry extends KalturaObject implements IFilterable
 		"status",
 	);
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
@@ -71,17 +74,14 @@ class KalturaCategoryEntry extends KalturaObject implements IFilterable
 		return array();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert($propertiesToSkip)
+	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull('categoryId');
 		$this->validatePropertyNotNull('entryId');
 		parent::validateForInsert($propertiesToSkip);
 	}
-	
-	public function validateForUpdate($sourceObject = null, $propertiesToSkip = array())
-	{
-		$this->validatePropertyNotNull('categoryId');
-		$this->validatePropertyNotNull('entryId');
-		parent::validateForUpdate($sourceObject, $propertiesToSkip);
-	}
+
 }
