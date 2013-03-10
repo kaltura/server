@@ -119,8 +119,10 @@ abstract class KJobHandlerWorker extends KBatchBase
 		
 		$response = $this->kClient->batch->freeExclusiveJob($job->id, $this->getExclusiveLockKey(), $this->getJobType(), $resetExecutionAttempts);
 		
-		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
-		$this->saveSchedulerQueue($this->getJobType(), $response->queueSize);
+		if(is_numeric($response->queueSize)) {
+			KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
+			$this->saveSchedulerQueue($this->getJobType(), $response->queueSize);
+		}
 		
 		return $response->job;
 	}

@@ -126,7 +126,11 @@ class KAsyncNotifier extends KJobHandlerWorker
 			$this->freeExclusiveJob($job);
 			$this->onFree($job);
 		}
-		$this->kClient->doMultiRequest();
+
+		$freeExclusiveResults = $this->kClient->doMultiRequest();
+		$freeExclusiveResults = array_pop($freeExclusiveResults);
+		KalturaLog::info("Queue size: {$freeExclusiveResults->queueSize} sent to scheduler");
+		$this->saveSchedulerQueue($this->getJobType(), $freeExclusiveResults->queueSize);
 	}
 	
 	/**
@@ -248,7 +252,7 @@ class KAsyncNotifier extends KJobHandlerWorker
 	private function updateNotificationStatus(KalturaBatchJob $not, $http_code, $res)
 	{
 		KalturaLog::debug("updateNotificationStatus($not->id, $http_code, $res)");
-		
+		 
 		$not->data->notificationResult = $res;
 		
 		if($http_code == 200 && $res !== false)
