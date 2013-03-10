@@ -354,8 +354,7 @@ class kEntitlementUtils
 			
 		return $privacyContextSearch;
 	}
-	
-	public static function getKsPrivacyContext()
+		public static function getKsPrivacyContext()
 	{
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
 		
@@ -366,6 +365,24 @@ class kEntitlementUtils
 		$ksPrivacyContexts = $ks->getPrivacyContext();
 		if(is_null($ksPrivacyContexts) || $ksPrivacyContexts == '')
 			return array(self::DEFAULT_CONTEXT . $partnerId);
+			
+		return explode(',', $ksPrivacyContexts);
+	}
+	
+	/**
+	 * Function returns the privacy context(s) found on the KS, if none are found returns array containing DEFAULT_PC
+	 */
+	public static function getKsPrivacyContextArray()
+	{
+		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
+		
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		if(!$ks)
+			return array(self::DEFAULT_CONTEXT);
+			
+		$ksPrivacyContexts = $ks->getPrivacyContext();
+		if(is_null($ksPrivacyContexts) || $ksPrivacyContexts == '')
+			return array(self::DEFAULT_CONTEXT);
 			
 		return explode(',', $ksPrivacyContexts);
 	}
