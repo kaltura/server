@@ -251,6 +251,9 @@ class BaseEntryService extends KalturaEntryService
 
 		if (!file_exists($entryFullPath))
 		{
+			// Backward compatability - support case in which the required file exist in the other DC
+			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
+			/*
 			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
 			if($remoteDCHost)
 			{
@@ -260,6 +263,7 @@ class BaseEntryService extends KalturaEntryService
 			{
 				throw new KalturaAPIException(KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN);
 			}
+			*/
 		}
 	    
 	    // validate the input object

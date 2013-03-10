@@ -427,6 +427,9 @@ class MediaService extends KalturaEntryService
 
 		if (!file_exists($entryFullPath))
 		{
+			// Backward compatability - support case in which the required file exist in the other DC
+			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
+			/*
 			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
 			if($remoteDCHost)
 			{
@@ -436,6 +439,7 @@ class MediaService extends KalturaEntryService
 			{
 				throw new KalturaAPIException(KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN);
 			}
+			*/
 		}
 
 		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
