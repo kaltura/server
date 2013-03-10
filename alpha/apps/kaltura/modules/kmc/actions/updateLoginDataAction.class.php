@@ -38,6 +38,11 @@ class updateLoginDataAction extends kalturaAction
 		$partnerId = $ksObj->partner_id;
 		$userId = $ksObj->user;
 
+		$this->forceKMCHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ENFORCE_HTTPS, $partnerId);
+		if( $this->forceKMCHttps && (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') ) {
+			die();
+		}
+
 		// Load the current user
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
 	

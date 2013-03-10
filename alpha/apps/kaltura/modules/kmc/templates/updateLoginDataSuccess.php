@@ -30,14 +30,10 @@
 	    l.href = href;
 	    return l;
 	};
-
-	var parentUrl = "<?php echo $parent_url; ?>";
-	var parentLocation = getLocation(parentUrl);
+	var forceKMCHttps = <?php echo ($forceKMCHttps) ? 'true' : 'false'; ?>;
 	// Check if our parent has the same protocol and host name and then check
 	// for top / window objects
-	if( parentLocation.protocol === window.location.protocol && 
-		parentLocation.hostname === window.location.hostname && 
-		top != window && top.location.hostname != window.location.hostname ) { 
+	if( forceKMCHttps && top != window && top.location.hostname != window.location.hostname ) { 
 		top.location = window.location;
 	}
 
@@ -110,6 +106,7 @@
 <?php if($success) { ?>
 <script type="text/javascript" src="/lib/js/postmessage.js"></script>
 <script type="text/javascript">
+var parentUrl = "<?php echo $parent_url; ?>";
 function send() {
 	XD.postMessage("<?php echo $msg; ?>", decodeURIComponent(parentUrl), parent);
 }
