@@ -1,3 +1,6 @@
+// Prevent the page to be framed
+if(top != window) { top.location = window.location; }
+
 /* kmc and kmc.vars defined in script block in kmc4success.php */
 
 // For debug enable to true. Debug will show information in the browser console
@@ -818,8 +821,8 @@ kmc.layout = {
 
 kmc.user = {
 
-	openSupport: function(href) {
-
+	openSupport: function(el) {
+		var href = el.href;
 		// Show overlay
 		kmc.utils.hideFlash(true);
 		kmc.layout.overlay.show();
