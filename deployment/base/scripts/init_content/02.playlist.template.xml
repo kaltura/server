@@ -18,6 +18,7 @@
 
 	<request service="playlist" action="add">
 		<playlist objectType="KalturaPlaylist">
+			<playlistType>10</playlistType>
 			<name>Recent Sea Videos</name>
 			<userId>template</userId>
 			<filters objectType="array">
@@ -33,6 +34,7 @@
 
 	<request service="playlist" action="add">
 		<playlist objectType="KalturaPlaylist">
+			<playlistType>10</playlistType>
 			<name>My images</name>
 			<description>All my images 2</description>
 			<userId>template</userId>
@@ -49,6 +51,7 @@
 
 	<request service="playlist" action="add">
 		<playlist objectType="KalturaPlaylist">
+			<playlistType>10</playlistType>
 			<name>Most recent videos</name>
 			<description>10 most  recent videos</description>
 			<userId>template</userId>
@@ -64,6 +67,7 @@
 
 	<request service="playlist" action="add">
 		<playlist objectType="KalturaPlaylist">
+			<playlistType>10</playlistType>
 			<name>Most popular videos</name>
 			<description>Most Popular videos (top 30)</description>
 			<userId>template</userId>
