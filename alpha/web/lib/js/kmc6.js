@@ -50,7 +50,7 @@ kmc.functions = {
 			srvurl				: "api_v3/index.php",
 			protocol 			: window.location.protocol + '//',
 			partnerid			: kmc.vars.partner_id,
-			subpid				: kmc.vars.subp_id,
+			subpid				: kmc.vars.partner_id + '00',
 			ks					: kmc.vars.ks,
 			entryId				: "-1",
 			kshowId				: "-1",
@@ -107,7 +107,7 @@ kmc.functions = {
 			cdnhost			: kmc.vars.cdn_host,
 			protocol 		: window.location.protocol.slice(0, -1),
 			partnerid		: kmc.vars.partner_id,
-			subPartnerId	: kmc.vars.subp_id,
+			subPartnerId	: kmc.vars.partner_id + '00',
 			sessionId		: kmc.vars.ks,
 			devFlag			: "true",
 			entryId			: "-1",
@@ -683,8 +683,12 @@ kmc.client = {
 		};
 			
 		kmc.client.makeRequest("shortlink_shortlink", "add", data, function( res ) {
+			var tinyUrl = false;
 			if( callback ) {
-				callback( kmc.vars.service_url + '/tiny/' + res.id );
+				if( res.id ) {
+					tinyUrl = kmc.vars.service_url + '/tiny/' + res.id;
+				}
+				callback( tinyUrl );
 			} else {
 				kmc.preview_embed.setShortURL(res.id);
 			}
