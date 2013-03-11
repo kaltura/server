@@ -408,7 +408,7 @@ abstract class KBatchBase implements IKalturaLogger
 			// - the response from the client (to check the client size beaviour)
 		$directorySync = is_dir($file);
 		KalturaLog::info("Check File Exists[$file] size[$size]");
-		if(! $size)
+		if(is_null($size))
 		{
 			clearstatcache();
 			if($directorySync)
