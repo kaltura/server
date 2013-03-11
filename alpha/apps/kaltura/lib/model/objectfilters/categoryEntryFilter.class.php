@@ -2,7 +2,7 @@
 /**
  * @package Core
  * @subpackage model.filters
- */ 
+ */
 class categoryEntryFilter extends baseObjectFilter
 {
 	public function init ()
@@ -21,20 +21,22 @@ class categoryEntryFilter extends baseObjectFilter
 			"_in_status",
 			) , NULL );
 
-		$this->allowed_order_fields = array ( );
+		$this->allowed_order_fields = array (
+			'created_at',
+		);
 
 		$this->aliases = array ();
 	}
 
-	public function describe() 
+	public function describe()
 	{
-		return 
+		return
 			array (
 				"display_name" => "CategoryEntryFilter",
 				"desc" => ""
 			);
 	}
-	
+
 	// TODO - move to base class, all that should stay here is the peer class, not the logic of the field translation !
 	// The base class should invoke $peek_class::translateFieldName( $field_name , BasePeer::TYPE_FIELDNAME , BasePeer::TYPE_COLNAME );
 	public function getFieldNameFromPeer ( $field_name )
@@ -47,12 +49,12 @@ class categoryEntryFilter extends baseObjectFilter
 	{
 		return categoryEntryPeer::ID;
 	}
-	
+
 	public function setCategoryIdEqual($v)
 	{
 		$this->set('_eq_category_id', $v);
 	}
-	
+
 	public function setEntryIdEqual($v)
 	{
 		$this->set('_eq_entry_id', $v);
