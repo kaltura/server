@@ -415,7 +415,7 @@ abstract class KBatchBase implements IKalturaLogger
 				$size=KBatchBase::foldersize($file);
 			else
 				$size = kFile::fileSize($file);
-			if(! $size)
+			if($size === false)
 			{
 				KalturaLog::debug("Size not found on file [$file]");
 				return false;
