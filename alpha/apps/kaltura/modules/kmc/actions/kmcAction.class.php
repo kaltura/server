@@ -27,7 +27,7 @@ class kmcAction extends kalturaAction
 
 		$swfUrl = ($this->securedLogin) ? 'https://' : 'http://';
 		$swfUrl .= $this->www_host .'/'. myContentStorage::getFSFlashRootPath ();
-		$swfUrl .= '/kmc/login/' . $kConf::get('kmc_login_version') . '/login.swf';
+		$swfUrl .= '/kmc/login/' . kConf::get('kmc_login_version') . '/login.swf';
 		$this->swfUrl = $swfUrl;
 		
 		$this->beta = $this->getRequestParameter( "beta" );
