@@ -24,11 +24,10 @@ class embedIframeJsAction extends sfAction
 
 		$widget_id = $this->getRequestParameter("widget_id", '_' . $partner_id);
 		
-		$partner_host = myPartnerUtils::getHost($partner_id);
-		$partner_cdnHost = myPartnerUtils::getCdnHost($partner_id);
-		
-		$use_cdn = $uiConf->getUseCdn();
-		$host = $use_cdn ?  $partner_cdnHost : $partner_host;
+		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+		$embed_host = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');	
+		$embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
+		$host = ($protocol == 'https') ? 'https://' . $embed_host_https : 'http://' . $embed_host;
 
 		$ui_conf_html5_url = $uiConf->getHtml5Url();
 
@@ -92,7 +91,6 @@ class embedIframeJsAction extends sfAction
 			$url .= ((strpos($url, "?") === false) ? "?" : "&") . 'wid=' . $widget_id . '&' . $_SERVER["QUERY_STRING"];
 		} else if ($autoEmbed) {
 			header('Content-Type: application/javascript');
-			$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 			$params = "protocol=$protocol&".$_SERVER["QUERY_STRING"];
 
 			$url .= ((strpos($url, "?") === false) ? "?" : "&") . $params;
