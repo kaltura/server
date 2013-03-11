@@ -44,6 +44,7 @@ class TagTableMap extends TableMap {
 		$this->addColumn('INSTANCE_COUNT', 'InstanceCount', 'INTEGER', true, null, 1);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('PRIVACY_CONTEXT', 'PrivacyContext', 'VARCHAR', true, 255, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', true, null, null);
 		// validators
 	} // initialize()
 

@@ -63,6 +63,12 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	protected $privacy_context;
 
 	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -226,6 +232,16 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	public function getPrivacyContext()
 	{
 		return $this->privacy_context;
+	}
+
+	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
 	}
 
 	/**
@@ -416,6 +432,26 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	} // setPrivacyContext()
 
 	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     Tag The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = TagPeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -458,6 +494,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 			$this->instance_count = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->privacy_context = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->custom_data = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -467,7 +504,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 7; // 7 = TagPeer::NUM_COLUMNS - TagPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 8; // 8 = TagPeer::NUM_COLUMNS - TagPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating Tag object", $e);
@@ -699,6 +736,8 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -709,7 +748,9 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 	public function postSave(PropelPDO $con = null) 
 	{
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 		parent::postSave($con);
 	}
 	
@@ -942,6 +983,9 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 			case 6:
 				return $this->getPrivacyContext();
 				break;
+			case 7:
+				return $this->getCustomData();
+				break;
 			default:
 				return null;
 				break;
@@ -970,6 +1014,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 			$keys[4] => $this->getInstanceCount(),
 			$keys[5] => $this->getCreatedAt(),
 			$keys[6] => $this->getPrivacyContext(),
+			$keys[7] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1022,6 +1067,9 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 			case 6:
 				$this->setPrivacyContext($value);
 				break;
+			case 7:
+				$this->setCustomData($value);
+				break;
 		} // switch()
 	}
 
@@ -1053,6 +1101,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[4], $arr)) $this->setInstanceCount($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setPrivacyContext($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setCustomData($arr[$keys[7]]);
 	}
 
 	/**
@@ -1071,6 +1120,7 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(TagPeer::INSTANCE_COUNT)) $criteria->add(TagPeer::INSTANCE_COUNT, $this->instance_count);
 		if ($this->isColumnModified(TagPeer::CREATED_AT)) $criteria->add(TagPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(TagPeer::PRIVACY_CONTEXT)) $criteria->add(TagPeer::PRIVACY_CONTEXT, $this->privacy_context);
+		if ($this->isColumnModified(TagPeer::CUSTOM_DATA)) $criteria->add(TagPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1136,6 +1186,8 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 		$copyObj->setCreatedAt($this->created_at);
 
 		$copyObj->setPrivacyContext($this->privacy_context);
+
+		$copyObj->setCustomData($this->custom_data);
 
 
 		$copyObj->setNew(true);
@@ -1216,4 +1268,121 @@ abstract class BaseTag extends BaseObject  implements Persistent {
 
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BaseTag
