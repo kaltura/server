@@ -20,9 +20,17 @@ class kmcAction extends kalturaAction
 		if( $this->getRequest()->getCookie('kmcks') ) {
 			$this->redirect('kmc/kmc2');
 		}
+
+		$this->www_host = kConf::get('www_host');
+		$https_enabled = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? true : false;
+		$this->securedLogin = (kConf::get('kmc_secured_login') || $https_enabled) ? true : false;
+
+		$swfUrl = ($this->securedLogin) ? 'https://' : 'http://';
+		$swfUrl .= $this->www_host .'/'. myContentStorage::getFSFlashRootPath ();
+		$swfUrl .= '/kmc/login/' . $kConf::get('kmc_login_version') . '/login.swf';
+		$this->swfUrl = $swfUrl;
 		
 		$this->beta = $this->getRequestParameter( "beta" );
-		$this->kmc_login_version 	= kConf::get('kmc_login_version');
 		$this->setPassHashKey = $this->getRequestParameter( "setpasshashkey" );
 		$this->hashKeyErrorCode = null;
 		$this->displayErrorFromServer = false;

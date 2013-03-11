@@ -1,18 +1,13 @@
-// KMC Login page
-if( typeof $ == 'undefined' ) $ = jQuery;
+// Get the KMC base url based on current location
+var baseUrl = (options.secureLogin) ? 'https:' : window.location.protocol;
+	baseUrl += '//' + window.location.hostname;
+	baseUrl += (window.location.port) ? ':' + window.location.port : '';
 
 function loginF( remMe, partner_id, subp_id, uid, ks , screen_name, email ) {
 
 	// Extlogin URL
 	var hash = window.location.hash || ''; 
-	var url = options.service_url + '/index.php/kmc/extlogin' + hash;
-	// URL Protocol
-	var service_url_protocol = options.service_url.split("://")[0];
-
-	// If login needs to be secured, change extlogin url to https	
-	if( options.secure_login && service_url_protocol == 'http' ) {
-		url = url.replace(/http:/g, "https:");
-	}
+	var url = baseUrl + '/index.php/kmc/extlogin' + hash;
 
 	// Setup input fields
 	var ks_input = $('<input />').attr({
@@ -40,7 +35,7 @@ function loginF( remMe, partner_id, subp_id, uid, ks , screen_name, email ) {
 }
 
 function gotoSignup() {
-	window.location = options.service_url + "/index.php/kmc/signup";
+	window.location = baseUrl + "/index.php/kmc/signup";
 }
 
 // Show login form
@@ -59,6 +54,6 @@ var params = {
 	bgcolor: "#272929",
 	quality: "high",
 	wmode: "window" ,
-	movie: options.swf_url
+	movie: options.swfUrl
 };
-swfobject.embedSWF(options.swf_url, "login_swf", "384", "350", "10.0.0", options.service_url + "/expressInstall.swf", flashVars, params);
+swfobject.embedSWF(options.swfUrl, "login_swf", "384", "350", "10.0.0", baseUrl + "/expressInstall.swf", flashVars, params);

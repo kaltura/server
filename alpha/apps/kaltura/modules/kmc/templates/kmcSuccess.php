@@ -1,28 +1,12 @@
-<?php
-$service_url = requestUtils::getHost();
-
-$www_host = kConf::get('www_host');
-$https_enabled = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? true : false;
-if (kConf::get('kmc_secured_login') || $https_enabled) {
-	$flash_dir = 'https://';
-}
-else {
-	$flash_dir = 'http://';
-}
-
-$flash_dir .= $www_host .'/'. myContentStorage::getFSFlashRootPath ();
-
-?>
-
 <style>
  body { background-color:#272929 !important; background-image:none !important;}
   div#login { width:500px; margin: 0 auto; text-align:center;}
 </style>
 
 <div id="kmcHeader">
-	<img src="<?php echo $service_url; ?>/lib/images/kmc/logo_kmc.png" alt="Kaltura CMS" />
+	<img src="/lib/images/kmc/logo_kmc.png" alt="Kaltura CMS" />
 	<div id="user_links">
-    	<a href="<?php echo $service_url; ?>/content/docs/pdf/KMC_User_Manual.pdf" target="_blank">User Manual</a>
+    	<a href="/content/docs/pdf/KMC_User_Manual.pdf" target="_blank">User Manual</a>
 	</div> 
 </div><!-- end kmcHeader -->
     
@@ -35,9 +19,8 @@ $flash_dir .= $www_host .'/'. myContentStorage::getFSFlashRootPath ();
 if(top != window) { top.location = window.location; }
 // Options
 var options = {
-	service_url: "<?php echo $service_url ?>",
-	secure_login: <?php echo (kConf::get('kmc_secured_login') || $https_enabled) ? 'true' : 'false'; ?>,
-	swf_url: "<?php echo $flash_dir ?>/kmc/login/<?php echo $kmc_login_version ?>/login.swf",
+	secureLogin: <?php echo ($securedLogin) ? 'true' : 'false'; ?>,
+	swfUrl: "<?php echo $swfUrl; ?>",
 	flashVars: {
 		host: "<?php echo $www_host; ?>",
 		displayErrorFromServer: "<?php echo ($displayErrorFromServer)? 'true': 'false'; ?>",
