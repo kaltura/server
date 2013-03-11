@@ -332,50 +332,22 @@ abstract class KalturaBaseService
 		}	
 	}
 
-	protected function validateApiAccessControl()
+	protected function validateApiAccessControl($partnerId = null)
 	{
 		// ignore for system partners
 		// for cases where an api action has a 'partnerId' parameter which will causes loading that partner instead of the ks partner
 		if ($this->getKs() && $this->getKs()->partner_id < 0)
 			return;
-			
-		$partner = $this->getPartner();
+		
+		if (is_null($partnerId))
+			$partner = $this->getPartner();
+		else
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+		
 		if (!$partner)
 			return;
-
-		$accessControl = $partner->getApiAccessControl();
-		if (is_null($accessControl))
-			return;
-
-		$context = new kEntryContextDataResult();
-		$disableCache = $accessControl->applyContext($context, $this->getApiAccessControlScope());
-		if ($disableCache)
-			KalturaResponseCacher::disableCache();
-
-		if(count($context->getAccessControlMessages()))
-		{
-			header("X-Kaltura-API-Access-Control: ".implode(', ', $context->getAccessControlMessages()));
-		}
-
-		if(count($context->getAccessControlActions()))
-		{
-			$actions = $context->getAccessControlActions();
-			foreach($actions as $action)
-			{
-				/* @var $action kAccessControlAction */
-				if($action->getType() == accessControlActionType::BLOCK)
-				{
-					throw new KalturaAPIException(APIErrors::SERVICE_ACCESS_CONTROL_RESTRICTED, $this->serviceId.'->'.$this->actionName);
-				}
-			}
-		}
-	}
-
-	private function getApiAccessControlScope()
-	{
-		$scope = new accessControlScope();
-		$scope->setKs(kCurrentContext::$ks);
-		$scope->setContexts(array(accessControlContextType::PLAY));
-		return $scope;
+		
+		if (!$partner->validateApiAccessControl())
+			throw new KalturaAPIException(APIErrors::SERVICE_ACCESS_CONTROL_RESTRICTED, $this->serviceId.'->'.$this->actionName);
 	}
 }

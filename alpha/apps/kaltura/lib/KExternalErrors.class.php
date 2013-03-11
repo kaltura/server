@@ -34,6 +34,7 @@ class KExternalErrors
 	const INVALID_TOKEN = 27;
 	const EXPIRED_TOKEN = 28;
 	const PROCESSING_FEED_REQUEST = 29;
+	const SERVICE_ACCESS_CONTROL_RESTRICTED = 30;
 	
 	private static $errorDescriptionMap = array(
 			self::ENTRY_NOT_FOUND => "requested entry not found",
@@ -65,7 +66,8 @@ class KExternalErrors
 			self::INVALID_TOKEN => "the supplied token is invalid",
 			self::EXPIRED_TOKEN => "the supplied token is expired",
 			self::PROCESSING_FEED_REQUEST => "the supplied feed is already being processed",
-			);
+			self::SERVICE_ACCESS_CONTROL_RESTRICTED => "action restricted due to access-control",
+	);
 	
 	public static function dieError($errorCode, $message = null)
 	{

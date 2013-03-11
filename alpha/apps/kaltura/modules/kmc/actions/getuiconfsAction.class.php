@@ -21,7 +21,10 @@ class getuiconfsAction extends kalturaAction
 		
 		$this->partner = PartnerPeer::retrieveByPK($this->partner_id);
 		if (!$this->partner)
-			die;
+			KExternalErrors::dieError( KExternalErrors::PARTNER_NOT_FOUND );
+					
+		if (!$this->partner->validateApiAccessControl())
+			KExternalErrors::dieError( KExternalErrors::SERVICE_ACCESS_CONTROL_RESTRICTED );
 			
 		$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : 0;
 		$this->isKDP3 = ($this->partner->getKmcVersion() != '1')? true: false;

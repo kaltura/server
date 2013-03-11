@@ -129,19 +129,28 @@ class KSecureEntryHelper
 		}
 		return $preview;
 	}
-	
-	public function validateForPlay()
+
+	public function validateApiAccessControl()
+	{
+		$partner = $this->entry->getPartner();
+		if ($partner && !$partner->validateApiAccessControl())
+			KExternalErrors::dieError(KExternalErrors::SERVICE_ACCESS_CONTROL_RESTRICTED);
+	}
+
+	public function validateForPlay($performApiAccessCheck = true)
 	{
 	    if ($this->contexts != array(accessControlContextType::THUMBNAIL))
 	    {
 		    $this->validateModeration();
 			$this->validateScheduling();
 	    }
-		$this->validateAccessControl();
+		$this->validateAccessControl($performApiAccessCheck);
 	}
 	
 	public function validateForDownload()
 	{
+		$this->validateApiAccessControl();
+		
 		if ($this->ks)
 		{
 			if ($this->isKsAdmin()) // no need to validate when ks is admin
@@ -154,7 +163,7 @@ class KSecureEntryHelper
 				return;
 		}	
 			
-		$this->validateForPlay();
+		$this->validateForPlay(false);
 	}
 	
 	protected function validateModeration()
@@ -166,8 +175,13 @@ class KSecureEntryHelper
 			KExternalErrors::dieError(KExternalErrors::ENTRY_MODERATION_ERROR);
 	}
 	
-	public function validateAccessControl()
+	public function validateAccessControl($performApiAccessCheck = true)
 	{
+		if ($performApiAccessCheck)
+		{
+			$this->validateApiAccessControl();
+		}
+		
 		$accessControl = $this->entry->getAccessControl();
 		if(!$accessControl)
 			return;

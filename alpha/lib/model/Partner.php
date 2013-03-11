@@ -448,6 +448,9 @@ class Partner extends BasePartner
 		
 	public function getForceCdnHost()	{		return $this->getFromCustomData( "forceCdnHost" , null, false  );	}
 	public function setForceCdnHost( $v )	{		return $this->putInCustomData( "forceCdnHost", $v );	}	
+
+	public function getEnforceHttpsApi()	{		return $this->getFromCustomData( "enforceHttpsApi" , null, false  );	}
+	public function setEnforceHttpsApi( $v )	{		return $this->putInCustomData( "enforceHttpsApi", $v );	}
 	
 	public function getFeaturesStatus()	
 	{		
@@ -1425,4 +1428,47 @@ class Partner extends BasePartner
 		else
 			return null;
 	}	
+
+	public function validateApiAccessControl()
+	{
+		if ($this->getEnforceHttpsApi() && (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on'))
+		{
+			KalturaLog::err('Action was accessed over HTTP while the partner is configured for HTTPS access only');
+			return false;
+		}
+
+		$accessControl = $this->getApiAccessControl();
+		if (is_null($accessControl))
+			return true;
+
+		$context = new kEntryContextDataResult();
+		
+		$scope = new accessControlScope();
+		$scope->setKs(kCurrentContext::$ks);
+		$scope->setContexts(array(accessControlContextType::PLAY));
+		
+		$disableCache = $accessControl->applyContext($context, $scope);
+		if ($disableCache)
+			kApiCache::disableCache();
+
+		if(count($context->getAccessControlMessages()))
+		{
+			header("X-Kaltura-API-Access-Control: ".implode(', ', $context->getAccessControlMessages()));
+		}
+
+		if(count($context->getAccessControlActions()))
+		{
+			$actions = $context->getAccessControlActions();
+			foreach($actions as $action)
+			{
+				/* @var $action kAccessControlAction */
+				if($action->getType() == accessControlActionType::BLOCK)
+				{
+					KalturaLog::err('Action was blocked by API access control');
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 }

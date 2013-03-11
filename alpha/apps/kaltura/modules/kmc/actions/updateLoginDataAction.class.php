@@ -37,6 +37,13 @@ class updateLoginDataAction extends kalturaAction
 		$ksObj = kSessionUtils::crackKs($ks);
 		$partnerId = $ksObj->partner_id;
 		$userId = $ksObj->user;
+		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if (!$partner)
+			KExternalErrors::dieError(KExternalErrors::PARTNER_NOT_FOUND);
+		
+		if (!$partner->validateApiAccessControl())
+			KExternalErrors::dieError(KExternalErrors::SERVICE_ACCESS_CONTROL_RESTRICTED);
 
 		$this->forceKMCHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ENFORCE_HTTPS, $partnerId);
 		if( $this->forceKMCHttps && (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') ) {

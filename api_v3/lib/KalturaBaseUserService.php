@@ -50,6 +50,8 @@ class KalturaBaseUserService extends KalturaBaseService
 	{
 		KalturaResponseCacher::disableCache();
 
+		$this->validateApiAccessControlByEmail($email);
+		
 		if ($newEmail != "")
 		{
 			if(!kString::isEmailString($newEmail))
@@ -105,6 +107,8 @@ class KalturaBaseUserService extends KalturaBaseService
 	protected function resetPasswordImpl($email)
 	{
 		KalturaResponseCacher::disableCache();
+		
+		$this->validateApiAccessControlByEmail($email);
 		
 		try {
 			$new_password = UserLoginDataPeer::resetUserPassword($email);
@@ -163,7 +167,11 @@ class KalturaBaseUserService extends KalturaBaseService
 		// if a KS of a specific partner is used, don't allow logging in to a different partner
 		if ($this->getPartnerId() && $partnerId && $this->getPartnerId() != $partnerId) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
-		}		
+		}
+
+		if ($loginEmail && !$partnerId) {
+			$this->validateApiAccessControlByEmail($loginEmail);
+		}
 		
 		try {
 			if ($loginEmail) {
@@ -240,6 +248,9 @@ class KalturaBaseUserService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		
 		try {
+			$loginData = UserLoginDataPeer::isHashKeyValid($hashKey);
+			if ($loginData)
+				$this->validateApiAccessControl($loginData->getLastLoginPartnerId());
 			$result = UserLoginDataPeer::setInitialPassword($hashKey, $newPassword);
 		}
 		catch (kUserException $e) {
@@ -269,4 +280,12 @@ class KalturaBaseUserService extends KalturaBaseService
 		}
 	}
 	
+	protected function validateApiAccessControlByEmail($email)
+	{ 
+		$loginData = UserLoginDataPeer::getByEmail($email);
+		if ($loginData)
+		{
+			$this->validateApiAccessControl($loginData->getLastLoginPartnerId());
+		}
+	}
 }

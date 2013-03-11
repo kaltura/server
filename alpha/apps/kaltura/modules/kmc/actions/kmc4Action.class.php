@@ -63,6 +63,11 @@ class kmc4Action extends kalturaAction
 
 		// Load partner
 		$this->partner = $partner = PartnerPeer::retrieveByPK($this->partner_id);
+		if (!$partner)
+			KExternalErrors::dieError(KExternalErrors::PARTNER_NOT_FOUND);
+		
+		if (!$partner->validateApiAccessControl())
+			KExternalErrors::dieError(KExternalErrors::SERVICE_ACCESS_CONTROL_RESTRICTED);
 		
 		kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, null, null, null, self::CURRENT_KMC_VERSION);
 		$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;

@@ -15,7 +15,26 @@ class logoutAction extends kalturaAction
 	{
 		$ksStr = $this->getP("ks");
 		if($ksStr) {
-			kSessionUtils::killKSession($ksStr);
+			$ksObj = null;
+			try
+			{
+				$ksObj = ks::fromSecureString($ksStr);
+			}
+			catch(Exception $e)
+			{				
+			}
+				
+			if ($ksObj)
+			{
+				$partner = PartnerPeer::retrieveByPK($ksObj->partner_id);
+				if (!$partner)
+					KExternalErrors::dieError(KExternalErrors::PARTNER_NOT_FOUND);
+						
+				if (!$partner->validateApiAccessControl())
+					KExternalErrors::dieError(KExternalErrors::SERVICE_ACCESS_CONTROL_RESTRICTED);
+				
+				$ksObj->kill();
+			}
 			KalturaLog::debug("Killing session with ks - [$ksStr], decoded - [".base64_decode($ksStr)."]");
 		}
 		else {

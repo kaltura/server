@@ -91,6 +91,11 @@ class extloginAction extends kalturaAction
 			$this->dieOnError  ( APIErrors::UNKNOWN_PARTNER_ID );	
 		}
 		
+		if (!$partner->validateApiAccessControl())
+		{
+			$this->dieOnError  ( APIErrors::SERVICE_ACCESS_CONTROL_RESTRICTED );
+		}
+		
 		$partner_id = $partner->getId();
 		$subp_id = $partner->getSubpId() ;
 		$admin_puser_id = $adminKuser->getPuserId();
