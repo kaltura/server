@@ -514,10 +514,10 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	{
 		$swf_url = $this->getSwfUrl();
 		$flash_url = myContentStorage::getFSFlashRootPath ();
-		$match = preg_match ( "v([\w\d\.]*)" , $swf_url , $version );
+		$match = preg_match ( '/v([\w\d\.]*)/' , $swf_url , $version );
 		if ( $match )
 		{
-			return $version[1];
+			return $version[0];
 		}
 		return null;
 	}
