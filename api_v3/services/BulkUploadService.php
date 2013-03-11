@@ -183,6 +183,10 @@ function serveAction($id)
 		$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		
+		if (!$fileSync) {
+			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST, $id);
+		}
+		
 		header("Content-Type: text/plain; charset=UTF-8");
 
 		if($local)
