@@ -6,10 +6,10 @@
     missingok
     notifempty
     prerotate
-        /sbin/service batchMgr stop 2>&1 >/dev/null || true
+        service kaltura_batch stop 2>&1 >/dev/null || true
     endscript
     postrotate
-        /sbin/service batchMgr start 2>&1 >/dev/null || true
+        service kaltura_batch start 2>&1 >/dev/null || true
     endscript
 }
 
