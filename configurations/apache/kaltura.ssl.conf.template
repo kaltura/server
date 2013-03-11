@@ -7,10 +7,10 @@ SSLRandomSeed connect builtin
 SSLMutex default
 SSLCryptoDevice builtin
 
-#SSLCertificateFile /etc/onprem-falcon2.crt 
-#SSLCertificateKeyFile /etc/onprem-falcon2.private.key
-SSLCertificateFile /etc/pki/tls/certs/localhost.crt
-SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
+#SSLCertificateFile /etc/@KALTURA_VIRTUAL_HOST_NAME@.crt 
+#SSLCertificateKeyFile /etc/@KALTURA_VIRTUAL_HOST_NAME@.private.key
+SSLCertificateFile /etc/pki/tls/certs/@KALTURA_VIRTUAL_HOST_NAME@.crt
+SSLCertificateKeyFile /etc/pki/tls/private/@KALTURA_VIRTUAL_HOST_NAME@.key
 
 <VirtualHost @KALTURA_FULL_VIRTUAL_HOST_NAME@>
 	SSLEngine on
