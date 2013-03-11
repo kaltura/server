@@ -42,7 +42,8 @@ class Kaltura_Client_Configuration
 	public $startZendDebuggerSession 	= false;
 	public $userAgent					= '';
 	public $verifySSL 					= true;
-	
+	public $sslCertificatePath			= null;
+
 	/**
 	 * Constructs new Kaltura configuration object
 	 *
@@ -51,10 +52,10 @@ class Kaltura_Client_Configuration
 	{
 	    if ($partnerId && !is_numeric($partnerId))
 	        throw new Kaltura_Client_ClientException("Invalid partner id", Kaltura_Client_ClientException::ERROR_INVALID_PARTNER_ID);
-	        
+
 	    $this->partnerId = $partnerId;
 	}
-	
+
 	/**
 	 * Set logger to get kaltura client debug logs
 	 *
@@ -64,7 +65,7 @@ class Kaltura_Client_Configuration
 	{
 		$this->logger = $log;
 	}
-	
+
 	/**
 	 * Gets the logger (Internal client use)
 	 *
