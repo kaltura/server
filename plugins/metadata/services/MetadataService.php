@@ -280,11 +280,16 @@ class MetadataService extends KalturaBaseService
 				$dbMetadata->setMetadataProfileVersion($dbMetadataProfile->getVersion());
 			}
 			
+			// Gonen - 2013-03-12 : change order of actions to solve possible race-condition when trying to update same object too soon
+			// increment without saving the object, to make sure we get the right syncKey
 			$dbMetadata->incrementVersion();
-			$dbMetadata->save();
 		
+			// prepare syncKey
 			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+			// save the file
 			kFileSyncUtils::file_put_contents($key, $xmlData);
+			// save the object to actually advance the version
+			$dbMetadata->save();
 			
 			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
 		}
@@ -564,16 +569,31 @@ class MetadataService extends KalturaBaseService
 	 */
 	public function updateFromXSLAction ($id, $xslFile)
 	{
-		$dbMetadataObject = MetadataPeer::retrieveByPK($id);
-		if (!$dbMetadataObject)
-			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND);
-		
 		$xslFilePath = $xslFile['tmp_name'];
 		if(!file_exists($xslFilePath))
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xslFile['name']);
 		
 		$xslData = file_get_contents($xslFilePath);
 		@unlink($xslFilePath);
+		
+		try
+		{
+			$result = $this->updateFromXslImpl($id, $xslData);
+		}
+		catch(PropelException $e)
+		{
+			// trying to catch propel exception that could happen in case of update of the same existing version (race-condition updating the same object too soon).
+			// in such case - try to update again
+			$result = $this->updateFromXslImpl($id, $xslData);
+		}
+		return $result;
+	}
+	
+	private function updateFromXslImpl($id, $xslData)
+	{
+		$dbMetadataObject = MetadataPeer::retrieveByPK($id);
+		if (!$dbMetadataObject)
+			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND);
 		
 		$dbMetadataObjectFileSyncKey = $dbMetadataObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		
