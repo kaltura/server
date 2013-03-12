@@ -25,6 +25,13 @@ class TagPeer extends BaseTagPeer
 			self::$s_criteria_filter = new criteriaFilter();
 		
 		$c = KalturaCriteria::create(self::OM_CLASS);
+		
+		if (kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$privacyContexts = kEntitlementUtils::getKsPrivacyContext();
+			$c->addAnd(self::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
+		}
+		
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
