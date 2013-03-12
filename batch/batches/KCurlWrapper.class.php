@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 
+ *
  * @package Scheduler
  *
  */
@@ -47,22 +47,22 @@ class KCurlHeaderResponse
 	const HTTP_STATUS_SERVICE_UNAVAIL = 503; //The service is temporarily overloaded.
 	const HTTP_STATUS_GATEWAY_TIMEOUT = 504; //The request was timed out waiting for a gateway.
 	const HTTP_STATUS_VERSION_NOT_SUP = 505; //The server does not support the HTTP protocol version that was used in the request message.
-	
+
 	/**
 	 * @var int
 	 */
 	public $code;
-	
+
 	/**
 	 * @var string
 	 */
 	public $codeName;
-	
+
 	/**
 	 * @var array
 	 */
 	public $headers = array();
-	
+
 	/**
 	 * @return boolean
 	 */
@@ -71,10 +71,10 @@ class KCurlHeaderResponse
 		$goodCodes = array(
 			self::HTTP_STATUS_OK => true,
 			self::HTTP_STATUS_PARTIAL_CONTENT => true,
-			self::HTTP_STATUS_REDIRECT => true, 
+			self::HTTP_STATUS_REDIRECT => true,
 			self::HTTP_STATUS_MOVED => true,
 		);
-		
+
 		return isset($goodCodes[$this->code]);
 	}
 }
@@ -88,19 +88,19 @@ class KCurlWrapper
 {
 	const HTTP_PROTOCOL_HTTP = 1;
 	const HTTP_PROTOCOL_FTP = 2;
-	
+
 	const HTTP_USER_AGENT = "\"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6\"";
-	
+
 	/**
 	 * @var resource
 	 */
 	public $ch;
-	
+
 	public $protocol;
-	
+
 	private static $headers;
 	private static $lastHeader;
-	
+
 	private static function read_header($ch, $string) {
 		self::$headers .= $string;
 		if ($string == "\r\n") // mark when we get to the last header so we can abort the curl
@@ -108,23 +108,23 @@ class KCurlWrapper
 		$length = strlen ( $string );
 		return $length;
 	}
-	
+
 	private static function read_body($ch, $string) {
 		if (self::$lastHeader) // if we read the last header abort the curl
 			return 0;
-		
+
 		$length = strlen ( $string );
 		return $length;
 	}
-	
+
 	/**
 	 * @param string $url
 	 */
-	public function __construct($url, $verbose = false) {
+	public function __construct($url, $params = null) {
 		$url = trim($url);
 
 		// this is the default - will change only in very specific conditions (bellow)
-		$this->protocol = self::HTTP_PROTOCOL_HTTP;		
+		$this->protocol = self::HTTP_PROTOCOL_HTTP;
 		try
 		{
 			$url_parts = parse_url( $url );
@@ -136,25 +136,31 @@ class KCurlWrapper
 		}
 		catch ( Exception $exception )
 		{
-			
+
 		}
-				
+
 		KalturaLog::info("Fetching url [$url]");
 		$this->ch = curl_init();
-		
+
 		// set URL and other appropriate options - these can be overriden with the setOpt function if desired
 		$url = self::encodeUrl($url);
 		curl_setopt($this->ch, CURLOPT_URL, $url);
 		curl_setopt($this->ch, CURLOPT_USERAGENT, self::HTTP_USER_AGENT);
 		curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
-		
+
 		curl_setopt($this->ch, CURLOPT_NOSIGNAL, true);
 		curl_setopt($this->ch, CURLOPT_FORBID_REUSE, true);
-		
-		if($verbose)
+
+		if($params && isset($params->curlVerbose) && $params->curlVerbose)
 			curl_setopt($this->ch, CURLOPT_VERBOSE, true);
+
+		if(!$params || !isset($params->curlVerifySSL) || !$params->curlVerifySSL)
+		{
+			curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, 2);
+		}
 	}
-	
+
 	/**
 	 * @param string $url
 	 * @return string
@@ -163,8 +169,8 @@ class KCurlWrapper
 	{
 		return str_replace(array(' ', '[', ']'), array('%20', '%5B', '%5D'), $url);
 	}
-	
-	
+
+
 	/**
 	 * @return false|string
 	 */
@@ -173,10 +179,10 @@ class KCurlWrapper
 		$err = curl_error($this->ch);
 		if(!strlen($err))
 			return false;
-			
+
 		return $err;
 	}
-	
+
 	/**
 	 * @return number
 	 */
@@ -184,7 +190,7 @@ class KCurlWrapper
 	{
 		return curl_errno($this->ch);
 	}
-	
+
 	/**
 	 * @param int $opt
 	 * @param mixed $val
@@ -194,7 +200,7 @@ class KCurlWrapper
 	{
 		return curl_setopt($this->ch, $opt, $val);
 	}
-	
+
 	/**
 	 * @param int $seconds
 	 * @return boolean
@@ -203,7 +209,7 @@ class KCurlWrapper
 	{
 		return $this->setOpt(CURLOPT_TIMEOUT, $seconds);
 	}
-	
+
 	/**
 	 * @param int $offset
 	 * @return boolean
@@ -212,7 +218,7 @@ class KCurlWrapper
 	{
 		return $this->setOpt(CURLOPT_RESUME_FROM, $offset);
 	}
-	
+
 	/**
 	 * @return false|KCurlHeaderResponse
 	 */
@@ -222,12 +228,12 @@ class KCurlWrapper
 		curl_setopt($this->ch, CURLOPT_BINARYTRANSFER, true);
 		curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, 'KCurlWrapper::read_header');
 		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body');
-            
-		
+
+
 
 		if($this->protocol == self::HTTP_PROTOCOL_FTP)
 			$noBody = true;
-		
+
 		if($noBody)
 		{
 			curl_setopt($this->ch, CURLOPT_NOBODY, true);
@@ -236,22 +242,22 @@ class KCurlWrapper
 		{
 			curl_setopt($this->ch, CURLOPT_RANGE, '0-0');
 		}
-				
+
 		self::$headers = "";
         self::$lastHeader = false;
         curl_exec($this->ch);
         if(!self::$headers)
            return false;
-		
+
 
 		self::$headers = explode("\r\n", self::$headers);
 
 		$curlHeaderResponse = new KCurlHeaderResponse();
-		
+
 		if ( $this->protocol == self::HTTP_PROTOCOL_HTTP )
 		{
 			$header = reset(self::$headers);
-			
+
 			// this line is true if the protocol is HTTP (or HTTPS);
 			$matches = null;
 			if(preg_match('/HTTP\/?[\d.]{0,3} ([\d]{3}) ([^\n\r]+)/', $header, $matches))
@@ -259,7 +265,7 @@ class KCurlWrapper
 				$curlHeaderResponse->code = $matches[1];
 				$curlHeaderResponse->codeName = $matches[2];
 			}
-			
+
 			foreach ( self::$headers as $header )
 			{
 				if(!strstr($header, ':'))
@@ -271,11 +277,11 @@ class KCurlWrapper
 					}
 					continue;
 				}
-					
+
 				list($name, $value) = explode(':', $header, 2);
 				$curlHeaderResponse->headers[trim(strtolower($name))] = trim($value);
 			}
-			
+
 			if(!$noBody)
 			{
 				$matches = null;
@@ -297,18 +303,18 @@ class KCurlWrapper
 				$headerParts = explode(':', $header, 2);
 				if(count($headerParts) < 2)
 					continue;
-					
+
 				list($name, $value) = $headerParts;
 				$curlHeaderResponse->headers[trim(strtolower($name))] = trim($value);
 			}
-	
+
 			// if this is a good ftp url - there will be a content-length header
 			$length = @$curlHeaderResponse->headers["content-length"];
 			if ( $length > 0 )
 			{
 				// this is equivalent to a good HTTP request
 				$curlHeaderResponse->code = KCurlHeaderResponse::HTTP_STATUS_OK;
-				$curlHeaderResponse->codeName = "OK";				
+				$curlHeaderResponse->codeName = "OK";
 			}
 			else
 			{
@@ -317,21 +323,21 @@ class KCurlWrapper
 					// example: curl: (10) the username and/or the password are incorrect
 					// in this case set the error code to unknown error and use the whole string as the description
 					$curlHeaderResponse->code = -1; // unknown error
-					$curlHeaderResponse->codeName = "curl: " . $curlHeaderResponse->headers["curl"] ;						
+					$curlHeaderResponse->codeName = "curl: " . $curlHeaderResponse->headers["curl"] ;
 				}
 				else
 				{
 					// example: curl: (10) the username and/or the password are incorrect
 					// in this case set the error code to unknown error and use the whole string as the description
 					$curlHeaderResponse->code = -1; // unknown error
-					$curlHeaderResponse->codeName = "Unknown FTP error" ;						
+					$curlHeaderResponse->codeName = "Unknown FTP error" ;
 				}
 			}
 		}
-		
+
 		return $curlHeaderResponse;
 	}
-	
+
 	/**
 	 * @param string $destFile
 	 * @return boolean
@@ -341,27 +347,27 @@ class KCurlWrapper
 		$returnTransfer = is_null($destFile);
 		if (!is_null($destFile))
 			$destFd = fopen($destFile, "ab");
-		
+
 		curl_setopt($this->ch, CURLOPT_HEADER, false);
 		curl_setopt($this->ch, CURLOPT_NOBODY, false);
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, $returnTransfer);
 		if (!is_null($destFile))
 			curl_setopt($this->ch, CURLOPT_FILE, $destFd);
-		
+
 		$ret = curl_exec($this->ch);
-		
+
 		if (!is_null($destFile)) {
 			fclose($destFd);
 		}
-		
+
 		return $ret;
 	}
-	
+
 	public function close()
 	{
 		curl_close($this->ch);
 	}
-	
+
 	// will destroy all the relevant handles
 	public function __destruct()
 	{

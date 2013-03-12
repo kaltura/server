@@ -7,11 +7,11 @@
 /**
  * Will import a single URL and store it in the file system.
  * The state machine of the job is as follows:
- * 	 	parse URL	(youTube is a special case) 
+ * 	 	parse URL	(youTube is a special case)
  * 		fetch heraders (to calculate the size of the file)
  * 		fetch file
  * 		move the file to the archive
- * 		set the entry's new status and file details  (check if FLV) 
+ * 		set the entry's new status and file details  (check if FLV)
  *
  * @package Scheduler
  * @subpackage Import
@@ -25,7 +25,7 @@ class KAsyncImport extends KJobHandlerWorker
 	{
 		return KalturaBatchJobType::IMPORT;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getJobType()
 	 */
@@ -33,7 +33,7 @@ class KAsyncImport extends KJobHandlerWorker
 	{
 		return self::getType();
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::exec()
 	 */
@@ -41,7 +41,7 @@ class KAsyncImport extends KJobHandlerWorker
 	{
 		return $this->fetchFile($job, $job->data);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::getMaxJobsEachRun()
 	 */
@@ -49,38 +49,38 @@ class KAsyncImport extends KJobHandlerWorker
 	{
 		return 1;
 	}
-	
+
 	/*
-	 * Will take a single KalturaBatchJob and fetch the URL to the job's destFile 
+	 * Will take a single KalturaBatchJob and fetch the URL to the job's destFile
 	 */
 	private function fetchFile(KalturaBatchJob $job, KalturaImportJobData $data)
 	{
 		KalturaLog::debug("fetchFile($job->id)");
-		
+
 		$jobSubType = $job->jobSubType;
-		
+
 		$sshProtocols = array(
-			kFileTransferMgrType::SCP, 
+			kFileTransferMgrType::SCP,
 			kFileTransferMgrType::SFTP,
 		);
-		
+
 		if (in_array($jobSubType, $sshProtocols))
 		{
 		    // use SSH file transfer manager for SFTP/SCP
             return $this->fetchFileSsh($job, $data);
 		}
-		
+
 		try
 		{
 			$sourceUrl = $data->srcFileUrl;
 			KalturaLog::debug("sourceUrl [$sourceUrl]");
-			
+
 			$this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED);
 			$fileSize = null;
 			$resumeOffset = 0;
 			if ($data->destFileLocalPath && file_exists($data->destFileLocalPath) )
-			{ 
-    			$curlWrapper = new KCurlWrapper($sourceUrl, $this->taskConfig->params->curlVerbose);
+			{
+    			$curlWrapper = new KCurlWrapper($sourceUrl, $this->taskConfig->params);
     			$useNoBody = ($job->executionAttempts > 1); // if the process crashed first time, tries with no body instead of range 0-0
     			$curlHeaderResponse = $curlWrapper->getHeader($useNoBody);
     			if(!$curlHeaderResponse || !count($curlHeaderResponse->headers))
@@ -88,26 +88,26 @@ class KAsyncImport extends KJobHandlerWorker
     				$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlWrapper->getErrorNumber(), "Couldn't read file. Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::FAILED);
     				return $job;
     			}
-    			
+
     			if($curlWrapper->getError())
     			{
     				KalturaLog::err("Headers error: " . $curlWrapper->getError());
     				KalturaLog::err("Headers error number: " . $curlWrapper->getErrorNumber());
     				$curlWrapper->close();
-    				
-    				$curlWrapper = new KCurlWrapper($sourceUrl, $this->taskConfig->params->curlVerbose);
+
+    				$curlWrapper = new KCurlWrapper($sourceUrl, $this->taskConfig->params);
     			}
-    			
+
     			if(!$curlHeaderResponse->isGoodCode())
     			{
     				$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, "Failed while reading file. HTTP Error: " . $curlHeaderResponse->code . " " . $curlHeaderResponse->codeName, KalturaBatchJobStatus::FAILED);
     				return $job;
     			}
-    			
+
     			if(isset($curlHeaderResponse->headers['content-length']))
     				$fileSize = $curlHeaderResponse->headers['content-length'];
     			$curlWrapper->close();
-    			
+
     			if( $fileSize )
     			{
     				clearstatcache();
@@ -122,9 +122,9 @@ class KAsyncImport extends KJobHandlerWorker
     				}
     			}
 			}
-			
-			$curlWrapper = new KCurlWrapper($sourceUrl, $this->taskConfig->params->curlVerbose);
-			$curlWrapper->setTimeout($this->taskConfig->params->curlTimeout);	
+
+			$curlWrapper = new KCurlWrapper($sourceUrl, $this->taskConfig->params);
+			$curlWrapper->setTimeout($this->taskConfig->params->curlTimeout);
 
 			if(is_null($fileSize)) {
 				// Read file size
@@ -132,25 +132,25 @@ class KAsyncImport extends KJobHandlerWorker
 				if($curlHeaderResponse && count($curlHeaderResponse->headers) && !$curlWrapper->getError() && isset($curlHeaderResponse->headers['content-length']))
 					$fileSize = $curlHeaderResponse->headers['content-length'];
 			}
-				
+
 			if($resumeOffset)
 			{
 				$curlWrapper->setResumeOffset($resumeOffset);
 			}
 			else
 			{
-				// creates a temp file path 	
-				$destFile = $this->getTempFilePath($sourceUrl);			
+				// creates a temp file path
+				$destFile = $this->getTempFilePath($sourceUrl);
 				KalturaLog::debug("destFile [$destFile]");
 				$data->destFileLocalPath = $destFile;
 				$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
 			}
-			
+
 			KalturaLog::debug("Executing curl");
 			$res = $curlWrapper->exec($data->destFileLocalPath);
 			KalturaLog::debug("Curl results: $res");
-		
+
 			if(!$res || $curlWrapper->getError())
 			{
 				$errNumber = $curlWrapper->getErrorNumber();
@@ -179,13 +179,13 @@ class KAsyncImport extends KJobHandlerWorker
 				}
 			}
 			$curlWrapper->close();
-			
+
 			if(!file_exists($data->destFileLocalPath))
 			{
 				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, "Error: output file doesn't exist", KalturaBatchJobStatus::RETRY);
 				return $job;
 			}
-			
+
 			// check the file size only if its first or second retry
 			// in case it failed few times, taks the file as is
 			if($fileSize)
@@ -201,10 +201,10 @@ class KAsyncImport extends KJobHandlerWorker
 					return $job;
 				}
 			}
-			
-			
+
+
 			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
-			
+
 			$job = $this->moveFile($job, $data->destFileLocalPath, $fileSize);
 		}
 		catch(Exception $ex)
@@ -213,39 +213,39 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 		return $job;
 	}
-	
-	
+
+
 	/*
-	 * Will take a single KalturaBatchJob and fetch the URL to the job's destFile 
+	 * Will take a single KalturaBatchJob and fetch the URL to the job's destFile
 	 */
 	private function fetchFileSsh(KalturaBatchJob $job, KalturaSshImportJobData $data)
 	{
 		KalturaLog::debug("fetchFile($job->id)");
-		
+
 		try
 		{
 			$sourceUrl = $data->srcFileUrl;
 			KalturaLog::debug("sourceUrl [$sourceUrl]");
-			
+
             // extract information from URL and job data
 			$parsedUrl = parse_url($sourceUrl);
-			
+
 			$host = isset($parsedUrl['host']) ? $parsedUrl['host'] : null;
 			$remotePath = isset($parsedUrl['path']) ? $parsedUrl['path'] : null;
 			$username = isset($parsedUrl['user']) ? $parsedUrl['user'] : null;
 			$password = isset($parsedUrl['pass']) ? $parsedUrl['pass'] : null;
 			$port = isset($parsedUrl['port']) ? $parsedUrl['port'] : null;
-			
+
 			$privateKey = isset($data->privateKey) ? $data->privateKey : null;
 			$publicKey  = isset($data->publicKey) ? $data->publicKey : null;
 			$passPhrase = isset($data->passPhrase) ? $data->passPhrase : null;
-			
+
 			KalturaLog::debug("host [$host] remotePath [$remotePath] username [$username] password [$password] port [$port]");
 			if ($privateKey || $publicKey) {
 			    KalturaLog::debug("Private Key: $privateKey");
 			    KalturaLog::debug("Public Key: $publicKey");
 			}
-			
+
 			if (!$host) {
 			    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, 'Error: missing host', KalturaBatchJobStatus::FAILED);
 			    return $job;
@@ -254,17 +254,17 @@ class KAsyncImport extends KJobHandlerWorker
 			    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, 'Error: missing path', KalturaBatchJobStatus::FAILED);
 			    return $job;
 			}
-			
+
 			// create suitable file transfer manager object
 			$subType = $job->jobSubType;
 			$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
 			$fileTransferMgr = kFileTransferMgr::getInstance($subType, $engineOptions);
-			
+
 			if (!$fileTransferMgr) {
 			    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, "Error: file transfer manager not found for type [$subType]", KalturaBatchJobStatus::FAILED);
 			    return $job;
 			}
-			
+
 			// login to server
 			if (!$privateKey || !$publicKey) {
 			    $fileTransferMgr->login($host, $username, $password, $port);
@@ -274,34 +274,34 @@ class KAsyncImport extends KJobHandlerWorker
 			    $publicKeyFile = $this->getFileLocationForSshKey($publicKey, 'publicKey');
 			    $fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase);
 			}
-			
+
 			// check if file exists
 			$fileExists = $fileTransferMgr->fileExists($remotePath);
 			if (!$fileExists) {
 			    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, "Error: remote file [$remotePath] does not exist", KalturaBatchJobStatus::FAILED);
 			    return $job;
 			}
-			
+
 			// get file size
 			$fileSize = $fileTransferMgr->fileSize($remotePath);
-			
-            // create a temp file path 				
-			$destFile = $this->getTempFilePath($remotePath);				
+
+            // create a temp file path
+			$destFile = $this->getTempFilePath($remotePath);
 			$data->destFileLocalPath = $destFile;
 			$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 			KalturaLog::debug("destFile [$destFile]");
-			
+
 			// download file - overwrite local if exists
 			$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
 			KalturaLog::debug("Downloading remote file [$remotePath] to local path [$destFile]");
 			$res = $fileTransferMgr->getFile($remotePath, $destFile);
-			
+
 			if(!file_exists($data->destFileLocalPath))
 			{
 				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, "Error: output file doesn't exist", KalturaBatchJobStatus::RETRY);
 				return $job;
 			}
-				
+
 			// check the file size only if its first or second retry
 			// in case it failed few times, taks the file as is
 			if($fileSize)
@@ -316,9 +316,9 @@ class KAsyncImport extends KJobHandlerWorker
 					return $job;
 				}
 			}
-			
+
 			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
-			
+
 			$job = $this->moveFile($job, $data->destFileLocalPath, $fileSize);
 		}
 		catch(Exception $ex)
@@ -327,7 +327,7 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 		return $job;
 	}
-	
+
 	/**
 	 * @param KalturaBatchJob $job
 	 * @param string $destFile
@@ -337,25 +337,25 @@ class KAsyncImport extends KJobHandlerWorker
 	private function moveFile(KalturaBatchJob $job, $destFile, $fileSize = null)
 	{
 		KalturaLog::debug("moveFile($job->id, $destFile, $fileSize)");
-		
+
 		try
 		{
-			// creates a shared file path 
+			// creates a shared file path
 			$rootPath = $this->taskConfig->params->sharedTempPath;
-			
+
 			$res = self::createDir( $rootPath );
-			if ( !$res ) 
+			if ( !$res )
 			{
 				KalturaLog::err( "Cannot continue import without shared directory");
-				die(); 
+				die();
 			}
 			$uniqid = uniqid('import_');
 			$sharedFile = $rootPath . DIRECTORY_SEPARATOR . $uniqid;
-			
+
 			$ext = pathinfo($destFile, PATHINFO_EXTENSION);
 			if(strlen($ext))
 				$sharedFile .= ".$ext";
-			
+
 			KalturaLog::debug("rename('$destFile', '$sharedFile')");
 			rename($destFile, $sharedFile);
 			if(!file_exists($sharedFile))
@@ -363,7 +363,7 @@ class KAsyncImport extends KJobHandlerWorker
 				KalturaLog::err("Error: renamed file doesn't exist");
 				die();
 			}
-				
+
 			clearstatcache();
 			if($fileSize)
 			{
@@ -377,13 +377,13 @@ class KAsyncImport extends KJobHandlerWorker
 			{
 				$fileSize = kFile::fileSize($sharedFile);
 			}
-			
+
 			@chmod($sharedFile, 0777);
-			
+
 			$data = $job->data;
 			$data->destFileLocalPath = $sharedFile;
 			$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
-			
+
 			if($this->checkFileExists($sharedFile, $fileSize))
 			{
 				$this->closeJob($job, null, null, 'Succesfully moved file', KalturaBatchJobStatus::FINISHED, $data);
@@ -399,44 +399,44 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 		return $job;
 	}
-	
+
 	/*
-	 * Lazy saving of the key to a temporary path, the key will exist in this location until the temp files are purged 
+	 * Lazy saving of the key to a temporary path, the key will exist in this location until the temp files are purged
 	 */
-	protected function getFileLocationForSshKey($keyContent, $prefix = 'key') 
+	protected function getFileLocationForSshKey($keyContent, $prefix = 'key')
 	{
 		$tempDirectory = sys_get_temp_dir();
-		$fileLocation = tempnam($tempDirectory, $prefix);		
+		$fileLocation = tempnam($tempDirectory, $prefix);
 		file_put_contents($fileLocation, $keyContent);
 		return $fileLocation;
 	}
-	
-	
+
+
 	protected function getTempFilePath($remotePath)
 	{
-	    // create a temp file path 
+	    // create a temp file path
 		$rootPath = $this->taskConfig->params->localTempPath;
-			
+
 		$res = self::createDir( $rootPath );
-		if ( !$res ) 
+		if ( !$res )
 		{
 			KalturaLog::err( "Cannot continue import without temp directory");
-			die(); 
+			die();
 		}
-			
+
 		$uniqid = uniqid('import_');
 		$destFile = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
-		
+
 		// in case the url has added arguments, remove them (and reveal the real URL path)
 		// in order to find the file extension
 		$urlPathEndIndex = strpos($remotePath, "?");
 		if ($urlPathEndIndex !== false)
 			$remotePath = substr($remotePath, 0, $urlPathEndIndex);
-			
+
 		$ext = pathinfo($remotePath, PATHINFO_EXTENSION);
 		if(strlen($ext))
 			$destFile .= ".$ext";
-			
+
 		return $destFile;
 	}
 }
