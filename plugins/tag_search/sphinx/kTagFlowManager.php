@@ -73,7 +73,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     			$privacyContexts = explode(",", $category->getPrivacyContexts());
     			if (!count($privacyContexts))
     				$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT; 
-    			$this->addOrIncrementTags(entryPeer::retrieveByPK($object->getEntryId()));
+    			$this->addOrIncrementTags(entryPeer::retrieveByPK($object->getEntryId()),null, $privacyContexts);
     		}
     	}
     	catch(Exception $e)
