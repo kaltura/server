@@ -42,7 +42,7 @@ var kmc = {
 <?php if( $previewEmbedV2 ) { ?>
 <!-- Preview & Embed Modal -->
 <div id="previewModal" class="modal preview_embed" ng-controller="PreviewCtrl">
-	<div class="title">
+	<div class="title clearfix">
 		<h2></h2>
 		<span class="close icon"></span>		
 		<a class="help icon" href="javascript:kmc.utils.openHelp('section_pne');"></a>
@@ -110,7 +110,7 @@ var kmc = {
 					<label class="control-label">Embed Code: </label>
 				</div>
 				<div class="input-append">
-				  <input class="span2" id="embedCode" type="text" value="{{embedCode}}">
+				  <textarea class="span2" id="embedCode">{{embedCode}}</textarea>
 				  <button class="btn copy-code" data-clipboard-target="embedCode">Copy</button>
 				</div>
 			</div>
@@ -122,11 +122,7 @@ var kmc = {
 	</div>
 </div>
 <script src="/lib/js/angular-1.0.4.min.js"></script>
-<script src="/lib/js/KalturaEmbedCodeGenerator-1.0.6.min.js"></script>
-<script src="/lib/js/jquery.qrcode-0.2.min.js"></script>
-<script src="/lib/js/ZeroClipboard.min.js"></script>
-<script src="/lib/js/preview.js?v=<?php echo $kmc_swf_version; ?>"></script>
-<script src="/lib/js/kmc6.js?v=<?php echo $kmc_swf_version; ?>"></script>
+<script src="/lib/js/kmc-full-6.0.0.min.js?v=<?php echo $kmc_swf_version; ?>"></script>
 <?php } else { ?> 
 <script type="text/javascript" src="/lib/js/kmc5.js?v=<?php echo $kmc_swf_version; ?>"></script>
 <?php } ?>
