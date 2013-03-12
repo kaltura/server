@@ -2,7 +2,7 @@
 /**
  * @package plugins.tagSearch
  */
-class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory, IKalturaSphinxConfiguration, IKalturaEventConsumers, IKalturaServices, IKalturaConfigurator
+class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory, IKalturaSphinxConfiguration, IKalturaEventConsumers, IKalturaServices, IKalturaConfigurator, IKalturaEnumerator
 {
     const PLUGIN_NAME = "tagSearch";
     
@@ -78,5 +78,28 @@ class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory,
 		return null;
 	}
 	
+
+	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		if(is_null($baseEnumName))
+			return array('TagResolveBatchJobType');
+		
+		if($baseEnumName == 'BatchJobType')
+			return array('TagResolveBatchJobType');
+			
+		return array();
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBatchJobTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BatchJobType', $value);
+	}
 	
 }
