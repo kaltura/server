@@ -1,7 +1,7 @@
 // Prevent the page to be framed
-if(top != window) { top.location = window.location; }
+if(kmc.vars.allowFrame == false && top != window) { top.location = window.location; }
 
-/* kmc and kmc.vars defined in script block in kmc4success.php */
+/* kmc and kmc.vars defined in script block in kmc4Action.class.php */
 
 // For debug enable to true. Debug will show information in the browser console
 kmc.vars.debug = false;
