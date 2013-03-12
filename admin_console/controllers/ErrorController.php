@@ -6,57 +6,59 @@
 class ErrorController extends Zend_Controller_Action
 {
 	const ACL_RESOURCE_NOT_EXCEPTION_PATTERN = '/Resource \'\\w*\' not found/';
-	
+
 	public function errorAction()
 	{
 		$this->_helper->layout->disableLayout();
 		$errors = $this->_getParam('error_handler');
-		
+
+		$exception = $errors->exception;
+		$this->view->exception	= $exception;
+		KalturaLog::err($exception);
+
 		// handle kaltura session expired
-		if (get_class($errors->exception) == 'Kaltura_Client_Exception')
+		if ($exception instanceof Kaltura_Client_Exception && strpos($exception->getMessage(), 'EXPIRED'))
 		{
-			if (strpos($errors->exception->getMessage(), 'EXPIRED'))
-			{
-				Infra_AuthHelper::getAuthInstance()->clearIdentity();
-				$this->_helper->redirector('login', 'user');
-			}
+			Infra_AuthHelper::getAuthInstance()->clearIdentity();
+			$this->_helper->redirector('login', 'user');
 		}
-		
+
 		// handle Zend MVC errors
-		switch ($errors->type) 
-		{ 
+		switch ($errors->type)
+		{
 			case Zend_Controller_Plugin_ErrorHandler::EXCEPTION_NO_CONTROLLER:
 			case Zend_Controller_Plugin_ErrorHandler::EXCEPTION_NO_ACTION:
-				$this->handleNotFoundException($errors->exception);
+				$this->handleNotFoundException($exception);
 				break;
 			default:
-				if (preg_match(self::ACL_RESOURCE_NOT_EXCEPTION_PATTERN, $errors->exception->getMessage()))
-					$this->handleNotFoundException($errors->exception);
+				if (preg_match(self::ACL_RESOURCE_NOT_EXCEPTION_PATTERN, $exception->getMessage()))
+					$this->handleNotFoundException($exception);
 				else
-					$this->handleApplicationException($errors->exception);
+					$this->handleApplicationException($exception);
 				break;
 		}
-		
-		$this->view->exception = $errors->exception;
-		$this->view->request   = $errors->request;
-	}
-	
-	public function deniedAction()
-	{
-		$this->_helper->layout->disableLayout();
-		die('Access denied');
-	}
-	
-	public function handleNotFoundException(Exception $ex)
-	{
-		$this->getResponse()->setHttpResponseCode(404);
-		$this->_helper->viewRenderer('not-found');
 	}
 
-	public function handleApplicationException(Exception $ex)
+	public function deniedAction()
 	{
-		KalturaLog::ERR($ex);
+		Infra_AuthHelper::getAuthInstance()->clearIdentity();
+		$this->_helper->viewRenderer('error');
+		$this->view->code	= Kaltura_HostedException::ERROR_CODE_ACCESS_DENIED;
+		$this->getResponse()->setHttpResponseCode(403);
+		$this->getResponse()->setHeader(Kaltura_HostedException::KALTURA_HEADER_ERROR_CODE, $this->view->code, true);
+	}
+
+	protected function handleNotFoundException(Exception $ex)
+	{
+		$this->view->code	= Kaltura_HostedException::ERROR_CODE_PAGE_NOT_FOUND;
+		$this->getResponse()->setHttpResponseCode(404);
+		$this->getResponse()->setHeader(Kaltura_HostedException::KALTURA_HEADER_ERROR_CODE, $this->view->code, true);
+	}
+
+	protected function handleApplicationException(Exception $ex)
+	{
+		$this->view->code	= Kaltura_HostedException::getErrorCode($ex);
 		$this->getResponse()->setHttpResponseCode(500);
-		$this->view->message = 'Application error';
+		$this->getResponse()->setHeader(Kaltura_HostedException::KALTURA_HEADER_ERROR_CODE, $this->view->code, true);
 	}
 }
