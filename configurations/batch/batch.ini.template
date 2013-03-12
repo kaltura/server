@@ -18,11 +18,6 @@ dwhEnabled											= 0
 timezone											= @TIME_ZONE@
 statusInterval										= 300
 enabledWorkers.KScheduleHelper						= 1
-
-
-[@BATCH_HOST_NAME@ : template]
-id													= 1
-name												= Default Scheduler
 enabledWorkers.DirectoryCleanupLocal				= 1
 enabledWorkers.DirectoryCleanupShared				= 1
 enabledWorkers.DirectoryCleanupBatchLogs			= 1

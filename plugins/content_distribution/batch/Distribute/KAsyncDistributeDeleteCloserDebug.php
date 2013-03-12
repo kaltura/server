@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package plugins.contentDistribution 
+ * @package plugins.contentDistribution
  * @subpackage Scheduler.Distribute.Debug
  */
 
@@ -10,7 +10,7 @@ chdir(dirname( __FILE__ ) . "/../../../../batch");
 
 require_once("bootstrap.php");
 
-$iniFile = "../configurations/batch.ini";			// should be the full file path
+$iniFile = "../configurations/batch";			// should be the full file path
 
 $kdebuger = new KGenericDebuger($iniFile);
 $kdebuger->run('KAsyncDistributeDeleteCloser');

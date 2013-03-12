@@ -9,7 +9,7 @@ chdir(dirname(__FILE__) . "/../../../../batch");
 
 require_once ("bootstrap.php");
 
-$iniFile = realpath(dirname(__FILE__) . "/../../../../configurations/batch.ini");
+$iniFile = realpath(dirname(__FILE__) . "/../../../../configurations/batch");
 
 $kdebuger = new KGenericDebuger($iniFile);
 $kdebuger->run('KAsyncDispatchEventNotification');

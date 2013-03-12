@@ -6,7 +6,7 @@
 chdir(dirname( __FILE__ ) . "/../../");
 require_once("bootstrap.php");
 
-$iniFile = "../configurations/batch.ini";		// should be the full file path
+$iniDir = "../configurations/batch";		// should be the full file path
 
-$kdebuger = new KGenericDebuger($iniFile);
+$kdebuger = new KGenericDebuger($iniDir);
 $kdebuger->run('KAsyncMailer');

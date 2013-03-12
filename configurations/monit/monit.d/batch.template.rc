@@ -4,13 +4,7 @@
            stop program = "/etc/init.d/kaltura_batch stop"
            #if 10 restarts within 10 cycles then timeout
            group kaltura
-           depends on batch.ini, batch_script
-
-        check file batch.ini
-            with path @APP_DIR@/configurations/batch.ini
-            # Reload batch if the batch.ini file was changed
-            if changed checksum
-               then exec "/etc/init.d/kaltura_batch restart"
+           depends on batch_script
 
         check file batch_script
             with path @APP_DIR@/batch/KGenericBatchMgr.class.php

@@ -22,7 +22,7 @@ if [ $# != 1 ]; then
 	exit 0 	
 fi
 
-CONFIG_FILE=$APP_DIR/configurations/batch.ini
+CONFIG_FILE=$APP_DIR/configurations/batch
 
 LOCKFILE="$LOG_DIR/batch/batch.pid"
 

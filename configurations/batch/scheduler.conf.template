@@ -1,0 +1,3 @@
+
+[@INSTALLED_HOSNAME@ : template]
+id	= @BATCH_SCHEDULER_ID@

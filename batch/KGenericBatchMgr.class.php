@@ -1,6 +1,6 @@
 <?php
 /**
- *  
+ *
  * @package Scheduler
  */
 
@@ -19,20 +19,20 @@ else if(isset($_SERVER['PHP_PEAR_PHP_BIN']))
 {
 	$phpPath = $_SERVER['PHP_PEAR_PHP_BIN'];
 }
-	
-$iniFile = dirname ( __FILE__ ) . "/../configurations/batch.ini";		// should be the full file path
+
+$iniDir = dirname ( __FILE__ ) . "/../configurations/batch";		// should be the full file path
 
 if(isset($argc) && $argc > 2)
 {
-	$iniFile = $argv[2];
+	$iniDir = $argv[2];
 }
 
-if(!file_exists($iniFile))
+if(!file_exists($iniDir))
 {
-	die("Configuration file [$iniFile] not found.");
+	die("Configuration file [$iniDir] not found.");
 }
-	
+
 require_once("bootstrap.php");
 
-$kscheduler = new KGenericScheduler($phpPath, $iniFile);
+$kscheduler = new KGenericScheduler($phpPath, $iniDir);
 $kscheduler->run();
