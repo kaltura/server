@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html ng-app="kmcApp" class="no-js lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html ng-app="kmcApp" class="no-js lt-ie10 lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html ng-app="kmcApp" class="no-js lt-ie10 lt-ie9"> <![endif]-->
-<!--[if lt IE 10]>     <html ng-app="kmcApp" class="no-js lt-ie10"> <![endif]-->
-<!--[if gt IE 8]><!--> <html ng-app="kmcApp" class="no-js"> <!--<![endif]-->
+<!--[if lt IE 7]>      <html class="no-js lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie10 lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie10 lt-ie9"> <![endif]-->
+<!--[if lt IE 10]>     <html class="no-js lt-ie10"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 <head>
 <base href="<?php echo requestUtils::getRequestHost() ?>/" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -18,7 +18,7 @@
 <script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/swfobject_v2.2.js"></script>
 
 </head>
-<body>
+<body id="ng-app" ng-app="kmcApp">
  <div id="wrap">
  <?php echo $sf_content ?>
  </div>
