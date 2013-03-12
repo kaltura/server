@@ -1,0 +1,278 @@
+@charset "utf-8";
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font: normal 62.5% arial, sans-serif;
+	background: #272929 url(../images/page_bg.png) repeat-x 0 -2px;
+}
+
+p,ul {
+	margin-bottom: .75em;
+}
+
+a,a:active,a:visited {
+	color: #3895e4;
+}
+
+a:hover {
+	color: #faa61a;
+}
+
+#menu a {
+	text-decoration: none;
+}
+
+#menu a:hover {
+	text-decoration: underline;
+}
+
+
+code,pre {
+	margin: 11px;
+	display: block;
+	padding: 10px;
+	font-size: 12px;
+	font-family: monospace;
+	border: 1px solid #cccccc;
+}
+
+pre {
+	border: none;
+	padding: 0px;
+}
+
+h1 {
+	font-size: 20px;
+	margin: 7px 0 10px 3px;
+	color: #fff;
+}
+
+h1 img {
+	margin-top: 1px;
+	float: left;
+}
+
+h2 {
+	font-size: 18px;
+	color: #2F3737;
+}
+
+h3 {
+	font-size: 14px;
+	padding-top: 0.75em;
+	margin-bottom: 0.5em;
+}
+
+p,ul,td {
+	font-size: 14px;
+}
+
+ul {
+	margin: 0 11px 22px;
+	list-style: circle inside none;
+}
+
+li {
+	margin: 0 0 6px 15px;
+	list-style: circle outside none;
+}
+
+
+#pageWrap {
+	margin: 0 10px;
+}
+
+#insideWrap {
+	widths: 100%;
+	padding: 5px 18px 25px;
+	displays: table;
+	background: #F8F8F8 url(../images/bg.png) repeat-x;
+}
+
+#menu {
+	width: 202px;
+	padding: 4px;
+	border: solid 1px #CFD7D7;
+	margin-top: 21px;
+	float: left;
+	background: #fff;
+	height: 300px;
+	padding: 11px;
+	background: #fff url(../images/sidebg.png) repeat-x 0 bottom;
+}
+
+
+#menu li.active {
+	font-weight: bold;
+	color: #222;
+	list-style-image: url(../images/arrow.gif);
+}
+
+#menu li.done {
+	list-style-image: url(../images/passed_step.png);
+}
+
+#content {
+	margin: 21px 0 0 222px;
+	padding: 14px 11px 0 15px;
+}
+
+#systemStatus div.passed,#systemStatus div.failed {
+	padding: 20px 22px 9px;
+	border: solid 2px green;
+}
+
+#systemStatus div.failed {
+	border-color: #b91a00;
+}
+
+#systemStatus strong {
+	color: #222;
+}
+
+#systemStatus .verify {
+	margin: 4px;
+	padding: 4px;
+	padding-left: 26px;
+}
+
+#systemStatus li.passed {
+	background: url(../images/passed.png) no-repeat 2px 50%;
+}
+
+#systemStatus .passed strong {
+	color: green;
+}
+
+#systemStatus li.failed {
+	background: url(../images/failed.png) no-repeat 2px 50%;
+	font-weight: bold;
+	color: #b91a00;
+}
+
+#systemStatus li.optional {
+	background: url(../images/optional.png) no-repeat 2px 50%;
+	list-style-type: none;
+}
+
+.status_error {
+	color: #b91a00;
+	font-weight: bold;
+}
+
+.help {
+	color: green;
+}
+
+ul#status_list {
+	margin-top: 22px;
+}
+
+ul#status_list li {
+	list-style-type: none;
+}
+
+#db_setup div {
+	font-size: 14px;
+}
+
+#systemStatus .fieldName {
+	width: 144px;
+	padding-bottom: 5px;
+}
+
+#systemStatus .theField {
+	width: 356px;
+	padding-bottom: 5px;
+}
+
+#systemStatus .theField input {
+	width: 300px;
+	border: solid 1px #B5CBD3;
+	height: 18px;
+	padding-top: 2px;
+	padding-left: 2px;
+}
+
+#systemStatus .fieldDescribe {
+	font-size: 10px;
+	padding-bottom: 10px;
+}
+
+#db_setup p {
+	margin-top: 11px;
+}
+
+#db_setup h4,#gnrl_info h4 {
+	margin: 0 0 8px 0;
+	color: #2F3737;
+}
+
+td p {
+	margin: 3px 0;
+}
+
+#systemStatus #db_setup div.failed {
+	padding: 18px 20px 5px;
+	margin-bottom: 25px;
+}
+
+#systemStatus #db_setup div.failed h2 {
+	color: #b91a00;
+	font-size: 14px;
+}
+
+#systemStatus #db_setup div.failed li {
+	list-style-type: disc;
+}
+
+#body li {
+	list-style-position: outside;
+	margin-left: 11px;
+	max-width: 1100px;
+}
+
+#body #systemStatus p {
+	margin-bottom: .5em;
+	margin-left: 5px;
+}
+
+#body p,#body li {
+	max-width: 1100px;
+}
+
+#body li p {
+	margin: 3px 0 9px;
+}
+
+#body div.failed,#body div.passed {
+	margin-bottom: 33px;
+}
+
+#body h3 span,#integrate h2 span {
+	padding-left: 22px;
+	font-weight: normal;
+	color: #666;
+}
+
+#body h3 span a,#integrate h2 span a {
+	color: #666;
+}
+
+#integrate h2 span {
+	font-size: 12px;
+}
+
+.error_hidden {
+	display: none;
+}
+
+.error_visible {
+	display: inline;
+	padding-left: 8px;
+	color: #b91a00;
+}
