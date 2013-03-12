@@ -86,7 +86,7 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	public static function getType()
 	{
-		throw new Exception("getType must be overidden");
+		throw new Exception("Method getType must be overridden");
 	}
 
 	/**
