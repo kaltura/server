@@ -28,8 +28,12 @@ class TagPeer extends BaseTagPeer
 		
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$privacyContexts = kEntitlementUtils::getKsPrivacyContext();
-			$c->addAnd(self::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
+			$privacyContexts = kEntitlementUtils::getKsPrivacyContextArray();
+			$c->addAnd(self::PRIVACY_CONTEXT, Tag::getIndexedFieldValue('TagPeer::PRIVACY_CONTEXT', $privacyContexts, kCurrentContext::getCurrentPartnerId()), Criteria::IN);
+		}
+		else 
+		{
+			$c->addAnd(self::PRIVACY_CONTEXT, Tag::getIndexedFieldValue('TagPeer::PRIVACY_CONTEXT', kTagFlowManager::NULL_PC, kCurrentContext::getCurrentPartnerId()));
 		}
 		
 		self::$s_criteria_filter->setFilter($c);

@@ -22,6 +22,7 @@ class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory,
 		    'tag' => SphinxFieldType::RT_FIELD,
 		    'object_type' => SphinxFieldType::RT_FIELD,
 		    'partner_id' => SphinxFieldType::RT_FIELD,
+			'privacy_context' => SphinxFieldType::RT_FIELD,
 		    'instance_count' => SphinxFieldType::RT_ATTR_BIGINT,
 		    'created_at' => SphinxFieldType::RT_ATTR_TIMESTAMP,
 		);
