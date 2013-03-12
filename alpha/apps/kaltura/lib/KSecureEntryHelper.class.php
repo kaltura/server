@@ -256,15 +256,15 @@ class KSecureEntryHelper
 					$valid = $ks->isValidForPartner($ks->partner_id);
 				}
 				if ($valid === ks::EXPIRED)
-					die("This URL is expired");
+					KExternalErrors::dieError(KExternalErrors::KS_EXPIRED, "This URL is expired");
 				else if ($valid === ks::INVALID_PARTNER)
 				{
 					if ($this->hasRules()) // TODO - for now if the entry doesnt have restrictions any way disregard a partner group check
-						die("Invalid session [".$valid."]");
+						KExternalErrors::dieError(KExternalErrors::INVALID_PARTNER, "Invalid session [".$valid."]");
 				}
 				else if ($valid !== ks::OK)
 				{
-					die("Invalid session [".$valid."]");
+					KExternalErrors::dieError(KExternalErrors::INVALID_KS, "Invalid session [".$valid."]");
 				}
 				
 				if ($ks->partner_id != $this->entry->getPartnerId())

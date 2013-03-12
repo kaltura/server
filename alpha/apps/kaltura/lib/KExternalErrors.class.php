@@ -35,6 +35,9 @@ class KExternalErrors
 	const EXPIRED_TOKEN = 28;
 	const PROCESSING_FEED_REQUEST = 29;
 	const SERVICE_ACCESS_CONTROL_RESTRICTED = 30;
+	const KS_EXPIRED = 31;
+	const INVALID_PARTNER = 32;
+	const ILLEGAL_UI_CONF = 33;
 	
 	private static $errorDescriptionMap = array(
 			self::ENTRY_NOT_FOUND => "requested entry not found",
@@ -67,6 +70,9 @@ class KExternalErrors
 			self::EXPIRED_TOKEN => "the supplied token is expired",
 			self::PROCESSING_FEED_REQUEST => "the supplied feed is already being processed",
 			self::SERVICE_ACCESS_CONTROL_RESTRICTED => "action restricted due to access-control",
+			self::KS_EXPIRED => "The given KS has expired",
+			self::INVALID_PARTNER => "The given partner isn't vaild for the request",
+			self::ILLEGAL_UI_CONF => "The given UI conf is illegal",
 	);
 	
 	public static function dieError($errorCode, $message = null)

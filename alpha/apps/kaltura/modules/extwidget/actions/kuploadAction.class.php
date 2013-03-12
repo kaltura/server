@@ -16,7 +16,7 @@ class kuploadAction extends sfAction
 		
 		if ( !$uiConf )
 		{
-			die();	
+			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND, "UI conf not found");	
 		}
 		
 		$partner_id = $uiConf->getPartnerId();
@@ -27,7 +27,7 @@ class kuploadAction extends sfAction
 		$ui_conf_swf_url = $uiConf->getSwfUrl();
 		if (!$ui_conf_swf_url)
 		{
-			die();
+			KExternalErrors::dieError(KExternalErrors::ILLEGAL_UI_CONF, "SWF URL not found in UI conf");
 		}
 			
 		if( kString::beginsWith( $ui_conf_swf_url , "http") )
@@ -49,6 +49,7 @@ class kuploadAction extends sfAction
 			"&uiConfId=" . $ui_conf_id.
 			$conf_vars;
 			
+		KExternalErrors::terminateDispatch();
 		$this->redirect(  "$swf_url?$params");
 	}
 }
