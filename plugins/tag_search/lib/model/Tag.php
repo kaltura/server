@@ -15,6 +15,8 @@
  */
 class Tag extends BaseTag implements IIndexable
 {
+	const PRIVACY_CONTEXT_INDEX_PREFIX = "pc";
+	
 	/* (non-PHPdoc)
      * @see IIndexable::getIntId()
      */
@@ -55,6 +57,7 @@ class Tag extends BaseTag implements IIndexable
            'object_type' => 'objectType',
            'created_at' => 'createdAt',
            'instance_count' => 'instanceCount',
+           'privacy_context' => 'indexPrivacyContext',
        );
         
     }
@@ -62,10 +65,11 @@ class Tag extends BaseTag implements IIndexable
     private static $indexFieldTypes = array(
         'int_id' => IIndexable::FIELD_TYPE_INTEGER,
         'tag' => IIndexable::FIELD_TYPE_STRING,
-        'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
-        'object_type' => IIndexable::FIELD_TYPE_INTEGER,
+        'partner_id' => IIndexable::FIELD_TYPE_STRING,
+        'object_type' => IIndexable::FIELD_TYPE_STRING,
         'created_at' => IIndexable::FIELD_TYPE_DATETIME,
-    	'instance_count' => IIndexable::FIELD_TYPE_INTEGER
+    	'instance_count' => IIndexable::FIELD_TYPE_INTEGER,
+    	'privacy_context' => IIndexable::FIELD_TYPE_STRING,
 	);
 
 	
@@ -126,9 +130,42 @@ class Tag extends BaseTag implements IIndexable
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
     
+	/* (non-PHPdoc)
+	 * @see IIndexable::getSearchIndexFieldsEscapeType()
+	 */
 	public function getSearchIndexFieldsEscapeType($fieldName)
 	{
 		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 	}
 
+	public function getIndexPrivacyContext ()
+	{
+		return $this->getPartnerId() . self::PRIVACY_CONTEXT_INDEX_PREFIX . $this->getPrivacyContext();
+	}
+	
+	public static function getIndexedFieldValue ($fieldName, $fieldValue, $partnerId)
+	{
+		$prefix = null;
+		if ($fieldName == "TagPeer::PRIVACY_CONTEXT")
+		{
+			$prefix = self::PRIVACY_CONTEXT_INDEX_PREFIX;
+		}
+		if (!$prefix)
+			return null;
+			
+		if (is_string($fieldValue))
+			return $partnerId . $prefix . $fieldValue;
+			
+		if (is_array($fieldValue))
+		{
+			$indexedFieldValue = array();
+			foreach ($fieldValue as &$singleFieldValue)
+			{
+				$indexedFieldValue[] = $partnerId. $prefix . $singleFieldValue;
+			}
+			
+			return $indexedFieldValue;
+		}
+	}
+	
 } // Tag
