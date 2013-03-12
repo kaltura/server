@@ -5,6 +5,7 @@ class SphinxTagCriteria extends SphinxCriteria
            TagPeer::TAG => 'tag',
            TagPeer::PARTNER_ID => 'partner_id',
            TagPeer::OBJECT_TYPE => 'object_type',
+           TagPeer::PRIVACY_CONTEXT => 'privacy_context',
            TagPeer::INSTANCE_COUNT => 'instance_count',
            TagPeer::CREATED_AT => 'created_at',
        );
@@ -23,6 +24,9 @@ class SphinxTagCriteria extends SphinxCriteria
 	{
 		return in_array($fieldName, array(
 			"tag",
+			"partner_id",
+			"object_type",
+			"privacy_context"
 		));
 	}
 	
@@ -84,6 +88,6 @@ class SphinxTagCriteria extends SphinxCriteria
 	{
 	    return true;
 	}
-	
+
 	
 }
