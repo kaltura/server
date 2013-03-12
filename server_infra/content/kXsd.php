@@ -382,7 +382,7 @@ class kXsd
 		
 		foreach($enumerations as $enumeration)
 		{
-			$enumerationsValueToNode[] = $enumeration->getAttribute('value');
+			$enumerationsValueToNode[] = htmlspecialchars($enumeration->getAttribute('value'),ENT_QUOTES,'UTF-8');
 		}			
 		
 		
@@ -394,7 +394,7 @@ class kXsd
 		
 		foreach($enumerations as $enumeration)
 		{
-			$enumerationsValueFromNode[] = $enumeration->getAttribute('value');
+			$enumerationsValueFromNode[] = htmlspecialchars($enumeration->getAttribute('value'),ENT_QUOTES,'UTF-8');
 		}
 		
 		if (!count(array_diff($enumerationsValueFromNode, $enumerationsValueToNode)))
