@@ -22,9 +22,6 @@ class kmc4Action extends kalturaAction
 		
 		sfView::SUCCESS;
 
-		// Prevent the page fron being embeded in an iframe
-		header( 'X-Frame-Options: DENY' );
-
 		/** check parameters and verify user is logged-in **/
 		$this->ks = $this->getP ( "kmcks" );
 		if(!$this->ks)
@@ -42,6 +39,13 @@ class kmc4Action extends kalturaAction
 		$ksObj = kSessionUtils::crackKs($this->ks);
 		// Set partnerId from KS
 		$this->partner_id = $ksObj->partner_id;
+
+		// Check if the KMC can be framed
+		//$allowFrame = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ALLOW_FRAME, $this->partner_id);
+		$allowFrame = false;
+		if(!$allowFrame) {
+			header( 'X-Frame-Options: DENY' );
+		}
 		// Check for forced HTTPS
 		$force_ssl = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ENFORCE_HTTPS, $this->partner_id);
 		if( $force_ssl && (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') ) {
@@ -187,6 +191,7 @@ class kmc4Action extends kalturaAction
 			'google_analytics_account'	=> kConf::get("ga_account"),
 			'language'					=> $language,
 			'logoutUrl'					=> $logoutUrl,
+			'allowFrame'				=> (bool) $allowFrame,
 		);
 		
 		$this->kmcVars = $kmcVars;
