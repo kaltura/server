@@ -130,6 +130,7 @@ class categoryEntry extends BasecategoryEntry {
 					
 					$entry->save();
 				}
+				kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			}
 			
 			if($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING)
