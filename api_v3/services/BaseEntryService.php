@@ -817,25 +817,30 @@ class BaseEntryService extends KalturaEntryService
 			$isSecured = $isSecured || PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT_USED, $dbEntry->getPartnerId());
 			
 			$result->streamerType = $this->getPartner()->getStreamerType();
-			if (!$result->streamerType)
-			{
-				if($isSecured)
-					$result->streamerType = kConf::get('secured_default_streamer_type');
-				elseif($dbEntry->getDuration() <= kConf::get('short_entries_max_duration'))
-					$result->streamerType = kConf::get('short_entries_default_streamer_type');
-				else
-					$result->streamerType = kConf::get('default_streamer_type');
-			}
-				
 			$result->mediaProtocol = $this->getPartner()->getMediaProtocol();
-			if (!$result->mediaProtocol)
+			if (!$result->streamerType || !$result->mediaProtocol)
 			{
-				if($isSecured)
-					$result->mediaProtocol = kConf::get('secured_default_media_protocol');
-				elseif($dbEntry->getDuration() <= kConf::get('short_entries_max_duration'))
-					$result->mediaProtocol = kConf::get('short_entries_default_media_protocol');
-				else
-					$result->mediaProtocol = kConf::get('default_media_protocol');
+				$enabledDeliveryTypes = $this->getPartner()->getDeliveryTypes();
+				unset($enabledDeliveryTypes['auto']);
+				$deliveryType = null; 
+				if($isSecured && isset($enabledDeliveryTypes[kConf::get('secured_default_delivery_type')]))
+					$deliveryType = kConf::get('secured_default_delivery_type');
+				elseif($dbEntry->getDuration() <= kConf::get('short_entries_max_duration') 
+					&& isset($enabledDeliveryTypes[kConf::get('short_entries_default_delivery_type')]))
+					$deliveryType = kConf::get('short_entries_default_delivery_type');
+				else if (isset($enabledDeliveryTypes[kConf::get('default_delivery_type')]))
+					$deliveryType = kConf::get('default_delivery_type');
+				else if(count($enabledDeliveryTypes))
+					$deliveryType = key($enabledDeliveryTypes);
+				if (!$deliveryType)
+						throw new KalturaAPIException(KalturaErrors::DELIVERY_TYPE_NOT_SPECIFIED);
+						
+				if (!$result->streamerType){
+					$result->streamerType = kDeliveryUtils::getStreamerType($enabledDeliveryTypes[$deliveryType]);
+				}
+				if (!$result->mediaProtocol){
+					$result->mediaProtocol = kDeliveryUtils::getMediaProtocol($enabledDeliveryTypes[$deliveryType]);
+				}
 			}
 		}
 		
