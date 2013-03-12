@@ -11,8 +11,8 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 	public function parse($content)
 	{
 		$matches = null;
-		$regex = '(?P<index>\d+)\r?\n\s*(?P<startHours>\d{2}):(?P<startMinutes>\d{2}):(?P<startSeconds>\d{2}),(?P<startMilliseconds>\d{3})\s*-->\s*(?P<endHours>\d{2}):(?P<endMinutes>\d{2}):(?P<endSeconds>\d{2}),(?P<endMilliseconds>\d{3})\s*\r?\n(?P<content>.+)\r?\n\r?\n?';
-		if(!preg_match_all("/$regex/sU", $content, $matches) || !count($matches) || !count($matches[0]))
+		$regex = '/(?P<index>\d+)\r?\n\s*(?P<startHours>\d{2}):(?P<startMinutes>\d{2}):(?P<startSeconds>\d{2}),(?P<startMilliseconds>\d{3})\s*-->\s*(?P<endHours>\d{2}):(?P<endMinutes>\d{2}):(?P<endSeconds>\d{2}),(?P<endMilliseconds>\d{3})\s*\r?\n(?P<content>(.+\r?\n?)*)/';
+		if(!preg_match_all($regex, $content, $matches) || !count($matches) || !count($matches[0]))
 		{
 			KalturaLog::err("Content regex not found");
 			return array();
