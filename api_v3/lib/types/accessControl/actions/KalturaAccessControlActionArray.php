@@ -32,6 +32,8 @@ class KalturaAccessControlActionArray extends KalturaTypedArray
 				return new KalturaAccessControlBlockAction();
 			case accessControlActionType::PREVIEW:
 				return new KalturaAccessControlPreviewAction();
+			case accessControlActionType::LIMIT_FLAVORS:
+				return new KalturaAccessControlLimitFlavorsAction();
 			default:
 				return KalturaPluginManager::loadObject('KalturaAccessControlAction', $dbObject->getType());
 		}
