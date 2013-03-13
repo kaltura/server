@@ -47,7 +47,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         if ($object instanceof categoryEntry)
         {
         	$entry = entryPeer::retrieveByPK($object->getEntryId());
-        	if ($entry->getTags())
+        	if ($entry && $entry->getTags())
         	{
         		return true;
         	}
@@ -101,7 +101,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         if (($object instanceof categoryEntry))
         {
         	$entry = entryPeer::retrieveByPK($object->getEntryId());
-        	if ($entry->getTags())
+        	if ($entry && $entry->getTags())
         		return true;
         }
         
