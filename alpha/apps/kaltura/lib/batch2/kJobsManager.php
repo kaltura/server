@@ -133,14 +133,6 @@ class kJobsManager
 			// retry of non locked entry
 			$dbBatchJob = self::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_RETRY);
 
-		} elseif (!$dbBatchJobLock->getSchedulerId()) {
-
-			// retry of non-scheduled entry
-			$dbBatchJobLock->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
-			$dbBatchJobLock->setExecutionAttempts(0);
-			$dbBatchJob->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
-			$dbBatchJob->save();
-
 		} elseif ($force) {
 
 			// retry of scheduled entry
