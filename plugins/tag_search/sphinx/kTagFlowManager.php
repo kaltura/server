@@ -148,7 +148,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         if ($oldTags && $oldTags != "")
             $this->decrementExistingTagsInstanceCount($object,$tagsForDelete,$privacyContexts);
 
-        $this->addOrIncrementTags($object);
+        $this->addOrIncrementTags($object,$privacyContexts);
     }
 
 	/* (non-PHPdoc)
