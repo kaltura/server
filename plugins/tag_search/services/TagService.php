@@ -52,7 +52,7 @@ class TagService extends KalturaBaseService
     
     /**
      * Action goes over all tags with instanceCount==0 and checks whether they need to be removed from the DB. Returns number of removed tags.
-     * @action resolveTags
+     * @action deletePending
      * @return int
      */
     public function deletePendingAction ()
