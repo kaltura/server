@@ -36,22 +36,22 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public function shouldConsumeDeletedEvent (BaseObject $object)
     {
-        if (!defined("taggedObjectType::". strtoupper(get_class($object))) && get_class($object) != categoryEntryPeer::OM_CLASS)
-            return;
-        
-        if (property_exists($object, self::TAGS_FIELD_NAME) && $object->getTags() != "")
+        if (defined("taggedObjectType::". strtoupper(get_class($object))))
         {
-            return true;
-        }
+	        if (property_exists($object, self::TAGS_FIELD_NAME) && $object->getTags() != "")
+	        {
+	            return true;
+	        }
+        	
+        } 
         
         if ($object instanceof categoryEntry)
         {
         	$entry = entryPeer::retrieveByPK($object->getEntryId());
         	if ($entry && $entry->getTags())
-        	{
         		return true;
-        	}
         }
+
         
         return false;
         
@@ -90,20 +90,22 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public function shouldConsumeCreatedEvent (BaseObject $object)
     {
-        if (!defined("taggedObjectType::". strtoupper(get_class($object))) && !($object instanceof categoryEntry))
-            return;
-        
-        if (property_exists($object, self::TAGS_FIELD_NAME) && $object->getTags() != "")
+        if (defined("taggedObjectType::". strtoupper(get_class($object))))
         {
-            return true;
-        }
+	        if (property_exists($object, self::TAGS_FIELD_NAME) && $object->getTags() != "")
+	        {
+	            return true;
+	        }
+        	
+        } 
         
-        if (($object instanceof categoryEntry))
+        if ($object instanceof categoryEntry)
         {
         	$entry = entryPeer::retrieveByPK($object->getEntryId());
         	if ($entry && $entry->getTags())
         		return true;
         }
+
         
         return false;
         
