@@ -15,17 +15,17 @@ include_once(dirname(__FILE__).'/php/check_status.php');
 		<title>Kaltura Video Platfrom - Home Page</title>
 		<link rel="stylesheet" rev="stylesheet" media="screen" href="./css/style.css">
 		<style type="text/css">
-			
+
 			h1 { padding:0; margin:0; font:Arial; font-size:22px; color:#000; }
 			h2 { padding:0; margin:0; margin-top:40px; font:Arial; font-size:48px; color:#206f87; }
 			h3 { padding:0; margin:0; margin-top:30px; margin-bottom:10px; font:Arial; font-size:16px; color:#000; }
 			h4.thumbdsec { background-color:#000;color:#fff;display:block;margin:0;padding:4px;width:252px;font-weight:bold;font-size:14px; }
-			
+
 			.strongs { padding:0; margin:0; padding-top:10px; padding-bottom:10px; font-weight:bold; }
-			
+
 			#pageWrap #insideWrap {  }
 			#pageWrap #insideWrap #content { margin:auto;padding:0; }
-			
+
 			a.console-image {
 				color:transparent;
 				display:block;
@@ -52,33 +52,19 @@ include_once(dirname(__FILE__).'/php/check_status.php');
 	<div id="insideWrap" style="margin-top:10px;margin-bottom:10px;">
 	<img src="images/home-icon.png" alt="home" style="position:relative;display:block;float:left;width:22px;height:22px;margin-right:10px;"/>
 	<h1>
-	Welcome to the Kaltura Video Platform - Community Edition
-	<?php
-		$parts = explode(' ', kConf::get('kaltura_version'));
-		$addition = "";
-		if (count($parts) > 3)
-			$addition = $parts[3];
-        echo ' '.$parts[2].' '.$addition;
-	?>
+	Welcome to the Kaltura Video Platform - Community Edition <?php echo str_replace('Kaltura-', '', kConf::get('kaltura_version')); ?>
 	</h1>
-	
+
 	<a name="top"></a>
-	
+
 	<div id="content">
-	
-		<div id="systemStatus">
-		
-			<?php echo $status_div; ?>
-			
-		</div> <!-- systemStatus -->
-		
 		<a name="start"></a>
 		<h2>Get Started!</h2>
 		<p>
 		Please login to the <a href="/admin_console" target="_blank">Kaltura Administration Console</a>, go to the <a href="/admin_console/index.php/partner/create" target="_blank">Add New Publisher</a> page and create your first publisher account.<br/>
-		You will then receive an email with the <a href="/kmc" target="_blank">Kaltura Management Console (KMC)</a> login credentials to access &amp; manage any publisher media. 
+		You will then receive an email with the <a href="/kmc" target="_blank">Kaltura Management Console (KMC)</a> login credentials to access &amp; manage any publisher media.
 		</p>
-		
+
 		<a name="goto"></a>
 		<h3>Click on the thumbnails below to manage the media or system:</h3>
 		<div style="width:540px;height:305px;padding:5px;font-size:1.2em;margin-bottom:60px;">
@@ -103,7 +89,7 @@ Use the <a target="_blank" href="/admin_console">Kaltura Administration Console<
 <div style="clear:both;"></div>
 </div>
 		</div>
-		
+
 		<a name="samples"></a>
 		<h3>How do I integrate Kaltura CE media into my website?</h3>
 			<ul>
@@ -120,8 +106,8 @@ Use the <a target="_blank" href="/admin_console">Kaltura Administration Console<
 			<li style="list-style:none outside url(images/famfam/newspaper.png);">Stay updated! [Sign for the <a href="http://www.kaltura.org/node/507" rel="lightframe[|width:460px; height:550px; scrolling: auto;]">Kaltura Newsletter</a>, Follow <a href="http://twitter.com/kaltura" target="_blank">@Kaltura</a>, Join the <a href="http://www.facebook.com/group.php?gid=14106775310#" target="_blank">Facebook</a> &amp; <a href="http://www.linkedin.com/groups?mostPopular=&amp;gid=2179100" target="_blank">LinkedIn</a> Groups]</li>
 			<li style="list-style:none outside url(images/famfam/group.png);">Join the <a href="http://www.meetup.com/OpenVideo/" target="_blank">Kaltura Open Video meetup group</a> to stay updated about upcoming developer meetups</li>
 		</ul>
-	
-		
+
+
 		<h3>I like Kaltura - where can I Contribute &amp; Participate?</h3>
 		<ul style="margin-left:20px;">
 			<li style="list-style:none outside url(images/famfam/bricks.png);">Browse <a href="http://www.kaltura.org/project" target="_blank">projects</a> &amp; <a href="http://www.kaltura.org/downloads" target="_blank">downloads</a></li>
@@ -130,7 +116,7 @@ Use the <a target="_blank" href="/admin_console">Kaltura Administration Console<
 			<li style="list-style:none outside url(images/famfam/help.png);">Read <a href="http://www.kaltura.org/documentation" target="_blank">documentation</a> and add guides</li>
 			<li style="list-style:none outside url(images/famfam/user_gray.png);"><a href="http://www.kaltura.org/forums/general/job-board" target="_blank">Post a job or offer your services</a></li>
 		</ul>
-		
+
 		<h3>Join the Kaltura Exchange to share your applications, get audience and make money!</h3>
 		<div>
 			<a href="http://exchange.kaltura.com" alt="Kaltura Exchange" target="_blank" style="color:transparent;" ><img src="images/exchange.png" style="display: block; float: left;margin-right:10px;margin-bottom :2px;" /></a>
@@ -145,7 +131,7 @@ Use the <a target="_blank" href="/admin_console">Kaltura Administration Console<
 			<div style="clear:both;"></div>
 		</div>
 	</div> <!-- content -->
-	
+
 	</div> <!-- insideWrap -->
 	</div> <!-- pageWrap -->
 
