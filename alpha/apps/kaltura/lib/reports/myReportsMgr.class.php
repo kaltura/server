@@ -52,6 +52,9 @@ class myReportsMgr
 										self::REPORT_TYPE_USER_CONTENT_DROPOFF,
 										self::REPORT_TYPE_USER_CONTENT_INTERACTIONS);
 										
+	static $end_user_filter_get_count_reports = array (self::REPORT_TYPE_PLATFORMS,
+										self::REPORT_TYPE_OPERATION_SYSTEM, 
+										self::REPORT_TYPE_BROWSERS);
 										
 
 	public static function runQuery ( $query_file , $map , $debug = false )
@@ -351,7 +354,7 @@ class myReportsMgr
 	{
 		$start = microtime ( true );
 		$total_count = 0;
-		if (!($input_filter instanceof endUserReportsInputFilter))
+		if ((!($input_filter instanceof endUserReportsInputFilter)) || in_array($report_type, self::$end_user_filter_get_count_reports) )
 		{
 			$total_count = self::getTotalTableCount( $partner_id , $report_type , $input_filter  ,
 				$page_size , $page_index , $order_by , $object_ids );	
