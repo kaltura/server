@@ -14,9 +14,6 @@ class updateLoginDataAction extends kalturaAction
 
 	public function execute() 
 	{
-		// Prevent the page fron being embeded in an iframe
-		header( 'X-Frame-Options: SAMEORIGIN' );
-
 		// Disable layout
 		$this->setLayout(false);
 		$this->success = false;
@@ -46,6 +43,10 @@ class updateLoginDataAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::SERVICE_ACCESS_CONTROL_RESTRICTED);
 
 		$this->forceKMCHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ENFORCE_HTTPS, $partnerId);
+		if( $forceKMCHttps ) {
+			// Prevent the page fron being embeded in an iframe
+			header( 'X-Frame-Options: SAMEORIGIN' );
+		}
 		if( $this->forceKMCHttps && (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') ) {
 			die();
 		}
