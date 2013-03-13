@@ -89,5 +89,14 @@ class SphinxTagCriteria extends SphinxCriteria
 	    return true;
 	}
 
+	protected function applyFilterFields(baseObjectFilter $filter)
+	{
+		if ($filter->get('_eq_object_type'))
+		{
+			$filter->set('_eq_object_type', Tag::getIndexedFieldValue('TagPeer::OBJECT_TYPE', $filter->get('_eq_object_type'), kCurrentContext::getCurrentPartnerId()));
+		}
+		
+		parent::applyFilterFields($filter);
+	}
 	
 }

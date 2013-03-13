@@ -17,6 +17,8 @@ class Tag extends BaseTag implements IIndexable
 {
 	const PRIVACY_CONTEXT_INDEX_PREFIX = "pc";
 	
+	const OBJECT_TYPE_INDEX_PREFIX = "ot";
+	
 	/* (non-PHPdoc)
      * @see IIndexable::getIntId()
      */
@@ -54,7 +56,7 @@ class Tag extends BaseTag implements IIndexable
            'int_id' => 'intId',
            'tag' => 'tag',
            'partner_id' => 'partnerId',
-           'object_type' => 'objectType',
+           'object_type' => 'indexObjectType',
            'created_at' => 'createdAt',
            'instance_count' => 'instanceCount',
            'privacy_context' => 'indexPrivacyContext',
@@ -154,12 +156,21 @@ class Tag extends BaseTag implements IIndexable
 		return $this->getPartnerId() . self::PRIVACY_CONTEXT_INDEX_PREFIX . $this->getPrivacyContext();
 	}
 	
+	public function getIndexObjectType ()
+	{
+		return $this->getPartnerId() . self::OBJECT_TYPE_INDEX_PREFIX. $this->getObjectType();
+	}
+	
 	public static function getIndexedFieldValue ($fieldName, $fieldValue, $partnerId)
 	{
 		$prefix = null;
 		if ($fieldName == "TagPeer::PRIVACY_CONTEXT")
 		{
 			$prefix = self::PRIVACY_CONTEXT_INDEX_PREFIX;
+		}
+		else if ($fieldName == "TagPeer::OBJECT_TYPE")
+		{
+			$prefix = self::OBJECT_TYPE_INDEX_PREFIX;
 		}
 		if (!$prefix)
 			return null;

@@ -339,7 +339,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    $c = KalturaCriteria::create(TagPeer::OM_CLASS);
 	    $c->addAnd(TagPeer::TAG, $tagStrings, KalturaCriteria::IN);
 	    $c->addAnd(TagPeer::PARTNER_ID, $partnerId, KalturaCriteria::EQUAL);
-	    $c->addAnd(TagPeer::OBJECT_TYPE, $objectType, KalturaCriteria::EQUAL);
+	    $c->addAnd(TagPeer::OBJECT_TYPE, Tag::getIndexedFieldValue("TagPeer::OBJECT_TYPE", $objectType, $partnerId), KalturaCriteria::EQUAL);
 	    return $c;
 	}
 	
