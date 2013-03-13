@@ -55,17 +55,20 @@ class TagService extends KalturaBaseService
      */
     public function resolveTagsAction ()
     {
+		TagPeer::setUseCriteriaFilter(false);
     	$c = KalturaCriteria::create(TagPeer::OM_CLASS);
 		$filter = new TagFilter();
 		$filter->set('_eq_instance_count', 0);
 		$filter->attachToCriteria($c);
-		
+		$c->applyFilters();
 		$count = $c->getRecordsCount();
 		
 		if (!$count)
-			die ('No tags pending for deletion.');
+		{
+			KalturaLog::info ('No tags pending for deletion.');
+			return;
+		}
 			
-		TagPeer::setUseCriteriaFilter(false);
 		$tagsForDelete = TagPeer::doSelect($c);
 		TagPeer::setUseCriteriaFilter(true);
 		
@@ -75,10 +78,10 @@ class TagService extends KalturaBaseService
 			switch ($tag->getObjectType())
 		    {
 		    	case taggedObjectType::ENTRY:
-		    		resolveEntryTag($tag);
+		    		$this->resolveEntryTag($tag);
 		    		break;
 		    	case taggedObjectType::CATEGORY:
-		    		resolveCategoryTag($tag);
+		    		$this->resolveCategoryTag($tag);
 		    		break;
 		    }
 		}
@@ -94,6 +97,7 @@ class TagService extends KalturaBaseService
 	    $entryFilter = new entryFilter();
 	    $entryFilter->set('_mlikeand_tags', $tag->getTag());
 	    $entryFilter->attachToCriteria($c);
+	    $c->applyFilters();
 	    $count = $c->getRecordsCount();
 	    if (!$count)
 	    {
@@ -109,6 +113,7 @@ class TagService extends KalturaBaseService
 	    $categoryFilter = new categoryFilter();
 	    $categoryFilter->set('_mlikeand_tags', $tag->getTag());
 	    $categoryFilter->attachToCriteria($c);
+	    $c->applyFilters();
 	    $count = $c->getRecordsCount();
 	    if (!$count)
 	    {
