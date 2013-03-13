@@ -1914,7 +1914,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function updateVideoDimensions ( )
 	{
-		$syncKey = $this->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		$asset = assetPeer::retrieveHighestBitrateByEntryId($this->getId());
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$dataPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		list ( $width , $height ) = $arr = myFileConverter::getVideoDimensions( $dataPath );
 		
