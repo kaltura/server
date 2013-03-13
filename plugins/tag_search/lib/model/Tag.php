@@ -95,6 +95,17 @@ class Tag extends BaseTag implements IIndexable
 			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 	}
 	
+	/* (non-PHPdoc)
+	 * @see BasecategoryKuser::postUpdate()
+	 */
+	public function postUpdate(PropelPDO $con = null)
+	{
+		parent::postUpdate($con);
+		
+		if (!$this->alreadyInSave)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
+	}
+	
 	/**
 	 * Function to increase instance count by 1.
 	 */
