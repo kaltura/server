@@ -138,6 +138,7 @@ class kJobsManager
 			// retry of non-scheduled entry
 			$dbBatchJobLock->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
 			$dbBatchJobLock->setExecutionAttempts(0);
+			$dbBatchJob->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
 			$dbBatchJob->save();
 
 		} elseif ($force) {
