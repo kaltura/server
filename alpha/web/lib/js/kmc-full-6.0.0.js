@@ -1,4 +1,4 @@
-/*! KMC - v6.0.0 - 2013-03-12
+/*! KMC - v6.0.0 - 2013-03-13
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2013 Ran Yefet; Licensed GNU */
 /*! Kaltura Embed Code Generator - v1.0.6 - 2013-02-28
@@ -2566,7 +2566,7 @@ QRBitBuffer.prototype = {
 	 * Use ng-view for preview template
  	 * Use filters for delivery types and embed types
  	 */
- 	 
+
 	var Preview = kmc.Preview || {};
 
 	// Preview Partner Defaults
@@ -2833,8 +2833,8 @@ QRBitBuffer.prototype = {
 			return '';
 		}
 		var protocol = (previewService.get('secureEmbed')) ? 'https' : 'http';
-		//var url = protocol + '://' + kmc.vars.base_host + '/index.php/kmc/preview';
-		var url = protocol + '://' + window.location.host + '/KMC_V2/preview.php';
+		var url = protocol + '://' + kmc.vars.base_host + '/index.php/kmc/preview';
+		//var url = protocol + '://' + window.location.host + '/KMC_V2/preview.php';
 		url += '/partner_id/' + kmc.vars.partner_id;
 		url += '/uiconf_id/' + player.id;
 		// Add entry Id
