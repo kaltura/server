@@ -19,7 +19,8 @@ class KAsyncTagResolve extends KPeriodicWorker
 	public function run($jobs = null) 
 	{
 		KalturaLog::info("Running tag resolver");
-		passthru("php ../../../../scripts/batch/tag/resolveTags.php");
+		$tagPlugin = KalturaTagSearchClientPlugin::get($this->kClient);
+		$tagPlugin->tag->resolveTags();
 	}
 	
 	/**
