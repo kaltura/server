@@ -445,7 +445,7 @@ class entryPeer extends BaseentryPeer
 		if($criteria instanceof KalturaCriteria)
 		{
 			$criteria->applyFilters();
-			return $criteria->getRecordsCount();
+			return min(self::$s_default_count_limit,$criteria->getRecordsCount());
 		}
 
 		$rs = self::doSelectStmt($criteria, $con);
