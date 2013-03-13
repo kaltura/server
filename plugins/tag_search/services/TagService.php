@@ -55,7 +55,7 @@ class TagService extends KalturaBaseService
      * @action resolveTags
      * @return int
      */
-    public function resolveTagsAction ()
+    public function deletePendingAction ()
     {
 		TagPeer::setUseCriteriaFilter(false);
     	$c = KalturaCriteria::create(TagPeer::OM_CLASS);
