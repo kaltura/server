@@ -41,8 +41,7 @@ class kmc4Action extends kalturaAction
 		$this->partner_id = $ksObj->partner_id;
 
 		// Check if the KMC can be framed
-		//$allowFrame = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ALLOW_FRAME, $this->partner_id);
-		$allowFrame = false;
+		$allowFrame = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ALLOW_FRAME, $this->partner_id);
 		if(!$allowFrame) {
 			header( 'X-Frame-Options: DENY' );
 		}
