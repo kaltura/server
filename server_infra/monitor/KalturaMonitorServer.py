@@ -17,8 +17,9 @@ import tornadio2
 class IndexHandler(tornado.web.RequestHandler):
     def get(self):
     	path = 'web' + self.request.path
-    	if path == 'web/':
-    		path += 'index.html'
+    	if path == 'web/' or path.find('..') >= 0:
+    		path = 'web/index.html'
+    		
         self.render(path)
 #        print "Served path[%s]" % path
 
@@ -114,7 +115,7 @@ class kMonitorQueryHandler(threading.Thread):
 #		print "Digesting server[%s], address[%s], partner[%s], action[%s], cached[%s], sessionType[%s]" % (apiRequest['server'], apiRequest['address'], apiRequest['partner'], apiRequest['action'], apiRequest['cached'], apiRequest['sessionType'])
         
 		now = int(time.time())
-		currentSecond = now.second % 60
+		currentSecond = now % 60
 		
 		while currentSecond != self.lastSecond:
 			# move to the new second
@@ -153,19 +154,36 @@ class kMonitorQueryHandler(threading.Thread):
 				
 #		print "Ingesting server[%s], address[%s], partner[%s], action[%s], cached[%s], sessionType[%s]" % (apiRequest['server'], apiRequest['address'], apiRequest['partner'], apiRequest['action'], apiRequest['cached'], apiRequest['sessionType'])
 		self.queue.put(apiRequest)
-		
+				
 monitorClients = {}
+monitorClientsLock = threading.Lock()
 		
 class kMonitorClient(tornadio2.SocketConnection):
 
 	def on_open(self, request):
 		self.handlers = {}
-		monitorClients[self.session.session_id] = self
+		self.handlersLock = threading.Lock()
+		
+		monitorClientsLock.acquire()
+		try:
+			monitorClients[self.session.session_id] = self
+		finally:
+			monitorClientsLock.release()
 
 	def on_close(self):
-		del monitorClients[self.session.session_id]
-		for name in self.handlers:
-			self.handlers[name].stop()
+		
+		monitorClientsLock.acquire()
+		try:
+			del monitorClients[self.session.session_id]
+		finally:
+			monitorClientsLock.release()
+			
+		self.handlersLock.acquire()
+		try:
+			for name in self.handlers:
+				self.handlers[name].stop()
+		finally:
+			self.handlersLock.release()
 		    
 	@tornadio2.event('applyQuery')
 	def applyQuery(self, query):
@@ -175,21 +193,28 @@ class kMonitorClient(tornadio2.SocketConnection):
 			print "Queried filter %s[%s]" % (field, monitorQuery.filters[field])
 		
 		name = monitorQuery.name
-		if name in self.handlers:
-			self.handlers[name].stop()
-		
-		# self.request is the TCP socket connected to the client
-		self.handlers[name] = kMonitorQueryHandler(name = name, query = monitorQuery, connection = self);
-		self.handlers[name].start();
+		self.handlersLock.acquire()
+		try:
+			if name in self.handlers:
+				self.handlers[name].stop()
+			# self.request is the TCP socket connected to the client
+			self.handlers[name] = kMonitorQueryHandler(name = name, query = monitorQuery, connection = self);
+			self.handlers[name].start();
+		finally:
+			self.handlersLock.release()
 		
 	def sendCalls(self, name, calls):
 		self.emit(name, calls);
 		
 	def handle(self, apiRequest):
 		# use cloned list in order to overcome changes in the list during the iterations
-		keys = self.handlers.keys()
-		for name in keys:
-			self.handlers[name].ingest(apiRequest)		
+		self.handlersLock.acquire()
+		try:
+			keys = self.handlers.keys()
+			for name in keys:
+				self.handlers[name].ingest(apiRequest)		
+		finally:
+			self.handlersLock.release()
 
 kMonitorRouter = tornadio2.TornadioRouter(kMonitorClient)
 
@@ -211,19 +236,23 @@ def collectRequests():
 
 	while(1):
 		requestData, addr = server_socket.recvfrom(2048)
-		
+				
 		try:
 			apiRequest = json.loads(requestData);
 		except ValueError:
 			continue
-		
-#		print "Received API request %s" % apiRequest
 
+		#print "Received API request %s" % apiRequest
+		
 		# use cloned list in order to overcome changes in the list during the iterations
-		keys = monitorClients.keys()
-		for sessionId in keys:
-			if sessionId in monitorClients:
-				monitorClients[sessionId].handle(apiRequest);
+		monitorClientsLock.acquire()
+		try:
+			keys = monitorClients.keys()
+			for sessionId in keys:
+				if sessionId in monitorClients:
+					monitorClients[sessionId].handle(apiRequest);
+		finally:
+			monitorClientsLock.release()
 	
 requestsListener = threading.Thread(target = collectRequests)
 requestsListener.setDaemon(True)
