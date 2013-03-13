@@ -18,7 +18,9 @@ $c->setLimit(10000);
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 //$sphinxCon = DbManager::getSphinxConnection();
 
+TagPeer::setUseCriteriaFilter(false);
 $tags = TagPeer::doSelect($c, $con);
+TagPeer::setUseCriteriaFilter(true);
 $sphinx = new kSphinxSearchManager();
 while(count($tags))
 {
@@ -38,7 +40,9 @@ while(count($tags))
 	
 	$c->setOffset($c->getOffset() + count($tags));
 	kMemoryManager::clearMemory();
+	TagPeer::setUseCriteriaFilter(false);
 	$tags = TagPeer::doSelect($c, $con);
+	TagPeer::setUseCriteriaFilter(true);
 }
 
 KalturaLog::log('Done');
