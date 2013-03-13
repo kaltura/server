@@ -173,9 +173,9 @@ class Tag extends BaseTag implements IIndexable
 			$prefix = self::OBJECT_TYPE_INDEX_PREFIX;
 		}
 		if (!$prefix)
-			return null;
+			return $fieldValue;
 			
-		if (is_string($fieldValue))
+		if (is_scalar($fieldValue))
 			return $partnerId . $prefix . $fieldValue;
 			
 		if (is_array($fieldValue))
