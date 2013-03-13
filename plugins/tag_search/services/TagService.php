@@ -51,7 +51,9 @@ class TagService extends KalturaBaseService
     }
     
     /**
+     * Action goes over all tags with instanceCount==0 and checks whether they need to be removed from the DB. Returns number of removed tags.
      * @action resolveTags
+     * @return int
      */
     public function resolveTagsAction ()
     {
@@ -66,9 +68,10 @@ class TagService extends KalturaBaseService
 		if (!$count)
 		{
 			KalturaLog::info ('No tags pending for deletion.');
-			return;
+			return 0;
 		}
 			
+		$deletedTags = 0;
 		$tagsForDelete = TagPeer::doSelect($c);
 		TagPeer::setUseCriteriaFilter(true);
 		
@@ -78,15 +81,21 @@ class TagService extends KalturaBaseService
 			switch ($tag->getObjectType())
 		    {
 		    	case taggedObjectType::ENTRY:
-		    		$this->resolveEntryTag($tag);
+		    		$deletedTags += $this->resolveEntryTag($tag);
 		    		break;
 		    	case taggedObjectType::CATEGORY:
-		    		$this->resolveCategoryTag($tag);
+		    		$deletedTags += $this->resolveCategoryTag($tag);
 		    		break;
 		    }
 		}
+		
+		return $deletedTags;
     }
     
+	/**
+	 * @param Tag $tag
+	 * @return int
+	 */
 	private function resolveEntryTag (Tag $tag)
 	{
 	    $c = KalturaCriteria::create(entryPeer::OM_CLASS);
@@ -102,10 +111,17 @@ class TagService extends KalturaBaseService
 	    if (!$count)
 	    {
 	    	$tag->delete();	
+	    	return 1;
 	    }
+	    
+	    return 0;
 	    
 	}
 	    
+	/**
+	 * @param Tag $tag
+	 * @return int
+	 */
 	private function resolveCategoryTag (Tag $tag)
 	{
 	    $c = KalturaCriteria::create(categoryPeer::OM_CLASS);
@@ -118,7 +134,10 @@ class TagService extends KalturaBaseService
 	    if (!$count)
 	    {
 	    	$tag->delete();	
+	    	return 1;
 	    }
+	    
+	    return 0;
 	}
 
 }
