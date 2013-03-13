@@ -28,12 +28,32 @@
 // @ignore
 // ===================================================================================================
 
+require_once(dirname(__file__) . '/lib/KalturaCommandLineParser.php');
 require_once(dirname(__file__) . '/lib/KalturaSession.php');
+
+$commandLineSwitches = array(
+		array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'b', 'bare', 'Print only the KS itself'),
+);
+
+// parse command line
+$options = KalturaCommandLineParser::parseArguments($commandLineSwitches);
+$arguments = KalturaCommandLineParser::stripCommandLineSwitches($commandLineSwitches, $argv);
+
+if (!$arguments)
+{
+	$usage = "Usage: renewKs [switches] <ks>\nOptions:\n";
+	$usage .= KalturaCommandLineParser::getArgumentsUsage($commandLineSwitches);
+	die($usage);
+}
+
+$ks = $arguments[0];
 
 KalturaSecretRepository::init();
 
-if ($argc < 2)
-	die("Usage: renewKs <ks>\n");
+if (!isset($options['bare']))
+	echo "ks\t";
 
-$ks = $argv[1];
-echo "ks\t" . KalturaSession::extendKs($ks) . "\n";
+echo KalturaSession::extendKs($ks);
+
+if (!isset($options['bare']))
+	echo "\n";

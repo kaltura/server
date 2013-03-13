@@ -74,10 +74,13 @@ Examples
 > extks MDQ2ZThjOTI0MTJmZGIxYTVlMWVhNDJlZDZhNDAyMDkyMWJhNzE0OXw0Mzc0ODE7NDM3NDgxOzEzNjI0OTI3Njc7MDsxMzYyNDA2MzY3Ljc3NzM7MDt3aWRnZXQ6MSx2aWV3Oio7Ow==
 
 7. Executing an API with a different source IP address:
-> i=`genipheader 9.8.7.6` ; genks 1234 | kalcli -H$i baseentry getContextData entryId=0_abcd56
+> ip=`genipheader 9.8.7.6` ; genks 1234 | kalcli -H$ip baseentry getContextData entryId=0_abcd56
 
 8. Using a serve action:
 > genks 1234 | kalcli -r document_documents serve entryId=0_abcdef > \temp\test.doc
 
 9. Nesting requests
 > kalcli -x session start partnerId=1234 secret=abcdef type=2 | awk '{print "ks "$1}' | kalcli media list
+
+10. Uploading files
+> ks=`genks -b 1234` ; kalcli -x uploadtoken add ks=$ks | awk '$1 == "id" {print "uploadTokenId "$2}' | kalcli uploadtoken upload ks=$ks fileData=@/tmp/test.php

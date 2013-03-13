@@ -146,15 +146,17 @@ $curlWrapper->ignoreCertErrors = isset($options['insecure']);
 
 // issue the request
 $result = $curlWrapper->getUrl($url, $params);
-if (!isset($options['raw']))
-	$result = formatResponse(unserialize($result)) . "\n";
 
 // output the response
 if (isset($options['include']) || isset($options['head']))
 	echo $curlWrapper->responseHeaders;
 
 if (!isset($options['head']))
+{
+	if (!isset($options['raw']))
+		$result = formatResponse(unserialize($result)) . "\n";
 	echo $result;
+}
 
 if (isset($options['time']) && !is_null($curlWrapper->totalTime))
 	echo "execution time\t{$curlWrapper->totalTime}\n";

@@ -44,15 +44,20 @@ class KalturaCurlWrapper
 	function getUrl($url, $params) 
 	{
 		$ch = curl_init();
-		$params = http_build_query($params);
 		if (!$this->useGet)
 		{
 			curl_setopt($ch, CURLOPT_POST, 1);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+			$hasFiles = false;
+			foreach($params as $key => $value)
+			{
+				if (strlen($value) > 1 && $value[0] == '@' && file_exists(substr($value, 1)))
+					$hasFiles = true;
+			}
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $hasFiles ? $params : http_build_query($params));
 		}
 		else if ($params)
 		{	
-			$url .= '&' . $params;
+			$url .= '&' . http_build_query($params);
 		}
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

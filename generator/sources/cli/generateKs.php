@@ -37,6 +37,7 @@ $commandLineSwitches = array(
 	array(KalturaCommandLineParser::SWITCH_REQUIRES_VALUE, 'e', 'expiry', 'Session expiry (seconds)'),
 	array(KalturaCommandLineParser::SWITCH_REQUIRES_VALUE, 'p', 'privileges', 'Session privileges'),
 	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'w', 'widget', 'Widget session'),
+	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'b', 'bare', 'Print only the KS itself'),
 );
 
 // parse command line
@@ -71,4 +72,10 @@ if (isset($options['widget']))
 	$privileges = 'widget:1,view:*';
 }
 
-echo "ks\t" . KalturaSession::generateKsV1($adminSecret, $user, $type, $partnerId, $expiry, $privileges, null, null) . "\n";
+if (!isset($options['bare']))
+	echo "ks\t";
+
+echo KalturaSession::generateKsV1($adminSecret, $user, $type, $partnerId, $expiry, $privileges, null, null);
+
+if (!isset($options['bare']))
+	echo "\n";
