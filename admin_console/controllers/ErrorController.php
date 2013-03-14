@@ -43,22 +43,22 @@ class ErrorController extends Zend_Controller_Action
 	{
 		Infra_AuthHelper::getAuthInstance()->clearIdentity();
 		$this->_helper->viewRenderer('error');
-		$this->view->code	= Kaltura_HostedException::ERROR_CODE_ACCESS_DENIED;
+		$this->view->code	= Kaltura_AdminException::ERROR_CODE_ACCESS_DENIED;
 		$this->getResponse()->setHttpResponseCode(403);
-		$this->getResponse()->setHeader(Kaltura_HostedException::KALTURA_HEADER_ERROR_CODE, $this->view->code, true);
+		$this->getResponse()->setHeader(Kaltura_AdminException::KALTURA_HEADER_ERROR_CODE, $this->view->code, true);
 	}
 
 	protected function handleNotFoundException(Exception $ex)
 	{
-		$this->view->code	= Kaltura_HostedException::ERROR_CODE_PAGE_NOT_FOUND;
+		$this->view->code	= Kaltura_AdminException::ERROR_CODE_PAGE_NOT_FOUND;
 		$this->getResponse()->setHttpResponseCode(404);
-		$this->getResponse()->setHeader(Kaltura_HostedException::KALTURA_HEADER_ERROR_CODE, $this->view->code, true);
+		$this->getResponse()->setHeader(Kaltura_AdminException::KALTURA_HEADER_ERROR_CODE, $this->view->code, true);
 	}
 
 	protected function handleApplicationException(Exception $ex)
 	{
-		$this->view->code	= Kaltura_HostedException::getErrorCode($ex);
+		$this->view->code	= Kaltura_AdminException::getErrorCode($ex);
 		$this->getResponse()->setHttpResponseCode(500);
-		$this->getResponse()->setHeader(Kaltura_HostedException::KALTURA_HEADER_ERROR_CODE, $this->view->code, true);
+		$this->getResponse()->setHeader(Kaltura_AdminException::KALTURA_HEADER_ERROR_CODE, $this->view->code, true);
 	}
 }
