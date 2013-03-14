@@ -448,7 +448,7 @@ class KalturaClientBase
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 		}
-		elseif(!$this->getConfig()->sslCertificatePath)
+		elseif($this->getConfig()->sslCertificatePath)
 		{
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 			curl_setopt($ch, CURLOPT_CAINFO, $this->getConfig()->sslCertificatePath);
