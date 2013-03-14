@@ -152,7 +152,10 @@ class thumbnailAction extends sfAction
 			
 		if(!preg_match('/^[0-9a-fA-F]{1,6}$/', $bgcolor))
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bgcolor must be six hexadecimal characters');
-		
+
+		if(!$vid_slices)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'vid_slices must be positive');
+				
 		if ($upload_token_id)
 		{
 			$upload_token = UploadTokenPeer::retrieveByPK($upload_token_id);
@@ -384,12 +387,18 @@ class thumbnailAction extends sfAction
 			}
 		}
 		
-		$nocache = strpos($tempThumbPath, "_NOCACHE_") !== false;
-		
+		$nocache = false;		
 		if ($securyEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
 			(!$securyEntryHelper->isKsWidget() && $securyEntryHelper->hasRules())) 
 			$nocache = true;
 
+		if ($nocache)
+			$cacheAge = 0;
+		else if (strpos($tempThumbPath, "_NOCACHE_") !== false)
+			$cacheAge = 60;
+		else
+			$cacheAge = 8640000;
+		
 		// notify external proxy, so it'll cache this url
 		if (!$nocache && requestUtils::getHost() == kConf::get ( "apphome_url" )  && file_exists($tempThumbPath))
 		{
@@ -400,11 +409,11 @@ class thumbnailAction extends sfAction
 		if (!$nocache)
 		{
 			$requestKey = $_SERVER["REQUEST_URI"];
-			$cache = new myCache("thumb", 86400 * 30); // 30 days
+			$cache = new myCache("thumb", $cacheAge); // 30 days
 			$cache->put($requestKey, $tempThumbPath);
 		}
 		
-		kFileUtils::dumpFile($tempThumbPath, null, $nocache ? 0 : null);
+		kFileUtils::dumpFile($tempThumbPath, null, $cacheAge);
 		
 		// TODO - can delete from disk assuming we caneasily recreate it and it will anyway be cached in the CDN
 		// however dumpfile dies at the end so we cant just write it here (maybe register a shutdown callback)
