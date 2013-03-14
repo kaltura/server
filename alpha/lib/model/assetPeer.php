@@ -389,12 +389,15 @@ class assetPeer extends BaseassetPeer
 		return self::doSelectOne($c);
 	}
 	
-	public static function retrieveReadyByEntryIdAndFlavorParams($entryId, array $flavorParamsIds)
+	public static function retrieveReadyByEntryIdAndFlavorParams($entryId, array $flavorParamsIds, $notIn = false)
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
-		$c->add(assetPeer::FLAVOR_PARAMS_ID, $flavorParamsIds, Criteria::IN);
+		if($notIn)
+			$c->add(assetPeer::FLAVOR_PARAMS_ID, $flavorParamsIds, Criteria::NOT_IN);
+		else
+			$c->add(assetPeer::FLAVOR_PARAMS_ID, $flavorParamsIds, Criteria::IN);
 		
 		return assetPeer::doSelectAscendingBitrate($c);
 	}
@@ -530,6 +533,24 @@ class assetPeer extends BaseassetPeer
 		}
 		
 		$assets = $newAssets;
+		return $newAssets;
+	}
+	
+	/**
+	 * Leaves only the specified tag in the flavor assets array, consider exclusive tags
+	 * 
+	 * @param array $assets
+	 * @param string $tag
+	 * @return array<assets>
+	 */
+	public static function filterByTagExclusive(array $assets, $tag)
+	{
+		$newAssets = array();
+		foreach($assets as $asset)
+		{
+			if ($asset->hasTagExclusive($tag))
+				$newAssets[] = $asset;
+		}	
 		return $newAssets;
 	}
 

@@ -337,6 +337,11 @@ class playManifestAction extends kalturaAction
 		if (is_null($flavorParamIds))
 			return;
 			
+		$flavorParamIds = $this->secureEntryHelper->filterAllowedFlavorParams($flavorParamIds);
+		
+		if(is_null($flavorParamIds))
+			return;
+			
 		$this->flavorIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($this->entryId, $flavorParamIds);
 	}
 
@@ -430,6 +435,8 @@ class playManifestAction extends kalturaAction
 				foreach ($tagsFallback as $tagOption)
 				{
 					if (!$flavorAsset->hasTag($tagOption))
+						continue;
+					if(!$this->secureEntryHelper->isAssetAllowed($flavorAsset))
 						continue;
 					$curFlavors[] = $flavorAsset;
 					break;

@@ -424,6 +424,9 @@ class DocumentsService extends KalturaEntryService
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $flavorAssetId);
 		}
 		
+		if(!$securyEntryHelper->isAssetAllowed($flavorAsset))
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $flavorAssetId);
+			
 		$fileName = $dbEntry->getName() . '.' . $flavorAsset->getFileExt();
 		
 		return $this->serveFlavorAsset($flavorAsset, $fileName, $forceProxy);
@@ -480,6 +483,9 @@ class DocumentsService extends KalturaEntryService
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $flavorParamsId);
 		}
 		
+		if(!$securyEntryHelper->isAssetAllowed($flavorAsset))
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $flavorParamsId);
+			
 		$fileName = $dbEntry->getName() . '.' . $flavorAsset->getFileExt();
 		
 		return $this->serveFlavorAsset($flavorAsset, $fileName, $forceProxy);

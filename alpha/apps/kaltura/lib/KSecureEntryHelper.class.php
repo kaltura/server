@@ -51,6 +51,36 @@ class KSecureEntryHelper
 	private $hashes;
 	
 	/**
+	 * the result of applyContext
+	 * @var kEntryContextDataResult
+	 */
+	private $contextResult;
+	
+	/**
+	 * Indicates if the context has LIMIT_FLAVORS action
+	 * @var bool
+	 */
+	private $hasLimitFlavorsAction = false;
+	
+	/**
+	 * Indicates if the context has BLOCKED action
+	 * @var bool
+	 */
+	private $hasBlockAction = false;
+
+	/**
+	 * Indicates if the context has PREVIEW action
+	 * @var bool
+	 */	
+	private $hasPreviewAction = false;
+	
+	/**
+	 * 
+	 * @var kAccessControlLimitFlavorsAction
+	 */
+	private $limitFlavorsAction = null;
+	
+	/**
 	 * 
 	 * @param entry $entry
 	 */
@@ -65,6 +95,7 @@ class KSecureEntryHelper
 		$this->contexts = $contexts;
 		
 		$this->validateKs();
+		$this->applyContext();
 	}
 	
 	public function hasRules()
@@ -85,42 +116,22 @@ class KSecureEntryHelper
 			return false;
 			
 		// should preview only when the access control is valid, but the preview and session restrictions exists
-		$accessControl = $this->entry->getAccessControl();
-		if ($accessControl)
-		{
-			$context = new kEntryContextDataResult();
-			$scope = $this->getAccessControlScope();
-			$accessControl->applyContext($context, $scope);
-			
-			$actions = $context->getAccessControlActions();
-			$previewActionFound = false;
-			foreach($actions as $action)
-			{
-				/* @var $action kAccessControlAction */
-				if($action->getType() == accessControlActionType::BLOCK)
-					return false;
+		if ($this->contextResult)
+		{			
+			if($this->hasBlockAction)
+				return false;
 					
-				if($action->getType() == accessControlActionType::PREVIEW)
-					$previewActionFound = true;
-			}
-			return $previewActionFound;
+			return $this->hasPreviewAction;
 		}
 		return false;
 	}
 	
 	public function getPreviewLength()
 	{
-		$accessControl = $this->entry->getAccessControl();
 		$preview = null;
-		if ($accessControl)
-		{
-			$context = new kEntryContextDataResult();
-			$scope = $this->getAccessControlScope();
-			if (!$this->isKsAdmin())
-				$accessControl->applyContext($context, $scope);
-			
-			$actions = $context->getAccessControlActions();
-			$previewActionFound = false;
+		if ($this->contextResult && $this->hasPreviewAction)
+		{			
+			$actions = $this->contextResult->getAccessControlActions();
 			foreach($actions as $action)
 			{
 				if($action instanceof kAccessControlPreviewAction)
@@ -182,51 +193,91 @@ class KSecureEntryHelper
 			$this->validateApiAccessControl();
 		}
 		
-		$accessControl = $this->entry->getAccessControl();
-		if(!$accessControl)
+		if(!$this->contextResult)
 			return;
 			
-		$context = new kEntryContextDataResult();
-		$scope = $this->getAccessControlScope();
-		if (!$this->isKsAdmin())
-			$this->disableCache = $accessControl->applyContext($context, $scope);
-		else
-			$this->disableCache = false;
-
-		if(count($context->getAccessControlMessages()))
+		if(count($this->contextResult->getAccessControlMessages()))
 		{
-			foreach($context->getAccessControlMessages() as $msg)
+			foreach($this->contextResult->getAccessControlMessages() as $msg)
 				header("X-Kaltura: access-control: $msg");
 		}
 		
-		if(count($context->getAccessControlActions()))
+		if($this->hasBlockAction)
 		{
-			$actions = $context->getAccessControlActions();
-			foreach($actions as $action)
-			{
-				/* @var $action kAccessControlAction */
-				if($action->getType() == accessControlActionType::BLOCK)
-				{
-					KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
-				}
-			}
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 		}
 	}
 	
-	public function applyContext()
+	public function filterAllowedFlavorParams(array $flavorParamsIds)
 	{
+		if($this->hasLimitFlavorsAction)
+		{
+			$filteredFlavorParamsIds = array();
+			foreach ($flavorParamsIds as $flavorParamsId) 
+			{
+				if($this->isFlavorParamsAllowed($flavorParamsId))
+					$filteredFlavorParamsIds[] = $flavorParamsId;
+			}
+			return $filteredFlavorParamsIds;
+		}
+		return $flavorParamsIds;
+	}
+	
+	public function isAssetAllowed(asset $asset)
+	{
+		return $this->isFlavorParamsAllowed($asset->getFlavorParamsId());		
+	}
+	
+	public function shouldBlock()
+	{
+		return $this->hasBlockAction;
+	}
+	
+	protected function isFlavorParamsAllowed($flavorParamsId)
+	{
+		if($this->hasLimitFlavorsAction)
+		{
+			$flavorParamsIds = explode(',', $this->limitFlavorsAction->getFlavorParamsIds());
+			return (in_array($flavorParamsId, $flavorParamsIds) && !$this->limitFlavorsAction->getIsBlockedList());
+		}
+		return true;
+	}
+	
+	protected function applyContext()
+	{
+		$this->contextResult = null;
 		$accessControl = $this->entry->getAccessControl();
 		if(!$accessControl)
 			return;
 			
-		$context = new kEntryContextDataResult();
+		$this->contextResult = new kEntryContextDataResult();
 		$scope = $this->getAccessControlScope();
 		if (!$this->isKsAdmin())
-			$this->disableCache = $accessControl->applyContext($context, $scope);
+			$this->disableCache = $accessControl->applyContext($this->contextResult, $scope);
 		else
 			$this->disableCache = false;
-
-		return $context;
+			
+		if(count($this->contextResult->getAccessControlActions()))
+		{
+			$actions = $this->contextResult->getAccessControlActions();
+			foreach($actions as $action)
+			{
+				/* @var $action kAccessControlAction */
+				switch ($action->getType())
+				{
+					case accessControlActionType::BLOCK:
+						$this->hasBlockAction = true;
+						break;
+					case accessControlActionType::LIMIT_FLAVORS:
+						$this->hasLimitFlavorsAction = true;
+						$this->limitFlavorsAction = $action;
+						break;
+					case accessControlActionType::PREVIEW:
+						$this->hasPreviewAction = true;
+						break;					
+				}
+			}
+		}			
 	}
 	
 	protected function validateScheduling()

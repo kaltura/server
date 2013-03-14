@@ -67,9 +67,6 @@ class WidevineDrmService extends KalturaBaseService
 		if($flavorAsset->getType() != WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::WRONG_ASSET_TYPE);
 			
-		KalturaLog::debug("Widevine Asset Id from request: ".$wvAssetId);
-		KalturaLog::debug("Widevine Asset Id from flavor asset object: ".$flavorAsset->getWidevineAssetId());
-		
 		if($wvAssetId != $flavorAsset->getWidevineAssetId())
 			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::FLAVOR_ASSET_ID_DONT_MATCH_WIDEVINE_ASSET_ID);
 					
@@ -77,10 +74,10 @@ class WidevineDrmService extends KalturaBaseService
 		if(!$entry)
 			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::FLAVOR_ASSET_ID_NOT_FOUND);
 			
-		$this->validateAccessControl($entry);		
+		$this->validateAccessControl($entry, $flavorAsset);		
 	}
 	
-	private function validateAccessControl($entry)
+	private function validateAccessControl(entry $entry, flavorAsset $flavorAsset)
 	{
 		KalturaLog::debug("Validating access control");
 		
@@ -93,17 +90,11 @@ class WidevineDrmService extends KalturaBaseService
 				throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::ENTRY_MODERATION_ERROR);
 		}
 			
-		$context = $secureEntryHelper->applyContext();
-		if(count($context->getAccessControlActions()))
-		{
-			$actions = $context->getAccessControlActions();
-			foreach($actions as $action)
-			{
-				/* @var $action kAccessControlAction */
-				if($action->getType() == accessControlActionType::BLOCK)
-					throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::ACCESS_CONTROL_RESTRICTED);
-			}
-		}
+		if($secureEntryHelper->shouldBlock())
+			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::ACCESS_CONTROL_RESTRICTED);
+			
+		if(!$secureEntryHelper->isAssetAllowed($flavorAsset))
+			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::FLAVOR_ASSET_ID_NOT_FOUND);
 	}
 	
 	private function getFlavorAssetObject($flavorAssetId)

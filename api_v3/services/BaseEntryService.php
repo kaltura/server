@@ -699,8 +699,6 @@ class BaseEntryService extends KalturaEntryService
 		if($ks)
 			$isAdmin = $ks->isAdmin();
 			
-		$accessControl = $dbEntry->getAccessControl();
-		/* @var $accessControl accessControl */
 		$result = new KalturaEntryContextDataResult();
 		$result->isAdmin = $isAdmin;
 		$result->isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
@@ -711,6 +709,18 @@ class BaseEntryService extends KalturaEntryService
 			KalturaResponseCacher::setConditionalCacheExpiry(600);
 		}	
 
+		$dbEntryContextResult = $this->applyAccessControlOnContextData($result, $dbEntry, $contextDataParams);
+		$this->setContextDataFlavorAssets($result, $dbEntryContextResult, $dbEntry, $contextDataParams);
+		$this->setContextDataStorageProfilesXml($result, $dbEntry, $contextDataParams);	
+		$this->setContextDataStreamerTypeAndMediaProtocol($result, $dbEntry, $contextDataParams);
+		
+		return $result;
+	}
+	
+	private function applyAccessControlOnContextData(KalturaEntryContextDataResult &$result, entry $dbEntry, KalturaEntryContextDataParams $contextDataParams)
+	{
+		$accessControl = $dbEntry->getAccessControl();
+		/* @var $accessControl accessControl */
 		if ($accessControl && $accessControl->hasRules())
 		{
 			$isSecured = true;
@@ -729,7 +739,7 @@ class BaseEntryService extends KalturaEntryService
 			
 			$accessControlScope = $accessControl->getScope();
             $contextDataParams->toObject($accessControlScope);
-            $accessControlScope->setEntryId($entryId);
+            $accessControlScope->setEntryId($dbEntry->getId());
 			$result->isAdmin = ($accessControlScope->getKs() && $accessControlScope->getKs()->isAdmin());
             
 			$dbResult = new kEntryContextDataResult();
@@ -738,39 +748,79 @@ class BaseEntryService extends KalturaEntryService
 				
 			$result->fromObject($dbResult);
 		}
+
+		return $dbResult;
+	}
+	
+	private function setContextDataFlavorAssets(KalturaEntryContextDataResult &$result, kEntryContextDataResult $dbEntryContextResult, entry $dbEntry, KalturaEntryContextDataParams $contextDataParams)
+	{
+		$flavorParamsIds = null;
+		$flavorParamsNotIn = false;
+		foreach ($dbEntryContextResult->getAccessControlActions() as $action) 
+		{			
+			if($action->getType == accessControlActionType::LIMIT_FLAVORS)
+			{
+				/* @var $action kAccessControlLimitFlavorsAction */
+				$flavorParamsIds = explode(',', $action->getFlavorParamsIds());
+				$flavorParamsNotIn = $action->getIsBlockedList();
+				break;
+			}
+		}	
 		
+		$flavorAssetsDb = array();
+		if (is_null($contextDataParams->flavorAssetId))
+		{
+			if(count($flavorParamsIds))
+				$flavorAssetsDb = assetPeer::retrieveReadyByEntryIdAndFlavorParams($dbEntry->getId(), $flavorParamsIds, $flavorParamsNotIn);
+			else 
+				$flavorAssetsDb = assetPeer::retrieveReadyByEntryId($dbEntry->getId());			
+		}
+		else
+		{
+			$asset = assetPeer::retrieveByPK($contextDataParams->flavorAssetId);				
+			if(!$asset)
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contextDataParams->flavorAssetId);
+				
+			if(count($flavorParamsIds))
+			{
+				$flavorAllowed = (in_array($asset->getFlavorParamsId(), $flavorParamsIds) && !$flavorParamsNotIn); 
+				if($flavorAllowed)
+					$flavorAssetsDb[] = $asset;
+			}
+		}		
+			
+		$tags = $contextDataParams->flavorTags;
+		if(!$tags)
+			$tags = flavorParams::TAG_MBR.','.flavorParams::TAG_WEB;
+			
+		$tagsArray = explode(',', $tags);
+		foreach ($tagsArray as $tag) 
+		{
+			$filteredFlavorAssetsDb = assetPeer::filterByTagExclusive($flavorAssetsDb, $tag);
+			if(count($filteredFlavorAssetsDb))
+			{
+				$flavorAssetsDb = $filteredFlavorAssetsDb;
+				break;
+			}
+		}
+
+		if(!count($flavorAssetsDb))
+			throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND, $dbEntry->getId());
+		
+		$result->flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb);
+		return $result;
+	}
+	
+	private function setContextDataStorageProfilesXml(KalturaEntryContextDataResult &$result, entry $dbEntry, KalturaEntryContextDataParams $contextDataParams)
+	{
 		$partner = PartnerPeer::retrieveByPK($dbEntry->getPartnerId());
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_DELIVERY_PRIORITY, $dbEntry->getPartnerId()) &&
 			$partner->getStorageServePriority() != StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
 		{
-			if (is_null($contextDataParams->flavorAssetId))
-			{
-				if ($contextDataParams->flavorTags)
-				{
-					$assets = assetPeer::retrieveReadyByEntryIdAndTag($entryId, $contextDataParams->flavorTags);
-					$asset = reset($assets);
-				}
-				else 
-					$asset = assetPeer::retrieveBestPlayByEntryId($entryId);
-				
-				if(!$asset)
-					throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND, $entryId);
-			}
-			else
-			{
-				$asset = assetPeer::retrieveByPK($contextDataParams->flavorAssetId);
-				
-				if(!$asset)
-					throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contextDataParams->flavorAssetId);
-			}
-			
-			if(!$asset)
-				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $entryId);
-								
+			$asset = reset($result->flavorAssets);					
 			$assetSyncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			$fileSyncs = kFileSyncUtils::getAllReadyExternalFileSyncsForKey($assetSyncKey);
-		
-			
+					
 			$storageProfilesXML = new SimpleXMLElement("<StorageProfiles/>");
 			foreach ($fileSyncs as $fileSync)
 			{
@@ -783,20 +833,21 @@ class BaseEntryService extends KalturaEntryService
 				{
 					$contextDataParams->streamerType = PlaybackProtocol::HTTP;
 					$contextDataParams->mediaProtocol = PlaybackProtocol::HTTP;
-
 				}
 				$storageProfileXML = $storageProfilesXML->addChild("StorageProfile");
 				
 				$storageProfileXML->addAttribute("storageProfileId",$storageProfileId);
 				$storageProfileXML->addChild("Name", $storageProfile->getName());
-				$storageProfileXML->addChild("SystemName", $storageProfile->getSystemName());
-				
+				$storageProfileXML->addChild("SystemName", $storageProfile->getSystemName());				
 			}
 
-			$result->storageProfilesXML = $storageProfilesXML->saveXML();
-			
+			$result->storageProfilesXML = $storageProfilesXML->saveXML();			
 		}
-		
+		return $result;
+	}
+	
+	private function setContextDataStreamerTypeAndMediaProtocol(KalturaEntryContextDataResult &$result, entry $dbEntry, KalturaEntryContextDataParams $contextDataParams)
+	{
 		if($contextDataParams->streamerType && $contextDataParams->streamerType != PlaybackProtocol::AUTO)
 		{
 			$result->streamerType = $contextDataParams->streamerType;
@@ -846,7 +897,7 @@ class BaseEntryService extends KalturaEntryService
 		
 		if ($result->streamerType == KalturaPlaybackProtocol::AKAMAI_HD || $result->streamerType == KalturaPlaybackProtocol::AKAMAI_HDS)
 			$result->mediaProtocol = KalturaPlaybackProtocol::HTTP;
-		
+			
 		return $result;
 	}
 	

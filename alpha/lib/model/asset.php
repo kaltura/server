@@ -89,6 +89,8 @@ class asset extends Baseasset implements ISyncableFile
 	const CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION = "partnerDescription";
 	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
 	
+	const EXCLUSIVE_TAG_PREFIX = 'exclusive_';
+	
 	public function copyToEntry($entryId = null, $partnerId = null)
 	{
 		$newFlavorAsset = $this->copy();
@@ -472,6 +474,18 @@ class asset extends Baseasset implements ISyncableFile
 	public function getTags()
 	{
 		return trim(parent::getTags());
+	}
+
+	public function hasTagExclusive($v)
+	{
+		if(!strncmp($v, self::EXCLUSIVE_TAG_PREFIX, strlen(self::EXCLUSIVE_TAG_PREFIX)))
+			return $this->hasTag($v);
+		else 
+		{
+			if(strstr($this->getTags(), self::EXCLUSIVE_TAG_PREFIX))
+				return false;
+			return $this->hasTag($v);
+		}
 	}
 
 	/**
