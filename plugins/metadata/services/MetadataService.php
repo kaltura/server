@@ -280,16 +280,11 @@ class MetadataService extends KalturaBaseService
 				$dbMetadata->setMetadataProfileVersion($dbMetadataProfile->getVersion());
 			}
 			
-			// Gonen - 2013-03-12 : change order of actions to solve possible race-condition when trying to update same object too soon
-			// increment without saving the object, to make sure we get the right syncKey
 			$dbMetadata->incrementVersion();
-		
-			// prepare syncKey
-			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-			// save the file
-			kFileSyncUtils::file_put_contents($key, $xmlData);
-			// save the object to actually advance the version
 			$dbMetadata->save();
+		
+			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+			kFileSyncUtils::file_put_contents($key, $xmlData);
 			
 			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
 		}
@@ -569,54 +564,16 @@ class MetadataService extends KalturaBaseService
 	 */
 	public function updateFromXSLAction ($id, $xslFile)
 	{
+		$dbMetadataObject = MetadataPeer::retrieveByPK($id);
+		if (!$dbMetadataObject)
+			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND);
+		
 		$xslFilePath = $xslFile['tmp_name'];
 		if(!file_exists($xslFilePath))
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xslFile['name']);
 		
 		$xslData = file_get_contents($xslFilePath);
 		@unlink($xslFilePath);
-		
-		for($i=0;$i<4;$i++)
-		{
-			try
-			{
-				$result = $this->updateFromXslImpl($id, $xslData);
-				return $result;
-			}
-			catch(PropelException $e)
-			{
-				// trying to catch propel exception that could happen in case of update of the same existing version (race-condition updating the same object too soon).
-				// in such case - try to update again
-				KalturaLog::debug("Retrying update by XSL due to propel exception: ".$e->getMessage());
-				continue;
-			}
-			catch(kFileSyncException $e)
-			{
-				// if the exception says that the file sync already exists - this is the same race-condition, let's try again
-				if($e->getCode() == kFileSyncException::FILE_SYNC_ALREADY_EXISTS)
-				{
-					KalturaLog::debug("Retrying update by XSL due to kFileSyncException: ".$e->getMessage());
-					continue;
-				}
-				else
-				{
-					// cought another exception that we don't know what it is or why it was thrown - re-throw it to stop the loop
-					KalturaLog::err("Failed updating metadata from XSL with exception ".get_class($e)." and message: ".$e->getMessage());
-					throw $e;
-				}
-			}
-		}
-		
-		// if we go here we did not return a successful result yet, let's make another last try before giving up
-		$result = $this->updateFromXslImpl($id, $xslData);
-		return $result;
-	}
-	
-	private function updateFromXslImpl($id, $xslData)
-	{
-		$dbMetadataObject = MetadataPeer::retrieveByPK($id);
-		if (!$dbMetadataObject)
-			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND);
 		
 		$dbMetadataObjectFileSyncKey = $dbMetadataObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		
