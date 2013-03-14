@@ -83,11 +83,10 @@ class KWidevineOperationEngine extends KOperationEngine
 			
 			$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
 			$updatedFlavorAsset->widevineAssetId = $response->getAssetid();
-			if($entry->startDate && $entry->endDate)
-			{
+			if($entry->startDate)
 				$updatedFlavorAsset->widevineDistributionStartDate = $entry->startDate;
+			if($entry->endDate)
 				$updatedFlavorAsset->widevineDistributionEndDate = $entry->endDate;
-			}
 			$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);
 			$this->unimpersonate();
 			return true;
@@ -136,12 +135,10 @@ class KWidevineOperationEngine extends KOperationEngine
 				}
 			}
 		}
-		if($entry->startDate && $entry->endDate)
-		{
+		if($entry->startDate)
 			$requestInput->setLicenseStartDate($entry->startDate);
+		if($entry->endDate)
 			$requestInput->setLicenseEndDate($entry->endDate);
-		}
-		
 		$requestXml = $requestInput->createPackageNotifyRequestXml();
 			
 		KalturaLog::debug('Package notify request: '.$requestXml);	

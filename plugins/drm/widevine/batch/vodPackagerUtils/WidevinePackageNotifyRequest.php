@@ -182,11 +182,10 @@ class WidevinePackageNotifyRequest
 		$packageNotifyXml->addAttribute('outputFile', $this->getOutputFileName());
 		if($this->getPolicy())
 			$packageNotifyXml->addAttribute('policy', $this->getPolicy());
-		if($this->getLicenseStartDate() && $this->getLicenseEndDate())
-		{		
-			$packageNotifyXml->addAttribute('licenseStartDate', $this->getLicenseStartDate());
+		if($this->getLicenseStartDate())
+			$packageNotifyXml->addAttribute('licenseStartDate', $this->getLicenseStartDate());			
+		if($this->getLicenseEndDate())
 			$packageNotifyXml->addAttribute('licenseEndDate', $this->getLicenseEndDate());
-		}
 		return $packageNotifyXml->asXML();
 	}
 }
