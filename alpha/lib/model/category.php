@@ -98,8 +98,6 @@ class category extends Basecategory implements IIndexable
 			{
 				$this->addDeleteCategoryKuserJob($this->getId());
 			}
-			$this->addIndexCategoryEntryJob($this->getId());
-			
 		}
 		
 		// save the childs for action category->delete - delete category is not done by async batch. 
