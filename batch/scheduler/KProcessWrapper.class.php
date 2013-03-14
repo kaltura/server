@@ -133,6 +133,7 @@ class KProcessWrapper
 		
 		if($this->handle && is_resource($this->handle))
 		{
+			KalturaLog::notice("About to kill process : " . $this->processId);
 			if($this->processId && function_exists('posix_kill'))
 				posix_kill($this->processId, 9);
 				
