@@ -76,7 +76,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     			$privacyContexts = $category->getPrivacyContexts() != "" ? explode(",", $category->getPrivacyContexts()) : array();
     			if (!count($privacyContexts))
     				$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT; 
-    			$this->addOrIncrementTags(entryPeer::retrieveByPK($object->getEntryId()),$privacyContexts);
+    			$this->addOrIncrementTags(entryPeer::retrieveByPK($object->getEntryId()),null, $privacyContexts);
     		}
     	}
     	catch(Exception $e)
@@ -115,10 +115,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public function objectChanged (BaseObject $object, array $modifiedColumns)
     {
-        $oldTags = $object->getColumnsOldValue(self::getClassConstValue(get_class($object->getPeer()), self::TAGS_FIELD_NAME));
-        $newTags = $object->getTags();
-        $tagsForDelete = implode(',', array_diff(explode(',', $oldTags), explode(',', $newTags)));
-        $privacyContexts = null;
         if ($object instanceof entry)
         {
         	$criteria = new Criteria();
@@ -145,10 +141,24 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         	}
         }
         
+        if ($object instanceof category)
+        {
+        	if (in_array(categoryPeer::PRIVACY_CONTEXTS, $modifiedColumns))
+        	{
+        		
+        	}
+        }
+        
+        $oldTags = $object->getColumnsOldValue(self::getClassConstValue(get_class($object->getPeer()), self::TAGS_FIELD_NAME));
+        $newTags = $object->getTags();
+        $tagsForDelete = implode(',', array_diff(explode(',', $oldTags), explode(',', $newTags)));
+        $tagsForUpdate = implode(',', array_diff(explode(',', $newTags), explode(',', $oldTags)));
+        $privacyContexts = null;
+        
         if ($oldTags && $oldTags != "")
             $this->decrementExistingTagsInstanceCount($object,$tagsForDelete,$privacyContexts);
 
-        $this->addOrIncrementTags($object,$privacyContexts);
+        $this->addOrIncrementTags($object, $tagsForUpdate, $privacyContexts);
     }
 
 	/* (non-PHPdoc)
@@ -163,6 +173,24 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         {
             return true;
         }
+        
+        if ($object instanceof category)
+        {
+        	if (in_array(categoryPeer::PRIVACY_CONTEXTS, $modifiedColumns))
+        	{
+        		$criteria = new Criteria();
+        		$criteria->add(categoryEntryPeer::CATEGORY_ID, $object->getId());
+        		$categoryEntries = categoryEntryPeer::doSelect($criteria);
+        		foreach ($categoryEntries as $categoryEntry)
+        		{
+        			/* @var $categoryEntry categoryEntry */
+        			$entry = entryPeer::retrieveByPK($categoryEntry->getEntryId());
+        			if ($entry->getTags())
+        				return true;
+        		}
+        	}
+        }
+        
         return false;
         
     }
@@ -173,10 +201,10 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      * @param BaseObject $object
      * @return array
      */
-	protected function addOrIncrementTags (BaseObject $object, array $privacyContexts = null)
+	protected function addOrIncrementTags (BaseObject $object, $tagsForUpdate = null, array $privacyContexts = null)
 	{
 	    KalturaLog::info("In Object Added handler");
-	    $objectTags = $this->trimObjectTags($object->getTags());
+	    $objectTags = $tagsForUpdate ? $this->trimObjectTags($tagsForUpdate) : $this->trimObjectTags($object->getTags());
 	    $objectTags = str_replace(self::$specialCharacters, self::$specialCharactersReplacement, $objectTags);
 	    if (!count($objectTags))
 	    {
