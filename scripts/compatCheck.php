@@ -65,10 +65,14 @@ $APIV3_TESTED_ACTIONS = array(
 		'*.search',
 		);
 
+$KS_PATTERNS = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/');
+
 // compare modes
 define('CM_XML', 0);
 define('CM_BINARY', 1);
 define('CM_WIDGET', 2);
+
+define('MAX_BINARY_DIFFS', 5);
 
 $ID_FIELDS = array('id', 'guid', 'loc', 'title', 'link');
 
@@ -405,7 +409,7 @@ function compareArrays($resultNew, $resultOld, $path)
 
 function normalizeResultBuffer($result)
 {
-	global $serviceUrlNew, $serviceUrlOld;
+	global $serviceUrlNew, $serviceUrlOld, $KS_PATTERNS;
 	
 	$result = preg_replace('/<executionTime>[0-9\.]+<\/executionTime>/', '', $result);
 	$result = preg_replace('/<serverTime>[0-9\.]+<\/serverTime>/', '', $result);
@@ -415,15 +419,14 @@ function normalizeResultBuffer($result)
 	$result = preg_replace('/<server_time>[0-9\.]+<\/server_time>/', '', $result);
 	$result = preg_replace('/server_time="[0-9\.]+"/', '', $result);
 	$result = preg_replace('/kaltura_player_\d+/', 'KP', $result);
-	$result = preg_replace('&ts=[0-9\.]+&', '&ts=0&', $result);
-	$result = preg_replace('/<\/result><\/xml>...\x01\0\0\x02\0\0\0/', '</result></xml>\x01\0\0\x02\0\0\0', $result);	// for kwidget
+	$result = preg_replace('/&ts=[0-9\.]+&/', '&ts=0&', $result);
 	
 	if (strlen($serviceUrlOld) < strlen($serviceUrlNew))		// this if is for case where one of the url is a prefix of the other
 		$result = str_replace($serviceUrlNew, $serviceUrlOld, $result);
 	else
 		$result = str_replace($serviceUrlOld, $serviceUrlNew, $result);
 	
-	$patterns = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/');
+	$patterns = $KS_PATTERNS;
 	foreach ($patterns as $pattern)
 	{
 		preg_match_all($pattern, $result, $matches);
@@ -435,6 +438,17 @@ function normalizeResultBuffer($result)
 	return $result;
 }
 
+function countDifferences($buffer1, $buffer2)
+{
+	$bufLen = strlen($buffer1);
+	$result = 0;
+	for ($i = 0; $i < $bufLen; $i++)
+	{
+		if ($buffer1[$i] != $buffer2[$i])
+			$result++;
+	}
+	return $result;
+}
 function uncompressWidget($buffer)
 {
 	return gzuncompress(substr($buffer, 8));
@@ -575,7 +589,7 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array(),
 		case CM_BINARY:
 			$resultOld = normalizeResultBuffer($resultOld);
 			$resultNew = normalizeResultBuffer($resultNew);
-			if ($resultNew === $resultOld)
+			if (countDifferences($resultNew, $resultOld) <= MAX_BINARY_DIFFS)
 				$errors = array();
 			else
 				$errors = array('Data does not match - newSize='.strlen($resultNew).' oldSize='.strlen($resultOld));
@@ -946,6 +960,11 @@ function processPS2Request($parsedParams)
 	
 	if (!in_array($fullActionName, $PS2_TESTED_XML_ACTIONS) && 
 		!in_array($fullActionName, $PS2_TESTED_BIN_ACTIONS))
+	{
+		return;
+	}
+	
+	if (!extendRequestKss($parsedParams))
 	{
 		return;
 	}
