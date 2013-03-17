@@ -781,7 +781,7 @@ class BaseEntryService extends KalturaEntryService
 		}
 		else
 		{
-			$asset = assetPeer::retrieveByPK($contextDataParams->flavorAssetId);				
+			$asset = assetPeer::retrieveById($contextDataParams->flavorAssetId);				
 			if(!$asset)
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contextDataParams->flavorAssetId);
 				
@@ -798,6 +798,11 @@ class BaseEntryService extends KalturaEntryService
 			$tags = flavorParams::TAG_MBR.','.flavorParams::TAG_WEB;
 			
 		$tagsArray = explode(',', $tags);
+		if(!in_array(flavorParams::TAG_MBR, $tagsArray))
+			$tagsArray[] = flavorParams::TAG_MBR;
+		if(!in_array(flavorParams::TAG_WEB, $tagsArray))
+			$tagsArray[] = flavorParams::TAG_WEB;
+				
 		foreach ($tagsArray as $tag) 
 		{
 			$filteredFlavorAssetsDb = assetPeer::filterByTagExclusive($flavorAssetsDb, $tag);
