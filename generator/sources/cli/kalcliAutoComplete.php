@@ -31,6 +31,7 @@ require_once(dirname(__file__) . '/kalcliSwitches.php');
 
 define('PROPERTY_DELIMITER', ':');
 define('ASSIGN_DELIMITER', '=');
+define('FILENAME_DELIMITER', '@');
 
 // String/completion utility functions
 function stripSuffix($str, $postfix)
@@ -185,10 +186,18 @@ function getTypeName($typeName)
 function addPropertySuffix($propertyDetails)
 {
 	$result = $propertyDetails['name'];
-	if (in_array(getTypeName($propertyDetails['type']), array('object', 'array')))
+	switch (getTypeName($propertyDetails['type']))
+	{
+	case 'object':
+	case 'array':
 		return $result . PROPERTY_DELIMITER;
-	else
+
+	case 'file':
+		return $result . ASSIGN_DELIMITER . FILENAME_DELIMITER;
+		
+	default:
 		return $result . ASSIGN_DELIMITER;
+	}
 }
 
 function getEnumValueCompletion($constDetails)
@@ -259,6 +268,15 @@ function getParameterNameCompletions($serviceName, $actionName, $autoCompWord, &
 				$enumValues = array_map('getEnumValueCompletion', getEnumValueList($enumType));
 				$finalComp = true;
 				return addPrefix($enumValues, $paramName.ASSIGN_DELIMITER);
+			}
+			else if ($assignPos + 1 < strlen($autoCompWord) && $autoCompWord[$assignPos + 1] == FILENAME_DELIMITER)
+			{
+				// upload file name completion
+				$fileName = substr($autoCompWord, $assignPos + 2);
+				$completions = null;
+				exec("compgen -f -- '{$fileName}'", $completions);
+				$finalComp = true;
+				return addPrefix($completions, $paramName.ASSIGN_DELIMITER.FILENAME_DELIMITER);
 			}
 		}
 	}
@@ -397,6 +415,8 @@ default:	// parameters
 		if (count($completions) != 1 || $finalComp)
 			break;
 		$curAutoCompWord = $completions[0];
+		if (substr($curAutoCompWord, -1) == FILENAME_DELIMITER)
+			break;		// don't automatically load all file completions (usually a lot..)
 	}
 	printCompletions($autoCompWord, $completions, $finalComp, false);
 	break;
