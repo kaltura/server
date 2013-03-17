@@ -720,6 +720,7 @@ class BaseEntryService extends KalturaEntryService
 	private function applyAccessControlOnContextData(KalturaEntryContextDataResult &$result, entry $dbEntry, KalturaEntryContextDataParams $contextDataParams)
 	{
 		$accessControl = $dbEntry->getAccessControl();
+		$dbResult = new kEntryContextDataResult();
 		/* @var $accessControl accessControl */
 		if ($accessControl && $accessControl->hasRules())
 		{
@@ -742,13 +743,12 @@ class BaseEntryService extends KalturaEntryService
             $accessControlScope->setEntryId($dbEntry->getId());
 			$result->isAdmin = ($accessControlScope->getKs() && $accessControlScope->getKs()->isAdmin());
             
-			$dbResult = new kEntryContextDataResult();
+			
 			if($accessControl->applyContext($dbResult) && $disableCache)
 				KalturaResponseCacher::disableCache();
 				
 			$result->fromObject($dbResult);
 		}
-
 		return $dbResult;
 	}
 	
