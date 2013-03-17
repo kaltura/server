@@ -557,7 +557,7 @@ function shouldProcessRequest($fullActionName, $parsedParams)
 	return 'yes';
 }
 
-function testAction($fullActionName, $parsedParams, $uri, $postParams = array(), $compareMode = CM_XML)
+function testAction($fullActionName, $parsedParams, $uri, $postParams = array(), $compareMode = CM_XML, $kalcliCmd = '')
 {
 	global $serviceUrlOld, $serviceUrlNew;
 	
@@ -635,6 +635,9 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array(),
 	print "\tUrl = $serviceUrlNew$uri\n";
 	print "\tPostParams = ".var_export($postParams, true)."\n";
 	print "\tTestUrl = $serviceUrlNew$uri&".http_build_query($postParams)."\n";	
+	if ($kalcliCmd)
+		print "\tkalcli = {$kalcliCmd}\n";
+	
 	foreach ($errors as $error)
 	{
 		print "\tError: $error\n";
@@ -712,6 +715,20 @@ function isActionApproved($fullActionName, $action)
 	return false;
 }
 
+function generateKalcliCommand($service, $action, $parsedParams)
+{
+	$kalcliCmd = "kalcli -x {$service} {$action}";
+	foreach ($parsedParams as $key => $value)
+	{
+		$curParam = "{$key}={$value}";
+		if (!preg_match('/^[a-zA-Z0-9\:_\-,=\.]+$/', $curParam))
+			$kalcliCmd .= " '{$curParam}'";
+		else
+			$kalcliCmd .= " {$curParam}";
+	}
+	return $kalcliCmd;
+}
+
 function processMultiRequest($parsedParams)
 {
 	$paramsByRequest = array();
@@ -775,10 +792,13 @@ function processMultiRequest($parsedParams)
 	}
 	
 	$parsedParams['format'] = '2';		# XML
-
-	$uri = "/api_v3/index.php?service=multirequest";
+	ksort($parsedParams);
 	
-	testAction($fullActionName, $parsedParams, $uri, $parsedParams);
+	$uri = "/api_v3/index.php?service=multirequest";
+
+	$kalcliCmd = generateKalcliCommand('multirequest', 'null', $parsedParams);
+	
+	testAction($fullActionName, $parsedParams, $uri, $parsedParams, CM_XML, $kalcliCmd);
 }
 
 function processRequest($parsedParams)
@@ -829,9 +849,13 @@ function processRequest($parsedParams)
 		return;
 	}
 	
+	ksort($parsedParams);
+	
+	$kalcliCmd = generateKalcliCommand($service, $action, $parsedParams);
+	
 	$uri = "/api_v3/index.php?service=$service&action=$action";
 	$compareMode = (beginsWith($action, 'serve') ? CM_BINARY : CM_XML);
-	testAction($fullActionName, $parsedParams, $uri, $parsedParams, $compareMode);
+	testAction($fullActionName, $parsedParams, $uri, $parsedParams, $compareMode, $kalcliCmd);
 }
 
 function processFeedRequest($parsedParams)
@@ -855,6 +879,7 @@ function processFeedRequest($parsedParams)
 	}
 	
 	$parsedParams['nocache'] = '1';
+	ksort($parsedParams);
 	
 	$uri = "/api_v3/getFeed.php?" . http_build_query($parsedParams, null, "&");
 	
@@ -978,6 +1003,7 @@ function processPS2Request($parsedParams)
 		return;
 	}
 	
+	ksort($parsedParams);
 	$uri = "/index.php/$module/$action?" . http_build_query($parsedParams, null, "&");
 
 	if (in_array($fullActionName, $PS2_TESTED_XML_ACTIONS))
