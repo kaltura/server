@@ -564,27 +564,32 @@ class MetadataService extends KalturaBaseService
 	 */
 	public function updateFromXSLAction ($id, $xslFile)
 	{
-		$dbMetadataObject = MetadataPeer::retrieveByPK($id);
-		if (!$dbMetadataObject)
-			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND);
-		
 		$xslFilePath = $xslFile['tmp_name'];
 		if(!file_exists($xslFilePath))
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xslFile['name']);
-		
+
 		$xslData = file_get_contents($xslFilePath);
 		@unlink($xslFilePath);
-		
+
+		return kLock::runLocked("metadata_update_xsl_{$id}", array($this, 'updateFromXSLImpl'), array($id, $xslData));
+	}
+
+	public function updateFromXSLImpl ($id, $xslData)
+	{
+		$dbMetadataObject = MetadataPeer::retrieveByPK($id);
+		if (!$dbMetadataObject)
+			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND);
+
 		$dbMetadataObjectFileSyncKey = $dbMetadataObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		
+
 		$xsltErrors = array();
-		$transformMetadataObjectData = kXml::transformXmlUsingXslt(kFileSyncUtils::file_get_contents($dbMetadataObjectFileSyncKey), $xslData, null, $xsltErrors);
-		
+		$transformMetadataObjectData = kXml::transformXmlUsingXslt(kFileSyncUtils::file_get_contents($dbMetadataObjectFileSyncKey), $xslData, array(), $xsltErrors);
+
 		if ( count($xsltErrors))
 		{
 			throw new KalturaAPIException(MetadataErrors::XSLT_VALIDATION_ERROR, implode(',', $xsltErrors));
 		}
-		
+
 		return $this->updateAction($id, $transformMetadataObjectData);
 	}
 }

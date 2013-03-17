@@ -17,6 +17,7 @@ class kCacheManager
 	const CACHE_TYPE_FEED_ENTRY = 'feedEntry';
 	const CACHE_TYPE_API_EXTRA_FIELDS = 'apiExtraFieldsCache';
 	const CACHE_TYPE_SPHINX_STICKY_SESSIONS = 'sphinxStickySessions';
+	const CACHE_TYPE_LOCK_KEYS = 'lockKeys';
 	
 	protected static $caches = array();
 	

@@ -135,6 +135,14 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	}
 
 	/* (non-PHPdoc)
+	 * @see kBaseCacheWrapper::add()
+	 */
+	public function add($key, $var, $expiry = 0)
+	{
+		return $this->callAndDetectErrors('add', array($key, $var, $this->flags, $expiry));
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::multiGet()
 	 */
 	public function multiGet($keys)

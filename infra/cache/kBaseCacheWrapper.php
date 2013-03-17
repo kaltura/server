@@ -28,6 +28,14 @@ abstract class kBaseCacheWrapper
 
 	/**
 	 * @param string $key
+	 * @param mixed $var
+	 * @param int $expiry
+	 * @return bool false on error
+	 */
+	abstract public function add($key, $var, $expiry = 0);
+	
+	/**
+	 * @param string $key
 	 * @return bool false on error
 	 */
 	abstract public function delete($key);

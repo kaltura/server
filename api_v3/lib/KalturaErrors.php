@@ -87,6 +87,8 @@ class KalturaErrors extends APIErrors
 
 	const SYSTEM_NAME_ALREADY_EXISTS = "SYSTEM_NAME_ALREADY_EXISTS,System name [%s] already exists";
 
+	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT,Timed out while attempting to grab lock";
+	
 	/**
 	 * Service Oriented Errors
 	 *

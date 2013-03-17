@@ -398,6 +398,10 @@ class KalturaFrontController
 					$object = new KalturaAPIException(KalturaErrors::FILE_NOT_FOUND);
 					break;
 					
+				case kCoreException::LOCK_TIMED_OUT:
+					$object = new KalturaAPIException(KalturaErrors::LOCK_TIMED_OUT);
+					break;
+						
 				default:
 		    		KalturaLog::crit($ex);
 					$object = new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);

@@ -124,6 +124,14 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	}
 	
 	/* (non-PHPdoc)
+	 * @see kBaseCacheWrapper::add()
+	 */
+	public function add($key, $var, $expiry = 0)
+	{
+		return false;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::delete()
 	 */
 	public function delete($key)
