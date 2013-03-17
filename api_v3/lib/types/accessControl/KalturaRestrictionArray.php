@@ -39,6 +39,8 @@ class KalturaRestrictionArray extends KalturaTypedArray
 				return new KalturaIpAddressRestriction();
 			case "kAccessControlUserAgentRestriction":
 				return new KalturaUserAgentRestriction();
+			case "kAccessControlLimitFlavorsRestriction":
+				return new KalturaLimitFlavorsRestriction();
 			default:
 				KalturaLog::err("Access control rule type [$objectClass] could not be loaded");
 				return null;
