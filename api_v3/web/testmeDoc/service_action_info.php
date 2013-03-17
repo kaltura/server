@@ -10,6 +10,10 @@ $serviceReflector = $serviceMap[strtolower($service)];
 
 /* @var $serviceReflector KalturaServiceActionItem */
 $actions = $serviceReflector->actionMap;
+if (!array_key_exists($action, $actions))
+{
+	die('Action "'.$action.'" does not exist for service "'.$service.'"');
+}
 try
 {
     $actionReflector = new KalturaActionReflector($service, $action, $actions[$action]);
