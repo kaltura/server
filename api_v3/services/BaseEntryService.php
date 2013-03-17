@@ -785,12 +785,11 @@ class BaseEntryService extends KalturaEntryService
 			if(!$asset)
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contextDataParams->flavorAssetId);
 				
+			$flavorAllowed = true;	
 			if(count($flavorParamsIds))
-			{
-				$flavorAllowed = (in_array($asset->getFlavorParamsId(), $flavorParamsIds) && !$flavorParamsNotIn); 
-				if($flavorAllowed)
-					$flavorAssetsDb[] = $asset;
-			}
+				$flavorAllowed = (in_array($asset->getFlavorParamsId(), $flavorParamsIds) && !$flavorParamsNotIn); 	
+			if($flavorAllowed)
+				$flavorAssetsDb[] = $asset;
 		}		
 			
 		$tags = $contextDataParams->flavorTags;
