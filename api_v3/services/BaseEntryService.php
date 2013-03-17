@@ -758,12 +758,12 @@ class BaseEntryService extends KalturaEntryService
 		$flavorParamsNotIn = false;
 		foreach ($dbEntryContextResult->getAccessControlActions() as $action) 
 		{	
-			if($action->getType == accessControlActionType::BLOCK)
+			if($action->getType() == accessControlActionType::BLOCK)
 			{
 				//in case of block action do not set the list of flavors
 				return $result;
 			}
-			if($action->getType == accessControlActionType::LIMIT_FLAVORS)
+			if($action->getType() == accessControlActionType::LIMIT_FLAVORS)
 			{
 				/* @var $action kAccessControlLimitFlavorsAction */
 				$flavorParamsIds = explode(',', $action->getFlavorParamsIds());
