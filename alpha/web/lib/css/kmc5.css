@@ -313,6 +313,7 @@ fieldset{ border:0 none; position:relative; }
 #previewModal a { color: #009ACC; }
 #previewModal input { width: auto; }
 #previewModal select { max-width: 100%; }
+#previewModal .content { min-height: 500px; }
 #previewModal .hr { border-top: 1px solid #ddd; border-bottom: 1px solid #fff; margin: 8px 0; }
 #previewModal .title { height: auto; }
 #previewModal .options { height: 100%; max-width: 370px; background-color: #F6F6F6; padding: 30px 30px 30px 26px; border-right: 1px solid #D4D4D4; min-height: 500px; overflow-y: auto; }
