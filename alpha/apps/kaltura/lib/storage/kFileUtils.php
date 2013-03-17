@@ -150,7 +150,7 @@ class kFileUtils extends kFile
 		KExternalErrors::dieGracefully();
 	}
 	
-    public static function dumpUrl($url, $allowRange = true, $passHeaders = false)
+    public static function dumpUrl($url, $allowRange = true, $passHeaders = false, $additionalHeaders = null)
 	{
 		KalturaLog::debug("URL [$url], $allowRange [$allowRange], $passHeaders [$passHeaders]");
 		self::closeDbConnections();
@@ -179,6 +179,12 @@ class kFileUtils extends kFile
 			list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
 			curl_setopt($ch, CURLOPT_RANGE, $range);
 		}
+
+		if ($additionalHeaders)
+		{
+			foreach($additionalHeaders as $header => $value)
+                       		$sendHeaders[] = "$header: $value";
+		}
 		
 		// when proxying request to other datacenter we may be already in a proxied request (from one of the internal proxy servers)
 		// we need to ensure the original HOST is sent in order to allow restirctions checks
@@ -187,14 +193,14 @@ class kFileUtils extends kFile
 
 		for($i = 0; $i < count($sendHeaders); $i++)
 		{
-			if (strpos($sendHeaders[$i], "HOST:") === 0)
+			if (stripos($sendHeaders[$i], "host:") === 0)
 			{
 				array_splice($sendHeaders, $i, 1);
 				break;
 			}
 		}
 
-		$sendHeaders[] = "HOST:$host";
+		$sendHeaders[] = "Host:$host";
 
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $sendHeaders);
 
