@@ -709,15 +709,15 @@ class BaseEntryService extends KalturaEntryService
 			KalturaResponseCacher::setConditionalCacheExpiry(600);
 		}	
 
-		$dbEntryContextResult = $this->applyAccessControlOnContextData($result, $dbEntry, $contextDataParams);
+		$dbEntryContextResult = $this->applyAccessControlOnContextData($result, $dbEntry, $contextDataParams, $isSecured);
 		$this->setContextDataFlavorAssets($result, $dbEntryContextResult, $dbEntry, $contextDataParams);
 		$this->setContextDataStorageProfilesXml($result, $dbEntry, $contextDataParams);	
-		$this->setContextDataStreamerTypeAndMediaProtocol($result, $dbEntry, $contextDataParams);
+		$this->setContextDataStreamerTypeAndMediaProtocol($result, $dbEntry, $contextDataParams, $isSecured);
 		
 		return $result;
 	}
 	
-	private function applyAccessControlOnContextData(KalturaEntryContextDataResult &$result, entry $dbEntry, KalturaEntryContextDataParams $contextDataParams)
+	private function applyAccessControlOnContextData(KalturaEntryContextDataResult &$result, entry $dbEntry, KalturaEntryContextDataParams $contextDataParams, &$isSecured)
 	{
 		$accessControl = $dbEntry->getAccessControl();
 		$dbResult = new kEntryContextDataResult();
@@ -802,16 +802,13 @@ class BaseEntryService extends KalturaEntryService
 		{
 			$filteredFlavorAssetsDb = assetPeer::filterByTagExclusive($flavorAssetsDb, $tag);
 			if(count($filteredFlavorAssetsDb))
-			{
-				$flavorAssetsDb = $filteredFlavorAssetsDb;
 				break;
-			}
 		}
 
-		if(!count($flavorAssetsDb))
+		if(!count($filteredFlavorAssetsDb))
 			throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND, $dbEntry->getId());
 		
-		$result->flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb);
+		$result->flavorAssets = KalturaFlavorAssetArray::fromDbArray($filteredFlavorAssetsDb);
 		return $result;
 	}
 	
@@ -850,7 +847,7 @@ class BaseEntryService extends KalturaEntryService
 		return $result;
 	}
 	
-	private function setContextDataStreamerTypeAndMediaProtocol(KalturaEntryContextDataResult &$result, entry $dbEntry, KalturaEntryContextDataParams $contextDataParams)
+	private function setContextDataStreamerTypeAndMediaProtocol(KalturaEntryContextDataResult &$result, entry $dbEntry, KalturaEntryContextDataParams $contextDataParams, $isSecured)
 	{
 		if($contextDataParams->streamerType && $contextDataParams->streamerType != PlaybackProtocol::AUTO)
 		{
