@@ -12,6 +12,24 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
     
     protected $mapFullNameToId = array();
     
+    
+    /* (non-PHPdoc)
+	 * @see KBulkUploadEngine::handleBulkUpload()
+	 */
+	public function handleBulkUpload()
+	{
+		$openedEntries = $this->kClient->batch->updateBulkUploadResults($this->job->id);
+		//we will wait for in progress category items because there might be dependencies between the category bulk items.
+		if($openedEntries)
+		{
+			KalturaLog::debug("Some earlier category uploads are still in progress.");
+			//will make the worker to restart the job.
+			$this->exceededMaxRecordsEachRun = true;
+			return;
+		}
+		parent::handleBulkUpload();
+	}
+    
     /**
      * (non-PHPdoc)
      * @see BulkUploadGeneralEngineCsv::createUploadResult()

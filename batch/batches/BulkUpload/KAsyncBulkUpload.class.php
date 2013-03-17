@@ -97,15 +97,7 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 			throw new KalturaException ( "Unable to find bulk upload engine", KalturaBatchJobAppErrors::ENGINE_NOT_FOUND );
 		}
 		$this->updateJob($job, 'Parsing file [' . $engine->getName() . ']', KalturaBatchJobStatus::QUEUED);
-
-		$openedEntries = $this->kClient->batch->updateBulkUploadResults($job->id);
-		if($openedEntries)
-		{
-			KalturaLog::debug("There are open objects on the job so we wait for them");
-			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
-			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::RETRY);
-		}
-			
+		
 		$engine->handleBulkUpload();
 		$job = $engine->getJob();
 		$data = $engine->getData();
