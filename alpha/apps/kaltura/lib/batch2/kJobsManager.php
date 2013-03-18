@@ -336,8 +336,8 @@ class kJobsManager
 		$dbConvertCollectionJob = kJobsManager::addJob($dbConvertCollectionJob, $convertCollectionData,
 				BatchJobType::CONVERT_COLLECTION, $currentConversionEngine);
 
-		KalturaLog::log("Calling CDLProceessFlavorsForCollection with [" . count($finalFlavorParamsOutputs) . "] flavor params");
-		$xml = KDLWrap::CDLProceessFlavorsForCollection($finalFlavorParamsOutputs);
+		KalturaLog::log("Calling CDLProceessFlavorsForCollection with [" . count($flavorParamsOutputs) . "] flavor params");
+		$xml = KDLWrap::CDLProceessFlavorsForCollection($flavorParamsOutputs);
 		$xml = str_replace(KDLCmdlinePlaceholders::OutFileName, $fileName, $xml);
 
 		$syncKey = $dbConvertCollectionJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG);
