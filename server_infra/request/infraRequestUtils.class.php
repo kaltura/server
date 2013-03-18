@@ -14,6 +14,7 @@ class infraRequestUtils
 	
 	protected static $isInGetRemoteAddress = false;
 	protected static $remoteAddress = null;
+	protected static $requestParams = null;
 
 	//
 	// the function check the http range header and sets http response headers accordingly
@@ -321,9 +322,10 @@ class infraRequestUtils
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
 			return self::PROTOCOL_HTTPS;
 		
-		if (isset($_REQUEST['apiProtocol']) && 
+		$params = self::getRequestParams();
+		if (isset($params['apiProtocol']) && 
 			kConf::hasParam('https_param_salt') && 
-			$_REQUEST['apiProtocol'] == 'https_' . kConf::get('https_param_salt'))
+			$params['apiProtocol'] == 'https_' . kConf::get('https_param_salt'))
 			return self::PROTOCOL_HTTPS;
 		
 		return self::PROTOCOL_HTTP;
@@ -371,6 +373,9 @@ class infraRequestUtils
 
 	public static function getRequestParams()
 	{
+		if (!is_null(self::$requestParams))
+			return self::$requestParams;
+		
 		$scriptParts = explode('/', $_SERVER['SCRIPT_NAME']);
 		$pathParts = explode('/', $_SERVER['PHP_SELF']);
 		$pathParts = array_diff($pathParts, $scriptParts);
@@ -384,6 +389,7 @@ class infraRequestUtils
 			$params[$key['value']] = $value['value'];
 		}
 			
-		return array_merge($params, $_GET, $_POST, $_FILES);
+		self::$requestParams = array_merge($params, $_GET, $_POST, $_FILES);
+		return self::$requestParams;
 	}
 }
