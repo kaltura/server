@@ -514,6 +514,8 @@ class FlavorAssetService extends KalturaAssetService
 	 * @action getWebPlayableByEntryId
 	 * @param string $entryId
 	 * @return KalturaFlavorAssetArray
+	 * 
+	 * @deprecated use baseEntry.getContextData instead
 	 */
 	public function getWebPlayableByEntryIdAction($entryId)
 	{
