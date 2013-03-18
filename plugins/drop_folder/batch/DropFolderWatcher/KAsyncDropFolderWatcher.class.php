@@ -136,8 +136,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 					catch (Exception $e)
 					{
 						KalturaLog::err("Error handling drop folder file [$physicalFileName] " . $e->getMessage());
-					}						
-					
+					}											
 				}
 				else //drop folder file entry found
 				{
@@ -435,6 +434,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			
 	function log($message)
 	{
-		KalturaLog::debug($message);
+		if(!strstr($message, 'KalturaDropFolderListResponse') && !strstr($message, 'KalturaDropFolderFileListResponse'))
+			KalturaLog::debug($message);
 	}	
 }
