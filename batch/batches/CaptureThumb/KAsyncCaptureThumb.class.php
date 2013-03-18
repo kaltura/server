@@ -171,6 +171,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		}
 		catch(Exception $ex)
 		{
+			$this->unimpersonate();
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 	}
