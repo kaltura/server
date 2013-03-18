@@ -166,11 +166,14 @@ $vidObj = $target->_video;
 					$cbr = 1;
 					break;
 			}
-			if($target->_container->_id==KDLContainerTarget::ISMV)
+			if($target->_container->_id==KDLContainerTarget::ISMV) {
 				$videoCodec['SmoothStreaming'] = 'True';
-			else
+				$videoCodec->Streams['AutoSize'] = 'True';
+			}
+			else {
 				$videoCodec['SmoothStreaming'] = 'False';
-				
+				$videoCodec->Streams['AutoSize'] = 'False';
+			}
 			$vFr = 30;
 			if($vidObj->_frameRate!==null && $vidObj->_frameRate>0){
 				$vFr = $vidObj->_frameRate;
