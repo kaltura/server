@@ -9,6 +9,9 @@
  */
 class infraRequestUtils
 {
+	const PROTOCOL_HTTP = 'http';
+	const PROTOCOL_HTTPS = 'https';
+	
 	protected static $isInGetRemoteAddress = false;
 	protected static $remoteAddress = null;
 
@@ -311,6 +314,19 @@ class infraRequestUtils
 			$remote_addr = (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null);
 		
 		return $remote_addr;
+	}
+	
+	public static function getProtocol()
+	{
+		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+			return self::PROTOCOL_HTTPS;
+		
+		if (isset($_REQUEST['apiProtocol']) && 
+			kConf::hasParam('https_param_salt') && 
+			$_REQUEST['apiProtocol'] == 'https_' . kConf::get('https_param_salt'))
+			return self::PROTOCOL_HTTPS;
+		
+		return self::PROTOCOL_HTTP;
 	}
 	
 	public static function parseUrlHost($url)
