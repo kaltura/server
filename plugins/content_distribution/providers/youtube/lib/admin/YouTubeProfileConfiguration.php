@@ -150,12 +150,6 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			'filters'		=> array('StringTrim'),
 		));
 
-		$this->addElement('text', 'sftp_port', array(
-			'label'			=> 'SFTP Port:',
-			'value'			=> '22',
-			'filters'		=> array('StringTrim'),
-		));
-
 		$this->addElement('text', 'sftp_login', array(
 			'label'			=> 'SFTP Login:',
 			'filters'		=> array('StringTrim'),
@@ -322,11 +316,14 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 		));
 
 		$this->addElement('select', 'instream_standard', array(
-			'label' => 'Instream Standard Ads:',
+			'label' => 'Instream Standard:',
 			'multioptions' => array(
 				'' => 'Default',
 				'true' => 'True',
 				'false' => 'False',
+				'long' => 'long',
+				'short' => 'short',
+				'disallow' => 'disallow',
 			)
 		));
 
@@ -449,7 +446,7 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 
 		// SFTP Configuration
 		$this->addDisplayGroup(
-			array('sftp_host', 'sftp_login', 'sftp_public_key', 'sftp_private_key', 'sftp_base_dir'),
+			array('sftp_host', 'sftp_port', 'sftp_login', 'sftp_public_key', 'sftp_private_key', 'sftp_base_dir'),
 			'sftp',
 			array('legend' => 'SFTP Configuration', 'decorators' => array('FormElements', 'Fieldset'), 'order' => $order++)
 		);
@@ -510,8 +507,15 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			array('legend' => 'Caption', 'decorators' => array('FormElements', 'Fieldset'), 'order' => $order++)
 		);
 
+		// Policies
+		$this->addDisplayGroup(
+			array('commercial_policy', 'ugc_policy'),
+			'policies',
+			array('legend' => 'Saved Policies', 'decorators' => array('FormElements', 'Fieldset'), 'order' => $order++)
+		);
+		$this->getElement('commercial_policy')->setLabel('Commercial Policy (Usage):');
+		$this->getElement('ugc_policy')->setLabel('UGC Policy (Match):');
+
 		$this->removeElement('target');
-		$this->removeElement('commercial_policy');
-		$this->removeElement('ugc_policy');
 	}
 }

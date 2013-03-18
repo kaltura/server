@@ -29,8 +29,22 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 	 * @var string
 	 */
 	public $currentPlaylists;
-		
-	
+
+	/**
+	 * @var string
+	 */
+	public $submitXml;
+
+	/**
+	 * @var string
+	 */
+	public $updateXml;
+
+	/**
+	 * @var string
+	 */
+	public $deleteXml;
+
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
 	    parent::__construct($distributionJobData);
@@ -67,6 +81,37 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 			$this->currentPlaylists = $entryDistributionDb->getFromCustomData('currentPlaylists');
 		else
 			KalturaLog::err('Entry distribution ['.$distributionJobData->entryDistributionId.'] not found');
+
+		if ($distributionJobData->distributionProfile->feedSpecVersion != YouTubeDistributionFeedSpecVersion::VERSION_2)
+			return;
+
+		$videoFilePath = $this->videoAssetFilePath;
+		$thumbnailFilePath = $this->thumbAssetFilePath;
+
+		$feed = null;
+		if ($distributionJobData instanceof KalturaDistributionSubmitJobData)
+		{
+			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultSubmitFeed($distributionJobData->distributionProfile, unserialize($this->fieldValues), $videoFilePath, $thumbnailFilePath);
+			$this->submitXml = $feed->getXml();
+		}
+		elseif ($distributionJobData instanceof KalturaDistributionUpdateJobData)
+		{
+			$remoteIdHandler = YouTubeDistributionRemoteIdHandler::initialize($distributionJobData->remoteId);
+			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultUpdateFeed($distributionJobData->distributionProfile, unserialize($this->fieldValues), $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
+			$this->updateXml = $feed->getXml();
+		}
+		elseif ($distributionJobData instanceof KalturaDistributionDeleteJobData)
+		{
+			$remoteIdHandler = YouTubeDistributionRemoteIdHandler::initialize($distributionJobData->remoteId);
+			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultDeleteFeed($distributionJobData->distributionProfile, unserialize($this->fieldValues), $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
+			$this->deleteXml = $feed->getXml();
+		}
+
+		if ($feed)
+		{
+			$this->sftpDirectory = $feed->getDirectoryName();
+			$this->sftpMetadataFilename = $feed->getMetadataTempFileName();
+		}
 	}
 		
 	private static $map_between_objects = array

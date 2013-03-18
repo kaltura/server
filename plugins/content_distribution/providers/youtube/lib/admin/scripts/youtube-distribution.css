@@ -4,6 +4,7 @@
 #frmDistributionProfileConfig dd input[type='text'] { width: 295px; }
 #frmDistributionProfileConfig dd select { width: 300px; }
 
+#frmDistributionProfileConfig .field-config-head { clear:both; }
 #frmDistributionProfileConfig .field-config-row .field-config-edit dt { width: auto; }
 
 #frmDistributionProfileConfig dt#delete_reference-label,

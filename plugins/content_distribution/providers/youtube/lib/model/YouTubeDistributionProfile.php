@@ -133,6 +133,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		YouTubeDistributionField::VIDEO_PUBLIC,
 		YouTubeDistributionField::CLAIM_TYPE,
 		YouTubeDistributionField::CLAIM_BLOCK_OUTSIDE_OWNERSHIP,
+		YouTubeDistributionField::ADVERTISING_INSTREAM_STANDARD,
 	);
 
 	/* (non-PHPdoc)
@@ -611,7 +612,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_ACTOR, 'Asset actor', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_BROADCASTER, 'Asset broadcaster', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_CONTENT_TYPE, 'Asset content type', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_CUSTOM_ID, 'Asset custom id', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_CUSTOM_ID, 'Asset custom id', '<xsl:value-of select="string(entryId)" />');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_DESCRIPTION, 'Asset description', '<xsl:value-of select="string(description)" />');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_DIRECTOR, 'Asset director', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_EIDR, 'Asset EIDR', '<xsl:text></xsl:text>');
@@ -620,7 +621,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_GENRE, 'Asset genre', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_GRID, 'Asset GRid', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_ISAN, 'Asset ISAN', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_KEYWORDS, 'Asset keywords', '<xsl:for-each select="tags/tag"><xsl:if test="position() &gt; 1"><xsl:text>,</xsl:text></xsl:if><xsl:value-of select="." /></xsl:for-each>');
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_KEYWORDS, 'Asset keywords', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_NOTES, 'Asset notes', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_ORIGINAL_RELEASE_DATE, 'Asset original release date', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_ORIGINAL_RELEASE_MEDIUM, 'Asset original medium', '<xsl:text></xsl:text>');
@@ -634,6 +635,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_START_YEAR, 'Asset start year', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_SUBTITLED_LANGUAGE, 'Asset subtitles language', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_TITLE, 'Asset title', '<xsl:value-of select="string(title)" />');
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_TYPE, 'Asset type', '<xsl:text>web</xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_TMS_ID, 'Asset TMS ID', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_UPC, 'Asset UPC', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_URL, 'Asset URL', '<xsl:text></xsl:text>');
@@ -649,8 +651,9 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::VIDEO_PUBLIC, 'Video public', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::VIDEO_CHANNEL, 'Video channel', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/account_username" />');
 
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::CLAIM_TYPE, 'Video type', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::CLAIM_TYPE, 'Claim type', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/claim_type" />');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::CLAIM_BLOCK_OUTSIDE_OWNERSHIP, 'Video block outside ownership', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ADVERTISING_INSTREAM_STANDARD, 'Instream standard', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/instream_standard" />');
 
 		if ($this->getFeedSpecVersion() == YouTubeDistributionFeedSpecVersion::VERSION_2)
 			$this->removeDistributionFieldConfigs($fieldConfigArray, $this->specV1OnlyFields);

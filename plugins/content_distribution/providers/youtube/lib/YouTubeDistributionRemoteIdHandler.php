@@ -78,15 +78,15 @@ class YouTubeDistributionRemoteIdHandler
 		$idHandler = new self;
 		if (self::isSerialized($str))
 		{
-			$array = unserialize($str);
-			if (isset($array['video']))
-				$idHandler->setVideoId($array['video']);
+			$object = json_decode($str);
+			if (isset($object->video))
+				$idHandler->setVideoId($object->video);
 
-			if (isset($array['asset']))
-				$idHandler->setAssetId($array['asset']);
+			if (isset($object->asset))
+				$idHandler->setAssetId($object->asset);
 
-			if (isset($array['reference']))
-				$idHandler->setReferenceId($array['reference']);
+			if (isset($object->reference))
+				$idHandler->setReferenceId($object->reference);
 		}
 		else
 		{
@@ -98,11 +98,11 @@ class YouTubeDistributionRemoteIdHandler
 
 	public function getSerialized()
 	{
-		$array = array();
-		$array['video'] = $this->getVideoId();
-		$array['asset'] = $this->getAssetId();
-		$array['reference'] = $this->getReferenceId();
-		return serialize($array);
+		$object = new stdClass;
+		$object->video = $this->getVideoId();
+		$object->asset = $this->getAssetId();
+		$object->reference = $this->getReferenceId();
+		return json_encode($object);
 	}
 
 	/**
@@ -115,7 +115,6 @@ class YouTubeDistributionRemoteIdHandler
 
 	protected static function isSerialized($str)
 	{
-		// if string is not serialized, it would be the video id, so this validation (while being hacky) is good enough
-		return strpos('{s:', $str) !== false;
+		return is_object(json_decode($str));
 	}
 }

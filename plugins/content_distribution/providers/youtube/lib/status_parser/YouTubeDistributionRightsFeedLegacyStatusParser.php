@@ -3,7 +3,7 @@
  * @package plugins.youTubeDistribution
  * @subpackage lib
  */
-class YouTubeDistributionLegacyStatusParser
+class YouTubeDistributionRightsFeedLegacyStatusParser
 {
 	/**
 	 * @var DOMDocument
@@ -40,6 +40,21 @@ class YouTubeDistributionLegacyStatusParser
 			return null;
 			
 		return $statusNode->nodeValue;
+	}
+
+	public function getErrorsSummary()
+	{
+		$errors = array();
+
+		$errorSummaryNodes = $this->xpath->query("//*/action[@name='Report error']/errors/error/summary");
+		foreach($errorSummaryNodes as $errorSummaryNode)
+			$errors[] = $errorSummaryNode->nodeValue;
+
+		$actionErrorNodes = $this->xpath->query("//*/action/status[text()='Failure']/../status_detail");
+		foreach($actionErrorNodes as $actionErrorNode)
+			$errors[] = $actionErrorNode->nodeValue;
+
+		return $errors;
 	}
 	
 	public function getReferenceId()

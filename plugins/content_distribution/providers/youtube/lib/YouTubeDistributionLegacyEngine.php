@@ -54,12 +54,12 @@ class YouTubeDistributionLegacyEngine extends DistributionEngine implements
 		}
 			
 		$statusParser = new YouTubeDistributionLegacyStatusParser($statusXml);
-		$status = $statusParser->getStatusForAction('Insert');
+		$status = $statusParser->getStatusForCommand('Insert');
 		$statusDetail = $statusParser->getStatusDetailForCommand('Insert');
 		if (is_null($status))
 		{
 			// try to get the status of Parse command
-			$status = $statusParser->getStatusForAction('Parse');
+			$status = $statusParser->getStatusForCommand('Parse');
 			$statusDetail = $statusParser->getStatusDetailForCommand('Parse');
 			if (!is_null($status))
 				throw new Exception('Distribution failed on parsing command with status ['.$status.'] and error ['.$statusDetail.']');
@@ -106,7 +106,7 @@ class YouTubeDistributionLegacyEngine extends DistributionEngine implements
 			return false;
 			
 		$statusParser = new YouTubeDistributionLegacyStatusParser($statusXml);
-		$status = $statusParser->getStatusForAction('Delete');
+		$status = $statusParser->getStatusForCommand('Delete');
 		$statusDetail = $statusParser->getStatusDetailForCommand('Delete');
 		if (is_null($status))
 			throw new Exception('Status could not be found after deletion request');
@@ -144,7 +144,7 @@ class YouTubeDistributionLegacyEngine extends DistributionEngine implements
 			return false;
 			
 		$statusParser = new YouTubeDistributionLegacyStatusParser($statusXml);
-		$status = $statusParser->getStatusForAction('Update');
+		$status = $statusParser->getStatusForCommand('Update');
 		$statusDetail = $statusParser->getStatusDetailForCommand('Update');
 		if (is_null($status))
 			throw new Exception('Status could not be found after distribution update');

@@ -3,18 +3,18 @@
  * @package plugins.youTubeDistribution
  * @subpackage lib
  */
-class YouTubeDistributionStatusParser
+class YouTubeDistributionLegacyStatusParser
 {
 	/**
 	 * @var DOMDocument
 	 */
 	protected $doc;
-	
+
 	/**
 	 * @var DOMXpath
 	 */
 	protected $xpath;
-	
+
 	/**
 	 * @param string $xml
 	 */
@@ -24,7 +24,7 @@ class YouTubeDistributionStatusParser
 		$this->doc->loadXML($xml);
 		$this->xpath = new DOMXPath($this->doc);
 	}
-	
+
 	/**
 	 * @param string $command
 	 * @return string
@@ -38,10 +38,10 @@ class YouTubeDistributionStatusParser
 		$statusNode = $this->xpath->query("status", $actionNode)->item(0);
 		if (is_null($statusNode))
 			return null;
-			
+
 		return $statusNode->nodeValue;
 	}
-	
+
 	/**
 	 * @param string $command
 	 * @return string
@@ -55,10 +55,10 @@ class YouTubeDistributionStatusParser
 		$statusDetailNode = $this->xpath->query("status_detail", $actionNode)->item(0);
 		if (is_null($statusDetailNode))
 			return null;
-			
+
 		return $statusDetailNode->nodeValue;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -67,7 +67,7 @@ class YouTubeDistributionStatusParser
 		$videoIdNode = $this->xpath->query("//*/item_status/id[@type='video_id']")->item(0);
 		if (is_null($videoIdNode))
 			return null;
-			
+
 		return $videoIdNode->nodeValue;
 	}
 }

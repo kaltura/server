@@ -137,4 +137,9 @@ interface YouTubeDistributionField extends BaseEnum
 	 */
 	const CLAIM_TYPE = 'CLAIM_TYPE';
 	const CLAIM_BLOCK_OUTSIDE_OWNERSHIP = 'CLAIM_BLOCK_OUTSIDE_OWNERSHIP';
+
+	/**
+	 * New spec- new elements for 'ad_policy'
+	 */
+	const ADVERTISING_INSTREAM_STANDARD = 'ADVERTISING_INSTREAM_STANDARD';
 }

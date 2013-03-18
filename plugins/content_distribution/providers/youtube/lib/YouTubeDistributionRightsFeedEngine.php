@@ -50,14 +50,17 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 			if ($batchStatus)
 				throw new Exception('Internal failure on YouTube, internal_failure-status.xml was found. Error ['.$batchStatus.']');
 
-			return false;
+			return false; // return false to recheck again on next job closing iteration
 		}
 			
-		$statusParser = new YouTubeDistributionLegacyStatusParser($statusXml);
+		$statusParser = new YouTubeDistributionRightsFeedLegacyStatusParser($statusXml);
 		$status = $statusParser->getStatusForAction('Submit reference');
 
 		if ($status != 'Success')
-			throw new Exception('Distribution failed with status ['.$status.']');
+		{
+			$errors = $statusParser->getErrorsSummary();
+			throw new Exception('Distribution failed with status ['.$status.'] and errors ['.implode(',', $errors).']');
+		}
 			
 		$referenceId = $statusParser->getReferenceId();
 		$assetId = $statusParser->getAssetId();
@@ -98,7 +101,7 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		if ($statusXml === false) // no status yet
 			return false;
 			
-		$statusParser = new YouTubeDistributionLegacyStatusParser($statusXml);
+		$statusParser = new YouTubeDistributionRightsFeedLegacyStatusParser($statusXml);
 		$status = $statusParser->getStatusForAction('Remove video');
 		if (is_null($status))
 			throw new Exception('Status could not be found after deletion request');
@@ -135,7 +138,7 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		if ($statusXml === false) // no status yet
 			return false;
 			
-		$statusParser = new YouTubeDistributionLegacyStatusParser($statusXml);
+		$statusParser = new YouTubeDistributionRightsFeedLegacyStatusParser($statusXml);
 		$status = $statusParser->getStatusForAction('Process asset');
 		if (is_null($status))
 			throw new Exception('Status could not be found after distribution update');
@@ -161,63 +164,31 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 	 */
 	protected function handleSubmit(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
 	{
-		$entryId = $data->entryDistribution->entryId;
-		$entry = $this->getEntry($data->entryDistribution->partnerId, $entryId);
-
 		$videoFilePath = $providerData->videoAssetFilePath;
+		$thumbnailFilePath = $providerData->thumbAssetFilePath;
 		if (!$videoFilePath)
 			throw new KalturaDistributionException('No video asset to distribute, the job will fail');
 
 		if (!file_exists($videoFilePath))
 			throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
 
-		$thumbnailFilePath = $providerData->thumbAssetFilePath;
-
-		$videoTag = $entryId.'-video';
-		$thumbnailTag = $entryId.'-thumbnail';
-
-		$feed = new YouTubeDistributionRightsFeedHelper($distributionProfile);
-		$fieldValues = unserialize($providerData->fieldValues);
-		$feed->setNotificationEmail($fieldValues);
-		$feed->setMetadataByFieldValues($fieldValues);
-		$feed->setByXpath('video/@tag', $videoTag);
-		$feed->setByXpath('asset/@tag', $videoTag);
-
-		// video file
-		$urgentReference = $fieldValues[KalturaYouTubeDistributionField::URGENT_REFERENCE_FILE];
-		$feed->appendFileElement('video', $urgentReference, pathinfo($videoFilePath, PATHINFO_BASENAME), $videoTag);
-
-		// thumbnail file
-		if (file_exists($thumbnailFilePath))
-		{
-			$feed->appendFileElement('image', false, pathinfo($thumbnailFilePath, PATHINFO_BASENAME), $thumbnailTag);
-			$feed->appendVideoArtworkElement('custom_thumbnail', $thumbnailTag);
-		}
-
-		$feed->appendVideoAssetFileRelationship($videoTag);
-		$feed->setAdParamsByFieldValues($fieldValues, $videoTag, $distributionProfile->enableAdServer);
-		$feed->appendRightsAdminByFieldValues($fieldValues, $videoTag);
-
 		$sftpManager = $this->getSFTPManager($distributionProfile);
-		$feed->sendFeed($sftpManager);
-		$data->sentData = $feed->getXml();
+		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $providerData->submitXml);
+		$data->sentData = $providerData->submitXml;
 		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
 
 		// upload the video
-		$videoSFTPPath = $feed->getDirectoryName() . '/' . pathinfo($videoFilePath, PATHINFO_BASENAME);
+		$videoSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($videoFilePath, PATHINFO_BASENAME);
 		$sftpManager->putFile($videoSFTPPath, $videoFilePath);
 
 		// upload the thumbnail if exists
 		if (file_exists($thumbnailFilePath))
 		{
-			$thumbnailSFTPPath = $feed->getDirectoryName() . '/' . pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
+			$thumbnailSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
 			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
 		}
 
-		$feed->setDeliveryComplete($sftpManager);
-
-		$providerData->sftpDirectory = $feed->getDirectoryName();
-		$providerData->sftpMetadataFilename = $feed->getMetadataTempFileName();
+		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
 	
 	/**
@@ -227,20 +198,12 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 	 */
 	protected function handleDelete(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
 	{
-		$remoteIdHandler = YouTubeDistributionRemoteIdHandler::initialize($data->remoteId);
-		$feed = new YouTubeDistributionRightsFeedHelper($distributionProfile);
-		$feed->setByXpath('video/@action', 'delete');
-		$feed->setByXpath('video/@action', $remoteIdHandler->getVideoId());
-
 		$sftpManager = $this->getSFTPManager($distributionProfile);
-		
-		$feed->sendFeed($sftpManager);
-		$data->sentData = $feed->getXml();
+		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $providerData->deleteXml);
+		$data->sentData = $providerData->deleteXml;
 		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
-		$feed->setDeliveryComplete($sftpManager);
-		
-		$providerData->sftpDirectory = $feed->getDirectoryName();
-		$providerData->sftpMetadataFilename = $feed->getMetadataTempFileName();
+
+		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
 	
 	/**
@@ -250,37 +213,21 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 	 */
 	protected function handleUpdate(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
 	{
-		$entryId = $data->entryDistribution->entryId;
-		$entry = $this->getEntry($data->entryDistribution->partnerId, $entryId);
-
-		$remoteIdHandler = YouTubeDistributionRemoteIdHandler::initialize($data->remoteId);
-
-		$feed = new YouTubeDistributionRightsFeedHelper($distributionProfile);
-		$fieldValues = unserialize($providerData->fieldValues);
-		if ($remoteIdHandler->getVideoId())
-			$feed->setVideoMetadataByFieldValues($fieldValues);
-		if ($remoteIdHandler->getAssetId())
-			$feed->setAssetMetadataByFieldValues($fieldValues);
+		$thumbnailFilePath = $providerData->thumbAssetFilePath;
 
 		$sftpManager = $this->getSFTPManager($distributionProfile);
+		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $providerData->updateXml);
+		$data->sentData = $providerData->updateXml;
+		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
 
-		// thumbnail file
-		$thumbnailFilePath = $providerData->thumbAssetFilePath;
+		// upload the thumbnail if exists
 		if (file_exists($thumbnailFilePath))
 		{
-			$feed->appendFileElement('image', false, pathinfo($thumbnailFilePath, PATHINFO_BASENAME), $thumbnailTag);
-			$feed->appendVideoArtworkElement('custom_thumbnail', $thumbnailTag);
-			$thumbnailSFTPPath = $feed->getDirectoryName() . '/' . pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
+			$thumbnailSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
 			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
 		}
 
-		$feed->sendFeed($sftpManager);
-		$data->sentData = $feed->getXml();
-		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
-		$feed->setDeliveryComplete($sftpManager);
-		
-		$providerData->sftpDirectory = $feed->getDirectoryName();
-		$providerData->sftpMetadataFilename = $feed->getMetadataTempFileName();
+		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
 	
 	/**
@@ -385,5 +332,15 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		if (!file_exists($metadataTempFilePath))
 			mkdir($metadataTempFilePath, 0777, true);
 		return $metadataTempFilePath;
+	}
+
+	/**
+	 * Uploads the empty delivery.complete marker file
+	 * @param sftpMgr $sftpManager
+	 */
+	public function setDeliveryComplete(sftpMgr $sftpManager, $directoryName)
+	{
+		$path = $directoryName.'/'.'delivery.complete';
+		$sftpManager->filePutContents($path, '');
 	}
 }

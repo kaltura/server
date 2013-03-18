@@ -39,7 +39,87 @@ class YouTubeDistributionRightsFeedHelper
 		if ($distributionProfile->sftpBaseDir)
 			$this->_directoryName = '/' . trim($distributionProfile->sftpBaseDir, '/') . $this->_directoryName;
 
-		$this->_metadataTempFileName = 'youtube_' . $timestampName . '.xml';
+		$this->_metadataTempFileName = 'youtube_xml20_' . $timestampName . '.xml';
+	}
+
+	public static function initializeDefaultSubmitFeed(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath)
+	{
+		$identifier= $fieldValues[KalturaYouTubeDistributionField::ASSET_CUSTOM_ID];
+		$videoTag = $identifier.'-video';
+		$thumbnailTag = $identifier.'-thumbnail';
+
+		$feed = new YouTubeDistributionRightsFeedHelper($distributionProfile);
+		$feed->setNotificationEmail($fieldValues);
+		$feed->setMetadataByFieldValues($fieldValues);
+		$feed->setByXpath('video/@tag', $videoTag);
+		$feed->setByXpath('asset/@tag', $videoTag);
+
+		// video file
+		$urgentReference = $fieldValues[KalturaYouTubeDistributionField::URGENT_REFERENCE_FILE];
+		$feed->appendFileElement('video', $urgentReference, pathinfo($videoFilePath, PATHINFO_BASENAME), $videoTag);
+
+		// thumbnail file
+		if (file_exists($thumbnailFilePath))
+		{
+			$feed->appendFileElement('image', false, pathinfo($thumbnailFilePath, PATHINFO_BASENAME), $thumbnailTag);
+			$feed->appendVideoArtworkElement('custom_thumbnail', $thumbnailTag);
+		}
+
+		$feed->appendVideoAssetFileRelationship($videoTag);
+		$feed->setAdParamsByFieldValues($fieldValues, $videoTag, $distributionProfile->enableAdServer);
+		$feed->appendRightsAdminByFieldValues($fieldValues, $videoTag);
+
+		return $feed;
+	}
+
+	public static function initializeDefaultUpdateFeed(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, YouTubeDistributionRemoteIdHandler $remoteIdHandler)
+	{
+		$identifier= $fieldValues[KalturaYouTubeDistributionField::ASSET_CUSTOM_ID];
+		$videoTag = $identifier.'-video';
+		$thumbnailTag = $identifier.'-thumbnail';
+
+		$feed = new YouTubeDistributionRightsFeedHelper($distributionProfile);
+		$feed->setNotificationEmail($fieldValues);
+
+		if ($remoteIdHandler->getVideoId())
+		{
+			$feed->setByXpath('video/@tag', $videoTag);
+			$feed->setVideoMetadataByFieldValues($fieldValues, $remoteIdHandler->getVideoId());
+		}
+		if ($remoteIdHandler->getAssetId())
+		{
+			$feed->setByXpath('asset/@tag', $videoTag);
+			$feed->setAssetMetadataByFieldValues($fieldValues, $remoteIdHandler->getAssetId());
+		}
+
+		// thumbnail file
+		if (file_exists($thumbnailFilePath))
+		{
+			$feed->appendFileElement('image', false, pathinfo($thumbnailFilePath, PATHINFO_BASENAME), $thumbnailTag);
+			$feed->appendVideoArtworkElement('custom_thumbnail', $thumbnailTag);
+		}
+
+		$feed->setAdParamsByFieldValues($fieldValues, $videoTag, $distributionProfile->enableAdServer);
+
+		return $feed;
+	}
+
+	public static function initializeDefaultDeleteFeed(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, YouTubeDistributionRemoteIdHandler $remoteIdHandler)
+	{
+		$feed = new YouTubeDistributionRightsFeedHelper($distributionProfile);
+		$feed->setNotificationEmail($fieldValues);
+		$feed->setByXpath('video/@action', 'delete');
+		$feed->setByXpath('video/@id', $remoteIdHandler->getVideoId());
+
+		if ($distributionProfile->deleteReference && $remoteIdHandler->getReferenceId())
+		{
+			$feed->setByXpath('reference/@action', 'delete');
+			$feed->setByXpath('reference/@id', $remoteIdHandler->getReferenceId());
+			if ($distributionProfile->releaseClaims)
+				$feed->setByXpath('reference/@release_claims', 'True');
+		}
+
+		return $feed;
 	}
 
 	public function __toString()
@@ -92,8 +172,11 @@ class YouTubeDistributionRightsFeedHelper
 		$this->setVideoMetadataByFieldValues($fieldValues);
 	}
 
-	public function setAssetMetadataByFieldValues($fieldValues)
+	public function setAssetMetadataByFieldValues($fieldValues, $assetId = null)
 	{
+		if ($assetId)
+			$this->setByXpath('asset/@id', $assetId);
+
 		$this->setByXpathFieldValueIfHasValue('asset/@type', $fieldValues, KalturaYouTubeDistributionField::ASSET_TYPE);
 		$this->setByXpathFieldValueIfHasValue('asset/@override_manual_edits', $fieldValues, KalturaYouTubeDistributionField::ASSET_OVERRIDE_MANUAL_EDITS);
 
@@ -126,10 +209,14 @@ class YouTubeDistributionRightsFeedHelper
 		$this->setByXpathFieldValueIfHasValue('asset/upc', $fieldValues, KalturaYouTubeDistributionField::ASSET_UPC);
 		$this->setByXpathFieldValueIfHasValue('asset/url', $fieldValues, KalturaYouTubeDistributionField::ASSET_URL);
 		$this->setByXpathFieldValueIfHasValue('asset/writer', $fieldValues, KalturaYouTubeDistributionField::ASSET_WRITER);
+		$this->appendWorldWideOwnership();
 	}
 
-	public function setVideoMetadataByFieldValues($fieldValues)
+	public function setVideoMetadataByFieldValues($fieldValues, $videoId = null)
 	{
+		if ($videoId)
+			$this->setByXpath('video/@id', $videoId);
+
 		$this->setByXpathFieldValueIfHasValue('video/allow_comment_rating', $fieldValues, KalturaYouTubeDistributionField::VIDEO_ALLOW_COMMENT_RATINGS);
 		$this->setByXpathFieldValueIfHasValue('video/allow_comments', $fieldValues, KalturaYouTubeDistributionField::ALLOW_COMMENTS);
 		$this->setByXpathFieldValueIfHasValue('video/allow_embedding', $fieldValues, KalturaYouTubeDistributionField::ALLOW_EMBEDDING);
@@ -140,15 +227,24 @@ class YouTubeDistributionRightsFeedHelper
 		$this->setByXpathFieldValueIfHasValue('video/description', $fieldValues, KalturaYouTubeDistributionField::MEDIA_DESCRIPTION);
 		$this->setByXpathFieldValueIfHasValue('video/domain_blacklist', $fieldValues, KalturaYouTubeDistributionField::VIDEO_DOMAIN_BLACK_LIST);
 		$this->setByXpathFieldValueIfHasValue('video/domain_whitelist', $fieldValues, KalturaYouTubeDistributionField::VIDEO_DOMAIN_WHITE_LIST);
-		$this->setByXpathFieldValueIfHasValue('video/end_time', $fieldValues, KalturaYouTubeDistributionField::END_TIME);
 		$this->setByXpathFieldValueIfHasValue('video/genre', $fieldValues, KalturaYouTubeDistributionField::MEDIA_CATEGORY);
 		$this->setByXpathFieldValueIfHasValue('video/hide_view_count', $fieldValues, KalturaYouTubeDistributionField::VIDEO_HIDE_VIEW_COUNT);
 		$this->appendVideoKeywords($fieldValues);
 		$this->setByXpathFieldValueIfHasValue('video/notify_subscribers', $fieldValues, KalturaYouTubeDistributionField::VIDEO_NOTIFY_SUBSCRIBERS);
 		$this->setByXpathFieldValueIfHasValue('video/public', $fieldValues, KalturaYouTubeDistributionField::VIDEO_PUBLIC);
-		$this->setByXpathFieldValueIfHasValue('video/recorded', $fieldValues, KalturaYouTubeDistributionField::DATE_RECORDED);
-		$this->setByXpathFieldValueIfHasValue('video/start_time', $fieldValues, KalturaYouTubeDistributionField::START_TIME);
+		$this->setByXpathFieldValueIfHasValue('video/recorded/date', $fieldValues, KalturaYouTubeDistributionField::DATE_RECORDED);
+		$this->setByXpathFieldValueIfHasValue('video/recorded/location', $fieldValues, KalturaYouTubeDistributionField::LOCATION_LOCATION_TEXT);
+		$this->setByXpathFieldValueIfHasValue('video/recorded/country', $fieldValues, KalturaYouTubeDistributionField::LOCATION_COUNTRY);
+		$this->setByXpathFieldValueIfHasValue('video/recorded/zip', $fieldValues, KalturaYouTubeDistributionField::LOCATION_ZIP_CODE);
 		$this->setByXpathFieldValueIfHasValue('video/title', $fieldValues, KalturaYouTubeDistributionField::MEDIA_TITLE);
+
+		$startTime = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::START_TIME);
+		if ($startTime && intval($startTime))
+			$this->setByXpath('video/start_time', date('c', intval($startTime)));
+
+		$endTime = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::END_TIME);
+		if ($endTime && intval($endTime))
+			$this->setByXpath('video/end_time', date('c', intval($endTime)));
 	}
 
 	public function getValueForField(array $fieldValues ,$key)
@@ -187,21 +283,30 @@ class YouTubeDistributionRightsFeedHelper
 
 	public function appendVideoAssetFileRelationship($fileTag)
 	{
-		return $this->_doc->firstChild
-			->appendChild($this->_doc->createElement('relationship'))
-				->appendChild($this->_doc->createElement('item'))
-					->setAttribute('path', "/feed/file[@tag='$fileTag']")
-					->parentNode
-				->parentNode
-				->appendChild($this->_doc->createElement('related_item'))
-					->setAttribute('path', "/feed/asset[@tag='$fileTag']")
-					->parentNode
-				->parentNode
-				->appendChild($this->_doc->createElement('related_item'))
-					->setAttribute('path', "/feed/video[@tag='$fileTag']")
-					->parentNode
-				->parentNode
-			->parentNode;
+		$itemsPaths = array(
+			"/feed/file[@tag='$fileTag']",
+		);
+
+		$relatedItemsPaths = array(
+			"/feed/asset[@tag='$fileTag']",
+			"/feed/video[@tag='$fileTag']"
+		);
+
+		return $this->appendRelationship($itemsPaths, $relatedItemsPaths);
+	}
+
+	public function appendRelationship($itemsPaths, $relatedItemsPaths)
+	{
+		$relationshipDom = $this->_doc->firstChild->appendChild($this->_doc->createElement('relationship'));
+		foreach($itemsPaths as $item)
+		{
+			$relationshipDom->appendChild($this->_doc->createElement('item'))->setAttribute('path', $item);
+		}
+		foreach($relatedItemsPaths as $relatedItemsPath)
+		{
+			$relationshipDom->appendChild($this->_doc->createElement('related_item'))->setAttribute('path', $relatedItemsPath);
+		}
+		return $relationshipDom;
 	}
 
 	public function appendKeywordsToElement(DOMElement $element, $keywordsStr)
@@ -232,6 +337,8 @@ class YouTubeDistributionRightsFeedHelper
 		if ($adServerEnabled)
 		{
 			$this->setByXpath('video_breaks/third_party_ad_server/ad_server_video_id', $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID));
+			$this->setByXpath('video_breaks/@tag', $videoTag);
+			$this->appendRelationship(array("/feed/video[@tag='$videoTag']"), array("/feed/video_breaks[@tag='$videoTag']"));
 		}
 
 		$allowPreRolls = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::ADVERTISING_ALLOW_PRE_ROLL_ADS);
@@ -261,17 +368,23 @@ class YouTubeDistributionRightsFeedHelper
 		if ($invideoValue)
 			$this->setByXpath('ad_policy/overlay/invideo', $adsenseForVideoValue);
 
+		$instreamStandardValue = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::ADVERTISING_INSTREAM_STANDARD);
+		if ($instreamStandardValue )
+			$this->setByXpath('ad_policy/instream/@standard', $instreamStandardValue );
+
+		// append relationship if ad policy was added
 		$adPolicyElement = $this->_xpath->query('/feed/ad_policy')->item(0);
 		if ($adPolicyElement)
 		{
 			$adPolicyElement->setAttribute('tag', $videoTag);
-			$this->_doc->firstChild
-				->appendChild($this->_doc->createElement('relationship'))
-					->appendChild($this->_doc->createElement('item'))
-						->setAttribute('path', "/feed/video[@tag='$videoTag']")->parentNode->parentNode
-				->appendChild($this->_doc->createElement('related_item'))
-					->setAttribute('path', "/feed/ad_policy[@tag='$videoTag']");
+			$this->appendRelationship(array("/feed/video[@tag='$videoTag']"), array("/feed/ad_policy[@tag='$videoTag']"));
 		}
+	}
+
+	public function appendWorldWideOwnership()
+	{
+		$this->setByXpath('ownership', '');
+		$this->appendRelationship(array('/feed/ownership[1]'), array('/feed/asset[1]'));
 	}
 
 	public function appendClaimElement(array $fieldValues, $videoTag, $rightAdminType, $policyName)
@@ -288,26 +401,26 @@ class YouTubeDistributionRightsFeedHelper
 
 	public function appendRightsAdminByFieldValues(array $fieldValues, $videoTag)
 	{
-		$commercialPolicy = $this->getValueForField($fieldValues, YouTubeDistributionField::POLICY_COMMERCIAL);
-		$ugcPolicy = $this->getValueForField($fieldValues, YouTubeDistributionField::POLICY_UGC);
+		$commercialPolicy = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::POLICY_COMMERCIAL);
+		$ugcPolicy = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::POLICY_UGC);
 		$rightsAdminType = null;
-		if ($commercialPolicy && $ugcPolicy)
+		if ($commercialPolicy)
 		{
-			$rightsAdminType = 'usage match';
-		}
-		elseif($commercialPolicy)
-		{
-			$rightsAdminType = 'usage';
-		}
-		elseif($ugcPolicy)
-		{
-			$rightsAdminType = 'match';
+			$this->appendRightsAdmin('usage', 'true');
+			$this->appendClaimElement($fieldValues, $videoTag, 'usage', $commercialPolicy);
 		}
 
-		if ($rightsAdminType)
+		if($ugcPolicy)
 		{
-			$this->appendRightsAdmin($rightsAdminType, 'true');
-			$this->appendClaimElement($fieldValues, $videoTag, $rightsAdminType, $commercialPolicy);
+			$this->appendRightsAdmin('match', 'true');
+			$itemsPaths = array(
+				"/feed/rights_admin[@type='match']",
+				"/external/rights_policy[@name='$ugcPolicy']",
+			);
+			$relatedItemsPaths = array(
+				"/feed/asset[@tag='$videoTag']"
+			);
+			$this->appendRelationship($itemsPaths, $relatedItemsPaths);
 		}
 	}
 
@@ -329,30 +442,10 @@ class YouTubeDistributionRightsFeedHelper
 		;
 	}
 
-	/**
-	 * Sends the feed using the sftpMgr connection
-	 * @param sftpMgr $sftpManager
-	 */
-	public function sendFeed(sftpMgr $sftpManager)
-	{
-		$xml = $this->_doc->saveXML();
-		$path = $this->_directoryName . '/' . $this->_metadataTempFileName;
-		$sftpManager->filePutContents($path, $xml);
-	}
 
 	public function getXml()
 	{
 		return $this->_doc->saveXML();
-	}
-
-	/**
-	 * Uploads the empty delivery.complete marker file
-	 * @param sftpMgr $sftpManager
-	 */
-	public function setDeliveryComplete(sftpMgr $sftpManager)
-	{
-		$path = $this->_directoryName . '/' . 'delivery.complete';
-		$sftpManager->filePutContents($path, '');
 	}
 
 	/**
