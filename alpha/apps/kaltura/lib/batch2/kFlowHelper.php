@@ -403,7 +403,10 @@ class kFlowHelper
 			$createThumb = false;
 			$extractMedia = false;
 		}
-
+		if($flavorParamsOutput->getFormat() == assetParams::CONTAINER_FORMAT_WIDEVINE)
+		{
+			$createThumb = false;
+		}
 		if($createThumb && in_array($flavorParamsOutput->getVideoCodec(), self::$thumbUnSupportVideoCodecs))
 			$createThumb = false;
 
@@ -1086,7 +1089,7 @@ class kFlowHelper
 				continue;
 			}
 
-			if(is_null($srcParamsId) && !$thumbParams->getSourceParamsId())
+			if(is_null($srcParamsId) && is_null($thumbParams->getSourceParamsId()))
 			{
 				// alternative should be used
 				$thumbParams->setSourceParamsId($alternateFlavorParamsId);
