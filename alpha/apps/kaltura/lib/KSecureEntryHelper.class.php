@@ -238,7 +238,11 @@ class KSecureEntryHelper
 		if($this->hasLimitFlavorsAction)
 		{
 			$flavorParamsIds = explode(',', $this->limitFlavorsAction->getFlavorParamsIds());
-			return (in_array($flavorParamsId, $flavorParamsIds) && !$this->limitFlavorsAction->getIsBlockedList());
+			$exists = in_array($flavorParamsId, $flavorParamsIds);
+			if($this->limitFlavorsAction->getIsBlockedList())
+				return !$exists;
+			else 
+				return $exists;
 		}
 		return true;
 	}
