@@ -97,9 +97,9 @@ fieldset{ border:0 none; position:relative; }
 	display: none;
 	background: #eff;
 	padding: 20px;
-	margin-top: 40px;
-	border-radius: 10px;
+	margin-top: 40px 10px;
 	font-family: Helvetica, Arial;
+	line-height: 24px;
 }
 .lt-ie8 #notSupported { display: block; }
 
