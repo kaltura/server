@@ -173,15 +173,27 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	protected static function setPermissions($filePath)
 	{
-		chmod($filePath, 0640);
 		chgrp($filePath, kConf::get('content_group'));
+		
+		if(is_dir($filePath))
+		{
+			chmod($filePath, 0750);
+			$dir = dir($filePath);
+			while (false !== ($file = $dir->read()))
+				self::setPermissions($filePath . DIRECTORY_SEPARATOR . $file);
+			$dir->close();
+		}
+		else
+		{
+			chmod($filePath, 0640);
+		}
 	}
 
 	protected static function fullMkdir($filePath)
 	{
 	    $dirs = explode(DIRECTORY_SEPARATOR , dirname($filePath));
 	    $path = '';
-	    foreach ($dirs as $dir) 
+	    foreach ($dirs as $dir)
 	    {
 	        $path .= DIRECTORY_SEPARATOR . $dir;
 	        if (is_dir($path))
