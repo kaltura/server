@@ -27,11 +27,13 @@ class KOperationEngineSegmenter  extends KSingleOutputOperationEngine
 			KalturaLog::debug("SUCCESS");
 		else 
 			KalturaLog::debug("FAILURE");
-		parent::operate($operator, $inFilePath, $configFilePath);
+		$res = parent::operate($operator, $inFilePath, $configFilePath);
 		rename("$this->outFilePath//playlist.m3u8", "$this->outFilePath//playlist.tmp");
 		self::parsePlayList("$this->outFilePath//playlist.tmp","$this->outFilePath//playlist.m3u8");
 //		rename("out_dummy.m3u8", "$this->outFilePath//out_dummy.m3u8");
 //		KalturaLog::info("operator($operator), inFilePath($inFilePath), configFilePath($configFilePath)");
+
+		return $res;
 	}
 
 	private function parsePlayList($fileIn, $fileOut)

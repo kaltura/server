@@ -20,6 +20,6 @@ class KOperationEngineQtTools  extends KSingleOutputOperationEngine
 		if(symlink($inFilePath, $qtInFilePath))
 			$inFilePath = $qtInFilePath;
 		
-		parent::operate($operator, $inFilePath, $configFilePath);
+		return parent::operate($operator, $inFilePath, $configFilePath);
 	}
 }

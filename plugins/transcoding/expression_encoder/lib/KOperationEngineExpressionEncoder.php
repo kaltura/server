@@ -60,8 +60,7 @@ class KOperationEngineExpressionEncoder  extends KSingleOutputOperationEngine
 					/*
 					 * Successfull execution attempt
 					 */
-				parent::operate($operator, $inFilePath, $configFilePath);
-				return;
+				return parent::operate($operator, $inFilePath, $configFilePath);
 			}
 			catch(Exception $e) {
 				$ex=$e;

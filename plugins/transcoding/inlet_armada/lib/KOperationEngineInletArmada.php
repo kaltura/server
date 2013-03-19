@@ -159,6 +159,8 @@ $trgPrefixWindows = null;
 			kFile::moveFile($outFileLinux, $this->outFilePath, true);
 			//copy($outFileLinux, $this->outFilePath);
 		}
+		
+		return true;
 	}
 
 	/*************************************

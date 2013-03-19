@@ -18,10 +18,4 @@ class KOperationEngineAvidemux  extends KSingleOutputOperationEngine
 		KalturaLog::info(print_r($this,true));
 		return $exeCmd;
 	}
-
-	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
-	{
-		parent::operate($operator, $inFilePath, $configFilePath);
-//		KalturaLog::info("operator($operator), inFilePath($inFilePath), configFilePath($configFilePath)");
-	}
 }
