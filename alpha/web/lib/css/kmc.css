@@ -93,6 +93,16 @@ fieldset{ border:0 none; position:relative; }
 		#login #login_swf span a { color: #11B4EE; }
 	#login #login_swf img { margin-top: 30px; }
 
+#notSupported { 
+	display: none;
+	background: #eff;
+	padding: 20px;
+	margin-top: 40px;
+	border-radius: 10px;
+	font-family: Helvetica, Arial;
+}
+.lt-ie8 #notSupported { display: block; }
+
 /*--------------------------------
 	Content
 ---------------------------------*/

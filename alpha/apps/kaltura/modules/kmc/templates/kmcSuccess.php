@@ -11,6 +11,7 @@
 </div><!-- end kmcHeader -->
     
 <div id="login">
+	<div id="notSupported">Thank you for your logging into the Kaltura Management Console. The KMC is no longer supported in Internet Explorer 7. Please upgrade your Internet Explorer to a higher version or browse to the KMC from another browser.</div>
     <div id="login_swf"><img src="/lib/images/kmc/flash.jpg" alt="Install Flash Player" /><span>You must have flash installed. <a href="http://get.adobe.com/flashplayer/" target="_blank">click here to download</a></span></div>
 </div>
 
