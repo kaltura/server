@@ -131,14 +131,25 @@ class KProcessWrapper
 			$this->pipes = null;
 		}
 		
-		if($this->handle && is_resource($this->handle))
+		if($this->handle && is_resource ($this->handle))
 		{
-			KalturaLog::notice("About to kill process : " . $this->processId);
-			if($this->processId && function_exists('posix_kill'))
-				posix_kill($this->processId, 9);
-				
-			proc_terminate($this->handle, 9); //9 is the SIGKILL signal
-			proc_close($this->handle);
+			$status = proc_get_status ( $this->handle );
+			if(!$status ['running'])
+				return;
+			
+			KalturaLog::notice("About to kill process " . $this->processId);
+			if ($this->processId) {
+				if(function_exists ( 'posix_kill' )){
+					posix_kill ( $this->processId, 9 );
+				} else {
+					// Make sure we kill the child process (the PHP)
+					system ( "kill " . $this->processId, $rc );
+				}
+			}
+			
+			proc_terminate ( $this->handle );
+			proc_close ( $this->handle );
+			
 			$this->handle = null;
 		}
 	}
