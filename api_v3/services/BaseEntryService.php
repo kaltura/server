@@ -812,9 +812,8 @@ class BaseEntryService extends KalturaEntryService
 		}
 
 		if(!count($filteredFlavorAssetsDb))
-			throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND, $dbEntry->getId());
+			$result->flavorAssets = KalturaFlavorAssetArray::fromDbArray($filteredFlavorAssetsDb);
 		
-		$result->flavorAssets = KalturaFlavorAssetArray::fromDbArray($filteredFlavorAssetsDb);
 		return $result;
 	}
 	
