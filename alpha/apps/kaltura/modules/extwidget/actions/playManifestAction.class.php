@@ -423,18 +423,17 @@ class playManifestAction extends kalturaAction
 	/**
 	 * @return array
 	 */
-	private function getReadyFlavorsByTags()
+	private function getReadyFlavorsByTags($flavorAssets)
 	{
-		$allFlavors = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
 		foreach ($this->tags as $tagsFallback)
 		{
 			$curFlavors = array();
 			
-			foreach ($allFlavors as $flavorAsset)
+			foreach ($flavorAssets as $flavorAsset)
 			{
 				foreach ($tagsFallback as $tagOption)
 				{
-					if (!$flavorAsset->hasTag($tagOption))
+					if (!$flavorAsset->hasTagExclusive($tagOption))
 						continue;
 					if(!$this->secureEntryHelper->isAssetAllowed($flavorAsset))
 						continue;
@@ -498,15 +497,16 @@ class playManifestAction extends kalturaAction
 		{
 			$flavorAssets = assetPeer::retrieveReadyByEntryId($this->entryId, $this->flavorIds);			
 		}
-
-		// if flavor list empty use the tags
 		if (!$flavorAssets)
 		{
-			$flavorAssets = $this->getReadyFlavorsByTags(); 
+			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId); 
 		}
-
+		
+		// filter flavors by tags		
+		$flavorAssets = $this->getReadyFlavorsByTags($flavorAssets);
+		
 		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
-				
+					
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
 		
