@@ -180,7 +180,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			chmod($filePath, 0750);
 			$dir = dir($filePath);
 			while (false !== ($file = $dir->read()))
-				self::setPermissions($filePath . DIRECTORY_SEPARATOR . $file);
+			{
+				if($file[0] != '.')
+					self::setPermissions($filePath . DIRECTORY_SEPARATOR . $file);
+			}
 			$dir->close();
 		}
 		else
