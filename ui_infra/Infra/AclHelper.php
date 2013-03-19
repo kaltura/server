@@ -32,7 +32,7 @@ class Infra_AclHelper
 	}
 	
 	/**
-	 * 
+	 *
 	 * @param  Zend_Acl_Resource_Interface|string $resource
 	 * @param  string                             $privilege
 	 * @return boolean
@@ -45,7 +45,7 @@ class Infra_AclHelper
 		$acl = Zend_Registry::get('acl');
 		if(!$acl->has($resource))
 		{
-			KalturaLog::err("Resource [$resource] privilege [$privilege] not found!");
+			KalturaLog::info("Resource [$resource] privilege [$privilege] not found!");
 			return false;
 		}
 		$allowed = $acl->isAllowed(self::getCurrentRole(), $resource, $privilege);
@@ -53,7 +53,7 @@ class Infra_AclHelper
 	}
 	
 	/**
-	 * 
+	 *
 	 * @param  Zend_Acl_Resource_Interface|string $resource
 	 * @param  string                             $privilege
 	 * @return boolean
