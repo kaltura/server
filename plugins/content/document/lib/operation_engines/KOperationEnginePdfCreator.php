@@ -47,7 +47,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			}
 			else {
 				// PDF input file copied as is to output file
-				return;
+				return true;
 			}
 		}
 				
@@ -143,6 +143,8 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			}
 			throw new KOperationEngineException('Cannot rename file ['.$tmpFile.'] to ['.$this->outFilePath.'] - ['.$error.']');
 		}
+		
+		return true;
 		
 	}
 		
