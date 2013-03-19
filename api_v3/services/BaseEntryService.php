@@ -872,31 +872,42 @@ class BaseEntryService extends KalturaEntryService
 		{
 			$isSecured = $isSecured || PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT_USED, $dbEntry->getPartnerId());
 			
-			$result->streamerType = $this->getPartner()->getStreamerType();
-			$result->mediaProtocol = $this->getPartner()->getMediaProtocol();
-			if (!$result->streamerType || !$result->mediaProtocol)
+			$defaultDeliveryTypeKey = $this->getPartner()->getDefaultDeliveryType();
+			if (!$defaultDeliveryTypeKey || $defaultDeliveryTypeKey == PlaybackProtocol::AUTO)
 			{
 				$enabledDeliveryTypes = $this->getPartner()->getDeliveryTypes();
-				unset($enabledDeliveryTypes['auto']);
+				foreach ($enabledDeliveryTypes as $enabledDeliveryTypeKey => $values){
+					if (isset($enabledDeliveryTypeKey['streamerType']) && $enabledDeliveryTypeKey['streamerType'] == PlaybackProtocol::AUTO)
+						unset($enabledDeliveryTypes[$enabledDeliveryTypeKey]);					
+				}
+				
+				if (!count($enabledDeliveryTypes))
+					throw new KalturaAPIException(KalturaErrors::DELIVERY_TYPE_NOT_SPECIFIED);
+				
+				$deliveryTypeKeys = array();
 				$deliveryType = null; 
-				if($isSecured && isset($enabledDeliveryTypes[kConf::get('secured_default_delivery_type')]))
-					$deliveryType = kConf::get('secured_default_delivery_type');
-				elseif($dbEntry->getDuration() <= kConf::get('short_entries_max_duration') 
-					&& isset($enabledDeliveryTypes[kConf::get('short_entries_default_delivery_type')]))
-					$deliveryType = kConf::get('short_entries_default_delivery_type');
-				else if (isset($enabledDeliveryTypes[kConf::get('default_delivery_type')]))
-					$deliveryType = kConf::get('default_delivery_type');
-				else if(count($enabledDeliveryTypes))
-					$deliveryType = key($enabledDeliveryTypes);
-				if (!$deliveryType)
-						throw new KalturaAPIException(KalturaErrors::DELIVERY_TYPE_NOT_SPECIFIED);
-						
-				if (!$result->streamerType){
-					$result->streamerType = kDeliveryUtils::getStreamerType($enabledDeliveryTypes[$deliveryType]);
+				if($isSecured)
+					$deliveryTypeKeys[] = 'secured_default_delivery_type';
+				if($dbEntry->getDuration() <= kConf::get('short_entries_max_duration'))
+					$deliveryTypeKeys[] = 'short_entries_default_delivery_type';
+				$deliveryTypeKeys[] = 'default_delivery_type';
+				
+				$deliveryType = key($enabledDeliveryTypes);
+				foreach ($deliveryTypeKeys as $deliveryTypeKey){
+					$deliveryTypeToValidate = kConf::get($deliveryTypeKey);
+                       if (isset ($enabledDeliveryTypes[$deliveryTypeToValidate])){
+                       		$deliveryType = $deliveryTypeToValidate;
+                       		break;
+						}
 				}
-				if (!$result->mediaProtocol){
-					$result->mediaProtocol = kDeliveryUtils::getMediaProtocol($enabledDeliveryTypes[$deliveryType]);
-				}
+				
+				$result->streamerType = kDeliveryUtils::getStreamerType($enabledDeliveryTypes[$deliveryType]);
+				$result->mediaProtocol = kDeliveryUtils::getMediaProtocol($enabledDeliveryTypes[$deliveryType]);
+			}
+			else {
+				$defaultDeliveryType = kConf::get($defaultDeliveryTypeKey);
+				$result->streamerType = kDeliveryUtils::getStreamerType($defaultDeliveryType);
+				$result->mediaProtocol = kDeliveryUtils::getMediaProtocol($defaultDeliveryType);
 			}
 		}
 		
