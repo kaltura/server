@@ -66,12 +66,14 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	/**
 	 * DVR Status Enabled/Disabled
 	 * @var KalturaDVRStatus
+	 * @insertonly
 	 */
 	public $dvrStatus;
 	
 	/**
 	 * Window of time which the DVR allows for backwards scrubbing (in minutes)
 	 * @var int
+	 * @insertonly
 	 */
 	public $dvrWindow;
 	
