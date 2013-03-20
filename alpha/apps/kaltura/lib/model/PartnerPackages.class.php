@@ -3,7 +3,7 @@
 /**
  * @package Core
  * @subpackage config
- */ 
+ */
 class PartnerPackages
 {
 	const PARTNER_PACKAGE_FREE = 1;
@@ -11,7 +11,7 @@ class PartnerPackages
 	
 	const CLASS_OF_SERVICE_SILVER = 1;
 	const CLASS_OF_SERVICE_GOLD = 2;
-	const CLASS_OF_SERVICE_PLATINUM = 3;	
+	const CLASS_OF_SERVICE_PLATINUM = 3;
 	
 	const PACKAGE_SUPPORT_TYPE_NONE = 0;
 	const PACKAGE_SUPPORT_TYPE_COMMUNITY = 1;
@@ -58,16 +58,15 @@ class PartnerPackages
 		
 	}
 	
-	private function flatXml2arr($flatXml) 
+	private function flatXml2arr($flatXml)
 	{
 		$arr = array();
 		$children = $flatXml->children();
 		foreach ($children as $child => $value) {
 			if (!$value->children())
 			{
-				list($key,$val) = each ($value);
-				$arr[$child] = $val;
-			} 
+				$arr[$child] = "$value";
+			}
 			else
 			{
 				$arr[$child] = $this->flatXml2arr($value);
