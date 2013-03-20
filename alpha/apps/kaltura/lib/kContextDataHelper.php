@@ -1,0 +1,352 @@
+<?php
+/**
+ * @package Core
+ * @subpackage utils
+ *
+ */
+class kContextDataHelper
+{
+	/**
+	 * 
+	 * @var array
+	 */
+	private $allowedFlavorAssets = array();
+	
+	/**
+	 * 
+	 * @var bool
+	 */
+	private $isSecured = false;
+	
+	/**
+	 * 
+	 * @var bool
+	 */
+	private $isAdmin = false;
+	
+	/**
+	 * 
+	 * @var bool
+	 */
+	private $disableCache = false;
+	
+	/**
+	 * 
+	 * @var string
+	 */
+	private $selectedTag = null;
+	
+	/**
+	 * the result of applyContext
+	 * @var kEntryContextDataResult
+	 */
+	private $contextDataResult;
+	
+	/**
+	 * 
+	 * @var entry
+	 */
+	private $entry;
+	
+	/**
+	 * 
+	 * @var Partner
+	 */
+	private $partner;
+	
+	/**
+	 * 
+	 * @var asset
+	 */
+	private $asset;
+	
+	private $storageProfilesXML = null;
+	
+	private $streamerType = null;
+	
+	private $mediaProtocol = null;
+	
+	/**
+	 * 
+	 * @param entry $entry
+	 * @param Partner $partner
+	 * @param asset $asset
+	 */
+	public function __construct(entry $entry, Partner $partner, asset $asset = null)
+	{
+		$this->entry = $entry;
+		$this->partner = $partner;
+		$this->asset = $asset;
+	}
+	
+	/**
+	 * @return array $allowedFlavorAssets
+	 */
+	public function getAllowedFlavorAssets() {
+		return $this->allowedFlavorAssets;
+	}
+
+	/**
+	 * @return bool $isAdmin
+	 */
+	public function getIsAdmin() {
+		return $this->isAdmin;
+	}
+
+	/**
+	 * @return bool $disableCache
+	 */
+	public function getDisableCache() {
+		return $this->disableCache;
+	}
+
+	/**
+	 * @return kEntryContextDataResult $contextDataResult
+	 */
+	public function getContextDataResult() {
+		return $this->contextDataResult;
+	}
+
+	/**
+	 * @return string $storageProfilesXML
+	 */
+	public function getStorageProfilesXML() {
+		return $this->storageProfilesXML;
+	}
+
+	/**
+	 * @return string $streamerType
+	 */
+	public function getStreamerType() {
+		return $this->streamerType;
+	}
+
+	/**
+	 * @return string $mediaProtocol
+	 */
+	public function getMediaProtocol() {
+		return $this->mediaProtocol;
+	}
+
+	public function buildContextDataResult(accessControlScope $scope, $flavorTags, $streamerType, $mediaProtocol)
+	{
+		$this->streamerType = $streamerType;
+		$this->mediaProtocol = $mediaProtocol;
+		if($scope->getKs())
+			$this->isAdmin = $scope->getKs()->isAdmin();
+		$this->contextDataResult = new kEntryContextDataResult();
+		
+		$this->applyAccessControlOnContextData($scope);
+		$this->setContextDataFlavorAssets($flavorTags);
+		$this->setContextDataStorageProfilesXml();	
+		$this->setContextDataStreamerTypeAndMediaProtocol();
+		
+	}
+	
+	private function applyAccessControlOnContextData(accessControlScope $accessControlScope)
+	{
+		$accessControl = $this->entry->getAccessControl();		
+		/* @var $accessControl accessControl */
+		if ($accessControl && $accessControl->hasRules())
+		{
+			$this->isSecured = true;
+			$this->disableCache = true;
+			if (kConf::hasMap("optimized_playback"))
+			{
+				$partnerId = $accessControl->getPartnerId();
+				$optimizedPlayback = kConf::getMap("optimized_playback");
+				if (array_key_exists($partnerId, $optimizedPlayback))
+				{
+					$params = $optimizedPlayback[$partnerId];
+					if (array_key_exists('cache_kdp_acccess_control', $params) && $params['cache_kdp_acccess_control'])
+						$this->disableCache = false;
+				}
+			}		
+	        $accessControlScope->setEntryId($this->entry->getId());
+			$this->isAdmin = ($accessControlScope->getKs() && $accessControlScope->getKs()->isAdmin());
+            
+			if($accessControl->applyContext($this->contextDataResult) && $this->disableCache)
+				$this->disableCache = true;
+			else 
+				$this->disableCache = false;
+		}
+	}
+	
+	private function setContextDataFlavorAssets($flavorTags)
+	{
+		$flavorParamsIds = null;
+		$flavorParamsNotIn = false;
+		if(!$this->isAdmin)
+		{
+			foreach ($this->contextDataResult->getAccessControlActions() as $action) 
+			{	
+				if($action->getType() == accessControlActionType::BLOCK)
+				{
+					//in case of block action do not set the list of flavors
+					return;
+				}
+				if($action->getType() == accessControlActionType::LIMIT_FLAVORS)
+				{
+					/* @var $action kAccessControlLimitFlavorsAction */
+					$flavorParamsIds = explode(',', $action->getFlavorParamsIds());
+					$flavorParamsNotIn = $action->getIsBlockedList();
+				}
+			}	
+		}
+		$flavorAssets = array();
+		if (is_null($this->asset))
+		{
+			if(count($flavorParamsIds))
+				$flavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($this->entry->getId(), $flavorParamsIds, $flavorParamsNotIn);
+			else 
+				$flavorAssets = assetPeer::retrieveReadyByEntryId($this->entry->getId());			
+		}
+		else
+		{
+			$flavorAllowed = true;	
+			if(count($flavorParamsIds))
+				$flavorAllowed = $this->isFlavorAllowed($this->asset->getFlavorParamsId(), $flavorParamsIds, $flavorParamsNotIn); 	
+			if($flavorAllowed)
+				$flavorAssets[] = $this->asset;
+		}			
+		$this->filterFlavorAssetsByTags($flavorAssets, $flavorTags);
+	}
+	
+	private function isFlavorAllowed($flavorParamsId, array $flavorParamsIds, $flavorParamsNotIn)
+	{
+		$exists = in_array($flavorParamsId, $flavorParamsIds);
+		if($flavorParamsNotIn)
+			return !$exists;
+		else 
+			return $exists;
+	}
+	
+	private function filterFlavorAssetsByTags($flavorAssets, $flavorTags)
+	{
+		if(!$flavorTags)
+			$flavorTags = flavorParams::TAG_MBR.','.flavorParams::TAG_WEB;
+			
+		$tagsArray = explode(',', $flavorTags);
+				
+		foreach ($tagsArray as $tag) 
+		{
+			$filteredFlavorAssets = array();
+			foreach ($flavorAssets as $flavorAsset) 
+			{
+				if($flavorAsset->hasTag($tag))
+					$filteredFlavorAssets[] = $flavorAsset;
+			}
+			if(count($filteredFlavorAssets))
+			{
+				$this->selectedTag = $tag;
+				break;
+			}
+		}
+		if(count($filteredFlavorAssets))
+			$this->allowedFlavorAssets = $filteredFlavorAssets;
+	}
+	
+	private function setContextDataStorageProfilesXml()
+	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_DELIVERY_PRIORITY, $this->entry->getPartnerId()) &&
+			$this->partner->getStorageServePriority() != StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
+		{
+			$asset = reset($this->allowedFlavorAssets);					
+			$assetSyncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			$fileSyncs = kFileSyncUtils::getAllReadyExternalFileSyncsForKey($assetSyncKey);
+					
+			$storageProfilesXML = new SimpleXMLElement("<StorageProfiles/>");
+			foreach ($fileSyncs as $fileSync)
+			{
+				$storageProfileId = $fileSync->getDc();
+				
+				$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+				
+				if ( !$storageProfile->getDeliveryRmpBaseUrl()
+					&& (!$this->streamerType || $this->streamerType == PlaybackProtocol::AUTO))
+				{
+					$this->streamerType = PlaybackProtocol::HTTP;
+					$this->mediaProtocol = PlaybackProtocol::HTTP;
+				}
+				$storageProfileXML = $storageProfilesXML->addChild("StorageProfile");
+				
+				$storageProfileXML->addAttribute("storageProfileId",$storageProfileId);
+				$storageProfileXML->addChild("Name", $storageProfile->getName());
+				$storageProfileXML->addChild("SystemName", $storageProfile->getSystemName());				
+			}
+
+			$this->storageProfilesXML = $storageProfilesXML->saveXML();			
+		}
+	}
+	
+	
+	private function setContextDataStreamerTypeAndMediaProtocol()
+	{
+		if($this->streamerType && $this->streamerType != PlaybackProtocol::AUTO)
+		{
+			$this->mediaProtocol = $this->mediaProtocol ? $this->mediaProtocol : $this->streamerType;
+		}
+		elseif ($this->entry->getType() == entryType::LIVE_STREAM)
+		{
+			$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', PlaybackProtocol::AKAMAI_HDS);
+			if ($config)	
+				$this->streamerType = PlaybackProtocol::AKAMAI_HDS;	
+			if (!$this->streamerType)
+				$this->streamerType = PlaybackProtocol::RTMP;
+		}
+		else
+		{
+			$this->isSecured = $this->isSecured || PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT_USED, $this->entry->getPartnerId());
+			$forcedDeliveryTypeKey = kDeliveryUtils::getForcedDeliveryTypeKey($this->selectedTag);
+			
+			if($forcedDeliveryTypeKey)
+				$defaultDeliveryTypeKey = $forcedDeliveryTypeKey;
+			else 
+				$defaultDeliveryTypeKey = $this->partner->getDefaultDeliveryType();
+				
+			if (!$defaultDeliveryTypeKey || $defaultDeliveryTypeKey == PlaybackProtocol::AUTO)
+				$deliveryType = $this->selectDeliveryTypeForAuto();
+			else 
+				$deliveryType = kDeliveryUtils::getDeliveryTypeFromConfig($defaultDeliveryTypeKey);
+			
+			$this->streamerType = kDeliveryUtils::getStreamerType($deliveryType);
+			$this->mediaProtocol = kDeliveryUtils::getMediaProtocol($deliveryType);
+		}
+		
+		if ($this->streamerType == PlaybackProtocol::AKAMAI_HD || $this->streamerType == PlaybackProtocol::AKAMAI_HDS)
+			$this->mediaProtocol = PlaybackProtocol::HTTP;
+	}
+	
+	private function selectDeliveryTypeForAuto()
+	{
+		$enabledDeliveryTypes = $this->partner->getDeliveryTypes();
+		foreach ($enabledDeliveryTypes as $enabledDeliveryTypeKey => $values){
+		if (isset($enabledDeliveryTypeKey['streamerType']) && $enabledDeliveryTypeKey['streamerType'] == PlaybackProtocol::AUTO)
+				unset($enabledDeliveryTypes[$enabledDeliveryTypeKey]);					
+		}
+				
+		if (!count($enabledDeliveryTypes))
+			return null;
+		//	throw new KalturaAPIException(KalturaErrors::DELIVERY_TYPE_NOT_SPECIFIED);
+				
+		$deliveryTypeKeys = array();
+		$deliveryTypeName = null; 
+		if($this->isSecured)
+			$deliveryTypeKeys[] = 'secured_default_delivery_type';
+		if($this->entry->getDuration() <= kConf::get('short_entries_max_duration'))
+			$deliveryTypeKeys[] = 'short_entries_default_delivery_type';
+		$deliveryTypeKeys[] = 'default_delivery_type';
+				
+		$deliveryTypeName = key($enabledDeliveryTypes);
+		foreach ($deliveryTypeKeys as $deliveryTypeKey){
+			$deliveryTypeToValidate = kConf::get($deliveryTypeKey);
+            if (isset ($enabledDeliveryTypes[$deliveryTypeToValidate]))
+            {
+             	$deliveryTypeName = $deliveryTypeToValidate;
+                break;
+			}
+		}		
+		$deliveryType = $enabledDeliveryTypes[$deliveryTypeName];	
+		return $deliveryType;
+	}
+}

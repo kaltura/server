@@ -1,18 +1,14 @@
 <?php
 
 class kDeliveryUtils {
-	
-	private static $forceDeliveryTypeForTag = array('widevine' => 'http');
-	
+		
 	/*
 	 * retrieves the streamer type for a delivery type array 
 	 */
-	public static function getStreamerType (array $deliveryType){
-		if (isset($deliveryType['streamerType'])){
-			if ($deliveryType['streamerType'] != PlaybackProtocol::AUTO){
-				return $deliveryType['streamerType'];
-			}
-		}
+	public static function getStreamerType (array $deliveryType)
+	{
+		if ($deliveryType && isset($deliveryType['streamerType']) && $deliveryType['streamerType'] != PlaybackProtocol::AUTO)
+			return $deliveryType['streamerType'];
 		
 		return PlaybackProtocol::HTTP;
 	}
@@ -20,7 +16,8 @@ class kDeliveryUtils {
 	 * retrieves the media protocol for a delivery type array
 	 */
 	public static function getMediaProtocol(array $deliveryType){
-		if (isset($deliveryType['mediaProtocol'])){
+		if (isset($deliveryType['mediaProtocol']))
+		{
 				return $deliveryType['mediaProtocol'];
 		}
 
@@ -29,10 +26,8 @@ class kDeliveryUtils {
 	
 	public static function getForcedDeliveryTypeKey($tag)
 	{
-		if(!$tag)
-			return null;
-		if(array_key_exists($tag, self::$forceDeliveryTypeForTag))
-			return self::$forceDeliveryTypeForTag[$tag];
+		if($tag)
+			return self::getForcedDeliveryTypeFromConfig($tag);
 		else
 			return null;
 		
@@ -59,5 +54,17 @@ class kDeliveryUtils {
 		}
 
 		return $deliveryTypeConfig[$key];
+	}
+	
+	public static function getForcedDeliveryTypeFromConfig($key)
+	{
+		$playersConfig = kConf::getMap('players');
+		if (is_array($playersConfig) && isset($playersConfig['forced_delivery_types']))
+		{
+			$deliveryTypeConfig = $playersConfig['forced_delivery_types'];
+			if (isset($deliveryTypeConfig[$key]))
+				return $deliveryTypeConfig[$key];
+		}
+		return null;
 	}
 }
