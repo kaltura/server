@@ -282,7 +282,7 @@ class kAkamaiUrlManager extends kUrlManager
 
 		return '/' . ltrim($baseUrl, '/') . '.csmil';
 	}
-	
+
 	public function getManifestUrl(array $flavors)
 	{
 		$url = $this->generateCsmilUrl($flavors);
@@ -291,8 +291,9 @@ class kAkamaiUrlManager extends kUrlManager
 		{
 			if (!isset($this->params["hd_secure_ios"]))
 				return null;
-				
-			$url = '/i' . $url . '/master.m3u8';
+
+			$protocolFolder = '/i';
+			$url = $url . '/master.m3u8';
 			$urlPrefix = $this->params["hd_secure_ios"];
 		}
 		else
@@ -300,9 +301,24 @@ class kAkamaiUrlManager extends kUrlManager
 			if (!isset($this->params["hd_secure_hds"]))
 				return null;
 				
-			$url = '/z' . $url . '/manifest.f4m';		
+			$protocolFolder = '/z';
+			$url = $url . '/manifest.f4m';		
 			$urlPrefix = $this->params["hd_secure_hds"];
 		}
-		return array('url' => $url, 'urlPrefix' => $urlPrefix);		
+
+		// move any folders on the url prefix to the url part, so that the protocol folder will always be first
+		$urlPrefixWithProtocol = $urlPrefix;
+		if (strpos($urlPrefix, '://') === false)
+			$urlPrefixWithProtocol = 'http://' . $urlPrefix;
+		
+		$urlPrefixPath = parse_url($urlPrefixWithProtocol, PHP_URL_PATH);
+		if ($urlPrefixPath && substr($urlPrefix, -strlen($urlPrefixPath)) == $urlPrefixPath)
+		{
+			$urlPrefix = substr($urlPrefix, 0, -strlen($urlPrefixPath));
+			$url = rtrim($urlPrefixPath, '/') . '/' . ltrim($url, '/');
+		}
+		
+		return array('url' => $protocolFolder . $url, 'urlPrefix' => $urlPrefix);		
 	}
 }
+	
