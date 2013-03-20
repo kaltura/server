@@ -6,7 +6,7 @@ define("KALTURA_API_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3");
 /**
  * for running the script you need to provide path to ini file like:
  *  --ini=/path/to/config.ini
- *  
+ *
  * to get example code for kmc wrapper add:
  *  --include-code
  *
@@ -31,7 +31,7 @@ $confObj = uiConfDeployment::init($arguments['ini']); // get and read the config
 
 uiConfDeployment::checkArguments($arguments);
 
-uiConfDeployment::$baseTag = $confObj->general->component->name; // gets the application name for the default tags 
+uiConfDeployment::$baseTag = $confObj->general->component->name; // gets the application name for the default tags
 uiConfDeployment::$defaultTags = "autodeploy, ". uiConfDeployment::$baseTag . "_" . $confObj->general->component->version; // create the uiConf default tags (for ui confs of the application)
 uiConfDeployment::$partnerId = $arguments['partner'];
 
@@ -63,7 +63,7 @@ if($includeCode)
 exit(0);
 
 /**
- * 
+ *
  * Used to deploy the ui confs
  * @author Roni
  *
@@ -71,70 +71,70 @@ exit(0);
 class uiConfDeployment
 {
 	/**
-	 * 
+	 *
 	 * The default tags for the ui confs
 	 * @var string
-	 */	
+	 */
 	public static $defaultTags = '';
 	
 	/**
-	 * 
+	 *
 	 * The base tag for the config file
 	 * @var string
 	 */
 	public static $baseTag = "";
 	
 	/**
-	 * 
+	 *
 	 * The arguments for the uiConf deployment
 	 * @var unknown_type
 	 */
 	public static $arguments = array();
 	
 	/**
-	 * 
+	 *
 	 * the partner for the ui conf deployment (currentlly defaulted to null)
 	 * @var int
 	 */
 	public static $partner = null;
 	
 	/**
-	 * 
+	 *
 	 * The tag search array
 	 * @var array<>
 	 */
 	public static $tags_search = array();
 	
 	/**
-	 * 
+	 *
 	 * the partner id for the ui conf deployment (currentlly defaulted to 0)
 	 * @var int
 	 */
 	public static $partnerId = 0;
 	
 	/**
-	 * 
+	 *
 	 * the $subPartnerId for the ui conf deployment (currentlly defaulted to 0)
 	 * @var int
 	 */
 	public static $subPartnerId = 0;
 	
 	/**
-	 * 
+	 *
 	 * the creation mode for the ui conf deployment (currentlly defaulted to 3)
 	 * @var int
 	 */
 	public static $creationMode = 3;
 		
 	/**
-	 * 
+	 *
 	 * the use cdn for the ui conf deployment (currentlly defaulted to 1)
 	 * @var int
 	 */
 	public static $useCdn = 1;
 			
 	/**
-	 * 
+	 *
 	 * deploys the ui conf from the ini file
 	 * @param Zend_Config_Ini $confObj
 	 */
@@ -171,7 +171,7 @@ class uiConfDeployment
 					//Create the ui conf from the xml
 					$uiConf = uiConfDeployment::populateUiconfFromConfig($widgetValue, $baseSwfUrl, $swfName, $objectType, uiConfDeployment::$arguments['disableUrlHashing']);
 												
-					if($uiConf) //If the ui conf was generated successfully 
+					if($uiConf) //If the ui conf was generated successfully
 					{
 						//Then we need to insert the ui conf to the DB (so we can get his id)
 						$uiconf_id = uiConfDeployment::addUiConfThroughPropel($uiConf);
@@ -199,9 +199,9 @@ class uiConfDeployment
 									
 									uiConfDeployment::updateUIConfFile($uiConf, $dependUiConfValue, "@@{$dependencyValue}@@"); // set new value instead of the dependency
 								
-								}								
+								}
 								else
-								{ 
+								{
 									uiConfDeployment::updateFeaturesFile($uiConf, $dependencyValue, "@@{$dependencyName}@@");
 									echo "Missing dependency: {$dependencyName} = {$dependencyValue} for widget: {$widgetName}. Attempting to replace the token in uiconf features file" . PHP_EOL;
 								}
@@ -221,7 +221,7 @@ class uiConfDeployment
 	}
 	
 	/**
-	 * 
+	 *
 	 * Deprectes old ui confs which have the same Tags.
 	 * it replaces their tag from autodeploy to deprecated
 	 * @param string $tag - the tag to depracate
@@ -236,7 +236,7 @@ class uiConfDeployment
 		$oldConfCriteria->addSelectColumn(uiConfPeer::ID);
 		$oldConfCriteria->addSelectColumn(uiConfPeer::TAGS);
 		
-		//Select ID, tags from ui_conf where tags like %$newTag%;  
+		//Select ID, tags from ui_conf where tags like %$newTag%;
 		$uiConfs = BasePeer::doSelect($oldConfCriteria, $con);
 
 		$totalDepractedCount = 0;
@@ -256,7 +256,7 @@ class uiConfDeployment
 			$deprecatedConfValues = new Criteria();
 			$deprecatedConfValues->add(uiConfPeer::TAGS, $deprecatedTag);
 			
-			//Update set tags = $deprecatedTag where ID = $oldUiConf->ID 
+			//Update set tags = $deprecatedTag where ID = $oldUiConf->ID
 			$deprecatedCount = BasePeer::doUpdate($oldConfCriteria, $deprecatedConfValues, $con);
 			
 			echo "uiConf number {$oldUiConf[0]} was updated with the tag = {$deprecatedTag} \n\n";
@@ -264,7 +264,7 @@ class uiConfDeployment
 			$totalDepractedCount += $deprecatedCount;
 		}
 		
-		//Add the status check to the select factor 
+		//Add the status check to the select factor
 		echo "{$totalDepractedCount} uiConfs were updated\n\n\n";
 
 		$count = uiConfPeer::doCount($oldConfCriteria);
@@ -277,7 +277,7 @@ class uiConfDeployment
 	}
 	
 	/**
-	 * 
+	 *
 	 * Sets the value to object if the value is not empty / null
 	 * @param string $value
 	 * @param string $object
@@ -291,7 +291,7 @@ class uiConfDeployment
 	}
 	
 	/**
-	 * 
+	 *
 	 * Used to initialize the ui conf deployment like a bootstarp fiel
 	 * @param unknown_type $conf_file_path
 	 */
@@ -315,24 +315,36 @@ class uiConfDeployment
 		
 		$dbConf = kConf::getDB();
 		DbManager::setConfig($dbConf);
-		DbManager::initialize();		
+		DbManager::initialize();
 		
+		$loggerConfigPath = realpath(KALTURA_ROOT_PATH . DIRECTORY_SEPARATOR . "configurations" . DIRECTORY_SEPARATOR . "logger.ini");
+		try // we don't want to fail when logger is not configured right
+		{
+			$config = new Zend_Config_Ini($loggerConfigPath);
+			$deploy = $config->deploy;
+			
+			KalturaLog::initLog($deploy);
+		}
+		catch(Zend_Config_Exception $ex)
+		{
+		}
+				
 		date_default_timezone_set(kConf::get("date_default_timezone"));
 		
 //		try
 //		{
-			$confObj = new Zend_Config_Ini($conf_file_path);	
+			$confObj = new Zend_Config_Ini($conf_file_path);
 //		}
 //		catch(Exception $ex)
 //		{
 //			echo 'Exiting on ERROR: '.$ex->getMessage().PHP_EOL;
 //			exit(1);
-//		}		
+//		}
 		return $confObj;
  	}
 	
 	/**
-	 * 
+	 *
 	 * Reads the config file from the given path
 	 * @param string $file_path
 	 */
@@ -356,7 +368,7 @@ class uiConfDeployment
 	}
 	
 	/**
-	 * 
+	 *
 	 * Not in use!
 	 * @param int $num
 	 */
@@ -373,14 +385,14 @@ class uiConfDeployment
 	}
 		
 	/**
-	 * 
+	 *
 	 * Add a new uiConf to the DB using propel
 	 * @param uiConf $pe_conf
 	 */
 	public static function addUiConfThroughPropel(uiConf $pe_conf)
 	{
 		global $skipAddUiconf;
-		if($skipAddUiconf) return rand(1000,1200); // return just any number if the no-create flag is on 
+		if($skipAddUiconf) return rand(1000,1200); // return just any number if the no-create flag is on
 		
 		$pe_conf->save();
 		
@@ -407,7 +419,7 @@ class uiConfDeployment
 	}
 	
 	/**
-	 * 
+	 *
 	 * Populate the uiconf from the config
 	 * @param Zend_Config_Ini $widget
 	 * @param string $baseSwfUrl
@@ -443,12 +455,12 @@ class uiConfDeployment
 			$uiconf->setConfFileFeatures(uiConfDeployment::readConfFileFromPath($widget->features));
 		}
 		
-		if($uiconf->getConfFileFeatures() === FALSE) 
+		if($uiconf->getConfFileFeatures() === FALSE)
 		{
 			echo "missing features conf file for uiconf {$widget->name}".PHP_EOL; // conf file is a must, features is not.
 		}
 		
-		//Set values to the ui conf 
+		//Set values to the ui conf
 		$uiconf->setPartnerId(uiConfDeployment::$partnerId);
 		$uiconf->setSubpId(uiConfDeployment::$subPartnerId);
 		$uiconf->setCreationMode(uiConfDeployment::$creationMode);
@@ -473,7 +485,7 @@ class uiConfDeployment
 	}
 	
 	/**
-	 * 
+	 *
 	 * Replaces in the uiConf the given replacmentString with the newValue and saves the changes in the UI conf
 	 * @param uiConf $uiconf
 	 * @param string $newValue
@@ -508,7 +520,7 @@ class uiConfDeployment
 	}
 
 	/**
-	 * 
+	 *
 	 * Updates the player id in the features file
 	 * @param uiConf $uiconf
 	 * @param string $uiconfId
@@ -525,7 +537,7 @@ class uiConfDeployment
 	}
 	
 	/**
-	 * 
+	 *
 	 * Prints the usage info for this script
 	 * @param unknown_type $message
 	 */
@@ -541,7 +553,7 @@ class uiConfDeployment
 	}
 
 	/**
-	 * 
+	 *
 	 * Gets the command line arguments and returns the arguments array
 	 * @param array $argv
 	 * @return array<> $arguments
@@ -571,7 +583,7 @@ class uiConfDeployment
 			
 			if(!isset($arguments[$arg_name])) { uiConfDeployment::printUsage('unknown argument '.$arg_name); }
 			
-			if(is_null($arg_value)) 
+			if(is_null($arg_value))
 				$arg_value = true;
 				
 			$arguments[$arg_name] = $arg_value;
@@ -583,25 +595,25 @@ class uiConfDeployment
 	}
 	
 	/**
-	 * 
+	 *
 	 * Checks that the argument are valid
 	 * @param array $arguments
 	 */
 	public static function checkArguments(array $arguments)
 	{
 		//Checks if the ini argument was given
-		if(!isset($arguments['ini']) || !($arguments['ini']) || is_null($arguments['ini'])) 
-		{ 
-			uiConfDeployment::printUsage('missing argument --ini'); 
+		if(!isset($arguments['ini']) || !($arguments['ini']) || is_null($arguments['ini']))
+		{
+			uiConfDeployment::printUsage('missing argument --ini');
 		}
 		
 		//Checks if the partner argument was given
-		if(!isset($arguments['partner']) || !($arguments['partner']) || is_null($arguments['partner'])) 
-		{ 
-			echo "--partner argument wasn't given. Using defualt partner 0\n"; 
+		if(!isset($arguments['partner']) || !($arguments['partner']) || is_null($arguments['partner']))
+		{
+			echo "--partner argument wasn't given. Using defualt partner 0\n";
 		}
-		else 
-		{		
+		else
+		{
 			self::$partner = PartnerPeer::retrieveByPK($arguments['partner']);
 			if(!self::$partner)
 			{
@@ -610,14 +622,14 @@ class uiConfDeployment
 		}
 		
 		//Check if ini file exists
-		if(!file_exists($arguments['ini'])) 
+		if(!file_exists($arguments['ini']))
 		{
-			uiConfDeployment::printUsage('config file not found '.$arguments['ini']); 
+			uiConfDeployment::printUsage('config file not found '.$arguments['ini']);
 		}
 	}
 	
 	/**
-	 * 
+	 *
 	 * set template partner
 	 */
 	public static function setTemplatePartner()
@@ -630,7 +642,7 @@ class uiConfDeployment
 }
 
 /**
- * 
+ *
  * Used to generate the ui conf deployment code
  * @author Roni
  *
@@ -640,7 +652,7 @@ class uiConfDeploymentCodeGenerator
 	const SEARCH_BY_TAG_FUNCTION_NAME = 'find_confs_by_usage_tag';
 	
 	/**
-	 * 
+	 *
 	 * Generates the code for the code samples
 	 * @return array<string>
 	 */
