@@ -892,30 +892,30 @@ class BaseEntryService extends KalturaEntryService
 					throw new KalturaAPIException(KalturaErrors::DELIVERY_TYPE_NOT_SPECIFIED);
 				
 				$deliveryTypeKeys = array();
-				$deliveryType = null; 
+				$deliveryTypeName = null; 
 				if($isSecured)
 					$deliveryTypeKeys[] = 'secured_default_delivery_type';
 				if($dbEntry->getDuration() <= kConf::get('short_entries_max_duration'))
 					$deliveryTypeKeys[] = 'short_entries_default_delivery_type';
 				$deliveryTypeKeys[] = 'default_delivery_type';
 				
-				$deliveryType = key($enabledDeliveryTypes);
+				$deliveryTypeName = key($enabledDeliveryTypes);
 				foreach ($deliveryTypeKeys as $deliveryTypeKey){
 					$deliveryTypeToValidate = kConf::get($deliveryTypeKey);
                        if (isset ($enabledDeliveryTypes[$deliveryTypeToValidate])){
-                       		$deliveryType = $deliveryTypeToValidate;
+                       		$deliveryTypeName = $deliveryTypeToValidate;
                        		break;
 						}
 				}
 				
-				$result->streamerType = kDeliveryUtils::getStreamerType($enabledDeliveryTypes[$deliveryType]);
-				$result->mediaProtocol = kDeliveryUtils::getMediaProtocol($enabledDeliveryTypes[$deliveryType]);
+				$deliveryType = $enabledDeliveryTypes[$deliveryTypeName];	
 			}
 			else {
-				$defaultDeliveryType = kDeliveryUtils::getDeliveryTypeFromConfig($defaultDeliveryTypeKey);
-				$result->streamerType = kDeliveryUtils::getStreamerType($defaultDeliveryType);
-				$result->mediaProtocol = kDeliveryUtils::getMediaProtocol($defaultDeliveryType);
+				$deliveryType = kDeliveryUtils::getDeliveryTypeFromConfig($defaultDeliveryTypeKey);
 			}
+			
+			$result->streamerType = kDeliveryUtils::getStreamerType($deliveryType);
+			$result->mediaProtocol = kDeliveryUtils::getMediaProtocol($deliveryType);
 		}
 		
 		if ($result->streamerType == KalturaPlaybackProtocol::AKAMAI_HD || $result->streamerType == KalturaPlaybackProtocol::AKAMAI_HDS)
