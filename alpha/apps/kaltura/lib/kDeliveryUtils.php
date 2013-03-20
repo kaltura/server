@@ -2,7 +2,7 @@
 
 class kDeliveryUtils {
 	
-	private static $forceDeliveryTypeForTag = array('exclusive_widevine' => 'http');
+	private static $forceDeliveryTypeForTag = array('widevine' => 'http');
 	
 	/*
 	 * retrieves the streamer type for a delivery type array 

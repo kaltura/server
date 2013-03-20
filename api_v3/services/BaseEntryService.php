@@ -799,14 +799,14 @@ class BaseEntryService extends KalturaEntryService
 			$tags = flavorParams::TAG_MBR.','.flavorParams::TAG_WEB;
 			
 		$tagsArray = explode(',', $tags);
-		if(!in_array(flavorParams::TAG_MBR, $tagsArray))
-			$tagsArray[] = flavorParams::TAG_MBR;
-		if(!in_array(flavorParams::TAG_WEB, $tagsArray))
-			$tagsArray[] = flavorParams::TAG_WEB;
 				
 		foreach ($tagsArray as $tag) 
 		{
-			$filteredFlavorAssetsDb = assetPeer::filterByTagExclusive($flavorAssetsDb, $tag);
+			foreach ($flavorAssetsDb as $flavorAsset) 
+			{
+				if($flavorAsset->hasTag($tag))
+					$filteredFlavorAssetsDb[] = $flavorAsset;
+			}
 			if(count($filteredFlavorAssetsDb))
 			{
 				$selectedTag = $tag;

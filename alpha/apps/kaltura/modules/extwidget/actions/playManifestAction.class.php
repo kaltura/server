@@ -138,8 +138,6 @@ class playManifestAction extends kalturaAction
 	 */
 	private $storageProfile = null;
 	
-	private $usingDefaultTags = false;
-	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	URL tokenization functions
 	
@@ -425,9 +423,9 @@ class playManifestAction extends kalturaAction
 	/**
 	 * @return array
 	 */
-	private function getReadyFlavorsByTags($flavorAssets, $tags)
+	private function getReadyFlavorsByTags($flavorAssets)
 	{
-		foreach ($tags as $tagsFallback)
+		foreach ($this->tags as $tagsFallback)
 		{
 			$curFlavors = array();
 			
@@ -435,7 +433,7 @@ class playManifestAction extends kalturaAction
 			{
 				foreach ($tagsFallback as $tagOption)
 				{
-					if (!$flavorAsset->hasTagExclusive($tagOption))
+					if (!$flavorAsset->hasTag($tagOption))
 						continue;
 					if(!$this->secureEntryHelper->isAssetAllowed($flavorAsset))
 						continue;
@@ -505,12 +503,7 @@ class playManifestAction extends kalturaAction
 		}
 		
 		// filter flavors by tags		
-		$flavorAssets = $this->getReadyFlavorsByTags($flavorAssets, $this->tags);
-		if(!count($flavorAssets) && !$this->usingDefaultTags)
-		{
-			$flavorAssets = $this->getReadyFlavorsByTags($flavorAssets, self::getDefaultTagsByFormat($this->format)); 
-		}
-		
+		$flavorAssets = $this->getReadyFlavorsByTags($flavorAssets);		
 		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
 					
 		// get flavors availability
@@ -1346,11 +1339,15 @@ class playManifestAction extends kalturaAction
 		if (!$this->tags)
 		{
 			$this->tags = self::getDefaultTagsByFormat($this->format);
-			$this->usingDefaultTags = true;
 		}
 		else
 		{
-			$this->tags = array(array($this->tags));
+			$tags = explode(',', $this->tags);
+			$this->tags = array();
+			foreach ($tags as $tag) 
+			{
+				$this->tags[] = array(trim($tag));
+			}
 		}
 				
 		$this->preferredBitrate = $this->getRequestParameter ( "preferredBitrate", null );

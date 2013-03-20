@@ -536,23 +536,6 @@ class assetPeer extends BaseassetPeer
 		return $newAssets;
 	}
 	
-	/**
-	 * Leaves only the specified tag in the flavor assets array, consider exclusive tags
-	 * 
-	 * @param array $assets
-	 * @param string $tag
-	 * @return array<assets>
-	 */
-	public static function filterByTagExclusive(array $assets, $tag)
-	{
-		$newAssets = array();
-		foreach($assets as $asset)
-		{
-			if ($asset->hasTagExclusive($tag))
-				$newAssets[] = $asset;
-		}	
-		return $newAssets;
-	}
 
 	/**
 	 * @param string $entryId
