@@ -44,18 +44,18 @@ class kDeliveryUtils {
 		if (!is_array($playersConfig))
 		{
 			KalturaLog::err('Players section is not defined');
-			return null;
+			return array();
 		}
 		if(!isset($playersConfig['delivery_types']))
 		{
 			KalturaLog::err('Delivery types section is not defined');
-			return null;
+			return array();
 		}
 		$deliveryTypeConfig = $playersConfig['delivery_types'];
 		if (!isset($deliveryTypeConfig[$key]))
 		{
 			KalturaLog::err('The key '.$key.' was not found in the delivery types config section');
-			return null;
+			return array();
 		}
 
 		return $deliveryTypeConfig[$key];
