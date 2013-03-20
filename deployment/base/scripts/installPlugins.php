@@ -2,6 +2,8 @@
 
 require_once(dirname(__FILE__) . '/../../bootstrap.php');
 
+myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_MASTER;
+
 kPluginableEnumsManager::enableNewValues();
 
 $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');

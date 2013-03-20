@@ -9,6 +9,8 @@
 chdir(__DIR__);
 require_once('../../bootstrap.php');
 
+myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_MASTER;
+
 $criteria = new Criteria();
 $criteria->add(entryPeer::PARTNER_ID, 99);
 $templateEntries = entryPeer::doCount($criteria);

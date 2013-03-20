@@ -15,6 +15,9 @@ $dirName = realpath($dirName);
 
 chdir(__DIR__);
 require_once('../../bootstrap.php');
+
+myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_MASTER;
+
 $con = Propel::getConnection(PartnerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 $sharedPartner = PartnerPeer::retrieveByPK(0);
 if($sharedPartner)
