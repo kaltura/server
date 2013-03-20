@@ -696,6 +696,7 @@ class BaseEntryService extends KalturaEntryService
 		$ks = $this->getKs();
 		$isAdmin = false;
 		$isSecured = false; // access control or entitlement enabled
+		$selectedTag = null;
 		if($ks)
 			$isAdmin = $ks->isAdmin();
 			
@@ -710,9 +711,9 @@ class BaseEntryService extends KalturaEntryService
 		}	
 
 		$dbEntryContextResult = $this->applyAccessControlOnContextData($result, $dbEntry, $contextDataParams, $isSecured);
-		$this->setContextDataFlavorAssets($result, $dbEntryContextResult, $dbEntry, $contextDataParams);
+		$this->setContextDataFlavorAssets($result, $dbEntryContextResult, $dbEntry, $contextDataParams, $selectedTag);
 		$this->setContextDataStorageProfilesXml($result, $dbEntry, $contextDataParams);	
-		$this->setContextDataStreamerTypeAndMediaProtocol($result, $dbEntry, $contextDataParams, $isSecured);
+		$this->setContextDataStreamerTypeAndMediaProtocol($result, $dbEntry, $contextDataParams, $isSecured, $selectedTag);
 		
 		return $result;
 	}
@@ -752,7 +753,7 @@ class BaseEntryService extends KalturaEntryService
 		return $dbResult;
 	}
 	
-	private function setContextDataFlavorAssets(KalturaEntryContextDataResult &$result, kEntryContextDataResult $dbEntryContextResult, entry $dbEntry, KalturaEntryContextDataParams $contextDataParams)
+	private function setContextDataFlavorAssets(KalturaEntryContextDataResult &$result, kEntryContextDataResult $dbEntryContextResult, entry $dbEntry, KalturaEntryContextDataParams $contextDataParams, &$selectedTag)
 	{
 		$flavorParamsIds = null;
 		$flavorParamsNotIn = false;
@@ -786,14 +787,13 @@ class BaseEntryService extends KalturaEntryService
 			$asset = assetPeer::retrieveById($contextDataParams->flavorAssetId);				
 			if(!$asset)
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contextDataParams->flavorAssetId);
-				
 			$flavorAllowed = true;	
 			if(count($flavorParamsIds))
 				$flavorAllowed = (in_array($asset->getFlavorParamsId(), $flavorParamsIds) && !$flavorParamsNotIn); 	
 			if($flavorAllowed)
 				$flavorAssetsDb[] = $asset;
-		}		
-			
+		}	
+		
 		$tags = $contextDataParams->flavorTags;
 		if(!$tags)
 			$tags = flavorParams::TAG_MBR.','.flavorParams::TAG_WEB;
@@ -808,10 +808,12 @@ class BaseEntryService extends KalturaEntryService
 		{
 			$filteredFlavorAssetsDb = assetPeer::filterByTagExclusive($flavorAssetsDb, $tag);
 			if(count($filteredFlavorAssetsDb))
+			{
+				$selectedTag = $tag;
 				break;
+			}
 		}
-
-		if(!count($filteredFlavorAssetsDb))
+		if(count($filteredFlavorAssetsDb))
 			$result->flavorAssets = KalturaFlavorAssetArray::fromDbArray($filteredFlavorAssetsDb);
 		
 		return $result;
@@ -852,7 +854,7 @@ class BaseEntryService extends KalturaEntryService
 		return $result;
 	}
 	
-	private function setContextDataStreamerTypeAndMediaProtocol(KalturaEntryContextDataResult &$result, entry $dbEntry, KalturaEntryContextDataParams $contextDataParams, $isSecured)
+	private function setContextDataStreamerTypeAndMediaProtocol(KalturaEntryContextDataResult &$result, entry $dbEntry, KalturaEntryContextDataParams $contextDataParams, $isSecured, $selectedTag)
 	{
 		if($contextDataParams->streamerType && $contextDataParams->streamerType != PlaybackProtocol::AUTO)
 		{
@@ -872,8 +874,12 @@ class BaseEntryService extends KalturaEntryService
 		else
 		{
 			$isSecured = $isSecured || PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT_USED, $dbEntry->getPartnerId());
+			$forcedDeliveryTypeKey = kDeliveryUtils::getForcedDeliveryTypeKey($selectedTag);
 			
-			$defaultDeliveryTypeKey = $this->getPartner()->getDefaultDeliveryType();
+			if($forcedDeliveryTypeKey)
+				$defaultDeliveryTypeKey = $forcedDeliveryTypeKey;
+			else 
+				$defaultDeliveryTypeKey = $this->getPartner()->getDefaultDeliveryType();
 			if (!$defaultDeliveryTypeKey || $defaultDeliveryTypeKey == PlaybackProtocol::AUTO)
 			{
 				$enabledDeliveryTypes = $this->getPartner()->getDeliveryTypes();
@@ -906,7 +912,7 @@ class BaseEntryService extends KalturaEntryService
 				$result->mediaProtocol = kDeliveryUtils::getMediaProtocol($enabledDeliveryTypes[$deliveryType]);
 			}
 			else {
-				$defaultDeliveryType = kConf::get($defaultDeliveryTypeKey);
+				$defaultDeliveryType = kDeliveryUtils::getDeliveryTypeFromConfig($defaultDeliveryTypeKey);
 				$result->streamerType = kDeliveryUtils::getStreamerType($defaultDeliveryType);
 				$result->mediaProtocol = kDeliveryUtils::getMediaProtocol($defaultDeliveryType);
 			}
