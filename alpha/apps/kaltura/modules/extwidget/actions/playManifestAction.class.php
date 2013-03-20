@@ -138,6 +138,8 @@ class playManifestAction extends kalturaAction
 	 */
 	private $storageProfile = null;
 	
+	private $usingDefaultTags = false;
+	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	URL tokenization functions
 	
@@ -423,9 +425,9 @@ class playManifestAction extends kalturaAction
 	/**
 	 * @return array
 	 */
-	private function getReadyFlavorsByTags($flavorAssets)
+	private function getReadyFlavorsByTags($flavorAssets, $tags)
 	{
-		foreach ($this->tags as $tagsFallback)
+		foreach ($tags as $tagsFallback)
 		{
 			$curFlavors = array();
 			
@@ -444,7 +446,7 @@ class playManifestAction extends kalturaAction
 			
 			if ($curFlavors)
 				return $curFlavors;
-		}
+		}		
 		return array();
 	}
 	
@@ -503,7 +505,11 @@ class playManifestAction extends kalturaAction
 		}
 		
 		// filter flavors by tags		
-		$flavorAssets = $this->getReadyFlavorsByTags($flavorAssets);
+		$flavorAssets = $this->getReadyFlavorsByTags($flavorAssets, $this->tags);
+		if(!count($flavorAssets) && !$this->usingDefaultTags)
+		{
+			$flavorAssets = $this->getReadyFlavorsByTags($flavorAssets, self::getDefaultTagsByFormat($this->format)); 
+		}
 		
 		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
 					
@@ -1340,6 +1346,7 @@ class playManifestAction extends kalturaAction
 		if (!$this->tags)
 		{
 			$this->tags = self::getDefaultTagsByFormat($this->format);
+			$this->usingDefaultTags = true;
 		}
 		else
 		{
