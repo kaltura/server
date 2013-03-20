@@ -182,13 +182,13 @@ class kSessionBase
 	
 	public function isWidgetSession()
 	{
-		return ($this->type == self::TYPE_KS) && ($this->user == 0) && (strstr($this->privileges,'widget:1') !== false);
+		return ($this->type == self::TYPE_KS) && $this->isAnonymousSession() && (strstr($this->privileges,'widget:1') !== false);
 	}
 	
 	public function isAnonymousSession()
 	{
-		return 	$this->user == 0;
-	}	
+		return $this->user === '' || $this->user === '0' || is_null($this->user);
+	}
 	
 	// overridable
 	protected function logError($msg)
