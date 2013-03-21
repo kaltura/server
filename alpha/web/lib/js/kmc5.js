@@ -13,7 +13,7 @@ kmc.vars.help_url = kmc.vars.service_url + '/kmc5help.html';
 // Set base URL
 kmc.vars.port = (window.location.port) ? ":" + window.location.port : "";
 kmc.vars.base_url = window.location.protocol + '//' + window.location.hostname + kmc.vars.port;
-kmc.vars.api_url = window.location.protocol + '//' + kmc.vars.host + kmc.vars.port;
+kmc.vars.api_url = window.location.protocol + '//' + kmc.vars.host;
 
 // Holds the minimum version for html5 & kdp with the api_v3 for playlists
 kmc.vars.min_kdp_version_for_playlist_api_v3 = '3.6.15';
