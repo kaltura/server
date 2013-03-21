@@ -7,11 +7,11 @@
 /**
  * Will convert a single flavor and store it in the file system.
  * The state machine of the job is as follows:
- * 	 	get the flavor 
+ * 	 	get the flavor
  * 		convert using the right method
  * 		save recovery file in case of crash
  * 		move the file to the archive
- * 		set the entry's new status and file details 
+ * 		set the entry's new status and file details
  *
  * @package Scheduler
  * @subpackage Conversion
@@ -88,13 +88,13 @@ class KAsyncConvert extends KJobHandlerWorker
 		$this->sharedTempPath = $this->taskConfig->params->sharedTempPath;
 	
 		$res = self::createDir( $this->localTempPath );
-		if ( !$res ) 
+		if ( !$res )
 		{
 			KalturaLog::err( "Cannot continue conversion without temp local directory");
 			return null;
 		}
 		$res = self::createDir( $this->sharedTempPath );
-		if ( !$res ) 
+		if ( !$res )
 		{
 			KalturaLog::err( "Cannot continue conversion without temp shared directory");
 			return null;
@@ -156,7 +156,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		// 2. full output log path
 		// 3. in case of remote engine (almost done) - id/url to query result
  
-// TODO: need to verify that this part can be removed	
+// TODO: need to verify that this part can be removed
 //		if($job->executionAttempts > 1) // is a retry
 //		{
 //			if(strlen($data->destFileSyncLocalPath) && file_exists($data->destFileSyncLocalPath))
@@ -199,7 +199,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		{
 			$isDone = $this->operationEngine->operate($operator, $data->actualSrcFileSyncLocalPath);
 			
-			$this->stopMonitor();	
+			$this->stopMonitor();
 				
 			$jobMessage = "engine [" . get_class($this->operationEngine) . "] converted successfully. ";
 			if($this->operationEngine->getMessage())
@@ -209,16 +209,16 @@ class KAsyncConvert extends KJobHandlerWorker
 			{
 				return $this->closeJob($job, null, null, $jobMessage, KalturaBatchJobStatus::ALMOST_DONE, $data);
 			}
-			else 
+			else
 			{
 				$job = $this->updateJob($job, $jobMessage, KalturaBatchJobStatus::MOVEFILE, $data);
-				return $this->moveFile($job, $data);				
-			}			
+				return $this->moveFile($job, $data);
+			}
 		}
 		catch(KOperationEngineException $e)
 		{
 			$log = $this->operationEngine->getLogData();
-			//removing unsuported XML chars 
+			//removing unsuported XML chars
 			$log  = preg_replace('/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u','',$log);
 			if($log && strlen($log))
 			{
@@ -238,7 +238,7 @@ class KAsyncConvert extends KJobHandlerWorker
 
 	protected function getOperator(KalturaConvartableJobData $data)
 	{
-		if(isset($data->flavorParamsOutput)) 
+		if(isset($data->flavorParamsOutput))
 		{
 			$operatorsSet = new kOperatorSets();
 			$operatorsSet->setSerialized(/*stripslashes*/($data->flavorParamsOutput->operators));
@@ -296,13 +296,13 @@ class KAsyncConvert extends KJobHandlerWorker
 		if($data->logFileSyncLocalPath && file_exists($data->logFileSyncLocalPath))
 		{
 			kFile::moveFile($data->logFileSyncLocalPath, "$sharedFile.log");
-			@chmod("$sharedFile.log", 0777);
+			$this->setFilePermissions("$sharedFile.log");
 			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
 		
 			if($this->taskConfig->params->isRemoteOutput) // for remote conversion
 				$data->logFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->logFileSyncLocalPath);
 		}
-		else 
+		else
 		{
 			$data->logFileSyncLocalPath = '';
 		}

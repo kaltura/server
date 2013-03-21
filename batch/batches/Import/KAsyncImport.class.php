@@ -378,7 +378,7 @@ class KAsyncImport extends KJobHandlerWorker
 				$fileSize = kFile::fileSize($sharedFile);
 			}
 
-			@chmod($sharedFile, 0777);
+			$this->setFilePermissions($sharedFile);
 
 			$data = $job->data;
 			$data->destFileLocalPath = $sharedFile;

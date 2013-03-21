@@ -7,11 +7,11 @@
 /**
  * Will convert a collection of flavors and store it in the file system.
  * The state machine of the job is as follows:
- * 	 	get the flavors 
+ * 	 	get the flavors
  * 		convert using the right method
  * 		save recovery file in case of crash
  * 		move the file to the archive
- * 		set the entry's new status and file details 
+ * 		set the entry's new status and file details
  *
  * @package Scheduler
  * @subpackage Conversion
@@ -205,7 +205,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 				'path' => $sharedPath,
 				'size' => $fileSize,
 			);
-		} 
+		}
 		
 		foreach($files2move as $file2move)
 		{
@@ -229,12 +229,12 @@ class KAsyncConvertCollection extends KAsyncConvert
 				KalturaLog::err("Error: moving file [$srcPath] failed");
 				die();
 			}
-			@chmod($destPath, 0777);
+			$this->setFilePermissions($destPath);
 		}
 		
 		$data->destDirLocalPath = $this->translateLocalPath2Shared($this->sharedTempPath);
 		if($this->taskConfig->params->isRemoteOutput) // for remote conversion
-		{			
+		{
 			$data->destDirRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destDirLocalPath);
 			$job->status = KalturaBatchJobStatus::ALMOST_DONE;
 			$job->message = "Files ready for download";

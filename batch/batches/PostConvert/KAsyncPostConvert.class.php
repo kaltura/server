@@ -7,13 +7,13 @@
 /**
  * Will convert a single flavor and store it in the file system.
  * The state machine of the job is as follows:
- * 	 	get the flavor 
+ * 	 	get the flavor
  * 		convert using the right method
  * 		save recovery file in case of crash
  * 		move the file to the archive
- * 		set the entry's new status and file details 
+ * 		set the entry's new status and file details
  *
- * 
+ *
  * @package Scheduler
  * @subpackage Post-Convert
  */
@@ -91,7 +91,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 				KalturaLog::info("Media info engine [" . get_class($engine) . "]");
 				$mediaInfo = $engine->getMediaInfo();
 			}
-			else 
+			else
 			{
 				$err = "Media info engine not found for job subtype [".$job->jobSubType."]";
 				KalturaLog::info($err);
@@ -121,7 +121,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			if(!$data->createThumb)
 				return $this->closeJob($job, null, null, "Media info id $createdMediaInfo->id saved", KalturaBatchJobStatus::FINISHED, $data);
 			
-			// creates a temp file path 
+			// creates a temp file path
 			$rootPath = $this->taskConfig->params->localTempPath;
 			$this->createDir($rootPath);
 				
@@ -172,7 +172,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	{
 		KalturaLog::debug("moveFile($job->id, $data->thumbPath)");
 		
-		// creates a temp file path 
+		// creates a temp file path
 		$rootPath = $this->taskConfig->params->sharedTempPath;
 		if(! is_dir($rootPath))
 		{
@@ -183,7 +183,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			}
 			else
 			{
-				// already exists but not a directory 
+				// already exists but not a directory
 				$err = "Cannot create temp thumbnail directory [$rootPath] due to an error. Please fix and restart";
 				throw new Exception($err, -1);
 			}
@@ -201,7 +201,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			throw new Exception($err, -1);
 		}
 		
-		@chmod($sharedFile, 0777);
+		$this->setFilePermissions($sharedFile);
 		$data->thumbPath = $sharedFile;
 		$job->data = $data;
 		return $job;

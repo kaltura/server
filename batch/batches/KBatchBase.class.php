@@ -390,6 +390,25 @@ abstract class KBatchBase implements IKalturaLogger
 	  return $ret;
 	}
 
+	protected function setFilePermissions($filePath)
+	{
+		if(is_dir($filePath))
+		{
+			@chmod($filePath, 0770);
+			$dir = dir($filePath);
+			while (false !== ($file = $dir->read()))
+			{
+				if($file[0] != '.')
+					$this->setFilePermissions($filePath . DIRECTORY_SEPARATOR . $file);
+			}
+			$dir->close();
+		}
+		else
+		{
+			@chmod($filePath, 0660);
+		}
+	}
+	
 	/**
 	 * @param string $file
 	 * @param int $size
@@ -397,6 +416,8 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	protected function checkFileExists($file, $size = null)
 	{
+		$this->setFilePermissions($file);
+		
 		if($this->isUnitTest)
 		{
 			KalturaLog::debug("Is in unit test");

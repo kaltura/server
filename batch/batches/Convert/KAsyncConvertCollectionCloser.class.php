@@ -7,7 +7,7 @@
 /**
  * Will close almost done conversions that sent to remote systems and store the files in the file system.
  * The state machine of the job is as follows:
- * 	 	get almost done conversions 
+ * 	 	get almost done conversions
  * 		check the convert status
  * 		download the converted file
  * 		save recovery file in case of crash
@@ -52,14 +52,14 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 		$this->sharedTempPath = $this->taskConfig->params->sharedTempPath;
 	
 		$res = self::createDir( $this->localTempPath );
-		if ( !$res ) 
+		if ( !$res )
 		{
 			KalturaLog::err( "Cannot continue conversion without temp local directory");
 			return null;
 		}
 		
 		$res = self::createDir( $this->sharedTempPath );
-		if ( !$res ) 
+		if ( !$res )
 		{
 			KalturaLog::err( "Cannot continue conversion without temp shared directory");
 			return null;
@@ -69,7 +69,7 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 	}
 	
 	private function closeConvert(KalturaBatchJob $job, KalturaConvertCollectionJobData $data)
-	{		
+	{
 		KalturaLog::debug("closeConvertCollection($job->id)");
 	
 		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
@@ -153,7 +153,7 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 				'path' => $sharedPath,
 				'size' => $fileSize,
 			);
-		} 
+		}
 		
 		foreach($files2move as $file2move)
 		{
@@ -172,7 +172,7 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 				KalturaLog::err("Error: moving file [$srcPath] failed");
 				die();
 			}
-			@chmod($destPath, 0777);
+			$this->setFilePermissions($destPath);
 		}
 		
 		$data->destDirLocalPath = $this->translateLocalPath2Shared($this->sharedTempPath);
