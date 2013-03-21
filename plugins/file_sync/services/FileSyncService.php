@@ -20,7 +20,7 @@ class FileSyncService extends KalturaBaseService
 	
 	/**
 	 * List file syce objects by filter and pager
-	 * 
+	 *
 	 * @action list
 	 * @param KalturaFileSyncFilter $filter
 	 * @param KalturaFilterPager $pager
@@ -70,7 +70,6 @@ class FileSyncService extends KalturaBaseService
 		
 		list($file_root, $real_path) = kPathManager::getFilePathArr($key);
 		$full_path = $file_root . $real_path;
-		chmod($full_path, 0644);
 		
 		if(file_exists($full_path))
 		{
@@ -79,7 +78,7 @@ class FileSyncService extends KalturaBaseService
 			$dbFileSync->setFileSizeFromPath($full_path);
 			$dbFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
 		}
-		else 
+		else
 		{
 			$dbFileSync->setFileSize(-1);
 			$dbFileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
