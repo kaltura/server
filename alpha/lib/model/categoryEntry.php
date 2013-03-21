@@ -124,10 +124,7 @@ class categoryEntry extends BasecategoryEntry {
 		
 				if($entry && !categoryEntryPeer::getSkipSave()) //entry might be deleted - and delete job remove the categoryEntry object
 				{
-					$categoryIds = array_unique ($this->entryCategoriesRemovedIds);
-					$leftCategories = array_diff($categoryIds, array($category->getId()));
-					$entry->setCategoriesIds(implode(entry::ENTRY_CATEGORY_SEPARATOR, $leftCategories));
-					
+					$entry->setCategoriesIds(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categoriesIds));
 					$entry->save();
 				}
 				kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
