@@ -16,7 +16,7 @@ class kDeliveryUtils {
 	 * retrieves the media protocol for a delivery type array
 	 */
 	public static function getMediaProtocol(array $deliveryType){
-		if (isset($deliveryType['mediaProtocol']))
+		if ($deliveryType && isset($deliveryType['mediaProtocol']))
 		{
 				return $deliveryType['mediaProtocol'];
 		}
