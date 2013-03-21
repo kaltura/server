@@ -703,7 +703,10 @@ class BaseEntryService extends KalturaEntryService
 			
 		$contextDataHelper = new kContextDataHelper($dbEntry, $this->getPartner(), $asset);
 		
-		$accessControlScope = $dbEntry->getAccessControl()->getScope();
+		if ($dbEntry->getAccessControl() && $dbEntry->getAccessControl()->hasRules())
+			$accessControlScope = $dbEntry->getAccessControl()->getScope();
+		else 
+			$accessControlScope = new accessControlScope();			
 		$contextDataParams->toObject($accessControlScope);
 		
 		$contextDataHelper->buildContextDataResult($accessControlScope, $contextDataParams->flavorTags, $contextDataParams->streamerType, $contextDataParams->mediaProtocol);
