@@ -93,6 +93,14 @@ function cUrl($url, $localFilePath, &$headers, $followLocation = true)
 
 require_once realpath(__DIR__ . '/../../') . '/lib/KalturaClient.php';
 
+class SanityTestLogger implements IKalturaLogger
+{
+	function log($msg)
+	{
+		echo "Client: $msg\n";
+	}
+}
+
 $clientConfig = new KalturaConfiguration();
 $clientConfig->partnerId = null;
 foreach($config['client'] as $field => $value)
