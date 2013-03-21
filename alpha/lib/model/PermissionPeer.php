@@ -4,7 +4,7 @@
 /**
  * Skeleton subclass for performing query and update operations on the 'permission' table.
  *
- * 
+ *
  *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
@@ -75,7 +75,7 @@ class PermissionPeer extends BasePermissionPeer
 		if(is_null(self::$s_criteria_filter))
 			self::$s_criteria_filter = new criteriaFilter();
 		
-		$c = new Criteria(); 
+		$c = new Criteria();
 		$c->add(self::STATUS, PermissionStatus::DELETED,Criteria::NOT_EQUAL);
 		self::$s_criteria_filter->setFilter($c);
 	}
@@ -193,11 +193,11 @@ class PermissionPeer extends BasePermissionPeer
 	public static function getByNameAndPartner($permissionName, $partnerIdsArray)
 	{
 		$c = new Criteria();
-		if (
-				(is_array($partnerIdsArray) && !in_array('*', $partnerIdsArray, true))
-				||
-				(!is_array($partnerIdsArray) && $partnerIdsArray != '*')
-			) 
+		
+		if(!is_array($partnerIdsArray))
+			$partnerIdsArray = array($partnerIdsArray);
+			
+		if(!in_array('*', $partnerIdsArray, true))
 		{
 			$partnerIdsArray = array_map('strval', $partnerIdsArray);
 			$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
@@ -335,7 +335,7 @@ class PermissionPeer extends BasePermissionPeer
 	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("permission:partnerId=%s", self::PARTNER_ID));		
+		return array(array("permission:partnerId=%s", self::PARTNER_ID));
 	}
 } // PermissionPeer
 
