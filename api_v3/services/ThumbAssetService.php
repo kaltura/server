@@ -80,10 +80,7 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
 		$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
 		$dbThumbAsset->save();
-	
-		if($dbEntry->getCreateThumb() && $dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-			$this->setAsDefaultAction($dbThumbAsset->getId());
-		
+
 		$thumbAsset = new KalturaThumbAsset();
 		$thumbAsset->fromObject($dbThumbAsset);
 		return $thumbAsset;
@@ -949,12 +946,11 @@ class ThumbAssetService extends KalturaAssetService
 	 * @action getUrl
 	 * @param string $id
 	 * @param int $storageId
-	 * @param KalturaThumbParams $thumbParams
 	 * @return string
 	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::THUMB_ASSET_IS_NOT_READY
 	 */
-	public function getUrlAction($id, $storageId = null, KalturaThumbParams $thumbParams = null)
+	public function getUrlAction($id, $storageId = null)
 	{
 		$assetDb = assetPeer::retrieveById($id);
 		if (!$assetDb || !($assetDb instanceof thumbAsset))
@@ -969,14 +965,10 @@ class ThumbAssetService extends KalturaAssetService
 				throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
 			}	
 		}
-		
 
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
 
-		if ($thumbParams)
-			return $this->serveAction($id, null, $thumbParams);
-			
 		if($storageId)
 			return $assetDb->getExternalUrl($storageId);
 			
