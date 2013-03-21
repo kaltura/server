@@ -66,6 +66,8 @@ class asperaMgr extends kFileTransferMgr
 			$cmd = "(echo $this->pass) | $this->ascpCmd ";
 		//creating folders on remote server
 		$cmd.= " -d ";
+		//when connecting to a remote host and prompted to accept a host key, ascp ignores the request
+		$cmd.=" --ignore-host-key ";
 		$cmd.=" -P $this->port ";
 		if ($this->privKeyFile)
 			$cmd.=" -i $this->privKeyFile ";

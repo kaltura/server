@@ -179,6 +179,9 @@ class HuluDistributionEngine extends DistributionEngine implements
 		else 
 			$cmd = "(echo $password) | ascp ";
 		$cmd.=" -P $port ";
+		
+		//when connecting to a remote host and prompted to accept a host key, ascp ignores the request
+		$cmd.=" --ignore-host-key ";
 		if ($privateKeyTempPath)
 			$cmd.=" -i $privateKeyTempPath ";
 		return $cmd;
