@@ -1,4 +1,3 @@
-LogLevel debug
 SSLPassPhraseDialog  builtin
 SSLSessionCache         shmcb:/var/cache/mod_ssl/scache(512000)
 SSLSessionCacheTimeout  300
@@ -9,8 +8,8 @@ SSLCryptoDevice builtin
 
 #SSLCertificateFile /etc/@KALTURA_VIRTUAL_HOST_NAME@.crt 
 #SSLCertificateKeyFile /etc/@KALTURA_VIRTUAL_HOST_NAME@.private.key
-SSLCertificateFile /etc/pki/tls/certs/@KALTURA_VIRTUAL_HOST_NAME@.crt
-SSLCertificateKeyFile /etc/pki/tls/private/@KALTURA_VIRTUAL_HOST_NAME@.key
+#SSLCertificateFile /etc/pki/tls/certs/@KALTURA_VIRTUAL_HOST_NAME@.crt
+#SSLCertificateKeyFile /etc/pki/tls/private/@KALTURA_VIRTUAL_HOST_NAME@.key
 
 <VirtualHost @KALTURA_FULL_VIRTUAL_HOST_NAME@>
 	SSLEngine on
