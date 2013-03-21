@@ -328,7 +328,10 @@ class kContextDataHelper
 		}
 				
 		if (!count($enabledDeliveryTypes))
+		{
+			KalturaLog::err('At least one non auto delivery type must be specified');
 			return null;
+		}
 		//	throw new KalturaAPIException(KalturaErrors::DELIVERY_TYPE_NOT_SPECIFIED);
 				
 		$deliveryTypeKeys = array();
