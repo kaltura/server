@@ -251,7 +251,9 @@ class kContextDataHelper
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_DELIVERY_PRIORITY, $this->entry->getPartnerId()) &&
 			$this->partner->getStorageServePriority() != StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
 		{
-			$asset = reset($this->allowedFlavorAssets);					
+			$asset = reset($this->allowedFlavorAssets);		
+			if(!$asset)
+				return;			
 			$assetSyncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			$fileSyncs = kFileSyncUtils::getAllReadyExternalFileSyncsForKey($assetSyncKey);
 					
