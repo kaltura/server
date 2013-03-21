@@ -28,6 +28,7 @@
 // @ignore
 // ===================================================================================================
 
+require_once(dirname(__file__) . '/lib/KalturaSession.php');
 require_once(dirname(__file__) . '/lib/KalturaCommandLineParser.php');
 require_once(dirname(__file__) . '/lib/KalturaCurlWrapper.php');
 require_once(dirname(__file__) . '/kalcliSwitches.php');
@@ -66,6 +67,8 @@ function formatResponse($resp, $indent = '')
 		return $result;
 	}
 }
+
+KalturaSecretRepository::init();
 
 // parse command line
 $options = KalturaCommandLineParser::parseArguments($commandLineSwitches);
@@ -110,6 +113,22 @@ if (!isset($options['no-stdin']))
 
 if (!isset($options['raw']))
 	$params['format'] = '3';      # PHP
+	
+// renew all ks'es
+if (!isset($options['no-renew']))
+{
+	foreach ($params as $key => &$value)
+	{
+		if ($key != 'ks' && !preg_match('/[\d]+:ks/', $key))
+			continue;
+
+		$renewedKs = KalturaSession::extendKs($value);
+		if (!$renewedKs)
+			continue;
+		
+		$value = $renewedKs;
+	}
+}
 
 // get the service url
 if (isset($options['url']) && is_string($options['url']))
