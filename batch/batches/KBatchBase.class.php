@@ -394,7 +394,7 @@ abstract class KBatchBase implements IKalturaLogger
 	{
 		if(is_dir($filePath))
 		{
-			@chmod($filePath, 0770);
+			@chmod($filePath, 0750);
 			$dir = dir($filePath);
 			while (false !== ($file = $dir->read()))
 			{
@@ -405,7 +405,7 @@ abstract class KBatchBase implements IKalturaLogger
 		}
 		else
 		{
-			@chmod($filePath, 0660);
+			@chmod($filePath, 0640);
 		}
 	}
 	
