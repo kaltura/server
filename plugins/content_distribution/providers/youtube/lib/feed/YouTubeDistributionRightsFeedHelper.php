@@ -156,9 +156,9 @@ class YouTubeDistributionRightsFeedHelper
 		}
 
 		if ($this->isAttribute($xpathItem))
-			$node->setAttribute(str_replace('@', '', $xpathItem), htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
+			$node->setAttribute(str_replace('@', '', $xpathItem), htmlspecialchars($value, ENT_COMPAT, 'UTF-8')); // ENT_COMPAT to leave single-quotes as is
 		else
-			$node->nodeValue = htmlspecialchars($value, ENT_NOQUOTES, 'UTF-8');
+			$node->nodeValue = htmlspecialchars($value, ENT_NOQUOTES, 'UTF-8'); // do not encode any quotes
 	}
 
 	public function setNotificationEmail(array $fieldValues)
