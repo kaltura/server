@@ -902,8 +902,6 @@ class Partner extends BasePartner
 	public function setMonthlyStorageOveragePrice($v)	{$this->putInCustomData('monthly_storage_overage_price', $v);}
 	public function setMonthlyStorageAndBandwidthOveragePrice($v)	{$this->putInCustomData('monthly_storage_and_bandwidth_overage_price', $v);}
 	public function setEndUsersOveragePrice($v)			{$this->putInCustomData('end_users_overage_price', $v);}
-	public function setStreamerType($v)					{$this->putInCustomData('streamer_type', $v);}
-	public function setMediaProtocol($v)				{$this->putInCustomData('media_protocol', $v);}
 	
 	public function setAdminLoginUsersOverageUnit($v)	{$this->putInCustomData('admin_login_users_overage_unit', $v);}
 	public function setPublishersOverageUnit($v)		{$this->putInCustomData('publishers_overage_unit', $v);}
@@ -941,8 +939,6 @@ class Partner extends BasePartner
 	public function getMonthlyStorageOveragePrice()		{return $this->getFromCustomData('monthly_storage_overage_price');}
 	public function getMonthlyStorageAndBandwidthOveragePrice()	{return $this->getFromCustomData('monthly_storage_and_bandwidth_overage_price');}
 	public function getEndUsersOveragePrice()			{return $this->getFromCustomData('end_users_overage_price');}
-	public function getStreamerType()					{return $this->getFromCustomData('streamer_type');}
-	public function getMediaProtocol()					{return $this->getFromCustomData('media_protocol');}
 	
 	public function getAdminLoginUsersOverageUnit()		{return $this->getFromCustomData('admin_login_users_overage_unit');}
 	public function getPublishersOverageUnit()			{return $this->getFromCustomData('publishers_overage_unit');}
@@ -956,7 +952,7 @@ class Partner extends BasePartner
     public function getMaxLoginAttemptsOverageUnit()    {return $this->getFromCustomData('login_attempts_overage_unit');}
     public function getMaxBulkSizeOverageUnit()         {return $this->getFromCustomData('bulk_size_overage_unit');}
 	public function getAutoModerateEntryFilter()         {return $this->getFromCustomData('auto_moderate_entry_filter');}
-    	public function getCacheFlavorVersion()       {return $this->getFromCustomData('cache_flavor_version');}
+    public function getCacheFlavorVersion()       {return $this->getFromCustomData('cache_flavor_version');}
 	
 	
 	/**
