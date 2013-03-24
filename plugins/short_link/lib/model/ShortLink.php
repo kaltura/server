@@ -93,7 +93,9 @@ class ShortLink extends BaseShortLink {
 				$dcChar = '0';
 				
 			$id = $dcChar . kString::generateStringId(3);
+			ShortLinkPeer::setUseCriteriaFilter(false);
 			$existingObject = ShortLinkPeer::retrieveByPK($id);
+			ShortLinkPeer::setUseCriteriaFilter(true);
 			
 			if ($existingObject)
 				KalturaLog::log("id [$id] already exists");
