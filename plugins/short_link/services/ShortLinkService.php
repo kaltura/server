@@ -20,7 +20,7 @@ class ShortLinkService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		if($actionName != 'goto' && $actionName != 'add')
+		if($actionName != 'goto')
 		{
 			$this->applyPartnerFilterForClass('ShortLink');
 			$this->applyPartnerFilterForClass('kuser');
