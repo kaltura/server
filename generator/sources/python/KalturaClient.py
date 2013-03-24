@@ -30,11 +30,13 @@ from KalturaClientBase import *
 from xml.parsers.expat import ExpatError
 from xml.dom import minidom
 from threading import Timer
+from StringIO import StringIO
 import hashlib
 import random
 import base64
 import socket
 import urllib
+import gzip
 import time
 import sys
 import os
@@ -212,6 +214,7 @@ class KalturaClient:
 
     @staticmethod
     def openRequestUrl(url, params, files, requestHeaders):
+        requestHeaders['Accept-encoding'] = 'gzip'
         if len(files.get()) == 0:
             data = None
             if params != None:
@@ -242,6 +245,12 @@ class KalturaClient:
                 raise KalturaClientException(e, KalturaClientException.ERROR_READ_TIMEOUT)
             except Exception, e:
                 raise KalturaClientException(e, KalturaClientException.ERROR_READ_FAILED)
+            if f.info().get('Content-Encoding') == 'gzip':
+                gzipFile = gzip.GzipFile(fileobj=StringIO(data))
+                try:
+                    data = gzipFile.read()
+                except IOError, e:
+                    raise KalturaClientException(e, KalturaClientException.ERROR_READ_GZIP_FAILED)
         finally:
             if requestTimeout != None:
                 readTimer.cancel()

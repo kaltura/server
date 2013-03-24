@@ -245,6 +245,7 @@ class KalturaClientException(Exception):
     ERROR_INVALID_OBJECT_TYPE = -7
     ERROR_RESULT_NOT_FOUND = -8
     ERROR_READ_TIMEOUT = -9
+    ERROR_READ_GZIP_FAILED = -10
   
     def __init__(self, message, code):
         self.code = code

@@ -233,16 +233,11 @@ print multiResult[1].totalCount
 client.setKs(multiResult[0])
 
 # error
-mediaEntry = KalturaMediaEntry()
-mediaEntry.setName("Error media entry")
-mediaEntry.setMediaType(KalturaMediaType(KalturaMediaType.VIDEO))
-
 try:
-    mediaEntry = client.media.addFromUploadedFile(mediaEntry, 'blkjfalkj')
+    mediaEntry = client.media.get('invalid entry id')
     assert(False)
 except KalturaException, e:
-    assert(e.message == 'The uploaded file was not found by the given token id, or was already used')
-    assert(e.code == 'UPLOADED_FILE_NOT_FOUND_BY_TOKEN')
+    assert(e.code == 'ENTRY_ID_NOT_FOUND')
 
 # multi request error
 client = KalturaClient(GetConfig())
@@ -252,16 +247,12 @@ client.startMultiRequest()
 ks = client.session.start(ADMIN_SECRET, USER_NAME, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "")
 client.setKs(ks)
 
-mediaEntry = KalturaMediaEntry()
-mediaEntry.setName("Error media entry")
-mediaEntry.setMediaType(KalturaMediaType(KalturaMediaType.VIDEO))
-client.media.addFromUploadedFile(mediaEntry, 'blkjfalkj')
+mediaEntry = client.media.get('invalid entry id')
 
 multiResult = client.doMultiRequest()
 client.setKs(multiResult[0])
 assert(isinstance(multiResult[1], KalturaException))
-assert(multiResult[1].message == 'The uploaded file was not found by the given token id, or was already used')
-assert(multiResult[1].code == 'UPLOADED_FILE_NOT_FOUND_BY_TOKEN')
+assert(multiResult[1].code == 'ENTRY_ID_NOT_FOUND')
 
 SampleMetadataOperations()
 AdvancedMultiRequestExample()
