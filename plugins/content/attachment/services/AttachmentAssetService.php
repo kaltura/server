@@ -449,8 +449,6 @@ class AttachmentAssetService extends KalturaAssetService
 		
 		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, accessControlContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload();
-		if(!$securyEntryHelper->isAssetAllowed($attachmentAsset))
-			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
 		
 		$ext = $attachmentAsset->getFileExt();
 		if(is_null($ext))

@@ -410,9 +410,6 @@ class CaptionAssetService extends KalturaAssetService
 		
 		if(!$captionAsset)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_PARAMS_ID_NOT_FOUND, $captionParamId);
-			
-		if(!$securyEntryHelper->isAssetAllowed($captionAsset))
-			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_PARAMS_ID_NOT_FOUND, $captionParamId);
 		
 		$fileName = $captionAsset->getId() . '.' . $captionAsset->getFileExt();
 		
@@ -520,8 +517,7 @@ class CaptionAssetService extends KalturaAssetService
 		
 		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, accessControlContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload();
-		if(!$securyEntryHelper->isAssetAllowed($captionAsset))
-			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
+		
 
 		$ext = $captionAsset->getFileExt();
 		if(is_null($ext))
