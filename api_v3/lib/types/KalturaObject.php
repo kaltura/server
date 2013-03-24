@@ -274,7 +274,7 @@ abstract class KalturaObject
 				$fromObjectClassCode = $this->generateFromObjectClass($srcObj, $fromObjectClass);
 				if (!$fromObjectClassCode)
 					return;
-				file_put_contents($cacheFileName, $fromObjectClassCode);
+				kFile::safeFilePutContents($cacheFileName, $fromObjectClassCode);
 			}
 	
 			require_once($cacheFileName);
